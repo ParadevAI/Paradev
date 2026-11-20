@@ -427,10 +427,10 @@ export function gbHourPackPricePerGbHour(pack: GbHourPack): number {
 	return (pack.price * 60) / pack.gbMinutes;
 }
 
-/** The purchasable lineup, one entry per family, ordered for display. */
 /** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
 const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
 
+/** The purchasable lineup, one entry per family, ordered for display. */
 export function planCatalogFromAutumn(
 	plans: AutumnCatalogPlan[],
 ): PlanFamily[] {

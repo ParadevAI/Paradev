@@ -264,9 +264,7 @@ describe("planCatalogFromAutumn", () => {
 		if (!pro || !ultra) throw new Error("lineup");
 		expect(pro.gbMinutesPerSeat).toBe(19200);
 		expect(pro.advertisedGbHoursPerSeat).toBeNull();
-		expect(ultra.advertisedGbHoursPerSeat).toBe(
-			(ultra.gbMinutesPerSeat ?? 0) / 60,
-		);
+		expect(ultra.advertisedGbHoursPerSeat).toBe(4000);
 	});
 
 	test("a GB-hour purchase rounds up to whole pack units, never past the maximum", () => {

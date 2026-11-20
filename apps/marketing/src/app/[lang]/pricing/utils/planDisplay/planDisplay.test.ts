@@ -9,6 +9,7 @@ function family(
 	key: string,
 	seatPrice: number,
 	gbMinutesPerSeat: number | null,
+	advertisedGbHoursPerSeat: number | null,
 	environments: number | null,
 ): PlanFamily {
 	return {
@@ -19,8 +20,7 @@ function family(
 		yearly: null,
 		legacy: [],
 		gbMinutesPerSeat,
-		advertisedGbHoursPerSeat:
-			key === "pro" || gbMinutesPerSeat === null ? null : gbMinutesPerSeat / 60,
+		advertisedGbHoursPerSeat,
 		overagePerGbHour: 0.06,
 		pack: null,
 		environments,
@@ -30,9 +30,9 @@ function family(
 describe("comparisonValue", () => {
 	test("cloud rows read each plan's catalog values", () => {
 		const catalog = [
-			family("pro", 20, null, null),
-			family("team", 60, 72000, 5),
-			family("ultra", 200, 240000, 10),
+			family("pro", 20, null, null, null),
+			family("team", 60, 72000, 1200, 5),
+			family("ultra", 200, 240000, 4000, 10),
 		];
 		const values = planPriceValues(catalog, setupI18n({ locale: "en" }));
 		const tiers = pricingTiers(catalog);
