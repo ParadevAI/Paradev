@@ -1179,6 +1179,7 @@
       "name": "@superset/port-scanner",
       "version": "0.1.0",
       "dependencies": {
+        "@superset/shared": "workspace:*",
         "pidtree": "0.6.0",
       },
       "devDependencies": {

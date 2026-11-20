@@ -521,6 +521,10 @@
 			"types": "./src/github-remote.ts",
 			"default": "./src/github-remote.ts"
 		},
+		"./resolve-command": {
+			"types": "./src/resolve-command.ts",
+			"default": "./src/resolve-command.ts"
+		},
 		"./simple-git-options": {
 			"types": "./src/simple-git-options.ts",
 			"default": "./src/simple-git-options.ts"
