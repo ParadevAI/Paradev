@@ -784,6 +784,12 @@ msgstr "{actor} отвязал(а) рабочее пространство {work
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} на данный момент · прогноз ~{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} ещё не выполнил вход в облачных рабочих областях. Войдите один раз, чтобы агенты запускались готовыми к работе."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} выполнил вход на этом компьютере как {localAccountLabel}, но не в облачных рабочих областях. Войдите один раз для облака, чтобы агенты запускались готовыми к работе."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеансы {agents} возобновятся, когда вы откроете их рабочее пространство."
 
@@ -1994,6 +2000,9 @@ msgstr "Аккаунт ожидает удаления"
 msgid "Account usage: {percent} used"
 msgstr "Использование аккаунта: {percent} использовано"
 
+msgid "Accounts"
+msgstr "Аккаунты"
+
 msgid "Achievements"
 msgstr "Достижения"
 
@@ -2368,9 +2377,6 @@ msgstr "Против main"
 
 msgid "Agent"
 msgstr "Агент"
-
-msgid "Agent commands"
-msgstr "Команды агентов"
 
 msgid "Agent Configs"
 msgstr "Конфигурации агентов"
@@ -3461,6 +3467,9 @@ msgstr "Свободен"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Доступен"
+
+msgid "Available in cloud workspaces"
+msgstr "Доступно в облачных рабочих областях"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Доступные плагины показываются на странице «Плагины» каждой роли. Установленные плагины устанавливаются всем в роли; их можно отключить, но нельзя удалить."
@@ -4909,6 +4918,10 @@ msgstr "Облачные рабочие пространства не входя
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Облачные рабочие области делают коммиты, пуши и открывают pull request от вашего имени"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Облачные рабочие области пока не включают {0}."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Облачные рабочие пространства игнорируют эту переменную. Вместо этого агенты входят в систему в разделе «Настройки › Агенты»."
 
@@ -5362,12 +5375,6 @@ msgstr "Подключено к {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Подключено к GitHub как {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Подключено по подписке"
-
-msgid "Connected with API key"
-msgstr "Подключено по ключу API"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Подключено, но Microsoft Graph отклонил подписки на уведомления."
@@ -10085,9 +10092,6 @@ msgstr "Как мы работаем"
 msgid "How you run agents"
 msgstr "Как вы запускаете агентов"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "Как ваши агенты входят внутри облачных рабочих областей. Другие подключают свои подписки или ключи API; на этой машине каждый агент продолжает использовать вход, который уже на ней есть."
-
 msgid "HTML preview"
 msgstr "Предпросмотр HTML"
 
@@ -11780,9 +11784,6 @@ msgstr "Ручной порядок"
 msgid "manual sign-in"
 msgstr "ручной вход"
 
-msgid "Manual sign-in"
-msgstr "Ручной вход"
-
 msgid "Mark all read"
 msgstr "Отметить всё как прочитанное"
 
@@ -12461,6 +12462,9 @@ msgstr "Новые агенты {providerLabel} будут использова�
 
 msgid "New agent"
 msgstr "Новый агент"
+
+msgid "New agent launches use the default account."
+msgstr "Новые запущенные агенты используют аккаунт по умолчанию."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "Новые запуски агентов используют этот аккаунт. Перезапустите работающего агента, чтобы переключить его."
@@ -18168,6 +18172,9 @@ msgstr "Настроить"
 msgid "Set up {0}"
 msgstr "Настроить {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "Настроить {agentLabel} для облачных рабочих областей?"
+
 msgid "Set up a host over SSH"
 msgstr "Настроить хост по SSH"
 
@@ -19663,6 +19670,9 @@ msgstr "Синхронизировать репозитории"
 
 msgid "Sync started"
 msgstr "Синхронизация запущена"
+
+msgid "Sync to cloud"
+msgstr "Синхронизировать с облаком"
 
 msgid "Synced {syncedAgo}"
 msgstr "Синхронизировано {syncedAgo}"

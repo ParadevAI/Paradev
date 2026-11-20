@@ -778,6 +778,12 @@ msgstr "{actor} відв'язав(-ла) робочий простір {workspac
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} наразі · прогноз ~{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} ще не виконав вхід у хмарних робочих просторах. Увійдіть один раз, щоб агенти запускалися готовими до роботи."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} виконав вхід на цій машині як {localAccountLabel}, але не в хмарних робочих просторах. Увійдіть один раз для хмари, щоб агенти запускалися готовими до роботи."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеанси {agents} відновляться, коли ви відкриєте їхній робочий простір."
 
@@ -1988,6 +1994,9 @@ msgstr "Обліковий запис очікує на видалення"
 msgid "Account usage: {percent} used"
 msgstr "Використання облікового запису: використано {percent}"
 
+msgid "Accounts"
+msgstr "Облікові записи"
+
 msgid "Achievements"
 msgstr "Досягнення"
 
@@ -2362,9 +2371,6 @@ msgstr "Порівняно з main"
 
 msgid "Agent"
 msgstr "Агент"
-
-msgid "Agent commands"
-msgstr "Команди агентів"
 
 msgid "Agent Configs"
 msgstr "Конфігурації агентів"
@@ -3455,6 +3461,9 @@ msgstr "Доступний"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Доступний"
+
+msgid "Available in cloud workspaces"
+msgstr "Доступно в хмарних робочих просторах"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Доступні плагіни показуються на сторінці «Плагіни» кожної ролі. Встановлені плагіни встановлюються для всіх у ролі: їх можна вимкнути, але не видалити."
@@ -4903,6 +4912,10 @@ msgstr "Хмарні робочі простори не входять у ваш
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Хмарні робочі простори комітять, пушать і відкривають пул-реквести від вашого імені"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Хмарні робочі простори поки не містять {0}."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Хмарні робочі простори ігнорують цю змінну. Натомість агенти входять у розділі Налаштування › Агенти."
 
@@ -5356,12 +5369,6 @@ msgstr "Підключено до {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Підключено до GitHub як {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Підключено через підписку"
-
-msgid "Connected with API key"
-msgstr "Підключено за ключем API"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Підключено, але Microsoft Graph відхилив підписки на сповіщення."
@@ -10079,9 +10086,6 @@ msgstr "Як ми працюємо"
 msgid "How you run agents"
 msgstr "Як ви запускаєте агентів"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "Як ваші агенти входять в облікові записи в хмарних робочих просторах. Інші люди підключають власні підписки або ключі API; на цьому комп'ютері кожен агент і далі використовує вхід, який на ньому вже є."
-
 msgid "HTML preview"
 msgstr "Попередній перегляд HTML"
 
@@ -11774,9 +11778,6 @@ msgstr "Порядок вручну"
 msgid "manual sign-in"
 msgstr "ручний вхід"
 
-msgid "Manual sign-in"
-msgstr "Ручний вхід"
-
 msgid "Mark all read"
 msgstr "Позначити всі як прочитані"
 
@@ -12455,6 +12456,9 @@ msgstr "Нові агенти {providerLabel} використовуватиму
 
 msgid "New agent"
 msgstr "Новий агент"
+
+msgid "New agent launches use the default account."
+msgstr "Нові запущені агенти використовують обліковий запис за замовчуванням."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "Нові запуски агентів використовують цей обліковий запис. Перезапустіть запущеного агента, щоб перемкнути його."
@@ -18162,6 +18166,9 @@ msgstr "Налаштувати"
 msgid "Set up {0}"
 msgstr "Налаштувати {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "Налаштувати {agentLabel} для хмарних робочих просторів?"
+
 msgid "Set up a host over SSH"
 msgstr "Налаштувати хост через SSH"
 
@@ -19657,6 +19664,9 @@ msgstr "Синхронізувати репозиторії"
 
 msgid "Sync started"
 msgstr "Синхронізацію запущено"
+
+msgid "Sync to cloud"
+msgstr "Синхронізувати з хмарою"
 
 msgid "Synced {syncedAgo}"
 msgstr "Синхронізовано {syncedAgo}"

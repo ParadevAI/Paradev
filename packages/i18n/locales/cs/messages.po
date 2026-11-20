@@ -784,6 +784,12 @@ msgstr "{actor} zrušil(a) propojení pracovního prostoru {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "zatím {actual} · odhad ~{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} zatím není přihlášen v cloudových pracovních prostorech. Přihlaste se jednou, aby agenti startovali připravení."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} je na tomto počítači přihlášen jako {localAccountLabel}, ale ne v cloudových pracovních prostorech. Přihlaste se jednou pro cloud, aby agenti startovali připravení."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Relace {agents} se obnoví, když otevřete jejich pracovní prostor."
 
@@ -1994,6 +2000,9 @@ msgstr "Účet čeká na smazání"
 msgid "Account usage: {percent} used"
 msgstr "Využití účtu: využito {percent}"
 
+msgid "Accounts"
+msgstr "Účty"
+
 msgid "Achievements"
 msgstr "Úspěchy"
 
@@ -2368,9 +2377,6 @@ msgstr "Proti main"
 
 msgid "Agent"
 msgstr "Agent"
-
-msgid "Agent commands"
-msgstr "Příkazy agentů"
 
 msgid "Agent Configs"
 msgstr "Konfigurace agentů"
@@ -3461,6 +3467,9 @@ msgstr "Volné"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Dostupné"
+
+msgid "Available in cloud workspaces"
+msgstr "Dostupné v cloudových pracovních prostorech"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Dostupné pluginy se zobrazí na stránce Pluginy dané role. Nainstalované pluginy se nainstalují všem v roli; mohou je zakázat, ale ne odebrat."
@@ -4909,6 +4918,10 @@ msgstr "Cloudové pracovní prostory nejsou součástí vašeho tarifu."
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Cloudové pracovní prostory zatím neobsahují {0}."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloudové pracovní prostory tuto proměnnou ignorují. Agenti se místo toho přihlašují v Nastavení › Agenti."
 
@@ -5362,12 +5375,6 @@ msgstr "Připojeno k {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Propojeno s GitHubem jako {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Připojeno přes předplatné"
-
-msgid "Connected with API key"
-msgstr "Připojeno pomocí API klíče"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Připojeno, ale Microsoft Graph odmítl odběry oznámení."
@@ -10085,9 +10092,6 @@ msgstr "Jak pracujeme"
 msgid "How you run agents"
 msgstr "Jak spouštíte agenty"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "Jak se vaši agenti přihlašují v cloudových pracovních prostorech. Ostatní připojují vlastní předplatné nebo API klíče; na tomto počítači každý agent dál používá přihlášení, které už na něm je."
-
 msgid "HTML preview"
 msgstr "Náhled HTML"
 
@@ -11780,9 +11784,6 @@ msgstr "Ruční řazení"
 msgid "manual sign-in"
 msgstr "ruční přihlášení"
 
-msgid "Manual sign-in"
-msgstr "Ruční přihlášení"
-
 msgid "Mark all read"
 msgstr "Označit vše jako přečtené"
 
@@ -12461,6 +12462,9 @@ msgstr "Noví agenti {providerLabel} použijí {accountLabel}."
 
 msgid "New agent"
 msgstr "Nový agent"
+
+msgid "New agent launches use the default account."
+msgstr "Nově spuštění agenti používají výchozí účet."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "Nová spuštění agentů použijí tento účet. Běžícího agenta přepnete jeho novým spuštěním."
@@ -18168,6 +18172,9 @@ msgstr "Nastavit"
 msgid "Set up {0}"
 msgstr "Nastavit {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "Nastavit {agentLabel} pro cloudové pracovní prostory?"
+
 msgid "Set up a host over SSH"
 msgstr "Nastavit host přes SSH"
 
@@ -19663,6 +19670,9 @@ msgstr "Synchronizovat repozitáře"
 
 msgid "Sync started"
 msgstr "Synchronizace spuštěna"
+
+msgid "Sync to cloud"
+msgstr "Synchronizovat do cloudu"
 
 msgid "Synced {syncedAgo}"
 msgstr "Synchronizováno {syncedAgo}"

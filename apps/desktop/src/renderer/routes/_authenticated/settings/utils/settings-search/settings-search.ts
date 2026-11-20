@@ -1751,9 +1751,9 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 	},
 	{
 		id: SETTING_ITEM_ID.AGENT_ACCOUNTS,
-		section: "agentAccounts",
-		title: "Agents",
-		description: "Sign-ins cloud agents run with",
+		section: "agents",
+		title: "Agent accounts",
+		description: "Accounts agents sign in with, on this machine and in cloud",
 		keywords: [
 			"claude",
 			"codex",
@@ -1969,7 +1969,6 @@ export function getVisibleItemsForSection(params: {
 /** Sections offered only with the cloud workspaces flag. */
 const CLOUD_WORKSPACE_SECTIONS: ReadonlySet<SettingsSection> = new Set([
 	"environments",
-	"agentAccounts",
 	"connections",
 ]);
 

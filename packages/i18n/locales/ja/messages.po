@@ -784,6 +784,12 @@ msgstr "{actor}がワークスペース {workspace} のリンクを解除しま�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "現時点で{actual} · 予測は約{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} はまだクラウドワークスペースでサインインしていません。一度サインインすると、エージェントがすぐに使える状態で起動します。"
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} はこのマシンで {localAccountLabel} としてサインインしていますが、クラウドワークスペースではサインインしていません。クラウド用に一度サインインすると、エージェントがすぐに使える状態で起動します。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} のセッションは、そのワークスペースを開くと再開されます。"
 
@@ -1994,6 +2000,9 @@ msgstr "アカウントは削除待ちです"
 msgid "Account usage: {percent} used"
 msgstr "アカウントの使用状況: {percent} 使用済み"
 
+msgid "Accounts"
+msgstr "アカウント"
+
 msgid "Achievements"
 msgstr "実績"
 
@@ -2368,9 +2377,6 @@ msgstr "mainとの比較"
 
 msgid "Agent"
 msgstr "エージェント"
-
-msgid "Agent commands"
-msgstr "エージェントコマンド"
 
 msgid "Agent Configs"
 msgstr "エージェント設定"
@@ -3461,6 +3467,9 @@ msgstr "利用可能"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "利用可能"
+
+msgid "Available in cloud workspaces"
+msgstr "クラウドワークスペースで利用可能"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "利用可能なプラグインは各ロールのプラグインページに表示されます。インストール済みのプラグインはそのロールの全員にインストールされ、無効にはできますが削除はできません。"
@@ -4909,6 +4918,10 @@ msgstr "クラウドワークスペースはご利用のプランに含まれて
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "クラウドワークスペースにはまだ {0} が含まれていません。"
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "クラウドワークスペースはこの変数を無視します。エージェントは代わりに「設定 › エージェント」でサインインします。"
 
@@ -5362,12 +5375,6 @@ msgstr "{connectedOrgName}に接続済み"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "{accountLogin} として GitHub に接続済み"
-
-msgid "Connected via subscription"
-msgstr "サブスクリプションで接続済み"
-
-msgid "Connected with API key"
-msgstr "APIキーで接続済み"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "接続しましたが、Microsoft Graphが通知サブスクリプションを拒否しました。"
@@ -10085,9 +10092,6 @@ msgstr "私たちの働き方"
 msgid "How you run agents"
 msgstr "エージェントの実行方法"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "クラウドワークスペース内でエージェントがどうサインインするかの設定です。ほかの人は自分のサブスクリプションやAPIキーを接続します。このマシンでは、各エージェントはすでにあるログインをそのまま使い続けます。"
-
 msgid "HTML preview"
 msgstr "HTMLプレビュー"
 
@@ -11780,9 +11784,6 @@ msgstr "手動順"
 msgid "manual sign-in"
 msgstr "手動サインイン"
 
-msgid "Manual sign-in"
-msgstr "手動サインイン"
-
 msgid "Mark all read"
 msgstr "すべて既読にする"
 
@@ -12461,6 +12462,9 @@ msgstr "新規の{providerLabel}エージェントは{accountLabel}を使用し�
 
 msgid "New agent"
 msgstr "新しいエージェント"
+
+msgid "New agent launches use the default account."
+msgstr "新しく起動するエージェントはデフォルトのアカウントを使います。"
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "新規エージェントの起動でこのアカウントを使用します。実行中のエージェントを切り替えるには再起動してください。"
@@ -18168,6 +18172,9 @@ msgstr "設定する"
 msgid "Set up {0}"
 msgstr "{0} をセットアップ"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "クラウドワークスペース用に {agentLabel} をセットアップしますか？"
+
 msgid "Set up a host over SSH"
 msgstr "SSH でホストを設定"
 
@@ -19663,6 +19670,9 @@ msgstr "リポジトリを同期"
 
 msgid "Sync started"
 msgstr "同期を開始しました"
+
+msgid "Sync to cloud"
+msgstr "クラウドに同期"
 
 msgid "Synced {syncedAgo}"
 msgstr "{syncedAgo}に同期"

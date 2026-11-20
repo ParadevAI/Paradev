@@ -26,7 +26,7 @@ import {
 	HiOutlineUser,
 	HiOutlineUserGroup,
 } from "react-icons/hi2";
-import { LuGitBranch, LuKeyboard, LuKeyRound, LuLink } from "react-icons/lu";
+import { LuGitBranch, LuKeyboard, LuLink } from "react-icons/lu";
 import type { SettingsSection } from "renderer/stores/settings-state";
 
 export type SettingsRoute =
@@ -45,7 +45,6 @@ export type SettingsRoute =
 	| "/settings/agents"
 	| "/settings/terminal"
 	| "/settings/files"
-	| "/settings/agent-accounts"
 	| "/settings/experimental"
 	| "/settings/integrations"
 	| "/settings/plugins"
@@ -117,6 +116,16 @@ export const SETTINGS_SECTION_GROUPS: SettingsSectionGroup[] = [
 				keywords: ["ringtones", "sounds"],
 			},
 			{
+				id: "/settings/agents",
+				section: "agents",
+				label: msg({
+					message: "Agents",
+				}),
+				icon: HiOutlineCpuChip,
+				keywords: ["accounts", "sign in", "subscription", "api key"],
+				fullWidth: true,
+			},
+			{
 				id: "/settings/usage",
 				section: "usage",
 				label: msg({
@@ -166,15 +175,6 @@ export const SETTINGS_SECTION_GROUPS: SettingsSectionGroup[] = [
 				icon: LuGitBranch,
 			},
 			{
-				id: "/settings/agents",
-				section: "agents",
-				label: msg({
-					message: "Agent commands",
-				}),
-				icon: HiOutlineCpuChip,
-				fullWidth: true,
-			},
-			{
 				id: "/settings/terminal",
 				section: "terminal",
 				label: msg({
@@ -214,14 +214,6 @@ export const SETTINGS_SECTION_GROUPS: SettingsSectionGroup[] = [
 					message: "Environments",
 				}),
 				icon: HiOutlineCube,
-			},
-			{
-				id: "/settings/agent-accounts",
-				section: "agentAccounts",
-				label: msg({
-					message: "Agents",
-				}),
-				icon: LuKeyRound,
 			},
 		],
 	},

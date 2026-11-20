@@ -29,7 +29,7 @@ import type {
 	CloudAuthState,
 	CustomProvider,
 	SaveCredentialInput,
-} from "../../../../hooks/useAgentCredential";
+} from "renderer/routes/_authenticated/hooks/useAgentCredential";
 import { ChatgptSignIn } from "./components/ChatgptSignIn";
 import { CopyStateIcon } from "./components/CopyStateIcon";
 import { DisconnectMenu } from "./components/DisconnectMenu";

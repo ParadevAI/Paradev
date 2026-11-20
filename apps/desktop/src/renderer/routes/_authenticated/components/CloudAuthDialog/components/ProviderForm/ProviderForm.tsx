@@ -3,7 +3,7 @@ import { gatewayBaseUrl } from "@superset/shared/agent-credentials";
 import { cn } from "@superset/ui/utils";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useId, useState } from "react";
-import type { CustomProvider } from "../../../../../../hooks/useAgentCredential";
+import type { CustomProvider } from "renderer/routes/_authenticated/hooks/useAgentCredential";
 import { FOCUS_RING } from "../../constants";
 import { ExternalTextLink } from "../ExternalTextLink";
 import { Field } from "../Field";

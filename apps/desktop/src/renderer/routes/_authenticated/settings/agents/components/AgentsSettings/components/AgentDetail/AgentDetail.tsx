@@ -3,6 +3,8 @@ import type { HostAgentConfig } from "@superset/host-service/settings";
 import { errorMessage } from "@superset/i18n/errors";
 import { AGENT_TYPES } from "@superset/shared/agent-command";
 import type { PromptTransport } from "@superset/shared/agent-prompt-launch";
+import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { getPresetById } from "@superset/shared/host-agent-presets";
 import {
 	AlertDialog,
@@ -22,6 +24,7 @@ import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useMutation } from "@tanstack/react-query";
 import { Info, RotateCcw, Trash2 } from "lucide-react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useState } from "react";
 import {
 	getAgentCommandText,
@@ -33,6 +36,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { AgentAccounts } from "renderer/routes/_authenticated/settings/components/AgentAccounts";
 import {
 	AgentDetailHeader,
 	AgentLaunchFields,
@@ -61,6 +65,12 @@ export function AgentDetail({
 	const isHooksSetupTarget = (AGENT_TYPES as readonly string[]).includes(
 		config.presetId,
 	);
+	const cloudEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
+	const managedAgent =
+		config.presetId === "claude" || config.presetId === "codex"
+			? config.presetId
+			: null;
 
 	const electronUtils = electronTrpc.useUtils();
 	const disabledHooksQuery =
@@ -279,6 +289,17 @@ export function AgentDetail({
 			/>
 
 			<div className="space-y-6">
+				{managedAgent ? (
+					<AgentAccounts
+						agent={managedAgent}
+						cloudEnabled={cloudEnabled}
+						label={config.label}
+					/>
+				) : cloudEnabled && !isCustom && !isCloudAgentId(config.presetId) ? (
+					<p className="text-xs text-muted-foreground">
+						<Trans>Cloud workspaces don't include {config.label} yet.</Trans>
+					</p>
+				) : null}
 				<Section
 					title={t({
 						message: "Label",

@@ -22,8 +22,13 @@ export function useAgentSignIn(presetId: string | undefined): {
 } {
 	const navigate = useNavigate();
 	const openAgentSettings = useCallback(
-		() => void navigate({ to: "/settings/agent-accounts" }),
-		[navigate],
+		() =>
+			void navigate(
+				presetId
+					? { to: "/settings/agents/$agentId", params: { agentId: presetId } }
+					: { to: "/settings/agents" },
+			),
+		[navigate, presetId],
 	);
 	const { workspace } = useWorkspace();
 	const { workspaces } = useCloudWorkspaces();

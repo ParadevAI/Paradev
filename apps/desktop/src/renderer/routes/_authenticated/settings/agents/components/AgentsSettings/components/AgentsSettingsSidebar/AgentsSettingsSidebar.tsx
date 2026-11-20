@@ -17,6 +17,8 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { HostAgentConfig } from "@superset/host-service/settings";
+import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { HostAgentPreset } from "@superset/shared/host-agent-presets";
 import {
 	DropdownMenu,
@@ -26,7 +28,8 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
-import { Plus, Wrench } from "lucide-react";
+import { Cloud, Plus, Wrench } from "lucide-react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { LuGripVertical } from "react-icons/lu";
 import { AgentIcon } from "renderer/components/AgentIcon";
@@ -181,6 +184,8 @@ interface AgentSidebarRowProps {
 
 function AgentSidebarRow({ row, isActive, onSelect }: AgentSidebarRowProps) {
 	const { t } = useLingui();
+	const cloudEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const {
 		setNodeRef,
 		setActivatorNodeRef,
@@ -212,6 +217,12 @@ function AgentSidebarRow({ row, isActive, onSelect }: AgentSidebarRowProps) {
 					className="size-4"
 				/>
 				<span className="truncate flex-1">{row.label}</span>
+				{cloudEnabled && isCloudAgentId(row.presetId) ? (
+					<Cloud
+						aria-label={t({ message: "Available in cloud workspaces" })}
+						className="size-3.5 shrink-0 text-muted-foreground transition-opacity group-hover/row:opacity-0"
+					/>
+				) : null}
 			</button>
 			<button
 				type="button"

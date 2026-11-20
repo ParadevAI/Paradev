@@ -784,6 +784,12 @@ msgstr "{actor} 取消关联工作区 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 预计约{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} 尚未在云工作区中登录。登录一次，智能体启动后即可直接使用。"
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} 已在本机以 {localAccountLabel} 登录，但尚未在云工作区中登录。为云端登录一次，智能体启动后即可直接使用。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "打开对应工作区时，{agents} 会话会恢复。"
 
@@ -1994,6 +2000,9 @@ msgstr "账户待删除"
 msgid "Account usage: {percent} used"
 msgstr "账户用量：已使用 {percent}"
 
+msgid "Accounts"
+msgstr "账户"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2368,9 +2377,6 @@ msgstr "对比main"
 
 msgid "Agent"
 msgstr "智能体"
-
-msgid "Agent commands"
-msgstr "智能体命令"
 
 msgid "Agent Configs"
 msgstr "智能体配置"
@@ -3461,6 +3467,9 @@ msgstr "可用"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "可用"
+
+msgid "Available in cloud workspaces"
+msgstr "可在云工作区中使用"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "可用的插件会显示在各角色的插件页面上。已安装的插件会为该角色的所有人安装，他们可以停用但不能移除。"
@@ -4909,6 +4918,10 @@ msgstr "您的方案不包含云工作区。"
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "云工作区以你的身份提交、推送并创建拉取请求"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "云工作区尚未包含 {0}。"
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "云工作区会忽略此变量。智能体改为在「设置 › 智能体」中登录。"
 
@@ -5362,12 +5375,6 @@ msgstr "已连接到{connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "已以 {accountLogin} 身份连接 GitHub"
-
-msgid "Connected via subscription"
-msgstr "已通过订阅连接"
-
-msgid "Connected with API key"
-msgstr "已用API密钥连接"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "已连接，但Microsoft Graph拒绝了通知订阅。"
@@ -10085,9 +10092,6 @@ msgstr "我们的工作方式"
 msgid "How you run agents"
 msgstr "运行智能体的方式"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "你的智能体在云端工作区中如何登录。其他人连接各自的订阅或API密钥；在这台机器上，每个智能体继续使用它上面已有的登录。"
-
 msgid "HTML preview"
 msgstr "HTML 预览"
 
@@ -11780,9 +11784,6 @@ msgstr "手动排序"
 msgid "manual sign-in"
 msgstr "手动登录"
 
-msgid "Manual sign-in"
-msgstr "手动登录"
-
 msgid "Mark all read"
 msgstr "全部标记为已读"
 
@@ -12461,6 +12462,9 @@ msgstr "新的{providerLabel}智能体将使用{accountLabel}。"
 
 msgid "New agent"
 msgstr "新建智能体"
+
+msgid "New agent launches use the default account."
+msgstr "新启动的智能体使用默认账户。"
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "新启动的智能体使用此账户。重新启动运行中的智能体才能切换。"
@@ -18168,6 +18172,9 @@ msgstr "设置"
 msgid "Set up {0}"
 msgstr "设置 {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "要为云工作区设置 {agentLabel} 吗？"
+
 msgid "Set up a host over SSH"
 msgstr "通过 SSH 设置主机"
 
@@ -19663,6 +19670,9 @@ msgstr "同步仓库"
 
 msgid "Sync started"
 msgstr "同步已开始"
+
+msgid "Sync to cloud"
+msgstr "同步到云端"
 
 msgid "Synced {syncedAgo}"
 msgstr "上次同步：{syncedAgo}"
