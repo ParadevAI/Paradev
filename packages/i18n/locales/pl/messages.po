@@ -6231,6 +6231,9 @@ msgstr "Nie udało się wczytać automatyzacji: {0}"
 msgid "Couldn't load automations"
 msgstr "Nie udało się wczytać automatyzacji"
 
+msgid "Couldn't load builds"
+msgstr "Nie udało się wczytać kompilacji"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Nie udało się wczytać współtwórców. Wpisz nazwę użytkownika."
 
@@ -6978,6 +6981,9 @@ msgstr "Domyślny terminal"
 
 msgid "Default terminal theme"
 msgstr "Domyślny motyw terminala"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Domyślny terminal: {terminalName}"
 
 msgid "Delegated"
 msgstr "Delegowany"
@@ -16487,6 +16493,9 @@ msgstr "Usuń terminal"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Usuń terminal {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Usuń terminal {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Usuń sesję terminala"
 
@@ -18964,6 +18973,9 @@ msgstr "Ktoś przenosi ten obszar roboczy…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Ktoś z zespołu Paradev sprawdzi tę stronę. Odezwiemy się tylko wtedy, gdy będziemy potrzebować więcej informacji."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Ktoś zapisał tę konfigurację, gdy ją edytowałeś. Zapisanie zastąpi jego wersję."
 
 msgid "Something else"
 msgstr "Coś innego"

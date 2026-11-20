@@ -6231,6 +6231,9 @@ msgstr "無法載入自動化：{0}"
 msgid "Couldn't load automations"
 msgstr "無法載入自動化"
 
+msgid "Couldn't load builds"
+msgstr "無法載入建置"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "無法載入貢獻者，請直接輸入使用者名稱。"
 
@@ -6978,6 +6981,9 @@ msgstr "預設終端"
 
 msgid "Default terminal theme"
 msgstr "預設終端主題"
+
+msgid "Default terminal: {terminalName}"
+msgstr "預設終端：{terminalName}"
 
 msgid "Delegated"
 msgstr "委派"
@@ -16487,6 +16493,9 @@ msgstr "移除終端"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "移除終端{createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "移除終端 {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "移除終端會話"
 
@@ -18964,6 +18973,9 @@ msgstr "有人正在移動此工作區…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev 團隊會審核此頁面。只有在需要你補充資訊時我們才會聯絡你。"
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "你編輯時有人儲存了此設定。儲存會取代對方的版本。"
 
 msgid "Something else"
 msgstr "其他問題"

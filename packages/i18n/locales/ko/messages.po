@@ -6231,6 +6231,9 @@ msgstr "자동화를 불러오지 못했습니다: {0}"
 msgid "Couldn't load automations"
 msgstr "자동화를 불러오지 못했습니다"
 
+msgid "Couldn't load builds"
+msgstr "빌드를 불러오지 못했습니다"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "기여자를 불러오지 못했습니다. 대신 사용자 이름을 입력하세요."
 
@@ -6978,6 +6981,9 @@ msgstr "기본 터미널"
 
 msgid "Default terminal theme"
 msgstr "기본 터미널 테마"
+
+msgid "Default terminal: {terminalName}"
+msgstr "기본 터미널: {terminalName}"
 
 msgid "Delegated"
 msgstr "위임"
@@ -16487,6 +16493,9 @@ msgstr "터미널 제거"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "{createdAtLabel} 터미널 제거"
 
+msgid "Remove terminal {terminalName}"
+msgstr "터미널 {terminalName} 제거"
+
 msgid "Remove terminal session"
 msgstr "터미널 세션 제거"
 
@@ -18964,6 +18973,9 @@ msgstr "누군가 이 워크스페이스를 이동하는 중입니다…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev 팀이 이 페이지를 검토합니다. 추가 정보가 필요할 때만 연락드립니다."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "편집하는 동안 다른 사람이 이 설정을 저장했습니다. 저장하면 그 버전이 대체됩니다."
 
 msgid "Something else"
 msgstr "기타"

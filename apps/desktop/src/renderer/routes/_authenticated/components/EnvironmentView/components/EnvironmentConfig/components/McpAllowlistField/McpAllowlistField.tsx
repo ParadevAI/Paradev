@@ -10,7 +10,7 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { Switch } from "@superset/ui/switch";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { usePluginCatalog } from "renderer/hooks/usePluginCatalog";
 
 interface PluginOption {
@@ -35,8 +35,10 @@ export function McpAllowlistField({
 	const { t } = useLingui();
 	const { plugins, isLoading } = usePluginCatalog();
 	const allowed = useMemo(() => new Set(value ?? []), [value]);
+	const [entriesAtMount] = useState(() => value ?? []);
 
 	const options = useMemo<PluginOption[]>(() => {
+		const kept = new Set([...entriesAtMount, ...allowed]);
 		const listed = plugins
 			.map((plugin) => ({
 				entry: mcpPluginEntry(plugin),
@@ -44,14 +46,14 @@ export function McpAllowlistField({
 				marketplace: plugin.marketplace,
 				shown: plugin.installed || plugin.managed,
 			}))
-			.filter((option) => option.shown || allowed.has(option.entry))
+			.filter((option) => option.shown || kept.has(option.entry))
 			.map(({ shown: _, ...option }) => option);
 		const listedEntries = new Set(listed.map((option) => option.entry));
-		const unlisted = [...allowed]
+		const unlisted = [...kept]
 			.filter((entry) => !listedEntries.has(entry))
 			.map((entry) => ({ entry, label: entry, marketplace: null }));
 		return [...listed, ...unlisted];
-	}, [plugins, allowed]);
+	}, [plugins, allowed, entriesAtMount]);
 
 	return (
 		<div className="flex flex-col gap-1.5 p-3">

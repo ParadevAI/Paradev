@@ -70,6 +70,8 @@ interface CodeEditorProps {
 	readOnly?: boolean;
 	placeholder?: string;
 	ariaLabel?: string;
+	/** Tab indents; off in a form, so Tab moves focus to the next field. */
+	tabIndents?: boolean;
 	fillHeight?: boolean;
 	className?: string;
 	editorRef?: MutableRefObject<CodeEditorAdapter | null>;
@@ -89,6 +91,7 @@ export function CodeEditor({
 	readOnly = false,
 	placeholder,
 	ariaLabel,
+	tabIndents = true,
 	fillHeight = true,
 	className,
 	editorRef,
@@ -184,7 +187,7 @@ export function CodeEditor({
 				}),
 				placeholder ? placeholderText(placeholder) : [],
 				keymap.of([
-					indentWithTab,
+					...(tabIndents ? [indentWithTab] : []),
 					...defaultKeymap,
 					...historyKeymap,
 					...searchKeymap,

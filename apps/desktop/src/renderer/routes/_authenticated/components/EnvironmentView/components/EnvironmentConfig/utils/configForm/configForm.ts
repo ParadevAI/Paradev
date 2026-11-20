@@ -15,11 +15,15 @@ export interface TerminalRow {
 	source: string | null;
 	name: string;
 	command: string;
+	/** The command as it was read; a row whose command is unchanged keeps its original value. */
+	originalCommand: string;
 	isDefault: boolean;
 }
 
 export interface PortRow {
 	key: string;
+	/** The table it was read from, so what the form does not change is kept. */
+	source: string | null;
 	name: string;
 	port: string;
 	label: string;
@@ -52,7 +56,7 @@ function scriptToRun(
 	script: string,
 	original: CommandValue | undefined,
 ): CommandValue | undefined {
-	if (script === runToScript(original)) return original;
+	if (script.trimEnd() === runToScript(original).trimEnd()) return original;
 	const text = script.trimEnd();
 	return text.trim() ? text : undefined;
 }
@@ -92,8 +96,13 @@ function withScript(entry: Phase | undefined, script: string) {
 	return run === original ? entry : withRun(entry, run);
 }
 
+/** One line for the terminal command input: a list or a multi-line script reads as `a && b`. */
 function commandText(run: CommandValue | undefined): string {
-	return Array.isArray(run) ? run.join(" && ") : (run ?? "");
+	const lines = Array.isArray(run) ? run : (run ?? "").split("\n");
+	return lines
+		.map((line) => line.trim())
+		.filter(Boolean)
+		.join(" && ");
 }
 
 function isCloudDefault(terminal: Terminal): boolean {
@@ -125,15 +134,20 @@ export function toConfigForm(config: ProjectConfig): ConfigForm {
 	return {
 		install: runToScript(cloudRun(config.install)),
 		start: runToScript(cloudRun(config.setup)),
-		terminals: terminals.map(([name, terminal]) => ({
-			key: nextRowKey(),
-			source: name,
-			name,
-			command: commandText(cloudRun(terminal)),
-			isDefault: name === defaultName,
-		})),
+		terminals: terminals.map(([name, terminal]) => {
+			const command = commandText(cloudRun(terminal));
+			return {
+				key: nextRowKey(),
+				source: name,
+				name,
+				command,
+				originalCommand: command,
+				isDefault: name === defaultName,
+			};
+		}),
 		ports: Object.entries(config.ports ?? {}).map(([name, port]) => ({
 			key: nextRowKey(),
+			source: name,
 			name,
 			port: String(port.default),
 			label: port.label ?? "",
@@ -152,27 +166,39 @@ export function fromConfigForm(
 	base: ProjectConfig,
 	form: ConfigForm,
 ): ProjectConfig {
-	const defaultName = defaultTerminalName(base);
+	const chosen = form.terminals.find((row) => row.isDefault);
+	const defaultChanged =
+		chosen === undefined
+			? defaultTerminalName(base) !== null
+			: chosen.source === null || chosen.source !== defaultTerminalName(base);
 	const terminals: Record<string, Terminal> = {};
 	for (const row of form.terminals) {
 		const original = row.source ? base.terminals?.[row.source] : undefined;
 		const command = row.command.trim();
 		let terminal =
-			(command === commandText(cloudRun(original)).trim()
+			(command === row.originalCommand.trim()
 				? original
 				: withRun(original, command || undefined)) ?? {};
-		const wasDefault = row.source !== null && row.source === defaultName;
-		if (row.isDefault !== wasDefault) {
+		if (defaultChanged && (row.isDefault || isCloudDefault(terminal))) {
 			terminal = withDefault(terminal, row.isDefault);
 		}
 		terminals[row.name.trim()] = terminal;
 	}
 	const ports: Record<string, Port> = {};
 	for (const row of form.ports) {
+		const original = row.source ? base.ports?.[row.source] : undefined;
+		const label = row.label.trim();
 		ports[row.name.trim()] = withoutUndefined({
+			...original,
 			default: Number(row.port),
-			label: row.label.trim() || undefined,
-			preview: row.preview ? true : undefined,
+			label:
+				original && label === (original.label ?? "").trim()
+					? original.label
+					: label || undefined,
+			preview:
+				original && row.preview === (original.preview === true)
+					? original.preview
+					: row.preview || undefined,
 		});
 	}
 	const mcp = withoutUndefined({
@@ -190,7 +216,6 @@ export function fromConfigForm(
 	});
 }
 
-/** The text to store; null when there is nothing left to store. */
 export function configText(config: ProjectConfig): string | null {
 	return isEmpty(config) ? null : toTomlText(config);
 }
@@ -204,7 +229,12 @@ export function terminalProblems(rows: TerminalRow[]): Map<string, RowProblem> {
 		const name = row.name.trim();
 		if (!CONFIG_NAME_PATTERN.test(name)) problems.set(row.key, "name");
 		else if (seen.has(name)) problems.set(row.key, "duplicate");
-		else if (!row.command.trim()) problems.set(row.key, "command");
+		else if (
+			!row.command.trim() &&
+			(row.source === null || row.command !== row.originalCommand)
+		) {
+			problems.set(row.key, "command");
+		}
 		seen.add(name);
 	}
 	return problems;

@@ -17,12 +17,16 @@ import { EnvironmentBuildStatus } from "./components/EnvironmentBuildStatus";
 
 interface EnvironmentHistoryTableProps {
 	builds: readonly EnvironmentBuild[];
+	loading: boolean;
+	failed: boolean;
 	onRestore: (buildId: string) => void;
 	restoring: boolean;
 }
 
 export function EnvironmentHistoryTable({
 	builds,
+	loading,
+	failed,
 	onRestore,
 	restoring,
 }: EnvironmentHistoryTableProps) {
@@ -54,7 +58,13 @@ export function EnvironmentHistoryTable({
 								className="py-6 text-center text-sm text-muted-foreground"
 								colSpan={5}
 							>
-								<Trans>No builds yet</Trans>
+								{loading ? (
+									<Trans>Loading</Trans>
+								) : failed ? (
+									<Trans>Couldn't load builds</Trans>
+								) : (
+									<Trans>No builds yet</Trans>
+								)}
 							</TableCell>
 						</TableRow>
 					) : (

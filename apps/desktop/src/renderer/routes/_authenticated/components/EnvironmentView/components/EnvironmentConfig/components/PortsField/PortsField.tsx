@@ -35,6 +35,7 @@ export function PortsField({ rows, problems, onChange }: PortsFieldProps) {
 							...rows,
 							{
 								key: nextRowKey(),
+								source: null,
 								name: "",
 								port: "",
 								label: "",

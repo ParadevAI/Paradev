@@ -6231,6 +6231,9 @@ msgstr "Không thể tải tự động hóa: {0}"
 msgid "Couldn't load automations"
 msgstr "Không thể tải tự động hóa"
 
+msgid "Couldn't load builds"
+msgstr "Không thể tải các bản build"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Không thể tải danh sách người đóng góp. Hãy nhập tên người dùng."
 
@@ -6978,6 +6981,9 @@ msgstr "Terminal mặc định"
 
 msgid "Default terminal theme"
 msgstr "Theme terminal mặc định"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Terminal mặc định: {terminalName}"
 
 msgid "Delegated"
 msgstr "Ủy quyền"
@@ -16487,6 +16493,9 @@ msgstr "Gỡ terminal"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Gỡ terminal {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Gỡ terminal {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Gỡ phiên terminal"
 
@@ -18964,6 +18973,9 @@ msgstr "Có người đang di chuyển không gian làm việc này…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Một thành viên của nhóm Paradev sẽ xem xét trang này. Chúng tôi chỉ liên hệ lại nếu cần thêm thông tin từ bạn."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Có người đã lưu cấu hình này trong lúc bạn đang sửa. Lưu sẽ thay thế phiên bản của họ."
 
 msgid "Something else"
 msgstr "Vấn đề khác"

@@ -6231,6 +6231,9 @@ msgstr "Tidak bisa memuat otomatisasi: {0}"
 msgid "Couldn't load automations"
 msgstr "Tidak bisa memuat otomatisasi"
 
+msgid "Couldn't load builds"
+msgstr "Tidak bisa memuat build"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Tidak bisa memuat kontributor. Ketik username saja."
 
@@ -6978,6 +6981,9 @@ msgstr "Terminal bawaan"
 
 msgid "Default terminal theme"
 msgstr "Tema terminal bawaan"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Terminal bawaan: {terminalName}"
 
 msgid "Delegated"
 msgstr "Didelegasikan"
@@ -16487,6 +16493,9 @@ msgstr "Hapus terminal"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Hapus terminal {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Hapus terminal {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Hapus sesi terminal"
 
@@ -18964,6 +18973,9 @@ msgstr "Seseorang sedang memindahkan workspace ini…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Seseorang dari tim Paradev akan meninjau halaman ini. Kami hanya menghubungi Anda jika perlu informasi tambahan."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Seseorang menyimpan konfigurasi ini saat Anda sedang mengeditnya. Menyimpan akan menggantikan versinya."
 
 msgid "Something else"
 msgstr "Hal lain"

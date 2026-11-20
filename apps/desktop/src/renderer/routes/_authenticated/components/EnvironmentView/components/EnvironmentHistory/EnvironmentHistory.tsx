@@ -69,6 +69,8 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 			</p>
 			<EnvironmentHistoryTable
 				builds={historyRows(all, RECENT_BUILDS)}
+				failed={builds.isError}
+				loading={builds.isPending}
 				onRestore={(buildId) => restore.mutate({ environmentId, buildId })}
 				restoring={restore.isPending}
 			/>

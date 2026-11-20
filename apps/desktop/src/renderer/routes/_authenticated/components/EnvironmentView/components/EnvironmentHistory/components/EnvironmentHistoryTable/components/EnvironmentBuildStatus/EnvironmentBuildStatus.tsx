@@ -38,7 +38,12 @@ export function EnvironmentBuildStatus({
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<span className="cursor-help">{label}</span>
+				<button
+					className="cursor-help rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+					type="button"
+				>
+					{label}
+				</button>
 			</TooltipTrigger>
 			<TooltipContent className="max-w-md whitespace-pre-wrap font-mono text-[11px]">
 				{error}

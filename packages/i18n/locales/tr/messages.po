@@ -6231,6 +6231,9 @@ msgstr "Otomasyon yüklenemedi: {0}"
 msgid "Couldn't load automations"
 msgstr "Otomasyonlar yüklenemedi"
 
+msgid "Couldn't load builds"
+msgstr "Derlemeler yüklenemedi"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Katkıda bulunanlar yüklenemedi. Bunun yerine bir kullanıcı adı yazın."
 
@@ -6978,6 +6981,9 @@ msgstr "Varsayılan terminal"
 
 msgid "Default terminal theme"
 msgstr "Varsayılan terminal teması"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Varsayılan terminal: {terminalName}"
 
 msgid "Delegated"
 msgstr "Devredilmiş"
@@ -16487,6 +16493,9 @@ msgstr "Terminali kaldır"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "{createdAtLabel} terminalini kaldır"
 
+msgid "Remove terminal {terminalName}"
+msgstr "{terminalName} terminalini kaldır"
+
 msgid "Remove terminal session"
 msgstr "Terminal oturumunu kaldır"
 
@@ -18964,6 +18973,9 @@ msgstr "Biri bu çalışma alanını taşıyor…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev ekibinden biri bu sayfayı inceleyecek. Yalnızca ek bilgiye ihtiyacımız olursa sizinle iletişime geçeriz."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Siz düzenlerken biri bu yapılandırmayı kaydetti. Kaydetmek onun sürümünün yerini alır."
 
 msgid "Something else"
 msgstr "Başka bir şey"

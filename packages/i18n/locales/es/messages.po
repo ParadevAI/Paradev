@@ -6231,6 +6231,9 @@ msgstr "No se pudo cargar la automatización: {0}"
 msgid "Couldn't load automations"
 msgstr "No se pudieron cargar las automatizaciones"
 
+msgid "Couldn't load builds"
+msgstr "No se pudieron cargar las compilaciones"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "No se pudieron cargar los colaboradores. Escribe un nombre de usuario."
 
@@ -6978,6 +6981,9 @@ msgstr "Terminal predeterminado"
 
 msgid "Default terminal theme"
 msgstr "Tema de terminal predeterminado"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Terminal predeterminado: {terminalName}"
 
 msgid "Delegated"
 msgstr "Delegado"
@@ -16487,6 +16493,9 @@ msgstr "Quitar terminal"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Quitar la terminal {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Quitar terminal {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Quitar la sesión de terminal"
 
@@ -18964,6 +18973,9 @@ msgstr "Alguien está moviendo este espacio de trabajo…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Alguien del equipo de Paradev revisará esta página. Solo te contactaremos si necesitamos más información."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Alguien guardó esta configuración mientras la editabas. Al guardar, reemplazarás su versión."
 
 msgid "Something else"
 msgstr "Otra cosa"

@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
-import { RadioGroup, RadioGroupItem } from "@superset/ui/radio-group";
+import { cn } from "@superset/ui/utils";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { PLACEHOLDERS } from "../../constants";
 import {
@@ -23,7 +23,6 @@ export function TerminalsField({
 	onChange,
 }: TerminalsFieldProps) {
 	const { t } = useLingui();
-	const defaultKey = rows.find((row) => row.isDefault)?.key ?? "";
 
 	const edit = (key: string, patch: Partial<TerminalRow>) =>
 		onChange(rows.map((row) => (row.key === key ? { ...row, ...patch } : row)));
@@ -43,6 +42,7 @@ export function TerminalsField({
 								source: null,
 								name: "",
 								command: "",
+								originalCommand: "",
 								isDefault: rows.length === 0,
 							},
 						])
@@ -61,15 +61,7 @@ export function TerminalsField({
 				</Trans>
 			</p>
 			{rows.length > 0 && (
-				<RadioGroup
-					className="gap-2"
-					onValueChange={(key) =>
-						onChange(
-							rows.map((row) => ({ ...row, isDefault: row.key === key })),
-						)
-					}
-					value={defaultKey}
-				>
+				<div className="flex flex-col gap-2">
 					<div className="flex items-center gap-2 text-[11px] text-muted-foreground">
 						<span className="w-32 shrink-0">
 							<Trans>Name</Trans>
@@ -82,56 +74,84 @@ export function TerminalsField({
 						</span>
 						<span className="w-7 shrink-0" />
 					</div>
-					{rows.map((row) => (
-						<div className="flex flex-col gap-1" key={row.key}>
-							<div className="flex items-center gap-2">
-								<Input
-									aria-invalid={
-										problems.get(row.key) === "name" ||
-										problems.get(row.key) === "duplicate"
-									}
-									aria-label={t({ message: "Terminal name" })}
-									className="h-8 w-32 shrink-0 font-mono text-xs md:text-xs"
-									onChange={(event) =>
-										edit(row.key, { name: event.target.value })
-									}
-									placeholder={PLACEHOLDERS.terminalName}
-									spellCheck={false}
-									value={row.name}
-								/>
-								<Input
-									aria-invalid={problems.get(row.key) === "command"}
-									aria-label={t({ message: "Terminal command" })}
-									className="h-8 flex-1 font-mono text-xs md:text-xs"
-									onChange={(event) =>
-										edit(row.key, { command: event.target.value })
-									}
-									placeholder={PLACEHOLDERS.terminalCommand}
-									spellCheck={false}
-									value={row.command}
-								/>
-								<div className="flex w-14 shrink-0 justify-center">
-									<RadioGroupItem
-										aria-label={t({ message: "Default terminal" })}
-										value={row.key}
+					{rows.map((row) => {
+						const terminalName = row.name.trim();
+						return (
+							<div className="flex flex-col gap-1" key={row.key}>
+								<div className="flex items-center gap-2">
+									<Input
+										aria-invalid={
+											problems.get(row.key) === "name" ||
+											problems.get(row.key) === "duplicate"
+										}
+										aria-label={t({ message: "Terminal name" })}
+										className="h-8 w-32 shrink-0 font-mono text-xs md:text-xs"
+										onChange={(event) =>
+											edit(row.key, { name: event.target.value })
+										}
+										placeholder={PLACEHOLDERS.terminalName}
+										spellCheck={false}
+										value={row.name}
 									/>
+									<Input
+										aria-invalid={problems.get(row.key) === "command"}
+										aria-label={t({ message: "Terminal command" })}
+										className="h-8 flex-1 font-mono text-xs md:text-xs"
+										onChange={(event) =>
+											edit(row.key, { command: event.target.value })
+										}
+										placeholder={PLACEHOLDERS.terminalCommand}
+										spellCheck={false}
+										value={row.command}
+									/>
+									<div className="flex w-14 shrink-0 justify-center">
+										<button
+											aria-label={
+												terminalName
+													? t({ message: `Default terminal: ${terminalName}` })
+													: t({ message: "Default terminal" })
+											}
+											aria-pressed={row.isDefault}
+											className="flex size-4 shrink-0 items-center justify-center rounded-full border border-input shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30"
+											onClick={() =>
+												onChange(
+													rows.map((other) => ({
+														...other,
+														isDefault: other.key === row.key,
+													})),
+												)
+											}
+											type="button"
+										>
+											<span
+												className={cn(
+													"size-2 rounded-full bg-primary",
+													!row.isDefault && "invisible",
+												)}
+											/>
+										</button>
+									</div>
+									<Button
+										aria-label={
+											terminalName
+												? t({ message: `Remove terminal ${terminalName}` })
+												: t({ message: "Remove terminal" })
+										}
+										className="text-muted-foreground"
+										onClick={() =>
+											onChange(rows.filter((other) => other.key !== row.key))
+										}
+										size="icon-xs"
+										variant="ghost"
+									>
+										<LuTrash2 />
+									</Button>
 								</div>
-								<Button
-									aria-label={t({ message: "Remove terminal" })}
-									className="text-muted-foreground"
-									onClick={() =>
-										onChange(rows.filter((other) => other.key !== row.key))
-									}
-									size="icon-xs"
-									variant="ghost"
-								>
-									<LuTrash2 />
-								</Button>
+								<RowProblemText problem={problems.get(row.key)} />
 							</div>
-							<RowProblemText problem={problems.get(row.key)} />
-						</div>
-					))}
-				</RadioGroup>
+						);
+					})}
+				</div>
 			)}
 		</div>
 	);

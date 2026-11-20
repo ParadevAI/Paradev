@@ -6231,6 +6231,9 @@ msgstr "Couldn't load automation: {0}"
 msgid "Couldn't load automations"
 msgstr "Couldn't load automations"
 
+msgid "Couldn't load builds"
+msgstr "Couldn't load builds"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Couldn't load contributors. Type a username instead."
 
@@ -6978,6 +6981,9 @@ msgstr "Default terminal"
 
 msgid "Default terminal theme"
 msgstr "Default terminal theme"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Default terminal: {terminalName}"
 
 msgid "Delegated"
 msgstr "Delegated"
@@ -16487,6 +16493,9 @@ msgstr "Remove terminal"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Remove terminal {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Remove terminal {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Remove terminal session"
 
@@ -18964,6 +18973,9 @@ msgstr "Someone is moving this workspace…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Someone on the Paradev team will review this page. We only follow up if we need more from you."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Someone saved this config while you were editing. Saving replaces their version."
 
 msgid "Something else"
 msgstr "Something else"

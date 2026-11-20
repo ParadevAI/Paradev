@@ -6231,6 +6231,9 @@ msgstr "Nepodařilo se načíst automatizaci: {0}"
 msgid "Couldn't load automations"
 msgstr "Nepodařilo se načíst automatizace"
 
+msgid "Couldn't load builds"
+msgstr "Nepodařilo se načíst sestavení"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Nepodařilo se načíst přispěvatele. Zadejte uživatelské jméno."
 
@@ -6978,6 +6981,9 @@ msgstr "Výchozí terminál"
 
 msgid "Default terminal theme"
 msgstr "Výchozí motiv terminálu"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Výchozí terminál: {terminalName}"
 
 msgid "Delegated"
 msgstr "Delegovaný"
@@ -16487,6 +16493,9 @@ msgstr "Odebrat terminál"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Odebrat terminál {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Odebrat terminál {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Odebrat relaci terminálu"
 
@@ -18964,6 +18973,9 @@ msgstr "Někdo přesouvá tento pracovní prostor…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Někdo z týmu Paradev tuto stránku posoudí. Ozveme se jen tehdy, když budeme potřebovat víc informací."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Někdo tuto konfiguraci uložil, zatímco jste ji upravovali. Uložením jeho verzi nahradíte."
 
 msgid "Something else"
 msgstr "Něco jiného"

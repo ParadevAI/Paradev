@@ -6231,6 +6231,9 @@ msgstr "Kan automatisering niet laden: {0}"
 msgid "Couldn't load automations"
 msgstr "Kan automatiseringen niet laden"
 
+msgid "Couldn't load builds"
+msgstr "Kan builds niet laden"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Kan contributors niet laden. Typ in plaats daarvan een gebruikersnaam."
 
@@ -6978,6 +6981,9 @@ msgstr "Standaardterminal"
 
 msgid "Default terminal theme"
 msgstr "Standaard terminalthema"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Standaardterminal: {terminalName}"
 
 msgid "Delegated"
 msgstr "Gedelegeerd"
@@ -16487,6 +16493,9 @@ msgstr "Terminal verwijderen"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Terminal {createdAtLabel} verwijderen"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Terminal {terminalName} verwijderen"
+
 msgid "Remove terminal session"
 msgstr "Terminalsessie verwijderen"
 
@@ -18964,6 +18973,9 @@ msgstr "Iemand verplaatst deze werkruimte…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Iemand van het Paradev-team beoordeelt deze pagina. We nemen alleen contact op als we meer van je nodig hebben."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Iemand heeft deze configuratie opgeslagen terwijl je hem bewerkte. Opslaan vervangt die versie."
 
 msgid "Something else"
 msgstr "Iets anders"

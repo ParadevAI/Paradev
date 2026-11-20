@@ -39,6 +39,7 @@ export function ScriptField({
 					onChange={onChange}
 					onSave={onSave}
 					placeholder={placeholder}
+					tabIndents={false}
 					value={value}
 				/>
 			</div>

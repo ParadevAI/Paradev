@@ -6231,6 +6231,9 @@ msgstr "无法加载自动化：{0}"
 msgid "Couldn't load automations"
 msgstr "无法加载自动化"
 
+msgid "Couldn't load builds"
+msgstr "无法加载构建"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "无法加载贡献者，请直接输入用户名。"
 
@@ -6978,6 +6981,9 @@ msgstr "默认终端"
 
 msgid "Default terminal theme"
 msgstr "默认终端主题"
+
+msgid "Default terminal: {terminalName}"
+msgstr "默认终端：{terminalName}"
 
 msgid "Delegated"
 msgstr "委派"
@@ -16487,6 +16493,9 @@ msgstr "移除终端"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "移除终端{createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "移除终端 {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "移除终端会话"
 
@@ -18964,6 +18973,9 @@ msgstr "有人正在移动此工作区…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev 团队会审核此页面。只有在需要你补充信息时我们才会联系你。"
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "你编辑时有人保存了此配置。保存会替换对方的版本。"
 
 msgid "Something else"
 msgstr "其他问题"

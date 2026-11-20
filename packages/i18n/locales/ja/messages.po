@@ -6231,6 +6231,9 @@ msgstr "オートメーションを読み込めませんでした: {0}"
 msgid "Couldn't load automations"
 msgstr "オートメーションを読み込めませんでした"
 
+msgid "Couldn't load builds"
+msgstr "ビルドを読み込めませんでした"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "コントリビューターを読み込めませんでした。ユーザー名を入力してください。"
 
@@ -6978,6 +6981,9 @@ msgstr "デフォルトのターミナル"
 
 msgid "Default terminal theme"
 msgstr "既定のターミナルテーマ"
+
+msgid "Default terminal: {terminalName}"
+msgstr "デフォルトのターミナル: {terminalName}"
 
 msgid "Delegated"
 msgstr "委任"
@@ -16487,6 +16493,9 @@ msgstr "ターミナルを削除"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "ターミナル{createdAtLabel}を削除"
 
+msgid "Remove terminal {terminalName}"
+msgstr "ターミナル {terminalName} を削除"
+
 msgid "Remove terminal session"
 msgstr "ターミナルセッションを削除"
 
@@ -18964,6 +18973,9 @@ msgstr "誰かがこのワークスペースを移動しています…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev チームがこのページを確認します。追加の情報が必要な場合にのみご連絡します。"
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "編集中に他の人がこの設定を保存しました。保存すると、そのバージョンは置き換えられます。"
 
 msgid "Something else"
 msgstr "その他"

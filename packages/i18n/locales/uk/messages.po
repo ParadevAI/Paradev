@@ -6225,6 +6225,9 @@ msgstr "Не вдалося завантажити автоматизацію: {
 msgid "Couldn't load automations"
 msgstr "Не вдалося завантажити автоматизації"
 
+msgid "Couldn't load builds"
+msgstr "Не вдалося завантажити збірки"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Не вдалося завантажити контриб'юторів. Введіть ім'я користувача."
 
@@ -6972,6 +6975,9 @@ msgstr "Термінал за замовчуванням"
 
 msgid "Default terminal theme"
 msgstr "Тема термінала за замовчуванням"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Термінал за замовчуванням: {terminalName}"
 
 msgid "Delegated"
 msgstr "Із делегуванням"
@@ -16481,6 +16487,9 @@ msgstr "Видалити термінал"
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Видалити термінал {createdAtLabel}"
 
+msgid "Remove terminal {terminalName}"
+msgstr "Видалити термінал {terminalName}"
+
 msgid "Remove terminal session"
 msgstr "Видалити сеанс термінала"
 
@@ -18958,6 +18967,9 @@ msgstr "Хтось переміщує цей робочий простір…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Команда Paradev перевірить цю сторінку. Ми зв'яжемося з вами, лише якщо нам знадобиться щось іще."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Хтось зберіг цю конфігурацію, поки ви її редагували. Збереження замінить його версію."
 
 msgid "Something else"
 msgstr "Інше"

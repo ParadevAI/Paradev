@@ -290,7 +290,6 @@ export function AddVariablesForm({
 		>
 			<div>
 				<div className="space-y-2 p-3">
-					{/* Column headers */}
 					<div className="flex items-center gap-2">
 						<span className="flex-1 text-xs font-medium text-muted-foreground">
 							<Trans>Key</Trans>
@@ -298,7 +297,6 @@ export function AddVariablesForm({
 						<span className="flex-1 text-xs font-medium text-muted-foreground">
 							<Trans>Value</Trans>
 						</span>
-						{/* spacer for trash button */}
 						<div className="w-8 shrink-0" />
 					</div>
 
