@@ -1,12 +1,18 @@
+import { acpHarnessForPreset } from "@superset/chat/core";
 import {
 	type AgentEffortOption,
 	type AgentModelOption,
+	type CatalogModel,
+	filterModelCatalog,
 	getAgentEfforts,
 	getAgentModelSupport,
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
+import { useAcpChatEnabled } from "../useAcpChatEnabled";
 
 export interface AgentLaunchPreferences {
 	/** Curated models the preset offers; undefined when it has no model flag. */
@@ -39,22 +45,33 @@ export function agentLaunchPresetId(config: {
 		: config.presetId;
 }
 
-/**
- * The remembered model and effort for a launch preset, checked against the
- * curated catalog. A pick that fell out of the catalog, or an effort the
- * picked model rejects, reads as the default: the host would refuse it, and
- * "Default" beats a launch that fails.
- */
 export function resolveAgentLaunchPreferences(
 	presetId: string | null,
 	modelByAgent: Record<string, string>,
 	effortByAgent: Record<string, string>,
+	discoveredModels?: CatalogModel[],
 ): AgentLaunchPreferences {
 	if (!presetId) return NO_PREFERENCES;
-	const models = getAgentModelSupport(presetId)?.models;
+	const models = discoveredModels
+		? filterModelCatalog(discoveredModels, {
+				requireTools: true,
+				requireTextOutput: true,
+				includeDeprecated: false,
+				selectedId: modelByAgent[presetId],
+			})
+		: getAgentModelSupport(presetId)?.models;
 	const model =
-		models?.find((option) => option.id === modelByAgent[presetId]) ?? null;
-	const efforts = getAgentEfforts(presetId, model?.id);
+		models?.find((option) => option.id === modelByAgent[presetId]) ??
+		(modelByAgent[presetId]
+			? { id: modelByAgent[presetId], label: modelByAgent[presetId] }
+			: null);
+	const efforts =
+		model &&
+		!getAgentModelSupport(presetId)?.models.some(
+			(entry) => entry.id === model.id,
+		)
+			? []
+			: getAgentEfforts(presetId, model?.id);
 	const effort =
 		efforts.find((option) => option.id === effortByAgent[presetId]) ?? null;
 	return { models, efforts, model, effort };
@@ -73,7 +90,36 @@ export function describeAgentLaunchPreferences({
 
 export function useAgentLaunchPreferences(
 	presetId: string | null,
+	target?: {
+		hostUrl?: string | null;
+		agent?: string;
+		surface?: "chat" | "terminal";
+	},
 ): AgentLaunchPreferences {
+	const chatEnabled = useAcpChatEnabled();
+	const surface =
+		target?.surface ??
+		(chatEnabled && acpHarnessForPreset(presetId ?? undefined)
+			? "chat"
+			: "terminal");
+	const catalog = useQuery({
+		queryKey: [
+			"agent-model-catalog",
+			target?.hostUrl,
+			target?.agent ?? presetId,
+			surface,
+		],
+		queryFn: () =>
+			getHostServiceClientByUrl(target?.hostUrl as string).agents.models.query({
+				agent: target?.agent ?? presetId ?? "",
+				surface: surface,
+			}),
+		enabled: !!target?.hostUrl && !!presetId,
+		staleTime: 60_000,
+		gcTime: 5 * 60_000,
+		retry: false,
+	});
+	const discoveredModels = catalog.data?.models;
 	const modelByAgent = useNewSessionPreferencesStore(
 		(state) => state.modelByAgent,
 	);
@@ -81,7 +127,13 @@ export function useAgentLaunchPreferences(
 		(state) => state.effortByAgent,
 	);
 	return useMemo(
-		() => resolveAgentLaunchPreferences(presetId, modelByAgent, effortByAgent),
-		[presetId, modelByAgent, effortByAgent],
+		() =>
+			resolveAgentLaunchPreferences(
+				presetId,
+				modelByAgent,
+				effortByAgent,
+				discoveredModels,
+			),
+		[presetId, modelByAgent, effortByAgent, discoveredModels],
 	);
 }

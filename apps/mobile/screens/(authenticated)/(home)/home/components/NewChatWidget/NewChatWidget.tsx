@@ -151,7 +151,11 @@ export function NewChatWidget({
 	const launchPresetId = selectedAgent
 		? agentLaunchPresetId(selectedAgent)
 		: agentId;
-	const launch = useAgentLaunchPreferences(launchPresetId);
+	const launch = useAgentLaunchPreferences(launchPresetId, {
+		hostUrl: selectedTarget?.hostUrl,
+		agent:
+			selectedAgent && "id" in selectedAgent ? selectedAgent.id : undefined,
+	});
 	const model = launch.model?.id ?? null;
 	const effort = launch.effort?.id ?? null;
 	// One dropdown after the agent, naming the model; the sheet it opens also
@@ -354,6 +358,11 @@ export function NewChatWidget({
 					params: {
 						presetId: launchPresetId,
 						agentLabel: selectedAgent?.label ?? "",
+						hostUrl: selectedTarget?.hostUrl ?? "",
+						agent:
+							(selectedAgent && "id" in selectedAgent
+								? selectedAgent.id
+								: undefined) ?? launchPresetId,
 					},
 				});
 			}}

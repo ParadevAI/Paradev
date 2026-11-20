@@ -32,6 +32,10 @@ import { trackAgentLaunched } from "../../../agent-launch-analytics";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
+import {
+	cachedTerminalModels,
+	discoverAgentModels,
+} from "../../../model-catalog/catalog";
 import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type {
 	TerminalAgentBinding,
@@ -361,6 +365,23 @@ function validateForkSessionIsResolvable(
 	}
 }
 
+export async function prepareAgentModelCatalog(
+	db: HostDb,
+	input: Pick<AgentRunInput, "agent" | "model" | "surface">,
+): Promise<void> {
+	if (!input.model) return;
+	const config = resolveHostAgentConfig(db, input.agent);
+	if (!config) return;
+	if (
+		input.surface === "chat" &&
+		acpHarnessForPreset(chatLaunchPresetId(config))
+	)
+		return;
+	const presetId = resolveAgentLaunchPresetId(config.presetId, config.command);
+	if (isCuratedAgentModel(presetId, input.model)) return;
+	await discoverAgentModels(db, { agent: input.agent, surface: "terminal" });
+}
+
 /**
  * Preflight a host-scoped launch before any larger workflow (such as
  * workspace creation) performs side effects.
@@ -382,13 +403,24 @@ export function validateAgentLaunchOptions(
 		config.presetId,
 		config.command,
 	);
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
-	validateAgentEffortSelection(
-		launchPresetId,
-		config.label,
-		input.effort,
-		input.model,
-	);
+	const chat =
+		input.surface === "chat" &&
+		!!acpHarnessForPreset(chatLaunchPresetId(config));
+	if (
+		!chat &&
+		!cachedTerminalModels(db, input.agent).some(
+			(model) => model.id === input.model,
+		)
+	) {
+		validateAgentModelSelection(launchPresetId, config.label, input.model);
+	}
+	if (!chat)
+		validateAgentEffortSelection(
+			launchPresetId,
+			config.label,
+			input.effort,
+			input.model,
+		);
 	validateAgentModeSelection(
 		launchPresetId,
 		config.label,
@@ -421,7 +453,13 @@ export function buildTerminalAgentLaunch(
 		config.presetId,
 		config.command,
 	);
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
+	if (
+		!cachedTerminalModels(db, input.agent).some(
+			(model) => model.id === input.model,
+		)
+	) {
+		validateAgentModelSelection(launchPresetId, config.label, input.model);
+	}
 	validateAgentEffortSelection(
 		launchPresetId,
 		config.label,
@@ -461,6 +499,7 @@ export function buildTerminalAgentLaunch(
 		launchPresetId,
 		input.model,
 		input.effort,
+		cachedTerminalModels(db, input.agent),
 	);
 	const effortArgs = buildAgentEffortArgs(
 		launchPresetId,
@@ -729,7 +768,6 @@ export function chatLaunchTarget(
 	const launchPresetId = chatLaunchPresetId(config);
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
 	return {
 		harness,
@@ -883,6 +921,7 @@ export async function runAgentInWorkspace(
 			message: `Workspace ${input.workspaceId} not found on this host — it may have been deleted.`,
 		});
 	}
+	await prepareAgentModelCatalog(ctx.db, input);
 	// Ahead of the launch path: continuing costs no pty and no trust seeding.
 	const continued = await continueAgent(ctx, input);
 	if (continued) return continued;
@@ -905,6 +944,16 @@ export async function runAgentInWorkspace(
 }
 
 export const agentsRouter = router({
+	models: protectedProcedure
+		.input(
+			z.object({
+				agent: z.string().min(1),
+				surface: z.enum(["chat", "terminal"]).default("chat"),
+				workspaceId: z.string().optional(),
+				refresh: z.boolean().optional(),
+			}),
+		)
+		.query(({ ctx, input }) => discoverAgentModels(ctx.db, input)),
 	run: protectedProcedure
 		.input(
 			z.object({

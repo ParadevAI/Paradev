@@ -12132,6 +12132,9 @@ msgstr "mô hình"
 msgid "Model"
 msgstr "Mô hình"
 
+msgid "Model availability could not be verified."
+msgstr "Không thể xác minh tính khả dụng của mô hình."
+
 msgid "Model context usage"
 msgstr "Mức dùng ngữ cảnh của mô hình"
 

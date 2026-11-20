@@ -12132,6 +12132,9 @@ msgstr "モデル"
 msgid "Model"
 msgstr "モデル"
 
+msgid "Model availability could not be verified."
+msgstr "モデルの利用可否を確認できませんでした。"
+
 msgid "Model context usage"
 msgstr "モデルのコンテキスト使用量"
 

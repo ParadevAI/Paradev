@@ -12132,6 +12132,9 @@ msgstr "modèle"
 msgid "Model"
 msgstr "Modèle"
 
+msgid "Model availability could not be verified."
+msgstr "Impossible de vérifier la disponibilité des modèles."
+
 msgid "Model context usage"
 msgstr "Utilisation du contexte du modèle"
 

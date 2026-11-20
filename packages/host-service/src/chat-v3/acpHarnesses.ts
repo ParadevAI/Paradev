@@ -23,6 +23,7 @@ export function acpHarnessFactory(
 	db: HostDb,
 	resolveAttachment: ResolveAttachment,
 	agents?: ChatAgentBridge,
+	discovery = false,
 ): HarnessFactory | null {
 	const entry = ACP_HARNESSES[harness];
 	if (!entry) return null;
@@ -39,6 +40,7 @@ export function acpHarnessFactory(
 	return (options) =>
 		createAcpAdapter({
 			command: entry.binary,
+			...(discovery ? { startupTimeoutMs: 10_000 } : {}),
 			cwd: options.cwd,
 			resolveAttachment,
 			storeImage: storeAgentImage,
@@ -67,20 +69,22 @@ export function acpHarnessFactory(
 						}),
 				});
 				const env = cli.env;
-				void captureSessionAccount(
-					entry.binary,
-					(entry.binary === "codex" ? env.CODEX_HOME : env.CLAUDE_CONFIG_DIR) ??
-						"",
-					Boolean(
-						entry.binary === "codex"
-							? env.OPENAI_API_KEY
-							: env.ANTHROPIC_API_KEY,
-					),
-				)
-					.then((account) => {
-						if (account) agents?.accountCaptured(options.sessionId, account);
-					})
-					.catch(() => undefined);
+				if (!discovery)
+					void captureSessionAccount(
+						entry.binary,
+						(entry.binary === "codex"
+							? env.CODEX_HOME
+							: env.CLAUDE_CONFIG_DIR) ?? "",
+						Boolean(
+							entry.binary === "codex"
+								? env.OPENAI_API_KEY
+								: env.ANTHROPIC_API_KEY,
+						),
+					)
+						.then((account) => {
+							if (account) agents?.accountCaptured(options.sessionId, account);
+						})
+						.catch(() => undefined);
 				const loginCommand = agentLoginCommand(entry.binary, env);
 				const login = loginCommand ? { loginCommand } : {};
 				if (!adapterEntry) {

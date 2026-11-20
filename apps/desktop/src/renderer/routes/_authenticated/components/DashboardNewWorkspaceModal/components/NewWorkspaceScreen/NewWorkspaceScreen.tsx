@@ -33,6 +33,7 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
+import { useAgentModelCatalog } from "renderer/hooks/useAgentModelCatalog";
 import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
@@ -612,9 +613,25 @@ export function NewWorkspaceScreen({
 		);
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [agentConfigs, selectedAgent]);
-	const modelSupport = selectedPresetId
+	const acpChatEnabled = useAcpChatEnabled();
+	const catalogs = useAgentModelCatalog(
+		launchHostUrl,
+		agentConfigs,
+		acpChatEnabled ? "chat" : "terminal",
+	);
+	const bundledSupport = selectedPresetId
 		? getAgentModelSupport(selectedPresetId)
 		: undefined;
+	const discovered = catalogs[selectedAgent];
+	const modelSupport =
+		discovered &&
+		(discovered.models.length > 0 || discovered.availability === "reported")
+			? {
+					presetId: selectedPresetId ?? selectedAgent,
+					modelFlag: bundledSupport?.modelFlag ?? null,
+					models: discovered.models,
+				}
+			: bundledSupport;
 	const { selectedModel, setSelectedModel } = useAgentModelPreference(
 		MODEL_STORAGE_KEY,
 		modelSupport ? selectedPresetId : null,
@@ -633,7 +650,11 @@ export function NewWorkspaceScreen({
 	// launches) as the agent default.
 	const effortOptions = useMemo(
 		() =>
-			selectedPresetId
+			selectedPresetId &&
+			(!selectedModel ||
+				getAgentModelSupport(selectedPresetId)?.models.some(
+					(entry) => entry.id === selectedModel,
+				))
 				? getAgentEfforts(selectedPresetId, selectedModel ?? undefined)
 				: [],
 		[selectedPresetId, selectedModel],
@@ -646,7 +667,6 @@ export function NewWorkspaceScreen({
 	const modeSupport = selectedPresetId
 		? getAgentModeSupport(selectedPresetId)
 		: undefined;
-	const acpChatEnabled = useAcpChatEnabled();
 	const startModes = acpChatEnabled
 		? acpStartModes(selectedPresetId)
 		: undefined;
@@ -659,7 +679,7 @@ export function NewWorkspaceScreen({
 							id: AGENT_DEFAULT_OPTION_ID,
 							label: t({ message: "Direct mode" }),
 						},
-						...modeSupport.modes.map(({ id, label }) => ({ id, label })),
+						...modeSupport.modes.map((entry) => ({ ...entry })),
 					]
 				: undefined),
 		[startModes, modeSupport, t],
@@ -717,9 +737,14 @@ export function NewWorkspaceScreen({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
+				availability: catalogs[agent.id]?.availability,
+				loading: catalogs[agent.id]?.loading,
+				onRefresh: catalogs[agent.id]?.refresh,
 				models: (
-					getAgentModelSupport(launchPresetIdOf(agent))?.models ?? []
-				).map(({ id, label }) => ({ id, label })),
+					catalogs[agent.id]?.models ??
+					getAgentModelSupport(launchPresetIdOf(agent))?.models ??
+					[]
+				).map((entry) => ({ ...entry })),
 			})),
 			onSwitch: (agentId, model) => {
 				pendingSwitchModel.current = model
@@ -728,7 +753,7 @@ export function NewWorkspaceScreen({
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, agentConfigs]);
+	}, [selectedAgent, setSelectedAgent, agentConfigs, catalogs]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(

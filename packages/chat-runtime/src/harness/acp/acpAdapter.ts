@@ -491,6 +491,7 @@ export class AcpAdapter implements HarnessAdapter {
 		},
 	);
 	private configOptions: SessionConfigOption[] = [];
+	private unavailableStartModel: string | undefined;
 	private replaying = false;
 	private agentName: string | null = null;
 	private quietReplay = false;
@@ -556,6 +557,22 @@ export class AcpAdapter implements HarnessAdapter {
 				}),
 			options.backgroundDetailIntervalMs,
 		);
+	}
+
+	async discoverModels(cwd: string): Promise<SessionConfigOption[]> {
+		await this.ensureConnected(cwd);
+		if (!this.client) throw new Error("Agent did not connect");
+		// ACP exposes models on session/new; no prompt or mode change is sent.
+		const response = await this.client.request(
+			"session/new",
+			{ cwd, mcpServers: [] },
+			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
+		);
+		const session = acpNewSessionResponseSchema.parse(response);
+		this.sessionId = session.sessionId;
+		this.handleConfigOptions(response);
+		if (this.configOptions.length === 0) await this.awaitStartOptions({});
+		return this.configOptions;
 	}
 
 	start(startOptions: HarnessStartOptions): AsyncIterable<AdapterEvent> {
@@ -769,6 +786,9 @@ export class AcpAdapter implements HarnessAdapter {
 		const sessionId = this.sessionId;
 		if (!client || !sessionId) return Promise.resolve(false);
 		const previous = this.configOptions;
+		const changesModel = previous.some(
+			(option) => option.id === configId && option.category === "model",
+		);
 		const previousModeId =
 			configId === this.modeConfigId ? this.modeId : undefined;
 		this.configOptions = previous.map((option) =>
@@ -804,7 +824,10 @@ export class AcpAdapter implements HarnessAdapter {
 				this.emitNotice("error", error.message);
 			});
 		return request.then(
-			() => true,
+			() => {
+				if (changesModel) this.unavailableStartModel = undefined;
+				return true;
+			},
 			() => false,
 		);
 	}
@@ -1202,6 +1225,14 @@ export class AcpAdapter implements HarnessAdapter {
 		this.emitSession({ status: this.statusAfterApprovals() });
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
+		if (this.unavailableStartModel) {
+			this.failTurn(turnId, {
+				kind: "model_unavailable",
+				message: this.unavailableStartModel,
+			});
+			this.heldTurnId = null;
+			return;
+		}
 		if (this.heldTurnId !== turnId) return;
 		this.heldTurnId = null;
 		const client = this.client;
@@ -2251,6 +2282,12 @@ export class AcpAdapter implements HarnessAdapter {
 				: Object.keys(wanted).length > 0
 					? this.awaitStartOptions(wanted)
 					: Promise.resolve({});
+		const confirmed = configured.then((taken) => {
+			this.unavailableStartModel =
+				wanted.modelId && !taken.modelId ? wanted.modelId : undefined;
+			return taken;
+		});
+		this.trackSelection(confirmed);
 		let sessionMode: Promise<string | undefined> = Promise.resolve(
 			this.options.clientApprovalModes && modeId && isClientApprovalMode(modeId)
 				? modeId
@@ -2271,7 +2308,7 @@ export class AcpAdapter implements HarnessAdapter {
 				taken ? modeId : undefined,
 			);
 		}
-		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+		void Promise.all([confirmed, sessionMode]).then(([taken, takenMode]) => {
 			if (wanted.effortId && !taken.effortId)
 				console.warn(
 					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,

@@ -759,3 +759,16 @@ describe("September 2026 model launches", () => {
 		}
 	});
 });
+
+it("passes a newly discovered model to its CLI without admitting arbitrary IDs", () => {
+	expect(
+		buildAgentModelArgs("opencode", "private/new-model", undefined, [
+			{ id: "private/new-model", label: "Private" },
+		]),
+	).toEqual(["--model", "private/new-model"]);
+	expect(
+		buildAgentModelArgs("opencode", "private/other", undefined, [
+			{ id: "private/new-model", label: "Private" },
+		]),
+	).toEqual([]);
+});
