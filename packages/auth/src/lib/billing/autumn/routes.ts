@@ -218,7 +218,7 @@ export const autumnBillingRoutes = {
 					heldAutumnPlanId(caller.organizationId),
 				]);
 				if (
-					stripeSubscription?.plan === "enterprise" ||
+					(!autumnPlanId && stripeSubscription?.plan === "enterprise") ||
 					(autumnPlanId &&
 						!LEGACY_CLIENT_PLAN_IDS.includes(autumnPlanId) &&
 						!(await isSelfServePlan(autumnPlanId)))

@@ -1,13 +1,9 @@
-import { billingUsesAutumn } from "@superset/auth/autumn";
-import { organizationPlanFromAutumn } from "@superset/auth/billing";
-import { db } from "@superset/db/client";
-import { subscriptions } from "@superset/db/schema";
+import { organizationPlan } from "@superset/auth/billing";
 import {
 	accountConnection,
 	connectionBotToken,
 } from "@superset/trpc/connectors";
 import { Client as QStash } from "@upstash/qstash";
-import { and, eq } from "drizzle-orm";
 import { env } from "@/env";
 import { posthog } from "@/lib/analytics";
 import { findSlackUserLink } from "../../lib/find-slack-user-link";
@@ -136,17 +132,7 @@ export async function processAgentMessage({
 					teamId,
 				})
 			: undefined,
-		billingUsesAutumn
-			? organizationPlanFromAutumn(connection.organizationId).then((plan) =>
-					plan === "free" ? undefined : { id: connection.organizationId },
-				)
-			: db.query.subscriptions.findFirst({
-					where: and(
-						eq(subscriptions.referenceId, connection.organizationId),
-						eq(subscriptions.status, "active"),
-					),
-					columns: { id: true },
-				}),
+		organizationPlan(connection.organizationId).then((plan) => plan !== "free"),
 	]);
 
 	if (!activeSubscription) {

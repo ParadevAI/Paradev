@@ -1,21 +1,14 @@
-import { billingUsesAutumn } from "@superset/auth/autumn";
-import { organizationPlanFromAutumn } from "@superset/auth/billing";
+import { organizationPlans } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
 	automations,
 	automationTriggers,
-	subscriptions,
 	type TriggerConfig,
 } from "@superset/db/schema";
-import {
-	ACTIVE_SUBSCRIPTION_STATUSES,
-	type PlanTier,
-	planAllowsTriggerKind,
-	planTierFromSubscription,
-} from "@superset/shared/billing";
+import { planAllowsTriggerKind } from "@superset/shared/billing";
 import { nextOccurrenceAfter } from "@superset/shared/rrule";
 import { Client } from "@upstash/qstash";
-import { and, desc, eq, inArray, lte } from "drizzle-orm";
+import { and, eq, lte } from "drizzle-orm";
 import { env } from "@/env";
 import { redispatchUndispatched } from "@/lib/automations/redispatchUndispatched";
 import { singleFlight } from "@/lib/singleFlight";
@@ -47,50 +40,6 @@ function scheduleFromConfig(
 	const dtstart = new Date(config.dtstart);
 	if (Number.isNaN(dtstart.getTime())) return null;
 	return { rrule: config.rrule, dtstart, timezone: config.timezone };
-}
-
-const AUTUMN_PLAN_CONCURRENCY = 10;
-
-/**
- * The plan of each organization, for the tier gate. One query for the whole
- * batch rather than one per row; the newest paying subscription wins, as it
- * does everywhere else the plan is read.
- */
-async function organizationPlans(
-	organizationIds: string[],
-): Promise<Map<string, PlanTier>> {
-	const plans = new Map<string, PlanTier>();
-	if (organizationIds.length === 0) return plans;
-	if (billingUsesAutumn) {
-		for (let i = 0; i < organizationIds.length; i += AUTUMN_PLAN_CONCURRENCY) {
-			const batch = organizationIds.slice(i, i + AUTUMN_PLAN_CONCURRENCY);
-			const tiers = await Promise.all(batch.map(organizationPlanFromAutumn));
-			for (const [index, id] of batch.entries()) {
-				plans.set(id, tiers[index] ?? "free");
-			}
-		}
-		return plans;
-	}
-	const rows = await db
-		.select({
-			organizationId: subscriptions.referenceId,
-			plan: subscriptions.plan,
-			status: subscriptions.status,
-		})
-		.from(subscriptions)
-		.where(
-			and(
-				inArray(subscriptions.referenceId, organizationIds),
-				inArray(subscriptions.status, [...ACTIVE_SUBSCRIPTION_STATUSES]),
-			),
-		)
-		.orderBy(desc(subscriptions.createdAt));
-	for (const row of rows) {
-		if (!plans.has(row.organizationId)) {
-			plans.set(row.organizationId, planTierFromSubscription(row));
-		}
-	}
-	return plans;
 }
 
 /**

@@ -234,15 +234,18 @@ export async function handleStripeBillingEvent(
 			0,
 		);
 
+		const renewalPlan = await autumnEmailPlan(org.id);
+		const planName = renewalPlan?.name ?? subscription.plan;
+
 		await resend.batch.send(
 			recipients.map((recipient) => ({
 				from: NOREPLY_FROM,
 				to: recipient.email,
-				subject: `${org.name}'s ${subscription.plan} plan renews soon`,
+				subject: `${org.name}'s ${planName} plan renews soon`,
 				react: RenewalUpcomingEmail({
 					recipientName: recipient.name,
 					organizationName: org.name,
-					planName: subscription.plan,
+					planName,
 					amount: formatPrice(invoice.amount_due, invoice.currency),
 					renewsAt: new Date(renewsAtSeconds * 1000),
 					seatCount: Math.max(1, seatCount),

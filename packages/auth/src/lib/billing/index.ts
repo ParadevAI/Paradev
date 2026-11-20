@@ -1,8 +1,10 @@
+export { organizationActivePlan } from "./active-plan";
 export type { OrganizationBilling, PaymentState } from "./autumn/billing-state";
 export { listRatePerGbHour } from "./autumn/catalog";
 export type { CloudUsage } from "./autumn/cloud-usage";
 export {
 	ensureAutumnCustomer,
+	heldAutumnPlanId,
 	organizationForStripeCustomer,
 	paidAutumnPlanId,
 } from "./autumn/customer";
@@ -17,7 +19,6 @@ export {
 	organizationBilling,
 	organizationEnvironmentLimitFromAutumn,
 	organizationGatedMachineSizesFromAutumn,
-	organizationPlanFromAutumn,
 } from "./autumn/plan-state";
 export {
 	syncFromStripeEvent,
@@ -26,6 +27,8 @@ export {
 export { autumnBillingRoutes } from "./autumn/routes";
 export { setAutumnSeats } from "./autumn/seats";
 export { seatItem } from "./autumn/subscription-row";
+export { organizationsInIntegrationGrace } from "./integration-grace";
 export { withAutumnBilling } from "./legacy/stripe-routes-shim";
 export { autumnBillingDeps } from "./legacy/stripe-routes-shim-deps";
+export { organizationPlan, organizationPlans } from "./plan";
 export { handleStripeBillingEvent } from "./stripe-billing-events";
