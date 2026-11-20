@@ -312,9 +312,15 @@ export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
 // amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
-// the terminal from its XTVERSION reply ("Superset (xterm.js)", see the
-// desktop terminal-version-reply) and the CSI-u probe.
+// the terminal from its XTVERSION reply (see TERMINAL_VERSION_NAME) and the
+// CSI-u probe.
 export const TERMINAL_IDENTITY_ENV_KEYS = [
 	"TERM_PROGRAM",
 	"TERM_PROGRAM_VERSION",
 ] as const;
+
+// Claude Code switches to its native-grade wheel mode for names that do NOT
+// start with "xterm.js" but still contain it. The daemon answers XTVERSION
+// before a renderer attaches, so the name must be shared, not duplicated in
+// the desktop renderer.
+export const TERMINAL_VERSION_NAME = "Superset (xterm.js)";

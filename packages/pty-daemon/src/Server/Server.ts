@@ -175,15 +175,17 @@ export class Server {
 							s.buffer.byteOffset,
 							s.buffer.byteLength,
 						);
-						const retained = s.colors
-							? buf
-							: session.colors.feed(buf, () => {});
+						const retained = session.identity.feed(
+							s.colors ? buf : session.colors.feed(buf, () => {}),
+							() => {},
+						);
 						session.buffer = [retained];
 						session.bufferBytes = retained.byteLength;
 						if (!s.modes) session.modes.feed(buf);
 					}
 					if (s.modes) session.modes.restore(s.modes);
 					if (s.colors) session.colors.restore(s.colors);
+					if (s.identity) session.identity.restore(s.identity);
 					this.wireSession(session);
 					adopted.push(session);
 				} catch (err) {
@@ -597,19 +599,24 @@ export class Server {
 			}
 		};
 		session.pty.onData((chunk) => {
-			const output = session.colors.feed(chunk, (reply) => {
+			const answer = (reply: Buffer) => {
 				try {
 					session.pty.write(reply);
 				} catch {
 					// The child can exit between emitting a query and receiving its reply.
 				}
-			});
+			};
+			// Both parsers answer at the source and strip the query from the
+			// stream, so a renderer that attaches later cannot answer it again.
+			const afterColors = session.colors.feed(chunk, answer);
+			const output = session.identity.feed(afterColors, answer);
 			if (output.length) deliver(output);
 		});
 		session.pty.onExit((info) => {
-			// A trailing ESC can make xterm answer an unfinished OSC during replay.
-			// Parser carry from an exited process must never become new output.
+			// Parser carry from an exited process must never become new output —
+			// a trailing ESC could otherwise answer an unfinished query on replay.
 			session.colors.flush();
+			session.identity.flush();
 			session.exited = true;
 			session.exitCode = info.code;
 			session.exitSignal = info.signal;

@@ -1,4 +1,5 @@
 import type { TerminalColorsSnapshot } from "./TerminalColors/index.ts";
+import type { TerminalIdentityQueriesSnapshot } from "./TerminalIdentityQueries/index.ts";
 // Handoff snapshot — on-disk serialization of the SessionStore that the
 // successor daemon reads on startup to rebuild its in-memory state.
 //
@@ -49,6 +50,8 @@ interface HandoffSessionMessage {
 	fdIndex: number;
 	modes?: TerminalModesSnapshot;
 	colors?: TerminalColorsSnapshot;
+	/** Optional: absent in snapshots written before identity answering existed. */
+	identity?: TerminalIdentityQueriesSnapshot;
 }
 
 export interface SerializedSession {
@@ -58,6 +61,7 @@ export interface SerializedSession {
 	fdIndex: number;
 	modes?: TerminalModesSnapshot;
 	colors?: TerminalColorsSnapshot;
+	identity?: TerminalIdentityQueriesSnapshot;
 	/** Live ring buffer bytes — empty Uint8Array when there's no replay. */
 	buffer: Uint8Array;
 }
@@ -96,6 +100,7 @@ export function serializeSessions(opts: SerializeOptions): HandoffSnapshot {
 			buffer: Buffer.concat(s.buffer),
 			modes: s.modes.snapshot(),
 			colors: s.colors.snapshot(),
+			identity: s.identity.snapshot(),
 		});
 	}
 	return {
@@ -127,6 +132,7 @@ export function writeSnapshot(path: string, snapshot: HandoffSnapshot): void {
 			fdIndex: s.fdIndex,
 			modes: s.modes,
 			colors: s.colors,
+			identity: s.identity,
 		};
 		parts.push(
 			encodeFrame(msg, s.buffer.byteLength > 0 ? s.buffer : undefined),
@@ -192,6 +198,7 @@ export function readSnapshot(path: string): HandoffSnapshot {
 			fdIndex: m.fdIndex,
 			modes: m.modes,
 			colors: m.colors,
+			identity: m.identity,
 			buffer: frame.payload ?? new Uint8Array(0),
 		});
 	}
