@@ -17,6 +17,8 @@ import {
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import {
+	type CloudBootCursor,
+	type CloudUsageCursor,
 	cloudBillingAnchor,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
@@ -41,6 +43,14 @@ let db: Awaited<ReturnType<typeof seedCloudUsage>>;
 beforeAll(async () => {
 	db = await seedCloudUsage();
 });
+
+/** Metrics from any grouping but `billingDay`, which has no workspaces count. */
+function counted<Metrics extends { workspaces: number | null }>(
+	metrics: Metrics,
+) {
+	if (metrics.workspaces === null) throw new Error("no workspaces count");
+	return { ...metrics, workspaces: metrics.workspaces };
+}
 
 const usage = (
 	options: Partial<Parameters<typeof queryCloudUsage>[2]>,
@@ -213,7 +223,7 @@ test("usage by period in one query matches each period's total", async () => {
 		await Promise.all(
 			periods.map(async (window) => ({
 				...window,
-				metrics: (await usage({ window })).total,
+				metrics: counted((await usage({ window })).total),
 			})),
 		),
 	);
@@ -222,7 +232,7 @@ test("usage by period in one query matches each period's total", async () => {
 		{ organizationId: ORG, userId: SAM },
 		{ periods: [NOVEMBER], overagePerGbHour: RATE },
 	);
-	expect(own?.metrics).toEqual((await usage({}, SAM)).total);
+	expect(own?.metrics).toEqual(counted((await usage({}, SAM)).total));
 });
 
 test("a table's dollars are exact: each row is its GB-hours at the rate, and the rows add up to the total", async () => {
@@ -314,12 +324,14 @@ test("paging one row at a time returns every row once, in order", async () => {
 	}
 	for (const groupBy of ["workspace", "day"] as const) {
 		expect(
-			await pages((cursor) => usage({ groupBy, limit: 1, cursor })),
+			await pages((cursor?: CloudUsageCursor) =>
+				usage({ groupBy, limit: 1, cursor }),
+			),
 		).toEqual((await usage({ groupBy })).items);
 	}
-	expect(await pages((cursor) => boots({ limit: 1, cursor }))).toEqual(
-		(await boots({})).items,
-	);
+	expect(
+		await pages((cursor?: CloudBootCursor) => boots({ limit: 1, cursor })),
+	).toEqual((await boots({})).items);
 });
 
 test("a search matches workspace names, any case, and its wildcards are text", async () => {
@@ -344,11 +356,11 @@ test.each([
 	const all = await usage({ groupBy: "workspace", sort });
 	expect(all.items.map((item) => item.key)).toEqual([...expected]);
 	const paged: typeof all.items = [];
-	let cursor: (typeof all)["nextCursor"] | undefined;
+	let cursor: CloudUsageCursor | undefined;
 	do {
 		const page = await usage({ groupBy: "workspace", sort, limit: 1, cursor });
 		paged.push(...page.items);
-		cursor = page.nextCursor;
+		cursor = page.nextCursor ?? undefined;
 	} while (cursor && paged.length < 10);
 	expect(paged).toEqual(all.items);
 });
@@ -619,9 +631,10 @@ describe("fleet scope", () => {
 	});
 
 	test("a failed workspace counts the same way on every path", async () => {
-		const failedWorkspaces = (result: { items: { workspaces: number }[] }) =>
-			result.items.reduce((sum, item) => sum + item.workspaces, 0);
-		const total = (await fleet({}, ORG)).total.workspaces;
+		const failedWorkspaces = (result: {
+			items: { workspaces: number | null }[];
+		}) => result.items.reduce((sum, item) => sum + counted(item).workspaces, 0);
+		const total = counted((await fleet({}, ORG)).total).workspaces;
 		for (const groupBy of ["workspace", "size", "organization"] as const) {
 			expect(failedWorkspaces(await fleet({ groupBy }, ORG)), groupBy).toBe(
 				total,
@@ -809,7 +822,7 @@ describe("queryFleetCloudUsageByWorkspaceDay", () => {
 				rows.find((row) => row.day === "2026-12-14" && row.gbHours > 0),
 			).toMatchObject({ workspaceId: BILLING_PAGE, gbHours: 1 });
 
-			const totals = new Map<string | null, number[]>();
+			const totals = new Map<string | null, [number, number, number, number]>();
 			for (const row of rows) {
 				const sum = totals.get(row.workspaceId) ?? [0, 0, 0, 0];
 				const [boots, failedBoots, hours, gbHours] = brief(row);
