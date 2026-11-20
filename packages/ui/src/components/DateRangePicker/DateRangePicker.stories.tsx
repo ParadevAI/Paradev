@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { DateRangePicker } from "./DateRangePicker";
-import { type DatePreset, valueOfPreset } from "./utils/choice";
+import {
+	type DatePreset,
+	type DateRangeValue,
+	valueOfPreset,
+} from "./utils/choice";
 
 const EARLIEST = "2026-09-29";
 const LATEST = "2026-11-18";
@@ -33,12 +37,17 @@ const LAST_90: DatePreset = {
 };
 const GROUPS = [[LAST_7, LAST_30, LAST_90], [ALL_TIME]];
 
+const dataOf = (value: DateRangeValue) => ({
+	value,
+	bounds: { earliest: EARLIEST, latest: LATEST },
+});
+
 function Controlled(props: React.ComponentProps<typeof DateRangePicker>) {
-	const [value, setValue] = useState(props.value);
+	const [value, setValue] = useState(props.data?.value);
 	return (
 		<DateRangePicker
 			{...props}
-			value={value}
+			data={props.data && value ? { ...props.data, value } : null}
 			onChange={(next) => {
 				setValue(next);
 				props.onChange(next);
@@ -59,8 +68,7 @@ const meta = {
 		),
 	],
 	args: {
-		value: valueOfPreset(LAST_30),
-		bounds: { earliest: EARLIEST, latest: LATEST },
+		data: dataOf(valueOfPreset(LAST_30)),
 		groups: GROUPS,
 		onChange: fn(),
 	},
@@ -71,10 +79,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const AllTime: Story = { args: { value: valueOfPreset(ALL_TIME) } };
+export const AllTime: Story = {
+	args: { data: dataOf(valueOfPreset(ALL_TIME)) },
+};
 
 export const CustomRange: Story = {
-	args: { value: { from: "2026-10-05", to: "2026-10-21", preset: null } },
+	args: {
+		data: dataOf({ from: "2026-10-05", to: "2026-10-21", preset: null }),
+	},
 };
 
 export const MenuOpen: Story = {
@@ -91,7 +103,9 @@ export const MenuOpen: Story = {
 };
 
 export const CalendarOpen: Story = {
-	args: { value: { from: "2026-10-05", to: "2026-10-21", preset: null } },
+	args: {
+		data: dataOf({ from: "2026-10-05", to: "2026-10-21", preset: null }),
+	},
 	play: async ({ canvasElement }) => {
 		await userEvent.click(within(canvasElement).getByRole("button"));
 		await userEvent.click(
@@ -104,11 +118,11 @@ export const CalendarOpen: Story = {
 };
 
 export const ClampedPreset: Story = {
-	args: { value: valueOfPreset(LAST_90) },
+	args: { data: dataOf(valueOfPreset(LAST_90)) },
 };
 
 export const NoClosedDays: Story = {
-	args: { bounds: null },
+	args: { data: null },
 };
 
 export const Narrow: Story = {
@@ -125,7 +139,9 @@ export const Narrow: Story = {
 };
 
 export const AcrossYears: Story = {
-	args: { value: { from: "2025-12-20", to: "2026-01-09", preset: null } },
+	args: {
+		data: dataOf({ from: "2025-12-20", to: "2026-01-09", preset: null }),
+	},
 };
 
 export const Keyboard: Story = {
@@ -148,5 +164,37 @@ export const Keyboard: Story = {
 		);
 		await userEvent.keyboard("{Escape}");
 		await waitFor(() => expect(trigger).toHaveFocus());
+	},
+};
+
+export const TwoCustomRangesInARow: Story = {
+	play: async ({ canvasElement, args }) => {
+		const day = (iso: string) =>
+			document.body.querySelector<HTMLElement>(`td[data-day="${iso}"] button`);
+		const pick = async (from: string, to: string) => {
+			await userEvent.click(within(canvasElement).getByRole("button"));
+			await userEvent.click(
+				await within(document.body).findByText(/Custom range/),
+			);
+			await waitFor(() => expect(day(from)).not.toBeNull());
+			await userEvent.click(day(from) as HTMLElement);
+			await userEvent.click(day(to) as HTMLElement);
+		};
+		await pick("2026-10-06", "2026-10-10");
+		await waitFor(() =>
+			expect(args.onChange).toHaveBeenLastCalledWith({
+				from: "2026-10-06",
+				to: "2026-10-10",
+				preset: null,
+			}),
+		);
+		await pick("2026-10-13", "2026-10-15");
+		await waitFor(() =>
+			expect(args.onChange).toHaveBeenLastCalledWith({
+				from: "2026-10-13",
+				to: "2026-10-15",
+				preset: null,
+			}),
+		);
 	},
 };

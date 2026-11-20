@@ -27,9 +27,11 @@ import {
 } from "./utils/choice";
 
 export interface DateRangePickerProps {
-	value: DateRangeValue;
-	/** The first and last day that can be picked, as `yyyy-MM-dd`; null when no day can be. */
-	bounds: { earliest: string; latest: string } | null;
+	/** The chosen range and the first and last day that can be picked (`yyyy-MM-dd`); null when no day can be. */
+	data: {
+		value: DateRangeValue;
+		bounds: { earliest: string; latest: string };
+	} | null;
 	groups: DatePreset[][];
 	onChange: (value: DateRangeValue) => void;
 }
@@ -37,8 +39,7 @@ export interface DateRangePickerProps {
 const toDay = (date: Date) => format(date, "yyyy-MM-dd");
 
 export function DateRangePicker({
-	value,
-	bounds,
+	data,
 	groups,
 	onChange,
 }: DateRangePickerProps) {
@@ -49,20 +50,18 @@ export function DateRangePicker({
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [calendarOpen, setCalendarOpen] = useState(false);
 	const [picked, setPicked] = useState<{ from: Date | undefined; to?: Date }>();
-	const preset = presetOf(value, groups);
+	const preset = data && presetOf(data.value, groups);
+	const setCalendar = (open: boolean) => {
+		setCalendarOpen(open);
+		setPicked(undefined);
+	};
 	const choose = (next: DateRangeValue) => {
 		onChange(next);
-		setCalendarOpen(false);
+		setCalendar(false);
 	};
 
 	return (
-		<Popover
-			open={calendarOpen}
-			onOpenChange={(open) => {
-				setCalendarOpen(open);
-				setPicked(undefined);
-			}}
-		>
+		<Popover open={calendarOpen} onOpenChange={setCalendar}>
 			<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
 				<PopoverAnchor asChild>
 					<DropdownMenuTrigger asChild>
@@ -71,16 +70,16 @@ export function DateRangePicker({
 							variant="outline"
 							size="sm"
 							className="max-w-full"
-							disabled={!bounds}
+							disabled={!data}
 						>
 							<LuCalendar />
-							{bounds ? (
+							{data ? (
 								<span className="flex min-w-0 gap-2">
 									<span className="truncate">
 										{preset?.label ?? t({ message: "Custom" })}
 									</span>
 									<span className="text-muted-foreground truncate">
-										{range(value.from, value.to)}
+										{range(data.value.from, data.value.to)}
 									</span>
 								</span>
 							) : (
@@ -119,12 +118,12 @@ export function DateRangePicker({
 							</div>
 						))}
 					</DropdownMenuRadioGroup>
-					<DropdownMenuItem onSelect={() => setCalendarOpen(true)}>
+					<DropdownMenuItem onSelect={() => setCalendar(true)}>
 						<Trans>Custom range…</Trans>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{bounds && (
+			{data && (
 				<PopoverContent
 					className="w-auto p-3"
 					align="end"
@@ -139,14 +138,17 @@ export function DateRangePicker({
 						resetOnSelect
 						numberOfMonths={narrow ? 1 : 2}
 						selected={
-							picked ?? { from: parseISO(value.from), to: parseISO(value.to) }
+							picked ?? {
+								from: parseISO(data.value.from),
+								to: parseISO(data.value.to),
+							}
 						}
-						defaultMonth={parseISO(value.from)}
-						startMonth={parseISO(bounds.earliest)}
-						endMonth={parseISO(bounds.latest)}
+						defaultMonth={parseISO(data.value.from)}
+						startMonth={parseISO(data.bounds.earliest)}
+						endMonth={parseISO(data.bounds.latest)}
 						disabled={[
-							{ before: parseISO(bounds.earliest) },
-							{ after: parseISO(bounds.latest) },
+							{ before: parseISO(data.bounds.earliest) },
+							{ after: parseISO(data.bounds.latest) },
 						]}
 						onSelect={(selected) => {
 							if (selected?.from && selected.to) {
