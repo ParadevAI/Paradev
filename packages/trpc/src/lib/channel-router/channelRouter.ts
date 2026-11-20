@@ -17,7 +17,7 @@ export interface RouteInput {
 }
 
 export interface RouteDeps {
-	fetch: typeof fetch;
+	fetch: (...args: Parameters<typeof fetch>) => ReturnType<typeof fetch>;
 	token: () => Promise<string>;
 	timeoutMs?: number;
 }
@@ -55,8 +55,14 @@ function areaOf(dev: RouterDev): string {
 		: `${dev.name} has no area set.`;
 }
 
+interface JevQuestion {
+	type: string;
+	instructions: string;
+	criteria?: Record<string, string>;
+}
+
 export function buildJevRequest(input: RouteInput) {
-	const devQuestions = Object.fromEntries(
+	const devQuestions: Record<string, JevQuestion> = Object.fromEntries(
 		input.devs.map((dev, index) => [
 			devQuestion(index),
 			{
@@ -69,6 +75,14 @@ export function buildJevRequest(input: RouteInput) {
 			},
 		]),
 	);
+	const questions: Record<string, JevQuestion> = {
+		...devQuestions,
+		[SEVERAL_QUESTION]: {
+			type: "noul",
+			instructions:
+				"Does `message` ask for two or more separate pieces of work that belong to different people or areas, or name two or more teammates to do something?",
+		},
+	};
 	return {
 		model: JEV_MODEL,
 		state: {
@@ -80,14 +94,7 @@ export function buildJevRequest(input: RouteInput) {
 			recent_messages: input.recent.slice(-MAX_RECENT).map(clip),
 			message: clip(input.message),
 		},
-		questions: {
-			...devQuestions,
-			[SEVERAL_QUESTION]: {
-				type: "noul",
-				instructions:
-					"Does `message` ask for two or more separate pieces of work that belong to different people or areas, or name two or more teammates to do something?",
-			},
-		},
+		questions,
 	};
 }
 

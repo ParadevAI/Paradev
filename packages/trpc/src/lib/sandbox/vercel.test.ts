@@ -84,8 +84,8 @@ stub(Sandbox, {
 		const ordered = options.tags
 			? sandboxes
 					.filter((sandbox) => sandbox.tags?.kind === "workspace")
-					.toSorted((a, b) => b.createdAt - a.createdAt)
-			: sandboxes.toSorted((a, b) => b.statusUpdatedAt - a.statusUpdatedAt);
+					.sort((a, b) => b.createdAt - a.createdAt)
+			: [...sandboxes].sort((a, b) => b.statusUpdatedAt - a.statusUpdatedAt);
 		return (async function* () {
 			yield* ordered;
 		})();
@@ -194,11 +194,11 @@ describe("listSandboxSessions", () => {
  * it first, which `resumes` records.
  */
 function fakeBox(read: "running" | "stopped") {
-	const box = {
-		live: read,
-		snapshotId: "snap_stop_0",
-		resumes: [] as string[],
-	};
+	const box: {
+		live: typeof read;
+		snapshotId: string | undefined;
+		resumes: string[];
+	} = { live: read, snapshotId: "snap_stop_0", resumes: [] };
 	const stoppedError = () => new APIError(new Response(null, { status: 410 }));
 	const session = {
 		sessionId: "sess_A",
@@ -401,7 +401,6 @@ describe("promoteSandboxToEnvironment", () => {
 });
 
 describe("wakeSandbox", () => {
-	type Box = { memoryMb: number; vcpus: number };
 	let running: boolean;
 	let onResume: (sandbox: unknown) => Promise<void>;
 	const calls: string[] = [];
@@ -447,8 +446,11 @@ describe("wakeSandbox", () => {
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
 		SUPERSET_BUNDLE_SHA: "a".repeat(64),
 	};
-	async function wake(): Promise<Box[]> {
-		const authorized: Box[] = [];
+	type Resumed = Parameters<
+		NonNullable<Parameters<typeof wakeSandbox>[0]["beforeResume"]>
+	>[0];
+	async function wake(): Promise<Resumed[]> {
+		const authorized: Resumed[] = [];
 		await wakeSandbox({
 			providerSandboxId: "ws-box",
 			claim: { vcpus: 4, identity, networkPolicy: {} } as never,
@@ -572,7 +574,7 @@ describe("agentToolsMounts", () => {
 		const want = {
 			"/opt/agents": {
 				drive: "agent-tools-iad1-0123456789ab",
-				mode: "snapshot",
+				mode: "snapshot" as const,
 			},
 		};
 		expect(

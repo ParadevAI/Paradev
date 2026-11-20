@@ -22,7 +22,9 @@ export class TranscriptionError extends Error {
 
 export async function transcribeAudio(
 	input: TranscribeAudioInput,
-	fetchImpl: typeof fetch = fetch,
+	fetchImpl: (
+		...args: Parameters<typeof fetch>
+	) => ReturnType<typeof fetch> = fetch,
 ): Promise<string> {
 	const form = new FormData();
 	form.append("model", input.model);

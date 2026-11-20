@@ -35,7 +35,9 @@ export class RealtimeMintError extends Error {
 
 export async function mintRealtimeClientSecret(
 	input: MintRealtimeSecretInput,
-	fetchImpl: typeof fetch = fetch,
+	fetchImpl: (
+		...args: Parameters<typeof fetch>
+	) => ReturnType<typeof fetch> = fetch,
 ): Promise<RealtimeClientSecret> {
 	const response = await fetchImpl(CLIENT_SECRETS_URL, {
 		method: "POST",

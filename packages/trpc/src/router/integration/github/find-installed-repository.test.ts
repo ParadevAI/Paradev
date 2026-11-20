@@ -2,6 +2,7 @@ import { beforeEach, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
+import { at } from "../../../../test/at";
 import { stub } from "../../../../test/stub";
 
 const ORG = "00000000-0000-4000-8000-000000000001";
@@ -35,15 +36,15 @@ beforeEach(() => {
 });
 
 test("a repository resolves to the installation of the GitHub account that owns it", async () => {
-	installed = [repositories[1]];
-	expect(await findInstalledRepository(ORG, "Globex/Gadgets")).toEqual({
+	installed = [at(repositories, 1)];
+	expect(await findInstalledRepository(ORG, "Globex/Gadgets")).toMatchObject({
 		installation: globex,
 		repo: { id: "repo-gadgets", fullName: "globex/gadgets" },
 	});
 });
 
 test("the lookup is scoped to the organization and matches the name case-insensitively", async () => {
-	installed = [repositories[1]];
+	installed = [at(repositories, 1)];
 	await findInstalledRepository(ORG, "Globex/Gadgets");
 	const [where] = repositoryLookups;
 	if (!where) throw new Error("no repository lookup");

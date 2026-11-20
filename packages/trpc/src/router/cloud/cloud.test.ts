@@ -362,7 +362,7 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 		{ range: NOVEMBER, groupBy: "workspace", search: "e" },
 		{ range: NOVEMBER, groupBy: "workspace", sort: "hours" },
 		{ range: NOVEMBER, groupBy: "workspace", order: "asc" },
-	] as const) {
+	] satisfies Parameters<typeof owner.usage.query>[0][]) {
 		await expect(
 			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
 		).rejects.toMatchObject(notValid);
@@ -598,9 +598,15 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 		limitReached: null,
 	});
 	expect(open?.unavailable).toEqual(
-		["seats", "bought", "freeCredits", "extraUsageLimit", "limitReached"].map(
-			(field) => ({ field, reason: "not_read" }),
-		),
+		(
+			[
+				"seats",
+				"bought",
+				"freeCredits",
+				"extraUsageLimit",
+				"limitReached",
+			] as const
+		).map((field) => ({ field, reason: "not_read" })),
 	);
 });
 
