@@ -438,6 +438,7 @@ export class GitWatcher {
 		if (state.refreshing) return;
 		if (
 			!force &&
+			!state.rulesChanged &&
 			Date.now() - state.lastRefreshAt < IGNORED_DIRS_REFRESH_MIN_MS
 		)
 			return;
