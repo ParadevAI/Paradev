@@ -1,7 +1,8 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useState } from "react";
+import { format, parseISO } from "date-fns";
+import { useRef, useState } from "react";
 import { LuCalendar, LuChevronDown } from "react-icons/lu";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { Button } from "../ui/button";
@@ -10,72 +11,80 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Popover, PopoverAnchor, PopoverContent } from "../ui/popover";
 
-import { useFormatDay } from "./hooks/useFormatDay";
+import { useFormatRange } from "./hooks/useFormatRange";
 import {
 	type DatePreset,
 	type DateRangeValue,
 	presetOf,
 	valueOfPreset,
 } from "./utils/choice";
-import { toDate, toDay } from "./utils/days";
 
 export interface DateRangePickerProps {
-	value: DateRangeValue | null;
-	earliest: string | null;
-	latest: string | null;
+	value: DateRangeValue;
+	/** The first and last day that can be picked, as `yyyy-MM-dd`; null when no day can be. */
+	bounds: { earliest: string; latest: string } | null;
 	groups: DatePreset[][];
 	onChange: (value: DateRangeValue) => void;
 }
 
+const toDay = (date: Date) => format(date, "yyyy-MM-dd");
+
 export function DateRangePicker({
 	value,
-	earliest,
-	latest,
+	bounds,
 	groups,
 	onChange,
 }: DateRangePickerProps) {
 	const { t } = useLingui();
-	const day = useFormatDay();
+	const range = useFormatRange();
 	const narrow = useIsMobile();
+	const trigger = useRef<HTMLButtonElement>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [calendarOpen, setCalendarOpen] = useState(false);
 	const [picked, setPicked] = useState<{ from: Date | undefined; to?: Date }>();
-	const itemDays = (item: DatePreset) => {
-		const [start, end] = [day(item.from), day(item.to)];
-		return (
-			<Trans>
-				{start} to {end}
-			</Trans>
-		);
-	};
-	const preset = value && presetOf(value, groups);
-	const name = preset?.label ?? t({ message: "Custom" });
-	const from = value ? day(value.from) : "";
-	const to = value ? day(value.to) : "";
+	const preset = presetOf(value, groups);
 	const choose = (next: DateRangeValue) => {
 		onChange(next);
-		setPicked(undefined);
 		setCalendarOpen(false);
 	};
 
 	return (
-		<Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+		<Popover
+			open={calendarOpen}
+			onOpenChange={(open) => {
+				setCalendarOpen(open);
+				setPicked(undefined);
+			}}
+		>
 			<DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
 				<PopoverAnchor asChild>
 					<DropdownMenuTrigger asChild>
-						<Button variant="outline" size="sm" disabled={!earliest}>
+						<Button
+							ref={trigger}
+							variant="outline"
+							size="sm"
+							className="max-w-full"
+							disabled={!bounds}
+						>
 							<LuCalendar />
-							{!value ? (
-								<Trans>No days available</Trans>
+							{bounds ? (
+								<span className="flex min-w-0 gap-2">
+									<span className="truncate">
+										{preset?.label ?? t({ message: "Custom" })}
+									</span>
+									<span className="text-muted-foreground truncate">
+										{range(value.from, value.to)}
+									</span>
+								</span>
 							) : (
-								<Trans>
-									{name} · {from} to {to}
-								</Trans>
+								<Trans>No days available</Trans>
 							)}
 							<LuChevronDown />
 						</Button>
@@ -85,58 +94,68 @@ export function DateRangePicker({
 					align="end"
 					onCloseAutoFocus={(event) => calendarOpen && event.preventDefault()}
 				>
-					{groups.map((group) => (
-						<div key={group[0]?.key}>
-							{group.map((item) => (
-								<DropdownMenuItem
-									key={item.key}
-									className="justify-between gap-6"
-									onSelect={() => choose(valueOfPreset(item))}
-								>
-									<span
-										className={preset?.key === item.key ? "font-medium" : ""}
+					<DropdownMenuRadioGroup
+						value={preset?.key ?? ""}
+						onValueChange={(key) => {
+							const next = groups.flat().find((item) => item.key === key);
+							if (next) choose(valueOfPreset(next));
+						}}
+					>
+						{groups.map((group) => (
+							<div key={group[0]?.key}>
+								{group.map((item) => (
+									<DropdownMenuRadioItem
+										key={item.key}
+										value={item.key}
+										className="justify-between gap-6"
 									>
 										{item.label}
-									</span>
-									<span className="text-muted-foreground text-xs">
-										{itemDays(item)}
-									</span>
-								</DropdownMenuItem>
-							))}
-							<DropdownMenuSeparator />
-						</div>
-					))}
+										<span className="text-muted-foreground text-xs">
+											{range(item.from, item.to)}
+										</span>
+									</DropdownMenuRadioItem>
+								))}
+								<DropdownMenuSeparator />
+							</div>
+						))}
+					</DropdownMenuRadioGroup>
 					<DropdownMenuItem onSelect={() => setCalendarOpen(true)}>
 						<Trans>Custom range…</Trans>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			{earliest && latest && (
+			{bounds && (
 				<PopoverContent
 					className="w-auto p-3"
 					align="end"
 					onFocusOutside={(event) => event.preventDefault()}
+					onCloseAutoFocus={(event) => {
+						event.preventDefault();
+						trigger.current?.focus();
+					}}
 				>
 					<Calendar
 						mode="range"
 						resetOnSelect
 						numberOfMonths={narrow ? 1 : 2}
 						selected={
-							picked ??
-							(value
-								? { from: toDate(value.from), to: toDate(value.to) }
-								: undefined)
+							picked ?? { from: parseISO(value.from), to: parseISO(value.to) }
 						}
-						defaultMonth={toDate(value?.from ?? latest)}
-						disabled={(date) => toDay(date) < earliest || toDay(date) > latest}
-						onSelect={(range) => {
-							if (range?.from && range.to) {
+						defaultMonth={parseISO(value.from)}
+						startMonth={parseISO(bounds.earliest)}
+						endMonth={parseISO(bounds.latest)}
+						disabled={[
+							{ before: parseISO(bounds.earliest) },
+							{ after: parseISO(bounds.latest) },
+						]}
+						onSelect={(selected) => {
+							if (selected?.from && selected.to) {
 								choose({
-									from: toDay(range.from),
-									to: toDay(range.to),
+									from: toDay(selected.from),
+									to: toDay(selected.to),
 									preset: null,
 								});
-							} else setPicked(range);
+							} else setPicked(selected);
 						}}
 					/>
 				</PopoverContent>

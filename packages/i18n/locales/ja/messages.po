@@ -1161,9 +1161,6 @@ msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オート�
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
 
-msgid "{name} · {from} to {to}"
-msgstr "{name} · {from}から{to}"
-
 msgid "{name} accounts"
 msgstr "{name} のアカウント"
 
@@ -1391,9 +1388,6 @@ msgstr "スター{starCount}件、まだ増えています"
 
 msgid "{start} – {end}"
 msgstr "{start}～{end}"
-
-msgid "{start} to {end}"
-msgstr "{start}から{end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {#件のオートメーションを開始しました} other {#件のオートメーションを開始しました}}"

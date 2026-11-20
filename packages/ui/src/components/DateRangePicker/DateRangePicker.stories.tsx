@@ -60,8 +60,7 @@ const meta = {
 	],
 	args: {
 		value: valueOfPreset(LAST_30),
-		earliest: EARLIEST,
-		latest: LATEST,
+		bounds: { earliest: EARLIEST, latest: LATEST },
 		groups: GROUPS,
 		onChange: fn(),
 	},
@@ -82,7 +81,11 @@ export const MenuOpen: Story = {
 	play: async ({ canvasElement }) => {
 		await userEvent.click(within(canvasElement).getByRole("button"));
 		await waitFor(() =>
-			expect(within(document.body).getByText("Last 7 days")).toBeVisible(),
+			expect(
+				within(document.body).getByRole("menuitemradio", {
+					name: /Last 7 days/,
+				}),
+			).toBeVisible(),
 		);
 	},
 };
@@ -105,15 +108,45 @@ export const ClampedPreset: Story = {
 };
 
 export const NoClosedDays: Story = {
-	args: { value: null, earliest: null, latest: null },
+	args: { bounds: null },
 };
 
 export const Narrow: Story = {
-	decorators: [
-		(Story) => (
-			<div className="w-[390px]">
-				<Story />
-			</div>
-		),
-	],
+	globals: { viewport: { value: "mobile1", isRotated: false } },
+	play: async ({ canvasElement }) => {
+		await userEvent.click(within(canvasElement).getByRole("button"));
+		await userEvent.click(
+			await within(document.body).findByText(/Custom range/),
+		);
+		await waitFor(() =>
+			expect(within(document.body).getAllByRole("grid")).not.toHaveLength(0),
+		);
+	},
+};
+
+export const AcrossYears: Story = {
+	args: { value: { from: "2025-12-20", to: "2026-01-09", preset: null } },
+};
+
+export const Keyboard: Story = {
+	play: async ({ canvasElement, args }) => {
+		const trigger = within(canvasElement).getByRole("button");
+		await userEvent.tab();
+		await expect(trigger).toHaveFocus();
+		await userEvent.keyboard("{Enter}");
+		await within(document.body).findByRole("menu");
+		await userEvent.keyboard("{Enter}");
+		await waitFor(() =>
+			expect(args.onChange).toHaveBeenLastCalledWith(valueOfPreset(LAST_7)),
+		);
+		await waitFor(() => expect(trigger).toHaveFocus());
+		await userEvent.keyboard("{Enter}");
+		await within(document.body).findByRole("menu");
+		await userEvent.keyboard("{End}{Enter}");
+		await waitFor(() =>
+			expect(within(document.body).getAllByRole("grid")).not.toHaveLength(0),
+		);
+		await userEvent.keyboard("{Escape}");
+		await waitFor(() => expect(trigger).toHaveFocus());
+	},
 };

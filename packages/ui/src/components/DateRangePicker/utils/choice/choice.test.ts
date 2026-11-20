@@ -16,30 +16,20 @@ const last7: DatePreset = {
 };
 const groups = [[all], [last7]];
 
-test("a value stands for the preset it names, or the first with the same days", () => {
+test("a value stands for the preset it names", () => {
 	expect(presetOf({ from: "x", to: "y", preset: "last7" }, groups)).toBe(last7);
-	expect(presetOf({ from: "2026-09-29", to: "2026-11-18" }, groups)).toBe(all);
 });
 
-test("a value with a null preset is a custom range, even with the days of a preset", () => {
+test("a custom range, or a preset that is not offered, stands for no preset", () => {
 	expect(
 		presetOf({ from: "2026-09-29", to: "2026-11-18", preset: null }, groups),
 	).toBeUndefined();
-});
-
-test("a named preset that is not offered falls back to the first with the same days", () => {
 	expect(
 		presetOf(
 			{ from: "2026-09-29", to: "2026-11-18", preset: "last3Months" },
 			groups,
 		),
-	).toBe(all);
-});
-
-test("days that match no preset are a custom range", () => {
-	expect(presetOf({ from: "2026-10-01", to: "2026-10-20" }, groups)).toBe(
-		undefined,
-	);
+	).toBeUndefined();
 });
 
 test("choosing a preset gives its key and its days", () => {

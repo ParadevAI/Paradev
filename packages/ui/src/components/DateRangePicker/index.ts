@@ -1,3 +1,2 @@
-export { DateRangePicker } from "./DateRangePicker";
-export { useFormatDay } from "./hooks/useFormatDay";
+export { DateRangePicker, type DateRangePickerProps } from "./DateRangePicker";
 export type { DatePreset, DateRangeValue } from "./utils/choice";

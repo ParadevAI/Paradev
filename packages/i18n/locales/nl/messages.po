@@ -1161,9 +1161,6 @@ msgstr "{monthlyPrice} per gebruiker/maand. Mobiel, automatiseringen, prioriteit
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Bij {myFailedCount} van je automatiseringen is de laatste run mislukt"
 
-msgid "{name} · {from} to {to}"
-msgstr "{name} · {from} tot {to}"
-
 msgid "{name} accounts"
 msgstr "{name}-accounts"
 
@@ -1391,9 +1388,6 @@ msgstr "{starCount} sterren en het worden er meer"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
-
-msgid "{start} to {end}"
-msgstr "{start} tot {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisering gestart} other {# automatiseringen gestart}}"

@@ -1161,9 +1161,6 @@ msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 
-msgid "{name} · {from} to {to}"
-msgstr "{name} · {from} 至 {to}"
-
 msgid "{name} accounts"
 msgstr "{name} 账号"
 
@@ -1391,9 +1388,6 @@ msgstr "{starCount}个星标，还在增长"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
-
-msgid "{start} to {end}"
-msgstr "{start} 至 {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个自动化}}"

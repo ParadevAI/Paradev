@@ -1161,9 +1161,6 @@ msgstr "{monthlyPrice} za użytkownika/mies. Aplikacja mobilna, automatyzacje, p
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
 
-msgid "{name} · {from} to {to}"
-msgstr "{name} · od {from} do {to}"
-
 msgid "{name} accounts"
 msgstr "Konta {name}"
 
@@ -1391,9 +1388,6 @@ msgstr "{starCount} gwiazdek i rośnie"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
-
-msgid "{start} to {end}"
-msgstr "{start} do {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Uruchomiono # automatyzację} few {Uruchomiono # automatyzacje} many {Uruchomiono # automatyzacji} other {Uruchomiono # automatyzacji}}"
