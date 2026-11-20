@@ -52,10 +52,7 @@ export function CloudUsagePage({
 	const byPerson = pricedQuery(unpricedByPerson);
 	const workspaces = pricedQuery(unpricedWorkspaces);
 	const allowance = period?.allowance ? priced(period.allowance) : null;
-	const rate = periods.data?.ratePerGbHour ?? null;
-	const unpriced =
-		(Boolean(period?.allowance) && allowance === null) ||
-		(periods.data !== undefined && rate === null);
+	const unpriced = Boolean(period?.allowance) && allowance === null;
 	const workspaceCount = workspaces.data?.total.workspaces ?? null;
 
 	return (
@@ -102,7 +99,7 @@ export function CloudUsagePage({
 								gbHours: byDay.data.total.gbHours,
 								usd: byDay.data.total.usageUsd,
 							}}
-							ratePerGbHour={rate}
+							ratePerGbHour={periods.data.ratePerGbHour}
 							allowance={allowance}
 							unavailable={period?.unavailable ?? []}
 							isPeriod={period !== undefined}

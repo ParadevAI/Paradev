@@ -4,15 +4,10 @@ import { useFormat } from "@superset/i18n/react";
 
 export function useUsageFormat() {
 	const { formatCurrency, formatNumber } = useFormat();
-	const cents = (usd: number) =>
-		formatCurrency(usd, "USD", {
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		});
 	/** Under a cent but not nothing reads as "<$0.01", as GB-hours read "<1". */
 	const withDigits = (digits: number) => (usd: number) =>
 		usd > 0 && usd < 0.01
-			? `<${cents(0.01)}`
+			? `<${formatCurrency(0.01, "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 			: formatCurrency(usd, "USD", {
 					minimumFractionDigits: usd === 0 ? 0 : digits,
 					maximumFractionDigits: usd === 0 ? 0 : digits,
