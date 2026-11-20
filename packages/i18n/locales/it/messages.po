@@ -4038,6 +4038,9 @@ msgstr "Impossibile aprire i percorsi di un workspace remoto nel Finder"
 msgid "Can't reach the host"
 msgstr "Impossibile raggiungere l'host"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Impossibile raggiungere l'host di questo workspace. Nuovo tentativo…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Impossibile annullare mentre una chat in questo workspace sta lavorando."
 
@@ -6231,6 +6234,12 @@ msgstr "Impossibile caricare i commenti di revisione"
 
 msgid "Couldn't load runs"
 msgstr "Impossibile caricare le esecuzioni"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Impossibile caricare i messaggi di questa chat."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Impossibile caricare i messaggi di questa chat. Nuovo tentativo…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Impossibile caricare il payload di questa esecuzione."

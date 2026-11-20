@@ -4038,6 +4038,9 @@ msgstr "Cesty vzdáleného pracovního prostoru nejde otevřít ve Finderu"
 msgid "Can't reach the host"
 msgstr "Host není dostupný"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Nelze se spojit s hostitelem tohoto pracovního prostoru. Zkouším znovu…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Nelze vrátit, dokud v tomto pracovním prostoru pracuje chat."
 
@@ -6231,6 +6234,12 @@ msgstr "Nepodařilo se načíst komentáře k revizi"
 
 msgid "Couldn't load runs"
 msgstr "Běhy se nepodařilo načíst"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Zprávy tohoto chatu se nepodařilo načíst."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Zprávy tohoto chatu se nepodařilo načíst. Zkouším znovu…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Data tohoto běhu se nepodařilo načíst."

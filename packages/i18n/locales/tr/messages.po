@@ -4038,6 +4038,9 @@ msgstr "Uzak çalışma alanı yolları Finder'da açılamaz"
 msgid "Can't reach the host"
 msgstr "Host'a ulaşılamıyor"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Bu çalışma alanının sunucusuna ulaşılamıyor. Yeniden deneniyor…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Bu çalışma alanında bir sohbet çalışırken geri alınamaz."
 
@@ -6231,6 +6234,12 @@ msgstr "İnceleme yorumları yüklenemedi"
 
 msgid "Couldn't load runs"
 msgstr "Çalıştırmalar yüklenemedi"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Bu sohbetin mesajları yüklenemedi."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Bu sohbetin mesajları yüklenemedi. Yeniden deneniyor…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Bu çalıştırmanın yükü yüklenemedi."

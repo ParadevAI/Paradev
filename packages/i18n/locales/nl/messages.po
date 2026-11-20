@@ -4038,6 +4038,9 @@ msgstr "Paden van externe werkruimtes kunnen niet in Finder worden geopend"
 msgid "Can't reach the host"
 msgstr "Host niet bereikbaar"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Kan de host van deze werkruimte niet bereiken. Opnieuw proberen…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Ongedaan maken kan niet terwijl een chat in deze werkruimte bezig is."
 
@@ -6231,6 +6234,12 @@ msgstr "Kan reviewopmerkingen niet laden"
 
 msgid "Couldn't load runs"
 msgstr "Kan runs niet laden"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Kan de berichten van deze chat niet laden."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Kan de berichten van deze chat niet laden. Opnieuw proberen…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Kan de payload van deze run niet laden."

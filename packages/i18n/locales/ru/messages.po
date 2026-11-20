@@ -4038,6 +4038,9 @@ msgstr "Пути удалённых рабочих областей нельзя
 msgid "Can't reach the host"
 msgstr "Не удаётся связаться с хостом"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Не удаётся связаться с хостом этой рабочей области. Повторная попытка…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Нельзя отменить, пока чат в этой рабочей области работает."
 
@@ -6231,6 +6234,12 @@ msgstr "Не удалось загрузить комментарии ревью
 
 msgid "Couldn't load runs"
 msgstr "Не удалось загрузить запуски"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Не удалось загрузить сообщения этого чата."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Не удалось загрузить сообщения этого чата. Повторная попытка…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Не удалось загрузить полезную нагрузку этого запуска."

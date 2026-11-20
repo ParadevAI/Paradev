@@ -4038,6 +4038,9 @@ msgstr "Pfade aus Remote-Arbeitsbereichen lassen sich nicht im Finder öffnen"
 msgid "Can't reach the host"
 msgstr "Host nicht erreichbar"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Der Host dieses Arbeitsbereichs ist nicht erreichbar. Neuer Versuch…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Rückgängig machen geht nicht, während ein Chat in diesem Arbeitsbereich arbeitet."
 
@@ -6231,6 +6234,12 @@ msgstr "Review-Kommentare konnten nicht geladen werden"
 
 msgid "Couldn't load runs"
 msgstr "Ausführungen konnten nicht geladen werden"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Die Nachrichten dieses Chats konnten nicht geladen werden."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Die Nachrichten dieses Chats konnten nicht geladen werden. Neuer Versuch…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Die Nutzlast dieser Ausführung konnte nicht geladen werden."

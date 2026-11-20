@@ -4032,6 +4032,9 @@ msgstr "Не вдається відкрити шляхи віддаленого
 msgid "Can't reach the host"
 msgstr "Хост недоступний"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Не вдається зв'язатися з хостом цього робочого простору. Повторна спроба…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Не можна скасувати, поки в цьому робочому просторі працює чат."
 
@@ -6225,6 +6228,12 @@ msgstr "Не вдалося завантажити коментарі рев'ю"
 
 msgid "Couldn't load runs"
 msgstr "Не вдалося завантажити запуски"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Не вдалося завантажити повідомлення цього чату."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Не вдалося завантажити повідомлення цього чату. Повторна спроба…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Не вдалося завантажити дані цього запуску."
