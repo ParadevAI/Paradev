@@ -781,6 +781,7 @@ function WorkspaceContent() {
 										renderBelowTabBar={() =>
 											showPresetsBar ? (
 												<PresetsBar
+													workspaceId={workspaceId}
 													matchedPresets={matchedPresets}
 													executePreset={executePreset}
 													showPresetsBar={showPresetsBar}

@@ -5071,6 +5071,12 @@ msgstr "Блок коду"
 msgid "Code Block"
 msgstr "Блок коду"
 
+msgid "Codex button"
+msgstr "Кнопка Codex"
+
+msgid "Codex usage indicator"
+msgstr "Індикатор використання Codex"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "кодинг-агентів"
@@ -14114,6 +14120,9 @@ msgstr "Лише запрошені люди"
 msgid "Only people who opted in appear here."
 msgstr "Тут показано лише тих, хто погодився на участь."
 
+msgid "Only show at or above a threshold"
+msgstr "Показувати лише після досягнення порога"
+
 msgid "Only the author can change a comment"
 msgstr "Лише автор може змінити коментар"
 
@@ -18499,6 +18508,9 @@ msgstr "Сеанс завершено"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Сеанс завершено. Натисніть Enter, щоб запустити нову оболонку."
 
+msgid "Session header"
+msgstr "Заголовок сеансу"
+
 msgid "Session name"
 msgstr "Назва сеансу"
 
@@ -21462,6 +21474,9 @@ msgstr "Три кроки · зачіпає packages/ui і apps/desktop"
 
 msgid "Threshold"
 msgstr "Поріг"
+
+msgid "Threshold (%)"
+msgstr "Поріг (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Від тікета до продакшену менше ніж за день (медіана)"

@@ -52,7 +52,9 @@ import {
 import { V1ImportModal } from "renderer/routes/_authenticated/components/V1ImportModal";
 import { useForwardedHotkeys } from "renderer/routes/_authenticated/hooks/useForwardedHotkeys";
 import { useZoomHotkeys } from "renderer/routes/_authenticated/hooks/useZoomHotkeys";
+import { useSettings } from "renderer/stores/settings";
 import { useSettingsStore } from "renderer/stores/settings-state";
+import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedStoreAcrossWindows";
 import { MOCK_ORG_ID, NOTIFICATION_EVENTS } from "shared/constants";
 import { AgentHooks } from "./components/AgentHooks";
 import { DockBadgeController } from "./components/DockBadgeController";
@@ -138,6 +140,7 @@ function AuthenticatedLayout() {
 	const [isSigningOut, setIsSigningOut] = useState(false);
 
 	useSettingsExternalChangeListener();
+	useEffect(() => syncPersistedStoreAcrossWindows(useSettings), []);
 
 	// Seed the parked-terminal eviction cap from settings (SUPER-1545).
 	const { data: parkedRuntimeCap } =
