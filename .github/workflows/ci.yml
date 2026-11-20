@@ -280,6 +280,9 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
+      - name: Typecheck the test preload
+        run: bun run typecheck:test-preload
+
   build-cli:
     name: Build CLI
     uses: ./.github/workflows/build-cli.yml

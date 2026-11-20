@@ -4,6 +4,6 @@
 		"types": ["bun-types"],
 		"jsx": "react-jsx"
 	},
-	"include": ["src"],
+	"include": ["src", "test"],
 	"exclude": ["node_modules", "src/**/*.integration.ts"]
 }
