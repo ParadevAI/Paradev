@@ -35,6 +35,7 @@ type Row = {
 };
 
 const FAVORITES_TAB = "favorites";
+const dismissedNotices = new Set<string>();
 const SHORTCUT_ROW_LIMIT = 9;
 const SHORTCUT_MODIFIER =
 	typeof navigator !== "undefined" &&
@@ -70,6 +71,7 @@ export function ModelPanel({
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState(currentPresetId);
 	const [provider, setProvider] = useState("");
+	const [, setNoticeRevision] = useState(0);
 	const [showAllModels, setShowAllModels] = useState(false);
 	const { favorites, toggle } = useFavoriteModels();
 	const listRef = useRef<HTMLDivElement>(null);
@@ -471,8 +473,11 @@ export function ModelPanel({
 					</DropdownMenuItem>
 				) : null}
 			</div>
-			{tabAgent && !runtimeModels && tabAgent.availability === "unknown" ? (
-				<div className="flex h-7 shrink-0 items-center gap-1.5 px-2.5 text-[11px] text-muted-foreground/70">
+			{tabAgent &&
+			!runtimeModels &&
+			tabAgent.availability === "unknown" &&
+			(tabAgent.loading || !dismissedNotices.has(catalogKey ?? "")) ? (
+				<div className="flex min-h-7 shrink-0 flex-wrap items-center gap-x-2 px-2.5 pb-1.5 text-[11px] text-muted-foreground/70">
 					{tabAgent.loading ? (
 						<>
 							<LuLoaderCircle className="size-3 animate-spin" />
@@ -480,7 +485,7 @@ export function ModelPanel({
 						</>
 					) : (
 						<>
-							<span className="min-w-0 flex-1 truncate">
+							<span className="w-full">
 								{t({ message: "Model availability could not be verified." })}
 							</span>
 							{tabAgent.onRefresh ? (
@@ -492,6 +497,16 @@ export function ModelPanel({
 									{t({ message: "Refresh" })}
 								</button>
 							) : null}
+							<button
+								type="button"
+								onClick={() => {
+									dismissedNotices.add(catalogKey ?? "");
+									setNoticeRevision((revision) => revision + 1);
+								}}
+								className="underline"
+							>
+								{t({ message: "Dismiss" })}
+							</button>
 						</>
 					)}
 				</div>
