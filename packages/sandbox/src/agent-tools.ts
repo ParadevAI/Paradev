@@ -17,6 +17,7 @@
  * image's copy.
  *
  *   bun run agent-tools --bundle <sha> [--region sfo1 ...]
+ *   bun run agent-tools --bundle <current release sha> --prune-dry-run
  *
  * Needs VERCEL_SANDBOX_TOKEN, VERCEL_SANDBOX_TEAM_ID, VERCEL_SANDBOX_PROJECT_ID.
  * The agent rows come from bundle/assets.json, so they must be that bundle's.
@@ -452,62 +453,217 @@ export function agentToolsGaps(
 	});
 }
 
+/** A sandbox as the project listing shows it; `mounts` is what its next session mounts. */
+export interface ListedSandbox {
+	name: string;
+	mounts?: Record<string, { drive: string }>;
+}
+
+/** One page of the project's sandbox listing; `next` is null on the last page. */
+export interface SandboxPage {
+	sandboxes: ListedSandbox[];
+	next: string | null;
+}
+
+export type SandboxLister = (cursor: string | null) => Promise<SandboxPage>;
+
+export const MAX_SANDBOX_LISTING_PAGES = 10_000;
+
 /**
- * Every drive a box may still mount: each environment row's bundle in its
- * region, and the newest released bundles in every region, so a rollback and
- * an environment created mid-release still find theirs.
+ * Every drive any sandbox in the project mounts, whatever its status or
+ * database, with the sandboxes that mount it. Throws unless the listing is
+ * whole: every page answered, each cursor new, and the sandboxes the caller
+ * knows exist are in it.
  */
-export function referencedAgentToolsDrives(args: {
-	rows: readonly { region: string; bundleSha: string | null }[];
-	recentBundles: readonly string[];
-	regions: readonly string[];
-}): Set<string> {
-	return new Set([
-		...args.rows.flatMap((row) =>
-			row.bundleSha ? [sandboxAgentToolsDrive(row.region, row.bundleSha)] : [],
-		),
-		...args.recentBundles.flatMap((sha) =>
-			args.regions.map((region) => sandboxAgentToolsDrive(region, sha)),
-		),
-	]);
+export async function listMountedDrives(
+	lister: SandboxLister,
+	expected: readonly string[] = [],
+): Promise<{ sandboxes: number; mounted: Map<string, string[]> }> {
+	const mounted = new Map<string, string[]>();
+	const seenCursors = new Set<string>();
+	const names = new Set<string>();
+	let cursor: string | null = null;
+	for (let pages = 0; ; pages++) {
+		if (pages >= MAX_SANDBOX_LISTING_PAGES) {
+			throw new Error(`listing has more than ${pages} pages`);
+		}
+		const page = await lister(cursor);
+		for (const sandbox of page.sandboxes) {
+			names.add(sandbox.name);
+			for (const { drive } of Object.values(sandbox.mounts ?? {})) {
+				mounted.set(drive, [...(mounted.get(drive) ?? []), sandbox.name]);
+			}
+		}
+		if (page.next === null) break;
+		if (seenCursors.has(page.next)) {
+			throw new Error(`listing repeated cursor ${page.next.slice(0, 16)}`);
+		}
+		seenCursors.add(page.next);
+		cursor = page.next;
+	}
+	if (names.size === 0) throw new Error("listing has no sandboxes");
+	const missing = expected.filter((name) => !names.has(name));
+	if (missing.length) {
+		throw new Error(`listing lacks ${missing.join(", ")}`);
+	}
+	return { sandboxes: names.size, mounted };
 }
 
-/** Agent-tools drives no environment row's bundle and region name any more. */
-export function agentToolsDrivesToPrune(
-	drives: readonly string[],
-	referenced: ReadonlySet<string>,
-): string[] {
-	return drives.filter(
-		(name) =>
-			SANDBOX_AGENT_TOOLS_DRIVE_PATTERN.test(name) && !referenced.has(name),
-	);
+export type PruneDecision =
+	| { drive: string; action: "keep"; reason: string }
+	| { drive: string; action: "delete" };
+
+/**
+ * A drive lives as long as a sandbox that mounts it: it is deleted once it
+ * is not the current release's bundle and no sandbox lists it under mounts.
+ */
+export function agentToolsPrunePlan(args: {
+	drives: readonly DriveEntry[];
+	mounted: ReadonlyMap<string, readonly string[]>;
+	currentBundle: string;
+}): PruneDecision[] {
+	const current = `-${args.currentBundle.slice(0, 12)}`;
+	return args.drives
+		.filter(({ name }) => SANDBOX_AGENT_TOOLS_DRIVE_PATTERN.test(name))
+		.map(({ name, attachedTo }): PruneDecision => {
+			if (name.endsWith(current)) {
+				return { drive: name, action: "keep", reason: "current release" };
+			}
+			const boxes = args.mounted.get(name) ?? [];
+			if (boxes.length) {
+				return {
+					drive: name,
+					action: "keep",
+					reason: `mounted by ${boxes.length} sandbox(es), e.g. ${boxes[0]}`,
+				};
+			}
+			if (attachedTo) {
+				return {
+					drive: name,
+					action: "keep",
+					reason: `attached to ${attachedTo}; next release retries`,
+				};
+			}
+			return { drive: name, action: "delete" };
+		})
+		.sort((a, b) => a.drive.localeCompare(b.drive));
 }
 
-/** Returns the drives it could not delete; a drive a sandbox holds is retried next release. */
+export type PruneOutcome =
+	| { outcome: "skipped"; reason: string }
+	| {
+			outcome: "pruned" | "dry-run";
+			kept: { drive: string; reason: string }[];
+			deleted: string[];
+			refused: string[];
+	  };
+
+/**
+ * Deletes nothing unless both the drive listing and the whole sandbox
+ * listing were read. A delete Vercel refuses (a drive still attached) is
+ * skipped and retried by the next release; nothing is forced.
+ */
 export async function pruneAgentToolsDrives(args: {
 	host: DriveHost;
-	referenced: ReadonlySet<string>;
-}): Promise<{ deleted: string[]; kept: string[] }> {
+	sandboxes: SandboxLister;
+	currentBundle: string;
+	expectedSandboxes?: readonly string[];
+	dryRun: boolean;
+	log: (line: string) => void;
+}): Promise<PruneOutcome> {
+	let drives: DriveEntry[];
+	let listing: Awaited<ReturnType<typeof listMountedDrives>>;
+	try {
+		drives = await args.host.list("agent-tools-");
+		listing = await listMountedDrives(args.sandboxes, args.expectedSandboxes);
+	} catch (error) {
+		const reason = `listing incomplete, deleted nothing: ${String(error).slice(0, 300)}`;
+		args.log(`agent-tools: prune skipped; ${reason}`);
+		return { outcome: "skipped", reason };
+	}
+	args.log(
+		`agent-tools: ${drives.length} drives, ${listing.sandboxes} sandboxes listed, ${listing.mounted.size} drives mounted`,
+	);
+	const kept: { drive: string; reason: string }[] = [];
 	const deleted: string[] = [];
-	const kept: string[] = [];
-	for (const name of agentToolsDrivesToPrune(
-		(await args.host.list("agent-tools-")).map((drive) => drive.name),
-		args.referenced,
-	)) {
+	const refused: string[] = [];
+	for (const decision of agentToolsPrunePlan({
+		drives,
+		mounted: listing.mounted,
+		currentBundle: args.currentBundle,
+	})) {
+		if (decision.action === "keep") {
+			kept.push({ drive: decision.drive, reason: decision.reason });
+			args.log(`agent-tools: keep ${decision.drive}: ${decision.reason}`);
+			continue;
+		}
+		if (args.dryRun) {
+			deleted.push(decision.drive);
+			args.log(`agent-tools: would delete ${decision.drive}`);
+			continue;
+		}
 		try {
-			await args.host.remove(name);
-			deleted.push(name);
-		} catch {
-			kept.push(name);
+			await args.host.remove(decision.drive);
+			deleted.push(decision.drive);
+			args.log(`agent-tools: deleted ${decision.drive}`);
+		} catch (error) {
+			refused.push(decision.drive);
+			args.log(
+				`agent-tools: keep ${decision.drive}: Vercel refused the delete (${String(error).slice(0, 200)}); next release retries`,
+			);
 		}
 	}
-	return { deleted, kept };
+	args.log(
+		`agent-tools: ${args.dryRun ? "dry run: would delete" : "deleted"} ${deleted.length}, kept ${kept.length + refused.length}`,
+	);
+	return {
+		outcome: args.dryRun ? "dry-run" : "pruned",
+		kept,
+		deleted,
+		refused,
+	};
 }
 
 interface VercelCredentials {
 	token: string;
 	teamId: string;
 	projectId: string;
+}
+
+const SandboxListingPage = z.object({
+	sandboxes: z.array(
+		z.object({
+			name: z.string(),
+			mounts: z.record(z.string(), z.object({ drive: z.string() })).optional(),
+		}),
+	),
+	pagination: z.object({ next: z.string().nullable() }),
+});
+
+/** Every sandbox in the project, of any status; the SDK's own listing hides the pages. */
+export function vercelSandboxLister(
+	credentials: VercelCredentials,
+	fetchPage: typeof fetch = fetch,
+): SandboxLister {
+	return async (cursor) => {
+		const query = new URLSearchParams({
+			teamId: credentials.teamId,
+			project: credentials.projectId,
+			limit: "50",
+			...(cursor ? { cursor } : {}),
+		});
+		const response = await fetchPage(
+			`https://api.vercel.com/v2/sandboxes?${query}`,
+			{ headers: { authorization: `Bearer ${credentials.token}` } },
+		);
+		if (!response.ok) {
+			throw new Error(
+				`sandbox listing answered ${response.status}: ${(await response.text()).slice(0, 200)}`,
+			);
+		}
+		const page = SandboxListingPage.parse(await response.json());
+		return { sandboxes: page.sandboxes, next: page.pagination.next };
+	};
 }
 
 export function vercelDriveHost(credentials: VercelCredentials): DriveHost {
@@ -658,6 +814,7 @@ if (import.meta.main) {
 		projectId: process.env.VERCEL_SANDBOX_PROJECT_ID ?? "",
 	};
 	const [bundleSha] = argValues(argv, "--bundle");
+	const pruneDryRun = argv.includes("--prune-dry-run");
 	if (!credentials.token || !credentials.teamId || !credentials.projectId) {
 		console.error(
 			"VERCEL_SANDBOX_TOKEN, VERCEL_SANDBOX_TEAM_ID and VERCEL_SANDBOX_PROJECT_ID are required",
@@ -667,6 +824,16 @@ if (import.meta.main) {
 	if (!bundleSha || !SHA256.test(bundleSha)) {
 		console.error("--bundle <sha256> is required");
 		process.exit(1);
+	}
+	if (pruneDryRun) {
+		const result = await pruneAgentToolsDrives({
+			host: vercelDriveHost(credentials),
+			sandboxes: vercelSandboxLister(credentials),
+			currentBundle: bundleSha,
+			dryRun: true,
+			log: console.log,
+		});
+		process.exit(result.outcome === "skipped" ? 1 : 0);
 	}
 	const regions = argValues(argv, "--region");
 	const unknown = regions.filter((region) => !isSandboxRegionId(region));

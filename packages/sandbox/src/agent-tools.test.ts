@@ -10,19 +10,22 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
 	type AgentToolsManifest,
-	agentToolsDrivesToPrune,
 	agentToolsGaps,
 	agentToolsManifest,
+	agentToolsPrunePlan,
 	type DriveHost,
 	describeAgentToolsPublish,
+	type ListedSandbox,
 	parseAgentToolsManifest,
 	parseBuilderResults,
 	pruneAgentToolsDrives,
 	publishAgentToolsDrive,
 	publishAgentToolsDrives,
 	type RegionPublish,
-	referencedAgentToolsDrives,
 	renderBuilderScript,
+	type SandboxLister,
+	type SandboxPage,
+	vercelSandboxLister,
 } from "./agent-tools";
 import { type Assets, loadAssets, sha256 } from "./manifest";
 
@@ -387,56 +390,178 @@ describe("agentToolsGaps", () => {
 	});
 });
 
-test("referenced drives: every row's bundle in its region, and the recent bundles in every region", () => {
-	const older = "1".repeat(64);
-	expect(
-		[
-			...referencedAgentToolsDrives({
-				rows: [
-					{ region: "iad1", bundleSha: older },
-					{ region: "fra1", bundleSha: null },
-				],
-				recentBundles: [BUNDLE],
-				regions: ["sfo1", "iad1"],
-			}),
-		].sort(),
-	).toEqual([
-		"agent-tools-iad1-0123456789ab",
-		"agent-tools-iad1-111111111111",
-		"agent-tools-sfo1-0123456789ab",
-	]);
-});
-
 describe("pruning", () => {
-	test("deletes only agent-tools drives no environment references", () => {
+	const CURRENT = "c".repeat(64);
+	const drive = (region: string, bundle: string) =>
+		`agent-tools-${region}-${bundle.slice(0, 12)}`;
+	const pages =
+		(...list: SandboxPage[]): SandboxLister =>
+		async (cursor) => {
+			const page = list[cursor === null ? 0 : Number(cursor)];
+			if (!page) throw new Error(`no page ${cursor}`);
+			return page;
+		};
+	const box = (name: string, mounted?: string): ListedSandbox => ({
+		name,
+		...(mounted ? { mounts: { "/opt/agents": { drive: mounted } } } : {}),
+	});
+	const prune = (
+		host: DriveHost,
+		sandboxes: SandboxLister,
+		options: { dryRun?: boolean; expected?: string[] } = {},
+	) => {
+		const lines: string[] = [];
+		return pruneAgentToolsDrives({
+			host,
+			sandboxes,
+			currentBundle: CURRENT,
+			expectedSandboxes: options.expected,
+			dryRun: options.dryRun ?? false,
+			log: (line) => lines.push(line),
+		}).then((result) => ({ result, lines }));
+	};
+
+	test("keeps the current release's drive in every region, mounted or not", () => {
 		expect(
-			agentToolsDrivesToPrune(
-				[
-					"agent-tools-sfo1-0123456789ab",
-					"agent-tools-sfo1-aaaaaaaaaaaa",
-					"agent-tools-iad1-0123456789ab",
-					"agent-tools-sfo1",
-					"agent-tools-builder-sfo1-xyz",
-				],
-				new Set(["agent-tools-sfo1-0123456789ab"]),
-			),
+			agentToolsPrunePlan({
+				drives: [{ name: drive("sfo1", CURRENT), createdAt: 0 }],
+				mounted: new Map(),
+				currentBundle: CURRENT,
+			}),
 		).toEqual([
-			"agent-tools-sfo1-aaaaaaaaaaaa",
-			"agent-tools-iad1-0123456789ab",
+			{
+				drive: drive("sfo1", CURRENT),
+				action: "keep",
+				reason: "current release",
+			},
 		]);
 	});
 
-	test("keeps a drive a sandbox holds for the next release", async () => {
+	test("keeps a drive any listed sandbox mounts, on any page, and deletes one none mounts", async () => {
+		const { host, calls } = fakeHost({
+			[drive("iad1", sha("1"))]: {},
+			[drive("fra1", sha("2"))]: {},
+			[drive("sfo1", sha("3"))]: {},
+			"agent-tools-builder-sfo1-x": {},
+		});
+		const { result, lines } = await prune(
+			host,
+			pages(
+				{ sandboxes: [box("ws-a", drive("iad1", sha("1")))], next: "1" },
+				{
+					sandboxes: [box("ws-b", drive("fra1", sha("2"))), box("ws-c")],
+					next: null,
+				},
+			),
+		);
+		expect(calls).toEqual([`remove ${drive("sfo1", sha("3"))}`]);
+		expect(result).toMatchObject({
+			outcome: "pruned",
+			deleted: [drive("sfo1", sha("3"))],
+		});
+		expect(lines).toContain(
+			`agent-tools: keep ${drive("iad1", sha("1"))}: mounted by 1 sandbox(es), e.g. ws-a`,
+		);
+		expect(lines).toContain(`agent-tools: deleted ${drive("sfo1", sha("3"))}`);
+	});
+
+	test.each([
+		["a page fails", pages({ sandboxes: [box("ws-a")], next: "1" }), []],
+		[
+			"a cursor repeats",
+			pages(
+				{ sandboxes: [box("ws-a")], next: "1" },
+				{ sandboxes: [], next: "1" },
+			),
+			[],
+		],
+		["the listing is empty", pages({ sandboxes: [], next: null }), []],
+		[
+			"a sandbox known to exist is missing",
+			pages({ sandboxes: [box("ws-a")], next: null }),
+			["env-internal-x"],
+		],
+	])("deletes nothing when %s", async (_, sandboxes, expected) => {
+		const { host, calls } = fakeHost({ [drive("sfo1", sha("3"))]: {} });
+		const { result } = await prune(host, sandboxes, { expected });
+		expect(result.outcome).toBe("skipped");
+		expect(calls).toEqual([]);
+	});
+
+	test("skips a drive Vercel refuses to delete and goes on", async () => {
 		const { host } = fakeHost({
-			"agent-tools-sfo1-aaaaaaaaaaaa": {},
-			"agent-tools-sfo1-bbbbbbbbbbbb": { attachedTo: "box" },
+			[drive("sfo1", sha("3"))]: {},
+			[drive("sfo1", sha("4"))]: {},
 		});
-		expect(
-			await pruneAgentToolsDrives({ host, referenced: new Set() }),
-		).toEqual({
-			deleted: ["agent-tools-sfo1-aaaaaaaaaaaa"],
-			kept: ["agent-tools-sfo1-bbbbbbbbbbbb"],
+		const refusing: DriveHost = {
+			...host,
+			remove: async (name) => {
+				if (name === drive("sfo1", sha("3")))
+					throw new Error("409 drive attached");
+				await host.remove(name);
+			},
+		};
+		const { result } = await prune(
+			refusing,
+			pages({ sandboxes: [box("ws-a")], next: null }),
+		);
+		expect(result).toMatchObject({
+			deleted: [drive("sfo1", sha("4"))],
+			refused: [drive("sfo1", sha("3"))],
 		});
+	});
+
+	test("does not try to delete a drive a sandbox holds attached", async () => {
+		const { host, calls } = fakeHost({
+			[drive("sfo1", sha("3"))]: { attachedTo: "builder" },
+		});
+		const { result } = await prune(
+			host,
+			pages({ sandboxes: [box("ws-a")], next: null }),
+		);
+		expect(calls).toEqual([]);
+		expect(result).toMatchObject({ deleted: [], refused: [] });
+	});
+
+	test("a dry run reports what it would delete and deletes nothing", async () => {
+		const { host, calls } = fakeHost({ [drive("sfo1", sha("3"))]: {} });
+		const { result, lines } = await prune(
+			host,
+			pages({ sandboxes: [box("ws-a")], next: null }),
+			{ dryRun: true },
+		);
+		expect(calls).toEqual([]);
+		expect(result).toMatchObject({
+			outcome: "dry-run",
+			deleted: [drive("sfo1", sha("3"))],
+		});
+		expect(lines).toContain(
+			`agent-tools: would delete ${drive("sfo1", sha("3"))}`,
+		);
+	});
+
+	test("the Vercel lister pages by cursor and throws on a refused page", async () => {
+		const seen: string[] = [];
+		const lister = vercelSandboxLister(
+			{ token: "t", teamId: "team", projectId: "prj" },
+			(async (url: string) => {
+				seen.push(new URL(url).searchParams.get("cursor") ?? "");
+				return seen.length === 1
+					? Response.json({
+							sandboxes: [
+								{ name: "ws-a", mounts: { "/opt/agents": { drive: "d" } } },
+							],
+							pagination: { next: "n1" },
+						})
+					: new Response("rate limited", { status: 429 });
+			}) as typeof fetch,
+		);
+		expect(await lister(null)).toEqual({
+			sandboxes: [{ name: "ws-a", mounts: { "/opt/agents": { drive: "d" } } }],
+			next: "n1",
+		});
+		await expect(lister("n1")).rejects.toThrow("429");
+		expect(seen).toEqual(["", "n1"]);
 	});
 });
 
