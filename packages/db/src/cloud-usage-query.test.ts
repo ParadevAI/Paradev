@@ -863,3 +863,102 @@ describe("queryFleetCloudUsageByWorkspaceDay", () => {
 		).not.toContain(BILLING_PAGE);
 	});
 });
+
+describe("grouped by billing day", () => {
+	const at = (lockSeq: number, sentAt: string, userId = MAYA) => ({
+		bootId: "boot_1",
+		lockSeq,
+		feature: "box_gb_minutes" as const,
+		organizationId: ORG,
+		cloudWorkspaceId: CHECKOUT,
+		userId,
+		windowFrom: new Date(sentAt),
+		windowTo: new Date(sentAt),
+		amount: "60",
+		sentAt: new Date(sentAt),
+	});
+	// 2026-11-01 is the fall-back day: Pacific midnight moves from 07:00Z to 08:00Z, 25 hours.
+	const seedFallBack = () =>
+		db
+			.insert(cloudUsageEvents)
+			.values([
+				at(41, "2026-11-01T07:30:00Z"),
+				at(42, "2026-11-02T07:30:00Z"),
+				at(43, "2026-11-02T08:30:00Z", SAM),
+				at(44, "2026-11-03T12:00:00Z"),
+			]);
+	const dropFallBack = () =>
+		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 41));
+	const PARTIAL = {
+		from: new Date("2026-11-01T10:00:00Z"),
+		to: new Date("2026-11-03T15:00:00Z"),
+	};
+	const totals = async (
+		groupBy: "day" | "billingDay",
+		window: { from: Date; to: Date },
+		filters: Parameters<typeof queryCloudUsage>[2]["filters"] = {},
+		userId?: string,
+	) => {
+		const { total } = await queryCloudUsage(
+			db,
+			{ organizationId: ORG, userId },
+			{ window, groupBy, filters, limit: 100, overagePerGbHour: RATE },
+		);
+		return [total.gbHours, total.hours, total.boots, total.failedBoots];
+	};
+
+	test("a row is a Pacific day: an event at 07:30Z on Nov 2 is still Nov 1", async () => {
+		await seedFallBack();
+		try {
+			const { items } = await usage({
+				groupBy: "billingDay",
+				window: PARTIAL,
+			});
+			const gbHoursOn = (day: string) =>
+				items.find((item) => item.key === day)?.gbHours ?? 0;
+			expect(items.map((item) => item.key)).toEqual(
+				[...items.map((item) => item.key)].sort().reverse(),
+			);
+			expect(gbHoursOn("2026-11-01")).toBe(1);
+			expect(gbHoursOn("2026-11-02")).toBe(1);
+			expect(gbHoursOn("2026-11-03")).toBe(1);
+		} finally {
+			await dropFallBack();
+		}
+	});
+
+	test("the totals equal the UTC-day totals over whole days, partial edge days, a member and a size", async () => {
+		await seedFallBack();
+		try {
+			for (const window of [NOVEMBER, OCTOBER, PARTIAL]) {
+				expect(await totals("billingDay", window)).toEqual(
+					await totals("day", window),
+				);
+				expect(await totals("billingDay", window, {}, SAM)).toEqual(
+					await totals("day", window, {}, SAM),
+				);
+				expect(await totals("billingDay", window, { size: "small" })).toEqual(
+					await totals("day", window, { size: "small" }),
+				);
+			}
+		} finally {
+			await dropFallBack();
+		}
+	});
+
+	test("a filter the rollup cannot apply reads events, with the same rows", async () => {
+		await seedFallBack();
+		try {
+			const rows = async (search?: string) =>
+				(
+					await usage({ groupBy: "billingDay", window: PARTIAL, search })
+				).items.map((item) => [item.key, item.gbHours, item.boots]);
+			const all = await rows();
+			const searched = await rows("checkout");
+			expect(searched.length).toBeGreaterThan(0);
+			for (const row of searched) expect(all).toContainEqual(row);
+		} finally {
+			await dropFallBack();
+		}
+	});
+});
