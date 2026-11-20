@@ -2378,9 +2378,6 @@ msgstr "Konfiguracje agentów"
 msgid "Agent credentials changed"
 msgstr "Dane logowania agenta zmieniły się"
 
-msgid "Agent default"
-msgstr "Domyślny model agenta"
-
 msgid "Agent finished"
 msgstr "Agent zakończył"
 
@@ -18353,6 +18350,9 @@ msgstr "Pokaż wszystkie komentarze"
 
 msgid "Show all lines"
 msgstr "Pokaż wszystkie wiersze"
+
+msgid "Show all models"
+msgstr "Pokaż wszystkie modele"
 
 msgid "Show Apple's installer"
 msgstr "Pokaż instalator Apple"

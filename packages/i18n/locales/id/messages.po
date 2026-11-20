@@ -2378,9 +2378,6 @@ msgstr "Konfigurasi Agen"
 msgid "Agent credentials changed"
 msgstr "Kredensial agen berubah"
 
-msgid "Agent default"
-msgstr "Model bawaan agen"
-
 msgid "Agent finished"
 msgstr "Agen selesai"
 
@@ -18353,6 +18350,9 @@ msgstr "Tampilkan semua komentar"
 
 msgid "Show all lines"
 msgstr "Tampilkan semua baris"
+
+msgid "Show all models"
+msgstr "Tampilkan semua model"
 
 msgid "Show Apple's installer"
 msgstr "Tampilkan penginstal Apple"

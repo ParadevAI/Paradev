@@ -98,7 +98,6 @@ export function ModelPicker({
 	);
 	const fast = fastOption(settings);
 	const effort = settings.find((option) => option.category === "thought_level");
-	const effortLabel = currentLabel(effort);
 	// The slider card owns effort and the fast toggle; the rest stay as rows.
 	const rows = settings.filter(
 		(option) => option !== effort && (effort ? option !== fast : true),
@@ -111,6 +110,9 @@ export function ModelPicker({
 		model?.label ??
 		currentAgentLabel ??
 		settings[0]?.label;
+	const currentEffortLabel = currentLabel(effort);
+	const effortLabel =
+		currentEffortLabel === pillLabel ? undefined : currentEffortLabel;
 	const modelLabelHidden = Boolean(hideModelLabel && agentIcon);
 	const hiddenLabels = [
 		modelLabelHidden ? pillLabel : null,

@@ -2378,9 +2378,6 @@ msgstr "Ajan yapılandırmaları"
 msgid "Agent credentials changed"
 msgstr "Ajan kimlik bilgileri değişti"
 
-msgid "Agent default"
-msgstr "Ajanın varsayılan modeli"
-
 msgid "Agent finished"
 msgstr "Ajan bitirdi"
 
@@ -18353,6 +18350,9 @@ msgstr "Tüm yorumları göster"
 
 msgid "Show all lines"
 msgstr "Tüm satırları göster"
+
+msgid "Show all models"
+msgstr "Tüm modelleri göster"
 
 msgid "Show Apple's installer"
 msgstr "Apple'ın yükleyicisini göster"

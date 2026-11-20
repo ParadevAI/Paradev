@@ -2372,9 +2372,6 @@ msgstr "Конфігурації агентів"
 msgid "Agent credentials changed"
 msgstr "Облікові дані агента змінилися"
 
-msgid "Agent default"
-msgstr "Типова модель агента"
-
 msgid "Agent finished"
 msgstr "Агент завершив роботу"
 
@@ -18347,6 +18344,9 @@ msgstr "Показати всі коментарі"
 
 msgid "Show all lines"
 msgstr "Показати всі рядки"
+
+msgid "Show all models"
+msgstr "Показати всі моделі"
 
 msgid "Show Apple's installer"
 msgstr "Показати інсталятор Apple"

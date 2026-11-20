@@ -99,9 +99,10 @@ export function ModelPanel({
 				? []
 				: (agentSwitcher?.agents.find((agent) => agent.presetId === presetId)
 						?.models ?? []);
-		return models.length > 0
-			? models.map((entry) => ({ ...entry, presetId }))
-			: [{ presetId, id: null, label: t({ message: "Default" }) }];
+		return [
+			{ presetId, id: null, label: t({ message: "Default" }) },
+			...models.map((entry) => ({ ...entry, presetId })),
+		];
 	};
 	const onFavoritesTab = tab === FAVORITES_TAB;
 	const tabAgent = agentSwitcher?.agents.find(
@@ -145,27 +146,33 @@ export function ModelPanel({
 		),
 	].sort();
 	const needle = query.trim().toLowerCase();
-	const matches = rows.filter(
-		(row) =>
-			filterModelCatalog(
-				[
+	const matchingRows = (includeAll: boolean) =>
+		rows.filter(
+			(row) =>
+				filterModelCatalog(
+					[
+						{
+							...row,
+							id: row.id ?? "default",
+							label: `${row.label} ${row.agentLabel ?? ""}`,
+						},
+					],
 					{
-						...row,
-						id: row.id ?? "default",
-						label: `${row.label} ${row.agentLabel ?? ""}`,
+						query: needle,
+						providers: provider ? [provider] : undefined,
+						requireTools: !includeAll,
+						requireTextOutput: !includeAll,
+						includeDeprecated: includeAll,
+						selectedId:
+							row.presetId === currentPresetId
+								? model?.currentValue
+								: undefined,
 					},
-				],
-				{
-					query: needle,
-					providers: provider ? [provider] : undefined,
-					requireTools: !showAllModels,
-					requireTextOutput: !showAllModels,
-					includeDeprecated: showAllModels,
-					selectedId:
-						row.presetId === currentPresetId ? model?.currentValue : undefined,
-				},
-			).length > 0,
-	);
+				).length > 0,
+		);
+	const matches = matchingRows(showAllModels);
+	const hasHiddenModels =
+		!showAllModels && matchingRows(true).length > matches.length;
 	const starred = onFavoritesTab ? [] : matches.filter(isFavorite);
 	const rest = onFavoritesTab
 		? matches
@@ -192,6 +199,7 @@ export function ModelPanel({
 	const selectTab = (next: string) => {
 		if (next === tab) return;
 		setTab(next);
+		setShowAllModels(false);
 		setProvider("");
 		setQuery("");
 	};
@@ -399,16 +407,6 @@ export function ModelPanel({
 					value={query}
 				/>
 			</label>
-			{rows.some((row) => row.metadata) ? (
-				<label className="flex items-center gap-2 border-b px-2.5 py-1 text-xs text-muted-foreground">
-					<input
-						type="checkbox"
-						checked={showAllModels}
-						onChange={(event) => setShowAllModels(event.target.checked)}
-					/>
-					{t({ message: "All models" })}
-				</label>
-			) : null}
 			{providers.length > 1 ? (
 				<div className="flex flex-wrap gap-1 border-b p-1.5">
 					{["", ...providers].map((value) => (
@@ -452,6 +450,21 @@ export function ModelPanel({
 						</div>
 					))
 				)}
+				{hasHiddenModels ? (
+					<DropdownMenuItem
+						className={cn(
+							MENU_ROW_CLASS,
+							"justify-center text-muted-foreground",
+						)}
+						onSelect={(event) => {
+							event.preventDefault();
+							setShowAllModels(true);
+							searchRef.current?.focus();
+						}}
+					>
+						{t({ message: "Show all models" })}
+					</DropdownMenuItem>
+				) : null}
 			</div>
 		</div>
 	);

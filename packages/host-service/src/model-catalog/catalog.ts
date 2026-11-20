@@ -108,6 +108,13 @@ async function context(
 	return { config, cwd, presetId, env, key, launch, options };
 }
 
+const DEFAULT_ALIAS_MODEL_ID = "default";
+
+/** Pickers add their own "Default" choice, which omits the model override. */
+export function withoutDefaultAlias(models: CatalogModel[]): CatalogModel[] {
+	return models.filter((model) => model.id !== DEFAULT_ALIAS_MODEL_ID);
+}
+
 export function parseCursorModels(output: string): CatalogModel[] {
 	const plain = stripVTControlCharacters(output);
 	return uniqueModels(
@@ -248,7 +255,7 @@ export async function discoverAgentModels(
 						}
 						if (models === undefined) throw new DiscoveryError("unsupported");
 						return {
-							models: uniqueModels(models),
+							models: withoutDefaultAlias(uniqueModels(models)),
 							source:
 								input.surface === "chat" || ctx.presetId === "opencode"
 									? "runtime"

@@ -2378,9 +2378,6 @@ msgstr "Cấu hình agent"
 msgid "Agent credentials changed"
 msgstr "Thông tin xác thực của agent đã thay đổi"
 
-msgid "Agent default"
-msgstr "Mô hình mặc định của tác nhân"
-
 msgid "Agent finished"
 msgstr "Agent đã xong"
 
@@ -18353,6 +18350,9 @@ msgstr "Hiển thị tất cả bình luận"
 
 msgid "Show all lines"
 msgstr "Hiện tất cả các dòng"
+
+msgid "Show all models"
+msgstr "Hiển thị tất cả mô hình"
 
 msgid "Show Apple's installer"
 msgstr "Hiện trình cài đặt của Apple"

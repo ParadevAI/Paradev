@@ -715,7 +715,7 @@ export function NewWorkspaceScreen({
 				selectedEffort,
 				labels: {
 					model: t({ message: "Model" }),
-					defaultModel: t({ message: "Agent default" }),
+					defaultModel: t({ message: "Default" }),
 					effort: t({ message: "Effort" }),
 					defaultEffort: t({ message: "Default" }),
 				},
@@ -733,7 +733,7 @@ export function NewWorkspaceScreen({
 	);
 	const pendingSwitchModel = useRef<{
 		agent: WorkspaceCreateAgent;
-		model: string;
+		model: string | null;
 	} | null>(null);
 	useEffect(() => {
 		const pending = pendingSwitchModel.current;
@@ -761,9 +761,10 @@ export function NewWorkspaceScreen({
 				).map((entry) => ({ ...entry })),
 			})),
 			onSwitch: (agentId, model) => {
-				pendingSwitchModel.current = model
-					? { agent: agentId, model: model.id }
-					: null;
+				pendingSwitchModel.current = {
+					agent: agentId,
+					model: model?.id ?? null,
+				};
 				setSelectedAgent(agentId);
 			},
 		};
