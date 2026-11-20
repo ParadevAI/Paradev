@@ -25,6 +25,7 @@ Object.assign(process.env, {
 	NEXT_PUBLIC_API_URL: "https://api.test",
 	NEXT_PUBLIC_WEB_URL: "https://app.superset.sh",
 	QSTASH_TOKEN: "qstash-token",
+	REALTIME_NUDGE_SECRET: "test-nudge-secret",
 	SERVER_ANTHROPIC_API_KEY: "test",
 	SLACK_SIGNING_SECRET: "test-secret",
 	YC_BOOKFACE_REWARD_ID: "yc-bookface-3mo-team",

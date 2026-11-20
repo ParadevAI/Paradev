@@ -14,7 +14,6 @@ import {
 	type PageStorageWriteRequest,
 	parsePageStorageScope,
 } from "@superset/shared/page-storage";
-import { readable, writableFor } from "@superset/shared/page-storage-access";
 import type { PageStorageHubRequest } from "@superset/shared/page-storage-hub";
 import {
 	isRealtimeNudgeKind,
@@ -146,13 +145,12 @@ app.post("/v2/page/:pageId/storage/ticket", async (c) => {
 	if (!auth?.sub) return c.json({ error: "Unauthorized" }, 401);
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
-	const manifest = await stub.readManifest();
-	if (!manifest) return c.json({ error: "Not found" }, 404);
-
-	const viewer = { userId: auth.sub, organizationIds: auth.organizationIds };
-	if (!readable(manifest, viewer)) {
-		return c.json({ error: "Forbidden" }, 403);
-	}
+	const { found, access } = await stub.accessFor({
+		userId: auth.sub,
+		organizationIds: auth.organizationIds,
+	});
+	if (!found) return c.json({ error: "Not found" }, 404);
+	if (!access.read) return c.json({ error: "Forbidden" }, 403);
 
 	const nonce = crypto.randomUUID();
 	const ticket = await signPageConnectTicket(c.env.NUDGE_SECRET, {
@@ -161,8 +159,8 @@ app.post("/v2/page/:pageId/storage/ticket", async (c) => {
 		name: auth.name ?? "Someone",
 		image: auth.image ?? null,
 		organizationIds: auth.organizationIds,
-		author: manifest.createdByUserId === auth.sub,
-		writable: writableFor(manifest, viewer),
+		author: access.author,
+		writable: access.write,
 		nonce,
 		exp: Math.floor(Date.now() / 1000) + PAGE_STORAGE_TICKET_SECONDS,
 	});
@@ -195,11 +193,12 @@ app.get("/v2/page/:pageId/storage/records", async (c) => {
 	}
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
-	const manifest = await stub.readManifest();
-	if (!manifest) return c.json({ error: "Not found" }, 404);
-
-	const viewer = { userId: auth.sub, organizationIds: auth.organizationIds };
-	if (!readable(manifest, viewer)) {
+	const { found, access } = await stub.accessFor({
+		userId: auth.sub,
+		organizationIds: auth.organizationIds,
+	});
+	if (!found) return c.json({ error: "Not found" }, 404);
+	if (!access.read) {
 		return c.json({ error: "You cannot read this page's storage" }, 403);
 	}
 
@@ -258,11 +257,12 @@ app.post("/v2/page/:pageId/storage/records", async (c) => {
 	}
 
 	const stub = await getServerByName(c.env.PageHub, pageId);
-	const manifest = await stub.readManifest();
-	if (!manifest) return c.json({ error: "Not found" }, 404);
-
-	const viewer = { userId: auth.sub, organizationIds: auth.organizationIds };
-	if (!writableFor(manifest, viewer)) {
+	const { found, access } = await stub.accessFor({
+		userId: auth.sub,
+		organizationIds: auth.organizationIds,
+	});
+	if (!found) return c.json({ error: "Not found" }, 404);
+	if (!access.write) {
 		return c.json({ error: "You cannot write this page's storage" }, 403);
 	}
 
