@@ -79,8 +79,9 @@ Search the project for an issue that already names the cause: `list_issues` on p
 `124fd465-3c78-43dc-a252-e99f5f8c33e0`, then look for the cause's fingerprint line.
 
 - **Known cause:** add a comment with the new count and one example id. Do not open a second issue.
-- **New cause:** open an issue in team `SUPER` and project `124fd465-3c78-43dc-a252-e99f5f8c33e0`,
-  with label `dev-doctor` (create the label once if it is missing). Write it in the format in
+- **New cause:** open an issue in team `Paradev` (id `2ee96ee8-ea1b-4d7e-860e-de45713f857c`) and
+  project `124fd465-3c78-43dc-a252-e99f5f8c33e0`, with label `dev-doctor` (create the label once
+  if it is missing). Write it in the format in
   `.agents/skills/ticket-format/SKILL.md`. End the description with a line
   `Fingerprint: <kind>/<short key>`.
 - **Fix clear and small:** also open a draft PR. Branch `dev-doctor/<slug>` from `origin/main`,
