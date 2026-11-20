@@ -12,24 +12,24 @@ import {
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import type { WorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
+import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 
 interface SaveCheckpointDialogProps {
 	cloudWorkspaceId: string;
-	environment: WorkspaceEnvironment;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
 export function SaveCheckpointDialog({
 	cloudWorkspaceId,
-	environment,
 	open,
 	onOpenChange,
 }: SaveCheckpointDialogProps) {
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
 	const promote = cloudTrpc.environment.promote.useMutation();
+	const environment = useWorkspaceEnvironment(cloudWorkspaceId);
+	if (!environment) return null;
 	const name = environment.name;
 
 	const handleSave = () => {

@@ -62,7 +62,7 @@ async function callBoxProcedure({
 	}
 }
 
-/** Runs the repository's cloud `[archive]` commands on a running box. */
+/** Runs the workspace's cloud `[archive]` commands on a running box. */
 export function runBoxArchiveHook(args: {
 	hostTarget: string;
 	hostSecret: string;

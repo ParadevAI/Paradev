@@ -2149,7 +2149,7 @@ msgstr "添加描述"
 msgid "Add description..."
 msgstr "添加描述..."
 
-msgid "Add Environment Variable"
+msgid "Add environment variables"
 msgstr "添加环境变量"
 
 msgid "Add extension"
@@ -2189,9 +2189,6 @@ msgstr "添加更多…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "从侧边栏菜单中添加一个即可开始。"
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "添加一个或多个环境变量。也可以拖放 .env 文件。"
-
 msgid "Add people"
 msgstr "添加人员"
 
@@ -2203,6 +2200,9 @@ msgstr "添加成员到频道"
 
 msgid "Add photos or files"
 msgstr "添加照片或文件"
+
+msgid "Add port"
+msgstr "添加端口"
 
 msgid "Add project"
 msgstr "添加项目"
@@ -2239,6 +2239,9 @@ msgstr "添加税号"
 
 msgid "Add team member..."
 msgstr "添加团队成员..."
+
+msgid "Add terminal"
+msgstr "添加终端"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "给风险最高又没测试的代码补上测试…"
@@ -2278,6 +2281,9 @@ msgstr "添加到侧边栏"
 
 msgid "Add to workspace"
 msgstr "添加到工作区"
+
+msgid "Add variables"
+msgstr "添加变量"
 
 msgid "Add what it does"
 msgstr "添加它的用途"
@@ -2625,6 +2631,9 @@ msgstr "所有页面"
 msgid "All plans"
 msgstr "全部方案"
 
+msgid "All plugins"
+msgstr "所有插件"
+
 msgid "All posts"
 msgstr "全部文章"
 
@@ -2714,6 +2723,9 @@ msgstr "已允许"
 
 msgid "Allowed for session"
 msgstr "本次会话内已允许"
+
+msgid "Allowed plugins"
+msgstr "允许的插件"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "已迁移到另一个组织。切换到该组织即可查看此项目。"
@@ -2808,6 +2820,9 @@ msgstr "自动化只能使用你创建的云端工作区"
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "环境保存你的仓库、变量和区域。可以基于它启动任意数量的工作区。"
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "环境的仓库无法更改。如需其他仓库，请创建新环境。"
+
 msgid "An error occurred"
 msgstr "发生错误"
 
@@ -2858,6 +2873,9 @@ msgstr "其他 AI 助手"
 
 msgid "another device"
 msgstr "另一台设备"
+
+msgid "Another row already uses this name."
+msgstr "其他行已使用此名称。"
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "请在下方终端中回答提问，例如输入密码。"
@@ -3576,9 +3594,6 @@ msgstr "此主机上新建worktree工作区的基准目录。"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}上新建worktree的基准目录。"
 
-msgid "Base image · no checkpoint yet"
-msgstr "基础镜像 · 尚无检查点"
-
 msgid "Base URL"
 msgstr "基础URL"
 
@@ -3853,6 +3868,12 @@ msgstr "打造最后一款软件"
 
 msgid "Building the last piece of software."
 msgstr "打造最后一款软件。"
+
+msgid "Building…"
+msgstr "正在构建…"
+
+msgid "Builds fail until there is an install script."
+msgstr "没有安装脚本时，构建会失败。"
 
 msgid "Built a plugin? Submit it here."
 msgstr "做了插件？在这里提交。"
@@ -4392,10 +4413,6 @@ msgstr "检查点"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "检查点 · tooltip重构之前"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "检查点已保存 {0}"
-
 msgid "Checkpoint saved to {name}"
 msgstr "已将检查点保存到 {name}"
 
@@ -4836,6 +4853,9 @@ msgstr "云端"
 msgid "Cloud · us-east"
 msgstr "云端 · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "在此环境中，云端智能体没有MCP服务器可用。"
+
 msgid "Cloud environment setup"
 msgstr "云环境设置"
 
@@ -5161,6 +5181,9 @@ msgstr "Conductor 是其所有者的商标。{0} 与 Conductor 或 Meta 无关�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor 工作区就是普通的 Git worktree。{0} 会在原位置直接使用它们。"
+
+msgid "Config"
+msgstr "配置"
 
 msgid "Config file contents"
 msgstr "配置文件内容"
@@ -6211,6 +6234,9 @@ msgstr "无法加载自动化：{0}"
 msgid "Couldn't load automations"
 msgstr "无法加载自动化"
 
+msgid "Couldn't load builds"
+msgstr "无法加载构建"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "无法加载贡献者，请直接输入用户名。"
 
@@ -6953,8 +6979,14 @@ msgstr "默认模型"
 msgid "Default team for new tasks"
 msgstr "新任务的默认团队"
 
+msgid "Default terminal"
+msgstr "默认终端"
+
 msgid "Default terminal theme"
 msgstr "默认终端主题"
+
+msgid "Default terminal: {terminalName}"
+msgstr "默认终端：{terminalName}"
 
 msgid "Delegated"
 msgstr "委派"
@@ -7403,6 +7435,9 @@ msgstr "目录"
 msgid "Disable"
 msgstr "停用"
 
+msgid "Disable MCP servers"
+msgstr "停用MCP服务器"
+
 msgid "Disable skill"
 msgstr "停用技能"
 
@@ -7820,6 +7855,9 @@ msgstr "每个席位会把其套餐的时长加入整个团队共享的一个时
 msgid "Each session resumes where it left off."
 msgstr "每个会话都会从中断处继续。"
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "每次构建成功都会保存一个快照。新工作区从当前快照启动，你也可以恢复到更早的快照。"
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "每个界面都有各自的排版设置。更改会立即体现在实时预览中。"
 
@@ -8027,6 +8065,9 @@ msgstr "正在结束通话"
 msgid "Ensure no regression"
 msgstr "确保没有回归"
 
+msgid "Enter a command."
+msgstr "请输入命令。"
+
 msgid "Enter a full email address"
 msgstr "请输入完整的邮箱地址"
 
@@ -8038,6 +8079,9 @@ msgstr "请输入{hostName}上的父目录"
 
 msgid "Enter a path on {hostName}"
 msgstr "请输入{hostName}上的路径"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "请输入 1 到 65535 之间的端口。"
 
 msgid "Enter a URL into the search bar above."
 msgstr "在上方的搜索栏中输入URL。"
@@ -8083,6 +8127,9 @@ msgstr "环境"
 
 msgid "Environment archived"
 msgstr "环境已归档"
+
+msgid "Environment history"
+msgstr "环境历史"
 
 msgid "Environment not found"
 msgstr "未找到环境"
@@ -10508,6 +10555,9 @@ msgstr "在你的客户端里安装Paradev MCP"
 msgid "Install plugin"
 msgstr "安装插件"
 
+msgid "Install script"
+msgstr "安装脚本"
+
 msgid "Install the desktop app"
 msgstr "安装桌面应用"
 
@@ -11617,6 +11667,9 @@ msgstr "长周期可靠性越过了一个门槛。傍晚6点派出去的活儿�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "长时间悬停才出现、只显示快捷键的tooltip；它的chip样式现在是TooltipContent的默认样式"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "长时间运行的命令，例如开发服务器。每个工作区启动时会打开默认终端。"
+
 msgid "Looking at {what}"
 msgstr "正在查看 {what}"
 
@@ -11857,6 +11910,9 @@ msgstr "最大为256 KB。"
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "MCP允许列表"
 
 msgid "MCP manager"
 msgstr "MCP管理器"
@@ -12757,6 +12813,9 @@ msgstr "此周期内没有启动。"
 msgid "No branches found"
 msgstr "未找到分支"
 
+msgid "No builds yet"
+msgstr "尚无构建"
+
 msgid "No changed files."
 msgstr "没有更改的文件。"
 
@@ -13101,6 +13160,9 @@ msgstr "未记录人员"
 
 msgid "No plugins available yet."
 msgstr "暂无可用插件。"
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "未安装插件，因此云端智能体在这里没有MCP服务器可用。"
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13854,6 +13916,9 @@ msgstr "只有创建此页面的人才能更改这些设置。"
 msgid "Only the person who created this workspace can change these."
 msgstr "只有创建此工作区的人可以更改这些设置。"
 
+msgid "Only the plugins below"
+msgstr "仅以下插件"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "只有讨论串的作者或页面所有者才能删除它"
 
@@ -14422,9 +14487,6 @@ msgstr "组织已存在"
 
 msgid "Organization created successfully!"
 msgstr "组织创建成功！"
-
-msgid "Organization default ({defaultName})"
-msgstr "组织默认（{defaultName}）"
 
 msgid "Organization deleted"
 msgstr "组织已删除"
@@ -15247,6 +15309,18 @@ msgstr "热门"
 msgid "Popular models"
 msgstr "热门模型"
 
+msgid "Port"
+msgstr "端口"
+
+msgid "Port label"
+msgstr "端口标签"
+
+msgid "Port name"
+msgstr "端口名称"
+
+msgid "Port number"
+msgstr "端口号"
+
 msgid "Ports"
 msgstr "端口"
 
@@ -15258,6 +15332,9 @@ msgstr "远程主机上的端口"
 
 msgid "Ports on this computer"
 msgstr "此计算机上的端口"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "应用监听的端口。预览端口会获得一个可从工作区打开的链接。"
 
 msgid "Ports: {totalPortCount} live"
 msgstr "端口：{totalPortCount}个活动"
@@ -16075,6 +16152,9 @@ msgstr "变基并合并"
 msgid "Rebase and merge"
 msgstr "变基并合并"
 
+msgid "Rebuild environment"
+msgstr "重新构建环境"
+
 msgid "Recall what was said in meetings"
 msgstr "回顾会议中说过的内容"
 
@@ -16384,6 +16464,9 @@ msgstr "移除提及{path}"
 msgid "Remove pasted text"
 msgstr "移除粘贴的文本"
 
+msgid "Remove port"
+msgstr "移除端口"
+
 msgid "Remove PR Link"
 msgstr "移除PR链接"
 
@@ -16399,8 +16482,14 @@ msgstr "移除脚本"
 msgid "Remove team member?"
 msgstr "移除团队成员？"
 
+msgid "Remove terminal"
+msgstr "移除终端"
+
 msgid "Remove terminal {createdAtLabel}"
 msgstr "移除终端{createdAtLabel}"
+
+msgid "Remove terminal {terminalName}"
+msgstr "移除终端 {terminalName}"
 
 msgid "Remove terminal session"
 msgstr "移除终端会话"
@@ -17307,6 +17396,12 @@ msgstr "在你的机器上运行本地命令"
 msgid "Runs appear here once an automation fires."
 msgstr "自动化触发后，运行将显示在这里。"
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "在每个新的云端工作区中、智能体启动之前，作为bash脚本运行。"
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "在构建环境时作为bash脚本运行。新工作区从构建结果开始。"
+
 msgid "Runs in"
 msgstr "运行位置"
 
@@ -17419,8 +17514,14 @@ msgstr "已保存 {name}"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "已保存 {name}，但其设置工作区无法启动：{reason}"
 
+msgid "Saved from a workspace"
+msgstr "从工作区保存"
+
 msgid "Saved to Downloads"
 msgstr "已保存到“下载”文件夹"
+
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "已保存。新工作区和下次构建会使用它；运行中的工作区会在重启时应用。"
 
 msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
 msgstr "按当前状态保存此工作区，包括其中安装的所有内容。从 {name} 新建的工作区将从此检查点开始。保存期间工作区会短暂停止。"
@@ -18808,9 +18909,6 @@ msgstr "笑脸与人物"
 msgid "Smoother onboarding"
 msgstr "更顺畅的上手流程"
 
-msgid "Snapshot"
-msgstr "快照"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "在每轮聊天前后为 worktree 创建快照，使该轮的卡片列出每个更改的文件（包括 shell 编辑）并可以撤销。每条提示词会先等待其快照完成。"
 
@@ -18882,6 +18980,9 @@ msgstr "有人正在移动此工作区…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev 团队会审核此页面。只有在需要你补充信息时我们才会联系你。"
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "你编辑时有人保存了此配置。保存会替换对方的版本。"
 
 msgid "Something else"
 msgstr "其他问题"
@@ -19196,6 +19297,9 @@ msgstr "用标签栏中的+新建一个。"
 
 msgid "Start or stop the workspace run command"
 msgstr "启动或停止工作区运行命令"
+
+msgid "Start script"
+msgstr "启动脚本"
 
 msgid "Start voice mode"
 msgstr "开始语音模式"
@@ -19869,6 +19973,9 @@ msgstr "终端"
 msgid "Terminal agent launch configuration"
 msgstr "终端智能体启动配置"
 
+msgid "Terminal command"
+msgstr "终端命令"
+
 msgid "Terminal connection: {label}"
 msgstr "终端连接：{label}"
 
@@ -19883,6 +19990,9 @@ msgstr "终端获得焦点时调整终端字号，浏览器窗格中调整页面
 
 msgid "Terminal input"
 msgstr "终端输入"
+
+msgid "Terminal name"
+msgstr "终端名称"
 
 msgid "Terminal removed"
 msgstr "终端已移除"
@@ -20124,6 +20234,9 @@ msgstr "调度员出现"
 
 msgid "The endpoint must use https."
 msgstr "端点必须使用 https。"
+
+msgid "The environment changed while it was being restored. Try again."
+msgstr "恢复期间环境已发生变化。请重试。"
 
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "该自动化用于启动云端工作区的环境已被归档或没有仓库。请在自动化的设置中选择其他环境。"
@@ -20547,6 +20660,9 @@ msgstr "此自动化位于其他组织"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "此浏览器未登录 Paradev。请登录以继续前往 {connectorName}。"
 
+msgid "This build has no snapshot to restore"
+msgstr "此构建没有可恢复的快照"
+
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
 
@@ -20592,6 +20708,13 @@ msgstr "无法启动此云端工作区"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需要最多 30 秒。"
 
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "此配置包含此版本的 Paradev 无法显示的设置，因此无法在这里编辑。请更新 Paradev，或使用 superset environments update 修改。"
+
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "此配置无效：{0}"
+
 msgid "This conversation is too long for the model"
 msgstr "此对话对模型来说太长了"
 
@@ -20623,17 +20746,14 @@ msgstr "此邮箱已通过其他登录方式注册，且提供方未将其确认
 msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
 msgstr "此环境每小时最多可手动启动 3 次构建。请在 {0} 分钟后重试。"
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "此环境没有可构建的 [install]。请在其基础分支的 .paradev/config.toml 中添加。"
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "此环境没有可构建的 [install]。请在设置的环境中将其添加到配置。"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此环境没有仓库。请先在设置中创建包含仓库的环境，再从该环境启动工作区"
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "此环境打开的是 {environmentRepository}，而不是 {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "此环境的仓库已固定；请再次提升一个工作区以更改它们"
 
 msgid "this file"
 msgstr "该文件"
@@ -21900,6 +22020,9 @@ msgstr "用于新智能体"
 msgid "Use global default"
 msgstr "使用全局默认值"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "请使用小写字母、数字和下划线，并以字母开头。"
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "请使用小写字母、数字、连字符和下划线"
 
@@ -22335,6 +22458,9 @@ msgstr "我们正在旧金山招聘工程师。来和我们一起打造工程师
 msgid "We're hiring in San Francisco"
 msgstr "我们在旧金山招聘"
 
+msgid "Web app"
+msgstr "网页应用"
+
 msgid "Web Fetch"
 msgstr "网页获取"
 
@@ -22477,6 +22603,9 @@ msgstr "团队都在自动化什么"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "这些评论所针对的内容已不在页面上，因此没有标记。"
 
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "此环境的构建和云端工作区运行的内容。没有配置时，云端读取主仓库的 .paradev/config.toml。"
+
 msgid "What we believe"
 msgstr "我们的信念"
 
@@ -22563,6 +22692,9 @@ msgstr "支持哪些AI编码智能体？"
 
 msgid "Which plans include automations?"
 msgstr "哪些套餐包含自动化？"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "此环境中云端智能体可使用哪些插件的MCP服务器。"
 
 msgid "Who can open it"
 msgstr "谁可以打开"

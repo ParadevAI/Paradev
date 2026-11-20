@@ -118,9 +118,7 @@ export async function startCommand(
 	const inputs = await prepareBuild(build);
 	const install = inputs.install;
 	if (key === "install" && !install) {
-		throw new BuildFailure(
-			`No [install] in .paradev/config.toml on ${inputs.installSource}`,
-		);
+		throw new BuildFailure(`No [install] in ${inputs.installSource}`);
 	}
 	const primaryDir = sandboxCheckoutDir(
 		SANDBOX_PATHS.workspace,

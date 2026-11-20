@@ -55,6 +55,8 @@ Paradev cloud workspaces keep agents working when your laptop is closed, and you
 
 Cloud workspaces run the setup scripts in `.paradev/config.json` from the repository. Convert your Conductor setup script as described in [Convert Your Scripts](/migrate-from-conductor#3-convert-your-scripts), then commit and push the file to every branch you will use as a base branch. A cloud workspace started from a branch without it does not run your setup.
 
+Once you have created the environment (next step), you can instead set its **Config** in **Settings → Environments**. It takes the `config.toml` format, not `config.json`; the `superset:setup` skill writes one and converts a `config.json`. Cloud workspaces then run it on every branch, and the repository's file is not read.
+
 `CONDUCTOR_PORT` is not set in Conductor Cloud, so cloud scripts usually do not need a port change.
 
 ### Create an environment
@@ -65,7 +67,7 @@ Cloud workspaces run the setup scripts in `.paradev/config.json` from the reposi
 
 Do not add agent API keys or GitHub tokens. Cloud workspaces ignore them: agents use your sign-in from **Settings → Agents**, and GitHub access comes from your connected GitHub account. See [Credentials](/cloud-workspaces#credentials).
 
-Not sure what the project needs? Click **Set up with an agent** in **Settings → Environments**. Claude installs what the project needs and writes its `.paradev/config.json`.
+Not sure what the project needs? Click **Set up with an agent** in **Settings → Environments**. Claude installs what the project needs and writes its config.
 
 ### Continue each branch
 

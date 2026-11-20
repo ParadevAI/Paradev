@@ -2149,8 +2149,8 @@ msgstr "Přidat popis"
 msgid "Add description..."
 msgstr "Přidat popis..."
 
-msgid "Add Environment Variable"
-msgstr "Přidat proměnnou prostředí"
+msgid "Add environment variables"
+msgstr "Přidat proměnné prostředí"
 
 msgid "Add extension"
 msgstr "Přidat rozšíření"
@@ -2189,9 +2189,6 @@ msgstr "Přidat další…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Začněte tím, že jednoho přidáte z nabídky v postranním panelu."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Přidejte jednu nebo více proměnných prostředí. Můžete také přetáhnout soubor .env."
-
 msgid "Add people"
 msgstr "Přidat lidi"
 
@@ -2203,6 +2200,9 @@ msgstr "Přidat lidi do kanálu"
 
 msgid "Add photos or files"
 msgstr "Přidat fotky nebo soubory"
+
+msgid "Add port"
+msgstr "Přidat port"
 
 msgid "Add project"
 msgstr "Přidat projekt"
@@ -2239,6 +2239,9 @@ msgstr "Přidat DIČ"
 
 msgid "Add team member..."
 msgstr "Přidat člena týmu..."
+
+msgid "Add terminal"
+msgstr "Přidat terminál"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Doplň testy pro nejrizikovější netestovaný kód…"
@@ -2278,6 +2281,9 @@ msgstr "Přidat do postranního panelu"
 
 msgid "Add to workspace"
 msgstr "Přidat do pracovního prostoru"
+
+msgid "Add variables"
+msgstr "Přidat proměnné"
 
 msgid "Add what it does"
 msgstr "Přidat, co dělá"
@@ -2625,6 +2631,9 @@ msgstr "Všechny stránky"
 msgid "All plans"
 msgstr "Všechny tarify"
 
+msgid "All plugins"
+msgstr "Všechny pluginy"
+
 msgid "All posts"
 msgstr "Všechny články"
 
@@ -2714,6 +2723,9 @@ msgstr "Povoleno"
 
 msgid "Allowed for session"
 msgstr "Povoleno pro relaci"
+
+msgid "Allowed plugins"
+msgstr "Povolené pluginy"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Už přeneseno do jiné organizace. Přepněte se do ní, abyste tento projekt viděli."
@@ -2808,6 +2820,9 @@ msgstr "Automatizace může používat jen cloudový pracovní prostor, který j
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Prostředí obsahuje vaše repozitáře, proměnné a region. Spusťte z něj tolik pracovních prostorů, kolik potřebujete."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Repozitáře prostředí nelze změnit. Pro jiné repozitáře vytvořte nové prostředí."
+
 msgid "An error occurred"
 msgstr "Došlo k chybě"
 
@@ -2858,6 +2873,9 @@ msgstr "Jiný AI asistent"
 
 msgid "another device"
 msgstr "jiné zařízení"
+
+msgid "Another row already uses this name."
+msgstr "Tento název už používá jiný řádek."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Odpovězte na dotazy v terminálu níže, například heslo."
@@ -3576,9 +3594,6 @@ msgstr "Základní adresář pro nové pracovní prostory s worktree na tomto ho
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Základní adresář pro nové worktree na {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Základní obraz · zatím bez kontrolního bodu"
-
 msgid "Base URL"
 msgstr "Základní URL"
 
@@ -3853,6 +3868,12 @@ msgstr "Stavíme poslední kus softwaru"
 
 msgid "Building the last piece of software."
 msgstr "Stavíme poslední kus softwaru."
+
+msgid "Building…"
+msgstr "Sestavuje se…"
+
+msgid "Builds fail until there is an install script."
+msgstr "Bez instalačního skriptu sestavení selžou."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Vytvořili jste plugin? Odešlete ho sem."
@@ -4392,10 +4413,6 @@ msgstr "Kontrolní bod"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrolní bod · před refaktorem tooltipů"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Kontrolní bod uložen {0}"
-
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint uložen do {name}"
 
@@ -4836,6 +4853,9 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Cloudoví agenti v tomto prostředí nemají žádné MCP servery."
+
 msgid "Cloud environment setup"
 msgstr "Nastavení cloudového prostředí"
 
@@ -5161,6 +5181,9 @@ msgstr "Conductor je ochranná známka svého vlastníka. {0} není s Conductor 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Pracovní prostory Conductor jsou obyčejné Git worktree. {0} je používá tam, kde jsou."
+
+msgid "Config"
+msgstr "Konfigurace"
 
 msgid "Config file contents"
 msgstr "Obsah konfiguračního souboru"
@@ -6211,6 +6234,9 @@ msgstr "Nepodařilo se načíst automatizaci: {0}"
 msgid "Couldn't load automations"
 msgstr "Nepodařilo se načíst automatizace"
 
+msgid "Couldn't load builds"
+msgstr "Nepodařilo se načíst sestavení"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Nepodařilo se načíst přispěvatele. Zadejte uživatelské jméno."
 
@@ -6953,8 +6979,14 @@ msgstr "Výchozí model"
 msgid "Default team for new tasks"
 msgstr "Výchozí tým pro nové úkoly"
 
+msgid "Default terminal"
+msgstr "Výchozí terminál"
+
 msgid "Default terminal theme"
 msgstr "Výchozí motiv terminálu"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Výchozí terminál: {terminalName}"
 
 msgid "Delegated"
 msgstr "Delegovaný"
@@ -7403,6 +7435,9 @@ msgstr "Adresář"
 msgid "Disable"
 msgstr "Zakázat"
 
+msgid "Disable MCP servers"
+msgstr "Vypnout MCP servery"
+
 msgid "Disable skill"
 msgstr "Vypnout skill"
 
@@ -7820,6 +7855,9 @@ msgstr "Každé místo přidá hodiny svého plánu do jednoho fondu, který sd�
 msgid "Each session resumes where it left off."
 msgstr "Každá relace naváže tam, kde skončila."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Každé úspěšné sestavení uloží snímek. Nové pracovní prostory začínají z aktuálního a můžete obnovit starší."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Každá plocha má vlastní typografii. Změny se okamžitě projeví v živých náhledech."
 
@@ -8027,6 +8065,9 @@ msgstr "Ukončuje se hovor"
 msgid "Ensure no regression"
 msgstr "Zajisti žádnou regresi"
 
+msgid "Enter a command."
+msgstr "Zadejte příkaz."
+
 msgid "Enter a full email address"
 msgstr "Zadejte celou e-mailovou adresu"
 
@@ -8038,6 +8079,9 @@ msgstr "Zadejte nadřazený adresář na {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Zadejte cestu na {hostName}"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Zadejte port od 1 do 65535."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Zadejte URL do vyhledávacího pole nahoře."
@@ -8083,6 +8127,9 @@ msgstr "Prostředí"
 
 msgid "Environment archived"
 msgstr "Prostředí archivováno"
+
+msgid "Environment history"
+msgstr "Historie prostředí"
 
 msgid "Environment not found"
 msgstr "Prostředí nebylo nalezeno"
@@ -10508,6 +10555,9 @@ msgstr "Nainstalujte Paradev MCP do svého klienta"
 msgid "Install plugin"
 msgstr "Nainstalovat plugin"
 
+msgid "Install script"
+msgstr "Instalační skript"
+
 msgid "Install the desktop app"
 msgstr "Nainstalujte desktopovou aplikaci"
 
@@ -11617,6 +11667,9 @@ msgstr "Spolehlivost na dlouhém horizontu překročí práh. Práce zadaná v 1
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip jen se zkratkou při dlouhém najetí; jeho styl čipu je nyní výchozí pro TooltipContent"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Dlouho běžící příkazy, například vývojový server. Každý pracovní prostor při spuštění otevře výchozí terminál."
+
 msgid "Looking at {what}"
 msgstr "Prohlížím {what}"
 
@@ -11857,6 +11910,9 @@ msgstr "Maximální velikost je 256 KB."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "Seznam povolených MCP"
 
 msgid "MCP manager"
 msgstr "Správce MCP"
@@ -12757,6 +12813,9 @@ msgstr "V tomto období žádná spuštění."
 msgid "No branches found"
 msgstr "Nenalezeny žádné větve"
 
+msgid "No builds yet"
+msgstr "Zatím žádná sestavení"
+
 msgid "No changed files."
 msgstr "Žádné změněné soubory."
 
@@ -13101,6 +13160,9 @@ msgstr "Osoba nezaznamenána"
 
 msgid "No plugins available yet."
 msgstr "Zatím nejsou k dispozici žádné pluginy."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Nejsou nainstalované žádné pluginy, takže cloudoví agenti tu nemají žádné MCP servery."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13854,6 +13916,9 @@ msgstr "Tuto stránku může měnit jen ten, kdo ji vytvořil."
 msgid "Only the person who created this workspace can change these."
 msgstr "Toto může změnit jen ten, kdo tento pracovní prostor vytvořil."
 
+msgid "Only the plugins below"
+msgstr "Jen pluginy níže"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Smazat ho může jen autor vlákna nebo vlastník stránky"
 
@@ -14422,9 +14487,6 @@ msgstr "Organizace již existuje"
 
 msgid "Organization created successfully!"
 msgstr "Organizace byla vytvořena!"
-
-msgid "Organization default ({defaultName})"
-msgstr "Výchozí pro organizaci ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organizace smazána"
@@ -15247,6 +15309,18 @@ msgstr "Oblíbené"
 msgid "Popular models"
 msgstr "Oblíbené modely"
 
+msgid "Port"
+msgstr "Port"
+
+msgid "Port label"
+msgstr "Popisek portu"
+
+msgid "Port name"
+msgstr "Název portu"
+
+msgid "Port number"
+msgstr "Číslo portu"
+
 msgid "Ports"
 msgstr "Porty"
 
@@ -15258,6 +15332,9 @@ msgstr "Porty na vzdálených hostech"
 
 msgid "Ports on this computer"
 msgstr "Porty na tomto počítači"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Porty, na kterých aplikace naslouchá. Porty s náhledem dostanou odkaz, který otevřete z pracovního prostoru."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Porty: aktivních: {totalPortCount}"
@@ -16075,6 +16152,9 @@ msgstr "Rebase a sloučit"
 msgid "Rebase and merge"
 msgstr "Rebase a sloučit"
 
+msgid "Rebuild environment"
+msgstr "Znovu sestavit prostředí"
+
 msgid "Recall what was said in meetings"
 msgstr "Připomeňte si, co zaznělo na schůzkách"
 
@@ -16384,6 +16464,9 @@ msgstr "Odebrat zmínku {path}"
 msgid "Remove pasted text"
 msgstr "Odebrat vložený text"
 
+msgid "Remove port"
+msgstr "Odebrat port"
+
 msgid "Remove PR Link"
 msgstr "Odebrat propojení s PR"
 
@@ -16399,8 +16482,14 @@ msgstr "Odebrat skript"
 msgid "Remove team member?"
 msgstr "Odebrat člena týmu?"
 
+msgid "Remove terminal"
+msgstr "Odebrat terminál"
+
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Odebrat terminál {createdAtLabel}"
+
+msgid "Remove terminal {terminalName}"
+msgstr "Odebrat terminál {terminalName}"
 
 msgid "Remove terminal session"
 msgstr "Odebrat relaci terminálu"
@@ -17307,6 +17396,12 @@ msgstr "Spouští lokální příkaz na vašem počítači"
 msgid "Runs appear here once an automation fires."
 msgstr "Běhy se zde objeví, jakmile se automatizace spustí."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Spustí se jako bash skript v každém novém cloudovém pracovním prostoru, než začnou agenti."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Spustí se jako bash skript při sestavení prostředí. Nové pracovní prostory začínají z jeho výsledku."
+
 msgid "Runs in"
 msgstr "Běží v"
 
@@ -17419,8 +17514,14 @@ msgstr "Uloženo: {name}"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} uloženo, ale jeho pracovní prostor pro nastavení se nepodařilo spustit: {reason}"
 
+msgid "Saved from a workspace"
+msgstr "Uloženo z pracovního prostoru"
+
 msgid "Saved to Downloads"
 msgstr "Uloženo do Stažených souborů"
+
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Uloženo. Nové pracovní prostory a příští sestavení ji použijí; běžící pracovní prostory ji převezmou po restartu."
 
 msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
 msgstr "Uloží tento pracovní prostor tak, jak je teď, se vším, co je v něm nainstalované. Nové pracovní prostory z {name} začnou z tohoto checkpointu. Pracovní prostor se během ukládání na chvíli zastaví."
@@ -18808,9 +18909,6 @@ msgstr "Smajlíci a lidé"
 msgid "Smoother onboarding"
 msgstr "Plynulejší onboarding"
 
-msgid "Snapshot"
-msgstr "Snímek"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Pořizovat snímek worktree před každým tahem chatu a po něm, aby jeho karta uváděla každý změněný soubor včetně změn ze shellu a dokázala je vrátit zpět. Každý prompt nejdřív počká na svůj snímek."
 
@@ -18882,6 +18980,9 @@ msgstr "Někdo přesouvá tento pracovní prostor…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Někdo z týmu Paradev tuto stránku posoudí. Ozveme se jen tehdy, když budeme potřebovat víc informací."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Někdo tuto konfiguraci uložil, zatímco jste ji upravovali. Uložením jeho verzi nahradíte."
 
 msgid "Something else"
 msgstr "Něco jiného"
@@ -19196,6 +19297,9 @@ msgstr "Spusťte ji pomocí + v liště karet."
 
 msgid "Start or stop the workspace run command"
 msgstr "Spustit nebo zastavit spouštěcí příkaz pracovního prostoru"
+
+msgid "Start script"
+msgstr "Spouštěcí skript"
 
 msgid "Start voice mode"
 msgstr "Spustit hlasový režim"
@@ -19869,6 +19973,9 @@ msgstr "Terminál"
 msgid "Terminal agent launch configuration"
 msgstr "Konfigurace spuštění terminálového agenta"
 
+msgid "Terminal command"
+msgstr "Příkaz terminálu"
+
 msgid "Terminal connection: {label}"
 msgstr "Připojení terminálu: {label}"
 
@@ -19883,6 +19990,9 @@ msgstr "Velikost písma terminálu, když má terminál fokus, přiblížení st
 
 msgid "Terminal input"
 msgstr "Vstup terminálu"
+
+msgid "Terminal name"
+msgstr "Název terminálu"
 
 msgid "Terminal removed"
 msgstr "Terminál odebrán"
@@ -20124,6 +20234,9 @@ msgstr "Nastupuje dispečer"
 
 msgid "The endpoint must use https."
 msgstr "Koncový bod musí používat https."
+
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Prostředí se během obnovení změnilo. Zkuste to znovu."
 
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Prostředí, ze kterého tato automatizace spouští cloudové pracovní prostory, bylo archivováno nebo nemá žádné repozitáře. V nastavení automatizace vyberte jiné prostředí."
@@ -20547,6 +20660,9 @@ msgstr "Tato automatizace je v jiné organizaci"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Tento prohlížeč není přihlášen do Paradevu. Přihlaste se a pokračujte do {connectorName}."
 
+msgid "This build has no snapshot to restore"
+msgstr "Toto sestavení nemá snímek k obnovení"
+
 msgid "This cannot be undone."
 msgstr "Nelze vrátit zpět."
 
@@ -20592,6 +20708,13 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Tato konfigurace obsahuje nastavení, která tato verze Paradev nedokáže zobrazit, takže ji zde nelze upravit. Aktualizujte Paradev, nebo ji změňte příkazem superset environments update."
+
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Tato konfigurace je neplatná: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -20623,17 +20746,14 @@ msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a po
 msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
 msgstr "Toto prostředí může spustit 3 ruční sestavení za hodinu. Zkuste to znovu za {0} min."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Toto prostředí nemá žádný [install] k sestavení. Přidejte ho do .paradev/config.toml v jeho základní větvi."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Toto prostředí nemá žádnou sekci [install] k sestavení. Přidejte ji do jeho konfigurace v Nastavení, Prostředí."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Toto prostředí otevírá {environmentRepository}, ne {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Repozitáře tohoto prostředí jsou pevně dané; pro jejich změnu znovu povyšte pracovní prostor"
 
 msgid "this file"
 msgstr "tento soubor"
@@ -21900,6 +22020,9 @@ msgstr "Použít pro nové agenty"
 msgid "Use global default"
 msgstr "Použít globální výchozí"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Použijte malá písmena, číslice a podtržítka; na začátku musí být písmeno."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Použijte malá písmena, číslice, pomlčky a podtržítka"
 
@@ -22335,6 +22458,9 @@ msgstr "Nabíráme inženýry v San Franciscu. Pojďte stavět nástroje, který
 msgid "We're hiring in San Francisco"
 msgstr "Nabíráme v San Franciscu"
 
+msgid "Web app"
+msgstr "Webová aplikace"
+
 msgid "Web Fetch"
 msgstr "Načtení webu"
 
@@ -22477,6 +22603,9 @@ msgstr "Co týmy automatizují"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "To, k čemu byly napsané, už na stránce není, takže nemají značku."
 
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "Co spouštějí sestavení a cloudové pracovní prostory tohoto prostředí. Bez něj cloud čte .paradev/config.toml hlavního repozitáře."
+
 msgid "What we believe"
 msgstr "Čemu věříme"
 
@@ -22563,6 +22692,9 @@ msgstr "Kteří AI kódovací agenti jsou podporovaní?"
 
 msgid "Which plans include automations?"
 msgstr "Které plány zahrnují automatizace?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "Pluginy, jejichž MCP servery mohou cloudoví agenti v tomto prostředí používat."
 
 msgid "Who can open it"
 msgstr "Kdo to může otevřít"

@@ -2149,8 +2149,8 @@ msgstr "Açıklama Ekle"
 msgid "Add description..."
 msgstr "Açıklama ekleyin..."
 
-msgid "Add Environment Variable"
-msgstr "Ortam değişkeni ekle"
+msgid "Add environment variables"
+msgstr "Ortam değişkenleri ekle"
 
 msgid "Add extension"
 msgstr "Uzantı ekle"
@@ -2189,9 +2189,6 @@ msgstr "Daha fazla ekle…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Başlamak için kenar çubuğundaki menüden bir tane ekleyin."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Bir veya daha fazla ortam değişkeni ekleyin. Bir .env dosyasını sürükleyip bırakabilirsiniz."
-
 msgid "Add people"
 msgstr "Kişi ekle"
 
@@ -2203,6 +2200,9 @@ msgstr "Kanala Kişi Ekle"
 
 msgid "Add photos or files"
 msgstr "Fotoğraf veya dosya ekle"
+
+msgid "Add port"
+msgstr "Port ekle"
 
 msgid "Add project"
 msgstr "Proje ekle"
@@ -2239,6 +2239,9 @@ msgstr "Vergi kimliği ekle"
 
 msgid "Add team member..."
 msgstr "Takım üyesi ekle..."
+
+msgid "Add terminal"
+msgstr "Terminal ekle"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Test edilmemiş en riskli kod için test ekle…"
@@ -2278,6 +2281,9 @@ msgstr "Kenar çubuğuna ekle"
 
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
+
+msgid "Add variables"
+msgstr "Değişken ekle"
 
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
@@ -2625,6 +2631,9 @@ msgstr "Tüm sayfalar"
 msgid "All plans"
 msgstr "Tüm planlar"
 
+msgid "All plugins"
+msgstr "Tüm eklentiler"
+
 msgid "All posts"
 msgstr "Tüm yazılar"
 
@@ -2714,6 +2723,9 @@ msgstr "İzin verildi"
 
 msgid "Allowed for session"
 msgstr "Oturum boyunca izin verildi"
+
+msgid "Allowed plugins"
+msgstr "İzin verilen eklentiler"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Zaten başka bir kuruluşa taşındı. Bu projeyi görmek için o kuruluşa geçin."
@@ -2808,6 +2820,9 @@ msgstr "Bir otomasyon yalnızca sizin oluşturduğunuz bir bulut çalışma alan
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Bir ortam depolarınızı, değişkenlerinizi ve bölgenizi içerir. Ondan istediğiniz kadar çalışma alanı başlatın."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Bir ortamın depoları değiştirilemez. Başka depolar için yeni bir ortam oluşturun."
+
 msgid "An error occurred"
 msgstr "Bir hata oluştu"
 
@@ -2858,6 +2873,9 @@ msgstr "Başka bir yapay zekâ asistanı"
 
 msgid "another device"
 msgstr "başka bir cihaz"
+
+msgid "Another row already uses this name."
+msgstr "Bu adı başka bir satır zaten kullanıyor."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Aşağıdaki terminalde parola gibi soruları yanıtla."
@@ -3576,9 +3594,6 @@ msgstr "Bu host'taki yeni worktree çalışma alanları için temel dizin."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName} üzerindeki yeni worktree'ler için temel dizin."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Temel imaj · henüz kontrol noktası yok"
-
 msgid "Base URL"
 msgstr "Temel URL"
 
@@ -3853,6 +3868,12 @@ msgstr "Son yazılım parçasını inşa etmek"
 
 msgid "Building the last piece of software."
 msgstr "Son yazılım parçasını inşa ediyoruz."
+
+msgid "Building…"
+msgstr "Derleniyor…"
+
+msgid "Builds fail until there is an install script."
+msgstr "Kurulum betiği olmadan derlemeler başarısız olur."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Bir eklenti mi geliştirdiniz? Buradan gönderin."
@@ -4392,10 +4413,6 @@ msgstr "Kontrol noktası"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrol noktası · tooltip yeniden düzenlemesinden önce"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Kontrol noktası kaydedildi {0}"
-
 msgid "Checkpoint saved to {name}"
 msgstr "Kontrol noktası {name} ortamına kaydedildi"
 
@@ -4836,6 +4853,9 @@ msgstr "Bulut"
 msgid "Cloud · us-east"
 msgstr "Bulut · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Bulut ajanları bu ortamda MCP sunucusu kullanamaz."
+
 msgid "Cloud environment setup"
 msgstr "Bulut ortamı kurulumu"
 
@@ -5161,6 +5181,9 @@ msgstr "Conductor, sahibinin ticari markasıdır. {0}, Conductor veya Meta ile b
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor çalışma alanları sıradan Git worktree'leridir. {0} bunları oldukları yerde kullanır."
+
+msgid "Config"
+msgstr "Yapılandırma"
 
 msgid "Config file contents"
 msgstr "Yapılandırma dosyasının içeriği"
@@ -6211,6 +6234,9 @@ msgstr "Otomasyon yüklenemedi: {0}"
 msgid "Couldn't load automations"
 msgstr "Otomasyonlar yüklenemedi"
 
+msgid "Couldn't load builds"
+msgstr "Derlemeler yüklenemedi"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Katkıda bulunanlar yüklenemedi. Bunun yerine bir kullanıcı adı yazın."
 
@@ -6953,8 +6979,14 @@ msgstr "Varsayılan model"
 msgid "Default team for new tasks"
 msgstr "Yeni görevler için varsayılan takım"
 
+msgid "Default terminal"
+msgstr "Varsayılan terminal"
+
 msgid "Default terminal theme"
 msgstr "Varsayılan terminal teması"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Varsayılan terminal: {terminalName}"
 
 msgid "Delegated"
 msgstr "Devredilmiş"
@@ -7403,6 +7435,9 @@ msgstr "Dizin"
 msgid "Disable"
 msgstr "Devre dışı bırak"
 
+msgid "Disable MCP servers"
+msgstr "MCP sunucularını devre dışı bırak"
+
 msgid "Disable skill"
 msgstr "Beceriyi devre dışı bırak"
 
@@ -7820,6 +7855,9 @@ msgstr "Her koltuk, planının saatlerini tüm ekibinizin paylaştığı tek bir
 msgid "Each session resumes where it left off."
 msgstr "Her oturum kaldığı yerden devam eder."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Her başarılı derleme bir anlık görüntü kaydeder. Yeni çalışma alanları geçerli olandan başlar ve daha eskisini geri yükleyebilirsiniz."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Her yüzeyin kendi tipografisi vardır. Değişiklikler canlı önizlemelerde hemen görünür."
 
@@ -8027,6 +8065,9 @@ msgstr "Arama sonlandırılıyor"
 msgid "Ensure no regression"
 msgstr "Regresyon olmadığından emin ol"
 
+msgid "Enter a command."
+msgstr "Bir komut girin."
+
 msgid "Enter a full email address"
 msgstr "Tam bir e-posta adresi girin"
 
@@ -8038,6 +8079,9 @@ msgstr "{hostName} üzerinde bir üst dizin girin"
 
 msgid "Enter a path on {hostName}"
 msgstr "{hostName} üzerinde bir yol girin"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "1 ile 65535 arasında bir port girin."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Yukarıdaki arama çubuğuna bir URL girin."
@@ -8083,6 +8127,9 @@ msgstr "Ortam"
 
 msgid "Environment archived"
 msgstr "Ortam arşivlendi"
+
+msgid "Environment history"
+msgstr "Ortam geçmişi"
 
 msgid "Environment not found"
 msgstr "Ortam bulunamadı"
@@ -10508,6 +10555,9 @@ msgstr "Paradev MCP'yi istemcinize kurun"
 msgid "Install plugin"
 msgstr "Eklenti kur"
 
+msgid "Install script"
+msgstr "Kurulum betiği"
+
 msgid "Install the desktop app"
 msgstr "Masaüstü uygulamasını kurun"
 
@@ -11617,6 +11667,9 @@ msgstr "Uzun vadeli güvenilirlik bir eşiği aşar. Akşam 18.00'de verilen iş
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Uzun bekletmede yalnızca kısayol gösteren tooltip; çip stili artık TooltipContent varsayılanı"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Geliştirme sunucusu gibi uzun süre çalışan komutlar. Her çalışma alanı başlarken varsayılan terminali açar."
+
 msgid "Looking at {what}"
 msgstr "{what} inceleniyor"
 
@@ -11857,6 +11910,9 @@ msgstr "En büyük boyut 256 KB."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "MCP izin listesi"
 
 msgid "MCP manager"
 msgstr "MCP yöneticisi"
@@ -12757,6 +12813,9 @@ msgstr "Bu dönemde başlatma yok."
 msgid "No branches found"
 msgstr "Dal bulunamadı"
 
+msgid "No builds yet"
+msgstr "Henüz derleme yok"
+
 msgid "No changed files."
 msgstr "Değişen dosya yok."
 
@@ -13101,6 +13160,9 @@ msgstr "Kayıtlı kişi yok"
 
 msgid "No plugins available yet."
 msgstr "Henüz kullanılabilir eklenti yok."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Yüklü eklenti yok, bu yüzden bulut ajanları burada MCP sunucusu kullanamaz."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13854,6 +13916,9 @@ msgstr "Bunları yalnızca bu sayfayı oluşturan kişi değiştirebilir."
 msgid "Only the person who created this workspace can change these."
 msgstr "Bunu yalnızca bu çalışma alanını oluşturan kişi değiştirebilir."
 
+msgid "Only the plugins below"
+msgstr "Yalnızca aşağıdaki eklentiler"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Konuyu yalnızca yazarı veya sayfanın sahibi silebilir"
 
@@ -14422,9 +14487,6 @@ msgstr "Kuruluş zaten var"
 
 msgid "Organization created successfully!"
 msgstr "Kuruluş oluşturuldu!"
-
-msgid "Organization default ({defaultName})"
-msgstr "Kuruluş varsayılanı ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Kuruluş silindi"
@@ -15247,6 +15309,18 @@ msgstr "Popüler"
 msgid "Popular models"
 msgstr "Popüler modeller"
 
+msgid "Port"
+msgstr "Port"
+
+msgid "Port label"
+msgstr "Port etiketi"
+
+msgid "Port name"
+msgstr "Port adı"
+
+msgid "Port number"
+msgstr "Port numarası"
+
 msgid "Ports"
 msgstr "Portlar"
 
@@ -15258,6 +15332,9 @@ msgstr "Uzak host'lardaki portlar"
 
 msgid "Ports on this computer"
 msgstr "Bu bilgisayardaki portlar"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Uygulamanın dinlediği portlar. Önizleme portları, çalışma alanından açabileceğiniz bir bağlantı alır."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Portlar: {totalPortCount} canlı"
@@ -16075,6 +16152,9 @@ msgstr "Rebase ve birleştir"
 msgid "Rebase and merge"
 msgstr "Rebase ve birleştir"
 
+msgid "Rebuild environment"
+msgstr "Ortamı yeniden derle"
+
 msgid "Recall what was said in meetings"
 msgstr "Toplantılarda söylenenleri hatırlayın"
 
@@ -16384,6 +16464,9 @@ msgstr "{path} bahsini kaldır"
 msgid "Remove pasted text"
 msgstr "Yapıştırılan metni kaldır"
 
+msgid "Remove port"
+msgstr "Portu kaldır"
+
 msgid "Remove PR Link"
 msgstr "PR bağlantısını kaldır"
 
@@ -16399,8 +16482,14 @@ msgstr "Betiği kaldır"
 msgid "Remove team member?"
 msgstr "Takım üyesi kaldırılsın mı?"
 
+msgid "Remove terminal"
+msgstr "Terminali kaldır"
+
 msgid "Remove terminal {createdAtLabel}"
 msgstr "{createdAtLabel} terminalini kaldır"
+
+msgid "Remove terminal {terminalName}"
+msgstr "{terminalName} terminalini kaldır"
 
 msgid "Remove terminal session"
 msgstr "Terminal oturumunu kaldır"
@@ -17307,6 +17396,12 @@ msgstr "Makinenizde yerel bir komut çalıştırır"
 msgid "Runs appear here once an automation fires."
 msgstr "Bir otomasyon tetiklendiğinde çalıştırmalar burada görünür."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Ajanlar başlamadan önce her yeni bulut çalışma alanında bash betiği olarak çalışır."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Ortam derlenirken bash betiği olarak çalışır. Yeni çalışma alanları bu sonuçtan başlar."
+
 msgid "Runs in"
 msgstr "Çalıştığı yer"
 
@@ -17419,8 +17514,14 @@ msgstr "{name} kaydedildi"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} kaydedildi, ancak kurulum çalışma alanı başlatılamadı: {reason}"
 
+msgid "Saved from a workspace"
+msgstr "Bir çalışma alanından kaydedildi"
+
 msgid "Saved to Downloads"
 msgstr "İndirilenler klasörüne kaydedildi"
+
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Kaydedildi. Yeni çalışma alanları ve sonraki derleme bunu kullanır; çalışan çalışma alanları yeniden başladıklarında uygular."
 
 msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
 msgstr "Bu çalışma alanını, içine kurulan her şeyle birlikte şu anki haliyle kaydeder. {name} ortamından açılan yeni çalışma alanları bu kontrol noktasından başlar. Kaydederken çalışma alanı kısa bir süre durur."
@@ -18808,9 +18909,6 @@ msgstr "Suratlar ve İnsanlar"
 msgid "Smoother onboarding"
 msgstr "Daha akıcı ilk kurulum"
 
-msgid "Snapshot"
-msgstr "Anlık görüntü"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Her sohbet turundan önce ve sonra worktree'nin anlık görüntüsünü alır; böylece kartı, kabukta yapılan düzenlemeler dahil değişen her dosyayı listeler ve bunları geri alabilir. Her istem önce kendi anlık görüntüsünü bekler."
 
@@ -18882,6 +18980,9 @@ msgstr "Biri bu çalışma alanını taşıyor…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Paradev ekibinden biri bu sayfayı inceleyecek. Yalnızca ek bilgiye ihtiyacımız olursa sizinle iletişime geçeriz."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Siz düzenlerken biri bu yapılandırmayı kaydetti. Kaydetmek onun sürümünün yerini alır."
 
 msgid "Something else"
 msgstr "Başka bir şey"
@@ -19196,6 +19297,9 @@ msgstr "Sekme şeridindeki + ile bir tane başlatın."
 
 msgid "Start or stop the workspace run command"
 msgstr "Çalışma alanı çalıştırma komutunu başlat veya durdur"
+
+msgid "Start script"
+msgstr "Başlangıç betiği"
 
 msgid "Start voice mode"
 msgstr "Sesli modu başlat"
@@ -19869,6 +19973,9 @@ msgstr "Terminal"
 msgid "Terminal agent launch configuration"
 msgstr "Terminal ajanı başlatma yapılandırması"
 
+msgid "Terminal command"
+msgstr "Terminal komutu"
+
 msgid "Terminal connection: {label}"
 msgstr "Terminal bağlantısı: {label}"
 
@@ -19883,6 +19990,9 @@ msgstr "Bir terminal odaktayken terminal yazı tipi boyutu, tarayıcı bölmesin
 
 msgid "Terminal input"
 msgstr "Terminal girişi"
+
+msgid "Terminal name"
+msgstr "Terminal adı"
 
 msgid "Terminal removed"
 msgstr "Terminal kaldırıldı"
@@ -20124,6 +20234,9 @@ msgstr "Dağıtıcı ortaya çıkar"
 
 msgid "The endpoint must use https."
 msgstr "Uç nokta https kullanmalıdır."
+
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Ortam geri yüklenirken değişti. Tekrar deneyin."
 
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Bu otomasyonun bulut çalışma alanlarını başlattığı ortam arşivlendi veya hiç deposu yok. Otomasyonun ayarlarından başka bir ortam seçin."
@@ -20547,6 +20660,9 @@ msgstr "Bu otomasyon başka bir kuruluşta"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Bu tarayıcıda Paradev oturumu açık değil. {connectorName} ile devam etmek için oturum açın."
 
+msgid "This build has no snapshot to restore"
+msgstr "Bu derlemenin geri yüklenecek bir anlık görüntüsü yok"
+
 msgid "This cannot be undone."
 msgstr "Bu geri alınamaz."
 
@@ -20592,6 +20708,13 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
 
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Bu yapılandırma, Paradev'in bu sürümünün gösteremediği ayarlar içerdiğinden burada düzenlenemez. Paradev'i güncelleyin veya superset environments update ile değiştirin."
+
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Bu yapılandırma geçersiz: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
 
@@ -20623,17 +20746,14 @@ msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağla
 msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
 msgstr "Bu ortam saatte 3 manuel derleme başlatabilir. {0} dakika sonra yeniden deneyin."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Bu ortamın derlenecek bir [install] bölümü yok. Temel dalındaki .paradev/config.toml dosyasına bir tane ekleyin."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Bu ortamda derlenecek bir [install] yok. Ayarlar, Ortamlar bölümünden yapılandırmasına bir tane ekleyin."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Bu ortam {repository} değil, {environmentRepository} açar"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Bu ortamın depoları sabittir; değiştirmek için bir çalışma alanını yeniden yükseltin"
 
 msgid "this file"
 msgstr "bu dosya"
@@ -21900,6 +22020,9 @@ msgstr "Yeni ajanlar için kullan"
 msgid "Use global default"
 msgstr "Genel varsayılanı kullan"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Küçük harf, rakam ve alt çizgi kullanın; ilk karakter harf olmalı."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Küçük harf, rakam, tire ve alt çizgi kullanın"
 
@@ -22335,6 +22458,9 @@ msgstr "San Francisco'da mühendis arıyoruz. Mühendislerin kodlama ajanların�
 msgid "We're hiring in San Francisco"
 msgstr "San Francisco'da işe alıyoruz"
 
+msgid "Web app"
+msgstr "Web uygulaması"
+
 msgid "Web Fetch"
 msgstr "Web getirme"
 
@@ -22477,6 +22603,9 @@ msgstr "Ekipler neleri otomatikleştiriyor"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Yazıldıkları öğe artık sayfada olmadığı için işaretleri yok."
 
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "Bu ortamın derlemelerinde ve bulut çalışma alanlarında çalışanlar. Yoksa bulut, ana deponun .paradev/config.toml dosyasını okur."
+
 msgid "What we believe"
 msgstr "Neye inanıyoruz"
 
@@ -22563,6 +22692,9 @@ msgstr "Hangi AI kodlama ajanları destekleniyor?"
 
 msgid "Which plans include automations?"
 msgstr "Hangi planlar otomasyonları içerir?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "Bulut ajanlarının bu ortamda hangi eklentilerin MCP sunucularını kullanabileceği."
 
 msgid "Who can open it"
 msgstr "Kimler açabilir"

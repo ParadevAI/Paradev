@@ -12,6 +12,7 @@ import {
 } from "@superset/db/schema";
 import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
+import { parseProjectConfig } from "@superset/shared/project-config";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
@@ -25,10 +26,12 @@ import {
 import { controlTags } from "../../lib/control-log";
 import {
 	deleteSandbox,
+	environmentRepositoryRows,
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
 	RepositoryError,
+	sandboxExists,
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
@@ -36,7 +39,12 @@ import {
 	type BuildRefusalReason,
 	BuildRefused,
 	isStale,
+	keptGoldenRefs,
+	markGoldenDeleted,
+	markGoldenRefDeleted,
+	restoreGolden,
 	startEnvironmentBuild,
+	undeletedGoldens,
 } from "../../lib/sandbox/environment-build";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
@@ -67,6 +75,28 @@ async function assertCanChangeForEveryone(
 	) {
 		await verifyOrgAdmin(ctx.principal.userId, environment.organizationId);
 	}
+}
+
+const CONFIG_MAX_LENGTH = 64 * 1024;
+
+/** A config with no settings clears it; anything else must parse as a `config.toml`. */
+function validConfig(text: string | null): string | null {
+	if (text === null || text.trim().length === 0) return null;
+	const parsed = parseProjectConfig(text);
+	if (!parsed.ok) {
+		const details = parsed.errors
+			.map((error) =>
+				error.line ? `line ${error.line}: ${error.message}` : error.message,
+			)
+			.join("; ");
+		throw userError({
+			code: "BAD_REQUEST",
+			message: `This config is invalid: ${details}`,
+			i18nKey: "serverError.environment.invalidConfig",
+			params: { details },
+		});
+	}
+	return Object.keys(parsed.config).length === 0 ? null : text;
 }
 
 /** An environment the caller may see; another member's personal one does not exist to them. */
@@ -226,6 +256,34 @@ async function setEnvironmentRepositories(args: {
 		.where(eq(environments.id, args.environmentId));
 }
 
+/** A box is built for its repositories, so an environment keeps the ones it was created with. */
+async function assertRepositoriesUnchanged(
+	current: { id: string; primaryRepositoryId: string | null },
+	input: { repositoryIds?: readonly string[]; primaryRepositoryId?: string },
+): Promise<void> {
+	const changesPrimary =
+		input.primaryRepositoryId !== undefined &&
+		input.primaryRepositoryId !== current.primaryRepositoryId;
+	let changesRepositories = false;
+	if (input.repositoryIds) {
+		const currentIds = new Set(
+			(await environmentRepositoryRows(current.id)).map((row) => row.id),
+		);
+		const nextIds = new Set(input.repositoryIds);
+		changesRepositories =
+			nextIds.size !== currentIds.size ||
+			[...nextIds].some((id) => !currentIds.has(id));
+	}
+	if (changesPrimary || changesRepositories) {
+		throw userError({
+			code: "FORBIDDEN",
+			message:
+				"An environment's repositories can't change. Create a new environment for other repositories.",
+			i18nKey: "serverError.environment.repositoriesFixed",
+		});
+	}
+}
+
 function primaryNotIncluded() {
 	return userError({
 		code: "BAD_REQUEST",
@@ -297,8 +355,15 @@ const BUILD_REFUSALS: Record<
 	},
 };
 
-/** What a client sees of a build; a running build whose workflow died reads as failed. */
-function toBuildView(build: SelectEnvironmentBuild) {
+/**
+ * What a client sees of a build; a running build whose workflow died reads as
+ * failed. Only a golden retention keeps (`keptGoldenRefs`) is restorable.
+ */
+function toBuildView(
+	build: SelectEnvironmentBuild,
+	activeRef: string,
+	kept: ReadonlySet<string>,
+) {
 	const stale = isStale(build);
 	return {
 		id: build.id,
@@ -309,6 +374,12 @@ function toBuildView(build: SelectEnvironmentBuild) {
 		error: stale ? "The build stopped unexpectedly" : build.error,
 		startedAt: build.startedAt,
 		finishedAt: build.finishedAt,
+		active: build.goldenRef !== null && build.goldenRef === activeRef,
+		restorable:
+			build.status === "succeeded" &&
+			build.goldenRef !== null &&
+			kept.has(build.goldenRef) &&
+			build.goldenRef !== activeRef,
 	};
 }
 
@@ -630,6 +701,7 @@ export const environmentRouter = {
 									...fromGolden,
 									scope: input.scope ?? source?.scope ?? "organization",
 									machineSize: source?.machineSize ?? null,
+									config: source?.config ?? null,
 									createdByUserId: ctx.principal.userId,
 								})
 								.returning();
@@ -674,6 +746,19 @@ export const environmentRouter = {
 							i18nKey: "serverError.environment.changedDuringPromote",
 						});
 					}
+					const savedAt = new Date();
+					await tx.insert(environmentBuilds).values({
+						environmentId,
+						organizationId: workspace.organizationId,
+						status: "succeeded",
+						trigger: "promote",
+						kind: "incremental",
+						repositoryIds: checkouts.map((entry) => entry.repository.id),
+						primaryRepositoryId,
+						goldenRef: goldenName,
+						startedAt: savedAt,
+						finishedAt: savedAt,
+					});
 					return saved;
 				})
 				.catch(async (error: unknown) => {
@@ -687,12 +772,14 @@ export const environmentRouter = {
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
-				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
-					console.error(
-						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
-						error,
-					),
-				);
+				await deleteSandbox(target.sourceRef)
+					.then(() => markGoldenRefDeleted(target.id, target.sourceRef))
+					.catch((error: unknown) =>
+						console.error(
+							`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
+							error,
+						),
+					);
 			}
 			await restart();
 			return row;
@@ -710,6 +797,8 @@ export const environmentRouter = {
 						environmentId: environment.id,
 						trigger: "manual",
 					}),
+					environment.sourceRef,
+					new Set(),
 				);
 			} catch (error) {
 				if (error instanceof BuildRefused) {
@@ -751,7 +840,85 @@ export const environmentRouter = {
 				.where(eq(environmentBuilds.environmentId, environment.id))
 				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
 				.limit(input.limit ?? 20);
-			return { builds: rows.map(toBuildView) };
+			const kept = keptGoldenRefs(
+				await undeletedGoldens(environment.id),
+				environment.sourceRef,
+			);
+			return {
+				builds: rows.map((build) =>
+					toBuildView(build, environment.sourceRef, kept),
+				),
+			};
+		}),
+
+	/** Makes an earlier build's golden the one new workspaces start from, with no build. */
+	restore: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				buildId: z.string().uuid(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await assertCanChangeForEveryone(environment, ctx);
+			const running = await db.query.environmentBuilds.findMany({
+				where: and(
+					eq(environmentBuilds.environmentId, environment.id),
+					eq(environmentBuilds.status, "running"),
+				),
+			});
+			if (running.some((build) => !isStale(build))) {
+				throw userError({
+					...BUILD_REFUSALS["already-running"],
+					message: "A build of this environment is already running",
+				});
+			}
+			const build = await db.query.environmentBuilds.findFirst({
+				where: and(
+					eq(environmentBuilds.id, input.buildId),
+					eq(environmentBuilds.environmentId, environment.id),
+				),
+			});
+			const goldenRef = build?.goldenRef;
+			const kept = keptGoldenRefs(
+				await undeletedGoldens(environment.id),
+				environment.sourceRef,
+			);
+			const notRestorable = () =>
+				userError({
+					code: "PRECONDITION_FAILED",
+					message: "This build has no snapshot to restore",
+					i18nKey: "serverError.environment.buildNotRestorable",
+				});
+			if (
+				!build ||
+				build.status !== "succeeded" ||
+				!goldenRef ||
+				goldenRef === environment.sourceRef ||
+				!kept.has(goldenRef)
+			) {
+				throw notRestorable();
+			}
+			if (!(await sandboxExists(goldenRef))) {
+				await markGoldenDeleted(build.id);
+				throw notRestorable();
+			}
+			const restored = await restoreGolden({
+				build,
+				goldenRef,
+				previousSourceRef: environment.sourceRef,
+			});
+			if (!restored) {
+				throw userError({
+					code: "CONFLICT",
+					message:
+						"The environment changed while it was being restored. Try again.",
+					i18nKey: "serverError.environment.changedDuringRestore",
+				});
+			}
+			return toBuildView(build, goldenRef, kept);
 		}),
 
 	update: personProcedure
@@ -764,61 +931,32 @@ export const environmentRouter = {
 				scope: z.enum(environmentScopeValues).optional(),
 				/** Null goes back to the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).nullable().optional(),
+				/** The environment's `config.toml`; null clears it. */
+				config: z.string().max(CONFIG_MAX_LENGTH).nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
-			if (input.machineSize !== undefined) {
+			if (
+				input.machineSize !== undefined ||
+				input.config !== undefined ||
+				(input.scope !== undefined && input.scope !== current.scope)
+			) {
 				await assertCanChangeForEveryone(current, ctx);
 			}
+			const config =
+				input.config === undefined ? undefined : validConfig(input.config);
 			await assertMachineSizeOffered(current.organizationId, input.machineSize);
+			await assertRepositoriesUnchanged(current, input);
 
-			// A golden was built for its repositories and set up by its primary.
-			// Changing either means a different golden, so it is promoted again.
-			const changesPrimary =
-				input.primaryRepositoryId !== undefined &&
-				input.primaryRepositoryId !== current.primaryRepositoryId;
-			if (
-				(input.repositoryIds || changesPrimary) &&
-				current.sourceKind !== "image"
-			) {
-				throw userError({
-					code: "FORBIDDEN",
-					message:
-						"This environment's repositories are fixed; promote a workspace again to change them",
-					i18nKey: "serverError.environment.repositoriesFrozen",
-				});
-			}
-			if (input.repositoryIds) {
-				const primaryRepositoryId =
-					input.primaryRepositoryId ?? current.primaryRepositoryId;
-				if (!primaryRepositoryId) throw primaryNotIncluded();
-				await setEnvironmentRepositories({
-					environmentId: input.id,
-					organizationId: current.organizationId,
-					repositoryIds: input.repositoryIds,
-					primaryRepositoryId,
-				});
-			} else if (input.primaryRepositoryId !== undefined) {
-				const included = await db.query.environmentRepositories.findFirst({
-					where: and(
-						eq(environmentRepositories.environmentId, input.id),
-						eq(environmentRepositories.repositoryId, input.primaryRepositoryId),
-					),
-				});
-				if (!included) throw primaryNotIncluded();
-				await db
-					.update(environments)
-					.set({ primaryRepositoryId: input.primaryRepositoryId })
-					.where(eq(environments.id, input.id));
-			}
 			const patch = {
 				...(input.name ? { name: input.name } : {}),
 				...(input.scope ? { scope: input.scope } : {}),
 				...(input.machineSize !== undefined
 					? { machineSize: input.machineSize }
 					: {}),
+				...(config !== undefined ? { config } : {}),
 				...(input.scope === "personal"
 					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
 					: {}),

@@ -9,4 +9,5 @@ export {
 	type TargetRequest,
 	targetKey,
 } from "./resolve-target";
+export { sandboxAllowsPlugin } from "./sandbox-allowlist";
 export { forgetUpstreamTools } from "./upstream-catalog";
