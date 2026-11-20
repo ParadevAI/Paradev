@@ -31,9 +31,10 @@ export class ForgottenClientError extends Error {
 	}
 }
 
+// Firecrawl and Resend reject a metadata document whose redirect URIs are on
+// another host than its client_id, so both live on the browser API origin.
 export function clientMetadataUrl(connectorSlug: string): string {
-	const base = env.PLUGIN_CLIENT_METADATA_BASE_URL ?? env.NEXT_PUBLIC_API_URL;
-	return `${base}/api/connectors/${connectorSlug}/client-metadata`;
+	return `${getBrowserApiUrl(env)}/api/connectors/${connectorSlug}/client-metadata`;
 }
 
 export function redirectUriFor(connectorSlug: string): string {
@@ -323,7 +324,8 @@ export async function resolveClientIdentity(
 	const metadataUrl = clientMetadataUrl(connectorSlug);
 	const issuedTo = "issuedTo" in client ? client.issuedTo : null;
 	const declared = method.token_request_auth_method;
-	if (issuedTo === metadataUrl) return { clientId: metadataUrl };
+	if (issuedTo && withOwnDomainTwins([metadataUrl]).includes(issuedTo))
+		return { clientId: issuedTo };
 	if (issuedTo) {
 		const bound = await storedClient(
 			server.issuer,

@@ -1218,6 +1218,9 @@ msgstr "{name}: 1ユーザーあたり月額 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 1ユーザーあたり月額 {monthly}、または年払いで {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} は以前のサインインを使用したままです。新しいサインインを使うには再起動してください。"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {人を1人以上指定するか、{choice}を選択してください。} sender {送信者を1人以上指定するか、{choice}を選択してください。} other {項目を1つ以上指定するか、{choice}を選択してください。}}"
 
@@ -2380,9 +2383,6 @@ msgstr "エージェントコマンド"
 
 msgid "Agent Configs"
 msgstr "エージェント設定"
-
-msgid "Agent credentials changed"
-msgstr "エージェントの認証情報が変更されました"
 
 msgid "Agent finished"
 msgstr "エージェントが完了しました"
@@ -16878,9 +16878,6 @@ msgstr "オンボーディングをやり直す"
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "実行中のワークスペースを再起動すると、エージェントに変更が反映されます。"
-
 msgid "Restart terminal daemon?"
 msgstr "ターミナルデーモンを再起動しますか?"
 
@@ -16889,9 +16886,6 @@ msgstr "ターミナルを再起動"
 
 msgid "Restart workspace"
 msgstr "ワークスペースを再起動"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "新しいエージェント認証情報を反映するにはワークスペースを再起動してください。"
 
 msgid "Restarted"
 msgstr "再起動"

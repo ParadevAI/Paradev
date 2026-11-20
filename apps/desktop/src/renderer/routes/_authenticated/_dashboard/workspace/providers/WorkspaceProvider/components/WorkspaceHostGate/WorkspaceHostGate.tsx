@@ -15,8 +15,7 @@ export function WorkspaceHostGate({
 	workspace: HostShapedWorkspace;
 	children: ReactNode;
 }) {
-	const { agentCredentialsChangedWorkspaceId, usageRefusal } =
-		useSandboxAccess();
+	const { agentsToRestart, usageRefusal } = useSandboxAccess();
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
 	const cloudRow = cloudWorkspaces?.find((row) => row.id === workspace.hostId);
 	const isCloudWorkspace = Boolean(cloudRow);
@@ -28,8 +27,12 @@ export function WorkspaceHostGate({
 	return (
 		<div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
 			<div className="flex min-h-0 min-w-0 flex-1">{children}</div>
-			{agentCredentialsChangedWorkspaceId === workspace.hostId ? (
-				<AgentCredentialsChangedBanner workspaceId={workspace.hostId} />
+			{agentsToRestart?.workspaceId === workspace.hostId ? (
+				<AgentCredentialsChangedBanner
+					workspaceId={workspace.id}
+					cloudWorkspaceId={workspace.hostId}
+					agents={agentsToRestart.agents}
+				/>
 			) : null}
 			{isCloudWorkspace ? (
 				<BoxOutOfMemoryBanner workspaceId={workspace.hostId} />

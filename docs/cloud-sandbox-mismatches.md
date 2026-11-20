@@ -819,7 +819,7 @@ get a full handle (`getSandboxToWake` in `vercel.ts`). Every other caller gets
 `getSandbox`, typed to the members that cannot resume (`stop`, `update`,
 `delete`, `listSessions`, `currentSession()` and reads), and acts on a running
 box through the session, whose calls answer 410 or 422 on a stopped one
-instead. Top-up and the credential refresh treat that answer as "not
+instead. Top-up and a claim re-apply treat that answer as "not
 running"; promote builds a stopped source's golden from the snapshot its
 stop took (measured: a create from that automatic snapshot has the stopped
 box's files). An HTTP request to a stopped box's port does not resume it

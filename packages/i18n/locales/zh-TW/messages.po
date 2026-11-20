@@ -1218,6 +1218,9 @@ msgstr "{name}：每位使用者每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每位使用者每月 {monthly}，或按年計費 {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} 仍在使用你先前的登入。重新啟動以使用新的登入。"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {請至少指定一個人員，或選擇{choice}。} sender {請至少指定一個寄件者，或選擇{choice}。} other {請至少指定一個項目，或選擇{choice}。}}"
 
@@ -2380,9 +2383,6 @@ msgstr "代理程式指令"
 
 msgid "Agent Configs"
 msgstr "代理程式配置"
-
-msgid "Agent credentials changed"
-msgstr "代理憑證已變更"
 
 msgid "Agent finished"
 msgstr "代理程式已完成"
@@ -16878,9 +16878,6 @@ msgstr "重新開始導覽"
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新啟動執行中的{providerLabel}代理程式嗎？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "重新啟動執行中的工作區，讓其中的代理程式套用此變更。"
-
 msgid "Restart terminal daemon?"
 msgstr "重啟終端守護程式？"
 
@@ -16889,9 +16886,6 @@ msgstr "重啟終端"
 
 msgid "Restart workspace"
 msgstr "重新啟動工作區"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "重新啟動工作區以套用新的代理憑證。"
 
 msgid "Restarted"
 msgstr "已重新啟動"

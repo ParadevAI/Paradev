@@ -49,8 +49,8 @@ interface SandboxAccessValue {
 	targets: SandboxTarget[];
 	/** False until the cloud list is known and every ready workspace in it has been addressed once. */
 	isReady: boolean;
-	/** The open workspace, when its box booted with agent sign-ins its creator has since changed. */
-	agentCredentialsChangedWorkspaceId: string | null;
+	/** The open workspace's agents whose sign-in kind changed since its box booted. */
+	agentsToRestart: { workspaceId: string; agents: string[] } | null;
 	usageRefusal: { workspaceId: string; error: unknown } | null;
 	wakeOpenWorkspace: () => Promise<void>;
 }
@@ -217,9 +217,9 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		() => ({
 			targets,
 			isReady: cloudWorkspaces !== undefined && access.allFetched,
-			agentCredentialsChangedWorkspaceId:
-				openWorkspace && wake.data?.agentCredentialsChanged
-					? openWorkspace.id
+			agentsToRestart:
+				openWorkspace && wake.data?.agentsToRestart?.length
+					? { workspaceId: openWorkspace.id, agents: wake.data.agentsToRestart }
 					: null,
 			usageRefusal:
 				openWorkspace && isCloudUsageRefusal(wake.error)
@@ -248,7 +248,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 const NO_SANDBOX_ACCESS: SandboxAccessValue = {
 	targets: [],
 	isReady: true,
-	agentCredentialsChangedWorkspaceId: null,
+	agentsToRestart: null,
 	usageRefusal: null,
 	wakeOpenWorkspace: async () => {},
 };

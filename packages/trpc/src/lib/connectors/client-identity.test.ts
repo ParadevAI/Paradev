@@ -209,6 +209,20 @@ describe("an issued grant", () => {
 		expect(registrations).toHaveLength(0);
 	});
 
+	test("issued to the metadata document on the other own domain keeps it", async () => {
+		const realBrowser = process.env.BROWSER_API_URL;
+		process.env.BROWSER_API_URL = "https://api.paradev.com";
+		const issuedTo =
+			"https://api.superset.sh/api/connectors/autumn_mcp/client-metadata";
+		try {
+			expect((await resolve({ issuedTo })).clientId).toBe(issuedTo);
+			expect(registrations).toHaveLength(0);
+		} finally {
+			if (realBrowser === undefined) delete process.env.BROWSER_API_URL;
+			else process.env.BROWSER_API_URL = realBrowser;
+		}
+	});
+
 	test("whose client is gone is not handed another one", async () => {
 		rows = [client({ clientId: "scoped-client", scopes: SCOPES })];
 

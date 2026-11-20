@@ -1218,6 +1218,9 @@ msgstr "{name}：每用户每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每用户每月 {monthly}，或按年计费 {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} 仍在使用你之前的登录。重启以使用新的登录。"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
 
@@ -2380,9 +2383,6 @@ msgstr "智能体命令"
 
 msgid "Agent Configs"
 msgstr "智能体配置"
-
-msgid "Agent credentials changed"
-msgstr "智能体凭据已更改"
 
 msgid "Agent finished"
 msgstr "智能体已完成"
@@ -16878,9 +16878,6 @@ msgstr "重新开始引导"
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "重启正在运行的工作区，让其中的智能体应用此更改。"
-
 msgid "Restart terminal daemon?"
 msgstr "重启终端守护进程？"
 
@@ -16889,9 +16886,6 @@ msgstr "重启终端"
 
 msgid "Restart workspace"
 msgstr "重启工作区"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "重启工作区以使用新的代理凭据。"
 
 msgid "Restarted"
 msgstr "已重启"

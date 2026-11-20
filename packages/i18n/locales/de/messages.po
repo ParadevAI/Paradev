@@ -1218,6 +1218,9 @@ msgstr "{name}: {monthly} pro Nutzer/Monat"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} pro Nutzer/Monat oder {yearly} bei jährlicher Abrechnung"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} nutzt noch deine vorherige Anmeldung. Starte neu, um die neue zu verwenden."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Gib mindestens eine Person an, oder wähle {choice}.} sender {Gib mindestens einen Absender an, oder wähle {choice}.} other {Gib mindestens einen Eintrag an, oder wähle {choice}.}}"
 
@@ -2380,9 +2383,6 @@ msgstr "Agent-Befehle"
 
 msgid "Agent Configs"
 msgstr "Agenten-Konfigurationen"
-
-msgid "Agent credentials changed"
-msgstr "Agent-Zugangsdaten geändert"
 
 msgid "Agent finished"
 msgstr "Agent fertig"
@@ -16878,9 +16878,6 @@ msgstr "Onboarding neu starten"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Laufende {providerLabel}-Agenten neu starten?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Starte laufende Arbeitsbereiche neu, damit ihre Agenten die Änderung übernehmen."
-
 msgid "Restart terminal daemon?"
 msgstr "Terminal-Daemon neu starten?"
 
@@ -16889,9 +16886,6 @@ msgstr "Terminals neu starten"
 
 msgid "Restart workspace"
 msgstr "Arbeitsbereich neu starten"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Starte Workspaces neu, damit sie die neuen Agent-Zugangsdaten übernehmen."
 
 msgid "Restarted"
 msgstr "Neu gestartet"

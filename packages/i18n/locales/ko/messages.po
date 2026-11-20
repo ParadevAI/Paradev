@@ -1218,6 +1218,9 @@ msgstr "{name}: 사용자당 월 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 사용자당 월 {monthly}, 또는 연간 결제 시 {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names}은(는) 아직 이전 로그인을 사용 중입니다. 새 로그인을 사용하려면 다시 시작하세요."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {사람을 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} sender {발신자를 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} other {항목을 하나 이상 지정하거나 {choice} 옵션을 선택하세요.}}"
 
@@ -2380,9 +2383,6 @@ msgstr "에이전트 명령"
 
 msgid "Agent Configs"
 msgstr "에이전트 설정"
-
-msgid "Agent credentials changed"
-msgstr "에이전트 자격 증명이 변경됨"
 
 msgid "Agent finished"
 msgstr "에이전트 완료"
@@ -16878,9 +16878,6 @@ msgstr "온보딩 다시 시작"
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "실행 중인 워크스페이스를 재시작하면 에이전트에 변경 사항이 반영됩니다."
-
 msgid "Restart terminal daemon?"
 msgstr "터미널 데몬을 다시 시작할까요?"
 
@@ -16889,9 +16886,6 @@ msgstr "터미널 다시 시작"
 
 msgid "Restart workspace"
 msgstr "워크스페이스 다시 시작"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "새 에이전트 자격 증명을 적용하려면 워크스페이스를 다시 시작하세요."
 
 msgid "Restarted"
 msgstr "다시 시작됨"
