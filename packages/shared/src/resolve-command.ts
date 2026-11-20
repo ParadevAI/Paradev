@@ -3,8 +3,6 @@ import { delimiter, isAbsolute, join } from "node:path";
 
 type Env = Record<string, string | undefined>;
 
-const resolved = new Map<string, string>();
-
 function isExecutableFile(path: string): boolean {
 	try {
 		if (!statSync(path).isFile()) return false;
@@ -29,6 +27,7 @@ function searchPath(name: string, pathValue: string): string | null {
 /**
  * Absolute path for `name`, so a spawn does not walk PATH itself. On macOS
  * libuv calls posix_spawn once per PATH entry, and every miss takes a PID.
+ * A stat per entry costs no PID, so the lookup runs on every call.
  * `preferred` paths win over PATH. Falls back to the bare name when nothing
  * matches, so the spawn still fails or succeeds as before.
  */
@@ -41,14 +40,7 @@ export function resolveCommand(
 ): string {
 	if (process.platform === "win32" || name.includes("/")) return name;
 
-	const pathValue = env.PATH ?? "";
-	const key = `${name}\0${preferred.join("\0")}\0${pathValue}`;
-	const cached = resolved.get(key);
-	if (cached && isExecutableFile(cached)) return cached;
-	resolved.delete(key);
-
-	const found = preferred.find(isExecutableFile) ?? searchPath(name, pathValue);
-	if (!found) return name;
-	resolved.set(key, found);
-	return found;
+	return (
+		preferred.find(isExecutableFile) ?? searchPath(name, env.PATH ?? "") ?? name
+	);
 }

@@ -67,17 +67,18 @@ describe.skipIf(process.platform === "win32")("resolveCommand", () => {
 		expect(resolveCommand("tool-d", { env: { PATH } })).toBe("tool-d");
 	});
 
-	it("resolves again when the cached file is gone", () => {
-		const first = executable(join(dir("e-first"), "tool-e"));
-		const second = executable(join(dir("e-second"), "tool-e"));
+	it("follows changes on disk between calls", () => {
+		const later = executable(join(dir("e-later"), "tool-e"));
 		const env = {
-			PATH: [join(root, "e-first"), join(root, "e-second")].join(delimiter),
+			PATH: [dir("e-earlier"), join(root, "e-later")].join(delimiter),
 		};
-		expect(resolveCommand("tool-e", { env })).toBe(first);
+		expect(resolveCommand("tool-e", { env })).toBe(later);
 
-		rmSync(first);
+		const earlier = executable(join(root, "e-earlier", "tool-e"));
+		expect(resolveCommand("tool-e", { env })).toBe(earlier);
 
-		expect(resolveCommand("tool-e", { env })).toBe(second);
+		rmSync(earlier);
+		expect(resolveCommand("tool-e", { env })).toBe(later);
 	});
 
 	it("searches the given env's PATH, not process.env", () => {
