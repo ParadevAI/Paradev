@@ -6814,6 +6814,9 @@ msgstr "個別見積もり"
 msgid "Custom provider"
 msgstr "カスタムプロバイダー"
 
+msgid "Custom range…"
+msgstr "カスタム範囲…"
+
 msgid "Custom themes"
 msgstr "カスタムテーマ"
 
@@ -12834,6 +12837,9 @@ msgstr "コントリビューターが見つかりません。"
 
 msgid "No credit card required."
 msgstr "クレジットカードは不要です。"
+
+msgid "No days available"
+msgstr "利用できる日がありません"
 
 msgid "No description"
 msgstr "説明なし"

@@ -6814,6 +6814,9 @@ msgstr "定制价格"
 msgid "Custom provider"
 msgstr "自定义提供商"
 
+msgid "Custom range…"
+msgstr "自定义范围…"
+
 msgid "Custom themes"
 msgstr "自定义主题"
 
@@ -12834,6 +12837,9 @@ msgstr "未找到贡献者。"
 
 msgid "No credit card required."
 msgstr "无需信用卡。"
+
+msgid "No days available"
+msgstr "没有可用的日期"
 
 msgid "No description"
 msgstr "无描述"

@@ -6814,6 +6814,9 @@ msgstr "Цена по договорённости"
 msgid "Custom provider"
 msgstr "Свой провайдер"
 
+msgid "Custom range…"
+msgstr "Свой диапазон…"
+
 msgid "Custom themes"
 msgstr "Свои темы"
 
@@ -12834,6 +12837,9 @@ msgstr "Контрибьюторы не найдены."
 
 msgid "No credit card required."
 msgstr "Карта не нужна."
+
+msgid "No days available"
+msgstr "Нет доступных дней"
 
 msgid "No description"
 msgstr "Без описания"

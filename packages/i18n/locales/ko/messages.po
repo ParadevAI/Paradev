@@ -6814,6 +6814,9 @@ msgstr "맞춤 가격"
 msgid "Custom provider"
 msgstr "사용자 지정 제공사"
 
+msgid "Custom range…"
+msgstr "사용자 지정 범위…"
+
 msgid "Custom themes"
 msgstr "사용자 지정 테마"
 
@@ -12834,6 +12837,9 @@ msgstr "기여자를 찾을 수 없습니다."
 
 msgid "No credit card required."
 msgstr "신용카드가 필요 없습니다."
+
+msgid "No days available"
+msgstr "사용 가능한 날짜 없음"
 
 msgid "No description"
 msgstr "설명 없음"

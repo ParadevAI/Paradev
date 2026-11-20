@@ -6814,6 +6814,9 @@ msgstr "Cena indywidualna"
 msgid "Custom provider"
 msgstr "Własny dostawca"
 
+msgid "Custom range…"
+msgstr "Zakres niestandardowy…"
+
 msgid "Custom themes"
 msgstr "Własne motywy"
 
@@ -12834,6 +12837,9 @@ msgstr "Nie znaleziono współtwórców."
 
 msgid "No credit card required."
 msgstr "Bez karty kredytowej."
+
+msgid "No days available"
+msgstr "Brak dostępnych dni"
 
 msgid "No description"
 msgstr "Brak opisu"

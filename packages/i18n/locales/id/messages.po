@@ -6814,6 +6814,9 @@ msgstr "Harga khusus"
 msgid "Custom provider"
 msgstr "Penyedia kustom"
 
+msgid "Custom range…"
+msgstr "Rentang kustom…"
+
 msgid "Custom themes"
 msgstr "Tema kustom"
 
@@ -12834,6 +12837,9 @@ msgstr "Tidak ada kontributor ditemukan."
 
 msgid "No credit card required."
 msgstr "Tanpa kartu kredit."
+
+msgid "No days available"
+msgstr "Tidak ada hari tersedia"
 
 msgid "No description"
 msgstr "Tidak ada deskripsi"

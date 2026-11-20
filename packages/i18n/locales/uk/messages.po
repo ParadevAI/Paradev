@@ -6808,6 +6808,9 @@ msgstr "Індивідуальні ціни"
 msgid "Custom provider"
 msgstr "Власний провайдер"
 
+msgid "Custom range…"
+msgstr "Власний діапазон…"
+
 msgid "Custom themes"
 msgstr "Власні теми"
 
@@ -12828,6 +12831,9 @@ msgstr "Учасників не знайдено."
 
 msgid "No credit card required."
 msgstr "Кредитна картка не потрібна."
+
+msgid "No days available"
+msgstr "Немає доступних днів"
 
 msgid "No description"
 msgstr "Немає опису"

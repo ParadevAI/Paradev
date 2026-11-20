@@ -6814,6 +6814,9 @@ msgstr "Prijs op maat"
 msgid "Custom provider"
 msgstr "Eigen provider"
 
+msgid "Custom range…"
+msgstr "Aangepast bereik…"
+
 msgid "Custom themes"
 msgstr "Eigen thema's"
 
@@ -12834,6 +12837,9 @@ msgstr "Geen contributors gevonden."
 
 msgid "No credit card required."
 msgstr "Geen creditcard nodig."
+
+msgid "No days available"
+msgstr "Geen dagen beschikbaar"
 
 msgid "No description"
 msgstr "Geen beschrijving"

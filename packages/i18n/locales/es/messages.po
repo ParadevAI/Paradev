@@ -6814,6 +6814,9 @@ msgstr "Precio personalizado"
 msgid "Custom provider"
 msgstr "Proveedor personalizado"
 
+msgid "Custom range…"
+msgstr "Rango personalizado…"
+
 msgid "Custom themes"
 msgstr "Temas personalizados"
 
@@ -12834,6 +12837,9 @@ msgstr "No se encontraron colaboradores."
 
 msgid "No credit card required."
 msgstr "No hace falta tarjeta de crédito."
+
+msgid "No days available"
+msgstr "No hay días disponibles"
 
 msgid "No description"
 msgstr "Sin descripción"

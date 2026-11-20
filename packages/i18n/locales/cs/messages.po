@@ -6814,6 +6814,9 @@ msgstr "Cena na míru"
 msgid "Custom provider"
 msgstr "Vlastní poskytovatel"
 
+msgid "Custom range…"
+msgstr "Vlastní rozsah…"
+
 msgid "Custom themes"
 msgstr "Vlastní motivy"
 
@@ -12834,6 +12837,9 @@ msgstr "Nenalezeni žádní přispěvatelé."
 
 msgid "No credit card required."
 msgstr "Bez platební karty."
+
+msgid "No days available"
+msgstr "Žádné dny k dispozici"
 
 msgid "No description"
 msgstr "Bez popisu"

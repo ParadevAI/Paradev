@@ -6814,6 +6814,9 @@ msgstr "Özel fiyatlandırma"
 msgid "Custom provider"
 msgstr "Özel sağlayıcı"
 
+msgid "Custom range…"
+msgstr "Özel aralık…"
+
 msgid "Custom themes"
 msgstr "Özel temalar"
 
@@ -12834,6 +12837,9 @@ msgstr "Katkıda bulunan bulunamadı."
 
 msgid "No credit card required."
 msgstr "Kredi kartı gerekmez."
+
+msgid "No days available"
+msgstr "Kullanılabilir gün yok"
 
 msgid "No description"
 msgstr "Açıklama yok"
