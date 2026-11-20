@@ -58,7 +58,8 @@ Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-3241699
 - Slow main-session answers:
   `select t.id, extract(epoch from t.settled_at - t.started_at) as seconds from agent_turns t join agent_sessions s on s.id = t.session_id where s.kind = 'main' and t.started_at > now() - interval '1 day' and t.settled_at - t.started_at > interval '60 seconds' order by 2 desc limit 20`
 - Possible router misses: a channel message with no mention and no turn, followed within 10
-  minutes by a message in the same channel that mentions a Dev.
+  minutes by a message in the same channel that mentions a Dev. Its `dev_channel_routed` event in
+  PostHog (`properties.messageId`) has each Dev's score, or `answered = false` when Jev failed.
 
 PostHog (`exec`): count `dev_reconciler_fixed` by `fix`, and `dev_turn_retried` by `reason`, over
 the last 7 days.
