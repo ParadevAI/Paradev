@@ -1,5 +1,7 @@
 import type { AgentModelCatalog } from "@superset/shared/agent-models";
 
+import { discoveryFailure } from "./discovery";
+
 type Entry = { catalog: AgentModelCatalog; expiresAt: number };
 export class ModelCatalogCache {
 	private entries = new Map<string, Entry>();
@@ -23,15 +25,17 @@ export class ModelCatalogCache {
 		if (hit && !refresh) return hit;
 		const pending = this.pending.get(key);
 		if (pending) return pending;
-		if (this.pending.size >= this.capacity) return fallback();
+		if (this.pending.size >= this.capacity)
+			return { ...fallback(), failure: "busy" };
 		const previous = this.entries.get(key)?.catalog;
 		const work = Promise.resolve()
 			.then(load)
-			.catch(() =>
-				previous && previous.source !== "bundled"
+			.catch((error) => ({
+				...(previous && previous.source !== "bundled"
 					? { ...previous, stale: true, availability: "unknown" as const }
-					: fallback(),
-			)
+					: fallback()),
+				failure: discoveryFailure(error),
+			}))
 			.then((catalog) => {
 				this.entries.delete(key);
 				const oldest = this.entries.keys().next().value;

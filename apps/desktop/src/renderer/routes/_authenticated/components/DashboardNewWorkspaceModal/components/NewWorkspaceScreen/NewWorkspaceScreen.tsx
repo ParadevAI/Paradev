@@ -618,6 +618,8 @@ export function NewWorkspaceScreen({
 		launchHostUrl,
 		agentConfigs,
 		acpChatEnabled ? "chat" : "terminal",
+		undefined,
+		isCloudHost ? undefined : (projectId ?? undefined),
 	);
 	const bundledSupport = selectedPresetId
 		? getAgentModelSupport(selectedPresetId)
@@ -740,6 +742,8 @@ export function NewWorkspaceScreen({
 				availability: catalogs[agent.id]?.availability,
 				loading: catalogs[agent.id]?.loading,
 				onRefresh: catalogs[agent.id]?.refresh,
+				onLoad: catalogs[agent.id]?.load,
+				catalogKey: catalogs[agent.id]?.key,
 				models: (
 					catalogs[agent.id]?.models ??
 					getAgentModelSupport(launchPresetIdOf(agent))?.models ??

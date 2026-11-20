@@ -27,6 +27,7 @@ export function AgentOptionsScreen({
 		presetId: string;
 		group: string;
 		hostUrl?: string;
+		projectId?: string;
 		agent?: string;
 	}) => Href;
 }) {
@@ -34,16 +35,18 @@ export function AgentOptionsScreen({
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
-	const { presetId, agentLabel, hostUrl, agent } = useLocalSearchParams<{
-		presetId?: string;
-		hostUrl?: string;
-		agent?: string;
-		agentLabel?: string;
-	}>();
+	const { presetId, agentLabel, hostUrl, agent, projectId } =
+		useLocalSearchParams<{
+			presetId?: string;
+			hostUrl?: string;
+			projectId?: string;
+			agent?: string;
+			agentLabel?: string;
+		}>();
 	const launchPresetId = presetId || null;
 	const { models, model, efforts, effort } = useAgentLaunchPreferences(
 		launchPresetId,
-		{ hostUrl, agent },
+		{ hostUrl, agent, projectId },
 	);
 	const setModel = useNewSessionPreferencesStore((state) => state.setModel);
 	const setEffort = useNewSessionPreferencesStore((state) => state.setEffort);
@@ -111,6 +114,7 @@ export function AgentOptionsScreen({
 										presetId: launchPresetId ?? "",
 										group,
 										hostUrl,
+										projectId,
 										agent,
 									}),
 								)

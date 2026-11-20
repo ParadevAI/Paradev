@@ -92,6 +92,8 @@ export function useAgentLaunchPreferences(
 	presetId: string | null,
 	target?: {
 		hostUrl?: string | null;
+		projectId?: string;
+		enabled?: boolean;
 		agent?: string;
 		surface?: "chat" | "terminal";
 	},
@@ -107,14 +109,16 @@ export function useAgentLaunchPreferences(
 			"agent-model-catalog",
 			target?.hostUrl,
 			target?.agent ?? presetId,
+			target?.projectId,
 			surface,
 		],
 		queryFn: () =>
 			getHostServiceClientByUrl(target?.hostUrl as string).agents.models.query({
 				agent: target?.agent ?? presetId ?? "",
 				surface: surface,
+				projectId: target?.projectId || undefined,
 			}),
-		enabled: !!target?.hostUrl && !!presetId,
+		enabled: target?.enabled !== false && !!target?.hostUrl && !!presetId,
 		staleTime: 60_000,
 		gcTime: 5 * 60_000,
 		retry: false,

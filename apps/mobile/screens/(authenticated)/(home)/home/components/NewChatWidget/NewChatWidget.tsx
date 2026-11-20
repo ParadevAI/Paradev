@@ -153,6 +153,10 @@ export function NewChatWidget({
 		: agentId;
 	const launch = useAgentLaunchPreferences(launchPresetId, {
 		hostUrl: selectedTarget?.hostUrl,
+		projectId: isCloudTarget
+			? undefined
+			: (selectedTarget?.projectId ?? undefined),
+		enabled: false,
 		agent:
 			selectedAgent && "id" in selectedAgent ? selectedAgent.id : undefined,
 	});
@@ -359,6 +363,7 @@ export function NewChatWidget({
 						presetId: launchPresetId,
 						agentLabel: selectedAgent?.label ?? "",
 						hostUrl: selectedTarget?.hostUrl ?? "",
+						projectId: isCloudTarget ? "" : (selectedTarget?.projectId ?? ""),
 						agent:
 							(selectedAgent && "id" in selectedAgent
 								? selectedAgent.id

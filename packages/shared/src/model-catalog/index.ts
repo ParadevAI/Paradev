@@ -24,6 +24,7 @@ export type AgentModelCatalog = {
 	availability: "reported" | "unknown";
 	fetchedAt: number;
 	stale: boolean;
+	failure?: "unsupported" | "timeout" | "busy" | "failed";
 };
 
 export type ModelFilters = {

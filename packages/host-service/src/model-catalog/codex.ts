@@ -5,6 +5,7 @@ import {
 } from "@superset/chat-runtime/acp-client";
 import type { CatalogModel } from "@superset/shared/agent-models";
 import { z } from "zod";
+import { abortable } from "./discovery";
 
 const pageSchema = z.object({
 	data: z.array(
@@ -20,6 +21,7 @@ const pageSchema = z.object({
 
 export async function discoverCodexModels(
 	launch: SpawnAcpOptions,
+	signal = AbortSignal.timeout(20_000),
 ): Promise<CatalogModel[]> {
 	const client = new AcpRpcClient({
 		createTransport: (handlers) =>
@@ -33,13 +35,16 @@ export async function discoverCodexModels(
 			),
 	});
 	try {
-		await client.request(
-			"initialize",
-			{
-				clientInfo: { name: "paradev-model-discovery", version: "1.0.0" },
-				capabilities: {},
-			},
-			10_000,
+		await abortable(
+			client.request(
+				"initialize",
+				{
+					clientInfo: { name: "paradev-model-discovery", version: "1.0.0" },
+					capabilities: {},
+				},
+				10_000,
+			),
+			signal,
 		);
 		client.notify("initialized", {});
 		const models: CatalogModel[] = [];
@@ -47,10 +52,13 @@ export async function discoverCodexModels(
 		const cursors = new Set<string>();
 		do {
 			const page = pageSchema.parse(
-				await client.request(
-					"model/list",
-					{ cursor, limit: 100, includeHidden: false },
-					10_000,
+				await abortable(
+					client.request(
+						"model/list",
+						{ cursor, limit: 100, includeHidden: false },
+						10_000,
+					),
+					signal,
 				),
 			);
 			models.push(

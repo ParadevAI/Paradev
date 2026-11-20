@@ -46,6 +46,7 @@ test("repeated outages retain the last successful models without claiming availa
 			...live,
 			stale: true,
 			availability: "unknown",
+			failure: "failed",
 		});
 	}
 });

@@ -13,15 +13,17 @@ import { useAgentLaunchPreferences } from "@/screens/(authenticated)/hooks/useAg
 export function ModelGroupScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const { presetId, group, hostUrl, agent } = useLocalSearchParams<{
+	const { presetId, group, hostUrl, agent, projectId } = useLocalSearchParams<{
 		presetId?: string;
 		hostUrl?: string;
+		projectId?: string;
 		agent?: string;
 		group?: string;
 	}>();
 	const launchPresetId = presetId || null;
 	const { models, model } = useAgentLaunchPreferences(launchPresetId, {
 		hostUrl,
+		projectId,
 		agent,
 	});
 	const setModel = useNewSessionPreferencesStore((state) => state.setModel);

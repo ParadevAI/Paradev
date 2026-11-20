@@ -164,6 +164,8 @@ export function AcpChatPane({
 		),
 		"chat",
 		workspaceId,
+		undefined,
+		sessionId && agent ? { id: sessionId, presetId: agent.id } : undefined,
 	);
 	const agentLabel = agentConfigs?.find(
 		(config) => config.id === agent?.id,
@@ -397,6 +399,8 @@ export function AcpChatPane({
 					availability: catalog?.availability,
 					loading: catalog?.loading,
 					onRefresh: catalog?.refresh,
+					onLoad: catalog?.load,
+					catalogKey: catalog?.key,
 					label: config?.label ?? presetId,
 					models:
 						catalog?.models ?? getAgentModelSupport(presetId)?.models ?? [],

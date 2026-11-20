@@ -2,6 +2,7 @@ import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
 import { attachedFilesBlock } from "@superset/chat-runtime";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
+import type { CatalogModel } from "@superset/shared/agent-models";
 import {
 	buildAgentEffortArgs,
 	buildAgentModeArgs,
@@ -32,10 +33,9 @@ import { trackAgentLaunched } from "../../../agent-launch-analytics";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
-import {
-	cachedTerminalModels,
-	discoverAgentModels,
-} from "../../../model-catalog/catalog";
+import { discoverAgentModels } from "../../../model-catalog/catalog";
+import { refreshModelMetadata } from "../../../model-catalog/metadata";
+import { sessionModelCatalog } from "../../../model-catalog/session";
 import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type {
 	TerminalAgentBinding,
@@ -43,6 +43,7 @@ import type {
 } from "../../../terminal-agents";
 import {
 	agentLaunchEnv,
+	chatLaunchPresetId,
 	type ResolvedHostAgentConfig,
 	resolveHostAgentConfig,
 } from "../../../terminal-agents/agent-config";
@@ -367,19 +368,29 @@ function validateForkSessionIsResolvable(
 
 export async function prepareAgentModelCatalog(
 	db: HostDb,
-	input: Pick<AgentRunInput, "agent" | "model" | "surface">,
-): Promise<void> {
-	if (!input.model) return;
+	input: Pick<AgentRunInput, "agent" | "model" | "surface"> & {
+		workspaceId?: string;
+		projectId?: string;
+	},
+): Promise<CatalogModel[]> {
+	if (!input.model) return [];
 	const config = resolveHostAgentConfig(db, input.agent);
-	if (!config) return;
+	if (!config) return [];
 	if (
 		input.surface === "chat" &&
 		acpHarnessForPreset(chatLaunchPresetId(config))
 	)
-		return;
+		return [];
 	const presetId = resolveAgentLaunchPresetId(config.presetId, config.command);
-	if (isCuratedAgentModel(presetId, input.model)) return;
-	await discoverAgentModels(db, { agent: input.agent, surface: "terminal" });
+	if (isCuratedAgentModel(presetId, input.model)) return [];
+	const catalog = await discoverAgentModels(db, {
+		agent: input.agent,
+		surface: "terminal",
+		workspaceId: input.workspaceId,
+		projectId: input.projectId,
+		refresh: true,
+	});
+	return catalog.availability === "reported" ? catalog.models : [];
 }
 
 /**
@@ -389,6 +400,7 @@ export async function prepareAgentModelCatalog(
 export function validateAgentLaunchOptions(
 	db: HostDb,
 	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode" | "surface">,
+	modelValidation: readonly CatalogModel[] | "deferred" = [],
 ): void {
 	if (!input.model && !input.effort && !input.mode) return;
 
@@ -408,7 +420,8 @@ export function validateAgentLaunchOptions(
 		!!acpHarnessForPreset(chatLaunchPresetId(config));
 	if (
 		!chat &&
-		!cachedTerminalModels(db, input.agent).some(
+		(modelValidation !== "deferred" || !getAgentModelSupport(launchPresetId)) &&
+		!(modelValidation === "deferred" ? [] : modelValidation).some(
 			(model) => model.id === input.model,
 		)
 	) {
@@ -438,6 +451,7 @@ export function validateAgentLaunchOptions(
 export function buildTerminalAgentLaunch(
 	db: HostDb,
 	input: AgentRunInput,
+	discoveredModels: readonly CatalogModel[] = [],
 ): { fullCommand: string; label: string; config: ResolvedHostAgentConfig } {
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) {
@@ -453,11 +467,7 @@ export function buildTerminalAgentLaunch(
 		config.presetId,
 		config.command,
 	);
-	if (
-		!cachedTerminalModels(db, input.agent).some(
-			(model) => model.id === input.model,
-		)
-	) {
+	if (!discoveredModels.some((model) => model.id === input.model)) {
 		validateAgentModelSelection(launchPresetId, config.label, input.model);
 	}
 	validateAgentEffortSelection(
@@ -499,7 +509,7 @@ export function buildTerminalAgentLaunch(
 		launchPresetId,
 		input.model,
 		input.effort,
-		cachedTerminalModels(db, input.agent),
+		discoveredModels,
 	);
 	const effortArgs = buildAgentEffortArgs(
 		launchPresetId,
@@ -584,6 +594,7 @@ async function runTerminalAgent(
 	const { fullCommand, label, config } = buildTerminalAgentLaunch(
 		ctx.db,
 		input,
+		await prepareAgentModelCatalog(ctx.db, input),
 	);
 
 	const result = await createTerminalSessionInternal({
@@ -783,22 +794,7 @@ export function chatLaunchTarget(
  * A chat takes only the config's env: its args and executable path apply to
  * terminal launches, and the chat runs the CLI the ACP harness resolves.
  */
-export function chatLaunchPresetId(
-	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
-): string {
-	const launchPresetId = resolveAgentLaunchPresetId(
-		config.presetId,
-		config.command,
-	);
-	if (!config.presetId.startsWith("custom")) return launchPresetId;
-	const [commandToken = ""] = config.command.trim().split(/\s+/);
-	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
-		.toLowerCase()
-		.replace(/\.exe$/, "");
-	return executable === "claude" || executable === "codex"
-		? executable
-		: launchPresetId;
-}
+export { chatLaunchPresetId } from "../../../terminal-agents/agent-config";
 
 /**
  * The agent config a stored chat ran under, and whether it still runs that
@@ -921,7 +917,6 @@ export async function runAgentInWorkspace(
 			message: `Workspace ${input.workspaceId} not found on this host — it may have been deleted.`,
 		});
 	}
-	await prepareAgentModelCatalog(ctx.db, input);
 	// Ahead of the launch path: continuing costs no pty and no trust seeding.
 	const continued = await continueAgent(ctx, input);
 	if (continued) return continued;
@@ -950,10 +945,27 @@ export const agentsRouter = router({
 				agent: z.string().min(1),
 				surface: z.enum(["chat", "terminal"]).default("chat"),
 				workspaceId: z.string().optional(),
+				projectId: z.string().optional(),
+				sessionId: z.string().optional(),
 				refresh: z.boolean().optional(),
 			}),
 		)
-		.query(({ ctx, input }) => discoverAgentModels(ctx.db, input)),
+		.query(({ ctx, input }) => {
+			if (input.sessionId) {
+				const catalog = sessionModelCatalog(
+					ctx.runtime.chat?.().live.get(input.sessionId) ?? null,
+					input.workspaceId,
+				);
+				if (!catalog)
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Chat session is not active in this workspace",
+					});
+				refreshModelMetadata();
+				return catalog;
+			}
+			return discoverAgentModels(ctx.db, input);
+		}),
 	run: protectedProcedure
 		.input(
 			z.object({

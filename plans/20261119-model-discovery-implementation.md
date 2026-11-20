@@ -4,7 +4,7 @@
 
 The host owns model availability. The metadata catalog describes models. Each picker decides which available choices to display. IDs retain their harness/provider spelling throughout; the metadata join never rewrites a launch ID.
 
-`agents.models` is a new host query, scoped by agent config, surface, and optional workspace. It returns models plus source, availability, freshness, and optional metadata. Existing procedure shapes are unchanged. New clients fall back to bundled lists if an older host lacks the query; this feature does not require raising the minimum host version.
+`agents.models` is a new host query, scoped by agent config, surface, and optional workspace, project, or active session. It returns models plus source, availability, freshness, and optional metadata. Existing procedure shapes are unchanged. New clients fall back to bundled lists if an older host lacks the query; this feature does not require raising the minimum host version.
 
 Discovery coverage:
 
@@ -21,7 +21,7 @@ The older cloud `chat.getModels` endpoint is unchanged: its routes and credentia
 
 ## Cache and metadata
 
-The process-local cache is isolated per host database, with keys derived from config, environment, surface, and working directory. Keys are hashes; credentials are never returned. Results live for one minute, with 64 entries and 64 in-flight requests per cache. Duplicate requests share work. At most two discovery operations run concurrently. Repeated failures preserve the last successful list but mark availability unknown; an authoritative empty list replaces prior data.
+The process-local cache is isolated per host database, with keys derived from config, environment, surface, and working directory. Keys are hashes; credentials are never returned. Results live for one minute, with 64 entries and 64 in-flight requests per cache. Duplicate requests share work. A process-wide scheduler admits two operations and at most 32 waiting requests. A 20-second deadline covers queueing, environment resolution and protocol calls; expired queued work never starts, and active probes dispose their processes. Repeated failures preserve the last successful list but mark availability unknown; an authoritative empty list replaces prior data.
 
 models.dev metadata refreshes in the background at most once a day after success, with a short network timeout and retry backoff. Exact provider/model matches enrich entries with tool support, modalities, reasoning, family, lifecycle status, and limits. Missing metadata does not remove runtime models. No full provider catalog is stored in renderer localStorage.
 
@@ -29,19 +29,19 @@ ACP has no universal model-list operation. The unprompted native session is requ
 
 ## Picker and launch behavior
 
-- Desktop workspace creation and agent switching use host discovery; mobile launch preferences and model sheets use the same query.
+- Desktop workspace creation and agent switching load discovery when an agent tab is opened. Mobile model sheets load the selected agent; the composer only reads cached choices. Both carry project context when available.
 - Desktop model menus search labels and native IDs, filter by provider, and offer an All models toggle. The default filter excludes known non-tool, non-text-output, and deprecated entries; unknown metadata and the current selection remain visible. Mobile launch lists use the same coding filters.
-- Active desktop chat choices merge metadata by exact ID without replacing session options.
+- Active desktop chat reads the existing live session through the runtime registry, checking workspace scope and rejecting dead sessions. It enriches exact IDs without opening a discovery process or replacing session options.
 - Desktop fallback lists display an unverified-availability notice and allow refresh.
 - Favorites are resolved against current choices before they become selectable.
 - Saved model IDs survive a catalog refresh. ACP refuses to prompt if an explicit start model could not be selected; choosing an available model clears the refusal.
-- Terminal launch validation and argument construction accept fresh discovered IDs as well as bundled IDs. Discovery is refreshed for unbundled selections before launch and workspace-creation validation.
+- Terminal launch preparation discovers unbundled selections in the actual workspace and passes the result directly into validation and argument construction. Neither reads a shared cache. Creation preflight checks the agent and launch controls but defers model availability until the workspace exists.
 - Effort options for models outside the bundled launch catalog are left to the active runtime instead of guessing a valid effort ladder.
 
 ## Verification
 
 - Shared model catalog and launch arguments: 98 tests passed.
-- Host catalog, cache, agent launch, and harness factory: 101 tests passed.
+- Host catalog, scheduler, session scoping, agent launch, CLI resolution, environment and harness factory: 112 tests passed.
 - ACP runtime, including discovery without prompting and recovery from an unavailable model: 205 tests passed.
 - Host and desktop typechecks, Biome checks on all changed TypeScript files, and git diff whitespace checks passed.
 - All 18 locale catalogs include the fallback notice; the i18n extraction/strict compilation check passed.
@@ -51,3 +51,13 @@ ACP has no universal model-list operation. The unprompted native session is requ
 - Screenshots and probe scripts are in ignored `artifacts/model-discovery-verification/`.
 
 Mobile typechecking reaches shared server packages and reports `unref` on `number` timer errors in port-scanner/workspace-fs. No mobile simulator run or paid model prompt was performed. Live provider membership was verified only for the available local accounts; other harnesses use the common protocol path and explicit fallback.
+
+## Runtime ownership and deployment boundaries
+
+`resolveAcpLaunch` is shared by chat startup and discovery. It resolves the same CLI, adapter, version and account environment, including sandbox-managed environment hydration. The resolved launch is passed directly to the discovery harness and is also used for its cache identity. Preset resolution lives with agent configuration rather than importing the agent router.
+
+A cached list is advisory: it does not authorize a launch. File-based logins and provider configuration can change independently of environment variables, so explicit refresh and fresh launch-time discovery remain necessary. Structured `unsupported`, `timeout`, `busy`, and `failed` states distinguish discovery failure classes; diagnostics log the agent and reason without credentials or subprocess output.
+
+Local and remote machines execute the same host-owned path. A running cloud sandbox uses that path after its managed environment is ready; sandbox bootstrap routes terminal launches through `runAgentInWorkspace`. Before provisioning, no runtime exists: cloud creation offers unverified bundled choices and validates at actual startup. The older hosted-chat backend remains separate. No remote relay or cloud sleep/wake end-to-end run has been performed.
+
+After refactoring, desktop CDP captured exactly one model-query POST on opening the Codex tab, followed by its eight native models. Reopening an already-fresh OpenCode tab issued no additional model query. This verifies demand-driven client behavior locally, not cloud lifecycle behavior.

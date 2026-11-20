@@ -317,6 +317,24 @@ describe("buildTerminalAgentLaunch", () => {
 			.run();
 	}
 
+	it("uses only the discovery result passed to this launch", () => {
+		const db = createTestDb();
+		seedConfig(db);
+		const input = {
+			workspaceId: "workspace",
+			agent: "claude",
+			prompt: "p",
+			model: "private/new",
+		};
+		const launch = buildTerminalAgentLaunch(db, input, [
+			{ id: "private/new", label: "New" },
+		]);
+		expect(launch.fullCommand).toContain("--model private/new");
+		expect(() => buildTerminalAgentLaunch(db, input)).toThrow(
+			/Unsupported model/,
+		);
+	});
+
 	it("resolves the agent config to a runnable command without a terminal", () => {
 		const db = createTestDb();
 		seedConfig(db);

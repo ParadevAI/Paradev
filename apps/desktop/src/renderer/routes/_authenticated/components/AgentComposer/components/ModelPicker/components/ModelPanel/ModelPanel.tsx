@@ -109,6 +109,12 @@ export function ModelPanel({
 	);
 	const runtimeModels =
 		tab === currentPresetId && model && tabAgent?.runtimeModels;
+	const loadRef = useRef(tabAgent?.onLoad);
+	loadRef.current = tabAgent?.onLoad;
+	const catalogKey = tabAgent?.catalogKey;
+	useEffect(() => {
+		if (catalogKey && tab !== FAVORITES_TAB) loadRef.current?.();
+	}, [tab, catalogKey]);
 	const rows: Row[] = onFavoritesTab
 		? favorites.flatMap((favorite) => {
 				const agent = agentSwitcher?.agents.find(

@@ -8,6 +8,8 @@ export type AgentChoice = {
 	loading?: boolean;
 	runtimeModels?: boolean;
 	onRefresh?: () => void;
+	onLoad?: () => void;
+	catalogKey?: string;
 };
 
 /** Other agents the chat can move to; picking one of their models hands the conversation over. */

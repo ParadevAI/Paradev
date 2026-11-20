@@ -50,7 +50,7 @@ let metadata = new Map<string, ModelMetadata>();
 let nextRefresh = 0;
 let pending: Promise<void> | undefined;
 
-function refresh(): void {
+export function refreshModelMetadata(): void {
 	if (pending || Date.now() < nextRefresh) return;
 	nextRefresh = Date.now() + 60_000;
 	pending = (async () => {
@@ -74,7 +74,6 @@ export function enrichModels(
 	models: CatalogModel[],
 	presetId: string,
 ): CatalogModel[] {
-	refresh();
 	const provider =
 		presetId === "claude"
 			? "anthropic"
