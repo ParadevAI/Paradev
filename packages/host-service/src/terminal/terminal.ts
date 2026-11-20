@@ -79,6 +79,7 @@ import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
+import { sanitizeReplayedQueries } from "./replay-query-sanitizer.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
 import {
 	getShellReadyMarkerEvidence,
@@ -2048,7 +2049,10 @@ function sendSeqAttach(
 			mode: "exact",
 		});
 		if (request.seq < session.outputSeq) {
-			sendBytes(socket, readRetainedFrom(session, request.seq));
+			sendBytes(
+				socket,
+				sanitizeReplayedQueries(readRetainedFrom(session, request.seq)),
+			);
 		}
 		return;
 	}
@@ -2062,7 +2066,12 @@ function sendSeqAttach(
 			mode: "tail",
 		});
 		if (session.retainedBytes > 0) {
-			sendBytes(socket, readRetainedFrom(session, session.retainedStartSeq));
+			sendBytes(
+				socket,
+				sanitizeReplayedQueries(
+					readRetainedFrom(session, session.retainedStartSeq),
+				),
+			);
 		}
 		return;
 	}
