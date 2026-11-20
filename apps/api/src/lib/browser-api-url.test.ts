@@ -75,7 +75,11 @@ for (const browserUrl of [
 		const config = JSON.parse(result.stdout.toString().trim());
 		const expectedUrl = browserUrl || identityUrl;
 		const metadataUrl =
-			browserUrl === "" ? "https://metadata.test" : identityUrl;
+			browserUrl === ""
+				? "https://metadata.test"
+				: browserUrl === "https://api.paradev.com"
+					? browserUrl
+					: identityUrl;
 		expect(config.baseURL).toBe(expectedUrl);
 		expect(config.authorizationRedirect).toBe(
 			`${expectedUrl}/api/integrations/google/callback`,
@@ -88,17 +92,9 @@ for (const browserUrl of [
 		expect(config.clientDocument.client_id).toBe(
 			`${metadataUrl}/api/connectors/google/client-metadata`,
 		);
-		expect(config.clientDocument.redirect_uris).toContain(
+		expect(config.clientDocument.redirect_uris).toEqual([
 			`${expectedUrl}/api/connectors/callback/google`,
-		);
-		if (expectedUrl.startsWith("https")) {
-			expect(config.clientDocument.redirect_uris).toContain(
-				"https://api.superset.sh/api/connectors/callback/google",
-			);
-			expect(config.clientDocument.redirect_uris).toContain(
-				"https://api.paradev.com/api/connectors/callback/google",
-			);
-		}
+		]);
 		expect(config.issuer).toBe(identityUrl);
 		for (const metadata of [config.metadata, config.openid]) {
 			expect(metadata.issuer).toBe(identityUrl);

@@ -127,8 +127,11 @@ endpoints (authorize, token, JWKS, registration, introspection, revocation,
 userinfo, logout) on the deployment's browser base URL. With no override these
 are unchanged. The MCP resource is always `${NEXT_PUBLIC_API_URL}/mcp`, including
 root and plugin discovery, while discovery URLs can use the request host.
-Connector client metadata keeps its stable client ID and accepts callback twins
-on our own domains. Existing dynamic-client grants look up their original client
+Connector client metadata is served on the browser API origin when that origin is
+an own-domain twin of `PLUGIN_CLIENT_METADATA_BASE_URL`, and lists only the
+callback on that origin: some providers (Firecrawl) reject a document whose
+redirect URIs are on another origin than its client ID. Grants issued to the
+twin's client ID keep refreshing as it. Existing dynamic-client grants look up their original client
 across those callback twins, scoped to the same issuer and connector; new grants
 still select registrations for the current callback only.
 
