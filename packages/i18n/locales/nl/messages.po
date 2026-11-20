@@ -4413,6 +4413,9 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · voor de tooltip-refactor"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Checkpoint opgeslagen in {name}"
+
 msgid "Checks"
 msgstr "Checks"
 
@@ -17444,6 +17447,9 @@ msgstr "Sandbox reageert niet meer"
 msgid "Save"
 msgstr "Opslaan"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Checkpoint opslaan in {name}?"
+
 msgid "Save All"
 msgstr "Alles opslaan"
 
@@ -17458,6 +17464,9 @@ msgstr "Opslaan als weergave"
 
 msgid "Save Changes"
 msgstr "Wijzigingen opslaan"
+
+msgid "Save checkpoint"
+msgstr "Checkpoint opslaan"
 
 msgid "Save edits"
 msgstr "Bewerkingen opslaan"
@@ -17513,6 +17522,12 @@ msgstr "Opgeslagen in Downloads"
 
 msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
 msgstr "Opgeslagen. Nieuwe werkruimtes en de volgende build gebruiken het; actieve werkruimtes nemen het over bij een herstart."
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Slaat deze workspace op zoals hij nu is, met alles wat erin is geïnstalleerd. Nieuwe workspaces uit {name} starten vanaf dit checkpoint. De workspace stopt even tijdens het opslaan."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Checkpoint opslaan in {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Opslaan als omgeving..."

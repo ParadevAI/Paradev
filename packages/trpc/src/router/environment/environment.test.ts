@@ -210,6 +210,7 @@ describe("environment.promote onto an environment", () => {
 describe("environment.promote of a running workspace", () => {
 	const restarted: Array<[string, { sessionId: string | null }]> = [];
 	const order: string[] = [];
+	const inserted: unknown[] = [];
 	stub(sandbox, {
 		promoteSandboxToEnvironment: async () => ({
 			goldenName: "env-new",
@@ -242,8 +243,12 @@ describe("environment.promote of a running workspace", () => {
 			const rows = () => [{ id: ENVIRONMENT_ID }];
 			const tx = {
 				insert: () => ({
-					values: () =>
-						Object.assign(Promise.resolve(), { returning: async () => rows() }),
+					values: (values: unknown) => {
+						inserted.push(values);
+						return Object.assign(Promise.resolve(), {
+							returning: async () => rows(),
+						});
+					},
 				}),
 				delete: () => ({ where: async () => {} }),
 			};
@@ -260,5 +265,12 @@ describe("environment.promote of a running workspace", () => {
 		});
 		expect(restarted).toEqual([[WORKSPACE_ID, { sessionId: "sess_A" }]]);
 		expect(order).toEqual(["save", "restart"]);
+		expect(inserted).toContainEqual(
+			expect.objectContaining({
+				trigger: "promote",
+				status: "succeeded",
+				goldenRef: expect.stringMatching(/^env-/),
+			}),
+		);
 	});
 });

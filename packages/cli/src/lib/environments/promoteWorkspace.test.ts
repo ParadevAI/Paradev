@@ -55,7 +55,7 @@ describe("promoteWorkspace", () => {
 			api,
 			organizationId: "org",
 			workspaceId: "w",
-			name: "Kiet",
+			into: { name: "Kiet" },
 			...fast,
 		});
 		expect(saved.id).toBe("new");
@@ -63,6 +63,31 @@ describe("promoteWorkspace", () => {
 			{
 				cloudWorkspaceId: "w",
 				name: "Kiet",
+				environmentId: undefined,
+				scope: undefined,
+			},
+		]);
+	});
+
+	test("a replace waits for the environment to move to a new golden", async () => {
+		const before = { id: "env", name: "Kiet", sourceRef: "env-old" };
+		const { api, promoted } = fakeApi({
+			promote: gatewayTimeout,
+			listResponses: [[before], [{ ...before, sourceRef: "env-new" }]],
+		});
+		const saved = await promoteWorkspace({
+			api,
+			organizationId: "org",
+			workspaceId: "w",
+			into: { environment: before },
+			...fast,
+		});
+		expect(saved.sourceRef).toBe("env-new");
+		expect(promoted).toEqual([
+			{
+				cloudWorkspaceId: "w",
+				name: undefined,
+				environmentId: "env",
 				scope: undefined,
 			},
 		]);
@@ -81,7 +106,7 @@ describe("promoteWorkspace", () => {
 				api,
 				organizationId: "org",
 				workspaceId: "w",
-				name: "Kiet",
+				into: { name: "Kiet" },
 				...fast,
 			}),
 		).rejects.toThrow("Only a ready workspace");
@@ -94,7 +119,7 @@ describe("promoteWorkspace", () => {
 				api,
 				organizationId: "org",
 				workspaceId: "w",
-				name: "Kiet",
+				into: { name: "Kiet" },
 				pollIntervalMs: 1,
 				pollTimeoutMs: 20,
 			}),

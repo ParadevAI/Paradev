@@ -4413,6 +4413,9 @@ msgstr "체크포인트"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "체크포인트 · 툴팁 리팩터링 전"
 
+msgid "Checkpoint saved to {name}"
+msgstr "{name}에 체크포인트를 저장했습니다"
+
 msgid "Checks"
 msgstr "검사"
 
@@ -17444,6 +17447,9 @@ msgstr "샌드박스가 응답하지 않습니다"
 msgid "Save"
 msgstr "저장"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "{name}에 체크포인트를 저장할까요?"
+
 msgid "Save All"
 msgstr "모두 저장"
 
@@ -17458,6 +17464,9 @@ msgstr "뷰로 저장"
 
 msgid "Save Changes"
 msgstr "변경사항 저장"
+
+msgid "Save checkpoint"
+msgstr "체크포인트 저장"
 
 msgid "Save edits"
 msgstr "편집 저장"
@@ -17513,6 +17522,12 @@ msgstr "다운로드 폴더에 저장했습니다"
 
 msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
 msgstr "저장했습니다. 새 워크스페이스와 다음 빌드에 적용되며, 실행 중인 워크스페이스는 다시 시작할 때 적용됩니다."
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "설치된 모든 것을 포함해 이 워크스페이스의 현재 상태를 저장합니다. {name}에서 만드는 새 워크스페이스는 이 체크포인트에서 시작합니다. 저장하는 동안 워크스페이스가 잠시 멈춥니다."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "{name}에 체크포인트 저장 중..."
 
 msgid "Saving as an environment..."
 msgstr "환경으로 저장하는 중..."

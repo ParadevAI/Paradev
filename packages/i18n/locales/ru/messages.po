@@ -4413,6 +4413,9 @@ msgstr "Контрольная точка"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольная точка · до рефакторинга tooltip"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Контрольная точка сохранена в {name}"
+
 msgid "Checks"
 msgstr "Проверки"
 
@@ -17444,6 +17447,9 @@ msgstr "Песочница перестала отвечать"
 msgid "Save"
 msgstr "Сохранить"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Сохранить контрольную точку в {name}?"
+
 msgid "Save All"
 msgstr "Сохранить всё"
 
@@ -17458,6 +17464,9 @@ msgstr "Сохранить как вид"
 
 msgid "Save Changes"
 msgstr "Сохранить изменения"
+
+msgid "Save checkpoint"
+msgstr "Сохранить контрольную точку"
 
 msgid "Save edits"
 msgstr "Сохранить правки"
@@ -17513,6 +17522,12 @@ msgstr "Сохранено в «Загрузки»"
 
 msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
 msgstr "Сохранено. Новые рабочие области и следующая сборка будут её использовать; запущенные рабочие области применят её после перезапуска."
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Сохраняет это рабочее пространство в текущем виде со всем, что в нём установлено. Новые рабочие пространства из {name} будут начинаться с этой контрольной точки. Во время сохранения рабочее пространство ненадолго остановится."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Сохранение контрольной точки в {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Сохранение как среда..."

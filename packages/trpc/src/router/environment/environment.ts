@@ -746,6 +746,19 @@ export const environmentRouter = {
 							i18nKey: "serverError.environment.changedDuringPromote",
 						});
 					}
+					const savedAt = new Date();
+					await tx.insert(environmentBuilds).values({
+						environmentId,
+						organizationId: workspace.organizationId,
+						status: "succeeded",
+						trigger: "promote",
+						kind: "incremental",
+						repositoryIds: checkouts.map((entry) => entry.repository.id),
+						primaryRepositoryId,
+						goldenRef: goldenName,
+						startedAt: savedAt,
+						finishedAt: savedAt,
+					});
 					return saved;
 				})
 				.catch(async (error: unknown) => {

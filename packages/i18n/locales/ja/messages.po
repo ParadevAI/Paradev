@@ -4413,6 +4413,9 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
 
+msgid "Checkpoint saved to {name}"
+msgstr "{name} にチェックポイントを保存しました"
+
 msgid "Checks"
 msgstr "チェック"
 
@@ -17444,6 +17447,9 @@ msgstr "サンドボックスが応答しなくなりました"
 msgid "Save"
 msgstr "保存"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "{name} にチェックポイントを保存しますか？"
+
 msgid "Save All"
 msgstr "すべて保存"
 
@@ -17458,6 +17464,9 @@ msgstr "ビューとして保存"
 
 msgid "Save Changes"
 msgstr "変更を保存"
+
+msgid "Save checkpoint"
+msgstr "チェックポイントを保存"
 
 msgid "Save edits"
 msgstr "編集を保存"
@@ -17513,6 +17522,12 @@ msgstr "ダウンロードフォルダに保存しました"
 
 msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
 msgstr "保存しました。新しいワークスペースと次回のビルドで使われます。実行中のワークスペースには再起動時に反映されます。"
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "このワークスペースを、インストール済みのものも含めて現在の状態で保存します。{name} から作成する新しいワークスペースはこのチェックポイントから始まります。保存中、ワークスペースは少しの間停止します。"
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "{name} にチェックポイントを保存中..."
 
 msgid "Saving as an environment..."
 msgstr "環境として保存しています..."

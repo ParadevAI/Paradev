@@ -4413,6 +4413,9 @@ msgstr "Punto de control"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Punto de control · antes de refactorizar los tooltips"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Punto de control guardado en {name}"
+
 msgid "Checks"
 msgstr "Comprobaciones"
 
@@ -17444,6 +17447,9 @@ msgstr "El sandbox dejó de responder"
 msgid "Save"
 msgstr "Guardar"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "¿Guardar un punto de control en {name}?"
+
 msgid "Save All"
 msgstr "Guardar todo"
 
@@ -17458,6 +17464,9 @@ msgstr "Guardar como vista"
 
 msgid "Save Changes"
 msgstr "Guardar cambios"
+
+msgid "Save checkpoint"
+msgstr "Guardar punto de control"
 
 msgid "Save edits"
 msgstr "Guardar las ediciones"
@@ -17513,6 +17522,12 @@ msgstr "Guardada en Descargas"
 
 msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
 msgstr "Guardado. Los nuevos espacios de trabajo y la próxima compilación la usarán; los espacios de trabajo en ejecución la aplicarán al reiniciarse."
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Guarda este espacio de trabajo tal como está ahora, con todo lo instalado en él. Los nuevos espacios de trabajo de {name} empezarán desde este punto de control. El espacio de trabajo se detiene un momento mientras se guarda."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Guardando un punto de control en {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Guardando como entorno..."

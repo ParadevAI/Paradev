@@ -1300,6 +1300,18 @@ Save a ready cloud workspace as a new environment that new workspaces fork from.
 </Command>
 
 <Command
+	name="superset environments replace <environment>"
+	options={[
+		{ flag: "--workspace <id>", description: "Cloud workspace ID. Required." },
+		{ flag: "--scope <personal|organization>", description: "Also change who can use it." },
+		{ flag: "--yes", description: "Replace without asking. Required without a terminal." },
+	]}
+>
+Replace an environment's snapshot with a ready cloud workspace, keeping its name and variables.
+Restarts the workspace.
+</Command>
+
+<Command
 	name="superset environments archive <environment>"
 	options={[
 		{ flag: "--yes", description: "Archive without asking. Required without a terminal." },

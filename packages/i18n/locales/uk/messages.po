@@ -4407,6 +4407,9 @@ msgstr "Контрольна точка"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольна точка · до рефакторингу підказок"
 
+msgid "Checkpoint saved to {name}"
+msgstr "Контрольну точку збережено в {name}"
+
 msgid "Checks"
 msgstr "Перевірки"
 
@@ -17438,6 +17441,9 @@ msgstr "Пісочниця перестала відповідати"
 msgid "Save"
 msgstr "Зберегти"
 
+msgid "Save a checkpoint to {name}?"
+msgstr "Зберегти контрольну точку в {name}?"
+
 msgid "Save All"
 msgstr "Зберегти все"
 
@@ -17452,6 +17458,9 @@ msgstr "Зберегти як подання"
 
 msgid "Save Changes"
 msgstr "Зберегти зміни"
+
+msgid "Save checkpoint"
+msgstr "Зберегти контрольну точку"
 
 msgid "Save edits"
 msgstr "Зберегти правки"
@@ -17507,6 +17516,12 @@ msgstr "Збережено в «Завантаження»"
 
 msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
 msgstr "Збережено. Нові робочі простори й наступна збірка використовуватимуть її; запущені робочі простори застосують її після перезапуску."
+
+msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
+msgstr "Зберігає цей робочий простір у поточному стані з усім, що в ньому встановлено. Нові робочі простори з {name} починатимуться з цієї контрольної точки. Під час збереження робочий простір ненадовго зупиниться."
+
+msgid "Saving a checkpoint to {name}..."
+msgstr "Збереження контрольної точки в {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."

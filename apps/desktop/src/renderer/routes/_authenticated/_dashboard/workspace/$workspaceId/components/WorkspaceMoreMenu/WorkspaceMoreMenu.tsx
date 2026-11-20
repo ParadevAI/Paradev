@@ -10,9 +10,19 @@ import {
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
-import { Container, Ellipsis, Play, Settings, Square, X } from "lucide-react";
+import {
+	Container,
+	DatabaseBackup,
+	Ellipsis,
+	Play,
+	Settings,
+	Square,
+	X,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { SaveCheckpointDialog } from "renderer/routes/_authenticated/_dashboard/components/SaveCheckpointDialog";
+import { useSaveCheckpoint } from "renderer/routes/_authenticated/_dashboard/hooks/useSaveCheckpoint";
 import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/RenameDialog";
@@ -57,6 +67,8 @@ export function WorkspaceMoreMenu({
 		runAfterClose(action);
 	};
 	const environment = useWorkspaceEnvironment(workspace.id);
+	const checkpoint = useSaveCheckpoint(workspace.id);
+	const [checkpointOpen, setCheckpointOpen] = useState(false);
 	const navigate = useNavigate();
 
 	const runItems = (
@@ -122,6 +134,15 @@ export function WorkspaceMoreMenu({
 						<Container className="size-4" />
 						<Trans>Manage environment</Trans>
 					</DropdownMenuItem>
+					{checkpoint.environment && (
+						<DropdownMenuItem
+							disabled={!checkpoint.isReady}
+							onSelect={() => openAfterClose(() => setCheckpointOpen(true))}
+						>
+							<DatabaseBackup className="size-4" />
+							<Trans>Save checkpoint</Trans>
+						</DropdownMenuItem>
+					)}
 				</>
 			)}
 		</>
@@ -173,6 +194,13 @@ export function WorkspaceMoreMenu({
 						if (!trimmed) return;
 						workspaceActions.renameWorkspace(workspace.id, trimmed, rename);
 					}}
+				/>
+			)}
+			{checkpoint.environment && (
+				<SaveCheckpointDialog
+					cloudWorkspaceId={workspace.id}
+					open={checkpointOpen}
+					onOpenChange={setCheckpointOpen}
 				/>
 			)}
 		</>

@@ -22,7 +22,7 @@ export default command({
 			api: ctx.api,
 			organizationId,
 			workspaceId: options.workspace,
-			name: options.name,
+			into: { name: options.name },
 			scope: options.scope,
 		});
 		return {
