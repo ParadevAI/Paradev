@@ -12165,9 +12165,6 @@ msgstr "模型"
 msgid "Model"
 msgstr "模型"
 
-msgid "Model availability could not be verified."
-msgstr "无法验证模型是否可用。"
-
 msgid "Model context usage"
 msgstr "模型上下文用量"
 

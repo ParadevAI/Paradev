@@ -20,10 +20,7 @@ type Agent = {
 };
 type Catalog = AgentModelCatalog & {
 	loading: boolean;
-	/** No list can come: the host predates discovery, or the agent has no listing. */
-	unverifiable: boolean;
 	key: string;
-	refresh: () => void;
 	load: () => void;
 };
 
@@ -62,14 +59,13 @@ export function useAgentModelCatalog(
 		projectId,
 		session?.id,
 	];
-	const queryFn = (agent: Agent, refresh?: boolean) => () =>
+	const queryFn = (agent: Agent) => () =>
 		getHostServiceClientByUrl(hostUrl as string).agents.models.query({
 			agent: agent.id,
 			surface: agent.surface ?? surface,
 			workspaceId,
 			projectId,
 			sessionId: agent.presetId === session?.presetId ? session?.id : undefined,
-			refresh,
 		});
 	const queries = useQueries({
 		queries: agents.map((agent) => ({
@@ -84,13 +80,13 @@ export function useAgentModelCatalog(
 	return Object.fromEntries(
 		agents.map((agent, index): [string, Catalog] => {
 			const query = queries[index];
-			const fetch = (refresh: boolean) => {
+			const load = () => {
 				if (!hostUrl) return;
 				void queryClient
 					.fetchQuery({
 						queryKey: queryKey(agent),
-						queryFn: queryFn(agent, refresh),
-						staleTime: refresh ? 0 : freshFor,
+						queryFn: queryFn(agent),
+						staleTime: freshFor,
 						retry: false,
 					})
 					.catch(() => undefined);
@@ -100,11 +96,8 @@ export function useAgentModelCatalog(
 				{
 					...(query?.data ?? bundledCatalog(agent)),
 					loading: query?.isFetching ?? false,
-					unverifiable:
-						query?.data?.failure === "unsupported" || (query?.isError ?? false),
 					key: JSON.stringify(queryKey(agent)),
-					refresh: () => fetch(true),
-					load: () => fetch(false),
+					load,
 				},
 			];
 		}),

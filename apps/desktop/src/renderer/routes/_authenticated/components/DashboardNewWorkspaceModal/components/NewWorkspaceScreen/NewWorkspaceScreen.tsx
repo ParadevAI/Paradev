@@ -740,11 +740,7 @@ export function NewWorkspaceScreen({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
-				availability: catalogs[agent.id]?.unverifiable
-					? undefined
-					: catalogs[agent.id]?.availability,
 				loading: catalogs[agent.id]?.loading,
-				onRefresh: catalogs[agent.id]?.refresh,
 				onLoad: catalogs[agent.id]?.load,
 				catalogKey: catalogs[agent.id]?.key,
 				defaultModelLabel: catalogs[agent.id]?.defaultModel?.label,

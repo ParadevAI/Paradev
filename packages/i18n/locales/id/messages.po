@@ -12165,9 +12165,6 @@ msgstr "model"
 msgid "Model"
 msgstr "Model"
 
-msgid "Model availability could not be verified."
-msgstr "Ketersediaan model tidak dapat diverifikasi."
-
 msgid "Model context usage"
 msgstr "Penggunaan konteks model"
 

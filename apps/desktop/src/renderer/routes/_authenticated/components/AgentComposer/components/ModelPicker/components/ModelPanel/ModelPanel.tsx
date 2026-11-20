@@ -15,14 +15,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import {
-	LuCheck,
-	LuLoaderCircle,
-	LuRefreshCw,
-	LuSearch,
-	LuStar,
-	LuX,
-} from "react-icons/lu";
+import { LuCheck, LuLoaderCircle, LuSearch, LuStar } from "react-icons/lu";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -42,7 +35,6 @@ type Row = {
 };
 
 const FAVORITES_TAB = "favorites";
-const dismissedNotices = new Set<string>();
 const SHORTCUT_ROW_LIMIT = 9;
 const SHORTCUT_MODIFIER =
 	typeof navigator !== "undefined" &&
@@ -78,7 +70,6 @@ export function ModelPanel({
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState(currentPresetId);
 	const [provider, setProvider] = useState("");
-	const [, setNoticeRevision] = useState(0);
 	const [showAllModels, setShowAllModels] = useState(false);
 	const { favorites, toggle } = useFavoriteModels();
 	const listRef = useRef<HTMLDivElement>(null);
@@ -480,46 +471,10 @@ export function ModelPanel({
 					</DropdownMenuItem>
 				) : null}
 			</div>
-			{tabAgent &&
-			!runtimeModels &&
-			tabAgent.availability === "unknown" &&
-			(tabAgent.loading || !dismissedNotices.has(catalogKey ?? "")) ? (
-				<div className="flex h-7 shrink-0 items-center gap-0.5 pr-1.5 pl-2.5 text-[11px] text-muted-foreground/70">
-					{tabAgent.loading ? (
-						<>
-							<LuLoaderCircle className="mr-1 size-3 animate-spin" />
-							{t({ message: "Loading..." })}
-						</>
-					) : (
-						<>
-							<span className="min-w-0 flex-1 truncate">
-								{t({ message: "Model availability could not be verified." })}
-							</span>
-							{tabAgent.onRefresh ? (
-								<button
-									type="button"
-									aria-label={t({ message: "Refresh" })}
-									title={t({ message: "Refresh" })}
-									onClick={tabAgent.onRefresh}
-									className="rounded p-1 hover:bg-accent hover:text-foreground"
-								>
-									<LuRefreshCw className="size-3" />
-								</button>
-							) : null}
-							<button
-								type="button"
-								aria-label={t({ message: "Dismiss" })}
-								title={t({ message: "Dismiss" })}
-								onClick={() => {
-									dismissedNotices.add(catalogKey ?? "");
-									setNoticeRevision((revision) => revision + 1);
-								}}
-								className="rounded p-1 hover:bg-accent hover:text-foreground"
-							>
-								<LuX className="size-3" />
-							</button>
-						</>
-					)}
+			{tabAgent?.loading && !runtimeModels ? (
+				<div className="flex h-7 shrink-0 items-center gap-1.5 px-2.5 text-[11px] text-muted-foreground/70">
+					<LuLoaderCircle className="size-3 animate-spin" />
+					{t({ message: "Loading..." })}
 				</div>
 			) : null}
 		</div>

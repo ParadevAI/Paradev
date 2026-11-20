@@ -6,10 +6,8 @@ export type AgentChoice = {
 	models: CatalogModel[];
 	/** The model this agent runs when no model is picked, when its runtime says. */
 	defaultModelLabel?: string;
-	availability?: "reported" | "unknown";
 	loading?: boolean;
 	runtimeModels?: boolean;
-	onRefresh?: () => void;
 	onLoad?: () => void;
 	catalogKey?: string;
 };

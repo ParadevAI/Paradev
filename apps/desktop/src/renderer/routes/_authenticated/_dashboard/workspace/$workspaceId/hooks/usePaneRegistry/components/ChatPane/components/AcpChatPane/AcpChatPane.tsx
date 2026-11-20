@@ -409,11 +409,7 @@ export function AcpChatPane({
 				return {
 					presetId,
 					runtimeModels: true,
-					availability: catalog?.unverifiable
-						? undefined
-						: catalog?.availability,
 					loading: catalog?.loading,
-					onRefresh: catalog?.refresh,
 					onLoad: catalog?.load,
 					catalogKey: catalog?.key,
 					defaultModelLabel: catalog?.defaultModel?.label,
