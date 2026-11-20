@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SessionConfigOption } from "@superset/chat/protocol";
 import {
+	DEFAULT_ALIAS_MODEL_ID,
 	filterModelCatalog,
 	type ModelMetadata,
 } from "@superset/shared/agent-models";
@@ -29,6 +30,7 @@ type Row = {
 	label: string;
 	description?: string;
 	agentLabel?: string;
+	hint?: string;
 	metadata?: ModelMetadata;
 };
 
@@ -91,6 +93,9 @@ export function ModelPanel({
 			return model.options.map((option) => ({
 				...catalog?.find((entry) => entry.id === option.id),
 				...option,
+				...(option.id === DEFAULT_ALIAS_MODEL_ID
+					? { label: t({ message: "Default" }), hint: option.description }
+					: {}),
 				presetId,
 			}));
 		}
@@ -258,6 +263,11 @@ export function ModelPanel({
 				title={row.description}
 			>
 				<span className="min-w-0 flex-1 truncate">{row.label}</span>
+				{row.hint ? (
+					<span className="max-w-32 shrink-0 truncate text-[11px] text-muted-foreground">
+						{row.hint}
+					</span>
+				) : null}
 				{row.agentLabel ? (
 					<span className="max-w-24 shrink-0 truncate text-[11px] text-muted-foreground">
 						{row.agentLabel}

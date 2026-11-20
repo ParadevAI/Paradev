@@ -9,6 +9,7 @@ import type {
 	CatalogModel,
 } from "@superset/shared/agent-models";
 import {
+	DEFAULT_ALIAS_MODEL_ID,
 	getAgentModelSupport,
 	resolveAgentLaunchPresetId,
 	uniqueModels,
@@ -107,8 +108,6 @@ async function context(
 		.digest("hex");
 	return { config, cwd, presetId, env, key, launch, options };
 }
-
-const DEFAULT_ALIAS_MODEL_ID = "default";
 
 /** Pickers add their own "Default" choice, which omits the model override. */
 export function withoutDefaultAlias(models: CatalogModel[]): CatalogModel[] {

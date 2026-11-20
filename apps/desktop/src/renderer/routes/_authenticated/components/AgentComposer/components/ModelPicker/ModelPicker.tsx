@@ -24,7 +24,10 @@ import {
 	PILL_TRIGGER_CLASS,
 } from "../../constants";
 import { useOptimisticSelections } from "../../hooks/useOptimisticSelections";
-import { currentLabel } from "../../utils/configOptionLabels";
+import {
+	currentLabel,
+	currentModelLabel,
+} from "../../utils/configOptionLabels";
 import { fastOption } from "../../utils/toggleOption";
 import { EffortSliderCard } from "./components/EffortSliderCard";
 import { ModelPanel } from "./components/ModelPanel";
@@ -106,7 +109,7 @@ export function ModelPicker({
 	const showsModels = Boolean(model) || canSwitchAgent;
 	const currentAgentLabel = currentAgent?.label;
 	const pillLabel =
-		currentLabel(model) ??
+		currentModelLabel(model) ??
 		model?.label ??
 		currentAgentLabel ??
 		settings[0]?.label;

@@ -72,6 +72,9 @@ export function filterModelCatalog(
 	});
 }
 
+/** The id a runtime uses for "whatever model the agent picks itself". */
+export const DEFAULT_ALIAS_MODEL_ID = "default";
+
 export function uniqueModels(models: readonly CatalogModel[]): CatalogModel[] {
 	const seen = new Set<string>();
 	return models.filter((model) => {
