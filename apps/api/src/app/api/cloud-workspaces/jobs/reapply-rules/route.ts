@@ -35,5 +35,6 @@ export async function POST(request: Request): Promise<Response> {
 	const outcome = await reapplyRulesFor(parsed.data, {
 		deadline: Date.now() + RUN_BUDGET_MS,
 	});
+	console.info("[cloud-workspaces/reapply-rules]", parsed.data, outcome);
 	return Response.json({ ok: true, ...outcome });
 }

@@ -9,7 +9,7 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 export interface SandboxAccess extends SandboxGrant {
 	desktopUrl: string;
 	desktopToken: string;
-	agentCredentialsChanged: boolean;
+	agentsToRestart: string[];
 }
 
 export const sandboxAccess = createSandboxAccess<SandboxAccess>(
@@ -24,7 +24,7 @@ export const sandboxAccess = createSandboxAccess<SandboxAccess>(
 			desktopUrl: granted.desktop.url,
 			desktopToken: granted.desktop.token,
 			expiresAt: new Date(granted.expiresAt).getTime(),
-			agentCredentialsChanged: granted.agentCredentialsChanged,
+			agentsToRestart: granted.agentsToRestart,
 		};
 	},
 	{
