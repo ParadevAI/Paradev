@@ -8,6 +8,8 @@ export function useAcpChatEnabled(): boolean {
 
 /** For choosing chat or terminal at launch: waits for the setting instead of reading "off" while it loads. */
 export function useResolveAcpChatEnabled(): () => Promise<boolean> {
+	// Warm the same preference that the toolbar must honor on the first click.
+	cloudTrpc.userSettings.get.useQuery(undefined, { staleTime: 60_000 });
 	const utils = cloudTrpc.useUtils();
 	return useCallback(
 		() =>

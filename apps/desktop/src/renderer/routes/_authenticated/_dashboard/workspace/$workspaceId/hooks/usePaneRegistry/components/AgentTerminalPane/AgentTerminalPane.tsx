@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
 import { useEffect } from "react";
 import type {
@@ -6,6 +7,7 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
+import { usePresetTerminalStarting } from "../../../../state/presetLaunches";
 import { TerminalPane } from "../TerminalPane";
 
 type ChatOnTerminalPaneData = TerminalPaneData &
@@ -32,6 +34,7 @@ export function AgentTerminalPane({
 	onNewShell: () => Promise<void>;
 }) {
 	const data = ctx.pane.data as ChatOnTerminalPaneData;
+	const starting = usePresetTerminalStarting(data.terminalId);
 	const isSavedChat = data.agentSurface === "acp";
 
 	useEffect(() => {
@@ -67,6 +70,12 @@ export function AgentTerminalPane({
 	]);
 
 	if (isSavedChat) return null;
+	if (starting)
+		return (
+			<output className="grid h-full place-items-center text-sm text-muted-foreground">
+				<Trans>Starting…</Trans>
+			</output>
+		);
 
 	return (
 		<TerminalPane

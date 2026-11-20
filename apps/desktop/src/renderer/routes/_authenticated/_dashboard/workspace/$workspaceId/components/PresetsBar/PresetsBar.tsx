@@ -10,6 +10,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { useWorkspaceHostUrl } from "@superset/workspace-client";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Settings } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -26,6 +27,7 @@ import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import type { HotkeyId } from "renderer/hotkeys";
 import { posthog } from "renderer/lib/posthog";
 import { resolvePresetIcon } from "renderer/lib/preset-icon";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -80,6 +82,8 @@ export function PresetsBar({
 	onToggleShowPresetsBar,
 }: PresetsBarProps) {
 	const navigate = useNavigate();
+	const { workspace } = useWorkspace();
+	const hostUrl = useWorkspaceHostUrl();
 	const isDark = useIsDarkTheme();
 	const isParadevShell = useParadevShell();
 	const collections = useCollections();
@@ -353,6 +357,14 @@ export function PresetsBar({
 				return (
 					<PresetBarItem
 						key={preset.id}
+						workspaceId={workspace.id}
+						hostUrl={hostUrl}
+						onViewUsage={() =>
+							void navigate({
+								to: "/settings/usage",
+								search: { workspaceId: workspace.id, agent: "codex" },
+							})
+						}
 						preset={preset}
 						visibleIndex={visibleIndex}
 						hotkeyId={hotkeyId}
