@@ -244,6 +244,8 @@ export const Composer = memo(function Composer({
 	const { storedDraft, onDraftChange, clearDraft, takeDraft } =
 		useComposerDraft(draftKey, draftPersisted);
 	const [editorResets, setEditorResets] = useState(0);
+	const blockedDraftSink = useRef(onDraftBlocked);
+	blockedDraftSink.current = readOnly ? onDraftBlocked : undefined;
 	useLayoutEffect(() => {
 		if (!readOnly || !onDraftBlocked) return;
 		const draft = takeDraft();
@@ -570,7 +572,9 @@ export const Composer = memo(function Composer({
 					),
 				};
 				const input = promptInputRef.current;
-				if (input) input.restoreDraft(restored);
+				const sink = blockedDraftSink.current;
+				if (sink) sink(restored);
+				else if (input) input.restoreDraft(restored);
 				else prependToDraft(draftKey, [restored]);
 				return;
 			}
