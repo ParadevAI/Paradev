@@ -14509,11 +14509,6 @@ msgstr "内存不足"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "内存不足：机器即将无响应。{sizeName} 有 {memoryGb} GB 内存。"
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "内存不足：为保持运行，机器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 内存。"
-
 msgid "Out of scope"
 msgstr "超出范围"
 
@@ -19383,11 +19378,6 @@ msgstr "已停止"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "已停止"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "已停止 {0}（{1} GB）以释放内存"
 
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"

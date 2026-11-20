@@ -14509,11 +14509,6 @@ msgstr "Mémoire saturée"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Mémoire saturée : la machine est sur le point de ne plus répondre. {sizeName} dispose de {memoryGb} Go."
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Mémoire saturée : la machine a arrêté {0} ({1} Go) pour continuer à fonctionner. {sizeName} dispose de {memoryGb} Go."
-
 msgid "Out of scope"
 msgstr "Hors périmètre"
 
@@ -19383,11 +19378,6 @@ msgstr "Arrêté"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Arrêté"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "{0} ({1} Go) arrêté pour libérer de la mémoire"
 
 msgid "Stopped by the usage limit"
 msgstr "Arrêté par la limite d'utilisation"

@@ -14503,11 +14503,6 @@ msgstr "Бракує пам'яті"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Бракує пам'яті: машина ось-ось перестане відповідати. У {sizeName} {memoryGb} ГБ."
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Бракує пам'яті: машина зупинила {0} ({1} ГБ), щоб і далі працювати. У {sizeName} {memoryGb} ГБ."
-
 msgid "Out of scope"
 msgstr "Поза скоупом"
 
@@ -19377,11 +19372,6 @@ msgstr "Зупинено"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Зупинено"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "Зупинено {0} ({1} ГБ), щоб звільнити пам'ять"
 
 msgid "Stopped by the usage limit"
 msgstr "Зупинено через ліміт використання"
