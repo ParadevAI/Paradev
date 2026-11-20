@@ -686,7 +686,7 @@ function periodList(state: BillingState, member = false): CloudPeriods {
 			metrics: total(member ? rows.filter(isMember) : rows),
 		};
 	});
-	return { items, nextCursor: null };
+	return { items, nextCursor: null, ratePerGbHour: RATE };
 }
 
 const noop = () => undefined;
@@ -748,7 +748,11 @@ export function overviewArgs(
 /** An organization with no billing periods: the last 30 days, priced at the list rate. */
 export function noPeriodsArgs() {
 	return {
-		periods: query<CloudPeriods>({ items: [], nextCursor: null }),
+		periods: query<CloudPeriods>({
+			items: [],
+			nextCursor: null,
+			ratePerGbHour: RATE,
+		}),
 		period: undefined,
 		...overviewQueries(
 			fleet(NORTHWIND_SEEDS, 3100, LAST_30_DAYS),

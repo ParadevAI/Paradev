@@ -140,6 +140,12 @@ export const cloudPeriodsOutputSchema = z.object({
 			start: z.date(),
 			end: z.date(),
 			closed: z.boolean(),
+			/**
+			 * Deprecated: the dollar fields `usedUsd`, `includedUsd`, `overageUsd`, `bought.usedUsd`,
+			 * `bought.totalUsd`, `freeCredits.usedUsd`, `freeCredits.totalUsd` and `extraUsageLimit.usd`.
+			 * Desktop 2.0.10 reads all eight; remove them together once the desktop floor is past it.
+			 * Price with `ratePerGbHour`.
+			 */
 			allowance: z
 				.object({
 					includedGbHours: z.number().nullable(),
@@ -166,4 +172,6 @@ export const cloudPeriodsOutputSchema = z.object({
 		}),
 	),
 	nextCursor: z.iso.date().nullable(),
+	/** The organization's price of one GB-hour; null when it is not known, and then no amount has a price. */
+	ratePerGbHour: z.number().nullable(),
 });
