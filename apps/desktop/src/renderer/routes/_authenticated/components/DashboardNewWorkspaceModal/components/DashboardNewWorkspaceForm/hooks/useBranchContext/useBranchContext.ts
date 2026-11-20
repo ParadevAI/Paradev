@@ -50,7 +50,6 @@ export function useBranchContext(
 			localHostUrl,
 			cloudRepository?.owner,
 			cloudRepository?.name,
-			query,
 		],
 		enabled: isCloud && !!localHostUrl && !!cloudRepository,
 		queryFn: async () => {
@@ -58,7 +57,6 @@ export function useBranchContext(
 			return client.workspaceCreation.searchRemoteBranches.query({
 				owner: cloudRepository?.owner as string,
 				repo: cloudRepository?.name as string,
-				query: query || undefined,
 			});
 		},
 	});
@@ -91,9 +89,13 @@ export function useBranchContext(
 		},
 	});
 
-	const cloudRows = useMemo<BranchRow[]>(
-		() =>
-			(cloudBranches.data?.items ?? []).map((name) => ({
+	const cloudRows = useMemo<BranchRow[]>(() => {
+		// All branches are fetched once and filtered here: a repo can have
+		// thousands, and one request per keystroke would page through them all.
+		const needle = query.trim().toLowerCase();
+		return (cloudBranches.data?.items ?? [])
+			.filter((name) => !needle || name.toLowerCase().includes(needle))
+			.map((name) => ({
 				name,
 				lastCommitDate: 0,
 				isLocal: false,
@@ -102,9 +104,8 @@ export function useBranchContext(
 				worktreePath: null,
 				hasWorkspace: false,
 				isCheckedOut: false,
-			})),
-		[cloudBranches.data],
-	);
+			}));
+	}, [cloudBranches.data, query]);
 
 	const pages = q.data?.pages as BranchPage[] | undefined;
 	const branches = useMemo<BranchRow[]>(
