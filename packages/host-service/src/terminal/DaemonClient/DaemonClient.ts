@@ -67,6 +67,7 @@ interface SessionCallbacks {
 	replayComplete: Set<(modes: TerminalModesSnapshot) => void>;
 	replay?: ReplayCompletion;
 	exit: Set<(info: ExitInfo) => void>;
+	staleSubscribeAnswers: number;
 }
 
 export interface DaemonClientOptions {
@@ -93,6 +94,7 @@ export class DaemonClient {
 	private socket: net.Socket | null = null;
 	private decoder = new FrameDecoder();
 	private readonly callbacks = new Map<string, SessionCallbacks>();
+	private readonly unansweredSubscribes = new Map<string, number>();
 	private readonly disconnectCbs = new Set<(err?: Error) => void>();
 	private daemonVersion = "";
 	private negotiated: number | null = null;
@@ -241,7 +243,12 @@ export class DaemonClient {
 		let entry = this.callbacks.get(id);
 		const wasFirst = !entry;
 		if (!entry) {
-			entry = { output: new Set(), exit: new Set(), replayComplete: new Set() };
+			entry = {
+				output: new Set(),
+				exit: new Set(),
+				replayComplete: new Set(),
+				staleSubscribeAnswers: this.unansweredSubscribes.get(id) ?? 0,
+			};
 			this.callbacks.set(id, entry);
 		}
 		if (cb.onReplayComplete) entry.replayComplete.add(cb.onReplayComplete);
@@ -271,6 +278,11 @@ export class DaemonClient {
 					replay: wasFirst && opts.replay,
 					...(this.modeSnapshots ? { modeSnapshot: true } : {}),
 				});
+				if (this.modeSnapshots)
+					this.unansweredSubscribes.set(
+						id,
+						(this.unansweredSubscribes.get(id) ?? 0) + 1,
+					);
 			} catch (error) {
 				entry.replay?.reject(error as Error);
 				this.callbacks.delete(id);
@@ -494,9 +506,15 @@ export class DaemonClient {
 		for (const frame of frames) {
 			const msg = frame.message as ServerMessage;
 			if (msg.type === "error" && msg.id) {
-				this.callbacks.get(msg.id)?.replay?.reject(new Error(msg.message));
+				// The daemon fails a subscribe only with ENOENT.
+				if (msg.code === "ENOENT" && this.unansweredSubscribes.has(msg.id)) {
+					if (!this.answerSubscribe(msg.id))
+						this.callbacks.get(msg.id)?.replay?.reject(new Error(msg.message));
+					continue;
+				}
 			}
 			if (msg.type === "replay-complete") {
+				if (this.answerSubscribe(msg.id)) continue;
 				const entry = this.callbacks.get(msg.id);
 				if (entry?.replay?.status !== "pending") continue;
 				try {
@@ -509,6 +527,7 @@ export class DaemonClient {
 			}
 			// Route session-keyed events to subscriber callbacks.
 			if (msg.type === "output" && this.callbacks.has(msg.id)) {
+				if (this.callbacks.get(msg.id)?.staleSubscribeAnswers) continue;
 				if (frame.payload) {
 					// Hand the bytes to subscribers as a Buffer view; same shape
 					// they got pre-binary-tail when we base64-decoded into Buffer.
@@ -535,6 +554,19 @@ export class DaemonClient {
 			// helpers can pick it up.
 			for (const l of this.adhocListeners) l(msg);
 		}
+	}
+
+	// The daemon answers a subscribe with replay-complete, or with an error
+	// when the id is unknown. Returns true when the answer is for a subscribe
+	// sent before the current subscriber registered.
+	private answerSubscribe(id: string): boolean {
+		const unanswered = this.unansweredSubscribes.get(id) ?? 0;
+		if (unanswered > 1) this.unansweredSubscribes.set(id, unanswered - 1);
+		else this.unansweredSubscribes.delete(id);
+		const entry = this.callbacks.get(id);
+		if (!entry?.staleSubscribeAnswers) return false;
+		entry.staleSubscribeAnswers--;
+		return true;
 	}
 
 	private rejectPendingReplays(error: Error): void {
