@@ -1,8 +1,9 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
+import type { Fetch } from "./fetch";
 import { fetchStarHistory } from "./star-history";
 
 const originalFetch = globalThis.fetch;
-const fake = (impl: (...args: Parameters<typeof fetch>) => Promise<Response>) =>
+const fake = (impl: Fetch) =>
 	Object.assign(impl, { preconnect: originalFetch.preconnect });
 afterEach(() => {
 	globalThis.fetch = originalFetch;

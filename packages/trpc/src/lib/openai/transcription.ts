@@ -1,3 +1,5 @@
+import type { Fetch } from "../fetch";
+
 const TRANSCRIPTIONS_URL = "https://api.openai.com/v1/audio/transcriptions";
 
 export interface TranscribeAudioInput {
@@ -22,9 +24,7 @@ export class TranscriptionError extends Error {
 
 export async function transcribeAudio(
 	input: TranscribeAudioInput,
-	fetchImpl: (
-		...args: Parameters<typeof fetch>
-	) => ReturnType<typeof fetch> = fetch,
+	fetchImpl: Fetch = fetch,
 ): Promise<string> {
 	const form = new FormData();
 	form.append("model", input.model);

@@ -1,4 +1,5 @@
 import type { RealtimeFunctionTool } from "@superset/shared/voice";
+import type { Fetch } from "../fetch";
 
 const CLIENT_SECRETS_URL = "https://api.openai.com/v1/realtime/client_secrets";
 
@@ -35,9 +36,7 @@ export class RealtimeMintError extends Error {
 
 export async function mintRealtimeClientSecret(
 	input: MintRealtimeSecretInput,
-	fetchImpl: (
-		...args: Parameters<typeof fetch>
-	) => ReturnType<typeof fetch> = fetch,
+	fetchImpl: Fetch = fetch,
 ): Promise<RealtimeClientSecret> {
 	const response = await fetchImpl(CLIENT_SECRETS_URL, {
 		method: "POST",
