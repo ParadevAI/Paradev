@@ -254,6 +254,8 @@ export interface PlanFamily {
 	yearly: CatalogPlan | null;
 	legacy: CatalogPlan[];
 	gbMinutesPerSeat: number | null;
+	/** The GB-hours per seat the family is sold with; null where it is not sold with cloud. */
+	advertisedGbHoursPerSeat: number | null;
 	overagePerGbHour: number | null;
 	pack: GbHourPack | null;
 	environments: number | null;
@@ -329,13 +331,17 @@ function catalogPlan(
 	return { id: plan.id, name: plan.name, interval, seatPrice: price.amount };
 }
 
+/** The Autumn features a cloud workspace boot is billed on; also the usage events' features. */
+export const BOX_GB_MINUTES_FEATURE_ID = "box_gb_minutes";
+export const ACTIVE_CPU_MINUTES_FEATURE_ID = "active_cpu_minutes";
+
 function gbMinutesPerSeat(
 	plan: AutumnCatalogPlan,
 	plans: AutumnCatalogPlan[],
 ): number | null {
 	return positiveNumber(
 		seatLicensePlan(plan, plans)?.items.find(
-			(item) => item.featureId === "box_gb_minutes",
+			(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID,
 		)?.included,
 	);
 }
@@ -350,7 +356,8 @@ function environmentLimit(plan: AutumnCatalogPlan): number | null {
 export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
 	const price = plan.items.find(
 		(item) =>
-			item.featureId === "box_gb_minutes" && item.price?.interval === "month",
+			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+			item.price?.interval === "month",
 	)?.price;
 	if (price?.amount == null) return null;
 	return (price.amount * 60) / (price.billingUnits ?? 1);
@@ -360,7 +367,8 @@ export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
 export function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
 	const price = plan.items.find(
 		(item) =>
-			item.featureId === "box_gb_minutes" && item.price?.interval === "one_off",
+			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+			item.price?.interval === "one_off",
 	)?.price;
 	const gbMinutes = positiveNumber(price?.billingUnits);
 	const amount = positiveNumber(price?.amount);
@@ -420,6 +428,9 @@ export function gbHourPackPricePerGbHour(pack: GbHourPack): number {
 }
 
 /** The purchasable lineup, one entry per family, ordered for display. */
+/** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
+const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
+
 export function planCatalogFromAutumn(
 	plans: AutumnCatalogPlan[],
 ): PlanFamily[] {
@@ -436,6 +447,7 @@ export function planCatalogFromAutumn(
 			yearly: null,
 			legacy: [],
 			gbMinutesPerSeat: null,
+			advertisedGbHoursPerSeat: null,
 			overagePerGbHour: null,
 			pack: null,
 			environments: null,
@@ -452,6 +464,11 @@ export function planCatalogFromAutumn(
 				Number.POSITIVE_INFINITY,
 		);
 		family.gbMinutesPerSeat ??= gbMinutesPerSeat(plan, plans);
+		family.advertisedGbHoursPerSeat =
+			family.gbMinutesPerSeat === null ||
+			FAMILIES_WITHOUT_ADVERTISED_CLOUD.includes(key)
+				? null
+				: family.gbMinutesPerSeat / 60;
 		family.overagePerGbHour ??= overagePerGbHour(plan);
 		family.pack ??= gbHourPack(plan);
 		family.environments ??= environmentLimit(plan);
@@ -503,14 +520,6 @@ export function seatPricePerMonth(family: PlanFamily, yearly: boolean): number {
 	const plan = planForInterval(family, yearly);
 	if (!plan) return 0;
 	return plan.interval === "year" ? plan.seatPrice / 12 : plan.seatPrice;
-}
-
-const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
-
-/** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
-export function advertisedGbMinutesPerSeat(family: PlanFamily): number | null {
-	if (FAMILIES_WITHOUT_ADVERTISED_CLOUD.includes(family.family)) return null;
-	return family.gbMinutesPerSeat;
 }
 
 export function familyForPlan(

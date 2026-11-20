@@ -1,7 +1,9 @@
 import { db } from "@superset/db/client";
 import { members, subscriptions } from "@superset/db/schema";
 import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
 	AUTO_TOPUP_MONTHLY_LIMIT,
+	BOX_GB_MINUTES_FEATURE_ID,
 	GB_HOUR_PURCHASE,
 	gbHourPack,
 	gbHourPurchase,
@@ -34,10 +36,6 @@ import {
 	heldAutumnPlanId,
 } from "./customer";
 import { paidPlanIdFromFlags } from "./entitlements";
-import {
-	ACTIVE_CPU_MINUTES_FEATURE_ID,
-	BOX_GB_MINUTES_FEATURE_ID,
-} from "./features";
 import { invalidateOrganizationBilling } from "./plan-state";
 import { syncOrganizationSubscription } from "./projection";
 import {

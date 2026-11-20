@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type AutumnCatalogPlan,
-	advertisedGbMinutesPerSeat,
 	catalogPlansFrom,
 	defaultMachineSize,
 	familyForPlan,
@@ -264,8 +263,10 @@ describe("planCatalogFromAutumn", () => {
 		const [pro, ultra] = lineup;
 		if (!pro || !ultra) throw new Error("lineup");
 		expect(pro.gbMinutesPerSeat).toBe(19200);
-		expect(advertisedGbMinutesPerSeat(pro)).toBeNull();
-		expect(advertisedGbMinutesPerSeat(ultra)).toBe(ultra.gbMinutesPerSeat);
+		expect(pro.advertisedGbHoursPerSeat).toBeNull();
+		expect(ultra.advertisedGbHoursPerSeat).toBe(
+			(ultra.gbMinutesPerSeat ?? 0) / 60,
+		);
 	});
 
 	test("a GB-hour purchase rounds up to whole pack units, never past the maximum", () => {

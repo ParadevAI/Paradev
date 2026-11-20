@@ -20,6 +20,8 @@ function family(
 			: null,
 		legacy: [],
 		gbMinutesPerSeat,
+		advertisedGbHoursPerSeat:
+			id === "pro" || gbMinutesPerSeat === null ? null : gbMinutesPerSeat / 60,
 		overagePerGbHour: null,
 		pack: null,
 		environments: null,

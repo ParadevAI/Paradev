@@ -19,6 +19,8 @@ function family(
 		yearly: null,
 		legacy: [],
 		gbMinutesPerSeat,
+		advertisedGbHoursPerSeat:
+			key === "pro" || gbMinutesPerSeat === null ? null : gbMinutesPerSeat / 60,
 		overagePerGbHour: 0.06,
 		pack: gbMinutesPerSeat ? { gbMinutes: 1000, price: 1 } : null,
 		environments,

@@ -1,9 +1,3 @@
-import type { CloudUsageFeature } from "@superset/db/enums";
-
-export const BOX_GB_MINUTES_FEATURE_ID =
-	"box_gb_minutes" satisfies CloudUsageFeature;
-export const ACTIVE_CPU_MINUTES_FEATURE_ID =
-	"active_cpu_minutes" satisfies CloudUsageFeature;
 export const SEATS_FEATURE_ID = "seats";
 export const ENVIRONMENTS_FEATURE_ID = "environments";
 export const PRO_ACCESS_FEATURE_ID = "pro_access";

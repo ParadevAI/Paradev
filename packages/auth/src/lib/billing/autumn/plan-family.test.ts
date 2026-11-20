@@ -11,6 +11,8 @@ function family(key: string, name: string, gbMinutesPerSeat: number | null) {
 		yearly: null,
 		legacy: [],
 		gbMinutesPerSeat,
+		advertisedGbHoursPerSeat:
+			key === "pro" || gbMinutesPerSeat === null ? null : gbMinutesPerSeat / 60,
 		overagePerGbHour: null,
 		pack: null,
 		environments: null,
