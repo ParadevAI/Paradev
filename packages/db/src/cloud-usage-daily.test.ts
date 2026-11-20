@@ -277,3 +277,27 @@ describe("cloud_usage_daily trigger", () => {
 		]);
 	});
 });
+
+describe("cloud_billing_day_start", () => {
+	test("is Pacific midnight on both sides of each daylight-saving change, and cloud_billing_day undoes it", async () => {
+		const { rows } = await db.execute<{
+			day: string;
+			start: string;
+			back: string;
+		}>(sql`
+			select d::text as day,
+				to_char(public.cloud_billing_day_start(d) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI') as start,
+				public.cloud_billing_day(public.cloud_billing_day_start(d))::text as back
+			from unnest(array['2026-03-07', '2026-03-08', '2026-03-09', '2026-10-31', '2026-11-01', '2026-11-02']::date[]) d
+			order by d`);
+		expect(rows.map(({ day, start }) => [day, start])).toEqual([
+			["2026-03-07", "2026-03-07T08:00"],
+			["2026-03-08", "2026-03-08T08:00"],
+			["2026-03-09", "2026-03-09T07:00"],
+			["2026-10-31", "2026-10-31T07:00"],
+			["2026-11-01", "2026-11-01T07:00"],
+			["2026-11-02", "2026-11-02T08:00"],
+		]);
+		for (const { day, back } of rows) expect(back).toBe(day);
+	});
+});
