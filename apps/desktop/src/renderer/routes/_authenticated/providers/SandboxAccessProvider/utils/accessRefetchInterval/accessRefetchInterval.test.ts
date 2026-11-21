@@ -4,6 +4,7 @@ import {
 	accessRefetchInterval,
 	createFailureStreak,
 	MAX_ERROR_RETRY_MS,
+	wakeRefetchInterval,
 } from "./accessRefetchInterval";
 
 const NOW = 1_000_000;
@@ -24,11 +25,29 @@ describe("accessRefetchInterval", () => {
 	test.each([
 		"FORBIDDEN",
 		"INTERNAL_SERVER_ERROR",
+		"TIMEOUT",
 	])("a %s retries soon, then backs off to the cap", (code) => {
 		const after = (consecutiveFailures: number) =>
 			accessRefetchInterval(
 				{ error: { data: { code } }, consecutiveFailures },
 				NOW,
+			);
+		expect(after(1)).toBe(ACCESS_RETRY_MS);
+		expect(after(3)).toBe(4 * ACCESS_RETRY_MS);
+		expect(after(50)).toBe(MAX_ERROR_RETRY_MS);
+	});
+});
+
+describe("wakeRefetchInterval", () => {
+	test("a successful wake keeps its normal keepalive interval", () => {
+		expect(wakeRefetchInterval({}, 10 * 60_000)).toBe(10 * 60_000);
+	});
+
+	test("a timed-out wake retries promptly with bounded backoff", () => {
+		const after = (consecutiveFailures: number) =>
+			wakeRefetchInterval(
+				{ error: { data: { code: "TIMEOUT" } }, consecutiveFailures },
+				10 * 60_000,
 			);
 		expect(after(1)).toBe(ACCESS_RETRY_MS);
 		expect(after(3)).toBe(4 * ACCESS_RETRY_MS);

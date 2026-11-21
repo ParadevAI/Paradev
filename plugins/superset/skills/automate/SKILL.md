@@ -5,7 +5,7 @@ argument-hint: describe the recurring task
 allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
-# Superset Automate
+# Paradev Automate
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
@@ -28,6 +28,7 @@ A page is identified by its workspace plus its path, so **which target you picke
 
 - `superset projects list`: a project target creates a fresh workspace per run (most tasks)
 - `superset workspaces list --local`: a workspace target reuses the same workspace every run (stateful tasks)
+- `superset environments list`: finds an environment id; pass it to `automations create --environment <id>` to start each run in a fresh cloud workspace, so runs do not need this machine awake
 
 ## 3. Pick what fires it
 

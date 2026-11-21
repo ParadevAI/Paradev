@@ -1,0 +1,1 @@
+export { getCharacterOffsetAtPoint } from "./getCharacterOffsetAtPoint";

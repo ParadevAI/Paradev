@@ -10,8 +10,11 @@ import type Stripe from "stripe";
 import { z } from "zod";
 import { env } from "../../env";
 import { organizationEnvironmentLimit } from "../../lib/billing/plan";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { countEnvironments } from "../environment/limit";
+import { requireActiveOrgRole } from "../utils/active-org";
+import { recordUpgradeIntent } from "./upgrade-nudge";
+import { upgradeNudgeDeps } from "./upgrade-nudge-deps";
 
 function subtractMonthsClamped(date: Date, months: number) {
 	const result = new Date(date);
@@ -135,7 +138,21 @@ async function isBillingOwner(userId: string, organizationId: string) {
 }
 
 export const billingRouter = {
-	activePlan: protectedProcedure.query(async ({ ctx }) => {
+	recordUpgradeIntent: personProcedure
+		.input(z.object({ feature: z.string().trim().min(1).max(64) }))
+		.mutation(async ({ ctx, input }) => {
+			await recordUpgradeIntent(
+				{
+					user: ctx.session.user,
+					organizationId: ctx.activeOrganizationId,
+					feature: input.feature,
+				},
+				upgradeNudgeDeps,
+			);
+			return { ok: true as const };
+		}),
+
+	activePlan: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		const billingProvider = billingUsesAutumn
 			? ("autumn" as const)
@@ -210,16 +227,17 @@ export const billingRouter = {
 		};
 	}),
 
-	cloudUsage: protectedProcedure.query(
+	cloudUsage: personProcedure.query(
 		async ({ ctx }): Promise<CloudUsage | null> => {
 			const activeOrgId = ctx.activeOrganizationId;
-			if (!billingUsesAutumn || !activeOrgId) return null;
-			const billing = await organizationBilling(activeOrgId);
-			return billing.cloudUsage ?? null;
+			if (!activeOrgId) return null;
+			if (!(await requireActiveOrgRole(ctx)).isAdmin) return null;
+			if (!billingUsesAutumn) return null;
+			return (await organizationBilling(activeOrgId)).cloudUsage ?? null;
 		},
 	),
 
-	environmentUsage: protectedProcedure.query(
+	environmentUsage: personProcedure.query(
 		async ({ ctx }): Promise<{ used: number; limit: number | null } | null> => {
 			const activeOrgId = ctx.activeOrganizationId;
 			if (!activeOrgId) return null;
@@ -234,7 +252,7 @@ export const billingRouter = {
 		},
 	),
 
-	invoices: protectedProcedure.query(async ({ ctx }) => {
+	invoices: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		if (!activeOrgId) {
 			throw userError({
@@ -272,7 +290,7 @@ export const billingRouter = {
 	 * "Pay now" link on the payment-failure surfaces, which otherwise can only
 	 * say that something failed.
 	 */
-	outstandingInvoice: protectedProcedure.query(async ({ ctx }) => {
+	outstandingInvoice: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		if (!activeOrgId) {
 			throw userError({
@@ -306,7 +324,7 @@ export const billingRouter = {
 		return toInvoiceSummary(unpaid, { includeHostedUrl: isOwner });
 	}),
 
-	details: protectedProcedure.query(async ({ ctx }) => {
+	details: personProcedure.query(async ({ ctx }) => {
 		const stripeCustomerId = await requireOwnerWithCustomer(ctx);
 		if (!stripeCustomerId) return null;
 
@@ -365,7 +383,7 @@ export const billingRouter = {
 		};
 	}),
 
-	portal: protectedProcedure
+	portal: personProcedure
 		.input(
 			z.object({
 				flowType: z

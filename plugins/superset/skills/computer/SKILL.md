@@ -5,7 +5,7 @@ argument-hint: the app and what to do in it
 allowed-tools: Bash(cua-driver:*) Bash(peekaboo:*) Bash(superset pages publish:*) Bash(paradev pages publish:*)
 ---
 
-# Superset Computer Control
+# Paradev Computer Control
 
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
@@ -19,8 +19,8 @@ for Cua Driver, the default.
 
 ## Choose the right surface
 
-- Use this skill for native apps, OS UI, and browser windows outside Superset.
-- Use `superset:browser` for Superset's in-app browser pane.
+- Use this skill for native apps, OS UI, and browser windows outside Paradev.
+- Use `superset:browser` for Paradev's in-app browser pane.
 - Prefer an application API, purpose-built CLI, or direct filesystem operation
   when the requested result does not require GUI interaction.
 

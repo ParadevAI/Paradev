@@ -1,0 +1,1 @@
+export { UsageByPerson } from "./UsageByPerson";

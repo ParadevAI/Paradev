@@ -41,12 +41,12 @@ describe("storeAgentImage", () => {
 			cwd,
 		);
 		expect(first?.path).toMatch(
-			/^\.superset\/attachments\/image-[0-9a-f]{12}\.png$/,
+			/^\.paradev\/attachments\/image-[0-9a-f]{12}\.png$/,
 		);
 		expect(again?.path).toMatch(
-			/^\.superset\/attachments\/shot-[0-9a-f]{12}\.png$/,
+			/^\.paradev\/attachments\/shot-[0-9a-f]{12}\.png$/,
 		);
-		const dir = join(cwd, ".superset", "attachments");
+		const dir = join(cwd, ".paradev", "attachments");
 		expect(readdirSync(dir).sort()).toEqual(
 			[".gitignore", first?.path.split("/").pop(), again?.path.split("/").pop()]
 				.filter((entry): entry is string => Boolean(entry))
@@ -68,13 +68,13 @@ describe("storeAgentImage", () => {
 			cwd,
 		);
 		expect(copied?.path).toMatch(
-			/^\.superset\/attachments\/home_page-[0-9a-f]{12}\.png$/,
+			/^\.paradev\/attachments\/home_page-[0-9a-f]{12}\.png$/,
 		);
 		expect(
 			readFileSync(join(cwd, copied?.path ?? "")).equals(Buffer.from(PNG)),
 		).toBe(true);
 
-		const dir = join(cwd, ".superset", "attachments");
+		const dir = join(cwd, ".paradev", "attachments");
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(join(dir, "upload.png"), PNG);
 		expect(
@@ -82,7 +82,7 @@ describe("storeAgentImage", () => {
 				{ kind: "file", mimeType: "image/png", path: join(dir, "upload.png") },
 				cwd,
 			)?.path,
-		).toMatch(/^\.superset\/attachments\/upload-[0-9a-f]{12}\.png$/);
+		).toMatch(/^\.paradev\/attachments\/upload-[0-9a-f]{12}\.png$/);
 	});
 
 	it.each([
@@ -90,7 +90,7 @@ describe("storeAgentImage", () => {
 		"attachments",
 	])("skips an over-cap file in %s", (location) => {
 		const dir =
-			location === "outside" ? outside : join(cwd, ".superset", "attachments");
+			location === "outside" ? outside : join(cwd, ".paradev", "attachments");
 		mkdirSync(dir, { recursive: true });
 		const linked = join(dir, "huge.png");
 		writeFileSync(linked, PNG);
@@ -103,11 +103,11 @@ describe("storeAgentImage", () => {
 			),
 		).toBe(null);
 		if (location === "outside")
-			expect(existsSync(join(cwd, ".superset"))).toBe(false);
+			expect(existsSync(join(cwd, ".paradev"))).toBe(false);
 	});
 
 	it("rejects non-files even when they already live in the attachments directory", () => {
-		const path = join(cwd, ".superset", "attachments", "directory.png");
+		const path = join(cwd, ".paradev", "attachments", "directory.png");
 		mkdirSync(path, { recursive: true });
 		expect(
 			storeAgentImage({ kind: "file", mimeType: "image/png", path }, cwd),
@@ -115,8 +115,8 @@ describe("storeAgentImage", () => {
 	});
 
 	it("rejects files beyond the shared preview size cap", () => {
-		const path = join(cwd, ".superset", "attachments", "large.png");
-		mkdirSync(join(cwd, ".superset", "attachments"), { recursive: true });
+		const path = join(cwd, ".paradev", "attachments", "large.png");
+		mkdirSync(join(cwd, ".paradev", "attachments"), { recursive: true });
 		writeFileSync(path, PNG);
 		const fd = openSync(path, "r+");
 		try {
@@ -134,7 +134,7 @@ describe("storeAgentImage", () => {
 		"attachments",
 	])("restores each tool's stored copy when a source in %s changes or disappears", (location) => {
 		const dir =
-			location === "outside" ? outside : join(cwd, ".superset", "attachments");
+			location === "outside" ? outside : join(cwd, ".paradev", "attachments");
 		mkdirSync(dir, { recursive: true });
 		const path = join(dir, "shot.png");
 		const source = { kind: "file" as const, mimeType: "image/png", path };

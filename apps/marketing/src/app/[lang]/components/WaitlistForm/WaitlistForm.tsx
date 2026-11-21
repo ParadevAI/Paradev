@@ -3,6 +3,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 import { track } from "@/lib/analytics";
+import { trackExternalFormSubmission } from "@/lib/analytics/external-tracking-runtime";
 import { withPosthog } from "@/lib/analytics/lazy";
 
 interface WaitlistFormProps {
@@ -32,6 +33,7 @@ export function WaitlistForm({ heading, description }: WaitlistFormProps) {
 		});
 
 		setSubmitted(true);
+		trackExternalFormSubmission("windows-linux-waitlist", email);
 	}
 
 	if (submitted) {
@@ -41,9 +43,7 @@ export function WaitlistForm({ heading, description }: WaitlistFormProps) {
 					<Trans>You're on the list!</Trans>
 				</h2>
 				<p className="text-sm text-muted-foreground">
-					<Trans>
-						We'll notify you when Windows &amp; Linux support is ready.
-					</Trans>
+					<Trans>We'll notify you when Windows support is ready.</Trans>
 				</p>
 			</div>
 		);

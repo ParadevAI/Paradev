@@ -2,7 +2,7 @@
 
 <img src="apps/desktop/src/resources/build/icons/icon.png" alt="Paradev app icon" width="96" height="96" />
 
-### Paradev
+### Paradev (formerly Superset)
 
 Run Claude Code, Codex, or another CLI agent with terminals, code review, and browser previews in one workspace.
 
@@ -13,6 +13,28 @@ Run Claude Code, Codex, or another CLI agent with terminals, code review, and br
 </p>
 
 </div>
+
+## What is Paradev?
+
+Paradev is an open-source desktop app for running CLI coding agents in parallel, released under the [MIT License](LICENSE.md). Each task gets its own Git worktree, branch, and terminals, so Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, or any other CLI agent can work on several tasks in one repository at the same time.
+
+Paradev is for developers who already use a coding agent in the terminal and want to run more than one task at once, without juggling terminal tabs and branches by hand.
+
+A single agent CLI runs one session in one terminal, and an editor is built around one checkout. Paradev adds the workspace around the agents:
+
+- **One worktree per task**: agents work in separate copies of the repository, on separate branches
+- **Review in the app**: a Changes pane to review, commit, push, and open pull requests, and a pull request pane with checks, review threads, and merge
+- **In-app browser**: preview each workspace's dev server, with ports detected per workspace
+- **Agent status**: the sidebar shows which agent is working, done, or waiting on you
+- **Beyond one machine**: remote hosts, an iPhone and iPad app, and automations that start agents on a schedule or from an event (Pro plan)
+
+Paradev is not a coding agent itself. You bring your own agent subscriptions and API keys, and Paradev does not proxy model calls.
+
+**Platforms**: macOS (Apple Silicon and Intel). Linux as an experimental x64 AppImage. Windows is not yet available.
+
+**Formerly Superset**: Paradev was previously named Superset, and the CLI command is still `superset`. It is unrelated to Apache Superset, the business intelligence tool.
+
+**Paradev vs. alternatives**: [Cursor](https://paradev.com/compare/cursor-alternative) · [Codex app](https://paradev.com/compare/codex-app-alternative) · [Conductor](https://paradev.com/compare/conductor-alternative)
 
 ### Documentation for agents
 
@@ -239,7 +261,7 @@ git clone https://github.com/paradevai/paradev.git
 Then run the development setup from that workspace terminal:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -257,13 +279,13 @@ See [**DEVELOPMENT.md**](./DEVELOPMENT.md) for the full guide: what the setup sc
 
 ## Configuration
 
-Configure workspace setup, teardown, and run scripts in `.superset/config.json`. See [full documentation](https://docs.paradev.com/setup-teardown-scripts).
+Configure workspace setup, teardown, and run scripts in `.paradev/config.json`. See [full documentation](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -301,7 +323,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get 
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -332,4 +354,4 @@ Join the Paradev community to get help, share feedback, and connect with other u
 
 **The desktop app is free forever.** Running agents in parallel on your own machine will never require payment. Anything we charge for will be an optional service on top.
 
-The whole app is in this repo under the [Elastic License 2.0](LICENSE.md): use it, fork it, modify it, self-host it for your team. The only thing off the table is repackaging Paradev itself as a service you sell to others.
+The whole app is in this repo under the [MIT License](LICENSE.md): use it, fork it, modify it, self-host it, and redistribute it.

@@ -1,0 +1,17 @@
+# Collapses a folder, relaunches, and opens it again. The rows are not in the
+# accessibility tree, so the screenshots are the evidence.
+appId: sh.superset.mobile
+---
+- tapOn: "Feature work group, 2 workspaces"
+- takeScreenshot: tag-folders-collapsed
+- stopApp
+- openLink: "superset://expo-development-client/?url=http%3A%2F%2Flocalhost%3A${METRO_PORT}&disableAutoLaunch=1&disableFab=1"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Feature work group, 2 workspaces"
+    timeout: 60000
+- takeScreenshot: tag-folders-collapsed-after-relaunch
+- tapOn: "Feature work group, 2 workspaces"
+- takeScreenshot: tag-folders-expanded

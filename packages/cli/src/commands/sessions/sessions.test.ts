@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { withLocalHostService } from "../../lib/host/test-helpers";
+import createSessionCommand from "./create/command";
 import listSessionsCommand from "./list/command";
 import openSessionCommand from "./open/command";
 import readSessionCommand from "./read/command";
@@ -40,6 +41,12 @@ withLocalHostService("org-1", {
 		readInput = input;
 		return { ok: true, envelopes: [], nextBefore: null };
 	},
+	"sessions.create": () => ({
+		kind: "chat",
+		sessionId: "chat-created",
+		terminalId: "term-2",
+		label: "claude",
+	}),
 	"sessions.resume": (input) => ({
 		kind: "chat",
 		sessionId: input.sessionId === SESSION_ID ? SESSION_ID : "chat-resumed",
@@ -120,6 +127,14 @@ describe("sessions commands", () => {
 		await expect(
 			runCommand(openSessionCommand, { session: "missing-id", print: true }),
 		).rejects.toThrow(/Session not found/);
+	});
+
+	test("create says when no desktop tab could be opened", async () => {
+		const result = (await runCommand(createSessionCommand, {
+			agent: "claude",
+		})) as { data: { openedInDesktop: boolean }; message: string };
+		expect(result.data.openedInDesktop).toBe(false);
+		expect(result.message).toContain("No desktop tab was opened");
 	});
 
 	test("old host missing sessions procedures surfaces update host-service error", async () => {

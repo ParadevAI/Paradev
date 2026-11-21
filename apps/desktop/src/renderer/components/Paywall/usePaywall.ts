@@ -30,14 +30,15 @@ export function usePaywall({
 		return isPaidPlanTier(userPlan);
 	}
 
-	function gateFeature(
+	/** Resolves true once the callback has run, false when the gate stopped it. */
+	function runGatedFeature(
 		feature: GatedFeature,
 		callback: () => void | Promise<void>,
 		context?: Record<string, unknown>,
-	): void {
-		if (resolving.current.has(feature)) return;
+	): Promise<boolean> {
+		if (resolving.current.has(feature)) return Promise.resolve(false);
 		resolving.current.add(feature);
-		void (async () => {
+		return (async () => {
 			try {
 				let plan: PlanTier;
 				try {
@@ -53,7 +54,7 @@ export function usePaywall({
 								"Could not check your plan. Check your connection and try again.",
 						}),
 					);
-					return;
+					return false;
 				}
 				if (isPaidPlanTier(plan)) {
 					try {
@@ -61,22 +62,32 @@ export function usePaywall({
 					} catch (error) {
 						console.error(`[paywall] Callback error for ${feature}:`, error);
 					}
-					return;
+					return true;
 				}
 				showPaywall(feature, {
 					organizationId,
 					userPlan: plan,
 					...context,
 				});
+				return false;
 			} finally {
 				resolving.current.delete(feature);
 			}
 		})();
 	}
 
+	function gateFeature(
+		feature: GatedFeature,
+		callback: () => void | Promise<void>,
+		context?: Record<string, unknown>,
+	): void {
+		void runGatedFeature(feature, callback, context);
+	}
+
 	return {
 		hasAccess,
 		gateFeature,
+		runGatedFeature,
 		userPlan,
 		isReady,
 	};

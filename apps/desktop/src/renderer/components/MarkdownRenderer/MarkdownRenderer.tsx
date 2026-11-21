@@ -1,5 +1,5 @@
 import { cn } from "@superset/ui/utils";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import type { Components } from "react-markdown";
 import { useMarkdownStyle } from "renderer/stores";
 import { SelectionContextMenu } from "./components";
@@ -45,7 +45,7 @@ interface MarkdownRendererProps {
 	components?: Partial<Components>;
 }
 
-export function MarkdownRenderer({
+export const MarkdownRenderer = memo(function MarkdownRenderer({
 	content,
 	style: styleProp,
 	className,
@@ -76,4 +76,4 @@ export function MarkdownRenderer({
 			</div>
 		</SelectionContextMenu>
 	);
-}
+});

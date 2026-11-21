@@ -2,17 +2,17 @@ import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import { useCallback, useState } from "react";
-import { ErrorState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/ErrorState";
-import { FileViewToggle } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/FileViewToggle";
-import { LoadingState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/LoadingState";
-import { SaveErrorBanner } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/SaveErrorBanner";
+import { ErrorState } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/ErrorState";
+import { FileViewToggle } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/FileViewToggle";
+import { LoadingState } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/LoadingState";
+import { SaveErrorBanner } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/components/SaveErrorBanner";
 import {
 	orderForToggle,
 	resolveActivePaneView,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/registry";
-import { splitFrontMatter } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/registry/views/MarkdownPreviewView/splitFrontMatter";
-import type { SharedFileDocument } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/fileDocumentStore";
-import type { FilePaneData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/registry";
+import { splitFrontMatter } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/FilePane/registry/views/MarkdownPreviewView/splitFrontMatter";
+import type { SharedFileDocument } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/state/fileDocumentStore";
+import type { FilePaneData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 
 interface FileEditPaneProps {
 	document: SharedFileDocument;
@@ -92,7 +92,7 @@ export function FileEditPane({ document, filePath }: FileEditPaneProps) {
 			<div className="flex items-center justify-between gap-2 border-b border-border/60 px-2 py-1">
 				{showFrontMatterHint ? (
 					<span className="min-w-0 truncate text-xs text-muted-foreground">
-						<Trans>Front matter hidden — switch to Markdown to edit it</Trans>
+						<Trans>Front matter hidden. Switch to Markdown to edit it</Trans>
 					</span>
 				) : (
 					<span />

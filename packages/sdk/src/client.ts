@@ -218,7 +218,7 @@ const ACCESS_EXPIRY_MARGIN_MS = 60_000;
 const ACCESS_REFRESH_MS = 10 * 60_000;
 
 /**
- * API Client for interfacing with the Superset API.
+ * API Client for interfacing with the Paradev API.
  */
 export class Superset {
 	apiKey: string;
@@ -244,7 +244,7 @@ export class Superset {
 	private _telemetryEnabled = isTelemetryEnabled();
 
 	/**
-	 * API Client for interfacing with the Superset API.
+	 * API Client for interfacing with the Paradev API.
 	 *
 	 * @param {string | undefined} [opts.apiKey=process.env['SUPERSET_API_KEY'] ?? undefined]
 	 * @param {string} [opts.baseURL=process.env['SUPERSET_BASE_URL'] ?? https://api.superset.sh] - Override the default base URL for the API.

@@ -2,29 +2,30 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { getDefaultTerminal } from "@superset/shared/project-config";
 import {
 	getProjectConfigPath,
 	hasConfiguredScripts,
+	loadProjectConfig,
 	loadSetupConfig,
-	resolveScript,
 	shellSingleQuote,
 } from "./config";
 
 interface Sandbox {
 	repoPath: string;
-	homeDir: string;
+	appHomeDir: string;
 	cleanup: () => void;
 }
 
 function createSandbox(): Sandbox {
 	const root = mkdtempSync(join(tmpdir(), "setup-config-test-"));
 	const repoPath = join(root, "repo");
-	const homeDir = join(root, "home");
+	const appHomeDir = join(root, "home");
 	mkdirSync(repoPath, { recursive: true });
-	mkdirSync(homeDir, { recursive: true });
+	mkdirSync(appHomeDir, { recursive: true });
 	return {
 		repoPath,
-		homeDir,
+		appHomeDir,
 		cleanup: () => rmSync(root, { recursive: true, force: true }),
 	};
 }
@@ -50,21 +51,21 @@ function writeRepoLocalConfig(repoPath: string, content: string | object) {
 }
 
 function writeUserOverride(
-	homeDir: string,
+	appHomeDir: string,
 	projectId: string,
 	content: object,
 ) {
-	const dir = join(homeDir, ".superset", "projects", projectId);
+	const dir = join(appHomeDir, "projects", projectId);
 	mkdirSync(dir, { recursive: true });
 	writeFileSync(join(dir, "config.json"), JSON.stringify(content), "utf-8");
 }
 
 function writeUserOverrideByPath(
-	homeDir: string,
+	appHomeDir: string,
 	repoPath: string,
 	content: object,
 ) {
-	const dir = join(homeDir, ".superset", "projects", repoPath);
+	const dir = join(appHomeDir, "projects", repoPath);
 	mkdirSync(dir, { recursive: true });
 	writeFileSync(join(dir, "config.json"), JSON.stringify(content), "utf-8");
 }
@@ -86,7 +87,7 @@ describe("loadSetupConfig", () => {
 		return loadSetupConfig({
 			repoPath: sandbox.repoPath,
 			projectId: args.projectId ?? PROJECT_ID,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 	}
 
@@ -163,7 +164,7 @@ describe("loadSetupConfig", () => {
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			worktreePath,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 
 		// Keys the worktree doesn't define fall through to the repo config.
@@ -177,7 +178,7 @@ describe("loadSetupConfig", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
 		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
 		writeRepoConfig(worktreePath, { setup: ["from-worktree"] });
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, {
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, {
 			setup: ["from-user"],
 		});
 
@@ -185,7 +186,7 @@ describe("loadSetupConfig", () => {
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			worktreePath,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 
 		expect(result?.setup).toEqual(["from-user"]);
@@ -205,7 +206,7 @@ describe("loadSetupConfig", () => {
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
 			worktreePath,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
 		});
 
 		expect(result?.setup).toEqual(["worktree-local", "base"]);
@@ -213,7 +214,7 @@ describe("loadSetupConfig", () => {
 
 	it("resolves the user override by repo path", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
-		writeUserOverrideByPath(sandbox.homeDir, sandbox.repoPath, {
+		writeUserOverrideByPath(sandbox.appHomeDir, sandbox.repoPath, {
 			setup: ["from-path-override"],
 		});
 
@@ -223,10 +224,10 @@ describe("loadSetupConfig", () => {
 
 	it("path-keyed user override wins over the legacy id-keyed one", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
-		writeUserOverrideByPath(sandbox.homeDir, sandbox.repoPath, {
+		writeUserOverrideByPath(sandbox.appHomeDir, sandbox.repoPath, {
 			setup: ["from-path-override"],
 		});
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, {
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, {
 			setup: ["from-id-override"],
 		});
 
@@ -239,7 +240,7 @@ describe("loadSetupConfig", () => {
 			setup: ["bun install"],
 			teardown: ["docker compose down"],
 		});
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, {
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, {
 			setup: ["bun install --frozen-lockfile"],
 		});
 
@@ -255,7 +256,7 @@ describe("loadSetupConfig", () => {
 		// Path-traversal guard: the loader should refuse to expand the override
 		// path for a projectId that looks like a relative path.
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
-		writeUserOverride(sandbox.homeDir, "../escapee", {
+		writeUserOverride(sandbox.appHomeDir, "../escapee", {
 			setup: ["from-override"],
 		});
 		const result = load({ projectId: "../escapee" });
@@ -334,7 +335,7 @@ describe("loadSetupConfig", () => {
 		// repo provides base; user override replaces setup (per-key); local
 		// overlay's `before` then prepends to that merged result.
 		writeRepoConfig(sandbox.repoPath, { setup: ["a"] });
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, { setup: ["b"] });
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, { setup: ["b"] });
 		writeRepoLocalConfig(sandbox.repoPath, {
 			setup: { before: ["pre"] },
 		});
@@ -351,7 +352,7 @@ describe("loadSetupConfig", () => {
 			setup: ["from-repo"],
 			teardown: ["keep-me"],
 		});
-		writeUserOverride(sandbox.homeDir, PROJECT_ID, { setup: [] });
+		writeUserOverride(sandbox.appHomeDir, PROJECT_ID, { setup: [] });
 
 		const result = load();
 		expect(result?.setup).toEqual([]);
@@ -415,7 +416,7 @@ describe("hasConfiguredScripts", () => {
 	});
 });
 
-describe("resolveScript", () => {
+describe("loadProjectConfig with v1 sources", () => {
 	let sandbox: Sandbox;
 
 	beforeEach(() => {
@@ -426,16 +427,28 @@ describe("resolveScript", () => {
 		sandbox.cleanup();
 	});
 
-	function resolve(key: "setup" | "teardown" | "run") {
-		return resolveScript(key, {
+	function load(worktreePath?: string) {
+		const config = loadProjectConfig({
 			repoPath: sandbox.repoPath,
 			projectId: PROJECT_ID,
-			homeDir: sandbox.homeDir,
+			appHomeDir: sandbox.appHomeDir,
+			...(worktreePath && { worktreePath }),
 		});
+		if (config?.kind !== "ok") return null;
+		const terminal = getDefaultTerminal(config.resolved);
+		return {
+			setup: config.resolved.setup,
+			archive: config.resolved.archive,
+			run: terminal
+				? { commands: terminal.commands, cwd: terminal.cwd }
+				: { commands: [] },
+		};
 	}
 
-	function writeFallbackScript(key: string) {
-		const dir = join(sandbox.repoPath, ".superset");
+	const bash = (scriptPath: string) => `bash ${shellSingleQuote(scriptPath)}`;
+
+	function writeFallbackScript(key: string, root = sandbox.repoPath) {
+		const dir = join(root, ".superset");
 		mkdirSync(dir, { recursive: true });
 		const scriptPath = join(dir, `${key}.sh`);
 		writeFileSync(scriptPath, "#!/usr/bin/env bash\n", "utf-8");
@@ -443,109 +456,74 @@ describe("resolveScript", () => {
 	}
 
 	it("returns null when no config and no fallback script exist", () => {
-		expect(resolve("setup")).toBeNull();
-		expect(resolve("teardown")).toBeNull();
-		expect(resolve("run")).toBeNull();
+		expect(load()).toBeNull();
 	});
 
 	it("returns configured commands, filtering empty entries", () => {
 		writeRepoConfig(sandbox.repoPath, {
 			teardown: ["docker compose down", "", "   ", "rm -rf .cache"],
 		});
-		expect(resolve("teardown")).toEqual({
-			kind: "commands",
-			commands: ["docker compose down", "rm -rf .cache"],
-		});
+		expect(load()?.archive.commands).toEqual([
+			"docker compose down",
+			"rm -rf .cache",
+		]);
 	});
 
-	it("only resolves the requested key", () => {
+	it("maps each key to its own section", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["bun install"] });
-		expect(resolve("setup")).toEqual({
-			kind: "commands",
-			commands: ["bun install"],
+		expect(load()).toEqual({
+			setup: { commands: ["bun install"] },
+			archive: { commands: [] },
+			run: { commands: [] },
 		});
-		expect(resolve("teardown")).toBeNull();
-		expect(resolve("run")).toBeNull();
 	});
 
 	it("falls back to <repoPath>/.superset/<key>.sh per key", () => {
 		const setupScript = writeFallbackScript("setup");
 		const teardownScript = writeFallbackScript("teardown");
-		expect(resolve("setup")).toEqual({
-			kind: "script",
-			scriptPath: setupScript,
+		expect(load()).toEqual({
+			setup: { commands: [bash(setupScript)] },
+			archive: { commands: [bash(teardownScript)] },
+			run: { commands: [] },
 		});
-		expect(resolve("teardown")).toEqual({
-			kind: "script",
-			scriptPath: teardownScript,
-		});
-		expect(resolve("run")).toBeNull();
 	});
 
 	it("prefers the worktree script when worktreePath is in scope", () => {
 		writeFallbackScript("teardown");
 		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
-		mkdirSync(join(worktreePath, ".superset"), { recursive: true });
-		const worktreeScript = join(worktreePath, ".superset", "teardown.sh");
-		writeFileSync(worktreeScript, "#!/usr/bin/env bash\n", "utf-8");
-
-		expect(
-			resolveScript("teardown", {
-				repoPath: sandbox.repoPath,
-				projectId: PROJECT_ID,
-				worktreePath,
-				homeDir: sandbox.homeDir,
-			}),
-		).toEqual({ kind: "script", scriptPath: worktreeScript });
+		const worktreeScript = writeFallbackScript("teardown", worktreePath);
+		expect(load(worktreePath)?.archive.commands).toEqual([
+			bash(worktreeScript),
+		]);
 	});
 
 	it("falls back to the main repo script when the worktree has none", () => {
 		const teardownScript = writeFallbackScript("teardown");
-		expect(
-			resolveScript("teardown", {
-				repoPath: sandbox.repoPath,
-				projectId: PROJECT_ID,
-				worktreePath: join(sandbox.repoPath, ".worktrees", "feature"),
-				homeDir: sandbox.homeDir,
-			}),
-		).toEqual({ kind: "script", scriptPath: teardownScript });
+		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
+		expect(load(worktreePath)?.archive.commands).toEqual([
+			bash(teardownScript),
+		]);
 	});
 
 	it("worktree config commands override the main repo's", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["from-repo"] });
 		const worktreePath = join(sandbox.repoPath, ".worktrees", "feature");
 		writeRepoConfig(worktreePath, { setup: ["from-worktree"] });
-
-		expect(
-			resolveScript("setup", {
-				repoPath: sandbox.repoPath,
-				projectId: PROJECT_ID,
-				worktreePath,
-				homeDir: sandbox.homeDir,
-			}),
-		).toEqual({ kind: "commands", commands: ["from-worktree"] });
+		expect(load(worktreePath)?.setup.commands).toEqual(["from-worktree"]);
 	});
 
 	it("configured commands win over the fallback script", () => {
 		writeRepoConfig(sandbox.repoPath, { setup: ["bun install"] });
 		writeFallbackScript("setup");
-		expect(resolve("setup")).toEqual({
-			kind: "commands",
-			commands: ["bun install"],
-		});
+		expect(load()?.setup.commands).toEqual(["bun install"]);
 	});
 
-	it("carries cwd on both command and script resolutions", () => {
+	it("carries cwd on both command and script sections", () => {
 		writeRepoConfig(sandbox.repoPath, { cwd: "apps/web", run: ["bun dev"] });
 		const teardownScript = writeFallbackScript("teardown");
-		expect(resolve("run")).toEqual({
-			kind: "commands",
-			commands: ["bun dev"],
-			cwd: "apps/web",
-		});
-		expect(resolve("teardown")).toEqual({
-			kind: "script",
-			scriptPath: teardownScript,
+		expect(load()?.run).toEqual({ commands: ["bun dev"], cwd: "apps/web" });
+		expect(load()?.archive).toEqual({
+			commands: [bash(teardownScript)],
 			cwd: "apps/web",
 		});
 	});
@@ -558,7 +536,14 @@ describe("shellSingleQuote", () => {
 });
 
 describe("getProjectConfigPath", () => {
-	it("appends .superset/config.json to the repoPath", () => {
-		expect(getProjectConfigPath("/tmp/x")).toBe("/tmp/x/.superset/config.json");
+	it("puts config.json in .paradev for a repo with no config", () => {
+		const repo = mkdtempSync(join(tmpdir(), "config-path-"));
+		try {
+			expect(getProjectConfigPath(repo)).toBe(
+				join(repo, ".paradev", "config.json"),
+			);
+		} finally {
+			rmSync(repo, { recursive: true, force: true });
+		}
 	});
 });

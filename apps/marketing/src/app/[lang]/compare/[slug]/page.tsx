@@ -1,11 +1,20 @@
+import { msg } from "@lingui/core/macro";
+import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
-import { mdxComponents } from "@/app/[lang]/blog/components/mdx-components";
-import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
+import {
+	getMdxComponents,
+	mdxComponents,
+} from "@/app/[lang]/blog/components/mdx-components";
+import {
+	hasLocalizedContent,
+	localeUrl,
+	localizedAlternates,
+} from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import {
 	BreadcrumbJsonLd,
@@ -13,39 +22,63 @@ import {
 	FAQPageJsonLd,
 	ItemListJsonLd,
 } from "@/components/JsonLd";
-import { getComparisonPages } from "@/lib/compare";
+import { extractCompareToc, getComparisonPages } from "@/lib/compare";
 import { getPricedComparisonPage } from "@/lib/compare-prices";
+import { getRelatedComparisonPages } from "@/lib/compare-related";
 import {
+	compareSearchDescription,
+	compareSearchTitle,
 	extractComparisonFaqItems,
 	extractRoundupItems,
 	getComparisonPageTypeLabel,
+	splitComparisonFaq,
 } from "@/lib/compare-utils";
 import { slugify } from "@/lib/content-utils";
+import { LEGACY_PAGE_REDIRECTS } from "@/lib/legacy-redirects";
 import { CompareLayout } from "./components/CompareLayout";
+
+const mdxOptions = { mdxOptions: { remarkPlugins: [remarkGfm] } };
 
 interface PageProps {
 	params: Promise<{ slug: string }>;
 }
 
 export default async function ComparePageRoute({ params }: PageProps) {
-	await initServerI18n();
+	const lang = await initServerI18n();
 
 	const { slug } = await params;
-	const page = await getPricedComparisonPage(slug);
+	const contentLocale = slug === "superset-vs-conductor" ? lang : "en";
+	const page = await getPricedComparisonPage(slug, contentLocale);
 
 	if (!page) {
 		notFound();
 	}
 
-	const url = `${COMPANY.MARKETING_URL}/compare/${slug}`;
+	const url =
+		slug === "superset-vs-conductor"
+			? localeUrl(lang, `/compare/${slug}`)
+			: `${COMPANY.MARKETING_URL}/compare/${slug}`;
+	const { body, faq } = splitComparisonFaq(page.content);
 	const faqItems = extractComparisonFaqItems(page.content);
 	const roundupItems =
 		page.type === "roundup"
 			? extractRoundupItems(page.content).map((item) => ({
 					name: item,
-					url: `${url}#${slugify(item)}`,
+					url: `${url}#${slugify(item, contentLocale)}`,
 				}))
 			: [];
+
+	const related = getRelatedComparisonPages(page, getComparisonPages(), {
+		redirectedPaths: new Set(Object.keys(LEGACY_PAGE_REDIRECTS)),
+	}).map((relatedPage) => ({
+		slug: relatedPage.slug,
+		href:
+			lang !== "en" && hasLocalizedContent(relatedPage.url)
+				? `/${lang}${relatedPage.url}`
+				: relatedPage.url,
+		title: relatedPage.title,
+		type: relatedPage.type,
+	}));
 
 	return (
 		<main>
@@ -74,11 +107,32 @@ export default async function ComparePageRoute({ params }: PageProps) {
 				]}
 			/>
 			{faqItems.length > 0 && <FAQPageJsonLd items={faqItems} />}
-			<CompareLayout page={page}>
+			<CompareLayout
+				page={page}
+				toc={extractCompareToc(page.content, contentLocale)}
+				related={related}
+				faq={
+					faq && (
+						<MDXRemote
+							source={faq}
+							components={
+								slug === "superset-vs-conductor"
+									? getMdxComponents(lang)
+									: mdxComponents
+							}
+							options={mdxOptions}
+						/>
+					)
+				}
+			>
 				<MDXRemote
-					source={page.content}
-					components={mdxComponents}
-					options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+					source={body}
+					components={
+						slug === "superset-vs-conductor"
+							? getMdxComponents(lang)
+							: mdxComponents
+					}
+					options={mdxOptions}
 				/>
 			</CompareLayout>
 		</main>
@@ -96,17 +150,34 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const { slug } = await params;
-	const page = await getPricedComparisonPage(slug);
+	const contentLocale = slug === "superset-vs-conductor" ? lang : "en";
+	const page = await getPricedComparisonPage(slug, contentLocale);
 
 	if (!page) {
 		return {};
 	}
 
 	const url = localeUrl(lang, `/compare/${slug}`);
+	const productName = BRAND.NAME;
+	const formerName = BRAND.FORMER_NAME;
+	const translatedIntroName =
+		contentLocale === "en"
+			? undefined
+			: getI18nInstance(lang)._(
+					msg({ message: `${productName} (formerly ${formerName})` }),
+				);
 
 	return {
-		title: page.title,
-		description: page.description,
+		title: {
+			absolute: compareSearchTitle(
+				page.title,
+				translatedIntroName ? [translatedIntroName] : undefined,
+			),
+		},
+		description: compareSearchDescription(
+			page.description,
+			translatedIntroName,
+		),
 		...(page.keywords.length > 0 && { keywords: page.keywords }),
 		alternates: localizedAlternates(lang, `/compare/${slug}`),
 		openGraph: {

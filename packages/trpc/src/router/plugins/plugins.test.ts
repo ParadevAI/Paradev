@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
-import { connections, pluginInstalls } from "@superset/db/schema";
+import { connections, members, pluginInstalls } from "@superset/db/schema";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
@@ -14,6 +14,8 @@ interface InstallRow {
 	marketplace: string;
 	pluginName: string;
 	manifest: unknown;
+	organizationId?: string;
+	policy?: Record<string, string>;
 }
 
 interface ConnectionRow {
@@ -52,7 +54,11 @@ stub(pluginConnections, {
 stub(db, {
 	select: () => ({
 		from: (table: unknown) => ({
+			leftJoin() {
+				return this;
+			},
 			where: (condition: SQL) => {
+				if (table === members) return rows([{ role: "member" }]);
 				if (table === connections) {
 					return rows(
 						live
@@ -205,6 +211,19 @@ describe("plugins.uninstall", () => {
 	});
 });
 
+describe("plugins.uninstall of an organization install", () => {
+	test("is refused when the organization installs it for the member's role", async () => {
+		installs = [
+			install({ organizationId: "org-1", policy: { member: "installed" } }),
+		];
+
+		await expect(caller.plugins.uninstall({ name: "notion" })).rejects.toThrow(
+			/cannot be uninstalled/,
+		);
+		expect(installs).toHaveLength(1);
+	});
+});
+
 describe("plugins.list", () => {
 	test("a connection without an install shows on its plugin's card, not a second card", async () => {
 		live = [connection("conn-mcp", "notion_mcp")];
@@ -242,5 +261,29 @@ describe("plugins.list", () => {
 		expect(
 			holders.map((plugin) => `${plugin.marketplace}/${plugin.name}`),
 		).toEqual(["acme/notes"]);
+	});
+
+	test("a first-party install does not hide the shared connection from its sibling plugin", async () => {
+		installs = [
+			install({
+				id: "install-gmail",
+				pluginName: "gmail",
+				manifest: {
+					name: "gmail",
+					version: "1.0.0",
+					extensions: { superset: { connector: { slug: "google" } } },
+				},
+			}),
+		];
+		live = [connection("conn-google", "google")];
+
+		const plugins = await caller.plugins.list();
+		const calendar = plugins.find(
+			(plugin) => plugin.name === "google-calendar",
+		);
+
+		expect(calendar?.connections.map((held) => held.id)).toEqual([
+			"conn-google",
+		]);
 	});
 });

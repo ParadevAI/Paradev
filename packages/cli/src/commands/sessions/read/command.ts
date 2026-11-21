@@ -89,9 +89,15 @@ function formatReadMessage(sessionId: string, page: SessionPageResult): string {
 	if (page.envelopes.length === 0) {
 		return `No events in session ${sessionId}`;
 	}
-	const lines = page.envelopes
-		.map(formatEnvelope)
-		.filter((line): line is string => Boolean(line));
+	const turnLines = new Set<string>();
+	const lines = page.envelopes.flatMap((envelope) => {
+		const line = formatEnvelope(envelope);
+		if (!line) return [];
+		if (envelope.event.type !== "turn") return [line];
+		if (turnLines.has(line)) return [];
+		turnLines.add(line);
+		return [line];
+	});
 	const body =
 		lines.length > 0
 			? lines.join("\n")

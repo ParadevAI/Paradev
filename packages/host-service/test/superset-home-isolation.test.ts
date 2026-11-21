@@ -31,7 +31,9 @@ describe("Paradev home isolation", () => {
 		const canonicalHome = canonical(isolated);
 		if (
 			canonicalHome !== canonical(preloadHome) ||
-			canonicalHome === canonical(join(homedir(), ".superset"))
+			[".paradev", ".superset"].some(
+				(dir) => canonicalHome === canonical(join(homedir(), dir)),
+			)
 		) {
 			throw new Error("SUPERSET_HOME_DIR is not isolated for tests");
 		}

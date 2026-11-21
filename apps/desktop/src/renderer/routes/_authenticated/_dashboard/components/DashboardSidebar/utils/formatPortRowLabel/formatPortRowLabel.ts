@@ -1,3 +1,5 @@
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
 import type { PortForward } from "shared/types";
 import type { DashboardSidebarPort } from "../../hooks/useDashboardSidebarPortsData";
 
@@ -15,7 +17,13 @@ export function formatPortRowLabel({
 	if (port.hostType === "local-device") {
 		return { text: `localhost:${port.port}` };
 	}
-	if (!forward) return { text: `${port.port} · remote` };
+	if (!forward) {
+		const where =
+			port.hostType === "cloud"
+				? i18n._(msg({ message: "cloud", context: "port location" }))
+				: i18n._(msg({ message: "remote", context: "port location" }));
+		return { text: `${port.port} · ${where}` };
+	}
 	switch (forward.status.state) {
 		case "active":
 			return forward.status.localPort === port.port

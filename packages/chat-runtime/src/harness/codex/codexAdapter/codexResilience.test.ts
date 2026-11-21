@@ -14,6 +14,7 @@ type Harness = {
 	events: AdapterEvent[];
 	sent: Record<string, unknown>[];
 	receive(frame: unknown): void;
+	exit(code: number): void;
 	settle(): Promise<void>;
 };
 
@@ -70,6 +71,7 @@ function startAdapter(): Harness {
 		events,
 		sent,
 		receive: (frame) => handlers?.onLine(JSON.stringify(frame)),
+		exit: (code) => handlers?.onExit(code, null),
 		settle: async () => {
 			for (let index = 0; index < 6; index += 1) {
 				await new Promise((resolve) => setTimeout(resolve, 0));
@@ -155,6 +157,30 @@ describe("codex adapter resilience", () => {
 });
 
 describe("codex cancel before the turn is running", () => {
+	test("an app-server that exits mid-turn fails the turn", async () => {
+		const harness = startAdapter();
+		await harness.settle();
+		harness.receive({
+			method: "turn/started",
+			params: {
+				threadId: THREAD_ID,
+				turn: { id: TURN_ID, status: "inProgress", startedAt: 1 },
+			},
+		});
+
+		harness.exit(1);
+		await harness.settle();
+
+		const turns = harness.events.flatMap((event) =>
+			event.kind === "turn" ? [event.turn] : [],
+		);
+		expect(turns.at(-1)).toMatchObject({
+			id: TURN_ID,
+			status: "failed",
+			error: { kind: "crashed", message: "codex app-server exited (code 1)" },
+		});
+	});
+
 	test("a cancel raced against turn/start is applied when the turn appears", async () => {
 		const harness = startAdapter();
 		await harness.settle();

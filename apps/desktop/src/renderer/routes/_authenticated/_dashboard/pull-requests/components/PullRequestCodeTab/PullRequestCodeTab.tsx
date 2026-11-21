@@ -6,7 +6,6 @@ import type {
 	SelectedLineRange,
 } from "@pierre/diffs";
 import { CodeView, type CodeViewHandle } from "@pierre/diffs/react";
-import { FileTree as PierreFileTree, useFileTree } from "@pierre/trees/react";
 import { errorMessage } from "@superset/i18n/errors";
 import { useIsTabVisible } from "@superset/panes";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
@@ -20,27 +19,37 @@ import {
 	formatAgentPromptWithFileContext,
 } from "renderer/hooks/host-service/useSendToTerminalAgent";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
+import {
+	agentLaunchPreset,
+	useResolveOpenAsChat,
+} from "renderer/hooks/useResolveOpenAsChat";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import {
-	createPierreTreeStyle,
-	formatDiffStats,
-	PIERRE_TREE_UNSAFE_CSS,
-	type PierreGitStatus,
-} from "renderer/lib/pierreTree";
+import type { FileStatus } from "renderer/lib/pierreTree";
 import type { AgentTarget } from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
-import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
-import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
+import { buildContentKey } from "renderer/routes/_authenticated/_dashboard/utils/buildContentKey";
+import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates/useWorkspaceCreates";
-import { pullRequestReadErrorMessage } from "../../utils/combinePullRequestReadErrors";
+import { usePullRequestThreads } from "../../hooks/usePullRequestThreads";
+import {
+	type PullRequestTarget,
+	pullRequestDiffQueryKey,
+	pullRequestThreadsQueryKey,
+	readPullRequestDiff,
+	replyToPullRequestThread,
+	setPullRequestThreadResolution,
+} from "../../utils/pullRequestClient";
 import { PullRequestCommentComposer } from "./components/PullRequestCommentComposer";
 import { PullRequestCommentThread } from "./components/PullRequestCommentThread";
-import { fetchPullRequestDiff } from "./utils/fetchPullRequestDiff";
+import { PullRequestFileList } from "./components/PullRequestFileList";
+import { getFileItemVersion } from "./utils/getFileItemVersion";
 import { parsePullRequestPatch } from "./utils/parsePullRequestPatch";
 
 interface PullRequestCodeTabProps {
@@ -104,20 +113,8 @@ const DEFAULT_TREE_WIDTH = 288;
 const MIN_TREE_WIDTH = 200;
 const MAX_TREE_WIDTH = 560;
 
-const ITEM_HEIGHT = 24;
-const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: ITEM_HEIGHT,
-	levelIndent: 8,
-});
-
-// Below this window width, the tree+diff split gets cramped enough that a
-// fully-expanded tree (Pierre's "open" default) eats more room than it's
-// worth — default to collapsed so the diff gets the space and the reviewer
-// expands only the folders they need. `useFileTree`'s initialExpansion is
-// a one-time value baked into the tree's store at creation, so this reads
-// window.innerWidth once at mount rather than reactively tracking the
-// pane's own width — a fully reactive re-collapse on resize would need a
-// bulk collapse-all the tree model doesn't expose.
+// Below this window width the file list starts with its folders collapsed.
+// Read once at mount, so a later resize never overrides the reviewer's folds.
 const NARROW_WINDOW_WIDTH_THRESHOLD = 1400;
 // Below this (stricter) *pane* width — this tab's own rendered width, via
 // ResizeObserver, not the window's — even a collapsed-folders tree panel is
@@ -127,10 +124,9 @@ const NARROW_WINDOW_WIDTH_THRESHOLD = 1400;
 // nothing stops it tracking width for the tab's whole lifetime.
 const NARROW_PANE_WIDTH_HIDE_TREE_THRESHOLD = 1150;
 
-// GitHub's diff-file-type vocabulary (from parsePatchFiles) mapped onto
-// Pierre's tree git-status vocabulary — a distinct mapping from
-// FILE_STATUS_TO_PIERRE, which targets local-filesystem status instead.
-const CHANGE_TYPE_TO_PIERRE_STATUS: Record<string, PierreGitStatus> = {
+// GitHub's diff-file-type vocabulary (from parsePatchFiles) mapped onto the
+// git status the changed-file rows and tree render.
+const CHANGE_TYPE_TO_FILE_STATUS: Record<string, FileStatus> = {
 	change: "modified",
 	"rename-pure": "renamed",
 	"rename-changed": "renamed",
@@ -140,8 +136,10 @@ const CHANGE_TYPE_TO_PIERRE_STATUS: Record<string, PierreGitStatus> = {
 
 interface ParsedFileDiff {
 	item: CodeViewItem<PrAnnotationMetadata>;
+	contentKey: string;
 	path: string;
-	status: PierreGitStatus;
+	oldPath?: string;
+	status: FileStatus;
 	additions: number;
 	deletions: number;
 }
@@ -157,10 +155,19 @@ function parseFileDiffs(diff: PullRequestDiff): ParsedFileDiff[] {
 			additions += hunk.additionLines;
 			deletions += hunk.deletionLines;
 		}
+		const contentKey = buildContentKey(fileDiff.name, JSON.stringify(fileDiff));
 		return {
-			item: { id: `${fileDiff.name}-${index}`, type: "diff", fileDiff },
+			item: {
+				id: `${fileDiff.name}-${index}`,
+				type: "diff",
+				// Pierre keys its render cache on cacheKey and falls back to the
+				// file name, which would keep showing a file's old content.
+				fileDiff: { ...fileDiff, cacheKey: contentKey },
+			},
+			contentKey,
 			path: fileDiff.name,
-			status: CHANGE_TYPE_TO_PIERRE_STATUS[fileDiff.type] ?? "modified",
+			oldPath: fileDiff.prevName,
+			status: CHANGE_TYPE_TO_FILE_STATUS[fileDiff.type] ?? "modified",
 			additions,
 			deletions,
 		};
@@ -190,9 +197,10 @@ export function PullRequestCodeTab({
 	// theme's).
 	const isRightPaneArea = useRightPaneLinkTarget() !== null;
 	const { options, style: codeViewStyle } = useDiffCardCodeViewTheme();
-	const codeViewRef = useRef<CodeViewHandle<PrAnnotationMetadata>>(null);
-	const [initialTreeExpansion] = useState<"open" | "closed">(() =>
-		window.innerWidth < NARROW_WINDOW_WIDTH_THRESHOLD ? "closed" : "open",
+	const codeViewRef =
+		useRef<CodeViewHandle<PrAnnotationMetadata, undefined>>(null);
+	const [startTreeCollapsed] = useState(
+		() => window.innerWidth < NARROW_WINDOW_WIDTH_THRESHOLD,
 	);
 	// Tracks this tab's own rendered width, not the window's — the PR list
 	// pane, an app sidebar, or a split view can all make the detail pane
@@ -221,30 +229,8 @@ export function PullRequestCodeTab({
 		(containerWidth != null &&
 			containerWidth < NARROW_PANE_WIDTH_HIDE_TREE_THRESHOLD);
 	const [treeWidth, setTreeWidth] = useState(DEFAULT_TREE_WIDTH);
-	const [composer, setComposer] = useState<ComposerState | null>(null);
-	// Pierre's controlled `items` prop skips reprocessing an item whose
-	// `version` is unchanged from what it last saw (see the version comment
-	// on `items` below) — composer open/close/move doesn't touch
-	// threadsUpdatedAt, so without this the annotation update goes stale:
-	// the composer can silently fail to open, or fail to disappear on
-	// cancel/Escape, whenever a thread hasn't also refetched in between.
-	// Scoped to just the file(s) losing or gaining the composer annotation
-	// (not every file in the diff) so a transition doesn't force Pierre to
-	// reprocess the whole PR. Both refs are written synchronously inside
-	// the event handler, before setComposer, so `items` sees the update on
-	// the very next render — no lag.
-	const composerVersionRef = useRef(0);
-	const composerAffectedPathsRef = useRef<ReadonlySet<string>>(new Set());
-	const updateComposer = useCallback((next: ComposerState | null) => {
-		composerVersionRef.current += 1;
-		setComposer((prev) => {
-			const affected = new Set<string>();
-			if (prev) affected.add(prev.path);
-			if (next) affected.add(next.path);
-			composerAffectedPathsRef.current = affected;
-			return next;
-		});
-	}, []);
+	const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+	const [composer, updateComposer] = useState<ComposerState | null>(null);
 	// Cancel/Escape/successful-submit close, as opposed to updateComposer(null)
 	// from onLineSelectionEnd's !range branch — there Pierre has *already*
 	// cleared its own selection (that's what produced the null range), so
@@ -253,23 +239,13 @@ export function PullRequestCodeTab({
 	const closeComposer = useCallback(() => {
 		updateComposer(null);
 		codeViewRef.current?.clearSelectedLines();
-	}, [updateComposer]);
+	}, []);
 	// Per-file collapse — Pierre's CodeViewDiffItem has a native `collapsed`
-	// field it uses to hide a file's body while keeping its header rendered,
-	// so this only needs to track *which* items are collapsed and bump their
-	// version (same reasoning as composerVersionRef above: Pierre skips an
-	// item whose version didn't change, and toggling collapsed doesn't touch
-	// threadsUpdatedAt on its own).
+	// field it uses to hide a file's body while keeping its header rendered.
 	const [collapsedFileIds, setCollapsedFileIds] = useState<ReadonlySet<string>>(
 		new Set(),
 	);
-	const collapseVersionRef = useRef(0);
-	// A single id for a per-file toggle, every id for collapse/expand-all —
-	// either way, every item this set names gets the version bump below.
-	const collapseAffectedIdsRef = useRef<ReadonlySet<string>>(new Set());
 	const toggleFileCollapsed = useCallback((itemId: string) => {
-		collapseVersionRef.current += 1;
-		collapseAffectedIdsRef.current = new Set([itemId]);
 		setCollapsedFileIds((prev) => {
 			const next = new Set(prev);
 			if (next.has(itemId)) next.delete(itemId);
@@ -279,8 +255,6 @@ export function PullRequestCodeTab({
 	}, []);
 	const setAllFilesCollapsed = useCallback(
 		(collapsed: boolean, allItemIds: readonly string[]) => {
-			collapseVersionRef.current += 1;
-			collapseAffectedIdsRef.current = new Set(allItemIds);
 			setCollapsedFileIds(collapsed ? new Set(allItemIds) : new Set());
 		},
 		[],
@@ -290,54 +264,26 @@ export function PullRequestCodeTab({
 	const repoFullName = pullRequestRefFromUrl(prUrl)?.repoFullName ?? null;
 	const canUseProject = !!projectId && !!hostUrl;
 	const isTabVisible = useIsTabVisible();
-
-	const { data, isLoading, error, refetch } = useQuery({
-		queryKey: [
-			"pull-request-diff",
+	const target = useMemo<PullRequestTarget>(
+		() => ({
 			organizationId,
 			repoFullName,
-			projectId,
-			hostUrl,
 			prNumber,
-		],
+		}),
+		[organizationId, repoFullName, prNumber],
+	);
+
+	const { data, isLoading, error, refetch } = useQuery({
+		queryKey: pullRequestDiffQueryKey(target),
 		enabled: isTabVisible,
-		queryFn: () =>
-			fetchPullRequestDiff({
-				projectId,
-				hostUrl,
-				prNumber,
-				repoFullName,
-				organizationId,
-			}),
+		queryFn: () => readPullRequestDiff(target),
 		staleTime: 30_000,
 		gcTime: 10 * 60_000,
 	});
 
-	const threadsQueryKey = [
-		"pull-request-threads",
-		projectId,
-		hostUrl,
-		prNumber,
-	];
-	const { data: threadsData, dataUpdatedAt: threadsUpdatedAt } = useQuery({
-		queryKey: threadsQueryKey,
-		enabled: canUseProject && isTabVisible,
-		queryFn: async () => {
-			if (!projectId) return { reviewThreads: [], fetchFailed: false };
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.getThreads.query({ projectId, prNumber });
-		},
-		staleTime: 30_000,
-		gcTime: 10 * 60_000,
-		// This tab and a workspace DiffPane for the same PR read threads
-		// through two different tRPC clients with two separate caches, so
-		// resolving/replying in one doesn't invalidate the other. DiffPane's
-		// own threads query already self-heals via a 30s refetchInterval
-		// (see useDiffAnnotations) rather than relying on cross-cache
-		// invalidation — matching that here keeps the two surfaces from
-		// drifting for longer than DiffPane already tolerates.
-		refetchInterval: 30_000,
-	});
+	const threadsQueryKey = pullRequestThreadsQueryKey(target);
+	const { data: threadsData, dataUpdatedAt: threadsUpdatedAt } =
+		usePullRequestThreads(target, { enabled: isTabVisible });
 	// getThreads degrades a GraphQL failure to an empty list rather than
 	// throwing (so a comments-fetch failure doesn't block the diff view
 	// itself) — fetchFailed is how it tells that apart from a PR that
@@ -356,7 +302,7 @@ export function PullRequestCodeTab({
 			{
 				description: t({
 					message:
-						"The diff is still up to date — only comments failed to load.",
+						"The diff is still up to date. Only comments failed to load.",
 				}),
 			},
 		);
@@ -373,10 +319,8 @@ export function PullRequestCodeTab({
 		ReadonlySet<string>
 	>(new Set());
 	const setThreadResolution = useMutation({
-		mutationFn: async (input: { threadId: string; resolved: boolean }) => {
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.setThreadResolution.mutate(input);
-		},
+		mutationFn: (input: { threadId: string; resolved: boolean }) =>
+			setPullRequestThreadResolution(target, input),
 		onMutate: (input) => {
 			setPendingResolveThreadIds((prev) => new Set(prev).add(input.threadId));
 		},
@@ -405,16 +349,8 @@ export function PullRequestCodeTab({
 		ReadonlySet<number>
 	>(new Set());
 	const replyToThread = useMutation({
-		mutationFn: async (input: { commentId: number; body: string }) => {
-			if (!projectId)
-				throw new Error("No project available to reply to a thread");
-			const client = getHostServiceClientByUrl(hostUrl);
-			return client.pullRequests.replyToThread.mutate({
-				projectId,
-				prNumber,
-				...input,
-			});
-		},
+		mutationFn: (input: { commentId: number; body: string }) =>
+			replyToPullRequestThread(target, input),
 		onMutate: (input) => {
 			setPendingReplyCommentIds((prev) => new Set(prev).add(input.commentId));
 		},
@@ -461,6 +397,8 @@ export function PullRequestCodeTab({
 	});
 	const linkedWorkspaceId = linkedWorkspaceData?.workspaceId ?? null;
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
+	const { agents: agentChoices } = useAgentChoices(hostUrl);
+	const resolveOpenAsChat = useResolveOpenAsChat();
 
 	// Mirrors DiffPane's split between "send to an existing terminal" and
 	// "create a new agent session", but the PR tab has no fixed workspace to
@@ -515,13 +453,26 @@ export function PullRequestCodeTab({
 			if (!hostId || !projectId) {
 				throw new Error("No host available to create a workspace");
 			}
+			const target = input.target;
+			const agentChoice = agentChoices.find(
+				(agent) => agent.id === target.configId,
+			);
+			const openAsChat =
+				agentChoice !== undefined &&
+				(await resolveOpenAsChat(agentLaunchPreset(agentChoice)));
 			const { completed } = submitWorkspaceCreate({
 				hostId,
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId,
 					pr: prNumber,
-					agents: [{ agent: input.target.configId, prompt: text }],
+					agents: [
+						{
+							agent: input.target.configId,
+							prompt: text,
+							...(openAsChat ? { surface: "chat" as const } : {}),
+						},
+					],
 				},
 			});
 			const outcome = await completed;
@@ -630,44 +581,21 @@ export function PullRequestCodeTab({
 					composerAnnotation && composer?.path === f.path
 						? [...threadAnnotations, composerAnnotation]
 						: threadAnnotations;
-				const isVersionAffected =
-					composerAffectedPathsRef.current.has(f.path) ||
-					collapseAffectedIdsRef.current.has(f.item.id);
+				const collapsed = collapsedFileIds.has(f.item.id);
 				return {
 					...f.item,
 					annotations: annotations.length > 0 ? annotations : undefined,
-					collapsed: collapsedFileIds.has(f.item.id),
-					// Pierre's controlled `items` prop diffs items by id and, per
-					// its own docs ("bump the version when also changing the
-					// value"), needs an explicit version bump to know an
-					// already-rendered item's content changed — otherwise a
-					// same-id item with new annotations (a reply landing, a
-					// resolve toggling, a composer opening/closing) or a
-					// collapsed toggle can go stale in the live view even though
-					// the query cache/state is correct. Only the file(s) actually
-					// affected get the extra bump, so a transition elsewhere
-					// doesn't force Pierre to reprocess every file in the diff.
-					version: isVersionAffected
-						? threadsUpdatedAt +
-							composerVersionRef.current +
-							collapseVersionRef.current
-						: threadsUpdatedAt,
+					collapsed,
+					// Pierre redraws an item only when its version changes, so the
+					// version must cover everything the item shows.
+					version: getFileItemVersion({
+						contentKey: f.contentKey,
+						annotations,
+						collapsed,
+					}),
 				};
 			}),
-		// composerVersionRef.current, composerAffectedPathsRef.current,
-		// collapseVersionRef.current, and collapseAffectedIdsRef.current are
-		// read directly, not listed as dependencies — all are written
-		// synchronously in their respective update callbacks before the
-		// state setter, so they're already current by the time this
-		// recomputes off the `composer`/`collapsedFileIds` change below.
-		[
-			files,
-			annotationsByPath,
-			composer,
-			composerAnnotation,
-			threadsUpdatedAt,
-			collapsedFileIds,
-		],
+		[files, annotationsByPath, composer, composerAnnotation, collapsedFileIds],
 	);
 	// Flattened in diff order (file order, then line number within a file)
 	// so next/prev walks the pane top-to-bottom instead of thread-creation
@@ -743,13 +671,15 @@ export function PullRequestCodeTab({
 		() =>
 			({
 				...options,
+				// GitHub patches have no full file contents to expand into.
+				expandUnchanged: false,
 				enableLineSelection: canUseProject,
 				enableGutterUtility: canUseProject,
 				// Pierre gates the gutter "+" button's pointer flow behind a
 				// non-null onGutterUtilityClick (InteractionManager's
 				// startGutterSelectionFromPointerDown early-returns otherwise)
 				// — the real open logic lives in onLineSelectionEnd, which also
-				// fires on gutter clicks. Mirrors the v2-workspace DiffPane's
+				// fires on gutter clicks. Mirrors the workspace DiffPane's
 				// identical stub for the same reason.
 				onGutterUtilityClick: () => {},
 				onLineSelectionEnd: (
@@ -764,76 +694,28 @@ export function PullRequestCodeTab({
 					if (!path) return;
 					updateComposer({ itemId: context.item.id, path, range });
 				},
-			}) as CodeViewOptions<PrAnnotationMetadata>,
-		[options, pathByItemId, updateComposer, canUseProject],
+			}) as CodeViewOptions<PrAnnotationMetadata, undefined>,
+		[options, pathByItemId, canUseProject],
 	);
 
-	const treePaths = useMemo(() => files.map((f) => f.path), [files]);
-	const fileByPath = useMemo(
-		() => new Map(files.map((f) => [f.path, f])),
-		[files],
-	);
-	const gitStatus = useMemo(
-		() => files.map((f) => ({ path: f.path, status: f.status })),
-		[files],
-	);
 	const itemIdByPath = useMemo(
 		() => new Map(files.map((f) => [f.path, f.item.id])),
 		[files],
 	);
-
-	// Routed through a ref so Pierre's handler closures (resolved once at
-	// useFileTree time) always see the latest data.
-	const handlersRef = useRef({
-		onSelect(_path: string) {},
-		renderRowDecoration(_ctx: { item: { kind: string; path: string } }) {
-			return null as { text: string } | null;
+	const selectFile = useCallback(
+		(path: string) => {
+			const itemId = itemIdByPath.get(path);
+			if (!itemId) return;
+			setSelectedFilePath(path);
+			codeViewRef.current?.scrollTo({
+				type: "item",
+				id: itemId,
+				align: "start",
+				behavior: "smooth-auto",
+			});
 		},
-	});
-	handlersRef.current.onSelect = (path) => {
-		const itemId = itemIdByPath.get(path);
-		if (!itemId) return;
-		codeViewRef.current?.scrollTo({
-			type: "item",
-			id: itemId,
-			align: "start",
-			behavior: "smooth-auto",
-		});
-	};
-	handlersRef.current.renderRowDecoration = (ctx) => {
-		if (ctx.item.kind === "directory") return null;
-		const file = fileByPath.get(ctx.item.path);
-		if (!file) return null;
-		const text = formatDiffStats(file.additions, file.deletions);
-		return text ? { text } : null;
-	};
-
-	const { model } = useFileTree({
-		paths: treePaths,
-		initialExpansion: initialTreeExpansion,
-		search: false,
-		unsafeCSS: PIERRE_TREE_UNSAFE_CSS,
-		gitStatus,
-		icons: { set: "complete", colored: true },
-		itemHeight: ITEM_HEIGHT,
-		overscan: 20,
-		stickyFolders: true,
-		flattenEmptyDirectories: true,
-		onSelectionChange: (selected) => {
-			const last = selected[selected.length - 1];
-			if (!last || last.endsWith("/")) return;
-			handlersRef.current.onSelect(last);
-		},
-		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
-	});
-
-	useEffect(() => {
-		model.resetPaths(treePaths);
-	}, [model, treePaths]);
-
-	useEffect(() => {
-		model.setGitStatus(gitStatus);
-	}, [model, gitStatus]);
+		[itemIdByPath],
+	);
 
 	if (isLoading) {
 		return (
@@ -855,7 +737,7 @@ export function PullRequestCodeTab({
 			<div ref={rootRef} className="flex min-h-0 flex-1 flex-col">
 				<div className="flex flex-1 items-center justify-center">
 					<WorkItemDetailState
-						message={pullRequestReadErrorMessage(error)}
+						message={errorMessage(error)}
 						isError
 						onRetry={() => void refetch()}
 					/>
@@ -899,22 +781,23 @@ export function PullRequestCodeTab({
 			)}
 		>
 			<div className="flex min-h-0 flex-1 overflow-hidden">
-				{!isTreeCollapsed && (
-					<ResizablePanel
-						width={treeWidth}
-						onWidthChange={setTreeWidth}
-						minWidth={MIN_TREE_WIDTH}
-						maxWidth={MAX_TREE_WIDTH}
-						handleSide="right"
-						onDoubleClickHandle={() => setTreeWidth(DEFAULT_TREE_WIDTH)}
-						className="flex flex-col"
-					>
-						<PierreFileTree
-							model={model}
-							style={{ ...TREE_STYLE, height: "100%" }}
-						/>
-					</ResizablePanel>
-				)}
+				{/* Hidden, not unmounted, so search and folds survive the toggle. */}
+				<ResizablePanel
+					width={treeWidth}
+					onWidthChange={setTreeWidth}
+					minWidth={MIN_TREE_WIDTH}
+					maxWidth={MAX_TREE_WIDTH}
+					handleSide="right"
+					onDoubleClickHandle={() => setTreeWidth(DEFAULT_TREE_WIDTH)}
+					className={cn("flex flex-col", isTreeCollapsed && "hidden")}
+				>
+					<PullRequestFileList
+						files={files}
+						selectedPath={selectedFilePath}
+						onSelectFile={selectFile}
+						startCollapsed={startTreeCollapsed}
+					/>
+				</ResizablePanel>
 				<div className="flex min-h-0 flex-1 flex-col">
 					<DiffViewToolbar
 						tree={{
@@ -953,7 +836,7 @@ export function PullRequestCodeTab({
 							if (!path) return null;
 							return <DiffFileHeaderName path={path} />;
 						}}
-						renderAnnotation={(annotation) => {
+						renderAnnotation={(...[annotation]) => {
 							const metadata = annotation.metadata;
 							if (!metadata) return null;
 							if (metadata.kind === "composer") {

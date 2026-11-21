@@ -7,6 +7,7 @@ import { pullRequests, workspaces } from "../../../db/schema";
 import { invalidateLabelCache } from "../../../ports/static-ports";
 import { isMissingPath } from "../../../runtime/path-state";
 import { coercePullRequestState } from "../../../runtime/pull-requests/utils/pull-request-mappers";
+import { trackConfigResolved } from "../../../runtime/setup/track-config-resolved";
 import {
 	removeDevAppProfile,
 	runTeardown,
@@ -182,7 +183,7 @@ export const workspaceCleanupRouter = router({
 	 *                       default lists before any slow work, so the
 	 *                       delete feels instant in every client
 	 *   1.   Preflight    — dirty-worktree check (skip if force)
-	 *   2.   Teardown     — run .superset/teardown.sh (per teardownMode)
+	 *   2.   Teardown     — run the repo's teardown (per teardownMode)
 	 *   3.   Local cleanup — PTYs, worktree
 	 *   4.   Branch delete — optional local branch cleanup
 	 *   5.   Caches
@@ -385,6 +386,18 @@ async function runDestroy(
 				}
 				warnings.push(formatTeardownWarning(teardown));
 			}
+		}
+
+		if (local && project) {
+			trackConfigResolved({
+				api: ctx.api,
+				organizationId: ctx.organizationId,
+				workspaceId: input.workspaceId,
+				phase: "archive",
+				repoPath: project.repoPath,
+				projectId: project.id,
+				worktreePath: local.worktreePath,
+			});
 		}
 
 		const result = await runDestroyPhases(ctx, input, {

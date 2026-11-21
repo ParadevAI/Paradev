@@ -5,7 +5,11 @@ import type {
 	ToolContent,
 	ToolKind,
 } from "@superset/chat/protocol";
-import type { AcpContentBlock, AcpToolCallContent } from "./wire";
+import type {
+	AcpCompactionStatus,
+	AcpContentBlock,
+	AcpToolCallContent,
+} from "./wire";
 
 const TOOL_KIND_BY_ACP: Record<string, ToolKind> = {
 	read: "read",
@@ -41,6 +45,22 @@ export function toolCallSettled(status: string | null | undefined): boolean {
 	return (
 		status === "completed" || status === "failed" || status === "cancelled"
 	);
+}
+
+const COMPACTION_TEXT: Record<AcpCompactionStatus, string> = {
+	in_progress: "Compacting conversation history",
+	completed: "Conversation history was compacted",
+	cancelled: "Conversation history compaction was canceled",
+	failed: "Could not compact conversation history",
+};
+
+export function compactionText(
+	status: AcpCompactionStatus,
+	error: string | undefined,
+): string {
+	return status === "failed" && error
+		? `${COMPACTION_TEXT.failed}: ${error}`
+		: COMPACTION_TEXT[status];
 }
 
 function planEntryStatus(status: string): Plan["entries"][number]["status"] {
@@ -97,6 +117,7 @@ export function mapToolBody(
 				path: entry.path,
 				oldText: entry.oldText ?? null,
 				newText: entry.newText,
+				...(entry._meta?.kind === "delete" ? { deleted: true } : {}),
 			});
 		} else if (entry.type === "diff") {
 			const patch =

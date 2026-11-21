@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paradev Environment"
+  short_description: "Set up a cloud environment so new workspaces start ready"
+  default_prompt: "Use $superset-environment to set up this cloud environment end to end."

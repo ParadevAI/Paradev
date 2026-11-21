@@ -11,6 +11,7 @@ import { TunnelClient } from "./tunnel-client";
 
 class FakeSocket extends EventTarget {
 	static instances: FakeSocket[] = [];
+	static node22AfterGc = false;
 	static OPEN = 1;
 	static CONNECTING = 0;
 	readyState = 0;
@@ -23,6 +24,7 @@ class FakeSocket extends EventTarget {
 	constructor(readonly url: string) {
 		super();
 		FakeSocket.instances.push(this);
+		if (FakeSocket.node22AfterGc) this.keepListenersAndRefireErrorOnClose();
 	}
 
 	static at(index: number) {
@@ -35,6 +37,21 @@ class FakeSocket extends EventTarget {
 		this.readyState = 1;
 		this.dispatchEvent(new Event("open"));
 	}
+
+	failWithoutClose() {
+		this.dispatchEvent(new Event("error"));
+	}
+
+	// Node 22 after a GC: aborted listeners can stay attached, and close() on a
+	// connecting socket fires error again before readyState changes.
+	keepListenersAndRefireErrorOnClose() {
+		const add = this.addEventListener.bind(this);
+		this.addEventListener = (type, listener) => add(type, listener);
+		this.close = mock(() => {
+			this.dispatchEvent(new Event("error"));
+			this.readyState = 2;
+		});
+	}
 }
 
 const originalWebSocket = globalThis.WebSocket;
@@ -45,6 +62,7 @@ beforeEach(() => {
 	elapsed = 0;
 	spyOn(performance, "now").mockImplementation(() => elapsed);
 	FakeSocket.instances = [];
+	FakeSocket.node22AfterGc = false;
 	globalThis.WebSocket = FakeSocket as unknown as typeof WebSocket;
 });
 
@@ -108,6 +126,48 @@ test("a stalled dial stops at 30 seconds without starting a doomed retry", () =>
 	expect(failed).toHaveBeenCalledTimes(1);
 	expect(FakeSocket.instances).toHaveLength(1);
 	expect(FakeSocket.at(0).close).toHaveBeenCalledTimes(1);
+});
+
+test("a failed handshake that fires only error retries at once", () => {
+	const { attach, failed } = startDial();
+	FakeSocket.at(0).failWithoutClose();
+	expect(FakeSocket.instances).toHaveLength(2);
+	FakeSocket.at(1).failWithoutClose();
+	expect(failed).toHaveBeenCalledTimes(1);
+	FakeSocket.at(0).dispatchEvent(new Event("close"));
+	advance(60_000);
+	expect(FakeSocket.instances).toHaveLength(2);
+	expect(failed).toHaveBeenCalledTimes(1);
+	expect(attach).not.toHaveBeenCalled();
+});
+
+test("a local socket that fails with only error closes the relay stream", () => {
+	const client = new TunnelClient({
+		relayUrl: "https://relay.example",
+		hostId: "org:host",
+		getAuthToken: async () => null,
+		localPort: 1234,
+		hostServiceSecret: "test",
+	});
+	// biome-ignore lint/complexity/useLiteralKeys: Bracket access permits testing the private dial without a control connection.
+	client["handleDial"]({
+		type: "stream:dial",
+		ticket: "ticket",
+		kind: "ws",
+		path: "/terminal/a",
+	});
+	FakeSocket.at(0).open();
+	FakeSocket.at(1).failWithoutClose();
+	expect(FakeSocket.at(0).close).toHaveBeenCalledTimes(1);
+});
+
+test("a socket that refires error after its listeners abort settles once", () => {
+	FakeSocket.node22AfterGc = true;
+	const { attach, failed } = startDial();
+	advance(30_000);
+	expect(failed).toHaveBeenCalledTimes(1);
+	expect(FakeSocket.instances).toHaveLength(1);
+	expect(attach).not.toHaveBeenCalled();
 });
 
 test("an opened ticket is never retried when its stream closes", () => {

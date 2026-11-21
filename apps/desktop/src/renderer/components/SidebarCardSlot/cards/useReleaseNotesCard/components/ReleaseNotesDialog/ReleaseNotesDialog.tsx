@@ -7,32 +7,24 @@ import {
 	DialogDescription,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import { useState } from "react";
-import { LuArrowUpRight, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { cn } from "@superset/ui/utils";
+import { LuArrowUpRight } from "react-icons/lu";
 import { env } from "renderer/env.renderer";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { formatReleaseDate } from "../../utils/formatReleaseDate";
-import { HIGHLIGHT_ICONS } from "./constants";
 
 interface ReleaseNotesDialogProps {
 	open: boolean;
-	/** Newest first; the dialog opens on the first one. */
-	releases: ReleaseNote[];
+	release: ReleaseNote;
 	onClose: () => void;
 }
 
 export function ReleaseNotesDialog({
 	open,
-	releases,
+	release,
 	onClose,
 }: ReleaseNotesDialogProps) {
 	const { t } = useLingui();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
-	const [index, setIndex] = useState(0);
-	const release = releases[index];
-	if (!release) return null;
-	const older = releases[index + 1];
-	const newer = releases[index - 1];
 	const version = release.version;
 
 	return (
@@ -45,90 +37,53 @@ export function ReleaseNotesDialog({
 		>
 			<DialogContent
 				showCloseButton={false}
-				className="max-h-[calc(100vh-4rem)] gap-0 overflow-y-auto rounded-xl p-0 sm:max-w-[520px]"
-			>
-				{release.image && (
-					<img
-						src={release.image}
-						alt=""
-						className="m-3 mb-0 aspect-[16/9] w-[calc(100%-1.5rem)] rounded-lg border border-border object-cover"
-					/>
+				className={cn(
+					"max-h-[calc(100vh-4rem)] gap-0 overflow-hidden rounded-xl p-0",
+					release.image
+						? "sm:min-h-[min(400px,calc(100vh-4rem))] sm:max-w-[760px] sm:grid-cols-[1fr_1.05fr]"
+						: "sm:max-w-[440px]",
 				)}
-
-				<div className="px-6 pt-5">
-					<DialogTitle className="flex items-baseline gap-2 text-lg font-medium leading-tight">
+			>
+				<div className="flex min-h-0 flex-col overflow-y-auto px-8 pt-9 pb-7">
+					<DialogDescription className="font-mono text-[11px] uppercase tracking-[0.12em]">
 						{t({ message: `Paradev ${version}` })}
-						<span className="text-base font-normal text-muted-foreground">
-							{formatReleaseDate(release.date, { withYear: true })}
-						</span>
-					</DialogTitle>
-					<DialogDescription className="mt-1">
-						{release.title}
 					</DialogDescription>
-				</div>
+					<DialogTitle className="mt-3.5 text-[26px] font-medium leading-[1.12] tracking-tight">
+						{release.title}
+					</DialogTitle>
 
-				<ul className="flex flex-col gap-4 px-6 pt-5">
-					{release.highlights.map((highlight) => {
-						const Icon = HIGHLIGHT_ICONS[highlight.icon];
-						return (
-							<li key={highlight.title} className="flex gap-3.5">
-								<div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
-									<Icon className="size-4" />
-								</div>
-								<div className="min-w-0">
-									<p className="text-sm font-medium">{highlight.title}</p>
-									<p className="mt-0.5 text-sm leading-snug text-muted-foreground">
-										{highlight.description}
-									</p>
-								</div>
-							</li>
-						);
-					})}
-				</ul>
+					<ul className="mt-6 flex flex-col gap-2.5 text-sm">
+						{release.highlights.map((highlight) => (
+							<li key={highlight.title}>{highlight.title}</li>
+						))}
+					</ul>
 
-				<div className="px-6 pt-6">
-					<Button className="w-full" onClick={onClose}>
-						<Trans>Got it</Trans>
-					</Button>
-				</div>
-
-				<div className="grid grid-cols-3 items-center px-3 py-3 text-sm">
-					<div className="justify-self-start">
-						{older && (
-							<Button
-								variant="ghost"
-								size="sm"
-								aria-label={t({ message: "Previous release" })}
-								onClick={() => setIndex(index + 1)}
-							>
-								<LuChevronLeft className="size-3.5" />
-								{older.version}
-							</Button>
-						)}
+					<div className="mt-auto flex items-center gap-1.5 pt-7">
+						<Button onClick={onClose}>
+							<Trans>Got it</Trans>
+						</Button>
+						<Button
+							variant="ghost"
+							className="text-muted-foreground"
+							onClick={() =>
+								openUrl.mutate(`${env.NEXT_PUBLIC_MARKETING_URL}/changelog`)
+							}
+						>
+							<Trans>All releases</Trans>
+							<LuArrowUpRight className="size-3.5" />
+						</Button>
 					</div>
-					<Button
-						variant="ghost"
-						size="sm"
-						className="justify-self-center text-muted-foreground"
-						onClick={() =>
-							openUrl.mutate(`${env.NEXT_PUBLIC_MARKETING_URL}/changelog`)
-						}
-					>
-						<Trans>All releases</Trans>
-						<LuArrowUpRight className="size-3.5" />
-					</Button>
-					<Button
-						variant="ghost"
-						size="sm"
-						className="justify-self-end"
-						disabled={!newer}
-						aria-label={t({ message: "Next release" })}
-						onClick={() => setIndex(index - 1)}
-					>
-						{newer ? newer.version : <Trans>Next</Trans>}
-						<LuChevronRight className="size-3.5" />
-					</Button>
 				</div>
+
+				{release.image && (
+					<div className="relative hidden overflow-hidden border-l border-border bg-black sm:block">
+						<img
+							src={release.image}
+							alt=""
+							className="absolute top-[14%] left-[6%] w-[165%] max-w-none rounded-lg border border-white/10"
+						/>
+					</div>
+				)}
 			</DialogContent>
 		</Dialog>
 	);

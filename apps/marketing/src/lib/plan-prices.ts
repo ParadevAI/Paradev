@@ -13,9 +13,8 @@ export function fillPlanPrices(text: string, catalog: PlanFamily[]): string {
 	return text.replace(PLAN_TOKEN, (_token, kind, familyId, yearly) => {
 		const family = catalog.find((candidate) => candidate.family === familyId);
 		if (kind === "gbHours") {
-			return family?.gbMinutesPerSeat
-				? formatNumber(family.gbMinutesPerSeat / 60, {}, "en")
-				: MISSING_PLAN_PRICE;
+			const gbHours = family?.advertisedGbHoursPerSeat;
+			return gbHours ? formatNumber(gbHours, {}, "en") : MISSING_PLAN_PRICE;
 		}
 		const price = family ? seatPricePerMonth(family, Boolean(yearly)) : 0;
 		return price

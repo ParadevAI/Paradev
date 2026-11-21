@@ -10,7 +10,6 @@ import { initServerI18n } from "@/app/i18n-server";
 import { getAbout } from "@/lib/about";
 import { getAllPeople } from "@/lib/people";
 import { CompanyFacts } from "../components/CompanyFacts";
-import { CTASection } from "../components/CTASection";
 import { Investors } from "../components/Investors";
 import { PhotoFan } from "../components/PhotoFan";
 import { StoryPhoto } from "../components/StoryPhoto";
@@ -28,8 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	);
 	const description = i18n._(
 		msg({
-			message:
-				"What Paradev is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents.",
+			message: `What ${BRAND.INTRO_NAME} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents.`,
 		}),
 	);
 	const ogDescription = i18n._(
@@ -80,9 +78,9 @@ export default async function TeamPage() {
 					</h1>
 					<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
 						<Trans>
-							Paradev is building self-improving software. It starts with giving
-							engineers the best tools that adapt to their needs over time.
-							We're 3 ex-YC CTOs building a tool that we love.
+							{BRAND.INTRO_NAME} is building self-improving software. It starts
+							with giving engineers the best tools that adapt to their needs
+							over time. We're 3 ex-YC CTOs building a tool that we love.
 						</Trans>
 					</p>
 				</section>
@@ -212,8 +210,6 @@ export default async function TeamPage() {
 					</div>
 				</section>
 			</div>
-
-			<CTASection showInstallCommand={false} />
 		</main>
 	);
 }

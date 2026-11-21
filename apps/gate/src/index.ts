@@ -4,7 +4,7 @@ import {
 	SANDBOX_GATE_TICKET_PARAM,
 	sandboxHostSecret,
 	verifySandboxGateTicket,
-} from "@superset/shared/sandbox-gate";
+} from "@superset/shared/sandbox/gate";
 import { assertEnv, type SandboxGateEnv } from "./env";
 
 /**

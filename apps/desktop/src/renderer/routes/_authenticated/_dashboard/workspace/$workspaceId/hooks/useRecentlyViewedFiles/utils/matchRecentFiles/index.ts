@@ -1,0 +1,1 @@
+export { matchRecentFiles } from "./matchRecentFiles";

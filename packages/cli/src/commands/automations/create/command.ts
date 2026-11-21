@@ -4,10 +4,12 @@ import { MACHINE_SIZES } from "@superset/shared/billing";
 import { command } from "../../../lib/command";
 import { resolveHostFilter } from "../../../lib/host-target";
 import { formatAutomationDate } from "../format";
+import { assertTriggersConnected } from "../missingConnectionError";
 import { resolveAutomationTarget } from "../resolveAutomationTarget";
 import {
 	refuseHostFlagsForCloud,
 	resolveCloudAutomationTarget,
+	splitCloudHost,
 } from "../resolveCloudAutomationTarget";
 import { resolveTriggers } from "../resolveTriggers";
 
@@ -49,10 +51,10 @@ export default command({
 				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Implies --cloud",
 			),
 		continueSession: boolean().desc(
-			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace",
+			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Without --workspace, the first run's workspace is kept for the next runs",
 		),
 		host: string().desc(
-			"Host the target project/workspace lives on (default: this machine)",
+			"Host the target project/workspace lives on, or `cloud` for --cloud (default: this machine)",
 		),
 		local: boolean().desc("Run the automation on this machine (the default)"),
 		agent: string()
@@ -63,6 +65,9 @@ export default command({
 			.desc(
 				"Workspace tag applied to each run's created workspace. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
 			),
+		group: string().desc(
+			"Group the automation is listed under in the automations table",
+		),
 	},
 	run: async ({ ctx, options }) => {
 		const prompt = options.prompt
@@ -86,12 +91,16 @@ export default command({
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
+		const hostFlag = splitCloudHost(options.host);
 		const cloud = Boolean(
-			options.cloud || options.environment || options.machineSize,
+			options.cloud ||
+				hostFlag.cloud ||
+				options.environment ||
+				options.machineSize,
 		);
 		if (cloud) {
 			refuseHostFlagsForCloud({
-				"--host": options.host,
+				"--host": hostFlag.host,
 				"--local": options.local,
 				"--project": options.project,
 				"--tag": options.tag?.length ? options.tag : undefined,
@@ -114,7 +123,7 @@ export default command({
 						userJwt: ctx.bearer,
 						api: ctx.api,
 						hostId: resolveHostFilter({
-							host: options.host ?? undefined,
+							host: hostFlag.host,
 							local: options.local ?? undefined,
 						}),
 						workspaceId: options.workspace ?? undefined,
@@ -122,6 +131,8 @@ export default command({
 					})),
 					v2WorkspaceId: options.workspace ?? undefined,
 				};
+
+		await assertTriggersConnected(ctx.api, organizationId, triggers);
 
 		const result = await ctx.api.automation.create.mutate({
 			name: options.name,
@@ -135,6 +146,7 @@ export default command({
 			timezone: options.timezone ?? DEFAULT_TIMEZONE,
 			...(triggers ? { triggers } : {}),
 			...(options.tag?.length ? { tags: options.tag } : {}),
+			...(options.group ? { group: options.group } : {}),
 		});
 
 		const schedule = result.nextRunAt

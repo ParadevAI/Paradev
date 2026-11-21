@@ -29,7 +29,7 @@
 	"vars": {
 		"USERCONTENT_URL": "https://frame.supersetusercontent.com",
 		"MEDIA_URL": "https://media.supersetusercontent.com",
-		"APP_URL": "https://app.superset.sh",
+		"APP_URL": "https://app.paradev.com",
 		"REALTIME_URL": "https://realtime.superset.sh",
 		// Who may frame a page. `file:` is the packaged desktop renderer; a
 		// frame still needs a valid ticket, so this admits embedding, not reading.

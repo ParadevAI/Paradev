@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export const DISABLED_SKILLS_STATE_FILE = "disabled-skills.json";
@@ -18,7 +18,7 @@ export const DISABLED_SKILLS_STATE_FILE = "disabled-skills.json";
  * hosts whose machine never runs the desktop).
  */
 export function getDisabledSkillsStateFilePath(): string {
-	return path.join(resolveSupersetHomeDir(), DISABLED_SKILLS_STATE_FILE);
+	return path.join(resolveAppHomeDir(), DISABLED_SKILLS_STATE_FILE);
 }
 
 export function readSharedDisabledSkillIds(): string[] {
@@ -38,7 +38,7 @@ export function readSharedDisabledSkillIds(): string[] {
 
 export function writeSharedDisabledSkillIds(ids: readonly string[]): void {
 	try {
-		fs.mkdirSync(resolveSupersetHomeDir(), { recursive: true });
+		fs.mkdirSync(resolveAppHomeDir(), { recursive: true });
 		writeFileIfChanged(
 			getDisabledSkillsStateFilePath(),
 			`${JSON.stringify({ disabledSkillIds: [...ids].sort() }, null, "\t")}\n`,

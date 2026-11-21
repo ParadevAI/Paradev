@@ -1,8 +1,10 @@
 import { db } from "@superset/db/client";
 import { pluginOauthClients } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import type { ConnectorMethod } from "@superset/shared/connectors";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { and, eq, isNotNull, lte } from "drizzle-orm";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { decryptOptional, encryptOptional } from "../../router/plugins/crypto";
 import { credentialFetch } from "../../router/plugins/manifest";
@@ -14,19 +16,49 @@ export interface ClientIdentity {
 	authentication?: "basic" | "post";
 }
 
+/**
+ * Which client a token request goes out as. A new grant takes any client
+ * registered for the scopes it asks for. A grant already issued is bound to its
+ * client: `null` is one issued before that was recorded.
+ */
+export type ClientFor = { newGrant: true } | { issuedTo: string | null };
+
+/** The client a grant was issued to no longer exists, so the grant cannot be refreshed. */
+export class ForgottenClientError extends Error {
+	constructor(issuer: string, clientId: string) {
+		super(`${issuer} client ${clientId} is no longer registered.`);
+		this.name = "ForgottenClientError";
+	}
+}
+
+// Firecrawl and Resend reject a metadata document whose redirect URIs are on
+// another host than its client_id, so both live on the browser API origin.
 export function clientMetadataUrl(connectorSlug: string): string {
-	const base = env.PLUGIN_CLIENT_METADATA_BASE_URL ?? env.NEXT_PUBLIC_API_URL;
-	return `${base}/api/connectors/${connectorSlug}/client-metadata`;
+	return `${getBrowserApiUrl(env)}/api/connectors/${connectorSlug}/client-metadata`;
 }
 
 export function redirectUriFor(connectorSlug: string): string {
-	return `${env.NEXT_PUBLIC_API_URL}/api/connectors/callback/${connectorSlug}`;
+	return `${getBrowserApiUrl(env)}/api/connectors/callback/${connectorSlug}`;
 }
+
+export function issuedGrantRedirectUris(
+	connectorSlug: string,
+	redirectUri = redirectUriFor(connectorSlug),
+): string[] {
+	return withOwnDomainTwins([
+		redirectUri,
+		`${env.NEXT_PUBLIC_API_URL}/api/connectors/callback/${connectorSlug}`,
+	]);
+}
+
+type DeclaredAuthMethod = ConnectorMethod["token_request_auth_method"];
 
 function pickAuthMethod(
 	supported: string[] | undefined,
 	issuer: string,
+	declared: DeclaredAuthMethod,
 ): "client_secret_post" | "client_secret_basic" | "none" {
+	if (declared) return declared;
 	const methods = supported ?? ["client_secret_basic"];
 	if (methods.includes("client_secret_post")) return "client_secret_post";
 	if (methods.includes("client_secret_basic")) return "client_secret_basic";
@@ -56,32 +88,85 @@ function authenticationFor(
 	return undefined;
 }
 
+type StoredClientRow = typeof pluginOauthClients.$inferSelect;
+
+function unexpired(row: StoredClientRow): boolean {
+	return !row.clientSecretExpiresAt || row.clientSecretExpiresAt > new Date();
+}
+
 async function storedClient(
 	issuer: string,
-	redirectUri: string,
+	redirectUri: string | string[],
+	declared: DeclaredAuthMethod,
+	pick: { clientId: string } | { coveringScopes: string[] } | { legacy: true },
 ): Promise<ClientIdentity | null> {
-	const [row] = await db
+	const rows = await db
 		.select()
 		.from(pluginOauthClients)
 		.where(
 			and(
 				eq(pluginOauthClients.issuer, issuer),
-				eq(pluginOauthClients.redirectUri, redirectUri),
+				Array.isArray(redirectUri)
+					? inArray(pluginOauthClients.redirectUri, redirectUri)
+					: eq(pluginOauthClients.redirectUri, redirectUri),
 			),
 		)
-		.limit(1);
-	if (!row) return null;
-	if (row.clientSecretExpiresAt && row.clientSecretExpiresAt <= new Date()) {
-		return null;
-	}
+		.orderBy(asc(pluginOauthClients.createdAt));
 
-	const secret = await decryptOptional(row.clientSecret);
+	const row =
+		"clientId" in pick
+			? rows.find((candidate) => candidate.clientId === pick.clientId)
+			: "legacy" in pick
+				? // A grant from before client ids were recorded was issued to the row
+					// from before scopes were. Moving it to a newer client only earns
+					// invalid_client, which would then forget that newer, healthy client.
+					rows.find(
+						(candidate) => candidate.scopes === null && unexpired(candidate),
+					)
+				: // A row from before scopes were recorded covers none, so a connector
+					// asking for any scope registers afresh rather than reuse a client
+					// the server may reject them for.
+					rows.find(
+						(candidate) =>
+							unexpired(candidate) &&
+							authenticates(candidate, declared) &&
+							pick.coveringScopes.every((scope) =>
+								candidate.scopes?.includes(scope),
+							),
+					);
+	if (!row) return null;
+	return identity(
+		row.clientId,
+		await decryptOptional(row.clientSecret),
+		row.tokenEndpointAuthMethod,
+		declared,
+	);
+}
+
+function authenticates(
+	row: StoredClientRow,
+	declared: DeclaredAuthMethod,
+): boolean {
+	return (
+		!declared ||
+		!authenticationFor(row.tokenEndpointAuthMethod) ||
+		row.tokenEndpointAuthMethod === declared
+	);
+}
+
+function identity(
+	clientId: string,
+	secret: string | null | undefined,
+	tokenEndpointAuthMethod: string | null,
+	declared: DeclaredAuthMethod,
+): ClientIdentity {
+	const authentication = authenticationFor(
+		secret && declared ? declared : tokenEndpointAuthMethod,
+	);
 	return {
-		clientId: row.clientId,
+		clientId,
 		...(secret ? { clientSecret: secret } : {}),
-		...(authenticationFor(row.tokenEndpointAuthMethod)
-			? { authentication: authenticationFor(row.tokenEndpointAuthMethod) }
-			: {}),
+		...(authentication ? { authentication } : {}),
 	};
 }
 
@@ -101,6 +186,7 @@ async function register(
 	const tokenEndpointAuthMethod = pickAuthMethod(
 		server.metadata.token_endpoint_auth_methods_supported,
 		server.issuer,
+		method.token_request_auth_method,
 	);
 	const response = await credentialFetch(
 		endpoint,
@@ -163,29 +249,67 @@ async function register(
 		),
 		registrationClientUri: payload.registration_client_uri ?? null,
 		tokenEndpointAuthMethod: resolvedAuthMethod,
+		// What was asked for, not what the response echoes: a server that grants
+		// less would otherwise send every connect into another registration.
+		scopes: method.scopes ?? [],
 	};
 
 	await db
 		.insert(pluginOauthClients)
 		.values({ issuer: server.issuer, redirectUri, ...row })
 		.onConflictDoUpdate({
-			target: [pluginOauthClients.issuer, pluginOauthClients.redirectUri],
+			target: [
+				pluginOauthClients.issuer,
+				pluginOauthClients.redirectUri,
+				pluginOauthClients.clientId,
+			],
 			set: row,
-			setWhere: and(
-				isNotNull(pluginOauthClients.clientSecretExpiresAt),
-				lte(pluginOauthClients.clientSecretExpiresAt, new Date()),
-			),
 		});
 
-	return (
-		(await storedClient(server.issuer, redirectUri)) ?? {
-			clientId: payload.client_id,
-			...(payload.client_secret ? { clientSecret: payload.client_secret } : {}),
-			...(authenticationFor(resolvedAuthMethod)
-				? { authentication: authenticationFor(resolvedAuthMethod) }
-				: {}),
-		}
+	return identity(
+		payload.client_id,
+		payload.client_secret,
+		resolvedAuthMethod,
+		method.token_request_auth_method,
 	);
+}
+
+const CLIENT_REJECTION =
+	/invalid_client|(unrecognized|unknown|unregistered|invalid)[ _]client|client(_id)?( is)? not (found|registered|recognized)/i;
+const PROBE_TIMEOUT_MS = 5000;
+const PROBE_CODE_CHALLENGE = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+
+// A server may delete a registration it issued (Supabase does when the first
+// approval takes over 15 minutes), and says so only on its authorize page.
+async function authorizationRejectsClient(
+	server: DiscoveredServer,
+	client: ClientIdentity,
+	redirectUri: string,
+	method: ConnectorMethod,
+): Promise<boolean> {
+	const url = new URL(server.metadata.authorization_endpoint);
+	url.searchParams.set("client_id", client.clientId);
+	url.searchParams.set("redirect_uri", redirectUri);
+	url.searchParams.set("response_type", "code");
+	url.searchParams.set("state", "probe");
+	url.searchParams.set("code_challenge", PROBE_CODE_CHALLENGE);
+	url.searchParams.set("code_challenge_method", "S256");
+	if (method.scopes?.length)
+		url.searchParams.set(
+			"scope",
+			method.scopes.join(method.scope_separator ?? " "),
+		);
+	try {
+		const response = await fetch(url, {
+			method: "GET",
+			redirect: "manual",
+			signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
+		});
+		if (response.status < 400 || response.status >= 500) return false;
+		return CLIENT_REJECTION.test((await response.text()).slice(0, 2000));
+	} catch {
+		return false;
+	}
 }
 
 const registering = new Map<string, Promise<ClientIdentity>>();
@@ -195,8 +319,26 @@ export async function resolveClientIdentity(
 	server: DiscoveredServer,
 	method: ConnectorMethod,
 	redirectUri: string,
+	client: ClientFor,
 ): Promise<ClientIdentity> {
 	const metadataUrl = clientMetadataUrl(connectorSlug);
+	const issuedTo = "issuedTo" in client ? client.issuedTo : null;
+	const declared = method.token_request_auth_method;
+	if (issuedTo && withOwnDomainTwins([metadataUrl]).includes(issuedTo))
+		return { clientId: issuedTo };
+	if (issuedTo) {
+		const bound = await storedClient(
+			server.issuer,
+			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			declared,
+			{
+				clientId: issuedTo,
+			},
+		);
+		if (!bound) throw new ForgottenClientError(server.issuer, issuedTo);
+		return bound;
+	}
+
 	if (
 		server.metadata.client_id_metadata_document_supported &&
 		new URL(metadataUrl).protocol === "https:"
@@ -204,10 +346,33 @@ export async function resolveClientIdentity(
 		return { clientId: metadataUrl };
 	}
 
-	const existing = await storedClient(server.issuer, redirectUri);
-	if (existing) return existing;
+	const scopes = method.scopes ?? [];
+	if (!("newGrant" in client)) {
+		// Registering here would hand the grant a client its tokens were never issued to.
+		const legacy = await storedClient(
+			server.issuer,
+			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			declared,
+			{
+				legacy: true,
+			},
+		);
+		if (!legacy) throw new ForgottenClientError(server.issuer, "(unrecorded)");
+		return legacy;
+	}
 
-	const key = `${server.issuer}\n${redirectUri}`;
+	const existing = await storedClient(server.issuer, redirectUri, declared, {
+		coveringScopes: scopes,
+	});
+	if (existing) {
+		if (
+			!(await authorizationRejectsClient(server, existing, redirectUri, method))
+		)
+			return existing;
+		await forgetClient(server.issuer, redirectUri, existing.clientId);
+	}
+
+	const key = `${server.issuer}\n${redirectUri}\n${scopes.join(" ")}`;
 	const pending = registering.get(key);
 	if (pending) return await pending;
 
@@ -220,7 +385,7 @@ export async function resolveClientIdentity(
 
 export async function forgetClient(
 	issuer: string,
-	redirectUri: string,
+	redirectUri: string | string[],
 	clientId: string,
 ): Promise<void> {
 	await db
@@ -228,7 +393,9 @@ export async function forgetClient(
 		.where(
 			and(
 				eq(pluginOauthClients.issuer, issuer),
-				eq(pluginOauthClients.redirectUri, redirectUri),
+				Array.isArray(redirectUri)
+					? inArray(pluginOauthClients.redirectUri, redirectUri)
+					: eq(pluginOauthClients.redirectUri, redirectUri),
 				eq(pluginOauthClients.clientId, clientId),
 			),
 		);

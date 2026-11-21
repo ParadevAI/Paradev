@@ -67,6 +67,7 @@ describe("rethrowCloudUnreachable", () => {
 		["ECONNREFUSED", "connect ECONNREFUSED 10.0.0.1:443"],
 		["ECONNRESET", "read ECONNRESET"],
 		["ENOTCONN", "read ENOTCONN"],
+		["EADDRNOTAVAIL", "read EADDRNOTAVAIL"],
 		["ENOTFOUND", "getaddrinfo ENOTFOUND api.example.invalid"],
 		["EAI_AGAIN", "getaddrinfo EAI_AGAIN api.example.invalid"],
 		["EHOSTUNREACH", "connect EHOSTUNREACH 10.0.0.1:443"],

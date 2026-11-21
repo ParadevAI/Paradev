@@ -1,19 +1,29 @@
+import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
+	environmentBuilds,
+	environmentProjects,
 	environmentRepositories,
 	environmentScopeValues,
 	environmentSecrets,
 	environments,
 	githubRepositories,
+	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
+import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
-import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
-import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
 import {
-	buildSandboxClaim,
+	assertCloudAccess,
+	assertMember,
+	isMember,
+	type MemberContext,
+} from "../../lib/cloud-guards";
+import { controlTags } from "../../lib/control-log";
+import {
 	deleteSandbox,
 	loadRepositories,
 	primaryRepository,
@@ -22,8 +32,18 @@ import {
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
-import { jwtProcedure, userError } from "../../trpc";
+import {
+	type BuildRefusalReason,
+	BuildRefused,
+	isStale,
+	startEnvironmentBuild,
+} from "../../lib/sandbox/environment-build";
+import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { isLiveStatus } from "../cloud-workspace/live";
+import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { wakeAfterStop } from "../cloud-workspace/wake";
+import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
 import {
 	assertEnvironmentCapacity,
@@ -33,18 +53,31 @@ import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
 
-/** An environment the caller may see; another member's personal one does not exist to them. */
-export async function loadEnvironment(
-	id: string,
-	ctx: { organizationIds: string[]; userId: string },
+async function assertCanChangeForEveryone(
+	environment: {
+		scope: string;
+		createdByUserId: string | null;
+		organizationId: string;
+	},
+	ctx: MemberContext,
 ) {
+	if (
+		environment.scope === "organization" &&
+		environment.createdByUserId !== ctx.principal.userId
+	) {
+		await verifyOrgAdmin(ctx.principal.userId, environment.organizationId);
+	}
+}
+
+/** An environment the caller may see; another member's personal one does not exist to them. */
+export async function loadEnvironment(id: string, ctx: MemberContext) {
 	const row = await db.query.environments.findFirst({
 		where: and(eq(environments.id, id), isNull(environments.archivedAt)),
 	});
 	const visible =
 		row &&
-		ctx.organizationIds.includes(row.organizationId) &&
-		(row.scope !== "personal" || row.createdByUserId === ctx.userId);
+		(await isMember(ctx, row.organizationId)) &&
+		(row.scope !== "personal" || row.createdByUserId === ctx.principal.userId);
 	if (!visible) {
 		throw userError({
 			code: "NOT_FOUND",
@@ -120,6 +153,39 @@ async function repositoriesByEnvironment(
 	return map;
 }
 
+async function projectIdsByEnvironment(environmentIds: readonly string[]) {
+	const rows = environmentIds.length
+		? await db
+				.select({
+					environmentId: environmentProjects.environmentId,
+					projectId: environmentProjects.projectId,
+				})
+				.from(environmentProjects)
+				.where(inArray(environmentProjects.environmentId, [...environmentIds]))
+		: [];
+	const map = new Map<string, string[]>();
+	for (const { environmentId, projectId } of rows) {
+		map.set(environmentId, [...(map.get(environmentId) ?? []), projectId]);
+	}
+	return map;
+}
+
+async function linkProject(args: {
+	environmentId: string;
+	organizationId: string;
+	projectId: string;
+}) {
+	await db
+		.insert(environmentProjects)
+		.values(args)
+		.onConflictDoNothing({
+			target: [
+				environmentProjects.environmentId,
+				environmentProjects.projectId,
+			],
+		});
+}
+
 async function setEnvironmentRepositories(args: {
 	environmentId: string;
 	organizationId: string;
@@ -174,7 +240,7 @@ async function loadPromotable(
 	cloudWorkspaceId: string,
 ) {
 	const workspace = await loadVisibleWorkspace(ctx, cloudWorkspaceId);
-	if (workspace.status !== "ready") {
+	if (!isLiveStatus(workspace.status)) {
 		throw userError({
 			code: "PRECONDITION_FAILED",
 			message: "Only a ready workspace can become an environment",
@@ -193,17 +259,70 @@ async function loadPromotable(
 	return { workspace, source, checkouts };
 }
 
+const BUILD_REFUSALS: Record<
+	BuildRefusalReason,
+	{
+		code:
+			| "NOT_FOUND"
+			| "FORBIDDEN"
+			| "PRECONDITION_FAILED"
+			| "CONFLICT"
+			| "TOO_MANY_REQUESTS";
+		i18nKey: string;
+	}
+> = {
+	"not-found": {
+		code: "NOT_FOUND",
+		i18nKey: "serverError.environment.environmentNotFound",
+	},
+	"not-paid": {
+		code: "FORBIDDEN",
+		i18nKey: "serverError.environment.notIncluded",
+	},
+	"no-repositories": {
+		code: "PRECONDITION_FAILED",
+		i18nKey: "serverError.cloudWorkspace.environmentHasNoRepositories",
+	},
+	"no-install": {
+		code: "PRECONDITION_FAILED",
+		i18nKey: "serverError.environment.noInstall",
+	},
+	"already-running": {
+		code: "CONFLICT",
+		i18nKey: "serverError.environment.buildAlreadyRunning",
+	},
+	"rate-limited": {
+		code: "TOO_MANY_REQUESTS",
+		i18nKey: "serverError.environment.manualBuildsRateLimited",
+	},
+};
+
+/** What a client sees of a build; a running build whose workflow died reads as failed. */
+function toBuildView(build: SelectEnvironmentBuild) {
+	const stale = isStale(build);
+	return {
+		id: build.id,
+		status: stale ? ("failed" as const) : build.status,
+		trigger: build.trigger,
+		kind: build.kind,
+		commitSha: build.commitSha,
+		error: stale ? "The build stopped unexpectedly" : build.error,
+		startedAt: build.startedAt,
+		finishedAt: build.finishedAt,
+	};
+}
+
 export const environmentRouter = {
 	secrets: secretsRouter,
 
-	suggestRegion: jwtProcedure.query(({ ctx }) => ({
+	suggestRegion: personProcedure.query(({ ctx }) => ({
 		region: regionForRequest(ctx.headers),
 	})),
 
-	list: jwtProcedure
+	list: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
 			const rows = await db
 				.select()
@@ -215,43 +334,59 @@ export const environmentRouter = {
 						// A personal environment is its creator's alone.
 						or(
 							eq(environments.scope, "organization"),
-							eq(environments.createdByUserId, ctx.userId),
+							eq(environments.createdByUserId, ctx.principal.userId),
 						),
 					),
 				)
 				.orderBy(asc(environments.name));
-			const repos = await repositoriesByEnvironment(rows);
+			const ids = rows.map((row) => row.id);
+			const [repos, projects] = await Promise.all([
+				repositoriesByEnvironment(rows),
+				projectIdsByEnvironment(ids),
+			]);
 			return rows.map((row) => ({
 				...row,
 				repositories: repos.get(row.id) ?? [],
+				projectIds: projects.get(row.id) ?? [],
 			}));
 		}),
 
-	get: jwtProcedure
+	get: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const row = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, row.organizationId);
-			const repos = await repositoriesByEnvironment([row]);
-			return { ...row, repositories: repos.get(row.id) ?? [] };
+			const [repos, projects] = await Promise.all([
+				repositoriesByEnvironment([row]),
+				projectIdsByEnvironment([row.id]),
+			]);
+			return {
+				...row,
+				repositories: repos.get(row.id) ?? [],
+				projectIds: projects.get(row.id) ?? [],
+			};
 		}),
 
-	create: jwtProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
 				name: z.string().min(1).max(100),
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20),
-				/** The repository a workspace opens on; its `.superset` config runs. */
+				/** The repository a workspace opens on; its Paradev config runs. */
 				primaryRepositoryId: z.string().uuid(),
 				scope: z.enum(environmentScopeValues).default("organization"),
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
+				projectId: z.string().min(1).max(200).optional(),
+				/** The size its workspaces boot at; omitted = the organization's default. */
+				machineSize: z.enum(MACHINE_SIZES).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			assertMember(ctx.organizationIds, input.organizationId);
+			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
+			await assertMachineSizeOffered(input.organizationId, input.machineSize);
 			const limit = await assertEnvironmentCapacity(input.organizationId);
 			if (!input.repositoryIds.includes(input.primaryRepositoryId)) {
 				throw primaryNotIncluded();
@@ -270,7 +405,8 @@ export const environmentRouter = {
 						region: input.region ?? regionForRequest(ctx.headers),
 						bundleSha,
 						scope: input.scope,
-						createdByUserId: ctx.userId,
+						machineSize: input.machineSize ?? null,
+						createdByUserId: ctx.principal.userId,
 					})
 					.returning();
 			});
@@ -288,6 +424,13 @@ export const environmentRouter = {
 					repositoryIds: input.repositoryIds,
 					primaryRepositoryId: input.primaryRepositoryId,
 				});
+				if (input.projectId) {
+					await linkProject({
+						environmentId: row.id,
+						organizationId: input.organizationId,
+						projectId: input.projectId,
+					});
+				}
 			} catch (error) {
 				await db.delete(environments).where(eq(environments.id, row.id));
 				throw error;
@@ -295,8 +438,47 @@ export const environmentRouter = {
 			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
 		}),
 
+	linkProject: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				projectId: z.string().min(1).max(200),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await linkProject({
+				environmentId: environment.id,
+				organizationId: environment.organizationId,
+				projectId: input.projectId,
+			});
+			return { linked: true };
+		}),
+
+	unlinkProject: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				projectId: z.string().min(1).max(200),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			await db
+				.delete(environmentProjects)
+				.where(
+					and(
+						eq(environmentProjects.environmentId, environment.id),
+						eq(environmentProjects.projectId, input.projectId),
+					),
+				);
+			return { linked: false };
+		}),
+
 	/** What promoting this workspace would make, before its golden is built. */
-	promotePreview: jwtProcedure
+	promotePreview: personProcedure
 		.input(z.object({ cloudWorkspaceId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const { workspace, source, checkouts } = await loadPromotable(
@@ -315,7 +497,7 @@ export const environmentRouter = {
 			};
 		}),
 
-	promote: jwtProcedure
+	promote: personProcedure
 		.input(
 			z
 				.object({
@@ -350,10 +532,11 @@ export const environmentRouter = {
 						i18nKey: "serverError.environment.organizationMismatch",
 					});
 				}
+				await assertCanChangeForEveryone(target, ctx);
 			}
 			const targetOwner =
 				target && input.scope === "personal"
-					? personalOwner(target, ctx.userId)
+					? personalOwner(target, ctx.principal.userId)
 					: null;
 
 			const environmentId = target?.id ?? crypto.randomUUID();
@@ -378,12 +561,28 @@ export const environmentRouter = {
 			const limit = target
 				? null
 				: await assertEnvironmentCapacity(workspace.organizationId);
-			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
-				claim,
+				organizationId: workspace.organizationId,
 			});
+			const { stopped } = golden;
+			const restart = async () => {
+				if (!stopped) return;
+				await wakeAfterStop(workspace, stopped).catch((error) => {
+					console.error(
+						`[environment/promote] could not restart ${workspace.id} after its snapshot`,
+						error,
+					);
+					if (isCloudUsageRefusal(error)) return;
+					Sentry.captureException(error, {
+						tags: controlTags({
+							cloudWorkspaceId: workspace.id,
+							organizationId: workspace.organizationId,
+						}),
+					});
+				});
+			};
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
 				provider: workspace.provider,
@@ -430,7 +629,8 @@ export const environmentRouter = {
 									name: input.name as string,
 									...fromGolden,
 									scope: input.scope ?? source?.scope ?? "organization",
-									createdByUserId: ctx.userId,
+									machineSize: source?.machineSize ?? null,
+									createdByUserId: ctx.principal.userId,
 								})
 								.returning();
 					// The golden baked these checkouts; a fork must ask for the same.
@@ -483,6 +683,7 @@ export const environmentRouter = {
 							cleanup,
 						),
 					);
+					await restart();
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
@@ -493,10 +694,67 @@ export const environmentRouter = {
 					),
 				);
 			}
+			await restart();
 			return row;
 		}),
 
-	update: jwtProcedure
+	/** Builds the environment's golden from `[install]`; returns the running build at once. */
+	rebuild: personProcedure
+		.input(z.object({ environmentId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			try {
+				return toBuildView(
+					await startEnvironmentBuild({
+						environmentId: environment.id,
+						trigger: "manual",
+					}),
+				);
+			} catch (error) {
+				if (error instanceof BuildRefused) {
+					throw userError({
+						...BUILD_REFUSALS[error.reason],
+						message: error.message,
+						...(error.retryAt
+							? {
+									params: {
+										minutes: Math.max(
+											1,
+											Math.ceil(
+												(error.retryAt.getTime() - Date.now()) / 60_000,
+											),
+										),
+									},
+								}
+							: {}),
+					});
+				}
+				throw error;
+			}
+		}),
+
+	/** The environment's builds, newest first, each with its failure reason. */
+	builds: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				limit: z.number().int().min(1).max(100).optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const rows = await db
+				.select()
+				.from(environmentBuilds)
+				.where(eq(environmentBuilds.environmentId, environment.id))
+				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
+				.limit(input.limit ?? 20);
+			return { builds: rows.map(toBuildView) };
+		}),
+
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -504,11 +762,17 @@ export const environmentRouter = {
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20).optional(),
 				primaryRepositoryId: z.string().uuid().optional(),
 				scope: z.enum(environmentScopeValues).optional(),
+				/** Null goes back to the organization's default. */
+				machineSize: z.enum(MACHINE_SIZES).nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
+			if (input.machineSize !== undefined) {
+				await assertCanChangeForEveryone(current, ctx);
+			}
+			await assertMachineSizeOffered(current.organizationId, input.machineSize);
 
 			// A golden was built for its repositories and set up by its primary.
 			// Changing either means a different golden, so it is promoted again.
@@ -552,8 +816,11 @@ export const environmentRouter = {
 			const patch = {
 				...(input.name ? { name: input.name } : {}),
 				...(input.scope ? { scope: input.scope } : {}),
+				...(input.machineSize !== undefined
+					? { machineSize: input.machineSize }
+					: {}),
 				...(input.scope === "personal"
-					? { createdByUserId: personalOwner(current, ctx.userId) }
+					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
 					: {}),
 			};
 			if (Object.keys(patch).length === 0) {
@@ -567,7 +834,7 @@ export const environmentRouter = {
 			return row;
 		}),
 
-	archive: jwtProcedure
+	archive: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const environment = await loadEnvironment(input.id, ctx);

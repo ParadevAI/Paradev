@@ -24,7 +24,7 @@ const meta = {
 	title: "ai-elements/WebFetchTool",
 	component: WebFetchTool,
 	args: {
-		url: "https://superset.sh/docs/workspaces",
+		url: "https://docs.paradev.com/workspaces",
 		state: "output-available",
 	},
 } satisfies Meta<typeof WebFetchTool>;
@@ -60,7 +60,7 @@ export const Fetching: Story = {
 export const NotFound: Story = {
 	args: {
 		statusCode: 404,
-		url: "https://superset.sh/docs/does-not-exist",
+		url: "https://docs.paradev.com/does-not-exist",
 	},
 	render: (args) => (
 		<View className="w-full">

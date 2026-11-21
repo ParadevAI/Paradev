@@ -1,4 +1,4 @@
-import { Heading, Section, Text } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { Button, EmailLayout } from "../../../components";
 
@@ -16,12 +16,9 @@ export function DownloadLinkEmail({
 			preview="Your Paradev desktop download link"
 			recipientEmail={recipientEmail}
 		>
-			<Heading className="m-0 mb-3 text-[22px] font-medium leading-8 text-foreground">
-				Get Paradev on your Mac
-			</Heading>
-			<Text className="m-0 mb-6 text-[15px] leading-6 text-muted">
-				Open this email on your Mac, then use the button below to download the
-				Paradev desktop app. The right version will be selected automatically.
+			<Text className="m-0 mb-6 text-[15px] leading-6 text-foreground">
+				Open this email on your computer and use the button below. It picks the
+				right version for you.
 			</Text>
 
 			<Section className="mb-8">
@@ -29,8 +26,7 @@ export function DownloadLinkEmail({
 			</Section>
 
 			<Text className="m-0 text-[13px] leading-5 text-muted">
-				The desktop app runs on macOS and Linux today. Windows is not yet
-				available.
+				The desktop app runs on macOS and Linux. Windows isn't supported yet.
 			</Text>
 		</EmailLayout>
 	);

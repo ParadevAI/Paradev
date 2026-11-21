@@ -1,8 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueryClient } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useFeatureFlag } from "posthog-react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
@@ -11,6 +9,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import {
 	getHostTerminalsQueryKey,
@@ -30,12 +29,11 @@ import { SessionList } from "./components/SessionList";
 export function SessionsSheet() {
 	const { t } = useLingui();
 	const params = useLocalSearchParams<{ id: string; active?: string }>();
-	const acpChat = Boolean(useFeatureFlag(FEATURE_FLAGS.ACP_CHAT));
 	const id = params.id;
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { workspace, host } = useWorkspaceHost(id ?? null);
-	const { terminalsByWorkspace } = useHostTerminals(host);
+	const { terminalsByWorkspace } = useHostTerminals(host, id);
 	const hostUrl = host
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
@@ -94,6 +92,7 @@ export function SessionsSheet() {
 								row.kind === "chat"
 									? getChatTransport(hostUrl).closeSession({
 											sessionId: row.terminalId,
+											userClosed: true,
 										})
 									: getHostServiceClientByUrl(
 											hostUrl,
@@ -130,28 +129,26 @@ export function SessionsSheet() {
 	// formSheet's cold mount (same trap CommitsSheet hit).
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
-			{acpChat ? (
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Button
-						icon="plus"
-						accessibilityLabel={t({
-							message: "New session",
-						})}
-						onPress={() =>
-							router.replace(`/(authenticated)/workspace/${id}/new-session`)
-						}
-					/>
-				</Stack.Toolbar>
-			) : null}
+			</HeaderToolbar>
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
+					icon="add"
+					accessibilityLabel={t({
+						message: "New session",
+					})}
+					onPress={() =>
+						router.replace(`/(authenticated)/workspace/${id}/new-session`)
+					}
+				/>
+			</HeaderToolbar>
 			<SessionList
 				rows={rows}
 				activeTerminalId={params.active ?? null}

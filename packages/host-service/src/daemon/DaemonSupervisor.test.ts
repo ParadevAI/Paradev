@@ -1432,7 +1432,7 @@ describe("ptyDaemonSocketPath", () => {
 		expect(
 			ptyDaemonSocketPath(ORG, {
 				NODE_ENV: "production",
-				SUPERSET_HOME_DIR: path.join(os.homedir(), ".superset"),
+				SUPERSET_HOME_DIR: path.join(os.homedir(), ".paradev"),
 			}),
 		).toBe(legacyPath());
 	});
@@ -1478,7 +1478,7 @@ describe("ptyDaemonSocketPath", () => {
 		expect(() =>
 			ptyDaemonSocketPath(ORG, {
 				NODE_ENV: "test",
-				SUPERSET_HOME_DIR: path.join(os.homedir(), ".superset"),
+				SUPERSET_HOME_DIR: path.join(os.homedir(), ".paradev"),
 			}),
 		).toThrow(/isolated temp dir/);
 		expect(() =>
@@ -1521,7 +1521,7 @@ describe("ptyDaemonSocketPath", () => {
 		expect(
 			ptyDaemonSocketPath(ORG, {
 				NODE_ENV: "development",
-				SUPERSET_HOME_DIR: `${path.join(os.homedir(), ".superset")}/../.superset/`,
+				SUPERSET_HOME_DIR: `${path.join(os.homedir(), ".paradev")}/../.paradev/`,
 			}),
 		).toBe(legacyPath());
 	});
@@ -1530,7 +1530,7 @@ describe("ptyDaemonSocketPath", () => {
 		const socket = ptyDaemonSocketPath("a1b2c3d4-e5f6-7890-abcd-ef1234567890", {
 			NODE_ENV: "development",
 			SUPERSET_HOME_DIR:
-				"/Users/someone/.superset/worktrees/0123456789abcdef-0123/very-long-branch-name-for-a-feature/superset-dev-data",
+				"/Users/someone/.superset/worktrees/0123456789abcdef-0123/very-long-branch-name-for-a-feature/paradev-dev-data",
 		});
 		expect(Buffer.byteLength(socket)).toBeLessThan(104);
 	});

@@ -1,4 +1,4 @@
-import { Heading, Link, Section, Text } from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
 import { COMPANY } from "@superset/shared/constants";
 import { format } from "date-fns";
 import { Button, EmailLayout } from "../../components";
@@ -13,6 +13,7 @@ interface PaymentFailedEmailProps {
 	/** Stripe's hosted invoice page. Unlike a billing portal session it stays
 	 * valid for 30 days, which is the point of putting it in an email. */
 	payInvoiceUrl?: string;
+	includesCloud?: boolean;
 }
 
 export function PaymentFailedEmail({
@@ -22,15 +23,15 @@ export function PaymentFailedEmail({
 	amount = "$50.00",
 	nextRetryDate = null,
 	payInvoiceUrl,
+	includesCloud = false,
 }: PaymentFailedEmailProps) {
 	const isFinalAttempt = nextRetryDate == null;
+	const cloudNotice = includesCloud
+		? " Cloud workspaces stop when access ends."
+		: "";
 
 	return (
 		<EmailLayout preview={`Payment failed for ${organizationName}`}>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				{isFinalAttempt ? "Final payment attempt failed" : "Payment failed"}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>
@@ -47,8 +48,8 @@ export function PaymentFailedEmail({
 						{isFinalAttempt ? "Final notice:" : "Action required:"}
 					</strong>{" "}
 					{isFinalAttempt
-						? `This was our last attempt. ${organizationName} loses ${planName} access today unless this invoice is paid.`
-						: `Update your payment method so your team doesn't lose ${planName} access.`}
+						? `This was our last attempt. ${organizationName} loses ${planName} access today unless this invoice is paid.${cloudNotice}`
+						: `Update your payment method so your team doesn't lose ${planName} access.${cloudNotice}`}
 				</Text>
 			</Section>
 
@@ -59,7 +60,7 @@ export function PaymentFailedEmail({
 			)}
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
-				Common reasons for payment failure:
+				Common reasons:
 			</Text>
 
 			<Text className="text-[13px] leading-6 text-muted m-0 mb-6">
@@ -76,11 +77,11 @@ export function PaymentFailedEmail({
 			)}
 
 			<Text className="text-[13px] leading-5 text-muted m-0">
-				Need help?{" "}
+				Need help? Please{" "}
 				<Link href={COMPANY.MAIL_TO} className="text-muted underline">
-					Contact our support team
-				</Link>{" "}
-				and we'll get you sorted out.
+					email support
+				</Link>
+				.
 			</Text>
 		</EmailLayout>
 	);

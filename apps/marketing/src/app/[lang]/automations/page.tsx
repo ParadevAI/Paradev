@@ -4,10 +4,10 @@ import { getI18nInstance } from "@superset/i18n/server";
 import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import { CTASection } from "@/app/[lang]/components/CTASection";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { env } from "@/env";
 import { AutomationsFAQ } from "./components/AutomationsFAQ";
 import { HowItWorks } from "./components/HowItWorks";
 import { LaunchWatchDemo } from "./components/LaunchWatchDemo";
@@ -73,7 +73,11 @@ export default async function AutomationsPage() {
 								webhook. Each run opens a workspace you can review.
 							</Trans>
 						</p>
-						<ProductHeroActions source="automations" docsPath="/automations" />
+						<ProductHeroActions
+							source="automations"
+							docsPath="/automations"
+							signInUrl={`${env.NEXT_PUBLIC_WEB_URL}/sign-in`}
+						/>
 					</div>
 					<LaunchWatchDemo />
 					<a
@@ -109,7 +113,6 @@ export default async function AutomationsPage() {
 
 				<AutomationsFAQ />
 			</main>
-			<CTASection />
 		</div>
 	);
 }

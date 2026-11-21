@@ -1,0 +1,1 @@
+export { registerInlineCodeExit } from "./inlineCodeExit";

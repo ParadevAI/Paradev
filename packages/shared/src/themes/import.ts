@@ -3,6 +3,8 @@ import { builtInThemes, darkTheme, lightTheme } from "./built-in";
 import { getEditorTheme } from "./editor-theme";
 import { getDefaultTerminalColors, type Theme } from "./types";
 
+export const MAX_THEME_CSS_LENGTH = 64 * 1024;
+
 const uiColorsSchema = z
 	.object({
 		background: z.string().optional(),
@@ -120,6 +122,12 @@ const editorSyntaxSchema = z
 		tagName: z.string().optional(),
 		attributeName: z.string().optional(),
 		invalid: z.string().optional(),
+		operator: z.string().optional(),
+		punctuation: z.string().optional(),
+		property: z.string().optional(),
+		parameter: z.string().optional(),
+		heading: z.string().optional(),
+		link: z.string().optional(),
 	})
 	.passthrough();
 
@@ -142,6 +150,7 @@ const themeConfigSchema = z
 		terminal: terminalColorsSchema.optional(),
 		colors: terminalColorsSchema.optional(),
 		editor: editorThemeSchema.optional(),
+		css: z.string().max(MAX_THEME_CSS_LENGTH).optional(),
 	})
 	.passthrough();
 
@@ -225,6 +234,7 @@ function parseThemeEntry(
 					...terminalOverrides,
 				}
 			: undefined,
+		css: config.css,
 	};
 	const baseEditorTheme = getEditorTheme(resolvedThemeBase);
 

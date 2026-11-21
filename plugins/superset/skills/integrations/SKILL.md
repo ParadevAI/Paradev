@@ -10,7 +10,7 @@ allowed-tools: Bash(superset mcp:*) Bash(paradev mcp:*) Bash(superset plugins:*)
 `paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
 
 An integration is an installed plugin with a connected account. Its tools do not run here.
-`superset mcp` hands the call to Superset's API, which attaches the stored credential and
+`superset mcp` hands the call to Paradev's API, which attaches the stored credential and
 forwards it to the plugin's MCP server. No token is ever written to this machine, which is
 also why a sandbox with no route to Linear can still file a Linear issue.
 

@@ -1,3 +1,4 @@
+import { terminalHostSocketPath } from "./socket-path";
 /**
  * Terminal Host Daemon Client
  *
@@ -24,14 +25,13 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { connect, type Socket } from "node:net";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import {
 	isPositiveInteger,
 	signalProcessTreeAndGroups,
 } from "@superset/pty-daemon/process-tree";
 import { app } from "electron";
-import { SUPERSET_DIR_NAME } from "shared/constants";
+import { SUPERSET_HOME_DIR } from "../app-environment";
 import { throwIfAborted } from "../terminal/abort";
 import {
 	TerminalAttachCanceledError,
@@ -76,10 +76,7 @@ enum ConnectionState {
 
 const DEBUG_CLIENT = process.env.SUPERSET_TERMINAL_DEBUG === "1";
 
-// Get from shared constants for multi-worktree support (imported at top of file)
-const SUPERSET_HOME_DIR = join(homedir(), SUPERSET_DIR_NAME);
-
-const SOCKET_PATH = join(SUPERSET_HOME_DIR, "terminal-host.sock");
+const SOCKET_PATH = terminalHostSocketPath(SUPERSET_HOME_DIR);
 const TOKEN_PATH = join(SUPERSET_HOME_DIR, "terminal-host.token");
 const PID_PATH = join(SUPERSET_HOME_DIR, "terminal-host.pid");
 const SPAWN_LOCK_PATH = join(SUPERSET_HOME_DIR, "terminal-host.spawn.lock");
@@ -170,16 +167,6 @@ export class TerminalHostClientDisposedError extends Error {
 	}
 }
 
-export interface TerminalHostClientEvents {
-	data: (sessionId: string, data: string) => void;
-	exit: (sessionId: string, exitCode: number, signal?: number) => void;
-	/** Terminal-specific error (e.g., write queue full - paste dropped) */
-	terminalError: (sessionId: string, error: string, code?: string) => void;
-	connected: () => void;
-	disconnected: () => void;
-	error: (error: Error) => void;
-}
-
 /**
  * Client for communicating with the terminal host daemon.
  * Emits events for terminal data and exit.
@@ -213,7 +200,6 @@ export class TerminalHostClient extends EventEmitter {
 		super();
 		if (DEBUG_CLIENT) {
 			console.log("[TerminalHostClient] Initialized with paths:", {
-				SUPERSET_DIR_NAME,
 				SUPERSET_HOME_DIR,
 				SOCKET_PATH,
 				NODE_ENV: process.env.NODE_ENV,

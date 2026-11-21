@@ -95,6 +95,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -127,6 +128,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -159,6 +161,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -187,7 +190,8 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 		await session.dispose();
 	});
 
-	it("healthy session has both isAlive=true and pid set", async () => {
+	it("healthy session has both isAlive=true and pid set, and dispose kills only through the injected tree kill", async () => {
+		const killed: number[] = [];
 		const session = new Session({
 			sessionId: "session-healthy",
 			workspaceId: "workspace-1",
@@ -197,6 +201,9 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async (pid) => {
+				killed.push(pid);
+			},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -216,6 +223,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 		expect(session.pid).toBe(12345);
 
 		await session.dispose();
+		expect(killed).toEqual([4242, 12345]);
 	});
 });
 
@@ -250,6 +258,7 @@ describe("TerminalHost — spawn failure cause", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell,
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 		session.spawn({
@@ -373,4 +382,170 @@ describe("TerminalHost — spawn failure cause", () => {
 
 		await session.dispose();
 	});
+});
+
+it("streams a command prompt emitted before spawn readiness resolves", async () => {
+	const { TerminalHost } = await import("./terminal-host");
+	const child = new FakeChildProcess();
+	let session: InstanceType<typeof Session> | undefined;
+	const host = new TerminalHost({
+		createSession: (request) => {
+			session = new Session({
+				...request,
+				cwd: "/tmp",
+				shell: "/bin/sh",
+				killProcessTree: async () => {},
+				spawnProcess: () => {
+					queueMicrotask(() => {
+						emitReadyAndSpawned(child);
+						const prompt = Buffer.from("Paste code here > ");
+						child.stdout.emit(
+							"data",
+							Buffer.concat([
+								createFrameHeader(PtySubprocessIpcType.Data, prompt.length),
+								prompt,
+							]),
+						);
+					});
+					return child as unknown as ChildProcess;
+				},
+			});
+			return session;
+		},
+	});
+	const messages: string[] = [];
+	const socket = {
+		destroyed: false,
+		write: (message: string) => {
+			messages.push(message);
+			return true;
+		},
+	} as unknown as import("node:net").Socket;
+	try {
+		await host.createOrAttach(socket, {
+			sessionId: "early-command",
+			paneId: "early-command",
+			tabId: "early-command",
+			workspaceId: "early-command",
+			cols: 80,
+			rows: 24,
+			command: "login",
+		});
+		expect(
+			messages.some((message) => message.includes("Paste code here > ")),
+		).toBe(true);
+	} finally {
+		await session?.dispose();
+	}
+});
+
+it("disposes a command canceled after attachment but before publication", async () => {
+	const { TerminalHost } = await import("./terminal-host");
+	const child = new FakeChildProcess();
+	const killed: number[] = [];
+	let session: InstanceType<typeof Session> | undefined;
+	const host = new TerminalHost({
+		createSession: (request) => {
+			session = new Session({
+				...request,
+				cwd: "/tmp",
+				shell: "/bin/sh",
+				killProcessTree: async (pid) => {
+					killed.push(pid);
+				},
+				spawnProcess: () => {
+					queueMicrotask(() => {
+						host.cancelCreateOrAttach({
+							sessionId: "canceled-command",
+							requestId: "cancel-request",
+						});
+						emitReadyAndSpawned(child);
+					});
+					return child as unknown as ChildProcess;
+				},
+			});
+			return session;
+		},
+	});
+	const socket = {
+		destroyed: false,
+		write: () => true,
+	} as unknown as import("node:net").Socket;
+	try {
+		await expect(
+			host.createOrAttach(socket, {
+				sessionId: "canceled-command",
+				requestId: "cancel-request",
+				paneId: "pane",
+				tabId: "tab",
+				workspaceId: "workspace",
+				cols: 80,
+				rows: 24,
+				command: "login",
+			}),
+		).rejects.toThrow();
+		expect(killed).toContain(4242);
+	} finally {
+		await session?.dispose();
+	}
+});
+
+it("canceled startup cannot remove the replacement session", async () => {
+	const { TerminalHost } = await import("./terminal-host");
+	let ready!: () => void;
+	let started!: () => void;
+	const pending = new Promise<void>((resolve) => {
+		ready = resolve;
+	});
+	const spawning = new Promise<void>((resolve) => {
+		started = resolve;
+	});
+	let count = 0;
+	let disposed = false;
+	let written = false;
+	const host = new TerminalHost({
+		createSession: () => {
+			const first = count++ === 0;
+			return {
+				onExit: () => {},
+				attach: async () => ({}),
+				spawn: () => {
+					if (first) started();
+				},
+				waitForReady: () => (first ? pending : Promise.resolve()),
+				isAlive: true,
+				isAttachable: true,
+				pid: 1,
+				clientCount: 1,
+				dispose: async () => {
+					if (first) disposed = true;
+				},
+				write: () => {
+					if (!first) written = true;
+				},
+			} as unknown as InstanceType<typeof Session>;
+		},
+	});
+	const socket = {} as import("node:net").Socket;
+	const request = {
+		sessionId: "replaced-command",
+		paneId: "pane",
+		tabId: "tab",
+		workspaceId: "workspace",
+		cols: 80,
+		rows: 24,
+		command: "login",
+	};
+	const original = host.createOrAttach(socket, {
+		...request,
+		requestId: "first",
+	});
+	const rejected = original.catch((error: unknown) => error);
+	await spawning;
+	await host.createOrAttach(socket, { ...request, requestId: "second" });
+	ready();
+	expect(await rejected).toBeInstanceOf(Error);
+	host.write({ sessionId: request.sessionId, data: "still attached" });
+	expect(disposed).toBe(true);
+	expect(written).toBe(true);
 });

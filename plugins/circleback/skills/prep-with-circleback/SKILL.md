@@ -20,8 +20,9 @@ resolve them with `FindProfiles` or `FindCompanies` and skip the calendar.
 
 ## 2. Pull the history with these people
 
-`SearchMeetings` filtered by the attendees' profiles or the company domain,
-newest first. Read the last two or three with `ReadMeetings`. For a long
+`SearchMeetings` filtered by one key attendee's profile or the company domain
+(a profiles filter matches only meetings every listed profile attended); sort
+the results by date yourself. Read the last two or three with `ReadMeetings`. For a long
 relationship read the most recent and the first: the first records what they
 wanted, the most recent records what they got.
 

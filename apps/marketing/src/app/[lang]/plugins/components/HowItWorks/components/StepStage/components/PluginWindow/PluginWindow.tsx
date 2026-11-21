@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { ChevronLeft, Plus, Sparkles } from "lucide-react";
+import { PluginIcon } from "@/app/[lang]/components/PluginIcon";
 import type { StepId } from "../../../../../../constants";
-import { PluginIcon } from "../../../../../PluginIcon";
 
 const SKILLS = ["file-issue", "duplicate-sweep", "project-status"];
 
