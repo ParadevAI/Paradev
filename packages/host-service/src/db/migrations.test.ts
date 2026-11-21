@@ -91,6 +91,33 @@ describe("host.db migrations", () => {
 		}
 	});
 
+	test("keep-awake defaults off without replacing existing host settings", () => {
+		const sqlite = open();
+		const db = drizzle(sqlite);
+		migrate(db, {
+			migrationsFolder: folderWithout({
+				omit: [],
+				through: "0038_mobile_devices",
+			}),
+		});
+		sqlite.exec(
+			"INSERT INTO host_settings (id, worktree_base_dir, branch_prefix_mode) VALUES (1, '/existing/worktrees', 'author')",
+		);
+		migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+		expect(
+			sqlite
+				.query(
+					"SELECT worktree_base_dir, branch_prefix_mode, keep_awake_while_agents_work FROM host_settings WHERE id = 1",
+				)
+				.get(),
+		).toEqual({
+			worktree_base_dir: "/existing/worktrees",
+			branch_prefix_mode: "author",
+			keep_awake_while_agents_work: 0,
+		});
+		sqlite.close();
+	});
+
 	test("drizzle's migrator cannot recover a database that lost them", () => {
 		const sqlite = open();
 		migrate(drizzle(sqlite), {
