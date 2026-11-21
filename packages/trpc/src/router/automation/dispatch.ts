@@ -15,6 +15,7 @@ import { parseGitHubRemote } from "@superset/shared/github-remote";
 import {
 	buildHostRoutingKey,
 	CLOUD_HOST_ID,
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 } from "@superset/shared/host-routing";
 import {
 	deduplicateBranchName,
@@ -703,7 +704,11 @@ async function createWorkspaceOnHost(args: {
 	return { workspaceId: result.workspace.id };
 }
 
-function relayHostCaller(options: RelayClientOptions): HostCaller {
+function relayHostCaller(relay: RelayClientOptions): HostCaller {
+	const options = {
+		...relay,
+		headers: { [SUPERSET_LAUNCH_SOURCE_HEADER]: "automation" },
+	};
 	return {
 		mutation: <TOutput>(procedure: string, input: object) =>
 			relayMutation<object, TOutput>(options, procedure, input),

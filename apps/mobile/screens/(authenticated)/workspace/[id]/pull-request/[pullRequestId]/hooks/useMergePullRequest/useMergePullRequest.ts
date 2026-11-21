@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { mergeMethodChoices } from "@superset/shared/pull-request-merge-methods";
 import { useMutation } from "@tanstack/react-query";
 import { Alert } from "react-native";
 import { useSession } from "@/lib/auth/client";
@@ -70,7 +71,10 @@ export function useMergePullRequest({
 	});
 
 	function confirmAndMerge(detail: PullRequestDetail) {
-		const method = detail.mergeability.allowedMergeMethods[0];
+		const method =
+			detail.mergeability.allowedMergeMethods.length > 0
+				? mergeMethodChoices(detail.mergeability).primary
+				: undefined;
 		if (!method) {
 			Alert.alert(
 				t({

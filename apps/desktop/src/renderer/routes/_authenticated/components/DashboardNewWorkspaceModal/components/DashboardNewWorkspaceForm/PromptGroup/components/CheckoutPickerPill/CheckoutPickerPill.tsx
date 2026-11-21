@@ -8,13 +8,13 @@ import {
 import { CgLaptop } from "react-icons/cg";
 import { HiCheck } from "react-icons/hi2";
 import { LuGitFork } from "react-icons/lu";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
-import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
-import { PickerChevron } from "../../../components/PickerChevron";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
-} from "../FormPickerTrigger";
+} from "renderer/routes/_authenticated/components/FormPickerTrigger";
+import type { WorkspaceCheckout } from "renderer/stores/new-workspace-draft";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
+import { PickerChevron } from "../../../components/PickerChevron";
 
 interface CheckoutPickerPillProps {
 	checkout: WorkspaceCheckout;
@@ -34,7 +34,7 @@ export function CheckoutPickerPill({
 	disabled = false,
 }: CheckoutPickerPillProps) {
 	const { t } = useLingui();
-	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const label =
 		checkout === "local" ? t({ message: "Local" }) : t({ message: "Worktree" });
 	const Icon = checkout === "local" ? CgLaptop : LuGitFork;
@@ -52,7 +52,7 @@ export function CheckoutPickerPill({
 					disabled={disabled}
 				>
 					<Icon
-						className={isParadevShell ? "size-3.5 shrink-0" : "size-3 shrink-0"}
+						className={isNewPage ? "size-3.5 shrink-0" : "size-3 shrink-0"}
 					/>
 					<span className="truncate">{label}</span>
 					<PickerChevron />

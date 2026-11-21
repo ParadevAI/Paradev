@@ -4,6 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 import { HiMiniArrowRight, HiMiniCheck } from "react-icons/hi2";
 import { track } from "@/lib/analytics";
+import { trackExternalFormSubmission } from "@/lib/analytics/external-tracking-runtime";
 import { withPosthog } from "@/lib/analytics/lazy";
 
 interface MobileWaitlistProps {
@@ -25,6 +26,7 @@ export function MobileWaitlist({ platform }: MobileWaitlistProps) {
 			if (wasOptedOut) posthog.opt_out_capturing();
 		});
 		setIsSubmitted(true);
+		trackExternalFormSubmission(`${platform}-waitlist`, email);
 	}
 
 	if (isSubmitted) {

@@ -56,6 +56,7 @@ function promiseWithTimeout<T>(
 }
 
 export class TerminalHost {
+	private readonly createSession: typeof createSession;
 	private sessions: Map<string, Session> = new Map();
 	private killTimers: Map<string, NodeJS.Timeout> = new Map();
 	private pendingAttaches: Map<string, PendingAttach> = new Map();
@@ -67,14 +68,17 @@ export class TerminalHost {
 	}) => void;
 
 	constructor({
+		createSession: sessionFactory = createSession,
 		onUnattachedExit,
 	}: {
+		createSession?: typeof createSession;
 		onUnattachedExit?: (event: {
 			sessionId: string;
 			exitCode: number;
 			signal?: number;
 		}) => void;
 	} = {}) {
+		this.createSession = sessionFactory;
 		this.onUnattachedExit = onUnattachedExit;
 	}
 
@@ -126,12 +130,16 @@ export class TerminalHost {
 
 				try {
 					throwIfAborted(pendingAttach.abortController.signal);
-					session = createSession(request);
+					session = this.createSession(request);
 					shouldDisposeIfCanceled = true;
 
 					session.onExit((id, exitCode, signal) => {
 						this.handleSessionExit(id, exitCode, signal);
 					});
+
+					if (request.command) {
+						await session.attach(socket, pendingAttach.abortController.signal);
+					}
 
 					session.spawn({
 						cwd: request.cwd || process.env.HOME || "/",
@@ -192,10 +200,12 @@ export class TerminalHost {
 				error instanceof TerminalAttachCanceledError &&
 				shouldDisposeIfCanceled &&
 				session &&
-				session.clientCount === 0
+				(this.sessions.get(sessionId) !== session || session.clientCount === 0)
 			) {
 				void session.dispose();
-				this.sessions.delete(sessionId);
+				if (this.sessions.get(sessionId) === session) {
+					this.sessions.delete(sessionId);
+				}
 			}
 			throw error;
 		} finally {

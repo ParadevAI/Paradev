@@ -5,7 +5,7 @@ import { ArrowRight, FolderX } from "lucide-react";
 
 interface WorkspaceNotFoundStateProps {
 	workspaceId: string;
-	browseTo: "/v2-workspaces" | "/cloud-workspaces";
+	browseTo: "/workspaces" | "/cloud-workspaces";
 }
 
 export function WorkspaceNotFoundState({

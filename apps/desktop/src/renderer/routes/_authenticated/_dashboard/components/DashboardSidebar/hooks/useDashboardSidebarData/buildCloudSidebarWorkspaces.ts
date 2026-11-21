@@ -1,3 +1,4 @@
+import type { CloudWorkspaceStatus } from "@superset/db/schema";
 import { sortByLastAgentMessage } from "@superset/shared/cloud-workspace-groups";
 import type {
 	PullRequestCheck,
@@ -7,7 +8,7 @@ import type {
 } from "@superset/shared/pull-request";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { cloudRepoProjectId } from "renderer/lib/github/cloudRepoProjectId";
-import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
+import { getWorkspaceDisplayName } from "renderer/utils/getWorkspaceDisplayName";
 import type {
 	DashboardSidebarWorkspace,
 	DashboardSidebarWorkspacePullRequest,
@@ -20,8 +21,8 @@ export interface CloudSidebarWorkspaceInput {
 	createdAt: Date;
 	updatedAt: Date;
 	agentStatusAt: Date | null;
-	createdBy: { userId: string } | null;
-	status?: "provisioning" | "ready" | "failed" | "deleted";
+	createdBy: { userId: string; name: string; image: string | null } | null;
+	status?: CloudWorkspaceStatus;
 }
 
 export interface CloudSidebarPullRequestInput {
@@ -146,7 +147,7 @@ export function buildCloudSidebarWorkspaces({
 			type: "worktree",
 			hostIsOnline: null,
 			accentColor: null,
-			name: getV2WorkspaceDisplayName({ name: workspace.name, branch }),
+			name: getWorkspaceDisplayName({ name: workspace.name, branch }),
 			branch,
 			pullRequest: pullRequest ? toSidebarPullRequest(pullRequest) : null,
 			repoUrl: repoFullName ? `https://github.com/${repoFullName}` : null,
@@ -163,8 +164,11 @@ export function buildCloudSidebarWorkspaces({
 			isPinned: false,
 			pendingTransaction: null,
 			isMine: userId !== null && workspace.createdBy?.userId === userId,
+			creator: workspace.createdBy,
 			sandboxStatus:
-				workspace.status === "provisioning" || workspace.status === "failed"
+				workspace.status === "provisioning" ||
+				workspace.status === "failed" ||
+				workspace.status === "asleep"
 					? workspace.status
 					: null,
 		};

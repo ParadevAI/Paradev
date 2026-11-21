@@ -81,6 +81,7 @@ export interface UsageAccount {
 	/** Stable key for the credential source (config path or keychain item),
 	 * used to dedupe and as a React key. */
 	accountKey: string;
+	quotaIdentity?: string | null;
 	/** Where the credential was found, for display ("~/.claude", "keychain"). */
 	sourceLabel: string;
 	email: string | null;

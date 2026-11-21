@@ -71,7 +71,7 @@ const workspace: VoiceWorkspace = {
 	hostName: "Mac",
 	branch: "auth",
 	project: "superset",
-	status: "ready",
+	status: "awake",
 	attention: "review",
 	attentionAt: 1_000,
 	lastActivityAt: 1_000,

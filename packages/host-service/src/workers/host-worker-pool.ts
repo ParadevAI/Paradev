@@ -14,6 +14,7 @@ import { existsSync } from "node:fs";
 import { cpus } from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { ResourceLimits } from "node:worker_threads";
 import type { WorkerTaskDefinition } from "./define-worker-task.ts";
 import {
 	DEFAULT_TIMEOUT_MS,
@@ -137,9 +138,38 @@ export function resolveHostWorkerScriptPath(): string | null {
 	return null;
 }
 
+/** Thrown by a pool without inline fallback when it has no worker to run on:
+ * paused after a crash (clears on its own) or no worker bundle (it will not). */
+export class WorkerPoolUnavailableError extends Error {
+	constructor(
+		name: string,
+		taskType: string,
+		readonly reason: "paused" | "no-bundle",
+	) {
+		super(`[${name}] no worker available for task "${taskType}" (${reason})`);
+		this.name = "WorkerPoolUnavailableError";
+	}
+}
+
+export interface HostWorkerPoolOptions {
+	scriptPathResolver?: () => string | null;
+	concurrency?: number;
+	idleTimeoutMs?: number;
+	execArgv?: string[];
+	name?: string;
+	resourceLimits?: ResourceLimits;
+	/** Never run a task on the main thread: with no worker the task fails,
+	 * and a worker crash pauses the pool for `pauseAfterCrashMs`. */
+	noInlineFallback?: {
+		pauseAfterCrashMs: number;
+		onPause?: (error: WorkerTaskError) => void;
+	};
+}
+
 export class HostWorkerPool {
 	private runner: WorkerTaskRunner | null = null;
 	private inlineOnly = false;
+	private pausedUntil = 0;
 	private warnedInline = false;
 	private crashTimestamps: number[] = [];
 	private readonly seenCrashErrors = new WeakSet<WorkerTaskError>();
@@ -152,18 +182,22 @@ export class HostWorkerPool {
 	private readonly concurrency: number;
 	private readonly idleTimeoutMs: number;
 	private readonly execArgv?: string[];
+	private readonly name: string;
+	private readonly resourceLimits?: ResourceLimits;
+	private readonly pauseAfterCrashMs: number | null;
+	private readonly onPause?: (error: WorkerTaskError) => void;
 
-	constructor(options?: {
-		scriptPathResolver?: () => string | null;
-		concurrency?: number;
-		idleTimeoutMs?: number;
-		execArgv?: string[];
-	}) {
+	constructor(options?: HostWorkerPoolOptions) {
 		this.scriptPathResolver =
 			options?.scriptPathResolver ?? resolveHostWorkerScriptPath;
 		this.concurrency = options?.concurrency ?? DEFAULT_CONCURRENCY;
 		this.idleTimeoutMs = options?.idleTimeoutMs ?? IDLE_TIMEOUT_MS;
 		this.execArgv = options?.execArgv;
+		this.name = options?.name ?? "host-worker";
+		this.resourceLimits = options?.resourceLimits;
+		this.pauseAfterCrashMs =
+			options?.noInlineFallback?.pauseAfterCrashMs ?? null;
+		this.onPause = options?.noInlineFallback?.onPause;
 	}
 
 	/** Exposed for tests. */
@@ -173,9 +207,11 @@ export class HostWorkerPool {
 
 	getRunner(): WorkerTaskRunner | null {
 		if (this.inlineOnly) return null;
+		if (Date.now() < this.pausedUntil) return null;
 		if (this.runner) return this.runner;
 		const scriptPath = this.scriptPathResolver();
 		if (!scriptPath) {
+			if (this.pauseAfterCrashMs !== null) return null;
 			this.inlineOnly = true;
 			this.warnInlineOnce(
 				"host-worker bundle not found — running worker tasks inline on the main thread",
@@ -185,9 +221,16 @@ export class HostWorkerPool {
 		this.runner = new WorkerTaskRunner({
 			workerScriptPath: scriptPath,
 			concurrency: this.concurrency,
-			name: "host-worker",
+			name: this.name,
 			idleTimeoutMs: this.idleTimeoutMs,
 			execArgv: this.execArgv,
+			resourceLimits: this.resourceLimits,
+			// Work can outlive its task here (the usage index refreshes in the
+			// background), so a crash with no task running must pause too.
+			onWorkerCrash:
+				this.pauseAfterCrashMs === null
+					? undefined
+					: (error) => this.recordCrash(error),
 		});
 		return this.runner;
 	}
@@ -215,7 +258,16 @@ export class HostWorkerPool {
 		options?: WorkerTaskOptions,
 	): Promise<TResult> {
 		const runner = this.getRunner();
-		if (!runner) return this.runInline(def, input, options);
+		if (!runner) {
+			if (this.pauseAfterCrashMs !== null) {
+				throw new WorkerPoolUnavailableError(
+					this.name,
+					def.type,
+					Date.now() < this.pausedUntil ? "paused" : "no-bundle",
+				);
+			}
+			return this.runInline(def, input, options);
+		}
 
 		try {
 			return await runner.runTask<TResult>(def.type, input, options);
@@ -225,6 +277,7 @@ export class HostWorkerPool {
 				error.name === WORKER_CRASH_ERROR_NAME
 			) {
 				this.recordCrash(error);
+				if (this.pauseAfterCrashMs !== null) throw error;
 				// The task died with the worker, not on its own merits — run it
 				// inline so the caller sees a real result or a real error.
 				const key =
@@ -321,11 +374,29 @@ export class HostWorkerPool {
 			(t) => now - t < CRASH_WINDOW_MS,
 		);
 		this.crashTimestamps.push(now);
-		if (this.crashTimestamps.length >= CRASH_BUDGET && !this.inlineOnly) {
-			this.inlineOnly = true;
-			this.warnInlineOnce(
-				`host-worker crashed ${CRASH_BUDGET}x within ${CRASH_WINDOW_MS / 1000}s — falling back to inline execution for the rest of this process`,
-			);
+		const budget = this.pauseAfterCrashMs === null ? CRASH_BUDGET : 1;
+		if (this.crashTimestamps.length >= budget && !this.inlineOnly) {
+			if (this.pauseAfterCrashMs === null) {
+				this.inlineOnly = true;
+				this.warnInlineOnce(
+					`host-worker crashed ${CRASH_BUDGET}x within ${CRASH_WINDOW_MS / 1000}s — falling back to inline execution for the rest of this process`,
+				);
+			} else {
+				this.pausedUntil = now + this.pauseAfterCrashMs;
+				this.crashTimestamps = [];
+				console.warn(
+					`[host-worker-pool] ${this.name} crashed — pausing for ${this.pauseAfterCrashMs / 1000}s`,
+				);
+				try {
+					this.onPause?.(error);
+				} catch (hookError) {
+					// Reporting must not stop the cleanup below.
+					console.warn(
+						`[host-worker-pool] ${this.name} onPause failed`,
+						hookError,
+					);
+				}
+			}
 			// Do NOT dispose the old runner: dispose() would reject its
 			// outstanding tasks with abort errors that bypass the inline
 			// retry. Detach it instead — in-flight tasks settle on their own

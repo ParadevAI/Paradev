@@ -2,7 +2,7 @@
 title: "How to Run Coding Agents on a Remote Machine or Always-On Host (2026)"
 description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, keep them working when your laptop closes, and review and preview their changes from your laptop."
 date: 2026-10-07
-lastUpdated: 2026-11-05
+lastUpdated: 2026-11-15
 type: "tutorial"
 competitors:
   - vs-code
@@ -140,7 +140,7 @@ A common path for a small team: start on laptops, then move long-running agent w
 
 ## How do I review and preview an agent's changes on a remote machine from my laptop?
 
-Review the diff where the code lives, and forward the dev server's port to your laptop so `localhost` works.
+Review the diff where the code lives, and forward the dev server's port to your laptop so `localhost` works. Paradev does both in one app: the **Changes** pane of a remote workspace shows the diff from the host, and the app forwards the ports that workspace started to your machine.
 
 - **VS Code Remote-SSH** shows the remote diff in Source Control and forwards ports over the SSH tunnel.
 - **Plain SSH:** `ssh -N -L 3000:localhost:3000 user@remote-host`, then open `http://localhost:3000`.

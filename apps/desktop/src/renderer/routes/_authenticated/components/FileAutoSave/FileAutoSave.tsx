@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { fileAutoSave } from "../../_dashboard/v2-workspace/$workspaceId/state/fileDocumentStore/fileAutoSave";
+import { fileAutoSave } from "../../_dashboard/workspace/$workspaceId/state/fileDocumentStore/fileAutoSave";
 
 export function FileAutoSave() {
 	const { data: mode = "off" } =

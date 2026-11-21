@@ -33,6 +33,7 @@ function isAllowedUrl(url: string): boolean {
 export function guardExtensionContents(
 	contents: Electron.WebContents,
 	openUrl: (url: string) => void,
+	onWindow?: (window: BrowserWindow) => void,
 ): void {
 	markBrowserPanePopup(contents);
 	const guard = (event: Electron.Event, url: string) => {
@@ -55,9 +56,12 @@ export function guardExtensionContents(
 		openUrl(details.url);
 		return { action: "deny" };
 	});
-	contents.on("did-create-window", (child) =>
-		guardExtensionContents(child.webContents, openUrl),
-	);
+	// A sign-in popup an extension page opens is a tab of its own, same as a
+	// pane's popup: without that the extension cannot see the page it opened.
+	contents.on("did-create-window", (child) => {
+		guardExtensionContents(child.webContents, openUrl, onWindow);
+		onWindow?.(child);
+	});
 }
 
 /**
@@ -70,6 +74,7 @@ export function openExtensionWindow(
 	session: Session,
 	options: ExtensionWindowOptions,
 	openUrl: (url: string) => void,
+	onWindow?: (window: BrowserWindow) => void,
 ): BrowserWindow {
 	if (!isAllowedUrl(options.url)) {
 		throw new Error(`Refusing to open ${options.url} in an extension window`);
@@ -90,7 +95,7 @@ export function openExtensionWindow(
 		},
 	});
 	const contents = window.webContents;
-	guardExtensionContents(contents, openUrl);
+	guardExtensionContents(contents, openUrl, onWindow);
 	window.once("ready-to-show", () => {
 		if (window.isDestroyed()) return;
 		if (options.focused === false) window.showInactive();

@@ -140,6 +140,8 @@ export interface PluginCatalogEntry {
 	interface: {
 		displayName: string;
 		category: PluginCategory;
+		/** A built-in icon key, or an image path inside the plugin (`./assets/icon.png`). */
+		icon?: string;
 	};
 	/**
 	 * Server-name → config. Names land verbatim as config keys in agent CLIs
@@ -539,6 +541,27 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 			firecrawl: {
 				type: "http",
 				url: "https://mcp.firecrawl.dev/v2/mcp-oauth",
+			},
+		},
+	},
+	{
+		name: "ahrefs",
+		version: "1.0.0",
+		description: "Research backlinks, keywords, and rankings",
+		interface: { displayName: "Ahrefs", category: "Data & APIs" },
+		mcpServers: {
+			ahrefs: { type: "http", url: "https://api.ahrefs.com/mcp/mcp" },
+		},
+	},
+	{
+		name: "planetscale",
+		version: "1.0.0",
+		description: "Inspect databases and branches and run SQL",
+		interface: { displayName: "PlanetScale", category: "Data & APIs" },
+		mcpServers: {
+			planetscale: {
+				type: "http",
+				url: "https://mcp.pscale.dev/mcp/planetscale",
 			},
 		},
 	},

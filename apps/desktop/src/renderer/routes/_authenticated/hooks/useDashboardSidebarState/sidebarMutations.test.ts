@@ -3,6 +3,7 @@ import {
 	ensureSidebarProjectRecord,
 	setSidebarProjectHidden,
 	tombstoneSidebarWorkspaceRecord,
+	updateRows,
 } from "./sidebarMutations";
 
 /**
@@ -97,14 +98,14 @@ function projectRow(
 
 function makeCollections() {
 	return {
-		v2WorkspaceLocalState: makeCollection<LocalStateRow>(
+		workspaceLocalState: makeCollection<LocalStateRow>(
 			(row) => row.workspaceId,
 		),
-		v2SidebarSections: makeCollection<{
+		sidebarSections: makeCollection<{
 			sectionId: string;
 			projectId: string;
 		}>((row) => row.sectionId),
-		v2SidebarProjects: makeCollection<ProjectRow>((row) => row.projectId),
+		sidebarProjects: makeCollection<ProjectRow>((row) => row.projectId),
 	};
 }
 
@@ -126,51 +127,51 @@ function asTombstoneArg(collections: Collections) {
 describe("setSidebarProjectHidden", () => {
 	it("flips only the hidden flag, leaving placement, sections and workspace rows intact", () => {
 		const collections = makeCollections();
-		collections.v2SidebarProjects.insert(
+		collections.sidebarProjects.insert(
 			projectRow("proj-1", { tabOrder: 3, isCollapsed: true }),
 		);
-		collections.v2SidebarSections.insert({
+		collections.sidebarSections.insert({
 			sectionId: "sec-1",
 			projectId: "proj-1",
 		});
-		collections.v2WorkspaceLocalState.insert(
+		collections.workspaceLocalState.insert(
 			localStateRow("ws-1", "proj-1", { sectionId: "sec-1", pinnedAt: 5 }),
 		);
 
 		setSidebarProjectHidden(asProjectArg(collections), "proj-1", true);
 
-		expect(collections.v2SidebarProjects.get("proj-1")).toMatchObject({
+		expect(collections.sidebarProjects.get("proj-1")).toMatchObject({
 			isHidden: true,
 			tabOrder: 3,
 			isCollapsed: true,
 		});
-		expect(collections.v2SidebarSections.get("sec-1")).toBeDefined();
+		expect(collections.sidebarSections.get("sec-1")).toBeDefined();
 		expect(
-			collections.v2WorkspaceLocalState.get("ws-1")?.sidebarState,
+			collections.workspaceLocalState.get("ws-1")?.sidebarState,
 		).toMatchObject({ sectionId: "sec-1", pinnedAt: 5, isHidden: false });
 
 		setSidebarProjectHidden(asProjectArg(collections), "proj-1", false);
-		expect(collections.v2SidebarProjects.get("proj-1")?.isHidden).toBe(false);
+		expect(collections.sidebarProjects.get("proj-1")?.isHidden).toBe(false);
 	});
 
 	it("is a no-op for a project with no placement row", () => {
 		const collections = makeCollections();
 		setSidebarProjectHidden(asProjectArg(collections), "proj-missing", true);
-		expect(collections.v2SidebarProjects.state.size).toBe(0);
+		expect(collections.sidebarProjects.state.size).toBe(0);
 	});
 });
 
 describe("ensureSidebarProjectRecord", () => {
 	it("reveals a hidden project instead of inserting a second row", () => {
 		const collections = makeCollections();
-		collections.v2SidebarProjects.insert(
+		collections.sidebarProjects.insert(
 			projectRow("proj-1", { isHidden: true, tabOrder: 7 }),
 		);
 
 		ensureSidebarProjectRecord(asProjectArg(collections), "proj-1");
 
-		expect(collections.v2SidebarProjects.state.size).toBe(1);
-		expect(collections.v2SidebarProjects.get("proj-1")).toMatchObject({
+		expect(collections.sidebarProjects.state.size).toBe(1);
+		expect(collections.sidebarProjects.get("proj-1")).toMatchObject({
 			isHidden: false,
 			tabOrder: 7,
 		});
@@ -183,33 +184,33 @@ describe("ensureSidebarProjectRecord", () => {
 			isCollapsed: true,
 			tabOrder: 7,
 		});
-		collections.v2SidebarProjects.insert(row);
+		collections.sidebarProjects.insert(row);
 		ensureSidebarProjectRecord(asProjectArg(collections), "proj-1", {
 			reveal: false,
 		});
-		expect(collections.v2SidebarProjects.get("proj-1")).toEqual(row);
+		expect(collections.sidebarProjects.get("proj-1")).toEqual(row);
 	});
 
 	it("inserts a visible row ahead of existing projects when none exists", () => {
 		const collections = makeCollections();
-		collections.v2SidebarProjects.insert(projectRow("proj-1", { tabOrder: 1 }));
+		collections.sidebarProjects.insert(projectRow("proj-1", { tabOrder: 1 }));
 
 		ensureSidebarProjectRecord(asProjectArg(collections), "proj-2");
 
-		const inserted = collections.v2SidebarProjects.get("proj-2");
+		const inserted = collections.sidebarProjects.get("proj-2");
 		expect(inserted?.isHidden).toBe(false);
 		expect(inserted?.tabOrder).toBeLessThan(1);
 	});
 
 	it("leaves a visible row untouched", () => {
 		const collections = makeCollections();
-		collections.v2SidebarProjects.insert(
+		collections.sidebarProjects.insert(
 			projectRow("proj-1", { tabOrder: 4, isCollapsed: true }),
 		);
 
 		ensureSidebarProjectRecord(asProjectArg(collections), "proj-1");
 
-		expect(collections.v2SidebarProjects.get("proj-1")).toMatchObject({
+		expect(collections.sidebarProjects.get("proj-1")).toMatchObject({
 			tabOrder: 4,
 			isCollapsed: true,
 			isHidden: false,
@@ -232,14 +233,14 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 		);
 
 		expect(
-			collections.v2WorkspaceLocalState.get("ws-new")?.sidebarState.isHidden,
+			collections.workspaceLocalState.get("ws-new")?.sidebarState.isHidden,
 		).toBe(true);
 		expect(cleaned).toEqual([]);
 	});
 
 	it("hides an existing row, clears its section, pin and right pane layout, and runs pane cleanup", () => {
 		const collections = makeCollections();
-		collections.v2WorkspaceLocalState.insert({
+		collections.workspaceLocalState.insert({
 			...localStateRow("ws-1", "proj-1", {
 				sectionId: "sec-1",
 				pinnedAt: 1753000000000,
@@ -257,11 +258,46 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 			},
 		);
 
-		const row = collections.v2WorkspaceLocalState.get("ws-1");
+		const row = collections.workspaceLocalState.get("ws-1");
 		expect(row?.sidebarState.isHidden).toBe(true);
 		expect(row?.sidebarState.sectionId).toBeNull();
 		expect(row?.sidebarState.pinnedAt).toBeNull();
 		expect(row?.rightPaneLayout).toBeUndefined();
 		expect(cleaned).toEqual(["ws-1"]);
+	});
+});
+
+describe("updateRows", () => {
+	it("writes every row in one update call, in key order", () => {
+		const rows = new Map([
+			["a", { tabOrder: 0 }],
+			["b", { tabOrder: 0 }],
+		]);
+		const calls: string[][] = [];
+		const collection = {
+			update: (
+				keys: string[],
+				callback: (drafts: Array<{ tabOrder: number }>) => void,
+			) => {
+				calls.push(keys);
+				callback(keys.map((key) => rows.get(key) ?? { tabOrder: -1 }));
+			},
+		};
+
+		updateRows<{ tabOrder: number }, number>(
+			collection as never,
+			new Map([
+				["b", 2],
+				["a", 1],
+			]),
+			(draft, tabOrder) => {
+				draft.tabOrder = tabOrder;
+			},
+		);
+		updateRows(collection as never, new Map(), () => {});
+
+		expect(calls).toEqual([["b", "a"]]);
+		expect(rows.get("a")?.tabOrder).toBe(1);
+		expect(rows.get("b")?.tabOrder).toBe(2);
 	});
 });

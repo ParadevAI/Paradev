@@ -8,6 +8,7 @@ import {
 	formatCurrency,
 	formatDate,
 	formatElapsed,
+	formatGbHours,
 	formatNumber,
 	formatPercent,
 	formatPrice,
@@ -27,6 +28,12 @@ describe("format helpers (en)", () => {
 		const time = new Date(2026, 9, 26, 23, 11);
 		expect(formatClockTime(time)).toBe("11:11");
 		expect(formatClockTime(time, "de")).toBe("23:11");
+	});
+
+	test("formatGbHours rounds to one decimal and marks a small amount", () => {
+		expect(formatGbHours(0)).toBe("0");
+		expect(formatGbHours(0.04)).toBe("<0.1");
+		expect(formatGbHours(1234.56)).toBe("1,234.6");
 	});
 
 	test("formatNumber groups digits", () => {

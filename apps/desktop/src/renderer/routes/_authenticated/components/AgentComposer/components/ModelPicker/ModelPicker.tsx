@@ -24,7 +24,10 @@ import {
 	PILL_TRIGGER_CLASS,
 } from "../../constants";
 import { useOptimisticSelections } from "../../hooks/useOptimisticSelections";
-import { currentLabel } from "../../utils/configOptionLabels";
+import {
+	currentLabel,
+	currentModelLabel,
+} from "../../utils/configOptionLabels";
 import { fastOption } from "../../utils/toggleOption";
 import { EffortSliderCard } from "./components/EffortSliderCard";
 import { ModelPanel } from "./components/ModelPanel";
@@ -98,7 +101,6 @@ export function ModelPicker({
 	);
 	const fast = fastOption(settings);
 	const effort = settings.find((option) => option.category === "thought_level");
-	const effortLabel = currentLabel(effort);
 	// The slider card owns effort and the fast toggle; the rest stay as rows.
 	const rows = settings.filter(
 		(option) => option !== effort && (effort ? option !== fast : true),
@@ -107,10 +109,19 @@ export function ModelPicker({
 	const showsModels = Boolean(model) || canSwitchAgent;
 	const currentAgentLabel = currentAgent?.label;
 	const pillLabel =
-		currentLabel(model) ??
+		currentModelLabel(model) ??
 		model?.label ??
 		currentAgentLabel ??
 		settings[0]?.label;
+	const currentEffort = effort?.options.find(
+		(entry) => entry.id === effort.currentValue,
+	);
+	const currentEffortLabel =
+		currentEffort?.id === agentSwitcher?.defaultOptionId
+			? (currentEffort?.description ?? currentEffort?.label)
+			: currentEffort?.label;
+	const effortLabel =
+		currentEffortLabel === pillLabel ? undefined : currentEffortLabel;
 	const modelLabelHidden = Boolean(hideModelLabel && agentIcon);
 	const hiddenLabels = [
 		modelLabelHidden ? pillLabel : null,

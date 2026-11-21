@@ -285,6 +285,12 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.chatMove.moveStopped": () =>
+		i18n._(
+			msg({
+				message: "This move stopped. The chat is still in its old workspace.",
+			}),
+		),
 	"serverError.channel.notFound": () =>
 		i18n._(
 			msg({
@@ -381,6 +387,38 @@ export const serverErrorMessages: Record<
 				message: "This message is too long",
 			}),
 		),
+	"serverError.cloud.cloudUsageNotEnabled": () =>
+		i18n._(
+			msg({
+				message: "Cloud usage is not enabled for this organization.",
+			}),
+		),
+	"serverError.cloud.cursorNotValid": () =>
+		i18n._(
+			msg({
+				message:
+					"That cursor could not be read. Drop it to start from the first page.",
+			}),
+		),
+	"serverError.cloud.noBillingPeriods": () =>
+		i18n._(
+			msg({
+				message:
+					"This organization has no billing periods. Choose a time range instead.",
+			}),
+		),
+	"serverError.cloud.noBillingPeriodStartsOn": (params) =>
+		i18n._(
+			msg({
+				message: `No billing period starts on ${params?.period}.`,
+			}),
+		),
+	"serverError.cloud.onlyAdminsSeeUsageByPerson": () =>
+		i18n._(
+			msg({
+				message: "Only owners and admins can see usage by person.",
+			}),
+		),
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
@@ -395,13 +433,20 @@ export const serverErrorMessages: Record<
 					"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 			}),
 		),
-	"serverError.cloudWorkspace.usageLimitReached": () =>
-		i18n._(
-			msg({
-				message:
-					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
-			}),
-		),
+	"serverError.cloudWorkspace.usageLimitReached": (params) =>
+		params?.next === "upgrade"
+			? i18n._(
+					msg({
+						message:
+							"Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
+					}),
+				)
+			: i18n._(
+					msg({
+						message:
+							"Cloud usage is used up for this period. An owner can buy more in Settings, Billing.",
+					}),
+				),
 	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>
 		i18n._(
 			msg({
@@ -474,6 +519,25 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Could not record environment",
+			}),
+		),
+	"serverError.environment.noInstall": () =>
+		i18n._(
+			msg({
+				message:
+					"This environment has no [install] to build. Add one to .paradev/config.toml on its base branch.",
+			}),
+		),
+	"serverError.environment.manualBuildsRateLimited": (params) =>
+		i18n._(
+			msg({
+				message: `This environment can start 3 manual builds an hour. Try again in ${params?.minutes} minutes.`,
+			}),
+		),
+	"serverError.environment.buildAlreadyRunning": () =>
+		i18n._(
+			msg({
+				message: "A build of this environment is already running",
 			}),
 		),
 	"serverError.task.notFound": () =>
@@ -719,6 +783,12 @@ export const serverErrorMessages: Record<
 				message: "Cannot remove yourself",
 			}),
 		),
+	"serverError.organization.alreadyExists": () =>
+		i18n._(
+			msg({
+				message: "Organization already exists",
+			}),
+		),
 	"serverError.organization.createFailed": () =>
 		i18n._(
 			msg({
@@ -772,6 +842,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Only owners can update organization settings",
+			}),
+		),
+	"serverError.organization.onlyOwnerCannotLeave": () =>
+		i18n._(
+			msg({
+				message: "You cannot leave the organization as the only owner",
 			}),
 		),
 	"serverError.organization.organizationNotFound": () =>
@@ -1197,6 +1273,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Too many support reports. Try again later.",
+			}),
+		),
+	"serverError.team.mustBelongToATeam": () =>
+		i18n._(
+			msg({
+				message: "You should be a member of at least one team",
 			}),
 		),
 	"serverError.team.taskKeyInvalid": () =>

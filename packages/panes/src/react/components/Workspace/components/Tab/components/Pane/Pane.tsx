@@ -14,7 +14,10 @@ import type {
 	SplitPosition,
 	Tab,
 } from "../../../../../../../types";
-import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
+import {
+	usePaneAppearance,
+	usePaneFlush,
+} from "../../../../../../hooks/usePaneAppearance";
 import { usePaneAside } from "../../../../../../hooks/usePaneAside";
 import { PaneFocusContext } from "../../../../../../hooks/usePaneFocus";
 import type {
@@ -96,6 +99,11 @@ export function Pane<TData>({
 }: PaneComponentProps<TData>) {
 	const { t } = useLingui();
 	const isCards = usePaneAppearance() === "cards";
+	const flush = usePaneFlush();
+	const minimumSizeClassName =
+		isCards && parentDirection === null
+			? "min-h-[160px] min-w-0"
+			: PANE_MIN_SIZE_CLASS_NAME;
 	const definition = registry[pane.kind];
 
 	const tabs = store.getState().tabs;
@@ -318,8 +326,8 @@ export function Pane<TData>({
 					// holds both the header's absolute popovers and the pane's banners.
 					className={
 						isCards
-							? `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden rounded-[10px] border border-border bg-background outline-none`
-							: `@container/pane-header relative flex h-full w-full ${PANE_MIN_SIZE_CLASS_NAME} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
+							? `@container/pane-header relative flex h-full w-full ${minimumSizeClassName} flex-col overflow-hidden bg-background outline-none${flush ? "" : " rounded-[10px] border border-border"}`
+							: `@container/pane-header relative flex h-full w-full ${minimumSizeClassName} flex-col overflow-hidden border-2 outline-none transition-colors duration-150 ${
 									isActive && parentDirection !== null
 										? "border-primary/15"
 										: "border-transparent"

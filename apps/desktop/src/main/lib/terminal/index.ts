@@ -7,13 +7,6 @@ import { DaemonTerminalManager, getDaemonTerminalManager } from "./daemon";
 import { stopV1Sessions, type V1DaemonClient } from "./stop-v1-sessions";
 
 export { DaemonTerminalManager, getDaemonTerminalManager };
-export type {
-	CreateSessionParams,
-	SessionResult,
-	TerminalDataEvent,
-	TerminalEvent,
-	TerminalExitEvent,
-} from "./types";
 
 export interface TerminalDaemonDeps {
 	getTerminalHostClient: () => Pick<

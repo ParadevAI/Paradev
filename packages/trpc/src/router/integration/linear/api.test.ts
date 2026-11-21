@@ -32,7 +32,9 @@ const rawIssue = {
 };
 
 function clientReturning(data: unknown) {
-	const rawRequest = mock(async () => ({ data }));
+	const rawRequest = mock(async (_query: string, _variables?: unknown) => ({
+		data,
+	}));
 	return {
 		client: { client: { rawRequest } } as unknown as LinearClient,
 		rawRequest,
@@ -193,7 +195,9 @@ describe("listProjects", () => {
 				},
 			},
 		];
-		const rawRequest = mock(async () => ({ data: pages.shift() }));
+		const rawRequest = mock(async (_query: string, _variables?: unknown) => ({
+			data: pages.shift(),
+		}));
 		const client = { client: { rawRequest } } as unknown as LinearClient;
 		const projects = await listProjects(client);
 		expect(projects.map((project) => project.id)).toEqual(["p1", "p2"]);
