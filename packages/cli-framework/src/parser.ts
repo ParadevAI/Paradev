@@ -129,7 +129,7 @@ export function parseArgv(
 		}
 
 		// --flag value or -f value
-		if (arg.startsWith("-")) {
+		if (arg.startsWith("-") && arg !== "-") {
 			const entry = optionsByFlag.get(arg);
 			if (!entry) {
 				throw new CLIError(`Unknown option: ${arg}`);
