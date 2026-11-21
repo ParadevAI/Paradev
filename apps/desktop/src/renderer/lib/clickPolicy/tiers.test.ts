@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { tierFor } from "./tiers";
+import { tierFor, withPlainDefault } from "./tiers";
 import type { ModifierEvent } from "./types";
 
 function event(init: Partial<ModifierEvent> = {}): ModifierEvent {
@@ -34,5 +34,21 @@ describe("tierFor 2-tier", () => {
 		expect(tierFor(event({ metaKey: true, shiftKey: true }), "2-tier")).toBe(
 			"meta",
 		);
+	});
+});
+
+describe("withPlainDefault", () => {
+	const unbound = { plain: null, shift: null, meta: "pane", metaShift: null };
+
+	it("fills an unbound plain click and leaves other tiers alone", () => {
+		expect(withPlainDefault(unbound, "newTab")).toEqual({
+			...unbound,
+			plain: "newTab",
+		});
+	});
+
+	it("keeps a plain click the user bound", () => {
+		const bound = { ...unbound, plain: "external" };
+		expect(withPlainDefault(bound, "newTab")).toBe(bound);
 	});
 });
