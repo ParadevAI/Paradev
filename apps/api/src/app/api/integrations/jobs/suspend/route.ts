@@ -91,6 +91,7 @@ async function githubPass(deadline: number) {
 	let processed = 0;
 	for (const installation of toSuspend) {
 		if (Date.now() > deadline) break;
+		if (await organizationSyncsNow(installation.organizationId)) continue;
 		const outcome = await suspendInstallation(installation);
 		outcomes[outcome] += 1;
 		processed += 1;

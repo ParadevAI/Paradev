@@ -12,6 +12,7 @@ import { PullRequestDetailToggle } from "renderer/routes/_authenticated/_dashboa
 import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
 import { AuthorFilter } from "./components/AuthorFilter";
+import { ReviewerFilter } from "./components/ReviewerFilter";
 import { ReviewFilter } from "./components/ReviewFilter";
 
 type PullRequestsStateFilter = "open" | "all" | "merged";
@@ -24,6 +25,8 @@ interface PullRequestsTopBarProps {
 	projectTargets: ProjectQueryTarget[];
 	authorFilter: string | null;
 	onAuthorFilterChange: (author: string | null) => void;
+	reviewerFilter: string | null;
+	onReviewerFilterChange: (reviewer: string | null) => void;
 	reviewFilter: PullRequestReviewFilter | null;
 	onReviewFilterChange: (review: PullRequestReviewFilter | null) => void;
 	stateFilter: PullRequestsStateFilter;
@@ -42,6 +45,8 @@ export function PullRequestsTopBar({
 	projectTargets,
 	authorFilter,
 	onAuthorFilterChange,
+	reviewerFilter,
+	onReviewerFilterChange,
 	reviewFilter,
 	onReviewFilterChange,
 	stateFilter,
@@ -82,6 +87,7 @@ export function PullRequestsTopBar({
 	const activeFilterCount = [
 		projectFilters.length > 0,
 		!!authorFilter,
+		!!reviewerFilter,
 		!!reviewFilter,
 	].filter(Boolean).length;
 
@@ -199,9 +205,9 @@ export function PullRequestsTopBar({
 							)}
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent align="end" className="w-80 space-y-1">
+					<PopoverContent align="end" className="w-80 p-2">
 						<div className="flex items-center justify-between gap-2">
-							<span className="text-xs text-muted-foreground">
+							<span className="pl-1 text-xs text-muted-foreground">
 								<Trans>Repository</Trans>
 							</span>
 							<ProjectFilter
@@ -211,7 +217,7 @@ export function PullRequestsTopBar({
 							/>
 						</div>
 						<div className="flex items-center justify-between gap-2">
-							<span className="text-xs text-muted-foreground">
+							<span className="pl-1 text-xs text-muted-foreground">
 								<Trans>Author</Trans>
 							</span>
 							<AuthorFilter
@@ -221,7 +227,17 @@ export function PullRequestsTopBar({
 							/>
 						</div>
 						<div className="flex items-center justify-between gap-2">
-							<span className="text-xs text-muted-foreground">
+							<span className="pl-1 text-xs text-muted-foreground">
+								<Trans>Reviewer</Trans>
+							</span>
+							<ReviewerFilter
+								value={reviewerFilter}
+								onChange={onReviewerFilterChange}
+								projectTargets={projectTargets}
+							/>
+						</div>
+						<div className="flex items-center justify-between gap-2">
+							<span className="pl-1 text-xs text-muted-foreground">
 								<Trans>Reviews</Trans>
 							</span>
 							<ReviewFilter

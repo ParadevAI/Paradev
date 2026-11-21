@@ -528,31 +528,6 @@ diagnostic and changes no codegen: the package uses no Swift-6-only syntax.
 **Guard:** `apps/mobile/expo-observe-swift-version-patch.test.ts`. Check
 whether upstream relaxed the podspec before re-applying after an SDK bump.
 
-## react-native-enriched-markdown (`react-native-enriched-markdown@<version>.patch`)
-
-**Why:** an agent message with a code block inside a numbered list item drew
-the item's number ("3.") on every line of the code, laid the code box over the
-item's own text, and drew more empty "3." lines after it. `ListItemRenderer`
-styles the item in ranges and only skips a range that *starts* in a code
-block. A range that starts in the item's text and runs on into the code block
-gets the list paragraph style and marker attributes for the whole block. Then
-`ListMarkerDrawer` draws a marker at the start of every paragraph that has
-them, and each code line is a paragraph.
-
-**What it changes:** `ios/renderer/ListItemRenderer.m` enumerates code blocks
-inside each range and styles only the parts outside them. It also marks every
-paragraph after the item's first one with `ListContinuationAttribute`.
-`ios/utils/ListMarkerDrawer.m` draws no marker on a paragraph with that mark.
-
-**Guard test:** `apps/mobile/react-native-enriched-markdown-list-patch.test.ts`.
-
-**Regenerating after a version bump:** apply the same two changes to the new
-version's files, write the diff to
-`patches/react-native-enriched-markdown@<version>.patch` (paths relative to the
-package root), update the key in `patchedDependencies`, run `bun install`, then
-`bun test apps/mobile/react-native-enriched-markdown-list-patch.test.ts`. It is
-a native change: rebuild the app to see it.
-
 ## @better-auth/oauth-provider (`@better-auth%2Foauth-provider@<version>.patch`)
 
 **Why:** the token endpoint rotates the refresh token on every refresh. When a
@@ -733,6 +708,23 @@ boundary.
    `runtime.sendNativeMessage` handlers are removed. They read one message per
    chunk of host output, counted characters instead of bytes, and left hosts
    running. The app's `extension-host/native-messaging/` is the only path.
+11. `tabs.query` applies `currentWindow` and `lastFocusedWindow`, which the
+   package read and ignored, so every window's active tab came back and the
+   caller took the first. A password manager filling a field in a sign-in
+   popup got the pane behind it instead. Both flags answer for the focused
+   window — resolved through `getLastFocusedWindow`, so a query agrees with
+   `windows.getCurrent` when no window has recorded focus and the newest one
+   stands in. A window that is focused when
+   it is added becomes that window: Chromium focuses a popup as it opens it,
+   before the app hands it over, so waiting for a `focus` event left the
+   extension answering for the window behind the popup.
+12. Window and tab shape: a window's `type` comes from the app
+   (`windowType` in `ChromeExtensionImpl`) instead of always being `"normal"`,
+   and `windows.getAll` filters on `windowTypes`. A tab's `index` is its
+   position in its own window instead of `-1`, and `tabs.query` stops
+   renumbering `index` by the position in the result it returns — the two
+   together are what makes `index` mean anything. `query` also applies
+   `index` and `windowType`.
 
 **What it changes** (`dist/chrome-extension-api.preload.js`): `chrome.storage`
 is no longer replaced. The package made `sync` and `managed` the same object
@@ -756,12 +748,22 @@ through `permissions.request`. Two tests list every handler the API classes
 register and every event name their code sends, and fail when one has no rule
 in `extensionApiRules`. One drives `ContextMenusAPI` through each handler and
 `restoreContextMenuItems`, and one reads the preload for the two changes there.
+Four more cover the window a query answers for and the shape it answers with:
+`tabs.query` with `currentWindow`, `observeWindow` on a window that already has
+focus, `windows.getAll` with `windowTypes`, and `tabs.query` on `index` and
+`windowType`.
 
 **Regenerating after a version bump:** `CI=1 bun patch electron-chrome-extensions`.
 In both bundles: add `senderExtensionId` and `assertSenderIsExtension` before
 `RoutingDelegate` and call it first in the three handlers; add the helpers and
 the table (`TAB_URL_FIELDS` to `hasApiPermission`) after `matchesTitlePattern`;
-add the `canSeeTabUrl` line to the `TabsAPI.query` filter; add `update` and
+add the `canSeeTabUrl`, `inFocusedWindow`, `index` and `windowType` lines to the
+`TabsAPI.query` filter and drop its trailing `index` renumbering; add
+`windowTypeOf` and `tabIndexOf` before `tabDetailsForExtension` and call them
+from `createWindowDetails` and `createTabDetails`; add the `windowTypes` filter
+to `WindowsAPI.getAll` and the `isFocused` line to `WindowsAPI.observeWindow`;
+add `windowType` to `ChromeExtensionImpl` in `dist/types/browser/impl.d.ts`;
+add `update` and
 `emitChanged` to `ContextMenusAPI` and `restoreContextMenuItems` after
 `addWindow`; remove the `runtime.connectNative`, `runtime.disconnectNative`
 and `runtime.sendNativeMessage` handlers from `RuntimeAPI`. In the preload,
@@ -774,3 +776,55 @@ listener. Then `CI=1 bun patch --commit
 'node_modules/electron-chrome-extensions'`, drop the empty `.bun-tag-*` entry
 it adds, run `bun install`, and run the guard test. A new handler or event in
 a ruled namespace fails that test until it has a rule.
+
+## @vercel/sandbox (`@vercel%2Fsandbox@<version>.patch`)
+
+**Why:** from 4.0.0 the SDK imports `Dispatcher1Wrapper` and `fetch` from
+`undici` 8. Bun replaces the bare `undici` specifier with its own built-in
+module, which has no `Dispatcher1Wrapper` (checked on Bun 1.4.3, 1.4.4 and the
+2026-11-12 canary), so the SDK fails at import: `Export named
+'Dispatcher1Wrapper' not found in module 'undici'`. Every Bun test that
+reaches `packages/trpc/src/lib/sandbox/vercel.ts` fails, and so do
+`bun run release` and the other `packages/sandbox` scripts. Node is not
+affected.
+
+**What it changes** (`dist/api-client/base-client.js` and `.cjs`): the import
+specifier `undici` becomes `undici/index.js`. Bun does not replace a path
+import, so it loads the undici 8 the SDK depends on. Under Node both
+specifiers resolve to the same file.
+
+**Guard test:** `packages/trpc/src/lib/sandbox/vercel-sandbox-undici-patch.test.ts`.
+
+**Regenerating after a version bump:** first check if the patch is still
+needed: `bun -e 'import("@vercel/sandbox")'` without it. If the import
+succeeds, delete the patch, this section and the guard test. If not,
+`bun patch @vercel/sandbox`, change the two specifiers,
+`bun patch --commit 'node_modules/@vercel/sandbox'`, then run the guard test.
+
+## sonner (`sonner@<version>.patch`)
+
+**Why:** #9938. Sonner treats a `loading` toast as not dismissable: it hides the
+close button and ignores swipe for that type, even with `closeButton` set on the
+`Toaster`. A loading toast stays until code replaces it, so a slow merge queue
+left "Adding to queue…" toasts on screen with no way to close them. Any loading
+toast must be dismissable by the user.
+
+**What it changes** (`dist/index.js` and `dist/index.mjs`): two lines in
+`Toast`. `disabled` is no longer `true` for loading toasts (it gated swipe and
+the close click), and the close button renders for every type. Loading toasts
+still do not auto-close.
+
+**Guard test:** `apps/desktop/src/sonner-dismissable-loading-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch sonner@<new-version>
+# in node_modules/sonner/dist/index.{js,mjs}: set `const disabled = false;`
+# and drop `&& toastType !== 'loading'` from the close button condition
+bun patch --commit 'node_modules/sonner'
+bun test apps/desktop/src/sonner-dismissable-loading-patch.test.ts
+```
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test once sonner lets loading toasts be dismissed.

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 
 import { formatOutput, table } from "./output";
 
@@ -12,16 +12,8 @@ const BEL = "\x07";
 // Built from constants: a regex literal cannot hold control characters.
 const OSC8 = new RegExp(`${ESC}\\]8;;[^${BEL}]*${BEL}`, "g");
 
-const originalIsTTY = process.stdout.isTTY;
-
-function setTTY(value: boolean | undefined): void {
-	Object.defineProperty(process.stdout, "isTTY", {
-		value,
-		configurable: true,
-	});
-}
-
-afterEach(() => setTTY(originalIsTTY));
+const LINKING = { isTTY: true, term: "xterm-256color" };
+const PIPE = { isTTY: false, term: "xterm-256color" };
 
 describe("formatOutput", () => {
 	const raw = { raw: "#!/bin/sh\necho hi\n" };
@@ -57,53 +49,58 @@ describe("formatOutput", () => {
 
 describe("table", () => {
 	test("truncates a cell wider than its cap", () => {
-		setTTY(false);
 		const out = table(
 			[{ title: "Schema history for every published page and version" }],
 			["title"],
 			undefined,
 			[30],
+			PIPE,
 		);
 		expect(out).toContain("Schema history for every publ…");
 	});
 
 	test("prints a URL in full however narrow its column", () => {
-		setTTY(false);
-		const out = table(ROWS, COLUMNS, undefined, CAPS);
+		const out = table(ROWS, COLUMNS, undefined, CAPS, PIPE);
 		expect(out).toContain(URL);
 		expect(out).not.toContain("…");
 		expect(out).not.toContain("\x1b]8;;");
 	});
 
 	test("links the URL it prints", () => {
-		setTTY(true);
-		const out = table(ROWS, COLUMNS, undefined, CAPS);
+		const out = table(ROWS, COLUMNS, undefined, CAPS, LINKING);
 		expect(out).toContain(`\x1b]8;;${URL}\x07${URL}\x1b]8;;\x07`);
 	});
 
+	test("prints a plain URL on a dumb terminal", () => {
+		const out = table(ROWS, COLUMNS, undefined, CAPS, {
+			isTTY: true,
+			term: "dumb",
+		});
+		expect(out).toContain(URL);
+		expect(out).not.toContain("\x1b]8;;");
+	});
+
 	test("keeps padding outside the link so it stops at the URL", () => {
-		setTTY(true);
 		const out = table(
 			[{ url: "http://a.dev" }, { url: URL }],
 			["url"],
 			["URL"],
 			[50],
+			LINKING,
 		);
 		expect(out).toContain("\x07http://a.dev\x1b]8;;\x07");
 	});
 
 	test("columns line up whether or not links are emitted", () => {
-		const widths = [true, false].map((tty) => {
-			setTTY(tty);
-			return table(ROWS, COLUMNS, undefined, CAPS)
+		const widths = [LINKING, PIPE].map((terminal) =>
+			table(ROWS, COLUMNS, undefined, CAPS, terminal)
 				.split("\n")
-				.map((line) => line.replace(OSC8, "").length);
-		});
+				.map((line) => line.replace(OSC8, "").length),
+		);
 		expect(widths[0]).toEqual(widths[1]!);
 	});
 
 	test("lines the next column up behind a URL wider than its cap", () => {
-		setTTY(false);
 		const lines = table(
 			[
 				{ url: URL, id: "4a436fc7" },
@@ -112,6 +109,7 @@ describe("table", () => {
 			["url", "id"],
 			["URL", "ID"],
 			[20, 10],
+			PIPE,
 		).split("\n");
 		const starts = ["ID", "4a436fc7", "860b82f8"].map((cell, i) =>
 			lines[i]?.indexOf(cell),
@@ -120,8 +118,7 @@ describe("table", () => {
 	});
 
 	test("leaves non-URL cells alone", () => {
-		setTTY(true);
-		const out = table([{ id: "not a url" }], ["id"], ["ID"], [30]);
+		const out = table([{ id: "not a url" }], ["id"], ["ID"], [30], LINKING);
 		expect(out).not.toContain("\x1b]8;;");
 	});
 });

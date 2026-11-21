@@ -1,0 +1,85 @@
+---
+title: "Paradev 与 Conductor：本地智能体、云端工作区和代码审查"
+description: "比较 Paradev 与 Conductor 在并行编码智能体、本地和云端工作区、代码审查、团队协作以及移动访问方面的差异。"
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset 与 conductor 对比
+  - conductor 替代方案
+  - AI 智能体编排
+  - 编码智能体管理
+  - conductor 与 superset 对比
+  - conductor 即将停服
+  - 从 conductor 迁移
+---
+
+如果你决定迁移，请参阅[从 Conductor 切换到 Paradev](/conductor)了解迁移选项，或根据需要查看[从 Conductor 迁移](https://docs.paradev.com/migrate-from-conductor)（本地应用）或[从 Conductor Cloud 迁移](https://docs.paradev.com/migrate-from-conductor-cloud)（云端工作区）。
+
+Paradev 和 Conductor 都会将并行编码任务整理到各自独立的工作区中。Conductor 提供云端工作区、共享团队对话、API 和 MCP 服务器、定时 Routines，以及带云端访问和本地 Mac 工作区实验性远程控制功能的 iOS 应用。Paradev 的 iPhone 和 iPad 应用可连接其云端工作区和你自己的主机，因此无论智能体在哪里运行，你都可以继续使用工作区终端并审查差异。
+
+## 概览
+
+| 需求 | Paradev | Conductor |
+|---|---|---|
+| 智能体 | Claude Code、Codex、OpenCode、Gemini CLI、Cursor Agent、Copilot、Amp，以及你添加的任意自定义 CLI 智能体 | Claude Code、Codex、Cursor、OpenCode |
+| 工作位置 | 本地工作区、已连接的主机、你自己的 Linux 服务器（[自带云端](https://docs.paradev.com/bring-your-own-cloud)）以及[云端工作区](https://docs.paradev.com/cloud-workspaces) | 本地 Mac 工作区和云端沙箱 |
+| 代码审查 | 更改窗格可提交、推送并创建 PR；PR 窗格可查看检查项、审查讨论串并进行合并 | 差异、检查项、拉取请求、合并和归档 |
+| 团队访问 | 添加的主机，可按成员授予访问权限；另有组织访问 | 共享云端工作区和对话 |
+| 浏览器 | 应用内浏览器窗格，带设计模式：选中一个元素并发送给智能体 | 浏览器预览 |
+| 自动化 | Pro 版支持在选定主机上定时运行智能体，并提供运行历史和失败重试 | 可按计划或通过 GitHub action 启动的云端 Routines |
+| 程序化控制 | CLI、TypeScript SDK 和 MCP 服务器 | API 和 Conductor MCP |
+| 手机 | 可从 App Store 下载 iPhone 和 iPad 应用；需 iOS 或 iPadOS 26+ 和 Pro；支持云端工作区及自有主机 | iOS 应用；支持云端工作区和[对本地 Mac 工作区的实验性远程控制](https://www.conductor.build/docs/reference/remote-control)。若要远程控制，Mac 必须保持开启、唤醒并联网。 |
+| 定价 | 免费；Pro {{price:pro}}/用户/月，或按年计费 {{price:pro:yearly}}；Team {{price:team}}，或按年计费 {{price:team:yearly}}；Ultra {{price:ultra}}；Enterprise 价格定制。付费计划可访问云端；包含用量和按量计费的额外用量请参阅[定价](/pricing)。 | 请参阅 Conductor 的[当前计划和账户访问权限](https://www.conductor.build/docs/cloud/faq) |
+
+Conductor 的[介绍](https://www.conductor.build/docs)列出了四种智能体 harness 及其代码审查流程。[云端文档](https://www.conductor.build/docs/cloud)介绍了共享环境和隔离沙箱。其当前文档也介绍了[通过 iPhone 远程控制本地 Mac 工作区的实验性功能](https://www.conductor.build/docs/reference/remote-control)。
+
+## Paradev 的要求
+
+Paradev 会在各自独立的工作区中运行 CLI 编码智能体，并在同一应用中提供终端和差异审查。桌面版支持 macOS 和实验性的 Linux AppImage。目前尚不支持 Windows。Paradev 根据 MIT 许可证开源。喜欢 Conductor 聊天功能的用户可以通过[聊天界面](https://docs.paradev.com/chat)使用 Claude Code、Codex、OpenCode 和 Pi。
+
+同时处理多个会话时，工作区页面会按状态（需要处理、正在工作、需要审查、空闲、已合并）汇总你所有主机中的工作区。中断的智能体会话可在同一窗格中恢复；Claude Code 或 Codex 启动的子智能体会显示在其父智能体下方。
+
+要在 [iPhone 和 iPad 上使用 Paradev](/mobile)，需要 iOS 26 或 iPadOS 26 或更高版本，以及 Pro。使用云端工作区时，不必让自己的电脑保持联网；如果工作区运行在自己的机器上，则该主机必须保持在线。远程访问和自动化也需要付费计划。请参阅[定价](/pricing)和[远程访问设置](https://docs.paradev.com/remote-access)。
+
+## 在你的仓库中试用
+
+本对比由 Paradev 发布。文中链接的 Conductor 文档支持相关功能描述；下方试用方法用于评估，并非经过测量的性能排名。
+
+要比较这两款应用，请在每款应用中使用相同的仓库提交、智能体、模型和两条互不依赖的任务提示。记录应用和智能体版本、日期以及任何设置差异。[并行任务指南](/blog/parallel-coding-agents-guide)包含范围明确的提示示例。
+
+| 试用步骤 | 记录的证据 |
+|---|---|
+| 创建两个互不依赖的任务 | 工作区路径和分支名；运行测试前所需的设置步骤 |
+| 让每个智能体完成一项小改动 | 提示、模型、修改的文件和检查输出 |
+| 要求修正一处内容 | 是否能找到并恢复正确的会话 |
+| 审查并整合两项更改 | 审查步骤、冲突和合并后的测试结果 |
+| 如有需要，尝试远程访问 | 主机可用性、所需计划以及断开连接时的情况 |
+
+将设置和代码审查耗时与智能体执行耗时分开测量。下结论前应重复试验：智能体的输出会有差异，而且运行更快也可能产生更差的差异结果。Git 工作树可以隔离工作文件，但不能保证整合时没有冲突，也不能确保智能体权限受到沙箱限制。
+
+![正在 Paradev 中审查一项更改。](/images/readme/diff-viewer.png)
+
+## Conductor 用户现在可以怎么做
+
+如果决定迁移，请保存分支并导出你想保留的记录。
+
+如果你想通过 iPhone 回复智能体，并在任务运行于自己的电脑、主机或云端工作区时审查其更改，同时使用任意 CLI 智能体，请选择 Paradev。通过[手机端操作指南](/blog/claude-code-codex-iphone)验证设置。要迁移工作，请参阅[本地应用指南](https://docs.paradev.com/migrate-from-conductor)或 [Conductor Cloud 指南](https://docs.paradev.com/migrate-from-conductor-cloud)。
+
+查看当前的 [Paradev 计划](/pricing)，包括计算和智能体提供商费用。智能体提供商的用量费用另行计费。
+
+## 常见问题
+
+### Conductor 只能用于本地工作吗？
+
+不是。Conductor 文档介绍了本地 Mac 工作区和[云端沙箱](https://www.conductor.build/docs/cloud)，其中包括共享云端工作区。其 iOS 应用也提供[对本地 Mac 工作区的实验性远程控制](https://www.conductor.build/docs/reference/remote-control)。
+
+### Conductor 能运行 OpenCode 吗？
+
+可以。其介绍将 OpenCode 与 Claude Code、Codex 和 Cursor 一并列出。
+
+### 使用 Paradev 是否必须更换编辑器？
+
+不必。你可以在自己的编辑器中打开工作区目录，同时由 Paradev 管理终端和工作区。对于重叠的编辑操作，应指定一个负责人。

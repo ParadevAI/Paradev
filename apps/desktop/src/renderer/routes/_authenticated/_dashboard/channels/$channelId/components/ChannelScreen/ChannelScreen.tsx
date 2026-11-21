@@ -204,7 +204,7 @@ export function ChannelScreen({
 		onSuccess: () => {
 			refresh();
 			if (channel?.visibility === "private") {
-				void navigate({ to: "/v2-workspaces" });
+				void navigate({ to: "/workspaces" });
 			}
 		},
 		onError,
@@ -217,7 +217,7 @@ export function ChannelScreen({
 	const archive = cloudTrpc.channel.archive.useMutation({
 		onSuccess: () => {
 			refresh();
-			void navigate({ to: "/v2-workspaces" });
+			void navigate({ to: "/workspaces" });
 		},
 		onError,
 	});

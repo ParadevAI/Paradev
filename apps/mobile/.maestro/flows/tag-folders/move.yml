@@ -1,0 +1,14 @@
+# Moves fix-login from bugs to Feature work, then ungroups it. Runs on the
+# seeded state in Manual order. Workspace rows are not in the accessibility
+# tree, so the row is long-pressed by position (iPhone 17 Pro).
+appId: sh.superset.mobile
+---
+- longPressOn:
+    point: "40%,${FIX_LOGIN_Y}"
+- tapOn: "Move to group"
+- tapOn: "Feature work"
+- extendedWaitUntil:
+    visible: "Feature work group, 3 workspaces"
+    timeout: 8000
+- assertVisible: "bugs group, 1 workspace"
+- takeScreenshot: tag-folders-moved

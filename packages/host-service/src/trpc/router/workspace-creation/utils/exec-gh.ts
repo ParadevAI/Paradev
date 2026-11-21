@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import { getToolEnvironment } from "../../../../terminal/clean-shell-env";
 
 const execFileAsync = promisify(execFile);
@@ -26,7 +27,7 @@ export type ExecGh = (
 
 export const execGh: ExecGh = async (args, options) => {
 	const env = await getToolEnvironment();
-	const child = execFileAsync("gh", args, {
+	const child = execFileAsync(resolveCommand("gh", { env }), args, {
 		encoding: "utf8",
 		timeout: options?.timeout ?? 10_000,
 		// Node's 1MB default dies on large REST payloads (open-PR sweeps of

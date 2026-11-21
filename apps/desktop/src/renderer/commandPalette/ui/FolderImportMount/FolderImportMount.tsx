@@ -49,7 +49,7 @@ export function FolderImportMount() {
 			if (result) {
 				toast.success(
 					t({
-						message: "Project ready — open it from the sidebar.",
+						message: "Project ready. Open it from the sidebar.",
 					}),
 				);
 			}

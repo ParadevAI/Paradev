@@ -14,6 +14,8 @@ export function useFormat() {
 				options?: Intl.NumberFormatOptions,
 				selectedLocale = locale,
 			) => format.formatNumber(value, options, selectedLocale),
+			formatGbHours: (gbHours: number, selectedLocale = locale) =>
+				format.formatGbHours(gbHours, selectedLocale),
 			formatPercent: (
 				value: number,
 				options?: Intl.NumberFormatOptions,

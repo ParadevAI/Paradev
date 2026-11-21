@@ -9,6 +9,7 @@ import {
 	disposeRuntime,
 } from "renderer/lib/terminal/terminal-runtime";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { createCommandSession } from "./utils/createCommandSession";
 import { installCommandTerminalLinks } from "./utils/installCommandTerminalLinks";
 
 interface CommandTerminalProps {
@@ -26,24 +27,22 @@ export function CommandTerminal({
 	onWriterReady,
 }: CommandTerminalProps) {
 	const appearance = useTerminalAppearance();
-	const appearanceRef = useRef(appearance);
-	appearanceRef.current = appearance;
+	const latest = useRef({
+		appearance,
+		command,
+		onExit,
+		onOutput,
+		onWriterReady,
+	});
+	latest.current = { appearance, command, onExit, onOutput, onWriterReady };
 	const containerRef = useRef<HTMLDivElement>(null);
-	const onExitRef = useRef(onExit);
-	onExitRef.current = onExit;
-	const onOutputRef = useRef(onOutput);
-	onOutputRef.current = onOutput;
-	const onWriterReadyRef = useRef(onWriterReady);
-	onWriterReadyRef.current = onWriterReady;
-	const commandRef = useRef(command);
-	commandRef.current = command;
 
 	useEffect(() => {
 		const container = containerRef.current;
 		if (!container) return;
 
 		const paneId = `command-terminal-${crypto.randomUUID()}`;
-		const runtime = createRuntime(paneId, appearanceRef.current);
+		const runtime = createRuntime(paneId, latest.current.appearance);
 		const disposeLinks = installCommandTerminalLinks(
 			runtime.terminal,
 			(url) => {
@@ -54,98 +53,44 @@ export function CommandTerminal({
 					});
 			},
 		);
-		const syncSize = () => {
-			void electronTrpcClient.terminal.resize.mutate({
-				paneId,
-				cols: runtime.terminal.cols,
-				rows: runtime.terminal.rows,
-			});
-		};
-		attachToContainer(runtime, container, syncSize);
-
-		// The dialog animates in, so the container often lacks final dimensions
-		// at mount and the initial fit measures wrong. Refit once the dialog has
-		// settled, then push the corrected size to the PTY.
-		const refit = () => {
-			if (!containerRef.current) return;
-			runtime.fitAddon.fit();
-			syncSize();
-		};
-		const refitTimers = [
-			window.setTimeout(refit, 100),
-			window.setTimeout(refit, 350),
-		];
-
-		// Queue input until the pane exists: xterm auto-replies to terminal
-		// queries (OSC 11, DSR) at mount, and a write to a not-yet-created pane
-		// makes the terminal service synthesize an exit event for it.
-		let disposed = false;
-		let paneReady = false;
-		let exited = false;
-		let exitBeforeReady: number | null = null;
-		const pendingInput: string[] = [];
-		const fireExit = (exitCode: number | null) => {
-			if (disposed || exited) return;
-			exited = true;
-			onExitRef.current(exitCode);
-		};
-
-		const writeToPty = (data: string) => {
-			if (disposed || exited) return;
-			if (!paneReady) {
-				pendingInput.push(data);
-				return;
-			}
-			void electronTrpcClient.terminal.write.mutate({ paneId, data });
-		};
-		const inputDisposable = runtime.terminal.onData(writeToPty);
-		onWriterReadyRef.current?.(writeToPty);
-
-		const subscription = electronTrpcClient.terminal.stream.subscribe(paneId, {
-			onData: (event) => {
-				if (event.type === "data") {
-					runtime.terminal.write(event.data);
-					onOutputRef.current?.(event.data);
-				} else if (event.type === "exit") {
-					const exitCode = event.signal ? 128 + event.signal : event.exitCode;
-					if (paneReady) fireExit(exitCode);
-					else exitBeforeReady = exitCode;
-				}
+		const terminal = electronTrpcClient.terminal;
+		const session = createCommandSession({
+			size: { cols: runtime.terminal.cols, rows: runtime.terminal.rows },
+			transport: {
+				subscribe: (handlers) => terminal.stream.subscribe(paneId, handlers),
+				create: (size) =>
+					terminal.createOrAttach.mutate({
+						paneId,
+						tabId: paneId,
+						workspaceId: paneId,
+						command: latest.current.command,
+						...size,
+						skipColdRestore: true,
+					}),
+				write: (data) => terminal.write.mutate({ paneId, data }),
+				resize: (size) => terminal.resize.mutate({ paneId, ...size }),
+				kill: () => terminal.kill.mutate({ paneId }),
 			},
+			onOutput: (data) => {
+				runtime.terminal.write(data);
+				latest.current.onOutput?.(data);
+			},
+			onExit: (code) => latest.current.onExit(code),
+			onError: (error) => toast.error(errorMessage(error)),
 		});
-
-		void electronTrpcClient.terminal.createOrAttach
-			.mutate({
-				paneId,
-				tabId: paneId,
-				workspaceId: paneId,
-				command: commandRef.current,
+		const input = runtime.terminal.onData(session.write);
+		attachToContainer(runtime, container, () =>
+			session.resize({
 				cols: runtime.terminal.cols,
 				rows: runtime.terminal.rows,
-				skipColdRestore: true,
-			})
-			.then(() => {
-				if (disposed) {
-					void electronTrpcClient.terminal.kill.mutate({ paneId });
-					return;
-				}
-				paneReady = true;
-				for (const data of pendingInput.splice(0)) {
-					void electronTrpcClient.terminal.write.mutate({ paneId, data });
-				}
-				if (exitBeforeReady !== null) fireExit(exitBeforeReady);
-			})
-			// A failed create would otherwise leave the dialog running forever
-			// with a dead terminal silently swallowing queued input.
-			.catch(() => fireExit(null));
+			}),
+		);
+		latest.current.onWriterReady?.(session.write);
 
 		return () => {
-			disposed = true;
-			for (const timer of refitTimers) window.clearTimeout(timer);
-			inputDisposable.dispose();
+			input.dispose();
 			disposeLinks();
-			subscription.unsubscribe();
-			void electronTrpcClient.terminal.kill.mutate({ paneId });
+			session.dispose();
 			disposeRuntime(runtime);
 		};
 	}, []);

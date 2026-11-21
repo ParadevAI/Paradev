@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
 	agentCredentialKindValues,
@@ -13,6 +14,7 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { queueRulesReapply } from "../../lib/sandbox/reapply-rules";
 import { personProcedure, userError } from "../../trpc";
 import {
 	accessTokenExpiresAt,
@@ -26,6 +28,7 @@ import {
 	requestDeviceCode,
 } from "./utils/chatgpt";
 import { decryptAgentCredential, encryptAgentCredential } from "./utils/crypto";
+import { normalizeAgentCredentialValue } from "./utils/normalize-value";
 import { checkPublicEndpoint } from "./utils/public-endpoint";
 import { type AgentSignIns, signInsFromRows } from "./utils/sign-ins";
 import { validateAgentCredential } from "./utils/validate";
@@ -93,7 +96,7 @@ export const agentCredentialRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const value = input.value.trim();
+			const value = normalizeAgentCredentialValue(input);
 			if (!value) {
 				throw userError({
 					code: "BAD_REQUEST",
@@ -188,6 +191,7 @@ export const agentCredentialRouter = {
 						lastValidatedAt: row.lastValidatedAt,
 					},
 				});
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { agent: input.agent, kind: input.kind };
 		}),
 
@@ -264,6 +268,7 @@ export const agentCredentialRouter = {
 						lastValidatedAt: row.lastValidatedAt,
 					},
 				});
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { status: "connected" as const, accountLabel };
 		}),
 
@@ -295,6 +300,7 @@ export const agentCredentialRouter = {
 						lastValidatedAt: row.lastValidatedAt,
 					},
 				});
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { agent: input.agent };
 		}),
 
@@ -309,6 +315,7 @@ export const agentCredentialRouter = {
 						eq(agentCredentials.agent, input.agent),
 					),
 				);
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { agent: input.agent };
 		}),
 } satisfies TRPCRouterRecord;
@@ -333,7 +340,9 @@ function isFresh(tokens: ChatgptTokens): boolean {
  * The stored ChatGPT session, renewed first when its access token is close to
  * expiring. The row is locked for the renewal: a refresh token works once, so
  * two boxes renewing together would sign the person out. Null once OpenAI
- * refuses the session: the row is removed so Settings asks for a new sign-in.
+ * refuses the session as dead: the row is removed under the lock, so a
+ * sign-in made meanwhile is never the one removed, and Settings asks for a
+ * new one. Any other failure keeps the stored session for the next try.
  */
 async function currentChatgptTokens(
 	row: AgentCredentialRow,
@@ -348,8 +357,9 @@ async function currentChatgptTokens(
 		lastValidatedAt: new Date(),
 	});
 	let renewed: ChatgptTokens | null = null;
+	let removed = false;
 	try {
-		return await dbWs.transaction(async (tx) => {
+		const current = await dbWs.transaction(async (tx) => {
 			const [locked] = await tx
 				.select()
 				.from(agentCredentials)
@@ -359,39 +369,104 @@ async function currentChatgptTokens(
 			if (!locked || locked.provider !== CHATGPT_PROVIDER) return null;
 			const current = chatgptTokensSchema.parse(JSON.parse(decryptRow(locked)));
 			if (isFresh(current)) return current;
-			renewed = await refreshChatgptTokens(current);
+			try {
+				renewed = await refreshChatgptTokens(current);
+			} catch (error) {
+				if (
+					!(error instanceof ChatgptSignInError) ||
+					error.reason !== "rejected"
+				) {
+					throw error;
+				}
+				console.warn(
+					`[agent-credential] OpenAI refused the ChatGPT sign-in (${error.code}); removing it`,
+				);
+				Sentry.captureMessage("ChatGPT sign-in refused; removed", {
+					level: "warning",
+					tags: { chatgpt_refresh_code: error.code ?? "none" },
+					extra: { credentialId: row.id },
+				});
+				await tx
+					.delete(agentCredentials)
+					.where(eq(agentCredentials.id, locked.id));
+				removed = true;
+				return null;
+			}
 			await tx
 				.update(agentCredentials)
 				.set(save(renewed))
 				.where(eq(agentCredentials.id, locked.id));
 			return renewed;
 		});
+		if (renewed || removed) await queueRulesReapply({ userId: row.userId });
+		return current;
 	} catch (error) {
 		if (renewed) {
 			await dbWs
 				.update(agentCredentials)
 				.set(save(renewed))
 				.where(eq(agentCredentials.id, row.id))
-				.catch((saveError) =>
+				.catch((saveError) => {
 					console.error(
 						"[agent-credential] renewed ChatGPT sign-in was not saved",
 						saveError,
-					),
-				);
+					);
+					Sentry.captureException(saveError, {
+						extra: { credentialId: row.id },
+					});
+				});
+			await queueRulesReapply({ userId: row.userId });
 			return renewed;
 		}
-		if (error instanceof ChatgptSignInError && error.reason === "rejected") {
-			console.warn(
-				"[agent-credential] OpenAI refused the ChatGPT sign-in; removing it",
-			);
-			await dbWs
-				.delete(agentCredentials)
-				.where(eq(agentCredentials.id, row.id));
-			return null;
-		}
 		console.warn("[agent-credential] ChatGPT sign-in was not renewed", error);
+		Sentry.captureException(error, {
+			tags: {
+				chatgpt_refresh_code:
+					(error instanceof ChatgptSignInError && error.code) || "none",
+			},
+			extra: { credentialId: row.id },
+		});
 		return stored;
 	}
+}
+
+/** Refreshes run this many at a time, so a few that hang to the timeout cannot use a whole run. */
+const RENEWAL_CONCURRENCY = 8;
+
+/**
+ * Renews every ChatGPT sign-in close to expiring, whether or not a box is
+ * running, so a session nobody uses for a while does not lapse. The order is
+ * shuffled each run: sign-ins that keep failing cannot keep the same others
+ * waiting behind them.
+ */
+export async function renewChatgptSignIns(args: {
+	deadline: number;
+}): Promise<{ checked: number }> {
+	const rows = await db
+		.select()
+		.from(agentCredentials)
+		.where(
+			and(
+				eq(agentCredentials.agent, "codex"),
+				eq(agentCredentials.provider, CHATGPT_PROVIDER),
+			),
+		);
+	const queue = rows
+		.map((row) => ({ row, order: Math.random() }))
+		.sort((a, b) => a.order - b.order)
+		.map(({ row }) => row);
+	let checked = 0;
+	const worker = async () => {
+		for (let row = queue.shift(); row; row = queue.shift()) {
+			if (Date.now() > args.deadline) return;
+			checked++;
+			await currentChatgptTokens(row).catch((error) =>
+				Sentry.captureException(error, { extra: { credentialId: row.id } }),
+			);
+		}
+	};
+	await Promise.all(Array.from({ length: RENEWAL_CONCURRENCY }, worker));
+	return { checked };
 }
 
 /**

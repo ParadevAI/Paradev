@@ -151,7 +151,15 @@ export function NewChatWidget({
 	const launchPresetId = selectedAgent
 		? agentLaunchPresetId(selectedAgent)
 		: agentId;
-	const launch = useAgentLaunchPreferences(launchPresetId);
+	const launch = useAgentLaunchPreferences(launchPresetId, {
+		hostUrl: selectedTarget?.hostUrl,
+		projectId: isCloudTarget
+			? undefined
+			: (selectedTarget?.projectId ?? undefined),
+		onlyForPick: true,
+		agent:
+			selectedAgent && "id" in selectedAgent ? selectedAgent.id : undefined,
+	});
 	const model = launch.model?.id ?? null;
 	const effort = launch.effort?.id ?? null;
 	// One dropdown after the agent, naming the model; the sheet it opens also
@@ -159,7 +167,7 @@ export function NewChatWidget({
 	// and one with neither shows nothing.
 	const launchOptionLabel =
 		launch.models !== undefined
-			? (launch.model?.label ?? t({ message: "Default model" }))
+			? (launch.model?.label ?? t({ message: "Default" }))
 			: launch.efforts.length > 0
 				? (launch.effort?.label ?? t({ message: "Default effort" }))
 				: null;
@@ -354,6 +362,12 @@ export function NewChatWidget({
 					params: {
 						presetId: launchPresetId,
 						agentLabel: selectedAgent?.label ?? "",
+						hostUrl: selectedTarget?.hostUrl ?? "",
+						projectId: isCloudTarget ? "" : (selectedTarget?.projectId ?? ""),
+						agent:
+							(selectedAgent && "id" in selectedAgent
+								? selectedAgent.id
+								: undefined) ?? launchPresetId,
 					},
 				});
 			}}

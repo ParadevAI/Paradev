@@ -9,7 +9,10 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
-import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
+import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
+	SUPERSET_USER_ID_HEADER,
+} from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import { cloudAccess } from "../../lib/cloud-guards";
@@ -21,7 +24,7 @@ import {
 } from "../../lib/sandbox";
 import { acpChatEnabled } from "../../lib/user-settings";
 import { startCloudWorkspace } from "../cloud-workspace/start";
-import { transitionCloudWorkspace } from "../cloud-workspace/transition";
+import { failCloudWorkspace } from "../cloud-workspace/transition";
 import {
 	markSandboxUnavailable,
 	wakeCloudWorkspace,
@@ -108,12 +111,14 @@ export async function runInCloud(
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
 		chat,
 		tags: automation.tags,
-		machineSize: (
-			await resolveMachineSize(
-				automation.organizationId,
-				automation.machineSize,
-			)
-		)?.name,
+		machineSize: automation.machineSize
+			? (
+					await resolveMachineSize(
+						automation.organizationId,
+						automation.machineSize,
+					)
+				)?.name
+			: undefined,
 		beforeProvision: async (workspaceId) => {
 			placed({ cloudWorkspaceId: workspaceId });
 			const bound = await db
@@ -184,6 +189,7 @@ async function prepareLaunch({
 		const headers = {
 			authorization: `Bearer ${await sandboxHostSecretFor(pinned.row.id)}`,
 			[SUPERSET_USER_ID_HEADER]: automation.ownerUserId,
+			[SUPERSET_LAUNCH_SOURCE_HEADER]: "automation",
 		};
 		// Listing the agents adds the built-in ones. Without this, `agents.run` fails
 		// on a box that never ran an agent.
@@ -251,21 +257,22 @@ async function assertOwnerMayUseCloud(
 }
 
 /** The pinned cloud workspace, awake, or null when it is gone. */
-async function reachablePin(
+export async function reachablePin(
 	cloudWorkspaceId: string,
 ): Promise<{ row: CloudWorkspaceRow; hostTarget: string } | null> {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 	});
-	if (!row || row.status === "deleted" || row.status === "failed") {
+	if (!row || row.status === "archived" || row.status === "failed") {
 		return null;
 	}
 	if (row.status === "provisioning") {
 		if (Date.now() - row.createdAt.getTime() > STRANDED_PROVISIONING_MS) {
-			await transitionCloudWorkspace({
-				id: row.id,
+			await failCloudWorkspace({
+				scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 				from: ["provisioning"],
-				to: "failed",
+				reason: "create_failed",
+				error: new Error("A pinned workspace stayed in provisioning"),
 			});
 			return null;
 		}

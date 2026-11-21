@@ -3,7 +3,10 @@ import { connections, type LinearConfig } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { userConnection } from "../../../lib/connectors";
+import {
+	grantSharedWithAnotherConnection,
+	userConnection,
+} from "../../../lib/connectors";
 import { personProcedure } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
 import { linearLiveRouter } from "./live";
@@ -47,11 +50,13 @@ export const linearRouter = {
 				return { success: false, error: "No connection found" };
 			}
 
-			try {
-				await callLinearForConnection(connection.id, (client) =>
-					client.logout(),
-				);
-			} catch {}
+			if (!(await grantSharedWithAnotherConnection(connection))) {
+				try {
+					await callLinearForConnection(connection.id, (client) =>
+						client.logout(),
+					);
+				} catch {}
+			}
 			await db.delete(connections).where(eq(connections.id, connection.id));
 			await trackTasksInSupersetWithoutLinear(input.organizationId);
 			return { success: true };

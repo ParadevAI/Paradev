@@ -16,7 +16,7 @@ import { eq } from "drizzle-orm";
 import { app, dialog } from "electron";
 import log from "electron-log/main";
 import { env as sharedEnv } from "shared/env.shared";
-import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
+import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/utils/shell-env";
 import { env as mainEnv } from "../env.main";
 import { SUPERSET_HOME_DIR } from "./app-environment";
 import { getBrowserBridgeInfo } from "./browser/browser-bridge-info";
@@ -41,11 +41,10 @@ import {
 	redactCrashTail,
 } from "./host-service-utils";
 import { localDb } from "./local-db";
-import { HOOK_PROTOCOL_VERSION } from "./terminal/env";
 
 export type HostServiceStatus = "starting" | "running" | "stopped";
 
-export interface Connection {
+interface Connection {
 	port: number;
 	secret: string;
 	machineId: string;
@@ -57,7 +56,7 @@ export interface HostServiceStatusEvent {
 	previousStatus: HostServiceStatus | null;
 }
 
-export interface SpawnConfig {
+interface SpawnConfig {
 	authToken: string;
 	cloudApiUrl: string;
 }
@@ -1121,8 +1120,6 @@ export class HostServiceCoordinator extends EventEmitter {
 			DESKTOP_VITE_PORT: String(sharedEnv.DESKTOP_VITE_PORT),
 			SUPERSET_HOME_DIR: SUPERSET_HOME_DIR,
 			SUPERSET_LEGACY_WORKTREE_BASE_DIR: row?.worktreeBaseDir ?? "",
-			SUPERSET_AGENT_HOOK_PORT: String(sharedEnv.DESKTOP_NOTIFICATIONS_PORT),
-			SUPERSET_AGENT_HOOK_VERSION: HOOK_PROTOCOL_VERSION,
 			// BROWSER_BRIDGE_URL/SECRET are set (or stripped) after the shell-env
 			// merge below, alongside RELAY_URL, so an inherited value can't leak
 			// into a standalone host.
@@ -1547,7 +1544,7 @@ export class HostServiceCoordinator extends EventEmitter {
 			detail: i18n._(
 				msg({
 					message:
-						"Its workspaces and terminals are unavailable until it restarts — use the Paradev tray menu > Host Service > Restart.",
+						"Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart.",
 				}),
 			),
 		});

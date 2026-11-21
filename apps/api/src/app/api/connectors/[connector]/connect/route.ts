@@ -35,6 +35,10 @@ export async function GET(
 	const plugin = search.get("plugin");
 	const returnsToPlugin =
 		plugin !== null && pluginConnectorSlug(plugin) === slug;
+	const failUrl =
+		returnsToPlugin && plugin
+			? `${env.NEXT_PUBLIC_WEB_URL}/plugins/${encodeURIComponent(plugin)}`
+			: connectUrl;
 
 	let method: ConnectorMethod;
 	try {
@@ -90,9 +94,9 @@ export async function GET(
 	} catch (error) {
 		if (error instanceof MissingConnectorEnvError) {
 			console.error(`[connectors/${slug}] ${error.message}`);
-			return Response.redirect(`${connectUrl}?error=not_configured`);
+			return Response.redirect(`${failUrl}?error=not_configured`);
 		}
 		console.error(`[connectors/${slug}] connect failed:`, error);
-		return Response.redirect(`${connectUrl}?error=connect_failed`);
+		return Response.redirect(`${failUrl}?error=connect_failed`);
 	}
 }

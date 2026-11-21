@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	Command,
 	CommandGroup,
@@ -42,7 +43,9 @@ export function CloudWorkspacePicker({
 		? (allWorkspaces?.find((row) => row.id === value) ?? null)
 		: null;
 	const resolving = !!value && allWorkspaces === undefined;
-	const gone = pinned?.status === "failed" || pinned?.status === "deleted";
+	const gone =
+		pinned?.status === "failed" ||
+		isArchivedCloudWorkspaceStatus(pinned?.status);
 	// A viewer who isn't the owner may not see the owner's workspaces at all.
 	const unseen = !!value && !resolving && !pinned && !!disabled;
 	const missing =
