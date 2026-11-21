@@ -1,4 +1,4 @@
-import { CONTINUE_PROMPT } from "@superset/chat/core";
+import { CONTINUE_PROMPT, withoutRepeatedContinue } from "@superset/chat/core";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import type { ClosedChat } from "./resumeAfterUpdate";
 
@@ -19,6 +19,7 @@ export function createClosedMidTurn(options: {
 	onChange?: () => void;
 }) {
 	const chats = new Map<string, ClosedChat>();
+	const resuming = new Set<string>();
 	const forget = (sessionId: string) => {
 		if (chats.delete(sessionId)) options.onChange?.();
 	};
@@ -47,10 +48,10 @@ export function createClosedMidTurn(options: {
 
 	const resumeOne = async (chat: ClosedChat, paused: Paused) => {
 		const runtime = options.runtime();
-		const continued = [
+		const continued = withoutRepeatedContinue([
 			...(chat.interrupted ? [CONTINUE] : []),
 			...chat.prompts,
-		];
+		]);
 		const onlyQueue = continued.length === 0;
 		const prompts = onlyQueue ? chat.pausedPrompts : continued;
 		const pausedPrompts = onlyQueue ? [] : chat.pausedPrompts;
@@ -106,11 +107,13 @@ export function createClosedMidTurn(options: {
 		async resume(): Promise<number> {
 			let resumed = 0;
 			for (const chat of [...chats.values()]) {
+				if (resuming.has(chat.sessionId)) continue;
 				const paused = pausedIn(chat);
 				if (!paused) {
 					forget(chat.sessionId);
 					continue;
 				}
+				resuming.add(chat.sessionId);
 				try {
 					await resumeOne(chat, paused);
 					forget(chat.sessionId);
@@ -120,6 +123,8 @@ export function createClosedMidTurn(options: {
 						"[chat-v3] could not resume a chat Paradev closed",
 						error,
 					);
+				} finally {
+					resuming.delete(chat.sessionId);
 				}
 			}
 			return resumed;

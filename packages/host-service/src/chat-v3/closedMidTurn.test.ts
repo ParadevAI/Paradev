@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type {
 	ChatRuntime,
 	LiveSession,
@@ -154,6 +155,32 @@ describe("chats a quit cut off", () => {
 
 		expect(await chats.resume()).toBe(1);
 		expect(resumed[0]).toMatchObject({ prompts: [queued], pausedPrompts: [] });
+	});
+
+	test("resumes that overlap continue the chat once", async () => {
+		const { runtime, resumed } = fakeRuntime({
+			"chat-1": { closedAt: 0, title: "x" },
+		});
+		const chats = closedChats(runtime);
+
+		const counts = await Promise.all([chats.resume(), chats.resume()]);
+
+		expect(counts).toEqual([1, 0]);
+		expect(resumed).toHaveLength(1);
+	});
+
+	test("a chat cut off with a continue still waiting is told to continue once", async () => {
+		const { runtime, resumed } = fakeRuntime({
+			"chat-1": { closedAt: 0, title: "x" },
+		});
+		const chats = closedChats(runtime);
+		const proceed = [{ type: "text" as const, text: CONTINUE_PROMPT }];
+		const queued = [{ type: "text" as const, text: "then run the tests" }];
+		chats.add({ ...CHAT, prompts: [proceed, proceed, queued] });
+
+		await chats.resume();
+
+		expect(resumed[0]?.prompts).toEqual([proceed, queued]);
 	});
 
 	test("a resume that fails keeps the chat to try again", async () => {

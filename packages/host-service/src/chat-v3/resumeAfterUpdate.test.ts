@@ -2,13 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { CONTINUE_AFTER_UPDATE_PROMPT } from "@superset/chat/core";
 import type {
 	ChatRuntime,
 	ResumeSessionInput,
 	UnfinishedSession,
 } from "@superset/chat-runtime";
 import {
-	CONTINUE_AFTER_UPDATE_PROMPT,
 	closedChatsOf,
 	RESUME_MARKER_MAX_AGE_MS,
 	recordUnfinishedChats,

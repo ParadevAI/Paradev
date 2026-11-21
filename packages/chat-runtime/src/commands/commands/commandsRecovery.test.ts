@@ -3,7 +3,12 @@ import { randomUUID } from "node:crypto";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
+import {
+	CONTINUE_PROMPT,
+	deriveTimeline,
+	emptySnapshot,
+	reduceMany,
+} from "@superset/chat/core";
 import type { ToolCall } from "@superset/chat/protocol";
 import { eq } from "drizzle-orm";
 import { chatJournal } from "../../db";
@@ -439,6 +444,26 @@ describe("a queue a quit cut off", () => {
 			).size,
 		).toBe(1);
 		await close();
+	});
+});
+
+describe("a chat resumed more than once", () => {
+	test("is told to continue once", async () => {
+		const replays: FakeHarness[] = [];
+		const runtime = createTestRuntime({ harnesses: hangingRegistry(replays) });
+		const cutOff = await startTurn(runtime);
+		await runtime.live.disposeAll();
+		const replacement = createChat(runtime, cutOff.sessionId);
+		const live = runtime.live.require(replacement.sessionId);
+		const proceed = [{ type: "text" as const, text: CONTINUE_PROMPT }];
+
+		live.promptOnceStarted([proceed]);
+		live.promptOnceStarted([proceed, proceed]);
+		await waitFor(() => replays.at(-1)?.prompted.length === 1);
+
+		expect(replays.at(-1)?.prompted).toEqual([proceed]);
+		expect(live.queuedCount).toBe(0);
+		await runtime.dispose();
 	});
 });
 

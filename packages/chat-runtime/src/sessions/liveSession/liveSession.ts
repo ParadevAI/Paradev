@@ -2,8 +2,10 @@ import { randomUUID } from "node:crypto";
 import {
 	type ChatSelections,
 	CONTINUE_PROMPT,
+	isContinuePrompt,
 	sessionSelections,
 	userStopOf,
+	withoutRepeatedContinue,
 } from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
@@ -270,9 +272,11 @@ export class LiveSession {
 	): void {
 		const toRun = prompts.filter((content) => !this.claimCarried(content));
 		const resumesCarried = toRun.length < prompts.length;
-		this.heldUntilStarted.push(...toRun);
+		this.heldUntilStarted.push(...this.withoutWaitingContinue(toRun));
 		this.heldPaused.push(
-			...pausedPrompts.filter((content) => !this.claimCarried(content)),
+			...this.withoutWaitingContinue(
+				pausedPrompts.filter((content) => !this.claimCarried(content)),
+			),
 		);
 		if (resumesCarried) {
 			this.carriedPrompts = 0;
@@ -282,6 +286,18 @@ export class LiveSession {
 		this.onHeldReleased = onReleased ?? null;
 		this.releaseHeldPrompts();
 		if (resumesCarried) this.resumeQueue();
+	}
+
+	private withoutWaitingContinue(prompts: UserContent[][]): UserContent[][] {
+		const inFlight = this.inFlight();
+		const waiting = [
+			...(inFlight ? [inFlight] : []),
+			...this.pendingSteers,
+			...this.queue,
+		]
+			.map((pending) => pending.content)
+			.concat(this.heldUntilStarted, this.heldPaused);
+		return withoutRepeatedContinue(prompts, waiting.some(isContinuePrompt));
 	}
 
 	/** A resumed prompt the replaced session's queue already brought over. */
@@ -309,10 +325,11 @@ export class LiveSession {
 		this.carriedCanceledToolIds = replaced.canceledToolIds;
 		this.hiddenStopKeys = replaced.hiddenStopKeys;
 		if (replaced.turn) this.carryFailedTurn(replaced.turn);
-		if (replaced.queued.length === 0) return;
-		this.carriedQueue = [...replaced.queued];
-		this.carriedPrompts += replaced.queued.length;
-		this.heldPaused.push(...replaced.queued);
+		const queued = this.withoutWaitingContinue(replaced.queued);
+		if (queued.length === 0) return;
+		this.carriedQueue = [...queued];
+		this.carriedPrompts += queued.length;
+		this.heldPaused.push(...queued);
 		this.releaseHeldPrompts();
 	}
 
