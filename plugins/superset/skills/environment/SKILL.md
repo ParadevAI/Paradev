@@ -23,7 +23,7 @@ A setup session often starts you in a box on the environment; its prompt says so
 - Steps 0 and 1: skip them. GitHub access already works in the box, and you were given the environment.
 - Step 3: you can't set variables. List the keys the code needs and where it reads them, and ask the user to add them under Variables on the environment's page (Settings, Environments).
 - Step 4: don't create another box. Work in this one with your own terminal.
-- Storing the config: show the user the file and ask them to paste it into the environment's Config, or commit it as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request. The cloud reads the repository's file only while the environment has no config of its own.
+- Storing the config: give the user the file and ask them to run `superset environments update <environment-id> --config <file>` on their own machine. The environment's page has fields for the install and start scripts, terminals, ports and MCP, not a box for the file, so settings without a field (`[archive]`, `cwd`, cloud tables) need the command. Or commit the file as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request. The cloud reads the repository's file only while the environment has no config of its own.
 - Step 5: once the config is stored or merged, ask the user to press Rebuild environment on the environment's page.
 - Step 6: ask the user to rename the environment and choose who can use it on its page. **Never archive this box: it is the one you are running in.** Skip starting a fresh workspace, and write **Try it:** in the final message as what the user does next.
 

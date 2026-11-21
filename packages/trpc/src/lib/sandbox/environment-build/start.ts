@@ -5,6 +5,7 @@ import {
 	environments,
 	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
+import { BUILD_ERRORS } from "@superset/shared/sandbox/build-errors";
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import { start } from "workflow/api";
 import { organizationPlan } from "../../billing/plan";
@@ -58,7 +59,7 @@ export async function expireStaleBuilds(environmentId: string): Promise<void> {
 		.update(environmentBuilds)
 		.set({
 			status: "failed",
-			error: "The build stopped unexpectedly",
+			error: BUILD_ERRORS.stoppedUnexpectedly,
 			finishedAt: new Date(now),
 		})
 		.where(

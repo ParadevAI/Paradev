@@ -3296,6 +3296,9 @@ msgstr "Setidaknya satu tim yang bisa kami sebut namanya, termasuk tim kami, mel
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Paling banyak {AUTO_TOPUP_MONTHLY_LIMIT} kali isi ulang per bulan, jadi hingga {monthlyMax} per bulan."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Paling banyak {MAX_PREVIEW_PORTS} port dapat memiliki pratinjau."
+
 msgid "at once"
 msgstr "sekaligus"
 
@@ -13946,6 +13949,9 @@ msgstr "Hanya pemilik atau pemilik organisasi yang dapat mengarsipkan otomatisas
 msgid "Only the people listed above can open it"
 msgstr "Hanya orang yang tercantum di atas yang dapat membukanya"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Hanya orang yang membuat environment ini atau admin organisasi yang dapat mengubah konfigurasinya."
+
 msgid "Only the person who created this page can change it"
 msgstr "Hanya orang yang membuat halaman ini yang bisa mengubahnya"
 
@@ -19030,6 +19036,9 @@ msgstr "Seseorang"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Orang lain sudah menerbitkan {entryPath} dari workspace ini. Terbitkan dengan id halaman yang eksplisit untuk menambahkan versi ke halaman mereka, atau pindahkan berkasnya."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Orang lain menyimpan konfigurasi environment ini saat Anda sedang mengeditnya"
+
 msgid "Someone is moving this workspace…"
 msgstr "Seseorang sedang memindahkan workspace ini…"
 
@@ -20218,6 +20227,15 @@ msgstr "Agen terbaik akan berganti.<0/>Alur kerja Anda tidak perlu."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Mesin aktif kembali dengan {actual} vCPU, bukan {wanted}. Mulai ulang untuk mencoba lagi."
 
+msgid "The build is no longer running"
+msgstr "Build tidak lagi berjalan"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Build berjalan lebih dari {BUILD_LIMIT_MINUTES} menit dan dihentikan"
+
+msgid "The build stopped unexpectedly"
+msgstr "Build berhenti secara tak terduga"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 
@@ -20283,6 +20301,9 @@ msgstr "Munculnya sang pengatur"
 
 msgid "The endpoint must use https."
 msgstr "Endpoint harus menggunakan https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Environment berubah selama build; snapshot saat ini dipertahankan"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Environment berubah saat sedang dipulihkan. Coba lagi."

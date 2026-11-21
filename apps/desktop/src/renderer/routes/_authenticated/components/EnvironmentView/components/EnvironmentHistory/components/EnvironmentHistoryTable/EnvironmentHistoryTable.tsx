@@ -19,8 +19,9 @@ interface EnvironmentHistoryTableProps {
 	builds: readonly EnvironmentBuild[];
 	loading: boolean;
 	failed: boolean;
-	onRestore: (buildId: string) => void;
-	restoring: boolean;
+	/** Absent hides Restore. */
+	onRestore?: (buildId: string) => void;
+	restoreDisabled: boolean;
 }
 
 export function EnvironmentHistoryTable({
@@ -28,7 +29,7 @@ export function EnvironmentHistoryTable({
 	loading,
 	failed,
 	onRestore,
-	restoring,
+	restoreDisabled,
 }: EnvironmentHistoryTableProps) {
 	const { i18n } = useLingui();
 	return (
@@ -94,10 +95,10 @@ export function EnvironmentHistoryTable({
 										<span className="pr-3 text-sm text-muted-foreground">
 											<Trans>Current</Trans>
 										</span>
-									) : build.restorable ? (
+									) : build.restorable && onRestore ? (
 										<Button
 											className="h-7"
-											disabled={restoring}
+											disabled={restoreDisabled}
 											onClick={() => onRestore(build.id)}
 											size="sm"
 											variant="outline"

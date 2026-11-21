@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { MAX_PREVIEW_PORTS } from "@superset/shared/project-config";
 import type { RowProblem } from "../../utils/configForm";
 
 interface RowProblemTextProps {
@@ -17,6 +18,8 @@ export function RowProblemText({ problem }: RowProblemTextProps) {
 				<Trans>Another row already uses this name.</Trans>
 			) : problem === "command" ? (
 				<Trans>Enter a command.</Trans>
+			) : problem === "previewLimit" ? (
+				<Trans>At most {MAX_PREVIEW_PORTS} ports can have a preview.</Trans>
 			) : (
 				<Trans>Enter a port from 1 to 65535.</Trans>
 			)}

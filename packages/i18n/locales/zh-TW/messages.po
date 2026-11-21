@@ -3296,6 +3296,9 @@ msgstr "至少有一支叫得出名字的團隊（包括我們自己）連續一
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "每月最多加值 {AUTO_TOPUP_MONTHLY_LIMIT} 次，即每月最多 {monthlyMax}。"
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "最多 {MAX_PREVIEW_PORTS} 個埠可以有預覽。"
+
 msgid "at once"
 msgstr "同時"
 
@@ -13946,6 +13949,9 @@ msgstr "只有擁有者或組織擁有者可以歸檔此自動化"
 msgid "Only the people listed above can open it"
 msgstr "只有上方列出的人可以開啟"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "只有建立此環境的人或組織管理員可以變更它的設定。"
+
 msgid "Only the person who created this page can change it"
 msgstr "只有建立此頁面的人才能修改它"
 
@@ -19030,6 +19036,9 @@ msgstr "某人"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "其他人已發佈此工作區中的 {entryPath}。使用明確的頁面 id 發佈以為其頁面新增版本，或移動該檔案。"
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "你編輯時有其他人儲存了此環境的設定"
+
 msgid "Someone is moving this workspace…"
 msgstr "有人正在移動此工作區…"
 
@@ -20218,6 +20227,15 @@ msgstr "最好的代理程式會變。<0/>你的工作流不該變。"
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "機器以 {actual} vCPU 啟動，而非 {wanted} vCPU。請重新啟動後再試一次。"
 
+msgid "The build is no longer running"
+msgstr "建置已不在執行"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "建置執行超過 {BUILD_LIMIT_MINUTES} 分鐘，已被停止"
+
+msgid "The build stopped unexpectedly"
+msgstr "建置意外停止"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 
@@ -20283,6 +20301,9 @@ msgstr "排程員出現"
 
 msgid "The endpoint must use https."
 msgstr "端點必須使用 https。"
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "建置期間環境已變更；已保留其目前快照"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "還原期間環境已變更。請再試一次。"

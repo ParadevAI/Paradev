@@ -3296,6 +3296,9 @@ msgstr "Ít nhất một đội mà chúng tôi có thể nêu tên, kể cả �
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Tối đa {AUTO_TOPUP_MONTHLY_LIMIT} lần nạp mỗi tháng, tức là tối đa {monthlyMax} mỗi tháng."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Tối đa {MAX_PREVIEW_PORTS} cổng có thể có bản xem trước."
+
 msgid "at once"
 msgstr "cùng lúc"
 
@@ -13946,6 +13949,9 @@ msgstr "Chỉ chủ sở hữu hoặc chủ sở hữu tổ chức mới có th�
 msgid "Only the people listed above can open it"
 msgstr "Chỉ những người có trong danh sách trên mới có thể mở"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Chỉ người tạo environment này hoặc admin của tổ chức mới có thể thay đổi cấu hình của nó."
+
 msgid "Only the person who created this page can change it"
 msgstr "Chỉ người tạo trang này mới thay đổi được"
 
@@ -19030,6 +19036,9 @@ msgstr "Ai đó"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Người khác đã xuất bản {entryPath} từ workspace này. Hãy xuất bản kèm id trang cụ thể để thêm phiên bản vào trang của họ, hoặc di chuyển tệp."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Người khác đã lưu cấu hình của environment này trong lúc bạn đang sửa"
+
 msgid "Someone is moving this workspace…"
 msgstr "Có người đang di chuyển không gian làm việc này…"
 
@@ -20218,6 +20227,15 @@ msgstr "Agent tốt nhất sẽ thay đổi.<0/>Quy trình của bạn thì khô
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Máy khởi động lại với {actual} vCPU thay vì {wanted}. Hãy khởi động lại để thử lần nữa."
 
+msgid "The build is no longer running"
+msgstr "Bản build không còn chạy nữa"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Bản build chạy quá {BUILD_LIMIT_MINUTES} phút và đã bị dừng"
+
+msgid "The build stopped unexpectedly"
+msgstr "Bản build đã dừng bất ngờ"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạn."
 
@@ -20283,6 +20301,9 @@ msgstr "Người điều phối xuất hiện"
 
 msgid "The endpoint must use https."
 msgstr "Endpoint phải dùng https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Environment đã thay đổi trong lúc build; snapshot hiện tại được giữ lại"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Environment đã thay đổi trong khi đang khôi phục. Hãy thử lại."

@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
 import {
+	BUILD_ERROR_LABELS,
 	BUILD_STATUS_LABELS,
 	type EnvironmentBuild,
 } from "renderer/routes/_authenticated/components/EnvironmentView/components/EnvironmentHistory/utils/environmentBuildMeta";
@@ -35,6 +36,7 @@ export function EnvironmentBuildStatus({
 		</span>
 	);
 	if (status !== "failed" || !error) return label;
+	const fixed = BUILD_ERROR_LABELS[error];
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -45,8 +47,13 @@ export function EnvironmentBuildStatus({
 					{label}
 				</button>
 			</TooltipTrigger>
-			<TooltipContent className="max-w-md whitespace-pre-wrap font-mono text-[11px]">
-				{error}
+			<TooltipContent
+				className={cn(
+					"max-w-md whitespace-pre-wrap",
+					!fixed && "font-mono text-[11px]",
+				)}
+			>
+				{fixed ? i18n._(fixed) : error}
 			</TooltipContent>
 		</Tooltip>
 	);

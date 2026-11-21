@@ -3296,6 +3296,9 @@ msgstr "Хотя бы одна команда, которую мы можем н
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Не более {AUTO_TOPUP_MONTHLY_LIMIT} пополнений в месяц, то есть до {monthlyMax} в месяц."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Предпросмотр может быть не более чем у {MAX_PREVIEW_PORTS} портов."
+
 msgid "at once"
 msgstr "одновременно"
 
@@ -13946,6 +13949,9 @@ msgstr "Только владелец или владелец организац
 msgid "Only the people listed above can open it"
 msgstr "Открыть могут только люди из списка выше"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Изменить конфигурацию этого окружения может только его создатель или администратор организации."
+
 msgid "Only the person who created this page can change it"
 msgstr "Изменить эту страницу может только тот, кто её создал"
 
@@ -19030,6 +19036,9 @@ msgstr "Кто-то"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Кто-то другой уже опубликовал {entryPath} из этого рабочего пространства. Опубликуйте с явным идентификатором страницы, чтобы добавить версию к его странице, или переместите файл."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Кто-то другой сохранил конфигурацию этого окружения, пока вы её редактировали"
+
 msgid "Someone is moving this workspace…"
 msgstr "Кто-то переносит эту рабочую область…"
 
@@ -20218,6 +20227,15 @@ msgstr "Лучший агент будет меняться.<0/>Ваш проц�
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Машина запустилась с {actual} vCPU вместо {wanted}. Перезапустите её, чтобы попробовать снова."
 
+msgid "The build is no longer running"
+msgstr "Сборка больше не выполняется"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Сборка шла дольше {BUILD_LIMIT_MINUTES} минут и была остановлена"
+
+msgid "The build stopped unexpectedly"
+msgstr "Сборка неожиданно остановилась"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Теперь кнопка выделяется. Я проверил это в вашей панели."
 
@@ -20283,6 +20301,9 @@ msgstr "Появляется диспетчер"
 
 msgid "The endpoint must use https."
 msgstr "Конечная точка должна использовать https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Окружение изменилось во время сборки; его текущий снимок сохранён"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Окружение изменилось во время восстановления. Попробуйте ещё раз."

@@ -3296,6 +3296,9 @@ msgstr "우리를 포함해 이름을 댈 수 있는 팀 중 최소 한 곳이 �
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "한 달에 최대 {AUTO_TOPUP_MONTHLY_LIMIT}회, 즉 월 최대 {monthlyMax}입니다."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "미리 보기를 사용할 수 있는 포트는 최대 {MAX_PREVIEW_PORTS}개입니다."
+
 msgid "at once"
 msgstr "동시"
 
@@ -13946,6 +13949,9 @@ msgstr "소유자 또는 조직 소유자만 이 자동화를 보관할 수 있�
 msgid "Only the people listed above can open it"
 msgstr "위에 나열된 사람만 열 수 있습니다"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "이 환경을 만든 사람이나 조직 관리자만 설정을 변경할 수 있습니다."
+
 msgid "Only the person who created this page can change it"
 msgstr "이 페이지를 만든 사람만 변경할 수 있습니다"
 
@@ -19030,6 +19036,9 @@ msgstr "누군가"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "다른 사람이 이 워크스페이스의 {entryPath}를 이미 게시했습니다. 페이지 ID를 명시해 그 페이지에 버전을 추가하거나 파일을 옮기세요."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "편집하는 동안 다른 사람이 이 환경의 설정을 저장했습니다"
+
 msgid "Someone is moving this workspace…"
 msgstr "누군가 이 워크스페이스를 이동하는 중입니다…"
 
@@ -20218,6 +20227,15 @@ msgstr "최고의 에이전트는 바뀝니다.<0/>워크플로는 그럴 필요
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "머신이 {wanted} vCPU가 아닌 {actual} vCPU로 시작되었습니다. 다시 시작해 보세요."
 
+msgid "The build is no longer running"
+msgstr "빌드가 더 이상 실행 중이 아닙니다"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "빌드가 {BUILD_LIMIT_MINUTES}분 넘게 실행되어 중지되었습니다"
+
+msgid "The build stopped unexpectedly"
+msgstr "빌드가 예기치 않게 중지되었습니다"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 
@@ -20283,6 +20301,9 @@ msgstr "배차원의 등장"
 
 msgid "The endpoint must use https."
 msgstr "엔드포인트는 https를 사용해야 합니다."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "빌드 중에 환경이 변경되어 현재 스냅샷을 유지했습니다"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "복원하는 동안 환경이 변경되었습니다. 다시 시도하세요."

@@ -3296,6 +3296,9 @@ msgstr "名前を挙げられるチームが少なくとも1つ、当社を含�
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "チャージは月 {AUTO_TOPUP_MONTHLY_LIMIT} 回まで、つまり月に最大 {monthlyMax} です。"
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "プレビューを使えるポートは最大 {MAX_PREVIEW_PORTS} 個です。"
+
 msgid "at once"
 msgstr "同時"
 
@@ -13946,6 +13949,9 @@ msgstr "このオートメーションをアーカイブできるのは、所有
 msgid "Only the people listed above can open it"
 msgstr "上記のメンバーだけが開けます"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "この環境の設定を変更できるのは、作成者または組織の管理者だけです。"
+
 msgid "Only the person who created this page can change it"
 msgstr "このページを変更できるのは作成者のみです"
 
@@ -19030,6 +19036,9 @@ msgstr "誰か"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "このワークスペースの {entryPath} は、他の人がすでに公開しています。ページ ID を明示して相手のページにバージョンを追加するか、ファイルを移動してください。"
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "編集中に他の人がこの環境の設定を保存しました"
+
 msgid "Someone is moving this workspace…"
 msgstr "誰かがこのワークスペースを移動しています…"
 
@@ -20218,6 +20227,15 @@ msgstr "最良のエージェントは変わります。<0/>ワークフロー�
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "マシンは {wanted} vCPU ではなく {actual} vCPU で起動しました。もう一度再起動してください。"
 
+msgid "The build is no longer running"
+msgstr "ビルドは実行されていません"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "ビルドが {BUILD_LIMIT_MINUTES} 分を超えたため停止しました"
+
+msgid "The build stopped unexpectedly"
+msgstr "ビルドが予期せず停止しました"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "ボタンが目立つようになりました。ペインで確認済みです。"
 
@@ -20283,6 +20301,9 @@ msgstr "ディスパッチャーの登場"
 
 msgid "The endpoint must use https."
 msgstr "エンドポイントは https を使用する必要があります。"
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "ビルド中に環境が変更されたため、現在のスナップショットを維持しました"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "復元中に環境が変更されました。もう一度お試しください。"

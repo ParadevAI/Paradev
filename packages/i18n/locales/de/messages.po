@@ -3296,6 +3296,9 @@ msgstr "Mindestens ein Team, das wir benennen können, unseres eingeschlossen, b
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Höchstens {AUTO_TOPUP_MONTHLY_LIMIT} Aufladungen pro Monat, also bis zu {monthlyMax} pro Monat."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Höchstens {MAX_PREVIEW_PORTS} Ports können eine Vorschau haben."
+
 msgid "at once"
 msgstr "gleichzeitig"
 
@@ -13946,6 +13949,9 @@ msgstr "Nur der Eigentümer oder ein Organisationsinhaber kann diese Automatisie
 msgid "Only the people listed above can open it"
 msgstr "Nur die oben aufgeführten Personen können es öffnen"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Nur die Person, die diese Umgebung erstellt hat, oder ein Admin der Organisation kann ihre Konfiguration ändern."
+
 msgid "Only the person who created this page can change it"
 msgstr "Nur wer diese Seite erstellt hat, kann sie ändern"
 
@@ -19030,6 +19036,9 @@ msgstr "Jemand"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Jemand anderes hat {entryPath} aus diesem Workspace bereits veröffentlicht. Veröffentliche mit einer ausdrücklichen Seiten-ID, um eine Version zu dessen Seite hinzuzufügen, oder verschiebe die Datei."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Jemand anderes hat die Konfiguration dieser Umgebung gespeichert, während du sie bearbeitet hast"
+
 msgid "Someone is moving this workspace…"
 msgstr "Jemand verschiebt diesen Arbeitsbereich…"
 
@@ -20218,6 +20227,15 @@ msgstr "Der beste Agent wird wechseln.<0/>Dein Workflow nicht."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Die Maschine lief mit {actual} vCPU statt {wanted} wieder an. Starte sie neu, um es erneut zu versuchen."
 
+msgid "The build is no longer running"
+msgstr "Der Build läuft nicht mehr"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Der Build lief länger als {BUILD_LIMIT_MINUTES} Minuten und wurde gestoppt"
+
+msgid "The build stopped unexpectedly"
+msgstr "Der Build wurde unerwartet beendet"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Der Button hebt sich jetzt ab. Ich habe es in deinem Bereich geprüft."
 
@@ -20283,6 +20301,9 @@ msgstr "Der Disponent tritt auf"
 
 msgid "The endpoint must use https."
 msgstr "Der Endpunkt muss https verwenden."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Die Umgebung hat sich während des Builds geändert; ihr aktueller Snapshot wurde beibehalten"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Die Umgebung hat sich während der Wiederherstellung geändert. Versuche es erneut."

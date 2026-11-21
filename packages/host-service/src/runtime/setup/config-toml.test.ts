@@ -33,6 +33,8 @@ beforeEach(() => {
 	}
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
+	// Never the box's own /etc/superset/environment.toml, which a cloud workspace running these tests has.
+	process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(root, "environment.toml");
 });
 
 afterEach(() => {

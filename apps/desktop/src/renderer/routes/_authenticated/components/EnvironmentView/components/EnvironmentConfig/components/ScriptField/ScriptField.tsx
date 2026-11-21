@@ -12,6 +12,7 @@ interface ScriptFieldProps {
 	onChange: (value: string) => void;
 	onSave?: () => void;
 	notice?: ReactNode;
+	readOnly?: boolean;
 }
 
 export function ScriptField({
@@ -24,6 +25,7 @@ export function ScriptField({
 	onChange,
 	onSave,
 	notice,
+	readOnly = false,
 }: ScriptFieldProps) {
 	return (
 		<div className="flex flex-col gap-1.5 p-3">
@@ -39,6 +41,7 @@ export function ScriptField({
 					onChange={onChange}
 					onSave={onSave}
 					placeholder={placeholder}
+					readOnly={readOnly}
 					tabIndents={false}
 					value={value}
 				/>

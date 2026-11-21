@@ -11,6 +11,8 @@ import {
 } from "@superset/ui/alert-dialog";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
+import { useMutationState } from "@tanstack/react-query";
+import { getMutationKey } from "@trpc/react-query";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 
@@ -28,6 +30,15 @@ export function SaveCheckpointDialog({
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
 	const promote = cloudTrpc.environment.promote.useMutation();
+	const saving = useMutationState({
+		filters: {
+			mutationKey: getMutationKey(cloudTrpc.environment.promote),
+			status: "pending",
+		},
+		select: (mutation) =>
+			(mutation.state.variables as { cloudWorkspaceId: string })
+				.cloudWorkspaceId,
+	}).includes(cloudWorkspaceId);
 	const environment = useWorkspaceEnvironment(cloudWorkspaceId);
 	if (!environment) return null;
 	const name = environment.name;
@@ -75,7 +86,7 @@ export function SaveCheckpointDialog({
 						<Trans>Cancel</Trans>
 					</Button>
 					<AlertDialogAction
-						disabled={promote.isPending}
+						disabled={saving}
 						size="sm"
 						className="h-7 px-3 text-xs"
 						onClick={handleSave}

@@ -13,9 +13,14 @@ const BUILD_POLL_MS = 5_000;
 
 interface EnvironmentHistoryProps {
 	environmentId: string;
+	/** False hides Restore: the API refuses this person's restores. */
+	canRestore: boolean;
 }
 
-export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
+export function EnvironmentHistory({
+	environmentId,
+	canRestore,
+}: EnvironmentHistoryProps) {
 	const utils = cloudTrpc.useUtils();
 	const builds = cloudTrpc.environment.builds.useQuery(
 		{ environmentId, limit: HISTORY_SCAN },
@@ -71,8 +76,12 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 				builds={historyRows(all, RECENT_BUILDS)}
 				failed={builds.isError}
 				loading={builds.isPending}
-				onRestore={(buildId) => restore.mutate({ environmentId, buildId })}
-				restoring={restore.isPending}
+				onRestore={
+					canRestore
+						? (buildId) => restore.mutate({ environmentId, buildId })
+						: undefined
+				}
+				restoreDisabled={restore.isPending || running}
 			/>
 		</div>
 	);

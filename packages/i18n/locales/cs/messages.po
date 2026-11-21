@@ -3296,6 +3296,9 @@ msgstr "Alespoň jeden tým, který umíme jmenovat — včetně toho našeho �
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Nejvýše {AUTO_TOPUP_MONTHLY_LIMIT} dobití měsíčně, tedy až {monthlyMax} měsíčně."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Náhled může mít nejvýše {MAX_PREVIEW_PORTS} portů."
+
 msgid "at once"
 msgstr "najednou"
 
@@ -13946,6 +13949,9 @@ msgstr "Tuto automatizaci může archivovat jen vlastník nebo vlastník organiz
 msgid "Only the people listed above can open it"
 msgstr "Otevřít ho mohou jen lidé uvedení výše"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Konfiguraci tohoto prostředí může změnit jen ten, kdo ho vytvořil, nebo správce organizace."
+
 msgid "Only the person who created this page can change it"
 msgstr "Tuto stránku může měnit jen ten, kdo ji vytvořil"
 
@@ -19030,6 +19036,9 @@ msgstr "Někdo"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Někdo jiný už {entryPath} z tohoto workspace publikoval. Publikuj s výslovným ID stránky a přidej verzi k jeho stránce, nebo soubor přesuň."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Někdo jiný uložil konfiguraci tohoto prostředí, zatímco jste ji upravovali"
+
 msgid "Someone is moving this workspace…"
 msgstr "Někdo přesouvá tento pracovní prostor…"
 
@@ -20218,6 +20227,15 @@ msgstr "Nejlepší agent se změní.<0/>Vaše workflow ne."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Stroj se spustil s {actual} vCPU místo {wanted}. Restartujte ho a zkuste to znovu."
 
+msgid "The build is no longer running"
+msgstr "Sestavení už neběží"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Sestavení běželo déle než {BUILD_LIMIT_MINUTES} minut a bylo zastaveno"
+
+msgid "The build stopped unexpectedly"
+msgstr "Sestavení se neočekávaně zastavilo"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 
@@ -20283,6 +20301,9 @@ msgstr "Nastupuje dispečer"
 
 msgid "The endpoint must use https."
 msgstr "Koncový bod musí používat https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Prostředí se během sestavení změnilo; jeho aktuální snímek zůstal zachován"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Prostředí se během obnovení změnilo. Zkuste to znovu."

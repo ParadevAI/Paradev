@@ -3296,6 +3296,9 @@ msgstr "At least one team we can name, ours included, passes every F4 gate for a
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+
 msgid "at once"
 msgstr "at once"
 
@@ -13946,6 +13949,9 @@ msgstr "Only the owner or an organization owner can archive this automation"
 msgid "Only the people listed above can open it"
 msgstr "Only the people listed above can open it"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Only the person who created this environment or an organization admin can change its config."
+
 msgid "Only the person who created this page can change it"
 msgstr "Only the person who created this page can change it"
 
@@ -19030,6 +19036,9 @@ msgstr "Someone"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Someone else has already published {entryPath} from this workspace. Publish with an explicit page id to add a version to their page, or move the file."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Someone else saved this environment's config while you were editing it"
+
 msgid "Someone is moving this workspace…"
 msgstr "Someone is moving this workspace…"
 
@@ -20218,6 +20227,15 @@ msgstr "The best agent will change.<0/>Your workflow shouldn't."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 
+msgid "The build is no longer running"
+msgstr "The build is no longer running"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+
+msgid "The build stopped unexpectedly"
+msgstr "The build stopped unexpectedly"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "The button now stands out. I checked it in your pane."
 
@@ -20283,6 +20301,9 @@ msgstr "The dispatcher appears"
 
 msgid "The endpoint must use https."
 msgstr "The endpoint must use https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "The environment changed during the build; its current snapshot was kept"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "The environment changed while it was being restored. Try again."

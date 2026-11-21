@@ -4,6 +4,7 @@ import { stub } from "../../../test/stub";
 import * as plan from "../../lib/billing/plan";
 import * as guards from "../../lib/cloud-guards";
 import * as sandbox from "../../lib/sandbox";
+import * as environmentBuild from "../../lib/sandbox/environment-build";
 import { userError } from "../../trpc";
 import * as access from "../cloud-workspace/access";
 import * as wake from "../cloud-workspace/wake";
@@ -21,6 +22,8 @@ let environment: Record<string, unknown> = {};
 let isAdmin = false;
 let written: Record<string, unknown>[] = [];
 let runningBuilds: Record<string, unknown>[] = [];
+let configMatches = true;
+let reapplied: unknown[] = [];
 
 stub(db.query.environments, { findFirst: async () => environment });
 stub(db.query.environmentBuilds, {
@@ -33,7 +36,8 @@ stub(db, {
 			written.push(values);
 			return {
 				where: () => ({
-					returning: async () => [{ ...environment, ...values }],
+					returning: async () =>
+						configMatches ? [{ ...environment, ...values }] : [],
 				}),
 			};
 		},
@@ -68,6 +72,9 @@ stub(access, {
 stub(sandbox, {
 	workspaceRepositories: async () => [],
 	environmentRepositoryRows: async () => [{ id: REPOSITORY_ID }] as never,
+	queueRulesReapply: async (scope: unknown) => {
+		reapplied.push(scope);
+	},
 });
 stub(plan, {
 	resolveMachineSize: async (_: string, name: string | null | undefined) =>
@@ -103,10 +110,13 @@ beforeEach(() => {
 		sourceKind: "image",
 		machineSize: "large",
 		primaryRepositoryId: REPOSITORY_ID,
+		config: null,
 	};
 	isAdmin = false;
 	written = [];
 	runningBuilds = [];
+	configMatches = true;
+	reapplied = [];
 });
 
 describe("environment.update machineSize", () => {
@@ -133,6 +143,15 @@ describe("environment.update machineSize", () => {
 });
 
 describe("environment.update config", () => {
+	const SETUP = '[setup]\nrun = "cp .env.example .env"\n';
+
+	test("a member who neither created nor administers a shared environment cannot change its config", async () => {
+		await expect(
+			caller.environment.update({ id: ENVIRONMENT_ID, config: SETUP }),
+		).rejects.toMatchObject({ code: "FORBIDDEN" });
+		expect(written).toEqual([]);
+	});
+
 	test("a config with only comments is stored as no config, so the repository's file still applies", async () => {
 		environment.createdByUserId = "user-1";
 		await caller.environment.update({
@@ -141,10 +160,33 @@ describe("environment.update config", () => {
 		});
 		expect(written).toEqual([{ config: null }]);
 	});
+
+	test("a changed config is handed to the environment's running boxes; an unchanged one is not", async () => {
+		environment.createdByUserId = "user-1";
+		environment.config = SETUP;
+		await caller.environment.update({ id: ENVIRONMENT_ID, config: SETUP });
+		expect(reapplied).toEqual([]);
+		await caller.environment.update({ id: ENVIRONMENT_ID, config: null });
+		expect(reapplied).toEqual([{ environmentId: ENVIRONMENT_ID }]);
+	});
+
+	test("a save over a config someone else changed since the edit began is refused", async () => {
+		environment.createdByUserId = "user-1";
+		configMatches = false;
+		await expect(
+			caller.environment.update({
+				id: ENVIRONMENT_ID,
+				config: SETUP,
+				expectedConfig: null,
+			}),
+		).rejects.toMatchObject({ code: "CONFLICT" });
+		expect(reapplied).toEqual([]);
+	});
 });
 
 describe("environment.update scope", () => {
 	test("a member who neither created nor administers a shared environment cannot take it private", async () => {
+		environment.createdByUserId = null;
 		await expect(
 			caller.environment.update({ id: ENVIRONMENT_ID, scope: "personal" }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
@@ -211,13 +253,36 @@ describe("environment.promote of a running workspace", () => {
 	const restarted: Array<[string, { sessionId: string | null }]> = [];
 	const order: string[] = [];
 	const inserted: unknown[] = [];
+	const deleted: string[] = [];
+	const pruned: string[] = [];
+	let selected: unknown[][] = [];
+	const query = (rows: unknown[]) => {
+		type Query = Promise<unknown[]> & {
+			from: () => Query;
+			where: () => Query;
+			limit: () => Query;
+		};
+		const chain: Query = Object.assign(Promise.resolve(rows), {
+			from: () => chain,
+			where: () => chain,
+			limit: () => chain,
+		});
+		return chain;
+	};
 	stub(sandbox, {
 		promoteSandboxToEnvironment: async () => ({
 			goldenName: "env-new",
 			region: "iad1",
 			stopped: { sessionId: "sess_A" },
 		}),
-		deleteSandbox: async () => {},
+		deleteSandbox: async (name: string) => {
+			deleted.push(name);
+		},
+	});
+	stub(environmentBuild, {
+		pruneGoldens: async (row: { id: string }) => {
+			pruned.push(row.id);
+		},
 	});
 	stub(wake, {
 		wakeAfterStop: async (
@@ -242,6 +307,14 @@ describe("environment.promote of a running workspace", () => {
 		transaction: async (run: (tx: unknown) => Promise<unknown>) => {
 			const rows = () => [{ id: ENVIRONMENT_ID }];
 			const tx = {
+				select: () => query(selected.shift() ?? []),
+				update: () => ({
+					set: (values: Record<string, unknown>) => ({
+						where: () => ({
+							returning: async () => [{ ...environment, ...values }],
+						}),
+					}),
+				}),
 				insert: () => ({
 					values: (values: unknown) => {
 						inserted.push(values);
@@ -259,6 +332,7 @@ describe("environment.promote of a running workspace", () => {
 	});
 
 	test("saves the environment, then starts the box again through the wake path; a refused restart does not fail the promote", async () => {
+		environment.config = '[setup]\nrun = "cp .env.example .env"\n';
 		await caller.environment.promote({
 			cloudWorkspaceId: WORKSPACE_ID,
 			name: "Saved",
@@ -267,10 +341,49 @@ describe("environment.promote of a running workspace", () => {
 		expect(order).toEqual(["save", "restart"]);
 		expect(inserted).toContainEqual(
 			expect.objectContaining({
+				name: "Saved",
+				config: environment.config,
+				machineSize: "large",
+			}),
+		);
+		expect(inserted).toContainEqual(
+			expect.objectContaining({
 				trigger: "promote",
 				status: "succeeded",
 				goldenRef: expect.stringMatching(/^env-/),
 			}),
 		);
+	});
+
+	test("a checkpoint keeps the snapshot it replaces in history, with that snapshot's repositories, and leaves deleting to retention", async () => {
+		environment.createdByUserId = "user-1";
+		environment.sourceKind = "fork";
+		environment.sourceRef = "env-old";
+		selected = [
+			[
+				{
+					sourceKind: "fork",
+					sourceRef: "env-old",
+					primaryRepositoryId: OTHER_REPOSITORY_ID,
+				},
+			],
+			[{ repositoryId: OTHER_REPOSITORY_ID }],
+			[],
+		];
+		inserted.length = 0;
+		await caller.environment.promote({
+			cloudWorkspaceId: WORKSPACE_ID,
+			environmentId: ENVIRONMENT_ID,
+		});
+		expect(inserted).toContainEqual(
+			expect.objectContaining({
+				goldenRef: "env-old",
+				trigger: "promote",
+				repositoryIds: [OTHER_REPOSITORY_ID],
+				primaryRepositoryId: OTHER_REPOSITORY_ID,
+			}),
+		);
+		expect(deleted).toEqual([]);
+		expect(pruned).toEqual([ENVIRONMENT_ID]);
 	});
 });

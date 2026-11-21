@@ -3296,6 +3296,9 @@ msgstr "Co najmniej jeden zespół, który da się wskazać z nazwy, w tym nasz,
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Najwyżej {AUTO_TOPUP_MONTHLY_LIMIT} doładowań w miesiącu, czyli do {monthlyMax} miesięcznie."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Podgląd może mieć najwyżej {MAX_PREVIEW_PORTS} portów."
+
 msgid "at once"
 msgstr "naraz"
 
@@ -13946,6 +13949,9 @@ msgstr "Tylko właściciel lub właściciel organizacji może zarchiwizować tę
 msgid "Only the people listed above can open it"
 msgstr "Otworzyć to mogą tylko osoby wymienione powyżej"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Konfigurację tego środowiska może zmienić tylko osoba, która je utworzyła, lub administrator organizacji."
+
 msgid "Only the person who created this page can change it"
 msgstr "Tylko osoba, która utworzyła tę stronę, może ją zmienić"
 
@@ -19030,6 +19036,9 @@ msgstr "Ktoś"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Ktoś inny opublikował już {entryPath} z tego workspace. Opublikuj z jawnym identyfikatorem strony, aby dodać wersję do jego strony, albo przenieś plik."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Ktoś inny zapisał konfigurację tego środowiska, gdy ją edytowałeś"
+
 msgid "Someone is moving this workspace…"
 msgstr "Ktoś przenosi ten obszar roboczy…"
 
@@ -20218,6 +20227,15 @@ msgstr "Najlepszy agent się zmieni.<0/>Twój workflow nie musi."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Maszyna uruchomiła się z {actual} vCPU zamiast {wanted}. Uruchom ją ponownie, aby spróbować jeszcze raz."
 
+msgid "The build is no longer running"
+msgstr "Kompilacja nie jest już uruchomiona"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Kompilacja trwała dłużej niż {BUILD_LIMIT_MINUTES} minut i została zatrzymana"
+
+msgid "The build stopped unexpectedly"
+msgstr "Kompilacja nieoczekiwanie się zatrzymała"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Przycisk teraz się wyróżnia. Sprawdziłem to w Twoim panelu."
 
@@ -20283,6 +20301,9 @@ msgstr "Pojawia się dyspozytor"
 
 msgid "The endpoint must use https."
 msgstr "Punkt końcowy musi używać https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Środowisko zmieniło się podczas kompilacji; jego bieżąca migawka została zachowana"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Środowisko zmieniło się podczas przywracania. Spróbuj ponownie."

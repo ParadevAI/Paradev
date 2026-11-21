@@ -1,5 +1,6 @@
 import {
 	CONFIG_NAME_PATTERN,
+	MAX_PREVIEW_PORTS,
 	type ProjectConfig,
 	toTomlText,
 } from "@superset/shared/project-config";
@@ -96,11 +97,11 @@ function withScript(entry: Phase | undefined, script: string) {
 	return run === original ? entry : withRun(entry, run);
 }
 
-/** One line for the terminal command input: a list or a multi-line script reads as `a && b`. */
+/** The terminal command as edited: a list reads as `a && b`, which runs the same; a script keeps its lines. */
 function commandText(run: CommandValue | undefined): string {
-	const lines = Array.isArray(run) ? run : (run ?? "").split("\n");
-	return lines
-		.map((line) => line.trim())
+	if (!Array.isArray(run)) return (run ?? "").trim();
+	return run
+		.map((command) => command.trim())
 		.filter(Boolean)
 		.join(" && ");
 }
@@ -220,7 +221,12 @@ export function configText(config: ProjectConfig): string | null {
 	return isEmpty(config) ? null : toTomlText(config);
 }
 
-export type RowProblem = "name" | "duplicate" | "command" | "port";
+export type RowProblem =
+	| "name"
+	| "duplicate"
+	| "command"
+	| "port"
+	| "previewLimit";
 
 export function terminalProblems(rows: TerminalRow[]): Map<string, RowProblem> {
 	const problems = new Map<string, RowProblem>();
@@ -243,13 +249,17 @@ export function terminalProblems(rows: TerminalRow[]): Map<string, RowProblem> {
 export function portProblems(rows: PortRow[]): Map<string, RowProblem> {
 	const problems = new Map<string, RowProblem>();
 	const seen = new Set<string>();
+	let previews = 0;
 	for (const row of rows) {
 		const name = row.name.trim();
 		const port = Number(row.port);
+		if (row.preview) previews += 1;
 		if (!CONFIG_NAME_PATTERN.test(name)) problems.set(row.key, "name");
 		else if (seen.has(name)) problems.set(row.key, "duplicate");
-		else if (!Number.isInteger(port) || port < 1 || port > 65535) {
+		else if (!/^\d+$/.test(row.port.trim()) || port < 1 || port > 65535) {
 			problems.set(row.key, "port");
+		} else if (row.preview && previews > MAX_PREVIEW_PORTS) {
+			problems.set(row.key, "previewLimit");
 		}
 		seen.add(name);
 	}

@@ -559,6 +559,13 @@ export const serverErrorMessages: Record<
 					"The environment changed while it was being restored. Try again.",
 			}),
 		),
+	"serverError.environment.configChanged": () =>
+		i18n._(
+			msg({
+				message:
+					"Someone else saved this environment's config while you were editing it",
+			}),
+		),
 	"serverError.task.notFound": () =>
 		i18n._(
 			msg({

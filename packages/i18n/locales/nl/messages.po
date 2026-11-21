@@ -3296,6 +3296,9 @@ msgstr "Minstens één team dat we kunnen noemen, het onze inbegrepen, haalt een
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Maximaal {AUTO_TOPUP_MONTHLY_LIMIT} keer per maand, dus tot {monthlyMax} per maand."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Hoogstens {MAX_PREVIEW_PORTS} poorten kunnen een preview hebben."
+
 msgid "at once"
 msgstr "tegelijk"
 
@@ -13946,6 +13949,9 @@ msgstr "Alleen de eigenaar of een organisatie-eigenaar kan deze automatisering a
 msgid "Only the people listed above can open it"
 msgstr "Alleen de mensen hierboven kunnen het openen"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Alleen degene die deze omgeving heeft gemaakt of een beheerder van de organisatie kan de configuratie wijzigen."
+
 msgid "Only the person who created this page can change it"
 msgstr "Alleen degene die deze pagina heeft gemaakt kan hem wijzigen"
 
@@ -19030,6 +19036,9 @@ msgstr "Iemand"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Iemand anders heeft {entryPath} vanuit deze workspace al gepubliceerd. Publiceer met een expliciet pagina-id om een versie aan hun pagina toe te voegen, of verplaats het bestand."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Iemand anders heeft de configuratie van deze omgeving opgeslagen terwijl je hem bewerkte"
+
 msgid "Someone is moving this workspace…"
 msgstr "Iemand verplaatst deze werkruimte…"
 
@@ -20218,6 +20227,15 @@ msgstr "De beste agent verandert.<0/>Jouw workflow niet."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "De machine kwam terug met {actual} vCPU in plaats van {wanted}. Start hem opnieuw om het nog eens te proberen."
 
+msgid "The build is no longer running"
+msgstr "De build wordt niet meer uitgevoerd"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "De build duurde langer dan {BUILD_LIMIT_MINUTES} minuten en is gestopt"
+
+msgid "The build stopped unexpectedly"
+msgstr "De build is onverwacht gestopt"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 
@@ -20283,6 +20301,9 @@ msgstr "De dispatcher verschijnt"
 
 msgid "The endpoint must use https."
 msgstr "Het endpoint moet https gebruiken."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "De omgeving is tijdens de build gewijzigd; de huidige snapshot is behouden"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "De omgeving is gewijzigd tijdens het herstellen. Probeer het opnieuw."

@@ -197,6 +197,25 @@ default = false
 		expect(ports.get("a")).toBe("port");
 	});
 
+	test("a port must be plain digits, and only as many ports as the cloud publishes can have a preview", () => {
+		const port = (key: string, value: string, preview = true) => ({
+			key,
+			source: null,
+			name: `p${key}`,
+			port: value,
+			label: "",
+			preview,
+		});
+		expect(portProblems([port("hex", "0x10")]).get("hex")).toBe("port");
+		expect(portProblems([port("exp", "1e3")]).get("exp")).toBe("port");
+		const many = Array.from({ length: 15 }, (_, index) =>
+			port(String(index), String(3000 + index)),
+		);
+		const problems = portProblems(many);
+		expect([...problems.keys()]).toEqual(["13", "14"]);
+		expect(problems.get("13")).toBe("previewLimit");
+	});
+
 	test("picking another default terminal clears every other default the cloud reads", () => {
 		const base = parse(`
 [terminals.a]
@@ -242,17 +261,25 @@ default = true
 		});
 	});
 
-	test("a multi-line terminal command reads as one line and is kept unless edited", () => {
-		const base = parse('[terminals.dev]\nrun = """\nbun i\nbun dev\n"""\n');
+	test("a multi-line terminal script keeps its lines, so comments and line continuations still work after an edit", () => {
+		const base = parse(
+			"[terminals.dev]\nrun = '''\n# start dev\nbun dev \\\n  --port 3000\n'''\n",
+		);
 		const form = toConfigForm(base);
 		const [dev] = form.terminals;
 		if (!dev) throw new Error("expected the dev terminal");
-		expect(dev.command).toBe("bun i && bun dev");
+		expect(dev.command).toBe("# start dev\nbun dev \\\n  --port 3000");
 		expect(fromConfigForm(base, form).terminals).toEqual(base.terminals);
-		dev.command = "bun i && bun start";
+		dev.command = "# start dev\nbun dev \\\n  --port 3001";
 		expect(fromConfigForm(base, form).terminals?.dev?.run).toBe(
-			"bun i && bun start",
+			"# start dev\nbun dev \\\n  --port 3001",
 		);
+	});
+
+	test("a terminal's command list reads as one `&&` line, which runs the same", () => {
+		const base = parse('[terminals.dev]\nrun = ["bun i", "bun dev"]\n');
+		const [dev] = toConfigForm(base).terminals;
+		expect(dev?.command).toBe("bun i && bun dev");
 	});
 
 	test("an unedited terminal with no cloud command does not block saving", () => {

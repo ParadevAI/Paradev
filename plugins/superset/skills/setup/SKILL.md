@@ -82,7 +82,7 @@ Rules:
 - Copy secrets and `.env` from the main checkout (`$SUPERSET_ROOT_PATH`) at setup time; never commit them.
 - Personal tweaks go in `config.local.toml`, next to `config.toml` in the main checkout. It is gitignored, applies to every worktree, is merged over the shared file, and the cloud never reads it.
 
-In the cloud, an environment can store its own `config.toml` on Paradev: paste it on the environment's page in Settings → Environments, or run `superset environments update <env> --config .paradev/config.toml`. While the environment has no config of its own, its builds and boxes read this repository file; once it has one, they run that instead, so store it again after changing this file. Leave `[mcp]` out of this file: it belongs in the environment's config only. The superset:environment skill sets one up end to end.
+In the cloud, an environment can store its own `config.toml` on Paradev: run `superset environments update <env> --config .paradev/config.toml`, or fill in its fields on the environment's page in Settings → Environments. While the environment has no config of its own, its builds and boxes read this repository file; once it has one, they run that instead, so store it again after changing this file. Leave `[mcp]` out of this file: it belongs in the environment's config only. The superset:environment skill sets one up end to end.
 
 In the cloud, `[install]` builds the environment's snapshot, which every new cloud workspace starts from:
 

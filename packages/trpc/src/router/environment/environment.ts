@@ -13,6 +13,7 @@ import {
 import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { parseProjectConfig } from "@superset/shared/project-config";
+import { BUILD_ERRORS } from "@superset/shared/sandbox/build-errors";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
@@ -30,6 +31,7 @@ import {
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
+	queueRulesReapply,
 	RepositoryError,
 	sandboxExists,
 	sortRepositories,
@@ -38,10 +40,12 @@ import {
 import {
 	type BuildRefusalReason,
 	BuildRefused,
+	currentGolden,
 	isStale,
 	keptGoldenRefs,
 	markGoldenDeleted,
-	markGoldenRefDeleted,
+	pruneGoldens,
+	recordReplacedGolden,
 	restoreGolden,
 	startEnvironmentBuild,
 	undeletedGoldens,
@@ -371,7 +375,7 @@ function toBuildView(
 		trigger: build.trigger,
 		kind: build.kind,
 		commitSha: build.commitSha,
-		error: stale ? "The build stopped unexpectedly" : build.error,
+		error: stale ? BUILD_ERRORS.stoppedUnexpectedly : build.error,
 		startedAt: build.startedAt,
 		finishedAt: build.finishedAt,
 		active: build.goldenRef !== null && build.goldenRef === activeRef,
@@ -672,6 +676,7 @@ export const environmentRouter = {
 							limit,
 						);
 					}
+					const replaced = target ? await currentGolden(tx, target.id) : null;
 					const [saved] = target
 						? await tx
 								.update(environments)
@@ -747,6 +752,12 @@ export const environmentRouter = {
 						});
 					}
 					const savedAt = new Date();
+					await recordReplacedGolden(tx, {
+						environmentId,
+						organizationId: workspace.organizationId,
+						replaced,
+						replacedAt: new Date(savedAt.getTime() - 1),
+					});
 					await tx.insert(environmentBuilds).values({
 						environmentId,
 						organizationId: workspace.organizationId,
@@ -771,15 +782,13 @@ export const environmentRouter = {
 					await restart();
 					throw error;
 				});
-			if (target?.sourceKind === "fork") {
-				await deleteSandbox(target.sourceRef)
-					.then(() => markGoldenRefDeleted(target.id, target.sourceRef))
-					.catch((error: unknown) =>
-						console.error(
-							`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
-							error,
-						),
-					);
+			if (target) {
+				await pruneGoldens(row, `promote ${row.id}`).catch((error: unknown) =>
+					console.error(
+						`[environment/promote] ${row.id} saved; could not prune its old goldens`,
+						error,
+					),
+				);
 			}
 			await restart();
 			return row;
@@ -933,6 +942,8 @@ export const environmentRouter = {
 				machineSize: z.enum(MACHINE_SIZES).nullable().optional(),
 				/** The environment's `config.toml`; null clears it. */
 				config: z.string().max(CONFIG_MAX_LENGTH).nullable().optional(),
+				/** The stored config the edit started from; a save over a different one is refused. */
+				expectedConfig: z.string().nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -967,8 +978,28 @@ export const environmentRouter = {
 			const [row] = await db
 				.update(environments)
 				.set(patch)
-				.where(eq(environments.id, input.id))
+				.where(
+					and(
+						eq(environments.id, input.id),
+						config === undefined || input.expectedConfig === undefined
+							? undefined
+							: input.expectedConfig === null
+								? isNull(environments.config)
+								: eq(environments.config, input.expectedConfig),
+					),
+				)
 				.returning();
+			if (!row) {
+				throw userError({
+					code: "CONFLICT",
+					message:
+						"Someone else saved this environment's config while you were editing it",
+					i18nKey: "serverError.environment.configChanged",
+				});
+			}
+			if (config !== undefined && config !== current.config) {
+				await queueRulesReapply({ environmentId: row.id });
+			}
 			return row;
 		}),
 

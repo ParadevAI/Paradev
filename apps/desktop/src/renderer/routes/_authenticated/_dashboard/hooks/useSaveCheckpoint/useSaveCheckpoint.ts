@@ -1,8 +1,7 @@
 import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
-import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
-import { authClient } from "renderer/lib/auth-client";
 import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
+import { useCanChangeEnvironment } from "renderer/routes/_authenticated/hooks/useCanChangeEnvironment";
 
 /**
  * The environment a cloud workspace can save a checkpoint to: null when the
@@ -12,13 +11,7 @@ export function useSaveCheckpoint(workspaceId: string) {
 	const environment = useWorkspaceEnvironment(workspaceId);
 	const { workspaces } = useCloudWorkspaces();
 	const status = workspaces?.find((row) => row.id === workspaceId)?.status;
-	const { data: session } = authClient.useSession();
-	const isAdmin = useIsOrganizationAdmin() === true;
-	const canSave =
-		!!environment &&
-		(environment.scope !== "organization" ||
-			environment.createdByUserId === session?.user?.id ||
-			isAdmin);
+	const canSave = useCanChangeEnvironment(environment);
 	return {
 		environment: canSave ? environment : null,
 		isReady: status !== undefined && isLiveCloudWorkspaceStatus(status),

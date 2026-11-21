@@ -64,9 +64,14 @@ function hasEdits(state: EditorState): boolean {
 
 interface EnvironmentConfigProps {
 	environment: Environment;
+	/** False shows the config read-only: the API refuses this person's changes. */
+	canChange: boolean;
 }
 
-export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
+export function EnvironmentConfig({
+	environment,
+	canChange,
+}: EnvironmentConfigProps) {
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
 	const saved = environment.config;
@@ -97,7 +102,12 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 			await utils.environment.invalidate();
 			setJustSaved(true);
 		},
-		onError: (error) => toast.error(errorMessage(error)),
+		onError: (error) => {
+			toast.error(errorMessage(error));
+			if (error.data?.code === "CONFLICT") {
+				void utils.environment.get.invalidate({ id: environment.id });
+			}
+		},
 	});
 
 	const { readable, form, changedElsewhere } = state;
@@ -106,14 +116,18 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 	const hasProblems = terminals.size > 0 || ports.size > 0;
 	const draft = draftOf(state);
 	const changed = readable && draft !== savedNormalized;
-	const canSave = changed && !hasProblems && !update.isPending;
+	const canSave = canChange && changed && !hasProblems && !update.isPending;
 
 	const save = () => {
 		if (!canSave) return;
 		setJustSaved(false);
 		sent.current = draft;
 		setState((current) => ({ ...current, changedElsewhere: false }));
-		update.mutate({ id: environment.id, config: draft });
+		update.mutate({
+			id: environment.id,
+			config: draft,
+			expectedConfig: state.origin,
+		});
 	};
 
 	const editForm = (patch: Partial<ConfigForm>) => {
@@ -130,9 +144,11 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 				<span className="text-xs font-medium">
 					<Trans>Config</Trans>
 				</span>
-				<Button disabled={!canSave} onClick={save} size="xs">
-					{update.isPending ? <Trans>Saving…</Trans> : <Trans>Save</Trans>}
-				</Button>
+				{canChange && (
+					<Button disabled={!canSave} onClick={save} size="xs">
+						{update.isPending ? <Trans>Saving…</Trans> : <Trans>Save</Trans>}
+					</Button>
+				)}
 			</div>
 			<p className="mb-2 text-xs text-muted-foreground">
 				<Trans>
@@ -140,6 +156,14 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 					the cloud reads the primary repository's .paradev/config.toml.
 				</Trans>
 			</p>
+			{!canChange && (
+				<p className="mb-2 text-xs text-muted-foreground">
+					<Trans>
+						Only the person who created this environment or an organization
+						admin can change its config.
+					</Trans>
+				</p>
+			)}
 			{changedElsewhere && (
 				<div className="mb-2 flex items-center justify-between gap-3 rounded-md border border-amber-500/40 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
 					<span>
@@ -161,7 +185,10 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 				</div>
 			)}
 			{readable ? (
-				<div className="divide-y divide-border/70 overflow-hidden rounded-lg border border-border/70">
+				<fieldset
+					className="min-w-0 divide-y divide-border/70 overflow-hidden rounded-lg border border-border/70"
+					disabled={!canChange}
+				>
 					<ScriptField
 						ariaLabel={t({ message: "Install script" })}
 						description={
@@ -182,6 +209,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 						onChange={(install) => editForm({ install })}
 						onSave={save}
 						placeholder={PLACEHOLDERS.install}
+						readOnly={!canChange}
 						value={form.install}
 					/>
 					<ScriptField
@@ -197,6 +225,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 						onChange={(start) => editForm({ start })}
 						onSave={save}
 						placeholder={PLACEHOLDERS.start}
+						readOnly={!canChange}
 						value={form.start}
 					/>
 					<TerminalsField
@@ -215,7 +244,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 						onEnabledChange={(mcpEnabled) => editForm({ mcpEnabled })}
 						value={form.mcpAllow}
 					/>
-				</div>
+				</fieldset>
 			) : (
 				<p className="rounded-md border border-border/70 px-3 py-2 text-xs text-muted-foreground">
 					<Trans>

@@ -1,3 +1,4 @@
+import { BUILD_ERRORS } from "@superset/shared/sandbox/build-errors";
 import { FatalError, sleep } from "workflow";
 import { TIMED_OUT_EXIT_CODE } from "../build-command";
 import {
@@ -81,14 +82,12 @@ export async function environmentBuildWorkflow(
 		await stopBox(buildId);
 		await waitFor(() => snapshotTaken(buildId, previousSnapshot));
 		if (!(await activateBuild(buildId, sourceRef))) {
-			throw new FatalError(
-				"The environment changed during the build; its current snapshot was kept",
-			);
+			throw new FatalError(BUILD_ERRORS.environmentChanged);
 		}
 	} catch (error) {
 		await failBuildAndCleanUp(
 			buildId,
-			FatalError.is(error) ? error.message : "The build stopped unexpectedly",
+			FatalError.is(error) ? error.message : BUILD_ERRORS.stoppedUnexpectedly,
 		);
 		return "failed";
 	}

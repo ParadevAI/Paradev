@@ -3296,6 +3296,9 @@ msgstr "Adını verebileceğimiz en az bir takım, bizimki de dahil, tam bir çe
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Ayda en fazla {AUTO_TOPUP_MONTHLY_LIMIT} yükleme, yani ayda en fazla {monthlyMax}."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "En fazla {MAX_PREVIEW_PORTS} portun önizlemesi olabilir."
+
 msgid "at once"
 msgstr "aynı anda"
 
@@ -13946,6 +13949,9 @@ msgstr "Bu otomasyonu yalnızca sahibi veya bir kuruluş sahibi arşivleyebilir"
 msgid "Only the people listed above can open it"
 msgstr "Yalnızca yukarıda listelenen kişiler açabilir"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Bu ortamın yapılandırmasını yalnızca onu oluşturan kişi veya bir kuruluş yöneticisi değiştirebilir."
+
 msgid "Only the person who created this page can change it"
 msgstr "Bu sayfayı yalnızca oluşturan kişi değiştirebilir"
 
@@ -19030,6 +19036,9 @@ msgstr "Biri"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Bu çalışma alanından {entryPath} dosyasını başkası zaten yayımlamış. Onun sayfasına sürüm eklemek için açık bir sayfa kimliğiyle yayımla ya da dosyayı taşı."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Siz düzenlerken başka biri bu ortamın yapılandırmasını kaydetti"
+
 msgid "Someone is moving this workspace…"
 msgstr "Biri bu çalışma alanını taşıyor…"
 
@@ -20218,6 +20227,15 @@ msgstr "En iyi ajan değişecek.<0/>İş akışınız değişmemeli."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Makine {wanted} yerine {actual} vCPU ile açıldı. Yeniden denemek için yeniden başlatın."
 
+msgid "The build is no longer running"
+msgstr "Derleme artık çalışmıyor"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Derleme {BUILD_LIMIT_MINUTES} dakikadan uzun sürdü ve durduruldu"
+
+msgid "The build stopped unexpectedly"
+msgstr "Derleme beklenmedik şekilde durdu"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 
@@ -20283,6 +20301,9 @@ msgstr "Dağıtıcı ortaya çıkar"
 
 msgid "The endpoint must use https."
 msgstr "Uç nokta https kullanmalıdır."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Ortam derleme sırasında değişti; mevcut anlık görüntüsü korundu"
 
 msgid "The environment changed while it was being restored. Try again."
 msgstr "Ortam geri yüklenirken değişti. Tekrar deneyin."

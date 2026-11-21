@@ -24,7 +24,11 @@ function EnvironmentSettingsPage() {
 				<HiArrowLeft className="size-4" />
 				<Trans>Environments</Trans>
 			</button>
-			<EnvironmentView environmentId={environmentId} onArchived={backToList} />
+			<EnvironmentView
+				environmentId={environmentId}
+				key={environmentId}
+				onArchived={backToList}
+			/>
 		</div>
 	);
 }

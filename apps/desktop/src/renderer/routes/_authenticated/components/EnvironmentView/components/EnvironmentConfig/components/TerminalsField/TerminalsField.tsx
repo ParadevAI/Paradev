@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
+import { Textarea } from "@superset/ui/textarea";
 import { cn } from "@superset/ui/utils";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import { PLACEHOLDERS } from "../../constants";
@@ -78,7 +79,7 @@ export function TerminalsField({
 						const terminalName = row.name.trim();
 						return (
 							<div className="flex flex-col gap-1" key={row.key}>
-								<div className="flex items-center gap-2">
+								<div className="flex items-start gap-2">
 									<Input
 										aria-invalid={
 											problems.get(row.key) === "name" ||
@@ -93,18 +94,32 @@ export function TerminalsField({
 										spellCheck={false}
 										value={row.name}
 									/>
-									<Input
-										aria-invalid={problems.get(row.key) === "command"}
-										aria-label={t({ message: "Terminal command" })}
-										className="h-8 flex-1 font-mono text-xs md:text-xs"
-										onChange={(event) =>
-											edit(row.key, { command: event.target.value })
-										}
-										placeholder={PLACEHOLDERS.terminalCommand}
-										spellCheck={false}
-										value={row.command}
-									/>
-									<div className="flex w-14 shrink-0 justify-center">
+									{row.command.includes("\n") ? (
+										<Textarea
+											aria-invalid={problems.get(row.key) === "command"}
+											aria-label={t({ message: "Terminal command" })}
+											className="min-h-8 flex-1 py-1.5 font-mono text-xs md:text-xs"
+											onChange={(event) =>
+												edit(row.key, { command: event.target.value })
+											}
+											rows={row.command.split("\n").length}
+											spellCheck={false}
+											value={row.command}
+										/>
+									) : (
+										<Input
+											aria-invalid={problems.get(row.key) === "command"}
+											aria-label={t({ message: "Terminal command" })}
+											className="h-8 flex-1 font-mono text-xs md:text-xs"
+											onChange={(event) =>
+												edit(row.key, { command: event.target.value })
+											}
+											placeholder={PLACEHOLDERS.terminalCommand}
+											spellCheck={false}
+											value={row.command}
+										/>
+									)}
+									<div className="flex h-8 w-14 shrink-0 items-center justify-center">
 										<button
 											aria-label={
 												terminalName
@@ -137,7 +152,7 @@ export function TerminalsField({
 												? t({ message: `Remove terminal ${terminalName}` })
 												: t({ message: "Remove terminal" })
 										}
-										className="text-muted-foreground"
+										className="mt-0.5 text-muted-foreground"
 										onClick={() =>
 											onChange(rows.filter((other) => other.key !== row.key))
 										}
