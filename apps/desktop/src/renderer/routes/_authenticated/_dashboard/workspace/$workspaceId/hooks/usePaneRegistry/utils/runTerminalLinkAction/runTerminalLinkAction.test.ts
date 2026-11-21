@@ -4,6 +4,7 @@ import {
 	type WorkspaceState,
 	type WorkspaceStore,
 } from "@superset/panes";
+import { env } from "renderer/env.renderer";
 import { type LinkTierMap, tierFor } from "renderer/lib/clickPolicy";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../../../types";
@@ -83,6 +84,55 @@ describe("runUrlLinkAction", () => {
 		expect(panesOfKind(store, "pull-request")).toHaveLength(0);
 		expect(panesOfKind(rightStore, "browser")).toHaveLength(0);
 		expect(panesOfKind(rightStore, "pull-request")).toHaveLength(1);
+	});
+
+	it("opens a page link in a new main tab for the new-tab action, even with a right pane", () => {
+		const store = createWorkspaceStore<PaneViewerData>({
+			initialState: workspaceState(),
+		});
+		const rightStore = createWorkspaceStore<PaneViewerData>({
+			initialState: workspaceState(),
+		});
+		let revealed = false;
+
+		runUrlLinkAction(
+			{
+				store,
+				rightPane: { store: rightStore, reveal: () => (revealed = true) },
+			},
+			`${env.NEXT_PUBLIC_WEB_URL}/page/quarterly-report-a3f9k2`,
+			"newTab",
+		);
+
+		expect(revealed).toBe(false);
+		expect(panesOfKind(rightStore, "page")).toHaveLength(0);
+		const tabs = store.getState().tabs;
+		expect(tabs).toHaveLength(2);
+		expect(Object.values(tabs[1]?.panes ?? {})[0]?.kind).toBe("page");
+	});
+
+	it("opens a PR in a new main tab for the new-tab action, even with a right pane", () => {
+		const store = createWorkspaceStore<PaneViewerData>({
+			initialState: workspaceState(),
+		});
+		const rightStore = createWorkspaceStore<PaneViewerData>({
+			initialState: workspaceState(),
+		});
+		let revealed = false;
+
+		runUrlLinkAction(
+			{
+				store,
+				rightPane: { store: rightStore, reveal: () => (revealed = true) },
+			},
+			PR_URL,
+			"newTab",
+		);
+
+		expect(revealed).toBe(false);
+		expect(panesOfKind(rightStore, "pull-request")).toHaveLength(0);
+		expect(store.getState().tabs).toHaveLength(2);
+		expect(panesOfKind(store, "pull-request")).toHaveLength(1);
 	});
 
 	it("gives a new tab to a PR opened with the new-tab action", () => {

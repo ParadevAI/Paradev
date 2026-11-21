@@ -94,7 +94,7 @@ function openPullRequestPane(
 	pullRequest: PullRequestRef,
 	action: Exclude<LinkAction, "external">,
 ): void {
-	if (deps.rightPane) {
+	if (deps.rightPane && action !== "newTab") {
 		deps.rightPane.reveal();
 		openPullRequestPaneInStore(deps.rightPane.store, pullRequest);
 		return;
@@ -121,7 +121,7 @@ export function runUrlLinkAction(
 		return;
 	}
 	const pageSlug = parseSupersetPageUrl(url, env.NEXT_PUBLIC_WEB_URL);
-	if (deps.rightPane) {
+	if (deps.rightPane && action !== "newTab") {
 		deps.rightPane.reveal();
 		if (pageSlug) {
 			openPagePaneInStore(deps.rightPane.store, { slug: pageSlug }, "tab");
