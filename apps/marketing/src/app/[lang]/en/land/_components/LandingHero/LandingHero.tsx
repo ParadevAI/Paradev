@@ -46,10 +46,6 @@ export function LandingHero({
 							}
 							className="group relative mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
-							<span
-								aria-hidden="true"
-								className="size-1.5 shrink-0 rounded-full bg-brand"
-							/>
 							<span>
 								<Trans>
 									Superset is now Paradev. Also, we raised an $11.5M seed

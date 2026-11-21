@@ -32,6 +32,7 @@ const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
 		unregister: { mutate: unregister },
 		onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
 		onAgentUse: { subscribe: () => ({ unsubscribe: () => {} }) },
+		onViewportZoom: { subscribe: () => ({ unsubscribe: () => {} }) },
 		getUnloadInfo: {
 			query: (input: { paneIds: string[] }) => unloadInfo(input),
 		},
