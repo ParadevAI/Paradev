@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
-import { LuPencil, LuSparkles, LuTimer } from "react-icons/lu";
+import { LuBot, LuPencil, LuTimer } from "react-icons/lu";
 import {
 	type AutomationTemplate,
 	ONBOARDING_SUGGESTIONS,
@@ -33,7 +33,7 @@ export function AutomationsEmptyState({
 				</div>
 				<div className="space-y-2">
 					<h2 className="flex items-center gap-2 font-semibold text-lg tracking-tight">
-						<Trans>What should run on a schedule?</Trans>
+						<Trans>What should run automatically?</Trans>
 						{showProBadge && (
 							<Badge variant="default">
 								<Trans>PRO</Trans>
@@ -48,7 +48,7 @@ export function AutomationsEmptyState({
 				</div>
 				<div className="flex flex-wrap items-center gap-2">
 					<Button size="sm" onClick={onCreateWithAgent} disabled={isCreating}>
-						<LuSparkles className="size-3.5" />
+						<LuBot className="size-3.5" />
 						<Trans>Create with AI</Trans>
 					</Button>
 					<Button

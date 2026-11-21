@@ -1,4 +1,6 @@
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import { parseOriginList } from "@superset/shared/origin-list";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -15,13 +17,16 @@ const desktopDevOrigins =
 
 function getAllowedOrigins(deploymentOrigin: string) {
 	return [
-		env.NEXT_PUBLIC_WEB_URL,
-		env.NEXT_PUBLIC_ADMIN_URL,
-		env.NEXT_PUBLIC_MARKETING_URL,
-		env.NEXT_PUBLIC_DESKTOP_URL,
+		...withOwnDomainTwins([
+			env.NEXT_PUBLIC_WEB_URL,
+			env.NEXT_PUBLIC_ADMIN_URL,
+			env.NEXT_PUBLIC_MARKETING_URL,
+			env.NEXT_PUBLIC_DESKTOP_URL,
+		]),
+		...parseOriginList(env.MOBILE_WEB_ORIGINS),
 		...getTrustedVercelPreviewOrigins(deploymentOrigin),
 		...desktopDevOrigins,
-	].filter(Boolean);
+	];
 }
 
 function getCorsHeaders(origin: string | null, deploymentOrigin: string) {
@@ -57,7 +62,10 @@ export default function proxy(req: NextRequest) {
 
 export const config = {
 	matcher: [
-		"/((?!_next|ingest|monitoring|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-		"/(api|trpc)(.*)",
+		"/api/trpc/(.*)",
+		"/api/auth/((?!jwks$|oauth2/token$).*)",
+		"/api/desktop/version",
+		"/api/mobile/version",
+		"/api/proxy/linear-image",
 	],
 };

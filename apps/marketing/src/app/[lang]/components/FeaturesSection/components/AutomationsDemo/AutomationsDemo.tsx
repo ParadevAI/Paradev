@@ -41,12 +41,12 @@ const AUTOMATIONS: {
 		}),
 	},
 	{
-		name: "roadmap-sync",
+		name: "pr-review",
 		schedule: msg({
-			message: "monthly",
+			message: "on review request",
 		}),
 		lastRun: msg({
-			message: "3d ago",
+			message: "12m ago",
 		}),
 	},
 ];
@@ -104,7 +104,7 @@ export function AutomationsDemo() {
 						<Trans>Name</Trans>
 					</div>
 					<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-						<Trans>Schedule</Trans>
+						<Trans>Trigger</Trans>
 					</div>
 					<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
 						<Trans>Last run</Trans>

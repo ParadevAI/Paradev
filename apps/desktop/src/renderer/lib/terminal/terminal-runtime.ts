@@ -33,6 +33,7 @@ import {
 import { installTerminalKeyEventHandler } from "./terminal-key-event-handler";
 import { getTerminalParkingContainer } from "./terminal-parking";
 import { persistSeqAnchor } from "./terminal-seq-anchor";
+import { installTerminalVersionReply } from "./terminal-version-reply";
 import { installInputModeReclaimer } from "./terminalInputModeReclaimer";
 
 const SERIALIZE_SCROLLBACK = 1000;
@@ -101,6 +102,7 @@ function createTerminal(
 		allowProposedApi: true,
 		scrollback: DEFAULT_TERMINAL_SCROLLBACK,
 		macOptionIsMeta: false,
+		macOptionClickForcesSelection: true,
 		cursorStyle: appearance.cursorStyle,
 		cursorInactiveStyle: "outline",
 		vtExtensions: { kittyKeyboard: true },
@@ -112,6 +114,7 @@ function createTerminal(
 	// live shell prompt by a TUI killed while attached (#4949). The parser
 	// handlers are owned by the terminal and cleaned up on terminal.dispose().
 	installInputModeReclaimer(terminal);
+	installTerminalVersionReply(terminal);
 	return { terminal, fitAddon, serializeAddon };
 }
 
@@ -397,7 +400,16 @@ export function attachToContainer(
 
 	runtime.container = container;
 	container.appendChild(runtime.wrapper);
-	measureAndResize(runtime, onResize);
+	const stillAttached = () =>
+		runtime.container === container &&
+		runtime.wrapper.parentElement === container;
+	// The rest of a pane switch is still writing the DOM; measuring now would
+	// lay the whole page out once per terminal.
+	requestAnimationFrame(() => {
+		if (!stillAttached()) return;
+		measureAndResize(runtime, onResize);
+		if (options.focus !== false) runtime.terminal.focus();
+	});
 	scheduleFontSettleRefit(
 		runtime.terminal,
 		() => hostIsVisible(runtime.container),
@@ -412,10 +424,6 @@ export function attachToContainer(
 	observer.observe(container);
 	runtime.resizeObserver = observer;
 	runtime._disposeResizeObserver = scheduler.dispose;
-
-	if (options.focus !== false) {
-		runtime.terminal.focus();
-	}
 }
 
 /** Returns whether the buffer snapshot was persisted, so callers can keep

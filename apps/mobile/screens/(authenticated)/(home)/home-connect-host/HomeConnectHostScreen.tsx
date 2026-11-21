@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -33,6 +34,7 @@ const SETUP_DOCS_URL = `${COMPANY.DOCS_URL}/remote-access`;
  */
 export function HomeConnectHostScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const { isLoadingOrganizations, activeOrganization } = useOrganizations();
 	const { query: hosts } = useOrgHosts();
@@ -76,7 +78,7 @@ export function HomeConnectHostScreen() {
 						</Text>
 						<Text className="text-muted-foreground text-center text-base">
 							<Trans>
-								Superset Mobile runs agents on the computers you connect.
+								{appName} Mobile runs agents on the computers you connect.
 							</Trans>
 						</Text>
 					</View>
@@ -90,7 +92,7 @@ export function HomeConnectHostScreen() {
 						})}
 					>
 						<Trans>
-							Download Superset at{" "}
+							Download {appName} at{" "}
 							<Text className="text-foreground text-sm font-medium">
 								{COMPANY.DOMAIN}/download
 							</Text>

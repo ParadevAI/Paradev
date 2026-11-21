@@ -1,11 +1,23 @@
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import {
+	type ConfigError,
+	fromV1Json,
+	type ResolvedPhase,
+	type ResolvedProjectConfig,
+	resolveProjectConfig,
+} from "@superset/shared/project-config";
+import { resolveProjectConfigDir } from "@superset/shared/project-config/dir";
+import {
+	configEnvironment,
+	findTomlConfigPath,
+	formatConfigErrors,
+	loadTomlConfig,
+} from "./project-config-toml";
 
-const PROJECT_SUPERSET_DIR_NAME = ".superset";
 const CONFIG_FILE_NAME = "config.json";
 const LOCAL_CONFIG_FILE_NAME = "config.local.json";
-const SUPERSET_DIR_NAME = ".superset";
 const PROJECTS_DIR_NAME = "projects";
 
 export interface SetupConfig {
@@ -166,22 +178,22 @@ function applyLocalOverlay(
 }
 
 export function getProjectConfigPath(repoPath: string): string {
-	return join(repoPath, PROJECT_SUPERSET_DIR_NAME, CONFIG_FILE_NAME);
+	return join(resolveProjectConfigDir(repoPath), CONFIG_FILE_NAME);
 }
 
 /**
  * Candidate user-override files, highest priority first: keyed by the
  * project's repo path mirrored under the projects dir (e.g.
- * `~/.superset/projects/Users/me/work/app/config.json` — discoverable
+ * `<app home>/projects/Users/me/work/app/config.json` — discoverable
  * without looking up an ID), then by project id (legacy). The first
  * candidate that parses wins.
  */
 function getUserOverridePaths(args: {
 	repoPath: string;
 	projectId: string;
-	homeDir: string;
+	appHomeDir: string;
 }): string[] {
-	const projectsDir = join(args.homeDir, SUPERSET_DIR_NAME, PROJECTS_DIR_NAME);
+	const projectsDir = join(args.appHomeDir, PROJECTS_DIR_NAME);
 	const paths = [join(projectsDir, args.repoPath, CONFIG_FILE_NAME)];
 	if (!args.projectId.includes("/") && !args.projectId.includes("\\")) {
 		paths.push(join(projectsDir, args.projectId, CONFIG_FILE_NAME));
@@ -190,17 +202,17 @@ function getUserOverridePaths(args: {
 }
 
 function getLocalOverlayPath(repoPath: string): string {
-	return join(repoPath, PROJECT_SUPERSET_DIR_NAME, LOCAL_CONFIG_FILE_NAME);
+	return join(resolveProjectConfigDir(repoPath), LOCAL_CONFIG_FILE_NAME);
 }
 
 /**
  * Resolve setup/teardown/run config for a v2 project. Base merge, per key,
  * later wins:
  *
- *   1. <repoPath>/.superset/config.json      — canonical project config
- *   2. <worktreePath>/.superset/config.json  — workspace/branch override
+ *   1. <repoPath>/<config dir>/config.json      — canonical project config
+ *   2. <worktreePath>/<config dir>/config.json  — workspace/branch override
  *      (only when a worktree is in scope: setup at create, teardown at delete)
- *   3. ~/.superset/projects/<repoPath>/config.json — per-machine user
+ *   3. <app home>/projects/<repoPath>/config.json — per-machine user
  *      override (falls back to the legacy <project-id> key)
  *
  * Then a local overlay with before/after/replace semantics: the worktree's
@@ -213,8 +225,7 @@ export function loadSetupConfig(args: {
 	projectId: string;
 	/** Workspace worktree; when set, its config overrides the main repo's. */
 	worktreePath?: string;
-	/** Override $HOME for tests. Defaults to `os.homedir()`. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): SetupConfig | null {
 	const projectConfig = readSetupConfigAt(getProjectConfigPath(args.repoPath));
 	const worktreeConfig = args.worktreePath
@@ -225,7 +236,7 @@ export function loadSetupConfig(args: {
 	for (const overridePath of getUserOverridePaths({
 		repoPath: args.repoPath,
 		projectId: args.projectId,
-		homeDir: args.homeDir ?? homedir(),
+		appHomeDir: args.appHomeDir ?? resolveAppHomeDir(),
 	})) {
 		userConfig = readSetupConfigAt(overridePath);
 		if (userConfig) break;
@@ -257,54 +268,176 @@ export function hasConfiguredScripts(config: SetupConfig | null): boolean {
 	return false;
 }
 
-export type ResolvedScript =
-	| { kind: "commands"; commands: string[]; cwd?: string }
-	| { kind: "script"; scriptPath: string; cwd?: string };
+export type ProjectConfigLoad =
+	| { kind: "ok"; format: "toml" | "json"; resolved: ResolvedProjectConfig }
+	| { kind: "invalid"; path: string; errors: ConfigError[] };
 
 /**
- * Resolve a lifecycle script (`setup` | `teardown` | `run`) for a project.
- * Every key gets the same posture:
- *
- *   1. Configured commands via {@link loadSetupConfig} — worktree config
- *      overrides the main repo's when `worktreePath` is in scope.
- *   2. Fallback: `.superset/<key>.sh`, worktree first (when in scope), then
- *      the main repo — gitignored scripts only exist in the main repo.
- *
- * Setup and teardown pass their worktree; `run` resolves per project, where
- * no single worktree exists, so it uses the main repo only.
- *
- * `cwd` from the same config rides along either way. Returns null when no
- * source resolves to anything runnable.
+ * The project's config in the config.toml model. A project still on v1 is read
+ * through its conversion, so every caller sees one shape. Worktree files win
+ * over the main repo's when `worktreePath` is in scope. Null when nothing is
+ * configured.
  */
-export function resolveScript(
-	key: ScriptKey,
-	args: {
-		repoPath: string;
-		projectId: string;
-		/** Workspace worktree; its config and script win over the main repo. */
-		worktreePath?: string;
-		/** Override $HOME for tests. Defaults to `os.homedir()`. */
-		homeDir?: string;
-	},
-): ResolvedScript | null {
-	const config = loadSetupConfig(args);
-	const cwd = config?.cwd;
-	const commands = nonEmptyStrings(config?.[key]);
-	if (commands.length > 0) {
-		return { kind: "commands", commands, ...(cwd && { cwd }) };
-	}
+export function loadProjectConfig(args: {
+	repoPath: string;
+	projectId: string;
+	worktreePath?: string;
+	appHomeDir?: string;
+}): ProjectConfigLoad | null {
+	const toml = loadTomlConfig(args);
+	if (toml?.kind === "invalid") return toml;
+	if (toml) return { kind: "ok", format: "toml", resolved: toml.resolved };
 
+	const v1 = withScriptFallbacks(loadSetupConfig(args) ?? {}, args);
+	if (!hasConfiguredScripts(v1)) return null;
+	return {
+		kind: "ok",
+		format: "json",
+		resolved: resolveProjectConfig({
+			base: fromV1Json(v1),
+			local: null,
+			environment: configEnvironment(),
+		}),
+	};
+}
+
+/** v1 runs `<config dir>/<key>.sh` for a key with no commands, worktree first. */
+function withScriptFallbacks(
+	config: SetupConfig,
+	args: { repoPath: string; worktreePath?: string },
+): SetupConfig {
 	const roots = args.worktreePath
 		? [args.worktreePath, args.repoPath]
 		: [args.repoPath];
+	const result = { ...config };
+	for (const key of SCRIPT_KEYS) {
+		if (nonEmptyStrings(config[key]).length > 0) continue;
+		const script = roots
+			.map((root) => join(resolveProjectConfigDir(root), `${key}.sh`))
+			.find((path) => existsSync(path));
+		if (script) result[key] = [`bash ${shellSingleQuote(script)}`];
+	}
+	return result;
+}
+
+export interface PhaseCommand {
+	command: string;
+	cwd?: string;
+}
+
+/**
+ * Phases as one `&&` chain. When they name different directories, each
+ * command enters its own, resolved against `root`.
+ */
+export function chainPhases(
+	phases: ResolvedPhase[],
+	root: string,
+): PhaseCommand | null {
+	const active = phases.filter((phase) => phase.commands.length > 0);
+	if (active.length === 0) return null;
+	const cwds = new Set(active.map((phase) => phase.cwd));
+	if (cwds.size === 1) {
+		const cwd = active[0]?.cwd;
+		return {
+			command: active.flatMap((phase) => phase.commands).join(" && "),
+			...(cwd && { cwd }),
+		};
+	}
+	return {
+		command: active
+			.flatMap((phase) => {
+				const dir = shellSingleQuote(resolve(root, phase.cwd ?? "."));
+				return phase.commands.map((command) => `(cd ${dir} && ${command})`);
+			})
+			.join(" && "),
+	};
+}
+
+/** A command that prints why the config is invalid, then fails. */
+export function invalidConfigCommand(
+	config: Extract<ProjectConfigLoad, { kind: "invalid" }>,
+): string {
+	const lines = formatConfigErrors(config);
+	console.error(lines.join("\n"));
+	return `printf '%s\\n' ${lines.map(shellSingleQuote).join(" ")} >&2 && false`;
+}
+
+/** Whether any config source exists, for the sidebar's "set up scripts" card. */
+export function hasProjectConfig(args: {
+	repoPath: string;
+	projectId: string;
+	appHomeDir?: string;
+}): boolean {
+	if (findTomlConfigPath(args)) return true;
+	return hasConfiguredScripts(loadSetupConfig(args));
+}
+
+export type LegacyConfigSource =
+	| "config_json"
+	| "config_local_json"
+	| "before_after"
+	| "user_projects_override"
+	| "script_fallback"
+	| "cloud_start";
+
+/**
+ * Which config format a workspace uses and which v1 features it still relies
+ * on, for usage reporting. Never reads command contents into the result.
+ */
+export function describeProjectConfigSources(args: {
+	repoPath: string;
+	projectId: string;
+	worktreePath?: string;
+	appHomeDir?: string;
+}): { format: "toml" | "json" | "none"; legacySources: LegacyConfigSource[] } {
+	if (findTomlConfigPath(args)) return { format: "toml", legacySources: [] };
+
+	const sources = new Set<LegacyConfigSource>();
+	const roots = args.worktreePath
+		? [args.worktreePath, args.repoPath]
+		: [args.repoPath];
+	const projectJsons = roots
+		.map((root) => readSetupConfigAt(getProjectConfigPath(root)))
+		.filter((config): config is SetupConfig => config !== null);
+	if (projectJsons.length > 0) sources.add("config_json");
+	if (projectJsons.some((config) => config.start?.length)) {
+		sources.add("cloud_start");
+	}
 	for (const root of roots) {
-		const scriptPath = join(root, PROJECT_SUPERSET_DIR_NAME, `${key}.sh`);
-		if (existsSync(scriptPath)) {
-			return { kind: "script", scriptPath, ...(cwd && { cwd }) };
+		const local = readJson<Record<string, unknown>>(getLocalOverlayPath(root));
+		if (!local) continue;
+		sources.add("config_local_json");
+		if (
+			Object.values(local).some(
+				(value) => value && typeof value === "object" && !Array.isArray(value),
+			)
+		) {
+			sources.add("before_after");
 		}
 	}
-
-	return null;
+	const appHomeDir = args.appHomeDir ?? resolveAppHomeDir();
+	if (
+		getUserOverridePaths({ ...args, appHomeDir }).some((path) =>
+			existsSync(path),
+		)
+	) {
+		sources.add("user_projects_override");
+	}
+	const config = loadSetupConfig(args);
+	for (const key of ["setup", "teardown", "run"] as const) {
+		if (nonEmptyStrings(config?.[key]).length > 0) continue;
+		if (
+			roots.some((root) =>
+				existsSync(join(resolveProjectConfigDir(root), `${key}.sh`)),
+			)
+		) {
+			sources.add("script_fallback");
+		}
+	}
+	return {
+		format: sources.size > 0 ? "json" : "none",
+		legacySources: [...sources],
+	};
 }
 
 /** POSIX single-quote escape: safe for any byte sequence in a path. */

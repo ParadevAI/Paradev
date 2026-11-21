@@ -8,13 +8,12 @@ import {
 } from "@superset/local-db";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { app, clipboard, shell } from "electron";
+import { app, clipboard, nativeImage, shell } from "electron";
+import { writeClipboardImage } from "main/lib/clipboard-image";
 import { localDb } from "main/lib/local-db";
 import { externalUrlLogLabel, isSafeExternalUrl } from "main/lib/safe-url";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
-import { getWorkspace } from "../workspaces/utils/db-helpers";
-import { getWorkspacePath } from "../workspaces/utils/worktree";
 import {
 	type ExternalApp,
 	getAppCommand,
@@ -63,7 +62,7 @@ function ensureGlobalDefaultEditor(app: ExternalApp) {
 }
 
 /** Resolves the default editor from project setting, then global setting. */
-export function resolveDefaultEditor(projectId?: string): ExternalApp | null {
+function resolveDefaultEditor(projectId?: string): ExternalApp | null {
 	if (projectId) {
 		const project = localDb
 			.select()
@@ -244,12 +243,27 @@ export const createExternalRouter = () => {
 				}
 			}),
 
+		copyImage: publicProcedure
+			.input(z.object({ pngBase64: z.string().min(1).max(70_000_000) }))
+			.mutation(async ({ input }) => {
+				const image = nativeImage.createFromBuffer(
+					Buffer.from(input.pngBase64, "base64"),
+				);
+				if (image.isEmpty()) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "Not a decodable image",
+					});
+				}
+				await writeClipboardImage(image);
+			}),
+
 		copyPath: publicProcedure.input(z.string()).mutation(async ({ input }) => {
-			clipboard.writeText(input);
+			await clipboard.writeText(input);
 		}),
 
 		copyText: publicProcedure.input(z.string()).mutation(async ({ input }) => {
-			clipboard.writeText(input);
+			await clipboard.writeText(input);
 		}),
 
 		resolvePath: publicProcedure
@@ -265,21 +279,10 @@ export const createExternalRouter = () => {
 			),
 
 		statPath: publicProcedure
-			.input(
-				z.object({
-					path: z.string(),
-					workspaceId: z.string().optional(),
-				}),
-			)
+			.input(z.object({ path: z.string() }))
 			.mutation(({ input }) =>
 				withResolveGuard(async () => {
-					const workspace = input.workspaceId
-						? getWorkspace(input.workspaceId)
-						: null;
-					const cwd = workspace
-						? (getWorkspacePath(workspace) ?? undefined)
-						: undefined;
-					const resolved = resolvePath(input.path, cwd);
+					const resolved = resolvePath(input.path);
 					try {
 						const stats = await fs.promises.stat(resolved);
 						return {
@@ -308,11 +311,10 @@ export const createExternalRouter = () => {
 					worktreePath: z.string().optional(),
 					projectId: z.string().optional(),
 					/**
-					 * Explicit app override from the caller (e.g. the v2 CMD+O
+					 * Explicit app override from the caller (e.g. the CMD+O
 					 * choice stored client-side in tanstack-db). When provided,
-					 * bypasses the server-side `resolveDefaultEditor` lookup —
-					 * which only knows about v1 localDb tables and would
-					 * otherwise return a stale global default for v2 projects.
+					 * bypasses the server-side `resolveDefaultEditor` lookup,
+					 * which only knows the global default.
 					 */
 					app: ExternalAppSchema.optional(),
 				}),
@@ -335,5 +337,3 @@ export const createExternalRouter = () => {
 			),
 	});
 };
-
-export type ExternalRouter = ReturnType<typeof createExternalRouter>;

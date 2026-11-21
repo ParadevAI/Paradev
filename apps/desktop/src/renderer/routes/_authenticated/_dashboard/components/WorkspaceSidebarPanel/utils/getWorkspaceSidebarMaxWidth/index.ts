@@ -1,0 +1,1 @@
+export { getWorkspaceSidebarMaxWidth } from "./getWorkspaceSidebarMaxWidth";

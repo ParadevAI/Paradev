@@ -1,11 +1,8 @@
 import { cn } from "@superset/ui/utils";
-import type { MouseEventHandler } from "react";
-import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
-import { useInlineWorkspacePortsEnabled } from "renderer/stores/inline-workspace-ports";
+import type { MouseEventHandler, SyntheticEvent } from "react";
 import { useWorkspaceAgentsRowEnabled } from "renderer/stores/workspace-agents-row";
 import type { DashboardSidebarWorkspaceIndentation } from "../../../../../../types";
 import { DashboardSidebarAgentsChip } from "./components/DashboardSidebarAgentsChip";
-import { DashboardSidebarPortsChip } from "./components/DashboardSidebarPortsChip";
 import { useDashboardSidebarWorkspaceRunningAgents } from "./hooks/useDashboardSidebarWorkspaceRunningAgents";
 
 interface DashboardSidebarWorkspaceChipsProps {
@@ -16,10 +13,19 @@ interface DashboardSidebarWorkspaceChipsProps {
 	onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
+function stopChipDragStart(event: SyntheticEvent<HTMLDivElement>) {
+	if (
+		event.target instanceof Element &&
+		(!event.currentTarget.contains(event.target) ||
+			event.target.closest("button"))
+	) {
+		event.stopPropagation();
+	}
+}
+
 /**
- * Activity line beneath a workspace row, left-aligned with the title: an
- * agents chip and a ports chip. Agent chips appear only when more than one
- * agent is running — a lone agent is the norm for a workspace and showing it
+ * Activity line beneath a workspace row, left-aligned with the title, for
+ * the agents chip. It appears only when more than one agent is running — a lone agent is the norm for a workspace and showing it
  * adds no signal.
  */
 export function DashboardSidebarWorkspaceChips({
@@ -28,11 +34,8 @@ export function DashboardSidebarWorkspaceChips({
 	indentation,
 	onClick,
 }: DashboardSidebarWorkspaceChipsProps) {
-	const inlineWorkspacePortsEnabled = useInlineWorkspacePortsEnabled();
 	const workspaceAgentsRowEnabled = useWorkspaceAgentsRowEnabled();
 
-	const portGroup = useDashboardSidebarWorkspacePorts(workspaceId);
-	const ports = inlineWorkspacePortsEnabled ? (portGroup?.ports ?? []) : [];
 	const runningAgents = useDashboardSidebarWorkspaceRunningAgents(workspaceId);
 	// One agent alone is what the pane already shows; the chip earns its
 	// place once there is more than one, or once the one has subagents
@@ -45,14 +48,11 @@ export function DashboardSidebarWorkspaceChips({
 			? runningAgents
 			: [];
 
-	if (ports.length === 0 && agents.length === 0) {
+	if (agents.length === 0) {
 		return null;
 	}
 
 	return (
-		// Stop pointer/touch starts from bubbling to the sortable workspace
-		// item's drag listeners, so pressing a chip isn't captured as a
-		// workspace-reorder gesture.
 		// biome-ignore lint/a11y/noStaticElementInteractions: clicks on the strip's empty area mirror the row click; chips are real buttons
 		// biome-ignore lint/a11y/useKeyWithClickEvents: keyboard activation lives on the workspace row button; the strip click is a pointer convenience
 		<div
@@ -65,8 +65,8 @@ export function DashboardSidebarWorkspaceChips({
 						: "pl-[42px]",
 				onClick && "cursor-pointer",
 			)}
-			onMouseDown={(event) => event.stopPropagation()}
-			onTouchStart={(event) => event.stopPropagation()}
+			onMouseDown={stopChipDragStart}
+			onTouchStart={stopChipDragStart}
 			onClick={(event) => {
 				if (!onClick) return;
 				const target = event.target as HTMLElement;
@@ -83,10 +83,7 @@ export function DashboardSidebarWorkspaceChips({
 				onClick(event);
 			}}
 		>
-			{agents.length > 0 && (
-				<DashboardSidebarAgentsChip workspaceId={workspaceId} agents={agents} />
-			)}
-			{ports.length > 0 && <DashboardSidebarPortsChip ports={ports} />}
+			<DashboardSidebarAgentsChip workspaceId={workspaceId} agents={agents} />
 		</div>
 	);
 }

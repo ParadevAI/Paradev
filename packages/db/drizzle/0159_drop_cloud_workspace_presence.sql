@@ -1,0 +1,1 @@
+DROP TABLE "cloud_workspace_presence" CASCADE;

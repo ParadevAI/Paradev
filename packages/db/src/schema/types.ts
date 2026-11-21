@@ -3,6 +3,7 @@ import type {
 	TriggerConfigInput,
 	TriggerScope as TriggerConfigScope,
 } from "@superset/shared/automation-triggers";
+import type { CloudUsageFeature } from "./enums";
 
 /**
  * Everything `dispatchMatchingTriggers` needs for one automation_events row:
@@ -15,8 +16,8 @@ export type AutomationEventDispatchInput = {
 	triggerId?: string;
 	/**
 	 * Restricts matching to one member's automations. Set by providers whose
-	 * connection is per member (Google): a member's calendar and mail events
-	 * must fire only that member's automations, never fan across the org.
+	 * connection is per member (Google): a member's mail events must fire only
+	 * that member's automations, never fan across the org.
 	 */
 	ownerUserId?: string;
 };
@@ -67,31 +68,8 @@ export type SentryConfig = {
 	regionUrl?: string;
 };
 
-/**
- * One watched calendar's sync state. Google's push carries no payload, only
- * "something changed"; the sync token is what turns that into a diff, and the
- * channel is what has to be renewed before it expires.
- */
-export type GoogleCalendarWatchState = {
-	summary?: string;
-	syncToken?: string;
-	/** When the calendar was first synced; earlier events are never "created". */
-	watchedSince?: string;
-	channelId?: string;
-	resourceId?: string;
-	/**
-	 * SHA-256 of the token Google echoes back as `X-Goog-Channel-Token`. A
-	 * hash because this column is read by every member's client through
-	 * `integration.list`; the token itself is what authenticates a push.
-	 */
-	channelTokenHash?: string;
-	/** Epoch milliseconds, as Google reports it. */
-	channelExpiresAt?: number;
-};
-
 export type GoogleConfig = {
 	provider: "google";
-	calendars?: Record<string, GoogleCalendarWatchState>;
 	gmail?: {
 		/** Where the next history.list starts. */
 		historyId?: string;
@@ -130,10 +108,6 @@ export type MicrosoftTeamsTriggerConfig = Extract<
 	TriggerConfig,
 	{ kind: "microsoft_teams" }
 >;
-export type GoogleCalendarTriggerConfig = Extract<
-	TriggerConfig,
-	{ kind: "google_calendar" }
->;
 export type GmailTriggerConfig = Extract<TriggerConfig, { kind: "gmail" }>;
 
 /**
@@ -147,6 +121,28 @@ export type GmailTriggerConfig = Extract<TriggerConfig, { kind: "gmail" }>;
 export type UserIdentityMetadata =
 	| { provider: "slack"; modelPreference?: string }
 	| { provider: "github" }
-	// The external id is the account address, since that is what calendar
-	// events and mail headers name people by; the stable subject id rides here.
+	// The external id is the account address, since that is what mail headers
+	// name people by; the stable subject id rides here.
 	| { provider: "google"; sub?: string };
+
+/** A cloud_usage_events row kept on its boot until it is written; timestamps are ISO strings. */
+export type PendingUsageEvent = {
+	bootId: string;
+	lockSeq: number;
+	feature: CloudUsageFeature;
+	organizationId: string;
+	cloudWorkspaceId?: string | null;
+	userId?: string | null;
+	windowFrom: string;
+	windowTo: string;
+	amount: string;
+	sentAt: string;
+};
+
+/** One phase of a boot: API spans first, then the box's stamps. `at` is epoch ms on the source's own clock. */
+export type CloudWorkspaceBootPhase = {
+	name: string;
+	source: "api" | "box";
+	at: number;
+	ms: number;
+};

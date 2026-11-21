@@ -1,5 +1,5 @@
 export { DeletePageDialog } from "./components/DeletePageDialog";
-export { PageSharePopover } from "./components/PageSharePopover";
+export { PageShareButton } from "./components/PageShareButton";
 export { PageTitleMenu } from "./components/PageTitleMenu";
 export { PageVersionBanner } from "./components/PageVersionBanner";
 export { RenamePageDialog } from "./components/RenamePageDialog";
@@ -8,6 +8,8 @@ export type {
 	PageHeaderActions,
 	PageHeaderOwner,
 	PageHeaderPage,
+	PageHeaderSharing,
 	PageHeaderVersion,
+	PageShareRole,
 	PageVisibility,
 } from "./types";

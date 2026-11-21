@@ -9,13 +9,22 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { settings } from "@superset/local-db";
+import { browserHistory, settings, workspaces } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
 	workspaceDevAppProfileDirName,
 } from "@superset/shared/dev-app-profile";
-import { app, dialog, Notification, net, protocol, session } from "electron";
+import { HTML_PREVIEW_SCHEME } from "@superset/shared/html-preview";
+import {
+	app,
+	BrowserWindow,
+	dialog,
+	Notification,
+	net,
+	protocol,
+	session,
+} from "electron";
 import { makeAppSetup } from "lib/electron-app/factories/app/setup";
 import {
 	authEvents,
@@ -23,39 +32,65 @@ import {
 	loadToken,
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
-import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
+import { applyShellEnvToProcess } from "lib/trpc/routers/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
+	APP_PARTITION,
+	BROWSER_PARTITION,
 	DEFAULT_CONFIRM_ON_QUIT,
 	PLATFORM,
 	PROTOCOL_SCHEME,
 } from "shared/constants";
 import { sweepDevAppProfiles } from "./dev-app-profile-sweep";
+import { getAppDisplayName } from "./lib/app-display-name";
 import { initAppState } from "./lib/app-state";
 import { requestAppleEventsAccess } from "./lib/apple-events-permission";
-import { isUpdateReadyToInstall, setupAutoUpdater } from "./lib/auto-updater";
+import {
+	isInstallingUpdate,
+	isUpdateReadyToInstall,
+	setupAutoUpdater,
+} from "./lib/auto-updater";
 import { startBrowserBridge } from "./lib/browser/browser-bridge";
 import { browserManager } from "./lib/browser/browser-manager";
 import { downloadManager } from "./lib/browser/download-manager";
-import { installBundledCliShim } from "./lib/bundled-cli";
+import {
+	initBrowserExtensionHost,
+	userExtensions,
+} from "./lib/browser/extension-host";
+import {
+	clearMovedPaneSitesOnce,
+	movePaneSitesOnce,
+} from "./lib/browser/move-pane-sites";
+import { preparePaneSessions } from "./lib/browser/pane-session";
+import {
+	installBundledCliShim,
+	installBundledPdevShim,
+} from "./lib/bundled-cli";
 import { installDevRunnerExit } from "./lib/dev-runner-exit";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
 import { loadWebviewBrowserExtension } from "./lib/extensions";
 import { getHostServiceCoordinator } from "./lib/host-service-coordinator";
+import { htmlPreviewProtocolHandler } from "./lib/html-preview-protocol";
 import { resolveAppLocale } from "./lib/language";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
-import { syncInstalledPluginMcpServers } from "./lib/plugin-installs";
+import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
+
+import {
+	adoptDesktopInstalls,
+	finishPendingOrganizationForget,
+	syncInstalledPluginMcpServers,
+} from "./lib/plugin-installs";
 import { portForwardManager } from "./lib/port-forward";
 import { ensureProjectIconsDir, getProjectIconPath } from "./lib/project-icons";
 import { runQuitCleanup } from "./lib/quit-sequence";
+import { startResourceJournal } from "./lib/resource-metrics/resource-journal";
 import { initSentry } from "./lib/sentry";
-import {
-	prewarmTerminalRuntime,
-	reconcileDaemonSessions,
-} from "./lib/terminal";
+import { stopPtyDaemons } from "./lib/stop-pty-daemons";
+import { stopMigratedV1SessionsOnBoot } from "./lib/terminal";
+import { readMigratedV1WorkspaceIds } from "./lib/terminal/stop-v1-sessions/migrated-v1-workspaces";
 import {
 	disposeTerminalHostClient,
 	getTerminalHostClient,
@@ -142,7 +177,7 @@ async function processDeepLink(url: string): Promise<void> {
 							i18n._(
 								msg({
 									message:
-										"Superset could not complete sign-in. Please try again.",
+										"Paradev could not complete sign-in. Please try again.",
 								}),
 							))
 					: i18n._(
@@ -159,7 +194,11 @@ async function processDeepLink(url: string): Promise<void> {
 
 	// Non-auth deep links: extract path and navigate in renderer
 	// e.g. superset://tasks/my-slug -> /tasks/my-slug
-	const path = `/${url.split("://")[1]}`;
+	// Links minted before the route rename (older CLIs, published pages).
+	const path = `/${url.slice(url.indexOf("://") + 3)}`.replace(
+		/^\/v2-workspace(s)?\b/,
+		"/workspace$1",
+	);
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();
@@ -192,7 +231,7 @@ function registerWithMacOSNotificationCenter() {
 	if (!PLATFORM.IS_MAC || !Notification.isSupported()) return;
 
 	const registrationNotification = new Notification({
-		title: app.name,
+		title: getAppDisplayName(),
 		body: " ",
 		silent: true,
 	});
@@ -236,6 +275,7 @@ let skipQuitConfirmation = false;
 // easy to trigger.
 let quitConfirmationOpen = false;
 let forceFullCleanup = false;
+let holdingQuitForCleanup = false;
 
 export function setSkipQuitConfirmation(): void {
 	skipQuitConfirmation = true;
@@ -287,7 +327,10 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", async (event) => {
-	if (isQuitting) return;
+	if (isQuitting) {
+		if (holdingQuitForCleanup) event.preventDefault();
+		return;
+	}
 
 	const isDev = process.env.NODE_ENV === "development";
 	if (!skipQuitConfirmation && !isDev && getConfirmOnQuitSetting()) {
@@ -296,6 +339,7 @@ app.on("before-quit", async (event) => {
 		quitConfirmationOpen = true;
 
 		try {
+			const displayName = getAppDisplayName();
 			const { response } = await dialog.showMessageBox({
 				type: "question",
 				buttons: [
@@ -304,7 +348,12 @@ app.on("before-quit", async (event) => {
 				],
 				defaultId: 0,
 				cancelId: 1,
-				title: i18n._(msg({ message: "Quit Superset" })),
+				title: i18n._(
+					msg({
+						message: `Quit ${displayName}`,
+						context: "quit confirmation dialog title",
+					}),
+				),
 				message: i18n._(
 					msg({
 						message: "Are you sure you want to quit?",
@@ -323,6 +372,12 @@ app.on("before-quit", async (event) => {
 	}
 
 	isQuitting = true;
+	const isUpdateInstalling = isUpdateReadyToInstall();
+	const resumeChats = isInstallingUpdate();
+	// Stopping the pty-daemons waits for host-services to exit; without this
+	// Electron exits once the windows close and cuts that wait short.
+	holdingQuitForCleanup = forceFullCleanup;
+	if (holdingQuitForCleanup) event.preventDefault();
 	// Local port-forward listeners hold no state worth draining; drop them so
 	// nothing keeps 127.0.0.1:<port> bound after the app is gone.
 	portForwardManager.stopAll();
@@ -331,16 +386,26 @@ app.on("before-quit", async (event) => {
 	// shrinking the set as windows close one-by-one.
 	markAppQuitting();
 	persistOpenWindows();
+	if (holdingQuitForCleanup) {
+		for (const window of BrowserWindow.getAllWindows()) window.hide();
+	}
 	await runQuitCleanup({
 		isDev,
 		forceFullCleanup,
-		isUpdateInstalling: isUpdateReadyToInstall(),
-		stopHostServices: () => getHostServiceCoordinator().stopAll(),
+		isUpdateInstalling,
+		stopHostServices: () =>
+			getHostServiceCoordinator().stopAll({ resumeChats }),
 		teardownTerminalHost,
+		stopPtyDaemons,
 		disposeTerminalHostClient,
 		disposeTray,
 		forceExit: (code) => app.exit(code),
 	});
+	if (holdingQuitForCleanup) {
+		holdingQuitForCleanup = false;
+		// The updater installs only when Electron finishes its own quit.
+		if (isUpdateInstalling) app.quit();
+	}
 });
 
 /**
@@ -389,6 +454,17 @@ if (process.env.NODE_ENV === "development") {
 // roughly 128 MB.
 app.commandLine.appendSwitch("disk-cache-size", String(1024 * 1024 * 1024));
 
+// Chromium 152 crashes in soft-navigation paint metrics (Sentry DESKTOP-1F1).
+app.commandLine.appendSwitch(
+	"disable-features",
+	[
+		app.commandLine.getSwitchValue("disable-features"),
+		"SoftNavigationDetection",
+	]
+		.filter(Boolean)
+		.join(","),
+);
+
 protocol.registerSchemesAsPrivileged([
 	{
 		scheme: "superset-icon",
@@ -406,6 +482,13 @@ protocol.registerSchemesAsPrivileged([
 			secure: true,
 			bypassCSP: true,
 			supportFetchAPI: true,
+		},
+	},
+	{
+		scheme: HTML_PREVIEW_SCHEME,
+		privileges: {
+			standard: true,
+			secure: true,
 		},
 	},
 ]);
@@ -451,6 +534,9 @@ if (!gotTheLock) {
 		// (plans/20260826-i18n-strategy.md). Menus are built later in
 		// initAppServices/initTray, so a plain activate is enough here.
 		await initI18nAsync(resolveAppLocale(getLanguageSetting()));
+		if (getAppDisplayName() !== app.name) {
+			app.setAboutPanelOptions({ applicationName: getAppDisplayName() });
+		}
 		registerWithMacOSNotificationCenter();
 		requestAppleEventsAccess();
 		requestLocalNetworkAccess();
@@ -467,7 +553,7 @@ if (!gotTheLock) {
 		};
 		protocol.handle("superset-icon", iconProtocolHandler);
 		session
-			.fromPartition("persist:superset")
+			.fromPartition(APP_PARTITION)
 			.protocol.handle("superset-icon", iconProtocolHandler);
 
 		// Serve system fonts (e.g. SF Mono on macOS) via custom protocol
@@ -496,33 +582,59 @@ if (!gotTheLock) {
 			};
 			protocol.handle("superset-font", fontProtocolHandler);
 			session
-				.fromPartition("persist:superset")
+				.fromPartition(APP_PARTITION)
 				.protocol.handle("superset-font", fontProtocolHandler);
 		}
+
+		protocol.handle(HTML_PREVIEW_SCHEME, htmlPreviewProtocolHandler);
+		session
+			.fromPartition("persist:superset")
+			.protocol.handle(HTML_PREVIEW_SCHEME, htmlPreviewProtocolHandler);
 
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();
 		initSentry();
-		await initAppState();
+		await initAppState(() =>
+			localDb
+				.select({ id: workspaces.id })
+				.from(workspaces)
+				.all()
+				.map((row) => row.id),
+		);
 
 		sweepNetworkLogs();
 		sweepDevAppProfiles();
 
+		preparePaneSessions();
 		await loadWebviewBrowserExtension();
+		initBrowserExtensionHost();
 
-		// Must happen before renderer restore runs
-		await reconcileDaemonSessions();
-		prewarmTerminalRuntime();
+		await stopMigratedV1SessionsOnBoot(readMigratedV1WorkspaceIds());
 
 		// Must be listening before any host-service spawns: the child learns the
 		// bridge endpoint/secret from its env, so a late bridge means browser
 		// control stays dark until the next respawn.
 		try {
-			await startBrowserBridge();
+			await startBrowserBridge({ extensions: userExtensions });
 		} catch (error) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
+		const appSession = session.fromPartition(APP_PARTITION);
+		const paneCookiesMarkerPath = path.join(
+			app.getPath("userData"),
+			"pane-cookies-copied",
+		);
+		try {
+			await movePaneSitesOnce({
+				from: appSession.cookies,
+				to: session.fromPartition(BROWSER_PARTITION).cookies,
+				markerPath: paneCookiesMarkerPath,
+			});
+		} catch (error) {
+			console.error("[main] Failed to copy browser pane cookies:", error);
+		}
 		downloadManager.start();
+		allowRendererToReachDeviceHub(APP_PARTITION);
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
@@ -590,16 +702,25 @@ if (!gotTheLock) {
 			console.error("[main] Failed to set up agent integrations:", error);
 		}
 		try {
-			// Converge agent MCP configs on the installed-plugin set, so
-			// installs/uninstalls that missed a mid-session sync land here.
 			syncInstalledPluginMcpServers();
 		} catch (error) {
-			console.error("[main] Failed to sync installed plugins:", error);
+			console.error("[main] Failed to sync plugin MCP servers:", error);
 		}
+		void finishPendingOrganizationForget().catch((error) =>
+			console.error("[main] Failed to remove organization plugins:", error),
+		);
+		void adoptDesktopInstalls().catch((error) =>
+			console.error("[main] Failed to move the desktop's plugin list:", error),
+		);
 		try {
 			installBundledCliShim();
 		} catch (error) {
 			console.error("[main] Failed to install bundled CLI shim:", error);
+		}
+		try {
+			installBundledPdevShim();
+		} catch (error) {
+			console.error("[main] Failed to install bundled pdev shim:", error);
 		}
 
 		if (IS_DEV) {
@@ -615,8 +736,22 @@ if (!gotTheLock) {
 			() => createPlatformWindow({ orgId: null }),
 			restoreWindows,
 		);
+		void clearMovedPaneSitesOnce({
+			from: appSession.cookies,
+			markerPath: paneCookiesMarkerPath,
+			readVisitedUrls: () =>
+				localDb
+					.select({ url: browserHistory.url })
+					.from(browserHistory)
+					.all()
+					.map((row) => row.url),
+			clearOldSites: (origins) => appSession.clearData({ origins }),
+		}).catch((error) =>
+			console.error("[main] Failed to clear moved browser pane sites:", error),
+		);
 		setupAutoUpdater();
 		initTray();
+		startResourceJournal();
 
 		const coldStartUrl = findDeepLinkInArgv(process.argv);
 		if (coldStartUrl) {

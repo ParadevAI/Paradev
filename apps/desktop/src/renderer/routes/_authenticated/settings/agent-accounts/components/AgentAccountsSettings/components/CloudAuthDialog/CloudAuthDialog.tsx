@@ -8,22 +8,19 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@superset/ui/dialog";
-import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import { RadioGroup, RadioGroupItem } from "@superset/ui/radio-group";
 import { toast } from "@superset/ui/sonner";
+import { ToggleGroup, ToggleGroupItem } from "@superset/ui/toggle-group";
 import { cn } from "@superset/ui/utils";
 import {
 	Check,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
-	Copy,
-	ExternalLink,
-	Eye,
-	EyeOff,
+	Terminal,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { SiVercel } from "react-icons/si";
 
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
@@ -33,6 +30,19 @@ import type {
 	CustomProvider,
 	SaveCredentialInput,
 } from "../../../../hooks/useAgentCredential";
+import { ChatgptSignIn } from "./components/ChatgptSignIn";
+import { CopyStateIcon } from "./components/CopyStateIcon";
+import { DisconnectMenu } from "./components/DisconnectMenu";
+import { ExternalTextLink } from "./components/ExternalTextLink";
+import { Field } from "./components/Field";
+import { ManualSignIn } from "./components/ManualSignIn";
+import { ProviderForm } from "./components/ProviderForm";
+import { SaveButton } from "./components/SaveButton";
+import { SavedSecret } from "./components/SavedSecret";
+import { SecretField } from "./components/SecretField";
+import { FOCUS_RING } from "./constants";
+
+const CODEX_USAGE_SETTINGS = "https://chatgpt.com/codex/settings/usage";
 
 interface CloudAuthDialogProps {
 	open: boolean;
@@ -43,7 +53,9 @@ interface CloudAuthDialogProps {
 	accountLabel: string | null;
 	chooseMethod: (method: CloudAuthMethod | null) => void;
 	save: (input: SaveCredentialInput) => Promise<unknown>;
+	signedIn: () => Promise<unknown>;
 	disconnect: () => Promise<unknown>;
+	setManual: () => Promise<unknown>;
 }
 
 export function CloudAuthDialog({
@@ -55,18 +67,40 @@ export function CloudAuthDialog({
 	accountLabel,
 	chooseMethod,
 	save,
+	signedIn,
 	disconnect,
+	setManual,
 }: CloudAuthDialogProps) {
 	const { t } = useLingui();
 	const isClaude = presetId === "claude";
 	const [view, setView] = useState<"main" | "custom">("main");
 	const { copyToClipboard, copied: copiedCommand } = useCopyToClipboard();
 	const [baseUrlDraft, setBaseUrlDraft] = useState("");
-	const [expanded, setExpanded] = useState<CustomProvider | null>(null);
+	const [expanded, setExpanded] = useState<CustomProvider | "manual" | null>(
+		null,
+	);
 	const [tokenDraft, setTokenDraft] = useState("");
 	const [apiKeyDraft, setApiKeyDraft] = useState("");
 	const [apiKeyAdvanced, setApiKeyAdvanced] = useState(false);
+	const [replacing, setReplacing] = useState(false);
 	const [checking, setChecking] = useState<string | null>(null);
+	const [chatgptPlan, setChatgptPlan] = useState<"personal" | "business">(
+		"personal",
+	);
+	const advancedId = useId();
+
+	const handleChatgptConnected = useCallback(
+		(connectedAs: string | null) => {
+			setReplacing(false);
+			toast.success(
+				connectedAs
+					? t({ message: `Signed in to ChatGPT as ${connectedAs}` })
+					: t({ message: "Signed in to ChatGPT" }),
+			);
+			void signedIn();
+		},
+		[signedIn, t],
+	);
 
 	/**
 	 * One call does both: the server checks the credential against the
@@ -82,6 +116,7 @@ export function CloudAuthDialog({
 		try {
 			await save(input);
 			onOk?.();
+			setReplacing(false);
 			toast.success(t({ message: "Verified and saved" }));
 		} catch (error) {
 			toast.error(
@@ -97,6 +132,7 @@ export function CloudAuthDialog({
 	const handleOpenChange = (next: boolean) => {
 		if (!next) {
 			setView("main");
+			setReplacing(false);
 			chooseMethod(null);
 		}
 		onOpenChange(next);
@@ -114,15 +150,19 @@ export function CloudAuthDialog({
 			icon: <SiVercel className="size-4" />,
 		},
 	];
-	const customLabel = providers.find(
-		(provider) => provider.id === state.customProvider,
-	)?.label;
+	const customLabel = state.manualOn
+		? t({ message: "Manual" })
+		: providers.find((provider) => provider.id === state.customProvider)?.label;
+	const customSet = state.customSaved || state.manualOn;
+	const tokenCommand = "claude setup-token";
 
-	const optionClass = (selected: boolean) =>
-		cn(
-			"rounded-lg border border-border px-4 py-3 transition-colors",
-			selected && "border-primary/60 bg-primary/[0.04] ring-1 ring-primary/40",
-		);
+	const optionClass = "overflow-hidden rounded-lg border border-border text-sm";
+	const optionRowClass =
+		"flex min-h-12 items-center gap-3 pr-3 transition-colors hover:bg-accent/50";
+	const optionLabelClass =
+		"flex flex-1 cursor-pointer items-center gap-3 self-stretch py-3 pl-3";
+	const optionBodyClass =
+		"space-y-3 border-t border-border bg-muted/30 px-3 py-3";
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
@@ -147,48 +187,57 @@ export function CloudAuthDialog({
 							<DialogDescription>
 								<Trans>
 									Route {label} through a provider you run, with the credentials
-									you hold. Saved values are handed to the agent at launch.
+									you hold, or leave its sign-in to your own tooling.
 								</Trans>
 							</DialogDescription>
 						</DialogHeader>
-						<div className="space-y-2">
+						<div className="space-y-3">
 							{providers.map((provider) => {
 								const isOpen = expanded === provider.id;
-								const saved = state.customSaved && isOpen;
+								const saved =
+									state.customSaved && state.customProvider === provider.id;
 								return (
-									<div
-										className={cn(
-											"rounded-lg border border-border",
-											isOpen && "border-primary/40",
-										)}
-										key={provider.id}
-									>
-										<button
-											className="flex w-full items-center gap-3 px-3 py-3 text-left text-sm"
-											onClick={() => setExpanded(isOpen ? null : provider.id)}
-											type="button"
-										>
-											{isOpen ? (
-												<ChevronDown className="size-4 text-muted-foreground" />
-											) : (
-												<ChevronRight className="size-4 text-muted-foreground" />
-											)}
-											<span className="text-muted-foreground">
-												{provider.icon}
-											</span>
-											<span className="font-medium">{provider.label}</span>
-											{provider.advanced ? (
-												<span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-													<Trans>Advanced</Trans>
+									<div className={optionClass} key={provider.id}>
+										<div className={optionRowClass}>
+											<button
+												aria-expanded={isOpen}
+												className={cn(
+													"flex flex-1 items-center gap-3 self-stretch py-3 pl-3 text-left",
+													FOCUS_RING,
+												)}
+												onClick={() => setExpanded(isOpen ? null : provider.id)}
+												type="button"
+											>
+												{isOpen ? (
+													<ChevronDown className="size-4 text-muted-foreground" />
+												) : (
+													<ChevronRight className="size-4 text-muted-foreground" />
+												)}
+												<span className="text-muted-foreground">
+													{provider.icon}
 												</span>
-											) : null}
+												<span className="font-medium">{provider.label}</span>
+												{provider.advanced ? (
+													<span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+														<Trans>Advanced</Trans>
+													</span>
+												) : null}
+												{saved ? (
+													<Check className="size-4 text-emerald-500" />
+												) : null}
+											</button>
 											{saved ? (
-												<Check className="ml-auto size-4 text-emerald-500" />
+												<DisconnectMenu
+													agentLabel={label}
+													credential={provider.label}
+													disconnect={disconnect}
+												/>
 											) : null}
-										</button>
+										</div>
 										{isOpen ? (
-											<div className="space-y-3 border-t border-border px-3 py-3">
+											<div className={optionBodyClass}>
 												<ProviderForm
+													agent={presetId}
 													checking={checking === provider.id}
 													onSave={(value, baseUrl) =>
 														verifyAndSave(provider.id, {
@@ -199,280 +248,380 @@ export function CloudAuthDialog({
 														})
 													}
 													provider={provider.id}
+													saved={saved}
 												/>
 											</div>
 										) : null}
 									</div>
 								);
 							})}
+							<div className={optionClass}>
+								<div className={optionRowClass}>
+									<button
+										aria-expanded={expanded === "manual"}
+										className={cn(
+											"flex flex-1 items-center gap-3 self-stretch py-3 pl-3 text-left",
+											FOCUS_RING,
+										)}
+										onClick={() =>
+											setExpanded(expanded === "manual" ? null : "manual")
+										}
+										type="button"
+									>
+										{expanded === "manual" ? (
+											<ChevronDown className="size-4 text-muted-foreground" />
+										) : (
+											<ChevronRight className="size-4 text-muted-foreground" />
+										)}
+										<span className="text-muted-foreground">
+											<Terminal className="size-4" />
+										</span>
+										<span className="font-medium">
+											<Trans>Manual</Trans>
+										</span>
+										{state.manualOn ? (
+											<Check className="size-4 text-emerald-500" />
+										) : null}
+									</button>
+									{state.manualOn ? (
+										<DisconnectMenu
+											agentLabel={label}
+											copy={{
+												action: t({ message: "Turn off manual mode" }),
+												title: t({
+													message: `Turn off manual mode for ${label}?`,
+												}),
+												description: t({
+													message: `${label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them.`,
+												}),
+												done: t({
+													message: `Manual mode is off for ${label}.`,
+												}),
+											}}
+											credential={t({ message: "manual sign-in" })}
+											disconnect={disconnect}
+										/>
+									) : null}
+								</div>
+								{expanded === "manual" ? (
+									<div className={optionBodyClass}>
+										<ManualSignIn
+											enable={setManual}
+											label={label}
+											manualOn={state.manualOn}
+											presetId={presetId}
+										/>
+									</div>
+								) : null}
+							</div>
 						</div>
 					</>
 				) : (
 					<>
 						<DialogHeader>
-							<DialogTitle>
-								<Trans>{label} in cloud workspaces</Trans>
-							</DialogTitle>
+							<DialogTitle>{label}</DialogTitle>
 							<DialogDescription>
-								<Trans>
-									Pick how {label} signs in inside a sandbox. The credential is
-									handed to the agent process when it launches and is not stored
-									in the sandbox.
-								</Trans>
+								<Trans>How {label} authenticates in cloud workspaces.</Trans>
 							</DialogDescription>
 						</DialogHeader>
 
 						<div className="space-y-3">
 							<RadioGroup
 								className="gap-3"
-								onValueChange={(value) =>
-									chooseMethod(value as CloudAuthMethod)
+								onValueChange={(value) => {
+									setReplacing(false);
+									chooseMethod(value as CloudAuthMethod);
+								}}
+								value={
+									state.method === "custom" || state.method === "manual"
+										? ""
+										: state.method
 								}
-								value={state.method === "custom" ? "" : state.method}
 							>
-								{/* Subscription */}
-								<div className={optionClass(state.method === "subscription")}>
-									<div className="flex items-center gap-3">
-										<RadioGroupItem
-											id={`${presetId}-sub`}
-											value="subscription"
-										/>
+								<div className={optionClass}>
+									<div className={optionRowClass}>
 										<Label
-											className="flex flex-1 items-center gap-2 font-medium"
+											className={optionLabelClass}
 											htmlFor={`${presetId}-sub`}
 										>
+											<RadioGroupItem
+												id={`${presetId}-sub`}
+												value="subscription"
+											/>
 											<Trans>Subscription</Trans>
 											{state.subscriptionConnected ? (
 												<Check className="size-4 text-emerald-500" />
 											) : null}
+											{state.subscriptionConnected && accountLabel ? (
+												<span className="truncate text-xs font-normal text-muted-foreground">
+													{accountLabel}
+												</span>
+											) : null}
 										</Label>
 										{state.subscriptionConnected ? (
-											<Button
-												onClick={() => void disconnect()}
-												size="sm"
-												variant="ghost"
-											>
-												<Trans>Sign out</Trans>
-											</Button>
+											<DisconnectMenu
+												agentLabel={label}
+												credential={t({ message: "subscription" })}
+												disconnect={disconnect}
+												onReconnect={
+													isClaude
+														? undefined
+														: () => {
+																chooseMethod("subscription");
+																setReplacing(true);
+															}
+												}
+											/>
 										) : null}
 									</div>
 									{state.method === "subscription" ? (
-										state.subscriptionConnected ? (
-											<div className="mt-3 pl-7">
-												<p className="text-xs text-muted-foreground">
-													{accountLabel ? (
-														<Trans>Signed in as {accountLabel}</Trans>
-													) : (
-														<Trans>
-															Signed in. The token is stored encrypted and is
-															never shown again.
-														</Trans>
-													)}
-												</p>
-											</div>
-										) : (
-											<div className="mt-3 space-y-2 pl-7">
-												<p className="text-xs text-muted-foreground">
-													{isClaude ? (
-														<Trans>
-															Sign in with your Claude account, or run{" "}
-															<code className="rounded bg-muted px-1 py-0.5 font-mono">
-																claude setup-token
-															</code>
-															<button
-																aria-label={t({ message: "Copy command" })}
-																className="ml-1 inline-flex align-middle text-muted-foreground hover:text-foreground"
-																onClick={() =>
-																	void copyToClipboard("claude setup-token")
-																}
-																type="button"
-															>
-																<CopyStateIcon copied={copiedCommand} />
-															</button>{" "}
-															in a terminal and paste the token here.
-														</Trans>
-													) : (
-														<Trans>
-															Signs in the way the Codex CLI does. Or run{" "}
-															<code className="rounded bg-muted px-1 py-0.5 font-mono">
-																codex login
-															</code>{" "}
-															in a terminal and paste its token here.
-														</Trans>
-													)}
-												</p>
-												<div className="flex items-center gap-2">
-													<Input
-														autoComplete="off"
-														className="font-mono text-sm"
-														onChange={(e) => setTokenDraft(e.target.value)}
-														placeholder={
-															isClaude
-																? "CLAUDE_CODE_OAUTH_TOKEN"
-																: "CODEX_ACCESS_TOKEN"
-														}
-														type="password"
-														value={tokenDraft}
+										<div className={optionBodyClass}>
+											{state.subscriptionConnected && !replacing ? (
+												isClaude ? (
+													<SavedSecret
+														label={t({ message: "Token" })}
+														onReplace={() => setReplacing(true)}
 													/>
-													<Button
-														disabled={
-															!tokenDraft.trim() || checking === "subscription"
-														}
-														onClick={() =>
-															verifyAndSave(
-																"subscription",
-																{
-																	kind: "subscription",
-																	value: tokenDraft.trim(),
-																},
-																() => setTokenDraft(""),
-															)
-														}
-														size="sm"
-														variant="outline"
-													>
-														{checking === "subscription" ? (
-															<Trans>Checking…</Trans>
-														) : (
-															<Trans>Save</Trans>
-														)}
-													</Button>
-												</div>
-											</div>
-										)
+												) : (
+													<ExternalTextLink href={CODEX_USAGE_SETTINGS}>
+														<Trans>Manage usage</Trans>
+													</ExternalTextLink>
+												)
+											) : (
+												<>
+													{isClaude ? null : (
+														<div className="flex items-center gap-2">
+															<ToggleGroup
+																className="justify-start"
+																onValueChange={(value) => {
+																	if (
+																		value === "personal" ||
+																		value === "business"
+																	) {
+																		setChatgptPlan(value);
+																	}
+																}}
+																size="sm"
+																type="single"
+																value={chatgptPlan}
+																variant="outline"
+															>
+																<ToggleGroupItem value="personal">
+																	<Trans>Personal plan</Trans>
+																</ToggleGroupItem>
+																<ToggleGroupItem value="business">
+																	<Trans>Business plan</Trans>
+																</ToggleGroupItem>
+															</ToggleGroup>
+															{replacing ? (
+																<Button
+																	className="ml-auto"
+																	onClick={() => setReplacing(false)}
+																	size="sm"
+																	variant="ghost"
+																>
+																	<Trans>Cancel</Trans>
+																</Button>
+															) : null}
+														</div>
+													)}
+													{isClaude ? (
+														<>
+															<p className="text-muted-foreground">
+																<Trans>
+																	Run{" "}
+																	<code className="rounded bg-muted px-1 py-0.5 font-mono">
+																		{tokenCommand}
+																	</code>
+																	<button
+																		aria-label={t({
+																			message: "Copy command",
+																		})}
+																		className={cn(
+																			"ml-1 inline-flex h-5 items-center rounded-sm align-top text-muted-foreground hover:text-foreground",
+																			FOCUS_RING,
+																		)}
+																		onClick={() =>
+																			void copyToClipboard(tokenCommand)
+																		}
+																		type="button"
+																	>
+																		<CopyStateIcon copied={copiedCommand} />
+																	</button>{" "}
+																	in a terminal and paste the token you get back
+																	here.
+																</Trans>
+															</p>
+															<div className="flex items-center gap-2">
+																<SecretField
+																	className="flex-1"
+																	hideLabel
+																	label={t({ message: "Token" })}
+																	onChange={setTokenDraft}
+																	placeholder="CLAUDE_CODE_OAUTH_TOKEN"
+																	value={tokenDraft}
+																/>
+																<SaveButton
+																	checking={checking === "subscription"}
+																	disabled={!tokenDraft.trim()}
+																	onClick={() =>
+																		verifyAndSave(
+																			"subscription",
+																			{
+																				kind: "subscription",
+																				value: tokenDraft.trim(),
+																			},
+																			() => setTokenDraft(""),
+																		)
+																	}
+																/>
+															</div>
+														</>
+													) : (
+														<ChatgptSignIn
+															onConnected={handleChatgptConnected}
+															plan={chatgptPlan}
+														/>
+													)}
+												</>
+											)}
+										</div>
 									) : null}
 								</div>
 
-								{/* API key */}
-								<div className={optionClass(state.method === "api_key")}>
-									<div className="flex items-center gap-3">
-										<RadioGroupItem id={`${presetId}-key`} value="api_key" />
+								<div className={optionClass}>
+									<div className={optionRowClass}>
 										<Label
-											className="flex flex-1 items-center gap-2 font-medium"
+											className={optionLabelClass}
 											htmlFor={`${presetId}-key`}
 										>
+											<RadioGroupItem id={`${presetId}-key`} value="api_key" />
 											<Trans>API key</Trans>
 											{state.apiKeySaved ? (
 												<Check className="size-4 text-emerald-500" />
 											) : null}
 										</Label>
-										{state.apiKeySaved || state.customSaved ? (
-											<Button
-												onClick={() => void disconnect()}
-												size="sm"
-												variant="ghost"
-											>
-												<Trans>Remove</Trans>
-											</Button>
-										) : null}
-										<a
-											className="inline-flex items-center gap-1 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+										<ExternalTextLink
 											href={
 												isClaude
 													? "https://console.anthropic.com/settings/keys"
 													: "https://platform.openai.com/api-keys"
 											}
-											rel="noreferrer"
-											target="_blank"
+											underline
 										>
 											<Trans>Get key</Trans>
-											<ExternalLink className="size-3.5" />
-										</a>
+										</ExternalTextLink>
+										{state.apiKeySaved ? (
+											<DisconnectMenu
+												agentLabel={label}
+												credential={t({ message: "API key" })}
+												disconnect={disconnect}
+											/>
+										) : null}
 									</div>
 									{state.method === "api_key" ? (
-										<div className="mt-3 space-y-2 pl-7">
-											<button
-												className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-												onClick={() => setApiKeyAdvanced((value) => !value)}
-												type="button"
-											>
-												{apiKeyAdvanced ? (
-													<ChevronDown className="size-4" />
-												) : (
-													<ChevronRight className="size-4" />
-												)}
-												<Trans>Advanced</Trans>
-											</button>
-											{apiKeyAdvanced ? (
-												<Field
-													label={t({ message: "Base URL" })}
-													onChange={setBaseUrlDraft}
-													placeholder={
-														isClaude
-															? "https://api.anthropic.com"
-															: "https://api.openai.com/v1"
-													}
-													value={baseUrlDraft}
+										<div className={optionBodyClass}>
+											{state.apiKeySaved && !replacing ? (
+												<SavedSecret
+													label={t({ message: "API key" })}
+													onReplace={() => setReplacing(true)}
 												/>
-											) : null}
-											<div className="flex items-center gap-2">
-												<Input
-													autoComplete="off"
-													className="font-mono text-sm"
-													onChange={(e) => setApiKeyDraft(e.target.value)}
-													placeholder={
-														state.apiKeySaved
-															? "••••••••••••••••"
-															: isClaude
-																? "ANTHROPIC_API_KEY"
-																: "OPENAI_API_KEY"
-													}
-													type="password"
-													value={apiKeyDraft}
-												/>
-												<Button
-													disabled={
-														!apiKeyDraft.trim() || checking === "api_key"
-													}
-													onClick={() =>
-														verifyAndSave(
-															"api_key",
-															{
-																kind: "api_key",
-																value: apiKeyDraft.trim(),
-																...(baseUrlDraft.trim()
-																	? { baseUrl: baseUrlDraft.trim() }
-																	: {}),
-															},
-															() => setApiKeyDraft(""),
-														)
-													}
-													size="sm"
-												>
-													{checking === "api_key" ? (
-														<Trans>Checking…</Trans>
-													) : (
-														<Trans>Save</Trans>
-													)}
-												</Button>
-											</div>
+											) : (
+												<>
+													<button
+														aria-controls={advancedId}
+														aria-expanded={apiKeyAdvanced}
+														className={cn(
+															"flex items-center gap-1 rounded-sm text-muted-foreground hover:text-foreground",
+															FOCUS_RING,
+														)}
+														onClick={() => setApiKeyAdvanced((value) => !value)}
+														type="button"
+													>
+														{apiKeyAdvanced ? (
+															<ChevronDown className="size-4" />
+														) : (
+															<ChevronRight className="size-4" />
+														)}
+														<Trans>Advanced</Trans>
+													</button>
+													{apiKeyAdvanced ? (
+														<div id={advancedId}>
+															<Field
+																label={t({ message: "Base URL" })}
+																onChange={setBaseUrlDraft}
+																placeholder={
+																	isClaude
+																		? "https://api.anthropic.com"
+																		: "https://api.openai.com/v1"
+																}
+																value={baseUrlDraft}
+															/>
+														</div>
+													) : null}
+													<div className="flex items-center gap-2">
+														<SecretField
+															className="flex-1"
+															hideLabel
+															label={t({ message: "API key" })}
+															onChange={setApiKeyDraft}
+															placeholder={
+																isClaude
+																	? "ANTHROPIC_API_KEY"
+																	: "OPENAI_API_KEY"
+															}
+															value={apiKeyDraft}
+														/>
+														<SaveButton
+															checking={checking === "api_key"}
+															disabled={!apiKeyDraft.trim()}
+															onClick={() =>
+																verifyAndSave(
+																	"api_key",
+																	{
+																		kind: "api_key",
+																		value: apiKeyDraft.trim(),
+																		...(baseUrlDraft.trim()
+																			? { baseUrl: baseUrlDraft.trim() }
+																			: {}),
+																	},
+																	() => setApiKeyDraft(""),
+																)
+															}
+														/>
+													</div>
+												</>
+											)}
 										</div>
 									) : null}
 								</div>
 							</RadioGroup>
 
 							{/* Custom provider: a nested view, not a radio */}
-							<button
-								className={cn(
-									optionClass(state.method === "custom"),
-									"flex w-full items-center gap-3 text-left",
-								)}
-								onClick={() => setView("custom")}
-								type="button"
-							>
-								<span className="flex-1 font-medium">
-									<Trans>Custom provider</Trans>
-									{state.method === "custom" && customLabel ? (
-										<span className="ml-2 text-sm font-normal text-muted-foreground">
-											{customLabel}
-										</span>
+							<div className={optionClass}>
+								<button
+									className={cn(
+										optionRowClass,
+										"w-full pl-3 text-left font-medium",
+										FOCUS_RING,
+									)}
+									onClick={() => setView("custom")}
+									type="button"
+								>
+									<span className="flex-1">
+										<Trans>Custom provider</Trans>
+										{customSet && customLabel ? (
+											<span className="ml-2 font-normal text-muted-foreground">
+												{customLabel}
+											</span>
+										) : null}
+									</span>
+									{customSet ? (
+										<Check className="size-4 text-emerald-500" />
 									) : null}
-								</span>
-								{state.method === "custom" && state.customSaved ? (
-									<Check className="size-4 text-emerald-500" />
-								) : null}
-								<ChevronRight className="size-4 text-muted-foreground" />
-							</button>
+									<ChevronRight className="size-4 text-muted-foreground" />
+								</button>
+							</div>
 						</div>
 					</>
 				)}
@@ -484,128 +633,5 @@ export function CloudAuthDialog({
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
-	);
-}
-
-/** One element so the surrounding <Trans> keeps a stable message id. */
-function CopyStateIcon({ copied }: { copied: boolean }) {
-	return copied ? (
-		<Check className="size-3.5 text-emerald-500" />
-	) : (
-		<Copy className="size-3.5" />
-	);
-}
-
-function SecretField({
-	placeholder,
-	label,
-	value,
-	onChange,
-}: {
-	placeholder: string;
-	label?: string;
-	value?: string;
-	onChange?: (value: string) => void;
-}) {
-	const { t } = useLingui();
-	const [shown, setShown] = useState(false);
-	return (
-		<div className="space-y-1.5">
-			{label ? <Label className="text-sm font-medium">{label}</Label> : null}
-			<div className="relative">
-				<Input
-					autoComplete="off"
-					className="pr-9 font-mono text-sm"
-					onChange={(e) => onChange?.(e.target.value)}
-					placeholder={placeholder}
-					type={shown ? "text" : "password"}
-					value={value}
-				/>
-				<button
-					aria-label={shown ? t({ message: "Hide" }) : t({ message: "Show" })}
-					className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-					onClick={() => setShown((value) => !value)}
-					type="button"
-				>
-					{shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-				</button>
-			</div>
-		</div>
-	);
-}
-
-function Field({
-	label,
-	placeholder,
-	value,
-	onChange,
-}: {
-	label: string;
-	placeholder?: string;
-	value?: string;
-	onChange?: (value: string) => void;
-}) {
-	return (
-		<div className="space-y-1.5">
-			<Label className="text-sm font-medium">{label}</Label>
-			<Input
-				autoComplete="off"
-				className="font-mono text-sm"
-				onChange={(e) => onChange?.(e.target.value)}
-				placeholder={placeholder}
-				value={value ?? ""}
-			/>
-		</div>
-	);
-}
-
-function ProviderForm({
-	provider,
-	onSave,
-	checking,
-}: {
-	provider: CustomProvider;
-	onSave: (value: string, baseUrl: string) => void;
-	checking: boolean;
-}) {
-	const { t } = useLingui();
-	const [draft, setDraft] = useState("");
-	const [baseUrl, setBaseUrl] = useState("https://ai-gateway.vercel.sh/v1");
-	const filled = draft.trim().length > 0 && baseUrl.trim().length > 0;
-	if (provider !== "gateway") return null;
-	return (
-		<>
-			<a
-				className="inline-flex items-center gap-1 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-				href="https://vercel.com/ai-gateway"
-				rel="noreferrer"
-				target="_blank"
-			>
-				<Trans>Get an API key</Trans>
-				<ExternalLink className="size-3.5" />
-			</a>
-			<Field
-				label={t({ message: "Base URL" })}
-				onChange={setBaseUrl}
-				placeholder="https://ai-gateway.vercel.sh/v1"
-				value={baseUrl}
-			/>
-			<div className="flex items-center gap-2">
-				<div className="flex-1">
-					<SecretField
-						onChange={setDraft}
-						placeholder="AI_GATEWAY_API_KEY"
-						value={draft}
-					/>
-				</div>
-				<Button
-					disabled={!filled || checking}
-					onClick={() => onSave(draft.trim(), baseUrl.trim())}
-					size="sm"
-				>
-					{checking ? <Trans>Checking…</Trans> : <Trans>Save</Trans>}
-				</Button>
-			</div>
-		</>
 	);
 }

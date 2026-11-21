@@ -3,11 +3,28 @@ export type OutputFlags = {
 	quiet: boolean;
 };
 
+/**
+ * Output that is a document, not data: printed as-is under --json and
+ * --quiet. It carries nothing else, so a data result that happens to have a
+ * `raw` field is still data.
+ */
+export function isRawResult(result: unknown): result is { raw: string } {
+	return (
+		typeof result === "object" &&
+		result !== null &&
+		"raw" in result &&
+		typeof result.raw === "string" &&
+		!("data" in result) &&
+		!("message" in result)
+	);
+}
+
 export function formatOutput(
 	result: unknown,
 	display: ((data: unknown) => string) | undefined,
 	flags: OutputFlags,
 ): string {
+	if (isRawResult(result)) return result.raw;
 	const data = isResultWithData(result) ? result.data : result;
 	const message = isResultWithMessage(result) ? result.message : undefined;
 
@@ -77,16 +94,18 @@ function isPaginatedEnvelope(data: unknown): data is { items: unknown[] } {
 
 const URL_CELL = /^https?:\/\/\S+$/;
 
-const supportsHyperlinks = () =>
-	process.stdout.isTTY === true && process.env.TERM !== "dumb";
+interface Terminal {
+	isTTY: boolean | undefined;
+	term: string | undefined;
+}
 
 /**
  * OSC 8 hyperlink, for terminals that honour it. A terminal that does not
  * falls back to detecting links in the text it can see, which is why a URL
  * cell is never truncated: the visible text has to stand on its own.
  */
-function hyperlink(url: string, label: string): string {
-	if (!supportsHyperlinks()) return label;
+function hyperlink(url: string, label: string, terminal: Terminal): string {
+	if (terminal.isTTY !== true || terminal.term === "dumb") return label;
 	return `\x1b]8;;${url}\x07${label}\x1b]8;;\x07`;
 }
 
@@ -103,6 +122,7 @@ export function table(
 	columns: string[],
 	headers?: string[],
 	maxColWidth: number | (number | undefined)[] = 60,
+	terminal: Terminal = { isTTY: process.stdout.isTTY, term: process.env.TERM },
 ): string {
 	if (data.length === 0) return "No results.";
 
@@ -132,7 +152,9 @@ export function table(
 		r
 			.map((cell, i) => {
 				const padding = " ".repeat(Math.max(0, widths[i]! - cell.text.length));
-				const body = cell.link ? hyperlink(cell.link, cell.text) : cell.text;
+				const body = cell.link
+					? hyperlink(cell.link, cell.text, terminal)
+					: cell.text;
 				return body + padding;
 			})
 			.join("  "),

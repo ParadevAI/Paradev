@@ -1,33 +1,29 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
-import type { ReactNode } from "react";
+import { useRef } from "react";
+import type { ViewInstance } from "react-native";
+import { View } from "react-native";
+import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
+import type { WorkspaceRowMenuProps } from "./WorkspaceRowMenu.types";
 
 export function WorkspaceRowMenu({
 	pinned,
 	onTogglePin,
 	canRename,
 	canDelete,
+	isCloud,
 	isUnread,
 	onToggleUnread,
 	onRename,
 	onDelete,
 	onCopyId,
 	onShare,
+	move,
+	groups,
 	children,
-}: {
-	pinned: boolean;
-	onTogglePin: () => void;
-	canRename: boolean;
-	canDelete: boolean;
-	isUnread: boolean;
-	onToggleUnread: () => void;
-	onRename: () => void;
-	onDelete: () => void;
-	onCopyId: () => void;
-	onShare: () => void;
-	children: ReactNode;
-}) {
+}: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
+	const rowRef = useRef<ViewInstance>(null);
 	// Tap navigation lives on the row itself; the Link exists solely because
 	// Link.Menu must be a direct child of Link, so tap is a no-op here.
 	return (
@@ -36,12 +32,16 @@ export function WorkspaceRowMenu({
 			onPress={(event) => event.preventDefault()}
 			asChild
 		>
-			<Link.Trigger>{children}</Link.Trigger>
+			<Link.Trigger>
+				<View ref={rowRef} collapsable={false}>
+					{children}
+				</View>
+			</Link.Trigger>
 			<Link.Menu>
 				{/* Each action is its own direct child: Link.Menu drops anything
 				    wrapped in a Fragment. */}
 				<Link.MenuAction
-					icon={isUnread ? "envelope.open" : "envelope.badge"}
+					icon={isUnread ? "bell" : "bell.badge"}
 					onPress={onToggleUnread}
 				>
 					{isUnread
@@ -52,18 +52,85 @@ export function WorkspaceRowMenu({
 								message: "Mark as Unread",
 							})}
 				</Link.MenuAction>
-				<Link.MenuAction
-					icon={pinned ? "pin.slash" : "pin"}
-					onPress={onTogglePin}
-				>
-					{pinned ? t({ message: "Unpin" }) : t({ message: "Pin" })}
-				</Link.MenuAction>
+				{onTogglePin ? (
+					<Link.MenuAction
+						icon={pinned ? "pin.slash" : "pin"}
+						onPress={onTogglePin}
+					>
+						{pinned ? t({ message: "Unpin" }) : t({ message: "Pin" })}
+					</Link.MenuAction>
+				) : null}
 				{canRename ? (
 					<Link.MenuAction icon="pencil" onPress={onRename}>
 						{t({ message: "Rename" })}
 					</Link.MenuAction>
 				) : null}
-				{canDelete ? (
+				{groups ? (
+					<Link.Menu title={t({ message: "Move to group" })} icon="folder">
+						{groups.options.map((group) => (
+							<Link.MenuAction
+								key={group.tag}
+								isOn={group.tag === groups.current}
+								onPress={() => groups.onMove(group.tag)}
+							>
+								{group.name}
+							</Link.MenuAction>
+						))}
+						<Link.Menu inline>
+							<Link.MenuAction
+								icon="folder.badge.plus"
+								onPress={groups.onCreate}
+							>
+								{t({ message: "Create new group" })}
+							</Link.MenuAction>
+						</Link.Menu>
+					</Link.Menu>
+				) : null}
+				{groups?.current ? (
+					<Link.MenuAction
+						icon="folder.badge.minus"
+						onPress={() => groups.onMove(null)}
+					>
+						{t({ message: "Ungroup" })}
+					</Link.MenuAction>
+				) : null}
+				{move && (move.canMoveToCloud || move.computers.length > 0) ? (
+					<Link.Menu
+						title={t({ message: "Move to" })}
+						icon="arrow.left.arrow.right"
+					>
+						{move.canMoveToCloud ? (
+							<Link.MenuAction icon="cloud" onPress={move.moveToCloud}>
+								{t({ message: "Cloud" })}
+							</Link.MenuAction>
+						) : null}
+						{move.computers.length > 0 ? (
+							<Link.Menu inline>
+								{move.computers.map((computer) => (
+									<Link.MenuAction
+										key={computer.hostId}
+										icon="server.rack"
+										disabled={!computer.online}
+										subtitle={
+											computer.online
+												? t({ message: "Online" })
+												: t({ message: "Offline" })
+										}
+										onPress={() => move.moveToComputer(computer)}
+									>
+										{computer.name}
+									</Link.MenuAction>
+								))}
+							</Link.Menu>
+						) : null}
+					</Link.Menu>
+				) : null}
+				{canDelete && isCloud ? (
+					<Link.MenuAction icon="archivebox" onPress={onDelete}>
+						{t({ message: "Archive" })}
+					</Link.MenuAction>
+				) : null}
+				{canDelete && !isCloud ? (
 					<Link.MenuAction icon="trash" destructive onPress={onDelete}>
 						{t({ message: "Delete" })}
 					</Link.MenuAction>
@@ -72,7 +139,10 @@ export function WorkspaceRowMenu({
 					<Link.MenuAction icon="doc.on.doc" onPress={onCopyId}>
 						{t({ message: "Copy ID" })}
 					</Link.MenuAction>
-					<Link.MenuAction icon="square.and.arrow.up" onPress={onShare}>
+					<Link.MenuAction
+						icon="square.and.arrow.up"
+						onPress={() => onShare(anchorOf(rowRef))}
+					>
 						{t({ message: "Share" })}
 					</Link.MenuAction>
 				</Link.Menu>

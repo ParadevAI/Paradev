@@ -15,6 +15,7 @@ export function toTerminalSessionError(
 	const { kind, error: message } = failure;
 	switch (kind) {
 		case "SESSION_WRONG_WORKSPACE":
+		case "WORKTREE_INACCESSIBLE":
 			return new TRPCError({ code: "FORBIDDEN", message, cause: { kind } });
 		case "SESSION_NOT_FOUND":
 		case "SESSION_EXITED":
@@ -28,6 +29,8 @@ export function toTerminalSessionError(
 				message,
 				cause: { kind },
 			});
+		case "CHAT_NEEDS_SUBMITTED_TEXT":
+			return new TRPCError({ code: "BAD_REQUEST", message, cause: { kind } });
 		case "TERMINAL_START_FAILED":
 			return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message });
 		default: {

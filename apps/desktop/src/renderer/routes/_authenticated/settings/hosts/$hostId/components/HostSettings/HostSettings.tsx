@@ -5,6 +5,7 @@ import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
 import {
 	type PersistableTransaction,
 	useOptimisticActions,
@@ -15,6 +16,7 @@ import { HighlightText } from "renderer/routes/_authenticated/settings/component
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import type { CandidateRow } from "./components/AddMemberDropdown";
 import { AddMemberDropdown } from "./components/AddMemberDropdown";
+import { CloudWorkspaceAccessSection } from "./components/CloudWorkspaceAccessSection";
 import { DeleteHostSection } from "./components/DeleteHostSection";
 import { HostHeader } from "./components/HostHeader";
 import { HostServiceSection } from "./components/HostServiceSection";
@@ -120,6 +122,7 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 			.sort((a, b) => a.name.localeCompare(b.name));
 	}, [orgMembers, hostUserRows, userMap, t]);
 
+	const isOrgOwner = useIsOrganizationOwner();
 	const isOwner = useMemo(() => {
 		if (!currentUserId) return false;
 		return (
@@ -208,6 +211,25 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 					</section>
 				)}
 
+				{isOwner && host.organizationId && (
+					<section className="space-y-3">
+						<h3 className="text-sm font-medium">
+							<HighlightText
+								text={t({
+									message: "Cloud workspaces",
+								})}
+								query={searchQuery}
+							/>
+						</h3>
+						<CloudWorkspaceAccessSection
+							key={`${host.organizationId}:${host.machineId}`}
+							organizationId={host.organizationId}
+							machineId={host.machineId}
+							allowed={host.allowCloudWorkspaces ?? false}
+						/>
+					</section>
+				)}
+
 				<section className="space-y-3">
 					<div className="flex items-end justify-between gap-4">
 						<div>
@@ -238,7 +260,7 @@ export function HostSettings({ hostId }: HostSettingsProps) {
 					/>
 				</section>
 
-				{isOwner ? (
+				{isOwner || isOrgOwner ? (
 					<DeleteHostSection
 						hostId={hostId}
 						hostName={host.name}

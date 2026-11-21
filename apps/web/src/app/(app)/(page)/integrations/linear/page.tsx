@@ -9,14 +9,20 @@ import {
 } from "@superset/ui/card";
 import { AlertTriangle, ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { SiLinear } from "react-icons/si";
+import { env } from "@/env";
 import { initServerI18n } from "@/lib/i18n-server";
 import { api } from "@/trpc/server";
 import { IntegrationErrorHandler } from "../components/IntegrationErrorHandler";
 import { ConnectionControls } from "./components/ConnectionControls";
 import { TeamSelector } from "./components/TeamSelector";
 
-export default async function LinearIntegrationPage() {
+export default async function LinearIntegrationPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ taskTracker?: string }>;
+}) {
 	const i18n = await initServerI18n();
 	const CALLBACK_MESSAGES = {
 		oauth_denied: i18n._(
@@ -44,6 +50,22 @@ export default async function LinearIntegrationPage() {
 				message: "You are not authorized to perform this action.",
 			}),
 		),
+		workspace_already_linked: {
+			param: "owner",
+			withParam: i18n._({
+				...msg({
+					message:
+						"This Linear workspace is already connected by {owner}. Ask them to disconnect first.",
+				}),
+				values: { owner: "{owner}" },
+			}),
+			withoutParam: i18n._(
+				msg({
+					message:
+						"This Linear workspace is already connected by another Paradev organization.",
+				}),
+			),
+		},
 	};
 	const CALLBACK_WARNINGS = {
 		sync_queued_failed: i18n._(
@@ -72,11 +94,26 @@ export default async function LinearIntegrationPage() {
 		);
 	}
 
+	if (
+		!(await trpc.integration.syncAllowed.query({
+			organizationId: organization.id,
+		}))
+	) {
+		redirect("/integrations?pro=linear");
+	}
+
 	const connection = await trpc.integration.linear.getConnection.query({
 		organizationId: organization.id,
 	});
 	const isConnected = !!connection;
 	const needsReconnect = !!connection?.needsReconnect;
+
+	const { taskTracker } = await searchParams;
+	if (taskTracker === "linear" && (!isConnected || needsReconnect)) {
+		redirect(
+			`${env.NEXT_PUBLIC_API_URL}/api/integrations/linear/connect?organizationId=${organization.id}&taskTracker=linear`,
+		);
+	}
 
 	return (
 		<div className="space-y-8">
@@ -137,7 +174,7 @@ export default async function LinearIntegrationPage() {
 						{i18n._(
 							msg({
 								message:
-									"Sync issues bidirectionally with Linear. Create tasks in Superset and have them appear in Linear, or import existing Linear issues.",
+									"Sync issues bidirectionally with Linear. Create tasks in Paradev and have them appear in Linear, or import existing Linear issues.",
 							}),
 						)}
 					</p>
@@ -185,7 +222,7 @@ export default async function LinearIntegrationPage() {
 							{i18n._(
 								msg({
 									message:
-										"Configure how tasks sync between Superset and Linear.",
+										"Configure how tasks sync between Paradev and Linear.",
 								}),
 							)}
 						</CardDescription>
@@ -204,7 +241,7 @@ export default async function LinearIntegrationPage() {
 								{i18n._(
 									msg({
 										message:
-											"Tasks created in Superset will be synced to this Linear team.",
+											"Tasks created in Paradev will be synced to this Linear team.",
 									}),
 								)}
 							</p>

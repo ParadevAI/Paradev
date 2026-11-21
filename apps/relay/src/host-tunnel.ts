@@ -38,7 +38,13 @@ const LIVENESS_SWEEP_MS = 45_000;
 const HOST_STALE_MS = 90_000;
 
 type ConnState =
-	| { kind: "host"; hostId: string }
+	| {
+			kind: "host";
+			hostId: string;
+			colo?: string | null;
+			connectedAt?: number;
+			retired?: true;
+	  }
 	| { kind: "client"; ticket: string; peer?: string }
 	| { kind: "dial"; ticket: string; peer?: string };
 
@@ -161,6 +167,7 @@ export class HostTunnel extends Server<RelayEnv> {
 	}
 
 	private async authorize(caller: Caller): Promise<AccessDecision> {
+		if (caller.preAuthorized) return "allowed";
 		const key = `access:${caller.userId}`;
 		const cached = await this.ctx.storage.get<AccessEntry>(key);
 		if (cached && cached.expiresAt > Date.now()) {
@@ -204,17 +211,31 @@ export class HostTunnel extends Server<RelayEnv> {
 
 		if (conn.tags.includes(HOST_TAG)) {
 			const hostId = url.searchParams.get("hostId") ?? this.name;
+			const colo = url.searchParams.get("colo");
+			const connectedAt = Date.now();
 			// State first: a replaced socket's close is delivered mid-await, and
 			// teardown must be able to tell this connection is the live host.
-			conn.setState({ kind: "host", hostId } satisfies ConnState);
+			conn.setState({
+				kind: "host",
+				hostId,
+				colo,
+				connectedAt,
+			} satisfies ConnState);
 			// Last-write-wins: the new socket evicts any old one.
 			for (const other of this.getConnections(HOST_TAG)) {
 				if (other.id !== conn.id)
-					closeQuietly(other, RELAY_CLOSE.replaced, "Replaced by new tunnel");
+					retireHost(other, RELAY_CLOSE.replaced, "Replaced by new tunnel");
 			}
 			await this.ctx.storage.put("lastHostSeenAt", Date.now());
 			await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
-			console.log(`[relay] host connected: ${hostId}`);
+			console.log({
+				message: "[relay] host connected",
+				hostId,
+				colo,
+				country: url.searchParams.get("country"),
+				asn: url.searchParams.get("asn"),
+				generation: url.searchParams.get("generation"),
+			});
 			return;
 		}
 
@@ -336,19 +357,25 @@ export class HostTunnel extends Server<RelayEnv> {
 		this.earlyFrames.set(conn.id, buffer);
 	}
 
-	async onClose(conn: Connection): Promise<void> {
-		await this.handleGone(conn);
+	async onClose(conn: Connection, code?: number): Promise<void> {
+		await this.handleGone(conn, code ?? null);
 	}
 
 	async onError(conn: Connection): Promise<void> {
-		await this.handleGone(conn);
+		await this.handleGone(conn, null);
 	}
 
-	private async handleGone(conn: Connection): Promise<void> {
+	private async handleGone(
+		conn: Connection,
+		code: number | null,
+	): Promise<void> {
 		const state = conn.state as ConnState | undefined;
 		if (!state) return;
 
 		if (state.kind === "host") {
+			const currentHost = this.hostConn();
+			if (currentHost && currentHost.id !== conn.id) return;
+
 			// Tags, not state: tags are assigned synchronously at accept, so a
 			// replacement host socket still mid-onConnect is never torn down.
 			for (const other of this.getConnections()) {
@@ -360,7 +387,16 @@ export class HostTunnel extends Server<RelayEnv> {
 			this.httpExchanges.abortAll();
 			// A replaced socket's close lands after the new one registered.
 			if (!this.hostConn()) {
-				console.log(`[relay] host disconnected: ${state.hostId}`);
+				console.log({
+					message: "[relay] host disconnected",
+					hostId: state.hostId,
+					colo: state.colo ?? null,
+					code,
+					connectedMs:
+						state.connectedAt === undefined
+							? null
+							: Date.now() - state.connectedAt,
+				});
 			}
 			return;
 		}
@@ -394,7 +430,7 @@ export class HostTunnel extends Server<RelayEnv> {
 			console.log(
 				`[relay] host stale, closing: ${state?.kind === "host" ? state.hostId : this.name}`,
 			);
-			closeQuietly(host, RELAY_CLOSE.staleHost, "No keepalive from host");
+			retireHost(host, RELAY_CLOSE.staleHost, "No keepalive from host");
 			return;
 		}
 
@@ -421,9 +457,12 @@ export class HostTunnel extends Server<RelayEnv> {
 		this.httpExchanges.fail(ticket);
 	}
 
+	// getConnections() trusts readyState, but a closed socket whose peer never
+	// answered reads OPEN again after a wake. The retired mark survives it.
 	private hostConn(): Connection | null {
 		for (const conn of this.getConnections(HOST_TAG)) {
-			if (conn.readyState === WebSocket.OPEN) return conn;
+			const state = conn.state as ConnState | undefined;
+			if (state?.kind === "host" && !state.retired) return conn;
 		}
 		return null;
 	}
@@ -439,6 +478,12 @@ export class HostTunnel extends Server<RelayEnv> {
 	private sendDial(host: Connection, dial: StreamDial): void {
 		host.send(JSON.stringify(dial));
 	}
+}
+
+function retireHost(conn: Connection, code: number, reason: string): void {
+	const state = conn.state as ConnState | undefined;
+	if (state?.kind === "host") conn.setState({ ...state, retired: true });
+	closeQuietly(conn, code, reason);
 }
 
 function closeQuietly(conn: Connection, code: number, reason: string): void {

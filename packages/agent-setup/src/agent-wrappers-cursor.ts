@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import {
 	buildWrapperScript,
@@ -7,19 +6,19 @@ import {
 	isSupersetManagedHookCommand,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
-import { getTemplatePath, getV1NotificationsPort } from "./config";
+import { getTemplatePath } from "./config";
 import {
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
-import { getHooksDir } from "./paths";
+import { APP_HOME_DIR_NAME, getHooksDir, resolveUserHomeDir } from "./paths";
 
 export const CURSOR_HOOK_SCRIPT_NAME = "cursor-hook.sh";
 
 const CURSOR_HOOK_SIGNATURE = "# Superset cursor hook";
-const CURSOR_HOOK_VERSION = "v8";
+const CURSOR_HOOK_VERSION = "v9";
 export const CURSOR_HOOK_MARKER = `${CURSOR_HOOK_SIGNATURE} ${CURSOR_HOOK_VERSION}`;
 
 interface CursorHookEntry {
@@ -32,7 +31,7 @@ export function getCursorHookScriptPath(): string {
 }
 
 export function getCursorGlobalHooksJsonPath(): string {
-	return path.join(os.homedir(), ".cursor", "hooks.json");
+	return path.join(resolveUserHomeDir(), ".cursor", "hooks.json");
 }
 
 export function getCursorHookScriptContent(): string {
@@ -42,7 +41,7 @@ export function getCursorHookScriptContent(): string {
 	);
 	return template
 		.replace("{{MARKER}}", CURSOR_HOOK_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 // Cursor invokes the hook script with the event name as argv; the script

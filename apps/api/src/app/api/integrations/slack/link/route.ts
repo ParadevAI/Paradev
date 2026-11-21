@@ -1,10 +1,13 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
 import { accountConnection } from "@superset/trpc/connectors";
 import { headers } from "next/headers";
 import { env } from "@/env";
 import { upsertIdentity } from "@/lib/integrations/upsertIdentity";
+import { signInUrl, wrongAccountResponse } from "@/lib/signInRedirect";
+import { unfurlLinks } from "../events/process-link-shared";
+import type { ConnectPayload } from "../events/utils/generate-connect-url";
 
 export async function GET(request: Request) {
 	const url = new URL(request.url);
@@ -15,7 +18,7 @@ export async function GET(request: Request) {
 		return new Response("Missing token or signature", { status: 400 });
 	}
 
-	let payload: { slackUserId: string; teamId: string; exp: number };
+	let payload: ConnectPayload;
 	try {
 		const decoded = Buffer.from(token, "base64url").toString("utf-8");
 		const expectedSig = createHmac("sha256", env.SLACK_SIGNING_SECRET)
@@ -43,20 +46,16 @@ export async function GET(request: Request) {
 		return new Response("Invalid token", { status: 400 });
 	}
 
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getRequestSession(await headers());
 	if (!session?.user) {
-		// Redirect to login, then back here
-		const returnUrl = encodeURIComponent(request.url);
-		return Response.redirect(
-			`${env.NEXT_PUBLIC_WEB_URL}/sign-in?redirect=${returnUrl}`,
-		);
+		return Response.redirect(signInUrl(request).toString(), 302);
 	}
 
 	const connection = await accountConnection("slack", payload.teamId);
 
 	if (!connection) {
 		return new Response(
-			"Slack workspace not connected to any Superset organization.",
+			"Slack workspace not connected to any Paradev organization.",
 			{ status: 404 },
 		);
 	}
@@ -67,9 +66,12 @@ export async function GET(request: Request) {
 	});
 
 	if (!membership) {
-		return new Response(
-			"You are not a member of the organization connected to this Slack workspace.",
-			{ status: 403 },
+		return wrongAccountResponse(
+			request,
+			new Response(
+				"You are not a member of the organization connected to this Slack workspace.",
+				{ status: 403 },
+			),
 		);
 	}
 
@@ -81,6 +83,19 @@ export async function GET(request: Request) {
 		// A Slack user id is only unique within a workspace.
 		externalScopeId: payload.teamId,
 	});
+
+	if (payload.unfurl) {
+		await unfurlLinks({
+			connection,
+			teamId: payload.teamId,
+			slackUserId: payload.slackUserId,
+			channel: payload.unfurl.channel,
+			ts: payload.unfurl.ts,
+			urls: [payload.unfurl.url],
+		}).catch((error: unknown) => {
+			console.error("[slack/link] Failed to unfurl after linking:", error);
+		});
+	}
 
 	return Response.redirect(
 		`${env.NEXT_PUBLIC_WEB_URL}/integrations/slack/linked`,

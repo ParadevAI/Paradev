@@ -1,0 +1,53 @@
+import { BRAND } from "@superset/shared/brand";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { CategoryArticle } from "@/app/[lang]/components/CategoryArticle";
+import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
+import { initServerI18n } from "@/app/i18n-server";
+import { getCategoryPage } from "@/lib/category";
+
+const SLUG = "multiplayer-coding-agents";
+
+export default async function MultiplayerCodingAgentsPage() {
+	await initServerI18n();
+
+	const page = getCategoryPage(SLUG);
+
+	if (!page) {
+		notFound();
+	}
+
+	return <CategoryArticle page={page} />;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+	const lang = await initServerI18n();
+	const page = getCategoryPage(SLUG);
+
+	if (!page) {
+		return {};
+	}
+
+	const url = localeUrl(lang, `/${SLUG}`);
+
+	return {
+		title: page.title,
+		description: page.description,
+		...(page.keywords.length > 0 && { keywords: page.keywords }),
+		alternates: localizedAlternates(lang, `/${SLUG}`),
+		openGraph: {
+			title: page.title,
+			description: page.description,
+			type: "article",
+			url,
+			siteName: BRAND.NAME,
+			publishedTime: page.date,
+			modifiedTime: page.lastUpdated ?? page.date,
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: page.title,
+			description: page.description,
+		},
+	};
+}

@@ -1,7 +1,9 @@
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { RouterOutputs } from "@superset/trpc";
 import { useFeatureFlagEnabled } from "posthog-js/react";
+import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useArchivingCloudWorkspaceIds } from "renderer/hooks/useArchivingCloudWorkspaceIds";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 export type CloudWorkspaceRow = RouterOutputs["cloudWorkspace"]["list"][number];
@@ -13,10 +15,14 @@ export type CloudWorkspaceRow = RouterOutputs["cloudWorkspace"]["list"][number];
  */
 const PROVISIONING_POLL_MS = 1_000;
 
-export interface CloudWorkspacesValue {
+interface CloudWorkspacesValue {
 	/** Undefined until the list has been fetched; empty when it never will be. */
 	workspaces: CloudWorkspaceRow[] | undefined;
 	organizationId: string | null;
+	/** False until the server has answered; a copy restored from disk is stale. */
+	isFresh: boolean;
+	/** True only while the first fetch is in flight with nothing to show; false once it answered, failed, or never runs. */
+	isLoading: boolean;
 }
 
 /**
@@ -45,11 +51,25 @@ export function useCloudWorkspaces(): CloudWorkspacesValue {
 				current.state.data?.some((row) => row.status === "provisioning")
 					? PROVISIONING_POLL_MS
 					: false,
+			refetchIntervalInBackground: true,
 		},
 	);
 
+	// A poll or nudge that lands before the archive commits still lists the row.
+	const archiving = useArchivingCloudWorkspaceIds();
+	const workspaces = useMemo(
+		() =>
+			archiving.length === 0
+				? query.data
+				: query.data?.filter((row) => !archiving.includes(row.id)),
+		[query.data, archiving],
+	);
+
 	return {
-		workspaces: query.data ?? (enabled ? undefined : []),
+		// A disabled query still holds the copy restored from disk.
+		workspaces: enabled ? workspaces : [],
 		organizationId,
+		isFresh: query.isSuccess && !query.isStale,
+		isLoading: query.isLoading,
 	};
 }

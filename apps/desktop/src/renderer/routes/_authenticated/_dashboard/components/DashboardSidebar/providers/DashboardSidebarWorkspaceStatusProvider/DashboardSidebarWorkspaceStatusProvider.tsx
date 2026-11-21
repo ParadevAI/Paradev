@@ -1,3 +1,4 @@
+import type { ActiveAgentStatus } from "@superset/shared/agent-status";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
@@ -22,15 +23,13 @@ import {
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
+import { deriveWorkspaceStatus } from "renderer/routes/_authenticated/_dashboard/utils/deriveWorkspaceStatus";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
-import {
-	type ActivePaneStatus,
-	getHighestPriorityStatus,
-	type PaneStatus,
-} from "shared/tabs-types";
+import { useNotificationStore } from "renderer/stores/notifications";
+import type { ActivePaneStatus, PaneStatus } from "shared/tabs-types";
 
-export interface SidebarWorkspaceStatusEntry {
+interface SidebarWorkspaceStatusEntry {
 	/** Highest-priority attention status across the workspace's terminals. */
 	status: ActivePaneStatus | null;
 	/** Manual unread mark, or any terminal in review/failed. */
@@ -41,6 +40,8 @@ export interface SidebarWorkspaceStatusEntry {
 	statuses: ReadonlyMap<string, PaneStatus>;
 	/** Populated only for the active workspace — the only row that shows it. */
 	diffStats: DiffStats | null;
+	/** When the host reported `status`, for mark-seen; null when derived from bindings. */
+	reportedAt: number | null;
 }
 
 const EMPTY_ENTRY: SidebarWorkspaceStatusEntry = {
@@ -49,6 +50,7 @@ const EMPTY_ENTRY: SidebarWorkspaceStatusEntry = {
 	bindings: new Map(),
 	statuses: new Map(),
 	diffStats: null,
+	reportedAt: null,
 };
 
 /**
@@ -59,10 +61,22 @@ const EMPTY_ENTRY: SidebarWorkspaceStatusEntry = {
 class SidebarWorkspaceStatusStore {
 	private entries = new Map<string, SidebarWorkspaceStatusEntry>();
 	private listeners = new Map<string, Set<() => void>>();
+	private allListeners = new Set<() => void>();
 	private pendingChanged: string[] = [];
 
 	get(workspaceId: string): SidebarWorkspaceStatusEntry {
 		return this.entries.get(workspaceId) ?? EMPTY_ENTRY;
+	}
+
+	getAll(): ReadonlyMap<string, SidebarWorkspaceStatusEntry> {
+		return this.entries;
+	}
+
+	subscribeAll(listener: () => void): () => void {
+		this.allListeners.add(listener);
+		return () => {
+			this.allListeners.delete(listener);
+		};
 	}
 
 	subscribe(workspaceId: string, listener: () => void): () => void {
@@ -105,6 +119,7 @@ class SidebarWorkspaceStatusStore {
 			if (!set) continue;
 			for (const listener of [...set]) listener();
 		}
+		for (const listener of [...this.allListeners]) listener();
 	}
 }
 
@@ -115,6 +130,10 @@ const StatusStoreContext = createContext<SidebarWorkspaceStatusStore | null>(
 export interface SidebarStatusWorkspaceRef {
 	id: string;
 	hostId: string;
+	/** Null means idle or never reported. */
+	reportedStatus?: ActiveAgentStatus | null;
+	/** The reporting host's clock, epoch ms. */
+	reportedAt?: number | null;
 }
 
 interface WorkspaceStatusTarget {
@@ -140,6 +159,7 @@ function entriesEqual(
 	return (
 		left.status === right.status &&
 		left.isUnread === right.isUnread &&
+		left.reportedAt === right.reportedAt &&
 		(left.diffStats === right.diffStats ||
 			(left.diffStats !== null &&
 				right.diffStats !== null &&
@@ -155,7 +175,7 @@ function entriesEqual(
  * subscriptions for every visible workspace, replacing the per-row copies
  * (~4 query observers + 2 bus listeners per row). Query keys, fetch shape,
  * and staleTime match useTerminalAgentBindings exactly, so the react-query
- * cache semantics (and consumers like useV2AttentionWorkspaceCount, which
+ * cache semantics (and consumers like useAttentionWorkspaceCount, which
  * aggregates over these keys) are unchanged — this reduces subscription
  * fan-out, not fetches.
  */
@@ -171,6 +191,26 @@ export function DashboardSidebarWorkspaceStatusProvider({
 	const [store] = useState(() => new SidebarWorkspaceStatusStore());
 	const queryClient = useQueryClient();
 	const { cache: hostWorkspacesCache } = useHostWorkspaces();
+	// Off the fingerprinted targets: a change here must not re-run the subscriptions.
+	const reportedByWorkspaceId = useMemo(
+		() =>
+			new Map(
+				workspaces.map(
+					(workspace) =>
+						[
+							workspace.id,
+							{
+								status: workspace.reportedStatus ?? null,
+								at: workspace.reportedAt ?? null,
+							},
+						] as const,
+				),
+			),
+		[workspaces],
+	);
+	const workspaceSeenAt = useNotificationStore(
+		(state) => state.workspaceSeenAt,
+	);
 
 	const computedTargets = useMemo<WorkspaceStatusTarget[]>(
 		() =>
@@ -205,14 +245,13 @@ export function DashboardSidebarWorkspaceStatusProvider({
 		queries: targets.map((target) => ({
 			queryKey: getTerminalAgentBindingsQueryKey(target.workspaceId),
 			enabled: target.hostUrl !== null,
-			queryFn: () => {
-				if (!target.hostUrl) return [] as TerminalAgentBinding[];
-				return getHostServiceClientByUrl(
-					target.hostUrl,
-				).terminalAgents.listByWorkspace.query({
-					workspaceId: target.workspaceId,
-				});
-			},
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).terminalAgents.listByWorkspace.query(
+					{
+						workspaceId: target.workspaceId,
+					},
+				),
+			),
 			// Lifecycle events invalidate for instant updates; the finite
 			// staleTime lets focus/remount refetches self-heal any staleness
 			// from events missed while the WS was down (host restart, sleep).
@@ -292,10 +331,8 @@ export function DashboardSidebarWorkspaceStatusProvider({
 		enabled: activeWorkspaceId !== null,
 	});
 
-	const manualUnread = useV2NotificationStore((state) => state.manualUnread);
-	const terminalSeenAt = useV2NotificationStore(
-		(state) => state.terminalSeenAt,
-	);
+	const manualUnread = useNotificationStore((state) => state.manualUnread);
+	const terminalSeenAt = useNotificationStore((state) => state.terminalSeenAt);
 
 	const previousEntriesRef = useRef(
 		new Map<string, SidebarWorkspaceStatusEntry>(),
@@ -318,24 +355,22 @@ export function DashboardSidebarWorkspaceStatusProvider({
 					}),
 				);
 			}
-			const hasManualUnread = Boolean(manualUnread[target.workspaceId]);
-			let hasAttentionTerminal = false;
-			for (const status of statuses.values()) {
-				if (status === "review" || status === "failed") {
-					hasAttentionTerminal = true;
-					break;
-				}
-			}
+			const report =
+				target.hostUrl === null
+					? reportedByWorkspaceId.get(target.workspaceId)
+					: undefined;
 			const candidate: SidebarWorkspaceStatusEntry = {
-				status: getHighestPriorityStatus([
-					hasManualUnread ? "review" : undefined,
-					...statuses.values(),
-				]),
-				isUnread: hasManualUnread || hasAttentionTerminal,
+				...deriveWorkspaceStatus({
+					terminalStatuses: statuses.values(),
+					hasManualUnread: Boolean(manualUnread[target.workspaceId]),
+					report,
+					seenAt: workspaceSeenAt[target.workspaceId],
+				}),
 				bindings,
 				statuses,
 				diffStats:
 					target.workspaceId === activeWorkspaceId ? activeDiffStats : null,
+				reportedAt: report?.at ?? null,
 			};
 			const previousEntry = previous.get(target.workspaceId);
 			next.set(
@@ -354,6 +389,8 @@ export function DashboardSidebarWorkspaceStatusProvider({
 		terminalSeenAt,
 		activeWorkspaceId,
 		activeDiffStats,
+		reportedByWorkspaceId,
+		workspaceSeenAt,
 	]);
 
 	store.replaceEntries(entries);
@@ -395,6 +432,17 @@ export function useSidebarWorkspaceStatus(
 	);
 }
 
+export function useSidebarWorkspaceStatuses(): ReadonlyMap<
+	string,
+	SidebarWorkspaceStatusEntry
+> {
+	const store = useSidebarWorkspaceStatusStore();
+	return useSyncExternalStore(
+		useCallback((listener) => store.subscribeAll(listener), [store]),
+		useCallback(() => store.getAll(), [store]),
+	);
+}
+
 /**
  * Marks every terminal with a live agent binding in the workspace as seen,
  * clearing derived `review` statuses. Reads bindings from the store at call
@@ -404,13 +452,20 @@ export function useMarkSidebarWorkspaceTerminalsSeen(
 	workspaceId: string,
 ): () => void {
 	const store = useSidebarWorkspaceStatusStore();
-	const markTerminalSeen = useV2NotificationStore(
+	const markTerminalSeen = useNotificationStore(
 		(state) => state.markTerminalSeen,
+	);
+	const markWorkspaceSeen = useNotificationStore(
+		(state) => state.markWorkspaceSeen,
 	);
 	return useCallback(() => {
 		// Host-clock only: "seen through the binding's last event".
-		for (const binding of store.get(workspaceId).bindings.values()) {
+		const entry = store.get(workspaceId);
+		for (const binding of entry.bindings.values()) {
 			markTerminalSeen(binding.terminalId, binding.lastEventAt);
 		}
-	}, [store, workspaceId, markTerminalSeen]);
+		if (entry.reportedAt !== null) {
+			markWorkspaceSeen(workspaceId, entry.reportedAt);
+		}
+	}, [store, workspaceId, markTerminalSeen, markWorkspaceSeen]);
 }

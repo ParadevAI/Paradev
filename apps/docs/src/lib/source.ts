@@ -1,4 +1,5 @@
 import { docs } from "fumadocs-mdx:collections/server";
+import { CANONICAL_URLS } from "@superset/shared/constants";
 import { type InferPageType, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 
@@ -21,7 +22,12 @@ export function getPageImage(page: InferPageType<typeof source>) {
 export async function getLLMText(page: InferPageType<typeof source>) {
 	const processed = await page.data.getText("processed");
 
-	return `# ${page.data.title}
-
-${processed}`;
+	return [
+		`# ${page.data.title}`,
+		`Source: ${CANONICAL_URLS.DOCS}${page.url}`,
+		page.data.description,
+		processed,
+	]
+		.filter(Boolean)
+		.join("\n\n");
 }

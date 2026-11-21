@@ -12,6 +12,18 @@
 			"types": "./src/client.ts",
 			"default": "./src/client.ts"
 		},
+		"./cloud-usage-autumn": {
+			"types": "./src/cloud-usage-autumn.ts",
+			"default": "./src/cloud-usage-autumn.ts"
+		},
+		"./cloud-usage-events": {
+			"types": "./src/cloud-usage-events.ts",
+			"default": "./src/cloud-usage-events.ts"
+		},
+		"./cloud-usage-query": {
+			"types": "./src/cloud-usage-query.ts",
+			"default": "./src/cloud-usage-query.ts"
+		},
 		"./enums": {
 			"types": "./src/schema/enums.ts",
 			"default": "./src/schema/enums.ts"
@@ -32,6 +44,10 @@
 			"types": "./src/task-list-query.ts",
 			"default": "./src/task-list-query.ts"
 		},
+		"./testing": {
+			"types": "./test/cloud-usage-fixture.ts",
+			"default": "./test/cloud-usage-fixture.ts"
+		},
 		"./utils": {
 			"types": "./src/utils/index.ts",
 			"default": "./src/utils/index.ts"
@@ -42,6 +58,7 @@
 		"push": "drizzle-kit push",
 		"migrate": "drizzle-kit migrate",
 		"studio": "drizzle-kit studio",
+		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {
@@ -50,13 +67,14 @@
 		"@t3-oss/env-core": "0.13.11",
 		"dotenv": "17.3.1",
 		"drizzle-orm": "0.45.2",
-		"zod": "4.4.3"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
+		"@electric-sql/pglite": "0.5.16",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
-		"bun-types": "1.3.14",
+		"bun-types": "1.4.3",
 		"drizzle-kit": "0.31.8",
-		"typescript": "6.0.3"
+		"typescript": "7.0.2"
 	}
 }

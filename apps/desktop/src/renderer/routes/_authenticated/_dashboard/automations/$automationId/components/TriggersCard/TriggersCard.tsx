@@ -3,10 +3,19 @@ import type {
 	DraftTrigger,
 	TriggerProblem,
 } from "@superset/shared/automation-triggers";
+import type { MachineSize } from "@superset/shared/billing";
+import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { nextOccurrenceAfter } from "@superset/shared/rrule";
 import type { RouterOutputs } from "@superset/trpc";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import type { apiTrpcClient } from "renderer/lib/api-trpc-client";
+import { authClient } from "renderer/lib/auth-client";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { DevicePicker } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker";
 import { ProjectPicker } from "../../../components/ProjectPicker";
 import type {
@@ -17,6 +26,9 @@ import { RelayOfflineNotice } from "../../../components/RelayOfflineNotice";
 import { TriggersEditor } from "../../../components/TriggersEditor";
 import { WorkspacePicker } from "../../../components/WorkspacePicker";
 import { AutomationTagsPicker } from "./components/AutomationTagsPicker";
+import { CloudWorkspacePicker } from "./components/CloudWorkspacePicker";
+import { EnvironmentPicker } from "./components/EnvironmentPicker";
+import { MachineSizePicker } from "./components/MachineSizePicker";
 import { SessionModePicker } from "./components/SessionModePicker";
 
 export type AutomationUpdatePatch = Partial<
@@ -29,7 +41,11 @@ export interface ScopeDraft {
 	v2ProjectId: string | null;
 	targetHostId: string | null;
 	v2WorkspaceId: string | null;
+	cloudWorkspaceId: string | null;
+	environmentId: string | null;
+	machineSize: MachineSize | null;
 	continueAgentSession: boolean;
+	reuseWorkspace: boolean;
 	tags: string[];
 }
 
@@ -59,6 +75,20 @@ export function TriggersCard({
 	optionState,
 }: TriggersCardProps) {
 	const { formatDateTime } = useFormat();
+	const cloud = hostId === CLOUD_HOST_ID;
+	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
+	const { data: session } = authClient.useSession();
+	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
+	const ownCloudWorkspaces = cloudWorkspaces?.filter(
+		(row) =>
+			isLiveCloudWorkspaceStatus(row.status) &&
+			row.createdByUserId === session?.user?.id,
+	);
+	const { data: environmentRows } = cloudTrpc.environment.list.useQuery(
+		{ organizationId: automation.organizationId },
+		{ enabled: cloud || cloudEnabled === true },
+	);
+	const environments = startableCloudEnvironments(environmentRows ?? []);
 
 	const recentProjects = useRecentProjects();
 	const selectedProject = recentProjects.find(
@@ -112,25 +142,6 @@ export function TriggersCard({
 				readOnly={readOnly}
 			>
 				<div className="flex flex-wrap items-center gap-x-1 gap-y-1 px-2 pt-1 text-[13px] text-muted-foreground">
-					<span>in</span>
-					<ProjectPicker
-						className={SCOPE_CHIP}
-						selectedProject={selectedProject}
-						sessionSelected={scope.v2ProjectId === null}
-						recentProjects={recentProjects}
-						disabled={readOnly}
-						onSelectProject={(v2ProjectId) =>
-							onScopeChange(
-								v2ProjectId === scope.v2ProjectId
-									? { v2ProjectId }
-									: {
-											v2ProjectId,
-											v2WorkspaceId: null,
-											continueAgentSession: false,
-										},
-							)
-						}
-					/>
 					<span>on</span>
 					<DevicePicker
 						className={SCOPE_CHIP}
@@ -144,50 +155,130 @@ export function TriggersCard({
 									: {
 											targetHostId: nextHostId,
 											v2WorkspaceId: null,
-											continueAgentSession: false,
+											cloudWorkspaceId: null,
+											...(nextHostId === CLOUD_HOST_ID
+												? {
+														v2ProjectId: null,
+														environmentId:
+															scope.environmentId ??
+															environments[0]?.id ??
+															null,
+													}
+												: { environmentId: null, machineSize: null }),
 										},
 							)
 						}
 					/>
+					<span>in</span>
+					{cloud ? (
+						<EnvironmentPicker
+							className={SCOPE_CHIP}
+							environments={environments}
+							value={scope.environmentId}
+							disabled={readOnly}
+							onChange={(environmentId) => onScopeChange({ environmentId })}
+						/>
+					) : (
+						<ProjectPicker
+							className={SCOPE_CHIP}
+							selectedProject={selectedProject}
+							sessionSelected={scope.v2ProjectId === null}
+							recentProjects={recentProjects}
+							disabled={readOnly}
+							onSelectProject={(v2ProjectId) =>
+								onScopeChange(
+									v2ProjectId === scope.v2ProjectId
+										? { v2ProjectId }
+										: {
+												v2ProjectId,
+												v2WorkspaceId: null,
+											},
+								)
+							}
+						/>
+					)}
 					<span>using</span>
-					<WorkspacePicker
-						className={SCOPE_CHIP}
-						hostId={hostId}
-						projectId={scope.v2ProjectId}
-						value={scope.v2WorkspaceId}
-						disabled={readOnly}
-						onChange={(v2WorkspaceId) =>
-							onScopeChange({
-								v2WorkspaceId,
-								...(v2WorkspaceId ? {} : { continueAgentSession: false }),
-								// Denormalized pin: the cloud stores both without a registry lookup.
-								...(v2WorkspaceId && hostId
-									? {
-											targetHostId: hostId,
-											v2ProjectId: scope.v2ProjectId,
-										}
-									: {}),
-							})
-						}
-					/>
-					<span>tagged</span>
-					<AutomationTagsPicker
-						className={SCOPE_CHIP}
-						tags={scope.tags}
-						projectId={scope.v2ProjectId}
-						disabled={readOnly}
-						onChange={(tags) => onScopeChange({ tags })}
-					/>
-					<span>running</span>
-					<SessionModePicker
-						className={SCOPE_CHIP}
-						continueAgentSession={scope.continueAgentSession}
-						pinnedWorkspaceId={scope.v2WorkspaceId}
-						disabled={readOnly}
-						onChange={(continueAgentSession) =>
-							onScopeChange({ continueAgentSession })
-						}
-					/>
+					{cloud ? (
+						<CloudWorkspacePicker
+							className={SCOPE_CHIP}
+							workspaces={ownCloudWorkspaces}
+							allWorkspaces={cloudWorkspaces}
+							value={scope.cloudWorkspaceId}
+							reuse={scope.reuseWorkspace}
+							disabled={readOnly}
+							onChange={({ cloudWorkspaceId, reuse }) => {
+								if (reuse && scope.reuseWorkspace) return;
+								onScopeChange({
+									cloudWorkspaceId,
+									reuseWorkspace: reuse,
+									...(cloudWorkspaceId || reuse
+										? {}
+										: { continueAgentSession: false }),
+								});
+							}}
+						/>
+					) : (
+						<WorkspacePicker
+							className={SCOPE_CHIP}
+							hostId={hostId}
+							projectId={scope.v2ProjectId}
+							value={scope.v2WorkspaceId}
+							reuse={scope.reuseWorkspace}
+							disabled={readOnly}
+							onChange={({ workspaceId: v2WorkspaceId, reuse }) => {
+								if (reuse && scope.reuseWorkspace) return;
+								onScopeChange({
+									v2WorkspaceId,
+									reuseWorkspace: reuse,
+									...(v2WorkspaceId || reuse
+										? {}
+										: { continueAgentSession: false }),
+									// Denormalized pin: the cloud stores both without a registry lookup.
+									...(v2WorkspaceId && hostId
+										? {
+												targetHostId: hostId,
+												v2ProjectId: scope.v2ProjectId,
+											}
+										: {}),
+								});
+							}}
+						/>
+					)}
+					{(scope.reuseWorkspace ||
+						scope.v2WorkspaceId ||
+						scope.cloudWorkspaceId) && (
+						<>
+							<span>and</span>
+							<SessionModePicker
+								className={SCOPE_CHIP}
+								continueAgentSession={scope.continueAgentSession}
+								disabled={readOnly}
+								onChange={(continueAgentSession) =>
+									onScopeChange({ continueAgentSession })
+								}
+							/>
+						</>
+					)}
+					{cloud && !scope.cloudWorkspaceId && (
+						<MachineSizePicker
+							className={SCOPE_CHIP}
+							value={scope.machineSize}
+							disabled={readOnly}
+							onChange={(machineSize) => onScopeChange({ machineSize })}
+						/>
+					)}
+					{!(scope.v2WorkspaceId ?? scope.cloudWorkspaceId) && (
+						<>
+							<span>tagged</span>
+							<AutomationTagsPicker
+								className={SCOPE_CHIP}
+								tags={scope.tags}
+								projectId={scope.v2ProjectId}
+								disabled={readOnly}
+								onChange={(tags) => onScopeChange({ tags })}
+							/>
+						</>
+					)}
 				</div>
 			</TriggersEditor>
 			<RelayOfflineNotice hostId={hostId} className="mt-1" />

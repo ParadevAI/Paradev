@@ -1,0 +1,18 @@
+---
+title: Inngest
+description: Find out why a function failed or never ran, read run traces, invoke functions, and rerun or cancel runs in Inngest Cloud
+---
+
+Find out why a function failed or never ran, read run traces, invoke functions, and rerun or cancel runs in Inngest Cloud.
+
+## MCP Server
+
+Tools come from Inngest's own MCP server at `https://api.inngest.com/mcp`. Paradev proxies each call and adds your credentials. Inngest decides which tools the server offers, so see [Inngest's MCP documentation](https://www.inngest.com/docs/ai-dev-tools/mcp) for the current list. For local development, the Inngest Dev Server has its own MCP server. This plugin does not connect to it.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Inngest in your browser and choose the account, the environments, and the permissions to give. Paradev does not need an app to be set up first. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

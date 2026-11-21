@@ -1,5 +1,21 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
+import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
+	BOX_GB_MINUTES_FEATURE_ID,
+} from "@superset/shared/billing";
 import { z } from "zod";
+
+export {
+	type CloudWorkspaceBootEndReason,
+	type CloudWorkspaceFailureReason,
+	type CloudWorkspaceStatus,
+	cloudWorkspaceBootEndReasonEnum,
+	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceFailureReasonEnum,
+	cloudWorkspaceFailureReasonValues,
+	cloudWorkspaceStatusEnum,
+	cloudWorkspaceStatusValues,
+} from "@superset/shared/cloud-workspace-status";
 
 export const taskStatusEnumValues = [
 	"backlog",
@@ -38,6 +54,10 @@ export const integrationProviderValues = [
 export const integrationProviderEnum = z.enum(integrationProviderValues);
 export type IntegrationProvider = z.infer<typeof integrationProviderEnum>;
 
+export const taskTrackerValues = ["superset", "linear"] as const;
+export const taskTrackerEnum = z.enum(taskTrackerValues);
+export type TaskTracker = z.infer<typeof taskTrackerEnum>;
+
 export const v2ClientTypeValues = ["desktop", "mobile", "web"] as const;
 export const v2ClientTypeEnum = z.enum(v2ClientTypeValues);
 export type V2ClientType = z.infer<typeof v2ClientTypeEnum>;
@@ -56,22 +76,123 @@ export const commandStatusEnum = z.enum(commandStatusValues);
 export type CommandStatus = z.infer<typeof commandStatusEnum>;
 
 /**
- * No sleep/wake states: the provider wakes a sandbox on the first inbound
- * connection, so "asleep" is invisible to callers and could only ever be
- * reported stale. `ready` means addressable, awake or not.
+ * `asleep`: the box session ended, and the box answers nothing until `access`
+ * with `wake` resumes it. Only `sandbox-sleep.ts` and `sandbox-expiry.ts` move
+ * a row between `awake` and `asleep`. `ready` and `deleted` are the old names
+ * of `awake` and `archived`: no row holds them, and Postgres cannot drop an
+ * enum value without rebuilding the type.
  */
-export const cloudWorkspaceStatusValues = [
-	"provisioning",
-	"ready",
-	"failed",
-	"deleted",
+
+/** Who else can open a cloud workspace besides its creator and the people it is shared with. `just_me` predates sharing: it means no one else. */
+export const cloudWorkspaceVisibilityValues = ["just_me", "org"] as const;
+export const cloudWorkspaceVisibilityEnum = z.enum(
+	cloudWorkspaceVisibilityValues,
+);
+export type CloudWorkspaceVisibility = z.infer<
+	typeof cloudWorkspaceVisibilityEnum
+>;
+
+/** The Autumn features a cloud workspace boot is billed on; the values are Autumn feature ids. */
+export const cloudUsageFeatureValues = [
+	BOX_GB_MINUTES_FEATURE_ID,
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
 ] as const;
-export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
-export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
+export const cloudUsageFeatureEnum = z.enum(cloudUsageFeatureValues);
+export type CloudUsageFeature = z.infer<typeof cloudUsageFeatureEnum>;
+
+/** Who inserted a boot row: a create or a wake that authorized it, or the reconcile that found its session unmetered. */
+export const cloudWorkspaceBootOriginValues = [
+	"create",
+	"wake",
+	"adopt",
+] as const;
+export const cloudWorkspaceBootOriginEnum = z.enum(
+	cloudWorkspaceBootOriginValues,
+);
+export type CloudWorkspaceBootOrigin = z.infer<
+	typeof cloudWorkspaceBootOriginEnum
+>;
+
+/** Who made a change: a person (bot accounts included) or Superset itself. */
+export const actorKindValues = ["user", "system"] as const;
+export type ActorKind = (typeof actorKindValues)[number];
+
+/** Things that happen to a cloud workspace that aren't a change to one of its fields. */
+export const cloudWorkspaceActivityEventValues = [
+	"created",
+	"archived",
+	"unarchived",
+	"joined",
+	"description_edited",
+	"run_finished",
+	"run_failed",
+	"shared",
+	"unshared",
+] as const;
+export type CloudWorkspaceActivityEvent =
+	(typeof cloudWorkspaceActivityEventValues)[number];
+
+export const taskProjectStateValues = [
+	"planned",
+	"started",
+	"paused",
+	"completed",
+	"canceled",
+] as const;
+export type TaskProjectState = (typeof taskProjectStateValues)[number];
+
+export const suggestionKindValues = [
+	"set_field",
+	"rewrite",
+	"relate",
+	"link_task",
+	"add_link",
+	"create_task",
+] as const;
+export type SuggestionKind = (typeof suggestionKindValues)[number];
+
+export const suggestionStatusValues = [
+	"pending",
+	"accepted",
+	"dismissed",
+	"stale",
+	"superseded",
+] as const;
+export type SuggestionStatus = (typeof suggestionStatusValues)[number];
+
+export const suggestionEntityValues = [
+	"cloud_workspace",
+	"task",
+	"task_project",
+	"task_label",
+	"pull_request",
+] as const;
+export type SuggestionEntity = (typeof suggestionEntityValues)[number];
 
 /** Who can see and use an environment: everyone in its organization, or its creator alone. */
 export const environmentScopeValues = ["organization", "personal"] as const;
 export type EnvironmentScope = (typeof environmentScopeValues)[number];
+
+export const environmentBuildStatusValues = [
+	"running",
+	"succeeded",
+	"failed",
+] as const;
+export type EnvironmentBuildStatus =
+	(typeof environmentBuildStatusValues)[number];
+
+/** `promote` records a golden saved from a workspace that a build replaced, so retention can delete it. */
+export const environmentBuildTriggerValues = [
+	"manual",
+	"daily",
+	"promote",
+] as const;
+export type EnvironmentBuildTrigger =
+	(typeof environmentBuildTriggerValues)[number];
+
+/** `incremental` forks the current golden; `fresh` starts from the base image. */
+export const environmentBuildKindValues = ["incremental", "fresh"] as const;
+export type EnvironmentBuildKind = (typeof environmentBuildKindValues)[number];
 
 export const environmentSourceKindValues = ["image", "fork"] as const;
 export const environmentSourceKindEnum = z.enum(environmentSourceKindValues);
@@ -108,6 +229,10 @@ export const automationRunErrorCodeValues = [
 	"host_offline",
 	"agent_not_found",
 	"workspace_not_found",
+	"cloud_not_ready",
+	"cloud_access_denied",
+	"cloud_environment_unusable",
+	"cloud_usage_limit_reached",
 ] as const;
 export const automationRunErrorCodeEnum = z.enum(automationRunErrorCodeValues);
 export type AutomationRunErrorCode = z.infer<typeof automationRunErrorCodeEnum>;
@@ -139,10 +264,12 @@ export const automationTriggerKindValues = [
 	// Same reason as integrationProviderValues: one additive migration up
 	// front, then every provider is a code-only change on top of it.
 	"microsoft_teams",
+	// Retired with the Calendar integration; Postgres cannot drop an enum
+	// value, so it stays in the type. No trigger ever had it.
 	"google_calendar",
 	"gmail",
 	"notion",
-] as const satisfies readonly TriggerConfigInput["kind"][];
+] as const;
 
 export type _EveryKindHasEnumValue = [
 	Exclude<
@@ -177,6 +304,27 @@ export const pageVisibilityValues = ["just_me", "org", "everyone"] as const;
 export const pageVisibilityEnum = z.enum(pageVisibilityValues);
 export type PageVisibility = z.infer<typeof pageVisibilityEnum>;
 
+export const pageShareRoleValues = ["view", "comment", "edit"] as const;
+export const pageShareRoleEnum = z.enum(pageShareRoleValues);
+export type PageShareRole = z.infer<typeof pageShareRoleEnum>;
+
+export const pageReportReasonValues = [
+	"malware_or_phishing",
+	"spam_or_scam",
+	"impersonation",
+	"sexual_content",
+	"violence_or_harassment",
+	"illegal_content",
+	"copyright",
+	"other",
+] as const;
+export const pageReportReasonEnum = z.enum(pageReportReasonValues);
+export type PageReportReason = z.infer<typeof pageReportReasonEnum>;
+
+export const pageReportStatusValues = ["open", "upheld", "dismissed"] as const;
+export const pageReportStatusEnum = z.enum(pageReportStatusValues);
+export type PageReportStatus = z.infer<typeof pageReportStatusEnum>;
+
 export const pageCommentAnchorKindValues = ["element", "text", "page"] as const;
 export const pageCommentAnchorKindEnum = z.enum(pageCommentAnchorKindValues);
 export type PageCommentAnchorKind = z.infer<typeof pageCommentAnchorKindEnum>;
@@ -204,3 +352,78 @@ export type HandleOwnerType = z.infer<typeof handleOwnerTypeEnum>;
 /** How a person signed their agent in: a subscription token, or a provider API key. */
 export const agentCredentialKindValues = ["subscription", "api_key"] as const;
 export type AgentCredentialKind = (typeof agentCredentialKindValues)[number];
+
+export const channelKindValues = ["channel", "dm"] as const;
+export const channelKindEnum = z.enum(channelKindValues);
+
+export const channelVisibilityValues = ["public", "private"] as const;
+export const channelVisibilityEnum = z.enum(channelVisibilityValues);
+export type ChannelVisibility = z.infer<typeof channelVisibilityEnum>;
+
+export const channelMemberRoleValues = ["member", "admin"] as const;
+export const channelMemberRoleEnum = z.enum(channelMemberRoleValues);
+export type ChannelMemberRole = z.infer<typeof channelMemberRoleEnum>;
+
+export const channelNotifyValues = ["all", "mentions", "none"] as const;
+export const channelNotifyEnum = z.enum(channelNotifyValues);
+export type ChannelNotify = z.infer<typeof channelNotifyEnum>;
+
+/**
+ * `main` is the one session every message to a Dev reaches; `task` is work it
+ * delegates, on its own box. `dm` and `thread` are retired and no longer created.
+ */
+export const agentSessionKindValues = ["dm", "thread", "main", "task"] as const;
+export const agentSessionKindEnum = z.enum(agentSessionKindValues);
+export type AgentSessionKind = z.infer<typeof agentSessionKindEnum>;
+
+export const agentTurnStatusValues = [
+	"running",
+	"completed",
+	"failed",
+	"interrupted",
+	"queued",
+] as const;
+export const agentTurnStatusEnum = z.enum(agentTurnStatusValues);
+export type AgentTurnStatus = z.infer<typeof agentTurnStatusEnum>;
+
+/** Why a turn started; recorded by the API, never by the worker. */
+export const agentTurnReasonValues = [
+	"direct_message",
+	"mention",
+	"thread_reply",
+	"channel_message",
+	"task_start",
+	"task_update",
+	"routine",
+] as const;
+export const agentTurnReasonEnum = z.enum(agentTurnReasonValues);
+export type AgentTurnReason = z.infer<typeof agentTurnReasonEnum>;
+export const agentTaskStatusValues = [
+	"queued",
+	"running",
+	"done",
+	"failed",
+	"stopped",
+] as const;
+export const agentTaskStatusEnum = z.enum(agentTaskStatusValues);
+export type AgentTaskStatus = z.infer<typeof agentTaskStatusEnum>;
+
+export const agentTaskRoleValues = ["writer", "reviewer"] as const;
+export const agentTaskRoleEnum = z.enum(agentTaskRoleValues);
+export type AgentTaskRole = z.infer<typeof agentTaskRoleEnum>;
+
+export const channelBroadcastValues = ["here", "channel", "everyone"] as const;
+export const channelBroadcastEnum = z.enum(channelBroadcastValues);
+export type ChannelBroadcast = z.infer<typeof channelBroadcastEnum>;
+
+/** Slack's membership message subtypes; a message without one is a post. */
+export const channelMessageSubtypeValues = [
+	"channel_join",
+	"channel_leave",
+] as const;
+export const channelMessageSubtypeEnum = z.enum(channelMessageSubtypeValues);
+export type ChannelMessageSubtype = z.infer<typeof channelMessageSubtypeEnum>;
+
+export const dockBounceValues = ["off", "once", "until_focused"] as const;
+export const dockBounceEnum = z.enum(dockBounceValues);
+export type DockBounce = z.infer<typeof dockBounceEnum>;

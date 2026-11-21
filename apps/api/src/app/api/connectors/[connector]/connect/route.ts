@@ -1,4 +1,5 @@
 import type { ConnectorMethod } from "@superset/shared/connectors";
+import { pluginConnectorSlug } from "@superset/shared/plugins";
 import {
 	authorizeUrl,
 	connectorMethod,
@@ -12,10 +13,11 @@ import {
 import { encryptSecret } from "@superset/trpc/integrations/plugins";
 
 import { env } from "@/env";
+import {
+	beginOAuthFlow,
+	connectorStateCookie,
+} from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
-import { createSignedState } from "@/lib/oauth-state";
-
-export const STATE_COOKIE = "connector_oauth_state";
 
 export async function GET(
 	request: Request,
@@ -28,7 +30,15 @@ export async function GET(
 	// Same reason as the callback: the generic connect page covers every
 	// connector, `/integrations/<slug>` only the seven older ones.
 	const connectUrl = `${env.NEXT_PUBLIC_WEB_URL}/connect/${slug}`;
-	const requested = new URL(request.url).searchParams.get("method");
+	const search = new URL(request.url).searchParams;
+	const requested = search.get("method");
+	const plugin = search.get("plugin");
+	const returnsToPlugin =
+		plugin !== null && pluginConnectorSlug(plugin) === slug;
+	const failUrl =
+		returnsToPlugin && plugin
+			? `${env.NEXT_PUBLIC_WEB_URL}/plugins/${encodeURIComponent(plugin)}`
+			: connectUrl;
 
 	let method: ConnectorMethod;
 	try {
@@ -49,43 +59,44 @@ export async function GET(
 			{ status: 400 },
 		);
 
-	let target: string;
-	let state: string;
 	try {
 		const redirect = redirectUriFor(slug);
-		const wantsPkce =
-			method.type === "oauth2" &&
-			(await resolveEndpoints(slug, method, redirect)).pkce;
-		const codeVerifier = wantsPkce ? createCodeVerifier() : null;
-		state = codeVerifier
-			? createSignedState({
-					organizationId: member.organizationId,
-					userId: member.userId,
-					codeVerifier: await encryptSecret(codeVerifier),
-				})
-			: member.state;
+		const endpoints =
+			method.type === "oauth2"
+				? await resolveEndpoints(slug, method, redirect, { newGrant: true })
+				: undefined;
+		const codeVerifier = endpoints?.pkce ? createCodeVerifier() : null;
+		// The callback must redeem the code as the client that asked for it, and
+		// a dynamic connector can have several registered.
+		const clientId = endpoints?.issuer ? endpoints.clientId : null;
 
-		target = (
-			await authorizeUrl(slug, method, {
-				redirectUri: redirect,
-				state,
-				codeVerifier,
-			})
-		).url;
+		return await beginOAuthFlow({
+			cookie: connectorStateCookie(slug),
+			payload: {
+				organizationId: member.organizationId,
+				userId: member.userId,
+				...(codeVerifier
+					? { codeVerifier: await encryptSecret(codeVerifier) }
+					: {}),
+				...(returnsToPlugin ? { plugin } : {}),
+				...(clientId ? { clientId } : {}),
+			},
+			authorizeUrl: async (state) =>
+				(
+					await authorizeUrl(slug, method, {
+						redirectUri: redirect,
+						state,
+						codeVerifier,
+						endpoints,
+					})
+				).url,
+		});
 	} catch (error) {
 		if (error instanceof MissingConnectorEnvError) {
 			console.error(`[connectors/${slug}] ${error.message}`);
-			return Response.redirect(`${connectUrl}?error=not_configured`);
+			return Response.redirect(`${failUrl}?error=not_configured`);
 		}
-		throw error;
+		console.error(`[connectors/${slug}] connect failed:`, error);
+		return Response.redirect(`${failUrl}?error=connect_failed`);
 	}
-
-	const secure = env.NEXT_PUBLIC_API_URL.startsWith("https") ? " Secure;" : "";
-	return new Response(null, {
-		status: 302,
-		headers: {
-			Location: target,
-			"Set-Cookie": `${STATE_COOKIE}=${state}; HttpOnly;${secure} SameSite=Lax; Path=/api/connectors; Max-Age=600`,
-		},
-	});
 }

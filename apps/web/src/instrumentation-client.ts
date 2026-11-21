@@ -8,6 +8,7 @@ import posthog from "posthog-js";
 
 import { env } from "@/env";
 import { registerBaseProperties } from "@/lib/posthog-client";
+import { sanitizePosthogEvent } from "@/lib/sanitize-posthog-event";
 
 posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	api_host: "/ingest",
@@ -19,8 +20,10 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	debug: false,
 	cross_subdomain_cookie: true,
 	person_profiles: "always",
+	custom_campaign_params: ["utm_id", "matchtype"],
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
+	before_send: sanitizePosthogEvent,
 });
 
 registerBaseProperties();

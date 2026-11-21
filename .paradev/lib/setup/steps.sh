@@ -1,0 +1,834 @@
+# Setup steps.
+
+# shellcheck source=../admin.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../admin.sh"
+
+step_load_env() {
+  echo "📂 Loading environment variables..."
+
+  if [ -z "${SUPERSET_ROOT_PATH:-}" ]; then
+    error "SUPERSET_ROOT_PATH not set"
+    return 1
+  fi
+
+  if [ ! -f "$SUPERSET_ROOT_PATH/.env" ]; then
+    error "Root .env file not found at $SUPERSET_ROOT_PATH/.env"
+    return 1
+  fi
+
+  set -a
+  # shellcheck source=/dev/null
+  source "$SUPERSET_ROOT_PATH/.env"
+  set +a
+
+  success "Environment variables loaded"
+  return 0
+}
+
+step_check_dependencies() {
+  echo "🔍 Checking dependencies..."
+  local missing=()
+
+  if ! command -v bun &> /dev/null; then
+    missing+=("bun (Install from https://bun.sh)")
+  fi
+
+  if ! command -v neonctl &> /dev/null; then
+    missing+=("neonctl (Run: npm install -g neonctl)")
+  fi
+
+  if ! command -v jq &> /dev/null; then
+    missing+=("jq (Run: brew install jq)")
+  fi
+
+  if [ ${#missing[@]} -gt 0 ]; then
+    error "Missing dependencies:"
+    for dep in "${missing[@]}"; do
+      echo "  - $dep"
+    done
+    return 1
+  fi
+
+  success "All dependencies found"
+  return 0
+}
+
+step_install_dependencies() {
+  echo "📥 Installing dependencies..."
+
+  if ! command -v bun &> /dev/null; then
+    error "Bun not available, skipping dependency installation"
+    return 1
+  fi
+
+  if ! bun install; then
+    error "Failed to install dependencies"
+    return 1
+  fi
+
+  success "Dependencies installed"
+  return 0
+}
+
+# RFC 3339 timestamp NEON_BRANCH_LEASE_DAYS from now, empty when no lease is set.
+neon_branch_lease_expiry() {
+  local days="${NEON_BRANCH_LEASE_DAYS:-}"
+  [ -n "$days" ] || return 0
+  date -u -d "+${days} days" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || date -u -v+"${days}"d +%Y-%m-%dT%H:%M:%SZ
+}
+
+# Push a branch's expiry NEON_BRANCH_LEASE_DAYS out. Never call
+# set-expiration without --expires-at: that removes the expiry.
+renew_neon_branch_lease() {
+  local branch_id="$1" project_id="$2"
+  local lease_expiry
+  lease_expiry="$(neon_branch_lease_expiry)"
+  [ -n "$lease_expiry" ] || return 0
+  if neonctl branches set-expiration "$branch_id" \
+      --project-id "$project_id" \
+      --expires-at "$lease_expiry" --output json > /dev/null; then
+    echo "  Lease renewed until $lease_expiry"
+  else
+    warn "Could not renew the Neon branch lease (continuing)"
+  fi
+}
+
+# Prints the id of the project's branch called $2: renews its lease when it
+# exists, else creates it (from branch $3 when given).
+find_or_create_neon_branch() {
+  local project_id="$1" name="$2" parent="${3:-}"
+  local branches_output existing_id lease_expiry
+
+  # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
+  if ! branches_output=$(neonctl branches list --project-id "$project_id" --output json); then
+    error "Failed to list Neon branches (check output above)"
+    return 1
+  fi
+
+  if ! validate_json "$branches_output" "Neon branches list"; then
+    return 1
+  fi
+
+  existing_id=$(echo "$branches_output" | jq -r --arg n "$name" '.[] | select(.name == $n) | .id // empty' 2>/dev/null)
+
+  if [ -n "$existing_id" ]; then
+    echo "  Using existing Neon branch..." >&2
+    renew_neon_branch_lease "$existing_id" "$project_id" >&2
+    printf '%s\n' "$existing_id"
+    return 0
+  fi
+
+  echo "  Creating new Neon branch..." >&2
+  lease_expiry="$(neon_branch_lease_expiry)"
+  local neon_output create_args=()
+  [ -n "$lease_expiry" ] && create_args+=(--expires-at "$lease_expiry")
+  [ -n "$parent" ] && create_args+=(--parent "$parent")
+  if ! neon_output=$(neonctl branches create \
+      --project-id "$project_id" \
+      --name "$name" \
+      ${create_args[@]+"${create_args[@]}"} \
+      --output json); then
+    error "Failed to create Neon branch (check output above)"
+    return 1
+  fi
+
+  if ! validate_json "$neon_output" "Neon branch creation"; then
+    return 1
+  fi
+
+  local new_id
+  new_id=$(echo "$neon_output" | jq -r '.branch.id // .id // empty' 2>/dev/null)
+  if [ -z "$new_id" ]; then
+    error "Branch ID not found in neonctl response"
+    echo "Response keys: $(echo "$neon_output" | jq -c 'keys' 2>/dev/null)" >&2
+    return 1
+  fi
+  printf '%s\n' "$new_id"
+}
+
+step_setup_neon_branch() {
+  echo "🗄️  Setting up Neon branch..."
+
+  NEON_PROJECT_ID="${NEON_PROJECT_ID:-}"
+  if [ -z "$NEON_PROJECT_ID" ]; then
+    error "NEON_PROJECT_ID environment variable is required"
+    return 1
+  fi
+
+  if ! command -v neonctl &> /dev/null; then
+    error "neonctl not available"
+    return 1
+  fi
+
+  if ! command -v jq &> /dev/null; then
+    error "jq not available"
+    return 1
+  fi
+
+  WORKSPACE_NAME="${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
+
+  BRANCH_ID="$(find_or_create_neon_branch "$NEON_PROJECT_ID" "$WORKSPACE_NAME")" || return 1
+
+  # Get connection strings
+  if ! DIRECT_URL=$(neonctl connection-string "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" --role-name neondb_owner); then
+    error "Failed to get direct connection string (check output above)"
+    return 1
+  fi
+
+  if ! POOLED_URL=$(neonctl connection-string "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" --role-name neondb_owner --pooled); then
+    error "Failed to get pooled connection string (check output above)"
+    return 1
+  fi
+
+  # Export for use in other steps
+  export BRANCH_ID DIRECT_URL POOLED_URL WORKSPACE_NAME
+  # An inherited env var beats bun's --env-file, so later steps would otherwise
+  # query the root .env's database instead of this branch.
+  export DATABASE_URL="$POOLED_URL" DATABASE_URL_UNPOOLED="$DIRECT_URL"
+
+  success "Neon branch ready: $WORKSPACE_NAME"
+  return 0
+}
+
+# The admin checkout's Neon project, parent branch, database and role come from the
+# environment's variables.
+ADMIN_NEON_VARS="ADMIN_NEON_PROJECT_ID ADMIN_NEON_PARENT_BRANCH ADMIN_NEON_DATABASE ADMIN_NEON_ROLE"
+
+admin_neon_missing() {
+  local var absent=""
+  for var in $ADMIN_NEON_VARS NEON_API_KEY; do
+    [ -n "${!var:-}" ] || absent+=" $var"
+  done
+  command -v neonctl &> /dev/null || absent+=" neonctl"
+  command -v jq &> /dev/null || absent+=" jq"
+  printf '%s' "${absent# }"
+}
+
+admin_connection_string() {
+  neonctl connection-string "$1" --project-id "$ADMIN_NEON_PROJECT_ID" \
+    --database-name "$ADMIN_NEON_DATABASE" --role-name "$ADMIN_NEON_ROLE" "${@:2}"
+}
+
+# Safe on every boot: installs only into a fresh checkout. A later boot that
+# cannot reach the admin branch leaves .env.workspace alone and fails.
+step_setup_admin_checkout() {
+  local dir="$1"
+  echo "🧰 Setting up the admin checkout at $dir..."
+
+  if [ -d "$dir/vendor/superset/.git" ] && [ -d "$dir/node_modules" ]; then
+    echo "  vendor/ and node_modules already present"
+  elif ! (cd "$dir" && bun run setup); then
+    error "bun run setup failed in $dir"
+    return 1
+  fi
+
+  if [ ! -e "$dir/.env" ] && [ ! -L "$dir/.env" ]; then
+    ln -s "$PARADEV_ADMIN_LIB_ROOT/.env" "$dir/.env"
+  fi
+
+  # Later lines of .env win, and the workspace's own come after the environment's.
+  local product_pooled product_direct
+  product_pooled="$(set -a; . "$PARADEV_ADMIN_LIB_ROOT/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL:-}")"
+  product_direct="$(set -a; . "$PARADEV_ADMIN_LIB_ROOT/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL_UNPOOLED:-}")"
+  if ! grep -q "^NEON_BRANCH_ID=" "$PARADEV_ADMIN_LIB_ROOT/.env" 2>/dev/null || [ -z "$product_pooled" ]; then
+    error "This workspace has no product database branch yet; not pointing the admin app at one"
+    return 1
+  fi
+
+  local kept_branch_id admin_pooled="" admin_direct="" admin_source="" branch_id="" problem=""
+  kept_branch_id="$(admin_workspace_branch_id "$dir")"
+  local missing
+  missing="$(admin_neon_missing)"
+  if [ -n "$missing" ]; then
+    problem="Not set or not installed: $missing"
+  elif branch_id="$(find_or_create_neon_branch "$ADMIN_NEON_PROJECT_ID" "$(admin_branch_name)" "$ADMIN_NEON_PARENT_BRANCH")" &&
+      admin_pooled="$(admin_connection_string "$branch_id" --pooled)" &&
+      admin_direct="$(admin_connection_string "$branch_id")"; then
+    admin_source="admin branch $(admin_branch_name)"
+  else
+    branch_id=""
+    problem="Could not get the admin branch $(admin_branch_name)"
+  fi
+
+  if [ -n "$problem" ]; then
+    if [ -n "$kept_branch_id" ]; then
+      error "$problem. Keeping $dir/.env.workspace on its branch $kept_branch_id; it was not changed"
+      return 1
+    fi
+    admin_pooled="${ADMIN_DATABASE_URL:-}"
+    admin_direct="${ADMIN_DATABASE_URL_UNPOOLED:-}"
+    if [ -n "$admin_pooled" ]; then
+      admin_source="the environment's ADMIN_DATABASE_URL (shared)"
+    else
+      admin_source="an in-memory admin database"
+    fi
+    warn "$problem. The admin app uses $admin_source"
+    step_skipped "Admin branch: not made, admin app uses $admin_source"
+  fi
+
+  local tmp
+  tmp="$(mktemp)"
+  {
+    echo "# Written by Paradev's .paradev/setup.cloud.sh on every boot: this workspace's"
+    echo "# product branch and $admin_source."
+    echo "# The environment's DATABASE_URL and ADMIN_DATABASE_URL* are also in every"
+    echo "# terminal's environment, and dotenv-cli (bun run db:migrate) does not override"
+    echo "# them: load this file first (set -a; . ./.env.workspace; set +a)."
+    write_env_var "DATABASE_URL" "$product_pooled"
+    write_env_var "DATABASE_URL_UNPOOLED" "${product_direct:-$product_pooled}"
+    if [ -n "$admin_pooled" ]; then
+      write_env_var "ADMIN_DATABASE_URL" "$admin_pooled"
+      write_env_var "ADMIN_DATABASE_URL_UNPOOLED" "${admin_direct:-$admin_pooled}"
+    fi
+    if [ -n "$branch_id" ]; then
+      write_env_var "ADMIN_NEON_BRANCH_ID" "$branch_id"
+    fi
+    if [ -n "${DEV_USER_EMAIL:-}" ]; then
+      write_env_var "DEV_USER_EMAIL" "$DEV_USER_EMAIL"
+    fi
+  } > "$tmp"
+  install -m 600 "$tmp" "$dir/.env.workspace"
+  rm -f "$tmp"
+  echo "  Wrote $dir/.env.workspace (product: this workspace's branch; admin: $admin_source)"
+
+  # Only on this workspace's own branch: never migrate the shared one.
+  if [ -n "$branch_id" ]; then
+    if (cd "$dir/app" && ADMIN_DATABASE_URL="$admin_pooled" \
+        ADMIN_DATABASE_URL_UNPOOLED="$admin_direct" bunx drizzle-kit migrate > /dev/null); then
+      echo "  Admin migrations applied"
+    else
+      error "Admin migrations failed on $(admin_branch_name)"
+      return 1
+    fi
+  fi
+
+  success "Admin checkout ready: $dir"
+  return 0
+}
+
+# Ports we must avoid because the OS (or commonly-installed services) listen on
+# them, OR because Node/Next.js refuses to bind them. Bases whose
+# [base, base+range) window contains any of these are skipped during allocation.
+#
+# - 5000, 7000: macOS Control Center / AirPlay Receiver (Sonoma+). Cannot be
+#   freed without disabling AirPlay Receiver in System Settings, so we just
+#   route around them.
+# - Node/Next.js "unsafe ports" in our [3000, ...) allocation range. Next.js
+#   refuses to start on these with errors like "Bad port: '5060' is reserved
+#   for sip" (see https://nextjs.org/docs/messages/reserved-port).
+#     3659  apple-sasl
+#     4045  lockd / npp
+#     5060  sip
+#     5061  sips
+#     6000  X11
+#     6566  sane-port
+#     6665-6669, 6697  IRC / IRC+TLS
+SUPERSET_RESERVED_PORTS="3659 4045 5000 5060 5061 6000 6566 6665 6666 6667 6668 6669 6697 7000"
+
+# Returns 0 if the [base, base+range) window contains no reserved port.
+port_base_is_safe() {
+  local base=$1
+  local range=$2
+  local reserved
+  for reserved in $SUPERSET_RESERVED_PORTS; do
+    if [ "$reserved" -ge "$base" ] && [ "$reserved" -lt "$((base + range))" ]; then
+      return 1
+    fi
+  done
+  return 0
+}
+
+# Two services on one offset surfaces much later, as EADDRINUSE from whichever
+# starts second.
+assert_unique_ports() {
+  local dupes
+  dupes=$(printf '%s\n' "$@" | sort | uniq -d)
+  if [ -n "$dupes" ]; then
+    error "Two services were assigned the same port: $(echo "$dupes" | tr '\n' ' ')"
+    return 1
+  fi
+}
+
+allocate_port_base() {
+  local alloc_file="$(prod_app_home)/port-allocations.json"
+  local lock_dir="$(prod_app_home)/port-allocations.lock"
+  local start=3000
+  local range=20
+
+  # Ensure directory and file exist
+  mkdir -p "$(prod_app_home)"
+  if [ ! -f "$alloc_file" ]; then
+    echo '{}' > "$alloc_file"
+  fi
+
+  if ! acquire_port_alloc_lock "$lock_dir" 30 300; then
+    return 1
+  fi
+
+  local key="$PWD"
+  local existing
+  if ! existing=$(jq -r --arg k "$key" '.[$k] // empty' "$alloc_file" 2>/dev/null); then
+    error "Failed to read port allocations: $alloc_file"
+    release_port_alloc_lock "$lock_dir"
+    return 1
+  fi
+
+  if [ -n "$existing" ]; then
+    if port_base_is_safe "$existing" "$range"; then
+      export SUPERSET_PORT_BASE="$existing"
+      release_port_alloc_lock "$lock_dir"
+      return 0
+    fi
+    echo "  Existing port base $existing overlaps a reserved port (${SUPERSET_RESERVED_PORTS}); reallocating..."
+    local tmp_file="${alloc_file}.tmp.$$"
+    if ! jq --arg k "$key" 'del(.[$k])' "$alloc_file" > "$tmp_file"; then
+      error "Failed to release stale port allocation"
+      rm -f "$tmp_file"
+      release_port_alloc_lock "$lock_dir"
+      return 1
+    fi
+    if ! mv "$tmp_file" "$alloc_file"; then
+      error "Failed to persist port allocation cleanup"
+      rm -f "$tmp_file"
+      release_port_alloc_lock "$lock_dir"
+      return 1
+    fi
+  fi
+
+  # Collect used port bases
+  local used
+  if ! used=$(jq -r '[.[]] | sort | .[]' "$alloc_file" 2>/dev/null); then
+    error "Failed to parse used port allocations: $alloc_file"
+    release_port_alloc_lock "$lock_dir"
+    return 1
+  fi
+
+  # Find first available slot, skipping any window that overlaps a reserved port
+  local candidate=$start
+  while echo "$used" | grep -qx "$candidate" 2>/dev/null \
+    || ! port_base_is_safe "$candidate" "$range"; do
+    candidate=$((candidate + range))
+  done
+
+  # Write allocation
+  local tmp_file="${alloc_file}.tmp.$$"
+  if ! jq --arg k "$key" --argjson v "$candidate" '. + {($k): $v}' "$alloc_file" > "$tmp_file"; then
+    error "Failed to write updated port allocations"
+    rm -f "$tmp_file"
+    release_port_alloc_lock "$lock_dir"
+    return 1
+  fi
+  if ! mv "$tmp_file" "$alloc_file"; then
+    error "Failed to persist port allocations"
+    rm -f "$tmp_file"
+    release_port_alloc_lock "$lock_dir"
+    return 1
+  fi
+
+  export SUPERSET_PORT_BASE="$candidate"
+  release_port_alloc_lock "$lock_dir"
+  return 0
+}
+
+step_write_env() {
+  echo "📝 Writing .env file..."
+
+  if [ -z "${SUPERSET_ROOT_PATH:-}" ] || [ ! -f "$SUPERSET_ROOT_PATH/.env" ]; then
+    error "Root .env file not available"
+    return 1
+  fi
+
+  # Copy root .env
+  if ! cp "$SUPERSET_ROOT_PATH/.env" .env; then
+    error "Failed to copy root .env"
+    return 1
+  fi
+
+  # Append workspace-specific values
+  {
+    echo ""
+    echo "# Workspace Identity"
+    # Stable folder-derived identity (data dir, protocol scheme, Neon branch).
+    # The dev app reads its display title live from the app home's host/*/host.db,
+    # so a later workspace rename never needs this file rewritten.
+    write_env_var "SUPERSET_WORKSPACE_NAME" "${WORKSPACE_NAME:-$(basename "$PWD")}"
+    write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
+    echo ""
+    echo "# Workspace Database (Neon Branch)"
+    if [ -n "${BRANCH_ID:-}" ]; then
+      write_env_var "NEON_BRANCH_ID" "$BRANCH_ID"
+    fi
+    if [ -n "${POOLED_URL:-}" ]; then
+      write_env_var "DATABASE_URL" "$POOLED_URL"
+    fi
+    if [ -n "${DIRECT_URL:-}" ]; then
+      write_env_var "DATABASE_URL_UNPOOLED" "$DIRECT_URL"
+    fi
+
+    # Port allocation for multi-worktree dev instances
+    # Each workspace gets a range of 20 ports from its base.
+    # Offsets: +0 web, +1 api, +2 marketing, +3 admin, +4 docs,
+    #          +5 desktop vite, +6 notifications, +7 streams, +8 streams internal,
+    #          +11 code inspector, +13 relay, +14 usercontent worker,
+    #          +18 realtime worker, +19 agents web export
+    # (+9, +10, +12 were Electric/Caddy/wrangler; retired, kept unassigned so
+    # the surviving offsets stay stable across existing allocations)
+    local BASE=$SUPERSET_PORT_BASE
+
+    # App ports (fixed offsets from base)
+    local WEB_PORT=$((BASE))
+    local API_PORT=$((BASE + 1))
+    local MARKETING_PORT=$((BASE + 2))
+    local ADMIN_PORT=$((BASE + 3))
+    local DOCS_PORT=$((BASE + 4))
+    local DESKTOP_VITE_PORT=$((BASE + 5))
+    local DESKTOP_NOTIFICATIONS_PORT=$((BASE + 6))
+    local STREAMS_PORT=$((BASE + 7))
+    local STREAMS_INTERNAL_PORT=$((BASE + 8))
+    local CODE_INSPECTOR_PORT=$((BASE + 11))
+    local RELAY_PORT=$((BASE + 13))
+    local USERCONTENT_DEV_PORT=$((BASE + 14))
+    local SANDBOX_GATE_DEV_PORT=$((BASE + 15))
+    local AGENTS_PORT=$((BASE + 19))
+    local REALTIME_PORT=$((BASE + 18))
+
+    echo ""
+    echo "# Workspace Ports (allocated from SUPERSET_PORT_BASE=$BASE, range=20)"
+    write_env_var "SUPERSET_PORT_BASE" "$BASE"
+    write_env_var "WEB_PORT" "$WEB_PORT"
+    write_env_var "API_PORT" "$API_PORT"
+    write_env_var "MARKETING_PORT" "$MARKETING_PORT"
+    write_env_var "ADMIN_PORT" "$ADMIN_PORT"
+    write_env_var "DOCS_PORT" "$DOCS_PORT"
+    write_env_var "DESKTOP_VITE_PORT" "$DESKTOP_VITE_PORT"
+    write_env_var "DESKTOP_NOTIFICATIONS_PORT" "$DESKTOP_NOTIFICATIONS_PORT"
+    write_env_var "STREAMS_PORT" "$STREAMS_PORT"
+    write_env_var "STREAMS_INTERNAL_PORT" "$STREAMS_INTERNAL_PORT"
+    write_env_var "CODE_INSPECTOR_PORT" "$CODE_INSPECTOR_PORT"
+    write_env_var "RELAY_PORT" "$RELAY_PORT"
+    write_env_var "USERCONTENT_DEV_PORT" "$USERCONTENT_DEV_PORT"
+    write_env_var "SANDBOX_GATE_DEV_PORT" "$SANDBOX_GATE_DEV_PORT"
+    write_env_var "AGENTS_PORT" "$AGENTS_PORT"
+    write_env_var "REALTIME_PORT" "$REALTIME_PORT"
+    echo ""
+    echo "# Cross-app URLs (overrides from root .env)"
+    write_env_var "NEXT_PUBLIC_API_URL" "http://localhost:$API_PORT"
+    write_env_var "NEXT_PUBLIC_WEB_URL" "http://localhost:$WEB_PORT"
+    write_env_var "NEXT_PUBLIC_MARKETING_URL" "http://localhost:$MARKETING_PORT"
+    write_env_var "NEXT_PUBLIC_ADMIN_URL" "http://localhost:$ADMIN_PORT"
+    write_env_var "NEXT_PUBLIC_DOCS_URL" "http://localhost:$DOCS_PORT"
+    write_env_var "NEXT_PUBLIC_DESKTOP_URL" "http://localhost:$DESKTOP_VITE_PORT"
+    write_env_var "NEXT_PUBLIC_RELAY_URL" "http://localhost:$RELAY_PORT"
+    write_env_var "EXPO_PUBLIC_WEB_URL" "http://localhost:$WEB_PORT"
+    write_env_var "EXPO_PUBLIC_API_URL" "http://localhost:$API_PORT"
+    write_env_var "RELAY_URL" "http://localhost:$RELAY_PORT"
+    write_env_var "NEXT_PUBLIC_RELAY_URL" "http://localhost:$RELAY_PORT"
+    write_env_var "REALTIME_URL" "http://localhost:$REALTIME_PORT"
+    write_env_var "NEXT_PUBLIC_REALTIME_URL" "http://localhost:$REALTIME_PORT"
+    write_env_var "EXPO_PUBLIC_REALTIME_URL" "http://localhost:$REALTIME_PORT"
+    write_env_var "REALTIME_NUDGE_SECRET" "fake-realtime-nudge-secret"
+    write_env_var "SUPERSET_WEB_URL" "http://localhost:$WEB_PORT"
+    write_env_var "USERCONTENT_URL" "http://frame.usercontent.localhost:$USERCONTENT_DEV_PORT"
+    write_env_var "MEDIA_URL" "http://media.usercontent.localhost:$USERCONTENT_DEV_PORT"
+    write_env_var "SANDBOX_GATE_ORIGIN" "http://127.0.0.1:$SANDBOX_GATE_DEV_PORT"
+    write_env_var "AGENTS_URL" "http://localhost:$AGENTS_PORT"
+    echo ""
+    echo "# Streams URLs (overrides from root .env)"
+    write_env_var "PORT" "$STREAMS_PORT"
+    write_env_var "STREAMS_URL" "http://localhost:$STREAMS_PORT"
+    write_env_var "NEXT_PUBLIC_STREAMS_URL" "http://localhost:$STREAMS_PORT"
+    write_env_var "EXPO_PUBLIC_STREAMS_URL" "http://localhost:$STREAMS_PORT"
+    write_env_var "STREAMS_INTERNAL_URL" "http://127.0.0.1:$STREAMS_INTERNAL_PORT"
+    write_env_var "EXPO_PUBLIC_RELAY_URL" "http://localhost:$RELAY_PORT"
+  } >> .env
+
+  success "Workspace .env written"
+
+  # Generate .paradev/ports.json for static port name mapping in the desktop app
+  local paradev_dir
+  paradev_dir="${PARADEV_SCRIPT_DIR:-$(dirname "$0")}"
+  assert_unique_ports "$WEB_PORT" "$API_PORT" "$MARKETING_PORT" "$ADMIN_PORT" \
+    "$DOCS_PORT" "$DESKTOP_VITE_PORT" "$DESKTOP_NOTIFICATIONS_PORT" "$STREAMS_PORT" \
+    "$STREAMS_INTERNAL_PORT" "$CODE_INSPECTOR_PORT" "$RELAY_PORT" "$USERCONTENT_DEV_PORT" \
+    "$SANDBOX_GATE_DEV_PORT" "$AGENTS_PORT" "$REALTIME_PORT" || return 1
+
+  cat > "$paradev_dir/ports.json" <<PORTSJSON
+{
+  "ports": [
+    { "port": $WEB_PORT, "label": "Web" },
+    { "port": $API_PORT, "label": "API" },
+    { "port": $MARKETING_PORT, "label": "Marketing" },
+    { "port": $ADMIN_PORT, "label": "Admin" },
+    { "port": $DOCS_PORT, "label": "Docs" },
+    { "port": $DESKTOP_VITE_PORT, "label": "Desktop Vite" },
+    { "port": $DESKTOP_NOTIFICATIONS_PORT, "label": "Notifications" },
+    { "port": $STREAMS_PORT, "label": "Streams" },
+    { "port": $STREAMS_INTERNAL_PORT, "label": "Streams Internal" },
+    { "port": $USERCONTENT_DEV_PORT, "label": "Usercontent Worker" },
+    { "port": $SANDBOX_GATE_DEV_PORT, "label": "Gate Worker" },
+    { "port": $AGENTS_PORT, "label": "Agents Web" },
+    { "port": $CODE_INSPECTOR_PORT, "label": "Code Inspector" }
+  ]
+}
+PORTSJSON
+  success "Port name mapping written to .paradev/ports.json"
+
+  return 0
+}
+
+step_setup_local_mcp() {
+  echo "🔌 Setting up local MCP server in .mcp.json..."
+
+  local mcp_file=".mcp.json"
+  if [ ! -f "$mcp_file" ]; then
+    warn "No .mcp.json found — skipping local MCP setup"
+    step_skipped "Setup local MCP (no .mcp.json)"
+    return 0
+  fi
+
+  if ! command -v jq &> /dev/null; then
+    error "jq not available"
+    return 1
+  fi
+
+  local api_port="${API_PORT:-$((${SUPERSET_PORT_BASE:-3000} + 1))}"
+  local local_url="http://localhost:${api_port}/api/v2/agent/mcp"
+
+  # Add or update paradev-local entry
+  local tmp_file="${mcp_file}.tmp.$$"
+  if ! jq --arg url "$local_url" '.mcpServers["paradev-local"] = {"type": "http", "url": $url} | del(.mcpServers["superset-local"])' "$mcp_file" > "$tmp_file"; then
+    error "Failed to set local MCP entry"
+    rm -f "$tmp_file"
+    return 1
+  fi
+  if ! mv "$tmp_file" "$mcp_file"; then
+    error "Failed to write $mcp_file"
+    rm -f "$tmp_file"
+    return 1
+  fi
+  success "Local MCP set to $local_url"
+
+  return 0
+}
+
+step_seed_auth_token() {
+  echo "🔑 Seeding auth token into paradev-dev-data/..."
+
+  local source_token="$(prod_app_home)/auth-token.enc"
+  local dev_data_dir="$DEV_DATA_DIR"
+  local dest_token="$dev_data_dir/auth-token.enc"
+
+  if [ ! -f "$source_token" ]; then
+    warn "No auth token found at $source_token — skipping (you'll need to sign in)"
+    step_skipped "Seed auth token (no source token)"
+    return 0
+  fi
+
+  mkdir -p "$dev_data_dir"
+  chmod 700 "$dev_data_dir"
+
+  if [ -f "$dest_token" ] && [ "$FORCE_OVERWRITE_DATA" != "1" ]; then
+    warn "Auth token already exists at $dest_token — skipping (use -f/--force)"
+    step_skipped "Seed auth token (already exists)"
+    return 0
+  fi
+
+  if ! cp "$source_token" "$dest_token"; then
+    error "Failed to copy auth token"
+    return 1
+  fi
+  chmod 600 "$dest_token"
+
+  success "Auth token seeded from $source_token"
+  return 0
+}
+
+step_seed_host_dbs() {
+  echo "🛰️  Seeding host-service DBs into paradev-dev-data/host/..."
+
+  local source_root="$(prod_app_home)/host"
+  local dev_data_dir="$DEV_DATA_DIR"
+  local dest_root="$dev_data_dir/host"
+  local force_overwrite="$FORCE_OVERWRITE_DATA"
+
+  if [ ! -d "$source_root" ]; then
+    warn "No host-service DBs found at $source_root — skipping (host-service will create fresh DBs per org)"
+    step_skipped "Seed host-service DBs (no source dir)"
+    return 0
+  fi
+
+  local org_dirs=()
+  for org_dir in "$source_root"/*/; do
+    [ -d "$org_dir" ] || continue
+    local org_id
+    org_id="$(basename "$org_dir")"
+    if [ -f "${org_dir}host.db" ]; then
+      org_dirs+=("$org_id")
+    fi
+  done
+
+  if [ ${#org_dirs[@]} -eq 0 ]; then
+    warn "No host.db files under $source_root — skipping"
+    step_skipped "Seed host-service DBs (no host.db files)"
+    return 0
+  fi
+
+  mkdir -p "$dest_root"
+  chmod 700 "$dev_data_dir" "$dest_root"
+
+  local seeded=0
+  local skipped=0
+  for org_id in "${org_dirs[@]}"; do
+    local source_db="$source_root/$org_id/host.db"
+    local dest_org_dir="$dest_root/$org_id"
+    local dest_db="$dest_org_dir/host.db"
+
+    if [ -f "$dest_db" ] && [ "$force_overwrite" != "1" ]; then
+      warn "Host DB already exists at $dest_db — skipping (use -f/--force)"
+      skipped=$((skipped + 1))
+      continue
+    fi
+
+    mkdir -p "$dest_org_dir"
+    chmod 700 "$dest_org_dir"
+
+    # Clear stale WAL siblings when overwriting so we don't mix old WAL
+    # data with a freshly-copied DB (their page pointers won't match).
+    if [ "$force_overwrite" = "1" ]; then
+      rm -f "$dest_db" "${dest_db}-shm" "${dest_db}-wal"
+    fi
+
+    # Copy all SQLite files so WAL data isn't lost when source is held open.
+    local copy_failed=0
+    for ext in "" "-shm" "-wal"; do
+      local source_file="${source_db}${ext}"
+      local dest_file="${dest_db}${ext}"
+
+      if [ -f "$source_file" ]; then
+        if ! cp "$source_file" "$dest_file"; then
+          error "Failed to copy $source_file to $dest_file"
+          copy_failed=1
+          break
+        fi
+        chmod 600 "$dest_file"
+      fi
+    done
+
+    if [ "$copy_failed" = "1" ]; then
+      # A lone host.db without its -wal/-shm siblings would make the next
+      # non-force run think this org is already seeded and skip it.
+      rm -f "$dest_db" "${dest_db}-shm" "${dest_db}-wal"
+      return 1
+    fi
+
+    # Checkpoint the copy's WAL (no lock contention since nothing else has it open).
+    if command -v sqlite3 &> /dev/null; then
+      sqlite3 "$dest_db" "PRAGMA wal_checkpoint(TRUNCATE);" &> /dev/null || true
+    fi
+
+    seeded=$((seeded + 1))
+  done
+
+  success "Host-service DBs seeded ($seeded copied, $skipped skipped) from $source_root"
+  return 0
+}
+
+step_seed_local_db() {
+  echo "💾 Seeding local DB into paradev-dev-data/..."
+
+  local source_db="$(prod_app_home)/local.db"
+  local dev_data_dir="$DEV_DATA_DIR"
+  local dest_db="$dev_data_dir/local.db"
+  local force_overwrite="$FORCE_OVERWRITE_DATA"
+
+  if [ "$force_overwrite" = "1" ] && [ -d "$dev_data_dir" ]; then
+    warn "Force overwrite enabled — removing existing $dev_data_dir/"
+    if ! rm -rf "$dev_data_dir"; then
+      error "Failed to remove existing $dev_data_dir/"
+      return 1
+    fi
+  fi
+
+  if [ ! -f "$source_db" ]; then
+    warn "No source local.db found at $source_db — skipping (app will create a fresh one)"
+    step_skipped "Seed local DB (no source DB)"
+    return 0
+  fi
+
+  if [ -f "$dest_db" ] && [ "$force_overwrite" != "1" ]; then
+    warn "Destination DB already exists at $dest_db — skipping seed (use -f/--force)"
+    step_skipped "Seed local DB (already exists)"
+    return 0
+  fi
+
+  mkdir -p "$dev_data_dir"
+  chmod 700 "$dev_data_dir"
+
+  # Copy all SQLite files so WAL data isn't lost when source is held open.
+  for ext in "" "-shm" "-wal"; do
+    local source_file="${source_db}${ext}"
+    local dest_file="${dest_db}${ext}"
+
+    if [ -f "$source_file" ]; then
+      if ! cp "$source_file" "$dest_file"; then
+        error "Failed to copy $source_file to $dest_file"
+        return 1
+      fi
+      chmod 600 "$dest_file"
+    fi
+  done
+
+  # Checkpoint the copy's WAL (no lock contention since nothing else has it open).
+  if command -v sqlite3 &> /dev/null; then
+    sqlite3 "$dest_db" "PRAGMA wal_checkpoint(TRUNCATE);" &> /dev/null || true
+  fi
+
+  success "Local DB seeded from $source_db"
+  return 0
+}
+
+step_seed_env_placeholders() {
+  echo "🧩 Seeding placeholders for keys missing from .env..."
+  seed_missing_env_placeholders ".env.local.example" ".env"
+}
+
+# The API validates its env with zod at module load; a missing key turns every
+# /api/trpc response into Next's HTML 500 and the desktop renders blank. Catch
+# that here, where the zod issues name the keys, instead of at first boot.
+step_validate_env() {
+  echo "🔎 Validating .env against the API env schemas..."
+
+  if ! command -v bun &> /dev/null; then
+    error "bun not available"
+    return 1
+  fi
+  if [ ! -f .env ]; then
+    error ".env not found"
+    return 1
+  fi
+
+  if ! env -u SKIP_ENV_VALIDATION bun --env-file=.env -e \
+      'await import("./packages/trpc/src/env.ts"); await import("./apps/api/src/env.ts");'; then
+    error ".env is missing a key the API requires (issues above). Give it a fake value in .env.local.example and re-run setup, which seeds it."
+    return 1
+  fi
+
+  success ".env satisfies packages/trpc/src/env.ts and apps/api/src/env.ts"
+  return 0
+}
+
+# A no-op anywhere this machine has never signed into desktop — see
+# packages/auth/src/seed-local-mobile-token.ts. Never worth failing setup over.
+step_seed_local_mobile_token() {
+  echo "📱 Seeding mobile dev sign-in token..."
+
+  if ! NODE_ENV=development bun --env-file=.env run packages/auth/src/seed-local-mobile-token.ts; then
+    warn "Could not seed a mobile dev sign-in token (non-fatal)"
+    step_skipped "Seed mobile dev token"
+    return 0
+  fi
+
+  success "Mobile dev sign-in token step complete"
+  return 0
+}

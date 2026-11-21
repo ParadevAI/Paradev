@@ -1,1 +1,6 @@
-export { PortForwardsProvider, usePortForward } from "./PortForwardsProvider";
+export {
+	PortForwardsProvider,
+	useExplicitForwards,
+	usePortForward,
+	usePortForwardLookup,
+} from "./PortForwardsProvider";

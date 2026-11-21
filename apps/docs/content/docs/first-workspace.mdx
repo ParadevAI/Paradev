@@ -3,7 +3,7 @@ title: Your First Parallel Session
 description: Go from install to three agents working in parallel, then ship the best result
 ---
 
-In about ten minutes you'll add a repo, put three agents to work on isolated branches, and merge the winner.
+In about ten minutes you'll add a repo, put three agents to work on separate branches, and merge the winner.
 
 ## 1. Add a Repository
 
@@ -13,15 +13,16 @@ Add your repo from a local folder or clone a remote repository. In the clone dia
 
 ## 2. Create a Workspace with a Prompt
 
-Press **⌘N** to create an isolated git worktree on its own branch.
+Press **⌘N** to create a new git worktree on its own branch.
 
 In the prompt-first flow, describe the task, pick an agent, and create. The agent starts working on your prompt immediately.
 
 A good first prompt if your repo needs dependencies or env files:
 
 ```text
-Set up this project for Superset. Read docs.superset.sh/setup-teardown-scripts
-and docs.superset.sh/ports, then author a .superset/config.json for this repo.
+Set up this project for Paradev. Read docs.paradev.com/setup-teardown-scripts
+and docs.paradev.com/ports, then author a .paradev/config.json for this repo (if it already has config in
+.superset/, edit that instead).
 ```
 
 Future workspaces will then install dependencies and copy env files automatically via [project lifecycle scripts](/setup-teardown-scripts).

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import matter from "gray-matter";
 import {
 	getAllSlugs,
 	getBlogPost,
@@ -6,13 +8,26 @@ import {
 	getListedBlogPosts,
 	getRelatedPosts,
 } from "./blog";
+import { extractComparisonFaqItems } from "./compare-utils";
 
 const unlistedSlugs = [
-	"claude-code-codex-iphone",
-	"scheduled-agent-maintenance",
-	"parallel-coding-agents-guide",
-	"superset-mobile",
+	"change-ui-with-your-coding-agent",
+	"send-pr-feedback-to-your-agent",
+	"review-agent-work-with-pages",
 ];
+
+test("preserves recorded blog updates without generating missing dates", () => {
+	for (const post of getBlogPosts()) {
+		const { data } = matter(
+			readFileSync(`content/blog/${post.slug}.mdx`, "utf8"),
+		);
+		expect(post.lastUpdated).toBe(
+			data.lastUpdated
+				? new Date(data.lastUpdated).toISOString().slice(0, 10)
+				: undefined,
+		);
+	}
+});
 
 describe("unlisted blog posts", () => {
 	test("remain published for direct routes, sitemaps, and LLM discovery", () => {
@@ -39,4 +54,12 @@ describe("unlisted blog posts", () => {
 			),
 		).toBe(false);
 	});
+});
+
+test("posts with a frontmatter FAQ do not repeat it in the body", () => {
+	for (const post of getBlogPosts()) {
+		if (!post.faq) continue;
+		expect(post.faq.length).toBeGreaterThan(0);
+		expect(extractComparisonFaqItems(post.content)).toEqual([]);
+	}
 });

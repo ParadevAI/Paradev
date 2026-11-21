@@ -2,6 +2,11 @@
 
 Branch: `debug-terminal-scrollback` (PR #5563). Status: implemented and verified — manual pass and CDP pass both complete.
 
+> **SUPERSEDED (2026-10-13, PR #8456).** Terminals now set no `TERM_PROGRAM`.
+> Claude Code picks its wheel mode from the XTVERSION reply (`xterm.js`), so
+> the kitty claim is no longer needed, and it made agents take kitty-only
+> paths (#8137, #7600). `TERMINAL_TERM_PROGRAM*` no longer exist.
+
 > **SUPERSEDED (2026-07-11).** The vscode identity fixed scroll *distance* but
 > not *cadence*: xterm.js still emitted ~one damped report per third wheel
 > event, and Claude compensated with multi-line jumps per report (chunky

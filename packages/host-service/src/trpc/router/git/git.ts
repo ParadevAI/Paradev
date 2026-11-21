@@ -9,17 +9,24 @@ import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
+	gitCheckoutBranchTask,
 	gitCommitFilesTask,
 	gitCommitTask,
 	gitDiffBulkTask,
 	gitDiffPatchTask,
 	gitDiffSideBlobTask,
 	gitFetchBaseRefTask,
+	gitFetchBranchesTask,
 	gitPushTask,
 	gitStagePathsTask,
 	gitStatusPartialTask,
 	gitStatusSnapshotTask,
 } from "../../../workers/tasks/git";
+import {
+	getLocalWorkspace,
+	updateLocalWorkspace,
+} from "../../../workspaces/local-workspace-store";
+import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
 import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
@@ -128,16 +135,43 @@ function invalidateStatus(workspaceId: string): void {
 	gitStatusStore.recordChange(workspaceId, undefined);
 }
 
+// A name git could read as an option (`--upload-pack=...`) never reaches it.
+const branchName = z
+	.string()
+	.min(1)
+	.refine((name) => !name.startsWith("-"), "Not a branch name");
+
+const CHECKOUT_REFUSALS = {
+	dirty: {
+		code: "PRECONDITION_FAILED",
+		message: () => "Commit or discard the changes in this workspace first.",
+	},
+	"held-elsewhere": {
+		code: "CONFLICT",
+		message: (branch: string) =>
+			`${branch} is checked out in another workspace.`,
+	},
+	"fetch-failed": {
+		code: "INTERNAL_SERVER_ERROR",
+		message: (branch: string) => `Could not fetch ${branch} from origin.`,
+	},
+	"not-found": {
+		code: "NOT_FOUND",
+		message: (branch: string) => `No branch ${branch} here or on origin.`,
+	},
+} as const;
+
 function runStatusSnapshot(
 	ctx: Parameters<typeof resolveWorktreePath>[0] &
-		Pick<HostServiceContext, "credentials">,
+		Pick<HostServiceContext, "credentials" | "eventBus">,
 	input: {
 		workspaceId: string;
 		baseBranch?: string;
 		priority?: "foreground" | "background";
 	},
 ) {
-	const requestKey = JSON.stringify({ baseBranch: input.baseBranch ?? null });
+	const baseBranch = input.baseBranch || undefined;
+	const requestKey = JSON.stringify({ baseBranch: baseBranch ?? null });
 	return gitStatusRefreshLimiter.run({
 		workspaceId: input.workspaceId,
 		requestKey,
@@ -148,35 +182,48 @@ function runStatusSnapshot(
 			const workerPool = getHostWorkerPool();
 
 			const computeFull = async () => {
+				const snapshotStartedAt = Date.now();
 				const result = await workerPool.run(
 					gitStatusSnapshotTask,
-					{ worktreePath, baseBranch: input.baseBranch, gitEnv },
+					{ worktreePath, baseBranch, gitEnv },
 					{ timeoutMs: 15_000 },
 				);
 				if (result.baseRefFetchTarget) {
 					const target = result.baseRefFetchTarget;
-					const coordinatorGit = createUserSimpleGit(worktreePath).env(gitEnv);
+					const coordinatorGit = createUserSimpleGit(worktreePath, {
+						env: gitEnv,
+					});
 					// The coordinator maps live in this process, not in individual
 					// workers, so worktrees sharing one common Git dir share one TTL
 					// and in-flight fetch. The network fetch itself remains off-loop.
-					scheduleBaseRefFetch(coordinatorGit, worktreePath, target, () =>
-						workerPool.run(
-							gitFetchBaseRefTask,
-							{ worktreePath, target, gitEnv },
-							{
-								timeoutMs: 30_000,
-								strategy: "coalesce",
-								dedupeKey: `${worktreePath}:base-ref:${target.remote}/${target.branch}`,
-							},
-						),
-					);
+					void scheduleBaseRefFetch(
+						coordinatorGit,
+						worktreePath,
+						target,
+						{ workspaceId: input.workspaceId, snapshotStartedAt },
+						() =>
+							workerPool.run(
+								gitFetchBaseRefTask,
+								{ worktreePath, target, gitEnv },
+								{
+									timeoutMs: 30_000,
+									strategy: "coalesce",
+									dedupeKey: `${worktreePath}:base-ref:${target.remote}/${target.branch}`,
+								},
+							),
+					).then((staleWorkspaceIds) => {
+						for (const workspaceId of staleWorkspaceIds) {
+							invalidateStatus(workspaceId);
+							ctx.eventBus.broadcastGitChanged(workspaceId);
+						}
+					});
 				}
 				return result.snapshot;
 			};
 
 			return gitStatusStore.read({
 				workspaceId: input.workspaceId,
-				baseBranch: input.baseBranch ?? null,
+				baseBranch: baseBranch ?? null,
 				computeFull,
 				computePartial: (paths) =>
 					workerPool.run(
@@ -492,8 +539,19 @@ export const gitRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const git = await ctx.git(worktreePath);
+			// Background naming may have renamed the branch after the caller
+			// read it. Only then does the caller's name no longer exist, and
+			// the row holds the branch the workspace has now. The row can lag
+			// a checkout, so an existing name is always taken as given.
+			const callerBranchExists =
+				(await git.raw(["branch", "--list", input.oldName])).trim() !== "";
+			const oldName = callerBranchExists
+				? input.oldName
+				: (getLocalWorkspace(ctx.db, input.workspaceId)?.branch ??
+					input.oldName);
 
 			// Check if branch has been pushed to remote
 			try {
@@ -501,7 +559,7 @@ export const gitRouter = router({
 					"ls-remote",
 					"--heads",
 					"origin",
-					input.oldName,
+					oldName,
 				]);
 				if (remote.trim()) {
 					throw new TRPCError({
@@ -514,9 +572,78 @@ export const gitRouter = router({
 				// ls-remote failed — probably no remote, safe to rename
 			}
 
-			await git.raw(["branch", "-m", input.oldName, input.newName]);
+			await git.raw(["branch", "-m", oldName, input.newName]);
 			invalidateStatus(input.workspaceId);
 			return { name: input.newName };
+		}),
+
+	/**
+	 * Moves the workspace onto another branch of its repository. A branch that
+	 * only exists on the remote is fetched first; `git switch` then creates the
+	 * tracking branch. Refused while the tree is dirty, because the switch
+	 * would carry the changes along, and while another worktree holds the
+	 * branch, because git allows a branch in one worktree at a time.
+	 */
+	checkoutBranch: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), branch: branchName }))
+		.mutation(async ({ ctx, input }) => {
+			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			const result = await getHostWorkerPool()
+				.run(
+					gitCheckoutBranchTask,
+					{ worktreePath, branch: input.branch, gitEnv },
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
+					rethrowEnvironmentalGitError(error);
+					throw error;
+				});
+			if (!result.ok) {
+				const refusal = CHECKOUT_REFUSALS[result.reason];
+				throw new TRPCError({
+					code: refusal.code,
+					message: refusal.message(input.branch),
+				});
+			}
+			updateLocalWorkspace(
+				{ db: ctx.db, eventBus: ctx.eventBus, userId: ctx.userId },
+				input.workspaceId,
+				{ branch: input.branch },
+			);
+			invalidateStatus(input.workspaceId);
+			return { branch: input.branch };
+		}),
+
+	fetchBranches: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				branches: z.array(branchName).max(20),
+				missingOnly: z.boolean().default(false),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			const result = await getHostWorkerPool()
+				.run(
+					gitFetchBranchesTask,
+					{
+						worktreePath,
+						branches: input.branches,
+						missingOnly: input.missingOnly,
+						gitEnv,
+					},
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
+					rethrowEnvironmentalGitError(error);
+					throw error;
+				});
+			if (result.fetched.length > 0) invalidateStatus(input.workspaceId);
+			return result;
 		}),
 
 	discardChanges: protectedProcedure
@@ -880,6 +1007,13 @@ export const gitRouter = router({
 				)
 				.catch((error: unknown) => {
 					rethrowEnvironmentalGitError(error);
+					if (error instanceof Error && error.name === "BaseRefMissingError") {
+						throw new TRPCError({
+							code: "NOT_FOUND",
+							message: error.message,
+							cause: { kind: "BASE_REF_MISSING" },
+						});
+					}
 					throw error;
 				});
 		}),
@@ -1061,6 +1195,7 @@ export const gitRouter = router({
 			return { logs: typeof data === "string" ? data : String(data) };
 		}),
 
+	/** @deprecated Use the API's `integration.github.getPullRequestThreads`, which acts as the viewer. Kept for released clients. */
 	getPullRequestThreads: queryProcedure
 		.meta({ timeoutMs: 30_000 })
 		.input(z.object({ workspaceId: z.string() }))
@@ -1164,6 +1299,7 @@ export const gitRouter = router({
 			return { reviewThreads, conversationComments };
 		}),
 
+	/** @deprecated Use the API's `integration.github.setPullRequestThreadResolution`, which acts as the viewer. Kept for released clients. */
 	setReviewThreadResolution: protectedProcedure
 		.input(
 			z.object({
@@ -1211,6 +1347,8 @@ export const gitRouter = router({
 	 * Replies into a review thread on the workspace's linked PR. Threads onto
 	 * `commentId` — a REST databaseId from getPullRequestThreads — which
 	 * GitHub accepts for any comment already in the thread.
+	 *
+	 * @deprecated Use the API's `integration.github.replyToPullRequestThread`, which acts as the viewer. Kept for released clients.
 	 */
 	replyToReviewThread: protectedProcedure
 		.input(

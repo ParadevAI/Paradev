@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import {
@@ -12,6 +13,7 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import {
 	Building2,
+	Copy,
 	Globe,
 	Link2,
 	Lock,
@@ -20,8 +22,13 @@ import {
 	PinOff,
 	Trash2,
 } from "lucide-react";
-import { type MouseEvent, useState } from "react";
-import { PageThumbnail } from "./components/PageThumbnail";
+import { type MouseEvent, useId, useRef, useState } from "react";
+import { useNow } from "renderer/hooks/useNow";
+import { PageThumbnail } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
+import { CommentCount } from "./components/CommentCount";
+import { CommentPreviewPanel } from "./components/CommentPreviewPanel";
+import { useCommentPreview } from "./hooks/useCommentPreview";
+import type { PageCardCommentPreview } from "./types";
 
 export interface PageCardItem {
 	id: string;
@@ -36,6 +43,8 @@ export interface PageCardItem {
 	sharedVersion: number | null;
 	createdByUserId: string | null;
 	ownerName: string | null;
+	commentCount: number;
+	commentPreview: PageCardCommentPreview | null;
 }
 
 interface PageCardProps {
@@ -45,6 +54,7 @@ interface PageCardProps {
 	onOpen: (page: PageCardItem, event: MouseEvent) => void;
 	onTogglePin: (pageId: string) => void;
 	onDelete: (pageId: string) => Promise<void>;
+	onDuplicate: (pageId: string, title: string) => Promise<void>;
 }
 
 export function PageCard({
@@ -54,7 +64,9 @@ export function PageCard({
 	onOpen,
 	onTogglePin,
 	onDelete,
+	onDuplicate,
 }: PageCardProps) {
+	const now = useNow(60_000);
 	const { formatRelativeTime } = useFormat();
 
 	const { t } = useLingui();
@@ -71,7 +83,30 @@ export function PageCard({
 	const edited = new Date(page.updatedAt).getTime();
 	const created = new Date(page.createdAt).getTime();
 	const wasEdited = edited - created > 60_000;
-	const timestamp = formatRelativeTime(wasEdited ? edited : created);
+	const timestamp = formatRelativeTime(wasEdited ? edited : created, now);
+
+	const preview = page.commentPreview;
+	const trigger = useCommentPreview({ eligible: preview !== null });
+	const panelDomId = useId();
+
+	const duplicating = useRef(false);
+	const duplicate = async () => {
+		if (duplicating.current) return;
+		duplicating.current = true;
+		const title = page.title;
+		try {
+			await onDuplicate(
+				page.id,
+				t({ message: `${title} (copy)` }).slice(0, 200),
+			);
+		} catch (error) {
+			toast.error(
+				errorMessage(error, t({ message: "Could not duplicate this page" })),
+			);
+		} finally {
+			duplicating.current = false;
+		}
+	};
 
 	const copyLink = async () => {
 		try {
@@ -91,31 +126,67 @@ export function PageCard({
 	};
 
 	return (
-		<div className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-muted-foreground/30">
-			<button
-				type="button"
-				onClick={(event) => onOpen(page, event)}
-				className="flex flex-1 flex-col text-left"
-			>
-				<PageThumbnail src={page.thumbnailUrl} />
-				<div className="flex flex-col gap-1 border-border/60 border-t px-3 py-2.5">
-					<span className="truncate font-medium text-sm">{page.title}</span>
-					<span className="flex items-center gap-1.5 text-muted-foreground text-xs">
-						<VisibilityIcon className="size-3 shrink-0" />
-						<span aria-hidden="true">·</span>
-						<span className="truncate">
-							{wasEdited ? <Trans>Edited</Trans> : <Trans>Created</Trans>}{" "}
-							{timestamp}
-						</span>
-						{ownerName ? (
-							<>
-								<span aria-hidden="true">·</span>
-								<span className="truncate">{ownerName}</span>
-							</>
-						) : null}
-					</span>
+		<div
+			ref={trigger.cardRef}
+			className={cn(
+				"group relative flex flex-col rounded-lg border border-border bg-card transition-colors hover:border-muted-foreground/30",
+				trigger.open && "z-10",
+			)}
+			{...trigger.cardProps}
+		>
+			<div className="relative">
+				<div aria-hidden="true" className="overflow-hidden rounded-t-[7px]">
+					<PageThumbnail src={page.thumbnailUrl} />
 				</div>
-			</button>
+				{preview ? (
+					<CommentPreviewPanel
+						slug={page.slug}
+						preview={preview}
+						panelId={panelDomId}
+						open={trigger.open}
+						triggerProps={trigger.panelProps}
+					/>
+				) : null}
+			</div>
+
+			<div className="flex flex-col gap-1 border-border/60 border-t px-3 py-2.5">
+				<div className="flex items-center justify-between gap-2">
+					<button
+						type="button"
+						onClick={(event) => onOpen(page, event)}
+						className="min-w-0 flex-1 text-left after:absolute after:inset-0 after:rounded-lg focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
+					>
+						<span className="block truncate font-medium text-sm">
+							{page.title}
+						</span>
+					</button>
+					{page.commentCount > 0 ? (
+						<CommentCount
+							slug={page.slug}
+							count={page.commentCount}
+							unread={preview?.unread ?? false}
+							open={trigger.open}
+							panelId={preview ? panelDomId : undefined}
+							countRef={trigger.countRef}
+							triggerProps={trigger.countProps}
+						/>
+					) : null}
+				</div>
+				<span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+					<VisibilityIcon className="size-3 shrink-0" />
+					<span aria-hidden="true">·</span>
+					<span className="truncate">
+						{wasEdited ? <Trans>Edited</Trans> : <Trans>Created</Trans>}{" "}
+						{timestamp}
+					</span>
+					{ownerName ? (
+						<>
+							<span aria-hidden="true">·</span>
+							<span className="truncate">{ownerName}</span>
+						</>
+					) : null}
+				</span>
+			</div>
 
 			{isPinned && (
 				<Pin className="absolute top-2 left-2 size-3.5 fill-current text-muted-foreground" />
@@ -131,7 +202,7 @@ export function PageCard({
 							message: `Actions for ${page.title}`,
 						})}
 						className={cn(
-							"absolute top-2 right-2 size-7 bg-background/80 backdrop-blur transition-opacity",
+							"absolute top-2 right-2 size-7 bg-background/90 transition-opacity",
 							"opacity-0 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100",
 						)}
 					>
@@ -150,6 +221,10 @@ export function PageCard({
 					<DropdownMenuItem onSelect={() => void copyLink()}>
 						<Link2 className="size-4" />
 						<Trans>Copy link</Trans>
+					</DropdownMenuItem>
+					<DropdownMenuItem onSelect={() => void duplicate()}>
+						<Copy className="size-4" />
+						<Trans>Duplicate</Trans>
 					</DropdownMenuItem>
 					{isOwner ? (
 						<DropdownMenuItem

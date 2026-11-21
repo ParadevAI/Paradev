@@ -1,9 +1,11 @@
+import { setPluginEnabled } from "@superset/agent-setup";
 import { positional, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
+import { withPluginHints } from "../../../lib/plugins/errors";
 import { resolvePluginRef } from "../../../lib/plugins/host";
-import { setPluginEnabled } from "../../../lib/plugins/install";
 
 export default command({
+	sandbox: false,
 	description: "Disable an installed plugin without dropping it",
 	args: [
 		positional("plugin")
@@ -21,7 +23,9 @@ export default command({
 			options.marketplace as string | undefined,
 		);
 
-		const updated = await setPluginEnabled(name, false, marketplace);
+		const updated = await withPluginHints(() =>
+			setPluginEnabled(name, false, marketplace),
+		);
 
 		let accountError: string | null = null;
 		try {

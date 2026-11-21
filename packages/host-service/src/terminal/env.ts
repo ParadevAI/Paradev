@@ -20,10 +20,8 @@ export {
 
 import fs from "node:fs";
 import os from "node:os";
-import {
-	TERMINAL_TERM_PROGRAM,
-	TERMINAL_TERM_PROGRAM_VERSION,
-} from "@superset/shared/constants";
+import { resolveAppHomeDir } from "@superset/agent-setup";
+import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
 	augmentPathForMacOS,
@@ -31,7 +29,7 @@ import {
 	getStrictShellEnvironment,
 } from "./clean-shell-env.ts";
 import { stripTerminalRuntimeEnv } from "./env-strip.ts";
-import { getShellBootstrapEnv } from "./shell-launch.ts";
+import { getShellBootstrapEnv, resolveLaunchShell } from "./shell-launch.ts";
 
 const MACOS_SYSTEM_CERT_FILE = "/etc/ssl/cert.pem";
 let cachedMacosSystemCertAvailable: boolean | null = null;
@@ -42,6 +40,9 @@ let cachedMacosSystemCertAvailable: boolean | null = null;
  * variables. Node ignores the system store without them, so an agent in a
  * terminal that lost them fails every model call with a certificate error.
  */
+/** `client_ip client_port server_ip server_port`, as sshd sets it. */
+const SANDBOX_SSH_CONNECTION = "127.0.0.1 0 127.0.0.1 0";
+
 const SANDBOX_FIREWALL_CA_KEYS = [
 	"NODE_EXTRA_CA_CERTS",
 	"NODE_USE_SYSTEM_CA",
@@ -193,8 +194,6 @@ interface BuildV2TerminalEnvParams {
 	workspacePath: string;
 	rootPath: string;
 	supersetEnv: "development" | "production";
-	agentHookPort: string;
-	agentHookVersion: string;
 	/**
 	 * tRPC URL for the host-service notifications.hook mutation.
 	 * Endpoint is unauthenticated by design — it broadcasts chimes and
@@ -202,6 +201,39 @@ interface BuildV2TerminalEnvParams {
 	 * forward-only). See the router for rationale.
 	 */
 	hostAgentHookUrl?: string;
+}
+
+/**
+ * The env for anything this host launches on the user's behalf, PTY or not.
+ * Everything a caller cannot know better than the host — the shell snapshot,
+ * the launch shell, the org and run mode — is filled in here so a second
+ * launch path cannot drift from the terminal's.
+ */
+export function buildHostLaunchEnv(params: {
+	cwd: string;
+	workspaceId: string;
+	workspacePath: string;
+	rootPath: string;
+	terminalId?: string;
+	themeType?: "dark" | "light";
+	hostAgentHookUrl?: string;
+}): Record<string, string> {
+	const baseEnv = getTerminalBaseEnv();
+	return buildV2TerminalEnv({
+		baseEnv,
+		shell: resolveLaunchShell(baseEnv),
+		supersetHomeDir: resolveAppHomeDir(),
+		organizationId: process.env.ORGANIZATION_ID || "",
+		themeType: params.themeType,
+		cwd: params.cwd,
+		terminalId: params.terminalId ?? "",
+		workspaceId: params.workspaceId,
+		workspacePath: params.workspacePath,
+		rootPath: params.rootPath,
+		supersetEnv:
+			process.env.NODE_ENV === "development" ? "development" : "production",
+		hostAgentHookUrl: params.hostAgentHookUrl,
+	});
 }
 
 /**
@@ -223,8 +255,6 @@ export function buildV2TerminalEnv(
 		workspacePath,
 		rootPath,
 		supersetEnv,
-		agentHookPort,
-		agentHookVersion,
 		hostAgentHookUrl,
 	} = params;
 
@@ -236,13 +266,7 @@ export function buildV2TerminalEnv(
 
 	env.TERM = "xterm-256color";
 	env.SHELL = shell;
-	// See TERMINAL_TERM_PROGRAM for why we identify as kitty: the client's
-	// full-fidelity wheel handler produces a native-grade report stream that
-	// TUIs must trust as-is, not amplify with vscode-style compensation.
-	// Shift+Enter does NOT depend on this: line-edit-translations.ts sends
-	// ESC+CR directly.
-	env.TERM_PROGRAM = TERMINAL_TERM_PROGRAM;
-	env.TERM_PROGRAM_VERSION = TERMINAL_TERM_PROGRAM_VERSION;
+	for (const key of TERMINAL_IDENTITY_ENV_KEYS) delete env[key];
 	env.COLORTERM = "truecolor";
 	env.COLORFGBG = themeType === "light" ? "0;15" : "15;0";
 	// TERM_THEME is an explicit light/dark hint that cursor-agent (and other
@@ -275,13 +299,9 @@ export function buildV2TerminalEnv(
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;
 	env.SUPERSET_ENV = supersetEnv;
-	env.SUPERSET_AGENT_HOOK_PORT = agentHookPort;
-	env.SUPERSET_AGENT_HOOK_VERSION = agentHookVersion;
-	// v2 — agent posts to host-service so the renderer can play the sound
-	// client-side. No auth token: the endpoint is unauthenticated by design
-	// (chimes plus an idempotent linked-task In Progress nudge). The
-	// notify-hook script falls back to the electron endpoint when this URL
-	// isn't set.
+	// Agent hooks post here; without it the notify-hook script finds the
+	// host-service through the host manifests. No auth token: the endpoint is
+	// unauthenticated by design (chimes plus an idempotent linked-task nudge).
 	if (hostAgentHookUrl) {
 		env.SUPERSET_HOST_AGENT_HOOK_URL = hostAgentHookUrl;
 	}
@@ -302,6 +322,9 @@ export function buildV2TerminalEnv(
 		// Claude refuses `--dangerously-skip-permissions` unless told it is
 		// inside a sandbox, which is exactly what this is.
 		env.IS_SANDBOX = "1";
+		// The box's X display is real but nobody sees it. TUIs (Codex, Claude
+		// Code) send a copy to the user's terminal over OSC 52 only under SSH.
+		env.SSH_CONNECTION ??= SANDBOX_SSH_CONNECTION;
 	}
 
 	// Electron child processes can't access macOS Keychain for TLS cert verification,

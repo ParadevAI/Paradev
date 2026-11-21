@@ -14,6 +14,7 @@ import type {
 	AgentPresetOverrideEnvelope,
 	BranchPrefixMode,
 	ExternalApp,
+	FileAutoSaveMode,
 	FileOpenMode,
 	GitHubStatus,
 	GitStatus,
@@ -228,6 +229,7 @@ export const settings = sqliteTable("settings", {
 	notificationVolume: integer("notification_volume"),
 	deleteLocalBranch: integer("delete_local_branch", { mode: "boolean" }),
 	fileOpenMode: text("file_open_mode").$type<FileOpenMode>(),
+	fileAutoSave: text("file_auto_save").$type<FileAutoSaveMode>(),
 	showPresetsBar: integer("show_presets_bar", { mode: "boolean" }),
 	useCompactTerminalAddButton: integer("use_compact_terminal_add_button", {
 		mode: "boolean",
@@ -269,6 +271,9 @@ export const settings = sqliteTable("settings", {
 		InstalledPlugin[]
 	>(),
 	disabledSkills: text("disabled_skills", { mode: "json" }).$type<string[]>(),
+	browserPinnedExtensions: text("browser_pinned_extensions", {
+		mode: "json",
+	}).$type<string[]>(),
 });
 
 export type InsertSettings = typeof settings.$inferInsert;
@@ -493,9 +498,10 @@ export type InsertDownload = typeof downloads.$inferInsert;
 export type SelectDownload = typeof downloads.$inferSelect;
 
 /**
- * Screenshots table - tracks page captures taken from the in-app browser
- * pane's overflow menu. The PNG lives on disk; this row is metadata plus a
- * small thumbnail so a gallery can render without reading every file.
+ * Screenshots table - tracks captures from the in-app browser pane (`url`)
+ * and from mobile devices (`deviceKey`). The PNG lives on disk; this row is
+ * metadata plus a small thumbnail so a gallery can render without reading
+ * every file.
  */
 export const screenshots = sqliteTable(
 	"screenshots",
@@ -503,7 +509,8 @@ export const screenshots = sqliteTable(
 		id: text("id")
 			.primaryKey()
 			.$defaultFn(() => uuidv4()),
-		url: text("url").notNull(),
+		url: text("url"),
+		deviceKey: text("device_key"),
 		filename: text("filename").notNull(),
 		savePath: text("save_path").notNull(),
 		width: integer("width").notNull(),
@@ -513,7 +520,13 @@ export const screenshots = sqliteTable(
 			.notNull()
 			.$defaultFn(() => Date.now()),
 	},
-	(table) => [index("screenshots_captured_at_idx").on(table.capturedAt)],
+	(table) => [
+		index("screenshots_captured_at_idx").on(table.capturedAt),
+		index("screenshots_device_key_captured_at_idx").on(
+			table.deviceKey,
+			table.capturedAt,
+		),
+	],
 );
 
 export type InsertScreenshot = typeof screenshots.$inferInsert;

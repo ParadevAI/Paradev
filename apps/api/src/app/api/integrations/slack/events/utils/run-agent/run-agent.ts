@@ -242,7 +242,7 @@ export async function formatErrorForSlack(
 	}
 	try {
 		const anthropic = new Anthropic({
-			apiKey: env.ANTHROPIC_API_KEY,
+			apiKey: env.SERVER_ANTHROPIC_API_KEY,
 			timeout: Math.min(ERROR_REWRITE_TIMEOUT_MS, remaining - 5_000),
 			maxRetries: 0,
 		});
@@ -593,7 +593,7 @@ async function handleGetChannelHistory({
 	return JSON.stringify({ messages });
 }
 
-const SYSTEM_PROMPT = `You are a helpful assistant in Slack for Superset, a platform for managing tasks and running coding agents in workspaces.
+const SYSTEM_PROMPT = `You are a helpful assistant in Slack for Paradev, a platform for managing tasks and running coding agents in workspaces.
 
 You can:
 - Create, search and update tasks using superset_* tools (deleting tasks is not available from Slack)
@@ -731,7 +731,7 @@ export async function runSlackAgent(
 	params: RunSlackAgentParams,
 ): Promise<SlackAgentResult> {
 	const anthropic = new Anthropic({
-		apiKey: env.ANTHROPIC_API_KEY,
+		apiKey: env.SERVER_ANTHROPIC_API_KEY,
 		timeout: MODEL_CALL_TIMEOUT_MS,
 		maxRetries: 1,
 	});
@@ -865,7 +865,7 @@ export async function runSlackAgent(
 			}
 			if (mentionsPlugin(params.prompt, plugin)) {
 				return [
-					`- ${plugin.displayName} is not connected to this user's Superset account, so there are no ${plugin.name}_* tools. If the request needs ${plugin.displayName}, say it is not connected instead of guessing; they can connect it from the Plugins page in Superset.`,
+					`- ${plugin.displayName} is not connected to this user's Paradev account, so there are no ${plugin.name}_* tools. If the request needs ${plugin.displayName}, say it is not connected instead of guessing; they can connect it from the Plugins page in Paradev.`,
 				];
 			}
 			return [];
@@ -920,6 +920,7 @@ ${agentContext}`;
 						},
 					],
 					...([
+						"claude-sonnet-5-5",
 						"claude-sonnet-5",
 						"claude-sonnet-4-6",
 						"claude-opus-5",

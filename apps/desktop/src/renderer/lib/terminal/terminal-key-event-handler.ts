@@ -6,8 +6,19 @@ import {
 } from "./clipboard-shortcuts";
 import { translateLineEditChord } from "./line-edit-translations";
 
-export interface TerminalKeyEventHandlerOptions {
+interface TerminalKeyEventHandlerOptions {
 	platform?: string;
+}
+
+// An app that captures the mouse draws its own selection; one that also reads
+// kitty keys can receive Cmd+C to copy it. xterm exposes the kitty flags only
+// on its private core service.
+function appOwnsSelection(terminal: XTerm): boolean {
+	if (terminal.modes.mouseTrackingMode === "none") return false;
+	const internal = terminal as XTerm & {
+		_core?: { coreService?: { kittyKeyboard?: { flags?: number } } };
+	};
+	return (internal._core?.coreService?.kittyKeyboard?.flags ?? 0) > 0;
 }
 
 function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
@@ -36,7 +47,7 @@ function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
 // sidesteps this by suppressing all super/Cmd chords on macOS before the
 // encoder runs (ghostty/src/input/key_encode.zig:534-545). We do the same via
 // shouldBubbleClipboardShortcut's Mac branch.
-export function createTerminalKeyEventHandler(
+function createTerminalKeyEventHandler(
 	terminal: XTerm,
 	options: TerminalKeyEventHandlerOptions = {},
 ) {
@@ -69,6 +80,7 @@ export function createTerminalKeyEventHandler(
 				isMac,
 				isWindows,
 				hasSelection: terminal.hasSelection(),
+				appOwnsSelection: appOwnsSelection(terminal),
 			})
 		) {
 			// Do NOT preventDefault: the browser keydown -> paste pipeline is what

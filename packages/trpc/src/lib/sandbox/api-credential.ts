@@ -11,7 +11,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, members } from "@superset/db/schema";
-import { sandboxApiCredential } from "@superset/shared/sandbox-gate";
+import { sandboxApiCredential } from "@superset/shared/sandbox/gate";
 import { and, eq, isNull } from "drizzle-orm";
 import { env } from "../../env";
 
@@ -23,12 +23,58 @@ export interface SandboxCaller {
 
 /** Everything `superset` in a box legitimately does, and nothing else. */
 export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
-	"cloudWorkspace.available",
-	"cloudWorkspace.list",
-	"cloudWorkspace.create",
+	"attachment.createUpload",
+	"attachment.resolve",
+	"automation.get",
+	"automation.getPrompt",
+	"automation.list",
+	"automation.reportCloudLaunch",
+	"automation.setEnabled",
+	"automation.setGroup",
+	"automation.setPrompt",
+	"automation.update",
+	"chatHistory.completeTranscriptUpload",
+	"chatHistory.createTranscriptUpload",
+	"chatHistory.push",
+	"chatHistory.syncEnabled",
 	"cloudWorkspace.access",
+	"cloudWorkspace.addLabel",
+	"cloudWorkspace.available",
+	"cloudWorkspace.create",
+	"cloudWorkspace.delete",
+	"cloudWorkspace.forwards",
+	"cloudWorkspace.get",
 	"cloudWorkspace.hostTicket",
+	"cloudWorkspace.linkTask",
+	"cloudWorkspace.list",
+	"cloudWorkspace.pullRequests",
+	"cloudWorkspace.removeLabel",
+	"cloudWorkspace.rename",
+	"cloudWorkspace.reportPullRequests",
+	"cloudWorkspace.setDescription",
+	"cloudWorkspace.setMachineSize",
+	"cloudWorkspace.setTags",
+	"cloudWorkspace.sleep",
+	"cloudWorkspace.unlinkTask",
+	"connectors.get",
+	"connectors.status",
+	"environment.get",
 	"environment.list",
+	"environment.secrets.list",
+	"githubUser.get",
+	"host.cloudWorkspaceAccess",
+	"host.list",
+	"host.relayEndpoint",
+	"integration.github.getInstallation",
+	"integration.github.listRepositories",
+	"integration.linear.issue",
+	"integration.linear.issues",
+	"integration.linear.workspace",
+	"integration.syncAllowed",
+	"integration.triggerOptions",
+	"organization.getActive",
+	"organization.getByIdFromJwt",
+	"organization.members.list",
 	"page.assets.upload",
 	"page.create",
 	"page.get",
@@ -37,6 +83,25 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"page.publish",
 	"page.pull",
 	"page.versions",
+	"pageComment.list",
+	"pageComment.listForOrganization",
+	"pageComment.reply",
+	"pageComment.resolve",
+	"plugins.install",
+	"plugins.list",
+	"plugins.marketplaces.add",
+	"plugins.marketplaces.list",
+	"plugins.marketplaces.remove",
+	"plugins.organization.bundle",
+	"plugins.setEnabled",
+	"plugins.uninstall",
+	"support.submitFeedback",
+	"task.byIdOrSlug",
+	"task.create",
+	"task.list",
+	"task.statuses.list",
+	"task.update",
+	"taskLabel.list",
 	"user.me",
 	"user.myOrganization",
 	"user.myOrganizations",
@@ -49,6 +114,24 @@ function equal(a: string, b: string): boolean {
 }
 
 /**
+ * The workspace a credential is for, without the database: callers that run
+ * before authentication use this to tell a box apart from anyone who can type
+ * the header name.
+ */
+export async function sandboxCredentialWorkspaceId(
+	header: string | null,
+): Promise<string | null> {
+	const [workspaceId, presented] = header?.split(".") ?? [];
+	if (!workspaceId || !presented) return null;
+	return equal(
+		presented,
+		await sandboxApiCredential(env.SANDBOX_GATE_SECRET, workspaceId),
+	)
+		? workspaceId
+		: null;
+}
+
+/**
  * The workspace a request comes from, or null. The creator must still be a
  * member of the workspace's organization: a box outlives the person's access
  * to the org otherwise.
@@ -56,16 +139,8 @@ function equal(a: string, b: string): boolean {
 export async function resolveSandboxCaller(
 	header: string | null,
 ): Promise<SandboxCaller | null> {
-	const [workspaceId, presented] = header?.split(".") ?? [];
-	if (!workspaceId || !presented) return null;
-	if (
-		!equal(
-			presented,
-			await sandboxApiCredential(env.SANDBOX_GATE_SECRET, workspaceId),
-		)
-	) {
-		return null;
-	}
+	const workspaceId = await sandboxCredentialWorkspaceId(header);
+	if (!workspaceId) return null;
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: and(
 			eq(cloudWorkspaces.id, workspaceId),

@@ -8,7 +8,7 @@ export const TESTIMONIALS = [
 		role: msg({ message: "GTM & AI Automation Architect, Mistral AI" }),
 		quote: msg({
 			message:
-				"Superset's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer.",
+				"Paradev's mobile app lets me keep my agents moving and unblock them from anywhere, even when I'm nowhere near my computer.",
 		}),
 	},
 	{
@@ -18,7 +18,7 @@ export const TESTIMONIALS = [
 		role: msg({ message: "Co-founder & CTO, TrainLoop (YC W25)" }),
 		quote: msg({
 			message:
-				"With the Superset mobile app, I can address production issues from anywhere.",
+				"With the Paradev mobile app, I can address production issues from anywhere.",
 		}),
 	},
 	{
@@ -27,8 +27,7 @@ export const TESTIMONIALS = [
 		href: "https://www.transposeplatform.vc",
 		role: msg({ message: "Partner, Transpose Platform" }),
 		quote: msg({
-			message:
-				"Superset mobile gives me the power of my desktop anywhere I go.",
+			message: "Paradev mobile gives me the power of my desktop anywhere I go.",
 		}),
 	},
 	{

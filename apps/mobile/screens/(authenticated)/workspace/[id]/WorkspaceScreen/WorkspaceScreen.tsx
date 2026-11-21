@@ -1,15 +1,26 @@
 import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
+import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { prompt } from "@superset/alert-prompt";
 import type {
 	ComposerHandle,
 	ComposerQuickKeysAction,
 	ComposerSessionTab,
 } from "@superset/composer";
 import { i18n } from "@superset/i18n";
+import { rawErrorMessage } from "@superset/i18n/errors";
+import { BRAND } from "@superset/shared/brand";
+import { hostReadsAttachmentParts } from "@superset/shared/host-version";
+import { pressableTitle, TitlePress } from "@superset/title-press";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { randomUUID } from "expo-crypto";
+import {
+	Stack,
+	useFocusEffect,
+	useLocalSearchParams,
+	useRouter,
+} from "expo-router";
 import {
 	CloudOff,
 	Plus,
@@ -17,40 +28,64 @@ import {
 	TriangleAlert,
 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActivityIndicator,
 	Alert,
+	Dimensions,
 	Keyboard,
+	type KeyboardEvent,
 	LayoutAnimation,
 	Pressable,
 	View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { PromptInputAttachmentItem } from "@/components/ai-elements/prompt-input";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import { getHostWorkspacesQueryKey } from "@/hooks/useHostWorkspaces";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { chatAttachmentParts } from "@/lib/attachments/chatParts";
+import {
+	awaitAttachmentUploads,
+	setDraftAttachmentHome,
+	toAttachmentFiles,
+} from "@/lib/attachments/upload";
+import { getChatTransport } from "@/lib/chat";
 import { errorCopy } from "@/lib/errors";
 import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
+import { apiClient } from "@/lib/trpc/client";
+import { useVoiceActive } from "@/lib/voice/voiceStore";
 import {
 	getHostTerminalsQueryKey,
 	useHostTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
-import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
+import {
+	anchorOf,
+	ToolbarAnchor,
+} from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { useAgentIconUris } from "@/screens/(authenticated)/hooks/useAgentIconUris";
 import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useCreateTerminalWorkspace";
 import { useSlashCommands } from "@/screens/(authenticated)/hooks/useSlashCommands";
 import { workspaceDraftKey } from "@/screens/(authenticated)/stores/composerDraftsStore";
 import { useLastSessionTabStore } from "@/screens/(authenticated)/stores/lastSessionTabStore";
+import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePendingWorkspaceCreatesStore } from "@/screens/(authenticated)/stores/pendingWorkspaceCreatesStore";
+import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
 import { useTerminalTabOrderStore } from "@/screens/(authenticated)/stores/terminalTabOrderStore";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
+import {
+	ChatSessionView,
+	type ChatSessionViewHandle,
+} from "../components/ChatSessionView";
 import { CloudWorkspaceProvisioningState } from "../components/CloudWorkspaceProvisioningState";
 import { ScrollToBottomButton } from "../components/ScrollToBottomButton";
 import {
@@ -65,10 +100,16 @@ import {
 	type TerminalWebViewHandle,
 } from "../components/TerminalWebView";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { usePullRequestDiffstat } from "../hooks/usePullRequestDiffstat";
 import { usePullRequestIconUri } from "../hooks/usePullRequestIconUri";
+import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
+import { useActiveChat } from "../stores/activeChatStore";
+import { keyboardOverlap } from "../utils/keyboardOverlap";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { PULL_REQUEST_SYMBOL, pullRequestStatus } from "../utils/pullRequest";
+import { resumeChat } from "../utils/resumeChat";
+import { CloudRefusalPlaceholder } from "./components/CloudRefusalPlaceholder";
 import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
@@ -119,21 +160,43 @@ const STATE_BANNERS: Partial<
  */
 export function WorkspaceScreen() {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const params = useLocalSearchParams<{ id: string; tab?: string }>();
 	const id = params.id;
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const queryClient = useQueryClient();
 
+	const setLastWorkspaceId = useLastWorkspaceStore(
+		(state) => state.setWorkspaceId,
+	);
+	useFocusEffect(
+		useCallback(() => {
+			if (id) setLastWorkspaceId(id);
+		}, [id, setLastWorkspaceId]),
+	);
+
 	const {
 		workspace,
 		host,
 		cloud,
 		sandboxUnreachable,
+		sandboxWaking,
+		sandboxRefusal,
 		retrySandbox,
 		isResolving,
 	} = useWorkspaceHost(id ?? null);
-	const { terminalsByWorkspace, isReady } = useHostTerminals(host);
+	const { workspaces: archivedRows } = useArchivedCloudWorkspaces({
+		enabled: !cloud && !workspace && !isResolving,
+	});
+	const archivedCloud = cloud
+		? null
+		: (archivedRows.find((row) => row.id === id) ?? null);
+	const {
+		terminalsByWorkspace,
+		isReady: terminalsReady,
+		isError: terminalsFailed,
+	} = useHostTerminals(host, id);
 	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	// Tabs hold the arrangement the user dragged in the sessions sheet, falling
@@ -161,22 +224,34 @@ export function WorkspaceScreen() {
 		id ? state.tabByWorkspace[id] : undefined,
 	);
 	const tabsHydrated = useLastSessionTabStore((state) => state.hasHydrated);
+	useEffect(() => {
+		if (params.tab) setPickedTerminalId(null);
+	}, [params.tab]);
 	const activeTerminalId = useMemo(() => {
 		// Nothing to resolve against until AsyncStorage answers (~165ms cold):
 		// picking the first row now attaches a stream to the wrong session and
 		// swaps it out from under the user when the remembered tab lands.
 		if (!tabsHydrated) return null;
-		for (const candidate of [
-			pickedTerminalId,
-			params.tab,
-			rememberedTerminalId,
-		]) {
+		const candidates = [pickedTerminalId, params.tab, rememberedTerminalId];
+		// An unanswered or failed list says nothing about whether it is gone.
+		if (!terminalsReady || terminalsFailed) {
+			return candidates.find((candidate) => !!candidate) ?? null;
+		}
+		for (const candidate of candidates) {
 			if (candidate && rows.some((row) => row.terminalId === candidate)) {
 				return candidate;
 			}
 		}
 		return rows[0]?.terminalId ?? null;
-	}, [tabsHydrated, pickedTerminalId, params.tab, rememberedTerminalId, rows]);
+	}, [
+		tabsHydrated,
+		terminalsReady,
+		terminalsFailed,
+		pickedTerminalId,
+		params.tab,
+		rememberedTerminalId,
+		rows,
+	]);
 
 	// Remembered here rather than in the tab-strip handler: every route into a
 	// session ends at this value — the strip, the sessions sheet, a new
@@ -353,6 +428,20 @@ export function WorkspaceScreen() {
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
 	const hostCompatibility = useHostCompatibility(hostUrl);
+	const hostVersion = hostCompatibility.hostVersion;
+	useEffect(() => {
+		if (!id || isResolving || !host) return;
+		setDraftAttachmentHome(workspaceDraftKey(id), cloud ? "cloud" : "host");
+	}, [id, isResolving, host, cloud]);
+	const { renameWorkspace, deleteWorkspace, copyId, copyLink, shareWorkspace } =
+		useWorkspaceHeaderActions(workspace, host);
+	const pinned = usePinnedWorkspacesStore((state) =>
+		id ? id in state.pinnedAt : false,
+	);
+	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
+	const setManualUnread = useUnreadWorkspacesStore(
+		(state) => state.setManualUnread,
+	);
 
 	useEffect(() => {
 		if (!id) return;
@@ -408,6 +497,14 @@ export function WorkspaceScreen() {
 	useEffect(() => {
 		if (id) clearManualUnread(id);
 	}, [id, clearManualUnread]);
+	const markCloudRead = useUnreadWorkspacesStore(
+		(state) => state.markCloudRead,
+	);
+	const cloudAgentStatusAt = cloud?.agentStatusAt?.getTime() ?? null;
+	useEffect(() => {
+		if (id && cloudAgentStatusAt !== null)
+			markCloudRead(id, cloudAgentStatusAt);
+	}, [id, cloudAgentStatusAt, markCloudRead]);
 
 	// Port of desktop's useClearActivePaneAttention: viewing the tab clears
 	// its `review` state by advancing the seen mark to the binding's last
@@ -416,6 +513,10 @@ export function WorkspaceScreen() {
 		(state) => state.markTerminalSeen,
 	);
 	const activeRow = rows.find((row) => row.terminalId === activeTerminalId);
+	const activeIsChat = activeRow?.kind === "chat";
+	const { running: chatRunning, stop: stopChat } = useActiveChat(
+		activeIsChat ? activeTerminalId : null,
+	);
 	const slashCommands = useSlashCommands({
 		machineId: host?.machineId ?? null,
 		hostUrl,
@@ -451,6 +552,42 @@ export function WorkspaceScreen() {
 		});
 	}, [host, queryClient]);
 
+	const openSession = useCallback(
+		(sessionId: string) => {
+			router.setParams({ tab: sessionId });
+			invalidateTerminals();
+		},
+		[router, invalidateTerminals],
+	);
+
+	// Opening a finished chat starts its agent session again, as reopening a
+	// desktop chat pane does. The resumed chat replaces the finished one.
+	const resumingChatRef = useRef<string | null>(null);
+	useEffect(() => {
+		const chat = activeRow?.kind === "chat" ? activeRow.chat : undefined;
+		if (!activeRow || !chat || chat.live || !chat.harnessSessionId) return;
+		if (!hostUrl || !id || resumingChatRef.current === activeRow.terminalId)
+			return;
+		resumingChatRef.current = activeRow.terminalId;
+		resumeChat({
+			transport: getChatTransport(hostUrl),
+			workspaceId: id,
+			chat: {
+				sessionId: activeRow.terminalId,
+				harness: chat.harness,
+				harnessSessionId: chat.harnessSessionId,
+			},
+			commandId: randomUUID(),
+		})
+			.then(openSession)
+			.catch((error: unknown) =>
+				Alert.alert(
+					t({ message: "Could not resume the chat" }),
+					errorCopy(error),
+				),
+			);
+	}, [activeRow, hostUrl, id, openSession, t]);
+
 	const [refreshing, setRefreshing] = useState(false);
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
@@ -478,9 +615,19 @@ export function WorkspaceScreen() {
 
 	const killTerminal = useCallback(
 		(terminalId: string) => {
-			if (!workspace || !hostUrl) return;
-			void getHostServiceClientByUrl(hostUrl)
-				.terminal.killSession.mutate({ terminalId, workspaceId: workspace.id })
+			if (!hostUrl || !id) return;
+			const row = rows.find((candidate) => candidate.terminalId === terminalId);
+			const closing =
+				row?.kind === "chat"
+					? getChatTransport(hostUrl).closeSession({
+							sessionId: terminalId,
+							userClosed: true,
+						})
+					: getHostServiceClientByUrl(hostUrl).terminal.killSession.mutate({
+							terminalId,
+							workspaceId: id,
+						});
+			void closing
 				// A kill that fails leaves the tab exactly where it was, which reads
 				// as the tap having missed. Cheap to ignore while closing was a
 				// long-press only; the strip now offers it on every selected tab and
@@ -495,7 +642,7 @@ export function WorkspaceScreen() {
 				)
 				.finally(invalidateTerminals);
 		},
-		[workspace, hostUrl, invalidateTerminals, t],
+		[id, hostUrl, rows, invalidateTerminals, t],
 	);
 
 	// The composer reports the intent and stops there: it has no idea that
@@ -527,6 +674,7 @@ export function WorkspaceScreen() {
 
 	// --- active terminal connection (one live stream; tabs switch it) ---
 	const terminalRef = useRef<TerminalWebViewHandle>(null);
+	const chatRef = useRef<ChatSessionViewHandle>(null);
 	const [connectionState, setConnectionState] =
 		useState<TerminalConnectionState>("connecting");
 	// Reported by the composer itself: it draws in an overlay and takes no
@@ -534,7 +682,9 @@ export function WorkspaceScreen() {
 	const [composerHeight, setComposerHeight] = useState(0);
 	const [keyboardHeight, setKeyboardHeight] = useState(0);
 	const [composerActive, setComposerActive] = useState(false);
+	const [typingInTerminal, setTypingInTerminal] = useState<string | null>(null);
 	const composerRef = useRef<ComposerHandle>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 	const [select, setSelect] = useState<TerminalSelectState>({
 		active: false,
 		hasSelection: false,
@@ -548,7 +698,7 @@ export function WorkspaceScreen() {
 	const hideNotice = useCallback(() => setNotice(null), []);
 	const composerActiveRef = useRef(false);
 	composerActiveRef.current = composerActive;
-	const handleTerminalTap = useCallback(() => {
+	const dismissComposer = useCallback(() => {
 		if (composerActiveRef.current) composerRef.current?.blur();
 	}, []);
 	const handleCopied = useCallback(
@@ -565,11 +715,11 @@ export function WorkspaceScreen() {
 	// cannot take text, and the name belongs to the host, not to the strip.
 	const renameTerminal = useCallback(
 		(terminalId: string, title: string) => {
-			if (!workspace || !hostUrl) return;
+			if (!hostUrl || !id) return;
 			void getHostServiceClientByUrl(hostUrl)
 				.terminal.rename.mutate({
 					terminalId,
-					workspaceId: workspace.id,
+					workspaceId: id,
 					title,
 				})
 				.catch((cause: unknown) =>
@@ -582,34 +732,30 @@ export function WorkspaceScreen() {
 				)
 				.finally(invalidateTerminals);
 		},
-		[workspace, hostUrl, invalidateTerminals, t],
+		[id, hostUrl, invalidateTerminals, t],
 	);
 
 	const promptRenameTerminal = useCallback(
 		(terminalId: string) => {
 			const row = rows.find((candidate) => candidate.terminalId === terminalId);
-			Alert.prompt(
-				t({
+			if (row?.kind === "chat") {
+				Alert.alert(t({ message: "A chat takes its name from the agent." }));
+				return;
+			}
+			void prompt({
+				title: t({
 					message: "Rename session",
 				}),
-				t({
+				message: t({
 					message:
 						"Leave it empty to go back to the name the terminal reports.",
 				}),
-				[
-					{
-						text: t({ message: "Cancel" }),
-						style: "cancel",
-					},
-					{
-						text: t({ message: "Save" }),
-						onPress: (value?: string) =>
-							renameTerminal(terminalId, value ?? ""),
-					},
-				],
-				"plain-text",
-				row?.customTitle ?? "",
-			);
+				defaultValue: row?.customTitle ?? "",
+				cancelText: t({ message: "Cancel" }),
+				confirmText: t({ message: "Save" }),
+			}).then((value) => {
+				if (value !== null) renameTerminal(terminalId, value);
+			});
 		},
 		[rows, renameTerminal, t],
 	);
@@ -626,22 +772,25 @@ export function WorkspaceScreen() {
 	);
 
 	useEffect(() => {
-		const show = Keyboard.addListener("keyboardWillShow", (event) => {
+		const animate = (event: KeyboardEvent) =>
 			LayoutAnimation.configureNext({
 				duration: event.duration || 250,
 				update: { type: LayoutAnimation.Types.keyboard },
 			});
-			setKeyboardHeight(event.endCoordinates.height);
+		// Change-frame, not just show: on iPad the keyboard docks, undocks,
+		// floats and splits without ever hiding.
+		const change = Keyboard.addListener("keyboardWillChangeFrame", (event) => {
+			animate(event);
+			setKeyboardHeight(
+				keyboardOverlap(event.endCoordinates, Dimensions.get("window").height),
+			);
 		});
 		const hide = Keyboard.addListener("keyboardWillHide", (event) => {
-			LayoutAnimation.configureNext({
-				duration: event.duration || 250,
-				update: { type: LayoutAnimation.Types.keyboard },
-			});
+			animate(event);
 			setKeyboardHeight(0);
 		});
 		return () => {
-			show.remove();
+			change.remove();
 			hide.remove();
 		};
 	}, []);
@@ -664,9 +813,45 @@ export function WorkspaceScreen() {
 	// separates and delays the Enter, and frames the text as a bracketed paste
 	// only when the running program actually has that mode on.
 	const handleSubmit = useCallback(
-		async (text: string) => {
+		async (text: string, attachments: PromptInputAttachmentItem[] = []) => {
 			if (!hostUrl || !activeTerminalId || !id) {
 				throw new Error("Terminal is not connected");
+			}
+			if (activeIsChat) {
+				if (!chatRef.current) throw new Error("Chat is not connected");
+				const host = getHostServiceClientByUrl(hostUrl);
+				const home = cloud ? "cloud" : "host";
+				const parts = await chatAttachmentParts({
+					home,
+					readsParts: hostReadsAttachmentParts(hostVersion),
+					files: toAttachmentFiles(attachments),
+					deps: {
+						awaitUploads: () =>
+							awaitAttachmentUploads(workspaceDraftKey(id), attachments),
+						// A cloud box resolves only the files attached to it.
+						attachFiles: (fileIds) =>
+							apiClient.cloudWorkspace.attachFiles.mutate({ id, fileIds }),
+						importFromCloud: (fileIds) =>
+							host.attachments.importFromCloud.mutate({ fileIds }),
+						hostUpload: (input) => host.attachments.upload.mutate(input),
+					},
+				}).catch((error: unknown) => {
+					posthog.capture("attachments_send_failed", {
+						surface: "chat",
+						home,
+						error: rawErrorMessage(error),
+					});
+					throw error;
+				});
+				if (parts.length > 0)
+					posthog.capture("attachments_sent", {
+						surface: "chat",
+						home,
+						count: parts.length,
+					});
+				await chatRef.current.send(text, parts);
+				composerRef.current?.blur();
+				return;
 			}
 			await getHostServiceClientByUrl(hostUrl).terminal.send.mutate({
 				terminalId: activeTerminalId,
@@ -674,7 +859,7 @@ export function WorkspaceScreen() {
 				text,
 			});
 		},
-		[hostUrl, activeTerminalId, id],
+		[hostUrl, activeTerminalId, id, activeIsChat, cloud, hostVersion],
 	);
 
 	const handleQuickKey = useCallback(
@@ -697,8 +882,32 @@ export function WorkspaceScreen() {
 		});
 	}, [connectionState, id, activeTerminalId]);
 
+	const wakingMessage = t({
+		message:
+			"This cloud workspace is waking up, which can take up to 30 seconds after it has been idle.",
+	});
 	const bannerDescriptor = STATE_BANNERS[connectionState];
-	const banner = bannerDescriptor ? i18n._(bannerDescriptor) : undefined;
+	const banner =
+		sandboxWaking &&
+		(connectionState === "connecting" || connectionState === "reconnecting")
+			? wakingMessage
+			: bannerDescriptor
+				? i18n._(bannerDescriptor)
+				: undefined;
+
+	// A stopped sandbox refused everything asked of it before the wake landed.
+	const wasWaking = useRef(sandboxWaking);
+	useEffect(() => {
+		if (wasWaking.current && !sandboxWaking) {
+			invalidateTerminals();
+			void queryClient.invalidateQueries({
+				queryKey: ["host-service", "workspaces", "list"],
+			});
+			terminalRef.current?.retry();
+		}
+		wasWaking.current = sandboxWaking;
+	}, [sandboxWaking, invalidateTerminals, queryClient]);
+	const voiceActive = useVoiceActive();
 	const showComposer =
 		activeTerminalId !== null &&
 		host !== null &&
@@ -709,9 +918,14 @@ export function WorkspaceScreen() {
 	const attachmentTarget = useMemo(
 		() =>
 			id && hostUrl && workspace?.worktreePath
-				? { workspaceId: id, hostUrl, draftKey: workspaceDraftKey(id) }
+				? {
+						workspaceId: id,
+						hostUrl,
+						isCloud: cloud !== null,
+						draftKey: workspaceDraftKey(id),
+					}
 				: null,
-		[id, hostUrl, workspace],
+		[id, hostUrl, workspace, cloud],
 	);
 
 	// The chip beside the quick keys, or nothing. Mark and colour both come off
@@ -743,6 +957,20 @@ export function WorkspaceScreen() {
 		};
 	}, [pullRequests, pullRequestIconUri, t]);
 
+	const pullRequestCount = pullRequests.length;
+	const latestPullRequestDiffstat = usePullRequestDiffstat({
+		pullRequest: pullRequests[0],
+	});
+	const chatPullRequestChip = pullRequestStatusNow
+		? {
+				label: t({
+					message: plural(pullRequestCount, { one: "# PR", other: "# PRs" }),
+				}),
+				status: pullRequestStatusNow,
+				diffstat: latestPullRequestDiffstat,
+			}
+		: undefined;
+
 	// One PR goes straight to it; a history goes to the list. Captured by hand
 	// because the tap lands in SwiftUI, where RN autocapture cannot see it.
 	const openPullRequests = useCallback(() => {
@@ -757,9 +985,16 @@ export function WorkspaceScreen() {
 			});
 			return;
 		}
+		const [pullRequest] = pullRequests;
 		router.push({
 			pathname: "/workspace/[id]/pull-request/[pullRequestId]",
-			params: { id, pullRequestId: String(pullRequests[0]?.prNumber ?? "") },
+			params: {
+				id,
+				pullRequestId: String(pullRequest?.prNumber ?? ""),
+				...(pullRequest
+					? { owner: pullRequest.repoOwner, repo: pullRequest.repoName }
+					: {}),
+			},
 		});
 	}, [id, pullRequests, router]);
 
@@ -810,7 +1045,8 @@ export function WorkspaceScreen() {
 			<Stack.Screen
 				options={{
 					...headerOptions,
-					title: t({ message: "Workspace" }),
+					headerTransparent: activeIsChat && contentScrollsUnderHeader,
+					title: workspace?.name ?? cloud?.name ?? archivedCloud?.name ?? "",
 					headerTitle: notice
 						? () => (
 								<HeaderNotice
@@ -820,44 +1056,93 @@ export function WorkspaceScreen() {
 									visibleFor={NOTICE_MS}
 								/>
 							)
-						: undefined,
+						: workspace
+							? pressableTitle(openActions)
+							: undefined,
 				}}
-			>
-				{notice ? null : (
-					<Stack.Title asChild>
-						<PressableScale onPress={openActions} disabled={!workspace}>
-							{/* Width budget: the back capsule and the ⋯ button leave ~160pt of
-							    bar on a 390pt screen — wider and the title collides with them
-							    under iOS 26's floating bar items. Anything that lands in the
-							    bar later comes out of this. */}
-							<View className="max-w-40">
-								<Text className="font-semibold text-[17px]" numberOfLines={1}>
-									{workspace?.name ?? cloud?.name ?? ""}
-								</Text>
-							</View>
-						</PressableScale>
-					</Stack.Title>
-				)}
-			</Stack.Screen>
+			/>
 
+			{workspace ? <TitlePress onPress={openActions} /> : null}
 			{workspace ? (
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Button
-						icon="ellipsis"
-						accessibilityLabel={t({ message: "Workspace details" })}
-						onPress={openActions}
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Button
+						accessibilityLabel={t({ message: "Manage sessions" })}
+						icon="sessions"
+						onPress={openSessions}
 					/>
-				</Stack.Toolbar>
+					<HeaderToolbar.Menu
+						icon="more"
+						accessibilityLabel={t({ message: "Workspace actions" })}
+					>
+						<HeaderToolbar.MenuAction icon="info" onPress={openActions}>
+							{t({ message: "Workspace details" })}
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="rename"
+							onPress={() => void renameWorkspace()}
+						>
+							{t({ message: "Rename" })}
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon={pinned ? "unpin" : "pin"}
+							onPress={() => id && togglePin(id)}
+						>
+							{pinned ? t({ message: "Unpin" }) : t({ message: "Pin" })}
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="markUnread"
+							onPress={() => id && setManualUnread(id)}
+						>
+							{t({ message: "Mark as Unread" })}
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuSection>
+							<HeaderToolbar.Submenu icon="copy" title={t({ message: "Copy" })}>
+								<HeaderToolbar.MenuAction
+									onPress={() => copyLink(handleCopied)}
+								>
+									{t({ message: "Copy link" })}
+								</HeaderToolbar.MenuAction>
+								<HeaderToolbar.MenuAction onPress={() => copyId(handleCopied)}>
+									{t({ message: "Copy ID" })}
+								</HeaderToolbar.MenuAction>
+							</HeaderToolbar.Submenu>
+							<HeaderToolbar.MenuAction
+								icon="share"
+								onPress={() => shareWorkspace(anchorOf(shareAnchorRef))}
+							>
+								{t({ message: "Share" })}
+							</HeaderToolbar.MenuAction>
+						</HeaderToolbar.MenuSection>
+						<HeaderToolbar.MenuSection>
+							{cloud ? (
+								<HeaderToolbar.MenuAction
+									icon="archive"
+									onPress={deleteWorkspace}
+								>
+									{t({ message: "Archive workspace" })}
+								</HeaderToolbar.MenuAction>
+							) : (
+								<HeaderToolbar.MenuAction
+									icon="delete"
+									destructive
+									onPress={deleteWorkspace}
+								>
+									{t({ message: "Delete workspace" })}
+								</HeaderToolbar.MenuAction>
+							)}
+						</HeaderToolbar.MenuSection>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			) : null}
 
-			{banner && activeTerminalId ? (
+			{banner && activeTerminalId && !activeIsChat ? (
 				<View className="bg-muted px-3 py-1.5">
 					<Text className="text-muted-foreground text-center text-xs">
 						{banner}
 					</Text>
 				</View>
 			) : null}
-			{connectionState === "error" && activeTerminalId ? (
+			{connectionState === "error" && activeTerminalId && !activeIsChat ? (
 				<View className="bg-muted flex-row items-center justify-center gap-3 px-3 py-1.5">
 					<Text className="text-muted-foreground text-xs">
 						<Trans>Connection failed.</Trans>
@@ -883,7 +1168,7 @@ export function WorkspaceScreen() {
 				{hostCompatibility.incompatible ? (
 					<WorkspacePlaceholder
 						body={t({
-							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update Superset on that machine.`,
+							message: `${host?.name ?? t({ message: "This host" })} is running host service ${hostCompatibility.hostVersion} — this app needs ${hostCompatibility.minVersion} or newer. Update ${appName} on that machine.`,
 						})}
 						icon={TriangleAlert}
 						onRefresh={onRefresh}
@@ -891,6 +1176,26 @@ export function WorkspaceScreen() {
 						title={t({
 							message: "This host needs an update",
 						})}
+					/>
+				) : cloud && sandboxRefusal ? (
+					<CloudRefusalPlaceholder
+						message={sandboxRefusal}
+						onRefresh={onRefresh}
+						onRetry={retrySandbox}
+						refreshing={refreshing}
+					/>
+				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (
+					<ChatSessionView
+						host={host}
+						hostUrl={hostUrl}
+						key={activeTerminalId}
+						onOpenSession={openSession}
+						onOpenPullRequests={openPullRequests}
+						onTap={dismissComposer}
+						pullRequestChip={chatPullRequestChip}
+						ref={chatRef}
+						sessionId={activeTerminalId}
+						workspaceId={id}
 					/>
 				) : activeTerminalId && host && id ? (
 					<>
@@ -904,11 +1209,14 @@ export function WorkspaceScreen() {
 							onSelectChange={setSelect}
 							onCopied={handleCopied}
 							onScrollChange={setAtBottom}
+							onKeyboardFocusChange={(focused) =>
+								setTypingInTerminal(focused ? activeTerminalId : null)
+							}
 							// Tap-to-dismiss without an overlay: a Pressable stacked over
 							// the WebView also ate scroll drags, so the scrollback froze
 							// whenever the keyboard was up. The page reports plain taps
 							// instead, and drags stay with the terminal.
-							onTap={handleTerminalTap}
+							onTap={dismissComposer}
 						/>
 						{/* The WebView swallows every touch that lands on it, so the back
 						    swipe never starts over the terminal. This strip keeps a
@@ -929,6 +1237,7 @@ export function WorkspaceScreen() {
 						    covers the viewport this would move. Always mounted — it
 						    fades itself, which it cannot do if the parent unmounts it. */}
 						<ScrollToBottomButton
+							icon="arrowDown"
 							visible={!atBottom && !select.active}
 							onPress={() => {
 								// The tap lands in SwiftUI, where RN autocapture cannot see
@@ -941,15 +1250,30 @@ export function WorkspaceScreen() {
 							}}
 						/>
 					</>
-				) : cloud && !workspace ? (
+				) : archivedCloud ? (
+					<CloudWorkspaceProvisioningState
+						cloud={archivedCloud}
+						unreachable={false}
+						onRetry={retrySandbox}
+					/>
+				) : cloud && !host ? (
 					<CloudWorkspaceProvisioningState
 						cloud={cloud}
 						unreachable={sandboxUnreachable}
 						onRetry={retrySandbox}
 					/>
-				) : isResolving || ((!isReady || !tabsHydrated) && host) ? (
+				) : isResolving ||
+					((!terminalsReady ||
+						!tabsHydrated ||
+						(cloud && terminalsFailed && rows.length === 0)) &&
+						host) ? (
 					<Centered>
 						<ActivityIndicator />
+						{sandboxWaking ? (
+							<Text className="text-muted-foreground mt-4 max-w-[280px] text-center text-[13px] leading-relaxed">
+								{wakingMessage}
+							</Text>
+						) : null}
 					</Centered>
 				) : !host ? (
 					<WorkspacePlaceholder
@@ -992,22 +1316,22 @@ export function WorkspaceScreen() {
 				)}
 			</View>
 
-			{showComposer ? (
+			{showComposer && !voiceActive ? (
 				<TerminalComposer
 					workspaceId={id}
 					allowAttachments={activeRow?.agentId != null}
 					slashCommands={slashCommands}
-					// A cloud workspace exists on screen before anything serves
-					// it; the strip would offer sessions on a sandbox that is not
-					// up yet.
-					sessionTabs={cloud && !workspace ? [] : sessionTabs}
+					// A cloud workspace exists on screen before its sandbox is
+					// even addressed; the strip would offer sessions on one that
+					// isn't reachable yet.
+					sessionTabs={cloud && !host ? [] : activeIsChat ? [] : sessionTabs}
 					onSessionTabPress={pickTerminal}
 					onSessionTabClose={confirmCloseTerminal}
 					onSessionTabRename={promptRenameTerminal}
 					onSessionTabCopyId={copyTerminalId}
 					onNewSessionPress={openAddMenu}
 					onAllSessionsPress={openSessions}
-					quickKeysAction={pullRequestAction}
+					quickKeysAction={activeIsChat ? undefined : pullRequestAction}
 					onQuickKeysActionPress={openPullRequests}
 					attachmentTarget={attachmentTarget}
 					onActiveChange={setComposerActive}
@@ -1018,8 +1342,16 @@ export function WorkspaceScreen() {
 					ref={composerRef}
 					selectActive={select.active}
 					selectHasSelection={select.hasSelection}
+					hideQuickKeys={
+						activeIsChat ||
+						(typingInTerminal !== null && typingInTerminal === activeTerminalId)
+					}
+					sendsAttachments={activeIsChat}
+					canStop={activeIsChat && chatRunning}
+					onStop={stopChat}
 				/>
 			) : null}
+			<ToolbarAnchor ref={shareAnchorRef} />
 		</View>
 	);
 }

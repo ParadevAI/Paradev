@@ -57,6 +57,11 @@ const MAX_BUFFERED_EVENTS = 30_000;
 const OVERFLOW_RESCAN_INITIAL_MS = 5_000;
 const OVERFLOW_RESCAN_MAX_MS = 60_000;
 const OVERFLOW_BACKOFF_RESET_MS = 120_000;
+const IGNORE_GROWTH_REATTACH_MIN_MS = 30_000;
+// A per-entry backend watches a new dir's children within milliseconds, so
+// ask git about new dirs at once, batched, before the walk goes deep.
+const NEW_DIR_IGNORE_CHECK_DELAY_MS = 10;
+const NEW_DIR_IGNORE_CHECK_MAX_DIRS = 64;
 
 // Recovery liveness probe: a freshly attached FSEvents stream can be deaf for
 // a sub-second window after subscribe() resolves (observed on a busy Electron
@@ -100,6 +105,35 @@ const NESTED_REPO_SCAN_CONCURRENCY = 4;
  */
 const WORKTREE_CONTAINER_NAMES = new Set([".worktrees", ".conductor"]);
 
+function toPosixRelative(from: string, to: string): string {
+	const relative = path.relative(from, to);
+	return path.sep === "/" ? relative : relative.split(path.sep).join("/");
+}
+
+function isUnderOrAt(relative: string, dirs: Iterable<string>): boolean {
+	for (const dir of dirs) {
+		if (relative === dir || relative.startsWith(`${dir}/`)) return true;
+	}
+	return false;
+}
+
+function isUnderOrAtPath(
+	absolutePath: string,
+	dirs: readonly string[],
+): boolean {
+	return dirs.some(
+		(dir) =>
+			absolutePath === dir ||
+			(absolutePath.startsWith(dir) && absolutePath[dir.length] === path.sep),
+	);
+}
+
+function isSafeRelDir(dir: string): boolean {
+	return (
+		dir.length > 0 && !dir.startsWith("/") && !dir.split("/").includes("..")
+	);
+}
+
 export function isRelPathUnderPrunedDirs(
 	relative: string,
 	prunedRelPrefixes: readonly string[],
@@ -131,11 +165,13 @@ export function isRelPathUnderPrunedDirs(
 // Watches are always recursive — @parcel/watcher offers no shallow mode.
 export interface WatchPathOptions {
 	absolutePath: string;
+	signal?: AbortSignal;
 }
 
 type WatchListener = (batch: { events: FsWatchEvent[] }) => void;
 
 interface WatcherState {
+	controller: AbortController;
 	/** Path as the caller asked us to watch, used in events emitted to listeners. */
 	absolutePath: string;
 	/**
@@ -166,6 +202,8 @@ interface WatcherState {
 	/** Bounded post-overflow probe for a root deletion whose event was dropped. */
 	overflowRootCheckTimer: ReturnType<typeof setInterval> | null;
 	overflowRootChecksLeft: number;
+	lastGrowthReattachAt: number;
+	growthReattachTimer: ReturnType<typeof setTimeout> | null;
 	/** Pending coalesced overflow rescan; trails the last overflow of a storm. */
 	overflowRescanTimer: ReturnType<typeof setTimeout> | null;
 	/** Hard fire-by time for the pending batch — rearms clamp to this so
@@ -184,6 +222,20 @@ interface WatcherState {
 	 * targeted watch if you need it".
 	 */
 	prunedRelPrefixes: string[];
+	/** The part of `prunedRelPrefixes` the native subscription was given. */
+	nativePrunedRelPrefixes: string[];
+	/** The rest: pruned here, by dropping their events, until a re-attach. */
+	filteredRelPrefixes: string[];
+	/** `filteredRelPrefixes` as absolute paths under `realPath`, for `isPruned`. */
+	filteredRealPaths: string[];
+	/** New root-relative dirs waiting for one batched git ignore check. */
+	newDirsToCheck: Set<string>;
+	newDirCheckTimer: ReturnType<typeof setTimeout> | null;
+	newDirCheckRunning: boolean;
+	ignoreRefresh: Promise<boolean> | null;
+	queuedIgnoreRefresh: Promise<boolean> | null;
+	/** Bumped when a full ignore listing is applied; older scoped answers are stale. */
+	ignoreListingEpoch: number;
 	filePaths: Map<string, true>;
 	directoryPaths: Set<string>;
 	pendingEvents: NativeWatchEvent[];
@@ -252,10 +304,15 @@ export interface FsWatcherManagerOptions {
 	 * (fully-untracked subtrees like `.next` or `__pycache__`), so they can be
 	 * pruned from the native subscription alongside the static defaults.
 	 * Injected (rather than spawning git here) to mirror how search injects
-	 * `runRipgrep`. Best-effort: failures degrade to the static list.
+	 * `runRipgrep`. Best-effort: failures degrade to the static list. With
+	 * `under`, it lists only inside those root-relative dirs.
 	 */
-	listGitIgnoredDirs?: (rootPath: string) => Promise<string[]>;
-	/** What actually watches the disk. Defaults per platform. */
+	listGitIgnoredDirs?: (
+		rootPath: string,
+		signal?: AbortSignal,
+		under?: readonly string[],
+	) => Promise<string[]>;
+	findNestedRepoRoots?: typeof findNestedRepoRoots;
 	backend?: NativeWatchBackend;
 	/** Per-watcher LRU cap on tracked file paths. Test-only override. */
 	filePathsMax?: number;
@@ -265,19 +322,32 @@ export interface FsWatcherManagerOptions {
 	overflowRescanInitialMs?: number;
 	overflowRescanMaxMs?: number;
 	overflowBackoffResetMs?: number;
+	growthReattachMinMs?: number;
+	now?: () => number;
 }
 
 export class FsWatcherManager {
 	private readonly debounceMs: number;
 	private readonly ignore: string[];
+	private readonly listGitIgnoredDirs?: FsWatcherManagerOptions["listGitIgnoredDirs"];
+	private readonly findNestedRoots: typeof findNestedRepoRoots;
+	private readonly pending = new Map<
+		string,
+		{
+			controller: AbortController;
+			listeners: Set<WatchListener>;
+			promise: Promise<WatcherState>;
+		}
+	>();
 	private readonly useDefaultIgnores: boolean;
-	private readonly listGitIgnoredDirs?: (rootPath: string) => Promise<string[]>;
 	private readonly backend: NativeWatchBackend;
 	private readonly filePathsMax: number;
 	private readonly recoveryPollMs: number;
 	private readonly overflowRescanInitialMs: number;
 	private readonly overflowRescanMaxMs: number;
 	private readonly overflowBackoffResetMs: number;
+	private readonly growthReattachMinMs: number;
+	private readonly now: () => number;
 	private readonly watchers = new Map<string, WatcherState>();
 	/**
 	 * One-shot dedup so a single ENOSPC report doesn't spam logs across every
@@ -311,6 +381,7 @@ export class FsWatcherManager {
 		this.ignore = [...new Set([...defaults, ...(options.ignore ?? [])])];
 		this.listGitIgnoredDirs = options.listGitIgnoredDirs;
 		this.backend = options.backend ?? defaultWatchBackend();
+		this.findNestedRoots = options.findNestedRepoRoots ?? findNestedRepoRoots;
 		this.filePathsMax = options.filePathsMax ?? FILE_PATHS_MAX;
 		this.recoveryPollMs = options.recoveryPollMs ?? 2_000;
 		this.overflowRescanInitialMs =
@@ -319,6 +390,9 @@ export class FsWatcherManager {
 			options.overflowRescanMaxMs ?? OVERFLOW_RESCAN_MAX_MS;
 		this.overflowBackoffResetMs =
 			options.overflowBackoffResetMs ?? OVERFLOW_BACKOFF_RESET_MS;
+		this.growthReattachMinMs =
+			options.growthReattachMinMs ?? IGNORE_GROWTH_REATTACH_MIN_MS;
+		this.now = options.now ?? Date.now;
 	}
 
 	async subscribe(
@@ -326,40 +400,79 @@ export class FsWatcherManager {
 		listener: WatchListener,
 	): Promise<() => Promise<void>> {
 		const absolutePath = normalizeAbsolutePath(options.absolutePath);
+		options.signal?.throwIfAborted();
 		let state = this.watchers.get(absolutePath);
-
-		if (!state) {
-			state = await this.createWatcher(absolutePath);
-			this.watchers.set(absolutePath, state);
+		let pending = this.pending.get(absolutePath);
+		if (!state && !pending) {
+			const controller = new AbortController();
+			const listeners = new Set<WatchListener>();
+			const promise = this.createWatcher(absolutePath, controller)
+				.then(async (created) => {
+					if (controller.signal.aborted) {
+						await this.disposeWatcherState(created);
+						controller.signal.throwIfAborted();
+					}
+					created.listeners = listeners;
+					this.watchers.set(absolutePath, created);
+					invalidateSearchIndexesForRoot(absolutePath);
+					this.emitDirect(created, {
+						events: [{ kind: "overflow", absolutePath, isDirectory: true }],
+					});
+					return created;
+				})
+				.finally(() => {
+					if (this.pending.get(absolutePath)?.controller === controller)
+						this.pending.delete(absolutePath);
+				});
+			pending = { controller, listeners, promise };
+			this.pending.set(absolutePath, pending);
 		}
-
-		state.listeners.add(listener);
-
-		return async () => {
-			const currentState = this.watchers.get(absolutePath);
-			if (!currentState) {
-				return;
+		const listeners = state?.listeners ?? pending?.listeners;
+		if (!listeners) throw new Error("Missing watcher subscription state");
+		listeners.add(listener);
+		let released = false;
+		const release = async () => {
+			if (released) return;
+			released = true;
+			options.signal?.removeEventListener("abort", onAbort);
+			listeners.delete(listener);
+			if (listeners.size > 0) return;
+			if (pending && this.pending.get(absolutePath) === pending) {
+				this.pending.delete(absolutePath);
+				pending.controller.abort();
 			}
-
-			currentState.listeners.delete(listener);
-			if (currentState.listeners.size > 0) {
-				return;
+			const current = this.watchers.get(absolutePath);
+			if (current?.listeners === listeners) {
+				this.watchers.delete(absolutePath);
+				await this.disposeWatcherState(current);
 			}
-
-			// Remove from the map before touching the native layer so a fresh
-			// subscribe can never reuse a state whose teardown is in flight.
-			this.watchers.delete(absolutePath);
-			await this.disposeWatcherState(currentState);
 		};
+		const onAbort = () => {
+			void release();
+		};
+		options.signal?.addEventListener("abort", onAbort, { once: true });
+		try {
+			if (!state && pending) state = await pending.promise;
+			options.signal?.throwIfAborted();
+			return release;
+		} catch (error) {
+			await release();
+			throw error;
+		}
 	}
 
 	async close(): Promise<void> {
+		const pending = [...this.pending.values()];
+		this.pending.clear();
+		for (const entry of pending) entry.controller.abort();
+		await Promise.allSettled(pending.map((entry) => entry.promise));
 		const states = Array.from(this.watchers.values());
 		this.watchers.clear();
 		await Promise.all(states.map((state) => this.disposeWatcherState(state)));
 	}
 
 	private async disposeWatcherState(state: WatcherState): Promise<void> {
+		state.controller.abort();
 		if (state.flushTimer) {
 			clearTimeout(state.flushTimer);
 			state.flushTimer = null;
@@ -370,6 +483,14 @@ export class FsWatcherManager {
 		}
 		this.clearOverflowRootCheck(state);
 		this.clearOverflowRescan(state);
+		if (state.growthReattachTimer) {
+			clearTimeout(state.growthReattachTimer);
+			state.growthReattachTimer = null;
+		}
+		if (state.newDirCheckTimer) {
+			clearTimeout(state.newDirCheckTimer);
+			state.newDirCheckTimer = null;
+		}
 		state.generation += 1;
 		state.throttler.dispose();
 		const subscription = state.subscription;
@@ -495,7 +616,10 @@ export class FsWatcherManager {
 		});
 	}
 
-	private async createWatcher(absolutePath: string): Promise<WatcherState> {
+	private async createWatcher(
+		absolutePath: string,
+		controller: AbortController,
+	): Promise<WatcherState> {
 		const normalizedPath = normalizeAbsolutePath(absolutePath);
 
 		try {
@@ -519,7 +643,9 @@ export class FsWatcherManager {
 			throw error;
 		}
 
+		controller.signal.throwIfAborted();
 		const state: WatcherState = {
+			controller,
 			absolutePath: normalizedPath,
 			realPath: normalizedPath,
 			realPathNormalized: normalizedPath,
@@ -531,6 +657,8 @@ export class FsWatcherManager {
 			probeSeen: false,
 			overflowRootCheckTimer: null,
 			overflowRootChecksLeft: 0,
+			lastGrowthReattachAt: Number.NEGATIVE_INFINITY,
+			growthReattachTimer: null,
 			overflowRescanTimer: null,
 			overflowRescanDeadline: 0,
 			overflowRescanDelayMs: this.overflowRescanInitialMs,
@@ -538,6 +666,15 @@ export class FsWatcherManager {
 			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
 			prunedRelPrefixes: [],
+			nativePrunedRelPrefixes: [],
+			filteredRelPrefixes: [],
+			filteredRealPaths: [],
+			newDirsToCheck: new Set<string>(),
+			newDirCheckTimer: null,
+			newDirCheckRunning: false,
+			ignoreRefresh: null,
+			queuedIgnoreRefresh: null,
+			ignoreListingEpoch: 0,
 			filePaths: new Map<string, true>(),
 			directoryPaths: new Set<string>(),
 			pendingEvents: [],
@@ -556,9 +693,13 @@ export class FsWatcherManager {
 			),
 		};
 
-		await this.attachNativeSubscription(state);
-
-		return state;
+		try {
+			await this.attachNativeSubscription(state);
+			return state;
+		} catch (error) {
+			await this.disposeWatcherState(state);
+			throw error;
+		}
 	}
 
 	/**
@@ -583,10 +724,14 @@ export class FsWatcherManager {
 		// (`__pycache__`, `packages/*/lib`, …) that the static list can't know
 		// about is pruned via whatever git itself considers fully ignored.
 		const [nestedRepoRelDirs, gitIgnoredRelDirs] = await Promise.all([
-			this.computeNestedRepoRelDirs(realPath),
-			this.computeGitIgnoredRelDirs(realPath),
+			this.computeNestedRepoRelDirs(realPath, state.controller.signal),
+			this.computeGitIgnoredRelDirs(realPath, state.controller.signal),
 		]);
+		state.controller.signal.throwIfAborted();
+		state.ignoreListingEpoch += 1;
 		state.prunedRelPrefixes = [...nestedRepoRelDirs, ...gitIgnoredRelDirs];
+		state.nativePrunedRelPrefixes = state.prunedRelPrefixes;
+		this.setFilteredRelPrefixes(state, []);
 		// Root-relative escaped globs: parcel matches ignores relative to the
 		// watch root (its defaults are all `**/…`), so an absolute path never
 		// matches. Bare paths aren't safe either — parcel's `is-glob` check
@@ -605,6 +750,10 @@ export class FsWatcherManager {
 			rootPath: realPath,
 			ignore,
 			generation,
+			isPruned: this.backend.watchesEachEntry
+				? (absolutePath) =>
+						isUnderOrAtPath(absolutePath, state.filteredRealPaths)
+				: undefined,
 			// A late callback from a superseded stream (suspended or replaced by
 			// recovery) describes a dead tree.
 			onError: (error) => {
@@ -645,7 +794,21 @@ export class FsWatcherManager {
 		}
 
 		this.normalizeEvents(visibleEvents, state);
-		for (const event of visibleEvents) state.pendingEvents.push(event);
+		const keptEvents =
+			state.filteredRelPrefixes.length === 0
+				? visibleEvents
+				: visibleEvents.filter(
+						(event) =>
+							!isUnderOrAt(
+								toPosixRelative(state.absolutePath, event.path),
+								state.filteredRelPrefixes,
+							),
+					);
+		if (keptEvents.length === 0) {
+			return;
+		}
+		this.queueNewDirIgnoreChecks(state, keptEvents);
+		for (const event of keptEvents) state.pendingEvents.push(event);
 		if (state.flushTimer) {
 			return;
 		}
@@ -668,16 +831,32 @@ export class FsWatcherManager {
 	 * scan we watch with whatever we found (an unpruned subtree degrades to the
 	 * pre-existing behavior, not a crash).
 	 */
-	private async computeNestedRepoRelDirs(realPath: string): Promise<string[]> {
+	private async computeNestedRepoRelDirs(
+		realPath: string,
+		signal: AbortSignal,
+	): Promise<string[]> {
 		if (this.runningNestedRepoScans >= NESTED_REPO_SCAN_CONCURRENCY) {
-			await new Promise<void>((resolve) =>
-				this.waitingNestedRepoScans.push(resolve),
-			);
+			await new Promise<void>((resolve, reject) => {
+				const start = () => {
+					signal.removeEventListener("abort", cancel);
+					resolve();
+				};
+				const cancel = () => {
+					const index = this.waitingNestedRepoScans.indexOf(start);
+					if (index !== -1) this.waitingNestedRepoScans.splice(index, 1);
+					reject(signal.reason);
+				};
+				signal.throwIfAborted();
+				this.waitingNestedRepoScans.push(start);
+				signal.addEventListener("abort", cancel, { once: true });
+			});
 		} else {
 			this.runningNestedRepoScans += 1;
 		}
 		try {
-			const { roots, truncated } = await findNestedRepoRoots(realPath, {
+			signal.throwIfAborted();
+			const { roots, truncated } = await this.findNestedRoots(realPath, {
+				signal,
 				pruneDirNames: DEFAULT_IGNORE_DIR_NAMES,
 				deadlineMs: NESTED_REPO_SCAN_DEADLINE_MS,
 			});
@@ -689,6 +868,7 @@ export class FsWatcherManager {
 			}
 			return roots.map((root) => path.relative(realPath, root));
 		} catch (error) {
+			if (signal.aborted) throw error;
 			console.error("[workspace-fs/watch] nested-repo scan failed", {
 				absolutePath: realPath,
 				error: toErrorMessage(error),
@@ -708,19 +888,18 @@ export class FsWatcherManager {
 	 * (first `bun dev` making `.next`) stays watched until the next attach, but
 	 * the git-watcher's own ignored-path filter caps its downstream cost.
 	 */
-	private async computeGitIgnoredRelDirs(realPath: string): Promise<string[]> {
+	private async computeGitIgnoredRelDirs(
+		realPath: string,
+		signal: AbortSignal,
+	): Promise<string[]> {
 		if (!this.listGitIgnoredDirs) {
 			return [];
 		}
 		try {
-			const dirs = await this.listGitIgnoredDirs(realPath);
-			return dirs.filter(
-				(dir) =>
-					dir.length > 0 &&
-					!dir.startsWith("/") &&
-					!dir.split("/").includes(".."),
-			);
+			const dirs = await this.listGitIgnoredDirs(realPath, signal);
+			return dirs.filter(isSafeRelDir);
 		} catch (error) {
+			if (signal.aborted) throw error;
 			console.error("[workspace-fs/watch] gitignored-dir scan failed", {
 				absolutePath: realPath,
 				error: toErrorMessage(error),
@@ -734,8 +913,10 @@ export class FsWatcherManager {
 	 * swap the native subscription to it. Needed when a directory is
 	 * UN-ignored: the attach-time prune otherwise keeps suppressing its events
 	 * until process restart (VS Code re-subscribes on watcherExclude changes
-	 * for the same reason). Growth of the set never requires this — new
-	 * ignored dirs are filtered downstream.
+	 * for the same reason). Growth of the set needs it only on a backend that
+	 * holds a watch per entry: there a `node_modules` created after attach
+	 * costs memory per file until the next attach. Growth swaps are
+	 * rate-limited, with one trailing retry so the last growth is not lost.
 	 *
 	 * The old stream stays attached until the new one is live, but its events
 	 * are dropped by the generation guard once attach begins, so a short gap
@@ -743,26 +924,86 @@ export class FsWatcherManager {
 	 * they derive from events; the search index is invalidated here.
 	 *
 	 * Returns true when the subscription was actually swapped. No-swap cases:
-	 * the fresh ignore set still contains every currently-pruned dir (growth
-	 * is handled downstream without re-attach), or the root is absent,
+	 * nothing shrank and no growth swap is due, or the root is absent,
 	 * suspended, or recovering (the next attach re-runs the providers anyway).
+	 *
+	 * One refresh runs at a time per root. A call made during one waits for a
+	 * single follow-up run, so an un-ignore seen mid-swap is not lost.
 	 */
 	async refreshIgnores(rootAbsolutePath: string): Promise<boolean> {
 		const state = this.watchers.get(normalizeAbsolutePath(rootAbsolutePath));
-		if (!state || !state.subscription || state.recoveryTimer) {
+		if (!state) return false;
+		return this.refreshIgnoresSerialized(state);
+	}
+
+	private refreshIgnoresSerialized(state: WatcherState): Promise<boolean> {
+		const running = state.ignoreRefresh;
+		if (!running) return this.startIgnoreRefresh(state);
+		state.queuedIgnoreRefresh ??= running
+			.catch(() => false)
+			.then(() => {
+				state.queuedIgnoreRefresh = null;
+				return this.refreshIgnoresSerialized(state);
+			});
+		return state.queuedIgnoreRefresh;
+	}
+
+	private startIgnoreRefresh(state: WatcherState): Promise<boolean> {
+		const run = this.refreshIgnoresNow(state).finally(() => {
+			if (state.ignoreRefresh === run) state.ignoreRefresh = null;
+		});
+		state.ignoreRefresh = run;
+		return run;
+	}
+
+	private async refreshIgnoresNow(state: WatcherState): Promise<boolean> {
+		if (!state.subscription || state.recoveryTimer) {
 			return false;
 		}
 		const [nestedRepoRelDirs, gitIgnoredRelDirs] = await Promise.all([
-			this.computeNestedRepoRelDirs(state.realPath),
-			this.computeGitIgnoredRelDirs(state.realPath),
+			this.computeNestedRepoRelDirs(state.realPath, state.controller.signal),
+			this.computeGitIgnoredRelDirs(state.realPath, state.controller.signal),
 		]);
-		const fresh = new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs]);
-		const shrunk = state.prunedRelPrefixes.some((dir) => !fresh.has(dir));
-		if (!shrunk) {
+		if (
+			state.controller.signal.aborted ||
+			!state.subscription ||
+			state.recoveryTimer
+		) {
+			// State changed while the providers ran.
 			return false;
 		}
-		if (!state.subscription || state.recoveryTimer) {
-			// State changed while the providers ran.
+		state.ignoreListingEpoch += 1;
+		const fresh = [...new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs])];
+		const freshSet = new Set(fresh);
+		const native = new Set(state.nativePrunedRelPrefixes);
+		const nativeShrunk = state.nativePrunedRelPrefixes.some(
+			(dir) => !freshSet.has(dir),
+		);
+		// A per-entry backend skipped new entries under a filtered dir, so an
+		// un-ignored one needs a re-crawl, like a native shrink.
+		const filteredShrunk =
+			this.backend.watchesEachEntry === true &&
+			state.filteredRelPrefixes.some((dir) => !freshSet.has(dir));
+		const added = fresh.filter((dir) => !native.has(dir));
+		let reattach = nativeShrunk || filteredShrunk;
+		if (!reattach && added.length > 0 && this.backend.watchesEachEntry) {
+			const waitMs =
+				state.lastGrowthReattachAt + this.growthReattachMinMs - this.now();
+			if (waitMs > 0) {
+				this.scheduleGrowthReattach(state, waitMs);
+			} else {
+				reattach = true;
+			}
+		}
+		if (!reattach) {
+			const changed =
+				fresh.length !== state.prunedRelPrefixes.length ||
+				state.prunedRelPrefixes.some((dir) => !freshSet.has(dir));
+			if (changed) {
+				state.prunedRelPrefixes = fresh;
+				this.setFilteredRelPrefixes(state, added);
+				this.emitRootOverflow(state);
+			}
 			return false;
 		}
 		// Detach the old stream BEFORE attaching the new one. Keeping both
@@ -774,6 +1015,7 @@ export class FsWatcherManager {
 		const oldSubscription = state.subscription;
 		state.subscription = null;
 		state.generation += 1;
+		state.lastGrowthReattachAt = this.now();
 		await unsubscribeQuietly(oldSubscription);
 		// Disposal or root-deletion recovery may have raced the detach.
 		if (
@@ -805,7 +1047,145 @@ export class FsWatcherManager {
 		}
 		// Events during the swap gap may have been missed.
 		invalidateSearchIndexesForRoot(state.absolutePath);
+		this.emitRootOverflow(state);
 		return true;
+	}
+
+	private emitRootOverflow(state: WatcherState): void {
+		this.emitDirect(state, {
+			events: [
+				{
+					kind: "overflow",
+					absolutePath: state.absolutePath,
+					isDirectory: true,
+				},
+			],
+		});
+	}
+
+	private scheduleGrowthReattach(state: WatcherState, delayMs: number): void {
+		if (state.growthReattachTimer) {
+			return;
+		}
+		const timer = setTimeout(() => {
+			state.growthReattachTimer = null;
+			if (this.watchers.get(state.absolutePath) !== state) return;
+			void this.refreshIgnores(state.absolutePath).catch((error) => {
+				if (state.controller.signal.aborted) return;
+				console.error("[workspace-fs/watch] ignore growth re-attach failed", {
+					absolutePath: state.absolutePath,
+					error: toErrorMessage(error),
+				});
+			});
+		}, delayMs);
+		timer.unref?.();
+		state.growthReattachTimer = timer;
+	}
+
+	private setFilteredRelPrefixes(state: WatcherState, dirs: string[]): void {
+		state.filteredRelPrefixes = dirs;
+		state.filteredRealPaths = dirs.map((dir) => path.join(state.realPath, dir));
+	}
+
+	/**
+	 * Without this, a per-entry backend watches a new `node_modules` file by
+	 * file until git-watcher's next refresh, which can come a minute later
+	 * under a large install. Children of a dir already queued are left to the
+	 * dir's answer; whatever this misses, `refreshIgnores` still finds.
+	 */
+	private queueNewDirIgnoreChecks(
+		state: WatcherState,
+		events: NativeWatchEvent[],
+	): void {
+		if (!this.backend.watchesEachEntry || !this.listGitIgnoredDirs) return;
+		for (const event of events) {
+			if (event.type !== "create" || event.isDirectory !== true) continue;
+			if (state.newDirsToCheck.size >= NEW_DIR_IGNORE_CHECK_MAX_DIRS) break;
+			const relative = toPosixRelative(state.absolutePath, event.path);
+			if (
+				!isSafeRelDir(relative) ||
+				isUnderOrAt(relative, state.prunedRelPrefixes) ||
+				isUnderOrAt(relative, state.newDirsToCheck)
+			) {
+				continue;
+			}
+			state.newDirsToCheck.add(relative);
+		}
+		this.scheduleNewDirIgnoreCheck(state);
+	}
+
+	private scheduleNewDirIgnoreCheck(state: WatcherState): void {
+		if (
+			state.newDirCheckTimer ||
+			state.newDirCheckRunning ||
+			state.newDirsToCheck.size === 0
+		) {
+			return;
+		}
+		const timer = setTimeout(() => {
+			state.newDirCheckTimer = null;
+			void this.checkNewDirsIgnored(state);
+		}, NEW_DIR_IGNORE_CHECK_DELAY_MS);
+		timer.unref?.();
+		state.newDirCheckTimer = timer;
+	}
+
+	private async checkNewDirsIgnored(state: WatcherState): Promise<void> {
+		const listGitIgnoredDirs = this.listGitIgnoredDirs;
+		const dirs = [...state.newDirsToCheck].filter(
+			(dir) => !isUnderOrAt(dir, state.prunedRelPrefixes),
+		);
+		state.newDirsToCheck.clear();
+		if (!listGitIgnoredDirs || dirs.length === 0) return;
+		state.newDirCheckRunning = true;
+		const epoch = state.ignoreListingEpoch;
+		let ignored: string[] = [];
+		try {
+			ignored = await listGitIgnoredDirs(
+				state.realPath,
+				state.controller.signal,
+				dirs,
+			);
+		} catch (error) {
+			if (!state.controller.signal.aborted) {
+				console.error("[workspace-fs/watch] new-dir ignore check failed", {
+					absolutePath: state.absolutePath,
+					error: toErrorMessage(error),
+				});
+			}
+		} finally {
+			state.newDirCheckRunning = false;
+		}
+		if (state.controller.signal.aborted || !state.subscription) return;
+		if (state.ignoreListingEpoch !== epoch) {
+			for (const dir of dirs) state.newDirsToCheck.add(dir);
+			this.scheduleNewDirIgnoreCheck(state);
+			return;
+		}
+		const added = [
+			...new Set(
+				ignored.filter(
+					(dir) =>
+						isSafeRelDir(dir) && !isUnderOrAt(dir, state.prunedRelPrefixes),
+				),
+			),
+		];
+		if (added.length > 0) {
+			state.prunedRelPrefixes = [...state.prunedRelPrefixes, ...added];
+			this.setFilteredRelPrefixes(state, [
+				...state.filteredRelPrefixes,
+				...added,
+			]);
+			this.emitRootOverflow(state);
+			this.scheduleGrowthReattach(
+				state,
+				Math.max(
+					0,
+					state.lastGrowthReattachAt + this.growthReattachMinMs - this.now(),
+				),
+			);
+		}
+		this.scheduleNewDirIgnoreCheck(state);
 	}
 
 	/**
@@ -821,7 +1201,7 @@ export class FsWatcherManager {
 		if (!state || !state.subscription) {
 			return true;
 		}
-		const relative = path.relative(
+		const relative = toPosixRelative(
 			state.absolutePath,
 			normalizeAbsolutePath(absolutePath),
 		);
@@ -1005,7 +1385,11 @@ export class FsWatcherManager {
 	 * reappear — VS Code's suspend/resume pattern (baseWatcher.ts).
 	 */
 	private async suspendForRecovery(state: WatcherState): Promise<void> {
-		if (!state.subscription || state.recoveryTimer) {
+		if (
+			state.controller.signal.aborted ||
+			!state.subscription ||
+			state.recoveryTimer
+		) {
 			return;
 		}
 		if (this.watchers.get(state.absolutePath) !== state) {

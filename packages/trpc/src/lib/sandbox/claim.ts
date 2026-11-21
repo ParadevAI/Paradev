@@ -7,26 +7,37 @@
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
 import {
+	GOLDEN_BOX_VCPUS,
+	LEGACY_MACHINE_SIZE,
+} from "@superset/shared/billing";
+import { BRAND } from "@superset/shared/brand";
+import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
 } from "@superset/shared/cloud-agent-launch";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
 	type SandboxRepository,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
-import { resolveAgentCredentialEnv } from "../../router/agent-credential";
+import { resolveAgentSignIns } from "../../router/agent-credential";
+import { accessTokenExpiresAt } from "../../router/agent-credential/utils/chatgpt";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
+import { posthog } from "../analytics";
+import { resolveMachineSize } from "../billing/plan";
+import { organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
+import { agentSignInKinds } from "./agent-sign-in-kinds";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
 	installationTokenFor,
 	toSandboxRepositories,
-	workspaceBranchName,
 	workspaceRepositories,
 } from "./repositories";
 import type { SandboxClaim, SandboxEnvironment } from "./vercel";
@@ -34,7 +45,17 @@ import type { SandboxClaim, SandboxEnvironment } from "./vercel";
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
 /** Commits by a workspace nobody created, such as an automation's. */
-const SUPERSET_GIT_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const SUPERSET_GIT_AUTHOR = { name: BRAND.NAME, email: "noreply@superset.sh" };
+
+/** A size the org no longer offers falls back to its default at the next start. */
+async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {
+	const size =
+		(await resolveMachineSize(
+			row.organizationId,
+			row.machineSize ?? LEGACY_MACHINE_SIZE,
+		)) ?? (await resolveMachineSize(row.organizationId, null));
+	return size?.vcpus ?? GOLDEN_BOX_VCPUS;
+}
 
 export async function buildSandboxClaim(args: {
 	row: CloudWorkspaceRow;
@@ -48,19 +69,29 @@ export async function buildSandboxClaim(args: {
 	claim: SandboxClaim;
 	environment: SandboxEnvironment;
 	repositories: SandboxRepository[];
+	agentCredentialDigest: string;
+	/** When the first token in the rules expires; null when none does. */
+	rulesExpireAt: Date | null;
 }> {
-	const [environment, userAgentEnv] = await Promise.all([
+	const [environment, signIns, boxLogs] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
 		args.row.createdByUserId
-			? resolveAgentCredentialEnv({ userId: args.row.createdByUserId })
-			: Promise.resolve({}),
+			? resolveAgentSignIns({ userId: args.row.createdByUserId })
+			: Promise.resolve({ env: {}, codexChatgpt: null }),
+		env.SENTRY_DSN_SANDBOX
+			? organizationFlagEnabled(
+					posthog,
+					FEATURE_FLAGS.SANDBOX_BOX_LOGS,
+					args.row.organizationId,
+				)
+			: false,
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
 		cloudWorkspaceId: args.row.id,
-		hooksRepositoryId: environment.hooksRepositoryId,
-		primaryBranch: args.row.branch,
-		workingBranch: workspaceBranchName(args.row),
+		primaryRepositoryId: environment.primaryRepositoryId,
+		primaryBranch: args.row.baseBranch,
+		workingBranch: args.row.branch,
 	});
 	const creator = args.row.createdByUserId;
 	const [userToken, githubAccount, creatorUser] = creator
@@ -73,17 +104,25 @@ export async function buildSandboxClaim(args: {
 				}),
 			])
 		: [null, null, undefined];
+	const plugins = await creatorPlugins(creator, args.row.organizationId);
 	// The creator's own token when they have connected GitHub: pushes and pull
 	// requests are theirs. The App's installation token otherwise.
-	const token =
-		userToken ??
-		(await installationTokenFor(checkouts.map((entry) => entry.repository)));
-	const hooksCheckout = checkouts.find((entry) => entry.hooks) ?? checkouts[0];
+	const installation = userToken
+		? null
+		: await installationTokenFor(checkouts.map((entry) => entry.repository));
+	const token = userToken ?? installation?.token ?? null;
+	const expiries = [
+		userToken ? githubAccount?.accessTokenExpiresAt : installation?.expiresAt,
+		signIns.codexChatgpt
+			? accessTokenExpiresAt(signIns.codexChatgpt.accessToken)
+			: null,
+	].filter((at): at is Date => at instanceof Date);
+	const primaryCheckout = checkouts[0];
 	const repoHooks =
-		args.withRepoHooks && hooksCheckout
+		args.withRepoHooks && primaryCheckout
 			? await readRepoHooks({
-					repo: hooksCheckout.repository,
-					branch: hooksCheckout.baseBranch,
+					repo: primaryCheckout.repository,
+					branch: primaryCheckout.baseBranch,
 					token,
 				})
 			: null;
@@ -94,12 +133,12 @@ export async function buildSandboxClaim(args: {
 		SUPERSET_API_URL: env.NEXT_PUBLIC_API_URL,
 		SUPERSET_SANDBOX_WORKSPACE_ID: args.row.id,
 		SUPERSET_SANDBOX_ORGANIZATION_ID: args.row.organizationId,
+		...(creator ? { SUPERSET_SANDBOX_CREATOR_USER_ID: creator } : {}),
 		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify(repositories),
+		SUPERSET_SANDBOX_PLUGINS: JSON.stringify(plugins),
 		SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: args.row.provider,
-		...(environment.bundleSha
-			? { SUPERSET_BUNDLE_SHA: environment.bundleSha }
-			: {}),
+		SUPERSET_BUNDLE_SHA: environment.bundleSha,
 		...(env.SENTRY_DSN_SANDBOX
 			? {
 					HOST_SERVICE_SENTRY_DSN: env.SENTRY_DSN_SANDBOX,
@@ -107,12 +146,14 @@ export async function buildSandboxClaim(args: {
 						env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
 				}
 			: {}),
+		...(boxLogs ? { SUPERSET_SANDBOX_BOX_LOGS: "1" as const } : {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
-	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({
 		workspaceId: args.row.id,
 		environmentEnv: environment.envs,
-		userAgentEnv,
+		userAgentEnv: signIns.env,
+		codexChatgpt: signIns.codexChatgpt,
 		githubToken: token,
 		gitAuthor: gitAuthorFor({
 			github: githubAccount
@@ -131,12 +172,24 @@ export async function buildSandboxClaim(args: {
 			hostSecret: await sandboxHostSecretFor(args.row.id),
 			managedEnv,
 			networkPolicy,
+			files,
 			ports: repoHooks?.ports,
+			vcpus: await boxVcpus(args.row),
+			agentTools: await organizationFlagEnabled(
+				posthog,
+				FEATURE_FLAGS.SANDBOX_AGENT_TOOLS_DRIVE,
+				args.row.organizationId,
+			),
 		},
 		environment: {
 			sourceKind: environment.sourceKind,
 			sourceRef: environment.sourceRef,
+			region: environment.region,
 		},
 		repositories,
+		agentCredentialDigest: agentSignInKinds(signIns),
+		rulesExpireAt: expiries.length
+			? new Date(Math.min(...expiries.map((at) => at.getTime())))
+			: null,
 	};
 }

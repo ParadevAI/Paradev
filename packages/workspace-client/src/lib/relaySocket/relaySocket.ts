@@ -7,7 +7,7 @@ export interface RelaySocketOptions {
 	/** Fresh token per attempt (user JWT for relay hosts, PSK for local). */
 	getToken: () => string | null | Promise<string | null>;
 	/**
-	 * Definitive access denial: the `_whoowns` preflight returned 403 (the
+	 * Definitive access denial: a retry's `_whoowns` preflight returned 403 (the
 	 * relay only 403s a verified-valid token, so retrying with a fresher one
 	 * can't change the answer; expired tokens surface as 401 and self-heal via
 	 * `getToken`). Without `accessDeniedRetryMs` the socket closes permanently
@@ -23,7 +23,7 @@ export interface RelaySocketOptions {
 	 */
 	hostOfflineRetryMs?: number;
 	/**
-	 * Called with the `_whoowns` probe result before every WS attempt (null
+	 * Called with the `_whoowns` probe result before every WS retry (null
 	 * when the URL isn't relay-routed or the relay is unreachable). Lets callers
 	 * surface *why* a stream is down — host offline (503), unauthorized (401),
 	 * host present but not answering (502/504/200) — which the WS upgrade status
@@ -41,6 +41,11 @@ export interface RelaySocketOptions {
 
 export type RelaySocket = ReconnectingWebSocket;
 
+// partysocket's own defaults, kept so callers that omit the delays see no change.
+const DEFAULT_MIN_RECONNECTION_DELAY = 3_000;
+const DEFAULT_MAX_RECONNECTION_DELAY = 10_000;
+const RECONNECTION_DELAY_GROW_FACTOR = 1.3;
+
 // Accepts http(s) host URLs and converts to ws(s), so consumers can pass
 // their host URL straight through without scheme juggling.
 function signUrl(url: string, token: string | null): string {
@@ -57,7 +62,8 @@ function signUrl(url: string, token: string | null): string {
  * dial carries a fresh token — the class of bug where a reconnect loop reuses
  * a URL signed with an hourly-rotated JWT (PR #5628) can't recur here. The
  * provider also runs the `_whoowns` probe, the only place a browser client
- * can observe the upgrade's real HTTP status.
+ * can observe the upgrade's real HTTP status. The first dial skips it; if that
+ * dial fails before opening, the retry probes at once, without a backoff.
  */
 export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 	let socket: ReconnectingWebSocket | null = null;
@@ -78,9 +84,31 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 	// otherwise a stale probe could make the diagnosis describe the prior endpoint.
 	let probeEpoch = 0;
 
+	const minDelay = opts.minReconnectionDelay ?? DEFAULT_MIN_RECONNECTION_DELAY;
+	const maxDelay = opts.maxReconnectionDelay ?? DEFAULT_MAX_RECONNECTION_DELAY;
+	const backoffDelay = (retryCount: number) =>
+		retryCount > 0
+			? Math.min(
+					minDelay * RECONNECTION_DELAY_GROW_FACTOR ** (retryCount - 1),
+					maxDelay,
+				)
+			: 0;
+
+	let unprobedDialPending = false;
+
 	const provider = async (): Promise<string> => {
+		const retryCount = socket?.retryCount ?? 0;
+		const retryingUnprobedDial = unprobedDialPending;
+		unprobedDialPending = false;
+		if (retryCount > 0 && !retryingUnprobedDial) {
+			await waitBeforeRetry(backoffDelay(retryCount));
+		}
 		const epoch = ++probeEpoch;
 		const url = signUrl(await opts.buildUrl(), await opts.getToken());
+		if (retryCount === 0) {
+			unprobedDialPending = true;
+			return url;
+		}
 		const probe = await probeRelayHost(url);
 		if (epoch === probeEpoch) opts.onProbe?.(probe);
 		if (probe?.status === 403) {
@@ -101,9 +129,12 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 		return url;
 	};
 
+	// partysocket sleeps out its backoff while holding its connection lock, so
+	// a reconnect() in that window does nothing. The backoff runs in the URL
+	// provider instead, where reconnect() can cut it short.
 	socket = new ReconnectingWebSocket(provider, [], {
-		minReconnectionDelay: opts.minReconnectionDelay,
-		maxReconnectionDelay: opts.maxReconnectionDelay,
+		minReconnectionDelay: 0,
+		maxReconnectionDelay: 0,
 		maxRetries: opts.maxRetries,
 		connectionTimeout: opts.connectionTimeout,
 		maxEnqueuedMessages: opts.maxEnqueuedMessages ?? 0,
@@ -112,6 +143,10 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 	// The URL provider holds partysocket's connection lock while awaiting a
 	// cooldown. Wake it on explicit retry/close so the provider settles
 	// promptly and the native retry loop can honor the user's action.
+	socket.addEventListener("open", () => {
+		unprobedDialPending = false;
+	});
+
 	const reconnect = socket.reconnect.bind(socket);
 	socket.reconnect = (code, reason) => {
 		cancelRetryWait?.();

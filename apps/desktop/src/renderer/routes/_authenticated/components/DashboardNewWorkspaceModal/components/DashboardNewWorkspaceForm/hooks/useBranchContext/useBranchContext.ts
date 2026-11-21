@@ -1,10 +1,10 @@
 import type { AppRouter } from "@superset/host-service";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { useMemo } from "react";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { CLOUD_HOST_ID } from "../../components/DevicePicker/DevicePicker";
 
 type SearchBranchesInput =
 	inferRouterInputs<AppRouter>["workspaceCreation"]["searchBranches"];
@@ -35,6 +35,7 @@ export function useBranchContext(
 	query: string,
 	filter: BranchFilter = "all",
 	cloudRepository: CloudRepository | null = null,
+	canReachHost = true,
 ) {
 	// A cloud workspace has no host to search — the sandbox doesn't exist until
 	// create — so its branches come from the GitHub remote instead.
@@ -71,7 +72,7 @@ export function useBranchContext(
 			query,
 			filter,
 		],
-		enabled: !isCloud && !!projectId && !!hostUrl,
+		enabled: !isCloud && canReachHost && !!projectId && !!hostUrl,
 		initialPageParam: undefined as string | undefined,
 		getNextPageParam: (last: BranchPage) => last.nextCursor ?? undefined,
 		queryFn: async ({ pageParam }): Promise<BranchPage> => {
@@ -119,6 +120,9 @@ export function useBranchContext(
 			defaultBranch: cloudRepository?.defaultBranch ?? null,
 			isLoading: cloudBranches.isLoading,
 			isError: cloudBranches.isError,
+			error: cloudBranches.error,
+			isRefetching: cloudBranches.isRefetching,
+			refetch: cloudBranches.refetch,
 			isFetchingNextPage: false,
 			hasNextPage: false,
 			fetchNextPage: () => {},
@@ -130,6 +134,9 @@ export function useBranchContext(
 		defaultBranch,
 		isLoading: q.isLoading,
 		isError: q.isError,
+		error: q.error,
+		isRefetching: q.isRefetching,
+		refetch: q.refetch,
 		isFetchingNextPage: q.isFetchingNextPage,
 		hasNextPage: q.hasNextPage,
 		fetchNextPage: q.fetchNextPage,

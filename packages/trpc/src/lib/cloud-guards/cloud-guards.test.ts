@@ -1,4 +1,7 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
+import { stub } from "../../../test/stub";
+import { posthog } from "../analytics";
 
 let flagResult: boolean | undefined;
 let storedEmail: string | null;
@@ -9,44 +12,31 @@ let calls: Array<{
 	options?: { personProperties?: Record<string, string> };
 }> = [];
 
-// Both stubbed so the real clients — and the validated env and database
-// connection they open at import — stay out of this test's module graph.
-// `mock.module` is process-wide, so every export the real module has must be
-// here: another file's import of `dbWs` resolves against this stub too.
-mock.module("@superset/db/client", () => ({
-	db: {
-		query: {
-			users: {
-				findFirst: () => {
-					lookups += 1;
-					return Promise.resolve(
-						storedEmail === null ? undefined : { email: storedEmail },
-					);
-				},
-			},
-		},
+stub(db.query.users, {
+	findFirst: () => {
+		lookups += 1;
+		return Promise.resolve(
+			storedEmail === null ? undefined : { email: storedEmail },
+		);
 	},
-	dbWs: {
-		transaction: () => Promise.reject(new Error("dbWs is stubbed in tests")),
+});
+stub(posthog, {
+	isFeatureEnabled: (
+		key: string,
+		distinctId: string,
+		options?: { personProperties?: Record<string, string> },
+	) => {
+		calls.push({ key, distinctId, options });
+		return Promise.resolve(flagResult);
 	},
-}));
-mock.module("../analytics", () => ({
-	posthog: {
-		isFeatureEnabled: (
-			key: string,
-			distinctId: string,
-			options?: { personProperties?: Record<string, string> },
-		) => {
-			calls.push({ key, distinctId, options });
-			return Promise.resolve(flagResult);
-		},
-	},
-}));
+});
 
-const { assertCloudAccess } = await import("./cloud-guards");
+const { assertCloudAccess, organizationOrFirst } = await import(
+	"./cloud-guards"
+);
 
 const signedIn = (email: string, id = "user-1") => ({
-	userId: "user-1",
+	principal: { userId: "user-1" },
 	session: { user: { id, email } },
 });
 
@@ -59,24 +49,25 @@ describe("assertCloudAccess", () => {
 
 	test("allows an account the flag is enabled for", async () => {
 		flagResult = true;
-		await assertCloudAccess(signedIn("Someone@Superset.sh"));
+		await assertCloudAccess(signedIn("Someone@Superset.sh"), null);
 	});
 
 	test("evaluates cloud-workspaces for the user, by normalized email", async () => {
 		flagResult = true;
-		await assertCloudAccess(signedIn("Someone@Superset.sh"));
+		await assertCloudAccess(signedIn("Someone@Superset.sh"), null);
 
 		expect(calls).toHaveLength(1);
 		expect(calls[0]?.key).toBe("cloud-workspaces");
 		expect(calls[0]?.distinctId).toBe("user-1");
 		expect(calls[0]?.options?.personProperties).toEqual({
 			email: "someone@superset.sh",
+			plan_tier: "none",
 		});
 	});
 
 	test("spends no query when the loaded session is this user", async () => {
 		flagResult = true;
-		await assertCloudAccess(signedIn("someone@superset.sh"));
+		await assertCloudAccess(signedIn("someone@superset.sh"), null);
 		expect(lookups).toBe(0);
 	});
 
@@ -84,18 +75,19 @@ describe("assertCloudAccess", () => {
 	// loaded row is only usable when it is this user's.
 	test("looks the user up when the session is somebody else", async () => {
 		flagResult = true;
-		await assertCloudAccess(signedIn("other@superset.sh", "user-2"));
+		await assertCloudAccess(signedIn("other@superset.sh", "user-2"), null);
 
 		expect(lookups).toBe(1);
 		expect(calls[0]?.options?.personProperties).toEqual({
 			email: "stored@superset.sh",
+			plan_tier: "none",
 		});
 	});
 
 	test("refuses an account the flag is disabled for", async () => {
 		flagResult = false;
 		await expect(
-			assertCloudAccess(signedIn("someone@example.com")),
+			assertCloudAccess(signedIn("someone@example.com"), null),
 		).rejects.toThrow(/not enabled for/);
 	});
 
@@ -105,7 +97,7 @@ describe("assertCloudAccess", () => {
 	test("refuses when the flag cannot be evaluated", async () => {
 		flagResult = undefined;
 		await expect(
-			assertCloudAccess(signedIn("someone@superset.sh")),
+			assertCloudAccess(signedIn("someone@superset.sh"), null),
 		).rejects.toThrow(/not enabled for/);
 	});
 
@@ -113,7 +105,32 @@ describe("assertCloudAccess", () => {
 		flagResult = false;
 		storedEmail = null;
 		await expect(
-			assertCloudAccess({ userId: "user-1", session: null }),
+			assertCloudAccess(
+				{ principal: { userId: "user-1" }, session: null },
+				null,
+			),
 		).rejects.toThrow(/this account/);
+	});
+});
+
+describe("organizationOrFirst", () => {
+	const caller = (
+		activeOrganizationId: string | null,
+		organizationIds?: string[],
+	) => ({
+		principal: { userId: "user-1" },
+		session: organizationIds ? { session: { organizationIds } } : null,
+		activeOrganizationId,
+		sandboxCaller: null,
+	});
+
+	test("a bearer that names no organization gets its token's first", () => {
+		expect(organizationOrFirst(caller(null, ["org-a", "org-b"]))).toBe("org-a");
+	});
+
+	test("the organization a request names wins", () => {
+		expect(organizationOrFirst(caller("org-b", ["org-a", "org-b"]))).toBe(
+			"org-b",
+		);
 	});
 });

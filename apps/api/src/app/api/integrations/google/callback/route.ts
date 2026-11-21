@@ -1,20 +1,20 @@
 import { db } from "@superset/db/client";
 import { connections } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import {
 	connectorMethod,
 	requireConnector,
 	upsertConnection,
 } from "@superset/trpc/connectors";
 import { googleTokenResponseSchema } from "@superset/trpc/integrations/google";
-import { Client } from "@upstash/qstash";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { env } from "@/env";
+import { STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { resolveCallback } from "@/lib/integrations/resolveCallback";
 import { upsertIdentity } from "@/lib/integrations/upsertIdentity";
-
-const qstash = new Client({ token: env.QSTASH_TOKEN, baseUrl: env.QSTASH_URL });
+import { enqueueWatchSetup } from "../lib/enqueueWatchSetup";
 
 const GOOGLE_CALL_TIMEOUT_MS = 10 * 1000;
 
@@ -24,24 +24,18 @@ const userInfoSchema = z.object({
 	name: z.string().optional(),
 });
 
-const REQUIRED_SCOPES = [
-	"https://www.googleapis.com/auth/calendar.readonly",
-	"https://www.googleapis.com/auth/gmail.readonly",
-];
+const REQUIRED_SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 
-function fail(reason: string): Response {
-	return Response.redirect(
-		`${env.NEXT_PUBLIC_WEB_URL}/integrations/google?error=${reason}`,
-	);
-}
+const settingsUrl = `${env.NEXT_PUBLIC_WEB_URL}/integrations/google`;
 
 export async function GET(request: Request) {
 	const callback = await resolveCallback(request, {
 		params: ["code"],
-		redirect: fail,
+		redirect: (error) => `${settingsUrl}?error=${error}`,
+		cookie: STATE_COOKIES.google,
 	});
 	if (callback instanceof Response) return callback;
-	const { organizationId, userId, params } = callback;
+	const { organizationId, userId, params, exit, fail } = callback;
 
 	const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
 		method: "POST",
@@ -49,9 +43,9 @@ export async function GET(request: Request) {
 		signal: AbortSignal.timeout(GOOGLE_CALL_TIMEOUT_MS),
 		body: new URLSearchParams({
 			grant_type: "authorization_code",
-			client_id: env.GOOGLE_CLIENT_ID,
-			client_secret: env.GOOGLE_CLIENT_SECRET,
-			redirect_uri: `${env.NEXT_PUBLIC_API_URL}/api/integrations/google/callback`,
+			client_id: env.GOOGLE_CONNECTIONS_CLIENT_ID,
+			client_secret: env.GOOGLE_CONNECTIONS_CLIENT_SECRET,
+			redirect_uri: `${getBrowserApiUrl(env)}/api/integrations/google/callback`,
 			code: params.code,
 		}),
 	});
@@ -69,9 +63,9 @@ export async function GET(request: Request) {
 	if (!parsedTokens.success) return fail("token_exchange_failed");
 	const tokens = parsedTokens.data;
 
-	// Someone can untick a scope on the consent screen. Half a connection —
-	// calendars but no mail — would save fine and then silently never fire
-	// Gmail triggers, so it is refused up front.
+	// Someone can untick the mail scope on the consent screen. The connection
+	// would save fine and then silently never fire Gmail triggers, so it is
+	// refused up front.
 	const granted = new Set((tokens.scope ?? "").split(" "));
 	if (!REQUIRED_SCOPES.every((scope) => granted.has(scope))) {
 		return fail("missing_scopes");
@@ -109,8 +103,8 @@ export async function GET(request: Request) {
 			raw: tokens as unknown as Record<string, unknown>,
 		},
 		identity: {
-			// The account's address, not an organization: Calendar and Gmail are
-			// one person's, and everything downstream treats them as theirs.
+			// The account's address, not an organization: a mailbox is one
+			// person's, and everything downstream treats it as theirs.
 			account: { id: email, label: email },
 			user: { id: info.sub, label: email },
 		},
@@ -135,7 +129,7 @@ export async function GET(request: Request) {
 		);
 
 	// The identity's external id is the address rather than Google's subject
-	// id, because calendar events and mail headers name people by address.
+	// id, because mail headers name people by address.
 	await upsertIdentity({
 		userId,
 		organizationId,
@@ -149,30 +143,5 @@ export async function GET(request: Request) {
 
 	await enqueueWatchSetup(result.connectionId);
 
-	return Response.redirect(`${env.NEXT_PUBLIC_WEB_URL}/integrations/google`);
-}
-
-/**
- * Watches are set up out of band: they take several Google calls per
- * calendar, and a failure there (an unreachable push address, say) must not
- * turn a successful authorization into an error page.
- */
-async function enqueueWatchSetup(connectionId: string): Promise<void> {
-	const jobUrl = `${env.NEXT_PUBLIC_API_URL}/api/integrations/google/jobs/renew-watches`;
-	const body = { connectionId };
-	if (env.NODE_ENV === "development") {
-		fetch(jobUrl, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(body),
-		}).catch((error) => {
-			console.error("[google/callback] dev watch setup failed:", error);
-		});
-		return;
-	}
-	try {
-		await qstash.publishJSON({ url: jobUrl, body, retries: 3 });
-	} catch (error) {
-		console.error("[google/callback] failed to queue watch setup:", error);
-	}
+	return exit(settingsUrl);
 }

@@ -1,0 +1,12 @@
+{
+	"name": "agent-worker-image",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"@temporalio/activity": "1.24.0",
+		"@temporalio/client": "1.24.0",
+		"@temporalio/common": "1.24.0",
+		"@temporalio/worker": "1.24.0",
+		"@temporalio/workflow": "1.24.0"
+	}
+}

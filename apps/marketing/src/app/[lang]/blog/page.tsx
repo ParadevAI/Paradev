@@ -4,7 +4,7 @@ import { getI18nInstance } from "@superset/i18n/server";
 import type { Metadata } from "next";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
-import { getListedBlogPosts } from "@/lib/blog";
+import { getBlogPost, getListedBlogPosts } from "@/lib/blog";
 import { BlogCard } from "./components/BlogCard";
 import { GridCross } from "./components/GridCross";
 
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const description = i18n._(
 		msg({
 			message:
-				"News, updates, and insights from the Superset team about parallel coding agents and developer productivity.",
+				"News, updates, and insights from the Paradev team about parallel coding agents and developer productivity.",
 		}),
 	);
 	return {
@@ -33,14 +33,14 @@ export async function generateMetadata(): Promise<Metadata> {
 			languages: localizedAlternates(lang, "/blog").languages,
 		},
 		openGraph: {
-			title: `${title} | Superset`,
+			title: `${title} | Paradev`,
 			description: description,
 			url: localeUrl(lang, "/blog"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | Superset`,
+			title: `${title} | Paradev`,
 			description: description,
 			images: ["/og-image.png"],
 		},
@@ -50,7 +50,20 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BlogPage() {
 	await initServerI18n();
 
-	const posts = getListedBlogPosts();
+	const guideSlugs = [
+		"change-ui-with-your-coding-agent",
+		"send-pr-feedback-to-your-agent",
+		"review-agent-work-with-pages",
+		"parallel-coding-agents-guide",
+		"scheduled-agent-maintenance",
+	];
+	const posts = getListedBlogPosts().filter(
+		(post) => !guideSlugs.includes(post.slug),
+	);
+	const guides = guideSlugs.flatMap((slug) => {
+		const post = getBlogPost(slug);
+		return post ? [post] : [];
+	});
 
 	return (
 		<main className="relative min-h-screen">
@@ -78,7 +91,7 @@ export default async function BlogPage() {
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-lg">
 						<Trans>
-							Insights from the Superset team about parallel coding agents and
+							Insights from the Paradev team about parallel coding agents and
 							developer productivity.
 						</Trans>
 					</p>
@@ -87,6 +100,23 @@ export default async function BlogPage() {
 					<GridCross className="bottom-0 right-0" />
 				</div>
 			</header>
+
+			<section
+				aria-labelledby="guides-heading"
+				className="relative max-w-3xl mx-auto px-6 pt-12"
+			>
+				<h2
+					id="guides-heading"
+					className="text-2xl font-medium tracking-tight text-foreground mb-6"
+				>
+					<Trans>Guides</Trans>
+				</h2>
+				<div className="flex flex-col gap-4">
+					{guides.map((post) => (
+						<BlogCard key={post.url} post={post} headingLevel="h3" />
+					))}
+				</div>
+			</section>
 
 			{/* Posts section */}
 			<div className="relative max-w-3xl mx-auto px-6 py-12">

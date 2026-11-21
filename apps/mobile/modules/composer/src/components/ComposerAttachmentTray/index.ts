@@ -1,0 +1,1 @@
+export { ComposerAttachmentTray } from "./ComposerAttachmentTray";

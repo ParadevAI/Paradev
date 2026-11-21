@@ -28,6 +28,7 @@ jobs:
     name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: startsWith(github.ref, 'refs/tags/desktop-v')
 
     steps:
@@ -75,8 +76,14 @@ jobs:
               if [[ "$arch" =~ ^[0-9]+\.[0-9]+\.[0-9] ]]; then
                 arch="x64"
               fi
-              cp "$file" "Superset-${arch}.dmg"
-              echo "Created stable copy: Superset-${arch}.dmg"
+              # Published links still use Superset-<arch>.dmg; keep that alias.
+              name="${file%%-[0-9]*}"
+              for alias in "Superset-${arch}.dmg" "${name}-${arch}.dmg"; do
+                if [[ ! -f "$alias" ]]; then
+                  cp "$file" "$alias"
+                  echo "Created stable copy: $alias"
+                fi
+              done
             fi
           done
           for file in *-mac.zip; do
@@ -141,6 +148,6 @@ jobs:
         run: |
           gh release create "${{ github.ref_name }}" \
             release-artifacts/* \
-            --title "Superset Desktop ${{ github.ref_name }}" \
+            --title "Paradev Desktop ${{ github.ref_name }}" \
             --notes-file release_notes.md \
             --draft

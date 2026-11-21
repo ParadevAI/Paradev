@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import { basename, resolve as resolvePath } from "node:path";
 import {
 	type ParsedGitHubRemote,
@@ -6,32 +6,49 @@ import {
 } from "@superset/shared/github-remote";
 import { BRANCH_PREFIX_MODES } from "@superset/shared/workspace-launch";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { z } from "zod";
-import { projects, tagFolderSettings, workspaces } from "../../../db/schema";
+import { projects, workspaces } from "../../../db/schema";
 import type { TagSettingSnapshot } from "../../../events/types";
 import {
 	emitProjectChanged,
+	getLiveProjectAtPath,
 	getLocalProject,
+	getProjectIncludingDeleted,
 	toProjectSnapshot,
 	updateLocalProject,
 } from "../../../projects/local-project-store";
+import {
+	listDeletedProjects,
+	purgeDeletedProject,
+	readDeletionImpact,
+	repoTakenError,
+	restoreProject,
+	softDeleteProject,
+} from "../../../projects/project-deletion";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import {
 	deleteTagFolderSetting,
 	getAllTagFolderSettings,
 	upsertTagFolderSetting,
 } from "../../../tag-folders";
+import { getStrictShellEnvironment } from "../../../terminal/clean-shell-env";
+import { gitDetectExternalWorktreesTask } from "../../../workers/tasks/git";
+import { updateLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import {
-	emitLocalWorkspaceDeleted,
-	updateLocalWorkspace,
-} from "../../../workspaces/local-workspace-store";
-import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
+	machineOnlyProcedure,
+	protectedProcedure,
+	queryProcedure,
+	router,
+} from "../../index";
+import { offLoop } from "../../off-loop";
+import { projectDirExists } from "../workspace-creation/shared/local-project";
 import {
 	normalizeSparseCheckoutPaths,
 	parseSparseCheckoutPaths,
 	serializeSparseCheckoutPaths,
 } from "../workspace-creation/shared/sparse-checkout";
+import { normalizeWorktreePath } from "../workspace-creation/shared/worktree-list";
 import { normalizeWorktreeBaseDir } from "../workspace-creation/shared/worktree-paths";
 import {
 	createFromClone,
@@ -44,6 +61,7 @@ import { getGitHubRemotes } from "./utils/git-remote";
 import { listGitHubRepositories } from "./utils/github-repositories";
 import { persistLocalProject } from "./utils/persist-project";
 import {
+	adoptLocalRepo,
 	cloneRepoInto,
 	type ResolvedRepo,
 	resolveLocalRepo,
@@ -90,6 +108,7 @@ export const projectRouter = router({
 		return ctx.db
 			.select()
 			.from(projects)
+			.where(isNull(projects.deletedAt))
 			.all()
 			.map((row) => ({
 				id: row.id,
@@ -204,18 +223,15 @@ export const projectRouter = router({
 
 	get: protectedProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
-		.query(({ ctx, input }) => {
-			const row = ctx.db
-				.select()
-				.from(projects)
-				.where(eq(projects.id, input.projectId))
-				.get();
+		.query(async ({ ctx, input }) => {
+			const row = getLocalProject(ctx.db, input.projectId);
 			if (!row) return null;
 			return {
 				id: row.id,
 				// Same fallback rule as project.list / toProjectSnapshot.
 				name: row.name || basename(row.repoPath),
 				repoPath: row.repoPath,
+				repoPathExists: await projectDirExists(row.repoPath),
 				repoOwner: row.repoOwner,
 				repoName: row.repoName,
 				repoUrl: row.repoUrl,
@@ -304,26 +320,19 @@ export const projectRouter = router({
 		)
 		.mutation(({ ctx, input }) => {
 			const worktreeBaseDir = normalizeWorktreeBaseDir(input.path);
+			if (!getLocalProject(ctx.db, input.projectId)) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Project is not set up on this host",
+				});
+			}
 			ctx.db
 				.update(projects)
 				.set({ worktreeBaseDir })
 				.where(eq(projects.id, input.projectId))
 				.run();
 
-			const project = ctx.db.query.projects
-				.findFirst({ where: eq(projects.id, input.projectId) })
-				.sync();
-			if (!project) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Project is not set up on this host",
-				});
-			}
-
-			return {
-				id: project.id,
-				worktreeBaseDir: project.worktreeBaseDir ?? null,
-			};
+			return { id: input.projectId, worktreeBaseDir };
 		}),
 
 	/**
@@ -349,7 +358,9 @@ export const projectRouter = router({
 			const updated = ctx.db
 				.update(projects)
 				.set({ namingInstructions })
-				.where(eq(projects.id, input.projectId))
+				.where(
+					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
+				)
 				.returning({ id: projects.id })
 				.get();
 			if (!updated) {
@@ -381,7 +392,9 @@ export const projectRouter = router({
 			const updated = ctx.db
 				.update(projects)
 				.set({ sparseCheckoutPaths: serializeSparseCheckoutPaths(paths) })
-				.where(eq(projects.id, input.projectId))
+				.where(
+					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
+				)
 				.returning({ id: projects.id })
 				.get();
 			if (!updated) {
@@ -412,7 +425,9 @@ export const projectRouter = router({
 					branchPrefixMode: input.mode,
 					branchPrefixCustom: input.customPrefix ?? null,
 				})
-				.where(eq(projects.id, input.projectId))
+				.where(
+					and(eq(projects.id, input.projectId), isNull(projects.deletedAt)),
+				)
 				.returning({ id: projects.id })
 				.get();
 			if (!updated) {
@@ -489,9 +504,7 @@ export const projectRouter = router({
 				!!cloneUrl &&
 				cloneUrl.toLowerCase() === expectedUrlLower;
 
-			const localProject = ctx.db.query.projects
-				.findFirst({ where: eq(projects.repoPath, gitRoot) })
-				.sync();
+			const localProject = getLiveProjectAtPath(ctx.db, gitRoot);
 
 			// A local-DB row keyed by this repo's git root is authoritative:
 			// the repo is already a v2 project on this device ("local is
@@ -628,7 +641,7 @@ export const projectRouter = router({
 				]),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => {
+		.mutation(async ({ ctx, input, signal }) => {
 			switch (input.mode.kind) {
 				case "empty":
 					return createFromEmpty(ctx, {
@@ -646,6 +659,7 @@ export const projectRouter = router({
 						name: input.name,
 						parentDir: input.mode.parentDir,
 						url: input.mode.url,
+						signal,
 					});
 				case "importLocal":
 					return createFromImportLocal(ctx, {
@@ -686,11 +700,8 @@ export const projectRouter = router({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const existing = ctx.db
-				.select({ id: projects.id, repoPath: projects.repoPath })
-				.from(projects)
-				.where(eq(projects.id, input.projectId))
-				.get();
+			restoreProject(ctx, input.projectId);
+			const existing = getProjectIncludingDeleted(ctx.db, input.projectId);
 
 			// Projects are host-owned, so a local row is this host's only
 			// self-contained source of repo coordinates. Without one the
@@ -776,7 +787,7 @@ export const projectRouter = router({
 							`${parsed.owner}/${parsed.name}`,
 						);
 					} else {
-						resolved = await resolveLocalRepo(input.mode.repoPath);
+						resolved = await adoptLocalRepo(input.mode.repoPath);
 					}
 
 					// Each on-disk repo path maps to at most one project in the
@@ -784,17 +795,9 @@ export const projectRouter = router({
 					// would clobber the first. Cloud-side GitHub URL collisions
 					// are allowed (see findBackfillConflict), but local-path
 					// collisions are not.
-					const localOwner = ctx.db
-						.select({ id: projects.id })
-						.from(projects)
-						.where(eq(projects.repoPath, resolved.repoPath))
-						.get();
+					const localOwner = getLiveProjectAtPath(ctx.db, resolved.repoPath);
 					if (localOwner && localOwner.id !== input.projectId) {
-						throw new TRPCError({
-							code: "CONFLICT",
-							message:
-								"Repository is already set up as another project on this device.",
-						});
+						throw repoTakenError();
 					}
 
 					rejectIfRepoint(resolved.repoPath);
@@ -822,85 +825,70 @@ export const projectRouter = router({
 		}),
 
 	/**
-	 * Project-delete saga. Local is reality — the local deletes are the
-	 * commit point, run first, and are fully offline-capable:
-	 *
-	 *   1. Ownership check: an id this host doesn't serve is a no-op —
-	 *      never a legacy cloud delete.
-	 *
-	 *   2. Best-effort `git worktree remove` for each worktree workspace so
-	 *      subsequent worktree commands aren't confused. Local workspaces
-	 *      live on the repo itself and have nothing to remove.
-	 *
-	 *   3. Local DB rows (workspaces + project). A failure here surfaces as
-	 *      an error — the local table is what the UI lists from, so a
-	 *      swallowed failure would toast "Deleted" over a surviving row.
-	 *
-	 * The on-disk repo directory is NEVER auto-removed. The user's code is
-	 * their code; deletion of the working tree must be an explicit action,
-	 * not a side-effect of project removal. Returns repoPath so a future
-	 * UI can offer an explicit "delete files too" follow-up.
+	 * Soft delete: the project and its live workspaces disappear for
+	 * everyone on this device, teardown runs and terminals stop, and the
+	 * worktrees stay on disk so `restore` can undo it until the purge sweep
+	 * runs. The repository folder is never removed.
 	 */
 	remove: machineOnlyProcedure
 		.input(z.object({ projectId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const localProject = ctx.db.query.projects
-				.findFirst({ where: eq(projects.id, input.projectId) })
-				.sync();
-			if (!localProject) return { success: true, repoPath: null };
-
-			// The project-row delete below cascades tombstones away — removing a
-			// project intentionally drops its workspace history. Sweep worktrees
-			// for live rows AND stranded tombstones (crash-interrupted deletes
-			// whose worktree survives): once the cascade runs, the startup
-			// reconciler can no longer see them.
-			const localWorkspaces = ctx.db
-				.select()
-				.from(workspaces)
-				.where(eq(workspaces.projectId, input.projectId))
-				.all()
-				.filter((ws) => ws.archivedAt == null || existsSync(ws.worktreePath));
-
-			for (const ws of localWorkspaces) {
-				if (ws.type === "local" || ws.worktreePath === localProject.repoPath)
-					continue;
-				try {
-					const git = await ctx.git(localProject.repoPath);
-					await git.raw(["worktree", "remove", ws.worktreePath]);
-				} catch (err) {
-					console.warn("[project.remove] failed to remove worktree", {
-						projectId: input.projectId,
-						worktreePath: ws.worktreePath,
-						err,
-					});
-				}
-			}
-
-			try {
-				// The project cascade removes its workspaces. Folder settings have no
-				// FK because the same scope column also holds Sessions, so delete both
-				// owners in one transaction: neither can survive a partial failure.
-				ctx.db.transaction((tx) => {
-					tx.delete(projects).where(eq(projects.id, input.projectId)).run();
-					tx.delete(tagFolderSettings)
-						.where(eq(tagFolderSettings.scope, input.projectId))
-						.run();
-				});
-				// Events describe committed state and must not escape the transaction.
-				for (const ws of localWorkspaces) emitLocalWorkspaceDeleted(ctx, ws);
-				ctx.eventBus.broadcastTagFoldersChanged({
-					scope: input.projectId,
-					settings: [],
-					occurredAt: Date.now(),
-				});
-				emitProjectChanged(ctx.eventBus, "deleted", input.projectId);
-			} catch (err) {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Failed to delete project locally: ${err instanceof Error ? err.message : String(err)}`,
-				});
-			}
-
-			return { success: true, repoPath: localProject.repoPath };
+			const deleted = await softDeleteProject(ctx, input.projectId);
+			return { success: true, repoPath: deleted?.repoPath ?? null };
 		}),
+
+	restore: machineOnlyProcedure
+		.input(z.object({ projectId: z.string().uuid() }))
+		.mutation(({ ctx, input }) => {
+			const restored = restoreProject(ctx, input.projectId);
+			if (!restored) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Project not found",
+				});
+			}
+			return restored;
+		}),
+
+	purge: machineOnlyProcedure
+		.input(z.object({ projectId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			if (!(await purgeDeletedProject(ctx, input.projectId))) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "Only a deleted project can be deleted permanently",
+				});
+			}
+			return { success: true };
+		}),
+
+	listDeleted: protectedProcedure.query(({ ctx }) => listDeletedProjects(ctx)),
+
+	/** Git worktrees that other agent tools (Conductor, T3 Code, Orca, …) left on
+	 * this machine and no workspace tracks yet, grouped by repository. */
+	detectExternalWorktrees: queryProcedure.query(async (args) => ({
+		repos: await offLoop({
+			task: gitDetectExternalWorktreesTask,
+			prepare: async ({ ctx }) => ({
+				homeDir: homedir(),
+				trackedWorktreePaths: ctx.db
+					.select({ worktreePath: workspaces.worktreePath })
+					.from(workspaces)
+					.leftJoin(projects, eq(projects.id, workspaces.projectId))
+					.where(
+						or(isNull(workspaces.archivedAt), isNotNull(projects.deletedAt)),
+					)
+					.all()
+					.map((row) => normalizeWorktreePath(row.worktreePath)),
+				gitEnv: await getStrictShellEnvironment().catch(
+					() => process.env as Record<string, string>,
+				),
+			}),
+			options: () => ({ timeoutMs: 4_000 }),
+		})(args),
+	})),
+
+	deletionImpact: protectedProcedure
+		.input(z.object({ projectId: z.string().uuid() }))
+		.query(({ ctx, input }) => readDeletionImpact(ctx, input.projectId)),
 });

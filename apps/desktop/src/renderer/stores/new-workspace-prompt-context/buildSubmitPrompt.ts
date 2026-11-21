@@ -4,7 +4,7 @@ import type {
 } from "renderer/stores/new-workspace-draft";
 import { useNewWorkspacePromptContextStore } from "./store";
 
-export interface BuildSubmitPromptArgs {
+interface BuildSubmitPromptArgs {
 	userPrompt: string;
 	linkedPR: LinkedPR | null;
 	linkedIssues: LinkedIssue[];
@@ -24,6 +24,17 @@ export function buildSubmitPrompt(args: BuildSubmitPromptArgs): string {
 		const body = readBody(`task:${issue.taskId}`);
 		const header = `## Linked task — ${issue.slug}: ${issue.title}`;
 		linkedSections.push(body ? `${header}\n${body}` : header);
+	}
+
+	for (const issue of args.linkedIssues) {
+		if (issue.source !== "linear") continue;
+		const body = readBody(`linear-issue:${issue.slug}`);
+		const headerLines = [
+			`## Linked Linear issue — ${issue.slug}: ${issue.title}`,
+		];
+		if (issue.url) headerLines.push(issue.url);
+		const header = headerLines.join("\n");
+		linkedSections.push(body ? `${header}\n\n${body}` : header);
 	}
 
 	for (const issue of args.linkedIssues) {

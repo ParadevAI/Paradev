@@ -66,7 +66,7 @@ describe("Tasks and pull requests navigation", () => {
 	test("keeps GitHub issues as a contextual Tasks source", () => {
 		const source = readComponent("components/TasksTopBar/TasksTopBar.tsx");
 
-		expect(source).toContain('message: "Linear"');
+		expect(source).toContain('message: "Tasks"');
 		expect(source).toContain('message: "GitHub issues"');
 		expect(source).not.toContain('"PRs"');
 	});
@@ -91,25 +91,38 @@ describe("Tasks and pull requests navigation", () => {
 	});
 
 	test("renders Tasks and Pull requests as separate left-rail destinations", () => {
-		const sidebarSources = [
-			readComponent(
-				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
-			),
-			readComponent(
-				"../../../../../../screens/main/components/WorkspaceSidebar/WorkspaceSidebarHeader/WorkspaceSidebarHeader.tsx",
-			),
-		];
-
 		// v2's labels go through Lingui (`message: "Tasks"`); v1 still has the
 		// literal aria-label. Accept either so this keeps asserting the routes
 		// stay separate rather than how their labels are authored.
 		const labelled = (source: string, label: string) =>
-			source.includes(`aria-label="${label}"`) ||
 			source.includes(`message: "${label}"`);
 
-		for (const source of sidebarSources) {
-			expect(source).toContain('to: "/tasks"');
-			expect(source).toContain('to: "/pull-requests"');
+		const navigationSource = readComponent(
+			"../../../hooks/useDashboardNavigation/useDashboardNavigation.ts",
+		);
+		const handlerBlock = (start: string, end: string) =>
+			navigationSource.slice(
+				navigationSource.indexOf(start),
+				navigationSource.indexOf(end),
+			);
+		expect(handlerBlock("openTasks:", "isPullRequestsOpen:")).toContain(
+			'to: "/tasks"',
+		);
+		expect(handlerBlock("openPullRequests:", "isPagesOpen:")).toContain(
+			'to: "/pull-requests"',
+		);
+
+		const v2Sources = [
+			readComponent(
+				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
+			),
+			readComponent(
+				"../../../components/NavigationRail/hooks/useRailDestinations/useRailDestinations.tsx",
+			),
+		];
+		for (const source of v2Sources) {
+			expect(source).toMatch(/onClick(=\{|: )navigation\.openTasks\b/);
+			expect(source).toMatch(/onClick(=\{|: )navigation\.openPullRequests\b/);
 			expect(labelled(source, "Tasks")).toBe(true);
 			expect(labelled(source, "Pull requests")).toBe(true);
 			expect(source).not.toContain("Tasks & PRs");

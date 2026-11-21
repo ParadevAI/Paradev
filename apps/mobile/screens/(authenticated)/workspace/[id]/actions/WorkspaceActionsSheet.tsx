@@ -1,32 +1,33 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatDistanceToNow } from "date-fns";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import {
-	PencilIcon,
-	PinIcon,
-	ShareIcon,
-	Trash2Icon,
-} from "lucide-react-native";
-import type { ReactNode } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { PencilIcon, PinIcon, ShareIcon } from "lucide-react-native";
+import { type ReactNode, type RefObject, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useHostProjects } from "@/hooks/useHostProjects";
 import { useTheme } from "@/hooks/useTheme";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { HeaderToolbar } from "@/lib/navigation";
 import { isSandboxHost } from "@/lib/sandbox-access";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
+import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useWorkspaceChangeset } from "../hooks/useWorkspaceChangeset";
 import { useWorkspaceHeaderActions } from "../hooks/useWorkspaceHeaderActions";
 import { WorkspacePages } from "./components/WorkspacePages";
+import { WorkspacePullRequests } from "./components/WorkspacePullRequests";
 
 function CircleAction({
+	ref,
 	icon,
 	label,
 	active,
 	onPress,
 }: {
+	ref?: RefObject<ViewInstance | null>;
 	icon: ReactNode;
 	label: string;
 	active?: boolean;
@@ -34,6 +35,7 @@ function CircleAction({
 }) {
 	return (
 		<Pressable
+			ref={ref}
 			accessibilityLabel={label}
 			onPress={onPress}
 			className={
@@ -75,7 +77,7 @@ function InfoRow({
 /**
  * Workspace sheet, Cursor's layout: centered name, circular actions
  * (edit / pin / share), a simple Info list led by the project identity,
- * Delete at the bottom.
+ * then the workspace's pull requests and pages.
  */
 export function WorkspaceActionsSheet() {
 	const { t } = useLingui();
@@ -85,17 +87,17 @@ export function WorkspaceActionsSheet() {
 	const { workspace, host } = useWorkspaceHost(id ?? null);
 	const changeset = useWorkspaceChangeset(id ?? null);
 	const { projects } = useHostProjects(host);
-	const { renameWorkspace, deleteWorkspace, shareWorkspace } =
-		useWorkspaceHeaderActions(workspace, host);
+	const { renameWorkspace, shareWorkspace } = useWorkspaceHeaderActions(
+		workspace,
+		host,
+	);
 	const pinned = usePinnedWorkspacesStore((state) =>
 		id ? id in state.pinnedAt : false,
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
+	const shareRef = useRef<ViewInstance>(null);
 
 	const isCloud = host !== null && isSandboxHost(host.machineId);
-	// Deleting a local workspace retires the record and leaves the checkout
-	// alone; deleting a cloud one deletes the sandbox. Either way it is allowed.
-	const canDelete = workspace !== null && workspace !== undefined;
 	const project = workspace?.projectId
 		? projects.find((candidate) => candidate.id === workspace.projectId)
 		: undefined;
@@ -105,15 +107,15 @@ export function WorkspaceActionsSheet() {
 			{/* The close button is a native bar item like every other sheet's:
 			    pinned while the content scrolls under the transparent header,
 			    and glass on the OS versions that draw it. */}
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="px-6 pb-10"
@@ -146,9 +148,10 @@ export function WorkspaceActionsSheet() {
 						onPress={() => id && togglePin(id)}
 					/>
 					<CircleAction
+						ref={shareRef}
 						label={t({ message: "Share" })}
 						icon={<ShareIcon size={19} color={theme.foreground} />}
-						onPress={shareWorkspace}
+						onPress={() => shareWorkspace(anchorOf(shareRef))}
 					/>
 				</View>
 
@@ -209,22 +212,9 @@ export function WorkspaceActionsSheet() {
 					/>
 				) : null}
 
-				<WorkspacePages workspaceId={id ?? null} />
+				<WorkspacePullRequests workspaceId={id ?? null} />
 
-				{canDelete ? (
-					<Pressable
-						onPress={() => {
-							router.back();
-							deleteWorkspace();
-						}}
-						className="mt-8 flex-row items-center justify-center gap-2 py-3 active:opacity-60"
-					>
-						<Trash2Icon size={18} color={theme.destructive} />
-						<Text className="text-destructive text-[15px] font-medium">
-							<Trans>Delete workspace</Trans>
-						</Text>
-					</Pressable>
-				) : null}
+				<WorkspacePages workspaceId={id ?? null} />
 			</ScrollView>
 		</>
 	);

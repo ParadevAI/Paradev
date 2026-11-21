@@ -73,6 +73,10 @@ export const terminalAgentBindings = sqliteTable(
 		// The terminal a "resumed" binding's session was relaunched into, so a
 		// pane that missed the relaunch can follow it there.
 		resumedIntoTerminalId: text("resumed_into_terminal_id"),
+		// Where the harness itself reported writing the session's transcript
+		// (Claude's hook `transcript_path`). Cleared when the binding moves to
+		// another session.
+		transcriptPath: text("transcript_path"),
 	},
 	(table) => [
 		index("terminal_agent_bindings_workspace_id_idx").on(table.workspaceId),
@@ -110,6 +114,11 @@ export const projects = sqliteTable(
 		// Empty string means "not yet backfilled" — the startup sweep targets
 		// these rows (name from cloud legacy row if reachable, else basename).
 		name: text().notNull().default(""),
+		// Non-null = soft-deleted: hidden everywhere, restorable until the
+		// purge sweep removes it. Workspaces deleted with the project carry
+		// the same value as their archivedAt, which is how restore finds them.
+		deletedAt: integer("deleted_at"),
+		deletedByUserId: text("deleted_by_user_id"),
 		// 0 means "predates local ownership"; write paths always set it.
 		updatedAt: integer("updated_at").notNull().default(0),
 		createdAt: integer("created_at")
@@ -224,7 +233,7 @@ export const workspaces = sqliteTable(
 	{
 		id: text().primaryKey(),
 		// Null = a project-less "session" workspace (managed folder under
-		// ~/.superset/sessions, its own standalone git repo).
+		// ~/.paradev/sessions, its own standalone git repo).
 		projectId: text("project_id").references(() => projects.id, {
 			onDelete: "cascade",
 		}),
@@ -386,3 +395,29 @@ export const workspacePullRequests = sqliteTable(
 		index("workspace_pull_requests_workspace_idx").on(table.workspaceId),
 	],
 );
+
+export type MobileDevicePlatform = "ios" | "android";
+
+/**
+ * Simulators and emulators this host booted for a Mobile pane. It shuts them
+ * down once no pane shows them; the rows outlive a crash so the next start
+ * can do the same.
+ */
+export const mobileOwnedDevices = sqliteTable(
+	"mobile_owned_devices",
+	{
+		platform: text().$type<MobileDevicePlatform>().notNull(),
+		deviceKey: text("device_key").notNull(),
+		bootedAt: integer("booted_at").notNull(),
+	},
+	(table) => [primaryKey({ columns: [table.platform, table.deviceKey] })],
+);
+
+export const mobileLastDevices = sqliteTable("mobile_last_devices", {
+	workspaceId: text("workspace_id")
+		.primaryKey()
+		.references(() => workspaces.id, { onDelete: "cascade" }),
+	platform: text().$type<MobileDevicePlatform>().notNull(),
+	deviceKey: text("device_key").notNull(),
+	pickedAt: integer("picked_at").notNull(),
+});

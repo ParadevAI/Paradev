@@ -1,19 +1,21 @@
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import {
 	connectionAccessToken,
 	userConnection,
 } from "@superset/trpc/connectors";
+import { unauthenticatedResponse } from "@/lib/signInRedirect";
 
 const LINEAR_IMAGE_HOST = "uploads.linear.app";
 const CACHE_MAX_AGE = 31536000; // 1 year (Linear URLs are content-addressed)
 
 export async function GET(request: Request): Promise<Response> {
-	const sessionData = await auth.api.getSession({
-		headers: request.headers,
-	});
+	const sessionData = await getRequestSession(request.headers);
 
 	if (!sessionData?.user) {
-		return new Response("Unauthorized", { status: 401 });
+		return unauthenticatedResponse(
+			request,
+			new Response("Unauthorized", { status: 401 }),
+		);
 	}
 
 	const organizationId = sessionData.session.activeOrganizationId;
@@ -63,7 +65,10 @@ export async function GET(request: Request): Promise<Response> {
 
 	// Fetch the image from Linear with auth
 	const linearResponse = await fetch(linearUrl, {
-		headers: { Authorization: `Bearer ${token}` },
+		headers: {
+			Authorization:
+				connection.authMethod === "api_key" ? token : `Bearer ${token}`,
+		},
 	});
 
 	if (!linearResponse.ok) {

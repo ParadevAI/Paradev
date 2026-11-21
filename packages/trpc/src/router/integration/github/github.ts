@@ -9,41 +9,85 @@ import { Client } from "@upstash/qstash";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../../env";
-import { protectedProcedure, userError } from "../../../trpc";
+import { installationOctokit } from "../../../lib/sandbox/clone-token";
+import { organizationSyncsNow } from "../../../lib/sync-policy/syncPolicy";
+import { personProcedure, planRequiredError, userError } from "../../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../utils";
+import { findInstalledRepository } from "./find-installed-repository";
+import { getPullRequestDiff } from "./get-pull-request-diff";
+import { organizationInstallations } from "./organization-installations";
+import { pullRequestProcedures } from "./pull-request-procedures";
+import {
+	type PullRequestDetail,
+	toChecks,
+	toChecksStatus,
+	toPullRequestState,
+	toReviewDecision,
+} from "./pull-request-shape";
 import { listGithubRepositories } from "./trigger-options";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
 export const githubRouter = {
-	getInstallation: protectedProcedure
+	...pullRequestProcedures,
+	getPullRequestDiff,
+	/** @deprecated Use `listInstallations`: an organization can connect several GitHub accounts. */
+	getInstallation: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
-
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: {
-					id: true,
-					accountLogin: true,
-					accountType: true,
-					suspended: true,
-					lastSyncedAt: true,
-					createdAt: true,
-				},
-			});
-
+			const [installation] = await organizationInstallations(
+				input.organizationId,
+			);
 			return installation ?? null;
 		}),
 
-	disconnect: protectedProcedure
+	listInstallations: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			return organizationInstallations(input.organizationId);
+		}),
+
+	disconnect: personProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				installationId: z.string().uuid().optional(),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
 
+			let installationId = input.installationId;
+			if (!installationId) {
+				// Released clients send no id. With several accounts there is no
+				// telling which one they confirmed, so refuse rather than guess.
+				const installations = await organizationInstallations(
+					input.organizationId,
+				);
+				if (installations.length > 1) {
+					throw userError({
+						code: "PRECONDITION_FAILED",
+						message:
+							"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
+						i18nKey: "serverError.integration.severalGithubAccountsConnected",
+					});
+				}
+				installationId = installations[0]?.id;
+			}
+			if (!installationId) {
+				return { success: false, error: "No installation found" };
+			}
+
 			const result = await db
 				.delete(githubInstallations)
-				.where(eq(githubInstallations.organizationId, input.organizationId))
+				.where(
+					and(
+						eq(githubInstallations.organizationId, input.organizationId),
+						eq(githubInstallations.id, installationId),
+					),
+				)
 				.returning({ id: githubInstallations.id });
 
 			if (result.length === 0) {
@@ -53,17 +97,24 @@ export const githubRouter = {
 			return { success: true };
 		}),
 
-	triggerSync: protectedProcedure
-		.input(z.object({ organizationId: z.string().uuid() }))
+	triggerSync: personProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				installationId: z.string().uuid().optional(),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
+			const installations = (
+				await organizationInstallations(input.organizationId)
+			).filter(
+				(installation) =>
+					!input.installationId || installation.id === input.installationId,
+			);
 
-			if (!installation) {
+			if (installations.length === 0) {
 				throw userError({
 					code: "NOT_FOUND",
 					message: "GitHub installation not found",
@@ -71,40 +122,62 @@ export const githubRouter = {
 				});
 			}
 
-			const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
-			const syncBody = {
-				installationDbId: installation.id,
-				organizationId: input.organizationId,
-			};
-
-			// In development, call the sync endpoint directly (QStash can't reach localhost)
-			if (env.NODE_ENV === "development") {
-				fetch(syncUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(syncBody),
-				}).catch((error) => {
-					console.error("[github/triggerSync] Dev sync failed:", error);
-				});
-			} else {
-				await qstash.publishJSON({
-					url: syncUrl,
-					body: syncBody,
-					retries: 3,
+			// The webhook drops this organization's deliveries, so a backfill here
+			// would go stale the moment it finished.
+			if (!(await organizationSyncsNow(input.organizationId))) {
+				throw planRequiredError({
+					message: "GitHub sync requires the Pro plan.",
+					i18nKey: "serverError.integration.githubSyncRequiresThePro",
+					requiredPlan: "pro",
 				});
 			}
+
+			const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
+			const publishFailures: unknown[] = [];
+			for (const installation of installations) {
+				const syncBody = {
+					installationDbId: installation.id,
+					organizationId: input.organizationId,
+				};
+
+				// In development, call the sync endpoint directly (QStash can't reach localhost)
+				if (env.NODE_ENV === "development") {
+					fetch(syncUrl, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(syncBody),
+					}).catch((error) => {
+						console.error("[github/triggerSync] Dev sync failed:", error);
+					});
+				} else {
+					try {
+						await qstash.publishJSON({
+							url: syncUrl,
+							body: syncBody,
+							retries: 3,
+						});
+					} catch (error) {
+						console.error(
+							`[github/triggerSync] Failed to queue sync for installation ${installation.id}:`,
+							error,
+						);
+						publishFailures.push(error);
+					}
+				}
+			}
+			if (publishFailures.length > 0) throw publishFailures[0];
 
 			return { success: true };
 		}),
 
-	listRepositories: protectedProcedure
+	listRepositories: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 			return listGithubRepositories(input.organizationId);
 		}),
 
-	listPullRequests: protectedProcedure
+	listPullRequests: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -115,23 +188,13 @@ export const githubRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
-
-			if (!installation) {
-				return [];
-			}
-
-			// Get repository IDs for this installation
 			const repos = await db.query.githubRepositories.findMany({
-				where: input.repositoryId
-					? and(
-							eq(githubRepositories.installationId, installation.id),
-							eq(githubRepositories.id, input.repositoryId),
-						)
-					: eq(githubRepositories.installationId, installation.id),
+				where: and(
+					eq(githubRepositories.organizationId, input.organizationId),
+					input.repositoryId
+						? eq(githubRepositories.id, input.repositoryId)
+						: undefined,
+				),
 				columns: { id: true },
 			});
 
@@ -168,7 +231,7 @@ export const githubRouter = {
 			});
 		}),
 
-	listOrganizationPullRequests: protectedProcedure
+	listOrganizationPullRequests: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -186,7 +249,7 @@ export const githubRouter = {
 	 * is not installed on has no entry; `hasInstallation` lets a client fall
 	 * back to a host it can reach.
 	 */
-	getByBranches: protectedProcedure
+	getByBranches: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -215,7 +278,7 @@ export const githubRouter = {
 			}
 
 			const repos = await db.query.githubRepositories.findMany({
-				where: eq(githubRepositories.installationId, installation.id),
+				where: eq(githubRepositories.organizationId, input.organizationId),
 				columns: { id: true, fullName: true, defaultBranch: true },
 			});
 			const repoByFullName = new Map(
@@ -250,6 +313,8 @@ export const githubRouter = {
 					title: githubPullRequests.title,
 					state: githubPullRequests.state,
 					isDraft: githubPullRequests.isDraft,
+					additions: githubPullRequests.additions,
+					deletions: githubPullRequests.deletions,
 					reviewDecision: githubPullRequests.reviewDecision,
 					checksStatus: githubPullRequests.checksStatus,
 					checks: githubPullRequests.checks,
@@ -292,38 +357,85 @@ export const githubRouter = {
 					number: row.number,
 					url: row.url,
 					title: row.title,
-					state: row.state,
+					state: toPullRequestState(row.state, row.mergedAt),
 					isDraft: row.isDraft,
-					reviewDecision: row.reviewDecision,
-					checksStatus: row.checksStatus,
-					checks: row.checks ?? [],
-					mergedAt: row.mergedAt,
+					additions: row.additions,
+					deletions: row.deletions,
+					reviewDecision: toReviewDecision(row.reviewDecision),
+					checksStatus: toChecksStatus(row.checksStatus),
+					checks: toChecks(row.checks),
 					updatedAt: row.updatedAt,
 				})),
 			};
 		}),
 
-	getStats: protectedProcedure
+	/**
+	 * One pull request by its own identity, repository and number, for a
+	 * detail pane that has no host in the loop: the webhook row supplies
+	 * everything but the description, which comes from GitHub with the
+	 * installation's token.
+	 *
+	 * @deprecated Use the API's `integration.github.getPullRequestDetail`, which acts as the viewer. Kept for released clients.
+	 */
+	getPullRequest: personProcedure
+		.input(
+			z.object({
+				organizationId: z.string().uuid(),
+				repoFullName: z.string().min(1),
+				number: z.number().int().positive(),
+			}),
+		)
+		.query(async ({ ctx, input }): Promise<PullRequestDetail> => {
+			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
+			const { installation, repo } = await findInstalledRepository(
+				input.organizationId,
+				input.repoFullName,
+			);
+			const [owner, name] = repo.fullName.split("/");
+			const [row, octokit] = await Promise.all([
+				db.query.githubPullRequests.findFirst({
+					where: and(
+						eq(githubPullRequests.repositoryId, repo.id),
+						eq(githubPullRequests.prNumber, input.number),
+					),
+				}),
+				installationOctokit(installation.installationId),
+			]);
+			const { data: pr } = await octokit.request(
+				"GET /repos/{owner}/{repo}/pulls/{pull_number}",
+				{ owner: owner ?? "", repo: name ?? "", pull_number: input.number },
+			);
+			return {
+				repoFullName: repo.fullName,
+				number: pr.number,
+				url: pr.html_url,
+				title: pr.title,
+				body: pr.body ?? "",
+				state: toPullRequestState(pr.state, pr.merged_at),
+				isDraft: pr.draft ?? false,
+				author: pr.user
+					? { login: pr.user.login, avatarUrl: pr.user.avatar_url ?? null }
+					: null,
+				head: {
+					ref: pr.head.ref,
+					repoFullName: pr.head.repo?.full_name ?? null,
+				},
+				base: { ref: pr.base.ref },
+				reviewDecision: toReviewDecision(row?.reviewDecision ?? null),
+				checksStatus: toChecksStatus(row?.checksStatus ?? "none"),
+				checks: toChecks(row?.checks ?? null),
+				createdAt: pr.created_at,
+				updatedAt: pr.updated_at,
+			};
+		}),
+
+	getStats: personProcedure
 		.input(z.object({ organizationId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const installation = await db.query.githubInstallations.findFirst({
-				where: eq(githubInstallations.organizationId, input.organizationId),
-				columns: { id: true },
-			});
-
-			if (!installation) {
-				return {
-					repositoryCount: 0,
-					openPullRequestCount: 0,
-					pendingChecksCount: 0,
-					failedChecksCount: 0,
-				};
-			}
-
 			const repos = await db.query.githubRepositories.findMany({
-				where: eq(githubRepositories.installationId, installation.id),
+				where: eq(githubRepositories.organizationId, input.organizationId),
 				columns: { id: true },
 			});
 

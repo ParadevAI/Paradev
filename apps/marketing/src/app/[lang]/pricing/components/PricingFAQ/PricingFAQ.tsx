@@ -1,72 +1,31 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { AnimatePresence, m } from "framer-motion";
-import { useState } from "react";
-import { HiPlus } from "react-icons/hi2";
-import { PRICING_FAQ_ITEMS, type PricingFAQItem } from "../../constants";
+import type { PlanFamily } from "@superset/shared/billing";
+import { useEffect } from "react";
+import { FAQDisclosure } from "../../../components/FAQDisclosure";
+import { PRICING_FAQ_ITEMS } from "../../constants";
+import { faqAnchor } from "../../utils/faqAnchor";
+import { faqAnswer } from "../../utils/faqAnswer";
+import { faqShown, planPriceValues } from "../../utils/planPriceValues";
 
-function FAQAccordionItem({
-	item,
-	index,
-	isOpen,
-	onToggle,
-}: {
-	item: PricingFAQItem;
-	index: number;
-	isOpen: boolean;
-	onToggle: () => void;
-}) {
-	const { t } = useLingui();
-	const contentId = `pricing-faq-${item.id}-${index}`;
-
-	return (
-		<div className="border-b border-border last:border-b-0">
-			<button
-				type="button"
-				onClick={onToggle}
-				aria-expanded={isOpen}
-				aria-controls={contentId}
-				className="group flex w-full items-center justify-between py-5 text-left outline-none"
-			>
-				<span className="text-sm sm:text-base font-medium text-foreground pr-4">
-					{t(item.question)}
-				</span>
-				<HiPlus
-					className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-						isOpen ? "rotate-45" : ""
-					}`}
-					aria-hidden="true"
-				/>
-			</button>
-			<AnimatePresence initial={false}>
-				{isOpen && (
-					<m.div
-						id={contentId}
-						role="region"
-						aria-labelledby={contentId}
-						initial={{ height: 0, opacity: 0 }}
-						animate={{ height: "auto", opacity: 1 }}
-						exit={{ height: 0, opacity: 0 }}
-						transition={{ duration: 0.2, ease: "easeInOut" }}
-						className="overflow-hidden"
-					>
-						<p className="pb-5 text-sm text-muted-foreground leading-relaxed pr-8">
-							{t(item.answer)}
-						</p>
-					</m.div>
-				)}
-			</AnimatePresence>
-		</div>
-	);
+interface PricingFAQProps {
+	catalog: PlanFamily[];
 }
 
-export function PricingFAQ() {
-	const [openIndex, setOpenIndex] = useState<number | null>(null);
+export function PricingFAQ({ catalog }: PricingFAQProps) {
+	const { t, i18n } = useLingui();
+	const priceValues = planPriceValues(catalog, i18n);
 
-	const handleToggle = (index: number) => {
-		setOpenIndex(openIndex === index ? null : index);
-	};
+	useEffect(() => {
+		const openFromHash = () => {
+			const target = document.getElementById(window.location.hash.slice(1));
+			if (target instanceof HTMLDetailsElement) target.open = true;
+		};
+		openFromHash();
+		window.addEventListener("hashchange", openFromHash);
+		return () => window.removeEventListener("hashchange", openFromHash);
+	}, []);
 
 	return (
 		<div>
@@ -77,15 +36,32 @@ export function PricingFAQ() {
 				<Trans>Common questions</Trans>
 			</h2>
 			<div>
-				{PRICING_FAQ_ITEMS.map((item, index) => (
-					<FAQAccordionItem
-						key={item.id}
-						item={item}
-						index={index}
-						isOpen={openIndex === index}
-						onToggle={() => handleToggle(index)}
-					/>
-				))}
+				{PRICING_FAQ_ITEMS.filter((item) => faqShown(item, priceValues)).map(
+					(item) => {
+						const answer = faqAnswer(item, priceValues, i18n);
+						return (
+							<FAQDisclosure
+								key={item.id}
+								id={faqAnchor(item.id)}
+								name="pricing-faq"
+								compact
+								question={t(item.question)}
+							>
+								<p>{answer.lead}</p>
+								{answer.list.length > 0 && (
+									<ul className="list-disc space-y-1 pl-5">
+										{answer.list.map((line) => (
+											<li key={line}>{line}</li>
+										))}
+									</ul>
+								)}
+								{answer.more.map((paragraph) => (
+									<p key={paragraph}>{paragraph}</p>
+								))}
+							</FAQDisclosure>
+						);
+					},
+				)}
 			</div>
 		</div>
 	);

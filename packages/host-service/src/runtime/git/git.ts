@@ -27,7 +27,7 @@ function getRemoteUrlCached(
 	const inFlight = remoteUrlInFlight.get(repoPath);
 	if (inFlight) return inFlight;
 
-	const resolving = getRemoteUrl(createUserSimpleGit(repoPath).env(env))
+	const resolving = getRemoteUrl(createUserSimpleGit(repoPath, { env }))
 		.then((url) => {
 			remoteUrlCache.set(repoPath, { url, resolvedAt: Date.now() });
 			return url;
@@ -75,6 +75,9 @@ export function createGitEnvResolver(provider: GitCredentialProvider) {
 
 export function createGitFactory(provider: GitCredentialProvider): GitFactory {
 	const resolveEnv = createGitEnvResolver(provider);
-	return async (repoPath: string) =>
-		createUserSimpleGit(repoPath).env(await resolveEnv(repoPath));
+	return async (repoPath, options) =>
+		createUserSimpleGit(repoPath, {
+			...options,
+			env: await resolveEnv(repoPath),
+		});
 }

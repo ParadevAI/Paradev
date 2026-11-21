@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { format } from "date-fns";
 import { DetailRow, EmailLayout } from "../../components";
 
@@ -36,17 +36,13 @@ export function RenewalUpcomingEmail({
 		<EmailLayout
 			preview={`${organizationName}'s ${planName} plan renews ${formattedRenewalDate}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Your plan renews on {formattedRenewalDate}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
 				Hi {recipientName ?? "there"},
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-2">
 				<strong>{organizationName}</strong>'s annual <strong>{planName}</strong>{" "}
-				subscription renews on {formattedRenewalDate}. Nothing is due yet — this
+				subscription renews on {formattedRenewalDate}. Nothing is due yet. This
 				is a heads-up so the charge isn't a surprise.
 			</Text>
 
@@ -64,8 +60,8 @@ export function RenewalUpcomingEmail({
 				last year,{" "}
 				{isOwner ? (
 					<>
-						update it before {formattedRenewalDate} so the renewal doesn't fail
-						— open Superset and go to <strong>Settings → Billing</strong>.
+						update it before {formattedRenewalDate} so the renewal doesn't fail.
+						Open Paradev and go to <strong>Settings → Billing</strong>.
 					</>
 				) : (
 					<>

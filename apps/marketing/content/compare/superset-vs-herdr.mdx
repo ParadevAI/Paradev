@@ -1,112 +1,164 @@
 ---
-title: "Superset vs Herdr (2026): Agent Workspace vs Agent Runtime"
-description: "Compare Superset and Herdr for running AI coding agents. See how a desktop agent workspace differs from Herdr's terminal-native runtime that keeps agents alive anywhere."
+title: "Paradev vs Herdr (2026): Two Desktop Apps for Coding Agents"
+description: "Compare Paradev and Herdr now that Herdr ships a desktop app: persistence, remote machines, mods and layouts, cloud workspaces, team sharing, review and pull requests, platforms, and price."
 date: 2026-08-07
-lastUpdated: 2026-08-07
+lastUpdated: 2026-11-10
 type: "1v1"
 competitors:
   - herdr
 keywords:
   - superset vs herdr
+  - paradev vs herdr
   - herdr alternative
+  - herdr desktop app
   - herdr.dev
   - agent runtime
   - tmux for ai agents
-  - ai agent orchestration
 ---
 
-Superset and Herdr both solve "I have more coding agents than terminals," but from opposite ends. Superset is a desktop workspace: a GUI where agents run in isolated Git worktrees with diff review, chat, a browser, and automations around them. Herdr (YC F26) is a runtime: an always-running background server with a terminal UI that holds real terminals open so agents survive your laptop lid closing, your SSH connection dropping, or every client quitting. Herdr's own compare page names Superset directly and frames the distinction as "apps manage the herd. Herdr runs it."
+Paradev and Herdr start from the same idea: coding agents should live in persistent terminals that outlive the window, grouped by the work they belong to. Since October 2026 both are also desktop apps, so the old "GUI or terminal" question no longer separates them.
+
+What separates them now is how far each one goes past the terminal. Herdr goes wide on the machine in front of you: spaces, tabs, panes, mods you write in JavaScript, and any machine you can reach over SSH, on macOS, Linux, Windows, and phones. Paradev goes deep into the rest of the loop: diff review and pull requests in the app, agents started by schedules and events, and cloud workspaces your teammates can open and drive.
+
+**Choose Herdr if you want a free, open-source, deeply customizable app over machines you own. Choose Paradev if you want review, automation, and a shared cloud workspace around the same agents.**
+
+This comparison is published by Paradev. Herdr details were checked against [herdr.dev](https://herdr.dev), its [documentation](https://herdr.dev/docs/), its [gallery](https://herdr.dev/gallery), and the [herdrdev/herdr-app](https://github.com/herdrdev/herdr-app) and [herdrdev/herdr](https://github.com/herdrdev/herdr) repositories on November 10, 2026.
+
+---
+
+## First, Which Herdr?
+
+Herdr is two programs, and they do not share agents.
+
+- **Herdr TUI** (`herdrdev/herdr`) is the original terminal app with its own server, started in March 2026, Apache-2.0, around 50,000 GitHub stars, latest release v0.9.5 on October 14, 2026. It keeps working.
+- **The Herdr desktop app** (`herdrdev/herdr-app`) is a new, separate native program built on `herdr-core`, with its own repository created on October 16, 2026 and a changelog that starts at 0.1.4 on October 23. It reached 0.1.15 on November 10, 2026.
+
+Herdr's own FAQ puts it plainly: "They don't share agents, so what runs in one doesn't show up in the other." This comparison is about the desktop app unless it says otherwise.
 
 ---
 
 ## At a Glance
 
-| | **Superset** | **Herdr** |
+| | **Paradev** | **Herdr (desktop app)** |
 |---|---|---|
-| **What it does** | Runs 100+ AI agents in parallel with Git worktree isolation, chat, review, and browser | Persistent runtime for agents: sessions, workspaces, tabs, and panes that outlive clients |
-| **Category** | Local-first agent workspace with remote/cloud hosts | Terminal-native agent runtime (TUI + CLI + socket API) |
-| **Interface** | Desktop GUI | Terminal UI with tmux-style keybindings; no GUI |
-| **Agent support** | Any CLI agent (Claude Code, Codex, OpenCode, Cursor, Copilot, Gemini, Mistral Vibe, and more) | 19 agents auto-detected (Claude Code, Codex, Cursor, OpenCode, Amp, Copilot, Droid, and more) |
-| **Isolation** | Automatic Git worktree per task | Worktree-per-workspace via CLI; Vercel Sandbox plugin for full VM isolation |
-| **Persistence** | Persistent terminal sessions | Server-owned terminals; detach anywhere, agents keep running |
-| **Diff review** | Built-in diff/file editor | None built in; pairs with external tools, sandbox changes return as Git patches |
-| **Automation** | Automations: scheduled agent sessions, TypeScript SDK, Slack bot | JSON socket API, agent-automation CLI, 500+ plugins; no built-in scheduling |
-| **License** | Source-available (ELv2) | Open source (Apache-2.0) |
+| **What it is** | Desktop workspace for CLI agents, with review and pull requests | Native app for terminals and coding agents, shaped by asking |
+| **Unit of work** | A workspace with its own Git worktree, branch, terminals, and panes | A space per machine and repository, with tabs per task and panes inside them |
+| **Persistence** | Terminals run in a background daemon; quitting or updating the app leaves them running, and they reattach with scrollback | Agents run in `herdr-core`, not the window; quit, update, or crash and terminals stay. After a reboot or a core crash, kept panes get fresh shells in their last folders, not their old programs |
+| **Agent status** | Status per workspace, with notifications | Working, Blocked, Done, and Idle in the sidebar and the tab, including agents on other machines, plus OSC 7501 for your own programs |
+| **Agent-to-agent** | Orchestration skill: a coordinator creates workspaces and launches workers, over the CLI, MCP, or SDK | `hc run --bg` and `hc send`: one agent hands a review or a test run to another and gets the report in its input |
+| **Remote machines** | Remote Access hosts, Bring Your Own Cloud on your own Linux server | Any machine you can reach over SSH, including through Tailscale; its spaces appear in the same sidebar |
+| **Cloud** | Cloud workspaces on Team and Ultra: each gets its own cloud machine | None announced |
+| **Team** | Cloud workspaces shared with the organization or named people, with full access to terminals and agents | Not a team product today: no accounts, no sharing |
+| **Review** | Changes pane with diff, commit, push, and pull request; Pull Requests view with CI checks and line comments | Your own tools, in a pane |
+| **Customization** | Settings, themes as JSON, `.paradev/config.json` per repository, plugins with MCP tools | Layouts and mods as plain files in `~/.config/herdr-app`; mods are JavaScript, and Herdr's docs call them "trusted code, not sandboxed extensions" |
+| **Platforms** | macOS, experimental Linux, iPhone and iPad; no Windows yet | macOS on Apple silicon, Linux x86_64 and arm64, Windows x86_64; iPhone, iPad, and Android |
+| **Price** | Free tier; Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}} per user per month | Free |
+| **License** | Open source, MIT | Open source, Apache-2.0 |
+| **Telemetry** | Product analytics, with controls in settings | Usage telemetry on by default; turn it off in Settings → Privacy |
 
 ---
 
-## What Is Superset?
+## What Is Herdr Now?
 
-Superset is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. It also runs across your own network devices through remote and cloud workspaces, and it can schedule agent sessions as automations with a TypeScript SDK and a Slack bot. You can review inside Superset or jump into VS Code, Cursor, Windsurf, JetBrains, or Zed. Source-available under Elastic License 2.0 (ELv2).
+The site's line is "Herdr is an app for running coding agents that you shape by asking," next to the claim "No two Herdrs look alike." That is the product in one sentence: the window, the sidebar, the tabs, the keys, and the themes are plain files under `~/.config/herdr-app`, a layout arranges the window, and mods are small JavaScript programs that draw panels, menus, and dialogs. You ask your agent to change them. The [gallery](https://herdr.dev/gallery) is where the community trades those files: on November 10, 2026 it listed 312 layouts and 576 mods, installed by copying one line for your agent to apply, not from a store.
 
-## What Is Herdr?
+The parts that matter for agent work are solid. A space holds work on one machine, usually one repository, and worktrees group in the sidebar. Each agent reports whether it is working, blocked, done, or idle, and the agents sidebar collects them from every space, including workers another agent started and sub-agents nested under their parent. Agents run in `herdr-core`, a small server, so closing the window leaves them running. `hc machine add` brings in any machine you can reach over SSH, Tailscale included, and remote work keeps going when your local window closes.
 
-Herdr is an open-source runtime for AI coding agents -- in its own words, "the runtime your coding agents live on: laptop, desktop, or a box you rent." It is a single Rust binary running an always-on server that owns real terminal sessions, organized as sessions, workspaces, tabs, and panes, with a TUI client you attach and detach like tmux. It auto-detects 19 agent CLIs and visualizes their state (working, blocked, done) up through the sidebar. Worktree management is built into the CLI, a newline-delimited JSON socket API makes everything scriptable (agents can drive Herdr from inside their own panes), and a marketplace hosts 500+ plugins -- including a first-party Vercel Sandbox plugin that runs each agent in an isolated cloud microVM and returns changes as Git patches. Herdr runs on macOS, Linux, and Windows (beta), joined Y Combinator's F26 batch, and its runtime is Apache-2.0 and free.
+Herdr is free and Apache-2.0, needs no account, and ships fast: twelve releases from 0.1.4 on October 23 to 0.1.15 on November 10, 2026. Usage telemetry is on by default and can be turned off in Settings → Privacy.
+
+## What Is Paradev?
+
+Paradev is a desktop workspace for the CLI agents you already pay for. Each new local branch-based workspace gets its own Git worktree, branch, and persistent terminals, and the agent runs with its own login, settings, and MCP servers. Around it are a Changes pane with diff review, commit, push, and pull request, a Pull Requests view with CI checks and line comments, a file editor, and an in-app browser with Design Mode. For Claude Code, Codex, OpenCode, and Pi, a [chat interface](https://docs.paradev.com/chat) shows the same session as a chat.
+
+Agents run in a background terminal daemon, so quitting with ⌘Q or installing an update leaves them working, and they reattach with scrollback. Work runs on your Mac, on hosts you add through Remote Access, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](/cloud). Paradev is open source under the MIT License.
+
+---
 
 ## Key Differences
 
-### Workspace vs Runtime
+### Cloud workspaces
 
-Superset is the place you work: launch agents, watch diffs, review, browse, merge -- one app for the whole loop. Herdr is the layer agents run on: it keeps their terminals alive and observable, and expects you to bring your own review flow, editor, and browser. Herdr's compare page is explicit that it pairs with manager apps rather than replacing the review experience. If you want one tool for the full loop, that is Superset. If you want a persistence layer under whatever tools you already use, that is Herdr.
+Herdr runs agents on machines you own: this laptop, or a server you add over SSH. That is a complete answer as long as a machine of yours is awake.
 
-### GUI vs Terminal
+Paradev adds one that is not yours to keep awake. A [cloud workspace](/cloud) runs on its own cloud sandbox on the Team and Ultra plans, started from an environment that holds the repositories, the variables, and the region. Close the laptop and the agent keeps working; reopen the workspace from the desktop app, an iPhone, or an iPad. Your agent sign-ins and GitHub access are not copied into the sandbox: the agent sees a placeholder, and Paradev adds your sign-in to outgoing requests. The variables and secrets you set on the environment are delivered to the sandbox as you configured them. Herdr has no cloud offering today.
 
-Superset is a desktop GUI with a terminal inside it. Herdr is terminal-native: TUI, tmux-style prefix keys, SSH-friendly, and "mobile support" means an SSH client on your phone. Developers who live in the terminal and want zero Electron will feel at home in Herdr; developers who want visual diff review, a browser pane, and clickable orchestration will prefer Superset.
+### Multiplayer and teams
 
-### Review and the Rest of the Loop
+Herdr has no accounts and no team tier, by design, and nothing in its documentation shares a running session between people: your terminals never pass through anyone's servers. The collaboration it does have is between your own agents, with `hc run --bg` and `hc send`, and between people only through the gallery, where you copy somebody's layout.
 
-Herdr has no built-in diff review -- agent status tells you something finished, and then you review in your editor or an external tool; its Vercel Sandbox flow returns raw Git patches you apply manually. Superset builds the review step in: a diff/file editor per worktree, plus one-click handoff to VS Code, Cursor, or JetBrains. Herdr also has no built-in scheduling; its automation story is the socket API and plugins, which are powerful but assume you script the recurring parts yourself. Superset ships automations with a TypeScript SDK and a Slack bot.
+Paradev shares the work itself. A cloud workspace can be visible to anyone in your organization or only to people you invite, and full access lets a teammate open its terminals and prompt the agents that are running. From a shell, `superset workspaces share add ws_a --user ann@example.com` or `--team` does the same thing. [Automations](https://docs.paradev.com/automations) run agents on a schedule or on an event, and each run becomes a live workspace you or a teammate can open, review, and continue. [Pages](https://docs.paradev.com/pages) give the team somewhere to discuss a result: an agent publishes a report or a design, teammates pin comments, and a watching agent publishes a new version. Larger teams get SAML SSO, SCIM, and audit logs on the enterprise tier, and Paradev is SOC 2 Type II. See [multiplayer coding agents](/multiplayer-coding-agents) for how those approaches compare.
 
-### Persistence and Remote
+### Review and the rest of the loop
 
-This is Herdr's home turf. The server owns the terminals, so agents keep working when every client disconnects, and a thin client can attach to a remote server over SSH with the UI streaming locally. Superset covers similar ground differently -- persistent terminal sessions plus remote and cloud workspaces that move whole worktree-isolated workspaces across your devices with the full GUI. Herdr's model is leaner and more composable; Superset's carries the entire workspace, review surface included.
+This is the oldest difference between the two and it survived Herdr's move to a desktop app. In Paradev, you read the patch, edit a file, open the running app in a browser pane, open the pull request, watch its checks, and send a line comment back to the agent that wrote the code, without leaving the workspace. In Herdr, review happens in whatever you already use, in a pane beside the agent.
 
-### Sandboxing
+### Customization: files you shape vs features that ship
 
-Herdr's Vercel Sandbox plugin is genuinely distinctive: each agent runs in an isolated Firecracker microVM, nothing touches your machine, uploads are reviewed before they happen, and deletion requires typing DELETE. Superset's isolation is Git worktrees on machines you control, which keeps your real environment, services, and dependencies available to agents. Stronger containment versus higher-fidelity environments -- which one wins depends on the task.
+Herdr's bet is that you should be able to rebuild the app by asking an agent to edit JSON and JavaScript, and the gallery shows people doing it. The cost is stated in Herdr's own docs: mods are trusted code, not sandboxed extensions, so a mod you paste can do what you can do.
+
+Paradev's bet is that the common shape is worth shipping: the panes, the diff, the pull requests, and the automations are features with defaults, and extension happens through plugins that add MCP tools, repository config, and themes. Less to shape, less to maintain.
+
+### Platforms
+
+Herdr is ahead here. It runs on macOS with Apple silicon, Linux on x86_64 and arm64, and Windows on x86_64, with apps for iPhone, iPad, and Android. Paradev runs on macOS, has an experimental Linux build, no Windows build yet, and an iPhone and iPad app, with Android on a [waitlist](/mobile#android).
+
+### Agents that drive the tool
+
+Both let agents operate the app. Herdr exposes `herdr-app --skill` and commands such as `ls`, `status`, `commands`, and `shot`. Paradev exposes a CLI, an MCP server, and a TypeScript SDK that go further out of the window: an agent can create a workspace, launch another agent in it, read its terminal, send a follow-up, open a pull request, or arrange panes, which is what the [orchestration skill](https://docs.paradev.com/orchestration) is built on.
 
 ---
 
 ## Pricing
 
-Superset offers a free tier and Pro at $20/seat/month. Herdr's runtime is free and Apache-2.0; the YC announcement says the runtime stays open, with commercial features to be built on top later (none priced as of August 2026). Vercel Sandbox usage bills at Vercel's standard rates. Both are bring-your-own-agent for model costs.
+| Plan | Paradev | Herdr |
+|---|---|---|
+| Free | Free tier, local workspaces, desktop app, CLI | Free: the app, `herdr-core`, and Herdr TUI are all open source |
+| Paid | Pro {{price:pro}} per user per month ({{price:pro:yearly}} yearly), Team {{price:team}}, Ultra {{price:ultra}} | None |
+| Large teams | Enterprise with SAML SSO, SCIM, and audit logs | None |
+
+Both bring your own agent subscriptions. Paradev's Team and Ultra plans add cloud workspaces; see [pricing](/pricing).
 
 ---
 
 ## Which Should You Choose?
 
-**Choose Superset if you:**
-
-- Want the full loop -- orchestration, diff review, browser, chat -- in one workspace
-- Prefer a GUI over a terminal multiplexer
-- Run scheduled or unattended agent sessions through automations and an SDK
-- Want team and enterprise features behind the tool
-
 **Choose Herdr if you:**
 
-- Live in the terminal and want a tmux-grade, Electron-free runtime
-- Care most about agents surviving disconnects, lid-closes, and client restarts
-- Want to script everything over a JSON socket API or extend via plugins
-- Want per-agent cloud microVM isolation via the Vercel Sandbox plugin
+- Want a free, Apache-2.0 app with no account, on macOS, Linux, or Windows
+- Want to reshape the window, sidebar, keys, and panels by asking an agent to edit files
+- Work across machines you own and reach over SSH or Tailscale
+- Want phone apps on both iOS and Android
 
-**Verdict:** Herdr is the best-in-class answer to "keep my agents alive anywhere I can SSH," and its runtime-not-app framing is honest -- it deliberately leaves review, browsing, and scheduling to other tools. Superset is the better fit if you want those other tools built in: worktree orchestration, diff review, browser, automations, and remote access as one product. Plenty of terminal-first developers will run Herdr; teams standardizing an agent workflow end to end will get further with Superset.
+**Choose Paradev if you:**
+
+- Want diff review, pull requests, CI checks, and line comments in the same app as the agent
+- Want cloud workspaces that keep working when your laptop is closed
+- Want a teammate to open the running workspace and prompt the agent
+- Want agents started by schedules and by GitHub, Slack, or Linear events
+- Want SSO, SCIM, and audit logs behind the tool
+
+**Verdict:** Herdr is the better answer if the machine in front of you is the whole problem and you enjoy shaping your tools. Paradev is the better answer when the work has to outlive your laptop, be picked up by somebody else, or arrive reviewed. They are close enough in the terminal that the decision usually comes down to cloud, team, and review, not to panes.
 
 ---
 
 ## Frequently Asked Questions
 
-### Is Herdr a Superset alternative?
+### Does Herdr have a desktop app now?
 
-Partially. Both orchestrate parallel coding agents, and Herdr's own comparison page lists Superset. But Herdr is a terminal runtime that deliberately excludes diff review, a browser, and scheduling, while Superset is a full workspace that includes them. Some developers use a runtime like Herdr underneath other tools.
+Yes. `herdrdev/herdr-app` is a separate native app, Apache-2.0, released from October 2026 and at 0.1.15 on November 10, 2026. It is built on `herdr-core` and does not share agents with Herdr TUI, which keeps working.
 
-### Do both support Git worktrees?
+### Is Herdr a Paradev alternative?
 
-Yes. Superset creates a worktree per task automatically. Herdr manages worktrees through its CLI, where creating a worktree creates a workspace, though it leaves the merge and review flow to you.
+For organizing agent terminals on machines you own, yes. Both keep agents running outside the window, group work per repository, and let agents drive the app. Paradev adds diff review and pull requests, automations, cloud workspaces, and sharing with teammates.
 
-### Is Herdr open source?
+### Can two people share a Herdr session?
 
-Yes. Herdr's runtime is Apache-2.0 and free, and the team has said it stays open after joining Y Combinator. Superset is source-available under the Elastic License 2.0 with a free tier and paid Pro.
+No. Herdr has no accounts and no sharing; what it shares between people are layouts and mods in its gallery. In Paradev, a cloud workspace can be shared with your organization or named teammates, and full access lets them open its terminals and prompt the agents.
 
-### What is Herdr's Vercel Sandbox integration?
+### Which runs on Windows?
 
-A first-party plugin that runs each agent in an isolated Vercel Sandbox microVM instead of on your machine, with reviewed file uploads, changes returned as Git patches, and human-confirmed deletion. It is the strongest isolation story in the terminal-runtime category; Superset instead runs agents in worktrees on your own local, remote, or cloud machines.
+Herdr does, on x86_64. Paradev runs on macOS, with an experimental Linux build and no Windows build yet.
+
+### Are both open source?
+
+Yes. Herdr's app, `herdr-core`, and the TUI are Apache-2.0. Paradev is MIT.

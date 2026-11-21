@@ -1,0 +1,1 @@
+export { replaceNewTabPane } from "./replaceNewTabPane";

@@ -1,0 +1,18 @@
+import type { PullRequestDiff } from "@superset/shared/pull-request-diff";
+import { z } from "zod";
+import { personProcedure } from "../../../trpc";
+import { asViewerOrInstallation } from "./viewer-octokit";
+
+// Errors stay unmapped: released desktops read this procedure's failures as-is.
+export const getPullRequestDiff = personProcedure
+	.input(
+		z.object({
+			organizationId: z.string().uuid(),
+			repoFullName: z.string().regex(/^[\w.-]+\/[\w.-]+$/),
+			number: z.number().int().positive(),
+		}),
+	)
+	.query(
+		async ({ ctx, input }): Promise<PullRequestDiff> =>
+			(await asViewerOrInstallation(ctx.session.user.id, input)).diff(),
+	);

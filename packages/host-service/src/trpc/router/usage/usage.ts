@@ -6,12 +6,19 @@ import { MAX_BACKFILL_DAYS } from "@superset/trpc/leaderboard-periods";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { WorkerPoolUnavailableError } from "../../../workers/host-worker-pool";
 import {
 	leaderboardPayloadTask,
 	usageHistoryTask,
 } from "../../../workers/tasks/usage";
+import { getUsageWorkerPool } from "../../../workers/usage-worker-pool";
+import { WORKER_CRASH_ERROR_NAME } from "../../../workers/WorkerTaskRunner";
 import { protectedProcedure, queryProcedure, router } from "../../index";
-import { offLoop } from "../../off-loop";
+import {
+	createOffLoop,
+	type OffLoopArgs,
+	type OffLoopSpec,
+} from "../../off-loop";
 import {
 	provisionClaudeAccount,
 	provisionCodexAccount,
@@ -78,6 +85,36 @@ function getQuota(forceRefresh: boolean): Promise<UsageAccount[]> {
 		if (cachedQuota === entry) cachedQuota = null;
 	});
 	return promise;
+}
+
+const offUsageWorker = createOffLoop(getUsageWorkerPool);
+
+/** offLoop on the usage worker. A crashed worker and a paused pool reach the
+ * client as a retryable TIMEOUT; the pool reports crashes to Sentry itself. */
+function usageOffLoop<TInput, TTaskInput, TResult>(
+	spec: OffLoopSpec<TInput, TTaskInput, TResult>,
+) {
+	const resolve = offUsageWorker(spec);
+	return async (args: OffLoopArgs<TInput>): Promise<TResult> => {
+		try {
+			return await resolve(args);
+		} catch (error) {
+			if (!(error instanceof Error)) throw error;
+			// A missing bundle stays an internal error, so Sentry reports it.
+			if (
+				(error instanceof WorkerPoolUnavailableError &&
+					error.reason === "paused") ||
+				error.name === WORKER_CRASH_ERROR_NAME
+			) {
+				throw new TRPCError({
+					code: "TIMEOUT",
+					message: "Usage history is paused after a failed scan.",
+					cause: error,
+				});
+			}
+			throw error;
+		}
+	};
 }
 
 export const leaderboardPayloadInput = z.object({
@@ -319,15 +356,15 @@ export const usageRouter = router({
 
 	/**
 	 * Token/cost history estimated from the agents' own transcript logs,
-	 * priced at API list rates. Runs in the worker pool — the transcript
+	 * priced at API list rates. Runs in the usage worker — the transcript
 	 * trees reach multiple GB. Coalesced per window so concurrent callers
-	 * (and the renderer's poll) share one scan.
+	 * share one scan.
 	 */
 	history: queryProcedure
 		.meta({ timeoutMs: 120_000 })
 		.input(z.object({ days: z.number().int().min(1).max(90) }))
 		.query(
-			offLoop({
+			usageOffLoop({
 				task: usageHistoryTask,
 				// Workspace/project rows from host.db let the worker attribute
 				// transcript cwds to real workspaces instead of guessing from
@@ -380,6 +417,7 @@ export const usageRouter = router({
 				},
 				options: ({ input }) => ({
 					dedupeKey: `usage-history:${input.days}`,
+					strategy: "coalesce",
 					timeoutMs: 110_000,
 				}),
 			}),
@@ -389,7 +427,7 @@ export const usageRouter = router({
 		.meta({ timeoutMs: 120_000 })
 		.input(leaderboardPayloadInput)
 		.query(
-			offLoop({
+			usageOffLoop({
 				task: leaderboardPayloadTask,
 				prepare: ({ ctx, input }) => {
 					const nowMs = Date.now();
@@ -405,6 +443,7 @@ export const usageRouter = router({
 				},
 				options: ({ input }) => ({
 					dedupeKey: `usage-leaderboard-payload:${input.days}`,
+					strategy: "coalesce",
 					timeoutMs: 110_000,
 				}),
 			}),

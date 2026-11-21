@@ -93,9 +93,9 @@ export const TESTIMONIALS: Testimonial[] = [
 	{
 		id: "10",
 		content:
-			"Tested various GUI tools for git worktree and agents - Conductor, Vibe Kanban, Agentastic, Crystal, FleetCode, Emdash, Sculptor - but Superset suits my taste the best",
+			"Tested various GUI tools for git worktree and agents - Conductor, Vibe Kanban, Agentastic, Crystal, FleetCode, Emdash, Sculptor - but Paradev suits my taste the best",
 		originalContent:
-			"试了各种 GUI 的 git worktree + agent 工具，Conductor、Vibe Kanban、Agentastic、Crystal、FleetCode、Emdash、Sculptor，还是 Superset 最合我的胃口",
+			"试了各种 GUI 的 git worktree + agent 工具，Conductor、Vibe Kanban、Agentastic、Crystal、FleetCode、Emdash、Sculptor，还是 Paradev 最合我的胃口",
 		author: "Iven",
 		handle: "@ivenvd",
 		role: "Engineer at Paraflow",

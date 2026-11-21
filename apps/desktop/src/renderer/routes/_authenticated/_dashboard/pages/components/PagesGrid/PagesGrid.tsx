@@ -9,8 +9,8 @@ import {
 } from "@superset/ui/empty";
 import { Skeleton } from "@superset/ui/skeleton";
 import { LuFileText, LuPlus, LuSearchX } from "react-icons/lu";
+import { THUMBNAIL_ASPECT_RATIO } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
 import { PageCard, type PageCardItem } from "./components/PageCard";
-import { THUMBNAIL_ASPECT_RATIO } from "./constants";
 
 const SKELETON_KEYS = [
 	"skeleton-a",
@@ -33,6 +33,7 @@ interface PagesGridProps {
 	onOpen: (page: PageCardItem, event: React.MouseEvent) => void;
 	onTogglePin: (pageId: string) => void;
 	onDelete: (pageId: string) => Promise<void>;
+	onDuplicate: (pageId: string, title: string) => Promise<void>;
 }
 
 export function PagesGrid({
@@ -47,6 +48,7 @@ export function PagesGrid({
 	onOpen,
 	onTogglePin,
 	onDelete,
+	onDuplicate,
 }: PagesGridProps) {
 	if (isPending) {
 		return (
@@ -128,6 +130,7 @@ export function PagesGrid({
 					onOpen={onOpen}
 					onTogglePin={onTogglePin}
 					onDelete={onDelete}
+					onDuplicate={onDuplicate}
 				/>
 			))}
 		</div>

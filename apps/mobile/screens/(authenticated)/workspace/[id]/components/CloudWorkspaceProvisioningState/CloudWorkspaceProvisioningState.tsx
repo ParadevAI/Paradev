@@ -1,9 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useRouter } from "expo-router";
+import { useFormat } from "@superset/i18n/react";
+import {
+	isArchivedCloudWorkspaceStatus,
+	isLiveCloudWorkspaceStatus,
+} from "@superset/shared/cloud-workspace-status";
 import {
 	AlertCircle,
+	Archive,
+	ArchiveRestore,
 	Check,
-	Cloud,
 	GitBranch,
 	type LucideIcon,
 } from "lucide-react-native";
@@ -15,6 +20,7 @@ import { Text } from "@/components/ui/text";
 import { useCloudWorkspaceActions } from "@/hooks/useCloudWorkspaceActions";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import { cn } from "@/lib/utils";
+import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 
 /**
  * A warm sandbox is up in a second or two; the first ones after an image
@@ -45,12 +51,15 @@ export function CloudWorkspaceProvisioningState({
 	const { t } = useLingui();
 	const elapsed = useElapsedSeconds();
 
+	if (isArchivedCloudWorkspaceStatus(cloud.status)) {
+		return <CloudWorkspaceArchivedState cloud={cloud} />;
+	}
 	if (cloud.status === "failed") {
 		return <CloudWorkspaceFailedState cloud={cloud} />;
 	}
 	// A booting sandbox fails its first requests too; only a stuck one is unreachable.
 	if (
-		cloud.status === "ready" &&
+		isLiveCloudWorkspaceStatus(cloud.status) &&
 		unreachable &&
 		elapsed >= STUCK_AFTER_SECONDS
 	) {
@@ -64,7 +73,7 @@ export function CloudWorkspaceProvisioningState({
 	const sandboxReady = cloud.status !== "provisioning";
 
 	return (
-		<Frame icon={Cloud} iconClassName="text-muted-foreground">
+		<Frame icon={CloudIcon} iconClassName="text-muted-foreground">
 			<Heading
 				title={t({
 					message: "Starting workspace",
@@ -100,10 +109,43 @@ export function CloudWorkspaceProvisioningState({
 	);
 }
 
+function CloudWorkspaceArchivedState({ cloud }: { cloud: CloudWorkspaceRow }) {
+	const { t } = useLingui();
+	const { formatCompactRelativeTime } = useFormat();
+	const { unarchive } = useCloudWorkspaceActions();
+
+	return (
+		<Frame icon={Archive} iconClassName="text-muted-foreground">
+			<Heading
+				title={cloud.name || t({ message: "Untitled workspace" })}
+				name={
+					cloud.deletedAt
+						? t({
+								message: `Archived · ${formatCompactRelativeTime(cloud.deletedAt)}`,
+							})
+						: t({ message: "Archived" })
+				}
+			/>
+			<Button
+				onPress={() =>
+					void unarchive(cloud.id).catch(() =>
+						Alert.alert(t({ message: "Unarchive failed" })),
+					)
+				}
+			>
+				<Icon as={ArchiveRestore} className="text-primary-foreground size-4" />
+				<Text>
+					<Trans>Unarchive</Trans>
+				</Text>
+			</Button>
+		</Frame>
+	);
+}
+
 /**
  * Provisioning gave up. The row is all that is left of the workspace — the
  * sandbox behind it was torn down when it failed — so the only thing to offer
- * is disposing of it, which is also the only way to clear it from the list.
+ * is archiving it, which is also the only way to clear it from the list.
  */
 function CloudWorkspaceFailedState({ cloud }: { cloud: CloudWorkspaceRow }) {
 	const { t } = useLingui();
@@ -118,9 +160,9 @@ function CloudWorkspaceFailedState({ cloud }: { cloud: CloudWorkspaceRow }) {
 			/>
 			<BranchLine branch={cloud.branch} />
 			<Text className="text-muted-foreground max-w-[300px] text-center text-[13px] leading-relaxed">
-				<Trans>Nothing is running. Remove it and create a new one.</Trans>
+				<Trans>Nothing is running. Archive it and create a new one.</Trans>
 			</Text>
-			<RemoveWorkspaceButton workspaceId={cloud.id} />
+			<ArchiveWorkspaceButton workspaceId={cloud.id} />
 		</Frame>
 	);
 }
@@ -147,7 +189,7 @@ function CloudWorkspaceUnreachableState({
 			<BranchLine branch={cloud.branch} />
 			<Text className="text-muted-foreground max-w-[300px] text-center text-[13px] leading-relaxed">
 				<Trans>
-					Still trying. If it keeps failing, remove it and create a new one.
+					Still trying. If it keeps failing, archive it and create a new one.
 				</Trans>
 			</Text>
 			<View className="flex-row gap-2">
@@ -156,37 +198,27 @@ function CloudWorkspaceUnreachableState({
 						<Trans>Try again</Trans>
 					</Text>
 				</Button>
-				<RemoveWorkspaceButton workspaceId={cloud.id} />
+				<ArchiveWorkspaceButton workspaceId={cloud.id} />
 			</View>
 		</Frame>
 	);
 }
 
-function RemoveWorkspaceButton({ workspaceId }: { workspaceId: string }) {
+function ArchiveWorkspaceButton({ workspaceId }: { workspaceId: string }) {
 	const { t } = useLingui();
-	const router = useRouter();
-	const { remove: removeCloudWorkspace } = useCloudWorkspaceActions();
-	const [isDeleting, setIsDeleting] = useState(false);
-
-	const remove = async () => {
-		setIsDeleting(true);
-		try {
-			await removeCloudWorkspace(workspaceId);
-			router.back();
-		} catch {
-			Alert.alert(t({ message: "Delete failed" }));
-			setIsDeleting(false);
-		}
-	};
+	const { archive } = useCloudWorkspaceActions();
 
 	return (
-		<Button variant="secondary" disabled={isDeleting} onPress={remove}>
+		<Button
+			variant="secondary"
+			onPress={() =>
+				void archive(workspaceId).catch(() =>
+					Alert.alert(t({ message: "Archive failed" })),
+				)
+			}
+		>
 			<Text>
-				{isDeleting
-					? t({ message: "Removing…" })
-					: t({
-							message: "Remove workspace",
-						})}
+				<Trans>Archive workspace</Trans>
 			</Text>
 		</Button>
 	);
@@ -203,7 +235,7 @@ function Frame({
 }) {
 	return (
 		<View className="flex-1 items-center justify-center px-8">
-			<View className="w-full items-center gap-5">
+			<View className="w-full max-w-md items-center gap-5">
 				<Icon
 					as={icon}
 					className={cn("size-12", iconClassName)}

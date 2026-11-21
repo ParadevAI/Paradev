@@ -1,4 +1,8 @@
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import {
+	type UseQueryResult,
+	useQueries,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -6,6 +10,7 @@ import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 import {
@@ -75,6 +80,16 @@ export interface UseHostWorkspacesResult {
 	cache: HostWorkspacesCacheOps;
 }
 
+// Module-level so useQueries keeps these arrays stable across renders; a
+// new array would rebuild `workspaces` and re-render every consumer.
+function pickQueryState<TData>(results: UseQueryResult<TData>[]) {
+	return results.map(({ data, isError, isSuccess }) => ({
+		data,
+		isError,
+		isSuccess,
+	}));
+}
+
 /**
  * The workspace read path: `workspace.list` per host (local direct, remote
  * via relay), merged and live-updated from each host's `workspace:changed`
@@ -112,17 +127,14 @@ export function useHostWorkspacesSource(
 	} = useKnownHosts();
 	const { targets: sandboxes, isReady: sandboxesReady } = useSandboxAccess();
 
-	// Only the open workspace's sandbox is a host here, and only once it has a
-	// running session: a stopped sandbox's URL answers nothing until the open
-	// workspace's own access wakes it and re-addresses it, and polling it
-	// before then is a stream of failed requests. The sidebar renders cloud
-	// rows from the cloud row, so nothing else needs a sandbox's served rows.
+	// Only the open workspace's sandbox is a host here: the sidebar renders
+	// cloud rows from the cloud row, so nothing else needs a sandbox's served
+	// rows, and asking would keep every sidebar sandbox awake.
 	const { workspaceId: openWorkspaceId } = useParams({ strict: false });
 	const openSandbox = useMemo(
 		() =>
-			sandboxes.find(
-				(sandbox) => sandbox.workspaceId === openWorkspaceId && sandbox.running,
-			) ?? null,
+			sandboxes.find((sandbox) => sandbox.workspaceId === openWorkspaceId) ??
+			null,
 		[sandboxes, openWorkspaceId],
 	);
 
@@ -191,9 +203,8 @@ export function useHostWorkspacesSource(
 			// Bounded retries so an online-per-cloud but tunnel-less relay
 			// target settles into isError quickly instead of holding isReady.
 			retry: 1,
-			queryFn: async (): Promise<HostWorkspaceRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				const served = (
 					(await client.workspace.list.query()) as HostWorkspaceRow[]
 				).map(normalizeServedWorkspaceRow);
@@ -210,8 +221,9 @@ export function useHostWorkspacesSource(
 					rows,
 				);
 				return rows;
-			},
+			}),
 		})),
+		combine: pickQueryState,
 	});
 
 	// Archived tombstones, opt-in, own query key: the shared live list (and
@@ -228,17 +240,17 @@ export function useHostWorkspacesSource(
 			enabled: includeArchived && target.hostUrl !== null,
 			refetchInterval: WORKSPACES_FALLBACK_REFETCH_INTERVAL_MS,
 			networkMode: "always" as const,
-			queryFn: async (): Promise<HostWorkspaceRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				const rows = (await client.workspace.list.query({
 					includeArchived: true,
 				})) as HostWorkspaceRow[];
 				return rows
 					.filter((row) => row.archivedAt != null)
 					.map(normalizeServedWorkspaceRow);
-			},
+			}),
 		})),
+		combine: pickQueryState,
 	});
 
 	const busEverOpenedRef = useRef<Set<string>>(new Set());
@@ -460,5 +472,8 @@ export function useHostWorkspacesSource(
 		};
 	}, [targets, queryClient]);
 
-	return { workspaces, isReady, hostsSettled: knownHostsSettled, cache };
+	return useMemo(
+		() => ({ workspaces, isReady, hostsSettled: knownHostsSettled, cache }),
+		[workspaces, isReady, knownHostsSettled, cache],
+	);
 }

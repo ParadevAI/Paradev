@@ -244,6 +244,7 @@ export class PageWatchManager {
 			});
 			this.retired.delete(entry);
 			this.cleanupFailures.delete(entry);
+			this.notifyChanged(entry.workspaceId);
 		} catch (error) {
 			const failures = (this.cleanupFailures.get(entry) ?? 0) + 1;
 			this.cleanupFailures.set(entry, failures);

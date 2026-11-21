@@ -22,9 +22,11 @@ type EventType =
 	| "port:changed"
 	| "workspace:changed"
 	| "workspace:create-settled"
+	| "workspace:naming-failed"
 	| "project:changed"
 	| "tag-folders:changed"
-	| "page-watch:changed";
+	| "page-watch:changed"
+	| "chat:sessions-changed";
 
 interface FsEventsPayload {
 	events: FsWatchEvent[];
@@ -91,6 +93,11 @@ export type WorkspaceCreateSettledPayload = Omit<
 	"type" | "workspaceId"
 >;
 
+export type WorkspaceNamingFailedPayload = Omit<
+	Extract<ServerMessage, { type: "workspace:naming-failed" }>,
+	"type" | "workspaceId"
+>;
+
 type ProjectChangedMessage = Extract<
 	ServerMessage,
 	{ type: "project:changed" }
@@ -108,6 +115,10 @@ export interface ProjectChangedPayload {
 }
 
 export interface PageWatchChangedPayload {
+	occurredAt: number;
+}
+
+export interface ChatSessionsChangedPayload {
 	occurredAt: number;
 }
 
@@ -141,16 +152,32 @@ type EventListener<T extends EventType> = T extends "fs:events"
 										workspaceId: string,
 										payload: WorkspaceCreateSettledPayload,
 									) => void
-								: T extends "project:changed"
-									? (projectId: string, payload: ProjectChangedPayload) => void
-									: T extends "tag-folders:changed"
-										? (scope: string, payload: TagFoldersChangedPayload) => void
-										: T extends "page-watch:changed"
+								: T extends "workspace:naming-failed"
+									? (
+											workspaceId: string,
+											payload: WorkspaceNamingFailedPayload,
+										) => void
+									: T extends "project:changed"
+										? (
+												projectId: string,
+												payload: ProjectChangedPayload,
+											) => void
+										: T extends "tag-folders:changed"
 											? (
-													workspaceId: string,
-													payload: PageWatchChangedPayload,
+													scope: string,
+													payload: TagFoldersChangedPayload,
 												) => void
-											: never;
+											: T extends "page-watch:changed"
+												? (
+														workspaceId: string,
+														payload: PageWatchChangedPayload,
+													) => void
+												: T extends "chat:sessions-changed"
+													? (
+															workspaceId: string,
+															payload: ChatSessionsChangedPayload,
+														) => void
+													: never;
 
 interface ListenerEntry {
 	type: EventType;
@@ -289,7 +316,9 @@ function handleMessage(state: ConnectionState, data: unknown): void {
 			message.type === "port:changed" ||
 			message.type === "workspace:changed" ||
 			message.type === "workspace:create-settled" ||
-			message.type === "page-watch:changed"
+			message.type === "workspace:naming-failed" ||
+			message.type === "page-watch:changed" ||
+			message.type === "chat:sessions-changed"
 				? message.workspaceId
 				: message.type === "project:changed"
 					? message.projectId
@@ -368,6 +397,11 @@ function handleMessage(state: ConnectionState, data: unknown): void {
 				project: message.project,
 				occurredAt: message.occurredAt,
 			});
+		} else if (message.type === "chat:sessions-changed") {
+			(entry.callback as EventListener<"chat:sessions-changed">)(
+				message.workspaceId,
+				{ occurredAt: message.occurredAt },
+			);
 		} else if (message.type === "tag-folders:changed") {
 			(entry.callback as EventListener<"tag-folders:changed">)(message.scope, {
 				settings: message.settings,
@@ -480,6 +514,16 @@ export function reconnectEventBusIfDown(hostUrl: string): void {
 	if (!state || state.status.state === "open") return;
 	state.socket.reconnect(1000, "endpoint or credentials refreshed");
 	setConnectionStatus(state, { state: "connecting" });
+}
+
+/**
+ * A host's connection status, or undefined when nothing holds a connection to
+ * it. Never creates a connection, so render code can call it.
+ */
+export function peekEventBusConnectionStatus(
+	hostUrl: string,
+): HostConnectionStatus | undefined {
+	return connections.get(hostUrl)?.status;
 }
 
 function maybeCleanupConnection(hostUrl: string): void {

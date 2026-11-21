@@ -1,5 +1,7 @@
 import * as Sentry from "@sentry/node";
+import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
+import type { TerminalAgentEndReason } from "./terminal-agents/types";
 
 let initialized = false;
 
@@ -11,8 +13,18 @@ export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
 	const dsn = process.env.HOST_SERVICE_SENTRY_DSN;
 	if (!dsn) return;
+	const tags = {
+		service: "host-service",
+		organization_id: options.organizationId,
+		run_mode: process.env.SUPERSET_HOST_RUN_MODE,
+		cloud_workspace_id: process.env.SUPERSET_SANDBOX_WORKSPACE_ID,
+		image_tag: process.env.SUPERSET_SANDBOX_IMAGE_TAG,
+		provider: process.env.SUPERSET_SANDBOX_PROVIDER,
+	};
 	Sentry.init({
 		dsn,
+		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
+		enableLogs: process.env.SUPERSET_SANDBOX_BOX_LOGS === "1",
 		release: process.env.HOST_SERVICE_SENTRY_RELEASE,
 		environment: process.env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		// A host that fails once usually fails in a loop: git.getStatus alone
@@ -25,18 +37,42 @@ export function initSentry(options: { organizationId?: string }): void {
 				exitEvenIfOtherHandlersAreRegistered: false,
 			}),
 		],
-		initialScope: {
-			tags: {
-				service: "host-service",
-				organization_id: options.organizationId,
-				run_mode: process.env.SUPERSET_HOST_RUN_MODE,
-				cloud_workspace_id: process.env.SUPERSET_SANDBOX_WORKSPACE_ID,
-				image_tag: process.env.SUPERSET_SANDBOX_IMAGE_TAG,
-				provider: process.env.SUPERSET_SANDBOX_PROVIDER,
-			},
-		},
+		initialScope: { tags, attributes: tags },
 	});
 	initialized = true;
+}
+
+type BoxAgentId = BuiltinAgentId | "custom";
+
+interface BoxEventAttributes {
+	"agent.ended": {
+		"agent.id": BoxAgentId;
+		"agent.end_reason": TerminalAgentEndReason;
+		ms: number;
+	};
+	"box.reaped": { "reap.rss_mb": number; "memory.limit_mb": number };
+	"hook.finished": { "hook.exit": number | NodeJS.Signals; ms: number };
+}
+
+/** Typed per event so no free text can reach Sentry Logs. */
+export function logBoxEvent<E extends keyof BoxEventAttributes>(
+	event: E,
+	attributes: BoxEventAttributes[E],
+	level: "info" | "warn" = "info",
+): void {
+	Sentry.logger[level](event, attributes);
+}
+
+/** A file a user attached that the agent did not get. */
+export function reportAttachmentResolveFailure(error: unknown): void {
+	if (!initialized) return;
+	Sentry.captureException(error, { tags: { attachment_resolve: "failed" } });
+}
+
+/** A usage scan that crashed its worker, idle or not; the pool pauses after. */
+export function reportUsageWorkerCrash(error: unknown): void {
+	if (!initialized) return;
+	Sentry.captureException(error, { tags: { usage_worker: "crashed" } });
 }
 
 export async function captureFatalStartupError(error: unknown): Promise<void> {

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { buildHint } from "../hint";
 import { tierFor } from "../tiers";
 import type {
@@ -59,14 +59,14 @@ export function buildPolicy(
 	};
 }
 
-type MapKey = "fileLinks" | "urlLinks" | "sidebarFileLinks";
+type MapKey = "fileLinks" | "urlLinks" | "sidebarFileLinks" | "pageLinks";
 
 export function usePolicy(
 	key: MapKey,
 	surface: Surface,
 	mode: TierMode,
 ): ClickPolicy {
-	const { preferences } = useV2UserPreferences();
+	const { preferences } = useUserPreferences();
 	const map = preferences[key];
 	const resolve = useCallback(
 		(event: ModifierEvent): ResolvedClick => {
@@ -87,5 +87,8 @@ export function usePolicy(
 		() => buildHint(map, surface, mode),
 		[map, surface, mode],
 	);
-	return { resolve, getAction, tierForAction, hint, map };
+	return useMemo(
+		() => ({ resolve, getAction, tierForAction, hint, map }),
+		[resolve, getAction, tierForAction, hint, map],
+	);
 }

@@ -1,13 +1,9 @@
 "use client";
 
-import { Trans } from "@lingui/react/macro";
-import { Share2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { cn } from "../../../../lib/utils";
-import { Button } from "../../../ui/button";
 import { DeletePageDialog } from "./components/DeletePageDialog";
-import { PagePublicBanner } from "./components/PagePublicBanner";
-import { PageSharePopover } from "./components/PageSharePopover";
+import { PageShareButton } from "./components/PageShareButton";
 import { PageTitleMenu } from "./components/PageTitleMenu";
 import { PageVersionBanner } from "./components/PageVersionBanner";
 import { RenamePageDialog } from "./components/RenamePageDialog";
@@ -24,6 +20,8 @@ interface PageHeaderProps extends PageHeaderActions {
 	leading?: ReactNode;
 	trailing?: ReactNode;
 	className?: string;
+	/** The empty space between the title and the actions, e.g. a window-drag region. */
+	fillerClassName?: string;
 }
 
 export function PageHeader({
@@ -33,13 +31,16 @@ export function PageHeader({
 	leading,
 	trailing,
 	className,
+	fillerClassName,
 	onSetVisibility,
 	onSetSharedVersion,
 	onDelete,
+	onDuplicate,
 	onRename,
 	onRefresh,
 	onPreviewVersion,
 	previewVersion = null,
+	sharing,
 }: PageHeaderProps) {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [shareOpen, setShareOpen] = useState(false);
@@ -48,6 +49,7 @@ export function PageHeader({
 
 	const isOwner =
 		currentUserId !== undefined && currentUserId === page.createdByUserId;
+	const editable = page.canEdit ?? isOwner;
 
 	return (
 		<>
@@ -58,11 +60,11 @@ export function PageHeader({
 				)}
 			>
 				{leading}
-				<div className="no-drag flex min-w-0 items-center">
+				<div className="flex min-w-0 items-center">
 					<PageTitleMenu
 						page={page}
 						versions={versions}
-						editable={isOwner}
+						editable={editable}
 						isOwner={isOwner}
 						open={menuOpen}
 						onOpenChange={setMenuOpen}
@@ -74,6 +76,7 @@ export function PageHeader({
 							setMenuOpen(false);
 							setDeleteOpen(true);
 						}}
+						onDuplicate={onDuplicate}
 						onRename={() => setRenameOpen(true)}
 						onRefresh={onRefresh}
 						onPreviewVersion={onPreviewVersion}
@@ -85,22 +88,20 @@ export function PageHeader({
 					) : null}
 				</div>
 
-				<div className="no-drag ml-auto flex shrink-0 items-center gap-1">
+				<div className={cn("h-full min-w-0 flex-1", fillerClassName)} />
+				<div className="flex shrink-0 items-center gap-1">
 					{trailing}
-					<PageSharePopover
+					<PageShareButton
 						page={page}
 						versions={versions}
-						editable={isOwner}
+						editable={editable}
 						open={shareOpen}
 						onOpenChange={setShareOpen}
 						onSetVisibility={onSetVisibility}
 						onSetSharedVersion={onSetSharedVersion}
-					>
-						<Button size="xs" variant="ghost" className="gap-1.5">
-							<Share2 className="size-3.5" />
-							<Trans>Share</Trans>
-						</Button>
-					</PageSharePopover>
+						currentUserId={currentUserId}
+						sharing={sharing}
+					/>
 				</div>
 
 				<DeletePageDialog
@@ -123,11 +124,6 @@ export function PageHeader({
 				<PageVersionBanner
 					version={previewVersion}
 					onExit={() => onPreviewVersion(null)}
-				/>
-			) : isOwner && page.visibility === "everyone" ? (
-				<PagePublicBanner
-					url={page.url}
-					onOpenShareSettings={() => setShareOpen(true)}
 				/>
 			) : null}
 		</>

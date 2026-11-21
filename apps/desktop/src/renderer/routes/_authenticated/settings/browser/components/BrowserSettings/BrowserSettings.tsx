@@ -14,6 +14,8 @@ import {
 	type SettingItemId,
 } from "../../../utils/settings-search";
 
+import { BrowserLinkSettings } from "./components/BrowserLinkSettings";
+
 interface BrowserSettingsProps {
 	visibleItems?: SettingItemId[] | null;
 }
@@ -113,7 +115,7 @@ export function BrowserSettings({ visibleItems }: BrowserSettingsProps) {
 							<p className="text-xs text-muted-foreground">
 								<Trans>
 									Copy browsing history and logins from Chrome, Brave, Arc, or
-									another Chromium browser into Superset.
+									another Chromium browser into Paradev.
 								</Trans>
 							</p>
 						</div>
@@ -128,6 +130,9 @@ export function BrowserSettings({ visibleItems }: BrowserSettingsProps) {
 						</Button>
 					</div>
 				)}
+				{[SETTING_ITEM_ID.LINKS_URL, SETTING_ITEM_ID.LINKS_PORT].some((id) =>
+					isItemVisible(id, visibleItems),
+				) && <BrowserLinkSettings visibleItems={visibleItems} />}
 			</div>
 
 			<ImportHistoryDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
