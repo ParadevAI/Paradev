@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { LuZap } from "react-icons/lu";
+import { ShimmerText } from "@/app/[lang]/components/ShimmerText";
 import { AUTOMATIONS } from "../../../../constants";
-import { ShimmerText } from "../../../ShimmerText";
 
 export function AutomationsScene() {
 	const { t } = useLingui();

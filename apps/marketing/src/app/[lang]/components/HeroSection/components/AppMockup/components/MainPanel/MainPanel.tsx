@@ -2,9 +2,9 @@
 
 import { useLingui } from "@lingui/react/macro";
 import { LuGitFork, LuX, LuZap } from "react-icons/lu";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
 import { SCENES } from "../../constants";
 import type { ActiveDemo, PagePhase } from "../../types";
-import { AgentLogo } from "../AgentLogo";
 import { IconButton } from "../IconButton";
 import { AutomationsScene } from "./components/AutomationsScene";
 import { DitherClouds } from "./components/DitherClouds";

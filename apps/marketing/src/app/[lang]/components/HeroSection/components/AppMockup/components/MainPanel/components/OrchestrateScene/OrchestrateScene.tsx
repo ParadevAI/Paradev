@@ -5,7 +5,7 @@ import {
 	LuPencil,
 	LuSquareTerminal,
 } from "react-icons/lu";
-import { AgentLogo } from "../../../AgentLogo";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
 import { Composer } from "../Composer";
 import { Step } from "../Step";
 import { Code } from "./components/Code";
@@ -22,7 +22,6 @@ export function OrchestrateScene() {
 						<span className="text-neutral-100/70">
 							<Trans>You</Trans>
 						</span>
-						<span className="text-neutral-100/40">3m</span>
 					</div>
 					<div className="max-w-[440px] rounded-[10px] bg-neutral-100/[0.04] px-3 py-2 text-neutral-100/90">
 						<Trans>
@@ -36,7 +35,6 @@ export function OrchestrateScene() {
 					<div className="flex items-center gap-2">
 						<AgentLogo agent="claude" />
 						<span className="text-neutral-100/90">Claude Code</span>
-						<span className="text-[12px] text-neutral-100/40">2m</span>
 					</div>
 
 					<p className="pr-10 text-neutral-100/90">

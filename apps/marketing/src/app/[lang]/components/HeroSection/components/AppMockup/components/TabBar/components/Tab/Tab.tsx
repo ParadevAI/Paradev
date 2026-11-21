@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { LuX } from "react-icons/lu";
-import { ShimmerText } from "../../../ShimmerText";
+import { ShimmerText } from "@/app/[lang]/components/ShimmerText";
 
 interface TabProps {
 	icon: ReactNode;

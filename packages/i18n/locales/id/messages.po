@@ -1701,9 +1701,6 @@ msgstr "1 pengguna"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ alur kerja bersamaan tanpa kehilangan konteks"
 
-msgid "12m ago"
-msgstr "12m lalu"
-
 msgid "145,000+ across 180 countries"
 msgstr "145.000+ di 180 negara"
 
@@ -1712,9 +1709,6 @@ msgstr "15 mnt"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ bintang, 100+ kontributor"
-
-msgid "1d ago"
-msgstr "1h lalu"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agen · 14 file berubah"
@@ -1730,9 +1724,6 @@ msgstr "2025 sampai sekarang"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2j lalu"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2399,9 +2390,6 @@ msgstr "Konfigurasi Agen"
 msgid "Agent finished"
 msgstr "Agen selesai"
 
-msgid "Agent Independence"
-msgstr "Independensi Agen"
-
 msgid "Agent is working"
 msgstr "Agen sedang bekerja"
 
@@ -2492,9 +2480,6 @@ msgstr "Agen hanya melihat placeholder. Paradev menambahkan login Anda ke permin
 
 msgid "Agents that run while you're away"
 msgstr "Agen yang berjalan saat Anda pergi"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agen memilah issue, menyusun changelog, dan memperbarui dependensi sendiri."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agen memakai akun ini saat memanggil tool Linear."
@@ -3884,6 +3869,9 @@ msgstr "Sudah membuat plugin? Kirimkan di sini."
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"
 
+msgid "Built to be driven by agents"
+msgstr "Dibuat untuk dikendalikan oleh agen"
+
 msgid "builtin"
 msgstr "bawaan"
 
@@ -4624,9 +4612,6 @@ msgstr "Membersihkan…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentasi CLI"
@@ -6634,9 +6619,6 @@ msgstr "Buat dengan AI"
 msgid "Create workspace"
 msgstr "Buat workspace"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Buat workspace dan jalankan agen dari CLI, SDK, atau lewat MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Buat workspace, jalankan agen, dan baca outputnya dari terminal atau skrip mana pun. macOS dan Linux."
 
@@ -7753,9 +7735,6 @@ msgstr "Draf dibuka"
 msgid "Draft PR #2841"
 msgstr "Draft PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "menyusun 3 draf balasan dukungan"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Seret <0>Paradev</0> ke folder <1>Aplikasi</1>"
 
@@ -7768,8 +7747,8 @@ msgstr "Seret workspace untuk mengatur ulang dalam Urutan manual"
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Kendalikan dari terminal"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Kendalikan seluruh aplikasi dan cloud dari CLI, SDK, atau melalui MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Kendalikan workspace, agen, dan sesi secara terprogram dari skrip, CI, atau alat Anda sendiri."
@@ -9114,6 +9093,9 @@ msgstr "Sesuaikan"
 msgid "Fix all failing checks"
 msgstr "Perbaiki semua check yang gagal"
 
+msgid "Fix bugs the moment they're filed"
+msgstr "Perbaiki bug begitu dilaporkan"
+
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Memperbaiki total keranjang untuk keranjang kosong. Menambahkan tes yang mereproduksi TypeError."
 
@@ -9131,6 +9113,9 @@ msgstr "Perbaiki temuan"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Perbaiki error baru di web. Reproduksi masing-masing dalam tes dan buka draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Perbaiki bug produksi"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9495,9 +9480,6 @@ msgstr "File hasil generate disembunyikan"
 
 msgid "Generated image"
 msgstr "Gambar yang dihasilkan"
-
-msgid "Generating"
-msgstr "Membuat"
 
 msgid "Generating..."
 msgstr "Membuat..."
@@ -14405,9 +14387,6 @@ msgstr "OpenAI menolak kunci API ini."
 msgid "Opened"
 msgstr "Dibuka"
 
-msgid "opened PR #841 for review"
-msgstr "membuka PR #841 untuk direview"
-
 msgid "Opening {appName}…"
 msgstr "Membuka {appName}…"
 
@@ -14917,9 +14896,6 @@ msgstr "Agen paralel"
 
 msgid "Parallel agents guide"
 msgstr "Panduan agen paralel"
-
-msgid "Parallel Execution"
-msgstr "Eksekusi Paralel"
 
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Sesi paralel per pengembang berlipat ganda setiap tujuh bulan, melewati ambang Operator, Manajer Pabrik, dan Henry Ford antara Agustus 2026 dan Agustus 2028"
@@ -17246,6 +17222,9 @@ msgstr "Jalankan 10+ agen coding paralel di mesin Anda."
 msgid "Run again"
 msgstr "Jalankan lagi"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Jalankan agen secara paralel, masing-masing di branch-nya sendiri. Tinjau hasil kerja mereka dengan diff bawaan, pemeriksaan PR, dan tinjauan oleh agen, lalu merge tanpa meninggalkan aplikasi."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Jalankan agen sesuai jadwal atau saat sesuatu terjadi."
 
@@ -17300,9 +17279,6 @@ msgstr "Jalankan sesuai jadwal atau saat ada event, sesuai permintaan, jeda, lan
 
 msgid "Run on any machine"
 msgstr "Di mesin mana pun"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Jalankan agen coding paralel untuk fitur, perbaikan, dan refactor. Masing-masing bekerja di branch sendiri, secara lokal atau di cloud."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Jalankan agen coding paralel dengan Paradev"
@@ -17516,8 +17492,8 @@ msgstr "Menyimpan..."
 msgid "Saving…"
 msgstr "Menyimpan…"
 
-msgid "Scale to 100+ agents"
-msgstr "Tingkatkan hingga lebih dari 100 agen"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Skalakan hingga ratusan agen, pertahankan standar kualitas"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Pindai kode QR, lalu masuk dengan akun Paradev yang sama dan pilih organisasi ini."
@@ -19234,8 +19210,8 @@ msgstr "Mulai sesi"
 msgid "Start agent"
 msgstr "Mulai agen"
 
-msgid "Start agents on events or a schedule"
-msgstr "Jalankan agen saat ada event atau sesuai jadwal"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Mulai agen secara otomatis: dari error Sentry, isu Linear, pull request GitHub, atau jadwal yang diatur sendiri oleh agen."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Mulai agen, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Kode Anda tetap di mesin Anda."
@@ -19605,9 +19581,6 @@ msgstr "Konsistensi · hari aktif dari 30"
 
 msgid "Switch account"
 msgstr "Ganti akun"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Ganti agen. Pertahankan alur kerja Anda"
 
 msgid "Switch host"
 msgstr "Ganti host"
@@ -19992,9 +19965,6 @@ msgstr "Tipografi terminal"
 
 msgid "Terminals"
 msgstr "Terminal"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminal ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Terminal tidak merespons"
@@ -21351,9 +21321,6 @@ msgstr "Triase email dan buat draf balasan"
 msgid "Triage new issues"
 msgstr "Triase issue baru"
 
-msgid "triaging 12 new issues…"
-msgstr "mentriase 12 issue baru…"
-
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Mencoba memperbaiki setiap bug yang diposting di #bugs."
 
@@ -21994,9 +21961,6 @@ msgstr "Pakai sebagai run workspace"
 msgid "Use cases"
 msgstr "Kasus penggunaan"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Gunakan Claude Code, Codex, OpenCode, atau agen CLI apa pun. Workspace, branch, dan proses review Anda tetap sama."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Pakai Claude Code, Codex, atau agen coding apa pun. Pilih per tugas atau jalankan beberapa berdampingan."
 
@@ -22029,6 +21993,12 @@ msgstr "Gunakan Paradev di ponsel dengan Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Gunakan paket agen dan kunci API yang sudah Anda punya. Panggilan model langsung ke penyedia Anda."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Gunakan agen terbaik. Tanpa pernah terkunci."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Gunakan agen terbaik begitu dirilis. Artefak, branch, dan plugin Anda berfungsi di semuanya."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."

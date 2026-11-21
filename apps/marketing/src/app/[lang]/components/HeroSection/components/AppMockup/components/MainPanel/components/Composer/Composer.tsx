@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { LuChevronDown, LuCornerDownLeft, LuPaperclip } from "react-icons/lu";
-import { AgentLogo } from "../../../AgentLogo";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
 import { IconButton } from "../../../IconButton";
 
 export function Composer() {

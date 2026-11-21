@@ -1,4 +1,5 @@
 import type { MessageDescriptor } from "@lingui/core";
+import type { AgentId } from "@/app/[lang]/components/AgentLogo";
 
 export type ActiveDemo =
 	| "Orchestrate Parallel Agents"
@@ -8,8 +9,6 @@ export type ActiveDemo =
 
 export type PagePhase = "published" | "commented" | "revised";
 
-export type AgentId = "claude" | "codex" | "opencode" | "gemini";
-
 export type SessionStatus = "needs" | "working";
 
 export type RailSection = "workspaces" | "automations" | "pages";
@@ -18,7 +17,6 @@ export interface SessionData {
 	title: string;
 	agent: AgentId;
 	status?: SessionStatus;
-	pr?: string;
 }
 
 export interface SessionGroupData {
@@ -31,17 +29,6 @@ export interface SceneConfig {
 	rail: RailSection;
 	activeSession: string | null;
 	showChanges: boolean;
-}
-
-export interface ChangedFile {
-	name: string;
-	depth: number;
-	isDir?: boolean;
-	add?: number;
-	del?: number;
-	badge?: "A" | "M";
-	selected?: boolean;
-	dimmed?: boolean;
 }
 
 export type DiffRow =

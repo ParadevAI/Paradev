@@ -2,9 +2,9 @@
 
 import { useLingui } from "@lingui/react/macro";
 import { LuPanelRight, LuPlus, LuZap } from "react-icons/lu";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
 import { NEW_CLOUD_SESSION, SCENES } from "../../constants";
 import type { ActiveDemo } from "../../types";
-import { AgentLogo } from "../AgentLogo";
 import { IconButton } from "../IconButton";
 import { Tab } from "./components/Tab";
 
@@ -42,19 +42,19 @@ export function TabBar({ activeDemo }: TabBarProps) {
 				)}
 				{activeDemo === "Publish Pages" && (
 					<Tab
-						icon={<AgentLogo agent="claude" />}
+						icon={<AgentLogo agent="pi" />}
 						label="Onboarding copy pass"
 						active
 					/>
 				)}
 				<Tab
-					icon={<AgentLogo agent="codex" />}
-					label="Pricing comparison"
-					working
+					icon={<AgentLogo agent="codex" dimmed />}
+					label="Command palette v2"
 				/>
 				<Tab
-					icon={<AgentLogo agent="claude" dimmed />}
-					label="Changelog page"
+					icon={<AgentLogo agent="opencode" />}
+					label="Fix flaky auth tests"
+					working
 				/>
 				<IconButton icon={LuPlus} />
 			</div>

@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { LuCheck, LuSquareTerminal } from "react-icons/lu";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
 import type { PagePhase } from "../../../../types";
-import { AgentLogo } from "../../../AgentLogo";
 import { Composer } from "../Composer";
 import { Step } from "../Step";
 
@@ -18,7 +18,6 @@ export function PagesScene({ phase }: PagesSceneProps) {
 						<span className="text-neutral-100/70">
 							<Trans>You</Trans>
 						</span>
-						<span className="text-neutral-100/40">3m</span>
 					</div>
 					<div className="max-w-[440px] rounded-[10px] bg-neutral-100/[0.04] px-3 py-2 text-neutral-100/90">
 						<Trans>turn the onboarding findings into a page</Trans>
@@ -29,7 +28,6 @@ export function PagesScene({ phase }: PagesSceneProps) {
 					<div className="flex items-center gap-2 pb-1">
 						<AgentLogo agent="claude" />
 						<span className="text-neutral-100/90">Claude Code</span>
-						<span className="text-[12px] text-neutral-100/40">2m</span>
 					</div>
 					<Step icon={LuSquareTerminal}>
 						<span className="font-mono text-[12px] text-neutral-100/70">

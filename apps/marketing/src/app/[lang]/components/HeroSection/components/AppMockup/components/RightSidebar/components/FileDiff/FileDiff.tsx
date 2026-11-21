@@ -16,7 +16,7 @@ export function FileDiff({ diff }: FileDiffProps) {
 				<span className="min-w-0 flex-1 truncate text-neutral-100/90">
 					{diff.path}
 				</span>
-				<span className="text-[#ffb02b]">M</span>
+				<span className="text-neutral-100/55">M</span>
 				<span className="text-[#58da98]">+{diff.add}</span>
 				{diff.del !== undefined && (
 					<span className="text-[#ff6557]">−{diff.del}</span>

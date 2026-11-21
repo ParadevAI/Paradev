@@ -1,7 +1,6 @@
-import { LuGitPullRequest } from "react-icons/lu";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
+import { ShimmerText } from "@/app/[lang]/components/ShimmerText";
 import type { SessionData } from "../../../../types";
-import { AgentLogo } from "../../../AgentLogo";
-import { ShimmerText } from "../../../ShimmerText";
 
 interface SessionRowProps {
 	session: SessionData;
@@ -26,12 +25,6 @@ export function SessionRow({ session, active }: SessionRowProps) {
 					className={`min-w-0 flex-1 truncate ${active || needsYou ? "text-neutral-100/90" : "text-neutral-100/70"}`}
 				>
 					{session.title}
-				</span>
-			)}
-			{session.pr && (
-				<span className="flex shrink-0 items-center gap-1 text-[12px] text-neutral-100/55">
-					<LuGitPullRequest className="size-3.5 text-neutral-100/40" />
-					{session.pr}
 				</span>
 			)}
 			{needsYou && (

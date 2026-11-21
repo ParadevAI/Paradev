@@ -12,7 +12,7 @@ export function CodeText({ code }: CodeTextProps) {
 				const key = `${index}-${part}`;
 				if (part.startsWith('"'))
 					return (
-						<span key={key} className="text-[#e6c384]">
+						<span key={key} className="text-neutral-100/55">
 							{part}
 						</span>
 					);
@@ -24,7 +24,7 @@ export function CodeText({ code }: CodeTextProps) {
 					);
 				if (index % 2 === 1)
 					return (
-						<span key={key} className="text-[#8cb4ff]">
+						<span key={key} className="text-neutral-100/90">
 							{part}
 						</span>
 					);

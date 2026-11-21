@@ -1701,9 +1701,6 @@ msgstr "1 user"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ concurrent workstreams without dropped state"
 
-msgid "12m ago"
-msgstr "12m ago"
-
 msgid "145,000+ across 180 countries"
 msgstr "145,000+ across 180 countries"
 
@@ -1712,9 +1709,6 @@ msgstr "15 min"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ stars, 100+ contributors"
-
-msgid "1d ago"
-msgstr "1d ago"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agents · 14 files changed"
@@ -1730,9 +1724,6 @@ msgstr "2025 to now"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2h ago"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2399,9 +2390,6 @@ msgstr "Agent Configs"
 msgid "Agent finished"
 msgstr "Agent finished"
 
-msgid "Agent Independence"
-msgstr "Agent Independence"
-
 msgid "Agent is working"
 msgstr "Agent is working"
 
@@ -2492,9 +2480,6 @@ msgstr "Agents see a placeholder. Paradev adds your sign-in to outgoing requests
 
 msgid "Agents that run while you're away"
 msgstr "Agents that run while you're away"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agents triage issues, draft changelogs, and bump dependencies on their own."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents use this account when they call Linear tools."
@@ -3884,6 +3869,9 @@ msgstr "Built a plugin? Submit it here."
 msgid "Built in Paradev"
 msgstr "Built in Paradev"
 
+msgid "Built to be driven by agents"
+msgstr "Built to be driven by agents"
+
 msgid "builtin"
 msgstr "builtin"
 
@@ -4624,9 +4612,6 @@ msgstr "Clearing…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI docs"
@@ -6634,9 +6619,6 @@ msgstr "Create with AI"
 msgid "Create workspace"
 msgstr "Create workspace"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 
@@ -7753,9 +7735,6 @@ msgstr "Draft opened"
 msgid "Draft PR #2841"
 msgstr "Draft PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "drafted 3 support replies"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 
@@ -7768,8 +7747,8 @@ msgstr "Drag workspaces to reorder in Manual order"
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Drive it from the terminal"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
@@ -9114,6 +9093,9 @@ msgstr "Fit"
 msgid "Fix all failing checks"
 msgstr "Fix all failing checks"
 
+msgid "Fix bugs the moment they're filed"
+msgstr "Fix bugs the moment they're filed"
+
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 
@@ -9131,6 +9113,9 @@ msgstr "Fix findings"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Fix production bugs"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9495,9 +9480,6 @@ msgstr "Generated file hidden"
 
 msgid "Generated image"
 msgstr "Generated image"
-
-msgid "Generating"
-msgstr "Generating"
 
 msgid "Generating..."
 msgstr "Generating..."
@@ -14405,9 +14387,6 @@ msgstr "OpenAI rejected this API key."
 msgid "Opened"
 msgstr "Opened"
 
-msgid "opened PR #841 for review"
-msgstr "opened PR #841 for review"
-
 msgid "Opening {appName}…"
 msgstr "Opening {appName}…"
 
@@ -14917,9 +14896,6 @@ msgstr "Parallel agents"
 
 msgid "Parallel agents guide"
 msgstr "Parallel agents guide"
-
-msgid "Parallel Execution"
-msgstr "Parallel Execution"
 
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
@@ -17246,6 +17222,9 @@ msgstr "Run 10+ parallel coding agents on your machine."
 msgid "Run again"
 msgstr "Run again"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Run agents on a schedule or when something happens."
 
@@ -17300,9 +17279,6 @@ msgstr "Run on a schedule or on events, run on demand, pause, resume, and read l
 
 msgid "Run on any machine"
 msgstr "Run on any machine"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Run parallel coding agents with Paradev"
@@ -17516,8 +17492,8 @@ msgstr "Saving..."
 msgid "Saving…"
 msgstr "Saving…"
 
-msgid "Scale to 100+ agents"
-msgstr "Scale to 100+ agents"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Scale to 100s of agents, maintain quality bar"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Scan the QR code, then sign in with the same Paradev account and select this organization."
@@ -19234,8 +19210,8 @@ msgstr "Start a session"
 msgid "Start agent"
 msgstr "Start agent"
 
-msgid "Start agents on events or a schedule"
-msgstr "Start agents on events or a schedule"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
@@ -19605,9 +19581,6 @@ msgstr "Sustain · active days in 30"
 
 msgid "Switch account"
 msgstr "Switch account"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Switch agents. Keep your workflow"
 
 msgid "Switch host"
 msgstr "Switch host"
@@ -19992,9 +19965,6 @@ msgstr "Terminal typography"
 
 msgid "Terminals"
 msgstr "Terminals"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminals ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Terminals aren't responding"
@@ -21351,9 +21321,6 @@ msgstr "Triage mail and draft replies"
 msgid "Triage new issues"
 msgstr "Triage new issues"
 
-msgid "triaging 12 new issues…"
-msgstr "triaging 12 new issues…"
-
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Tries a fix for each bug someone posts in #bugs."
 
@@ -21994,9 +21961,6 @@ msgstr "Use as workspace run"
 msgid "Use cases"
 msgstr "Use cases"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 
@@ -22029,6 +21993,12 @@ msgstr "Use Paradev on your phone with Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Use the agent plans and API keys you already have. Model calls go straight to your provider."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Use the best agent. Never get locked in."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Use the desktop app to start running parallel coding agents."

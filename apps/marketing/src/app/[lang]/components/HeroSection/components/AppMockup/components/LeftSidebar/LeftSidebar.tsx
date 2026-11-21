@@ -4,8 +4,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	LuArrowLeft,
 	LuArrowRight,
-	LuChevronDown,
-	LuChevronRight,
 	LuPanelLeft,
 	LuSearch,
 	LuSquarePen,
@@ -15,7 +13,6 @@ import {
 	NEW_CLOUD_SESSION,
 	SCENES,
 	SESSION_GROUPS,
-	SETTLED_COUNT,
 } from "../../constants";
 import type { ActiveDemo } from "../../types";
 import { IconButton } from "../IconButton";
@@ -49,15 +46,12 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 			<div className="flex min-h-0 flex-1">
 				<WindowRail active={scene.rail} />
 				<div className="flex min-w-0 flex-1 flex-col pb-1">
-					<div className="flex min-h-0 flex-1 flex-col gap-3 rounded-l-xl bg-[#121212] px-2 pt-1.5 pb-2">
+					<div className="flex min-h-0 flex-1 flex-col gap-3 rounded-l-xl bg-[#121212] px-2 pt-1.5 pb-2 opacity-60">
 						<div className="flex items-center gap-1">
 							<div className="flex h-7 min-w-0 flex-1 items-center gap-2 rounded-md bg-neutral-100/[0.06] pr-1 pl-2">
 								<LuSearch className="size-4 shrink-0 text-neutral-100/55" />
 								<span className="min-w-0 flex-1 truncate text-neutral-100/40">
 									<Trans>Search</Trans>
-								</span>
-								<span className="rounded bg-neutral-100/[0.06] px-1 py-px text-[11px] leading-[14px] text-neutral-100/55">
-									⌘K
 								</span>
 							</div>
 							<IconButton icon={LuSquarePen} />
@@ -72,11 +66,6 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 												? group.label
 												: t(group.label)}
 										</span>
-										<span className="tabular-nums text-neutral-100/30">
-											{group.sessions.length +
-												(isCloud && group.id === CLOUD_GROUP_ID ? 1 : 0)}
-										</span>
-										<LuChevronDown className="size-4 text-neutral-100/30" />
 									</div>
 									{group.id === CLOUD_GROUP_ID && (
 										<div
@@ -104,10 +93,6 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 							<span className="min-w-0 flex-1 truncate font-medium text-neutral-100/50">
 								<Trans>Settled</Trans>
 							</span>
-							<span className="tabular-nums text-neutral-100/30">
-								{SETTLED_COUNT}
-							</span>
-							<LuChevronRight className="size-4 text-neutral-100/30" />
 						</div>
 					</div>
 				</div>

@@ -2,7 +2,6 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import type {
 	ActiveDemo,
-	ChangedFile,
 	FileDiffData,
 	PagePhase,
 	SceneConfig,
@@ -24,44 +23,42 @@ export const SESSION_GROUPS: SessionGroupData[] = [
 		label: msg({ message: "Pinned" }),
 		sessions: [
 			{ title: "Settings → modal", agent: "claude", status: "needs" },
-			{ title: "Command palette v2", agent: "claude" },
+			{ title: "Command palette v2", agent: "codex" },
 		],
 	},
 	{
 		id: "working",
 		label: msg({ message: "Working" }),
 		sessions: [
-			{ title: "Fix flaky auth tests", agent: "claude", status: "working" },
-			{ title: "Linear → PR automation", agent: "claude", status: "working" },
+			{ title: "Fix flaky auth tests", agent: "opencode", status: "working" },
+			{ title: "Linear → PR automation", agent: "cursor", status: "working" },
 		],
 	},
 	{
 		id: "paradev/desktop",
 		label: "paradev/desktop",
 		sessions: [
-			{ title: "Publish pricing comparison", agent: "codex", status: "needs" },
-			{ title: "Terminal go brrr", agent: "opencode", pr: "#482" },
+			{ title: "Publish pricing comparison", agent: "gemini", status: "needs" },
+			{ title: "Terminal go brrr", agent: "vibe" },
 		],
 	},
 	{
 		id: "paradev/web",
 		label: "paradev/web",
 		sessions: [
-			{ title: "Onboarding copy pass", agent: "claude", status: "needs" },
-			{ title: "Changelog page", agent: "claude" },
+			{ title: "Onboarding copy pass", agent: "pi", status: "needs" },
+			{ title: "Changelog page", agent: "kiro" },
 		],
 	},
 	{
 		id: CLOUD_GROUP_ID,
 		label: "paradev/cloud",
 		sessions: [
-			{ title: "Team usage panel", agent: "claude", pr: "#485" },
-			{ title: "Sentry triage → issues", agent: "claude" },
+			{ title: "Team usage panel", agent: "devin" },
+			{ title: "Sentry triage → issues", agent: "grok" },
 		],
 	},
 ];
-
-export const SETTLED_COUNT = 12;
 
 export const SCENES: Record<ActiveDemo, SceneConfig> = {
 	"Orchestrate Parallel Agents": {
@@ -85,23 +82,6 @@ export const SCENES: Record<ActiveDemo, SceneConfig> = {
 		showChanges: true,
 	},
 };
-
-export const CHANGED_FILES: ChangedFile[] = [
-	{ name: "apps/desktop/src", depth: 0, isDir: true },
-	{ name: "settings", depth: 1, isDir: true },
-	{ name: "SettingsDialog.tsx", depth: 2, add: 86, badge: "A" },
-	{
-		name: "SettingsPage.tsx",
-		depth: 2,
-		add: 12,
-		del: 38,
-		badge: "M",
-		dimmed: true,
-	},
-	{ name: "hotkeys", depth: 1, isDir: true },
-	{ name: "useHotkeys.ts", depth: 2, add: 27, badge: "M", selected: true },
-	{ name: "routes.ts", depth: 1, add: 3, del: 3, badge: "M" },
-];
 
 export const FILE_DIFFS: FileDiffData[] = [
 	{
