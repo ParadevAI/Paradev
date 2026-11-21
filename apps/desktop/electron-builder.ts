@@ -17,8 +17,10 @@ import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const currentYear = new Date().getFullYear();
 const productName = pkg.productName;
-// productName names the bundle, userData, logs and the keychain entry, so it
-// never changes; the menu bar, Dock and launchers show displayName.
+// Squirrel.Mac renames the installed bundle when the executable name equals
+// the bundle file name, which breaks the terminal handoff of released builds.
+// The executable keeps this name so existing Superset.app installs stay put.
+export const legacyAppName = "Superset";
 export const displayName = process.env.DESKTOP_DISPLAY_NAME || productName;
 export const toInstallerFileName = (name: string) =>
 	name.trim().replace(/\s+/g, "-");
@@ -49,7 +51,7 @@ const macElectronLanguages = SUPPORTED_LOCALES.flatMap((locale) => {
 const config: Configuration = {
 	appId: "com.superset.desktop",
 	productName,
-	afterPack: localizeMacDisplayName(displayName),
+	afterPack: localizeMacDisplayName(displayName, legacyAppName),
 	copyright: `Copyright © ${currentYear} Superset Inc.`,
 	electronVersion: pkg.devDependencies.electron.replace(/^\^/, ""),
 
@@ -152,7 +154,8 @@ const config: Configuration = {
 			// launch when it is not productName. The shown name is localized in
 			// afterPack.
 			CFBundleName: productName,
-			CFBundleDisplayName: productName,
+			CFBundleExecutable: legacyAppName,
+			CFBundleDisplayName: legacyAppName,
 			LSHasLocalizedDisplayName: true,
 			// Required for macOS microphone permission prompt
 			NSMicrophoneUsageDescription: `${displayName} needs microphone access for dictation in the chat composer and for voice-enabled tools like Codex transcription.`,
@@ -169,7 +172,8 @@ const config: Configuration = {
 
 	// fpm's default xz takes ~15 minutes on the 2 GB tree; gzip takes about
 	// one and costs roughly a tenth in download size.
-	deb: { compression: "gz" },
+	// The in-app update runs dpkg -i, which must replace the installed package.
+	deb: { compression: "gz", packageName: "superset" },
 
 	// Deep linking protocol
 	protocols: {
@@ -189,7 +193,7 @@ const config: Configuration = {
 		// no longer install by default; the deb needs nothing extra and installs
 		// the desktop entry and icon that the dock and deep links resolve.
 		target: ["AppImage", "deb"],
-		artifactName: `superset-\${version}-\${arch}.\${ext}`,
+		artifactName: `paradev-\${version}-\${arch}.\${ext}`,
 		// GNOME's app menus only show their heuristic "New Window" item
 		// intermittently for running apps; an explicit desktop action (the
 		// Chrome/VS Code approach) is always shown. The action relaunches with

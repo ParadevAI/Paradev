@@ -110,8 +110,10 @@ jobs:
           for file in *.AppImage; do
             if [[ -f "$file" ]]; then
               arch=$(echo "$file" | sed -E 's/.*-([^-]+)\.AppImage$/\1/')
-              cp "$file" "Superset-Canary-${arch}.AppImage"
-              echo "Created canary copy: Superset-Canary-${arch}.AppImage"
+              for alias in "Paradev-Canary-${arch}.AppImage" "Superset-Canary-${arch}.AppImage"; do
+                cp "$file" "$alias"
+                echo "Created canary copy: $alias"
+              done
             fi
           done
           # Prerelease builds may request canary-linux.yml; keep latest-linux.yml as fallback.
