@@ -17,6 +17,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
 
@@ -43,6 +44,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_DICTATION,
 		visibleItems,
 	);
+	const showParadevAnywhere = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE,
+		visibleItems,
+	);
 	const showStarGithub = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB,
 		visibleItems,
@@ -51,6 +56,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 	const utils = electronTrpc.useUtils();
 	const changesOpenTarget = useSettings((s) => s.changesOpenTarget);
 	const dictationEnabled = useSettings((s) => s.dictationEnabled);
+	const paradevAnywhereShown = useSettings((s) => s.showParadevAnywhereButton);
 	const updateSetting = useSettings((s) => s.update);
 
 	const { data: confirmOnQuit, isLoading: isConfirmLoading } =
@@ -139,6 +145,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 					SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT,
 					visibleItems,
 				) && <AgentSessionPlacementSetting searchQuery={searchQuery} />}
+
+				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
+					<AcpChatSetting />
+				)}
 
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">
@@ -233,6 +243,32 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 							checked={dictationEnabled}
 							onCheckedChange={(enabled) =>
 								updateSetting("dictationEnabled", enabled)
+							}
+						/>
+					</div>
+				)}
+
+				{showParadevAnywhere && (
+					<div className="flex items-center justify-between">
+						<div className="space-y-0.5">
+							<Label htmlFor="paradev-anywhere" className="text-sm font-medium">
+								<HighlightText
+									text={t({ message: "Use Paradev anywhere button" })}
+									query={searchQuery}
+								/>
+							</Label>
+							<p className="text-xs text-muted-foreground">
+								<Trans>
+									Show the sidebar button that links to Mobile, Cloud, the CLI
+									and Self-hosted.
+								</Trans>
+							</p>
+						</div>
+						<Switch
+							id="paradev-anywhere"
+							checked={paradevAnywhereShown}
+							onCheckedChange={(shown) =>
+								updateSetting("showParadevAnywhereButton", shown)
 							}
 						/>
 					</div>

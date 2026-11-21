@@ -78,7 +78,7 @@ superset workspaces create --environment <environment-id> --name "Set up <name>"
 
 Always pass `--machine-size large`. The default size runs out of memory on many production builds and makes every install and lint slow.
 
-The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `ready`; stop and report if it is `failed`. Then work inside the box through terminals:
+The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `awake` (`ready` from a CLI older than 2.0.10); stop and report if it is `failed`. Then work inside the box through terminals:
 
 ```bash
 superset terminals create --workspace <workspace-id> --command "<cmd>"
@@ -106,7 +106,7 @@ When a meaningful step works (dependencies installed, services running, tests gr
 superset environments replace <environment-id> --workspace <workspace-id> --yes
 ```
 
-The box must be `ready`. It comes back with the same ID; restart services you need afterwards. Repeat after each meaningful step rather than once at the end, so a later failure loses little.
+The box must be `awake` or `asleep` (`ready` from a CLI older than 2.0.10). It comes back with the same ID; restart services you need afterwards. Repeat after each meaningful step rather than once at the end, so a later failure loses little.
 
 ## 6. Finish
 
@@ -114,7 +114,7 @@ The box must be `ready`. It comes back with the same ID; restart services you ne
 2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. To keep it private: `superset environments update <environment-id> --scope personal` (an environment you were given may already be shared).
 3. If the `config.toml` change is not in a pull request yet, offer to open one, and ask before pushing.
 4. Archive the setup box: `superset workspaces archive <workspace-id>`.
-5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `ready` (stop and report if it is `failed`), then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
+5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `awake` (or `ready`; stop and report if it is `failed`), then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
 6. End with a final message in this structure, and nothing after it. Keep each section short. Write "none" for an empty section; do not drop it.
 
 ```markdown

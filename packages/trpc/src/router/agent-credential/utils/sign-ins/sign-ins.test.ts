@@ -64,7 +64,7 @@ describe("signInsFromRows", () => {
 	test("Manual is the same answer on every wake and refresh, so nothing is rewritten or renewed", async () => {
 		const first = await signInsFromRows([manual("claude")], neverRead);
 		const again = await signInsFromRows([manual("claude")], neverRead);
-		expect(first).toEqual({ env: {}, codexChatgpt: null });
+		expect(first).toEqual({ env: {}, codexChatgpt: null, manual: ["claude"] });
 		expect(again).toEqual(first);
 	});
 

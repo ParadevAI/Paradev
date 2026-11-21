@@ -9,12 +9,7 @@ import {
 } from "@superset/shared/page-comments-runtime";
 import { pagePresenceUrl } from "@superset/shared/page-presence";
 import * as Haptics from "expo-haptics";
-import {
-	Stack,
-	useFocusEffect,
-	useLocalSearchParams,
-	useRouter,
-} from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -23,10 +18,12 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { env } from "@/lib/env";
-import { errorCopy } from "@/lib/errors";
+import { errorCopy, isTransportError } from "@/lib/errors";
 import { getHostAuthToken } from "@/lib/host/client";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
+import { usePageActions } from "../hooks/usePageActions";
 import { usePageQuery } from "../hooks/usePages";
 import { CommentPin } from "./components/CommentPin";
 import { PageFrame, type PageFrameHandle } from "./components/PageFrame";
@@ -73,6 +70,7 @@ export function PageDetailScreen({
 		scrollY?: string;
 	}>();
 	const headerHeight = useHeaderHeight();
+	const frameTop = contentScrollsUnderHeader ? headerHeight : 0;
 	const access = usePageAccessQuery(slug);
 	// Optimistic while loading: the server refuses a view-only reader's comment either way.
 	const canComment = access.data?.canComment ?? true;
@@ -94,11 +92,14 @@ export function PageDetailScreen({
 
 	const page = usePageQuery(slug);
 	const pageId = page.data?.id;
+	const actions = usePageActions(page.data, { onDeleted: router.back });
 	const version = page.data?.version;
 	const viewUrl = page.data?.viewUrl;
 	const loaded = viewUrl !== undefined && loadedSrc === viewUrl;
 	const frameFailed = viewUrl !== undefined && failedSrc === viewUrl;
 	const offline = page.status === "pending" && page.fetchStatus === "paused";
+	const pageError =
+		page.data && isTransportError(page.error) ? null : page.error;
 
 	const { threads, refetch: refetchComments } = usePageCommentThreads({
 		pageId: pageId ?? "",
@@ -249,19 +250,19 @@ export function PageDetailScreen({
 	return (
 		<View className="bg-background flex-1">
 			{presentation === "sheet" ? (
-				<Stack.Toolbar placement="left">
-					<Stack.Toolbar.Button
-						icon="xmark"
+				<HeaderToolbar placement="left">
+					<HeaderToolbar.Button
+						icon="close"
 						accessibilityLabel={t({ message: "Close" })}
 						onPress={() => router.back()}
 					/>
-				</Stack.Toolbar>
+				</HeaderToolbar>
 			) : null}
 
-			<Stack.Toolbar placement="right">
+			<HeaderToolbar placement="right">
 				{presentation === "sheet" ? (
-					<Stack.Toolbar.Button
-						icon="arrow.up.left.and.arrow.down.right"
+					<HeaderToolbar.Button
+						icon="expand"
 						accessibilityLabel={t({ message: "Open full screen" })}
 						onPress={() => {
 							void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -273,8 +274,8 @@ export function PageDetailScreen({
 					/>
 				) : null}
 				{canComment ? (
-					<Stack.Toolbar.Button
-						icon={commentMode ? "viewfinder.circle.fill" : "viewfinder"}
+					<HeaderToolbar.Button
+						icon={commentMode ? "commentModeOn" : "commentMode"}
 						accessibilityLabel={
 							commentMode
 								? t({ message: "Leave comment mode" })
@@ -287,8 +288,8 @@ export function PageDetailScreen({
 						}}
 					/>
 				) : null}
-				<Stack.Toolbar.Button
-					icon="bubble.left.and.bubble.right"
+				<HeaderToolbar.Button
+					icon="comments"
 					accessibilityLabel={t({ message: "Show all comments" })}
 					onPress={() => {
 						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -299,20 +300,44 @@ export function PageDetailScreen({
 						});
 					}}
 				/>
-				<Stack.Toolbar.Button
-					icon="square.and.arrow.up"
-					accessibilityLabel={t({ message: "Share this page" })}
-					onPress={() => {
-						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-						router.push({
-							pathname: "/(authenticated)/pages/[slug]/share",
-							params: { slug },
-						});
-					}}
-				/>
-			</Stack.Toolbar>
+				<HeaderToolbar.Menu
+					icon="more"
+					accessibilityLabel={t({ message: "Page actions" })}
+				>
+					<HeaderToolbar.MenuAction
+						icon="share"
+						onPress={() =>
+							router.push({
+								pathname: "/(authenticated)/pages/[slug]/share",
+								params: { slug },
+							})
+						}
+					>
+						{t({ message: "Share" })}
+					</HeaderToolbar.MenuAction>
+					{actions ? (
+						<HeaderToolbar.MenuAction icon="copy" onPress={actions.duplicate}>
+							{t({ message: "Duplicate" })}
+						</HeaderToolbar.MenuAction>
+					) : null}
+					{actions?.rename ? (
+						<HeaderToolbar.MenuAction icon="rename" onPress={actions.rename}>
+							{t({ message: "Rename" })}
+						</HeaderToolbar.MenuAction>
+					) : null}
+					{actions?.remove ? (
+						<HeaderToolbar.MenuAction
+							icon="delete"
+							destructive
+							onPress={actions.remove}
+						>
+							{t({ message: "Delete" })}
+						</HeaderToolbar.MenuAction>
+					) : null}
+				</HeaderToolbar.Menu>
+			</HeaderToolbar>
 
-			{page.error || offline ? (
+			{pageError || offline ? (
 				<View className="flex-1 items-center justify-center px-8">
 					<Text className="text-center font-medium">
 						{offline
@@ -322,9 +347,9 @@ export function PageDetailScreen({
 					<Text className="text-muted-foreground mt-1 text-center text-sm">
 						{offline
 							? t({ message: "It will open once the connection is back." })
-							: errorCopy(page.error)}
+							: errorCopy(pageError)}
 					</Text>
-					{page.error && !offline ? (
+					{pageError && !offline ? (
 						<Button
 							className="mt-6"
 							variant="secondary"
@@ -348,7 +373,7 @@ export function PageDetailScreen({
 					<PageFrame
 						ref={frameRef}
 						src={viewUrl}
-						insetTop={headerHeight}
+						insetTop={frameTop}
 						onMessage={onFrameMessage}
 						onLoadEnd={() => {
 							setLoadedSrc(viewUrl);
@@ -359,7 +384,7 @@ export function PageDetailScreen({
 
 					<View
 						className="absolute inset-x-0 bottom-0 overflow-hidden"
-						style={{ top: headerHeight }}
+						style={{ top: frameTop }}
 						pointerEvents="box-none"
 					>
 						{unresolvedThreads.map((thread) => {
@@ -392,7 +417,13 @@ export function PageDetailScreen({
 						) : null}
 					</View>
 
-					{pageId ? <PagePresence key={pageId} url={presenceUrl} /> : null}
+					{pageId ? (
+						<PagePresence
+							key={pageId}
+							url={presenceUrl}
+							onPublished={() => void page.refetch()}
+						/>
+					) : null}
 
 					{commentMode && !selection ? (
 						<View
@@ -430,7 +461,7 @@ export function PageDetailScreen({
 				</View>
 			) : null}
 
-			{page.error || offline || frameFailed || loaded ? null : (
+			{pageError || offline || frameFailed || loaded ? null : (
 				<View className="absolute inset-0 items-center justify-center">
 					<Spinner className="size-5" />
 				</View>

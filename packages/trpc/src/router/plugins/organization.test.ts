@@ -78,7 +78,7 @@ stub(db, {
 					if (table === members) {
 						const { params } = dialect.sqlToQuery(condition);
 						const roles = params.filter((p) => ROLES.includes(p as string));
-						return result(
+						return result<{ userId?: string; role: string }>(
 							roles.length
 								? MEMBERS.filter((m) => roles.includes(m.role))
 								: [{ role }],

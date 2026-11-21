@@ -31,8 +31,10 @@ export function useHostAgentConfigs({
 			const activeFeatureFlags = Object.entries(featureFlags ?? {})
 				.filter(([, value]) => Boolean(value))
 				.map(([flag]) => flag);
-			return configs.filter((config) =>
-				isAgentPresetEnabled(config.presetId, activeFeatureFlags),
+			return configs.filter(
+				(config) =>
+					config.presetId !== "mastracode" &&
+					isAgentPresetEnabled(config.presetId, activeFeatureFlags),
 			);
 		},
 		[featureFlags],

@@ -55,7 +55,7 @@
 			},
 			"category": "development",
 			"source": "./plugins/sentry",
-			"version": "1.0.3"
+			"version": "1.0.4"
 		},
 		{
 			"name": "gmail",
@@ -238,6 +238,16 @@
 			"version": "1.0.0"
 		},
 		{
+			"name": "ahrefs",
+			"description": "Research SEO with Ahrefs: backlinks, organic keywords, rankings, site audits, and brand visibility in AI search.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/ahrefs",
+			"version": "1.0.0"
+		},
+		{
 			"name": "wispr",
 			"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
 			"author": {
@@ -245,6 +255,16 @@
 			},
 			"category": "productivity",
 			"source": "./plugins/wispr",
+			"version": "1.0.0"
+		},
+		{
+			"name": "planetscale",
+			"description": "Work with your PlanetScale databases: inspect organizations, databases, and branches, read schemas, run SQL, and review query insights.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/planetscale",
 			"version": "1.0.0"
 		}
 	],

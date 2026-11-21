@@ -22,7 +22,7 @@ import {
 import {
 	type SandboxRepository,
 	sandboxRepositoryPath,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { and, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { installationOctokit } from "./clone-token";
@@ -222,7 +222,7 @@ export function toSandboxRepositories(
  */
 export async function installationTokenFor(
 	repositories: readonly RepositoryRow[],
-): Promise<string | null> {
+): Promise<{ token: string; expiresAt: Date } | null> {
 	const first = repositories[0];
 	if (!first || !env.GH_APP_ID || !env.GH_APP_PRIVATE_KEY) return null;
 	const installation = await db.query.githubInstallations.findFirst({
@@ -231,12 +231,12 @@ export async function installationTokenFor(
 	if (!installation) return null;
 	try {
 		const octokit = await installationOctokit(installation.installationId);
-		const { token } = (await octokit.auth({
+		const { token, expiresAt } = (await octokit.auth({
 			type: "installation",
 			refresh: true,
 			repositoryNames: repositories.map((repository) => repository.name),
-		})) as { token: string };
-		return token;
+		})) as { token: string; expiresAt: string };
+		return { token, expiresAt: new Date(expiresAt) };
 	} catch (error) {
 		if (repositories.some((repository) => repository.isPrivate)) throw error;
 		console.warn(

@@ -176,8 +176,9 @@ export class FakeHarness implements HarnessAdapter {
 		pending.release();
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
 		this.emit({ kind: "session", session: { modeId } });
+		return Promise.resolve(true);
 	}
 
 	async dispose(): Promise<void> {
@@ -217,7 +218,7 @@ export class FakeHarness implements HarnessAdapter {
 		}
 	}
 
-	private emit(event: AdapterEvent): void {
+	protected emit(event: AdapterEvent): void {
 		if (event.kind === "turn") this.currentTurn = event.turn;
 		if (event.kind === "item" && event.item.kind === "tool_call") {
 			const running = asRunningToolCall(event);

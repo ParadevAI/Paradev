@@ -1,0 +1,1 @@
+export { WorkspaceSwitcherFooter } from "./WorkspaceSwitcherFooter";

@@ -1,0 +1,26 @@
+diff --git a/dist/api-client/base-client.cjs b/dist/api-client/base-client.cjs
+index 888e9fa4a70eef8e3e3bf0ff3c5a8ed3c97d0619..3d22fb7661660bfe28defa5eb45188b2a65983ef 100644
+--- a/dist/api-client/base-client.cjs
++++ b/dist/api-client/base-client.cjs
+@@ -3,7 +3,7 @@ const require_api_error = require('./api-error.cjs');
+ const require_array = require('../utils/array.cjs');
+ const require_with_retry = require('./with-retry.cjs');
+ let zod = require("zod");
+-let undici = require("undici");
++let undici = require("undici/index.js");
+ 
+ //#region src/api-client/base-client.ts
+ const DEFAULT_AGENT = new undici.Agent({ bodyTimeout: 0 });
+diff --git a/dist/api-client/base-client.js b/dist/api-client/base-client.js
+index 767f83ec7afef5b9697981301acc1d2302d861c9..ba44a435203a60fd908c4e1ccf669c1954ce466d 100644
+--- a/dist/api-client/base-client.js
++++ b/dist/api-client/base-client.js
+@@ -2,7 +2,7 @@ import { APIError } from "./api-error.js";
+ import { array } from "../utils/array.js";
+ import { withRetry } from "./with-retry.js";
+ import { z } from "zod";
+-import { Agent, Dispatcher1Wrapper, fetch } from "undici";
++import { Agent, Dispatcher1Wrapper, fetch } from "undici/index.js";
+ 
+ //#region src/api-client/base-client.ts
+ const DEFAULT_AGENT = new Agent({ bodyTimeout: 0 });

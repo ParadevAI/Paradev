@@ -1,0 +1,1 @@
+export { apiUrlFromRedirect } from "./apiUrlFromRedirect";

@@ -13,6 +13,7 @@ export interface RelayClientOptions {
 	hostId: string;
 	jwt: string;
 	timeoutMs?: number;
+	headers?: Record<string, string>;
 }
 
 export class RelayDispatchError extends Error {
@@ -57,7 +58,7 @@ export function relayMutation<TInput, TOutput>(
 	return hostServiceMutation(
 		{
 			baseUrl: `${options.relayUrl}/hosts/${options.hostId}`,
-			headers: { authorization: `Bearer ${options.jwt}` },
+			headers: { ...options.headers, authorization: `Bearer ${options.jwt}` },
 			timeoutMs: options.timeoutMs,
 		},
 		procedure,
@@ -74,7 +75,7 @@ export function relayQuery<TInput, TOutput>(
 	return hostServiceQuery(
 		{
 			baseUrl: `${options.relayUrl}/hosts/${options.hostId}`,
-			headers: { authorization: `Bearer ${options.jwt}` },
+			headers: { ...options.headers, authorization: `Bearer ${options.jwt}` },
 			timeoutMs: options.timeoutMs,
 		},
 		procedure,

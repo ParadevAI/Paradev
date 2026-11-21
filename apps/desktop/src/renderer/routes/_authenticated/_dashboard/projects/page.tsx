@@ -29,6 +29,6 @@ function ProjectsPage() {
 	const search = Route.useSearch();
 	const isEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
 	if (isEnabled === undefined) return null;
-	if (!isEnabled) return <Redirect to="/v2-workspaces" />;
+	if (!isEnabled) return <Redirect to="/workspaces" />;
 	return <ProjectsView search={search} />;
 }

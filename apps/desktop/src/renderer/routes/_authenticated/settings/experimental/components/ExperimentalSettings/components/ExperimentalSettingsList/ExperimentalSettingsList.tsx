@@ -18,8 +18,9 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
-import { AcpChatSetting } from "../AcpChatSetting";
 import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
+import { NewLayoutSetting } from "../NewLayoutSetting";
+import { NewWorkspacePageSetting } from "../NewWorkspacePageSetting";
 import { RestartOnboardingSetting } from "../RestartOnboardingSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
@@ -46,10 +47,6 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const showAcpChat = isItemVisible(
-		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
-		visibleItems,
-	);
 	const showChatTurnSnapshots = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
 		visibleItems,
@@ -60,6 +57,14 @@ export function ExperimentalSettingsList({
 	);
 	const showRestartOnboarding = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
+		visibleItems,
+	);
+	const showNewLayout = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_NEW_LAYOUT,
+		visibleItems,
+	);
+	const showNewWorkspacePage = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_NEW_WORKSPACE_PAGE,
 		visibleItems,
 	);
 	const openV1ImportModal = useOpenV1ImportModal();
@@ -84,6 +89,8 @@ export function ExperimentalSettingsList({
 			</div>
 
 			<div className="space-y-6">
+				{showNewLayout && <NewLayoutSetting />}
+				{showNewWorkspacePage && <NewWorkspacePageSetting />}
 				{showV1Migration && !isV2OnlyUser && (
 					<div className="flex items-center justify-between gap-6">
 						<div className="min-w-0 flex-1 space-y-0.5">
@@ -177,7 +184,6 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showAcpChat && <AcpChatSetting />}
 				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
 				{showRestartOnboarding && <RestartOnboardingSetting />}

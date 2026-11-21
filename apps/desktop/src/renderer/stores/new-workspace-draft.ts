@@ -3,7 +3,7 @@ import type {
 	PromptInputAttachment,
 } from "@superset/chat-ui/PromptInput";
 import { create } from "zustand";
-import { useV2WorkspaceCreateDefaultsStore } from "./v2-workspace-create-defaults";
+import { useWorkspaceCreateDefaultsStore } from "./workspace-create-defaults";
 
 export type LinkedIssue = {
 	slug: string;
@@ -66,7 +66,7 @@ function buildInitialDraft(): NewWorkspaceDraft {
 		selectedProjectId: null,
 		selectedProjectRepository: null,
 		isSession: false,
-		checkout: useV2WorkspaceCreateDefaultsStore.getState().checkout,
+		checkout: useWorkspaceCreateDefaultsStore.getState().checkout,
 		promptDraft: [],
 		baseBranch: null,
 		baseBranchSource: null,

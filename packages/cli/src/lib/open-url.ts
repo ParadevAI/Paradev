@@ -19,6 +19,7 @@ export function desktopWorkspaceLink(
 	workspaceId: string,
 	options?: { sessionId?: string },
 ): string {
+	// Desktops before the route rename only know v2-workspace; newer ones rewrite it.
 	const base = `superset://v2-workspace/${workspaceId}`;
 	if (!options?.sessionId) return base;
 	const params = new URLSearchParams({ sessionId: options.sessionId });

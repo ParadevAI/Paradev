@@ -132,7 +132,7 @@ export function CreateChannelDialog({
 								<RadioGroupItem id="new-channel-public" value="public" />
 								<span>
 									<Trans>
-										Public — anyone in{" "}
+										Public: anyone in{" "}
 										<span className="font-semibold">{organizationName}</span>
 									</Trans>
 								</span>
@@ -147,7 +147,7 @@ export function CreateChannelDialog({
 									className="mt-0.5"
 								/>
 								<span className="flex flex-col">
-									<Trans>Private — only specific people</Trans>
+									<Trans>Private: only specific people</Trans>
 									<span className="text-muted-foreground">
 										<Trans>Can only be viewed or joined by invitation</Trans>
 									</span>

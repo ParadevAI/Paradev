@@ -29,6 +29,7 @@ export type PullRequestsSearch = {
 	repo?: string;
 	projects?: string;
 	author?: string;
+	reviewer?: string;
 	review?: string;
 	state?: "open" | "all" | "merged";
 };
@@ -43,6 +44,7 @@ export const Route = createFileRoute(
 		project: typeof search.project === "string" ? search.project : undefined,
 		projects: typeof search.projects === "string" ? search.projects : undefined,
 		author: typeof search.author === "string" ? search.author : undefined,
+		reviewer: typeof search.reviewer === "string" ? search.reviewer : undefined,
 		review: typeof search.review === "string" ? search.review : undefined,
 		state: ["open", "all", "merged"].includes(search.state as string)
 			? (search.state as PullRequestsSearch["state"])
@@ -60,7 +62,7 @@ export const Route = createFileRoute(
  * always reveals the other, since hiding both would leave nothing on screen.
  */
 function PullRequestsLayout() {
-	const { search, project, repo, projects, author, review, state } =
+	const { search, project, repo, projects, author, reviewer, review, state } =
 		Route.useSearch();
 	const params = useParams({ strict: false }) as { prNumber?: string };
 	const selectedPrNumber = params.prNumber
@@ -109,6 +111,7 @@ function PullRequestsLayout() {
 			initialSearch={search}
 			initialProjects={initialProjects}
 			initialAuthor={author}
+			initialReviewer={reviewer}
 			initialReview={review}
 			initialState={state}
 			selectedPrNumber={selectedPrNumber}

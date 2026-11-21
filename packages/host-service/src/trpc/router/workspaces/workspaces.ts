@@ -11,7 +11,8 @@ import { userError } from "@superset/trpc/i18n-error";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { projects, workspaces } from "../../../db/schema";
+import { workspaces } from "../../../db/schema";
+import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
 import { createGitEnvResolver } from "../../../runtime/git";
 import { getGitAuthorName } from "../../../runtime/git/identity";
 import { resolveRef } from "../../../runtime/git/refs";
@@ -40,6 +41,7 @@ import {
 } from "../../index";
 import {
 	buildTerminalAgentLaunch,
+	trackTerminalAgentLaunched,
 	validateAgentLaunchOptions,
 } from "../agents";
 import {
@@ -1309,7 +1311,7 @@ export const workspacesRouter = router({
 			// command up-front; if it fails (unknown agent, missing attachment) fall
 			// back to the parallel dispatch, which surfaces the error in the agents
 			// result.
-			let chainAgent: { fullCommand: string; label: string } | null = null;
+			let chainAgent: ReturnType<typeof buildTerminalAgentLaunch> | null = null;
 			const soleLaunch = sugarLaunches.length === 1 ? sugarLaunches[0] : null;
 			if (
 				!alreadyExists &&
@@ -1372,6 +1374,9 @@ export const workspacesRouter = router({
 						sessionId: terminal.id,
 						label: chainAgent.label,
 					};
+					trackTerminalAgentLaunched(ctx, chainAgent.config, {
+						workspaceId: workspaceRow.id,
+					});
 				}
 			}
 
@@ -1538,9 +1543,7 @@ export const workspacesRouter = router({
 			// AI rename also renames the git branch against the project repo;
 			// session workspaces (null projectId) have neither.
 			const project = local.projectId
-				? ctx.db.query.projects
-						.findFirst({ where: eq(projects.id, local.projectId) })
-						.sync()
+				? getProjectIncludingDeleted(ctx.db, local.projectId)
 				: undefined;
 			if (!project) {
 				throw new TRPCError({
