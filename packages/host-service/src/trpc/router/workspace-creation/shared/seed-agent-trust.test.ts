@@ -269,32 +269,6 @@ describe("seedAgentFolderTrust", () => {
 });
 
 describe("resolveTrustTarget", () => {
-	test("env -u before a bare name keeps the profile the agent wrapper restores", () => {
-		const previous = process.env.SUPERSET_HOME_DIR;
-		const profile = join(dir, "default-profile");
-		mkdirSync(join(dir, "state"));
-		mkdirSync(profile);
-		writeFileSync(join(dir, "state", "default-claude-config-dir"), profile);
-		process.env.SUPERSET_HOME_DIR = dir;
-		try {
-			const target = (command: string) =>
-				resolveTrustTarget(createTestDb(), {
-					presetId: "custom",
-					command,
-					env: {},
-				})?.file;
-			expect(target("env -u CLAUDE_CONFIG_DIR claude")).toBe(
-				join(profile, ".claude.json"),
-			);
-			expect(target("env -u CLAUDE_CONFIG_DIR /opt/bin/claude")).toBe(
-				join(homedir(), ".claude.json"),
-			);
-		} finally {
-			if (previous === undefined) delete process.env.SUPERSET_HOME_DIR;
-			else process.env.SUPERSET_HOME_DIR = previous;
-		}
-	});
-
 	test("expands variables and honours HOME set by the wrapper", () => {
 		const target = (command: string) =>
 			resolveTrustTarget(createTestDb(), {

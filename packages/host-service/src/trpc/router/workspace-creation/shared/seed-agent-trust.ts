@@ -74,7 +74,6 @@ function commandTokens(config: LaunchCommand): string[] {
 
 function unwrapEnvCommand(config: LaunchCommand): {
 	executable: string;
-	viaPath: boolean;
 	env: Record<string, string>;
 	clearsInherited: boolean;
 	unset: string[];
@@ -115,7 +114,6 @@ function unwrapEnvCommand(config: LaunchCommand): {
 	const program = tokens[index] ?? "";
 	return {
 		executable: programName(program),
-		viaPath: !/[\\/]/.test(program),
 		env,
 		clearsInherited,
 		unset,
@@ -161,16 +159,10 @@ export function resolveTrustTarget(
 		};
 	}
 	const wrapper = unwrapEnvCommand(config);
-	const accountEnv = resolveDefaultAccountEnv(db, family);
 	const inherited: Record<string, string> = wrapper.clearsInherited
 		? {}
-		: { ...accountEnv, ...config.env };
-	for (const name of wrapper.unset) {
-		delete inherited[name];
-		// The agent wrapper on PATH re-reads the default-account pointer when its var is empty.
-		const restored = accountEnv[name];
-		if (wrapper.viaPath && restored) inherited[name] = restored;
-	}
+		: { ...resolveDefaultAccountEnv(db, family), ...config.env };
+	for (const name of wrapper.unset) delete inherited[name];
 	const env = { ...inherited, ...wrapper.env };
 	const home = env.HOME || homedir();
 	if (family === "claude") {
