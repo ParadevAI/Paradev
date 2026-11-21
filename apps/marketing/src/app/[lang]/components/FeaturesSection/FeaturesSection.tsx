@@ -19,10 +19,10 @@ export function FeaturesSection() {
 	const { t } = useLingui();
 
 	return (
-		<section id="features" className="relative py-24 sm:py-32">
+		<section id="features" className="relative py-16 sm:py-24">
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				{/* Feature Rows */}
-				<div className="space-y-24 sm:space-y-32">
+				<div className="space-y-16 sm:space-y-20">
 					{FEATURES.map((feature, index) => {
 						const isReversed = index % 2 === 1;
 						const DemoComponent = DEMO_COMPONENTS[index];
