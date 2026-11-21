@@ -1,3 +1,4 @@
+import type { PageViewportZoom } from "@superset/shared/page-zoom";
 import { observable } from "@trpc/server/observable";
 import { session } from "electron";
 import {
@@ -247,6 +248,20 @@ export const createBrowserRouter = () => {
 					browserManager.on(`pane-focus:${input.paneId}`, handler);
 					return () => {
 						browserManager.off(`pane-focus:${input.paneId}`, handler);
+					};
+				});
+			}),
+
+		onViewportZoom: publicProcedure
+			.input(z.object({ paneId: z.string() }))
+			.subscription(({ input }) => {
+				return observable<PageViewportZoom>((emit) => {
+					const handler = (viewport: PageViewportZoom) => {
+						emit.next(viewport);
+					};
+					browserManager.on(`viewport-zoom:${input.paneId}`, handler);
+					return () => {
+						browserManager.off(`viewport-zoom:${input.paneId}`, handler);
 					};
 				});
 			}),
