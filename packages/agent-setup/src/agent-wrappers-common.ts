@@ -171,7 +171,7 @@ function buildLoopGuard(binaryName: string): string {
 	return `_superset_depth="\${${depthVar}:-0}"
 case "$_superset_depth" in *[!0-9]*) _superset_depth=0 ;; esac
 if [ "$_superset_depth" -ge ${MAX_WRAPPER_NESTING} ]; then
-  echo "Paradev: ${binaryName} wrapper re-entered itself ${MAX_WRAPPER_NESTING} times; a PATH entry resolves ${binaryName} back to this wrapper ($0). Remove it from PATH." >&2
+  echo "Paradev: ${binaryName} wrapper started ${MAX_WRAPPER_NESTING} times in one process tree. Either a PATH entry leads back to this wrapper ($0), or ${binaryName} is nested more than ${MAX_WRAPPER_NESTING} levels deep. Run 'type -a ${binaryName}' to see each ${binaryName} on PATH." >&2
   exit ${WRAPPER_LOOP_EXIT_STATUS}
 fi
 export ${depthVar}=$((10#$_superset_depth + 1))

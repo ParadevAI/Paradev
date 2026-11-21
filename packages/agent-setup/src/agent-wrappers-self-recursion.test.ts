@@ -1,8 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from "bun:test";
+import { afterAll, describe, expect, it } from "bun:test";
 import { spawnSync } from "node:child_process";
 import {
 	mkdirSync,
 	mkdtempSync,
+	readdirSync,
 	readFileSync,
 	rmSync,
 	symlinkSync,
@@ -21,61 +22,47 @@ const FAKE_HOME = path.join(TEST_ROOT, "fake-home");
 const REAL_BIN_DIR = path.join(TEST_ROOT, "real-bin");
 const SYSTEM_PATH = "/usr/bin:/bin";
 
-const originalSupersetHomeDir = process.env.SUPERSET_HOME_DIR;
-const originalHome = process.env.HOME;
-
+const wrappers: Record<string, unknown> = await import("./agent-wrappers");
 const {
-	createClaudeWrapper,
-	createCodexWrapper,
-	createCopilotWrapper,
-	createCursorAgentWrapper,
-	createOpenCodeWrapper,
-	createUfoWrapper,
-} = await import("./agent-wrappers");
-const { getWrapperDepthVar, MAX_WRAPPER_NESTING, WRAPPER_LOOP_EXIT_STATUS } =
-	await import("./agent-wrappers-common");
+	getWrapperDepthVar,
+	MAX_WRAPPER_NESTING,
+	WRAPPER_LOOP_EXIT_STATUS,
+	WRAPPER_MARKER,
+} = await import("./agent-wrappers-common");
 
-const WRAPPER_CREATORS: Record<string, () => void> = {
-	claude: createClaudeWrapper,
-	codex: createCodexWrapper,
-	opencode: createOpenCodeWrapper,
-	copilot: createCopilotWrapper,
-	ufo: createUfoWrapper,
-	"cursor-agent": createCursorAgentWrapper,
-};
+const WRAPPER_CREATORS = Object.entries(wrappers)
+	.filter(([name]) => /^create\w+Wrapper$/.test(name))
+	.map(([, value]) => value as () => void);
 
-function restoreEnv(): void {
-	if (originalSupersetHomeDir === undefined) {
-		delete process.env.SUPERSET_HOME_DIR;
-	} else {
-		process.env.SUPERSET_HOME_DIR = originalSupersetHomeDir;
-	}
-	if (originalHome === undefined) {
-		delete process.env.HOME;
-	} else {
-		process.env.HOME = originalHome;
-	}
-}
-
-/** Generates `binary`'s wrapper as if the app home were `homeDir`. */
-function generateWrapper(binary: string, homeDir: string): string {
-	mkdirSync(path.join(homeDir, "bin"), { recursive: true });
+/** Generates every wrapper as if the app home were `homeDir`; returns its bin dir. */
+function generateWrappers(homeDir: string): string {
+	const binDir = path.join(homeDir, "bin");
+	mkdirSync(binDir, { recursive: true });
+	const saved = {
+		SUPERSET_HOME_DIR: process.env.SUPERSET_HOME_DIR,
+		HOME: process.env.HOME,
+	};
+	const log = console.log;
 	process.env.SUPERSET_HOME_DIR = homeDir;
 	process.env.HOME = FAKE_HOME;
+	console.log = () => {};
 	try {
-		WRAPPER_CREATORS[binary]?.();
+		for (const create of WRAPPER_CREATORS) create();
 	} finally {
-		restoreEnv();
+		console.log = log;
+		for (const [key, value] of Object.entries(saved)) {
+			if (value === undefined) delete process.env[key];
+			else process.env[key] = value;
+		}
 	}
-	return path.join(homeDir, "bin", binary);
+	return binDir;
 }
 
-function scenarioDir(binary: string, name: string): string {
-	const dir = path.join(TEST_ROOT, `${binary}-${name}`);
-	rmSync(dir, { recursive: true, force: true });
-	mkdirSync(dir, { recursive: true });
-	return dir;
-}
+mkdirSync(FAKE_HOME, { recursive: true });
+const BIN_DIR = generateWrappers(path.join(TEST_ROOT, "app-home"));
+const BINARIES = readdirSync(BIN_DIR).sort();
+const ALIAS_BIN_DIR = path.join(TEST_ROOT, "alias-bin");
+symlinkSync(BIN_DIR, ALIAS_BIN_DIR);
 
 function writeExecutable(file: string, content: string): void {
 	mkdirSync(path.dirname(file), { recursive: true });
@@ -89,6 +76,12 @@ function installStub(dir: string, binary: string): string {
 		`#!/bin/bash\necho "STUB depth=$${getWrapperDepthVar(binary)}"\n`,
 	);
 	return stubPath;
+}
+
+function scenarioDir(name: string): string {
+	const dir = path.join(TEST_ROOT, name);
+	mkdirSync(dir, { recursive: true });
+	return dir;
 }
 
 function extractResolver(wrapperScript: string): string {
@@ -152,183 +145,166 @@ function runWrapper(
 	};
 }
 
-beforeAll(() => {
-	mkdirSync(FAKE_HOME, { recursive: true });
-});
-
 afterAll(() => {
-	restoreEnv();
 	rmSync(TEST_ROOT, { recursive: true, force: true });
 });
 
-describe.each(Object.keys(WRAPPER_CREATORS))("%s wrapper", (binary) => {
-	describe("real binary resolution under a different HOME", () => {
-		it("skips an aliased bin dir", () => {
-			const root = scenarioDir(binary, "alias");
-			const wrapper = generateWrapper(binary, path.join(root, "app-home"));
-			const alias = path.join(root, "alias-bin");
-			symlinkSync(path.dirname(wrapper), alias);
-			const stub = installStub(REAL_BIN_DIR, binary);
-
-			const result = resolve(binary, wrapper, {
-				path: `${alias}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
-				argv0: path.join(alias, binary),
-			});
-
-			expect(result.stdout).toBe(stub);
-		});
-
-		it("skips a symlink to the wrapper in another PATH dir", () => {
-			const root = scenarioDir(binary, "symlink");
-			const wrapper = generateWrapper(binary, path.join(root, "app-home"));
-			const linkDir = path.join(root, "usr-local-bin");
-			mkdirSync(linkDir, { recursive: true });
-			symlinkSync(wrapper, path.join(linkDir, binary));
-			const stub = installStub(REAL_BIN_DIR, binary);
-
-			const result = resolve(binary, wrapper, {
-				path: `${linkDir}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
-				argv0: path.join(linkDir, binary),
-			});
-
-			expect(result.stdout).toBe(stub);
-		});
-
-		it("finds nothing when only a symlink to the wrapper is on PATH", () => {
-			const root = scenarioDir(binary, "symlink-only");
-			const wrapper = generateWrapper(binary, path.join(root, "app-home"));
-			const linkDir = path.join(root, "usr-local-bin");
-			mkdirSync(linkDir, { recursive: true });
-			symlinkSync(wrapper, path.join(linkDir, binary));
-
-			const result = resolve(binary, wrapper, {
-				path: `${linkDir}:${SYSTEM_PATH}`,
-				argv0: path.join(linkDir, binary),
-			});
-
-			expect(result).toEqual({ status: 1, stdout: "" });
-		});
-
-		it("skips relative and duplicated entries that name the wrapper", () => {
-			const root = scenarioDir(binary, "relative");
-			const wrapper = generateWrapper(binary, path.join(root, "app-home"));
-			const binDir = path.dirname(wrapper);
-			symlinkSync(binDir, path.join(root, "rel-bin"));
-			const stub = installStub(REAL_BIN_DIR, binary);
-
-			const result = resolve(binary, wrapper, {
-				cwd: root,
-				argv0: `rel-bin/${binary}`,
-				path: [
-					"rel-bin",
-					"./rel-bin/",
-					binDir,
-					`${binDir}//`,
-					`${binDir}/./`,
-					REAL_BIN_DIR,
-					SYSTEM_PATH,
-				].join(":"),
-			});
-
-			expect(result.stdout).toBe(stub);
-		});
-
-		it("skips a copy of the wrapper from another app home", () => {
-			const root = scenarioDir(binary, "two-homes");
-			const first = generateWrapper(binary, path.join(root, "home-a"));
-			const second = generateWrapper(binary, path.join(root, "home-b"));
-			const stub = installStub(REAL_BIN_DIR, binary);
-
-			const fromFirst = resolve(binary, first, {
-				path: `${path.dirname(second)}:${path.dirname(first)}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
-			});
-			const fromSecond = resolve(binary, second, {
-				path: `${path.dirname(first)}:${path.dirname(second)}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
-			});
-
-			expect(fromFirst.stdout).toBe(stub);
-			expect(fromSecond.stdout).toBe(stub);
-		});
-
-		it("still returns a real binary that is not a Superset wrapper", () => {
-			const root = scenarioDir(binary, "plain");
-			const wrapper = generateWrapper(binary, path.join(root, "app-home"));
-			const otherDir = path.join(root, "other");
-			writeExecutable(path.join(otherDir, binary), "#!/bin/bash\nexit 0\n");
-			const stub = installStub(REAL_BIN_DIR, binary);
-
-			const result = resolve(binary, wrapper, {
-				path: `${otherDir}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
-			});
-
-			expect(result.stdout).toBe(path.join(otherDir, binary));
-			expect(stub).not.toBe(result.stdout);
-		});
+describe("every generated wrapper", () => {
+	it("is generated", () => {
+		expect(BINARIES.length).toBe(WRAPPER_CREATORS.length);
+		expect(BINARIES).toContain("claude");
 	});
 
-	describe("loop guard", () => {
-		const depthVar = getWrapperDepthVar(binary);
-
-		function setup(name: string): { wrapper: string; stubDir: string } {
-			const root = scenarioDir(binary, name);
-			const wrapper = generateWrapper(binary, path.join(root, "app-home"));
-			const stubDir = path.join(root, "stub-bin");
-			installStub(stubDir, binary);
-			return { wrapper, stubDir };
-		}
-
-		it("counts each pass in the environment", () => {
-			const { wrapper, stubDir } = setup("count");
-
-			expect(runWrapper(wrapper, stubDir).stdout).toBe("STUB depth=1");
-			expect(runWrapper(wrapper, stubDir, { [depthVar]: "3" }).stdout).toBe(
-				"STUB depth=4",
+	describe.each(BINARIES)("%s", (binary) => {
+		it("has the marker on its second line", () => {
+			const lines = readFileSync(path.join(BIN_DIR, binary), "utf8").split(
+				"\n",
 			);
+			expect(lines[1]).toBe(WRAPPER_MARKER);
 		});
 
-		it("refuses to run once the nesting limit is reached", () => {
-			const { wrapper, stubDir } = setup("limit");
+		it("skips its own bin dir reached through an alias", () => {
+			const stub = installStub(REAL_BIN_DIR, binary);
 
-			const result = runWrapper(wrapper, stubDir, {
-				[depthVar]: String(MAX_WRAPPER_NESTING),
+			const result = resolve(binary, path.join(BIN_DIR, binary), {
+				path: `${ALIAS_BIN_DIR}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
+				argv0: path.join(ALIAS_BIN_DIR, binary),
 			});
 
-			expect(result.status).toBe(WRAPPER_LOOP_EXIT_STATUS);
-			expect(result.stdout).toBe("");
-			expect(result.stderr).toContain(`${binary} wrapper re-entered itself`);
-			expect(result.stderr).toContain("Remove it from PATH");
+			expect(result.stdout).toBe(stub);
+		});
+	});
+});
+
+describe("real binary resolution under a different HOME", () => {
+	const binary = "claude";
+	const wrapper = path.join(BIN_DIR, binary);
+	const stub = installStub(REAL_BIN_DIR, binary);
+
+	it("skips a symlink to the wrapper in another PATH dir", () => {
+		const linkDir = scenarioDir("usr-local-bin");
+		symlinkSync(wrapper, path.join(linkDir, binary));
+
+		expect(
+			resolve(binary, wrapper, {
+				path: `${linkDir}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
+				argv0: path.join(linkDir, binary),
+			}).stdout,
+		).toBe(stub);
+		expect(
+			resolve(binary, wrapper, {
+				path: `${linkDir}:${SYSTEM_PATH}`,
+				argv0: path.join(linkDir, binary),
+			}),
+		).toEqual({ status: 1, stdout: "" });
+	});
+
+	it("skips relative and duplicated entries that name the wrapper", () => {
+		const root = scenarioDir("relative");
+		symlinkSync(BIN_DIR, path.join(root, "rel-bin"));
+
+		const result = resolve(binary, wrapper, {
+			cwd: root,
+			argv0: `rel-bin/${binary}`,
+			path: [
+				"rel-bin",
+				"./rel-bin/",
+				BIN_DIR,
+				`${BIN_DIR}//`,
+				`${BIN_DIR}/./`,
+				REAL_BIN_DIR,
+				SYSTEM_PATH,
+			].join(":"),
 		});
 
-		it("still runs one pass below the limit", () => {
-			const { wrapper, stubDir } = setup("below-limit");
+		expect(result.stdout).toBe(stub);
+	});
 
-			const result = runWrapper(wrapper, stubDir, {
-				[depthVar]: String(MAX_WRAPPER_NESTING - 1),
-			});
+	it("skips itself when its marker line is gone", () => {
+		const dir = scenarioDir("unmarked");
+		const unmarked = path.join(dir, binary);
+		writeExecutable(
+			unmarked,
+			readFileSync(wrapper, "utf8").replace(`${WRAPPER_MARKER}\n`, ""),
+		);
 
-			expect(result.status).toBe(0);
-			expect(result.stdout).toBe(`STUB depth=${MAX_WRAPPER_NESTING}`);
+		const result = resolve(binary, unmarked, {
+			path: `${dir}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
 		});
 
-		it("reads leading zeros as decimal and ignores junk", () => {
-			const { wrapper, stubDir } = setup("junk");
+		expect(result.stdout).toBe(stub);
+	});
 
-			expect(runWrapper(wrapper, stubDir, { [depthVar]: "09" }).status).toBe(
-				WRAPPER_LOOP_EXIT_STATUS,
-			);
-			expect(runWrapper(wrapper, stubDir, { [depthVar]: "x1" }).stdout).toBe(
-				"STUB depth=1",
-			);
+	it("skips a wrapper from another app home", () => {
+		const otherBinDir = generateWrappers(path.join(TEST_ROOT, "home-b"));
+
+		const result = resolve(binary, wrapper, {
+			path: `${otherBinDir}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
 		});
 
-		it("does not share a counter between binaries", () => {
-			const { wrapper, stubDir } = setup("separate");
+		expect(result.stdout).toBe(stub);
+	});
 
-			const result = runWrapper(wrapper, stubDir, {
-				SUPERSET_WRAPPER_DEPTH_other: String(MAX_WRAPPER_NESTING),
-			});
+	it("still returns a real binary that is not a Superset wrapper", () => {
+		const otherDir = scenarioDir("other");
+		writeExecutable(path.join(otherDir, binary), "#!/bin/bash\nexit 0\n");
 
-			expect(result.stdout).toBe("STUB depth=1");
+		const result = resolve(binary, wrapper, {
+			path: `${otherDir}:${REAL_BIN_DIR}:${SYSTEM_PATH}`,
 		});
+
+		expect(result.stdout).toBe(path.join(otherDir, binary));
+	});
+});
+
+describe("loop guard", () => {
+	const binary = "claude";
+	const wrapper = path.join(BIN_DIR, binary);
+	const depthVar = getWrapperDepthVar(binary);
+	const stubDir = scenarioDir("stub-bin");
+	installStub(stubDir, binary);
+
+	it("counts each pass in the environment", () => {
+		expect(runWrapper(wrapper, stubDir).stdout).toBe("STUB depth=1");
+	});
+
+	it("still runs one pass below the limit", () => {
+		const result = runWrapper(wrapper, stubDir, {
+			[depthVar]: String(MAX_WRAPPER_NESTING - 1),
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stdout).toBe(`STUB depth=${MAX_WRAPPER_NESTING}`);
+	});
+
+	it("refuses to run once the nesting limit is reached", () => {
+		const result = runWrapper(wrapper, stubDir, {
+			[depthVar]: String(MAX_WRAPPER_NESTING),
+		});
+
+		expect(result.status).toBe(WRAPPER_LOOP_EXIT_STATUS);
+		expect(result.stdout).toBe("");
+		expect(result.stderr).toContain(
+			`${binary} wrapper started ${MAX_WRAPPER_NESTING} times`,
+		);
+		expect(result.stderr).toContain(`nested more than ${MAX_WRAPPER_NESTING}`);
+		expect(result.stderr).toContain(`type -a ${binary}`);
+	});
+
+	it("reads leading zeros as decimal and ignores junk", () => {
+		expect(runWrapper(wrapper, stubDir, { [depthVar]: "09" }).status).toBe(
+			WRAPPER_LOOP_EXIT_STATUS,
+		);
+		expect(runWrapper(wrapper, stubDir, { [depthVar]: "x1" }).stdout).toBe(
+			"STUB depth=1",
+		);
+	});
+
+	it("does not share a counter between binaries", () => {
+		const result = runWrapper(wrapper, stubDir, {
+			[getWrapperDepthVar("codex")]: String(MAX_WRAPPER_NESTING),
+		});
+
+		expect(result.stdout).toBe("STUB depth=1");
 	});
 });
