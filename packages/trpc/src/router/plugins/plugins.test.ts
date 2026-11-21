@@ -5,6 +5,7 @@ import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
 import { posthog } from "../../lib/analytics";
+import * as googleRelease from "../integration/google/release";
 import * as pluginConnections from "./connections";
 import * as proxy from "./proxy";
 
@@ -32,6 +33,7 @@ const bound = (condition: SQL) => dialect.sqlToQuery(condition).params;
 let installs: InstallRow[] = [];
 let live: ConnectionRow[] = [];
 let forgotten: string[] = [];
+let released: string[] = [];
 
 const rows = <T>(value: T[]) =>
 	Object.assign(Promise.resolve(value), {
@@ -41,6 +43,9 @@ const rows = <T>(value: T[]) =>
 
 stub(posthog, { capture: () => {} });
 stub(proxy, { forgetUpstreamTools: (id: string) => forgotten.push(id) });
+stub(googleRelease, {
+	releaseGoogleGrant: async (row: ConnectionRow) => released.push(row.id),
+});
 
 stub(pluginConnections, {
 	installRecord: (_userId: string, pluginName: string) => {
@@ -85,9 +90,23 @@ stub(db, {
 			},
 		}),
 	}),
-	delete: () => ({
+	delete: (table: unknown) => ({
 		where: (condition: SQL) => {
 			const values = bound(condition);
+			if (table === connections) {
+				return {
+					returning: async () => {
+						const hit = live.filter(
+							(row) =>
+								row.connector === "google" &&
+								row.disconnectedAt === null &&
+								values.includes(row.connectedByUserId),
+						);
+						live = live.filter((row) => !hit.includes(row));
+						return hit;
+					},
+				};
+			}
 			installs = installs.filter((row) => !values.includes(row.id));
 			return Promise.resolve();
 		},
@@ -99,6 +118,7 @@ stub(db, {
 					const values = bound(condition);
 					const hit = live.filter(
 						(row) =>
+							row.connector !== "google" &&
 							row.disconnectedAt === null &&
 							values.includes(row.connector) &&
 							values.includes(row.connectedByUserId),
@@ -156,9 +176,35 @@ beforeEach(() => {
 	installs = [];
 	live = [];
 	forgotten = [];
+	released = [];
 });
 
 describe("plugins.uninstall", () => {
+	test("keeps Google for Calendar, then removes credentials after the last Google plugin", async () => {
+		installs = [
+			install({ id: "gmail", pluginName: "gmail" }),
+			install({ id: "calendar", pluginName: "google-calendar" }),
+		];
+		live = [
+			connection("mine", "google"),
+			connection("theirs", "google", "user-2"),
+		];
+
+		expect(
+			(await caller.plugins.uninstall({ name: "gmail" })).disconnected,
+		).toBe(0);
+		expect(live).toHaveLength(2);
+		expect(released).toEqual([]);
+
+		expect(
+			(await caller.plugins.uninstall({ name: "google-calendar" }))
+				.disconnected,
+		).toBe(1);
+		expect(live.map(({ id }) => id)).toEqual(["theirs"]);
+		expect(forgotten).toEqual(["mine"]);
+		expect(released).toEqual(["mine"]);
+	});
+
 	test("disconnects the connector the published manifest names, not the stored one", async () => {
 		installs = [install()];
 		live = [

@@ -8,6 +8,7 @@ import { stripeClient } from "@superset/auth/stripe";
 import { db, dbWs } from "@superset/db/client";
 import {
 	accounts,
+	connections,
 	members,
 	oauthAccessTokens,
 	oauthConsents,
@@ -24,6 +25,7 @@ import {
 import { and, count, eq, ne } from "drizzle-orm";
 
 import { settleOrganizationNow } from "../../router/cloud-workspace/meter";
+import { deleteGoogleConnections } from "../connectors/disconnect";
 import { purgePageStorageForUser } from "../page-store";
 import { deletePostHogPerson } from "../posthog-persons";
 
@@ -61,6 +63,10 @@ async function deleteCustomerIfNeverCharged(customerId: string) {
 export async function purgeAccount(userId: string): Promise<void> {
 	await deletePostHogPerson(userId);
 	await purgePageStorageForUser(userId);
+	await deleteGoogleConnections([
+		eq(connections.connectedByUserId, userId),
+		eq(connections.ownerKind, "user"),
+	]);
 
 	const memberships = await db.query.members.findMany({
 		where: eq(members.userId, userId),

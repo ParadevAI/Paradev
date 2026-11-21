@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import {
+	connections,
 	members,
 	oauthAccessTokens,
 	oauthRefreshTokens,
@@ -16,6 +17,7 @@ import { z } from "zod";
 
 import { findOrganizationSolelyOwnedBy } from "../../lib/account-purge";
 import { emitAppFirstOpened } from "../../lib/activation-events";
+import { deleteGoogleConnections } from "../../lib/connectors/disconnect";
 import { queueRulesReapply } from "../../lib/sandbox/reapply-rules";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
 import { personProcedure, userError } from "../../trpc";
@@ -69,11 +71,6 @@ export const userRouter = {
 			return updatedUser;
 		}),
 
-	/** Grace-period deletion: marks the account and revokes every live
-	 * credential (sessions + issued OAuth tokens). Orgs and billing are left
-	 * untouched so reactivation within the window restores everything; the
-	 * daily purge-expired-deletions job in apps/api purges once the window
-	 * has passed. */
 	deleteAccount: personProcedure.mutation(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
@@ -86,6 +83,10 @@ export const userRouter = {
 			});
 		}
 
+		await deleteGoogleConnections([
+			eq(connections.connectedByUserId, userId),
+			eq(connections.ownerKind, "user"),
+		]);
 		await db
 			.update(users)
 			.set({ deletionRequestedAt: new Date() })

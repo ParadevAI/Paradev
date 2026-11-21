@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { stripeClient } from "@superset/auth/stripe";
 import { db, dbWs } from "@superset/db/client";
-import type { SQL } from "drizzle-orm";
+import { and, type SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { setTestEnv } from "../../../test/env";
 import { stub } from "../../../test/stub";
 import * as meter from "../../router/cloud-workspace/meter";
+import * as disconnect from "../connectors/disconnect";
 import * as pageStore from "../page-store";
 
 interface FakeOrganization {
@@ -102,6 +103,20 @@ stub(dbWs, {
 	transaction: async (run: (transaction: typeof tx) => Promise<void>) => {
 		await run(tx);
 		log.push("tombstone");
+	},
+});
+
+stub(disconnect, {
+	deleteGoogleConnections: async (conditions: SQL[]) => {
+		const where = and(...conditions);
+		if (!where) throw new Error("Missing connection selection");
+		const query = dialect.sqlToQuery(where);
+		expect(query.params).toEqual([USER_ID, "user"]);
+		expect(query.sql).toContain('"connections"."connected_by_user_id"');
+		expect(query.sql).toContain('"connections"."owner_kind"');
+		expect(query.sql).not.toContain("disconnected_at");
+		log.push(`google-connections.delete ${USER_ID}`);
+		return [];
 	},
 });
 
@@ -210,6 +225,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			`google-connections.delete ${USER_ID}`,
 			"settle org-solo",
 			"subscription.cancel sub_solo",
 			"charges.list cus_solo",
@@ -235,6 +251,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			`google-connections.delete ${USER_ID}`,
 			"settle org-paid",
 			"charges.list cus_paid",
 			"organization.delete org-paid",
@@ -242,7 +259,7 @@ describe("purgeAccount", () => {
 		]);
 	});
 
-	test("leaves a shared organization's customer alone and lowers its seats", async () => {
+	test("removes personal Google connections in shared organizations before tombstoning", async () => {
 		organizations = [
 			{
 				id: "org-shared",
@@ -257,6 +274,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			`google-connections.delete ${USER_ID}`,
 			"subscription.update sub_shared 1",
 			"tombstone",
 		]);
@@ -281,6 +299,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			`google-connections.delete ${USER_ID}`,
 			"settle org-solo",
 			"charges.list cus_gone",
 			"organization.delete org-solo",
@@ -336,6 +355,7 @@ describe("purgeAccount", () => {
 		expect(log).toEqual([
 			"posthog.delete",
 			`page-storage.purge ${USER_ID}`,
+			`google-connections.delete ${USER_ID}`,
 			"settle org-solo",
 			"charges.list cus_solo",
 		]);

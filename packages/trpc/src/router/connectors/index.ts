@@ -16,9 +16,9 @@ import {
 	requireConnector,
 	upsertConnection,
 } from "../../lib/connectors";
+import { disconnectConnections } from "../../lib/connectors/disconnect";
 import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
-import { forgetUpstreamTools } from "../plugins/proxy";
 
 function methodSummary(method: ConnectorMethod) {
 	return {
@@ -279,21 +279,17 @@ export const connectorsRouter = {
 			else if (existing.connectedByUserId !== ctx.session.user.id)
 				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
 
-			const [row] = await db
-				.update(connections)
-				.set({ disconnectedAt: new Date(), disconnectReason: "user" })
-				.where(
-					and(
-						eq(connections.id, input.connectionId),
-						eq(connections.organizationId, input.organizationId),
-						reachable,
-					),
-				)
-				.returning({ id: connections.id });
+			const [row] = await disconnectConnections(
+				[
+					eq(connections.id, input.connectionId),
+					eq(connections.organizationId, input.organizationId),
+					reachable,
+				],
+				"user",
+			);
 
 			if (!row)
 				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
-			forgetUpstreamTools(row.id);
 			return { disconnected: row.id };
 		}),
 } satisfies TRPCRouterRecord;
