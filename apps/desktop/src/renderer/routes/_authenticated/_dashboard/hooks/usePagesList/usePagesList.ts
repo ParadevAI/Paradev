@@ -1,3 +1,4 @@
+import type { keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import {
@@ -12,7 +13,11 @@ import {
  */
 export function usePagesList(
 	filter: PagesListFilter = {},
-	options: { enabled?: boolean; staleTime?: number } = {},
+	options: {
+		enabled?: boolean;
+		staleTime?: number;
+		placeholderData?: typeof keepPreviousData;
+	} = {},
 ) {
 	const query = cloudTrpc.page.listPaginated.useInfiniteQuery(
 		pagesListInput(filter),

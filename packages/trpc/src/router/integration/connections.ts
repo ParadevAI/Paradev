@@ -4,14 +4,14 @@ import { getConnector } from "@superset/shared/connectors";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { orgConnection, userConnection } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "./utils";
 
 export function getConnectionProcedure<R>(
 	connector: string,
 	present: (connection: SelectConnection) => R,
 ) {
-	return protectedProcedure
+	return personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }): Promise<R | null> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -32,7 +32,7 @@ export function disconnectProcedure(
 	before?: (connectionId: string, organizationId: string) => Promise<void>,
 	beforeAll?: (organizationId: string) => Promise<void>,
 ) {
-	return protectedProcedure
+	return personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);

@@ -69,7 +69,7 @@ export function ThreadCard({
 			</div>
 			<ChannelMessageRow
 				message={root}
-				author={authorOf(root.authorUserId)}
+				author={authorOf(root.authorId)}
 				compact={false}
 				now={now}
 				currentUserId={currentUserId}
@@ -95,7 +95,7 @@ export function ThreadCard({
 					{reply.id === firstUnread?.id && <NewMessagesLine />}
 					<ChannelMessageRow
 						message={reply}
-						author={authorOf(reply.authorUserId)}
+						author={authorOf(reply.authorId)}
 						compact={false}
 						now={now}
 						currentUserId={currentUserId}

@@ -1,4 +1,4 @@
-import { Heading, Link, Section, Text } from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { differenceInDays } from "date-fns";
 import { Button, EmailLayout } from "../../components";
@@ -32,10 +32,6 @@ export function OrganizationInvitationEmail({
 		<EmailLayout
 			preview={`${inviterName} invited you to join ${organizationName}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Join {organizationName} on Paradev
-			</Heading>
-
 			{inviteeName && (
 				<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 					Hi {inviteeName},

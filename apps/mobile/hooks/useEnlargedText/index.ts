@@ -1,0 +1,1 @@
+export { useEnlargedText } from "./useEnlargedText";

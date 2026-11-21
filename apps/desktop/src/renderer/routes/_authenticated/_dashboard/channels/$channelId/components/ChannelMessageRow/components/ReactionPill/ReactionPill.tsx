@@ -39,7 +39,7 @@ export function ReactionPill({
 						name={reaction.emoji}
 						className="flex size-4 items-center justify-center text-[15px] leading-none"
 					/>
-					{reaction.userIds.length}
+					{reaction.actorIds.length}
 				</button>
 			</TooltipTrigger>
 			<TooltipContent

@@ -419,27 +419,108 @@ export function formatPaymentSucceeded(
 	];
 }
 
+export interface PreviousPlan {
+	planName: string | null;
+	pricePerSeatCents: number;
+	interval: "monthly" | "yearly";
+	seatCount: number;
+}
+
+type PlanChangeDirection = "upgrade" | "downgrade" | "same";
+
+function monthlyCents(
+	pricePerSeatCents: number,
+	seatCount: number,
+	interval: "monthly" | "yearly",
+): number {
+	const total = pricePerSeatCents * seatCount;
+	return interval === "yearly" ? total / 12 : total;
+}
+
+export function planChangeDirection(
+	enriched: EnrichedSubscription,
+	previous: PreviousPlan,
+): PlanChangeDirection {
+	const before = monthlyCents(
+		previous.pricePerSeatCents,
+		previous.seatCount,
+		previous.interval,
+	);
+	const after = monthlyCents(
+		enriched.pricePerSeatCents,
+		enriched.seatCount,
+		enriched.interval,
+	);
+	if (after > before) return "upgrade";
+	if (after < before) return "downgrade";
+	return "same";
+}
+
+const planChangeHeaders = {
+	upgrade: "Plan Upgraded :arrow_up:",
+	downgrade: "Plan Downgraded :arrow_down:",
+	same: "Plan Changed",
+} satisfies Record<PlanChangeDirection, string>;
+
+function previousPlanBlock(
+	enriched: EnrichedSubscription,
+	previous: PreviousPlan,
+): unknown {
+	const previousName = previous.planName ?? "Unknown";
+	const previousPrice = `${formatPrice(previous.pricePerSeatCents)}/seat/${intervalLabel(previous.interval)}`;
+	const currentPrice = `${formatPrice(enriched.pricePerSeatCents)}/seat/${intervalLabel(enriched.interval)}`;
+	return {
+		type: "section",
+		fields: [
+			{
+				type: "mrkdwn",
+				text: `*Plan:*\n${previousName} -> ${enriched.planName}`,
+			},
+			{
+				type: "mrkdwn",
+				text: `*Price:*\n${previousPrice} -> ${currentPrice}`,
+			},
+			{
+				type: "mrkdwn",
+				text: `*Interval:*\n${previous.interval} -> ${enriched.interval}`,
+			},
+			{
+				type: "mrkdwn",
+				text: `*Seats:*\n${previous.seatCount} -> ${enriched.seatCount}`,
+			},
+		],
+	};
+}
+
 export function formatPlanChanged(
 	enriched: EnrichedSubscription,
+	previous: PreviousPlan | null,
 	previousInterval?: string,
 ): unknown[] {
+	const direction = previous ? planChangeDirection(enriched, previous) : "same";
 	return [
 		{
 			type: "header",
-			text: { type: "plain_text", text: "Plan Changed", emoji: true },
+			text: {
+				type: "plain_text",
+				text: planChangeHeaders[direction],
+				emoji: true,
+			},
 		},
 		standardFields(enriched),
-		...(previousInterval
-			? [
-					{
-						type: "section",
-						text: {
-							type: "mrkdwn",
-							text: `*Interval:*\n${previousInterval} -> ${enriched.interval}`,
+		...(previous
+			? [previousPlanBlock(enriched, previous)]
+			: previousInterval
+				? [
+						{
+							type: "section",
+							text: {
+								type: "mrkdwn",
+								text: `*Interval:*\n${previousInterval} -> ${enriched.interval}`,
+							},
 						},
-					},
-				]
-			: []),
+					]
+				: []),
 		stripeDashboardButtons(
 			enriched.stripeCustomerId,
 			enriched.stripeSubscriptionId,

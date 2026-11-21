@@ -4,8 +4,7 @@ import { ChevronRight } from "lucide-react-native";
 import { Pressable, ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
-import { hostServiceUrl } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
 import { PULL_REQUEST_STATUS, pullRequestStatus } from "../utils/pullRequest";
 import { RowDiffstat } from "./components/RowDiffstat";
@@ -26,11 +25,6 @@ export function PullRequestsSheet() {
 	const { t } = useLingui();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
-	const { host } = useWorkspaceHost(id ?? null);
-	const hostUrl =
-		host?.isOnline === true
-			? hostServiceUrl(host.organizationId, host.machineId)
-			: null;
 	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	return (
@@ -42,15 +36,15 @@ export function PullRequestsSheet() {
 					}),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="px-4 pb-10 pt-2"
@@ -88,7 +82,6 @@ export function PullRequestsSheet() {
 							</Text>
 							<RowDiffstat
 								enabled={index < DIFFSTAT_ROW_LIMIT}
-								hostUrl={hostUrl}
 								pullRequest={pullRequest}
 							/>
 							<Icon

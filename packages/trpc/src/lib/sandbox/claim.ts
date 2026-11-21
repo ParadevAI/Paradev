@@ -4,29 +4,34 @@
  * its identity file, the credential rules for the firewall, the managed
  * environment to push after boot, and the host secret for the boot command.
  */
-import { createHmac } from "node:crypto";
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
-import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import {
+	GOLDEN_BOX_VCPUS,
+	LEGACY_MACHINE_SIZE,
+} from "@superset/shared/billing";
+import { BRAND } from "@superset/shared/brand";
 import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
 } from "@superset/shared/cloud-agent-launch";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
 	type SandboxRepository,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
-import {
-	type AgentSignIns,
-	resolveAgentSignIns,
-} from "../../router/agent-credential";
+import { resolveAgentSignIns } from "../../router/agent-credential";
+import { accessTokenExpiresAt } from "../../router/agent-credential/utils/chatgpt";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
+import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
+import { organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
+import { agentSignInKinds } from "./agent-sign-in-kinds";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
@@ -39,35 +44,15 @@ import type { SandboxClaim, SandboxEnvironment } from "./vercel";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
-/**
- * A ChatGPT sign-in counts by its account, not its access token: the API
- * renews that token every few days and the firewall carries the new one, so a
- * renewal is not a change a running agent has to restart for.
- */
-function agentCredentialDigest(signIns: AgentSignIns): string {
-	const values: Record<string, string> = {
-		...signIns.env,
-		...(signIns.codexChatgpt
-			? { CODEX_CHATGPT_ACCOUNT: signIns.codexChatgpt.accountId }
-			: {}),
-	};
-	const sorted = Object.keys(values)
-		.sort()
-		.map((key) => [key, values[key]]);
-	return createHmac("sha256", env.SANDBOX_GATE_SECRET)
-		.update(`agent-credentials:${JSON.stringify(sorted)}`)
-		.digest("hex");
-}
-
 /** Commits by a workspace nobody created, such as an automation's. */
-const SUPERSET_GIT_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const SUPERSET_GIT_AUTHOR = { name: BRAND.NAME, email: "noreply@superset.sh" };
 
 /** A size the org no longer offers falls back to its default at the next start. */
 async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {
 	const size =
 		(await resolveMachineSize(
 			row.organizationId,
-			row.machineSize ?? "large",
+			row.machineSize ?? LEGACY_MACHINE_SIZE,
 		)) ?? (await resolveMachineSize(row.organizationId, null));
 	return size?.vcpus ?? GOLDEN_BOX_VCPUS;
 }
@@ -85,12 +70,21 @@ export async function buildSandboxClaim(args: {
 	environment: SandboxEnvironment;
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
+	/** When the first token in the rules expires; null when none does. */
+	rulesExpireAt: Date | null;
 }> {
-	const [environment, signIns] = await Promise.all([
+	const [environment, signIns, boxLogs] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
 		args.row.createdByUserId
 			? resolveAgentSignIns({ userId: args.row.createdByUserId })
 			: Promise.resolve({ env: {}, codexChatgpt: null }),
+		env.SENTRY_DSN_SANDBOX
+			? organizationFlagEnabled(
+					posthog,
+					FEATURE_FLAGS.SANDBOX_BOX_LOGS,
+					args.row.organizationId,
+				)
+			: false,
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
@@ -110,12 +104,19 @@ export async function buildSandboxClaim(args: {
 				}),
 			])
 		: [null, null, undefined];
-	const plugins = await creatorPlugins(creator);
+	const plugins = await creatorPlugins(creator, args.row.organizationId);
 	// The creator's own token when they have connected GitHub: pushes and pull
 	// requests are theirs. The App's installation token otherwise.
-	const token =
-		userToken ??
-		(await installationTokenFor(checkouts.map((entry) => entry.repository)));
+	const installation = userToken
+		? null
+		: await installationTokenFor(checkouts.map((entry) => entry.repository));
+	const token = userToken ?? installation?.token ?? null;
+	const expiries = [
+		userToken ? githubAccount?.accessTokenExpiresAt : installation?.expiresAt,
+		signIns.codexChatgpt
+			? accessTokenExpiresAt(signIns.codexChatgpt.accessToken)
+			: null,
+	].filter((at): at is Date => at instanceof Date);
 	const primaryCheckout = checkouts[0];
 	const repoHooks =
 		args.withRepoHooks && primaryCheckout
@@ -145,6 +146,7 @@ export async function buildSandboxClaim(args: {
 						env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
 				}
 			: {}),
+		...(boxLogs ? { SUPERSET_SANDBOX_BOX_LOGS: "1" as const } : {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
 	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({
@@ -173,6 +175,11 @@ export async function buildSandboxClaim(args: {
 			files,
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
+			agentTools: await organizationFlagEnabled(
+				posthog,
+				FEATURE_FLAGS.SANDBOX_AGENT_TOOLS_DRIVE,
+				args.row.organizationId,
+			),
 		},
 		environment: {
 			sourceKind: environment.sourceKind,
@@ -180,6 +187,9 @@ export async function buildSandboxClaim(args: {
 			region: environment.region,
 		},
 		repositories,
-		agentCredentialDigest: agentCredentialDigest(signIns),
+		agentCredentialDigest: agentSignInKinds(signIns),
+		rulesExpireAt: expiries.length
+			? new Date(Math.min(...expiries.map((at) => at.getTime())))
+			: null,
 	};
 }

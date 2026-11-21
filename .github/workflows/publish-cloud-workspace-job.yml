@@ -1,0 +1,46 @@
+name: Publish Cloud Workspace Job
+
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which job under /api/cloud-workspaces/jobs/ to publish to QStash once, outside its schedule.
+        type: choice
+        options:
+          - reconcile-usage
+          - renew-chatgpt-sign-ins
+        default: reconcile-usage
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.job }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    concurrency:
+      group: publish-cloud-workspace-job-${{ inputs.job }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Publish the job through QStash
+        env:
+          QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
+          # The API's QStash client reads this too; the account is not on the default host.
+          QSTASH_URL: ${{ secrets.QSTASH_URL }}
+          API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          JOB: ${{ inputs.job }}
+        run: |
+          set -euo pipefail
+          target="${API_URL%/}/api/cloud-workspaces/jobs/${JOB}"
+          base="${QSTASH_URL:-https://qstash.upstash.io}"
+          echo "publishing to ${target}"
+          status=$(curl -sS -o /tmp/qstash-response -w "%{http_code}" -X POST \
+            "${base%/}/v2/publish/${target}" \
+            -H "Authorization: Bearer ${QSTASH_TOKEN}" \
+            -H "Upstash-Method: POST" \
+            -H "Upstash-Retries: 0" \
+            -H "Content-Type: application/json" \
+            --data '{}')
+          echo "qstash answered ${status}"
+          cat /tmp/qstash-response; echo
+          [ "${status}" -ge 200 ] && [ "${status}" -lt 300 ]

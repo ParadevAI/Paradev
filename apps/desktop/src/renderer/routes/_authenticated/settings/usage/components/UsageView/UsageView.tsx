@@ -28,16 +28,11 @@ import {
 	getPresetIcon,
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
-import type {
-	UsageAccount,
-	UsageQuotaWindow,
-} from "renderer/hooks/host-service/useHostUsageQuota";
+import { QuotaWindowRow } from "renderer/components/QuotaWindowRow";
+import type { UsageAccount } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import {
-	formatResetIn,
-	formatResetLabel,
-} from "renderer/utils/usage/formatResetIn";
+import { QUOTA_AGENT_LABELS } from "renderer/utils/usage/quotaAgentLabels";
 import { useRemoveUsageAccount } from "../../hooks/useRemoveUsageAccount";
 import { useRestartAgentSessions } from "../../hooks/useRestartAgentSessions";
 import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
@@ -49,17 +44,10 @@ import { RemoveAccountDialog } from "./components/RemoveAccountDialog";
 import type { RestartSessionsPrompt } from "./components/RestartSessionsDialog";
 import { RestartSessionsDialog } from "./components/RestartSessionsDialog";
 import { API_BILLING_LINKS } from "./utils/apiBilling";
+import { dedupeUsageAccounts } from "./utils/dedupeUsageAccounts";
 import { switchSignInCommand } from "./utils/switchSignInCommand";
 import type { ManagedAgent, QuotaAgent } from "./utils/visibleQuotaAgents";
 import { isManagedAgent, visibleQuotaAgents } from "./utils/visibleQuotaAgents";
-
-const AGENT_LABELS: Record<QuotaAgent, string> = {
-	claude: "Claude Code",
-	codex: "Codex",
-	grok: "Grok",
-	agy: "Antigravity",
-	opencode: "OpenCode",
-};
 
 /** Re-auth command for agents whose logins Superset only reads. */
 const READ_ONLY_LOGIN_COMMANDS: Record<
@@ -70,39 +58,6 @@ const READ_ONLY_LOGIN_COMMANDS: Record<
 	agy: "agy",
 	opencode: "opencode auth login",
 };
-
-function meterColor(usedPercent: number): string {
-	if (usedPercent >= 90) return "bg-red-500";
-	if (usedPercent >= 70) return "bg-amber-500";
-	return "bg-primary";
-}
-
-/** One line per window: label · bar · % · reset. Density over ceremony. */
-function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
-	const percent = Math.min(window.usedPercent, 100);
-	return (
-		<div className="grid grid-cols-[minmax(0,9rem)_1fr_2.5rem_5rem] items-center gap-2">
-			<span className="truncate text-[11px] text-muted-foreground">
-				{window.label}
-			</span>
-			<div className="h-1 w-full overflow-hidden rounded-full bg-muted">
-				<div
-					className={cn("h-full rounded-full", meterColor(window.usedPercent))}
-					style={{ width: `${Math.max(percent, 1)}%` }}
-				/>
-			</div>
-			<span className="text-right text-[11px] tabular-nums">
-				{window.usedPercent}%
-			</span>
-			<span
-				className="text-right text-[11px] text-muted-foreground tabular-nums"
-				title={window.resetsAt ? formatResetLabel(window.resetsAt) : undefined}
-			>
-				{window.resetsAt ? `↺ ${formatResetIn(window.resetsAt)}` : ""}
-			</span>
-		</div>
-	);
-}
 
 function creditsLine(account: UsageAccount): string | null {
 	if (account.creditsBalance !== null) {
@@ -186,7 +141,7 @@ function AccountCard({
 							disabled={isSwitching}
 							title={t({
 								message:
-									"Make default — launch new terminals and agents on this account.",
+									"Make default: launch new terminals and agents on this account.",
 							})}
 							onClick={onMakeDefault ?? undefined}
 						>
@@ -202,7 +157,7 @@ function AccountCard({
 					{hideEmails && account.email ? (
 						<Trans>Email hidden</Trans>
 					) : (
-						(account.email ?? AGENT_LABELS[account.agent])
+						(account.email ?? QUOTA_AGENT_LABELS[account.agent])
 					)}
 				</span>
 				{account.plan && (
@@ -293,7 +248,7 @@ function AccountCard({
 			) : expiredCommand !== null ? (
 				<div className="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[11px] text-muted-foreground">
 					<span>
-						<Trans>Sign-in expired — run</Trans>
+						<Trans>Sign-in expired. Run</Trans>
 					</span>
 					<button
 						type="button"
@@ -394,7 +349,7 @@ export function UsageView({
 	const { countRestartCandidates, restartMutation } =
 		useRestartAgentSessions(hostUrl);
 
-	const accounts = quotaQuery.data ?? [];
+	const accounts = dedupeUsageAccounts(quotaQuery.data ?? []);
 	useEffect(() => {
 		const key = `${hostUrl}:${focusedAgent}:${focusedAccountKey}`;
 		if (
@@ -432,7 +387,7 @@ export function UsageView({
 		agent: ManagedAgent,
 		accountLabel: string,
 	) => {
-		const providerLabel = AGENT_LABELS[agent];
+		const providerLabel = QUOTA_AGENT_LABELS[agent];
 		let candidateCount = 0;
 		try {
 			candidateCount = await countRestartCandidates(agent);
@@ -570,7 +525,9 @@ export function UsageView({
 					<section key={agent} className="flex flex-col gap-1.5">
 						<div className="flex items-center gap-1.5">
 							{icon && <img src={icon} alt="" className="size-3.5" />}
-							<span className="text-xs font-medium">{AGENT_LABELS[agent]}</span>
+							<span className="text-xs font-medium">
+								{QUOTA_AGENT_LABELS[agent]}
+							</span>
 							{isManagedAgent(agent) && (
 								<Button
 									variant="ghost"
@@ -592,8 +549,8 @@ export function UsageView({
 						) : agentAccounts.length === 0 ? (
 							<div className="rounded-lg border border-dashed px-3 py-2 text-[11px] text-muted-foreground">
 								<Trans>
-									No {AGENT_LABELS[agent]} logins on this host — sign in and
-									usage appears here.
+									No {QUOTA_AGENT_LABELS[agent]} logins on this host. Sign in
+									and usage appears here.
 								</Trans>
 							</div>
 						) : (

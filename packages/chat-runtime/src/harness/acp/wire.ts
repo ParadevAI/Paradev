@@ -68,13 +68,36 @@ export const acpNewSessionResponseSchema = z.looseObject({
 		.optional(),
 });
 
+export const acpPromptUsageSchema = z.looseObject({
+	inputTokens: z.number().nonnegative(),
+	outputTokens: z.number().nonnegative(),
+	cachedReadTokens: z.number().nonnegative().nullish(),
+});
+export type AcpPromptUsage = z.infer<typeof acpPromptUsageSchema>;
+
 export const acpPromptResponseSchema = z.looseObject({
 	stopReason: z.string().optional(),
 	messageId: z.string().optional(),
+	usage: acpPromptUsageSchema.optional().catch(undefined),
 });
 
 export const acpUsageUpdateSchema = z.looseObject({
+	used: z.number().nonnegative().optional().catch(undefined),
+	size: z.number().positive().optional().catch(undefined),
 	cost: z.unknown().optional(),
+	_meta: z
+		.looseObject({
+			"_claude/rateLimit": z.unknown().optional(),
+			"_claude/model": z.unknown().optional(),
+		})
+		.nullish()
+		.catch(undefined),
+});
+export type AcpUsageUpdate = z.infer<typeof acpUsageUpdateSchema>;
+
+export const acpUsdCostSchema = z.looseObject({
+	amount: z.number().nonnegative(),
+	currency: z.literal("USD"),
 });
 
 export const ACP_STEERING_METHOD = "_session/steering";
@@ -108,6 +131,10 @@ const acpToolCallContentSchema = z.looseObject({
 		.looseObject({ format: z.string().optional(), text: z.string() })
 		.nullable()
 		.optional(),
+	_meta: z
+		.looseObject({ kind: z.string().optional() })
+		.optional()
+		.catch(undefined),
 });
 export type AcpToolCallContent = z.infer<typeof acpToolCallContentSchema>;
 
@@ -199,6 +226,30 @@ export const acpPlanUpdateSchema = z.looseObject({
 		planId: z.string().min(1),
 		entries: acpPlanEntriesSchema.optional(),
 	}),
+});
+
+export const acpCompactionStatusSchema = z.enum([
+	"in_progress",
+	"completed",
+	"failed",
+	"cancelled",
+]);
+export type AcpCompactionStatus = z.infer<typeof acpCompactionStatusSchema>;
+
+export const acpCompactionUpdateSchema = z.looseObject({
+	compactionId: z.string().min(1),
+	status: acpCompactionStatusSchema,
+	error: z.string().nullable().optional(),
+});
+
+export const acpCompactionSummaryChunkSchema = z.looseObject({
+	compactionId: z.string().min(1),
+});
+
+export const acpNoticeSchema = z.looseObject({
+	severity: z.string(),
+	title: z.string().min(1),
+	description: z.string().nullable().optional(),
 });
 
 /**

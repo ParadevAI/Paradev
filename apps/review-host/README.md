@@ -7,7 +7,7 @@ The always-on host Apple's reviewer signs into. A persistent GCP VM since
 | --- | --- |
 | Instance | `superset-review-host`, zone `us-west1-b`, project `fair-scout-481221-v0` ("Superset") |
 | Shape | `e2-standard-4` — 4 vCPU, 16 GB, 50 GB pd-balanced, deletion protection on |
-| Superset org | `9617bc8e-7f57-4af8-8b5e-586290ae536a` — "App Review" |
+| Paradev org | `9617bc8e-7f57-4af8-8b5e-586290ae536a` — "App Review" |
 | Account | `appreview@superset.sh` (password lives in App Store Connect, nowhere else) |
 | Machine name | `acme-devbox` — what the reviewer sees |
 

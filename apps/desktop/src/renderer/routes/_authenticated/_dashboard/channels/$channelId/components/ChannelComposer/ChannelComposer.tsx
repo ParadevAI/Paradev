@@ -9,7 +9,7 @@ import { useComposerDictation } from "renderer/routes/_authenticated/components/
 import { useApplyChannelMessage } from "renderer/routes/_authenticated/hooks/useApplyChannelMessage";
 import { pendingMessage } from "renderer/routes/_authenticated/utils/channelMessageCache";
 import {
-	mentionedUserIds,
+	mentionedIds,
 	useChannelMentions,
 } from "../../hooks/useChannelMentions";
 import { useEmojiSuggestions } from "../../hooks/useEmojiSuggestions";
@@ -49,7 +49,7 @@ export function ChannelComposer({
 	const { data: members } = cloudTrpc.channel.members.useQuery({ channelId });
 	const [outsiderIds, setOutsiderIds] = useState<string[]>([]);
 	const outsiders = useMemo(() => {
-		const memberIds = new Set((members ?? []).map((m) => m.userId));
+		const memberIds = new Set((members ?? []).map((m) => m.actorId));
 		return people.filter(
 			(person) => outsiderIds.includes(person.id) && !memberIds.has(person.id),
 		);
@@ -71,11 +71,11 @@ export function ChannelComposer({
 		}));
 		const pending = pendingMessage({
 			channelId,
-			authorUserId: currentUserId,
+			authorId: currentUserId,
 			body,
 			clientId: crypto.randomUUID(),
 			threadRootId,
-			mentionedUserIds: mentionedUserIds(payload.mentions),
+			mentionedIds: mentionedIds(payload.mentions),
 			broadcast: strongestBroadcast(payload.mentions),
 			attachments: previews,
 		});
@@ -107,7 +107,7 @@ export function ChannelComposer({
 					body,
 					threadRootId,
 					clientId: pending.id,
-					mentionedUserIds: pending.mentionedUserIds,
+					mentionedIds: pending.mentionedIds,
 					broadcast: pending.broadcast,
 					fileIds,
 				}),
@@ -115,9 +115,9 @@ export function ChannelComposer({
 			.then((sent) => {
 				apply(sent);
 				release();
-				const memberIds = new Set((members ?? []).map((m) => m.userId));
+				const memberIds = new Set((members ?? []).map((m) => m.actorId));
 				setOutsiderIds(
-					[...new Set(pending.mentionedUserIds)].filter(
+					[...new Set(pending.mentionedIds)].filter(
 						(id) => id !== currentUserId && !memberIds.has(id),
 					),
 				);

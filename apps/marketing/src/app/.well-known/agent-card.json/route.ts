@@ -8,7 +8,7 @@ export function GET() {
 	const card = {
 		protocolVersion: "0.3.0",
 		name: BRAND.NAME,
-		description: `${BRAND.NAME} runs parallel AI coding agents in isolated Git worktrees. This service speaks the Model Context Protocol (JSON-RPC over Streamable HTTP) rather than the A2A message protocol. Connect an MCP client to the URL below to create workspaces, launch coding agents, set up automations, and manage tasks on behalf of a ${BRAND.NAME} user.`,
+		description: `${BRAND.NAME} runs parallel AI coding agents, each in its own Git worktree and branch. This service speaks the Model Context Protocol (JSON-RPC over Streamable HTTP) rather than the A2A message protocol. Connect an MCP client to the URL below to create workspaces, launch coding agents, set up automations, and manage tasks on behalf of a ${BRAND.NAME} user.`,
 		url: MCP_SERVER_URL,
 		preferredTransport: "JSONRPC",
 		provider: {

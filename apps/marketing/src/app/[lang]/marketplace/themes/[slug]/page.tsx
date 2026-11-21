@@ -42,8 +42,8 @@ export async function generateMetadata({
 		description,
 		keywords: [
 			`${theme.name} theme`,
-			`${theme.name} superset theme`,
-			`superset ${theme.type} theme`,
+			`${theme.name} ${COMPANY.NAME} theme`,
+			`${COMPANY.NAME} ${theme.type} theme`,
 			...theme.tags,
 		],
 		alternates: localizedAlternates(lang, `/marketplace/themes/${theme.slug}`),

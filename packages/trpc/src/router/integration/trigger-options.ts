@@ -1,6 +1,6 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { githubTriggerOptions } from "./github/trigger-options";
 import { googleTriggerOptions } from "./google/trigger-options";
 import { linearTriggerOptions } from "./linear/trigger-options";
@@ -64,7 +64,7 @@ export const triggerOptionsRouter = {
 	 * token, provider down) yields an empty list rather than failing the rest —
 	 * the editor stays usable and the sentence shows what it can.
 	 */
-	triggerOptions: protectedProcedure
+	triggerOptions: personProcedure
 		// An enum, not a free string: an unknown group used to come back as {},
 		// which reads exactly like a provider the org has not connected.
 		.input(

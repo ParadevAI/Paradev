@@ -11,6 +11,7 @@ import {
 	PluginTargetError,
 	resolveTarget,
 } from "@superset/trpc/plugins-proxy";
+import { z } from "zod";
 import { env } from "@/env";
 import {
 	checkRateLimit,
@@ -95,6 +96,18 @@ async function handle(
 		throw error;
 	}
 
+	const connectionId = new URL(req.url).searchParams.get("connection");
+	if (connectionId && !z.uuid().safeParse(connectionId).success) {
+		return withRateLimitHeaders(
+			errorResponse(
+				"INVALID_CONNECTION",
+				"connection must be a connection id.",
+				400,
+			),
+			rateLimitState,
+		);
+	}
+
 	let server: Awaited<ReturnType<typeof buildPluginServer>>;
 	try {
 		const target = await resolveTarget({
@@ -102,7 +115,7 @@ async function handle(
 			organizationId: ctx.organizationId,
 			marketplace,
 			plugin,
-			connectionId: new URL(req.url).searchParams.get("connection"),
+			connectionId,
 		});
 		server = await buildPluginServer(target);
 	} catch (error) {

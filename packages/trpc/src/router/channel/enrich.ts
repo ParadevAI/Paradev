@@ -22,7 +22,7 @@ async function reactionsByMessage(
 		.select({
 			messageId: channelMessageReactions.messageId,
 			emoji: channelMessageReactions.emoji,
-			userId: channelMessageReactions.userId,
+			actorId: channelMessageReactions.actorId,
 		})
 		.from(channelMessageReactions)
 		.where(inArray(channelMessageReactions.messageId, messageIds))
@@ -31,12 +31,12 @@ async function reactionsByMessage(
 	for (const row of rows) {
 		const byEmoji = byMessage.get(row.messageId) ?? new Map();
 		byMessage.set(row.messageId, byEmoji);
-		byEmoji.set(row.emoji, [...(byEmoji.get(row.emoji) ?? []), row.userId]);
+		byEmoji.set(row.emoji, [...(byEmoji.get(row.emoji) ?? []), row.actorId]);
 	}
 	return new Map(
 		[...byMessage].map(([messageId, byEmoji]) => [
 			messageId,
-			[...byEmoji].map(([emoji, userIds]) => ({ emoji, userIds })),
+			[...byEmoji].map(([emoji, actorIds]) => ({ emoji, actorIds })),
 		]),
 	);
 }

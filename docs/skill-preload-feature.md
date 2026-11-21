@@ -18,4 +18,4 @@ When the agent invokes `load_skill` (or the legacy `skill`) tool, the chat rende
 
 ## What this repo intentionally does *not* do
 
-An earlier version of this integration extracted custom `/command` chips from the user's message and forwarded them as `preloadSkills` metadata to `sendMessage`. That mechanism depended on a mastra fork (`superset-sh/mastra#9`) that never landed — upstream chose agent-autonomous skill discovery instead. The preload wiring has been removed; `/command` chips serialize to plain `/command` text on send and the agent handles them via its normal tool-choice path.
+An earlier version of this integration extracted custom `/command` chips from the user's message and forwarded them as `preloadSkills` metadata to `sendMessage`. That mechanism depended on a mastra fork (`paradevai/mastra#9`) that never landed — upstream chose agent-autonomous skill discovery instead. The preload wiring has been removed; `/command` chips serialize to plain `/command` text on send and the agent handles them via its normal tool-choice path.

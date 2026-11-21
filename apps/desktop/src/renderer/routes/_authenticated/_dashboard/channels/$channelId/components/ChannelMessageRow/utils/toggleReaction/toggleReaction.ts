@@ -9,18 +9,18 @@ export function toggleReaction(
 ): ChannelReaction[] {
 	const existing = reactions.find((reaction) => reaction.emoji === emoji);
 	if (reacted) {
-		if (existing?.userIds.includes(userId)) return [...reactions];
+		if (existing?.actorIds.includes(userId)) return [...reactions];
 		return existing
 			? reactions.map((reaction) =>
 					reaction === existing
-						? { ...reaction, userIds: [...reaction.userIds, userId] }
+						? { ...reaction, actorIds: [...reaction.actorIds, userId] }
 						: reaction,
 				)
-			: [...reactions, { emoji, userIds: [userId] }];
+			: [...reactions, { emoji, actorIds: [userId] }];
 	}
 	return reactions.flatMap((reaction) => {
 		if (reaction.emoji !== emoji) return [reaction];
-		const userIds = reaction.userIds.filter((id) => id !== userId);
-		return userIds.length > 0 ? [{ ...reaction, userIds }] : [];
+		const actorIds = reaction.actorIds.filter((id) => id !== userId);
+		return actorIds.length > 0 ? [{ ...reaction, actorIds }] : [];
 	});
 }

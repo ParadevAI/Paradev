@@ -62,8 +62,6 @@ describe("planPriceValues", () => {
 			yearlyTotal: "$648",
 			gbHours: "1,200",
 			hours: "150",
-			overage: "$0.06",
-			overageRate: "$0.06 per GB-hour",
 			environments: "5",
 			previousName: "Pro",
 		});
@@ -73,7 +71,15 @@ describe("planPriceValues", () => {
 			hasYearlyDiscount: false,
 			environments: "10",
 		});
-		expect(values.byFamily.pro).toMatchObject({ environments: null });
+		expect(values.byFamily.pro).toMatchObject({
+			gbHours: null,
+			hours: null,
+			environments: null,
+		});
+		expect(values.allowanceItems).toHaveLength(2);
+		expect(values.allowanceItems.some((item) => item.startsWith("Pro:"))).toBe(
+			false,
+		);
 		expect(values.maxDiscount).toBe("20%");
 		expect(values.fromPrice).toBe("$16");
 	});
@@ -99,14 +105,13 @@ describe("planPriceValues", () => {
 					: candidate,
 			);
 		const catalog = planCatalogFromAutumn([
-			...plan("pro", 20, "month", pro),
+			...withPack(plan("pro", 20, "month", pro, 19200)),
 			...withPack(plan("team", 60, "month", team, 72000)),
 			...withPack(plan("ultra", 200, "month", ultra, 240000)),
 		]);
 		const values = planPriceValues(catalog, setupI18n({ locale: "en" }));
 		expect(values.byFamily.pro).toMatchObject({
 			gbHours: null,
-			overageRate: null,
 			pack: null,
 		});
 		expect(values.byFamily.team).toMatchObject({

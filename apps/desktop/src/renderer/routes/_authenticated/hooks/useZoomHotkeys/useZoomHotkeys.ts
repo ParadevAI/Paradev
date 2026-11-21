@@ -1,8 +1,9 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useFontSettingsMutation } from "renderer/hooks/useFontSettingsMutation";
-import { useHotkey } from "renderer/hotkeys";
+import { PLATFORM, resolveHotkeyFromEvent, useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
+import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
+import { isPlusKeyZoomIn } from "./isPlusKeyZoomIn";
 import { resolveZoomTarget } from "./resolveZoomTarget";
 import {
 	stepTerminalFontSize,
@@ -67,4 +68,17 @@ export function useZoomHotkeys() {
 	useHotkey("ZOOM_IN", () => zoom("in"));
 	useHotkey("ZOOM_OUT", () => zoom("out"));
 	useHotkey("ZOOM_RESET", () => zoom("reset"));
+
+	const zoomRef = useRef(zoom);
+	zoomRef.current = zoom;
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (!isPlusKeyZoomIn(event, PLATFORM === "mac")) return;
+			if (resolveHotkeyFromEvent(event) !== null) return;
+			event.preventDefault();
+			zoomRef.current("in");
+		};
+		document.addEventListener("keydown", onKeyDown);
+		return () => document.removeEventListener("keydown", onKeyDown);
+	}, []);
 }

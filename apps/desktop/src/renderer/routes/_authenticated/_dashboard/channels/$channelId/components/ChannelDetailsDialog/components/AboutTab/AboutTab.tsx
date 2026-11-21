@@ -7,8 +7,8 @@ import {
 import type { RouterOutputs } from "@superset/trpc";
 import { Button } from "@superset/ui/button";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { DetailRow } from "renderer/routes/_authenticated/_dashboard/components/DetailRow";
 import type { ChannelPerson } from "../../../ChannelMessageRow";
-import { DetailRow } from "./components/DetailRow";
 
 type ChannelSummary = RouterOutputs["channel"]["get"];
 

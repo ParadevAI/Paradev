@@ -7,6 +7,7 @@ config({ path: path.resolve(process.cwd(), "../../../.env"), quiet: true });
 
 export const env = createEnv({
 	server: {
+		BROWSER_API_URL: z.string().url().optional(),
 		GH_CLIENT_ID: z.string(),
 		GH_CLIENT_SECRET: z.string(),
 		GOOGLE_CLIENT_ID: z.string(),
@@ -27,6 +28,19 @@ export const env = createEnv({
 		AUTUMN_SECRET_KEY: z.string().min(1),
 		QSTASH_TOKEN: z.string().min(1),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
+		MOBILE_WEB_ORIGINS: z.string().optional(),
+		// AWS Marketplace is off while the product code is unset.
+		AWS_MARKETPLACE_PRODUCT_CODE: z.string().min(1).optional(),
+		AWS_MARKETPLACE_REGION: z.string().min(1).default("us-east-1"),
+		AWS_MARKETPLACE_ACCESS_KEY_ID: z.string().min(1).optional(),
+		AWS_MARKETPLACE_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+		AWS_MARKETPLACE_ENTERPRISE_PLAN_ID: z.string().min(1).default("enterprise"),
+		AWS_MARKETPLACE_SELLER_ACCOUNT_ID: z
+			.string()
+			.regex(/^\d{12}$/)
+			.optional(),
+		// The API key the EventBridge API destination sends in its header.
+		AWS_MARKETPLACE_EVENTS_TOKEN: z.string().min(32).optional(),
 	},
 	clientPrefix: "NEXT_PUBLIC_",
 	client: {

@@ -7,6 +7,7 @@ import {
 } from "lexical";
 import { type JSX, useContext } from "react";
 import { Chip } from "../../../Chip";
+import { useRenderChip } from "../../providers/ChipRenderProvider";
 import type { ComposerChip } from "../../types";
 import { ChipRendererContext } from "./chipRenderer";
 
@@ -19,6 +20,7 @@ function MentionChipComponent({
 }) {
 	const [isSelected] = useLexicalNodeSelection(nodeKey);
 	const custom = useContext(ChipRendererContext)?.(chip);
+	const renderChip = useRenderChip();
 	if (custom) {
 		return (
 			<span
@@ -30,7 +32,11 @@ function MentionChipComponent({
 			</span>
 		);
 	}
-	return <Chip chip={chip} mention selected={isSelected} />;
+	const wrapped = renderChip?.(
+		chip,
+		<Chip chip={chip} mention selected={isSelected} tooltip={false} />,
+	);
+	return wrapped ?? <Chip chip={chip} mention selected={isSelected} />;
 }
 
 export type SerializedMentionChipNode = Spread<
@@ -44,6 +50,20 @@ export type SerializedMentionChipNode = Spread<
 	},
 	SerializedLexicalNode
 >;
+
+export function chipFromJSON(
+	serialized: SerializedMentionChipNode,
+): ComposerChip {
+	return {
+		label: serialized.label,
+		serialized: serialized.serialized,
+		brandColor: serialized.brandColor ?? undefined,
+		iconUrl: serialized.iconUrl ?? undefined,
+		...(serialized.description ? { description: serialized.description } : {}),
+		data:
+			serialized.dataJson == null ? undefined : JSON.parse(serialized.dataJson),
+	};
+}
 
 export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	__label: string;

@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { eq, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
 import { isMissingPath } from "../../../runtime/path-state";
 import {
 	getWorkspaceTags,
@@ -35,6 +36,36 @@ export const workspaceRouter = router({
 				...localWorkspace,
 				worktreeExists: !isMissingPath(localWorkspace.worktreePath),
 			};
+		}),
+
+	/**
+	 * The repositories a workspace holds, primary first. A workspace holds one
+	 * repository, at its root, until multi-repo workspaces land; the shape is
+	 * the one they will return.
+	 */
+	repositories: protectedProcedure
+		.input(z.object({ workspaceId: z.string() }))
+		.query(({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			const project = workspace.projectId
+				? getProjectIncludingDeleted(ctx.db, workspace.projectId)
+				: undefined;
+			return [
+				{
+					id: workspace.id,
+					path: ".",
+					name: basename(project?.repoPath ?? workspace.worktreePath),
+					primary: true,
+				},
+			];
 		}),
 
 	/**

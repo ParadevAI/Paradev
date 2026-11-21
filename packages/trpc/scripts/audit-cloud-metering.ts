@@ -1,4 +1,8 @@
 import { parseArgs } from "node:util";
+import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
+	BOX_GB_MINUTES_FEATURE_ID,
+} from "@superset/shared/billing";
 
 async function main(): Promise<void> {
 	const { values } = parseArgs({
@@ -89,7 +93,7 @@ async function main(): Promise<void> {
 	do {
 		const page = await autumn.autumnClient.events.list({
 			customerId: values.organization,
-			featureId: ["box_gb_minutes", "active_cpu_minutes"],
+			featureId: [BOX_GB_MINUTES_FEATURE_ID, ACTIVE_CPU_MINUTES_FEATURE_ID],
 			customRange: { start: eventStart, end: Date.now() },
 			limit: 500,
 			startCursor: cursor,
@@ -122,7 +126,7 @@ async function main(): Promise<void> {
 			(event) => event.properties.bootId === boot.id,
 		);
 		const memoryEvents = tagged.filter(
-			(event) => event.featureId === "box_gb_minutes",
+			(event) => event.featureId === BOX_GB_MINUTES_FEATURE_ID,
 		);
 		const net = memoryEvents.reduce((sum, event) => sum + event.value, 0);
 		const reserved = boot.lockOpen
@@ -150,7 +154,7 @@ async function main(): Promise<void> {
 			!boot.lockOpen &&
 			settledEnd >= session.endedAt;
 		const cpu = tagged
-			.filter((event) => event.featureId === "active_cpu_minutes")
+			.filter((event) => event.featureId === ACTIVE_CPU_MINUTES_FEATURE_ID)
 			.reduce((sum, event) => sum + event.value, 0);
 		const providerCpu =
 			session.activeCpuMs === null ? null : session.activeCpuMs / 60_000;
@@ -195,7 +199,8 @@ async function main(): Promise<void> {
 				unattributedMemoryEventValue: events
 					.filter(
 						(event) =>
-							event.featureId === "box_gb_minutes" && !event.properties.bootId,
+							event.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+							!event.properties.bootId,
 					)
 					.reduce((sum, event) => sum + event.value, 0),
 				note: "Vercel window usage is clipped runtime. Lifetime comparisons use full lock histories, not event posting dates. Holds and unsettled runtime are not consumed usage. Legacy missing attribution, adoption gaps, and event ingestion delay can produce discrepancies. No balances are changed.",

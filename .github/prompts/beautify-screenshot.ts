@@ -35,6 +35,14 @@
 //   --hl-style rails   mark the highlight with a rounded white outline that
 //                      fades down from the top (the homepage headline's rail)
 //                      and a soft white glow instead of the accent ring
+//                      rails-bottom | rails-left | rails-right start the fade
+//                      on that edge; surround draws the outline on all four
+//                      sides; diagonal | diagonal-alt shine two opposite
+//                      corners; corner-tl | corner-tr | corner-bl | corner-br
+//                      shine one. Pick by shape: top rails for a tall panel,
+//                      diagonal or surround for a short row, a side or corner
+//                      away from the edge the subject hugs.
+//   --hl-radius <px>   corner radius of the white outline (default 14)
 //   --bleed            (card only) anchor the card near the top and let it run
 //                      off the bottom edge under a fade, the way Linear frames
 //                      a tall surface; the crop should be taller than 16:10
@@ -167,6 +175,29 @@ const frameW = Math.round(
 		: Math.min(CANVAS_W * FRAME_FRAC, CANVAS_H * FRAME_FRAC * aspect),
 );
 
+const RAIL_FADE =
+	"rgba(255,255,255,.75), rgba(255,255,255,.22) 35%, rgba(255,255,255,0) 75%";
+const RAIL_DIAGONAL =
+	"rgba(255,255,255,.8), rgba(255,255,255,.12) 38%, rgba(255,255,255,.12) 62%, rgba(255,255,255,.8)";
+const RAIL_CORNER =
+	"rgba(255,255,255,.85), rgba(255,255,255,.25) 45%, rgba(255,255,255,.06) 85%";
+const RAIL_GRADIENTS: Record<string, string> = {
+	rails: `linear-gradient(180deg, ${RAIL_FADE})`,
+	"rails-bottom": `linear-gradient(0deg, ${RAIL_FADE})`,
+	"rails-left": `linear-gradient(90deg, ${RAIL_FADE})`,
+	"rails-right": `linear-gradient(270deg, ${RAIL_FADE})`,
+	surround: "linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.5))",
+	diagonal: `linear-gradient(135deg, ${RAIL_DIAGONAL})`,
+	"diagonal-alt": `linear-gradient(45deg, ${RAIL_DIAGONAL})`,
+	"corner-tl": `radial-gradient(circle at 0% 0%, ${RAIL_CORNER})`,
+	"corner-tr": `radial-gradient(circle at 100% 0%, ${RAIL_CORNER})`,
+	"corner-bl": `radial-gradient(circle at 0% 100%, ${RAIL_CORNER})`,
+	"corner-br": `radial-gradient(circle at 100% 100%, ${RAIL_CORNER})`,
+};
+const hlStyle = flags.get("hl-style") ?? "";
+const hlRadiusFlag = Number(flags.get("hl-radius") ?? "14");
+const hlRadius =
+	Number.isFinite(hlRadiusFlag) && hlRadiusFlag >= 0 ? hlRadiusFlag : 14;
 // Optional highlight: accent ring + dim outside, in source-pixel coordinates.
 let highlight = "";
 if (flags.has("highlight")) {
@@ -174,7 +205,7 @@ if (flags.has("highlight")) {
 	const k = frameW / view[2]; // source px -> frame px
 	const x = (hx - view[0]) * k;
 	const y = (hy - view[1]) * k;
-	const hlClass = flags.get("hl-style") === "rails" ? "hl rails" : "hl";
+	const hlClass = hlStyle in RAIL_GRADIENTS ? "hl rails" : "hl";
 	highlight = `<div class="${hlClass}" style="left:${x.toFixed(1)}px; top:${y.toFixed(1)}px;
 		width:${(hw * k).toFixed(1)}px; height:${(hh * k).toFixed(1)}px;"></div>`;
 }
@@ -295,7 +326,7 @@ const html = `<!doctype html><html><head><meta charset="utf8"><style>
   /* rails: the homepage headline's white rail as a rounded outline, bright
      along the top and fading down the sides, over a soft white glow */
   .hl.rails {
-    border:none; border-radius:14px;
+    border:none; border-radius:${hlRadius}px;
     box-shadow: 0 0 0 9999px rgba(0,0,0,${Number(flags.get("hl-dim") ?? "0.42") || 0.42}),
                 0 0 28px 2px rgba(255,255,255,.10),
                 0 0 80px 8px rgba(255,255,255,.05);
@@ -303,7 +334,7 @@ const html = `<!doctype html><html><head><meta charset="utf8"><style>
   .hl.rails::before {
     content:""; position:absolute; inset:0; pointer-events:none;
     border-radius:inherit; padding:1.5px;
-    background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.22) 35%, rgba(255,255,255,0) 75%);
+    background: ${RAIL_GRADIENTS[hlStyle] ?? RAIL_GRADIENTS.rails};
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor; mask-composite: exclude;
   }

@@ -99,13 +99,23 @@ export function ThreadPane({
 	}, [canMark, pendingSeq, messageId, applyThreadRead, markReadMutate]);
 	const markNowRef = useRef(markNow);
 	markNowRef.current = markNow;
+	const returnedReadSeq =
+		!manualUnread && unread?.firstUnread && followState
+			? followState.lastReadSeq
+			: null;
+	const onReturn = () => {
+		if (returnedReadSeq !== null) setGhost(returnedReadSeq);
+		markNow();
+	};
+	const onReturnRef = useRef(onReturn);
+	onReturnRef.current = onReturn;
 	useEffect(() => {
 		if (!canMark) return;
 		const timer = setTimeout(() => markNowRef.current(), MARK_READ_DELAY_MS);
 		return () => clearTimeout(timer);
 	}, [canMark]);
 	useEffect(() => {
-		const onFocus = () => markNowRef.current();
+		const onFocus = () => onReturnRef.current();
 		window.addEventListener("focus", onFocus);
 		return () => window.removeEventListener("focus", onFocus);
 	}, []);
@@ -153,7 +163,7 @@ export function ThreadPane({
 			<div className="min-h-0 flex-1 overflow-y-auto pb-2">
 				<ChannelMessageRow
 					message={data.root}
-					author={authorOf(data.root.authorUserId)}
+					author={authorOf(data.root.authorId)}
 					compact={false}
 					now={now}
 					currentUserId={currentUserId}
@@ -189,10 +199,8 @@ export function ThreadPane({
 							{isFirstNew && <NewMessagesLine />}
 							<ChannelMessageRow
 								message={reply}
-								author={authorOf(reply.authorUserId)}
-								compact={
-									!isFirstNew && previous?.authorUserId === reply.authorUserId
-								}
+								author={authorOf(reply.authorId)}
+								compact={!isFirstNew && previous?.authorId === reply.authorId}
 								now={now}
 								currentUserId={currentUserId}
 								canModerate={canModerate}

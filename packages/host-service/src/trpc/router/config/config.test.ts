@@ -88,24 +88,24 @@ describe("configRouter", () => {
 	});
 
 	describe("getConfigFiles and writeConfigFile", () => {
-		const supersetDir = () => join(sandbox.repoPath, ".superset");
+		const configDir = () => join(sandbox.repoPath, ".paradev");
 
 		it("returns nothing but the paths when no file exists", async () => {
 			const caller = createCaller(sandbox.repoPath);
 			const files = await caller.getConfigFiles({ projectId: PROJECT_ID });
 			expect(files.shared).toBeNull();
 			expect(files.local.content).toBeNull();
-			expect(files.tomlPath).toBe(join(supersetDir(), "config.toml"));
+			expect(files.tomlPath).toBe(join(configDir(), "config.toml"));
 		});
 
 		it("prefers config.toml over config.json", async () => {
 			const caller = createCaller(sandbox.repoPath);
-			mkdirSync(supersetDir(), { recursive: true });
-			writeFileSync(join(supersetDir(), "config.json"), "{}");
+			mkdirSync(configDir(), { recursive: true });
+			writeFileSync(join(configDir(), "config.json"), "{}");
 			expect(
 				(await caller.getConfigFiles({ projectId: PROJECT_ID })).shared?.format,
 			).toBe("json");
-			writeFileSync(join(supersetDir(), "config.toml"), "# hi\n");
+			writeFileSync(join(configDir(), "config.toml"), "# hi\n");
 			expect(
 				(await caller.getConfigFiles({ projectId: PROJECT_ID })).shared,
 			).toMatchObject({ format: "toml", content: "# hi\n" });
@@ -121,7 +121,7 @@ describe("configRouter", () => {
 				format: "toml",
 				content,
 			});
-			expect(readFileSync(join(supersetDir(), "config.toml"), "utf-8")).toBe(
+			expect(readFileSync(join(configDir(), "config.toml"), "utf-8")).toBe(
 				content,
 			);
 			await caller.writeConfigFile({
@@ -131,7 +131,7 @@ describe("configRouter", () => {
 				content: '[setup]\nrun = "direnv allow"\n',
 			});
 			expect(
-				readFileSync(join(supersetDir(), "config.local.toml"), "utf-8"),
+				readFileSync(join(configDir(), "config.local.toml"), "utf-8"),
 			).toContain("direnv");
 		});
 
@@ -152,7 +152,24 @@ describe("configRouter", () => {
 					join(sandbox.repoPath, ".git", "info", "exclude"),
 					"utf-8",
 				),
-			).toBe("*.log\n/.superset/config.local.toml\n");
+			).toBe("*.log\n/.paradev/config.local.toml\n");
+		});
+
+		it("keeps editing a repo configured in .superset", async () => {
+			const caller = createCaller(sandbox.repoPath);
+			const legacyDir = join(sandbox.repoPath, ".superset");
+			mkdirSync(legacyDir, { recursive: true });
+			writeFileSync(join(legacyDir, "config.json"), "{}");
+			await caller.writeConfigFile({
+				projectId: PROJECT_ID,
+				file: "shared",
+				format: "toml",
+				content: "# moved to toml\n",
+			});
+			expect(readFileSync(join(legacyDir, "config.toml"), "utf-8")).toBe(
+				"# moved to toml\n",
+			);
+			expect(existsSync(configDir())).toBe(false);
 		});
 
 		it("refuses invalid content and writes nothing", async () => {
@@ -173,12 +190,12 @@ describe("configRouter", () => {
 					content: "[1]",
 				}),
 			).rejects.toThrow(/JSON object/);
-			expect(existsSync(join(supersetDir(), "config.toml"))).toBe(false);
+			expect(existsSync(join(configDir(), "config.toml"))).toBe(false);
 		});
 	});
 
 	describe("updateConfig", () => {
-		it("creates .superset/config.json on first save", async () => {
+		it("creates .paradev/config.json on first save", async () => {
 			const caller = createCaller(sandbox.repoPath);
 			await caller.updateConfig({
 				projectId: PROJECT_ID,
@@ -186,7 +203,7 @@ describe("configRouter", () => {
 				teardown: [],
 			});
 
-			const configPath = join(sandbox.repoPath, ".superset", "config.json");
+			const configPath = join(sandbox.repoPath, ".paradev", "config.json");
 			expect(existsSync(configPath)).toBe(true);
 			const parsed = JSON.parse(readFileSync(configPath, "utf-8"));
 			expect(parsed).toEqual({ setup: ["bun install"], teardown: [] });

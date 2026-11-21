@@ -22,9 +22,10 @@ export function camelToKebab(str: string): string {
 	return str.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
 }
 
-/** A bare `-` is a value, by convention stdin. */
-function isFlag(arg: string): boolean {
-	return arg.startsWith("-") && arg !== "-";
+const FLAG_LIKE = /^(?:-[a-zA-Z]|--[^\s-])[^\s=]*(?:=|$)/;
+
+function isOptionValue(token: string | undefined): token is string {
+	return token !== undefined && token !== "--" && !FLAG_LIKE.test(token);
 }
 
 export type ParseResult = {
@@ -128,7 +129,7 @@ export function parseArgv(
 		}
 
 		// --flag value or -f value
-		if (isFlag(arg)) {
+		if (arg.startsWith("-") && arg !== "-") {
 			const entry = optionsByFlag.get(arg);
 			if (!entry) {
 				throw new CLIError(`Unknown option: ${arg}`);
@@ -151,7 +152,10 @@ export function parseArgv(
 
 			// String/number: consume next arg as value
 			const nextArg = args[i + 1];
-			if (nextArg === undefined || isFlag(nextArg)) {
+			if (
+				!isOptionValue(nextArg) ||
+				optionsByFlag.has(nextArg.split("=", 1)[0]!)
+			) {
 				throw new CLIError(
 					`Option ${arg} requires a value`,
 					entry[1].enumVals

@@ -4,7 +4,9 @@ import { i18n } from "@superset/i18n";
 import { cn } from "@superset/ui/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
+import { FlagGate } from "./components/FlagGate";
 import { NAV_ITEMS } from "./constants";
 
 function isNavItemActive(pathname: string, href: string) {
@@ -19,8 +21,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 			{NAV_ITEMS.map((item) => {
 				const isActive = isNavItemActive(pathname, item.href);
 				const Icon = item.icon;
-				return (
-					<Link
+				const NavLink = item.reloadDocument ? "a" : Link;
+				const link = (
+					<NavLink
 						key={item.href}
 						href={item.href}
 						aria-current={isActive ? "page" : undefined}
@@ -39,7 +42,14 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 						<span className="flex-1 truncate text-left">
 							{i18n._(item.label)}
 						</span>
-					</Link>
+					</NavLink>
+				);
+				return item.flag ? (
+					<Suspense key={item.href} fallback={null}>
+						<FlagGate flag={item.flag}>{link}</FlagGate>
+					</Suspense>
+				) : (
+					link
 				);
 			})}
 		</nav>

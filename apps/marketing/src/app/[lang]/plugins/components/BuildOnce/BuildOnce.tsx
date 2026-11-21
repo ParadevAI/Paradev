@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { SubmitPluginActions } from "@/app/[lang]/components/SubmitPluginActions";
 import { AgentTargets } from "./components/AgentTargets";
 import { ManifestWindow } from "./components/ManifestWindow";
 
@@ -17,6 +18,9 @@ export function BuildOnce() {
 					looks.
 				</Trans>
 			</p>
+			<div className="mt-8">
+				<SubmitPluginActions />
+			</div>
 			<div className="mt-12 grid items-stretch gap-6 lg:grid-cols-2">
 				<ManifestWindow />
 				<AgentTargets />

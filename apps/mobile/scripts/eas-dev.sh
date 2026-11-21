@@ -15,7 +15,7 @@
 #   MOBILE_EAS_BUILD_ID=<id> apps/mobile/scripts/eas-dev.sh   # install this build, skip the lookup
 #
 # Requires: EXPO_TOKEN (or `eas login`), this repo's .env already written
-# (.superset/setup.sh or setup.cloud.sh), and local egress enabled on the Expo
+# (.paradev/setup.sh or setup.cloud.sh), and local egress enabled on the Expo
 # account.
 set -euo pipefail
 
@@ -57,7 +57,7 @@ if [ "$NEW" = "1" ] && [ "$RELOAD" = "1" ]; then
 fi
 
 if [ ! -f .env ]; then
-	echo "No .env here — run .superset/setup.sh or .superset/setup.cloud.sh first." >&2
+	echo "No .env here — run .paradev/setup.sh or .paradev/setup.cloud.sh first." >&2
 	exit 1
 fi
 set -a

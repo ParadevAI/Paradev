@@ -13,7 +13,7 @@ import {
 	sharingResourceSchema,
 	validateGrantees,
 } from "../../lib/sharing";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import {
 	assertPageReadable,
@@ -21,6 +21,7 @@ import {
 	loadPageShareRole,
 	pageAccess,
 } from "./access";
+import { readAsMember } from "./read-loader";
 
 async function loadSharedPage(
 	ctx: Parameters<typeof requireActiveOrgMembership>[0] & {
@@ -57,10 +58,21 @@ async function loadManagedPage(
 }
 
 export const pageSharingRouter = {
-	get: protectedProcedure
+	get: personProcedure
 		.input(sharingResourceSchema)
 		.query(async ({ ctx, input }) => {
-			const { page, userId, shareRole } = await loadSharedPage(ctx, input.id);
+			const loaded = await readAsMember(ctx, input.id, () =>
+				loadSharedPage(ctx, input.id),
+			);
+			if (!loaded) {
+				return {
+					owner: null,
+					grantees: [],
+					canManage: false,
+					organizationRole: "view" as const,
+				};
+			}
+			const { page, userId, shareRole } = loaded;
 			const [owner] = page.createdByUserId
 				? await db
 						.select({
@@ -76,12 +88,12 @@ export const pageSharingRouter = {
 			return {
 				owner: owner ?? null,
 				grantees: await listGrantees({ kind: "page", id: page.id }),
-				canManage: pageAccess(page, userId, shareRole).canManage,
+				canManage: pageAccess(page, userId, shareRole).canEdit,
 				organizationRole: page.organizationRole,
 			};
 		}),
 
-	add: protectedProcedure
+	add: personProcedure
 		.input(addPageSharesSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page, userId } = await loadManagedPage(ctx, input.id);
@@ -99,7 +111,7 @@ export const pageSharingRouter = {
 			return { added };
 		}),
 
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(removeShareSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);
@@ -111,7 +123,7 @@ export const pageSharingRouter = {
 			};
 		}),
 
-	setRole: protectedProcedure
+	setRole: personProcedure
 		.input(setShareRoleSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { page } = await loadManagedPage(ctx, input.id);

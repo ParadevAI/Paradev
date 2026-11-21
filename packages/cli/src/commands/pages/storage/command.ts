@@ -13,8 +13,8 @@ import {
 	parsePageStorageScope,
 } from "@superset/shared/page-storage";
 import { pageStorageRecordsPath } from "@superset/shared/page-storage-hub";
+import { jwtForApiKey } from "../../../lib/api-key-jwt";
 import { command } from "../../../lib/command";
-import { getApiUrl } from "../../../lib/config";
 import { env } from "../../../lib/env";
 import { resolvePageId } from "../pageId";
 
@@ -29,16 +29,7 @@ export async function userJwt(
 			"Run: superset auth login, or pass --api-key",
 		);
 	}
-	const response = await fetchImpl(`${getApiUrl()}/api/auth/token`, {
-		headers: { "x-api-key": bearer },
-	});
-	if (!response.ok) {
-		throw new CLIError(
-			`Could not get a token for this API key (${response.status})`,
-			"Check the key with: superset auth whoami",
-		);
-	}
-	return ((await response.json()) as { token: string }).token;
+	return jwtForApiKey(bearer, fetchImpl);
 }
 
 export async function readStorage({

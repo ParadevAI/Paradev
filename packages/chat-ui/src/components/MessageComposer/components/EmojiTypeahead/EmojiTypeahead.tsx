@@ -11,9 +11,9 @@ import {
 } from "lexical";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { $isInCode } from "../../../PromptInput/utils/isInCode";
 import type { MessageEmojiSuggestion } from "../../types";
 import { MessageEmojiOption } from "../../utils/emojiOption";
-import { $isInCode } from "../../utils/isInCode";
 import { EmojiMenu } from "./components/EmojiMenu";
 
 const MAX_SUGGESTIONS = 8;

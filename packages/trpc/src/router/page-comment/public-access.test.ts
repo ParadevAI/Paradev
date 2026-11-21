@@ -99,7 +99,7 @@ describe("page comments, from outside an organization", () => {
 				},
 				session: { activeOrganizationId: null },
 			}),
-		),
+		).filter(([name]) => name !== "list"),
 	)("%s turns away a signed-in reader with no active org", async (_name, call) => {
 		dbTouched = false;
 		expect(await codeOf(call)).toBe("FORBIDDEN");

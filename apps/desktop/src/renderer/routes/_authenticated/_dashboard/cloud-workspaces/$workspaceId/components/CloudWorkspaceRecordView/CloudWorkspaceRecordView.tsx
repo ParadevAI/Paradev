@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import type { CloudTask } from "renderer/routes/_authenticated/_dashboard/components/CloudTaskRow";
 import type { RecordLabel } from "renderer/routes/_authenticated/_dashboard/components/RecordLabels";
 import { RecordLayout } from "renderer/routes/_authenticated/_dashboard/components/RecordLayout";
@@ -189,7 +190,9 @@ export function CloudWorkspaceRecordView({
 				<CloudWorkspaceDescription
 					key={workspace.id}
 					description={workspace.description}
-					canGenerate={workspace.status === "ready" && !workspace.deletedAt}
+					canGenerate={
+						isLiveCloudWorkspaceStatus(workspace.status) && !workspace.deletedAt
+					}
 					isGenerating={isGeneratingDescription}
 					onSave={onSaveDescription}
 					onGenerate={onGenerateDescription}

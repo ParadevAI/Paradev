@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Sau đó chạy thiết lập phát triển từ terminal của workspace đó:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Xem [**DEVELOPMENT.md**](../DEVELOPMENT.md) để có hướng dẫn đầy đ�
 
 ## Cấu hình
 
-Cấu hình các script setup, teardown và run của workspace trong `.superset/config.json`. Xem [tài liệu đầy đủ](https://docs.paradev.com/setup-teardown-scripts).
+Cấu hình các script setup, teardown và run của workspace trong `.paradev/config.json`. Xem [tài liệu đầy đủ](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -321,7 +321,6 @@ Phím tắt có thể tùy chỉnh qua **Cài đặt → Phím tắt** (⌘/); x
 
 ## Riêng tư theo mặc định
 
-- **Mã nguồn công khai**: toàn bộ mã nguồn ở trên GitHub theo giấy phép Elastic License 2.0 (ELv2).
 - **Kết nối tường minh**: bạn tự chọn agent, provider và tích hợp nào được kết nối.
 
 ## Đóng góp
@@ -351,4 +350,4 @@ Tham gia cộng đồng Paradev để được trợ giúp, chia sẻ phản h�
 
 **Ứng dụng desktop miễn phí mãi mãi.** Chạy song song các agent trên máy của chính bạn sẽ không bao giờ phải trả tiền. Bất cứ thứ gì chúng tôi thu phí sẽ là dịch vụ tùy chọn nằm bên trên.
 
-Toàn bộ ứng dụng nằm trong repo này theo giấy phép [Elastic License 2.0](../LICENSE.md): cứ dùng, fork, chỉnh sửa, tự host cho đội ngũ của bạn. Điều duy nhất không được phép là đóng gói lại chính Paradev thành dịch vụ bạn bán cho người khác.
+Toàn bộ ứng dụng nằm trong repo này theo [Giấy phép MIT](../LICENSE.md): cứ dùng, fork, chỉnh sửa, tự host và phân phối lại.

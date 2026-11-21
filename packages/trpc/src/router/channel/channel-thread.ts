@@ -8,7 +8,7 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, inArray, isNull, lte, max, or, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { loadChannelAccess } from "./access";
 import { enrichMessages } from "./enrich";
 import {
@@ -58,11 +58,14 @@ async function latestReplySeq(rootId: string): Promise<number> {
 	return row?.seq ?? 0;
 }
 
-const followTarget = [channelThreadFollows.rootId, channelThreadFollows.userId];
+const followTarget = [
+	channelThreadFollows.rootId,
+	channelThreadFollows.actorId,
+];
 
 export const channelThreadRouter = {
 	/** Followed threads, unread first, each with its root and newest replies. */
-	list: protectedProcedure
+	list: personProcedure
 		.input(listChannelsSchema)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -87,19 +90,19 @@ export const channelThreadRouter = {
 					channelMembers,
 					and(
 						eq(channelMembers.channelId, channels.id),
-						eq(channelMembers.userId, userId),
+						eq(channelMembers.actorId, userId),
 					),
 				)
 				.where(
 					and(
-						eq(channelThreadFollows.userId, userId),
+						eq(channelThreadFollows.actorId, userId),
 						eq(channelThreadFollows.following, true),
 						eq(channels.organizationId, input.organizationId),
 						isNull(channels.archivedAt),
 						sql`${channelMessages.replyCount} > 0`,
 						or(
 							eq(channels.visibility, "public"),
-							sql`${channelMembers.userId} is not null`,
+							sql`${channelMembers.actorId} is not null`,
 						),
 					),
 				)
@@ -151,7 +154,7 @@ export const channelThreadRouter = {
 		}),
 
 	/** Moves a followed thread's read point forward; without `seq`, to the newest reply. */
-	markRead: protectedProcedure
+	markRead: personProcedure
 		.input(markThreadReadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -166,7 +169,7 @@ export const channelThreadRouter = {
 				.where(
 					and(
 						eq(channelThreadFollows.rootId, root.id),
-						eq(channelThreadFollows.userId, userId),
+						eq(channelThreadFollows.actorId, userId),
 						eq(channelThreadFollows.following, true),
 					),
 				)
@@ -184,7 +187,7 @@ export const channelThreadRouter = {
 		}),
 
 	/** Makes a reply the first unread one, and follows the thread. */
-	markUnread: protectedProcedure
+	markUnread: personProcedure
 		.input(messageIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -206,7 +209,7 @@ export const channelThreadRouter = {
 						eq(channelMessages.threadRootId, root.id),
 						isNull(channelMessages.deletedAt),
 						lte(channelMessages.seq, reply.seq),
-						sql`${channelMessages.authorUserId} is distinct from ${userId}`,
+						sql`${channelMessages.authorId} is distinct from ${userId}`,
 					),
 				);
 			const lastReadSeq = Math.max((other?.seq ?? reply.seq) - 1, 0);
@@ -214,7 +217,7 @@ export const channelThreadRouter = {
 				.insert(channelThreadFollows)
 				.values({
 					rootId: root.id,
-					userId,
+					actorId: userId,
 					channelId: root.channelId,
 					lastReadSeq,
 				})
@@ -232,7 +235,7 @@ export const channelThreadRouter = {
 		}),
 
 	/** Following marks the thread read, so only replies after it are new. */
-	follow: protectedProcedure
+	follow: personProcedure
 		.input(followThreadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -245,7 +248,7 @@ export const channelThreadRouter = {
 				.insert(channelThreadFollows)
 				.values({
 					rootId: root.id,
-					userId,
+					actorId: userId,
 					channelId: root.channelId,
 					following: input.following,
 					lastReadSeq,

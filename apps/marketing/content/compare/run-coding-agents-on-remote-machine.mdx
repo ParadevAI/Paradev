@@ -1,8 +1,8 @@
 ---
 title: "How to Run Coding Agents on a Remote Machine or Always-On Host (2026)"
-description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, and keep them working when your laptop closes."
+description: "Run Claude Code, Codex, and other coding agents on a remote Linux server, shared host, or Mac mini, keep them working when your laptop closes, and review and preview their changes from your laptop."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-15
 type: "tutorial"
 competitors:
   - vs-code
@@ -26,6 +26,8 @@ keywords:
 To run coding agents on a remote machine, put the agents and the repo on an always-on host (a Linux server, a cloud VM, or a Mac mini) and use your laptop only to prompt, review, and preview. Paradev has this built in: turn on Remote Access on a macOS or Linux machine, and it becomes a host in the same app as your laptop. Each agent gets its own worktree there, and you reach its terminals, diffs, and ports from the desktop app, the CLI, or the iPhone and iPad app, with no SSH setup.
 
 The agents' own remote features still work on a Paradev host. Paradev runs the real `claude` and `codex` CLIs in real terminals, so Claude Code Remote Control (`/remote-control`) can follow a session on that host from the Claude app, and `codex cloud exec` can hand a task to Codex cloud. Use Paradev to run and track several agents across machines, and the agent's own feature when you want its app or its cloud. Other options are VS Code Remote-SSH, SSH plus tmux over Tailscale, and managed cloud agents such as Codex cloud or Cursor Cloud Agents. Pick by where you want the agent to run and how many agents you need to keep track of at once.
+
+To review and preview a remote agent's changes from your laptop in Paradev, open the remote workspace. Its **Changes** pane shows the diff from the host. The app forwards the ports it detects, so `localhost:3000` on your laptop reaches the dev server on the host. [Review and preview details](#how-do-i-review-and-preview-an-agent-s-changes-on-a-remote-machine-from-my-laptop).
 
 This guide answers the questions developers ask most about remote, always-on, and shared setups for parallel coding agents, with the tradeoffs of each option.
 
@@ -52,7 +54,7 @@ superset ws create --host <host-id> --project <project-id> \
   --name fix-login-bug --branch fix/login-bug --agent claude --prompt "Fix the login redirect bug"
 ```
 
-Remote Access is a Pro feature. See [Remote Access](https://docs.superset.sh/remote-access).
+Remote Access is a Pro feature. See [Remote Access](https://docs.paradev.com/remote-access).
 
 ## How do I control coding agents on a remote Linux server from my Mac?
 
@@ -72,7 +74,9 @@ export SUPERSET_API_KEY=sk_live_…
 superset start --daemon --org <id|slug|name>
 ```
 
-The host launches whichever agents are on its `PATH`: the docs list Claude Code, Codex, Cursor Agent, Amp, Gemini CLI, and OpenCode. The host also needs `git` and `gh`. The Mac then sees the server under **Other devices** in the Device filter. Details: [Host Server](https://docs.superset.sh/cli/host-server).
+The host launches whichever agents are on its `PATH`: the docs list Claude Code, Codex, Cursor Agent, Amp, Gemini CLI, and OpenCode. The host also needs `git` and `gh`. The Mac then sees the server under **Other devices** in the Device filter. Details: [Host Server](https://docs.paradev.com/cli/host-server).
+
+If the server is a VM in your own cloud account, follow [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud). The host binds to 127.0.0.1 and connects out to the relay, so the server needs no inbound ports. Repos and agent sign-ins stay on that server, and you open it from the desktop or phone app. It needs a paid plan.
 
 ## How do I keep coding agents working when I close my laptop?
 
@@ -93,7 +97,7 @@ KillMode=process
 
 Keep `KillMode=process`; other modes stop every terminal and agent when the service restarts. Add `--auto-update` to a daemon start if you want the host to update itself.
 
-You can then check on agents from your laptop when it wakes, or from [Paradev for iPhone and iPad](/blog/superset-mobile) (Pro, iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.superset.sh/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
+You can then check on agents from your laptop when it wakes, or from [Paradev for iPhone and iPad](/blog/superset-mobile) (Pro, iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.paradev.com/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
 
 ## Can I use Claude Code Remote Control or Codex cloud on a Paradev host?
 
@@ -115,7 +119,7 @@ What Paradev adds for a shared host:
 - **Access per host.** When a host first comes online, only the person who started it can see it. Add teammates in **Settings → Hosts → Add member**; owners can promote or remove members.
 - **One worktree per workspace.** Each workspace gets its own branch, directory, terminals, and port list.
 - **Know whose work is whose.** The Workspaces page filters by who created each workspace, and tags stay with the user who applied them.
-- **Ports.** Paradev detects the ports each workspace listens on but does not assign port ranges. If several agents run dev servers, reserve ports in a [setup script](https://docs.superset.sh/ports).
+- **Ports.** Paradev detects the ports each workspace listens on but does not assign port ranges. If several agents run dev servers, reserve ports in a [setup script](https://docs.paradev.com/ports).
 
 Paradev's docs recommend a **dedicated machine** for this, provisioned with only the repos and credentials you mean to share, not your personal workstation. Anything the host service can reach becomes reachable by clients you grant access to.
 
@@ -132,18 +136,18 @@ Laptops are the cheapest start, a shared host gives the most compute per dollar 
 | Credentials | Spread across laptops | On one box you control | With the provider |
 | Main risk | Agents slow the machine you work on | Resource contention, single point of failure | Idle bills, provider limits |
 
-A common path for a small team: start on laptops, then move long-running agent work to one shared host once people want agents to run overnight or need more cores. Paradev covers all three columns with the same app. A laptop and a shared host are both just devices in the list, and Paradev cloud workspaces run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected.
+A common path for a small team: start on laptops, then move long-running agent work to one shared host once people want agents to run overnight or need more cores. Paradev covers all three columns with the same app. A laptop and a shared host are both just devices in the list, a shared host can be a server in your own cloud account, and Paradev cloud workspaces each get their own cloud sandbox and work from desktop, iPhone, and iPad without keeping your own computer connected.
 
 ## How do I review and preview an agent's changes on a remote machine from my laptop?
 
-Review the diff where the code lives, and forward the dev server's port to your laptop so `localhost` works.
+Review the diff where the code lives, and forward the dev server's port to your laptop so `localhost` works. Paradev does both in one app: the **Changes** pane of a remote workspace shows the diff from the host, and the app forwards the ports that workspace started to your machine.
 
 - **VS Code Remote-SSH** shows the remote diff in Source Control and forwards ports over the SSH tunnel.
 - **Plain SSH:** `ssh -N -L 3000:localhost:3000 user@remote-host`, then open `http://localhost:3000`.
 - **Tailscale:** `tailscale serve 3000` on the host, then open the URL it prints. This keeps the port inside your tailnet.
 - **Codespaces** forwards ports from its cloud environment the same way.
 
-In Paradev, open the remote workspace and its **Changes** pane shows the agent's diff from the host. When you select a remote workspace, the app forwards each port that workspace started to the same port on your machine, so `localhost:3000` reaches the dev server on the host. Open it in the [in-app browser pane](https://docs.superset.sh/browser) next to the diff, or in your own browser. If the port is busy locally, choose **Use another port**. Limits: the host needs host-service 1.26 or newer, only TCP is forwarded, and other services on the host stay unreachable. Details: [Ports on a remote host](https://docs.superset.sh/remote-access#ports-on-a-remote-host).
+In Paradev, open the remote workspace and its **Changes** pane shows the agent's diff from the host. When you select a remote workspace, the app forwards each port that workspace started to the same port on your machine, so `localhost:3000` reaches the dev server on the host. Open it in the [in-app browser pane](https://docs.paradev.com/browser) next to the diff, or in your own browser. If the port is busy locally, choose **Use another port**. Limits: the host needs host-service 1.26 or newer, only TCP is forwarded, and other services on the host stay unreachable. Details: [Ports on a remote host](https://docs.paradev.com/remote-access#ports-on-a-remote-host).
 
 Do not make a dev server public just to preview it. A forwarded port carries your cookies and auth headers, so treat it like the remote service it is.
 
@@ -177,7 +181,7 @@ No. Paradev routes terminals, diffs, and forwarded ports through the Paradev rel
 
 ### Are Paradev cloud workspaces available?
 
-Yes. Cloud workspaces run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected. Remote Access to your own machines is a separate option on Pro.
+Yes, on the Team and Ultra plans. [Cloud workspaces](/cloud) run in a cloud sandbox that Paradev runs for you, and they work from desktop, iPhone, and iPad without keeping your own computer connected. You start one from an environment with your GitHub repos, variables, and region. Remote Access to your own machines, and Bring Your Own Cloud on your own Linux server, are separate options.
 
 ### Do Git worktrees isolate agents on a shared machine?
 

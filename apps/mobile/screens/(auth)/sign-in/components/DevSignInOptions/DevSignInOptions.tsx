@@ -56,7 +56,7 @@ export function DevSignInOptions() {
 		}
 	};
 
-	// .superset/setup.sh (local) or setup.cloud.sh (cloud sandbox) mints a
+	// .paradev/setup.sh (local) or setup.cloud.sh (cloud sandbox) mints a
 	// one-time token redeemable for the real developer's/creator's own session
 	// (seed-local-mobile-token.ts, seed-cloud-mobile-token.ts) and bakes it
 	// into this build's env. Redeem it the moment this screen appears —

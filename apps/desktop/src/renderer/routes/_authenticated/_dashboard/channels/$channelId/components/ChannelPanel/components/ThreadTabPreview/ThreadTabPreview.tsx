@@ -23,7 +23,7 @@ export function ThreadTabPreview({
 		{ staleTime: PREVIEW_STALE_MS, retry: false },
 	);
 	const root = data?.root;
-	const author = root?.authorUserId ? peopleById.get(root.authorUserId) : null;
+	const author = root?.authorId ? peopleById.get(root.authorId) : null;
 	return (
 		<TabPreviewContent
 			title={label}

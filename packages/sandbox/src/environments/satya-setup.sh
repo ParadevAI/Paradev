@@ -17,6 +17,17 @@ CONFIG_DIR="$HOME/code/config"
 # there too, so the dev-stack scripts below take the checkout as their cwd.
 WORKSPACE="$(pwd)"
 
+# A snapshot keeps every block the root disk ever wrote, even after a delete,
+# so download caches go to tmpfs. The VM mounts a 64 MB /dev/shm until the
+# desktop grows it. Bun's own cache stays on disk: node_modules is hardlinked
+# into it.
+sudo mount -o remount,size=50% /dev/shm 2>/dev/null || true
+if ! CACHE_DIR="$(mktemp -d /dev/shm/satya-setup.XXXXXX 2>/dev/null)"; then
+  CACHE_DIR="$(mktemp -d)"
+  log "no /dev/shm; download caches go to $CACHE_DIR on disk"
+fi
+trap 'sudo rm -rf "$CACHE_DIR"' EXIT
+
 export DEBIAN_FRONTEND=noninteractive
 # The bundle writes /etc/zsh/zprofile before zsh is installed, and dpkg asks
 # about a config file it did not create; keep the bundle's. On failure, logs
@@ -34,18 +45,20 @@ sudo -E apt-get update -qq
 # The image carries the toolchain; these are the internal team's shell tools.
 apt_install --no-install-recommends zsh fzf silversearcher-ag neovim postgresql-client
 log "shell tooling installed"
+# An image built before clang-16 moved into it lacks the compiler the desktop's native build needs.
+command -v clang++-16 >/dev/null || { apt_install --no-install-recommends clang-16; log "clang-16 installed"; }
 # neonctl: a workspace branches the database for itself on its first start,
-# the same way .superset/setup.sh does on a laptop.
-sudo npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }
+# the same way .paradev/setup.sh does on a laptop.
+sudo npm_config_cache="$CACHE_DIR/npm" npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }
 
 # vercel, wrangler, eas: day-to-day deploy/build CLIs (Vercel projects,
 # Cloudflare Workers apps, Expo mobile) an engineer reaches for directly
 # instead of waiting on CI. agent-device drives an EAS simulator.
-sudo npm install -g vercel wrangler eas-cli agent-device >/dev/null 2>&1 && log "vercel $(vercel --version 2>/dev/null), wrangler $(wrangler --version 2>/dev/null), eas $(eas --version 2>/dev/null), agent-device $(agent-device --version 2>/dev/null) installed" || { log "vercel/wrangler/eas-cli/agent-device install failed"; exit 1; }
+sudo npm_config_cache="$CACHE_DIR/npm" npm install -g vercel wrangler eas-cli agent-device >/dev/null 2>&1 && log "vercel $(vercel --version 2>/dev/null), wrangler $(wrangler --version 2>/dev/null), eas $(eas --version 2>/dev/null), agent-device $(agent-device --version 2>/dev/null) installed" || { log "vercel/wrangler/eas-cli/agent-device install failed"; exit 1; }
 
 # ntn (Notion), stripe: each reads its credential from the environment's
 # variables, NOTION_API_TOKEN and STRIPE_API_KEY.
-sudo npm install -g ntn >/dev/null 2>&1 && log "ntn $(ntn --version 2>/dev/null) installed" || { log "ntn install failed"; exit 1; }
+sudo npm_config_cache="$CACHE_DIR/npm" npm install -g ntn >/dev/null 2>&1 && log "ntn $(ntn --version 2>/dev/null) installed" || { log "ntn install failed"; exit 1; }
 curl -fsSL https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee /usr/share/keyrings/stripe.gpg >/dev/null
 echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee /etc/apt/sources.list.d/stripe.list >/dev/null
 sudo -E apt-get update -qq
@@ -53,7 +66,7 @@ apt_install stripe
 log "stripe $(stripe --version 2>/dev/null) installed"
 
 # The dev stack and the workspace's database are the repository's own
-# .superset/setup.cloud.sh and .superset/dev-stack.cloud.sh, run by the start
+# .paradev/setup.cloud.sh and .paradev/dev-stack.cloud.sh, run by the start
 # hook. This environment only adds what is not in the repository: the shell
 # tooling above, and neonctl, which setup.cloud.sh calls.
 
@@ -100,8 +113,11 @@ fi
 
 if [ -d "$WORKSPACE/.git" ] && [ ! -d "$WORKSPACE/node_modules" ]; then
   log "installing dependencies (several minutes)"
-  if (cd "$WORKSPACE" && bun install --frozen-lockfile >/tmp/bun-install.log 2>&1); then
-    rm -rf "$HOME/.cache/electron"
+  if (cd "$WORKSPACE" &&
+    electron_config_cache="$CACHE_DIR/electron" ELECTRON_CACHE="$CACHE_DIR/electron" \
+    npm_config_devdir="$CACHE_DIR/node-gyp" \
+    bun install --frozen-lockfile >/tmp/bun-install.log 2>&1); then
+    rm -rf "$HOME/.cache/electron" "$HOME/.cache/node-gyp" "$HOME/.electron-gyp"
     log "dependencies installed"
   else
     log "bun install failed:"

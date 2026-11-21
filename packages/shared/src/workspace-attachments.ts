@@ -12,8 +12,16 @@
  * must go through these helpers rather than reimplementing them.
  */
 
-/** Worktree-relative directory attachments are written into. */
-export const WORKSPACE_ATTACHMENTS_DIR = ".superset/attachments";
+/**
+ * Worktree-relative directory for files the app writes for agents
+ * (attachments, task prompts). Every writer drops a `.gitignore` of `*` in
+ * it, so these never show up as changes in the repo.
+ */
+export const WORKSPACE_ATTACHMENTS_DIR = ".paradev/attachments";
+export const WORKSPACE_ATTACHMENTS_GITIGNORE = "*\n";
+
+/** Where attachments went before the rename; messages still reference it. */
+export const LEGACY_WORKSPACE_ATTACHMENTS_DIR = ".superset/attachments";
 
 /**
  * Reduce an untrusted filename (clipboard, picker, upload) to a shell- and

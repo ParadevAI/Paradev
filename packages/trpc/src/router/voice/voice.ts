@@ -28,7 +28,7 @@ import {
 	TranscriptionError,
 	transcribeAudio,
 } from "../../lib/openai/transcription";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { dictationAudioExtension, transcribeSchema } from "./schema";
 
@@ -84,7 +84,7 @@ export const voiceRouter = {
 	 * API key never leaves the server and the tool list cannot drift from
 	 * what the device executes.
 	 */
-	createSession: protectedProcedure
+	createSession: personProcedure
 		.input(voiceSessionSettingsSchema.optional())
 		.mutation(async ({ ctx, input }) => {
 			if (!env.SERVER_OPENAI_API_KEY) {
@@ -154,7 +154,7 @@ export const voiceRouter = {
 			}
 		}),
 
-	transcribe: protectedProcedure
+	transcribe: personProcedure
 		.input(transcribeSchema)
 		.mutation(async ({ ctx, input }) => {
 			if (!env.SERVER_OPENAI_API_KEY) {

@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Luego ejecuta la configuración de desarrollo desde el terminal de ese espacio de trabajo:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Consulta [**DEVELOPMENT.md**](../DEVELOPMENT.md) para la guía completa: qué ha
 
 ## Configuración
 
-Configura los scripts de setup, teardown y run de los espacios de trabajo en `.superset/config.json`. Consulta la [documentación completa](https://docs.paradev.com/setup-teardown-scripts).
+Configura los scripts de setup, teardown y run de los espacios de trabajo en `.paradev/config.json`. Consulta la [documentación completa](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -321,7 +321,6 @@ Los atajos de teclado se pueden personalizar en **Configuración → Atajos de t
 
 ## Privado por defecto
 
-- **Código fuente disponible**: todo el código está en GitHub bajo la Elastic License 2.0 (ELv2).
 - **Conexiones explícitas**: tú eliges qué agentes, proveedores e integraciones conectar.
 
 ## Contribuir
@@ -351,4 +350,4 @@ Los atajos de teclado se pueden personalizar en **Configuración → Atajos de t
 
 **La app de escritorio es gratis para siempre.** Ejecutar agentes en paralelo en tu propia máquina nunca requerirá pago. Todo lo que cobremos será un servicio opcional adicional.
 
-Toda la app está en este repositorio bajo la [Elastic License 2.0](../LICENSE.md): úsala, haz un fork, modifícala, autoalójala para tu equipo. Lo único que queda fuera es reempaquetar el propio Paradev como un servicio que vendas a terceros.
+Toda la app está en este repositorio bajo la [licencia MIT](../LICENSE.md): úsala, haz un fork, modifícala, autoalójala y redistribúyela.

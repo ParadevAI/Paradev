@@ -18,7 +18,9 @@ describe("linkPreview.get", () => {
 	])("answers %s with an empty preview instead of an error", async (url) => {
 		expect(await callerFor(true).get({ url })).toEqual({
 			title: null,
+			description: null,
 			iconDataUrl: null,
+			image: null,
 		});
 	});
 

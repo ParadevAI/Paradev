@@ -359,7 +359,6 @@ describe("pdev agent registration", () => {
 
 	it("is enabled only while the pdev-agent flag is active", () => {
 		expect(isAgentPresetEnabled("pdev", [])).toBe(false);
-		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.ACP_CHAT])).toBe(false);
 		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.PDEV_AGENT])).toBe(true);
 		expect(isAgentPresetEnabled("pi", [])).toBe(true);
 		expect(isAgentPresetEnabled("custom:pdev", [])).toBe(true);

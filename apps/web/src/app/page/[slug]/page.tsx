@@ -131,35 +131,44 @@ export default async function PublishedPage({
 
 	const session = await getSession();
 
-	const publicView = async () => {
+	if (!session) {
 		const shared = await pullPublicPage(slug);
 		return shared ? (
 			<PublicPageView
 				pageId={shared.id}
 				title={shared.title}
 				viewUrl={shared.viewUrl}
+				version={shared.version}
 				slug={slug}
-				signedIn={Boolean(session)}
+				signedIn={false}
 			/>
-		) : null;
-	};
-
-	if (!session) {
-		return (await publicView()) ?? <PageUnavailable slug={slug} />;
+		) : (
+			<PageUnavailable slug={slug} />
+		);
 	}
 
 	let page: Awaited<ReturnType<typeof pullPage>>;
 	try {
 		page = await pullPage(slug, requestedVersion);
 	} catch (error) {
-		if (!isNotFound(error) && !isForbidden(error)) throw error;
-		const view = requestedVersion === undefined ? await publicView() : null;
-		if (view) return view;
 		if (isNotFound(error)) notFound();
-		if (error instanceof TRPCClientError) {
+		if (isForbidden(error) && error instanceof TRPCClientError) {
 			return <WrongOrganization message={error.message} />;
 		}
 		throw error;
+	}
+
+	if (page.member === false) {
+		return (
+			<PublicPageView
+				pageId={page.id}
+				title={page.title}
+				viewUrl={page.viewUrl}
+				version={page.version}
+				slug={slug}
+				signedIn
+			/>
+		);
 	}
 
 	const [versions, access] = await Promise.all([
@@ -190,6 +199,7 @@ export default async function PublishedPage({
 						sharedVersion: page.sharedVersion,
 						latestVersion: page.latestVersion,
 						servedVersion: page.servedVersion,
+						canEdit: access.canEdit,
 					}}
 					versions={versions}
 					currentUserId={session.user.id}
@@ -208,6 +218,8 @@ export default async function PublishedPage({
 							pageId={page.id}
 							src={page.viewUrl}
 							title={page.title}
+							version={page.version}
+							viewerId={session.user.id}
 							previewing={
 								page.servedVersion !== null &&
 								page.version !== page.servedVersion

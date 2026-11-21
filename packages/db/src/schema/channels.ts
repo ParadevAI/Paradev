@@ -14,15 +14,18 @@ import {
 	uuid,
 } from "drizzle-orm/pg-core";
 
+import { actors } from "./actors";
 import { organizations, users } from "./auth";
 import {
 	channelBroadcastValues,
+	channelKindValues,
 	channelMemberRoleValues,
+	channelMessageSubtypeValues,
 	channelNotifyValues,
 	channelVisibilityValues,
 	dockBounceValues,
 } from "./enums";
-import { tasks } from "./schema";
+import { taskProjects } from "./schema";
 
 export const channelVisibility = pgEnum(
 	"channel_visibility",
@@ -38,9 +41,15 @@ export const channelBroadcast = pgEnum(
 	channelBroadcastValues,
 );
 export const dockBounce = pgEnum("dock_bounce", dockBounceValues);
+export const channelKind = pgEnum("channel_kind", channelKindValues);
+export const channelMessageSubtype = pgEnum(
+	"channel_message_subtype",
+	channelMessageSubtypeValues,
+);
 
 /**
- * A conversation for a group of people in an organization. Public channels
+ * A conversation for a group of people and Devs in an organization, or a
+ * person's DM with a Dev (`kind: dm`, always private). Public channels
  * are readable and joinable by every member of the organization; private
  * ones only by their members. `lastSeq` is the per-channel message counter:
  * a send takes the next value under the row lock, so messages in a channel
@@ -55,6 +64,7 @@ export const channels = pgTable(
 			.references(() => organizations.id, { onDelete: "cascade" }),
 		name: text().notNull(),
 		description: text(),
+		kind: channelKind().notNull().default("channel"),
 		visibility: channelVisibility().notNull().default("public"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
@@ -62,6 +72,13 @@ export const channels = pgTable(
 		lastSeq: bigint("last_seq", { mode: "number" }).notNull().default(0),
 		lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
 		archivedAt: timestamp("archived_at", { withTimezone: true }),
+		/** The project whose tasks the channel shows; several channels can share one. */
+		taskProjectId: uuid("task_project_id").references(
+			(): AnyPgColumn => taskProjects.id,
+			{ onDelete: "set null" },
+		),
+		/** A Linear project whose issues the channel shows instead; Linear holds the issues. */
+		linearProjectId: text("linear_project_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -71,9 +88,10 @@ export const channels = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(t) => [
+		index("channels_task_project_idx").on(t.taskProjectId),
 		uniqueIndex("channels_org_name_unique")
 			.on(t.organizationId, sql`lower(${t.name})`)
-			.where(sql`${t.archivedAt} IS NULL`),
+			.where(sql`${t.archivedAt} IS NULL AND ${t.kind} = 'channel'`),
 		index("channels_organization_idx").on(t.organizationId),
 	],
 );
@@ -87,9 +105,9 @@ export const channelMembers = pgTable(
 		channelId: uuid("channel_id")
 			.notNull()
 			.references(() => channels.id, { onDelete: "cascade" }),
-		userId: uuid("user_id")
+		actorId: uuid("actor_id")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => actors.id, { onDelete: "cascade" }),
 		role: channelMemberRole().notNull().default("member"),
 		/** Null follows the person's default in `channel_notification_prefs`. */
 		notify: channelNotify(),
@@ -103,8 +121,8 @@ export const channelMembers = pgTable(
 			.defaultNow(),
 	},
 	(t) => [
-		primaryKey({ columns: [t.channelId, t.userId] }),
-		index("channel_members_user_idx").on(t.userId),
+		primaryKey({ columns: [t.channelId, t.actorId] }),
+		index("channel_members_actor_idx").on(t.actorId),
 	],
 );
 
@@ -115,7 +133,8 @@ export type SelectChannelMember = typeof channelMembers.$inferSelect;
  * A message in a channel. A reply carries `threadRootId`; the root keeps the
  * thread's reply count and last reply time so the timeline can draw the
  * replies line without counting. Deleting keeps the row (body cleared) so a
- * thread under a deleted message survives.
+ * thread under a deleted message survives. A `subtype` row records the
+ * author joining or leaving; `inviterId` is who added or removed them.
  */
 export const channelMessages = pgTable(
 	"channel_messages",
@@ -129,11 +148,15 @@ export const channelMessages = pgTable(
 			(): AnyPgColumn => channelMessages.id,
 			{ onDelete: "cascade" },
 		),
-		authorUserId: uuid("author_user_id").references(() => users.id, {
+		authorId: uuid("author_id").references(() => actors.id, {
 			onDelete: "set null",
 		}),
 		body: text().notNull(),
-		mentionedUserIds: uuid("mentioned_user_ids")
+		subtype: channelMessageSubtype(),
+		inviterId: uuid("inviter_id").references(() => actors.id, {
+			onDelete: "set null",
+		}),
+		mentionedIds: uuid("mentioned_ids")
 			.array()
 			.notNull()
 			.default(sql`'{}'::uuid[]`),
@@ -151,7 +174,7 @@ export const channelMessages = pgTable(
 		uniqueIndex("channel_messages_channel_seq_unique").on(t.channelId, t.seq),
 		index("channel_messages_thread_idx").on(t.threadRootId, t.seq),
 		uniqueIndex("channel_messages_author_client_unique")
-			.on(t.authorUserId, t.clientId)
+			.on(t.authorId, t.clientId)
 			.where(sql`${t.clientId} IS NOT NULL`),
 	],
 );
@@ -159,22 +182,22 @@ export const channelMessages = pgTable(
 export type InsertChannelMessage = typeof channelMessages.$inferInsert;
 export type SelectChannelMessage = typeof channelMessages.$inferSelect;
 
-/** One person's emoji reaction to a message, by Slack shortcode (`+1::skin-tone-3`). */
+/** A person's or Dev's emoji reaction to a message, by Slack shortcode (`+1::skin-tone-3`). */
 export const channelMessageReactions = pgTable(
 	"channel_message_reactions",
 	{
 		messageId: uuid("message_id")
 			.notNull()
 			.references(() => channelMessages.id, { onDelete: "cascade" }),
-		userId: uuid("user_id")
+		actorId: uuid("actor_id")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => actors.id, { onDelete: "cascade" }),
 		emoji: text().notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
 	},
-	(t) => [primaryKey({ columns: [t.messageId, t.userId, t.emoji] })],
+	(t) => [primaryKey({ columns: [t.messageId, t.actorId, t.emoji] })],
 );
 
 export type SelectChannelMessageReaction =
@@ -192,9 +215,9 @@ export const channelThreadFollows = pgTable(
 		rootId: uuid("root_id")
 			.notNull()
 			.references(() => channelMessages.id, { onDelete: "cascade" }),
-		userId: uuid("user_id")
+		actorId: uuid("actor_id")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => actors.id, { onDelete: "cascade" }),
 		channelId: uuid("channel_id")
 			.notNull()
 			.references(() => channels.id, { onDelete: "cascade" }),
@@ -208,30 +231,13 @@ export const channelThreadFollows = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(t) => [
-		primaryKey({ columns: [t.rootId, t.userId] }),
-		index("channel_thread_follows_user_idx").on(t.userId, t.channelId),
+		primaryKey({ columns: [t.rootId, t.actorId] }),
+		index("channel_thread_follows_actor_idx").on(t.actorId, t.channelId),
 	],
 );
 
 export type SelectChannelThreadFollow =
 	typeof channelThreadFollows.$inferSelect;
-
-/** A task's channel: at most one, so adding a task to a channel moves it from any other. */
-export const channelTasks = pgTable(
-	"channel_tasks",
-	{
-		taskId: uuid("task_id")
-			.primaryKey()
-			.references(() => tasks.id, { onDelete: "cascade" }),
-		channelId: uuid("channel_id")
-			.notNull()
-			.references(() => channels.id, { onDelete: "cascade" }),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.notNull()
-			.defaultNow(),
-	},
-	(t) => [index("channel_tasks_channel_id_idx").on(t.channelId)],
-);
 
 /**
  * A person's channel notification settings, the ones Slack keeps in

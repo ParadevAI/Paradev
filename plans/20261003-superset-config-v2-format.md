@@ -374,7 +374,7 @@ What the tidying changes:
 
 - **`[install]`** holds `bun install`, so the cloud base image caches dependencies. Today `setup.sh` runs it on every new local worktree, and `setup.cloud.sh` on every boot.
 - **The dev stack** moves from `setup.cloud` into a cloud-only version of the `dev` process, so Superset tracks it and stops it on archive.
-- **`archive.sh`** is `teardown.sh` without the steps Superset now handles: killing terminal daemons, freeing the port base, removing `superset-dev-data`. It keeps deleting the Neon branch.
+- **`archive.sh`** is `teardown.sh` without the steps Superset now handles: killing terminal daemons, freeing the port base, removing `paradev-dev-data`. It keeps deleting the Neon branch.
 - **`archive.cloud.sh`** only deletes the Neon branch. `setup.cloud.sh` re-creates it on Undo.
 - **`[ports]`** replaces `ports.json`. The other 10 ports follow the same pattern. `setup.sh` reads `SUPERSET_PORT_*` instead of calling `allocate_port_base`.
 

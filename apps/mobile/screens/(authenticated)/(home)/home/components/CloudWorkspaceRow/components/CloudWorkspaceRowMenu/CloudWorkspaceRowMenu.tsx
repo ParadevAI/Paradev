@@ -1,3 +1,4 @@
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { itemFromCloudRow } from "@/hooks/useCloudWorkspaceItems";
@@ -31,7 +32,7 @@ export function CloudWorkspaceRowMenu({
 	);
 	return (
 		<WorkspaceRowMenu
-			canRename={row.status === "ready"}
+			canRename={isLiveCloudWorkspaceStatus(row.status)}
 			canDelete={row.status !== "provisioning"}
 			isCloud
 			isUnread={isUnread}
@@ -46,6 +47,7 @@ export function CloudWorkspaceRowMenu({
 					params: { id: row.id },
 				})
 			}
+			link={{ href: `/workspace/${row.id}`, onCopied }}
 		>
 			{children}
 		</WorkspaceRowMenu>

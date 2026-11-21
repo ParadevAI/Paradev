@@ -2,7 +2,7 @@
 title: "How to Run Multiple OpenCode Agents in Parallel"
 description: "Run OpenCode tasks in separate Git worktrees with concrete setup commands, bounded prompts, and checks for independent edits and safe integration."
 date: 2026-07-13
-lastUpdated: 2026-09-23
+lastUpdated: 2026-11-13
 type: "tutorial"
 competitors:
   - opencode
@@ -14,6 +14,7 @@ keywords:
   - opencode agent teams
   - opencode worktrees
   - opencode multi session
+  - opencode background subagents
 ---
 
 Run multiple OpenCode tasks in parallel by giving each task a separate Git worktree and branch, then launching OpenCode from that directory. Review each diff and test the combined changes before merging. Subagents and extra sessions help divide work, but you should verify their working directories rather than assume they isolate edits.
@@ -28,6 +29,8 @@ OpenCode's [agent documentation](https://opencode.ai/docs/agents/) distinguishes
 | Delegation to subagents | Depends on execution setup | Actual working directory and tool permissions |
 | One OpenCode process per Git worktree | Separate checkout per task | Branch, dependencies, preview ports, and integration tests |
 | Paradev workspaces with OpenCode | Worktree and terminal per independent task | Same checks, with workspace management and diff review in the app |
+
+Since [OpenCode 2.3.0](https://github.com/sst/opencode/releases/tag/v2.3.0) (November 13, 2026), subagents always run in the background. A subagent call returns its session ID at once, the subagent keeps working, and it reports to the parent session when it goes idle. You can keep prompting the parent while several subagents run. The release notes do not say that each subagent gets its own worktree, so check where a subagent edits before you let several change code at once. Subagents fit research and review; tasks that edit code are safer in their own worktree.
 
 Community plugins may add coordination. Evaluate the specific plugin's current documentation, permissions, and maintenance before relying on its isolation guarantees.
 
@@ -68,7 +71,7 @@ Our [Git 2.52.0 isolation check](/parallel-coding-agents#a-reproducible-isolatio
 
 Inspect each task's diff and command output. Resolve dependencies between tasks before integrating them, then rerun the relevant checks on the combined branch. Record failures and manual corrections as well as successful runs.
 
-Manual worktrees can be enough for occasional parallel tasks. Paradev adds persistent terminals, workspace organization, and built-in diff review when tracking those tasks becomes repetitive. See [Paradev vs OpenCode](/compare/superset-vs-opencode) and the [three-task walkthrough](/blog/parallel-coding-agents-guide).
+Manual worktrees can be enough for occasional parallel tasks. Paradev adds persistent terminals, workspace organization, and built-in diff review when tracking those tasks becomes repetitive. Its [chat interface](https://docs.paradev.com/chat) can also show an OpenCode session as a chat. Paradev is open source under the MIT License. See [Paradev vs OpenCode](/compare/superset-vs-opencode) and the [three-task walkthrough](/blog/parallel-coding-agents-guide).
 
 ## Frequently Asked Questions
 
@@ -79,6 +82,10 @@ Yes. Give each independent task a separate workspace and use the agent you prefe
 ### Do OpenCode subagents guarantee isolated Git worktrees?
 
 Do not infer filesystem isolation from the agent role. Check the working directory and execution setup. For independent edits, use separate worktrees or another explicitly isolated environment.
+
+### Do OpenCode subagents run in parallel?
+
+Yes, since OpenCode 2.3.0. Subagents return right away, run in the background, and report back to the parent session when they go idle, so several can run at once. Check each subagent's working directory before you let it edit code.
 
 ### Do worktrees eliminate conflicts?
 

@@ -20,7 +20,7 @@ export function useChannelNotifyOptions() {
 		mentions: t({ message: "Just mentions" }),
 		none: t({ message: "Nothing" }),
 	};
-	const fallback = levels[prefs?.notify ?? "mentions"];
+	const fallback = levels[prefs?.notify ?? "all"];
 	const options: { value: ChannelNotifyOption; label: string }[] = [
 		{ value: "default", label: t({ message: `Default (${fallback})` }) },
 		{ value: "all", label: levels.all },

@@ -1,1 +1,1 @@
-export { CloudGlyph } from "./CloudGlyph";
+export { CloudGlyph, type CloudGlyphState } from "./CloudGlyph";
