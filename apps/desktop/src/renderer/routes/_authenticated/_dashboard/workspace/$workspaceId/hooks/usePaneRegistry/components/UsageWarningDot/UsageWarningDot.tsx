@@ -11,10 +11,17 @@ export function UsageWarningDot({
 	terminalId: string;
 }) {
 	const { t } = useLingui();
-	const { state, tightest } = useAccountUsage(workspaceId, terminalId);
-	if (state !== "ready" || !tightest || tightest.usedPercent < 70) return null;
+	const { binding, state, tightest } = useAccountUsage(workspaceId, terminalId);
+	if (state !== "ready" || !tightest) return null;
 	const percent = formatPercent(tightest.usedPercent / 100);
 	const label = t({ message: `Account usage: ${percent} used` });
+	if (binding?.agentId === "codex")
+		return (
+			<span className="shrink-0 text-[10px] tabular-nums" title={label}>
+				{percent}
+			</span>
+		);
+	if (tightest.usedPercent < 70) return null;
 	return (
 		<span
 			role="img"

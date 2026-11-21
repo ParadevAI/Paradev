@@ -11,6 +11,7 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import {
 	Circle,
 	Files,
@@ -64,6 +65,7 @@ import {
 	getDocument,
 	useSharedFileDocument,
 } from "../../state/fileDocumentStore";
+import { afterPresetTerminalStart } from "../../state/presetLaunches";
 import {
 	type BrowserPaneData,
 	type ChatPaneData,
@@ -220,6 +222,7 @@ export function usePaneRegistry({
 	const scrollToBottomShortcut = useHotkeyDisplay("SCROLL_TO_BOTTOM").text;
 	const workspaceTrpcUtils = workspaceTrpc.useUtils();
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 	const { mutate: killTerminalSession, isPending: isKillingTerminalSession } =
 		workspaceTrpc.terminal.killSession.useMutation({
 			onSuccess: () => {
@@ -554,7 +557,15 @@ export function usePaneRegistry({
 						}
 						clearWorkspaceRunTerminal(terminalId);
 						terminalRuntimeRegistry.dispose(terminalId);
-						killTerminalSessionSilently({ terminalId, workspaceId });
+						afterPresetTerminalStart(terminalId, () => {
+							if (
+								[store, ...(linkedStores ?? [])].some((candidate) =>
+									findTerminalPaneLocation(candidate.getState(), terminalId),
+								)
+							)
+								return;
+							killTerminalSessionSilently({ terminalId, workspaceId });
+						});
 					},
 					onAfterRemove: (pane) => {
 						terminalRuntimeRegistry.release(
@@ -612,16 +623,28 @@ export function usePaneRegistry({
 									toast.error(t({ message: "Copy failed" }));
 								});
 						};
-						const agentSessionIdOf = (ctx: RendererContext<PaneViewerData>) => {
+						const agentBindingOf = (ctx: RendererContext<PaneViewerData>) => {
 							const { terminalId } = ctx.pane.data as TerminalPaneData;
 							return queryClient
 								.getQueryData<TerminalAgentBinding[]>(
 									getTerminalAgentBindingsQueryKey(workspaceId),
 								)
-								?.find((binding) => binding.terminalId === terminalId)
-								?.agentSessionId;
+								?.find((binding) => binding.terminalId === terminalId);
 						};
+						const agentSessionIdOf = (ctx: RendererContext<PaneViewerData>) =>
+							agentBindingOf(ctx)?.agentSessionId;
 						const terminalActions: ContextMenuActionConfig<PaneViewerData>[] = [
+							{
+								key: "view-codex-usage",
+								label: t({ message: "View usage" }),
+								hidden: (ctx) => agentBindingOf(ctx)?.agentId !== "codex",
+								onSelect: () => {
+									void navigate({
+										to: "/settings/usage",
+										search: { workspaceId, agent: "codex" },
+									});
+								},
+							},
 							{
 								key: "copy",
 								label: t({ message: "Copy" }),
@@ -1205,6 +1228,7 @@ export function usePaneRegistry({
 			clearShortcut,
 			scrollToBottomShortcut,
 			killTerminalSession,
+			navigate,
 			killTerminalSessionSilently,
 			isKillingTerminalSession,
 			launcher,
