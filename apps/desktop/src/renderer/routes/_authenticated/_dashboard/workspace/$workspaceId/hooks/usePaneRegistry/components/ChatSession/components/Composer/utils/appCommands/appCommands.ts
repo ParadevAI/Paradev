@@ -23,7 +23,9 @@ import { FORK_TARGET_ARGS, parseForkTarget, parseSwitch } from "../commandArgs";
 export type AppCommandContext = {
 	newChat?: () => void;
 	openModelPicker?: () => void;
-	fast?: { on: boolean; set: (on: boolean) => void };
+	fast?:
+		| { on: boolean; set: (on: boolean) => void }
+		| { explainUnavailable: () => void };
 	plan?: { active: boolean; enter: () => void; leave: () => void };
 	fork?: {
 		targets: readonly ChatForkTarget[];
@@ -96,10 +98,17 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		description: msg({ message: "Turn Fast mode on or off" }),
 		hint: "[on|off]",
 		available: (context) => context.fast !== undefined,
+		listed: (context) =>
+			context.fast !== undefined && !("explainUnavailable" in context.fast),
 		run: (context, args) => {
-			const on = context.fast ? parseSwitch(args, context.fast.on) : null;
+			const fast = context.fast;
+			if (fast && "explainUnavailable" in fast) {
+				fast.explainUnavailable();
+				return "done";
+			}
+			const on = fast ? parseSwitch(args, fast.on) : null;
 			if (on === null) return "bad-args";
-			context.fast?.set(on);
+			fast?.set(on);
 			return "done";
 		},
 	},

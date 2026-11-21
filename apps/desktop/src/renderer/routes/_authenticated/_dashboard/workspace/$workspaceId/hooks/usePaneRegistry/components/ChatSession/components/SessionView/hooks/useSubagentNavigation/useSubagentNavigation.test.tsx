@@ -239,8 +239,10 @@ test("going back opens the parent subagent, then the main chat", () => {
 		}),
 	);
 	act(() => hook.result.current.openSubagent("subagent:c2"));
+	expect(hook.result.current.parentTitle).toBe(readme.title);
 	act(() => hook.result.current.goBack());
 	expect(hook.result.current.focusedId).toBe("subagent:c1");
+	expect(hook.result.current.parentTitle).toBeNull();
 	act(() => hook.result.current.goBack());
 	expect(hook.result.current.focusedId).toBeNull();
 });

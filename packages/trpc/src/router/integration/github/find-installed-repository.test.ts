@@ -1,18 +1,43 @@
 import { beforeEach, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
+import type { SelectGithubInstallation } from "@superset/db/schema";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../../test/stub";
 
 const ORG = "00000000-0000-4000-8000-000000000001";
-const acme = { id: "installation-acme", installationId: "1" };
-const globex = { id: "installation-globex", installationId: "2" };
-const repositories = [
-	{ id: "repo-widgets", fullName: "acme/widgets", installation: acme },
-	{ id: "repo-gadgets", fullName: "globex/gadgets", installation: globex },
-];
+const installation = (
+	id: string,
+	installationId: string,
+	accountLogin: string,
+): SelectGithubInstallation => ({
+	id,
+	organizationId: ORG,
+	connectedByUserId: "00000000-0000-4000-8000-000000000002",
+	installationId,
+	accountLogin,
+	accountType: "Organization",
+	permissions: null,
+	suspended: false,
+	suspendedAt: null,
+	lastSyncedAt: null,
+	createdAt: new Date("2026-11-01T00:00:00Z"),
+	updatedAt: new Date("2026-11-01T00:00:00Z"),
+});
+const acme = installation("installation-acme", "1", "acme");
+const globex = installation("installation-globex", "2", "globex");
+const widgets = {
+	id: "repo-widgets",
+	fullName: "acme/widgets",
+	installation: acme,
+};
+const gadgets = {
+	id: "repo-gadgets",
+	fullName: "globex/gadgets",
+	installation: globex,
+};
 
-let installed: typeof repositories = [];
+let installed: (typeof widgets)[] = [];
 let hasInstallation = true;
 const repositoryLookups: SQL[] = [];
 
@@ -35,7 +60,7 @@ beforeEach(() => {
 });
 
 test("a repository resolves to the installation of the GitHub account that owns it", async () => {
-	installed = [repositories[1]];
+	installed = [gadgets];
 	expect(await findInstalledRepository(ORG, "Globex/Gadgets")).toEqual({
 		installation: globex,
 		repo: { id: "repo-gadgets", fullName: "globex/gadgets" },
@@ -43,7 +68,7 @@ test("a repository resolves to the installation of the GitHub account that owns 
 });
 
 test("the lookup is scoped to the organization and matches the name case-insensitively", async () => {
-	installed = [repositories[1]];
+	installed = [gadgets];
 	await findInstalledRepository(ORG, "Globex/Gadgets");
 	const [where] = repositoryLookups;
 	if (!where) throw new Error("no repository lookup");

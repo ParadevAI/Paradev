@@ -103,6 +103,7 @@ test("a stopped or failed subagent disables the composer with the reason", () =>
 	expect(stopped.hook.result.current.target?.disabledReason).toBe(
 		"Explore stopped",
 	);
+	expect(stopped.hook.result.current.target?.blockedBy).toBe("stopped");
 	const failed = renderTarget({
 		...explore,
 		status: "failed",
@@ -113,6 +114,7 @@ test("a stopped or failed subagent disables the composer with the reason", () =>
 	expect(failed.hook.result.current.target?.disabledReason).toBe(
 		"Explore failed",
 	);
+	expect(failed.hook.result.current.target?.blockedBy).toBe("failed");
 	const resumable = renderTarget({
 		...explore,
 		status: "failed",
@@ -121,6 +123,7 @@ test("a stopped or failed subagent disables the composer with the reason", () =>
 		canStop: false,
 	});
 	expect(resumable.hook.result.current.target?.disabledReason).toBeUndefined();
+	expect(resumable.hook.result.current.target?.blockedBy).toBeUndefined();
 });
 
 test("a subagent without controls can't be messaged", () => {
@@ -135,7 +138,20 @@ test("a subagent without controls can't be messaged", () => {
 	expect(hook.result.current.target?.disabledReason).toBe(
 		"Explore can't be messaged",
 	);
+	expect(hook.result.current.target?.blockedBy).toBe("agent");
 	expect(hook.result.current.target?.onStop).toBeUndefined();
+});
+
+test("a finished subagent without controls is not blamed on the agent", () => {
+	const {
+		subagentStatus: _status,
+		canSteer: _steer,
+		canStop: _stop,
+		canBackground: _background,
+		...finished
+	} = explore;
+	const { hook } = renderTarget({ ...finished, status: "completed" });
+	expect(hook.result.current.target?.blockedBy).toBe("ended");
 });
 
 test("stop reads the item and stops its task", () => {
@@ -152,13 +168,72 @@ test("a host too old to message subagents gives the text back and says so", asyn
 			draft: textDraft(""),
 		});
 	});
-	expect(onUnsent).toHaveBeenCalledWith(
-		typed,
-		`chat-v3-draft:t1:subagent:${explore.id}`,
-	);
+	expect(onUnsent).toHaveBeenCalledWith(typed, "chat-v3-draft:t1");
 	expect(hook.result.current.target?.disabledReason).toBe(
 		"Update this host to message subagents",
 	);
+	expect(hook.result.current.target?.blockedBy).toBe("host");
+});
+
+test("a refused steer gives the text back where it can still be sent", async () => {
+	const live = renderTarget(explore, "finished");
+	await act(async () => {
+		await live.hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
+	});
+	expect(live.onUnsent).toHaveBeenCalledWith(
+		typed,
+		`chat-v3-draft:t1:subagent:${explore.id}`,
+	);
+
+	const ended = renderTarget({ ...explore, canSteer: false }, "finished");
+	await act(async () => {
+		await ended.hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
+	});
+	expect(ended.onUnsent).toHaveBeenCalledWith(typed, "chat-v3-draft:t1");
+});
+
+test("a steer that fails after the host refused steering goes back to the main chat", async () => {
+	const replies: Array<(result: SteerSubagentResult) => void> = [];
+	const steerSubagent = mock(
+		(_taskId: string, _content: UserContent[]) =>
+			new Promise<SteerSubagentResult>((resolve) => replies.push(resolve)),
+	);
+	const onUnsent = mock((_content: UserContent[], _draftKey: string) => {});
+	const hook = renderHook(() =>
+		useSubagentTarget({
+			client: { steerSubagent },
+			draftKey: "chat-v3-draft:t1",
+			focusedId: explore.id,
+			items: itemsOf(explore),
+			onSend: () => {},
+			onStop: () => {},
+			onUnsent,
+		}),
+	);
+	const send = hook.result.current.onSend;
+	const options = { steer: false, draft: textDraft("") };
+	let first: unknown;
+	let second: unknown;
+	act(() => {
+		first = send(typed, options);
+		second = send(typed, options);
+	});
+	await act(async () => {
+		replies[0]?.("unsupported");
+		await first;
+		replies[1]?.("finished");
+		await second;
+	});
+	expect(onUnsent.mock.calls.map(([, key]) => key)).toEqual([
+		"chat-v3-draft:t1",
+		"chat-v3-draft:t1",
+	]);
 });
 
 test("drafts are kept per target", () => {

@@ -133,6 +133,13 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 		setSeed({ draftKey, draft: undefined });
 	}, [draftKey, persisted]);
 
+	const takeDraft = useCallback((): ComposerDraft | null => {
+		const draft = readDraft(draftKey);
+		if (draft === undefined || isEmpty(draft)) return null;
+		clearDraft();
+		return draft;
+	}, [draftKey, clearDraft]);
+
 	if (seed.draftKey !== draftKey) {
 		recoveredAfterRead.delete(draftKey);
 		setSeed({ draftKey, draft: readDraft(draftKey) });
@@ -142,5 +149,6 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 		storedDraft: seed.draftKey === draftKey ? seed.draft : readDraft(draftKey),
 		onDraftChange,
 		clearDraft,
+		takeDraft,
 	};
 }

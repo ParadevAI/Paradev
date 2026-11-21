@@ -164,8 +164,7 @@ msgstr "{0, plural, one {#项失败} other {#项失败}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#个文件已更改} other {#个文件已更改}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {#个文件} other {#个文件}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {#个任务} other {#个任务}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {# 个终端正在运行}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {# 行未修改}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -784,6 +787,9 @@ msgstr "{actor} 取消关联工作区 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 预计约{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} 不允许你向其子智能体发送消息。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "打开对应工作区时，{agents} 会话会恢复。"
 
@@ -1170,8 +1176,17 @@ msgstr "{name} 请求确认"
 msgid "{name} can't be messaged"
 msgstr "无法向 {name} 发送消息"
 
+msgid "{name} can't take messages now."
+msgstr "{name} 目前无法接收消息。"
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} 无法接收消息。你的文本已放回主聊天。"
+
 msgid "{name} failed"
 msgstr "{name} 失败"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} 已失败，无法接收消息。"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
@@ -1205,6 +1220,9 @@ msgstr "{name} 开始工作"
 
 msgid "{name} stopped"
 msgstr "{name} 已停止"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} 已停止，无法接收消息。"
 
 msgid "{name} wants more access"
 msgstr "{name} 请求更多访问权限"
@@ -1683,9 +1701,6 @@ msgstr "1个用户"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10条以上并行工作流且不丢状态"
 
-msgid "12m ago"
-msgstr "12分钟前"
-
 msgid "145,000+ across 180 countries"
 msgstr "180 个国家/地区，14.5 万+"
 
@@ -1694,9 +1709,6 @@ msgstr "15 分钟"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ 星标，100+ 贡献者"
-
-msgid "1d ago"
-msgstr "1天前"
 
 msgid "2 agents · 14 files changed"
 msgstr "2个智能体 · 14个文件已更改"
@@ -1712,9 +1724,6 @@ msgstr "2025至今"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2小时前"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2387,9 +2396,6 @@ msgstr "智能体配置"
 msgid "Agent finished"
 msgstr "智能体已完成"
 
-msgid "Agent Independence"
-msgstr "智能体无关"
-
 msgid "Agent is working"
 msgstr "智能体正在工作"
 
@@ -2480,9 +2486,6 @@ msgstr "智能体只看到占位符。Paradev 会把你的登录凭据添加到�
 
 msgid "Agents that run while you're away"
 msgstr "你离开时也在运行的智能体"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "智能体自动分拣 issue、起草 changelog、升级依赖。"
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "智能体调用 Linear 工具时会使用此账号。"
@@ -3515,12 +3518,18 @@ msgstr "运行中"
 msgid "Away"
 msgstr "离开"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace 没有响应。请几分钟后重试。"
+
 msgid "Back"
 msgstr "返回"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
+
+msgid "Back to {parentTitle}"
+msgstr "返回 {parentTitle}"
 
 msgid "Back to About"
 msgstr "返回关于页"
@@ -3809,6 +3818,9 @@ msgstr "迁入工作区"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "将v1的项目、工作区和终端脚本迁移到v2。每一项单独导入，可以重试。"
 
+msgid "Bring Your Own Subscription"
+msgstr "自带订阅"
+
 msgid "Bringing over your v1 projects"
 msgstr "正在迁移你的 v1 项目"
 
@@ -3880,6 +3892,9 @@ msgstr "做了插件？在这里提交。"
 
 msgid "Built in Paradev"
 msgstr "在 Paradev 中构建"
+
+msgid "Built to be driven by agents"
+msgstr "为智能体驱动而生"
 
 msgid "builtin"
 msgstr "内置"
@@ -4488,6 +4503,9 @@ msgstr "请选择"
 msgid "Choose the model"
 msgstr "选择模型"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "选择由 AWS Marketplace 计费的组织。每个订阅只能关联一个组织。"
+
 msgid "Choose the primary repository"
 msgstr "选择主仓库"
 
@@ -4614,9 +4632,6 @@ msgstr "正在清除…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI与SDK"
 
 msgid "CLI docs"
 msgstr "CLI文档"
@@ -5330,6 +5345,9 @@ msgstr "连接后，将以你自己的身份而非工作区的身份处理拉取
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "连接你的 {pluginLabel} 账户，然后重新加载此页面。"
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "关联你的 AWS Marketplace 订阅"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6630,9 +6648,6 @@ msgstr "用AI创建"
 msgid "Create workspace"
 msgstr "创建工作区"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "通过 CLI、SDK 或 MCP 创建工作区并启动智能体。"
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "在任意终端或脚本中创建工作区、启动智能体并读取其输出。支持 macOS 和 Linux。"
 
@@ -6927,6 +6942,9 @@ msgstr "每月的日期"
 
 msgid "Day One"
 msgstr "元老"
+
+msgid "Days are in Pacific time."
+msgstr "日期按太平洋时间计算。"
 
 msgid "days running three agents at once"
 msgstr "同时运行三个智能体的天数"
@@ -7755,9 +7773,6 @@ msgstr "创建了草稿"
 msgid "Draft PR #2841"
 msgstr "草稿 PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "起草了3条支持回复"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "将 <0>Paradev</0> 拖到<1>应用程序</1>文件夹"
 
@@ -7770,8 +7785,8 @@ msgstr "在手动排序下可拖拽工作区重新排列"
 msgid "Drawer"
 msgstr "抽屉"
 
-msgid "Drive it from the terminal"
-msgstr "在终端里驱动它"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "通过 CLI、SDK 或 MCP 驱动整个应用和云端。"
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "从脚本、CI或你自己的工具以编程方式驱动工作区、智能体和会话。"
@@ -7957,6 +7972,9 @@ msgstr "已编辑"
 
 msgid "Edited {ago}"
 msgstr "编辑于{ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "已编辑 <0>SettingsDialog.tsx</0>"
 
 msgid "Editing"
 msgstr "编辑"
@@ -8888,11 +8906,8 @@ msgstr "常见问题"
 msgid "Fast"
 msgstr "快速"
 
-msgid "Fast mode off"
-msgstr "快速模式已关闭"
-
-msgid "Fast mode on"
-msgstr "快速模式已开启"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "此模型不支持快速模式。请选择支持该模式的模型。"
 
 msgid "Fault"
 msgstr "故障"
@@ -9110,9 +9125,6 @@ msgstr "已完成"
 msgid "Finished · unread"
 msgstr "已完成 · 未读"
 
-msgid "finished · worked for 7s"
-msgstr "已完成 · 用时7秒"
-
 msgid "Finishing the move…"
 msgstr "正在完成移动…"
 
@@ -9127,6 +9139,9 @@ msgstr "适应窗口"
 
 msgid "Fix all failing checks"
 msgstr "修复所有失败的检查"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "问题一提交就修复"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "修复空购物车的总价。新增一个复现该 TypeError 的测试。"
@@ -9145,6 +9160,9 @@ msgstr "修复评审问题"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "修复 web 中的新错误。每个错误都用测试复现，并开一个草稿 pull request。"
+
+msgid "Fix production bugs"
+msgstr "修复生产环境的缺陷"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9510,9 +9528,6 @@ msgstr "已隐藏生成的文件"
 msgid "Generated image"
 msgstr "生成的图片"
 
-msgid "Generating"
-msgstr "生成中"
-
 msgid "Generating..."
 msgstr "正在生成..."
 
@@ -9692,6 +9707,12 @@ msgstr "返回首页"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "请返回 {appName} 并重新登录。"
+
+msgid "Go back to {parentTitle}."
+msgstr "返回 {parentTitle}。"
+
+msgid "Go back to message the main agent."
+msgstr "返回以向主智能体发送消息。"
 
 msgid "Go back to the previous page in history"
 msgstr "返回历史记录中的上一页"
@@ -10794,6 +10815,12 @@ msgstr "删除后无法恢复。"
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到应用内浏览器中。之后智能体可以在你已登录的网站上执行操作。"
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "该订阅已关联到你不是成员的组织。请让该组织的所有者邀请你。"
+
+msgid "It is linked to {organization}."
+msgstr "已关联到 {organization}。"
+
 msgid "It keeps the title from your prompt."
 msgstr "将保留根据你的提示生成的标题。"
 
@@ -11399,6 +11426,9 @@ msgstr "链接已复制"
 msgid "Link copied"
 msgstr "链接已复制"
 
+msgid "Link organization"
+msgstr "关联组织"
+
 msgid "Link task"
 msgstr "关联任务"
 
@@ -11407,6 +11437,9 @@ msgstr "关联此任务"
 
 msgid "Linked {slug} to workspace"
 msgstr "已将{slug}关联到工作区"
+
+msgid "Linking..."
+msgstr "正在关联..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11611,9 +11644,6 @@ msgstr "本地工作区"
 
 msgid "Local workspaces"
 msgstr "本地工作区"
-
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "本地工作区运行在你的电脑上。连接什么由你决定。"
 
 msgid "Local, on a host, or in the cloud"
 msgstr "本地、主机上或云端"
@@ -12093,6 +12123,9 @@ msgstr "消息"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "包含这些词的消息会像提及一样通知你。用逗号分隔。"
 
+msgid "Messages you send go to {name}."
+msgstr "你发送的消息将发给 {name}。"
+
 msgid "Microphone"
 msgstr "麦克风"
 
@@ -12179,8 +12212,8 @@ msgstr "移动应用"
 msgid "Mobile App"
 msgstr "移动应用"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "移动端、云端，或自带云"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "移动端、云端，或使用你自己的机群"
 
 msgid "Mode"
 msgstr "模式"
@@ -12310,6 +12343,9 @@ msgstr "迁移云端工作"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关闭则将其打开"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "把设置改成模态框，这样大家不用离开工作区。保留搜索筛选，并让 ⌘, 在任何地方都能打开它。"
 
 msgid "Move this workspace to {computerName}?"
 msgstr "将此工作区移至 {computerName}？"
@@ -13811,6 +13847,9 @@ msgstr "只有 {organizationName} 的管理员可以邀请新成员"
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "只有组织所有者才能更改方案，请联系所有者升级。"
 
+msgid "Only an owner or admin can link this organization."
+msgstr "只有所有者或管理员可以关联此组织。"
+
 msgid "Only available on macOS."
 msgstr "仅在macOS上可用。"
 
@@ -14268,6 +14307,9 @@ msgstr "在默认浏览器中打开页面"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "在 Paradev 的 iPhone 和 iPad 应用中打开页面并回复评论。"
 
+msgid "Open PR"
+msgstr "创建 PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "打开PR #{0}"
@@ -14319,6 +14361,9 @@ msgstr "开源"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "基于 MIT 许可证开源。用你自己的订阅和密钥使用任何智能体。"
+
+msgid "Open source.<0/>Secure by design."
+msgstr "开源。<0/>安全源于设计。"
 
 msgid "Open System Settings"
 msgstr "打开系统设置"
@@ -14406,9 +14451,6 @@ msgstr "OpenAI拒绝了此API密钥。"
 
 msgid "Opened"
 msgstr "已创建"
-
-msgid "opened PR #841 for review"
-msgstr "开了PR #841待审查"
 
 msgid "Opening {appName}…"
 msgstr "正在打开 {appName}…"
@@ -14917,9 +14959,6 @@ msgstr "并行智能体"
 msgid "Parallel agents guide"
 msgstr "并行智能体指南"
 
-msgid "Parallel Execution"
-msgstr "并行执行"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "每位开发者的并行会话数每七个月翻倍，在 2026 年 8 月至 2028 年 8 月期间跨越操作员、厂长和 Henry Ford 等级门槛"
 
@@ -15209,11 +15248,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "方案"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "计划"
+
 msgid "Plan restored"
 msgstr "方案已恢复"
 
 msgid "Plan updated"
 msgstr "方案已更新"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "计划：把 <0>SettingsPage</0> 提取为 <1>SettingsDialog</1>，让 ⌘, 走全局快捷键层，搜索保持不变。现在开始。"
 
 msgctxt "project state"
 msgid "Planned"
@@ -15546,9 +15592,6 @@ msgstr "隐私政策"
 msgid "Private"
 msgstr "私有"
 
-msgid "Private by default.<0/>You're in control."
-msgstr "默认私密。<0/>掌控权在你。"
-
 msgid "Private: only specific people"
 msgstr "私密：仅限特定人员"
 
@@ -15833,9 +15876,6 @@ msgstr "推送你的分支，然后在 Mac 上或 {companyName} 云工作区中�
 msgid "Pushed"
 msgstr "已推送"
 
-msgid "Pushed and opened a draft PR."
-msgstr "已推送并开了一个草稿PR。"
-
 msgid "Pushing..."
 msgstr "正在推送…"
 
@@ -15952,6 +15992,9 @@ msgstr "Radix会按不同方向旋转tooltip的箭头容器，"
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltip文档"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "已运行 <0>bun test settings</0> · 14 个通过 · 1 个失败"
+
 msgid "Random icon"
 msgstr "随机图标"
 
@@ -16006,6 +16049,9 @@ msgstr "已读取"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "已读取"
+
+msgid "Read 3 files"
+msgstr "已读取 3 个文件"
 
 msgid "Read a list of your most visited websites"
 msgstr "读取您最常访问的网站列表"
@@ -16653,6 +16699,9 @@ msgstr "回复"
 msgid "Reply in thread"
 msgstr "在话题中回复"
 
+msgid "Reply to Claude Code…"
+msgstr "回复 Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "回复讨论串…"
 
@@ -17259,6 +17308,9 @@ msgstr "在你的机器上并行运行10个以上的编码智能体。"
 msgid "Run again"
 msgstr "重新运行"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "并行运行智能体，每个都在自己的分支上工作。用内置的差异视图、PR 检查和智能体评审来审查它们的成果，然后无需离开应用即可合并。"
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "按计划或在发生某件事时运行智能体。"
 
@@ -17313,9 +17365,6 @@ msgstr "按计划或事件运行、按需运行、暂停、恢复并查看日志
 
 msgid "Run on any machine"
 msgstr "在任意机器上运行"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "在新功能、修复和重构上并行运行编码智能体。每个智能体都在自己的分支上工作，本地或云端皆可。"
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "用 Paradev 并行运行编程智能体"
@@ -17541,8 +17590,8 @@ msgstr "正在保存..."
 msgid "Saving…"
 msgstr "正在保存…"
 
-msgid "Scale to 100+ agents"
-msgstr "扩展至 100 多个智能体"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "扩展到数百个智能体，质量标准不降"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "扫描二维码，然后使用同一个 Paradev 账号登录并选择此组织。"
@@ -18314,6 +18363,9 @@ msgstr "设置..."
 msgid "settings.ts"
 msgstr "settings.ts"
 
+msgid "Settled"
+msgstr "已完结"
+
 msgid "Setup"
 msgstr "初始化"
 
@@ -18443,6 +18495,9 @@ msgstr "显示全部评论"
 
 msgid "Show all lines"
 msgstr "显示所有行"
+
+msgid "Show all models"
+msgstr "显示所有模型"
 
 msgid "Show Apple's installer"
 msgstr "显示 Apple 安装器"
@@ -19253,8 +19308,8 @@ msgstr "开始一个会话"
 msgid "Start agent"
 msgstr "启动代理"
 
-msgid "Start agents on events or a schedule"
-msgstr "按事件或计划启动智能体"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "自动启动智能体：由 Sentry 错误、Linear 问题、GitHub 拉取请求触发，或按智能体自己设定的计划运行。"
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "在 iPhone 或 iPad 上启动智能体、实时跟进并审查差异。你的代码始终留在你的机器上。"
@@ -19627,9 +19682,6 @@ msgstr "持续性 · 30 天内的活跃天数"
 
 msgid "Switch account"
 msgstr "切换账号"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "换智能体，不换工作流"
 
 msgid "Switch host"
 msgstr "切换主机"
@@ -20020,9 +20072,6 @@ msgstr "终端排版"
 
 msgid "Terminals"
 msgstr "终端"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "终端（{TERMINAL_COUNT}）"
 
 msgid "Terminals aren't responding"
 msgstr "终端没有响应"
@@ -20626,6 +20675,9 @@ msgstr "该智能体无法分叉对话"
 msgid "This agent can't run in a cloud workspace"
 msgstr "此智能体无法在云端工作区中运行"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "此智能体不允许你向其子智能体发送消息。"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所选设备上已不存在这个智能体（它的智能体可能被重置过）。在你选择新的智能体之前，运行都会失败。"
 
@@ -20803,6 +20855,12 @@ msgstr "这个Linear工作区已被{owner}连接。请让对方先断开连接�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "这个Linear工作区已被另一个Paradev组织连接。"
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此链接已过期。请从你的 AWS Marketplace 订阅再次打开 Paradev。"
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此链接无效。请从你的 AWS Marketplace 订阅再次打开 Paradev。"
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "这看起来是二进制文件。以文本方式打开可能显示乱码，文件较大时还可能让编辑器卡死。"
 
@@ -20842,8 +20900,14 @@ msgstr "这只会更改显示名称，不会更改分支。"
 msgid "this organization"
 msgstr "此组织"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "此组织已在使用银行卡付款。请先取消该套餐，或选择其他组织。"
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "此组织没有结算周期。请改为选择一个时间范围。"
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "此组织已关联到另一个 AWS Marketplace 订阅。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此组织使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
@@ -20964,6 +21028,9 @@ msgstr "此子智能体现在无法移到后台"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主机不再跟踪该子智能体。其记录仍保存在磁盘上的智能体会话目录中。"
+
+msgid "This subscription is already linked to another organization."
+msgstr "此订阅已关联到另一个组织。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "该终端还没有可交接的输出。"
@@ -21370,9 +21437,6 @@ msgstr "分拣邮件并起草回复"
 
 msgid "Triage new issues"
 msgstr "分类新议题"
-
-msgid "triaging 12 new issues…"
-msgstr "正在分类12个新议题…"
 
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "尝试修复有人在 #bugs 中报告的每个 bug。"
@@ -21872,6 +21936,12 @@ msgstr "更新 <0>{key}</0> 的值"
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"
 
+msgid "Update this host to message subagents."
+msgstr "更新此主机以向子智能体发送消息。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "更新此主机以向子智能体发送消息。你的文本已放回主聊天。"
+
 msgid "Update this host to move subagents to the background"
 msgstr "请更新此主机以将子智能体移到后台"
 
@@ -22008,9 +22078,6 @@ msgstr "用作工作区运行脚本"
 msgid "Use cases"
 msgstr "使用场景"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "使用 Claude Code、Codex、OpenCode 或任何 CLI 智能体。你的工作区、分支和审查流程保持不变。"
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "使用Claude Code、Codex或任何编码智能体。按任务选择，或让多个并行运行。"
 
@@ -22046,6 +22113,12 @@ msgstr "通过 Pro 在手机上使用 Paradev。"
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "使用你已有的智能体套餐和 API 密钥。模型调用直接发往你的服务商。"
+
+msgid "Use the best agent. Never get locked in."
+msgstr "用最好的智能体，永不被锁定。"
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "最好的智能体一发布就能用上。你的产出物、分支和插件在所有智能体之间通用。"
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "使用桌面应用开始并行运行编码智能体。"
@@ -22280,9 +22353,15 @@ msgstr "查看堆栈，拉取请求 {position}/{size}"
 msgid "View usage"
 msgstr "查看用量"
 
+msgid "Viewed"
+msgstr "已查看"
+
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "正在查看"
+
+msgid "Viewing subagent {name}"
+msgstr "正在查看子智能体 {name}"
 
 msgid "Violence or harassment"
 msgstr "暴力或骚扰"
@@ -22406,6 +22485,9 @@ msgstr "我们无法从此组织的支付方式扣款。请让所有者更新它
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "我们无法从你的支付方式扣款。请更新支付方式以保留此方案。"
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "无法确认你的 AWS Marketplace 订阅"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "无法连接到{appName}以确认它是否在线。请检查网络连接后重试。"
@@ -23115,6 +23197,9 @@ msgstr "你没有此终端的访问权限。"
 msgid "You don't have permission to remove this member"
 msgstr "你没有移除该成员的权限"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "你还没有自己拥有或管理的组织。请先创建一个，然后再次打开此链接。"
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "你有未保存的环境变量。确定要关闭吗？"
 
@@ -23218,8 +23303,8 @@ msgstr "你的智能体发布设计和报告。团队发表评论，智能体随
 msgid "Your agent subscriptions and keys"
 msgstr "你的智能体订阅和密钥"
 
-msgid "Your Agents, Your Accounts"
-msgstr "你的智能体，你的账号"
+msgid "Your AWS Marketplace subscription is active"
+msgstr "你的 AWS Marketplace 订阅已生效"
 
 msgid "Your changes"
 msgstr "你的更改"

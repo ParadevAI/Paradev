@@ -13,6 +13,7 @@ import {
 	cloudWorkspaces,
 	type InsertCloudUsageEvent,
 } from "@superset/db/schema";
+import { BOX_GB_MINUTES_FEATURE_ID } from "@superset/shared/billing";
 import { eq, sql } from "drizzle-orm";
 
 /**
@@ -118,7 +119,7 @@ for (const lock of locks) {
 	else if (lock.amount < 0) skipped.negative += 1;
 	else {
 		const sentAt = new Date(lock.lastEventAt);
-		const box = lock.feature === "box_gb_minutes";
+		const box = lock.feature === BOX_GB_MINUTES_FEATURE_ID;
 		rows.push({
 			bootId: lock.bootId,
 			lockSeq: lock.lockSeq,
@@ -176,8 +177,9 @@ function totalBy(key: (row: InsertCloudUsageEvent) => string): Totals {
 		const total = totals[key(row)] ?? { rows: 0, gbMinutes: 0, cpuMinutes: 0 };
 		totals[key(row)] = total;
 		total.rows += 1;
-		total[row.feature === "box_gb_minutes" ? "gbMinutes" : "cpuMinutes"] +=
-			Number(row.amount);
+		total[
+			row.feature === BOX_GB_MINUTES_FEATURE_ID ? "gbMinutes" : "cpuMinutes"
+		] += Number(row.amount);
 	}
 	return totals;
 }

@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# gagal} other {# gagal}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# file berubah} other {# file berubah}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# file} other {# file}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# tugas} other {# tugas}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {# terminal berjalan}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {# baris tidak diubah}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -784,6 +787,9 @@ msgstr "{actor} melepas tautan workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} sejauh ini · ~{projected} diperkirakan"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} tidak mengizinkan Anda mengirim pesan ke subagennya."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Sesi {agents} dilanjutkan saat Anda membuka workspace-nya."
 
@@ -1170,8 +1176,17 @@ msgstr "{name} bertanya"
 msgid "{name} can't be messaged"
 msgstr "{name} tidak bisa dikirimi pesan"
 
+msgid "{name} can't take messages now."
+msgstr "{name} tidak dapat menerima pesan sekarang."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} tidak dapat menerima pesan. Teks Anda kembali ke obrolan utama."
+
 msgid "{name} failed"
 msgstr "{name} gagal"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} gagal dan tidak dapat menerima pesan."
 
 msgid "{name} finished"
 msgstr "{name} selesai"
@@ -1205,6 +1220,9 @@ msgstr "{name} mulai bekerja"
 
 msgid "{name} stopped"
 msgstr "{name} dihentikan"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} berhenti dan tidak dapat menerima pesan."
 
 msgid "{name} wants more access"
 msgstr "{name} meminta akses lebih"
@@ -1683,9 +1701,6 @@ msgstr "1 pengguna"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ alur kerja bersamaan tanpa kehilangan konteks"
 
-msgid "12m ago"
-msgstr "12m lalu"
-
 msgid "145,000+ across 180 countries"
 msgstr "145.000+ di 180 negara"
 
@@ -1694,9 +1709,6 @@ msgstr "15 mnt"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ bintang, 100+ kontributor"
-
-msgid "1d ago"
-msgstr "1h lalu"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agen · 14 file berubah"
@@ -1712,9 +1724,6 @@ msgstr "2025 sampai sekarang"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2j lalu"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2387,9 +2396,6 @@ msgstr "Konfigurasi Agen"
 msgid "Agent finished"
 msgstr "Agen selesai"
 
-msgid "Agent Independence"
-msgstr "Independensi Agen"
-
 msgid "Agent is working"
 msgstr "Agen sedang bekerja"
 
@@ -2480,9 +2486,6 @@ msgstr "Agen hanya melihat placeholder. Paradev menambahkan login Anda ke permin
 
 msgid "Agents that run while you're away"
 msgstr "Agen yang berjalan saat Anda pergi"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agen memilah issue, menyusun changelog, dan memperbarui dependensi sendiri."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agen memakai akun ini saat memanggil tool Linear."
@@ -3515,12 +3518,18 @@ msgstr "Aktif"
 msgid "Away"
 msgstr "Tidak di tempat"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace tidak merespons. Coba lagi dalam beberapa menit."
+
 msgid "Back"
 msgstr "Kembali"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Kembali"
+
+msgid "Back to {parentTitle}"
+msgstr "Kembali ke {parentTitle}"
 
 msgid "Back to About"
 msgstr "Kembali ke Tentang"
@@ -3809,6 +3818,9 @@ msgstr "Impor ruang kerja Anda"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Bawa proyek, workspace, dan skrip terminal v1 ke v2. Tiap item diimpor satu per satu dan bisa dicoba ulang."
 
+msgid "Bring Your Own Subscription"
+msgstr "Bawa Langganan Anda Sendiri"
+
 msgid "Bringing over your v1 projects"
 msgstr "Memindahkan proyek v1 Anda"
 
@@ -3880,6 +3892,9 @@ msgstr "Sudah membuat plugin? Kirimkan di sini."
 
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"
+
+msgid "Built to be driven by agents"
+msgstr "Dibuat untuk dikendalikan oleh agen"
 
 msgid "builtin"
 msgstr "bawaan"
@@ -4488,6 +4503,9 @@ msgstr "Pilih salah satu"
 msgid "Choose the model"
 msgstr "Pilih model"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Pilih organisasi yang akan ditagih oleh AWS Marketplace. Setiap langganan terhubung ke satu organisasi."
+
 msgid "Choose the primary repository"
 msgstr "Pilih repositori utama"
 
@@ -4614,9 +4632,6 @@ msgstr "Membersihkan…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentasi CLI"
@@ -5330,6 +5345,9 @@ msgstr "Hubungkan untuk bertindak pada pull request sebagai diri Anda, bukan seb
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Hubungkan akun {pluginLabel} Anda, lalu muat ulang halaman ini."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Hubungkan langganan AWS Marketplace Anda"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6630,9 +6648,6 @@ msgstr "Buat dengan AI"
 msgid "Create workspace"
 msgstr "Buat workspace"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Buat workspace dan jalankan agen dari CLI, SDK, atau lewat MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Buat workspace, jalankan agen, dan baca outputnya dari terminal atau skrip mana pun. macOS dan Linux."
 
@@ -6927,6 +6942,9 @@ msgstr "Hari dalam bulan"
 
 msgid "Day One"
 msgstr "Hari pertama"
+
+msgid "Days are in Pacific time."
+msgstr "Hari mengikuti waktu Pasifik."
 
 msgid "days running three agents at once"
 msgstr "hari menjalankan tiga agen sekaligus"
@@ -7755,9 +7773,6 @@ msgstr "Draf dibuka"
 msgid "Draft PR #2841"
 msgstr "Draft PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "menyusun 3 draf balasan dukungan"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Seret <0>Paradev</0> ke folder <1>Aplikasi</1>"
 
@@ -7770,8 +7785,8 @@ msgstr "Seret workspace untuk mengatur ulang dalam Urutan manual"
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Kendalikan dari terminal"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Kendalikan seluruh aplikasi dan cloud dari CLI, SDK, atau melalui MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Kendalikan workspace, agen, dan sesi secara terprogram dari skrip, CI, atau alat Anda sendiri."
@@ -7957,6 +7972,9 @@ msgstr "Diedit"
 
 msgid "Edited {ago}"
 msgstr "Diedit {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Mengedit <0>SettingsDialog.tsx</0>"
 
 msgid "Editing"
 msgstr "Pengeditan"
@@ -8888,11 +8906,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Cepat"
 
-msgid "Fast mode off"
-msgstr "Mode cepat nonaktif"
-
-msgid "Fast mode on"
-msgstr "Mode cepat aktif"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Mode cepat tidak tersedia untuk model ini. Pilih model yang mendukungnya."
 
 msgid "Fault"
 msgstr "Kegagalan"
@@ -9110,9 +9125,6 @@ msgstr "Selesai"
 msgid "Finished · unread"
 msgstr "Selesai · belum dibaca"
 
-msgid "finished · worked for 7s"
-msgstr "selesai · bekerja 7 dtk"
-
 msgid "Finishing the move…"
 msgstr "Menyelesaikan pemindahan…"
 
@@ -9127,6 +9139,9 @@ msgstr "Sesuaikan"
 
 msgid "Fix all failing checks"
 msgstr "Perbaiki semua check yang gagal"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Perbaiki bug begitu dilaporkan"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Memperbaiki total keranjang untuk keranjang kosong. Menambahkan tes yang mereproduksi TypeError."
@@ -9145,6 +9160,9 @@ msgstr "Perbaiki temuan"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Perbaiki error baru di web. Reproduksi masing-masing dalam tes dan buka draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Perbaiki bug produksi"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9510,9 +9528,6 @@ msgstr "File hasil generate disembunyikan"
 msgid "Generated image"
 msgstr "Gambar yang dihasilkan"
 
-msgid "Generating"
-msgstr "Membuat"
-
 msgid "Generating..."
 msgstr "Membuat..."
 
@@ -9692,6 +9707,12 @@ msgstr "Kembali ke beranda"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Kembali ke {appName} dan masuk lagi."
+
+msgid "Go back to {parentTitle}."
+msgstr "Kembali ke {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Kembali untuk mengirim pesan ke agen utama."
 
 msgid "Go back to the previous page in history"
 msgstr "Kembali ke halaman sebelumnya di riwayat"
@@ -10794,6 +10815,12 @@ msgstr "Komentar ini tidak bisa dikembalikan."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Menyalin cookie dari profil \"{profileName}\" Anda ke browser di dalam aplikasi. Agen lalu dapat bertindak di situs tempat Anda masuk."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Langganan ini sudah terhubung ke organisasi yang bukan tempat Anda menjadi anggota. Minta pemiliknya untuk mengundang Anda."
+
+msgid "It is linked to {organization}."
+msgstr "Terhubung ke {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Judul dari prompt Anda tetap dipakai."
 
@@ -11399,6 +11426,9 @@ msgstr "tautan disalin"
 msgid "Link copied"
 msgstr "Tautan disalin"
 
+msgid "Link organization"
+msgstr "Hubungkan organisasi"
+
 msgid "Link task"
 msgstr "Tautkan tugas"
 
@@ -11407,6 +11437,9 @@ msgstr "Tautkan tugas ini"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} ditautkan ke workspace"
+
+msgid "Linking..."
+msgstr "Menghubungkan..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11611,9 +11644,6 @@ msgstr "Workspace lokal"
 
 msgid "Local workspaces"
 msgstr "Workspace lokal"
-
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Workspace lokal berjalan di mesin Anda. Anda yang menentukan apa yang terhubung."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokal, di host, atau di cloud"
@@ -12093,6 +12123,9 @@ msgstr "Pesan"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Pesan dengan kata-kata ini memberi notifikasi seperti sebutan. Pisahkan dengan koma."
 
+msgid "Messages you send go to {name}."
+msgstr "Pesan yang Anda kirim akan masuk ke {name}."
+
 msgid "Microphone"
 msgstr "Mikrofon"
 
@@ -12179,8 +12212,8 @@ msgstr "Aplikasi mobile"
 msgid "Mobile App"
 msgstr "Aplikasi Mobile"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Seluler, cloud, atau cloud Anda sendiri"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Seluler, Cloud, atau armada Anda sendiri"
 
 msgid "Mode"
 msgstr "Mode"
@@ -12310,6 +12343,9 @@ msgstr "Pindahkan pekerjaan cloud"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Pindahkan Pengaturan ke modal agar orang tidak perlu meninggalkan ruang kerja mereka. Pertahankan pemfilteran pencarian, dan buat ⌘, membukanya dari mana saja."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Pindahkan workspace ini ke {computerName}?"
@@ -13811,6 +13847,9 @@ msgstr "Hanya admin {organizationName} yang dapat mengundang orang baru"
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Hanya pemilik organisasi yang bisa mengubah paket. Minta pemilik Anda untuk upgrade."
 
+msgid "Only an owner or admin can link this organization."
+msgstr "Hanya pemilik atau admin yang dapat menghubungkan organisasi ini."
+
 msgid "Only available on macOS."
 msgstr "Hanya tersedia di macOS."
 
@@ -14268,6 +14307,9 @@ msgstr "Buka Halaman di Browser Bawaan"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Buka halaman dan balas komentar dari aplikasi Paradev di iPhone dan iPad."
 
+msgid "Open PR"
+msgstr "Buka PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Buka PR #{0}"
@@ -14319,6 +14361,9 @@ msgstr "Open Source"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source dengan lisensi MIT. Gunakan agen apa pun dengan langganan dan kunci Anda sendiri."
+
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Aman sejak dirancang."
 
 msgid "Open System Settings"
 msgstr "Buka System Settings"
@@ -14406,9 +14451,6 @@ msgstr "OpenAI menolak kunci API ini."
 
 msgid "Opened"
 msgstr "Dibuka"
-
-msgid "opened PR #841 for review"
-msgstr "membuka PR #841 untuk direview"
 
 msgid "Opening {appName}…"
 msgstr "Membuka {appName}…"
@@ -14917,9 +14959,6 @@ msgstr "Agen paralel"
 msgid "Parallel agents guide"
 msgstr "Panduan agen paralel"
 
-msgid "Parallel Execution"
-msgstr "Eksekusi Paralel"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Sesi paralel per pengembang berlipat ganda setiap tujuh bulan, melewati ambang Operator, Manajer Pabrik, dan Henry Ford antara Agustus 2026 dan Agustus 2028"
 
@@ -15209,11 +15248,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Paket"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Rencana"
+
 msgid "Plan restored"
 msgstr "Paket dipulihkan"
 
 msgid "Plan updated"
 msgstr "Paket diperbarui"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Rencana: ekstrak <0>SettingsPage</0> menjadi <1>SettingsDialog</1>, arahkan ⌘, melalui lapisan hotkey global, biarkan pencarian apa adanya. Mulai sekarang."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15546,9 +15592,6 @@ msgstr "Kebijakan Privasi"
 msgid "Private"
 msgstr "Privat"
 
-msgid "Private by default.<0/>You're in control."
-msgstr "Privat secara bawaan.<0/>Anda yang mengendalikan."
-
 msgid "Private: only specific people"
 msgstr "Privat: hanya orang tertentu"
 
@@ -15833,9 +15876,6 @@ msgstr "Push branch Anda, lalu lanjutkan di Mac atau di workspace cloud {company
 msgid "Pushed"
 msgstr "Di-push"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Sudah di-push dan membuka draf PR."
-
 msgid "Pushing..."
 msgstr "Melakukan push…"
 
@@ -15952,6 +15992,9 @@ msgstr "Radix memutar pembungkus panah tooltip per sisi,"
 msgid "Radix Tooltip docs"
 msgstr "Dokumentasi Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Menjalankan <0>bun test settings</0> · 14 lulus · 1 gagal"
+
 msgid "Random icon"
 msgstr "Ikon acak"
 
@@ -16006,6 +16049,9 @@ msgstr "Dibaca"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Dibaca"
+
+msgid "Read 3 files"
+msgstr "Membaca 3 file"
 
 msgid "Read a list of your most visited websites"
 msgstr "Membaca daftar situs web yang paling sering Anda kunjungi"
@@ -16653,6 +16699,9 @@ msgstr "Balas"
 msgid "Reply in thread"
 msgstr "Balas di utas"
 
+msgid "Reply to Claude Code…"
+msgstr "Balas Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "Balas thread…"
 
@@ -17259,6 +17308,9 @@ msgstr "Jalankan 10+ agen coding paralel di mesin Anda."
 msgid "Run again"
 msgstr "Jalankan lagi"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Jalankan agen secara paralel, masing-masing di branch-nya sendiri. Tinjau hasil kerja mereka dengan diff bawaan, pemeriksaan PR, dan tinjauan oleh agen, lalu merge tanpa meninggalkan aplikasi."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Jalankan agen sesuai jadwal atau saat sesuatu terjadi."
 
@@ -17313,9 +17365,6 @@ msgstr "Jalankan sesuai jadwal atau saat ada event, sesuai permintaan, jeda, lan
 
 msgid "Run on any machine"
 msgstr "Di mesin mana pun"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Jalankan agen coding paralel untuk fitur, perbaikan, dan refactor. Masing-masing bekerja di branch sendiri, secara lokal atau di cloud."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Jalankan agen coding paralel dengan Paradev"
@@ -17541,8 +17590,8 @@ msgstr "Menyimpan..."
 msgid "Saving…"
 msgstr "Menyimpan…"
 
-msgid "Scale to 100+ agents"
-msgstr "Tingkatkan hingga lebih dari 100 agen"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Skalakan hingga ratusan agen, pertahankan standar kualitas"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Pindai kode QR, lalu masuk dengan akun Paradev yang sama dan pilih organisasi ini."
@@ -18314,6 +18363,9 @@ msgstr "Pengaturan..."
 msgid "settings.ts"
 msgstr "settings.ts"
 
+msgid "Settled"
+msgstr "Selesai"
+
 msgid "Setup"
 msgstr "Setup"
 
@@ -18443,6 +18495,9 @@ msgstr "Tampilkan semua komentar"
 
 msgid "Show all lines"
 msgstr "Tampilkan semua baris"
+
+msgid "Show all models"
+msgstr "Tampilkan semua model"
 
 msgid "Show Apple's installer"
 msgstr "Tampilkan penginstal Apple"
@@ -19253,8 +19308,8 @@ msgstr "Mulai sesi"
 msgid "Start agent"
 msgstr "Mulai agen"
 
-msgid "Start agents on events or a schedule"
-msgstr "Jalankan agen saat ada event atau sesuai jadwal"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Mulai agen secara otomatis: dari error Sentry, isu Linear, pull request GitHub, atau jadwal yang diatur sendiri oleh agen."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Mulai agen, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Kode Anda tetap di mesin Anda."
@@ -19627,9 +19682,6 @@ msgstr "Konsistensi · hari aktif dari 30"
 
 msgid "Switch account"
 msgstr "Ganti akun"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Ganti agen. Pertahankan alur kerja Anda"
 
 msgid "Switch host"
 msgstr "Ganti host"
@@ -20020,9 +20072,6 @@ msgstr "Tipografi terminal"
 
 msgid "Terminals"
 msgstr "Terminal"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminal ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Terminal tidak merespons"
@@ -20626,6 +20675,9 @@ msgstr "Agen ini tidak dapat mencabangkan percakapan"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agen ini tidak bisa berjalan di workspace cloud"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Agen ini tidak mengizinkan Anda mengirim pesan ke subagennya."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agen ini sudah tidak ada di perangkat yang dipilih (agennya mungkin telah direset). Run akan gagal sampai Anda memilih yang baru."
 
@@ -20803,6 +20855,12 @@ msgstr "Workspace Linear ini sudah terhubung oleh {owner}. Minta mereka memutusk
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Workspace Linear ini sudah terhubung oleh organisasi Paradev lain."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Tautan ini sudah kedaluwarsa. Buka Paradev lagi dari langganan AWS Marketplace Anda."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Tautan ini tidak valid. Buka Paradev lagi dari langganan AWS Marketplace Anda."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Ini tampak seperti file biner. Membukanya sebagai teks bisa menampilkan output kacau atau membekukan editor untuk file besar."
 
@@ -20842,8 +20900,14 @@ msgstr "Ini hanya mengubah nama tampilan, bukan branch-nya."
 msgid "this organization"
 msgstr "organisasi ini"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Organisasi ini sudah membayar dengan kartu. Batalkan paket tersebut terlebih dahulu, atau pilih organisasi lain."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Organisasi ini tidak memiliki periode penagihan. Pilih rentang waktu sebagai gantinya."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Organisasi ini sudah terhubung ke langganan AWS Marketplace lain."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Organisasi ini memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
@@ -20964,6 +21028,9 @@ msgstr "Subagen ini tidak bisa dipindahkan ke latar belakang sekarang"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Subagen ini tidak lagi dilacak oleh host. Transkripnya tetap tersimpan di disk pada direktori sesi agen."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Langganan ini sudah terhubung ke organisasi lain."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Terminal ini belum punya keluaran untuk diserahkan."
@@ -21370,9 +21437,6 @@ msgstr "Triase email dan buat draf balasan"
 
 msgid "Triage new issues"
 msgstr "Triase issue baru"
-
-msgid "triaging 12 new issues…"
-msgstr "mentriase 12 issue baru…"
 
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Mencoba memperbaiki setiap bug yang diposting di #bugs."
@@ -21872,6 +21936,12 @@ msgstr "Perbarui nilai untuk <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 
+msgid "Update this host to message subagents."
+msgstr "Perbarui host ini untuk mengirim pesan ke subagen."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Perbarui host ini untuk mengirim pesan ke subagen. Teks Anda kembali ke obrolan utama."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Perbarui host ini untuk memindahkan subagen ke latar belakang"
 
@@ -22008,9 +22078,6 @@ msgstr "Pakai sebagai run workspace"
 msgid "Use cases"
 msgstr "Kasus penggunaan"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Gunakan Claude Code, Codex, OpenCode, atau agen CLI apa pun. Workspace, branch, dan proses review Anda tetap sama."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Pakai Claude Code, Codex, atau agen coding apa pun. Pilih per tugas atau jalankan beberapa berdampingan."
 
@@ -22046,6 +22113,12 @@ msgstr "Gunakan Paradev di ponsel dengan Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Gunakan paket agen dan kunci API yang sudah Anda punya. Panggilan model langsung ke penyedia Anda."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Gunakan agen terbaik. Tanpa pernah terkunci."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Gunakan agen terbaik begitu dirilis. Artefak, branch, dan plugin Anda berfungsi di semuanya."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."
@@ -22280,9 +22353,15 @@ msgstr "Lihat stack, pull request {position} dari {size}"
 msgid "View usage"
 msgstr "Lihat penggunaan"
 
+msgid "Viewed"
+msgstr "Dilihat"
+
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Dilihat"
+
+msgid "Viewing subagent {name}"
+msgstr "Melihat subagen {name}"
 
 msgid "Violence or harassment"
 msgstr "Kekerasan atau pelecehan"
@@ -22406,6 +22485,9 @@ msgstr "Kami tidak bisa menagih metode pembayaran organisasi ini. Minta pemilik 
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Kami tidak bisa menagih metode pembayaran Anda. Perbarui untuk mempertahankan paket ini."
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Kami tidak dapat mengonfirmasi langganan AWS Marketplace Anda"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Kami tidak dapat menghubungi {appName} untuk melihat apakah perangkat ini online. Periksa koneksi Anda dan coba lagi."
@@ -23115,6 +23197,9 @@ msgstr "Anda tidak punya akses ke terminal ini."
 msgid "You don't have permission to remove this member"
 msgstr "Anda tidak punya izin untuk menghapus anggota ini"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Anda belum memiliki atau mengelola organisasi. Buat satu, lalu buka tautan ini lagi."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Ada variabel environment yang belum disimpan. Yakin ingin menutup?"
 
@@ -23218,8 +23303,8 @@ msgstr "Agen Anda menerbitkan desain dan laporan. Tim Anda berkomentar, lalu age
 msgid "Your agent subscriptions and keys"
 msgstr "Langganan dan kunci agen Anda"
 
-msgid "Your Agents, Your Accounts"
-msgstr "Agen Anda, Akun Anda"
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Langganan AWS Marketplace Anda aktif"
 
 msgid "Your changes"
 msgstr "Perubahan Anda"

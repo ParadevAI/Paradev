@@ -1,5 +1,6 @@
 // Runs whole queries, unlike task-list-query's condition builders: the admin repo shares them and vendors packages/db but not packages/trpc.
 import {
+	BOX_GB_MINUTES_FEATURE_ID,
 	gbMinutesUsd,
 	isMachineSize,
 	LEGACY_MACHINE_SIZE,
@@ -201,8 +202,6 @@ export function cloudBillingPeriodIndex(
 		: null;
 }
 
-export const BILLED_FEATURE = "box_gb_minutes";
-
 const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
 );
@@ -365,7 +364,7 @@ function usageFacts(
 		.where(
 			and(
 				inOrganization(scope, events.organizationId),
-				eq(events.feature, BILLED_FEATURE),
+				eq(events.feature, BOX_GB_MINUTES_FEATURE_ID),
 				gte(events.sentAt, window.from),
 				lt(events.sentAt, window.to),
 				options.sentWhere,
@@ -1104,7 +1103,7 @@ const bootColumns = {
 	memoryMb: boots.memoryMb,
 	vcpus: boots.vcpus,
 	endReason: boots.endReason,
-	gbMinutes: sql<string>`(select coalesce(sum(${events.amount}), 0) from ${events} where ${events.bootId} = ${boots.id} and ${events.feature} = ${BILLED_FEATURE} and ${events.sentAt} is not null)`,
+	gbMinutes: sql<string>`(select coalesce(sum(${events.amount}), 0) from ${events} where ${events.bootId} = ${boots.id} and ${events.feature} = ${BOX_GB_MINUTES_FEATURE_ID} and ${events.sentAt} is not null)`,
 };
 
 function bootConditions(scope: Scope, options: BootReadOptions) {

@@ -9,7 +9,7 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { browserHistory, settings } from "@superset/local-db";
+import { browserHistory, settings, workspaces } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
@@ -594,7 +594,13 @@ if (!gotTheLock) {
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();
 		initSentry();
-		await initAppState();
+		await initAppState(() =>
+			localDb
+				.select({ id: workspaces.id })
+				.from(workspaces)
+				.all()
+				.map((row) => row.id),
+		);
 
 		sweepNetworkLogs();
 		sweepDevAppProfiles();

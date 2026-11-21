@@ -40,6 +40,7 @@ function makeBuild(
 		error: null,
 		startedAt: new Date(0),
 		finishedAt: null,
+		goldenDeletedAt: null,
 		...overrides,
 	};
 }

@@ -16,7 +16,7 @@ export function CTASection() {
 		<>
 			<section className="w-full py-14 [@media(max-height:800px)]:py-8">
 				<div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col items-center text-center">
-					<h2 className="text-4xl sm:text-5xl lg:text-7xl lg:[@media(max-height:800px)]:text-6xl font-medium tracking-tight leading-[1.05] text-foreground mb-10 [@media(max-height:800px)]:mb-8">
+					<h2 className="text-3xl sm:text-5xl lg:text-7xl lg:[@media(max-height:800px)]:text-6xl font-light tracking-tight leading-[1.1] text-foreground mb-10 [@media(max-height:800px)]:mb-8">
 						<Trans comment="Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.">
 							Smash your backlog.
 						</Trans>

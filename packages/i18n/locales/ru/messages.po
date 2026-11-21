@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# с ошибкой} few {# с ошибкой} many {# 
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# файл изменён} few {# файла изменено} many {# файлов изменено} other {# файла изменено}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# задача} few {# задачи} many {# задач
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# терминал запущен} few {# терминала запущено} many {# терминалов запущено} other {# терминала запущено}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# строка без изменений} few {# строки без изменений} many {# строк без изменений} other {# строки без изменений}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -784,6 +787,9 @@ msgstr "{actor} отвязал(а) рабочее пространство {work
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} на данный момент · прогноз ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} не позволяет отправлять сообщения своим субагентам."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеансы {agents} возобновятся, когда вы откроете их рабочее пространство."
 
@@ -1170,8 +1176,17 @@ msgstr "{name} спрашивает"
 msgid "{name} can't be messaged"
 msgstr "{name} не может получать сообщения"
 
+msgid "{name} can't take messages now."
+msgstr "{name} сейчас не может получать сообщения."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} не может получать сообщения. Ваш текст снова в основном чате."
+
 msgid "{name} failed"
 msgstr "{name}: ошибка"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} завершился с ошибкой и не может получать сообщения."
 
 msgid "{name} finished"
 msgstr "{name} завершил работу"
@@ -1205,6 +1220,9 @@ msgstr "{name} начал работу"
 
 msgid "{name} stopped"
 msgstr "{name} остановлен"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} остановлен и не может получать сообщения."
 
 msgid "{name} wants more access"
 msgstr "{name} запрашивает больше доступа"
@@ -1683,9 +1701,6 @@ msgstr "1 пользователь"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ параллельных потоков работы без потери состояния"
 
-msgid "12m ago"
-msgstr "12 мин назад"
-
 msgid "145,000+ across 180 countries"
 msgstr "Более 145 000 в 180 странах"
 
@@ -1694,9 +1709,6 @@ msgstr "15 мин"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ звёзд, 100+ участников"
-
-msgid "1d ago"
-msgstr "1 д. назад"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 агента · изменено 14 файлов"
@@ -1712,9 +1724,6 @@ msgstr "С 2025 по сегодня"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2 ч. назад"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2387,9 +2396,6 @@ msgstr "Конфигурации агентов"
 msgid "Agent finished"
 msgstr "Агент завершил"
 
-msgid "Agent Independence"
-msgstr "Независимость от агента"
-
 msgid "Agent is working"
 msgstr "Агент работает"
 
@@ -2480,9 +2486,6 @@ msgstr "Агенты видят только заглушку. Paradev доба�
 
 msgid "Agents that run while you're away"
 msgstr "Агенты, которые работают, пока вас нет"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Агенты сами разбирают issues, пишут черновики changelog и обновляют зависимости."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенты используют этот аккаунт, когда вызывают инструменты Linear."
@@ -3515,12 +3518,18 @@ msgstr "Работает"
 msgid "Away"
 msgstr "Отошёл"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace не отвечает. Повторите попытку через несколько минут."
+
 msgid "Back"
 msgstr "Назад"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Назад"
+
+msgid "Back to {parentTitle}"
+msgstr "Вернуться к {parentTitle}"
 
 msgid "Back to About"
 msgstr "К разделу «О нас»"
@@ -3809,6 +3818,9 @@ msgstr "Перенесите рабочие пространства"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Перенесите проекты, рабочие области и скрипты терминала из v1 в v2. Каждый элемент импортируется отдельно, попытку можно повторить."
 
+msgid "Bring Your Own Subscription"
+msgstr "Используйте свою подписку"
+
 msgid "Bringing over your v1 projects"
 msgstr "Переносим ваши проекты из v1"
 
@@ -3880,6 +3892,9 @@ msgstr "Создали плагин? Отправьте его здесь."
 
 msgid "Built in Paradev"
 msgstr "Создано в Paradev"
+
+msgid "Built to be driven by agents"
+msgstr "Создан, чтобы им управляли агенты"
 
 msgid "builtin"
 msgstr "встроенная"
@@ -4488,6 +4503,9 @@ msgstr "Выберите"
 msgid "Choose the model"
 msgstr "Выбрать модель"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Выберите организацию, которой AWS Marketplace будет выставлять счета. Каждая подписка привязывается к одной организации."
+
 msgid "Choose the primary repository"
 msgstr "Выберите основной репозиторий"
 
@@ -4614,9 +4632,6 @@ msgstr "Очистка…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI и SDK"
 
 msgid "CLI docs"
 msgstr "Документация CLI"
@@ -5330,6 +5345,9 @@ msgstr "Подключитесь, чтобы работать с пул-рекв
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Подключите аккаунт {pluginLabel}, затем перезагрузите эту страницу."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Подключите подписку AWS Marketplace"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6630,9 +6648,6 @@ msgstr "Создать с помощью AI"
 msgid "Create workspace"
 msgstr "Создать рабочую область"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Создавайте рабочие области и запускайте агентов из CLI, SDK или через MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Создавайте рабочие области, запускайте агентов и читайте их вывод из любого терминала или скрипта. macOS и Linux."
 
@@ -6927,6 +6942,9 @@ msgstr "День месяца"
 
 msgid "Day One"
 msgstr "Первый день"
+
+msgid "Days are in Pacific time."
+msgstr "Дни указаны по тихоокеанскому времени."
 
 msgid "days running three agents at once"
 msgstr "дней с тремя агентами одновременно"
@@ -7755,9 +7773,6 @@ msgstr "Открыт черновик"
 msgid "Draft PR #2841"
 msgstr "Черновой PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "подготовил 3 ответа поддержки"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Перетащите <0>Paradev</0> в папку <1>Программы</1>"
 
@@ -7770,8 +7785,8 @@ msgstr "Перетаскивайте рабочие области для изм
 msgid "Drawer"
 msgstr "Шторка"
 
-msgid "Drive it from the terminal"
-msgstr "Управляйте из терминала"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Управляйте всем приложением и облаком через CLI, SDK или MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Управляйте рабочими областями, агентами и сессиями программно — из скриптов, CI или собственных инструментов."
@@ -7957,6 +7972,9 @@ msgstr "Изменён"
 
 msgid "Edited {ago}"
 msgstr "Изменено {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Изменён <0>SettingsDialog.tsx</0>"
 
 msgid "Editing"
 msgstr "Редактирование"
@@ -8888,11 +8906,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Быстрый"
 
-msgid "Fast mode off"
-msgstr "Быстрый режим выключен"
-
-msgid "Fast mode on"
-msgstr "Быстрый режим включён"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Быстрый режим недоступен для этой модели. Выберите модель, которая его поддерживает."
 
 msgid "Fault"
 msgstr "Сбой"
@@ -9110,9 +9125,6 @@ msgstr "Завершено"
 msgid "Finished · unread"
 msgstr "Завершено · не прочитано"
 
-msgid "finished · worked for 7s"
-msgstr "завершил · работал 7 с"
-
 msgid "Finishing the move…"
 msgstr "Завершение переноса…"
 
@@ -9127,6 +9139,9 @@ msgstr "По размеру"
 
 msgid "Fix all failing checks"
 msgstr "Починить все упавшие проверки"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Исправляйте баги в момент их появления"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Исправляет сумму корзины для пустых корзин. Добавляет тест, который воспроизводит TypeError."
@@ -9145,6 +9160,9 @@ msgstr "Исправить замечания"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Исправляй новые ошибки в web. Воспроизведи каждую в тесте и открой черновой pull request."
+
+msgid "Fix production bugs"
+msgstr "Исправление багов в продакшене"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9510,9 +9528,6 @@ msgstr "Сгенерированный файл скрыт"
 msgid "Generated image"
 msgstr "Сгенерированное изображение"
 
-msgid "Generating"
-msgstr "Генерация"
-
 msgid "Generating..."
 msgstr "Генерация..."
 
@@ -9692,6 +9707,12 @@ msgstr "Вернуться на главную"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Вернитесь в {appName} и войдите снова."
+
+msgid "Go back to {parentTitle}."
+msgstr "Вернитесь к {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Вернитесь, чтобы написать основному агенту."
 
 msgid "Go back to the previous page in history"
 msgstr "Вернуться на предыдущую страницу в истории"
@@ -10794,6 +10815,12 @@ msgstr "Его нельзя будет вернуть."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Cookie из вашего профиля «{profileName}» копируются во встроенный браузер приложения. Тогда агенты смогут действовать на сайтах, где вы вошли в аккаунт."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Она уже привязана к организации, в которой вы не состоите. Попросите владельца пригласить вас."
+
+msgid "It is linked to {organization}."
+msgstr "Она привязана к {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Останется название из вашего запроса."
 
@@ -11399,6 +11426,9 @@ msgstr "ссылка скопирована"
 msgid "Link copied"
 msgstr "Ссылка скопирована"
 
+msgid "Link organization"
+msgstr "Привязать организацию"
+
 msgid "Link task"
 msgstr "Привязать задачу"
 
@@ -11407,6 +11437,9 @@ msgstr "Связать эту задачу"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} привязана к рабочей области"
+
+msgid "Linking..."
+msgstr "Привязка..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11611,9 +11644,6 @@ msgstr "Локальная рабочая область"
 
 msgid "Local workspaces"
 msgstr "Локальные рабочие области"
-
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Локальные рабочие области работают на вашем компьютере. Что к ним подключать, решаете вы."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Локально, на хосте или в облаке"
@@ -12093,6 +12123,9 @@ msgstr "Сообщения"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Сообщения с этими словами уведомляют вас как упоминание. Разделяйте их запятыми."
 
+msgid "Messages you send go to {name}."
+msgstr "Ваши сообщения получит {name}."
+
 msgid "Microphone"
 msgstr "Микрофон"
 
@@ -12179,8 +12212,8 @@ msgstr "Мобильное приложение"
 msgid "Mobile App"
 msgstr "Мобильное приложение"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Телефон, облако или собственное облако"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Мобильное приложение, облако или собственный парк машин"
 
 msgid "Mode"
 msgstr "Режим"
@@ -12310,6 +12343,9 @@ msgstr "Перенесите работу из облака"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Перемещать фокус между основными вкладками и правой боковой панелью и открывать панель, если она закрыта"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Перенеси настройки в модальное окно, чтобы людям не приходилось покидать рабочее пространство. Сохрани фильтрацию поиска и сделай так, чтобы ⌘, открывало его откуда угодно."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Перенести эту рабочую область на {computerName}?"
@@ -13811,6 +13847,9 @@ msgstr "Приглашать новых людей могут только ад�
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Менять тариф может только владелец организации. Попросите его перейти на Pro."
 
+msgid "Only an owner or admin can link this organization."
+msgstr "Привязать эту организацию может только владелец или администратор."
+
 msgid "Only available on macOS."
 msgstr "Доступно только в macOS."
 
@@ -14268,6 +14307,9 @@ msgstr "Открыть страницу в браузере по умолчан�
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Открывайте страницы и отвечайте на комментарии в приложении Paradev на iPhone и iPad."
 
+msgid "Open PR"
+msgstr "Открыть PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Открыть PR #{0}"
@@ -14319,6 +14361,9 @@ msgstr "Открытый исходный код"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source под лицензией MIT. Используйте любого агента на своих подписках и ключах."
+
+msgid "Open source.<0/>Secure by design."
+msgstr "Открытый код.<0/>Безопасность на уровне архитектуры."
 
 msgid "Open System Settings"
 msgstr "Открыть Системные настройки"
@@ -14406,9 +14451,6 @@ msgstr "OpenAI отклонил этот ключ API."
 
 msgid "Opened"
 msgstr "Открыт"
-
-msgid "opened PR #841 for review"
-msgstr "открыл PR #841 на ревью"
 
 msgid "Opening {appName}…"
 msgstr "Открываем {appName}…"
@@ -14917,9 +14959,6 @@ msgstr "Параллельные агенты"
 msgid "Parallel agents guide"
 msgstr "Руководство по параллельным агентам"
 
-msgid "Parallel Execution"
-msgstr "Параллельное выполнение"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Число параллельных сессий на разработчика удваивается каждые семь месяцев, преодолевая пороги Оператора, Директора завода и Henry Ford с августа 2026 по август 2028 года"
 
@@ -15209,11 +15248,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Тариф"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "План"
+
 msgid "Plan restored"
 msgstr "Тариф восстановлен"
 
 msgid "Plan updated"
 msgstr "Тариф обновлён"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "План: вынести <0>SettingsPage</0> в <1>SettingsDialog</1>, провести ⌘, через глобальный слой горячих клавиш, поиск оставить как есть. Начинаю."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15546,9 +15592,6 @@ msgstr "Политика конфиденциальности"
 msgid "Private"
 msgstr "Приватный"
 
-msgid "Private by default.<0/>You're in control."
-msgstr "Приватно по умолчанию.<0/>Контроль у вас."
-
 msgid "Private: only specific people"
 msgstr "Закрытый: только определённые люди"
 
@@ -15833,9 +15876,6 @@ msgstr "Запушьте ветки и продолжайте работу на 
 msgid "Pushed"
 msgstr "Новые коммиты"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Отправил изменения и открыл черновик PR."
-
 msgid "Pushing..."
 msgstr "Отправка…"
 
@@ -15952,6 +15992,9 @@ msgstr "Radix поворачивает обёртку стрелки подск�
 msgid "Radix Tooltip docs"
 msgstr "Документация Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Выполнено <0>bun test settings</0> · 14 пройдено · 1 не пройден"
+
 msgid "Random icon"
 msgstr "Случайный значок"
 
@@ -16006,6 +16049,9 @@ msgstr "Прочитано"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Прочитан"
+
+msgid "Read 3 files"
+msgstr "Прочитано 3 файла"
 
 msgid "Read a list of your most visited websites"
 msgstr "Читать список самых посещаемых сайтов"
@@ -16653,6 +16699,9 @@ msgstr "Ответить"
 msgid "Reply in thread"
 msgstr "Ответить в ветке"
 
+msgid "Reply to Claude Code…"
+msgstr "Ответить Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "Ответить в ветке…"
 
@@ -17259,6 +17308,9 @@ msgstr "Запускайте 10+ параллельных кодовых аге�
 msgid "Run again"
 msgstr "Запустить снова"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Запускайте агентов параллельно, каждого в своей ветке. Проверяйте их работу с помощью встроенных диффов, проверок PR и ревью от агентов, а затем сливайте изменения, не выходя из приложения."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Запускайте агентов по расписанию или когда что-то происходит."
 
@@ -17313,9 +17365,6 @@ msgstr "Запуск по расписанию или по событиям, з�
 
 msgid "Run on any machine"
 msgstr "На любой машине"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Запускайте параллельных агентов для фич, исправлений и рефакторинга. Каждый работает в своей ветке, локально или в облаке."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Запускайте параллельных агентов для кода в Paradev"
@@ -17541,8 +17590,8 @@ msgstr "Сохранение..."
 msgid "Saving…"
 msgstr "Сохранение…"
 
-msgid "Scale to 100+ agents"
-msgstr "Масштабируйте до 100+ агентов"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Масштабируйтесь до сотен агентов, сохраняя планку качества"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Отсканируйте QR-код, войдите в тот же аккаунт Paradev и выберите эту организацию."
@@ -18314,6 +18363,9 @@ msgstr "Настройки..."
 msgid "settings.ts"
 msgstr "settings.ts"
 
+msgid "Settled"
+msgstr "Завершённые"
+
 msgid "Setup"
 msgstr "Установка"
 
@@ -18443,6 +18495,9 @@ msgstr "Показать все комментарии"
 
 msgid "Show all lines"
 msgstr "Показать все строки"
+
+msgid "Show all models"
+msgstr "Показать все модели"
 
 msgid "Show Apple's installer"
 msgstr "Показать установщик Apple"
@@ -19253,8 +19308,8 @@ msgstr "Запустить сессию"
 msgid "Start agent"
 msgstr "Запустить агента"
 
-msgid "Start agents on events or a schedule"
-msgstr "Запускайте агентов по событиям или по расписанию"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Запускайте агентов автоматически: по ошибке в Sentry, задаче в Linear, пул-реквесту в GitHub или по расписанию, которое агент задаёт сам."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Запускайте агентов, следите за ними в реальном времени и проверяйте diff с iPhone или iPad. Ваш код остаётся на ваших машинах."
@@ -19627,9 +19682,6 @@ msgstr "Регулярность · активных дней из 30"
 
 msgid "Switch account"
 msgstr "Сменить аккаунт"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Меняйте агентов. Процесс остаётся"
 
 msgid "Switch host"
 msgstr "Сменить хост"
@@ -20020,9 +20072,6 @@ msgstr "Типографика терминала"
 
 msgid "Terminals"
 msgstr "Терминалы"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Терминалы ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Терминалы не отвечают"
@@ -20626,6 +20675,9 @@ msgstr "Этот агент не может ответвить разговор"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Этот агент не позволяет отправлять сообщения своим субагентам."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
 
@@ -20803,6 +20855,12 @@ msgstr "Это рабочее пространство Linear уже подкл�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Это рабочее пространство Linear уже подключено другой организацией Paradev."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Срок действия ссылки истёк. Снова откройте Paradev из подписки AWS Marketplace."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Ссылка недействительна. Снова откройте Paradev из подписки AWS Marketplace."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Похоже, это бинарный файл. Открытие его как текста может показать мусор или подвесить редактор на больших файлах."
 
@@ -20842,8 +20900,14 @@ msgstr "Это меняет только отображаемое имя, а н�
 msgid "this organization"
 msgstr "эта организация"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Эта организация уже платит картой. Сначала отмените этот тариф или выберите другую организацию."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "У этой организации нет расчётных периодов. Выберите временной диапазон."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Эта организация уже привязана к другой подписке AWS Marketplace."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Эта организация на бесплатном тарифе. {appName} Mobile доступен организациям на тарифе Pro."
@@ -20964,6 +21028,9 @@ msgstr "Этого субагента сейчас нельзя перевест
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Хост больше не отслеживает этого субагента. Его стенограмма остаётся на диске в каталоге сессии агента."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Эта подписка уже привязана к другой организации."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "В этом терминале пока нет вывода, который можно передать."
@@ -21370,9 +21437,6 @@ msgstr "Разбор почты и черновики ответов"
 
 msgid "Triage new issues"
 msgstr "Разбирать новые задачи"
-
-msgid "triaging 12 new issues…"
-msgstr "разбирает 12 новых задач…"
 
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Пытается исправить каждый баг, о котором пишут в #bugs."
@@ -21872,6 +21936,12 @@ msgstr "Обновите значение <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
 
+msgid "Update this host to message subagents."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам. Ваш текст снова в основном чате."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Обновите этот хост, чтобы переводить субагентов в фон"
 
@@ -22008,9 +22078,6 @@ msgstr "Использовать как запуск рабочей област
 msgid "Use cases"
 msgstr "Сценарии"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Используйте Claude Code, Codex, OpenCode или любой CLI-агент. Рабочие области, ветки и ревью остаются прежними."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Используйте Claude Code, Codex или любого кодового агента. Выбирайте под задачу или запускайте несколько рядом."
 
@@ -22046,6 +22113,12 @@ msgstr "Используйте Paradev на телефоне с Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Используйте тарифы агентов и API-ключи, которые у вас уже есть. Запросы к моделям идут напрямую к вашему провайдеру."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Используйте лучшего агента. Без привязки к одному."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Используйте лучших агентов сразу после их выхода. Ваши артефакты, ветки и плагины работают со всеми."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Используйте десктопное приложение, чтобы запускать параллельных кодовых агентов."
@@ -22280,9 +22353,15 @@ msgstr "Открыть стек, пул-реквест {position} из {size}"
 msgid "View usage"
 msgstr "Посмотреть использование"
 
+msgid "Viewed"
+msgstr "Просмотрено"
+
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Открыт"
+
+msgid "Viewing subagent {name}"
+msgstr "Просмотр субагента {name}"
 
 msgid "Violence or harassment"
 msgstr "Насилие или травля"
@@ -22406,6 +22485,9 @@ msgstr "Не удалось списать средства со способа 
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Не удалось списать средства с вашего способа оплаты. Обновите его, чтобы сохранить тариф."
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Не удалось подтвердить подписку AWS Marketplace"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Не удалось связаться с {appName}, чтобы узнать, в сети ли он. Проверьте подключение и попробуйте снова."
@@ -23115,6 +23197,9 @@ msgstr "У вас нет доступа к этому терминалу."
 msgid "You don't have permission to remove this member"
 msgstr "У вас нет прав удалить этого участника"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "У вас пока нет организации, которой вы владеете или управляете. Создайте её и снова откройте эту ссылку."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "У вас есть несохранённые переменные окружения. Точно закрыть?"
 
@@ -23218,8 +23303,8 @@ msgstr "Ваш агент публикует дизайны и отчёты. К�
 msgid "Your agent subscriptions and keys"
 msgstr "Ваши подписки и ключи для агентов"
 
-msgid "Your Agents, Your Accounts"
-msgstr "Ваши агенты, ваши аккаунты"
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Подписка AWS Marketplace активна"
 
 msgid "Your changes"
 msgstr "Ваши изменения"

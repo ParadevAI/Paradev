@@ -21,8 +21,13 @@ import {
 import { DesignModeController } from "./design-mode-controller";
 import { captureDesignModeScreenshot } from "./design-mode-screenshot";
 import { buildDesignModeScript } from "./design-mode-script";
+import { watchGuestMouseDown } from "./focus-forward";
 import { buildGuestContextMenu } from "./guest-context-menu";
 import { markBrowserPanePopup, shouldOpenAsPopup } from "./popup-window";
+import {
+	createViewportZoomForward,
+	VIEWPORT_ZOOM_WORLD_ID,
+} from "./viewport-zoom-forward";
 
 interface ConsoleEntry {
 	level: "log" | "warn" | "error" | "info" | "debug";
@@ -124,32 +129,6 @@ const DEEP_LINK_SCHEMES = new Set([
 	`${PROTOCOL_SCHEMES.PROD}:`,
 	`${PROTOCOL_SCHEME}:`,
 ]);
-
-/**
- * Resolves `true` on the next `mousedown` in the guest's current document, or
- * `false` on `pagehide`. Installs its listeners the first time (idempotent
- * across repeated injections into the same document) and queues a resolver per
- * call so a fresh `executeJavaScript` await always gets the *next* press, not a
- * stale one. Never calls `stopPropagation`/`preventDefault` — purely observes.
- * The `pagehide` settle is required: a pending `executeJavaScript` keeps its
- * document alive after navigation, so each guest reload would leak one.
- */
-const NEXT_MOUSEDOWN_SCRIPT = `(() => {
-	if (!window.__supersetMousedownHook) {
-		window.__supersetMousedownHook = { resolvers: [] };
-		const settle = (pressed) => {
-			const hook = window.__supersetMousedownHook;
-			const resolvers = hook.resolvers;
-			hook.resolvers = [];
-			for (const resolve of resolvers) resolve(pressed);
-		};
-		document.addEventListener("mousedown", () => settle(true), true);
-		window.addEventListener("pagehide", () => settle(false));
-	}
-	return new Promise((resolve) => {
-		window.__supersetMousedownHook.resolvers.push(resolve);
-	});
-})()`;
 
 function protocolOf(url: string): string | null {
 	try {
@@ -287,6 +266,7 @@ class BrowserManager extends EventEmitter {
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
+	private viewportZoomListeners = new Map<string, () => void>();
 	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
 	private requestedPanes = new Set<string>();
@@ -316,6 +296,7 @@ class BrowserManager extends EventEmitter {
 				this.navigationListeners,
 				this.popupListeners,
 				this.focusListeners,
+				this.viewportZoomListeners,
 				this.formEditListeners,
 			]) {
 				const cleanup = map.get(paneId);
@@ -343,6 +324,7 @@ class BrowserManager extends EventEmitter {
 			this.setupBeforeInput(paneId, wc);
 			this.setupNavigationGuard(paneId, wc);
 			this.setupFocusForward(paneId, wc);
+			this.setupViewportZoom(paneId, wc);
 			this.setupFormEditTracking(paneId, wc);
 		}
 		this.emit("pane-registered", {
@@ -360,6 +342,7 @@ class BrowserManager extends EventEmitter {
 			this.navigationListeners,
 			this.popupListeners,
 			this.focusListeners,
+			this.viewportZoomListeners,
 			this.formEditListeners,
 		]) {
 			const cleanup = map.get(paneId);
@@ -1337,60 +1320,41 @@ class BrowserManager extends EventEmitter {
 	}
 
 	/**
-	 * A click inside the guest never bubbles a DOM event to the pane's own
-	 * mousedown handler — the webview is a separate WebContents, hoisted
-	 * outside the pane tree. `WebContents.on('focus')` looks like the fix
-	 * (Electron's documented signal for focus moving between WebContents in
-	 * the same window) but doesn't actually fire for a `<webview>` guest —
-	 * confirmed live: `wc.isFocused()` stayed false immediately after a click
-	 * that had already moved the host's `document.activeElement` onto the
-	 * webview element. `<webview>` uses the older guest-view plumbing, and its
-	 * focus doesn't route through the same WebContents-level signal a
-	 * WebContentsView would give.
-	 *
-	 * Instead, borrow the same no-preload technique design-mode already uses:
-	 * inject a script that resolves a Promise on the guest's next mousedown,
-	 * `executeJavaScript` awaits it, and re-arms immediately after. No
-	 * preload/nodeIntegration needed — the guest stays untrusted.
+	 * A click inside the guest never reaches the pane's own mousedown handler:
+	 * the webview is a separate WebContents, hoisted outside the pane tree.
+	 * `WebContents.on('focus')` does not fire for a `<webview>` guest, so watch
+	 * the guest's mouse input instead.
 	 */
 	private setupFocusForward(paneId: string, wc: Electron.WebContents): void {
-		let cancelled = false;
-		// Bumped on every main-frame document. dom-ready starts a fresh loop
-		// for the new document; the stale one exits at its next check and a
-		// late resolution from it is dropped rather than emitted.
-		let generation = 0;
-		const loop = async (gen: number): Promise<void> => {
-			while (!cancelled && gen === generation) {
-				if (wc.isDestroyed()) return;
-				let pressed: unknown;
-				try {
-					pressed = await wc.executeJavaScript(NEXT_MOUSEDOWN_SCRIPT);
-				} catch {
-					// Script failed to run (mid-navigation, crashed renderer):
-					// retry, but not in a hot spin.
-					await new Promise((resolve) => setTimeout(resolve, 100));
-					continue;
-				}
-				if (pressed === false || cancelled || gen !== generation) return;
-				this.emit(`pane-focus:${paneId}`);
-				this.emit("pane-focused", { paneId });
-			}
-		};
-		const rearm = (): void => {
-			generation += 1;
-			void loop(generation);
-		};
-
-		wc.on("dom-ready", rearm);
+		const stop = watchGuestMouseDown(wc, () => {
+			this.emit(`pane-focus:${paneId}`);
+			this.emit("pane-focused", { paneId });
+		});
 		this.focusListeners.set(paneId, () => {
-			cancelled = true;
 			try {
-				wc.off("dom-ready", rearm);
+				stop();
 			} catch {
 				// webContents may be destroyed
 			}
 		});
-		void loop(generation);
+	}
+
+	private setupViewportZoom(paneId: string, wc: Electron.WebContents): void {
+		const forward = createViewportZoomForward({
+			runScript: (code) =>
+				wc.executeJavaScriptInIsolatedWorld(VIEWPORT_ZOOM_WORLD_ID, [{ code }]),
+			onViewport: (viewport) => this.emit(`viewport-zoom:${paneId}`, viewport),
+		});
+		wc.on("dom-ready", forward.rearm);
+		this.viewportZoomListeners.set(paneId, () => {
+			forward.cancel();
+			try {
+				wc.off("dom-ready", forward.rearm);
+			} catch {
+				// webContents may be destroyed
+			}
+		});
+		forward.rearm();
 	}
 
 	private setupFormEditTracking(

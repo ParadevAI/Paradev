@@ -15,7 +15,7 @@ export function TrustedBySection() {
 		<section className="py-16 sm:py-20 bg-background overflow-hidden">
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				<div>
-					<h2 className="text-base sm:text-xl font-medium text-center mb-4 sm:mb-8 text-foreground">
+					<h2 className="text-sm sm:text-base font-normal text-center mb-4 sm:mb-8 text-muted-foreground">
 						<Trans>Trusted by builders from</Trans>
 					</h2>
 				</div>

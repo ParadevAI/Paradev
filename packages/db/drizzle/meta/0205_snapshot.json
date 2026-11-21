@@ -1,5 +1,5 @@
 {
-  "id": "42f9990f-eca0-4be4-ba4d-55cc998aaeff",
+  "id": "33751b44-2518-40de-9217-50bcc23b14de",
   "prevId": "fab56a2f-3e2a-4ce5-b648-b05190c45635",
   "version": "7",
   "dialect": "postgresql",
@@ -9888,8 +9888,8 @@
           "method": "btree",
           "with": {}
         },
-        "cloud_workspace_boots_open_idx": {
-          "name": "cloud_workspace_boots_open_idx",
+        "cloud_workspace_boots_open_or_locked_idx": {
+          "name": "cloud_workspace_boots_open_or_locked_idx",
           "columns": [
             {
               "expression": "started_at",
@@ -9899,7 +9899,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"cloud_workspace_boots\".\"stopped_at\" is null or \"cloud_workspace_boots\".\"finalized_through\" is null or \"cloud_workspace_boots\".\"finalized_through\" < \"cloud_workspace_boots\".\"stopped_at\"",
+          "where": "(\"cloud_workspace_boots\".\"stopped_at\" is null or \"cloud_workspace_boots\".\"finalized_through\" is null or \"cloud_workspace_boots\".\"finalized_through\" < \"cloud_workspace_boots\".\"stopped_at\" or \"cloud_workspace_boots\".\"lock_open\")",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -12077,12 +12077,6 @@
         },
         "machine_size": {
           "name": "machine_size",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "config": {
-          "name": "config",
           "type": "text",
           "primaryKey": false,
           "notNull": false

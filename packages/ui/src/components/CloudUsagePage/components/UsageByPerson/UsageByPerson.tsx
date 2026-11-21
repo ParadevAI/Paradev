@@ -14,7 +14,7 @@ import type { PricedUsage } from "../../utils/priced";
 import { Person } from "../Person";
 import { QueryStatus } from "../QueryStatus";
 import { Section } from "../Section";
-import { utcDays } from "../UsageByDay/utils/utcDays";
+import { utcDays } from "./utils/utcDays";
 
 interface UsageByPersonProps {
 	Link: CloudUsageLink;

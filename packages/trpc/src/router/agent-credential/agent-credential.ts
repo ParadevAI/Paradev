@@ -28,6 +28,7 @@ import {
 	requestDeviceCode,
 } from "./utils/chatgpt";
 import { decryptAgentCredential, encryptAgentCredential } from "./utils/crypto";
+import { normalizeAgentCredentialValue } from "./utils/normalize-value";
 import { checkPublicEndpoint } from "./utils/public-endpoint";
 import { type AgentSignIns, signInsFromRows } from "./utils/sign-ins";
 import { validateAgentCredential } from "./utils/validate";
@@ -95,7 +96,7 @@ export const agentCredentialRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const value = input.value.trim();
+			const value = normalizeAgentCredentialValue(input);
 			if (!value) {
 				throw userError({
 					code: "BAD_REQUEST",

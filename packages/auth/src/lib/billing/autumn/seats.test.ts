@@ -9,6 +9,7 @@ test("a missing Autumn customer allows legacy seat handling without retries or a
 		new AutumnError("Customer does not exist in this org and env", {
 			body,
 			response: new Response(body, { status: 404 }),
+			request: new Request("https://api.useautumn.com/v1/customers"),
 		}),
 	);
 	const fetch = spyOn(globalThis, "fetch").mockRejectedValue(

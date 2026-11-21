@@ -1,4 +1,8 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
+import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
+	BOX_GB_MINUTES_FEATURE_ID,
+} from "@superset/shared/billing";
 import { z } from "zod";
 
 export {
@@ -90,8 +94,8 @@ export type CloudWorkspaceVisibility = z.infer<
 
 /** The Autumn features a cloud workspace boot is billed on; the values are Autumn feature ids. */
 export const cloudUsageFeatureValues = [
-	"box_gb_minutes",
-	"active_cpu_minutes",
+	BOX_GB_MINUTES_FEATURE_ID,
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
 ] as const;
 export const cloudUsageFeatureEnum = z.enum(cloudUsageFeatureValues);
 export type CloudUsageFeature = z.infer<typeof cloudUsageFeatureEnum>;

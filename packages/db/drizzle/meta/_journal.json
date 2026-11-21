@@ -1440,8 +1440,22 @@
     {
       "idx": 205,
       "version": "7",
-      "when": 1795154755973,
-      "tag": "0205_environment_config",
+      "when": 1795176188571,
+      "tag": "0205_cloud_workspace_boots_open_or_locked_idx",
+      "breakpoints": true
+    },
+    {
+      "idx": 206,
+      "version": "7",
+      "when": 1795212874823,
+      "tag": "0206_aws_marketplace_customers",
+      "breakpoints": true
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1795297907753,
+      "tag": "0207_environment_config",
       "breakpoints": true
     }
   ]

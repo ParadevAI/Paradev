@@ -362,7 +362,7 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 		{ range: NOVEMBER, groupBy: "workspace", search: "e" },
 		{ range: NOVEMBER, groupBy: "workspace", sort: "hours" },
 		{ range: NOVEMBER, groupBy: "workspace", order: "asc" },
-	] as const) {
+	] satisfies Parameters<typeof owner.usage.query>[0][]) {
 		await expect(
 			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
 		).rejects.toMatchObject(notValid);
@@ -504,7 +504,11 @@ test("with billing off there are no periods and no prices", async () => {
 		billingOff: true,
 		listRatePerGbHour: async () => 0.06,
 	});
-	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
+	expect(await owner.periods.list({})).toEqual({
+		items: [],
+		nextCursor: null,
+		ratePerGbHour: null,
+	});
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
@@ -522,7 +526,9 @@ test("the open period's allowance is in dollars at the usage rate, with bought a
 			overageLimit: { type: "absolute", gbMinutes: 6000 },
 		}),
 	});
-	const [open] = (await owner.periods.list({})).items;
+	const { items, ratePerGbHour } = await owner.periods.list({});
+	expect(ratePerGbHour).toBe(0.06);
+	const [open] = items;
 	expect(open?.allowance).toMatchObject({
 		usedUsd: 2.04,
 		includedUsd: 1.2,
@@ -592,9 +598,15 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 		limitReached: null,
 	});
 	expect(open?.unavailable).toEqual(
-		["seats", "bought", "freeCredits", "extraUsageLimit", "limitReached"].map(
-			(field) => ({ field, reason: "not_read" }),
-		),
+		(
+			[
+				"seats",
+				"bought",
+				"freeCredits",
+				"extraUsageLimit",
+				"limitReached",
+			] as const
+		).map((field) => ({ field, reason: "not_read" })),
 	);
 });
 

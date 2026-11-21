@@ -23,7 +23,6 @@ import { HistoryIcon, Settings2Icon } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
-import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
@@ -33,7 +32,6 @@ import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId"
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
-import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -97,6 +95,7 @@ import { SupersetIcon } from "./components/SupersetIcon";
 import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
+import { useLaunchModels } from "./hooks/useLaunchModels";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
@@ -107,6 +106,7 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
+import { launchPresetIdOf } from "./utils/launchPresetIdOf";
 import {
 	type PendingEnvironmentSetup,
 	planEnvironmentSetup,
@@ -135,10 +135,6 @@ interface NewWorkspaceScreenProps {
  * The workspace-creation surface: heading, sample prompts, and a minimal
  * composer, filling the window rather than a dialog.
  */
-function launchPresetIdOf(agent: AgentSelectAgent): string {
-	return agent.launchPresetId ?? agent.presetId ?? agent.iconId ?? agent.id;
-}
-
 export function NewWorkspaceScreen({
 	isOpen,
 	preSelectedProjectId,
@@ -591,7 +587,13 @@ export function NewWorkspaceScreen({
 		useAgentChoices(launchHostUrl);
 	const cloudAgents = useCloudAgentChoices();
 	// Under Cloud the built-in presets stand in for a host's agent list.
-	const agentConfigs = isCloudHost ? cloudAgents : hostAgents;
+	const agentConfigs = useMemo(
+		() =>
+			(isCloudHost ? cloudAgents : hostAgents).filter(
+				(agent) => launchPresetIdOf(agent) !== "mastracode",
+			),
+		[isCloudHost, cloudAgents, hostAgents],
+	);
 	const agentsFetched = isCloudHost || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
 		() => agentConfigs.map((agent) => agent.id),
@@ -612,13 +614,22 @@ export function NewWorkspaceScreen({
 		);
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [agentConfigs, selectedAgent]);
-	const modelSupport = selectedPresetId
-		? getAgentModelSupport(selectedPresetId)
-		: undefined;
-	const { selectedModel, setSelectedModel } = useAgentModelPreference(
-		MODEL_STORAGE_KEY,
-		modelSupport ? selectedPresetId : null,
-	);
+	const acpChatEnabled = useAcpChatEnabled();
+	const {
+		catalogs,
+		defaultEffortLabel,
+		modelSupport,
+		selectedModel,
+		setSelectedModel,
+		modelForLaunch,
+	} = useLaunchModels({
+		agents: agentConfigs,
+		selectedAgent,
+		selectedPresetId,
+		hostUrl: launchHostUrl,
+		projectId: isCloudHost ? undefined : (projectId ?? undefined),
+		storageKey: MODEL_STORAGE_KEY,
+	});
 	const effortSupport = selectedPresetId
 		? getAgentEffortSupport(selectedPresetId)
 		: undefined;
@@ -633,7 +644,11 @@ export function NewWorkspaceScreen({
 	// launches) as the agent default.
 	const effortOptions = useMemo(
 		() =>
-			selectedPresetId
+			selectedPresetId &&
+			(!selectedModel ||
+				getAgentModelSupport(selectedPresetId)?.models.some(
+					(entry) => entry.id === selectedModel,
+				))
 				? getAgentEfforts(selectedPresetId, selectedModel ?? undefined)
 				: [],
 		[selectedPresetId, selectedModel],
@@ -646,7 +661,6 @@ export function NewWorkspaceScreen({
 	const modeSupport = selectedPresetId
 		? getAgentModeSupport(selectedPresetId)
 		: undefined;
-	const acpChatEnabled = useAcpChatEnabled();
 	const startModes = acpChatEnabled
 		? acpStartModes(selectedPresetId)
 		: undefined;
@@ -659,7 +673,7 @@ export function NewWorkspaceScreen({
 							id: AGENT_DEFAULT_OPTION_ID,
 							label: t({ message: "Direct mode" }),
 						},
-						...modeSupport.modes.map(({ id, label }) => ({ id, label })),
+						...modeSupport.modes.map((entry) => ({ ...entry })),
 					]
 				: undefined),
 		[startModes, modeSupport, t],
@@ -681,14 +695,22 @@ export function NewWorkspaceScreen({
 				selectedModel,
 				efforts: effortOptions,
 				selectedEffort,
+				defaultEffortLabel: selectedModel ? undefined : defaultEffortLabel,
 				labels: {
 					model: t({ message: "Model" }),
-					defaultModel: t({ message: "Default model" }),
+					defaultModel: t({ message: "Default" }),
 					effort: t({ message: "Effort" }),
 					defaultEffort: t({ message: "Default" }),
 				},
 			}),
-		[effortOptions, modelSupport, selectedEffort, selectedModel, t],
+		[
+			effortOptions,
+			modelSupport,
+			selectedEffort,
+			selectedModel,
+			defaultEffortLabel,
+			t,
+		],
 	);
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
 	const selectLaunchOption = useCallback(
@@ -701,7 +723,7 @@ export function NewWorkspaceScreen({
 	);
 	const pendingSwitchModel = useRef<{
 		agent: WorkspaceCreateAgent;
-		model: string;
+		model: string | null;
 	} | null>(null);
 	useEffect(() => {
 		const pending = pendingSwitchModel.current;
@@ -713,22 +735,30 @@ export function NewWorkspaceScreen({
 		if (selectedAgent === "none") return undefined;
 		return {
 			currentPresetId: selectedAgent,
+			defaultOptionId: AGENT_DEFAULT_OPTION_ID,
 			agents: agentConfigs.map((agent) => ({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
+				loading: catalogs[agent.id]?.loading,
+				onLoad: catalogs[agent.id]?.load,
+				catalogKey: catalogs[agent.id]?.key,
+				defaultModelLabel: catalogs[agent.id]?.defaultModel?.label,
 				models: (
-					getAgentModelSupport(launchPresetIdOf(agent))?.models ?? []
-				).map(({ id, label }) => ({ id, label })),
+					catalogs[agent.id]?.models ??
+					getAgentModelSupport(launchPresetIdOf(agent))?.models ??
+					[]
+				).map((entry) => ({ ...entry })),
 			})),
 			onSwitch: (agentId, model) => {
-				pendingSwitchModel.current = model
-					? { agent: agentId, model: model.id }
-					: null;
+				pendingSwitchModel.current = {
+					agent: agentId,
+					model: model?.id ?? null,
+				};
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, agentConfigs]);
+	}, [selectedAgent, setSelectedAgent, agentConfigs, catalogs]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(
@@ -781,7 +811,7 @@ export function NewWorkspaceScreen({
 		projectId,
 		selectedAgent,
 		selectedPresetId,
-		modelSupport ? selectedModel : null,
+		modelForLaunch,
 		effortForLaunch,
 		modeForLaunch,
 		uploadAttachments,

@@ -23,6 +23,8 @@ import { SEGMENT_COLORS } from "./constants";
 interface AllowanceCardProps {
 	/** Our own count of the range's usage, shown when billing gives no breakdown. */
 	metered: Amount;
+	/** The organization's price of one GB-hour, from `cloud.periods.list`. */
+	ratePerGbHour: number | null;
 	/** Null for a past period. */
 	allowance: CloudAllowance | null;
 	/** What billing could not give; a `not_read` entry means no breakdown yet. */
@@ -35,6 +37,7 @@ interface AllowanceCardProps {
 
 export function AllowanceCard({
 	metered,
+	ratePerGbHour,
 	allowance,
 	unavailable,
 	isPeriod,
@@ -45,6 +48,7 @@ export function AllowanceCard({
 	const shown = cloudUsageDisplay(
 		unavailable.some((item) => item.reason === "not_read") ? null : allowance,
 		metered,
+		ratePerGbHour,
 	);
 	const dollars = dollarsFor([
 		shown.used.usd,

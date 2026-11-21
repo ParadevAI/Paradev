@@ -18,6 +18,7 @@ import { useHostServiceInfo } from "renderer/hooks/host-service/useHostServiceIn
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
+import { useAgentModelCatalog } from "renderer/hooks/useAgentModelCatalog";
 import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import { StoredChatTranscript } from "../../../../../../components/StoredChatTranscript";
@@ -157,6 +158,16 @@ export function AcpChatPane({
 	const { hostUrl } = useWorkspaceClient();
 	const hostInfo = useHostServiceInfo(hostUrl);
 	const { data: agentConfigs } = useAgentConfigs(hostUrl);
+	const modelCatalogs = useAgentModelCatalog(
+		hostUrl,
+		(agentConfigs ?? []).filter((config) =>
+			acpHarnessForPreset(config.presetId),
+		),
+		"chat",
+		workspaceId,
+		undefined,
+		sessionId && agent ? { id: sessionId, presetId: agent.id } : undefined,
+	);
 	const agentLabel = agentConfigs?.find(
 		(config) => config.id === agent?.id,
 	)?.label;
@@ -390,15 +401,23 @@ export function AcpChatPane({
 		if (!presetIds.includes(agent.id)) return undefined;
 		return {
 			currentPresetId: agent.id,
-			agents: presetIds.map((presetId) => ({
-				presetId,
-				label:
-					agentConfigs?.find((config) => config.presetId === presetId)?.label ??
+			agents: presetIds.map((presetId) => {
+				const config = agentConfigs?.find(
+					(entry) => entry.presetId === presetId,
+				);
+				const catalog = modelCatalogs[config?.id ?? ""];
+				return {
 					presetId,
-				models: (getAgentModelSupport(presetId)?.models ?? []).map(
-					({ id, label }) => ({ id, label }),
-				),
-			})),
+					runtimeModels: true,
+					loading: catalog?.loading,
+					onLoad: catalog?.load,
+					catalogKey: catalog?.key,
+					defaultModelLabel: catalog?.defaultModel?.label,
+					label: config?.label ?? presetId,
+					models:
+						catalog?.models ?? getAgentModelSupport(presetId)?.models ?? [],
+				};
+			}),
 			onSwitch: async (
 				presetId: string,
 				nextModel: { id: string; label: string } | null,
@@ -466,6 +485,7 @@ export function AcpChatPane({
 	}, [
 		agent,
 		agentConfigs,
+		modelCatalogs,
 		onSwitchAgent,
 		onOpenAgentChat,
 		sessionId,

@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# selhává} few {# selhávají} many {# selhává} oth
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# změněný soubor} few {# změněné soubory} many {# změněného souboru} other {# změněných souborů}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# úkol} few {# úkoly} many {# úkolu} other {# úkol�
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# běžící terminál} few {# běžící terminály} many {# běžícího terminálu} other {# běžících terminálů}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# nezměněný řádek} few {# nezměněné řádky} many {# nezměněného řádku} other {# nezměněných řádků}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -784,6 +787,9 @@ msgstr "{actor} zrušil(a) propojení pracovního prostoru {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "zatím {actual} · odhad ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} vám nedovolí posílat zprávy svým subagentům."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Relace {agents} se obnoví, když otevřete jejich pracovní prostor."
 
@@ -1170,8 +1176,17 @@ msgstr "{name} se ptá"
 msgid "{name} can't be messaged"
 msgstr "{name} nemůže přijímat zprávy"
 
+msgid "{name} can't take messages now."
+msgstr "{name} teď nemůže přijímat zprávy."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} nemůže přijímat zprávy. Váš text je zpět v hlavním chatu."
+
 msgid "{name} failed"
 msgstr "{name} selhal"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} selhal a nemůže přijímat zprávy."
 
 msgid "{name} finished"
 msgstr "{name} skončil"
@@ -1205,6 +1220,9 @@ msgstr "{name} začal pracovat"
 
 msgid "{name} stopped"
 msgstr "{name} byl zastaven"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} se zastavil a nemůže přijímat zprávy."
 
 msgid "{name} wants more access"
 msgstr "{name} chce rozšířený přístup"
@@ -1683,9 +1701,6 @@ msgstr "1 uživatel"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ souběžných proudů práce bez ztráty přehledu"
 
-msgid "12m ago"
-msgstr "před 12 min"
-
 msgid "145,000+ across 180 countries"
 msgstr "145 000+ ve 180 zemích"
 
@@ -1694,9 +1709,6 @@ msgstr "15 min"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ hvězd, 100+ přispěvatelů"
-
-msgid "1d ago"
-msgstr "před 1 d"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agenti · 14 změněných souborů"
@@ -1712,9 +1724,6 @@ msgstr "2025 až dnes"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "před 2 h"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2387,9 +2396,6 @@ msgstr "Konfigurace agentů"
 msgid "Agent finished"
 msgstr "Agent dokončil"
 
-msgid "Agent Independence"
-msgstr "Nezávislost na agentovi"
-
 msgid "Agent is working"
 msgstr "Agent pracuje"
 
@@ -2480,9 +2486,6 @@ msgstr "Agenti vidí jen zástupný údaj. Paradev přidá vaše přihlášení 
 
 msgid "Agents that run while you're away"
 msgstr "Agenti, kteří běží, když jste pryč"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agenti sami třídí issues, píší changelogy a aktualizují závislosti."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agenti používají tento účet, když volají nástroje Linear."
@@ -3515,12 +3518,18 @@ msgstr "Běží"
 msgid "Away"
 msgstr "Nepřítomen"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace neodpovídá. Zkuste to znovu za několik minut."
+
 msgid "Back"
 msgstr "Zpět"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Zpět"
+
+msgid "Back to {parentTitle}"
+msgstr "Zpět na {parentTitle}"
 
 msgid "Back to About"
 msgstr "Zpět na O nás"
@@ -3809,6 +3818,9 @@ msgstr "Převeďte své pracovní prostory"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Přeneste projekty, pracovní prostory a terminálové skripty z v1 do v2. Každá položka se importuje zvlášť a jde ji zkusit znovu."
 
+msgid "Bring Your Own Subscription"
+msgstr "Přineste si vlastní předplatné"
+
 msgid "Bringing over your v1 projects"
 msgstr "Přenášíme vaše projekty z v1"
 
@@ -3880,6 +3892,9 @@ msgstr "Vytvořili jste plugin? Odešlete ho sem."
 
 msgid "Built in Paradev"
 msgstr "Vytvořeno v Paradev"
+
+msgid "Built to be driven by agents"
+msgstr "Stvořeno k tomu, aby ho řídili agenti"
 
 msgid "builtin"
 msgstr "vestavěný"
@@ -4488,6 +4503,9 @@ msgstr "Vyberte"
 msgid "Choose the model"
 msgstr "Vybrat model"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Vyberte organizaci, které bude AWS Marketplace účtovat. Každé předplatné je propojeno s jednou organizací."
+
 msgid "Choose the primary repository"
 msgstr "Vyberte hlavní repozitář"
 
@@ -4614,9 +4632,6 @@ msgstr "Mažu…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI a SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentace CLI"
@@ -5330,6 +5345,9 @@ msgstr "Připojte se, abyste s pull requesty pracovali sami za sebe, ne jako pra
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Připojte svůj účet {pluginLabel} a pak tuto stránku znovu načtěte."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Propojte předplatné AWS Marketplace"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6630,9 +6648,6 @@ msgstr "Vytvořit s AI"
 msgid "Create workspace"
 msgstr "Vytvořit pracovní prostor"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Vytvářejte pracovní prostory a spouštějte agenty z CLI, SDK nebo přes MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Vytvářejte pracovní prostory, spouštějte agenty a čtěte jejich výstup z libovolného terminálu nebo skriptu. macOS a Linux."
 
@@ -6927,6 +6942,9 @@ msgstr "Den v měsíci"
 
 msgid "Day One"
 msgstr "První den"
+
+msgid "Days are in Pacific time."
+msgstr "Dny jsou v tichomořském čase."
 
 msgid "days running three agents at once"
 msgstr "dní se třemi agenty najednou"
@@ -7755,9 +7773,6 @@ msgstr "Otevřen koncept"
 msgid "Draft PR #2841"
 msgstr "Draft PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "připravil 3 odpovědi podpoře"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Přetáhněte <0>Paradev</0> do složky <1>Aplikace</1>"
 
@@ -7770,8 +7785,8 @@ msgstr "Přetažením pracovních prostorů změníte pořadí v ručním řazen
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Řiďte to z terminálu"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Řiďte celou aplikaci i cloud z CLI, přes SDK nebo MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Řiďte pracovní prostory, agenty a relace programově ze skriptů, CI nebo vlastních nástrojů."
@@ -7957,6 +7972,9 @@ msgstr "Upraveno"
 
 msgid "Edited {ago}"
 msgstr "Upraveno {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Upraven <0>SettingsDialog.tsx</0>"
 
 msgid "Editing"
 msgstr "Úpravy"
@@ -8888,11 +8906,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Rychlý"
 
-msgid "Fast mode off"
-msgstr "Rychlý režim vypnut"
-
-msgid "Fast mode on"
-msgstr "Rychlý režim zapnut"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Rychlý režim není pro tento model dostupný. Vyberte model, který ho podporuje."
 
 msgid "Fault"
 msgstr "Selhání"
@@ -9110,9 +9125,6 @@ msgstr "Dokončeno"
 msgid "Finished · unread"
 msgstr "Hotovo · nepřečteno"
 
-msgid "finished · worked for 7s"
-msgstr "hotovo · pracoval 7 s"
-
 msgid "Finishing the move…"
 msgstr "Dokončování přesunu…"
 
@@ -9127,6 +9139,9 @@ msgstr "Přizpůsobit"
 
 msgid "Fix all failing checks"
 msgstr "Opravit všechny selhávající kontroly"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Opravujte chyby ve chvíli, kdy jsou nahlášeny"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Oprava součtu košíku pro prázdné košíky. Přidává test, který reprodukuje TypeError."
@@ -9145,6 +9160,9 @@ msgstr "Opravit nálezy"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Opravuj nové chyby ve web. Každou zreprodukuj testem a otevři draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Opravovat produkční chyby"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9510,9 +9528,6 @@ msgstr "Vygenerovaný soubor je skrytý"
 msgid "Generated image"
 msgstr "Vygenerovaný obrázek"
 
-msgid "Generating"
-msgstr "Generuje"
-
 msgid "Generating..."
 msgstr "Generuji..."
 
@@ -9692,6 +9707,12 @@ msgstr "Zpět na úvod"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Vraťte se do {appName} a přihlaste se znovu."
+
+msgid "Go back to {parentTitle}."
+msgstr "Vraťte se na {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Vraťte se a napište hlavnímu agentovi."
 
 msgid "Go back to the previous page in history"
 msgstr "Přejít zpět na předchozí stránku v historii"
@@ -10794,6 +10815,12 @@ msgstr "Nepůjde ho obnovit."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Zkopíruje soubory cookie z vašeho profilu „{profileName}“ do prohlížeče v aplikaci. Agenti pak mohou jednat na webech, kde jste přihlášeni."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Je už propojeno s organizací, jejímž nejste členem. Požádejte jejího vlastníka o pozvánku."
+
+msgid "It is linked to {organization}."
+msgstr "Je propojeno s {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Zůstane mu název z vašeho zadání."
 
@@ -11399,6 +11426,9 @@ msgstr "odkaz zkopírován"
 msgid "Link copied"
 msgstr "Odkaz zkopírován"
 
+msgid "Link organization"
+msgstr "Propojit organizaci"
+
 msgid "Link task"
 msgstr "Propojit úkol"
 
@@ -11407,6 +11437,9 @@ msgstr "Propojit tento úkol"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} propojeno s pracovním prostorem"
+
+msgid "Linking..."
+msgstr "Propojování..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11611,9 +11644,6 @@ msgstr "Lokální pracovní prostor"
 
 msgid "Local workspaces"
 msgstr "Lokální pracovní prostory"
-
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Lokální pracovní prostory běží na vašem počítači. Co se k nim připojí, rozhodujete vy."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokálně, na hostiteli nebo v cloudu"
@@ -12093,6 +12123,9 @@ msgstr "Zprávy"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Zprávy s těmito slovy vás upozorní jako zmínka. Oddělte je čárkami."
 
+msgid "Messages you send go to {name}."
+msgstr "Zprávy, které pošlete, dostane {name}."
+
 msgid "Microphone"
 msgstr "Mikrofon"
 
@@ -12179,8 +12212,8 @@ msgstr "Mobilní aplikace"
 msgid "Mobile App"
 msgstr "Mobilní aplikace"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Mobil, cloud nebo vlastní cloud"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobil, cloud nebo vlastní flotila"
 
 msgid "Mode"
 msgstr "Režim"
@@ -12310,6 +12343,9 @@ msgstr "Přesuňte práci z cloudu"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a otevřít panel, pokud je zavřený"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Přesuň Nastavení do modálního okna, aby lidé nemuseli opouštět svůj pracovní prostor. Zachovej filtrování vyhledávání a zařiď, aby ho ⌘, otevřelo odkudkoli."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Přesunout tento pracovní prostor na {computerName}?"
@@ -13811,6 +13847,9 @@ msgstr "Nové lidi mohou zvát jen správci {organizationName}"
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Tarif může změnit jen vlastník organizace. Požádejte ho o přechod na Pro."
 
+msgid "Only an owner or admin can link this organization."
+msgstr "Tuto organizaci může propojit jen vlastník nebo správce."
+
 msgid "Only available on macOS."
 msgstr "Dostupné jen na macOS."
 
@@ -14268,6 +14307,9 @@ msgstr "Otevřít stránku ve výchozím prohlížeči"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Otevírejte stránky a odpovídejte na komentáře v aplikaci Paradev na iPhonu a iPadu."
 
+msgid "Open PR"
+msgstr "Otevřít PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Otevřít PR #{0}"
@@ -14319,6 +14361,9 @@ msgstr "Open source"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source pod licencí MIT. Používejte libovolného agenta s vlastními předplatnými a klíči."
+
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Bezpečné už od návrhu."
 
 msgid "Open System Settings"
 msgstr "Otevřít Nastavení systému"
@@ -14406,9 +14451,6 @@ msgstr "OpenAI tento API klíč odmítl."
 
 msgid "Opened"
 msgstr "Otevřen"
-
-msgid "opened PR #841 for review"
-msgstr "otevřel PR #841 k revizi"
 
 msgid "Opening {appName}…"
 msgstr "Otevírá se {appName}…"
@@ -14917,9 +14959,6 @@ msgstr "Paralelní agenti"
 msgid "Parallel agents guide"
 msgstr "Průvodce paralelními agenty"
 
-msgid "Parallel Execution"
-msgstr "Paralelní běh"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Počet souběžných relací na vývojáře se každých sedm měsíců zdvojnásobuje a mezi srpnem 2026 a srpnem 2028 překračuje hranice Operátor, Vedoucí závodu a Henry Ford"
 
@@ -15209,11 +15248,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Tarif"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Plán"
+
 msgid "Plan restored"
 msgstr "Tarif obnoven"
 
 msgid "Plan updated"
 msgstr "Tarif byl aktualizován"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Plán: vyčlenit <0>SettingsPage</0> do <1>SettingsDialog</1>, vést ⌘, přes globální vrstvu klávesových zkratek, vyhledávání nechat beze změny. Začínám."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15546,9 +15592,6 @@ msgstr "Zásady ochrany soukromí"
 msgid "Private"
 msgstr "Soukromý"
 
-msgid "Private by default.<0/>You're in control."
-msgstr "Soukromé ve výchozím stavu.<0/>Máte to pod kontrolou."
-
 msgid "Private: only specific people"
 msgstr "Soukromý: jen vybraní lidé"
 
@@ -15833,9 +15876,6 @@ msgstr "Pushněte své větve a pak pokračujte na svém Macu nebo v cloudovém 
 msgid "Pushed"
 msgstr "Nový push"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Odeslal push a otevřel koncept PR."
-
 msgid "Pushing..."
 msgstr "Pushování…"
 
@@ -15952,6 +15992,9 @@ msgstr "Radix otáčí obal šipky tooltipu podle strany,"
 msgid "Radix Tooltip docs"
 msgstr "Dokumentace Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Spuštěno <0>bun test settings</0> · 14 prošlo · 1 selhal"
+
 msgid "Random icon"
 msgstr "Náhodná ikona"
 
@@ -16006,6 +16049,9 @@ msgstr "Přečteno"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Přečteno"
+
+msgid "Read 3 files"
+msgstr "Přečteny 3 soubory"
 
 msgid "Read a list of your most visited websites"
 msgstr "Číst seznam vašich nejnavštěvovanějších webů"
@@ -16653,6 +16699,9 @@ msgstr "Odpovědět"
 msgid "Reply in thread"
 msgstr "Odpovědět ve vlákně"
 
+msgid "Reply to Claude Code…"
+msgstr "Odpovědět Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "Odpovědět do vlákna…"
 
@@ -17259,6 +17308,9 @@ msgstr "Spusťte na svém stroji 10+ paralelních programovacích agentů."
 msgid "Run again"
 msgstr "Spustit znovu"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Spouštějte agenty paralelně, každého ve vlastní větvi. Kontrolujte jejich práci pomocí vestavěných diffů, kontrol PR a revize agenty a pak slučujte, aniž byste opustili aplikaci."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Spouštějte agenty podle plánu nebo když se něco stane."
 
@@ -17313,9 +17365,6 @@ msgstr "Spouštění podle plánu nebo událostí, na vyžádání, pozastavení
 
 msgid "Run on any machine"
 msgstr "Na jakémkoli počítači"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Spouštějte paralelní kódovací agenty na funkce, opravy a refaktory. Každý pracuje na vlastní větvi, lokálně nebo v cloudu."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Spouštějte paralelní coding agenty s Paradev"
@@ -17541,8 +17590,8 @@ msgstr "Ukládání…"
 msgid "Saving…"
 msgstr "Ukládám…"
 
-msgid "Scale to 100+ agents"
-msgstr "Škálujte na více než 100 agentů"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Škálujte na stovky agentů a udržte laťku kvality"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Naskenujte QR kód, přihlaste se stejným účtem Paradev a vyberte tuto organizaci."
@@ -18314,6 +18363,9 @@ msgstr "Nastavení..."
 msgid "settings.ts"
 msgstr "settings.ts"
 
+msgid "Settled"
+msgstr "Uzavřené"
+
 msgid "Setup"
 msgstr "Setup"
 
@@ -18443,6 +18495,9 @@ msgstr "Zobrazit všechny komentáře"
 
 msgid "Show all lines"
 msgstr "Zobrazit všechny řádky"
+
+msgid "Show all models"
+msgstr "Zobrazit všechny modely"
 
 msgid "Show Apple's installer"
 msgstr "Zobrazit instalátor od Applu"
@@ -19253,8 +19308,8 @@ msgstr "Spustit relaci"
 msgid "Start agent"
 msgstr "Spustit agenta"
 
-msgid "Start agents on events or a schedule"
-msgstr "Spouštějte agenty událostmi nebo podle plánu"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Spouštějte agenty automaticky: na základě chyby v Sentry, úkolu v Linear, pull requestu na GitHubu nebo podle plánu, který si agent nastaví sám."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Spouštějte agenty, sledujte je živě a kontrolujte diff z iPhonu nebo iPadu. Váš kód zůstává na vašich počítačích."
@@ -19627,9 +19682,6 @@ msgstr "Pravidelnost · aktivní dny z 30"
 
 msgid "Switch account"
 msgstr "Přepnout účet"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Vyměňte agenta. Workflow zůstane"
 
 msgid "Switch host"
 msgstr "Přepnout hosta"
@@ -20020,9 +20072,6 @@ msgstr "Typografie terminálu"
 
 msgid "Terminals"
 msgstr "Terminály"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminály ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Terminály neodpovídají"
@@ -20626,6 +20675,9 @@ msgstr "Tento agent neumí rozvětvit konverzaci"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Tento agent nemůže běžet v cloudovém pracovním prostoru"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Tento agent vám nedovolí posílat zprávy svým subagentům."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Tento agent už na vybraném zařízení neexistuje (jeho agenti mohli být resetováni). Běhy budou selhávat, dokud nevyberete jiného."
 
@@ -20803,6 +20855,12 @@ msgstr "Tento Linear workspace už připojil {owner}. Požádejte je, ať ho nej
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Tento Linear workspace už připojila jiná organizace Paradev."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Platnost tohoto odkazu vypršela. Otevřete Paradev znovu z předplatného AWS Marketplace."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Tento odkaz není platný. Otevřete Paradev znovu z předplatného AWS Marketplace."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Vypadá to na binární soubor. Otevření jako text může zobrazit nesmyslný výstup nebo u velkých souborů zamrznout editor."
 
@@ -20842,8 +20900,14 @@ msgstr "Změní se jen zobrazovaný název, ne větev."
 msgid "this organization"
 msgstr "této organizace"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Tato organizace už platí kartou. Nejdřív tento tarif zrušte, nebo vyberte jinou organizaci."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Tato organizace nemá žádná fakturační období. Zvolte místo toho časový rozsah."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Tato organizace je už propojena s jiným předplatným AWS Marketplace."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tato organizace má tarif Free. {appName} Mobile je dostupný pro organizace s tarifem Pro."
@@ -20964,6 +21028,9 @@ msgstr "Tento subagent se teď nedá přesunout na pozadí"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Tento subagent už není hostitelem sledován. Jeho přepis zůstává na disku v adresáři relace agenta."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Toto předplatné je už propojeno s jinou organizací."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Tento terminál zatím nemá žádný výstup k předání."
@@ -21370,9 +21437,6 @@ msgstr "Třídění pošty a návrhy odpovědí"
 
 msgid "Triage new issues"
 msgstr "Třídit nové issues"
-
-msgid "triaging 12 new issues…"
-msgstr "třídí 12 nových issues…"
 
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Zkusí opravit každou chybu, kterou někdo napíše do #bugs."
@@ -21872,6 +21936,12 @@ msgstr "Aktualizujte hodnotu <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
 
+msgid "Update this host to message subagents."
+msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům. Váš text je zpět v hlavním chatu."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli přesouvat subagenty na pozadí"
 
@@ -22008,9 +22078,6 @@ msgstr "Použít jako spuštění pracovního prostoru"
 msgid "Use cases"
 msgstr "Případy použití"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Používejte Claude Code, Codex, OpenCode nebo jakéhokoli CLI agenta. Vaše pracovní prostory, větve i kontrola zůstávají stejné."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Použijte Claude Code, Codex nebo libovolného kódovacího agenta. Vyberte podle úkolu nebo jich spusťte několik vedle sebe."
 
@@ -22046,6 +22113,12 @@ msgstr "Používejte Paradev na telefonu s Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Používejte tarify agentů a API klíče, které už máte. Volání modelů jdou přímo k vašemu poskytovateli."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Používejte nejlepšího agenta. Bez uzamčení u jednoho."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Používejte nejlepší agenty, jakmile vyjdou. Vaše artefakty, větve a pluginy fungují se všemi."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pro spouštění paralelních kódovacích agentů použijte desktopovou aplikaci."
@@ -22280,9 +22353,15 @@ msgstr "Zobrazit stack, pull request {position} z {size}"
 msgid "View usage"
 msgstr "Zobrazit využití"
 
+msgid "Viewed"
+msgstr "Zobrazeno"
+
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Zobrazeno"
+
+msgid "Viewing subagent {name}"
+msgstr "Zobrazujete subagenta {name}"
 
 msgid "Violence or harassment"
 msgstr "Násilí nebo obtěžování"
@@ -22406,6 +22485,9 @@ msgstr "Nepodařilo se strhnout platbu ze způsobu platby této organizace. Pož
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Nepodařilo se strhnout platbu z vašeho způsobu platby. Aktualizujte ho, ať vám tarif zůstane."
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Předplatné AWS Marketplace se nepodařilo potvrdit"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Nepodařilo se spojit se {appName}em a zjistit, jestli je online. Zkontrolujte připojení a zkuste to znovu."
@@ -23115,6 +23197,9 @@ msgstr "K tomuto terminálu nemáte přístup."
 msgid "You don't have permission to remove this member"
 msgstr "Nemáte oprávnění tohoto člena odebrat"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Zatím nevlastníte ani nespravujete žádnou organizaci. Vytvořte ji a pak tento odkaz otevřete znovu."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Máte neuložené proměnné prostředí. Opravdu chcete zavřít?"
 
@@ -23218,8 +23303,8 @@ msgstr "Váš agent publikuje návrhy a reporty. Tým je okomentuje a agent se p
 msgid "Your agent subscriptions and keys"
 msgstr "Vaše předplatná agentů a klíče"
 
-msgid "Your Agents, Your Accounts"
-msgstr "Vaši agenti, vaše účty"
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Vaše předplatné AWS Marketplace je aktivní"
 
 msgid "Your changes"
 msgstr "Vaše změny"

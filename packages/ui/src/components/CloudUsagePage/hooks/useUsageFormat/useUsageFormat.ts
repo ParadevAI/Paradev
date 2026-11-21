@@ -4,11 +4,14 @@ import { useFormat } from "@superset/i18n/react";
 
 export function useUsageFormat() {
 	const { formatCurrency, formatNumber } = useFormat();
+	/** Under a cent but not nothing reads as "<$0.01", as GB-hours read "<1". */
 	const withDigits = (digits: number) => (usd: number) =>
-		formatCurrency(usd, "USD", {
-			minimumFractionDigits: usd === 0 ? 0 : digits,
-			maximumFractionDigits: usd === 0 ? 0 : digits,
-		});
+		usd > 0 && usd < 0.01
+			? `<${formatCurrency(0.01, "USD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+			: formatCurrency(usd, "USD", {
+					minimumFractionDigits: usd === 0 ? 0 : digits,
+					maximumFractionDigits: usd === 0 ? 0 : digits,
+				});
 	/** As in the design: $0, cents under $100, whole dollars from there. */
 	const dollars = (usd: number) => withDigits(Math.abs(usd) < 100 ? 2 : 0)(usd);
 	/** One precision for figures shown together, as on one card: whole dollars once any reaches $100. */
