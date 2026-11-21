@@ -20322,11 +20322,11 @@ msgstr "Tên này hiển thị trên thanh bên."
 msgid "The network connection changed"
 msgstr "Kết nối mạng đã thay đổi"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Workspace mã nguồn mở cho Claude Code, Codex và mọi coding agent."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Workspace mã nguồn mở cho Claude Code, Codex và mọi agent. Trên máy của bạn hoặc trên đám mây."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Workspace mã nguồn mở cho Claude Code, Codex, OpenCode và mọi agent lập trình. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Workspace mã nguồn mở cho Claude Code, Codex, OpenCode và mọi agent, trên máy của bạn hoặc trên đám mây. Chạy các tác vụ song song trên các nhánh riêng và xem xét mọi thứ ở một nơi."
 
 msgid "The organization reached its usage limit."
 msgstr "Tổ chức đã đạt giới hạn sử dụng."

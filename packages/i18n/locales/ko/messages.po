@@ -20322,11 +20322,11 @@ msgstr "이 이름은 사이드바에 표시됩니다."
 msgid "The network connection changed"
 msgstr "네트워크 연결이 바뀌었습니다"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Claude Code, Codex, 그리고 모든 코딩 에이전트를 위한 오픈 소스 워크스페이스."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Claude Code, Codex, 그리고 모든 에이전트를 위한 오픈 소스 워크스페이스. 로컬에서도 클라우드에서도."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Claude Code, Codex, OpenCode, 그리고 모든 코딩 에이전트를 위한 오픈 소스 워크스페이스. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Claude Code, Codex, OpenCode, 그리고 모든 에이전트를 위한 오픈 소스 워크스페이스. 로컬에서도 클라우드에서도 사용할 수 있습니다. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
 
 msgid "The organization reached its usage limit."
 msgstr "조직이 사용량 한도에 도달했습니다."

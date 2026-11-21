@@ -20322,11 +20322,11 @@ msgstr "Это имя отображается на боковой панели.
 msgid "The network connection changed"
 msgstr "Сетевое соединение изменилось"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Рабочая область с открытым исходным кодом для Claude Code, Codex и любого кодового агента."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Рабочая область с открытым исходным кодом для Claude Code, Codex и любого агента. Локально или в облаке."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Рабочее пространство с открытым исходным кодом для Claude Code, Codex, OpenCode и любого другого агента для кода. Запускайте задачи параллельно в отдельных ветках и проверяйте всё в одном месте."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Рабочее пространство с открытым исходным кодом для Claude Code, Codex, OpenCode и любого другого агента, локально или в облаке. Запускайте задачи параллельно в отдельных ветках и проверяйте всё в одном месте."
 
 msgid "The organization reached its usage limit."
 msgstr "Организация достигла лимита использования."

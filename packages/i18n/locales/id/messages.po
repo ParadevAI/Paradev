@@ -20322,11 +20322,11 @@ msgstr "Nama ini ditampilkan di bilah samping."
 msgid "The network connection changed"
 msgstr "Koneksi jaringan berubah"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Workspace open source untuk Claude Code, Codex, dan agen apa pun. Secara lokal atau di cloud."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen apa pun, secara lokal atau di cloud. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
 msgid "The organization reached its usage limit."
 msgstr "Organisasi telah mencapai batas penggunaannya."
