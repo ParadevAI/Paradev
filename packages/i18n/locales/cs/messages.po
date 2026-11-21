@@ -20435,11 +20435,11 @@ msgstr "Název se zobrazuje v postranním panelu."
 msgid "The network connection changed"
 msgstr "Síťové připojení se změnilo"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Open-source pracovní prostor pro Claude Code, Codex a jakéhokoli kódovacího agenta."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Open-source pracovní prostor pro Claude Code, Codex a jakéhokoli agenta. Lokálně nebo v cloudu."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Open-source pracovní prostor pro Claude Code, Codex, OpenCode a jakéhokoli kódovacího agenta. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Open-source pracovní prostor pro Claude Code, Codex, OpenCode a jakéhokoli agenta, lokálně nebo v cloudu. Spouštějte úkoly paralelně na samostatných větvích a vše kontrolujte na jednom místě."
 
 msgid "The organization reached its usage limit."
 msgstr "Organizace dosáhla svého limitu využití."

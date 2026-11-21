@@ -20435,11 +20435,11 @@ msgstr "Le nom s’affiche dans la barre latérale."
 msgid "The network connection changed"
 msgstr "La connexion réseau a changé"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "L'espace de travail open source pour Claude Code, Codex et n'importe quel agent de code."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "L'espace de travail open source pour Claude Code, Codex et n'importe quel agent. En local ou dans le cloud."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "L'espace de travail open source pour Claude Code, Codex, OpenCode et n'importe quel agent de code. Lancez des tâches en parallèle sur des branches séparées et relisez tout au même endroit."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "L'espace de travail open source pour Claude Code, Codex, OpenCode et n'importe quel agent, en local ou dans le cloud. Lancez des tâches en parallèle sur des branches séparées et relisez tout au même endroit."
 
 msgid "The organization reached its usage limit."
 msgstr "L'organisation a atteint sa limite d'utilisation."

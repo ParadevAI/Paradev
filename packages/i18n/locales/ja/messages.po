@@ -20435,11 +20435,11 @@ msgstr "この名前はサイドバーに表示されます。"
 msgid "The network connection changed"
 msgstr "ネットワーク接続が変更されました"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Claude Code、Codex、そしてあらゆるコーディングエージェントのための、オープンソースのワークスペース。"
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Claude Code、Codex、そしてあらゆるエージェントのための、オープンソースのワークスペース。ローカルでもクラウドでも。"
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Claude Code、Codex、OpenCode、そしてあらゆるコーディングエージェントのための、オープンソースのワークスペース。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Claude Code、Codex、OpenCode、そしてあらゆるエージェントのための、ローカルでもクラウドでも使えるオープンソースのワークスペース。タスクを別々のブランチで並行して実行し、すべてを1か所でレビューできます。"
 
 msgid "The organization reached its usage limit."
 msgstr "組織が使用量の上限に達しました。"
