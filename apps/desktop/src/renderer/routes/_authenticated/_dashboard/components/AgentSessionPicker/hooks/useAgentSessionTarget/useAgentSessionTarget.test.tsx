@@ -49,7 +49,7 @@ test("the currently open chat takes priority over an old selection", () => {
 	).toBe("chat-a");
 });
 
-test("falls back to the usual default when the open chat is not a live session", () => {
+test("requires a new selection when the open chat is unavailable", () => {
 	const sessions = [
 		{ terminalId: "term-a", chatSessionId: "chat-a" },
 	] as TerminalAgentBinding[];
@@ -60,9 +60,42 @@ test("falls back to the usual default when the open chat is not a live session",
 			preferredTerminalId: "term-b",
 		}),
 	);
+	expect(result.current.resolved).toBeNull();
+	act(() => result.current.onValueChange("existing:term-a"));
 	expect(result.current.resolved).toEqual({
 		kind: "existing",
 		terminalId: "term-a",
 		chatSessionId: "chat-a",
 	});
+});
+
+test("does not switch targets when the preferred chat detaches and returns", () => {
+	const chat = {
+		terminalId: "term-b",
+		chatSessionId: "chat-b",
+	} as TerminalAgentBinding;
+	const other = {
+		terminalId: "term-a",
+		chatSessionId: "chat-a",
+	} as TerminalAgentBinding;
+	const { result, rerender } = renderHook(
+		({ sessions }) =>
+			useAgentSessionTarget({
+				sessions,
+				configs: [],
+				preferredTerminalId: "term-b",
+			}),
+		{ initialProps: { sessions: [chat, other] } },
+	);
+	expect(
+		result.current.resolved?.kind === "existing" &&
+			result.current.resolved.terminalId,
+	).toBe("term-b");
+	rerender({ sessions: [other] });
+	expect(result.current.resolved).toBeNull();
+	rerender({ sessions: [chat, other] });
+	expect(
+		result.current.resolved?.kind === "existing" &&
+			result.current.resolved.terminalId,
+	).toBe("term-b");
 });
