@@ -709,7 +709,8 @@ class TerminalRuntimeRegistryImpl {
 	endedCleanly(terminalId: string, instanceId?: string): boolean {
 		const exitStatus = this.getEntry(terminalId, instanceId)?.transport
 			.exitStatus;
-		return exitStatus?.exitCode === 0 && exitStatus.signal === 0;
+		if (!exitStatus || exitStatus.signal !== 0) return false;
+		return exitStatus.exitCode === 0 || exitStatus.shellExited === true;
 	}
 
 	prepareReplacement(
@@ -804,10 +805,4 @@ if (import.meta.hot) {
 	import.meta.hot.data.registry = terminalRuntimeRegistry;
 }
 
-export type {
-	ConnectionState,
-	LinkHoverInfo,
-	TerminalFailureClassification,
-	TerminalLinkHandlers,
-	TerminalLogEntry,
-};
+export type { ConnectionState, LinkHoverInfo, TerminalLogEntry };

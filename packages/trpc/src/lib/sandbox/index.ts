@@ -1,4 +1,6 @@
+export { renewChatgptSignIns } from "../../router/agent-credential";
 export { mintSandboxGateAccess, sandboxHostSecretFor } from "./access";
+export { agentsToRestart } from "./agent-sign-in-kinds";
 export {
 	type ReportSandboxAgentStatusOutcome,
 	reportSandboxAgentStatus,
@@ -9,12 +11,21 @@ export {
 	type SandboxCaller,
 	sandboxCredentialWorkspaceId,
 } from "./api-credential";
-export { bootBeganSince, recordBootSpans } from "./boot-trace";
+export {
+	apiPhases,
+	bootBeganSince,
+	bootPhases,
+	recordBootSpans,
+} from "./boot-trace";
 export {
 	type BoxHookOutcome,
 	rerunBoxStartHook,
 	runBoxArchiveHook,
 } from "./box-hooks";
+export {
+	type ReportSandboxBoxPressureOutcome,
+	reportSandboxBoxPressure,
+} from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
@@ -23,10 +34,12 @@ export {
 	type RemoteBranchPage,
 } from "./list-branches";
 export {
-	type RefreshSandboxCredentialsOutcome,
-	refreshSandboxCredentials,
-} from "./refresh-credentials";
-export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
+	queueRulesReapply,
+	REAPPLY_RULES_JOB_PATH,
+	type RulesScope,
+	reapplyRulesFor,
+	scheduleRulesRefresh,
+} from "./reapply-rules";
 export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
@@ -44,12 +57,15 @@ export {
 	workspaceRepositories,
 } from "./repositories";
 export {
+	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
+	keepaliveWindowMs,
 	listActiveWorkspaceSandboxes,
+	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
 	provisionSandbox,

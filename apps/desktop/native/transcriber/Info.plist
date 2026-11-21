@@ -7,6 +7,6 @@
 	<key>CFBundleName</key>
 	<string>Superset Transcriber</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Superset uses on-device speech recognition to transcribe dictation in the chat composer.</string>
+	<string>Paradev uses on-device speech recognition to transcribe dictation in the chat composer.</string>
 </dict>
 </plist>

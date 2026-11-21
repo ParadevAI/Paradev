@@ -62,7 +62,7 @@ export function ChatSearchResults({ query }: { query: string }) {
 						if (stale) return;
 						setOpen(false);
 						void navigate({
-							to: "/v2-workspace/$workspaceId",
+							to: "/workspace/$workspaceId",
 							params: { workspaceId: result.workspaceId },
 							search: {
 								sessionId: result.sessionId,

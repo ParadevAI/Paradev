@@ -9,6 +9,13 @@ import { HOST_AGENT_PRESETS } from "./host-agent-presets";
  */
 const INSTALLED_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
 
+/**
+ * The installed presets that can run as a chat in the sandbox: claude and codex
+ * through the ACP adapters `packages/sandbox/src/assets/produce.ts` bundles,
+ * pdev through `pdev acp`, its own ACP server.
+ */
+const CHAT_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
+
 export const CLOUD_AGENT_IDS: readonly string[] = HOST_AGENT_PRESETS.filter(
 	(preset) => INSTALLED_IN_SANDBOX.has(preset.presetId),
 ).map((preset) => preset.presetId);
@@ -21,8 +28,12 @@ export function isCloudAgentId(id: string): boolean {
 }
 
 export function supportsCloudAgentChat(agent: string | undefined): boolean {
-	return agent === "claude" || agent === "pdev";
+	return !!agent && CHAT_IN_SANDBOX.has(agent);
 }
+
+export const CLOUD_AGENT_LAUNCH_SURFACES = ["terminal", "chat"] as const;
+export type CloudAgentLaunchSurface =
+	(typeof CLOUD_AGENT_LAUNCH_SURFACES)[number];
 
 /**
  * What a cloud workspace launches on first boot: a built-in agent and its
@@ -43,7 +54,7 @@ export const cloudAgentLaunchSchema = z.object({
 	 * itself once host-service is up.
 	 */
 	attachmentFileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).optional(),
-	surface: z.enum(["terminal", "chat"]).optional(),
+	surface: z.enum(CLOUD_AGENT_LAUNCH_SURFACES).optional(),
 	/**
 	 * Set only by cloud automation dispatch. A manual create must not name a
 	 * run: the box reports this id, and the API trusts it as the correlation.
@@ -60,10 +71,15 @@ export type CloudAgentLaunch = z.infer<typeof cloudAgentLaunchSchema>;
 
 export type CloudAgentLaunchDescriptor = {
 	agent: string;
-	surface: "chat" | "terminal";
+	surface: CloudAgentLaunchSurface;
 	promptHash: string | null;
 	/** Null when the launch picks its own terminal id. */
 	terminalId: string | null;
+};
+
+/** A launch a box has not started yet, with the prompt its waiting pane shows. */
+export type PendingCloudAgentLaunch = CloudAgentLaunchDescriptor & {
+	prompt: string;
 };
 
 export async function hashCloudAgentPrompt(prompt: string): Promise<string> {

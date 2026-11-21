@@ -65,7 +65,7 @@ export function ChannelContextMenu({
 		onSuccess: () => {
 			options.onSuccess();
 			if (isActive && channel.visibility === "private") {
-				void navigate({ to: "/v2-workspaces" });
+				void navigate({ to: "/workspaces" });
 			}
 		},
 	});

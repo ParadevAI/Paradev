@@ -49,10 +49,13 @@ describe("getAppCommand", () => {
 		]);
 	});
 
-	test("returns single-element array for xcode", () => {
+	test("opens xcode by bundle ID, so a version-named install still launches", () => {
 		const result = getAppCommand("xcode", "/path/to/file");
 		expect(result).toEqual([
-			{ command: "open", args: ["-a", "Xcode", "/path/to/file"] },
+			{
+				command: "open",
+				args: ["-b", "com.apple.dt.Xcode", "/path/to/file"],
+			},
 		]);
 	});
 

@@ -1,16 +1,20 @@
+import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
+	environmentBuilds,
 	environmentProjects,
 	environmentRepositories,
 	environmentScopeValues,
 	environmentSecrets,
 	environments,
 	githubRepositories,
+	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
+import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
-import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
 	assertCloudAccess,
@@ -18,8 +22,8 @@ import {
 	isMember,
 	type MemberContext,
 } from "../../lib/cloud-guards";
+import { controlTags } from "../../lib/control-log";
 import {
-	buildSandboxClaim,
 	deleteSandbox,
 	loadRepositories,
 	primaryRepository,
@@ -28,8 +32,18 @@ import {
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
+import {
+	type BuildRefusalReason,
+	BuildRefused,
+	isStale,
+	startEnvironmentBuild,
+} from "../../lib/sandbox/environment-build";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { isLiveStatus } from "../cloud-workspace/live";
+import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { wakeAfterStop } from "../cloud-workspace/wake";
+import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
 import {
 	assertEnvironmentCapacity,
@@ -38,6 +52,22 @@ import {
 import { regionForRequest } from "./region-for-request";
 import { secretsRouter } from "./secrets";
 import { decryptSecret, encryptSecret } from "./secrets/utils/crypto";
+
+async function assertCanChangeForEveryone(
+	environment: {
+		scope: string;
+		createdByUserId: string | null;
+		organizationId: string;
+	},
+	ctx: MemberContext,
+) {
+	if (
+		environment.scope === "organization" &&
+		environment.createdByUserId !== ctx.principal.userId
+	) {
+		await verifyOrgAdmin(ctx.principal.userId, environment.organizationId);
+	}
+}
 
 /** An environment the caller may see; another member's personal one does not exist to them. */
 export async function loadEnvironment(id: string, ctx: MemberContext) {
@@ -210,7 +240,7 @@ async function loadPromotable(
 	cloudWorkspaceId: string,
 ) {
 	const workspace = await loadVisibleWorkspace(ctx, cloudWorkspaceId);
-	if (workspace.status !== "ready") {
+	if (!isLiveStatus(workspace.status)) {
 		throw userError({
 			code: "PRECONDITION_FAILED",
 			message: "Only a ready workspace can become an environment",
@@ -227,6 +257,59 @@ async function loadPromotable(
 		workingBranch: workspace.branch,
 	});
 	return { workspace, source, checkouts };
+}
+
+const BUILD_REFUSALS: Record<
+	BuildRefusalReason,
+	{
+		code:
+			| "NOT_FOUND"
+			| "FORBIDDEN"
+			| "PRECONDITION_FAILED"
+			| "CONFLICT"
+			| "TOO_MANY_REQUESTS";
+		i18nKey: string;
+	}
+> = {
+	"not-found": {
+		code: "NOT_FOUND",
+		i18nKey: "serverError.environment.environmentNotFound",
+	},
+	"not-paid": {
+		code: "FORBIDDEN",
+		i18nKey: "serverError.environment.notIncluded",
+	},
+	"no-repositories": {
+		code: "PRECONDITION_FAILED",
+		i18nKey: "serverError.cloudWorkspace.environmentHasNoRepositories",
+	},
+	"no-install": {
+		code: "PRECONDITION_FAILED",
+		i18nKey: "serverError.environment.noInstall",
+	},
+	"already-running": {
+		code: "CONFLICT",
+		i18nKey: "serverError.environment.buildAlreadyRunning",
+	},
+	"rate-limited": {
+		code: "TOO_MANY_REQUESTS",
+		i18nKey: "serverError.environment.manualBuildsRateLimited",
+	},
+};
+
+/** What a client sees of a build; a running build whose workflow died reads as failed. */
+function toBuildView(build: SelectEnvironmentBuild) {
+	const stale = isStale(build);
+	return {
+		id: build.id,
+		status: stale ? ("failed" as const) : build.status,
+		trigger: build.trigger,
+		kind: build.kind,
+		commitSha: build.commitSha,
+		error: stale ? "The build stopped unexpectedly" : build.error,
+		startedAt: build.startedAt,
+		finishedAt: build.finishedAt,
+	};
 }
 
 export const environmentRouter = {
@@ -296,11 +379,14 @@ export const environmentRouter = {
 				/** Where its boxes run; the region nearest the caller when omitted. */
 				region: z.enum(SANDBOX_REGION_IDS).optional(),
 				projectId: z.string().min(1).max(200).optional(),
+				/** The size its workspaces boot at; omitted = the organization's default. */
+				machineSize: z.enum(MACHINE_SIZES).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
+			await assertMachineSizeOffered(input.organizationId, input.machineSize);
 			const limit = await assertEnvironmentCapacity(input.organizationId);
 			if (!input.repositoryIds.includes(input.primaryRepositoryId)) {
 				throw primaryNotIncluded();
@@ -319,6 +405,7 @@ export const environmentRouter = {
 						region: input.region ?? regionForRequest(ctx.headers),
 						bundleSha,
 						scope: input.scope,
+						machineSize: input.machineSize ?? null,
 						createdByUserId: ctx.principal.userId,
 					})
 					.returning();
@@ -445,6 +532,7 @@ export const environmentRouter = {
 						i18nKey: "serverError.environment.organizationMismatch",
 					});
 				}
+				await assertCanChangeForEveryone(target, ctx);
 			}
 			const targetOwner =
 				target && input.scope === "personal"
@@ -473,12 +561,28 @@ export const environmentRouter = {
 			const limit = target
 				? null
 				: await assertEnvironmentCapacity(workspace.organizationId);
-			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
-				claim,
+				organizationId: workspace.organizationId,
 			});
+			const { stopped } = golden;
+			const restart = async () => {
+				if (!stopped) return;
+				await wakeAfterStop(workspace, stopped).catch((error) => {
+					console.error(
+						`[environment/promote] could not restart ${workspace.id} after its snapshot`,
+						error,
+					);
+					if (isCloudUsageRefusal(error)) return;
+					Sentry.captureException(error, {
+						tags: controlTags({
+							cloudWorkspaceId: workspace.id,
+							organizationId: workspace.organizationId,
+						}),
+					});
+				});
+			};
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
 				provider: workspace.provider,
@@ -525,6 +629,7 @@ export const environmentRouter = {
 									name: input.name as string,
 									...fromGolden,
 									scope: input.scope ?? source?.scope ?? "organization",
+									machineSize: source?.machineSize ?? null,
 									createdByUserId: ctx.principal.userId,
 								})
 								.returning();
@@ -578,6 +683,7 @@ export const environmentRouter = {
 							cleanup,
 						),
 					);
+					await restart();
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
@@ -588,7 +694,64 @@ export const environmentRouter = {
 					),
 				);
 			}
+			await restart();
 			return row;
+		}),
+
+	/** Builds the environment's golden from `[install]`; returns the running build at once. */
+	rebuild: personProcedure
+		.input(z.object({ environmentId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			try {
+				return toBuildView(
+					await startEnvironmentBuild({
+						environmentId: environment.id,
+						trigger: "manual",
+					}),
+				);
+			} catch (error) {
+				if (error instanceof BuildRefused) {
+					throw userError({
+						...BUILD_REFUSALS[error.reason],
+						message: error.message,
+						...(error.retryAt
+							? {
+									params: {
+										minutes: Math.max(
+											1,
+											Math.ceil(
+												(error.retryAt.getTime() - Date.now()) / 60_000,
+											),
+										),
+									},
+								}
+							: {}),
+					});
+				}
+				throw error;
+			}
+		}),
+
+	/** The environment's builds, newest first, each with its failure reason. */
+	builds: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				limit: z.number().int().min(1).max(100).optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const rows = await db
+				.select()
+				.from(environmentBuilds)
+				.where(eq(environmentBuilds.environmentId, environment.id))
+				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
+				.limit(input.limit ?? 20);
+			return { builds: rows.map(toBuildView) };
 		}),
 
 	update: personProcedure
@@ -599,11 +762,17 @@ export const environmentRouter = {
 				repositoryIds: z.array(z.string().uuid()).min(1).max(20).optional(),
 				primaryRepositoryId: z.string().uuid().optional(),
 				scope: z.enum(environmentScopeValues).optional(),
+				/** Null goes back to the organization's default. */
+				machineSize: z.enum(MACHINE_SIZES).nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
+			if (input.machineSize !== undefined) {
+				await assertCanChangeForEveryone(current, ctx);
+			}
+			await assertMachineSizeOffered(current.organizationId, input.machineSize);
 
 			// A golden was built for its repositories and set up by its primary.
 			// Changing either means a different golden, so it is promoted again.
@@ -647,6 +816,9 @@ export const environmentRouter = {
 			const patch = {
 				...(input.name ? { name: input.name } : {}),
 				...(input.scope ? { scope: input.scope } : {}),
+				...(input.machineSize !== undefined
+					? { machineSize: input.machineSize }
+					: {}),
 				...(input.scope === "personal"
 					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
 					: {}),

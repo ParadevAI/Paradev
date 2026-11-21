@@ -1,0 +1,1 @@
+export { WorkspacesTable } from "./WorkspacesTable";

@@ -10,6 +10,7 @@ import {
 	type DurableEvent,
 	type Envelope,
 	type Item,
+	isUsageLimitMessage,
 	type SessionState,
 	sessionStateSchema,
 	type Turn,
@@ -51,10 +52,6 @@ export const USAGE_LIMIT_GRACE_MS = 30_000;
 
 /** The most a timer can wait; a reset further out is re-armed when it fires. */
 const MAX_TIMER_MS = 2_147_483_647;
-
-/** Adapters that only see the refusal as an error carry its text. */
-const USAGE_LIMIT_TEXT =
-	/(?:usage|spending|monthly|weekly|daily) limit (?:reached|exceeded)|(?:quota|credits?) (?:exceeded|exhausted|depleted)|insufficient[_ ](?:quota|credits)|hit your (?:usage )?limit|credit balance is too low/i;
 
 const CONTINUE: UserContent[] = [{ type: "text", text: CONTINUE_PROMPT }];
 
@@ -597,8 +594,7 @@ export class LiveSession {
 		if (turn.status !== "failed" || !turn.error) return turn;
 		if (turn.error.kind === "usage_limit") return turn;
 		const limited =
-			turn.id === this.limitedTurnId ||
-			USAGE_LIMIT_TEXT.test(turn.error.message);
+			turn.id === this.limitedTurnId || isUsageLimitMessage(turn.error.message);
 		return limited
 			? { ...turn, error: { ...turn.error, kind: "usage_limit" } }
 			: turn;
@@ -748,7 +744,7 @@ export class LiveSession {
 					return;
 				const limitText =
 					event.turn.status === "failed" &&
-					USAGE_LIMIT_TEXT.test(event.turn.error?.message ?? "");
+					isUsageLimitMessage(event.turn.error?.message ?? "");
 				if (limitText && !this.sessionState.usageLimit) {
 					this.limitReached({ hitAtMs: this.now() });
 				}

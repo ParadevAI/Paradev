@@ -19,10 +19,11 @@ export const scanNestedRepositories: typeof findNestedRepoRoots = (
 export function scanGitIgnoredDirectories(
 	rootPath: string,
 	signal?: AbortSignal,
+	under?: readonly string[],
 ): Promise<string[]> {
 	return getHostWorkerPool().run(
 		ignoredDirectoriesTask,
-		{ rootPath },
+		{ rootPath, under },
 		{ signal },
 	);
 }

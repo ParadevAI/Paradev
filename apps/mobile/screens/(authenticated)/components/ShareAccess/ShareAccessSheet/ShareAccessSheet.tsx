@@ -8,12 +8,13 @@ import {
 } from "@superset/shared/sharing";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Check, Link2, Search } from "lucide-react-native";
 import { type ReactNode, useState } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar } from "@/lib/navigation";
 import type { GeneralAccess } from "../types";
 import { granteeRefOf } from "../utils/granteeRefOf";
 import { GeneralAccessRow } from "./components/GeneralAccessRow";
@@ -87,13 +88,13 @@ export function ShareAccessSheet({
 
 	return (
 		<>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({ message: "Done" })}
-					icon="checkmark"
+					icon="confirm"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 
 			<ScrollView
 				className="bg-background flex-1"

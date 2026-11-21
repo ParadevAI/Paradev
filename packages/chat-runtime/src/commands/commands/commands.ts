@@ -63,6 +63,7 @@ import {
 	respondToUsageLimitInputSchema,
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
+	sessionNotRunningMessage,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
 	steerSubagentInputSchema,
@@ -970,7 +971,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					const source = options.sessions.get(parsed.sessionId);
 					const replay = replaySession(parsed.sessionId);
 					if (!source || !replay.ok) {
-						throw new Error(`chat session ${parsed.sessionId} is not running`);
+						throw new Error(sessionNotRunningMessage(parsed.sessionId));
 					}
 					const before = transcriptBefore(
 						replay.snapshot,

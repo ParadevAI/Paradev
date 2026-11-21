@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
+import { at } from "../../../../test/at";
 import { buildPluginServer } from "./plugin-server";
 import { type PluginTarget, PluginTargetError } from "./resolve-target";
 
@@ -109,17 +110,17 @@ describe("a plugin server with two accounts", () => {
 		try {
 			const { tools } = await client.listTools();
 			expect(tools).toHaveLength(1);
-			expect(tools[0].name).toBe("send_email");
+			expect(at(tools).name).toBe("send_email");
 
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				Record<string, unknown>
 			>;
-			expect(properties.superset_account.enum).toEqual([
+			expect(properties.superset_account?.enum).toEqual([
 				"id-personal",
 				"id-work",
 			]);
-			expect(tools[0].inputSchema.required).toContain("superset_account");
+			expect(at(tools).inputSchema.required).toContain("superset_account");
 			expect(client.getInstructions()).toContain("2 accounts");
 		} finally {
 			await close();
@@ -139,8 +140,8 @@ describe("a plugin server with two accounts", () => {
 			});
 
 			expect(calls).toHaveLength(1);
-			expect(calls[0].args).toEqual({ body: "hi" });
-			expect(calls[0].credential).toBe("token-id-personal");
+			expect(at(calls).args).toEqual({ body: "hi" });
+			expect(at(calls).credential).toBe("token-id-personal");
 			expect(result.isError).toBeFalsy();
 			expect(JSON.stringify(result.content)).toContain("token-id-personal");
 			expect(JSON.stringify(result.content)).toContain(
@@ -163,7 +164,7 @@ describe("a plugin server with two accounts", () => {
 				name: "send_email",
 				arguments: { superset_account: "work", body: "hi" },
 			});
-			expect(calls[0].credential).toBe("token-id-work");
+			expect(at(calls).credential).toBe("token-id-work");
 		} finally {
 			await close();
 		}
@@ -255,7 +256,7 @@ describe("a plugin server with two accounts", () => {
 		try {
 			const { tools } = await client.listTools();
 			expect(tools).toHaveLength(1);
-			expect(tools[0].inputSchema.required).toContain("superset_account");
+			expect(at(tools).inputSchema.required).toContain("superset_account");
 		} finally {
 			await close();
 		}
@@ -269,18 +270,18 @@ describe("a plugin server with one account", () => {
 
 		try {
 			const { tools } = await client.listTools();
-			expect(tools[0].inputSchema.properties).not.toHaveProperty(
+			expect(at(tools).inputSchema.properties).not.toHaveProperty(
 				"superset_account",
 			);
-			expect(tools[0].inputSchema.required).toEqual(["body"]);
+			expect(at(tools).inputSchema.required).toEqual(["body"]);
 
 			const result = await client.callTool({
 				name: "send_email",
 				arguments: { body: "hi" },
 			});
 			expect(result.isError).toBeFalsy();
-			expect(calls[0].args).toEqual({ body: "hi" });
-			expect(calls[0].credential).toBe("token-id-work");
+			expect(at(calls).args).toEqual({ body: "hi" });
+			expect(at(calls).credential).toBe("token-id-work");
 		} finally {
 			await close();
 		}
@@ -306,11 +307,11 @@ describe("which account the tool list comes from", () => {
 		try {
 			const { tools } = await client.listTools();
 			expect(tools).toHaveLength(1);
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				{ enum: string[] }
 			>;
-			expect(properties.superset_account.enum).toEqual([
+			expect(properties.superset_account?.enum).toEqual([
 				"id-personal",
 				"id-work",
 			]);
@@ -330,12 +331,12 @@ describe("which account the tool list comes from", () => {
 
 		try {
 			const { tools } = await client.listTools();
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				{ enum: string[] }
 			>;
 
-			expect(properties.superset_account.enum).toEqual(["id-work"]);
+			expect(properties.superset_account?.enum).toEqual(["id-work"]);
 		} finally {
 			await close();
 		}
@@ -352,12 +353,12 @@ describe("which account the tool list comes from", () => {
 
 		try {
 			const { tools } = await client.listTools();
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				{ enum: string[] }
 			>;
 
-			expect(properties.superset_account.enum).toEqual([
+			expect(properties.superset_account?.enum).toEqual([
 				"id-personal",
 				"id-work",
 			]);
@@ -368,7 +369,9 @@ describe("which account the tool list comes from", () => {
 });
 
 describe("a vendor rejecting the credential mid-session", () => {
-	function rejectingTarget(connectionId: string): PluginTarget {
+	function rejectingTarget(
+		connectionId: string,
+	): Extract<PluginTarget, { kind: "first-party" }> {
 		return {
 			kind: "first-party",
 			plugin: "gmail",

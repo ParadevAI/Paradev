@@ -58,6 +58,7 @@ const RUNTIME_PACKAGES = [
 	"node-pty",
 	"@parcel/watcher",
 	"@xterm/headless",
+	"@agentclientprotocol/claude-agent-acp",
 ] as const;
 
 /**

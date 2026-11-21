@@ -45,13 +45,14 @@ describe("user.myOrganizations", () => {
 			organizationId: "box-org",
 			userId: "creator",
 		});
-		expect(await box.user.myOrganizations()).toEqual([{ id: "box-org" }]);
+		expect((await box.user.myOrganizations()).map((org) => org.id)).toEqual([
+			"box-org",
+		]);
 	});
 
 	test("lists every organization for a signed-in client", async () => {
-		expect(await callerFor(null).user.myOrganizations()).toEqual([
-			{ id: "box-org" },
-			{ id: "other-org" },
-		]);
+		expect(
+			(await callerFor(null).user.myOrganizations()).map((org) => org.id),
+		).toEqual(["box-org", "other-org"]);
 	});
 });

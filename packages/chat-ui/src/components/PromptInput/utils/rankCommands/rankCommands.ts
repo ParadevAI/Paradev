@@ -13,7 +13,7 @@ const DESCRIPTION_SUBSTRING = 10;
 const DESCRIPTION_MIN_QUERY = 3;
 
 function commandName(command: PromptInputCommand): string {
-	return command.title.toLowerCase().replace(/^\//, "");
+	return command.title.toLowerCase().replace(/^[/$]/, "");
 }
 
 function isSubsequence(query: string, candidate: string): boolean {
@@ -25,11 +25,18 @@ function isSubsequence(query: string, candidate: string): boolean {
 	return false;
 }
 
+function startsAWord(name: string, query: string): boolean {
+	for (let index = 1; index < name.length; index++) {
+		if ("$:_-".includes(name[index - 1] ?? "") && name.startsWith(query, index))
+			return true;
+	}
+	return false;
+}
+
 function nameScore(name: string, query: string): number {
 	if (name === query) return NAME_EXACT;
 	if (name.startsWith(query)) return NAME_PREFIX;
-	if (name.split(/[:_-]/).some((word) => word.startsWith(query)))
-		return NAME_WORD_PREFIX;
+	if (startsAWord(name, query)) return NAME_WORD_PREFIX;
 	if (name.includes(query)) return NAME_SUBSTRING;
 	if (query.length > 1 && name[0] === query[0] && isSubsequence(query, name))
 		return NAME_SUBSEQUENCE;
@@ -63,11 +70,13 @@ function namedScore(command: PromptInputCommand, query: string): number {
  * Descriptions are searched only when no name or alias matches. Groups stay
  * together, led by the group holding the best match; a tie goes to the group
  * listed first. Whitespace means arguments are being typed, so nothing is
- * offered.
+ * offered. `prefixOnly` keeps names and aliases that start a word with the
+ * query, so a mid-sentence path such as `/tmp` does not match `/trpc-compat`.
  */
 export function rankCommands(
 	commands: PromptInputCommand[],
 	query: string,
+	{ prefixOnly = false }: { prefixOnly?: boolean } = {},
 ): PromptInputCommand[] {
 	if (/\s/.test(query)) return [];
 	const normalized = query.toLowerCase().replace(/^\//, "");
@@ -77,8 +86,10 @@ export function rankCommands(
 		const group = command.group ?? null;
 		if (!groupOrder.has(group)) groupOrder.set(group, groupOrder.size);
 	}
+	const minScore = prefixOnly ? NAME_WORD_PREFIX : 1;
 	const byName = commands.map((command) => namedScore(command, normalized));
-	const searchDescriptions = byName.every((score) => score === 0);
+	const searchDescriptions =
+		!prefixOnly && byName.every((score) => score === 0);
 	const scored = commands
 		.map((command, index) => ({
 			command,
@@ -88,7 +99,7 @@ export function rankCommands(
 				? descriptionScore(command.description ?? "", normalized)
 				: (byName[index] ?? 0),
 		}))
-		.filter((entry) => entry.score > 0);
+		.filter((entry) => entry.score >= minScore);
 	const groupBest = new Map<string | null, number>();
 	for (const entry of scored) {
 		groupBest.set(

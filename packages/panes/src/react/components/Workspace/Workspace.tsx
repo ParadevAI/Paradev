@@ -4,7 +4,10 @@ import { useDragLayer } from "react-dnd";
 import { useStore } from "zustand";
 import { isPaneInLinkedStore } from "../../../core/transfer";
 import type { Pane, Tab as TabType } from "../../../types";
-import { PaneAppearanceContext } from "../../hooks/usePaneAppearance";
+import {
+	PaneAppearanceContext,
+	PaneFlushContext,
+} from "../../hooks/usePaneAppearance";
 import { PaneAreaFocusedContext } from "../../hooks/usePaneAreaFocused";
 import { PaneAsideRenderContext } from "../../hooks/usePaneAside";
 import type { WorkspaceProps } from "../../types";
@@ -21,6 +24,7 @@ const NO_KEPT_TABS: readonly KeptTabEntry[] = [];
 
 export function Workspace<TData>({
 	appearance = "default",
+	flush = false,
 	isFocused = true,
 	store,
 	registry,
@@ -199,62 +203,64 @@ export function Workspace<TData>({
 
 	return (
 		<PaneAppearanceContext.Provider value={appearance}>
-			<PaneAreaFocusedContext.Provider value={isFocused}>
-				<PaneAsideRenderContext.Provider value={renderPaneAside}>
-					<div
-						className={cn(
-							"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground",
-							appearance !== "cards" && "bg-background",
-							className,
-						)}
-					>
-						{renderTabBar ? renderTabBar(tabBar) : tabBar}
-						{renderBelowTabBar?.()}
-						{keepAliveTabs > 0 ? (
-							<div className="relative min-h-0 min-w-0 flex-1">
-								{mountedTabs.map((tab) => (
-									<KeptTab
-										key={tab.id}
-										isVisible={tab.id === displayedTab?.id}
-										store={store}
-										tab={tab}
-										registry={registry}
-										paneActions={paneActions}
-										contextMenuActions={contextMenuActions}
-										onPaneError={onPaneError}
-										onSplitResizeDragging={onSplitResizeDragging}
-									/>
-								))}
-								{!displayedTab && (
-									<EmptyAreaDropZone
-										store={store}
-										className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground"
-									>
-										{renderEmptyState?.() ?? "No tabs open"}
-									</EmptyAreaDropZone>
-								)}
-							</div>
-						) : displayedTab ? (
-							<Tab
-								store={store}
-								tab={displayedTab}
-								registry={registry}
-								paneActions={paneActions}
-								contextMenuActions={contextMenuActions}
-								onPaneError={onPaneError}
-								onSplitResizeDragging={onSplitResizeDragging}
-							/>
-						) : (
-							<EmptyAreaDropZone
-								store={store}
-								className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground"
-							>
-								{renderEmptyState?.() ?? "No tabs open"}
-							</EmptyAreaDropZone>
-						)}
-					</div>
-				</PaneAsideRenderContext.Provider>
-			</PaneAreaFocusedContext.Provider>
+			<PaneFlushContext.Provider value={flush}>
+				<PaneAreaFocusedContext.Provider value={isFocused}>
+					<PaneAsideRenderContext.Provider value={renderPaneAside}>
+						<div
+							className={cn(
+								"flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden text-foreground",
+								appearance !== "cards" && "bg-background",
+								className,
+							)}
+						>
+							{renderTabBar ? renderTabBar(tabBar) : tabBar}
+							{renderBelowTabBar?.()}
+							{keepAliveTabs > 0 ? (
+								<div className="relative min-h-0 min-w-0 flex-1">
+									{mountedTabs.map((tab) => (
+										<KeptTab
+											key={tab.id}
+											isVisible={tab.id === displayedTab?.id}
+											store={store}
+											tab={tab}
+											registry={registry}
+											paneActions={paneActions}
+											contextMenuActions={contextMenuActions}
+											onPaneError={onPaneError}
+											onSplitResizeDragging={onSplitResizeDragging}
+										/>
+									))}
+									{!displayedTab && (
+										<EmptyAreaDropZone
+											store={store}
+											className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground"
+										>
+											{renderEmptyState?.() ?? "No tabs open"}
+										</EmptyAreaDropZone>
+									)}
+								</div>
+							) : displayedTab ? (
+								<Tab
+									store={store}
+									tab={displayedTab}
+									registry={registry}
+									paneActions={paneActions}
+									contextMenuActions={contextMenuActions}
+									onPaneError={onPaneError}
+									onSplitResizeDragging={onSplitResizeDragging}
+								/>
+							) : (
+								<EmptyAreaDropZone
+									store={store}
+									className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground"
+								>
+									{renderEmptyState?.() ?? "No tabs open"}
+								</EmptyAreaDropZone>
+							)}
+						</div>
+					</PaneAsideRenderContext.Provider>
+				</PaneAreaFocusedContext.Provider>
+			</PaneFlushContext.Provider>
 		</PaneAppearanceContext.Provider>
 	);
 }

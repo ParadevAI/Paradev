@@ -5,7 +5,9 @@ import * as crypto from "../../router/plugins/crypto";
 import * as triggerPins from "./trigger-pins";
 
 // Every connection read answers with a live row in another organization.
-const otherOrgRow = [{ email: "owner@other.test" }];
+const otherOrgRow = [
+	{ email: "owner@other.test", organizationId: "org-other" },
+];
 const selectChain = {
 	from: () => selectChain,
 	innerJoin: () => selectChain,
@@ -66,7 +68,10 @@ describe("upsertConnection across organizations", () => {
 
 	test("refuses a Slack workspace that another organization connected", async () => {
 		expect(await connect("slack")).toEqual({
-			conflict: { ownerEmail: "owner@other.test" },
+			conflict: {
+				ownerEmail: "owner@other.test",
+				ownerOrganizationId: "org-other",
+			},
 		});
 	});
 });
