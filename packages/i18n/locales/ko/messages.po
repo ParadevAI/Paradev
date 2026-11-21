@@ -18590,6 +18590,9 @@ msgstr "사이드바 순서"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "앱 업데이트를 설치할 수 있을 때 사이드바에 표시되는 알약 배지"
 
+msgid "Sidebar sections"
+msgstr "사이드바 섹션"
+
 msgid "Sign in"
 msgstr "로그인"
 

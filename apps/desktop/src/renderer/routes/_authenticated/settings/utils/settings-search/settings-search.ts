@@ -31,6 +31,7 @@ export const SETTING_ITEM_ID = {
 
 	APPEARANCE_THEME: "appearance-theme",
 	APPEARANCE_LANGUAGE: "appearance-language",
+	APPEARANCE_SIDEBAR_SECTIONS: "appearance-sidebar-sections",
 	APPEARANCE_MARKDOWN: "appearance-markdown",
 	APPEARANCE_CUSTOM_THEMES: "appearance-custom-themes",
 	APPEARANCE_EDITOR_FONT: "appearance-editor-font",
@@ -452,6 +453,24 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"i18n",
 			"english",
 			"international",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.APPEARANCE_SIDEBAR_SECTIONS,
+		section: "appearance",
+		title: "Sidebar sections",
+		description: "Choose which sections appear in the sidebar",
+		keywords: [
+			"navigation",
+			"hide",
+			"show",
+			"workspaces",
+			"chat",
+			"pages",
+			"plugins",
+			"automations",
+			"tasks",
+			"pull requests",
 		],
 	},
 	{
@@ -1993,6 +2012,12 @@ export function getVisibleMatchCountBySection(
 	visibility: SettingsSectionVisibility,
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter((item) => {
+		if (
+			item.id === SETTING_ITEM_ID.APPEARANCE_SIDEBAR_SECTIONS &&
+			!visibility.hasNavigationRail
+		) {
+			return false;
+		}
 		const navItem = NAV_ITEMS.get(item.section);
 		return navItem
 			? isSettingsSectionVisible(navItem, visibility)

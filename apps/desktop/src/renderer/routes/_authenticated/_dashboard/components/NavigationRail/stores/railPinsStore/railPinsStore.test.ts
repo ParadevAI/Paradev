@@ -3,6 +3,7 @@ import {
 	isRailDestinationPinned,
 	resolveRailOrder,
 	sanitizeRailPins,
+	useRailPinsStore,
 	withRailOrder,
 	withRailPin,
 } from "./railPinsStore";
@@ -54,20 +55,49 @@ describe("withRailOrder", () => {
 
 describe("sanitizeRailPins", () => {
 	test("falls back to the defaults when the saved value has the wrong shape", () => {
-		expect(sanitizeRailPins(null)).toEqual({ pinOverrides: {}, order: [] });
-		expect(sanitizeRailPins({ pinOverrides: null, order: "tasks" })).toEqual({
+		expect(sanitizeRailPins(null)).toEqual({
 			pinOverrides: {},
 			order: [],
+			hiddenDestinationIds: [],
 		});
+		expect(
+			sanitizeRailPins({
+				pinOverrides: null,
+				order: "tasks",
+				hiddenDestinationIds: "pages",
+			}),
+		).toEqual({ pinOverrides: {}, order: [], hiddenDestinationIds: [] });
 	});
 
 	test("drops unknown sections, wrong value types and repeated ids", () => {
-		const { pinOverrides, order } = sanitizeRailPins({
+		const { pinOverrides, order, hiddenDestinationIds } = sanitizeRailPins({
 			pinOverrides: { tasks: false, chat: "yes", removed: true },
 			order: ["tasks", "removed", "tasks", 3, "workspaces"],
+			hiddenDestinationIds: ["plugins", "removed", 3, "plugins", "constructor"],
 		});
 		expect(pinOverrides).toEqual({ tasks: false });
 		expect(order.slice(0, 2)).toEqual(["tasks", "workspaces"]);
 		expect(new Set(order).size).toBe(order.length);
+		expect(hiddenDestinationIds).toEqual(["plugins"]);
 	});
+});
+
+test("hiding a sidebar section keeps its pin and position when shown again", () => {
+	const initialState = useRailPinsStore.getState();
+	try {
+		initialState.setPinned("pages", false);
+		initialState.setVisibleOrder(["pages", "workspaces"]);
+		const { order } = useRailPinsStore.getState();
+
+		initialState.setDestinationVisible("pages", false);
+		expect(useRailPinsStore.getState().hiddenDestinationIds).toEqual(["pages"]);
+
+		initialState.setDestinationVisible("pages", true);
+		const visible = useRailPinsStore.getState();
+		expect(visible.hiddenDestinationIds).toEqual([]);
+		expect(visible.order).toEqual(order);
+		expect(visible.pinOverrides.pages).toBe(false);
+	} finally {
+		useRailPinsStore.setState(initialState, true);
+	}
 });

@@ -18590,6 +18590,9 @@ msgstr "Ordine della barra laterale"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Pillola nella barra laterale mostrata quando un aggiornamento dell'app è pronto per l'installazione"
 
+msgid "Sidebar sections"
+msgstr "Sezioni della barra laterale"
+
 msgid "Sign in"
 msgstr "Accedi"
 

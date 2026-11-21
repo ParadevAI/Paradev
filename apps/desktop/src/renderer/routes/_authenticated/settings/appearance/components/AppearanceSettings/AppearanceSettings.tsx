@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import {
 	isItemVisible,
 	SETTING_ITEM_ID,
@@ -8,6 +9,7 @@ import {
 import { FontSettingSection } from "./components/FontSettingSection";
 import { LanguageSection } from "./components/LanguageSection";
 import { MarkdownStyleSection } from "./components/MarkdownStyleSection";
+import { SidebarSections } from "./components/SidebarSections";
 import { ThemeSection } from "./components/ThemeSection";
 
 /**
@@ -55,6 +57,9 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 		SETTING_ITEM_ID.APPEARANCE_LANGUAGE,
 		visibleItems,
 	);
+	const showSidebarSections =
+		useParadevShell() &&
+		isItemVisible(SETTING_ITEM_ID.APPEARANCE_SIDEBAR_SECTIONS, visibleItems);
 	const showThemeSection = showTheme || showCustomThemes;
 
 	return (
@@ -79,6 +84,7 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 						{showMarkdown && <MarkdownStyleSection />}
 					</div>
 				)}
+				{showSidebarSections && <SidebarSections key="sidebar-sections" />}
 				{(showEditorFont || showTerminalFont) && (
 					<FontSettingSection
 						key="typography"

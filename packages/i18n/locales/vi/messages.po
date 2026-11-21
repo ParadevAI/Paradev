@@ -18590,6 +18590,9 @@ msgstr "Thứ tự thanh bên"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Pill ở thanh bên hiện khi có bản cập nhật ứng dụng sẵn sàng cài"
 
+msgid "Sidebar sections"
+msgstr "Các mục trên thanh bên"
+
 msgid "Sign in"
 msgstr "Đăng nhập"
 
