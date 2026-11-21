@@ -59,9 +59,6 @@ const READY_FOR_REVIEW = [
 const TERMINAL_LINES = [
 	"❯ claude",
 	" ",
-	"Claude Code v2.0.74",
-	"Opus 4.5 · Claude Max",
-	" ",
 	"❯ Implement order validation",
 	" ",
 	"I'll implement order validation.",
@@ -152,7 +149,7 @@ export function ParallelExecutionDemo() {
 					<div className="size-2 rounded-full bg-[#28c840]/85" />
 				</div>
 				<span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] tracking-tight text-muted-foreground/60">
-					superset
+					paradev
 				</span>
 			</div>
 
