@@ -319,6 +319,7 @@ export function createClaudeWrapper(): void {
 		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",
 			"default-claude-config-dir",
+			{ credentialCommands: ["auth login", "auth logout"] },
 		),
 	});
 	createWrapper("claude", script);
@@ -338,7 +339,11 @@ export function createCodexWrapper(): void {
 			beforeLaunch: buildDefaultAccountResolver(
 				"CODEX_HOME",
 				"default-codex-home",
-				"SUPERSET_AMBIENT_CODEX_HOME",
+				{
+					ambientEnvVar: "SUPERSET_AMBIENT_CODEX_HOME",
+					credentialCommands: ["login", "logout"],
+					readOnlyCommands: ["login status"],
+				},
 			),
 		},
 	);
