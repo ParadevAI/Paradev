@@ -482,6 +482,29 @@ describe("getAgentEfforts", () => {
 		);
 	});
 
+	it("offers Gemini 4 Carbon and Hydrogen in agy, with xhigh only on Hydrogen", () => {
+		const agyModels = getAgentModelSupport("agy")?.models.map((m) => m.id);
+		expect(agyModels).toContain("gemini-4-carbon");
+		expect(agyModels).toContain("gemini-4-hydrogen");
+		expect(getAgentEfforts("agy", "gemini-4-carbon").map((e) => e.id)).toEqual([
+			"low",
+			"medium",
+			"high",
+		]);
+		expect(
+			getAgentEfforts("agy", "gemini-4-hydrogen").map((e) => e.id),
+		).toEqual(["low", "medium", "high", "xhigh"]);
+		expect(buildAgentModelArgs("agy", "gemini-4-hydrogen")).toEqual([
+			"--model",
+			"gemini-4-hydrogen",
+		]);
+		expect(buildAgentEffortArgs("agy", "xhigh", "gemini-4-hydrogen")).toEqual([
+			"--effort",
+			"xhigh",
+		]);
+		expect(buildAgentEffortArgs("agy", "xhigh", "gemini-4-carbon")).toEqual([]);
+	});
+
 	it("offers codex's top efforts only alongside the models that take them", () => {
 		expect(getAgentEfforts("codex", "gpt-5.6-sol").map((e) => e.id)).toEqual([
 			"low",

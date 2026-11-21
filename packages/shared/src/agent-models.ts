@@ -188,9 +188,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		models: [
 			// Family ids; `--effort` picks the level. The catalog is
 			// account-dependent and agy rejects ids the account lacks. Verified
-			// against `agy models` (agy 1.4.10, 2026-10-29) except Gemini 4 Argon,
-			// whose family and level ids ship in the binary but need a plan that
-			// includes it.
+			// against `agy models` (agy 1.4.10, 2026-10-29) except the Gemini 4
+			// models, whose family and level ids ship in the binary (Carbon and
+			// Hydrogen since agy 1.4.11) but need a plan that includes them.
+			{ id: "gemini-4-carbon", label: "Gemini 4 Carbon" },
+			{ id: "gemini-4-hydrogen", label: "Gemini 4 Hydrogen" },
 			{ id: "gemini-4-argon", label: "Gemini 4 Argon" },
 			{ id: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
 			{ id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
@@ -592,7 +594,12 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 	"glm-5.2-high": cursorEffortVariants("glm-5.2", ["high", "max"]),
 };
 
-const AGY_EFFORT_MODELS = ["gemini-4-argon", "gemini-3.8-flash"] as const;
+const AGY_EFFORT_MODELS = [
+	"gemini-4-carbon",
+	"gemini-4-hydrogen",
+	"gemini-4-argon",
+	"gemini-3.8-flash",
+] as const;
 
 const PI_THINKING_LEVELS: AgentModelOption[] = [
 	{ id: "off", label: "Off" },
@@ -697,6 +704,7 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 			{ id: "low", label: "Low", models: AGY_EFFORT_MODELS },
 			{ id: "medium", label: "Medium", models: AGY_EFFORT_MODELS },
 			{ id: "high", label: "High", models: AGY_EFFORT_MODELS },
+			{ id: "xhigh", label: "xHigh", models: ["gemini-4-hydrogen"] },
 		],
 	},
 	{
