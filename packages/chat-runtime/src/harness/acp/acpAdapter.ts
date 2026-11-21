@@ -810,10 +810,12 @@ export class AcpAdapter implements HarnessAdapter {
 			{
 				sessionId,
 				configId,
-				value: isBoolean ? value === TOGGLE_ON : value,
-				...(this.negotiatedVersion >= 2
-					? { type: isBoolean ? "boolean" : "id" }
-					: {}),
+				...(isBoolean
+					? { type: "boolean", value: value === TOGGLE_ON }
+					: {
+							value,
+							...(this.negotiatedVersion >= 2 ? { type: "id" } : {}),
+						}),
 			},
 			this.requestTimeoutMs(),
 		);

@@ -6445,7 +6445,9 @@ describe("AcpAdapter config options", () => {
 			agent.sent
 				.filter((f) => f.method === "session/set_config_option")
 				.map((f) => f.params),
-		).toEqual([{ sessionId: "sess-1", configId: "fast", value: true }]);
+		).toEqual([
+			{ sessionId: "sess-1", configId: "fast", type: "boolean", value: true },
+		]);
 
 		await adapter.dispose();
 	});
