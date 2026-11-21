@@ -1,7 +1,4 @@
-"use client";
-
 import { Trans } from "@lingui/react/macro";
-import { m } from "framer-motion";
 import { LuCheck, LuSquareTerminal } from "react-icons/lu";
 import type { PagePhase } from "../../../../types";
 import { AgentLogo } from "../../../AgentLogo";
@@ -44,17 +41,15 @@ export function PagesScene({ phase }: PagesSceneProps) {
 							<Trans>Published version 1.</Trans>
 						</span>
 					</Step>
-					<m.div
-						initial={false}
-						animate={{ opacity: phase === "revised" ? 1 : 0 }}
-						transition={{ duration: 0.25 }}
+					<div
+						className={`transition-opacity duration-[250ms] motion-reduce:transition-none ${phase === "revised" ? "opacity-100" : "opacity-0"}`}
 					>
 						<Step icon={LuCheck}>
 							<span className="text-neutral-100/90">
 								<Trans>Rewrote it and published version 2.</Trans>
 							</span>
 						</Step>
-					</m.div>
+					</div>
 				</div>
 			</div>
 			<Composer />

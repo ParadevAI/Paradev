@@ -1,7 +1,4 @@
-"use client";
-
 import { Plural, Trans } from "@lingui/react/macro";
-import { m } from "framer-motion";
 import {
 	LuEllipsis,
 	LuFileDiff,
@@ -27,14 +24,9 @@ export function RightSidebar({ activeDemo }: RightSidebarProps) {
 	const visible = SCENES[activeDemo].showChanges;
 
 	return (
-		<m.div
-			className="shrink-0 overflow-hidden"
-			initial={false}
-			animate={{
-				width: visible ? COLUMN_WIDTH + COLUMN_GAP : 0,
-				opacity: visible ? 1 : 0,
-			}}
-			transition={{ duration: 0.3, ease: "easeOut" }}
+		<div
+			className={`shrink-0 overflow-hidden transition-[width,opacity,visibility] duration-300 ease-out motion-reduce:transition-none ${visible ? "opacity-100" : "invisible opacity-0"}`}
+			style={{ width: visible ? COLUMN_WIDTH + COLUMN_GAP : 0 }}
 			aria-hidden={!visible}
 		>
 			<div
@@ -102,6 +94,6 @@ export function RightSidebar({ activeDemo }: RightSidebarProps) {
 					</div>
 				</div>
 			</div>
-		</m.div>
+		</div>
 	);
 }

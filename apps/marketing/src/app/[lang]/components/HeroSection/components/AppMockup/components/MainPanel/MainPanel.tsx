@@ -1,7 +1,6 @@
 "use client";
 
 import { useLingui } from "@lingui/react/macro";
-import { m } from "framer-motion";
 import { LuGitFork, LuX, LuZap } from "react-icons/lu";
 import { SCENES } from "../../constants";
 import type { ActiveDemo, PagePhase } from "../../types";
@@ -76,13 +75,11 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 						className="pointer-events-none absolute inset-0 h-full w-full"
 					/>
 					<div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-24">
-						<m.div
-							initial={false}
-							animate={{ y: isCloud ? 0 : 10, scale: isCloud ? 1 : 0.98 }}
-							transition={{ duration: 0.25, ease: "easeOut" }}
+						<div
+							className={`transition-transform duration-[250ms] ease-out motion-reduce:transition-none ${isCloud ? "" : "translate-y-2.5 scale-[0.98]"}`}
 						>
 							<NewCloudWorkspaceDialog active={isCloud} />
-						</m.div>
+						</div>
 					</div>
 				</SceneLayer>
 

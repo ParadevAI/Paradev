@@ -1,7 +1,6 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { m } from "framer-motion";
 import {
 	LuArrowLeft,
 	LuArrowRight,
@@ -80,19 +79,15 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 										<LuChevronDown className="size-4 text-neutral-100/30" />
 									</div>
 									{group.id === CLOUD_GROUP_ID && (
-										<m.div
-											className="overflow-hidden"
-											initial={false}
-											animate={{
-												height: isCloud ? "auto" : 0,
-												opacity: isCloud ? 1 : 0,
-											}}
-											transition={{ duration: 0.25, ease: "easeOut" }}
+										<div
+											className={`grid transition-[grid-template-rows,opacity] duration-[250ms] ease-out motion-reduce:transition-none ${isCloud ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
 										>
-											<div className="pb-0.5">
-												<SessionRow session={NEW_CLOUD_SESSION} active />
+											<div className="min-h-0 overflow-hidden">
+												<div className="pb-0.5">
+													<SessionRow session={NEW_CLOUD_SESSION} active />
+												</div>
 											</div>
-										</m.div>
+										</div>
 									)}
 									{group.sessions.map((session) => (
 										<SessionRow
