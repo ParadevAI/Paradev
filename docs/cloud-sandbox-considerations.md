@@ -38,6 +38,8 @@ schedule (`/api/cloud-workspaces/jobs/reconcile-usage`, every 30 minutes, set
 in the Upstash console and watched by a Sentry cron monitor) finalizes each
 running box's memory GB-minutes and takes the next lock; a box whose next lock
 is refused is stopped. Stopping, archiving or deleting a box settles the rest.
+The same run opens a boot for any session from the last hour that has none
+(`adoptRunningBoxes` in `meter.ts`), billed from the session's start.
 Environment builds are not billed. Prices and limits live in Autumn, not here.
 Each paid seat adds its plan's GB-minutes to one team pool through Autumn
 seat licenses; see [Seats and cloud hours in Autumn](autumn-seat-licenses.md).
@@ -197,24 +199,49 @@ reach every tool an agent runs; and it reaps the largest least-protected
 process when `MemAvailable` drops under 8% of the box, so the agent sees an
 exit 137 from its tool instead of the box dying. Boot also writes
 `SUPERSET_SANDBOX_MEMORY_MB` and `SUPERSET_SANDBOX_VCPUS` into every login
-shell from the cgroup, so a hook or an agent can size its work. **Swap is on demand
-(2026-10-22):** memguard adds 2 GB swapfiles under `/var/swap` when free memory
-drops below twice its reap floor, up to 1.5x the box (at least 6 GB, at most
-16 GB), at `vm.swappiness=10`, and drops the newest one after ten quiet
-minutes if RAM can take its pages back; the cgroup permits it
-(`memory.swap.max` is unbounded). A box that never needs swap holds none on
-disk. A box that did need it carries those blocks in every snapshot after,
-even once memguard drops the file: a snapshot keeps every block the disk ever
-wrote (see "Deleting a file does not shrink a snapshot" in
-`cloud-sandbox-mismatches.md`). Measured on a 2/4 box: the host-service
-typecheck the kernel had killed at 3 GB finished in 22 s with 855 MB swapped;
-the `apps/desktop` typecheck, which needs about 8 GB in all, grew swap
-0 → 6 GB and finished in 86 s with host-service's health check never above
-47 ms, then swap shrank back to nothing. A GC keeps its hot set in RAM, so a
-swapped heap is slow, not a stall. Swap is never on without memguard: with a
-fixed 2 GB swapfile and no memguard, the desktop typecheck stalled
-host-service past 5 s and was killed by the kernel after 233 s. Still open: automatic resume of an agent whose own process was
+shell from the cgroup, so a hook or an agent can size its work. **No swap
+(2026-11-17):** from 2026-10-22 memguard grew 2 GB swapfiles under
+`/var/swap` on demand, up to 1.5x the box (6-16 GB). That let an undersized
+box finish a large typecheck slowly, but a snapshot is a full block copy of
+the disk, so swap written once stayed in every later snapshot of the
+workspace. Vercel's sandbox team recommends no swap and preventing OOMs
+instead, so memguard now grows none, and at start it turns off and removes
+any `/var/swap/superset-*` an earlier bundle left (that does not shrink a
+snapshot that already holds it); boot still removes the older `/swapfile`.
+Without swap, a reap that comes late is not a slow box but a stall: with no
+memguard, a steady allocator on a 4 GB box stalled host-service for 282 s and
+the kernel's killer never fired. Three changes keep memguard ahead of that.
+It checks `MemAvailable` four times a second (it ranks once a second) and
+forks nothing between checks; it reaps when the next check at the current
+rate of fall would be under the floor, not only once it is; and after a kill
+it waits for the victim to exit, not a fixed 3 s, because eight parallel
+workers refilled 2 GB in that pause and starved memguard itself for 170 s.
+Measured on 4 and 8 GB boxes (reserved hugepages on a real box, the image's
+boot, host-service probed every 250 ms from outside): a steady allocator,
+parallel workers, page cache with an allocator, and a 2 GB/s allocator all
+kept host-service's longest silence at 314 ms with no kernel kill. With swap
+and the old 1 s check, the 2 GB/s allocator beat memguard in 6 of 7 runs
+and the kernel's killer fired; host-service went silent for up to 62 s
+(4 GB) and 94 s (8 GB). What a customer loses: on a box too small for the job, the largest
+process is killed at about 92% use instead of the box swapping; the remedy
+is a larger machine size. Open: Vercel will send webhook events for sandbox
+OOMs; once they exist, the API can report them to the realtime hub beside
+host-service's pressure report (`runtime/sandbox-box-pressure`), which
+cannot report a box whose host-service has stalled. Still open: automatic resume of an agent whose own process was
 reaped while its terminal survived.
+
+## Box logs leave the box
+
+When the organization's PostHog flag `sandbox-box-logs` is on, the claim sets
+`SUPERSET_SANDBOX_BOX_LOGS=1` and host-service turns on the Sentry SDK's logs
+(`logBoxEvent` in `packages/host-service/src/sentry.ts`). Only those fixed
+events leave the box, each with ids, counts and durations: no log file, no
+console line, no error message. A box whose host-service never answers is
+reported by the control plane: `SandboxNotReadyError` names the boot phases
+`boot.log` reached, not the step output between them. `memguard.log`,
+`desktop.log`, `checkout.log` and `host-service.log` stay on the box.
+Before the flag is on for a customer organization, the policy wording (L1)
+must be live.
 
 ## Untested behaviour
 

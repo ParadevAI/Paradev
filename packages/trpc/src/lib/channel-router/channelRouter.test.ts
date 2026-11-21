@@ -152,14 +152,13 @@ describe("routeChannelMessage", () => {
 				token,
 			},
 			{
-				fetch: (async () => {
+				fetch: async () => {
 					throw new Error("network");
-				}) as unknown as typeof fetch,
+				},
 				token,
 			},
 			{
-				fetch: (async () =>
-					Response.json(jevResponse({ respond: [1, 1] }))) as typeof fetch,
+				fetch: async () => Response.json(jevResponse({ respond: [1, 1] })),
 				token: async () => {
 					throw new Error("no token");
 				},

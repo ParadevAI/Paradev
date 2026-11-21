@@ -124,13 +124,13 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 				},
 			});
 			void navigate({
-				to: "/v2-workspace/$workspaceId",
+				to: "/workspace/$workspaceId",
 				params: { workspaceId },
 			});
 			void completed.then((outcome) => {
 				if (outcome.ok && outcome.workspaceId !== workspaceId) {
 					void navigate({
-						to: "/v2-workspace/$workspaceId",
+						to: "/workspace/$workspaceId",
 						params: { workspaceId: outcome.workspaceId },
 						replace: true,
 					});

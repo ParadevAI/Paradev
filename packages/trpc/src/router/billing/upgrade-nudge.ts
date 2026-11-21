@@ -21,17 +21,17 @@ export function upgradeNudgeFeatureName(feature: string): string {
 
 export function upgradeNudgeUrl(
 	webUrl: string,
-	organizationId: string | null,
+	organizationId: string,
 ): string {
 	const url = new URL("/settings/billing", webUrl);
-	if (organizationId) url.searchParams.set("organization", organizationId);
+	url.searchParams.set("organization", organizationId);
 	return url.toString();
 }
 
 export interface UpgradeNudgeMessage {
 	to: string;
 	featureName: string;
-	organizationId: string | null;
+	organizationId: string;
 }
 
 export interface UpgradeNudgeDeps {
@@ -41,6 +41,8 @@ export interface UpgradeNudgeDeps {
 		feature: string;
 		outcome: UpgradeNudgeOutcome;
 	}): void;
+	/** Only owners can pay on the billing page the email links to. */
+	isOrganizationOwner(userId: string, organizationId: string): Promise<boolean>;
 	isOrganizationPaid(organizationId: string): Promise<boolean>;
 	isUnsubscribed(email: string): Promise<boolean>;
 	/** Reads the user's 7-day slot without taking it. */
@@ -53,6 +55,8 @@ export interface UpgradeNudgeDeps {
 
 export type UpgradeNudgeOutcome =
 	| "sent"
+	| "no_organization"
+	| "not_owner"
 	| "paid"
 	| "unsubscribed"
 	| "rate_limited"
@@ -82,9 +86,11 @@ async function nudge(
 ): Promise<UpgradeNudgeOutcome> {
 	try {
 		if (await deps.isClaimed(user.id)) return "rate_limited";
-		if (organizationId && (await deps.isOrganizationPaid(organizationId))) {
-			return "paid";
+		if (!organizationId) return "no_organization";
+		if (!(await deps.isOrganizationOwner(user.id, organizationId))) {
+			return "not_owner";
 		}
+		if (await deps.isOrganizationPaid(organizationId)) return "paid";
 		if (await deps.isUnsubscribed(user.email)) return "unsubscribed";
 		if (!(await deps.claim(user.id))) return "rate_limited";
 		await deps.send({

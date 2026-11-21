@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"types": ["bun"],
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"target": "esnext",
+		"lib": ["esnext"],
+		"strict": true,
+		"noEmit": true,
+		"skipLibCheck": true
+	},
+	"files": ["test-preload.ts"]
+}

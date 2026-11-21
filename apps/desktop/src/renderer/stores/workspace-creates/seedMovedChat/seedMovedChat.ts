@@ -2,7 +2,7 @@ import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
 import type {
 	ChatPaneData,
 	PaneViewerData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
@@ -29,7 +29,7 @@ export function seedMovedChat({
 	agentId: string;
 	title: string | null;
 }): void {
-	if (!collections.v2WorkspaceLocalState.get(workspaceId)) {
+	if (!collections.workspaceLocalState.get(workspaceId)) {
 		writeWorkspacePaneLayout(
 			collections,
 			{ id: workspaceId, projectId },
@@ -37,7 +37,7 @@ export function seedMovedChat({
 			[],
 		);
 	}
-	const existing = collections.v2WorkspaceLocalState.get(workspaceId)
+	const existing = collections.workspaceLocalState.get(workspaceId)
 		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
 	const alreadyOpen = existing?.tabs.some((tab) =>
 		Object.values(tab.panes).some(
@@ -64,7 +64,7 @@ export function seedMovedChat({
 		],
 	});
 	const { version, tabs, activeTabId } = store.getState();
-	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+	collections.workspaceLocalState.update(workspaceId, (draft) => {
 		draft.paneLayout = { version, tabs, activeTabId };
 	});
 }

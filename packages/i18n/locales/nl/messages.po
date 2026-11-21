@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# mislukt} other {# mislukt}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# bestand gewijzigd} other {# bestanden gewijzigd}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# bestand} other {# bestanden}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# taak} other {# taken}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# terminal actief} other {# terminals actief}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# ongewijzigde regel} other {# ongewijzigde regels}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -469,6 +472,7 @@ msgstr "{0} eindigend op {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{0} bestanden bestaan al in {where}. Wil je ze vervangen?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-uren"
@@ -783,6 +787,9 @@ msgstr "{actor} heeft de koppeling met workspace {workspace} verwijderd"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} tot nu toe · ~{projected} verwacht"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "Met {agentLabel} kun je geen berichten naar subagents sturen."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents}-sessies worden hervat wanneer je hun workspace opent."
 
@@ -797,6 +804,9 @@ msgstr "{appName} Mobile hoort bij Pro"
 
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile draait agents op de computers die je koppelt."
+
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {# cloudwerkruimte archiveren} other {# cloudwerkruimtes archiveren}}"
 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {# commit achter op main, rebase nodig} other {# commits achter op main, rebase nodig}}"
@@ -886,9 +896,6 @@ msgstr "{count, plural, one {heeft een commit toegevoegd} other {heeft # commits
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {# werkruimte aangemaakt} other {# werkruimtes aangemaakt}}"
 
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {# werkruimte verwijderen} other {# werkruimtes verwijderen}}"
-
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {# bestand bewerkt} other {# bestanden bewerkt}}"
 
@@ -915,6 +922,12 @@ msgstr "{count, plural, one {# pagina opgehaald} other {# pagina's opgehaald}}"
 
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {# worktree importeren} other {# worktrees importeren}}"
+
+msgid "{count, plural, one {in # workspace in the last 30 days} other {in # workspaces in the last 30 days}}"
+msgstr "{count, plural, one {in # werkruimte in de afgelopen 30 dagen} other {in # werkruimtes in de afgelopen 30 dagen}}"
+
+msgid "{count, plural, one {in # workspace this period} other {in # workspaces this period}}"
+msgstr "{count, plural, one {in # werkruimte in deze periode} other {in # werkruimtes in deze periode}}"
 
 msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
 msgstr "{count, plural, one {# pull request mergen?} other {# pull requests mergen?}}"
@@ -991,6 +1004,9 @@ msgstr "{daysLeft, plural, one {Nog # dag} other {Nog # dagen}}"
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Je account is gedeactiveerd en wordt over # dag definitief verwijderd. Reactiveer het om alles terug te krijgen zoals je het achterliet.} other {Je account is gedeactiveerd en wordt over # dagen definitief verwijderd. Reactiveer het om alles terug te krijgen zoals je het achterliet.}}"
 
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {# werkruimte verwijderen} other {# werkruimtes verwijderen}}"
+
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
@@ -1018,6 +1034,9 @@ msgstr "{fileCount, plural, one {# bestand gewijzigd in deze werkruimte} other {
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# bestand bewerkt} other {# bestanden bewerkt}}"
+
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} van {total}"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} om te focussen"
@@ -1100,6 +1119,9 @@ msgstr "{label} is daarna weer niet ingesteld. In je werkruimtes verandert niets
 msgid "{label} is set to manual"
 msgstr "{label} gebruikt nu handmatig inloggen"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Gebruikt quotum van {label}: {summary}. Gebruiksinstellingen openen"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -1154,11 +1176,23 @@ msgstr "{name} vraagt"
 msgid "{name} can't be messaged"
 msgstr "{name} kan geen berichten ontvangen"
 
+msgid "{name} can't take messages now."
+msgstr "{name} kan nu geen berichten ontvangen."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} kan geen berichten ontvangen. Je tekst staat weer in de hoofdchat."
+
 msgid "{name} failed"
 msgstr "{name} is mislukt"
 
+msgid "{name} failed and can't take messages."
+msgstr "{name} is mislukt en kan geen berichten ontvangen."
+
 msgid "{name} finished"
 msgstr "{name} is klaar"
+
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Groep {name}, {count, plural, one {# werkruimte} other {# werkruimtes}}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1187,6 +1221,9 @@ msgstr "{name} is begonnen"
 msgid "{name} stopped"
 msgstr "{name} is gestopt"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} is gestopt en kan geen berichten ontvangen."
+
 msgid "{name} wants more access"
 msgstr "{name} wil meer toegang"
 
@@ -1199,6 +1236,9 @@ msgstr "{name}: {monthly} per gebruiker/maand"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per gebruiker/maand, of {yearly} bij jaarlijkse facturering"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} gebruikt nog je vorige aanmelding. Herstart om de nieuwe te gebruiken."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Geef minstens één persoon op, of kies {choice}.} sender {Geef minstens één afzender op, of kies {choice}.} other {Geef minstens één item op, of kies {choice}.}}"
 
@@ -1210,6 +1250,9 @@ msgstr "{openCount} open"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Ook gewijzigd in deze werkruimte: # bestand} other {Ook gewijzigd in deze werkruimte: # bestanden}}"
+
+msgid "{over} overage"
+msgstr "{over} overschrijding"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} kan namens jou gegevens in je {pluginLabel}-account lezen en wijzigen, ook in toekomstige versies van deze pagina. Wat de pagina leest, kan ze naar andere websites sturen. Sta alleen pagina’s toe die je vertrouwt."
@@ -1312,8 +1355,8 @@ msgstr "{pullRequests} · naar {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# bericht wacht in de wachtrij} other {# berichten wachten in de wachtrij}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} per GB-uur. Gebruikt na de maandelijkse pool, en verlopen nooit."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} per GB-uur. Worden gebruikt na het in het abonnement inbegrepen gebruik en verlopen nooit."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% gelezen"
@@ -1335,6 +1378,9 @@ msgstr "Nog {remaining} tokens over"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Wijzigingen in # bestand ongedaan gemaakt.} other {Wijzigingen in # bestanden ongedaan gemaakt.}}"
 
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Inbegrepen bij # plek} other {Inbegrepen bij # plekken}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1352,11 +1398,17 @@ msgstr "{shown} van {total}"
 msgid "{shownCount} shown · {0} · {1} tokens"
 msgstr "{shownCount} getoond · {0} · {1} tokens"
 
+msgid "{size}, {memory} GB"
+msgstr "{size}, {memory} GB"
+
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {# overgeslagen} other {# overgeslagen}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} sterren en het worden er meer"
+
+msgid "{start} – {end}"
+msgstr "{start} – {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisering gestart} other {# automatiseringen gestart}}"
@@ -1415,8 +1467,14 @@ msgstr "{used} van {limit} omgevingen"
 msgid "{used} of {size} tokens"
 msgstr "{used} van {size} tokens"
 
+msgid "{used} of {total}"
+msgstr "{used} van {total}"
+
 msgid "{used} used"
 msgstr "{used} gebruikt"
+
+msgid "{used} used by you"
+msgstr "{used} door jou gebruikt"
 
 msgid "{user} and {others} joined and left."
 msgstr "{user} en {others} zijn erbij gekomen en weer vertrokken."
@@ -1643,9 +1701,6 @@ msgstr "1 gebruiker"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ gelijktijdige werkstromen zonder verlies van context"
 
-msgid "12m ago"
-msgstr "12m geleden"
-
 msgid "145,000+ across 180 countries"
 msgstr "145.000+ in 180 landen"
 
@@ -1654,9 +1709,6 @@ msgstr "15 min"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ sterren, 100+ bijdragers"
-
-msgid "1d ago"
-msgstr "1d geleden"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agents · 14 bestanden gewijzigd"
@@ -1672,9 +1724,6 @@ msgstr "2025 tot nu"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2u geleden"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -1727,6 +1776,9 @@ msgstr "87,4K van 200K tokens gebruikt in deze sessie."
 
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Een betere ingebouwde browser: bekijk je wijzigingen en klik op elk element om het als context naar de agent te sturen."
+
+msgid "A build of this environment is already running"
+msgstr "Er loopt al een build van deze omgeving"
 
 msgid "A CDP endpoint per pane"
 msgstr "Een CDP-endpoint per paneel"
@@ -1950,9 +2002,6 @@ msgstr "Accountnaam"
 
 msgid "Account pending deletion"
 msgstr "Account wordt verwijderd"
-
-msgid "Account usage"
-msgstr "Accountgebruik"
 
 msgid "Account usage: {percent} used"
 msgstr "Accountgebruik: {percent} gebruikt"
@@ -2338,14 +2387,8 @@ msgstr "Agentcommando's"
 msgid "Agent Configs"
 msgstr "Agentconfiguraties"
 
-msgid "Agent credentials changed"
-msgstr "Agentgegevens gewijzigd"
-
 msgid "Agent finished"
 msgstr "Agent klaar"
-
-msgid "Agent Independence"
-msgstr "Agentonafhankelijkheid"
 
 msgid "Agent is working"
 msgstr "Agent is bezig"
@@ -2437,9 +2480,6 @@ msgstr "Agents zien alleen een placeholder. Paradev voegt je aanmelding toe aan 
 
 msgid "Agents that run while you're away"
 msgstr "Agents die doorwerken als je weg bent"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agents sorteren issues, schrijven changelogs en werken dependencies bij, helemaal zelf."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."
@@ -2747,6 +2787,9 @@ msgstr "Ook: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Weet altijd welke agent jou nodig heeft, met meldingen die rechtstreeks naar de vastgelopen agent linken."
 
+msgid "Amount of GB-hours"
+msgstr "Aantal GB-uren"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "Een agent voltooit wijzigingen over meerdere bestanden van begin tot eind."
 
@@ -2822,9 +2865,6 @@ msgstr "een ander apparaat"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantwoord vragen in de terminal hieronder, zoals een wachtwoord."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Beantwoord deze vraag op desktop, of sla hem over."
-
 msgid "Answered"
 msgstr "Beantwoord"
 
@@ -2873,6 +2913,9 @@ msgstr "Elke naam"
 msgid "Any page"
 msgstr "Elke pagina"
 
+msgid "Any person"
+msgstr "Iedere persoon"
+
 msgid "Any project"
 msgstr "Elk project"
 
@@ -2887,6 +2930,9 @@ msgstr "Alle reviewers"
 
 msgid "any sender"
 msgstr "elke afzender"
+
+msgid "Any size"
+msgstr "Elke grootte"
 
 msgid "Any status"
 msgstr "Elke status"
@@ -3085,12 +3131,19 @@ msgstr "Omgeving archiveren"
 msgid "Archive failed"
 msgstr "Archiveren mislukt"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Geselecteerde cloudwerkruimtes archiveren"
+
 msgid "Archive this automation before you delete it."
 msgstr "Archiveer deze automatisering voordat je haar verwijdert."
 
 msgid "Archive workspace"
 msgstr "Werkruimte archiveren"
 
+msgid "Archived"
+msgstr "Gearchiveerd"
+
+msgctxt "cloud workspace status"
 msgid "Archived"
 msgstr "Gearchiveerd"
 
@@ -3190,6 +3243,10 @@ msgstr "Vraagt voor bewerkingen en opdrachten"
 
 msgid "Asks only for risky actions"
 msgstr "Vraagt alleen bij riskante acties"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "Slaapstand"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
@@ -3436,8 +3493,15 @@ msgstr "Wacht op review van jou"
 msgid "Awaiting review from you or your team"
 msgstr "Wacht op review van jou of je team"
 
+msgctxt "cloud workspace status"
+msgid "Awake"
+msgstr "Actief"
+
 msgid "Away"
 msgstr "Afwezig"
+
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace reageert niet. Probeer het over een paar minuten opnieuw."
 
 msgid "Back"
 msgstr "Terug"
@@ -3445,6 +3509,9 @@ msgstr "Terug"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Terug"
+
+msgid "Back to {parentTitle}"
+msgstr "Terug naar {parentTitle}"
 
 msgid "Back to About"
 msgstr "Terug naar Over ons"
@@ -3548,6 +3615,9 @@ msgstr "Wordt nu gebouwd."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Verder: F5 is geen claim voor de korte termijn"
 
+msgid "Billed hours"
+msgstr "Gefactureerde uren"
+
 msgid "Billed monthly"
 msgstr "Maandelijks gefactureerd"
 
@@ -3563,8 +3633,8 @@ msgstr "Facturering"
 msgid "Billing details"
 msgstr "Factuurgegevens"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Facturering weigerde een cloudwerkruimte te starten: het abonnement van de organisatie bevat geen cloudwerkruimtes, of de limiet voor cloudgebruik is bereikt. Cloudwerkruimtes vereisen het Team- of Ultra-abonnement. Upgrade of verhoog de limiet in Instellingen > Facturering, of voer de automatisering uit op een apparaat."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Facturering weigerde een cloudwerkruimte te starten: het abonnement bevat geen cloudwerkruimtes, of de organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Bekijk Instellingen, Facturering, of voer de automatisering uit op een apparaat."
 
 msgid "Binary"
 msgstr "Binair"
@@ -3628,6 +3698,9 @@ msgstr "Opstarten"
 msgid "Booting {0}…"
 msgstr "{0} wordt opgestart…"
 
+msgid "Boots"
+msgstr "Starts"
+
 msgid "Border"
 msgstr "Rand"
 
@@ -3640,8 +3713,8 @@ msgstr "Geleend van hoe zelfrijdende auto's worden beoordeeld, toegepast op hoe 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Lade onderaan, swipevriendelijk op touchapparaten."
 
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Gekochte GB-uren over: {prepaid}"
+msgid "Bought credits"
+msgstr "Gekocht tegoed"
 
 msgid "Bounce the Dock icon"
 msgstr "Dock-symbool laten stuiteren"
@@ -3730,6 +3803,9 @@ msgstr "Neem je werkruimten over"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Neem projecten, werkruimtes en terminalscripts uit v1 mee naar v2. Elk item wordt afzonderlijk geïmporteerd en kan opnieuw worden geprobeerd."
 
+msgid "Bring Your Own Subscription"
+msgstr "Gebruik je eigen abonnement"
+
 msgid "Bringing over your v1 projects"
 msgstr "Je v1-projecten worden overgezet"
 
@@ -3796,6 +3872,9 @@ msgstr "Een plugin gebouwd? Dien hem hier in."
 msgid "Built in Paradev"
 msgstr "Gebouwd in Paradev"
 
+msgid "Built to be driven by agents"
+msgstr "Gebouwd om door agents te worden aangestuurd"
+
 msgid "builtin"
 msgstr "ingebouwd"
 
@@ -3842,9 +3921,6 @@ msgstr "Knoppen, toggles en toetsenbordaanwijzingen"
 msgid "Buy"
 msgstr "Kopen"
 
-msgid "Buy extra GB-hours"
-msgstr "Extra GB-uren kopen"
-
 msgid "Buy for {total}"
 msgstr "Kopen voor {total}"
 
@@ -3863,6 +3939,12 @@ msgstr "Door te autoriseren geef je deze applicatie toegang tot je gegevens volg
 
 msgid "By clicking continue, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "Door op doorgaan te klikken ga je akkoord met onze <0>servicevoorwaarden</0> en het <1>privacybeleid</1>."
+
+msgid "By day"
+msgstr "Per dag"
+
+msgid "By person"
+msgstr "Per persoon"
 
 msgid "By signing in, you agree to our\n"
 "<0>Terms of Service</0> and <1>Privacy Policy</1>"
@@ -4210,9 +4292,6 @@ msgstr "Kanaalopties"
 msgid "Channels"
 msgstr "Kanalen"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Schrijft meer GB-uren af van je opgeslagen kaart wanneer gekochte GB-uren opraken."
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -4353,6 +4432,9 @@ msgstr "Checks geslaagd"
 msgid "Checks Skipped"
 msgstr "Checks overgeslagen"
 
+msgid "Checks unavailable"
+msgstr "Checks niet beschikbaar"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Kies een {pluginLabel}-account"
 
@@ -4403,6 +4485,9 @@ msgstr "Kies er een"
 
 msgid "Choose the model"
 msgstr "Model kiezen"
+
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Kies de organisatie die AWS Marketplace factureert. Elk abonnement is gekoppeld aan één organisatie."
 
 msgid "Choose the primary repository"
 msgstr "Kies de primaire repository"
@@ -4530,9 +4615,6 @@ msgstr "Wissen…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-docs"
@@ -4790,6 +4872,27 @@ msgstr "Cloudsandboxen"
 msgid "Cloud usage"
 msgstr "Cloudgebruik"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Cloudgebruik is niet ingeschakeld voor deze organisatie."
+
+msgid "Cloud usage is used up for this period."
+msgstr "Het cloudgebruik voor deze periode is op."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Het cloudgebruik voor deze periode is op. Een eigenaar kan meer kopen in Instellingen, Facturering."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Het cloudgebruik voor deze periode is op. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Het cloudgebruik voor deze periode is op. Deze workspace stopt over 10 minuten. Een eigenaar kan meer kopen om hem te laten doordraaien."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Het cloudgebruik voor deze periode is op. Deze workspace stopt over 10 minuten. Een eigenaar kan upgraden naar Team of Ultra om hem te laten doordraaien."
+
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Het cloudgebruik voor deze periode is op. Workspaces kunnen niet starten."
+
 msgid "Cloud workspace"
 msgstr "Cloudwerkruimte"
 
@@ -4823,6 +4926,9 @@ msgstr "Cloudwerkruimtes committen, pushen en openen pull requests als jou"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloudworkspaces negeren deze variabele. Agents melden zich in plaats daarvan aan via Instellingen › Agents."
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "Cloudwerkruimten vereisen een betaald abonnement."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloudwerkruimtes vereisen het Team- of Ultra-abonnement. Upgrade in Instellingen, Facturering om er een te starten."
@@ -5034,6 +5140,10 @@ msgstr "Plannen vergelijken"
 msgid "Compared against the default style"
 msgstr "Vergeleken met de standaardstijl"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Vergelijking"
+
 msgid "complete"
 msgstr "afgerond"
 
@@ -5212,6 +5322,9 @@ msgstr "Koppel om pull requests met je eigen account te beheren in plaats van vi
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Verbind je {pluginLabel}-account en laad deze pagina daarna opnieuw."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Je AWS Marketplace-abonnement koppelen"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -5926,6 +6039,9 @@ msgstr "Delen mislukt"
 msgid "Could not sign out. Please try again."
 msgstr "Afmelden is mislukt. Probeer het opnieuw."
 
+msgid "Could not start"
+msgstr "Kon niet starten"
+
 msgid "Could not start agent"
 msgstr "Kan agent niet starten"
 
@@ -5943,6 +6059,9 @@ msgstr "Kan sessie niet starten"
 
 msgid "Could not start the chat"
 msgstr "Kan de chat niet starten"
+
+msgid "Could not start."
+msgstr "Kon niet starten."
 
 msgid "Could not steer"
 msgstr "Kan niet bijsturen"
@@ -6008,6 +6127,9 @@ msgstr "Kon het gesprek niet afsplitsen"
 msgid "Couldn't cancel the move"
 msgstr "Kan het verplaatsen niet annuleren"
 
+msgid "Couldn't change the group color"
+msgstr "Kan de groepskleur niet wijzigen"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Kan de machinegrootte niet wijzigen: {0}"
@@ -6054,8 +6176,14 @@ msgstr "Stack maken mislukt"
 msgid "Couldn't create the channel"
 msgstr "Kan het kanaal niet maken"
 
+msgid "Couldn't create the group"
+msgstr "Kan de groep niet maken"
+
 msgid "Couldn't create workspace"
 msgstr "Kan werkruimte niet aanmaken"
+
+msgid "Couldn't delete the group"
+msgstr "Kan de groep niet verwijderen"
 
 msgid "Couldn't discard changes"
 msgstr "Kan wijzigingen niet verwerpen"
@@ -6143,6 +6271,9 @@ msgstr "{name} kon niet worden verplaatst"
 msgid "Couldn't move the subagent to the background"
 msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
+msgid "Couldn't move the workspace"
+msgstr "Kan de werkruimte niet verplaatsen"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
 
@@ -6192,6 +6323,9 @@ msgstr "Verwijderen uit mergewachtrij mislukt"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Kan de lokale login niet verwijderen"
+
+msgid "Couldn't rename the group"
+msgstr "Kan de groep niet hernoemen"
 
 msgid "Couldn't restart terminals"
 msgstr "Kan terminals niet herstarten"
@@ -6349,6 +6483,9 @@ msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "CPU-beperkt"
 
+msgid "Crashed"
+msgstr "Gecrasht"
+
 msgid "Create"
 msgstr "Aanmaken"
 
@@ -6484,9 +6621,6 @@ msgstr "Maken met AI"
 
 msgid "Create workspace"
 msgstr "Werkruimte aanmaken"
-
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Maak werkruimtes en start agents vanuit de CLI, de SDK of via MCP."
 
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Maak werkruimtes aan, start agents en lees hun output vanuit elke terminal of elk script. macOS en Linux."
@@ -6695,6 +6829,9 @@ msgstr "Prijs op maat"
 msgid "Custom provider"
 msgstr "Eigen provider"
 
+msgid "Custom range…"
+msgstr "Aangepast bereik…"
+
 msgid "Custom themes"
 msgstr "Eigen thema's"
 
@@ -6779,6 +6916,9 @@ msgstr "Dag van de maand"
 
 msgid "Day One"
 msgstr "Dag één"
+
+msgid "Days are in Pacific time."
+msgstr "Dagen zijn in Pacific-tijd."
 
 msgid "days running three agents at once"
 msgstr "dagen met drie agents tegelijk"
@@ -6994,6 +7134,10 @@ msgstr "verwijderd"
 msgid "Deleted"
 msgstr "Verwijderd"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "Verwijderd"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "Verwijderd"
@@ -7040,6 +7184,9 @@ msgstr "Verwijderde projecten kunnen 30 dagen lang worden hersteld, samen met de
 
 msgid "Deleted user"
 msgstr "Verwijderde gebruiker"
+
+msgid "Deleted workspace"
+msgstr "Verwijderde werkruimte"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "Werkruimtes verwijderd, maar de zijbalk kon niet worden bijgewerkt"
@@ -7591,9 +7738,6 @@ msgstr "Draft geopend"
 msgid "Draft PR #2841"
 msgstr "Draft-PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "3 supportantwoorden opgesteld"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Sleep <0>Paradev</0> naar je map <1>Programma's</1>"
 
@@ -7606,8 +7750,8 @@ msgstr "Sleep werkruimtes om ze te herordenen in Handmatige volgorde"
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Stuur het aan vanuit de terminal"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Stuur de hele app en de cloud aan vanuit de CLI, de SDK of via MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Stuur werkruimtes, agents en sessies programmatisch aan vanuit scripts, CI of je eigen tools."
@@ -7696,6 +7840,9 @@ msgstr "Elk oppervlak heeft zijn eigen typografie. Wijzigingen zie je meteen in 
 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Elke werkruimte krijgt een eigen cloudmachine en werkt door als je laptop dicht is. Kijk mee op desktop, iPhone of iPad."
+
+msgid "Earlier period"
+msgstr "Vorige periode"
 
 msgid "Early 2024"
 msgstr "Begin 2024"
@@ -7787,6 +7934,9 @@ msgstr "Bewerkt"
 
 msgid "Edited {ago}"
 msgstr "Bewerkt {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "<0>SettingsDialog.tsx</0> bewerkt"
 
 msgid "Editing"
 msgstr "Bewerken"
@@ -8210,9 +8360,6 @@ msgstr "Externe browser"
 msgid "extra ${used} of ${limit}"
 msgstr "extra ${used} van ${limit}"
 
-msgid "Extra GB-hours"
-msgstr "Extra GB-uren"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "Extra GB-uren, gekocht wanneer nodig"
 
@@ -8250,6 +8397,10 @@ msgid "Failed"
 msgstr "Mislukt"
 
 msgctxt "agent status"
+msgid "Failed"
+msgstr "Mislukt"
+
+msgctxt "cloud workspace status"
 msgid "Failed"
 msgstr "Mislukt"
 
@@ -8445,6 +8596,9 @@ msgstr "Laden van afbeelding mislukt"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Laden van repository's mislukt. Probeer het opnieuw."
+
+msgid "Failed to load usage"
+msgstr "Gebruik kon niet worden geladen"
 
 msgid "Failed to log out. Please try again."
 msgstr "Uitloggen mislukt. Probeer het opnieuw."
@@ -8705,11 +8859,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Snel"
 
-msgid "Fast mode off"
-msgstr "Snelle modus uit"
-
-msgid "Fast mode on"
-msgstr "Snelle modus aan"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Snelle modus is niet beschikbaar voor dit model. Kies een model dat dit ondersteunt."
 
 msgid "Fault"
 msgstr "Storing"
@@ -8927,11 +9078,11 @@ msgstr "Voltooid"
 msgid "Finished · unread"
 msgstr "Klaar · ongelezen"
 
-msgid "finished · worked for 7s"
-msgstr "klaar · 7s gewerkt"
-
 msgid "Finishing the move…"
 msgstr "Verplaatsing afronden…"
+
+msgid "First page"
+msgstr "Eerste pagina"
 
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Eerste keer? Zet inloggen met apparaatcode aan in de <0>ChatGPT-instellingen</0>."
@@ -8941,6 +9092,9 @@ msgstr "Passend"
 
 msgid "Fix all failing checks"
 msgstr "Alle mislukte checks fixen"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Los bugs op zodra ze gemeld worden"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Lost het winkelwagentotaal op voor lege winkelwagens. Voegt een test toe die de TypeError reproduceert."
@@ -8959,6 +9113,9 @@ msgstr "Bevindingen oplossen"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Los nieuwe fouten in web op. Reproduceer elke fout in een test en open een draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Productiebugs oplossen"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9198,6 +9355,9 @@ msgstr "Oprichtend engineer"
 msgid "Free"
 msgstr "Free"
 
+msgid "Free credits"
+msgstr "Gratis tegoed"
+
 msgid "Free for everyone"
 msgstr "Gratis voor iedereen"
 
@@ -9297,18 +9457,6 @@ msgstr "Open drempels"
 msgid "GB-hours"
 msgstr "GB-uren"
 
-msgid "GB-hours over the plan: {overage}"
-msgstr "GB-uren boven het abonnement: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "GB-uren boven de pool"
-
-msgid "GB-hours used: {used}"
-msgstr "Gebruikte GB-uren: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Gebruikte GB-uren: {used} van {included}"
-
 msgid "General"
 msgstr "Algemeen"
 
@@ -9332,9 +9480,6 @@ msgstr "Gegenereerd bestand verborgen"
 
 msgid "Generated image"
 msgstr "Gegenereerde afbeelding"
-
-msgid "Generating"
-msgstr "Genereren"
 
 msgid "Generating..."
 msgstr "Genereren..."
@@ -9515,6 +9660,12 @@ msgstr "Terug naar home"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Ga terug naar {appName} en log opnieuw in."
+
+msgid "Go back to {parentTitle}."
+msgstr "Ga terug naar {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Ga terug om de hoofdagent een bericht te sturen."
 
 msgid "Go back to the previous page in history"
 msgstr "Terug naar de vorige pagina in de geschiedenis"
@@ -10021,6 +10172,10 @@ msgstr "Identiteit"
 msgid "Idle"
 msgstr "Inactief"
 
+msgctxt "cloud workspace boot"
+msgid "Idle"
+msgstr "Inactief"
+
 msgid "Idle · branch pushed"
 msgstr "Inactief · branch gepusht"
 
@@ -10091,6 +10246,9 @@ msgstr "Alles importeren"
 
 msgid "Import cookies and passwords…"
 msgstr "Cookies en wachtwoorden importeren…"
+
+msgid "Import custom theme?"
+msgstr "Aangepast thema importeren?"
 
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Importeer elk v1-project in v2. Al geïmporteerde projecten worden als geïmporteerd weergegeven."
@@ -10211,6 +10369,9 @@ msgstr "In review"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "Open in de {appName}-desktopapp Instellingen → Externe toegang en zet “Externe toegang tot dit apparaat via de relay toestaan” aan."
 
+msgid "in the last 30 days"
+msgstr "in de afgelopen 30 dagen"
+
 msgid "In the merge queue"
 msgstr "In de mergewachtrij"
 
@@ -10219,6 +10380,9 @@ msgstr "In de mergewachtrij. GitHub merget hem als hij aan de beurt is."
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Open in de Paradev-desktopapp <0>Instellingen → Uiterlijk → Thema</0>."
+
+msgid "in this period"
+msgstr "in deze periode"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "In minder dan een jaar hebben meer dan 145.000 ontwikkelaars in 180 landen {productName} gebruikt en meer dan 1,85 miljoen agent-werkruimtes aangemaakt."
@@ -10249,6 +10413,9 @@ msgstr "Inbegrepen bij Enterprise"
 
 msgid "Included with Team and Ultra."
 msgstr "Inbegrepen bij Team en Ultra."
+
+msgid "Included with the plan"
+msgstr "Inbegrepen in het abonnement"
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Inclusief de Paradev-specifieke box-variant"
@@ -10598,6 +10765,12 @@ msgstr "Dit kan niet ongedaan worden gemaakt."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar de browser in de app. Agents kunnen dan handelen op de sites waar je bent ingelogd."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Het is al gekoppeld aan een organisatie waarvan je geen lid bent. Vraag de eigenaar om je uit te nodigen."
+
+msgid "It is linked to {organization}."
+msgstr "Het is gekoppeld aan {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
 
@@ -10643,6 +10816,9 @@ msgstr "De reacties en geschiedenis worden ook verwijderd."
 msgid "Its connected accounts were disconnected."
 msgstr "De gekoppelde accounts zijn ontkoppeld."
 
+msgid "Its machine no longer exists."
+msgstr "De machine bestaat niet meer."
+
 msgid "Its own branch and copy of the files"
 msgstr "Een eigen branch en een eigen kopie van de bestanden"
 
@@ -10651,6 +10827,12 @@ msgstr "De plugins verschijnen zodra de synchronisatie klaar is."
 
 msgid "Its replies go with it."
 msgstr "De antwoorden worden ook verwijderd."
+
+msgid "Its saved state expired."
+msgstr "De opgeslagen status is verlopen."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "De terminal opent hier zodra de cloudwerkruimte hem start."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Het werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op {computerName} begint vanaf die branch, en elke Claude-chat gaat daar verder. Agents die aan het werk zijn, stoppen eerst. Terminals en andere chats blijven waar ze zijn."
@@ -10862,6 +11044,9 @@ msgstr "Laatste 3 maanden"
 msgid "last 30 days"
 msgstr "laatste 30 dagen"
 
+msgid "Last 30 days"
+msgstr "Afgelopen 30 dagen"
+
 msgid "Last 4 weeks"
 msgstr "Laatste 4 weken"
 
@@ -10935,6 +11120,9 @@ msgstr "Latentie"
 
 msgid "Later messages are removed."
 msgstr "Latere berichten worden verwijderd."
+
+msgid "Later period"
+msgstr "Volgende periode"
 
 msgid "Latest"
 msgstr "Nieuwste"
@@ -11188,6 +11376,9 @@ msgstr "link gekopieerd"
 msgid "Link copied"
 msgstr "Link gekopieerd"
 
+msgid "Link organization"
+msgstr "Organisatie koppelen"
+
 msgid "Link task"
 msgstr "Taak koppelen"
 
@@ -11196,6 +11387,9 @@ msgstr "Deze taak koppelen"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} gekoppeld aan werkruimte"
+
+msgid "Linking..."
+msgstr "Koppelen..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11400,9 +11594,6 @@ msgstr "Lokale werkruimte"
 
 msgid "Local workspaces"
 msgstr "Lokale werkruimtes"
-
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Lokale werkruimtes draaien op je machine. Jij bepaalt wat er verbinding mee maakt."
 
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokaal, op een host of in de cloud"
@@ -11876,6 +12067,9 @@ msgstr "Berichten"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Berichten met deze woorden geven je een melding zoals een vermelding. Scheid ze met komma's."
 
+msgid "Messages you send go to {name}."
+msgstr "Berichten die je stuurt gaan naar {name}."
+
 msgid "Microphone"
 msgstr "Microfoon"
 
@@ -11962,8 +12156,8 @@ msgstr "Mobiele app"
 msgid "Mobile App"
 msgstr "Mobiele app"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Mobiel, cloud of je eigen cloud"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobiel, cloud of je eigen vloot"
 
 msgid "Mode"
 msgstr "Modus"
@@ -12093,6 +12287,9 @@ msgstr "Cloudwerk verhuizen"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "De focus verplaatsen tussen de hoofdtabbladen en de rechterzijbalk, en de zijbalk openen als die gesloten is"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Zet Instellingen in een modal zodat mensen hun werkruimte niet hoeven te verlaten. Behoud het zoekfilter en laat ⌘, het overal vandaan openen."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Deze werkruimte naar {computerName} verplaatsen?"
@@ -12361,6 +12558,9 @@ msgstr "Nieuwe groep…"
 msgid "New issue"
 msgstr "Nieuwe issue"
 
+msgid "New layout"
+msgstr "Nieuwe indeling"
+
 msgid "New messages"
 msgstr "Nieuwe berichten"
 
@@ -12427,6 +12627,9 @@ msgstr "Nieuwe werkruimte ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nieuwe werkruimte in {name}"
 
+msgid "New workspace page"
+msgstr "Nieuwe werkruimtepagina"
+
 msgid "Newer than this app"
 msgstr "Nieuwer dan deze app"
 
@@ -12462,6 +12665,9 @@ msgstr "Volgende afbeelding"
 
 msgid "Next match"
 msgstr "Volgende overeenkomst"
+
+msgid "Next page"
+msgstr "Volgende pagina"
 
 msgid "Next Right Sidebar Tab"
 msgstr "Volgend tabblad in de rechterzijbalk"
@@ -12506,7 +12712,7 @@ msgstr "Nachtelijke audit"
 msgid "No"
 msgstr "Nee"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Geen {0}-logins op deze host. Log in en het gebruik verschijnt hier."
 
@@ -12576,6 +12782,13 @@ msgstr "Geen auteurs gevonden."
 
 msgid "No automations match"
 msgstr "Geen overeenkomende automatiseringen"
+
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Er begint geen factuurperiode op {0}."
+
+msgid "No boots in this period."
+msgstr "Geen starts in deze periode."
 
 msgid "No branches found"
 msgstr "Geen branches gevonden"
@@ -12660,6 +12873,9 @@ msgstr "Geen contributors gevonden."
 
 msgid "No credit card required."
 msgstr "Geen creditcard nodig."
+
+msgid "No days available"
+msgstr "Geen dagen beschikbaar"
 
 msgid "No description"
 msgstr "Geen beschrijving"
@@ -12915,6 +13131,9 @@ msgstr "Geen openstaande uitnodigingen"
 
 msgid "No people found."
 msgstr "Geen personen gevonden."
+
+msgid "No person recorded"
+msgstr "Geen persoon vastgelegd"
 
 msgid "No plugins available yet."
 msgstr "Nog geen plugins beschikbaar."
@@ -13172,6 +13391,9 @@ msgstr "Nog geen werkruimtes op deze host"
 msgid "No workspaces yet"
 msgstr "Nog geen werkruimtes"
 
+msgid "No workspaces."
+msgstr "Geen werkruimtes."
+
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Nee. {companyName} stuurt modelaanroepen nooit via een proxy. Agents gebruiken je eigen abonnementen en sleutels."
 
@@ -13270,6 +13492,10 @@ msgstr "Niet in deze versie"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Er komen nog geen gebeurtenissen binnen: Microsoft Graph heeft de meldingsabonnementen geweigerd. Controleer de beheerderstoestemming en de goedkeuring van de beveiligde API van de app, en verbind opnieuw."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Niet vastgelegd"
 
 msgid "Not reported yet"
 msgstr "Nog niet gemeld"
@@ -13403,6 +13629,9 @@ msgstr "Objecten"
 msgid "of {0}"
 msgstr "van {0}"
 
+msgid "of {held}"
+msgstr "van {held}"
+
 msgid "of {total}"
 msgstr "van {total}"
 
@@ -13415,8 +13644,9 @@ msgstr "van alle tokens"
 msgid "Off"
 msgstr "Uit"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Uit. Koopt meer GB-uren wanneer ze opraken."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Uit"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -13555,6 +13785,9 @@ msgstr "Alleen beheerders van {organizationName} kunnen nieuwe personen uitnodig
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Alleen een eigenaar van de organisatie kan het plan wijzigen. Vraag de jouwe om te upgraden."
 
+msgid "Only an owner or admin can link this organization."
+msgstr "Alleen een eigenaar of beheerder kan deze organisatie koppelen."
+
 msgid "Only available on macOS."
 msgstr "Alleen beschikbaar op macOS."
 
@@ -13573,6 +13806,9 @@ msgstr "Alleen eigenaren van de host of organisatie-eigenaren kunnen deze host v
 msgid "Only images can be attached to a comment"
 msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
 
+msgid "Only import themes from sources you trust."
+msgstr "Importeer alleen thema’s uit vertrouwde bronnen."
+
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
 
@@ -13590,6 +13826,9 @@ msgstr "Alleen eigenaren van de organisatie kunnen deze instellingen wijzigen."
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Alleen organisatie-eigenaren of de eigenaar van het apparaat kunnen dit project verwijderen."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Alleen eigenaren en beheerders kunnen het gebruik per persoon zien."
 
 msgid "Only owners can change membership."
 msgstr "Alleen eigenaren kunnen het lidmaatschap wijzigen."
@@ -14003,6 +14242,9 @@ msgstr "Pagina openen in standaardbrowser"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Open pages en reageer op opmerkingen in de Paradev-app op iPhone en iPad."
 
+msgid "Open PR"
+msgstr "PR openen"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "PR #{0} openen"
@@ -14054,6 +14296,9 @@ msgstr "Open source"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source onder MIT. Gebruik elke agent met je eigen abonnementen en sleutels."
+
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Veilig door ontwerp."
 
 msgid "Open System Settings"
 msgstr "Systeeminstellingen openen"
@@ -14141,9 +14386,6 @@ msgstr "OpenAI heeft deze API-sleutel geweigerd."
 
 msgid "Opened"
 msgstr "Geopend"
-
-msgid "opened PR #841 for review"
-msgstr "PR #841 geopend voor review"
 
 msgid "Opening {appName}…"
 msgstr "{appName} wordt geopend…"
@@ -14308,11 +14550,6 @@ msgstr "Geheugen vol"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Geheugen vol: de machine reageert bijna niet meer. {sizeName} heeft {memoryGb} GB."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Geheugen vol: de machine heeft {0} ({1} GB) gestopt om te blijven draaien. {sizeName} heeft {memoryGb} GB."
 
 msgid "Out of scope"
 msgstr "Buiten scope"
@@ -14660,9 +14897,6 @@ msgstr "Parallelle agents"
 msgid "Parallel agents guide"
 msgstr "Gids voor parallelle agents"
 
-msgid "Parallel Execution"
-msgstr "Parallelle uitvoering"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Parallelle sessies per ontwikkelaar verdubbelen elke zeven maanden en passeren tussen augustus 2026 en augustus 2028 de drempels voor Operator, Fabrieksmanager en Henry Ford"
 
@@ -14952,11 +15186,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Plan"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Plan"
+
 msgid "Plan restored"
 msgstr "Plan hersteld"
 
 msgid "Plan updated"
 msgstr "Abonnement bijgewerkt"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Plan: <0>SettingsPage</0> afsplitsen naar <1>SettingsDialog</1>, ⌘, via de globale sneltoetslaag laten lopen, zoeken ongewijzigd laten. Ik begin nu."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15211,6 +15452,9 @@ msgstr "Vorige afbeelding"
 msgid "Previous match"
 msgstr "Vorige overeenkomst"
 
+msgid "Previous page"
+msgstr "Vorige pagina"
+
 msgid "Previous prompts"
 msgstr "Eerdere prompts"
 
@@ -15270,9 +15514,6 @@ msgstr "Privacybeleid"
 
 msgid "Private"
 msgstr "Privé"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Standaard privé.<0/>Jij houdt de controle."
 
 msgid "Private: only specific people"
 msgstr "Privé: alleen bepaalde mensen"
@@ -15447,6 +15688,10 @@ msgstr "Eigenschappen"
 msgid "Provide either id or slug"
 msgstr "Geef een id of een slug op"
 
+msgctxt "cloud workspace status"
+msgid "Provisioning"
+msgstr "Wordt ingericht"
+
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Het provisioneren is mislukt en de sandbox is afgebroken. Er draait niets en deze werkruimte kan niet worden geopend. Maak een nieuwe aan om het opnieuw te proberen."
 
@@ -15553,9 +15798,6 @@ msgstr "Push je branches en werk daarna verder op je Mac of in een cloudwerkruim
 
 msgid "Pushed"
 msgstr "Gepusht"
-
-msgid "Pushed and opened a draft PR."
-msgstr "Gepusht en een draft-PR geopend."
 
 msgid "Pushing..."
 msgstr "Bezig met pushen…"
@@ -15673,6 +15915,9 @@ msgstr "Radix roteert de wrapper van de tooltip-pijl per zijde,"
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltip-docs"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "<0>bun test settings</0> uitgevoerd · 14 geslaagd · 1 mislukt"
+
 msgid "Random icon"
 msgstr "Willekeurig pictogram"
 
@@ -15727,6 +15972,9 @@ msgstr "Gelezen"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Gelezen"
+
+msgid "Read 3 files"
+msgstr "3 bestanden gelezen"
 
 msgid "Read a list of your most visited websites"
 msgstr "Een lijst lezen van je meest bezochte websites"
@@ -15827,6 +16075,10 @@ msgstr "Leest en plaatst"
 
 msgid "Ready"
 msgstr "Klaar"
+
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "Gereed"
 
 msgid "Ready for review"
 msgstr "Klaar voor review"
@@ -16013,6 +16265,9 @@ msgstr "is samen met {others} opnieuw lid geworden van {channel}."
 msgid "rejoined {channel}."
 msgstr "is opnieuw lid geworden van {channel}."
 
+msgid "Related comparisons"
+msgstr "Gerelateerde vergelijkingen"
+
 msgid "Related Posts"
 msgstr "Gerelateerde berichten"
 
@@ -16031,6 +16286,9 @@ msgstr "Besturing loslaten"
 msgid "Release…"
 msgstr "Release…"
 
+msgid "Released before use"
+msgstr "Vrijgegeven vóór gebruik"
+
 msgid "Reload"
 msgstr "Herladen"
 
@@ -16042,6 +16300,9 @@ msgstr "Opnieuw laden vanaf schijf"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Herlaad Paradev om de lijst met werkruimtes te verversen."
+
+msgid "Reload to apply"
+msgstr "Opnieuw laden om toe te passen"
 
 msgid "Reload window"
 msgstr "Venster herladen"
@@ -16349,6 +16610,9 @@ msgstr "Antwoorden"
 msgid "Reply in thread"
 msgstr "Reageren in thread"
 
+msgid "Reply to Claude Code…"
+msgstr "Antwoord aan Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "Reageren op thread…"
 
@@ -16475,9 +16739,6 @@ msgstr "Locatie resetten"
 msgid "Reset terminal"
 msgstr "Terminal resetten"
 
-msgid "Reset time unavailable"
-msgstr "Resettijd niet beschikbaar"
-
 msgid "Reset to default"
 msgstr "Terug naar standaard"
 
@@ -16492,9 +16753,6 @@ msgstr "Zoom resetten"
 
 msgid "Reset Zoom"
 msgstr "Zoom resetten"
-
-msgid "Resets {resetDate}"
-msgstr "Wordt gereset op {resetDate}"
 
 msgid "Resets at {until}"
 msgstr "Reset om {until}"
@@ -16584,9 +16842,6 @@ msgstr "Onboarding opnieuw starten"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Draaiende {providerLabel}-agents herstarten?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Herstart draaiende werkruimtes zodat hun agents de wijziging oppikken."
-
 msgid "Restart terminal daemon?"
 msgstr "Terminal-daemon herstarten?"
 
@@ -16596,8 +16851,8 @@ msgstr "Terminals herstarten"
 msgid "Restart workspace"
 msgstr "Werkruimte herstarten"
 
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Herstart workspaces om de nieuwe agentgegevens op te pakken."
+msgid "Restarted"
+msgstr "Herstart"
 
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "{restartedOrgCount} hostservices herstart"
@@ -16905,6 +17160,10 @@ msgstr "Draaien"
 msgid "Rotate device"
 msgstr "Apparaat draaien"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Overzicht"
+
 msgid "Roundups"
 msgstr "Overzichten"
 
@@ -16928,6 +17187,9 @@ msgstr "Rij-acties"
 
 msgid "Rows changed"
 msgstr "Rijen gewijzigd"
+
+msgid "Rows per page"
+msgstr "Rijen per pagina"
 
 msgid "Rule"
 msgstr "Regel"
@@ -16956,6 +17218,9 @@ msgstr "Draai 10+ parallelle coding agents op je machine."
 
 msgid "Run again"
 msgstr "Opnieuw uitvoeren"
+
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Laat agents parallel werken, elk op een eigen branch. Beoordeel hun werk met ingebouwde diffs, PR-checks en review door agents, en merge zonder de app te verlaten."
 
 msgid "Run agents on a schedule or when something happens."
 msgstr "Draai agents volgens schema of als er iets gebeurt."
@@ -17012,9 +17277,6 @@ msgstr "Draai volgens schema of bij gebeurtenissen, op aanvraag, pauzeer, hervat
 msgid "Run on any machine"
 msgstr "Op elke machine"
 
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Draai parallelle coding agents op features, fixes en refactors. Elke agent werkt op een eigen branch, lokaal of in de cloud."
-
 msgid "Run parallel coding agents with Paradev"
 msgstr "Voer parallelle coding agents uit met Paradev"
 
@@ -17048,6 +17310,9 @@ msgstr "Voer dit uit in een terminal en ga dan verder:"
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Voer dit uit in een terminal en plak daarna het token dat het toont:"
 
+msgid "Run time"
+msgstr "Looptijd"
+
 msgid "Run workspace command"
 msgstr "Werkruimtecommando uitvoeren"
 
@@ -17068,6 +17333,10 @@ msgstr "loopt"
 
 msgid "Running"
 msgstr "Bezig"
+
+msgctxt "cloud workspace boot"
+msgid "Running"
+msgstr "Actief"
 
 msgid "Running \"{name}\" now"
 msgstr "\"{name}\" wordt nu uitgevoerd"
@@ -17220,8 +17489,8 @@ msgstr "Opslaan..."
 msgid "Saving…"
 msgstr "Opslaan…"
 
-msgid "Scale to 100+ agents"
-msgstr "Schaal op naar meer dan 100 agents"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Schaal naar honderden agents en houd de kwaliteitslat hoog"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Scan de QR-code, log in met hetzelfde Paradev-account en selecteer deze organisatie."
@@ -17993,6 +18262,9 @@ msgstr "Instellingen..."
 msgid "settings.ts"
 msgstr "settings.ts"
 
+msgid "Settled"
+msgstr "Afgerond"
+
 msgid "Setup"
 msgstr "Setup"
 
@@ -18046,9 +18318,6 @@ msgstr "Deel."
 
 msgid "Shared"
 msgstr "Gedeeld"
-
-msgid "Shared across sessions using this login."
-msgstr "Gedeeld door sessies die deze aanmelding gebruiken."
 
 msgid "Shared app components"
 msgstr "Gedeelde app-componenten"
@@ -18114,9 +18383,6 @@ msgstr "Toon een bevestiging bij het afsluiten van de app"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Een microfoon in het chatinvoerveld tonen. Spraak wordt getranscribeerd door ChatGPT als Codex daarbij is ingelogd, anders waar mogelijk op je Mac, en anders door de servers van Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Toon een knop Gebruik in de zijbalk van het startscherm, onder Pull requests"
-
 msgid "Show all {count}"
 msgstr "Alle {count} tonen"
 
@@ -18128,6 +18394,9 @@ msgstr "Alle opmerkingen tonen"
 
 msgid "Show all lines"
 msgstr "Alle regels tonen"
+
+msgid "Show all models"
+msgstr "Alle modellen tonen"
 
 msgid "Show Apple's installer"
 msgstr "Toon het installatieprogramma van Apple"
@@ -18179,6 +18448,9 @@ msgstr "Minder bestanden tonen"
 
 msgid "Show file tree"
 msgstr "Bestandsboom tonen"
+
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Onder in de zijbalk tonen hoeveel quotum elke modelaanbieder heeft gebruikt"
 
 msgid "Show in bar"
 msgstr "Tonen in balk"
@@ -18237,6 +18509,9 @@ msgstr "Lijst met pull requests tonen"
 msgid "Show pull request preview"
 msgstr "Voorbeeld van pull request tonen"
 
+msgid "Show quota rings on sidebar"
+msgstr "Quotumringen in de zijbalk tonen"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Opgeloste tonen ({resolvedCount})"
 
@@ -18269,9 +18544,6 @@ msgstr "Activerende payload tonen"
 
 msgid "Show translation"
 msgstr "Vertaling tonen"
-
-msgid "Show usage tab on sidebar"
-msgstr "Gebruikstabblad tonen in zijbalk"
 
 msgid "Show workspace activity"
 msgstr "Werkruimteactiviteit tonen"
@@ -18935,8 +19207,8 @@ msgstr "Sessie starten"
 msgid "Start agent"
 msgstr "Agent starten"
 
-msgid "Start agents on events or a schedule"
-msgstr "Start agents bij gebeurtenissen of volgens schema"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Start agents automatisch: vanuit een Sentry-fout, een Linear-issue, een GitHub-pull request of een schema dat de agent zelf instelt."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Start agents, volg ze live en review de diff vanaf je iPhone of iPad. Je code blijft op je machines."
@@ -19152,10 +19424,9 @@ msgstr "gestopt"
 msgid "Stopped"
 msgstr "Gestopt"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "{0} ({1} GB) gestopt om geheugen vrij te maken"
+msgctxt "cloud workspace boot"
+msgid "Stopped"
+msgstr "Gestopt"
 
 msgid "Stopped by the usage limit"
 msgstr "Gestopt door de gebruikslimiet"
@@ -19307,9 +19578,6 @@ msgstr "Continuïteit · actieve dagen van 30"
 
 msgid "Switch account"
 msgstr "Van account wisselen"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Wissel van agent. Houd je workflow"
 
 msgid "Switch host"
 msgstr "Van host wisselen"
@@ -19695,9 +19963,6 @@ msgstr "Terminaltypografie"
 msgid "Terminals"
 msgstr "Terminals"
 
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminals ({TERMINAL_COUNT})"
-
 msgid "Terminals aren't responding"
 msgstr "Terminals reageren niet"
 
@@ -19742,6 +20007,9 @@ msgstr "Dit account is niet meer verbonden — kies een ander."
 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Die agentsessie heeft nog geen gesprek om te openen. Hij is gestart maar nooit aangestuurd."
+
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Die cursor kan niet worden gelezen. Laat hem weg om bij de eerste pagina te beginnen."
 
 msgid "that device"
 msgstr "dat apparaat"
@@ -20060,6 +20328,9 @@ msgstr "De open-source werkruimte voor Claude Code, Codex en elke andere coding 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "De open-source workspace voor Claude Code, Codex, OpenCode en elke andere coding agent. Voer taken parallel uit op aparte branches en review alles op één plek."
 
+msgid "The organization reached its usage limit."
+msgstr "De organisatie heeft haar gebruikslimiet bereikt."
+
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "De andere kant van de verplaatsing draait een oudere versie. Herstart een cloudwerkruimte of werk de host van het apparaat bij en probeer het opnieuw."
 
@@ -20109,8 +20380,8 @@ msgstr "Het pad moet binnen de repository blijven"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "De pluginwijziging is niet binnen {seconds} seconden voltooid."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "De pool wordt elke maand vernieuwd. Gebruik daarboven wordt per GB-uur gefactureerd tegen het tarief bij elk abonnement."
+msgid "The pool resets every month."
+msgstr "De pool wordt elke maand opnieuw ingesteld."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "De primaire repository moet een van de repository's van de omgeving zijn"
@@ -20204,8 +20475,17 @@ msgstr "De update kan ook:"
 msgid "The very beginning"
 msgstr "Het allereerste begin"
 
+msgid "The workspace could not be created."
+msgstr "De werkruimte kon niet worden gemaakt."
+
+msgid "The workspace could not be queued to start."
+msgstr "De werkruimte kon niet in de wachtrij worden gezet om te starten."
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "De werkruimte kon niet worden bereikt. Controleer of hij draait en probeer het opnieuw."
+
+msgid "The workspace did not become ready."
+msgstr "De werkruimte werd niet gereed."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "De werkruimte is nog niet klaar. Probeer het opnieuw."
@@ -20281,6 +20561,9 @@ msgstr "Deze agent kan een gesprek niet afsplitsen"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "Met deze agent kun je geen berichten naar subagents sturen."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."
@@ -20388,6 +20671,13 @@ msgstr "Deze map bestaat niet. Het terminalscript valt terug op de root van de w
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de provider heeft het niet als geverifieerd bevestigd. Log in met de methode die je eerder gebruikte."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "Deze omgeving kan 3 handmatige builds per uur starten. Probeer het over {0} minuten opnieuw."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan .paradev/config.toml op de basisbranch."
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"
 
@@ -20445,6 +20735,12 @@ msgstr "Deze Linear-werkruimte is al gekoppeld door {owner}. Vraag hen om eerst 
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Deze Linear-werkruimte is al gekoppeld door een andere Paradev-organisatie."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Deze link is verlopen. Open Paradev opnieuw vanuit je AWS Marketplace-abonnement."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Deze link is ongeldig. Open Paradev opnieuw vanuit je AWS Marketplace-abonnement."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Dit lijkt een binair bestand. Als tekst openen kan onleesbare uitvoer geven of de editor bij grote bestanden laten vastlopen."
 
@@ -20483,6 +20779,15 @@ msgstr "Dit verandert alleen de weergavenaam, niet de branch."
 
 msgid "this organization"
 msgstr "deze organisatie"
+
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Deze organisatie betaalt al met een kaart. Zeg dat abonnement eerst op of kies een andere organisatie."
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Deze organisatie heeft geen factuurperiodes. Kies in plaats daarvan een tijdsbereik."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Deze organisatie is al gekoppeld aan een ander AWS Marketplace-abonnement."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Deze organisatie zit op het Free-plan. {appName} Mobile is beschikbaar voor organisaties met Pro."
@@ -20604,6 +20909,9 @@ msgstr "Deze subagent kan nu niet naar de achtergrond"
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Deze subagent wordt niet meer gevolgd door de host. Het transcript blijft op schijf in de sessiemap van de agent."
 
+msgid "This subscription is already linked to another organization."
+msgstr "Dit abonnement is al gekoppeld aan een andere organisatie."
+
 msgid "This terminal has no output to hand over yet."
 msgstr "Deze terminal heeft nog geen uitvoer om over te dragen."
 
@@ -20691,6 +20999,9 @@ msgstr "Deze werkruimte"
 
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
+
+msgid "This workspace has no usage in this period."
+msgstr "Deze werkruimte heeft in deze periode geen gebruik."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Deze werkruimte is mogelijk verwijderd, of je hebt er geen toegang meer toe."
@@ -21007,9 +21318,6 @@ msgstr "Triageer mail en schrijf conceptantwoorden"
 msgid "Triage new issues"
 msgstr "Nieuwe issues triageren"
 
-msgid "triaging 12 new issues…"
-msgstr "12 nieuwe issues triageren…"
-
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Probeert elke bug op te lossen die iemand in #bugs plaatst."
 
@@ -21105,6 +21413,10 @@ msgstr "maak van de onboarding-bevindingen een pagina"
 
 msgid "Turned off because its files changed"
 msgstr "Uitgeschakeld omdat de bestanden zijn gewijzigd"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
 
 msgid "Two Hands"
 msgstr "Twee handen"
@@ -21413,6 +21725,9 @@ msgstr "Naamloos script"
 msgid "Untitled workspace"
 msgstr "Naamloze werkruimte"
 
+msgid "Untrusted themes may put your data at risk."
+msgstr "Onbetrouwbare thema’s kunnen je gegevens in gevaar brengen."
+
 msgid "Up next"
 msgstr "Straks aan de beurt"
 
@@ -21500,6 +21815,12 @@ msgstr "Werk de waarde van <0>{key}</0> bij"
 
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
+
+msgid "Update this host to message subagents."
+msgstr "Werk deze host bij om subagents berichten te sturen."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Werk deze host bij om subagents berichten te sturen. Je tekst staat weer in de hoofdchat."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Werk deze host bij om subagents naar de achtergrond te verplaatsen"
@@ -21594,6 +21915,9 @@ msgstr "Gebruik"
 msgid "Usage is out of date"
 msgstr "De gebruiksgegevens zijn verouderd"
 
+msgid "Usage limit"
+msgstr "Gebruikslimiet"
+
 msgid "Usage limit reached"
 msgstr "Gebruikslimiet bereikt"
 
@@ -21634,9 +21958,6 @@ msgstr "Gebruiken als run van de werkruimte"
 msgid "Use cases"
 msgstr "Toepassingen"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Gebruik Claude Code, Codex, OpenCode of elke CLI-agent. Je werkruimtes, branches en reviews blijven hetzelfde."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Gebruik Claude Code, Codex of welke coding agent dan ook. Kies per taak of laat er meerdere naast elkaar draaien."
 
@@ -21670,11 +21991,23 @@ msgstr "Gebruik Paradev op je telefoon met Pro."
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Gebruik de agentabonnementen en API-sleutels die je al hebt. Modelaanroepen gaan rechtstreeks naar je provider."
 
+msgid "Use the best agent. Never get locked in."
+msgstr "Gebruik de beste agent. Zonder ooit vast te zitten."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Gebruik de beste agents zodra ze uitkomen. Je artefacten, branches en plugins werken met allemaal."
+
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Gebruik de desktop-app om parallelle coding agents te draaien."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten en probeer het opnieuw."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Gebruik de vernieuwde pagina ‘Nieuwe werkruimte’: het promptvak in het midden, met de project- en branchkiezers erboven."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Gebruik de vernieuwde vensterindeling: een pictogrambalk, tabbladen in de titelbalk en panelen als kaarten."
 
 msgid "Use this account"
 msgstr "Dit account gebruiken"
@@ -21897,9 +22230,15 @@ msgstr "Stack bekijken, pull request {position} van {size}"
 msgid "View usage"
 msgstr "Gebruik bekijken"
 
+msgid "Viewed"
+msgstr "Bekeken"
+
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Bekeken"
+
+msgid "Viewing subagent {name}"
+msgstr "Je bekijkt subagent {name}"
 
 msgid "Violence or harassment"
 msgstr "Geweld of intimidatie"
@@ -22023,6 +22362,9 @@ msgstr "We konden de betaalmethode van deze organisatie niet belasten. Vraag een
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "We konden je betaalmethode niet belasten. Werk die bij om dit plan te behouden."
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "We konden je AWS Marketplace-abonnement niet bevestigen"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "We konden {appName} niet bereiken om te zien of hij online is. Controleer je verbinding en probeer het opnieuw."
@@ -22723,6 +23065,9 @@ msgstr "Je hebt geen toegang tot deze terminal."
 msgid "You don't have permission to remove this member"
 msgstr "Je hebt geen rechten om dit lid te verwijderen"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Je bent nog geen eigenaar of beheerder van een organisatie. Maak er een aan en open deze link daarna opnieuw."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Je hebt niet-opgeslagen omgevingsvariabelen. Weet je zeker dat je wilt sluiten?"
 
@@ -22826,8 +23171,8 @@ msgstr "Je agent publiceert ontwerpen en rapporten. Je team geeft commentaar en 
 msgid "Your agent subscriptions and keys"
 msgstr "Je agentabonnementen en sleutels"
 
-msgid "Your Agents, Your Accounts"
-msgstr "Jouw agents, jouw accounts"
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Je AWS Marketplace-abonnement is actief"
 
 msgid "Your changes"
 msgstr "Jouw wijzigingen"
@@ -22837,6 +23182,9 @@ msgstr "Je wijzigingen gaan verloren als je ze niet opslaat."
 
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "Je chatgeschiedenis blijft bewaard. Alleen de agent start opnieuw."
+
+msgid "Your cloud usage"
+msgstr "Jouw cloudgebruik"
 
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Je cloudwerkruimtes hebben geen toegang meer tot deze host."
@@ -22878,9 +23226,6 @@ msgstr "Je naam <0>(als we je prompt gebruiken, vermelden we je in de changelog)
 msgid "Your organization"
 msgstr "Je organisatie"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Verhoog de limiet of upgrade in Instellingen, Facturering om deze werkruimte te starten."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Je organisatie heeft haar limiet voor omgevingen ({0}) bereikt. Archiveer een omgeving of upgrade in Instellingen, Facturering om er meer toe te voegen."
@@ -22894,12 +23239,6 @@ msgstr "Je organisatie installeert {plugin} voor je, dus het kan niet worden ver
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Je organisatie installeert deze plugin voor je. Je kunt hem uitschakelen, maar niet verwijderen."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Je organisatie heeft de limiet voor cloudgebruik bereikt."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Deze werkruimte stopt over een paar minuten, tenzij de limiet wordt verhoogd."
 
 msgid "Your organization reached its environment limit."
 msgstr "Je organisatie heeft de limiet voor omgevingen bereikt."
@@ -22969,6 +23308,9 @@ msgstr "Je niveau is een gewogen score over de {0} assen die voor jou gemeten zi
 msgid "Your tokens"
 msgstr "Je tokens"
 
+msgid "Your usage by day"
+msgstr "Jouw gebruik per dag"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "Je v1-projecten en -workspaces worden overgezet naar het nieuwe Paradev. Ze verschijnen in de zijbalk zodra elk ervan klaar is."
 
@@ -22983,6 +23325,9 @@ msgstr "De beheerder van je workspace zet aanmelden met apparaatcode voor Codex 
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "Je werkruimte is niet veranderd. Je kunt hem over een paar minuten opnieuw verplaatsen."
+
+msgid "Your workspaces"
+msgstr "Jouw werkruimten"
 
 msgid "Zap"
 msgstr "Bliksem"

@@ -9,7 +9,7 @@ import { BackgroundTerminalsSetting } from "./components/BackgroundTerminalsSett
 import { CloseConfirmSetting } from "./components/CloseConfirmSetting";
 import { CopyOnSelectSetting } from "./components/CopyOnSelectSetting";
 import { PresetsSection } from "./components/PresetsSection";
-import { V2SessionsSection } from "./components/V2SessionsSection";
+import { SessionsSection } from "./components/SessionsSection";
 
 interface TerminalSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -102,7 +102,7 @@ export function TerminalSettings({
 				)}
 				{showCopyOnSelect && <CopyOnSelectSetting key="copy-on-select" />}
 				{showCloseConfirm && <CloseConfirmSetting key="close-confirm" />}
-				{showSessions && <V2SessionsSection key="sessions" />}
+				{showSessions && <SessionsSection key="sessions" />}
 			</SectionList>
 		</div>
 	);

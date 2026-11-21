@@ -58,3 +58,37 @@ test.each([
 		}),
 	).toBe(webUrl);
 });
+
+describe("the admin origin", () => {
+	const adminUrl = "https://admin.example.com";
+	const resolveAdmin = (redirect: string) =>
+		resolveCallbackUrl({
+			redirect,
+			webUrl,
+			trustedOrigins: [apiUrl],
+			adminUrl,
+		});
+
+	test("is a valid return target, path and query kept", () => {
+		expect(resolveAdmin(`${adminUrl}/hiring?tab=x`)).toBe(
+			`${adminUrl}/hiring?tab=x`,
+		);
+	});
+
+	test.each([
+		"https://evil.example/x",
+		"//admin.example.com/x",
+		"https://admin.example.com.evil.example/x",
+		"https://sub.admin.example.com/x",
+		"https://evil.example@admin.example.com/x",
+		"https://admin.example.com@evil.example/x",
+		"https://admin.example.com:8443/x",
+		"http://admin.example.com/x",
+	])("does not open anything else: %s", (redirect) => {
+		expect(resolveAdmin(redirect)).toBe(webUrl);
+	});
+
+	test("is not trusted when no admin URL is set", () => {
+		expect(resolve(`${adminUrl}/x`)).toBe(webUrl);
+	});
+});

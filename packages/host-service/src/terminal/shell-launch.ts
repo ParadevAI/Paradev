@@ -10,6 +10,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
+import { SHELL_EXIT_MARKER_SCRIPT } from "@superset/shared/shell-exit-marker";
 import {
 	type ResolveConfiguredShellOptions,
 	resolveConfiguredShell,
@@ -66,6 +67,9 @@ function buildFishInitCommand(binDir: string): string {
 		`or set -gx PATH "$_superset_bin" $PATH`,
 		`function _superset_prompt_mark --on-event fish_prompt`,
 		`printf '\\033]133;A\\007'`,
+		`end`,
+		`function _superset_exit_mark --on-event fish_exit`,
+		`isatty stdout; and printf '${SHELL_EXIT_MARKER_SCRIPT}'`,
 		`end`,
 	].join("; ");
 }

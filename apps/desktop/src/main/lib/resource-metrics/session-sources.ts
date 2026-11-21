@@ -1,6 +1,6 @@
 import { getHostServiceCoordinator } from "main/lib/host-service-coordinator";
 import {
-	parseV2ResourceSessions,
+	parseResourceSessions,
 	type WorkspaceSessionMap,
 } from "./session-normalization";
 
@@ -72,7 +72,7 @@ export async function collectWorkspaceSessionMap(
 				}
 				mergeWorkspaceSessionMaps(
 					workspaceSessionMap,
-					parseV2ResourceSessions(await response.json()),
+					parseResourceSessions(await response.json()),
 				);
 			} catch (error) {
 				if (isAbortError(error)) {
@@ -99,7 +99,7 @@ export function getWorkspaceMetadata(workspaceId: string): WorkspaceMetadata {
 	// host fan-out. Keep stable non-empty placeholders for validation.
 	return {
 		workspaceName: `Workspace ${workspaceId.slice(0, 8)}`,
-		projectId: "v2",
-		projectName: "V2 Workspaces",
+		projectId: "unknown",
+		projectName: "Workspaces",
 	};
 }

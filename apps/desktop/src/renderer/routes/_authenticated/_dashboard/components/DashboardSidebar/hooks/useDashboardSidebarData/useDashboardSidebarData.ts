@@ -180,7 +180,7 @@ export function useDashboardSidebarData() {
 		useLiveQuery(
 			(q) =>
 				q
-					.from({ sidebarProjects: collections.v2SidebarProjects })
+					.from({ sidebarProjects: collections.sidebarProjects })
 					.select(({ sidebarProjects }) => ({
 						projectId: sidebarProjects.projectId,
 						isCollapsed: sidebarProjects.isCollapsed,
@@ -275,7 +275,7 @@ export function useDashboardSidebarData() {
 	const { data: storedSidebarSections = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ sidebarSections: collections.v2SidebarSections })
+				.from({ sidebarSections: collections.sidebarSections })
 				// Same tie-breaking rationale as the projects query above.
 				.orderBy(({ sidebarSections }) => sidebarSections.tabOrder, "asc")
 				.orderBy(({ sidebarSections }) => sidebarSections.sectionId, "asc")
@@ -314,7 +314,7 @@ export function useDashboardSidebarData() {
 		useLiveQuery(
 			(q) =>
 				q
-					.from({ sidebarWorkspaces: collections.v2WorkspaceLocalState })
+					.from({ sidebarWorkspaces: collections.workspaceLocalState })
 					// Same tie-breaking rationale as the projects query above.
 					.orderBy(
 						({ sidebarWorkspaces }) => sidebarWorkspaces.sidebarState.tabOrder,
@@ -500,7 +500,7 @@ export function useDashboardSidebarData() {
 				continue;
 			}
 			if (placed.projectId !== row.projectId) {
-				collections.v2WorkspaceLocalState.update(row.id, (draft) => {
+				collections.workspaceLocalState.update(row.id, (draft) => {
 					draft.sidebarState.projectId = row.projectId;
 				});
 			}

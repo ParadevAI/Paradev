@@ -73,6 +73,7 @@ export function GitHubStarPill({
 		// opacity/interactivity change, never the layout.
 		return (
 			<motion.div
+				initial={false}
 				animate={{ opacity: isVisible ? 1 : 0 }}
 				transition={{ duration: 0.32, ease: "easeOut" }}
 				style={{ pointerEvents: isVisible ? "auto" : "none" }}

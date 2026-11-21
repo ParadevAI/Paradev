@@ -12,7 +12,12 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { electronTrpcClient } from "../../lib/trpc-client";
 import { trpcThemeStorage } from "../../lib/trpc-storage";
-import { applyUIColors, toXtermTheme, updateThemeClass } from "./utils";
+import {
+	applyThemeCss,
+	applyUIColors,
+	toXtermTheme,
+	updateThemeClass,
+} from "./utils";
 
 /** Special theme ID for system preference (follows OS dark/light mode) */
 export const SYSTEM_THEME_ID = "system";
@@ -181,6 +186,7 @@ function applyTheme(
 } {
 	// Apply UI colors to CSS variables
 	applyUIColors(theme.ui);
+	applyThemeCss(theme.css);
 
 	// The window-controls overlay (Windows, Linux) is painted by the window,
 	// not the page, so it follows the theme from here. Electron parses only

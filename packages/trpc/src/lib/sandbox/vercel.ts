@@ -11,12 +11,20 @@
  */
 
 import * as Sentry from "@sentry/core";
+import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
+import {
+	type BootStamp,
+	parseBootStamps,
+} from "@superset/shared/sandbox/boot-stamps";
 import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
+	SANDBOX_USER,
 	type SandboxIdentity,
+	sandboxAgentToolsDrive,
 } from "@superset/shared/sandbox/contract";
 import {
 	APIError,
@@ -28,6 +36,13 @@ import {
 } from "@vercel/sandbox";
 import { env } from "../../env";
 import { bootStampsFrom, type HostAnswer } from "./boot-trace";
+import {
+	BUILD_COMMANDS_DIR,
+	buildCommandDir,
+	detachedCommandScript,
+	parseCommandState,
+	readCommandScript,
+} from "./build-command";
 import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
@@ -41,16 +56,26 @@ export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
  * is active (`topUpSandboxSession`) is extended before it gets there, so this
  * is really the idle stop.
  */
-export const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
-/** Above the 10-minute client keepalive, so an open workspace is always extended in time. */
-const EXTEND_BELOW_MS = 30 * 60 * 1000;
+export const SESSION_TIMEOUT_MS = 15 * 60 * 1000;
 const MIN_TOP_UP_MS = 60 * 1000;
+/** What host-service bundles that do not report their keepalive interval ping at. */
+const LEGACY_KEEPALIVE_INTERVAL_MS = 15 * 60 * 1000;
+const KEEPALIVE_MARGIN_MS = 5 * 60 * 1000;
 const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const BOOT_COMMAND = "/usr/local/bin/superset-boot";
 const HOST_PROBE_TIMEOUT_MS = 1_500;
+
+/** How long an agent keepalive keeps a session running: past the box's next ping. */
+export function keepaliveWindowMs(pingsEveryMs?: number): number {
+	const interval = Math.min(
+		pingsEveryMs ?? LEGACY_KEEPALIVE_INTERVAL_MS,
+		LEGACY_KEEPALIVE_INTERVAL_MS,
+	);
+	return Math.max(SESSION_TIMEOUT_MS, interval + KEEPALIVE_MARGIN_MS);
+}
 
 function credentials() {
 	return {
@@ -72,9 +97,13 @@ function isNotFound(error: unknown): boolean {
 export class SandboxUnavailableError extends Error {
 	constructor(
 		readonly providerSandboxId: string,
-		cause: unknown,
+		cause?: unknown,
 	) {
 		super(`Sandbox ${providerSandboxId} is unavailable`, { cause });
+	}
+
+	get snapshotExpired(): boolean {
+		return this.cause instanceof APIError && this.cause.response.status === 410;
 	}
 }
 
@@ -86,7 +115,7 @@ function isUnavailable(error: unknown): boolean {
 }
 
 /** Vercel starts a new session on every resume, so the id tells a stale record from a fresh one. */
-function sessionIdOf(sandbox: Sandbox): string | null {
+function sessionIdOf(sandbox: Pick<Sandbox, "currentSession">): string | null {
 	try {
 		return sandbox.currentSession().sessionId;
 	} catch {
@@ -94,14 +123,60 @@ function sessionIdOf(sandbox: Sandbox): string | null {
 	}
 }
 
-async function getSandbox(name: string): Promise<Sandbox | null> {
+/** The session ended under the call: the SDK's own resume-and-retry case. */
+function isSessionStopped(error: unknown): boolean {
+	if (!(error instanceof APIError)) return false;
+	if (error.response.status === 410) return true;
+	const code = (error.json as { error?: { code?: string } } | undefined)?.error
+		?.code;
+	return (
+		error.response.status === 422 &&
+		(code === "sandbox_stopping" || code === "sandbox_snapshotting")
+	);
+}
+
+/**
+ * Most of a handle's calls resume a stopped session and retry. Only a wake
+ * or a create may do that, so every other caller gets the members that
+ * cannot, and acts on a running session through `currentSession()`, whose
+ * calls fail on a stopped one instead.
+ */
+type NonResumingSandbox = Pick<
+	Sandbox,
+	| "name"
+	| "status"
+	| "region"
+	| "vcpus"
+	| "expiresAt"
+	| "currentSnapshotId"
+	| "domain"
+	| "currentSession"
+	| "update"
+	| "stop"
+	| "delete"
+	| "listSessions"
+>;
+
+/** A handle whose calls resume a stopped session: for a wake or a create only. */
+async function getSandboxToWake(
+	name: string,
+	onResume?: (sandbox: Sandbox) => Promise<void>,
+): Promise<Sandbox | null> {
 	try {
-		return await Sandbox.get({ ...credentials(), name, resume: false });
+		return await Sandbox.get({
+			...credentials(),
+			name,
+			resume: false,
+			onResume,
+		});
 	} catch (error) {
 		if (isNotFound(error)) return null;
 		throw error;
 	}
 }
+
+const getSandbox: (name: string) => Promise<NonResumingSandbox | null> =
+	getSandboxToWake;
 
 export interface SandboxEnvironment {
 	sourceKind: "image" | "fork";
@@ -121,8 +196,12 @@ export interface SandboxClaim {
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
-	/** The bundle's agent-tools drive to mount read-only; absent keeps the image's agents. */
-	agentToolsDrive?: string | null;
+	/** Mount the bundle's agent-tools drive read-only; absent keeps the image's agents. */
+	agentTools?: boolean;
+}
+
+function environmentTags(organizationId: string): Record<string, string> {
+	return { kind: "environment", org: organizationId };
 }
 
 /** Vercel allows 5 tags per sandbox. */
@@ -130,12 +209,13 @@ function sandboxTags(
 	kind: "workspace" | "environment",
 	identity: SandboxIdentity,
 ): Record<string, string> {
-	const tags = { kind, org: identity.SUPERSET_SANDBOX_ORGANIZATION_ID };
+	const org = identity.SUPERSET_SANDBOX_ORGANIZATION_ID;
 	// A golden's identity is the workspace it was built from, not its own.
-	if (kind === "environment") return tags;
+	if (kind === "environment") return environmentTags(org);
 	const user = identity.SUPERSET_SANDBOX_CREATOR_USER_ID;
 	return {
-		...tags,
+		kind,
+		org,
 		workspace: identity.SUPERSET_SANDBOX_WORKSPACE_ID,
 		...(user ? { user } : {}),
 	};
@@ -176,6 +256,16 @@ export async function agentToolsMounts(
 	return { [SANDBOX_PATHS.agents]: { drive: driveName, mode: "snapshot" } };
 }
 
+/** The box's own region names the drive: a workspace stays where it was created when its environment moves. */
+export function agentToolsDriveName(
+	claim: Pick<SandboxClaim, "agentTools" | "identity">,
+	region: string,
+): string | null {
+	return claim.agentTools
+		? sandboxAgentToolsDrive(region, claim.identity.SUPERSET_BUNDLE_SHA)
+		: null;
+}
+
 function publishedPorts(extra: readonly number[] = []): number[] {
 	return [...new Set([...SANDBOX_PUBLISHED_PORTS, ...extra])];
 }
@@ -205,7 +295,7 @@ async function writeIdentity(
  * started there. They hold placeholders only.
  */
 async function writeSignInFiles(
-	sandbox: Sandbox,
+	sandbox: Pick<Sandbox, "writeFiles">,
 	files: SandboxFile[] = [],
 ): Promise<void> {
 	if (files.length === 0) return;
@@ -261,9 +351,11 @@ export async function provisionSandbox(args: {
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
-	const mounts = await agentToolsMounts(args.claim.agentToolsDrive);
+	const mounts = await agentToolsMounts(
+		agentToolsDriveName(args.claim, args.environment.region),
+	);
 	const sandbox =
-		(await getSandbox(args.name)) ??
+		(await getSandboxToWake(args.name)) ??
 		(await Sentry.startSpan(
 			{
 				name:
@@ -311,11 +403,31 @@ export async function provisionSandbox(args: {
 const HOST_READY_TIMEOUT_MS = 60_000;
 const HOST_READY_POLL_MS = 100;
 
+/** The boot's phases only: the lines between the stamps are step output. */
 export class SandboxNotReadyError extends Error {
-	constructor(providerSandboxId: string) {
-		super(`host-service in ${providerSandboxId} did not answer in time`);
+	constructor(providerSandboxId: string, bootStamps: BootStamp[] | null) {
+		const start = bootStamps?.[0]?.at ?? 0;
+		const reached = bootStamps
+			? bootStamps
+					.map((stamp) => `${stamp.phase} +${stamp.at - start}ms`)
+					.join(", ") || "no phase"
+			: "an unreadable boot log";
+		super(
+			`host-service in ${providerSandboxId} did not answer in time; the boot reached ${reached}`,
+		);
 		this.name = "SandboxNotReadyError";
 	}
+}
+
+async function readBoxBootStamps(name: string): Promise<BootStamp[] | null> {
+	const sandbox = await getSandbox(name);
+	const log = await sandbox
+		?.currentSession()
+		.readFileToBuffer(
+			{ path: SANDBOX_PATHS.bootLog },
+			{ signal: AbortSignal.timeout(10_000) },
+		);
+	return log ? parseBootStamps(log.toString("utf8")) : null;
 }
 
 async function waitForHostService(
@@ -336,7 +448,10 @@ async function waitForHostService(
 		}
 		await new Promise((resolve) => setTimeout(resolve, HOST_READY_POLL_MS));
 	}
-	throw new SandboxNotReadyError(providerSandboxId);
+	throw new SandboxNotReadyError(
+		providerSandboxId,
+		await readBoxBootStamps(providerSandboxId).catch(() => null),
+	);
 }
 
 /**
@@ -386,24 +501,31 @@ export async function pushManagedEnv(
 }
 
 /**
- * Re-applies the credential rules to a running box: the GitHub token in them
- * lasts an hour (a user token eight), so a box nobody reopens asks for this
- * before it expires. Wakes nothing; a stopped box gets fresh rules on wake.
+ * Hands a running box its current rules, login files and managed environment,
+ * waking nothing. A box that stops part way through is left stopped.
  */
-export async function applySandboxPolicy(args: {
+export async function applyClaimInPlace(args: {
 	providerSandboxId: string;
-	networkPolicy: NetworkPolicy;
+	claim: Pick<
+		SandboxClaim,
+		"networkPolicy" | "files" | "managedEnv" | "hostSecret"
+	>;
 }): Promise<"applied" | "not-running"> {
-	const sandbox = await Sandbox.get({
-		...credentials(),
-		name: args.providerSandboxId,
-		resume: false,
-	}).catch((error: unknown) => {
-		if (isNotFound(error)) return null;
+	const sandbox = await getSandbox(args.providerSandboxId);
+	if (sandbox?.status !== "running") return "not-running";
+	try {
+		await sandbox.update({ networkPolicy: args.claim.networkPolicy });
+		await writeSignInFiles(sandbox.currentSession(), args.claim.files);
+		await pushManagedEnv(
+			sandbox.domain(HOST_SERVICE_PORT),
+			args.claim.hostSecret,
+			args.claim.managedEnv,
+		);
+	} catch (error) {
+		const now = await getSandbox(args.providerSandboxId);
+		if (now?.status !== "running") return "not-running";
 		throw error;
-	});
-	if (!sandbox || sandbox.status !== "running") return "not-running";
-	await sandbox.update({ networkPolicy: args.networkPolicy });
+	}
 	return "applied";
 }
 
@@ -417,11 +539,8 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	sessionId: string | null;
 }> {
 	try {
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name: providerSandboxId,
-			resume: false,
-		});
+		const sandbox = await getSandbox(providerSandboxId);
+		if (!sandbox) throw new SandboxUnavailableError(providerSandboxId);
 		const running = sandbox.status === "running";
 		return {
 			hostTarget: sandbox.domain(HOST_SERVICE_PORT),
@@ -438,21 +557,32 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	}
 }
 
+/** How much to extend a session by so it ends `windowMs` from now; 0 when it nearly does already. */
+function extensionToEnd(expiresAt: Date | undefined, windowMs: number): number {
+	const extension = Date.now() + windowMs - (expiresAt?.getTime() ?? 0);
+	return extension > MIN_TOP_UP_MS ? extension : 0;
+}
+
 /**
- * Extends a running session so it ends `SESSION_TIMEOUT_MS` from now; never
+ * Extends a running session so it ends `windowMs` from now; never
  * wakes a stopped one. The provider only extends by a duration, and refuses
  * past the plan's 24h session cap. Goes through the session:
  * `Sandbox.extendTimeout` resumes a session that stopped meanwhile.
  */
 export async function topUpSandboxSession(
 	providerSandboxId: string,
+	windowMs = SESSION_TIMEOUT_MS,
 ): Promise<{ expiresAt: Date; sessionId: string | null } | null> {
 	const sandbox = await getSandbox(providerSandboxId);
 	if (sandbox?.status !== "running" || !sandbox.expiresAt) return null;
-	const extension =
-		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
-	if (extension > MIN_TOP_UP_MS) {
-		await sandbox.currentSession().extendTimeout(extension);
+	const extension = extensionToEnd(sandbox.expiresAt, windowMs);
+	if (extension) {
+		try {
+			await sandbox.currentSession().extendTimeout(extension);
+		} catch (error) {
+			if (isSessionStopped(error)) return null;
+			throw error;
+		}
 	}
 	return sandbox.expiresAt
 		? { expiresAt: sandbox.expiresAt, sessionId: sessionIdOf(sandbox) }
@@ -483,8 +613,18 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
-	/** Runs once the box is known to be stopped, before anything resumes it. */
-	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+	/** A stopped box is left stopped, and the wake answers null. */
+	onlyIfRunning?: boolean;
+	/**
+	 * Runs once the box is known to be stopped, before anything resumes it; or,
+	 * for a box read running that a call here resumed (`resumedSession`), once
+	 * those calls end.
+	 */
+	beforeResume?: (box: {
+		memoryMb: number;
+		vcpus: number;
+		resumedSession?: { sessionId: string | null; expiresAt: Date | null };
+	}) => Promise<void>;
 }): Promise<{
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
@@ -494,15 +634,22 @@ export async function wakeSandbox(args: {
 	answer: HostAnswer;
 	expiresAt: Date | null;
 	sessionId: string | null;
-}> {
+} | null> {
 	try {
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name: args.providerSandboxId,
-			resume: false,
-		});
+		let wasRunning = false;
+		let resumed = null as { vcpus: number; sessionId: string | null } | null;
+		const sandbox = await getSandboxToWake(
+			args.providerSandboxId,
+			async (box) => {
+				if (!wasRunning) return;
+				const session = box.currentSession();
+				resumed = { vcpus: session.vcpus, sessionId: session.sessionId };
+			},
+		);
+		if (!sandbox) throw new SandboxUnavailableError(args.providerSandboxId);
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
-		const wasRunning = sandbox.status === "running";
+		wasRunning = sandbox.status === "running";
+		if (args.onlyIfRunning && !wasRunning) return null;
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
 			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
@@ -519,10 +666,23 @@ export async function wakeSandbox(args: {
 					),
 			);
 		}
+		if (!wasRunning && sandbox.timeout !== SESSION_TIMEOUT_MS) {
+			// A resume reuses the timeout saved at create, so older boxes keep theirs.
+			try {
+				await sandbox.update({ timeout: SESSION_TIMEOUT_MS });
+			} catch (error) {
+				console.warn(
+					`[sandbox] timeout update failed for ${args.providerSandboxId}`,
+					error,
+				);
+			}
+		}
 		if (!wasRunning) {
 			const { [SANDBOX_PATHS.agents]: previous, ...others } =
 				sandbox.mounts ?? {};
-			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
+			const agents = await agentToolsMounts(
+				agentToolsDriveName(args.claim, sandbox.region),
+			);
 			if (agents || previous) {
 				await sandbox
 					.update({ mounts: { ...others, ...agents } })
@@ -538,11 +698,11 @@ export async function wakeSandbox(args: {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
 		}
 		if (wasRunning) {
-			const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
-			if (remaining < EXTEND_BELOW_MS) {
+			const extension = extensionToEnd(sandbox.expiresAt, SESSION_TIMEOUT_MS);
+			if (extension) {
 				// Past the plan's per-session cap the extension is refused; the
 				// session then ends and the next open resumes it.
-				await sandbox.extendTimeout(SESSION_TIMEOUT_MS).catch(() => {});
+				await sandbox.extendTimeout(extension).catch(() => {});
 			}
 		}
 		// A box that is already serving needs neither a fresh identity file nor
@@ -568,6 +728,16 @@ export async function wakeSandbox(args: {
 			await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
 				runBoot(sandbox, args.claim.hostSecret),
 			);
+		}
+		if (resumed && args.beforeResume) {
+			await args.beforeResume({
+				memoryMb: resumed.vcpus * MEMORY_MB_PER_VCPU,
+				vcpus: resumed.vcpus,
+				resumedSession: {
+					sessionId: resumed.sessionId,
+					expiresAt: sandbox.expiresAt ?? null,
+				},
+			});
 		}
 		const answer = await Sentry.startSpan(
 			{ name: "settle", op: "sandbox" },
@@ -633,7 +803,8 @@ export async function stripWorkspaceIdentity(sandbox: Sandbox): Promise<void> {
 export async function stopAndSnapshot(
 	name: string,
 ): Promise<{ sessionId: string | null }> {
-	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	const sandbox = await getSandbox(name);
+	if (!sandbox) throw new SandboxUnavailableError(name);
 	const before = sandbox.currentSnapshotId;
 	const sessionId = sessionIdOf(sandbox);
 	await sandbox.stop();
@@ -645,26 +816,27 @@ export async function stopAndSnapshot(
  * A golden is a stopped sandbox whose current snapshot is what forks start
  * from. It is built from a snapshot of the source taken now (a fork alone
  * would start from the source's last stop) and created with an empty env.
- * Taking that snapshot ends the source's session, so a running source is
- * started again before this returns.
+ * Taking that snapshot ends the source's session. The source stays stopped:
+ * the caller starts it again through a wake, which meters the new session.
  */
 export async function promoteSandboxToEnvironment(args: {
 	sourceSandbox: string;
 	goldenName: string;
-	/** What restarts the source: it boots the same way a wake does. */
-	claim: SandboxClaim;
-}): Promise<{ goldenName: string; region: string }> {
-	const source = await Sandbox.get({
-		...credentials(),
-		name: args.sourceSandbox,
-		resume: false,
-	});
-	const wasRunning = source.status === "running";
-	const snapshot = await source.snapshot();
+	organizationId: string;
+}): Promise<{
+	goldenName: string;
+	region: string;
+	/** The session the snapshot ended; null when the source was not running. */
+	stopped: { sessionId: string | null } | null;
+}> {
+	const source = await getSandbox(args.sourceSandbox);
+	if (!source) throw new SandboxUnavailableError(args.sourceSandbox);
+	const stopped =
+		source.status === "running" ? { sessionId: sessionIdOf(source) } : null;
 	const golden = await Sandbox.create({
 		...credentials(),
 		name: args.goldenName,
-		source: { type: "snapshot", snapshotId: snapshot.snapshotId },
+		source: { type: "snapshot", snapshotId: await snapshotNow(source) },
 		ports: publishedPorts(),
 		timeout: GOLDEN_SESSION_TIMEOUT_MS,
 		region: source.region as SandboxRegion,
@@ -673,18 +845,33 @@ export async function promoteSandboxToEnvironment(args: {
 		persistent: true,
 		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
-		tags: sandboxTags("environment", args.claim.identity),
+		tags: environmentTags(args.organizationId),
 	});
 	await stripWorkspaceIdentity(golden);
 	const created = golden.currentSnapshotId;
 	await golden.stop();
 	await waitForStopSnapshot(args.goldenName, created);
-	if (wasRunning) {
-		await writeIdentity(source, args.claim.identity);
-		await writeSignInFiles(source, args.claim.files);
-		await runBoot(source, args.claim.hostSecret);
+	return { goldenName: args.goldenName, region: source.region, stopped };
+}
+
+/**
+ * A running box's disk, snapshotted now; a stopped box's disk is the snapshot
+ * its stop took, so it is not resumed to take another.
+ */
+async function snapshotNow(source: NonResumingSandbox): Promise<string> {
+	if (source.status === "running") {
+		try {
+			return (await source.currentSession().snapshot()).snapshotId;
+		} catch (error) {
+			if (!isSessionStopped(error)) throw error;
+		}
+	} else if (source.status === "stopped") {
+		if (source.currentSnapshotId) return source.currentSnapshotId;
+		throw new SandboxUnavailableError(source.name);
+	} else if (source.status !== "stopping" && source.status !== "snapshotting") {
+		throw new SandboxUnavailableError(source.name);
 	}
-	return { goldenName: args.goldenName, region: source.region };
+	return waitForStopSnapshot(source.name, source.currentSnapshotId);
 }
 
 /**
@@ -694,19 +881,161 @@ export async function promoteSandboxToEnvironment(args: {
 export async function waitForStopSnapshot(
 	name: string,
 	previous: string | undefined,
-): Promise<void> {
+): Promise<string> {
 	const deadline = Date.now() + 3 * 60 * 1000;
 	while (Date.now() < deadline) {
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name,
-			resume: false,
-		});
+		const sandbox = await getSandbox(name);
+		if (!sandbox) throw new SandboxUnavailableError(name);
 		const current = sandbox.currentSnapshotId;
-		if (sandbox.status === "stopped" && current && current !== previous) return;
+		if (sandbox.status === "stopped" && current && current !== previous) {
+			return current;
+		}
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 	}
 	throw new Error(`${name} did not snapshot in time`);
+}
+
+/** Where an environment build's box starts: the current golden, or the image. */
+export type BuildBoxSource =
+	| { kind: "fork"; golden: string }
+	| { kind: "image"; region: string };
+
+/**
+ * The box an environment build runs in. Never booted, so neither
+ * host-service nor the repository's start hook runs. Its session ends on its
+ * own if the workflow that drives it dies.
+ */
+export async function createBuildBox(args: {
+	name: string;
+	source: BuildBoxSource;
+	networkPolicy: NetworkPolicy;
+	organizationId: string;
+	sessionTimeoutMs: number;
+}): Promise<void> {
+	const config = {
+		...credentials(),
+		name: args.name,
+		timeout: args.sessionTimeoutMs,
+		env: {},
+		networkPolicy: args.networkPolicy,
+		persistent: true,
+		snapshotExpiration: 0,
+		keepLastSnapshots: { count: 1 },
+		tags: { kind: "environment", org: args.organizationId },
+		resources: { vcpus: GOLDEN_BOX_VCPUS },
+	};
+	if (await getSandbox(args.name)) return;
+	if (args.source.kind === "fork") {
+		await Sandbox.fork({ ...config, sourceSandbox: args.source.golden });
+		return;
+	}
+	await Sandbox.create({
+		...config,
+		image: SANDBOX_IMAGE_NAME,
+		region: args.source.region as SandboxRegion,
+	});
+}
+
+/** What a build command left on the box; `exitCode` is null while it runs. */
+export interface BuildCommandState {
+	exitCode: number | null;
+	tail: string;
+}
+
+/**
+ * Starts a script detached and returns at once: the box runs it, not the
+ * caller. Starting the same key again does not start a second copy.
+ */
+export async function startBuildCommand(args: {
+	name: string;
+	key: string;
+	script: string;
+	env: Record<string, string>;
+	cwd?: string;
+	timeoutSeconds: number;
+}): Promise<void> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: [
+			"-c",
+			detachedCommandScript({
+				dir: buildCommandDir(args.key),
+				script: args.script,
+				timeoutSeconds: args.timeoutSeconds,
+			}),
+		],
+		env: args.env,
+		...(args.cwd ? { cwd: args.cwd } : {}),
+		detached: true,
+	});
+}
+
+export async function readBuildCommand(args: {
+	name: string;
+	key: string;
+}): Promise<BuildCommandState> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	const read = await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: ["-c", readCommandScript(buildCommandDir(args.key))],
+	});
+	return parseCommandState(await read.stdout());
+}
+
+// TODO: import ROOT_DISK_AGENTS_COMMAND from @superset/shared/sandbox/contract once #9911 merges.
+export const ROOT_DISK_AGENTS_COMMAND = `ls -d /opt/codex /opt/pdev ${SANDBOX_PATHS.media}/claude-* ${SANDBOX_PATHS.steps}/install-agent-clis.version 2>/dev/null || true`;
+
+/** The agent CLI paths on the box's own disk; empty when the disk is clean. */
+export async function buildBoxRootDiskAgents(name: string): Promise<string> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name,
+		resume: false,
+	});
+	const read = await sandbox.runCommand({
+		cmd: "bash",
+		args: ["-c", ROOT_DISK_AGENTS_COMMAND],
+	});
+	return (await read.stdout()).trim();
+}
+
+export async function buildBoxSnapshotId(name: string): Promise<string | null> {
+	const sandbox = await getSandbox(name);
+	return sandbox?.currentSnapshotId ?? null;
+}
+
+/** Strips workspace identity and the build's own files, then stops; a box already stopping is left alone. */
+export async function stopBuildBox(name: string): Promise<void> {
+	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	if (sandbox.status !== "running") return;
+	await stripWorkspaceIdentity(sandbox);
+	await sandbox.runCommand({
+		cmd: "rm",
+		args: ["-rf", BUILD_COMMANDS_DIR],
+		sudo: true,
+	});
+	await sandbox.stop();
+}
+
+/** True once forks of the box start from the snapshot its stop took. */
+export async function buildBoxSnapshotTaken(
+	name: string,
+	previous: string | null,
+): Promise<boolean> {
+	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	const current = sandbox.currentSnapshotId;
+	return (
+		sandbox.status === "stopped" && Boolean(current) && current !== previous
+	);
 }
 
 /**
@@ -738,9 +1067,13 @@ export interface BoxSession {
 	startedAt: number;
 	endedAt: number | null;
 	activeCpuMs: number | null;
+	egressBytes: number | null;
+	/** Vercel marked it failed or aborted; a timeout and our own stops both end as `stopped`. */
+	crashed: boolean;
 }
 
 const LIVE_STATUSES = new Set(["pending", "running"]);
+const CRASHED_STATUSES = new Set(["failed", "aborted"]);
 const SESSION_PAGE_SIZE = 20;
 
 export function sessionEndedAt(session: {
@@ -770,6 +1103,7 @@ interface RawSession {
 	requestedStopAt?: number;
 	updatedAt: number;
 	activeCpuDurationMs?: number;
+	networkTransfer?: { ingress: number; egress: number };
 }
 
 function toBoxSession(session: RawSession): BoxSession | null {
@@ -781,7 +1115,32 @@ function toBoxSession(session: RawSession): BoxSession | null {
 		startedAt: session.startedAt,
 		endedAt: sessionEndedAt(session),
 		activeCpuMs: session.activeCpuDurationMs ?? null,
+		egressBytes: session.networkTransfer?.egress ?? null,
+		crashed: CRASHED_STATUSES.has(session.status),
 	};
+}
+
+/**
+ * The box's sessions that are live or ended at or after `since`, newest
+ * first. Null when the sandbox no longer exists.
+ */
+export async function listSandboxSessions(
+	providerSandboxId: string,
+	since: number,
+): Promise<BoxSession[] | null> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (!sandbox) return null;
+	const sessions: BoxSession[] = [];
+	for await (const raw of await sandbox.listSessions({
+		sortOrder: "desc",
+		limit: SESSION_PAGE_SIZE,
+	})) {
+		const session = toBoxSession(raw);
+		if (!session) continue;
+		if (session.endedAt !== null && session.endedAt < since) break;
+		sessions.push(session);
+	}
+	return sessions;
 }
 
 /** Null when the sandbox no longer exists. */

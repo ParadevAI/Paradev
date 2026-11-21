@@ -15,15 +15,15 @@ import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticat
 import { useResumeMovesToThisComputer } from "renderer/routes/_authenticated/_dashboard/hooks/useResumeMovesToThisComputer";
 import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
-import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
+import { useDevSeedSidebar } from "renderer/routes/_authenticated/hooks/useDevSeedSidebar";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useAutomationFailuresStore } from "renderer/stores/automation-failures";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { usePortsDisplayMode } from "renderer/stores/inline-workspace-ports";
+import { useNotificationStore } from "renderer/stores/notifications";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedStoreAcrossWindows";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
@@ -35,7 +35,7 @@ import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMo
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TitleBar } from "./components/TitleBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
-import { browserRuntimeRegistry } from "./v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
+import { browserRuntimeRegistry } from "./workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
 	component: DashboardLayout,
@@ -50,7 +50,7 @@ function DashboardLayout() {
 	const portsDisplayMode = usePortsDisplayMode();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	const quickCreateWorkspace = useQuickCreateWorkspace();
-	useDevSeedV2Sidebar();
+	useDevSeedSidebar();
 	useEffect(() => {
 		const stopWorkspaceSidebarSync = syncPersistedStoreAcrossWindows(
 			useWorkspaceSidebarStore,
@@ -58,9 +58,8 @@ function DashboardLayout() {
 		const stopSectionCollapseSync = syncPersistedStoreAcrossWindows(
 			useSidebarSectionsCollapseStore,
 		);
-		const stopAgentStateSync = syncPersistedStoreAcrossWindows(
-			useV2NotificationStore,
-		);
+		const stopAgentStateSync =
+			syncPersistedStoreAcrossWindows(useNotificationStore);
 		const stopCloudSidebarSync =
 			syncPersistedStoreAcrossWindows(useCloudSidebarStore);
 		const stopAutomationFailuresSync = syncPersistedStoreAcrossWindows(
@@ -79,11 +78,12 @@ function DashboardLayout() {
 	}, []);
 	// Get current workspace from route to pre-select project in new workspace modal
 	const matchRoute = useMatchRoute();
-	const v2Match = matchRoute({
-		to: "/v2-workspace/$workspaceId",
+	const workspaceMatch = matchRoute({
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
-	const currentWorkspaceId = v2Match !== false ? v2Match.workspaceId : null;
+	const currentWorkspaceId =
+		workspaceMatch !== false ? workspaceMatch.workspaceId : null;
 	useHistoryNavigationShortcuts();
 
 	const currentWorkspace = useMemo(

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { NotFound } from "renderer/routes/not-found";
-import { V2ProjectSettings } from "../../v2-project/$projectId/components/V2ProjectSettings";
+import { ProjectSettings } from "./components/ProjectSettings";
 
 export const Route = createFileRoute(
 	"/_authenticated/settings/projects/$projectId/",
@@ -21,7 +21,7 @@ function ProjectDetailPage() {
 	const { projectId } = Route.useParams();
 	const { hostId, focus } = Route.useSearch();
 	return (
-		<V2ProjectSettings
+		<ProjectSettings
 			projectId={projectId}
 			hostId={hostId ?? null}
 			focusField={focus ?? null}

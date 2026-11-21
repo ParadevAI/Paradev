@@ -55,19 +55,19 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["router-history"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/paneScrollStateCache/paneScrollStateCache.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/state/paneScrollStateCache/paneScrollStateCache.ts",
 		["v2-pane-scroll-state-v1"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops/pendingChatStops.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/pendingChatStops/pendingChatStops.ts",
 		["pending-chat-stops-v1"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspaces/stores/v2WorkspacesFilterStore/v2WorkspacesFilterStore.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspaces/stores/workspacesFilterStore/workspacesFilterStore.ts",
 		["v2-workspaces-view"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft/useComposerDraft.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft/useComposerDraft.ts",
 		["chat-v3-draft:*"],
 	],
 	["src/renderer/stores/prompt-history.ts", ["prompt-history"]],
@@ -99,6 +99,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["list-display"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/components/NavigationRail/stores/railPinsStore/railPinsStore.ts",
+		["rail-pins"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPanelStore/channelPanelStore.ts",
 		["channel-panels-v1"],
 	],
@@ -111,15 +115,12 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["sidebar-workspaces-collapse"],
 	],
 	[
-		"src/renderer/stores/v2-workspace-create-defaults.ts",
+		"src/renderer/stores/workspace-create-defaults.ts",
 		["v2-workspace-create-defaults"],
 	],
-	["src/renderer/stores/v2-project-local-meta.ts", ["v2-project-local-meta"]],
-	[
-		"src/renderer/stores/v2-changes-sections/store.ts",
-		["v2-changes-sections-v1"],
-	],
-	["src/renderer/stores/v2-notifications/store.ts", ["v2-notifications-v1"]],
+	["src/renderer/stores/project-local-meta.ts", ["v2-project-local-meta"]],
+	["src/renderer/stores/changes-sections/store.ts", ["v2-changes-sections-v1"]],
+	["src/renderer/stores/notifications/store.ts", ["v2-notifications-v1"]],
 	["src/renderer/stores/hiring-banner/store.ts", ["hiring-banner-v1"]],
 	[
 		"src/renderer/stores/payment-failed-card-dismissal/store.ts",
@@ -152,6 +153,8 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/workspace-agents-row.ts", ["workspace-agents-row"]],
 	["src/renderer/stores/chat-turn-snapshots.ts", ["chat-turn-snapshots"]],
+	["src/renderer/stores/paradev-shell.ts", ["paradev-shell"]],
+	["src/renderer/stores/new-workspace-page.ts", ["new-workspace-page"]],
 	[
 		"src/renderer/routes/_authenticated/settings/usage/utils/usageLastSection/usageLastSection.ts",
 		["usage-last-section-v1"],
@@ -191,11 +194,11 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["chatFavoriteModels"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/utils/savedChatMode/savedChatMode.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/utils/savedChatMode/savedChatMode.ts",
 		["chatModeByAgent"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/lastChatAgent/lastChatAgent.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/lastChatAgent/lastChatAgent.ts",
 		["chatLastAgent"],
 	],
 	[
@@ -233,7 +236,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["lastViewedWorkspaceId"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/richInputOpenStore.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/TerminalPane/richInputOpenStore.ts",
 		["superset.terminalRichInputOpen"],
 	],
 	[
@@ -249,7 +252,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["lastSelectedV2IssueBatchAgent"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/tasks/components/RunInWorkspacePopoverV2/RunInWorkspacePopoverV2.tsx",
+		"src/renderer/routes/_authenticated/_dashboard/tasks/components/RunInWorkspacePopover/RunInWorkspacePopover.tsx",
 		["lastSelectedV2TaskBatchAgent"],
 	],
 	[
@@ -257,7 +260,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["daemon-update-dismissed-failure-*"],
 	],
 	[
-		"src/renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar/useDevSeedV2Sidebar.ts",
+		"src/renderer/routes/_authenticated/hooks/useDevSeedSidebar/useDevSeedSidebar.ts",
 		["superset:dev:v2-sidebar-seeded"],
 	],
 	["src/renderer/routes/sign-in/page.tsx", ["superset-last-auth-method"]],

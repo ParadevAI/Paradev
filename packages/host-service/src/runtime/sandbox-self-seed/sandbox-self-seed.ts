@@ -6,6 +6,8 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
 	type CloudAgentLaunch,
+	describeCloudAgentLaunch,
+	type PendingCloudAgentLaunch,
 	readCloudAgentLaunch,
 } from "@superset/shared/cloud-agent-launch";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -19,6 +21,7 @@ import {
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
+import { logBoxEvent } from "../../sentry";
 import {
 	createTerminalSessionInternal,
 	isAgentTerminalAlive,
@@ -32,6 +35,7 @@ import { importCloudAttachments } from "../../trpc/router/attachments/attachment
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
 import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
+import { recordBootStamp } from "../boot-stamps";
 import {
 	getManagedEnv,
 	waitForManagedEnv,
@@ -50,6 +54,7 @@ import {
 	withPendingLaunchReport,
 } from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
+import { hookOutcomeLine } from "./utils/hookOutcomeLine";
 import { seedSandboxAgents } from "./utils/seedSandboxAgents";
 import { terminalFallbackMode } from "./utils/terminalFallbackMode";
 
@@ -356,7 +361,11 @@ export async function runSandboxStartHook(
 		}
 		writeFileSync(files.marker, `${started.pid ?? ""}\n`);
 		console.log(
-			`[sandbox] start hook running in terminal ${started.terminalId}: ${plan.run.command}`,
+			hookOutcomeLine(
+				"start",
+				`running in terminal ${started.terminalId}`,
+				plan.run.command,
+			),
 		);
 		return {
 			started: true,
@@ -375,8 +384,16 @@ export async function runSandboxStartHook(
 	});
 	child.unref();
 	const pid = child.pid ?? 0;
-	startHookState = { state: "running", command, pid, since: Date.now() };
-	child.on("exit", (code) => {
+	const since = Date.now();
+	startHookState = { state: "running", command, pid, since };
+	child.on("exit", (code, signal) => {
+		const ms = Date.now() - since;
+		recordBootStamp(
+			code === 0
+				? `hook.exited exit=0 ms=${ms}`
+				: `hook.failed exit=${code ?? signal} ms=${ms}`,
+		);
+		logBoxEvent("hook.finished", { "hook.exit": code ?? signal ?? -1, ms });
 		startHookState = {
 			state: "exited",
 			command,
@@ -399,7 +416,9 @@ export async function runSandboxStartHook(
 		});
 	});
 	if (failure !== null && failure !== 0) {
-		console.error(`[sandbox] start hook failed (exit ${failure}): ${command}`);
+		console.error(
+			hookOutcomeLine("start", `failed (exit ${failure})`, command),
+		);
 		return {
 			started: false,
 			reason: "failed",
@@ -411,7 +430,7 @@ export async function runSandboxStartHook(
 	// Written only now: a hook that failed to start must be runnable again on
 	// this boot, and the marker is what makes the next call a no-op.
 	writeFileSync(files.marker, `${pid}\n`);
-	console.log(`[sandbox] start hook running (pid ${pid}): ${command}`);
+	console.log(hookOutcomeLine("start", `running (pid ${pid})`, command));
 	return { started: true, pid, command };
 }
 
@@ -483,6 +502,23 @@ function approveClaudeApiKey(): void {
 		rejected: rejected.filter((entry) => entry !== suffix),
 	};
 	writeFileSync(path, JSON.stringify(config, null, 2));
+}
+
+/**
+ * The launch a client can open a waiting pane for: promised a terminal id
+ * and not yet claimed by `launchSandboxAgentOnce`.
+ */
+export async function readPendingSandboxLaunch(
+	workspaceId: string,
+	env: NodeJS.ProcessEnv = process.env,
+): Promise<PendingCloudAgentLaunch | null> {
+	if (env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
+	const identity = readSandboxIdentity(env);
+	if (identity?.workspaceId !== workspaceId) return null;
+	if (!identity.launch?.terminalId) return null;
+	if (existsSync(identity.launchMarkerPath)) return null;
+	const descriptor = await describeCloudAgentLaunch(identity.launch);
+	return descriptor && { ...descriptor, prompt: identity.launch.prompt };
 }
 
 /**

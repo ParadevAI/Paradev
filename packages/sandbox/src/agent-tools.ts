@@ -41,6 +41,8 @@ export const AGENT_TOOLS: readonly AgentTool[] = [
 	{ name: "claude", bin: "claude" },
 	{ name: "codex", bin: "bin/codex" },
 	{ name: "pdev", bin: "pdev/pdev" },
+	{ name: "opencode", bin: "opencode" },
+	{ name: "pi", bin: "pi/pi" },
 ];
 
 export interface AgentTool {
@@ -54,6 +56,9 @@ const DEFAULT_CHECK = ["--version"];
 const CHECK_TIMEOUT_SECONDS = 30;
 
 export const AGENT_TOOLS_MANIFEST = "manifest.json";
+
+/** Agents a box used to carry on its own disk; a drive without one of them must not be released. */
+export const REQUIRED_AGENT_TOOLS = ["claude", "codex", "pdev"] as const;
 
 const agentToolSchema = z.object({
 	name: z.string().regex(/^[a-z0-9-]+$/),
@@ -268,6 +273,8 @@ export interface AgentToolsPublish {
 	outcome: "exists" | "published";
 	forkedFrom?: string;
 	agents: AgentResult[];
+	/** What the drive's manifest names once published. */
+	available: { name: string; sha: string }[];
 }
 
 /** The region's newest other agent-tools drive that no sandbox holds read-write. */
@@ -314,7 +321,13 @@ export async function publishAgentToolsDrive(args: {
 		const found = parseAgentToolsManifest(
 			await args.host.readManifest(drive, args.region),
 		);
-		if (found.length > 0) return { drive, outcome: "exists", agents: [] };
+		if (found.length > 0)
+			return {
+				drive,
+				outcome: "exists",
+				agents: [],
+				available: found.map(({ name, sha }) => ({ name, sha })),
+			};
 		await args.host.remove(drive);
 	}
 	let forkedFrom: string | undefined;
@@ -346,11 +359,13 @@ export async function publishAgentToolsDrive(args: {
 			tools: args.tools,
 		}),
 	);
+	const agents = parseBuilderResults(stdout);
 	return {
 		drive,
 		outcome: "published",
 		...(forkedFrom ? { forkedFrom } : {}),
-		agents: parseBuilderResults(stdout),
+		agents,
+		available: agents.flatMap(({ name, sha }) => (sha ? [{ name, sha }] : [])),
 	};
 }
 
@@ -391,6 +406,7 @@ export async function publishAgentToolsDrives(
 /** One line per region and per agent that did not get the bundle's version; warnings start `::warning::`. */
 export function describeAgentToolsPublish(
 	results: readonly RegionPublish[],
+	assets: Assets = {},
 ): string[] {
 	return results.flatMap((entry) => {
 		if ("error" in entry) {
@@ -407,16 +423,53 @@ export function describeAgentToolsPublish(
 			...agents.flatMap((agent) =>
 				agent.outcome === "kept-previous"
 					? [
-							`::warning::agent-tools: ${drive}: ${agent.name} kept ${agent.sha?.slice(0, 12)} from the earlier drive; the bundle's version failed`,
+							`::warning::agent-tools: ${entry.region}: ${agent.name} ${assets[agent.name]?.version ?? "of this bundle"} failed; ${drive} keeps ${agent.sha?.slice(0, 12)} from ${forkedFrom ?? "the earlier drive"}`,
 						]
 					: agent.outcome === "dropped"
 						? [
-								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes keep the image's ${agent.name}`,
+								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes keep the image's ${agent.name}, if the image has one`,
 							]
 						: [],
 			),
 		];
 	});
+}
+
+/** One line per region a box needs whose drive is missing or lacks a required agent; empty means release. */
+export function agentToolsGaps(
+	results: readonly RegionPublish[],
+	needed: ReadonlySet<string>,
+	required: readonly string[] = REQUIRED_AGENT_TOOLS,
+): string[] {
+	return results.flatMap((entry) => {
+		if (!needed.has(entry.region)) return [];
+		if ("error" in entry) return [`${entry.region}: no drive`];
+		const names = new Set(entry.result.available.map(({ name }) => name));
+		const missing = required.filter((name) => !names.has(name));
+		return missing.length
+			? [`${entry.region}: ${entry.result.drive} has no ${missing.join(", ")}`]
+			: [];
+	});
+}
+
+/**
+ * Every drive a box may still mount: each environment row's bundle in its
+ * region, and the newest released bundles in every region, so a rollback and
+ * an environment created mid-release still find theirs.
+ */
+export function referencedAgentToolsDrives(args: {
+	rows: readonly { region: string; bundleSha: string | null }[];
+	recentBundles: readonly string[];
+	regions: readonly string[];
+}): Set<string> {
+	return new Set([
+		...args.rows.flatMap((row) =>
+			row.bundleSha ? [sandboxAgentToolsDrive(row.region, row.bundleSha)] : [],
+		),
+		...args.recentBundles.flatMap((sha) =>
+			args.regions.map((region) => sandboxAgentToolsDrive(region, sha)),
+		),
+	]);
 }
 
 /** Agent-tools drives no environment row's bundle and region name any more. */

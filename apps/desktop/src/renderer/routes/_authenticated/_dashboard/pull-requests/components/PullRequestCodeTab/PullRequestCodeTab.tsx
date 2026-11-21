@@ -19,14 +19,19 @@ import {
 	formatAgentPromptWithFileContext,
 } from "renderer/hooks/host-service/useSendToTerminalAgent";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
+import {
+	agentLaunchPreset,
+	useResolveOpenAsChat,
+} from "renderer/hooks/useResolveOpenAsChat";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { FileStatus } from "renderer/lib/pierreTree";
 import type { AgentTarget } from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
 import { buildContentKey } from "renderer/routes/_authenticated/_dashboard/utils/buildContentKey";
-import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
-import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
+import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
@@ -392,6 +397,8 @@ export function PullRequestCodeTab({
 	});
 	const linkedWorkspaceId = linkedWorkspaceData?.workspaceId ?? null;
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
+	const { agents: agentChoices } = useAgentChoices(hostUrl);
+	const resolveOpenAsChat = useResolveOpenAsChat();
 
 	// Mirrors DiffPane's split between "send to an existing terminal" and
 	// "create a new agent session", but the PR tab has no fixed workspace to
@@ -446,13 +453,26 @@ export function PullRequestCodeTab({
 			if (!hostId || !projectId) {
 				throw new Error("No host available to create a workspace");
 			}
+			const target = input.target;
+			const agentChoice = agentChoices.find(
+				(agent) => agent.id === target.configId,
+			);
+			const openAsChat =
+				agentChoice !== undefined &&
+				(await resolveOpenAsChat(agentLaunchPreset(agentChoice)));
 			const { completed } = submitWorkspaceCreate({
 				hostId,
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId,
 					pr: prNumber,
-					agents: [{ agent: input.target.configId, prompt: text }],
+					agents: [
+						{
+							agent: input.target.configId,
+							prompt: text,
+							...(openAsChat ? { surface: "chat" as const } : {}),
+						},
+					],
 				},
 			});
 			const outcome = await completed;
@@ -659,7 +679,7 @@ export function PullRequestCodeTab({
 				// non-null onGutterUtilityClick (InteractionManager's
 				// startGutterSelectionFromPointerDown early-returns otherwise)
 				// — the real open logic lives in onLineSelectionEnd, which also
-				// fires on gutter clicks. Mirrors the v2-workspace DiffPane's
+				// fires on gutter clicks. Mirrors the workspace DiffPane's
 				// identical stub for the same reason.
 				onGutterUtilityClick: () => {},
 				onLineSelectionEnd: (

@@ -112,6 +112,10 @@ __superset_prompt_mark() {
   printf "\\033]777;superset-shell-ready\\007\\033]133;A\\007"
 }
 precmd_functions=(\${precmd_functions[@]} __superset_prompt_mark)
+__superset_exit_mark() {
+  [[ $ZSH_SUBSHELL -eq 0 && -t 1 ]] && printf "\\033]777;superset-shell-exit\\007"
+}
+zshexit_functions=(\${zshexit_functions[@]} __superset_exit_mark)
 export ZDOTDIR="$_superset_home"
 `,
 	);
@@ -237,6 +241,29 @@ describe("shell-ready evidence learning", () => {
 				`healthy profile took ${elapsed}ms — gate fell back to the timeout`,
 			);
 			await waitFor(() => readEvidenceFile().zsh === "delivered", 5_000);
+		},
+	);
+
+	test(
+		"a shell that ends itself with a failing status reports shellExited",
+		{ skip: !ZSH },
+		async () => {
+			const terminalId = `e2e-exit-${randomUUID().slice(0, 8)}`;
+			const session = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId,
+				db,
+				listed: true,
+				initialCommand: "exit 3",
+			});
+			assert.ok(!("error" in session), "error" in session ? session.error : "");
+			try {
+				await waitFor(() => session.exited, 25_000);
+				assert.equal(session.exitCode, 3);
+				assert.equal(session.shellExited, true);
+			} finally {
+				await disposeSessionAndWait(terminalId, db);
+			}
 		},
 	);
 

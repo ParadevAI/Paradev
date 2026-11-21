@@ -18,8 +18,11 @@ const assetSchema = z.object({
 	 * Empty for an executable, which has none.
 	 */
 	suffix: z.string().regex(/^(\.[a-z0-9.]+)?$/),
-	/** Absolute path on the box. Archives are staged under the media dir. */
-	dest: z.string().startsWith("/"),
+	/**
+	 * Absolute path on the box. Archives are staged under the media dir.
+	 * Absent for a drive-only row: no box fetches it, only the agent-tools drive.
+	 */
+	dest: z.string().startsWith("/").optional(),
 	mode: z
 		.string()
 		.regex(/^0[0-7]{3}$/)
@@ -50,6 +53,12 @@ const stepSchema = z.object({
 	salt: z.string().default(""),
 	/** Of `assets`, the archives the step unpacks: deleted once it succeeds, fetched again before it re-runs. */
 	discards: z.array(z.string()).optional(),
+	/**
+	 * Runs before host-service starts; every other step runs after it. Its
+	 * `after` steps must be the same kind, and it must discard every asset it
+	 * declares: the runner fetches only those before host-service.
+	 */
+	beforeHost: z.boolean().optional(),
 });
 export type Step = z.infer<typeof stepSchema>;
 export const stepsSchema = z.array(stepSchema);
@@ -123,21 +132,74 @@ export function discardingSteps(steps: Step[]): Map<string, string> {
 	return owners;
 }
 
-/** The fifth column names the step that discards the row, empty for a row that stays. */
+/**
+ * The fifth column names the step that discards the row, empty for a row that
+ * stays. A drive-only row has no line: no box fetches it.
+ */
 export function renderAssetsTsv(assets: Assets, steps: Step[] = []): string {
 	const owners = discardingSteps(steps);
-	return Object.entries(assets)
-		.map(([key, a]) =>
-			[a.mode, a.sha256, a.suffix, b64(a.dest), owners.get(key) ?? ""].join(
+	const rows = Object.entries(assets).flatMap(([key, a]) =>
+		a.dest ? [{ key, ...a, dest: a.dest }] : [],
+	);
+	return rows
+		.map((a) =>
+			[a.mode, a.sha256, a.suffix, b64(a.dest), owners.get(a.key) ?? ""].join(
 				"\t",
 			),
 		)
 		.join("\n")
-		.concat(Object.keys(assets).length ? "\n" : "");
+		.concat(rows.length ? "\n" : "");
+}
+
+/** Puts the drive-only pins in the bundle's hash, so a bump names a new drive. No box reads it. */
+export function renderDriveAssetsTsv(assets: Assets): string {
+	return Object.entries(assets)
+		.filter(([, a]) => !a.dest)
+		.map(([key, a]) => `${key}\t${a.sha256}\n`)
+		.join("");
 }
 
 export interface DerivedStep extends Step {
 	version: string;
+	/** Every step this one is `after`, directly or through another, in execution order. */
+	upstream: string[];
+}
+
+/** Each step's `after`, closed transitively, in manifest order. */
+export function upstreamSteps(steps: Step[]): Map<string, string[]> {
+	const order = new Map(steps.map((s, i) => [s.name, i]));
+	const beforeHost = new Set(
+		steps.filter((s) => s.beforeHost).map((s) => s.name),
+	);
+	const closure = new Map<string, string[]>();
+	for (const step of steps) {
+		if (step.beforeHost) {
+			const fetched = step.assets.filter((a) => !step.discards?.includes(a));
+			if (fetched.length)
+				throw new Error(
+					`step ${step.name} runs before host-service but does not discard ${fetched.join(", ")}`,
+				);
+		}
+		const found = new Set<string>();
+		for (const dep of step.after) {
+			const upstream = closure.get(dep);
+			if (!upstream)
+				throw new Error(
+					`step ${step.name} runs after ${dep}, which is not an earlier step`,
+				);
+			if (step.beforeHost && !beforeHost.has(dep))
+				throw new Error(
+					`step ${step.name} runs before host-service, after ${dep}, which does not`,
+				);
+			found.add(dep);
+			for (const name of upstream) found.add(name);
+		}
+		closure.set(
+			step.name,
+			[...found].sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0)),
+		);
+	}
+	return closure;
 }
 
 /**
@@ -153,6 +215,7 @@ export function deriveStepVersions(args: {
 	stepsDir: string;
 }): DerivedStep[] {
 	const toolsByDest = new Map(args.tools.map((t) => [t.dest, t.sha256]));
+	const upstream = upstreamSteps(args.steps);
 	const versions = new Map<string, string>();
 	const derived: DerivedStep[] = [];
 	for (const step of args.steps) {
@@ -162,6 +225,10 @@ export function deriveStepVersions(args: {
 			const asset = args.assets[key];
 			if (!asset)
 				throw new Error(`step ${step.name} declares unknown asset ${key}`);
+			if (!asset.dest)
+				throw new Error(
+					`step ${step.name} declares ${key}, which is drive-only and never on the box`,
+				);
 			parts.push(`asset:${key}:${asset.sha256}`);
 		}
 		for (const input of step.inputs) {
@@ -183,14 +250,26 @@ export function deriveStepVersions(args: {
 		if (step.salt) parts.push(`salt:${step.salt}`);
 		const version = sha256(parts.join("\n"));
 		versions.set(step.name, version);
-		derived.push({ ...step, version });
+		derived.push({ ...step, version, upstream: upstream.get(step.name) ?? [] });
 	}
 	return derived;
 }
 
+/**
+ * Columns: name, version, assets, upstream steps, `host` for a step that runs
+ * before host-service. The runner skips a step whose upstream failed.
+ */
 export function renderStepsTsv(steps: DerivedStep[]): string {
 	return steps
-		.map((s) => [s.name, s.version, s.assets.join(",")].join("\t"))
+		.map((s) =>
+			[
+				s.name,
+				s.version,
+				s.assets.join(","),
+				s.upstream.join(","),
+				s.beforeHost ? "host" : "",
+			].join("\t"),
+		)
 		.join("\n")
 		.concat(steps.length ? "\n" : "");
 }

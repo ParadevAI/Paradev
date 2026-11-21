@@ -30,7 +30,7 @@ export function useProjectTagFolderSections(projectId: string | null): {
 	const { data: storedSections = [], isReady } = useLiveQuery(
 		(q) =>
 			q
-				.from({ sidebarSections: collections.v2SidebarSections })
+				.from({ sidebarSections: collections.sidebarSections })
 				.select(({ sidebarSections }) => ({
 					sectionId: sidebarSections.sectionId,
 					projectId: sidebarSections.projectId,

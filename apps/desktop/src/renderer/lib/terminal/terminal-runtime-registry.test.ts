@@ -699,6 +699,35 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 	});
 });
 
+describe("endedCleanly", () => {
+	test("a failing exit is clean only when the shell ended by itself", () => {
+		const entry: { transport: { exitStatus: unknown } } = {
+			transport: { exitStatus: null },
+		};
+		const internals = terminalRuntimeRegistry as unknown as {
+			getEntry: () => typeof entry;
+		};
+		const getEntry = spyOn(internals, "getEntry").mockReturnValue(entry);
+		try {
+			const endedCleanly = (exitStatus: unknown) => {
+				entry.transport.exitStatus = exitStatus;
+				return terminalRuntimeRegistry.endedCleanly("t1", "pane");
+			};
+			expect(endedCleanly(null)).toBe(false);
+			expect(endedCleanly({ exitCode: 0, signal: 0 })).toBe(true);
+			expect(endedCleanly({ exitCode: 1, signal: 0 })).toBe(false);
+			expect(endedCleanly({ exitCode: 1, signal: 0, shellExited: true })).toBe(
+				true,
+			);
+			expect(endedCleanly({ exitCode: 0, signal: 9, shellExited: true })).toBe(
+				false,
+			);
+		} finally {
+			getEntry.mockRestore();
+		}
+	});
+});
+
 describe("terminal replacement history", () => {
 	test("distinguishes session death from transport termination and bounds restored history", () => {
 		const serialize = mock(() => "previous output");

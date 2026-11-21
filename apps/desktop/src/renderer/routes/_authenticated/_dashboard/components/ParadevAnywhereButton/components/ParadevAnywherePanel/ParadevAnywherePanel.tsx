@@ -95,7 +95,7 @@ export function ParadevAnywherePanel({
 					<X className={ICON_CLASS} strokeWidth={ICON_STROKE_WIDTH} />
 				</button>
 			</div>
-			<div className="grid grid-cols-2 gap-2">
+			<div className="grid grid-cols-1 gap-2 @[280px]:grid-cols-2">
 				{surfaces.map((surface) => (
 					<SurfaceTile
 						key={surface.id}

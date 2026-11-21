@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import { organizations } from "@superset/db/schema/auth";
@@ -77,5 +79,11 @@ export async function syncingOrganizationIds(
 export async function organizationSyncsNow(
 	organizationId: string,
 ): Promise<boolean> {
+	if (
+		billingUsesAutumn &&
+		(await organizationPlanFromAutumn(organizationId)) !== "free"
+	) {
+		return true;
+	}
 	return (await syncingOrganizationIds([organizationId])).has(organizationId);
 }

@@ -198,7 +198,7 @@ const config: NextConfig = {
 			{
 				source: "/docs/:path*",
 				destination: `${docsUrl}/:path*`,
-				permanent: false,
+				permanent: true,
 			},
 			...buildLegacyRedirects({ locales: SUPPORTED_LOCALES, docsUrl }),
 		];

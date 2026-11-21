@@ -14,6 +14,7 @@ function visibleSections(overrides: Partial<SettingsSectionVisibility>) {
 		isMac: true,
 		isAdmin: true,
 		pluginsEnabled: true,
+		cloudUsageEnabled: true,
 		allowedSections: allSections,
 		...overrides,
 	};
@@ -28,6 +29,9 @@ describe("isSettingsSectionVisible", () => {
 		expect(visibleSections({ isMac: false })).not.toContain("permissions");
 		expect(visibleSections({ isAdmin: false })).not.toContain("plugins");
 		expect(visibleSections({ pluginsEnabled: false })).not.toContain("plugins");
+		expect(visibleSections({ cloudUsageEnabled: false })).not.toContain(
+			"cloudUsage",
+		);
 		expect(
 			visibleSections({
 				allowedSections: new Set<SettingsSection>(["account", "billing"]),

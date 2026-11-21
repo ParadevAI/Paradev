@@ -2,8 +2,8 @@ import { useLocation } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
 	type AccessibleV2Workspace,
-	useAccessibleV2Workspaces,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+	useAccessibleWorkspaces,
+} from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import {
 	bucketWorkspaces,
 	type SwitcherGroup,
@@ -23,7 +23,7 @@ export function useSwitcherGroups(
 	rawQuery: string,
 	enabled = true,
 ): SwitcherGroups {
-	const { all: workspaces } = useAccessibleV2Workspaces({
+	const { all: workspaces } = useAccessibleWorkspaces({
 		liveState: !enabled
 			? undefined
 			: rawQuery.trimStart().startsWith("#")
@@ -31,7 +31,7 @@ export function useSwitcherGroups(
 				: "cached",
 	});
 	const currentPath = useLocation({ select: (loc) => loc.pathname });
-	const currentId = currentPath.match(/^\/v2-workspace\/([^/]+)/)?.[1] ?? null;
+	const currentId = currentPath.match(/^\/workspace\/([^/]+)/)?.[1] ?? null;
 	const query = useMemo(
 		() =>
 			parseSwitcherQuery(

@@ -19,7 +19,7 @@ export const APP_PARTITION = "persist:superset";
 export const BROWSER_PARTITION = "persist:browser";
 
 export const NOTIFICATION_EVENTS = {
-	FOCUS_V2_NOTIFICATION_SOURCE: "focus-v2-notification-source",
+	FOCUS_NOTIFICATION_SOURCE: "focus-v2-notification-source",
 	SETTINGS_EXTERNAL_CHANGE: "settings-external-change",
 	OPEN_ROUTE: "open-route",
 	NOTIFICATION_REPLY: "notification-reply",
@@ -50,5 +50,4 @@ export const DEFAULT_FILE_AUTO_SAVE = "off" as const;
 export const DEFAULT_WAIT_FOR_SETUP_BEFORE_AGENT = false;
 export const DEFAULT_TELEMETRY_ENABLED = true;
 export const DEFAULT_SHOW_RESOURCE_MONITOR = true;
-export const DEFAULT_SHOW_USAGE_IN_SIDEBAR = false;
 export const DEFAULT_EXPOSE_HOST_SERVICE_VIA_RELAY = false;
