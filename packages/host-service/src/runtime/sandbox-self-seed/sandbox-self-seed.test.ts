@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import {
 	existsSync,
-	mkdirSync,
 	mkdtempSync,
 	readFileSync,
 	rmSync,
@@ -56,6 +55,10 @@ describe("startHookPlan", () => {
 		root = mkdtempSync(join(tmpdir(), "start-hook-test-"));
 		previousRunMode = process.env.SUPERSET_HOST_RUN_MODE;
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
 	});
 
 	afterEach(() => {
@@ -63,11 +66,11 @@ describe("startHookPlan", () => {
 		if (previousRunMode === undefined)
 			delete process.env.SUPERSET_HOST_RUN_MODE;
 		else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
+		delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
 	});
 
 	function planFor(toml: string) {
-		mkdirSync(join(root, ".superset"), { recursive: true });
-		writeFileSync(join(root, ".superset", "config.toml"), toml, "utf-8");
+		writeFileSync(join(root, "environment.toml"), toml, "utf-8");
 		return startHookPlan({
 			worktreePath: root,
 			workspaceId: "ws-1",
@@ -120,6 +123,10 @@ describe("start hook run terminal", () => {
 		};
 		previousRunMode = process.env.SUPERSET_HOST_RUN_MODE;
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
 	});
 
 	afterEach(() => {
@@ -127,11 +134,11 @@ describe("start hook run terminal", () => {
 		if (previousRunMode === undefined)
 			delete process.env.SUPERSET_HOST_RUN_MODE;
 		else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
+		delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
 	});
 
 	function identityWith(toml: string): SandboxIdentity {
-		mkdirSync(join(root, ".superset"), { recursive: true });
-		writeFileSync(join(root, ".superset", "config.toml"), toml, "utf-8");
+		writeFileSync(join(root, "environment.toml"), toml, "utf-8");
 		return { worktreePath: root, workspaceId: "ws-1" } as SandboxIdentity;
 	}
 

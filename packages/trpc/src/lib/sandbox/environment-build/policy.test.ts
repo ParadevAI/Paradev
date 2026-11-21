@@ -5,6 +5,7 @@ import {
 	dailyBuildsPaused,
 	goldensToDelete,
 	isStale,
+	keptGoldenRefs,
 	nextManualBuildAt,
 } from "./policy";
 
@@ -32,6 +33,12 @@ describe("goldensToDelete", () => {
 		);
 		expect(goldensToDelete(goldens("d", "c", "b", "a"), "a")).toEqual(
 			goldens("b"),
+		);
+	});
+
+	test("what it keeps can be restored: the active golden plus the 2 newest others", () => {
+		expect(keptGoldenRefs(goldens("d", "c", "b", "a"), "a")).toEqual(
+			new Set(["a", "d", "c"]),
 		);
 	});
 });

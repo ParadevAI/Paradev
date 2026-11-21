@@ -2152,8 +2152,8 @@ msgstr "Додати опис"
 msgid "Add description..."
 msgstr "Додайте опис..."
 
-msgid "Add Environment Variable"
-msgstr "Додати змінну середовища"
+msgid "Add environment variables"
+msgstr "Додати змінні середовища"
 
 msgid "Add extension"
 msgstr "Додати розширення"
@@ -2192,9 +2192,6 @@ msgstr "Додати ще…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Додайте агента з меню на бічній панелі, щоб почати."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Додайте одну або кілька змінних середовища. Можна також перетягнути файл .env."
-
 msgid "Add people"
 msgstr "Додати людей"
 
@@ -2206,6 +2203,9 @@ msgstr "Додати людей до каналу"
 
 msgid "Add photos or files"
 msgstr "Додати фото або файли"
+
+msgid "Add port"
+msgstr "Додати порт"
 
 msgid "Add project"
 msgstr "Додати проєкт"
@@ -2242,6 +2242,9 @@ msgstr "Додати податковий номер"
 
 msgid "Add team member..."
 msgstr "Додати учасника команди..."
+
+msgid "Add terminal"
+msgstr "Додати термінал"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Додай тести для найризикованішого неперевіреного коду…"
@@ -2281,6 +2284,9 @@ msgstr "Додати на бічну панель"
 
 msgid "Add to workspace"
 msgstr "Додати до робочого простору"
+
+msgid "Add variables"
+msgstr "Додати змінні"
 
 msgid "Add what it does"
 msgstr "Опишіть, що він робить"
@@ -2622,6 +2628,9 @@ msgstr "Усі сторінки"
 msgid "All plans"
 msgstr "Усі тарифи"
 
+msgid "All plugins"
+msgstr "Усі плагіни"
+
 msgid "All posts"
 msgstr "Усі дописи"
 
@@ -2711,6 +2720,9 @@ msgstr "Дозволено"
 
 msgid "Allowed for session"
 msgstr "Дозволено на сеанс"
+
+msgid "Allowed plugins"
+msgstr "Дозволені плагіни"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Уже перенесено в іншу організацію. Перейдіть до неї, щоб побачити цей проєкт."
@@ -2805,6 +2817,9 @@ msgstr "Автоматизація може використовувати ли�
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Середовище містить ваші репозиторії, змінні та регіон. Запускайте з нього стільки робочих просторів, скільки потрібно."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Репозиторії середовища не можна змінити. Для інших репозиторіїв створіть нове середовище."
+
 msgid "An error occurred"
 msgstr "Сталася помилка"
 
@@ -2855,6 +2870,9 @@ msgstr "Інший ШІ-асистент"
 
 msgid "another device"
 msgstr "інший пристрій"
+
+msgid "Another row already uses this name."
+msgstr "Ця назва вже використовується в іншому рядку."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Відповідайте на запитання в терміналі нижче, наприклад введіть пароль."
@@ -3272,6 +3290,9 @@ msgstr "Принаймні одна команда, яку ми можемо н�
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Не більше ніж {AUTO_TOPUP_MONTHLY_LIMIT} поповнень на місяць, тобто до {monthlyMax} на місяць."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Попередній перегляд може мати не більше ніж {MAX_PREVIEW_PORTS} портів."
+
 msgid "at once"
 msgstr "одночасно"
 
@@ -3579,9 +3600,6 @@ msgstr "Базова папка для нових робочих простор�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Базова папка для нових worktree на {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Базовий образ · контрольної точки ще немає"
-
 msgid "Base URL"
 msgstr "Базовий URL"
 
@@ -3859,6 +3877,12 @@ msgstr "Створюємо останню програму"
 
 msgid "Building the last piece of software."
 msgstr "Створюємо останню програму."
+
+msgid "Building…"
+msgstr "Триває збірка…"
+
+msgid "Builds fail until there is an install script."
+msgstr "Без скрипту встановлення збірки завершуються помилкою."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Створили плагін? Надішліть його тут."
@@ -4401,10 +4425,6 @@ msgstr "Контрольна точка"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольна точка · до рефакторингу підказок"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Контрольну точку збережено {0}"
-
 msgid "Checkpoint saved to {name}"
 msgstr "Контрольну точку збережено в {name}"
 
@@ -4845,6 +4865,9 @@ msgstr "Хмара"
 msgid "Cloud · us-east"
 msgstr "Хмара · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Хмарні агенти не отримують MCP-серверів у цьому середовищі."
+
 msgid "Cloud environment setup"
 msgstr "Налаштування хмарного середовища"
 
@@ -5170,6 +5193,9 @@ msgstr "Conductor — торговельна марка її власника. {
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Робочі простори Conductor — це звичайні Git worktree. {0} використовує їх там, де вони є."
+
+msgid "Config"
+msgstr "Конфігурація"
 
 msgid "Config file contents"
 msgstr "Вміст файлу конфігурації"
@@ -6223,6 +6249,9 @@ msgstr "Не вдалося завантажити автоматизацію: {
 msgid "Couldn't load automations"
 msgstr "Не вдалося завантажити автоматизації"
 
+msgid "Couldn't load builds"
+msgstr "Не вдалося завантажити збірки"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Не вдалося завантажити контриб'юторів. Введіть ім'я користувача."
 
@@ -6965,8 +6994,14 @@ msgstr "Модель за замовчуванням"
 msgid "Default team for new tasks"
 msgstr "Команда за замовчуванням для нових завдань"
 
+msgid "Default terminal"
+msgstr "Термінал за замовчуванням"
+
 msgid "Default terminal theme"
 msgstr "Тема термінала за замовчуванням"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Термінал за замовчуванням: {terminalName}"
 
 msgid "Delegated"
 msgstr "Із делегуванням"
@@ -7415,6 +7450,9 @@ msgstr "Папка"
 msgid "Disable"
 msgstr "Вимкнути"
 
+msgid "Disable MCP servers"
+msgstr "Вимкнути MCP-сервери"
+
 msgid "Disable skill"
 msgstr "Вимкнути навичку"
 
@@ -7829,6 +7867,9 @@ msgstr "Кожне місце додає години свого тарифу д
 msgid "Each session resumes where it left off."
 msgstr "Кожен сеанс продовжиться з того місця, де зупинився."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Кожна успішна збірка зберігає знімок. Нові робочі простори запускаються з поточного, а раніший можна відновити."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Кожна поверхня має власну типографіку. Зміни одразу видно в живому попередньому перегляді."
 
@@ -8039,6 +8080,9 @@ msgstr "Завершення дзвінка"
 msgid "Ensure no regression"
 msgstr "Переконайся, що немає регресії"
 
+msgid "Enter a command."
+msgstr "Введіть команду."
+
 msgid "Enter a full email address"
 msgstr "Введіть повну адресу електронної пошти"
 
@@ -8050,6 +8094,9 @@ msgstr "Введіть батьківську папку на {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Введіть шлях на {hostName}"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Введіть порт від 1 до 65535."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Введіть URL у рядок пошуку вище."
@@ -8095,6 +8142,9 @@ msgstr "Середовище"
 
 msgid "Environment archived"
 msgstr "Середовище архівовано"
+
+msgid "Environment history"
+msgstr "Історія середовища"
 
 msgid "Environment not found"
 msgstr "Середовище не знайдено"
@@ -10523,6 +10573,9 @@ msgstr "Встановіть Paradev MCP у свій клієнт"
 msgid "Install plugin"
 msgstr "Встановити плагін"
 
+msgid "Install script"
+msgstr "Скрипт встановлення"
+
 msgid "Install the desktop app"
 msgstr "Встановити десктопний застосунок"
 
@@ -11641,6 +11694,9 @@ msgstr "Надійність на довготривалих завданнях 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Підказка лише з комбінацією клавіш після довгого наведення; її стиль чипа тепер типовий для TooltipContent"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Довготривалі команди, як-от dev-сервер. Кожен робочий простір під час запуску відкриває термінал за замовчуванням."
+
 msgid "Looking at {what}"
 msgstr "Переглядаємо {what}"
 
@@ -11881,6 +11937,9 @@ msgstr "Максимальний розмір: 256 КБ."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "Список дозволених MCP"
 
 msgid "MCP manager"
 msgstr "Менеджер MCP"
@@ -12787,6 +12846,9 @@ msgstr "За цей період запусків немає."
 msgid "No branches found"
 msgstr "Гілок не знайдено"
 
+msgid "No builds yet"
+msgstr "Збірок ще немає"
+
 msgid "No changed files."
 msgstr "Немає змінених файлів."
 
@@ -13131,6 +13193,9 @@ msgstr "Особу не записано"
 
 msgid "No plugins available yet."
 msgstr "Доступних плагінів ще немає."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Плагіни не встановлено, тому хмарні агенти не отримують тут MCP-серверів."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13878,6 +13943,9 @@ msgstr "Лише власник або власник організації м�
 msgid "Only the people listed above can open it"
 msgstr "Відкрити можуть лише люди, указані вище"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Змінити конфігурацію цього середовища може лише той, хто його створив, або адміністратор організації."
+
 msgid "Only the person who created this page can change it"
 msgstr "Змінити цю сторінку може лише той, хто її створив"
 
@@ -13886,6 +13954,9 @@ msgstr "Змінити це може лише той, хто створив цю
 
 msgid "Only the person who created this workspace can change these."
 msgstr "Змінити це може лише той, хто створив цей робочий простір."
+
+msgid "Only the plugins below"
+msgstr "Лише плагіни нижче"
 
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Видалити його може лише автор треду або власник сторінки"
@@ -14458,9 +14529,6 @@ msgstr "Організація вже існує"
 
 msgid "Organization created successfully!"
 msgstr "Організацію успішно створено!"
-
-msgid "Organization default ({defaultName})"
-msgstr "Типове для організації ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Організацію видалено"
@@ -15287,6 +15355,18 @@ msgstr "Популярні"
 msgid "Popular models"
 msgstr "Популярні моделі"
 
+msgid "Port"
+msgstr "Порт"
+
+msgid "Port label"
+msgstr "Підпис порту"
+
+msgid "Port name"
+msgstr "Ім'я порту"
+
+msgid "Port number"
+msgstr "Номер порту"
+
 msgid "Ports"
 msgstr "Порти"
 
@@ -15298,6 +15378,9 @@ msgstr "Порти на віддалених хостах"
 
 msgid "Ports on this computer"
 msgstr "Порти на цьому комп’ютері"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Порти, які слухає застосунок. Порти з попереднім переглядом отримують посилання, яке можна відкрити з робочого простору."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Активних портів: {totalPortCount}"
@@ -16115,6 +16198,9 @@ msgstr "Зробити ребейз і злити"
 msgid "Rebase and merge"
 msgstr "Зробити ребейз і злити"
 
+msgid "Rebuild environment"
+msgstr "Перезібрати середовище"
+
 msgid "Recall what was said in meetings"
 msgstr "Згадати, що говорили на зустрічах"
 
@@ -16424,6 +16510,9 @@ msgstr "Прибрати згадку {path}"
 msgid "Remove pasted text"
 msgstr "Прибрати вставлений текст"
 
+msgid "Remove port"
+msgstr "Видалити порт"
+
 msgid "Remove PR Link"
 msgstr "Прибрати посилання на PR"
 
@@ -16439,8 +16528,14 @@ msgstr "Видалити скрипт"
 msgid "Remove team member?"
 msgstr "Видалити учасника команди?"
 
+msgid "Remove terminal"
+msgstr "Видалити термінал"
+
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Видалити термінал {createdAtLabel}"
+
+msgid "Remove terminal {terminalName}"
+msgstr "Видалити термінал {terminalName}"
 
 msgid "Remove terminal session"
 msgstr "Видалити сеанс термінала"
@@ -17350,6 +17445,12 @@ msgstr "Виконує локальну команду на вашому ком�
 msgid "Runs appear here once an automation fires."
 msgstr "Запуски з'являться тут, щойно спрацює автоматизація."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Запускається як bash-скрипт у кожному новому хмарному робочому просторі до запуску агентів."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Запускається як bash-скрипт під час збирання середовища. Нові робочі простори починаються з його результату."
+
 msgid "Runs in"
 msgstr "Запускається в"
 
@@ -17462,8 +17563,14 @@ msgstr "{name} збережено"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} збережено, але не вдалося запустити робочий простір для налаштування: {reason}"
 
+msgid "Saved from a workspace"
+msgstr "Збережено з робочого простору"
+
 msgid "Saved to Downloads"
 msgstr "Збережено в «Завантаження»"
+
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Збережено. Нові робочі простори й наступна збірка використовуватимуть її; запущені робочі простори застосують її після перезапуску."
 
 msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
 msgstr "Зберігає цей робочий простір у поточному стані з усім, що в ньому встановлено. Нові робочі простори з {name} починатимуться з цієї контрольної точки. Під час збереження робочий простір ненадовго зупиниться."
@@ -18857,9 +18964,6 @@ msgstr "Смайлики й люди"
 msgid "Smoother onboarding"
 msgstr "Плавніший онбординг"
 
-msgid "Snapshot"
-msgstr "Знімок"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Робити знімок worktree до і після кожного ходу чату, щоб його картка показувала кожен змінений файл, зокрема зміни, зроблені через shell, і могла їх скасувати. Кожен промпт спершу чекає на свій знімок."
 
@@ -18926,11 +19030,17 @@ msgstr "Хтось"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Хтось інший уже опублікував {entryPath} з цього робочого простору. Опублікуйте з явним ідентифікатором сторінки, щоб додати версію до його сторінки, або перемістіть файл."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Хтось інший зберіг конфігурацію цього середовища, поки ви її редагували"
+
 msgid "Someone is moving this workspace…"
 msgstr "Хтось переміщує цей робочий простір…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Команда Paradev перевірить цю сторінку. Ми зв'яжемося з вами, лише якщо нам знадобиться щось іще."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Хтось зберіг цю конфігурацію, поки ви її редагували. Збереження замінить його версію."
 
 msgid "Something else"
 msgstr "Інше"
@@ -19245,6 +19355,9 @@ msgstr "Запустіть сеанс кнопкою + на смузі вкла�
 
 msgid "Start or stop the workspace run command"
 msgstr "Запустити або зупинити команду запуску робочого простору"
+
+msgid "Start script"
+msgstr "Скрипт запуску"
 
 msgid "Start voice mode"
 msgstr "Увімкнути голосовий режим"
@@ -19915,6 +20028,9 @@ msgstr "Термінал"
 msgid "Terminal agent launch configuration"
 msgstr "Конфігурація запуску термінального агента"
 
+msgid "Terminal command"
+msgstr "Команда термінала"
+
 msgid "Terminal connection: {label}"
 msgstr "З'єднання термінала: {label}"
 
@@ -19929,6 +20045,9 @@ msgstr "Розмір шрифту термінала, коли термінал 
 
 msgid "Terminal input"
 msgstr "Введення в термінал"
+
+msgid "Terminal name"
+msgstr "Ім'я термінала"
 
 msgid "Terminal removed"
 msgstr "Термінал видалено"
@@ -20102,6 +20221,15 @@ msgstr "Найкращий агент зміниться.<0/>Ваш робочи
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Машина запустилася з {actual} vCPU замість {wanted}. Перезапустіть її, щоб спробувати знову."
 
+msgid "The build is no longer running"
+msgstr "Збірка більше не виконується"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Збірка тривала понад {BUILD_LIMIT_MINUTES} хвилин і була зупинена"
+
+msgid "The build stopped unexpectedly"
+msgstr "Збірка неочікувано зупинилася"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Тепер кнопка помітніша. Я перевірив її у вашій панелі."
 
@@ -20167,6 +20295,12 @@ msgstr "З'являється диспетчер"
 
 msgid "The endpoint must use https."
 msgstr "Ендпоінт має використовувати https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Середовище змінилося під час збірки; його поточний знімок збережено"
+
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Середовище змінилося під час відновлення. Спробуйте ще раз."
 
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Середовище, з якого ця автоматизація запускає хмарні робочі простори, архівовано, або в ньому немає репозиторіїв. Виберіть інше середовище в налаштуваннях автоматизації."
@@ -20593,6 +20727,9 @@ msgstr "Ця автоматизація в іншій організації"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "У цьому браузері не виконано вхід у Paradev. Увійдіть, щоб перейти до {connectorName}."
 
+msgid "This build has no snapshot to restore"
+msgstr "Ця збірка не має знімка для відновлення"
+
 msgid "This cannot be undone."
 msgstr "Цю дію неможливо скасувати."
 
@@ -20638,6 +20775,13 @@ msgstr "Цей хмарний робочий простір не може зап
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Цей хмарний робочий простір прокидається; після простою це може тривати до 30 секунд."
 
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "У цій конфігурації є налаштування, які ця версія Paradev не може показати, тому її не можна змінити тут. Оновіть Paradev або змініть її командою superset environments update."
+
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Ця конфігурація недійсна: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Ця розмова задовга для моделі"
 
@@ -20669,17 +20813,14 @@ msgstr "Цю електронну адресу вже зареєстровано
 msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
 msgstr "У цьому середовищі можна запустити не більше 3 ручних збірок на годину. Спробуйте ще раз через {0} хв."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Це середовище не має [install] для збірки. Додайте його в .paradev/config.toml у базовій гілці."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "У цьому середовищі немає [install] для збірки. Додайте його в конфігурацію в розділі «Налаштування», «Середовища»."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "У цьому середовищі немає репозиторіїв. Створіть середовище з репозиторіями в налаштуваннях, а потім запустіть робочий простір із нього"
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Це середовище відкриває {environmentRepository}, а не {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Репозиторії цього середовища фіксовані; щоб змінити їх, ще раз створіть середовище з робочого простору"
 
 msgid "this file"
 msgstr "цей файл"
@@ -21961,6 +22102,9 @@ msgstr "Використовувати для нових агентів"
 msgid "Use global default"
 msgstr "Використовувати глобальне значення за замовчуванням"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Використовуйте малі літери, цифри й підкреслення; першою має бути літера."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Використовуйте малі літери, цифри, дефіси та підкреслення"
 
@@ -22411,6 +22555,9 @@ msgstr "Ми наймаємо інженерів у Сан-Франциско. �
 msgid "We're hiring in San Francisco"
 msgstr "Ми наймаємо в Сан-Франциско"
 
+msgid "Web app"
+msgstr "Вебзастосунок"
+
 msgid "Web Fetch"
 msgstr "Завантаження вебсторінки"
 
@@ -22553,6 +22700,9 @@ msgstr "Що автоматизують команди"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Того, до чого їх було написано, більше немає на сторінці, тому вони не мають прив'язки."
 
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "Що запускають збірки й хмарні робочі простори цього середовища. Без неї хмара читає .paradev/config.toml основного репозиторію."
+
 msgid "What we believe"
 msgstr "У що ми віримо"
 
@@ -22639,6 +22789,9 @@ msgstr "Які кодинг-агенти підтримуються?"
 
 msgid "Which plans include automations?"
 msgstr "У яких тарифах є автоматизації?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "Плагіни, MCP-сервери яких хмарні агенти можуть використовувати в цьому середовищі."
 
 msgid "Who can open it"
 msgstr "Хто може відкрити"
