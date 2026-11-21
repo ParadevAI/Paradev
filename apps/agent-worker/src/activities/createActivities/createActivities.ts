@@ -735,6 +735,15 @@ function callSummary(call: ToolCallBlock): string {
 		args.path ??
 		args.pattern ??
 		args.shell_id ??
+		args.target ??
+		args.taskId ??
+		args.channel ??
+		args.routine_id ??
+		args.pageId ??
+		args.id ??
+		args.slug ??
+		args.title ??
+		args.query ??
 		args.description ??
 		(call.name === "ls" ? "." : "");
 	return String(value).slice(0, 200);

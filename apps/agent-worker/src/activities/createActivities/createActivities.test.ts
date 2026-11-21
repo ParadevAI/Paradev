@@ -441,6 +441,19 @@ describe("settleTurn", () => {
 		expect(posted).toEqual([]);
 	});
 
+	test("records where a reply tool call went", async () => {
+		const { activities, settled } = setup();
+		await runOne(activities, "please use the reply tool");
+		await activities.settleTurn({
+			...turn,
+			outcome: "completed",
+			steersConsumed: 0,
+		});
+		expect(settled[0]?.toolCalls).toEqual([
+			{ name: "mcp__dev__reply", summary: "channel:x", status: "done" },
+		]);
+	});
+
 	test("counts only this turn and closes calls a stop left open", async () => {
 		const { activities, settled, memory } = setup();
 		await runOne(activities, "first", "t1");
