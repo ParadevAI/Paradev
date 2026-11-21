@@ -3,6 +3,7 @@ import {
 	type EnrichedSubscription,
 	formatPlanChanged,
 	formatSubscriptionCancelled,
+	formatTeamSubscriptionStarted,
 	type PreviousPlan,
 	planChangeDirection,
 	planLabel,
@@ -14,6 +15,7 @@ function createEnrichedSubscription(
 	return {
 		organizationName: "Acme",
 		planName: "Pro",
+		planTier: "pro",
 		stripeCustomerId: "cus_123",
 		stripeSubscriptionId: "sub_123",
 		seatCount: 3,
@@ -171,5 +173,30 @@ describe("formatPlanChanged", () => {
 
 		expect(serialized).toContain("Plan Changed");
 		expect(serialized).toContain("yearly -> monthly");
+	});
+});
+
+describe("formatTeamSubscriptionStarted", () => {
+	test("pings the channel and names the customer channel", () => {
+		const blocks = JSON.stringify(
+			formatTeamSubscriptionStarted(
+				createEnrichedSubscription({ planName: "Team", planTier: "team" }),
+				{ name: "ext-acme-paradev", automated: true },
+			),
+		);
+
+		expect(blocks).toContain("New Team Plan Customer");
+		expect(blocks).toContain("<!channel> Opening #ext-acme-paradev");
+	});
+
+	test("asks for a manual channel when the bot is not set up", () => {
+		const blocks = JSON.stringify(
+			formatTeamSubscriptionStarted(
+				createEnrichedSubscription({ planName: "Team", planTier: "team" }),
+				{ name: "ext-acme-paradev", automated: false },
+			),
+		);
+
+		expect(blocks).toContain("Open #ext-acme-paradev by hand");
 	});
 });
