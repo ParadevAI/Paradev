@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { DurableEnvelope } from "@superset/chat/protocol";
+import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
 import { type ChatRuntime, chatSyncState } from "@superset/chat-runtime";
 import { createTestRuntime } from "@superset/chat-runtime/testing";
 import type { ApiClient } from "../types";
@@ -33,10 +33,12 @@ function setup(
 	const runtime = createTestRuntime({ onAppend: (e) => appended.push(e) });
 	runtimes.push(runtime);
 	const pushes: PushInput[] = [];
+	const held: { until: Promise<void> | null } = { until: null };
 	const api = {
 		chatHistory: {
 			push: {
 				mutate: async (input: PushInput) => {
+					if (held.until) await held.until;
 					if (reject(input)) {
 						throw Object.assign(new Error("rejected"), {
 							data: { code: options.rejectCode ?? "BAD_REQUEST" },
@@ -49,13 +51,17 @@ function setup(
 		},
 	} as unknown as ApiClient;
 	const timers: (() => void)[] = [];
+	const delays: number[] = [];
+	const clock = { now: 0 };
 	const sync = createChatSync({
 		runtime: () => runtime,
 		api,
-		schedule: (run) => {
+		schedule: (run, ms) => {
 			timers.push(run);
+			delays.push(ms);
 			return () => {};
 		},
+		now: () => clock.now,
 	});
 	const open = (sessionId: string) =>
 		runtime.journal.open({
@@ -81,8 +87,49 @@ function setup(
 				usage: { inputTokens: usage, cachedInputTokens: 0, outputTokens: 0 },
 			},
 		});
-	return { runtime, sync, pushes, say, turn, open, timers, appended };
+	const tool = (id: string, status: "running" | "completed") =>
+		runtime.journal.append(CHAT, {
+			type: "item",
+			turnId: "t",
+			item: {
+				id,
+				kind: "tool_call",
+				title: id,
+				toolKind: "read",
+				toolName: "Read",
+				status,
+				content: [],
+				startedAtMs: 0,
+			},
+		});
+	const note = () => {
+		for (const envelope of appended.splice(0)) sync.noteAppend(envelope);
+	};
+	const runNext = async () => {
+		delays.shift();
+		await timers.shift()?.();
+		await Bun.sleep(0);
+	};
+	return {
+		runtime,
+		sync,
+		pushes,
+		say,
+		turn,
+		tool,
+		open,
+		note,
+		runNext,
+		timers,
+		delays,
+		clock,
+		held,
+		appended,
+	};
 }
+
+const seqs = (pushes: PushInput[]) =>
+	pushes.map((push) => push.events.map((e) => e.seq));
 
 describe("createChatSync", () => {
 	test("pushes only what was not pushed before", async () => {
@@ -120,6 +167,169 @@ describe("createChatSync", () => {
 			[1, 2],
 			[3, 4, 5],
 		]);
+	});
+
+	test("finished tool calls push a running chat at most once per checkpoint gap", async () => {
+		const { sync, pushes, turn, tool, note, runNext, delays, clock } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 1_000;
+		tool("x", "running");
+		tool("x", "completed");
+		tool("y", "completed");
+		note();
+		expect(delays).toEqual([2_000]);
+
+		clock.now = 3_000;
+		await runNext();
+		await runNext();
+		expect(seqs(pushes)).toEqual([[1], [2, 3, 4]]);
+	});
+
+	test("without a checkpoint gap a finished tool call waits for the turn to end", async () => {
+		const { sync, pushes, turn, tool, note, runNext, timers } = setup();
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+		tool("x", "completed");
+		note();
+		expect(timers).toHaveLength(0);
+		expect(seqs(pushes)).toEqual([[1]]);
+	});
+
+	test("a tool call that finishes while a push is in flight waits a whole gap", async () => {
+		const { sync, pushes, turn, tool, note, runNext, delays, clock, held } =
+			setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 5_000;
+		tool("x", "completed");
+		note();
+		let release = () => {};
+		held.until = new Promise((resolve) => {
+			release = resolve;
+		});
+		await runNext();
+		tool("y", "completed");
+		note();
+		held.until = null;
+		release();
+		await Bun.sleep(0);
+		expect(seqs(pushes)).toEqual([[1], [2]]);
+		expect(delays).toEqual([3_000]);
+
+		clock.now = 8_000;
+		await runNext();
+		await runNext();
+		expect(seqs(pushes)).toEqual([[1], [2], [3]]);
+	});
+
+	test("a push made meanwhile moves a waiting checkpoint back", async () => {
+		const { sync, pushes, turn, tool, note, runNext, delays, clock } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 1_000;
+		tool("x", "completed");
+		note();
+		clock.now = 2_500;
+		await sync.syncSession(CHAT);
+		clock.now = 3_000;
+		await runNext();
+		expect(delays).toEqual([2_500]);
+		expect(seqs(pushes)).toEqual([[1], [2]]);
+	});
+
+	test("a waiting checkpoint does nothing once the API drops the gap", async () => {
+		const { sync, pushes, turn, tool, note, runNext, timers, clock } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 1_000;
+		tool("x", "completed");
+		note();
+		sync.setCheckpointGap(null);
+		clock.now = 3_000;
+		await runNext();
+		expect(timers).toHaveLength(0);
+		expect(seqs(pushes)).toEqual([[1]]);
+	});
+
+	test("an info notice waits for the next push", async () => {
+		const { runtime, sync, note, runNext, timers } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		runtime.journal.append(CHAT, {
+			type: "item",
+			turnId: "t",
+			item: { id: "n", kind: "notice", noticeKind: "info", startedAtMs: 0 },
+		});
+		note();
+		expect(timers).toHaveLength(0);
+	});
+
+	test.each<[string, DurableEvent]>([
+		[
+			"asks its user something",
+			{
+				type: "item",
+				turnId: "t",
+				item: {
+					id: "q",
+					kind: "approval_request",
+					targetItemId: null,
+					title: "Run it?",
+					status: "pending",
+					startedAtMs: 0,
+				},
+			},
+		],
+		[
+			"reports an error",
+			{
+				type: "item",
+				turnId: "t",
+				item: { id: "n", kind: "notice", noticeKind: "error", startedAtMs: 0 },
+			},
+		],
+		[
+			"changes status",
+			{
+				type: "session",
+				session: { status: "awaiting_input", harness: "fake" },
+			},
+		],
+	])("a chat that %s is pushed at once", async (_name, event) => {
+		const { runtime, sync, pushes, note, runNext, delays } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		runtime.journal.append(CHAT, event);
+		note();
+		expect(delays).toEqual([0]);
+		await runNext();
+		expect(pushes).toHaveLength(1);
 	});
 
 	test("a started sync pushes chats a previous run left unpushed", () => {
