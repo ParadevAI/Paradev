@@ -24,7 +24,6 @@ export function localizeMacDisplayName(displayName: string) {
 	return async (context: AfterPackContext) => {
 		if (context.electronPlatformName !== "darwin") return;
 		const appName = context.packager.appInfo.productFilename;
-		if (displayName === appName) return;
 		writeLocalizedDisplayName(
 			join(context.appOutDir, `${appName}.app`, "Contents", "Resources"),
 			displayName,

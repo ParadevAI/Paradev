@@ -22,6 +22,11 @@ describe("toAppDisplayName", () => {
 		);
 	});
 
+	it("treats the legacy and current product names alike", () => {
+		expect(toAppDisplayName("Paradev", "Paradev")).toBe("Paradev");
+		expect(toAppDisplayName("Superset", "Paradev")).toBe("Paradev");
+	});
+
 	it("leaves a name without the product name alone", () => {
 		expect(toAppDisplayName("Electron", "Paradev")).toBe("Electron");
 	});

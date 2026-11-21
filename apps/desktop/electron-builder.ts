@@ -15,10 +15,11 @@ import {
 } from "./runtime-dependencies";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
+const LEGACY_EXECUTABLE_NAME = "Superset";
 const currentYear = new Date().getFullYear();
 const productName = pkg.productName;
-// productName names the bundle, userData, logs and the keychain entry, so it
-// never changes; the menu bar, Dock and launchers show displayName.
+// productName names the bundle, userData, logs and the keychain entry; the
+// menu bar, Dock and launchers show displayName.
 export const displayName = process.env.DESKTOP_DISPLAY_NAME || productName;
 export const toInstallerFileName = (name: string) =>
 	name.trim().replace(/\s+/g, "-");
@@ -152,7 +153,12 @@ const config: Configuration = {
 			// launch when it is not productName. The shown name is localized in
 			// afterPack.
 			CFBundleName: productName,
-			CFBundleDisplayName: productName,
+			// The updater renames a bundle only when its file name equals the
+			// executable name, and the pty daemon hands off through the
+			// executable's absolute path. A fixed executable name keeps both
+			// stable for installs that are still Superset.app.
+			CFBundleExecutable: LEGACY_EXECUTABLE_NAME,
+			CFBundleDisplayName: LEGACY_EXECUTABLE_NAME,
 			LSHasLocalizedDisplayName: true,
 			// Required for macOS microphone permission prompt
 			NSMicrophoneUsageDescription: `${displayName} needs microphone access for dictation in the chat composer and for voice-enabled tools like Codex transcription.`,
@@ -169,7 +175,9 @@ const config: Configuration = {
 
 	// fpm's default xz takes ~15 minutes on the 2 GB tree; gzip takes about
 	// one and costs roughly a tenth in download size.
-	deb: { compression: "gz" },
+	// The package name follows productName; a renamed deb would be a second
+	// package owning the same desktop entry.
+	deb: { compression: "gz", packageName: "superset" },
 
 	// Deep linking protocol
 	protocols: {

@@ -73,6 +73,7 @@ import { loadWebviewBrowserExtension } from "./lib/extensions";
 import { getHostServiceCoordinator } from "./lib/host-service-coordinator";
 import { htmlPreviewProtocolHandler } from "./lib/html-preview-protocol";
 import { resolveAppLocale } from "./lib/language";
+import { pinLegacyAppProfile } from "./lib/legacy-app-profile";
 import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
@@ -108,6 +109,10 @@ import {
 
 console.log("[main] Local database ready:", !!localDb);
 const IS_DEV = process.env.NODE_ENV === "development";
+
+if (!IS_DEV) {
+	pinLegacyAppProfile(app);
+}
 
 void applyShellEnvToProcess().catch((error) => {
 	console.error("[main] Failed to apply shell environment:", error);

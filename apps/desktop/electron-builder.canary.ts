@@ -42,6 +42,8 @@ const config: Configuration = {
 		artifactName: `${toInstallerFileName(displayName)}-\${version}-\${arch}.\${ext}`,
 	},
 
+	deb: { ...baseConfig.deb, packageName: "superset-canary" },
+
 	mac: {
 		...baseConfig.mac,
 		...(existsSync(canaryMacIconPath) ? { icon: canaryMacIconPath } : {}),
@@ -49,6 +51,7 @@ const config: Configuration = {
 		extendInfo: {
 			...baseConfig.mac?.extendInfo,
 			CFBundleName: productName,
+			CFBundleExecutable: productName,
 			CFBundleDisplayName: productName,
 		},
 	},
