@@ -21,6 +21,7 @@ import {
 import { DesignModeController } from "./design-mode-controller";
 import { captureDesignModeScreenshot } from "./design-mode-screenshot";
 import { buildDesignModeScript } from "./design-mode-script";
+import { createFocusForward, FOCUS_FORWARD_WORLD_ID } from "./focus-forward";
 import { buildGuestContextMenu } from "./guest-context-menu";
 import { markBrowserPanePopup, shouldOpenAsPopup } from "./popup-window";
 
@@ -124,32 +125,6 @@ const DEEP_LINK_SCHEMES = new Set([
 	`${PROTOCOL_SCHEMES.PROD}:`,
 	`${PROTOCOL_SCHEME}:`,
 ]);
-
-/**
- * Resolves `true` on the next `mousedown` in the guest's current document, or
- * `false` on `pagehide`. Installs its listeners the first time (idempotent
- * across repeated injections into the same document) and queues a resolver per
- * call so a fresh `executeJavaScript` await always gets the *next* press, not a
- * stale one. Never calls `stopPropagation`/`preventDefault` — purely observes.
- * The `pagehide` settle is required: a pending `executeJavaScript` keeps its
- * document alive after navigation, so each guest reload would leak one.
- */
-const NEXT_MOUSEDOWN_SCRIPT = `(() => {
-	if (!window.__supersetMousedownHook) {
-		window.__supersetMousedownHook = { resolvers: [] };
-		const settle = (pressed) => {
-			const hook = window.__supersetMousedownHook;
-			const resolvers = hook.resolvers;
-			hook.resolvers = [];
-			for (const resolve of resolvers) resolve(pressed);
-		};
-		document.addEventListener("mousedown", () => settle(true), true);
-		window.addEventListener("pagehide", () => settle(false));
-	}
-	return new Promise((resolve) => {
-		window.__supersetMousedownHook.resolvers.push(resolve);
-	});
-})()`;
 
 function protocolOf(url: string): string | null {
 	try {
@@ -1354,43 +1329,33 @@ class BrowserManager extends EventEmitter {
 	 * preload/nodeIntegration needed — the guest stays untrusted.
 	 */
 	private setupFocusForward(paneId: string, wc: Electron.WebContents): void {
-		let cancelled = false;
-		// Bumped on every main-frame document. dom-ready starts a fresh loop
-		// for the new document; the stale one exits at its next check and a
-		// late resolution from it is dropped rather than emitted.
-		let generation = 0;
-		const loop = async (gen: number): Promise<void> => {
-			while (!cancelled && gen === generation) {
-				if (wc.isDestroyed()) return;
-				let pressed: unknown;
-				try {
-					pressed = await wc.executeJavaScript(NEXT_MOUSEDOWN_SCRIPT);
-				} catch {
-					// Script failed to run (mid-navigation, crashed renderer):
-					// retry, but not in a hot spin.
-					await new Promise((resolve) => setTimeout(resolve, 100));
-					continue;
-				}
-				if (pressed === false || cancelled || gen !== generation) return;
+		const focusForward = createFocusForward({
+			runScript: (code) =>
+				wc.executeJavaScriptInIsolatedWorld(FOCUS_FORWARD_WORLD_ID, [{ code }]),
+			isDestroyed: () => wc.isDestroyed(),
+			onPress: () => {
 				this.emit(`pane-focus:${paneId}`);
 				this.emit("pane-focused", { paneId });
-			}
-		};
-		const rearm = (): void => {
-			generation += 1;
-			void loop(generation);
-		};
+			},
+			onUnexpectedResult: (result) => {
+				console.warn("[browser] focus hook returned a non-boolean", {
+					paneId,
+					type: typeof result,
+				});
+			},
+			sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+		});
 
-		wc.on("dom-ready", rearm);
+		wc.on("dom-ready", focusForward.rearm);
 		this.focusListeners.set(paneId, () => {
-			cancelled = true;
+			focusForward.cancel();
 			try {
-				wc.off("dom-ready", rearm);
+				wc.off("dom-ready", focusForward.rearm);
 			} catch {
 				// webContents may be destroyed
 			}
 		});
-		void loop(generation);
+		focusForward.rearm();
 	}
 
 	private setupFormEditTracking(

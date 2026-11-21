@@ -110,6 +110,24 @@ describe("pane operations", () => {
 		expect(store.getState().tabs[0]?.activePaneId).toBe("p2");
 	});
 
+	it("does not notify subscribers when the pane is already active", () => {
+		const store = makeStore();
+		store.getState().addTab({
+			id: "t1",
+			panes: [tp("p1"), tp("p2")],
+			activePaneId: "p1",
+		});
+		const before = store.getState();
+		let notified = 0;
+		const unsubscribe = store.subscribe(() => notified++);
+
+		store.getState().setActivePane({ tabId: "t1", paneId: "p1" });
+
+		unsubscribe();
+		expect(notified).toBe(0);
+		expect(store.getState()).toBe(before);
+	});
+
 	it("gets pane by ID across tabs", () => {
 		const store = makeStore();
 		store.getState().addTab({ id: "t1", panes: [tp("p1")] });
