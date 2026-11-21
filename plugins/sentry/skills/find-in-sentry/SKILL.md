@@ -2,7 +2,7 @@
 name: find-in-sentry
 description: Answer "what's breaking" questions from Sentry — find the right org and project, search issues and errors with the vocabulary Sentry uses, and report what is actually firing rather than the first hit. Use when the user asks what errors are happening, whether something is stable, what changed since a release, or for any health summary of a service.
 argument-hint: the service, error, release, or question to look up
-allowed-tools: mcp__sentry__find_organizations, mcp__sentry__find_projects, mcp__sentry__search_issues, mcp__sentry__search_errors, mcp__sentry__get_sentry_resource, mcp__sentry__search_sentry_tools, mcp__sentry__execute_sentry_tool
+allowed-tools: mcp__sentry__find_organizations, mcp__sentry__find_projects, mcp__sentry__search_issues, mcp__sentry__search_errors, mcp__sentry__get_sentry_resource
 ---
 
 # Find what is actually firing
