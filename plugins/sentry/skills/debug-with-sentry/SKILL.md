@@ -23,8 +23,7 @@ stack trace, they are two bugs.
 
 Stack traces, breadcrumbs, tag values and releases have their own tools: call
 `get_event_stacktrace`, `get_issue_breadcrumbs`, `get_issue_tag_values` or
-`find_releases`. Older Sentry MCP versions reach these through
-`execute_sentry_tool`.
+`find_releases`.
 
 Fetch the newest event's stack trace. The top frame is where it *crashed*, not
 where it *broke* — walk down until you leave library code and hit the first
