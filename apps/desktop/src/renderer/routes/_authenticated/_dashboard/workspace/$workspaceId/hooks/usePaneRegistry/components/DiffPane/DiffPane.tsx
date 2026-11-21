@@ -509,11 +509,13 @@ export function DiffPane({
 		paneId: context.pane.id,
 	});
 
+	const { options, style } = useDiffCardCodeViewTheme();
 	const { targetItemId, notifyScroll, releaseScroll } = useDiffCodeViewScroll({
 		codeViewRef,
 		data,
 		fileByItemId,
 		items,
+		expandUnchanged: options.expandUnchanged ?? false,
 		collapsedSet,
 		setCollapsed,
 		scrollStateKey,
@@ -588,7 +590,6 @@ export function DiffPane({
 		},
 		[scrollStateKey, notifyScroll],
 	);
-	const { options, style } = useDiffCardCodeViewTheme();
 
 	// A file past the load cap can't expand or enter edit mode. Mark it, and
 	// leave the edit mode the click may have started.
