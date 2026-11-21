@@ -8871,6 +8871,9 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Rychlý"
 
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Rychlý režim není pro tento model dostupný. Vyberte model, který ho podporuje."
+
 msgid "Fast mode off"
 msgstr "Rychlý režim vypnut"
 

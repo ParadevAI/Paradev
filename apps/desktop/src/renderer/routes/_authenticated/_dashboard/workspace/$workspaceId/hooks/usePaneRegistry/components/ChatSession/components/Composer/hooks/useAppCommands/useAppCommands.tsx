@@ -27,6 +27,8 @@ import { resolveCollisions } from "../../utils/commandCollisions";
 import { PLAN_ID, type PlanSwitch, planControl } from "../../utils/planControl";
 import { restoreCommand } from "../../utils/restoreCommand";
 
+const CLAUDE_PRESET_ID = "claude";
+
 export type TypedCommandOutcome = "not-app" | "ran" | "kept";
 
 function hintText(command: AppCommand, i18n: I18n): string | undefined {
@@ -136,7 +138,21 @@ export function useAppCommands({
 							},
 						},
 					}
-				: {}),
+				: !fast &&
+						presetId === CLAUDE_PRESET_ID &&
+						availableCommands.some((command) => command.name === "fast")
+					? {
+							fast: {
+								explainUnavailable: () =>
+									toast.error(
+										t({
+											message:
+												"Fast mode is not available for this model. Choose a model that supports it.",
+										}),
+									),
+							},
+						}
+					: {}),
 			...(plan && ("modeId" in plan.enter ? onSetMode : onSetConfigOption)
 				? {
 						plan: {
@@ -181,6 +197,7 @@ export function useAppCommands({
 			},
 		};
 	}, [
+		availableCommands,
 		canForkToWorktree,
 		configOptions,
 		createAutomation,
