@@ -3803,6 +3803,9 @@ msgstr "작업 공간 가져오기"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "v1의 프로젝트, 워크스페이스, 터미널 스크립트를 v2로 가져옵니다. 항목별로 개별 가져오며 다시 시도할 수 있습니다."
 
+msgid "Bring Your Own Subscription"
+msgstr "기존 구독 그대로 사용"
+
 msgid "Bringing over your v1 projects"
 msgstr "v1 프로젝트를 옮기는 중"
 
@@ -11595,9 +11598,6 @@ msgstr "로컬 워크스페이스"
 msgid "Local workspaces"
 msgstr "로컬 워크스페이스"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "로컬 워크스페이스는 당신의 기기에서 실행됩니다. 무엇을 연결할지는 당신이 정합니다."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "로컬, 호스트 또는 클라우드에서"
 
@@ -12159,8 +12159,8 @@ msgstr "모바일 앱"
 msgid "Mobile App"
 msgstr "모바일 앱"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "모바일, 클라우드, 또는 자체 클라우드"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "모바일, 클라우드 또는 자체 플릿"
 
 msgid "Mode"
 msgstr "모드"
@@ -14300,6 +14300,9 @@ msgstr "오픈 소스"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "MIT 라이선스 오픈 소스입니다. 내 구독과 키로 어떤 에이전트든 사용하세요."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "오픈 소스.<0/>설계부터 안전하게."
+
 msgid "Open System Settings"
 msgstr "시스템 설정 열기"
 
@@ -15514,9 +15517,6 @@ msgstr "개인정보처리방침"
 
 msgid "Private"
 msgstr "비공개"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "기본이 비공개입니다.<0/>통제권은 여러분에게 있습니다."
 
 msgid "Private: only specific people"
 msgstr "비공개: 특정 사람만"
@@ -23173,9 +23173,6 @@ msgstr "에이전트가 디자인과 보고서를 게시합니다. 팀이 댓글
 
 msgid "Your agent subscriptions and keys"
 msgstr "에이전트 구독과 키"
-
-msgid "Your Agents, Your Accounts"
-msgstr "당신의 에이전트, 당신의 계정"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "AWS Marketplace 구독이 활성화되었습니다"

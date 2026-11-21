@@ -3803,6 +3803,9 @@ msgstr "Bring over your workspaces"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 
+msgid "Bring Your Own Subscription"
+msgstr "Bring Your Own Subscription"
+
 msgid "Bringing over your v1 projects"
 msgstr "Bringing over your v1 projects"
 
@@ -11595,9 +11598,6 @@ msgstr "Local workspace"
 msgid "Local workspaces"
 msgstr "Local workspaces"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Local workspaces run on your machine. You decide what connects to them."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Local, on a host, or in the cloud"
 
@@ -12159,8 +12159,8 @@ msgstr "Mobile app"
 msgid "Mobile App"
 msgstr "Mobile App"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Mobile, Cloud, or bring your own Cloud"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobile, Cloud, or bring your own fleet"
 
 msgid "Mode"
 msgstr "Mode"
@@ -14300,6 +14300,9 @@ msgstr "Open Source"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source under MIT. Use any agent on your own subscriptions and keys."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Secure by design."
+
 msgid "Open System Settings"
 msgstr "Open System Settings"
 
@@ -15514,9 +15517,6 @@ msgstr "Privacy Policy"
 
 msgid "Private"
 msgstr "Private"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Private by default.<0/>You're in control."
 
 msgid "Private: only specific people"
 msgstr "Private: only specific people"
@@ -23173,9 +23173,6 @@ msgstr "Your agent publishes designs and reports. Your team comments, and it get
 
 msgid "Your agent subscriptions and keys"
 msgstr "Your agent subscriptions and keys"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Your Agents, Your Accounts"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Your AWS Marketplace subscription is active"

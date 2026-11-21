@@ -3803,6 +3803,9 @@ msgstr "Impor ruang kerja Anda"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Bawa proyek, workspace, dan skrip terminal v1 ke v2. Tiap item diimpor satu per satu dan bisa dicoba ulang."
 
+msgid "Bring Your Own Subscription"
+msgstr "Bawa Langganan Anda Sendiri"
+
 msgid "Bringing over your v1 projects"
 msgstr "Memindahkan proyek v1 Anda"
 
@@ -11595,9 +11598,6 @@ msgstr "Workspace lokal"
 msgid "Local workspaces"
 msgstr "Workspace lokal"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Workspace lokal berjalan di mesin Anda. Anda yang menentukan apa yang terhubung."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokal, di host, atau di cloud"
 
@@ -12159,8 +12159,8 @@ msgstr "Aplikasi mobile"
 msgid "Mobile App"
 msgstr "Aplikasi Mobile"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Seluler, cloud, atau cloud Anda sendiri"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Seluler, Cloud, atau armada Anda sendiri"
 
 msgid "Mode"
 msgstr "Mode"
@@ -14300,6 +14300,9 @@ msgstr "Open Source"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source dengan lisensi MIT. Gunakan agen apa pun dengan langganan dan kunci Anda sendiri."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Aman sejak dirancang."
+
 msgid "Open System Settings"
 msgstr "Buka System Settings"
 
@@ -15514,9 +15517,6 @@ msgstr "Kebijakan Privasi"
 
 msgid "Private"
 msgstr "Privat"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Privat secara bawaan.<0/>Anda yang mengendalikan."
 
 msgid "Private: only specific people"
 msgstr "Privat: hanya orang tertentu"
@@ -23173,9 +23173,6 @@ msgstr "Agen Anda menerbitkan desain dan laporan. Tim Anda berkomentar, lalu age
 
 msgid "Your agent subscriptions and keys"
 msgstr "Langganan dan kunci agen Anda"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Agen Anda, Akun Anda"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Langganan AWS Marketplace Anda aktif"

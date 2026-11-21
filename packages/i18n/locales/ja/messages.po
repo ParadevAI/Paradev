@@ -3803,6 +3803,9 @@ msgstr "ワークスペースを引き継ぐ"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "v1のプロジェクト、ワークスペース、ターミナルスクリプトをv2に取り込みます。項目ごとに個別にインポートされ、再試行できます。"
 
+msgid "Bring Your Own Subscription"
+msgstr "お持ちのサブスクリプションをそのまま利用"
+
 msgid "Bringing over your v1 projects"
 msgstr "v1 のプロジェクトを移行しています"
 
@@ -11595,9 +11598,6 @@ msgstr "ローカルワークスペース"
 msgid "Local workspaces"
 msgstr "ローカルワークスペース"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "ローカルワークスペースはあなたのマシンで動きます。何をつなぐかはあなたが決めます。"
-
 msgid "Local, on a host, or in the cloud"
 msgstr "ローカル、ホスト上、またはクラウドで"
 
@@ -12159,8 +12159,8 @@ msgstr "モバイルアプリ"
 msgid "Mobile App"
 msgstr "モバイルアプリ"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "モバイル、クラウド、または自分のクラウド"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "モバイル、クラウド、または自前のフリート"
 
 msgid "Mode"
 msgstr "モード"
@@ -14300,6 +14300,9 @@ msgstr "オープンソース"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "MIT ライセンスのオープンソース。お持ちのサブスクリプションとキーで、どのエージェントでも使えます。"
 
+msgid "Open source.<0/>Secure by design."
+msgstr "オープンソース。<0/>設計段階からセキュア。"
+
 msgid "Open System Settings"
 msgstr "システム設定を開く"
 
@@ -15514,9 +15517,6 @@ msgstr "プライバシーポリシー"
 
 msgid "Private"
 msgstr "プライベート"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "既定でプライベート。<0/>主導権はあなたに。"
 
 msgid "Private: only specific people"
 msgstr "非公開：特定のメンバーのみ"
@@ -23173,9 +23173,6 @@ msgstr "エージェントがデザインやレポートを公開します。チ
 
 msgid "Your agent subscriptions and keys"
 msgstr "エージェントのサブスクリプションとキー"
-
-msgid "Your Agents, Your Accounts"
-msgstr "エージェントもアカウントも、あなたのもの"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "AWS Marketplace のサブスクリプションは有効です"

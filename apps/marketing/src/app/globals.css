@@ -4,9 +4,8 @@
 @source "./*/pages";
 
 @theme {
-	--font-sans:
-		var(--font-inter), "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
-	--font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+	--font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+	--font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @theme inline {
@@ -27,13 +26,6 @@
 }
 
 @layer base {
-	/* Linear-style Inter: optical sizing (Display cut at large sizes) +
-	   alternate glyphs. Feature settings are ignored by the mono/pixel fonts. */
-	body {
-		font-optical-sizing: auto;
-		font-feature-settings: "cv01", "ss03";
-	}
-
 	button:not(:disabled),
 	[role="button"]:not([aria-disabled="true"]) {
 		cursor: pointer;
@@ -324,35 +316,6 @@
 	.animate-rail-extend,
 	.animate-station-pulse {
 		animation: none;
-	}
-}
-
-@layer base {
-	/* Arial matched to Inter at 16px. With the opsz axis, the fallback next/font
-	   generates is too wide, so layout.tsx turns it off. Emitted only in a layer. */
-	@font-face {
-		font-family: "Inter Fallback";
-		src: local("Arial"), local("Arimo"), local("Liberation Sans");
-		size-adjust: 104.77%;
-		ascent-override: 92.47%;
-		descent-override: 23.03%;
-		line-gap-override: 0%;
-	}
-
-	/* Same, matched to Inter's display width at 32px and up */
-	@font-face {
-		font-family: "Inter Display Fallback";
-		src: local("Arial"), local("Arimo"), local("Liberation Sans");
-		size-adjust: 96.65%;
-		ascent-override: 100.24%;
-		descent-override: 24.96%;
-		line-gap-override: 0%;
-	}
-
-	h1 {
-		font-family:
-			var(--font-inter), "Inter Display Fallback", ui-sans-serif, system-ui,
-			sans-serif;
 	}
 }
 

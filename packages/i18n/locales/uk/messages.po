@@ -3797,6 +3797,9 @@ msgstr "Перенесіть свої робочі простори"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Перенесіть проєкти, робочі простори та скрипти термінала з v1 у v2. Кожен елемент імпортується окремо, тож імпорт можна повторити."
 
+msgid "Bring Your Own Subscription"
+msgstr "Використовуйте власну підписку"
+
 msgid "Bringing over your v1 projects"
 msgstr "Перенесення ваших проєктів з v1"
 
@@ -11589,9 +11592,6 @@ msgstr "Локальний робочий простір"
 msgid "Local workspaces"
 msgstr "Локальні робочі простори"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Локальні робочі простори працюють на вашому комп'ютері. Що до них підключати, вирішуєте ви."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Локально, на хості або в хмарі"
 
@@ -12153,8 +12153,8 @@ msgstr "Мобільний застосунок"
 msgid "Mobile App"
 msgstr "Мобільний застосунок"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Телефон, хмара або власна хмара"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Мобільний застосунок, хмара або власний парк машин"
 
 msgid "Mode"
 msgstr "Режим"
@@ -14294,6 +14294,9 @@ msgstr "Відкритий код"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Відкритий код за ліцензією MIT. Використовуйте будь-якого агента на власних підписках і ключах."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Відкритий код.<0/>Безпека на рівні архітектури."
+
 msgid "Open System Settings"
 msgstr "Відкрити Системні параметри"
 
@@ -15508,9 +15511,6 @@ msgstr "Політика конфіденційності"
 
 msgid "Private"
 msgstr "Приватний"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Приватно за замовчуванням.<0/>Контроль за вами."
 
 msgid "Private: only specific people"
 msgstr "Приватний: лише певні люди"
@@ -23167,9 +23167,6 @@ msgstr "Ваш агент публікує дизайни та звіти. Ва�
 
 msgid "Your agent subscriptions and keys"
 msgstr "Ваші підписки та ключі для агентів"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Ваші агенти, ваші облікові записи"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Підписка AWS Marketplace активна"

@@ -3803,6 +3803,9 @@ msgstr "Çalışma alanlarınızı aktarın"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "v1 projelerini, çalışma alanlarını ve terminal betiklerini v2'ye taşıyın. Her öğe ayrı ayrı aktarılır ve yeniden denenebilir."
 
+msgid "Bring Your Own Subscription"
+msgstr "Kendi aboneliğinizi kullanın"
+
 msgid "Bringing over your v1 projects"
 msgstr "v1 projeleriniz aktarılıyor"
 
@@ -11595,9 +11598,6 @@ msgstr "Yerel çalışma alanı"
 msgid "Local workspaces"
 msgstr "Yerel çalışma alanları"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Yerel çalışma alanları makinenizde çalışır. Onlara neyin bağlanacağına siz karar verirsiniz."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Yerelde, bir host'ta veya bulutta"
 
@@ -12159,8 +12159,8 @@ msgstr "Mobil uygulama"
 msgid "Mobile App"
 msgstr "Mobil uygulama"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Mobil, bulut veya kendi bulutunuz"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobil, bulut veya kendi filonuz"
 
 msgid "Mode"
 msgstr "Mod"
@@ -14300,6 +14300,9 @@ msgstr "Açık Kaynak"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "MIT lisansıyla açık kaynak. Herhangi bir ajanı kendi abonelikleriniz ve anahtarlarınızla kullanın."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Açık kaynak.<0/>Tasarımdan itibaren güvenli."
+
 msgid "Open System Settings"
 msgstr "Sistem Ayarları'nı aç"
 
@@ -15514,9 +15517,6 @@ msgstr "Gizlilik Politikası"
 
 msgid "Private"
 msgstr "Özel"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Varsayılan olarak özel.<0/>Kontrol sizde."
 
 msgid "Private: only specific people"
 msgstr "Gizli: yalnızca belirli kişiler"
@@ -23173,9 +23173,6 @@ msgstr "Ajanınız tasarımlar ve raporlar yayınlar. Ekibiniz yorum yapar, ajan
 
 msgid "Your agent subscriptions and keys"
 msgstr "Ajan abonelikleriniz ve anahtarlarınız"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Sizin ajanlarınız, sizin hesaplarınız"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "AWS Marketplace aboneliğiniz etkin"

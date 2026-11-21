@@ -3803,6 +3803,9 @@ msgstr "迁入工作区"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "将v1的项目、工作区和终端脚本迁移到v2。每一项单独导入，可以重试。"
 
+msgid "Bring Your Own Subscription"
+msgstr "自带订阅"
+
 msgid "Bringing over your v1 projects"
 msgstr "正在迁移你的 v1 项目"
 
@@ -11595,9 +11598,6 @@ msgstr "本地工作区"
 msgid "Local workspaces"
 msgstr "本地工作区"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "本地工作区运行在你的电脑上。连接什么由你决定。"
-
 msgid "Local, on a host, or in the cloud"
 msgstr "本地、主机上或云端"
 
@@ -12159,8 +12159,8 @@ msgstr "移动应用"
 msgid "Mobile App"
 msgstr "移动应用"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "移动端、云端，或自带云"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "移动端、云端，或使用你自己的机群"
 
 msgid "Mode"
 msgstr "模式"
@@ -14300,6 +14300,9 @@ msgstr "开源"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "基于 MIT 许可证开源。用你自己的订阅和密钥使用任何智能体。"
 
+msgid "Open source.<0/>Secure by design."
+msgstr "开源。<0/>安全源于设计。"
+
 msgid "Open System Settings"
 msgstr "打开系统设置"
 
@@ -15514,9 +15517,6 @@ msgstr "隐私政策"
 
 msgid "Private"
 msgstr "私有"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "默认私密。<0/>掌控权在你。"
 
 msgid "Private: only specific people"
 msgstr "私密：仅限特定人员"
@@ -23173,9 +23173,6 @@ msgstr "你的智能体发布设计和报告。团队发表评论，智能体随
 
 msgid "Your agent subscriptions and keys"
 msgstr "你的智能体订阅和密钥"
-
-msgid "Your Agents, Your Accounts"
-msgstr "你的智能体，你的账号"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "你的 AWS Marketplace 订阅已生效"

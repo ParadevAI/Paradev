@@ -3803,6 +3803,9 @@ msgstr "Převeďte své pracovní prostory"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Přeneste projekty, pracovní prostory a terminálové skripty z v1 do v2. Každá položka se importuje zvlášť a jde ji zkusit znovu."
 
+msgid "Bring Your Own Subscription"
+msgstr "Přineste si vlastní předplatné"
+
 msgid "Bringing over your v1 projects"
 msgstr "Přenášíme vaše projekty z v1"
 
@@ -11595,9 +11598,6 @@ msgstr "Lokální pracovní prostor"
 msgid "Local workspaces"
 msgstr "Lokální pracovní prostory"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Lokální pracovní prostory běží na vašem počítači. Co se k nim připojí, rozhodujete vy."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokálně, na hostiteli nebo v cloudu"
 
@@ -12159,8 +12159,8 @@ msgstr "Mobilní aplikace"
 msgid "Mobile App"
 msgstr "Mobilní aplikace"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Mobil, cloud nebo vlastní cloud"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobil, cloud nebo vlastní flotila"
 
 msgid "Mode"
 msgstr "Režim"
@@ -14300,6 +14300,9 @@ msgstr "Open source"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source pod licencí MIT. Používejte libovolného agenta s vlastními předplatnými a klíči."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Bezpečné už od návrhu."
+
 msgid "Open System Settings"
 msgstr "Otevřít Nastavení systému"
 
@@ -15514,9 +15517,6 @@ msgstr "Zásady ochrany soukromí"
 
 msgid "Private"
 msgstr "Soukromý"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Soukromé ve výchozím stavu.<0/>Máte to pod kontrolou."
 
 msgid "Private: only specific people"
 msgstr "Soukromý: jen vybraní lidé"
@@ -23173,9 +23173,6 @@ msgstr "Váš agent publikuje návrhy a reporty. Tým je okomentuje a agent se p
 
 msgid "Your agent subscriptions and keys"
 msgstr "Vaše předplatná agentů a klíče"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Vaši agenti, vaše účty"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Vaše předplatné AWS Marketplace je aktivní"

@@ -37,7 +37,7 @@ export function FeaturesSection() {
 								<div
 									className={`space-y-6 ${isReversed ? "lg:order-2" : "lg:order-1"}`}
 								>
-									<h3 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
+									<h3 className="text-2xl sm:text-3xl font-light tracking-tight text-foreground">
 										{feature.href ? (
 											<Link
 												href={

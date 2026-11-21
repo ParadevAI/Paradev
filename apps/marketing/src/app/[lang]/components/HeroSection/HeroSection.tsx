@@ -54,7 +54,7 @@ export function HeroSection() {
 							<EdgeGlare className="-inset-px rounded-[inherit]" />
 						</Link>
 						<div className="space-y-4 sm:space-y-6">
-							<h1 className="text-[min(2.25rem,8.6vw)] sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] [word-spacing:0.15em] whitespace-pre-line text-foreground relative max-w-6xl mx-auto">
+							<h1 className="text-[min(2.25rem,8.6vw)] sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight leading-[1.1] [word-spacing:0.15em] whitespace-pre-line text-foreground relative max-w-6xl mx-auto">
 								<RiseHeadline
 									lead={t({
 										message: "Run an Army of",
@@ -70,7 +70,7 @@ export function HeroSection() {
 							</h1>
 							<p
 								id="hero-subheadline"
-								className="text-base sm:text-xl font-light text-muted-foreground max-w-4xl mx-auto"
+								className="text-base sm:text-xl text-muted-foreground max-w-4xl mx-auto"
 							>
 								<Trans>
 									The open-source workspace for Claude Code, Codex, and any

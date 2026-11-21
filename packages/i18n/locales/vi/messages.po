@@ -3803,6 +3803,9 @@ msgstr "Nhập các không gian làm việc của bạn"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Đưa dự án, workspace và script terminal từ v1 sang v2. Mỗi mục được nhập riêng và có thể thử lại."
 
+msgid "Bring Your Own Subscription"
+msgstr "Dùng gói đăng ký của riêng bạn"
+
 msgid "Bringing over your v1 projects"
 msgstr "Đang chuyển các dự án v1 của bạn"
 
@@ -11595,9 +11598,6 @@ msgstr "Workspace cục bộ"
 msgid "Local workspaces"
 msgstr "Workspace cục bộ"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Workspace cục bộ chạy trên máy của bạn. Bạn quyết định những gì kết nối với chúng."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Trên máy, trên host, hoặc trên cloud"
 
@@ -12159,8 +12159,8 @@ msgstr "Ứng dụng di động"
 msgid "Mobile App"
 msgstr "Ứng dụng di động"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Di động, cloud, hoặc cloud của riêng bạn"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Di động, đám mây hoặc dàn máy của riêng bạn"
 
 msgid "Mode"
 msgstr "Chế độ"
@@ -14300,6 +14300,9 @@ msgstr "Mã nguồn mở"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Mã nguồn mở theo giấy phép MIT. Dùng bất kỳ agent nào với gói đăng ký và khóa của riêng bạn."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Mã nguồn mở.<0/>Bảo mật ngay từ thiết kế."
+
 msgid "Open System Settings"
 msgstr "Mở System Settings"
 
@@ -15514,9 +15517,6 @@ msgstr "Chính sách quyền riêng tư"
 
 msgid "Private"
 msgstr "Riêng tư"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Riêng tư theo mặc định.<0/>Bạn nắm quyền kiểm soát."
 
 msgid "Private: only specific people"
 msgstr "Riêng tư: chỉ những người cụ thể"
@@ -23173,9 +23173,6 @@ msgstr "Agent của bạn xuất bản thiết kế và báo cáo. Nhóm bạn b
 
 msgid "Your agent subscriptions and keys"
 msgstr "Gói đăng ký và khóa agent của bạn"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Agent của bạn, tài khoản của bạn"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Gói đăng ký AWS Marketplace của bạn đang hoạt động"

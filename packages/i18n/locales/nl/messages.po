@@ -3803,6 +3803,9 @@ msgstr "Neem je werkruimten over"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Neem projecten, werkruimtes en terminalscripts uit v1 mee naar v2. Elk item wordt afzonderlijk geïmporteerd en kan opnieuw worden geprobeerd."
 
+msgid "Bring Your Own Subscription"
+msgstr "Gebruik je eigen abonnement"
+
 msgid "Bringing over your v1 projects"
 msgstr "Je v1-projecten worden overgezet"
 
@@ -11595,9 +11598,6 @@ msgstr "Lokale werkruimte"
 msgid "Local workspaces"
 msgstr "Lokale werkruimtes"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Lokale werkruimtes draaien op je machine. Jij bepaalt wat er verbinding mee maakt."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokaal, op een host of in de cloud"
 
@@ -12159,8 +12159,8 @@ msgstr "Mobiele app"
 msgid "Mobile App"
 msgstr "Mobiele app"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Mobiel, cloud of je eigen cloud"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobiel, cloud of je eigen vloot"
 
 msgid "Mode"
 msgstr "Modus"
@@ -14300,6 +14300,9 @@ msgstr "Open source"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source onder MIT. Gebruik elke agent met je eigen abonnementen en sleutels."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Veilig door ontwerp."
+
 msgid "Open System Settings"
 msgstr "Systeeminstellingen openen"
 
@@ -15514,9 +15517,6 @@ msgstr "Privacybeleid"
 
 msgid "Private"
 msgstr "Privé"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Standaard privé.<0/>Jij houdt de controle."
 
 msgid "Private: only specific people"
 msgstr "Privé: alleen bepaalde mensen"
@@ -23173,9 +23173,6 @@ msgstr "Je agent publiceert ontwerpen en rapporten. Je team geeft commentaar en 
 
 msgid "Your agent subscriptions and keys"
 msgstr "Je agentabonnementen en sleutels"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Jouw agents, jouw accounts"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Je AWS Marketplace-abonnement is actief"

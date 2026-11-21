@@ -3803,6 +3803,9 @@ msgstr "Importe seus espaços de trabalho"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Traga projetos, áreas de trabalho e scripts de terminal da v1 para a v2. Cada item é importado individualmente e pode ser repetido."
 
+msgid "Bring Your Own Subscription"
+msgstr "Traga sua própria assinatura"
+
 msgid "Bringing over your v1 projects"
 msgstr "Trazendo seus projetos da v1"
 
@@ -11595,9 +11598,6 @@ msgstr "Área de trabalho local"
 msgid "Local workspaces"
 msgstr "Áreas de trabalho locais"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Áreas de trabalho locais rodam na sua máquina. Você decide o que se conecta a elas."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Local, em um host ou na nuvem"
 
@@ -12159,8 +12159,8 @@ msgstr "App para celular"
 msgid "Mobile App"
 msgstr "App para celular"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Celular, nuvem ou sua própria nuvem"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Mobile, nuvem ou sua própria frota"
 
 msgid "Mode"
 msgstr "Modo"
@@ -14300,6 +14300,9 @@ msgstr "Código aberto"
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source sob a licença MIT. Use qualquer agente com suas próprias assinaturas e chaves."
 
+msgid "Open source.<0/>Secure by design."
+msgstr "Código aberto.<0/>Seguro por design."
+
 msgid "Open System Settings"
 msgstr "Abrir Ajustes do Sistema"
 
@@ -15514,9 +15517,6 @@ msgstr "Política de Privacidade"
 
 msgid "Private"
 msgstr "Privado"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Privado por padrão.<0/>Você no controle."
 
 msgid "Private: only specific people"
 msgstr "Privado: só pessoas específicas"
@@ -23173,9 +23173,6 @@ msgstr "Seu agente publica designs e relatórios. Sua equipe comenta e o agente 
 
 msgid "Your agent subscriptions and keys"
 msgstr "Suas assinaturas e chaves de agentes"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Seus agentes, suas contas"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Sua assinatura do AWS Marketplace está ativa"
