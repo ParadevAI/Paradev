@@ -58,6 +58,12 @@ describe("EventBus workspace:create-settled replay", () => {
 		occurredAt: 1_700_000_000_000,
 	};
 
+	const kept = {
+		...settled,
+		workspaceId: "workspace-2",
+		canonicalWorkspaceId: "workspace-2",
+	};
+
 	function connect(eventBus: EventBus): unknown[] {
 		const received: unknown[] = [];
 		eventBus.handleOpen({
@@ -93,8 +99,11 @@ describe("EventBus workspace:create-settled replay", () => {
 			ok: false,
 			error: "boom",
 		});
+		eventBus.broadcastWorkspaceCreateSettled(kept);
 
-		expect(connect(eventBus)).toEqual([]);
+		expect(connect(eventBus)).toEqual([
+			{ type: "workspace:create-settled", ...kept },
+		]);
 	});
 
 	it("drops a settle once its workspace is deleted", () => {
@@ -109,8 +118,29 @@ describe("EventBus workspace:create-settled replay", () => {
 			workspace: null,
 			occurredAt: 0,
 		});
+		eventBus.broadcastWorkspaceCreateSettled(kept);
 
-		expect(connect(eventBus)).toEqual([]);
+		expect(connect(eventBus)).toEqual([
+			{ type: "workspace:create-settled", ...kept },
+		]);
+	});
+
+	it("drops a client whose replay send fails", () => {
+		const eventBus = createEventBus(() => 0);
+		eventBus.broadcastWorkspaceCreateSettled(settled);
+		let sends = 0;
+		eventBus.handleOpen({
+			readyState: 1,
+			send() {
+				sends++;
+				throw new Error("socket gone");
+			},
+			close() {},
+		});
+
+		eventBus.broadcastWorkspaceCreateSettled(kept);
+
+		expect(sends).toBe(1);
 	});
 
 	it("keeps only the newest 50 settles", () => {

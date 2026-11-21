@@ -191,7 +191,10 @@ export class EventBus {
 				sendMessage(socket, message);
 			}
 		} catch (error) {
-			console.error("[event-bus] create-settled replay failed", { error });
+			console.error("[event-bus] create-settled replay failed — dropping", {
+				error,
+			});
+			this.handleClose(socket);
 		}
 	}
 
