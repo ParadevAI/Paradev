@@ -20322,11 +20322,11 @@ msgstr "Ad kenar çubuğunda görünür."
 msgid "The network connection changed"
 msgstr "Ağ bağlantısı değişti"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Claude Code, Codex ve her kodlama ajanı için açık kaynak çalışma alanı."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Claude Code, Codex ve her ajan için açık kaynak çalışma alanı. Yerelde veya bulutta."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Claude Code, Codex, OpenCode ve herhangi bir kodlama ajanı için açık kaynak çalışma alanı. Görevleri ayrı dallarda paralel çalıştırın ve her şeyi tek bir yerden inceleyin."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Claude Code, Codex, OpenCode ve herhangi bir ajan için yerelde veya bulutta açık kaynak çalışma alanı. Görevleri ayrı dallarda paralel çalıştırın ve her şeyi tek bir yerden inceleyin."
 
 msgid "The organization reached its usage limit."
 msgstr "Kuruluş kullanım sınırına ulaştı."

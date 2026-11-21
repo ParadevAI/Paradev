@@ -20322,11 +20322,11 @@ msgstr "此名稱會顯示在側邊欄中。"
 msgid "The network connection changed"
 msgstr "網路連線已變更"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "開源工作區，容納Claude Code、Codex和任何編碼代理程式。"
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "開源工作區，容納Claude Code、Codex和任何代理程式。本機或雲端皆可執行。"
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何程式碼代理。在不同分支上平行執行任務，並在同一處審查所有內容。"
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "開源工作區，容納 Claude Code、Codex、OpenCode 和任何代理，本機或雲端皆可執行。在不同分支上平行執行任務，並在同一處審查所有內容。"
 
 msgid "The organization reached its usage limit."
 msgstr "組織已達到使用上限。"
