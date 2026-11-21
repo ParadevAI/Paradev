@@ -1450,6 +1450,13 @@
       "when": 1795212874823,
       "tag": "0206_aws_marketplace_customers",
       "breakpoints": true
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1795260969109,
+      "tag": "0207_user_settings_naming_instructions",
+      "breakpoints": true
     }
   ]
 }

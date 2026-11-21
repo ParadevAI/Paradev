@@ -1,4 +1,4 @@
-import { boolean, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 
 /**
@@ -10,6 +10,7 @@ export const userSettings = pgTable("user_settings", {
 		.primaryKey()
 		.references(() => users.id, { onDelete: "cascade" }),
 	experimentalChat: boolean("experimental_chat").notNull().default(false),
+	namingInstructions: text("naming_instructions"),
 	updatedAt: timestamp("updated_at", { withTimezone: true })
 		.notNull()
 		.defaultNow()
