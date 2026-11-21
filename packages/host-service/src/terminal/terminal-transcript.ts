@@ -214,6 +214,7 @@ export function reconstructTerminalTranscript(
 		const history: string[] = [];
 		const core = (term as unknown as XtermInternals)._core;
 		let previousRowCount = 0;
+		let previousLastRowLength = 0;
 		let scrolledRows = 0;
 		let hasPartialScroll = false;
 		term.onScroll(() => {
@@ -227,12 +228,13 @@ export function reconstructTerminalTranscript(
 		for (const chunk of splitForSampling(stream, cols, rows)) {
 			scrolledRows = 0;
 			hasPartialScroll = false;
+			const { cursorX, cursorY } = term.buffer.active;
 			const startsAfterVisibleOutput =
-				term.buffer.active.cursorY >= previousRowCount;
+				cursorY >= previousRowCount ||
+				(cursorY === previousRowCount - 1 && cursorX >= previousLastRowLength);
 			write(chunk);
 			const viewport = readViewport(term);
-			// Text written in order cannot overlap rows that scrolled out of view.
-			// Keep text matching for redraws and confined scroll regions.
+			// Linear output cannot reappear in rows that scrolled away; redraws still match on text.
 			const overlapLimit =
 				startsAfterVisibleOutput &&
 				scrolledRows > 0 &&
@@ -242,6 +244,7 @@ export function reconstructTerminalTranscript(
 					: rows;
 			appendWithoutOverlap(history, viewport, overlapLimit);
 			previousRowCount = viewport.length;
+			previousLastRowLength = viewport.at(-1)?.length ?? 0;
 			if (history.length > MAX_HISTORY_ROWS) {
 				history.splice(0, history.length - MAX_HISTORY_ROWS);
 			}
