@@ -49,9 +49,9 @@ TASKS=$(run_json tasks list)
 TERMINALS='[]'
 for ws in $(printf '%s' "$WORKSPACES" | jq -r '.[]?.id // empty'); do
   echo "reading terminals in $ws..." >&2
-  LIST=$(run_json terminals list --workspace "$ws" "${HOST_ARGS[@]}")
+  LIST=$(run_json terminals list --workspace "$ws" ${HOST_ARGS[@]+"${HOST_ARGS[@]}"})
   for term in $(printf '%s' "$LIST" | jq -r '.sessions[]?.terminalId // empty'); do
-    READ=$(run_json terminals read --workspace "$ws" --terminal "$term" --max-lines "$MAX_LINES" "${HOST_ARGS[@]}")
+    READ=$(run_json terminals read --workspace "$ws" --terminal "$term" --max-lines "$MAX_LINES" ${HOST_ARGS[@]+"${HOST_ARGS[@]}"})
     ENTRY=$(printf '%s' "$LIST" | jq -c --arg ws "$ws" --arg id "$term" --argjson read "$READ" \
       '.sessions[] | select(.terminalId == $id) | {workspaceId: $ws, terminalId: .terminalId, title: .title, attached: .attached, text: ($read.text // null)}')
     TERMINALS=$(printf '%s' "$TERMINALS" | jq -c --argjson e "$ENTRY" '. + [$e]')
