@@ -1,6 +1,5 @@
 "use client";
 
-import type { MessageDescriptor } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { PlanFamily } from "@superset/shared/billing";
 import { cn } from "@superset/ui/utils";
@@ -78,7 +77,6 @@ function DesktopTable({ tiers, values }: TableProps) {
 						<DesktopSectionGroup
 							key={section.id}
 							title={t(section.title)}
-							badge={section.badge}
 							columns={tiers.length + 1}
 						>
 							{section.rows.map((row) => (
@@ -122,12 +120,10 @@ function TierPriceLabel({
 
 function DesktopSectionGroup({
 	title,
-	badge,
 	columns,
 	children,
 }: {
 	title: string;
-	badge?: MessageDescriptor;
 	columns: number;
 	children: React.ReactNode;
 }) {
@@ -138,10 +134,7 @@ function DesktopSectionGroup({
 					colSpan={columns}
 					className="border-b border-border bg-accent/20 px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground"
 				>
-					<div className="flex items-center gap-2">
-						<span>{title}</span>
-						{badge && <SectionBadge label={badge} />}
-					</div>
+					{title}
 				</td>
 			</tr>
 			{children}
@@ -204,8 +197,7 @@ function MobileTable({ tiers, values }: TableProps) {
 				{COMPARISON_SECTIONS.map((section) => (
 					<section key={section.id} className="flex flex-col">
 						<p className="mb-1 flex items-center gap-2 rounded-md bg-accent/20 px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-							<span>{t(section.title)}</span>
-							{section.badge && <SectionBadge label={section.badge} />}
+							{t(section.title)}
 						</p>
 						<ul>
 							{section.rows.map((row) => (
@@ -253,13 +245,4 @@ function Cell({ value }: { value: ComparisonRow["values"][number] }) {
 		);
 	}
 	return <span>{typeof value === "string" ? value : t(value)}</span>;
-}
-
-function SectionBadge({ label }: { label: MessageDescriptor }) {
-	const { t } = useLingui();
-	return (
-		<span className="rounded-sm bg-accent/40 px-2 py-0.5 text-[10px] text-muted-foreground">
-			{t(label)}
-		</span>
-	);
 }

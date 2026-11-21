@@ -163,7 +163,7 @@ describe("a custom row", () => {
 			});
 		});
 		const text = view.container.textContent ?? "";
-		expect(text).toContain("Invalid recurrence rule — changes aren't saved");
+		expect(text).toContain("Invalid recurrence rule. Changes aren't saved");
 		expect(text).not.toContain("Next run Friday");
 	});
 
@@ -175,7 +175,7 @@ describe("a custom row", () => {
 			fireEvent.change(ui.getByRole("textbox"), { target: { value: "" } });
 		});
 		const text = view.container.textContent ?? "";
-		expect(text).toContain("Enter a recurrence rule — changes aren't saved");
+		expect(text).toContain("Enter a recurrence rule. Changes aren't saved");
 		expect(text).not.toContain("Next run Friday");
 	});
 

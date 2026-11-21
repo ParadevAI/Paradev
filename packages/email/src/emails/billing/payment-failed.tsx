@@ -13,6 +13,7 @@ interface PaymentFailedEmailProps {
 	/** Stripe's hosted invoice page. Unlike a billing portal session it stays
 	 * valid for 30 days, which is the point of putting it in an email. */
 	payInvoiceUrl?: string;
+	includesCloud?: boolean;
 }
 
 export function PaymentFailedEmail({
@@ -22,8 +23,12 @@ export function PaymentFailedEmail({
 	amount = "$50.00",
 	nextRetryDate = null,
 	payInvoiceUrl,
+	includesCloud = false,
 }: PaymentFailedEmailProps) {
 	const isFinalAttempt = nextRetryDate == null;
+	const cloudNotice = includesCloud
+		? " Cloud workspaces stop when access ends."
+		: "";
 
 	return (
 		<EmailLayout preview={`Payment failed for ${organizationName}`}>
@@ -43,8 +48,8 @@ export function PaymentFailedEmail({
 						{isFinalAttempt ? "Final notice:" : "Action required:"}
 					</strong>{" "}
 					{isFinalAttempt
-						? `This was our last attempt. ${organizationName} loses ${planName} access today unless this invoice is paid.`
-						: `Update your payment method so your team doesn't lose ${planName} access.`}
+						? `This was our last attempt. ${organizationName} loses ${planName} access today unless this invoice is paid.${cloudNotice}`
+						: `Update your payment method so your team doesn't lose ${planName} access.${cloudNotice}`}
 				</Text>
 			</Section>
 

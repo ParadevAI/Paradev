@@ -17,7 +17,7 @@ Search the release tags, not main. Run `git fetch --tags` first in a fresh clone
 
 ```bash
 PROC='page\.list(?!Paginated)'   # the procedure path; exclude longer names that share the prefix
-FLOOR=1.29.0                     # MINIMUM_DESKTOP_VERSION in apps/api/src/app/api/desktop/version/route.ts
+FLOOR=1.37.0                     # MINIMUM_DESKTOP_VERSION in apps/api/src/app/api/desktop/version/route.ts
 for v in $({ echo "$FLOOR"; git tag -l 'desktop-v*' | sed 's/^desktop-v//'; } | awk '!/-/' | sort -uV | sed -n "/^$FLOOR\$/,\$p"); do
   git rev-parse -q --verify "refs/tags/desktop-v$v" >/dev/null || continue
   git grep -q -P "$PROC" "desktop-v$v" -- apps/desktop && echo "desktop-v$v calls it"

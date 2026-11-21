@@ -1,1 +1,0 @@
-export { MachineSizePickerPill } from "./MachineSizePickerPill";

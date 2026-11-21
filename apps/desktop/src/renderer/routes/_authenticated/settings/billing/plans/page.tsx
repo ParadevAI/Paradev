@@ -4,7 +4,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import {
-	advertisedGbMinutesPerSeat,
 	familyForPlan,
 	gbHourPackPricePerGbHour,
 	offersYearlyDiscount,
@@ -14,7 +13,6 @@ import {
 	seatPricePerMonth,
 } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
-import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
@@ -24,12 +22,12 @@ import { Fragment, useState } from "react";
 import { HiArrowLeft, HiArrowUpRight, HiCheck } from "react-icons/hi2";
 import { env } from "renderer/env.renderer";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
+import { usePlanCatalog } from "renderer/hooks/usePlanCatalog";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { PlanChangeDialog } from "../components/PlanChangeDialog";
 import { useBillingActions } from "../hooks/useBillingActions";
-import { usePlanCatalog } from "../hooks/usePlanCatalog";
 
 export const Route = createFileRoute("/_authenticated/settings/billing/plans/")(
 	{
@@ -72,10 +70,13 @@ type ComparisonValue = MessageDescriptor | boolean | null;
 type ComparisonRow = {
 	label: MessageDescriptor;
 	href?: string;
-	values: [free: ComparisonValue, paid: ComparisonValue, enterprise: ComparisonValue];
+	values: [
+		free: ComparisonValue,
+		paid: ComparisonValue,
+		enterprise: ComparisonValue,
+	];
 	cloudGbHours?: boolean;
 	cloudPack?: boolean;
-	badge?: { label: MessageDescriptor; variant: "default" | "secondary" };
 };
 
 type ComparisonSection = {
@@ -199,7 +200,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 				}),
 				values: [null, null, msg({ message: "Custom" })],
 				cloudGbHours: true,
-				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 			{
 				label: msg({
@@ -207,7 +207,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 				}),
 				values: [null, null, msg({ message: "Custom" })],
 				cloudPack: true,
-				badge: { label: msg({ message: "Beta" }), variant: "secondary" },
 			},
 		],
 	},
@@ -382,7 +381,11 @@ function PlansPage() {
 	} = useBillingActions();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
 
-	const { plan: currentPlan, isReady: planResolved, activePlan } = useCurrentPlan();
+	const {
+		plan: currentPlan,
+		isReady: planResolved,
+		activePlan,
+	} = useCurrentPlan();
 	const cancelAt = activePlan?.cancelAt;
 	const currentColumn =
 		currentPlan === "pro"
@@ -420,7 +423,7 @@ function PlansPage() {
 
 	const yearlyFor = (card: PlanCardData) =>
 		card.family ? isYearly && offersYearlyDiscount(card.family) : isYearly;
-	
+
 	const getPriceLabel = (plan: PlanCardData): string => {
 		if (plan.price !== "seat") return i18n._(getValue(plan.price));
 		if (!plan.family) return "";
@@ -436,11 +439,11 @@ function PlansPage() {
 		plan: PlanCardData,
 	): ComparisonValue | string => {
 		if (row.cloudGbHours && plan.family) {
-			const gbMinutes = advertisedGbMinutesPerSeat(plan.family);
-			return gbMinutes ? formatNumber(gbMinutes / 60) : null;
+			const gbHours = plan.family.advertisedGbHoursPerSeat;
+			return gbHours ? formatNumber(gbHours) : null;
 		}
 		if (row.cloudPack && plan.family) {
-			const pack = advertisedGbMinutesPerSeat(plan.family)
+			const pack = plan.family.advertisedGbHoursPerSeat
 				? plan.family.pack
 				: null;
 			return pack
@@ -580,7 +583,8 @@ function PlansPage() {
 				<div
 					className="relative"
 					style={{
-						minWidth: LABEL_COLUMN_WIDTH + planCards.length * PLAN_COLUMN_MIN_WIDTH,
+						minWidth:
+							LABEL_COLUMN_WIDTH + planCards.length * PLAN_COLUMN_MIN_WIDTH,
 					}}
 				>
 					<div
@@ -644,7 +648,8 @@ function PlansPage() {
 										// user can act on. Hold at "Current plan" until it lands — and
 										// equally when the row carries no readable interval.
 										const intervalMatches =
-											subscriptionIsYearly === null || yearlyFor(plan) === subscriptionIsYearly;
+											subscriptionIsYearly === null ||
+											yearlyFor(plan) === subscriptionIsYearly;
 										if (!planResolved || intervalMatches) {
 											planActions = [
 												{
@@ -784,6 +789,7 @@ function PlansPage() {
 														variant={action.variant}
 														size={action.size ?? "sm"}
 														className={cn(
+															"h-auto min-h-8 whitespace-normal py-1",
 															action.fullWidth === false ? "w-fit" : "w-full",
 															action.align === "center" && "self-center",
 															action.align === "start" && "self-start",
@@ -826,7 +832,10 @@ function PlansPage() {
 										{i18n._(section.title)}
 									</span>
 								</div>
-								<div className="h-px bg-border/60" style={{ gridColumn: "1 / -1" }} />
+								<div
+									className="h-px bg-border/60"
+									style={{ gridColumn: "1 / -1" }}
+								/>
 
 								{section.rows.map((row, rowIndex) => {
 									const isLastRow =
@@ -848,14 +857,6 @@ function PlansPage() {
 												) : (
 													i18n._(row.label)
 												)}
-												{row.badge && (
-													<Badge
-														variant={row.badge.variant}
-														className="px-1.5 py-0 text-[10px] font-medium"
-													>
-														{i18n._(row.badge.label)}
-													</Badge>
-												)}
 											</div>
 											{planCards.map((plan) => (
 												<div
@@ -866,7 +867,10 @@ function PlansPage() {
 												</div>
 											))}
 											{!isLastRow && (
-												<div className="h-px bg-border/60" style={{ gridColumn: "1 / -1" }} />
+												<div
+													className="h-px bg-border/60"
+													style={{ gridColumn: "1 / -1" }}
+												/>
 											)}
 										</Fragment>
 									);

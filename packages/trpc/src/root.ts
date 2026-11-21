@@ -12,6 +12,7 @@ import { analyticsRouter } from "./router/analytics";
 import { apiKeyRouter } from "./router/api-key";
 import { attachmentRouter } from "./router/attachment";
 import { automationRouter } from "./router/automation";
+import { awsMarketplaceRouter } from "./router/aws-marketplace";
 import { billingRouter } from "./router/billing";
 import {
 	channelMessageRouter,
@@ -21,6 +22,9 @@ import {
 	channelThreadRouter,
 } from "./router/channel";
 import { chatRouter } from "./router/chat";
+import { chatHistoryRouter } from "./router/chat-history";
+import { chatMoveRouter } from "./router/chat-move";
+import { cloudRouter } from "./router/cloud";
 import { cloudWorkspaceRouter } from "./router/cloud-workspace";
 import { connectorsRouter } from "./router/connectors";
 import { environmentRouter } from "./router/environment";
@@ -33,6 +37,7 @@ import { organizationRouter } from "./router/organization";
 import { pageRouter } from "./router/page";
 import { pageCommentRouter } from "./router/page-comment";
 import { pluginsRouter } from "./router/plugins";
+import { projectRouter } from "./router/project";
 import { sandboxRouter } from "./router/sandbox";
 import { suggestionRouter } from "./router/suggestion";
 import { supportRouter } from "./router/support/support";
@@ -43,9 +48,10 @@ import { taskRecordRouter } from "./router/task-record";
 import { teamRouter } from "./router/team";
 import { userRouter } from "./router/user";
 import { userSettingsRouter } from "./router/user-settings";
-import { v2ProjectRouter } from "./router/v2-project";
-import { v2WorkspaceRouter } from "./router/v2-workspace";
 import { voiceRouter } from "./router/voice";
+import { workspaceRouter } from "./router/workspace";
+import { legacyWorkspaceRouter } from "./router/workspace/legacy";
+import { workspaceMoveRouter } from "./router/workspace-move";
 import { createCallerFactory, createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
@@ -58,8 +64,12 @@ export const appRouter = createTRPCRouter({
 	analytics: analyticsRouter,
 	attachment: attachmentRouter,
 	automation: automationRouter,
+	awsMarketplace: awsMarketplaceRouter,
 	billing: billingRouter,
 	chat: chatRouter,
+	chatHistory: chatHistoryRouter,
+	chatMove: chatMoveRouter,
+	cloud: cloudRouter,
 	cloudWorkspace: cloudWorkspaceRouter,
 	environment: environmentRouter,
 	host: { ...hostRouter, ...hostManagementRouter },
@@ -89,6 +99,7 @@ export const appRouter = createTRPCRouter({
 	user: userRouter,
 	userSettings: userSettingsRouter,
 	voice: voiceRouter,
+	workspaceMove: workspaceMoveRouter,
 	// TODO(2026-10-11): drop; desktops and phones before 1.29 call these names.
 	v2Host: {
 		list: hostManagementRouter.roster,
@@ -99,8 +110,13 @@ export const appRouter = createTRPCRouter({
 		removeMember: hostManagementRouter.removeMember,
 		setMemberRole: hostManagementRouter.setMemberRole,
 	},
-	v2Project: v2ProjectRouter,
-	v2Workspace: v2WorkspaceRouter,
+	project: projectRouter,
+	workspace: workspaceRouter,
+	// Every released host-service calls these names, and so does this one until
+	// the API with the new names is live. Keep them until MINIMUM_DESKTOP_VERSION
+	// is past the first release that calls the new ones.
+	v2Project: projectRouter,
+	v2Workspace: { ...workspaceRouter, ...legacyWorkspaceRouter },
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,3 +1,5 @@
+import { parse } from "shell-quote";
+
 /**
  * Prompt transports define the small set of ways a CLI can receive prompt
  * payloads. Keep this enum intentionally small and add a new transport only
@@ -44,8 +46,35 @@ export function quoteSingleShell(value: string): string {
 	return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
+// Stricter than SAFE_SHELL_TOKEN: a prompt or session id must never expand,
+// and zsh expands a leading `~`, `%` (job specs) or `=` (EQUALS).
+const SAFE_SHELL_ARG = /^[A-Za-z0-9_@+:,./-][A-Za-z0-9_@+=:,./-]*$/;
+
+function quoteShellArg(value: string): string {
+	return SAFE_SHELL_ARG.test(value) ? value : quoteSingleShell(value);
+}
+
 export function buildArgvCommand(argv: string[]): string {
-	return argv.map(quoteSingleShell).join(" ");
+	return argv.map(quoteShellArg).join(" ");
+}
+
+const SAFE_SHELL_TOKEN = /^[A-Za-z0-9_@%+=:,./~-]+$/;
+
+export function quoteShellToken(value: string): string {
+	if (value === "") return "''";
+	if (SAFE_SHELL_TOKEN.test(value)) return value;
+	return quoteSingleShell(value);
+}
+
+export function hasShellSyntax(commandText: string): boolean {
+	return parse(commandText).some((token) => typeof token !== "string");
+}
+
+// The agent settings store a command with shell syntax whole, with no args,
+// as shell code to run as written.
+export function agentCommandText(command: string, args: string[]): string {
+	if (args.length === 0 && hasShellSyntax(command)) return command;
+	return [command, ...args].map(quoteShellToken).join(" ");
 }
 
 export function envOverlayPrefix(env: Record<string, string>): string {

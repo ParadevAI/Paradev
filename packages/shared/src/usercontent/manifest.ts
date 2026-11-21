@@ -107,7 +107,9 @@ export function parsePageManifest(text: string): PageManifest | null {
 	};
 }
 
-export function servedVersionOf(manifest: PageManifest): number | null {
+export function servedVersionOf(
+	manifest: Pick<PageManifest, "sharedVersion" | "latestVersion">,
+): number | null {
 	return manifest.sharedVersion ?? manifest.latestVersion;
 }
 

@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { resolve } from "node:path";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import {
 	type FindNestedRepoRootsOptions,
 	type FindNestedRepoRootsResult,
@@ -21,11 +22,11 @@ export const nestedRepositoriesTask = defineWorkerTask<
 });
 
 export const ignoredDirectoriesTask = defineWorkerTask<
-	{ rootPath: string },
+	{ rootPath: string; under?: readonly string[] },
 	string[]
 >({
 	type: "watcher/ignored-directories",
-	handler: ({ rootPath }) => listGitIgnoredDirs(rootPath),
+	handler: ({ rootPath, under }) => listGitIgnoredDirs(rootPath, under),
 });
 
 export const gitDirectoryTask = defineWorkerTask<
@@ -36,7 +37,7 @@ export const gitDirectoryTask = defineWorkerTask<
 	handler: async ({ rootPath }) => {
 		try {
 			const { stdout } = await promisify(execFile)(
-				"git",
+				resolveCommand("git"),
 				["rev-parse", "--git-dir"],
 				{ cwd: rootPath, timeout: 3_000 },
 			);

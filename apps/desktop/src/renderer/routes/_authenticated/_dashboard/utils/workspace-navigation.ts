@@ -3,14 +3,12 @@ import {
 	type AgentIdentityId,
 } from "@superset/shared/agent-catalog";
 import type {
+	AnyRouter,
+	HistoryLocation,
 	NavigateOptions,
 	UseNavigateResult,
 } from "@tanstack/react-router";
-
-export interface WorkspaceSearchParams {
-	tabId?: string;
-	paneId?: string;
-}
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 
 /**
  * Deep link into a subagent's transcript pane. The sidebar cannot reach a
@@ -24,7 +22,7 @@ export interface SubagentLinkParams {
 	agentType?: string;
 }
 
-export interface SubagentLinkSearchParams {
+interface SubagentLinkSearchParams {
 	subagentTerminalId?: string;
 	subagentId?: string;
 	subagentAgentId?: string;
@@ -78,33 +76,28 @@ export function parseSubagentSearch(
 	};
 }
 
-export interface V2WorkspaceSearchParams extends SubagentLinkSearchParams {
+export interface WorkspaceSearchParams extends SubagentLinkSearchParams {
 	sessionId?: string;
 	terminalId?: string;
 	focusRequestId?: string;
 	openUrl?: string;
 	openUrlTarget?: "current-tab" | "new-tab";
 	openUrlRequestId?: string;
-	openUrlAgent?: true;
 }
 
-/**
- * Navigate to a workspace and update localStorage to remember it as the last viewed workspace.
- * This ensures the workspace will be restored when the app is reopened.
- *
- * @param workspaceId - The ID of the workspace to navigate to
- * @param navigate - The navigate function from useNavigate()
- * @param options - Optional navigation options (replace, resetScroll, etc.)
- */
+type WorkspaceNavigationOptions = Omit<
+	NavigateOptions,
+	"to" | "params" | "search"
+> & {
+	search?: WorkspaceSearchParams;
+};
+
 export function navigateToWorkspace(
 	workspaceId: string,
 	navigate: UseNavigateResult<string>,
-	options?: Omit<NavigateOptions, "to" | "params"> & {
-		search?: WorkspaceSearchParams;
-	},
+	options?: WorkspaceNavigationOptions,
 ): Promise<void> {
 	const { search, ...rest } = options ?? {};
-	localStorage.setItem("lastViewedWorkspaceId", workspaceId);
 	return navigate({
 		to: "/workspace/$workspaceId",
 		params: { workspaceId },
@@ -113,21 +106,55 @@ export function navigateToWorkspace(
 	});
 }
 
-/**
- * Navigate to a V2 workspace route.
- */
-export function navigateToV2Workspace(
+export async function navigateToWorkspaceAndThen(
 	workspaceId: string,
-	navigate: UseNavigateResult<string>,
-	options?: Omit<NavigateOptions, "to" | "params" | "search"> & {
-		search?: V2WorkspaceSearchParams;
-	},
+	router: AnyRouter,
+	afterNavigate: () => void | Promise<void>,
+	options?: WorkspaceNavigationOptions,
 ): Promise<void> {
-	const { search, ...rest } = options ?? {};
-	return navigate({
-		to: "/v2-workspace/$workspaceId",
-		params: { workspaceId },
-		search: search ?? {},
-		...rest,
+	const destination = router
+		.buildLocation({
+			to: "/workspace/$workspaceId",
+			params: { workspaceId },
+		})
+		.pathname.replace(/\/$/, "");
+	let cancelled = false;
+	const unsubscribe = router.history.subscribe(
+		({ location }: { location: HistoryLocation }) => {
+			if (location.pathname.replace(/\/$/, "") !== destination) {
+				cancelled = true;
+				unsubscribe();
+			}
+		},
+	);
+	try {
+		await navigateToWorkspace(workspaceId, router.navigate, options);
+	} catch (error) {
+		unsubscribe();
+		throw error;
+	}
+	const isCurrent = () =>
+		!cancelled &&
+		!router.state.isLoading &&
+		router.state.matches.every((match) => match.status === "success") &&
+		router.state.matches.some(
+			(match) =>
+				"workspaceId" in match.params &&
+				match.params.workspaceId === workspaceId,
+		);
+	if (!isCurrent()) {
+		unsubscribe();
+		return;
+	}
+	// Animation-frame callbacks run before paint; a task gives paint a turn first.
+	requestAnimationFrame(() => {
+		setTimeout(async () => {
+			unsubscribe();
+			try {
+				if (isCurrent()) await afterNavigate();
+			} catch (error) {
+				reportRendererError(error);
+			}
+		}, 0);
 	});
 }

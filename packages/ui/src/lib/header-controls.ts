@@ -5,7 +5,7 @@ export function headerTabClassName(isActive: boolean): string {
 	return cn(
 		"flex h-7 items-center rounded-md text-xs transition-colors",
 		isActive
-			? "bg-card text-foreground ring-1 ring-input"
+			? "bg-[var(--header-tab-selected,var(--card))] text-foreground ring-1 ring-input"
 			: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
 	);
 }

@@ -45,6 +45,11 @@ export const DESCRIPTION_MARKDOWN_STYLE: MarkdownStyle = {
 		checkmarkColor: THEME.dark.background,
 		checkedTextColor: THEME.dark.mutedForeground,
 	},
+	math: {
+		color: THEME.dark.foreground,
+		backgroundColor: THEME.dark.secondary,
+	},
+	inlineMath: { color: THEME.dark.foreground },
 	table: {
 		color: THEME.dark.foreground,
 		borderColor: THEME.dark.border,

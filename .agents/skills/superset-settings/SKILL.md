@@ -133,7 +133,7 @@ Booleans accept `true/false/on/off/1/0/yes/no`.
 | --- | --- |
 | behavior | `confirmOnQuit`, `fileOpenMode` (`split-pane\|new-tab`), `showResourceMonitor`, `showUsageInSidebar`, `openLinksInApp`, `defaultEditor` (vscode, cursor, zed, ...) |
 | git | `branchPrefixMode` (`none\|github\|author\|custom`), `branchPrefixCustom`, `worktreeBaseDir`; host-wide, written through the local host service, so the app (or `superset start`) must be running |
-| notifications | `selectedRingtoneId` (shamisen, arcade, ping, quick, doowap, woman, african, afrobeat, edm, comeback, shabala), `notificationSoundsMuted`, `notificationVolume` (0-100) |
+| notifications | `selectedRingtoneId` (shamisen, arcade, ping, quick, doowap, woman, african, afrobeat, edm, comeback, shabala, tribute), `notificationSoundsMuted`, `notificationVolume` (0-100) |
 | terminal | `terminalLinkBehavior` (`external-editor\|file-viewer`), `terminalParkedRuntimeCap` (2-64), `showPresetsBar`, `useCompactTerminalAddButton`, `autoApplyDefaultPreset`, `waitForSetupBeforeAgent` |
 | terminal appearance | `terminalFontFamily`, `terminalFontSize` (10-24, 0.5 steps), `terminalLineHeight` (1-2.5), `terminalLetterSpacing` (-2-4), `terminalFontWeight` (100-900), `terminalLigatures`, `terminalMinimumContrast` (1\|3\|4.5\|7), `terminalCursorStyle` (`block\|bar\|underline`), `terminalCursorBlink` |
 | editor appearance | `editorFontFamily`, `editorFontSize`, `editorLineHeight`, `editorLetterSpacing`, `editorFontWeight`, `editorLigatures` |

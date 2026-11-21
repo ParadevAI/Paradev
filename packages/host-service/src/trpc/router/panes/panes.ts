@@ -17,6 +17,7 @@ import { createCallerFactory, protectedProcedure, router } from "../../index";
 import { requireChatSession } from "../sessions/session-service";
 import { terminalRouter } from "../terminal";
 import { addPaneDetails } from "./add-pane-details";
+import { closeChatsOnTerminal } from "./close-chats-on-terminal";
 import { resolveOpenPath } from "./resolve-open-path";
 
 const createTerminalCaller = createCallerFactory(terminalRouter);
@@ -195,13 +196,14 @@ export const panesRouter = router({
 				paneId: input.paneId,
 				keepTerminal: input.keepTerminal,
 			});
-			// A live terminal left without a pane is re-adopted into a new tab
-			// by the desktop, so closing ends it unless it was backgrounded.
+			// A live terminal or chat left without a pane is re-adopted into a new
+			// tab by the desktop, so closing ends it unless it was backgrounded.
 			if (terminalId && !input.keepTerminal) {
 				await createTerminalCaller(ctx).killSession({
 					workspaceId: input.workspaceId,
 					terminalId,
 				});
+				await closeChatsOnTerminal(ctx, input.workspaceId, terminalId);
 			}
 			return { ...result, terminalId: terminalId ?? null };
 		}),

@@ -1,0 +1,1 @@
+ALTER TABLE `chat_sessions_local` ADD `closed_by_user` integer DEFAULT false NOT NULL;

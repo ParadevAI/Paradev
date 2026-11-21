@@ -4,7 +4,7 @@ import {
 	AGENT_TYPES,
 	type AgentType,
 } from "@superset/shared/agent-command";
-import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 
 const BUILTIN_AGENT_IDS = new Set<string>(AGENT_TYPES);
 
@@ -65,7 +65,7 @@ export function buildV2TerminalPresetRow(
 	tabOrder: number,
 	resolved: Pick<ResolvedPresetImport, "v2Name" | "linkedAgentId">,
 	overrides?: { id?: string; useAsWorkspaceRun?: boolean },
-): V2TerminalPresetRow {
+): TerminalPresetRow {
 	return {
 		id: overrides?.id ?? crypto.randomUUID(),
 		name: resolved.v2Name,

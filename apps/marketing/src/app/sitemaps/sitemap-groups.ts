@@ -45,6 +45,11 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.8,
 		},
 		{
+			url: `${baseUrl}/conductor`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
 			url: `${baseUrl}/mobile`,
 			changeFrequency: "monthly",
 			priority: 0.8,

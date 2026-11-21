@@ -1,11 +1,28 @@
 import { msg } from "@lingui/core/macro";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { BookOpenIcon, HistoryIcon, SettingsIcon } from "lucide-react";
-import { LuLayers } from "react-icons/lu";
+import { TbStack2 } from "react-icons/tb";
+import { type SwitcherOpenedVia, useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { RecentlyViewedFrame } from "../../ui/RecentlyViewed/RecentlyViewedFrame";
-import { WorkspaceListFrame } from "../../ui/WorkspaceList";
 import { settingsTabCommands } from "../settings/commands";
+
+export const WORKSPACES_COMMAND_ID = "nav.workspaces";
+
+export function openWorkspaceList(
+	options: { via?: SwitcherOpenedVia; holdsModifier?: boolean } = {},
+): void {
+	useFrameStackStore.getState().openSwitcher({
+		via: options.via ?? "command",
+		holdsModifier: options.holdsModifier ?? false,
+	});
+}
+
+export function toggleWorkspaceList(): void {
+	const { open, root, setOpen } = useFrameStackStore.getState();
+	if (open && root === "switcher") setOpen(false);
+	else openWorkspaceList({ via: "pill" });
+}
 
 export const navigationProvider: CommandProvider = {
 	id: "navigation",
@@ -31,14 +48,15 @@ export const navigationProvider: CommandProvider = {
 				renderFrame: () => <RecentlyViewedFrame />,
 			},
 			{
-				id: "nav.workspaces",
+				id: WORKSPACES_COMMAND_ID,
 				title: msg({
 					message: "Workspaces",
 				}),
 				section: "navigation",
-				icon: LuLayers,
+				icon: TbStack2,
+				hotkeyId: "OPEN_WORKSPACE_LIST",
 				keywords: ["workspace", "project", "repo", "repository", "switch"],
-				renderFrame: () => <WorkspaceListFrame />,
+				run: () => openWorkspaceList({ via: "command" }),
 			},
 			{
 				id: "nav.docs",

@@ -73,13 +73,26 @@ describe("ChatSessionStore", () => {
 
 	test("a new session is open, and reopening a closed one opens it again", () => {
 		expect(runtime.sessions.get("s1")?.closedAt).toBeNull();
-		runtime.sessions.markClosed("s1", 5);
+		runtime.sessions.markClosed("s1", { closedAt: 5, byUser: true });
 		runtime.journal.open({
 			sessionId: "s1",
 			scopeId: "w1",
 			harness: "claude-code",
 		});
-		expect(runtime.sessions.get("s1")?.closedAt).toBeNull();
+		expect(runtime.sessions.get("s1")).toMatchObject({
+			closedAt: null,
+			closedByUser: false,
+		});
+	});
+
+	test("a close by a person stays recorded when the chat is closed again internally", () => {
+		expect(runtime.sessions.get("s1")?.closedByUser).toBe(false);
+		runtime.sessions.markClosed("s1", { closedAt: 5, byUser: true });
+		runtime.sessions.markClosed("s1", { closedAt: 6 });
+		expect(runtime.sessions.get("s1")).toMatchObject({
+			closedAt: 6,
+			closedByUser: true,
+		});
 	});
 
 	test("returns null for an unknown session", () => {

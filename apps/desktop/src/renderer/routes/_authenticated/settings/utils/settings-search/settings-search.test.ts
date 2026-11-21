@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
+import type { SettingsSectionVisibility } from "../settingsSections";
 import {
+	getOfferedSections,
 	getVisibleItemsForSection,
 	getVisibleMatchCountBySection,
 	SETTING_ITEM_ID,
@@ -80,46 +82,34 @@ describe("settings search - hosts", () => {
 	});
 });
 
-describe("settings search - usage in sidebar", () => {
-	it('searching "sidebar" in Usage returns the usage-in-sidebar switch for v2 users', () => {
+describe("settings search - quota rings switch", () => {
+	it('searching "sidebar" in Usage returns the quota rings switch', () => {
 		const ids = getVisibleItemsForSection({
 			section: "usage",
 			searchQuery: "sidebar",
-			isV2: true,
 		});
-		expect(ids).toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
+		expect(ids).toContain(SETTING_ITEM_ID.USAGE_RAIL_RINGS);
 	});
 
-	it("hides the usage-in-sidebar switch from v1 users", () => {
-		const ids = getVisibleItemsForSection({
-			section: "usage",
-			searchQuery: "sidebar",
-			isV2: false,
-		});
-		expect(ids).not.toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
+	it('searching "quota" matches the quota rings switch', () => {
+		const ids = getIds(searchSettings("quota"));
+		expect(ids).toContain(SETTING_ITEM_ID.USAGE_RAIL_RINGS);
 	});
 
-	it('searching "shortcut" matches the usage-in-sidebar item', () => {
-		const ids = getIds(searchSettings("shortcut"));
-		expect(ids).toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
-	});
-
-	it("lists the usage-in-sidebar switch in Usage without a search for v2 users", () => {
+	it("lists the quota rings switch in Usage without a search", () => {
 		const ids = getVisibleItemsForSection({
 			section: "usage",
 			searchQuery: "",
-			isV2: true,
 		});
-		expect(ids).toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
+		expect(ids).toContain(SETTING_ITEM_ID.USAGE_RAIL_RINGS);
 	});
 });
 
 describe("settings search - auto save", () => {
-	it('lists Auto Save for v2 users when searching "onFocusChange"', () => {
+	it('lists Auto Save when searching "onFocusChange"', () => {
 		const ids = getVisibleItemsForSection({
 			section: "files",
 			searchQuery: "onFocusChange",
-			isV2: true,
 		});
 		expect(ids).toContain(SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE);
 	});
@@ -128,39 +118,53 @@ describe("settings search - auto save", () => {
 		"after delay",
 		"on focus change",
 		"on window change",
-	])('lists Auto Save for v2 users when searching "%s"', (searchQuery) => {
+	])('lists Auto Save when searching "%s"', (searchQuery) => {
 		const ids = getVisibleItemsForSection({
 			section: "files",
 			searchQuery,
-			isV2: true,
 		});
 		expect(ids).toContain(SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE);
 	});
 });
 
-describe("settings search - mobile rollout", () => {
-	it("excludes mobile matches until the feature flag is enabled", () => {
-		expect(
-			getVisibleMatchCountBySection("iPhone", true, false).mobile,
-		).toBeUndefined();
-		expect(
-			getVisibleMatchCountBySection("iPhone", true, false, true).mobile,
-		).toBe(1);
-		expect(
-			getVisibleMatchCountBySection("iPhone", false, false, true).mobile,
-		).toBe(1);
+function visible(
+	overrides: Partial<SettingsSectionVisibility> = {},
+): SettingsSectionVisibility {
+	return {
+		isMac: true,
+		isAdmin: true,
+		pluginsEnabled: false,
+		cloudUsageEnabled: false,
+		allowedSections: getOfferedSections(false),
+		...overrides,
+	};
+}
+
+describe("settings search - mobile", () => {
+	it("finds the mobile section", () => {
+		expect(getVisibleMatchCountBySection("iPhone", visible()).mobile).toBe(1);
 	});
 });
 
-describe("settings search - plugins visibility", () => {
-	it("excludes plugin matches unless the plugins section is visible", () => {
+describe("settings search - visibility", () => {
+	it("counts matches only in sections the settings nav shows", () => {
 		expect(
-			getVisibleMatchCountBySection("marketplace", true, false, false, false)
-				.plugins,
+			getVisibleMatchCountBySection("marketplace", visible()).plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("marketplace", true, false, false, true)
-				.plugins,
+			getVisibleMatchCountBySection(
+				"marketplace",
+				visible({ pluginsEnabled: true }),
+			).plugins,
 		).toBeGreaterThan(0);
+		expect(
+			getVisibleMatchCountBySection("gb-hours", visible()).cloudUsage,
+		).toBeUndefined();
+		expect(
+			getVisibleMatchCountBySection(
+				"gb-hours",
+				visible({ cloudUsageEnabled: true }),
+			).cloudUsage,
+		).toBe(1);
 	});
 });

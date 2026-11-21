@@ -8,14 +8,19 @@
 import { db } from "@superset/db/client";
 import { githubUserConnections } from "@superset/db/schema";
 import { withConnectionLock } from "@superset/db/utils";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
+import { queueRulesReapply } from "../sandbox/reapply-rules";
 import { open, seal } from "../secret-box";
 
 const STATE_TTL_MS = 10 * 60_000;
-/** Refresh a token this close to expiring, so a box never holds a dying one. */
-const REFRESH_MARGIN_MS = 15 * 60_000;
+/**
+ * Longer than the most a scheduled rule refresh runs before expiry (45 min),
+ * so that refresh always renews the token and moves the next one on.
+ */
+export const GITHUB_USER_TOKEN_REFRESH_MARGIN_MS = 50 * 60_000;
 const STATE_AAD = "github-user-connect";
 
 export class GithubUserConnectionError extends Error {
@@ -46,7 +51,7 @@ function clientCredentials(): { clientId: string; clientSecret: string } {
 }
 
 export function githubUserCallbackUrl(): string {
-	return `${env.NEXT_PUBLIC_API_URL}/api/github/user/callback`;
+	return `${getBrowserApiUrl(env)}/api/github/user/callback`;
 }
 
 function tokenAad(userId: string, kind: "access" | "refresh"): string {
@@ -190,6 +195,7 @@ export async function completeGithubUserConnection(args: {
 			target: githubUserConnections.userId,
 			set: { ...identity, ...columns },
 		});
+	await queueRulesReapply({ userId });
 	return { login: identity.login };
 }
 
@@ -197,10 +203,16 @@ export async function githubUserConnectionFor(userId: string): Promise<{
 	githubUserId: string;
 	login: string;
 	name: string | null;
+	accessTokenExpiresAt: Date | null;
 } | null> {
 	const row = await db.query.githubUserConnections.findFirst({
 		where: eq(githubUserConnections.userId, userId),
-		columns: { githubUserId: true, login: true, name: true },
+		columns: {
+			githubUserId: true,
+			login: true,
+			name: true,
+			accessTokenExpiresAt: true,
+		},
 	});
 	return row ?? null;
 }
@@ -212,29 +224,43 @@ export async function githubUserConnectionFor(userId: string): Promise<{
  * A connection GitHub no longer honours is removed, and the caller falls back
  * to the App's token.
  */
+export function githubUserTokenIsFresh(
+	expiresAt: Date | null,
+	now = Date.now(),
+): boolean {
+	return (
+		!expiresAt ||
+		expiresAt.getTime() - now > GITHUB_USER_TOKEN_REFRESH_MARGIN_MS
+	);
+}
+
 export async function githubUserTokenFor(
 	userId: string,
 ): Promise<string | null> {
 	if (!githubUserConnectionConfigured()) return null;
 	const fresh = (row: typeof githubUserConnections.$inferSelect) =>
-		!row.accessTokenExpiresAt ||
-		row.accessTokenExpiresAt.getTime() - Date.now() > REFRESH_MARGIN_MS;
+		githubUserTokenIsFresh(row.accessTokenExpiresAt);
 	const row = await db.query.githubUserConnections.findFirst({
 		where: eq(githubUserConnections.userId, userId),
 	});
 	if (!row) return null;
 	if (fresh(row))
 		return open(row.encryptedAccessToken, tokenAad(userId, "access"));
-	return withConnectionLock(`github-user:${userId}`, async (tx) => {
+	const result = await withConnectionLock<{
+		token: string | null;
+		rotated?: boolean;
+	}>(`github-user:${userId}`, async (tx) => {
 		const [current] = await tx
 			.select()
 			.from(githubUserConnections)
 			.where(eq(githubUserConnections.userId, userId));
-		if (!current) return null;
+		if (!current) return { token: null };
 		if (fresh(current)) {
-			return open(current.encryptedAccessToken, tokenAad(userId, "access"));
+			return {
+				token: open(current.encryptedAccessToken, tokenAad(userId, "access")),
+			};
 		}
-		if (!current.encryptedRefreshToken) return null;
+		if (!current.encryptedRefreshToken) return { token: null };
 		try {
 			const tokens = await exchange({
 				grant_type: "refresh_token",
@@ -247,7 +273,7 @@ export async function githubUserTokenFor(
 				.update(githubUserConnections)
 				.set(tokenColumns(userId, tokens))
 				.where(eq(githubUserConnections.userId, userId));
-			return tokens.access_token;
+			return { token: tokens.access_token, rotated: true };
 		} catch (error) {
 			if (
 				error instanceof GithubUserConnectionError &&
@@ -259,15 +285,20 @@ export async function githubUserTokenFor(
 				await tx
 					.delete(githubUserConnections)
 					.where(eq(githubUserConnections.userId, userId));
-				return null;
+				return { token: null, rotated: true };
 			}
 			console.warn(
 				`[github-user] refresh failed for ${userId}; kept for the next attempt`,
 				error instanceof Error ? error.message : error,
 			);
-			return null;
+			return { token: null };
 		}
 	});
+	// GitHub revoked the old token, which the person's other boxes still hold.
+	if (result.rotated) {
+		await queueRulesReapply({ userId });
+	}
+	return result.token;
 }
 
 /** Removes the connection and revokes the grant, so GitHub forgets it too. */
@@ -279,6 +310,7 @@ export async function disconnectGithubUser(userId: string): Promise<void> {
 	await db
 		.delete(githubUserConnections)
 		.where(eq(githubUserConnections.userId, userId));
+	await queueRulesReapply({ userId });
 	if (!githubUserConnectionConfigured()) return;
 	const { clientId, clientSecret } = clientCredentials();
 	await fetch(`https://api.github.com/applications/${clientId}/grant`, {

@@ -7,7 +7,14 @@ import { z } from "zod";
  */
 export const AIR_CLIENT_META = {
 	jetbrains: {
-		air: { version: 1, capabilities: ["asyncTasks", "nativeSubagentSessions"] },
+		air: {
+			version: 1,
+			capabilities: [
+				"asyncTasks",
+				"nativeSubagentSessions",
+				"backgroundSubagents",
+			],
+		},
 	},
 };
 
@@ -23,7 +30,11 @@ export const airAsyncTaskSpawnedSchema = z.looseObject({
 	name: z.string().nullable().optional(),
 	description: z.string().nullable().optional(),
 	canStop: z.boolean().nullable().optional(),
+	taskType: z.string().nullable().optional(),
 });
+
+/** An async task of this type is a turn the agent started on its own, without a prompt. */
+export const AIR_AUTONOMOUS_TURN_TASK_TYPE = "turn";
 
 export const airAsyncTaskProgressSchema = z.looseObject({
 	asyncTaskId: z.string().min(1),
@@ -95,4 +106,25 @@ export function isSubagentControlCall(raw: unknown): boolean {
 		jetbrains?.air?.subagent === true ||
 		SUBAGENT_CONTROL_TOOLS.has(claudeCode?.toolName ?? "")
 	);
+}
+
+const permissionMetaSchema = z.looseObject({
+	_meta: z.looseObject({
+		jetbrains: z.looseObject({
+			air: z.looseObject({
+				permission: z.looseObject({
+					description: z.string().nullable().optional(),
+				}),
+			}),
+		}),
+	}),
+});
+
+// claude-agent-acp calls this field temporary diagnostic text: an adapter bump may change or drop it.
+export function airPermissionReason(raw: unknown): string | undefined {
+	const parsed = permissionMetaSchema.safeParse(raw);
+	if (!parsed.success) return undefined;
+	const description =
+		parsed.data._meta.jetbrains.air.permission.description?.trim();
+	return description?.replace(/^Reason:\s*/, "") || undefined;
 }

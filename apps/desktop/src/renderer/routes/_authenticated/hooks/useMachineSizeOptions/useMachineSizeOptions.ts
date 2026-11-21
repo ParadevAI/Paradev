@@ -6,6 +6,7 @@ import {
 	machineSpec,
 	offeredMachineSizes,
 } from "@superset/shared/billing";
+import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import { useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
@@ -22,7 +23,7 @@ export function useMachineSizeOptions(): {
 	options: MachineSizeOption[];
 	defaultSize: MachineSize;
 } {
-	const { t } = useLingui();
+	const { i18n, t } = useLingui();
 	const { formatNumber } = useFormat();
 	const organizationId = useActiveOrganizationId();
 	const { data } = cloudTrpc.cloudWorkspace.machineSizes.useQuery(
@@ -31,13 +32,6 @@ export function useMachineSizeOptions(): {
 	);
 	return useMemo(() => {
 		const sizes = data?.sizes.map((size) => size.name) ?? FALLBACK_SIZES;
-		const names: Record<MachineSize, string> = {
-			small: t({ message: "Small", context: "machine size" }),
-			medium: t({ message: "Medium", context: "machine size" }),
-			large: t({ message: "Large", context: "machine size" }),
-			xlarge: t({ message: "X-Large", context: "machine size" }),
-			"2xlarge": t({ message: "2X-Large", context: "machine size" }),
-		};
 
 		return {
 			defaultSize: data?.defaultSize ?? defaultMachineSize(sizes),
@@ -47,10 +41,10 @@ export function useMachineSizeOptions(): {
 				const memory = formatNumber(memoryGb);
 				return {
 					size,
-					name: names[size],
+					name: i18n._(MACHINE_SIZE_NAMES[size]),
 					spec: t({ message: `${vcpuCount} vCPU · ${memory} GB` }),
 				};
 			}),
 		};
-	}, [data, t, formatNumber]);
+	}, [data, i18n, t, formatNumber]);
 }

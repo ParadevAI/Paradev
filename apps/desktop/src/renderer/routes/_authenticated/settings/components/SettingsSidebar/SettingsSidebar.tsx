@@ -1,15 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { COMPANY, FEATURE_FLAGS } from "@superset/shared/constants";
+import { COMPANY } from "@superset/shared/constants";
 import { Link } from "@tanstack/react-router";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import {
 	HiArrowLeft,
 	HiArrowTopRightOnSquare,
 	HiMagnifyingGlass,
 	HiXMark,
 } from "react-icons/hi2";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import { usePluginsSettingsVisible } from "renderer/hooks/usePluginsSettingsVisible";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AppMenuButton } from "renderer/routes/_authenticated/_dashboard/components/AppMenuButton";
 import { NavigationControls } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls";
@@ -23,6 +20,7 @@ import {
 	useSettingsSearchQuery,
 } from "renderer/stores/settings-state";
 import { COLLAPSED_WORKSPACE_SIDEBAR_WIDTH } from "renderer/stores/workspace-sidebar-state";
+import { useSettingsSectionVisibility } from "../../hooks/useSettingsSectionVisibility";
 import { getVisibleMatchCountBySection } from "../../utils/settings-search";
 import { GeneralSettings } from "./GeneralSettings";
 
@@ -31,23 +29,12 @@ export function SettingsSidebar() {
 	const searchQuery = useSettingsSearchQuery();
 	const setSearchQuery = useSetSettingsSearchQuery();
 	const originRoute = useSettingsOriginRoute();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
-	const mobileEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH) === true;
-	const cloudWorkspacesEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
-	const pluginsVisible = usePluginsSettingsVisible();
+	const visibility = useSettingsSectionVisibility();
 	const normalizedSearchQuery = searchQuery.trim();
 	const matchCounts = normalizedSearchQuery
-		? getVisibleMatchCountBySection(
-				normalizedSearchQuery,
-				isV2CloudEnabled,
-				cloudWorkspacesEnabled,
-				mobileEnabled,
-				pluginsVisible,
-			)
+		? getVisibleMatchCountBySection(normalizedSearchQuery, visibility)
 		: null;
 
 	return (

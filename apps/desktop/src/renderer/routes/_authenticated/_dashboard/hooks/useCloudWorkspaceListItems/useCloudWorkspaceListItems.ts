@@ -1,3 +1,4 @@
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { authClient } from "renderer/lib/auth-client";
@@ -32,8 +33,12 @@ export function useCloudWorkspaceListItems(workspaces: CloudWorkspaceRow[]) {
 		organizationId,
 	});
 	const { byWorkspace: pullRequestsById } = useCloudPullRequests({
-		active: workspaces.some((workspace) => workspace.status !== "deleted"),
-		archived: workspaces.some((workspace) => workspace.status === "deleted"),
+		active: workspaces.some(
+			(workspace) => !isArchivedCloudWorkspaceStatus(workspace.status),
+		),
+		archived: workspaces.some((workspace) =>
+			isArchivedCloudWorkspaceStatus(workspace.status),
+		),
 	});
 
 	const toItem = (workspace: CloudWorkspaceRow): CloudWorkspaceListItem => {

@@ -1,4 +1,3 @@
-import { getAgentModelSupport } from "@superset/shared/agent-models";
 import { useCallback, useEffect, useState } from "react";
 
 function readStoredMap(storageKey: string): Record<string, string> {
@@ -26,10 +25,7 @@ function readStoredModel(
 	if (!presetId) return null;
 	const stored = readStoredMap(storageKey)[presetId];
 	if (!stored) return null;
-	// Drop ids that fell out of the curated registry — "Default" beats a
-	// flag value the CLI no longer accepts.
-	const support = getAgentModelSupport(presetId);
-	return support?.models.some((model) => model.id === stored) ? stored : null;
+	return stored;
 }
 
 /**

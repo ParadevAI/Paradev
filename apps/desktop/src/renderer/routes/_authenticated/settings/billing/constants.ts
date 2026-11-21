@@ -1,8 +1,8 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { PLAN_TIERS, type PlanTier } from "@superset/shared/billing";
+import type { PlanTier } from "@superset/shared/billing";
 
-export { PLAN_TIERS, type PlanTier };
+export type { PlanTier };
 
 export interface Plan {
 	id: PlanTier;
