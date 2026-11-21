@@ -156,16 +156,26 @@ describe("chats a quit cut off", () => {
 		expect(resumed[0]).toMatchObject({ prompts: [queued], pausedPrompts: [] });
 	});
 
-	test("resumes that overlap continue the chat once", async () => {
+	test("resumes that overlap continue each chat once", async () => {
 		const { runtime, resumed } = fakeRuntime({
 			"chat-1": { closedAt: 0, title: "x" },
+			"chat-b": { closedAt: 0, title: "y" },
 		});
 		const chats = closedChats(runtime);
+		chats.add({ ...CHAT, sessionId: "chat-b", terminalId: "terminal-b" });
 
-		const counts = await Promise.all([chats.resume(), chats.resume()]);
+		const counts = await Promise.all([
+			chats.resume(),
+			chats.resume(),
+			chats.resume(),
+		]);
 
-		expect(counts).toEqual([1, 0]);
-		expect(resumed).toHaveLength(1);
+		expect(counts).toEqual([2, 2, 2]);
+		expect(resumed.map((input) => input.replacesSessionId)).toEqual([
+			"chat-1",
+			"chat-b",
+		]);
+		expect(await chats.resume()).toBe(0);
 	});
 
 	test("a resume that fails keeps the chat to try again", async () => {

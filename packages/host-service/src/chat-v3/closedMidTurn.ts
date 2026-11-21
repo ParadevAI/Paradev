@@ -19,7 +19,7 @@ export function createClosedMidTurn(options: {
 	onChange?: () => void;
 }) {
 	const chats = new Map<string, ClosedChat>();
-	const resuming = new Set<string>();
+	let resuming: Promise<number> | null = null;
 	const forget = (sessionId: string) => {
 		if (chats.delete(sessionId)) options.onChange?.();
 	};
@@ -76,6 +76,25 @@ export function createClosedMidTurn(options: {
 		await runtime.commands.closeSession({ sessionId: chat.sessionId });
 	};
 
+	const resumeAll = async (): Promise<number> => {
+		let resumed = 0;
+		for (const chat of [...chats.values()]) {
+			const paused = pausedIn(chat);
+			if (!paused) {
+				forget(chat.sessionId);
+				continue;
+			}
+			try {
+				await resumeOne(chat, paused);
+				forget(chat.sessionId);
+				resumed++;
+			} catch (error) {
+				console.warn("[chat-v3] could not resume a chat Paradev closed", error);
+			}
+		}
+		return resumed;
+	};
+
 	return {
 		add(chat: ClosedChat): void {
 			chats.set(chat.sessionId, chat);
@@ -104,30 +123,12 @@ export function createClosedMidTurn(options: {
 			return open;
 		},
 
-		async resume(): Promise<number> {
-			let resumed = 0;
-			for (const chat of [...chats.values()]) {
-				if (resuming.has(chat.sessionId)) continue;
-				const paused = pausedIn(chat);
-				if (!paused) {
-					forget(chat.sessionId);
-					continue;
-				}
-				resuming.add(chat.sessionId);
-				try {
-					await resumeOne(chat, paused);
-					forget(chat.sessionId);
-					resumed++;
-				} catch (error) {
-					console.warn(
-						"[chat-v3] could not resume a chat Paradev closed",
-						error,
-					);
-				} finally {
-					resuming.delete(chat.sessionId);
-				}
-			}
-			return resumed;
+		/** Calls that overlap share one pass, so no chat is resumed twice. */
+		resume(): Promise<number> {
+			resuming ??= resumeAll().finally(() => {
+				resuming = null;
+			});
+			return resuming;
 		},
 
 		keepPaused(): void {
