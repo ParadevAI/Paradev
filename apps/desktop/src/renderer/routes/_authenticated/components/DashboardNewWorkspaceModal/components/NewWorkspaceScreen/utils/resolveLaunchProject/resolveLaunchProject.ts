@@ -1,4 +1,4 @@
-import type { WorkspaceCreateProjectChoice } from "renderer/stores/v2-workspace-create-defaults";
+import type { WorkspaceCreateProjectChoice } from "renderer/stores/workspace-create-defaults";
 
 export interface LaunchProject {
 	id: string;

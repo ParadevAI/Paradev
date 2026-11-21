@@ -1,0 +1,2 @@
+DROP INDEX "cloud_workspace_boots_open_idx";--> statement-breakpoint
+CREATE INDEX "cloud_workspace_boots_open_or_locked_idx" ON "cloud_workspace_boots" USING btree ("started_at") WHERE ("cloud_workspace_boots"."stopped_at" is null or "cloud_workspace_boots"."finalized_through" is null or "cloud_workspace_boots"."finalized_through" < "cloud_workspace_boots"."stopped_at" or "cloud_workspace_boots"."lock_open");

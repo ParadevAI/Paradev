@@ -2,6 +2,11 @@
 	transition: opacity 300ms ease-out;
 }
 
+.cloud-glyph-asleep {
+	stroke-dasharray: 1.6 1.4;
+	opacity: 0.5;
+}
+
 .cloud-glyph-arc {
 	stroke-dasharray: 26 74;
 	animation:

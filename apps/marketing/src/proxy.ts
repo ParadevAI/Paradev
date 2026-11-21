@@ -76,7 +76,20 @@ function route(request: NextRequest) {
 	}
 
 	const url = request.nextUrl.clone();
-	url.pathname = `/en${pathname}`;
+	// Keep /land available as a profile handle. Only these English child URLs
+	// use the internal /en/en tree; direct /en URLs still canonicalize above.
+	const barePath = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+	const landingPage =
+		barePath === "/land/claude-code-parallel-sessions" ||
+		barePath === "/land/claude-code-worktrees" ||
+		barePath === "/land/codex-cli-worktrees";
+	if (landingPage && barePath !== pathname) {
+		// NextURL retains the inbound trailing-slash flag when serialized.
+		const target = new URL(request.url);
+		target.pathname = barePath;
+		return NextResponse.redirect(target, 308);
+	}
+	url.pathname = landingPage ? `/en/en${pathname}` : `/en${pathname}`;
 	return NextResponse.rewrite(url);
 }
 

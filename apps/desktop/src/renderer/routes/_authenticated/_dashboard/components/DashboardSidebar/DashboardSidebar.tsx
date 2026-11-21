@@ -9,9 +9,9 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HiOutlineCog6Tooth } from "react-icons/hi2";
 import {
 	SidebarCardSlot,
@@ -20,28 +20,19 @@ import {
 	useReleaseNotesCard,
 } from "renderer/components/SidebarCardSlot";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { useHotkeyDisplay } from "renderer/hotkeys";
-import { authClient } from "renderer/lib/auth-client";
+import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
-import {
-	EMPTY_CLOUD_SIDEBAR,
-	useCloudSidebarStore,
-} from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
-import { isInCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useNotificationStore } from "renderer/stores/notifications";
 import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
-import {
-	type ActiveWorkspaceSwitcherOption,
-	DashboardSidebarActiveWorkspaceSwitcher,
-} from "./components/DashboardSidebarActiveWorkspaceSwitcher";
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
 import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarChannelsSection";
@@ -57,7 +48,7 @@ import { DashboardSidebarSessionsSection } from "./components/DashboardSidebarSe
 import { DashboardSidebarShellHeader } from "./components/DashboardSidebarShellHeader";
 import { DashboardSidebarWorkspacesHeader } from "./components/DashboardSidebarWorkspacesHeader";
 import { useGettingStartedCard } from "./components/GettingStartedCard";
-import { useV2SetupScriptCard } from "./components/V2SetupScriptCard";
+import { useSetupScriptCard } from "./components/SetupScriptCard";
 import {
 	getBlockedDragProps,
 	useBlockedDragNotice,
@@ -200,9 +191,12 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	const matchRoute = useMatchRoute();
 	const settingsHotkey = useHotkeyDisplay("OPEN_SETTINGS").text;
 	const isSettingsOpen = !!matchRoute({ to: "/settings", fuzzy: true });
+	const footerRef = useRef<HTMLDivElement>(null);
 	const { activeHostUrl } = useLocalHostService();
-	const v2RouteMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
-	const activeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
+	const workspaceRouteMatch = matchRoute({ to: "/workspace/$workspaceId" });
+	const activeWorkspaceId = workspaceRouteMatch
+		? workspaceRouteMatch.workspaceId
+		: null;
 	const isParadevShell = useParadevShell();
 	const isChatSection = useIsChatSection();
 	const workspacesListCollapsed = useSidebarSectionsCollapseStore(
@@ -212,7 +206,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		preferences,
 		setSidebarProjectSortMode,
 		setSidebarProjectHostFilter,
-	} = useV2UserPreferences();
+	} = useUserPreferences();
 	const sortMode = preferences.sidebarProjectSortMode;
 	// The icon rail has no control for the filter, so it rests there.
 	const hostFilter =
@@ -231,7 +225,13 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		groups.map((p) => p.id),
 	);
 	useEffect(() => {
-		setProjectOrder(groups.map((p) => p.id));
+		setProjectOrder((current) => {
+			const next = groups.map((p) => p.id);
+			return next.length === current.length &&
+				next.every((id, index) => id === current[index])
+				? current
+				: next;
+		});
 	}, [groups]);
 
 	const orderedGroups = useMemo(() => {
@@ -355,14 +355,14 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	// don't churn per keystroke.
 	const { workspaces: cloudWorkspaces, isFresh: isCloudListFresh } =
 		useCloudWorkspaces();
-	const pruneWorkspaceSeen = useV2NotificationStore(
+	const pruneWorkspaceSeen = useNotificationStore(
 		(state) => state.pruneWorkspaceSeen,
 	);
 	useEffect(() => {
 		if (!cloudWorkspaces || !isCloudListFresh) return;
 		const live = new Set(cloudWorkspaces.map((cloud) => cloud.id));
 		for (const id of Object.keys(
-			useV2NotificationStore.getState().workspaceSeenAt,
+			useNotificationStore.getState().workspaceSeenAt,
 		)) {
 			if (!live.has(id)) pruneWorkspaceSeen(id);
 		}
@@ -392,60 +392,12 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		return [...byId.values()];
 	}, [pinnedWorkspaces, sessionWorkspaces, orderedGroups, cloudWorkspaces]);
 
-	const { data: session } = authClient.useSession();
-	const userId = session?.user?.id ?? null;
-	const organizationId = useActiveOrganizationId();
-	const cloudSidebarEntries = useCloudSidebarStore((state) =>
-		organizationId
-			? (state.byOrganization[organizationId] ?? EMPTY_CLOUD_SIDEBAR).entries
-			: EMPTY_CLOUD_SIDEBAR.entries,
-	);
-	const switcherWorkspaces = useMemo<ActiveWorkspaceSwitcherOption[]>(() => {
-		const byId = new Map<string, ActiveWorkspaceSwitcherOption>();
-		for (const workspace of pinnedWorkspaces) {
-			byId.set(workspace.id, {
-				id: workspace.id,
-				name: workspace.name,
-				detail: workspace.projectName,
-			});
-		}
-		for (const workspace of sessionWorkspaces) {
-			byId.set(workspace.id, {
-				id: workspace.id,
-				name: workspace.name,
-				detail: null,
-			});
-		}
-		for (const project of sortedGroups) {
-			for (const workspace of getProjectChildrenWorkspaces(project.children)) {
-				byId.set(workspace.id, {
-					id: workspace.id,
-					name: workspace.name,
-					detail: project.name,
-				});
-			}
-		}
-		for (const cloud of cloudWorkspaces ?? []) {
-			if (!isInCloudSidebar(cloud, cloudSidebarEntries[cloud.id], userId))
-				continue;
-			byId.set(cloud.id, { id: cloud.id, name: cloud.name, detail: null });
-		}
-		return [...byId.values()];
-	}, [
-		pinnedWorkspaces,
-		sessionWorkspaces,
-		sortedGroups,
-		cloudWorkspaces,
-		userId,
-		cloudSidebarEntries,
-	]);
-
-	const activeV2Project = useMemo(() => {
-		if (!activeV2WorkspaceId) return null;
+	const activeProject = useMemo(() => {
+		if (!activeWorkspaceId) return null;
 		// A pinned active workspace renders outside its project group, so
 		// resolve its project by id instead.
 		const pinned = pinnedWorkspaces.find(
-			(workspace) => workspace.id === activeV2WorkspaceId,
+			(workspace) => workspace.id === activeWorkspaceId,
 		);
 		if (pinned) {
 			return groups.find((project) => project.id === pinned.projectId) ?? null;
@@ -454,27 +406,27 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 			for (const child of project.children) {
 				if (
 					child.type === "workspace" &&
-					child.workspace.id === activeV2WorkspaceId
+					child.workspace.id === activeWorkspaceId
 				) {
 					return project;
 				}
 				if (child.type === "section") {
 					for (const ws of child.section.workspaces) {
-						if (ws.id === activeV2WorkspaceId) return project;
+						if (ws.id === activeWorkspaceId) return project;
 					}
 				}
 			}
 		}
 		return null;
-	}, [groups, pinnedWorkspaces, activeV2WorkspaceId]);
+	}, [groups, pinnedWorkspaces, activeWorkspaceId]);
 
 	// Ordered by priority for the single card slot below — blocking first,
 	// then actionable, then nags.
 	const paymentFailedCard = usePaymentFailedCard({ surface: "v2" });
-	const setupScriptCard = useV2SetupScriptCard({
+	const setupScriptCard = useSetupScriptCard({
 		hostUrl: activeHostUrl,
-		projectId: activeV2Project?.id ?? null,
-		projectName: activeV2Project?.name ?? null,
+		projectId: activeProject?.id ?? null,
+		projectName: activeProject?.name ?? null,
 	});
 	const gettingStartedCard = useGettingStartedCard();
 	const releaseNotesCard = useReleaseNotesCard();
@@ -493,13 +445,11 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 
 	const workspaceList = (
 		<>
-			{(isCollapsed || !workspacesListCollapsed) && (
-				<DashboardSidebarPinnedSection
-					pinnedWorkspaces={displayedPinnedWorkspaces}
-					isCollapsed={isCollapsed}
-					onWorkspaceHover={refreshWorkspacePullRequest}
-				/>
-			)}
+			<DashboardSidebarPinnedSection
+				pinnedWorkspaces={displayedPinnedWorkspaces}
+				isCollapsed={isCollapsed}
+				onWorkspaceHover={refreshWorkspacePullRequest}
+			/>
 			<DashboardSidebarSessionsSection
 				sessionWorkspaces={displayedSessionWorkspaces}
 				isCollapsed={isCollapsed}
@@ -577,19 +527,15 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	return (
 		<DashboardSidebarSelectionProvider
 			availableWorkspaceIds={selectableWorkspaceIds}
-			activeWorkspaceId={activeV2WorkspaceId}
+			activeWorkspaceId={activeWorkspaceId}
 		>
 			<DashboardSidebarBulkDeleteMount />
 			<DashboardSidebarSectionRenameProvider>
 				<DashboardSidebarHoverProvider>
 					<DashboardSidebarWorkspaceStatusProvider
 						workspaces={statusWorkspaces}
-						activeWorkspaceId={activeV2WorkspaceId}
+						activeWorkspaceId={activeWorkspaceId}
 					>
-						<DashboardSidebarActiveWorkspaceSwitcher
-							workspaces={switcherWorkspaces}
-							activeWorkspaceId={activeV2WorkspaceId}
-						/>
 						{/* Port data comes from the single DashboardSidebarPortsProvider in the
 						    dashboard layout, which wraps this sidebar. */}
 						<DashboardSidebarHoverCardOverlay>
@@ -652,6 +598,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 										</OverflowFadeContainer>
 										{cardSlot}
 										<div
+											ref={footerRef}
 											className={cn(
 												isCollapsed
 													? "flex flex-col items-center gap-2 py-2"
@@ -667,6 +614,11 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 											)}
 
 											<UpdatesPill isCollapsed={isCollapsed} />
+											<ParadevAnywhereButton
+												variant="footer"
+												side={isCollapsed ? "right" : "top"}
+												anchorRef={isCollapsed ? undefined : footerRef}
+											/>
 											<Tooltip delayDuration={300}>
 												<TooltipTrigger asChild>
 													<button

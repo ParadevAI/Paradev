@@ -6,6 +6,7 @@ import {
 	getBundledSkillIcons,
 	getBundledSkillPath,
 	getDisabledSkills,
+	installedPluginIcons,
 	installOrganizationPlugin,
 	installPlugin,
 	organizationPluginVersions,
@@ -122,6 +123,8 @@ export const createPluginsRouter = () => {
 				}
 				return setPluginEnabled(input.name, input.enabled);
 			}),
+
+		installedIcons: publicProcedure.query(() => installedPluginIcons()),
 
 		organizationVersions: publicProcedure.query(() =>
 			organizationPluginVersions(),

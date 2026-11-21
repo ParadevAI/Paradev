@@ -50,6 +50,12 @@ For deterministic per-workspace port ranges, reserve a range in a shared file (f
 
 The desktop app forwards detected ports from the selected remote workspace to your machine. If a local port is busy, choose **Use another port** from its row. See [remote port forwarding](/remote-access#ports-on-a-remote-host) for requirements and behavior, or forward a port yourself below.
 
+### Cloud workspace ports
+
+Paradev forwards nothing from a [cloud workspace](/cloud-workspaces) until you choose to. Click **Forward** on a port in the **Share** popover (under **Ports on this computer**), the sidebar ports card, or the top-bar ports dropdown. If the local port is busy, Paradev uses the next free one and the row says which port it chose. A forward lasts until you click **Stop**, sign out, or quit.
+
+Inside a cloud workspace, `superset ports list` shows who forwarded which port. See the [CLI reference](/cli/cli-reference#ports).
+
 ### Forward a port yourself
 
 **SSH**: forward the port, then open `http://localhost:3000` locally:

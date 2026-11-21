@@ -366,7 +366,7 @@ export async function handleAuthCallback(params: {
 	return { success: true };
 }
 
-export type ParsedAuthDeepLink =
+type ParsedAuthDeepLink =
 	| { type: "not-auth" }
 	| { type: "malformed" }
 	| {

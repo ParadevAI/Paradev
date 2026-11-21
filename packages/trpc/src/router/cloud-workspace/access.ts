@@ -63,11 +63,11 @@ export const visibleTo = (userId: string) =>
 export const isListed = (archived: boolean) =>
 	archived
 		? and(
-				eq(cloudWorkspaces.status, "deleted"),
+				eq(cloudWorkspaces.status, "archived"),
 				// Rows deleted before archiving existed have no deletedAt and no box.
 				isNotNull(cloudWorkspaces.deletedAt),
 			)
-		: ne(cloudWorkspaces.status, "deleted");
+		: ne(cloudWorkspaces.status, "archived");
 
 export const notFound = () =>
 	userError({

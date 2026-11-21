@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
+import { logControl } from "../../lib/control-log";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
 	deleteSandbox,
@@ -12,6 +13,7 @@ import {
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
+import { recordBootEnd, recordBoxStopped } from "./sandbox-sleep";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -33,7 +35,7 @@ function isStillArchived(
 ): row is CloudWorkspaceRow {
 	return (
 		row !== undefined &&
-		row.status === "deleted" &&
+		row.status === "archived" &&
 		row.deletedAt?.toISOString() === input.archivedAt &&
 		row.provider === "vercel"
 	);
@@ -87,16 +89,35 @@ export async function reapArchivedCloudWorkspace(
 		return "skipped";
 	}
 	if (input.stage === "delete") {
+		await recordBootEnd(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+			{ sessionId: null, reason: "archived" },
+		);
 		await settleWorkspaceNow(row.id).catch((error) =>
 			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
 		);
 		await deleteSandbox(row.providerSandboxId);
 		await reapWorkspaceFiles(row.id);
+		logControl("archive.deleted", {
+			cloudWorkspaceId: row.id,
+			organizationId: row.organizationId,
+		});
 		return "reaped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
-	await stopSandbox(row.providerSandboxId);
+	const stopped = await stopSandbox(row.providerSandboxId);
+	await recordBoxStopped(
+		{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+		{
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+			reason: "archived",
+		},
+	);
 	await queueSettleWorkspace(row.id);
+	logControl("archive.stopped", {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	});
 	return "stopped";
 }
 
@@ -134,7 +155,11 @@ function queueReapStage(
  */
 export async function queueReap(
 	input: Omit<ReapArchivedCloudWorkspaceInput, "stage">,
-	providerSandboxId: string,
+	box: {
+		organizationId: string;
+		providerSandboxId: string;
+		sandboxSessionId: string | null;
+	},
 ): Promise<void> {
 	await queueReapStage({ ...input, stage: "delete" }, ARCHIVE_GRACE_SECONDS);
 	await queueReapStage(
@@ -145,6 +170,16 @@ export async function queueReap(
 			`[cloud-workspace] could not queue the stop for ${input.cloudWorkspaceId}`,
 			error,
 		);
-		await stopSandbox(providerSandboxId);
+		const stopped = await stopSandbox(box.providerSandboxId);
+		await recordBoxStopped(
+			{
+				cloudWorkspaceId: input.cloudWorkspaceId,
+				organizationId: box.organizationId,
+			},
+			{
+				sessionId: stopped.sessionId ?? box.sandboxSessionId,
+				reason: "archived",
+			},
+		);
 	});
 }

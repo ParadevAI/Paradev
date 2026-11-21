@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { env } from "@/env";
 import { HowItWorks } from "./components/HowItWorks";
 import { PagesDemoVideo } from "./components/PagesDemoVideo";
 import { PagesHeroVideo } from "./components/PagesHeroVideo";
@@ -47,7 +48,11 @@ export default async function PagesPage() {
 								feedback.
 							</Trans>
 						</p>
-						<ProductHeroActions source="pages" docsPath="/pages" />
+						<ProductHeroActions
+							source="pages"
+							docsPath="/pages"
+							signInUrl={`${env.NEXT_PUBLIC_WEB_URL}/sign-in`}
+						/>
 					</div>
 					<PagesHeroVideo />
 				</section>

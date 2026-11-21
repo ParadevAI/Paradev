@@ -1,6 +1,7 @@
 import {
 	gbHourPack,
 	type MachineSize,
+	overagePerGbHour,
 	PLAN_METADATA,
 	type PlanTier,
 } from "@superset/shared/billing";
@@ -37,6 +38,8 @@ export interface OrganizationBilling {
 	scheduledAt: string | null;
 	periodStart: string | null;
 	periodEnd: string | null;
+	/** Autumn anchors the monthly GB-minute reset on it. */
+	startedAt: string | null;
 	billingInterval: string | null;
 	lapsed: boolean;
 	paymentState: PaymentState;
@@ -59,6 +62,19 @@ function planTierOf(
 	return typeof family === "string" && family ? family : tier;
 }
 
+/** The paid plan's seat licenses, else the seats feature of a plan from before licenses. */
+function seatCount(
+	customer: Pick<AutumnCustomer, "balances" | "licenses">,
+	planId: string | null,
+): number | null {
+	const licenses = (customer.licenses ?? []).filter(
+		(license) => license.parentPlanId === planId,
+	);
+	return licenses.length
+		? licenses.reduce((total, license) => total + license.granted, 0)
+		: (customer.balances[SEATS_FEATURE_ID]?.granted ?? null);
+}
+
 function iso(ms: number | null | undefined): string | null {
 	return ms ? new Date(ms).toISOString() : null;
 }
@@ -66,7 +82,12 @@ function iso(ms: number | null | undefined): string | null {
 export function billingFromCustomer(
 	customer: Pick<
 		AutumnCustomer,
-		"flags" | "subscriptions" | "invoices" | "balances" | "billingControls"
+		| "flags"
+		| "subscriptions"
+		| "invoices"
+		| "balances"
+		| "billingControls"
+		| "licenses"
 	>,
 	now: number,
 	seatInterval: string | null = null,
@@ -111,6 +132,7 @@ export function billingFromCustomer(
 						currency: unpaidInvoice?.currency ?? null,
 					}
 				: { kind: "ok" };
+	const pack = paid?.plan ? gbHourPack(paid.plan) : null;
 	return {
 		tier,
 		autumnPlanId: paidPlanId,
@@ -120,6 +142,7 @@ export function billingFromCustomer(
 		scheduledAt:
 			next && next.planId !== paidPlanId ? iso(next.startedAt) : null,
 		periodStart: iso(paid?.currentPeriodStart),
+		startedAt: iso(paid?.startedAt),
 		periodEnd: iso(
 			seatRenewal({
 				startedAt: paid?.startedAt,
@@ -138,7 +161,10 @@ export function billingFromCustomer(
 		cloudUsage: cloudUsageFromBalances(
 			customer.balances,
 			customer.billingControls,
-			paid?.plan ? gbHourPack(paid.plan) : null,
+			pack,
+			(paid?.plan && overagePerGbHour(paid.plan)) ??
+				(pack && (pack.price * 60) / pack.gbMinutes),
+			seatCount(customer, paidPlanId),
 		),
 		planTier: planTierOf(paid?.plan?.metadata, tier),
 		gatedMachineSizes: gatedMachineSizesFromFlags(customer.flags),

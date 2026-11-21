@@ -87,6 +87,27 @@ control socket open to make it online, reads its presence, and deletes it throug
 refuses to run against a non-local API. While online it receives the app's `stream:dial` tickets and
 answers none, so lists behind that host keep loading.
 
+### A host that serves workspaces
+
+The stand-in host answers no requests. For screens that need real projects and workspaces, run
+the CLI bundle as an isolated host on this worktree's relay:
+
+- Build it: `cd packages/cli && bun run build:dist -- --target=darwin-arm64`.
+- Sign in the dev account (`POST /api/auth/sign-in/email`) and keep `body.token`.
+- Write a wrapper that runs `dist/superset-darwin-arm64/bin/superset` under `env -i` with
+  `HOME=<scratch>/fakehome`, `SUPERSET_HOME_DIR=<scratch>/home`, `SUPERSET_API_URL`, `RELAY_URL`,
+  `SUPERSET_ORGANIZATION_ID=<dev org>` and `SUPERSET_API_KEY=<token>`. The fake HOME keeps the
+  host's agent setup out of your real `~/.claude` and skills.
+- Run `<wrapper> start` in a Paradev terminal. Seed with `<wrapper> projects create --local
+  --import <repo>` and `<wrapper> workspaces create --local ... --tag ...`.
+  `scripts/e2e/tag-folders.sh` is a working example.
+- The host id comes from the machine, not the home directory, so every copy registers as the same
+  host and the newest one takes the relay. Before starting another, stop the old ones by PID:
+  `ps -axo pid=,command= | grep superset-darwin-arm64`. The home directory is only in their
+  environment, so `pkill -f <home>` matches nothing.
+- Workspace rows sit inside a native `Link.Menu` and are not in the tree Maestro reads. Assert
+  on project and folder headers, and take screenshots for the rows.
+
 ### Evidence
 
 ```bash

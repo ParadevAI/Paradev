@@ -57,6 +57,31 @@ describe("matchModelRate", () => {
 		});
 	});
 
+	test("prices GPT-6.2 Astra and Sol, with long-context rates above 272k", () => {
+		expect(matchModelRate("codex", "gpt-6.2-astra")).toMatchObject({
+			inputPerM: 8,
+			outputPerM: 40,
+			cacheReadPerM: 0.4,
+			approximate: false,
+		});
+		expect(matchModelRate("codex", "gpt-6.2-astra", 272_001)).toMatchObject({
+			inputPerM: 16,
+			outputPerM: 60,
+			cacheReadPerM: 0.8,
+		});
+		expect(matchModelRate("codex", "gpt-6.2-sol")).toMatchObject({
+			inputPerM: 2,
+			outputPerM: 10,
+			cacheReadPerM: 0.1,
+			approximate: false,
+		});
+		expect(matchModelRate("codex", "gpt-6.2-sol", 272_001)).toMatchObject({
+			inputPerM: 4,
+			outputPerM: 15,
+			cacheReadPerM: 0.2,
+		});
+	});
+
 	test("prices GPT-6.1 Terra at its own rate, not the cheapest fallback", () => {
 		expect(matchModelRate("codex", "gpt-6.1-terra")).toMatchObject({
 			inputPerM: 1,
@@ -117,6 +142,17 @@ describe("matchModelRate", () => {
 				output: 1_000_000,
 			}),
 		).toBeCloseTo(24.2);
+	});
+
+	test("prices Fable 5.2 and Mythos 5.2 at their own rates, not Fable 5.1's", () => {
+		for (const model of ["claude-fable-5-2", "claude-mythos-5-2"]) {
+			expect(matchModelRate("claude", model)).toMatchObject({
+				inputPerM: 8,
+				outputPerM: 40,
+				cacheReadPerM: 0.2,
+				approximate: false,
+			});
+		}
 	});
 
 	test("prices Fable 5.1 and Mythos 5.1 cache reads at their own rate, not the usual 0.1x", () => {

@@ -31,7 +31,10 @@ export function offscreenDocumentUrl(
 	return url.href;
 }
 
-export function serveOffscreenDocuments(session: Session): void {
+/** Serves `chrome.offscreen`, and answers which page is an extension's document. */
+export function serveOffscreenDocuments(
+	session: Session,
+): (extensionId: string) => Electron.WebContents | undefined {
 	const documents = new Map<string, Electron.WebContents>();
 	const served = new WeakSet<Electron.ServiceWorkerMain>();
 
@@ -103,4 +106,6 @@ export function serveOffscreenDocuments(session: Session): void {
 			call(extensionId, method, params),
 		);
 	});
+
+	return (extensionId: string) => documents.get(extensionId);
 }

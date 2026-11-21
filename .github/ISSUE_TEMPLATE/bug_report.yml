@@ -8,7 +8,7 @@ body:
       label: Where did this happen?
       options:
         - Desktop app (macOS)
-        - Web app (app.superset.sh)
+        - Web app (app.paradev.com)
         - CLI
         - Building from source
         - Other

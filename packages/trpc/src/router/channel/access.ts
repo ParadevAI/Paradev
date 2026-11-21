@@ -10,6 +10,7 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import type { DevPrincipal, Principal } from "../../principal";
+import { isOrgAdmin } from "../utils/active-org";
 
 type OrgRole = string;
 
@@ -17,10 +18,6 @@ export interface ChannelAccess {
 	channel: SelectChannel;
 	membership: SelectChannelMember | null;
 	orgRole: OrgRole;
-}
-
-export function isOrgAdmin(orgRole: OrgRole): boolean {
-	return orgRole === "owner" || orgRole === "admin";
 }
 
 export function canRead(

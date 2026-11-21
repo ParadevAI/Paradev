@@ -98,6 +98,7 @@ const MERGEABILITY: PullRequestMergeability = {
 	requiresThreadResolution: false,
 	queue: null,
 	allowedMergeMethods: ["squash"],
+	defaultMergeMethod: "squash",
 };
 
 const CAN: PullRequestCapabilities = {

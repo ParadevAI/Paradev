@@ -122,6 +122,8 @@ export function handleResize(
 ): ServerMessage | undefined {
 	const session = ctx.store.get(msg.id);
 	if (!session) return errorFor(msg.id, `unknown session: ${msg.id}`, "ENOENT");
+	if (session.exited)
+		return errorFor(msg.id, `session exited: ${msg.id}`, "EEXITED");
 	try {
 		session.pty.resize(msg.cols, msg.rows);
 	} catch (err) {

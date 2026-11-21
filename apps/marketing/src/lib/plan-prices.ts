@@ -1,6 +1,5 @@
 import { formatCurrency, formatNumber } from "@superset/i18n/format";
 import {
-	advertisedGbMinutesPerSeat,
 	PLAN_PRICE_CURRENCY,
 	type PlanFamily,
 	seatPricePerMonth,
@@ -14,10 +13,8 @@ export function fillPlanPrices(text: string, catalog: PlanFamily[]): string {
 	return text.replace(PLAN_TOKEN, (_token, kind, familyId, yearly) => {
 		const family = catalog.find((candidate) => candidate.family === familyId);
 		if (kind === "gbHours") {
-			const gbMinutes = family && advertisedGbMinutesPerSeat(family);
-			return gbMinutes
-				? formatNumber(gbMinutes / 60, {}, "en")
-				: MISSING_PLAN_PRICE;
+			const gbHours = family?.advertisedGbHoursPerSeat;
+			return gbHours ? formatNumber(gbHours, {}, "en") : MISSING_PLAN_PRICE;
 		}
 		const price = family ? seatPricePerMonth(family, Boolean(yearly)) : 0;
 		return price

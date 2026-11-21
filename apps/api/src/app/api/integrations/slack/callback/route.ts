@@ -1,4 +1,5 @@
 import { WebClient } from "@slack/web-api";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import {
 	connectorMethod,
 	requireConnector,
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
 	if (callback instanceof Response) return callback;
 	const { organizationId, userId, params, exit, fail } = callback;
 
-	const redirectUri = `${env.NEXT_PUBLIC_API_URL}/api/integrations/slack/callback`;
+	const redirectUri = `${getBrowserApiUrl(env)}/api/integrations/slack/callback`;
 	const client = new WebClient();
 
 	try {

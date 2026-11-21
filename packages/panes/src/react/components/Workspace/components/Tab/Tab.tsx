@@ -13,7 +13,10 @@ import type {
 	Tab as TabType,
 } from "../../../../../types";
 import { useIsTabVisible } from "../../../../hooks/useIsTabVisible";
-import { usePaneAppearance } from "../../../../hooks/usePaneAppearance";
+import {
+	usePaneAppearance,
+	usePaneFlush,
+} from "../../../../hooks/usePaneAppearance";
 import {
 	PaneAsideTargetContext,
 	topRightPaneId,
@@ -70,6 +73,7 @@ function SplitView<TData>({
 }) {
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
 	const isCards = usePaneAppearance() === "cards";
+	const flush = usePaneFlush();
 	const activeHandlePointerRef = useRef<{
 		pointerId: number;
 		downAt: number;
@@ -138,11 +142,13 @@ function SplitView<TData>({
 				// The active pane draws a 2px border on either side of the 1px
 				// divider. Cover that full visual border with the sash hit area.
 				hitAreaSize="large"
-				// As cards, the gap between two panes is the sash.
+				// As cards, the gap between two panes is the sash; flush, a hairline is.
 				className={
-					isCards
-						? "w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
-						: undefined
+					!isCards
+						? undefined
+						: flush
+							? "w-px shrink-0 bg-border data-[panel-group-direction=vertical]:h-px data-[resize-handle-state=drag]:bg-foreground/40 data-[resize-handle-state=hover]:bg-foreground/30"
+							: "w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
 				}
 				style={{ zIndex: RESIZE_HANDLE_BASE_Z_INDEX - path.length }}
 				onPointerDownCapture={(event) => {
@@ -310,6 +316,7 @@ export function Tab<TData>({
 	onSplitResizeDragging,
 }: TabProps<TData>) {
 	const isCards = usePaneAppearance() === "cards";
+	const flush = usePaneFlush();
 	if (!tab.layout) {
 		return (
 			<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -325,7 +332,7 @@ export function Tab<TData>({
 			<div
 				className={cn(
 					"isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto",
-					isCards && "p-1.5",
+					isCards && !flush && "p-1.5",
 				)}
 			>
 				<LayoutNodeView
