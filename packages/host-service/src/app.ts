@@ -43,6 +43,7 @@ import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-ro
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
+import { startHostKeepAwake } from "./runtime/keep-awake";
 import { applyLegacyHomeMove } from "./runtime/legacy-home-paths";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
@@ -263,6 +264,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		);
 	}
 	const terminalAgentStore = new TerminalAgentStore(terminalAgentPersistence);
+	const keepAwake = startHostKeepAwake({
+		db,
+		store: terminalAgentStore,
+		eventBus,
+	});
 
 	const pageWatch = new PageWatchManager({
 		api: {
@@ -330,6 +336,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		api,
 	});
 	const runtime = {
+		keepAwake,
 		agentJobs,
 		filesystem,
 		pullRequests: pullRequestRuntime,
@@ -598,6 +605,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		keepAwake.stop();
 		stopChatSync?.();
 		agentJobs.stopAll();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);

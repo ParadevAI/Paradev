@@ -24,6 +24,7 @@ test("an older host without the update API stays readable but cannot offer in-ap
 		version: "1.26.0",
 		installSource: "unknown",
 		updatable: false,
+		keepAwakeSupported: false,
 	});
 });
 test("capability comes from the live host, even if the reported install source is CLI", async () => {
@@ -47,4 +48,26 @@ test("capability comes from the live host, even if the reported install source i
 	});
 	client.system.updateStatus.query = async () => ({ updatable: true }) as never;
 	expect((await readHostServiceInfo(client)).updatable).toBe(true);
+});
+
+test("keep-awake capability remains available when cloud host info fails", async () => {
+	const client = {
+		health: {
+			check: {
+				query: async () => ({
+					version: "2.0.6",
+					capabilities: { keepAwake: true },
+				}),
+			},
+		},
+		host: {
+			info: {
+				query: async () => {
+					throw new Error("offline");
+				},
+			},
+		},
+		system: { updateStatus: { query: async () => ({ updatable: false }) } },
+	} as unknown as Client;
+	expect((await readHostServiceInfo(client)).keepAwakeSupported).toBe(true);
 });

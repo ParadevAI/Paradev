@@ -1,0 +1,1 @@
+ALTER TABLE `host_settings` ADD `keep_awake_while_agents_work` integer DEFAULT false NOT NULL;
