@@ -13,6 +13,7 @@ export function localeUrl(lang: SupportedLocale, path: string): string {
 
 /** The MDX bodies and production-run essay currently exist only in English. */
 export function hasLocalizedContent(path: string): boolean {
+	if (path === "/compare/superset-vs-conductor") return true;
 	return !(
 		/^\/(blog|changelog|compare)\/[^/]+$/.test(path) ||
 		[

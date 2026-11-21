@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { Editor } from "@tiptap/core";
+import { useEditorState } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	HiOutlineBold,
@@ -65,13 +66,17 @@ function HeadingDropdown({ editor }: { editor: Editor }) {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, [open]);
 
-	const currentLevel = editor.isActive("heading", { level: 1 })
-		? 1
-		: editor.isActive("heading", { level: 2 })
-			? 2
-			: editor.isActive("heading", { level: 3 })
-				? 3
-				: 0;
+	const currentLevel = useEditorState({
+		editor,
+		selector: ({ editor }) =>
+			editor.isActive("heading", { level: 1 })
+				? 1
+				: editor.isActive("heading", { level: 2 })
+					? 2
+					: editor.isActive("heading", { level: 3 })
+						? 3
+						: 0,
+	});
 
 	const label =
 		currentLevel === 0 ? t({ message: "Text" }) : `H${currentLevel}`;
@@ -203,10 +208,16 @@ function ListDropdown({ editor }: { editor: Editor }) {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, [open]);
 
+	const active = useEditorState({
+		editor,
+		selector: ({ editor }) => ({
+			bulletList: editor.isActive("bulletList"),
+			orderedList: editor.isActive("orderedList"),
+			taskList: editor.isActive("taskList"),
+		}),
+	});
 	const isAnyListActive =
-		editor.isActive("bulletList") ||
-		editor.isActive("orderedList") ||
-		editor.isActive("taskList");
+		active.bulletList || active.orderedList || active.taskList;
 
 	const handleSelect = useCallback(
 		(type: "bullet" | "ordered" | "task", e: React.MouseEvent) => {
@@ -264,7 +275,7 @@ function ListDropdown({ editor }: { editor: Editor }) {
 					<button
 						type="button"
 						className={`flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm hover:bg-accent ${
-							editor.isActive("bulletList") ? "bg-accent/50" : ""
+							active.bulletList ? "bg-accent/50" : ""
 						}`}
 						onMouseDown={(e) => handleSelect("bullet", e)}
 					>
@@ -274,7 +285,7 @@ function ListDropdown({ editor }: { editor: Editor }) {
 					<button
 						type="button"
 						className={`flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm hover:bg-accent ${
-							editor.isActive("orderedList") ? "bg-accent/50" : ""
+							active.orderedList ? "bg-accent/50" : ""
 						}`}
 						onMouseDown={(e) => handleSelect("ordered", e)}
 					>
@@ -284,7 +295,7 @@ function ListDropdown({ editor }: { editor: Editor }) {
 					<button
 						type="button"
 						className={`flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm hover:bg-accent ${
-							editor.isActive("taskList") ? "bg-accent/50" : ""
+							active.taskList ? "bg-accent/50" : ""
 						}`}
 						onMouseDown={(e) => handleSelect("task", e)}
 					>
@@ -303,6 +314,19 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 	const [showLinkInput, setShowLinkInput] = useState(false);
 	const [linkUrl, setLinkUrl] = useState("");
 	const linkInputRef = useRef<HTMLInputElement>(null);
+	const active = useEditorState({
+		editor,
+		selector: ({ editor }) => ({
+			bold: editor.isActive("bold"),
+			italic: editor.isActive("italic"),
+			underline: editor.isActive("underline"),
+			strike: editor.isActive("strike"),
+			code: editor.isActive("code"),
+			link: editor.isActive("link"),
+			blockquote: editor.isActive("blockquote"),
+			codeBlock: editor.isActive("codeBlock"),
+		}),
+	});
 
 	useEffect(() => {
 		if (showLinkInput) {
@@ -363,7 +387,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Bold",
 				})}
-				isActive={editor.isActive("bold")}
+				isActive={active.bold}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleBold().run();
@@ -376,7 +400,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Italic",
 				})}
-				isActive={editor.isActive("italic")}
+				isActive={active.italic}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleItalic().run();
@@ -389,7 +413,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Underline",
 				})}
-				isActive={editor.isActive("underline")}
+				isActive={active.underline}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleUnderline().run();
@@ -402,7 +426,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Strikethrough",
 				})}
-				isActive={editor.isActive("strike")}
+				isActive={active.strike}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleStrike().run();
@@ -415,7 +439,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Inline code",
 				})}
-				isActive={editor.isActive("code")}
+				isActive={active.code}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleCode().run();
@@ -430,7 +454,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Link",
 				})}
-				isActive={editor.isActive("link")}
+				isActive={active.link}
 				onMouseDown={(e) => {
 					prevent(e);
 					if (editor.isActive("link")) {
@@ -448,7 +472,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Blockquote",
 				})}
-				isActive={editor.isActive("blockquote")}
+				isActive={active.blockquote}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleBlockquote().run();
@@ -461,7 +485,7 @@ export function BubbleMenuToolbar({ editor }: BubbleMenuToolbarProps) {
 				title={t({
 					message: "Code block",
 				})}
-				isActive={editor.isActive("codeBlock")}
+				isActive={active.codeBlock}
 				onMouseDown={(e) => {
 					prevent(e);
 					editor.chain().focus().toggleCodeBlock().run();

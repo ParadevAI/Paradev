@@ -4,6 +4,7 @@ import type {
 	Delta,
 	DiscoverSessionsResult,
 	Item,
+	SessionConfigOption,
 	SessionState,
 	Turn,
 	UserContent,
@@ -42,6 +43,7 @@ export type DiscoverNativeSessionsInput = {
 };
 
 export interface HarnessAdapter {
+	discoverModels?(cwd: string): Promise<SessionConfigOption[]>;
 	start(options: HarnessStartOptions): AsyncIterable<AdapterEvent>;
 	prompt(content: UserContent[]): void;
 	cancelTurn(): void;

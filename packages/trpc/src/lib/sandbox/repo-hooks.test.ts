@@ -15,7 +15,28 @@ describe("repoHooksFromToml", () => {
 	});
 
 	test("a file without previews publishes nothing extra", () => {
-		expect(repoHooksFromToml('[setup]\nrun = "x"\n')).toEqual({});
+		expect(repoHooksFromToml('[archive]\nrun = "x"\n')).toEqual({});
+	});
+
+	test("reads [install] with its cloud override", () => {
+		expect(
+			repoHooksFromToml(
+				'[install]\nrun = "bun install"\ncwd = "apps/web"\n[install.cloud]\nrun = ["bun install", "bunx playwright install chromium"]\n',
+			),
+		).toEqual({
+			install: {
+				commands: ["bun install", "bunx playwright install chromium"],
+				cwd: "apps/web",
+			},
+		});
+	});
+
+	test("an [install] the cloud turns off is no install", () => {
+		expect(
+			repoHooksFromToml(
+				'[install]\nrun = "bun install"\n[install.cloud]\nrun = []\n',
+			),
+		).toEqual({});
 	});
 
 	test("an invalid file is treated as missing", () => {

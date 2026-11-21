@@ -53,7 +53,7 @@ export function useCloudWorkspaceActions() {
 				to === "archived"
 					? {
 							...row,
-							status: "deleted",
+							status: "archived",
 							deletedAt: new Date(),
 							sandboxUrl: null,
 						}

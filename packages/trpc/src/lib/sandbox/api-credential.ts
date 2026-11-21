@@ -11,7 +11,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, members } from "@superset/db/schema";
-import { sandboxApiCredential } from "@superset/shared/sandbox-gate";
+import { sandboxApiCredential } from "@superset/shared/sandbox/gate";
 import { and, eq, isNull } from "drizzle-orm";
 import { env } from "../../env";
 
@@ -29,6 +29,10 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"automation.getPrompt",
 	"automation.list",
 	"automation.reportCloudLaunch",
+	"automation.setEnabled",
+	"automation.setGroup",
+	"automation.setPrompt",
+	"automation.update",
 	"chatHistory.completeTranscriptUpload",
 	"chatHistory.createTranscriptUpload",
 	"chatHistory.push",

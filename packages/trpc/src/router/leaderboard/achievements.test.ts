@@ -11,6 +11,12 @@ import {
 	totalAwardableRows,
 } from "./achievements";
 
+function bySlug(slug: string) {
+	const achievement = CATALOG_BY_SLUG[slug];
+	if (!achievement) throw new Error(`no achievement ${slug}`);
+	return achievement;
+}
+
 describe("catalog shape", () => {
 	test("every slug is unique and indexed", () => {
 		const slugs = CATALOG.map((entry) => entry.slug);
@@ -65,8 +71,8 @@ describe("badge art", () => {
 });
 
 describe("earnedTier", () => {
-	const shipIt = CATALOG_BY_SLUG["ship-it"];
-	const efficient = CATALOG_BY_SLUG.efficient;
+	const shipIt = bySlug("ship-it");
+	const efficient = bySlug("efficient");
 
 	test("awards nothing below the first threshold", () => {
 		expect(earnedTier(shipIt, 0)).toBe(0);
@@ -91,7 +97,7 @@ describe("earnedTier", () => {
 	});
 
 	test("awards nothing for single-award families", () => {
-		expect(earnedTier(CATALOG_BY_SLUG["run-01"], 1)).toBe(0);
+		expect(earnedTier(bySlug("run-01"), 1)).toBe(0);
 	});
 });
 
@@ -133,11 +139,11 @@ describe("totalAwardableRows", () => {
 
 describe("isRetired", () => {
 	test("is false while retiredAt is null", () => {
-		expect(isRetired(CATALOG_BY_SLUG["day-one"], "2030-01-01")).toBe(false);
+		expect(isRetired(bySlug("day-one"), "2030-01-01")).toBe(false);
 	});
 
 	test("compares dates when set", () => {
-		const retired = { ...CATALOG_BY_SLUG["day-one"], retiredAt: "2026-09-30" };
+		const retired = { ...bySlug("day-one"), retiredAt: "2026-09-30" };
 		expect(isRetired(retired, "2026-09-29")).toBe(false);
 		expect(isRetired(retired, "2026-10-01")).toBe(true);
 	});

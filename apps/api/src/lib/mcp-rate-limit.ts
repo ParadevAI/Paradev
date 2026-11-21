@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import { sandboxCredentialWorkspaceId } from "@superset/trpc/lib/sandbox";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";

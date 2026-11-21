@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { cn } from "@superset/ui/utils";
 import { memo, useDeferredValue, useMemo, useState } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { ChangedFileFolderList } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileFolderList";
 import { ChangedFileRow } from "renderer/routes/_authenticated/_dashboard/components/ChangedFileRow";
 import { ChangesListHeader } from "renderer/routes/_authenticated/_dashboard/components/ChangesListHeader";
@@ -30,7 +30,7 @@ export const PullRequestFileList = memo(function PullRequestFileList({
 	onSelectFile,
 	startCollapsed,
 }: PullRequestFileListProps) {
-	const { preferences, setChangesViewMode } = useV2UserPreferences();
+	const { preferences, setChangesViewMode } = useUserPreferences();
 	const viewMode = preferences.changesViewMode;
 	const { foldSignal, collapsed, toggleFold } = useFoldSignal(startCollapsed);
 	const [query, setQuery] = useState("");

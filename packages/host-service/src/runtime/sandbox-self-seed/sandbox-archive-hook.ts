@@ -6,6 +6,7 @@ import { getManagedEnv } from "../sandbox-managed-env/sandbox-managed-env.ts";
 import { chainPhases, loadProjectConfig } from "../setup/config";
 import type { SandboxIdentity } from "./sandbox-self-seed";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
+import { hookOutcomeLine } from "./utils/hookOutcomeLine";
 
 /** The same limit as a local archive, so `[archive]` has one documented cap. */
 export const ARCHIVE_HOOK_TIMEOUT_MS = TEARDOWN_TIMEOUT_MS;
@@ -96,7 +97,7 @@ export async function runSandboxArchiveHook(
 			});
 		});
 		child.on("close", (code) => {
-			console.log(`[sandbox] archive hook exited ${code}: ${command}`);
+			console.log(hookOutcomeLine("archive", `exited ${code}`, command));
 			finish(
 				code === 0 && !timedOut
 					? { status: "ok", outputTail: output }

@@ -2,7 +2,7 @@ import {
 	DEFAULT_SANDBOX_REGION,
 	nearestSandboxRegion,
 	type SandboxRegionId,
-} from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/regions";
 
 /**
  * The sandbox region nearest the caller, from the geo headers Vercel sets on a

@@ -4,7 +4,7 @@ import type { RequestOptions } from "../internal/request-options";
 
 /**
  * Terminals are PTY sessions inside a cloud workspace's sandbox. The
- * workspace must be `ready` (see `workspaces.retrieve`).
+ * workspace must be `awake` or `asleep` (see `workspaces.retrieve`).
  */
 export class Terminals extends APIResource {
 	/**

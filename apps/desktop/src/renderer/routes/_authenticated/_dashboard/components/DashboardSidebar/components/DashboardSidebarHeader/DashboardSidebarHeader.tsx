@@ -13,12 +13,11 @@ import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import {
 	LuClock,
 	LuFileText,
-	LuGauge,
-	LuLayers,
 	LuPlus,
 	LuPuzzle,
 	LuSearch,
 } from "react-icons/lu";
+import { TbStack2 } from "react-icons/tb";
 import { VscFolderOpened, VscNewFolder } from "react-icons/vsc";
 import { ZoomStable } from "renderer/components/ZoomStable";
 import { env } from "renderer/env.renderer";
@@ -39,7 +38,6 @@ import {
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
-import { useShowsAppTopBar } from "renderer/routes/_authenticated/_dashboard/hooks/useShowsAppTopBar";
 import { STROKE_WIDTH_THICK } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import { COLLAPSED_WORKSPACE_SIDEBAR_WIDTH } from "renderer/stores/workspace-sidebar-state";
 import { useCommandPaletteToggle } from "../../hooks/useCommandPaletteToggle";
@@ -63,7 +61,6 @@ export function DashboardSidebarHeader({
 	// Default to Mac while loading so we don't briefly cover the traffic lights.
 	const isMac = platform === undefined || platform === "darwin";
 	const zoomFactor = useZoomFactor();
-	const showsAppTopBar = useShowsAppTopBar();
 	// `?? false`: the hook returns undefined until PostHog flags resolve.
 	// Dev builds bypass the flag — the local dev account isn't in the
 	// @superset.sh release condition.
@@ -71,37 +68,33 @@ export function DashboardSidebarHeader({
 		(useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS) ?? false) ||
 		env.NODE_ENV === "development";
 	const { myFailedCount } = useFailedAutomations();
-	const { data: isUsageInSidebarEnabled } =
-		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 
 	if (isCollapsed) {
 		return (
 			<div className="flex flex-col">
 				{/* The page's header row continues across the rail, and the macOS
 				    window buttons sit in it. */}
-				{!showsAppTopBar && (
-					<div
-						// w +1px: overlaps the container's border-r so the sidebar's
-						// vertical border starts below the row, not inside it.
-						className={cn(
-							"drag h-12 w-[calc(100%+1px)] shrink-0",
-							WINDOW_CHROME_BAND_CLASS,
-						)}
-					>
-						{!isMac && (
-							<div
-								className="flex items-center justify-center"
-								style={{
-									width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
-									marginTop: WINDOW_CONTROLS_ROW_TOP,
-									height: WINDOW_CONTROLS_ROW_HEIGHT,
-								}}
-							>
-								<AppMenuButton />
-							</div>
-						)}
-					</div>
-				)}
+				<div
+					// w +1px: overlaps the container's border-r so the sidebar's
+					// vertical border starts below the row, not inside it.
+					className={cn(
+						"drag h-12 w-[calc(100%+1px)] shrink-0",
+						WINDOW_CHROME_BAND_CLASS,
+					)}
+				>
+					{!isMac && (
+						<div
+							className="flex items-center justify-center"
+							style={{
+								width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+								marginTop: WINDOW_CONTROLS_ROW_TOP,
+								height: WINDOW_CONTROLS_ROW_HEIGHT,
+							}}
+						>
+							<AppMenuButton />
+						</div>
+					)}
+				</div>
 				{/* Mirrors the expanded header's nav container so the buttons keep
 				    the same padding, order, and vertical rhythm when collapsed. */}
 				<div className="flex flex-col items-center gap-1 px-2 pt-3 pb-2">
@@ -156,7 +149,7 @@ export function DashboardSidebarHeader({
 										: "text-muted-foreground hover:bg-fill-hover",
 								)}
 							>
-								<LuLayers className="size-3.5" strokeWidth={1.5} />
+								<TbStack2 className="size-3.5" strokeWidth={1.5} />
 							</button>
 						</TooltipTrigger>
 						<TooltipContent side="right">
@@ -252,26 +245,6 @@ export function DashboardSidebarHeader({
 							<Trans>Pull requests</Trans>
 						</TooltipContent>
 					</Tooltip>
-
-					{isUsageInSidebarEnabled && (
-						<Tooltip delayDuration={300}>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={navigation.openUsage}
-									aria-label={t({
-										message: "Usage",
-									})}
-									className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover"
-								>
-									<LuGauge className="size-3.5" strokeWidth={1.5} />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="right">
-								<Trans>Usage</Trans>
-							</TooltipContent>
-						</Tooltip>
-					)}
 
 					<Tooltip delayDuration={300}>
 						<TooltipTrigger asChild>
@@ -420,7 +393,7 @@ export function DashboardSidebarHeader({
 						: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
 				)}
 			>
-				<LuLayers
+				<TbStack2
 					className="size-4 shrink-0 text-muted-foreground"
 					strokeWidth={1.5}
 				/>
@@ -501,25 +474,6 @@ export function DashboardSidebarHeader({
 					<Trans>Pull requests</Trans>
 				</span>
 			</button>
-
-			{isUsageInSidebarEnabled && (
-				<button
-					type="button"
-					onClick={navigation.openUsage}
-					aria-label={t({
-						message: "Usage",
-					})}
-					className="flex h-7 w-full items-center gap-2 rounded-md px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
-				>
-					<LuGauge
-						className="size-4 shrink-0 text-muted-foreground"
-						strokeWidth={1.5}
-					/>
-					<span className="flex-1 text-left">
-						<Trans>Usage</Trans>
-					</span>
-				</button>
-			)}
 
 			<button
 				type="button"

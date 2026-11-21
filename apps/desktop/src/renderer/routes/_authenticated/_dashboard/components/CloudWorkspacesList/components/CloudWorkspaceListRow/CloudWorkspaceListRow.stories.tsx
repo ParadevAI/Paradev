@@ -20,7 +20,7 @@ const meta = {
 			workspace: {
 				id: "ws-1",
 				name: "Cloud presence",
-				status: "ready",
+				status: "awake",
 				agentStatus: null,
 				agentStatusAt: new Date("2026-09-25T11:55:00Z"),
 				createdAt: new Date("2026-09-25T09:00:00Z"),

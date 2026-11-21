@@ -5,7 +5,6 @@ import {
 	MAX_ATTACHMENTS,
 } from "@superset/shared/attachment-limits";
 import * as DocumentPicker from "expo-document-picker";
-import { File } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback } from "react";
 import { Alert } from "react-native";
@@ -15,6 +14,7 @@ import {
 	imageAssetToAttachment,
 	type PromptInputAttachmentInput,
 } from "@/components/ai-elements/prompt-input";
+import { attachmentSize } from "@/lib/attachments/attachmentFile";
 import {
 	cancelAttachmentUpload,
 	startAttachmentUploads,
@@ -38,7 +38,7 @@ const composerName = (key: string) =>
  * at upload, where the failure can name the file.
  */
 function sizeOf(item: PromptInputAttachmentInput): number {
-	return item.size ?? new File(item.uri).size;
+	return item.size ?? attachmentSize(item.uri);
 }
 
 /**

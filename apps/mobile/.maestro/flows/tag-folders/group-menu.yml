@@ -1,0 +1,30 @@
+# Renames, recolors and deletes the bugs group through its menu button.
+appId: sh.superset.mobile
+---
+- tapOn:
+    text: "Group actions"
+    index: 2
+- tapOn: "Rename group"
+- tapOn:
+    text: "Continue"
+    optional: true
+- eraseText: 40
+- inputText: "Crash fixes"
+- tapOn: "Rename"
+- extendedWaitUntil:
+    visible: "Crash fixes group, 1 workspace"
+    timeout: 8000
+- tapOn:
+    text: "Group actions"
+    index: 2
+- tapOn: "Set group color"
+- tapOn: "Green"
+- takeScreenshot: tag-folders-green
+- tapOn:
+    text: "Group actions"
+    index: 2
+- tapOn: "Delete group"
+- extendedWaitUntil:
+    notVisible: "Crash fixes group, 1 workspace"
+    timeout: 8000
+- takeScreenshot: tag-folders-deleted
