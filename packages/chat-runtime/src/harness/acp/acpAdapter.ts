@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import {
 	type ChatSelections,
+	isPageComplete,
+	questionPages,
 	type SelectionCategory,
 	selectionCategoryOf,
 } from "@superset/chat/core";
@@ -381,7 +383,11 @@ function formField(
 	if (!choices) {
 		if (property.type === "integer") return { ...base, input: "integer" };
 		if (property.type === "number") return { ...base, input: "number" };
-		return { ...base, input: "text" };
+		return {
+			...base,
+			input: "text",
+			...(property._meta ? { answerFor: property._meta.codex.questionId } : {}),
+		};
 	}
 	return {
 		...base,
@@ -408,35 +414,6 @@ function formContent(
 		else content[id] = value;
 	}
 	return content;
-}
-
-function formErrors(
-	values: Record<string, string | string[]>,
-	fields: readonly FormField[],
-	fieldTypes: Record<string, string | undefined>,
-): string[] {
-	const errors: string[] = [];
-	for (const field of fields) {
-		const value = values[field.id];
-		const empty =
-			value === undefined ||
-			(Array.isArray(value) ? value.length === 0 : value.trim() === "");
-		if (empty) {
-			if (field.required) errors.push(field.id);
-			continue;
-		}
-		const type = fieldTypes[field.id];
-		if (type !== "number" && type !== "integer") continue;
-		const parsed = Number(value);
-		if (
-			typeof value !== "string" ||
-			!Number.isFinite(parsed) ||
-			(type === "integer" && !Number.isInteger(parsed))
-		) {
-			errors.push(field.id);
-		}
-	}
-	return errors;
 }
 
 export class AcpAdapter implements HarnessAdapter {
@@ -690,11 +667,9 @@ export class AcpAdapter implements HarnessAdapter {
 		if (
 			decision.type === "form" &&
 			pending.item.form &&
-			formErrors(
-				decision.values,
-				pending.item.form.fields,
-				pending.fieldTypes ?? {},
-			).length > 0
+			questionPages(pending.item.form.fields).some(
+				(page) => !isPageComplete(page, decision.values),
+			)
 		) {
 			this.emitNotice(
 				"error",
