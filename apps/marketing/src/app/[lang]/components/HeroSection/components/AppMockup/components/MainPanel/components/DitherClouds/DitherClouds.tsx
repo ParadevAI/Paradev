@@ -8,6 +8,7 @@ import {
 	DOT,
 	DRIFT_PER_FRAME,
 	FRAME_MS,
+	LATTICE_SIZE,
 	MAX_DPR,
 } from "./constants";
 
@@ -16,6 +17,18 @@ const hash = (i: number, j: number) => {
 	return h - Math.floor(h);
 };
 
+// The cloud field samples the lattice about a million times per frame, so the
+// hash is read from a wrapping table instead of computed with Math.sin.
+const LATTICE = new Float32Array(LATTICE_SIZE * LATTICE_SIZE);
+for (let j = 0; j < LATTICE_SIZE; j++) {
+	for (let i = 0; i < LATTICE_SIZE; i++) {
+		LATTICE[j * LATTICE_SIZE + i] = hash(i, j);
+	}
+}
+const lattice = (i: number, j: number) =>
+	LATTICE[(j & (LATTICE_SIZE - 1)) * LATTICE_SIZE + (i & (LATTICE_SIZE - 1))] ??
+	0;
+
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 const noise = (x: number, y: number) => {
@@ -23,10 +36,10 @@ const noise = (x: number, y: number) => {
 	const j = Math.floor(y);
 	const u = smooth(x - i);
 	const v = smooth(y - j);
-	const a = hash(i, j);
-	const b = hash(i + 1, j);
-	const c = hash(i, j + 1);
-	const d = hash(i + 1, j + 1);
+	const a = lattice(i, j);
+	const b = lattice(i + 1, j);
+	const c = lattice(i, j + 1);
+	const d = lattice(i + 1, j + 1);
 	return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
 };
 
