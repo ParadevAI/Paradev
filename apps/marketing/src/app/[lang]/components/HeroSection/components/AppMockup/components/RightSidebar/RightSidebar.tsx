@@ -1,118 +1,107 @@
 "use client";
 
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
+import { m } from "framer-motion";
 import {
-	LuArrowRight,
-	LuFileText,
+	LuEllipsis,
+	LuFileDiff,
+	LuFiles,
+	LuGitCommitHorizontal,
 	LuGitPullRequest,
-	LuPlay,
+	LuGlobe,
 } from "react-icons/lu";
-import { FILE_CHANGES } from "../../constants";
+import { CHANGED_FILES, FILE_DIFFS, SCENES } from "../../constants";
 import type { ActiveDemo } from "../../types";
-import { FileChangeItem } from "../FileChangeItem";
+import { IconButton } from "../IconButton";
+import { ChangedFileRow } from "./components/ChangedFileRow";
+import { FileDiff } from "./components/FileDiff";
+
+const COLUMN_WIDTH = 440;
+const COLUMN_GAP = 4;
 
 interface RightSidebarProps {
 	activeDemo: ActiveDemo;
 }
 
-const TABS = ["Files", "Changes", "Review"] as const;
-
 export function RightSidebar({ activeDemo }: RightSidebarProps) {
-	const { t } = useLingui();
-	const isPages = activeDemo === "Publish Pages";
-
-	const tabLabels: Record<(typeof TABS)[number], string> = {
-		Files: t({ message: "Files" }),
-		Changes: t({ message: "Changes" }),
-		Review: t({ message: "Review" }),
-	};
+	const visible = SCENES[activeDemo].showChanges;
 
 	return (
-		<div className="relative flex w-[236px] shrink-0 flex-col overflow-hidden border-l border-border/60 bg-card text-[11px]">
-			<div className="flex h-9 items-center gap-1 px-2">
-				<button
-					type="button"
-					className="flex h-6 items-center gap-1.5 rounded-sm px-1.5 text-[11px] text-foreground/75 hover:bg-foreground/[0.04] hover:text-foreground/95"
-				>
-					<LuPlay className="size-2.5 fill-current text-muted-foreground/65" />
-					<span>
-						<Trans>Run</Trans>
-					</span>
-				</button>
-				<button
-					type="button"
-					className={`flex h-6 items-center gap-1.5 rounded-sm px-1.5 text-[11px] transition-colors duration-200 ${
-						isPages
-							? "bg-foreground/[0.07] text-foreground/95"
-							: "text-foreground/75 hover:bg-foreground/[0.04] hover:text-foreground/95"
-					}`}
-				>
-					<LuFileText
-						className={`size-2.5 ${isPages ? "text-brand-light" : "text-muted-foreground/65"}`}
-					/>
-					<span>
-						<Trans>Pages</Trans>
-					</span>
-				</button>
-				<button
-					type="button"
-					className="flex h-6 items-center gap-1.5 rounded-sm px-1.5 text-[11px] text-foreground/75 hover:bg-foreground/[0.04] hover:text-foreground/95"
-				>
-					<LuGitPullRequest className="size-2.5 text-brand-light/80" />
-					<span>
-						<Trans>PR</Trans>
-					</span>
-					<span className="font-mono tabular-nums text-muted-foreground/55">
-						#827
-					</span>
-				</button>
-			</div>
-
-			<div className="flex h-8 items-stretch">
-				{TABS.map((tab) => (
-					<div
-						key={tab}
-						className={`flex flex-1 cursor-pointer items-center justify-center text-[11px] font-medium ${
-							tab === "Files"
-								? "bg-background text-foreground/95"
-								: "text-muted-foreground/55 hover:text-foreground/85"
-						}`}
-					>
-						{tabLabels[tab]}
-					</div>
-				))}
-			</div>
-
-			<div className="bg-background px-3 pt-3 pb-2">
-				<div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground/60">
-					<span className="tabular-nums text-emerald-400/85">+393</span>
-					<span className="tabular-nums text-rose-400/75">−42</span>
-					<span className="text-muted-foreground/45">·</span>
-					<span>
-						<Plural value={5} one="# file" other="# files" />
-					</span>
-					<span className="text-muted-foreground/45">·</span>
-					<span className="flex items-center gap-1">
-						<LuArrowRight className="size-2.5" />
-						<span className="rounded-sm bg-foreground/[0.07] px-1 py-px">
-							main
+		<m.div
+			className="shrink-0 overflow-hidden"
+			initial={false}
+			animate={{
+				width: visible ? COLUMN_WIDTH + COLUMN_GAP : 0,
+				opacity: visible ? 1 : 0,
+			}}
+			transition={{ duration: 0.3, ease: "easeOut" }}
+			aria-hidden={!visible}
+		>
+			<div
+				className="flex h-full flex-col gap-1"
+				style={{ width: COLUMN_WIDTH, marginLeft: COLUMN_GAP }}
+			>
+				<div className="flex h-8 shrink-0 items-center justify-between">
+					<div className="flex items-center gap-1">
+						<span className="flex h-7 items-center gap-1.5 rounded-md bg-neutral-100/10 pr-2.5 pl-2 text-neutral-100/90">
+							<LuFileDiff className="size-4" />
+							<Trans>Changes</Trans>
+							<span className="rounded bg-neutral-100/10 px-[5px] text-[11px] leading-4 text-neutral-100/70">
+								4
+							</span>
 						</span>
-					</span>
+						<span className="flex h-7 items-center gap-1.5 pr-2.5 pl-2 text-neutral-100/55">
+							<LuGlobe className="size-4" />
+							<Trans>Browser</Trans>
+						</span>
+						<span className="flex h-7 items-center gap-1.5 pr-2.5 pl-2 text-neutral-100/55">
+							<LuFiles className="size-4" />
+							<Trans>Files</Trans>
+						</span>
+					</div>
+					<IconButton icon={LuEllipsis} />
+				</div>
+
+				<div className="flex min-h-0 flex-1 flex-col rounded-xl bg-[#161616]">
+					<div className="flex h-10 shrink-0 items-center justify-between py-1.5 pr-2.5 pl-4">
+						<div className="flex items-center gap-2">
+							<span className="flex gap-1.5 font-medium tabular-nums">
+								<span className="text-[#58da98]">+128</span>
+								<span className="text-[#ff6557]">−41</span>
+							</span>
+							<span className="text-neutral-100/55">
+								<Plural value={4} one="# file" other="# files" />
+							</span>
+						</div>
+						<IconButton icon={LuEllipsis} />
+					</div>
+
+					<div className="flex min-h-0 flex-1 flex-col gap-3 px-3 pt-2 pb-3">
+						<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+							<div className="flex shrink-0 flex-col">
+								{CHANGED_FILES.map((file) => (
+									<ChangedFileRow key={file.name} file={file} />
+								))}
+							</div>
+							<div className="flex flex-col gap-2">
+								{FILE_DIFFS.map((diff) => (
+									<FileDiff key={diff.path} diff={diff} />
+								))}
+							</div>
+						</div>
+						<div className="flex shrink-0 gap-2">
+							<span className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md font-medium text-neutral-100/70 shadow-[inset_0_0_0_1px_rgb(245_245_245/0.1)]">
+								<LuGitCommitHorizontal className="size-4" />
+								<Trans>Commit</Trans>
+							</span>
+							<span className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md bg-neutral-100/[0.12] font-medium text-neutral-100/90">
+								<LuGitPullRequest className="size-4" />
+								<Trans>Open PR</Trans>
+							</span>
+						</div>
+					</div>
 				</div>
 			</div>
-
-			<div className="flex-1 space-y-0.5 overflow-hidden bg-background py-1.5">
-				{FILE_CHANGES.map((file, index) => (
-					<FileChangeItem
-						key={`${file.path}-${index}`}
-						path={file.path}
-						add={file.add}
-						del={file.del}
-						indent={file.indent}
-						type={file.type}
-					/>
-				))}
-			</div>
-		</div>
+		</m.div>
 	);
 }

@@ -164,8 +164,7 @@ msgstr "{0, plural, one {#件失敗} other {#件失敗}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#件のファイルを変更} other {#件のファイルを変更}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {#ファイル} other {#ファイル}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {#件のタスク} other {#件のタスク}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {ターミナル # 個が実行中}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {変更なし #行} other {変更なし #行}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "編集済み"
 msgid "Edited {ago}"
 msgstr "{ago}に編集"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "<0>SettingsDialog.tsx</0> を編集"
+
 msgid "Editing"
 msgstr "編集"
 
@@ -9092,9 +9098,6 @@ msgstr "完了"
 
 msgid "Finished · unread"
 msgstr "完了 · 未読"
-
-msgid "finished · worked for 7s"
-msgstr "完了 · 7秒稼働"
 
 msgid "Finishing the move…"
 msgstr "移動を完了しています…"
@@ -12306,6 +12309,9 @@ msgstr "クラウドの作業を移行"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "ワークスペースを離れずに済むよう、設定をモーダルに移してください。検索の絞り込みは残し、⌘, でどこからでも開けるようにしてください。"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "このワークスペースを {computerName} に移動しますか？"
 
@@ -14257,6 +14263,9 @@ msgstr "ページを既定のブラウザで開く"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Paradev の iPhone・iPad アプリからページを開き、コメントに返信できます。"
 
+msgid "Open PR"
+msgstr "PR を作成"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "PR #{0} を開く"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "プラン"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "計画"
+
 msgid "Plan restored"
 msgstr "プランを復元しました"
 
 msgid "Plan updated"
 msgstr "プランを更新しました"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "計画: <0>SettingsPage</0> を <1>SettingsDialog</1> に切り出し、⌘, をグローバルホットキー層に通し、検索はそのまま残します。これから始めます。"
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "ブランチをプッシュしたら、Mac 上または {companyName} �
 msgid "Pushed"
 msgstr "プッシュ"
 
-msgid "Pushed and opened a draft PR."
-msgstr "プッシュしてドラフトPRを作成しました。"
-
 msgid "Pushing..."
 msgstr "プッシュ中…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radixはtooltipの矢印ラッパーを辺ごとに回転させるため
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltipのドキュメント"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "<0>bun test settings</0> を実行 · 14件成功 · 1件失敗"
+
 msgid "Random icon"
 msgstr "ランダムなアイコン"
 
@@ -15983,6 +15999,9 @@ msgstr "読み取り"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "読み取り済み"
+
+msgid "Read 3 files"
+msgstr "3ファイルを読み取り"
 
 msgid "Read a list of your most visited websites"
 msgstr "よくアクセスするウェブサイトのリストを読み取る"
@@ -16617,6 +16636,9 @@ msgstr "返信"
 
 msgid "Reply in thread"
 msgstr "スレッドで返信"
+
+msgid "Reply to Claude Code…"
+msgstr "Claude Code に返信…"
 
 msgid "Reply to thread…"
 msgstr "スレッドに返信…"
@@ -18266,6 +18288,9 @@ msgstr "設定..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "完了済み"
 
 msgid "Setup"
 msgstr "セットアップ"
@@ -22237,6 +22262,9 @@ msgstr "スタックを表示、プルリクエスト {position}/{size}"
 
 msgid "View usage"
 msgstr "使用量を表示"
+
+msgid "Viewed"
+msgstr "確認済み"
 
 msgctxt "stack layer"
 msgid "Viewing"

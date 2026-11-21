@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# thất bại} other {# thất bại}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# tệp thay đổi} other {# tệp thay đổi}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# tệp} other {# tệp}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# tác vụ} other {# tác vụ}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {# terminal đang chạy}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {# dòng không thay đổi}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "Đã sửa"
 msgid "Edited {ago}"
 msgstr "Đã sửa {ago}"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Đã sửa <0>SettingsDialog.tsx</0>"
+
 msgid "Editing"
 msgstr "Chỉnh sửa"
 
@@ -9092,9 +9098,6 @@ msgstr "Đã xong"
 
 msgid "Finished · unread"
 msgstr "Đã xong · chưa đọc"
-
-msgid "finished · worked for 7s"
-msgstr "đã xong · làm trong 7s"
 
 msgid "Finishing the move…"
 msgstr "Đang hoàn tất việc chuyển…"
@@ -12306,6 +12309,9 @@ msgstr "Chuyển công việc trên cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Di chuyển tiêu điểm giữa các tab chính và thanh bên phải, và mở thanh bên nếu đang đóng"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Chuyển Cài đặt vào một modal để mọi người không phải rời không gian làm việc. Giữ nguyên tính năng lọc tìm kiếm và để ⌘, mở nó từ bất cứ đâu."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Chuyển không gian làm việc này sang {computerName}?"
 
@@ -14257,6 +14263,9 @@ msgstr "Mở trang trong trình duyệt mặc định"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Mở trang và trả lời bình luận từ ứng dụng Paradev trên iPhone và iPad."
 
+msgid "Open PR"
+msgstr "Mở PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Mở PR #{0}"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Gói"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Kế hoạch"
+
 msgid "Plan restored"
 msgstr "Đã khôi phục gói"
 
 msgid "Plan updated"
 msgstr "Đã cập nhật gói"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Kế hoạch: tách <0>SettingsPage</0> thành <1>SettingsDialog</1>, đưa ⌘, qua lớp phím tắt toàn cục, giữ nguyên tìm kiếm. Bắt đầu ngay."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "Push các nhánh của bạn, rồi tiếp tục trên Mac hoặc trong 
 msgid "Pushed"
 msgstr "Đã push"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Đã push và mở một PR nháp."
-
 msgid "Pushing..."
 msgstr "Đang push…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix xoay lớp bọc mũi tên tooltip theo từng phía,"
 msgid "Radix Tooltip docs"
 msgstr "Tài liệu Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Đã chạy <0>bun test settings</0> · 14 đạt · 1 thất bại"
+
 msgid "Random icon"
 msgstr "Biểu tượng ngẫu nhiên"
 
@@ -15983,6 +15999,9 @@ msgstr "Đã đọc"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Đã đọc"
+
+msgid "Read 3 files"
+msgstr "Đã đọc 3 tệp"
 
 msgid "Read a list of your most visited websites"
 msgstr "Đọc danh sách trang web bạn truy cập nhiều nhất"
@@ -16617,6 +16636,9 @@ msgstr "Trả lời"
 
 msgid "Reply in thread"
 msgstr "Trả lời trong chuỗi"
+
+msgid "Reply to Claude Code…"
+msgstr "Trả lời Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "Trả lời luồng…"
@@ -18266,6 +18288,9 @@ msgstr "Cài đặt..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Đã xong"
 
 msgid "Setup"
 msgstr "Thiết lập"
@@ -22237,6 +22262,9 @@ msgstr "Xem stack, pull request {position}/{size}"
 
 msgid "View usage"
 msgstr "Xem mức sử dụng"
+
+msgid "Viewed"
+msgstr "Đã xem"
 
 msgctxt "stack layer"
 msgid "Viewing"

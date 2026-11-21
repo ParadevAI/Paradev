@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# с ошибкой} few {# с ошибкой} many {# 
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# файл изменён} few {# файла изменено} many {# файлов изменено} other {# файла изменено}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# задача} few {# задачи} many {# задач
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# терминал запущен} few {# терминала запущено} many {# терминалов запущено} other {# терминала запущено}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# строка без изменений} few {# строки без изменений} many {# строк без изменений} other {# строки без изменений}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "Изменён"
 msgid "Edited {ago}"
 msgstr "Изменено {ago}"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Изменён <0>SettingsDialog.tsx</0>"
+
 msgid "Editing"
 msgstr "Редактирование"
 
@@ -9092,9 +9098,6 @@ msgstr "Завершено"
 
 msgid "Finished · unread"
 msgstr "Завершено · не прочитано"
-
-msgid "finished · worked for 7s"
-msgstr "завершил · работал 7 с"
 
 msgid "Finishing the move…"
 msgstr "Завершение переноса…"
@@ -12306,6 +12309,9 @@ msgstr "Перенесите работу из облака"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Перемещать фокус между основными вкладками и правой боковой панелью и открывать панель, если она закрыта"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Перенеси настройки в модальное окно, чтобы людям не приходилось покидать рабочее пространство. Сохрани фильтрацию поиска и сделай так, чтобы ⌘, открывало его откуда угодно."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Перенести эту рабочую область на {computerName}?"
 
@@ -14257,6 +14263,9 @@ msgstr "Открыть страницу в браузере по умолчан�
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Открывайте страницы и отвечайте на комментарии в приложении Paradev на iPhone и iPad."
 
+msgid "Open PR"
+msgstr "Открыть PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Открыть PR #{0}"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Тариф"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "План"
+
 msgid "Plan restored"
 msgstr "Тариф восстановлен"
 
 msgid "Plan updated"
 msgstr "Тариф обновлён"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "План: вынести <0>SettingsPage</0> в <1>SettingsDialog</1>, провести ⌘, через глобальный слой горячих клавиш, поиск оставить как есть. Начинаю."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "Запушьте ветки и продолжайте работу на 
 msgid "Pushed"
 msgstr "Новые коммиты"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Отправил изменения и открыл черновик PR."
-
 msgid "Pushing..."
 msgstr "Отправка…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix поворачивает обёртку стрелки подск�
 msgid "Radix Tooltip docs"
 msgstr "Документация Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Выполнено <0>bun test settings</0> · 14 пройдено · 1 не пройден"
+
 msgid "Random icon"
 msgstr "Случайный значок"
 
@@ -15983,6 +15999,9 @@ msgstr "Прочитано"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Прочитан"
+
+msgid "Read 3 files"
+msgstr "Прочитано 3 файла"
 
 msgid "Read a list of your most visited websites"
 msgstr "Читать список самых посещаемых сайтов"
@@ -16617,6 +16636,9 @@ msgstr "Ответить"
 
 msgid "Reply in thread"
 msgstr "Ответить в ветке"
+
+msgid "Reply to Claude Code…"
+msgstr "Ответить Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "Ответить в ветке…"
@@ -18266,6 +18288,9 @@ msgstr "Настройки..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Завершённые"
 
 msgid "Setup"
 msgstr "Установка"
@@ -22237,6 +22262,9 @@ msgstr "Открыть стек, пул-реквест {position} из {size}"
 
 msgid "View usage"
 msgstr "Посмотреть использование"
+
+msgid "Viewed"
+msgstr "Просмотрено"
 
 msgctxt "stack layer"
 msgid "Viewing"

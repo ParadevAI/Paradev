@@ -269,6 +269,16 @@
 	--animate-belt-march: belt-march 900ms linear infinite;
 	--animate-rail-extend: rail-extend 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 	--animate-station-pulse: station-pulse 2.4s ease-in-out infinite;
+	--animate-text-shimmer: text-shimmer 2.4s linear infinite;
+}
+
+@keyframes text-shimmer {
+	from {
+		background-position: 100% 0;
+	}
+	to {
+		background-position: 0 0;
+	}
 }
 
 @keyframes belt-march {

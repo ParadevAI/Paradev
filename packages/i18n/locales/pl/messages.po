@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# nieudana} few {# nieudane} many {# nieudanych} other 
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# zmieniony plik} few {# zmienione pliki} many {# zmienionych plików} other {# zmienionego pliku}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# zadanie} few {# zadania} many {# zadań} other {# zad
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# działający terminal} few {# działające terminale} many {# działających terminali} other {# działającego terminala}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# niezmieniony wiersz} few {# niezmienione wiersze} many {# niezmienionych wierszy} other {# niezmienionego wiersza}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "Edytowano"
 msgid "Edited {ago}"
 msgstr "Edytowano {ago}"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Edytowano <0>SettingsDialog.tsx</0>"
+
 msgid "Editing"
 msgstr "Edycja"
 
@@ -9092,9 +9098,6 @@ msgstr "Zakończono"
 
 msgid "Finished · unread"
 msgstr "Zakończone · nieprzeczytane"
-
-msgid "finished · worked for 7s"
-msgstr "zakończono · pracował 7 s"
 
 msgid "Finishing the move…"
 msgstr "Kończenie przenoszenia…"
@@ -12306,6 +12309,9 @@ msgstr "Przenieś pracę z chmury"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Przenieś fokus między głównymi kartami a prawym paskiem bocznym i otwórz pasek, jeśli jest zamknięty"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Przenieś Ustawienia do okna modalnego, żeby ludzie nie musieli opuszczać swojego obszaru roboczego. Zachowaj filtrowanie wyszukiwania i spraw, żeby ⌘, otwierało je z dowolnego miejsca."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Przenieść ten obszar roboczy na {computerName}?"
 
@@ -14257,6 +14263,9 @@ msgstr "Otwórz stronę w domyślnej przeglądarce"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Otwieraj strony i odpowiadaj na komentarze w aplikacji Paradev na iPhonie i iPadzie."
 
+msgid "Open PR"
+msgstr "Otwórz PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Otwórz PR #{0}"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Plan"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Plan"
+
 msgid "Plan restored"
 msgstr "Plan przywrócony"
 
 msgid "Plan updated"
 msgstr "Plan zaktualizowany"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Plan: wydzielić <0>SettingsPage</0> do <1>SettingsDialog</1>, przepuścić ⌘, przez globalną warstwę skrótów, wyszukiwanie zostawić bez zmian. Zaczynam."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "Wypchnij gałęzie, a potem pracuj dalej na Macu lub w obszarze roboczym
 msgid "Pushed"
 msgstr "Wypchnięty"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Wypchnięto i otwarto szkic PR."
-
 msgid "Pushing..."
 msgstr "Wykonywanie push…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix obraca kontener strzałki tooltipa zależnie od strony,"
 msgid "Radix Tooltip docs"
 msgstr "Dokumentacja Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Uruchomiono <0>bun test settings</0> · 14 zaliczonych · 1 nieudany"
+
 msgid "Random icon"
 msgstr "Losowa ikona"
 
@@ -15983,6 +15999,9 @@ msgstr "Odczytano"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Odczytano"
+
+msgid "Read 3 files"
+msgstr "Przeczytano 3 pliki"
 
 msgid "Read a list of your most visited websites"
 msgstr "Odczytywać listę najczęściej odwiedzanych stron"
@@ -16617,6 +16636,9 @@ msgstr "Odpowiedz"
 
 msgid "Reply in thread"
 msgstr "Odpowiedz w wątku"
+
+msgid "Reply to Claude Code…"
+msgstr "Odpowiedz Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "Odpowiedz w wątku…"
@@ -18266,6 +18288,9 @@ msgstr "Ustawienia..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Zakończone"
 
 msgid "Setup"
 msgstr "Konfiguracja"
@@ -22237,6 +22262,9 @@ msgstr "Pokaż stos, pull request {position} z {size}"
 
 msgid "View usage"
 msgstr "Zobacz zużycie"
+
+msgid "Viewed"
+msgstr "Przejrzano"
 
 msgctxt "stack layer"
 msgid "Viewing"

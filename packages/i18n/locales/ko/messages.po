@@ -164,8 +164,7 @@ msgstr "{0, plural, one {#개 실패} other {#개 실패}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {파일 #개 변경됨} other {파일 #개 변경됨}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {파일 #개} other {파일 #개}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {작업 #개} other {작업 #개}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {터미널 #개 실행 중}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {변경 없는 줄 #개}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "편집함"
 msgid "Edited {ago}"
 msgstr "{ago} 편집됨"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "<0>SettingsDialog.tsx</0> 수정함"
+
 msgid "Editing"
 msgstr "편집"
 
@@ -9092,9 +9098,6 @@ msgstr "완료"
 
 msgid "Finished · unread"
 msgstr "완료 · 읽지 않음"
-
-msgid "finished · worked for 7s"
-msgstr "완료 · 7초 작업"
 
 msgid "Finishing the move…"
 msgstr "이동을 마무리하는 중…"
@@ -12306,6 +12309,9 @@ msgstr "클라우드 작업 옮기기"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "메인 탭과 오른쪽 사이드바 사이에서 포커스를 옮기고, 사이드바가 닫혀 있으면 엽니다"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "사람들이 워크스페이스를 떠나지 않도록 설정을 모달로 옮겨 줘. 검색 필터링은 유지하고, ⌘, 로 어디서든 열 수 있게 해 줘."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "이 워크스페이스를 {computerName}(으)로 옮길까요?"
 
@@ -14257,6 +14263,9 @@ msgstr "기본 브라우저에서 페이지 열기"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "iPhone 및 iPad용 Paradev 앱에서 페이지를 열고 댓글에 답글을 남기세요."
 
+msgid "Open PR"
+msgstr "PR 열기"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "PR #{0} 열기"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "플랜"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "계획"
+
 msgid "Plan restored"
 msgstr "플랜이 복원되었습니다"
 
 msgid "Plan updated"
 msgstr "플랜이 업데이트되었습니다"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "계획: <0>SettingsPage</0>를 <1>SettingsDialog</1>로 분리하고, ⌘, 를 전역 단축키 레이어로 연결하고, 검색은 그대로 둡니다. 지금 시작합니다."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "브랜치를 푸시한 다음 Mac이나 {companyName} 클라우드 워�
 msgid "Pushed"
 msgstr "푸시됨"
 
-msgid "Pushed and opened a draft PR."
-msgstr "푸시하고 초안 PR을 열었습니다."
-
 msgid "Pushing..."
 msgstr "푸시 중…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix는 툴팁 화살표 래퍼를 방향에 따라 회전시키므로,
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltip 문서"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "<0>bun test settings</0> 실행함 · 14개 통과 · 1개 실패"
+
 msgid "Random icon"
 msgstr "무작위 아이콘"
 
@@ -15983,6 +15999,9 @@ msgstr "읽음"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "읽음"
+
+msgid "Read 3 files"
+msgstr "파일 3개 읽음"
 
 msgid "Read a list of your most visited websites"
 msgstr "가장 많이 방문한 웹사이트 목록 읽기"
@@ -16617,6 +16636,9 @@ msgstr "답글"
 
 msgid "Reply in thread"
 msgstr "스레드에서 답글"
+
+msgid "Reply to Claude Code…"
+msgstr "Claude Code에 답장…"
 
 msgid "Reply to thread…"
 msgstr "스레드에 답글…"
@@ -18266,6 +18288,9 @@ msgstr "설정..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "완료됨"
 
 msgid "Setup"
 msgstr "설정"
@@ -22237,6 +22262,9 @@ msgstr "스택 보기, 풀 리퀘스트 {position}/{size}"
 
 msgid "View usage"
 msgstr "사용량 보기"
+
+msgid "Viewed"
+msgstr "확인함"
 
 msgctxt "stack layer"
 msgid "Viewing"

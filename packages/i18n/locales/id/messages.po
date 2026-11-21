@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# gagal} other {# gagal}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# file berubah} other {# file berubah}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# file} other {# file}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# tugas} other {# tugas}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {# terminal berjalan}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {# baris tidak diubah}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "Diedit"
 msgid "Edited {ago}"
 msgstr "Diedit {ago}"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Mengedit <0>SettingsDialog.tsx</0>"
+
 msgid "Editing"
 msgstr "Pengeditan"
 
@@ -9092,9 +9098,6 @@ msgstr "Selesai"
 
 msgid "Finished · unread"
 msgstr "Selesai · belum dibaca"
-
-msgid "finished · worked for 7s"
-msgstr "selesai · bekerja 7 dtk"
 
 msgid "Finishing the move…"
 msgstr "Menyelesaikan pemindahan…"
@@ -12306,6 +12309,9 @@ msgstr "Pindahkan pekerjaan cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Pindahkan Pengaturan ke modal agar orang tidak perlu meninggalkan ruang kerja mereka. Pertahankan pemfilteran pencarian, dan buat ⌘, membukanya dari mana saja."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Pindahkan workspace ini ke {computerName}?"
 
@@ -14257,6 +14263,9 @@ msgstr "Buka Halaman di Browser Bawaan"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Buka halaman dan balas komentar dari aplikasi Paradev di iPhone dan iPad."
 
+msgid "Open PR"
+msgstr "Buka PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Buka PR #{0}"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Paket"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Rencana"
+
 msgid "Plan restored"
 msgstr "Paket dipulihkan"
 
 msgid "Plan updated"
 msgstr "Paket diperbarui"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Rencana: ekstrak <0>SettingsPage</0> menjadi <1>SettingsDialog</1>, arahkan ⌘, melalui lapisan hotkey global, biarkan pencarian apa adanya. Mulai sekarang."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "Push branch Anda, lalu lanjutkan di Mac atau di workspace cloud {company
 msgid "Pushed"
 msgstr "Di-push"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Sudah di-push dan membuka draf PR."
-
 msgid "Pushing..."
 msgstr "Melakukan push…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix memutar pembungkus panah tooltip per sisi,"
 msgid "Radix Tooltip docs"
 msgstr "Dokumentasi Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Menjalankan <0>bun test settings</0> · 14 lulus · 1 gagal"
+
 msgid "Random icon"
 msgstr "Ikon acak"
 
@@ -15983,6 +15999,9 @@ msgstr "Dibaca"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Dibaca"
+
+msgid "Read 3 files"
+msgstr "Membaca 3 file"
 
 msgid "Read a list of your most visited websites"
 msgstr "Membaca daftar situs web yang paling sering Anda kunjungi"
@@ -16617,6 +16636,9 @@ msgstr "Balas"
 
 msgid "Reply in thread"
 msgstr "Balas di utas"
+
+msgid "Reply to Claude Code…"
+msgstr "Balas Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "Balas thread…"
@@ -18266,6 +18288,9 @@ msgstr "Pengaturan..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Selesai"
 
 msgid "Setup"
 msgstr "Setup"
@@ -22237,6 +22262,9 @@ msgstr "Lihat stack, pull request {position} dari {size}"
 
 msgid "View usage"
 msgstr "Lihat penggunaan"
+
+msgid "Viewed"
+msgstr "Dilihat"
 
 msgctxt "stack layer"
 msgid "Viewing"

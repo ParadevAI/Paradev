@@ -164,8 +164,7 @@ msgstr "{0, plural, one {#項失敗} other {#項失敗}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#個檔案已更改} other {#個檔案已更改}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {#個檔案} other {#個檔案}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {#個任務} other {#個任務}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {# 個終端機正在執行}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {# 行未修改}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "已編輯"
 msgid "Edited {ago}"
 msgstr "編輯於{ago}"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "已編輯 <0>SettingsDialog.tsx</0>"
+
 msgid "Editing"
 msgstr "編輯"
 
@@ -9092,9 +9098,6 @@ msgstr "已完成"
 
 msgid "Finished · unread"
 msgstr "已完成 · 未讀"
-
-msgid "finished · worked for 7s"
-msgstr "已完成 · 用時7秒"
 
 msgid "Finishing the move…"
 msgstr "正在完成移動…"
@@ -12306,6 +12309,9 @@ msgstr "遷移雲端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主要分頁與右側邊欄之間移動焦點，若側邊欄已關閉則將其開啟"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "把設定改成強制回應視窗，這樣大家不必離開工作區。保留搜尋篩選，並讓 ⌘, 在任何地方都能開啟它。"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "要將此工作區移至 {computerName} 嗎？"
 
@@ -14257,6 +14263,9 @@ msgstr "在預設瀏覽器中開啟頁面"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "在 Paradev 的 iPhone 和 iPad 應用程式中開啟頁面並回覆留言。"
 
+msgid "Open PR"
+msgstr "建立 PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "開啟PR #{0}"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "方案"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "計畫"
+
 msgid "Plan restored"
 msgstr "方案已恢復"
 
 msgid "Plan updated"
 msgstr "方案已更新"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "計畫：把 <0>SettingsPage</0> 抽出為 <1>SettingsDialog</1>，讓 ⌘, 走全域快速鍵層，搜尋維持不變。現在開始。"
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "推送你的分支，然後在 Mac 上或 {companyName} 雲端工作區�
 msgid "Pushed"
 msgstr "已推送"
 
-msgid "Pushed and opened a draft PR."
-msgstr "已推送並開了一個草稿PR。"
-
 msgid "Pushing..."
 msgstr "正在推送…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix會按不同方向旋轉tooltip的箭頭容器，"
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltip文件"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "已執行 <0>bun test settings</0> · 14 個通過 · 1 個失敗"
+
 msgid "Random icon"
 msgstr "隨機圖示"
 
@@ -15983,6 +15999,9 @@ msgstr "已讀取"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "已讀取"
+
+msgid "Read 3 files"
+msgstr "已讀取 3 個檔案"
 
 msgid "Read a list of your most visited websites"
 msgstr "讀取你最常造訪的網站清單"
@@ -16617,6 +16636,9 @@ msgstr "回覆"
 
 msgid "Reply in thread"
 msgstr "在討論串中回覆"
+
+msgid "Reply to Claude Code…"
+msgstr "回覆 Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "回覆討論串…"
@@ -18266,6 +18288,9 @@ msgstr "設定..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "已結束"
 
 msgid "Setup"
 msgstr "初始化"
@@ -22237,6 +22262,9 @@ msgstr "檢視堆疊，拉取請求 {position}/{size}"
 
 msgid "View usage"
 msgstr "檢視用量"
+
+msgid "Viewed"
+msgstr "已檢視"
 
 msgctxt "stack layer"
 msgid "Viewing"

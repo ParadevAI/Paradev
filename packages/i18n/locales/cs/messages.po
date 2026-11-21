@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# selhává} few {# selhávají} many {# selhává} oth
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# změněný soubor} few {# změněné soubory} many {# změněného souboru} other {# změněných souborů}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# soubor} few {# soubory} many {# souboru} other {# souborů}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# úkol} few {# úkoly} many {# úkolu} other {# úkol�
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# běžící terminál} few {# běžící terminály} many {# běžícího terminálu} other {# běžících terminálů}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# nezměněný řádek} few {# nezměněné řádky} many {# nezměněného řádku} other {# nezměněných řádků}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -7950,6 +7953,9 @@ msgstr "Upraveno"
 msgid "Edited {ago}"
 msgstr "Upraveno {ago}"
 
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Upraven <0>SettingsDialog.tsx</0>"
+
 msgid "Editing"
 msgstr "Úpravy"
 
@@ -9092,9 +9098,6 @@ msgstr "Dokončeno"
 
 msgid "Finished · unread"
 msgstr "Hotovo · nepřečteno"
-
-msgid "finished · worked for 7s"
-msgstr "hotovo · pracoval 7 s"
 
 msgid "Finishing the move…"
 msgstr "Dokončování přesunu…"
@@ -12306,6 +12309,9 @@ msgstr "Přesuňte práci z cloudu"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a otevřít panel, pokud je zavřený"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Přesuň Nastavení do modálního okna, aby lidé nemuseli opouštět svůj pracovní prostor. Zachovej filtrování vyhledávání a zařiď, aby ho ⌘, otevřelo odkudkoli."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Přesunout tento pracovní prostor na {computerName}?"
 
@@ -14257,6 +14263,9 @@ msgstr "Otevřít stránku ve výchozím prohlížeči"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Otevírejte stránky a odpovídejte na komentáře v aplikaci Paradev na iPhonu a iPadu."
 
+msgid "Open PR"
+msgstr "Otevřít PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Otevřít PR #{0}"
@@ -15201,11 +15210,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Tarif"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Plán"
+
 msgid "Plan restored"
 msgstr "Tarif obnoven"
 
 msgid "Plan updated"
 msgstr "Tarif byl aktualizován"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Plán: vyčlenit <0>SettingsPage</0> do <1>SettingsDialog</1>, vést ⌘, přes globální vrstvu klávesových zkratek, vyhledávání nechat beze změny. Začínám."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15826,6 @@ msgstr "Pushněte své větve a pak pokračujte na svém Macu nebo v cloudovém 
 msgid "Pushed"
 msgstr "Nový push"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Odeslal push a otevřel koncept PR."
-
 msgid "Pushing..."
 msgstr "Pushování…"
 
@@ -15929,6 +15942,9 @@ msgstr "Radix otáčí obal šipky tooltipu podle strany,"
 msgid "Radix Tooltip docs"
 msgstr "Dokumentace Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Spuštěno <0>bun test settings</0> · 14 prošlo · 1 selhal"
+
 msgid "Random icon"
 msgstr "Náhodná ikona"
 
@@ -15983,6 +15999,9 @@ msgstr "Přečteno"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Přečteno"
+
+msgid "Read 3 files"
+msgstr "Přečteny 3 soubory"
 
 msgid "Read a list of your most visited websites"
 msgstr "Číst seznam vašich nejnavštěvovanějších webů"
@@ -16617,6 +16636,9 @@ msgstr "Odpovědět"
 
 msgid "Reply in thread"
 msgstr "Odpovědět ve vlákně"
+
+msgid "Reply to Claude Code…"
+msgstr "Odpovědět Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "Odpovědět do vlákna…"
@@ -18266,6 +18288,9 @@ msgstr "Nastavení..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Uzavřené"
 
 msgid "Setup"
 msgstr "Setup"
@@ -22237,6 +22262,9 @@ msgstr "Zobrazit stack, pull request {position} z {size}"
 
 msgid "View usage"
 msgstr "Zobrazit využití"
+
+msgid "Viewed"
+msgstr "Zobrazeno"
 
 msgctxt "stack layer"
 msgid "Viewing"
