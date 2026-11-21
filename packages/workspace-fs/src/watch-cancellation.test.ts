@@ -148,3 +148,46 @@ test("watcher readiness refreshes edits made during the background scan", async 
 	expect(entries.map((entry) => entry.name)).toContain("during-scan.txt");
 	await stream.return?.();
 });
+
+for (const phase of ["attaching", "attached"] as const) {
+	test(`close waits for the last aborted listener's ${phase} native watch`, async () => {
+		const rootPath = await root();
+		const controller = new AbortController();
+		const entered = deferred<void>();
+		const gate = deferred<void>();
+		let detached = false;
+		const manager = new FsWatcherManager({
+			backend: {
+				name: "test",
+				async subscribe() {
+					entered.resolve();
+					if (phase === "attaching") await gate.promise;
+					return {
+						async unsubscribe() {
+							await gate.promise;
+							detached = true;
+						},
+					};
+				},
+			},
+		});
+		managers.push(manager);
+		const subscription = manager
+			.subscribe(
+				{ absolutePath: rootPath, signal: controller.signal },
+				() => {},
+			)
+			.catch((error) => {
+				if (!(error instanceof Error && error.name === "AbortError"))
+					throw error;
+			});
+		await entered.promise;
+		if (phase === "attached") await subscription;
+		controller.abort();
+		const closedAfterDetach = manager.close().then(() => detached);
+		await new Promise<void>((resolve) => setImmediate(resolve));
+		gate.resolve();
+		expect(await closedAfterDetach).toBe(true);
+		await subscription;
+	});
+}
