@@ -5,10 +5,15 @@ import {
 	environments,
 	members,
 } from "@superset/db/schema";
-import { CLOUD_AGENT_PROMPT_MAX_LENGTH } from "@superset/shared/cloud-agent-launch";
-import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
+import {
+	CLOUD_AGENT_PROMPT_MAX_LENGTH,
+	supportsCloudAgentChat,
+} from "@superset/shared/cloud-agent-launch";
+import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
+	SUPERSET_USER_ID_HEADER,
+} from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
-import { acpChatEnabled } from "../../lib/acp-chat";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import { cloudAccess } from "../../lib/cloud-guards";
 import {
@@ -17,8 +22,9 @@ import {
 	SandboxUnavailableError,
 	sandboxHostSecretFor,
 } from "../../lib/sandbox";
+import { acpChatEnabled } from "../../lib/user-settings";
 import { startCloudWorkspace } from "../cloud-workspace/start";
-import { transitionCloudWorkspace } from "../cloud-workspace/transition";
+import { failCloudWorkspace } from "../cloud-workspace/transition";
 import {
 	markSandboxUnavailable,
 	wakeCloudWorkspace,
@@ -30,6 +36,7 @@ import {
 	type AgentRunResult,
 	nonForkPullRequest,
 	type PreviousRunSession,
+	pinCreatedWorkspace,
 	previousRunSession,
 	RunFailure,
 	type RunWorkspace,
@@ -75,11 +82,8 @@ export async function runInCloud(
 	const launch = await withDeadline(prepareLaunch(args));
 	const { automation, prompt, placed, runId } = args;
 
+	const chat = await acpChatEnabled(automation.ownerUserId);
 	if (launch.kind === "pinned") {
-		// The sandbox's Codex is older than the codex-acp floor, so only Claude chats.
-		const chat =
-			automation.agent === "claude" &&
-			(await acpChatEnabled(automation.ownerUserId));
 		const target = { baseUrl: launch.hostTarget, headers: launch.headers };
 		return launchAgentSession(
 			{
@@ -92,7 +96,7 @@ export async function runInCloud(
 				workspaceId: launch.row.id,
 				agent: automation.agent,
 				prompt,
-				chat,
+				chat: chat && supportsCloudAgentChat(automation.agent),
 				previous: launch.previous,
 			},
 		);
@@ -105,12 +109,16 @@ export async function runInCloud(
 		name: automation.name.slice(0, 200),
 		branch: launch.branch,
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
-		machineSize: (
-			await resolveMachineSize(
-				automation.organizationId,
-				automation.machineSize,
-			)
-		)?.name,
+		chat,
+		tags: automation.tags,
+		machineSize: automation.machineSize
+			? (
+					await resolveMachineSize(
+						automation.organizationId,
+						automation.machineSize,
+					)
+				)?.name
+			: undefined,
 		beforeProvision: async (workspaceId) => {
 			placed({ cloudWorkspaceId: workspaceId });
 			const bound = await db
@@ -135,6 +143,8 @@ export async function runInCloud(
 			{ cloudWorkspaceId: automation.cloudWorkspaceId },
 			created.id,
 		);
+	} else if (automation.reuseWorkspace) {
+		await pinCreatedWorkspace(automation.id, { cloudWorkspaceId: created.id });
 	}
 	return null;
 }
@@ -179,6 +189,7 @@ async function prepareLaunch({
 		const headers = {
 			authorization: `Bearer ${await sandboxHostSecretFor(pinned.row.id)}`,
 			[SUPERSET_USER_ID_HEADER]: automation.ownerUserId,
+			[SUPERSET_LAUNCH_SOURCE_HEADER]: "automation",
 		};
 		// Listing the agents adds the built-in ones. Without this, `agents.run` fails
 		// on a box that never ran an agent.
@@ -230,10 +241,10 @@ async function assertOwnerMayUseCloud(
 			"cloud_access_denied",
 		);
 	}
-	const { enabled } = await cloudAccess({
-		userId: automation.ownerUserId,
-		session: null,
-	});
+	const { enabled } = await cloudAccess(
+		{ principal: { userId: automation.ownerUserId }, session: null },
+		automation.organizationId,
+	);
 	if (enabled === undefined) {
 		throw new RunFailure("could not check the owner's cloud access", null);
 	}
@@ -246,21 +257,22 @@ async function assertOwnerMayUseCloud(
 }
 
 /** The pinned cloud workspace, awake, or null when it is gone. */
-async function reachablePin(
+export async function reachablePin(
 	cloudWorkspaceId: string,
 ): Promise<{ row: CloudWorkspaceRow; hostTarget: string } | null> {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 	});
-	if (!row || row.status === "deleted" || row.status === "failed") {
+	if (!row || row.status === "archived" || row.status === "failed") {
 		return null;
 	}
 	if (row.status === "provisioning") {
 		if (Date.now() - row.createdAt.getTime() > STRANDED_PROVISIONING_MS) {
-			await transitionCloudWorkspace({
-				id: row.id,
+			await failCloudWorkspace({
+				scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 				from: ["provisioning"],
-				to: "failed",
+				reason: "create_failed",
+				error: new Error("A pinned workspace stayed in provisioning"),
 			});
 			return null;
 		}
@@ -288,11 +300,11 @@ async function pullRequestBranch(
 	if (!pullRequest?.headRef || event.repositoryId === null) return undefined;
 	const environment = await db.query.environments.findFirst({
 		where: eq(environments.id, environmentId),
-		columns: { hooksRepositoryId: true },
+		columns: { primaryRepositoryId: true },
 	});
 	const primary = primaryRepository(
 		await environmentRepositoryRows(environmentId),
-		environment?.hooksRepositoryId,
+		environment?.primaryRepositoryId,
 	);
 	return primary?.repoId === event.repositoryId
 		? pullRequest.headRef

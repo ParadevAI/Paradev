@@ -4,15 +4,14 @@ import { describe, expect, test } from "bun:test";
 // click policy, so modifier-click can never reach GitHub again.
 const RENDERER_ROOT = import.meta.dir.split("/").slice(0, -3).join("/");
 const DASHBOARD = "routes/_authenticated/_dashboard";
-const V2_WORKSPACE = `${DASHBOARD}/v2-workspace/$workspaceId`;
+const V2_WORKSPACE = `${DASHBOARD}/workspace/$workspaceId`;
 const SIDEBAR_ROWS = `${DASHBOARD}/components/DashboardSidebar/components/DashboardSidebarWorkspaceItem/components`;
 
 const SURFACES = [
-	`${V2_WORKSPACE}/hooks/usePaneRegistry/components/DiffPane/components/DiffPaneHeaderExtras/components/DiffPanePRLink/DiffPanePRLink.tsx`,
+	`${V2_WORKSPACE}/hooks/usePaneRegistry/components/DiffPane/components/DiffPanePRLink/DiffPanePRLink.tsx`,
 	`${V2_WORKSPACE}/components/ChangesControl/components/PRStatusGroup/PRStatusGroup.tsx`,
 	`${V2_WORKSPACE}/components/WorkspaceSidebar/hooks/useReviewTab/components/PRHeader/PRHeader.tsx`,
 	`${SIDEBAR_ROWS}/DashboardSidebarExpandedWorkspaceRow/DashboardSidebarExpandedWorkspaceRow.tsx`,
-	`${SIDEBAR_ROWS}/DashboardSidebarLegacyExpandedWorkspaceRow/DashboardSidebarLegacyExpandedWorkspaceRow.tsx`,
 ];
 
 // The ↗ "View on GitHub" button is browser-only by design.

@@ -7,6 +7,7 @@ import { COMPANY } from "@superset/shared/constants";
 import { m } from "framer-motion";
 import type { ReactNode } from "react";
 import {
+	HiArrowUpRight,
 	HiOutlineCodeBracket,
 	HiOutlineServerStack,
 	HiOutlineSignal,
@@ -18,17 +19,22 @@ const SECURITY_FEATURES: {
 	icon: ReactNode;
 	title: MessageDescriptor;
 	description: MessageDescriptor;
+	link?: { href: string; label: MessageDescriptor };
 }[] = [
 	{
-		id: "source-available",
+		id: "open-source",
 		icon: <HiOutlineCodeBracket className="w-5 h-5 text-foreground/70" />,
 		title: msg({
-			message: "Source Available",
+			message: "Open Source",
 		}),
 		description: msg({
 			message:
-				"Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality.",
+				"Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub.",
 		}),
+		link: {
+			href: COMPANY.GITHUB_URL,
+			label: msg({ message: "View on GitHub" }),
+		},
 	},
 	{
 		id: "local-first",
@@ -38,18 +44,18 @@ const SECURITY_FEATURES: {
 		}),
 		description: msg({
 			message:
-				"Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only.",
+				"In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox.",
 		}),
 	},
 	{
 		id: "your-accounts",
 		icon: <HiOutlineSignal className="w-5 h-5 text-foreground/70" />,
 		title: msg({
-			message: "Your Agents, Your Accounts",
+			message: "Bring Your Own Subscription",
 		}),
 		description: msg({
 			message:
-				"Use your existing agent subscriptions and API keys. Superset never proxies model calls or locks your workflow to one provider.",
+				"Use the agent plans and API keys you already have. Model calls go straight to your provider.",
 		}),
 	},
 ];
@@ -69,22 +75,22 @@ export function SecuritySection() {
 					transition={{ duration: 0.5 }}
 				>
 					<div className="space-y-4">
-						<span className="text-sm font-mono uppercase tracking-widest text-brand">
-							<Trans>Security</Trans>
-						</span>
-						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.1] text-foreground">
+						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.1] text-foreground">
 							<Trans>
-								Private by default.
+								Open source.
 								<br />
-								You&apos;re in control.
+								Secure by design.
 							</Trans>
 						</h2>
-						<p className="text-base sm:text-lg font-light text-muted-foreground max-w-[700px]">
-							<Trans>
-								Your code stays local by default, with explicit control over
-								connected services.
-							</Trans>
-						</p>
+						<a
+							href={COMPANY.TRUST_URL}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1.5 text-base sm:text-lg leading-relaxed text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+						>
+							<Trans>SOC 2 Type II compliant. Request our report.</Trans>
+							<HiArrowUpRight className="size-4 shrink-0" />
+						</a>
 					</div>
 					<a
 						href={COMPANY.TRUST_URL}
@@ -119,12 +125,23 @@ export function SecuritySection() {
 							<div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-[2px] bg-muted border border-border">
 								{feature.icon}
 							</div>
-							<h3 className="text-lg font-medium text-foreground/90 mb-2">
+							<h3 className="text-lg font-medium text-foreground mb-2">
 								{t(feature.title)}
 							</h3>
-							<p className="text-sm leading-relaxed text-muted-foreground">
+							<p className="text-base leading-relaxed text-muted-foreground">
 								{t(feature.description)}
 							</p>
+							{feature.link && (
+								<a
+									href={feature.link.href}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="mt-4 inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+								>
+									{t(feature.link.label)}
+									<HiArrowUpRight className="size-3.5" />
+								</a>
+							)}
 						</m.div>
 					))}
 				</m.div>

@@ -23,6 +23,8 @@ const PLAN_BY_PRICE: Record<string, string> = {
 	[env.STRIPE_PRO_MONTHLY_PRICE_ID]: PRO_MONTHLY_PLAN_ID,
 	[env.STRIPE_PRO_YEARLY_PRICE_ID]: PRO_ANNUAL_PLAN_ID,
 };
+// Autumn imports onto a plan's latest version; these Stripe prices are version 1's.
+const LEGACY_PRICE_PLAN_VERSION = 1;
 
 const ENTERPRISE_TEMPLATE_PLAN_ID = "enterprise";
 const SEAT_INTERVALS = new Set(["month", "year"]);
@@ -280,6 +282,9 @@ async function main() {
 						link: { subscriptionId: row.stripeSubscriptionId },
 						plan: {
 							planId,
+							...(row.plan === "enterprise"
+								? {}
+								: { version: LEGACY_PRICE_PLAN_VERSION }),
 							featureQuantities: [
 								{ featureId: SEATS_FEATURE_ID, quantity: seat.quantity ?? 1 },
 							],

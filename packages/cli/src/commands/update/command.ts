@@ -24,7 +24,7 @@ import { atomicReplace, backupRootFor } from "./atomic-replace";
 // CLI's update channel independent of desktop releases — which would otherwise
 // shadow CLI on `/releases/latest`.
 const ROLLING_DOWNLOAD_BASE =
-	"https://github.com/superset-sh/superset/releases/download/cli-latest";
+	"https://github.com/paradevai/paradev/releases/download/cli-latest";
 
 function detectTarget(): string {
 	const arch = process.arch === "arm64" ? "arm64" : "x64";
@@ -59,7 +59,7 @@ function tarballUrl(target: string, version?: string): string {
 	if (!version) {
 		return `${ROLLING_DOWNLOAD_BASE}/superset-${target}.tar.gz`;
 	}
-	return `https://github.com/superset-sh/superset/releases/download/cli-v${version}/superset-${target}.tar.gz`;
+	return `https://github.com/paradevai/paradev/releases/download/cli-v${version}/superset-${target}.tar.gz`;
 }
 
 const SEMVER_RE = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?$/;
@@ -111,7 +111,7 @@ function resolveInstallRoot(): string {
 
 export default command({
 	sandbox: false,
-	description: "Update the Superset CLI and host service to the latest release",
+	description: "Update the Paradev CLI and host service to the latest release",
 	skipMiddleware: true,
 	options: {
 		check: boolean().desc("Only check for updates; don't install"),
@@ -126,7 +126,7 @@ export default command({
 	run: async ({ options }) => {
 		if (isDesktopBundled()) {
 			throw new CLIError(
-				"This CLI is bundled with the Superset desktop app and updates together with the app.",
+				"This CLI is bundled with the Paradev desktop app and updates together with the app.",
 				`For a standalone CLI that updates in place: curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh`,
 			);
 		}

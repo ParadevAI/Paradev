@@ -1,0 +1,1 @@
+export { replyFooters } from "./replyFooters";

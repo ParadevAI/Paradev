@@ -5,15 +5,20 @@ type Mutation =
 	| "prompt"
 	| "removeQueuedPrompt"
 	| "steerQueuedPrompt"
+	| "updateQueuedPrompt"
 	| "resumeQueue"
+	| "respondToUsageLimit"
 	| "cancelTurn"
 	| "stopBackgroundTask"
+	| "steerSubagent"
+	| "backgroundSubagent"
 	| "respondToApproval"
 	| "setMode"
 	| "setConfigOption"
 	| "closeSession"
 	| "forkSession"
-	| "rewindSession";
+	| "rewindSession"
+	| "undoTurnFiles";
 
 type Query =
 	| "getSession"
@@ -22,7 +27,8 @@ type Query =
 	| "discoverSessions"
 	| "getItems"
 	| "getOutline"
-	| "getItemBodies";
+	| "getItemBodies"
+	| "getTurnChanges";
 
 /** A tRPC client for the chat router, by shape rather than by router type. */
 export type ChatTrpcClient = {
@@ -38,15 +44,20 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		prompt: (input) => client.prompt.mutate(input),
 		removeQueuedPrompt: (input) => client.removeQueuedPrompt.mutate(input),
 		steerQueuedPrompt: (input) => client.steerQueuedPrompt.mutate(input),
+		updateQueuedPrompt: (input) => client.updateQueuedPrompt.mutate(input),
 		resumeQueue: (input) => client.resumeQueue.mutate(input),
+		respondToUsageLimit: (input) => client.respondToUsageLimit.mutate(input),
 		cancelTurn: (input) => client.cancelTurn.mutate(input),
 		stopBackgroundTask: (input) => client.stopBackgroundTask.mutate(input),
+		steerSubagent: (input) => client.steerSubagent.mutate(input),
+		backgroundSubagent: (input) => client.backgroundSubagent.mutate(input),
 		respondToApproval: (input) => client.respondToApproval.mutate(input),
 		setMode: (input) => client.setMode.mutate(input),
 		setConfigOption: (input) => client.setConfigOption.mutate(input),
 		closeSession: (input) => client.closeSession.mutate(input),
 		forkSession: (input) => client.forkSession.mutate(input),
 		rewindSession: (input) => client.rewindSession.mutate(input),
+		undoTurnFiles: (input) => client.undoTurnFiles.mutate(input),
 		getSession: (input) => client.getSession.query(input),
 		getQueue: (input) => client.getQueue.query(input),
 		listSessions: (input) => client.listSessions.query(input),
@@ -54,5 +65,6 @@ export function chatTransportFromTrpc(client: ChatTrpcClient): ChatTransport {
 		getItems: (input) => client.getItems.query(input),
 		getOutline: (input) => client.getOutline.query(input),
 		getItemBodies: (input) => client.getItemBodies.query(input),
+		getTurnChanges: (input) => client.getTurnChanges.query(input),
 	};
 }

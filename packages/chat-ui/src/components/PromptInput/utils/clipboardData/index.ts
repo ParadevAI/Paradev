@@ -1,0 +1,1 @@
+export { $clipboardData } from "./clipboardData";

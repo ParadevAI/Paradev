@@ -1,0 +1,85 @@
+---
+title: "Paradev 與 Conductor 比較：本機代理、雲端工作區和審查"
+description: "比較 Paradev 和 Conductor 的平行編碼代理、本機與雲端工作區、審查、團隊協作和行動裝置存取功能。"
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset 與 conductor 比較
+  - conductor 替代方案
+  - ai 代理協作管理
+  - 編碼代理管理
+  - conductor 與 superset 比較
+  - conductor 即將停止服務
+  - 從 conductor 遷移
+---
+
+如果你選擇轉換，請參閱[從 Conductor 轉移至 Paradev](/conductor)了解遷移選項，或依照[從 Conductor 遷移](https://docs.paradev.com/migrate-from-conductor)處理本機 App，或依照[從 Conductor Cloud 遷移](https://docs.paradev.com/migrate-from-conductor-cloud)處理雲端工作區。
+
+Paradev 和 Conductor 都會將平行編碼任務整理到各自獨立的工作區。Conductor 提供雲端工作區、共用團隊對話、API 和 MCP 伺服器、排程 Routines，以及可存取雲端並實驗性遠端控制本機 Mac 工作區的 iOS App。Paradev 的 iPhone 和 iPad App 可連接其雲端工作區及你擁有的主機，因此無論代理在哪裡執行，你都能繼續使用工作區終端機並審查差異。
+
+## 快速比較
+
+| 需求 | Paradev | Conductor |
+|---|---|---|
+| 代理 | Claude Code、Codex、OpenCode、Gemini CLI、Cursor Agent、Copilot、Amp，以及你新增的任何自訂 CLI 代理 | Claude Code、Codex、Cursor、OpenCode |
+| 執行位置 | 本機工作區、已連接的主機、自有 Linux 伺服器（[自帶雲端](https://docs.paradev.com/bring-your-own-cloud)），以及[雲端工作區](https://docs.paradev.com/cloud-workspaces) | 本機 Mac 工作區和雲端沙箱 |
+| 審查 | 「變更」窗格可提交、推送並建立 PR；PR 窗格可顯示檢查結果、審查討論串並合併 | 差異、檢查結果、pull request、合併和封存 |
+| 團隊存取 | 新增的主機可個別授予成員存取權，另有組織存取權 | 共用雲端工作區和對話 |
+| 瀏覽器 | App 內瀏覽器窗格含有設計模式，可選取元素並傳送給代理 | 瀏覽器預覽 |
+| 自動化 | Pro 可在選定主機上排程執行代理，並提供執行記錄及失敗重試 | 可按排程或由 GitHub action 觸發的 Routines，在雲端執行 |
+| 程式化控制 | CLI、TypeScript SDK 和 MCP 伺服器 | API 和 Conductor MCP |
+| 手機 | App Store 上架的 iPhone 和 iPad App，適用於 iOS 或 iPadOS 26+，需 Pro；可連接雲端工作區和自有主機 | iOS App；雲端工作區及[對本機 Mac 工作區的實驗性遠端控制](https://www.conductor.build/docs/reference/remote-control)。使用遠端控制時，Mac 必須保持開啟、喚醒且連線。 |
+| 價格 | 免費；Pro {{price:pro}}/每位使用者/月，或按年計費 {{price:pro:yearly}}；Team {{price:team}}，或按年計費 {{price:team:yearly}}；Ultra {{price:ultra}}；Enterprise 客製方案。付費方案可使用雲端；方案內用量和額外用量計費方式請參閱[價格](/pricing)。 | Conductor 的[目前方案和帳戶存取方式](https://www.conductor.build/docs/cloud/faq) |
+
+Conductor 的[介紹](https://www.conductor.build/docs)列出四種代理 harness 和其審查流程。[雲端文件](https://www.conductor.build/docs/cloud)說明共用環境和隔離沙箱。其目前文件也介紹了[從 iPhone 遠端控制本機 Mac 工作區的實驗性功能](https://www.conductor.build/docs/reference/remote-control)。
+
+## Paradev 的需求
+
+Paradev 可在獨立工作區中執行 CLI 編碼代理，並將終端機和差異審查整合在同一個 App 中。桌面版支援 macOS 和實驗性 Linux AppImage。目前尚未支援 Windows。Paradev 採用 MIT License 開源。喜歡 Conductor 聊天功能的使用者，可透過[聊天介面](https://docs.paradev.com/chat)使用 Claude Code、Codex、OpenCode 和 Pi。
+
+若要同時管理多個工作階段，「工作區」頁面會依狀態（需要處理、執行中、需要審查、閒置、已合併）整理你所有主機上的工作區。中斷的代理工作階段會在同一窗格中繼續執行，而 Claude Code 或 Codex 啟動的子代理則會顯示在其父代理下方。
+
+若要在 [iPhone 和 iPad 上使用 Paradev](/mobile)，需要 iOS 26 或 iPadOS 26 以上版本，並訂閱 Pro。雲端工作區不需要讓自己的電腦保持連線；若工作區位於自有電腦，則該主機必須保持在線。遠端存取和自動化也需要付費方案。請參閱[價格](/pricing)和[遠端存取設定](https://docs.paradev.com/remote-access)。
+
+## 在你的存放庫中試用
+
+本比較由 Paradev 發布。連結的 Conductor 文件支援各項功能描述；以下試用方式是評估方法，並非實測效能排名。
+
+若要比較兩款 App，請在每款 App 中使用相同的存放庫提交版本、代理、模型，以及兩個彼此獨立的任務提示。記錄 App 和代理版本、日期及設定差異。[平行任務指南](/blog/parallel-coding-agents-guide)提供了範圍明確的提示範例。
+
+| 試用步驟 | 記錄的項目 |
+|---|---|
+| 建立兩項互不相依的任務 | 工作區路徑和分支名稱；執行測試前需要的設定步驟 |
+| 讓每個代理完成一項小型變更 | 提示、模型、變更的檔案和檢查輸出 |
+| 要求修正一項內容 | 是否能找到並恢復正確的工作階段 |
+| 審查並整合兩項變更 | 審查步驟、衝突和整合後的測試結果 |
+| 若需要，試用遠端存取 | 主機可用狀態、所需方案，以及中斷連線時的狀況 |
+
+將設定和審查時間與代理執行時間分開衡量。在下結論前重複測試：代理輸出會有所差異，而且執行較快的結果仍可能產生較差的差異。Git worktree 能隔離工作檔案，但無法保證整合時不會發生衝突，也無法保證代理權限受到沙箱限制。
+
+![在 Paradev 中審查變更。](/images/readme/diff-viewer.png)
+
+## Conductor 使用者現在可以怎麼做
+
+如果你選擇轉換，請儲存分支，並匯出想保留的記錄。
+
+如果你希望在代理執行任務時，能透過 iPhone 回覆代理並審查變更，且代理可在你的電腦、主機或雲端工作區上執行、支援任何 CLI 代理，請選擇 Paradev。請依照[手機操作指南](/blog/claude-code-codex-iphone)確認設定。若要轉移工作，請參閱[本機 App 指南](https://docs.paradev.com/migrate-from-conductor)或[Conductor Cloud 指南](https://docs.paradev.com/migrate-from-conductor-cloud)。
+
+比較目前的 [Paradev 方案](/pricing)，其中包含運算和代理供應商費用。代理供應商用量會另外計費。
+
+## 常見問題
+
+### Conductor 只能在本機使用嗎？
+
+不是。Conductor 的文件介紹了本機 Mac 工作區和[雲端沙箱](https://www.conductor.build/docs/cloud)，其中包括共用雲端工作區。其 iOS App 也提供[對本機 Mac 工作區的實驗性遠端控制](https://www.conductor.build/docs/reference/remote-control)。
+
+### Conductor 能執行 OpenCode 嗎？
+
+可以。其介紹列出了 OpenCode，以及 Claude Code、Codex 和 Cursor。
+
+### 使用 Paradev 需要更換編輯器嗎？
+
+不需要。你可以在編輯器中開啟工作區目錄，同時讓 Paradev 管理終端機和工作區。對於彼此重疊的編輯操作，請指定由哪一方負責。

@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import type { GitEnvironmentCause } from "../../../error-types";
 
 // Git's own text for environmental failures: the worktree was deleted out
 // from under a running git process, macOS denies reading it, or the
@@ -20,6 +21,10 @@ const NOT_GIT_REPO_PATTERN =
 // such as running out of memory, stay unclassified.
 const INDEX_STORAGE_UNAVAILABLE_PATTERN =
 	/unable to map index file: Operation (?:timed out|canceled)$/m;
+// The same storage failure on any other file git maps (packfiles, pack
+// indexes, worktree files it hashes), reported by git's xmmap() wrapper.
+const MAPPED_FILE_STORAGE_UNAVAILABLE_PATTERN =
+	/^fatal: mmap failed: Operation (?:timed out|canceled)$/m;
 // Git's text when the directory resolves to a repository but has no work tree
 // attached: the repo is bare, or the linked worktree's admin data was removed
 // or pruned. Distinct from CWD_GONE_PATTERN, where the directory itself is
@@ -108,6 +113,34 @@ const PUSH_REFUSED_PATTERN = /^error: failed to push some refs to '/im;
 const PUSH_SRC_REFSPEC_UNRESOLVED_PATTERN =
 	/^error: src refspec .* does not match any$/im;
 
+export const GIT_TOOLS_MISSING_MESSAGE =
+	"Git can't run because Apple's Command Line Tools aren't installed on this Mac.";
+
+/**
+ * True when git never ran because the macOS /usr/bin/git stub refused (no
+ * Command Line Tools, a broken Xcode, or an unaccepted Xcode license).
+ */
+export function isGitToolsMissingError(error: unknown): boolean {
+	const message = error instanceof Error ? error.message : String(error);
+	return (
+		XCODE_SELECT_NO_TOOLS_PATTERN.test(message) ||
+		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(message)
+	);
+}
+
+/** Throws the plain-language PRECONDITION_FAILED for a stub refusal. */
+export function rethrowGitToolsMissing(error: unknown): void {
+	if (!isGitToolsMissingError(error)) return;
+	throw new TRPCError({
+		code: "PRECONDITION_FAILED",
+		message: GIT_TOOLS_MISSING_MESSAGE,
+		cause: {
+			kind: "GIT_ENVIRONMENT",
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		} satisfies GitEnvironmentCause,
+	});
+}
+
 /**
  * Rethrows environmental git failures — the same classification
  * resolve-worktree.ts applies before git runs — and pushes git refused as
@@ -147,7 +180,8 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 	}
 	if (
 		CWD_UNREADABLE_PATTERN.test(error.message) ||
-		INDEX_STORAGE_UNAVAILABLE_PATTERN.test(error.message)
+		INDEX_STORAGE_UNAVAILABLE_PATTERN.test(error.message) ||
+		MAPPED_FILE_STORAGE_UNAVAILABLE_PATTERN.test(error.message)
 	) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
@@ -157,13 +191,25 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 	}
 	if (
 		XCODE_SELECT_NO_TOOLS_PATTERN.test(error.message) ||
-		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(error.message) ||
-		XCODE_LICENSE_NOT_ACCEPTED_PATTERN.test(error.message)
+		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(error.message)
 	) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: error.message,
-			cause: { kind: "GIT_ENVIRONMENT" },
+			cause: {
+				kind: "GIT_ENVIRONMENT",
+				reason: "COMMAND_LINE_TOOLS_MISSING",
+			} satisfies GitEnvironmentCause,
+		});
+	}
+	if (XCODE_LICENSE_NOT_ACCEPTED_PATTERN.test(error.message)) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: error.message,
+			cause: {
+				kind: "GIT_ENVIRONMENT",
+				reason: "XCODE_LICENSE_NOT_ACCEPTED",
+			} satisfies GitEnvironmentCause,
 		});
 	}
 	if (FILTER_HELPER_MISSING_PATTERN.test(error.message)) {

@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import type { PresenceVisitor } from "@superset/shared/page-presence";
+import { PresenceStack } from "@superset/ui/presence";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { CloudWorkspaceShareButton } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspaceShareButton";
-import { PresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PresenceStack";
 
 interface CloudWorkspaceRecordSharingProps {
 	workspaceId: string;

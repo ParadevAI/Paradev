@@ -19,21 +19,10 @@ import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
 import { posthog } from "../../lib/analytics";
-import { createTRPCRouter, protectedProcedure, userError } from "../../trpc";
+import { createTRPCRouter, personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const SUPPORT_EMAIL = COMPANY.MAIL_TO.replace(/^mailto:/, "");
-const supportReportRateLimit =
-	env.KV_REST_API_URL && env.KV_REST_API_TOKEN
-		? new Ratelimit({
-				redis: new Redis({
-					url: env.KV_REST_API_URL,
-					token: env.KV_REST_API_TOKEN,
-				}),
-				limiter: Ratelimit.slidingWindow(3, "1 h"),
-				prefix: "ratelimit:support:migration-report",
-			})
-		: null;
 
 const submitFeedbackRateLimit =
 	env.KV_REST_API_URL && env.KV_REST_API_TOKEN
@@ -58,39 +47,6 @@ const submitPromptRateLimit =
 				prefix: "ratelimit:support:submit-prompt",
 			})
 		: null;
-
-async function assertSupportReportRateLimit({
-	userId,
-	organizationId,
-}: {
-	userId: string;
-	organizationId: string | null | undefined;
-}) {
-	if (!supportReportRateLimit) {
-		if (env.NODE_ENV === "production") {
-			throw userError({
-				code: "INTERNAL_SERVER_ERROR",
-				message: "Support rate limiting is not configured",
-				i18nKey: "serverError.support.supportRateLimitingIsNotConfigured",
-			});
-		}
-		console.warn(
-			"[support/sendMigrationReport] rate limit skipped because KV is not configured",
-		);
-		return;
-	}
-
-	const { success } = await supportReportRateLimit.limit(
-		`${organizationId ?? "no-org"}:${userId}`,
-	);
-	if (!success) {
-		throw userError({
-			code: "TOO_MANY_REQUESTS",
-			message: "Too many support reports. Try again later.",
-			i18nKey: "serverError.support.tooManySupportReportsTryAgain",
-		});
-	}
-}
 
 async function assertSubmitPromptRateLimit({
 	userId,
@@ -130,49 +86,7 @@ function sanitizeEmailBodyLine(value: string): string {
 }
 
 export const supportRouter = createTRPCRouter({
-	sendMigrationReport: protectedProcedure
-		.input(
-			z.object({
-				report: z.string().min(1).max(20_000),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			const organizationId = ctx.activeOrganizationId;
-			const user = ctx.session.user;
-			const safeName = user.name ? sanitizeEmailBodyLine(user.name) : "";
-			const userLabel = safeName ? `${safeName} <${user.email}>` : user.email;
-
-			await assertSupportReportRateLimit({
-				userId: user.id,
-				organizationId,
-			});
-
-			try {
-				const { error } = await resend.emails.send({
-					from: NOREPLY_FROM,
-					to: SUPPORT_EMAIL,
-					replyTo: user.email,
-					subject: "Superset V1 to V2 migration issue",
-					text: [
-						`User: ${userLabel}`,
-						`User ID: ${user.id}`,
-						`Organization ID: ${organizationId ?? "none"}`,
-						"",
-						input.report,
-					].join("\n"),
-				});
-				if (error) throw error;
-			} catch (error) {
-				console.error("[support/sendMigrationReport] failed", error);
-				throw userError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to send migration report",
-					i18nKey: "serverError.support.failedToSendMigrationReport",
-				});
-			}
-		}),
-
-	submitFeedback: protectedProcedure
+	submitFeedback: personProcedure
 		.input(
 			z
 				.object({
@@ -326,7 +240,7 @@ export const supportRouter = createTRPCRouter({
 			});
 		}),
 
-	submitPrompt: protectedProcedure
+	submitPrompt: personProcedure
 		.input(
 			z.object({
 				promptText: z.string().min(1).max(10_000),

@@ -3,6 +3,11 @@ import {
 	type IntegrationProvider,
 } from "@superset/shared/integrations";
 import type { SettingsSection } from "renderer/stores/settings-state";
+import {
+	isSettingsSectionVisible,
+	SETTINGS_SECTION_GROUPS,
+	type SettingsSectionVisibility,
+} from "../settingsSections";
 
 export const SETTING_ITEM_ID = {
 	MOBILE_APP: "mobile-app",
@@ -38,21 +43,20 @@ export const SETTING_ITEM_ID = {
 
 	KEYBOARD_SHORTCUTS: "keyboard-shortcuts",
 	BEHAVIOR_CONFIRM_QUIT: "behavior-confirm-quit",
-	BEHAVIOR_FILE_OPEN_MODE: "behavior-file-open-mode",
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
+	BEHAVIOR_ACP_CHAT: "behavior-acp-chat",
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
-	USAGE_IN_SIDEBAR: "usage-in-sidebar",
-	BEHAVIOR_OPEN_LINKS_IN_APP: "behavior-open-links-in-app",
+	BEHAVIOR_PARADEV_ANYWHERE: "behavior-paradev-anywhere",
+	USAGE_RAIL_RINGS: "usage-rail-rings",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
 
 	BROWSER_HOMEPAGE: "browser-homepage",
 	BROWSER_IMPORT_HISTORY: "browser-import-history",
 
 	GIT_BRANCH_PREFIX: "git-branch-prefix",
-	GIT_DELETE_LOCAL_BRANCH: "git-delete-local-branch",
 	GIT_WORKTREE_LOCATION: "git-worktree-location",
 
 	AGENTS_ENABLED: "agents-enabled",
@@ -62,7 +66,6 @@ export const SETTING_ITEM_ID = {
 	TERMINAL_PRESETS: "terminal-presets",
 	TERMINAL_QUICK_ADD: "terminal-quick-add",
 	TERMINAL_SESSIONS: "terminal-sessions",
-	TERMINAL_LINK_BEHAVIOR: "terminal-link-behavior",
 	TERMINAL_BACKGROUND_LIMIT: "terminal-background-limit",
 	TERMINAL_COPY_ON_SELECT: "terminal-copy-on-select",
 	TERMINAL_CLOSE_CONFIRM: "terminal-close-confirm",
@@ -77,21 +80,27 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_V1_MIGRATION: "experimental-v1-migration",
 	EXPERIMENTAL_INLINE_WORKSPACE_PORTS: "experimental-inline-workspace-ports",
 	EXPERIMENTAL_WORKSPACE_AGENTS: "experimental-workspace-agents",
-	EXPERIMENTAL_NEW_SIDEBAR: "experimental-new-sidebar",
+	EXPERIMENTAL_CHAT_TURN_SNAPSHOTS: "experimental-chat-turn-snapshots",
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
+	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
+	EXPERIMENTAL_NEW_LAYOUT: "experimental-new-layout",
+	EXPERIMENTAL_NEW_WORKSPACE_PAGE: "experimental-new-workspace-page",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
 	BILLING_USAGE: "billing-usage",
 
+	CLOUD_USAGE: "cloud-usage",
+
 	PROJECT_NAME: "project-name",
 	PROJECT_PATH: "project-path",
 	PROJECT_SCRIPTS: "project-scripts",
-	PROJECT_BRANCH_PREFIX: "project-branch-prefix",
 	PROJECT_WORKTREE_LOCATION: "project-worktree-location",
 	PROJECT_SPARSE_CHECKOUT: "project-sparse-checkout",
-	PROJECT_IMPORT_WORKTREES: "project-import-worktrees",
+
+	ORGANIZATION_PLUGIN_SOURCES: "organization-plugin-sources",
+	ORGANIZATION_PLUGIN_ACCESS: "organization-plugin-access",
 
 	API_KEYS_LIST: "api-keys-list",
 	API_KEYS_GENERATE: "api-keys-generate",
@@ -106,6 +115,7 @@ export const SETTING_ITEM_ID = {
 		"security-expose-host-service-via-relay",
 
 	HOST_MEMBERS: "host-members",
+	HOST_ALLOW_CLOUD_WORKSPACES: "host-allow-cloud-workspaces",
 	ENVIRONMENTS_LIST: "environments-list",
 	AGENT_ACCOUNTS: "agent-accounts",
 	CONNECTIONS: "connections",
@@ -136,152 +146,6 @@ export interface SettingsItem {
 	title: string;
 	description: string;
 	keywords: string[];
-}
-
-/**
- * Which v1/v2 variant of the desktop UI a setting applies to.
- * - "v1": only used by the legacy desktop UI; hide when the user is on v2.
- * - "v2": only meaningful in the v2 desktop UI; hide when the user is on v1.
- * - "shared": applies to both (or is provided by a global/cloud surface).
- *
- * Source of truth for the v1/v2 settings audit. When adding a new setting,
- * pick a variant or it will fail typecheck on the registry below.
- */
-export type SettingVariant = "v1" | "v2" | "shared";
-
-const INTEGRATION_ITEM_VARIANTS = Object.fromEntries(
-	INTEGRATIONS.map((integration) => [
-		integrationSettingItemId(integration.provider),
-		"shared",
-	]),
-) as Record<IntegrationSettingItemId, SettingVariant>;
-
-export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
-	...INTEGRATION_ITEM_VARIANTS,
-
-	[SETTING_ITEM_ID.ACCOUNT_PROFILE]: "shared",
-	[SETTING_ITEM_ID.ACCOUNT_SIGNOUT]: "shared",
-	[SETTING_ITEM_ID.ACCOUNT_DELETE]: "shared",
-	[SETTING_ITEM_ID.ACCOUNT_LEADERBOARD]: "shared",
-
-	[SETTING_ITEM_ID.ORGANIZATION_LOGO]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_NAME]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_SLUG]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_ID]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_TASK_TRACKER]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_LIST]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_INVITE]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_MEMBERS_PENDING_INVITATIONS]: "shared",
-	[SETTING_ITEM_ID.ORGANIZATION_DELETE]: "shared",
-
-	[SETTING_ITEM_ID.TEAMS_LIST]: "shared",
-
-	[SETTING_ITEM_ID.APPEARANCE_THEME]: "shared",
-	[SETTING_ITEM_ID.APPEARANCE_LANGUAGE]: "shared",
-	[SETTING_ITEM_ID.APPEARANCE_MARKDOWN]: "shared",
-	[SETTING_ITEM_ID.APPEARANCE_CUSTOM_THEMES]: "shared",
-	[SETTING_ITEM_ID.APPEARANCE_EDITOR_FONT]: "v2",
-	[SETTING_ITEM_ID.APPEARANCE_TERMINAL_FONT]: "v2",
-
-	[SETTING_ITEM_ID.RINGTONES_NOTIFICATION]: "shared",
-
-	[SETTING_ITEM_ID.USAGE_TOKENS]: "shared",
-	[SETTING_ITEM_ID.USAGE_RESOURCES]: "shared",
-
-	[SETTING_ITEM_ID.KEYBOARD_SHORTCUTS]: "shared",
-
-	[SETTING_ITEM_ID.BEHAVIOR_CONFIRM_QUIT]: "shared",
-	[SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE]: "v1",
-	[SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE]: "v2",
-	[SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT]: "v2",
-	// The top-bar Changes control is a v2-only surface.
-	[SETTING_ITEM_ID.BEHAVIOR_CHANGES_OPEN_TARGET]: "v2",
-	[SETTING_ITEM_ID.BEHAVIOR_RESOURCE_MONITOR]: "shared",
-	// The agent composers that offer dictation are v2-only.
-	[SETTING_ITEM_ID.BEHAVIOR_DICTATION]: "v2",
-	// The home sidebar (DashboardSidebar) only renders for v2 users.
-	[SETTING_ITEM_ID.USAGE_IN_SIDEBAR]: "v2",
-	[SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP]: "v1",
-	[SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB]: "shared",
-
-	// The in-app browser pane is a v2-only surface.
-	[SETTING_ITEM_ID.BROWSER_HOMEPAGE]: "v2",
-	[SETTING_ITEM_ID.BROWSER_IMPORT_HISTORY]: "v2",
-
-	// Branch prefix exists in both UIs — v1 `GitSettings`, v2 `V2GitSettings`.
-	[SETTING_ITEM_ID.GIT_BRANCH_PREFIX]: "shared",
-	[SETTING_ITEM_ID.GIT_DELETE_LOCAL_BRANCH]: "v1",
-	[SETTING_ITEM_ID.GIT_WORKTREE_LOCATION]: "shared",
-
-	[SETTING_ITEM_ID.AGENTS_ENABLED]: "shared",
-	[SETTING_ITEM_ID.AGENTS_COMMANDS]: "shared",
-	[SETTING_ITEM_ID.AGENTS_TASK_PROMPTS]: "shared",
-
-	[SETTING_ITEM_ID.TERMINAL_PRESETS]: "shared",
-	[SETTING_ITEM_ID.TERMINAL_QUICK_ADD]: "shared",
-	[SETTING_ITEM_ID.TERMINAL_SESSIONS]: "shared",
-	[SETTING_ITEM_ID.TERMINAL_LINK_BEHAVIOR]: "v1",
-	[SETTING_ITEM_ID.TERMINAL_BACKGROUND_LIMIT]: "v2",
-	[SETTING_ITEM_ID.TERMINAL_COPY_ON_SELECT]: "v2",
-	[SETTING_ITEM_ID.TERMINAL_CLOSE_CONFIRM]: "v2",
-
-	[SETTING_ITEM_ID.LINKS_FILE]: "v2",
-	[SETTING_ITEM_ID.LINKS_FOLDER]: "v2",
-	[SETTING_ITEM_ID.LINKS_URL]: "v2",
-	[SETTING_ITEM_ID.LINKS_SIDEBAR_FILE]: "v2",
-	[SETTING_ITEM_ID.LINKS_PORT]: "v2",
-	[SETTING_ITEM_ID.LINKS_PAGE]: "v2",
-
-	[SETTING_ITEM_ID.EXPERIMENTAL_V1_MIGRATION]: "v2",
-	[SETTING_ITEM_ID.EXPERIMENTAL_INLINE_WORKSPACE_PORTS]: "v2",
-	[SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS]: "v2",
-	[SETTING_ITEM_ID.EXPERIMENTAL_NEW_SIDEBAR]: "v2",
-	// Gates both the v1 renderer launch and the v2 host-side launch.
-	[SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT]: "shared",
-
-	[SETTING_ITEM_ID.BILLING_OVERVIEW]: "shared",
-	[SETTING_ITEM_ID.BILLING_PLANS]: "shared",
-	[SETTING_ITEM_ID.BILLING_USAGE]: "shared",
-
-	[SETTING_ITEM_ID.PROJECT_NAME]: "shared",
-	[SETTING_ITEM_ID.PROJECT_PATH]: "shared",
-	[SETTING_ITEM_ID.PROJECT_SCRIPTS]: "shared",
-	[SETTING_ITEM_ID.PROJECT_BRANCH_PREFIX]: "v1",
-	[SETTING_ITEM_ID.PROJECT_WORKTREE_LOCATION]: "shared",
-	[SETTING_ITEM_ID.PROJECT_SPARSE_CHECKOUT]: "v2",
-	[SETTING_ITEM_ID.PROJECT_IMPORT_WORKTREES]: "v1",
-
-	[SETTING_ITEM_ID.API_KEYS_LIST]: "shared",
-	[SETTING_ITEM_ID.API_KEYS_GENERATE]: "shared",
-
-	[SETTING_ITEM_ID.PERMISSIONS_FULL_DISK_ACCESS]: "shared",
-	[SETTING_ITEM_ID.PERMISSIONS_ACCESSIBILITY]: "shared",
-	[SETTING_ITEM_ID.PERMISSIONS_MICROPHONE]: "shared",
-	[SETTING_ITEM_ID.PERMISSIONS_APPLE_EVENTS]: "shared",
-	[SETTING_ITEM_ID.PERMISSIONS_LOCAL_NETWORK]: "shared",
-
-	[SETTING_ITEM_ID.SECURITY_EXPOSE_HOST_SERVICE_VIA_RELAY]: "shared",
-	[SETTING_ITEM_ID.MOBILE_APP]: "shared",
-
-	[SETTING_ITEM_ID.HOST_MEMBERS]: "shared",
-	[SETTING_ITEM_ID.ENVIRONMENTS_LIST]: "v2",
-	[SETTING_ITEM_ID.AGENT_ACCOUNTS]: "v2",
-	[SETTING_ITEM_ID.CONNECTIONS]: "v2",
-	[SETTING_ITEM_ID.ENVIRONMENTS_SECRETS]: "v2",
-	[SETTING_ITEM_ID.HOST_INVITE_MEMBER]: "shared",
-	[SETTING_ITEM_ID.HOST_MEMBER_ROLE]: "shared",
-	[SETTING_ITEM_ID.HOST_WORKTREE_LOCATION]: "v2",
-	[SETTING_ITEM_ID.HOST_SERVICE_VERSION]: "v2",
-	[SETTING_ITEM_ID.HOST_DELETE]: "shared",
-};
-
-export function isItemAllowedForVariant(
-	itemId: SettingItemId,
-	isV2: boolean,
-): boolean {
-	const variant = SETTING_ITEM_VARIANT[itemId];
-	if (variant === "shared") return true;
-	return isV2 ? variant === "v2" : variant === "v1";
 }
 
 /**
@@ -344,12 +208,12 @@ const INTEGRATION_SEARCH_ITEMS: SettingsItem[] = INTEGRATIONS.map(
 	}),
 );
 
-export const SETTINGS_ITEMS: SettingsItem[] = [
+const SETTINGS_ITEMS: SettingsItem[] = [
 	{
 		id: SETTING_ITEM_ID.MOBILE_APP,
 		section: "mobile",
 		title: "Mobile",
-		description: "Use Superset on your iPhone",
+		description: "Use Paradev on your iPhone",
 		keywords: ["phone", "mobile", "qr", "scan", "ios", "app store"],
 	},
 	{
@@ -465,7 +329,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.ORGANIZATION_TASK_TRACKER,
 		section: "organization",
 		title: "Track tasks in",
-		description: "Use Superset tasks or your Linear issues",
+		description: "Use Paradev tasks or your Linear issues",
 		keywords: [
 			"organization",
 			"tasks",
@@ -791,23 +655,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.GIT_DELETE_LOCAL_BRANCH,
-		section: "git",
-		title: "Delete local branch on workspace removal",
-		description:
-			"Also delete the local git branch when deleting a worktree workspace",
-		keywords: [
-			"git",
-			"delete",
-			"branch",
-			"local",
-			"worktree",
-			"workspace",
-			"remove",
-			"cleanup",
-		],
-	},
-	{
 		id: SETTING_ITEM_ID.GIT_BRANCH_PREFIX,
 		section: "git",
 		title: "Branch Prefix",
@@ -823,25 +670,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"username",
 			"feat",
 			"custom",
-		],
-	},
-	{
-		id: SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE,
-		section: "files",
-		title: "File open mode",
-		description:
-			"Choose how files open when clicked in the file tree or changes view",
-		keywords: [
-			"file",
-			"open",
-			"mode",
-			"split",
-			"pane",
-			"tab",
-			"new tab",
-			"split pane",
-			"viewer",
-			"behavior",
 		],
 	},
 	{
@@ -877,6 +705,30 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"design",
 			"comments",
 			"pages",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT,
+		section: "behavior",
+		title: "Open agents in chat",
+		description:
+			"New agent sessions start in chat instead of the terminal. You can switch any session from its menu.",
+		keywords: [
+			"chat",
+			"interface",
+			"default",
+			"terminal",
+			"open",
+			"acp",
+			"agent",
+			"claude",
+			"codex",
+			"opencode",
+			"pi",
+			"session",
+			"pane",
+			"toggle",
+			"switch",
 		],
 	},
 	{
@@ -921,7 +773,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "behavior",
 		title: "Dictation",
 		description:
-			"Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Superset's servers.",
+			"Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers.",
 		keywords: [
 			"dictation",
 			"dictate",
@@ -935,20 +787,41 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.USAGE_IN_SIDEBAR,
+		id: SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE,
+		section: "behavior",
+		title: "Use Paradev anywhere button",
+		description:
+			"Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted",
+		keywords: [
+			"use paradev anywhere",
+			"sidebar",
+			"button",
+			"hide",
+			"show",
+			"mobile",
+			"cloud",
+			"cli",
+			"self-hosted",
+			"devices",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.USAGE_RAIL_RINGS,
 		section: "usage",
-		title: "Show usage tab on sidebar",
-		description: "Show a Usage button in the home sidebar, under Pull requests",
+		title: "Show quota rings on sidebar",
+		description:
+			"Show how much quota each model provider has used, at the bottom of the sidebar",
 		keywords: [
 			"sidebar",
 			"rail",
-			"button",
-			"shortcut",
-			"nav",
-			"home",
-			"gauge",
-			"pull requests",
+			"quota",
+			"rate limit",
 			"usage",
+			"ring",
+			"claude",
+			"codex",
+			"hide",
+			"show",
 		],
 	},
 	{
@@ -969,26 +842,9 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP,
-		section: "browser",
-		title: "Open links in the in-app browser",
-		description:
-			"Open links from chat and terminal in the in-app browser instead of your default browser",
-		keywords: [
-			"browser",
-			"links",
-			"in-app",
-			"external",
-			"open",
-			"chat",
-			"terminal",
-			"url",
-		],
-	},
-	{
 		id: SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB,
 		section: "behavior",
-		title: "Star Superset on GitHub",
+		title: "Star Paradev on GitHub",
 		description: "Support the project with a GitHub star",
 		keywords: [
 			"star",
@@ -1249,26 +1105,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.TERMINAL_LINK_BEHAVIOR,
-		section: "terminal",
-		title: "Link Behavior",
-		description: "How to open links from terminal",
-		keywords: [
-			"terminal",
-			"link",
-			"click",
-			"open",
-			"external",
-			"editor",
-			"file",
-			"url",
-			"path",
-			"cmd",
-			"ctrl",
-			"browser",
-		],
-	},
-	{
 		id: SETTING_ITEM_ID.LINKS_FILE,
 		section: "files",
 		title: "File links",
@@ -1481,19 +1317,22 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_SIDEBAR,
+		id: SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
 		section: "experimental",
-		title: "New sidebar",
+		title: "Track file changes per turn",
 		description:
-			"Cloud workspaces under their projects, a local and cloud filter, and the redesigned workspace row",
+			"Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them",
 		keywords: [
 			"experimental",
-			"sidebar",
-			"cloud",
-			"workspaces",
-			"projects",
-			"filter",
-			"redesign",
+			"chat",
+			"turn",
+			"snapshot",
+			"checkpoint",
+			"changes",
+			"files",
+			"edited",
+			"undo",
+			"diff",
 			"toggle",
 			"switch",
 		],
@@ -1518,6 +1357,63 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"reuse",
 			"sequential",
 			"install",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_LAYOUT,
+		section: "experimental",
+		title: "New layout",
+		description:
+			"Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards",
+		keywords: [
+			"experimental",
+			"layout",
+			"shell",
+			"redesign",
+			"design",
+			"sidebar",
+			"rail",
+			"tabs",
+			"title bar",
+			"cards",
+			"toggle",
+			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_WORKSPACE_PAGE,
+		section: "experimental",
+		title: "New workspace page",
+		description:
+			"Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it",
+		keywords: [
+			"experimental",
+			"new workspace",
+			"home",
+			"composer",
+			"prompt",
+			"redesign",
+			"layout",
+			"pickers",
+			"toggle",
+			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
+		section: "experimental",
+		title: "Restart onboarding",
+		description:
+			"Go through the first-run steps again. Your projects and settings stay as they are.",
+		keywords: [
+			"experimental",
+			"onboarding",
+			"restart",
+			"first run",
+			"setup",
+			"welcome",
+			"terminal",
+			"chat",
 		],
 	},
 	...INTEGRATION_SEARCH_ITEMS,
@@ -1569,6 +1465,13 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.CLOUD_USAGE,
+		section: "cloudUsage",
+		title: "Cloud usage",
+		description: "Cloud usage by day, person and workspace",
+		keywords: ["cloud", "usage", "gb-hours", "workspaces", "boots", "billing"],
+	},
+	{
 		id: SETTING_ITEM_ID.PROJECT_NAME,
 		section: "project",
 		title: "Project Name",
@@ -1615,26 +1518,6 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.PROJECT_BRANCH_PREFIX,
-		section: "project",
-		title: "Branch Prefix",
-		description: "Override the default branch prefix for this project",
-		keywords: [
-			"project",
-			"branch",
-			"prefix",
-			"naming",
-			"git",
-			"worktree",
-			"author",
-			"github",
-			"username",
-			"feat",
-			"custom",
-			"override",
-		],
-	},
-	{
 		id: SETTING_ITEM_ID.PROJECT_WORKTREE_LOCATION,
 		section: "project",
 		title: "Worktree Location",
@@ -1670,21 +1553,33 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.PROJECT_IMPORT_WORKTREES,
-		section: "project",
-		title: "Import Worktrees",
-		description: "Import existing worktrees from disk into Superset",
+		id: SETTING_ITEM_ID.ORGANIZATION_PLUGIN_SOURCES,
+		section: "plugins",
+		title: "Plugin Sources",
+		description: "GitHub repositories your organization's plugins sync from",
 		keywords: [
-			"project",
-			"import",
-			"worktree",
-			"worktrees",
-			"workspace",
-			"workspaces",
-			"external",
-			"existing",
-			"disk",
-			"add",
+			"plugins",
+			"marketplace",
+			"repository",
+			"github",
+			"source",
+			"sync",
+			"organization",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.ORGANIZATION_PLUGIN_ACCESS,
+		section: "plugins",
+		title: "Organization Plugins",
+		description: "Choose which roles can install each organization plugin",
+		keywords: [
+			"plugins",
+			"roles",
+			"access",
+			"policy",
+			"install",
+			"members",
+			"admins",
 		],
 	},
 	{
@@ -1814,7 +1709,7 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "security",
 		title: "Allow remote access to this device via relay",
 		description:
-			"Controls whether other devices can reach your local host service through the Superset relay",
+			"Controls whether other devices can reach your local host service through the Paradev relay",
 		keywords: [
 			"security",
 			"relay",
@@ -1831,6 +1726,27 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"host service",
 			"tunnel",
 			"attack surface",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.HOST_ALLOW_CLOUD_WORKSPACES,
+		section: "hosts",
+		title: "Allow my cloud workspaces to reach this host",
+		description:
+			"Lets agents in your cloud workspaces call a host you own through the relay",
+		keywords: [
+			"security",
+			"cloud",
+			"cloud workspace",
+			"sandbox",
+			"relay",
+			"remote",
+			"--host",
+			"agent",
+			"host",
+			"hosts",
+			"access",
+			"owner",
 		],
 	},
 	{
@@ -2021,19 +1937,6 @@ export function searchSettings(query: string): SettingsItem[] {
 	});
 }
 
-export function getMatchCountBySection(
-	query: string,
-): Partial<Record<SettingsSection, number>> {
-	const matches = searchSettings(query);
-	const counts: Partial<Record<SettingsSection, number>> = {};
-
-	for (const item of matches) {
-		counts[item.section] = (counts[item.section] || 0) + 1;
-	}
-
-	return counts;
-}
-
 export function getMatchingItemsForSection(
 	query: string,
 	section: SettingsSection,
@@ -2049,30 +1952,20 @@ export function isItemVisible(
 }
 
 /**
- * Items in `section` that are allowed for the active v1/v2 variant and
- * (if a search query is provided) also match the query. Returns an array
- * suitable for passing to `isItemVisible` at the leaf — never `null`, so
- * variant-hidden items are always excluded.
+ * Items in `section` that (if a search query is provided) match the query.
+ * Returns an array suitable for passing to `isItemVisible` at the leaf.
  */
 export function getVisibleItemsForSection(params: {
 	section: SettingsSection;
 	searchQuery: string;
-	isV2: boolean;
 }): SettingItemId[] {
-	const { section, searchQuery, isV2 } = params;
+	const { section, searchQuery } = params;
 	const matched = searchQuery.trim()
 		? getMatchingItemsForSection(searchQuery, section)
 		: SETTINGS_ITEMS.filter((item) => item.section === section);
-	return matched
-		.filter((item) => isItemAllowedForVariant(item.id, isV2))
-		.map((item) => item.id);
+	return matched.map((item) => item.id);
 }
 
-/**
- * Like `getMatchCountBySection`, but excludes items that are hidden by the
- * active v1/v2 variant. Used by the sidebar so search counts and section
- * visibility agree.
- */
 /** Sections offered only with the cloud workspaces flag. */
 const CLOUD_WORKSPACE_SECTIONS: ReadonlySet<SettingsSection> = new Set([
 	"environments",
@@ -2081,27 +1974,30 @@ const CLOUD_WORKSPACE_SECTIONS: ReadonlySet<SettingsSection> = new Set([
 ]);
 
 function isItemOffered(
-	item: { id: SettingItemId; section: SettingsSection },
-	isV2: boolean,
+	item: { section: SettingsSection },
 	cloudWorkspaces: boolean,
 ): boolean {
-	return (
-		isItemAllowedForVariant(item.id, isV2) &&
-		(cloudWorkspaces || !CLOUD_WORKSPACE_SECTIONS.has(item.section))
-	);
+	return cloudWorkspaces || !CLOUD_WORKSPACE_SECTIONS.has(item.section);
 }
 
+const NAV_ITEMS = new Map(
+	SETTINGS_SECTION_GROUPS.flatMap((group) => group.items).map((item) => [
+		item.section,
+		item,
+	]),
+);
+
+/** Like `getMatchCountBySection`, but only for sections the settings nav shows. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	isV2: boolean,
-	cloudWorkspaces: boolean,
-	mobileEnabled = false,
+	visibility: SettingsSectionVisibility,
 ): Partial<Record<SettingsSection, number>> {
-	const matches = searchSettings(query).filter(
-		(item) =>
-			isItemOffered(item, isV2, cloudWorkspaces) &&
-			(item.section !== "mobile" || mobileEnabled),
-	);
+	const matches = searchSettings(query).filter((item) => {
+		const navItem = NAV_ITEMS.get(item.section);
+		return navItem
+			? isSettingsSectionVisible(navItem, visibility)
+			: visibility.allowedSections.has(item.section);
+	});
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {
 		counts[item.section] = (counts[item.section] || 0) + 1;
@@ -2109,18 +2005,13 @@ export function getVisibleMatchCountBySection(
 	return counts;
 }
 
-/**
- * Sections that contain at least one item allowed for the active variant.
- * Sections with no allowed items (e.g. `git` in v2, `links` in v1) should
- * be hidden from the sidebar entirely.
- */
-export function getAllowedSectionsForVariant(
-	isV2: boolean,
+/** Sections that contain at least one offered item. */
+export function getOfferedSections(
 	cloudWorkspaces: boolean,
 ): Set<SettingsSection> {
 	const sections = new Set<SettingsSection>();
 	for (const item of SETTINGS_ITEMS) {
-		if (isItemOffered(item, isV2, cloudWorkspaces)) sections.add(item.section);
+		if (isItemOffered(item, cloudWorkspaces)) sections.add(item.section);
 	}
 	return sections;
 }

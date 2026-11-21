@@ -3,7 +3,7 @@
 	"name": "GitHub Dark Colorblind",
 	"type": "dark",
 	"author": "GitHub (primer/github-vscode-theme)",
-	"description": "GitHub Dark Default theme for Superset",
+	"description": "GitHub Dark Default theme for Paradev",
 	"ui": {
 		"background": "#0d1117",
 		"foreground": "#e6edf3",

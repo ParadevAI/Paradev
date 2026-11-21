@@ -41,6 +41,8 @@ import {
 	type Theme,
 } from "shared/themes";
 
+import { ImportThemeWarningDialog } from "./components/ImportThemeWarningDialog";
+
 const MAX_THEME_FILE_SIZE = 256 * 1024; // 256 KB
 
 function ThemeOptionRow({ theme }: { theme: Theme }) {
@@ -151,7 +153,9 @@ export function ThemeSection() {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const importButtonRef = useRef<HTMLButtonElement>(null);
 	const [isImporting, setIsImporting] = useState(false);
+	const [showImportWarning, setShowImportWarning] = useState(false);
 	const activeThemeId = useThemeId();
 	const setTheme = useSetTheme();
 	const activeTheme = useThemeStore((state) => state.activeTheme);
@@ -335,7 +339,7 @@ export function ThemeSection() {
 			name: "My Custom Theme",
 			type: baseTheme.type,
 			author: "You",
-			description: "Custom Superset theme",
+			description: "Custom Paradev theme",
 			ui: baseTheme.ui,
 			terminal: getTerminalColors(baseTheme),
 		};
@@ -353,6 +357,12 @@ export function ThemeSection() {
 
 	return (
 		<>
+			<ImportThemeWarningDialog
+				returnFocusRef={importButtonRef}
+				open={showImportWarning}
+				onOpenChange={setShowImportWarning}
+				onContinue={() => fileInputRef.current?.click()}
+			/>
 			<ThemeRow
 				label={t({
 					message: "Theme",
@@ -459,7 +469,8 @@ export function ThemeSection() {
 						type="button"
 						variant="outline"
 						size="sm"
-						onClick={() => fileInputRef.current?.click()}
+						ref={importButtonRef}
+						onClick={() => setShowImportWarning(true)}
 						disabled={isImporting}
 					>
 						<HiOutlineArrowUpTray className="mr-1.5 h-4 w-4" />

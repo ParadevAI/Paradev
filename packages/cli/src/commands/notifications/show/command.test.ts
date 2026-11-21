@@ -31,7 +31,7 @@ afterEach(() => {
 });
 
 describe("notifications show", () => {
-	test("from a Superset terminal, a click opens the calling terminal", async () => {
+	test("from a Paradev terminal, a click opens the calling terminal", async () => {
 		await invoke({ body: "12 passed", sound: true });
 		expect(show).toHaveBeenLastCalledWith({
 			title: "Tests pass",

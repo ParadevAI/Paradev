@@ -6,9 +6,16 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
-import { LuArrowUp, LuCheck, LuEllipsis, LuTrash2 } from "react-icons/lu";
+import {
+	LuArrowUp,
+	LuCheck,
+	LuCircleOff,
+	LuEllipsis,
+	LuTrash2,
+} from "react-icons/lu";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import type { CatalogPlugin } from "renderer/hooks/usePluginCatalog";
+import { ManagedBadge } from "renderer/routes/_authenticated/_dashboard/plugins/components/ManagedBadge";
 import { PluginKindBadges } from "renderer/routes/_authenticated/_dashboard/plugins/components/PluginKindBadges";
 
 interface PluginCardProps {
@@ -19,7 +26,8 @@ interface PluginCardProps {
 	onOpen: (plugin: CatalogPlugin) => void;
 	onInstall: (plugin: CatalogPlugin) => void;
 	onUninstall: (plugin: CatalogPlugin) => void;
-	onUpdate: (name: string) => void;
+	onDisable: (plugin: CatalogPlugin) => void;
+	onUpdate: (plugin: CatalogPlugin) => void;
 }
 
 export function PluginCard({
@@ -30,6 +38,7 @@ export function PluginCard({
 	onOpen,
 	onInstall,
 	onUninstall,
+	onDisable,
 	onUpdate,
 }: PluginCardProps) {
 	const { t } = useLingui();
@@ -50,7 +59,11 @@ export function PluginCard({
 			}}
 			className="flex cursor-pointer items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-fill-hover"
 		>
-			<PluginIcon pluginName={plugin.name} />
+			<PluginIcon
+				pluginName={plugin.name}
+				icon={plugin.interface.icon}
+				iconUrl={plugin.iconUrl}
+			/>
 			<div className="min-w-0 flex-1">
 				<div className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-foreground">
 					{/* Truncates so the badges and status keep their width; without
@@ -58,6 +71,7 @@ export function PluginCard({
 					    painting over the ··· menu. */}
 					<span className="truncate">{plugin.interface.displayName}</span>
 					<PluginKindBadges plugin={plugin} />
+					{plugin.managed && <ManagedBadge compact />}
 					{isInstalled && !isConnected ? (
 						<span className="shrink-0 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
 							<Trans>Not connected</Trans>
@@ -73,7 +87,7 @@ export function PluginCard({
 							className="h-4 shrink-0 gap-0.5 rounded px-1 text-[9px] font-medium tracking-wide uppercase"
 							onClick={(event) => {
 								event.stopPropagation();
-								onUpdate(plugin.name);
+								onUpdate(plugin);
 							}}
 						>
 							<LuArrowUp className="size-2.5" />
@@ -100,24 +114,37 @@ export function PluginCard({
 							<LuEllipsis className="size-4" />
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
+					<DropdownMenuContent
+						align="end"
+						onClick={(event) => event.stopPropagation()}
+					>
 						{plugin.updateAvailable && (
 							<DropdownMenuItem
 								disabled={isBusy}
-								onSelect={() => onUpdate(plugin.name)}
+								onSelect={() => onUpdate(plugin)}
 							>
 								<LuArrowUp className="size-4" />
 								<Trans>Update</Trans>
 							</DropdownMenuItem>
 						)}
-						<DropdownMenuItem
-							variant="destructive"
-							disabled={isBusy}
-							onSelect={() => onUninstall(plugin)}
-						>
-							<LuTrash2 className="size-4" />
-							<Trans>Remove</Trans>
-						</DropdownMenuItem>
+						{plugin.managed ? (
+							<DropdownMenuItem
+								disabled={isBusy}
+								onSelect={() => onDisable(plugin)}
+							>
+								<LuCircleOff className="size-4" />
+								<Trans>Disable</Trans>
+							</DropdownMenuItem>
+						) : (
+							<DropdownMenuItem
+								variant="destructive"
+								disabled={isBusy}
+								onSelect={() => onUninstall(plugin)}
+							>
+								<LuTrash2 className="size-4" />
+								<Trans>Remove</Trans>
+							</DropdownMenuItem>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			) : (

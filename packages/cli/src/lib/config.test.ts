@@ -62,7 +62,7 @@ describe("config writes", () => {
 		expect(nodeFs.existsSync(unlinkedPaths[0] ?? "")).toBe(false);
 	});
 
-	test("writeConfig writes the exported Superset config path", () => {
+	test("writeConfig writes the exported Paradev config path", () => {
 		writeConfig({ organizationId: "org_123" });
 
 		expect(

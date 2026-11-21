@@ -5,6 +5,8 @@ export const REALTIME_NUDGE_KINDS = [
 	"hosts",
 	"cloud_workspaces",
 	"automation_runs",
+	"pull_requests",
+	"plugins",
 ] as const;
 
 export type RealtimeNudgeKind = (typeof REALTIME_NUDGE_KINDS)[number];
@@ -88,4 +90,27 @@ export function realtimeWorkspacePresencePath(
 	workspaceId: string,
 ): string {
 	return `/organization/${encodeURIComponent(organizationId)}/workspace/${encodeURIComponent(workspaceId)}`;
+}
+
+/** A cloud workspace's forwards socket and read endpoint, relative to the realtime origin. */
+export function realtimeWorkspaceForwardsPath(
+	organizationId: string,
+	workspaceId: string,
+): string {
+	return `${realtimeWorkspacePresencePath(organizationId, workspaceId)}/forwards`;
+}
+
+export const MAX_WORKSPACE_FORWARDS = 50;
+
+export interface WorkspaceForwardsReport {
+	type: "forwards";
+	forwards: { port: number; localPort: number }[];
+}
+
+export interface WorkspaceForward {
+	port: number;
+	localPort: number;
+	user: { id: string; name: string; image: string | null };
+	/** Epoch ms the port was first reported at this local port. */
+	since: number;
 }

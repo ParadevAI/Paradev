@@ -7,6 +7,7 @@ import { env } from "@/env";
 import { initServerI18n } from "@/lib/i18n-server";
 import { api } from "@/trpc/server";
 import { ConsentForm } from "./components/ConsentForm";
+import { getRedirectTarget } from "./utils/getRedirectTarget";
 
 interface ConsentPageProps {
 	searchParams: Promise<Record<string, string>>;
@@ -35,7 +36,7 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 					<a href={env.NEXT_PUBLIC_MARKETING_URL}>
 						<Image
 							src="/title.svg"
-							alt="Superset"
+							alt="Paradev"
 							width={140}
 							height={24}
 							priority
@@ -73,8 +74,12 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 
 	const oauthApp = await db.query.oauthClients.findFirst({
 		where: (table, { eq }) => eq(table.clientId, client_id),
-		columns: { name: true },
+		columns: { name: true, redirectUris: true },
 	});
+	const redirect = getRedirectTarget(
+		params.redirect_uri,
+		oauthApp?.redirectUris ?? [],
+	);
 
 	const extendedSession = session.session as typeof session.session & {
 		activeOrganizationId?: string | null;
@@ -88,7 +93,7 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 				<a href={env.NEXT_PUBLIC_MARKETING_URL}>
 					<Image
 						src="/title.svg"
-						alt="Superset"
+						alt="Paradev"
 						width={140}
 						height={24}
 						priority
@@ -99,6 +104,7 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 				<ConsentForm
 					clientId={client_id}
 					clientName={oauthApp?.name ?? undefined}
+					redirect={redirect ?? undefined}
 					scopes={scopes}
 					userName={session.user.name}
 					organizations={userOrganizations.map((org) => ({

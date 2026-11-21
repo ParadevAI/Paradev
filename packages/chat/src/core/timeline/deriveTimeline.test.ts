@@ -4,6 +4,7 @@ import type { Item, ToolCall } from "../../protocol/items";
 import { emptySnapshot, reduceMany } from "../reducer/reducer";
 import {
 	collapseWorkLog,
+	deriveChildrenByParent,
 	derivePendingApprovals,
 	deriveQueuedPrompts,
 	deriveTimeline,
@@ -110,6 +111,221 @@ describe("deriveTimeline", () => {
 		if (firstEntry?.kind !== "item") throw new Error("expected item entry");
 		expect(firstEntry.item.id).toBe("m1");
 	});
+
+	test("a replayed Claude Code stop is a user_stop entry, not a prompt", () => {
+		seq = 0;
+		const prompt = (id: string, text: string, startedAtMs: number): Item => ({
+			id,
+			kind: "user_message",
+			startedAtMs,
+			content: [{ type: "text", text }],
+		});
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(prompt("p1", "refactor the parser", 10), "h1"),
+			env(message("partial", 11), "h1"),
+			env(prompt("stop", "[Request interrupted by user]\n", 12), "h2"),
+			env(prompt("p2", "only rename it", 13), "h2"),
+			env(message("reply", 14), "h2"),
+		]);
+		const groups = deriveTimeline(snapshot, { harness: "claude-acp" });
+		expect(groups[1]?.entries).toEqual([
+			{
+				kind: "user_stop",
+				item: prompt("stop", "[Request interrupted by user]\n", 12),
+				stop: "response",
+			},
+			{ kind: "item", item: prompt("p2", "only rename it", 13) },
+			{ kind: "item", item: message("reply", 14) },
+		]);
+	});
+
+	test("a Claude Code stop at a tool call reads as stopped, without its canned reply", () => {
+		seq = 0;
+		const stop: Item = {
+			id: "stop",
+			kind: "user_message",
+			startedAtMs: 12,
+			content: [
+				{ type: "text", text: "[Request interrupted by user for tool use]" },
+			],
+		};
+		const cannedReply: Item = {
+			id: "canned",
+			kind: "agent_message",
+			startedAtMs: 13,
+			text: "No response requested.",
+		};
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(toolCall("sleep", "failed", 11), "h1"),
+			env(stop, "h1"),
+			env(cannedReply, "h1"),
+		]);
+
+		const groups = deriveTimeline(snapshot, { harness: "claude-acp" });
+		expect(groups[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+			{ kind: "user_stop", item: stop as UserMessage, stop: "tool_use" },
+		]);
+
+		const split = deriveTimeline(
+			reduceMany(emptySnapshot(), [
+				env(toolCall("sleep", "failed", 11), "h1"),
+				env(stop, "h2"),
+			]),
+			{ harness: "claude-acp" },
+		);
+		expect(split[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+		]);
+
+		const hiddenStop = deriveTimeline(
+			reduceMany(emptySnapshot(), [
+				env(toolCall("sleep", "canceled", 11), "h1"),
+				env({ ...stop, discarded: true } as Item, "h1"),
+				env(cannedReply, "h1"),
+			]),
+			{ harness: "claude-acp" },
+		);
+		expect(hiddenStop[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+		]);
+
+		const elsewhere = deriveTimeline(snapshot, { harness: "codex" });
+		expect(elsewhere[0]?.entries.map((entry) => entry.kind)).toEqual([
+			"item",
+			"item",
+			"item",
+		]);
+	});
+});
+
+describe("deriveTimeline with nested items", () => {
+	function subagentTool(id: string, startedAtMs: number): ToolCall {
+		return { ...toolCall(id, "completed", startedAtMs), subagent: true };
+	}
+
+	test("nestChildItems drops children with a known parent from the top level", () => {
+		seq = 0;
+		const child: ToolCall = {
+			...toolCall("sub:c1:bash-1", "completed", 11),
+			parentItemId: "subagent:c1",
+		};
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(subagentTool("subagent:c1", 10), "t1"),
+			env(child, "t1"),
+			env(message("m1", 12), "t1"),
+		]);
+
+		const nested = deriveTimeline(snapshot, { nestChildItems: true });
+		const ids = nested[0]?.entries.map((entry) =>
+			entry.kind === "item" ? entry.item.id : "run",
+		);
+		expect(ids).toEqual(["subagent:c1", "m1"]);
+
+		// Without nesting, the child joins its parent's run at the top level.
+		const flat = deriveTimeline(snapshot);
+		const flatFirst = flat[0]?.entries[0];
+		if (flatFirst?.kind !== "tool_run") throw new Error("expected tool_run");
+		expect(flatFirst.items.map((item) => item.id)).toEqual([
+			"subagent:c1",
+			"sub:c1:bash-1",
+		]);
+	});
+
+	test("a pending subagent approval stays top-level and nests once answered", () => {
+		seq = 0;
+		const approval: Item = {
+			kind: "approval_request",
+			id: "approval:sub:c1:bash-1",
+			targetItemId: "sub:c1:bash-1",
+			title: "Allow Bash?",
+			status: "pending",
+			startedAtMs: 11,
+			parentItemId: "subagent:c1",
+		};
+		const topLevelIds = (items: Item[]) =>
+			deriveTimeline(
+				reduceMany(
+					emptySnapshot(),
+					items.map((item) => env(item, "t1")),
+				),
+				{ nestChildItems: true },
+			)[0]?.entries.map((entry) =>
+				entry.kind === "item" ? entry.item.id : "run",
+			);
+
+		expect(topLevelIds([subagentTool("subagent:c1", 10), approval])).toEqual([
+			"subagent:c1",
+			"approval:sub:c1:bash-1",
+		]);
+		expect(
+			topLevelIds([
+				subagentTool("subagent:c1", 10),
+				{ ...approval, status: "answered", decision: { type: "accept" } },
+			]),
+		).toEqual(["subagent:c1"]);
+	});
+
+	test("a child whose parent is missing stays at the top level", () => {
+		seq = 0;
+		const orphan: ToolCall = {
+			...toolCall("sub:c1:bash-1", "completed", 11),
+			parentItemId: "subagent:c1",
+		};
+		const snapshot = reduceMany(emptySnapshot(), [env(orphan, "t1")]);
+		const groups = deriveTimeline(snapshot, { nestChildItems: true });
+		expect(groups[0]?.entries.length).toBe(1);
+	});
+});
+
+describe("deriveChildrenByParent", () => {
+	test("groups children under their parent, sorted by start", () => {
+		seq = 0;
+		const child = (id: string, startedAtMs: number): ToolCall => ({
+			...toolCall(id, "completed", startedAtMs),
+			parentItemId: "subagent:c1",
+		});
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(subagentParent(), "t1"),
+			env(child("b", 2), "t1"),
+			env(child("a", 1), "t1"),
+			env(message("m1", 3), "t1"),
+		]);
+		const map = deriveChildrenByParent(snapshot);
+		expect(map.get("subagent:c1")?.map((item) => item.id)).toEqual(["a", "b"]);
+		expect(map.size).toBe(1);
+	});
+
+	test("keeps a list's identity while the parent's children are unchanged", () => {
+		seq = 0;
+		const child: ToolCall = {
+			...toolCall("sub:c1:bash-1", "completed", 2),
+			parentItemId: "subagent:c1",
+		};
+		const first = deriveChildrenByParent(
+			reduceMany(emptySnapshot(), [
+				env(subagentParent(), "t1"),
+				env(child, "t1"),
+			]),
+		);
+		// An unrelated item arrives; the child list itself is untouched.
+		const second = deriveChildrenByParent(
+			reduceMany(emptySnapshot(), [
+				env(subagentParent(), "t1"),
+				env(child, "t1"),
+				env(message("m1", 3), "t1"),
+			]),
+			first,
+		);
+		expect(second.get("subagent:c1")).toBe(first.get("subagent:c1"));
+	});
+
+	function subagentParent(): ToolCall {
+		return {
+			...toolCall("subagent:c1", "completed", 1),
+			subagent: true,
+		};
+	}
 });
 
 describe("derivePendingApprovals", () => {

@@ -1,14 +1,17 @@
 import { SortableContext } from "@dnd-kit/sortable";
 import { useLingui } from "@lingui/react/macro";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import {
 	dropZoneId,
 	parseId,
 	SESSIONS_CONTAINER,
 	useDashboardSidebarDnd,
 } from "../../../../hooks/useSidebarDnd";
-import { useDashboardSidebarSelection } from "../../../../providers/DashboardSidebarSelectionProvider";
+import {
+	useDashboardSidebarSelection,
+	type WorkspaceSelectionEvent,
+} from "../../../../providers/DashboardSidebarSelectionProvider";
 import type {
 	DashboardSidebarWorkspace,
 	DashboardSidebarWorkspaceIndentation,
@@ -18,10 +21,8 @@ import { SidebarDropZone } from "../../../SidebarDropZone";
 import { SortableSectionHeader } from "../../../SortableSectionHeader";
 import { SortableWorkspaceItem } from "../../../SortableWorkspaceItem";
 
-// Bulk actions are host-backed; a cloud row stays out of the selection.
 const isBulkSelectable = (workspace: DashboardSidebarWorkspace) =>
-	workspace.pendingTransaction?.type !== "insert" &&
-	workspace.hostType !== "cloud";
+	workspace.pendingTransaction?.type !== "insert";
 
 interface DashboardSidebarExpandedProjectContentProps {
 	/** DnD container: a project id, or SESSIONS_CONTAINER for the Sessions lane. */
@@ -110,6 +111,20 @@ export function DashboardSidebarExpandedProjectContent({
 			}),
 		[flatItems, workspacesById, groupInfo, collapsedSectionIds],
 	);
+	// Rows memoize on this prop, so it must not change when the list does.
+	const selectableWorkspaceIdsRef = useRef(selectableWorkspaceIds);
+	useLayoutEffect(() => {
+		selectableWorkspaceIdsRef.current = selectableWorkspaceIds;
+	});
+	const handleSelectionClick = useCallback(
+		(event: WorkspaceSelectionEvent, workspaceId: string) =>
+			selectWorkspaceFromEvent(event, {
+				workspaceId,
+				projectId: containerId,
+				orderedWorkspaceIds: selectableWorkspaceIdsRef.current,
+			}),
+		[selectWorkspaceFromEvent, containerId],
+	);
 
 	return (
 		<AnimatePresence initial={false}>
@@ -179,14 +194,7 @@ export function DashboardSidebarExpandedProjectContent({
 												canBulkSelect && isWorkspaceSelected(parsed.realId)
 											}
 											onSelectionClick={
-												canBulkSelect
-													? (event) =>
-															selectWorkspaceFromEvent(event, {
-																workspaceId: parsed.realId,
-																projectId: containerId,
-																orderedWorkspaceIds: selectableWorkspaceIds,
-															})
-													: undefined
+												canBulkSelect ? handleSelectionClick : undefined
 											}
 											collapsed={isInCollapsedSection}
 											isDragPlaceholder={inDraggedSection}

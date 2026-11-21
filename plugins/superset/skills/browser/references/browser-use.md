@@ -51,7 +51,7 @@ export BU_CDP_URL=http://127.0.0.1:9333 BU_NAME=<app>
   (`osascript -e 'quit app "<App>"'`), then run the `open` line again. Its tabs
   return if it restores sessions.
 - Google Chrome 136+ ignores the port on its own profile. Add
-  `--user-data-dir=$HOME/.superset/browser-profiles/chrome` and open it with
+  `--user-data-dir=$HOME/.paradev/browser-profiles/chrome` and open it with
   `open -na`: a separate agent profile that runs beside the user's Chrome. The
   user signs in there once.
 - Arc hides its tabs from CDP and crashes when a client opens one. Do not

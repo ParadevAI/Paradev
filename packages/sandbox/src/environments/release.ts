@@ -5,8 +5,8 @@
  *
  *   1. the host-service runtime asset (this checkout's host-service and
  *      pty-daemon, natives installed for the box), this checkout's CLI, the
- *      latest claude, codex and Chrome (a fetch that fails keeps the
- *      committed pin) and the bundle, published
+ *      latest claude, codex, Chrome, opencode and pi (a fetch or digest
+ *      check that fails keeps the committed pin) and the bundle, published
  *   2. the image in Vercel Container Registry under a candidate tag, unless
  *      --skip-image; `latest`, which every image environment resolves to,
  *      stays on the previous release
@@ -44,8 +44,12 @@ import {
 	SANDBOX_ROOT_CHECKOUT,
 	type SandboxIdentity,
 	sandboxCheckoutDir,
-} from "@superset/shared/sandbox-contract";
-import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/contract";
+import {
+	DEFAULT_SANDBOX_REGION,
+	isSandboxRegionId,
+	SANDBOX_REGION_IDS,
+} from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
 // The provisioning code imports the API env schema; an operator running this
@@ -55,7 +59,9 @@ process.env.SKIP_ENV_VALIDATION ??= "1";
 const SKIP_IMAGE = process.argv.includes("--skip-image");
 const KEEP_OLD = process.argv.includes("--keep-old");
 const PRODUCTION = process.argv.includes("--production");
-const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome"];
+/** Released bundles whose drives stay in every region, so a rollback to one of them has its drives. */
+const KEPT_RELEASED_BUNDLES = 3;
+const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome", "opencode", "pi"];
 /** The environment the release rebuilds; without it, the release creates one named INTERNAL_NAME. */
 const ENVIRONMENT_ID = process.env.SUPERSET_INTERNAL_ENVIRONMENT_ID;
 const INTERNAL_NAME =
@@ -63,11 +69,11 @@ const INTERNAL_NAME =
 const ORGANIZATION_ID = process.env.SUPERSET_INTERNAL_ORGANIZATION_ID;
 const ENV_FILE = process.env.SUPERSET_INTERNAL_ENV_FILE;
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-const REPO_URL = "https://github.com/superset-sh/superset.git";
+const REPO_URL = "https://github.com/paradevai/paradev.git";
 const REPO_PATH = SANDBOX_ROOT_CHECKOUT;
 const REPO_DIR = sandboxCheckoutDir(SANDBOX_PATHS.workspace, REPO_PATH);
-const REPO_FULL_NAME = "superset-sh/superset";
-/** The monorepo branch the golden is built from; its `.superset/config.json` supplies `start`. */
+const REPO_FULL_NAME = "paradevai/paradev";
+/** The monorepo branch the golden is built from; its `.paradev/config.json` supplies `start`. */
 const BRANCH = process.env.SUPERSET_INTERNAL_BRANCH ?? "main";
 const REGION = DEFAULT_SANDBOX_REGION;
 
@@ -147,6 +153,39 @@ log(
 await publishBundle(bundle, { dry: false });
 log(`bundle: ${bundle.sha256} published`);
 
+// 1b. the bundle's agent-tools drive in every region, before any row points
+// at the bundle so no box mounts one mid-write. Every region, so an
+// environment created there before the next release finds its drive. A
+// region a box is in must have a drive with every required agent.
+const agentTools = await import("../agent-tools");
+const driveHost = agentTools.vercelDriveHost(credentials);
+async function environmentRegions(): Promise<Set<string>> {
+	const { db } = await import("@superset/db/client");
+	const rows = await db.query.environments.findMany({
+		columns: { region: true },
+	});
+	return new Set(
+		[REGION, ...rows.map((row) => row.region)].filter(isSandboxRegionId),
+	);
+}
+const neededRegions = await environmentRegions();
+const published = await agentTools.publishAgentToolsDrives({
+	host: driveHost,
+	regions: SANDBOX_REGION_IDS,
+	bundleSha: bundle.sha256,
+	assets: bundle.assets,
+});
+for (const line of agentTools.describeAgentToolsPublish(
+	published,
+	bundle.assets,
+)) {
+	if (line.startsWith("::warning::")) console.log(line);
+	else log(line);
+}
+const gaps = agentTools.agentToolsGaps(published, neededRegions);
+if (gaps.length)
+	fail(`agent-tools: ${gaps.join("; ")}; no image, golden or row changed`);
+
 // 2. image
 const candidateTag = `release-${bundle.sha256.slice(0, 12)}`;
 const goldenImage = SKIP_IMAGE
@@ -161,15 +200,21 @@ if (SKIP_IMAGE) {
 }
 
 // 3. golden
+// The modules, not the `lib/sandbox` barrel: it also builds the billing and
+// email clients, whose secrets this job does not have.
 const {
 	deleteSandbox,
-	deriveSandboxCredentials,
 	provisionSandbox,
-	sandboxHostSecretFor,
 	stopAndSnapshot,
 	stripWorkspaceIdentity,
 	wakeSandbox,
-} = await import("@superset/trpc/lib/sandbox");
+} = await import("@superset/trpc/lib/sandbox/vercel");
+const { deriveSandboxCredentials } = await import(
+	"@superset/trpc/lib/sandbox/credentials"
+);
+const { sandboxHostSecretFor } = await import(
+	"@superset/trpc/lib/sandbox/access"
+);
 const { probeBox, checkWakeLog } = await import("./probe");
 
 const setupScript = readFileSync(
@@ -186,7 +231,7 @@ function identityFor(workspaceId: string, sourceRef: string): SandboxIdentity {
 		SUPERSET_SANDBOX_WORKSPACE_ID: workspaceId,
 		SUPERSET_SANDBOX_ORGANIZATION_ID: ORGANIZATION_ID as string,
 		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
-			{ url: REPO_URL, branch: BRANCH, path: REPO_PATH, hooks: true },
+			{ url: REPO_URL, branch: BRANCH, path: REPO_PATH },
 		]),
 		SUPERSET_SANDBOX_IMAGE_TAG: sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
@@ -216,6 +261,7 @@ for (;;) {
 				managedEnv: {},
 				networkPolicy: "allow-all",
 				vcpus: GOLDEN_BOX_VCPUS,
+				agentTools: true,
 			},
 		});
 		break;
@@ -239,6 +285,7 @@ await wakeSandbox({
 		managedEnv: {},
 		networkPolicy: "allow-all",
 		vcpus: GOLDEN_BOX_VCPUS,
+		agentTools: true,
 	},
 });
 log("golden: host-service up; waiting for the checkout");
@@ -297,7 +344,7 @@ if (setup.code !== 0)
 	fail(`setup hook exited ${setup.code}; ${golden} left for inspection`);
 
 const checks: Array<[label: string, command: string, expect: RegExp]> = [
-	["repo", `git -C ${REPO_DIR} remote get-url origin`, /superset-sh\/superset/],
+	["repo", `git -C ${REPO_DIR} remote get-url origin`, /paradevai\/paradev/],
 	["dependencies", `test -d ${REPO_DIR}/node_modules && echo ok`, /ok/],
 	[
 		"turbo",
@@ -311,7 +358,7 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 	],
 	[
 		"the repository's cloud setup and dev stack",
-		"test -x /workspace/.superset/setup.cloud.sh && test -x /workspace/.superset/dev-stack.cloud.sh && echo ok",
+		"test -x /workspace/.paradev/setup.cloud.sh && test -x /workspace/.paradev/dev-stack.cloud.sh && echo ok",
 		/ok/,
 	],
 	["neonctl", "neonctl --version", /^\d+\.\d+/m],
@@ -400,6 +447,7 @@ const probeClaim = {
 	managedEnv,
 	networkPolicy,
 	vcpus: GOLDEN_BOX_VCPUS,
+	agentTools: true,
 };
 log(`probe: provisioning ${probe} as a fork of ${golden}`);
 await provisionSandbox({
@@ -470,18 +518,19 @@ if (!SKIP_IMAGE) {
 
 // 5. rows
 const { db, dbWs } = await import("@superset/db/client");
-const { environments, environmentRepositories, githubRepositories } =
-	await import("@superset/db/schema");
-const { and, eq, isNull } = await import("drizzle-orm");
+const { environments, environmentRepositories } = await import(
+	"@superset/db/schema"
+);
+const { desc, eq } = await import("drizzle-orm");
+const { releaseRepositoryWhere } = await import(
+	"./utils/releaseRepositoryWhere"
+);
 const { recordReleasedBundle } = await import("./record-bundle");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
-// the box acts on the monorepo's own .superset/config.json.
+// the box acts on the monorepo's own .paradev/config.json.
 const monorepo = await db.query.githubRepositories.findFirst({
-	where: and(
-		eq(githubRepositories.organizationId, ORGANIZATION_ID as string),
-		eq(githubRepositories.fullName, REPO_FULL_NAME),
-	),
+	where: releaseRepositoryWhere(ORGANIZATION_ID as string, REPO_FULL_NAME),
 });
 if (!monorepo)
 	fail(
@@ -512,14 +561,13 @@ const fromGolden = {
 	sourceRef: golden,
 	region: REGION,
 	bundleSha: bundle.sha256,
-	hooksRepositoryId: monorepo.id,
+	primaryRepositoryId: monorepo.id,
 	archivedAt: null,
 };
 const { internal, bundled } = await dbWs.transaction(async (tx) => {
 	const bundled = await tx
 		.update(environments)
 		.set({ bundleSha: bundle.sha256 })
-		.where(isNull(environments.archivedAt))
 		.returning({ id: environments.id });
 	const [internal] = previous
 		? await tx
@@ -556,6 +604,40 @@ if (!previous)
 	log(
 		`rows: created; set SUPERSET_INTERNAL_ENVIRONMENT_ID=${internal.id} so the next release updates it`,
 	);
+
+// One Vercel project holds every database's drives (staging shares
+// production's rows; preview branches copy them), so only the production
+// release, whose rows the others mirror, may delete one.
+if (!PRODUCTION) {
+	log("agent-tools: prune skipped; only --production prunes drives");
+} else {
+	try {
+		const { sandboxBundles } = await import("@superset/db/schema");
+		const rows = await db.query.environments.findMany({
+			columns: { region: true, bundleSha: true },
+		});
+		const recent = await db
+			.select({ sha: sandboxBundles.sha })
+			.from(sandboxBundles)
+			.orderBy(desc(sandboxBundles.releasedAt))
+			.limit(KEPT_RELEASED_BUNDLES);
+		const { deleted, kept } = await agentTools.pruneAgentToolsDrives({
+			host: driveHost,
+			referenced: agentTools.referencedAgentToolsDrives({
+				rows,
+				recentBundles: [bundle.sha256, ...recent.map((row) => row.sha)],
+				regions: SANDBOX_REGION_IDS,
+			}),
+		});
+		log(
+			`agent-tools: pruned ${deleted.length}${kept.length ? `; ${kept.join(", ")} still attached, next release retries` : ""}`,
+		);
+	} catch (error) {
+		console.log(
+			`::warning::agent-tools: prune failed: ${String(error).slice(0, 300)}`,
+		);
+	}
+}
 
 if (
 	previous &&

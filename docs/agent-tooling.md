@@ -52,7 +52,7 @@ and agent launch by `packages/host-service/src/trpc/router/usage/default-account
 publishes the selection to `$SUPERSET_HOME_DIR/state/default-*` pointer files. The agent wrappers
 re-read those at every launch (`buildDefaultAccountResolver` in agent-setup), so a switch reaches
 existing terminals the next time the agent starts; a value the user exported by hand always wins.
-Superset never touches the credential stores; the provider CLIs own every login end to end.
+Paradev never touches the credential stores; the provider CLIs own every login end to end.
 
 Because those CLIs read *everything* from their active config dir, a second dir would otherwise
 mean a second, empty setup. `packages/agent-setup/src/provider-profiles.ts` provisions each
@@ -72,13 +72,13 @@ non-default profile from the default account (`~/.claude`, `~/.codex`):
   (`packages/host-service/src/trpc/router/usage/session-share.ts`; existing trees are merged in,
   live sessions included).
 - Per-account and never shared: credentials, `oauthAccount`/`userID` identity and per-project
-  state in `.claude.json`, auth-related settings keys, and Superset's own lifecycle hooks
+  state in `.claude.json`, auth-related settings keys, and Paradev's own lifecycle hooks
   (written per profile).
 
 Provisioning is idempotent and runs when an account is added, when one is selected, and at host
 boot for the selected accounts (`usage/account-provisioning.ts`).
 
-## Discovering Superset CLI commands
+## Discovering Paradev CLI commands
 
 Agent-facing text (`AGENTS.md`, skills, prompts) should point agents at `superset schema` to learn
 what commands and options exist, not at `--help` text. It prints every command, option and argument
@@ -96,8 +96,9 @@ exists only in this worktree, read the from-source CLI with
 `bun run --cwd packages/cli dev schema 2>/dev/null | jq ...`; it can list commands the installed
 CLI does not have yet.
 
-`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`) is the chat-only
-namespace targeting `sessions.*` on the host. The host accepts only supported chat providers, with
+`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`, `import`) is the
+chat-only namespace targeting `sessions.*` on the host; `search`, in the same namespace, asks the
+cloud API instead. The host accepts only supported chat providers, with
 no fallback to `agents.run` or `terminal.*`; `superset agents` and
 `superset terminals` remain unchanged for terminal-backed agent runs.
 
@@ -132,7 +133,13 @@ superset sessions open --local --workspace WORKSPACE_ID --session CHAT_SESSION_I
 superset sessions close --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions resume --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions import --local --workspace WORKSPACE_ID --agent claude --native-session PROVIDER_SESSION_ID
+superset sessions search "acpAdapter upload" --limit 10
 ```
+
+`sessions search` asks the cloud API, not a host: it finds your chats that are stored in the cloud,
+which are every chat on a cloud workspace, every chat moved there, and every chat whose move started
+but did not finish, one row per conversation.
+It takes no `--workspace`.
 
 The host resolves the selected agent to an installed ACP harness. It does not check the `acp-chat`
 rollout flag: the desktop gates the chat UI and the API gates automation dispatch. Unsupported
@@ -148,8 +155,13 @@ inside Claude, Codex, or another ACP agent. `sessions resume --session` accepts 
 returns the live chat session ID, which is a new one when the chat had stopped. `sessions import
 --native-session` accepts the latter, with `--agent`, and adopts that conversation into a new chat.
 `sessions create` always starts a new chat. `sessions send` resumes a stopped chat first and returns
-the session ID the prompt went to. `sessions list` lists Superset-saved sessions for the workspace;
+the session ID the prompt went to. `sessions list` lists Paradev-saved sessions for the workspace;
 native provider discovery remains available in the chat header's history menu.
+
+`sessions create`, `import` and `resume` also open the chat in a background tab of the host's
+desktop app when one is attached; a desktop never opens a chat by finding it. To show an existing
+session, run `superset panes new-tab --workspace WORKSPACE_ID --session CHAT_SESSION_ID`, with
+`--focus` to select it.
 
 Automations check the owner's `acp-chat` flag in the API, then the host's `sessions.capabilities`. Eligible runs use
 `sessions.create`; unsupported agents retain terminal launches. Hosts without the sessions router
@@ -193,7 +205,7 @@ exposing them as `/superset-dev:<skill>`. Re-run after editing a skill, then
 `/reload-plugins`. In production the skills ship inside the real `superset`
 plugin, so there's no collision — this is dev-only.
 
-`bun scripts/dev-cli.ts` finds the live host manifest under `<worktree>/superset-dev-data/host/*`,
+`bun scripts/dev-cli.ts` finds the live host manifest under `<worktree>/paradev-dev-data/host/*`,
 then runs the dev CLI with `SUPERSET_HOME_DIR` (the dev data dir),
 `SUPERSET_ORGANIZATION_ID` (the live host's org), and a placeholder
 `SUPERSET_API_KEY` (local host commands use the manifest token, not this). Start

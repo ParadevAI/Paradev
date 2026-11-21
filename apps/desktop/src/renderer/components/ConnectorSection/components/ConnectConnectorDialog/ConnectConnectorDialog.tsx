@@ -116,7 +116,7 @@ function DialogBody({
 					) : author ? (
 						t({ message: `Developed by ${author}` })
 					) : (
-						<Trans>Authorize Superset to act on your behalf.</Trans>
+						<Trans>Authorize Paradev to act on your behalf.</Trans>
 					)}
 				</DialogDescription>
 			</DialogHeader>
@@ -127,16 +127,33 @@ function DialogBody({
 						title={<Trans>You control the access</Trans>}
 						body={
 							<Trans>
-								Superset only receives the permissions this connector asks for.
+								Paradev only receives the permissions this connector asks for.
 								Disconnect at any time to revoke them.
 							</Trans>
 						}
 					/>
+					{connector?.scope === "user" ? (
+						<TrustItem
+							title={<Trans>Personal to you</Trans>}
+							body={t({
+								message: `Only you can use this connection. Teammates connect their own ${name} accounts.`,
+							})}
+						/>
+					) : connector ? (
+						<TrustItem
+							title={<Trans>Shared with your organization</Trans>}
+							body={
+								<Trans>
+									Everyone in this organization uses this connection.
+								</Trans>
+							}
+						/>
+					) : null}
 					<TrustItem
 						title={<Trans>Credentials stay on the server</Trans>}
 						body={
 							<Trans>
-								Tokens are held by Superset and attached to requests there. They
+								Tokens are held by Paradev and attached to requests there. They
 								are never written into your local agent config.
 							</Trans>
 						}

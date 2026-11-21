@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERCEL_CLI_VERSION: 50.22.1
+  VERCEL_CLI_VERSION: 50.31.0
 
 jobs:
   deploy-database:
@@ -70,7 +70,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
     environment: production
-    needs: deploy-database
+    needs: [deploy-database, deploy-web]
 
     steps:
       - name: Checkout repository
@@ -105,6 +105,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
@@ -122,6 +123,12 @@ jobs:
           MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           USERCONTENT_TOKEN_SECRET: ${{ secrets.USERCONTENT_TOKEN_SECRET }}
+          AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
+          AGENT_TURN_SIGNING_SECRET: ${{ secrets.AGENT_TURN_SIGNING_SECRET }}
+          AGENT_SESSION_SECRET: ${{ secrets.AGENT_SESSION_SECRET }}
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+          TEMPORAL_NAMESPACE: ${{ secrets.TEMPORAL_NAMESPACE }}
+          TEMPORAL_API_KEY: ${{ secrets.TEMPORAL_API_KEY }}
           CLOUDFLARE_BROWSER_RENDERING_TOKEN: ${{ secrets.CLOUDFLARE_BROWSER_RENDERING_TOKEN }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -130,6 +137,14 @@ jobs:
           GOOGLE_PUBSUB_TOPIC: ${{ secrets.GOOGLE_PUBSUB_TOPIC }}
           GOOGLE_PUBSUB_PUSH_TOKEN: ${{ secrets.GOOGLE_PUBSUB_PUSH_TOKEN }}
           SUPPORT_LOOKUP_TOKEN: ${{ secrets.SUPPORT_LOOKUP_TOKEN }}
+          AWS_MARKETPLACE_PRODUCT_CODE: ${{ secrets.AWS_MARKETPLACE_PRODUCT_CODE }}
+          AWS_MARKETPLACE_REGION: ${{ secrets.AWS_MARKETPLACE_REGION }}
+          AWS_MARKETPLACE_ACCESS_KEY_ID: ${{ secrets.AWS_MARKETPLACE_ACCESS_KEY_ID }}
+          AWS_MARKETPLACE_SECRET_ACCESS_KEY: ${{ secrets.AWS_MARKETPLACE_SECRET_ACCESS_KEY }}
+          AWS_MARKETPLACE_SELLER_ACCOUNT_ID: ${{ secrets.AWS_MARKETPLACE_SELLER_ACCOUNT_ID }}
+          AWS_MARKETPLACE_EVENTS_TOKEN: ${{ secrets.AWS_MARKETPLACE_EVENTS_TOKEN }}
+          AWS_MARKETPLACE_ENTERPRISE_PLAN_ID: ${{ secrets.AWS_MARKETPLACE_ENTERPRISE_PLAN_ID }}
+          MOBILE_WEB_ORIGINS: ${{ secrets.MOBILE_WEB_ORIGINS }}
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           NEXT_PUBLIC_SENTRY_DSN_API: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_API }}
@@ -207,7 +222,14 @@ jobs:
             --env MEDIA_URL=$MEDIA_URL \
             --env STATIC_URL=$STATIC_URL \
             --env USERCONTENT_TOKEN_SECRET=$USERCONTENT_TOKEN_SECRET \
+            --env AGENT_WORKER_SECRET=$AGENT_WORKER_SECRET \
+            --env AGENT_TURN_SIGNING_SECRET=$AGENT_TURN_SIGNING_SECRET \
+            --env AGENT_SESSION_SECRET=$AGENT_SESSION_SECRET \
+            --env TEMPORAL_ADDRESS=$TEMPORAL_ADDRESS \
+            --env TEMPORAL_NAMESPACE=$TEMPORAL_NAMESPACE \
+            --env TEMPORAL_API_KEY=$TEMPORAL_API_KEY \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
+            --env DOMAIN_MOVE_ENABLED=$DOMAIN_MOVE_ENABLED \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
@@ -222,6 +244,14 @@ jobs:
             --env GOOGLE_PUBSUB_TOPIC=$GOOGLE_PUBSUB_TOPIC \
             --env GOOGLE_PUBSUB_PUSH_TOKEN=$GOOGLE_PUBSUB_PUSH_TOKEN \
             --env SUPPORT_LOOKUP_TOKEN=$SUPPORT_LOOKUP_TOKEN \
+            --env AWS_MARKETPLACE_PRODUCT_CODE=$AWS_MARKETPLACE_PRODUCT_CODE \
+            --env AWS_MARKETPLACE_REGION=$AWS_MARKETPLACE_REGION \
+            --env AWS_MARKETPLACE_ACCESS_KEY_ID=$AWS_MARKETPLACE_ACCESS_KEY_ID \
+            --env AWS_MARKETPLACE_SECRET_ACCESS_KEY=$AWS_MARKETPLACE_SECRET_ACCESS_KEY \
+            --env AWS_MARKETPLACE_SELLER_ACCOUNT_ID=$AWS_MARKETPLACE_SELLER_ACCOUNT_ID \
+            --env AWS_MARKETPLACE_EVENTS_TOKEN=$AWS_MARKETPLACE_EVENTS_TOKEN \
+            --env AWS_MARKETPLACE_ENTERPRISE_PLAN_ID=$AWS_MARKETPLACE_ENTERPRISE_PLAN_ID \
+            --env MOBILE_WEB_ORIGINS=$MOBILE_WEB_ORIGINS \
             --env GH_CLIENT_ID=$GH_CLIENT_ID \
             --env GH_CLIENT_SECRET=$GH_CLIENT_SECRET \
             --env NEXT_PUBLIC_SENTRY_DSN_API=$NEXT_PUBLIC_SENTRY_DSN_API \
@@ -325,6 +355,7 @@ jobs:
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
@@ -356,6 +387,7 @@ jobs:
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
           RELAY_URL: ${{ secrets.RELAY_URL }}
           RELAY_BACKUP_URL: ${{ secrets.RELAY_BACKUP_URL }}
+          AGENTS_URL: ${{ secrets.AGENTS_URL }}
         run: |
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
@@ -365,6 +397,8 @@ jobs:
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
+            --env DOMAIN_MOVE_ENABLED=$DOMAIN_MOVE_ENABLED \
+            --env AGENTS_URL=$AGENTS_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
             --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
@@ -392,6 +426,76 @@ jobs:
             --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
             --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY
+
+  deploy-paradev:
+    name: Deploy Paradev
+    needs: deploy-database
+    uses: ./.github/workflows/deploy-paradev-staging.yml
+    with:
+      mode: final
+    secrets: inherit
+
+  deploy-agents:
+    name: Deploy Agents Web to Vercel
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    environment: production
+    needs: deploy-api
+
+    steps:
+      - name: Check the agents project is configured
+        id: agents-config
+        env:
+          AGENTS_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+        run: echo "configured=$([ -n "$AGENTS_PROJECT_ID" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        if: steps.agents-config.outputs.configured == 'true'
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install dependencies
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun install --frozen --ignore-scripts
+
+      - name: Compile translations
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun run --filter=@superset/i18n build
+
+      - name: Install Vercel CLI
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      - name: Build and Deploy Agents Web
+        if: steps.agents-config.outputs.configured == 'true'
+        working-directory: apps/mobile
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+          EXPO_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          EXPO_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
+          EXPO_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
+          EXPO_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
+          EXPO_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          EXPO_PUBLIC_SENTRY_DSN_MOBILE: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN_MOBILE }}
+          EXPO_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
+        run: |
+          bun scripts/build-web.ts
+          vercel deploy --prod --prebuilt --archive=tgz --token=$VERCEL_TOKEN
 
   deploy-marketing:
     name: Deploy Marketing to Vercel
@@ -429,7 +533,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
+          NEXT_PUBLIC_WEB_URL: ${{ secrets.MARKETING_WEB_URL || secrets.NEXT_PUBLIC_WEB_URL }}
           NEXT_PUBLIC_MARKETING_URL: ${{ secrets.NEXT_PUBLIC_MARKETING_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
@@ -455,6 +559,7 @@ jobs:
           SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
+          AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
         run: |
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
           vercel build --prod --token=$VERCEL_TOKEN
@@ -486,6 +591,7 @@ jobs:
             --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
             --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
+            --env AUTUMN_SECRET_KEY=$AUTUMN_SECRET_KEY \
             --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY
 
   # Every relay deploy restarts every Durable Object, which drops the control
@@ -555,6 +661,95 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bunx wrangler deploy
 
+  agent-worker-changes:
+    name: Detect Agent Worker Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      worker: ${{ steps.filter.outputs.worker }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            worker:
+              - 'apps/agent-worker/**'
+              - 'packages/agent-harness/**'
+              - 'packages/chat-runtime/src/harness/acp/rpcClient/**'
+              - '.github/workflows/deploy-production.yml'
+
+  # A rollout restarts the worker; turns it was running resume on the new one.
+  deploy-agent-worker:
+    name: Deploy Agent Worker to Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    permissions:
+      contents: read
+    needs: [agent-worker-changes, deploy-api]
+    if: >-
+      !cancelled() && needs.deploy-api.result == 'success' && (
+        github.event_name == 'workflow_dispatch'
+        || needs.agent-worker-changes.result != 'success'
+        || needs.agent-worker-changes.outputs.worker == 'true'
+      )
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Skip until Temporal is configured
+        id: configured
+        env:
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+        run: |
+          if [ -z "$TEMPORAL_ADDRESS" ]; then
+            echo "::notice::TEMPORAL_ADDRESS is not set; the agent worker is not deployed."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Bun
+        if: steps.configured.outputs.ready == 'true'
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        if: steps.configured.outputs.ready == 'true'
+        run: bun install --frozen --ignore-scripts
+
+      - name: Build
+        if: steps.configured.outputs.ready == 'true'
+        working-directory: apps/agent-worker
+        run: bun run build
+
+      - name: Deploy Worker with its secrets
+        if: steps.configured.outputs.ready == 'true'
+        working-directory: apps/agent-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
+          TEMPORAL_ADDRESS: ${{ secrets.TEMPORAL_ADDRESS }}
+          TEMPORAL_NAMESPACE: ${{ secrets.TEMPORAL_NAMESPACE }}
+          TEMPORAL_API_KEY: ${{ secrets.TEMPORAL_API_KEY }}
+          AGENT_ROUTER_API_KEY: ${{ secrets.AGENT_ROUTER_API_KEY }}
+        run: |
+          set -euo pipefail
+          secrets="$(mktemp)"
+          trap 'rm -f "$secrets"' EXIT
+          jq -n '{AGENT_WORKER_SECRET: env.AGENT_WORKER_SECRET, TEMPORAL_ADDRESS: env.TEMPORAL_ADDRESS, TEMPORAL_NAMESPACE: env.TEMPORAL_NAMESPACE, TEMPORAL_API_KEY: env.TEMPORAL_API_KEY, AGENT_ROUTER_API_KEY: env.AGENT_ROUTER_API_KEY} | with_entries(select(.value != null and .value != ""))' > "$secrets"
+          bunx wrangler deploy --secrets-file "$secrets"
+
   realtime-changes:
     name: Detect Realtime Changes
     runs-on: ubuntu-latest
@@ -575,6 +770,9 @@ jobs:
             realtime:
               - 'apps/realtime/**'
               - 'packages/shared/src/realtime.ts'
+              - 'packages/shared/src/channels.ts'
+              - 'packages/shared/src/move-book/**'
+              - '!packages/shared/src/move-book/**/*.test.ts'
               - 'packages/shared/src/page-storage.ts'
               - 'packages/shared/src/page-storage-hub.ts'
               - 'packages/shared/src/page-storage-access.ts'

@@ -27,6 +27,7 @@ import { UserMessageBubble } from "./components/UserMessageBubble";
 
 interface ChatRowViewProps {
 	row: ChatRow;
+	asker?: string | undefined;
 	isLastReply: boolean;
 	/** The streamed text for a message or thought, else its stored text. */
 	text: string;
@@ -63,6 +64,7 @@ function sameRow(a: ChatRow, b: ChatRow): boolean {
 export const ChatRowView = memo(
 	function ChatRowView({
 		row,
+		asker,
 		isLastReply,
 		text,
 		harness,
@@ -98,8 +100,12 @@ export const ChatRowView = memo(
 			case "turn_status":
 				return (
 					<SystemLine tone={row.status === "failed" ? "error" : "muted"}>
-						{row.status === "interrupted" ? (
+						{row.status === "paused" ? (
+							<Trans>Paused when Paradev closed</Trans>
+						) : row.status === "interrupted" ? (
 							<Trans>Stopped</Trans>
+						) : row.status === "limited" ? (
+							<Trans>Stopped by the usage limit</Trans>
 						) : (
 							(row.message ?? <Trans>The turn failed</Trans>)
 						)}
@@ -163,6 +169,7 @@ export const ChatRowView = memo(
 				return (
 					<ApprovalCard
 						approval={item as ApprovalRequest}
+						asker={asker}
 						onRespond={onRespond}
 					/>
 				);
@@ -181,6 +188,7 @@ export const ChatRowView = memo(
 	},
 	(prev, next) =>
 		sameRow(prev.row, next.row) &&
+		prev.asker === next.asker &&
 		prev.isLastReply === next.isLastReply &&
 		prev.text === next.text &&
 		prev.harness === next.harness &&

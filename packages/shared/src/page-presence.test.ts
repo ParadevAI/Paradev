@@ -1,15 +1,84 @@
 import { describe, expect, test } from "bun:test";
 import {
+	type PagePresenceViewer,
 	pagePresenceUrl,
-	presenceColor,
+	presencePeople,
 	presenceViewersFrom,
 } from "./page-presence";
 
-describe("presenceColor", () => {
-	test("maps each colour slot the hub hands out to a distinct colour", () => {
-		const colors = Array.from({ length: 8 }, (_, slot) => presenceColor(slot));
-		expect(new Set(colors).size).toBe(8);
-		expect(presenceColor(8)).toBe(presenceColor(0));
+const viewer = (
+	key: string,
+	guest: boolean,
+	guestNumber: number | null = null,
+): PagePresenceViewer => ({
+	id: `${key}-socket`,
+	key,
+	name: guest ? "" : key,
+	image: null,
+	guest,
+	guestNumber,
+	color: 0,
+});
+
+const ana = {
+	userId: "ana",
+	name: "Ana",
+	image: null,
+	lastSeenAt: 1,
+	active: true,
+};
+
+describe("presencePeople", () => {
+	test("adds each guest here once, after the visitors", () => {
+		const people = presencePeople(
+			[ana],
+			[viewer("ana", false), viewer("g1", true, 3), viewer("g1", true, 3)],
+			(n) => `Guest ${n}`,
+			9,
+		);
+		expect(people).toEqual([
+			ana,
+			{
+				userId: "guest:g1",
+				name: "Guest 3",
+				image: null,
+				lastSeenAt: 9,
+				active: true,
+			},
+		]);
+	});
+
+	test("returns the same list when no guest is here", () => {
+		const visitors = [ana];
+		expect(presencePeople(visitors, [viewer("ana", false)], String, 9)).toBe(
+			visitors,
+		);
+	});
+
+	test("shows a guest everyone present, since they get no visitor list", () => {
+		expect(
+			presencePeople(
+				[],
+				[viewer("ana", false), viewer("g2", true, 1)],
+				() => "Guest",
+				9,
+			),
+		).toEqual([
+			{
+				userId: "viewer:ana",
+				name: "ana",
+				image: null,
+				lastSeenAt: 9,
+				active: true,
+			},
+			{
+				userId: "guest:g2",
+				name: "Guest",
+				image: null,
+				lastSeenAt: 9,
+				active: true,
+			},
+		]);
 	});
 });
 

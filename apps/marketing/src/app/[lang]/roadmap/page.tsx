@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const description = i18n._(
 		msg({
 			message:
-				"See what we're building now, what's coming next, and where Superset is headed.",
+				"See what we're building now, what's coming next, and where Paradev is headed.",
 		}),
 	);
 	return {
@@ -31,14 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 			languages: localizedAlternates(lang, "/roadmap").languages,
 		},
 		openGraph: {
-			title: `${title} | Superset`,
+			title: `${title} | ${BRAND.NAME}`,
 			description: description,
 			url: localeUrl(lang, "/roadmap"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | Superset`,
+			title: `${title} | ${BRAND.NAME}`,
 			description: description,
 			images: ["/og-image.png"],
 		},

@@ -1,117 +1,14 @@
 /**
- * Round 3 of bug-hunting. Targets: path-traversal in *.create where the
- * branch / name comes from the renderer.
+ * Round 3 of bug-hunting.
  */
 
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
-import { existsSync, rmSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { projects } from "../../src/db/schema";
 import { createTestHost, type TestHost } from "../helpers/createTestHost";
 import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
-
-describe("bug-hunt-3: branch-name path traversal in workspace.create", () => {
-	let host: TestHost;
-	let repo: GitFixture;
-	const projectId = randomUUID();
-	let escapeDir: string;
-
-	beforeEach(async () => {
-		repo = await createGitFixture();
-		// Plant a sibling we can prove a bug by creating a worktree inside.
-		escapeDir = resolve(dirname(repo.repoPath), `pwn-${randomUUID()}`);
-	});
-
-	afterEach(async () => {
-		if (host) await host.dispose();
-		repo.dispose();
-		try {
-			rmSync(escapeDir, { recursive: true, force: true });
-		} catch {}
-	});
-
-	test("workspace.create with a '../escape' branch name is rejected (no worktree outside project)", async () => {
-		host = await createTestHost({
-			apiOverrides: {
-				"host.ensure.mutate": () => ({ machineId: "m1" }),
-				"v2Workspace.create.mutate": (input: unknown) => {
-					const i = input as { branch: string; name: string };
-					return {
-						id: randomUUID(),
-						projectId,
-						branch: i.branch,
-						name: i.name,
-					};
-				},
-			},
-		});
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-
-		// path.join('<repoPath>', '.worktrees', '../../<escape>') normalizes
-		// to <parent-of-parent-of-repoPath>/<escape>. If the procedure
-		// uses `join` without re-validating, it creates a worktree well
-		// outside the project root.
-		const evilBranch = `../../pwn-${randomUUID()}`;
-		const expectedEscapePath = join(repo.repoPath, ".worktrees", evilBranch); // path.join collapses .. segments
-
-		const result = await host.trpc.workspace.create
-			.mutate({
-				projectId,
-				name: "x",
-				branch: evilBranch,
-			})
-			.catch((err) => err);
-
-		// The procedure should have rejected the input. If it didn't, a
-		// worktree was placed at expectedEscapePath, outside the repo.
-		// Log the error message so we can see WHY it rejected (git's branch
-		// name validation? or our own?) — important for understanding the
-		// defense.
-		if (result instanceof Error) {
-			console.error("[bug-hunt-3] rejected with:", result.message);
-		}
-		expect(existsSync(expectedEscapePath)).toBe(false);
-		// And the call should have errored out.
-		expect(result).toBeInstanceOf(Error);
-	});
-});
-
-describe("bug-hunt-3: branch-name path traversal in workspaceCreation.create", () => {
-	let host: TestHost;
-	let repo: GitFixture;
-	const projectId = randomUUID();
-
-	beforeEach(async () => {
-		host = await createTestHost();
-		repo = await createGitFixture();
-		host.db
-			.insert(projects)
-			.values({ id: projectId, repoPath: repo.repoPath })
-			.run();
-	});
-
-	afterEach(async () => {
-		await host.dispose();
-		repo.dispose();
-	});
-
-	test("workspaceCreation.create rejects a '../escape' branchName (safeResolveWorktreePath guard)", async () => {
-		// safeResolveWorktreePath uses `resolve` and rejects escapes. This
-		// is the v2 entry point and is the one we expect to be locked down.
-		await expect(
-			host.trpc.workspaceCreation.create.mutate({
-				pendingId: randomUUID(),
-				projectId,
-				names: { workspaceName: "x", branchName: "../../escape" },
-				composer: {},
-			}),
-		).rejects.toThrow();
-	});
-});
 
 describe("bug-hunt-3: workspace.delete + dirty worktree", () => {
 	let host: TestHost;

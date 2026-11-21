@@ -221,7 +221,7 @@ export function planAttachmentUploads(
 
 export default command({
 	description:
-		"Submit feedback privately to the Superset team (sent from your account so we can reply)",
+		"Submit feedback privately to the Paradev team (sent from your account so we can reply)",
 	options: {
 		type: string()
 			.enum("bug", "feature", "general")
@@ -308,7 +308,7 @@ export default command({
 		return {
 			data: { submitted: true, attachments: attachments.length },
 			message:
-				"Feedback sent to the Superset team. A copy was CC'd to your account email; reply there with any follow-up so it stays on the same thread.",
+				"Feedback sent to the Paradev team. A copy was CC'd to your account email; reply there with any follow-up so it stays on the same thread.",
 		};
 	},
 });

@@ -21,7 +21,7 @@ VALUES (
   'warning',
   'immediate',
   '1.99.0',
-  E'### Heads up: v2.0 has breaking changes\n\nCloud mirrors need re-linking once after you update. [Details](https://superset.sh/changelog)',
+  E'### Heads up: v2.0 has breaking changes\n\nCloud mirrors need re-linking once after you update. [Details](https://paradev.com/changelog)',
   'Update now',
   'install-update',
   true,

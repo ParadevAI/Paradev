@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { $isListNode, ListItemNode, ListNode } from "@lexical/list";
 import {
 	$createParagraphNode,
 	$createTextNode,
@@ -17,13 +18,13 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 function setup(history: string[]) {
 	const editor = createEditor({
 		namespace: "history-test",
-		nodes: [MentionChipNode],
+		nodes: [MentionChipNode, ListNode, ListItemNode],
 		onError: (error) => {
 			throw error;
 		},
 	});
-	registerHistoryNavigation(editor, () => history);
-	return editor;
+	const navigation = registerHistoryNavigation(editor, () => history);
+	return Object.assign(editor, { navigation });
 }
 
 async function setContent(
@@ -69,6 +70,16 @@ const read = (editor: LexicalEditor) =>
 	});
 
 describe("registerHistoryNavigation", () => {
+	it("recalls the previous prompt on request, even with no selection", async () => {
+		const editor = setup(["first", "second"]);
+		editor.update(() => $getRoot().clear(), { discrete: true });
+		await tick();
+
+		editor.navigation.recallOlder();
+		await tick();
+		expect(read(editor).text).toBe("second");
+	});
+
 	it("recalls newest first from an empty box and walks back to an empty box", async () => {
 		const editor = setup(["first", "second"]);
 		await setContent(editor, () => {}, "end");
@@ -127,5 +138,28 @@ describe("registerHistoryNavigation", () => {
 		expect(read(editor).text).toBe("second PLUS MY EDIT");
 		await press(editor, "up");
 		expect(read(editor).text).toBe("second PLUS MY EDIT");
+	});
+
+	it("recalls a markdown prompt as a list and walks on from it", async () => {
+		const editor = setup(["first", "- one\n- two"]);
+		await setContent(editor, () => {}, "end");
+
+		await press(editor, "up");
+		expect(
+			editor
+				.getEditorState()
+				.read(() => $isListNode($getRoot().getFirstChild())),
+		).toBe(true);
+		await press(editor, "up");
+		expect(read(editor).text).toBe("first");
+	});
+
+	it("walks past a prompt whose markdown reads back differently", async () => {
+		const editor = setup(["first", "  - a"]);
+		await setContent(editor, () => {}, "end");
+
+		await press(editor, "up");
+		await press(editor, "up");
+		expect(read(editor).text).toBe("first");
 	});
 });

@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
-import { Link, useMatchRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { HiOutlineTrash } from "react-icons/hi2";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { settingsListItemClass } from "../../../../../components/SettingsListSidebar";
 import { useDeletedProjects } from "../../../../hooks/useDeletedProjects";
 

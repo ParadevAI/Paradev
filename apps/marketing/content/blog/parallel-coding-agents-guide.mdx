@@ -29,7 +29,7 @@ Record the starting commit with `git rev-parse HEAD`. Use that same base for all
 
 ## Create one worktree per task
 
-In Superset, open your project and create three workspaces, each with its own branch. Use descriptive names such as `demo/format-tests`, `demo/search-copy`, and `demo/setup-docs`. Start Claude Code or Codex in each workspace.
+In Paradev, open your project and create three workspaces, each with its own branch. Use descriptive names such as `demo/format-tests`, `demo/search-copy`, and `demo/setup-docs`. Start Claude Code or Codex in each workspace.
 
 ![One repository with a separate worktree and branch for each task.](/images/guides/worktree-isolation.svg)
 
@@ -101,7 +101,7 @@ Watch memory, build load, and provider limits. Start fewer agents if the machine
 
 ## Review each diff, then test the combined result
 
-![Superset's diff viewer showing an isolated change.](/images/readme/diff-viewer.png)
+![Paradev's diff viewer showing an isolated change.](/images/readme/diff-viewer.png)
 
 For each workspace:
 
@@ -128,4 +128,4 @@ git worktree list
 
 Git refuses removal when a worktree contains changes it needs you to handle. Inspect those changes instead of adding `--force`. Removing a worktree keeps its branch; decide separately whether the branch should be retained.
 
-For the underlying Git behavior, read the [worktree walkthrough](/compare/git-worktrees-for-ai-agents) and [Git's worktree documentation](https://git-scm.com/docs/git-worktree). For product selection, compare [Superset and Orca](/compare/superset-vs-orca), [Conductor](/compare/superset-vs-conductor), and [Emdash](/compare/superset-vs-emdash).
+For the underlying Git behavior, read the [worktree walkthrough](/compare/git-worktrees-for-ai-agents) and [Git's worktree documentation](https://git-scm.com/docs/git-worktree). For product selection, compare [Paradev and Orca](/compare/superset-vs-orca), [Conductor](/compare/superset-vs-conductor), and [Emdash](/compare/superset-vs-emdash).

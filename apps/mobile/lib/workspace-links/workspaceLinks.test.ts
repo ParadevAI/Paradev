@@ -17,6 +17,12 @@ describe("workspaceIdFromUrl", () => {
 		);
 	});
 
+	test("reads the id from the web origin's twin on the other root domain", () => {
+		expect(
+			workspaceIdFromUrl("https://app.paradev.com/workspaces/ws-1", WEB),
+		).toBe("ws-1");
+	});
+
 	test("refuses another origin, however similar", () => {
 		expect(
 			workspaceIdFromUrl(

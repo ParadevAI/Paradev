@@ -1,14 +1,16 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatDistanceToNow } from "date-fns";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { PencilIcon, PinIcon, ShareIcon } from "lucide-react-native";
 import { type ReactNode, type RefObject, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useHostProjects } from "@/hooks/useHostProjects";
 import { useTheme } from "@/hooks/useTheme";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
+import { HeaderToolbar } from "@/lib/navigation";
 import { isSandboxHost } from "@/lib/sandbox-access";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
@@ -25,7 +27,7 @@ function CircleAction({
 	active,
 	onPress,
 }: {
-	ref?: RefObject<View | null>;
+	ref?: RefObject<ViewInstance | null>;
 	icon: ReactNode;
 	label: string;
 	active?: boolean;
@@ -93,7 +95,7 @@ export function WorkspaceActionsSheet() {
 		id ? id in state.pinnedAt : false,
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
-	const shareRef = useRef<View>(null);
+	const shareRef = useRef<ViewInstance>(null);
 
 	const isCloud = host !== null && isSandboxHost(host.machineId);
 	const project = workspace?.projectId
@@ -105,15 +107,15 @@ export function WorkspaceActionsSheet() {
 			{/* The close button is a native bar item like every other sheet's:
 			    pinned while the content scrolls under the transparent header,
 			    and glass on the OS versions that draw it. */}
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="px-6 pb-10"

@@ -122,6 +122,15 @@ function applyDurable(draft: Draft, event: DurableEvent): void {
 		}
 		case "session": {
 			draft.session = event.session;
+			const live = new Set(
+				(event.session.backgroundTasks ?? []).map((task) =>
+					streamKey("background", task.id),
+				),
+			);
+			for (const key of [...readable(draft, "liveStreams").keys()]) {
+				if (key.startsWith("background:") && !live.has(key))
+					writable(draft, "liveStreams").delete(key);
+			}
 			return;
 		}
 	}

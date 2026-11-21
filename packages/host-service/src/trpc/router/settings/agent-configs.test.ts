@@ -10,7 +10,7 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "../../../db/schema";
 import type { HostServiceContext } from "../../../types";
-import { agentConfigsRouter } from "./agent-configs";
+import { agentConfigsRouter, ensurePresetRow } from "./agent-configs";
 
 function presetBody(presetId: string) {
 	const preset = getPresetById(presetId);
@@ -62,7 +62,7 @@ describe("agentConfigsRouter", () => {
 			expect(result.map((row) => row.order)).toEqual(DEFAULT_PRESET_ORDERS);
 		});
 
-		it("does not seed Superset", async () => {
+		it("does not seed Paradev", async () => {
 			const caller = createCaller();
 			const result = await caller.list();
 			expect(result.find((row) => row.presetId === "superset")).toBeUndefined();
@@ -635,5 +635,20 @@ describe("agentConfigsRouter", () => {
 			// extra row added above is dropped.
 			expect(result.filter((row) => row.presetId === "omp")).toHaveLength(1);
 		});
+	});
+});
+
+describe("ensurePresetRow", () => {
+	it("adds a cloud workspace's flag-gated launch agent after the defaults", async () => {
+		const { caller, db } = createCallerWithDb();
+		const hostDb = db as unknown as HostServiceContext["db"];
+		ensurePresetRow(hostDb, "pdev");
+		ensurePresetRow(hostDb, "pdev");
+		const rows = await caller.list();
+		expect(rows.map((row) => row.presetId)).toEqual([
+			...DEFAULT_PRESET_IDS,
+			"pdev",
+		]);
+		expect(rows.at(-1)?.order).toBe(DEFAULT_PRESET_IDS.length);
 	});
 });

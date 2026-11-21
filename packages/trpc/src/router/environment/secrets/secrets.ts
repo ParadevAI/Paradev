@@ -9,16 +9,17 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, ne, sql, sum } from "drizzle-orm";
 import { z } from "zod";
 import { assertCloudAccess } from "../../../lib/cloud-guards";
-import { jwtProcedure, userError } from "../../../trpc";
+import { queueRulesReapply } from "../../../lib/sandbox/reapply-rules";
+import { personProcedure, userError } from "../../../trpc";
 import { loadEnvironment } from "../environment";
 import { decryptSecret, encryptSecret } from "./utils/crypto";
 
 export const secretsRouter = {
-	list: jwtProcedure
+	list: personProcedure
 		.input(z.object({ environmentId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
 			const organizationId = environment.organizationId;
 			const rows = await db
 				.select({
@@ -38,11 +39,11 @@ export const secretsRouter = {
 			return rows;
 		}),
 
-	getDecrypted: jwtProcedure
+	getDecrypted: personProcedure
 		.input(z.object({ environmentId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
 			const organizationId = environment.organizationId;
 			const rows = await db
 				.select({
@@ -88,7 +89,7 @@ export const secretsRouter = {
 			}));
 		}),
 
-	set: jwtProcedure
+	set: personProcedure
 		.input(
 			z.object({
 				environmentId: z.string().uuid(),
@@ -98,8 +99,8 @@ export const secretsRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
 
 			const keyCheck = validateSecretKey(input.key);
 			if (!keyCheck.valid) {
@@ -153,7 +154,7 @@ export const secretsRouter = {
 						key: input.key,
 					}),
 					sensitive: input.sensitive,
-					createdByUserId: ctx.userId,
+					createdByUserId: ctx.principal.userId,
 				})
 				.onConflictDoUpdate({
 					target: [
@@ -170,16 +171,17 @@ export const secretsRouter = {
 						sensitive: input.sensitive,
 					},
 				});
+			await queueRulesReapply({ environmentId: input.environmentId });
 			return { key: input.key };
 		}),
 
-	remove: jwtProcedure
+	remove: personProcedure
 		.input(
 			z.object({ environmentId: z.string().uuid(), key: z.string().min(1) }),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await assertCloudAccess(ctx);
 			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
 			const organizationId = environment.organizationId;
 			await db
 				.delete(environmentSecrets)
@@ -190,6 +192,7 @@ export const secretsRouter = {
 						eq(environmentSecrets.key, input.key),
 					),
 				);
+			await queueRulesReapply({ environmentId: input.environmentId });
 			return { removed: true };
 		}),
 } satisfies TRPCRouterRecord;

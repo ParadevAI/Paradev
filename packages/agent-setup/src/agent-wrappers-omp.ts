@@ -5,7 +5,7 @@ import {
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
 import { getTemplatePath } from "./config";
-import { resolveUserHomeDir } from "./paths";
+import { APP_HOME_DIR_NAME, resolveUserHomeDir } from "./paths";
 
 export const OMP_EXTENSION_FILE = "superset-hooks.ts";
 
@@ -43,7 +43,9 @@ export function getOmpExtensionContent(): string {
 		getTemplatePath("omp-extension.template.ts"),
 		"utf-8",
 	);
-	return template.replace("{{MARKER}}", OMP_EXTENSION_MARKER);
+	return template
+		.replace("{{MARKER}}", OMP_EXTENSION_MARKER)
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 /**

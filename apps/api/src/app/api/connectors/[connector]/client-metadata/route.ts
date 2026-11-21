@@ -14,7 +14,7 @@ export async function GET(
 	return Response.json(
 		{
 			client_id: clientMetadataUrl(slug),
-			client_name: "Superset",
+			client_name: "Paradev",
 			client_uri: CANONICAL_URLS.MARKETING,
 			redirect_uris: [redirectUriFor(slug)],
 			grant_types: ["authorization_code", "refresh_token"],

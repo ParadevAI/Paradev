@@ -1,40 +1,11 @@
 import { isSupportedLocale } from "@superset/i18n";
-import { COMPANY } from "@superset/shared/constants";
 import { isProfileHandle } from "@superset/trpc/leaderboard-reserved-handles";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { canonicalPathname } from "@/lib/canonical-pathname";
-import { assignHeadlineVariant } from "@/lib/hero-headline-assignment";
-import { evaluateHeadlineVariant } from "@/lib/hero-headline-flags";
 
-export async function proxy(request: NextRequest) {
-	const response = route(request);
-	if (
-		!isHomepage(request.nextUrl.pathname) ||
-		response?.headers.has("location")
-	) {
-		return response;
-	}
-	const homepage = response ?? NextResponse.next();
-	await assignHeadlineVariant(request, homepage, {
-		isProductionHost: isProductionHost(request),
-		evaluate: evaluateHeadlineVariant,
-	});
-	return homepage;
-}
-
-function isHomepage(pathname: string): boolean {
-	const [, first = "", ...rest] = pathname.split("/");
-	return rest.length === 0 && (first === "" || isSupportedLocale(first));
-}
-
-function isProductionHost(request: NextRequest): boolean {
-	const productionHost = new URL(COMPANY.MARKETING_URL).hostname;
-	const { hostname } = request.nextUrl;
-	return (
-		process.env.NODE_ENV === "production" &&
-		(hostname === productionHost || hostname === `www.${productionHost}`)
-	);
+export function proxy(request: NextRequest) {
+	return route(request);
 }
 
 /**
@@ -105,7 +76,20 @@ function route(request: NextRequest) {
 	}
 
 	const url = request.nextUrl.clone();
-	url.pathname = `/en${pathname}`;
+	// Keep /land available as a profile handle. Only these English child URLs
+	// use the internal /en/en tree; direct /en URLs still canonicalize above.
+	const barePath = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+	const landingPage =
+		barePath === "/land/claude-code-parallel-sessions" ||
+		barePath === "/land/claude-code-worktrees" ||
+		barePath === "/land/codex-cli-worktrees";
+	if (landingPage && barePath !== pathname) {
+		// NextURL retains the inbound trailing-slash flag when serialized.
+		const target = new URL(request.url);
+		target.pathname = barePath;
+		return NextResponse.redirect(target, 308);
+	}
+	url.pathname = landingPage ? `/en/en${pathname}` : `/en${pathname}`;
 	return NextResponse.rewrite(url);
 }
 

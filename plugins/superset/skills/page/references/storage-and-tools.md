@@ -49,12 +49,12 @@ superset pages storage <page> --key data --scope shared --remove
 ## Live data: `window.superset.tools`
 
 A page can call a plugin's tool as the person viewing it, through their own
-connected account. Superset makes the call; the page makes no network request.
+connected account. Paradev makes the call; the page makes no network request.
 
 ```js
 const tools = window.superset?.tools;
 if (await tools?.ready) {
-  const result = await tools.call("neon-readonly", "run_sql", {
+  const result = await tools.call("neon", "run_sql", {
     sql: "select count(*) from organizations",
   });
 }
@@ -64,8 +64,8 @@ if (await tools?.ready) {
 - The viewer allows each plugin once per page, and may install or connect it.
   A grant covers every tool, writes too, and later page versions, and the page
   can send what it reads to other websites.
-- Use `neon-readonly` for dashboards. Read-only is not enforced yet for accounts
-  connected with write access, so do not rely on it for safety. `exa` is search.
+- `neon` runs SQL, writes included, so only run read queries from a page.
+  `exa` is search.
 - Handle absence and errors by `error.code`: `needs_install`, `needs_connection`,
   `denied`, `unavailable_signed_out`, `rate_limited`, `invalid`, `tool_error`,
   `unavailable`. A tool that fails returns `tool_error` with the tool's message.

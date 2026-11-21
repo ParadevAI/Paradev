@@ -6,6 +6,7 @@ import {
 	readdirSync,
 	readFileSync,
 	rmSync,
+	statSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -17,6 +18,10 @@ import {
 	readInstalledPluginSources,
 	setAgentSetupTemplatesDir,
 } from "@superset/agent-setup";
+import {
+	packPluginBundle,
+	pluginBundleHash,
+} from "@superset/shared/plugins/bundle";
 import { seedSandboxPlugins } from "./sandbox-plugins";
 
 let home: string;
@@ -94,6 +99,90 @@ describe("seedSandboxPlugins", () => {
 		expect(existsSync(join(cached, "plugin.json"))).toBe(true);
 		expect(existsSync(join(cached, "skills"))).toBe(true);
 		expect(existsSync(join(cached, "extra", "thing.txt"))).toBe(true);
+	});
+
+	it("unpacks an organization plugin's uploaded tree, so its skills reach the box", async () => {
+		const marketplace = "organization-org-1";
+		const bundle = packPluginBundle(
+			new Map([
+				["plugin.json", Buffer.from('{"name":"team-tools","version":"2.0.0"}')],
+				["skills/triage/SKILL.md", Buffer.from("---\nname: triage\n---\n")],
+				["scripts/run.sh", Buffer.from("#!/bin/sh\n")],
+			]),
+			new Set(["scripts/run.sh"]),
+		);
+		await seedSandboxPlugins(
+			{
+				SUPERSET_SANDBOX_PLUGINS: JSON.stringify([
+					{ marketplace, name: "team-tools", version: "1.0.0", enabled: true },
+				]),
+			},
+			async (name) => ({
+				name,
+				marketplace,
+				version: "2.0.0",
+				contentHash: pluginBundleHash(bundle),
+				bundle: bundle.toString("base64"),
+			}),
+		);
+
+		const cached = pluginCachePath(marketplace, "team-tools", "2.0.0");
+		expect(ledger().plugins[0]).toMatchObject({
+			version: "2.0.0",
+			installPath: cached,
+		});
+		expect(existsSync(join(cached, "skills", "triage", "SKILL.md"))).toBe(true);
+		expect(statSync(join(cached, "scripts", "run.sh")).mode & 0o111).not.toBe(
+			0,
+		);
+		expect(
+			statSync(join(cached, "skills", "triage", "SKILL.md")).mode & 0o111,
+		).toBe(0);
+	});
+
+	it("keeps an organization plugin's cached tree when its download fails", async () => {
+		const marketplace = "organization-org-1";
+		const cached = pluginCachePath(marketplace, "team-tools", "2.0.0");
+		mkdirSync(cached, { recursive: true });
+		writeFileSync(join(cached, "plugin.json"), '{"name":"team-tools"}');
+		mkdirSync(join(home, "plugins"), { recursive: true });
+		writeFileSync(
+			join(home, "plugins", "installed_plugins.json"),
+			JSON.stringify({
+				version: 1,
+				plugins: [
+					{
+						marketplace: "acme",
+						name: "team-tools",
+						version: "9.0.0",
+						installPath: "/elsewhere",
+					},
+					{
+						marketplace,
+						name: "team-tools",
+						version: "2.0.0",
+						installPath: cached,
+					},
+				],
+			}),
+		);
+
+		await seedSandboxPlugins(
+			{
+				SUPERSET_SANDBOX_PLUGINS: JSON.stringify([
+					{ marketplace, name: "team-tools", version: "3.0.0", enabled: true },
+				]),
+			},
+			async () => {
+				throw new Error("offline");
+			},
+		);
+
+		expect(ledger().plugins[0]).toMatchObject({
+			marketplace,
+			version: "2.0.0",
+			installPath: cached,
+		});
 	});
 
 	it("leaves no partial tree behind when the copy fails", async () => {

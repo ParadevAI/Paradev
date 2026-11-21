@@ -71,15 +71,21 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			billingFromCustomer(customer({ flags: pro, subscription: {} }), NOW),
 		).toEqual({
 			tier: "pro",
+			autumnPlanId: "pro",
 			status: "active",
 			cancelAt: null,
+			scheduledPlanId: null,
+			scheduledAt: null,
 			periodStart: new Date(NOW - 10 * DAY).toISOString(),
+			startedAt: new Date(NOW - 40 * DAY).toISOString(),
 			periodEnd: new Date(NOW + 20 * DAY).toISOString(),
 			billingInterval: "month",
 			lapsed: false,
 			paymentState: { kind: "ok" },
 			cloudUsage: null,
+			planTier: "pro",
 			gatedMachineSizes: [],
+			environmentLimit: null,
 		});
 	});
 
@@ -92,6 +98,82 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			NOW,
 		);
 		expect(billing.billingInterval).toBe("year");
+	});
+
+	test("a seat change scheduled for renewal is not a cancellation", () => {
+		const source = customer({
+			flags: pro,
+			subscription: { expiresAt: NOW + 20 * DAY },
+		});
+		const active = source.subscriptions[0];
+		if (!active) throw new Error("Missing fixture subscription");
+		source.subscriptions.unshift({
+			...active,
+			status: "scheduled",
+			expiresAt: null,
+			startedAt: NOW + 20 * DAY,
+		} as never);
+		const billing = billingFromCustomer(source, NOW);
+		expect(billing.cancelAt).toBeNull();
+		expect(billing.periodEnd).toBe(new Date(NOW + 20 * DAY).toISOString());
+		source.subscriptions.shift();
+		expect(billingFromCustomer(source, NOW).cancelAt).toBe(
+			new Date(NOW + 20 * DAY).toISOString(),
+		);
+	});
+
+	test("a downgrade scheduled for renewal names the next plan instead of a cancellation", () => {
+		const source = customer({
+			flags: pro,
+			subscription: { planId: "pro", expiresAt: NOW + 20 * DAY },
+		});
+		const active = source.subscriptions[0];
+		if (!active) throw new Error("Missing fixture subscription");
+		source.subscriptions.push({
+			...active,
+			planId: "pro_v2",
+			status: "scheduled",
+			expiresAt: null,
+			startedAt: NOW + 20 * DAY,
+		} as never);
+		const billing = billingFromCustomer(source, NOW);
+		expect(billing.cancelAt).toBeNull();
+		expect(billing.scheduledPlanId).toBe("pro_v2");
+		expect(billing.scheduledAt).toBe(new Date(NOW + 20 * DAY).toISOString());
+	});
+
+	test("the plan tier is the plan's family, else the entitlement tier", () => {
+		const tierFor = (metadata: Record<string, unknown>) =>
+			billingFromCustomer(
+				customer({
+					flags: pro,
+					subscription: {
+						plan: { ...seatPricedPlan("month"), metadata } as never,
+					},
+				}),
+				NOW,
+			).planTier;
+		expect(tierFor({ family: "team" })).toBe("team");
+		expect(tierFor({})).toBe("pro");
+		expect(billingFromCustomer(customer({}), NOW).planTier).toBe("free");
+	});
+
+	test("a yearly seat license reads as yearly and renews on its anniversary", () => {
+		const billing = billingFromCustomer(
+			customer({
+				flags: pro,
+				subscription: {
+					plan: { price: null, items: [] } as never,
+					startedAt: NOW - 40 * DAY,
+				},
+			}),
+			NOW,
+			"year",
+		);
+		expect(billing.billingInterval).toBe("year");
+		expect(billing.periodEnd).toBe(
+			new Date(NOW - 40 * DAY + 365 * DAY).toISOString(),
+		);
 	});
 
 	test("a paid tier with no matching subscription still reads as active for released desktops", () => {
@@ -151,4 +233,65 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			billingFromCustomer(customer({ invoices: [invoice("paid")] }), NOW),
 		).toMatchObject({ lapsed: false, paymentState: { kind: "ok" } });
 	});
+});
+
+describe("environment limit", () => {
+	test("a free organization without an environments grant gets none", () => {
+		expect(billingFromCustomer(customer({}), NOW).environmentLimit).toBe(0);
+	});
+
+	test("a paid plan without the feature leaves the limit to the default", () => {
+		expect(
+			billingFromCustomer(customer({ flags: pro, subscription: {} }), NOW)
+				.environmentLimit,
+		).toBeNull();
+	});
+});
+
+test.each([
+	[
+		"the plan's monthly price",
+		{ amount: 0.25, interval: "month", billingUnits: 250 },
+	],
+	[
+		"the pack price, with no monthly price",
+		{ amount: 0.06, interval: "one_off", billingUnits: 60 },
+	],
+])("cloud usage is priced per GB-hour from %s", (_, price) => {
+	const source = customer({
+		flags: pro,
+		subscription: {
+			plan: { items: [{ featureId: "box_gb_minutes", price }] },
+		} as never,
+	});
+	source.balances = {
+		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
+	} as never;
+	expect(
+		billingFromCustomer(source, NOW).cloudUsage?.overagePerGbHour,
+	).toBeCloseTo(0.06);
+});
+
+test.each([
+	[
+		"the paid plan's seat licenses",
+		{
+			licenses: [
+				{ parentPlanId: "pro", granted: 3 },
+				{ parentPlanId: "team", granted: 9 },
+			],
+			balances: {},
+		},
+		3,
+	],
+	["the seats feature", { balances: { seats: { granted: 4 } } }, 4],
+	["no seat count", { balances: {} }, null],
+] as const)("cloud usage counts seats from %s", (_, seats, expected) => {
+	const source = customer({ flags: pro, subscription: {} });
+	Object.assign(source, seats);
+	source.balances = {
+		...source.balances,
+		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
+	} as never;
+	expect(billingFromCustomer(source, NOW).cloudUsage?.seats).toBe(expected);
 });

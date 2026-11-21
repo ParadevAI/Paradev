@@ -27,7 +27,7 @@ This validates **react-native-streamdown** inside our metro composition.
 const greet = (name: string) => \`hello \${name}\`;
 \`\`\`
 
-> Blockquote with [a link](https://superset.sh).
+> Blockquote with [a link](https://paradev.com).
 `;
 
 function StreamingDemo() {

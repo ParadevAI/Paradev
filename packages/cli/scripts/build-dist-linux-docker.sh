@@ -23,7 +23,7 @@ esac
 
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 BUN_VERSION="$(cat "$REPO_ROOT/.bun-version")"
-NODE_VERSION="22.22.2"
+NODE_VERSION="22.23.4"
 
 echo "[docker-build] target=$TARGET platform=$PLATFORM bun=$BUN_VERSION node=$NODE_VERSION"
 echo "[docker-build] repo: $REPO_ROOT"

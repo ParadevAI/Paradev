@@ -33,11 +33,15 @@ export {
 	type PageVisibility,
 	RenamePageDialog,
 } from "./components/PageHeader";
-export { PageViewers } from "./components/PageViewers";
+export { PageUpdateBanner } from "./components/PageUpdateBanner";
 export { useFramePointerDown } from "./hooks/useFramePointerDown";
 export { usePageStorageConnect } from "./hooks/usePageStorageConnect";
 export type { PageToolHost } from "./hooks/usePageTools";
 export { usePageToolsUnavailable } from "./hooks/usePageToolsUnavailable";
+export {
+	type PageUpdateCandidate,
+	usePageUpdateOffer,
+} from "./hooks/usePageUpdateOffer";
 export {
 	type CommentDraft,
 	type CommentIntent,

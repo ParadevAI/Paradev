@@ -2,18 +2,37 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { FAQDisclosure } from "../FAQDisclosure";
 import { FAQ_ITEMS } from "./constants";
 
-export function FAQSection() {
+export interface FAQSectionItem {
+	id: string;
+	question: string;
+	answer: ReactNode;
+	link?: { href: string; label: string };
+}
+
+export function FAQSection({ items }: { items?: FAQSectionItem[] }) {
 	const { t } = useLingui();
+	const entries: FAQSectionItem[] =
+		items ??
+		FAQ_ITEMS.map((item) => ({
+			id: item.id,
+			question: t(item.question),
+			answer: t(item.answer),
+			link: item.link && {
+				href: item.link.href,
+				label: t(item.link.label),
+			},
+		}));
 
 	return (
 		<section className="relative py-24 sm:py-32">
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				<div className="grid grid-cols-1 xl:grid-cols-[1fr_1.5fr] gap-12 xl:gap-20">
 					<div className="xl:sticky xl:top-24 xl:self-start">
-						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-foreground leading-[1.1]">
+						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-foreground leading-[1.1]">
 							<Trans>
 								Frequently
 								<br />
@@ -24,19 +43,19 @@ export function FAQSection() {
 
 					<div>
 						<div className="w-full">
-							{FAQ_ITEMS.map((item) => (
+							{entries.map((item) => (
 								<FAQDisclosure
 									key={item.id}
 									name="home-faq"
-									question={t(item.question)}
+									question={item.question}
 								>
-									<p>{t(item.answer)}</p>
+									<p>{item.answer}</p>
 									{item.link && (
 										<Link
 											href={item.link.href}
-											className="inline-block text-brand hover:text-brand-light transition-colors"
+											className="inline-block text-foreground underline underline-offset-4 decoration-border hover:decoration-foreground transition-colors"
 										>
-											{t(item.link.label)} →
+											{item.link.label} →
 										</Link>
 									)}
 								</FAQDisclosure>

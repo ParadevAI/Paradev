@@ -89,7 +89,7 @@ export function EmailLayout({
 							padding: "40px 24px 48px",
 						}}
 					>
-						<Img src={`${assets}/logo-full.png`} alt="Superset" width="116" />
+						<Img src={`${assets}/logo-full.png`} alt="Paradev" width="116" />
 
 						<Section style={{ paddingTop: "32px" }}>{children}</Section>
 
@@ -104,7 +104,7 @@ export function EmailLayout({
 							<Link href={COMPANY.APP_STORE_URL}>
 								<Img
 									src={`${assets}/badge-appstore.png`}
-									alt="Download Superset on the App Store"
+									alt="Download Paradev on the App Store"
 									width="108"
 									height="32"
 									style={{ display: "inline-block" }}
@@ -119,9 +119,9 @@ export function EmailLayout({
 									textDecoration: "none",
 								}}
 							>
-								Superset
+								{COMPANY.LEGAL_NAME}
 							</Link>
-							, Inc., San Francisco, CA
+							, San Francisco, CA
 						</Text>
 						{recipientEmail || unsubscribeUrl ? (
 							<Text style={footerText}>

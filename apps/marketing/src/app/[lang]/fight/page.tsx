@@ -2,6 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
+import { isProfileHandle } from "@superset/trpc/leaderboard-reserved-handles";
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { LeaderboardBackLink } from "@/app/[lang]/components/LeaderboardBackLink";
@@ -46,6 +47,7 @@ async function resolveFighter(handle?: string): Promise<Fighter | null> {
 
 	const house = HOUSE_FIGHTERS.find((entry) => entry.handle === normalized);
 	if (house) return house;
+	if (!isProfileHandle(normalized)) return null;
 
 	const profile = await loadParticipant(normalized);
 	return profile ? fromParticipant(profile) : null;

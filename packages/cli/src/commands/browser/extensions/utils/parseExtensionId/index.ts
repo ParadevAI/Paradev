@@ -1,0 +1,1 @@
+export { parseExtensionId } from "./parseExtensionId";

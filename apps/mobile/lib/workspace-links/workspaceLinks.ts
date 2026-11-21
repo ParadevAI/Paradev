@@ -1,3 +1,5 @@
+import { isOwnOriginTwin } from "@superset/shared/own-domains";
+
 const APP_SCHEME = "superset:";
 
 function singleSegment(pathname: string, prefix: string): string | null {
@@ -28,6 +30,6 @@ export function workspaceIdFromUrl(url: string, webUrl: string): string | null {
 	if (target.protocol === APP_SCHEME) {
 		return singleSegment(`/${target.host}${target.pathname}`, "v2-workspace");
 	}
-	if (target.origin !== web.origin) return null;
+	if (!isOwnOriginTwin(target.origin, web.origin)) return null;
 	return singleSegment(target.pathname, "workspaces");
 }

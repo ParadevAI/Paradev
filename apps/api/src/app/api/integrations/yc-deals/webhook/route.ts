@@ -5,14 +5,13 @@ import { YcDealCodeEmail } from "@superset/email/emails/billing/yc-deal-code";
 import { NOREPLY_FROM } from "@superset/email/sender";
 import { and, eq } from "drizzle-orm";
 import { Resend } from "resend";
-import Stripe from "stripe";
 import { z } from "zod";
 
 import { env } from "@/env";
+import { addRewardPromoCode } from "./addRewardPromoCode";
 
 const SOURCE = "yc-bookface";
 
-const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
 const resend = new Resend(env.RESEND_API_KEY);
 
 const companySchema = z.looseObject({
@@ -49,7 +48,7 @@ function generateCode(): string {
 	for (let i = 0; i < 8; i++) {
 		suffix += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
 	}
-	return `YC-${suffix}`;
+	return `YC${suffix}`;
 }
 
 type Outcome = {
@@ -58,32 +57,43 @@ type Outcome = {
 };
 
 async function sendCode(email: string, payload: Payload): Promise<Outcome> {
-	const promotionCode = await stripeClient.promotionCodes.create({
-		promotion: { type: "coupon", coupon: env.YC_BOOKFACE_COUPON_ID },
-		code: generateCode(),
-		max_redemptions: 1,
-		metadata: {
-			source: SOURCE,
-			ycRedemptionId: String(payload.id),
-			email,
-		},
+	const code = generateCode();
+	await addRewardPromoCode(env.YC_BOOKFACE_REWARD_ID, {
+		code,
+		global_max_redemption: 1,
 	});
 
 	const { error } = await resend.emails.send({
 		from: NOREPLY_FROM,
 		replyTo: "kiet@superset.sh",
 		to: email,
-		subject: "Your Superset YC deal code",
+		subject: "Your Paradev YC deal code",
 		react: YcDealCodeEmail({
 			firstName: payload.first_name,
-			code: promotionCode.code,
+			code,
 		}),
 	});
 	if (error) {
 		throw new Error(`Failed to email promotion code: ${error.message}`);
 	}
 
-	return { status: "code_sent", promotionCode: promotionCode.code };
+	return { status: "code_sent", promotionCode: code };
+}
+
+async function alertFailure(payload: Payload, error: unknown): Promise<void> {
+	const reason = error instanceof Error ? error.message : String(error);
+	const who = payload.email ?? "unknown email";
+	try {
+		await fetch(env.SLACK_BILLING_WEBHOOK_URL, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: `:rotating_light: YC Bookface redemption ${payload.id} (${who}) failed, and the founder sees "The deal provider rejected this redemption". ${reason}`,
+			}),
+		});
+	} catch (slackError) {
+		console.error("[yc-deals/webhook] Slack alert failed:", slackError);
+	}
 }
 
 async function resolveOutcome(payload: Payload): Promise<Outcome> {
@@ -140,6 +150,7 @@ export async function POST(request: Request) {
 			`[yc-deals/webhook] Failed to process redemption ${externalRedemptionId}:`,
 			error,
 		);
+		await alertFailure(payload, error);
 		return Response.json({ error: "Processing failed" }, { status: 500 });
 	}
 

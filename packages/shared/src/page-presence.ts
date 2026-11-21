@@ -20,23 +20,42 @@ export interface PresenceVisitor {
 export const MAX_PAGE_GUESTS = 20;
 export const MAX_PRESENCE_VISITORS = 50;
 
-const PRESENCE_COLORS = [
-	"#2563eb",
-	"#db2777",
-	"#7c3aed",
-	"#ea580c",
-	"#059669",
-	"#dc2626",
-	"#0891b2",
-	"#65a30d",
-];
+export const PRESENCE_COLOR_COUNT = 8;
 
-export const PRESENCE_COLOR_COUNT = PRESENCE_COLORS.length;
-
-export function presenceColor(slot: number): string {
-	return PRESENCE_COLORS[
-		Math.abs(Math.trunc(slot)) % PRESENCE_COLOR_COUNT
-	] as string;
+/** Visitors first, then the guests here now. A guest gets no visitor list, so everyone present counts for them. */
+export function presencePeople(
+	visitors: PresenceVisitor[],
+	viewers: PagePresenceViewer[],
+	guestName: (guestNumber: number | null) => string,
+	now: number,
+): PresenceVisitor[] {
+	const seen = new Set<string>();
+	const present = viewers.flatMap((viewer) => {
+		if (seen.has(viewer.key)) return [];
+		seen.add(viewer.key);
+		if (viewer.guest) {
+			return [
+				{
+					userId: `guest:${viewer.key}`,
+					name: guestName(viewer.guestNumber),
+					image: null,
+					lastSeenAt: now,
+					active: true,
+				},
+			];
+		}
+		if (visitors.length > 0) return [];
+		return [
+			{
+				userId: `viewer:${viewer.key}`,
+				name: viewer.name,
+				image: viewer.image,
+				lastSeenAt: now,
+				active: true,
+			},
+		];
+	});
+	return present.length === 0 ? visitors : [...visitors, ...present];
 }
 
 export function presenceViewersFrom(raw: unknown): PagePresenceViewer[] {

@@ -23,7 +23,12 @@ import { createManualWait } from "../../testing/manualWait";
 import { createMemoryStreamServer } from "../../testing/memoryStream";
 import { registerDom } from "../../testing/registerDom";
 import type { ChatSession, FrameScheduler } from "./useChatSession";
-import { useChatSession } from "./useChatSession";
+import {
+	DEFAULT_DELTAS,
+	prefetchChatSession,
+	useChatSession,
+} from "./useChatSession";
+import { forgetSnapshot } from "./utils/snapshotCache";
 
 registerDom();
 const {
@@ -154,6 +159,8 @@ let renders = 0;
 
 function Probe(props: {
 	client: SessionClient;
+	sendEnabled?: boolean;
+	snapshotWorktree?: boolean;
 	scheduler?: FrameScheduler;
 	pageSize?: number;
 	wait?: ReturnType<typeof createManualWait>["wait"];
@@ -161,6 +168,8 @@ function Probe(props: {
 	renders += 1;
 	latest = useChatSession({
 		client: props.client,
+		sendEnabled: props.sendEnabled,
+		snapshotWorktree: props.snapshotWorktree,
 		deltas: [],
 		scheduler: props.scheduler,
 		pageSize: props.pageSize,
@@ -282,6 +291,62 @@ describe("useChatSession", () => {
 		});
 		await domWaitFor(() => expect(session().outbox).toHaveLength(0));
 		expect(host.prompts()).toBe(1);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("a held outbox waits for sending permission even after the transcript connects", async () => {
+		const stack = await startStack();
+		let up = false;
+		const host = unreachableUntil(stack.transport, () => up);
+		const manual = createManualWait();
+		const client = stack.makeClient({
+			transport: host.transport,
+			wait: manual.wait,
+		});
+		const view = render(<Probe client={client} wait={manual.wait} />);
+		act(() => session().sendPrompt([{ type: "text", text: "hello" }]));
+		view.rerender(
+			<Probe client={client} wait={manual.wait} sendEnabled={false} />,
+		);
+		up = true;
+		await domWaitFor(() => {
+			act(() => manual.flush());
+			expect(session().connection).toBe("open");
+		});
+		act(() => session().retryPrompt(session().outbox[0]?.clientId ?? ""));
+		expect(host.prompts()).toBe(0);
+		expect(session().outbox).toMatchObject([{ state: "queued", attempts: 0 }]);
+		view.rerender(<Probe client={client} wait={manual.wait} sendEnabled />);
+		await domWaitFor(() => expect(session().outbox).toHaveLength(0));
+		expect(host.prompts()).toBe(1);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("asks the host to snapshot the worktree for each prompt when told to", async () => {
+		const stack = await startStack();
+		const asked: (boolean | undefined)[] = [];
+		const transport = new Proxy(stack.transport, {
+			get: (target, key) =>
+				key === "prompt"
+					? (input: Parameters<ChatTransport["prompt"]>[0]) => {
+							asked.push(input.snapshotWorktree);
+							return target.prompt(input);
+						}
+					: Reflect.get(target, key),
+		});
+		const client = stack.makeClient({ transport });
+		const view = render(<Probe client={client} snapshotWorktree />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+
+		await domWaitFor(() => expect(asked).toEqual([true]));
 		view.unmount();
 		client.close();
 		await stack.runtime.dispose();
@@ -749,6 +814,111 @@ describe("useChatSession", () => {
 		await stack.runtime.dispose();
 	});
 
+	test("seeds from a prefetched transcript without fetching it again, and streams what follows", async () => {
+		const stack = await startStack();
+		const writer = stack.makeClient();
+		const writerView = render(<Probe client={writer} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		const shown = [...session().snapshot.items.keys()];
+		writerView.unmount();
+		writer.close();
+		forgetSnapshot(stack.sessionId);
+
+		const prefetcher = stack.makeClient();
+		expect(await prefetchChatSession(prefetcher)).toBe(true);
+		prefetcher.close();
+
+		const host = heldUntilReleased(stack.transport);
+		const client = stack.makeClient({ transport: host.transport });
+		const view = render(<Probe client={client} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		expect([...session().snapshot.items.keys()]).toEqual(shown);
+		expect(host.requested).toEqual([]);
+
+		await domWaitFor(() => expect(session().connection).toBe("open"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "again" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.items.size).toBeGreaterThan(shown.length),
+		);
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		expect(host.requested).toEqual([]);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("streams what happened between the prefetch and the mount, without fetching", async () => {
+		const stack = await startStack();
+		const writer = stack.makeClient();
+		const writerView = render(<Probe client={writer} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		const before = session().snapshot.items.size;
+		writerView.unmount();
+		writer.close();
+		forgetSnapshot(stack.sessionId);
+
+		const prefetcher = stack.makeClient();
+		expect(await prefetchChatSession(prefetcher)).toBe(true);
+		prefetcher.close();
+
+		const outside = stack.makeClient();
+		await outside.prompt({
+			clientId: randomUUID(),
+			content: [{ type: "text", text: "meanwhile" }],
+		});
+		let latestOutline = await stack.transport.getOutline({
+			sessionId: stack.sessionId,
+		});
+		for (
+			let attempt = 0;
+			attempt < 200 &&
+			!(
+				latestOutline.ok &&
+				latestOutline.outline.items.length > before &&
+				latestOutline.outline.session?.status === "idle"
+			);
+			attempt++
+		) {
+			await new Promise((resolve) => setTimeout(resolve, 5));
+			latestOutline = await stack.transport.getOutline({
+				sessionId: stack.sessionId,
+			});
+		}
+		if (!latestOutline.ok) throw new Error("no outline");
+		const meanwhile = latestOutline.outline.items.map(({ item }) => item.id);
+		expect(meanwhile.length).toBeGreaterThan(before);
+		outside.close();
+
+		const host = heldUntilReleased(stack.transport);
+		const client = stack.makeClient({ transport: host.transport });
+		const view = render(<Probe client={client} />);
+		await domWaitFor(() =>
+			expect([...session().snapshot.items.keys()].sort()).toEqual(
+				[...meanwhile].sort(),
+			),
+		);
+		expect(host.requested).toEqual([]);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
 	test("keeps loaded tool bodies when the fresh outline replaces the cached transcript", async () => {
 		const stack = await startStack();
 		const transport = withOmittedTool(stack.transport);
@@ -837,4 +1007,8 @@ describe("useChatSession", () => {
 	test("keeps the cached transcript when the journal cannot be read", async () => {
 		expect(await cacheAndFailLoad("journal_missing")).toBeGreaterThan(0);
 	});
+});
+
+test("a chat subscribes to background steps by default", () => {
+	expect(DEFAULT_DELTAS).toContain("background");
 });

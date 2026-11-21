@@ -74,7 +74,7 @@ export function CliAuthCodeDisplay({ code, state }: CliAuthCodeDisplayProps) {
 				<Trans>Authentication Code</Trans>
 			</h1>
 			<p className="text-muted-foreground">
-				<Trans>Paste this into Superset CLI:</Trans>
+				<Trans>Paste this into Paradev CLI:</Trans>
 			</p>
 
 			{/* biome-ignore lint/a11y/useSemanticElements: keep as div so the inner <code> stays selectable as a ctrl+c fallback if clipboard write fails — wrapping in a button disrupts selection focus */}

@@ -1,6 +1,10 @@
 import { EventEmitter } from "node:events";
 import type { BackgroundTask } from "@superset/chat/protocol";
-import type { AgentDefinitionId } from "@superset/shared/agent-catalog";
+import {
+	type AgentDefinitionId,
+	isBuiltinAgentId,
+} from "@superset/shared/agent-catalog";
+import { logBoxEvent } from "../sentry";
 import {
 	getSubagentHarness,
 	readSubagentTranscript,
@@ -241,6 +245,12 @@ export class TerminalAgentStore extends EventEmitter {
 		this.byTerminal.set(terminalId, next);
 		this.persistence?.upsert(next);
 		this.emit("change", workspaceId);
+		this.noteActivity(workspaceId);
+	}
+
+	/** An agent did something; the sandbox keepalive listens for this. */
+	noteActivity(workspaceId: string): void {
+		this.emit("activity", workspaceId);
 	}
 
 	recordChatEvent(
@@ -278,6 +288,7 @@ export class TerminalAgentStore extends EventEmitter {
 				: {}),
 		});
 		this.emit("change", input.workspaceId);
+		this.noteActivity(input.workspaceId);
 	}
 
 	updateChat(
@@ -302,6 +313,10 @@ export class TerminalAgentStore extends EventEmitter {
 
 	getChat(terminalId: string): TerminalAgentBinding | undefined {
 		return this.chatByTerminal.get(terminalId);
+	}
+
+	getChatOrTerminalAgent(terminalId: string): TerminalAgentBinding | undefined {
+		return this.chatByTerminal.get(terminalId) ?? this.get(terminalId);
 	}
 
 	hasChat(terminalId: string): boolean {
@@ -338,6 +353,7 @@ export class TerminalAgentStore extends EventEmitter {
 				endedAt: occurredAt,
 			});
 			this.emit("change", workspaceId);
+			this.noteActivity(workspaceId);
 			return;
 		}
 
@@ -369,6 +385,7 @@ export class TerminalAgentStore extends EventEmitter {
 			this.subagentsByTerminal.set(terminalId, new Map([[subagentId, next]]));
 		}
 		this.emit("change", workspaceId);
+		this.noteActivity(workspaceId);
 	}
 
 	/**
@@ -642,6 +659,15 @@ export class TerminalAgentStore extends EventEmitter {
 		const existing = this.byTerminal.get(terminalId);
 		this.byTerminal.delete(terminalId);
 		this.subagentsByTerminal.delete(terminalId);
+		if (existing) {
+			logBoxEvent("agent.ended", {
+				"agent.id": isBuiltinAgentId(existing.agentId)
+					? existing.agentId
+					: "custom",
+				"agent.end_reason": reason,
+				ms: endedAt - existing.startedAt,
+			});
+		}
 
 		let marked: { workspaceId: string } | undefined;
 		if (this.persistence?.markEnded) {

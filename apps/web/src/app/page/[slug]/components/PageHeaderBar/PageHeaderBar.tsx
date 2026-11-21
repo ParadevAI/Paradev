@@ -5,8 +5,8 @@ import {
 	PageHeader,
 	type PageHeaderPage,
 	type PageHeaderVersion,
-	PageViewers,
 } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { useTRPC } from "@/trpc/react";
@@ -44,6 +44,7 @@ export function PageHeaderBar({
 	);
 	const updatePage = useMutation(trpc.page.update.mutationOptions());
 	const deletePage = useMutation(trpc.page.delete.mutationOptions());
+	const duplicatePage = useMutation(trpc.page.duplicate.mutationOptions());
 	const sharing = usePageSharing(page.id);
 
 	return (
@@ -54,7 +55,7 @@ export function PageHeaderBar({
 			previewVersion={previewVersion}
 			trailing={
 				<>
-					<PageViewers pageId={page.id} className="mr-1" />
+					<PagePresenceStack pageId={page.id} viewerId={currentUserId} />
 					<OpenInSupersetButton slug={slug} />
 					<PageWatchBadge
 						slug={slug}
@@ -84,6 +85,10 @@ export function PageHeaderBar({
 			onDelete={async () => {
 				await deletePage.mutateAsync({ id: page.id });
 				router.replace("/");
+			}}
+			onDuplicate={async (title) => {
+				const copy = await duplicatePage.mutateAsync({ id: page.id, title });
+				router.push(`/page/${copy.slug}`);
 			}}
 		/>
 	);

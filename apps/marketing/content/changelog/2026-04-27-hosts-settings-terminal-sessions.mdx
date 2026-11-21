@@ -1,16 +1,16 @@
 ---
-title: Superset 2.0 is in open beta!
+title: Paradev 2.0 is in open beta!
 date: 2026-04-27
 image: /changelog/v2-public-beta.png
 ---
 
-**Superset 2.0 is in open beta.** Enable it under **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/3748" />. It's a 2-way door, and your v1 workspaces and sessions stay put when you flip back.
+**Paradev 2.0 is in open beta.** Enable it under **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/3748" />. It's a 2-way door, and your v1 workspaces and sessions stay put when you flip back.
 
-![Settings → Experimental: Try Superset v2 toggle and v1 → v2 migration](/changelog/v2-enable-flag.png)
+![Settings → Experimental: Try Paradev v2 toggle and v1 → v2 migration](/changelog/v2-enable-flag.png)
 
 ## Remote workspaces
 
-In 2.0, a workspace runs on a host: your own machine or another Superset device. Point your local app at any Superset device on the same network (a beefier box across the room, a cloud VM, a teammate's host) and run workspaces on it as if they were local. Terminal, file editor, and chat all behave the same way <PRBadge url="https://github.com/superset-sh/superset/pull/3566" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3606" />, and ports listening on the remote host show up in your sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/3676" />.
+In 2.0, a workspace runs on a host: your own machine or another Paradev device. Point your local app at any Paradev device on the same network (a beefier box across the room, a cloud VM, a teammate's host) and run workspaces on it as if they were local. Terminal, file editor, and chat all behave the same way <PRBadge url="https://github.com/superset-sh/superset/pull/3566" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3606" />, and ports listening on the remote host show up in your sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/3676" />.
 
 ![Sidebar with a Cloud workspace group and a remote workspace hover card](/changelog/v2-remote-workspaces.png)
 
@@ -20,7 +20,7 @@ The diff viewer is rebuilt to feel like reviewing a PR on your machine: one infi
 
 ![v2 Changes pane: infinite-scroll diff with compact file sidebar and review tab](/changelog/v2-changes-pane.png)
 
-## Superset CLI
+## Paradev CLI
 
 The `superset` CLI is a single static binary that drives the same backend as the desktop app. Sign in with `superset auth login`, then create workspaces, tail terminals, and trigger automations from your shell or CI <PRBadge url="https://github.com/superset-sh/superset/pull/3638" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3640" />.
 

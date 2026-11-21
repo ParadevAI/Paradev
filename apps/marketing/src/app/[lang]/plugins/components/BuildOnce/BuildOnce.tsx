@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { SubmitPluginActions } from "@/app/[lang]/components/SubmitPluginActions";
 import { AgentTargets } from "./components/AgentTargets";
 import { ManifestWindow } from "./components/ManifestWindow";
 
@@ -13,10 +14,13 @@ export function BuildOnce() {
 			</h2>
 			<p className="mt-5 max-w-xl text-lg text-muted-foreground leading-relaxed">
 				<Trans>
-					A manifest and a few skill files. Superset puts it where every agent
+					A manifest and a few skill files. Paradev puts it where every agent
 					looks.
 				</Trans>
 			</p>
+			<div className="mt-8">
+				<SubmitPluginActions />
+			</div>
 			<div className="mt-12 grid items-stretch gap-6 lg:grid-cols-2">
 				<ManifestWindow />
 				<AgentTargets />

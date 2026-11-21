@@ -87,6 +87,11 @@ export function PageSharePopover({
 			label: t({ message: "Can comment" }),
 			description: t({ message: "Read the page and leave comments" }),
 		},
+		{
+			id: "edit",
+			label: t({ message: "Can edit" }),
+			description: t({ message: "Publish new versions, rename and share" }),
+		},
 	];
 
 	const confirm = (from: string, to: string): ShareConfirmation | null => {
@@ -242,7 +247,7 @@ export function PageSharePopover({
 							<SelectTrigger size="sm" className="w-full">
 								<SelectValue />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent className="w-(--radix-select-trigger-width)">
 								<SelectItem value={LATEST}>
 									{latestVersion === null
 										? t({ message: "Latest" })
@@ -251,9 +256,15 @@ export function PageSharePopover({
 								{pinnable.map((entry) => {
 									const version = entry.version;
 									return (
-										<SelectItem key={version} value={String(version)}>
-											<Trans>Version {version}</Trans> ·{" "}
-											{entry.label ?? relativeTime(entry.createdAt)}
+										<SelectItem
+											key={version}
+											value={String(version)}
+											className="*:[span]:last:min-w-0"
+										>
+											<span className="truncate">
+												<Trans>Version {version}</Trans> ·{" "}
+												{entry.label ?? relativeTime(entry.createdAt)}
+											</span>
 										</SelectItem>
 									);
 								})}

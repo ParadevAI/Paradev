@@ -27,7 +27,7 @@ export type PersistableTransaction = {
 	};
 };
 
-interface V2WorkspacePatch {
+interface WorkspacePatch {
 	name?: string;
 	branch?: string;
 	taskId?: string | null;
@@ -233,25 +233,45 @@ export function useOptimisticActions() {
 
 		/**
 		 * Patch the cloud list the way the host cache is patched for a local
-		 * rename: the row reads from this query, so without it the old name
-		 * sits there for a round trip. Returns the rollback.
+		 * write: the row reads from this query, so without it the old value
+		 * sits there for a round trip. Returns the rollback, which restores
+		 * only this row's patched fields: a group action writes every member
+		 * at once, and one failure must not undo the others' pending patches.
 		 */
-		const patchCloudWorkspaceName = (workspaceId: string, name: string) => {
+		const patchCloudWorkspaceRow = (
+			workspaceId: string,
+			patch: Partial<CloudWorkspaceRow>,
+		) => {
 			const listKey = getQueryKey(cloudTrpc.cloudWorkspace.list);
 			// An in-flight refetch would otherwise land after the patch and
-			// overwrite it with the pre-rename row.
+			// overwrite it with the pre-write row.
 			void queryClient.cancelQueries({ queryKey: listKey });
-			const previous = queryClient.getQueriesData<CloudWorkspaceRow[]>({
-				queryKey: listKey,
-			});
+			const patchedKeys = Object.keys(patch) as (keyof CloudWorkspaceRow)[];
+			const previous = queryClient
+				.getQueriesData<CloudWorkspaceRow[]>({ queryKey: listKey })
+				.flatMap(([queryKey, rows]) => {
+					const row = rows?.find((candidate) => candidate.id === workspaceId);
+					if (!row) return [];
+					const fields: Partial<CloudWorkspaceRow> = {};
+					for (const key of patchedKeys) {
+						(fields as Record<string, unknown>)[key] = row[key];
+					}
+					return [[queryKey, fields] as const];
+				});
 			queryClient.setQueriesData<CloudWorkspaceRow[]>(
 				{ queryKey: listKey },
 				(rows) =>
-					rows?.map((row) => (row.id === workspaceId ? { ...row, name } : row)),
+					rows?.map((row) =>
+						row.id === workspaceId ? { ...row, ...patch } : row,
+					),
 			);
 			return () => {
-				for (const [queryKey, rows] of previous) {
-					queryClient.setQueryData(queryKey, rows);
+				for (const [queryKey, fields] of previous) {
+					queryClient.setQueryData<CloudWorkspaceRow[]>(queryKey, (rows) =>
+						rows?.map((row) =>
+							row.id === workspaceId ? { ...row, ...fields } : row,
+						),
+					);
 				}
 			};
 		};
@@ -291,7 +311,7 @@ export function useOptimisticActions() {
 		const trackedWorkspaceWrite = (
 			failureTitle: string,
 			workspaceId: string,
-			patch: V2WorkspacePatch,
+			patch: WorkspacePatch,
 		) => {
 			const transaction = runWorkspaceMutation(failureTitle, () => {
 				const workspace = hostWorkspaces.find(
@@ -303,7 +323,7 @@ export function useOptimisticActions() {
 				const hostUrl = hostWorkspacesCache.resolveHostUrl(workspace.hostId);
 				if (!hostUrl) {
 					throw new Error(
-						"The workspace's host is offline — try again when it reconnects.",
+						"The workspace's host is offline. Try again when it reconnects.",
 					);
 				}
 				hostWorkspacesCache.upsertWorkspace({
@@ -411,11 +431,33 @@ export function useOptimisticActions() {
 				// Workspace records are host-owned: the write goes to the owning
 				// host, the cache is patched optimistically, and the host's
 				// workspace:changed broadcast (or a rollback refetch) converges it.
-				updateWorkspace: (workspaceId: string, patch: V2WorkspacePatch) =>
+				updateWorkspace: (workspaceId: string, patch: WorkspacePatch) =>
 					trackedWorkspaceWrite(
 						"Failed to update workspace",
 						workspaceId,
 						patch,
+					),
+				// A cloud row's tags live on the API, like its name. Its sandbox
+				// may answer as a host under the same id and must not take the
+				// write, so the caller picks this action by the row's kind.
+				setCloudWorkspaceTags: (workspaceId: string, tags: string[]) =>
+					runWorkspaceMutation(
+						t({ message: "Failed to update workspace" }),
+						() => {
+							const rollback = patchCloudWorkspaceRow(workspaceId, { tags });
+							return makeTransaction(
+								"update",
+								apiTrpcClient.cloudWorkspace.setTags
+									.mutate({ id: workspaceId, tags })
+									.catch((error) => {
+										rollback();
+										throw error;
+									})
+									.finally(() => {
+										void utils.cloudWorkspace.list.invalidate();
+									}),
+							);
+						},
 					),
 				// A cloud workspace is named by the API that created it, not by the
 				// sandbox underneath it — the sandbox's own row exists only to give
@@ -432,7 +474,9 @@ export function useOptimisticActions() {
 						? runWorkspaceMutation(
 								t({ message: "Failed to rename workspace" }),
 								() => {
-									const rollback = patchCloudWorkspaceName(workspaceId, name);
+									const rollback = patchCloudWorkspaceRow(workspaceId, {
+										name,
+									});
 									return makeTransaction(
 										"update",
 										apiTrpcClient.cloudWorkspace.rename

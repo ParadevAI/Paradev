@@ -762,7 +762,7 @@ test("a reply that names an unconnected plugin gets a Connect button after it", 
 	expect(postMessage).toHaveBeenCalledTimes(3);
 	expect(postMessage.mock.calls[2]?.[0]).toMatchObject({
 		thread_ts: "1.0",
-		text: "Linear isn't connected to your Superset account yet.",
+		text: "Linear isn't connected to your Paradev account yet.",
 		blocks: [
 			{ type: "section" },
 			{

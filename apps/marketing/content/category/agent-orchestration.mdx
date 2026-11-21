@@ -2,7 +2,7 @@
 title: "AI Agent Orchestration for Software Development"
 description: "What agent orchestration means for coding: the primitives (isolation, sessions, review, scheduling, programmatic control), the patterns, and when you actually need it."
 date: 2026-08-17
-lastUpdated: 2026-09-23
+lastUpdated: 2026-11-10
 keywords:
   - agent orchestration
   - ai agent orchestration
@@ -11,6 +11,8 @@ keywords:
   - multi agent development
   - agent automation
   - mcp agent control
+  - cloud coding agents
+  - multiplayer coding agents
 ---
 
 Agent orchestration is everything around the coding agents: where they run, how they stay alive, who watches them, and how their output gets reviewed and merged. The agents write the code. Orchestration decides where, when, and under what supervision they run.
@@ -34,7 +36,7 @@ A local machine must remain awake for its agents to keep executing. To continue 
 
 ## The primitives
 
-Homegrown or product, orchestration setups end up with the same six pieces.
+Homegrown or product, orchestration setups end up with the same seven pieces.
 
 ### Isolated workspaces
 
@@ -42,7 +44,7 @@ Each unit of work gets its own working directory and branch, almost always a [Gi
 
 ### Persistent sessions
 
-Session persistence separates the agent process from the app window. In Superset, a terminal daemon owns the sessions, so restarting the app does not need to restart the agent. Persistence does not keep a sleeping or powered-off host executing work. See the [terminal daemon implementation](/blog/terminal-daemon-deep-dive).
+Session persistence separates the agent process from the app window. In Paradev, a terminal daemon owns the sessions, so restarting the app does not need to restart the agent. Persistence does not keep a sleeping or powered-off host executing work. See the [terminal daemon implementation](/blog/terminal-daemon-deep-dive).
 
 ### Status and monitoring
 
@@ -60,22 +62,28 @@ Recurring prompts on a schedule: nightly dependency bumps, morning triage of new
 
 ![A team's scheduled agent automations: daily standup digests, Linear ticket grooming, CRM syncs, each running an agent prompt on a schedule in its own workspace](/changelog/automations.png)
 
+### A machine that is not your laptop
+
+Persistence keeps an agent alive when the app closes. It does nothing when the machine sleeps, loses its network, or goes into a bag. Orchestration at any real size needs somewhere else to run: a second machine you own, a server in your own cloud account, or a hosted sandbox per workspace.
+
+Paradev covers the three: Remote Access for a macOS or Linux machine you add, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) for a Linux server in your own account, and [cloud workspaces](/cloud) on the Team and Ultra plans, where each workspace gets its own cloud machine and keeps working with your laptop closed. Your agent sign-ins and GitHub access are not copied into the sandbox: the agent sees a placeholder, and Paradev adds your sign-in to outgoing requests. The variables and secrets you set on the environment are delivered to the sandbox as you configured them.
+
 ### Programmatic control
 
-An API for the whole loop, so scripts and other agents can create workspaces, launch agents with a prompt, read terminals, and collect results. The emerging standard here is [MCP](https://docs.superset.sh/mcp-server) (Model Context Protocol): expose orchestration as tools, and any MCP-capable agent can drive it. This is how agent-managing-agents setups work in practice, and Superset ships an MCP server, a [CLI](https://docs.superset.sh/cli/getting-started), and a [TypeScript SDK](https://docs.superset.sh/sdk/getting-started) for exactly this.
+An API for the whole loop, so scripts and other agents can create workspaces, launch agents with a prompt, read terminals, and collect results. The emerging standard here is [MCP](https://docs.paradev.com/mcp-server) (Model Context Protocol): expose orchestration as tools, and any MCP-capable agent can drive it. This is how agent-managing-agents setups work in practice, and Paradev ships an MCP server, a [CLI](https://docs.paradev.com/cli/getting-started), and a [TypeScript SDK](https://docs.paradev.com/sdk/getting-started) for exactly this.
 
 ![The superset CLI menu: agents, automations, hosts, projects, tasks, terminals, and workspaces, all scriptable from any shell](/changelog/2026-08-09-cli-browser.png)
 
-## What Superset orchestrates
+## What Paradev orchestrates
 
-Superset (superset.sh) is a source-available workspace for CLI coding agents. It is unrelated to Apache Superset, the business-intelligence product. Claude Code, Codex, and OpenCode provide the coding agents; Superset provides workspaces, terminals, review, and scheduling around them.
+Paradev (paradev.com) is an open-source workspace for CLI coding agents. It is unrelated to Apache Superset, the business-intelligence product. Claude Code, Codex, and OpenCode provide the coding agents; Paradev provides workspaces, terminals, review, and scheduling around them.
 
 | Fact | Where to verify it |
 |---|---|
-| Source-available under Elastic License 2.0, not OSI-approved open source | [Repository license](https://github.com/superset-sh/superset/blob/main/LICENSE.md) |
+| Open source under the MIT License | [Repository license](https://github.com/paradevai/paradev/blob/main/LICENSE.md) |
 | macOS desktop; experimental Linux AppImage; Windows unavailable | [Downloads](/download) |
 | Free tier plus paid seats; agent-provider usage is separate | [Current plans](/pricing) |
-| Automations require Pro or Enterprise and an available target host | [Automation requirements](https://docs.superset.sh/automations) |
+| Automations require Pro or Enterprise and an available target host | [Automation requirements](https://docs.paradev.com/automations) |
 | Worktrees separate working files, not process permissions, ports, or databases | [Git worktree reference](https://git-scm.com/docs/git-worktree) |
 
 For a first scheduled task, use the [maintenance-check walkthrough](/blog/scheduled-agent-maintenance). It includes a bounded prompt and explains how to inspect the result. An automation run marked **created** means its workspace was created; inspect the agent output to know whether the checks passed.
@@ -92,13 +100,25 @@ For a first scheduled task, use the [maintenance-check walkthrough](/blog/schedu
 
 **Race and pick.** Launch two or three agents on the same task with different approaches or different models, keep the best diff, discard the rest. Cheap insurance on tasks where approach matters more than effort.
 
+## Orchestration with more than one person
+
+Everything above describes one person dispatching agents. Teams hit a second problem: two people, each with agents, working the same repository without a way to see each other's work in flight. The pull request arrives too late to prevent the overlap.
+
+Three answers are in use in 2026:
+
+- **Share the output.** Branches, pull requests, and issue trackers, as always. Nothing new to buy, and nothing stops two agents from spending an afternoon on the same file.
+- **Share the context and let agents talk.** Cursor rebuilt Projects for multiplayer on November 10, 2026: members of a Project share a task board and a context store, and each member's coordinator agent can message a teammate's.
+- **Share the running workspace.** In Paradev, a cloud workspace is visible to your organization or to the people you invite, and full access lets a teammate open its terminals and prompt the agents that are already running. [Automations](https://docs.paradev.com/automations) produce workspaces a teammate can pick up, and [Pages](https://docs.paradev.com/pages) give the team a place to comment on what an agent produced.
+
+The trade-offs are covered in [multiplayer coding agents](/multiplayer-coding-agents).
+
 ## Two schools of orchestration
 
 Tools in this category split on one design question: who decomposes the work?
 
 **Coordinator-led** tools put an AI in charge of planning. [Augment Intent](/compare/superset-vs-augment-intent), for example, has a coordinator agent draft a spec, fan tasks out to implementor agents, and run a verifier over the result. You approve at checkpoints. This buys hands-off breadth on well-scoped features and costs you control over decomposition.
 
-**Developer-led** tools keep decomposition with you and make dispatch, isolation, monitoring, and review as fast as possible. Superset, [Conductor](/compare/superset-vs-conductor), and [Zed's Parallel Agents](/compare/superset-vs-zed) are in this school. It matches how senior engineers already split work, and it degrades gracefully: when a task is fuzzy, you scope it, not a planning agent.
+**Developer-led** tools keep decomposition with you and make dispatch, isolation, monitoring, and review as fast as possible. Paradev, [Conductor](/compare/superset-vs-conductor), and [Zed's Parallel Agents](/compare/superset-vs-zed) are in this school. It matches how senior engineers already split work, and it degrades gracefully: when a task is fuzzy, you scope it, not a planning agent.
 
 Neither is strictly better. Coordinator-led shines on PR-sized features with clear requirements. Developer-led wins when task boundaries need judgment: legacy code, fuzzy specs, work that touches shared modules.
 
@@ -124,11 +144,11 @@ Frameworks like LangChain or agent SDKs are for building agents and wiring them 
 
 ### Can one AI agent manage other coding agents?
 
-Yes. Expose orchestration as MCP tools and any MCP-capable agent can create workspaces, launch agents with prompts, watch their terminals, and collect diffs. Superset ships an MCP server for this, so a chat agent or a CI job can run a fleet without a human in the dispatch loop.
+Yes. Expose orchestration as MCP tools and any MCP-capable agent can create workspaces, launch agents with prompts, watch their terminals, and collect diffs. Paradev ships an MCP server for this, so a chat agent or a CI job can run a fleet without a human in the dispatch loop.
 
 ### How do scheduled agent runs work?
 
-You define a prompt, an agent, a target host, and a schedule. Superset Automations require Pro or Enterprise. If the host is offline when dispatch occurs, the run fails and the schedule advances; retry after the host is available. A created workspace is not evidence that the agent succeeded. Read its output before accepting the result.
+You define a prompt, an agent, a target host, and a schedule. Paradev Automations require Pro or Enterprise. If the host is offline when dispatch occurs, the run fails and the schedule advances; retry after the host is available. A created workspace is not evidence that the agent succeeded. Read its output before accepting the result.
 
 ### What should I look for in an agent orchestration tool?
 

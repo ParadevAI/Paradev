@@ -1,4 +1,12 @@
 export {
+	AGY_HOOKS_NAME,
+	createAgyHooksJson,
+	createAgyWrapper,
+	getAgyHooksJsonContent,
+	getAgyHooksJsonPath,
+	removeAgyManagedHooks,
+} from "./agent-wrappers-agy";
+export {
 	AMP_PLUGIN_FILE,
 	AMP_PLUGIN_MARKER,
 	createAmpPlugin,
@@ -17,6 +25,7 @@ export {
 	createCodexHooksJson,
 	createCodexWrapper,
 	createOpenCodePlugin,
+	createOpenCodeTuiPlugin,
 	createOpenCodeWrapper,
 	getClaudeGlobalSettingsJsonContent,
 	getClaudeGlobalSettingsJsonPath,
@@ -26,10 +35,14 @@ export {
 	getOpenCodeGlobalPluginPath,
 	getOpenCodePluginContent,
 	getOpenCodePluginPath,
+	getOpenCodeTuiPluginContent,
+	getOpenCodeTuiPluginPath,
 	OPENCODE_PLUGIN_FILE,
 	OPENCODE_PLUGIN_MARKER,
+	OPENCODE_TUI_PLUGIN_MARKER,
 	removeClaudeManagedHooks,
 	removeCodexManagedHooks,
+	removeOpenCodeTuiPlugin,
 } from "./agent-wrappers-claude-codex-opencode";
 export {
 	buildWrapperScript,

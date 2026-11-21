@@ -5,7 +5,7 @@ import { getChangelogEntry } from "@/lib/changelog";
 import { formatChangelogDate } from "@/lib/changelog-utils";
 import { getInterBold } from "../../utils/getInterBold";
 
-export const alt = "Superset Changelog";
+export const alt = "Paradev Changelog";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -53,7 +53,7 @@ export default async function Image({
 					fontFamily: "Inter",
 				}}
 			>
-				Superset Changelog
+				Paradev Changelog
 			</div>,
 			{
 				...size,
@@ -163,7 +163,7 @@ export default async function Image({
 								color: "#ffffff",
 							}}
 						>
-							Superset
+							Paradev
 						</div>
 					)}
 				</div>

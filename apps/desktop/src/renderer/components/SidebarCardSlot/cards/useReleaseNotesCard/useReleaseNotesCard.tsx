@@ -46,14 +46,10 @@ export function useReleaseNotesCard(): SidebarCardEntry | null {
 
 	return {
 		id: `release-notes-${version}`,
-		title: t({ message: `Superset ${version}` }),
+		title: t({ message: `Paradev ${version}` }),
 		description: formatReleaseDate(release.date, { withYear: false }),
 		media: release.image ? (
-			<img
-				src={release.image}
-				alt=""
-				className="aspect-[16/9] w-full object-cover"
-			/>
+			<img src={release.image} alt="" className="block h-auto w-full" />
 		) : undefined,
 		onClick: () => {
 			track("release_notes_card_clicked", { version });
@@ -67,7 +63,7 @@ export function useReleaseNotesCard(): SidebarCardEntry | null {
 		children: (
 			<ReleaseNotesDialog
 				open={isDialogOpen}
-				releases={releases}
+				release={release}
 				onClose={() => {
 					setDialogOpen(false);
 					dismiss();

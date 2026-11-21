@@ -22,12 +22,13 @@ provisions running indefinitely, and nothing in the product would ever have
 shown them.
 
 **An idle sandbox stops after its session timeout. Done, with a caveat.** A
-session ends four hours after its last extension; only the workspace someone
-has open extends it (every token refresh with `wake`), so a closed workspace
-stops within four hours and costs snapshot storage only. Still owed: a per-org
-quota and cost visibility in the product — and a decision on unattended agent
-runs, which die with the session (Blaxel froze processes; Vercel snapshots the
-filesystem and boots fresh).
+session ends one hour after its last extension. The workspace someone has
+open extends it (every token refresh with `wake`), and so does the box while
+its agent is active, so a closed workspace stops within an hour of its
+agent's last activity and costs snapshot storage only. Still owed: a per-org
+quota and cost visibility in the product. Work left running after a turn (a
+background shell, a dev server) dies with the session (Blaxel froze
+processes; Vercel snapshots the filesystem and boots fresh).
 
 **Box time is metered and capped.** Creating a workspace checks the
 organization may run boxes; every box start or wake takes a short Autumn
@@ -37,7 +38,11 @@ schedule (`/api/cloud-workspaces/jobs/reconcile-usage`, every 30 minutes, set
 in the Upstash console and watched by a Sentry cron monitor) finalizes each
 running box's memory GB-minutes and takes the next lock; a box whose next lock
 is refused is stopped. Stopping, archiving or deleting a box settles the rest.
+The same run opens a boot for any session from the last hour that has none
+(`adoptRunningBoxes` in `meter.ts`), billed from the session's start.
 Environment builds are not billed. Prices and limits live in Autumn, not here.
+Each paid seat adds its plan's GB-minutes to one team pool through Autumn
+seat licenses; see [Seats and cloud hours in Autumn](autumn-seat-licenses.md).
 Still owed: our own idle stop (boxes run until Vercel's session timeout, and
 every minute is billed), per-member billing for Teams, and confirming Autumn's
 lock behaviour (retried and expired finalize) in its sandbox.
@@ -75,7 +80,8 @@ environment's. Fixed (2026-09-25).** A sandbox's Anthropic or OpenAI credential
 comes from the creator's sign-in (Settings › Agents, per user,
 `agent_credentials`), brokered at the firewall by a rule that fires only on the
 placeholder the agent presents. An environment variable by one of those names
-(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`) is ignored:
+(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`,
+`CODEX_ACCESS_TOKEN`, `CODEX_API_KEY`) is ignored:
 it never reaches the box, so nothing that runs there, a launched agent, a
 hand-typed `claude`, a headless `claude -p`, `codex`, the app itself, can bill
 it; the environment sheet and `secrets set` say so. Measured on Claude Code
@@ -122,6 +128,19 @@ itself and the workspaces its organization shares, in `loadReadyWorkspace`,
 `loadVisibleWorkspace` and `delete` together; a check on one of them is
 bypassed through the others.
 
+**A box reaches its creator's own hosts, when a host allows it. Accepted
+(opt-in).** The firewall adds the workspace credential on requests to the
+relay as well as the API, and the relay asks `host.cloudWorkspaceAccess` on
+every call. A host is reachable only if the creator owns it (a member's box is
+refused) and turned on "Allow my cloud workspaces to reach this host"
+(`v2_hosts.allow_cloud_workspaces`, set by `host.setCloudWorkspaceAccess`,
+which a box cannot call). The API is the only lock: host-service does not know
+the call came from a box, so a wrong value in that column opens the host. Once
+on, anything in any box the creator made can drive that host as them,
+including a prompt-injected agent. Off by default; turning it off stops the
+next call. Only HTTP gets through: the firewall refuses WebSocket upgrades on a
+host it rewrites, and the relay refuses them from a box.
+
 **A sandbox has exactly one gate, and it is ours.** A sandbox's own port is
 a public URL that clients never see; they reach a workspace through the
 sandbox gate (`apps/gate`), which verifies a ticket the API signed
@@ -163,9 +182,66 @@ CORS headers, and the app shows "Connecting… / Unknown host" with a hint about
 tray menu Linux does not have. Seen 2026-09-11 from a throwaway prompt that
 invited the agent to "try the new image". Recovery is a platform-side
 `vercel sandbox stop` (snapshots the disk, kills everything) followed by the
-app's Retry, which wakes a clean session. Still owed: memory pressure shown in
-the product, and a kill switch for the runaway process short of stopping the
-box. **Open.**
+app's Retry, which wakes a clean session. **Pressure is shown in the product
+(2026-11-13):** host-service samples cgroup PSI and memguard's reaps every 5 s
+(`runtime/sandbox-box-pressure`) and reports changes to the API, which hands
+them to the organization's realtime hub; every window gets the boxes under
+pressure as a sidebar dot, and the open workspace an out-of-memory banner. The
+hub keeps only boxes under pressure and drops one that stops re-reporting.
+**The kill switch is done (2026-10-21):** measured on a 2 vCPU / 4 GB
+box, the kernel's killer was the last thing to act — with no swap it drops code
+pages first, and host-service's event loop stalled for 113 s while a 3 GB
+`tsc` refaulted everything. `superset-memguard` (bundle, started by boot as
+root) now ranks every process by what it is — host-service and pty-daemon
+−900, agent and desktop sessions −300, everything else the platform's 500 — because the
+kernel copies the score at fork and host-service's protection would otherwise
+reach every tool an agent runs; and it reaps the largest least-protected
+process when `MemAvailable` drops under 8% of the box, so the agent sees an
+exit 137 from its tool instead of the box dying. Boot also writes
+`SUPERSET_SANDBOX_MEMORY_MB` and `SUPERSET_SANDBOX_VCPUS` into every login
+shell from the cgroup, so a hook or an agent can size its work. **No swap
+(2026-11-17):** from 2026-10-22 memguard grew 2 GB swapfiles under
+`/var/swap` on demand, up to 1.5x the box (6-16 GB). That let an undersized
+box finish a large typecheck slowly, but a snapshot is a full block copy of
+the disk, so swap written once stayed in every later snapshot of the
+workspace. Vercel's sandbox team recommends no swap and preventing OOMs
+instead, so memguard now grows none, and at start it turns off and removes
+any `/var/swap/superset-*` an earlier bundle left (that does not shrink a
+snapshot that already holds it); boot still removes the older `/swapfile`.
+Without swap, a reap that comes late is not a slow box but a stall: with no
+memguard, a steady allocator on a 4 GB box stalled host-service for 282 s and
+the kernel's killer never fired. Three changes keep memguard ahead of that.
+It checks `MemAvailable` four times a second (it ranks once a second) and
+forks nothing between checks; it reaps when the next check at the current
+rate of fall would be under the floor, not only once it is; and after a kill
+it waits for the victim to exit, not a fixed 3 s, because eight parallel
+workers refilled 2 GB in that pause and starved memguard itself for 170 s.
+Measured on 4 and 8 GB boxes (reserved hugepages on a real box, the image's
+boot, host-service probed every 250 ms from outside): a steady allocator,
+parallel workers, page cache with an allocator, and a 2 GB/s allocator all
+kept host-service's longest silence at 314 ms with no kernel kill. With swap
+and the old 1 s check, the 2 GB/s allocator beat memguard in 6 of 7 runs
+and the kernel's killer fired; host-service went silent for up to 62 s
+(4 GB) and 94 s (8 GB). What a customer loses: on a box too small for the job, the largest
+process is killed at about 92% use instead of the box swapping; the remedy
+is a larger machine size. Open: Vercel will send webhook events for sandbox
+OOMs; once they exist, the API can report them to the realtime hub beside
+host-service's pressure report (`runtime/sandbox-box-pressure`), which
+cannot report a box whose host-service has stalled. Still open: automatic resume of an agent whose own process was
+reaped while its terminal survived.
+
+## Box logs leave the box
+
+When the organization's PostHog flag `sandbox-box-logs` is on, the claim sets
+`SUPERSET_SANDBOX_BOX_LOGS=1` and host-service turns on the Sentry SDK's logs
+(`logBoxEvent` in `packages/host-service/src/sentry.ts`). Only those fixed
+events leave the box, each with ids, counts and durations: no log file, no
+console line, no error message. A box whose host-service never answers is
+reported by the control plane: `SandboxNotReadyError` names the boot phases
+`boot.log` reached, not the step output between them. `memguard.log`,
+`desktop.log`, `checkout.log` and `host-service.log` stay on the box.
+Before the flag is on for a customer organization, the policy wording (L1)
+must be live.
 
 ## Untested behaviour
 
@@ -208,8 +284,8 @@ older than a few minutes and tears down any sandbox they name, plus the same
 teardown on the paths that can't currently reach it. One row from that incident
 had to be cleared by hand.
 
-**The Superset CLI is offered but not installed. Open.** A cloud workspace's
-agent row includes "Superset CLI" alongside Claude, Codex and Copilot, and
+**The Paradev CLI is offered but not installed. Open.** A cloud workspace's
+agent row includes "Paradev CLI" alongside Claude, Codex and Copilot, and
 picking it fails with command-not-found: the image installs the agent CLIs but
 not ours. It also matters beyond the picker — the CLI is how an agent spawns
 workspaces and other agents, so a sandbox without it can't orchestrate. Install

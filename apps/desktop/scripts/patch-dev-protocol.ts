@@ -22,8 +22,8 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
 import { isAbsolute, relative, resolve, sep } from "node:path";
+import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 import { config } from "dotenv";
 
 // override: true ensures .env values take precedence over inherited env vars
@@ -40,8 +40,8 @@ import {
 	getWorkspaceName,
 } from "../src/shared/worktree-id";
 
-const DEFAULT_WORKTREE_BASE = resolve(homedir(), ".superset/worktrees");
-const DEFAULT_PROD_DB_PATH = resolve(homedir(), ".superset/local.db");
+const DEFAULT_WORKTREE_BASE = resolve(defaultAppHomeDir(), "worktrees");
+const DEFAULT_PROD_DB_PATH = resolve(defaultAppHomeDir(), "local.db");
 
 type ResolveWorkspaceIdentityOptions = {
 	cwd?: string;
@@ -251,7 +251,8 @@ export function main() {
 			currentScheme === PROTOCOL_SCHEME &&
 			currentName === DISPLAY_NAME &&
 			isRenamed &&
-			pathTxtCorrect
+			pathTxtCorrect &&
+			hasValidSignature(ELECTRON_APP_PATH)
 		) {
 			console.log(
 				`[patch-dev-protocol] ${PROTOCOL_SCHEME}:// already registered`,
@@ -347,6 +348,17 @@ export function main() {
 		console.warn("[patch-dev-protocol] Failed to rename Electron.app:", err);
 	}
 
+	// Editing Info.plist breaks Electron's signature, and macOS then drops
+	// every notification the app shows without an error.
+	try {
+		execSync(`codesign --force --deep --sign - "${actualAppPath}"`, {
+			stdio: "ignore",
+		});
+		console.log("[patch-dev-protocol] Re-signed the app (ad hoc)");
+	} catch (err) {
+		console.warn("[patch-dev-protocol] Failed to re-sign the app:", err);
+	}
+
 	try {
 		execSync(
 			`/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "${actualAppPath}"`,
@@ -380,6 +392,17 @@ export function main() {
 	}
 
 	return { worktreePath, workspaceName };
+}
+
+function hasValidSignature(appPath: string): boolean {
+	try {
+		execSync(`codesign --verify --deep --strict "${appPath}"`, {
+			stdio: "ignore",
+		});
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 if (import.meta.main) {

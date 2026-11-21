@@ -4,6 +4,7 @@ import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import { readRootDomain } from "@superset/shared/app-identity";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
 import { buildLegacyRedirects } from "./src/lib/legacy-redirects";
@@ -29,6 +30,7 @@ const apiOrigin = process.env.NEXT_PUBLIC_API_URL
 
 // Third parties this site actually loads (probed against production):
 // - Google Ads gtag + Reddit pixel, injected in [lang]/layout.tsx
+// - Paradev external tracking script + LeadConnector event endpoint
 // - Cloudflare Web Analytics, injected at the edge by the Cloudflare proxy
 // - Work at a Startup job board (+ its hCaptcha) on /careers
 // - PostHog goes through the same-origin /ingest rewrite; ui_host is listed
@@ -47,7 +49,7 @@ const contentSecurityPolicy = [
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		apiOrigin,
+		...withOwnDomainTwins([apiOrigin]),
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.posthog.com",
@@ -57,6 +59,7 @@ const contentSecurityPolicy = [
 		"https://googleads.g.doubleclick.net",
 		"https://ad.doubleclick.net",
 		"https://alb.reddit.com",
+		"https://backend.leadconnectorhq.com",
 		"https://www.workatastartup.com",
 		...hcaptcha,
 		!isProduction && "ws:",
@@ -78,6 +81,7 @@ const contentSecurityPolicy = [
 	"object-src 'none'",
 	[
 		"script-src 'self' 'unsafe-inline'",
+		"https://x.paradev.com",
 		...googleAdsScripts,
 		"https://www.redditstatic.com",
 		"https://static.cloudflareinsights.com",
@@ -172,12 +176,12 @@ const config: NextConfig = {
 				permanent: true,
 			},
 			{
-				source: "/:lang(en)?/:page(join-us|career)",
+				source: "/:lang(en)?/:page(join-us|career|hiring)",
 				destination: "/careers",
 				permanent: true,
 			},
 			{
-				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career)`,
+				source: `/:lang(${SUPPORTED_LOCALES.join("|")})/:page(join-us|career|hiring)`,
 				destination: "/:lang/careers",
 				permanent: true,
 			},
@@ -194,7 +198,7 @@ const config: NextConfig = {
 			{
 				source: "/docs/:path*",
 				destination: `${docsUrl}/:path*`,
-				permanent: false,
+				permanent: true,
 			},
 			...buildLegacyRedirects({ locales: SUPPORTED_LOCALES, docsUrl }),
 		];

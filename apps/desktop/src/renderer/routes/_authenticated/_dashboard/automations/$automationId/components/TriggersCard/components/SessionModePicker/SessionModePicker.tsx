@@ -10,9 +10,8 @@ import {
 import { ChipButton } from "../../../../../components/TriggerSentence/components/ChipButton";
 
 /**
- * Whether each run starts its own agent session or continues the one the
- * previous run left behind. Only rendered for a pinned workspace, which is
- * where that session lives.
+ * Whether each run starts its own agent conversation or picks up the one the
+ * previous run left. Only rendered when runs share a workspace.
  */
 export function SessionModePicker({
 	continueAgentSession,
@@ -27,12 +26,8 @@ export function SessionModePicker({
 }) {
 	const label = i18n._(
 		continueAgentSession
-			? msg({
-					message: "continuing the last session",
-				})
-			: msg({
-					message: "in a new session",
-				}),
+			? msg({ message: "Continue", context: "automation session mode" })
+			: msg({ message: "Start fresh" }),
 	);
 
 	return (
@@ -49,22 +44,37 @@ export function SessionModePicker({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start">
 				<DropdownMenuRadioGroup
-					value={continueAgentSession ? "continue" : "new"}
+					value={continueAgentSession ? "continue" : "fresh"}
 					onValueChange={(value) => onChange(value === "continue")}
 				>
-					<DropdownMenuRadioItem value="new">
-						{i18n._(
-							msg({
-								message: "Start a new agent session each run",
-							}),
-						)}
+					<DropdownMenuRadioItem value="fresh">
+						<span className="flex flex-col">
+							<span>{i18n._(msg({ message: "Start fresh" }))}</span>
+							<span className="text-xs text-muted-foreground">
+								{i18n._(
+									msg({ message: "Each run starts a new agent conversation" }),
+								)}
+							</span>
+						</span>
 					</DropdownMenuRadioItem>
 					<DropdownMenuRadioItem value="continue">
-						{i18n._(
-							msg({
-								message: "Continue the session the last run left",
-							}),
-						)}
+						<span className="flex flex-col">
+							<span>
+								{i18n._(
+									msg({
+										message: "Continue",
+										context: "automation session mode",
+									}),
+								)}
+							</span>
+							<span className="text-xs text-muted-foreground">
+								{i18n._(
+									msg({
+										message: "The agent picks up where the last run left off",
+									}),
+								)}
+							</span>
+						</span>
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>

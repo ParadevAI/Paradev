@@ -47,7 +47,7 @@ export default async function GoogleIntegrationPage() {
 		no_refresh_token: i18n._(
 			msg({
 				message:
-					"Google did not grant lasting access. Remove Superset from your Google account's third-party access and try again.",
+					"Google did not grant lasting access. Remove Paradev from your Google account's third-party access and try again.",
 			}),
 		),
 		userinfo_failed: i18n._(
@@ -173,14 +173,16 @@ export default async function GoogleIntegrationPage() {
 						isConnected={isConnected}
 						needsReconnect={needsReconnect}
 					/>
-					{connection?.email && (
+					{connection && connection.emails.length > 0 && (
 						<div className="mt-4 text-sm text-muted-foreground">
 							{i18n._(
 								msg({
 									message: "Connected as",
 								}),
 							)}{" "}
-							<span className="font-medium">{connection.email}</span>
+							<span className="font-medium">
+								{connection.emails.join(", ")}
+							</span>
 						</div>
 					)}
 				</CardContent>

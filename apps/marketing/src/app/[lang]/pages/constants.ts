@@ -21,7 +21,7 @@ export const LOOP_STEPS: (PagesItem & { id: LoopStepId })[] = [
 		id: "share",
 		title: msg({ message: "Share." }),
 		description: msg({
-			message: "Send the link. Your team opens it in a browser or in Superset.",
+			message: "Send the link. Your team opens it in a browser or in Paradev.",
 		}),
 	},
 	{
@@ -53,14 +53,14 @@ export const FEATURES: PagesItem[] = [
 	{
 		title: msg({ message: "Works with any agent" }),
 		description: msg({
-			message: "Publish from the Superset CLI or over MCP.",
+			message: "Publish from the Paradev CLI or over MCP.",
 		}),
 	},
 	{
 		title: msg({ message: "Read it on your phone" }),
 		description: msg({
 			message:
-				"Open pages and reply to comments from the Superset app on iPhone and iPad.",
+				"Open pages and reply to comments from the Paradev app on iPhone and iPad.",
 		}),
 	},
 	{

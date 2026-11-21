@@ -37,10 +37,11 @@ function encryptV10(
 const KEY = deriveCookieKey("test-password");
 
 describe("isProtectedCookieHost", () => {
-	it("protects the production domain by default", () => {
-		expect(PROTECTED_COOKIE_DOMAINS).toEqual(["superset.sh"]);
+	it("protects both production domains by default", () => {
+		expect(PROTECTED_COOKIE_DOMAINS).toEqual(["superset.sh", "paradev.com"]);
 		expect(isProtectedCookieHost("superset.sh")).toBe(true);
 		expect(isProtectedCookieHost(".app.superset.sh")).toBe(true);
+		expect(isProtectedCookieHost(".app.paradev.com")).toBe(true);
 		expect(isProtectedCookieHost("notsuperset.sh")).toBe(false);
 	});
 
@@ -464,7 +465,7 @@ describe("importCookies", () => {
 		]);
 	});
 
-	it("skips Superset's own hosts, host-only or domain", async () => {
+	it("skips Paradev's own hosts, host-only or domain", async () => {
 		const s = fakeSession();
 		const result = await importCookies(s.session, [
 			imported("app.superset.sh", "session", "x"),

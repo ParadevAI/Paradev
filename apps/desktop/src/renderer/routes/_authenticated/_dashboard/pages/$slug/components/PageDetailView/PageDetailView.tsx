@@ -4,12 +4,12 @@ import {
 	CommentModeButton,
 	PageHeader as PageTitleBar,
 } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { Spinner } from "@superset/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
-import { PagePresenceStack } from "renderer/routes/_authenticated/_dashboard/components/PagePresenceStack";
 import { PageViewer } from "renderer/routes/_authenticated/_dashboard/components/PageViewer";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 
@@ -38,6 +38,7 @@ export function PageDetailView({
 		onRename,
 		onRefresh,
 		onDelete,
+		onDuplicate,
 		sharing,
 		canComment,
 	} = usePageHeaderData({ slug, version: previewVersion });
@@ -75,7 +76,7 @@ export function PageDetailView({
 						leading={backButton}
 						trailing={
 							<>
-								<PagePresenceStack pageId={page.id} />
+								<PagePresenceStack pageId={page.id} viewerId={currentUserId} />
 								{canComment ? (
 									<CommentModeButton
 										enabled={commentsEnabled}
@@ -92,13 +93,24 @@ export function PageDetailView({
 						sharing={sharing}
 						onRename={onRename}
 						onRefresh={onRefresh}
-						onPreviewVersion={setPreviewVersion}
+						onPreviewVersion={(next) =>
+							setPreviewVersion(next === page.servedVersion ? null : next)
+						}
 						previewVersion={
 							previewVersion === page.servedVersion ? null : previewVersion
 						}
 						onDelete={async () => {
 							await onDelete();
 							goBack();
+						}}
+						onDuplicate={async (title) => {
+							const copy = await onDuplicate(title);
+							if (copy) {
+								await navigate({
+									to: "/pages/$slug",
+									params: { slug: copy.slug },
+								});
+							}
 						}}
 					/>
 				</PageHeader>
@@ -123,6 +135,7 @@ export function PageDetailView({
 					onCommentsEnabledChange={setCommentsEnabled}
 					initialThreadId={initialThreadId}
 					initialPanelOpen={initialPanelOpen}
+					findActive
 				/>
 			</div>
 		</div>

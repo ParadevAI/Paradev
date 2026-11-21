@@ -3,6 +3,9 @@ import { FileText } from "lucide-react";
 import { useState } from "react";
 import { THUMBNAIL_ASPECT_RATIO } from "./constants";
 
+const RETRY_FAILED_AFTER_MS = 60_000;
+const failedAtBySrc = new Map<string, number>();
+
 interface PageThumbnailProps {
 	src: string | null;
 	/** Takes the height its container gives it instead of the capture's aspect ratio, cropping from the top. */
@@ -20,15 +23,21 @@ export function PageThumbnail({
 	fill = false,
 	className,
 }: PageThumbnailProps) {
-	const [failed, setFailed] = useState<{ src: string; at: number } | null>(
+	const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+	const [failure, setFailure] = useState<{ src: string; at: number } | null>(
 		null,
 	);
-	// A capture that has not happened yet 404s; the failure is remembered per
-	// src but expires, so a later list refetch retries instead of showing the
-	// placeholder forever under the same thumbnail URL.
+	// Failures are shared across cards so a remount doesn't refetch a known
+	// 404, and expire so a later list refetch retries a fresh capture.
+	const failedAt =
+		src === null
+			? undefined
+			: failure?.src === src
+				? failure.at
+				: failedAtBySrc.get(src);
 	const showImage =
 		src !== null &&
-		!(failed && failed.src === src && Date.now() - failed.at < 60_000);
+		!(failedAt !== undefined && Date.now() - failedAt < RETRY_FAILED_AFTER_MS);
 
 	return (
 		<div
@@ -39,20 +48,27 @@ export function PageThumbnail({
 			)}
 			style={fill ? undefined : { aspectRatio: THUMBNAIL_ASPECT_RATIO }}
 		>
-			{showImage ? (
+			<div className="flex h-full w-full items-center justify-center text-muted-foreground">
+				<FileText className="size-5 opacity-40" />
+			</div>
+			{showImage && (
 				<img
 					src={src}
 					alt=""
 					aria-hidden="true"
 					loading="lazy"
 					decoding="async"
-					onError={() => setFailed({ src, at: Date.now() })}
-					className="absolute inset-0 h-full w-full object-cover object-top"
+					onLoad={() => setLoadedSrc(src)}
+					onError={() => {
+						const at = Date.now();
+						failedAtBySrc.set(src, at);
+						setFailure({ src, at });
+					}}
+					className={cn(
+						"absolute inset-0 h-full w-full object-cover object-top",
+						loadedSrc !== src && "invisible",
+					)}
 				/>
-			) : (
-				<div className="flex h-full w-full items-center justify-center text-muted-foreground">
-					<FileText className="size-5 opacity-40" />
-				</div>
 			)}
 		</div>
 	);

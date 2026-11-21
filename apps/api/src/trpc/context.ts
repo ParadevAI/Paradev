@@ -1,14 +1,18 @@
 import * as Sentry from "@sentry/nextjs";
-import { auth, type Session } from "@superset/auth/server";
+import { auth, getRequestSession, type Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
+import {
+	productAudiences,
+	verifyUserBearer,
+} from "@superset/shared/verify-jwt";
 import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
+	sandboxCredentialWorkspaceId,
 } from "@superset/trpc/lib/sandbox";
-import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
 import { env } from "@/env";
 
@@ -29,18 +33,12 @@ async function sessionFromOAuthBearer(
 	const token = match?.[1];
 	if (!token || !looksLikeJwt(token)) return null;
 
-	let payload: Record<string, unknown>;
-	try {
-		payload = (await verifyAccessToken(token, {
-			jwksUrl: `${apiUrl}/api/auth/jwks`,
-			verifyOptions: {
-				issuer: apiUrl,
-				audience: [apiUrl, `${apiUrl}/`],
-			},
-		})) as Record<string, unknown>;
-	} catch {
-		return null;
-	}
+	const payload = await verifyUserBearer(
+		token,
+		apiUrl,
+		productAudiences(apiUrl),
+	);
+	if (!payload) return null;
 
 	const authorizedClientId =
 		typeof payload.azp === "string" ? payload.azp : null;
@@ -48,9 +46,7 @@ async function sessionFromOAuthBearer(
 		return null;
 	}
 
-	const userId = typeof payload.sub === "string" ? payload.sub : null;
-	if (!userId) return null;
-
+	const userId = payload.sub;
 	const user = await db.query.users.findFirst({
 		where: eq(authSchema.users.id, userId),
 	});
@@ -58,6 +54,9 @@ async function sessionFromOAuthBearer(
 
 	const activeOrganizationId =
 		typeof payload.organizationId === "string" ? payload.organizationId : null;
+	const organizationIds = Array.isArray(payload.organizationIds)
+		? payload.organizationIds
+		: undefined;
 
 	const sessionId = typeof payload.sid === "string" ? payload.sid : userId;
 
@@ -67,6 +66,7 @@ async function sessionFromOAuthBearer(
 			id: sessionId,
 			userId,
 			activeOrganizationId,
+			organizationIds,
 			expiresAt: new Date(((payload.exp as number) ?? 0) * 1000),
 			token: token,
 			ipAddress: null,
@@ -120,9 +120,7 @@ export const createContext = async ({
 	req: Request;
 	resHeaders: Headers;
 }) => {
-	let session = await auth.api.getSession({
-		headers: req.headers,
-	});
+	let session = await getRequestSession(req.headers);
 
 	if (!session) {
 		session = await sessionFromOAuthBearer(req.headers);
@@ -138,6 +136,9 @@ export const createContext = async ({
 		auth,
 		headers: req.headers,
 		sandboxCaller: sandbox?.caller ?? null,
+		sandboxWorkspaceId: await sandboxCredentialWorkspaceId(
+			req.headers.get(SANDBOX_API_CREDENTIAL_HEADER),
+		),
 	});
 
 	if (context.client) {

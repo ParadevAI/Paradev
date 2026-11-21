@@ -115,7 +115,7 @@ export function WebhookSentence({ triggerId, disabled }: WebhookSentenceProps) {
 					{!triggerId
 						? "Save triggers first"
 						: token
-							? "The URL alone triggers the run — paste it where only a URL fits. Shown once."
+							? "The URL alone triggers the run. Paste it where only a URL fits. Shown once."
 							: secretPrefix
 								? `Token ${secretPrefix}… is set. Regenerating replaces it.`
 								: "Issues the token this URL authenticates with."}
@@ -135,7 +135,7 @@ export function WebhookSentence({ triggerId, disabled }: WebhookSentenceProps) {
 					</TooltipTrigger>
 					<TooltipContent side="bottom">
 						The same token as an Authorization header, for senders that can set
-						one — headers stay out of URL logs.
+						one. Headers stay out of URL logs.
 					</TooltipContent>
 				</Tooltip>
 			)}

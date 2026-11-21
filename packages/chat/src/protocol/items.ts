@@ -14,6 +14,7 @@ export const textElementSchema = z.looseObject({
 	}),
 	elementKind: z.enum(["file_mention", "slash_command", "other"]),
 	label: z.string().optional(),
+	data: z.unknown().optional(),
 });
 export type TextElement = z.infer<typeof textElementSchema>;
 
@@ -25,12 +26,20 @@ export const userContentSchema = z.discriminatedUnion("type", [
 		/** Reaches the agent, but is not kept on the transcript's user message. */
 		hidden: z.boolean().optional(),
 	}),
-	z.looseObject({
-		type: z.literal("attachment"),
-		attachmentId: z.string().min(1),
-		name: z.string(),
-		mimeType: z.string(),
-	}),
+	z
+		.looseObject({
+			type: z.literal("attachment"),
+			/** In the host's attachment store: a workspace on a machine someone owns. */
+			attachmentId: z.string().min(1).optional(),
+			/** In our storage: a cloud workspace. Readers prefer it when both are set. */
+			fileId: z.string().uuid().optional(),
+			name: z.string(),
+			mimeType: z.string(),
+			sizeBytes: z.number().int().nonnegative().optional(),
+		})
+		.refine((part) => part.attachmentId || part.fileId, {
+			message: "An attachment needs an attachmentId or a fileId",
+		}),
 ]);
 export type UserContent = z.infer<typeof userContentSchema>;
 
@@ -84,6 +93,8 @@ export const toolContentSchema = z.discriminatedUnion("type", [
 		path: z.string(),
 		oldText: z.string().nullable(),
 		newText: z.string(),
+		/** The agent removed the file; an empty `newText` alone can also be an emptied file. */
+		deleted: z.boolean().optional(),
 	}),
 	z.looseObject({
 		type: z.literal("terminal"),
@@ -124,6 +135,7 @@ export type ToolKind = z.infer<typeof toolKindSchema>;
 export const userMessageSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("user_message"),
+	from: z.literal("parent").optional().catch(undefined),
 	clientId: z.string().min(1).optional(),
 	queued: z.boolean().optional(),
 	discarded: z.boolean().optional(),
@@ -159,6 +171,14 @@ export const toolCallStatusSchema = z.enum([
 ]);
 export type ToolCallStatus = z.infer<typeof toolCallStatusSchema>;
 
+export const subagentStatusSchema = z.enum([
+	"running",
+	"idle",
+	"stopped",
+	"failed",
+]);
+export type SubagentStatus = z.infer<typeof subagentStatusSchema>;
+
 export const toolCallSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("tool_call"),
@@ -175,6 +195,10 @@ export const toolCallSchema = z.looseObject({
 	rawInput: z.unknown().optional(),
 	rawOutput: z.unknown().optional(),
 	subagent: z.boolean().optional(),
+	subagentStatus: subagentStatusSchema.optional().catch(undefined),
+	canSteer: z.boolean().optional(),
+	canStop: z.boolean().optional(),
+	canBackground: z.boolean().optional(),
 	attachments: z.array(itemAttachmentSchema).optional(),
 	bodyOmitted: z.boolean().optional(),
 	mcpServer: z
@@ -223,6 +247,7 @@ export const approvalRequestSchema = z.looseObject({
 	targetItemId: z.string().min(1).nullable(),
 	title: z.string(),
 	detail: z.array(toolContentSchema).optional(),
+	reason: z.string().optional(),
 	options: z
 		.array(
 			z.looseObject({

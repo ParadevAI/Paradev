@@ -41,6 +41,7 @@ function isInsideTrans(node: import("@ast-grep/napi").SgNode): boolean {
 }
 
 const LITERAL_IDENTIFIERS = new Set([
+	"Paradev",
 	"Superset",
 	"Claude",
 	"Cursor",
@@ -60,6 +61,7 @@ const LITERAL_IDENTIFIERS = new Set([
 	"about:blank",
 	"work",
 	"CLIENT_KEY...",
+	"owner/name",
 ]);
 const VISIBLE_PROP =
 	/^(title|label|placeholder|aria-label|accessibilityLabel|description|alt|emptyMessage|message)=["']([\s\S]*)["']$/;

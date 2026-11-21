@@ -142,8 +142,18 @@ export function PagesList({
 				utils.page.listPaginated.setInfiniteData(listInput, context.previous);
 			}
 		},
+		onSuccess: (_data, { id }) => {
+			if (favoritePageIdSet.has(id)) onTogglePin(id);
+		},
 		onSettled: () => {
 			void utils.page.listPaginated.invalidate(listInput);
+			void utils.page.counts.invalidate();
+		},
+	});
+
+	const duplicatePage = cloudTrpc.page.duplicate.useMutation({
+		onSettled: () => {
+			void utils.page.listPaginated.invalidate();
 			void utils.page.counts.invalidate();
 		},
 	});
@@ -292,6 +302,10 @@ export function PagesList({
 								message: "Page deleted",
 							}),
 						);
+					}}
+					onDuplicate={async (pageId, title) => {
+						await duplicatePage.mutateAsync({ id: pageId, title });
+						toast.success(t({ message: "Page duplicated" }));
 					}}
 				/>
 

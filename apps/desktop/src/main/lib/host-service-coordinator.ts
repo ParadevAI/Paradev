@@ -8,12 +8,15 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { organizations, settings } from "@superset/local-db";
 import { getHostId, getHostName } from "@superset/shared/host-info";
-import { HOST_INSTALL_SOURCE_ENV } from "@superset/shared/host-version";
+import {
+	HOST_CHAT_RESUME_MARKER_FILE,
+	HOST_INSTALL_SOURCE_ENV,
+} from "@superset/shared/host-version";
 import { eq } from "drizzle-orm";
 import { app, dialog } from "electron";
 import log from "electron-log/main";
 import { env as sharedEnv } from "shared/env.shared";
-import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/workspaces/utils/shell-env";
+import { getProcessEnvWithShellPath } from "../../lib/trpc/routers/utils/shell-env";
 import { env as mainEnv } from "../env.main";
 import { SUPERSET_HOME_DIR } from "./app-environment";
 import { getBrowserBridgeInfo } from "./browser/browser-bridge-info";
@@ -38,11 +41,10 @@ import {
 	redactCrashTail,
 } from "./host-service-utils";
 import { localDb } from "./local-db";
-import { HOOK_PROTOCOL_VERSION } from "./terminal/env";
 
 export type HostServiceStatus = "starting" | "running" | "stopped";
 
-export interface Connection {
+interface Connection {
 	port: number;
 	secret: string;
 	machineId: string;
@@ -54,7 +56,7 @@ export interface HostServiceStatusEvent {
 	previousStatus: HostServiceStatus | null;
 }
 
-export interface SpawnConfig {
+interface SpawnConfig {
 	authToken: string;
 	cloudApiUrl: string;
 }
@@ -475,7 +477,10 @@ export class HostServiceCoordinator extends EventEmitter {
 	}
 
 	/** Returns the pid it sent SIGTERM to, or null when it signalled nothing. */
-	stop(organizationId: string): number | null {
+	stop(
+		organizationId: string,
+		options: { resumeChats?: boolean } = {},
+	): number | null {
 		// Cancel first, and unconditionally: a respawn may be pending with no
 		// instance tracked (the crashed one was already deleted), and quitting or
 		// restarting must not let that timer resurrect a child.
@@ -495,6 +500,7 @@ export class HostServiceCoordinator extends EventEmitter {
 		if (instance.owned) {
 			try {
 				if (instance.pid > 0) {
+					if (options.resumeChats) this.markChatResume(organizationId);
 					this.deps.killProcess(instance.pid, "SIGTERM");
 					signalledPid = instance.pid;
 					this.scheduleKillEscalation(organizationId, instance.pid);
@@ -520,13 +526,30 @@ export class HostServiceCoordinator extends EventEmitter {
 		this.deps.removeManifest(organizationId);
 	}
 
+	private markChatResume(organizationId: string): void {
+		const marker = path.join(
+			this.deps.manifestDir(organizationId),
+			HOST_CHAT_RESUME_MARKER_FILE,
+		);
+		const pending = `${marker}.${process.pid}.tmp`;
+		try {
+			fs.writeFileSync(pending, JSON.stringify({ requestedAt: Date.now() }));
+			fs.renameSync(pending, marker);
+		} catch (error) {
+			log.warn(
+				`[host-service:${organizationId}] could not mark chats to resume`,
+				error,
+			);
+		}
+	}
+
 	/** Returns the pids of the children it sent SIGTERM to. */
-	stopAll(): number[] {
+	stopAll(options: { resumeChats?: boolean } = {}): number[] {
 		this.startGeneration++;
 		this.desiredOrganizationIds.clear();
 		const signalledPids: number[] = [];
 		for (const [id] of this.instances) {
-			const pid = this.stop(id);
+			const pid = this.stop(id, options);
 			if (pid !== null) signalledPids.push(pid);
 		}
 		// A crashed instance is deleted before its respawn fires, so an org with a
@@ -1097,8 +1120,6 @@ export class HostServiceCoordinator extends EventEmitter {
 			DESKTOP_VITE_PORT: String(sharedEnv.DESKTOP_VITE_PORT),
 			SUPERSET_HOME_DIR: SUPERSET_HOME_DIR,
 			SUPERSET_LEGACY_WORKTREE_BASE_DIR: row?.worktreeBaseDir ?? "",
-			SUPERSET_AGENT_HOOK_PORT: String(sharedEnv.DESKTOP_NOTIFICATIONS_PORT),
-			SUPERSET_AGENT_HOOK_VERSION: HOOK_PROTOCOL_VERSION,
 			// BROWSER_BRIDGE_URL/SECRET are set (or stripped) after the shell-env
 			// merge below, alongside RELAY_URL, so an inherited value can't leak
 			// into a standalone host.
@@ -1509,21 +1530,21 @@ export class HostServiceCoordinator extends EventEmitter {
 				? i18n._({
 						...msg({
 							message:
-								"The Superset host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically.",
+								"The Paradev host service for {organization} stopped unexpectedly ({cause}) and could not be restarted automatically.",
 						}),
 						values: { organization: orgName, cause },
 					})
 				: i18n._({
 						...msg({
 							message:
-								"The Superset host service stopped unexpectedly ({cause}) and could not be restarted automatically.",
+								"The Paradev host service stopped unexpectedly ({cause}) and could not be restarted automatically.",
 						}),
 						values: { cause },
 					}),
 			detail: i18n._(
 				msg({
 					message:
-						"Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart.",
+						"Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart.",
 				}),
 			),
 		});

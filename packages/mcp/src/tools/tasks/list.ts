@@ -29,7 +29,7 @@ export function register(server: McpServer): void {
 				.uuid()
 				.nullish()
 				.describe(
-					"Superset only: filter by status ID. Call tasks_statuses_list if you don't have one.",
+					"Paradev only: filter by status ID. Call tasks_statuses_list if you don't have one.",
 				),
 			linearStatus: z
 				.enum(linearStatusFilterValues)
@@ -43,13 +43,13 @@ export function register(server: McpServer): void {
 			priority: z
 				.enum(["urgent", "high", "medium", "low", "none"])
 				.nullish()
-				.describe("Superset only: filter by priority."),
+				.describe("Paradev only: filter by priority."),
 			assigneeId: z
 				.string()
 				.min(1)
 				.nullish()
 				.describe(
-					"Filter by assignee: a Superset user ID, or for Linear a Linear user id or email.",
+					"Filter by assignee: a Paradev user ID, or for Linear a Linear user id or email.",
 				),
 			assigneeMe: z
 				.boolean()
@@ -58,7 +58,7 @@ export function register(server: McpServer): void {
 			creatorMe: z
 				.boolean()
 				.nullish()
-				.describe("Superset only: tasks created by the calling user."),
+				.describe("Paradev only: tasks created by the calling user."),
 			search: z
 				.string()
 				.min(1)
@@ -69,7 +69,7 @@ export function register(server: McpServer): void {
 				.max(20)
 				.nullish()
 				.describe(
-					"Superset only: label names. A task must have all of them (case-insensitive). A label also matches its sub-labels: acme matches acme/web.",
+					"Paradev only: label names. A task must have all of them (case-insensitive). A label also matches its sub-labels: acme matches acme/web.",
 				),
 			limit: z
 				.number()

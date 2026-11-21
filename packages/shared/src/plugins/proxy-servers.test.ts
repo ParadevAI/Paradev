@@ -62,7 +62,42 @@ describe("desiredPluginMcpServers", () => {
 		);
 	});
 
-	test("another marketplace's same-named plugin is not served Superset's", () => {
+	test("an organization's plugin is served through the proxy under its own marketplace", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "team-tools", marketplace: "organization-org-1" },
+		]);
+		expect((desired["team-tools"] as { url: string }).url).toBe(
+			"https://api.superset.sh/mcp/plugins/organization-org-1/team-tools",
+		);
+	});
+
+	test("two organizations' same-named plugins get an entry each", () => {
+		const desired = desiredPluginMcpServers([
+			{ name: "deploy", marketplace: "organization-aaaaaaaa-1111" },
+			{ name: "deploy", marketplace: "organization-bbbbbbbb-2222" },
+		]);
+		expect(Object.keys(desired).sort()).toEqual([
+			"deploy-aaaaaaaa",
+			"deploy-bbbbbbbb",
+		]);
+		expect((desired["deploy-bbbbbbbb"] as { url: string }).url).toBe(
+			"https://api.superset.sh/mcp/plugins/organization-bbbbbbbb-2222/deploy",
+		);
+	});
+
+	test("an organization plugin with only skills gets no MCP entry", () => {
+		expect(
+			desiredPluginMcpServers([
+				{
+					name: "team-skills",
+					marketplace: "organization-org-1",
+					tools: false,
+				},
+			]),
+		).toEqual({});
+	});
+
+	test("another marketplace's same-named plugin is not served Paradev's", () => {
 		const desired = desiredPluginMcpServers([
 			{ name: "linear", marketplace: "acme" },
 		]);

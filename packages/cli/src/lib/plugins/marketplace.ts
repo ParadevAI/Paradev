@@ -1,37 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
-import { isSafePluginSegment } from "@superset/agent-setup";
+import {
+	MARKETPLACE_FILE,
+	type Marketplace,
+	type MarketplaceEntry,
+} from "@superset/agent-setup";
 import { CLIError } from "@superset/cli-framework";
 
-export const MARKETPLACE_FILE = ".agent-marketplace.json";
+export {
+	assertSafeSegment,
+	MARKETPLACE_FILE,
+	type Marketplace,
+	type MarketplaceEntry,
+	releaseTag,
+} from "@superset/agent-setup";
+
 export const SUPERSET_EXTENSION = "superset";
-
-export function assertSafeSegment(value: string, label: string): string {
-	if (!isSafePluginSegment(value)) {
-		throw new CLIError(
-			`Refusing to use ${label} "${value}": it must be alphanumeric with dots, dashes, pluses, or underscores, and cannot contain "..".`,
-		);
-	}
-	return value;
-}
-
-export interface MarketplaceEntry {
-	name: string;
-	description?: string;
-	author?: { name: string; url?: string };
-	category?: string;
-	source: string;
-	version?: string;
-}
-
-export interface Marketplace {
-	name: string;
-	description?: string;
-	owner?: { name: string; url?: string };
-	plugins: MarketplaceEntry[];
-	featured?: string[];
-	renames?: Record<string, string>;
-}
 
 export interface PluginMcp {
 	type: "streamable-http";
@@ -184,11 +168,6 @@ export function resolvePlugins(
 	return ctx.marketplace.plugins
 		.filter((entry) => !wanted || wanted.has(entry.name))
 		.map((entry) => resolvePlugin(ctx, entry));
-}
-
-/** The git tag a published version lives at. */
-export function releaseTag(name: string, version: string): string {
-	return `${assertSafeSegment(name, "plugin name")}@${assertSafeSegment(version, "version")}`;
 }
 
 export function compareVersions(a: string, b: string): number {

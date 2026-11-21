@@ -1,10 +1,13 @@
 import { githubRepoSlug } from "@superset/shared/github-stars";
+import { cacheLife } from "next/cache";
 
 interface GitHubRepoResponse {
 	stargazers_count: number;
 }
 
 export async function getGitHubStars(): Promise<number | null> {
+	"use cache";
+	cacheLife({ revalidate: 3600 });
 	try {
 		const response = await fetch(
 			`https://api.github.com/repos/${githubRepoSlug()}`,

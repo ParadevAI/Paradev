@@ -1,7 +1,11 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaceShares, cloudWorkspaces } from "@superset/db/schema";
-import { and, eq, exists, or, sql } from "drizzle-orm";
-import { assertCloudAccess, assertMember } from "../../lib/cloud-guards";
+import { and, eq, exists, isNotNull, ne, or, sql } from "drizzle-orm";
+import {
+	assertCloudAccess,
+	assertMember,
+	type MemberContext,
+} from "../../lib/cloud-guards";
 import { grantsTo, isCloudWorkspaceSharedWith } from "../../lib/sharing";
 import { userError } from "../../trpc";
 
@@ -50,6 +54,21 @@ export const visibleTo = (userId: string) =>
 		),
 	);
 
+/**
+ * Deleted rows are never a workspace you can open, so they are only listed
+ * when archived ones are asked for. Everything else is listed from the moment
+ * it is created: the client renders provisioning and failed rows off `status`
+ * rather than being told they don't exist yet.
+ */
+export const isListed = (archived: boolean) =>
+	archived
+		? and(
+				eq(cloudWorkspaces.status, "archived"),
+				// Rows deleted before archiving existed have no deletedAt and no box.
+				isNotNull(cloudWorkspaces.deletedAt),
+			)
+		: ne(cloudWorkspaces.status, "archived");
+
 export const notFound = () =>
 	userError({
 		code: "NOT_FOUND",
@@ -58,18 +77,15 @@ export const notFound = () =>
 	});
 
 export async function loadVisibleWorkspace(
-	ctx: Parameters<typeof assertCloudAccess>[0] & {
-		organizationIds: string[];
-		userId: string;
-	},
+	ctx: Parameters<typeof assertCloudAccess>[0] & MemberContext,
 	id: string,
 ) {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, id),
 	});
 	if (!row) throw notFound();
-	await assertCloudAccess(ctx);
-	assertMember(ctx.organizationIds, row.organizationId);
-	if (!(await canOpenWorkspace(row, ctx.userId))) throw notFound();
+	await assertMember(ctx, row.organizationId);
+	await assertCloudAccess(ctx, row.organizationId);
+	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
 	return row;
 }

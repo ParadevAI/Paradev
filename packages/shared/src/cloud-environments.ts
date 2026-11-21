@@ -13,6 +13,31 @@ export function startableCloudEnvironments<T extends SelectableEnvironment>(
 	);
 }
 
+type RepositoryEnvironment = {
+	repositories?: ReadonlyArray<{ fullName: string }> | null;
+};
+
+/** Whether a cloud workspace started from `environment` opens `repositoryFullName`. */
+export function environmentOpensRepository(
+	environment: RepositoryEnvironment,
+	repositoryFullName: string,
+): boolean {
+	const wanted = repositoryFullName.toLowerCase();
+	return (environment.repositories ?? []).some(
+		(repo) => repo.fullName.toLowerCase() === wanted,
+	);
+}
+
+/** The environments a cloud workspace of `repositoryFullName` can start in. */
+export function environmentsForRepository<T extends RepositoryEnvironment>(
+	environments: T[],
+	repositoryFullName: string,
+): T[] {
+	return environments.filter((environment) =>
+		environmentOpensRepository(environment, repositoryFullName),
+	);
+}
+
 /**
  * The environment a cloud workspace starts from, by id (names change and can
  * differ only by case); undefined on a miss, so each caller phrases that

@@ -15,6 +15,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
 	resolveTrustFamily,
+	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
 	seedCodexFolderTrust,
 } from "./seed-agent-trust";
@@ -37,6 +38,12 @@ describe("resolveTrustFamily", () => {
 		expect(resolveTrustFamily({ presetId: "codex", command: "codex" })).toBe(
 			"codex",
 		);
+		expect(
+			resolveTrustFamily({
+				presetId: "agy",
+				command: "agy --mode accept-edits",
+			}),
+		).toBe("agy");
 	});
 
 	test("matches custom presets by launch executable", () => {
@@ -152,6 +159,30 @@ describe("seedClaudeFolderTrust", () => {
 			true,
 		);
 		expect(readdirSync(home)).toEqual([".claude.json"]);
+	});
+});
+
+describe("seedAgyFolderTrust", () => {
+	test("appends to trustedWorkspaces, preserving other keys", async () => {
+		const file = join(dir, "settings.json");
+		writeFileSync(
+			file,
+			JSON.stringify({ trustedWorkspaces: ["/other"], theme: "dark" }),
+		);
+		await seedAgyFolderTrust(file, "/tmp/session-a");
+		await seedAgyFolderTrust(file, "/tmp/session-a");
+		expect(JSON.parse(readFileSync(file, "utf-8"))).toEqual({
+			trustedWorkspaces: ["/other", "/tmp/session-a"],
+			theme: "dark",
+		});
+	});
+
+	test("leaves a never-set-up agy alone", async () => {
+		await seedAgyFolderTrust(
+			join(dir, "missing", "settings.json"),
+			"/tmp/session-b",
+		);
+		expect(readdirSync(dir)).toEqual([]);
 	});
 });
 

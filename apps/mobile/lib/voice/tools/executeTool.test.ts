@@ -20,7 +20,7 @@ const workspaces: VoiceWorkspace[] = [
 		hostName: null,
 		branch: "auth-refactor",
 		project: "superset/superset",
-		status: "ready",
+		status: "awake",
 		attention: "review",
 		attentionAt: NOW - 3 * MIN,
 		lastActivityAt: NOW - 3 * MIN,
@@ -35,7 +35,7 @@ const workspaces: VoiceWorkspace[] = [
 		hostName: "Satya's Mac",
 		branch: "dash",
 		project: "superset",
-		status: "ready",
+		status: "awake",
 		attention: "working",
 		attentionAt: NOW - 10 * MIN,
 		lastActivityAt: NOW - 10 * MIN,
@@ -50,7 +50,7 @@ const workspaces: VoiceWorkspace[] = [
 		hostName: "Satya's Mac",
 		branch: "old",
 		project: "superset",
-		status: "ready",
+		status: "awake",
 		attention: null,
 		attentionAt: null,
 		lastActivityAt: NOW - 3 * 24 * 60 * MIN,
@@ -106,7 +106,7 @@ function fakeData(overrides: Partial<VoiceData> = {}): VoiceData & {
 		restartWorkspace: async () => {},
 		readPage: async () => "Usage is up 12% this week.",
 		listEnvironments: async () => [
-			{ id: "env-1", name: "Superset" },
+			{ id: "env-1", name: "Paradev" },
 			{ id: "env-2", name: "Docs site" },
 		],
 		createWorkspace: async () => ({ id: "ws-new", name: "Fix login" }),
@@ -325,7 +325,7 @@ describe("executeTool", () => {
 			ctx,
 		);
 		expect(result.output).toMatchObject({
-			error: { kind: "ambiguous", environments: ["Superset", "Docs site"] },
+			error: { kind: "ambiguous", environments: ["Paradev", "Docs site"] },
 		});
 		expect(result.ui).toBeUndefined();
 	});

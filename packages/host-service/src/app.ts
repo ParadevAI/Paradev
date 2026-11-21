@@ -1,11 +1,14 @@
+import { join } from "node:path";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
-import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PORTS } from "@superset/shared/sandbox/contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
 const MAX_DISPLAY_BUFFER_BYTES = 32 * 1024 * 1024;
@@ -15,11 +18,12 @@ import { TRPCError } from "@trpc/server";
 import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { parseLaunchSource, withLaunchSource } from "./agent-launch-analytics";
 import { createApiClient } from "./api";
+import { createChatSync, syncWhenEnabled } from "./chat-sync";
 import {
 	createChatAgentBridge,
 	createChatV3Mount,
-	promptChatSession,
 	registerChatV3Routes,
 } from "./chat-v3";
 import { createDb, type HostDb } from "./db";
@@ -33,31 +37,41 @@ import {
 } from "./projects/project-deletion";
 import type { ApiAuthProvider } from "./providers/auth";
 import type { HostAuthProvider } from "./providers/host-auth";
+import { AgentJobRunner } from "./runtime/agent-jobs";
 import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
 import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
 import { createGitEnvResolver, createGitFactory } from "./runtime/git";
+import { applyLegacyHomeMove } from "./runtime/legacy-home-paths";
 import { runProjectBackfill } from "./runtime/project-backfill";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
+import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 } from "./runtime/sandbox-self-seed";
 import {
 	isAgentTerminalAlive,
 	registerWorkspaceTerminalRoute,
-	sendAgentMessage,
 } from "./terminal/terminal";
 import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
-import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
+import { sendToAgent } from "./terminal-agents/send-to-agent";
 import { appRouter } from "./trpc/router";
+import {
+	ATTACHMENT_SWEEP_INTERVAL_MS,
+	sweepAttachmentStore,
+} from "./trpc/router/attachments/sweep";
 import { gitStatusStore } from "./trpc/router/git/utils/git-status-store";
-import { stopLocalMobileServer } from "./trpc/router/mobile";
+import {
+	disposeLocalMobileDevices,
+	startLocalMobileDeviceCleanup,
+} from "./trpc/router/mobile";
 import {
 	resumeCrashedAgentSessions,
 	resumeSessionDepsFor,
@@ -74,6 +88,7 @@ import type {
 } from "./types";
 import { getHostWorkerPool } from "./workers/host-worker-pool";
 import { gitWorkspaceRefsTask } from "./workers/tasks/git";
+import { disposeUsageWorkerPool } from "./workers/usage-worker-pool";
 import { disposeWorkspaceTitleJobs } from "./workspaces/workspace-title-jobs";
 
 export interface CreateAppOptions {
@@ -123,6 +138,7 @@ export interface CreateAppResult {
 	 */
 	launchSandboxAgent: () => Promise<void>;
 	resumeCrashedAgents: () => Promise<void>;
+	recordUnfinishedChats: () => void;
 	readLinkedPullRequests: () => Promise<
 		{ repository: string; number: number; linkedAt: number }[]
 	>;
@@ -138,6 +154,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		options.api ??
 		createApiClient(config.cloudApiUrl, providers.auth, config.organizationId);
 	const db = options.db ?? createDb(config.dbPath, config.migrationsFolder);
+	void applyLegacyHomeMove(db);
 	// A sandbox is provisioned for exactly one workspace, and the env says
 	// which. Seeding it here rather than from the API keeps the schema in one
 	// place and leaves provisioning with nothing to orchestrate.
@@ -218,6 +235,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			],
 		}),
 	);
+	app.use("*", (c, next) =>
+		withLaunchSource(
+			parseLaunchSource(c.req.header(SUPERSET_LAUNCH_SOURCE_HEADER)),
+			next,
+		),
+	);
 
 	const eventBus = new EventBus({ db, filesystem, gitWatcher });
 	eventBus.start();
@@ -260,22 +283,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
-			const chat = terminalAgentStore.getChat(terminalId);
-			const chatSessionId = chat?.chatSessionId;
-			if (chatSessionId) {
-				if (!matchesAgentBinding(chat, expectedAgent)) {
-					throw new Error("The chat's agent changed before delivery");
-				}
-				await promptChatSession({
-					runtime: chatV3.runtime(),
-					chatSessionId,
-					text,
-					acquireDelivery,
-					signal,
-				});
-				return;
-			}
-			const result = await sendAgentMessage({
+			const result = await sendToAgent({
 				terminalId,
 				workspaceId,
 				text,
@@ -284,6 +292,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				acquireDelivery,
 				signal,
 				terminalAgentStore,
+				chatRuntime: () => chatV3.runtime(),
 				db,
 				eventBus,
 			});
@@ -294,31 +303,45 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isTerminalAlive: (terminalId, workspaceId) => {
 			const chat = terminalAgentStore.getChat(terminalId);
-			if (chat) return chat.lastEventType !== "Failed";
+			if (chat?.chatSessionId) {
+				const live = chatV3.runtime().live.get(chat.chatSessionId);
+				return live !== null && live.state.status !== "dead";
+			}
 			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
 		},
 		isAgentBusy: (terminalId) =>
 			agentIsBusy(
-				(
-					terminalAgentStore.getChat(terminalId) ??
-					terminalAgentStore.get(terminalId)
-				)?.lastEventType,
+				terminalAgentStore.getChatOrTerminalAgent(terminalId)?.lastEventType,
 			),
 		getAgent: (terminalId) => {
-			const binding =
-				terminalAgentStore.getChat(terminalId) ??
-				terminalAgentStore.get(terminalId);
+			const binding = terminalAgentStore.getChatOrTerminalAgent(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});
 	pageWatch.subscribeToTerminalEvents(eventBus);
 
+	const agentJobs = new AgentJobRunner({
+		rootDir: join(resolveAppHomeDir(), "agent-jobs"),
+		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
+	});
+
+	const chatSync = createChatSync({
+		runtime: () => chatV3.existingRuntime(),
+		api,
+	});
 	const runtime = {
+		agentJobs,
 		filesystem,
 		pullRequests: pullRequestRuntime,
 		pageWatch,
 		chat: () => chatV3.runtime(),
+		chatSync,
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
+		closedMidTurn: {
+			list: () => chatV3.closedMidTurn(),
+			resume: () => chatV3.resumeClosedMidTurn(),
+			keepPaused: () => chatV3.keepClosedMidTurnPaused(),
+		},
 	};
 
 	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
@@ -342,6 +365,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	};
 	const chatV3 = createChatV3Mount({
 		db,
+		api,
 		dbPath: config.dbPath,
 		agents: createChatAgentBridge(chatAgentContext),
 		onSessionChanged: ({ scopeId, occurredAt }) =>
@@ -349,7 +373,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				workspaceId: scopeId,
 				occurredAt,
 			}),
+		onAppend: (envelope) => chatSync.noteAppend(envelope),
 	});
+	// A box whose owner has it keeps its chats in the cloud as they happen; a
+	// machine someone owns pushes a chat only when it moves.
+	const stopChatSync =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
+			? syncWhenEnabled({ chatSync, api })
+			: null;
+	try {
+		chatV3.resumeAfterUpdate();
+	} catch (error) {
+		console.warn("[host-service] chat resume after update failed:", error);
+	}
 
 	// Startup sweeps run in the background so they don't block server
 	// startup.
@@ -376,6 +412,21 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			? null
 			: setInterval(() => void runProjectPurge(), PROJECT_PURGE_INTERVAL_MS);
 	projectPurgeTimer?.unref?.();
+	const runAttachmentSweep = () =>
+		sweepAttachmentStore().catch((err) => {
+			console.warn("[host-service] attachment sweep failed:", err);
+		});
+	const attachmentSweepTimer =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
+			? null
+			: setInterval(
+					() => void runAttachmentSweep(),
+					ATTACHMENT_SWEEP_INTERVAL_MS,
+				);
+	attachmentSweepTimer?.unref?.();
+	if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") {
+		startLocalMobileDeviceCleanup(db);
+	}
 
 	void (async () => {
 		if (process.env.SUPERSET_HOST_RUN_MODE === "sandbox") return;
@@ -403,6 +454,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			console.warn("[host-service] archived-workspace reconcile failed:", err);
 		});
 		await runProjectPurge();
+		await runAttachmentSweep();
 		// Re-share the default account's Claude/Codex config into the selected
 		// provider profiles. Last: it touches no host state the sweeps above
 		// repair, and a slow filesystem must not delay them.
@@ -494,6 +546,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	});
 	registerChatV3Routes({ app, db, mount: chatV3, upgradeWebSocket });
 
+	// tRPC answers a streamed batch before it has read the request body, and
+	// a sandbox's ingress treats that early response as the end of the
+	// exchange and drops the upload still in flight. Hand tRPC a body it
+	// already has, so no response starts before the request is complete.
+	app.use("/trpc/*", async (c, next) => {
+		if (c.req.raw.body !== null && !c.req.raw.bodyUsed) {
+			c.req.raw = new Request(c.req.raw, {
+				body: await c.req.raw.arrayBuffer(),
+			});
+		}
+		await next();
+	});
+
 	app.use(
 		"/trpc/*",
 		trpcServer({
@@ -533,7 +598,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		stopChatSync?.();
+		agentJobs.stopAll();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
+		if (attachmentSweepTimer) clearInterval(attachmentSweepTimer);
 		await disposeWorkspaceTitleJobs(db);
 		// Each step is best-effort and isolated: a throw in one cleanup must
 		// not skip the others, otherwise a flaky `.stop()` could leak the
@@ -549,9 +617,9 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			console.warn("[host-service] pageWatch.stop failed:", err);
 		}
 		try {
-			stopLocalMobileServer();
+			await disposeLocalMobileDevices();
 		} catch (err) {
-			console.warn("[host-service] stopLocalMobileServer failed:", err);
+			console.warn("[host-service] disposeLocalMobileDevices failed:", err);
 		}
 		try {
 			await chatV3.dispose();
@@ -567,6 +635,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			await getHostWorkerPool().dispose();
 		} catch (err) {
 			console.warn("[host-service] hostWorkerPool.dispose failed:", err);
+		}
+		try {
+			await disposeUsageWorkerPool();
+		} catch (err) {
+			console.warn("[host-service] usageWorkerPool.dispose failed:", err);
 		}
 		try {
 			eventBus.close();
@@ -610,6 +683,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	/** Same context the launcher above builds: a resume runs an agent. */
 	const resumeCrashedAgents = async () => {
+		await waitForSandboxManagedEnv();
 		const ctx = {
 			git,
 			credentials: providers.credentials,
@@ -624,7 +698,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			isAuthenticated: true,
 			browserBridge: config.browserBridge,
 		} as HostServiceContext;
-		await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		try {
+			await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		} finally {
+			if (sandboxIdentity)
+				await resumeSandboxStartHookRun(ctx, sandboxIdentity);
+		}
 	};
 
 	return {
@@ -635,6 +714,16 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		eventBus,
 		launchSandboxAgent,
 		resumeCrashedAgents,
+		recordUnfinishedChats: () => {
+			try {
+				chatV3.recordUnfinished();
+			} catch (error) {
+				console.warn(
+					"[host-service] could not record unfinished chats:",
+					error,
+				);
+			}
+		},
 		readLinkedPullRequests: () => pullRequestRuntime.listLinkedPullRequests(),
 		onPullRequestLinked: (listener) =>
 			pullRequestRuntime.onPullRequestLinked(listener),

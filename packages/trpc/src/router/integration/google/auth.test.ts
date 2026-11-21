@@ -13,10 +13,14 @@ const connector: GoogleOAuthClient = {
 };
 
 function oauthError(code: string): GaxiosError {
-	return new GaxiosError(code, { url: new URL("https://oauth2.test") }, {
-		status: 400,
-		data: { error: code },
-	} as never);
+	return new GaxiosError(
+		code,
+		{ url: new URL("https://oauth2.test"), headers: new Headers() },
+		{
+			status: 400,
+			data: { error: code },
+		} as never,
+	);
 }
 
 describe("refreshClientsFor", () => {

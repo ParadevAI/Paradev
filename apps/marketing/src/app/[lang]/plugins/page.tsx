@@ -2,12 +2,12 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
-import { CTASection } from "@/app/[lang]/components/CTASection";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { env } from "@/env";
 import { AgentStrip } from "./components/AgentStrip";
 import { BuildOnce } from "./components/BuildOnce";
 import { HowItWorks } from "./components/HowItWorks";
@@ -18,7 +18,7 @@ import { FEATURES } from "./constants";
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
-	const title = i18n._(msg({ message: "Superset Plugins" }));
+	const title = i18n._(msg({ message: "Paradev Plugins" }));
 	const description = i18n._(
 		msg({
 			message:
@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			title,
 			description,
 			images: [image.url],
-			creator: "@superset_sh",
+			creator: SOCIAL.X.handle,
 		},
 	};
 }
@@ -63,7 +63,7 @@ export default async function PluginsPage() {
 				<section>
 					<div className="max-w-3xl">
 						<p className="font-mono text-brand text-xs uppercase tracking-wider">
-							<Trans>Superset Plugins</Trans>
+							<Trans>Paradev Plugins</Trans>
 						</p>
 						<h1 className="mt-4 font-medium text-balance text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>One plugin. Every coding agent.</Trans>
@@ -74,7 +74,11 @@ export default async function PluginsPage() {
 								cloud.
 							</Trans>
 						</p>
-						<ProductHeroActions source="plugins" docsPath="/mcp-server" />
+						<ProductHeroActions
+							source="plugins"
+							docsPath="/mcp-server"
+							signInUrl={`${env.NEXT_PUBLIC_WEB_URL}/sign-in`}
+						/>
 						<AgentStrip />
 					</div>
 					<PluginCatalog />
@@ -109,7 +113,6 @@ export default async function PluginsPage() {
 
 				<BuildOnce />
 			</main>
-			<CTASection />
 		</div>
 	);
 }

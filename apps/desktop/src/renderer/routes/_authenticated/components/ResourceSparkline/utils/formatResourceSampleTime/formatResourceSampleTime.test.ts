@@ -10,8 +10,8 @@ test("chart tooltip uses the sample timestamp, not its configured text label", (
 		second: "2-digit",
 	});
 	for (const label of [
-		"Superset CPU · last 5 min",
-		"Superset memory · last 5 min",
+		"Paradev CPU · last 5 min",
+		"Paradev memory · last 5 min",
 		undefined,
 	]) {
 		expect(formatResourceSampleTime(label, [{ payload: { at } }])).toBe(

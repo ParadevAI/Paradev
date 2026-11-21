@@ -1,4 +1,11 @@
 import * as Sentry from "@sentry/cloudflare";
+import { parseBoxPressure } from "@superset/shared/box-pressure";
+import {
+	parseChannelRealtimeEvent,
+	USER_EVENTS_PATH,
+	USERS_PUBLISH_PATH,
+} from "@superset/shared/channels";
+import type { MoveBookRequest } from "@superset/shared/move-book";
 import {
 	MAX_PAGE_STORAGE_KEY_LENGTH,
 	MAX_PAGE_STORAGE_VALUE_BYTES,
@@ -15,6 +22,7 @@ import {
 } from "@superset/shared/realtime";
 import {
 	signPageConnectTicket,
+	verifyAgentSessionTicket,
 	verifyPageConnectTicket,
 } from "@superset/shared/usercontent";
 import { verifyJWT } from "@superset/shared/verify-jwt";
@@ -23,9 +31,13 @@ import type { Context } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { getServerByName } from "partyserver";
-import { OrgHub } from "./org-hub";
+import type { AppendInput } from "./agent-session/AgentSessionLog";
+import { AgentSessionHub } from "./agent-session-hub";
+import { MoveHub } from "./move-hub";
+import { ORG_USER_HEADER, OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
 import type { RealtimeEnv } from "./types";
+import { UserHub } from "./user-hub";
 import { readBodyWithin } from "./utils/readBodyWithin";
 import { WORKSPACE_CLAIMS_HEADER, WorkspaceHub } from "./workspace-hub";
 
@@ -73,13 +85,13 @@ app.get("/v2/org/:organizationId/nudges", async (c) => {
 	if (!token) return acceptAndClose(4401, "Unauthorized");
 	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
 	if (!auth) return acceptAndClose(4401, "Unauthorized");
-	// Nudges carry no data, so organization membership is the whole check.
+	// Nudges carry no data and presence is org-wide, so membership is the whole check.
 	if (!auth.organizationIds.includes(organizationId)) {
 		return acceptAndClose(4403, "Not a member of this organization");
 	}
 	const stub = await getServerByName(c.env.OrgHub, organizationId);
 	return stub.fetch("https://realtime/subscribe", {
-		headers: { Upgrade: "websocket" },
+		headers: { Upgrade: "websocket", [ORG_USER_HEADER]: auth.sub },
 	});
 });
 
@@ -95,6 +107,24 @@ app.post("/v2/page/:pageId/storage/admin", async (c) => {
 		return c.json({ error: "op required" }, 400);
 	}
 	const stub = await getServerByName(c.env.PageHub, c.req.param("pageId"));
+	return c.json(await stub.apply(request));
+});
+
+app.post("/v2/org/:organizationId/moves", async (c) => {
+	const token = extractToken(c);
+	if (!token || token !== c.env.NUDGE_SECRET) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const request = (await c.req
+		.json()
+		.catch(() => null)) as MoveBookRequest | null;
+	if (!request || typeof request.op !== "string") {
+		return c.json({ error: "op required" }, 400);
+	}
+	const stub = await getServerByName(
+		c.env.MoveHub,
+		c.req.param("organizationId"),
+	);
 	return c.json(await stub.apply(request));
 });
 
@@ -375,6 +405,50 @@ app.get("/organization/:organizationId/workspace/:workspaceId", async (c) => {
 	return stub.fetch("https://realtime/presence", { headers });
 });
 
+app.get(
+	"/organization/:organizationId/workspace/:workspaceId/forwards",
+	async (c) => {
+		const organizationId = c.req.param("organizationId");
+		const workspaceId = c.req.param("workspaceId");
+		if (!UUID.test(workspaceId)) return c.json({ error: "Not found" }, 404);
+		const token = extractToken(c);
+		const stubName = `${organizationId}:${workspaceId}`;
+
+		if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+			if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
+				return c.json({ error: "Unauthorized" }, 401);
+			}
+			const stub = await getServerByName(c.env.WorkspaceHub, stubName);
+			return c.json({ forwards: await stub.listForwards() });
+		}
+
+		if (!token) return acceptAndClose(4401, "Unauthorized");
+		const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+		if (!auth) return acceptAndClose(4401, "Unauthorized");
+		if (!auth.organizationIds.includes(organizationId)) {
+			return acceptAndClose(4403, "Not a member of this organization");
+		}
+		const { success } = await c.env.WORKSPACE_PRESENCE_BY_USER.limit({
+			key: auth.sub,
+		});
+		if (!success) return acceptAndClose(4429, "Too many requests");
+		const stub = await getServerByName(c.env.WorkspaceHub, stubName);
+		const headers = new Headers({ Upgrade: "websocket" });
+		headers.set(
+			WORKSPACE_CLAIMS_HEADER,
+			JSON.stringify({
+				userId: auth.sub,
+				name: auth.name ?? "Someone",
+				image: auth.image ?? null,
+				organizationIds: auth.organizationIds,
+				teamIds: auth.teamIds,
+				forwarder: true,
+			}),
+		);
+		return stub.fetch("https://realtime/forwards", { headers });
+	},
+);
+
 app.post(
 	"/organization/:organizationId/workspace/:workspaceId/access",
 	async (c) => {
@@ -396,7 +470,99 @@ app.post(
 	},
 );
 
+// ── A user's own events (channels) ───────────────────────────────────
+
+app.get(USER_EVENTS_PATH, async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const token = extractToken(c);
+	if (!token) return acceptAndClose(4401, "Unauthorized");
+	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
+	if (!auth?.sub) return acceptAndClose(4401, "Unauthorized");
+	const stub = await getServerByName(c.env.UserHub, auth.sub);
+	return stub.fetch("https://realtime/subscribe", {
+		headers: { Upgrade: "websocket" },
+	});
+});
+
+const MAX_PUBLISH_RECIPIENTS = 500;
+
+function secretMatches(token: string, secret: string): boolean {
+	const encoder = new TextEncoder();
+	const given = encoder.encode(token);
+	const expected = encoder.encode(secret);
+	return (
+		given.byteLength === expected.byteLength &&
+		crypto.subtle.timingSafeEqual(given, expected)
+	);
+}
+
+app.post(USERS_PUBLISH_PATH, async (c) => {
+	const token = extractToken(c);
+	if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const body = (await c.req.json().catch(() => null)) as {
+		userIds?: unknown;
+		event?: unknown;
+	} | null;
+	const userIds = body?.userIds;
+	if (
+		!Array.isArray(userIds) ||
+		userIds.length > MAX_PUBLISH_RECIPIENTS ||
+		!userIds.every((id) => typeof id === "string" && UUID.test(id))
+	) {
+		return c.json({ error: "userIds required" }, 400);
+	}
+	const event = parseChannelRealtimeEvent(body?.event);
+	if (!event) return c.json({ error: "unknown event" }, 400);
+	const results = await Promise.allSettled(
+		userIds.map(async (userId) => {
+			const stub = await getServerByName(c.env.UserHub, userId);
+			await stub.publish(event);
+		}),
+	);
+	const failed = results.filter((result) => result.status === "rejected");
+	if (failed.length > 0) {
+		console.warn(
+			`[user-events] ${event.type} failed for ${failed.length} of ${userIds.length}`,
+		);
+	}
+	return c.json({ ok: true });
+});
+
 // ── Emit: the API, after a write ────────────────────────────────────
+
+app.post("/v2/box-pressure", async (c) => {
+	const token = extractToken(c);
+	if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const body = (await c.req.json().catch(() => null)) as {
+		organizationId?: unknown;
+		workspaceId?: unknown;
+		pressure?: unknown;
+	} | null;
+	const organizationId = body?.organizationId;
+	const workspaceId = body?.workspaceId;
+	if (
+		typeof organizationId !== "string" ||
+		organizationId.length === 0 ||
+		typeof workspaceId !== "string" ||
+		!UUID.test(workspaceId)
+	) {
+		return c.json({ error: "organizationId and workspaceId required" }, 400);
+	}
+	const pressure =
+		body?.pressure === null ? null : parseBoxPressure(body?.pressure);
+	if (body?.pressure !== null && !pressure) {
+		return c.json({ error: "invalid pressure" }, 400);
+	}
+	const stub = await getServerByName(c.env.OrgHub, organizationId);
+	await stub.reportBoxPressure(workspaceId, pressure);
+	return c.json({ ok: true });
+});
 
 app.post("/v2/nudge", async (c) => {
 	const token = extractToken(c);
@@ -425,6 +591,100 @@ app.post("/v2/nudge", async (c) => {
 
 // Exceptions only, as on the relay: console capture at this volume is a
 // memory leak, and a peer going away is not an error.
+// ── Agent sessions: one object per session, written by the agent worker ──
+
+const MAX_AGENT_APPEND_BYTES = 4 * 1024 * 1024;
+
+async function agentSessionTicket(
+	c: Context<AppContext>,
+	token: string | null,
+	scope: "read" | "write",
+) {
+	if (!token) return null;
+	const claims = await verifyAgentSessionTicket(
+		c.env.AGENT_SESSION_SECRET,
+		token,
+	);
+	if (!claims || claims.sessionId !== c.req.param("sessionId")) return null;
+	if (scope === "write" && claims.scope !== "write") return null;
+	return claims;
+}
+
+app.get("/v2/agent-runtime/sessions/:sessionId/stream", async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const claims = await agentSessionTicket(
+		c,
+		c.req.query("ticket") ?? extractToken(c),
+		"read",
+	);
+	if (!claims) return acceptAndClose(4401, "Unauthorized");
+	const target = new URL("https://realtime/subscribe");
+	for (const key of ["since", "deltas"]) {
+		const value = c.req.query(key);
+		if (value) target.searchParams.set(key, value);
+	}
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return stub.fetch(target.toString(), { headers: { Upgrade: "websocket" } });
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/events", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "read");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const limit = Math.min(
+		Math.max(Number(c.req.query("limit") ?? 500) || 500, 1),
+		1_000,
+	);
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	const before = c.req.query("before");
+	if (before !== undefined) {
+		return c.json(await stub.eventsBefore(before || null, limit));
+	}
+	return c.json(await stub.eventsSince(c.req.query("since") ?? null, limit));
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/head", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "read");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json(await stub.head());
+});
+
+app.get("/v2/agent-runtime/sessions/:sessionId/transcript", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "write");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	const after = Math.max(Number(c.req.query("after") ?? 0) || 0, 0);
+	const stepKey = c.req.query("stepKey");
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json({
+		entries: await stub.transcript(stepKey ? { stepKey } : { afterSeq: after }),
+	});
+});
+
+app.post("/v2/agent-runtime/sessions/:sessionId/append", async (c) => {
+	const claims = await agentSessionTicket(c, extractToken(c), "write");
+	if (!claims) return c.json({ error: "Unauthorized" }, 401);
+	if (Number(c.req.header("content-length") ?? 0) > MAX_AGENT_APPEND_BYTES) {
+		return c.json({ error: "Too large" }, 413);
+	}
+	const text = await readBodyWithin(
+		c.req.raw.body,
+		MAX_AGENT_APPEND_BYTES,
+	).catch(() => "");
+	if (text === null) return c.json({ error: "Too large" }, 413);
+	const input = parseJson(text) as AppendInput | null;
+	if (
+		!input ||
+		typeof input.stepKey !== "string" ||
+		typeof input.turnId !== "string"
+	) {
+		return c.json({ error: "Invalid body" }, 400);
+	}
+	const stub = await getServerByName(c.env.AgentSessionHub, claims.sessionId);
+	return c.json(await stub.append(input));
+});
+
 function isPeerGone(message: string): boolean {
 	return (
 		message === "Network connection lost." ||
@@ -457,10 +717,25 @@ const InstrumentedWorkspaceHub = Sentry.instrumentDurableObjectWithSentry(
 	sentryOptions,
 	WorkspaceHub,
 );
+const InstrumentedUserHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	UserHub,
+);
+const InstrumentedAgentSessionHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	AgentSessionHub,
+);
+const InstrumentedMoveHub = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	MoveHub,
+);
 export {
 	InstrumentedOrgHub as OrgHub,
 	InstrumentedPageHub as PageHub,
 	InstrumentedWorkspaceHub as WorkspaceHub,
+	InstrumentedUserHub as UserHub,
+	InstrumentedAgentSessionHub as AgentSessionHub,
+	InstrumentedMoveHub as MoveHub,
 };
 
 export default Sentry.withSentry(sentryOptions, {

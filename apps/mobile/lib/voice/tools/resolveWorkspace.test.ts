@@ -15,7 +15,7 @@ const workspace = (
 	hostName: null,
 	branch: null,
 	project: null,
-	status: "ready",
+	status: "awake",
 	attention: null,
 	attentionAt: null,
 	lastActivityAt: null,
