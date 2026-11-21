@@ -94,7 +94,6 @@ export type ComposerHandle = Pick<
 	"restoreDraft" | "addFiles" | "focus"
 > & {
 	returnFocus: (recallHistory?: boolean) => void;
-	/** Opens the model picker on this agent's models only. */
 	openModelPicker: () => void;
 };
 
@@ -271,11 +270,9 @@ export const Composer = memo(function Composer({
 	const { returnFocus } = drawerEntry;
 	const mcpPicker = useMcpServerPicker({ workspaceId, presetId });
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
-	const [agentModelsOnly, setAgentModelsOnly] = useState(false);
 	const changeModelPickerOpen = useCallback(
 		(open: boolean) => {
 			setModelPickerOpen(open);
-			if (!open) setAgentModelsOnly(false);
 			onModelPickerOpenChange?.(open);
 		},
 		[onModelPickerOpenChange],
@@ -288,10 +285,7 @@ export const Composer = memo(function Composer({
 			addFiles: (files: File[]) => promptInputRef.current?.addFiles(files),
 			focus: focusInput,
 			returnFocus,
-			openModelPicker: () => {
-				setAgentModelsOnly(true);
-				changeModelPickerOpen(true);
-			},
+			openModelPicker: () => changeModelPickerOpen(true),
 		}),
 		[focusInput, returnFocus, changeModelPickerOpen],
 	);
@@ -741,7 +735,7 @@ export const Composer = memo(function Composer({
 								)}
 								{configOptions && onSetConfigOption && (
 									<ModelPicker
-										agentSwitcher={agentModelsOnly ? undefined : agentSwitcher}
+										agentSwitcher={agentSwitcher}
 										configOptions={configOptions}
 										hideEffortLabel={footerTier >= 1}
 										hideModelLabel={footerTier >= 3}
