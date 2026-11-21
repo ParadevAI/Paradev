@@ -319,7 +319,12 @@ export interface UpdateLocalWorkspacePatch {
 	tags?: string[];
 }
 
-/** Patch a local row, bump `updatedAt`, and broadcast. */
+/**
+ * Patch a local row, bump `updatedAt`, and broadcast. An archived row is
+ * still written (the board's history reads it) but never broadcast: clients
+ * dropped it on the archive's `deleted` event, and an `updated` would
+ * resurrect it in their lists.
+ */
 export function updateLocalWorkspace(
 	ctx: WorkspaceStoreContext,
 	id: string,
@@ -383,7 +388,7 @@ export function updateLocalWorkspace(
 		else keepWorkspaceBranch(ctx.db, id);
 	}
 	const row = getLocalWorkspace(ctx.db, id);
-	if (row) emitWorkspaceChanged(ctx, "updated", row);
+	if (row && row.archivedAt == null) emitWorkspaceChanged(ctx, "updated", row);
 	return row;
 }
 
