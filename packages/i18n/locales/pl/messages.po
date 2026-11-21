@@ -8874,12 +8874,6 @@ msgstr "Szybki"
 msgid "Fast mode is not available for this model. Choose a model that supports it."
 msgstr "Tryb szybki nie jest dostępny dla tego modelu. Wybierz model, który go obsługuje."
 
-msgid "Fast mode off"
-msgstr "Tryb szybki wyłączony"
-
-msgid "Fast mode on"
-msgstr "Tryb szybki włączony"
-
 msgid "Fault"
 msgstr "Błąd krytyczny"
 

@@ -8874,12 +8874,6 @@ msgstr "Nhanh"
 msgid "Fast mode is not available for this model. Choose a model that supports it."
 msgstr "Chế độ nhanh không khả dụng cho mô hình này. Hãy chọn mô hình hỗ trợ chế độ này."
 
-msgid "Fast mode off"
-msgstr "Đã tắt chế độ nhanh"
-
-msgid "Fast mode on"
-msgstr "Đã bật chế độ nhanh"
-
 msgid "Fault"
 msgstr "Lỗi nghiêm trọng"
 

@@ -128,14 +128,8 @@ export function useAppCommands({
 				? {
 						fast: {
 							on: fast.currentValue === "on",
-							set: (on: boolean) => {
-								onSetConfigOption(fast.id, on ? "on" : "off");
-								toast.success(
-									on
-										? t({ message: "Fast mode on" })
-										: t({ message: "Fast mode off" }),
-								);
-							},
+							set: (on: boolean) =>
+								onSetConfigOption(fast.id, on ? "on" : "off"),
 						},
 					}
 				: !fast &&

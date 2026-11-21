@@ -8868,12 +8868,6 @@ msgstr "Швидкий"
 msgid "Fast mode is not available for this model. Choose a model that supports it."
 msgstr "Швидкий режим недоступний для цієї моделі. Виберіть модель, яка його підтримує."
 
-msgid "Fast mode off"
-msgstr "Швидкий режим вимкнено"
-
-msgid "Fast mode on"
-msgstr "Швидкий режим увімкнено"
-
 msgid "Fault"
 msgstr "Збій"
 

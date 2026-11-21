@@ -8874,12 +8874,6 @@ msgstr "快速"
 msgid "Fast mode is not available for this model. Choose a model that supports it."
 msgstr "此模型不支持快速模式。请选择支持该模式的模型。"
 
-msgid "Fast mode off"
-msgstr "快速模式已关闭"
-
-msgid "Fast mode on"
-msgstr "快速模式已开启"
-
 msgid "Fault"
 msgstr "故障"
 

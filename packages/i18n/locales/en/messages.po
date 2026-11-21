@@ -8874,12 +8874,6 @@ msgstr "Fast"
 msgid "Fast mode is not available for this model. Choose a model that supports it."
 msgstr "Fast mode is not available for this model. Choose a model that supports it."
 
-msgid "Fast mode off"
-msgstr "Fast mode off"
-
-msgid "Fast mode on"
-msgstr "Fast mode on"
-
 msgid "Fault"
 msgstr "Fault"
 

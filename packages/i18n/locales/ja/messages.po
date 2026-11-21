@@ -8874,12 +8874,6 @@ msgstr "高速"
 msgid "Fast mode is not available for this model. Choose a model that supports it."
 msgstr "このモデルでは高速モードを使用できません。対応しているモデルを選択してください。"
 
-msgid "Fast mode off"
-msgstr "高速モード: オフ"
-
-msgid "Fast mode on"
-msgstr "高速モード: オン"
-
 msgid "Fault"
 msgstr "フォールト"
 
