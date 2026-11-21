@@ -113,10 +113,14 @@ export async function initAppState(
 	_appState.data = ensureValidShape(_appState.data, liveWorkspaceIds);
 	const sizeAfter = JSON.stringify(_appState.data).length;
 	if (sizeAfter < sizeBefore) {
-		await _appState.write();
-		console.log(
-			`[app-state] Pruned stale tabs: ${sizeBefore} -> ${sizeAfter} bytes`,
-		);
+		try {
+			await _appState.write();
+			console.log(
+				`[app-state] Pruned stale tabs: ${sizeBefore} -> ${sizeAfter} bytes`,
+			);
+		} catch (error) {
+			console.error("[app-state] Failed to write pruned tabs:", error);
+		}
 	}
 
 	console.log(`App state initialized at: ${APP_STATE_PATH}`);
