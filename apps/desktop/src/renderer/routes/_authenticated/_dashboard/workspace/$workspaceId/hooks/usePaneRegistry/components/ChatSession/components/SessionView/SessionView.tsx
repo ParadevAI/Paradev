@@ -721,6 +721,7 @@ export function SessionView({
 				runningTurnId !== null ||
 				approvals.length > 0 ||
 				outbox.length > 0,
+			canSwitchAgent: (agentSwitcher?.agents.length ?? 0) > 1,
 			configOptions,
 			manualSignIn,
 			openAgentSettings,
