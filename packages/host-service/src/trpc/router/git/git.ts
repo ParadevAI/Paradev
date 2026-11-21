@@ -263,6 +263,7 @@ const getDiffInputShape = z.object({
 	baseBranch: z.string().optional(),
 	commitHash: z.string().optional(),
 	fromHash: z.string().optional(),
+	includeFrom: z.boolean().optional(),
 });
 
 /** Upper bound on one getDiffBulk call — generous headroom over the largest
@@ -450,12 +451,13 @@ export const gitRouter = router({
 				workspaceId: z.string(),
 				commitHash: z.string(),
 				fromHash: z.string().optional(),
+				includeFrom: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
-			const dedupeKey = `${input.workspaceId}:commit-files:${input.fromHash ?? ""}:${input.commitHash}`;
+			const dedupeKey = `${input.workspaceId}:commit-files:${input.fromHash ?? ""}:${input.includeFrom ?? false}:${input.commitHash}`;
 			const files = await runCommitFilesDeduped(dedupeKey, () =>
 				getHostWorkerPool().run(
 					gitCommitFilesTask,
@@ -463,6 +465,7 @@ export const gitRouter = router({
 						worktreePath,
 						commitHash: input.commitHash,
 						fromHash: input.fromHash,
+						includeFrom: input.includeFrom,
 						gitEnv,
 					},
 					{
@@ -921,6 +924,7 @@ export const gitRouter = router({
 					baseBranch: input.baseBranch,
 					commitHash: input.commitHash,
 					fromHash: input.fromHash,
+					includeFrom: input.includeFrom,
 					gitEnv,
 				},
 				{ timeoutMs: 30_000 },
@@ -943,6 +947,7 @@ export const gitRouter = router({
 				baseBranch: z.string().optional(),
 				commitHash: z.string().optional(),
 				fromHash: z.string().optional(),
+				includeFrom: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -961,6 +966,7 @@ export const gitRouter = router({
 					baseBranch: input.baseBranch,
 					commitHash: input.commitHash,
 					fromHash: input.fromHash,
+					includeFrom: input.includeFrom,
 					gitEnv,
 				},
 				{ timeoutMs: 60_000 },
@@ -982,6 +988,7 @@ export const gitRouter = router({
 				baseBranch: z.string().optional(),
 				commitHash: z.string().optional(),
 				fromHash: z.string().optional(),
+				includeFrom: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -1001,6 +1008,7 @@ export const gitRouter = router({
 						baseBranch: input.baseBranch,
 						commitHash: input.commitHash,
 						fromHash: input.fromHash,
+						includeFrom: input.includeFrom,
 						gitEnv,
 					},
 					{ timeoutMs: 60_000 },
