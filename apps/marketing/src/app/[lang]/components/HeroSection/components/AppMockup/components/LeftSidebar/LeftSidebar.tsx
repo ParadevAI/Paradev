@@ -69,6 +69,7 @@ export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 									</div>
 									{group.id === CLOUD_GROUP_ID && (
 										<div
+											aria-hidden={!isCloud}
 											className={`grid transition-[grid-template-rows,opacity] duration-[250ms] ease-out motion-reduce:transition-none ${isCloud ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
 										>
 											<div className="min-h-0 overflow-hidden">

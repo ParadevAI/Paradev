@@ -1,5 +1,5 @@
 import type { DiffRow } from "../../../../../../types";
-import { CodeText } from "../../../CodeText";
+import { CodeText } from "./components/CodeText";
 
 const LINE_TONE = {
 	add: {

@@ -12292,7 +12292,7 @@ msgid "Move focus between the main tabs and the right sidebar, and open the side
 msgstr "Mover o foco entre as abas principais e a barra lateral direita, e abrir a barra lateral se estiver fechada"
 
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
-msgstr "Mova as Configurações para um modal para que as pessoas não saiam do workspace. Mantenha a filtragem da busca e faça ⌘, abri-lo de qualquer lugar."
+msgstr "Mova as Configurações para um modal para que as pessoas não saiam da área de trabalho. Mantenha a filtragem da busca e faça ⌘, abri-lo de qualquer lugar."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Mover esta área de trabalho para {computerName}?"

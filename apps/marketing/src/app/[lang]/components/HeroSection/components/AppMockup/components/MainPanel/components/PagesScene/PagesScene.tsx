@@ -40,6 +40,7 @@ export function PagesScene({ phase }: PagesSceneProps) {
 						</span>
 					</Step>
 					<div
+						aria-hidden={phase !== "revised"}
 						className={`transition-opacity duration-[250ms] motion-reduce:transition-none ${phase === "revised" ? "opacity-100" : "opacity-0"}`}
 					>
 						<Step icon={LuCheck}>
