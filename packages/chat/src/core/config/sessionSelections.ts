@@ -37,10 +37,7 @@ export function isSelectionCategory(
 }
 
 /** Claude lists fast mode as `fast` with no category, Codex as `fast-mode`. */
-export const FAST_OPTION_IDS: ReadonlySet<string> = new Set([
-	"fast",
-	"fast-mode",
-]);
+const FAST_OPTION_IDS = new Set(["fast", "fast-mode"]);
 
 export function isFastOption(option: SessionConfigOption): boolean {
 	return (

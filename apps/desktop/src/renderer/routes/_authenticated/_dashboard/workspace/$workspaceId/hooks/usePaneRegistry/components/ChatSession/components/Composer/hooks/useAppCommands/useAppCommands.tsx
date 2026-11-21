@@ -138,7 +138,8 @@ export function useAppCommands({
 							},
 						},
 					}
-				: presetId === CLAUDE_PRESET_ID &&
+				: !fast &&
+						presetId === CLAUDE_PRESET_ID &&
 						availableCommands.some((command) => command.name === "fast")
 					? {
 							fast: {

@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import {
 	type ChatSelections,
-	FAST_OPTION_IDS,
 	type SelectionCategory,
 	selectionCategoryOf,
 } from "@superset/chat/core";
@@ -113,6 +112,7 @@ import {
  */
 const LATEST_PROTOCOL_VERSION = 2;
 
+const FAST_CONFIG_ID = "fast";
 const TOGGLE_ON = "on";
 const TOGGLE_OFF = "off";
 
@@ -2160,7 +2160,7 @@ export class AcpAdapter implements HarnessAdapter {
 			const id = option.configId ?? option.id;
 			if (!id) return [];
 			if (option.type === "boolean") {
-				if (!FAST_OPTION_IDS.has(id)) return [];
+				if (id !== FAST_CONFIG_ID) return [];
 				this.booleanConfigIds.add(id);
 				return [
 					{
