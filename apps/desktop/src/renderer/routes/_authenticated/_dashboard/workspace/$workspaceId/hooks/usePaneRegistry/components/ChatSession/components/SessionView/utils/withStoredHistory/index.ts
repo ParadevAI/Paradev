@@ -1,1 +1,1 @@
-export { withStoredHistory } from "./withStoredHistory";
+export { storedIsAhead, withStoredHistory } from "./withStoredHistory";

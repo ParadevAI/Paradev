@@ -50,6 +50,23 @@ describe("withStoredHistory", () => {
 		]);
 	});
 
+	it("shows the stored chat while it is further along than the live one", () => {
+		const stored = snapshot("e1", [
+			[1, "a", "first"],
+			[2, "b", "second (done)"],
+			[3, "c", "third"],
+		]);
+		const kept = snapshot("e1", [
+			[1, "a", "first"],
+			[2, "b", "second (so far)"],
+		]);
+		expect(texts(withStoredHistory(stored, kept))).toEqual([
+			"first",
+			"second (done)",
+			"third",
+		]);
+	});
+
 	it("shows only the host's chat once it started a new epoch", () => {
 		const stored = snapshot("e1", [[1, "a", "old"]]);
 		const live = snapshot("e2", [[1, "z", "new"]]);
