@@ -17,6 +17,11 @@ import {
 	queryCloudUsageByPeriod,
 } from "@superset/db/cloud-usage-query";
 import { organizations } from "@superset/db/schema";
+import {
+	cloudBootsOutputSchema,
+	cloudPeriodsOutputSchema,
+	cloudUsageOutputSchema,
+} from "@superset/shared/cloud-usage-api";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -32,11 +37,8 @@ import {
 	type CloudListFilters,
 	type CloudRange,
 	cloudBootsInputSchema,
-	cloudBootsOutputSchema,
 	cloudPeriodsInputSchema,
-	cloudPeriodsOutputSchema,
 	cloudUsageInputSchema,
-	cloudUsageOutputSchema,
 	type RangePreset,
 	type UsageKeyset,
 	usageKeysetSchemas,
@@ -158,49 +160,54 @@ function windowFor(range: CloudRange, anchor: CloudBillingAnchor | null) {
 }
 
 export function cloudRouterWith(deps: CloudDeps) {
-	const scopedProcedure = personProcedure.use(async ({ ctx, next }) => {
-		const { organizationId, isAdmin } = await requireActiveOrgRole(
-			ctx,
-			deps.db,
-		);
-		const enabled = await organizationFlagEnabled(
-			deps.flags,
-			FEATURE_FLAGS.CLOUD_USAGE,
-			organizationId,
-		);
-		if (!enabled) {
-			throw userError({
-				code: "FORBIDDEN",
-				message: "Cloud usage is not enabled for this organization.",
-				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
-			});
-		}
-		const billing = await deps.billing(organizationId);
-		const cloudUsage = billing?.cloudUsage ?? null;
-		// A paid plan whose own rate was not read gets no price: the list rate could be the wrong one.
-		const rate =
-			cloudUsage?.overagePerGbHour ??
-			(billing?.tier === "free" ? await deps.listRatePerGbHour() : null);
-		if (rate === null && cloudUsage && billing?.tier !== "free") {
-			console.warn(
-				`[cloud] ${organizationId} has a paid plan but no GB-hour rate; usage has no price`,
+	/** `gated`: the usage pages, behind the cloud usage flag; Billing reads the open period for every organization. */
+	const scopedProcedure = (gated: boolean) =>
+		personProcedure.use(async ({ ctx, next }) => {
+			const { organizationId, isAdmin } = await requireActiveOrgRole(
+				ctx,
+				deps.db,
 			);
-		}
-		const scope: CloudUsageScope = isAdmin
-			? { organizationId }
-			: { organizationId, userId: ctx.session.user.id };
-		const anchor = cloudUsage?.resetsAt
-			? cloudBillingAnchor(
-					new Date(cloudUsage.resetsAt),
-					billing?.startedAt ? new Date(billing.startedAt) : null,
-				)
-			: null;
-		return next({ ctx: { scope, isAdmin, cloudUsage, rate, anchor } });
-	});
+			if (
+				gated &&
+				!(await organizationFlagEnabled(
+					deps.flags,
+					FEATURE_FLAGS.CLOUD_USAGE,
+					organizationId,
+				))
+			) {
+				throw userError({
+					code: "FORBIDDEN",
+					message: "Cloud usage is not enabled for this organization.",
+					i18nKey: "serverError.cloud.cloudUsageNotEnabled",
+				});
+			}
+			const billing = await deps.billing(organizationId);
+			const cloudUsage = billing?.cloudUsage ?? null;
+			// A paid plan whose own rate was not read gets no price: the list rate could be the wrong one.
+			const rate =
+				cloudUsage?.overagePerGbHour ??
+				(billing?.tier === "free" ? await deps.listRatePerGbHour() : null);
+			if (rate === null && cloudUsage && billing?.tier !== "free") {
+				console.warn(
+					`[cloud] ${organizationId} has a paid plan but no GB-hour rate; usage has no price`,
+				);
+			}
+			const scope: CloudUsageScope = isAdmin
+				? { organizationId }
+				: { organizationId, userId: ctx.session.user.id };
+			const anchor = cloudUsage?.resetsAt
+				? cloudBillingAnchor(
+						new Date(cloudUsage.resetsAt),
+						billing?.startedAt ? new Date(billing.startedAt) : null,
+					)
+				: null;
+			return next({ ctx: { scope, isAdmin, cloudUsage, rate, anchor } });
+		});
+	const pageProcedure = scopedProcedure(true);
 
 	return {
 		usage: {
-			query: scopedProcedure
+			query: pageProcedure
 				.input(cloudUsageInputSchema)
 				.output(cloudUsageOutputSchema)
 				.query(async ({ ctx, input }) => {
@@ -212,7 +219,10 @@ export function cloudRouterWith(deps: CloudDeps) {
 						});
 					}
 					const sort =
-						input.sort ?? (input.groupBy === "day" ? null : "gbHours");
+						input.sort ??
+						(input.groupBy === "day" || input.groupBy === "billingDay"
+							? null
+							: "gbHours");
 					const keysetSort =
 						sort === null ? "key" : sort === "gbHours" ? "gbMinutes" : sort;
 					const keyset = readCursor<UsageKeyset>(
@@ -265,7 +275,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 		},
 
 		boots: {
-			list: scopedProcedure
+			list: pageProcedure
 				.input(cloudBootsInputSchema)
 				.output(cloudBootsOutputSchema)
 				.query(async ({ ctx, input }) => {
@@ -304,12 +314,14 @@ export function cloudRouterWith(deps: CloudDeps) {
 
 		periods: {
 			/** Newest first, back to the period the organization was created in. */
-			list: scopedProcedure
+			list: scopedProcedure(false)
 				.input(cloudPeriodsInputSchema)
 				.output(cloudPeriodsOutputSchema)
 				.query(async ({ ctx, input }) => {
 					const { cloudUsage, anchor } = ctx;
-					if (!cloudUsage || !anchor) return { items: [], nextCursor: null };
+					if (!cloudUsage || !anchor) {
+						return { items: [], nextCursor: null, ratePerGbHour: ctx.rate };
+					}
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
 						: -1;
@@ -345,6 +357,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						}),
 						nextCursor:
 							periods.length > input.limit && last ? periodId(last.from) : null,
+						ratePerGbHour: ctx.rate,
 					};
 				}),
 		},

@@ -105,6 +105,11 @@ describe("scope", () => {
 			groupBy: "user",
 		});
 		expect(byUser.items.map((item) => item.key)).toEqual([MAYA, SAM]);
+		expect(byUser.items[1]?.days?.[0]).toEqual({
+			day: "2026-11-01",
+			gbHours: 16,
+			usageUsd: 0.96,
+		});
 		const [open] = (await owner.periods.list({})).items;
 		expect(open?.allowance).toMatchObject({
 			includedGbHours: 20,
@@ -142,6 +147,36 @@ describe("scope", () => {
 			boots: 0,
 			workspaces: 0,
 		});
+	});
+
+	test("billingDay pages Pacific days newest first, one at a time, and day is still the UTC day", async () => {
+		const pages: (string | null)[] = [];
+		let cursor: string | undefined;
+		do {
+			const page = await caller(MAYA).usage.query({
+				range: NOVEMBER,
+				groupBy: "billingDay",
+				limit: 1,
+				cursor,
+			});
+			pages.push(...page.items.map((item) => item.key));
+			cursor = page.nextCursor ?? undefined;
+		} while (cursor);
+		expect(pages).toEqual([...pages].sort().reverse());
+		expect(new Set(pages).size).toBe(pages.length);
+		const byDay = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "day",
+		});
+		const byBillingDay = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "billingDay",
+		});
+		expect(byBillingDay.total.gbHours).toBe(byDay.total.gbHours);
+		expect(byBillingDay.total.workspaces).toBeNull();
+		expect(byBillingDay.items[0]?.workspaces).toBeNull();
+		expect(typeof byDay.total.workspaces).toBe("number");
+		expect(byDay.items.map((item) => item.key)).toContain("2026-11-01");
 	});
 
 	test("a workspace in another organization returns nothing", async () => {
@@ -250,6 +285,23 @@ describe("scope", () => {
 			caller(SAM).usage.query({ range: NOVEMBER, groupBy: "user" }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
 	});
+
+	test("a member opening another person's workspace by id gets nothing of it", async () => {
+		const member = caller(SAM);
+		const usage = await member.usage.query({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+			groupBy: "workspace",
+			limit: 1,
+		});
+		expect(usage.items).toEqual([]);
+		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
+		const boots = await member.boots.list({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+		});
+		expect(boots.items).toEqual([]);
+	});
 });
 
 const encoded = (cursor: object) =>
@@ -310,7 +362,7 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 		{ range: NOVEMBER, groupBy: "workspace", search: "e" },
 		{ range: NOVEMBER, groupBy: "workspace", sort: "hours" },
 		{ range: NOVEMBER, groupBy: "workspace", order: "asc" },
-	] as const) {
+	] satisfies Parameters<typeof owner.usage.query>[0][]) {
 		await expect(
 			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
 		).rejects.toMatchObject(notValid);
@@ -400,17 +452,24 @@ test("sorting by name or status needs grouping by workspace", async () => {
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
-test("with the flag off every procedure is FORBIDDEN and billing is not read", async () => {
+test("with the flag off the usage pages are FORBIDDEN and billing is not read", async () => {
 	const readCloudUsage = mock(async () => CLOUD_USAGE);
 	const off = caller(MAYA, { enabled: false, readCloudUsage });
 	for (const call of [
 		() => off.usage.query({ range: "7d" }),
 		() => off.boots.list({ range: "7d" }),
-		() => off.periods.list({}),
 	]) {
 		await expect(call()).rejects.toMatchObject({ code: "FORBIDDEN" });
 	}
 	expect(readCloudUsage).not.toHaveBeenCalled();
+});
+
+test("with the flag off Billing still reads the open period and its allowance", async () => {
+	const [open] = (await caller(MAYA, { enabled: false }).periods.list({}))
+		.items;
+	expect(open?.closed).toBe(false);
+	expect(open?.allowance).toMatchObject({ includedGbHours: 20 });
+	expect(open?.metrics.gbHours).toBe(34);
 });
 
 test("periods run from the open one back to the one the organization was created in", async () => {
@@ -445,7 +504,11 @@ test("with billing off there are no periods and no prices", async () => {
 		billingOff: true,
 		listRatePerGbHour: async () => 0.06,
 	});
-	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
+	expect(await owner.periods.list({})).toEqual({
+		items: [],
+		nextCursor: null,
+		ratePerGbHour: null,
+	});
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
@@ -463,7 +526,9 @@ test("the open period's allowance is in dollars at the usage rate, with bought a
 			overageLimit: { type: "absolute", gbMinutes: 6000 },
 		}),
 	});
-	const [open] = (await owner.periods.list({})).items;
+	const { items, ratePerGbHour } = await owner.periods.list({});
+	expect(ratePerGbHour).toBe(0.06);
+	const [open] = items;
 	expect(open?.allowance).toMatchObject({
 		usedUsd: 2.04,
 		includedUsd: 1.2,
@@ -533,9 +598,15 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 		limitReached: null,
 	});
 	expect(open?.unavailable).toEqual(
-		["seats", "bought", "freeCredits", "extraUsageLimit", "limitReached"].map(
-			(field) => ({ field, reason: "not_read" }),
-		),
+		(
+			[
+				"seats",
+				"bought",
+				"freeCredits",
+				"extraUsageLimit",
+				"limitReached",
+			] as const
+		).map((field) => ({ field, reason: "not_read" })),
 	);
 });
 

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import { generateDrizzleJson, generateMigration } from "drizzle-kit/api";
 import {
@@ -31,6 +32,12 @@ export const NOVEMBER = {
 };
 export const RATE = 0.06;
 
+const CLOUD_USAGE_DAILY_MIGRATIONS = [
+	"0201_cloud_usage_daily_trigger.sql",
+	"0202_cloud_usage_daily_backfill.sql",
+	"0204_cloud_billing_day_start.sql",
+].map((name) => new URL(`../drizzle/${name}`, import.meta.url));
+
 /** An in-process Postgres with the cloud usage tables, seeded with two organizations. */
 export async function seedCloudUsage() {
 	const tables = new Set<PgTable>();
@@ -43,6 +50,7 @@ export async function seedCloudUsage() {
 	};
 	withParents(schema.cloudUsageEvents);
 	withParents(schema.members);
+	withParents(schema.cloudUsageDaily);
 	const types = Object.values(schema).filter(
 		(value) => isPgEnum(value) || isPgSchema(value),
 	);
@@ -57,6 +65,9 @@ export async function seedCloudUsage() {
 	);
 	const client = new PGlite();
 	await client.exec(ddl.join(";\n"));
+	for (const migration of CLOUD_USAGE_DAILY_MIGRATIONS) {
+		await client.exec(readFileSync(migration, "utf8"));
+	}
 	const db = drizzle({ client, schema, casing: "snake_case" });
 
 	await db.insert(schema.organizations).values([

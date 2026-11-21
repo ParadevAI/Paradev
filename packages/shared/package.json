@@ -24,6 +24,7 @@
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./cloud-usage-display": "./src/cloud-usage-display.ts",
 		"./slack-links": {
 			"types": "./src/slack-links.ts",
 			"default": "./src/slack-links.ts"
@@ -392,6 +393,10 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./cloud-usage-api": {
+			"types": "./src/cloud-usage-api.ts",
+			"default": "./src/cloud-usage-api.ts"
+		},
 		"./box-pressure": {
 			"types": "./src/box-pressure.ts",
 			"default": "./src/box-pressure.ts"
@@ -516,6 +521,10 @@
 			"types": "./src/github-remote.ts",
 			"default": "./src/github-remote.ts"
 		},
+		"./resolve-command": {
+			"types": "./src/resolve-command.ts",
+			"default": "./src/resolve-command.ts"
+		},
 		"./simple-git-options": {
 			"types": "./src/simple-git-options.ts",
 			"default": "./src/simple-git-options.ts"
@@ -523,6 +532,10 @@
 		"./shell-ready-scanner": {
 			"types": "./src/shell-ready-scanner.ts",
 			"default": "./src/shell-ready-scanner.ts"
+		},
+		"./shell-exit-marker": {
+			"types": "./src/shell-exit-marker.ts",
+			"default": "./src/shell-exit-marker.ts"
 		},
 		"./leaked-input-mode-reclaim": {
 			"types": "./src/leaked-input-mode-reclaim.ts",

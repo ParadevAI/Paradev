@@ -1,5 +1,6 @@
+export * from "./model-catalog";
 /**
- * Curated per-agent model, effort, and launch-mode catalogs for the
+ * Bundled per-agent model, effort, and launch-mode fallbacks for the
  * workspace-create pickers.
  *
  * Entries are keyed by terminal-agent presetId (see
@@ -10,8 +11,8 @@
  * The virtual `omp` preset is resolved from the configured executable so OMP
  * options never leak onto the legacy `pi` CLI.
  *
- * The lists are hand-maintained and expected to drift with CLI releases —
- * update them here when a tool adds or retires models.
+ * Live model discovery takes precedence where the harness supports it.
+ * These lists keep older hosts and offline pickers usable.
  */
 
 export interface AgentModelOption {
@@ -853,6 +854,22 @@ export function isCuratedAgentModel(presetId: string, model: string): boolean {
 	);
 }
 
+const LISTS_OWN_MODELS = new Set(["codex", "opencode", "cursor-agent"]);
+
+/**
+ * True for a bundled model, and for any well-formed id on an agent that lists
+ * its own models: the CLI decides whether that id exists.
+ */
+export function isLaunchableAgentModel(
+	presetId: string,
+	model: string,
+): boolean {
+	return (
+		isCuratedAgentModel(presetId, model) ||
+		(LISTS_OWN_MODELS.has(presetId) && /^[^\s\p{Cc}]{1,200}$/u.test(model))
+	);
+}
+
 /**
  * Argv tokens that select `model` for the given preset, e.g.
  * `["--model", "sonnet"]`. Returns `[]` for unknown presets, presets without
@@ -871,7 +888,7 @@ export function buildAgentModelArgs(
 	if (!model) return [];
 	const support = getAgentModelSupport(presetId);
 	if (!support?.modelFlag) return [];
-	if (!isCuratedAgentModel(presetId, model)) return [];
+	if (!isLaunchableAgentModel(presetId, model)) return [];
 	const variant = effort
 		? getAgentEffortSupport(presetId)?.modelVariants?.[model]?.[effort]
 		: undefined;

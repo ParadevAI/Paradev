@@ -1,118 +1,122 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import {
+	type Amount,
+	type CloudAllowance,
+	cloudUsageDisplay,
+} from "@superset/shared/cloud-usage-display";
 import type { ReactNode } from "react";
+import { Badge } from "../../../ui/badge";
+import {
+	Card,
+	CardAction,
+	CardContent,
+	CardHeader,
+	CardTitle,
+} from "../../../ui/card";
+import { BOX } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
-import type { CloudPeriod } from "../../types";
-import type { PricedAllowance, PricedMetrics } from "../../utils/priced";
 import { AllowanceLines } from "./components/AllowanceLines";
-import { allowanceLines } from "./utils/allowanceLines";
-
-type Reason = CloudPeriod["unavailable"][number]["reason"];
+import { SEGMENT_COLORS } from "./constants";
 
 interface AllowanceCardProps {
-	total: PricedMetrics;
-	/** Undefined when the organization has no billing periods and the range is the last 30 days. */
-	period: CloudPeriod | undefined;
-	/** The period's allowance; null for a closed period. */
-	allowance: PricedAllowance | null;
+	/** Our own count of the range's usage, shown when billing gives no breakdown. */
+	metered: Amount;
+	/** The organization's price of one GB-hour, from `cloud.periods.list`. */
+	ratePerGbHour: number | null;
+	/** Null for a past period. */
+	allowance: CloudAllowance | null;
+	/** What billing could not give; a `not_read` entry means no breakdown yet. */
+	unavailable: readonly { reason: string }[];
+	/** False for the last 30 days of an organization with no billing periods. */
+	isPeriod: boolean;
 	billing: ReactNode;
+	seats: number | null;
 }
 
-/** What the card says, once per reason, about a value the router could not give. A member never sees the card. */
-const NOTES: Record<Exclude<Reason, "owners_and_admins_only">, ReactNode> = {
-	closed_period: (
-		<Trans>The breakdown by plan is kept for the current period only.</Trans>
-	),
-	not_read: (
-		<Trans>
-			Seats, credits and the extra-usage limit are not loaded yet. They show
-			after billing data next refreshes.
-		</Trans>
-	),
-	percent_of_allowance: (
-		<Trans>
-			The extra-usage limit is a percentage of the plan, so its amount is not
-			shown.
-		</Trans>
-	),
-	not_tracked: (
-		<Trans>This page cannot tell when the usage limit is reached.</Trans>
-	),
-};
-
 export function AllowanceCard({
-	total,
-	period,
+	metered,
+	ratePerGbHour,
 	allowance,
+	unavailable,
+	isPeriod,
 	billing,
+	seats,
 }: AllowanceCardProps) {
 	const { dollarsFor } = useUsageFormat();
-	const summary =
-		allowance?.includedGbHours != null && allowance.includedUsd !== null
-			? allowanceLines(
-					allowance,
-					{ gbHours: allowance.includedGbHours, usd: allowance.includedUsd },
-					{ gbHours: total.gbHours, usd: total.usageUsd },
-					period?.unavailable
-						.filter((item) => item.reason === "not_read")
-						.map((item) => item.field),
-				)
-			: null;
-	const dollars = dollarsFor([
-		total.usageUsd,
-		...(summary
-			? [
-					summary.used.usd,
-					summary.cap.usd,
-					...summary.lines.flatMap((line) => [
-						line.used.usd,
-						...(line.total ? [line.total.usd] : []),
-					]),
-				]
-			: []),
-	]);
-	const used = dollars(summary ? summary.used.usd : total.usageUsd);
-	const cap = summary && dollars(summary.cap.usd);
-	const reasons = new Set(period?.unavailable.map((item) => item.reason));
-	const notes = (Object.keys(NOTES) as (keyof typeof NOTES)[]).filter(
-		(reason) => reasons.has(reason),
+	const shown = cloudUsageDisplay(
+		unavailable.some((item) => item.reason === "not_read") ? null : allowance,
+		metered,
+		ratePerGbHour,
 	);
+	const dollars = dollarsFor([
+		shown.used.usd,
+		...(shown.held ? [shown.held.usd] : []),
+		...(shown.over ? [shown.over.usd] : []),
+		...shown.lines.flatMap((line) => [line.used.usd, line.total.usd]),
+	]);
+	const used = dollars(shown.used.usd);
+	const held = shown.held && dollars(shown.held.usd);
+	const over = shown.over && dollars(shown.over.usd);
+	const segments = [
+		...shown.lines.map((line) => ({ kind: line.kind, usd: line.used.usd })),
+		...(shown.over ? [{ kind: "over" as const, usd: shown.over.usd }] : []),
+	];
+	const scale = Math.max(shown.held?.usd ?? 0, shown.used.usd) || 1;
 
 	return (
-		<section className="space-y-3 rounded-lg bg-muted/60 p-4">
-			<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-				<h3 className="text-base tabular-nums">
+		<Card className={BOX}>
+			<CardHeader className="items-center">
+				<CardTitle
+					role="heading"
+					aria-level={3}
+					className="flex flex-wrap items-baseline gap-x-1.5 text-base font-normal tabular-nums"
+				>
 					<span className="font-semibold">
 						<Trans>{used} used</Trans>
-					</span>{" "}
+					</span>
 					<span className="text-muted-foreground">
-						{summary?.headline === "limit" ? (
-							<Trans>of {cap} limit</Trans>
-						) : summary?.headline === "included" ? (
-							<Trans>of {cap} included</Trans>
-						) : period ? (
+						{held ? (
+							<Trans>of {held}</Trans>
+						) : isPeriod ? (
 							<Trans>in this period</Trans>
 						) : (
 							<Trans>in the last 30 days</Trans>
 						)}
 					</span>
-				</h3>
-				{billing}
-			</div>
-			{summary && allowance && (
-				<AllowanceLines
-					lines={summary.lines}
-					scale={summary.scale}
-					seats={allowance.seats}
-					format={dollars}
-				/>
+					{over && (
+						<Badge variant="warning" className="self-center">
+							<Trans>{over} overage</Trans>
+						</Badge>
+					)}
+				</CardTitle>
+				<CardAction>{billing}</CardAction>
+			</CardHeader>
+			{shown.held && (
+				<CardContent className="space-y-3">
+					<div
+						role="img"
+						aria-label={`${used} / ${held}`}
+						className="flex h-2.5 overflow-hidden rounded-full bg-foreground/15"
+					>
+						{segments.map((segment) => (
+							<span
+								key={segment.kind}
+								className={SEGMENT_COLORS[segment.kind]}
+								style={{ width: `${(segment.usd / scale) * 100}%` }}
+							/>
+						))}
+					</div>
+					{shown.lines.length > 1 && (
+						<AllowanceLines
+							lines={shown.lines}
+							seats={seats}
+							format={dollars}
+						/>
+					)}
+				</CardContent>
 			)}
-			{notes.map((reason) => (
-				<p key={reason} className="text-xs text-muted-foreground">
-					{NOTES[reason]}
-				</p>
-			))}
-		</section>
+		</Card>
 	);
 }

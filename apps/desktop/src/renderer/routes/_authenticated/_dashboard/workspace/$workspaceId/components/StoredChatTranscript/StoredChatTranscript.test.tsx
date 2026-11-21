@@ -115,7 +115,7 @@ test("a cloud workspace's stored chat renders while its box wakes, with no works
 						value={{
 							targets: [],
 							isReady: true,
-							agentCredentialsChangedWorkspaceId: null,
+							agentsToRestart: null,
 							usageRefusal: null,
 							wakeOpenWorkspace: async () => {},
 						}}

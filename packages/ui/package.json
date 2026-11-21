@@ -18,6 +18,7 @@
 		"./share-access": "./src/components/ShareAccess/index.ts",
 		"./pixel-404": "./src/components/Pixel404/index.ts",
 		"./star-chart": "./src/components/StarChart/index.ts",
+		"./date-range-picker": "./src/components/DateRangePicker/index.ts",
 		"./mesh-gradient": "./src/components/mesh-gradient.tsx",
 		"./icons/preset-icons": "./src/assets/icons/preset-icons/index.ts",
 		"./icons/preset-icons/*": "./src/assets/icons/preset-icons/*.svg",
@@ -27,7 +28,8 @@
 		"./*": "./src/components/ui/*.tsx",
 		"./app-store-qr": "./src/components/AppStoreQr/index.ts",
 		"./pro-features-dialog": "./src/components/ProFeaturesDialog/index.ts",
-		"./cloud-usage-page": "./src/components/CloudUsagePage/index.ts"
+		"./cloud-usage-page": "./src/components/CloudUsagePage/index.ts",
+		"./page-link": "./src/components/PageLink/index.ts"
 	},
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
@@ -108,8 +110,6 @@
 		"@lingui/babel-plugin-lingui-macro": "6.12.0",
 		"@rolldown/plugin-babel": "0.3.0",
 		"@storybook/react-vite": "10.6.2",
-		"@superset/auth": "workspace:*",
-		"@superset/trpc": "workspace:*",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/postcss": "4.2.2",
 		"@tailwindcss/vite": "4.2.2",

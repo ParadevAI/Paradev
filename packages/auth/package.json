@@ -24,6 +24,10 @@
 			"types": "./src/lib/billing/autumn/cloud-usage.ts",
 			"default": "./src/lib/billing/autumn/cloud-usage.ts"
 		},
+		"./billing/aws-marketplace": {
+			"types": "./src/lib/billing/aws-marketplace/index.ts",
+			"default": "./src/lib/billing/aws-marketplace/index.ts"
+		},
 		"./billing": {
 			"types": "./src/lib/billing/index.ts",
 			"default": "./src/lib/billing/index.ts"
@@ -39,6 +43,8 @@
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {
+		"@aws-sdk/client-marketplace-entitlement-service": "3.1150.0",
+		"@aws-sdk/client-marketplace-metering": "3.1150.0",
 		"@better-auth/api-key": "1.6.22",
 		"@better-auth/expo": "1.6.22",
 		"@better-auth/oauth-provider": "1.6.22",
@@ -63,6 +69,7 @@
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
+		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

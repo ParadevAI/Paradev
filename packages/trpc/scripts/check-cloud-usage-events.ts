@@ -6,6 +6,7 @@ import {
 	autumnUsageByLock,
 	LOCK_SETTLED_MS,
 } from "@superset/db/cloud-usage-autumn";
+import { recordedUsage } from "@superset/db/cloud-usage-events";
 import { cloudUsageEvents, cloudWorkspaceBoots } from "@superset/db/schema";
 import { and, isNull, lt } from "drizzle-orm";
 
@@ -71,15 +72,7 @@ for (const lock of locks) {
 	if (lock.lastEventAt >= settledBefore) unsettled.add(key(lock));
 }
 const ours = new Map<string, number>();
-for (const row of await db
-	.select({
-		bootId: cloudUsageEvents.bootId,
-		lockSeq: cloudUsageEvents.lockSeq,
-		feature: cloudUsageEvents.feature,
-		amount: cloudUsageEvents.amount,
-		sentAt: cloudUsageEvents.sentAt,
-	})
-	.from(cloudUsageEvents)) {
+for (const row of await recordedUsage(db)) {
 	if (!closed.has(row.bootId)) continue;
 	ours.set(key(row), (ours.get(key(row)) ?? 0) + Number(row.amount));
 	if (!row.sentAt || row.sentAt.getTime() >= settledBefore) {

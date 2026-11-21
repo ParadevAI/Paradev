@@ -1,12 +1,15 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { useFormat } from "@superset/i18n/react";
-import { Progress } from "@superset/ui/progress";
-import { useQuery } from "@tanstack/react-query";
+import { authClient } from "@superset/auth/client";
+import {
+	BillingUsageCard,
+	GbHourPurchase,
+} from "@superset/ui/cloud-usage-page";
+import { PageLink } from "@superset/ui/page-link";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTRPC } from "@/trpc/react";
-import { GbHourPurchase } from "./components/GbHourPurchase";
 
 interface CloudUsageCardProps {
 	organizationId: string | null;
@@ -20,85 +23,49 @@ export function CloudUsageCard({
 	showUsageLink,
 }: CloudUsageCardProps) {
 	const trpc = useTRPC();
-	const { formatDate, formatGbHours } = useFormat();
+	const queryClient = useQueryClient();
 	const { data: usage } = useQuery(trpc.billing.cloudUsage.queryOptions());
-
-	if (
-		!usage ||
-		(usage.includedGbMinutes === 0 &&
-			usage.usedGbMinutes === 0 &&
-			usage.overageGbMinutes === 0 &&
-			usage.prepaidGbMinutes === 0 &&
-			!usage.pack)
-	) {
-		return null;
-	}
-
-	const gbHours = (gbMinutes: number) => formatGbHours(gbMinutes / 60);
-	const used = gbHours(usage.usedGbMinutes);
-	const included =
-		usage.includedGbMinutes === null ? null : gbHours(usage.includedGbMinutes);
-	const overage =
-		usage.overageGbMinutes > 0 ? gbHours(usage.overageGbMinutes) : null;
-	const prepaid =
-		usage.prepaidGbMinutes > 0 ? gbHours(usage.prepaidGbMinutes) : null;
-	const resetDate = usage.resetsAt
-		? formatDate(new Date(usage.resetsAt))
-		: null;
-	const percentUsed =
-		usage.includedGbMinutes && usage.includedGbMinutes > 0
-			? Math.min(100, (usage.usedGbMinutes / usage.includedGbMinutes) * 100)
-			: 100;
+	const { data: periods } = useQuery(
+		trpc.cloud.periods.list.queryOptions({ limit: 1 }),
+	);
+	if (!usage) return null;
 
 	return (
 		<div className="space-y-3 border-t pt-6">
-			<div className="flex items-baseline justify-between gap-4">
-				<div className="flex items-center gap-2 text-sm font-medium">
-					<Trans>Cloud usage</Trans>
-				</div>
-				<div className="flex items-baseline gap-3 text-sm">
-					{resetDate && (
-						<span className="text-muted-foreground">
-							<Trans>Resets {resetDate}</Trans>
-						</span>
-					)}
-					{showUsageLink && (
-						<Link
-							href="/settings/cloud-usage"
-							className="text-primary hover:underline"
-						>
-							<Trans>See usage</Trans>
-						</Link>
-					)}
-				</div>
-			</div>
-			<div className="text-sm tabular-nums">
-				{included === null ? (
-					<Trans>GB-hours used: {used}</Trans>
-				) : (
-					<Trans>
-						GB-hours used: {used} of {included}
-					</Trans>
-				)}
-			</div>
-			{usage.includedGbMinutes !== null && usage.includedGbMinutes > 0 && (
-				<Progress value={percentUsed} />
-			)}
-			{prepaid && (
-				<div className="text-sm text-muted-foreground tabular-nums">
-					<Trans>Bought GB-hours left: {prepaid}</Trans>
-				</div>
-			)}
-			{overage && (
-				<div className="text-sm text-warning tabular-nums">
-					<Trans>GB-hours over the plan: {overage}</Trans>
-				</div>
-			)}
+			<BillingUsageCard
+				period={periods?.items[0]}
+				ratePerGbHour={periods?.ratePerGbHour ?? null}
+				link={
+					showUsageLink && (
+						<PageLink>
+							<Link href="/settings/cloud-usage">
+								<Trans>Cloud usage</Trans>
+							</Link>
+						</PageLink>
+					)
+				}
+			/>
 			{canBuy && usage.pack && organizationId && (
 				<GbHourPurchase
 					organizationId={organizationId}
 					pack={usage.pack}
 					autoTopup={usage.autoTopup}
+					post={(path, body) =>
+						authClient.$fetch(path, { method: "POST", body, throw: true })
+					}
+					refresh={() =>
+						Promise.all([
+							queryClient.invalidateQueries({
+								queryKey: trpc.billing.cloudUsage.queryKey(),
+							}),
+							queryClient.invalidateQueries({
+								queryKey: trpc.billing.activePlan.queryKey(),
+							}),
+							queryClient.invalidateQueries({
+								queryKey: trpc.cloud.periods.list.queryKey(),
+							}),
+						])
+					}
 				/>
 			)}
 		</div>

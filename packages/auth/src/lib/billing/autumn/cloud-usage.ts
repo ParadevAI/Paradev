@@ -1,11 +1,11 @@
 import {
 	ALLOWANCE_UNAVAILABLE_FIELDS,
 	type ALLOWANCE_UNAVAILABLE_REASONS,
+	BOX_GB_MINUTES_FEATURE_ID,
 	type GbHourPack,
 	gbMinutesUsd,
 } from "@superset/shared/billing";
 import type { getAutumnCustomer } from "./customer";
-import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
 
 export interface CloudAutoTopup {
 	enabled: boolean;
@@ -108,7 +108,13 @@ export function cloudUsageFromBalances(
 			: balance.usage,
 		overageGbMinutes: balance.unlimited
 			? 0
-			: Math.max(0, balance.usage - balance.granted),
+			: breakdown.length
+				? sum(
+						recurring
+							.filter((item) => item.price?.billingMethod === "usage_based")
+							.map((item) => Math.max(0, item.usage - item.includedGrant)),
+					)
+				: Math.max(0, balance.usage - balance.granted),
 		prepaidGbMinutes: Math.max(0, sum(prepaid.map((item) => item.remaining))),
 		bought: credit(prepaid.filter(isBought)),
 		freeCredits: credit(prepaid.filter((item) => !isBought(item))),

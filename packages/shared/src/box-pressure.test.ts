@@ -8,7 +8,6 @@ import {
 const busy: BoxPressure = {
 	level: "busy",
 	limitedBy: ["cpu"],
-	reap: null,
 	at: 1,
 };
 
@@ -19,15 +18,18 @@ describe("parseBoxPressure", () => {
 		).toEqual({ ...busy, limitedBy: ["cpu", "memory"] });
 	});
 
-	test("rejects an unknown level, an unknown resource or a bad reap", () => {
+	test("rejects an unknown level or an unknown resource", () => {
 		expect(parseBoxPressure({ ...busy, level: "ok" })).toBeNull();
 		expect(parseBoxPressure({ ...busy, limitedBy: ["disk"] })).toBeNull();
+	});
+
+	test("drops the process kill an older box still sends", () => {
 		expect(
 			parseBoxPressure({
 				...busy,
-				reap: { processName: "tsc", rssMb: -1, at: 1 },
+				reap: { processName: "tsc", rssMb: 3100, at: 1 },
 			}),
-		).toBeNull();
+		).toEqual(busy);
 	});
 });
 

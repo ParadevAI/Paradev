@@ -469,6 +469,7 @@ msgstr "{0} 끝자리 {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where}에 파일 {0}개가 이미 있습니다. 바꿀까요?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB 시간"
@@ -783,6 +784,9 @@ msgstr "{actor} 님이 워크스페이스 {workspace}의 연결을 해제했습�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "현재 {actual} · 예상 ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel}에서는 서브 에이전트에게 메시지를 보낼 수 없습니다."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} 세션은 해당 워크스페이스를 열면 재개됩니다."
 
@@ -1028,6 +1032,9 @@ msgstr "{fileCount, plural, one {이 워크스페이스에서 변경된 파일 #
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {파일 #개 편집} other {파일 #개 편집}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{total}개 중 {first}–{last}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "포커스하려면 {focusShortcutText}"
 
@@ -1166,8 +1173,17 @@ msgstr "{name}이(가) 요청함"
 msgid "{name} can't be messaged"
 msgstr "{name}에게 메시지를 보낼 수 없습니다"
 
+msgid "{name} can't take messages now."
+msgstr "{name}은(는) 지금 메시지를 받을 수 없습니다."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name}은(는) 메시지를 받을 수 없습니다. 입력한 텍스트는 기본 채팅으로 돌아갔습니다."
+
 msgid "{name} failed"
 msgstr "{name} 실패"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name}이(가) 실패하여 메시지를 받을 수 없습니다."
 
 msgid "{name} finished"
 msgstr "{name} 완료"
@@ -1202,6 +1218,9 @@ msgstr "{name} 작업 시작"
 msgid "{name} stopped"
 msgstr "{name} 중지됨"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name}이(가) 중지되어 메시지를 받을 수 없습니다."
+
 msgid "{name} wants more access"
 msgstr "{name}에서 더 많은 접근 권한을 요청합니다"
 
@@ -1214,6 +1233,9 @@ msgstr "{name}: 사용자당 월 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 사용자당 월 {monthly}, 또는 연간 결제 시 {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names}은(는) 아직 이전 로그인을 사용 중입니다. 새 로그인을 사용하려면 다시 시작하세요."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {사람을 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} sender {발신자를 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} other {항목을 하나 이상 지정하거나 {choice} 옵션을 선택하세요.}}"
 
@@ -1225,6 +1247,9 @@ msgstr "{openCount}개 열림"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {이 워크스페이스에서 함께 변경됨: 파일 #개} other {이 워크스페이스에서 함께 변경됨: 파일 #개}}"
+
+msgid "{over} overage"
+msgstr "초과 {over}"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle}은(는) 사용자 본인으로서 {pluginLabel} 계정의 데이터를 읽고 변경할 수 있으며, 이 페이지의 향후 버전에도 적용됩니다. 읽은 내용을 다른 웹사이트로 보낼 수 있습니다. 신뢰하는 페이지만 허용하세요."
@@ -1327,8 +1352,8 @@ msgstr "{pullRequests} · 대상 {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {대기열에서 대기 중인 메시지 #개} other {대기열에서 대기 중인 메시지 #개}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "GB 시간당 {rate}. 월간 풀 다음에 사용되며 만료되지 않습니다."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "GB-시간당 {rate}. 플랜에 포함된 사용량 다음에 사용되며 만료되지 않습니다."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% 읽음"
@@ -1349,9 +1374,6 @@ msgstr "{remaining} 토큰 남음"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {#개 행 중 {first}–{last}}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {좌석 #개에 포함}}"
@@ -1658,9 +1680,6 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Union Square Ventures가 주도한 1,150만 달러 시드 투자"
 
-msgid "0 rows"
-msgstr "0개 행"
-
 msgid "1"
 msgstr "1"
 
@@ -1763,6 +1782,9 @@ msgstr "이 세션에서 200K 중 87.4K 토큰을 사용했습니다."
 
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "더 나은 인앱 브라우저입니다. 변경 사항을 미리 보고, 아무 요소나 클릭해 에이전트에 컨텍스트로 보내세요."
+
+msgid "A build of this environment is already running"
+msgstr "이 환경의 빌드가 이미 실행 중입니다"
 
 msgid "A CDP endpoint per pane"
 msgstr "패널마다 전용 CDP 엔드포인트"
@@ -2371,9 +2393,6 @@ msgstr "에이전트 명령"
 msgid "Agent Configs"
 msgstr "에이전트 설정"
 
-msgid "Agent credentials changed"
-msgstr "에이전트 자격 증명이 변경됨"
-
 msgid "Agent finished"
 msgstr "에이전트 완료"
 
@@ -2779,6 +2798,9 @@ msgstr "참고: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습니다. 알림을 누르면 막힌 에이전트로 바로 이동합니다."
+
+msgid "Amount of GB-hours"
+msgstr "GB-시간 수량"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
@@ -3490,12 +3512,18 @@ msgstr "실행 중"
 msgid "Away"
 msgstr "자리 비움"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace에서 응답이 없습니다. 몇 분 후에 다시 시도하세요."
+
 msgid "Back"
 msgstr "뒤로"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "뒤로"
+
+msgid "Back to {parentTitle}"
+msgstr "{parentTitle}(으)로 돌아가기"
 
 msgid "Back to About"
 msgstr "소개로 돌아가기"
@@ -3599,6 +3627,9 @@ msgstr "지금 만들고 있습니다."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "그 너머: F5는 단기 전망이 아닙니다"
 
+msgid "Billed hours"
+msgstr "청구 시간"
+
 msgid "Billed monthly"
 msgstr "월간 결제"
 
@@ -3614,8 +3645,8 @@ msgstr "결제"
 msgid "Billing details"
 msgstr "결제 정보"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "결제에서 클라우드 워크스페이스 시작을 거부했습니다. 조직의 플랜에 클라우드 워크스페이스가 포함되어 있지 않거나 클라우드 사용 한도에 도달했습니다. 클라우드 워크스페이스에는 Team 또는 Ultra 플랜이 필요합니다. 설정 > 결제에서 업그레이드하거나 한도를 높이거나, 기기에서 자동화를 실행하세요."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "결제에서 클라우드 워크스페이스 시작을 거부했습니다. 플랜에 클라우드 워크스페이스가 포함되어 있지 않거나, 조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 설정의 결제를 확인하거나 기기에서 자동화를 실행하세요."
 
 msgid "Binary"
 msgstr "바이너리"
@@ -3696,9 +3727,6 @@ msgstr "하단 드로어로, 터치 기기에서 스와이프하기 좋습니다
 
 msgid "Bought credits"
 msgstr "구매한 크레딧"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "구매한 GB 시간 잔여: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Dock 아이콘 튀기기"
@@ -3898,9 +3926,6 @@ msgstr "버튼, 토글, 키보드 어포던스"
 
 msgid "Buy"
 msgstr "구매"
-
-msgid "Buy extra GB-hours"
-msgstr "추가 GB 시간 구매"
 
 msgid "Buy for {total}"
 msgstr "{total}에 구매"
@@ -4273,9 +4298,6 @@ msgstr "채널 옵션"
 msgid "Channels"
 msgstr "채널"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 더 결제합니다."
-
 msgid "Chat"
 msgstr "채팅"
 
@@ -4469,6 +4491,9 @@ msgstr "선택하세요"
 
 msgid "Choose the model"
 msgstr "모델 선택"
+
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "AWS Marketplace가 청구할 조직을 선택하세요. 구독 하나에는 조직 하나만 연결할 수 있습니다."
 
 msgid "Choose the primary repository"
 msgstr "기본 리포지토리 선택"
@@ -4859,6 +4884,24 @@ msgstr "클라우드 사용량"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "이 조직에는 클라우드 사용량이 켜져 있지 않습니다."
 
+msgid "Cloud usage is used up for this period."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 더 구매할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 Team 또는 Ultra로 업그레이드할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 10분 후에 중지됩니다. 소유자가 더 구매하면 계속 실행할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 10분 후에 중지됩니다. 소유자가 Team 또는 Ultra로 업그레이드하면 계속 실행할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 워크스페이스를 시작할 수 없습니다."
+
 msgid "Cloud workspace"
 msgstr "클라우드 워크스페이스"
 
@@ -4886,9 +4929,6 @@ msgstr "{account}에는 클라우드 워크스페이스가 활성화되어 있�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "클라우드 워크스페이스는 현재 플랜에 포함되어 있지 않습니다."
-
-msgid "Cloud workspaces cannot start."
-msgstr "클라우드 워크스페이스를 시작할 수 없습니다."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "클라우드 워크스페이스가 사용자 본인으로 커밋, 푸시하고 풀 리퀘스트를 엽니다"
@@ -5291,6 +5331,9 @@ msgstr "연결하면 워크스페이스가 아닌 본인 계정으로 풀 리퀘
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} 계정을 연결한 다음 이 페이지를 새로 고치세요."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "AWS Marketplace 구독 연결"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6798,6 +6841,9 @@ msgstr "맞춤 가격"
 msgid "Custom provider"
 msgstr "사용자 지정 제공사"
 
+msgid "Custom range…"
+msgstr "사용자 지정 범위…"
+
 msgid "Custom themes"
 msgstr "사용자 지정 테마"
 
@@ -6882,6 +6928,9 @@ msgstr "날짜(일)"
 
 msgid "Day One"
 msgstr "데이 원"
+
+msgid "Days are in Pacific time."
+msgstr "날짜는 태평양 시간 기준입니다."
 
 msgid "days running three agents at once"
 msgstr "에이전트 세 개를 동시에 돌린 일수"
@@ -8323,9 +8372,6 @@ msgstr "외부 브라우저"
 msgid "extra ${used} of ${limit}"
 msgstr "${limit} 중 추가 ${used}"
 
-msgid "Extra GB-hours"
-msgstr "추가 GB 시간"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "필요할 때 구매하는 추가 GB 시간"
 
@@ -8334,9 +8380,6 @@ msgstr "매우 높음"
 
 msgid "Extra small"
 msgstr "아주 작음"
-
-msgid "Extra usage"
-msgstr "추가 사용량"
 
 msgid "Extra usage limit reached"
 msgstr "추가 사용량 한도에 도달했습니다"
@@ -9324,10 +9367,6 @@ msgstr "창립 엔지니어"
 msgid "Free"
 msgstr "무료"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "무료"
-
 msgid "Free credits"
 msgstr "무료 크레딧"
 
@@ -9429,18 +9468,6 @@ msgstr "열린 관문"
 
 msgid "GB-hours"
 msgstr "GB 시간"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "플랜 초과 GB 시간: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "풀을 넘는 GB 시간"
-
-msgid "GB-hours used: {used}"
-msgstr "사용한 GB 시간: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "사용한 GB 시간: {included} 중 {used}"
 
 msgid "General"
 msgstr "일반"
@@ -9648,6 +9675,12 @@ msgstr "홈으로 돌아가기"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "{appName}(으)로 돌아가서 다시 로그인하세요."
+
+msgid "Go back to {parentTitle}."
+msgstr "{parentTitle}(으)로 돌아가세요."
+
+msgid "Go back to message the main agent."
+msgstr "기본 에이전트에게 메시지를 보내려면 돌아가세요."
 
 msgid "Go back to the previous page in history"
 msgstr "기록에서 이전 페이지로 돌아갑니다"
@@ -9985,9 +10018,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "매시간"
-
-msgid "Hours"
-msgstr "시간"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "시간은 팀 전체가 공유합니다. 표준 {vcpus} vCPU / {memoryGb} GB 워크스페이스 기준이며, 더 큰 머신은 더 빨리 사용합니다."
@@ -10750,6 +10780,12 @@ msgstr "되돌릴 수 없습니다."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "\"{profileName}\" 프로필의 쿠키를 앱 내 브라우저로 복사합니다. 그러면 에이전트가 로그인된 사이트에서 작업할 수 있습니다."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "이 구독은 회원이 아닌 조직에 이미 연결되어 있습니다. 조직 소유자에게 초대를 요청하세요."
+
+msgid "It is linked to {organization}."
+msgstr "{organization}에 연결되어 있습니다."
+
 msgid "It keeps the title from your prompt."
 msgstr "프롬프트에서 가져온 제목이 유지됩니다."
 
@@ -11355,6 +11391,9 @@ msgstr "링크를 복사했습니다"
 msgid "Link copied"
 msgstr "링크 복사됨"
 
+msgid "Link organization"
+msgstr "조직 연결"
+
 msgid "Link task"
 msgstr "작업 연결"
 
@@ -11363,6 +11402,9 @@ msgstr "이 작업 연결"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug}을(를) 워크스페이스에 연결했습니다"
+
+msgid "Linking..."
+msgstr "연결 중..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11509,9 +11551,6 @@ msgstr "더 불러오는 중..."
 
 msgid "Loading more…"
 msgstr "더 불러오는 중…"
-
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "{targetPage}페이지 중 {loadingPage}페이지를 불러오는 중..."
 
 msgid "Loading project…"
 msgstr "프로젝트 불러오는 중…"
@@ -12045,6 +12084,9 @@ msgstr "메시지"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "이 단어가 포함된 메시지는 멘션처럼 알림을 보냅니다. 쉼표로 구분하세요."
+
+msgid "Messages you send go to {name}."
+msgstr "보내는 메시지는 {name}에게 전달됩니다."
 
 msgid "Microphone"
 msgstr "마이크"
@@ -12805,9 +12847,6 @@ msgstr "이 컴퓨터에서 아직 Claude 또는 Codex 사용량을 찾지 못�
 msgid "No cloud environment opens {repository}."
 msgstr "{repository}을(를) 여는 클라우드 환경이 없습니다."
 
-msgid "No cloud usage in this period."
-msgstr "이 기간에 클라우드 사용량이 없습니다."
-
 msgid "No cloud workspaces"
 msgstr "클라우드 워크스페이스 없음"
 
@@ -12849,6 +12888,9 @@ msgstr "기여자를 찾을 수 없습니다."
 
 msgid "No credit card required."
 msgstr "신용카드가 필요 없습니다."
+
+msgid "No days available"
+msgstr "사용 가능한 날짜 없음"
 
 msgid "No description"
 msgstr "설명 없음"
@@ -13415,9 +13457,6 @@ msgstr "이 서버에서는 사용할 수 없습니다"
 msgid "Not bound · configure in Settings → Links"
 msgstr "지정되지 않음 · 설정 → 링크에서 구성하세요"
 
-msgid "Not broken down yet"
-msgstr "아직 세부 내역 없음"
-
 msgid "Not configured"
 msgstr "구성되지 않음"
 
@@ -13429,9 +13468,6 @@ msgstr "연결 안 됨"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "연결되지 않음 · 클라우드 워크스페이스가 조직의 GitHub App으로 푸시합니다"
-
-msgid "Not counted by billing yet"
-msgstr "아직 청구에 반영되지 않음"
 
 msgid "Not demoed here"
 msgstr "여기서는 시연하지 않음"
@@ -13471,6 +13507,10 @@ msgstr "이 버전에는 없음"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "아직 이벤트를 받지 못하고 있습니다. Microsoft Graph가 알림 구독을 거부했습니다. 앱의 관리자 동의와 보호된 API 승인을 확인한 뒤 다시 연결하세요."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "기록 없음"
 
 msgid "Not reported yet"
 msgstr "아직 보고되지 않음"
@@ -13604,11 +13644,8 @@ msgstr "사물"
 msgid "of {0}"
 msgstr "{0} 중"
 
-msgid "of {cap} included"
-msgstr "({cap} 포함)"
-
-msgid "of {cap} limit"
-msgstr "(한도 {cap})"
+msgid "of {held}"
+msgstr "/ {held}"
 
 msgid "of {total}"
 msgstr "{total}명 중"
@@ -13622,8 +13659,9 @@ msgstr "전체 토큰 대비"
 msgid "Off"
 msgstr "끔"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "꺼짐. 부족해지면 GB 시간을 더 구매합니다."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "끔"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -13761,6 +13799,9 @@ msgstr "{organizationName} 관리자만 새 사람을 초대할 수 있습니다
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "플랜은 조직 소유자만 변경할 수 있습니다. 소유자에게 업그레이드를 요청하세요."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "소유자 또는 관리자만 이 조직을 연결할 수 있습니다."
 
 msgid "Only available on macOS."
 msgstr "macOS에서만 사용할 수 있습니다."
@@ -14482,10 +14523,6 @@ msgstr "오리지널"
 msgid "Other"
 msgstr "기타"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "기타"
-
 msgid "Other apps"
 msgstr "다른 앱"
 
@@ -14525,11 +14562,6 @@ msgstr "메모리 부족"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "메모리 부족: 머신이 곧 응답하지 않을 수 있습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "메모리 부족: 머신이 계속 실행되도록 {0}({1} GB)을(를) 중지했습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
 
 msgid "Out of scope"
 msgstr "범위를 벗어남"
@@ -14598,9 +14630,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "페이지"
 
-msgid "Page {page} of {pages}"
-msgstr "{page} / {pages} 페이지"
-
 msgid "Page actions"
 msgstr "페이지 작업"
 
@@ -14657,10 +14686,6 @@ msgstr "페이지 매김"
 
 msgid "Pagination"
 msgstr "페이지네이션"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "유료"
 
 msgid "Paid plans"
 msgstr "유료 요금제"
@@ -16440,9 +16465,6 @@ msgstr "에이전트를 제거할"
 msgid "remove the PR link"
 msgstr "PR 링크를 제거할"
 
-msgid "Remove this filter"
-msgstr "이 필터 제거"
-
 msgid "Remove trigger"
 msgstr "트리거 제거"
 
@@ -16737,9 +16759,6 @@ msgstr "확대/축소 초기화"
 msgid "Reset Zoom"
 msgstr "확대/축소 초기화"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate}에 초기화"
-
 msgid "Resets at {until}"
 msgstr "{until}에 재설정"
 
@@ -16828,9 +16847,6 @@ msgstr "온보딩 다시 시작"
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "실행 중인 워크스페이스를 재시작하면 에이전트에 변경 사항이 반영됩니다."
-
 msgid "Restart terminal daemon?"
 msgstr "터미널 데몬을 다시 시작할까요?"
 
@@ -16839,9 +16855,6 @@ msgstr "터미널 다시 시작"
 
 msgid "Restart workspace"
 msgstr "워크스페이스 다시 시작"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "새 에이전트 자격 증명을 적용하려면 워크스페이스를 다시 시작하세요."
 
 msgid "Restarted"
 msgstr "다시 시작됨"
@@ -17301,6 +17314,9 @@ msgstr "터미널에서 이 명령을 실행한 후 계속하세요:"
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "터미널에서 이 명령을 실행한 다음 출력된 토큰을 붙여 넣으세요:"
+
+msgid "Run time"
+msgstr "실행 시간"
 
 msgid "Run workspace command"
 msgstr "워크스페이스 명령 실행"
@@ -17775,9 +17791,6 @@ msgstr "Kbd 사용처를 검색하는 중"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "주기 중간에 제거한 좌석은 {0}까지 활성 상태로 유지됩니다."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "좌석, 크레딧, 추가 사용량 한도가 아직 로드되지 않았습니다. 다음에 결제 데이터가 새로 고쳐지면 표시됩니다."
-
 msgid "Secondary"
 msgstr "보조"
 
@@ -17843,9 +17856,6 @@ msgstr "채용 공고를 확인하거나 먼저 Paradev를 사용해 보세요."
 
 msgid "See this gate on the scorecard"
 msgstr "성적표에서 이 관문 보기"
-
-msgid "See usage"
-msgstr "사용량 보기"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "무엇이 바뀌었는지 보고, 피드백을 주고, 준비되면 머지하세요."
@@ -18386,6 +18396,9 @@ msgstr "모든 댓글 표시"
 
 msgid "Show all lines"
 msgstr "모든 줄 표시"
+
+msgid "Show all models"
+msgstr "모든 모델 보기"
 
 msgid "Show Apple's installer"
 msgstr "Apple 설치 프로그램 보기"
@@ -19417,11 +19430,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "중지됨"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "메모리를 확보하려고 {0}({1} GB)을(를) 중지했습니다"
-
 msgid "Stopped by the usage limit"
 msgstr "사용량 한도로 중단됨"
 
@@ -20108,9 +20116,6 @@ msgstr "최고의 에이전트는 바뀝니다.<0/>워크플로는 그럴 필요
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "머신이 {wanted} vCPU가 아닌 {actual} vCPU로 시작되었습니다. 다시 시작해 보세요."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "요금제별 내역은 현재 기간에만 보관됩니다."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 
@@ -20182,9 +20187,6 @@ msgstr "이 자동화가 클라우드 워크스페이스를 시작하는 환경�
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "확장 프로그램과 로컬 데이터가 이 브라우저에서 삭제됩니다."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "추가 사용량 한도는 요금제에 대한 비율이므로 금액이 표시되지 않습니다."
 
 msgid "The factory"
 msgstr "공장"
@@ -20386,8 +20388,8 @@ msgstr "경로는 리포지토리 안에 있어야 합니다"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "플러그인 변경이 {seconds}초 안에 완료되지 않았습니다."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "풀은 매달 초기화됩니다. 초과 사용량은 각 플랜에 표시된 GB 시간당 요금으로 청구됩니다."
+msgid "The pool resets every month."
+msgstr "풀은 매달 초기화됩니다."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "기본 저장소는 환경의 저장소 중 하나여야 합니다"
@@ -20568,6 +20570,9 @@ msgstr "이 에이전트는 대화를 분기할 수 없습니다"
 msgid "This agent can't run in a cloud workspace"
 msgstr "이 에이전트는 클라우드 워크스페이스에서 실행할 수 없습니다"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "이 에이전트에서는 서브 에이전트에게 메시지를 보낼 수 없습니다."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "이 에이전트는 선택한 기기에 더 이상 존재하지 않습니다 (에이전트가 초기화되었을 수 있습니다). 새 에이전트를 선택할 때까지 실행이 실패합니다."
 
@@ -20674,6 +20679,13 @@ msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있으며, 제공자가 이를 인증된 것으로 확인하지 않았습니다. 이전에 사용한 방법으로 로그인하세요."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "이 환경은 한 시간에 수동 빌드를 3번까지 시작할 수 있습니다. {0}분 후에 다시 시도하세요."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "이 환경에는 빌드할 [install]이 없습니다. 기본 브랜치의 .paradev/config.toml에 추가하세요."
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 있는 환경을 만든 다음 그 환경에서 워크스페이스를 시작하세요"
 
@@ -20731,6 +20743,12 @@ msgstr "이 Linear 워크스페이스는 이미 {owner}이(가) 연결했습니�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "이 Linear 워크스페이스는 이미 다른 Paradev 조직이 연결했습니다."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "이 링크는 만료되었습니다. AWS Marketplace 구독에서 Paradev를 다시 여세요."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "이 링크는 유효하지 않습니다. AWS Marketplace 구독에서 Paradev를 다시 여세요."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "바이너리 파일로 보입니다. 텍스트로 열면 깨진 내용이 표시되거나, 파일이 크면 에디터가 멈출 수 있습니다."
 
@@ -20770,14 +20788,17 @@ msgstr "표시 이름만 변경되며 브랜치는 바뀌지 않습니다."
 msgid "this organization"
 msgstr "이 조직"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "이 조직은 이미 카드로 결제하고 있습니다. 먼저 해당 플랜을 취소하거나 다른 조직을 선택하세요."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "이 조직에는 청구 기간이 없습니다. 대신 시간 범위를 선택하세요."
 
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "이 조직은 이미 다른 AWS Marketplace 구독에 연결되어 있습니다."
+
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "이 조직은 Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "이 페이지에서는 사용량 한도에 도달했는지 알 수 없습니다."
 
 msgid "This page could not be loaded"
 msgstr "이 페이지를 불러올 수 없습니다"
@@ -20895,6 +20916,9 @@ msgstr "이 서브 에이전트는 지금 백그라운드로 옮길 수 없습�
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "이 서브 에이전트는 더 이상 호스트에서 추적되지 않습니다. 기록은 에이전트의 세션 디렉터리에 디스크로 남아 있습니다."
+
+msgid "This subscription is already linked to another organization."
+msgstr "이 구독은 이미 다른 조직에 연결되어 있습니다."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "이 터미널에는 아직 넘길 출력이 없습니다."
@@ -21569,10 +21593,6 @@ msgstr "알 수 없음"
 msgid "Unknown"
 msgstr "알 수 없음"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "알 수 없음"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "알 수 없음"
@@ -21807,6 +21827,12 @@ msgstr "<0>{key}</0>의 값 업데이트"
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
 
+msgid "Update this host to message subagents."
+msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요. 입력한 텍스트는 기본 채팅으로 돌아갔습니다."
+
 msgid "Update this host to move subagents to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기려면 이 호스트를 업데이트하세요"
 
@@ -21900,17 +21926,11 @@ msgstr "사용량"
 msgid "Usage is out of date"
 msgstr "사용량 정보가 오래되었습니다"
 
-msgid "usage limit"
-msgstr "사용량 한도"
-
 msgid "Usage limit"
 msgstr "사용량 한도"
 
 msgid "Usage limit reached"
 msgstr "사용량 한도에 도달했습니다"
-
-msgid "Usage limit reached."
-msgstr "사용량 한도에 도달했습니다."
 
 msgid "Usage sections"
 msgstr "사용량 섹션"
@@ -22222,6 +22242,9 @@ msgctxt "stack layer"
 msgid "Viewing"
 msgstr "보는 중"
 
+msgid "Viewing subagent {name}"
+msgstr "서브 에이전트 {name} 보는 중"
+
 msgid "Violence or harassment"
 msgstr "폭력 또는 괴롭힘"
 
@@ -22344,6 +22367,9 @@ msgstr "이 조직의 결제 수단으로 청구하지 못했습니다. 소유�
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "결제 수단으로 청구하지 못했습니다. 이 플랜을 유지하려면 결제 수단을 업데이트하세요."
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "AWS Marketplace 구독을 확인할 수 없습니다"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "온라인 상태인지 확인하기 위해 {appName}에 연결하지 못했습니다. 연결을 확인하고 다시 시도하세요."
@@ -23044,8 +23070,8 @@ msgstr "이 터미널에 접근할 권한이 없습니다."
 msgid "You don't have permission to remove this member"
 msgstr "이 멤버를 제거할 권한이 없습니다"
 
-msgid "You have no cloud usage in this period."
-msgstr "이 기간에 내 클라우드 사용량이 없습니다."
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "아직 소유하거나 관리하는 조직이 없습니다. 조직을 만든 다음 이 링크를 다시 여세요."
 
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "저장하지 않은 환경 변수가 있습니다. 정말 닫을까요?"
@@ -23153,6 +23179,9 @@ msgstr "에이전트 구독과 키"
 msgid "Your Agents, Your Accounts"
 msgstr "당신의 에이전트, 당신의 계정"
 
+msgid "Your AWS Marketplace subscription is active"
+msgstr "AWS Marketplace 구독이 활성화되었습니다"
+
 msgid "Your changes"
 msgstr "내 변경 내용"
 
@@ -23205,9 +23234,6 @@ msgstr "이름 <0>(프롬프트를 채택하면 변경 로그에 이름을 남�
 msgid "Your organization"
 msgstr "내 조직"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "조직이 클라우드 사용 한도에 도달했습니다. 이 워크스페이스를 시작하려면 설정의 결제에서 한도를 올리거나 업그레이드하세요."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "조직이 환경 한도({0})에 도달했습니다. 환경을 보관하거나 설정의 결제에서 업그레이드하여 더 추가하세요."
@@ -23222,20 +23248,11 @@ msgstr "조직에서 {plugin}을(를) 대신 설치하므로 제거할 수 없�
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "조직에서 이 플러그인을 대신 설치합니다. 비활성화할 수는 있지만 제거할 수는 없습니다."
 
-msgid "Your organization reached its cloud usage limit."
-msgstr "조직이 클라우드 사용 한도에 도달했습니다."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "조직이 클라우드 사용 한도에 도달했습니다. 한도를 올리지 않으면 이 워크스페이스는 몇 분 후에 중지됩니다."
-
 msgid "Your organization reached its environment limit."
 msgstr "조직이 환경 한도에 도달했습니다."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "내 사용량만 표시됩니다. 조직의 합계, 할당량, 사람별 사용량은 소유자와 관리자만 볼 수 있습니다."
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."

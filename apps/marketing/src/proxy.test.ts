@@ -30,6 +30,31 @@ describe("proxy", () => {
 		);
 	});
 
+	test("routes only the three English landing URLs without taking the land handle", async () => {
+		for (const slug of [
+			"claude-code-parallel-sessions",
+			"claude-code-worktrees",
+			"codex-cli-worktrees",
+		]) {
+			const path = `/land/${slug}`;
+			const query = "?utm_source=test&utm_campaign=landing&gclid=a%2Bb";
+			expect((await run(`${path}${query}`)).rewrite).toBe(
+				`/en/en${path}${query}`,
+			);
+			expect(await run(`${path}/${query}`)).toMatchObject({
+				status: 308,
+				location: `${path}${query}`,
+			});
+			expect((await run(`/en${path}`)).location).toBe(path);
+			expect((await run(`/en/en${path}`)).location).toBe(`/en${path}`);
+			expect((await run(`/fr${path}`)).rewrite).toBeUndefined();
+		}
+		expect((await run("/land")).rewrite).toBe("/en/user/land");
+		expect((await run("/land/")).rewrite).toBe("/en/user/land/");
+		expect((await run("/land/other")).rewrite).toBe("/en/land/other");
+		expect((await run("/land/other/")).rewrite).toBe("/en/land/other/");
+	});
+
 	test("serves canonical paths without a redirect", async () => {
 		expect((await run("/careers")).rewrite).toBe("/en/careers");
 		expect(await run("/zh-CN/careers")).toMatchObject({

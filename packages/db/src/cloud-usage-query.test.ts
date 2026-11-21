@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { eq } from "drizzle-orm";
+import { eq, gte, inArray } from "drizzle-orm";
 import {
 	BEN,
 	BILLING_PAGE,
@@ -17,6 +17,8 @@ import {
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import {
+	type CloudBootCursor,
+	type CloudUsageCursor,
 	cloudBillingAnchor,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
@@ -26,8 +28,10 @@ import {
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
 	queryFleetCloudUsage,
+	queryFleetCloudUsageByWorkspaceDay,
 } from "./cloud-usage-query";
 import {
+	cloudUsageDaily,
 	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
@@ -39,6 +43,14 @@ let db: Awaited<ReturnType<typeof seedCloudUsage>>;
 beforeAll(async () => {
 	db = await seedCloudUsage();
 });
+
+/** Metrics from any grouping but `billingDay`, which has no workspaces count. */
+function counted<Metrics extends { workspaces: number | null }>(
+	metrics: Metrics,
+) {
+	if (metrics.workspaces === null) throw new Error("no workspaces count");
+	return { ...metrics, workspaces: metrics.workspaces };
+}
 
 const usage = (
 	options: Partial<Parameters<typeof queryCloudUsage>[2]>,
@@ -110,6 +122,29 @@ describe("queryCloudUsage", () => {
 		]);
 	});
 
+	test("each person's row holds their days, in the same page", async () => {
+		const days = (items: { days?: { day: string; gbHours: number }[] }[]) =>
+			items.map((item) => item.days?.map((day) => [day.day, day.gbHours]));
+		const people = await usage({ groupBy: "user" });
+		expect(people.items.map((item) => item.ref?.name)).toEqual(["Maya", "Sam"]);
+		expect(days(people.items)).toEqual([
+			[
+				["2026-11-10", 18],
+				["2026-11-12", 0],
+				["2026-11-16", 0],
+			],
+			[
+				["2026-11-01", 16],
+				["2026-11-17", 0],
+			],
+		]);
+		const first = await usage({ groupBy: "user", limit: 1 });
+		expect(days(first.items)).toEqual([days(people.items)[0]]);
+		expect((await usage({ groupBy: "day" })).items[0]).not.toHaveProperty(
+			"days",
+		);
+	});
+
 	test("a workspace that failed with no boot appears with its failure", async () => {
 		const { items } = await usage({
 			groupBy: "workspace",
@@ -120,8 +155,14 @@ describe("queryCloudUsage", () => {
 				id: BROKEN,
 				name: "broken-env",
 				status: "failed",
+				deleted: false,
 				size: "large",
-				owner: { id: MAYA, name: "Maya", email: "Maya@example.com" },
+				owner: {
+					id: MAYA,
+					name: "Maya",
+					email: "Maya@example.com",
+					image: null,
+				},
 				failure: {
 					reason: "snapshot_expired",
 					at: new Date("2026-11-16T14:03:00Z"),
@@ -182,7 +223,7 @@ test("usage by period in one query matches each period's total", async () => {
 		await Promise.all(
 			periods.map(async (window) => ({
 				...window,
-				metrics: (await usage({ window })).total,
+				metrics: counted((await usage({ window })).total),
 			})),
 		),
 	);
@@ -191,7 +232,43 @@ test("usage by period in one query matches each period's total", async () => {
 		{ organizationId: ORG, userId: SAM },
 		{ periods: [NOVEMBER], overagePerGbHour: RATE },
 	);
-	expect(own?.metrics).toEqual((await usage({}, SAM)).total);
+	expect(own?.metrics).toEqual(counted((await usage({}, SAM)).total));
+});
+
+test("a table's dollars are exact: each row is its GB-hours at the rate, and the rows add up to the total", async () => {
+	const window = {
+		from: new Date("2026-02-10T00:00:00Z"),
+		to: new Date("2026-02-11T00:00:00Z"),
+	};
+	const fiveGbMinutes = [CHECKOUT, BILLING_PAGE, BROKEN].map(
+		(cloudWorkspaceId, i) => ({
+			bootId: "boot_1",
+			lockSeq: 61 + i,
+			feature: "box_gb_minutes" as const,
+			organizationId: ORG,
+			cloudWorkspaceId,
+			userId: MAYA,
+			windowFrom: new Date("2026-02-10T12:00:00Z"),
+			windowTo: new Date("2026-02-10T12:05:00Z"),
+			amount: "5",
+			sentAt: new Date("2026-02-10T12:05:00Z"),
+		}),
+	);
+	await db.insert(cloudUsageEvents).values(fiveGbMinutes);
+	try {
+		const { items, total } = await usage({ window, groupBy: "workspace" });
+		expect(items).toHaveLength(3);
+		for (const item of items) {
+			expect(item.usageUsd).toBeCloseTo((5 / 60) * RATE, 15);
+		}
+		const rows = items.reduce((sum, item) => sum + (item.usageUsd ?? 0), 0);
+		expect(total.usageUsd).toBeCloseTo((15 / 60) * RATE, 15);
+		expect(rows).toBeCloseTo(total.usageUsd ?? Number.NaN, 15);
+	} finally {
+		await db
+			.delete(cloudUsageEvents)
+			.where(inArray(cloudUsageEvents.lockSeq, [61, 62, 63]));
+	}
 });
 
 describe("listCloudBoots", () => {
@@ -247,12 +324,14 @@ test("paging one row at a time returns every row once, in order", async () => {
 	}
 	for (const groupBy of ["workspace", "day"] as const) {
 		expect(
-			await pages((cursor) => usage({ groupBy, limit: 1, cursor })),
+			await pages((cursor?: CloudUsageCursor) =>
+				usage({ groupBy, limit: 1, cursor }),
+			),
 		).toEqual((await usage({ groupBy })).items);
 	}
-	expect(await pages((cursor) => boots({ limit: 1, cursor }))).toEqual(
-		(await boots({})).items,
-	);
+	expect(
+		await pages((cursor?: CloudBootCursor) => boots({ limit: 1, cursor })),
+	).toEqual((await boots({})).items);
 });
 
 test("a search matches workspace names, any case, and its wildcards are text", async () => {
@@ -277,11 +356,11 @@ test.each([
 	const all = await usage({ groupBy: "workspace", sort });
 	expect(all.items.map((item) => item.key)).toEqual([...expected]);
 	const paged: typeof all.items = [];
-	let cursor: (typeof all)["nextCursor"] | undefined;
+	let cursor: CloudUsageCursor | undefined;
 	do {
 		const page = await usage({ groupBy: "workspace", sort, limit: 1, cursor });
 		paged.push(...page.items);
-		cursor = page.nextCursor;
+		cursor = page.nextCursor ?? undefined;
 	} while (cursor && paged.length < 10);
 	expect(paged).toEqual(all.items);
 });
@@ -552,9 +631,10 @@ describe("fleet scope", () => {
 	});
 
 	test("a failed workspace counts the same way on every path", async () => {
-		const failedWorkspaces = (result: { items: { workspaces: number }[] }) =>
-			result.items.reduce((sum, item) => sum + item.workspaces, 0);
-		const total = (await fleet({}, ORG)).total.workspaces;
+		const failedWorkspaces = (result: {
+			items: { workspaces: number | null }[];
+		}) => result.items.reduce((sum, item) => sum + counted(item).workspaces, 0);
+		const total = counted((await fleet({}, ORG)).total).workspaces;
 		for (const groupBy of ["workspace", "size", "organization"] as const) {
 			expect(failedWorkspaces(await fleet({ groupBy }, ORG)), groupBy).toBe(
 				total,
@@ -616,5 +696,436 @@ describe("fleet scope", () => {
 			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
 		);
 		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
+	});
+});
+
+describe("queryFleetCloudUsageByWorkspaceDay", () => {
+	const YEAR = {
+		from: new Date("2026-03-01T00:00:00Z"),
+		to: new Date("2027-01-01T00:00:00Z"),
+	};
+	const eventAt = (
+		lockSeq: number,
+		cloudWorkspaceId: string | null,
+		sentAt: string,
+	) => ({
+		bootId: "boot_1",
+		lockSeq,
+		feature: "box_gb_minutes" as const,
+		organizationId: ORG,
+		cloudWorkspaceId,
+		userId: MAYA,
+		windowFrom: new Date(sentAt),
+		windowTo: new Date(sentAt),
+		amount: "60",
+		sentAt: new Date(sentAt),
+	});
+
+	const pacificHour = new Intl.DateTimeFormat("en-US", {
+		timeZone: "America/Los_Angeles",
+		hour: "numeric",
+		hourCycle: "h23",
+	});
+	const pacificMidnight = (date: string) => {
+		const at = ["07", "08"]
+			.map((hour) => new Date(`${date}T${hour}:00:00Z`))
+			.find((candidate) => Number(pacificHour.format(candidate)) === 0);
+		if (!at) throw new Error(`No Pacific midnight on ${date}`);
+		return at;
+	};
+	const nextDate = (date: string) =>
+		new Date(Date.parse(`${date}T00:00:00Z`) + 86_400_000)
+			.toISOString()
+			.slice(0, 10);
+
+	const round = (value: number) => Math.round(value * 1e6) / 1e6;
+	const brief = (row: {
+		boots: number;
+		failedBoots: number;
+		hours: number;
+		gbHours: number;
+	}) => [row.boots, row.failedBoots, round(row.hours), round(row.gbHours)];
+	const byWorkspace = async (window = YEAR, filters = {}) =>
+		(
+			await queryFleetCloudUsage(db, ORG, {
+				window,
+				filters,
+				groupBy: "workspace",
+				limit: 100,
+				overagePerGbHour: null,
+				refs: false,
+			})
+		).items
+			.map((item) => [item.key, ...brief(item)])
+			.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+
+	const seedEdges = () =>
+		db
+			.insert(cloudUsageEvents)
+			.values([
+				eventAt(21, CHECKOUT, "2026-03-08T07:59:00Z"),
+				eventAt(22, CHECKOUT, "2026-03-08T08:00:00Z"),
+				eventAt(23, CHECKOUT, "2026-03-09T06:59:00Z"),
+				eventAt(24, BILLING_PAGE, "2026-03-09T07:00:00Z"),
+				eventAt(25, BILLING_PAGE, "2026-07-15T07:30:00Z"),
+				eventAt(26, BILLING_PAGE, "2026-12-15T07:30:00Z"),
+				eventAt(27, null, "2026-12-15T08:00:00Z"),
+			]);
+	const dropEdges = () =>
+		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 21));
+
+	test("a billing day starts at 07:00 UTC in summer and 08:00 UTC in winter", async () => {
+		await db
+			.insert(cloudUsageEvents)
+			.values([
+				eventAt(31, CHECKOUT, "2026-07-15T06:59:59Z"),
+				eventAt(32, CHECKOUT, "2026-07-15T07:00:00Z"),
+				eventAt(33, CHECKOUT, "2026-11-15T07:59:59Z"),
+				eventAt(34, CHECKOUT, "2026-11-15T08:00:00Z"),
+			]);
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+				filters: { workspace: CHECKOUT },
+			});
+			const gbHoursOn = (day: string) =>
+				rows.find((row) => row.day === day)?.gbHours;
+			expect(gbHoursOn("2026-07-14")).toBe(1);
+			expect(gbHoursOn("2026-07-15")).toBe(1);
+			expect(gbHoursOn("2026-11-14")).toBe(1);
+			expect(gbHoursOn("2026-11-15")).toBe(1);
+		} finally {
+			await db
+				.delete(cloudUsageEvents)
+				.where(gte(cloudUsageEvents.lockSeq, 31));
+		}
+	});
+
+	test("rows by day add up to the workspace totals, and each day matches its Pacific day", async () => {
+		await seedEdges();
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+			});
+			const days = [...new Set(rows.map((row) => row.day))];
+			expect(days).toEqual(
+				expect.arrayContaining([
+					"2026-03-07",
+					"2026-03-08",
+					"2026-03-09",
+					"2026-07-15",
+					"2026-12-14",
+					"2026-12-15",
+				]),
+			);
+			expect(
+				rows.find((row) => row.day === "2026-12-14" && row.gbHours > 0),
+			).toMatchObject({ workspaceId: BILLING_PAGE, gbHours: 1 });
+
+			const totals = new Map<string | null, [number, number, number, number]>();
+			for (const row of rows) {
+				const sum = totals.get(row.workspaceId) ?? [0, 0, 0, 0];
+				const [boots, failedBoots, hours, gbHours] = brief(row);
+				totals.set(row.workspaceId, [
+					sum[0] + (boots ?? 0),
+					sum[1] + (failedBoots ?? 0),
+					sum[2] + (hours ?? 0),
+					sum[3] + (gbHours ?? 0),
+				]);
+			}
+			expect(
+				[...totals]
+					.map(([key, sum]) => [key, ...sum.map(round)])
+					.sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+			).toEqual(await byWorkspace());
+
+			for (const day of days) {
+				const window = {
+					from: pacificMidnight(day),
+					to: pacificMidnight(nextDate(day)),
+				};
+				expect(
+					rows
+						.filter((row) => row.day === day)
+						.map((row) => [row.workspaceId, ...brief(row)])
+						.sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+					day,
+				).toEqual(await byWorkspace(window));
+			}
+		} finally {
+			await dropEdges();
+		}
+	});
+
+	test("usage with no workspace has a null workspace id", async () => {
+		await seedEdges();
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+			});
+			expect(rows.filter((row) => row.workspaceId === null)).toEqual([
+				{
+					workspaceId: null,
+					day: "2026-12-15",
+					boots: 0,
+					failedBoots: 0,
+					hours: 0,
+					gbHours: 1,
+				},
+			]);
+		} finally {
+			await dropEdges();
+		}
+	});
+
+	test("filters and organizations narrow it like the fleet query", async () => {
+		const rows = (organizationId: string | string[] | null, filters = {}) =>
+			queryFleetCloudUsageByWorkspaceDay(db, organizationId, {
+				window: NOVEMBER,
+				filters,
+			});
+		const workspaceIds = async (
+			organizationId: string | string[] | null,
+			filters = {},
+		) => [
+			...new Set(
+				(await rows(organizationId, filters)).map((row) => row.workspaceId),
+			),
+		];
+		expect(await workspaceIds(ORG, { workspace: CHECKOUT })).toEqual([
+			CHECKOUT,
+		]);
+		expect(await workspaceIds(ORG, { user: SAM })).toEqual([BILLING_PAGE]);
+		expect(await workspaceIds(ORG, { status: ["failed"] })).toEqual([BROKEN]);
+		expect(await workspaceIds(ORG, { search: "BILLING" })).toEqual([
+			BILLING_PAGE,
+		]);
+		expect(await workspaceIds([OTHER_ORG])).toEqual([OTHER_WS]);
+		expect(await workspaceIds([])).toEqual([]);
+		expect((await rows(null)).map((row) => [row.workspaceId, row.day])).toEqual(
+			expect.arrayContaining([
+				[OTHER_WS, "2026-11-10"],
+				[CHECKOUT, "2026-11-10"],
+			]),
+		);
+		expect(
+			(await rows(ORG, { size: "medium" })).map((row) => row.workspaceId),
+		).not.toContain(BILLING_PAGE);
+	});
+});
+
+describe("grouped by billing day", () => {
+	const at = (lockSeq: number, sentAt: string, userId = MAYA) => ({
+		bootId: "boot_1",
+		lockSeq,
+		feature: "box_gb_minutes" as const,
+		organizationId: ORG,
+		cloudWorkspaceId: CHECKOUT,
+		userId,
+		windowFrom: new Date(sentAt),
+		windowTo: new Date(sentAt),
+		amount: "60",
+		sentAt: new Date(sentAt),
+	});
+	// 2026-11-01 is the fall-back day: Pacific midnight moves from 07:00Z to 08:00Z, 25 hours.
+	const seedFallBack = () =>
+		db
+			.insert(cloudUsageEvents)
+			.values([
+				at(41, "2026-11-01T07:30:00Z"),
+				at(42, "2026-11-02T07:30:00Z"),
+				at(43, "2026-11-02T08:30:00Z", SAM),
+				at(44, "2026-11-03T12:00:00Z"),
+			]);
+	const dropFallBack = () =>
+		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 41));
+	const PARTIAL = {
+		from: new Date("2026-11-01T10:00:00Z"),
+		to: new Date("2026-11-03T15:00:00Z"),
+	};
+	const totals = async (
+		groupBy: "day" | "billingDay",
+		window: { from: Date; to: Date },
+		filters: Parameters<typeof queryCloudUsage>[2]["filters"] = {},
+		userId?: string,
+	) => {
+		const { total } = await queryCloudUsage(
+			db,
+			{ organizationId: ORG, userId },
+			{ window, groupBy, filters, limit: 100, overagePerGbHour: RATE },
+		);
+		return [total.gbHours, total.hours, total.boots, total.failedBoots];
+	};
+
+	test("a row is a Pacific day: an event at 07:30Z on Nov 2 is still Nov 1", async () => {
+		await seedFallBack();
+		try {
+			const { items } = await usage({
+				groupBy: "billingDay",
+				window: PARTIAL,
+			});
+			const gbHoursOn = (day: string) =>
+				items.find((item) => item.key === day)?.gbHours ?? 0;
+			expect(items.map((item) => item.key)).toEqual(
+				[...items.map((item) => item.key)].sort().reverse(),
+			);
+			expect(gbHoursOn("2026-11-01")).toBe(1);
+			expect(gbHoursOn("2026-11-02")).toBe(1);
+			expect(gbHoursOn("2026-11-03")).toBe(1);
+		} finally {
+			await dropFallBack();
+		}
+	});
+
+	test("the totals equal the UTC-day totals over whole days, partial edge days, a member and a size", async () => {
+		await seedFallBack();
+		try {
+			for (const window of [NOVEMBER, OCTOBER, PARTIAL]) {
+				expect(await totals("billingDay", window)).toEqual(
+					await totals("day", window),
+				);
+				expect(await totals("billingDay", window, {}, SAM)).toEqual(
+					await totals("day", window, {}, SAM),
+				);
+				expect(await totals("billingDay", window, { size: "small" })).toEqual(
+					await totals("day", window, { size: "small" }),
+				);
+			}
+		} finally {
+			await dropFallBack();
+		}
+	});
+
+	test("workspaces is null by billing day, in the rows and the total; day keeps it", async () => {
+		const byBillingDay = await usage({ groupBy: "billingDay" });
+		expect(byBillingDay.items.length).toBeGreaterThan(0);
+		for (const metrics of [byBillingDay.total, ...byBillingDay.items]) {
+			expect(metrics.workspaces).toBeNull();
+		}
+		const byDay = await usage({ groupBy: "day" });
+		for (const metrics of [byDay.total, ...byDay.items]) {
+			expect(typeof metrics.workspaces).toBe("number");
+		}
+	});
+
+	// 2026-03-08 springs forward (23 hours); 2026-11-01 falls back (25 hours).
+	const seedSpring = () =>
+		db
+			.insert(cloudUsageEvents)
+			.values([
+				at(51, "2026-03-07T07:30:00Z"),
+				at(52, "2026-03-08T07:59:00Z"),
+				at(53, "2026-03-08T08:00:00Z", SAM),
+				at(54, "2026-03-09T06:59:00Z"),
+				at(55, "2026-03-09T07:00:00Z"),
+				at(56, "2026-03-10T09:00:00Z"),
+			]);
+	const dropSpring = () =>
+		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 51));
+	/** A rollup row whose events were all taken back: it adds nothing and makes no row. */
+	const zeroRow = () =>
+		db.insert(cloudUsageDaily).values({
+			organizationId: ORG,
+			day: "2026-11-05",
+			userId: MAYA,
+			vcpus: 4,
+			gbMinutes: "0",
+			seconds: "0",
+			events: 0,
+		});
+	const dropZeroRow = () =>
+		db.delete(cloudUsageDaily).where(eq(cloudUsageDaily.events, 0));
+	const SPRING = {
+		from: new Date("2026-03-07T12:00:00Z"),
+		to: new Date("2026-03-10T12:00:00Z"),
+	};
+	type Case = {
+		name: string;
+		window: { from: Date; to: Date };
+		filters?: Parameters<typeof queryCloudUsage>[2]["filters"];
+		userId?: string;
+		fleet?: true;
+	};
+	const springForward: Case = {
+		name: "spring forward, partial edge days",
+		window: SPRING,
+	};
+	const wholeMonth: Case = { name: "a whole month", window: NOVEMBER };
+	const cases: Case[] = [
+		springForward,
+		{ name: "fall back, partial edge days", window: PARTIAL },
+		wholeMonth,
+		{ name: "another month", window: OCTOBER },
+		{ name: "a member", window: NOVEMBER, userId: SAM },
+		{ name: "a size", window: NOVEMBER, filters: { size: "medium" } },
+		{
+			name: "a workspace (events only)",
+			window: NOVEMBER,
+			filters: { workspace: CHECKOUT },
+		},
+		{
+			name: "a status (events only)",
+			window: NOVEMBER,
+			filters: { status: ["awake", "failed"] },
+		},
+		{ name: "the fleet", window: NOVEMBER, fleet: true },
+	];
+	const rowsOf = async (
+		{ window, filters, userId, fleet }: Case,
+		fromEvents: boolean,
+	) => {
+		const options = {
+			window,
+			filters,
+			groupBy: "billingDay" as const,
+			limit: 100,
+			overagePerGbHour: RATE,
+			fromEvents,
+		};
+		const result = fleet
+			? await queryFleetCloudUsage(db, null, { ...options, refs: false })
+			: await queryCloudUsage(db, { organizationId: ORG, userId }, options);
+		const brief = (metrics: (typeof result)["total"]) => [
+			Math.round(metrics.gbHours * 1e6) / 1e6,
+			Math.round(metrics.hours * 1e6) / 1e6,
+			metrics.boots,
+			metrics.failedBoots,
+			metrics.workspaces,
+		];
+		return {
+			rows: result.items.map((item) => [item.key, ...brief(item)]),
+			total: brief(result.total),
+			rowCount: result.rowCount,
+		};
+	};
+
+	test("every row from the rollup equals the row from events: both daylight-saving changes, an events = 0 row, an empty rollup day, members, sizes, workspaces and statuses", async () => {
+		await seedSpring();
+		await seedFallBack();
+		await zeroRow();
+		try {
+			for (const testCase of cases) {
+				const fromRollup = await rowsOf(testCase, false);
+				expect({ case: testCase.name, ...fromRollup }).toEqual({
+					case: testCase.name,
+					...(await rowsOf(testCase, true)),
+				});
+			}
+			const november = (await rowsOf(wholeMonth, false)).rows;
+			// 2026-11-12 has boots and no usage: a row from the boots alone.
+			expect(november.find(([key]) => key === "2026-11-12")).toBeDefined();
+			expect(november.find(([key]) => key === "2026-11-05")).toBeUndefined();
+			const spring = (await rowsOf(springForward, false)).rows;
+			expect(spring.map(([key]) => key)).toEqual([
+				"2026-03-10",
+				"2026-03-09",
+				"2026-03-08",
+				"2026-03-07",
+			]);
+		} finally {
+			await dropSpring();
+			await dropFallBack();
+			await dropZeroRow();
+		}
 	});
 });

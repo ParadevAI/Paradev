@@ -13,6 +13,7 @@ const CACHE_TTL_MS = 60_000;
 
 export type AgentCli = {
 	command: string;
+	version: string;
 	env: NodeJS.ProcessEnv;
 };
 
@@ -68,6 +69,7 @@ function parseVersion(output: string): string | null {
 async function probeVersion(
 	command: string,
 	env: NodeJS.ProcessEnv,
+	signal?: AbortSignal,
 ): Promise<string | null> {
 	const hit = cache.get(command);
 	if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.version;
@@ -76,12 +78,13 @@ async function probeVersion(
 		const { stdout, stderr } = await execFileAsync(command, ["--version"], {
 			env,
 			timeout: VERSION_TIMEOUT_MS,
+			signal,
 		});
 		version = parseVersion(stdout) ?? parseVersion(stderr);
 	} catch {
 		version = null;
 	}
-	cache.set(command, { at: Date.now(), version });
+	if (!signal?.aborted) cache.set(command, { at: Date.now(), version });
 	return version;
 }
 
@@ -120,12 +123,14 @@ export async function resolveAgentCli(options: {
 	minVersion: string;
 	upgrade?: string;
 	env: () => Promise<NodeJS.ProcessEnv>;
+	signal?: AbortSignal;
 }): Promise<AgentCli> {
 	const env = await options.env();
+	options.signal?.throwIfAborted();
 	const command = agentCliCommand(options.binary, env);
-	const found = await probeVersion(command, env);
+	const found = await probeVersion(command, env, options.signal);
 	if (!found || !meetsFloor(found, options.minVersion)) {
 		throw new Error(agentCliUnsupported({ ...options, found }));
 	}
-	return { command, env };
+	return { command, env, version: found };
 }

@@ -469,6 +469,7 @@ msgstr "{0}，尾号{1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where}中已存在{0}个文件。是否要替换它们？"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB 小时"
@@ -783,6 +784,9 @@ msgstr "{actor} 取消关联工作区 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 预计约{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} 不允许你向其子智能体发送消息。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "打开对应工作区时，{agents} 会话会恢复。"
 
@@ -1028,6 +1032,9 @@ msgstr "{fileCount, plural, one {此工作区中有 # 个文件更改} other {�
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "第 {first}–{last} 条，共 {total} 条"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
 
@@ -1166,8 +1173,17 @@ msgstr "{name} 请求确认"
 msgid "{name} can't be messaged"
 msgstr "无法向 {name} 发送消息"
 
+msgid "{name} can't take messages now."
+msgstr "{name} 目前无法接收消息。"
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} 无法接收消息。你的文本已放回主聊天。"
+
 msgid "{name} failed"
 msgstr "{name} 失败"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} 已失败，无法接收消息。"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
@@ -1202,6 +1218,9 @@ msgstr "{name} 开始工作"
 msgid "{name} stopped"
 msgstr "{name} 已停止"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} 已停止，无法接收消息。"
+
 msgid "{name} wants more access"
 msgstr "{name} 请求更多访问权限"
 
@@ -1214,6 +1233,9 @@ msgstr "{name}：每用户每月 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每用户每月 {monthly}，或按年计费 {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} 仍在使用你之前的登录。重启以使用新的登录。"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
 
@@ -1225,6 +1247,9 @@ msgstr "{openCount}项已开启"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {此工作区中还有更改：# 个文件} other {此工作区中还有更改：# 个文件}}"
+
+msgid "{over} overage"
+msgstr "超额 {over}"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} 可以以你的身份读取和更改你的 {pluginLabel} 账户中的数据，包括此页面的未来版本。它可以把读取的内容发送到其他网站。只允许你信任的页面。"
@@ -1327,8 +1352,8 @@ msgstr "{pullRequests} · 目标 {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {队列中有 # 条消息等待} other {队列中有 # 条消息等待}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "每 GB 小时 {rate}。在每月额度池之后使用，永不过期。"
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "每 GB 小时 {rate}。在套餐包含的用量之后使用，永不过期。"
 
 msgid "{readPercent}% read"
 msgstr "已读{readPercent}%"
@@ -1349,9 +1374,6 @@ msgstr "剩余 {remaining} 个 token"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {共 # 行，第 {first}–{last} 行}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {# 个席位包含}}"
@@ -1658,9 +1680,6 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "由 Union Square Ventures 领投的 1150 万美元种子轮"
 
-msgid "0 rows"
-msgstr "0 行"
-
 msgid "1"
 msgstr "1"
 
@@ -1763,6 +1782,9 @@ msgstr "本次会话已使用87.4K/200K个token。"
 
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "更好用的应用内浏览器：预览改动，点击任意元素即可作为上下文发给智能体。"
+
+msgid "A build of this environment is already running"
+msgstr "此环境已有构建正在运行"
 
 msgid "A CDP endpoint per pane"
 msgstr "每个窗格一个 CDP 端点"
@@ -2371,9 +2393,6 @@ msgstr "智能体命令"
 msgid "Agent Configs"
 msgstr "智能体配置"
 
-msgid "Agent credentials changed"
-msgstr "智能体凭据已更改"
-
 msgid "Agent finished"
 msgstr "智能体已完成"
 
@@ -2779,6 +2798,9 @@ msgstr "另有：@superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "随时知道哪个智能体需要你，通知可直接跳转到被阻塞的智能体。"
+
+msgid "Amount of GB-hours"
+msgstr "GB 小时数量"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "智能体能端到端完成跨文件改动。"
@@ -3490,12 +3512,18 @@ msgstr "运行中"
 msgid "Away"
 msgstr "离开"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace 没有响应。请几分钟后重试。"
+
 msgid "Back"
 msgstr "返回"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
+
+msgid "Back to {parentTitle}"
+msgstr "返回 {parentTitle}"
 
 msgid "Back to About"
 msgstr "返回关于页"
@@ -3599,6 +3627,9 @@ msgstr "正在构建中。"
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "再往后：F5不是近期的主张"
 
+msgid "Billed hours"
+msgstr "计费时长"
+
 msgid "Billed monthly"
 msgstr "按月计费"
 
@@ -3614,8 +3645,8 @@ msgstr "账单"
 msgid "Billing details"
 msgstr "账单信息"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "计费系统拒绝启动云工作区：组织的方案不包含云工作区，或已达到云使用上限。云工作区需要 Team 或 Ultra 方案。请在设置 > 账单中升级或提高上限，或在设备上运行此自动化。"
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "账单拒绝启动云工作区：方案不包含云工作区，或组织已用完本周期的全部云用量。请查看设置的账单，或在设备上运行此自动化。"
 
 msgid "Binary"
 msgstr "二进制"
@@ -3696,9 +3727,6 @@ msgstr "底部抽屉，在触屏设备上便于滑动操作。"
 
 msgid "Bought credits"
 msgstr "已购买的额度"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "已购 GB 小时剩余：{prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "弹跳程序坞图标"
@@ -3898,9 +3926,6 @@ msgstr "按钮、切换控件和键盘提示"
 
 msgid "Buy"
 msgstr "购买"
-
-msgid "Buy extra GB-hours"
-msgstr "购买额外 GB 小时"
 
 msgid "Buy for {total}"
 msgstr "以 {total} 购买"
@@ -4273,9 +4298,6 @@ msgstr "频道选项"
 msgid "Channels"
 msgstr "频道"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "当购买的 GB 小时不足时，从已保存的卡扣款购买更多 GB 小时。"
-
 msgid "Chat"
 msgstr "聊天"
 
@@ -4469,6 +4491,9 @@ msgstr "请选择"
 
 msgid "Choose the model"
 msgstr "选择模型"
+
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "选择由 AWS Marketplace 计费的组织。每个订阅只能关联一个组织。"
 
 msgid "Choose the primary repository"
 msgstr "选择主仓库"
@@ -4859,6 +4884,24 @@ msgstr "云端用量"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "此组织未启用云端用量。"
 
+msgid "Cloud usage is used up for this period."
+msgstr "本周期的云用量已用完。"
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "本周期的云用量已用完。所有者可以在设置的账单中购买更多。"
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "本周期的云用量已用完。所有者可以在设置的账单中升级到 Team 或 Ultra。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "本周期的云用量已用完。此工作区将在 10 分钟后停止。所有者可以购买更多以使其继续运行。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "本周期的云用量已用完。此工作区将在 10 分钟后停止。所有者可以升级到 Team 或 Ultra 以使其继续运行。"
+
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "本周期的云用量已用完。工作区无法启动。"
+
 msgid "Cloud workspace"
 msgstr "云端工作区"
 
@@ -4886,9 +4929,6 @@ msgstr "{account} 未开通云工作区。云工作区包含在 Team 和 Ultra �
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "您的方案不包含云工作区。"
-
-msgid "Cloud workspaces cannot start."
-msgstr "云工作区无法启动。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "云工作区以你的身份提交、推送并创建拉取请求"
@@ -5291,6 +5331,9 @@ msgstr "连接后，将以你自己的身份而非工作区的身份处理拉取
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "连接你的 {pluginLabel} 账户，然后重新加载此页面。"
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "关联你的 AWS Marketplace 订阅"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6798,6 +6841,9 @@ msgstr "定制价格"
 msgid "Custom provider"
 msgstr "自定义提供商"
 
+msgid "Custom range…"
+msgstr "自定义范围…"
+
 msgid "Custom themes"
 msgstr "自定义主题"
 
@@ -6882,6 +6928,9 @@ msgstr "每月的日期"
 
 msgid "Day One"
 msgstr "元老"
+
+msgid "Days are in Pacific time."
+msgstr "日期按太平洋时间计算。"
 
 msgid "days running three agents at once"
 msgstr "同时运行三个智能体的天数"
@@ -8323,9 +8372,6 @@ msgstr "外部浏览器"
 msgid "extra ${used} of ${limit}"
 msgstr "额外用量${used}/${limit}"
 
-msgid "Extra GB-hours"
-msgstr "额外 GB 小时"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "按需购买的额外 GB 小时"
 
@@ -8334,9 +8380,6 @@ msgstr "极高"
 
 msgid "Extra small"
 msgstr "超小"
-
-msgid "Extra usage"
-msgstr "额外用量"
 
 msgid "Extra usage limit reached"
 msgstr "已达到额外用量上限"
@@ -9324,10 +9367,6 @@ msgstr "创始工程师"
 msgid "Free"
 msgstr "免费版"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "免费"
-
 msgid "Free credits"
 msgstr "免费额度"
 
@@ -9429,18 +9468,6 @@ msgstr "已开启关卡"
 
 msgid "GB-hours"
 msgstr "GB 小时"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "超出套餐的 GB 小时：{overage}"
-
-msgid "GB-hours past the pool"
-msgstr "超出额度池的 GB 小时"
-
-msgid "GB-hours used: {used}"
-msgstr "已用 GB 小时：{used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "已用 GB 小时：{used} / {included}"
 
 msgid "General"
 msgstr "通用"
@@ -9648,6 +9675,12 @@ msgstr "返回首页"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "请返回 {appName} 并重新登录。"
+
+msgid "Go back to {parentTitle}."
+msgstr "返回 {parentTitle}。"
+
+msgid "Go back to message the main agent."
+msgstr "返回以向主智能体发送消息。"
 
 msgid "Go back to the previous page in history"
 msgstr "返回历史记录中的上一页"
@@ -9985,9 +10018,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "每小时"
-
-msgid "Hours"
-msgstr "小时"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "时长由整个团队共享。以标准 {vcpus} vCPU / {memoryGb} GB 工作区计算，更大的机器消耗更快。"
@@ -10750,6 +10780,12 @@ msgstr "删除后无法恢复。"
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到应用内浏览器中。之后智能体可以在你已登录的网站上执行操作。"
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "该订阅已关联到你不是成员的组织。请让该组织的所有者邀请你。"
+
+msgid "It is linked to {organization}."
+msgstr "已关联到 {organization}。"
+
 msgid "It keeps the title from your prompt."
 msgstr "将保留根据你的提示生成的标题。"
 
@@ -11355,6 +11391,9 @@ msgstr "链接已复制"
 msgid "Link copied"
 msgstr "链接已复制"
 
+msgid "Link organization"
+msgstr "关联组织"
+
 msgid "Link task"
 msgstr "关联任务"
 
@@ -11363,6 +11402,9 @@ msgstr "关联此任务"
 
 msgid "Linked {slug} to workspace"
 msgstr "已将{slug}关联到工作区"
+
+msgid "Linking..."
+msgstr "正在关联..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11509,9 +11551,6 @@ msgstr "正在加载更多..."
 
 msgid "Loading more…"
 msgstr "正在加载更多…"
-
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "正在加载第 {loadingPage} 页，共 {targetPage} 页..."
 
 msgid "Loading project…"
 msgstr "正在加载项目…"
@@ -12045,6 +12084,9 @@ msgstr "消息"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "包含这些词的消息会像提及一样通知你。用逗号分隔。"
+
+msgid "Messages you send go to {name}."
+msgstr "你发送的消息将发给 {name}。"
 
 msgid "Microphone"
 msgstr "麦克风"
@@ -12805,9 +12847,6 @@ msgstr "这台机器上还没有发现Claude或Codex的用量。现在加入，�
 msgid "No cloud environment opens {repository}."
 msgstr "没有云环境打开 {repository}。"
 
-msgid "No cloud usage in this period."
-msgstr "此周期内没有云端用量。"
-
 msgid "No cloud workspaces"
 msgstr "没有云工作区"
 
@@ -12849,6 +12888,9 @@ msgstr "未找到贡献者。"
 
 msgid "No credit card required."
 msgstr "无需信用卡。"
+
+msgid "No days available"
+msgstr "没有可用的日期"
 
 msgid "No description"
 msgstr "无描述"
@@ -13415,9 +13457,6 @@ msgstr "此服务器不可用"
 msgid "Not bound · configure in Settings → Links"
 msgstr "未绑定 · 在设置→链接中配置"
 
-msgid "Not broken down yet"
-msgstr "尚未细分"
-
 msgid "Not configured"
 msgstr "未配置"
 
@@ -13429,9 +13468,6 @@ msgstr "未连接"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未连接 · 云端工作区以组织的 GitHub App 身份推送"
-
-msgid "Not counted by billing yet"
-msgstr "尚未计入账单"
 
 msgid "Not demoed here"
 msgstr "此处未做演示"
@@ -13471,6 +13507,10 @@ msgstr "不在此版本中"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "尚未接收到事件：Microsoft Graph拒绝了通知订阅。请检查应用的管理员同意和受保护API的审批，然后重新连接。"
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "未记录"
 
 msgid "Not reported yet"
 msgstr "尚未报告"
@@ -13604,11 +13644,8 @@ msgstr "物品"
 msgid "of {0}"
 msgstr "共{0}人"
 
-msgid "of {cap} included"
-msgstr "（共包含 {cap}）"
-
-msgid "of {cap} limit"
-msgstr "（上限 {cap}）"
+msgid "of {held}"
+msgstr "／{held}"
 
 msgid "of {total}"
 msgstr "共{total}名"
@@ -13622,8 +13659,9 @@ msgstr "占全部token"
 msgid "Off"
 msgstr "关闭"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "已关闭。不足时购买更多 GB 小时。"
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "关闭"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -13761,6 +13799,9 @@ msgstr "只有 {organizationName} 的管理员可以邀请新成员"
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "只有组织所有者才能更改方案，请联系所有者升级。"
+
+msgid "Only an owner or admin can link this organization."
+msgstr "只有所有者或管理员可以关联此组织。"
 
 msgid "Only available on macOS."
 msgstr "仅在macOS上可用。"
@@ -14482,10 +14523,6 @@ msgstr "原创组件"
 msgid "Other"
 msgstr "其他"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "其他"
-
 msgid "Other apps"
 msgstr "其他应用"
 
@@ -14525,11 +14562,6 @@ msgstr "内存不足"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "内存不足：机器即将无响应。{sizeName} 有 {memoryGb} GB 内存。"
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "内存不足：为保持运行，机器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 内存。"
 
 msgid "Out of scope"
 msgstr "超出范围"
@@ -14598,9 +14630,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "页面"
 
-msgid "Page {page} of {pages}"
-msgstr "第 {page} / {pages} 页"
-
 msgid "Page actions"
 msgstr "页面操作"
 
@@ -14657,10 +14686,6 @@ msgstr "分页"
 
 msgid "Pagination"
 msgstr "分页"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "付费"
 
 msgid "Paid plans"
 msgstr "付费套餐"
@@ -16440,9 +16465,6 @@ msgstr "移除智能体"
 msgid "remove the PR link"
 msgstr "移除PR链接"
 
-msgid "Remove this filter"
-msgstr "移除此筛选"
-
 msgid "Remove trigger"
 msgstr "移除触发器"
 
@@ -16737,9 +16759,6 @@ msgstr "重置缩放"
 msgid "Reset Zoom"
 msgstr "重置缩放"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate} 重置"
-
 msgid "Resets at {until}"
 msgstr "将于 {until} 重置"
 
@@ -16828,9 +16847,6 @@ msgstr "重新开始引导"
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "重启正在运行的工作区，让其中的智能体应用此更改。"
-
 msgid "Restart terminal daemon?"
 msgstr "重启终端守护进程？"
 
@@ -16839,9 +16855,6 @@ msgstr "重启终端"
 
 msgid "Restart workspace"
 msgstr "重启工作区"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "重启工作区以使用新的代理凭据。"
 
 msgid "Restarted"
 msgstr "已重启"
@@ -17301,6 +17314,9 @@ msgstr "在终端中运行以下命令，然后继续："
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "在终端中运行此命令，然后粘贴它输出的令牌："
+
+msgid "Run time"
+msgstr "运行时长"
 
 msgid "Run workspace command"
 msgstr "运行工作区命令"
@@ -17775,9 +17791,6 @@ msgstr "正在搜索Kbd的使用处"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "周期中途移除的席位在 {0} 前仍然有效。"
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "席位、额度和额外用量上限尚未加载。下次账单数据刷新后会显示。"
-
 msgid "Secondary"
 msgstr "次要"
 
@@ -17843,9 +17856,6 @@ msgstr "查看空缺职位，或先试用 Paradev。"
 
 msgid "See this gate on the scorecard"
 msgstr "在评分表中查看这道关卡"
-
-msgid "See usage"
-msgstr "查看用量"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "查看改动、给出反馈，就绪后合并成果。"
@@ -18386,6 +18396,9 @@ msgstr "显示全部评论"
 
 msgid "Show all lines"
 msgstr "显示所有行"
+
+msgid "Show all models"
+msgstr "显示所有模型"
 
 msgid "Show Apple's installer"
 msgstr "显示 Apple 安装器"
@@ -19417,11 +19430,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "已停止"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "已停止 {0}（{1} GB）以释放内存"
-
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
@@ -20108,9 +20116,6 @@ msgstr "最好的智能体会变。<0/>你的工作流不该变。"
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "机器以 {actual} vCPU 启动，而不是 {wanted} vCPU。请重启后重试。"
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "按套餐的明细只保留当前周期。"
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
 
@@ -20182,9 +20187,6 @@ msgstr "该自动化用于启动云端工作区的环境已被归档或没有仓
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "该扩展程序及其本地数据将从此浏览器中删除。"
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "额外用量上限是套餐的一个百分比，因此不显示金额。"
 
 msgid "The factory"
 msgstr "工厂"
@@ -20386,8 +20388,8 @@ msgstr "路径必须位于仓库内"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "插件更改未在 {seconds} 秒内完成。"
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"
+msgid "The pool resets every month."
+msgstr "额度池每月重置。"
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "主仓库必须是该环境的仓库之一"
@@ -20568,6 +20570,9 @@ msgstr "该智能体无法分叉对话"
 msgid "This agent can't run in a cloud workspace"
 msgstr "此智能体无法在云端工作区中运行"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "此智能体不允许你向其子智能体发送消息。"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所选设备上已不存在这个智能体（它的智能体可能被重置过）。在你选择新的智能体之前，运行都会失败。"
 
@@ -20674,6 +20679,13 @@ msgstr "此目录不存在。终端脚本将回退到工作区根目录。"
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此邮箱已通过其他登录方式注册，且提供方未将其确认为已验证。请使用你之前使用的方式登录。"
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "此环境每小时最多可手动启动 3 次构建。请在 {0} 分钟后重试。"
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "此环境没有可构建的 [install]。请在其基础分支的 .paradev/config.toml 中添加。"
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此环境没有仓库。请先在设置中创建包含仓库的环境，再从该环境启动工作区"
 
@@ -20731,6 +20743,12 @@ msgstr "这个Linear工作区已被{owner}连接。请让对方先断开连接�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "这个Linear工作区已被另一个Paradev组织连接。"
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此链接已过期。请从你的 AWS Marketplace 订阅再次打开 Paradev。"
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此链接无效。请从你的 AWS Marketplace 订阅再次打开 Paradev。"
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "这看起来是二进制文件。以文本方式打开可能显示乱码，文件较大时还可能让编辑器卡死。"
 
@@ -20770,14 +20788,17 @@ msgstr "这只会更改显示名称，不会更改分支。"
 msgid "this organization"
 msgstr "此组织"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "此组织已在使用银行卡付款。请先取消该套餐，或选择其他组织。"
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "此组织没有结算周期。请改为选择一个时间范围。"
 
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "此组织已关联到另一个 AWS Marketplace 订阅。"
+
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此组织使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "此页面无法判断何时达到使用上限。"
 
 msgid "This page could not be loaded"
 msgstr "无法加载这个页面"
@@ -20895,6 +20916,9 @@ msgstr "此子智能体现在无法移到后台"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主机不再跟踪该子智能体。其记录仍保存在磁盘上的智能体会话目录中。"
+
+msgid "This subscription is already linked to another organization."
+msgstr "此订阅已关联到另一个组织。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "该终端还没有可交接的输出。"
@@ -21569,10 +21593,6 @@ msgstr "未知"
 msgid "Unknown"
 msgstr "未知"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "未知"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "未知"
@@ -21807,6 +21827,12 @@ msgstr "更新 <0>{key}</0> 的值"
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"
 
+msgid "Update this host to message subagents."
+msgstr "更新此主机以向子智能体发送消息。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "更新此主机以向子智能体发送消息。你的文本已放回主聊天。"
+
 msgid "Update this host to move subagents to the background"
 msgstr "请更新此主机以将子智能体移到后台"
 
@@ -21900,17 +21926,11 @@ msgstr "用量"
 msgid "Usage is out of date"
 msgstr "用量数据已过时"
 
-msgid "usage limit"
-msgstr "使用上限"
-
 msgid "Usage limit"
 msgstr "使用上限"
 
 msgid "Usage limit reached"
 msgstr "已达到使用上限"
-
-msgid "Usage limit reached."
-msgstr "已达到使用上限。"
 
 msgid "Usage sections"
 msgstr "用量分区"
@@ -22222,6 +22242,9 @@ msgctxt "stack layer"
 msgid "Viewing"
 msgstr "正在查看"
 
+msgid "Viewing subagent {name}"
+msgstr "正在查看子智能体 {name}"
+
 msgid "Violence or harassment"
 msgstr "暴力或骚扰"
 
@@ -22344,6 +22367,9 @@ msgstr "我们无法从此组织的支付方式扣款。请让所有者更新它
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "我们无法从你的支付方式扣款。请更新支付方式以保留此方案。"
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "无法确认你的 AWS Marketplace 订阅"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "无法连接到{appName}以确认它是否在线。请检查网络连接后重试。"
@@ -23044,8 +23070,8 @@ msgstr "你没有此终端的访问权限。"
 msgid "You don't have permission to remove this member"
 msgstr "你没有移除该成员的权限"
 
-msgid "You have no cloud usage in this period."
-msgstr "你在此周期内没有云端用量。"
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "你还没有自己拥有或管理的组织。请先创建一个，然后再次打开此链接。"
 
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "你有未保存的环境变量。确定要关闭吗？"
@@ -23153,6 +23179,9 @@ msgstr "你的智能体订阅和密钥"
 msgid "Your Agents, Your Accounts"
 msgstr "你的智能体，你的账号"
 
+msgid "Your AWS Marketplace subscription is active"
+msgstr "你的 AWS Marketplace 订阅已生效"
+
 msgid "Your changes"
 msgstr "你的更改"
 
@@ -23205,9 +23234,6 @@ msgstr "你的名字 <0>（若我们采用你的提示词，会在更新日志�
 msgid "Your organization"
 msgstr "你的组织"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "你的组织已达到云端用量上限。请在“设置”中的“账单”提高上限或升级，以启动此工作区。"
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "你的组织已达到环境数量上限（{0}）。请归档一个环境，或在“设置”中的“账单”升级以添加更多。"
@@ -23222,20 +23248,11 @@ msgstr "你的组织为你安装了 {plugin}，因此无法卸载。你可以停
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "你的组织为你安装了此插件。你可以停用它，但不能移除。"
 
-msgid "Your organization reached its cloud usage limit."
-msgstr "您的组织已达到云使用上限。"
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "你的组织已达到云端用量上限。除非提高上限，此工作区将在几分钟后停止。"
-
 msgid "Your organization reached its environment limit."
 msgstr "您的组织已达到环境数量上限。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接你自己的账户后，Paradev 为你完成的工作会以你的名义显示。"
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "仅显示你自己的用量。组织的总量、额度和按人员的用量仅对所有者和管理员可见。"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"

@@ -469,6 +469,7 @@ msgstr "{0}(末尾{1})"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where}には{0}件のファイルがすでに存在します。置き換えますか?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB 時間"
@@ -783,6 +784,9 @@ msgstr "{actor}がワークスペース {workspace} のリンクを解除しま�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "現時点で{actual} · 予測は約{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} では、サブエージェントにメッセージを送れません。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} のセッションは、そのワークスペースを開くと再開されます。"
 
@@ -1028,6 +1032,9 @@ msgstr "{fileCount, plural, one {このワークスペースで変更された�
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{total} 件中 {first}–{last}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}でフォーカス"
 
@@ -1166,8 +1173,17 @@ msgstr "{name} が確認を求めています"
 msgid "{name} can't be messaged"
 msgstr "{name} にはメッセージを送れません"
 
+msgid "{name} can't take messages now."
+msgstr "{name} は現在メッセージを受け取れません。"
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} はメッセージを受け取れません。テキストはメインチャットに戻しました。"
+
 msgid "{name} failed"
 msgstr "{name} が失敗しました"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} は失敗したため、メッセージを受け取れません。"
 
 msgid "{name} finished"
 msgstr "{name} が完了しました"
@@ -1202,6 +1218,9 @@ msgstr "{name} が作業を開始しました"
 msgid "{name} stopped"
 msgstr "{name} が停止しました"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} は停止したため、メッセージを受け取れません。"
+
 msgid "{name} wants more access"
 msgstr "{name} がより多くのアクセスを求めています"
 
@@ -1214,6 +1233,9 @@ msgstr "{name}: 1ユーザーあたり月額 {monthly}"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 1ユーザーあたり月額 {monthly}、または年払いで {yearly}"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} は以前のサインインを使用したままです。新しいサインインを使うには再起動してください。"
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {人を1人以上指定するか、{choice}を選択してください。} sender {送信者を1人以上指定するか、{choice}を選択してください。} other {項目を1つ以上指定するか、{choice}を選択してください。}}"
 
@@ -1225,6 +1247,9 @@ msgstr "{openCount}件通過"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {このワークスペースで他にも変更: #件のファイル} other {このワークスペースで他にも変更: #件のファイル}}"
+
+msgid "{over} overage"
+msgstr "超過 {over}"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} は、あなたとして {pluginLabel} アカウントのデータを読み取り、変更できます。このページの今後のバージョンも含みます。読み取った内容を他のウェブサイトに送信できます。信頼できるページだけを許可してください。"
@@ -1327,8 +1352,8 @@ msgstr "{pullRequests} · {base} 向け"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {キューで待機中のメッセージ #件} other {キューで待機中のメッセージ #件}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "GB 時間あたり {rate}。月間プールの後に使われ、期限はありません。"
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "GB 時間あたり {rate}。プランに含まれる使用量の後に使われ、期限はありません。"
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}%読了"
@@ -1349,9 +1374,6 @@ msgstr "残り {remaining} トークン"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {# 行中 {first}–{last}}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {# シート分に含まれる}}"
@@ -1658,9 +1680,6 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Union Square Ventures がリードしたシードラウンドで 1,150 万ドル"
 
-msgid "0 rows"
-msgstr "0 行"
-
 msgid "1"
 msgstr "1"
 
@@ -1763,6 +1782,9 @@ msgstr "このセッションで200Kトークン中87.4Kを使用しました。
 
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "アプリ内ブラウザを改良します。変更をプレビューし、任意の要素をクリックしてコンテキストとしてエージェントに送れます。"
+
+msgid "A build of this environment is already running"
+msgstr "この環境のビルドはすでに実行中です"
 
 msgid "A CDP endpoint per pane"
 msgstr "ペインごとに専用のCDPエンドポイント"
@@ -2371,9 +2393,6 @@ msgstr "エージェントコマンド"
 msgid "Agent Configs"
 msgstr "エージェント設定"
 
-msgid "Agent credentials changed"
-msgstr "エージェントの認証情報が変更されました"
-
 msgid "Agent finished"
 msgstr "エージェントが完了しました"
 
@@ -2779,6 +2798,9 @@ msgstr "その他: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "どのエージェントがあなたを必要としているかが常に分かります。通知からブロック中のエージェントへ直接ジャンプできます。"
+
+msgid "Amount of GB-hours"
+msgstr "GB 時間の量"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "エージェントが複数ファイルにまたがる変更を最後までやり切る。"
@@ -3490,12 +3512,18 @@ msgstr "稼働中"
 msgid "Away"
 msgstr "離席中"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace から応答がありません。数分後にもう一度お試しください。"
+
 msgid "Back"
 msgstr "戻る"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "戻る"
+
+msgid "Back to {parentTitle}"
+msgstr "{parentTitle} に戻る"
 
 msgid "Back to About"
 msgstr "会社概要に戻る"
@@ -3599,6 +3627,9 @@ msgstr "いま作っています。"
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "その先:F5は近い将来の主張ではない"
 
+msgid "Billed hours"
+msgstr "課金対象時間"
+
 msgid "Billed monthly"
 msgstr "月払い"
 
@@ -3614,8 +3645,8 @@ msgstr "請求"
 msgid "Billing details"
 msgstr "請求先情報"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "課金によりクラウドワークスペースの起動が拒否されました。組織のプランにクラウドワークスペースが含まれていないか、クラウド利用上限に達しています。クラウドワークスペースには Team または Ultra プランが必要です。設定 > 請求でアップグレードするか上限を上げてください。またはデバイスで自動化を実行してください。"
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "請求によりクラウドワークスペースの起動が拒否されました。プランにクラウドワークスペースが含まれていないか、組織がこの期間のクラウド使用量をすべて使い切っています。設定の請求を確認するか、デバイスでオートメーションを実行してください。"
 
 msgid "Binary"
 msgstr "バイナリ"
@@ -3696,9 +3727,6 @@ msgstr "下部ドロワー。タッチデバイスではスワイプで操作で
 
 msgid "Bought credits"
 msgstr "購入したクレジット"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "購入済み GB 時間の残り: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Dockアイコンを弾ませる"
@@ -3898,9 +3926,6 @@ msgstr "ボタン、トグル、キーボード操作の手がかり"
 
 msgid "Buy"
 msgstr "購入"
-
-msgid "Buy extra GB-hours"
-msgstr "GB 時間を追加購入"
 
 msgid "Buy for {total}"
 msgstr "{total} で購入"
@@ -4273,9 +4298,6 @@ msgstr "チャンネルのオプション"
 msgid "Channels"
 msgstr "チャンネル"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "購入した GB 時間が少なくなると、保存済みのカードに追加の GB 時間を請求します。"
-
 msgid "Chat"
 msgstr "チャット"
 
@@ -4469,6 +4491,9 @@ msgstr "選択してください"
 
 msgid "Choose the model"
 msgstr "モデルを選択"
+
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "AWS Marketplace が請求する組織を選択してください。1 つのサブスクリプションには 1 つの組織をリンクできます。"
 
 msgid "Choose the primary repository"
 msgstr "メインのリポジトリを選択"
@@ -4859,6 +4884,24 @@ msgstr "クラウド使用量"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "この組織ではクラウド使用量が有効になっていません。"
 
+msgid "Cloud usage is used up for this period."
+msgstr "この期間のクラウド使用量を使い切りました。"
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "この期間のクラウド使用量を使い切りました。オーナーは設定の請求から追加購入できます。"
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "この期間のクラウド使用量を使い切りました。オーナーは設定の請求から Team または Ultra にアップグレードできます。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "この期間のクラウド使用量を使い切りました。このワークスペースは 10 分後に停止します。オーナーが追加購入すれば実行を続けられます。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "この期間のクラウド使用量を使い切りました。このワークスペースは 10 分後に停止します。オーナーが Team または Ultra にアップグレードすれば実行を続けられます。"
+
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "この期間のクラウド使用量を使い切りました。ワークスペースを起動できません。"
+
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
 
@@ -4886,9 +4929,6 @@ msgstr "{account} ではクラウドワークスペースが有効になって�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "クラウドワークスペースはご利用のプランに含まれていません。"
-
-msgid "Cloud workspaces cannot start."
-msgstr "クラウドワークスペースを起動できません。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
@@ -5291,6 +5331,9 @@ msgstr "接続すると、ワークスペースではなく自分としてプル
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} アカウントを接続してから、このページを再読み込みしてください。"
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "AWS Marketplace のサブスクリプションを接続"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6798,6 +6841,9 @@ msgstr "個別見積もり"
 msgid "Custom provider"
 msgstr "カスタムプロバイダー"
 
+msgid "Custom range…"
+msgstr "カスタム範囲…"
+
 msgid "Custom themes"
 msgstr "カスタムテーマ"
 
@@ -6882,6 +6928,9 @@ msgstr "日にち"
 
 msgid "Day One"
 msgstr "デイワン"
+
+msgid "Days are in Pacific time."
+msgstr "日付は太平洋時間です。"
 
 msgid "days running three agents at once"
 msgstr "エージェントを同時に3つ動かした日数"
@@ -8323,9 +8372,6 @@ msgstr "外部ブラウザ"
 msgid "extra ${used} of ${limit}"
 msgstr "追加分 ${limit}中${used}"
 
-msgid "Extra GB-hours"
-msgstr "追加の GB 時間"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "必要に応じて購入できる追加 GB 時間"
 
@@ -8334,9 +8380,6 @@ msgstr "最高"
 
 msgid "Extra small"
 msgstr "極小"
-
-msgid "Extra usage"
-msgstr "追加使用量"
 
 msgid "Extra usage limit reached"
 msgstr "追加使用量の上限に達しました"
@@ -9324,10 +9367,6 @@ msgstr "創業エンジニア"
 msgid "Free"
 msgstr "Free"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "無料"
-
 msgid "Free credits"
 msgstr "無料クレジット"
 
@@ -9429,18 +9468,6 @@ msgstr "通過したゲート"
 
 msgid "GB-hours"
 msgstr "GB 時間"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "プランを超えた GB 時間: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "プールを超えた GB 時間"
-
-msgid "GB-hours used: {used}"
-msgstr "使用した GB 時間: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "使用した GB 時間: {included} のうち {used}"
 
 msgid "General"
 msgstr "全般"
@@ -9648,6 +9675,12 @@ msgstr "ホームに戻る"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "{appName} に戻って、もう一度サインインしてください。"
+
+msgid "Go back to {parentTitle}."
+msgstr "{parentTitle} に戻ってください。"
+
+msgid "Go back to message the main agent."
+msgstr "メインエージェントにメッセージを送るには戻ってください。"
 
 msgid "Go back to the previous page in history"
 msgstr "履歴の前のページに戻る"
@@ -9985,9 +10018,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "毎時"
-
-msgid "Hours"
-msgstr "時間"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "時間はチーム全体で共有されます。標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしており、大きいマシンほど早く消費します。"
@@ -10750,6 +10780,12 @@ msgstr "元に戻すことはできません。"
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "\"{profileName}\" プロファイルの Cookie をアプリ内ブラウザにコピーします。エージェントはその後、あなたがログインしているサイトで操作できます。"
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "このサブスクリプションは、あなたがメンバーではない組織にすでにリンクされています。組織のオーナーに招待を依頼してください。"
+
+msgid "It is linked to {organization}."
+msgstr "{organization} にリンクされています。"
+
 msgid "It keeps the title from your prompt."
 msgstr "プロンプトから付けたタイトルのままになります。"
 
@@ -11355,6 +11391,9 @@ msgstr "リンクをコピーしました"
 msgid "Link copied"
 msgstr "リンクをコピーしました"
 
+msgid "Link organization"
+msgstr "組織をリンク"
+
 msgid "Link task"
 msgstr "タスクをリンク"
 
@@ -11363,6 +11402,9 @@ msgstr "このタスクをリンク"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug}をワークスペースにリンクしました"
+
+msgid "Linking..."
+msgstr "リンク中..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11509,9 +11551,6 @@ msgstr "さらに読み込み中..."
 
 msgid "Loading more…"
 msgstr "さらに読み込み中…"
-
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "{targetPage} ページ中 {loadingPage} ページ目を読み込んでいます..."
 
 msgid "Loading project…"
 msgstr "プロジェクトを読み込み中…"
@@ -12045,6 +12084,9 @@ msgstr "メッセージ"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "これらの語句を含むメッセージはメンションと同様に通知されます。カンマで区切って入力してください。"
+
+msgid "Messages you send go to {name}."
+msgstr "送信したメッセージは {name} に届きます。"
 
 msgid "Microphone"
 msgstr "マイク"
@@ -12805,9 +12847,6 @@ msgstr "このマシンでClaudeやCodexの使用がまだ見つかりません�
 msgid "No cloud environment opens {repository}."
 msgstr "{repository} を開くクラウド環境がありません。"
 
-msgid "No cloud usage in this period."
-msgstr "この期間のクラウド使用量はありません。"
-
 msgid "No cloud workspaces"
 msgstr "クラウドワークスペースはありません"
 
@@ -12849,6 +12888,9 @@ msgstr "コントリビューターが見つかりません。"
 
 msgid "No credit card required."
 msgstr "クレジットカードは不要です。"
+
+msgid "No days available"
+msgstr "利用できる日がありません"
 
 msgid "No description"
 msgstr "説明なし"
@@ -13415,9 +13457,6 @@ msgstr "このサーバーでは利用できません"
 msgid "Not bound · configure in Settings → Links"
 msgstr "未割り当て · 設定 → リンクで設定"
 
-msgid "Not broken down yet"
-msgstr "まだ内訳がありません"
-
 msgid "Not configured"
 msgstr "未設定"
 
@@ -13429,9 +13468,6 @@ msgstr "未接続"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未接続 · クラウドワークスペースは組織の GitHub App としてプッシュします"
-
-msgid "Not counted by billing yet"
-msgstr "まだ請求に反映されていない分"
 
 msgid "Not demoed here"
 msgstr "ここではデモしていません"
@@ -13471,6 +13507,10 @@ msgstr "このバージョンにはありません"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "まだイベントを受信していません: Microsoft Graphが通知サブスクリプションを拒否しました。アプリの管理者同意と保護されたAPIの承認を確認してから、再接続してください。"
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "記録なし"
 
 msgid "Not reported yet"
 msgstr "まだ報告されていません"
@@ -13604,11 +13644,8 @@ msgstr "物"
 msgid "of {0}"
 msgstr "{0}人中"
 
-msgid "of {cap} included"
-msgstr "（{cap} 含む）"
-
-msgid "of {cap} limit"
-msgstr "（上限 {cap}）"
+msgid "of {held}"
+msgstr "／{held}"
 
 msgid "of {total}"
 msgstr "{total}人中"
@@ -13622,8 +13659,9 @@ msgstr "全トークン中"
 msgid "Off"
 msgstr "オフ"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "オフ。少なくなると GB 時間を追加購入します。"
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "オフ"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -13761,6 +13799,9 @@ msgstr "新しいユーザーを招待できるのは{organizationName}の管理
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "プランを変更できるのは組織のオーナーのみです。オーナーにアップグレードを依頼してください。"
+
+msgid "Only an owner or admin can link this organization."
+msgstr "この組織をリンクできるのはオーナーまたは管理者のみです。"
 
 msgid "Only available on macOS."
 msgstr "macOSでのみ利用できます。"
@@ -14482,10 +14523,6 @@ msgstr "独自コンポーネント"
 msgid "Other"
 msgstr "その他"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "その他"
-
 msgid "Other apps"
 msgstr "他のアプリ"
 
@@ -14525,11 +14562,6 @@ msgstr "メモリ不足"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "メモリ不足: マシンが応答しなくなりかけています。{sizeName} のメモリは {memoryGb} GB です。"
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "メモリ不足: マシンは動作を続けるため {0} ({1} GB) を停止しました。{sizeName} のメモリは {memoryGb} GB です。"
 
 msgid "Out of scope"
 msgstr "スコープ外"
@@ -14598,9 +14630,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "ページ"
 
-msgid "Page {page} of {pages}"
-msgstr "{page} / {pages} ページ"
-
 msgid "Page actions"
 msgstr "ページの操作"
 
@@ -14657,10 +14686,6 @@ msgstr "ページネーション"
 
 msgid "Pagination"
 msgstr "Pagination"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "有料"
 
 msgid "Paid plans"
 msgstr "有料プラン"
@@ -16440,9 +16465,6 @@ msgstr "エージェントを削除する"
 msgid "remove the PR link"
 msgstr "PRリンクを削除する"
 
-msgid "Remove this filter"
-msgstr "このフィルターを解除"
-
 msgid "Remove trigger"
 msgstr "トリガーを削除"
 
@@ -16737,9 +16759,6 @@ msgstr "ズームをリセット"
 msgid "Reset Zoom"
 msgstr "ズームをリセット"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate} にリセット"
-
 msgid "Resets at {until}"
 msgstr "{until} にリセット"
 
@@ -16828,9 +16847,6 @@ msgstr "オンボーディングをやり直す"
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "実行中のワークスペースを再起動すると、エージェントに変更が反映されます。"
-
 msgid "Restart terminal daemon?"
 msgstr "ターミナルデーモンを再起動しますか?"
 
@@ -16839,9 +16855,6 @@ msgstr "ターミナルを再起動"
 
 msgid "Restart workspace"
 msgstr "ワークスペースを再起動"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "新しいエージェント認証情報を反映するにはワークスペースを再起動してください。"
 
 msgid "Restarted"
 msgstr "再起動"
@@ -17301,6 +17314,9 @@ msgstr "ターミナルでこれを実行してから続行してください:"
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "これをターミナルで実行し、表示されたトークンを貼り付けてください："
+
+msgid "Run time"
+msgstr "稼働時間"
 
 msgid "Run workspace command"
 msgstr "ワークスペースのコマンドを実行"
@@ -17775,9 +17791,6 @@ msgstr "Kbdの使用箇所を検索中"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "期間の途中で削除した席は {0} まで有効です。"
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "シート、クレジット、追加使用量の上限はまだ読み込まれていません。次に請求データが更新されると表示されます。"
-
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -17843,9 +17856,6 @@ msgstr "募集中のポジションを見るか、まずはParadevを試して�
 
 msgid "See this gate on the scorecard"
 msgstr "このゲートをスコアカードで見る"
-
-msgid "See usage"
-msgstr "使用量を見る"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "変更内容を確認し、フィードバックを送り、準備ができたら成果をマージします。"
@@ -18386,6 +18396,9 @@ msgstr "すべてのコメントを表示"
 
 msgid "Show all lines"
 msgstr "すべての行を表示"
+
+msgid "Show all models"
+msgstr "すべてのモデルを表示"
 
 msgid "Show Apple's installer"
 msgstr "Apple のインストーラを表示"
@@ -19417,11 +19430,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "停止"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "メモリを確保するため {0} ({1} GB) を停止しました"
-
 msgid "Stopped by the usage limit"
 msgstr "使用量の上限により停止"
 
@@ -20108,9 +20116,6 @@ msgstr "最良のエージェントは変わります。<0/>ワークフロー�
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "マシンは {wanted} vCPU ではなく {actual} vCPU で起動しました。もう一度再起動してください。"
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "プラン別の内訳は現在の期間のみ保持されます。"
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "ボタンが目立つようになりました。ペインで確認済みです。"
 
@@ -20182,9 +20187,6 @@ msgstr "このオートメーションがクラウドワークスペースを起
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "拡張機能とそのローカルデータがこのブラウザから削除されます。"
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "追加使用量の上限はプランに対する割合で決まるため、金額は表示されません。"
 
 msgid "The factory"
 msgstr "工場"
@@ -20386,8 +20388,8 @@ msgstr "パスはリポジトリ内にある必要があります"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "プラグインの変更が {seconds} 秒以内に完了しませんでした。"
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "プールは毎月リセットされます。超過分は各プランに表示された GB 時間あたりの料金で請求されます。"
+msgid "The pool resets every month."
+msgstr "プールは毎月リセットされます。"
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "プライマリリポジトリは環境のリポジトリのいずれかである必要があります"
@@ -20568,6 +20570,9 @@ msgstr "このエージェントは会話を分岐できません"
 msgid "This agent can't run in a cloud workspace"
 msgstr "このエージェントはクラウドワークスペースで実行できません"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "このエージェントでは、サブエージェントにメッセージを送れません。"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "選択したデバイスにこのエージェントは存在しません(エージェントがリセットされた可能性があります)。新しいエージェントを選ぶまで実行は失敗します。"
 
@@ -20674,6 +20679,13 @@ msgstr "このディレクトリは存在しません。ターミナルスクリ
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "このメールアドレスは別のサインイン方法で既に登録されており、プロバイダーが確認済みとして認証しませんでした。以前使用した方法でサインインしてください。"
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "この環境で開始できる手動ビルドは1時間に3回までです。{0}分後にもう一度お試しください。"
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "この環境にはビルドする [install] がありません。ベースブランチの .paradev/config.toml に追加してください。"
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "この環境にはリポジトリがありません。設定でリポジトリを含む環境を作成し、その環境からワークスペースを開始してください"
 
@@ -20731,6 +20743,12 @@ msgstr "このLinearワークスペースは{owner}がすでに接続してい�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "このLinearワークスペースは別のParadev組織がすでに接続しています。"
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "このリンクは期限切れです。AWS Marketplace のサブスクリプションから Paradev をもう一度開いてください。"
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "このリンクは無効です。AWS Marketplace のサブスクリプションから Paradev をもう一度開いてください。"
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "バイナリファイルのようです。テキストとして開くと文字化けしたり、大きなファイルではエディタが固まる可能性があります。"
 
@@ -20770,14 +20788,17 @@ msgstr "変更されるのは表示名だけで、ブランチは変わりませ
 msgid "this organization"
 msgstr "この組織"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "この組織はすでにカードで支払っています。そのプランを先にキャンセルするか、別の組織を選択してください。"
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "この組織には請求期間がありません。代わりに期間を選んでください。"
 
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "この組織はすでに別の AWS Marketplace サブスクリプションにリンクされています。"
+
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "この組織はFreeプランです。{appName} MobileはProプランの組織でご利用いただけます。"
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "このページでは使用量の上限に達したかどうかを判断できません。"
 
 msgid "This page could not be loaded"
 msgstr "このページを読み込めませんでした"
@@ -20895,6 +20916,9 @@ msgstr "このサブエージェントは今はバックグラウンドに移動
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "このサブエージェントはホストで追跡されなくなりました。トランスクリプトはエージェントのセッションディレクトリにディスク上で残ります。"
+
+msgid "This subscription is already linked to another organization."
+msgstr "このサブスクリプションはすでに別の組織にリンクされています。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "このターミナルには引き継げる出力がまだありません。"
@@ -21569,10 +21593,6 @@ msgstr "不明"
 msgid "Unknown"
 msgstr "不明"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "不明"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "不明"
@@ -21807,6 +21827,12 @@ msgstr "<0>{key}</0> の値を更新"
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"
 
+msgid "Update this host to message subagents."
+msgstr "サブエージェントにメッセージを送るには、このホストを更新してください。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "サブエージェントにメッセージを送るには、このホストを更新してください。テキストはメインチャットに戻しました。"
+
 msgid "Update this host to move subagents to the background"
 msgstr "サブエージェントをバックグラウンドに移動するには、このホストを更新してください"
 
@@ -21900,17 +21926,11 @@ msgstr "使用量"
 msgid "Usage is out of date"
 msgstr "使用状況が古くなっています"
 
-msgid "usage limit"
-msgstr "使用量の上限"
-
 msgid "Usage limit"
 msgstr "使用量の上限"
 
 msgid "Usage limit reached"
 msgstr "使用量の上限に達しました"
-
-msgid "Usage limit reached."
-msgstr "使用量の上限に達しました。"
 
 msgid "Usage sections"
 msgstr "使用量セクション"
@@ -22222,6 +22242,9 @@ msgctxt "stack layer"
 msgid "Viewing"
 msgstr "表示中"
 
+msgid "Viewing subagent {name}"
+msgstr "サブエージェント {name} を表示中"
+
 msgid "Violence or harassment"
 msgstr "暴力または嫌がらせ"
 
@@ -22344,6 +22367,9 @@ msgstr "この組織の支払い方法に請求できませんでした。オー
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "お客様の支払い方法に請求できませんでした。このプランを維持するには更新してください。"
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "AWS Marketplace のサブスクリプションを確認できませんでした"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "オンラインかどうかを確認するための{appName}への接続に失敗しました。接続を確認して、もう一度お試しください。"
@@ -23044,8 +23070,8 @@ msgstr "このターミナルへのアクセス権がありません。"
 msgid "You don't have permission to remove this member"
 msgstr "このメンバーを削除する権限がありません"
 
-msgid "You have no cloud usage in this period."
-msgstr "この期間のクラウド使用量はありません。"
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "オーナーまたは管理者である組織がまだありません。組織を作成してから、このリンクをもう一度開いてください。"
 
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "保存していない環境変数があります。閉じてもよろしいですか？"
@@ -23153,6 +23179,9 @@ msgstr "エージェントのサブスクリプションとキー"
 msgid "Your Agents, Your Accounts"
 msgstr "エージェントもアカウントも、あなたのもの"
 
+msgid "Your AWS Marketplace subscription is active"
+msgstr "AWS Marketplace のサブスクリプションは有効です"
+
 msgid "Your changes"
 msgstr "編集中の内容"
 
@@ -23205,9 +23234,6 @@ msgstr "お名前 <0>(プロンプトを採用した場合、changelogでクレ�
 msgid "Your organization"
 msgstr "あなたの組織"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "組織がクラウドの利用上限に達しました。このワークスペースを起動するには、「設定」の「請求」で上限を引き上げるかアップグレードしてください。"
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "組織が環境数の上限（{0}）に達しました。環境をアーカイブするか、「設定」の「請求」でアップグレードして追加してください。"
@@ -23222,20 +23248,11 @@ msgstr "{plugin} は組織によってインストールされているため、
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "このプラグインは組織によってインストールされています。無効にはできますが、削除はできません。"
 
-msgid "Your organization reached its cloud usage limit."
-msgstr "組織がクラウドの使用上限に達しました。"
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "組織がクラウドの利用上限に達しました。上限を引き上げない限り、このワークスペースは数分後に停止します。"
-
 msgid "Your organization reached its environment limit."
 msgstr "組織が環境の上限に達しました。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "あなた自身のアカウントです。組織の連携は Paradev がそのツールにアクセスするためのもので、あなたのアカウントを接続すると、Paradev があなたのために行った作業があなたの名前で表示されます。"
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "あなた自身の使用量のみです。組織の合計、割り当て、人別の使用量はオーナーと管理者のみが表示できます。"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"

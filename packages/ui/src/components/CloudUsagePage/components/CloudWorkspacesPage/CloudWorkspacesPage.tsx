@@ -2,7 +2,6 @@
 
 import { Trans } from "@lingui/react/macro";
 import { useEffect } from "react";
-import { usePeriodLabel } from "../../hooks/usePeriodLabel";
 import type {
 	CloudPages,
 	CloudPeriod,
@@ -15,13 +14,11 @@ import type {
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
 import { pricedPages } from "../../utils/priced";
-import { workspaceOf } from "../../utils/workspaceOf";
 import { ROWS_PER_PAGE } from "../../utils/workspacesFilters";
-import { Notice } from "../Notice";
 import { PageHeader } from "../PageHeader";
+import { PeriodStepper } from "../PeriodStepper";
 import { QueryStatus } from "../QueryStatus";
 import { WorkspacesTable } from "../WorkspacesTable";
-import { FilterChips } from "./components/FilterChips";
 import { Pager } from "./components/Pager";
 import { WorkspacesToolbar } from "./components/WorkspacesToolbar";
 
@@ -50,7 +47,6 @@ export function CloudWorkspacesPage({
 	byPerson,
 }: CloudWorkspacesPageProps) {
 	const workspaces = pricedPages(unpriced);
-	const periodLabel = usePeriodLabel();
 	const param = periodParam(periods.data?.items, period);
 	/** Any change but the page itself goes back to the first page. */
 	const to = (next: WorkspacesFilters): WorkspacesTarget => ({
@@ -70,8 +66,6 @@ export function CloudWorkspacesPage({
 	// Pages are cursor pages: a page from the URL is reached by loading the pages before it, up to the last page there is.
 	const wanted = Math.min((filters.page ?? 1) - 1, (pageCount ?? 1) - 1);
 	const walking = !workspaces.isError && wanted >= pages.length && hasNextPage;
-	const loadingPage = pages.length + 1;
-	const targetPage = wanted + 1;
 	useEffect(() => {
 		if (walking && !isFetchingNextPage) fetchNextPage();
 	}, [walking, isFetchingNextPage, fetchNextPage]);
@@ -81,12 +75,6 @@ export function CloudWorkspacesPage({
 				item.ref && !("status" in item.ref) ? [item.ref] : [],
 			) ?? [])
 		: null;
-	const personName =
-		people?.find((person) => person.id === filters.user)?.name ??
-		pages
-			.flatMap((page) => page.items)
-			.map((row) => workspaceOf(row)?.owner)
-			.find((owner) => owner?.id === filters.user)?.name;
 
 	return (
 		<div className="@container space-y-4">
@@ -102,10 +90,15 @@ export function CloudWorkspacesPage({
 				title={
 					isAdmin ? <Trans>Workspaces</Trans> : <Trans>Your workspaces</Trans>
 				}
-				actions={
-					<span className="text-sm text-muted-foreground tabular-nums">
-						{period ? periodLabel(period) : <Trans>Last 30 days</Trans>}
-					</span>
+				period={
+					periods.data && (
+						<PeriodStepper
+							Link={Link}
+							periods={periods.data.items}
+							period={period}
+							to={(id) => ({ ...to(filters), period: id })}
+						/>
+					)
 				}
 			/>
 			<WorkspacesToolbar
@@ -113,21 +106,9 @@ export function CloudWorkspacesPage({
 				people={people}
 				onChange={(next) => navigate(to(next))}
 			/>
-			<FilterChips
-				Link={Link}
-				filters={filters}
-				personName={personName}
-				to={to}
-			/>
-			{walking ? (
-				<Notice>
-					<Trans>
-						Loading page {loadingPage} of {targetPage}...
-					</Trans>
-				</Notice>
-			) : !periods.data || !workspaces.data ? (
+			{walking || !periods.data || !workspaces.data ? (
 				<QueryStatus
-					isError={periods.isError || workspaces.isError}
+					isError={!walking && (periods.isError || workspaces.isError)}
 					onRetry={() =>
 						periods.isError ? periods.refetch() : workspaces.refetch()
 					}
@@ -145,28 +126,30 @@ export function CloudWorkspacesPage({
 								to({ ...filters, sort: sort === "gbHours" ? undefined : sort }),
 						}}
 					/>
-					<Pager
-						pageSizes={pages.map((page) => page.items.length)}
-						index={index}
-						rowCount={pages[0]?.rowCount ?? 0}
-						hasNextPage={hasNextPage}
-						isFetchingNextPage={isFetchingNextPage}
-						onPage={(next) =>
-							navigate({
-								...to(filters),
-								page: next === 0 ? undefined : next + 1,
-							})
-						}
-						rows={rows}
-						onRows={(rows) =>
-							navigate(
-								to({
-									...filters,
-									rows: rows === DEFAULT_ROWS ? undefined : rows,
-								}),
-							)
-						}
-					/>
+					{(pages[0]?.rowCount ?? 0) > 0 && (
+						<Pager
+							pageSizes={pages.map((page) => page.items.length)}
+							index={index}
+							rowCount={pages[0]?.rowCount ?? 0}
+							hasNextPage={hasNextPage}
+							isFetchingNextPage={isFetchingNextPage}
+							onPage={(next) =>
+								navigate({
+									...to(filters),
+									page: next === 0 ? undefined : next + 1,
+								})
+							}
+							rows={rows}
+							onRows={(rows) =>
+								navigate(
+									to({
+										...filters,
+										rows: rows === DEFAULT_ROWS ? undefined : rows,
+									}),
+								)
+							}
+						/>
+					)}
 				</>
 			)}
 		</div>

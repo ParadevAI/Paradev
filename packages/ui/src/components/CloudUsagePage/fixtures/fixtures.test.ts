@@ -1,26 +1,19 @@
 import { describe, expect, it } from "bun:test";
 import type { WorkspaceRef } from "../types";
+import { billingDays } from "../utils/billingDay";
 import {
-	type BillingState,
+	BILLING_STATES,
+	noPeriodsArgs,
 	overviewArgs,
 	workspaceArgs,
 	workspacePages,
 } from "./fixtures";
 
-const STATES: BillingState[] = [
-	"northwind",
-	"trial",
-	"prepaid",
-	"limitReached",
-	"percentCap",
-	"notRead",
-	"unbilled",
-];
 const refOf = (row: { ref: unknown }) => row.ref as WorkspaceRef;
 
 describe("story fixtures hold only states the router can return", () => {
 	it("stops workspaces at the usage limit only in the state that reached it", () => {
-		for (const state of STATES) {
+		for (const state of BILLING_STATES) {
 			const rows = overviewArgs(state).workspaces.data?.items ?? [];
 			const atLimit = rows.filter(
 				(row) => refOf(row).lastBoot?.endReason === "usage_limit",
@@ -53,5 +46,25 @@ describe("story fixtures hold only states the router can return", () => {
 		const rows = workspacePages().flatMap((page) => page.items);
 		const usage = rows.map((row) => row.usageUsd);
 		expect(usage).toEqual([...usage].sort((a, b) => b - a));
+	});
+
+	it("draws the By day bars the page draws: one per billing day, adding up to the headline", () => {
+		const stories = [
+			...BILLING_STATES.map((state) => overviewArgs(state)),
+			overviewArgs("northwind", { back: 1 }),
+			overviewArgs("northwind", { member: true }),
+			noPeriodsArgs(),
+		];
+		for (const args of stories) {
+			const usage = args.byDay.data;
+			if (!usage) throw new Error("no byDay");
+			const days = billingDays(usage.range);
+			for (const item of usage.items) expect(days).toContain(item.key ?? "");
+			const bars = usage.items.reduce((sum, item) => sum + item.gbHours, 0);
+			expect(bars).toBeCloseTo(usage.total.gbHours, 6);
+			expect(usage.total.workspaces).toBeNull();
+		}
+		const noPeriods = noPeriodsArgs().byDay.data;
+		expect(noPeriods && billingDays(noPeriods.range)).toHaveLength(30);
 	});
 });

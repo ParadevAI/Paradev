@@ -12,11 +12,7 @@ const RETRY_MAX_MS = 10 * 60_000;
 
 function sameReport(a: BoxPressure | null, b: BoxPressure | null): boolean {
 	if (!a || !b) return !a && !b;
-	return (
-		a.level === b.level &&
-		a.limitedBy.join() === b.limitedBy.join() &&
-		a.reap?.at === b.reap?.at
-	);
+	return a.level === b.level && a.limitedBy.join() === b.limitedBy.join();
 }
 
 export function startSandboxBoxPressureReporter(args: {

@@ -9,7 +9,7 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { browserHistory, settings } from "@superset/local-db";
+import { browserHistory, settings, workspaces } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
@@ -454,6 +454,17 @@ if (process.env.NODE_ENV === "development") {
 // roughly 128 MB.
 app.commandLine.appendSwitch("disk-cache-size", String(1024 * 1024 * 1024));
 
+// Chromium 152 crashes in soft-navigation paint metrics (Sentry DESKTOP-1F1).
+app.commandLine.appendSwitch(
+	"disable-features",
+	[
+		app.commandLine.getSwitchValue("disable-features"),
+		"SoftNavigationDetection",
+	]
+		.filter(Boolean)
+		.join(","),
+);
+
 protocol.registerSchemesAsPrivileged([
 	{
 		scheme: "superset-icon",
@@ -583,7 +594,13 @@ if (!gotTheLock) {
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();
 		initSentry();
-		await initAppState();
+		await initAppState(() =>
+			localDb
+				.select({ id: workspaces.id })
+				.from(workspaces)
+				.all()
+				.map((row) => row.id),
+		);
 
 		sweepNetworkLogs();
 		sweepDevAppProfiles();

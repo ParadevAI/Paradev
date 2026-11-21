@@ -1,14 +1,17 @@
-import type { RouterOutputs } from "@superset/trpc";
+import type {
+	cloudBootsOutputSchema,
+	cloudPeriodsOutputSchema,
+	cloudUsageOutputSchema,
+} from "@superset/shared/cloud-usage-api";
 import type { ComponentType, ReactNode } from "react";
+import type { z } from "zod";
 
-type Cloud = RouterOutputs["cloud"];
-
-export type CloudPeriods = Cloud["periods"]["list"];
+export type CloudPeriods = z.output<typeof cloudPeriodsOutputSchema>;
 export type CloudPeriod = CloudPeriods["items"][number];
-export type CloudUsage = Cloud["usage"]["query"];
+export type CloudUsage = z.output<typeof cloudUsageOutputSchema>;
 export type CloudUsageRow = CloudUsage["items"][number];
 export type CloudMetrics = CloudUsage["total"];
-export type CloudBoots = Cloud["boots"]["list"];
+export type CloudBoots = z.output<typeof cloudBootsOutputSchema>;
 export type CloudBoot = CloudBoots["items"][number];
 
 export type WorkspaceRef = Extract<

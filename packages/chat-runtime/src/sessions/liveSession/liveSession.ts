@@ -4,6 +4,7 @@ import {
 	CONTINUE_PROMPT,
 	sessionSelections,
 	userStopOf,
+	withoutWaitingContinues,
 } from "@superset/chat/core";
 import {
 	type DiscoverSessionsResult,
@@ -257,9 +258,7 @@ export class LiveSession {
 			harnessSessionId,
 			terminalId: this.options.terminalId,
 			...sessionSelections(this.sessionState),
-			interrupted,
-			prompts,
-			pausedPrompts,
+			...withoutWaitingContinues({ interrupted, prompts, pausedPrompts }),
 		};
 	}
 

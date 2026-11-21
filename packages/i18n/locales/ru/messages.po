@@ -469,6 +469,7 @@ msgstr "{0}, оканчивается на {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "В {where} уже есть {0} таких файлов. Заменить их?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} ГБ-часов"
@@ -783,6 +784,9 @@ msgstr "{actor} отвязал(а) рабочее пространство {work
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} на данный момент · прогноз ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} не позволяет отправлять сообщения своим субагентам."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеансы {agents} возобновятся, когда вы откроете их рабочее пространство."
 
@@ -1028,6 +1032,9 @@ msgstr "{fileCount, plural, one {В этой рабочей области из�
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Изменён # файл} few {Изменено # файла} many {Изменено # файлов} other {Изменено # файла}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} из {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} — фокус"
 
@@ -1166,8 +1173,17 @@ msgstr "{name} спрашивает"
 msgid "{name} can't be messaged"
 msgstr "{name} не может получать сообщения"
 
+msgid "{name} can't take messages now."
+msgstr "{name} сейчас не может получать сообщения."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} не может получать сообщения. Ваш текст снова в основном чате."
+
 msgid "{name} failed"
 msgstr "{name}: ошибка"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} завершился с ошибкой и не может получать сообщения."
 
 msgid "{name} finished"
 msgstr "{name} завершил работу"
@@ -1202,6 +1218,9 @@ msgstr "{name} начал работу"
 msgid "{name} stopped"
 msgstr "{name} остановлен"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} остановлен и не может получать сообщения."
+
 msgid "{name} wants more access"
 msgstr "{name} запрашивает больше доступа"
 
@@ -1214,6 +1233,9 @@ msgstr "{name}: {monthly} за пользователя в месяц"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за пользователя в месяц или {yearly} при оплате за год"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} всё ещё использует ваш предыдущий вход. Перезапустите, чтобы использовать новый."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
 
@@ -1225,6 +1247,9 @@ msgstr "{openCount} открыто"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Также изменён в этой рабочей области: # файл} few {Также изменены в этой рабочей области: # файла} many {Также изменены в этой рабочей области: # файлов} other {Также изменены в этой рабочей области: # файла}}"
+
+msgid "{over} overage"
+msgstr "{over} сверх лимита"
 
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} может от вашего имени читать и изменять данные в вашем аккаунте {pluginLabel}, в том числе в будущих версиях этой страницы. Прочитанное она может отправить на другие сайты. Разрешайте только страницам, которым доверяете."
@@ -1327,8 +1352,8 @@ msgstr "{pullRequests} · в {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# сообщение ждёт в очереди} few {# сообщения ждут в очереди} many {# сообщений ждут в очереди} other {# сообщения ждут в очереди}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} за ГБ-час. Расходуются после месячного пула и не сгорают."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} за ГБ-час. Расходуются после включённого в план использования и не сгорают."
 
 msgid "{readPercent}% read"
 msgstr "прочитано {readPercent}%"
@@ -1349,9 +1374,6 @@ msgstr "Осталось токенов: {remaining}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Изменения в # файле отменены.} few {Изменения в # файлах отменены.} many {Изменения в # файлах отменены.} other {Изменения в # файла отменены.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {{first}–{last} из # строки} few {{first}–{last} из # строк} many {{first}–{last} из # строк} other {{first}–{last} из # строки}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {Входит в # место} few {Входит в # места} many {Входит в # мест} other {Входит в # места}}"
@@ -1658,9 +1680,6 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Посевной раунд на 11,5 млн $ под руководством Union Square Ventures"
 
-msgid "0 rows"
-msgstr "0 строк"
-
 msgid "1"
 msgstr "1"
 
@@ -1763,6 +1782,9 @@ msgstr "В этой сессии использовано 87.4K из 200K ток
 
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Лучший встроенный браузер: смотрите свои изменения и кликайте по любому элементу, чтобы отправить его агенту как контекст."
+
+msgid "A build of this environment is already running"
+msgstr "Сборка этого окружения уже выполняется"
 
 msgid "A CDP endpoint per pane"
 msgstr "Свой CDP-эндпоинт для каждой панели"
@@ -2371,9 +2393,6 @@ msgstr "Команды агентов"
 msgid "Agent Configs"
 msgstr "Конфигурации агентов"
 
-msgid "Agent credentials changed"
-msgstr "Учётные данные агента изменились"
-
 msgid "Agent finished"
 msgstr "Агент завершил"
 
@@ -2779,6 +2798,9 @@ msgstr "Также: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Всегда знайте, какому агенту вы нужны: уведомления ведут прямо к заблокированному агенту."
+
+msgid "Amount of GB-hours"
+msgstr "Количество ГБ-часов"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент выполняет изменения в нескольких файлах от начала до конца."
@@ -3490,12 +3512,18 @@ msgstr "Работает"
 msgid "Away"
 msgstr "Отошёл"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace не отвечает. Повторите попытку через несколько минут."
+
 msgid "Back"
 msgstr "Назад"
 
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Назад"
+
+msgid "Back to {parentTitle}"
+msgstr "Вернуться к {parentTitle}"
 
 msgid "Back to About"
 msgstr "К разделу «О нас»"
@@ -3599,6 +3627,9 @@ msgstr "Делается прямо сейчас."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Дальше: F5 — не заявка на ближайшее будущее"
 
+msgid "Billed hours"
+msgstr "Оплачиваемые часы"
+
 msgid "Billed monthly"
 msgstr "Оплата помесячно"
 
@@ -3614,8 +3645,8 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платёжные данные"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Биллинг отказался запустить облачное рабочее пространство: план организации не включает облачные рабочие пространства, или достигнут лимит использования облака. Облачным рабочим пространствам нужен план Team или Ultra. Повысьте план или увеличьте лимит в разделе Настройки > Оплата, либо запустите автоматизацию на устройстве."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Оплата не позволила запустить облачное рабочее пространство: план не включает облачные рабочие пространства, или организация израсходовала всё облачное использование за этот период. Откройте Настройки, Оплата или запустите автоматизацию на устройстве."
 
 msgid "Binary"
 msgstr "Бинарный"
@@ -3696,9 +3727,6 @@ msgstr "Нижняя шторка, удобная для свайпов на с�
 
 msgid "Bought credits"
 msgstr "Купленные кредиты"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Осталось купленных ГБ-часов: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Подпрыгивание значка в Dock"
@@ -3898,9 +3926,6 @@ msgstr "Кнопки, переключатели и клавиатурные п�
 
 msgid "Buy"
 msgstr "Купить"
-
-msgid "Buy extra GB-hours"
-msgstr "Купить дополнительные ГБ-часы"
 
 msgid "Buy for {total}"
 msgstr "Купить за {total}"
@@ -4273,9 +4298,6 @@ msgstr "Параметры канала"
 msgid "Channels"
 msgstr "Каналы"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Списывает с сохранённой карты оплату за новые ГБ-часы, когда купленные ГБ-часы заканчиваются."
-
 msgid "Chat"
 msgstr "Чат"
 
@@ -4469,6 +4491,9 @@ msgstr "Выберите"
 
 msgid "Choose the model"
 msgstr "Выбрать модель"
+
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Выберите организацию, которой AWS Marketplace будет выставлять счета. Каждая подписка привязывается к одной организации."
 
 msgid "Choose the primary repository"
 msgstr "Выберите основной репозиторий"
@@ -4859,6 +4884,24 @@ msgstr "Использование облака"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Использование облака не включено для этой организации."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Облачное использование за этот период исчерпано."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Облачное использование за этот период исчерпано. Владелец может докупить ещё в разделе Настройки, Оплата."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Облачное использование за этот период исчерпано. Владелец может перейти на Team или Ultra в разделе Настройки, Оплата."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Облачное использование за этот период исчерпано. Это рабочее пространство остановится через 10 минут. Владелец может докупить, чтобы оно продолжило работать."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Облачное использование за этот период исчерпано. Это рабочее пространство остановится через 10 минут. Владелец может перейти на Team или Ultra, чтобы оно продолжило работать."
+
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Облачное использование за этот период исчерпано. Рабочие пространства не могут запуститься."
+
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
 
@@ -4886,9 +4929,6 @@ msgstr "Облачные рабочие пространства не включ
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Облачные рабочие пространства не входят в ваш тариф."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Облачные рабочие области не могут запуститься."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Облачные рабочие области делают коммиты, пуши и открывают pull request от вашего имени"
@@ -5291,6 +5331,9 @@ msgstr "Подключитесь, чтобы работать с пул-рекв
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Подключите аккаунт {pluginLabel}, затем перезагрузите эту страницу."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Подключите подписку AWS Marketplace"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -6798,6 +6841,9 @@ msgstr "Цена по договорённости"
 msgid "Custom provider"
 msgstr "Свой провайдер"
 
+msgid "Custom range…"
+msgstr "Свой диапазон…"
+
 msgid "Custom themes"
 msgstr "Свои темы"
 
@@ -6882,6 +6928,9 @@ msgstr "День месяца"
 
 msgid "Day One"
 msgstr "Первый день"
+
+msgid "Days are in Pacific time."
+msgstr "Дни указаны по тихоокеанскому времени."
 
 msgid "days running three agents at once"
 msgstr "дней с тремя агентами одновременно"
@@ -8323,9 +8372,6 @@ msgstr "Внешний браузер"
 msgid "extra ${used} of ${limit}"
 msgstr "сверх лимита ${used} из ${limit}"
 
-msgid "Extra GB-hours"
-msgstr "Дополнительные ГБ-часы"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "Дополнительные ГБ-часы по мере необходимости"
 
@@ -8334,9 +8380,6 @@ msgstr "Очень высокий"
 
 msgid "Extra small"
 msgstr "Очень маленький"
-
-msgid "Extra usage"
-msgstr "Дополнительное использование"
 
 msgid "Extra usage limit reached"
 msgstr "Достигнут лимит дополнительного использования"
@@ -9324,10 +9367,6 @@ msgstr "Инженер-основатель"
 msgid "Free"
 msgstr "Бесплатно"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Бесплатно"
-
 msgid "Free credits"
 msgstr "Бесплатные кредиты"
 
@@ -9429,18 +9468,6 @@ msgstr "Шлюзов открыто"
 
 msgid "GB-hours"
 msgstr "ГБ-часы"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "ГБ-часы сверх тарифа: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "ГБ-часы сверх пула"
-
-msgid "GB-hours used: {used}"
-msgstr "Использовано ГБ-часов: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Использовано ГБ-часов: {used} из {included}"
 
 msgid "General"
 msgstr "Общие"
@@ -9648,6 +9675,12 @@ msgstr "Вернуться на главную"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Вернитесь в {appName} и войдите снова."
+
+msgid "Go back to {parentTitle}."
+msgstr "Вернитесь к {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Вернитесь, чтобы написать основному агенту."
 
 msgid "Go back to the previous page in history"
 msgstr "Вернуться на предыдущую страницу в истории"
@@ -9985,9 +10018,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Ежечасно"
-
-msgid "Hours"
-msgstr "Часы"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Часы общие для всей команды. Они рассчитаны на стандартную рабочую область {vcpus} vCPU / {memoryGb} ГБ, а более мощные машины расходуют их быстрее."
@@ -10750,6 +10780,12 @@ msgstr "Его нельзя будет вернуть."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Cookie из вашего профиля «{profileName}» копируются во встроенный браузер приложения. Тогда агенты смогут действовать на сайтах, где вы вошли в аккаунт."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Она уже привязана к организации, в которой вы не состоите. Попросите владельца пригласить вас."
+
+msgid "It is linked to {organization}."
+msgstr "Она привязана к {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Останется название из вашего запроса."
 
@@ -11355,6 +11391,9 @@ msgstr "ссылка скопирована"
 msgid "Link copied"
 msgstr "Ссылка скопирована"
 
+msgid "Link organization"
+msgstr "Привязать организацию"
+
 msgid "Link task"
 msgstr "Привязать задачу"
 
@@ -11363,6 +11402,9 @@ msgstr "Связать эту задачу"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} привязана к рабочей области"
+
+msgid "Linking..."
+msgstr "Привязка..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -11509,9 +11551,6 @@ msgstr "Загружаем ещё..."
 
 msgid "Loading more…"
 msgstr "Загружаем ещё…"
-
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Загрузка страницы {loadingPage} из {targetPage}..."
 
 msgid "Loading project…"
 msgstr "Загрузка проекта…"
@@ -12045,6 +12084,9 @@ msgstr "Сообщения"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Сообщения с этими словами уведомляют вас как упоминание. Разделяйте их запятыми."
+
+msgid "Messages you send go to {name}."
+msgstr "Ваши сообщения получит {name}."
 
 msgid "Microphone"
 msgstr "Микрофон"
@@ -12805,9 +12847,6 @@ msgstr "На этой машине пока нет данных об испол�
 msgid "No cloud environment opens {repository}."
 msgstr "Ни одна облачная среда не открывает {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "За этот период облако не использовалось."
-
 msgid "No cloud workspaces"
 msgstr "Нет облачных рабочих пространств"
 
@@ -12849,6 +12888,9 @@ msgstr "Контрибьюторы не найдены."
 
 msgid "No credit card required."
 msgstr "Карта не нужна."
+
+msgid "No days available"
+msgstr "Нет доступных дней"
 
 msgid "No description"
 msgstr "Без описания"
@@ -13415,9 +13457,6 @@ msgstr "Недоступно на этом сервере"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Не назначено · настройте в Настройки → Ссылки"
 
-msgid "Not broken down yet"
-msgstr "Ещё не разбито по статьям"
-
 msgid "Not configured"
 msgstr "Не настроено"
 
@@ -13429,9 +13468,6 @@ msgstr "Не подключено"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Не подключено · облачные рабочие области пушат как GitHub App вашей организации"
-
-msgid "Not counted by billing yet"
-msgstr "Ещё не учтено в счёте"
 
 msgid "Not demoed here"
 msgstr "Здесь не показано"
@@ -13471,6 +13507,10 @@ msgstr "Нет в этой версии"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "События пока не приходят: Microsoft Graph отклонил подписки на уведомления. Проверьте согласие администратора и одобрение защищённого API, затем переподключитесь."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Не записано"
 
 msgid "Not reported yet"
 msgstr "Пока нет данных"
@@ -13604,11 +13644,8 @@ msgstr "Предметы"
 msgid "of {0}"
 msgstr "из {0}"
 
-msgid "of {cap} included"
-msgstr "из {cap} по тарифу"
-
-msgid "of {cap} limit"
-msgstr "из лимита {cap}"
+msgid "of {held}"
+msgstr "из {held}"
 
 msgid "of {total}"
 msgstr "из {total}"
@@ -13622,8 +13659,9 @@ msgstr "от всех токенов"
 msgid "Off"
 msgstr "Выкл."
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Выключено. Докупает ГБ-часы, когда они заканчиваются."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Выкл."
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -13761,6 +13799,9 @@ msgstr "Приглашать новых людей могут только ад�
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Менять тариф может только владелец организации. Попросите его перейти на Pro."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "Привязать эту организацию может только владелец или администратор."
 
 msgid "Only available on macOS."
 msgstr "Доступно только в macOS."
@@ -14482,10 +14523,6 @@ msgstr "Оригиналы"
 msgid "Other"
 msgstr "Прочее"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Прочее"
-
 msgid "Other apps"
 msgstr "Другие приложения"
 
@@ -14525,11 +14562,6 @@ msgstr "Нехватка памяти"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Нехватка памяти: машина вот-вот перестанет отвечать. У {sizeName} {memoryGb} ГБ."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Нехватка памяти: машина остановила {0} ({1} ГБ), чтобы продолжить работу. У {sizeName} {memoryGb} ГБ."
 
 msgid "Out of scope"
 msgstr "Вне рамок"
@@ -14598,9 +14630,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Страница"
 
-msgid "Page {page} of {pages}"
-msgstr "Страница {page} из {pages}"
-
 msgid "Page actions"
 msgstr "Действия со страницей"
 
@@ -14657,10 +14686,6 @@ msgstr "постраничная навигация"
 
 msgid "Pagination"
 msgstr "Постраничная навигация"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Платно"
 
 msgid "Paid plans"
 msgstr "Платные тарифы"
@@ -16440,9 +16465,6 @@ msgstr "удалить агента"
 msgid "remove the PR link"
 msgstr "отвязать PR"
 
-msgid "Remove this filter"
-msgstr "Убрать этот фильтр"
-
 msgid "Remove trigger"
 msgstr "Удалить триггер"
 
@@ -16737,9 +16759,6 @@ msgstr "Сбросить масштаб"
 msgid "Reset Zoom"
 msgstr "Сбросить масштаб"
 
-msgid "Resets {resetDate}"
-msgstr "Сброс {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Сброс в {until}"
 
@@ -16828,9 +16847,6 @@ msgstr "Пройти онбординг заново"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустить работающих агентов {providerLabel}?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Перезапустите работающие рабочие области, чтобы их агенты применили изменение."
-
 msgid "Restart terminal daemon?"
 msgstr "Перезапустить демон терминала?"
 
@@ -16839,9 +16855,6 @@ msgstr "Перезапустить терминалы"
 
 msgid "Restart workspace"
 msgstr "Перезапустить рабочую область"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Перезапустите рабочие пространства, чтобы применить новые учётные данные агента."
 
 msgid "Restarted"
 msgstr "Перезапущено"
@@ -17301,6 +17314,9 @@ msgstr "Выполните это в терминале, затем продол
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Выполните это в терминале, затем вставьте токен, который он выведет:"
+
+msgid "Run time"
+msgstr "Время работы"
 
 msgid "Run workspace command"
 msgstr "Запустить команду рабочей области"
@@ -17775,9 +17791,6 @@ msgstr "Ищем использования Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Места, удалённые в середине периода, остаются активными до {0}."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Места, кредиты и лимит дополнительного использования ещё не загружены. Они появятся при следующем обновлении платёжных данных."
-
 msgid "Secondary"
 msgstr "Вторичная"
 
@@ -17843,9 +17856,6 @@ msgstr "Посмотрите вакансии или сначала попроб
 
 msgid "See this gate on the scorecard"
 msgstr "Посмотреть этот шлюз в таблице"
-
-msgid "See usage"
-msgstr "Посмотреть использование"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Посмотрите, что изменилось, дайте обратную связь и объедините работу, когда она готова."
@@ -18386,6 +18396,9 @@ msgstr "Показать все комментарии"
 
 msgid "Show all lines"
 msgstr "Показать все строки"
+
+msgid "Show all models"
+msgstr "Показать все модели"
 
 msgid "Show Apple's installer"
 msgstr "Показать установщик Apple"
@@ -19417,11 +19430,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Остановлена"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "Остановлен {0} ({1} ГБ), чтобы освободить память"
-
 msgid "Stopped by the usage limit"
 msgstr "Остановлено лимитом использования"
 
@@ -20108,9 +20116,6 @@ msgstr "Лучший агент будет меняться.<0/>Ваш проц�
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Машина запустилась с {actual} vCPU вместо {wanted}. Перезапустите её, чтобы попробовать снова."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Разбивка по тарифу хранится только для текущего периода."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Теперь кнопка выделяется. Я проверил это в вашей панели."
 
@@ -20182,9 +20187,6 @@ msgstr "Окружение, из которого эта автоматизац�
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Расширение и его локальные данные удаляются из этого браузера."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "Лимит дополнительного использования задан процентом от тарифа, поэтому его сумма не показана."
 
 msgid "The factory"
 msgstr "Фабрика"
@@ -20386,8 +20388,8 @@ msgstr "Путь должен оставаться внутри репозито
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Изменение плагина не завершилось за {seconds} с."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Пул обновляется каждый месяц. Использование сверх него оплачивается за ГБ-час по ставке, указанной в каждом тарифе."
+msgid "The pool resets every month."
+msgstr "Пул обновляется каждый месяц."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Основной репозиторий должен быть одним из репозиториев окружения"
@@ -20568,6 +20570,9 @@ msgstr "Этот агент не может ответвить разговор"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Этот агент не позволяет отправлять сообщения своим субагентам."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
 
@@ -20674,6 +20679,13 @@ msgstr "Такой папки не существует. Скрипт терми
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Этот адрес электронной почты уже зарегистрирован с другим способом входа, и провайдер не подтвердил его как проверенный. Войдите тем способом, которым пользовались раньше."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "В этой среде можно запустить не более 3 ручных сборок в час. Повторите попытку через {0} мин."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "У этого окружения нет [install] для сборки. Добавьте его в .paradev/config.toml в базовой ветке."
+
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "В этом окружении нет репозиториев. Создайте окружение с репозиториями в Настройках и запустите рабочую область из него"
 
@@ -20731,6 +20743,12 @@ msgstr "Это рабочее пространство Linear уже подкл�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Это рабочее пространство Linear уже подключено другой организацией Paradev."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Срок действия ссылки истёк. Снова откройте Paradev из подписки AWS Marketplace."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Ссылка недействительна. Снова откройте Paradev из подписки AWS Marketplace."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Похоже, это бинарный файл. Открытие его как текста может показать мусор или подвесить редактор на больших файлах."
 
@@ -20770,14 +20788,17 @@ msgstr "Это меняет только отображаемое имя, а н�
 msgid "this organization"
 msgstr "эта организация"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Эта организация уже платит картой. Сначала отмените этот тариф или выберите другую организацию."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "У этой организации нет расчётных периодов. Выберите временной диапазон."
 
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Эта организация уже привязана к другой подписке AWS Marketplace."
+
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Эта организация на бесплатном тарифе. {appName} Mobile доступен организациям на тарифе Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Эта страница не может определить, когда достигнут лимит использования."
 
 msgid "This page could not be loaded"
 msgstr "Не удалось загрузить эту страницу"
@@ -20895,6 +20916,9 @@ msgstr "Этого субагента сейчас нельзя перевест
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Хост больше не отслеживает этого субагента. Его стенограмма остаётся на диске в каталоге сессии агента."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Эта подписка уже привязана к другой организации."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "В этом терминале пока нет вывода, который можно передать."
@@ -21569,10 +21593,6 @@ msgstr "неизвестно"
 msgid "Unknown"
 msgstr "Неизвестно"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Неизвестно"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Неизвестно"
@@ -21807,6 +21827,12 @@ msgstr "Обновите значение <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
 
+msgid "Update this host to message subagents."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам. Ваш текст снова в основном чате."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Обновите этот хост, чтобы переводить субагентов в фон"
 
@@ -21900,17 +21926,11 @@ msgstr "Использование"
 msgid "Usage is out of date"
 msgstr "Данные об использовании устарели"
 
-msgid "usage limit"
-msgstr "лимит использования"
-
 msgid "Usage limit"
 msgstr "Лимит использования"
 
 msgid "Usage limit reached"
 msgstr "Достигнут лимит использования"
-
-msgid "Usage limit reached."
-msgstr "Достигнут лимит использования."
 
 msgid "Usage sections"
 msgstr "Разделы использования"
@@ -22222,6 +22242,9 @@ msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Открыт"
 
+msgid "Viewing subagent {name}"
+msgstr "Просмотр субагента {name}"
+
 msgid "Violence or harassment"
 msgstr "Насилие или травля"
 
@@ -22344,6 +22367,9 @@ msgstr "Не удалось списать средства со способа 
 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Не удалось списать средства с вашего способа оплаты. Обновите его, чтобы сохранить тариф."
+
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Не удалось подтвердить подписку AWS Marketplace"
 
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Не удалось связаться с {appName}, чтобы узнать, в сети ли он. Проверьте подключение и попробуйте снова."
@@ -23044,8 +23070,8 @@ msgstr "У вас нет доступа к этому терминалу."
 msgid "You don't have permission to remove this member"
 msgstr "У вас нет прав удалить этого участника"
 
-msgid "You have no cloud usage in this period."
-msgstr "В этом периоде вы не использовали облако."
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "У вас пока нет организации, которой вы владеете или управляете. Создайте её и снова откройте эту ссылку."
 
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "У вас есть несохранённые переменные окружения. Точно закрыть?"
@@ -23153,6 +23179,9 @@ msgstr "Ваши подписки и ключи для агентов"
 msgid "Your Agents, Your Accounts"
 msgstr "Ваши агенты, ваши аккаунты"
 
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Подписка AWS Marketplace активна"
+
 msgid "Your changes"
 msgstr "Ваши изменения"
 
@@ -23205,9 +23234,6 @@ msgstr "Ваше имя <0>(если возьмём ваш промпт, ука�
 msgid "Your organization"
 msgstr "Ваша организация"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Ваша организация достигла лимита использования облака. Увеличьте лимит или перейдите на другой тариф в разделе «Настройки», «Оплата», чтобы запустить эту рабочую область."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Ваша организация достигла лимита окружений ({0}). Архивируйте окружение или перейдите на другой тариф в разделе «Настройки», «Оплата», чтобы добавить ещё."
@@ -23222,20 +23248,11 @@ msgstr "Ваша организация устанавливает {plugin} дл
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Ваша организация устанавливает этот плагин для вас. Его можно отключить, но нельзя удалить."
 
-msgid "Your organization reached its cloud usage limit."
-msgstr "Ваша организация достигла лимита использования облака."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Ваша организация достигла лимита использования облака. Эта рабочая область остановится через несколько минут, если лимит не увеличить."
-
 msgid "Your organization reached its environment limit."
 msgstr "Ваша организация достигла лимита окружений."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваши собственные учётные записи. Интеграции вашей организации дают Paradev доступ к её инструментам; подключив свои, вы увидите работу, которую Paradev делает для вас, под своим именем."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Только ваше собственное использование. Итоги организации, её лимит и использование по людям доступны владельцам и администраторам."
 
 msgid "Your Paradev download is starting."
 msgstr "Загрузка Paradev начинается."

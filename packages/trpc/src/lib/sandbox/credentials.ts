@@ -4,9 +4,8 @@
  * No credential enters the box. Every outbound credential is a header rule
  * on the sandbox firewall: the agent sends a placeholder, the firewall swaps
  * the header on the way out, and the value lives only here. The rules are
- * re-derived and re-applied on every wake and keepalive, so a token that
- * expires (the GitHub installation token lasts an hour) is never stale for
- * longer than one keepalive.
+ * re-derived and re-applied on every wake, when anything in them changes, and
+ * before a token in them expires (`reapply-rules.ts`).
  *
  * What does reach the box is the managed environment: the environment's own
  * variables minus any provider credential, which a cloud workspace ignores,

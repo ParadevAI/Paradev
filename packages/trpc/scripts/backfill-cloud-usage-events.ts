@@ -6,12 +6,14 @@ import {
 	autumnUsageByLock,
 	LOCK_SETTLED_MS,
 } from "@superset/db/cloud-usage-autumn";
+import { recordedUsage } from "@superset/db/cloud-usage-events";
 import {
 	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
 	type InsertCloudUsageEvent,
 } from "@superset/db/schema";
+import { BOX_GB_MINUTES_FEATURE_ID } from "@superset/shared/billing";
 import { eq, sql } from "drizzle-orm";
 
 /**
@@ -76,17 +78,7 @@ const boots = await db
 const bootById = new Map(boots.map((boot) => [boot.id, boot]));
 const lockKey = (lock: { bootId: string; lockSeq: number; feature: string }) =>
 	`${lock.bootId}:${lock.lockSeq}:${lock.feature}`;
-const recorded = new Set(
-	(
-		await db
-			.selectDistinct({
-				bootId: cloudUsageEvents.bootId,
-				lockSeq: cloudUsageEvents.lockSeq,
-				feature: cloudUsageEvents.feature,
-			})
-			.from(cloudUsageEvents)
-	).map(lockKey),
-);
+const recorded = new Set((await recordedUsage(db)).map(lockKey));
 const { locks, untied } = autumnUsageByLock(
 	events,
 	new Map(boots.map((boot) => [boot.id, boot.lockSeq])),
@@ -127,7 +119,7 @@ for (const lock of locks) {
 	else if (lock.amount < 0) skipped.negative += 1;
 	else {
 		const sentAt = new Date(lock.lastEventAt);
-		const box = lock.feature === "box_gb_minutes";
+		const box = lock.feature === BOX_GB_MINUTES_FEATURE_ID;
 		rows.push({
 			bootId: lock.bootId,
 			lockSeq: lock.lockSeq,
@@ -185,8 +177,9 @@ function totalBy(key: (row: InsertCloudUsageEvent) => string): Totals {
 		const total = totals[key(row)] ?? { rows: 0, gbMinutes: 0, cpuMinutes: 0 };
 		totals[key(row)] = total;
 		total.rows += 1;
-		total[row.feature === "box_gb_minutes" ? "gbMinutes" : "cpuMinutes"] +=
-			Number(row.amount);
+		total[
+			row.feature === BOX_GB_MINUTES_FEATURE_ID ? "gbMinutes" : "cpuMinutes"
+		] += Number(row.amount);
 	}
 	return totals;
 }
