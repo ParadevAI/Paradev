@@ -108,6 +108,10 @@ msgstr "{0, plural, one {#个活动端口：隐藏详情} other {#个活动端�
 msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
 msgstr "{0, plural, one {#个活动端口：显示详情} other {#个活动端口：显示详情}}"
 
+#. placeholder {0}: terminalIds.length
+msgid "{0, plural, one {# agent still runs the old version.} other {# agents still run the old version.}}"
+msgstr "{0, plural, one {#个智能体仍在运行旧版本。} other {#个智能体仍在运行旧版本。}}"
+
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
 msgstr "{0, plural, other {# 个智能体}}"
@@ -4521,6 +4525,9 @@ msgstr "阐明这里"
 
 msgid "Claude Code sessions, with claude --resume"
 msgstr "Claude Code 会话（使用 claude --resume）"
+
+msgid "Claude Code was updated"
+msgstr "Claude Code 已更新"
 
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code、Codex 和 OpenCode 是智能体；Paradev 是你同时运行多个智能体的地方。每个任务都有自己的 Git worktree 和分支，因此十个智能体可以同时在十个分支上工作，而你在一个地方监控、审查和合并。"

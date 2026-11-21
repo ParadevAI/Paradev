@@ -108,6 +108,10 @@ msgstr "{0, plural, one {활성 포트 #개: 세부 정보 숨기기} other {활
 msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
 msgstr "{0, plural, one {활성 포트 #개: 세부 정보 표시} other {활성 포트 #개: 세부 정보 표시}}"
 
+#. placeholder {0}: terminalIds.length
+msgid "{0, plural, one {# agent still runs the old version.} other {# agents still run the old version.}}"
+msgstr "{0, plural, one {에이전트 #개가 아직 이전 버전으로 실행 중입니다.} other {에이전트 #개가 아직 이전 버전으로 실행 중입니다.}}"
+
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
 msgstr "{0, plural, other {에이전트 #개}}"
@@ -4521,6 +4525,9 @@ msgstr "이것을 명확히 해 주세요"
 
 msgid "Claude Code sessions, with claude --resume"
 msgstr "Claude Code 세션 (claude --resume 사용)"
+
+msgid "Claude Code was updated"
+msgstr "Claude Code가 업데이트되었습니다"
 
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code, Codex, OpenCode는 에이전트이고, Paradev는 그 에이전트들을 한 번에 여러 개 실행하는 곳입니다. 작업마다 자체 Git 워크트리와 브랜치가 생기므로, 에이전트 열 개가 브랜치 열 개에서 동시에 작업하는 동안 한곳에서 모니터링, 리뷰, 병합할 수 있습니다."
