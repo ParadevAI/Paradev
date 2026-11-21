@@ -96,4 +96,9 @@ describe("parseAgyTranscriptLine", () => {
 		);
 		expect(entry).toMatchObject({ uncachedInput: 50, output: 7 });
 	});
+
+	it("skips lines that are not JSON objects", () => {
+		expect(parseAgyTranscriptLine("null", "session-1", "/repo")).toBeNull();
+		expect(parseAgyTranscriptLine("[1,2]", "session-1", "/repo")).toBeNull();
+	});
 });

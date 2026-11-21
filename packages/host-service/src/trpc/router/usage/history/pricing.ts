@@ -170,6 +170,11 @@ const RATES_BY_AGENT: Record<UsageAgent, Record<string, ModelRate>> = {
 	hermes: MULTI_AGENT_RATES,
 };
 
+// agy transcripts carry no model id, so price them as Gemini Pro.
+const UNKNOWN_MODEL_RATES: Partial<Record<UsageAgent, ModelRate>> = {
+	agy: AGY_RATES["gemini-3.1-pro"],
+};
+
 const cheapestByAgent = new Map<UsageAgent, ModelRate>();
 function cheapestRate(agent: UsageAgent): ModelRate {
 	let cheapest = cheapestByAgent.get(agent);
@@ -227,7 +232,10 @@ export function matchModelRate(
 				: best.rate;
 		return { ...rate, approximate: false };
 	}
-	return { ...cheapestRate(agent), approximate: true };
+	return {
+		...(UNKNOWN_MODEL_RATES[agent] ?? cheapestRate(agent)),
+		approximate: true,
+	};
 }
 
 export interface TokenCounts {
