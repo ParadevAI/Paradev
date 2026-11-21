@@ -214,7 +214,9 @@ function getHostAgentHookUrl(): string {
 type TerminalClientMessage =
 	| { type: "input"; data: string }
 	| { type: "colors"; colors: TerminalColors; resetOverrides?: boolean }
-	| { type: "resize"; cols: number; rows: number }
+	// `repaint`: the client's screen may not match the PTY's, so the program
+	// must redraw even when the size does not change.
+	| { type: "resize"; cols: number; rows: number; repaint?: boolean }
 	// The client's current keyboard-focus state, sent on every attach. A
 	// reattaching client may hold focus the program last heard it lost (or
 	// vice versa) — a fresh xterm can't self-report because focus-reporting
@@ -3957,7 +3959,9 @@ export function registerWorkspaceTerminalRoute({
 							next === null ||
 							(next.cols === session.cols && next.rows === session.rows);
 						const needsForcedNudge =
-							session.pendingRepaintNudge !== null && dimsUnchanged;
+							(session.pendingRepaintNudge !== null ||
+								message.repaint === true) &&
+							dimsUnchanged;
 						clearPendingRepaintNudge(session);
 						const changed = applyEffectiveDims(session, { force: true });
 						if (!changed) sendMessage(ws, ptySizeMessage(session));
