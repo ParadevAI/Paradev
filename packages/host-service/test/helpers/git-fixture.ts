@@ -1,4 +1,10 @@
-import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import {
+	appendFileSync,
+	mkdtempSync,
+	realpathSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { SimpleGit } from "simple-git";
@@ -26,9 +32,10 @@ export async function createGitFixture(): Promise<GitFixture> {
 	const git = createUserSimpleGit(repoPath);
 
 	await git.init(["--initial-branch=main"]);
-	await git.addConfig("user.email", "test@superset.local");
-	await git.addConfig("user.name", "Test Runner");
-	await git.addConfig("commit.gpgsign", "false");
+	appendFileSync(
+		join(repoPath, ".git", "config"),
+		"\n[user]\n\temail = test@superset.local\n\tname = Test Runner\n[commit]\n\tgpgsign = false\n",
+	);
 
 	const commit = async (
 		message: string,
@@ -36,8 +43,9 @@ export async function createGitFixture(): Promise<GitFixture> {
 	): Promise<string> => {
 		for (const [path, contents] of Object.entries(files)) {
 			writeFileSync(join(repoPath, path), contents);
-			await git.add(path);
 		}
+		const paths = Object.keys(files);
+		if (paths.length) await git.raw(["add", "--", ...paths]);
 		const result = await git.commit(message, undefined, {
 			"--allow-empty": null,
 		});
