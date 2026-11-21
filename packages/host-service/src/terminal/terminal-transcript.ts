@@ -19,6 +19,10 @@ import { HeadlessTerminal } from "./headless-xterm.ts";
 
 const ESC = String.fromCharCode(27);
 const ALT_SCREEN_ENTER = `${ESC}[?1049h`;
+const LINEAR_OUTPUT_CONTROLS = new RegExp(
+	`${ESC}\\[[0-9:;]*m|\\r?\\n|\\t`,
+	"g",
+);
 
 /**
  * Scrollback the replay emulator keeps. Sampling reads the viewport, so this
@@ -29,7 +33,10 @@ const SCROLLBACK_ROWS = 200;
 const MAX_HISTORY_ROWS = 20_000;
 
 interface XtermInternals {
-	_core?: { _writeBuffer?: { writeSync(data: string | Uint8Array): void } };
+	_core?: {
+		_writeBuffer?: { writeSync(data: string | Uint8Array): void };
+		buffer?: { scrollTop: number; scrollBottom: number };
+	};
 }
 
 /**
@@ -205,9 +212,36 @@ export function reconstructTerminalTranscript(
 		// place and leave nothing behind. Sampling the viewport reconstructs
 		// history in both modes, so the mode never has to be guessed.
 		const history: string[] = [];
+		const core = (term as unknown as XtermInternals)._core;
+		let previousRowCount = 0;
+		let scrolledRows = 0;
+		let hasPartialScroll = false;
+		term.onScroll(() => {
+			const buffer = core?.buffer;
+			if (buffer?.scrollTop === 0 && buffer.scrollBottom === rows - 1) {
+				scrolledRows++;
+			} else {
+				hasPartialScroll = true;
+			}
+		});
 		for (const chunk of splitForSampling(stream, cols, rows)) {
+			scrolledRows = 0;
+			hasPartialScroll = false;
+			const startsAfterVisibleOutput =
+				term.buffer.active.cursorY >= previousRowCount;
 			write(chunk);
-			appendWithoutOverlap(history, readViewport(term), rows);
+			const viewport = readViewport(term);
+			// Text written in order cannot overlap rows that scrolled out of view.
+			// Keep text matching for redraws and confined scroll regions.
+			const overlapLimit =
+				startsAfterVisibleOutput &&
+				scrolledRows > 0 &&
+				!hasPartialScroll &&
+				!/\p{Cc}/u.test(chunk.replace(LINEAR_OUTPUT_CONTROLS, ""))
+					? Math.max(0, previousRowCount - scrolledRows)
+					: rows;
+			appendWithoutOverlap(history, viewport, overlapLimit);
+			previousRowCount = viewport.length;
 			if (history.length > MAX_HISTORY_ROWS) {
 				history.splice(0, history.length - MAX_HISTORY_ROWS);
 			}

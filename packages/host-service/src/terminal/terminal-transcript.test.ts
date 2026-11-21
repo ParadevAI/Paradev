@@ -73,6 +73,46 @@ describe("reconstructTerminalTranscript", () => {
 		expect(distinct(text, /line-(\d+)/g)).toBe(300);
 	});
 
+	test.each([
+		"normal",
+		"alternate",
+	] as const)("preserves intentionally identical scrolling lines on the %s screen", (screen) => {
+		// Enough lines to continue scrolling once the normal buffer fills.
+		const lines = [
+			"connecting",
+			...Array<string>(300).fill("retrying connection"),
+			"connected",
+		];
+		const enter = screen === "alternate" ? `${ESC}[?1049h` : "";
+		const log =
+			screen === "alternate"
+				? lines.map((line) => `${ESC}[32m${line}${ESC}[0m`)
+				: lines;
+		const text = reconstructTerminalTranscript(
+			`${enter}${log.join("\r\n")}\r\n`,
+			{ cols: 80, rows: 24 },
+		);
+		expect(text.split("\n")).toEqual(lines);
+	});
+
+	test("does not duplicate a header above a scrolling region", () => {
+		const blankLines = "\r\n".repeat(80);
+		const stream = `persistent header\r\n${ESC}[3;24r${ESC}[24;1H${blankLines}`;
+		const text = reconstructTerminalTranscript(stream, { cols: 80, rows: 24 });
+		expect(text).toBe("persistent header");
+	});
+
+	test("does not append an unchanged redraw that crosses a sample boundary", () => {
+		const size = { cols: 80, rows: 24 };
+		const frame = "unchanged status\r\n".repeat(size.rows);
+		// Pad before cursor-home so the marker ends a sample.
+		const stylePadding = `${ESC}[0m`.repeat(8);
+		const redraw = `${stylePadding}${ESC}[H${frame}`;
+		expect(reconstructTerminalTranscript(frame + redraw.repeat(12), size)).toBe(
+			reconstructTerminalTranscript(frame, size),
+		);
+	});
+
 	test("keeps wrapped double-width output, which code-unit chunking lost", () => {
 		// A CJK line at 80 characters is 160 columns wide, so it wraps to two
 		// rendered rows. Chunking on code units let more than a screen scroll
