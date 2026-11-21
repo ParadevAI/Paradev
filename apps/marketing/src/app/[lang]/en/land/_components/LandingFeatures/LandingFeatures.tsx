@@ -38,14 +38,9 @@ export function LandingFeatures({ overlay }: { overlay: FeatureOverlay }) {
 								<div
 									className={`space-y-6 ${isReversed ? "lg:order-2" : "lg:order-1"}`}
 								>
-									<div className="space-y-4">
-										<span className="text-sm font-mono uppercase tracking-widest text-brand">
-											{t(feature.tag)}
-										</span>
-										<h3 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
-											{modified ? overlay.title : t(feature.title)}
-										</h3>
-									</div>
+									<h3 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground">
+										{modified ? overlay.title : t(feature.title)}
+									</h3>
 									<p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-[500px]">
 										{modified ? overlay.description : t(feature.description)}
 									</p>
