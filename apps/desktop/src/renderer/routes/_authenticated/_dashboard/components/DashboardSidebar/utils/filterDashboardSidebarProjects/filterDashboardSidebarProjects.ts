@@ -82,11 +82,7 @@ export function filterDashboardSidebarProjects(
 	});
 }
 
-/**
- * The same filter over the hidden-projects restore list, so a search still
- * finds a hidden project. Names only: a hidden project's workspaces are never
- * built, so there is nothing else to match.
- */
+/** Names only: the workspaces of a hidden project are never built. */
 export function filterDashboardSidebarHiddenProjects(
 	projects: DashboardSidebarHiddenProject[],
 	query: string,

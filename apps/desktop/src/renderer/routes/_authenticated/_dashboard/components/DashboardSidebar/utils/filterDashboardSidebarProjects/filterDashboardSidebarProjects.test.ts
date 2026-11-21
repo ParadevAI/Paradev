@@ -85,9 +85,7 @@ describe("filterDashboardSidebarProjects", () => {
 
 	it("trims the query before matching", () => {
 		expect(
-			filterDashboardSidebarProjects(projects, "  hero  ").map(
-				(project) => project.id,
-			),
+			filterDashboardSidebarProjects(projects, "  hero  ").map((p) => p.id),
 		).toEqual(["p-marketing"]);
 	});
 
