@@ -16,7 +16,7 @@ import {
 	DEFAULT_BACKOFF_INITIAL_MS,
 	DEFAULT_BACKOFF_MAX_MS,
 } from "../../client";
-import type { OutboxEntry, SessionSnapshot } from "../../core";
+import type { OutboxEntry, PromptDelivery, SessionSnapshot } from "../../core";
 import {
 	emptySnapshot,
 	hasOmittedBody,
@@ -174,10 +174,7 @@ export type ChatSession = {
 	outbox: OutboxEntry[];
 	hasOlder: boolean;
 	requestItemBodies(itemIds: readonly string[]): void;
-	sendPrompt(
-		content: UserContent[],
-		steer?: { expectedTurnId: string },
-	): OutboxEntry;
+	sendPrompt(content: UserContent[], delivery?: PromptDelivery): OutboxEntry;
 	retryPrompt(clientId: string): void;
 	discardPrompt(clientId: string): void;
 	loadOlder(): Promise<boolean>;
@@ -259,6 +256,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 						clientId: entry.clientId,
 						content: entry.content,
 						...(entry.steer ? { steer: entry.steer } : {}),
+						...(entry.join ? { join: entry.join } : {}),
 						...(snapshotWorktreeRef.current ? { snapshotWorktree: true } : {}),
 					});
 				},
@@ -539,8 +537,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	}, [client, deltasKey, pageSize, enqueue, resync, applySeed]);
 
 	const sendPrompt = useCallback(
-		(content: UserContent[], steer?: { expectedTurnId: string }) => {
-			const entry = outbox.enqueue(content, steer);
+		(content: UserContent[], delivery?: PromptDelivery) => {
+			const entry = outbox.enqueue(content, delivery);
 			void outbox.flush();
 			return entry;
 		},
