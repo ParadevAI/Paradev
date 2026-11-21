@@ -1,9 +1,10 @@
 import type { AppRouter } from "@superset/host-service";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { useQuery } from "@tanstack/react-query";
-import { useMatchRoute } from "@tanstack/react-router";
 import type { inferRouterOutputs } from "@trpc/server";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useBoxPressure } from "renderer/stores/box-pressure";
 import { useWorkspaceHostTarget } from "../useWorkspaceHostUrl";
 
 export type BoxResources = NonNullable<
@@ -12,19 +13,22 @@ export type BoxResources = NonNullable<
 
 const LIVE_POLL_MS = 5_000;
 
-/** Every ready workspace has a gate address, asleep or not, so only the open one is asked. */
 export function useBoxResources(
 	workspaceId: string,
 	{ enabled }: { enabled: boolean },
 ): BoxResources | null {
 	const openMatch = useMatchRoute()({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const isOpen = openMatch !== false && openMatch.workspaceId === workspaceId;
+	const isReporting = useBoxPressure(workspaceId) !== null;
 	const target = useWorkspaceHostTarget(workspaceId);
 	const hostUrl =
-		enabled && isOpen && target.status === "ready" && target.kind === "sandbox"
+		enabled &&
+		(isOpen || isReporting) &&
+		target.status === "ready" &&
+		target.kind === "sandbox"
 			? target.url
 			: null;
 

@@ -31,9 +31,10 @@ export class ForgottenClientError extends Error {
 	}
 }
 
+// Firecrawl and Resend reject a metadata document whose redirect URIs are on
+// another host than its client_id, so both live on the browser API origin.
 export function clientMetadataUrl(connectorSlug: string): string {
-	const base = env.PLUGIN_CLIENT_METADATA_BASE_URL ?? env.NEXT_PUBLIC_API_URL;
-	return `${base}/api/connectors/${connectorSlug}/client-metadata`;
+	return `${getBrowserApiUrl(env)}/api/connectors/${connectorSlug}/client-metadata`;
 }
 
 export function redirectUriFor(connectorSlug: string): string {
@@ -50,10 +51,14 @@ export function issuedGrantRedirectUris(
 	]);
 }
 
+type DeclaredAuthMethod = ConnectorMethod["token_request_auth_method"];
+
 function pickAuthMethod(
 	supported: string[] | undefined,
 	issuer: string,
+	declared: DeclaredAuthMethod,
 ): "client_secret_post" | "client_secret_basic" | "none" {
+	if (declared) return declared;
 	const methods = supported ?? ["client_secret_basic"];
 	if (methods.includes("client_secret_post")) return "client_secret_post";
 	if (methods.includes("client_secret_basic")) return "client_secret_basic";
@@ -92,6 +97,7 @@ function unexpired(row: StoredClientRow): boolean {
 async function storedClient(
 	issuer: string,
 	redirectUri: string | string[],
+	declared: DeclaredAuthMethod,
 	pick: { clientId: string } | { coveringScopes: string[] } | { legacy: true },
 ): Promise<ClientIdentity | null> {
 	const rows = await db
@@ -123,6 +129,7 @@ async function storedClient(
 					rows.find(
 						(candidate) =>
 							unexpired(candidate) &&
+							authenticates(candidate, declared) &&
 							pick.coveringScopes.every((scope) =>
 								candidate.scopes?.includes(scope),
 							),
@@ -132,6 +139,18 @@ async function storedClient(
 		row.clientId,
 		await decryptOptional(row.clientSecret),
 		row.tokenEndpointAuthMethod,
+		declared,
+	);
+}
+
+function authenticates(
+	row: StoredClientRow,
+	declared: DeclaredAuthMethod,
+): boolean {
+	return (
+		!declared ||
+		!authenticationFor(row.tokenEndpointAuthMethod) ||
+		row.tokenEndpointAuthMethod === declared
 	);
 }
 
@@ -139,8 +158,11 @@ function identity(
 	clientId: string,
 	secret: string | null | undefined,
 	tokenEndpointAuthMethod: string | null,
+	declared: DeclaredAuthMethod,
 ): ClientIdentity {
-	const authentication = authenticationFor(tokenEndpointAuthMethod);
+	const authentication = authenticationFor(
+		secret && declared ? declared : tokenEndpointAuthMethod,
+	);
 	return {
 		clientId,
 		...(secret ? { clientSecret: secret } : {}),
@@ -164,6 +186,7 @@ async function register(
 	const tokenEndpointAuthMethod = pickAuthMethod(
 		server.metadata.token_endpoint_auth_methods_supported,
 		server.issuer,
+		method.token_request_auth_method,
 	);
 	const response = await credentialFetch(
 		endpoint,
@@ -243,7 +266,50 @@ async function register(
 			set: row,
 		});
 
-	return identity(payload.client_id, payload.client_secret, resolvedAuthMethod);
+	return identity(
+		payload.client_id,
+		payload.client_secret,
+		resolvedAuthMethod,
+		method.token_request_auth_method,
+	);
+}
+
+const CLIENT_REJECTION =
+	/invalid_client|(unrecognized|unknown|unregistered|invalid)[ _]client|client(_id)?( is)? not (found|registered|recognized)/i;
+const PROBE_TIMEOUT_MS = 5000;
+const PROBE_CODE_CHALLENGE = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+
+// A server may delete a registration it issued (Supabase does when the first
+// approval takes over 15 minutes), and says so only on its authorize page.
+async function authorizationRejectsClient(
+	server: DiscoveredServer,
+	client: ClientIdentity,
+	redirectUri: string,
+	method: ConnectorMethod,
+): Promise<boolean> {
+	const url = new URL(server.metadata.authorization_endpoint);
+	url.searchParams.set("client_id", client.clientId);
+	url.searchParams.set("redirect_uri", redirectUri);
+	url.searchParams.set("response_type", "code");
+	url.searchParams.set("state", "probe");
+	url.searchParams.set("code_challenge", PROBE_CODE_CHALLENGE);
+	url.searchParams.set("code_challenge_method", "S256");
+	if (method.scopes?.length)
+		url.searchParams.set(
+			"scope",
+			method.scopes.join(method.scope_separator ?? " "),
+		);
+	try {
+		const response = await fetch(url, {
+			method: "GET",
+			redirect: "manual",
+			signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
+		});
+		if (response.status < 400 || response.status >= 500) return false;
+		return CLIENT_REJECTION.test((await response.text()).slice(0, 2000));
+	} catch {
+		return false;
+	}
 }
 
 const registering = new Map<string, Promise<ClientIdentity>>();
@@ -257,11 +323,14 @@ export async function resolveClientIdentity(
 ): Promise<ClientIdentity> {
 	const metadataUrl = clientMetadataUrl(connectorSlug);
 	const issuedTo = "issuedTo" in client ? client.issuedTo : null;
-	if (issuedTo === metadataUrl) return { clientId: metadataUrl };
+	const declared = method.token_request_auth_method;
+	if (issuedTo && withOwnDomainTwins([metadataUrl]).includes(issuedTo))
+		return { clientId: issuedTo };
 	if (issuedTo) {
 		const bound = await storedClient(
 			server.issuer,
 			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			declared,
 			{
 				clientId: issuedTo,
 			},
@@ -283,6 +352,7 @@ export async function resolveClientIdentity(
 		const legacy = await storedClient(
 			server.issuer,
 			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			declared,
 			{
 				legacy: true,
 			},
@@ -291,10 +361,16 @@ export async function resolveClientIdentity(
 		return legacy;
 	}
 
-	const existing = await storedClient(server.issuer, redirectUri, {
+	const existing = await storedClient(server.issuer, redirectUri, declared, {
 		coveringScopes: scopes,
 	});
-	if (existing) return existing;
+	if (existing) {
+		if (
+			!(await authorizationRejectsClient(server, existing, redirectUri, method))
+		)
+			return existing;
+		await forgetClient(server.issuer, redirectUri, existing.clientId);
+	}
 
 	const key = `${server.issuer}\n${redirectUri}\n${scopes.join(" ")}`;
 	const pending = registering.get(key);

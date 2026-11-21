@@ -1,8 +1,6 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { useFeatureFlagEnabled } from "posthog-js/react";
+import { buildSidebarFolderKey } from "@superset/shared/workspace-tag-folders";
 import { useEffect, useRef, useState } from "react";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { posthog } from "renderer/lib/posthog";
@@ -39,7 +37,6 @@ import { useFinalizeProjectSetup } from "renderer/react-query/projects";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { buildSidebarFolderKey } from "renderer/routes/_authenticated/utils/workspaceTagFolders/workspaceTagFolders";
 import { useV1MigrationStatusStore } from "renderer/stores/v1-migration-status";
 import { appendPendingMigratedTerminals } from "renderer/stores/workspace-creates/appendPendingMigratedTerminals";
 
@@ -82,20 +79,13 @@ async function listGatingFailureReasons(
 
 export function V1AutoMigration() {
 	const { data: session } = authClient.useSession();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { activeHostUrl } = useLocalHostService();
 	const collections = useCollections();
 	const finalizeSetup = useFinalizeProjectSetup();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
-	const agentsQuery = useV2AgentConfigs(activeHostUrl);
+	const agentsQuery = useAgentConfigs(activeHostUrl);
 	const setMigrationStatus = useV1MigrationStatusStore((s) => s.setStatus);
 	const clearRunningStatus = useV1MigrationStatusStore((s) => s.clearRunning);
-	// Rollout pacing: percentage ramp + high-profile org exclusions. Only
-	// gates NEW migrations (v1 surface) — post-flip catch-up must always run.
-	// undefined (flags not loaded / offline) counts as off: stay on v1.
-	const migrationFlagEnabled = useFeatureFlagEnabled(
-		FEATURE_FLAGS.V1_AUTO_MIGRATION,
-	);
 	const startedOrgsRef = useRef<Set<string>>(new Set());
 	const retryAttemptsRef = useRef<Map<string, number>>(new Map());
 	const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -136,12 +126,11 @@ export function V1AutoMigration() {
 		if (!organizationId || !onboarded || !activeHostUrl || !agentsSettled) {
 			return;
 		}
-		if (!isV2CloudEnabled && migrationFlagEnabled !== true) return;
 		if (startedOrgsRef.current.has(organizationId)) return;
 		startedOrgsRef.current.add(organizationId);
 
 		const hostUrl = activeHostUrl;
-		const trigger = isV2CloudEnabled ? "v2-followup" : "v1-surface";
+		const trigger = "v2-followup";
 		const isActiveOrg = () => activeOrgRef.current === organizationId;
 		const setStatus: typeof setMigrationStatus = (...args) => {
 			if (isActiveOrg()) setMigrationStatus(...args);
@@ -231,24 +220,21 @@ export function V1AutoMigration() {
 				);
 				ipc = scoped.ipc;
 
-				let groupsOnly = false;
-				if (isV2CloudEnabled) {
-					const plan = await planV1AutoPass({
-						ipc,
-						leftOut: scoped.leftOut,
-						organizationId,
-						followUpPending: isV1FollowUpPending(organizationId),
-						migrationComplete: isV1MigrationComplete(organizationId),
-					});
-					groupsOnly = plan.pass === "groups-only";
-					showsProgress = plan.showsProgress;
-				}
+				const plan = await planV1AutoPass({
+					ipc,
+					leftOut: scoped.leftOut,
+					organizationId,
+					followUpPending: isV1FollowUpPending(organizationId),
+					migrationComplete: isV1MigrationComplete(organizationId),
+				});
+				const groupsOnly = plan.pass === "groups-only";
+				showsProgress = plan.showsProgress;
 				if (showsProgress) setStatus(organizationId, "running");
 
 				const groupTarget: V1GroupTarget = (group, projectId, tag) => {
 					const sectionId = buildSidebarFolderKey(projectId, tag);
-					if (collections.v2SidebarSections.get(sectionId)) return;
-					collections.v2SidebarSections.insert({
+					if (collections.sidebarSections.get(sectionId)) return;
+					collections.sidebarSections.insert({
 						sectionId,
 						projectId,
 						tag,
@@ -276,13 +262,13 @@ export function V1AutoMigration() {
 					organizationId,
 					hostClient: getHostServiceClientByUrl(hostUrl),
 					ipc,
-					reconcileWithHost: !isV2CloudEnabled,
+					reconcileWithHost: false,
 					presetTarget: {
 						agents,
 						existing: Array.from(
-							collections.v2TerminalPresets.state.values(),
+							collections.terminalPresets.state.values(),
 						).map((p) => ({ name: p.name, agentId: p.agentId })),
-						insert: (row) => collections.v2TerminalPresets.insert(row),
+						insert: (row) => collections.terminalPresets.insert(row),
 					},
 					terminalTarget: {
 						appendPending: (workspace, terminals) =>
@@ -324,7 +310,7 @@ export function V1AutoMigration() {
 					// Already on v2: no flip happens, so no welcome card or
 					// continuity restore to hand off to the next launch.
 					markV1MigrationComplete(organizationId, {
-						armFlipHandoff: !isV2CloudEnabled,
+						armFlipHandoff: false,
 					});
 					const bestEffortClean =
 						summary.settings.failed +
@@ -338,10 +324,7 @@ export function V1AutoMigration() {
 					// working on v1 for the REST of this session (the pass ran at
 					// boot), so the first v2 boot must re-sync that tail before the
 					// flag can clear.
-					setV1FollowUpPending(
-						organizationId,
-						(firstCompletion && !isV2CloudEnabled) || !bestEffortClean,
-					);
+					setV1FollowUpPending(organizationId, !bestEffortClean);
 				}
 
 				// Failure and skip reasons come from the ledger (the summary only
@@ -407,8 +390,6 @@ export function V1AutoMigration() {
 		organizationId,
 		onboarded,
 		activeHostUrl,
-		isV2CloudEnabled,
-		migrationFlagEnabled,
 		agentsSettled,
 		agents,
 		collections,

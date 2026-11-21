@@ -1,12 +1,16 @@
 import { useLingui } from "@lingui/react/macro";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
+import { useRelayUrl } from "renderer/hooks/useRelayUrl";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useCreateCloudWorkspace } from "renderer/routes/_authenticated/hooks/useCreateCloudWorkspace";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { requestSandboxAccess } from "renderer/routes/_authenticated/utils/requestSandboxAccess";
+import { sandboxAccess } from "renderer/routes/_authenticated/utils/sandboxAccess";
 import { seedMovedChat } from "renderer/stores/workspace-creates/seedMovedChat";
 import { abandonWorkspaceMove } from "../../utils/abandonWorkspaceMove";
 import {
@@ -15,29 +19,22 @@ import {
 	mergeHandoffs,
 	skippedTerminalNames,
 } from "../../utils/handOffTerminals";
-import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import type { MovableWorkspace } from "../useWorkspaceMoveDirections";
 
 export type MoveToCloudStage = "saving" | "starting";
 
-/** How long moved terminals wait for the new cloud box to answer. */
 const BOX_CONNECT_ATTEMPTS = 120;
 const BOX_CONNECT_RETRY_MS = 5_000;
 
-/**
- * Moves a workspace on this computer into a new cloud workspace: its work
- * goes to one branch, and each of its chats moves on its own. Its terminal
- * agents start again in the new workspace once its box answers. Returns the
- * chats that could not move and stayed here, and later the terminals.
- */
 export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
 	const collections = useCollections();
-	const utils = cloudTrpc.useUtils();
-	const { activeHostUrl } = useLocalHostService();
+	const { create: createCloudWorkspace } = useCreateCloudWorkspace();
+	const { activeHostUrl, machineId } = useLocalHostService();
+	const relayUrl = useRelayUrl();
 	const { projects } = useHostProjects();
 	const sourceProject = projects.find(
 		(row) =>
@@ -63,8 +60,19 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			signal?: AbortSignal;
 		}) => {
 			if (!organizationId) throw new Error(t`No active organization`);
-			if (!activeHostUrl) {
-				throw new Error(t`This computer's host is not running`);
+			const sourceUrl = resolveHostUrl({
+				hostId: workspace.hostId,
+				machineId,
+				activeHostUrl,
+				organizationId,
+				relayUrl,
+			});
+			if (!sourceUrl) {
+				throw new Error(
+					workspace.hostId === machineId
+						? t`This device's host is not running`
+						: t`That device can't be reached`,
+				);
 			}
 			const assertEnvironmentOpens = (repository: string) => {
 				const environmentRepository = environment.repositoryFullName;
@@ -85,7 +93,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					fromHostId: workspace.hostId,
 				});
 			onBegun?.(workspaceMoveId);
-			const source = getHostServiceClientByUrl(activeHostUrl);
+			const source = getHostServiceClientByUrl(sourceUrl);
 			const leaving: { chats: string[]; terminals: string[] } = {
 				chats: [],
 				terminals: [],
@@ -109,7 +117,10 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 						(terminal) => terminal.terminalId,
 					);
 					if (moveSignal.aborted) {
-						await releaseSourceTerminals(
+						// The move can end while prepare runs, after the catch below released nothing.
+						await releaseSourceChats(source, leaving.chats);
+						leaving.chats = [];
+						leaving.terminals = await releaseSourceTerminals(
 							source,
 							workspace.id,
 							leaving.terminals,
@@ -118,7 +129,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					assertEnvironmentOpens(prepared.repositoryFullName);
 					moveSignal.throwIfAborted();
 					onStage("starting");
-					const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
+					const created = await createCloudWorkspace({
 						organizationId,
 						environmentId: environment.id,
 						name: workspace.name,
@@ -131,8 +142,17 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					return { prepared, created };
 				},
 			}).catch(async (error: unknown) => {
-				await abandonWorkspaceMove(workspaceMoveId, error, signal?.aborted);
-				await releaseSourceChats(source, leaving.chats);
+				const moved = new Set(
+					(await abandonWorkspaceMove(
+						workspaceMoveId,
+						error,
+						signal?.aborted,
+					)) ?? [],
+				);
+				await releaseSourceChats(
+					source,
+					leaving.chats.filter((id) => !moved.has(id)),
+				);
 				await releaseSourceTerminals(source, workspace.id, leaving.terminals);
 				throw error;
 			});
@@ -157,12 +177,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					title: chat.title,
 				});
 			}
-			const listInput = { organizationId };
-			await utils.cloudWorkspace.list.cancel(listInput);
-			utils.cloudWorkspace.list.setData(listInput, (rows) =>
-				rows ? [created, ...rows] : [created],
-			);
-			void utils.cloudWorkspace.list.invalidate();
 			// A host older than terminal moves returns neither list.
 			const terminals: MovingTerminal[] = prepared.terminals ?? [];
 			const skippedTerminals = skippedTerminalNames(prepared.skippedTerminals);
@@ -172,9 +186,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 				sourceWorkspaceId: workspace.id,
 				toWorkspaceId: created.id,
 				connect: async () =>
-					getHostServiceClientByUrl(
-						(await requestSandboxAccess(created.id, true)).url,
-					),
+					getHostServiceClientByUrl((await sandboxAccess.wake(created.id)).url),
 				resolveUrls: (fileIds) =>
 					cloudTrpcClient.attachment.resolve.mutate({ fileIds }),
 				attempts: BOX_CONNECT_ATTEMPTS,
@@ -193,9 +205,11 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 		[
 			organizationId,
 			activeHostUrl,
+			machineId,
+			relayUrl,
 			t,
 			workspace,
-			utils,
+			createCloudWorkspace,
 			collections,
 			sourceRepository,
 		],

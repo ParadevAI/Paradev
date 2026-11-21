@@ -1,0 +1,1 @@
+export { BootsTable } from "./BootsTable";

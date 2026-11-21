@@ -19,6 +19,10 @@ import {
 	TERMINAL_HANDOFF_MAX_CHARS,
 } from "@superset/shared/session-handoff";
 import {
+	containsShellExitMarker,
+	SHELL_EXIT_MARKER_TAIL_BYTES,
+} from "@superset/shared/shell-exit-marker";
+import {
 	createScanState,
 	type ShellReadyScanState,
 	scanForShellReady,
@@ -252,7 +256,7 @@ type TerminalServerMessage =
 			message: string;
 			code?: "session-gone" | "attach-retryable";
 	  }
-	| { type: "exit"; exitCode: number; signal: number }
+	| { type: "exit"; exitCode: number; signal: number; shellExited?: boolean }
 	| { type: "title"; title: string | null }
 	// The PTY's size, the smallest box across visible clients. Sent to every
 	// client when it changes, and to a client after each of its resizes, so a
@@ -566,6 +570,7 @@ interface TerminalSession {
 	exited: boolean;
 	exitCode: number;
 	exitSignal: number;
+	shellExited: boolean;
 	listed: boolean;
 	/** Last title the shell reported over OSC. Lives and dies with the process. */
 	title: string | null;
@@ -895,7 +900,9 @@ export type TerminalSessionErrorKind =
 	 * Retrying will fail the same way; this is the only kind that means "we
 	 * have a bug or a broken install".
 	 */
-	| "TERMINAL_START_FAILED";
+	| "TERMINAL_START_FAILED"
+	/** The target is a chat, which has no input to hold unsent or empty text. */
+	| "CHAT_NEEDS_SUBMITTED_TEXT";
 
 export type TerminalSessionError = {
 	inputStaged?: true;
@@ -1554,6 +1561,17 @@ function retainOutput(session: TerminalSession, data: Uint8Array) {
 			session.retainedStartSeq += removed.byteLength;
 		}
 	}
+}
+
+function readRetainedTail(
+	session: TerminalSession,
+	maxBytes: number,
+): Uint8Array {
+	const end = session.retainedStartSeq + session.retainedBytes;
+	return readRetainedFrom(
+		session,
+		Math.max(session.retainedStartSeq, end - maxBytes),
+	);
 }
 
 /** Concatenate the retained stream from absolute seq `from` to the present. */
@@ -2970,6 +2988,15 @@ export function getPendingTerminalWorkspaceId(
 	return lifecycleOperations.getWorkspaceId(terminalId);
 }
 
+function announceListed(session: TerminalSession): void {
+	session.eventBus?.broadcastTerminalLifecycle({
+		workspaceId: session.workspaceId,
+		terminalId: session.terminalId,
+		eventType: "listed",
+		occurredAt: Date.now(),
+	});
+}
+
 export function createTerminalSessionInternal(
 	options: CreateTerminalSessionOptions,
 ): Promise<TerminalSession | CreateSessionError> {
@@ -3032,7 +3059,10 @@ async function createTerminalSessionUnlocked({
 		if (mismatchError)
 			return { kind: "SESSION_WRONG_WORKSPACE", error: mismatchError };
 
-		if (listed) existing.listed = true;
+		if (listed && !existing.listed) {
+			existing.listed = true;
+			announceListed(existing);
+		}
 		if (initialCommand) queueInitialCommand(existing, initialCommand);
 		return existing;
 	}
@@ -3303,6 +3333,7 @@ async function createTerminalSessionUnlocked({
 		exited: false,
 		exitCode: 0,
 		exitSignal: 0,
+		shellExited: false,
 		listed,
 		title: null,
 		customTitle,
@@ -3343,6 +3374,7 @@ async function createTerminalSessionUnlocked({
 	reclaimSession = session;
 	sessions.set(terminalId, session);
 	portManager.upsertSession(terminalId, workspaceId, pty.pid);
+	if (session.listed) announceListed(session);
 
 	if (session.shellReadyState === "pending") {
 		// Size the wait to observed reality: on machines whose profile never
@@ -3434,6 +3466,9 @@ async function createTerminalSessionUnlocked({
 				cancelShellReady(session);
 				session.exitCode = code ?? 0;
 				session.exitSignal = signal ?? 0;
+				session.shellExited = containsShellExitMarker(
+					readRetainedTail(session, SHELL_EXIT_MARKER_TAIL_BYTES),
+				);
 				const occurredAt = Date.now();
 
 				if (!chatPortTerminalIds.has(terminalId))
@@ -3470,6 +3505,7 @@ async function createTerminalSessionUnlocked({
 					type: "exit",
 					exitCode: session.exitCode,
 					signal: session.exitSignal,
+					shellExited: session.shellExited,
 				});
 
 				eventBus?.broadcastTerminalLifecycle({
@@ -3642,6 +3678,7 @@ export function registerWorkspaceTerminalRoute({
 						type: "exit",
 						exitCode: session.exitCode,
 						signal: session.exitSignal,
+						shellExited: session.shellExited,
 					});
 				}
 				return true;

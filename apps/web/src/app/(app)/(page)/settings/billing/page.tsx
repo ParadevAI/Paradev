@@ -3,6 +3,7 @@ import { Button } from "@superset/ui/button";
 import Link from "next/link";
 import { HiCheckCircle } from "react-icons/hi2";
 import { initServerI18n } from "@/lib/i18n-server";
+import { cloudUsageEnabled } from "../../../utils/cloudUsageEnabled";
 import { BillingSettings } from "./components/BillingSettings";
 
 export default async function BillingPage({
@@ -45,6 +46,7 @@ export default async function BillingPage({
 	return (
 		<BillingSettings
 			organizationId={organization}
+			cloudUsageEnabled={await cloudUsageEnabled()}
 			selectedPlan={plan}
 			yearly={
 				interval === "yearly"

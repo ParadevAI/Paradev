@@ -1,22 +1,21 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
 import { draftText } from "@superset/chat-ui/PromptInput";
 import { errorMessage } from "@superset/i18n/errors";
 import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
+import { useResolveOpenAsChat } from "renderer/hooks/useResolveOpenAsChat";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
-import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useCreateCloudWorkspace } from "renderer/routes/_authenticated/hooks/useCreateCloudWorkspace";
 import type { NewWorkspacePromptContextApi } from "renderer/stores/new-workspace-prompt-context";
 import { usePromptHistoryStore } from "renderer/stores/prompt-history";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
-import { seedPendingCloudChat } from "renderer/stores/workspace-creates/pendingCloudChat";
 import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorkspaceDraftContext";
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
@@ -59,15 +58,13 @@ export function useSubmitWorkspace(
 		[draft.promptDraft],
 	);
 	const { submit } = useWorkspaceCreates();
-	const collections = useCollections();
 	const activeOrganizationId = useActiveOrganizationId();
-	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
-	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
-	const utils = cloudTrpc.useUtils();
+	const resolveOpenAsChat = useResolveOpenAsChat();
+	const { create: createCloudWorkspace } = useCreateCloudWorkspace();
 
 	// Submit is reachable from Cmd+Enter, the editor's Enter handler, and the
 	// create button, and it awaits uploads / environment lookup / prompt
-	// context before anything observable changes — `createCloudWorkspace.isPending`
+	// context before anything observable changes — the create's pending state
 	// is still false in that window, so without this latch a quick second
 	// Cmd+Enter created a second workspace. Released in `finally` so a submit
 	// that failed validation or errored can be retried.
@@ -186,69 +183,51 @@ export function useSubmitWorkspace(
 								timeoutMs: 2000,
 							})
 						: null;
-					const createdResult = await createCloudWorkspace.mutateAsync({
-						organizationId: activeOrganizationId,
-						environmentId,
-						name: workspaceName ?? undefined,
-						// Linked PR and issue bodies can push this past the create input's
-						// 20,000-character cap.
-						prompt:
-							(cloudPrompt ?? userPrompt).trim().slice(0, 20_000) || undefined,
-						typedPrompt: userPrompt.trim().slice(0, 20_000) || undefined,
-						taskIds: cloudLinkedIssues
-							.flatMap((issue) =>
-								issue.source === "internal" && issue.taskId
-									? [issue.taskId]
-									: [],
-							)
-							.slice(0, 10),
-						branch: draft.baseBranch ?? branchName ?? undefined,
-						...(attachmentIds.length > 0
-							? { attachmentFileIds: attachmentIds }
-							: {}),
-						...(wantCloudAgent
-							? {
-									agent: cloudAgent,
-									...(isSelectedAgent
-										? {
-												model: selectedModel ?? undefined,
-												effort: selectedEffort ?? undefined,
-												mode: selectedMode ?? undefined,
-											}
-										: {}),
-									agentTerminalId: crypto.randomUUID(),
-								}
-							: {}),
-					});
-					const { initialLaunch, ...created } = createdResult;
-					if (initialLaunch?.surface === "chat") {
-						seedPendingCloudChat({
-							collections,
-							workspaceId: created.id,
-							launch: initialLaunch,
+					const created = await createCloudWorkspace(
+						{
+							organizationId: activeOrganizationId,
+							environmentId,
+							name: workspaceName ?? undefined,
+							// Linked PR and issue bodies can push this past the create input's
+							// 20,000-character cap.
+							prompt:
+								(cloudPrompt ?? userPrompt).trim().slice(0, 20_000) ||
+								undefined,
+							typedPrompt: userPrompt.trim().slice(0, 20_000) || undefined,
+							taskIds: cloudLinkedIssues
+								.flatMap((issue) =>
+									issue.source === "internal" && issue.taskId
+										? [issue.taskId]
+										: [],
+								)
+								.slice(0, 10),
+							branch: draft.baseBranch ?? branchName ?? undefined,
+							...(attachmentIds.length > 0
+								? { attachmentFileIds: attachmentIds }
+								: {}),
+							...(wantCloudAgent
+								? {
+										agent: cloudAgent,
+										...(isSelectedAgent
+											? {
+													model: selectedModel ?? undefined,
+													effort: selectedEffort ?? undefined,
+													mode: selectedMode ?? undefined,
+												}
+											: {}),
+									}
+								: {}),
+						},
+						{
 							prompt: userPrompt.trim(),
 							modelId: isSelectedAgent ? selectedModel : null,
 							modeId: isSelectedAgent ? selectedMode : null,
-						});
-					}
+						},
+					);
 					if (ignoreDraft) closeModal();
 					else closeAndResetDraft();
-					// The cloud list is what both the sidebar and the workspace route
-					// read, and nothing used to tell it a workspace had been created —
-					// the row appeared whenever the poll next came round, which is why
-					// creating one felt like nothing had happened. Seeded rather than
-					// only invalidated because the route we're about to open decides
-					// between "provisioning" and "doesn't exist" off this list, and
-					// even one refetch round trip is long enough to flash the wrong
-					// one. Cancelled first so an in-flight fetch from before the
-					// create can't land on top of the patch.
-					const listInput = { organizationId: activeOrganizationId };
-					await utils.cloudWorkspace.list.cancel(listInput);
-					utils.cloudWorkspace.list.setData(listInput, (rows) =>
-						rows ? [created, ...rows] : [created],
-					);
 					void navigate({
-						to: "/v2-workspace/$workspaceId",
+						to: "/workspace/$workspaceId",
 						params: { workspaceId: created.id },
 					}).catch((error) => {
 						console.error(
@@ -256,8 +235,6 @@ export function useSubmitWorkspace(
 							error,
 						);
 					});
-					// Server truth on top of the patch — the generated name lands here.
-					void utils.cloudWorkspace.list.invalidate();
 					return true;
 				} catch (error) {
 					toast.error(
@@ -307,9 +284,7 @@ export function useSubmitWorkspace(
 				: null;
 
 			const openAsChat =
-				wantAgent &&
-				Boolean(acpHarnessForPreset(selectedPresetId)) &&
-				(await resolveAcpChatEnabled());
+				wantAgent && (await resolveOpenAsChat(selectedPresetId));
 			const agents = wantAgent
 				? [
 						{
@@ -388,7 +363,7 @@ export function useSubmitWorkspace(
 			closeAndResetDraft();
 			const { completed } = submit({ hostId, snapshot });
 			void navigate({
-				to: "/v2-workspace/$workspaceId",
+				to: "/workspace/$workspaceId",
 				params: { workspaceId },
 			}).catch((error) => {
 				console.error("[useSubmitWorkspace] failed to open workspace", error);
@@ -396,7 +371,7 @@ export function useSubmitWorkspace(
 
 			const isViewingOptimisticWorkspace = () => {
 				const workspaceMatch = matchRoute({
-					to: "/v2-workspace/$workspaceId",
+					to: "/workspace/$workspaceId",
 				});
 				return (
 					workspaceMatch !== false && workspaceMatch.workspaceId === workspaceId
@@ -411,7 +386,7 @@ export function useSubmitWorkspace(
 				if (outcome.workspaceId === workspaceId) return;
 				if (!isViewingOptimisticWorkspace()) return;
 				void navigate({
-					to: "/v2-workspace/$workspaceId",
+					to: "/workspace/$workspaceId",
 					params: { workspaceId: outcome.workspaceId },
 					replace: true,
 				}).catch((error) => {
@@ -425,11 +400,10 @@ export function useSubmitWorkspace(
 		},
 		[
 			activeOrganizationId,
-			resolveAcpChatEnabled,
+			resolveOpenAsChat,
 			selectedPresetId,
 			closeAndResetDraft,
 			closeModal,
-			collections,
 			createCloudWorkspace,
 			draft,
 			prompt,
@@ -448,7 +422,6 @@ export function useSubmitWorkspace(
 			submit,
 			t,
 			uploadAttachments,
-			utils,
 			cloudEnvironmentId,
 		],
 	);

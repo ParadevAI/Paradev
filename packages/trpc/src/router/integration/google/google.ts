@@ -7,12 +7,12 @@ import {
 	decryptOptional,
 	decryptSecret,
 	grantSharedWithAnotherConnection,
-	userConnection,
+	userConnections,
 } from "../../../lib/connectors";
 import { personProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import { stopMailboxWatch } from "./gmail";
-import { findGoogleConnection, googleConfigOf } from "./state";
+import { googleConfigOf, summarizeGoogleConnections } from "./state";
 
 export const googleRouter = {
 	getConnection: personProcedure
@@ -20,25 +20,16 @@ export const googleRouter = {
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			// The caller's own connection: Google is per member, so another
+			// The caller's own connections: Google is per member, so another
 			// member's account is not this person's to see or manage.
-			const connection = await userConnection(
-				input.organizationId,
-				"google",
-				ctx.session.user.id,
-				{ includeDisconnected: true },
+			return summarizeGoogleConnections(
+				await userConnections(
+					input.organizationId,
+					"google",
+					ctx.session.user.id,
+					{ includeDisconnected: true },
+				),
 			);
-			if (!connection) return null;
-
-			return {
-				id: connection.id,
-				// The Google account's address; the connection is that person's
-				// mailbox, not the organization's.
-				email: connection.externalAccountId,
-				connectedByUserId: connection.connectedByUserId,
-				connectedAt: connection.createdAt,
-				needsReconnect: connection.disconnectedAt !== null,
-			};
 		}),
 
 	disconnect: personProcedure
@@ -46,11 +37,15 @@ export const googleRouter = {
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const connection = await findGoogleConnection(
+			const owned = await userConnections(
 				input.organizationId,
+				"google",
 				ctx.session.user.id,
 			);
-			if (connection) await releaseGoogleGrant(connection);
+			const leaving = owned.map((connection) => connection.id);
+			for (const connection of owned) {
+				await releaseGoogleGrant(connection, leaving);
+			}
 
 			const result = await db
 				.delete(connections)
@@ -76,8 +71,9 @@ export const googleRouter = {
  */
 export async function releaseGoogleGrant(
 	connection: SelectConnection,
+	alsoLeaving: readonly string[] = [],
 ): Promise<void> {
-	if (await grantSharedWithAnotherConnection(connection)) return;
+	if (await grantSharedWithAnotherConnection(connection, alsoLeaving)) return;
 	// Best effort: Google keeps pushing until the watch is stopped or
 	// expires, and the push route would only reject pushes for a missing
 	// connection. A failure here must not block the disconnect.

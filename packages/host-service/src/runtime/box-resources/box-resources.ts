@@ -7,7 +7,7 @@ import {
 } from "node:fs";
 import { availableParallelism, uptime } from "node:os";
 import { join } from "node:path";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 
 export interface BoxReap {
 	at: number;

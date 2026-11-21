@@ -3,10 +3,11 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import {
 	useOpenNewWorkspace,
 	useOpenNewWorkspaceForHost,
@@ -74,7 +75,7 @@ export function useDashboardSidebarProjectSectionActions({
 	// pointing at a workspace the sidebar no longer shows (or that no longer
 	// exists), so both land on the workspaces list first.
 	const matchRoute = useMatchRoute();
-	const activeWorkspaceMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
+	const activeWorkspaceMatch = matchRoute({ to: "/workspace/$workspaceId" });
 	const activeWorkspaceId = activeWorkspaceMatch
 		? activeWorkspaceMatch.workspaceId
 		: null;
@@ -85,7 +86,7 @@ export function useDashboardSidebarProjectSectionActions({
 			(workspace) => workspace.id === activeWorkspaceId,
 		);
 		if (active?.projectId === project.id) {
-			navigate({ to: "/v2-workspaces" });
+			navigate({ to: "/workspaces" });
 		}
 	};
 

@@ -1,10 +1,17 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 
 const execFileAsync = promisify(execFile);
 
 /** Timeout for shell commands to prevent hanging (ms) */
 export const EXEC_TIMEOUT_MS = 5000;
+
+export const psCommand = () =>
+	resolveCommand("ps", { preferred: ["/bin/ps", "/usr/bin/ps"] });
+
+export const lsofCommand = () =>
+	resolveCommand("lsof", { preferred: ["/usr/sbin/lsof", "/usr/bin/lsof"] });
 
 /**
  * Run execFile and tolerate a plain non-zero exit by returning its stdout.

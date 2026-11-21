@@ -1,3 +1,5 @@
+import type { Fetch } from "../fetch";
+
 export interface RouterDev {
 	id: string;
 	name: string;
@@ -17,7 +19,7 @@ export interface RouteInput {
 }
 
 export interface RouteDeps {
-	fetch: typeof fetch;
+	fetch: Fetch;
 	token: () => Promise<string>;
 	timeoutMs?: number;
 }
@@ -56,19 +58,30 @@ function areaOf(dev: RouterDev): string {
 }
 
 export function buildJevRequest(input: RouteInput) {
-	const devQuestions = Object.fromEntries(
-		input.devs.map((dev, index) => [
-			devQuestion(index),
+	const questions = Object.fromEntries([
+		...input.devs.map(
+			(dev, index) =>
+				[
+					devQuestion(index),
+					{
+						type: "choice",
+						instructions: `${dev.name} is an AI teammate in #${input.channelName}. ${areaOf(dev)} Should ${dev.name} reply to \`message\`?`,
+						criteria: {
+							respond: `\`message\` speaks to ${dev.name} by name to ask for something, or asks for a concrete task or a factual answer in ${dev.name}'s area, or reports a problem in that area for someone to fix, or follows up on something ${dev.name} said in \`recent_messages\``,
+							stay_out: `People are talking to each other: an announcement, opinion, a question that asks people what they think, a request for humans to review or look at something, status update, thanks, joke, sarcasm or venting; or it is addressed to a named person other than ${dev.name}, or mentions ${dev.name} only in passing, or the request belongs to another teammate's area`,
+						},
+					},
+				] as const,
+		),
+		[
+			SEVERAL_QUESTION,
 			{
-				type: "choice",
-				instructions: `${dev.name} is an AI teammate in #${input.channelName}. ${areaOf(dev)} Should ${dev.name} reply to \`message\`?`,
-				criteria: {
-					respond: `\`message\` speaks to ${dev.name} by name to ask for something, or asks for a concrete task or a factual answer in ${dev.name}'s area, or reports a problem in that area for someone to fix, or follows up on something ${dev.name} said in \`recent_messages\``,
-					stay_out: `People are talking to each other: an announcement, opinion, a question that asks people what they think, a request for humans to review or look at something, status update, thanks, joke, sarcasm or venting; or it is addressed to a named person other than ${dev.name}, or mentions ${dev.name} only in passing, or the request belongs to another teammate's area`,
-				},
+				type: "noul",
+				instructions:
+					"Does `message` ask for two or more separate pieces of work that belong to different people or areas, or name two or more teammates to do something?",
 			},
-		]),
-	);
+		] as const,
+	]);
 	return {
 		model: JEV_MODEL,
 		state: {
@@ -80,14 +93,7 @@ export function buildJevRequest(input: RouteInput) {
 			recent_messages: input.recent.slice(-MAX_RECENT).map(clip),
 			message: clip(input.message),
 		},
-		questions: {
-			...devQuestions,
-			[SEVERAL_QUESTION]: {
-				type: "noul",
-				instructions:
-					"Does `message` ask for two or more separate pieces of work that belong to different people or areas, or name two or more teammates to do something?",
-			},
-		},
+		questions,
 	};
 }
 

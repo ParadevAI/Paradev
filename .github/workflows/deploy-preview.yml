@@ -9,11 +9,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERCEL_CLI_VERSION: 50.22.1
+  VERCEL_CLI_VERSION: 50.31.0
   PR_NUMBER: ${{ github.event.pull_request.number }}
   API_ALIAS: api-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   BROWSER_API_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('api.pr-{0}.paradev.com', github.event.pull_request.number) || format('api-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
   WEB_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('app.pr-{0}.paradev.com', github.event.pull_request.number) || format('web-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
+  AGENTS_ALIAS: agents-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   MARKETING_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || format('marketing-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
   ADMIN_ALIAS: admin-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   DOCS_ALIAS: docs-pr-${{ github.event.pull_request.number }}-superset.vercel.app
@@ -192,9 +193,11 @@ jobs:
           GOOGLE_CONNECTIONS_CLIENT_SECRET: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_SECRET }}
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          MOBILE_WEB_ORIGINS: ${{ secrets.MOBILE_WEB_ORIGINS }}
           NEXT_PUBLIC_SENTRY_DSN_API: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_API }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
           PLUGIN_CLIENT_METADATA_BASE_URL: ${{ secrets.PLUGIN_CLIENT_METADATA_BASE_URL }}
@@ -236,6 +239,13 @@ jobs:
           VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
           AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
           AUTUMN_WEBHOOK_SECRET: ${{ secrets.AUTUMN_WEBHOOK_SECRET }}
+          AWS_MARKETPLACE_PRODUCT_CODE: ${{ secrets.AWS_MARKETPLACE_PRODUCT_CODE }}
+          AWS_MARKETPLACE_REGION: ${{ secrets.AWS_MARKETPLACE_REGION }}
+          AWS_MARKETPLACE_ACCESS_KEY_ID: ${{ secrets.AWS_MARKETPLACE_ACCESS_KEY_ID }}
+          AWS_MARKETPLACE_SECRET_ACCESS_KEY: ${{ secrets.AWS_MARKETPLACE_SECRET_ACCESS_KEY }}
+          AWS_MARKETPLACE_SELLER_ACCOUNT_ID: ${{ secrets.AWS_MARKETPLACE_SELLER_ACCOUNT_ID }}
+          AWS_MARKETPLACE_EVENTS_TOKEN: ${{ secrets.AWS_MARKETPLACE_EVENTS_TOKEN }}
+          AWS_MARKETPLACE_ENTERPRISE_PLAN_ID: ${{ secrets.AWS_MARKETPLACE_ENTERPRISE_PLAN_ID }}
           BILLING_PROVIDER: ${{ secrets.BILLING_PROVIDER }}
           SANDBOX_GATE_SECRET: ${{ secrets.SANDBOX_GATE_SECRET }}
           SANDBOX_GATE_ORIGIN: ${{ secrets.SANDBOX_GATE_ORIGIN }}
@@ -276,9 +286,11 @@ jobs:
             --env GOOGLE_CONNECTIONS_CLIENT_SECRET=$GOOGLE_CONNECTIONS_CLIENT_SECRET \
             --env GH_CLIENT_ID=$GH_CLIENT_ID \
             --env GH_CLIENT_SECRET=$GH_CLIENT_SECRET \
+            --env MOBILE_WEB_ORIGINS=$MOBILE_WEB_ORIGINS \
             --env NEXT_PUBLIC_SENTRY_DSN_API=$NEXT_PUBLIC_SENTRY_DSN_API \
             --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
+            --env DOMAIN_MOVE_ENABLED="$DOMAIN_MOVE_ENABLED" \
             --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
             --env POSTHOG_API_KEY=$POSTHOG_API_KEY \
             --env PLUGIN_CLIENT_METADATA_BASE_URL="$PLUGIN_CLIENT_METADATA_BASE_URL" \
@@ -320,6 +332,13 @@ jobs:
             --env VERCEL_SANDBOX_PROJECT_ID=$VERCEL_SANDBOX_PROJECT_ID \
             --env AUTUMN_SECRET_KEY=$AUTUMN_SECRET_KEY \
             --env AUTUMN_WEBHOOK_SECRET=$AUTUMN_WEBHOOK_SECRET \
+            --env AWS_MARKETPLACE_PRODUCT_CODE=$AWS_MARKETPLACE_PRODUCT_CODE \
+            --env AWS_MARKETPLACE_REGION=$AWS_MARKETPLACE_REGION \
+            --env AWS_MARKETPLACE_ACCESS_KEY_ID=$AWS_MARKETPLACE_ACCESS_KEY_ID \
+            --env AWS_MARKETPLACE_SECRET_ACCESS_KEY=$AWS_MARKETPLACE_SECRET_ACCESS_KEY \
+            --env AWS_MARKETPLACE_SELLER_ACCOUNT_ID=$AWS_MARKETPLACE_SELLER_ACCOUNT_ID \
+            --env AWS_MARKETPLACE_EVENTS_TOKEN=$AWS_MARKETPLACE_EVENTS_TOKEN \
+            --env AWS_MARKETPLACE_ENTERPRISE_PLAN_ID=$AWS_MARKETPLACE_ENTERPRISE_PLAN_ID \
             --env BILLING_PROVIDER=$BILLING_PROVIDER \
             --env SANDBOX_GATE_SECRET=$SANDBOX_GATE_SECRET \
             --env SANDBOX_GATE_ORIGIN=$SANDBOX_GATE_ORIGIN \
@@ -416,6 +435,7 @@ jobs:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_WEB: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_WEB }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
@@ -434,6 +454,7 @@ jobs:
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
           RELAY_URL: ${{ secrets.RELAY_URL }}
           RELAY_BACKUP_URL: ${{ secrets.RELAY_BACKUP_URL }}
+          AGENTS_URL: https://${{ env.AGENTS_ALIAS }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
           vercel build --token=$VERCEL_TOKEN
@@ -444,6 +465,7 @@ jobs:
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
+            --env AGENTS_URL=$AGENTS_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
             --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
@@ -455,6 +477,7 @@ jobs:
             --env STATIC_URL=$STATIC_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
+            --env DOMAIN_MOVE_ENABLED="$DOMAIN_MOVE_ENABLED" \
             --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
             --env NEXT_PUBLIC_SENTRY_DSN_WEB=$NEXT_PUBLIC_SENTRY_DSN_WEB \
             --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
@@ -490,6 +513,85 @@ jobs:
         with:
           name: web-status
           path: web-status.env
+
+  deploy-agents:
+    name: Deploy Agents Web
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    environment:
+      name: preview
+      url: https://${{ env.WEB_ALIAS }}/agents
+
+    steps:
+      - name: Check the agents project is configured
+        id: agents-config
+        env:
+          AGENTS_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+        run: echo "configured=$([ -n "$AGENTS_PROJECT_ID" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        if: steps.agents-config.outputs.configured == 'true'
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install dependencies
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun install --frozen --ignore-scripts
+
+      - name: Compile translations
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun run --filter=@superset/i18n build
+
+      - name: Install Vercel CLI
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      - name: Build and Deploy Agents Web
+        if: steps.agents-config.outputs.configured == 'true'
+        working-directory: apps/mobile
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+          EXPO_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          EXPO_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
+          EXPO_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
+          EXPO_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
+          EXPO_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          EXPO_PUBLIC_SENTRY_DSN_MOBILE: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN_MOBILE }}
+          EXPO_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
+        run: |
+          bun scripts/build-web.ts
+          VERCEL_URL=$(vercel deploy --prebuilt --archive=tgz --token=$VERCEL_TOKEN)
+          vercel alias $VERCEL_URL ${{ env.AGENTS_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+
+      - name: Save agents success status
+        if: steps.agents-config.outputs.configured == 'true'
+        run: |
+          cat > agents-status.env << EOF
+          AGENTS_STATUS="✅"
+          AGENTS_LINK="<a href=\"https://${{ env.WEB_ALIAS }}/agents\">Open Preview</a>"
+          EOF
+
+      - name: Upload agents status
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: agents-status
+          path: agents-status.env
 
   deploy-marketing:
     name: Deploy Marketing
@@ -734,7 +836,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: always()
-    needs: [create-database, deploy-database, deploy-api, deploy-web, deploy-marketing, deploy-docs]
+    needs: [create-database, deploy-database, deploy-api, deploy-web, deploy-agents, deploy-marketing, deploy-docs]
     permissions:
       contents: read
       pull-requests: write
@@ -757,6 +859,8 @@ jobs:
           API_LINK="Failed to deploy"
           WEB_STATUS="❌"
           WEB_LINK="Failed to deploy"
+          AGENTS_STATUS="❌"
+          AGENTS_LINK="Failed to deploy"
           MARKETING_STATUS="❌"
           MARKETING_LINK="Failed to deploy"
           DOCS_STATUS="❌"
@@ -777,6 +881,15 @@ jobs:
             source web-status.env
           fi
 
+          if [[ "${{ needs.deploy-agents.result }}" == "success" ]]; then
+            if [[ -f agents-status.env ]]; then
+              source agents-status.env
+            else
+              AGENTS_STATUS="➖"
+              AGENTS_LINK="Not set up"
+            fi
+          fi
+
           if [[ "${{ needs.deploy-marketing.result }}" == "success" ]]; then
             source marketing-status.env
           fi
@@ -785,7 +898,7 @@ jobs:
             source docs-status.env
           fi
 
-          export DATABASE_STATUS DATABASE_LINK API_STATUS API_LINK WEB_STATUS WEB_LINK MARKETING_STATUS MARKETING_LINK DOCS_STATUS DOCS_LINK
+          export DATABASE_STATUS DATABASE_LINK API_STATUS API_LINK WEB_STATUS WEB_LINK AGENTS_STATUS AGENTS_LINK MARKETING_STATUS MARKETING_LINK DOCS_STATUS DOCS_LINK
           envsubst < .github/templates/preview-comment.md > final-comment.md
 
       - name: Post final deployment comment

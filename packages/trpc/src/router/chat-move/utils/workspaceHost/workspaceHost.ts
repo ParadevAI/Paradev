@@ -12,6 +12,7 @@ import {
 	hostServiceMutation,
 	relayMutation,
 } from "../../../automation/relay-client";
+import { isLiveStatus } from "../../../cloud-workspace/live";
 import { wakeCloudWorkspace } from "../../../cloud-workspace/wake";
 
 export type WorkspaceHost = {
@@ -61,7 +62,7 @@ export async function workspaceHost(args: {
 		),
 	});
 	if (!cloud) throw new Error("The cloud workspace is gone");
-	if (cloud.status !== "ready") {
+	if (!isLiveStatus(cloud.status)) {
 		throw new Error(`The cloud workspace is ${cloud.status}`);
 	}
 	const { hostTarget } = await wakeCloudWorkspace(cloud);

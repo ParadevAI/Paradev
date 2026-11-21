@@ -1,6 +1,10 @@
 "use client";
 
-import { Command as CommandPrimitive, defaultFilter } from "cmdk";
+import {
+	Command as CommandPrimitive,
+	defaultFilter,
+	useCommandState,
+} from "cmdk";
 import { SearchIcon } from "lucide-react";
 import type * as React from "react";
 
@@ -186,4 +190,5 @@ export {
 	CommandSeparator,
 	CommandPrimitive,
 	defaultFilter,
+	useCommandState,
 };

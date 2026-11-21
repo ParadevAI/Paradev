@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { SHELL_EXIT_MARKER_SCRIPT } from "@superset/shared/shell-exit-marker";
 import {
 	SUPERSET_MANAGED_BINARIES,
 	type SupersetManagedBinary,
@@ -209,6 +210,11 @@ __superset_prompt_mark() {
 }
 # Keep our hook LAST so it fires after direnv and other precmd hooks complete.
 precmd_functions=(\${precmd_functions[@]} __superset_prompt_mark)
+# Tells the host that the shell ended by itself (exit, logout, Ctrl+D).
+__superset_exit_mark() {
+  [[ $ZSH_SUBSHELL -eq 0 && -t 1 ]] && printf "${SHELL_EXIT_MARKER_SCRIPT}"
+}
+zshexit_functions=(\${zshexit_functions[@]} __superset_exit_mark)
 export ZDOTDIR="$_superset_home"
 `;
 	const wroteZlogin = writeFileIfChanged(zloginPath, zloginScript, 0o644);
@@ -268,6 +274,12 @@ else
     PROMPT_COMMAND="__superset_prompt_mark"
   fi
 fi
+# Tells the host that the shell ended by itself (exit, logout, Ctrl+D).
+# Bash has one EXIT trap, so a trap from the user's config stays in place.
+__superset_exit_mark() {
+  [[ $BASH_SUBSHELL -eq 0 && -t 1 ]] && printf "${SHELL_EXIT_MARKER_SCRIPT}"
+}
+[[ -z "$(trap -p EXIT)" ]] && trap __superset_exit_mark EXIT
 `;
 	const changed = writeFileIfChanged(rcfilePath, script, 0o644);
 	console.log(`[agent-setup] ${changed ? "Updated" : "Verified"} bash wrapper`);

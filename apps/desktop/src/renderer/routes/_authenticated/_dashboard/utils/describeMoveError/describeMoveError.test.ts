@@ -54,7 +54,7 @@ describe("describeMoveError", () => {
 			'teleport.importChat: No procedure found on path "teleport.importChat"';
 		expect(describeMoveError(raw)).toEqual({
 			reason:
-				"The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again.",
+				"The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again.",
 			details: raw,
 		});
 	});
@@ -67,9 +67,9 @@ describe("describeMoveError", () => {
 
 	test("keeps a message that is already readable", () => {
 		expect(
-			describeMoveError("Add acme/web as a project on this computer first"),
+			describeMoveError("Add acme/web as a project on this device first"),
 		).toEqual({
-			reason: "Add acme/web as a project on this computer first",
+			reason: "Add acme/web as a project on this device first",
 			details: null,
 		});
 	});

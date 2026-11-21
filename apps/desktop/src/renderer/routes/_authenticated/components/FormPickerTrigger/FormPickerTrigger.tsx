@@ -1,7 +1,7 @@
 import { cn } from "@superset/ui/utils";
 import type { ComponentProps } from "react";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { PILL_TRIGGER_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
 
 // Shared trigger for the top-of-modal pickers (Device / Project / Branch).
 // No background; uniform icon size, text size, and text color so the three
@@ -11,12 +11,12 @@ export function FormPickerTrigger({
 	type = "button",
 	...props
 }: ComponentProps<"button">) {
-	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	return (
 		<button
 			type={type}
 			className={cn(
-				isParadevShell
+				isNewPage
 					? cn(
 							PILL_TRIGGER_CLASS,
 							"group text-muted-foreground disabled:opacity-50",

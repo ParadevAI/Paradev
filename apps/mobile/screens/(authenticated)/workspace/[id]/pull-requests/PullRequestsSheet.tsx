@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react-native";
 import { Pressable, ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar } from "@/lib/navigation";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
 import { PULL_REQUEST_STATUS, pullRequestStatus } from "../utils/pullRequest";
 import { RowDiffstat } from "./components/RowDiffstat";
@@ -35,15 +36,15 @@ export function PullRequestsSheet() {
 					}),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="px-4 pb-10 pt-2"

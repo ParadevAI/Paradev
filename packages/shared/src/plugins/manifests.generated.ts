@@ -1105,6 +1105,49 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"planetscale": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "planetscale",
+		"version": "1.0.0",
+		"description": "Work with your PlanetScale databases: inspect organizations, databases, and branches, read schemas, run SQL, and review query insights.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"planetscale",
+			"mysql",
+			"postgres",
+			"vitess",
+			"database",
+			"sql"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "PlanetScale",
+					"category": "Data & APIs",
+					"icon": "planetscale"
+				},
+				"connector": {
+					"slug": "planetscale_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.pscale.dev/mcp/planetscale"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

@@ -30,8 +30,14 @@ describe("cloudUsageFromBalances", () => {
 			usedGbMinutes: 2400,
 			overageGbMinutes: 0,
 			prepaidGbMinutes: 0,
+			bought: { grantedGbMinutes: 0, remainingGbMinutes: 0 },
+			freeCredits: { grantedGbMinutes: 0, remainingGbMinutes: 0 },
+			seats: null,
+			overageLimit: { type: "none" },
+			limitReached: false,
 			autoTopup: null,
 			pack: null,
+			overagePerGbHour: null,
 			resetsAt: new Date(RESET).toISOString(),
 		});
 	});
@@ -52,8 +58,14 @@ describe("cloudUsageFromBalances", () => {
 			usedGbMinutes: 50000,
 			overageGbMinutes: 0,
 			prepaidGbMinutes: 0,
+			bought: { grantedGbMinutes: 0, remainingGbMinutes: 0 },
+			freeCredits: { grantedGbMinutes: 0, remainingGbMinutes: 0 },
+			seats: null,
+			overageLimit: { type: "none" },
+			limitReached: false,
 			autoTopup: null,
 			pack: null,
+			overagePerGbHour: null,
 			resetsAt: null,
 		});
 	});
@@ -62,12 +74,12 @@ describe("cloudUsageFromBalances", () => {
 		expect(cloudUsageFromBalances({})).toBeNull();
 	});
 
-	test("bought packs are counted apart from the monthly pool", () => {
+	test("bought packs, with credit carried from an earlier pack, are apart from the monthly pool and from a granted credit", () => {
 		const usage = cloudUsageFromBalances(
 			boxBalance({
-				granted: 420000,
-				usage: 370000,
-				remaining: 50000,
+				granted: 446000,
+				usage: 392000,
+				remaining: 54000,
 				breakdown: [
 					{
 						id: "monthly",
@@ -84,10 +96,27 @@ describe("cloudUsageFromBalances", () => {
 					{
 						id: "pack",
 						planId: "team",
-						includedGrant: 0,
+						includedGrant: 20000,
 						prepaidGrant: 60000,
 						remaining: 50000,
-						usage: 10000,
+						usage: 30000,
+						unlimited: false,
+						reset: { interval: "one_off", resetsAt: null },
+						price: {
+							amount: 0.06,
+							billingUnits: 60,
+							billingMethod: "prepaid",
+							maxPurchase: null,
+						},
+						expiresAt: null,
+					},
+					{
+						id: "credit",
+						planId: null,
+						includedGrant: 6000,
+						prepaidGrant: 0,
+						remaining: 4000,
+						usage: 2000,
 						unlimited: false,
 						reset: { interval: "one_off", resetsAt: null },
 						price: null,
@@ -110,12 +139,124 @@ describe("cloudUsageFromBalances", () => {
 			includedGbMinutes: 360000,
 			usedGbMinutes: 360000,
 			overageGbMinutes: 0,
-			prepaidGbMinutes: 50000,
+			prepaidGbMinutes: 54000,
+			bought: { grantedGbMinutes: 80000, remainingGbMinutes: 50000 },
+			freeCredits: { grantedGbMinutes: 6000, remainingGbMinutes: 4000 },
 			autoTopup: {
 				enabled: true,
 				thresholdGbMinutes: 15000,
 				quantityGbMinutes: 60000,
 			},
 		});
+	});
+
+	test.each([
+		["no spend limit is no cap", {}, { type: "none" }],
+		[
+			"overage turned off is a cap of zero",
+			{ overageAllowed: [{ featureId: "box_gb_minutes", enabled: false }] },
+			{ type: "absolute", gbMinutes: 0 },
+		],
+		[
+			"an absolute spend limit is a cap in GB-minutes",
+			{
+				spendLimits: [
+					{ featureId: "box_gb_minutes", enabled: true, overageLimit: 6000 },
+				],
+			},
+			{ type: "absolute", gbMinutes: 6000 },
+		],
+		[
+			"a percentage spend limit stays a percentage",
+			{
+				spendLimits: [
+					{
+						featureId: "box_gb_minutes",
+						enabled: true,
+						limitType: "usage_percentage",
+						overageLimit: 300,
+					},
+				],
+			},
+			{ type: "usage_percentage", percent: 300 },
+		],
+	] as const)("%s", (_, billingControls, overageLimit) => {
+		expect(
+			cloudUsageFromBalances(boxBalance({}), billingControls as never)
+				?.overageLimit,
+		).toEqual(overageLimit);
+	});
+
+	test.each([
+		["no cap is never reached", {}, -50000, false],
+		[
+			"overage off is reached at nothing left",
+			{ overageAllowed: [{ featureId: "box_gb_minutes", enabled: false }] },
+			0,
+			true,
+		],
+		[
+			"overage off is not reached while some is left",
+			{ overageAllowed: [{ featureId: "box_gb_minutes", enabled: false }] },
+			1,
+			false,
+		],
+		[
+			"an absolute cap is reached at that much overage",
+			{
+				spendLimits: [
+					{ featureId: "box_gb_minutes", enabled: true, overageLimit: 6000 },
+				],
+			},
+			-6000,
+			true,
+		],
+		[
+			"an absolute cap is not reached below it",
+			{
+				spendLimits: [
+					{ featureId: "box_gb_minutes", enabled: true, overageLimit: 6000 },
+				],
+			},
+			-5999,
+			false,
+		],
+		[
+			"a percentage cap is not known",
+			{
+				spendLimits: [
+					{
+						featureId: "box_gb_minutes",
+						enabled: true,
+						limitType: "usage_percentage",
+						overageLimit: 300,
+					},
+				],
+			},
+			-50000,
+			null,
+		],
+		[
+			"a hard usage limit is not known",
+			{
+				usageLimits: [
+					{
+						featureId: "box_gb_minutes",
+						enabled: true,
+						limit: 9600,
+						interval: "month",
+					},
+				],
+			},
+			0,
+			null,
+		],
+	] as const)("limit reached: %s", (_, billingControls, remaining, reached) => {
+		expect(
+			cloudUsageFromBalances(
+				boxBalance({ remaining }),
+				billingControls as never,
+			)?.limitReached,
+		).toBe(reached);
 	});
 });

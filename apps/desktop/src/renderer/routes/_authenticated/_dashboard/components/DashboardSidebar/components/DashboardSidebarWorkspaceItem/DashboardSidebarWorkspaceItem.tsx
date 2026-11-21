@@ -96,7 +96,6 @@ export function DashboardSidebarWorkspaceItem({
 		handleCopyWorkspaceId,
 		handleCreateSection,
 		handleMoveToSection,
-		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleRemovePullRequest,
 		handleTogglePin,
@@ -131,12 +130,12 @@ export function DashboardSidebarWorkspaceItem({
 		[pendingName, workspace],
 	);
 
-	const { v2Workspaces: v2WorkspaceActions } = useOptimisticActions();
+	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const [renameBranchTarget, setRenameBranchTarget] = useState<string | null>(
 		null,
 	);
 	const handleAfterBranchRename = (newBranchName: string) => {
-		v2WorkspaceActions.updateWorkspace(id, { branch: newBranchName });
+		workspaceActions.updateWorkspace(id, { branch: newBranchName });
 	};
 	const isPending = pendingTransaction?.type === "insert";
 
@@ -292,7 +291,6 @@ export function DashboardSidebarWorkspaceItem({
 							onCreateSection={handleCreateSection}
 							showDeleteHotkey={isActive}
 							onMoveToSection={handleMoveToSection}
-							onOpenInFinder={handleOpenInFinder}
 							onCopyPath={handleCopyPath}
 							onCopyBranchName={handleCopyBranchName}
 							onCopyWorkspaceId={handleCopyWorkspaceId}
@@ -383,7 +381,6 @@ export function DashboardSidebarWorkspaceItem({
 						isCloudWorkspace={isCloudWorkspace}
 						isPinned={workspace.isPinned}
 						onTogglePin={handleTogglePin}
-						onOpenInFinder={handleOpenInFinder}
 						showDeleteHotkey={isActive}
 						onCopyPath={handleCopyPath}
 						onCopyBranchName={handleCopyBranchName}

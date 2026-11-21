@@ -32,7 +32,7 @@ import {
 	loadToken,
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
-import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
+import { applyShellEnvToProcess } from "lib/trpc/routers/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
 	APP_PARTITION,
@@ -194,7 +194,11 @@ async function processDeepLink(url: string): Promise<void> {
 
 	// Non-auth deep links: extract path and navigate in renderer
 	// e.g. superset://tasks/my-slug -> /tasks/my-slug
-	const path = `/${url.slice(url.indexOf("://") + 3)}`;
+	// Links minted before the route rename (older CLIs, published pages).
+	const path = `/${url.slice(url.indexOf("://") + 3)}`.replace(
+		/^\/v2-workspace(s)?\b/,
+		"/workspace$1",
+	);
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();
@@ -449,6 +453,17 @@ if (process.env.NODE_ENV === "development") {
 // small for a video inside a page. 1 GiB lifts the per-entry cap to
 // roughly 128 MB.
 app.commandLine.appendSwitch("disk-cache-size", String(1024 * 1024 * 1024));
+
+// Chromium 152 crashes in soft-navigation paint metrics (Sentry DESKTOP-1F1).
+app.commandLine.appendSwitch(
+	"disable-features",
+	[
+		app.commandLine.getSwitchValue("disable-features"),
+		"SoftNavigationDetection",
+	]
+		.filter(Boolean)
+		.join(","),
+);
 
 protocol.registerSchemesAsPrivileged([
 	{

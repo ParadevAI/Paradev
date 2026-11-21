@@ -1,4 +1,4 @@
-import { useIsV2OnlyUser } from "renderer/hooks/useIsV2CloudEnabled";
+import { useIsV2OnlyUser } from "renderer/hooks/useIsV2OnlyUser";
 import type { SettingItemId } from "../../../utils/settings-search";
 import { ExperimentalSettingsList } from "./components/ExperimentalSettingsList";
 
