@@ -24,20 +24,9 @@ export function resolvePendingCreationPresets(
 	});
 }
 
-export interface CreationPresetRun {
-	preset: TerminalPresetRow;
-	options: { target: "new-tab" } | undefined;
-}
-
-/**
- * Split-pane presets run first, while the agent tab seeded by the create is
- * still the active tab; each new-tab preset activates the tab it opens.
- * Sequential presets always get a new tab: aimed at the active tab, they would
- * type into the agent's PTY.
- */
-export function planCreationPresetRuns(
-	presets: readonly TerminalPresetRow[],
-): CreationPresetRun[] {
+// Split-pane presets run first, while the agent tab is still active. The rest
+// get a new tab: a sequential preset would type into the agent's PTY.
+export function planCreationPresetRuns(presets: readonly TerminalPresetRow[]) {
 	const runs = presets.map((preset) => ({
 		preset,
 		options:
@@ -102,7 +91,7 @@ export function useRunWorkspaceCreationPresets({
 			resolvePresetCommands,
 		);
 		void (async () => {
-			// Serial so tabs land in presets-bar order. executePreset toasts its
+			// Serial so new tabs land in presets-bar order. executePreset toasts its
 			// own failures; the guard keeps an unexpected throw from skipping
 			// later scripts.
 			for (const { preset, options } of planCreationPresetRuns(presets)) {
