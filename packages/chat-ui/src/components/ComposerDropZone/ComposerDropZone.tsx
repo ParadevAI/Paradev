@@ -32,6 +32,7 @@ export type ComposerDropZoneProps = {
 	children: ReactNode;
 	label?: string;
 	className?: string;
+	"data-theme-surface"?: string;
 	ref?: Ref<HTMLDivElement>;
 	onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
 };
@@ -44,6 +45,7 @@ export function ComposerDropZone({
 		}),
 	),
 	className,
+	"data-theme-surface": themeSurface,
 	ref,
 	onKeyDown,
 }: ComposerDropZoneProps) {
@@ -82,6 +84,7 @@ export function ComposerDropZone({
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the composer's file picker */}
 			<div
 				className={cn("relative", className)}
+				data-theme-surface={themeSurface}
 				onKeyDown={onKeyDown}
 				ref={ref}
 				onDragOver={(event) => {

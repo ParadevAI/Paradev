@@ -26,7 +26,7 @@ interface GitHubStarPillProps {
 
 /**
  * Small, always-optional "Star Superset on GitHub" pill for the empty
- * "no pane open" screens (v1 EmptyTabView and v2 WorkspaceEmptyState) and
+ * "no pane open" screens (WorkspaceEmptyState) and
  * the new-workspace screen. Renders straight from live `state`, with no
  * nag-suppression layer — unlike the onboarding toast, this is a low-key
  * status indicator, not an interruptive campaign, so it's allowed to be
@@ -73,6 +73,7 @@ export function GitHubStarPill({
 		// opacity/interactivity change, never the layout.
 		return (
 			<motion.div
+				initial={false}
 				animate={{ opacity: isVisible ? 1 : 0 }}
 				transition={{ duration: 0.32, ease: "easeOut" }}
 				style={{ pointerEvents: isVisible ? "auto" : "none" }}

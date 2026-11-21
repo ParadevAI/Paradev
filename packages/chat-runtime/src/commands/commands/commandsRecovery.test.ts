@@ -3,7 +3,12 @@ import { randomUUID } from "node:crypto";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
+import {
+	CONTINUE_PROMPT,
+	deriveTimeline,
+	emptySnapshot,
+	reduceMany,
+} from "@superset/chat/core";
 import type { ToolCall } from "@superset/chat/protocol";
 import { eq } from "drizzle-orm";
 import { chatJournal } from "../../db";
@@ -439,6 +444,48 @@ describe("a queue a quit cut off", () => {
 			).size,
 		).toBe(1);
 		await close();
+	});
+});
+
+describe("a continue that was still waiting at a quit", () => {
+	const FOLLOW_UP = [{ type: "text" as const, text: "and the docs" }];
+	const PROCEED = [{ type: "text" as const, text: CONTINUE_PROMPT }];
+
+	test("is not carried over: the resume says it once, before the rest of the queue", async () => {
+		const dataDir = mkdtempSync(join(tmpdir(), "chat-runtime-"));
+		const replays: FakeHarness[] = [];
+		const harnesses = hangingRegistry(replays);
+		const open = () =>
+			createChatRuntime({ dataDir, openDatabase: createBunChatDb, harnesses });
+		const quit = open();
+		const cutOff = await startTurn(quit);
+		for (const content of [FOLLOW_UP, PROCEED, PROCEED]) {
+			quit.commands.prompt({
+				commandId: randomUUID(),
+				sessionId: cutOff.sessionId,
+				clientId: randomUUID(),
+				content,
+			});
+		}
+
+		const relaunched = open();
+		const replacement = createChat(relaunched, cutOff.sessionId);
+		await waitFor(
+			() => relaunched.live.get(replacement.sessionId)?.state.status === "idle",
+		);
+		const live = relaunched.live.require(replacement.sessionId);
+		expect(live.queueState.prompts.map((prompt) => prompt.content)).toEqual([
+			FOLLOW_UP,
+		]);
+
+		live.promptOnceStarted([PROCEED, FOLLOW_UP], []);
+
+		expect(replays.at(-1)?.prompted).toEqual([PROCEED]);
+		expect(live.queueState.prompts.map((prompt) => prompt.content)).toEqual([
+			FOLLOW_UP,
+		]);
+		await relaunched.dispose();
+		await quit.dispose();
 	});
 });
 

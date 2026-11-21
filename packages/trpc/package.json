@@ -16,6 +16,10 @@
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
 		},
+		"./feature-flags": {
+			"types": "./src/lib/feature-flags.ts",
+			"default": "./src/lib/feature-flags.ts"
+		},
 		"./sync-policy": {
 			"types": "./src/lib/sync-policy/syncPolicy.ts",
 			"default": "./src/lib/sync-policy/syncPolicy.ts"
@@ -132,6 +136,10 @@
 			"types": "./src/router/cloud-workspace/reap.ts",
 			"default": "./src/router/cloud-workspace/reap.ts"
 		},
+		"./environment-build": {
+			"types": "./src/lib/sandbox/environment-build/index.ts",
+			"default": "./src/lib/sandbox/environment-build/index.ts"
+		},
 		"./automation-dispatch": {
 			"types": "./src/router/automation/dispatch.ts",
 			"default": "./src/router/automation/dispatch.ts"
@@ -205,13 +213,16 @@
 		"semver": "7.7.4",
 		"superjson": "2.2.6",
 		"undici": "7.30.0",
+		"workflow": "5.5.0",
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
+		"@better-auth/api-key": "1.6.22",
 		"@microsoft/microsoft-graph-types": "2.43.1",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
 		"@types/semver": "7.7.1",
+		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

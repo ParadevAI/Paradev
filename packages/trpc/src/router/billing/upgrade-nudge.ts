@@ -4,8 +4,8 @@ export const UPGRADE_NUDGE_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
 
 const FEATURE_NAMES: Record<string, string> = {
 	"mobile-app": `${BRAND.NAME} Mobile`,
-	"invite-members": "Inviting teammates",
-	"cloud-workspaces": "Cloud workspaces",
+	"invite-members": "team invites",
+	"cloud-workspaces": "cloud workspaces",
 };
 
 const SAFE_FEATURE_ID = /^[a-z0-9]+(?:[_.-][a-z0-9]+)*$/i;
@@ -16,13 +16,22 @@ export function upgradeNudgeFeatureName(feature: string): string {
 		: undefined;
 	if (known) return known;
 	if (!SAFE_FEATURE_ID.test(feature)) return "a Pro feature";
-	const words = feature.replace(/[_.-]+/g, " ").toLowerCase();
-	return words.charAt(0).toUpperCase() + words.slice(1);
+	return feature.replace(/[_.-]+/g, " ").toLowerCase();
+}
+
+export function upgradeNudgeUrl(
+	webUrl: string,
+	organizationId: string,
+): string {
+	const url = new URL("/settings/billing", webUrl);
+	url.searchParams.set("organization", organizationId);
+	return url.toString();
 }
 
 export interface UpgradeNudgeMessage {
 	to: string;
 	featureName: string;
+	organizationId: string;
 }
 
 export interface UpgradeNudgeDeps {
@@ -32,6 +41,8 @@ export interface UpgradeNudgeDeps {
 		feature: string;
 		outcome: UpgradeNudgeOutcome;
 	}): void;
+	/** Only owners can pay on the billing page the email links to. */
+	isOrganizationOwner(userId: string, organizationId: string): Promise<boolean>;
 	isOrganizationPaid(organizationId: string): Promise<boolean>;
 	isUnsubscribed(email: string): Promise<boolean>;
 	/** Reads the user's 7-day slot without taking it. */
@@ -44,6 +55,8 @@ export interface UpgradeNudgeDeps {
 
 export type UpgradeNudgeOutcome =
 	| "sent"
+	| "no_organization"
+	| "not_owner"
 	| "paid"
 	| "unsubscribed"
 	| "rate_limited"
@@ -73,14 +86,17 @@ async function nudge(
 ): Promise<UpgradeNudgeOutcome> {
 	try {
 		if (await deps.isClaimed(user.id)) return "rate_limited";
-		if (organizationId && (await deps.isOrganizationPaid(organizationId))) {
-			return "paid";
+		if (!organizationId) return "no_organization";
+		if (!(await deps.isOrganizationOwner(user.id, organizationId))) {
+			return "not_owner";
 		}
+		if (await deps.isOrganizationPaid(organizationId)) return "paid";
 		if (await deps.isUnsubscribed(user.email)) return "unsubscribed";
 		if (!(await deps.claim(user.id))) return "rate_limited";
 		await deps.send({
 			to: user.email,
 			featureName: upgradeNudgeFeatureName(feature),
+			organizationId,
 		});
 		return "sent";
 	} catch (error) {

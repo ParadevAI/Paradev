@@ -115,6 +115,22 @@ const LATEST_PROTOCOL_VERSION = 2;
 /** Who `initialize` says we are; v2 requires a name and a version. */
 const CLIENT_INFO = { name: "superset", version: "1.0.0" };
 
+function clientCapabilitiesFor(protocolVersion: number) {
+	const heldAtV1 = protocolVersion < LATEST_PROTOCOL_VERSION;
+	return {
+		fs: { readTextFile: false, writeTextFile: false },
+		terminal: false,
+		elicitation: { form: {} },
+		...(heldAtV1 ? { plan: {} } : {}),
+		session: {
+			compaction: {},
+			notices: {},
+			...(heldAtV1 ? { configOptions: { boolean: {} } } : {}),
+		},
+		_meta: AIR_CLIENT_META,
+	};
+}
+
 function unconfirmedSelectionMessage(error: AcpTimeoutError): string {
 	return `${error.message}. The agent can still apply the change, so the selection stays as you set it.`;
 }
@@ -237,6 +253,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	defaultModeId?: string;
 	clientApprovalModes?: boolean;
 	forkAtMessage?: boolean;
+	protocolVersion?: number;
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
@@ -322,6 +339,9 @@ const MAIN_AGENT_ACTIVITY = new Set([
 	"tool_call_content_chunk",
 	"plan",
 	"plan_update",
+	"notice",
+	"compaction_update",
+	"compaction_summary_chunk",
 ]);
 
 function isApprovalOptionKind(
@@ -471,6 +491,8 @@ export class AcpAdapter implements HarnessAdapter {
 		},
 	);
 	private configOptions: SessionConfigOption[] = [];
+	private unavailableStartModel: string | undefined;
+	private modelSetSinceStart = false;
 	private replaying = false;
 	private agentName: string | null = null;
 	private quietReplay = false;
@@ -536,6 +558,22 @@ export class AcpAdapter implements HarnessAdapter {
 				}),
 			options.backgroundDetailIntervalMs,
 		);
+	}
+
+	async discoverModels(cwd: string): Promise<SessionConfigOption[]> {
+		await this.ensureConnected(cwd);
+		if (!this.client) throw new Error("Agent did not connect");
+		// ACP exposes models on session/new; no prompt or mode change is sent.
+		const response = await this.client.request(
+			"session/new",
+			{ cwd, mcpServers: [] },
+			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
+		);
+		const session = acpNewSessionResponseSchema.parse(response);
+		this.sessionId = session.sessionId;
+		this.handleConfigOptions(response);
+		if (this.configOptions.length === 0) await this.awaitStartOptions({});
+		return this.configOptions;
 	}
 
 	start(startOptions: HarnessStartOptions): AsyncIterable<AdapterEvent> {
@@ -749,6 +787,9 @@ export class AcpAdapter implements HarnessAdapter {
 		const sessionId = this.sessionId;
 		if (!client || !sessionId) return Promise.resolve(false);
 		const previous = this.configOptions;
+		const changesModel = previous.some(
+			(option) => option.id === configId && option.category === "model",
+		);
 		const previousModeId =
 			configId === this.modeConfigId ? this.modeId : undefined;
 		this.configOptions = previous.map((option) =>
@@ -784,7 +825,13 @@ export class AcpAdapter implements HarnessAdapter {
 				this.emitNotice("error", error.message);
 			});
 		return request.then(
-			() => true,
+			() => {
+				if (changesModel) {
+					this.unavailableStartModel = undefined;
+					this.modelSetSinceStart = true;
+				}
+				return true;
+			},
 			() => false,
 		);
 	}
@@ -1002,10 +1049,12 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		}
 
+		const protocolVersion =
+			this.options.protocolVersion ?? LATEST_PROTOCOL_VERSION;
 		const initialized = await client.request(
 			"initialize",
 			{
-				protocolVersion: LATEST_PROTOCOL_VERSION,
+				protocolVersion,
 				// v2 requires `info` and renamed `clientCapabilities` to
 				// `capabilities`, so both names go out and one request serves either
 				// side of the bump.
@@ -1015,12 +1064,7 @@ export class AcpAdapter implements HarnessAdapter {
 				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
 				// Do not advertise fs/terminal: the agent falls back to its own
 				// Read/Edit/Bash tools, which run headless in the workspace.
-				clientCapabilities: {
-					fs: { readTextFile: false, writeTextFile: false },
-					terminal: false,
-					elicitation: { form: {} },
-					_meta: AIR_CLIENT_META,
-				},
+				clientCapabilities: clientCapabilitiesFor(protocolVersion),
 			},
 			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
 		);
@@ -1185,6 +1229,14 @@ export class AcpAdapter implements HarnessAdapter {
 		this.emitSession({ status: this.statusAfterApprovals() });
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
+		if (this.unavailableStartModel) {
+			this.failTurn(turnId, {
+				kind: "model_unavailable",
+				message: this.unavailableStartModel,
+			});
+			this.heldTurnId = null;
+			return;
+		}
 		if (this.heldTurnId !== turnId) return;
 		this.heldTurnId = null;
 		const client = this.client;
@@ -1442,11 +1494,16 @@ export class AcpAdapter implements HarnessAdapter {
 			case "tool_call_content_chunk":
 			case "plan":
 			case "plan_update":
+			case "notice":
 				this.main.handleUpdate(variant, outer.data.update, turnId);
 				return;
 			case "tool_call":
 			case "tool_call_update":
 				this.handleToolCall(outer.data.update, turnId);
+				return;
+			case "compaction_update":
+			case "compaction_summary_chunk":
+				this.handleCompaction(variant, outer.data.update, turnId);
 				return;
 			case "available_commands_update":
 				this.handleAvailableCommands(outer.data.update);
@@ -1518,13 +1575,23 @@ export class AcpAdapter implements HarnessAdapter {
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
 		if (!item || this.replaying) return;
 		this.trackBackgroundShell(item);
-		this.trackCompaction(raw, item);
+		if (this.compactions.has(item.id) || isCompactionCall(raw))
+			this.trackCompaction(item.id, item.status === "running");
 	}
 
-	private trackCompaction(raw: unknown, item: ToolCall): void {
-		if (!this.compactions.has(item.id) && !isCompactionCall(raw)) return;
-		if (item.status !== "running") {
-			this.compactions.delete(item.id);
+	private handleCompaction(
+		variant: "compaction_update" | "compaction_summary_chunk",
+		raw: unknown,
+		turnId: string,
+	): void {
+		const notice = this.main.handleCompaction(variant, raw, turnId);
+		if (!notice || this.replaying) return;
+		this.trackCompaction(notice.id, notice.completedAtMs === undefined);
+	}
+
+	private trackCompaction(itemId: string, running: boolean): void {
+		if (!running) {
+			this.compactions.delete(itemId);
 			if (this.compactions.size === 0) this.endCompactions();
 			return;
 		}
@@ -1533,11 +1600,13 @@ export class AcpAdapter implements HarnessAdapter {
 				this.settleCompactions = resolve;
 			});
 		}
-		this.compactions.add(item.id);
+		this.compactions.add(itemId);
 	}
 
 	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
 	private endCompactions(): void {
+		if (!this.disposed)
+			for (const itemId of this.compactions) this.main.cancelCompaction(itemId);
 		this.compactions.clear();
 		this.settleCompactions?.();
 		this.settleCompactions = null;
@@ -1918,6 +1987,7 @@ export class AcpAdapter implements HarnessAdapter {
 		open = false,
 	): void {
 		run.stream.flush();
+		run.stream.cancelCompactions();
 		this.cancelSubagentApprovals(sessionId, run);
 		this.endSubagentTasks(sessionId);
 		this.backgroundTasks.end(run.item.id);
@@ -2061,6 +2131,7 @@ export class AcpAdapter implements HarnessAdapter {
 		this.autonomousTurns.delete(asyncTaskId);
 		const turn = this.currentTurn;
 		if (!turnId || turn?.id !== turnId || turn.status !== "running") return;
+		this.endCompactions();
 		this.main.flush();
 		this.emitTurn({
 			...turn,
@@ -2215,6 +2286,14 @@ export class AcpAdapter implements HarnessAdapter {
 				: Object.keys(wanted).length > 0
 					? this.awaitStartOptions(wanted)
 					: Promise.resolve({});
+		this.modelSetSinceStart = false;
+		const confirmed = configured.then((taken) => {
+			if (!this.modelSetSinceStart)
+				this.unavailableStartModel =
+					wanted.modelId && !taken.modelId ? wanted.modelId : undefined;
+			return taken;
+		});
+		this.trackSelection(confirmed);
 		let sessionMode: Promise<string | undefined> = Promise.resolve(
 			this.options.clientApprovalModes && modeId && isClientApprovalMode(modeId)
 				? modeId
@@ -2235,7 +2314,7 @@ export class AcpAdapter implements HarnessAdapter {
 				taken ? modeId : undefined,
 			);
 		}
-		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+		void Promise.all([confirmed, sessionMode]).then(([taken, takenMode]) => {
 			if (wanted.effortId && !taken.effortId)
 				console.warn(
 					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
@@ -2552,6 +2631,7 @@ export class AcpAdapter implements HarnessAdapter {
 			this.finishSubagent(sessionId, "failed");
 		}
 		this.backgroundTasks.clear();
+		this.endCompactions();
 		const message = `acp agent exited (code ${code ?? "null"})`;
 		if (this.stderrTail) console.warn(`[acp] ${message}\n${this.stderrTail}`);
 		if (this.currentTurn?.status === "running") {

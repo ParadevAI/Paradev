@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import {
+	existsSync,
 	mkdirSync,
 	mkdtempSync,
 	readFileSync,
@@ -159,6 +160,62 @@ describe("start hook run terminal", () => {
 		await until(() => started.length > 0);
 		expect(started).toEqual(["bun dev"]);
 		expect(readFileSync(files.runTerminal, "utf8").trim()).toBe("term-1");
+	});
+
+	test("a multi-line setup command never reaches the log; its exit is stamped in the boot log", async () => {
+		const bootLog = join(root, "boot.log");
+		const previousBootLog = process.env.SUPERSET_SANDBOX_BOOT_LOG;
+		process.env.SUPERSET_SANDBOX_BOOT_LOG = bootLog;
+		const printed: unknown[] = [];
+		const spies = (["log", "warn", "error"] as const).map((method) =>
+			spyOn(console, method).mockImplementation((...args) => {
+				printed.push(...args);
+			}),
+		);
+		try {
+			const identity = identityWith(
+				'[setup.cloud]\nrun = """\necho LINE-ONE\necho LINE-TWO-SECRET\nexit 3\n"""\n',
+			);
+			const outcome = await runSandboxStartHook(ctx, identity, {
+				files,
+				starter: fakeStarter().starter,
+			});
+			expect(outcome).toMatchObject({ started: false, exitCode: 3 });
+			await until(() => readFileSync(bootLog, "utf8").includes("hook."));
+		} finally {
+			for (const spy of spies) spy.mockRestore();
+			if (previousBootLog === undefined)
+				delete process.env.SUPERSET_SANDBOX_BOOT_LOG;
+			else process.env.SUPERSET_SANDBOX_BOOT_LOG = previousBootLog;
+		}
+		expect(JSON.stringify(printed)).not.toMatch(/LINE-ONE|LINE-TWO-SECRET/);
+		expect(printed.join("\n")).toMatch(
+			/\[sandbox\] start hook failed \(exit 3\) \(command of \d+ chars\)/,
+		);
+		expect(readFileSync(bootLog, "utf8")).toMatch(
+			/^\d{13} hook\.failed exit=3 ms=\d+\n$/,
+		);
+	});
+
+	test("a setup that succeeds is stamped exited 0 in the boot log", async () => {
+		const bootLog = join(root, "boot.log");
+		const previousBootLog = process.env.SUPERSET_SANDBOX_BOOT_LOG;
+		process.env.SUPERSET_SANDBOX_BOOT_LOG = bootLog;
+		try {
+			const identity = identityWith('[setup.cloud]\nrun = "true"\n');
+			await runSandboxStartHook(ctx, identity, {
+				files,
+				starter: fakeStarter().starter,
+			});
+			await until(() => existsSync(bootLog));
+		} finally {
+			if (previousBootLog === undefined)
+				delete process.env.SUPERSET_SANDBOX_BOOT_LOG;
+			else process.env.SUPERSET_SANDBOX_BOOT_LOG = previousBootLog;
+		}
+		expect(readFileSync(bootLog, "utf8")).toMatch(
+			/^\d{13} hook\.exited exit=0 ms=\d+\n$/,
+		);
 	});
 
 	test("a forced re-run keeps the run terminal that is still live", async () => {

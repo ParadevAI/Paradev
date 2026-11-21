@@ -73,6 +73,7 @@ export function toPullRequestDetail(
 		reviewDecision: reviewDecision(read.mergeability.reviewDecision),
 		checksStatus: computeChecksStatus(checks),
 		checks,
+		checksUnavailable: read.checksUnavailable === true,
 		createdAt: activity?.createdAt ?? "",
 		updatedAt: activity?.updatedAt ?? "",
 		additions: pr.additions,

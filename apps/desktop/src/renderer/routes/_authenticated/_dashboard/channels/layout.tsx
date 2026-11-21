@@ -10,6 +10,6 @@ export const Route = createFileRoute("/_authenticated/_dashboard/channels")({
 function ChannelsLayout() {
 	const enabled = useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS);
 	if (enabled === undefined) return null;
-	if (!enabled) return <Redirect to="/v2-workspaces" />;
+	if (!enabled) return <Redirect to="/workspaces" />;
 	return <Outlet />;
 }

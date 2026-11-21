@@ -2,6 +2,7 @@ import {
 	BOX_PRESSURE_HEARTBEAT_MS,
 	type BoxPressure,
 } from "@superset/shared/box-pressure";
+import { logBoxEvent } from "../../sentry";
 import type { BoxResources } from "../box-resources";
 import { type BoxPressureState, nextBoxPressure } from "./box-pressure-level";
 
@@ -11,11 +12,7 @@ const RETRY_MAX_MS = 10 * 60_000;
 
 function sameReport(a: BoxPressure | null, b: BoxPressure | null): boolean {
 	if (!a || !b) return !a && !b;
-	return (
-		a.level === b.level &&
-		a.limitedBy.join() === b.limitedBy.join() &&
-		a.reap?.at === b.reap?.at
-	);
+	return a.level === b.level && a.limitedBy.join() === b.limitedBy.join();
 }
 
 export function startSandboxBoxPressureReporter(args: {
@@ -35,6 +32,7 @@ export function startSandboxBoxPressureReporter(args: {
 	let inFlight = false;
 	let retryAt = 0;
 	let retryDelay = RETRY_MIN_MS;
+	let loggedReapAt: number | null = null;
 
 	const report = async (pressure: BoxPressure | null) => {
 		inFlight = true;
@@ -72,6 +70,15 @@ export function startSandboxBoxPressureReporter(args: {
 		if (inFlight || now() < retryAt) return;
 		const sample = args.read();
 		if (!sample) return;
+		const reap = sample.recentReap;
+		if (reap && reap.at !== loggedReapAt) {
+			loggedReapAt = reap.at;
+			logBoxEvent(
+				"box.reaped",
+				{ "reap.rss_mb": reap.rssMb, "memory.limit_mb": sample.memoryLimitMb },
+				"warn",
+			);
+		}
 		const at = now();
 		state = nextBoxPressure(state, sample, at);
 		const due =

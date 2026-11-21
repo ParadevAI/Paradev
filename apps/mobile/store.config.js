@@ -1,7 +1,5 @@
 // Dynamic so the demo-account credentials never enter the repo: they come from
 // APP_REVIEW_EMAIL / APP_REVIEW_PASSWORD in the root .env (or the shell).
-// Optionally set APP_REVIEW_VIDEO_URL to a short screen recording of the
-// sign-in and review flow; reviewers reliably follow a video where they skim text.
 // Submission checklist and what to do on rejection or delay: see RELEASE.md.
 
 const path = require("node:path");
@@ -9,9 +7,6 @@ require("dotenv").config({
 	path: path.resolve(__dirname, "../../.env"),
 	quiet: true,
 });
-
-const reviewVideoUrl = process.env.APP_REVIEW_VIDEO_URL ?? "";
-const voiceVideoUrl = process.env.APP_REVIEW_VOICE_VIDEO_URL ?? "";
 
 // App Review reads these notes under time pressure, so they lead with what the
 // app is (a remote client, nothing runs on the device) and then address the
@@ -26,23 +21,18 @@ const reviewNotes = [
 	"1. On the sign-in screen tap 'Sign in with email' and use the demo account below (no two-factor prompt; the account belongs to an organization that already has a workspace with sample agent sessions, so nothing needs to be installed to see the full app).",
 	"2. Home lists workspaces and sessions. Open a session to read the agent transcript, chat with it, view the files it changed, and open the terminal.",
 	"3. Settings is reachable from the organization name in the top-left; account deletion is there under Danger Zone.",
-	reviewVideoUrl
-		? `A two-minute walkthrough of these steps: ${reviewVideoUrl}`
-		: null,
 	"",
 	"GUIDELINES WE EXPECT YOU TO CHECK",
 	"Payments (3.1): As we said in our November 6 reply, this version removes every link to our website from the app. There are no purchase options, links, or calls to action for buying outside the app, on any storefront. Paradev is sold to organizations, per seat, for their engineering teams (3.1.3(c) Enterprise Services); individuals use the free plan. A plan bought by the organization unlocks Paradev Mobile for its members, who sign in with their work account.",
-	`Background audio (2.5.4): Voice mode is a live spoken conversation with the user's coding agent, and it keeps running while the phone is locked or the app is in the background.${voiceVideoUrl ? ` Screen recording on a physical device: ${voiceVideoUrl}` : ""}`,
+	"Background audio (2.5.4): Voice mode is a live spoken conversation with the user's coding agent, and it keeps running while the phone is locked or the app is in the background. A recording on a physical iPhone is attached: voice mode keeps talking on the Home Screen and the Lock Screen. iOS leaves call audio out of screen recordings, so a Mac microphone recorded the sound.",
 	"Sign-in (4.8): Sign in with Apple is offered alongside GitHub, Google, and email. Any of them creates a free account instantly, which lands on the Pro-required screen described above; the demo account is the one with a paid workspace.",
 	"Account deletion (5.1.1 v): Settings > Danger Zone > Delete account, in-app, no email or web visit required.",
 	"Code execution (2.5.2): No user or project code is downloaded or executed on the device. The terminal tab renders output streamed from the user's own session and sends keystrokes to it; the agents themselves run on the user's computer or in their cloud workspace.",
-	"Originality (4.3): This is the official mobile client for Paradev, our own product, built and operated by Superset Inc. It is not a template, a repackaged app, or a wrapper around another vendor's tool: it talks to our own API (api.superset.sh) and to the Paradev host agent that our desktop app installs (plus crash and usage reporting through Sentry and PostHog, declared in App Privacy), and the bundle identifier (sh.superset.mobile) matches our domain. The full source of this app is public in our repository at https://github.com/paradevai/paradev (apps/mobile, 13,000+ stars), alongside the desktop app it pairs with, which has been downloaded millions of times. Other apps in this category are phone front-ends for a third-party CLI; Paradev Mobile only works with Paradev accounts, workspaces, and hosts.",
+	"Originality (4.3): This is the official mobile client for Paradev, our own product, built and operated by Superset Inc. It is not a template, a repackaged app, or a wrapper around another vendor's tool: it talks to our own API (api.superset.sh) and to the Paradev host agent that our desktop app installs (plus crash and usage reporting through Sentry and PostHog, declared in App Privacy), and the bundle identifier (sh.superset.mobile) matches our domain. The full source of this app is public in our repository at https://github.com/paradevai/paradev (apps/mobile, 13,000+ stars). Other apps in this category are phone front-ends for a third-party CLI; Paradev Mobile only works with Paradev accounts, workspaces, and hosts.",
 	"Permissions: Photos and camera are used only to attach images to chat messages. The microphone is used to dictate a message (transcribed on the device, with speech recognition if iOS asks for it) and for voice mode. Each prompt appears the first time the feature is used and the app works without any of them.",
 	"",
 	"Questions: support@paradev.com, or call the contact above; we respond within the hour during US business hours.",
-]
-	.filter((line) => line !== null)
-	.join("\n");
+].join("\n");
 
 module.exports = {
 	configVersion: 0,
@@ -52,7 +42,7 @@ module.exports = {
 		categories: ["DEVELOPER_TOOLS", "PRODUCTIVITY"],
 		info: {
 			"en-US": {
-				title: "Paradev: 100+ Coding Agents",
+				title: "Paradev (formerly Superset)",
 				subtitle: "Manage AI agents on the go",
 				promoText:
 					"Your agents keep working when you leave your desk. Start a task, follow it live, and review the diff from your phone.",

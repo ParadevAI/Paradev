@@ -1,5 +1,5 @@
 import { cn } from "@superset/ui/utils";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ZoomStable } from "renderer/components/ZoomStable";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -35,14 +35,16 @@ const ROW_HEIGHT = 44;
 
 /**
  * The window's top row: window controls and history, then the open screen's
- * tab bar, with the right pane's tab bar above the right pane.
+ * tab bar above the content card, with the right pane's tab bar above the
+ * right pane.
  *
  * On macOS the row keeps a constant physical height under page zoom, so its
  * controls stay in line with the fixed window buttons; the tab slots
  * counter-zoom their content to match.
  */
 export function TitleBar() {
-	const { setMain, setSide, mainClaims } = useTitleBarSlots();
+	const { setMain, setSide, mainClaims, contentCard } = useTitleBarSlots();
+	const leadingRef = useRef<HTMLDivElement>(null);
 	const sideWidth = useTitleBarSideWidth();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
@@ -75,64 +77,79 @@ export function TitleBar() {
 			setOverlay(background, foreground, TITLE_BAR_OVERLAY_HEIGHT);
 		};
 	}, [background, foreground]);
+	useEffect(() => {
+		const leading = leadingRef.current;
+		if (!contentCard || !leading) return;
+		const align = () => {
+			leading.style.width = `${contentCard.getBoundingClientRect().left}px`;
+		};
+		align();
+		const observer = new ResizeObserver(align);
+		observer.observe(contentCard);
+		return () => {
+			observer.disconnect();
+			leading.style.width = "";
+		};
+	}, [contentCard]);
 	const slotStyle = isMac
 		? {
 				zoom: 1 / zoomFactor,
-				width: `${zoomFactor * 100}%`,
-				height: `${zoomFactor * 100}%`,
 			}
 		: undefined;
 
 	return (
 		<div
-			className="flex h-11 shrink-0 items-stretch [--header-tab-selected:var(--shell-tab-selected)]"
+			className="hide-scrollbar flex h-11 shrink-0 items-stretch overflow-x-auto [--header-tab-selected:var(--shell-tab-selected)]"
 			style={isMac ? { height: `${ROW_HEIGHT / zoomFactor}px` } : undefined}
 		>
-			{isMac ? (
-				<div
-					className="drag h-full shrink-0"
-					style={{ width: TRAFFIC_LIGHTS_WIDTH / zoomFactor }}
-				/>
-			) : (
-				<>
+			<div ref={leadingRef} className="flex min-w-min items-stretch">
+				{isMac ? (
 					<div
 						className="drag h-full shrink-0"
-						style={{ width: "env(titlebar-area-x, 0px)" }}
+						style={{ width: TRAFFIC_LIGHTS_WIDTH / zoomFactor }}
 					/>
-					<div
-						className="flex shrink-0 items-center justify-center"
-						style={{ width: NAVIGATION_RAIL_WIDTH }}
-					>
-						<AppMenuButton />
-					</div>
-				</>
-			)}
-			<div className="flex shrink-0 items-center pr-1">
-				<ZoomStable enabled={isMac} className="flex items-center gap-0.5">
-					<NavigationControls />
-					<SidebarToggle />
-					{isListPanelCollapsed && <WorkspaceSwitcherButton />}
-					{isListPanelCollapsed && <NewWorkspaceButton />}
-					<PortsDropdown align="start" />
-					<OfflineBadge />
-				</ZoomStable>
+				) : (
+					<>
+						<div
+							className="drag h-full shrink-0"
+							style={{ width: "env(titlebar-area-x, 0px)" }}
+						/>
+						<div
+							className="flex shrink-0 items-center justify-center"
+							style={{ width: NAVIGATION_RAIL_WIDTH }}
+						>
+							<AppMenuButton />
+						</div>
+					</>
+				)}
+				<div className="flex shrink-0 items-center">
+					<ZoomStable enabled={isMac} className="flex items-center gap-0.5">
+						<NavigationControls />
+						<SidebarToggle />
+						{isListPanelCollapsed && <WorkspaceSwitcherButton />}
+						{isListPanelCollapsed && <NewWorkspaceButton />}
+						<PortsDropdown align="start" />
+						<OfflineBadge />
+					</ZoomStable>
+				</div>
+				<div className="drag h-full min-w-1 flex-1" />
 			</div>
 			<div
 				className={cn(
-					"relative min-w-0 flex-1 overflow-hidden",
+					"flex min-w-min flex-1 overflow-hidden",
 					mainClaims === 0 && "hidden",
 				)}
 			>
 				<div
 					ref={setMain}
-					className="absolute top-0 left-0 flex size-full"
+					className="flex h-full min-w-0 flex-1"
 					style={slotStyle}
 				/>
 			</div>
 			{mainClaims === 0 && <div className="drag h-full min-w-0 flex-1" />}
 			<div
 				className={cn(
-					"relative min-w-0 overflow-hidden",
+					"flex min-w-min overflow-hidden",
 					sideWidth === null && "hidden",
 				)}
 				style={
@@ -145,7 +162,7 @@ export function TitleBar() {
 			>
 				<div
 					ref={setSide}
-					className="absolute top-0 left-0 flex size-full"
+					className="flex h-full min-w-0 flex-1"
 					style={slotStyle}
 				/>
 			</div>

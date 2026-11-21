@@ -1,4 +1,7 @@
+import { db } from "@superset/db/client";
+import { members } from "@superset/db/schema";
 import { Redis } from "@upstash/redis";
+import { and, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { env } from "../../env";
 import { posthog } from "../../lib/analytics";
@@ -6,6 +9,7 @@ import { organizationPlan } from "../../lib/billing/plan";
 import {
 	UPGRADE_NUDGE_INTERVAL_SECONDS,
 	type UpgradeNudgeDeps,
+	upgradeNudgeUrl,
 } from "./upgrade-nudge";
 
 export const UPGRADE_NUDGE_EVENT = "billing.upgrade_nudge_due";
@@ -32,6 +36,17 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 		});
 	},
 
+	async isOrganizationOwner(userId, organizationId) {
+		const member = await db.query.members.findFirst({
+			where: and(
+				eq(members.userId, userId),
+				eq(members.organizationId, organizationId),
+			),
+			columns: { role: true },
+		});
+		return member?.role === "owner";
+	},
+
 	async isOrganizationPaid(organizationId) {
 		return (await organizationPlan(organizationId)) !== "free";
 	},
@@ -55,7 +70,7 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 		return result === "OK";
 	},
 
-	async send({ to, featureName }) {
+	async send({ to, featureName, organizationId }) {
 		if (env.NODE_ENV !== "production") {
 			console.info(
 				`[billing/upgrade-nudge] not emitting ${UPGRADE_NUDGE_EVENT} outside production`,
@@ -67,7 +82,7 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 			email: to,
 			payload: {
 				featureName,
-				upgradeUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
+				upgradeUrl: upgradeNudgeUrl(env.NEXT_PUBLIC_WEB_URL, organizationId),
 			},
 		});
 		if (error) throw new Error(error.message);

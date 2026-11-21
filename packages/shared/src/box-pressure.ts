@@ -8,7 +8,6 @@ export type BoxResource = (typeof BOX_RESOURCES)[number];
 export interface BoxPressure {
 	level: BoxPressureLevel;
 	limitedBy: BoxResource[];
-	reap: { processName: string; rssMb: number; at: number } | null;
 	at: number;
 }
 
@@ -22,8 +21,6 @@ export interface BoxPressureMessage {
 	snapshot: boolean;
 	workspaces: Record<string, BoxPressure | null>;
 }
-
-const MAX_PROCESS_NAME = 64;
 
 function isFiniteNonNegative(value: unknown): value is number {
 	return typeof value === "number" && Number.isFinite(value) && value >= 0;
@@ -44,26 +41,9 @@ export function parseBoxPressure(value: unknown): BoxPressure | null {
 	) {
 		return null;
 	}
-	let reap: BoxPressure["reap"] = null;
-	if (input.reap !== null && input.reap !== undefined) {
-		const raw = input.reap as Record<string, unknown>;
-		if (
-			typeof raw.processName !== "string" ||
-			!isFiniteNonNegative(raw.rssMb) ||
-			!isFiniteNonNegative(raw.at)
-		) {
-			return null;
-		}
-		reap = {
-			processName: raw.processName.slice(0, MAX_PROCESS_NAME),
-			rssMb: raw.rssMb,
-			at: raw.at,
-		};
-	}
 	return {
 		level: input.level as BoxPressureLevel,
 		limitedBy: [...new Set(input.limitedBy as BoxResource[])],
-		reap,
 		at: input.at,
 	};
 }

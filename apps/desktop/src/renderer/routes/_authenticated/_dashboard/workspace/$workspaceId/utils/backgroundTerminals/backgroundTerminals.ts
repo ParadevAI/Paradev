@@ -1,0 +1,89 @@
+import { PENDING_CLOUD_LAUNCH_PANE_KIND } from "../../types";
+
+export const BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS = 250;
+
+/** A pending cloud chat holds the terminal id its launch was promised. */
+const TERMINAL_CLAIMING_KINDS = new Set([
+	"terminal",
+	PENDING_CLOUD_LAUNCH_PANE_KIND,
+]);
+export const BACKGROUND_TERMINAL_CLOSED_REFETCH_INTERVAL_MS = 10_000;
+export const BACKGROUND_TERMINAL_OPEN_REFETCH_INTERVAL_MS = 2_000;
+
+interface TerminalPaneLike {
+	kind: string;
+	data: unknown;
+}
+
+interface WorkspaceTabLike {
+	panes: Record<string, TerminalPaneLike>;
+}
+
+interface BackgroundTerminalSessionLike {
+	terminalId: string;
+	createdAt?: number;
+}
+
+function getTerminalIdFromPaneData(data: unknown): string | null {
+	if (!data || typeof data !== "object") return null;
+	const terminalId = (data as { terminalId?: unknown }).terminalId;
+	return typeof terminalId === "string" && terminalId.length > 0
+		? terminalId
+		: null;
+}
+
+export function getAttachedTerminalIdsKey(
+	tabs: readonly WorkspaceTabLike[],
+): string {
+	const ids = new Set<string>();
+	for (const tab of tabs) {
+		for (const pane of Object.values(tab.panes)) {
+			if (!TERMINAL_CLAIMING_KINDS.has(pane.kind)) continue;
+			const terminalId = getTerminalIdFromPaneData(pane.data);
+			if (terminalId) ids.add(terminalId);
+		}
+	}
+	return JSON.stringify([...ids].sort());
+}
+
+export function parseAttachedTerminalIdsKey(key: string): string[] {
+	try {
+		const parsed = JSON.parse(key);
+		return Array.isArray(parsed)
+			? parsed.filter((value): value is string => typeof value === "string")
+			: [];
+	} catch {
+		return [];
+	}
+}
+
+/**
+ * Terminals that have a tab now or had one in the settled snapshot. A new tab
+ * counts at once; a tab that goes away still counts until the snapshot settles.
+ */
+export function getTabbedTerminalIds(
+	currentKey: string,
+	settledKey: string,
+): string[] {
+	return [
+		...new Set([
+			...parseAttachedTerminalIdsKey(currentKey),
+			...parseAttachedTerminalIdsKey(settledKey),
+		]),
+	];
+}
+
+export function getBackgroundTerminalSessions<
+	T extends BackgroundTerminalSessionLike,
+>(sessions: readonly T[], attachedTerminalIds: Iterable<string>): T[] {
+	const attached = new Set(attachedTerminalIds);
+	return sessions
+		.filter((session) => !attached.has(session.terminalId))
+		.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+}
+
+export function getBackgroundTerminalRefetchInterval(isOpen: boolean): number {
+	return isOpen
+		? BACKGROUND_TERMINAL_OPEN_REFETCH_INTERVAL_MS
+		: BACKGROUND_TERMINAL_CLOSED_REFETCH_INTERVAL_MS;
+}

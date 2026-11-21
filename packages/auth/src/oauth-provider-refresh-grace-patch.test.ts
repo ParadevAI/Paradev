@@ -128,7 +128,7 @@ describe("@better-auth/oauth-provider refresh reuse grace patch", () => {
 		const reuse = await t.refresh("machine-a");
 
 		expect(reuse.status).toBe(400);
-		expect((await reuse.json()).error).toBe("invalid_grant");
+		expect(await reuse.json()).toMatchObject({ error: "invalid_grant" });
 		expect(t.liveTokens()).toBe(2);
 		expect(
 			t.warnings.filter((m) => m.includes("oauth-refresh-reuse-grace")),

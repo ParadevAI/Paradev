@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { buildHint } from "../hint";
 import { tierFor } from "../tiers";
 import type {
@@ -66,7 +66,7 @@ export function usePolicy(
 	surface: Surface,
 	mode: TierMode,
 ): ClickPolicy {
-	const { preferences } = useV2UserPreferences();
+	const { preferences } = useUserPreferences();
 	const map = preferences[key];
 	const resolve = useCallback(
 		(event: ModifierEvent): ResolvedClick => {

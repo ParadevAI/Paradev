@@ -7,6 +7,7 @@ import type { ChatRuntime } from "@superset/chat-runtime";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { getHostId } from "@superset/shared/host-info";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import { TRPCError } from "@trpc/server";
 import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
@@ -650,8 +651,9 @@ export const teleportRouter = router({
 				requireLocalProject(ctx, input.projectId),
 			);
 			const gitEnv = await createGitEnvResolver(ctx.credentials)(repoPath);
+			const env = { ...process.env, ...gitEnv };
 			await execFileAsync(
-				"git",
+				resolveCommand("git", { env }),
 				[
 					"-C",
 					repoPath,
@@ -659,7 +661,7 @@ export const teleportRouter = router({
 					"origin",
 					`+refs/heads/${input.branch}:refs/remotes/origin/${input.branch}`,
 				],
-				{ env: { ...process.env, ...gitEnv } },
+				{ env },
 			).catch((error: unknown) => {
 				rethrowEnvironmentalGitError(error);
 				throw error;
