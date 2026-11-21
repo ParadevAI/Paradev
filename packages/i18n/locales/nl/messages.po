@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# mislukt} other {# mislukt}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# bestand gewijzigd} other {# bestanden gewijzigd}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# bestand} other {# bestanden}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# taak} other {# taken}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {# terminal actief} other {# terminals actief}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# ongewijzigde regel} other {# ongewijzigde regels}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -1698,9 +1701,6 @@ msgstr "1 gebruiker"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ gelijktijdige werkstromen zonder verlies van context"
 
-msgid "12m ago"
-msgstr "12m geleden"
-
 msgid "145,000+ across 180 countries"
 msgstr "145.000+ in 180 landen"
 
@@ -1709,9 +1709,6 @@ msgstr "15 min"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ sterren, 100+ bijdragers"
-
-msgid "1d ago"
-msgstr "1d geleden"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agents · 14 bestanden gewijzigd"
@@ -1727,9 +1724,6 @@ msgstr "2025 tot nu"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2u geleden"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2396,9 +2390,6 @@ msgstr "Agentconfiguraties"
 msgid "Agent finished"
 msgstr "Agent klaar"
 
-msgid "Agent Independence"
-msgstr "Agentonafhankelijkheid"
-
 msgid "Agent is working"
 msgstr "Agent is bezig"
 
@@ -2489,9 +2480,6 @@ msgstr "Agents zien alleen een placeholder. Paradev voegt je aanmelding toe aan 
 
 msgid "Agents that run while you're away"
 msgstr "Agents die doorwerken als je weg bent"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agents sorteren issues, schrijven changelogs en werken dependencies bij, helemaal zelf."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agents gebruiken dit account wanneer ze Linear-tools aanroepen."
@@ -3881,6 +3869,9 @@ msgstr "Een plugin gebouwd? Dien hem hier in."
 msgid "Built in Paradev"
 msgstr "Gebouwd in Paradev"
 
+msgid "Built to be driven by agents"
+msgstr "Gebouwd om door agents te worden aangestuurd"
+
 msgid "builtin"
 msgstr "ingebouwd"
 
@@ -4621,9 +4612,6 @@ msgstr "Wissen…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "CLI-docs"
@@ -6631,9 +6619,6 @@ msgstr "Maken met AI"
 msgid "Create workspace"
 msgstr "Werkruimte aanmaken"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Maak werkruimtes en start agents vanuit de CLI, de SDK of via MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Maak werkruimtes aan, start agents en lees hun output vanuit elke terminal of elk script. macOS en Linux."
 
@@ -7750,9 +7735,6 @@ msgstr "Draft geopend"
 msgid "Draft PR #2841"
 msgstr "Draft-PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "3 supportantwoorden opgesteld"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Sleep <0>Paradev</0> naar je map <1>Programma's</1>"
 
@@ -7765,8 +7747,8 @@ msgstr "Sleep werkruimtes om ze te herordenen in Handmatige volgorde"
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Stuur het aan vanuit de terminal"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Stuur de hele app en de cloud aan vanuit de CLI, de SDK of via MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Stuur werkruimtes, agents en sessies programmatisch aan vanuit scripts, CI of je eigen tools."
@@ -7949,6 +7931,9 @@ msgstr "Bewerkt"
 
 msgid "Edited {ago}"
 msgstr "Bewerkt {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "<0>SettingsDialog.tsx</0> bewerkt"
 
 msgid "Editing"
 msgstr "Bewerken"
@@ -9093,9 +9078,6 @@ msgstr "Voltooid"
 msgid "Finished · unread"
 msgstr "Klaar · ongelezen"
 
-msgid "finished · worked for 7s"
-msgstr "klaar · 7s gewerkt"
-
 msgid "Finishing the move…"
 msgstr "Verplaatsing afronden…"
 
@@ -9110,6 +9092,9 @@ msgstr "Passend"
 
 msgid "Fix all failing checks"
 msgstr "Alle mislukte checks fixen"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Los bugs op zodra ze gemeld worden"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Lost het winkelwagentotaal op voor lege winkelwagens. Voegt een test toe die de TypeError reproduceert."
@@ -9128,6 +9113,9 @@ msgstr "Bevindingen oplossen"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Los nieuwe fouten in web op. Reproduceer elke fout in een test en open een draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Productiebugs oplossen"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9492,9 +9480,6 @@ msgstr "Gegenereerd bestand verborgen"
 
 msgid "Generated image"
 msgstr "Gegenereerde afbeelding"
-
-msgid "Generating"
-msgstr "Genereren"
 
 msgid "Generating..."
 msgstr "Genereren..."
@@ -12306,6 +12291,9 @@ msgstr "Cloudwerk verhuizen"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "De focus verplaatsen tussen de hoofdtabbladen en de rechterzijbalk, en de zijbalk openen als die gesloten is"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Zet Instellingen in een modal zodat mensen hun werkruimte niet hoeven te verlaten. Behoud het zoekfilter en laat ⌘, het overal vandaan openen."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Deze werkruimte naar {computerName} verplaatsen?"
 
@@ -14257,6 +14245,9 @@ msgstr "Pagina openen in standaardbrowser"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Open pages en reageer op opmerkingen in de Paradev-app op iPhone en iPad."
 
+msgid "Open PR"
+msgstr "PR openen"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "PR #{0} openen"
@@ -14395,9 +14386,6 @@ msgstr "OpenAI heeft deze API-sleutel geweigerd."
 
 msgid "Opened"
 msgstr "Geopend"
-
-msgid "opened PR #841 for review"
-msgstr "PR #841 geopend voor review"
 
 msgid "Opening {appName}…"
 msgstr "{appName} wordt geopend…"
@@ -14909,9 +14897,6 @@ msgstr "Parallelle agents"
 msgid "Parallel agents guide"
 msgstr "Gids voor parallelle agents"
 
-msgid "Parallel Execution"
-msgstr "Parallelle uitvoering"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Parallelle sessies per ontwikkelaar verdubbelen elke zeven maanden en passeren tussen augustus 2026 en augustus 2028 de drempels voor Operator, Fabrieksmanager en Henry Ford"
 
@@ -15201,11 +15186,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Plan"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Plan"
+
 msgid "Plan restored"
 msgstr "Plan hersteld"
 
 msgid "Plan updated"
 msgstr "Abonnement bijgewerkt"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Plan: <0>SettingsPage</0> afsplitsen naar <1>SettingsDialog</1>, ⌘, via de globale sneltoetslaag laten lopen, zoeken ongewijzigd laten. Ik begin nu."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15802,6 @@ msgstr "Push je branches en werk daarna verder op je Mac of in een cloudwerkruim
 msgid "Pushed"
 msgstr "Gepusht"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Gepusht en een draft-PR geopend."
-
 msgid "Pushing..."
 msgstr "Bezig met pushen…"
 
@@ -15929,6 +15918,9 @@ msgstr "Radix roteert de wrapper van de tooltip-pijl per zijde,"
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltip-docs"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "<0>bun test settings</0> uitgevoerd · 14 geslaagd · 1 mislukt"
+
 msgid "Random icon"
 msgstr "Willekeurig pictogram"
 
@@ -15983,6 +15975,9 @@ msgstr "Gelezen"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Gelezen"
+
+msgid "Read 3 files"
+msgstr "3 bestanden gelezen"
 
 msgid "Read a list of your most visited websites"
 msgstr "Een lijst lezen van je meest bezochte websites"
@@ -16618,6 +16613,9 @@ msgstr "Antwoorden"
 msgid "Reply in thread"
 msgstr "Reageren in thread"
 
+msgid "Reply to Claude Code…"
+msgstr "Antwoord aan Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "Reageren op thread…"
 
@@ -17224,6 +17222,9 @@ msgstr "Draai 10+ parallelle coding agents op je machine."
 msgid "Run again"
 msgstr "Opnieuw uitvoeren"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Laat agents parallel werken, elk op een eigen branch. Beoordeel hun werk met ingebouwde diffs, PR-checks en review door agents, en merge zonder de app te verlaten."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Draai agents volgens schema of als er iets gebeurt."
 
@@ -17278,9 +17279,6 @@ msgstr "Draai volgens schema of bij gebeurtenissen, op aanvraag, pauzeer, hervat
 
 msgid "Run on any machine"
 msgstr "Op elke machine"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Draai parallelle coding agents op features, fixes en refactors. Elke agent werkt op een eigen branch, lokaal of in de cloud."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Voer parallelle coding agents uit met Paradev"
@@ -17494,8 +17492,8 @@ msgstr "Opslaan..."
 msgid "Saving…"
 msgstr "Opslaan…"
 
-msgid "Scale to 100+ agents"
-msgstr "Schaal op naar meer dan 100 agents"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Schaal naar honderden agents en houd de kwaliteitslat hoog"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Scan de QR-code, log in met hetzelfde Paradev-account en selecteer deze organisatie."
@@ -18266,6 +18264,9 @@ msgstr "Instellingen..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Afgerond"
 
 msgid "Setup"
 msgstr "Setup"
@@ -19209,8 +19210,8 @@ msgstr "Sessie starten"
 msgid "Start agent"
 msgstr "Agent starten"
 
-msgid "Start agents on events or a schedule"
-msgstr "Start agents bij gebeurtenissen of volgens schema"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Start agents automatisch: vanuit een Sentry-fout, een Linear-issue, een GitHub-pull request of een schema dat de agent zelf instelt."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Start agents, volg ze live en review de diff vanaf je iPhone of iPad. Je code blijft op je machines."
@@ -19580,9 +19581,6 @@ msgstr "Continuïteit · actieve dagen van 30"
 
 msgid "Switch account"
 msgstr "Van account wisselen"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Wissel van agent. Houd je workflow"
 
 msgid "Switch host"
 msgstr "Van host wisselen"
@@ -19967,9 +19965,6 @@ msgstr "Terminaltypografie"
 
 msgid "Terminals"
 msgstr "Terminals"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminals ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Terminals reageren niet"
@@ -21326,9 +21321,6 @@ msgstr "Triageer mail en schrijf conceptantwoorden"
 msgid "Triage new issues"
 msgstr "Nieuwe issues triageren"
 
-msgid "triaging 12 new issues…"
-msgstr "12 nieuwe issues triageren…"
-
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Probeert elke bug op te lossen die iemand in #bugs plaatst."
 
@@ -21969,9 +21961,6 @@ msgstr "Gebruiken als run van de werkruimte"
 msgid "Use cases"
 msgstr "Toepassingen"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Gebruik Claude Code, Codex, OpenCode of elke CLI-agent. Je werkruimtes, branches en reviews blijven hetzelfde."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Gebruik Claude Code, Codex of welke coding agent dan ook. Kies per taak of laat er meerdere naast elkaar draaien."
 
@@ -22004,6 +21993,12 @@ msgstr "Gebruik Paradev op je telefoon met Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Gebruik de agentabonnementen en API-sleutels die je al hebt. Modelaanroepen gaan rechtstreeks naar je provider."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Gebruik de beste agent. Zonder ooit vast te zitten."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Gebruik de beste agents zodra ze uitkomen. Je artefacten, branches en plugins werken met allemaal."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Gebruik de desktop-app om parallelle coding agents te draaien."
@@ -22237,6 +22232,9 @@ msgstr "Stack bekijken, pull request {position} van {size}"
 
 msgid "View usage"
 msgstr "Gebruik bekijken"
+
+msgid "Viewed"
+msgstr "Bekeken"
 
 msgctxt "stack layer"
 msgid "Viewing"

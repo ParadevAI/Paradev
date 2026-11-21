@@ -164,8 +164,7 @@ msgstr "{0, plural, one {#개 실패} other {#개 실패}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {파일 #개 변경됨} other {파일 #개 변경됨}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {파일 #개} other {파일 #개}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {작업 #개} other {작업 #개}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {터미널 #개 실행 중}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {변경 없는 줄 #개}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -1698,9 +1701,6 @@ msgstr "사용자 1명"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "상태 유실 없이 동시 작업 흐름 10개 이상"
 
-msgid "12m ago"
-msgstr "12분 전"
-
 msgid "145,000+ across 180 countries"
 msgstr "180개국 145,000명 이상"
 
@@ -1709,9 +1709,6 @@ msgstr "15분"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "스타 15k+, 기여자 100+"
-
-msgid "1d ago"
-msgstr "1일 전"
 
 msgid "2 agents · 14 files changed"
 msgstr "에이전트 2개 · 파일 14개 변경"
@@ -1727,9 +1724,6 @@ msgstr "2025년~현재"
 
 msgid "2027"
 msgstr "2027년"
-
-msgid "2h ago"
-msgstr "2시간 전"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2396,9 +2390,6 @@ msgstr "에이전트 설정"
 msgid "Agent finished"
 msgstr "에이전트 완료"
 
-msgid "Agent Independence"
-msgstr "에이전트 독립성"
-
 msgid "Agent is working"
 msgstr "에이전트 작업 중"
 
@@ -2489,9 +2480,6 @@ msgstr "에이전트에는 자리 표시자만 보입니다. Paradev가 나가�
 
 msgid "Agents that run while you're away"
 msgstr "자리를 비운 동안에도 실행되는 에이전트"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "에이전트가 이슈 분류, changelog 초안 작성, 의존성 업데이트를 알아서 합니다."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "에이전트는 Linear 도구를 호출할 때 이 계정을 사용합니다."
@@ -3881,6 +3869,9 @@ msgstr "플러그인을 만드셨나요? 여기에서 제출하세요."
 msgid "Built in Paradev"
 msgstr "Paradev로 개발합니다"
 
+msgid "Built to be driven by agents"
+msgstr "에이전트가 구동하도록 만들어졌습니다"
+
 msgid "builtin"
 msgstr "기본 제공"
 
@@ -4621,9 +4612,6 @@ msgstr "삭제하는 중…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI 및 SDK"
 
 msgid "CLI docs"
 msgstr "CLI 문서"
@@ -6631,9 +6619,6 @@ msgstr "AI로 만들기"
 msgid "Create workspace"
 msgstr "워크스페이스 만들기"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "CLI, SDK 또는 MCP로 워크스페이스를 만들고 에이전트를 시작하세요."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "어떤 터미널이나 스크립트에서든 워크스페이스를 만들고, 에이전트를 실행하고, 출력을 확인하세요. macOS와 Linux를 지원합니다."
 
@@ -7750,9 +7735,6 @@ msgstr "초안 열림"
 msgid "Draft PR #2841"
 msgstr "초안 PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "지원 답변 3건 초안 작성"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "<0>Paradev</0>를 <1>응용 프로그램</1> 폴더로 드래그하세요"
 
@@ -7765,8 +7747,8 @@ msgstr "수동 정렬에서 워크스페이스를 드래그하여 순서 변경"
 msgid "Drawer"
 msgstr "드로어"
 
-msgid "Drive it from the terminal"
-msgstr "터미널에서 조작하세요"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "CLI, SDK 또는 MCP로 앱과 클라우드 전체를 구동하세요."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "스크립트, CI, 자체 도구에서 워크스페이스, 에이전트, 세션을 프로그래밍 방식으로 다루세요."
@@ -7949,6 +7931,9 @@ msgstr "편집함"
 
 msgid "Edited {ago}"
 msgstr "{ago} 편집됨"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "<0>SettingsDialog.tsx</0> 수정함"
 
 msgid "Editing"
 msgstr "편집"
@@ -9093,9 +9078,6 @@ msgstr "완료"
 msgid "Finished · unread"
 msgstr "완료 · 읽지 않음"
 
-msgid "finished · worked for 7s"
-msgstr "완료 · 7초 작업"
-
 msgid "Finishing the move…"
 msgstr "이동을 마무리하는 중…"
 
@@ -9110,6 +9092,9 @@ msgstr "맞춤"
 
 msgid "Fix all failing checks"
 msgstr "실패한 검사 모두 고치기"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "버그가 접수되는 순간 바로 수정"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "빈 장바구니의 장바구니 합계를 수정합니다. TypeError를 재현하는 테스트를 추가합니다."
@@ -9128,6 +9113,9 @@ msgstr "지적 사항 수정"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "web의 새 오류를 고쳐 줘. 각각 테스트로 재현하고 초안 풀 리퀘스트를 열어 줘."
+
+msgid "Fix production bugs"
+msgstr "프로덕션 버그 수정"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9492,9 +9480,6 @@ msgstr "생성된 파일 숨김"
 
 msgid "Generated image"
 msgstr "생성된 이미지"
-
-msgid "Generating"
-msgstr "생성 중"
 
 msgid "Generating..."
 msgstr "생성 중..."
@@ -12306,6 +12291,9 @@ msgstr "클라우드 작업 옮기기"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "메인 탭과 오른쪽 사이드바 사이에서 포커스를 옮기고, 사이드바가 닫혀 있으면 엽니다"
 
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "사람들이 워크스페이스를 떠나지 않도록 설정을 모달로 옮겨 줘. 검색 필터링은 유지하고, ⌘, 로 어디서든 열 수 있게 해 줘."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "이 워크스페이스를 {computerName}(으)로 옮길까요?"
 
@@ -14257,6 +14245,9 @@ msgstr "기본 브라우저에서 페이지 열기"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "iPhone 및 iPad용 Paradev 앱에서 페이지를 열고 댓글에 답글을 남기세요."
 
+msgid "Open PR"
+msgstr "PR 열기"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "PR #{0} 열기"
@@ -14395,9 +14386,6 @@ msgstr "OpenAI가 이 API 키를 거부했습니다."
 
 msgid "Opened"
 msgstr "열림"
-
-msgid "opened PR #841 for review"
-msgstr "리뷰용 PR #841 생성"
 
 msgid "Opening {appName}…"
 msgstr "{appName}을(를) 여는 중…"
@@ -14909,9 +14897,6 @@ msgstr "병렬 에이전트"
 msgid "Parallel agents guide"
 msgstr "병렬 에이전트 가이드"
 
-msgid "Parallel Execution"
-msgstr "병렬 실행"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "개발자당 병렬 세션 수가 7개월마다 두 배로 늘어나며 2026년 8월부터 2028년 8월 사이에 운영자, 공장장, Henry Ford 등급 기준을 넘어섭니다"
 
@@ -15201,11 +15186,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "플랜"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "계획"
+
 msgid "Plan restored"
 msgstr "플랜이 복원되었습니다"
 
 msgid "Plan updated"
 msgstr "플랜이 업데이트되었습니다"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "계획: <0>SettingsPage</0>를 <1>SettingsDialog</1>로 분리하고, ⌘, 를 전역 단축키 레이어로 연결하고, 검색은 그대로 둡니다. 지금 시작합니다."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15810,9 +15802,6 @@ msgstr "브랜치를 푸시한 다음 Mac이나 {companyName} 클라우드 워�
 msgid "Pushed"
 msgstr "푸시됨"
 
-msgid "Pushed and opened a draft PR."
-msgstr "푸시하고 초안 PR을 열었습니다."
-
 msgid "Pushing..."
 msgstr "푸시 중…"
 
@@ -15929,6 +15918,9 @@ msgstr "Radix는 툴팁 화살표 래퍼를 방향에 따라 회전시키므로,
 msgid "Radix Tooltip docs"
 msgstr "Radix Tooltip 문서"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "<0>bun test settings</0> 실행함 · 14개 통과 · 1개 실패"
+
 msgid "Random icon"
 msgstr "무작위 아이콘"
 
@@ -15983,6 +15975,9 @@ msgstr "읽음"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "읽음"
+
+msgid "Read 3 files"
+msgstr "파일 3개 읽음"
 
 msgid "Read a list of your most visited websites"
 msgstr "가장 많이 방문한 웹사이트 목록 읽기"
@@ -16618,6 +16613,9 @@ msgstr "답글"
 msgid "Reply in thread"
 msgstr "스레드에서 답글"
 
+msgid "Reply to Claude Code…"
+msgstr "Claude Code에 답장…"
+
 msgid "Reply to thread…"
 msgstr "스레드에 답글…"
 
@@ -17224,6 +17222,9 @@ msgstr "내 머신에서 10개 이상의 코딩 에이전트를 병렬로 실행
 msgid "Run again"
 msgstr "다시 실행"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "에이전트를 병렬로 실행하고, 각 에이전트는 자기 브랜치에서 작업합니다. 내장된 diff, PR 체크, 에이전트 리뷰로 작업을 검토한 뒤 앱을 떠나지 않고 병합하세요."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "일정에 따라 또는 어떤 일이 생겼을 때 에이전트를 실행하세요."
 
@@ -17278,9 +17279,6 @@ msgstr "일정이나 이벤트로 실행, 필요할 때 실행, 일시 중지, �
 
 msgid "Run on any machine"
 msgstr "어떤 머신에서든 실행"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "기능, 수정, 리팩터링에 코딩 에이전트를 병렬로 실행하세요. 각 에이전트는 로컬이나 클라우드에서 자체 브랜치로 작업합니다."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Paradev로 병렬 코딩 에이전트 실행"
@@ -17494,8 +17492,8 @@ msgstr "저장 중..."
 msgid "Saving…"
 msgstr "저장하는 중…"
 
-msgid "Scale to 100+ agents"
-msgstr "100개 이상의 에이전트로 확장"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "에이전트 수백 개로 확장해도 품질 기준은 그대로"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "QR 코드를 스캔한 후 동일한 Paradev 계정으로 로그인하고 이 조직을 선택하세요."
@@ -18266,6 +18264,9 @@ msgstr "설정..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "완료됨"
 
 msgid "Setup"
 msgstr "설정"
@@ -19209,8 +19210,8 @@ msgstr "세션 시작"
 msgid "Start agent"
 msgstr "에이전트 시작"
 
-msgid "Start agents on events or a schedule"
-msgstr "이벤트나 일정으로 에이전트 시작"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "에이전트를 자동으로 시작하세요: Sentry 오류, Linear 이슈, GitHub 풀 리퀘스트, 또는 에이전트가 스스로 정한 일정에 따라."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "iPhone이나 iPad에서 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. 코드는 내 머신에 그대로 남습니다."
@@ -19580,9 +19581,6 @@ msgstr "지속성 · 30일 중 활동 일수"
 
 msgid "Switch account"
 msgstr "계정 전환"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "에이전트는 바꾸고, 워크플로는 그대로"
 
 msgid "Switch host"
 msgstr "호스트 전환"
@@ -19967,9 +19965,6 @@ msgstr "터미널 타이포그래피"
 
 msgid "Terminals"
 msgstr "터미널"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "터미널 ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "터미널이 응답하지 않습니다"
@@ -21326,9 +21321,6 @@ msgstr "메일 분류 및 답장 초안 작성"
 msgid "Triage new issues"
 msgstr "새 이슈 분류"
 
-msgid "triaging 12 new issues…"
-msgstr "새 이슈 12건 분류 중…"
-
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "#bugs에 올라온 버그마다 수정을 시도합니다."
 
@@ -21969,9 +21961,6 @@ msgstr "워크스페이스 실행으로 사용"
 msgid "Use cases"
 msgstr "사용 사례"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Claude Code, Codex, OpenCode 등 어떤 CLI 에이전트든 사용하세요. 워크스페이스, 브랜치, 리뷰 방식은 그대로입니다."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Claude Code, Codex 등 어떤 코딩 에이전트든 사용하세요. 작업마다 고르거나 여러 개를 나란히 돌리세요."
 
@@ -22004,6 +21993,12 @@ msgstr "Pro로 휴대폰에서 Paradev를 사용하세요."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "이미 가진 에이전트 플랜과 API 키를 사용하세요. 모델 호출은 제공업체로 바로 갑니다."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "최고의 에이전트를 쓰세요. 종속될 일은 없습니다."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "최고의 에이전트를 나오자마자 사용하세요. 산출물, 브랜치, 플러그인이 모든 에이전트에서 그대로 작동합니다."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "데스크톱 앱에서 병렬 코딩 에이전트를 실행하세요."
@@ -22237,6 +22232,9 @@ msgstr "스택 보기, 풀 리퀘스트 {position}/{size}"
 
 msgid "View usage"
 msgstr "사용량 보기"
+
+msgid "Viewed"
+msgstr "확인함"
 
 msgctxt "stack layer"
 msgid "Viewing"
