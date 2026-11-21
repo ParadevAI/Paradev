@@ -58,8 +58,13 @@ function commandTokens(config: LaunchCommand): string[] {
 	const command = config.command.trim();
 	const args = config.args ?? [];
 	if (!/\s/.test(command)) return [command, ...args];
+	const [first = ""] = command.split(/\s+/);
+	// shell-quote reads backslashes as escapes, which breaks Windows paths.
+	if (programName(first) !== "env" && !ENV_ASSIGNMENT.test(first)) {
+		return [first];
+	}
 	const tokens: string[] = [];
-	for (const token of parse(command, (key) => `$${key}`)) {
+	for (const token of parse(command, (key) => process.env[key] ?? "")) {
 		if (typeof token === "string") tokens.push(token);
 		else if ("op" in token && token.op === "glob") tokens.push(token.pattern);
 		else break;
@@ -67,12 +72,9 @@ function commandTokens(config: LaunchCommand): string[] {
 	return [...tokens, ...args];
 }
 
-/**
- * Splits `[env [-i] [-u NAME] ...] [VAR=value ...] <program>` into the program
- * name and how the wrapper changes the inherited env at launch.
- */
 function unwrapEnvCommand(config: LaunchCommand): {
 	executable: string;
+	viaPath: boolean;
 	env: Record<string, string>;
 	clearsInherited: boolean;
 	unset: string[];
@@ -84,14 +86,20 @@ function unwrapEnvCommand(config: LaunchCommand): {
 	if (programName(tokens[0] ?? "") === "env") {
 		for (index = 1; index < tokens.length; index++) {
 			const token = tokens[index] ?? "";
-			if (token === "-i" || token === "-" || token === "--ignore-environment") {
+			const short = /^-(i*)(?:u(.*))?$/s.exec(token);
+			if (token === "--ignore-environment") {
 				clearsInherited = true;
-			} else if ((token === "-u" || token === "--unset") && tokens[index + 1]) {
+			} else if (token === "--unset" && tokens[index + 1]) {
 				unset.push(tokens[++index] ?? "");
 			} else if (token.startsWith("--unset=")) {
 				unset.push(token.slice("--unset=".length));
-			} else if (/^-u./.test(token)) {
-				unset.push(token.slice(2));
+			} else if (short) {
+				if (short[1] || short[2] === undefined) clearsInherited = true;
+				if (short[2] !== undefined) {
+					const name = short[2] || tokens[++index];
+					if (!name) break;
+					unset.push(name);
+				}
 			} else {
 				if (token === "--") index++;
 				break;
@@ -104,8 +112,10 @@ function unwrapEnvCommand(config: LaunchCommand): {
 		if (!match?.[1]) break;
 		env[match[1]] = match[2] ?? "";
 	}
+	const program = tokens[index] ?? "";
 	return {
-		executable: programName(tokens[index] ?? ""),
+		executable: programName(program),
+		viaPath: !/[\\/]/.test(program),
 		env,
 		clearsInherited,
 		unset,
@@ -151,21 +161,28 @@ export function resolveTrustTarget(
 		};
 	}
 	const wrapper = unwrapEnvCommand(config);
+	const accountEnv = resolveDefaultAccountEnv(db, family);
 	const inherited: Record<string, string> = wrapper.clearsInherited
 		? {}
-		: { ...resolveDefaultAccountEnv(db, family), ...config.env };
-	for (const name of wrapper.unset) delete inherited[name];
+		: { ...accountEnv, ...config.env };
+	for (const name of wrapper.unset) {
+		delete inherited[name];
+		// The agent wrapper on PATH re-reads the default-account pointer when its var is empty.
+		const restored = accountEnv[name];
+		if (wrapper.viaPath && restored) inherited[name] = restored;
+	}
 	const env = { ...inherited, ...wrapper.env };
+	const home = env.HOME || homedir();
 	if (family === "claude") {
 		const configDir = env.CLAUDE_CONFIG_DIR;
 		return {
 			family,
 			file: configDir
 				? join(configDir, ".claude.json")
-				: join(homedir(), ".claude.json"),
+				: join(home, ".claude.json"),
 		};
 	}
-	const codexHome = env.CODEX_HOME || join(homedir(), ".codex");
+	const codexHome = env.CODEX_HOME || join(home, ".codex");
 	return { family, file: join(codexHome, "config.toml") };
 }
 
@@ -318,12 +335,14 @@ export async function seedAgentFolderTrust(
 		const target = resolveTrustTarget(db, config);
 		if (target === null) return;
 		const normalized = normalizeFolderPath(folderPath);
+		// A relative config dir is relative to the agent's cwd, the session folder.
+		const file = resolve(folderPath, target.file);
 		if (target.family === "claude") {
-			await seedClaudeFolderTrust(target.file, normalized);
+			await seedClaudeFolderTrust(file, normalized);
 		} else if (target.family === "agy") {
-			await seedAgyFolderTrust(target.file, normalized);
+			await seedAgyFolderTrust(file, normalized);
 		} else {
-			await seedCodexFolderTrust(target.file, normalized);
+			await seedCodexFolderTrust(file, normalized);
 		}
 	} catch (err) {
 		console.warn(

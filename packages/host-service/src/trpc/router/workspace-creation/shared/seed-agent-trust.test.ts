@@ -103,6 +103,15 @@ describe("resolveTrustFamily", () => {
 		).toBe(null);
 	});
 
+	test("keeps backslashes in a Windows path with arguments", () => {
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command: "C:\\Users\\me\\claude.exe --resume",
+			}),
+		).toBe("claude");
+	});
+
 	test("returns null for providers without a known trust store", () => {
 		expect(resolveTrustFamily({ presetId: "gemini", command: "gemini" })).toBe(
 			null,
@@ -241,9 +250,66 @@ describe("seedAgentFolderTrust", () => {
 			true,
 		);
 	});
+
+	test("resolves a relative CLAUDE_CONFIG_DIR against the session folder", async () => {
+		const session = join(dir, "session");
+		mkdirSync(join(session, "profile"), { recursive: true });
+		await seedAgentFolderTrust(createTestDb(), session, {
+			presetId: "custom",
+			command: "env CLAUDE_CONFIG_DIR=profile claude",
+			env: {},
+		});
+		const state = JSON.parse(
+			readFileSync(join(session, "profile", ".claude.json"), "utf-8"),
+		);
+		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
+			true,
+		);
+	});
 });
 
 describe("resolveTrustTarget", () => {
+	test("env -u before a bare name keeps the profile the agent wrapper restores", () => {
+		const previous = process.env.SUPERSET_HOME_DIR;
+		const profile = join(dir, "default-profile");
+		mkdirSync(join(dir, "state"));
+		mkdirSync(profile);
+		writeFileSync(join(dir, "state", "default-claude-config-dir"), profile);
+		process.env.SUPERSET_HOME_DIR = dir;
+		try {
+			const target = (command: string) =>
+				resolveTrustTarget(createTestDb(), {
+					presetId: "custom",
+					command,
+					env: {},
+				})?.file;
+			expect(target("env -u CLAUDE_CONFIG_DIR claude")).toBe(
+				join(profile, ".claude.json"),
+			);
+			expect(target("env -u CLAUDE_CONFIG_DIR /opt/bin/claude")).toBe(
+				join(homedir(), ".claude.json"),
+			);
+		} finally {
+			if (previous === undefined) delete process.env.SUPERSET_HOME_DIR;
+			else process.env.SUPERSET_HOME_DIR = previous;
+		}
+	});
+
+	test("expands variables and honours HOME set by the wrapper", () => {
+		const target = (command: string) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "custom",
+				command,
+				env: {},
+			})?.file;
+		expect(target('env CLAUDE_CONFIG_DIR="$HOME/agent-profile" claude')).toBe(
+			join(`${process.env.HOME ?? ""}/agent-profile`, ".claude.json"),
+		);
+		expect(target("env HOME=/isolated claude")).toBe(
+			join("/isolated", ".claude.json"),
+		);
+	});
+
 	test("env -i and -u drop the inherited CLAUDE_CONFIG_DIR", () => {
 		const target = (args: string[]) =>
 			resolveTrustTarget(createTestDb(), {
@@ -253,12 +319,33 @@ describe("resolveTrustTarget", () => {
 				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
 			})?.file;
 		const defaultFile = join(homedir(), ".claude.json");
-		expect(target([])).toBe("/agent-profile/.claude.json");
+		expect(target([])).toBe(join("/agent-profile", ".claude.json"));
 		expect(target(["-i"])).toBe(defaultFile);
 		expect(target(["-u", "CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
 		expect(target(["--unset=CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
 		expect(target(["-uCLAUDE_CONFIG_DIR"])).toBe(defaultFile);
-		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe("/p/.claude.json");
+		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe(
+			join("/p", ".claude.json"),
+		);
+	});
+
+	test("parses clustered env options", () => {
+		const target = (args: string[]) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "claude",
+				command: "env",
+				args: [...args, "CLAUDE_CONFIG_DIR=/p", "claude"],
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file;
+		expect(target(["-iuCLAUDE_CONFIG_DIR"])).toBe(join("/p", ".claude.json"));
+		expect(target(["-iu", "X"])).toBe(join("/p", ".claude.json"));
+		expect(
+			resolveTrustTarget(createTestDb(), {
+				presetId: "custom",
+				command: "env -iuCLAUDE_CONFIG_DIR claude",
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file,
+		).toBe(join(homedir(), ".claude.json"));
 	});
 
 	test("reads env options from a raw command string", () => {
@@ -275,7 +362,7 @@ describe("resolveTrustTarget", () => {
 		expect(target("env --ignore-environment claude")).toBe(defaultFile);
 		expect(target("env -uCLAUDE_CONFIG_DIR claude")).toBe(defaultFile);
 		expect(target("env -i CLAUDE_CONFIG_DIR=/p claude")).toBe(
-			"/p/.claude.json",
+			join("/p", ".claude.json"),
 		);
 	});
 });
