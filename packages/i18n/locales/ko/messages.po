@@ -8859,11 +8859,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "빠름"
 
-msgid "Fast mode off"
-msgstr "빠른 모드 꺼짐"
-
-msgid "Fast mode on"
-msgstr "빠른 모드 켜짐"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "이 모델에서는 빠른 모드를 사용할 수 없습니다. 지원하는 모델을 선택하세요."
 
 msgid "Fault"
 msgstr "결함"

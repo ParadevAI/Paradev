@@ -8859,11 +8859,8 @@ msgstr "SSS"
 msgid "Fast"
 msgstr "Hızlı"
 
-msgid "Fast mode off"
-msgstr "Hızlı mod kapalı"
-
-msgid "Fast mode on"
-msgstr "Hızlı mod açık"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Hızlı mod bu model için kullanılamıyor. Bunu destekleyen bir model seçin."
 
 msgid "Fault"
 msgstr "Hata (Fault)"

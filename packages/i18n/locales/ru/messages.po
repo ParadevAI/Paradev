@@ -8859,11 +8859,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Быстрый"
 
-msgid "Fast mode off"
-msgstr "Быстрый режим выключен"
-
-msgid "Fast mode on"
-msgstr "Быстрый режим включён"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Быстрый режим недоступен для этой модели. Выберите модель, которая его поддерживает."
 
 msgid "Fault"
 msgstr "Сбой"
