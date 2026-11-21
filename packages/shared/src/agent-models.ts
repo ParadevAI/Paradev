@@ -758,7 +758,23 @@ export function resolveAgentLaunchPresetId(
 	const executable = (
 		commandParts[commandParts.length - 1] ?? ""
 	).toLowerCase();
-	return executable === "omp" || executable === "omp.exe" ? "omp" : presetId;
+	const name = executable.replace(/\.exe$/, "");
+	if (name === "omp") return "omp";
+	// A user-authored agent that runs a known CLI (`opencode --model …`,
+	// `/usr/local/bin/claude`) launches with that CLI's model flag and
+	// catalog, so its picker offers the same models as the builtin.
+	if (
+		isCustomAgentPresetId(presetId) &&
+		AGENT_MODEL_SUPPORT.some(
+			(entry) => entry.presetId === name && entry.modelFlag !== "--agent",
+		)
+	)
+		return name;
+	return presetId;
+}
+
+function isCustomAgentPresetId(presetId: string): boolean {
+	return presetId === "custom" || presetId.startsWith("custom:");
 }
 
 export function getAgentModelSupport(

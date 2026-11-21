@@ -371,6 +371,21 @@ describe("resolveAgentLaunchPresetId", () => {
 		expect(resolveAgentLaunchPresetId("pi", "OMP.EXE --foo")).toBe("omp");
 		expect(resolveAgentLaunchPresetId("pi", "pi --foo")).toBe("pi");
 	});
+
+	it("gives a custom agent running a known CLI that CLI's model support", () => {
+		expect(resolveAgentLaunchPresetId("custom", "opencode")).toBe("opencode");
+		expect(
+			resolveAgentLaunchPresetId("custom", "/usr/local/bin/opencode --foo"),
+		).toBe("opencode");
+		expect(resolveAgentLaunchPresetId("custom:abc", "claude")).toBe("claude");
+		expect(resolveAgentLaunchPresetId("custom", "CODEX.EXE")).toBe("codex");
+	});
+
+	it("leaves custom agents on unknown CLIs and builtins alone", () => {
+		expect(resolveAgentLaunchPresetId("custom", "my-agent")).toBe("custom");
+		expect(resolveAgentLaunchPresetId("custom", "polygraph")).toBe("custom");
+		expect(resolveAgentLaunchPresetId("amp", "opencode")).toBe("amp");
+	});
 });
 
 describe("getAgentEffortSupport", () => {
