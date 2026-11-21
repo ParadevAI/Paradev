@@ -645,7 +645,6 @@ function ChatScreen() {
 									);
 								}
 							}}
-							onChipClick={(chip) => showNotice(`Would open ${chip.label}`)}
 						/>
 					</div>
 				</MessageScroller.Root>
@@ -694,7 +693,6 @@ function ComposerOnly() {
 					}}
 					onSubmit={() => {}}
 					onAttachmentClick={() => {}}
-					onChipClick={() => {}}
 				/>
 			</div>
 		</div>

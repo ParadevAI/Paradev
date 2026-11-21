@@ -147,18 +147,21 @@ function normalizePullRequestCandidates(
 	head: GitHubPullRequestHeadRef,
 ): GitHubPullRequestNode | null {
 	const requestedKey = headKey(head.owner, head.repo, head.branch);
+	const candidates = asArray(raw)
+		.map((item) => normalizePullRequest(item))
+		.filter(
+			(node): node is GitHubPullRequestNode =>
+				node !== null &&
+				headKey(
+					node.headRepositoryOwner?.login,
+					node.headRepository?.name,
+					node.headRefName,
+				) === requestedKey,
+		);
+	// Candidates arrive most recently updated first; a reused branch name must
+	// not resolve to an old merged PR while a newer one is still open.
 	return (
-		asArray(raw)
-			.map((item) => normalizePullRequest(item))
-			.find(
-				(node) =>
-					node &&
-					headKey(
-						node.headRepositoryOwner?.login,
-						node.headRepository?.name,
-						node.headRefName,
-					) === requestedKey,
-			) ?? null
+		candidates.find((node) => node.state === "OPEN") ?? candidates[0] ?? null
 	);
 }
 
@@ -273,6 +276,41 @@ export async function fetchPullRequestByHead(
 	});
 
 	return normalizePullRequestCandidates(response.data, head);
+}
+
+export async function fetchPullRequestByNumberFromGh(
+	execGh: ExecGh,
+	repository: {
+		owner: string;
+		name: string;
+	},
+	prNumber: number,
+): Promise<GitHubPullRequestNode | null> {
+	const raw = await execGh([
+		"api",
+		"--method",
+		"GET",
+		`repos/${repository.owner}/${repository.name}/pulls/${prNumber}`,
+	]);
+
+	return normalizePullRequest(raw);
+}
+
+export async function fetchPullRequestByNumber(
+	octokit: Octokit,
+	repository: {
+		owner: string;
+		name: string;
+	},
+	prNumber: number,
+): Promise<GitHubPullRequestNode | null> {
+	const response = await octokit.rest.pulls.get({
+		owner: repository.owner,
+		repo: repository.name,
+		pull_number: prNumber,
+	});
+
+	return normalizePullRequest(response.data);
 }
 
 // 100 full PR objects (bodies included) routinely exceed exec's stdout

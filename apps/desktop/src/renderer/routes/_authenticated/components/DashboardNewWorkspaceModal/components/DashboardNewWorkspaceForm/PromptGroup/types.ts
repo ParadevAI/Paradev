@@ -1,7 +1,7 @@
-// v2 ids are runtime host_agent_configs UUIDs, not a static enum like v1.
+// Agent ids are runtime host_agent_configs UUIDs, not a static enum like v1.
 export type WorkspaceCreateAgent = string;
 
-// New key — old one held v1 preset slugs that won't match v2 UUIDs.
+// New key — old one held preset slugs that no longer match agent UUIDs.
 export const AGENT_STORAGE_KEY = "lastSelectedV2WorkspaceCreateAgent";
 
 // JSON map of presetId → model id; keyed by preset (not config UUID) so the
@@ -13,9 +13,6 @@ export const EFFORT_STORAGE_KEY = "lastSelectedV2WorkspaceCreateEffortByPreset";
 
 // JSON map of presetId → launch mode id; same contract as MODEL_STORAGE_KEY.
 export const MODE_STORAGE_KEY = "lastSelectedV2WorkspaceCreateModeByPreset";
-
-export const PILL_BUTTON_CLASS =
-	"!h-[22px] min-h-0 rounded-md border-[0.5px] border-border bg-foreground/[0.04] shadow-none text-[11px]";
 
 export interface ProjectOption {
 	id: string;

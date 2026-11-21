@@ -1,1 +1,1 @@
-export { mentionedUserIds, useChannelMentions } from "./useChannelMentions";
+export { mentionedIds, useChannelMentions } from "./useChannelMentions";

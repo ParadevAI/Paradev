@@ -147,9 +147,9 @@ export function OpenRoles({ applyLabel, className = "" }: OpenRolesProps) {
 						}
 					});`}
 			</Script>
-			<waas-job-board company="superset" />
+			<waas-job-board company="paradev" />
 			<noscript>
-				<a href="https://www.ycombinator.com/companies/superset/jobs">
+				<a href="https://www.ycombinator.com/companies/paradev/jobs">
 					<Trans>View open roles on Y Combinator</Trans>
 				</a>
 			</noscript>

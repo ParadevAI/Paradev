@@ -42,10 +42,13 @@ export default defineConfig({
 				title: "Workspaces & agents",
 				commands: [
 					"workspaces",
+					"worktrees",
+					"environments",
 					"sessions",
 					"agents",
 					"terminals",
 					"panes",
+					"ports",
 					"snapshot",
 					"scripts",
 				],

@@ -51,6 +51,7 @@ stub(refresh, {
 const { PluginTargetError, resolveTarget, targetKey } = await import(
 	"./resolve-target"
 );
+type TargetError = InstanceType<typeof PluginTargetError>;
 
 interface ManifestOptions {
 	name?: string;
@@ -113,7 +114,7 @@ describe("resolveTarget", () => {
 		await expect(resolveTarget(request)).rejects.toThrow(PluginTargetError);
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: PluginTargetError) => expect(error.status).toBe(404),
+			(error: TargetError) => expect(error.status).toBe(404),
 		);
 		expect(installedCalls[0]).toEqual(["user-1", "acme", "superset"]);
 	});
@@ -122,7 +123,7 @@ describe("resolveTarget", () => {
 		install = installed("superset", {});
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: PluginTargetError) => {
+			(error: TargetError) => {
 				expect(error).toBeInstanceOf(PluginTargetError);
 				expect(error.status).toBe(404);
 				expect(error.message).toContain("exposes no tools");
@@ -251,11 +252,31 @@ describe("resolveTarget", () => {
 			plugin: "gmail",
 		}).then(
 			() => expect.unreachable("a foreign gmail must not get the real server"),
-			(error: PluginTargetError) => {
+			(error: TargetError) => {
 				expect(error).toBeInstanceOf(PluginTargetError);
 				expect(error.status).toBe(403);
 			},
 		);
+	});
+
+	test("a plugin of another organization the member is in resolves while this one is active", async () => {
+		install = {
+			...installed("organization-org-2", {
+				mcpUrl: "https://tools.acme.test/mcp",
+			}),
+			organizationId: "org-2",
+		};
+
+		const target = await resolveTarget({
+			...request,
+			marketplace: "organization-org-2",
+		});
+
+		expect(target).toMatchObject({
+			kind: "remote",
+			url: "https://tools.acme.test/mcp",
+			publicOnly: true,
+		});
 	});
 
 	test("a plugin from another marketplace cannot redirect a connector's credential", async () => {
@@ -334,7 +355,7 @@ describe("resolveTarget", () => {
 
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: PluginTargetError) => {
+			(error: TargetError) => {
 				expect(error.status).toBe(501);
 			},
 		);
@@ -342,20 +363,19 @@ describe("resolveTarget", () => {
 });
 
 describe("resolveTarget with several accounts", () => {
-	const twoAccounts = [
-		{
-			id: "conn-work",
-			authMethod: "oauth2",
-			externalUserLabel: "satya@superset.sh",
-			externalAccountLabel: null,
-		},
-		{
-			id: "conn-personal",
-			authMethod: "oauth2",
-			externalUserLabel: "satya.personal@gmail.com",
-			externalAccountLabel: null,
-		},
-	];
+	const work = {
+		id: "conn-work",
+		authMethod: "oauth2",
+		externalUserLabel: "satya@superset.sh",
+		externalAccountLabel: null,
+	};
+	const personal = {
+		id: "conn-personal",
+		authMethod: "oauth2",
+		externalUserLabel: "satya.personal@gmail.com",
+		externalAccountLabel: null,
+	};
+	const twoAccounts = [work, personal];
 
 	test("keeps an account that needs reconnecting, so naming it is not rerouted", async () => {
 		install = installed("superset", {
@@ -363,9 +383,9 @@ describe("resolveTarget with several accounts", () => {
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
 		accounts = [
-			twoAccounts[0],
+			work,
 			{
-				...twoAccounts[1],
+				...personal,
 				disconnectedAt: new Date(),
 				disconnectReason: "needs_reauth",
 			},
@@ -415,7 +435,7 @@ describe("resolveTarget with several accounts", () => {
 			connector: "acme-crm",
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
-		accounts = [twoAccounts[1], twoAccounts[0]];
+		accounts = [personal, work];
 
 		const target = await resolveTarget(request);
 		if (target.kind !== "multi") return expect.unreachable("expected multi");
@@ -431,7 +451,7 @@ describe("resolveTarget with several accounts", () => {
 			connector: "acme-crm",
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
-		accounts = [twoAccounts[0]];
+		accounts = [work];
 
 		const target = await resolveTarget(request);
 

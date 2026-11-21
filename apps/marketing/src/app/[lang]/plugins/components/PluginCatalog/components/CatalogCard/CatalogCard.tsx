@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Check } from "lucide-react";
+import { PluginIcon } from "@/app/[lang]/components/PluginIcon";
 import type { CatalogPlugin } from "../../../../constants";
-import { PluginIcon } from "../../../PluginIcon";
 
 export function CatalogCard({ plugin }: { plugin: CatalogPlugin }) {
 	const { t } = useLingui();

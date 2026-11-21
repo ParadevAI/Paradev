@@ -91,8 +91,6 @@ export function useOverflowFade<TElement extends HTMLElement>({
 					resizeObserver.observe(child);
 				}
 			}
-
-			updateOverflow();
 		};
 
 		observeResizeTargets();

@@ -26,7 +26,7 @@ const client = new Superset({
 
 ### Telemetry
 
-The SDK reports one `sdk_method_called` event per resource call: the method name (for example `tasks.list`), SDK version, runtime, whether the call succeeded, and how long it took. Request and response data are never included. The report is sent after your call settles and is best-effort, so it cannot slow down or fail a call. Set `SUPERSET_TELEMETRY=0` to turn it off.
+The SDK reports one `sdk_method_called` event per resource call: the method name (for example `tasks.list`), SDK version, runtime, whether the call succeeded, and how long it took. Request and response data are never included. The report is sent after your call settles, best-effort, so it cannot slow down or fail a call. Set `SUPERSET_TELEMETRY=0` to turn it off.
 
 ---
 
@@ -69,7 +69,7 @@ const tasks = await client.tasks.list({
 });
 ```
 
-Returns `Array<TaskListItem>`. Each row is a `Task` denormalized with `assigneeName`, `assigneeImage`, `creatorName`, `creatorImage`, and `statusName` so you don't need follow-up calls for display.
+Returns `Array<TaskListItem>`. Each row is a `Task` with added `assigneeName`, `assigneeImage`, `creatorName`, `creatorImage`, and `statusName`.
 
 ### `tasks.retrieve(idOrSlug)`
 
@@ -107,7 +107,7 @@ await client.tasks.delete(id);
 
 ### `tasks.statuses.list()`
 
-List the task statuses (workflow states) configured for the active organization, in display order. Useful for resolving status ids before [`tasks.create`](#taskscreatebody) or [`tasks.update`](#tasksupdatebody).
+List the task statuses (workflow states) configured for the active organization, in display order. Use it to resolve status ids before [`tasks.create`](#taskscreatebody) or [`tasks.update`](#tasksupdatebody).
 
 ```ts
 const statuses = await client.tasks.statuses.list();
@@ -131,14 +131,13 @@ const workspaces = await client.workspaces.list({ hostId: '<machineId>' });
 ```
 
 Returns `Array<Workspace>`. Rows include the host-served `projectName`
-(`string | null`; null when the workspace's project row is missing on that
-host, so don't assume it's always present).
+(`string | null`; null when the project row is missing on that host).
 
 ### `workspaces.create({ hostId, projectId, name, branch?, pr?, baseBranch?, taskId?, agents?, command? })`
 
-Create a worktree on a specific host. Provide exactly one of `branch` or `pr` (a pull request number; the host checks out the verified PR head and derives the branch). `baseBranch` picks the fork point when `branch` doesn't exist yet, and `taskId` links the new workspace to a task. Optionally spawn one or more agents inside it as soon as the worktree is ready, and/or run a one-off shell `command` in the worktree. Goes through the relay tunnel: the host must be online.
+Create a worktree on a specific host. Provide exactly one of `branch` or `pr` (a pull request number; the host checks out the verified PR head and derives the branch). `baseBranch` picks the fork point when `branch` doesn't exist yet, and `taskId` links the new workspace to a task. Optionally spawn agents in it once the worktree is ready, and/or run a one-off shell `command` in the worktree. Goes through the relay tunnel: the host must be online.
 
-Each entry in `agents` takes a preset id (e.g. `"claude"`) or a `HostAgentConfig` instance UUID: the host service resolves it against its configured rows and copies their stored `command`, `args`, and `env`. Set `model` or `effort` to override the agent's model or reasoning effort for that launch, or omit them to use the agent's own defaults. Use [`agents.list({ hostId })`](#agentslist-hostid-) to enumerate what's installed. `command` is independent of `agents`. Pass either or both.
+Each entry in `agents` takes a preset id (e.g. `"claude"`) or a `HostAgentConfig` instance UUID: the host service resolves it against its configured rows and copies their stored `command`, `args`, and `env`. Set `model` or `effort` to override the agent's model or reasoning effort for that launch, or omit them to use the agent's own defaults. Use [`agents.list({ hostId })`](#agentslist-hostid-) to enumerate what's installed. Pass `command`, `agents`, or both.
 
 ```ts
 const result = await client.workspaces.create({
@@ -168,7 +167,7 @@ Returns a `WorkspaceCreateResult`:
 
 ### `workspaces.update(id, params, { hostId })`
 
-Update fields on an existing workspace on its host. Moving a workspace to a different branch or host requires host-side orchestration and is not safe to drive directly.
+Update fields on an existing workspace on its host. Moving a workspace to another branch or host needs host-side orchestration and is not safe to do with this method.
 
 ```ts
 await client.workspaces.update('<workspaceId>', { name: 'wire-up-auth-v2' }, { hostId: '<machineId>' });

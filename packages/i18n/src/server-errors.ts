@@ -92,6 +92,15 @@ export const serverErrorMessages: Record<
 				message: `${params?.agent} cannot be signed in this way yet.`,
 			}),
 		),
+	"serverError.agent.notFound": () =>
+		i18n._(msg({ message: "Agent not found" })),
+	"serverError.agent.adminRequired": () =>
+		i18n._(
+			msg({
+				message:
+					"Only its creator or an organization admin can change this agent",
+			}),
+		),
 	"serverError.apiKey.activeOrganizationRequiredToCreate": () =>
 		i18n._(
 			msg({
@@ -128,11 +137,23 @@ export const serverErrorMessages: Record<
 				message: `This automation belongs to ${params?.organizationName}. Switch to that organization to open it.`,
 			}),
 		),
-	"serverError.automation.onlyTheOwnerOrAnOrganizationOwner": () =>
+	"serverError.automation.archiveBeforeDelete": () =>
+		i18n._(
+			msg({
+				message: "Archive this automation before you delete it.",
+			}),
+		),
+	"serverError.automation.automationIsArchived": () =>
+		i18n._(
+			msg({
+				message: "This automation is archived. Restore it first.",
+			}),
+		),
+	"serverError.automation.onlyTheOwnerOrAnOrganizationOwnerCanArchive": () =>
 		i18n._(
 			msg({
 				message:
-					"Only the owner or an organization owner can delete this automation",
+					"Only the owner or an organization owner can archive this automation",
 			}),
 		),
 	"serverError.automation.automationsRequireThePro": () =>
@@ -264,6 +285,12 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.chatMove.moveStopped": () =>
+		i18n._(
+			msg({
+				message: "This move stopped. The chat is still in its old workspace.",
+			}),
+		),
 	"serverError.channel.notFound": () =>
 		i18n._(
 			msg({
@@ -294,8 +321,6 @@ export const serverErrorMessages: Record<
 				message: "Only channel admins can do that",
 			}),
 		),
-	"serverError.channel.taskInHiddenChannel": () =>
-		i18n._(msg({ message: "This task is in a channel you can't see" })),
 	"serverError.channel.archived": () =>
 		i18n._(
 			msg({
@@ -324,6 +349,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Only people in this organization can join",
+			}),
+		),
+	"serverError.channel.onlyPeopleManage": () =>
+		i18n._(
+			msg({
+				message: "Only people can manage a channel",
 			}),
 		),
 	"serverError.channelMessage.notFound": () =>
@@ -356,6 +387,38 @@ export const serverErrorMessages: Record<
 				message: "This message is too long",
 			}),
 		),
+	"serverError.cloud.cloudUsageNotEnabled": () =>
+		i18n._(
+			msg({
+				message: "Cloud usage is not enabled for this organization.",
+			}),
+		),
+	"serverError.cloud.cursorNotValid": () =>
+		i18n._(
+			msg({
+				message:
+					"That cursor could not be read. Drop it to start from the first page.",
+			}),
+		),
+	"serverError.cloud.noBillingPeriods": () =>
+		i18n._(
+			msg({
+				message:
+					"This organization has no billing periods. Choose a time range instead.",
+			}),
+		),
+	"serverError.cloud.noBillingPeriodStartsOn": (params) =>
+		i18n._(
+			msg({
+				message: `No billing period starts on ${params?.period}.`,
+			}),
+		),
+	"serverError.cloud.onlyAdminsSeeUsageByPerson": () =>
+		i18n._(
+			msg({
+				message: "Only owners and admins can see usage by person.",
+			}),
+		),
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
@@ -370,13 +433,20 @@ export const serverErrorMessages: Record<
 					"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 			}),
 		),
-	"serverError.cloudWorkspace.usageLimitReached": () =>
-		i18n._(
-			msg({
-				message:
-					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
-			}),
-		),
+	"serverError.cloudWorkspace.usageLimitReached": (params) =>
+		params?.next === "upgrade"
+			? i18n._(
+					msg({
+						message:
+							"Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
+					}),
+				)
+			: i18n._(
+					msg({
+						message:
+							"Cloud usage is used up for this period. An owner can buy more in Settings, Billing.",
+					}),
+				),
 	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>
 		i18n._(
 			msg({
@@ -424,6 +494,13 @@ export const serverErrorMessages: Record<
 				message: "Connecting GitHub is not configured on this server",
 			}),
 		),
+	"serverError.githubUser.notConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Connect GitHub in Settings to act on pull requests as yourself",
+			}),
+		),
 	"serverError.cloudWorkspace.githubRepositoryOutOfReach": () =>
 		i18n._(
 			msg({
@@ -442,6 +519,25 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Could not record environment",
+			}),
+		),
+	"serverError.environment.noInstall": () =>
+		i18n._(
+			msg({
+				message:
+					"This environment has no [install] to build. Add one to .paradev/config.toml on its base branch.",
+			}),
+		),
+	"serverError.environment.manualBuildsRateLimited": (params) =>
+		i18n._(
+			msg({
+				message: `This environment can start 3 manual builds an hour. Try again in ${params?.minutes} minutes.`,
+			}),
+		),
+	"serverError.environment.buildAlreadyRunning": () =>
+		i18n._(
+			msg({
+				message: "A build of this environment is already running",
 			}),
 		),
 	"serverError.task.notFound": () =>
@@ -542,6 +638,12 @@ export const serverErrorMessages: Record<
 				message: "Not a member of this organization",
 			}),
 		),
+	"serverError.host.onlyTheHostOwnerCanAllowCloudWorkspaces": () =>
+		i18n._(
+			msg({
+				message: "Only the host owner can let cloud workspaces reach it",
+			}),
+		),
 	"serverError.host.onlyTheHostOwnerCanSet": () =>
 		i18n._(
 			msg({
@@ -558,6 +660,13 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "GitHub installation not found",
+			}),
+		),
+	"serverError.integration.severalGithubAccountsConnected": () =>
+		i18n._(
+			msg({
+				message:
+					"Several GitHub accounts are connected. Choose the one to disconnect in the web app, or update the CLI.",
 			}),
 		),
 	"serverError.integration.githubSyncRequiresThePro": () =>
@@ -588,6 +697,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Not a member of this organization",
+			}),
+		),
+	"serverError.integration.pullRequestNotFound": () =>
+		i18n._(
+			msg({
+				message: "Pull request not found",
 			}),
 		),
 	"serverError.integration.onlyOwnersCanDeleteProjects": () =>
@@ -668,6 +783,12 @@ export const serverErrorMessages: Record<
 				message: "Cannot remove yourself",
 			}),
 		),
+	"serverError.organization.alreadyExists": () =>
+		i18n._(
+			msg({
+				message: "Organization already exists",
+			}),
+		),
 	"serverError.organization.createFailed": () =>
 		i18n._(
 			msg({
@@ -723,6 +844,12 @@ export const serverErrorMessages: Record<
 				message: "Only owners can update organization settings",
 			}),
 		),
+	"serverError.organization.onlyOwnerCannotLeave": () =>
+		i18n._(
+			msg({
+				message: "You cannot leave the organization as the only owner",
+			}),
+		),
 	"serverError.organization.organizationNotFound": () =>
 		i18n._(
 			msg({
@@ -745,6 +872,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "You don't have permission to remove this member",
+			}),
+		),
+	"serverError.page.cannotEdit": () =>
+		i18n._(
+			msg({
+				message: "You can view this page but not change it",
 			}),
 		),
 	"serverError.page.cannotComment": () =>
@@ -849,6 +982,42 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Workspace not found",
+			}),
+		),
+	"serverError.routine.roomNotAllowed": () =>
+		i18n._(
+			msg({
+				message: "The Dev can't post there.",
+			}),
+		),
+	"serverError.routine.notFound": () =>
+		i18n._(
+			msg({
+				message: "Routine not found",
+			}),
+		),
+	"serverError.routine.nothingToDo": () =>
+		i18n._(
+			msg({
+				message: "A routine needs a schedule or something to watch.",
+			}),
+		),
+	"serverError.routine.invalidSchedule": () =>
+		i18n._(
+			msg({
+				message: "This schedule isn't valid.",
+			}),
+		),
+	"serverError.routine.tooFrequent": () =>
+		i18n._(
+			msg({
+				message: "A routine can run at most once an hour.",
+			}),
+		),
+	"serverError.routine.inThePast": () =>
+		i18n._(
+			msg({
+				message: "This schedule has no runs left.",
 			}),
 		),
 	"serverError.pageComment.commentNotFound": () =>
@@ -998,6 +1167,35 @@ export const serverErrorMessages: Record<
 			message: "Plugin {plugin} is not installed",
 			values: params,
 		}),
+	"serverError.plugins.managedByOrganization": (params) =>
+		i18n._({
+			id: "serverError.plugins.managedByOrganization",
+			message:
+				"Your organization installs {plugin} for you, so it cannot be uninstalled. You can disable it.",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourceNeedsGithub": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceNeedsGithub",
+			message:
+				"Connect your GitHub account to add a repository; syncs read it with your account",
+		}),
+	"serverError.plugins.pluginSourceOutOfReach": (params) =>
+		i18n._({
+			id: "serverError.plugins.pluginSourceOutOfReach",
+			message: "Your GitHub account cannot read {repo}",
+			values: params,
+		}),
+	"serverError.plugins.pluginSourcePathOutside": () =>
+		i18n._({
+			id: "serverError.plugins.pluginSourcePathOutside",
+			message: "The path must stay inside the repository",
+		}),
+	"serverError.plugins.unknownPluginSource": () =>
+		i18n._({
+			id: "serverError.plugins.unknownPluginSource",
+			message: "That plugin source does not exist",
+		}),
 	"serverError.plugins.unknownPlugin": (params) =>
 		i18n._({
 			id: "serverError.plugins.unknownPlugin",
@@ -1077,6 +1275,12 @@ export const serverErrorMessages: Record<
 				message: "Too many support reports. Try again later.",
 			}),
 		),
+	"serverError.team.mustBelongToATeam": () =>
+		i18n._(
+			msg({
+				message: "You should be a member of at least one team",
+			}),
+		),
 	"serverError.team.taskKeyInvalid": () =>
 		i18n._(
 			msg({
@@ -1111,7 +1315,7 @@ export const serverErrorMessages: Record<
 	"serverError.user.theRecoveryPeriodHasEndedContact": () =>
 		i18n._(
 			msg({
-				message: "The recovery period has ended. Contact support@superset.sh.",
+				message: "The recovery period has ended. Contact support@paradev.com.",
 			}),
 		),
 	"serverError.user.userNotFound": () =>

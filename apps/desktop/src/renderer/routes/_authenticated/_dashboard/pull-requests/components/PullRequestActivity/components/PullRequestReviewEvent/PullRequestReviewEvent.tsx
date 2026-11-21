@@ -1,4 +1,5 @@
 import { CircleCheck, CircleX, MessageSquare } from "lucide-react";
+import { useNow } from "renderer/hooks/useNow";
 import type { PullRequestDetailComment } from "../../../../hooks/usePullRequestDetail";
 import { usePullRequestActivityLayout } from "../../../../providers/PullRequestActivityLayoutProvider";
 import { describePullRequestTime } from "../../../../utils/describePullRequestTime";
@@ -34,6 +35,7 @@ export function PullRequestReviewEvent({
 	first,
 	last,
 }: PullRequestReviewEventProps) {
+	const now = useNow(60_000);
 	const layout = usePullRequestActivityLayout();
 	const { Icon, className } = VERDICT_ICON[verdict];
 	const icon = <Icon strokeWidth={1.75} className={`size-4 ${className}`} />;
@@ -41,7 +43,7 @@ export function PullRequestReviewEvent({
 		<PullRequestTimelineEventLine
 			name={pullRequestAuthorLabel(comment.author)}
 			action={<PullRequestReviewStateLabel state={verdict} />}
-			time={describePullRequestTime(comment.createdAt)}
+			time={describePullRequestTime(comment.createdAt, now)}
 		/>
 	);
 	if (layout === "row") {

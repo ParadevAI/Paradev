@@ -16,6 +16,8 @@ export const PENDING_SEQ = Number.MAX_SAFE_INTEGER;
 export function fromWire(wire: ChannelMessageWire): ChannelMessage {
 	return {
 		...wire,
+		subtype: wire.subtype ?? null,
+		inviterId: wire.inviterId ?? null,
 		lastReplyAt: wire.lastReplyAt ? new Date(wire.lastReplyAt) : null,
 		editedAt: wire.editedAt ? new Date(wire.editedAt) : null,
 		deletedAt: wire.deletedAt ? new Date(wire.deletedAt) : null,
@@ -25,11 +27,11 @@ export function fromWire(wire: ChannelMessageWire): ChannelMessage {
 
 export function pendingMessage(input: {
 	channelId: string;
-	authorUserId: string;
+	authorId: string;
 	body: string;
 	clientId: string;
 	threadRootId: string | null;
-	mentionedUserIds: string[];
+	mentionedIds: string[];
 	broadcast?: ChannelBroadcast | null;
 	/** Local previews of the files on their way up. */
 	attachments?: ChannelAttachment[];
@@ -39,9 +41,11 @@ export function pendingMessage(input: {
 		channelId: input.channelId,
 		seq: PENDING_SEQ,
 		threadRootId: input.threadRootId,
-		authorUserId: input.authorUserId,
+		authorId: input.authorId,
 		body: input.body,
-		mentionedUserIds: input.mentionedUserIds,
+		subtype: null,
+		inviterId: null,
+		mentionedIds: input.mentionedIds,
 		broadcast: input.broadcast ?? null,
 		clientId: input.clientId,
 		replyCount: 0,

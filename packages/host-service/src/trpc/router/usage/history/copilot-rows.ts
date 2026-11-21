@@ -22,7 +22,7 @@ function parseUtcTimestamp(raw: string | null): number {
 }
 
 export function copilotRowsToEntries(
-	rows: CopilotUsageRow[],
+	rows: Iterable<CopilotUsageRow>,
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,

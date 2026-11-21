@@ -21,6 +21,7 @@ while true; do
     --port "$REALTIME_PORT" \
     --var "NEXT_PUBLIC_API_URL:$NEXT_PUBLIC_API_URL" \
     --var "NUDGE_SECRET:$REALTIME_NUDGE_SECRET" \
+    --var "AGENT_SESSION_SECRET:${AGENT_SESSION_SECRET:-}" \
     --var "USERCONTENT_URL:${USERCONTENT_URL:-https://frame.supersetusercontent.com}"
   sleep 1
 done

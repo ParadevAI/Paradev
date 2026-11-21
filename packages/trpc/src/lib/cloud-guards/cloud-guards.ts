@@ -1,13 +1,16 @@
 import { organizationBilling } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { users } from "@superset/db/schema";
+import { findOrgMembership } from "@superset/db/utils";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { posthog } from "../analytics";
+import type { SandboxCaller } from "../sandbox/api-credential";
+import { tokenOrganizationIds } from "../token-organizations";
 
 interface CloudAccessContext {
-	userId: string;
+	principal: { userId: string };
 	session: { user: { id: string; email: string } } | null;
 }
 
@@ -53,7 +56,7 @@ export async function cloudAccess(
 	const account = email?.trim().toLowerCase() ?? "";
 	const enabled = await posthog.isFeatureEnabled(
 		FEATURE_FLAGS.CLOUD_WORKSPACES,
-		ctx.userId,
+		ctx.principal.userId,
 		{
 			// Sent explicitly: the conditions are email-based, and a person
 			// PostHog has not seen yet would otherwise be refused for the wrong
@@ -74,23 +77,61 @@ export async function cloudAccess(
  * spending a second query on it. Only a session describing somebody else
  * (a cookie and a bearer disagreeing) needs the lookup.
  */
-async function currentEmail(ctx: {
-	userId: string;
-	session: { user: { id: string; email: string } } | null;
-}): Promise<string | null> {
-	if (ctx.session?.user.id === ctx.userId) return ctx.session.user.email;
+async function currentEmail(ctx: CloudAccessContext): Promise<string | null> {
+	const { userId } = ctx.principal;
+	if (ctx.session?.user.id === userId) return ctx.session.user.email;
 	const user = await db.query.users.findFirst({
-		where: eq(users.id, ctx.userId),
+		where: eq(users.id, userId),
 		columns: { email: true },
 	});
 	return user?.email ?? null;
 }
 
-export function assertMember(
-	organizationIds: string[],
+export interface MemberContext {
+	principal: { userId: string };
+	session: { session: object } | null;
+	activeOrganizationId: string | null;
+	sandboxCaller: SandboxCaller | null;
+}
+
+/**
+ * Whether the caller belongs to the organization. The organization this
+ * request already checked, or one a bearer's token lists, needs no query; an
+ * organization joined since the token was minted is looked up. A box acts
+ * only in its own.
+ */
+export async function isMember(
+	ctx: MemberContext,
 	organizationId: string,
-): void {
-	if (!organizationIds.includes(organizationId)) {
+): Promise<boolean> {
+	if (
+		ctx.sandboxCaller &&
+		ctx.sandboxCaller.organizationId !== organizationId
+	) {
+		return false;
+	}
+	if (organizationId === ctx.activeOrganizationId) return true;
+	if (tokenOrganizationIds(ctx.session)?.includes(organizationId)) return true;
+	return Boolean(
+		await findOrgMembership({ userId: ctx.principal.userId, organizationId }),
+	);
+}
+
+/**
+ * The organization a request acts in. A bearer that names none gets its
+ * token's first, as the routes released clients call before naming one expect.
+ */
+export function organizationOrFirst(ctx: MemberContext): string | null {
+	return (
+		ctx.activeOrganizationId ?? tokenOrganizationIds(ctx.session)?.[0] ?? null
+	);
+}
+
+export async function assertMember(
+	ctx: MemberContext,
+	organizationId: string,
+): Promise<void> {
+	if (!(await isMember(ctx, organizationId))) {
 		throw userError({
 			code: "FORBIDDEN",
 			message: "Not a member of this organization",

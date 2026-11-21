@@ -33,3 +33,9 @@
 - [ ] Vale could not run (`bunx vale` fails to resolve); I checked the prose by hand for the banned words and em dashes. Run it before merging.
 - [ ] The Notion plugin is "not installed" in `superset plugins list`, and no Notion MCP tool is loaded. I read the SOP through the Notion REST API with $NOTION_MCP_TOKEN instead. Fix the connector so `notion-fetch` works.
 - [ ] Not documented: ACP chat/session CLI (#8668, #8585), chat paste cards (#8577), image gallery (#8573), and the plugins connect flow (#8646). They are flag-gated or the plugins page is staff-only. Re-check once they ship broadly.
+
+## 2026-11-11 17:00 — Weekly docs update
+
+- [ ] Review branch docs/update-2026-11-11 (not pushed): stacked PRs/merge queue, cloud port forwarding, `superset ports`, automations "Same workspace"
+- [ ] Vale could not run (bunx vale not resolvable); run it on the 4 changed docs files
+- [ ] Undocumented, decide if wanted: Fable 5.2, chat move/sync/search across laptop and cloud (#9340/#9339), pane drag to sidebar (#9530), sidebar tab shortcuts (#9540), ⌘F in Pages (#9545), multiple GitHub orgs (#9396), cloud host access switch (#9409), manual sign-in (#9372)

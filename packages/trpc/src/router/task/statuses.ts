@@ -3,11 +3,11 @@ import { taskStatuses } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 
 export const taskStatusesRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(z.object({ nativeOnly: z.boolean() }).optional())
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);

@@ -171,10 +171,10 @@ export function ScheduleSentence({
 			{showsProblem ? (
 				<span className="ml-1 truncate text-[13px] text-destructive">
 					{draftCleared
-						? "Enter a recurrence rule — changes aren't saved"
+						? "Enter a recurrence rule. Changes aren't saved"
 						: customProblem === "exhausted"
-							? "No upcoming runs — changes aren't saved"
-							: "Invalid recurrence rule — changes aren't saved"}
+							? "No upcoming runs. Changes aren't saved"
+							: "Invalid recurrence rule. Changes aren't saved"}
 				</span>
 			) : (
 				nextRun && (

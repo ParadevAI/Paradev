@@ -1,0 +1,20 @@
+---
+title: Supabase
+description: Inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions in your Supabase projects
+---
+
+Inspect tables, run SQL, apply migrations, read logs and advisors, and deploy Edge Functions in your Supabase projects.
+
+## MCP Server
+
+Tools come from Supabase's own MCP server at `https://mcp.supabase.com/mcp`. Paradev proxies each call and adds your credentials. Supabase decides which tools the server offers, so see [Supabase's MCP documentation](https://supabase.com/docs/guides/ai-tools/mcp) for the current list.
+
+The tools act with your own permissions, on real projects. Connect a development project when you can, and read Supabase's [security guidance](https://supabase.com/docs/guides/ai-tools/mcp#security-risks) before you connect production.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Supabase in your browser and approve access. Paradev does not need an app to be set up first. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

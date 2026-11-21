@@ -16,19 +16,22 @@ export async function autumnRest<T>(
 	path: string,
 	body: unknown,
 	timeoutMs = 5_000,
+	apiVersion = AUTUMN_API_VERSION,
 ): Promise<T> {
 	const response = await fetch(`https://api.useautumn.com/v1/${path}`, {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${env.AUTUMN_SECRET_KEY}`,
 			"Content-Type": "application/json",
-			"x-api-version": AUTUMN_API_VERSION,
+			"x-api-version": apiVersion,
 		},
 		body: JSON.stringify(body),
 		signal: AbortSignal.timeout(timeoutMs),
 	});
 	if (!response.ok) {
-		throw new Error(`Autumn ${path} failed with ${response.status}`);
+		throw new Error(
+			`Autumn ${path} failed with ${response.status}: ${await response.text()}`,
+		);
 	}
 	return (await response.json()) as T;
 }

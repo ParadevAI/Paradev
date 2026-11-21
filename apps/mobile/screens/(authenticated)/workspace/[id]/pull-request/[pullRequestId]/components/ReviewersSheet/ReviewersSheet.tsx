@@ -6,6 +6,7 @@ import { Check } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { HeaderToolbar } from "@/lib/navigation";
 import type {
 	PullRequestReviewer,
 	ReviewerState,
@@ -57,15 +58,15 @@ export function ReviewersSheet({
 					title: t({ message: "Reviewers" }),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="gap-6 px-4 pb-10 pt-2"

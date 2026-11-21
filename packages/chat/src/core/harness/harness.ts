@@ -15,6 +15,48 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 	pdev: "pdev-acp",
 };
 
+export type AcpStartMode = { id: string; label: string };
+
+const ACP_START_MODES: Record<
+	string,
+	{ modes: readonly AcpStartMode[]; defaultModeId: string }
+> = {
+	"claude-acp": {
+		modes: [
+			{ id: "default", label: "Ask for approval" },
+			{ id: "acceptEdits", label: "Approve edits" },
+			{ id: "auto", label: "Approve for me" },
+			{ id: "plan", label: "Plan" },
+			{ id: "bypassPermissions", label: "Full access" },
+		],
+		defaultModeId: "bypassPermissions",
+	},
+	"codex-acp": {
+		modes: [
+			{ id: "read-only", label: "Read-only" },
+			{ id: "workspace-write", label: "Workspace access" },
+			{ id: "agent", label: "Auto review" },
+			{ id: "agent-full-access", label: "Full access" },
+		],
+		defaultModeId: "agent-full-access",
+	},
+	"pdev-acp": {
+		modes: [
+			{ id: "default", label: "Ask for approval" },
+			{ id: "auto", label: "Approve for me" },
+			{ id: "bypassPermissions", label: "Full access" },
+		],
+		defaultModeId: "bypassPermissions",
+	},
+};
+
+export function acpStartModes(
+	presetId: string | null | undefined,
+): { modes: readonly AcpStartMode[]; defaultModeId: string } | undefined {
+	const harness = acpHarnessForPreset(presetId);
+	return harness ? ACP_START_MODES[harness] : undefined;
+}
+
 /** Harness ids from before ACP, still on old sessions. Display only. */
 const LEGACY_PRESET_BY_HARNESS: Record<string, string> = {
 	"claude-code": "claude",

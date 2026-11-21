@@ -25,6 +25,7 @@ import {
 	snapshotFromOutline,
 	withItemBodies,
 } from "../../core";
+import type { UsageLimitAction } from "../../protocol/commands";
 import type { Cursor } from "../../protocol/cursor";
 import type { DeltaChannel, Envelope } from "../../protocol/envelope";
 import { isDurableEnvelope, isResetEnvelope } from "../../protocol/envelope";
@@ -40,6 +41,8 @@ import {
 	cachedSnapshot,
 	cacheSnapshot,
 	forgetSnapshot,
+	primeSnapshot,
+	takePrimedSnapshot,
 } from "./utils/snapshotCache";
 
 export type FrameScheduler = (flush: () => void) => () => void;
@@ -93,6 +96,23 @@ async function fetchSeed(
 	};
 }
 
+export async function prefetchChatSession(
+	client: SessionClient,
+	pageSize?: number,
+): Promise<boolean> {
+	const seed = await fetchSeed(client, pageSize).catch(() => null);
+	if (!seed) return false;
+	if (seed.kind === "outline") {
+		primeSnapshot(client.sessionId, seed.snapshot);
+	} else {
+		cacheSnapshot(
+			client.sessionId,
+			reduceMany(emptySnapshot(), seed.envelopes),
+		);
+	}
+	return true;
+}
+
 type InitialLoad = [
 	session: Awaited<ReturnType<SessionClient["getSession"]>>,
 	seed: Seed | null,
@@ -137,6 +157,7 @@ export const DEFAULT_DELTAS: readonly DeltaChannel[] = [
 export type UseChatSessionOptions = {
 	client: SessionClient;
 	sendEnabled?: boolean;
+	snapshotWorktree?: boolean;
 	deltas?: readonly DeltaChannel[];
 	pageSize?: number;
 	scheduler?: FrameScheduler;
@@ -162,7 +183,9 @@ export type ChatSession = {
 	loadOlder(): Promise<boolean>;
 	removeQueuedPrompt(itemId: string): Promise<void>;
 	steerQueuedPrompt(itemId: string): Promise<void>;
+	updateQueuedPrompt(itemId: string, content: UserContent[]): Promise<void>;
 	resumeQueue(): Promise<void>;
+	respondToUsageLimit(action: UsageLimitAction): Promise<void>;
 	cancelTurn(turnId: string, options?: { pauseQueue?: boolean }): Promise<void>;
 	stopBackgroundTask(taskId: string): Promise<boolean>;
 	respondToApproval(approvalId: string, decision: Decision): Promise<void>;
@@ -190,6 +213,8 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const sendEnabled = options.sendEnabled ?? true;
 	const sendEnabledRef = useRef(sendEnabled);
 	sendEnabledRef.current = sendEnabled;
+	const snapshotWorktreeRef = useRef(options.snapshotWorktree === true);
+	snapshotWorktreeRef.current = options.snapshotWorktree === true;
 	const pageSize = options.pageSize;
 	const deltasKey = (options.deltas ?? DEFAULT_DELTAS).join(",");
 
@@ -234,6 +259,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 						clientId: entry.clientId,
 						content: entry.content,
 						...(entry.steer ? { steer: entry.steer } : {}),
+						...(snapshotWorktreeRef.current ? { snapshotWorktree: true } : {}),
 					});
 				},
 			}),
@@ -406,6 +432,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		setStatus("loading");
 		setUnreachable(false);
 		setConnection("connecting");
+		const primed = takePrimedSnapshot(client.sessionId);
 		const cached = cachedSnapshot(client.sessionId);
 		setSnapshot(cached ?? emptySnapshot());
 		setHasOlder(false);
@@ -468,9 +495,12 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 			}
 			loaded = seed !== null;
 			setStatus("ready");
+			subscribe(seeded?.cursor ?? session.cursor);
+		};
+		const subscribe = (since: Cursor | null) => {
 			stream = client.subscribe({
 				deltas,
-				since: seeded?.cursor ?? session.cursor,
+				since,
 				onEnvelope: (envelope) => {
 					if (!isResetEnvelope(envelope)) enqueue(envelope);
 				},
@@ -484,7 +514,14 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 				},
 			});
 		};
-		void seed(0);
+		if (primed) {
+			const seeded = applySeed({ kind: "outline", snapshot: primed }, false);
+			loaded = true;
+			setStatus("ready");
+			subscribe(seeded?.cursor ?? null);
+		} else {
+			void seed(0);
+		}
 
 		return () => {
 			if (loaded && !snapshotRef.current.pendingReset) {
@@ -556,8 +593,17 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		(itemId: string) => client.steerQueuedPrompt(itemId),
 		[client],
 	);
+	const updateQueuedPrompt = useCallback(
+		(itemId: string, content: UserContent[]) =>
+			client.updateQueuedPrompt(itemId, content),
+		[client],
+	);
 
 	const resumeQueue = useCallback(() => client.resumeQueue(), [client]);
+	const respondToUsageLimit = useCallback(
+		(action: UsageLimitAction) => client.respondToUsageLimit(action),
+		[client],
+	);
 
 	const cancelTurn = useCallback(
 		(turnId: string, options?: { pauseQueue?: boolean }) =>
@@ -598,7 +644,9 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		loadOlder,
 		removeQueuedPrompt,
 		steerQueuedPrompt,
+		updateQueuedPrompt,
 		resumeQueue,
+		respondToUsageLimit,
 		cancelTurn,
 		stopBackgroundTask,
 		respondToApproval,

@@ -27,7 +27,7 @@ Run different agents on different subscriptions from one machine:
 - Logins, credentials, and account identity stay per account. The **…** menu on a card offers **Switch sign-in…** (re-login that profile to a different account) and, for secondary profiles, **Remove…**, which deletes that profile and its credentials, never your shared setup or history. The system-default login can't be removed.
 - If a sign-in expires, the card shows the exact login command to run, with click-to-copy.
 
-Under the hood, a profile is just a config dir the CLI is pointed at (`CLAUDE_CONFIG_DIR` / `CODEX_HOME`). Paradev's agent wrappers re-resolve the current default every time the agent starts in a Paradev terminal, so switching works for agents you launch by hand too, and a value you export yourself always wins.
+A profile is a config directory the CLI is pointed at (`CLAUDE_CONFIG_DIR` / `CODEX_HOME`). Paradev's agent wrappers re-resolve the default each time the agent starts in a Paradev terminal, so switching also works for agents you launch by hand. A value you export yourself always wins.
 
 ## Token Costs
 
@@ -40,10 +40,7 @@ Below the meters, the **Token usage** chart estimates spend from the agents' loc
 
 ## Leaderboard History
 
-Joining or rejoining the leaderboard publishes available local usage history
-from the last 90 days, starting no earlier than July 29, 2026. Leaving deletes
-your published history. Rejoining restores only the history within that window
-that is still available in your local session logs.
+Joining or rejoining the leaderboard publishes available local usage history from the last 90 days, starting no earlier than July 29, 2026. Leaving deletes your published history. Rejoining restores only history in that window that is still in your local session logs.
 
 ## Machine Resources
 

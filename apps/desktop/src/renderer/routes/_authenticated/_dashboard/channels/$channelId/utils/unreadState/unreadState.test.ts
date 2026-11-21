@@ -3,11 +3,11 @@ import {
 	type ChannelMessage,
 	PENDING_SEQ,
 } from "renderer/routes/_authenticated/utils/channelMessageCache";
-import { unreadState } from "./unreadState";
+import { countsAsUnread, unreadState } from "./unreadState";
 
 function message(
 	seq: number,
-	authorUserId: string,
+	authorId: string,
 	deleted = false,
 ): ChannelMessage {
 	return {
@@ -15,9 +15,11 @@ function message(
 		channelId: "c",
 		seq,
 		threadRootId: null,
-		authorUserId,
+		authorId,
 		body: "hi",
-		mentionedUserIds: [],
+		subtype: null,
+		inviterId: null,
+		mentionedIds: [],
 		broadcast: null,
 		clientId: null,
 		replyCount: 0,
@@ -52,5 +54,17 @@ describe("unreadState", () => {
 		const state = unreadState([message(1, "them"), message(2, "me")], 1, "me");
 		expect(state.firstUnread).toBeNull();
 		expect(state.latestSeq).toBe(2);
+	});
+
+	it("skips joins and leaves except the reader being added by someone", () => {
+		const join = (authorId: string, inviterId: string | null) => ({
+			...message(1, authorId),
+			subtype: "channel_join" as const,
+			inviterId,
+		});
+		expect(countsAsUnread(join("a", null), "me")).toBe(false);
+		expect(countsAsUnread(join("a", "b"), "me")).toBe(false);
+		expect(countsAsUnread(join("me", null), "me")).toBe(false);
+		expect(countsAsUnread(join("me", "b"), "me")).toBe(true);
 	});
 });

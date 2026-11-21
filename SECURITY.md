@@ -9,7 +9,7 @@ Please do not report security vulnerabilities through public GitHub issues, Disc
 Report privately through one of these channels:
 
 1. **GitHub private vulnerability reporting (preferred):** use the ["Report a vulnerability"](https://github.com/paradevai/paradev/security/advisories/new) button under the Security tab of this repository.
-2. **Email:** send details to [support@superset.sh](mailto:support@superset.sh) with "Security" in the subject line.
+2. **Email:** send details to [support@paradev.com](mailto:support@paradev.com) with "Security" in the subject line.
 
 Please include as much of the following as you can:
 
@@ -31,7 +31,7 @@ We ask that you give us a reasonable window to remediate before disclosing publi
 In scope:
 
 - The Paradev desktop app, CLI, and host service (this repository)
-- The Paradev API and web app (superset.sh, app.superset.sh, relay.superset.sh)
+- The Paradev API and web app (paradev.com, app.paradev.com, api.paradev.com, relay.superset.sh, and the superset.sh hosts that still serve the app and API)
 
 Out of scope:
 

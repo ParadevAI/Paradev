@@ -340,6 +340,17 @@ describe("createManagedSkills with plugin sources", () => {
 		expect(shared).toContain(MANAGED_SKILL_MARKER);
 	});
 
+	it("an overlapping older run does not reap what a newer one wrote", async () => {
+		const github = seedMarketplacePlugin("github", ["issue-triage"]);
+		const older = run(undefined, []);
+		const newer = run(undefined, [github]);
+		await Promise.all([older, newer]);
+
+		expect(existsSync(path.join(agentsSkills, "github-issue-triage"))).toBe(
+			true,
+		);
+	});
+
 	it("keeps non-skill payload out of the Claude plugin dir", async () => {
 		const linear = seedMarketplacePlugin("linear", ["triage"]);
 		await run(undefined, [linear]);

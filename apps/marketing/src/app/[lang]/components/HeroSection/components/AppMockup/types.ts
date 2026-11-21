@@ -1,8 +1,10 @@
 export type ActiveDemo =
 	| "Orchestrate Parallel Agents"
+	| "Cloud Workspaces"
 	| "Automate Tasks"
-	| "Remote Access"
-	| "See Changes";
+	| "Publish Pages";
+
+export type PagePhase = "published" | "commented" | "revised";
 
 export type WorkspaceStatus = "permission" | "working" | "review";
 
@@ -14,7 +16,6 @@ export interface WorkspaceData {
 	add?: number;
 	del?: number;
 	pr?: string;
-	isActive?: boolean;
 	status?: WorkspaceStatus;
 	icon?: "cloud" | "branch";
 }
@@ -36,4 +37,5 @@ export interface AgentTab {
 
 export interface AppMockupProps {
 	activeDemo?: ActiveDemo;
+	edgeGlare?: boolean;
 }

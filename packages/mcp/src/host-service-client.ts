@@ -1,4 +1,5 @@
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
+import { isSandboxStopped } from "@superset/shared/sandbox/reach";
 import SuperJSON from "superjson";
 
 /**
@@ -6,7 +7,25 @@ import SuperJSON from "superjson";
  * address no longer leads to it (a stopped or moved sandbox). A host-service
  * error response is not this — it means the call reached the host.
  */
-export class HostServiceUnreachableError extends Error {}
+export class HostServiceUnreachableError extends Error {
+	constructor(
+		message: string,
+		readonly status: number | null = null,
+	) {
+		super(message);
+	}
+}
+
+export function canWakeAndRetry(
+	method: "query" | "mutation",
+	error: unknown,
+): boolean {
+	if (!(error instanceof HostServiceUnreachableError)) return false;
+	return (
+		method === "query" ||
+		(error.status !== null && isSandboxStopped({ status: error.status }))
+	);
+}
 
 export type HostServiceCallOptions =
 	| {
@@ -67,7 +86,7 @@ export async function hostServiceCall<TOutput>(
 		const message = `${label} returned ${response.status} for ${procedure}: ${rawBody.slice(0, 200)}`;
 		throw isTrpcErrorBody(rawBody)
 			? new Error(message)
-			: new HostServiceUnreachableError(message);
+			: new HostServiceUnreachableError(message, response.status);
 	}
 
 	type TrpcEnvelope = { result?: { data?: unknown } };

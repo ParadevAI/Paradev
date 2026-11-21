@@ -1,3 +1,4 @@
+import { terminalHostSocketPath } from "../lib/terminal-host/socket-path";
 /**
  * Terminal Host Daemon
  *
@@ -8,8 +9,8 @@
  *
  * IPC Protocol:
  * - Uses NDJSON (newline-delimited JSON) over Unix domain socket
- * - Socket: ~/.superset/terminal-host.sock
- * - Auth token: ~/.superset/terminal-host.token
+ * - Socket: ~/.paradev/terminal-host.sock
+ * - Auth token: ~/.paradev/terminal-host.token
  */
 
 import { randomBytes } from "node:crypto";
@@ -22,9 +23,8 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { createServer, type Server, Socket } from "node:net";
-import { homedir } from "node:os";
 import { join } from "node:path";
-import { SUPERSET_DIR_NAME } from "shared/constants";
+import { SUPERSET_HOME_DIR } from "../lib/app-environment";
 import { isTerminalSpawnFailedError } from "../lib/terminal/errors";
 import {
 	type CancelCreateOrAttachRequest,
@@ -57,12 +57,8 @@ import { TerminalHost } from "./terminal-host";
 
 const DAEMON_VERSION = "1.0.0";
 
-// SUPERSET_DIR_NAME is imported from shared/constants for multi-worktree support
-// This allows workspace-specific home directories (e.g., ~/.superset-my-feature)
-const SUPERSET_HOME_DIR = join(homedir(), SUPERSET_DIR_NAME);
-
 // Socket and token paths
-const SOCKET_PATH = join(SUPERSET_HOME_DIR, "terminal-host.sock");
+const SOCKET_PATH = terminalHostSocketPath(SUPERSET_HOME_DIR);
 const TOKEN_PATH = join(SUPERSET_HOME_DIR, "terminal-host.token");
 const PID_PATH = join(SUPERSET_HOME_DIR, "terminal-host.pid");
 

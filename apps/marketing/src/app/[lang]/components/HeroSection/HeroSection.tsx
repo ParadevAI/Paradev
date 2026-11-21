@@ -3,16 +3,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaApple, FaGithub } from "react-icons/fa";
+import { EdgeGlare } from "@/app/[lang]/components/EdgeGlare";
 import { track } from "@/lib/analytics";
-import { HEADLINE_VARIANTS, type HeadlineVariant } from "@/lib/hero-headline";
 import { DownloadButton } from "../DownloadButton";
 import { WaitlistModal } from "../WaitlistModal";
 import { BoidsBackground } from "./components/BoidsBackground";
 import { ProductDemo } from "./components/ProductDemo";
 import { RiseHeadline } from "./components/RiseHeadline";
-import { useHeadlineExposure } from "./hooks/useHeadlineExposure";
 
 export function HeroSection() {
 	const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
@@ -27,38 +26,6 @@ export function HeroSection() {
 	}, []);
 	const { t, i18n } = useLingui();
 
-	const headlineRef = useRef<HTMLHeadingElement>(null);
-	useHeadlineExposure(headlineRef);
-
-	const headlines: Record<HeadlineVariant, [lead: string, emphasis: string]> = {
-		control: [
-			t({ message: "Bring Any Agent" }),
-			t({ message: "Orchestrate Them All" }),
-		],
-		ide: [
-			t({
-				message: "The IDE for",
-				comment:
-					"Homepage headline, line 1 of 2. Line 2 is “Parallel Agents”; reorder the two lines if the language needs it.",
-			}),
-			t({
-				message: "Parallel Agents",
-				comment: "Homepage headline, line 2 of 2, after “The IDE for”.",
-			}),
-		],
-		army: [
-			t({
-				message: "Run an Army of",
-				comment:
-					"Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.",
-			}),
-			t({
-				message: "Coding Agents",
-				comment: "Homepage headline, line 2 of 2, after “Run an Army of”.",
-			}),
-		],
-	};
-
 	return (
 		<div>
 			<div className="relative flex flex-col items-center pt-24 sm:pt-32 lg:pt-40 pb-16 sm:pb-24 overflow-hidden">
@@ -71,12 +38,8 @@ export function HeroSection() {
 									? "/blog/superset-is-now-paradev"
 									: `/${i18n.locale}/blog/superset-is-now-paradev`
 							}
-							className="group mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
+							className="group relative mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
-							<span
-								aria-hidden="true"
-								className="size-1.5 shrink-0 rounded-full bg-brand"
-							/>
 							<span>
 								<Trans>
 									Superset is now Paradev. Also, we raised an $11.5M seed
@@ -88,27 +51,30 @@ export function HeroSection() {
 							>
 								→
 							</span>
+							<EdgeGlare className="-inset-px rounded-[inherit]" />
 						</Link>
 						<div className="space-y-4 sm:space-y-6">
-							<h1
-								ref={headlineRef}
-								className="text-[min(2.25rem,8.6vw)] sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] [word-spacing:0.15em] whitespace-pre-line text-foreground relative max-w-6xl mx-auto"
-							>
-								{HEADLINE_VARIANTS.map((variant) => (
-									<span key={variant} data-headline-variant={variant}>
-										<RiseHeadline
-											lead={headlines[variant][0]}
-											emphasis={headlines[variant][1]}
-										/>
-									</span>
-								))}
+							<h1 className="text-[min(2.25rem,8.6vw)] sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] [word-spacing:0.15em] whitespace-pre-line text-foreground relative max-w-6xl mx-auto">
+								<RiseHeadline
+									lead={t({
+										message: "Run an Army of",
+										comment:
+											"Homepage headline, line 1 of 2. Line 2 is “Coding Agents”; reorder the two lines if the language needs it.",
+									})}
+									emphasis={t({
+										message: "Coding Agents",
+										comment:
+											"Homepage headline, line 2 of 2, after “Run an Army of”.",
+									})}
+								/>
 							</h1>
 							<p
 								id="hero-subheadline"
 								className="text-base sm:text-xl font-light text-muted-foreground max-w-4xl mx-auto"
 							>
 								<Trans>
-									One workspace for Claude Code, Codex, and any coding agent.
+									The open-source workspace for Claude Code, Codex, and any
+									coding agent.
 								</Trans>
 							</p>
 						</div>

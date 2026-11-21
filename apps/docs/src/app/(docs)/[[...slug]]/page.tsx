@@ -79,7 +79,7 @@ export async function generateMetadata(
 	const pageImage = getPageImage(page).url;
 
 	return {
-		title: page.data.title,
+		title: page.data.seoTitle ?? page.data.title,
 		description: page.data.description,
 		alternates: {
 			canonical: page.url,

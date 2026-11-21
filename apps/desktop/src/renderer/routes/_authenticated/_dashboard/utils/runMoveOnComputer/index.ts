@@ -1,0 +1,1 @@
+export { runMoveOnComputer } from "./runMoveOnComputer";

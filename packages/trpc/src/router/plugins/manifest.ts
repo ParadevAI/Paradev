@@ -1,4 +1,9 @@
 import { firstPartyManifest } from "@superset/shared/plugins";
+import {
+	type RequestInit as UndiciRequestInit,
+	fetch as undiciFetch,
+} from "undici";
+import { publicOnlyAgent } from "../../lib/organization-plugins/internal-host";
 
 export const SUPERSET_EXTENSION = "superset";
 
@@ -171,6 +176,7 @@ export async function credentialFetch(
 	init: RequestInit,
 	what: string,
 	timeoutMs: number = CREDENTIAL_FETCH_TIMEOUT_MS,
+	{ publicOnly = false }: { publicOnly?: boolean } = {},
 ): Promise<Response> {
 	let parsed: URL;
 	try {
@@ -185,11 +191,17 @@ export async function credentialFetch(
 	}
 
 	const deadline = AbortSignal.timeout(timeoutMs);
-	const response = await fetch(url, {
+	const request = {
 		...init,
-		redirect: "manual",
+		redirect: "manual" as const,
 		signal: init.signal ? AbortSignal.any([init.signal, deadline]) : deadline,
-	});
+	};
+	const response = publicOnly
+		? ((await undiciFetch(url, {
+				...(request as UndiciRequestInit),
+				dispatcher: publicOnlyAgent,
+			})) as unknown as Response)
+		: await fetch(url, request);
 	if (response.status >= 300 && response.status < 400) {
 		throw new Error(
 			`${what} URL redirected to ${response.headers.get("location") ?? "an unnamed location"}; refusing to resend the credential.`,

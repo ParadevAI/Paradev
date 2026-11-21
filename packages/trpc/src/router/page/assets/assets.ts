@@ -4,9 +4,10 @@ import { fileOriginalKey } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, count, eq, sql } from "drizzle-orm";
 import { presignedPutUrl } from "../../../lib/r2";
-import { protectedProcedure, userError } from "../../../trpc";
+import { actorProcedure, personProcedure, userError } from "../../../trpc";
 import { requireActiveOrgMembership } from "../../utils/active-org";
-import { assertPageWritable } from "../access";
+import { assertPageEditable } from "../access";
+import { pageCaller, pageReader } from "../page-caller";
 import { validateAssetPaths } from "../publish-rules";
 import {
 	MAX_PAGE_ASSETS,
@@ -27,11 +28,11 @@ import {
  * belongs to the version publish is about to mint, not to the page.
  */
 export const pageAssetRouter = {
-	upload: protectedProcedure
+	upload: actorProcedure
 		.input(uploadPageFileSchema)
 		.mutation(async ({ ctx, input }) => {
-			const organizationId = await requireActiveOrgMembership(ctx);
-			const userId = ctx.session.user.id;
+			const caller = await pageCaller(ctx);
+			const { organizationId, userId } = caller;
 
 			// A document has no page to stage against and no lineage to be reused
 			// from — publish is handed its id directly.
@@ -42,7 +43,7 @@ export const pageAssetRouter = {
 			const page = await loadWritablePage({
 				pageId: input.pageId,
 				organizationId,
-				userId,
+				userId: pageReader(caller),
 			});
 			validateAssetPaths([{ path: input.path }]);
 
@@ -73,7 +74,7 @@ export const pageAssetRouter = {
 			return recorded;
 		}),
 
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(removePageAssetSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -163,7 +164,7 @@ async function loadWritablePage({
 			i18nKey: "serverError.page.pageNotFound",
 		});
 	}
-	assertPageWritable(page, userId);
+	await assertPageEditable(page, userId);
 	return page;
 }
 

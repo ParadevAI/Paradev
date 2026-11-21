@@ -7,7 +7,7 @@ export interface SandboxKeepaliveTiming {
 }
 
 const DEFAULT_TIMING: SandboxKeepaliveTiming = {
-	intervalMs: 15 * 60_000,
+	intervalMs: 5 * 60_000,
 	retryBaseMs: 30_000,
 };
 
@@ -17,11 +17,11 @@ function httpStatus(error: unknown): number | undefined {
 
 /**
  * Asks the API for more session time while the box's agents are active. The
- * API tops the session up to a full timeout, so the box stops a timeout after
- * the last activity, whether or not anyone has the workspace open.
+ * API tops the session up past the next ping, so the box stops soon after the
+ * last activity, whether or not anyone has the workspace open.
  */
 export function startSandboxKeepalive(args: {
-	keepalive: () => Promise<unknown>;
+	keepalive: (pingsEveryMs: number) => Promise<unknown>;
 	store: Pick<TerminalAgentStore, "on" | "off">;
 	timing?: Partial<SandboxKeepaliveTiming>;
 }): () => void {
@@ -44,7 +44,7 @@ export function startSandboxKeepalive(args: {
 		active = false;
 		inFlight = true;
 		try {
-			await args.keepalive();
+			await args.keepalive(timing.intervalMs);
 			failures = 0;
 			nextAt = Date.now() + timing.intervalMs;
 		} catch (error) {

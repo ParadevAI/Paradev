@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,6 +7,8 @@ import type { SandboxIdentity } from "./sandbox-self-seed";
 
 let root: string;
 let previousRunMode: string | undefined;
+let previousHome: string | undefined;
+let previousBashEnv: string | undefined;
 
 function identity(): SandboxIdentity {
 	return {
@@ -31,12 +33,21 @@ beforeEach(() => {
 	root = mkdtempSync(join(tmpdir(), "archive-hook-test-"));
 	previousRunMode = process.env.SUPERSET_HOST_RUN_MODE;
 	process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+	// The hook runs `bash -lc`; an empty HOME and no BASH_ENV keep the
+	// developer's shell startup files out of the run.
+	previousHome = process.env.HOME;
+	process.env.HOME = root;
+	previousBashEnv = process.env.BASH_ENV;
+	delete process.env.BASH_ENV;
 });
 
 afterEach(() => {
 	rmSync(root, { recursive: true, force: true });
 	if (previousRunMode === undefined) delete process.env.SUPERSET_HOST_RUN_MODE;
 	else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
+	if (previousHome === undefined) delete process.env.HOME;
+	else process.env.HOME = previousHome;
+	if (previousBashEnv !== undefined) process.env.BASH_ENV = previousBashEnv;
 });
 
 describe("runSandboxArchiveHook", () => {
@@ -47,6 +58,26 @@ describe("runSandboxArchiveHook", () => {
 		const result = await runSandboxArchiveHook(identity());
 		expect(result.status).toBe("ok");
 		expect(result.status === "ok" && result.outputTail).toBe("cloud\ndone\n");
+	});
+
+	it("logs the outcome without a multi-line command", async () => {
+		writeConfig(
+			'[archive.cloud]\nrun = """\necho ARCHIVE-LINE-ONE\necho ARCHIVE-LINE-TWO\n"""\n',
+		);
+		const printed: unknown[] = [];
+		const spy = spyOn(console, "log").mockImplementation((...args) => {
+			printed.push(...args);
+		});
+		try {
+			expect((await runSandboxArchiveHook(identity())).status).toBe("ok");
+		} finally {
+			spy.mockRestore();
+		}
+		expect(printed).toEqual([
+			expect.stringMatching(
+				/^\[sandbox\] archive hook exited 0 \(command of \d+ chars\)$/,
+			),
+		]);
 	});
 
 	it("is skipped when there is nothing to run", async () => {

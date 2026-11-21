@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -273,7 +273,7 @@ git clone https://github.com/paradevai/paradev.git
 次に、そのワークスペースのターミナルから開発セットアップを実行します:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -287,13 +287,13 @@ Neonアカウントやサードパーティの認証情報は不要です。`set
 
 ## 設定
 
-ワークスペースのセットアップ、ティアダウン、実行スクリプトは `.superset/config.json` で設定します。[完全なドキュメント](https://docs.paradev.com/setup-teardown-scripts)を参照してください。
+ワークスペースのセットアップ、ティアダウン、実行スクリプトは `.paradev/config.json` で設定します。[完全なドキュメント](https://docs.paradev.com/setup-teardown-scripts)を参照してください。
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -316,7 +316,6 @@ Neonアカウントやサードパーティの認証情報は不要です。`set
 
 ## デフォルトでプライベート
 
-- **ソース公開**: 全ソースコードはElastic License 2.0(ELv2)の下でGitHubに公開されています。
 - **明示的な接続**: どのエージェント、プロバイダー、インテグレーションを接続するかは、あなた自身が選択します。
 
 ## コントリビューション
@@ -346,4 +345,4 @@ Paradevコミュニティに参加して、サポートを受けたり、フィ�
 
 **デスクトップアプリは永久に無料です。**自分のマシンでエージェントを並列実行することに、料金がかかることは決してありません。課金があるとしても、その上に載るオプションサービスだけです。
 
-アプリ全体がこのリポジトリに[Elastic License 2.0](../LICENSE.md)の下で公開されています:使う、フォークする、改変する、チームでセルフホストする、すべて自由です。唯一できないのは、Paradev自体をサービスとして再パッケージし、他者に販売することだけです。
+アプリ全体がこのリポジトリに[MITライセンス](../LICENSE.md)の下で公開されています:使う、フォークする、改変する、セルフホストする、再配布する、すべて自由です。

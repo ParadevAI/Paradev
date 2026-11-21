@@ -5,6 +5,7 @@ import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { MOCK_ORG_ID } from "shared/constants";
 import {
@@ -112,9 +113,8 @@ export function useHostProjects(): UseHostProjectsResult {
 			networkMode: "always" as const,
 			refetchIntervalInBackground: true,
 			retry: 1,
-			queryFn: async (): Promise<HostProjectRow[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				// Normalize per-row: remote hosts on pre-local-first builds
 				// don't serve name/createdAt/updatedAt yet.
 				const rows = (
@@ -124,7 +124,7 @@ export function useHostProjects(): UseHostProjectsResult {
 				).map(normalizeHostProjectRow);
 				saveHostProjectsSnapshot(target.organizationId, target.machineId, rows);
 				return rows;
-			},
+			}),
 		})),
 	});
 

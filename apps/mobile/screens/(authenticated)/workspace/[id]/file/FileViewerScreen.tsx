@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { ActivityIndicator, ScrollView, Share, View } from "react-native";
 import { CodeBlockContent } from "@/components/ai-elements/code-block";
 import { Text } from "@/components/ui/text";
@@ -11,6 +12,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import {
 	anchorOf,
 	ToolbarAnchor,
@@ -32,7 +34,7 @@ export function FileViewerScreen() {
 			: null;
 
 	const category = (source ?? "unstaged") as ChangesetSource;
-	const shareAnchorRef = useRef<View>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
 
 	const query = useQuery({
 		// Distinct from the files-changed screen's diff-row cache: same procedure,
@@ -74,31 +76,31 @@ export function FileViewerScreen() {
 						) : null}
 					</View>
 				</Stack.Title>
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Menu
-						icon="ellipsis"
+				<HeaderToolbar placement="right">
+					<HeaderToolbar.Menu
+						icon="more"
 						accessibilityLabel={t({
 							message: "File actions",
 						})}
 					>
-						<Stack.Toolbar.MenuAction
-							icon="doc.on.doc"
+						<HeaderToolbar.MenuAction
+							icon="copy"
 							onPress={() => void Clipboard.setStringAsync(path ?? "")}
 						>
 							{t({
 								message: "Copy relative path",
 							})}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="doc.on.doc"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="copy"
 							onPress={() => void Clipboard.setStringAsync(fileName)}
 						>
 							{t({
 								message: "Copy file name",
 							})}
-						</Stack.Toolbar.MenuAction>
-						<Stack.Toolbar.MenuAction
-							icon="square.and.arrow.up"
+						</HeaderToolbar.MenuAction>
+						<HeaderToolbar.MenuAction
+							icon="share"
 							onPress={() =>
 								void Share.share(
 									{ message: contents },
@@ -107,9 +109,9 @@ export function FileViewerScreen() {
 							}
 						>
 							{t({ message: "Share via…" })}
-						</Stack.Toolbar.MenuAction>
-					</Stack.Toolbar.Menu>
-				</Stack.Toolbar>
+						</HeaderToolbar.MenuAction>
+					</HeaderToolbar.Menu>
+				</HeaderToolbar>
 			</Stack.Screen>
 			<ScrollView
 				className="bg-background flex-1"

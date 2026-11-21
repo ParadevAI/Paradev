@@ -1,1 +1,1 @@
-export { MessageEditor } from "./MessageEditor";
+export { type MessageEdit, MessageEditor } from "./MessageEditor";

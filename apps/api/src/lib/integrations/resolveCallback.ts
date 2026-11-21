@@ -22,6 +22,7 @@ type ResolveCallbackOptions<Name extends string> = {
 export type CallbackContext<Name extends string> = {
 	organizationId: string;
 	userId: string;
+	role: string;
 	url: URL;
 	params: Record<Name, string>;
 	/** The raw state token, for a flow carrying more than the identity. */
@@ -90,5 +91,14 @@ export async function resolveCallback<Name extends string>(
 		return fail("unauthorized");
 	}
 
-	return { organizationId, userId, url, params, state, exit, fail };
+	return {
+		organizationId,
+		userId,
+		role: membership.role,
+		url,
+		params,
+		state,
+		exit,
+		fail,
+	};
 }

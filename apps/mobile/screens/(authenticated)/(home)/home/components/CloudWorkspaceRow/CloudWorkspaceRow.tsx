@@ -1,10 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
+import { RowLink } from "@/components/RowLink";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceRow as CloudWorkspaceRowData } from "@/hooks/useCloudWorkspaces";
+import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
 import { cn } from "@/lib/utils";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
@@ -28,6 +31,7 @@ export function CloudWorkspaceRow({
 	now,
 	cache,
 	onCopied,
+	card = false,
 }: {
 	row: CloudWorkspaceRowData;
 	repoFullName?: string;
@@ -36,10 +40,13 @@ export function CloudWorkspaceRow({
 	now: Date;
 	cache: HostWorkspacesCacheOps;
 	onCopied: () => void;
+	/** A cell of Home's wide grid rather than a row of the Cloud list. */
+	card?: boolean;
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
-	const archived = row.status === "deleted";
+	const enlargedText = useEnlargedText();
+	const archived = isArchivedCloudWorkspaceStatus(row.status);
 	const readAt = useUnreadWorkspacesStore((state) => state.cloudReadAt[row.id]);
 	const manuallyUnread = useUnreadWorkspacesStore(
 		(state) => row.id in state.manualUnread,
@@ -76,8 +83,11 @@ export function CloudWorkspaceRow({
 
 	const body = (
 		<Pressable
-			className="bg-background flex-row items-center gap-3 rounded-xl py-2 pl-4 pr-3"
-			onPress={() => router.push(`/(authenticated)/workspace/${row.id}`)}
+			className={cn(
+				"bg-background flex-row items-center gap-3 rounded-xl pr-3",
+				card ? "py-3 pl-3" : "py-2 pl-4",
+			)}
+			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
 			ph-label="cloud-workspace-row"
 		>
 			<ProjectAvatar
@@ -93,7 +103,7 @@ export function CloudWorkspaceRow({
 						"shrink font-medium text-[15px]",
 						archived && "text-muted-foreground",
 					)}
-					numberOfLines={1}
+					numberOfLines={enlargedText ? undefined : 1}
 				>
 					{row.name || t({ message: "Untitled workspace" })}
 				</Text>
@@ -135,19 +145,23 @@ export function CloudWorkspaceRow({
 		</Pressable>
 	);
 
-	return archived ? (
-		<ArchivedCloudRowMenu row={row} cache={cache} onCopied={onCopied}>
-			{body}
-		</ArchivedCloudRowMenu>
-	) : (
-		<CloudWorkspaceRowMenu
-			row={row}
-			cache={cache}
-			isUnread={isUnread}
-			onToggleUnread={toggleUnread}
-			onCopied={onCopied}
-		>
-			{body}
-		</CloudWorkspaceRowMenu>
+	return (
+		<RowLink href={`/workspace/${row.id}`}>
+			{archived ? (
+				<ArchivedCloudRowMenu row={row} cache={cache} onCopied={onCopied}>
+					{body}
+				</ArchivedCloudRowMenu>
+			) : (
+				<CloudWorkspaceRowMenu
+					row={row}
+					cache={cache}
+					isUnread={isUnread}
+					onToggleUnread={toggleUnread}
+					onCopied={onCopied}
+				>
+					{body}
+				</CloudWorkspaceRowMenu>
+			)}
+		</RowLink>
 	);
 }

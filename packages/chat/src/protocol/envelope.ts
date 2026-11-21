@@ -59,6 +59,25 @@ export const backgroundTaskSchema = z.looseObject({
 });
 export type BackgroundTask = z.infer<typeof backgroundTaskSchema>;
 
+/**
+ * The agent's provider refused the last turn for the account's usage, and
+ * the queue waits until someone resumes it. `resetsAtMs` is when the
+ * provider said the window reopens, when it said; `resumeAtReset` is the
+ * host's promise to continue the session then on its own.
+ */
+export const usageLimitSchema = z.looseObject({
+	hitAtMs: z.number(),
+	resetsAtMs: z.number().optional(),
+	resumeAtReset: z.boolean().optional(),
+	/** When an armed resume will send: the reset plus the host's grace. */
+	resumesAtMs: z.number().optional(),
+	/** The provider's name for the window that closed, e.g. `five_hour`. */
+	window: z.string().optional(),
+	/** The model the refused request was for, as the provider names it. */
+	model: z.string().optional(),
+});
+export type UsageLimit = z.infer<typeof usageLimitSchema>;
+
 export const sessionStateSchema = z.looseObject({
 	status: sessionStatusSchema,
 	harness: z.string().min(1),
@@ -77,6 +96,11 @@ export const sessionStateSchema = z.looseObject({
 	harnessSessionId: z.string().optional(),
 	queuePaused: z.boolean().optional(),
 	queueControls: z.boolean().optional(),
+	usageLimit: usageLimitSchema.optional(),
+	/** The queue paused for a usage limit, which stays the reason after its notice is dismissed. */
+	queuePausedByLimit: z.boolean().optional(),
+	/** The queue was waiting when Paradev closed, and stays paused until someone resumes it. */
+	queuePausedByShutdown: z.boolean().optional(),
 	backgroundTasks: z.array(backgroundTaskSchema).optional(),
 	awaitingBackground: z.boolean().optional(),
 });
@@ -90,7 +114,9 @@ export const TURN_FAILURE_KINDS = [
 	"model_unavailable",
 	"context_too_long",
 	"refused",
+	"usage_limit",
 	"session_lost",
+	"host_stopped",
 	"unknown",
 ] as const;
 export const turnFailureKindSchema = z.enum(TURN_FAILURE_KINDS);
@@ -107,6 +133,17 @@ export const turnErrorSchema = z.looseObject({
 });
 export type TurnError = z.infer<typeof turnErrorSchema>;
 
+const USAGE_LIMIT_MESSAGE =
+	/(?:usage|spend|spending|monthly|weekly|daily) limits? (?:reached|exceeded)|(?:reached|hit) your (?:[\w'-]+ ){0,4}(?:usage|spend|spending) limits?|hit your (?:usage )?limit|(?:quota|credits?) (?:exceeded|exhausted|depleted)|exceeded your current quota|insufficient[_ ](?:quota|credits)|credit balance is too low/i;
+
+/** Gemini words a per-minute 429 as "exceeded your current quota" and links its rate-limit docs. */
+const RATE_LIMIT_MESSAGE = /rate[-_ ]?limit/i;
+
+/** Providers word a usage or spend refusal many ways; adapters often see only that text. */
+export function isUsageLimitMessage(message: string): boolean {
+	return USAGE_LIMIT_MESSAGE.test(message) && !RATE_LIMIT_MESSAGE.test(message);
+}
+
 export const turnSchema = z.looseObject({
 	id: z.string().min(1),
 	status: z.enum(["running", "completed", "failed", "interrupted"]),
@@ -121,11 +158,24 @@ export const turnSchema = z.looseObject({
 			costUsd: z.number().nonnegative().optional(),
 		})
 		.optional(),
+	/**
+	 * The agent's latest report on the whole session while this turn ran: how
+	 * full the context window is, and its running cost total, not this turn's.
+	 */
+	sessionUsage: z
+		.looseObject({
+			contextUsed: z.number().nonnegative(),
+			contextSize: z.number().positive(),
+			costUsd: z.number().nonnegative().optional(),
+		})
+		.optional()
+		.catch(undefined),
 	startedAtMs: z.number(),
 	completedAtMs: z.number().optional(),
 });
 export type Turn = z.infer<typeof turnSchema>;
 export type Usage = NonNullable<Turn["usage"]>;
+export type SessionUsage = NonNullable<Turn["sessionUsage"]>;
 
 export const durableEventSchema = z.discriminatedUnion("type", [
 	z.looseObject({

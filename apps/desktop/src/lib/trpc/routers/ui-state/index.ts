@@ -1,3 +1,4 @@
+import { MAX_THEME_CSS_LENGTH } from "@superset/shared/themes";
 import { TRPCError } from "@trpc/server";
 import { appState } from "main/lib/app-state";
 import type { TabsState, ThemeState } from "main/lib/app-state/schemas";
@@ -232,8 +233,9 @@ const themeSchema = z.object({
 	description: z.string().optional(),
 	type: z.enum(["dark", "light"]),
 	ui: uiColorsSchema,
-	terminal: terminalColorsSchema,
+	terminal: terminalColorsSchema.optional(),
 	editor: editorThemeSchema.optional(),
+	css: z.string().max(MAX_THEME_CSS_LENGTH).optional(),
 	isBuiltIn: z.boolean().optional(),
 	isCustom: z.boolean().optional(),
 });

@@ -3,12 +3,9 @@ title: Use with OpenRouter, Bedrock, Vertex, or Vercel
 description: Connect Paradev to Vercel AI Gateway, OpenRouter, AWS Bedrock, Google Vertex, and other providers
 ---
 
-If you're using Paradev in the terminal - any CLI agent (Claude Code, Codex, Curser Agents, etc.)
-automatically just work. That's the beauty of us being terminal first.
+Claude Code in the Paradev terminal works with these providers when the variables below are set. Other agents, such as Codex, read their own provider settings. The chat interface has its own setup flow.
 
-For the Chat UI, we have a flow for users to get started.
-
-## Chat UI
+## Chat interface
 
 1. Open the model picker at the bottom of the chat
 
@@ -30,7 +27,7 @@ See the provider sections below for the specific variables to use.
 
 ## Terminal
 
-Set environment variables in your shell profile or per workspace via **Settings > Env**.
+Set the variables below in your shell profile, or per workspace under **Settings > Env**.
 
 <Callout type="info">
 For Anthropic-compatible providers (OpenRouter, Vercel AI Gateway), set `ANTHROPIC_API_KEY` to an empty string to prevent direct Anthropic authentication.
@@ -50,7 +47,7 @@ ANTHROPIC_API_KEY=
 
 ## OpenRouter
 
-[OpenRouter](https://openrouter.ai) provides access to many models through a single API.
+Use many models through one API with [OpenRouter](https://openrouter.ai).
 
 ```bash
 ANTHROPIC_BASE_URL=https://openrouter.ai/api

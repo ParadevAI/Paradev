@@ -1,6 +1,6 @@
 # Codex App Plugin System (Apps / MCPs / Skills) — Research
 
-> Research notes compiled 2026-07-24. Goal: understand how OpenAI's Codex app implements its plugin experience so Superset can build a similar surface, layered with MintMCP-style org permission & authorization management (see [mintmcp-feature-set.md](./mintmcp-feature-set.md)).
+> Research notes compiled 2026-07-24. Goal: understand how OpenAI's Codex app implements its plugin experience so Paradev can build a similar surface, layered with MintMCP-style org permission & authorization management (see [mintmcp-feature-set.md](./mintmcp-feature-set.md)).
 >
 > Primary sources: [Codex plugins docs](https://learn.chatgpt.com/docs/plugins), [Build skills docs](https://learn.chatgpt.com/docs/build-skills.md), [Codex CLI plugin system deep-dive](https://codex.danielvaughan.com/2026/03/30/codex-cli-plugin-system/), [Enterprise admin rollout guide](https://learn.chatgpt.com/docs/enterprise/admin-setup), [OpenAI admin controls for plugins/apps](https://help.openai.com/en/articles/11509118-admin-controls-security-and-compliance-for-plugins-and-apps).
 
@@ -131,14 +131,14 @@ Where Codex stops and MintMCP-style governance begins (the opportunity):
 | Runtime monitoring | Approval prompts + logs | Live rule-based detection/blocking, PII & secret scanning |
 | Provisioning | Manual role assignment | SCIM-driven membership |
 
-### Sketch for Superset
+### Sketch for Paradev
 
 **Packaging constraint: this is an org feature — teams-only, paid.** The governance layer (org marketplace, gateway, admin policy plane, agent identities, audit) is gated to team/org plans. Individual users keep today's local conventions (`.agents/skills/`, `.mcp.json`, personal config) for free — the paid tier is what centralizes and governs them, mirroring how both Codex (Enterprise workspace controls) and MintMCP (contact-sales) monetize the admin plane rather than the client experience.
 
 1. **Catalog UX like Codex**: one "Plugins" surface with Apps / MCPs / Skills tabs; org + personal marketplaces; repo-scoped `.agents/plugins/marketplace.json` we already half-align with (`.agents/skills/`, `.mcp.json` conventions in this repo).
-2. **Gateway underneath like MintMCP**: every MCP entry in an installed plugin resolves to a Superset-gateway URL, not a local stdio command — the gateway does OAuth brokering, per-role tool filtering (virtual bundles), and tool-call audit logging.
+2. **Gateway underneath like MintMCP**: every MCP entry in an installed plugin resolves to a Paradev-gateway URL, not a local stdio command — the gateway does OAuth brokering, per-role tool filtering (virtual bundles), and tool-call audit logging.
 3. **Org policy plane**: admin console with plugin states (`INSTALLED_BY_DEFAULT` / `AVAILABLE` / `NOT_AVAILABLE`) per role, separate app-authorization approvals, and audit export. Skills are low-risk (instructions only) → lighter review lane; MCP/apps → auth'd, gated lane.
-4. **Agent identities**: sessions launched by Superset agents get their own credentialed identity at the gateway rather than impersonating the user — fixes the multi-account pain Codex users hit.
+4. **Agent identities**: sessions launched by Paradev agents get their own credentialed identity at the gateway rather than impersonating the user — fixes the multi-account pain Codex users hit.
 
 ## Sources
 

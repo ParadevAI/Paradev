@@ -14,6 +14,7 @@ import { Text } from "@/components/ui/text";
 interface QueuedPromptsProps {
 	prompts: UserMessage[];
 	paused: boolean;
+	pausedByShutdown?: boolean;
 	actionable: boolean;
 	onSteer: (itemId: string) => void;
 	onRemove: (itemId: string) => void;
@@ -23,6 +24,7 @@ interface QueuedPromptsProps {
 export function QueuedPrompts({
 	prompts,
 	paused,
+	pausedByShutdown = false,
 	actionable,
 	onSteer,
 	onRemove,
@@ -34,7 +36,11 @@ export function QueuedPrompts({
 			{paused ? (
 				<View className="mb-2 flex-row items-center gap-3 rounded-2xl bg-white/5 px-3.5 py-3">
 					<Text className="text-muted-foreground min-w-0 flex-1 text-[13px]">
-						<Trans>Queue paused because you interrupted</Trans>
+						{pausedByShutdown ? (
+							<Trans>Queue paused when Paradev closed</Trans>
+						) : (
+							<Trans>Queue paused because you interrupted</Trans>
+						)}
 					</Text>
 					{actionable ? (
 						<Pressable

@@ -6,7 +6,7 @@ import {
 import type { MachineSize } from "@superset/shared/billing";
 import { useMemo, useState } from "react";
 
-export interface AutomationDraft {
+interface AutomationDraft {
 	name: string;
 	prompt: string;
 	agent: string;
@@ -18,6 +18,7 @@ export interface AutomationDraft {
 	machineSize: MachineSize | null;
 	tags: string[];
 	continueAgentSession: boolean;
+	reuseWorkspace: boolean;
 	triggers: DraftTrigger[];
 }
 

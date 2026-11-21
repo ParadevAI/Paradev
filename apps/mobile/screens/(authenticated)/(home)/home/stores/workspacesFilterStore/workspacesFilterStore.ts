@@ -4,7 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type WorkspaceSort = "updatedAt" | "createdAt";
+/** Desktop sidebar's sort modes. Projects keep their order in every mode. */
+export type WorkspaceSort = "manual" | "active" | "created";
 
 /** Cloud is a place you scope to, not a machine you own. */
 export type WorkspaceScope = "cloud" | "host";
@@ -21,12 +22,16 @@ export const SORT_OPTIONS: {
 	label: MessageDescriptor;
 }[] = [
 	{
-		label: msg({ message: "Last updated" }),
-		value: "updatedAt",
+		label: msg({ message: "Manual order" }),
+		value: "manual",
+	},
+	{
+		label: msg({ message: "Last active" }),
+		value: "active",
 	},
 	{
 		label: msg({ message: "Date created" }),
-		value: "createdAt",
+		value: "created",
 	},
 ];
 
@@ -50,7 +55,7 @@ export const useWorkspacesFilterStore = create<WorkspacesFilterStore>()(
 		(set) => ({
 			hostFilter: null,
 			scope: "host",
-			sort: "updatedAt",
+			sort: "manual",
 			cloudStatus: "active",
 			cloudCreator: "me",
 			hasHydrated: false,
@@ -66,6 +71,19 @@ export const useWorkspacesFilterStore = create<WorkspacesFilterStore>()(
 		{
 			name: "workspaces-filter",
 			storage: createJSONStorage(() => AsyncStorage),
+			// Version 0 stored "updatedAt" as its default, so it cannot tell a
+			// choice from the default; it maps to desktop's default instead.
+			version: 1,
+			migrate: (persisted, version) => {
+				const state = persisted as Partial<
+					Omit<WorkspacesFilterStore, "sort"> & { sort: string }
+				>;
+				if (version >= 1) return state as WorkspacesFilterStore;
+				return {
+					...state,
+					sort: state.sort === "createdAt" ? "created" : "manual",
+				} as WorkspacesFilterStore;
+			},
 			partialize: ({ hostFilter, scope, sort, cloudCreator }) => ({
 				hostFilter,
 				scope,

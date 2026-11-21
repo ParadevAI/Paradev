@@ -1,1 +1,1 @@
-export { type UnreadState, unreadState } from "./unreadState";
+export { countsAsUnread, type UnreadState, unreadState } from "./unreadState";

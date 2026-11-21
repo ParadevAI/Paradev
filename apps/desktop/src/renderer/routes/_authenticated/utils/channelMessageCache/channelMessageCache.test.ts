@@ -11,11 +11,11 @@ import {
 const message = (seq: number, id = `m${seq}`): ChannelMessage => ({
 	...pendingMessage({
 		channelId: "c",
-		authorUserId: "u",
+		authorId: "u",
 		body: "hi",
 		clientId: `client-${id}`,
 		threadRootId: null,
-		mentionedUserIds: [],
+		mentionedIds: [],
 	}),
 	id,
 	seq,
@@ -25,11 +25,11 @@ describe("channel message cache", () => {
 	test("a confirmed message replaces its pending copy", () => {
 		const pending = pendingMessage({
 			channelId: "c",
-			authorUserId: "u",
+			authorId: "u",
 			body: "hi",
 			clientId: "k",
 			threadRootId: null,
-			mentionedUserIds: [],
+			mentionedIds: [],
 		});
 		const list = upsertMessage([message(1)], pending);
 		expect(list.at(-1)?.seq).toBe(PENDING_SEQ);

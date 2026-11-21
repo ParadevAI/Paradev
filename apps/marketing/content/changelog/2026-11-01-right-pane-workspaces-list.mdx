@@ -1,0 +1,86 @@
+---
+title: An Improved Right Pane and a New Workspaces List
+date: 2026-11-01
+image: /changelog/2026-11-01-right-pane-hero.png
+version: 2.0.3
+highlights:
+  - icon: layout
+    title: An improved right pane
+    description: A New Tab screen with every tool, and files that open as preview tabs you can keep
+  - icon: list-checks
+    title: A new Workspaces list
+    description: Saved views, filter chips and a Display menu to sort and group every workspace
+  - icon: bot
+    title: Group your automations
+    description: Put automations in groups, drag them between groups, and pause or delete several at once
+---
+
+## An Improved Right Pane <PRBadge url="https://github.com/superset-sh/superset/pull/8965" />
+
+The right pane keeps Changes, Files, Pages, a browser or a terminal open beside your agent, and it got easier to use.
+
+<Video src="/changelog/2026-11-01-right-pane.mp4" title="Opening Changes and a file in the right pane, then keeping the file's preview tab" />
+
+- **+** opens a New Tab screen with every tool and its hotkey, this workspace's newest pages, and its pull requests
+- Files open in a preview tab with an italic title. Click the tab to keep it <PRBadge url="https://github.com/superset-sh/superset/pull/8964" />
+- The main **+** menu has an **Open in right pane** section <PRBadge url="https://github.com/superset-sh/superset/pull/9019" />
+- It's on for everyone, and its switch is gone from **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/9008" />
+- Agents can open and arrange it too, with `superset panes` <PRBadge url="https://github.com/superset-sh/superset/pull/9204" />
+
+```bash
+superset panes open changes
+superset panes open file src/app.ts --line 42
+superset panes sidebar show --full-screen
+```
+
+Open it with ⌘⇧G for Changes or ⌘⇧B for a browser, or click **+** in the right pane.
+
+## A New Workspaces List <PRBadge url="https://github.com/superset-sh/superset/pull/9115" />
+
+The **Workspaces** page now works like an issue tracker. Pick a built-in view (**All**, **Needs me**, **Working**), add filter chips for host, project, creator or status, and save the result as your own view.
+
+- **Display** switches between list and board, groups by status, project, host or creator, and orders by the last agent message, creation time or name
+- Long lists scroll smoothly, and your choices are kept
+
+Open **Workspaces** in the sidebar.
+
+## Group Your Automations <PRBadge url="https://github.com/superset-sh/superset/pull/9210" />
+
+Automations can now live in groups. Right-click an automation and choose **Move to group**, or type a new name to create one.
+
+<Video src="/changelog/2026-11-01-automation-groups.mp4" title="Selecting three automations, moving them into a new Weekly group, then dragging one more in" />
+
+- Drag a row, or a whole selection, onto another group
+- ⌘-click to select several, then move, pause, resume or delete them at once
+- From the CLI: `superset automations update <id> --group "Daily check-ins"` <PRBadge url="https://github.com/superset-sh/superset/pull/9209" />
+
+Open **Automations** in the sidebar. Docs: [Automations](https://docs.paradev.com/automations).
+
+## Improvements
+
+- **Subagents and background work in the top bar** - one top-bar button shows the branch's pull request and opens a panel with the running subagents, background shells and pull requests from every tab <PRBadge url="https://github.com/superset-sh/superset/pull/8975" />
+- **Pull requests act as you** - merging, commenting and resolving threads use your own GitHub login, never the login of the machine that runs the workspace <PRBadge url="https://github.com/superset-sh/superset/pull/8799" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8980" />
+- **Ukrainian** - pick «Українська» in **Settings → Appearance**, contributed by [@serhii-kucherenko](https://github.com/serhii-kucherenko) <PRBadge url="https://github.com/superset-sh/superset/pull/9190" />
+- **Organization plugins** - admins sync plugins from their own GitHub repositories and offer them to members by role, in **Settings → Plugins** <PRBadge url="https://github.com/superset-sh/superset/pull/8327" />
+- **New plugins** - Resend, Peec AI, and Sazabi, contributed by [@shcallaway](https://github.com/shcallaway) <PRBadge url="https://github.com/superset-sh/superset/pull/9005" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9087" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9169" />
+- **Click a terminal link** - a plain click on a URL opens a menu to open it in the app, in your browser, or copy it <PRBadge url="https://github.com/superset-sh/superset/pull/9092" />
+- **Copy a workspace link** - right-click a workspace in the sidebar and choose **Copy → Copy link** to paste it into Linear or Slack <PRBadge url="https://github.com/superset-sh/superset/pull/9112" />
+- **Antigravity status and models** - Antigravity sessions now show their status dot and get a model and effort picker <PRBadge url="https://github.com/superset-sh/superset/pull/9070" />
+- **A faster app** - agent events and workspace switches no longer redraw the whole window, and hidden panes no longer redraw on every git change <PRBadge url="https://github.com/superset-sh/superset/pull/9202" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9149" />
+- **Lighter onboarding** - fewer screens, and no setup step when the GitHub CLI is already signed in <PRBadge url="https://github.com/superset-sh/superset/pull/9074" />
+- Experimental: turn on chat in **Settings → Experimental → Chat**, now saved to your account on every device. Chat shows how full the context window is, offers Undo per turn, draws Mermaid diagrams, and pauses at a usage limit with a **Resume at reset** button <PRBadge url="https://github.com/superset-sh/superset/pull/9162" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8929" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8941" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9083" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9109" />
+
+![The top bar's activity panel listing running subagents beside the agent](/changelog/2026-11-01-top-bar-activity.png)
+
+---
+
+**Bug fixes**
+
+- Diffs load when a change set has more than 2,000 files, and a file too large to expand now says so <PRBadge url="https://github.com/superset-sh/superset/pull/9211" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9100" />
+- Diffs no longer crash on an unchanged file or a load error <PRBadge url="https://github.com/superset-sh/superset/pull/9212" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9214" />
+- A failed desktop sign-in no longer lands on the web dashboard <PRBadge url="https://github.com/superset-sh/superset/pull/8899" />
+- Shared workspace and plugin links open the desktop app when you are signed out on the web <PRBadge url="https://github.com/superset-sh/superset/pull/8923" />
+- The Google Calendar plugin no longer loops on Connect <PRBadge url="https://github.com/superset-sh/superset/pull/8705" />
+- A check run that failed to start now counts as failed, contributed by [@akshatcoder-hash](https://github.com/akshatcoder-hash) <PRBadge url="https://github.com/superset-sh/superset/pull/8963" />
+- Codex workspace seats that share an email are kept in usage, contributed by [@tsavo-at-pieces](https://github.com/tsavo-at-pieces) <PRBadge url="https://github.com/superset-sh/superset/pull/9059" />
+- Some screens no longer show raw message ids in place of text <PRBadge url="https://github.com/superset-sh/superset/pull/9222" />

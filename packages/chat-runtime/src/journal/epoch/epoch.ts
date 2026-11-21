@@ -12,6 +12,7 @@ export type ChatSessionInit = {
 	sessionId: string;
 	scopeId: string;
 	harness: string;
+	agentConfigId?: string | null;
 	harnessSessionId?: string | null;
 	status?: SessionStatus;
 	title?: string | null;
@@ -35,12 +36,14 @@ export function openEpoch(db: ChatDb, init: ChatSessionInit): OpenedEpoch {
 			sessionId: init.sessionId,
 			scopeId: init.scopeId,
 			harness: init.harness,
+			agentConfigId: init.agentConfigId ?? null,
 			harnessSessionId: init.harnessSessionId ?? null,
 			epoch,
 			status: init.status ?? "starting",
 			title: init.title ?? null,
 			queuedCount: 0,
 			updatedAt: Date.now(),
+			closedAt: null,
 		});
 		return { epoch, minted: true };
 	}
@@ -56,6 +59,7 @@ export function openEpoch(db: ChatDb, init: ChatSessionInit): OpenedEpoch {
 		epoch,
 		init.status ?? "starting",
 		Date.now(),
+		init.agentConfigId ?? null,
 	);
 	return { epoch, minted: true };
 }

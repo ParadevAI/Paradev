@@ -39,21 +39,21 @@ export const listProjectWorktrees = protectedProcedure
 				),
 			)
 			.all();
-		const workspaceBranches = new Set(
-			workspaceRows.map((row) => row.branch).filter(Boolean),
-		);
-		const workspacePaths = new Set(
-			workspaceRows
-				.map((row) => row.worktreePath)
-				.filter(Boolean)
-				.map(normalizeWorktreePath),
-		);
+		const workspaceIdByBranch = new Map<string, string>();
+		const workspaceIdByPath = new Map<string, string>();
+		for (const row of workspaceRows) {
+			if (row.branch) workspaceIdByBranch.set(row.branch, row.id);
+			if (row.worktreePath) {
+				workspaceIdByPath.set(normalizeWorktreePath(row.worktreePath), row.id);
+			}
+		}
 		const mainRepoPath = normalizeWorktreePath(localProject.repoPath);
 
 		const worktrees: {
 			branch: string;
 			path: string;
 			hasWorkspace: boolean;
+			workspaceId: string | null;
 			isMainWorktree: boolean;
 		}[] = [];
 		for (const record of records) {
@@ -61,12 +61,15 @@ export const listProjectWorktrees = protectedProcedure
 			if (record.prunable) continue;
 			if (!record.branch) continue;
 			const normalizedPath = normalizeWorktreePath(record.path);
+			const workspaceId =
+				workspaceIdByPath.get(normalizedPath) ??
+				workspaceIdByBranch.get(record.branch) ??
+				null;
 			worktrees.push({
 				branch: record.branch,
 				path: record.path,
-				hasWorkspace:
-					workspaceBranches.has(record.branch) ||
-					workspacePaths.has(normalizedPath),
+				hasWorkspace: workspaceId !== null,
+				workspaceId,
 				isMainWorktree: normalizedPath === mainRepoPath,
 			});
 		}

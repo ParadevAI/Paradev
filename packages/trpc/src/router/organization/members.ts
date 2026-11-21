@@ -3,11 +3,11 @@ import { members, users } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq, ilike, isNull, or } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 
 export const organizationMembersRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(
 			z
 				.object({

@@ -23,15 +23,16 @@ const recipient = (
 	...overrides,
 });
 const message = (overrides: Partial<NotifyMessage> = {}): NotifyMessage => ({
-	authorUserId: "kiet",
+	authorId: "kiet",
 	body: "hello",
-	mentionedUserIds: [],
+	mentionedIds: [],
 	broadcast: null,
 	isReply: false,
 	...overrides,
 });
 const prefs = (overrides: Partial<NotifyPrefs> = {}): NotifyPrefs => ({
 	...DEFAULT_NOTIFY_PREFS,
+	notify: "mentions",
 	...overrides,
 });
 const reason = (
@@ -42,10 +43,16 @@ const reason = (
 
 describe("notifyReason", () => {
 	test("never for your own message", () => {
-		expect(reason({}, { authorUserId: ME, mentionedUserIds: [ME] })).toBeNull();
+		expect(reason({}, { authorId: ME, mentionedIds: [ME] })).toBeNull();
 	});
 
-	test("level comes from the channel, else the default", () => {
+	test("everything notifies by default", () => {
+		expect(
+			notifyReason(recipient(), DEFAULT_NOTIFY_PREFS, message(), NOW),
+		).toBe("message");
+	});
+
+	test("level comes from the channel, else the person's setting", () => {
 		expect(reason({}, {})).toBeNull();
 		expect(reason({}, {}, { notify: "all" })).toBe("message");
 		expect(reason({ notify: "all" }, {})).toBe("message");
@@ -53,11 +60,11 @@ describe("notifyReason", () => {
 	});
 
 	test("Nothing blocks even a mention", () => {
-		expect(reason({ notify: "none" }, { mentionedUserIds: [ME] })).toBeNull();
+		expect(reason({ notify: "none" }, { mentionedIds: [ME] })).toBeNull();
 	});
 
 	test("a mention or keyword gets through a mute; nothing else does", () => {
-		expect(reason({ muted: true }, { mentionedUserIds: [ME] })).toBe("mention");
+		expect(reason({ muted: true }, { mentionedIds: [ME] })).toBe("mention");
 		expect(
 			reason({ muted: true }, { body: "ship it" }, { keywords: ["ship"] }),
 		).toBe("mention");
@@ -90,18 +97,16 @@ describe("notifyReason", () => {
 		expect(reason({}, { isReply: true })).toBeNull();
 		expect(reason({ notify: "all" }, { isReply: true })).toBeNull();
 		expect(reason({ followsThread: true }, { isReply: true })).toBe("reply");
-		expect(reason({}, { isReply: true, mentionedUserIds: [ME] })).toBe(
-			"mention",
-		);
+		expect(reason({}, { isReply: true, mentionedIds: [ME] })).toBe("mention");
 		expect(reason({}, { isReply: true, broadcast: "channel" })).toBeNull();
 		expect(reason({}, { isReply: true, broadcast: "here" })).toBe("here");
 	});
 
 	test("Do Not Disturb blocks everything", () => {
 		const pausedUntil = new Date(NOW.getTime() + 60_000);
-		expect(reason({}, { mentionedUserIds: [ME] }, { pausedUntil })).toBeNull();
+		expect(reason({}, { mentionedIds: [ME] }, { pausedUntil })).toBeNull();
 		const ended = new Date(NOW.getTime() - 60_000);
-		expect(reason({}, { mentionedUserIds: [ME] }, { pausedUntil: ended })).toBe(
+		expect(reason({}, { mentionedIds: [ME] }, { pausedUntil: ended })).toBe(
 			"mention",
 		);
 	});

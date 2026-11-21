@@ -43,7 +43,7 @@ short version:
    worktree's Electron.
 2. **After boot** silence the agent notify-hook debug echoes (dev mode prints
    `[notify-hook] …` lines into TUI panes; the file is rewritten on every app launch):
-   insert `DEBUG_HOOKS_ENABLED="0"` in `superset-dev-data/hooks/notify.sh`. Revert after.
+   insert `DEBUG_HOOKS_ENABLED="0"` in `paradev-dev-data/hooks/notify.sh`. Revert after.
 3. Stage demo org over CDP: host-service `project.create` (importLocal of /tmp demo repos
    with bare-clone remotes), swap `v2SidebarProjects` placements, `workspaces.create` with
    `agents:[…]` for real sessions, `apiTrpcClient.automation.create` for demo automations.
@@ -51,7 +51,7 @@ short version:
 5. Capture scene bursts at 10fps via CDP `Page.captureScreenshot` loops. Verify frames
    differ (`cmp` first vs last) before trusting a take.
 6. CLI beat: vhs with a sandboxed `superset` shim (PATH-scoped to the dev instance via
-   `superset-dev-data/zsh/.zshrc`; never run the real CLI against a prod org for demos).
+   `paradev-dev-data/zsh/.zshrc`; never run the real CLI against a prod org for demos).
    vhs mp4 output can fail; use `.gif` output and resample with `fps=10`.
 
 ## Pipeline (assembly)

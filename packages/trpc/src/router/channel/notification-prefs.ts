@@ -2,7 +2,7 @@ import { db } from "@superset/db/client";
 import { channelNotificationPrefs } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { inArray } from "drizzle-orm";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { DEFAULT_NOTIFY_PREFS, type NotifyPrefs } from "./notify-rules";
 import { updateNotificationPrefsSchema } from "./schema";
 
@@ -25,9 +25,9 @@ async function prefsFor(userId: string): Promise<NotifyPrefs> {
 }
 
 export const channelNotificationPrefsRouter = {
-	get: protectedProcedure.query(({ ctx }) => prefsFor(ctx.session.user.id)),
+	get: personProcedure.query(({ ctx }) => prefsFor(ctx.session.user.id)),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateNotificationPrefsSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;

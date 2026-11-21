@@ -13,12 +13,20 @@ setTestEnv({ NEXT_PUBLIC_API_URL: undefined });
 type Policy = {
 	allow: Record<
 		string,
-		Array<{ transform: Array<{ headers: Record<string, string> }> }>
+		Array<{
+			match?: unknown;
+			transform: Array<{ headers: Record<string, string> }>;
+		}>
 	>;
 };
 const rules = (
 	policy: Awaited<ReturnType<typeof deriveSandboxCredentials>>["networkPolicy"],
 ) => (policy as Policy).allow;
+
+function restore(key: string, value: string | undefined): void {
+	if (value === undefined) delete process.env[key];
+	else process.env[key] = value;
+}
 
 const WORKSPACE_ID = "11111111-2222-4333-8444-555555555555";
 
@@ -132,6 +140,34 @@ describe("deriveSandboxCredentials", () => {
 		expect(JSON.stringify(managedEnv)).not.toContain("ghs_token");
 	});
 
+	test("the relay gets the same workspace credential as the API", async () => {
+		const saved = {
+			api: process.env.NEXT_PUBLIC_API_URL,
+			relay: process.env.RELAY_URL,
+		};
+		process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
+		process.env.RELAY_URL = "https://relay.example.com";
+		try {
+			const { networkPolicy } = await deriveSandboxCredentials({
+				workspaceId: WORKSPACE_ID,
+				environmentEnv: {},
+				userAgentEnv: {},
+				githubToken: null,
+				gitAuthor: author,
+			});
+			const allow = rules(networkPolicy);
+			expect(allow["relay.example.com"]).toEqual(allow["api.example.com"]);
+			expect(
+				allow["relay.example.com"]?.[0]?.transform[0]?.headers[
+					"x-superset-sandbox-credential"
+				],
+			).toStartWith(`${WORKSPACE_ID}.`);
+		} finally {
+			restore("NEXT_PUBLIC_API_URL", saved.api);
+			restore("RELAY_URL", saved.relay);
+		}
+	});
+
 	test("brokered names in the environment's variables never reach the box", async () => {
 		const { managedEnv } = await deriveSandboxCredentials({
 			workspaceId: WORKSPACE_ID,
@@ -220,6 +256,13 @@ describe("deriveSandboxCredentials for Codex", () => {
 		result: Awaited<ReturnType<typeof deriveSandboxCredentials>>,
 		path: string,
 	) => result.files.find((entry) => entry.path === path)?.content;
+	const codexConfig = (
+		result: Awaited<ReturnType<typeof deriveSandboxCredentials>>,
+	) =>
+		Bun.TOML.parse(file(result, CODEX_SYSTEM_CONFIG_PATH) ?? "") as {
+			model_provider: string;
+			model_providers: Record<string, Record<string, unknown>>;
+		};
 
 	test("a ChatGPT sign-in is a bearer swap on chatgpt.com and a login file of placeholders", async () => {
 		const result = await derive({ codexChatgpt: chatgpt });
@@ -251,7 +294,51 @@ describe("deriveSandboxCredentials for Codex", () => {
 			auth_mode: "apikey",
 			OPENAI_API_KEY: SANDBOX_CREDENTIAL_PLACEHOLDER,
 		});
-		expect(file(result, CODEX_SYSTEM_CONFIG_PATH)).toBe("");
+	});
+
+	test("an OpenAI key gets the API endpoint without WebSockets, keyed by the placeholder variable", async () => {
+		const result = await derive({
+			userAgentEnv: { OPENAI_API_KEY: "sk-mine" },
+		});
+		const config = codexConfig(result);
+		expect(config.model_provider).toBe("openai-api-key");
+		expect(config.model_providers["openai-api-key"]).toMatchObject({
+			base_url: "https://api.openai.com/v1",
+			wire_api: "responses",
+			env_key: "OPENAI_API_KEY",
+			supports_websockets: false,
+		});
+		expect(JSON.stringify(result.files)).not.toContain("sk-mine");
+	});
+
+	test("an OpenAI key with a base URL points the provider at that URL", async () => {
+		const result = await derive({
+			userAgentEnv: {
+				OPENAI_API_KEY: "sk-mine",
+				OPENAI_BASE_URL: "https://ai-gateway.vercel.sh/v1",
+			},
+		});
+		expect(codexConfig(result).model_providers["openai-api-key"]).toMatchObject(
+			{
+				base_url: "https://ai-gateway.vercel.sh/v1",
+				supports_websockets: false,
+			},
+		);
+	});
+
+	test("a ChatGPT sign-in keeps the ChatGPT provider even beside an OpenAI key", async () => {
+		const result = await derive({
+			codexChatgpt: chatgpt,
+			userAgentEnv: { OPENAI_API_KEY: "sk-mine" },
+		});
+		const config = codexConfig(result);
+		expect(config.model_provider).toBe("chatgpt");
+		expect(Object.keys(config.model_providers)).toEqual(["chatgpt"]);
+		expect(config.model_providers.chatgpt).toMatchObject({
+			base_url: "https://chatgpt.com/backend-api/codex",
+			requires_openai_auth: true,
+			supports_websockets: false,
+		});
 	});
 
 	test("an environment's Codex token is ignored like any provider credential", async () => {

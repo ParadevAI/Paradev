@@ -33,6 +33,7 @@ function makeWorkspace(
 		isPinned: false,
 		pendingTransaction: null,
 		isMine: true,
+		creator: null,
 		sandboxStatus: null,
 		...overrides,
 	};

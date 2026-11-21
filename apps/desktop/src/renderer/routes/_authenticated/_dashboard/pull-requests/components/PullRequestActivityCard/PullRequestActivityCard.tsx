@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
 import { ChevronsUpDown } from "lucide-react";
 import type { ReactNode } from "react";
+import { useNow } from "renderer/hooks/useNow";
 import { usePullRequestActivityLayout } from "../../providers/PullRequestActivityLayoutProvider";
 import { describePullRequestTime } from "../../utils/describePullRequestTime";
 import {
@@ -55,8 +56,9 @@ export function PullRequestActivityCard({
 	className,
 	children,
 }: PullRequestActivityCardProps) {
+	const now = useNow(60_000);
 	const layout = usePullRequestActivityLayout();
-	const time = describePullRequestTime(createdAt);
+	const time = describePullRequestTime(createdAt, now);
 	const hasContent = Boolean(children || replies || footer);
 	const foldable = Boolean(onCollapsedChange);
 	const folded = foldable && collapsed;

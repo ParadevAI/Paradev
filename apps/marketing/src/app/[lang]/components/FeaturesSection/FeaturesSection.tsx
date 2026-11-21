@@ -4,10 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import { AutomationsDemo } from "./components/AutomationsDemo";
 import { CliDemo } from "./components/CliDemo";
 import { FeatureDemo } from "./components/FeatureDemo";
-import { IsolationDemo } from "./components/IsolationDemo";
-import { OpenInDemo } from "./components/OpenInDemo";
 import { ParallelExecutionDemo } from "./components/ParallelExecutionDemo";
-import { RemoteWorkspacesDemo } from "./components/RemoteWorkspacesDemo";
 import { UniversalCompatibilityDemo } from "./components/UniversalCompatibilityDemo";
 import { FEATURES } from "./constants";
 
@@ -15,20 +12,17 @@ const DEMO_COMPONENTS = [
 	UniversalCompatibilityDemo,
 	ParallelExecutionDemo,
 	AutomationsDemo,
-	IsolationDemo,
-	RemoteWorkspacesDemo,
 	CliDemo,
-	OpenInDemo,
 ];
 
 export function FeaturesSection() {
 	const { t } = useLingui();
 
 	return (
-		<section id="features" className="relative py-24 sm:py-32">
+		<section id="features" className="relative py-16 sm:py-24">
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				{/* Feature Rows */}
-				<div className="space-y-24 sm:space-y-32">
+				<div className="space-y-16 sm:space-y-20">
 					{FEATURES.map((feature, index) => {
 						const isReversed = index % 2 === 1;
 						const DemoComponent = DEMO_COMPONENTS[index];

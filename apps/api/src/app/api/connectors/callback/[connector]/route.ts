@@ -69,6 +69,7 @@ export async function GET(
 			codeVerifier,
 			params: callback.params,
 			issuer: callback.url.searchParams.get("iss"),
+			clientId: carried?.clientId ?? null,
 		});
 
 		const identity = await probeIdentity(

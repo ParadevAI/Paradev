@@ -14,6 +14,7 @@ export {
 	type ChangelogEntry,
 	formatChangelogDate,
 	slugify,
+	summarizeChangelogEntry,
 } from "./changelog-utils";
 
 const CHANGELOG_DIR = path.join(process.cwd(), "content/changelog");

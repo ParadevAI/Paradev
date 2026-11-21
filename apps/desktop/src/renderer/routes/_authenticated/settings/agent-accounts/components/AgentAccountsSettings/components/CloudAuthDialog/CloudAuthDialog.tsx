@@ -13,7 +13,13 @@ import { RadioGroup, RadioGroupItem } from "@superset/ui/radio-group";
 import { toast } from "@superset/ui/sonner";
 import { ToggleGroup, ToggleGroupItem } from "@superset/ui/toggle-group";
 import { cn } from "@superset/ui/utils";
-import { Check, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+	Check,
+	ChevronDown,
+	ChevronLeft,
+	ChevronRight,
+	Terminal,
+} from "lucide-react";
 import { useCallback, useId, useState } from "react";
 import { SiVercel } from "react-icons/si";
 
@@ -29,6 +35,7 @@ import { CopyStateIcon } from "./components/CopyStateIcon";
 import { DisconnectMenu } from "./components/DisconnectMenu";
 import { ExternalTextLink } from "./components/ExternalTextLink";
 import { Field } from "./components/Field";
+import { ManualSignIn } from "./components/ManualSignIn";
 import { ProviderForm } from "./components/ProviderForm";
 import { SaveButton } from "./components/SaveButton";
 import { SavedSecret } from "./components/SavedSecret";
@@ -48,6 +55,7 @@ interface CloudAuthDialogProps {
 	save: (input: SaveCredentialInput) => Promise<unknown>;
 	signedIn: () => Promise<unknown>;
 	disconnect: () => Promise<unknown>;
+	setManual: () => Promise<unknown>;
 }
 
 export function CloudAuthDialog({
@@ -61,13 +69,16 @@ export function CloudAuthDialog({
 	save,
 	signedIn,
 	disconnect,
+	setManual,
 }: CloudAuthDialogProps) {
 	const { t } = useLingui();
 	const isClaude = presetId === "claude";
 	const [view, setView] = useState<"main" | "custom">("main");
 	const { copyToClipboard, copied: copiedCommand } = useCopyToClipboard();
 	const [baseUrlDraft, setBaseUrlDraft] = useState("");
-	const [expanded, setExpanded] = useState<CustomProvider | null>(null);
+	const [expanded, setExpanded] = useState<CustomProvider | "manual" | null>(
+		null,
+	);
 	const [tokenDraft, setTokenDraft] = useState("");
 	const [apiKeyDraft, setApiKeyDraft] = useState("");
 	const [apiKeyAdvanced, setApiKeyAdvanced] = useState(false);
@@ -139,9 +150,10 @@ export function CloudAuthDialog({
 			icon: <SiVercel className="size-4" />,
 		},
 	];
-	const customLabel = providers.find(
-		(provider) => provider.id === state.customProvider,
-	)?.label;
+	const customLabel = state.manualOn
+		? t({ message: "Manual" })
+		: providers.find((provider) => provider.id === state.customProvider)?.label;
+	const customSet = state.customSaved || state.manualOn;
 	const tokenCommand = "claude setup-token";
 
 	const optionClass = "overflow-hidden rounded-lg border border-border text-sm";
@@ -175,7 +187,7 @@ export function CloudAuthDialog({
 							<DialogDescription>
 								<Trans>
 									Route {label} through a provider you run, with the credentials
-									you hold. Saved values are handed to the agent at launch.
+									you hold, or leave its sign-in to your own tooling.
 								</Trans>
 							</DialogDescription>
 						</DialogHeader>
@@ -243,6 +255,65 @@ export function CloudAuthDialog({
 									</div>
 								);
 							})}
+							<div className={optionClass}>
+								<div className={optionRowClass}>
+									<button
+										aria-expanded={expanded === "manual"}
+										className={cn(
+											"flex flex-1 items-center gap-3 self-stretch py-3 pl-3 text-left",
+											FOCUS_RING,
+										)}
+										onClick={() =>
+											setExpanded(expanded === "manual" ? null : "manual")
+										}
+										type="button"
+									>
+										{expanded === "manual" ? (
+											<ChevronDown className="size-4 text-muted-foreground" />
+										) : (
+											<ChevronRight className="size-4 text-muted-foreground" />
+										)}
+										<span className="text-muted-foreground">
+											<Terminal className="size-4" />
+										</span>
+										<span className="font-medium">
+											<Trans>Manual</Trans>
+										</span>
+										{state.manualOn ? (
+											<Check className="size-4 text-emerald-500" />
+										) : null}
+									</button>
+									{state.manualOn ? (
+										<DisconnectMenu
+											agentLabel={label}
+											copy={{
+												action: t({ message: "Turn off manual mode" }),
+												title: t({
+													message: `Turn off manual mode for ${label}?`,
+												}),
+												description: t({
+													message: `${label} goes back to not set up. Nothing changes inside your workspaces: your script and the login it keeps stay until you remove them.`,
+												}),
+												done: t({
+													message: `Manual mode is off for ${label}.`,
+												}),
+											}}
+											credential={t({ message: "manual sign-in" })}
+											disconnect={disconnect}
+										/>
+									) : null}
+								</div>
+								{expanded === "manual" ? (
+									<div className={optionBodyClass}>
+										<ManualSignIn
+											enable={setManual}
+											label={label}
+											manualOn={state.manualOn}
+											presetId={presetId}
+										/>
+									</div>
+								) : null}
+							</div>
 						</div>
 					</>
 				) : (
@@ -250,9 +321,7 @@ export function CloudAuthDialog({
 						<DialogHeader>
 							<DialogTitle>{label}</DialogTitle>
 							<DialogDescription>
-								<Trans>
-									How {label} signs in when Paradev runs it for you.
-								</Trans>
+								<Trans>How {label} authenticates in cloud workspaces.</Trans>
 							</DialogDescription>
 						</DialogHeader>
 
@@ -263,7 +332,11 @@ export function CloudAuthDialog({
 									setReplacing(false);
 									chooseMethod(value as CloudAuthMethod);
 								}}
-								value={state.method === "custom" ? "" : state.method}
+								value={
+									state.method === "custom" || state.method === "manual"
+										? ""
+										: state.method
+								}
 							>
 								<div className={optionClass}>
 									<div className={optionRowClass}>
@@ -375,7 +448,8 @@ export function CloudAuthDialog({
 																	>
 																		<CopyStateIcon copied={copiedCommand} />
 																	</button>{" "}
-																	in a terminal and paste the token here.
+																	in a terminal and paste the token you get back
+																	here.
 																</Trans>
 															</p>
 															<div className="flex items-center gap-2">
@@ -536,13 +610,13 @@ export function CloudAuthDialog({
 								>
 									<span className="flex-1">
 										<Trans>Custom provider</Trans>
-										{state.method === "custom" && customLabel ? (
+										{customSet && customLabel ? (
 											<span className="ml-2 font-normal text-muted-foreground">
 												{customLabel}
 											</span>
 										) : null}
 									</span>
-									{state.method === "custom" && state.customSaved ? (
+									{customSet ? (
 										<Check className="size-4 text-emerald-500" />
 									) : null}
 									<ChevronRight className="size-4 text-muted-foreground" />
