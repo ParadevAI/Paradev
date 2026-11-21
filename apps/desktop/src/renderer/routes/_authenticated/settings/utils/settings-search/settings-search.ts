@@ -58,6 +58,7 @@ export const SETTING_ITEM_ID = {
 
 	GIT_BRANCH_PREFIX: "git-branch-prefix",
 	GIT_WORKTREE_LOCATION: "git-worktree-location",
+	GIT_NAMING_INSTRUCTIONS: "git-naming-instructions",
 
 	AGENTS_ENABLED: "agents-enabled",
 	AGENTS_COMMANDS: "agents-commands",
@@ -839,6 +840,25 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"storage",
 			"base",
 			"default",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.GIT_NAMING_INSTRUCTIONS,
+		section: "git",
+		title: "Naming instructions",
+		description:
+			"Account-wide instructions for AI-generated workspace and branch names",
+		keywords: [
+			"git",
+			"branch",
+			"workspace",
+			"naming",
+			"name",
+			"instructions",
+			"ai",
+			"global",
+			"prefix",
+			"ticket",
 		],
 	},
 	{

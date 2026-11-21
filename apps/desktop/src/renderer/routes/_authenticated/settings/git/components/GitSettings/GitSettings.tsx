@@ -25,6 +25,7 @@ import {
 	WorktreeLocationPicker,
 } from "../../../components/WorktreeLocationPicker";
 import { useDefaultWorktreePath } from "../../../components/WorktreeLocationPicker/useDefaultWorktreePath";
+import { GlobalNamingInstructionsSection } from "./components/GlobalNamingInstructionsSection";
 
 interface GitSettingsProps {
 	hostId: string | null;
@@ -256,6 +257,8 @@ export function GitSettings({ hostId }: GitSettingsProps) {
 					/>
 				</SettingsRow>
 			</section>
+
+			<GlobalNamingInstructionsSection />
 		</div>
 	);
 }

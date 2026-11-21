@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
+	buildInstructions,
 	generateWorkspaceNamesFromPrompt,
+	parseGeneratedWorkspaceNames,
 	resolveGeneratedBranchName,
 	trimTitle,
 } from "./ai-workspace-names";
@@ -51,15 +53,71 @@ describe("generateWorkspaceNamesFromPrompt", () => {
 	// fallback has no model to give them to and ignores them.
 	test("still derives names when the project sets naming instructions", async () => {
 		await expect(
-			generateWorkspaceNamesFromPrompt(
-				"fix the login redirect",
-				undefined,
-				"Prefix branches with fix/ and include the ticket id.",
-			),
+			generateWorkspaceNamesFromPrompt("fix the login redirect", undefined, {
+				project: "Prefix branches with fix/ and include the ticket id.",
+			}),
 		).resolves.toEqual({
 			title: "fix the login redirect",
 			branchName: "fix-the-login-redirect",
 		});
+	});
+});
+
+describe("buildInstructions", () => {
+	const global = "Prefix branches with feat/ or fix/.";
+	const project = "Include the Linear ticket id.";
+
+	test("has no custom block without instructions", () => {
+		const prompt = buildInstructions({ global: "  ", project: null });
+		expect(prompt).not.toContain("naming-instructions>");
+		expect(prompt).toContain("No prefixes.");
+	});
+
+	test("global only", () => {
+		const prompt = buildInstructions({ global });
+		expect(prompt).toContain(
+			`<global-naming-instructions>\n${global}\n</global-naming-instructions>`,
+		);
+		expect(prompt).not.toContain("<project-naming-instructions>");
+		expect(prompt).toContain('plus "/" when the naming instructions ask');
+	});
+
+	test("project only", () => {
+		const prompt = buildInstructions({ project });
+		expect(prompt).toContain(
+			`<project-naming-instructions>\n${project}\n</project-naming-instructions>`,
+		);
+		expect(prompt).not.toContain("<global-naming-instructions>");
+		expect(prompt).not.toContain("conflict with the global");
+	});
+
+	test("both, global first, and the project wins on conflict", () => {
+		const prompt = buildInstructions({ global, project });
+		const globalAt = prompt.indexOf("<global-naming-instructions>");
+		const projectAt = prompt.indexOf("<project-naming-instructions>");
+		expect(globalAt).toBeGreaterThan(-1);
+		expect(projectAt).toBeGreaterThan(globalAt);
+		expect(prompt).toContain(
+			"Where they conflict with the global naming instructions, these win",
+		);
+	});
+});
+
+describe("parseGeneratedWorkspaceNames", () => {
+	const reply = { title: "Add login", branchName: "feat/add-login" };
+
+	test("keeps a / prefix that global-only instructions ask for", () => {
+		expect(
+			parseGeneratedWorkspaceNames(reply, {
+				global: "Prefix branches with feat/.",
+			}).branchName,
+		).toBe("feat/add-login");
+	});
+
+	test("strips the / without custom instructions", () => {
+		expect(parseGeneratedWorkspaceNames(reply).branchName).toBe(
+			"featadd-login",
+		);
 	});
 });
 

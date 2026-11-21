@@ -1,0 +1,1 @@
+export { GlobalNamingInstructionsSection } from "./GlobalNamingInstructionsSection";
