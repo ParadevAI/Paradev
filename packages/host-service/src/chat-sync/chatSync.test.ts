@@ -33,10 +33,12 @@ function setup(
 	const runtime = createTestRuntime({ onAppend: (e) => appended.push(e) });
 	runtimes.push(runtime);
 	const pushes: PushInput[] = [];
+	const held: { until: Promise<void> | null } = { until: null };
 	const api = {
 		chatHistory: {
 			push: {
 				mutate: async (input: PushInput) => {
+					if (held.until) await held.until;
 					if (reject(input)) {
 						throw Object.assign(new Error("rejected"), {
 							data: { code: options.rejectCode ?? "BAD_REQUEST" },
@@ -121,6 +123,7 @@ function setup(
 		timers,
 		delays,
 		clock,
+		held,
 		appended,
 	};
 }
@@ -201,6 +204,91 @@ describe("createChatSync", () => {
 		expect(seqs(pushes)).toEqual([[1]]);
 	});
 
+	test("a tool call that finishes while a push is in flight waits a whole gap", async () => {
+		const { sync, pushes, turn, tool, note, runNext, delays, clock, held } =
+			setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 5_000;
+		tool("x", "completed");
+		note();
+		let release = () => {};
+		held.until = new Promise((resolve) => {
+			release = resolve;
+		});
+		await runNext();
+		tool("y", "completed");
+		note();
+		held.until = null;
+		release();
+		await Bun.sleep(0);
+		expect(seqs(pushes)).toEqual([[1], [2]]);
+		expect(delays).toEqual([3_000]);
+
+		clock.now = 8_000;
+		await runNext();
+		await runNext();
+		expect(seqs(pushes)).toEqual([[1], [2], [3]]);
+	});
+
+	test("a push made meanwhile moves a waiting checkpoint back", async () => {
+		const { sync, pushes, turn, tool, note, runNext, delays, clock } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 1_000;
+		tool("x", "completed");
+		note();
+		clock.now = 2_500;
+		await sync.syncSession(CHAT);
+		clock.now = 3_000;
+		await runNext();
+		expect(delays).toEqual([2_500]);
+		expect(seqs(pushes)).toEqual([[1], [2]]);
+	});
+
+	test("a waiting checkpoint does nothing once the API drops the gap", async () => {
+		const { sync, pushes, turn, tool, note, runNext, timers, clock } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		turn("running");
+		note();
+		await runNext();
+
+		clock.now = 1_000;
+		tool("x", "completed");
+		note();
+		sync.setCheckpointGap(null);
+		clock.now = 3_000;
+		await runNext();
+		expect(timers).toHaveLength(0);
+		expect(seqs(pushes)).toEqual([[1]]);
+	});
+
+	test("an info notice waits for the next push", async () => {
+		const { runtime, sync, note, runNext, timers } = setup();
+		sync.setCheckpointGap(3_000);
+		sync.start();
+		await runNext();
+		runtime.journal.append(CHAT, {
+			type: "item",
+			turnId: "t",
+			item: { id: "n", kind: "notice", noticeKind: "info", startedAtMs: 0 },
+		});
+		note();
+		expect(timers).toHaveLength(0);
+	});
+
 	test.each<[string, DurableEvent]>([
 		[
 			"asks its user something",
@@ -218,7 +306,7 @@ describe("createChatSync", () => {
 			},
 		],
 		[
-			"posts a notice",
+			"reports an error",
 			{
 				type: "item",
 				turnId: "t",

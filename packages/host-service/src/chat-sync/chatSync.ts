@@ -1,4 +1,8 @@
-import type { DurableEnvelope, ToolCall } from "@superset/chat/protocol";
+import type {
+	DurableEnvelope,
+	Notice,
+	ToolCall,
+} from "@superset/chat/protocol";
 import {
 	type ChatDb,
 	type ChatRuntime,
@@ -28,9 +32,9 @@ export type ChatSync = {
 	syncSession(sessionId: string): Promise<void>;
 	/**
 	 * Records an append. A chat is pushed at once when a turn starts or ends,
-	 * its title or status changes, or it asks its user something. A finished
-	 * tool call pushes it at most once per checkpoint gap. The rest waits in
-	 * the journal. A chat that is moving pushes every append.
+	 * its title or status changes, it asks its user something or it reports an
+	 * error. A finished tool call pushes it at most once per checkpoint gap. The
+	 * rest waits in the journal. A chat that is moving pushes every append.
 	 */
 	noteAppend(envelope: DurableEnvelope): void;
 	/** Keeps pushing every chat that changes, retrying with backoff. */
@@ -171,7 +175,7 @@ export function createChatSync(args: {
 				});
 				writePushed(db, sessionId, session.epoch, ackedSeq);
 				lastPushAt.set(sessionId, now());
-				return true;
+				return rows.length === batchEvents || events.length < rows.length;
 			} catch (error) {
 				const code = errorCode(error);
 				if (!code || !REJECTED_CODES.has(code)) throw error;
@@ -325,7 +329,10 @@ export function createChatSync(args: {
 			return changed ? "now" : null;
 		}
 		const { item } = event;
-		if (item.kind === "approval_request" || item.kind === "notice") {
+		if (
+			item.kind === "approval_request" ||
+			(item.kind === "notice" && (item as Notice).noticeKind === "error")
+		) {
 			return "now";
 		}
 		if (item.kind === "tool_call" && (item as ToolCall).status !== "running") {
@@ -334,18 +341,25 @@ export function createChatSync(args: {
 		return null;
 	};
 
-	/** Never brings a push forward past a retry that is waiting out a failure. */
+	/**
+	 * Waits out the gap from the chat's latest push, counting one in flight as
+	 * just made. Never brings a push forward past a retry waiting out a failure.
+	 */
 	const checkpoint = (sessionId: string) => {
 		if (checkpointGapMs === null || checkpoints.has(sessionId)) return;
-		const push = () => {
+		const due = () => {
 			checkpoints.delete(sessionId);
+			if (checkpointGapMs === null) return;
+			const last = inFlight.has(sessionId) ? now() : lastPushAt.get(sessionId);
+			const wait = last === undefined ? 0 : last + checkpointGapMs - now();
+			if (wait > 0) {
+				checkpoints.set(sessionId, schedule(due, wait));
+				return;
+			}
 			dirty.add(sessionId);
 			wake(SETTLE_MS);
 		};
-		const last = lastPushAt.get(sessionId);
-		const wait = last === undefined ? 0 : last + checkpointGapMs - now();
-		if (wait <= 0) push();
-		else checkpoints.set(sessionId, schedule(push, wait));
+		due();
 	};
 
 	const cancelCheckpoint = (sessionId: string) => {
