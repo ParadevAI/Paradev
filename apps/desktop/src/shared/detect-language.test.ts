@@ -9,6 +9,9 @@ describe("detectLanguage", () => {
 		expect(detectLanguage("apps/web/.env.test")).toBe("shell");
 		expect(detectLanguage("C:\\repo\\.ENV.LOCAL")).toBe("shell");
 		expect(detectLanguage("production.env")).toBe("shell");
+		expect(detectLanguage(".env-sample")).toBe("shell");
+		expect(detectLanguage(".env_test")).toBe("shell");
+		expect(detectLanguage(".envrc")).toBe("shell");
 	});
 
 	test("keeps a known extension ahead of the dotenv prefix", () => {
@@ -20,5 +23,7 @@ describe("detectLanguage", () => {
 		expect(detectLanguage("config.local")).toBe("plaintext");
 		expect(detectLanguage("settings.test")).toBe("plaintext");
 		expect(detectLanguage("env.local")).toBe("plaintext");
+		expect(detectLanguage(".environment")).toBe("plaintext");
+		expect(detectLanguage(".envoy")).toBe("plaintext");
 	});
 });

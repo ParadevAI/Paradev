@@ -42,6 +42,7 @@ const languageByExtension = new Map(
 		zsh: "shell",
 		fish: "shell",
 		env: "shell",
+		envrc: "shell",
 
 		// Config
 		dockerfile: "dockerfile",
@@ -67,11 +68,13 @@ const languageByExtension = new Map(
 	}),
 );
 
+const dotenvFileName = /^\.env(?![a-z0-9])/;
+
 /**
  * Language id for the CodeMirror editor, from the file's basename: a known
  * extension wins (`Dockerfile.md` is markdown), then a known stem
- * (`Dockerfile.prod` is a Dockerfile), then a `.env` prefix (`.env.local` is
- * shell), else `"plaintext"`.
+ * (`Dockerfile.prod` is a Dockerfile), then a `.env` name (`.env.local` is
+ * shell, `.environment` is not), else `"plaintext"`.
  */
 export function detectLanguage(filePath: string): string {
 	const fileName = filePath.split(/[/\\]/).pop()?.toLowerCase() ?? "";
@@ -80,6 +83,6 @@ export function detectLanguage(filePath: string): string {
 	return (
 		languageByExtension.get(ext) ??
 		languageByStem.get(stem) ??
-		(fileName.startsWith(".env") ? "shell" : "plaintext")
+		(dotenvFileName.test(fileName) ? "shell" : "plaintext")
 	);
 }
