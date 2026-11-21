@@ -2,6 +2,7 @@ import { SUPERSET_RELAYED_HEADER } from "@superset/shared/host-routing";
 import {
 	describeRelayClose,
 	type HttpDialFrame,
+	RELAY_CLOSE,
 	RELAY_CONNECT_TIMEOUT_MS,
 	type StreamDial,
 	type StreamDialFailed,
@@ -26,6 +27,10 @@ const URL_PROVIDER_STEP_TIMEOUT_MS = 15_000;
 // Partysocket retries every few seconds while the relay is unreachable, and
 // each lookup is an API call; one per window is enough to follow a relay move.
 const RELAY_RESOLVE_INTERVAL_MS = 5 * 60_000;
+// The relay also answers 4403 when it cannot reach the API, and a refused
+// connect opens before it closes.
+const FORBIDDEN_RETRY_BASE_MS = 30_000;
+const FORBIDDEN_RETRY_MAX_MS = 5 * 60_000;
 
 function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
 	return Promise.race([
@@ -37,6 +42,13 @@ function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
 			).unref?.();
 		}),
 	]);
+}
+
+function sleep(ms: number): Promise<void> {
+	if (ms <= 0) return Promise.resolve();
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms).unref?.();
+	});
 }
 const DIAL_ATTEMPTS = 2;
 const MAX_BUFFERED_FRAMES = 256;
@@ -62,6 +74,7 @@ export interface TunnelClientOptions {
 	 * while an ordinary reconnect costs no API call. On failure the last known
 	 * URL is reused. */
 	resolveRelayUrl?: () => Promise<string>;
+	onForbidden?: (reason: string) => Promise<void>;
 }
 
 function toWs(url: string): string {
@@ -82,6 +95,8 @@ export class TunnelClient {
 	private relayUrl: string;
 	private lastAttemptOpened = true;
 	private lastRelayResolveAt = Number.NEGATIVE_INFINITY;
+	private forbiddenRecovery: Promise<void> | null = null;
+	private forbiddenCloses = 0;
 	private closed = false;
 
 	constructor(options: TunnelClientOptions) {
@@ -100,6 +115,8 @@ export class TunnelClient {
 				maxReconnectionDelay: 5_000,
 				minReconnectionDelay: 1_000,
 				connectionTimeout: RELAY_CONNECT_TIMEOUT_MS,
+				shouldReconnectOnClose: (event) =>
+					event.code !== RELAY_CLOSE.forbidden || !this.options.onForbidden,
 			},
 		);
 		this.control = control;
@@ -115,6 +132,7 @@ export class TunnelClient {
 
 		control.addEventListener("message", (event) => {
 			this.lastInboundAt = Date.now();
+			this.forbiddenCloses = 0;
 			let message: StreamDial | { type: "pong" };
 			try {
 				message = JSON.parse(String(event.data));
@@ -140,6 +158,9 @@ export class TunnelClient {
 				retrying: !this.closed,
 			});
 			this.connectedAt = 0;
+			if (event.code === RELAY_CLOSE.forbidden) {
+				this.recoverFromForbidden(event.reason);
+			}
 		});
 
 		this.pingTimer = setInterval(() => {
@@ -157,6 +178,10 @@ export class TunnelClient {
 					);
 					control.reconnect();
 				}
+				return;
+			}
+			if (this.forbiddenRecovery) {
+				this.notOpenSince = null;
 				return;
 			}
 			this.notOpenSince ??= Date.now();
@@ -182,6 +207,31 @@ export class TunnelClient {
 	private markOpened(): void {
 		this.lastAttemptOpened = true;
 		this.lastRelayResolveAt = Number.NEGATIVE_INFINITY;
+	}
+
+	private recoverFromForbidden(reason: string): void {
+		const { onForbidden } = this.options;
+		if (!onForbidden || this.forbiddenRecovery || this.closed) return;
+		const delay =
+			this.forbiddenCloses === 0
+				? 0
+				: Math.min(
+						FORBIDDEN_RETRY_BASE_MS * 2 ** (this.forbiddenCloses - 1),
+						FORBIDDEN_RETRY_MAX_MS,
+					);
+		this.forbiddenCloses++;
+		this.forbiddenRecovery = onForbidden(reason)
+			.catch((error) => {
+				console.warn(
+					"[host-service:tunnel] forbidden recovery failed; reconnecting anyway:",
+					error instanceof Error ? error.message : error,
+				);
+			})
+			.then(() => sleep(delay))
+			.then(() => {
+				this.forbiddenRecovery = null;
+				if (!this.closed) this.control?.reconnect();
+			});
 	}
 
 	private async buildControlUrl(): Promise<string> {

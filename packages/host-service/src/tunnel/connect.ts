@@ -44,52 +44,41 @@ async function resolveRelayUrl(
 	return fallback;
 }
 
+const REGISTER_ATTEMPT_TIMEOUT_MS = 30_000;
 const REGISTER_RETRY_BASE_MS = 30_000;
 const REGISTER_RETRY_MAX_MS = 5 * 60_000;
 
-export async function connectRelay(
-	options: ConnectRelayOptions,
-): Promise<TunnelClient | null> {
-	// Registration is what makes this host exist server-side (hosts list,
-	// automations, relay routing). A one-shot attempt left a transient API
-	// failure at boot permanently stranding the host as locally-healthy but
-	// cloud-invisible (issue #6415) — so retry with backoff until it lands,
-	// and record the outcome where health.check can report it.
+// Registration is what makes this host exist server-side (hosts list,
+// automations, relay routing). A one-shot attempt left a transient API
+// failure at boot permanently stranding the host as locally-healthy but
+// cloud-invisible (issue #6415) — so retry with backoff until it lands,
+// and record the outcome where health.check can report it.
+export async function registerHost(
+	options: Pick<ConnectRelayOptions, "api" | "organizationId" | "signal">,
+	attemptTimeoutMs = REGISTER_ATTEMPT_TIMEOUT_MS,
+): Promise<{ machineId: string } | null> {
 	for (let attempt = 0; !options.signal?.aborted; attempt++) {
+		const deadline = AbortSignal.timeout(attemptTimeoutMs);
 		try {
 			const host = await options.api.host.ensure.mutate(
 				{
 					organizationId: options.organizationId,
 					machineId: getHostId(),
 					name: getHostName(),
-					// Registration runs once per process and a restart re-registers,
-					// so the cloud remembers the last build that reported its version.
 					version: HOST_SERVICE_VERSION,
 					platform: `${os.platform()}-${os.arch()}`,
 					installSource: getHostInstallSource(),
 				},
-				{ signal: options.signal },
+				{
+					signal: options.signal
+						? AbortSignal.any([options.signal, deadline])
+						: deadline,
+				},
 			);
 			if (options.signal?.aborted) return null;
 			recordRegistrationSuccess();
 			console.log(`[host-service] registered as host ${host.machineId}`);
-
-			const relayUrl = await resolveRelayUrl(options.api, options.relayUrl);
-			if (options.signal?.aborted) return null;
-			console.log(`[host-service] relay: ${relayUrl}`);
-
-			const clientOptions = {
-				relayUrl,
-				hostId: buildHostRoutingKey(options.organizationId, host.machineId),
-				getAuthToken: () => options.authProvider.getJwt(),
-				localPort: options.localPort,
-				hostServiceSecret: options.hostServiceSecret,
-				resolveRelayUrl: () => resolveRelayUrl(options.api, options.relayUrl),
-			};
-
-			const tunnel = new TunnelClient(clientOptions);
-			void tunnel.connect();
-			return tunnel;
+			return host;
 		} catch (error) {
 			if (options.signal?.aborted) return null;
 			recordRegistrationFailure(error);
@@ -98,7 +87,7 @@ export async function connectRelay(
 				REGISTER_RETRY_MAX_MS,
 			);
 			console.error(
-				`[host-service] failed to register/connect relay (retrying in ${Math.round(delay / 1000)}s):`,
+				`[host-service] failed to register host (retrying in ${Math.round(delay / 1000)}s):`,
 				error,
 			);
 			// unref: the HTTP server keeps the process alive between retries;
@@ -110,4 +99,33 @@ export async function connectRelay(
 		}
 	}
 	return null;
+}
+
+export async function connectRelay(
+	options: ConnectRelayOptions,
+): Promise<TunnelClient | null> {
+	const host = await registerHost(options);
+	if (!host) return null;
+
+	const relayUrl = await resolveRelayUrl(options.api, options.relayUrl);
+	if (options.signal?.aborted) return null;
+	console.log(`[host-service] relay: ${relayUrl}`);
+
+	const tunnel = new TunnelClient({
+		relayUrl,
+		hostId: buildHostRoutingKey(options.organizationId, host.machineId),
+		getAuthToken: () => options.authProvider.getJwt(),
+		localPort: options.localPort,
+		hostServiceSecret: options.hostServiceSecret,
+		resolveRelayUrl: () => resolveRelayUrl(options.api, options.relayUrl),
+		onForbidden: async (reason) => {
+			recordRegistrationFailure(new Error(`relay refused host: ${reason}`));
+			console.warn(
+				`[host-service] relay refused this host (${reason}); re-registering`,
+			);
+			await registerHost(options);
+		},
+	});
+	void tunnel.connect();
+	return tunnel;
 }
