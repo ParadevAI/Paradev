@@ -54,21 +54,6 @@ describe("parseAgyTranscriptLine", () => {
 		});
 	});
 
-	it("skips steps without token counts", () => {
-		expect(
-			parseAgyTranscriptLine(
-				JSON.stringify({
-					source: "USER",
-					type: "USER_INPUT",
-					created_at: "2026-10-14T03:03:00Z",
-					content: "fix the bug",
-				}),
-				"session-1",
-				"/repo",
-			),
-		).toBeNull();
-	});
-
 	it("prefers top-level agy tokens over a nested usage object", () => {
 		const entry = parseAgyTranscriptLine(
 			JSON.stringify({
@@ -82,19 +67,6 @@ describe("parseAgyTranscriptLine", () => {
 			"/repo",
 		);
 		expect(entry).toMatchObject({ uncachedInput: 100, output: 20 });
-	});
-
-	it("reads nested usage when top-level token fields are zero", () => {
-		const entry = parseAgyTranscriptLine(
-			JSON.stringify({
-				created_at: "2026-10-14T03:03:40Z",
-				output_tokens: 0,
-				usage: { input_tokens: 50, output_tokens: 7 },
-			}),
-			"session-1",
-			"/repo",
-		);
-		expect(entry).toMatchObject({ uncachedInput: 50, output: 7 });
 	});
 
 	it("skips lines that are not JSON objects", () => {

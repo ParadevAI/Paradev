@@ -170,7 +170,6 @@ const RATES_BY_AGENT: Record<UsageAgent, Record<string, ModelRate>> = {
 	hermes: MULTI_AGENT_RATES,
 };
 
-// agy transcripts carry no model id, so price them as Gemini Pro.
 const UNKNOWN_MODEL_RATES: Partial<Record<UsageAgent, ModelRate>> = {
 	agy: AGY_RATES["gemini-3.1-pro"],
 };
