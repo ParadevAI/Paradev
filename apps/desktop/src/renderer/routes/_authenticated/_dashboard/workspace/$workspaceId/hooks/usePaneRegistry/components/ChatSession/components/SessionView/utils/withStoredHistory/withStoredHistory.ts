@@ -13,18 +13,39 @@ export function storedIsAhead(
 	);
 }
 
+/** `current` with every item of `earlier` before its first one in front, if the two overlap. */
+function inFront(
+	earlier: SessionSnapshot,
+	current: SessionSnapshot,
+): SessionSnapshot {
+	const first = current.items.keys().next().value;
+	if (first === undefined || !earlier.items.has(first)) return current;
+	const items = new Map<string, StoredItem>();
+	for (const [id, entry] of earlier.items) {
+		if (id === first) break;
+		items.set(id, entry);
+	}
+	for (const [id, entry] of current.items) items.set(id, entry);
+	return {
+		...current,
+		items,
+		turns: new Map([...earlier.turns, ...current.turns]),
+	};
+}
+
 /**
  * The live chat with the stored history in front of it: every stored item
  * before the first one the host sent, then the host's own. Items keep their
  * ids, so rows the live chat takes over update in place instead of
  * remounting. A host that started a new epoch shows only its own. A stored
- * chat further along than the live one shows instead, until the host catches up.
+ * chat further along than the live one shows instead, with the live one's
+ * older items in front, until the host catches up.
  */
 export function withStoredHistory(
 	stored: SessionSnapshot,
 	live: SessionSnapshot,
 ): SessionSnapshot {
-	if (live.items.size === 0 || storedIsAhead(stored, live))
+	if (live.items.size === 0)
 		return { ...stored, session: live.session ?? stored.session };
 	if (
 		live.cursor &&
@@ -33,17 +54,11 @@ export function withStoredHistory(
 	) {
 		return live;
 	}
-	const firstLive = live.items.keys().next().value;
-	if (firstLive === undefined || !stored.items.has(firstLive)) return live;
-	const items = new Map<string, StoredItem>();
-	for (const [id, entry] of stored.items) {
-		if (id === firstLive) break;
-		items.set(id, entry);
+	if (storedIsAhead(stored, live)) {
+		return {
+			...inFront(live, stored),
+			session: live.session ?? stored.session,
+		};
 	}
-	for (const [id, entry] of live.items) items.set(id, entry);
-	return {
-		...live,
-		items,
-		turns: new Map([...stored.turns, ...live.turns]),
-	};
+	return inFront(stored, live);
 }
