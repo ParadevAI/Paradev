@@ -309,11 +309,11 @@ local_write_config_overlay() {
   local path="$PARADEV_SCRIPT_DIR/config.local.json"
   local overlay='{"setup":["./.paradev/setup.local.sh"],"teardown":["./.paradev/teardown.local.sh"]}'
   local merged
-  if [ -f "$path" ]; then
+  if [ -f "$path" ] && grep -q '[^[:space:]]' "$path"; then
     merged="$(jq -s --argjson overlay "$overlay" \
       'if length == 1 and (.[0] | type) == "object" then .[0] * $overlay else error("not one JSON object") end' \
       "$path")" || {
-      error "$path must contain exactly one JSON object"
+      error "$path must contain exactly one JSON object; fix it or delete it, then re-run setup"
       return 1
     }
   else
