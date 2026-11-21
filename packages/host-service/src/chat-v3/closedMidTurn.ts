@@ -1,4 +1,4 @@
-import { CONTINUE_PROMPT, withoutRepeatedContinue } from "@superset/chat/core";
+import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import type { ClosedChat } from "./resumeAfterUpdate";
 
@@ -48,10 +48,10 @@ export function createClosedMidTurn(options: {
 
 	const resumeOne = async (chat: ClosedChat, paused: Paused) => {
 		const runtime = options.runtime();
-		const continued = withoutRepeatedContinue([
+		const continued = [
 			...(chat.interrupted ? [CONTINUE] : []),
 			...chat.prompts,
-		]);
+		];
 		const onlyQueue = continued.length === 0;
 		const prompts = onlyQueue ? chat.pausedPrompts : continued;
 		const pausedPrompts = onlyQueue ? [] : chat.pausedPrompts;

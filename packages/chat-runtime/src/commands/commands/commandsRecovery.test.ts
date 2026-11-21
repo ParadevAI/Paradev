@@ -447,23 +447,45 @@ describe("a queue a quit cut off", () => {
 	});
 });
 
-describe("a chat resumed more than once", () => {
-	test("is told to continue once", async () => {
+describe("a continue that was still waiting at a quit", () => {
+	const FOLLOW_UP = [{ type: "text" as const, text: "and the docs" }];
+	const PROCEED = [{ type: "text" as const, text: CONTINUE_PROMPT }];
+
+	test("is not carried over: the resume says it once, before the rest of the queue", async () => {
+		const dataDir = mkdtempSync(join(tmpdir(), "chat-runtime-"));
 		const replays: FakeHarness[] = [];
-		const runtime = createTestRuntime({ harnesses: hangingRegistry(replays) });
-		const cutOff = await startTurn(runtime);
-		await runtime.live.disposeAll();
-		const replacement = createChat(runtime, cutOff.sessionId);
-		const live = runtime.live.require(replacement.sessionId);
-		const proceed = [{ type: "text" as const, text: CONTINUE_PROMPT }];
+		const harnesses = hangingRegistry(replays);
+		const open = () =>
+			createChatRuntime({ dataDir, openDatabase: createBunChatDb, harnesses });
+		const quit = open();
+		const cutOff = await startTurn(quit);
+		for (const content of [FOLLOW_UP, PROCEED, PROCEED]) {
+			quit.commands.prompt({
+				commandId: randomUUID(),
+				sessionId: cutOff.sessionId,
+				clientId: randomUUID(),
+				content,
+			});
+		}
 
-		live.promptOnceStarted([proceed]);
-		live.promptOnceStarted([proceed, proceed]);
-		await waitFor(() => replays.at(-1)?.prompted.length === 1);
+		const relaunched = open();
+		const replacement = createChat(relaunched, cutOff.sessionId);
+		await waitFor(
+			() => relaunched.live.get(replacement.sessionId)?.state.status === "idle",
+		);
+		const live = relaunched.live.require(replacement.sessionId);
+		expect(live.queueState.prompts.map((prompt) => prompt.content)).toEqual([
+			FOLLOW_UP,
+		]);
 
-		expect(replays.at(-1)?.prompted).toEqual([proceed]);
-		expect(live.queuedCount).toBe(0);
-		await runtime.dispose();
+		live.promptOnceStarted([PROCEED, FOLLOW_UP], []);
+
+		expect(replays.at(-1)?.prompted).toEqual([PROCEED]);
+		expect(live.queueState.prompts.map((prompt) => prompt.content)).toEqual([
+			FOLLOW_UP,
+		]);
+		await relaunched.dispose();
+		await quit.dispose();
 	});
 });
 

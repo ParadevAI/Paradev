@@ -6,6 +6,7 @@ import {
 	deriveQueuedPrompts,
 	deriveTimeline,
 	emptySnapshot,
+	isContinuePrompt,
 	isStartingMode,
 	outlineSnapshot,
 	reduceMany,
@@ -206,7 +207,8 @@ function carriedFrom(
 	}
 	const queued = deriveQueuedPrompts(snapshot)
 		.sort((a, b) => a.startedAtMs - b.startedAtMs)
-		.map((message) => message.content);
+		.map((message) => message.content)
+		.filter((content) => !isContinuePrompt(content));
 	return {
 		turn: failedLastTurn(snapshot),
 		canceledToolIds,

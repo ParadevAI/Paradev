@@ -7,7 +7,7 @@ import {
 } from "node:fs";
 import {
 	CONTINUE_AFTER_UPDATE_PROMPT,
-	withoutRepeatedContinue,
+	withoutWaitingContinues,
 } from "@superset/chat/core";
 import { userContentSchema } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
@@ -97,12 +97,12 @@ export function resumeUnfinishedChats(options: {
 				...session,
 				sourceSessionId: chat.sessionId,
 				cwd: options.resolveCwd(session.scopeId),
-				prompts: withoutRepeatedContinue([
+				prompts: [
 					...(interrupted
 						? [[{ type: "text" as const, text: CONTINUE_AFTER_UPDATE_PROMPT }]]
 						: []),
 					...prompts,
-				]),
+				],
 			});
 			resumed++;
 		} catch (error) {
@@ -127,7 +127,8 @@ const closedChatSchema = sessionSchema
 		sessionId: z.string().min(1),
 		interrupted: z.boolean().default(true),
 		prompts: z.array(z.array(userContentSchema).min(1)).default([]),
-	});
+	})
+	.transform(withoutWaitingContinues);
 
 export type ClosedChat = z.infer<typeof closedChatSchema>;
 

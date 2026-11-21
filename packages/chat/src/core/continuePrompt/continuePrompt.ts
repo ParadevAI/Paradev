@@ -14,15 +14,27 @@ export function isContinuePrompt(content: UserContent[]): boolean {
 	);
 }
 
-export function withoutRepeatedContinue(
-	prompts: UserContent[][],
-	alreadyWaiting = false,
-): UserContent[][] {
-	let waiting = alreadyWaiting;
-	return prompts.filter((content) => {
-		if (!isContinuePrompt(content)) return true;
-		if (waiting) return false;
-		waiting = true;
-		return true;
-	});
+export type CutOffWork = {
+	interrupted: boolean;
+	prompts: UserContent[][];
+	pausedPrompts: UserContent[][];
+};
+
+/**
+ * A continue that was still waiting is not carried over: the chat counts as
+ * interrupted, and the resume says it once.
+ */
+export function withoutWaitingContinues<Work extends CutOffWork>(
+	work: Work,
+): Work {
+	const waiting = [...work.prompts, ...work.pausedPrompts];
+	if (!waiting.some(isContinuePrompt)) return work;
+	const rest = (prompts: UserContent[][]) =>
+		prompts.filter((content) => !isContinuePrompt(content));
+	return {
+		...work,
+		interrupted: true,
+		prompts: rest(work.prompts),
+		pausedPrompts: rest(work.pausedPrompts),
+	};
 }
