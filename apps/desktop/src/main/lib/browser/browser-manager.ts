@@ -21,9 +21,13 @@ import {
 import { DesignModeController } from "./design-mode-controller";
 import { captureDesignModeScreenshot } from "./design-mode-screenshot";
 import { buildDesignModeScript } from "./design-mode-script";
-import { createFocusForward, FOCUS_FORWARD_WORLD_ID } from "./focus-forward";
+import { watchGuestMouseDown } from "./focus-forward";
 import { buildGuestContextMenu } from "./guest-context-menu";
 import { markBrowserPanePopup, shouldOpenAsPopup } from "./popup-window";
+import {
+	createViewportZoomForward,
+	VIEWPORT_ZOOM_WORLD_ID,
+} from "./viewport-zoom-forward";
 
 interface ConsoleEntry {
 	level: "log" | "warn" | "error" | "info" | "debug";
@@ -262,6 +266,7 @@ class BrowserManager extends EventEmitter {
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
+	private viewportZoomListeners = new Map<string, () => void>();
 	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
 	private requestedPanes = new Set<string>();
@@ -291,6 +296,7 @@ class BrowserManager extends EventEmitter {
 				this.navigationListeners,
 				this.popupListeners,
 				this.focusListeners,
+				this.viewportZoomListeners,
 				this.formEditListeners,
 			]) {
 				const cleanup = map.get(paneId);
@@ -318,6 +324,7 @@ class BrowserManager extends EventEmitter {
 			this.setupBeforeInput(paneId, wc);
 			this.setupNavigationGuard(paneId, wc);
 			this.setupFocusForward(paneId, wc);
+			this.setupViewportZoom(paneId, wc);
 			this.setupFormEditTracking(paneId, wc);
 		}
 		this.emit("pane-registered", {
@@ -335,6 +342,7 @@ class BrowserManager extends EventEmitter {
 			this.navigationListeners,
 			this.popupListeners,
 			this.focusListeners,
+			this.viewportZoomListeners,
 			this.formEditListeners,
 		]) {
 			const cleanup = map.get(paneId);
@@ -1312,50 +1320,41 @@ class BrowserManager extends EventEmitter {
 	}
 
 	/**
-	 * A click inside the guest never bubbles a DOM event to the pane's own
-	 * mousedown handler — the webview is a separate WebContents, hoisted
-	 * outside the pane tree. `WebContents.on('focus')` looks like the fix
-	 * (Electron's documented signal for focus moving between WebContents in
-	 * the same window) but doesn't actually fire for a `<webview>` guest —
-	 * confirmed live: `wc.isFocused()` stayed false immediately after a click
-	 * that had already moved the host's `document.activeElement` onto the
-	 * webview element. `<webview>` uses the older guest-view plumbing, and its
-	 * focus doesn't route through the same WebContents-level signal a
-	 * WebContentsView would give.
-	 *
-	 * Instead, borrow the same no-preload technique design-mode already uses:
-	 * inject a script that resolves a Promise on the guest's next mousedown,
-	 * `executeJavaScript` awaits it, and re-arms immediately after. No
-	 * preload/nodeIntegration needed — the guest stays untrusted.
+	 * A click inside the guest never reaches the pane's own mousedown handler:
+	 * the webview is a separate WebContents, hoisted outside the pane tree.
+	 * `WebContents.on('focus')` does not fire for a `<webview>` guest, so watch
+	 * the guest's mouse input instead.
 	 */
 	private setupFocusForward(paneId: string, wc: Electron.WebContents): void {
-		const focusForward = createFocusForward({
-			runScript: (code) =>
-				wc.executeJavaScriptInIsolatedWorld(FOCUS_FORWARD_WORLD_ID, [{ code }]),
-			isDestroyed: () => wc.isDestroyed(),
-			onPress: () => {
-				this.emit(`pane-focus:${paneId}`);
-				this.emit("pane-focused", { paneId });
-			},
-			onUnexpectedResult: (result) => {
-				console.warn("[browser] focus hook returned a non-boolean", {
-					paneId,
-					type: typeof result,
-				});
-			},
-			sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+		const stop = watchGuestMouseDown(wc, () => {
+			this.emit(`pane-focus:${paneId}`);
+			this.emit("pane-focused", { paneId });
 		});
-
-		wc.on("dom-ready", focusForward.rearm);
 		this.focusListeners.set(paneId, () => {
-			focusForward.cancel();
 			try {
-				wc.off("dom-ready", focusForward.rearm);
+				stop();
 			} catch {
 				// webContents may be destroyed
 			}
 		});
-		focusForward.rearm();
+	}
+
+	private setupViewportZoom(paneId: string, wc: Electron.WebContents): void {
+		const forward = createViewportZoomForward({
+			runScript: (code) =>
+				wc.executeJavaScriptInIsolatedWorld(VIEWPORT_ZOOM_WORLD_ID, [{ code }]),
+			onViewport: (viewport) => this.emit(`viewport-zoom:${paneId}`, viewport),
+		});
+		wc.on("dom-ready", forward.rearm);
+		this.viewportZoomListeners.set(paneId, () => {
+			forward.cancel();
+			try {
+				wc.off("dom-ready", forward.rearm);
+			} catch {
+				// webContents may be destroyed
+			}
+		});
+		forward.rearm();
 	}
 
 	private setupFormEditTracking(

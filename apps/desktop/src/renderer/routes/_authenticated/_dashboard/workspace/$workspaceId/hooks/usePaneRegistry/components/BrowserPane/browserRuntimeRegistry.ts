@@ -354,7 +354,11 @@ export class BrowserRuntimeRegistryImpl {
 		workspaceId: string,
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
-		const detachViewportZoom = attachBrowserViewportZoom(webview);
+		const detachViewportZoom = attachBrowserViewportZoom(
+			webview,
+			paneId,
+			this.ipc.browser.onViewportZoom,
+		);
 		webview.setAttribute("partition", BROWSER_PARTITION);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
