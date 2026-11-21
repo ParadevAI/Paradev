@@ -365,6 +365,54 @@ describe("resuming chats after a restart", () => {
 	});
 });
 
+describe("the mode a stopped chat had", () => {
+	/** A chat switched to Full access, whose agent then stops as on a host restart. */
+	async function stoppedChat() {
+		const { runtime, started } = runtimeWithStartedAgents();
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		await waitFor(() => runtime.live.get(sessionId)?.state.status === "idle");
+		runtime.commands.setMode({
+			commandId: randomUUID(),
+			sessionId,
+			modeId: "bypassPermissions",
+		});
+		await waitFor(
+			() => runtime.live.get(sessionId)?.state.modeId === "bypassPermissions",
+		);
+		await runtime.live.dispose(sessionId);
+		// As `sessions resume` does: the agent session only.
+		const resume = (modeId?: string) =>
+			runtime.commands.createSession({
+				commandId: randomUUID(),
+				scopeId: "workspace-1",
+				harness: FAKE_HARNESS,
+				cwd: "/tmp/workspace",
+				...(modeId ? { modeId } : {}),
+				resume: { harnessSessionId: "agent-1" },
+			});
+		return { runtime, started, resume };
+	}
+
+	test("comes back when the chat is resumed by its agent session alone", async () => {
+		const { runtime, started, resume } = await stoppedChat();
+		resume();
+		expect(started[1]?.modeId).toBe("bypassPermissions");
+		await runtime.dispose();
+	});
+
+	test("gives way to a mode the resume asks for", async () => {
+		const { runtime, started, resume } = await stoppedChat();
+		resume("plan");
+		expect(started[1]?.modeId).toBe("plan");
+		await runtime.dispose();
+	});
+});
+
 describe("the agent config a chat launched with", () => {
 	test("is stored and handed to every relaunch of that agent session", async () => {
 		const { runtime, started } = runtimeWithStartedAgents();
