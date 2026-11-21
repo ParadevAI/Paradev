@@ -38,6 +38,12 @@ function findUsage(value: unknown, depth = 0): JsonObject | null {
 	return null;
 }
 
+function hasTopLevelTokens(value: JsonObject): boolean {
+	return ["input_tokens", "output_tokens", "cache_read_tokens"].some(
+		(key) => typeof value[key] === "number",
+	);
+}
+
 export function parseAgyTranscriptLine(
 	line: string,
 	sessionId: string,
@@ -49,8 +55,7 @@ export function parseAgyTranscriptLine(
 	} catch {
 		return null;
 	}
-	const usage = findUsage(value);
-	if (!usage) return null;
+	const usage = hasTopLevelTokens(value) ? value : (findUsage(value) ?? value);
 	const input = numberAt(usage, [
 		"input_tokens",
 		"inputTokens",
@@ -75,7 +80,9 @@ export function parseAgyTranscriptLine(
 		"thoughts_token_count",
 		"thoughtsTokenCount",
 	]);
-	if (input + cached + output === 0) return null;
+	// agy counts cache reads outside input_tokens; Gemini counts them inside.
+	const cacheRead = numberAt(usage, ["cache_read_tokens", "cacheReadTokens"]);
+	if (input + cached + cacheRead + output === 0) return null;
 	const rawTimestamp =
 		value.created_at ?? value.timestamp ?? value.createdAt ?? usage.timestamp;
 	const timestampMs =
@@ -99,7 +106,7 @@ export function parseAgyTranscriptLine(
 		cwd,
 		sessionId,
 		uncachedInput: Math.max(0, input - cached),
-		cachedInput: Math.min(input, cached),
+		cachedInput: Math.min(input, cached) + cacheRead,
 		cacheWrite5m: 0,
 		cacheWrite1h: 0,
 		output,
@@ -135,6 +142,8 @@ export async function collectAgyEntries(
 		}
 		scanned += 1;
 		let cwd: string | null = null;
+		const entriesByStep = new Map<number, UsageLogEntry>();
+		const unindexed: UsageLogEntry[] = [];
 		await forEachLine(path, (line) => {
 			let envelope: JsonObject | null = null;
 			try {
@@ -153,8 +162,15 @@ export async function collectAgyEntries(
 				if (label) sessionLabels.set(sessionId, label);
 			}
 			const entry = parseAgyTranscriptLine(line, sessionId, cwd);
-			if (entry && entry.timestampMs >= cutoffMs) out.push(entry);
+			if (!entry || entry.timestampMs < cutoffMs) return;
+			if (typeof envelope?.step_index === "number") {
+				entriesByStep.set(envelope.step_index, entry);
+			} else {
+				unindexed.push(entry);
+			}
 		});
+		for (const entry of entriesByStep.values()) out.push(entry);
+		for (const entry of unindexed) out.push(entry);
 	}
 	return scanned;
 }

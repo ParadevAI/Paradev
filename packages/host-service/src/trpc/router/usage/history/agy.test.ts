@@ -28,4 +28,59 @@ describe("parseAgyTranscriptLine", () => {
 			reasoningOutput: 10,
 		});
 	});
+
+	it("parses agy step lines with top-level token counts", () => {
+		const entry = parseAgyTranscriptLine(
+			JSON.stringify({
+				step_index: 3,
+				source: "MODEL",
+				type: "PLANNER_RESPONSE",
+				status: "DONE",
+				created_at: "2026-10-14T03:03:40Z",
+				input_tokens: 3013,
+				cache_read_tokens: 14973,
+				output_tokens: 1518,
+			}),
+			"session-1",
+			"/repo",
+		);
+		expect(entry).toMatchObject({
+			agent: "agy",
+			model: "antigravity",
+			timestampMs: Date.parse("2026-10-14T03:03:40Z"),
+			uncachedInput: 3013,
+			cachedInput: 14973,
+			output: 1518,
+		});
+	});
+
+	it("skips steps without token counts", () => {
+		expect(
+			parseAgyTranscriptLine(
+				JSON.stringify({
+					source: "USER",
+					type: "USER_INPUT",
+					created_at: "2026-10-14T03:03:00Z",
+					content: "fix the bug",
+				}),
+				"session-1",
+				"/repo",
+			),
+		).toBeNull();
+	});
+
+	it("prefers top-level agy tokens over a nested usage object", () => {
+		const entry = parseAgyTranscriptLine(
+			JSON.stringify({
+				type: "PLANNER_RESPONSE",
+				created_at: "2026-10-14T03:03:40Z",
+				input_tokens: 100,
+				output_tokens: 20,
+				tool_calls: [{ args: { usage: { input_tokens: 9999 } } }],
+			}),
+			"session-1",
+			"/repo",
+		);
+		expect(entry).toMatchObject({ uncachedInput: 100, output: 20 });
+	});
 });
