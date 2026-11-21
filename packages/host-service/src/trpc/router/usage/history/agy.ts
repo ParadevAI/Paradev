@@ -40,7 +40,7 @@ function findUsage(value: unknown, depth = 0): JsonObject | null {
 
 function hasTopLevelTokens(value: JsonObject): boolean {
 	return ["input_tokens", "output_tokens", "cache_read_tokens"].some(
-		(key) => typeof value[key] === "number",
+		(key) => typeof value[key] === "number" && value[key] > 0,
 	);
 }
 
@@ -142,8 +142,6 @@ export async function collectAgyEntries(
 		}
 		scanned += 1;
 		let cwd: string | null = null;
-		const entriesByStep = new Map<number, UsageLogEntry>();
-		const unindexed: UsageLogEntry[] = [];
 		await forEachLine(path, (line) => {
 			let envelope: JsonObject | null = null;
 			try {
@@ -162,15 +160,8 @@ export async function collectAgyEntries(
 				if (label) sessionLabels.set(sessionId, label);
 			}
 			const entry = parseAgyTranscriptLine(line, sessionId, cwd);
-			if (!entry || entry.timestampMs < cutoffMs) return;
-			if (typeof envelope?.step_index === "number") {
-				entriesByStep.set(envelope.step_index, entry);
-			} else {
-				unindexed.push(entry);
-			}
+			if (entry && entry.timestampMs >= cutoffMs) out.push(entry);
 		});
-		for (const entry of entriesByStep.values()) out.push(entry);
-		for (const entry of unindexed) out.push(entry);
 	}
 	return scanned;
 }

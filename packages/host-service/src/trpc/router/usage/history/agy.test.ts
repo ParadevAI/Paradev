@@ -83,4 +83,17 @@ describe("parseAgyTranscriptLine", () => {
 		);
 		expect(entry).toMatchObject({ uncachedInput: 100, output: 20 });
 	});
+
+	it("reads nested usage when top-level token fields are zero", () => {
+		const entry = parseAgyTranscriptLine(
+			JSON.stringify({
+				created_at: "2026-10-14T03:03:40Z",
+				output_tokens: 0,
+				usage: { input_tokens: 50, output_tokens: 7 },
+			}),
+			"session-1",
+			"/repo",
+		);
+		expect(entry).toMatchObject({ uncachedInput: 50, output: 7 });
+	});
 });
