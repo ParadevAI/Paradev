@@ -1,261 +1,166 @@
 "use client";
 
-import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { m, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { HiCheck } from "react-icons/hi2";
+import { LuCheck, LuEye } from "react-icons/lu";
+import { type AgentId, AgentLogo } from "@/app/[lang]/components/AgentLogo";
+import { ShimmerText } from "@/app/[lang]/components/ShimmerText";
+import { DemoWindow } from "../DemoWindow";
 
-const GENERATING_STATUS: MessageDescriptor = msg({
-	message: "Generating",
-});
-
-const IN_PROGRESS_TASKS = [
-	{
-		id: "task-1",
-		name: "Analyze Tab vs Agent Usag...",
-		status: GENERATING_STATUS,
-		rotation: 45,
-	},
-	{
-		id: "task-2",
-		name: "PyTorch MNIST Experiments",
-		status: GENERATING_STATUS,
-		rotation: 180,
-	},
-	{
-		id: "task-3",
-		name: "Fix PR Comments Fetching I...",
-		status: GENERATING_STATUS,
-		rotation: 270,
-	},
+const IN_PROGRESS_TASKS: { id: string; name: string; agent: AgentId }[] = [
+	{ id: "task-1", name: "Analyze Tab vs Agent Usage", agent: "claude" },
+	{ id: "task-2", name: "PyTorch MNIST Experiments", agent: "codex" },
+	{ id: "task-3", name: "Fix PR Comments Fetching", agent: "opencode" },
 ];
 
-const READY_FOR_REVIEW = [
+const READY_FOR_REVIEW: {
+	id: string;
+	name: string;
+	agent: AgentId;
+}[] = [
 	{
 		id: "review-1",
-		name: "Enterprise Order Mana...",
-		time: "now",
-		added: 93,
-		removed: 18,
+		name: "Enterprise Order Management",
+		agent: "claude",
 	},
 	{
 		id: "review-2",
-		name: "Set up Cursor Rules fo...",
-		time: "30m",
-		added: 37,
-		removed: 0,
+		name: "Set up Cursor Rules",
+		agent: "cursor",
 	},
 	{
 		id: "review-3",
 		name: "Bioinformatics Tools",
-		time: "45m",
-		added: 135,
-		removed: 21,
+		agent: "gemini",
 	},
 ];
 
-const TERMINAL_LINES = [
-	"❯ claude",
-	" ",
-	"❯ Implement order validation",
-	" ",
-	"I'll implement order validation.",
-	"Let me examine the existing schema...",
-	" ",
-	"Read: src/schemas/order.ts",
-	"Read: src/api/orders/validate.ts",
-	" ",
-	"✓ Added validation for required fields,",
-	"  quantity checks, and price formats.",
+const TRANSCRIPT: { kind: "text" | "read" | "done"; text: string }[] = [
+	{
+		kind: "text",
+		text: "I'll implement order validation. Let me examine the existing schema...",
+	},
+	{ kind: "read", text: "src/schemas/order.ts" },
+	{
+		kind: "done",
+		text: "Added validation for required fields, quantity checks, and price formats.",
+	},
 ];
 
-function SpinnerIcon({
-	className,
-	rotation = 0,
-}: {
-	className?: string;
-	rotation?: number;
-}) {
-	return (
-		<m.svg
-			className={className}
-			viewBox="0 0 24 24"
-			fill="none"
-			aria-hidden="true"
-			animate={{ rotate: [rotation, rotation + 360] }}
-			transition={{
-				duration: 5,
-				repeat: Number.POSITIVE_INFINITY,
-				ease: "linear",
-			}}
-		>
-			<circle
-				className="opacity-25"
-				cx="12"
-				cy="12"
-				r="10"
-				stroke="currentColor"
-				strokeWidth="3"
-			/>
-			<path
-				className="opacity-75"
-				fill="currentColor"
-				d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-			/>
-		</m.svg>
-	);
-}
+const STEP_MS = 450;
 
 export function ParallelExecutionDemo() {
-	const { t } = useLingui();
 	const ref = useRef<HTMLDivElement>(null);
 	const isInView = useInView(ref, { once: true, margin: "-100px" });
-	const [displayedLines, setDisplayedLines] = useState<string[]>([]);
+	const [shown, setShown] = useState(0);
 
-	// Line-by-line animation
 	useEffect(() => {
 		if (!isInView) return;
-
-		let lineIndex = 0;
 		const interval = setInterval(() => {
-			if (lineIndex < TERMINAL_LINES.length) {
-				setDisplayedLines(TERMINAL_LINES.slice(0, lineIndex + 1));
-				lineIndex++;
-			} else {
-				clearInterval(interval);
-			}
-		}, 150);
-
+			setShown((count) => {
+				if (count >= TRANSCRIPT.length) clearInterval(interval);
+				return Math.min(count + 1, TRANSCRIPT.length);
+			});
+		}, STEP_MS);
 		return () => clearInterval(interval);
 	}, [isInView]);
 
 	return (
-		<m.div
-			ref={ref}
-			className="relative w-full min-w-[500px] max-w-2xl overflow-hidden rounded-lg border border-border bg-background shadow-[0_1px_1px_rgba(0,0,0,0.4),0_24px_70px_-16px_rgba(0,0,0,0.75)]"
-			initial={{ opacity: 0, y: 20 }}
-			animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-			transition={{ duration: 0.5 }}
+		<DemoWindow
+			windowRef={ref}
+			inView={isInView}
+			className="w-full min-w-[500px] max-w-2xl"
 		>
-			<div className="pointer-events-none absolute inset-0 z-10 rounded-lg ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" />
-
-			{/* Window chrome */}
-			<div className="relative flex h-8 items-center border-b border-border/60 bg-card px-3">
-				<div className="flex items-center gap-1.5">
-					<div className="size-2 rounded-full bg-[#ff5f57]/85" />
-					<div className="size-2 rounded-full bg-[#febc2e]/85" />
-					<div className="size-2 rounded-full bg-[#28c840]/85" />
-				</div>
-				<span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] tracking-tight text-muted-foreground/60">
-					paradev
-				</span>
-			</div>
-
 			<div className="flex h-[360px]">
-				{/* Sidebar */}
-				<div className="w-56 shrink-0 overflow-hidden border-r border-border/60 bg-card">
-					{/* In Progress Section */}
-					<div className="p-3">
-						<div className="mb-2 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground/65">
-							<Trans>In Progress</Trans>{" "}
-							<span className="text-muted-foreground/40">
-								{IN_PROGRESS_TASKS.length}
-							</span>
+				<div className="flex w-56 shrink-0 flex-col gap-3 overflow-hidden bg-[#121212] p-2 opacity-70">
+					<div className="flex flex-col gap-0.5">
+						<div className="flex h-6 items-center px-2 text-[12px] font-medium text-neutral-100/50">
+							<Trans>In Progress</Trans>
 						</div>
 						{IN_PROGRESS_TASKS.map((task, index) => (
 							<m.div
 								key={task.id}
-								className="flex cursor-pointer items-start gap-2 rounded-sm px-1 py-1.5 hover:bg-foreground/[0.04]"
+								className="flex h-7 items-center gap-2 rounded-md px-2"
 								initial={{ opacity: 0, x: -10 }}
 								animate={
 									isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }
 								}
 								transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
 							>
-								<SpinnerIcon
-									className="mt-0.5 size-3.5 shrink-0 text-muted-foreground/55"
-									rotation={task.rotation}
-								/>
-								<div className="min-w-0">
-									<div className="truncate text-xs text-muted-foreground">
-										{task.name}
-									</div>
-									<div className="text-[10px] text-muted-foreground/45">
-										{t(task.status)}
-									</div>
-								</div>
+								<AgentLogo agent={task.agent} dimmed />
+								<ShimmerText className="min-w-0 flex-1 truncate">
+									{task.name}
+								</ShimmerText>
 							</m.div>
 						))}
 					</div>
 
-					{/* Ready for Review Section */}
-					<div className="p-3 pt-0">
-						<div className="mb-2 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground/65">
-							<Trans>Ready for Review</Trans>{" "}
-							<span className="text-muted-foreground/40">
-								{READY_FOR_REVIEW.length}
-							</span>
+					<div className="flex flex-col gap-0.5">
+						<div className="flex h-6 items-center px-2 text-[12px] font-medium text-neutral-100/50">
+							<Trans>Ready for Review</Trans>
 						</div>
 						{READY_FOR_REVIEW.map((task, index) => (
 							<m.div
 								key={task.id}
-								className="flex cursor-pointer items-start gap-2 rounded-sm px-1 py-1.5 hover:bg-foreground/[0.04]"
+								className={`flex h-7 items-center gap-2 rounded-md px-2 ${index === 0 ? "bg-neutral-100/[0.08]" : ""}`}
 								initial={{ opacity: 0, x: -10 }}
 								animate={
 									isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }
 								}
 								transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
 							>
-								<HiCheck className="mt-0.5 size-3.5 shrink-0 text-muted-foreground/55" />
-								<div className="min-w-0 flex-1">
-									<div className="flex items-center justify-between gap-1">
-										<span className="truncate text-xs text-muted-foreground">
-											{task.name}
-										</span>
-										<span className="shrink-0 text-[10px] text-muted-foreground/45">
-											{task.time}
-										</span>
-									</div>
-									<div className="flex items-center gap-1 font-mono text-[10px] tabular-nums">
-										<span className="text-emerald-400/85">+{task.added}</span>
-										{task.removed > 0 && (
-											<span className="text-rose-400/75">−{task.removed}</span>
-										)}
-									</div>
-								</div>
+								<AgentLogo agent={task.agent} dimmed={index !== 0} />
+								<span
+									className={`min-w-0 flex-1 truncate ${index === 0 ? "text-neutral-100/90" : "text-neutral-100/70"}`}
+								>
+									{task.name}
+								</span>
 							</m.div>
 						))}
 					</div>
 				</div>
 
-				{/* Terminal Area */}
-				<div className="flex min-w-0 flex-1 flex-col">
-					{/* Terminal content */}
-					<div className="flex-1 overflow-y-auto p-4 font-mono text-[11px] leading-relaxed text-muted-foreground">
-						{displayedLines.map((line, index) => (
-							<div
-								key={`line-${index}-${line.slice(0, 10)}`}
-								className={`${line.startsWith("❯") ? "text-foreground" : ""} ${line.startsWith("Read:") ? "text-muted-foreground/55" : ""} ${line.startsWith("✓") ? "text-emerald-400/85" : ""}`}
-							>
-								{line || " "}
-							</div>
-						))}
+				<div className="flex min-w-0 flex-1 flex-col gap-4 p-4">
+					<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+						<div className="self-end rounded-[10px] bg-neutral-100/[0.04] px-3 py-2 text-neutral-100/90">
+							Implement order validation
+						</div>
+						<div className="flex items-center gap-2">
+							<AgentLogo agent="claude" />
+							<span className="text-neutral-100/90">Claude Code</span>
+						</div>
+						<div className="flex flex-col gap-2.5">
+							{TRANSCRIPT.map((line, index) => (
+								<div
+									key={line.text}
+									className={`flex items-start gap-2 transition-opacity duration-300 motion-reduce:transition-none ${index < shown ? "opacity-100" : "opacity-0"}`}
+								>
+									{line.kind === "read" && (
+										<LuEye className="mt-0.5 size-4 shrink-0 text-neutral-100/40" />
+									)}
+									{line.kind === "done" && (
+										<LuCheck className="mt-0.5 size-4 shrink-0 text-[#58da98]" />
+									)}
+									<span
+										className={
+											line.kind === "read"
+												? "font-mono text-[12px] text-neutral-100/55"
+												: "text-neutral-100/90"
+										}
+									>
+										{line.text}
+									</span>
+								</div>
+							))}
+						</div>
 					</div>
 
-					{/* Prompt row */}
-					<div className="border-t border-border/60 px-4 pb-3 pt-3">
-						<div className="flex items-center gap-2.5">
-							<span className="text-muted-foreground/55">❯</span>
-							<span className="h-3.5 w-[7px] bg-foreground/60" />
-							<span className="flex-1 font-mono text-[11px] text-muted-foreground/40">
-								<Trans>Type a task for Claude…</Trans>
-							</span>
-						</div>
+					<div className="shrink-0 rounded-xl bg-[#232323] px-3 py-2.5 text-neutral-100/55 shadow-[inset_0_0_0_1px_rgb(245_245_245/0.06)]">
+						<Trans>Type a task for Claude…</Trans>
 					</div>
 				</div>
 			</div>
-		</m.div>
+		</DemoWindow>
 	);
 }

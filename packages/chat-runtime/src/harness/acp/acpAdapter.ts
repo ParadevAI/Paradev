@@ -112,6 +112,10 @@ import {
  */
 const LATEST_PROTOCOL_VERSION = 2;
 
+const FAST_CONFIG_ID = "fast";
+const TOGGLE_ON = "on";
+const TOGGLE_OFF = "off";
+
 /** Who `initialize` says we are; v2 requires a name and a version. */
 const CLIENT_INFO = { name: "superset", version: "1.0.0" };
 
@@ -491,6 +495,7 @@ export class AcpAdapter implements HarnessAdapter {
 		},
 	);
 	private configOptions: SessionConfigOption[] = [];
+	private booleanConfigIds = new Set<string>();
 	private unavailableStartModel: string | undefined;
 	private modelSetSinceStart = false;
 	private replaying = false;
@@ -799,13 +804,18 @@ export class AcpAdapter implements HarnessAdapter {
 			configOptions: this.configOptions,
 			...(configId === this.modeConfigId ? { modeId: value } : {}),
 		});
+		const isBoolean = this.booleanConfigIds.has(configId);
 		const request = client.request(
 			"session/set_config_option",
 			{
 				sessionId,
 				configId,
-				value,
-				...(this.negotiatedVersion >= 2 ? { type: "id" } : {}),
+				...(isBoolean
+					? { type: "boolean", value: value === TOGGLE_ON }
+					: {
+							value,
+							...(this.negotiatedVersion >= 2 ? { type: "id" } : {}),
+						}),
 			},
 			this.requestTimeoutMs(),
 		);
@@ -2145,9 +2155,27 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleConfigOptions(raw: unknown): void {
 		const parsed = acpConfigOptionUpdateSchema.safeParse(raw);
 		if (!parsed.success) return;
+		this.booleanConfigIds = new Set();
 		this.configOptions = parsed.data.configOptions.flatMap((option) => {
 			const id = option.configId ?? option.id;
-			if (!id || (option.type && option.type !== "select")) return [];
+			if (!id) return [];
+			if (option.type === "boolean") {
+				if (id !== FAST_CONFIG_ID) return [];
+				this.booleanConfigIds.add(id);
+				return [
+					{
+						id,
+						label: this.optionLabel(option.name),
+						...(option.category ? { category: option.category } : {}),
+						currentValue: option.currentValue === true ? TOGGLE_ON : TOGGLE_OFF,
+						options: [
+							{ id: TOGGLE_ON, label: "On" },
+							{ id: TOGGLE_OFF, label: "Off" },
+						],
+					},
+				];
+			}
+			if (option.type && option.type !== "select") return [];
 			return [
 				{
 					id,

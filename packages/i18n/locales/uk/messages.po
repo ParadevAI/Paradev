@@ -158,8 +158,7 @@ msgstr "{0, plural, one {# з помилкою} few {# з помилкою} many
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {Змінено # файл} few {Змінено # файли} many {Змінено # файлів} other {Змінено # файлу}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
 
@@ -270,6 +269,10 @@ msgstr "{0, plural, one {# завдання} few {# завдання} many {# з
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, one {Запущено # термінал} few {Запущено # термінали} many {Запущено # терміналів} other {Запущено # термінала}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, one {# рядок без змін} few {# рядки без змін} many {# рядків без змін} other {# рядка без змін}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -1692,9 +1695,6 @@ msgstr "1 користувач"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ паралельних робочих потоків без втрати стану"
 
-msgid "12m ago"
-msgstr "12 хв тому"
-
 msgid "145,000+ across 180 countries"
 msgstr "Понад 145 000 у 180 країнах"
 
@@ -1703,9 +1703,6 @@ msgstr "15 хв"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ зірок, 100+ контриб'юторів"
-
-msgid "1d ago"
-msgstr "1 дн. тому"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 агенти · змінено 14 файлів"
@@ -1721,9 +1718,6 @@ msgstr "З 2025 до сьогодні"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2 год тому"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2390,9 +2384,6 @@ msgstr "Конфігурації агентів"
 msgid "Agent finished"
 msgstr "Агент завершив роботу"
 
-msgid "Agent Independence"
-msgstr "Самостійність агента"
-
 msgid "Agent is working"
 msgstr "Агент працює"
 
@@ -2483,9 +2474,6 @@ msgstr "Агенти бачать лише заглушку. Paradev додає 
 
 msgid "Agents that run while you're away"
 msgstr "Агенти, що працюють, поки вас немає"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Агенти самі сортують issues, пишуть чернетки changelog і оновлюють залежності."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Агенти використовують цей обліковий запис, коли викликають інструменти Linear."
@@ -3809,6 +3797,9 @@ msgstr "Перенесіть свої робочі простори"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Перенесіть проєкти, робочі простори та скрипти термінала з v1 у v2. Кожен елемент імпортується окремо, тож імпорт можна повторити."
 
+msgid "Bring Your Own Subscription"
+msgstr "Використовуйте власну підписку"
+
 msgid "Bringing over your v1 projects"
 msgstr "Перенесення ваших проєктів з v1"
 
@@ -3874,6 +3865,9 @@ msgstr "Створили плагін? Надішліть його тут."
 
 msgid "Built in Paradev"
 msgstr "Створено в Paradev"
+
+msgid "Built to be driven by agents"
+msgstr "Створено, щоб ним керували агенти"
 
 msgid "builtin"
 msgstr "вбудований"
@@ -4615,9 +4609,6 @@ msgstr "Очищення…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI і SDK"
 
 msgid "CLI docs"
 msgstr "Документація CLI"
@@ -6625,9 +6616,6 @@ msgstr "Створити за допомогою ШІ"
 msgid "Create workspace"
 msgstr "Створити робочий простір"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Створюйте робочі простори й запускайте агентів із CLI, SDK або через MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Створюйте робочі простори, запускайте агентів і читайте їхній вивід з будь-якого термінала чи скрипту. macOS і Linux."
 
@@ -7744,9 +7732,6 @@ msgstr "Відкрито чернетку"
 msgid "Draft PR #2841"
 msgstr "Чернетка PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "підготував чернетки 3 відповідей для підтримки"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Перетягніть <0>Paradev</0> у папку <1>Програми</1>"
 
@@ -7759,8 +7744,8 @@ msgstr "Перетягуйте робочі простори, щоб зміни�
 msgid "Drawer"
 msgstr "Висувна панель"
 
-msgid "Drive it from the terminal"
-msgstr "Керуйте з термінала"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Керуйте всім застосунком і хмарою через CLI, SDK або MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Керуйте робочими просторами, агентами та сеансами програмно: зі скриптів, CI або власних інструментів."
@@ -7943,6 +7928,9 @@ msgstr "Змінено"
 
 msgid "Edited {ago}"
 msgstr "Змінено {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Змінено <0>SettingsDialog.tsx</0>"
 
 msgid "Editing"
 msgstr "Редагування"
@@ -8865,11 +8853,8 @@ msgstr "Поширені запитання"
 msgid "Fast"
 msgstr "Швидкий"
 
-msgid "Fast mode off"
-msgstr "Швидкий режим вимкнено"
-
-msgid "Fast mode on"
-msgstr "Швидкий режим увімкнено"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Швидкий режим недоступний для цієї моделі. Виберіть модель, яка його підтримує."
 
 msgid "Fault"
 msgstr "Збій"
@@ -9087,9 +9072,6 @@ msgstr "Завершено"
 msgid "Finished · unread"
 msgstr "Завершено · не прочитано"
 
-msgid "finished · worked for 7s"
-msgstr "завершив · працював 7 с"
-
 msgid "Finishing the move…"
 msgstr "Завершення переміщення…"
 
@@ -9104,6 +9086,9 @@ msgstr "За розміром"
 
 msgid "Fix all failing checks"
 msgstr "Виправити всі невдалі перевірки"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Виправляйте баги щойно про них повідомили"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Виправляє суму кошика для порожніх кошиків. Додає тест, який відтворює TypeError."
@@ -9122,6 +9107,9 @@ msgstr "Виправити зауваження"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Виправляй нові помилки у web. Відтвори кожну в тесті й відкрий чернетку пул-реквесту."
+
+msgid "Fix production bugs"
+msgstr "Виправляти баги в продакшені"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9486,9 +9474,6 @@ msgstr "Згенерований файл приховано"
 
 msgid "Generated image"
 msgstr "Згенероване зображення"
-
-msgid "Generating"
-msgstr "Генерування"
 
 msgid "Generating..."
 msgstr "Генерування..."
@@ -11604,9 +11589,6 @@ msgstr "Локальний робочий простір"
 msgid "Local workspaces"
 msgstr "Локальні робочі простори"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Локальні робочі простори працюють на вашому комп'ютері. Що до них підключати, вирішуєте ви."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Локально, на хості або в хмарі"
 
@@ -12168,8 +12150,8 @@ msgstr "Мобільний застосунок"
 msgid "Mobile App"
 msgstr "Мобільний застосунок"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Телефон, хмара або власна хмара"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Мобільний застосунок, хмара або власний парк машин"
 
 msgid "Mode"
 msgstr "Режим"
@@ -12299,6 +12281,9 @@ msgstr "Перенесіть роботу з хмари"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Переміщувати фокус між основними вкладками та правою бічною панеллю і відкривати панель, якщо вона закрита"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Перенеси налаштування в модальне вікно, щоб людям не доводилося залишати робочий простір. Збережи фільтрацію пошуку й зроби так, щоб ⌘, відкривало його звідусіль."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Перемістити цей робочий простір на {computerName}?"
@@ -14251,6 +14236,9 @@ msgstr "Відкрити сторінку в браузері за замовч�
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Відкривайте сторінки й відповідайте на коментарі в застосунку Paradev на iPhone та iPad."
 
+msgid "Open PR"
+msgstr "Відкрити PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Відкрити PR #{0}"
@@ -14302,6 +14290,9 @@ msgstr "Відкритий код"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Відкритий код за ліцензією MIT. Використовуйте будь-якого агента на власних підписках і ключах."
+
+msgid "Open source.<0/>Secure by design."
+msgstr "Відкритий код.<0/>Безпека на рівні архітектури."
 
 msgid "Open System Settings"
 msgstr "Відкрити Системні параметри"
@@ -14389,9 +14380,6 @@ msgstr "OpenAI відхилив цей ключ API."
 
 msgid "Opened"
 msgstr "Відкрито"
-
-msgid "opened PR #841 for review"
-msgstr "відкрив PR #841 на рев'ю"
 
 msgid "Opening {appName}…"
 msgstr "Відкриття {appName}…"
@@ -14903,9 +14891,6 @@ msgstr "Паралельні агенти"
 msgid "Parallel agents guide"
 msgstr "Посібник з паралельних агентів"
 
-msgid "Parallel Execution"
-msgstr "Паралельне виконання"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Кількість паралельних сеансів на розробника подвоюється кожні сім місяців і перетинає пороги «Оператор», «Директор заводу» та «Генрі Форд» між серпнем 2026 і серпнем 2028 року"
 
@@ -15195,11 +15180,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Тариф"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "План"
+
 msgid "Plan restored"
 msgstr "Тариф відновлено"
 
 msgid "Plan updated"
 msgstr "Тариф оновлено"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "План: винести <0>SettingsPage</0> у <1>SettingsDialog</1>, провести ⌘, через глобальний шар гарячих клавіш, пошук залишити як є. Починаю."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15517,9 +15509,6 @@ msgstr "Політика конфіденційності"
 msgid "Private"
 msgstr "Приватний"
 
-msgid "Private by default.<0/>You're in control."
-msgstr "Приватно за замовчуванням.<0/>Контроль за вами."
-
 msgid "Private: only specific people"
 msgstr "Приватний: лише певні люди"
 
@@ -15804,9 +15793,6 @@ msgstr "Запуште гілки й продовжуйте на Mac або в �
 msgid "Pushed"
 msgstr "Запушено"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Запушено й відкрито чернетку PR."
-
 msgid "Pushing..."
 msgstr "Пуш..."
 
@@ -15923,6 +15909,9 @@ msgstr "Radix повертає обгортку стрілки підказки 
 msgid "Radix Tooltip docs"
 msgstr "Документація Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Виконано <0>bun test settings</0> · 14 пройдено · 1 не пройдено"
+
 msgid "Random icon"
 msgstr "Випадковий значок"
 
@@ -15977,6 +15966,9 @@ msgstr "Читання"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Прочитано"
+
+msgid "Read 3 files"
+msgstr "Прочитано 3 файли"
 
 msgid "Read a list of your most visited websites"
 msgstr "Читати список найвідвідуваніших сайтів"
@@ -16612,6 +16604,9 @@ msgstr "Відповісти"
 msgid "Reply in thread"
 msgstr "Відповісти в треді"
 
+msgid "Reply to Claude Code…"
+msgstr "Відповісти Claude Code…"
+
 msgid "Reply to thread…"
 msgstr "Відповісти в треді…"
 
@@ -17218,6 +17213,9 @@ msgstr "Запускайте 10+ паралельних кодинг-агент�
 msgid "Run again"
 msgstr "Запустити знову"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Запускайте агентів паралельно, кожного у власній гілці. Перевіряйте їхню роботу за допомогою вбудованих дифів, перевірок PR і рев’ю від агентів, а потім зливайте зміни, не виходячи із застосунку."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Запускайте агентів за розкладом або коли щось відбувається."
 
@@ -17272,9 +17270,6 @@ msgstr "Запуск за розкладом або за подіями, зап�
 
 msgid "Run on any machine"
 msgstr "На будь-якій машині"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Запускайте паралельних агентів для нових функцій, виправлень і рефакторингу. Кожен працює у власній гілці, локально або в хмарі."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Запускайте кодинг-агентів паралельно з Paradev"
@@ -17488,8 +17483,8 @@ msgstr "Збереження..."
 msgid "Saving…"
 msgstr "Збереження…"
 
-msgid "Scale to 100+ agents"
-msgstr "Масштабуйтеся до 100+ агентів"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Масштабуйтеся до сотень агентів, тримаючи планку якості"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Відскануйте QR-код, потім увійдіть у той самий обліковий запис Paradev і виберіть цю організацію."
@@ -18260,6 +18255,9 @@ msgstr "Налаштування..."
 
 msgid "settings.ts"
 msgstr "settings.ts"
+
+msgid "Settled"
+msgstr "Завершені"
 
 msgid "Setup"
 msgstr "Налаштування"
@@ -19203,8 +19201,8 @@ msgstr "Почати сеанс"
 msgid "Start agent"
 msgstr "Запустити агента"
 
-msgid "Start agents on events or a schedule"
-msgstr "Запускайте агентів за подіями або за розкладом"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Запускайте агентів автоматично: за помилкою в Sentry, тікетом у Linear, пул-реквестом у GitHub або за розкладом, який агент задає сам."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Запускайте агентів, стежте за ними наживо й переглядайте diff з iPhone або iPad. Ваш код залишається на ваших комп'ютерах."
@@ -19574,9 +19572,6 @@ msgstr "Регулярність · активних днів із 30"
 
 msgid "Switch account"
 msgstr "Змінити обліковий запис"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Змінюйте агентів. Робочий процес залишається"
 
 msgid "Switch host"
 msgstr "Змінити хост"
@@ -19961,9 +19956,6 @@ msgstr "Типографіка термінала"
 
 msgid "Terminals"
 msgstr "Термінали"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Термінали ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Термінали не відповідають"
@@ -21320,9 +21312,6 @@ msgstr "Розбір пошти й чернетки відповідей"
 msgid "Triage new issues"
 msgstr "Розбір нових issues"
 
-msgid "triaging 12 new issues…"
-msgstr "розбирає 12 нових issues…"
-
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Пробує виправити кожен баг, який хтось публікує в #bugs."
 
@@ -21963,9 +21952,6 @@ msgstr "Використати як запуск робочого простор
 msgid "Use cases"
 msgstr "Сценарії використання"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Використовуйте Claude Code, Codex, OpenCode або будь-який CLI-агент. Робочі простори, гілки й рев'ю залишаються такими ж."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Використовуйте Claude Code, Codex або будь-якого кодинг-агента. Вибирайте для кожного завдання окремо або запускайте кількох паралельно."
 
@@ -21998,6 +21984,12 @@ msgstr "Користуйтеся Paradev на телефоні з Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Використовуйте тарифи агентів і API-ключі, які у вас уже є. Запити до моделей ідуть напряму до вашого провайдера."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Використовуйте найкращого агента. Без прив’язки до одного."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Використовуйте найкращих агентів щойно вони виходять. Ваші артефакти, гілки та плагіни працюють з усіма."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Використовуйте десктопний застосунок, щоб запускати паралельних кодинг-агентів."
@@ -22231,6 +22223,9 @@ msgstr "Переглянути стек, пул-реквест {position} з {si
 
 msgid "View usage"
 msgstr "Переглянути використання"
+
+msgid "Viewed"
+msgstr "Переглянуто"
 
 msgctxt "stack layer"
 msgid "Viewing"
@@ -23169,9 +23164,6 @@ msgstr "Ваш агент публікує дизайни та звіти. Ва�
 
 msgid "Your agent subscriptions and keys"
 msgstr "Ваші підписки та ключі для агентів"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Ваші агенти, ваші облікові записи"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Підписка AWS Marketplace активна"
