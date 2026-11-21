@@ -4960,6 +4960,12 @@ msgstr "程式碼塊"
 msgid "Code Block"
 msgstr "程式碼塊"
 
+msgid "Codex button"
+msgstr "Codex 按鈕"
+
+msgid "Codex usage indicator"
+msgstr "Codex 用量指示器"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "程式代理程式大軍"
@@ -13869,6 +13875,9 @@ msgstr "僅受邀者"
 msgid "Only people who opted in appear here."
 msgstr "只有選擇加入的人才會出現在這裡。"
 
+msgid "Only show at or above a threshold"
+msgstr "僅在達到或超過門檻時顯示"
+
 msgid "Only the author can change a comment"
 msgstr "只有作者可以修改留言"
 
@@ -18155,6 +18164,9 @@ msgstr "工作階段已結束"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "工作階段已結束。按 Enter 啟動新的 Shell。"
 
+msgid "Session header"
+msgstr "工作階段標題列"
+
 msgid "Session name"
 msgstr "會話名稱"
 
@@ -21055,6 +21067,9 @@ msgstr "三個步驟 · 涉及packages/ui和apps/desktop"
 
 msgid "Threshold"
 msgstr "門檻"
+
+msgid "Threshold (%)"
+msgstr "門檻 (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "從工單到上線中位不足一天"

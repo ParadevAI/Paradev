@@ -4960,6 +4960,12 @@ msgstr "Khối mã"
 msgid "Code Block"
 msgstr "Code Block"
 
+msgid "Codex button"
+msgstr "Nút Codex"
+
+msgid "Codex usage indicator"
+msgstr "Chỉ báo mức sử dụng Codex"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "Agent lập trình"
@@ -13869,6 +13875,9 @@ msgstr "Chỉ những người được mời"
 msgid "Only people who opted in appear here."
 msgstr "Chỉ những người đã chọn tham gia mới xuất hiện ở đây."
 
+msgid "Only show at or above a threshold"
+msgstr "Chỉ hiển thị khi đạt ngưỡng trở lên"
+
 msgid "Only the author can change a comment"
 msgstr "Chỉ tác giả mới có thể sửa bình luận"
 
@@ -18155,6 +18164,9 @@ msgstr "Phiên đã kết thúc"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Phiên đã kết thúc. Nhấn Enter để mở shell mới."
 
+msgid "Session header"
+msgstr "Tiêu đề phiên"
+
 msgid "Session name"
 msgstr "Tên phiên"
 
@@ -21055,6 +21067,9 @@ msgstr "Ba bước · động tới packages/ui và apps/desktop"
 
 msgid "Threshold"
 msgstr "Ngưỡng"
+
+msgid "Threshold (%)"
+msgstr "Ngưỡng (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Từ ticket đến production dưới một ngày, tính trung vị"

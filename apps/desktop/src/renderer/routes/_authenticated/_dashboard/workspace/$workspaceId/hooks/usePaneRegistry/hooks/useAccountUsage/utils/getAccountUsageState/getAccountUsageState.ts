@@ -1,4 +1,7 @@
-import type { UsageAccount } from "renderer/hooks/host-service/useHostUsageQuota";
+import type {
+	UsageAccount,
+	UsageQuotaWindow,
+} from "renderer/hooks/host-service/useHostUsageQuota";
 
 interface Identity {
 	source?: "environment" | "profile";
@@ -40,7 +43,13 @@ export function getAccountUsageState({
 	const generalWindows = windows.filter((w) =>
 		["five_hour", "seven_day", "primary", "secondary"].includes(w.id),
 	);
-	const tightest = generalWindows.reduce<(typeof windows)[number] | undefined>(
+	const hasReset = (window: UsageQuotaWindow) =>
+		window.resetsAt !== null && new Date(window.resetsAt).getTime() <= now;
+	const isCodex = identity?.agent === "codex";
+	const usableWindows = isCodex
+		? generalWindows.filter((window) => !hasReset(window))
+		: generalWindows;
+	const tightest = usableWindows.reduce<UsageQuotaWindow | undefined>(
 		(a, b) => (!a || b.usedPercent > a.usedPercent ? b : a),
 		undefined,
 	);
@@ -48,7 +57,7 @@ export function getAccountUsageState({
 		account &&
 		(failed ||
 			now - new Date(account.fetchedAt).getTime() >= 10 * 60_000 ||
-			windows.some((w) => w.resetsAt && new Date(w.resetsAt).getTime() <= now));
+			(isCodex ? !tightest : windows.some(hasReset)));
 	const state = !supported
 		? "unavailable"
 		: loading
@@ -57,7 +66,7 @@ export function getAccountUsageState({
 				? "unverified"
 				: identity.credentialKind === "api_key"
 					? "api"
-					: !account || account.status !== "ok" || !tightest
+					: !account || account.status !== "ok" || generalWindows.length === 0
 						? "unavailable"
 						: stale
 							? "stale"
