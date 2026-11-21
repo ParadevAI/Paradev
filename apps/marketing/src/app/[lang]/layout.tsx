@@ -140,6 +140,7 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
+				<meta name="darkreader-lock" />
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd
 					dateModified={getChangelogEntries()[0]?.date}
