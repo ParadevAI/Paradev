@@ -8871,6 +8871,9 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Snel"
 
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Snelle modus is niet beschikbaar voor dit model. Kies een model dat dit ondersteunt."
+
 msgid "Fast mode off"
 msgstr "Snelle modus uit"
 

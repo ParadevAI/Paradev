@@ -8871,6 +8871,9 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Rápido"
 
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "O modo rápido não está disponível para este modelo. Escolha um modelo compatível."
+
 msgid "Fast mode off"
 msgstr "Modo rápido desativado"
 
