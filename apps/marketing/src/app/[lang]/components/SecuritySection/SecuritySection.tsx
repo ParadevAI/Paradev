@@ -51,7 +51,7 @@ const SECURITY_FEATURES: {
 		id: "your-accounts",
 		icon: <HiOutlineSignal className="w-5 h-5 text-foreground/70" />,
 		title: msg({
-			message: "Your Agents, Your Accounts",
+			message: "Bring Your Own Subscription",
 		}),
 		description: msg({
 			message:
@@ -75,22 +75,22 @@ export function SecuritySection() {
 					transition={{ duration: 0.5 }}
 				>
 					<div className="space-y-4">
-						<span className="text-sm font-mono uppercase tracking-widest text-brand">
-							<Trans>Security</Trans>
-						</span>
-						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.1] text-foreground">
+						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.1] text-foreground">
 							<Trans>
-								Private by default.
+								Open source.
 								<br />
-								You&apos;re in control.
+								Secure by design.
 							</Trans>
 						</h2>
-						<p className="text-base sm:text-lg font-light text-muted-foreground max-w-[700px]">
-							<Trans>
-								Local workspaces run on your machine. You decide what connects
-								to them.
-							</Trans>
-						</p>
+						<a
+							href={COMPANY.TRUST_URL}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1.5 text-base sm:text-lg leading-relaxed text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+						>
+							<Trans>SOC 2 Type II compliant. Request our report.</Trans>
+							<HiArrowUpRight className="size-4 shrink-0" />
+						</a>
 					</div>
 					<a
 						href={COMPANY.TRUST_URL}
@@ -125,10 +125,10 @@ export function SecuritySection() {
 							<div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-[2px] bg-muted border border-border">
 								{feature.icon}
 							</div>
-							<h3 className="text-lg font-medium text-foreground/90 mb-2">
+							<h3 className="text-lg font-medium text-foreground mb-2">
 								{t(feature.title)}
 							</h3>
-							<p className="text-sm leading-relaxed text-muted-foreground">
+							<p className="text-base leading-relaxed text-muted-foreground">
 								{t(feature.description)}
 							</p>
 							{feature.link && (
@@ -136,7 +136,7 @@ export function SecuritySection() {
 									href={feature.link.href}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="mt-4 inline-flex items-center gap-1 text-sm text-foreground/80 underline-offset-4 transition-colors hover:text-foreground hover:underline"
+									className="mt-4 inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
 								>
 									{t(feature.link.label)}
 									<HiArrowUpRight className="size-3.5" />
