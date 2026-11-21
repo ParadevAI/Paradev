@@ -283,7 +283,10 @@ export class SessionStream {
 		if (!chunk) return;
 		const open = this.openMessage(kind, turnId, messageId, from);
 		if (kind === "agent_message" && model) open.model = model;
-		open.text += chunk;
+		open.text =
+			kind === "agent_message" && resendsWholeText(open.text, chunk)
+				? chunk
+				: open.text + chunk;
 		if (kind === "agent_message") {
 			this.streamAgentText(open);
 			return;
@@ -635,6 +638,18 @@ export class SessionStream {
 	private emit(item: Item, turnId: string): void {
 		this.options.emitItem(item, turnId);
 	}
+}
+
+// claude-agent-acp sends a text block again in full, under the same messageId,
+// when it does not extend what streamed: a MessageDisplay hook rewrote it, or
+// deltas were lost. Otherwise it sends only the rest of the block.
+function resendsWholeText(text: string, chunk: string): boolean {
+	return (
+		text.trim() !== "" &&
+		chunk.length > text.length &&
+		chunk.endsWith(text) &&
+		!chunk.startsWith(text)
+	);
 }
 
 function notifyLevelOf(raw: unknown): string | undefined {

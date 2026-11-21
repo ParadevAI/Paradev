@@ -1208,6 +1208,90 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
+	it("shows a reply a display hook rewrote once, not after the streamed text", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ protocolVersion: 1 },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "check the history" }]);
+		await flush();
+
+		for (const text of ["I'll check ", "the git history."])
+			agent.notify("sess-1", {
+				sessionUpdate: "agent_message_chunk",
+				messageId: "m1",
+				content: { type: "text", text },
+			});
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "tc-1",
+			title: "git log",
+			kind: "execute",
+			status: "pending",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			messageId: "m1",
+			content: { type: "text", text: "[18:03:05] I'll check the git history." },
+		});
+		agent.releasePrompts("end_turn");
+		await flush();
+
+		const replies = itemsOf(events).filter((i) => i.kind === "agent_message");
+		expect(new Set(replies.map((i) => i.id))).toEqual(
+			new Set(["agent_message:id-1:m1"]),
+		);
+		expect(replies.at(-1)).toMatchObject({
+			text: "[18:03:05] I'll check the git history.",
+		});
+		await adapter.dispose();
+	});
+
+	it("appends text that continues a reply after a tool call", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ protocolVersion: 1 },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "check the history" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			messageId: "m1",
+			content: { type: "text", text: "Checking." },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "tc-1",
+			title: "git log",
+			kind: "execute",
+			status: "pending",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			messageId: "m1",
+			content: { type: "text", text: " Done." },
+		});
+		agent.releasePrompts("end_turn");
+		await flush();
+
+		const replies = itemsOf(events).filter((i) => i.kind === "agent_message");
+		expect(replies.at(-1)).toMatchObject({ text: "Checking. Done." });
+		await adapter.dispose();
+	});
+
 	it("replays a compaction as a notice in its place, not as a user message", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
