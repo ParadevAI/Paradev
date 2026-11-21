@@ -1677,21 +1677,21 @@ function deliverOutput(session: TerminalSession, bytes: Uint8Array) {
 }
 
 /**
- * Force the running program to repaint by changing the PTY size and
- * restoring it — two real SIGWINCHes (a same-dims resize emits none). Used
- * after a reanchor attach, where the renderer may hold a stale frame that
- * only the program itself can faithfully redraw (the v1 terminal-host's
- * proven recipe; never synthesize screen content the tracker may not have
- * — #6290).
- *
- * The interim size is smaller than the live terminal. cursor-agent's Ink
- * renderer forces a write on a width decrease, and a wider interim frame
- * would wrap in the terminal that is still the old size (#8733).
+ * Force the running program to repaint by toggling the PTY one column and
+ * one row smaller and back — two real SIGWINCHes (a same-dims resize emits
+ * none). Used after a reanchor attach, where the renderer may hold a stale
+ * frame that only the program itself can faithfully redraw (the v1
+ * terminal-host's proven recipe; never synthesize screen content the tracker
+ * may not have — #6290).
  */
 function nudgeRepaint(session: TerminalSession) {
 	if (!isCurrentLiveSession(session)) return;
 	const { cols, rows } = session;
-	const intermediate = repaintNudgeIntermediateSize(cols, rows);
+	const intermediate = repaintNudgeIntermediateSize(
+		cols,
+		rows,
+		MIN_TERMINAL_ROWS,
+	);
 	const generation = session.resizeGeneration;
 	session.pty.resize(intermediate.cols, intermediate.rows);
 	setTimeout(() => {

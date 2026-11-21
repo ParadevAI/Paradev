@@ -1,19 +1,12 @@
-/**
- * Temporary PTY size for a repaint nudge. One column and one row smaller
- * than the live size, when that still fits in the PTY.
- *
- * The on-screen terminal stays at the live size for the whole nudge. A
- * larger intermediate frame wraps there, and the restore then erases from
- * the wrong cursor. A smaller frame does not wrap. cursor-agent's Ink
- * renderer also forces a write when the width shrinks; restoring the live
- * size writes again because that layout is different.
- */
+// Ink apps such as cursor-agent repaint only when the width shrinks, and a
+// wider interim frame would wrap in the client, which keeps the live size.
 export function repaintNudgeIntermediateSize(
 	cols: number,
 	rows: number,
+	minRows: number,
 ): { cols: number; rows: number } {
 	return {
 		cols: cols > 1 ? cols - 1 : cols + 1,
-		rows: rows > 1 ? rows - 1 : rows + 1,
+		rows: rows > minRows ? rows - 1 : rows + 1,
 	};
 }
