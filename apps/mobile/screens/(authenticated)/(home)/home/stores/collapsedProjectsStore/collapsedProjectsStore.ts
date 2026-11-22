@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { collapsedProjectKey } from "./collapseKeys";
+import { PLACE_COLLAPSE_KEY, prunePlaceKeys } from "./prunePlaceKeys";
 
 /**
  * Which project sections are shut, keyed `machineId:projectId` — collapse is
@@ -13,22 +15,18 @@ interface CollapsedProjectsStore {
 	/** False until AsyncStorage answers — sections would flash open before it. */
 	hasHydrated: boolean;
 	toggleProject: (machineId: string, projectId: string) => void;
-	setAllCollapsed: (
-		machineId: string,
-		projectIds: string[],
-		collapsed: boolean,
-	) => void;
-}
-
-export function collapsedProjectKey(machineId: string, projectId: string) {
-	return `${machineId}:${projectId}`;
+	togglePlace: (placeId: string) => void;
+	/** Forgets collapsed places (machines, Cloud) that no longer exist. */
+	prunePlaces: (placeIds: readonly string[]) => void;
 }
 
 export const useCollapsedProjectsStore = create<CollapsedProjectsStore>()(
 	persist(
-		(set) => ({
+		(set, get) => ({
 			collapsed: {},
 			hasHydrated: false,
+			togglePlace: (placeId) =>
+				get().toggleProject(placeId, PLACE_COLLAPSE_KEY),
 			toggleProject: (machineId, projectId) => {
 				set((state) => {
 					const key = collapsedProjectKey(machineId, projectId);
@@ -39,15 +37,10 @@ export const useCollapsedProjectsStore = create<CollapsedProjectsStore>()(
 					return { collapsed: { ...state.collapsed, [key]: true as const } };
 				});
 			},
-			setAllCollapsed: (machineId, projectIds, collapsed) => {
+			prunePlaces: (placeIds) => {
 				set((state) => {
-					const next = { ...state.collapsed };
-					for (const projectId of projectIds) {
-						const key = collapsedProjectKey(machineId, projectId);
-						if (collapsed) next[key] = true;
-						else delete next[key];
-					}
-					return { collapsed: next };
+					const collapsed = prunePlaceKeys(state.collapsed, placeIds);
+					return collapsed === state.collapsed ? state : { collapsed };
 				});
 			},
 		}),

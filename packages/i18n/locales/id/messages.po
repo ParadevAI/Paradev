@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# proyek tersembunyi} other {# proyek tersembunyi}}"
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# item riwayat} other {# item riwayat}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} other {# host}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, other {# label}}"
@@ -187,6 +191,10 @@ msgstr "{0, plural, other {# label}}"
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# login} other {# login}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# perlu input} other {# perlu input}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -222,6 +230,10 @@ msgstr "{0, plural, one {# proyek} other {# proyek}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# pull request}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# siap} other {# siap}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +243,14 @@ msgstr "{0, plural, other {# balasan}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repositori} other {# repositori}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# hasil di semua host} other {# hasil di semua host}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# hasil di tempat yang dipilih} other {# hasil di tempat yang dipilih}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +299,10 @@ msgstr "{0, plural, other {# terminal berjalan}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, other {# baris tidak diubah}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# bekerja} other {# bekerja}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -884,6 +908,9 @@ msgstr "{count, plural, one {# terminal tetap di workspace lama.} other {# termi
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {# terminal berhenti dan tidak bisa dijalankan lagi.} other {# terminal berhenti dan tidak bisa dijalankan lagi.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {# workspace} other {# workspace}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree di repositori ini belum punya workspace. Worktree itu akan diimpor sebagai workspace.} other {# worktree di repositori ini belum punya workspace. Worktree itu akan diimpor sebagai workspace.}}"
 
@@ -1141,6 +1168,9 @@ msgstr "{machineSize} (tidak termasuk paket Anda)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, other {Maksimal # host sekaligus}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Menyalin percakapan (# pesan)} other {Menyalin percakapan (# pesan)}}"
@@ -2588,6 +2618,9 @@ msgstr "Semua fitur, berdampingan"
 
 msgid "All files exceed the maximum size."
 msgstr "Semua file melebihi ukuran maksimum."
+
+msgid "All hosts"
+msgstr "Semua host"
 
 msgid "All in a new tab (split panes)"
 msgstr "Semua di tab baru (panel terbagi)"
@@ -4058,6 +4091,9 @@ msgstr "Dapat melihat"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Bisakah kamu menyeragamkan tooltip di seluruh aplikasi?"
+
+msgid "can’t check"
+msgstr "tidak bisa dicek"
 
 msgid "Can’t check {hostName}"
 msgstr "Tidak dapat memeriksa {hostName}"
@@ -13315,6 +13351,9 @@ msgstr "Tidak ada posisi yang cocok untuk saya. Apakah saya tetap boleh menghubu
 msgid "No runs yet"
 msgstr "Belum ada run"
 
+msgid "No saved workspaces"
+msgstr "Tidak ada workspace tersimpan"
+
 msgid "No screenshots yet"
 msgstr "Belum ada tangkapan layar"
 
@@ -13620,6 +13659,9 @@ msgstr "Tidak ada apa pun di {pathname}."
 msgid "Nothing needs a retry"
 msgstr "Tidak ada yang perlu dicoba ulang"
 
+msgid "Nothing needs you right now"
+msgstr "Tidak ada yang menunggu Anda saat ini"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Belum ada yang dipublikasikan dalam 30 hari terakhir. Peringkat Anda muncul setelah penggunaan dari mesin ini tersinkron, dipublikasikan sebagai <0>{handle}</0>."
 
@@ -13733,11 +13775,12 @@ msgstr "Offline"
 msgid "Offline / local-first mode"
 msgstr "Mode offline / local-first"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "offline, terlihat {0}"
+
 msgid "OK"
 msgstr "OK"
-
-msgid "Older"
-msgstr "Lebih lama"
 
 msgid "On"
 msgstr "Nyala"
@@ -20909,9 +20952,6 @@ msgstr "Tenant Microsoft ini sudah terhubung oleh organisasi Paradev lain."
 msgid "This model isn't available"
 msgstr "Model ini tidak tersedia"
 
-msgid "This month"
-msgstr "Bulan ini"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Pemindahan ini berhenti. Chat masih ada di workspace lamanya."
 
@@ -21082,9 +21122,6 @@ msgstr "Pengguna ini menjalankan layanan host untuk perangkat ini dan harus teta
 
 msgid "This view hit an error"
 msgstr "Tampilan ini mengalami kesalahan"
-
-msgid "This week"
-msgstr "Minggu ini"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Ini akan me-merge secara atomik setiap pull request terbuka hingga #{prNumber} ke {base} menggunakan commit merge."

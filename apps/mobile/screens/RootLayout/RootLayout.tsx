@@ -41,6 +41,7 @@ const PERSISTED_QUERY_PREFIXES = [
 	["cloud", "user", "myOrganizations"],
 	["cloud", "host", "roster"],
 	["cloud", "cloudWorkspace", "list"],
+	["cloud", "cloudWorkspace", "repositories"],
 	["host-service", "workspaces", "list"],
 	["host-service", "projects", "list"],
 ] as const;
