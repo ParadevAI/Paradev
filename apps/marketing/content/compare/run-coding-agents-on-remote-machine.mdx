@@ -23,7 +23,7 @@ keywords:
   - claude code remote control remote server
 ---
 
-To run coding agents on a remote machine, put the agents and the repo on an always-on host (a Linux server, a cloud VM, or a Mac mini) and use your laptop only to prompt, review, and preview. Paradev has this built in: turn on Remote Access on a macOS or Linux machine, and it becomes a host in the same app as your laptop. Each agent gets its own worktree there, and you reach its terminals, diffs, and ports from the desktop app, the CLI, or the iPhone and iPad app, with no SSH setup.
+To run coding agents on a remote machine, put the agents and the repo on an always-on host (a Linux server, a cloud VM, or a Mac mini) and use your laptop only to prompt, review, and preview. Paradev has this built in: turn on Remote Access on a macOS or Linux machine, and it becomes a host in the same app as your laptop. Each agent gets its own worktree there, and you reach its terminals, diffs, and ports from the desktop app, the CLI, or the iPhone, iPad, and Android app, with no SSH setup.
 
 The agents' own remote features still work on a Paradev host. Paradev runs the real `claude` and `codex` CLIs in real terminals, so Claude Code Remote Control (`/remote-control`) can follow a session on that host from the Claude app, and `codex cloud exec` can hand a task to Codex cloud. Use Paradev to run and track several agents across machines, and the agent's own feature when you want its app or its cloud. Other options are VS Code Remote-SSH, SSH plus tmux over Tailscale, and managed cloud agents such as Codex cloud or Cursor Cloud Agents. Pick by where you want the agent to run and how many agents you need to keep track of at once.
 
@@ -97,7 +97,7 @@ KillMode=process
 
 Keep `KillMode=process`; other modes stop every terminal and agent when the service restarts. Add `--auto-update` to a daemon start if you want the host to update itself.
 
-You can then check on agents from your laptop when it wakes, or from [Paradev for iPhone and iPad](/blog/superset-mobile) (Pro, iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.paradev.com/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
+You can then check on agents from your laptop when it wakes, or from [Paradev's mobile app](/blog/superset-mobile) (Pro; iPhone and iPad need iOS 26 or iPadOS 26 or later). Scheduled [Automations](https://docs.paradev.com/automations) also target a device, so a nightly run can fire on the always-on host. If that device is offline at fire time, the run fails and the next one is scheduled normally.
 
 ## Can I use Claude Code Remote Control or Codex cloud on a Paradev host?
 
@@ -136,7 +136,7 @@ Laptops are the cheapest start, a shared host gives the most compute per dollar 
 | Credentials | Spread across laptops | On one box you control | With the provider |
 | Main risk | Agents slow the machine you work on | Resource contention, single point of failure | Idle bills, provider limits |
 
-A common path for a small team: start on laptops, then move long-running agent work to one shared host once people want agents to run overnight or need more cores. Paradev covers all three columns with the same app. A laptop and a shared host are both just devices in the list, a shared host can be a server in your own cloud account, and Paradev cloud workspaces each get their own cloud sandbox and work from desktop, iPhone, and iPad without keeping your own computer connected.
+A common path for a small team: start on laptops, then move long-running agent work to one shared host once people want agents to run overnight or need more cores. Paradev covers all three columns with the same app. A laptop and a shared host are both just devices in the list, a shared host can be a server in your own cloud account, and Paradev cloud workspaces each get their own cloud sandbox and work from desktop, iPhone, iPad, and Android without keeping your own computer connected.
 
 ## How do I review and preview an agent's changes on a remote machine from my laptop?
 
@@ -169,7 +169,7 @@ Yes. Install Claude Code on the server and connect with SSH and tmux, VS Code Re
 
 ### Can I use Claude Code Remote Control on a Paradev host?
 
-Yes. Start Claude Code in a workspace on the host and type `/remote-control`. The session appears in the Claude app and at claude.ai/code, and it also stays visible in Paradev's desktop and iPhone apps. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the workspace's terminal must stay open in at least one pane.
+Yes. Start Claude Code in a workspace on the host and type `/remote-control`. The session appears in the Claude app and at claude.ai/code, and it also stays visible in Paradev's desktop and mobile apps. You need a claude.ai login on a Pro, Max, Team, or Enterprise plan, and the workspace's terminal must stay open in at least one pane.
 
 ### Do I need to keep my laptop open for agents to keep working?
 
@@ -181,7 +181,7 @@ No. Paradev routes terminals, diffs, and forwarded ports through the Paradev rel
 
 ### Are Paradev cloud workspaces available?
 
-Yes, on the Team and Ultra plans. [Cloud workspaces](/cloud) run in a cloud sandbox that Paradev runs for you, and they work from desktop, iPhone, and iPad without keeping your own computer connected. You start one from an environment with your GitHub repos, variables, and region. Remote Access to your own machines, and Bring Your Own Cloud on your own Linux server, are separate options.
+Yes, on the Team and Ultra plans. [Cloud workspaces](/cloud) run in a cloud sandbox that Paradev runs for you, and they work from desktop, iPhone, iPad, and Android without keeping your own computer connected. You start one from an environment with your GitHub repos, variables, and region. Remote Access to your own machines, and Bring Your Own Cloud on your own Linux server, are separate options.
 
 ### Do Git worktrees isolate agents on a shared machine?
 
