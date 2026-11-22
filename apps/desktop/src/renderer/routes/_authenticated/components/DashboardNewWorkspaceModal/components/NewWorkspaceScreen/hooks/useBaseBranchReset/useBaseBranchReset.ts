@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import type { NewWorkspaceDraft } from "renderer/stores/new-workspace-draft";
-import { useV2WorkspaceCreateDefaultsStore } from "renderer/stores/v2-workspace-create-defaults";
+import { useWorkspaceCreateDefaultsStore } from "renderer/stores/workspace-create-defaults";
 
 interface Options {
-	projectId: string | null;
+	/** The project, or on the cloud the environment, that the base branches from. */
+	branchDefaultKey: string | null;
 	hostId: string | null;
 	updateDraft: (
 		patch: Pick<NewWorkspaceDraft, "baseBranch" | "baseBranchSource">,
@@ -11,32 +12,36 @@ interface Options {
 }
 
 /**
- * Sets the draft's base branch to the user's last pick for the selected
- * project, on mount and on every project or host change. The draft store is
- * global and entry points select the project before this screen mounts, so a
- * base left over from another project would otherwise ride into the create.
+ * Sets the draft's base branch to the user's last pick for `branchDefaultKey`,
+ * on mount and on every key or host change. The draft store is global and entry
+ * points select the project before this screen mounts.
  */
 export function useBaseBranchReset({
-	projectId,
+	branchDefaultKey,
 	hostId,
 	updateDraft,
 }: Options) {
-	const persistedDefault = useV2WorkspaceCreateDefaultsStore((state) =>
-		projectId ? (state.baseBranchesByProjectId[projectId] ?? null) : null,
+	const persistedDefault = useWorkspaceCreateDefaultsStore((state) =>
+		branchDefaultKey
+			? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
+			: null,
 	);
 	const seededForRef = useRef<{
-		projectId: string | null;
+		branchDefaultKey: string | null;
 		hostId: string | null;
 	} | null>(null);
 	useEffect(() => {
 		const seededFor = seededForRef.current;
-		if (seededFor?.projectId === projectId && seededFor.hostId === hostId) {
+		if (
+			seededFor?.branchDefaultKey === branchDefaultKey &&
+			seededFor.hostId === hostId
+		) {
 			return;
 		}
-		seededForRef.current = { projectId, hostId };
+		seededForRef.current = { branchDefaultKey, hostId };
 		updateDraft({
 			baseBranch: persistedDefault?.branchName ?? null,
 			baseBranchSource: persistedDefault?.source ?? null,
 		});
-	}, [projectId, hostId, persistedDefault, updateDraft]);
+	}, [branchDefaultKey, hostId, persistedDefault, updateDraft]);
 }

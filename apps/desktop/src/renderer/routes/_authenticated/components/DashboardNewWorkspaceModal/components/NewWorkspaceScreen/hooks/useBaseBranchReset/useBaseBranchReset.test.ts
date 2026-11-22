@@ -8,8 +8,8 @@ const { useBaseBranchReset } = await import("./useBaseBranchReset");
 const { useNewWorkspaceDraftStore } = await import(
 	"renderer/stores/new-workspace-draft"
 );
-const { useV2WorkspaceCreateDefaultsStore } = await import(
-	"renderer/stores/v2-workspace-create-defaults"
+const { environmentBranchKey, useWorkspaceCreateDefaultsStore } = await import(
+	"renderer/stores/workspace-create-defaults"
 );
 afterEach(cleanup);
 afterAll(async () => {
@@ -18,22 +18,26 @@ afterAll(async () => {
 
 beforeEach(() => {
 	useNewWorkspaceDraftStore.getState().resetDraft();
-	useV2WorkspaceCreateDefaultsStore.setState({ baseBranchesByProjectId: {} });
+	useWorkspaceCreateDefaultsStore.setState({ baseBranchesByProjectId: {} });
 });
 
-function renderBaseBranch() {
-	return renderHook(() => {
-		const draft = useNewWorkspaceDraftStore();
-		useBaseBranchReset({
-			projectId: draft.selectedProjectId,
-			hostId: draft.hostId,
-			updateDraft: draft.updateDraft,
-		});
-		return {
-			baseBranch: draft.baseBranch,
-			baseBranchSource: draft.baseBranchSource,
-		};
-	});
+interface Target {
+	branchDefaultKey: string | null;
+	hostId: string | null;
+}
+
+function renderBaseBranch(initial: Target) {
+	return renderHook(
+		(target: Target) => {
+			const draft = useNewWorkspaceDraftStore();
+			useBaseBranchReset({ ...target, updateDraft: draft.updateDraft });
+			return {
+				baseBranch: draft.baseBranch,
+				baseBranchSource: draft.baseBranchSource,
+			};
+		},
+		{ initialProps: initial },
+	);
 }
 
 /** What a sidebar "+" does: select the project, then mount the screen. */
@@ -46,18 +50,24 @@ function leaveBaseThenSelect(projectId: string) {
 test("drops a base left over from another project when it mounts", () => {
 	leaveBaseThenSelect("superset");
 
-	const { result } = renderBaseBranch();
+	const { result } = renderBaseBranch({
+		branchDefaultKey: "superset",
+		hostId: "machine",
+	});
 
 	expect(result.current).toEqual({ baseBranch: null, baseBranchSource: null });
 });
 
 test("applies the project's saved base when it mounts", () => {
-	useV2WorkspaceCreateDefaultsStore
+	useWorkspaceCreateDefaultsStore
 		.getState()
 		.setBaseBranchDefault("cooknco", "release", "remote-tracking");
 	leaveBaseThenSelect("cooknco");
 
-	const { result } = renderBaseBranch();
+	const { result } = renderBaseBranch({
+		branchDefaultKey: "cooknco",
+		hostId: "machine",
+	});
 
 	expect(result.current).toEqual({
 		baseBranch: "release",
@@ -65,32 +75,34 @@ test("applies the project's saved base when it mounts", () => {
 	});
 });
 
-test("keeps the draft's base while open, and resets it on a project change", () => {
-	useNewWorkspaceDraftStore.getState().selectProject("padel-manager");
-	const { result } = renderBaseBranch();
+test("keeps the draft's base while open, and resets it on a key change", () => {
+	const { result, rerender } = renderBaseBranch({
+		branchDefaultKey: "padel-manager",
+		hostId: "machine",
+	});
 
 	act(() => {
 		useNewWorkspaceDraftStore
 			.getState()
 			.updateDraft({ baseBranch: "hotfix", baseBranchSource: "local" });
-		useV2WorkspaceCreateDefaultsStore
+		useWorkspaceCreateDefaultsStore
 			.getState()
 			.setBaseBranchDefault("padel-manager", "staging", "local");
 	});
 	expect(result.current.baseBranch).toBe("hotfix");
 
-	act(() => {
-		useNewWorkspaceDraftStore.getState().selectProject("superset");
-	});
+	rerender({ branchDefaultKey: "superset", hostId: "machine" });
 	expect(result.current).toEqual({ baseBranch: null, baseBranchSource: null });
 });
 
-test("re-seeds the project's saved base when the host changes", () => {
-	useV2WorkspaceCreateDefaultsStore
+test("re-seeds the saved base when the host changes", () => {
+	useWorkspaceCreateDefaultsStore
 		.getState()
 		.setBaseBranchDefault("cooknco", "release", "remote-tracking");
-	useNewWorkspaceDraftStore.getState().selectProject("cooknco");
-	const { result } = renderBaseBranch();
+	const { result, rerender } = renderBaseBranch({
+		branchDefaultKey: "cooknco",
+		hostId: "machine",
+	});
 
 	act(() => {
 		useNewWorkspaceDraftStore
@@ -99,11 +111,29 @@ test("re-seeds the project's saved base when the host changes", () => {
 	});
 	expect(result.current.baseBranch).toBe("hotfix");
 
-	act(() => {
-		useNewWorkspaceDraftStore.getState().updateDraft({ hostId: "other-host" });
-	});
+	rerender({ branchDefaultKey: "cooknco", hostId: "other-host" });
 	expect(result.current).toEqual({
 		baseBranch: "release",
+		baseBranchSource: "remote-tracking",
+	});
+});
+
+test("applies the environment's saved base once the cloud environment resolves", () => {
+	const envKey = environmentBranchKey("env-1");
+	useWorkspaceCreateDefaultsStore
+		.getState()
+		.setBaseBranchDefault(envKey, "trunk", "remote-tracking");
+	leaveBaseThenSelect("cooknco");
+
+	const { result, rerender } = renderBaseBranch({
+		branchDefaultKey: null,
+		hostId: "cloud",
+	});
+	expect(result.current).toEqual({ baseBranch: null, baseBranchSource: null });
+
+	rerender({ branchDefaultKey: envKey, hostId: "cloud" });
+	expect(result.current).toEqual({
+		baseBranch: "trunk",
 		baseBranchSource: "remote-tracking",
 	});
 });
