@@ -1,5 +1,7 @@
 import type { LinkTier, ModifierEvent, TierMode } from "./types";
 
+type TierMap<Action> = Record<LinkTier, Action | null>;
+
 /**
  * Resolve a click event to a tier under the given mode.
  *
@@ -16,4 +18,12 @@ export function tierFor(event: ModifierEvent, mode: TierMode): LinkTier {
 	if (mode === "2-tier") return meta ? "meta" : "plain";
 	if (meta) return event.shiftKey ? "metaShift" : "meta";
 	return event.shiftKey ? "shift" : "plain";
+}
+
+/** A map where an unbound plain click runs `action`. Bound tiers are kept. */
+export function withPlainDefault<Action>(
+	map: TierMap<Action>,
+	action: Action,
+): TierMap<Action> {
+	return map.plain === null ? { ...map, plain: action } : map;
 }

@@ -97,27 +97,38 @@ function describeRejection(
 	return null;
 }
 
+/** Installs from before the Paradev rename keep logging under "Superset". */
+const DESKTOP_APP_NAMES = ["Paradev", "Superset"];
+
 /** electron-log's default main.log location for the desktop app. */
-function appLogPath(): string {
+function appLogPath(appName: string): string {
 	const home = os.homedir();
 	switch (process.platform) {
 		case "darwin":
-			return join(home, "Library", "Logs", "Superset", "main.log");
+			return join(home, "Library", "Logs", appName, "main.log");
 		case "win32":
 			return join(
 				process.env.APPDATA ?? join(home, "AppData", "Roaming"),
-				"Superset",
+				appName,
 				"logs",
 				"main.log",
 			);
 		default:
 			return join(
 				process.env.XDG_CONFIG_HOME ?? join(home, ".config"),
-				"Superset",
+				appName,
 				"logs",
 				"main.log",
 			);
 	}
+}
+
+export function desktopAppLogPaths(
+	exists: (path: string) => boolean = existsSync,
+): string[] {
+	const paths = DESKTOP_APP_NAMES.map(appLogPath);
+	const found = paths.filter((path) => exists(path));
+	return found.length > 0 ? found : paths.slice(0, 1);
 }
 
 async function describeHostService(
@@ -151,7 +162,7 @@ async function collectDiagnostics(
 		`OS: ${os.platform()} ${os.release()} ${os.arch()}`,
 		await describeHostService(organizationId),
 	];
-	const logPaths = [appLogPath()];
+	const logPaths = desktopAppLogPaths();
 	if (organizationId) logPaths.push(hostServiceLogPath(organizationId));
 	for (const logPath of logPaths) {
 		if (existsSync(logPath)) {

@@ -56,10 +56,15 @@ interface TerminalLifecycleBase {
 }
 
 export type TerminalLifecycleMessage =
+	/** The terminal now appears in `terminal.list`, whoever started it. */
+	| (TerminalLifecycleBase & { eventType: "listed" })
 	| (TerminalLifecycleBase & {
 			eventType: "exit";
 			exitCode: number;
 			signal: number;
+	  })
+	| (TerminalLifecycleBase & {
+			eventType: "command-finished";
 	  })
 	/**
 	 * The agent session that was running in `terminalId` now lives in

@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { projects } from "../db/schema";
 import type { EventBus } from "../events";
@@ -34,11 +34,42 @@ export function toProjectSnapshot(
 	};
 }
 
+/** A live project. Deleted projects are hidden from every caller that does
+ * not ask for them by name. */
 export function getLocalProject(
 	db: HostDb,
 	id: string,
 ): HostProjectRow | undefined {
+	return db.query.projects
+		.findFirst({ where: and(eq(projects.id, id), isNull(projects.deletedAt)) })
+		.sync();
+}
+
+export function getProjectIncludingDeleted(
+	db: HostDb,
+	id: string,
+): HostProjectRow | undefined {
 	return db.query.projects.findFirst({ where: eq(projects.id, id) }).sync();
+}
+
+export function getLiveProjectAtPath(
+	db: HostDb,
+	repoPath: string,
+): HostProjectRow | undefined {
+	return db.query.projects
+		.findFirst({
+			where: and(eq(projects.repoPath, repoPath), isNull(projects.deletedAt)),
+		})
+		.sync();
+}
+
+export function getProjectAtPathIncludingDeleted(
+	db: HostDb,
+	repoPath: string,
+): HostProjectRow | undefined {
+	return db.query.projects
+		.findFirst({ where: eq(projects.repoPath, repoPath) })
+		.sync();
 }
 
 export function emitProjectChanged(

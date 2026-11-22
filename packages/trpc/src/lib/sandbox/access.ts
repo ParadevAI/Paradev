@@ -2,7 +2,7 @@ import {
 	sandboxGateUrl,
 	sandboxHostSecret,
 	signSandboxGateTicket,
-} from "@superset/shared/sandbox-gate";
+} from "@superset/shared/sandbox/gate";
 import { env } from "../../env";
 
 /**

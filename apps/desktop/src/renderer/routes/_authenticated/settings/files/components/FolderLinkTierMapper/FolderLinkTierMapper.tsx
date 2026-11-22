@@ -9,6 +9,7 @@ import {
 } from "@superset/ui/select";
 import { useCallback } from "react";
 import {
+	FOLDER_LINK_PLAIN_DEFAULT,
 	type FolderLinkAction,
 	type FolderTierMap,
 	folderIntentLabel,
@@ -31,7 +32,7 @@ function fromSlot(slot: SlotValue): FolderLinkAction | null {
 	return slot === "none" ? null : slot;
 }
 
-export interface FolderLinkTierMapperProps {
+interface FolderLinkTierMapperProps {
 	title: string;
 	description: string;
 	value: FolderTierMap;
@@ -72,6 +73,8 @@ export function FolderLinkTierMapper({
 			<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
 				{TIERS.map((tier) => {
 					const id = `${idPrefix}-${tier}`;
+					const fallback =
+						tier === "plain" ? FOLDER_LINK_PLAIN_DEFAULT : undefined;
 					return (
 						<div
 							key={tier}
@@ -81,7 +84,7 @@ export function FolderLinkTierMapper({
 								{modifierLabel(tier)}
 							</Label>
 							<Select
-								value={toSlot(value[tier])}
+								value={toSlot(value[tier] ?? fallback ?? null)}
 								onValueChange={(v) => pick(tier, v as SlotValue)}
 							>
 								<SelectTrigger
@@ -92,9 +95,11 @@ export function FolderLinkTierMapper({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="none">
-										<Trans>Do nothing</Trans>
-									</SelectItem>
+									{!fallback && (
+										<SelectItem value="none">
+											<Trans>Do nothing</Trans>
+										</SelectItem>
+									)}
 									{ACTIONS.map((action) => (
 										<SelectItem key={action} value={action}>
 											{folderIntentLabel(action)}

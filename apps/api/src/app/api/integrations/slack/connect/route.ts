@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
 			slackAuthUrl.searchParams.set("client_id", env.SLACK_CLIENT_ID);
 			slackAuthUrl.searchParams.set(
 				"redirect_uri",
-				`${env.NEXT_PUBLIC_API_URL}/api/integrations/slack/callback`,
+				`${getBrowserApiUrl(env)}/api/integrations/slack/callback`,
 			);
 			slackAuthUrl.searchParams.set("scope", SLACK_SCOPES);
 			slackAuthUrl.searchParams.set("state", state);

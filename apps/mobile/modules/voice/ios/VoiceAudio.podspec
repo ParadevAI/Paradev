@@ -5,10 +5,10 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'VoiceAudio'
   s.version        = package['version']
-  s.summary        = 'Audio session for Superset voice mode'
+  s.summary        = 'Audio session for Paradev voice mode'
   s.description    = 'Owns AVAudioSession while a realtime voice call runs: speaker, Bluetooth, interruptions'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

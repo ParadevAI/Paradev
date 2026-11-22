@@ -14,6 +14,7 @@ import {
 import { initTRPC, TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import superjson from "superjson";
+import { z } from "zod";
 import { env } from "./env";
 import { formatError, userError } from "./i18n-error";
 import { hasAdminAccess } from "./lib/admin-access";
@@ -23,8 +24,8 @@ import {
 } from "./lib/agent-turn/turn-token";
 import { posthog } from "./lib/analytics";
 import {
-	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
+	sandboxMayCall,
 } from "./lib/sandbox/api-credential";
 import { tokenOrganizationIds } from "./lib/token-organizations";
 import {
@@ -118,13 +119,17 @@ const t = initTRPC.context<TRPCContext>().create({
 	},
 });
 
+const organizationInput = z.object({ organizationId: z.string() });
+
 /**
- * A box may only reach what `superset` inside it needs. Everything else is a
+ * A box may only reach what `superset` inside it needs, and only in its own
+ * organization, whether the header or the input names it. Everything else is a
  * person's call, made from a client they signed into — the credential is
  * unstealable, but every process in the box can use it.
  */
-const sandboxScope = t.middleware(async ({ ctx, path, next }) => {
-	if (ctx.sandboxCaller && !SANDBOX_ALLOWED_PROCEDURES.has(path)) {
+const sandboxScope = t.middleware(async ({ ctx, path, getRawInput, next }) => {
+	if (!ctx.sandboxCaller) return next();
+	if (!sandboxMayCall(path)) {
 		throw userError({
 			code: "FORBIDDEN",
 			message: `A cloud workspace cannot call ${path}. Run this from a client you are signed into.`,
@@ -132,6 +137,11 @@ const sandboxScope = t.middleware(async ({ ctx, path, next }) => {
 			params: { path },
 		});
 	}
+	const input = organizationInput.safeParse(await getRawInput());
+	assertInBoxOrganization(
+		ctx.sandboxCaller,
+		input.data?.organizationId ?? null,
+	);
 	return next();
 });
 

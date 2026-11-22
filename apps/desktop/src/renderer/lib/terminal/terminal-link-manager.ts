@@ -10,6 +10,7 @@
 import type { ILinkHandler, Terminal as XTerm } from "@xterm/xterm";
 import type { DetectedLink } from "./links";
 import {
+	isWebLink,
 	LinkDetectorAdapter,
 	LocalLinkDetector,
 	type StatCallback,
@@ -29,7 +30,7 @@ export type LinkHoverInfo =
 	| { kind: "url"; url: string };
 
 /**
- * Link handler callbacks for the v2 terminal.
+ * Link handler callbacks for the terminal.
  */
 export interface TerminalLinkHandlers {
 	/** Called when a file path link is activated (Cmd/Ctrl+click). */
@@ -45,6 +46,11 @@ export interface TerminalLinkHandlers {
 	 * which handles all path resolution (relative, tilde, etc.) server-side.
 	 */
 	stat?: StatCallback;
+	/**
+	 * Finds the file a path most plausibly means when it does not exist as
+	 * written. Asked only for path-like text, never for single words.
+	 */
+	resolveFile?: (reference: string) => Promise<{ resolvedPath: string } | null>;
 }
 
 interface LinkProviderDisposable {
@@ -62,6 +68,7 @@ interface LinkProviderDisposable {
 export class TerminalLinkManager {
 	private _disposables: LinkProviderDisposable[] = [];
 	private _resolver: TerminalLinkResolver | null = null;
+	private _fileFinder: TerminalLinkResolver | null = null;
 	private _handlers: TerminalLinkHandlers | null = null;
 	private _oscLinkHandler: ILinkHandler | null = null;
 
@@ -93,6 +100,8 @@ export class TerminalLinkManager {
 		this._clearOscLinkHandler();
 		this._resolver?.clearCache();
 		this._resolver = null;
+		this._fileFinder?.clearCache();
+		this._fileFinder = null;
 		this._handlers = null;
 	}
 
@@ -116,33 +125,65 @@ export class TerminalLinkManager {
 		if (!this._resolver) {
 			this._resolver = new TerminalLinkResolver(handlers.stat);
 		}
+		if (!this._fileFinder) {
+			this._fileFinder = new TerminalLinkResolver(async (path) => {
+				const file = await this._handlers?.resolveFile?.(path);
+				return file
+					? { isDirectory: false, resolvedPath: file.resolvedPath }
+					: null;
+			});
+		}
+
+		// xterm reports a text-selection drag that ends on a link as a click.
+		const isClick = (event: MouseEvent) =>
+			event.metaKey ||
+			event.ctrlKey ||
+			event.shiftKey ||
+			!this._terminal.hasSelection();
+		const onFileLinkClick =
+			handlers.onFileLinkClick &&
+			((event: MouseEvent, link: DetectedLink) => {
+				if (isClick(event)) handlers.onFileLinkClick?.(event, link);
+			});
+		const onUrlClick =
+			handlers.onUrlClick &&
+			((event: MouseEvent, url: string) => {
+				if (isClick(event)) handlers.onUrlClick?.(event, url);
+			});
 
 		const onLinkHover = handlers.onLinkHover;
 		const onLinkLeave = handlers.onLinkLeave;
 
 		// 1. File path detector (highest priority)
-		const detector = new LocalLinkDetector(this._resolver);
+		const detector = new LocalLinkDetector(this._resolver, this._fileFinder);
 		const adapter = new LinkDetectorAdapter(
 			this._terminal,
 			detector,
-			handlers.onFileLinkClick,
+			(event, link) => {
+				if (isWebLink(link)) onUrlClick?.(event, link.url);
+				else onFileLinkClick?.(event, link);
+			},
 			onLinkHover
 				? (event, link) =>
-						onLinkHover(event, {
-							kind: "file",
-							isDirectory: link.isDirectory,
-							resolvedPath: link.resolvedPath,
-							row: link.row,
-							col: link.col,
-						})
+						onLinkHover(
+							event,
+							isWebLink(link)
+								? { kind: "url", url: link.url }
+								: {
+										kind: "file",
+										isDirectory: link.isDirectory,
+										resolvedPath: link.resolvedPath,
+										row: link.row,
+										col: link.col,
+									},
+						)
 				: undefined,
 			onLinkLeave,
 		);
 		this._disposables.push(this._terminal.registerLinkProvider(adapter));
 
 		// 2. URL link provider (handles terminal-wrapped URLs)
-		if (handlers.onUrlClick) {
-			const onUrlClick = handlers.onUrlClick;
+		if (onUrlClick) {
 			const urlProvider = new UrlLinkProvider(
 				this._terminal,
 				(event, uri) => {
@@ -177,8 +218,8 @@ export class TerminalLinkManager {
 		// exists (validated via stat). Catches bare filenames like
 		// "AGENTS.md" that have no path separator or line suffix.
 		// To disable: remove or comment out this block.
-		if (handlers.onFileLinkClick) {
-			const onFileClick = handlers.onFileLinkClick;
+		if (onFileLinkClick) {
+			const onFileClick = onFileLinkClick;
 			const wordDetector = new WordLinkDetector(
 				this._terminal,
 				this._resolver,

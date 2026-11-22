@@ -2,13 +2,14 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { acpStartModes } from "@superset/chat/core";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { draftText } from "@superset/chat-ui/PromptInput";
+import { errorMessage } from "@superset/i18n/errors";
 import {
 	getAgentEffortSupport,
 	getAgentEfforts,
 	getAgentModelSupport,
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
-import type { MachineSize } from "@superset/shared/billing";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
@@ -22,21 +23,20 @@ import { HistoryIcon, Settings2Icon } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
-import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
+import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
-import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
-import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
@@ -50,29 +50,30 @@ import { ModePicker } from "renderer/routes/_authenticated/components/AgentCompo
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
-import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
+import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
+import { SetUpEnvironmentButton } from "renderer/routes/_authenticated/components/SetUpEnvironmentButton";
+import { useDefaultCloudAgent } from "renderer/routes/_authenticated/hooks/useDefaultCloudAgent";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
-	NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-	NEW_WORKSPACE_SCREEN_MAX_WIDTH,
-	NEW_WORKSPACE_SCREEN_MIN_WIDTH,
-	useNewWorkspaceWidthStore,
-} from "renderer/stores/new-workspace-width";
+	ENVIRONMENT_SETUP_PROMPT,
+	environmentSetupAgentPrompt,
+	withEnvironmentSetupSkill,
+} from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
+import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
+import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
 	environmentBranchKey,
 	NO_PROJECT_KEY,
-	useV2WorkspaceCreateDefaultsStore,
-} from "renderer/stores/v2-workspace-create-defaults";
+	useWorkspaceCreateDefaultsStore,
+} from "renderer/stores/workspace-create-defaults";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
 import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence";
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
 import { useWorkspaceHostOptions } from "../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { CheckoutPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/CheckoutPickerPill";
 import { CompareBaseBranchPicker } from "../DashboardNewWorkspaceForm/PromptGroup/components/CompareBaseBranchPicker";
-import { EnvironmentPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/EnvironmentPickerPill";
-import { MachineSizePickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/MachineSizePickerPill";
 import { ProjectPickerPill } from "../DashboardNewWorkspaceForm/PromptGroup/components/ProjectPickerPill";
 import { PromptHistoryCommand } from "../DashboardNewWorkspaceForm/PromptGroup/components/PromptHistoryCommand";
 import { useBranchPickerController } from "../DashboardNewWorkspaceForm/PromptGroup/hooks/useBranchPickerController";
@@ -88,13 +89,13 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
-import { SymmetricResizeHandles } from "../SymmetricResizeHandles";
-import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
 import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
+import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
+import { useLaunchModels } from "./hooks/useLaunchModels";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
@@ -105,7 +106,11 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
-import { resolveCloudChoices } from "./utils/resolveCloudChoices";
+import { launchPresetIdOf } from "./utils/launchPresetIdOf";
+import {
+	type PendingEnvironmentSetup,
+	planEnvironmentSetup,
+} from "./utils/planEnvironmentSetup";
 import { resolveLaunchHost } from "./utils/resolveLaunchHost";
 import {
 	type LaunchProjectPick,
@@ -127,13 +132,9 @@ interface NewWorkspaceScreenProps {
 }
 
 /**
- * The v2 workspace-creation surface: heading, sample prompts, and a minimal
+ * The workspace-creation surface: heading, sample prompts, and a minimal
  * composer, filling the window rather than a dialog.
  */
-function launchPresetIdOf(agent: AgentSelectAgent): string {
-	return agent.launchPresetId ?? agent.presetId ?? agent.iconId ?? agent.id;
-}
-
 export function NewWorkspaceScreen({
 	isOpen,
 	preSelectedProjectId,
@@ -142,10 +143,12 @@ export function NewWorkspaceScreen({
 }: NewWorkspaceScreenProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const navigate = useNavigate();
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
 		closeModal,
+		closeAndResetDraft,
 		draft,
 		updateDraft,
 		selectProject,
@@ -157,13 +160,13 @@ export function NewWorkspaceScreen({
 	const relayUrl = useRelayUrl();
 	const activeOrganizationId = useActiveOrganizationId();
 
-	const setLastProjectId = useV2WorkspaceCreateDefaultsStore(
+	const setLastProjectId = useWorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectId,
 	);
-	const lastHostId = useV2WorkspaceCreateDefaultsStore(
+	const lastHostId = useWorkspaceCreateDefaultsStore(
 		(state) => state.lastHostId,
 	);
-	const setLastHostId = useV2WorkspaceCreateDefaultsStore(
+	const setLastHostId = useWorkspaceCreateDefaultsStore(
 		(state) => state.setLastHostId,
 	);
 	const hostId = resolveLaunchHost({
@@ -186,22 +189,22 @@ export function NewWorkspaceScreen({
 	});
 	const isCloudHost = hostId === CLOUD_HOST_ID;
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
-	const setLastProjectChoice = useV2WorkspaceCreateDefaultsStore(
+	const setLastProjectChoice = useWorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectChoice,
 	);
-	const setCheckoutDefault = useV2WorkspaceCreateDefaultsStore(
+	const setCheckoutDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.setCheckout,
 	);
-	const cloudChoices = useV2WorkspaceCreateDefaultsStore(
+	const cloudChoices = useWorkspaceCreateDefaultsStore(
 		(state) => state.cloudChoices,
 	);
-	const setCloudChoice = useV2WorkspaceCreateDefaultsStore(
+	const setCloudChoice = useWorkspaceCreateDefaultsStore(
 		(state) => state.setCloudChoice,
 	);
-	const samplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
+	const samplePromptsDismissed = useWorkspaceCreateDefaultsStore(
 		(state) => state.samplePromptsDismissed,
 	);
-	const setSamplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
+	const setSamplePromptsDismissed = useWorkspaceCreateDefaultsStore(
 		(state) => state.setSamplePromptsDismissed,
 	);
 
@@ -260,7 +263,7 @@ export function NewWorkspaceScreen({
 	);
 	const selectableProjects = isCloudHost ? cloudProjects : projects;
 
-	const lastProjectChoice = useV2WorkspaceCreateDefaultsStore(
+	const lastProjectChoice = useWorkspaceCreateDefaultsStore(
 		(state) =>
 			state.lastProjectChoice[isCloudHost ? "cloud" : "device"] ?? null,
 	);
@@ -326,18 +329,6 @@ export function NewWorkspaceScreen({
 	const isSession = resolvedProject.isSession;
 	const isProjectPending = resolvedProject.isPending;
 
-	const storedComposerWidth = useNewWorkspaceWidthStore(
-		(state) => state.screenWidth,
-	);
-	const setStoredComposerWidth = useNewWorkspaceWidthStore(
-		(state) => state.setScreenWidth,
-	);
-	/** Width while a resize drag is in flight; persisted on release. */
-	const [liveComposerWidth, setLiveComposerWidth] = useState<number | null>(
-		null,
-	);
-	const composerWidth = liveComposerWidth ?? storedComposerWidth;
-
 	// One suggestion per open. resetKey only bumps on resetDraft, so ordinary
 	// modal reopens roll their own counter; the tiptap Placeholder extension
 	// freezes its text at editor mount, so the roll also rides the editor key.
@@ -355,14 +346,11 @@ export function NewWorkspaceScreen({
 			PROMPT_PLACEHOLDERS[
 				Math.floor(Math.random() * PROMPT_PLACEHOLDERS.length)
 			];
-		const prompt = descriptor
+		return descriptor
 			? t(descriptor)
 			: t({
 					message: "What do you want to do?",
 				});
-		return t({
-			message: `${prompt} · # to change project, host, and more`,
-		});
 	}, [resetKey, placeholderRoll, t]);
 
 	const projectId = resolvedProject.projectId;
@@ -380,7 +368,6 @@ export function NewWorkspaceScreen({
 		selectedProject?.githubOwner && selectedProject.githubRepoName
 			? `${selectedProject.githubOwner}/${selectedProject.githubRepoName}`
 			: null;
-	const machineSizeOptions = useMachineSizeOptions();
 	const cloudProjectId = isSession ? null : projectId;
 	const cloudChoiceKey = cloudProjectId ?? NO_PROJECT_KEY;
 	const cloudSelection = useMemo(
@@ -390,20 +377,42 @@ export function NewWorkspaceScreen({
 				projectId: cloudProjectId,
 				repositoryFullName: projectRepositoryFullName,
 				choices: cloudChoices,
-				offeredSizes: machineSizeOptions.options.map((option) => option.size),
-				defaultSize: machineSizeOptions.defaultSize,
 			}),
 		[
 			environmentsQuery.data,
 			cloudProjectId,
 			projectRepositoryFullName,
 			cloudChoices,
-			machineSizeOptions,
 		],
 	);
 	const resolvedEnvironment = cloudSelection.environment ?? undefined;
-	const isCloudTargetLoading = environmentsQuery.isLoading || github.isLoading;
+	const isCloudTargetLoading =
+		environmentsQuery.isLoading || github.isLoading || !areProjectsReady;
 	const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
+	const [dialogSendsDraft, setDialogSendsDraft] = useState(false);
+	const [pendingSetup, setPendingSetup] =
+		useState<PendingEnvironmentSetup | null>(null);
+	const needsEnvironment =
+		isCloudHost &&
+		cloudEnabled !== false &&
+		environmentsQuery.isSuccess &&
+		!isCloudTargetLoading &&
+		!resolvedEnvironment;
+	const projectRepository = projectRepositoryFullName
+		? github.repositoriesByFullName.get(projectRepositoryFullName.toLowerCase())
+		: undefined;
+	const { createEnvironment, isCreating: isCreatingProjectEnvironment } =
+		useCreateProjectEnvironment(activeOrganizationId);
+	const setupPlan = isCloudHost
+		? planEnvironmentSetup({
+				pending: pendingSetup,
+				choiceKey: cloudChoiceKey,
+				selectedEnvironmentId: resolvedEnvironment?.id ?? null,
+				needsEnvironment,
+				repository: projectRepository,
+			})
+		: null;
+	const defaultCloudAgent = useDefaultCloudAgent();
 	const cloudRepository = useMemo(() => {
 		if (!isCloudHost) return null;
 		const primary = resolvedEnvironment?.repositories?.[0];
@@ -440,16 +449,15 @@ export function NewWorkspaceScreen({
 			? environmentBranchKey(resolvedEnvironment.id)
 			: null
 		: projectId;
-	const persistedBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
-		(state) =>
-			branchDefaultKey
-				? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
-				: null,
+	const persistedBaseBranchDefault = useWorkspaceCreateDefaultsStore((state) =>
+		branchDefaultKey
+			? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
+			: null,
 	);
-	const setBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
+	const setBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.setBaseBranchDefault,
 	);
-	const clearBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
+	const clearBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.clearBaseBranchDefault,
 	);
 	const previousBranchDefaultKeyRef = useRef(branchDefaultKey);
@@ -534,28 +542,15 @@ export function NewWorkspaceScreen({
 			setCloudChoice(cloudChoiceKey, { environmentId }),
 		[setCloudChoice, cloudChoiceKey],
 	);
-	const handleSelectMachineSize = useCallback(
-		(machineSize: MachineSize) =>
-			setCloudChoice(cloudChoiceKey, { machineSize }),
-		[setCloudChoice, cloudChoiceKey],
-	);
 	const cloudSettings = useMemo(
 		() =>
 			isCloudHost
 				? {
 						environments: [...cloudSelection.linked, ...cloudSelection.other],
 						onSelectEnvironment: handleSelectEnvironment,
-						machineSizes: machineSizeOptions.options,
-						onSelectMachineSize: handleSelectMachineSize,
 					}
 				: null,
-		[
-			isCloudHost,
-			cloudSelection,
-			handleSelectEnvironment,
-			machineSizeOptions,
-			handleSelectMachineSize,
-		],
+		[isCloudHost, cloudSelection, handleSelectEnvironment],
 	);
 	const settingProviders = useWorkspaceSettingMentionProviders({
 		projects: selectableProjects,
@@ -589,14 +584,20 @@ export function NewWorkspaceScreen({
 	}, [setSamplePromptsDismissed]);
 
 	const { agents: hostAgents, isFetched: hostAgentsFetched } =
-		useV2AgentChoices(launchHostUrl);
+		useAgentChoices(launchHostUrl);
 	const cloudAgents = useCloudAgentChoices();
 	// Under Cloud the built-in presets stand in for a host's agent list.
-	const v2Agents = isCloudHost ? cloudAgents : hostAgents;
-	const v2AgentsFetched = isCloudHost || hostAgentsFetched;
+	const agentConfigs = useMemo(
+		() =>
+			(isCloudHost ? cloudAgents : hostAgents).filter(
+				(agent) => launchPresetIdOf(agent) !== "mastracode",
+			),
+		[isCloudHost, cloudAgents, hostAgents],
+	);
+	const agentsFetched = isCloudHost || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
-		() => v2Agents.map((agent) => agent.id),
-		[v2Agents],
+		() => agentConfigs.map((agent) => agent.id),
+		[agentConfigs],
 	);
 	const { selectedAgent, setSelectedAgent } =
 		useAgentLaunchPreferences<WorkspaceCreateAgent>({
@@ -604,20 +605,31 @@ export function NewWorkspaceScreen({
 			defaultAgent: selectableAgentIds[0] ?? "none",
 			fallbackAgent: selectableAgentIds[0] ?? "none",
 			validAgents: selectableAgentIds,
-			agentsReady: v2AgentsFetched,
+			agentsReady: agentsFetched,
 		});
 
 	const selectedPresetId = useMemo(() => {
-		const agent = v2Agents.find((candidate) => candidate.id === selectedAgent);
+		const agent = agentConfigs.find(
+			(candidate) => candidate.id === selectedAgent,
+		);
 		return agent ? launchPresetIdOf(agent) : null;
-	}, [v2Agents, selectedAgent]);
-	const modelSupport = selectedPresetId
-		? getAgentModelSupport(selectedPresetId)
-		: undefined;
-	const { selectedModel, setSelectedModel } = useAgentModelPreference(
-		MODEL_STORAGE_KEY,
-		modelSupport ? selectedPresetId : null,
-	);
+	}, [agentConfigs, selectedAgent]);
+	const acpChatEnabled = useAcpChatEnabled();
+	const {
+		catalogs,
+		defaultEffortLabel,
+		modelSupport,
+		selectedModel,
+		setSelectedModel,
+		modelForLaunch,
+	} = useLaunchModels({
+		agents: agentConfigs,
+		selectedAgent,
+		selectedPresetId,
+		hostUrl: launchHostUrl,
+		projectId: isCloudHost ? undefined : (projectId ?? undefined),
+		storageKey: MODEL_STORAGE_KEY,
+	});
 	const effortSupport = selectedPresetId
 		? getAgentEffortSupport(selectedPresetId)
 		: undefined;
@@ -632,7 +644,11 @@ export function NewWorkspaceScreen({
 	// launches) as the agent default.
 	const effortOptions = useMemo(
 		() =>
-			selectedPresetId
+			selectedPresetId &&
+			(!selectedModel ||
+				getAgentModelSupport(selectedPresetId)?.models.some(
+					(entry) => entry.id === selectedModel,
+				))
 				? getAgentEfforts(selectedPresetId, selectedModel ?? undefined)
 				: [],
 		[selectedPresetId, selectedModel],
@@ -645,7 +661,6 @@ export function NewWorkspaceScreen({
 	const modeSupport = selectedPresetId
 		? getAgentModeSupport(selectedPresetId)
 		: undefined;
-	const acpChatEnabled = useAcpChatEnabled();
 	const startModes = acpChatEnabled
 		? acpStartModes(selectedPresetId)
 		: undefined;
@@ -658,7 +673,7 @@ export function NewWorkspaceScreen({
 							id: AGENT_DEFAULT_OPTION_ID,
 							label: t({ message: "Direct mode" }),
 						},
-						...modeSupport.modes.map(({ id, label }) => ({ id, label })),
+						...modeSupport.modes.map((entry) => ({ ...entry })),
 					]
 				: undefined),
 		[startModes, modeSupport, t],
@@ -680,14 +695,22 @@ export function NewWorkspaceScreen({
 				selectedModel,
 				efforts: effortOptions,
 				selectedEffort,
+				defaultEffortLabel: selectedModel ? undefined : defaultEffortLabel,
 				labels: {
 					model: t({ message: "Model" }),
-					defaultModel: t({ message: "Default model" }),
+					defaultModel: t({ message: "Default" }),
 					effort: t({ message: "Effort" }),
 					defaultEffort: t({ message: "Default" }),
 				},
 			}),
-		[effortOptions, modelSupport, selectedEffort, selectedModel, t],
+		[
+			effortOptions,
+			modelSupport,
+			selectedEffort,
+			selectedModel,
+			defaultEffortLabel,
+			t,
+		],
 	);
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
 	const selectLaunchOption = useCallback(
@@ -700,7 +723,7 @@ export function NewWorkspaceScreen({
 	);
 	const pendingSwitchModel = useRef<{
 		agent: WorkspaceCreateAgent;
-		model: string;
+		model: string | null;
 	} | null>(null);
 	useEffect(() => {
 		const pending = pendingSwitchModel.current;
@@ -712,22 +735,30 @@ export function NewWorkspaceScreen({
 		if (selectedAgent === "none") return undefined;
 		return {
 			currentPresetId: selectedAgent,
-			agents: v2Agents.map((agent) => ({
+			defaultOptionId: AGENT_DEFAULT_OPTION_ID,
+			agents: agentConfigs.map((agent) => ({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
+				loading: catalogs[agent.id]?.loading,
+				onLoad: catalogs[agent.id]?.load,
+				catalogKey: catalogs[agent.id]?.key,
+				defaultModelLabel: catalogs[agent.id]?.defaultModel?.label,
 				models: (
-					getAgentModelSupport(launchPresetIdOf(agent))?.models ?? []
-				).map(({ id, label }) => ({ id, label })),
+					catalogs[agent.id]?.models ??
+					getAgentModelSupport(launchPresetIdOf(agent))?.models ??
+					[]
+				).map((entry) => ({ ...entry })),
 			})),
 			onSwitch: (agentId, model) => {
-				pendingSwitchModel.current = model
-					? { agent: agentId, model: model.id }
-					: null;
+				pendingSwitchModel.current = {
+					agent: agentId,
+					model: model?.id ?? null,
+				};
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, v2Agents]);
+	}, [selectedAgent, setSelectedAgent, agentConfigs, catalogs]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(
@@ -780,13 +811,12 @@ export function NewWorkspaceScreen({
 		projectId,
 		selectedAgent,
 		selectedPresetId,
-		modelSupport ? selectedModel : null,
+		modelForLaunch,
 		effortForLaunch,
 		modeForLaunch,
 		uploadAttachments,
 		promptContext,
 		resolvedEnvironment?.id ?? null,
-		isCloudHost ? cloudSelection.machineSize : null,
 		hostId,
 		isSession,
 	);
@@ -801,9 +831,9 @@ export function NewWorkspaceScreen({
 						"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 				});
 			if (isCloudTargetLoading) return t({ message: "Loading environments…" });
-			return resolvedEnvironment
-				? null
-				: t({ message: "Select an environment" });
+			if (environmentsQuery.isError)
+				return t({ message: "Could not load environments" });
+			return null;
 		}
 		if (isProjectPending || (!selectedProject && !isSession))
 			return t({
@@ -834,7 +864,7 @@ export function NewWorkspaceScreen({
 		activeHostUrl,
 		selectedRemoteHostPresence,
 		isCloudTargetLoading,
-		resolvedEnvironment,
+		environmentsQuery.isError,
 		t,
 	]);
 
@@ -865,7 +895,91 @@ export function NewWorkspaceScreen({
 		});
 	}, [closeModal, hostId, navigate, selectedProject?.id]);
 
+	const setupInFlightRef = useRef(false);
+	const runEnvironmentSetup = useCallback(
+		async ({
+			cloudPrompt,
+			ignoreDraft,
+		}: {
+			cloudPrompt: (typed: string, environmentUrl: string) => string;
+			ignoreDraft: boolean;
+		}) => {
+			if (!setupPlan || setupInFlightRef.current) return;
+			if (setupPlan.kind === "dialog") {
+				setDialogSendsDraft(!ignoreDraft);
+				setIsCreatingEnvironment(true);
+				return;
+			}
+			const agent =
+				selectedAgent !== "none" ? selectedAgent : defaultCloudAgent;
+			if (!agent) {
+				toast.error(
+					t({ message: "No agent is available to set up the environment" }),
+				);
+				return;
+			}
+			setupInFlightRef.current = true;
+			try {
+				let environmentId: string | null =
+					setupPlan.kind === "reuse" ? setupPlan.environmentId : null;
+				if (setupPlan.kind === "create") {
+					environmentId = await createEnvironment({
+						repository: setupPlan.repository,
+						projectId: cloudProjectId,
+					});
+					if (!environmentId) return;
+					setCloudChoice(cloudChoiceKey, { environmentId });
+					setPendingSetup({ choiceKey: cloudChoiceKey, environmentId });
+				}
+				if (!environmentId) return;
+				const environmentUrl = new URL(
+					`/environments/${environmentId}`,
+					env.NEXT_PUBLIC_WEB_URL,
+				).toString();
+				const started = await createWorkspace({
+					cloudEnvironmentId: environmentId,
+					cloudPrompt: (typed) => cloudPrompt(typed, environmentUrl),
+					cloudAgent: agent,
+					ignoreDraft,
+				});
+				if (started) setPendingSetup(null);
+			} catch (error) {
+				toast.error(
+					errorMessage(error, t({ message: "Could not create environment" })),
+					isCloudUsageRefusal(error)
+						? {
+								action: {
+									label: t({ message: "Open billing" }),
+									onClick: () => {
+										closeModal();
+										void navigate({ to: "/settings/billing" });
+									},
+								},
+							}
+						: undefined,
+				);
+			} finally {
+				setupInFlightRef.current = false;
+			}
+		},
+		[
+			setupPlan,
+			selectedAgent,
+			defaultCloudAgent,
+			createEnvironment,
+			cloudProjectId,
+			setCloudChoice,
+			cloudChoiceKey,
+			createWorkspace,
+			closeModal,
+			navigate,
+			t,
+		],
+	);
+
+	const isStarting = isCreating || isCreatingProjectEnvironment;
 	const handleSubmit = useCallback(() => {
+		if (isStarting) return;
 		if (needsSetup) {
 			handleGoToSetup();
 			return;
@@ -880,10 +994,20 @@ export function NewWorkspaceScreen({
 			}
 			return;
 		}
+		if (setupPlan) {
+			void runEnvironmentSetup({
+				cloudPrompt: withEnvironmentSetupSkill,
+				ignoreDraft: false,
+			});
+			return;
+		}
 		void createWorkspace();
 	}, [
 		activeHostUrl,
 		createWorkspace,
+		isStarting,
+		setupPlan,
+		runEnvironmentSetup,
 		hostId,
 		handleGoToSetup,
 		hostService,
@@ -956,6 +1080,18 @@ export function NewWorkspaceScreen({
 			tier={samplePromptTier}
 		/>
 	);
+	const setUpEnvironmentButton = setupPlan && (
+		<SetUpEnvironmentButton
+			onClick={() =>
+				void runEnvironmentSetup({
+					cloudPrompt: (_typed, environmentUrl) =>
+						withEnvironmentSetupSkill(ENVIRONMENT_SETUP_PROMPT, environmentUrl),
+					ignoreDraft: true,
+				})
+			}
+			pending={isStarting}
+		/>
+	);
 	const devicePicker = (
 		<DevicePicker hostId={hostId} onSelectHostId={handleSelectHostId} />
 	);
@@ -982,22 +1118,40 @@ export function NewWorkspaceScreen({
 						closeModal();
 						void navigate({ to: "/settings/environments" });
 					}}
+					onEditEnvironment={(environmentId) => {
+						closeModal();
+						void navigate({
+							to: "/settings/environments/$environmentId",
+							params: { environmentId },
+						});
+					}}
 					isLoading={environmentsQuery.isLoading}
-				/>
-			)}
-			{isCloudHost && (
-				<MachineSizePickerPill
-					machineSize={cloudSelection.machineSize}
-					onSelectMachineSize={handleSelectMachineSize}
 				/>
 			)}
 			{activeOrganizationId && (
 				<CreateEnvironmentFlow
-					onOpenChange={setIsCreatingEnvironment}
-					onStarted={closeModal}
+					onOpenChange={(open) => {
+						setIsCreatingEnvironment(open);
+						if (!open) setDialogSendsDraft(false);
+					}}
+					agent={selectedAgent !== "none" ? selectedAgent : undefined}
+					onStarted={dialogSendsDraft ? closeAndResetDraft : closeModal}
+					setupPrompt={
+						dialogSendsDraft && !isPromptEmpty
+							? (environmentUrl) =>
+									withEnvironmentSetupSkill(
+										draftText(draft.promptDraft),
+										environmentUrl,
+									)
+							: environmentSetupAgentPrompt
+					}
 					open={isCreatingEnvironment}
 					organizationId={activeOrganizationId}
-					projectId={isSession ? null : projectId}
+					project={
+						isSession || !projectId
+							? null
+							: { id: projectId, repositoryFullName: projectRepositoryFullName }
+					}
 				/>
 			)}
 			{linkedPR ? (
@@ -1061,29 +1215,25 @@ export function NewWorkspaceScreen({
 			<Trans>Set up project…</Trans>
 		</Button>
 	);
-	const resizeHandles = (
-		<SymmetricResizeHandles
-			currentWidth={composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH}
-			minWidth={NEW_WORKSPACE_SCREEN_MIN_WIDTH}
-			maxWidth={NEW_WORKSPACE_SCREEN_MAX_WIDTH}
-			onWidthChange={setLiveComposerWidth}
-			onWidthCommit={(width) => {
-				setStoredComposerWidth(width);
-				setLiveComposerWidth(null);
-			}}
-			onReset={() => {
-				setStoredComposerWidth(null);
-				setLiveComposerWidth(null);
-			}}
-		/>
-	);
 
-	if (isParadevShell) {
+	if (isNewPage) {
 		return (
-			<ComposerDropZone className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background">
-				<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
-					{headerActions}
-				</div>
+			<ComposerDropZone
+				data-theme-surface="new-workspace"
+				className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background"
+			>
+				{isParadevShell ? (
+					<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
+						{headerActions}
+					</div>
+				) : (
+					<PageHeader
+						className="sticky top-0 z-10 w-full bg-background"
+						end={
+							<div className="flex items-center gap-0.5">{headerActions}</div>
+						}
+					/>
+				)}
 				<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
 					<h1 className="sr-only">
 						<Trans>What should we build next?</Trans>
@@ -1093,34 +1243,32 @@ export function NewWorkspaceScreen({
 						className="mb-6"
 						reserveSpace
 					/>
-					<div
-						className="relative flex w-full flex-col gap-2.5"
-						style={{
-							maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-						}}
-					>
-						<AnimatePresence initial={false}>
-							{isPromptEmpty &&
-								!samplePromptsPending &&
-								!samplePromptsDismissed && (
-									<motion.div
-										key="sample-prompts"
-										initial={{ opacity: 0, y: 12 }}
-										animate={{ opacity: 1, y: 0 }}
-										exit={{ opacity: 0, transition: { duration: 0 } }}
-										transition={{
-											type: "tween",
-											duration: 0.15,
-											ease: "easeOut",
-										}}
-										// Out of flow, below the block: the composer is centred on
-										// the screen and must not move when the suggestions go.
-										className="absolute inset-x-0 top-full mt-3"
-									>
-										{samplePromptsList}
-									</motion.div>
-								)}
-						</AnimatePresence>
+					<div className="relative flex w-full max-w-[592px] flex-col gap-2.5">
+						{/* Out of flow, below the block: the composer is centred on
+						the screen and must not move when the suggestions go. */}
+						<div className="absolute inset-x-0 top-full mt-3 flex flex-col items-start gap-2">
+							{setUpEnvironmentButton}
+							<AnimatePresence initial={false}>
+								{isPromptEmpty &&
+									!samplePromptsPending &&
+									!samplePromptsDismissed && (
+										<motion.div
+											key="sample-prompts"
+											initial={{ opacity: 0, y: 12 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, transition: { duration: 0 } }}
+											transition={{
+												type: "tween",
+												duration: 0.15,
+												ease: "easeOut",
+											}}
+											className="w-full"
+										>
+											{samplePromptsList}
+										</motion.div>
+									)}
+							</AnimatePresence>
+						</div>
 						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
 							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{contextPickers}
@@ -1131,7 +1279,6 @@ export function NewWorkspaceScreen({
 							layout="inline"
 							allowEmptySubmit
 							autoFocus
-							className="w-full"
 							draft={{
 								segments: draft.promptDraft,
 								attachments: draft.promptAttachments,
@@ -1149,22 +1296,18 @@ export function NewWorkspaceScreen({
 								return false;
 							}}
 							mentionProviders={mentionProviders}
-							pending={isCreating}
+							pending={isStarting}
 							placeholder={t({ message: "Do anything in Paradev" })}
 						/>
 						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
 							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{modePicker}
-								<AgentPickerPill
-									agents={v2Agents}
-									selectedAgentId={selectedAgent}
-									onSelect={setSelectedAgent}
-								/>
 							</div>
 							<div className="flex shrink-0 items-center gap-1.5">
 								{setupButton}
-								{selectedAgent !== "none" && (
+								{agentSwitcher && (
 									<ModelPicker
+										agentSwitcher={agentSwitcher}
 										configOptions={launchOptions}
 										onOpenChange={setModelPickerOpen}
 										onSelect={selectLaunchOption}
@@ -1173,7 +1316,6 @@ export function NewWorkspaceScreen({
 								)}
 							</div>
 						</div>
-						{resizeHandles}
 					</div>
 				</div>
 			</ComposerDropZone>
@@ -1182,25 +1324,28 @@ export function NewWorkspaceScreen({
 
 	// ── Render ───────────────────────────────────────────────────────
 	return (
-		<ComposerDropZone className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background">
+		<ComposerDropZone
+			data-theme-surface="new-workspace"
+			className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background"
+		>
 			<PageHeader
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}
 			/>
-			<div className="flex flex-1 flex-col items-center justify-center gap-8">
+			<div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 flex-col items-center gap-8 [@media(max-height:640px)]:hidden">
 				<SupersetIcon className="h-10 w-auto text-muted-foreground/70" />
 				<h1 className="text-center text-3xl font-medium text-foreground/90">
 					<Trans>What should we build next?</Trans>
 				</h1>
-				<GitHubStarPill surface="new_workspace" reserveSpace />
+				<GitHubStarPill
+					surface="new_workspace"
+					className="pointer-events-auto"
+					reserveSpace
+				/>
 			</div>
-			<div className="flex w-full flex-col items-center px-6 pb-8">
-				<div
-					className="relative flex w-full flex-col"
-					style={{
-						maxWidth: composerWidth ?? NEW_WORKSPACE_SCREEN_DEFAULT_WIDTH,
-					}}
-				>
+			<div className="flex w-full flex-1 flex-col items-center justify-end px-6 pb-8">
+				{/* On short windows the editor stops before the centred heading. */}
+				<div className="relative flex w-full max-w-[592px] flex-col [--prompt-input-max-height:max(4.5rem,calc(50vh-16rem))]">
 					<AnimatePresence initial={false}>
 						{isPromptEmpty &&
 							!samplePromptsPending &&
@@ -1225,10 +1370,12 @@ export function NewWorkspaceScreen({
 								</motion.div>
 							)}
 					</AnimatePresence>
+					{setUpEnvironmentButton && (
+						<div className="mb-2 flex">{setUpEnvironmentButton}</div>
+					)}
 					<AgentComposer
 						allowEmptySubmit
 						autoFocus
-						className="w-full"
 						draft={{
 							segments: draft.promptDraft,
 							attachments: draft.promptAttachments,
@@ -1246,7 +1393,7 @@ export function NewWorkspaceScreen({
 							return false;
 						}}
 						mentionProviders={mentionProviders}
-						pending={isCreating}
+						pending={isStarting}
 						placeholder={promptPlaceholder}
 						toolbar={modePicker}
 						toolbarEnd={
@@ -1268,7 +1415,6 @@ export function NewWorkspaceScreen({
 						</div>
 						{setupButton}
 					</div>
-					{resizeHandles}
 				</div>
 			</div>
 		</ComposerDropZone>

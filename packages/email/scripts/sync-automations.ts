@@ -98,9 +98,8 @@ const desired: DesiredAutomation[] = [
 				type: "send_email",
 				config: {
 					template: { id: "23458b3f-39fb-4465-a3f8-431b73d51aa4" },
-					subject: "",
-					from: "Kiet <kiet@hey.superset.sh>",
-					replyTo: "kiet@superset.sh",
+					from: "Kiet <kiet@hey.paradev.com>",
+					replyTo: "kiet@paradev.com",
 				},
 			},
 		],
@@ -111,6 +110,29 @@ const desired: DesiredAutomation[] = [
 				type: "default",
 			},
 		],
+	},
+	{
+		// Mobile paywall hits. The API claims a 7-day KV key per user before it
+		// emits, so each trigger is already deduplicated.
+		name: "upgrade-nudge",
+		steps: [
+			{
+				key: "start",
+				type: "trigger",
+				config: { eventName: "billing.upgrade_nudge_due" },
+			},
+			{
+				key: "send_upgrade_nudge",
+				type: "send_email",
+				config: {
+					template: template("billing-upgrade-nudge", {
+						featureName: { var: "event.featureName" },
+						upgradeUrl: { var: "event.upgradeUrl" },
+					}),
+				},
+			},
+		],
+		connections: [{ from: "start", to: "send_upgrade_nudge", type: "default" }],
 	},
 	{
 		// Signup drip. Listens for first-open from minute zero; a user with no
@@ -205,15 +227,30 @@ function canonConfig(c: Record<string, unknown>): Record<string, unknown> {
 	}
 	return out;
 }
+function sortKeys(v: unknown): unknown {
+	if (Array.isArray(v)) return v.map(sortKeys);
+	if (v === null || typeof v !== "object") return v;
+	return Object.fromEntries(
+		Object.entries(v)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([k, x]) => [k, sortKeys(x)]),
+	);
+}
 function canonGraph(steps: Step[], connections: Connection[]): string {
-	return JSON.stringify({
-		steps: steps
-			.map((s) => ({ key: s.key, type: s.type, config: canonConfig(s.config) }))
-			.sort((a, b) => a.key.localeCompare(b.key)),
-		connections: [...connections].sort((a, b) =>
-			`${a.from}>${a.to}`.localeCompare(`${b.from}>${b.to}`),
-		),
-	});
+	return JSON.stringify(
+		sortKeys({
+			steps: steps
+				.map((s) => ({
+					key: s.key,
+					type: s.type,
+					config: canonConfig(s.config),
+				}))
+				.sort((a, b) => a.key.localeCompare(b.key)),
+			connections: [...connections].sort((a, b) =>
+				`${a.from}>${a.to}`.localeCompare(`${b.from}>${b.to}`),
+			),
+		}),
+	);
 }
 
 const listed = await resend.automations.list({ limit: 100 });

@@ -66,7 +66,6 @@ async function organizationPlugin(
 }
 
 export default command({
-	sandbox: false,
 	description:
 		"Install a plugin: connect its account first if it needs one, then materialize its skills locally and record it on your account",
 	args: [

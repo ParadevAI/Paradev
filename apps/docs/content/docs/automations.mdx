@@ -35,6 +35,7 @@ Click **Automations → New automation** and fill in:
 - **Title**: how the automation appears in the list
 - **Prompt**: the instructions the agent receives. Supports markdown, `@file/path` mentions (scoped to the selected project), `:emoji:` shortcodes, and `/` slash commands.
 - **Device**: which host runs the session. Defaults to this device. Pick **Cloud** to run each session in a new [cloud workspace](/cloud-workspaces) at the [machine size](/cloud-workspaces#machine-sizes) you choose, or in an existing cloud workspace.
+- **Workspace**: **New workspace** (each run makes its own), **Same workspace** (the first run makes one and later runs reuse it), or a workspace you pick. With a shared workspace, **Session mode** chooses **Start fresh** (a new agent conversation each run) or **Continue** (the agent picks up where the last run left off).
 - **Project**: the v2 project the session runs against, or **No project** for a session per run.
 - **Trigger**: an event from a connected integration, a webhook, or a schedule. See [Triggers](#triggers).
 - **Agent**: Claude, Codex, Amp, or anything else you've set up under **Settings → Agents**.
@@ -198,3 +199,7 @@ superset automations list --archived
 superset automations unarchive <id>   # restores it, paused
 superset automations delete <id>      # permanently deletes an archived automation
 ```
+
+## Related Guide
+
+- [Scheduled Coding Agents: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs](https://paradev.com/compare/scheduled-coding-agents)

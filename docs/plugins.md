@@ -66,7 +66,10 @@ that must not change under them.
 `license` — with everything Paradev-specific under `extensions.superset`:
 
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
-  `packages/shared/src/plugins/index.ts`), and `icon`.
+  `packages/shared/src/plugins/index.ts`), and `icon`. `icon` names a built-in icon key or an
+  image inside the plugin (`./assets/icon.svg`: svg, png, webp or jpeg, ≤ 256 KB, no URLs,
+  absolute paths or traversal). The desktop reads the image from the installed tree
+  (`packages/agent-setup/src/plugin-icon.ts`), so it shows only once the plugin is installed.
 - `connector` — the one connection this plugin needs, as `{ "slug" }`. A slug names a connector in
   `packages/shared/src/connectors/connectors.json`; the manifest carries no OAuth configuration of
   its own — no scopes, no client mode, no `requires_env`. A connection is account state, and the
@@ -96,7 +99,11 @@ authorization server's metadata, and then gets a client identity one of two ways
   stored; or
 - the server offers a `registration_endpoint`, so we register once per authorization server
   (RFC 7591) and keep the result in `plugin_oauth_clients`, keyed by issuer and redirect URI so
-  every user shares one registration.
+  every user shares one registration. The registration picks a client authentication method from
+  the server's `token_endpoint_auth_methods_supported` (`client_secret_basic` when it lists none).
+  A server that wants another one than it advertises gets `token_request_auth_method` on the
+  method: we register with it, send token requests with it, and register again rather than reuse a
+  stored client registered with another one.
 
 Either way the flow is PKCE with a `resource` indicator, the authorization response's `iss` is
 checked against the discovered issuer before the code is redeemed (RFC 9207), and refresh happens
@@ -107,6 +114,14 @@ Credentials never reach the manifest, the renderer, or the agent's machine. They
 by `packages/trpc/src/lib/secret-box.ts` under `SECRETS_ENCRYPTION_KEY` and attached by the proxy in
 `packages/trpc/src/router/plugins/proxy/`, so a tool call goes out from the API, not from the
 agent.
+
+The proxy gives each caller an `Mcp-Session-Id` and keeps one vendor MCP session per caller session
+and connection, so state that a vendor keeps per session (an active project or organization) lasts
+from one call to the next. The vendor session id is in Redis for one hour after its last successful use. A
+caller that does not send the id back, or any caller while Redis cannot be reached, gets a new vendor
+session for each call. `superset mcp call-tool` keeps its session between runs of one agent
+launch (`SUPERSET_AGENT_LAUNCH_ID`, which the agent wrapper sets once per launch) in
+`plugin-mcp-sessions.json` under the Superset home, and ends it at the end of a run anywhere else.
 
 ## Install state on a machine
 

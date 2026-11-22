@@ -154,7 +154,7 @@ async function previousPlanFromPrice(
 				? null
 				: price.product;
 		return {
-			planName: product?.name ?? null,
+			planName: product?.name.replace(/ seat$/i, "") ?? null,
 			pricePerSeatCents: price.unit_amount,
 			interval: price.recurring?.interval === "year" ? "yearly" : "monthly",
 			seatCount,

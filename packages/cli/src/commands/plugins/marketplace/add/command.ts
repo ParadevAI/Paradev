@@ -7,7 +7,6 @@ import { command } from "../../../../lib/command";
 import { withPluginHints } from "../../../../lib/plugins/errors";
 
 export default command({
-	sandbox: false,
 	description: "Add a marketplace from a GitHub repo or local path",
 	args: [
 		positional("source")

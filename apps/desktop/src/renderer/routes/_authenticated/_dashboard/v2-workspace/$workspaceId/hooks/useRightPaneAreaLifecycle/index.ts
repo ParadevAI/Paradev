@@ -1,1 +1,0 @@
-export { useRightPaneAreaLifecycle } from "./useRightPaneAreaLifecycle";

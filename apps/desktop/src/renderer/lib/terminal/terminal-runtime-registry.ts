@@ -29,13 +29,13 @@ import {
 	persistSeqAnchor,
 } from "./terminal-seq-anchor";
 import {
+	background,
 	type ConnectionState,
 	clearLogs,
 	connect,
 	createTransport,
 	disposeTransport,
 	getPersistableSeqAnchor,
-	park,
 	reconnect,
 	sendColors,
 	sendDispose,
@@ -101,11 +101,7 @@ class TerminalRuntimeRegistryImpl {
 			terminalId,
 			instanceId,
 			runtime: null,
-			// A destroyed PTY (exit / session-gone) has nothing left to restore —
-			// drop the persisted scrollback the moment the server says so.
-			transport: createTransport({
-				onSessionEnded: () => clearPersistedRuntimeState(terminalId),
-			}),
+			transport: createTransport(),
 			linkManager: null,
 			pendingLinkHandlers: null,
 			imagePasteOverride: null,
@@ -217,6 +213,18 @@ class TerminalRuntimeRegistryImpl {
 					entry.transport.seqAnchor = loadPersistedSeqAnchor(terminalId);
 				}
 			}
+			if (entry.runtime.initialContent !== "none") {
+				entry.transport._repaintRequest = "needed";
+			}
+			// Rows only: a workspace switch changes the columns for a moment, and
+			// only a row change drops rows from the screen.
+			let lastRows = entry.runtime.terminal.rows;
+			entry.runtime.terminal.onResize(({ rows }) => {
+				if (rows !== lastRows && entry.transport.connectionState !== "open") {
+					entry.transport._repaintRequest = "needed";
+				}
+				lastRows = rows;
+			});
 			entry.runtime.imagePasteOverride = entry.imagePasteOverride;
 			this.observeBufferChanges(entry);
 			entry.linkManager = new TerminalLinkManager(entry.runtime.terminal);
@@ -361,15 +369,7 @@ class TerminalRuntimeRegistryImpl {
 				? getPersistableSeqAnchor(entry.transport)
 				: null,
 		);
-		// detachFromContainer persists unconditionally; a dead session's snapshot
-		// must not outlive the PTY.
-		if (entry.transport.sessionEnded) {
-			clearPersistedRuntimeState(terminalId);
-		}
-		// Snapshot and anchor are on disk — close the socket. A parked pane no
-		// longer parses hidden output or joins reconnect storms; remount's
-		// connect() re-dials and the host replays from the anchor.
-		park(entry.transport);
+		background(entry.transport);
 		this.scheduleParkedEviction();
 	}
 
@@ -416,10 +416,6 @@ class TerminalRuntimeRegistryImpl {
 			(entry) => entry.runtime?.terminal.buffer.active.type === "alternate",
 		);
 		for (const entry of victims) {
-			if (entry.transport.sessionEnded) {
-				this.disposeEntry(entry, { persistedState: "clear" });
-				continue;
-			}
 			if (!entry.runtime || !tryPersistRuntimeState(entry.runtime)) {
 				this.warnPersistFailureOnce(entry.terminalId);
 				continue;
@@ -504,10 +500,6 @@ class TerminalRuntimeRegistryImpl {
 				)
 			: this.getEntries(terminalId);
 		for (const entry of entries) {
-			if (entry.transport.sessionEnded) {
-				this.disposeEntry(entry, { persistedState: "clear" });
-				continue;
-			}
 			// Land frame-pending output first so snapshot and anchor agree.
 			entry.transport._writeCoalescer?.flushSync();
 			if (entry.runtime && !tryPersistRuntimeState(entry.runtime)) {
@@ -699,6 +691,40 @@ class TerminalRuntimeRegistryImpl {
 		);
 	}
 
+	/**
+	 * Save an ended session's scrollback now: a host-service restart forgets
+	 * the session, and a pane that was never parked has no other snapshot.
+	 */
+	persistEndedSession(terminalId: string, instanceId?: string): void {
+		const entry = this.getEntry(terminalId, instanceId);
+		const runtime = entry?.runtime;
+		if (!entry?.transport.sessionEnded || !runtime) return;
+		entry.transport._writeCoalescer?.flushSync();
+		const key = this.getEntryKey(entry.terminalId, entry.instanceId);
+		const save = () => {
+			if (this.entries.get(key) !== entry || entry.runtime !== runtime) return;
+			if (!tryPersistRuntimeState(runtime)) {
+				this.warnPersistFailureOnce(terminalId);
+				return;
+			}
+			persistSeqAnchor(
+				terminalId,
+				runtime.gate.pending === 0
+					? getPersistableSeqAnchor(entry.transport)
+					: null,
+			);
+		};
+		// The gate releases this write right after its callback returns.
+		runtime.terminal.write("", () => queueMicrotask(save));
+	}
+
+	endedCleanly(terminalId: string, instanceId?: string): boolean {
+		const exitStatus = this.getEntry(terminalId, instanceId)?.transport
+			.exitStatus;
+		if (!exitStatus || exitStatus.signal !== 0) return false;
+		return exitStatus.exitCode === 0 || exitStatus.shellExited === true;
+	}
+
 	prepareReplacement(
 		terminalId: string,
 		instanceId: string,
@@ -713,7 +739,9 @@ class TerminalRuntimeRegistryImpl {
 					excludeAltBuffer: true,
 					excludeModes: true,
 				});
-				initialBuffer = `${history}\r\n\x1b[0m${notice}\r\n`;
+				// DECSC: a prompt that restores the cursor (DECRC) and erases below
+				// would otherwise land at home and wipe the history.
+				initialBuffer = `${history}\r\n\x1b[0m${notice}\r\n\x1b7`;
 			} catch (error) {
 				console.warn(
 					"Failed to retain terminal history for replacement",
@@ -789,10 +817,4 @@ if (import.meta.hot) {
 	import.meta.hot.data.registry = terminalRuntimeRegistry;
 }
 
-export type {
-	ConnectionState,
-	LinkHoverInfo,
-	TerminalFailureClassification,
-	TerminalLinkHandlers,
-	TerminalLogEntry,
-};
+export type { ConnectionState, LinkHoverInfo, TerminalLogEntry };

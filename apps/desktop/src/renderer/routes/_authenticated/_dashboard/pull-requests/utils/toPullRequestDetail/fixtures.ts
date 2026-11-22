@@ -32,6 +32,7 @@ export function cloudPullRequestRead(
 			requiresThreadResolution: false,
 			queue: null,
 			allowedMergeMethods: ["squash"],
+			defaultMergeMethod: "squash",
 		},
 		capabilities: {
 			update: true,

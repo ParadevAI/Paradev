@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.summary        = 'SF Symbol button with an optional anchored menu'
   s.description    = 'A UIButton rendering an SF Symbol, which shows a UIMenu anchored to itself when given items'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

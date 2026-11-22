@@ -8,6 +8,7 @@ import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { projects, workspaces } from "../../db/schema.ts";
+import { caught } from "../box-log-filter";
 
 const PATH_COLUMNS = [
 	["projects", "repo_path"],
@@ -46,6 +47,9 @@ export async function applyLegacyHomeMove(
 			.filter(({ worktreePath }) => worktreePath.startsWith(`${move.to}/`));
 		await repairGitWorktrees(moved, move.from);
 	} catch (error) {
-		console.error("[host-service] Could not rewrite moved paths:", error);
+		console.error(
+			"[host-service] Could not rewrite moved paths:",
+			caught(error),
+		);
 	}
 }

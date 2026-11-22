@@ -9,6 +9,10 @@ export { ShadowClickHint } from "./components/ShadowClickHint";
 export { buildHint, unboundHint } from "./hint";
 export { modifierLabel } from "./modifierLabel";
 export {
+	FILE_LINK_PLAIN_DEFAULT,
+	FOLDER_LINK_PLAIN_DEFAULT,
+} from "./policies/agentOutputLinks";
+export {
 	buildChangesSidebarFileHint,
 	type ChangesSidebarFileIntent,
 	resolveChangesSidebarFileIntent,
@@ -27,7 +31,10 @@ export {
 	PULL_REQUEST_LINKS,
 	usePullRequestLinkPolicy,
 } from "./policies/pullRequestLinkPolicy";
-export { useChangesSidebarFilePolicy } from "./policies/useChangesSidebarFilePolicy";
+export {
+	type ChangesSidebarFilePolicy,
+	useChangesSidebarFilePolicy,
+} from "./policies/useChangesSidebarFilePolicy";
 export { useInlineFilePolicy } from "./policies/useInlineFilePolicy";
 export { usePagePolicy } from "./policies/usePagePolicy";
 export { useSidebarFilePolicy } from "./policies/useSidebarFilePolicy";
@@ -40,7 +47,7 @@ export {
 	type UrlLinkAction,
 	useUrlLinkAction,
 } from "./policies/useUrlLinkAction";
-export { tierFor } from "./tiers";
+export { tierFor, withPlainDefault } from "./tiers";
 export type {
 	LinkAction,
 	LinkTier,

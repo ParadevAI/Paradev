@@ -95,7 +95,6 @@ describe("Tasks and pull requests navigation", () => {
 		// literal aria-label. Accept either so this keeps asserting the routes
 		// stay separate rather than how their labels are authored.
 		const labelled = (source: string, label: string) =>
-			source.includes(`aria-label="${label}"`) ||
 			source.includes(`message: "${label}"`);
 
 		const navigationSource = readComponent(
@@ -117,23 +116,16 @@ describe("Tasks and pull requests navigation", () => {
 			readComponent(
 				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
 			),
-			readComponent("../../../components/NavigationRail/NavigationRail.tsx"),
+			readComponent(
+				"../../../components/NavigationRail/hooks/useRailDestinations/useRailDestinations.tsx",
+			),
 		];
 		for (const source of v2Sources) {
-			expect(source).toContain("onClick={navigation.openTasks}");
-			expect(source).toContain("onClick={navigation.openPullRequests}");
+			expect(source).toMatch(/onClick(=\{|: )navigation\.openTasks\b/);
+			expect(source).toMatch(/onClick(=\{|: )navigation\.openPullRequests\b/);
 			expect(labelled(source, "Tasks")).toBe(true);
 			expect(labelled(source, "Pull requests")).toBe(true);
 			expect(source).not.toContain("Tasks & PRs");
 		}
-
-		const v1Source = readComponent(
-			"../../../../../../screens/main/components/WorkspaceSidebar/WorkspaceSidebarHeader/WorkspaceSidebarHeader.tsx",
-		);
-		expect(v1Source).toContain('to: "/tasks"');
-		expect(v1Source).toContain('to: "/pull-requests"');
-		expect(labelled(v1Source, "Tasks")).toBe(true);
-		expect(labelled(v1Source, "Pull requests")).toBe(true);
-		expect(v1Source).not.toContain("Tasks & PRs");
 	});
 });

@@ -307,7 +307,7 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 				projectId,
 				author: "alice,octo--cat",
 			}),
-		).rejects.toThrow("Author must be a valid GitHub username");
+		).rejects.toThrow("Must be a valid GitHub username");
 		expect(calls).toHaveLength(0);
 	});
 
@@ -443,11 +443,84 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 		expect(atCap.hasNextPage).toBe(false);
 	});
 
+	test("searchPullRequests direct lookup matches a requested reviewer", async () => {
+		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
+			projectId,
+			query: "#33",
+			reviewer: "@ME-USER",
+		});
+		expect(result.pullRequests).toHaveLength(1);
+		expect(result.pullRequests[0].prNumber).toBe(33);
+		// Matching a direct request must not cost a Search API call.
+		expect(calls.map((call) => call.method)).not.toContain(
+			"search.issuesAndPullRequests",
+		);
+	});
+
+	test("searchPullRequests direct lookup drops a PR nobody asked that reviewer to review", async () => {
+		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
+			projectId,
+			query: "#33",
+			reviewer: "outsider",
+		});
+		expect(result.pullRequests).toEqual([]);
+		expect(result.totalCount).toBe(0);
+	});
+
+	test("searchPullRequests rejects an invalid reviewer login", async () => {
+		await expect(
+			host.trpc.workspaceCreation.searchPullRequests.query({
+				projectId,
+				reviewer: "bob,octo--cat",
+			}),
+		).rejects.toThrow("Must be a valid GitHub username");
+	});
+
+	test("searchPullRequests cannot combine a reviewer with a viewer relationship", async () => {
+		await expect(
+			host.trpc.workspaceCreation.searchPullRequests.query({
+				projectId,
+				reviewer: "bob",
+				viewerRelationship: "needs-review",
+			}),
+		).rejects.toThrow(
+			"viewerRelationship cannot be combined with author, reviewer or review",
+		);
+	});
+
+	test("searchPullRequests refuses a reviewer plus the team-review-requested filter", async () => {
+		// Both compile to `review-requested:`, and repeated qualifiers OR on
+		// GitHub — the pair would widen the results instead of intersecting.
+		await expect(
+			host.trpc.workspaceCreation.searchPullRequests.query({
+				projectId,
+				reviewer: "bob",
+				review: "team-review-requested",
+			}),
+		).rejects.toThrow(
+			"reviewer cannot be combined with the team-review-requested review filter",
+		);
+	});
+
+	test("searchPullRequests allows a reviewer alongside the other review filters", async () => {
+		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
+			projectId,
+			query: "find me",
+			reviewer: "dave",
+			review: "approved",
+		});
+		expect(result.pullRequests).toEqual([]);
+		const searchArgs = calls[0].args as { q: string };
+		expect(searchArgs.q).toContain("review-requested:dave");
+		expect(searchArgs.q).toContain("review:approved");
+	});
+
 	test("searchPullRequests filters search results to PRs only", async () => {
 		const result = await host.trpc.workspaceCreation.searchPullRequests.query({
 			projectId,
 			query: "find me",
 			author: "carol,bob",
+			reviewer: "dave,erin",
 			review: "approved",
 		});
 		// Our fake search returns one issue (no `pull_request`), so no PRs.
@@ -455,6 +528,10 @@ describe("workspaceCreation github procedures with mocked Octokit", () => {
 		expect(calls[0].method).toBe("search.issuesAndPullRequests");
 		const searchArgs = calls[0].args as { q: string };
 		expect(searchArgs.q).toContain("author:carol author:bob");
+		// Repeated qualifiers OR on GitHub, so both reviewers widen the set.
+		expect(searchArgs.q).toContain(
+			"review-requested:dave review-requested:erin",
+		);
 		expect(searchArgs.q).toContain("review:approved");
 	});
 });

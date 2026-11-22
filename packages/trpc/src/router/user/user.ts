@@ -16,6 +16,7 @@ import { z } from "zod";
 
 import { findOrganizationSolelyOwnedBy } from "../../lib/account-purge";
 import { emitAppFirstOpened } from "../../lib/activation-events";
+import { queueRulesReapply } from "../../lib/sandbox/reapply-rules";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
 import { personProcedure, userError } from "../../trpc";
 
@@ -64,6 +65,7 @@ export const userRouter = {
 				.set({ name: input.name })
 				.where(eq(users.id, ctx.session.user.id))
 				.returning();
+			await queueRulesReapply({ userId: ctx.session.user.id });
 			return updatedUser;
 		}),
 

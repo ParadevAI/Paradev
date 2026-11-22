@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { buildHint } from "../hint";
-import { tierFor } from "../tiers";
+import { tierFor, withPlainDefault } from "../tiers";
 import type {
 	LinkAction,
 	LinkTierMap,
@@ -65,9 +65,14 @@ export function usePolicy(
 	key: MapKey,
 	surface: Surface,
 	mode: TierMode,
+	plainDefault?: LinkAction,
 ): ClickPolicy {
-	const { preferences } = useV2UserPreferences();
-	const map = preferences[key];
+	const { preferences } = useUserPreferences();
+	const stored = preferences[key];
+	const map = useMemo(
+		() => (plainDefault ? withPlainDefault(stored, plainDefault) : stored),
+		[stored, plainDefault],
+	);
 	const resolve = useCallback(
 		(event: ModifierEvent): ResolvedClick => {
 			const tier = tierFor(event, mode);
@@ -87,5 +92,8 @@ export function usePolicy(
 		() => buildHint(map, surface, mode),
 		[map, surface, mode],
 	);
-	return { resolve, getAction, tierForAction, hint, map };
+	return useMemo(
+		() => ({ resolve, getAction, tierForAction, hint, map }),
+		[resolve, getAction, tierForAction, hint, map],
+	);
 }

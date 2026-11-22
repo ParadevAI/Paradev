@@ -18,37 +18,16 @@ import {
 	HiOutlineComputerDesktop,
 	HiOutlineServer,
 } from "react-icons/hi2";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
 	FORM_PICKER_MENU_CLASS,
 	FormPickerTrigger,
-} from "../../PromptGroup/components/FormPickerTrigger";
+} from "renderer/routes/_authenticated/components/FormPickerTrigger";
+import { OnlineDot } from "renderer/routes/_authenticated/components/OnlineDot";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
 import { PickerChevron } from "../PickerChevron";
 import { useWorkspaceHostOptions } from "./hooks/useWorkspaceHostOptions";
-
-function OnlineDot({ online }: { online: boolean }) {
-	const { t } = useLingui();
-	return (
-		<span
-			role="img"
-			aria-label={
-				online
-					? t({
-							message: "online",
-						})
-					: t({
-							message: "offline",
-						})
-			}
-			className={cn(
-				"inline-block size-1.5 shrink-0 rounded-full",
-				online ? "bg-emerald-500" : "bg-muted-foreground/60",
-			)}
-		/>
-	);
-}
 
 interface DevicePickerProps {
 	hostId: string | null;
@@ -94,7 +73,7 @@ export function DevicePicker({
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
-	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const { currentDeviceName, localHostIsOnline, otherHosts } =
 		useWorkspaceHostOptions();
 	const isLocal = hostId === null || hostId === machineId;
@@ -136,7 +115,7 @@ export function DevicePicker({
 					{getSelectedIcon(
 						hostId,
 						machineId,
-						isParadevShell ? "size-3.5 shrink-0" : "size-4 shrink-0",
+						isNewPage ? "size-3.5 shrink-0" : "size-4 shrink-0",
 					)}
 					<span className="truncate">{selectedLabel}</span>
 					{selectedOnline !== null && <OnlineDot online={selectedOnline} />}

@@ -9,6 +9,7 @@ import {
 	installedPluginsFilePath,
 	installOrganizationPlugin as installOrganizationPluginOnMachine,
 	installPlugin as installPluginOnMachine,
+	readInstalledPluginIcons,
 	readInstalledPlugins,
 	readInstalledVersions,
 	reconcileOrganizationPlugins,
@@ -162,6 +163,11 @@ export function organizationPluginVersions(): {
 	return (readInstalledVersions() ?? []).filter((entry) =>
 		isOrganizationMarketplace(entry.marketplace),
 	);
+}
+
+/** Artwork each installed plugin ships through its manifest `icon`, read from its tree on this machine. */
+export function installedPluginIcons() {
+	return readInstalledPluginIcons();
 }
 
 export function setOrganizationPluginEnabled(

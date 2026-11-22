@@ -5,6 +5,7 @@ import type {
 } from "@superset/shared/automation-triggers";
 import type { MachineSize } from "@superset/shared/billing";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { nextOccurrenceAfter } from "@superset/shared/rrule";
@@ -80,7 +81,8 @@ export function TriggersCard({
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
 	const ownCloudWorkspaces = cloudWorkspaces?.filter(
 		(row) =>
-			row.status === "ready" && row.createdByUserId === session?.user?.id,
+			isLiveCloudWorkspaceStatus(row.status) &&
+			row.createdByUserId === session?.user?.id,
 	);
 	const { data: environmentRows } = cloudTrpc.environment.list.useQuery(
 		{ organizationId: automation.organizationId },

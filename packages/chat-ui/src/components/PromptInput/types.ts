@@ -89,6 +89,8 @@ export type PromptInputCommand = {
 	searchAliases?: string[];
 	// Tab inserts this chip in place of the typed command instead of selecting.
 	completion?: ComposerChip;
+	// Offered mid-sentence too, not only when the command starts the message.
+	inline?: boolean;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 

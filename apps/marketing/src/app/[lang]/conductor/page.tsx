@@ -1,7 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { formatDate } from "@superset/i18n/format";
+
 import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
@@ -18,43 +18,28 @@ import { SwitchActions } from "./components/SwitchActions";
 import {
 	COMPARE_PATH,
 	COMPARISON_ROWS,
-	CONDUCTOR_ANNOUNCEMENT_URL,
 	DOES_NOT_TRANSFER,
 	FAQ_ITEMS,
 	HIGHLIGHTS,
 	MIGRATE_CLOUD_URL,
 	MIGRATION_STEPS,
-	SHUTDOWN_DATE,
-	TIMELINE,
 	TRANSFERS,
 } from "./constants";
 
 const PATH = "/conductor";
 const TITLE = msg({
-	message: "Conductor Cloud ends {shutdownDate}. Switch to {companyName}",
+	message: "Switch to {companyName}",
 });
 const DESCRIPTION = msg({
 	message:
-		"Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source.",
+		"Move your worktrees and agents to {companyName} in a few minutes. Free and open source.",
 });
-
-function dayLabel(date: Date, locale: string, withYear = false): string {
-	return formatDate(
-		date,
-		withYear
-			? { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }
-			: { month: "long", day: "numeric", timeZone: "UTC" },
-		locale,
-	);
-}
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
 	const values = {
 		companyName: BRAND.NAME,
-		shutdownDate: dayLabel(SHUTDOWN_DATE, lang),
-		shutdownDateLong: dayLabel(SHUTDOWN_DATE, lang, true),
 	};
 	const title = i18n._({ ...TITLE, values });
 	const description = i18n._({ ...DESCRIPTION, values });
@@ -81,10 +66,10 @@ export default async function ConductorPage() {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
 	const prices = planPriceValues(await fetchPlanCatalog(), i18n);
-	const proPrice = prices.byFamily.pro?.monthly;
-	const teamPrice = prices.byFamily.team?.monthly;
-	const shutdownDate = dayLabel(SHUTDOWN_DATE, lang);
-	const values = { companyName: BRAND.NAME, shutdownDate, proPrice, teamPrice };
+	const proPrice = prices.byFamily.pro?.yearly;
+	const teamPrice = prices.byFamily.team?.yearly;
+	const companyName = BRAND.NAME;
+	const values = { companyName, proPrice, teamPrice };
 	const t = (descriptor: MessageDescriptor) =>
 		i18n._({ ...descriptor, values });
 	const priced = (
@@ -107,10 +92,7 @@ export default async function ConductorPage() {
 						For Conductor users
 					</p>
 					<h1 className="mt-4 text-balance font-medium text-4xl text-foreground tracking-tight sm:text-6xl">
-						<Trans>
-							Conductor Cloud ends {shutdownDate}. Move to {BRAND.NAME} in
-							minutes.
-						</Trans>
+						<Trans>Move to {companyName} in minutes.</Trans>
 					</h1>
 					<p className="mt-5 max-w-xl text-lg text-muted-foreground leading-relaxed">
 						<Trans>
@@ -141,50 +123,6 @@ export default async function ConductorPage() {
 							</li>
 						))}
 					</ul>
-				</section>
-
-				<section className="mt-24 sm:mt-32" aria-labelledby="timeline">
-					<h2
-						id="timeline"
-						className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl"
-					>
-						<Trans>Key dates</Trans>
-					</h2>
-					<p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
-						<Trans>
-							Congrats to the Conductor team on joining Meta. Dates are from{" "}
-							<a
-								href={CONDUCTOR_ANNOUNCEMENT_URL}
-								className="text-foreground underline underline-offset-4 hover:text-brand"
-							>
-								their announcement
-							</a>
-							.
-						</Trans>
-					</p>
-					<ol className="mt-10 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-						{TIMELINE.map((entry) => (
-							<li
-								key={entry.dateTime}
-								className={`border-t pt-4 ${entry.urgent ? "border-brand" : "border-border"}`}
-							>
-								<time
-									dateTime={entry.dateTime}
-									className={`font-mono text-xs uppercase tracking-wider ${entry.urgent ? "text-brand" : "text-muted-foreground"}`}
-								>
-									{entry.date
-										? dayLabel(entry.date, lang)
-										: entry.dateLabel && t(entry.dateLabel)}
-								</time>
-								<h3 className="mt-2 font-medium text-foreground">
-									{t(entry.title)}
-								</h3>
-								<p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-									{t(entry.detail)}
-								</p>
-							</li>
-						))}
-					</ol>
 				</section>
 
 				<section
@@ -392,7 +330,7 @@ export default async function ConductorPage() {
 
 				<section className="mt-24 border border-border p-8 sm:mt-32 sm:p-12">
 					<h2 className="font-medium text-3xl text-foreground tracking-tight sm:text-4xl">
-						<Trans>Move your agents before {shutdownDate}.</Trans>
+						<Trans>Move your agents.</Trans>
 					</h2>
 					<p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
 						<Trans>

@@ -41,7 +41,7 @@ export function OrganizationJsonLd() {
 		"@context": "https://schema.org",
 		"@type": "Organization",
 		"@id": `${COMPANY.MARKETING_URL}/#organization`,
-		name: BRAND.INTRO_NAME,
+		name: BRAND.NAME,
 		alternateName: BRAND.FORMER_NAME,
 		legalName: COMPANY.LEGAL_NAME,
 		url: COMPANY.MARKETING_URL,
@@ -72,7 +72,6 @@ export function OrganizationJsonLd() {
 			"https://github.com/superset-sh",
 			SOCIAL.X_FORMER.url,
 			"https://www.linkedin.com/company/superset-sh",
-			"https://www.youtube.com/@superset-sh",
 		],
 	};
 
@@ -88,7 +87,7 @@ export function SoftwareApplicationJsonLd({
 		"@context": "https://schema.org",
 		"@type": "SoftwareApplication",
 		"@id": `${COMPANY.MARKETING_URL}/#software`,
-		name: BRAND.INTRO_NAME,
+		name: BRAND.NAME,
 		alternateName: BRAND.FORMER_NAME,
 		operatingSystem: PRODUCT_PLATFORMS,
 		license: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
@@ -148,7 +147,7 @@ export function ArticleJsonLd({
 		},
 		publisher: {
 			"@type": "Organization",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -201,7 +200,7 @@ export function ComparisonJsonLd({
 		...(keywords && keywords.length > 0 && { keywords }),
 		publisher: {
 			"@type": "Organization",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			alternateName: BRAND.FORMER_NAME,
 			logo: {
 				"@type": "ImageObject",
@@ -229,8 +228,8 @@ export function WebsiteJsonLd() {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: BRAND.INTRO_NAME,
-		alternateName: BRAND.FORMER_NAME,
+		name: BRAND.NAME,
+		alternateName: [BRAND.FORMER_NAME, new URL(COMPANY.MARKETING_URL).hostname],
 		url: COMPANY.MARKETING_URL,
 	};
 
@@ -246,7 +245,7 @@ export function HomeWebPageJsonLd() {
 		name: `${BRAND.INTRO_NAME}: Run an army of coding agents`,
 		isPartOf: {
 			"@type": "WebSite",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		speakable: {
@@ -268,7 +267,7 @@ export function ServiceJsonLd() {
 			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel, each in its own Git worktree and branch, with diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
 		provider: {
 			"@type": "Organization",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		url: COMPANY.MARKETING_URL,

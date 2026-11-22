@@ -17,6 +17,7 @@ describe("inferModelProvider", () => {
 			"anthropic",
 		);
 		expect(inferModelProvider("agy", "gemini-3.1-pro")).toBe("google");
+		expect(inferModelProvider("agy", "antigravity")).toBe("google");
 		expect(inferModelProvider("pi", "openai/gpt-5.6")).toBe("openai");
 	});
 });

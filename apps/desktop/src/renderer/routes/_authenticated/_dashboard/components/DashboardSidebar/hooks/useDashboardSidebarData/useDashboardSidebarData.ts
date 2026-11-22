@@ -6,8 +6,8 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
-	useReducer,
 	useRef,
+	useState,
 } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
@@ -36,6 +36,7 @@ import {
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
+import { useShallow } from "zustand/react/shallow";
 import type {
 	DashboardSidebarGithubHold,
 	DashboardSidebarHiddenProject,
@@ -61,6 +62,7 @@ import {
 } from "./derivePullRequestQueryTargets";
 import { pickGithubStatus } from "./pickGithubStatus";
 import { createPullRequestRefreshGate } from "./pullRequestRefreshCooldown";
+import { selectPendingInserts } from "./selectPendingInserts";
 import { sidebarHostIsOnline } from "./sidebarHostIsOnline";
 import {
 	type StableDashboardSidebarProjects,
@@ -159,8 +161,10 @@ export function useDashboardSidebarData() {
 		toggleProjectCollapsed,
 	} = useDashboardSidebarState();
 	const queryClient = useQueryClient();
-	const workspaceTransactionsById = useWorkspaceTransactionsStore(
-		(state) => state.byWorkspaceId,
+	// Rows only show create progress. Selecting updates too rebuilt the whole
+	// sidebar each time a tag write settled, once per member on group delete.
+	const pendingInsertsById = useWorkspaceTransactionsStore(
+		useShallow((state) => selectPendingInserts(state.byWorkspaceId)),
 	);
 
 	const { hosts, organizationId: knownHostsOrgId } = useKnownHosts();
@@ -176,7 +180,7 @@ export function useDashboardSidebarData() {
 		useLiveQuery(
 			(q) =>
 				q
-					.from({ sidebarProjects: collections.v2SidebarProjects })
+					.from({ sidebarProjects: collections.sidebarProjects })
 					.select(({ sidebarProjects }) => ({
 						projectId: sidebarProjects.projectId,
 						isCollapsed: sidebarProjects.isCollapsed,
@@ -271,7 +275,7 @@ export function useDashboardSidebarData() {
 	const { data: storedSidebarSections = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ sidebarSections: collections.v2SidebarSections })
+				.from({ sidebarSections: collections.sidebarSections })
 				// Same tie-breaking rationale as the projects query above.
 				.orderBy(({ sidebarSections }) => sidebarSections.tabOrder, "asc")
 				.orderBy(({ sidebarSections }) => sidebarSections.sectionId, "asc")
@@ -310,7 +314,7 @@ export function useDashboardSidebarData() {
 		useLiveQuery(
 			(q) =>
 				q
-					.from({ sidebarWorkspaces: collections.v2WorkspaceLocalState })
+					.from({ sidebarWorkspaces: collections.workspaceLocalState })
 					// Same tie-breaking rationale as the projects query above.
 					.orderBy(
 						({ sidebarWorkspaces }) => sidebarWorkspaces.sidebarState.tabOrder,
@@ -496,7 +500,7 @@ export function useDashboardSidebarData() {
 				continue;
 			}
 			if (placed.projectId !== row.projectId) {
-				collections.v2WorkspaceLocalState.update(row.id, (draft) => {
+				collections.workspaceLocalState.update(row.id, (draft) => {
 					draft.sidebarState.projectId = row.projectId;
 				});
 			}
@@ -582,9 +586,9 @@ export function useDashboardSidebarData() {
 				hostIsOnline: sidebarHostIsOnline(
 					hostsByMachineId.get(workspace.hostId),
 				),
-				pendingTransaction: workspaceTransactionsById[workspace.id] ?? null,
+				pendingTransaction: pendingInsertsById[workspace.id] ?? null,
 			})),
-		[hostsByMachineId, rawSidebarWorkspaces, workspaceTransactionsById],
+		[hostsByMachineId, rawSidebarWorkspaces, pendingInsertsById],
 	);
 
 	const sidebarWorkspaces = useMemo(
@@ -670,13 +674,9 @@ export function useDashboardSidebarData() {
 
 	// A held host's query can stop polling (host offline) and keep its cached
 	// hold, so nothing else re-renders when the hold expires.
-	const [githubExpiryTick, onGithubHoldExpired] = useReducer(
-		(tick: number) => tick + 1,
-		0,
-	);
+	const [githubHoldNow, setGithubHoldNow] = useState(() => Date.now());
 	// One notice for the whole sidebar: the hold is per host credential, not
 	// per workspace, and the local machine's is the one the user can fix.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: the tick re-reads Date.now() when a hold expires
 	const githubStatus = useMemo<DashboardSidebarGithubHold | null>(() => {
 		const picked = pickGithubStatus(
 			pullRequestQueries.map((query, index) => ({
@@ -684,7 +684,7 @@ export function useDashboardSidebarData() {
 				status: query.data?.github,
 			})),
 			machineId,
-			Date.now(),
+			githubHoldNow,
 		);
 		if (!picked) return null;
 		return {
@@ -694,7 +694,7 @@ export function useDashboardSidebarData() {
 			isLocalHost: picked.machineId === machineId,
 		};
 	}, [
-		githubExpiryTick,
+		githubHoldNow,
 		hostsByMachineId,
 		machineId,
 		pullRequestQueries,
@@ -704,7 +704,7 @@ export function useDashboardSidebarData() {
 	useEffect(() => {
 		if (githubHoldUntil === undefined) return;
 		const timer = setTimeout(
-			onGithubHoldExpired,
+			() => setGithubHoldNow(Date.now()),
 			Math.max(0, githubHoldUntil - Date.now()) + 50,
 		);
 		return () => clearTimeout(timer);
