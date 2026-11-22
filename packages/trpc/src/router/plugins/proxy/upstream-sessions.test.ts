@@ -40,7 +40,7 @@ describe("upstreamSessions", () => {
 		expect(hashes.size).toBe(0);
 	});
 
-	test("a store that cannot be reached holds nothing and throws nothing", async () => {
+	test("a store that cannot be reached holds nothing, throws nothing and warns once", async () => {
 		const warn = spyOn(console, "warn").mockImplementation(() => {});
 		const sessions = upstreamSessions(unreachableRedis(), "user-a", "caller-1");
 		try {
@@ -49,7 +49,7 @@ describe("upstreamSessions", () => {
 			await sessions.touch();
 			await sessions.drop("conn");
 			expect(await sessions.takeAll()).toEqual({});
-			expect(warn).toHaveBeenCalledTimes(5);
+			expect(warn).toHaveBeenCalledTimes(1);
 		} finally {
 			warn.mockRestore();
 		}

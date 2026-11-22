@@ -63,8 +63,18 @@ export async function upstreamClient(
 	};
 }
 
-// What a vendor answers for a session it has dropped, before it runs the call.
-const SESSION_GONE = new Set([400, 401, 404]);
+// What a vendor answers for a session it has dropped, before it runs the call:
+// the SDK puts the response body, a JSON-RPC error, in the message.
+function sessionGone(error: unknown): boolean {
+	if (!(error instanceof StreamableHTTPError)) return false;
+	if (error.code === 404 || error.code === 401) return true;
+	return (
+		error.code === 400 &&
+		(/"code":\s*-32001\b/.test(error.message) ||
+			(/"code":\s*-32000\b/.test(error.message) &&
+				/not initialized/i.test(error.message)))
+	);
+}
 
 export async function callUpstream(
 	target: UpstreamTarget & { connectionId: string },
@@ -85,13 +95,7 @@ export async function callUpstream(
 			await sessions.touch();
 			return result;
 		} catch (error) {
-			if (
-				!(
-					error instanceof StreamableHTTPError &&
-					SESSION_GONE.has(error.code ?? 0)
-				)
-			)
-				throw error;
+			if (!sessionGone(error)) throw error;
 			await sessions.drop(target.connectionId);
 		} finally {
 			await session.client.close();

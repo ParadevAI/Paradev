@@ -26,19 +26,22 @@ export type SessionRedis = Pick<
 	"hget" | "hsetnx" | "hdel" | "hgetall" | "expire" | "del"
 >;
 
-function unavailable<T>(fallback: T): (error: unknown) => T {
-	return (error) => {
-		console.warn("[plugins/proxy] session store unavailable", { error });
-		return fallback;
-	};
-}
-
 export function upstreamSessions(
 	redis: SessionRedis,
 	userId: string,
 	callerSessionId: string,
 ): UpstreamSessions {
 	const key = `plugin-mcp-session:${userId}:${callerSessionId}`;
+	let warned = false;
+	const unavailable =
+		<T>(fallback: T) =>
+		(error: unknown): T => {
+			if (!warned) {
+				console.warn("[plugins/proxy] session store unavailable", { error });
+				warned = true;
+			}
+			return fallback;
+		};
 	return {
 		get: (connectionId) =>
 			redis.hget<ResumableSession>(key, connectionId).catch(unavailable(null)),

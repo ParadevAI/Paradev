@@ -29,9 +29,12 @@ import {
 } from "@/lib/oauth-metadata";
 import { callerSessionId, withIssuedSessionId } from "./utils/callerSession";
 
+// Retries would hold every tool call for seconds while Redis is down, and the
+// session store already falls back to no stored session.
 const redis = new Redis({
 	url: env.KV_REST_API_URL,
 	token: env.KV_REST_API_TOKEN,
+	retry: { retries: 0 },
 });
 
 interface RouteParams {

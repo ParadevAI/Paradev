@@ -631,7 +631,7 @@ describe("a vendor that keeps state per MCP session", () => {
 			initialized: 0,
 			deleted: [] as string[],
 			resumedWith: [] as (string | null)[],
-			refuseNextResumed: undefined as number | undefined,
+			refuseNextResumed: undefined as Response | undefined,
 			refuseAll: undefined as number | undefined,
 		};
 
@@ -680,7 +680,7 @@ describe("a vendor that keeps state per MCP session", () => {
 			const refusal = vendor.refuseNextResumed;
 			if (refusal && request.method === "POST") {
 				vendor.refuseNextResumed = undefined;
-				return new Response(null, { status: refusal });
+				return refusal;
 			}
 			vendor.resumedWith.push(request.headers.get("mcp-protocol-version"));
 			return transport.handleRequest(request);
@@ -762,23 +762,48 @@ describe("a vendor that keeps state per MCP session", () => {
 		expect(stored()).toHaveLength(1);
 	});
 
-	for (const status of [400, 401]) {
-		test(`a resumed session answered ${status} is replaced once, with no rejection recorded`, async () => {
+	const jsonRpcError = (status: number, code: number, message: string) =>
+		Response.json(
+			{ jsonrpc: "2.0", error: { code, message }, id: null },
+			{ status },
+		);
+	const dropped: Record<string, () => Response> = {
+		"400 Session not found": () =>
+			jsonRpcError(400, -32001, "Session not found"),
+		"400 Server not initialized": () =>
+			jsonRpcError(400, -32000, "Bad Request: Server not initialized"),
+		"401": () => new Response(null, { status: 401 }),
+	};
+	for (const [answer, refusal] of Object.entries(dropped)) {
+		test(`a resumed session answered ${answer} is replaced once, with no rejection recorded`, async () => {
 			const vendor = stubVendor();
 			const { sessions, stored } = callerSession();
 			const rejected: string[] = [];
 
 			await callOnce(sessions, "switch_project", { project: "Production" });
-			const dropped = at(stored());
-			vendor.refuseNextResumed = status;
+			const old = at(stored());
+			vendor.refuseNextResumed = refusal();
 
 			expect(await callOnce(sessions, "project_get", {}, rejected)).toContain(
 				"Default",
 			);
-			expect(stored()).not.toContain(dropped);
+			expect(stored()).not.toContain(old);
 			expect(rejected).toEqual([]);
 		});
 	}
+
+	test("a 400 that is the tool's own failure is not retried", async () => {
+		const vendor = stubVendor();
+		const { sessions, stored } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		const kept = stored();
+		vendor.refuseNextResumed = jsonRpcError(400, -32602, "Invalid params");
+
+		await expect(callOnce(sessions, "project_get")).rejects.toThrow();
+		expect(vendor.initialized).toBe(1);
+		expect(stored()).toEqual(kept);
+	});
 
 	test("a fresh session that is rejected too records the rejection", async () => {
 		const vendor = stubVendor();
@@ -798,7 +823,7 @@ describe("a vendor that keeps state per MCP session", () => {
 
 		await callOnce(sessions, "switch_project", { project: "Production" });
 		const before = expired.length;
-		vendor.refuseNextResumed = 500;
+		vendor.refuseNextResumed = new Response(null, { status: 500 });
 		await expect(callOnce(sessions, "project_get")).rejects.toThrow();
 
 		expect(expired).toHaveLength(before);
