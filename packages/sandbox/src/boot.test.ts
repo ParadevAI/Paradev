@@ -54,7 +54,20 @@ describe("superset-boot", () => {
 	test("memguard's loop forks nothing between checks, and kills before it logs", () => {
 		expect(memguard).not.toMatch(/^\s*sleep /m);
 		expect(memguard).toMatch(/pause 0\.25\ndone\s*$/);
-		expect(memguard).toMatch(/kill -9 "\$victim" 2>\/dev\/null\n\s*log "reap /);
+		expect(memguard).toMatch(
+			/kill -9 "\$victim" 2>\/dev\/null &&\n\s*log "reap /,
+		);
+	});
+
+	test("memguard logs pressure it cannot relieve once per episode, not every check", () => {
+		expect(memguard).toMatch(
+			/\[ "\$pressed" = 1 \] \|\| log "pressure [^\n]*\n\s*pressed=1\n\s*else\n\s*pressed=0/,
+		);
+	});
+
+	test("a process that exits during a memguard scan writes no error to its log", () => {
+		expect(memguard).not.toMatch(/[<>] "[^"]*" 2>\/dev\/null/);
+		expect(memguard).toMatch(/2>\/dev\/null < "\$p\/status"/);
 	});
 
 	test("starts host-service after only the before-host steps; the rest run detached after it", () => {
