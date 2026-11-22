@@ -139,3 +139,51 @@ test("a replaced control socket that reads open again never receives dials", asy
 	expect(await dialedOn).toBe("live");
 	await tunnel.onClose(live);
 });
+
+test("a replaced control socket's close answers the stream dials sent through it", async () => {
+	const oldHost = socket("old", "host");
+	const replacement = socket("replacement", "host");
+	const connections = [oldHost];
+	const tunnel = tunnelWith(connections);
+
+	const sentToOld = tunnel.prepareStream(caller, "old-ticket", "/terminal", "");
+	await Bun.sleep(0);
+	connections.splice(0, 1, replacement);
+	const sentToReplacement = tunnel.prepareStream(
+		caller,
+		"new-ticket",
+		"/terminal",
+		"",
+	);
+	await Bun.sleep(0);
+	await tunnel.onClose(oldHost);
+
+	expect(await answerWithin(sentToOld, 20)).toBe("dial-failed");
+	expect(await answerWithin(sentToReplacement, 20)).toBe("no answer yet");
+});
+
+test("a replaced control socket's close fails the HTTP exchanges not yet dialed back", async () => {
+	const oldHost = socket("old", "host");
+	const replacement = socket("replacement", "host");
+	const connections = [oldHost];
+	const tunnel = tunnelWith(connections);
+	const request = {
+		method: "GET",
+		pathWithQuery: "/trpc/workspace.list",
+		headers: {},
+		body: new Uint8Array(),
+	};
+
+	const sentToOld = tunnel.proxyHttp(caller, request);
+	await Bun.sleep(0);
+	connections.splice(0, 1, replacement);
+	const sentToReplacement = tunnel.proxyHttp(caller, request);
+	await Bun.sleep(0);
+	await tunnel.onClose(oldHost);
+
+	expect(await answerWithin(sentToOld, 20)).toEqual({
+		ok: false,
+		reason: "dial-failed",
+	});
+	expect(await answerWithin(sentToReplacement, 20)).toBe("no answer yet");
+});

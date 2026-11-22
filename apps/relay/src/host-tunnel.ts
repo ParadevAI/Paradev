@@ -58,6 +58,11 @@ export type PrepareStreamResult =
 
 type AccessDecision = "allowed" | "denied" | "error";
 type Access<T> = ({ access: "allowed" } & T) | { access: "denied" | "error" };
+interface PendingDial {
+	sentTo: string;
+	resolve: (result: PrepareStreamResult) => void;
+	timer: ReturnType<typeof setTimeout>;
+}
 interface PresenceInfo {
 	online: boolean;
 	lastSeenAt: number | null;
@@ -71,10 +76,7 @@ interface PresenceInfo {
 export class HostTunnel extends Server<RelayEnv> {
 	static options = { hibernate: true };
 
-	private readonly pendingDials = new Map<
-		string,
-		(result: PrepareStreamResult) => void
-	>();
+	private readonly pendingDials = new Map<string, PendingDial>();
 	private readonly earlyFrames = new Map<
 		string,
 		(string | ArrayBuffer | ArrayBufferView)[]
@@ -127,10 +129,14 @@ export class HostTunnel extends Server<RelayEnv> {
 		const host = this.hostConn();
 		if (!host) return "no-host";
 		const arrived = new Promise<PrepareStreamResult>((resolve) => {
-			this.pendingDials.set(ticket, resolve);
-			setTimeout(() => {
-				if (this.pendingDials.delete(ticket)) resolve("timeout");
-			}, DIAL_TIMEOUT_MS);
+			this.pendingDials.set(ticket, {
+				sentTo: host.id,
+				resolve,
+				timer: setTimeout(
+					() => this.answerDial(ticket, "timeout"),
+					DIAL_TIMEOUT_MS,
+				),
+			});
 		});
 		this.sendDial(host, {
 			type: "stream:dial",
@@ -156,7 +162,7 @@ export class HostTunnel extends Server<RelayEnv> {
 		const host = this.hostConn();
 		if (!host) return { ok: false, reason: "timeout" };
 		const ticket = crypto.randomUUID();
-		const result = this.httpExchanges.begin(ticket, request);
+		const result = this.httpExchanges.begin(ticket, request, host.id);
 		this.sendDial(host, {
 			type: "stream:dial",
 			ticket,
@@ -245,16 +251,14 @@ export class HostTunnel extends Server<RelayEnv> {
 				this.httpExchanges.onDialConnect(ticket, conn);
 				return;
 			}
-			const waiting = this.pendingDials.get(ticket);
 			// An unknown ticket is garbage, expired, or already consumed: the
 			// ticket is this route's only credential, so anything else is
 			// refused rather than left open.
-			if (!waiting) {
+			if (!this.pendingDials.has(ticket)) {
 				conn.close(RELAY_CLOSE.unknownTicket, "Unknown or expired ticket");
 				return;
 			}
 			conn.setState({ kind: "dial", ticket } satisfies ConnState);
-			this.pendingDials.delete(ticket);
 			this.unpairedDialTimers.set(
 				ticket,
 				setTimeout(() => {
@@ -267,7 +271,7 @@ export class HostTunnel extends Server<RelayEnv> {
 					);
 				}, UNPAIRED_DIAL_TIMEOUT_MS),
 			);
-			waiting("ready");
+			this.answerDial(ticket, "ready");
 			return;
 		}
 
@@ -374,7 +378,13 @@ export class HostTunnel extends Server<RelayEnv> {
 
 		if (state.kind === "host") {
 			const currentHost = this.hostConn();
-			if (currentHost && currentHost.id !== conn.id) return;
+			if (currentHost && currentHost.id !== conn.id) {
+				for (const [ticket, dial] of this.pendingDials) {
+					if (dial.sentTo === conn.id) this.answerDial(ticket, "dial-failed");
+				}
+				this.httpExchanges.failUndialed(conn.id);
+				return;
+			}
 
 			// Tags, not state: tags are assigned synchronously at accept, so a
 			// replacement host socket still mid-onConnect is never torn down.
@@ -384,8 +394,9 @@ export class HostTunnel extends Server<RelayEnv> {
 			}
 			for (const [, timer] of this.unpairedDialTimers) clearTimeout(timer);
 			this.unpairedDialTimers.clear();
-			for (const [, waiting] of this.pendingDials) waiting("no-host");
-			this.pendingDials.clear();
+			for (const ticket of this.pendingDials.keys()) {
+				this.answerDial(ticket, "no-host");
+			}
 			this.httpExchanges.abortAll();
 			// A replaced socket's close lands after the new one registered.
 			if (!this.hostConn()) {
@@ -451,13 +462,19 @@ export class HostTunnel extends Server<RelayEnv> {
 	// The host gave up dialing this ticket: answer the waiting client now
 	// instead of at the deadline.
 	private failDial(ticket: string): void {
-		const waiting = this.pendingDials.get(ticket);
-		if (waiting) {
-			this.pendingDials.delete(ticket);
-			waiting("dial-failed");
+		if (this.pendingDials.has(ticket)) {
+			this.answerDial(ticket, "dial-failed");
 			return;
 		}
 		this.httpExchanges.fail(ticket);
+	}
+
+	private answerDial(ticket: string, result: PrepareStreamResult): void {
+		const dial = this.pendingDials.get(ticket);
+		if (!dial) return;
+		clearTimeout(dial.timer);
+		this.pendingDials.delete(ticket);
+		dial.resolve(result);
 	}
 
 	// getConnections() trusts readyState, but a closed socket whose peer never
