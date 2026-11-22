@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/node";
 import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
+import type { BoxLogSource } from "./runtime/box-log-files";
 import { createBoxLogFilter } from "./runtime/box-log-filter";
 import { getManagedEnv } from "./runtime/sandbox-managed-env";
 import type { TerminalAgentEndReason } from "./terminal-agents/types";
@@ -19,6 +20,15 @@ export function initSentry(options: { organizationId?: string }): void {
 	initialized = true;
 }
 
+/** Only a cloud box of a flagged organization sends log lines; a desktop user's own host-service never does. */
+export function sendsBoxLogs(env: NodeJS.ProcessEnv): boolean {
+	return (
+		Boolean(env.HOST_SERVICE_SENTRY_DSN) &&
+		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
+		env.SUPERSET_SANDBOX_BOX_LOGS === "1"
+	);
+}
+
 export function hostSentryOptions(
 	env: NodeJS.ProcessEnv,
 	organizationId: string | undefined,
@@ -33,9 +43,7 @@ export function hostSentryOptions(
 		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
 		provider: env.SUPERSET_SANDBOX_PROVIDER,
 	};
-	const boxLogs =
-		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
-		env.SUPERSET_SANDBOX_BOX_LOGS === "1";
+	const boxLogs = sendsBoxLogs(env);
 	return {
 		dsn,
 		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
@@ -107,6 +115,11 @@ export function logBoxEvent<E extends keyof BoxEventAttributes>(
 	level: "info" | "warn" = "info",
 ): void {
 	Sentry.logger[level](event, { ...attributes, "box.event": true });
+}
+
+/** One line of a box log file; the files have no level. */
+export function logBoxFileLine(source: BoxLogSource, line: string): void {
+	Sentry.logger.info(line, { "log.source": source });
 }
 
 /** A file a user attached that the agent did not get. */

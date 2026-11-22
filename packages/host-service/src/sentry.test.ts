@@ -1,20 +1,25 @@
 import { describe, expect, it } from "bun:test";
-import { hostSentryOptions } from "./sentry";
+import { hostSentryOptions, sendsBoxLogs } from "./sentry";
 
 const DSN = "https://public@o0.ingest.sentry.io/0";
 
 function sendsLines(env: NodeJS.ProcessEnv): boolean {
 	const options = hostSentryOptions(env, "org");
-	if (!options) return false;
+	if (!options) return sendsBoxLogs(env);
 	const integrations = Array.isArray(options.integrations)
 		? options.integrations
 		: [];
 	const consoleLogs = integrations.some((i) => i.name === "ConsoleLogs");
-	return Boolean(options.enableLogs || options.beforeSendLog || consoleLogs);
+	return Boolean(
+		options.enableLogs ||
+			options.beforeSendLog ||
+			consoleLogs ||
+			sendsBoxLogs(env),
+	);
 }
 
 describe("hostSentryOptions", () => {
-	it("never sends log lines from a desktop user's own host-service, flag or not", () => {
+	it("never sends log lines or box log files from a desktop user's own host-service, flag or not", () => {
 		expect(sendsLines({ HOST_SERVICE_SENTRY_DSN: DSN })).toBe(false);
 		expect(
 			sendsLines({

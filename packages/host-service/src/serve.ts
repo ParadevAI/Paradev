@@ -12,7 +12,12 @@ import {
 import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
-import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
+import {
+	processStartedAt,
+	readBootStamps,
+	recordBootStamp,
+} from "./runtime/boot-stamps";
+import { startBoxLogFiles } from "./runtime/box-log-files";
 import { readSandboxBoxResources } from "./runtime/box-resources";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
@@ -24,7 +29,12 @@ import { startVitalsLog } from "./runtime/vitals";
 import { detachFromLaunchDirectory } from "./runtime/working-directory";
 import { installProcessSafetyNet, installUpgradeSocketGuard } from "./safety";
 import { configureSelfUpdater } from "./self-update";
-import { captureFatalStartupError, initSentry } from "./sentry";
+import {
+	captureFatalStartupError,
+	initSentry,
+	logBoxFileLine,
+	sendsBoxLogs,
+} from "./sentry";
 import { startTerminalBaseEnvResolution } from "./terminal/env";
 import { startTerminalReaper } from "./terminal/reaper";
 import { connectRelay, type TunnelClient } from "./tunnel";
@@ -33,6 +43,12 @@ async function main(): Promise<void> {
 	installConsoleTimestamps();
 	recordBootStamp("host.process.start", processStartedAt());
 	initSentry({ organizationId: env.ORGANIZATION_ID });
+	if (sendsBoxLogs(process.env)) {
+		void startBoxLogFiles(
+			readBootStamps()[0]?.at ?? processStartedAt(),
+			logBoxFileLine,
+		);
+	}
 
 	// Before anything spawns a worker thread or a child process: a host
 	// started from a workspace outlives that directory (HOST-SERVICE-5D).

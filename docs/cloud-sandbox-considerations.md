@@ -250,8 +250,12 @@ decides what a record holds:
   URLs, so paths, repository and branch names can leave the box in them.
 - Any other `console` line goes out as its prefix and level only. `debug`
   lines are not sent.
+- Each line of the current boot in the files `BOX_LOG_FILES` names
+  (`packages/host-service/src/runtime/box-log-files/box-log-files.ts`):
+  `boot.log`, `memguard.log` and `desktop.log`, our own scripts' output,
+  with `log.source` `boot`, `memguard` or `desktop`.
 
-What a console line keeps then passes `createBoxLogScrub`
+What a console line keeps, and each file line, then passes `createBoxLogScrub`
 (`packages/shared/src/sandbox/box-log-scrub.ts`). A value after the name of a
 managed variable (`KEY=`, `"KEY":`, `KEY:`) and every token shape it knows
 are replaced with `[redacted]`. A line that still holds 12 characters in a row
@@ -268,7 +272,8 @@ log records and do not pass this filter.
 
 A box whose host-service never answers is reported by the control plane:
 `SandboxNotReadyError` names the boot phases `boot.log` reached, not the step
-output between them. The files under `/var/log/superset` stay on the box.
+output between them. `checkout.log`, the start hook's output and every other
+file under `/var/log/superset` stay on the box.
 Before the flag is on for a customer organization, the policy wording (L1)
 must be live.
 
