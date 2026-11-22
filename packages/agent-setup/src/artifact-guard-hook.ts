@@ -25,7 +25,7 @@ export function createArtifactGuardScript(): void {
 		getArtifactGuardScriptContent(),
 		0o755,
 	);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} artifact guard hook`,
 	);
 }

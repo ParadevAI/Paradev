@@ -13,9 +13,9 @@ import { toast } from "@superset/ui/sonner";
 import { Clipboard, ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { bareWebUrl } from "renderer/lib/bareWebUrl";
 import type { LinkAction } from "renderer/lib/clickPolicy";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
-import { bareWebUrl } from "../../utils/bareWebUrl";
 
 const NO_MODIFIERS = {
 	metaKey: false,

@@ -108,7 +108,7 @@ export function ensureManagedTomlBlock(spec: ManagedTomlBlockSpec): void {
 	if (content === "") return;
 	fs.mkdirSync(path.dirname(filePath), { recursive: true });
 	const changed = writeFileIfChanged(filePath, content, spec.fileMode);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} ${spec.fileLabel}`,
 	);
 }
@@ -129,7 +129,7 @@ export function removeManagedTomlBlock(spec: ManagedTomlBlockSpec): void {
 		return;
 	}
 	const changed = writeFileIfChanged(filePath, `${base}\n`, spec.fileMode);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Removed" : "Verified no"} ${spec.removeLabel}`,
 	);
 }

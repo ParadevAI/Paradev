@@ -233,13 +233,51 @@ reaped while its terminal survived.
 ## Box logs leave the box
 
 When the organization's PostHog flag `sandbox-box-logs` is on, the claim sets
-`SUPERSET_SANDBOX_BOX_LOGS=1` and host-service turns on the Sentry SDK's logs
-(`logBoxEvent` in `packages/host-service/src/sentry.ts`). Only those fixed
-events leave the box, each with ids, counts and durations: no log file, no
-console line, no error message. A box whose host-service never answers is
-reported by the control plane: `SandboxNotReadyError` names the boot phases
-`boot.log` reached, not the step output between them. `memguard.log`,
-`desktop.log`, `checkout.log` and `host-service.log` stay on the box.
+`SUPERSET_SANDBOX_BOX_LOGS=1`, and host-service on that box sends log records
+to Sentry Logs (`hostSentryOptions` in `packages/host-service/src/sentry.ts`).
+A host-service not in run mode `sandbox`, which is every desktop user's own,
+never sends one. `createBoxLogFilter`
+(`packages/host-service/src/runtime/box-log-filter/box-log-filter.ts`)
+decides what a record holds:
+
+- A typed box event (`logBoxEvent`) goes out as it is: ids, counts and
+  durations only. The hourly cap does not apply to it.
+- A `console` line whose `[prefix]` is in `BOX_LOG_PREFIXES` goes out as its
+  template, the call site's constant first argument with `{}` for each later
+  argument, plus the later arguments that are strings, numbers or booleans.
+  Objects, which include every error, are not sent; a caught value is passed
+  through `caught()`, so a string rejection is an object too. Those call sites
+  pass ids, counts, versions, ports, paths, a client address, agent, plugin
+  and integration names and URLs, so paths, repository and branch names can
+  leave the box in them. A test keeps their first argument free of `${}`.
+- Any other `console` line goes out as its prefix only. `debug` lines are not
+  sent.
+
+The template and each string go through `createBoxLogScrub`
+(`packages/host-service/src/runtime/box-log-filter/box-log-scrub.ts`). A record that holds a
+managed value, the host secret or the DSN, raw, JSON-escaped or URL-encoded,
+goes out as `box.logs.withheld` with its level only; URL userinfo, `Bearer`
+and `Basic` credentials, GitHub, Stripe and `sk-` keys are replaced with
+`[redacted]`. Limits: a value shorter than 8 characters is not matched; part
+of a value, or a value in another encoding, is not matched; a token that is
+not a managed value is found only if its shape is in that list; a caught
+value passed without `caught()`, or a line whose single argument is
+interpolated, is not held back. A box sends
+at most 1,000 filtered records an hour; the record that reaches the cap is
+`box.logs.capped`, and the next hour starts with `box.logs.dropped` and the
+count. Sentry error events (`captureException`, uncaught exceptions) are not
+log records and do not pass this filter.
+
+Two typed events come from the box's own logs, which host-service reads
+and does not send. Each boot stamp leaves as `boot.phase`: the phase token and
+its times, never the line's detail, and only a token of a family
+`superset-boot` or host-service writes (`BOOT_PHASE_FAMILIES`). Each memguard
+kill or unrelieved pressure leaves as `box.reaped` or `box.memory_low`: the
+class of the process from its OOM score and memory sizes, never its name.
+
+A box whose host-service never answers is reported by the control plane:
+`SandboxNotReadyError` names the boot phases `boot.log` reached, not the step
+output between them. The files under `/var/log/superset` stay on the box.
 Before the flag is on for a customer organization, the policy wording (L1)
 must be live.
 

@@ -10,6 +10,7 @@ const CONTINUE: UserContent[] = [{ type: "text", text: CONTINUE_PROMPT }];
 
 export function useFailureRecovery({
 	blocked,
+	canSwitchAgent = false,
 	configOptions,
 	manualSignIn,
 	openAgentSettings,
@@ -22,6 +23,7 @@ export function useFailureRecovery({
 	setConfigOption,
 }: {
 	blocked: boolean;
+	canSwitchAgent?: boolean;
 	configOptions: SessionConfigOption[] | undefined;
 	manualSignIn?: boolean;
 	openAgentSettings?: () => void;
@@ -78,6 +80,7 @@ export function useFailureRecovery({
 		[],
 	);
 	const canChangeModel =
+		(canSwitchAgent && configOptions !== undefined) ||
 		configOptions?.some(
 			(option) => option.category === "model" && option.options.length > 1,
 		) === true;

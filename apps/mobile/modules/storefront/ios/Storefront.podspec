@@ -5,10 +5,10 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'Storefront'
   s.version        = package['version']
-  s.summary        = 'App Store storefront country for Superset'
+  s.summary        = 'App Store storefront country for Paradev'
   s.description    = 'Reads the StoreKit storefront country code'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

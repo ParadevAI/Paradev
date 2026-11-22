@@ -74,6 +74,15 @@ describe("parseProjectConfig", () => {
 		expect(parseProjectConfig('[terminals.cloud]\nrun = "x"\n').ok).toBe(true);
 	});
 
+	test("[mcp] allow takes plugins as name@marketplace only", () => {
+		const ok = parseProjectConfig('[mcp]\nallow = ["linear@superset"]\n');
+		expect(ok.ok && ok.config.mcp?.allow).toEqual(["linear@superset"]);
+		const bare = parseProjectConfig('[mcp]\nallow = ["linear"]\n');
+		expect(bare.ok).toBe(false);
+		if (bare.ok) return;
+		expect(bare.errors[0]?.message).toContain("name@marketplace");
+	});
+
 	test("accepts an empty file", () => {
 		expect(parseProjectConfig("").ok).toBe(true);
 	});

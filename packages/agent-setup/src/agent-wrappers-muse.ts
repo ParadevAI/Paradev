@@ -72,7 +72,7 @@ export function createMuseManagedHooksFile(): void {
 		getMuseManagedHooksContent(),
 		0o644,
 	);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Muse managed hooks file`,
 	);
 }
@@ -179,7 +179,7 @@ export function createMuseSettingsJson(): void {
 		return;
 	}
 	const changed = writeFileIfChanged(settingsPath, content, 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Muse settings.json`,
 	);
 }

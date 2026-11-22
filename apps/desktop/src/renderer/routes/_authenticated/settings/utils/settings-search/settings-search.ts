@@ -1795,6 +1795,9 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"fork",
 			"base",
 			"template",
+			"config",
+			"config.toml",
+			"build",
 		],
 	},
 	{

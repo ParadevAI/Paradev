@@ -3,6 +3,11 @@ export function hookOutcomeLine(
 	hook: "start" | "archive",
 	outcome: string,
 	command: string,
-): string {
-	return `[sandbox] ${hook} hook ${outcome} (command of ${command.length} chars)`;
+) {
+	return [
+		"[sandbox] hook outcome (hook, outcome, command chars):",
+		hook,
+		outcome,
+		command.length,
+	] as const;
 }

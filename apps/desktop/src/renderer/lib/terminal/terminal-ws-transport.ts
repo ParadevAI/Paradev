@@ -19,6 +19,7 @@ import {
 	shouldSurfaceDiagnosis,
 } from "./attach-retry-diagnosis";
 import { terminalQueryColors } from "./terminal-query-colors";
+import { writeReplayedOutput } from "./terminal-replay-write";
 import {
 	classifyTerminalFailure,
 	type TerminalFailureClassification,
@@ -59,6 +60,8 @@ type TerminalServerMessage =
 			type: "synced";
 			epoch: string;
 			seq: number;
+			// Live stream position; bytes before it are replayed. Old hosts omit it.
+			head?: number;
 			mode: "exact" | "tail" | "reanchor";
 	  }
 	// Liveness probe. The host drops a client that answered before and then
@@ -193,12 +196,20 @@ export interface TerminalTransport {
 	 * With `_seqCounting` still false at close time, it means a pre-seq host
 	 * fed the xterm uncounted bytes — the anchor is invalidated. */
 	_bytesSinceAttach: boolean;
+	/** Replayed bytes still to come on this connection, from `synced`. */
+	_replayBytesLeft: number;
 	/**
 	 * True when the xterm was born with content (restored snapshot or seeded
 	 * from a sibling instance). Without an anchor, such an xterm must never
 	 * request the ring tail (`seq=new`) — it would double-paint.
 	 */
 	_xtermHadContent: boolean;
+	/**
+	 * "needed": the xterm may not match the PTY's screen (it came from a
+	 * snapshot, or its rows changed while detached), so the next resize asks
+	 * the host for a repaint. "sent": waiting for the host's `size` answer.
+	 */
+	_repaintRequest: "none" | "needed" | "sent";
 	/** Internal: wall-clock-gap watchdog for laptop sleep/wake detection. */
 	_livenessTimer: ReturnType<typeof setInterval> | null;
 	/** Internal: Date.now() at the last watchdog tick. */
@@ -467,8 +478,10 @@ export function createTransport(
 		seqAnchor: null,
 		_seqCounting: false,
 		_seqEverSynced: false,
+		_replayBytesLeft: 0,
 		_bytesSinceAttach: false,
 		_xtermHadContent: false,
+		_repaintRequest: "none",
 		_livenessTimer: null,
 		_lastLivenessTick: 0,
 		_resumeListener: null,
@@ -807,7 +820,15 @@ function attachSocketListeners(
 			if (transport._seqCounting && transport.seqAnchor) {
 				transport.seqAnchor.seq += data.byteLength;
 			}
-			transport._writeCoalescer?.push(new Uint8Array(data));
+			let bytes = new Uint8Array(data);
+			if (transport._replayBytesLeft > 0) {
+				const replayed = bytes.subarray(0, transport._replayBytesLeft);
+				transport._replayBytesLeft -= replayed.byteLength;
+				bytes = bytes.subarray(replayed.byteLength);
+				transport._writeCoalescer?.flushSync();
+				writeReplayedOutput(terminal, replayed);
+			}
+			if (bytes.byteLength > 0) transport._writeCoalescer?.push(bytes);
 			transport._hasReceivedBytes = true;
 			transport._bytesSinceAttach = true;
 			return;
@@ -833,6 +854,9 @@ function attachSocketListeners(
 		}
 
 		if (message.type === "size") {
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "none";
+			}
 			setNarrowedByOtherClient(transport, message.cols < terminal.cols);
 			return;
 		}
@@ -853,9 +877,14 @@ function attachSocketListeners(
 			// pre-seq host, and neither advances the stream position.
 			transport._seqCounting = false;
 			transport._bytesSinceAttach = false;
+			transport._replayBytesLeft = 0;
 			setConnectionState(transport, "open");
 			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
+			// The last connection ended before the host answered the request.
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "needed";
+			}
 			sendResize(transport, terminal.cols, terminal.rows);
 			flushPendingInput(transport);
 			return;
@@ -865,6 +894,10 @@ function attachSocketListeners(
 			transport.seqAnchor = { epoch: message.epoch, seq: message.seq };
 			transport._seqCounting = true;
 			transport._seqEverSynced = true;
+			transport._replayBytesLeft = Math.max(
+				0,
+				(message.head ?? message.seq) - message.seq,
+			);
 			// Re-assert current keyboard focus so the running program's focus
 			// state can't stay stale across the reattach (tmux does the same on
 			// client attach). xterm's own DECSET-1004 self-report fires while
@@ -1224,7 +1257,11 @@ export function sendResize(
 	const socket = transport._socket;
 	if (!socket || socket.readyState !== WebSocket.OPEN) return;
 	if (transport.connectionState !== "open") return;
-	socket.send(JSON.stringify({ type: "resize", cols, rows }));
+	const repaint = transport._repaintRequest === "needed" || undefined;
+	if (repaint) {
+		transport._repaintRequest = "sent";
+	}
+	socket.send(JSON.stringify({ type: "resize", cols, rows, repaint }));
 }
 
 export function sendDispose(transport: TerminalTransport) {

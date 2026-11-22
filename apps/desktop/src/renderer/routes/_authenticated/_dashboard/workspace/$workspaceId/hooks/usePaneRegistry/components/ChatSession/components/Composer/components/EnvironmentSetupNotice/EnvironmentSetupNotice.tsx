@@ -8,7 +8,7 @@ import {
 	withEnvironmentSetupSkill,
 } from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
 
-/** Offered to an environment's creator until it has a checkpoint ("image" means it never had one). */
+/** Offered to an environment's creator until it has a build ("image" means it never had one). */
 export function EnvironmentSetupNotice({
 	className,
 	workspaceId,
