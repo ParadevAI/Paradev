@@ -151,6 +151,16 @@ Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vib
 natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
 read the shared convention.
 
+Claude gets two plugin directories with the same skills: `~/.claude/skills/paradev` (skills answer
+to `paradev:<skill>`) and `~/.claude/skills/superset`, the old name, which saved prompts, automations
+and released builds still use. The `superset` copy keeps each skill's body, but its description only
+says to use the `paradev:` name, so the model picks the new one. Composers fold `superset:<x>` into
+`paradev:<x>` as an alias (`foldLegacyPluginCommands` in `@superset/shared/slash-commands`). Do not
+remove the `superset` directory: builds from before the rename provision only it and reap
+`paradev`, so `superset:` is the one name that resolves on every build. If the user owns a
+`paradev` directory, `superset` stays the full plugin. The `~/.agents/skills/superset-<skill>` names
+and the source directory `plugins/superset/` did not change.
+
 Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
 `~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors
 `PDEV_CODING_AGENT_DIR` when set. Claude and pdev entries share the ownership ledger at
