@@ -15,11 +15,12 @@ The open-source workspace for Claude Code, Codex, and any coding agent.
 
 ## Why Paradev
 
-One agent in one terminal is simple. Five agents means a row of terminal tabs, branches you juggle by hand, and no clear view of which agent is waiting on you. Paradev is the workspace for parallel coding agents: each agent works in its own Git worktree, and you watch, review, and merge them all from one window.
+Paradev is the workspace for parallel coding agents. These are the reasons people who use it every day have given, in their own words.
 
-- **Run agents in parallel, each on its own branch.** Each task gets its own Git worktree, branch, and terminals, so working files stay separate.
-- **Run many agents without losing track.** The sidebar shows which agents are working and which are waiting on you. Review their work with built-in diffs and PR checks, then merge without leaving the app.
-- **Use the best agent. Never get locked in.** Paradev runs Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, and any other CLI agent. Use the agent plans and API keys you already have. Model calls go straight to your provider.
+- **Agents run in parallel and never touch each other's files.** [@AIC_Hugo](https://x.com/AIC_Hugo/status/2120442223137595499) wrote that Paradev "gives every task its own worktree, branch and terminal, so my agents run in parallel and never touch each other's files."
+- **Your sessions keep running.** For [@gregpr07](https://x.com/gregpr07/status/2013038355630432742), "closing a laptop doesn't kill the sessions." [@TimSuchanek](https://x.com/TimSuchanek/status/2052939547168919995) likes "being able to upgrade while you have sessions running."
+- **You review in the same place.** "You can view git changes within itself," as [@gregpr07](https://x.com/gregpr07/status/2013038355630432742) put it. Read the diff, check the pull request, and merge without leaving the app.
+- **It is open source and works with the agents you already use.** [@MrJamesHenry](https://x.com/MrJamesHenry/status/2031662137475825924) chose it because it is "open and therefore forkable and inspectable." Paradev runs Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, and any other CLI agent on the plans and API keys you already have. Model calls go straight to your provider.
 
 ## Get started
 
