@@ -77,31 +77,32 @@ describe("nextRecoveryDelayMs", () => {
 });
 
 describe("isSessionRecovering", () => {
-	it("keeps recovering a saved session only while the API is unreachable", () => {
-		const savedSession = {
-			hasLocalToken: true,
-			isOnline: true,
-			hasUser: false,
-		};
-		const networkError = { status: undefined };
+	const savedSession = { hasLocalToken: true, isOnline: true, hasUser: false };
 
-		expect(isSessionRecovering({ ...savedSession, error: networkError })).toBe(
-			true,
-		);
+	it("keeps recovering a saved session on a network error or 5xx", () => {
+		expect(
+			isSessionRecovering({ ...savedSession, error: { status: undefined } }),
+		).toBe(true);
 		expect(
 			isSessionRecovering({ ...savedSession, error: { status: 503 } }),
 		).toBe(true);
+	});
+
+	it("stops recovering when the server rejects the session", () => {
 		expect(
 			isSessionRecovering({ ...savedSession, error: { status: 401 } }),
 		).toBe(false);
 		expect(
 			isSessionRecovering({ ...savedSession, error: { status: 403 } }),
 		).toBe(false);
+	});
+
+	it("does not recover without a saved token", () => {
 		expect(
 			isSessionRecovering({
 				...savedSession,
 				hasLocalToken: false,
-				error: networkError,
+				error: { status: undefined },
 			}),
 		).toBe(false);
 	});

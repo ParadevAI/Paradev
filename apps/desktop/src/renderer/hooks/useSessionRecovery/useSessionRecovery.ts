@@ -111,7 +111,7 @@ export function useSessionRecovery() {
 		try {
 			await refetch();
 		} catch (error) {
-			console.warn("[sign-in] session recovery refetch failed", error);
+			console.warn("[auth] session recovery refetch failed", error);
 		} finally {
 			recoveryInFlightRef.current = false;
 
