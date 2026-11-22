@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
@@ -19,13 +19,13 @@ interface HostLabelProps {
 	lastSeenAt?: number | null;
 	/** Asks again whether the machine is online. */
 	onRetry?: () => Promise<void>;
-	/** The list's first item: no section gap above it. */
+	/** The list's first item: no rule above it. */
 	first?: boolean;
 }
 
 /**
- * Titles the place the rows under it live on: the list's top level, so its
- * strongest text, though not a collapsible level of its own.
+ * Titles the place the rows under it live on. A rule above it, not a bigger
+ * size, marks it as the list's top level.
  */
 export function HostLabel({
 	name,
@@ -53,9 +53,10 @@ export function HostLabel({
 	return (
 		<View
 			className={cn(
-				"flex-row items-center gap-3 px-4 pb-1",
-				first ? "pt-2" : "pt-6",
+				"flex-row items-center gap-3 px-4 pb-1 pt-2",
+				!first && "border-border mt-3",
 			)}
+			style={first ? undefined : { borderTopWidth: StyleSheet.hairlineWidth }}
 		>
 			<View
 				className={cn(
@@ -81,7 +82,7 @@ export function HostLabel({
 					)}
 				>
 					<Text
-						className="text-foreground shrink font-semibold text-[20px]"
+						className="text-foreground shrink font-semibold text-[17px]"
 						numberOfLines={enlargedText ? undefined : 1}
 					>
 						{name}

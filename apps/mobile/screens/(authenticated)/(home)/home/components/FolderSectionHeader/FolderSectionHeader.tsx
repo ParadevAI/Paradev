@@ -73,7 +73,7 @@ export function FolderSectionHeader({
 				</View>
 				<View className="shrink flex-row items-center gap-2">
 					<Text
-						className="text-muted-foreground shrink text-[15px] font-medium"
+						className="text-muted-foreground shrink text-[16px] font-medium"
 						numberOfLines={enlargedText ? undefined : 1}
 					>
 						{name}

@@ -65,7 +65,7 @@ export function ProjectSectionHeader({
 					{icon ?? <ProjectAvatar name={name} iconUrl={iconUrl} size={20} />}
 				</View>
 				<Text
-					className="shrink text-[17px] font-semibold"
+					className="shrink text-[16px] font-semibold"
 					numberOfLines={enlargedText ? undefined : 1}
 				>
 					{name}

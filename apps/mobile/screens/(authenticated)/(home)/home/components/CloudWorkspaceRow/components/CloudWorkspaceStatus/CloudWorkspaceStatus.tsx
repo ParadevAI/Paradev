@@ -89,7 +89,7 @@ export function CloudWorkspaceStatus({
 	}
 	if (!row.agentStatusAt) return null;
 	return (
-		<Text className="text-muted-foreground text-[11px] tabular-nums">
+		<Text className="text-muted-foreground text-[13px] tabular-nums">
 			{compactTime(row.agentStatusAt.getTime(), now.getTime())}
 		</Text>
 	);
