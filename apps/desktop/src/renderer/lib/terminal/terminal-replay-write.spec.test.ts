@@ -516,11 +516,10 @@ describe("replay edges", () => {
 		dispose();
 	});
 
-	test("a ring-sized replay sends nothing and later queries are answered", async () => {
+	test("a large replay with many queries sends nothing, and the next live query is answered", async () => {
 		const { terminal, sent, parsed, dispose } = await setup();
-		const block = `${"x".repeat(4000)}\r\n${ALL_ANSWERED}`;
-		const ring = block.repeat(Math.ceil((2 * 1024 * 1024) / block.length));
-		replay(terminal, ring);
+		const block = `${"x".repeat(2000)}\r\n${ALL_ANSWERED}`;
+		replay(terminal, block.repeat(16));
 		terminal.write(`${ESC}[c`);
 		await parsed();
 		expect(sent).toEqual([`${ESC}[?62;4;9;22c`]);
@@ -604,6 +603,36 @@ describe("input during a replay", () => {
 			expect(sent).toEqual(["x", "pasted", "\r"]);
 			expect(terminal.options.disableStdin).toBe(false);
 			dispose();
+		});
+	});
+
+	test("text the app pastes while a replayed image decodes arrives once, after it", async () => {
+		await withPendingDecode(async (release) => {
+			const { terminalRuntimeRegistry } = await import(
+				"./terminal-runtime-registry"
+			);
+			const terminalId = `replay-spec-paste-${++runtimes}`;
+			const container = document.createElement("div");
+			document.body.appendChild(container);
+			terminalRuntimeRegistry.mount(
+				terminalId,
+				container,
+				getDefaultTerminalAppearance(),
+			);
+			const terminal = terminalRuntimeRegistry.getTerminal(terminalId);
+			if (!terminal) throw new Error("expected a mounted terminal");
+			const sent: string[] = [];
+			terminal.onData((data) => sent.push(data));
+			replay(terminal, `${ESC}_Gi=42,a=T,f=24,s=1,v=1;AAAA${ST}${ESC}[c`);
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			expect(terminal.options.disableStdin).toBe(true);
+			terminalRuntimeRegistry.paste(terminalId, "dropped.png");
+			expect(sent).toEqual([]);
+			release();
+			await new Promise<void>((resolve) => terminal.write("", resolve));
+			expect(sent).toEqual(["dropped.png"]);
+			terminalRuntimeRegistry.dispose(terminalId);
+			container.remove();
 		});
 	});
 

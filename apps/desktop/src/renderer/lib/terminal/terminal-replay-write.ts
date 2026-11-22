@@ -32,11 +32,20 @@ export function isReplaying(terminal: ReplayTerminal): boolean {
 	return replayStates.get(terminal)?.replaying ?? false;
 }
 
+function deliverUserInput(terminal: ReplayTerminal, deliver: () => void) {
+	const state = replayStates.get(terminal);
+	if (state?.replaying) state.held.push(deliver);
+	else deliver();
+}
+
 /** For input the app sends on the user's behalf, outside xterm's key path. */
 export function sendUserInput(terminal: ReplayTerminal, data: string): void {
-	const state = replayStates.get(terminal);
-	if (state?.replaying) state.held.push(() => terminal.input(data, true));
-	else terminal.input(data, true);
+	deliverUserInput(terminal, () => terminal.input(data, true));
+}
+
+/** For text the app pastes on the user's behalf (paste command, drops). */
+export function pasteUserText(terminal: ReplayTerminal, text: string): void {
+	deliverUserInput(terminal, () => terminal.paste?.(text));
 }
 
 /**

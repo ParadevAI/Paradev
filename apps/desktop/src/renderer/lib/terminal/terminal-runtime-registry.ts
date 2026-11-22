@@ -10,6 +10,7 @@ import {
 	type TerminalLinkHandlers,
 	TerminalLinkManager,
 } from "./terminal-link-manager";
+import { pasteUserText } from "./terminal-replay-write";
 import {
 	attachToContainer,
 	clearPersistedRuntimeState,
@@ -567,7 +568,8 @@ class TerminalRuntimeRegistryImpl {
 
 	paste(terminalId: string, text: string, instanceId?: string): void {
 		const entry = this.getEntry(terminalId, instanceId);
-		entry?.runtime?.terminal.paste(text);
+		const terminal = entry?.runtime?.terminal;
+		if (terminal) pasteUserText(terminal, text);
 	}
 
 	findNext(terminalId: string, query: string, instanceId?: string): boolean {
