@@ -9,7 +9,7 @@ export default command({
 	options: {
 		workspace: string().required().desc("Workspace ID"),
 		host: string().desc("Host the workspace lives on (default: this machine)"),
-		pane: string().required().desc("Pane ID (from `superset browser list`)"),
+		pane: string().required().desc("Pane ID (from `paradev browser list`)"),
 		from: string().desc(
 			"Source browser to import from, e.g. 'Comet', 'Chrome' (an exact browser name wins, else a partial match)",
 		),

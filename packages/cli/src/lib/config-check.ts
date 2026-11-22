@@ -78,7 +78,7 @@ function checkAuth(value: unknown, now: number): FieldCheck {
 	) {
 		issues.push(
 			warning(
-				"`auth.refreshStartedAt` is in the future: if it is more than 5 minutes ahead, the next command drops the refresh token (run: superset auth login)",
+				"`auth.refreshStartedAt` is in the future: if it is more than 5 minutes ahead, the next command drops the refresh token (run: paradev auth login)",
 			),
 		);
 	}
@@ -112,7 +112,7 @@ function checkAuth(value: unknown, now: number): FieldCheck {
 			usable = false;
 			issues.push(
 				warning(
-					`\`auth.expiresAt\` ${when} and there is no refresh token: the next command fails with "Session expired" (run: superset auth login)`,
+					`\`auth.expiresAt\` ${when} and there is no refresh token: the next command fails with "Session expired" (run: paradev auth login)`,
 				),
 			);
 		}
@@ -206,7 +206,7 @@ export function checkConfig(
 	if (!loggedIn && parsed.auth === undefined && parsed.apiKey === undefined) {
 		issues.push(
 			warning(
-				"No `auth` or `apiKey`: this file holds no login (run: superset auth login)",
+				"No `auth` or `apiKey`: this file holds no login (run: paradev auth login)",
 			),
 		);
 	}

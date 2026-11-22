@@ -18,7 +18,7 @@ export default command({
 		),
 	],
 	options: {
-		plugin: string().desc("Plugin name from `superset plugins list`"),
+		plugin: string().desc("Plugin name from `paradev plugins list`"),
 		account: string().desc(
 			"Connection id, when the plugin's connector has more than one account",
 		),

@@ -54,8 +54,8 @@ Create an API key in **Settings → API Keys**, then:
 
 ```bash
 export SUPERSET_API_KEY=sk_live_…
-superset start --daemon --org <id|slug|name>
-superset status
+paradev start --daemon --org <id|slug|name>
+paradev status
 ```
 
 `--org` is needed only if the key belongs to more than one organization. See [Headless hosts](/remote-access#headless-sandbox-ci-or-server).
@@ -63,10 +63,10 @@ superset status
 To keep the host running across reboots, run it under systemd instead: [Run it under systemd](/cli/host-server#run-it-under-systemd). First stop the host you started above:
 
 ```bash
-superset stop --org <id|slug|name>
+paradev stop --org <id|slug|name>
 ```
 
-Use the same `--org` you passed to `superset start`, or leave it out if you did.
+Use the same `--org` you passed to `paradev start`, or leave it out if you did.
 
 systemd does not see variables you exported in your shell. Put them in a file only root can read, such as `/etc/superset/host.env`:
 
@@ -85,7 +85,7 @@ Then add `EnvironmentFile=/etc/superset/host.env` to the unit's `[Service]` sect
 Clone a repo onto the server:
 
 ```bash
-superset projects create --name "My Project" --local \
+paradev projects create --name "My Project" --local \
   --clone https://github.com/org/repo.git --parent-dir ~/code
 ```
 

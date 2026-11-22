@@ -21,13 +21,13 @@ export async function resolveHost(
 	if (!host) {
 		throw new CLIError(
 			`Host not found: ${nameOrId}`,
-			"Run: superset hosts list",
+			"Run: paradev hosts list",
 		);
 	}
 	if (rest.length > 0) {
 		throw new CLIError(
 			`Multiple hosts named "${nameOrId}"`,
-			"Use the host id instead (see: superset hosts list).",
+			"Use the host id instead (see: paradev hosts list).",
 		);
 	}
 	return {

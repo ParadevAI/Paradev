@@ -99,7 +99,7 @@ export function reportHostOutcomes(
 		throw new CLIError(
 			lines.join("\n"),
 			data.notFound.length > 0
-				? "Pass full workspace IDs (superset workspaces list), and --host <id> for a workspace on another machine"
+				? "Pass full workspace IDs (paradev workspaces list), and --host <id> for a workspace on another machine"
 				: undefined,
 			data,
 		);

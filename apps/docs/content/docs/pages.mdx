@@ -36,7 +36,7 @@ The Paradev plugin includes a [Pages skill](/skills) that guides agents through 
 To publish from the CLI, run:
 
 ```bash
-superset pages publish design.html --title "Onboarding design" --label "First draft"
+paradev pages publish design.html --title "Onboarding design" --label "First draft"
 ```
 
 The command returns a shareable URL. Publishing does not open the page. See the [CLI reference](/cli/cli-reference#pages) for options.
@@ -88,13 +88,13 @@ The agent can change the page, answer a question in the thread, or leave feedbac
 Publish the same source path from the same workspace to create a new version of the existing page. Your team keeps using the same link, and earlier versions remain in version history.
 
 ```bash
-superset pages publish design.html --label "Simplified onboarding after team review"
+paradev pages publish design.html --label "Simplified onboarding after team review"
 ```
 
 If the source moved or you're publishing from another workspace, pass the existing page ID explicitly:
 
 ```bash
-superset pages publish design.html --page <page-id> --label "Updated onboarding flow"
+paradev pages publish design.html --page <page-id> --label "Updated onboarding flow"
 ```
 
 Publishing from outside a workspace works too, but there's no path for a later publish to resolve against: every run creates a separate page unless you pass `--page`. The publish tells you when that happened and prints the command to reuse.
@@ -102,14 +102,14 @@ Publishing from outside a workspace works too, but there's no path for a later p
 Use the page title menu to preview earlier versions read-only, rename the page, or refresh it. You can also inspect version history or retrieve a published version:
 
 ```bash
-superset pages versions <page-id-or-slug>
-superset pages pull <page-id-or-slug> --version 1 > original-design.html
+paradev pages versions <page-id-or-slug>
+paradev pages pull <page-id-or-slug> --version 1 > original-design.html
 ```
 
 **Duplicate** in the same menu copies the version the page currently serves into a new page that only you can see. The copy starts at version 1 and does not carry the original's comments, shares, or version history. From the CLI:
 
 ```bash
-superset pages duplicate <page-id-or-slug> --title "Design, second take"
+paradev pages duplicate <page-id-or-slug> --title "Design, second take"
 ```
 
 ## Read What Viewers Stored
@@ -132,8 +132,8 @@ const keys = await window.superset.storage.list("pipeline:", { scope: "shared" }
 A page can store up to 20 MiB in total. You can read what viewers stored:
 
 ```bash
-superset pages storage <page-id-or-slug>
-superset pages storage <page-id-or-slug> --key votes
+paradev pages storage <page-id-or-slug>
+paradev pages storage <page-id-or-slug> --key votes
 ```
 
 The first command lists each key and how many people stored a value under it. With `--key`, it prints each person's value and when they last changed it. With `--scope private`, you see only your own value. Add `--scope` to pick `slot`, `private` or `shared`. Add `--json` for the raw records. On a `just_me` page only the creator can read storage. On an `org` or `everyone` page, members of the page's organization can read it, even when the page is public.
@@ -141,8 +141,8 @@ The first command lists each key and how many people stored a value under it. Wi
 You can also write storage as yourself, for example to refresh data from an automation without a new publish. Both `--set` and `--remove` need `--key`, and `--set` takes a JSON value:
 
 ```bash
-superset pages storage <page-id-or-slug> --key data --scope shared --set '{"deals": 42}'
-superset pages storage <page-id-or-slug> --key data --scope shared --remove
+paradev pages storage <page-id-or-slug> --key data --scope shared --set '{"deals": 42}'
+paradev pages storage <page-id-or-slug> --key data --scope shared --remove
 ```
 
 On `org` and `everyone` pages, only signed-in members of the page's organization can read or write storage. On a `just_me` page, only the creator can. Anyone who can write can overwrite or remove a `shared` value. Someone outside the organization who opens an `everyone` page can read the page, but not its storage.

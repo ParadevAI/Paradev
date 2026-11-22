@@ -62,13 +62,13 @@ export async function resolveHostTarget(
 		if (!manifest) {
 			throw new CLIError(
 				"Host service for this machine isn't running",
-				"Run: superset start",
+				"Run: paradev start",
 			);
 		}
 		if (!isProcessAlive(manifest.pid)) {
 			throw new CLIError(
 				"Host service manifest is stale (recorded PID is dead)",
-				"Run: superset start",
+				"Run: paradev start",
 			);
 		}
 		return {
@@ -100,7 +100,7 @@ export async function resolveHostTarget(
 	if (targetHostId.toLowerCase() === CLOUD_HOST_ID) {
 		throw new CLIError(
 			"`--host cloud` is not one host: each cloud workspace runs its own",
-			"Name the workspace: `superset snapshot --host cloud --workspace <id>`, or a workspace command such as `superset sessions list --workspace <id>`",
+			"Name the workspace: `paradev snapshot --host cloud --workspace <id>`, or a workspace command such as `paradev sessions list --workspace <id>`",
 		);
 	}
 

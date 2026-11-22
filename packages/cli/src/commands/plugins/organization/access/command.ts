@@ -23,7 +23,7 @@ export default command({
 		if (!plugin) {
 			throw new CLIError(
 				`Your organization has no plugin "${name}".`,
-				"See what it has: superset plugins organization list",
+				"See what it has: paradev plugins organization list",
 			);
 		}
 		const policy: OrganizationPluginPolicy = { ...plugin.policy };

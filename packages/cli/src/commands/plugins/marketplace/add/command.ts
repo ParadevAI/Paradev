@@ -55,7 +55,7 @@ export default command({
 					location: local.location,
 				},
 			],
-			message: `${local.updated ? "Updated" : "Added"} marketplace "${local.name}" with ${local.plugins} plugin${local.plugins === 1 ? "" : "s"}. Install one with: superset plugins install <name> --marketplace ${local.name}`,
+			message: `${local.updated ? "Updated" : "Added"} marketplace "${local.name}" with ${local.plugins} plugin${local.plugins === 1 ? "" : "s"}. Install one with: paradev plugins install <name> --marketplace ${local.name}`,
 		};
 	},
 });
