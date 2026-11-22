@@ -702,20 +702,20 @@ describe("fleet scope", () => {
 });
 
 describe("queryFleetCloudUsageSeries", () => {
-	const YEAR = {
-		from: new Date("2026-03-01T00:00:00Z"),
-		to: new Date("2027-01-01T00:00:00Z"),
-	};
-	const series = (
-		by: "organization" | "user",
-		keys: string[],
-		window = NOVEMBER,
-	) => queryFleetCloudUsageSeries(db, null, { window, by, keys });
+	const organizations = (keys: string[], window = NOVEMBER) =>
+		queryFleetCloudUsageSeries(db, { window, by: "organization", keys });
+	const users = (keys: string[], window = NOVEMBER, organizationId = ORG) =>
+		queryFleetCloudUsageSeries(db, {
+			window,
+			by: "user",
+			organizationId,
+			keys,
+		});
 	const sum = (points: (number | undefined)[]) =>
 		points.reduce<number>((total, point) => total + (point ?? 0), 0);
 
 	test("a user's points are the billing days of the same window", async () => {
-		const { starts, stepDays, series: byUser } = await series("user", [MAYA]);
+		const { starts, stepDays, series } = await users([MAYA]);
 		const days = await usage({
 			groupBy: "billingDay",
 			filters: { user: MAYA },
@@ -725,45 +725,75 @@ describe("queryFleetCloudUsageSeries", () => {
 		);
 		expect(stepDays).toBe(1);
 		expect(starts[0]).toBe("2026-11-01");
-		expect(byUser[MAYA]).toEqual(starts.map((day) => expected.get(day) ?? 0));
-		expect(sum(byUser[MAYA] ?? [])).toBeGreaterThan(0);
+		expect(series[MAYA]).toEqual(starts.map((day) => expected.get(day) ?? 0));
+		expect(sum(series[MAYA] ?? [])).toBeGreaterThan(0);
 	});
 
-	test("leaves out the open billing day at the end of the window", async () => {
-		const { starts } = await series("user", [MAYA]);
+	test("leaves out the partial days at both edges of the window", async () => {
+		const { starts } = await users([MAYA]);
+		expect(starts[0]).toBe("2026-11-01");
 		expect(starts.at(-1)).toBe("2026-11-29");
 	});
 
 	test("an organization's points are its users' points", async () => {
-		const orgs = await series("organization", [ORG, OTHER_ORG]);
-		const users = (await series("user", [MAYA, SAM, BEN])).series;
-		const added = (...keys: string[]) =>
-			orgs.starts.map((_, i) => sum(keys.map((key) => users[key]?.[i])));
-		expect(orgs.series[ORG]).toEqual(added(MAYA, SAM));
-		expect(orgs.series[OTHER_ORG]).toEqual(added(BEN));
+		const orgs = await organizations([ORG, OTHER_ORG]);
+		const inOrg = (await users([MAYA, SAM])).series;
+		const inOther = (await users([BEN], NOVEMBER, OTHER_ORG)).series;
+		const added = (points: Record<string, number[]>, ...keys: string[]) =>
+			orgs.starts.map((_, i) => sum(keys.map((key) => points[key]?.[i])));
+		expect(orgs.series[ORG]).toEqual(added(inOrg, MAYA, SAM));
+		expect(orgs.series[OTHER_ORG]).toEqual(added(inOther, BEN));
+	});
+
+	test("a user of another organization has no points here", async () => {
+		const { series } = await users([BEN]);
+		expect(sum(series[BEN] ?? [])).toBe(0);
 	});
 
 	test("a key with no usage has zeros", async () => {
-		const { starts, series: byUser } = await series("user", [ADA]);
-		expect(byUser[ADA]).toEqual(starts.map(() => 0));
+		const { starts, series } = await users([ADA]);
+		expect(series[ADA]).toEqual(starts.map(() => 0));
 	});
 
 	test("no keys gives no series", async () => {
-		expect((await series("user", [])).series).toEqual({});
+		expect((await users([])).series).toEqual({});
 	});
 
-	test("a window over 60 days is summed into whole-day buckets", async () => {
-		const day = await series("user", [MAYA, SAM], YEAR);
-		const total = await usage({
-			groupBy: "billingDay",
-			window: YEAR,
-		});
-		expect(day.stepDays).toBe(Math.ceil(day.stepDays));
-		expect(day.starts.length).toBeLessThanOrEqual(60);
-		expect(day.stepDays).toBeGreaterThan(1);
-		expect(
-			sum(day.series[MAYA] ?? []) + sum(day.series[SAM] ?? []),
-		).toBeCloseTo(total.total.gbHours);
+	test("buckets end on the last whole day and drop the days before that do not fill one", async () => {
+		const sentAt = (day: string) => new Date(`${day}T12:00:00Z`);
+		await db.insert(cloudUsageEvents).values(
+			["2026-03-01", "2026-03-02", "2026-03-03", "2026-04-30"].map(
+				(day, i) => ({
+					bootId: "boot_1",
+					lockSeq: 40 + i,
+					feature: "box_gb_minutes" as const,
+					organizationId: ORG,
+					cloudWorkspaceId: CHECKOUT,
+					userId: ADA,
+					windowFrom: sentAt(day),
+					windowTo: sentAt(day),
+					amount: "60",
+					sentAt: sentAt(day),
+				}),
+			),
+		);
+		try {
+			const sixtyOneDays = {
+				from: new Date("2026-03-01T08:00:00Z"),
+				to: new Date("2026-05-01T07:00:00Z"),
+			};
+			const { starts, stepDays, series } = await users([ADA], sixtyOneDays);
+			expect(stepDays).toBe(2);
+			expect(starts).toHaveLength(30);
+			expect(starts[0]).toBe("2026-03-02");
+			expect(starts.at(-1)).toBe("2026-04-29");
+			expect(series[ADA]?.[0]).toBe(2);
+			expect(series[ADA]?.[29]).toBe(1);
+			expect(sum(series[ADA] ?? [])).toBe(3);
+		} finally {
+			await db.delete(cloudUsageEvents).where(eq(cloudUsageEvents.userId, ADA));
+			await db.delete(cloudUsageDaily).where(eq(cloudUsageDaily.userId, ADA));
+		}
 	});
 });
 

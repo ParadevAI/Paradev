@@ -1030,41 +1030,39 @@ export async function queryFleetCloudUsageByWorkspaceDay(
 	});
 }
 
-export const CLOUD_USAGE_SERIES_MAX_POINTS = 60;
+const SERIES_MAX_POINTS = 60;
 
 /**
  * GB-hours per billing day of each organization or user in `keys`, from the daily rollup in one
- * query. Only whole billing days in the window count, so the open day is left out. A window longer
- * than `CLOUD_USAGE_SERIES_MAX_POINTS` days is summed into buckets of `stepDays` whole days, and
- * `starts` holds each bucket's first billing day. Every key has one point per bucket, zero where it
- * has no usage. Staff only, like `queryFleetCloudUsage`.
+ * query. Only whole billing days count: partial days at both edges of the window are left out, so
+ * the open day is never drawn. A window longer than 60 days is summed into buckets of `stepDays`
+ * whole days that end on the window's last whole day; the leading days that do not fill a bucket
+ * are dropped. `starts` holds each bucket's first billing day. Every key has one point per bucket,
+ * zero where it has no usage. Staff only, like `queryFleetCloudUsage`.
  */
 export async function queryFleetCloudUsageSeries(
 	db: Db,
-	organizationId: string | string[] | null,
-	options: {
-		window: CloudUsageWindow;
-		by: "organization" | "user";
-		keys: string[];
-	},
+	options: { window: CloudUsageWindow; keys: string[] } & (
+		| { by: "organization" }
+		| { by: "user"; organizationId: string }
+	),
 ) {
-	const { window, by, keys } = options;
+	const { window, keys } = options;
 	const { firstWhole, endWhole } = wholeBillingDays(window);
+	const step = sql`greatest(1, ceil((raw."end" - raw.first) / ${SERIES_MAX_POINTS}::numeric))::int`;
+	const days = sql`(raw."end" - raw.first) / ${step} * ${step}`;
 	const span = db.$with("span").as(
 		db
 			.select({
-				first: sql<string>`bounds.first`.as("first"),
-				end: sql<string>`bounds."end"`.as("end"),
-				days: sql<number>`bounds."end" - bounds.first`.as("days"),
-				step: sql<number>`greatest(1, ceil((bounds."end" - bounds.first) / ${CLOUD_USAGE_SERIES_MAX_POINTS}::numeric))::int`.as(
-					"step",
-				),
+				first: sql<string>`raw."end" - ${days}`.as("first"),
+				end: sql<string>`raw."end"`.as("end"),
+				days: sql<number>`${days}`.as("days"),
+				step: sql<number>`${step}`.as("step"),
 			})
-			.from(
-				sql`(select ${firstWhole} as first, ${endWhole} as "end") as bounds`,
-			),
+			.from(sql`(select ${firstWhole} as first, ${endWhole} as "end") as raw`),
 	);
-	const keyColumn = by === "organization" ? daily.organizationId : daily.userId;
+	const keyColumn =
+		options.by === "organization" ? daily.organizationId : daily.userId;
 	const bucket = sql<number>`(${daily.day} - ${span.first}) / ${span.step}`;
 	const sums = db.$with("sums").as(
 		db
@@ -1077,7 +1075,9 @@ export async function queryFleetCloudUsageSeries(
 			.innerJoin(span, sql`true`)
 			.where(
 				and(
-					inOrganization({ organizationId }, daily.organizationId),
+					options.by === "user"
+						? eq(daily.organizationId, options.organizationId)
+						: undefined,
 					inArray(keyColumn, keys),
 					sql`${daily.day} >= ${span.first}`,
 					sql`${daily.day} < ${span.end}`,
