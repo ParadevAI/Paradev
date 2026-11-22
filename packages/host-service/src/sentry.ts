@@ -78,7 +78,10 @@ export function hostSentryOptions(
 					]
 				: []),
 		],
-		initialScope: { tags, attributes: tags },
+		initialScope: {
+			tags,
+			attributes: { ...tags, "log.source": "host-service" },
+		},
 	};
 }
 
