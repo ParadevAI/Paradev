@@ -14,7 +14,13 @@ export function SectionLabel({
 }) {
 	const enlargedText = useEnlargedText();
 	return (
-		<View className={cn(SECTION_LABEL.frame(first), "min-h-11 justify-center")}>
+		<View
+			className={cn(
+				SECTION_LABEL.frame(first),
+				SECTION_LABEL.row,
+				"justify-center",
+			)}
+		>
 			<Text
 				accessibilityRole="header"
 				className={SECTION_LABEL.label}

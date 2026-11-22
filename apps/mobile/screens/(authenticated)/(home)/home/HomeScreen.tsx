@@ -117,7 +117,7 @@ import {
 	withPinnedSection,
 } from "./utils/pinnedSection";
 import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
-import { withRowSeparators } from "./utils/withRowSeparators";
+import { withNeighbourFlags } from "./utils/withNeighbourFlags";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -684,7 +684,7 @@ export function HomeScreen() {
 	// A section label at the top sits close to the chips, as a first host header does.
 	const listItems = useMemo<HomeListItem[]>(() => {
 		const [head, ...rest] = builtItems;
-		return withRowSeparators(
+		return withNeighbourFlags(
 			withPinnedSection(
 				head?.kind === "sectionLabel"
 					? [{ ...head, first: true }, ...rest]
@@ -967,6 +967,7 @@ export function HomeScreen() {
 							count={item.count}
 							collapsed={item.collapsed}
 							attention={item.attention}
+							afterLabel={item.afterLabel}
 							onToggle={() => {
 								void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 								toggleProject(machineId, item.projectId);

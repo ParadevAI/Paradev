@@ -61,6 +61,8 @@ export type HomeListItem =
 			offline: boolean;
 			/** A Cloud repository: no "+", the composer has one Cloud target. */
 			cloud?: boolean;
+			/** Right under a section label, which already gives the space above. */
+			afterLabel?: boolean;
 	  }
 	| ({
 			kind: "folderHeader";

@@ -25,7 +25,7 @@ export function NeedsMeChip({ count, active, onPress }: NeedsMeChipProps) {
 		>
 			<Text
 				className={cn(
-					"text-xs",
+					"text-[13px] leading-4",
 					active ? "text-background" : "text-foreground",
 				)}
 			>
@@ -34,7 +34,7 @@ export function NeedsMeChip({ count, active, onPress }: NeedsMeChipProps) {
 			{count > 0 ? (
 				<Text
 					className={cn(
-						"font-semibold text-xs",
+						"font-semibold text-[13px] leading-4",
 						active ? "text-background" : "text-yellow-500",
 					)}
 				>

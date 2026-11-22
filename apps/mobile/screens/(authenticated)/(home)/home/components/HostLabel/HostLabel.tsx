@@ -13,7 +13,7 @@ import type { PlaceStatus } from "@/screens/(authenticated)/(home)/utils/placeSt
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import { AttentionMark } from "../AttentionMark";
-import { SECTION_LABEL } from "../SectionLabel";
+import { SECTION_LABEL, SECTION_LABEL_HIT_SLOP } from "../SectionLabel";
 
 interface HostLabelProps {
 	name: string;
@@ -69,7 +69,7 @@ export function HostLabel({
 	const content = (
 		<View
 			className={cn(
-				"min-w-0 flex-1 flex-row items-center gap-1.5",
+				"min-w-0 flex-1 flex-row items-center",
 				enlargedText && "flex-wrap",
 				unreachable && "opacity-60",
 			)}
@@ -82,9 +82,15 @@ export function HostLabel({
 			</Text>
 			{onToggle ? (
 				<>
-					<Text className={SECTION_LABEL.count}>{count}</Text>
-					<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
-					{attention ? <AttentionMark attention={attention} /> : null}
+					<Text className={cn(SECTION_LABEL.count, "ml-2")}>{count}</Text>
+					<View className="ml-1">
+						<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
+					</View>
+					{attention ? (
+						<View className="ml-2">
+							<AttentionMark attention={attention} />
+						</View>
+					) : null}
 				</>
 			) : null}
 		</View>
@@ -113,12 +119,13 @@ export function HostLabel({
 						.join(", ")}
 					accessibilityState={{ expanded: !collapsed }}
 					ph-label="host-header-toggle"
-					className="web:hover:opacity-80 min-h-11 min-w-0 flex-1 flex-row items-center active:opacity-60"
+					hitSlop={SECTION_LABEL_HIT_SLOP}
+					className="web:hover:opacity-80 min-h-8 min-w-0 flex-1 flex-row items-center active:opacity-60"
 				>
 					{content}
 				</Pressable>
 			) : (
-				<View className="min-h-11 min-w-0 flex-1 flex-row items-center">
+				<View className="min-h-8 min-w-0 flex-1 flex-row items-center">
 					{content}
 				</View>
 			)}

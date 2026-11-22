@@ -111,8 +111,8 @@ export function CloudWorkspaceRow({
 	const body = (
 		<Pressable
 			className={cn(
-				"bg-background flex-row items-center gap-3 rounded-xl py-3",
-				card ? "px-3" : cn("min-h-12 pr-4", grouped ? "pl-8" : "pl-4"),
+				"bg-background min-h-16 flex-row items-center gap-3 rounded-xl py-2",
+				card ? "px-3" : cn("pr-4", grouped ? "pl-8" : "pl-4"),
 			)}
 			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
 			accessibilityRole="button"

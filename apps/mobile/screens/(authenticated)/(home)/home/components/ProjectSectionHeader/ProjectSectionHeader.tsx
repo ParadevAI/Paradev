@@ -7,6 +7,7 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { useTheme } from "@/hooks/useTheme";
+import { cn } from "@/lib/utils";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
@@ -23,6 +24,8 @@ interface ProjectSectionHeaderProps {
 	onNewWorkspace?: () => void;
 	/** The most urgent state of the rows a collapsed project hides. */
 	attention?: TerminalAttention | null;
+	/** Directly under a section label, which already gives the space above. */
+	afterLabel?: boolean;
 }
 
 /**
@@ -39,6 +42,7 @@ export function ProjectSectionHeader({
 	onToggle,
 	onNewWorkspace,
 	attention,
+	afterLabel = false,
 }: ProjectSectionHeaderProps) {
 	const attentionLabel = useAttentionLabel();
 	const { t } = useLingui();
@@ -49,7 +53,9 @@ export function ProjectSectionHeader({
 		// The collapse target and the "+" are siblings on purpose: a control
 		// nested inside an accessible Pressable is folded into its parent and
 		// VoiceOver never reaches it.
-		<View className="flex-row items-center px-4 pt-4">
+		<View
+			className={cn("flex-row items-center px-4", afterLabel ? "pt-1" : "pt-4")}
+		>
 			<Pressable
 				onPress={onToggle}
 				accessibilityLabel={[
@@ -64,19 +70,27 @@ export function ProjectSectionHeader({
 				<View className="size-6 items-center justify-center">
 					{icon ?? <ProjectAvatar name={name} iconUrl={iconUrl} size={20} />}
 				</View>
-				<Text
-					className="shrink text-[16px] font-semibold"
-					numberOfLines={enlargedText ? undefined : 1}
-				>
-					{name}
-				</Text>
-				<Text className="text-muted-foreground text-[13px] tabular-nums">
-					{count}
-				</Text>
-				{/* Two icons rather than one rotated: a transform on the icon itself
-				    doesn't reach the underlying SVG, so it renders nothing. */}
-				<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
-				{attention ? <AttentionMark attention={attention} /> : null}
+				<View className="shrink flex-row items-center">
+					<Text
+						className="shrink text-[16px] font-semibold"
+						numberOfLines={enlargedText ? undefined : 1}
+					>
+						{name}
+					</Text>
+					<Text className="text-muted-foreground ml-2 text-[13px] tabular-nums">
+						{count}
+					</Text>
+					{/* Two icons rather than one rotated: a transform on the icon itself
+					    doesn't reach the underlying SVG, so it renders nothing. */}
+					<View className="ml-1">
+						<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
+					</View>
+					{attention ? (
+						<View className="ml-2">
+							<AttentionMark attention={attention} />
+						</View>
+					) : null}
+				</View>
 			</Pressable>
 			{onNewWorkspace ? (
 				<Button
