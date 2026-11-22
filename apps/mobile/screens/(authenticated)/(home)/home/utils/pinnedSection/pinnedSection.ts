@@ -1,3 +1,5 @@
+import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
+import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import type { HomeListItem } from "../../types";
 import { strongestAttention } from "../strongestAttention";
@@ -12,6 +14,45 @@ export function pickPinned<W extends { id: string }>(
 	return workspaces
 		.filter((workspace) => pinnedAt[workspace.id] !== undefined)
 		.sort((a, b) => (pinnedAt[b.id] as number) - (pinnedAt[a.id] as number));
+}
+
+export type PinnedEntry =
+	| {
+			id: string;
+			kind: "host";
+			workspace: HostWorkspaceItem;
+			projectName: string;
+			hostName: string;
+			offline: boolean;
+	  }
+	| {
+			id: string;
+			kind: "cloud";
+			row: CloudWorkspaceRow;
+			repoName: string | null;
+	  };
+
+/** Pinned rows out of their project, so their detail names where they live. */
+export function pinnedRows(
+	entries: readonly PinnedEntry[],
+	cloudName: string,
+): HomeListItem[] {
+	return entries.map((entry) =>
+		entry.kind === "host"
+			? {
+					kind: "workspace",
+					workspace: entry.workspace,
+					detail: `${entry.projectName} · ${entry.hostName}`,
+					offline: entry.offline,
+				}
+			: {
+					kind: "cloudRow",
+					row: entry.row,
+					detail: entry.repoName
+						? `${entry.repoName} · ${cloudName}`
+						: cloudName,
+				},
+	);
 }
 
 /**

@@ -113,7 +113,9 @@ import {
 } from "./utils/needsMe";
 import {
 	PINNED_PLACE_ID,
+	type PinnedEntry,
 	pickPinned,
+	pinnedRows,
 	withPinnedSection,
 } from "./utils/pinnedSection";
 import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
@@ -321,23 +323,85 @@ export function HomeScreen() {
 	const noProjectName = t({ message: "No project" });
 	const cloudName = t({ message: "Cloud" });
 
-	// Pinned rows leave their project for the Pinned section at the top.
-	const pinned = useMemo(
+	const cloudListRows = useMemo(
 		() =>
-			pickPinned(
-				scopeHosts.flatMap((host) =>
-					(workspacesByHost.get(host.machineId)?.workspaces ?? [])
-						.filter(
-							(workspace) =>
-								workspace.hostId === host.machineId &&
-								workspace.worktreeExists !== false,
-						)
-						.map((workspace) => ({ id: workspace.id, workspace, host })),
-				),
-				pinnedAt,
-			),
-		[scopeHosts, workspacesByHost, pinnedAt],
+			cloudScope || cloudInMulti
+				? (showArchived ? archivedCloud : activeCloud).filter((row) =>
+						cloudFilters.matchesCreator(row.createdByUserId),
+					)
+				: [],
+		[
+			cloudScope,
+			cloudInMulti,
+			showArchived,
+			archivedCloud,
+			activeCloud,
+			cloudFilters.matchesCreator,
+		],
 	);
+	const cloudRepos = useCloudRepos();
+	const cloudRowAttentionOf = useCallback(
+		(row: CloudWorkspaceRow) =>
+			isArchivedCloudWorkspaceStatus(row.status)
+				? null
+				: cloudRowAttention(row, cloudReadAt[row.id], !!manualUnread[row.id]),
+		[cloudReadAt, manualUnread],
+	);
+	// Pinned rows leave their project for the Pinned section at the top.
+	const pinned = useMemo(() => {
+		const projectName = (
+			host: (typeof scopeHosts)[number],
+			workspace: HostWorkspaceItem,
+		) =>
+			(workspace.projectId &&
+				projectsByHost
+					.get(host.machineId)
+					?.find((project) => project.id === workspace.projectId)?.name) ||
+			noProjectName;
+		const hostEntries = scopeHosts.flatMap((host) =>
+			(workspacesByHost.get(host.machineId)?.workspaces ?? [])
+				.filter(
+					(workspace) =>
+						workspace.hostId === host.machineId &&
+						workspace.worktreeExists !== false,
+				)
+				.map(
+					(workspace): PinnedEntry => ({
+						id: workspace.id,
+						kind: "host",
+						workspace,
+						projectName: projectName(host, workspace),
+						hostName: host.name,
+						offline: isPlaceUnreachable(statusOf(host)),
+					}),
+				),
+		);
+		const cloudEntries = showArchived
+			? []
+			: cloudListRows.map((row): PinnedEntry => {
+					const repo =
+						cloudRepos.status === "success"
+							? cloudRepos.byWorkspace.get(row.id)
+							: undefined;
+					return {
+						id: row.id,
+						kind: "cloud",
+						row,
+						repoName: repo ? repoShortName(repo.fullName) : null,
+					};
+				});
+		return pickPinned([...hostEntries, ...cloudEntries], pinnedAt);
+	}, [
+		scopeHosts,
+		workspacesByHost,
+		projectsByHost,
+		noProjectName,
+		statusOf,
+		showArchived,
+		cloudListRows,
+		cloudRepos,
+		pinnedAt,
+	]);
 	const pinnedIds = useMemo(
 		() => new Set(pinned.map((entry) => entry.id)),
 		[pinned],
@@ -409,30 +473,6 @@ export function HomeScreen() {
 	}, [needsMeHidden]);
 	const needsMeOn = needsMeActive && !needsMeHidden;
 
-	const cloudListRows = useMemo(
-		() =>
-			cloudScope || cloudInMulti
-				? (showArchived ? archivedCloud : activeCloud).filter((row) =>
-						cloudFilters.matchesCreator(row.createdByUserId),
-					)
-				: [],
-		[
-			cloudScope,
-			cloudInMulti,
-			showArchived,
-			archivedCloud,
-			activeCloud,
-			cloudFilters.matchesCreator,
-		],
-	);
-	const cloudRepos = useCloudRepos();
-	const cloudRowAttentionOf = useCallback(
-		(row: CloudWorkspaceRow) =>
-			isArchivedCloudWorkspaceStatus(row.status)
-				? null
-				: cloudRowAttention(row, cloudReadAt[row.id], !!manualUnread[row.id]),
-		[cloudReadAt, manualUnread],
-	);
 	// Null until the repositories answer: a row is not filed under no
 	// repository before then.
 	const cloudListItems = useMemo(
@@ -440,6 +480,7 @@ export function HomeScreen() {
 			buildCloudSection(cloudListRows, cloudRepos, {
 				sort,
 				archived: showArchived,
+				lifted: pinnedIds,
 				rowAttention: cloudRowAttentionOf,
 				isCollapsed: sectionOptions.isCollapsed,
 				noProjectName,
@@ -452,6 +493,7 @@ export function HomeScreen() {
 			cloudRowAttentionOf,
 			sectionOptions.isCollapsed,
 			noProjectName,
+			pinnedIds,
 		],
 	);
 
@@ -564,7 +606,11 @@ export function HomeScreen() {
 							.map(rowAttention),
 						items: hostSections.get(host.machineId) ?? [],
 						// Every row pinned is not an empty place.
-						empty: pinned.some((entry) => entry.host === host)
+						empty: pinned.some(
+							(entry) =>
+								entry.kind === "host" &&
+								entry.workspace.hostId === host.machineId,
+						)
 							? undefined
 							: {
 									label:
@@ -581,18 +627,23 @@ export function HomeScreen() {
 					? {
 							name: cloudName,
 							collapsed: placeCollapsed(CLOUD_PLACE_ID),
-							attentions: cloudListRows.map(cloudRowAttentionOf),
+							attentions: cloudListRows
+								.filter((row) => !pinnedIds.has(row.id))
+								.map(cloudRowAttentionOf),
 							items: cloudListItems ?? [],
-							empty: {
-								label:
-									cloudListItems === null
-										? null
-										: activeCloud.length > 0
-											? t({
-													message: "No cloud workspaces match these filters",
-												})
-											: t({ message: "No cloud workspaces yet" }),
-							},
+							empty: pinned.some((entry) => entry.kind === "cloud")
+								? undefined
+								: {
+										label:
+											cloudListItems === null
+												? null
+												: activeCloud.length > 0
+													? t({
+															message:
+																"No cloud workspaces match these filters",
+														})
+													: t({ message: "No cloud workspaces yet" }),
+									},
 						}
 					: null,
 			});
@@ -650,34 +701,12 @@ export function HomeScreen() {
 		t,
 	]);
 
-	const pinnedRows = useMemo(
+	const shownPinnedRows = useMemo(
 		() =>
-			needsMeOn || cloudScope || showOfflinePlaceholder
+			needsMeOn || showArchived || showOfflinePlaceholder
 				? []
-				: pinned.map(({ workspace, host }): HomeListItem => {
-						const projectName =
-							(workspace.projectId &&
-								projectsByHost
-									.get(host.machineId)
-									?.find((project) => project.id === workspace.projectId)
-									?.name) ||
-							noProjectName;
-						return {
-							kind: "workspace",
-							workspace,
-							detail: `${projectName} · ${host.name}`,
-							offline: isPlaceUnreachable(statusOf(host)),
-						};
-					}),
-		[
-			needsMeOn,
-			cloudScope,
-			showOfflinePlaceholder,
-			pinned,
-			projectsByHost,
-			noProjectName,
-			statusOf,
-		],
+				: pinnedRows(pinned, cloudName),
+		[needsMeOn, showArchived, showOfflinePlaceholder, pinned, cloudName],
 	);
 	const pinnedLabel = t({ message: "Pinned" });
 
@@ -691,8 +720,12 @@ export function HomeScreen() {
 					: builtItems,
 				{
 					label: pinnedLabel,
-					rows: pinnedRows,
-					attentions: pinned.map(({ workspace }) => rowAttention(workspace)),
+					rows: shownPinnedRows,
+					attentions: pinned.map((entry) =>
+						entry.kind === "host"
+							? rowAttention(entry.workspace)
+							: cloudRowAttentionOf(entry.row),
+					),
 					collapsed:
 						collapseHydrated &&
 						!!collapsed[
@@ -704,9 +737,10 @@ export function HomeScreen() {
 	}, [
 		builtItems,
 		pinnedLabel,
-		pinnedRows,
+		shownPinnedRows,
 		pinned,
 		rowAttention,
+		cloudRowAttentionOf,
 		collapseHydrated,
 		collapsed,
 	]);

@@ -71,6 +71,15 @@ describe("buildCloudSection", () => {
 		]);
 	});
 
+	test("leaves pinned rows to the Pinned section, hiding a repository left empty", () => {
+		const items = buildCloudSection(
+			[row("a"), row("b"), row("c")],
+			answered({ a: "acme/web", b: "acme/api", c: "acme/web" }),
+			{ ...options, lifted: new Set(["b", "c"]) },
+		);
+		expect(describeItems(items)).toEqual(["[web 1]", "a"]);
+	});
+
 	test("waits while the repositories are pending, rather than filing rows under no repository", () => {
 		expect(
 			buildCloudSection([row("a")], { status: "pending" }, options),

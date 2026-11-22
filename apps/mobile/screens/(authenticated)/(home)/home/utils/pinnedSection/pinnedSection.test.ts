@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import type { HomeListItem } from "../../types";
-import { pickPinned, withPinnedSection } from "./pinnedSection";
+import {
+	type PinnedEntry,
+	pickPinned,
+	pinnedRows,
+	withPinnedSection,
+} from "./pinnedSection";
 
 const row = (id: string): HomeListItem => ({
 	kind: "cloudRow",
@@ -12,6 +17,44 @@ describe("pickPinned", () => {
 		expect(
 			pickPinned([{ id: "a" }, { id: "b" }, { id: "c" }], { a: 1, c: 5 }),
 		).toEqual([{ id: "c" }, { id: "a" }]);
+	});
+});
+
+describe("pinnedRows", () => {
+	test("names a host row's project and host, a Cloud row's repository and Cloud", () => {
+		const entries: PinnedEntry[] = [
+			{
+				id: "h",
+				kind: "host",
+				workspace: { id: "h" } as never,
+				projectName: "web",
+				hostName: "Studio",
+				offline: true,
+			},
+			{ id: "c", kind: "cloud", row: { id: "c" } as never, repoName: "api" },
+			{ id: "n", kind: "cloud", row: { id: "n" } as never, repoName: null },
+		];
+		expect(pinnedRows(entries, "Cloud")).toEqual([
+			{
+				kind: "workspace",
+				workspace: { id: "h" } as never,
+				detail: "web · Studio",
+				offline: true,
+			},
+			{ kind: "cloudRow", row: { id: "c" } as never, detail: "api · Cloud" },
+			{ kind: "cloudRow", row: { id: "n" } as never, detail: "Cloud" },
+		]);
+	});
+
+	test("orders host and Cloud pins together, newest pin first", () => {
+		const entries = pickPinned(
+			[
+				{ id: "h", kind: "host" },
+				{ id: "c", kind: "cloud" },
+			],
+			{ h: 1, c: 2 },
+		);
+		expect(entries.map((entry) => entry.id)).toEqual(["c", "h"]);
 	});
 });
 

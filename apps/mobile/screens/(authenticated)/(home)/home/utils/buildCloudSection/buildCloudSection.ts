@@ -25,6 +25,8 @@ export interface CloudSectionOptions {
 	rowAttention: (row: CloudWorkspaceRow) => TerminalAttention | null;
 	isCollapsed: (placeId: string, key: string) => boolean;
 	noProjectName: string;
+	/** Rows listed in the Pinned section instead of under their repository. */
+	lifted?: ReadonlySet<string>;
 }
 
 /** `owner/name` → `name`. */
@@ -58,13 +60,14 @@ export function buildCloudSection(
 		rowAttention,
 		isCollapsed,
 		noProjectName,
+		lifted,
 	}: CloudSectionOptions,
 ): HomeListItem[] | null {
 	const time = (row: CloudWorkspaceRow) =>
 		cloudRowSortTime(row, sort, archived);
 	const newestFirst = (a: CloudWorkspaceRow, b: CloudWorkspaceRow) =>
 		time(b) - time(a) || a.name.localeCompare(b.name);
-	const sorted = [...rows].sort(newestFirst);
+	const sorted = rows.filter((row) => !lifted?.has(row.id)).sort(newestFirst);
 
 	if (sorted.length === 0) return [];
 	if (repos.status === "pending") return null;

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { itemFromCloudRow } from "@/hooks/useCloudWorkspaceItems";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
+import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { WorkspaceRowMenu } from "../../../WorkspaceRow/components/WorkspaceRowMenu";
 import { useWorkspaceRowActions } from "../../../WorkspaceRow/hooks/useWorkspaceRowActions";
 
@@ -23,6 +24,8 @@ export function CloudWorkspaceRowMenu({
 	children: ReactNode;
 }) {
 	const router = useRouter();
+	const pinned = usePinnedWorkspacesStore((state) => row.id in state.pinnedAt);
+	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 	const { renameWorkspace, deleteWorkspace, copyId } = useWorkspaceRowActions(
 		itemFromCloudRow(row),
 		cache,
@@ -37,7 +40,8 @@ export function CloudWorkspaceRowMenu({
 			isCloud
 			isUnread={isUnread}
 			onToggleUnread={onToggleUnread}
-			pinned={false}
+			pinned={pinned}
+			onTogglePin={() => togglePin(row.id)}
 			onRename={() => void renameWorkspace()}
 			onDelete={deleteWorkspace}
 			onCopyId={copyId}
