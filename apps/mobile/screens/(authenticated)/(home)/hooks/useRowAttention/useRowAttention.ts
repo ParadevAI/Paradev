@@ -8,7 +8,6 @@ import {
 } from "@/screens/(authenticated)/(home)/home/utils/needsMe";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 
-/** What each row's mark shows, for headers and counts that stand in for rows. */
 export function useRowAttention(
 	attentionByWorkspace: ReadonlyMap<string, TerminalAttention>,
 ) {

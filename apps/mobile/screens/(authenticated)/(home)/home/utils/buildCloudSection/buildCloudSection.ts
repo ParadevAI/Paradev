@@ -25,16 +25,13 @@ export interface CloudSectionOptions {
 	rowAttention: (row: CloudWorkspaceRow) => TerminalAttention | null;
 	isCollapsed: (placeId: string, key: string) => boolean;
 	noProjectName: string;
-	/** Rows listed in the Pinned section instead of under their repository. */
 	lifted?: ReadonlySet<string>;
 }
 
-/** `owner/name` → `name`. */
 export function repoShortName(fullName: string): string {
 	return fullName.slice(fullName.indexOf("/") + 1);
 }
 
-/** A workspace's primary repository by short name, once the repositories answered. */
 export function cloudRepoName(
 	repos: CloudRepos,
 	workspaceId: string,

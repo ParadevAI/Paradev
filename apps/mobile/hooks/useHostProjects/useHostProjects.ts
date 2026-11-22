@@ -111,7 +111,6 @@ export function useHostsProjects(
 	});
 }
 
-/** One host's projects; see useHostsProjects. */
 export function useHostProjects(
 	host: WorkspacesHost | null,
 ): UseHostProjectsResult {

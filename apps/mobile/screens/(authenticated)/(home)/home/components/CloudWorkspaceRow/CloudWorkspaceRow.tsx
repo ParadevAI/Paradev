@@ -46,11 +46,8 @@ export function CloudWorkspaceRow({
 	card?: boolean;
 	/** Replaces the branch in the detail line, e.g. "repo · Cloud" outside the Cloud list. */
 	detail?: string;
-	/** A row inside a group, indented as a host's grouped row. */
 	grouped?: boolean;
-	/** Draws a hairline under the row. */
 	separator?: boolean;
-	/** Under a label that names the state: the detail line leaves it out. */
 	stateInLabel?: boolean;
 }) {
 	const { t } = useLingui();

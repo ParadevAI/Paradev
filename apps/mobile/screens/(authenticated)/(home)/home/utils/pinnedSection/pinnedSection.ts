@@ -7,7 +7,6 @@ import { strongestAttention } from "../strongestAttention";
 
 export const PINNED_PLACE_ID = "pinned";
 
-/** The pinned workspaces among `workspaces`, newest pin first. */
 export function pickPinned<W extends { id: string }>(
 	workspaces: readonly W[],
 	pinnedAt: Readonly<Record<string, number>>,

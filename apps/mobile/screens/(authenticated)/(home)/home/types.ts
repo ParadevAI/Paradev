@@ -31,14 +31,10 @@ export type HomeListItem =
 			lastSeenAt?: number | null;
 			/** Offers Try again, for the single-host offline notice. */
 			retry?: boolean;
-			/** The list's first item. */
 			first?: boolean;
-			/** Under several places the header folds its place away. */
 			collapsible?: boolean;
 			collapsed?: boolean;
-			/** Workspaces listed under the place. */
 			count?: number;
-			/** The most urgent state among rows a collapsed place hides. */
 			attention?: TerminalAttention | null;
 	  }
 	| {
@@ -60,7 +56,6 @@ export type HomeListItem =
 			offline: boolean;
 			/** A Cloud repository: no "+", the composer has one Cloud target. */
 			cloud?: boolean;
-			/** Right under a section label, which already gives the space above. */
 			afterLabel?: boolean;
 	  }
 	| ({
@@ -85,9 +80,7 @@ export type HomeListItem =
 			offline?: boolean;
 			/** Replaces the branch line, e.g. "project · host" under Needs me. */
 			detail?: string;
-			/** Draws a hairline under the row. */
 			separator?: boolean;
-			/** Under a label that names the state, as under Needs me. */
 			stateInLabel?: boolean;
 	  }
 	| {
@@ -99,14 +92,12 @@ export type HomeListItem =
 			kind: "sectionLabel";
 			key: string;
 			label: string;
-			/** The list's first item. */
 			first?: boolean;
 	  }
 	| {
 			kind: "cloudRow";
 			row: CloudWorkspaceRow;
 			detail?: string;
-			/** A row inside a group, indented as a host's grouped row. */
 			grouped?: boolean;
 			separator?: boolean;
 			stateInLabel?: boolean;

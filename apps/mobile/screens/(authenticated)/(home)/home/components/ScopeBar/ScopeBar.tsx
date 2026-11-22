@@ -9,7 +9,6 @@ import { NeedsMeChip } from "./components/NeedsMeChip";
 
 interface ScopeBarProps {
 	scope: WorkspaceScope;
-	/** The place's name, All hosts, or how many places. */
 	label: string;
 	hostOnline: boolean;
 	sortLabel: string | null;

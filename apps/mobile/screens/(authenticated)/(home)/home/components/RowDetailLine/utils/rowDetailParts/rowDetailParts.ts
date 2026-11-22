@@ -1,7 +1,6 @@
 import { formatNumber } from "@superset/i18n/format";
 
 export interface RowDetailInput {
-	/** The row's live state, e.g. "Needs input"; null when it has none. */
 	state: string | null;
 	/** Its pull request's status word and ink, shown when there is no state. */
 	pullRequest: { label: string; ink: string } | null;
@@ -10,7 +9,6 @@ export interface RowDetailInput {
 	branch: string | null;
 	/** Replaces the branch, e.g. "project · host" outside its project. */
 	context?: string | null;
-	/** The section above already names the state, as under Needs me. */
 	omitState?: boolean;
 	noChanges: string;
 }
@@ -34,12 +32,14 @@ export function rowDetailParts({
 	noChanges,
 }: RowDetailInput): RowDetailPart[] {
 	const parts: RowDetailPart[] = [];
-	if (omitState) {
-		// The section label says it.
-	} else if (state) parts.push({ key: "state", text: state, ink: null });
-	else if (pullRequest) {
-		parts.push({ key: "state", text: pullRequest.label, ink: pullRequest.ink });
-	}
+	const stateWord = omitState
+		? null
+		: state
+			? { text: state, ink: null }
+			: pullRequest
+				? { text: pullRequest.label, ink: pullRequest.ink }
+				: null;
+	if (stateWord) parts.push({ key: "state", ...stateWord });
 	if (diff && (diff.additions > 0 || diff.deletions > 0)) {
 		parts.push({
 			key: "diff",

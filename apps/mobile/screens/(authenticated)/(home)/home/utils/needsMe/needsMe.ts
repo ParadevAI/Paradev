@@ -51,7 +51,6 @@ export interface NeedsMeCandidate {
 
 const BUCKET_ORDER: NeedsMeBucket[] = ["input", "review", "working"];
 
-/** A flat list under small section labels: Needs input, Ready for review, Working. */
 export function buildNeedsMeList(
 	candidates: readonly NeedsMeCandidate[],
 	labels: Record<NeedsMeBucket, string>,
@@ -80,7 +79,6 @@ export function buildNeedsMeList(
 	});
 }
 
-/** A host row's attention: its sessions' state, else a manual unread mark. */
 export function hostRowAttention(
 	workspaceId: string,
 	attentionByWorkspace: ReadonlyMap<string, TerminalAttention>,
@@ -104,7 +102,6 @@ export function isCloudRowUnread(
 	return row.agentStatus === "review" && !isRead;
 }
 
-/** A cloud row's attention, read the way its row marks it. */
 export function cloudRowAttention(
 	row: {
 		status: string;

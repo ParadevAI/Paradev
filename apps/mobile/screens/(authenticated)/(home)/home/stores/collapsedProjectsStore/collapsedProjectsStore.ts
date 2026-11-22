@@ -15,7 +15,6 @@ interface CollapsedProjectsStore {
 	/** False until AsyncStorage answers — sections would flash open before it. */
 	hasHydrated: boolean;
 	toggleProject: (machineId: string, projectId: string) => void;
-	/** Folds a whole place (a machine, Cloud, Pinned) under its label. */
 	togglePlace: (placeId: string) => void;
 	/** Forgets collapsed places (machines, Cloud) that no longer exist. */
 	prunePlaces: (placeIds: readonly string[]) => void;

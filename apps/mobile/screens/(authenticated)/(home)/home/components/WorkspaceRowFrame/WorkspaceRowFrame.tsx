@@ -34,11 +34,9 @@ export function WorkspaceRowFrame({
 	nameMuted?: boolean;
 	detailParts: RowDetailPart[];
 	trailing?: ReactNode;
-	/** A cell of Home's wide grid rather than a row of the list. */
 	card?: boolean;
 	grouped?: boolean;
 	bar?: GroupBarSpan | null;
-	/** Draws a hairline under the row. */
 	separator?: boolean;
 	onPress: () => void;
 	disabled?: boolean;

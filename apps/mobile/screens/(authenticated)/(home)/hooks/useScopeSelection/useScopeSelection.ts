@@ -22,7 +22,6 @@ export interface ScopeSelectionValue {
 	cloud: boolean;
 	/** The one machine when it is the only place ticked. */
 	selectedHost: OrgHost | null;
-	/** Every machine in the org, by name. */
 	orgHosts: OrgHost[];
 	cloudEnabled: boolean;
 	allOffered: boolean;
@@ -30,7 +29,6 @@ export interface ScopeSelectionValue {
 	label: SelectionLabel;
 }
 
-/** The places Home lists, resolved against the org's machines. */
 export function useScopeSelection(): ScopeSelectionValue {
 	const saved = useWorkspacesFilterStore((store) => store.selection);
 	const cloudEnabled = useCloudScopeEnabled();

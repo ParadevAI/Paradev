@@ -19,7 +19,6 @@ const STATUS_RANK = {
 	closed: 3,
 } as const;
 
-/** Each listed row's pull request: host rows by repo and branch, Cloud rows by id. */
 export function useRowPullRequests({
 	projects,
 	items,

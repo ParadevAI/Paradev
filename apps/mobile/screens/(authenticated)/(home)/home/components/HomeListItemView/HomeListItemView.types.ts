@@ -11,7 +11,6 @@ import type {
 import type { TagFolderActions } from "../../hooks/useTagFolderActions";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 
-/** What Home's list items read and do, shared by every item on screen. */
 export interface HomeListContext {
 	cache: HostWorkspacesCacheOps;
 	cloudCache: HostWorkspacesCacheOps;

@@ -21,15 +21,11 @@ interface HostLabelProps {
 	status: PlaceStatus;
 	/** Null = never reached the relay. */
 	lastSeenAt?: number | null;
-	/** Asks again whether the machine is online. */
 	onRetry?: () => Promise<void>;
-	/** The list's first item: no rule above it. */
 	first?: boolean;
-	/** Folds the place's rows away; absent where the place can't fold. */
 	onToggle?: () => void;
 	collapsed?: boolean;
 	count?: number;
-	/** The most urgent state among the rows a collapsed place hides. */
 	attention?: TerminalAttention | null;
 }
 

@@ -26,7 +26,6 @@ interface ProjectSectionHeaderProps {
 	onNewWorkspace?: () => void;
 	/** The most urgent state of the rows a collapsed project hides. */
 	attention?: TerminalAttention | null;
-	/** Directly under a section label, which already gives the space above. */
 	afterLabel?: boolean;
 }
 

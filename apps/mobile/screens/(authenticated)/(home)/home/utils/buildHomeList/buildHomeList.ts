@@ -77,7 +77,6 @@ export interface HomeListInput {
 	cloudRepos: CloudRepos;
 	/** Cloud holds active rows the filters hide. */
 	cloudHasRows: boolean;
-	/** Cloud is one of several places. */
 	cloudInPlaces: boolean;
 	archived: boolean;
 	needsMeActive: boolean;
@@ -121,7 +120,6 @@ function projectNameOf(
 	);
 }
 
-/** Home's whole list: Pinned, then the places with their sections, or Needs me. */
 export function buildHomeList(input: HomeListInput): HomeList {
 	const {
 		scope,

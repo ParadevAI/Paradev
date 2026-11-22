@@ -20,11 +20,9 @@ export function SheetRow({
 	onPress,
 	isLast = false,
 }: {
-	/** Left empty, the slot still holds the name at 52pt. */
 	icon?: ReactNode;
 	label: string;
 	subtitle?: string;
-	/** Shown before the check slot, e.g. a count or the current value. */
 	trailing?: ReactNode;
 	/** Set on pick-one rows; reserves the check slot whether ticked or not. */
 	checked?: boolean;

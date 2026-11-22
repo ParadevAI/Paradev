@@ -2,7 +2,6 @@ import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useScopeSelection } from "../useScopeSelection";
 
-/** The scope chip's text: one place by name, All hosts, or how many. */
 export function useScopeLabel(): string {
 	const { t } = useLingui();
 	const { label, orgHosts } = useScopeSelection();

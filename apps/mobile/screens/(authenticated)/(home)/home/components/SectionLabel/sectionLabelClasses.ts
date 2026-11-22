@@ -1,4 +1,3 @@
-/** Home's one section-label style: muted text as typed, at the secondary size. */
 export const SECTION_LABEL_HIT_SLOP = { top: 6, bottom: 6 };
 
 export const SECTION_LABEL = {

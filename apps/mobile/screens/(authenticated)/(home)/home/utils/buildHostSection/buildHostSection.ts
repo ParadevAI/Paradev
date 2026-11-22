@@ -26,11 +26,9 @@ export interface HostSectionOptions {
 	rowAttention: (workspace: HostWorkspaceItem) => TerminalAttention | null;
 	isCollapsed: (machineId: string, key: string) => boolean;
 	noProjectName: string;
-	/** Rows listed in the Pinned section instead of under their project. */
 	lifted: ReadonlySet<string>;
 }
 
-/** One host's projects, groups and rows, as Home lists a single machine. */
 export function buildHostSection(
 	{ machineId, workspaces, projects, tagSettings, offline }: HostSectionInput,
 	{

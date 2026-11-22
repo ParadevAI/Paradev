@@ -24,7 +24,6 @@ export function isPlaceUnreachable(status: PlaceStatus): boolean {
 
 export type PlaceEmptyState = "loading" | "failed" | "empty" | "nothingSaved";
 
-/** Why a place has no rows to list. */
 export function placeEmptyState(
 	status: PlaceStatus,
 	workspaces: { isReady: boolean; failed: boolean },

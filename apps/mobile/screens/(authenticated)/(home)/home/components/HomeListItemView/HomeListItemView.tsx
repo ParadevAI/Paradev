@@ -22,7 +22,6 @@ export function HomeListItemView({
 	context,
 }: {
 	item: HomeListItem;
-	/** A cell of the wide grid rather than a row of the list. */
 	card: boolean;
 	context: HomeListContext;
 }) {

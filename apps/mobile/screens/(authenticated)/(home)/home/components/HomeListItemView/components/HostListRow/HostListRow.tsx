@@ -51,7 +51,6 @@ export function HostListRow({
 			}
 		/>
 	);
-	// Rows from a machine that is not answering: shown, not opened.
 	return item.offline ? (
 		<View pointerEvents="none" className="opacity-50">
 			{row}

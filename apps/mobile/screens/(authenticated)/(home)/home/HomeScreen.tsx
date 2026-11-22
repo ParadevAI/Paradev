@@ -188,7 +188,6 @@ export function HomeScreen() {
 	const { terminalsByWorkspace, attentionByWorkspace } =
 		useHostsTerminals(onlineScopeHosts);
 
-	// Projects are fully local — served by each host, not the cloud.
 	const { byHost: projectsByHost, isReady: projectsReady } =
 		useHostsProjects(scopeHosts);
 	const projects = useMemo(

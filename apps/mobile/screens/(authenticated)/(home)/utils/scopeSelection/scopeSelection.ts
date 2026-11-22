@@ -1,10 +1,8 @@
-/** The places Home lists: some of your machines, and Cloud. */
 export interface ScopeSelection {
 	hosts: string[];
 	cloud: boolean;
 }
 
-/** One machine, Cloud alone, or several places under labels. */
 export type WorkspaceScope = "host" | "cloud" | "multi";
 
 /** More machines than this and Home never queries them all at once. */
@@ -97,7 +95,6 @@ export function resolveSelection({
 const placeCount = (selection: ScopeSelection) =>
 	selection.hosts.length + (selection.cloud ? 1 : 0);
 
-/** A machine can be ticked while fewer than the cap are. */
 export function canTickHost(
 	selection: ScopeSelection,
 	machineId: string,
@@ -168,7 +165,6 @@ export function selectionLabel(
 	return { kind: "count", count: placeCount(selection) };
 }
 
-/** The ticked machines, by name. */
 export function selectedHosts<H extends SelectableHost>(
 	hosts: readonly H[],
 	selection: ScopeSelection,

@@ -9,7 +9,6 @@ import { useAttentionLabel } from "@/screens/(authenticated)/(home)/home/hooks/u
 import type { TerminalAttention } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
 
-/** A search result in Home's row layout; an offline host's result is dimmed and does not open. */
 export function SearchResultRow({
 	workspace,
 	placeName,

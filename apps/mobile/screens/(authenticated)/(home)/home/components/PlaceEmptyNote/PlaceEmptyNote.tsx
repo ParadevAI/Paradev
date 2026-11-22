@@ -2,7 +2,6 @@ import { ActivityIndicator, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { LIST_GRID } from "@/screens/(authenticated)/(home)/utils/listGrid";
 
-/** One muted line under a place label with no rows; a spinner while it loads. */
 export function PlaceEmptyNote({ label }: { label: string | null }) {
 	return (
 		<View

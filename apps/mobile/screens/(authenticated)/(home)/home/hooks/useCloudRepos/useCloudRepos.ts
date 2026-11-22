@@ -10,7 +10,6 @@ function cloudReposQueryKey(organizationId: string | null) {
 	return ["cloud", "cloudWorkspace", "repositories", organizationId] as const;
 }
 
-/** Each cloud workspace's primary repository, and whether the API has answered. */
 export function useCloudRepos(): CloudRepos {
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;

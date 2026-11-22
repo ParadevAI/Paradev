@@ -68,11 +68,8 @@ export function WorkspaceRow({
 	group?: { color: string | null; bar: GroupBarSpan | null };
 	/** Replaces the branch in the detail line, e.g. "project · host" outside its project. */
 	detail?: string;
-	/** Rows of a host that can't answer: shown, not opened. */
 	disabled?: boolean;
-	/** Draws a hairline under the row. */
 	separator?: boolean;
-	/** Under a label that names the state: the detail line leaves it out. */
 	stateInLabel?: boolean;
 }) {
 	const { t } = useLingui();
@@ -164,8 +161,6 @@ export function WorkspaceRow({
 					detailParts={detailParts}
 					trailing={
 						sessions.length > 0 ? (
-							// Overlapping avatar-style stack — stays ~fixed-width as
-							// sessions grow instead of eating the row.
 							<View className="flex-row items-center">
 								{sessions.slice(0, MAX_SESSION_MARKS).map((session, index) => (
 									<View
