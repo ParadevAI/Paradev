@@ -50,7 +50,7 @@ export function buildCompanyFactsSection(): string[] {
 		`## Facts about ${BRAND.NAME}`,
 		"",
 		`- **What it is**: a local-first desktop workspace for orchestrating any CLI-based coding agent. Each task runs in its own Git worktree, and ${BRAND.NAME} provides the stable workflow around the agents.`,
-		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Next to the agent terminals it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
+		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Claude Code, Codex, OpenCode, and Pi run in a chat interface or a terminal; other agents run in a terminal. Next to the agents it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
 		`- **Company**: built by ${BRAND.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
 		`- **License**: open source under the ${PRODUCT_LICENSE}. The code is public on GitHub (${COMPANY.GITHUB_URL}).`,
 		`- **Not Apache Superset**: ${PRODUCT_DISAMBIGUATION}`,
