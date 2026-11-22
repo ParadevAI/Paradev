@@ -112,6 +112,9 @@ const {
 } = await import("./agent-wrappers");
 const { getManagedArtifactGuardHookCommand, getManagedNotifyHookCommand } =
 	await import("./agent-wrappers-common");
+const { buildClaudeWrapperExecLine } = await import(
+	"./agent-wrappers-claude-codex-opencode"
+);
 
 function requireContent(content: string | null): string {
 	if (content === null) throw new Error("Expected merged hook content");
@@ -2176,6 +2179,83 @@ describe("agent-wrappers claude settings.json", () => {
 		expect(
 			getClaudeGlobalSettingsJsonContent("/tmp/.superset/hooks/notify.sh"),
 		).toBeNull();
+	});
+});
+
+describe("agent-wrappers claude hooks-only settings", () => {
+	const hooksFile = path.join(TEST_HOOKS_DIR, "claude-settings.json");
+
+	function launchArgs(env: Record<string, string>, args: string[]): string {
+		const script = `REAL_BIN=echo\n${buildClaudeWrapperExecLine()}`;
+		return execFileSync("bash", ["-c", script, "claude", ...args], {
+			env: { PATH: process.env.PATH ?? "", ...env },
+			encoding: "utf-8",
+		}).trim();
+	}
+
+	const terminal = {
+		SUPERSET_TERMINAL_ID: "t1",
+		SUPERSET_HOME_DIR: TEST_SUPERSET_HOME_DIR,
+	};
+
+	beforeEach(() => {
+		mkdirSync(TEST_HOOKS_DIR, { recursive: true });
+	});
+
+	afterEach(() => {
+		rmSync(TEST_ROOT, { recursive: true, force: true });
+	});
+
+	it("writes only the managed hooks and removes the file on teardown", () => {
+		createClaudeSettingsJson();
+		const parsed = JSON.parse(readFileSync(hooksFile, "utf-8"));
+		expect(Object.keys(parsed)).toEqual(["hooks"]);
+		expect(parsed.hooks.Stop[0].hooks[0].command).toBe(
+			managedClaudeHookCommand,
+		);
+
+		removeClaudeManagedHooks();
+		expect(existsSync(hooksFile)).toBe(false);
+	});
+
+	it("passes the hooks file only for a config dir exported by hand", () => {
+		writeFileSync(hooksFile, "{}");
+		const exported = { ...terminal, CLAUDE_CONFIG_DIR: "/tmp/claude-alt" };
+
+		expect(launchArgs(exported, ["-p", "hi"])).toBe(
+			`--settings ${hooksFile} -p hi`,
+		);
+		expect(launchArgs(terminal, ["-p", "hi"])).toBe("-p hi");
+		expect(
+			launchArgs(
+				{ ...exported, SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: "/tmp/claude-alt" },
+				["-p", "hi"],
+			),
+		).toBe("-p hi");
+		expect(
+			launchArgs(
+				{
+					SUPERSET_HOME_DIR: TEST_SUPERSET_HOME_DIR,
+					CLAUDE_CONFIG_DIR: "/tmp/claude-alt",
+				},
+				["hi"],
+			),
+		).toBe("hi");
+	});
+
+	it("keeps the caller's own --settings and --setting-sources", () => {
+		writeFileSync(hooksFile, "{}");
+		const exported = { ...terminal, CLAUDE_CONFIG_DIR: "/tmp/claude-alt" };
+
+		expect(launchArgs(exported, ["--settings", "mine.json"])).toBe(
+			"--settings mine.json",
+		);
+		expect(launchArgs(exported, ["--setting-sources="])).toBe(
+			"--setting-sources=",
+		);
+		expect(launchArgs(exported, ["--", "--settings"])).toBe(
+			`--settings ${hooksFile} -- --settings`,
+		);
 	});
 });
 
