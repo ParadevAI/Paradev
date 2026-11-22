@@ -171,6 +171,112 @@ Use the agent plans and API keys you already have. These agents are built in, an
 
 <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/amp.svg" />&nbsp;[Amp Code](https://ampcode.com/) &nbsp;·&nbsp; <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/antigravity.svg" />&nbsp;[Antigravity CLI](https://antigravity.google/) &nbsp;·&nbsp; <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/claude.svg" />&nbsp;[Claude Code](https://github.com/anthropics/claude-code) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/codex-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/codex.svg" /></picture>&nbsp;[OpenAI Codex CLI](https://github.com/openai/codex) &nbsp;·&nbsp; <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/cursor.svg" />&nbsp;[Cursor Agent](https://docs.cursor.com/agent) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/droid-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/droid.svg" /></picture>&nbsp;[Droid](https://www.factory.ai/) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/fx-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/fx.svg" /></picture>&nbsp;[fx](https://fx.sh/) &nbsp;·&nbsp; <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/gemini.svg" />&nbsp;[Gemini CLI](https://github.com/google-gemini/gemini-cli) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/copilot-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/copilot.svg" /></picture>&nbsp;[GitHub Copilot](https://github.com/features/copilot) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/grok-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/grok.svg" /></picture>&nbsp;[Grok](https://x.ai/) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/hermes-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/hermes.svg" /></picture>&nbsp;[Hermes](https://github.com/NousResearch/hermes-agent) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/muse-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/muse.svg" /></picture>&nbsp;[Muse Code](https://developer.meta.com/ai/products/muse-code/) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/devin-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/devin.svg" /></picture>&nbsp;[Devin](https://devin.ai/cli) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/kimi-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/kimi.svg" /></picture>&nbsp;[Kimi Code](https://www.kimi.com/) &nbsp;·&nbsp; <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/kiro.svg" />&nbsp;[Kiro](https://kiro.dev/cli/) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/mastracode-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/mastracode.svg" /></picture>&nbsp;[Mastra Code](https://mastra.ai/) &nbsp;·&nbsp; <img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/vibe.svg" />&nbsp;[Mistral Vibe](https://mistral.ai/) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/pi-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/pi.svg" /></picture>&nbsp;[Oh My Pi](https://github.com/can1357/oh-my-pi) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/opencode-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/opencode.svg" /></picture>&nbsp;[OpenCode](https://github.com/opencode-ai/opencode) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/pi-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/pi.svg" /></picture>&nbsp;[Pi](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent) &nbsp;·&nbsp; <picture><source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/icons/preset-icons/polygraph-white.svg" /><img height="16" valign="middle" alt="" src="packages/ui/src/assets/icons/preset-icons/polygraph.svg" /></picture>&nbsp;[Polygraph](https://trypolygraph.com/)
 
+## FAQ
+
+<details>
+<summary>How do I keep multiple coding agents from overwriting each other in one repository?</summary>
+<br />
+
+Paradev gives each agent its own workspace: a Git worktree on its own branch, with its own terminal. Agents edit separate copies of the working files, so one agent does not overwrite another agent's changes. Worktrees do not sandbox processes, and branches can still conflict when you merge them. [Workspaces docs](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>I have too many Claude Code terminal sessions. How do I keep track of them?</summary>
+<br />
+
+Paradev shows every agent session in one sidebar, grouped by project, with a status for each. Claude Code reports when it finishes and when it waits for your input, and the sidebar flags workspaces that need you. [Agent status docs](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Can I check on my coding agents and answer them from my iPhone?</summary>
+<br />
+
+Yes, Paradev for iPhone and iPad lets you start agents, follow their sessions live, answer them, and review their changes. It needs iOS 26 or iPadOS 26 or later and Paradev Pro, and there is also an Android app on Google Play. For workspaces on your computer, turn on Remote Access and keep the computer awake and online. [Mobile app docs](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>Can a coding agent run on a schedule, like nightly maintenance or a weekly flaky-test check?</summary>
+<br />
+
+Yes, Paradev automations run an agent on an hourly, daily, weekly, or custom schedule. Each run creates a workspace where you review the changes and continue the work. Automations need the Pro plan. [Automations docs](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Can I get notified when a coding agent needs my input?</summary>
+<br />
+
+Yes, the Paradev desktop app notifies you when an agent finishes or stops to wait for your input, and the macOS dock icon shows a badge. Support varies by agent: Claude Code reports both states, and some agents report only when they finish. On the mobile app, a dot on the workspace shows that an agent needs your permission; push notifications are not available yet. [Agent status docs](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Can I run coding agents on a remote machine or in the cloud and review the changes from my laptop?</summary>
+<br />
+
+Yes, with Paradev remote access (Pro plan) you open workspaces hosted on another machine, such as a Mac mini or a server, from your laptop. Cloud workspaces (Team and Ultra plans) run each workspace on its own cloud machine, so agents keep working when your laptop is closed. [Remote access docs](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Can I come back to a task later with its agent session and branch still there?</summary>
+<br />
+
+Yes, a Paradev workspace stays on disk as a Git worktree on its branch until you delete it. Terminals belong to a background process, so they keep running and keep their scrollback when you close or update the app. If a terminal stops after a crash or restart, Paradev can resume the agent session for agents that support resume, such as Claude Code and Codex. [Keep agents running docs](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>Can I start a coding agent from Slack, Linear, Sentry, or a GitHub pull request?</summary>
+<br />
+
+Yes, Paradev automations start an agent when a GitHub pull request event, a Slack message, a Linear issue, a Sentry issue, or a webhook arrives, and the agent gets the event details with your prompt. You can also mention the Paradev bot in Slack to start a cloud workspace and agent. Automations and the Slack integration need the Pro plan. [Automations docs](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Can I use Claude Code and Codex together, with one writing code and the other reviewing it?</summary>
+<br />
+
+Yes, Paradev runs Claude Code and Codex side by side, each in its own terminal or workspace. To get a review, select lines in the diff and send them to the other agent, or use **Continue with another agent** to start a session of a different agent with the recent context. [Agent sessions docs](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>Can I click an element in my running web app and have a coding agent change it?</summary>
+<br />
+
+Yes, Paradev has a Design mode in its in-app browser: open your dev server, turn on **Design**, and click the element. You then describe the change, and the agent gets the element's details and a screenshot with your note. [Browser docs](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>Which coding agents does Paradev support, and do I keep my own subscriptions?</summary>
+<br />
+
+Paradev has built-in support for Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp, and more, and you can add any other CLI agent. Agents use your own subscriptions and API keys. Paradev does not proxy model calls, so your provider bills you directly. [Supported agents docs](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>What is the Paradev license, what does it cost, and which platforms does it run on?</summary>
+<br />
+
+Paradev is open source under the MIT License. The Free plan covers local workspaces with the desktop app and the CLI. Paid plans add features such as automations and cloud workspaces. The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not available yet. [FAQ docs](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Is Paradev the same as Superset? Is it related to Apache Superset?</summary>
+<br />
+
+Paradev was previously named Superset, which is why the CLI command is still `superset`. It is not related to Apache Superset, the business intelligence tool. [Install docs](https://docs.paradev.com/install)
+
+</details>
+
 ## Contributing
 
 Clone the repository, add it to the installed Paradev app, and create a workspace for your change. Then run the setup script once in that workspace terminal:
