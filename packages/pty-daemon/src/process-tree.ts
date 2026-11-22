@@ -245,6 +245,15 @@ function normalizeTtyName(raw: string | undefined): string | null {
 	return raw;
 }
 
+export function parseForegroundProcessState(stdout: string): boolean {
+	const [tpgidText, pgidText] = stdout.trim().split(/\s+/);
+	const tpgid = Number(tpgidText);
+	const pgid = Number(pgidText);
+	if (!isPositiveInteger(tpgid) || !isPositiveInteger(pgid)) return false;
+
+	return tpgid !== pgid;
+}
+
 /**
  * Whether a foreground command (something other than the shell's own prompt) is
  * currently running in the shell's controlling terminal.
@@ -254,23 +263,26 @@ function normalizeTtyName(raw: string | undefined): string | null {
  * shell has handed the terminal to the command's group, so they differ. This is
  * precise — unlike a "shell has descendants" check it does not false-positive on
  * suspended or background jobs. Fails closed (returns false) on any ps error.
+ *
+ * Async so callers (notably host-service's tRPC handler) never block their
+ * event loop on a `ps` spawn.
  */
-export function hasRunningForegroundProcess(shellPid: number): boolean {
-	if (!isPositiveInteger(shellPid)) return false;
+export function hasRunningForegroundProcess(
+	shellPid: number,
+): Promise<boolean> {
+	if (!isPositiveInteger(shellPid)) return Promise.resolve(false);
 
-	const result = spawnSync(
-		"ps",
-		["-o", "tpgid=", "-o", "pgid=", "-p", String(shellPid)],
-		{ encoding: "utf8" },
-	);
-	if (result.error || result.status !== 0) return false;
-
-	const [tpgidText, pgidText] = result.stdout.trim().split(/\s+/);
-	const tpgid = Number(tpgidText);
-	const pgid = Number(pgidText);
-	if (!isPositiveInteger(tpgid) || !isPositiveInteger(pgid)) return false;
-
-	return tpgid !== pgid;
+	return new Promise((resolve) => {
+		execFile(
+			"ps",
+			["-o", "tpgid=", "-o", "pgid=", "-p", String(shellPid)],
+			{ encoding: "utf8", timeout: PS_TIMEOUT_MS },
+			(error, stdout) => {
+				if (error) return resolve(false);
+				resolve(parseForegroundProcessState(stdout));
+			},
+		);
+	});
 }
 
 export function collectProcessTree(
