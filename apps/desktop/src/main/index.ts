@@ -1,3 +1,5 @@
+// Must stay the first import: later imports read userData at load time.
+import "./lib/legacy-app-name/pin";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
