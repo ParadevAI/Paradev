@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.summary        = 'Right-edge swipe that pushes the next screen interactively'
   s.description    = 'Drives a react-native-screens push from a right-edge pan, so the pushed screen follows the finger'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'
