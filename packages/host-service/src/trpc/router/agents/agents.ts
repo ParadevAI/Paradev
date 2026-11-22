@@ -56,7 +56,7 @@ import {
 } from "../attachments/storage";
 import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
-import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
+import { seedWorkspaceAgentTrust } from "../workspace-creation/shared/seed-agent-trust";
 
 /**
  * Build a shell command string that runs the resolved agent config with the
@@ -880,17 +880,8 @@ export async function runAgentInWorkspace(
 	const continued = await continueAgent(ctx, input);
 	if (continued) return continued;
 
-	// Session workspaces are standalone repos the host itself scaffolded, so
-	// agent CLIs can't inherit folder trust from anywhere — pre-trust the
-	// folder in the launching agent's own trust store so its first
-	// interactive boot skips the trust dialog. Worktree workspaces inherit
-	// trust from the main checkout and need nothing.
-	if (workspace.projectId === null) {
-		const config = resolveHostAgentConfig(ctx.db, input.agent);
-		if (config) {
-			await seedAgentFolderTrust(ctx.db, workspace.worktreePath, config);
-		}
-	}
+	const config = resolveHostAgentConfig(ctx.db, input.agent);
+	if (config) await seedWorkspaceAgentTrust(ctx.db, workspace, config);
 	return (
 		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
 		runTerminalAgent(ctx, input, launch.terminalId)
