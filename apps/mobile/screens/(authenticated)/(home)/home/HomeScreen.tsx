@@ -111,6 +111,11 @@ import {
 	type NeedsMeCandidate,
 	needsMeCount,
 } from "./utils/needsMe";
+import {
+	PINNED_PLACE_ID,
+	pickPinned,
+	withPinnedSection,
+} from "./utils/pinnedSection";
 import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
 import { withRowSeparators } from "./utils/withRowSeparators";
 
@@ -288,7 +293,11 @@ export function HomeScreen() {
 	// Only an answered roster says a machine is gone.
 	useEffect(() => {
 		if (!collapseHydrated || !hostsQuery.isSuccess) return;
-		prunePlaces([...orgHosts.map((host) => host.machineId), CLOUD_PLACE_ID]);
+		prunePlaces([
+			...orgHosts.map((host) => host.machineId),
+			CLOUD_PLACE_ID,
+			PINNED_PLACE_ID,
+		]);
 	}, [collapseHydrated, hostsQuery.isSuccess, orgHosts, prunePlaces]);
 
 	const activityTs = useCallback(
@@ -312,6 +321,28 @@ export function HomeScreen() {
 	const noProjectName = t({ message: "No project" });
 	const cloudName = t({ message: "Cloud" });
 
+	// Pinned rows leave their project for the Pinned section at the top.
+	const pinned = useMemo(
+		() =>
+			pickPinned(
+				scopeHosts.flatMap((host) =>
+					(workspacesByHost.get(host.machineId)?.workspaces ?? [])
+						.filter(
+							(workspace) =>
+								workspace.hostId === host.machineId &&
+								workspace.worktreeExists !== false,
+						)
+						.map((workspace) => ({ id: workspace.id, workspace, host })),
+				),
+				pinnedAt,
+			),
+		[scopeHosts, workspacesByHost, pinnedAt],
+	);
+	const pinnedIds = useMemo(
+		() => new Set(pinned.map((entry) => entry.id)),
+		[pinned],
+	);
+
 	const sectionOptions = useMemo<HostSectionOptions>(
 		() => ({
 			sort,
@@ -321,6 +352,7 @@ export function HomeScreen() {
 			isCollapsed: (machineId, key) =>
 				collapseHydrated && !!collapsed[collapsedProjectKey(machineId, key)],
 			noProjectName,
+			lifted: pinnedIds,
 		}),
 		[
 			sort,
@@ -330,6 +362,7 @@ export function HomeScreen() {
 			collapsed,
 			collapseHydrated,
 			noProjectName,
+			pinnedIds,
 		],
 	);
 
@@ -366,7 +399,8 @@ export function HomeScreen() {
 	const showOfflinePlaceholder =
 		hostOffline &&
 		!!selectedHost &&
-		(hostSections.get(selectedHost.machineId)?.length ?? 0) === 0;
+		(hostSections.get(selectedHost.machineId)?.length ?? 0) === 0 &&
+		pinned.length === 0;
 
 	// A filter you can't see must not keep the list narrowed.
 	const needsMeHidden = showArchived || showOfflinePlaceholder;
@@ -524,19 +558,23 @@ export function HomeScreen() {
 							.filter(
 								(workspace) =>
 									workspace.hostId === host.machineId &&
-									workspace.worktreeExists !== false,
+									workspace.worktreeExists !== false &&
+									!pinnedIds.has(workspace.id),
 							)
 							.map(rowAttention),
 						items: hostSections.get(host.machineId) ?? [],
-						empty: {
-							label:
-								emptyLabels[
-									placeEmptyState(status, {
-										isReady: state?.isReady ?? false,
-										failed: state?.failed ?? false,
-									})
-								],
-						},
+						// Every row pinned is not an empty place.
+						empty: pinned.some((entry) => entry.host === host)
+							? undefined
+							: {
+									label:
+										emptyLabels[
+											placeEmptyState(status, {
+												isReady: state?.isReady ?? false,
+												failed: state?.failed ?? false,
+											})
+										],
+								},
 					};
 				}),
 				cloud: cloudInMulti
@@ -607,17 +645,71 @@ export function HomeScreen() {
 		cloudListRows,
 		cloudRowAttentionOf,
 		cloudName,
+		pinned,
+		pinnedIds,
 		t,
 	]);
+
+	const pinnedRows = useMemo(
+		() =>
+			needsMeOn || cloudScope || showOfflinePlaceholder
+				? []
+				: pinned.map(({ workspace, host }): HomeListItem => {
+						const projectName =
+							(workspace.projectId &&
+								projectsByHost
+									.get(host.machineId)
+									?.find((project) => project.id === workspace.projectId)
+									?.name) ||
+							noProjectName;
+						return {
+							kind: "workspace",
+							workspace,
+							detail: `${projectName} · ${host.name}`,
+							offline: isPlaceUnreachable(statusOf(host)),
+						};
+					}),
+		[
+			needsMeOn,
+			cloudScope,
+			showOfflinePlaceholder,
+			pinned,
+			projectsByHost,
+			noProjectName,
+			statusOf,
+		],
+	);
+	const pinnedLabel = t({ message: "Pinned" });
+
 	// A section label at the top sits close to the chips, as a first host header does.
 	const listItems = useMemo<HomeListItem[]>(() => {
 		const [head, ...rest] = builtItems;
 		return withRowSeparators(
-			head?.kind === "sectionLabel"
-				? [{ ...head, first: true }, ...rest]
-				: builtItems,
+			withPinnedSection(
+				head?.kind === "sectionLabel"
+					? [{ ...head, first: true }, ...rest]
+					: builtItems,
+				{
+					label: pinnedLabel,
+					rows: pinnedRows,
+					attentions: pinned.map(({ workspace }) => rowAttention(workspace)),
+					collapsed:
+						collapseHydrated &&
+						!!collapsed[
+							collapsedProjectKey(PINNED_PLACE_ID, PLACE_COLLAPSE_KEY)
+						],
+				},
+			),
 		);
-	}, [builtItems]);
+	}, [
+		builtItems,
+		pinnedLabel,
+		pinnedRows,
+		pinned,
+		rowAttention,
+		collapseHydrated,
+		collapsed,
+	]);
 
 	const composerWorkspaces = useMemo(
 		() => [...workspaces, ...cloudItems],

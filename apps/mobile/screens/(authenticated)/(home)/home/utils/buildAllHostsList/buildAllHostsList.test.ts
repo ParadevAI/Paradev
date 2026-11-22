@@ -287,6 +287,25 @@ describe("buildHostSection", () => {
 		expect(items.map(describeItem)).toEqual(["project:demo", "ws:a"]);
 	});
 
+	test("leaves pinned rows to the Pinned section: counts drop, an emptied project hides", () => {
+		const items = buildHostSection(
+			{
+				machineId: "m1",
+				workspaces: [
+					workspace("a", "m1"),
+					workspace("b", "m1"),
+					workspace("solo", "m1", null),
+				],
+				projects: [project],
+				tagSettings: [],
+				offline: false,
+			},
+			{ ...options, lifted: new Set(["a", "solo"]) },
+		);
+		expect(items.map(describeItem)).toEqual(["project:demo", "ws:b"]);
+		expect(items[0]).toMatchObject({ count: 1 });
+	});
+
 	test("joins the bars of adjacent coloured groups and frees the ends next to anything else", () => {
 		const P1 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 		const P2 = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";

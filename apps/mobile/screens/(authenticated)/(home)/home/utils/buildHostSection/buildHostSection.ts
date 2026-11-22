@@ -27,6 +27,8 @@ export interface HostSectionOptions {
 	rowAttention: (workspace: HostWorkspaceItem) => TerminalAttention | null;
 	isCollapsed: (machineId: string, key: string) => boolean;
 	noProjectName: string;
+	/** Rows listed in the Pinned section instead of under their project. */
+	lifted?: ReadonlySet<string>;
 }
 
 /** One host's projects, groups and rows, as Home lists a single machine. */
@@ -39,6 +41,7 @@ export function buildHostSection(
 		rowAttention,
 		isCollapsed,
 		noProjectName,
+		lifted,
 	}: HostSectionOptions,
 ): HomeListItem[] {
 	const items: HomeListItem[] = [];
@@ -62,7 +65,8 @@ export function buildHostSection(
 	// A record whose worktree folder is gone from the host's disk is a stale
 	// shell nothing can run in — not worth a list slot.
 	const pool = hostRows.filter(
-		(workspace) => workspace.worktreeExists !== false,
+		(workspace) =>
+			workspace.worktreeExists !== false && !lifted?.has(workspace.id),
 	);
 
 	// A project id the host no longer reports is as good as none: grouping

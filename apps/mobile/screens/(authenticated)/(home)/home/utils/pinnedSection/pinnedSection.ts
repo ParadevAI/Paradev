@@ -1,0 +1,54 @@
+import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
+import type { HomeListItem } from "../../types";
+import { strongestAttention } from "../strongestAttention";
+
+export const PINNED_PLACE_ID = "pinned";
+
+/** The pinned workspaces among `workspaces`, newest pin first. */
+export function pickPinned<W extends { id: string }>(
+	workspaces: readonly W[],
+	pinnedAt: Readonly<Record<string, number>>,
+): W[] {
+	return workspaces
+		.filter((workspace) => pinnedAt[workspace.id] !== undefined)
+		.sort((a, b) => (pinnedAt[b.id] as number) - (pinnedAt[a.id] as number));
+}
+
+/**
+ * Puts a Pinned section, folding like a place, above the list. It takes
+ * the list's first-item spacing from whatever led before.
+ */
+export function withPinnedSection(
+	list: readonly HomeListItem[],
+	pinned: {
+		label: string;
+		rows: readonly HomeListItem[];
+		attentions: readonly (TerminalAttention | null | undefined)[];
+		collapsed: boolean;
+	},
+): HomeListItem[] {
+	if (pinned.rows.length === 0) return [...list];
+	const rest = list.map((item, index) =>
+		index === 0 && (item.kind === "hostLabel" || item.kind === "sectionLabel")
+			? { ...item, first: false }
+			: item,
+	);
+	return [
+		{
+			kind: "hostLabel",
+			placeId: PINNED_PLACE_ID,
+			name: pinned.label,
+			cloud: false,
+			status: "online",
+			first: true,
+			collapsible: true,
+			collapsed: pinned.collapsed,
+			count: pinned.rows.length,
+			attention: pinned.collapsed
+				? strongestAttention(pinned.attentions)
+				: null,
+		},
+		...(pinned.collapsed ? [] : pinned.rows),
+		...rest,
+	];
+}
