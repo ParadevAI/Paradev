@@ -36,7 +36,7 @@ function result(): unknown {
 	};
 }
 
-function createHarness(modeId?: string): Harness {
+function createHarness(): Harness {
 	const pending: unknown[] = [];
 	let notify: (() => void) | null = null;
 	let aborted = false;
@@ -74,9 +74,7 @@ function createHarness(modeId?: string): Harness {
 	};
 
 	const adapter = new ClaudeAdapter({ query });
-	const iterator = adapter
-		.start({ cwd: "/workspace", ...(modeId ? { modeId } : {}) })
-		[Symbol.asyncIterator]();
+	const iterator = adapter.start({ cwd: "/workspace" })[Symbol.asyncIterator]();
 
 	return {
 		adapter,
@@ -540,56 +538,6 @@ describe("ClaudeAdapter permission modes", () => {
 			session: { modeId: "bypassPermissions" },
 		});
 		expect(reverted.value).toMatchObject({ session: { modeId: "default" } });
-	});
-
-	test("restores the mode from before plan when the plan is approved, not when declined", async () => {
-		const harness = createHarness("bypassPermissions");
-		await harness.iterator.next();
-		await Bun.sleep(0);
-		await harness.adapter.setMode("plan");
-		await harness.iterator.next();
-
-		const answerExitPlan = async (
-			id: string,
-			decision: "accept" | "decline",
-		) => {
-			const asked = harness.options()?.canUseTool?.(
-				"ExitPlanMode",
-				{ plan: id },
-				{
-					signal: new AbortController().signal,
-					toolUseID: id,
-					requestId: id,
-				},
-			);
-			const approval = (await untilStatus(harness.iterator)).find(
-				(event) => event.kind === "item",
-			);
-			harness.adapter.respondToApproval(
-				approval?.kind === "item" ? approval.item.id : "",
-				{ type: decision },
-			);
-			return {
-				result: await asked,
-				events: await untilStatus(harness.iterator),
-			};
-		};
-
-		const declined = await answerExitPlan("tool-1", "decline");
-		expect(declined.result).toMatchObject({ behavior: "deny" });
-
-		const approved = await answerExitPlan("tool-2", "accept");
-		expect(approved.result).toEqual({
-			behavior: "allow",
-			updatedInput: { plan: "tool-2" },
-			updatedPermissions: [
-				{ type: "setMode", mode: "bypassPermissions", destination: "session" },
-			],
-		});
-		expect(approved.events).toContainEqual({
-			kind: "session",
-			session: { modeId: "bypassPermissions" },
-		});
 	});
 });
 

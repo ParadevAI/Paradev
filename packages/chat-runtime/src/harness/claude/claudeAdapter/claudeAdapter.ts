@@ -91,7 +91,6 @@ export type ClaudeAdapterOptions = {
 };
 
 type PendingApproval = {
-	toolName: string;
 	toolUseId: string;
 	turnId: string;
 	input: Record<string, unknown>;
@@ -215,7 +214,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private session: ClaudeSession | null = null;
 	private sessionId: string | null = null;
 	private modeId: ClaudePermissionMode = "default";
-	private modeBeforePlan: ClaudePermissionMode | null = null;
 	private pump: Promise<void> | null = null;
 	private resolvingPrompt: Promise<void> | null = null;
 	private disposed = false;
@@ -360,7 +358,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (!pending) return;
 		this.approvals.delete(approvalId);
 
-		let nextMode: ClaudePermissionMode | null = null;
 		if (pending.questions) {
 			pending.settle(
 				questionResult(pending.input, pending.questions, decision),
@@ -369,23 +366,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 			decision.type === "accept" ||
 			decision.type === "accept_for_session"
 		) {
-			if (pending.toolName === "ExitPlanMode") {
-				const restored =
-					this.modeBeforePlan ??
-					(this.modeId === "plan" ? "default" : this.modeId);
-				this.modeBeforePlan = null;
-				if (this.modeId !== restored) nextMode = restored;
-				this.modeId = restored;
-				pending.settle({
-					behavior: "allow",
-					updatedInput: pending.input,
-					updatedPermissions: [
-						{ type: "setMode", mode: restored, destination: "session" },
-					],
-				});
-			} else {
-				pending.settle({ behavior: "allow", updatedInput: pending.input });
-			}
+			pending.settle({ behavior: "allow", updatedInput: pending.input });
 		} else {
 			this.translator?.markDeclined(pending.toolUseId);
 			pending.settle({
@@ -396,9 +377,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 		}
 
 		this.emitApproval(approvalId, pending, "answered", decision);
-		if (nextMode) {
-			this.events.push({ kind: "session", session: { modeId: nextMode } });
-		}
 		if (this.approvals.size === 0) {
 			const status = this.translator?.currentTurnId ? "running" : "idle";
 			this.events.push({ kind: "session", session: { status } });
@@ -408,11 +386,8 @@ export class ClaudeAdapter implements HarnessAdapter {
 
 	setMode(modeId: string): Promise<boolean> {
 		const previous = this.modeId;
-		const previousBeforePlan = this.modeBeforePlan;
 		const next = claudeMode(modeId);
 		this.modeId = next;
-		if (next !== "plan") this.modeBeforePlan = null;
-		else if (previous !== "plan") this.modeBeforePlan = previous;
 		this.events.push({ kind: "session", session: { modeId: next } });
 		const applied = this.session?.setPermissionMode?.(next);
 		if (!applied) return Promise.resolve(true);
@@ -421,7 +396,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 			() => {
 				if (this.modeId === next) {
 					this.modeId = previous;
-					this.modeBeforePlan = previousBeforePlan;
 					this.events.push({ kind: "session", session: { modeId: previous } });
 				}
 				return false;
@@ -518,15 +492,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 		const approvalId = this.mintId();
 		const turnId = this.translator?.currentTurnId ?? "unattributed";
 		return new Promise<PermissionResult>((settle) => {
-			const pending = {
-				toolName,
-				toolUseId,
-				turnId,
-				input,
-				reason,
-				questions,
-				settle,
-			};
+			const pending = { toolUseId, turnId, input, reason, questions, settle };
 			this.approvals.set(approvalId, pending);
 			this.emitApproval(approvalId, pending, "pending");
 			this.events.push({
