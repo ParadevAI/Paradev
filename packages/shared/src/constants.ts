@@ -80,6 +80,7 @@ export const COMPANY = {
 	APP_STORE_ID,
 	APP_STORE_URL: `https://apps.apple.com/app/id${APP_STORE_ID}`,
 	PLAY_STORE_URL: `https://play.google.com/store/apps/details?id=${ANDROID_APP.PACKAGE}`,
+	MOBILE_INSTALL_URL: `${MARKETING_URL}/get-app`,
 	STATUS_URL: `https://status.${ROOT_DOMAIN}`,
 	TRUST_URL: `https://trust.${ROOT_DOMAIN}`,
 	JOIN_US_URL: `${MARKETING_URL}/careers`,
