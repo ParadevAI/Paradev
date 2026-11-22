@@ -8,10 +8,13 @@ import {
 	AmbiguousConnectionError,
 	AmbiguousPluginError,
 	buildPluginServer,
+	endUpstreamSessions,
 	PluginTargetError,
 	resolveTarget,
 	sandboxAllowsPlugin,
+	upstreamSessions,
 } from "@superset/trpc/plugins-proxy";
+import { Redis } from "@upstash/redis";
 import { z } from "zod";
 import { env } from "@/env";
 import {
@@ -24,6 +27,15 @@ import {
 	mcpProtectedResourceMetadataUrl,
 	mcpUnauthorizedResponse,
 } from "@/lib/oauth-metadata";
+import { callerSessionId, withIssuedSessionId } from "./utils/callerSession";
+
+// Retries would hold every tool call for seconds while Redis is down, and the
+// session store already falls back to no stored session.
+const redis = new Redis({
+	url: env.KV_REST_API_URL,
+	token: env.KV_REST_API_TOKEN,
+	retry: { retries: 0 },
+});
 
 interface RouteParams {
 	params: Promise<{ marketplace: string; plugin: string }>;
@@ -130,6 +142,11 @@ async function handle(
 		);
 	}
 
+	const sessionId = callerSessionId(req);
+	const sessions = sessionId
+		? upstreamSessions(redis, ctx.userId, sessionId)
+		: undefined;
+
 	let server: Awaited<ReturnType<typeof buildPluginServer>>;
 	try {
 		const target = await resolveTarget({
@@ -139,7 +156,10 @@ async function handle(
 			plugin,
 			connectionId,
 		});
-		server = await buildPluginServer(target);
+		if (req.method === "DELETE" && sessions) {
+			await endUpstreamSessions(target, sessions);
+		}
+		server = await buildPluginServer(target, { sessions });
 	} catch (error) {
 		if (error instanceof PluginTargetError) {
 			return withRateLimitHeaders(
@@ -173,7 +193,10 @@ async function handle(
 			extra: { mcpContext: ctx },
 		},
 	});
-	return withRateLimitHeaders(response, rateLimitState);
+	return withRateLimitHeaders(
+		withIssuedSessionId(req, response),
+		rateLimitState,
+	);
 }
 
 export const maxDuration = 800;
