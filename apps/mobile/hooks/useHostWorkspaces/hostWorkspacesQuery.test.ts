@@ -52,4 +52,17 @@ describe("useHostsWorkspaces queries", () => {
 		expect(byHost.get("m1")?.workspaces[0]?.hostReachable).toBe(false);
 		unsubscribe();
 	});
+
+	test("an online host that errored with nothing cached failed, one with a cache did not", () => {
+		const failed = combineHostWorkspaces(
+			[host(true)],
+			[{ data: undefined, isError: true, isSuccess: false }],
+		);
+		const cached = combineHostWorkspaces(
+			[host(true)],
+			[{ data: rows, isError: true, isSuccess: false }],
+		);
+		expect(failed.get("m1")?.failed).toBe(true);
+		expect(cached.get("m1")?.failed).toBe(false);
+	});
 });

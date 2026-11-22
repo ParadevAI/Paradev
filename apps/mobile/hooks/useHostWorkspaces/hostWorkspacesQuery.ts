@@ -26,6 +26,8 @@ export interface HostWorkspacesState {
 	 * states only — existing rows always render (cache-first rule).
 	 */
 	isReady: boolean;
+	/** The host could not be asked and there is nothing cached. */
+	failed: boolean;
 }
 
 const NO_WORKSPACES: HostWorkspaceItem[] = [];
@@ -67,6 +69,7 @@ export function combineHostWorkspaces(
 				query?.data?.map((row) => ({ ...row, hostReachable: reachable })) ??
 				NO_WORKSPACES,
 			isReady: !host.isOnline || !!query?.isSuccess || !!query?.isError,
+			failed: !!query?.isError && query.data === undefined,
 		});
 	});
 	return byHost;

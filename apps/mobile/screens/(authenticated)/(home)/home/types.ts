@@ -1,5 +1,6 @@
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
+import type { PlaceStatus } from "@/screens/(authenticated)/(home)/utils/placeStatus";
 import type { TerminalAttention } from "./hooks/useHostTerminals/attention";
 import type { TagFolderGroup } from "./utils/groupByTagFolder";
 
@@ -20,13 +21,16 @@ export type HomeListItem =
 			placeId: string;
 			name: string;
 			cloud: boolean;
-			online: boolean;
+			status: PlaceStatus;
 			lastSeenAt?: number | null;
+			/** Offers Try again, for the single-host offline notice. */
+			retry?: boolean;
 	  }
 	| {
 			kind: "placeEmpty";
 			placeId: string;
-			label: string;
+			/** Null while the place has not answered yet. */
+			label: string | null;
 	  }
 	| {
 			kind: "projectHeader";

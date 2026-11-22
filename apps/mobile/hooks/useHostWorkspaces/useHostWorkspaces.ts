@@ -35,7 +35,8 @@ export interface HostWorkspacesCacheOps {
 	invalidateHost: (hostId: string) => void;
 }
 
-export interface UseHostWorkspacesResult extends HostWorkspacesState {
+export interface UseHostWorkspacesResult
+	extends Omit<HostWorkspacesState, "failed"> {
 	cache: HostWorkspacesCacheOps;
 }
 

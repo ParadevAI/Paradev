@@ -1,0 +1,1 @@
+export { searchRowDetail } from "./searchRowDetail";

@@ -48,6 +48,7 @@ export function WorkspaceRow({
 	groups,
 	inGroup = false,
 	detail,
+	disabled = false,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -65,6 +66,8 @@ export function WorkspaceRow({
 	inGroup?: boolean;
 	/** Replaces the branch line, e.g. "project · host" outside its project. */
 	detail?: string;
+	/** Rows of a host that can't answer: shown, not opened. */
+	disabled?: boolean;
 }) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
@@ -134,6 +137,8 @@ export function WorkspaceRow({
 						!card && (grouped ? "pl-8" : "pl-4"),
 					)}
 					onPress={() => router.navigate(`/(authenticated)${href}`)}
+					disabled={disabled}
+					accessibilityState={{ disabled }}
 					accessibilityRole="button"
 					accessibilityLabel={[
 						workspace.name,

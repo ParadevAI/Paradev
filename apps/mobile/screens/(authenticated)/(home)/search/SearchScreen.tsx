@@ -20,15 +20,23 @@ import {
 	type HostWorkspaceItem,
 	useHostsWorkspaces,
 } from "@/hooks/useHostWorkspaces";
+import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { HeaderToolbar } from "@/lib/navigation";
+import { cn } from "@/lib/utils";
+import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCloudRepos";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useScopeHosts } from "@/screens/(authenticated)/(home)/hooks/useScopeHosts";
 import { useCloudScopeEnabled } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import {
+	isPlaceUnreachable,
+	placeStatus,
+} from "@/screens/(authenticated)/(home)/utils/placeStatus";
 import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
+import { searchRowDetail } from "./utils/searchRowDetail";
 
 /**
  * The native search bar lives in this sheet, not on the home screen: on a
@@ -65,6 +73,22 @@ export function SearchScreen() {
 	});
 	const { byHost: projectsByHost } = useHostsProjects(scopeHosts);
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
+	const { presenceStatus } = useOrgHosts();
+	const cloudRepos = useCloudRepos();
+	const hostsById = useMemo(
+		() => new Map(scopeHosts.map((host) => [host.machineId, host])),
+		[scopeHosts],
+	);
+	// Rows of a machine that can't answer are listed, dimmed, as on Home.
+	const isUnreachable = useCallback(
+		(workspace: HostWorkspaceItem) => {
+			const host = hostsById.get(workspace.hostId);
+			return (
+				!!host && isPlaceUnreachable(placeStatus(host.isOnline, presenceStatus))
+			);
+		},
+		[hostsById, presenceStatus],
+	);
 
 	// Same hosts the home list polls, so the query keys are shared and the
 	// sheet decorates from cache instead of paying its own fan-out.
@@ -184,9 +208,9 @@ export function SearchScreen() {
 	);
 	const close = useCallback(() => router.back(), [router]);
 	const openFirst = useCallback(() => {
-		const first = results[0];
+		const first = results.find((workspace) => !isUnreachable(workspace));
 		if (first) open(first);
-	}, [results, open]);
+	}, [results, open, isUnreachable]);
 
 	return (
 		<>
@@ -243,14 +267,23 @@ export function SearchScreen() {
 					) : undefined
 				}
 				renderItem={({ item: workspace }) => {
-					const projectName = workspace.projectId
-						? projectNamesById.get(workspace.projectId)
-						: undefined;
+					const host = hostsById.get(workspace.hostId);
+					const projectName = host
+						? (workspace.projectId &&
+								projectNamesById.get(workspace.projectId)) ||
+							null
+						: (cloudRepos.get(workspace.id)?.split("/")[1] ?? null);
+					const unreachable = isUnreachable(workspace);
 					return (
 						<RowLink href={`/workspace/${workspace.id}`}>
 							<Pressable
-								className="web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5"
+								className={cn(
+									"web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5",
+									unreachable && "opacity-50",
+								)}
 								onPress={() => open(workspace)}
+								disabled={unreachable}
+								accessibilityState={{ disabled: unreachable }}
 								ph-label="search-workspace-row"
 							>
 								<View className="size-6 items-center justify-center">
@@ -268,9 +301,13 @@ export function SearchScreen() {
 										className="text-muted-foreground text-[11.5px]"
 										numberOfLines={1}
 									>
-										{projectName
-											? `${projectName} · ${workspace.branch}`
-											: workspace.branch}
+										{searchRowDetail({
+											placeName: allScope
+												? (host?.name ?? t({ message: "Cloud" }))
+												: null,
+											projectName,
+											branch: workspace.branch,
+										})}
 									</Text>
 								</View>
 							</Pressable>

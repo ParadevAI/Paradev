@@ -40,7 +40,7 @@ const project = {
 const describeItem = (item: HomeListItem) => {
 	switch (item.kind) {
 		case "hostLabel":
-			return `label:${item.name}${item.online ? "" : ":offline"}`;
+			return `label:${item.name}${item.status === "online" ? "" : `:${item.status}`}`;
 		case "projectHeader":
 			return `project:${item.name}${item.offline ? ":offline" : ""}`;
 		case "workspace":
@@ -48,7 +48,7 @@ const describeItem = (item: HomeListItem) => {
 		case "cloudRow":
 			return `cloud:${item.row.id}`;
 		case "placeEmpty":
-			return `empty:${item.label}`;
+			return `empty:${item.label ?? "loading"}`;
 		default:
 			return item.kind;
 	}
@@ -72,20 +72,20 @@ describe("buildAllHostsList", () => {
 				{
 					machineId: "m3",
 					name: "Studio",
-					online: false,
+					status: "offline" as const,
 					lastSeenAt: 1,
 					items: section("m3", true),
 				},
 				{
 					machineId: "m2",
 					name: "Zeta",
-					online: true,
+					status: "online" as const,
 					items: section("m2", false),
 				},
 				{
 					machineId: "m1",
 					name: "Alpha",
-					online: true,
+					status: "online" as const,
 					items: section("m1", false),
 				},
 			],
@@ -112,20 +112,25 @@ describe("buildAllHostsList", () => {
 	test("says why an empty place has no rows, and only when that is known", () => {
 		const list = buildAllHostsList({
 			hosts: [
-				{ machineId: "m1", name: "Alpha", online: true, items: [] },
+				{
+					machineId: "m1",
+					name: "Alpha",
+					status: "online" as const,
+					items: [],
+				},
 				{
 					machineId: "m2",
 					name: "Studio",
-					online: false,
+					status: "offline" as const,
 					lastSeenAt: null,
 					items: [],
-					emptyLabel: "No saved workspaces",
+					empty: { label: "No saved workspaces" },
 				},
 			],
 			cloud: {
 				name: "Cloud",
 				items: [],
-				emptyLabel: "No cloud workspaces yet",
+				empty: { label: "No cloud workspaces yet" },
 			},
 		});
 		expect(list.map(describeItem)).toEqual([
@@ -137,9 +142,36 @@ describe("buildAllHostsList", () => {
 		]);
 	});
 
+	test("keeps a host with pending presence among the reachable ones, loading", () => {
+		const list = buildAllHostsList({
+			hosts: [
+				{
+					machineId: "m1",
+					name: "Alpha",
+					status: "pending",
+					items: [],
+					empty: { label: null },
+				},
+			],
+			cloud: { name: "Cloud", items: [] },
+		});
+		expect(list.map(describeItem)).toEqual([
+			"label:Alpha:pending",
+			"empty:loading",
+			"label:Cloud",
+		]);
+	});
+
 	test("leaves Cloud out where it is not offered", () => {
 		const list = buildAllHostsList({
-			hosts: [{ machineId: "m1", name: "Alpha", online: true, items: [] }],
+			hosts: [
+				{
+					machineId: "m1",
+					name: "Alpha",
+					status: "online" as const,
+					items: [],
+				},
+			],
 			cloud: null,
 		});
 		expect(list.map(describeItem)).toEqual(["label:Alpha"]);
