@@ -22,7 +22,7 @@ Paradev is the workspace for running parallel coding agents. You can run any cod
 - **Agents can drive it too.** Our CLI, MCP server, and skills let agents drive the entire app and orchestrate other agents.
 - **Check in from anywhere** with our mobile and web apps.
 - **View Git changes right in the app.** Read the diff, check the pull request, and merge without leaving.
-- **Use the agents you already have.** Paradev runs Claude Code, Codex, OpenCode, Gemini, Cursor Agent, and any other CLI agent on the plans and API keys you already have.
+- **Use the agents you already have.** Paradev runs Claude Code, Codex, OpenCode, Gemini, Cursor Agent, and any other CLI agent on the plans and API keys you already have, in a terminal or as a chat.
 
 ## Get started
 
@@ -176,6 +176,46 @@ Use the agent plans and API keys you already have. These agents are built in, an
 <br />
 
 <details>
+<summary>Is Paradev a terminal app or a desktop app?</summary>
+<br />
+
+Paradev is a desktop app, not a terminal app. Agents run inside it as a chat or in a terminal. Next to them you get a diff viewer, pull requests, an in-app browser, and a file editor. [FAQ docs](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Do I have to use a terminal, or can I chat with the coding agent?</summary>
+<br />
+
+No, Paradev can show an agent session as a chat instead of a terminal, and you approve or decline the agent's actions with a click. Chat works with Claude Code, Codex, OpenCode, and Pi; Paradev runs the CLI you already installed, so it keeps your login and settings. The **CLI** / **Chat** toggle switches a running session without losing context, and other agents run in a Paradev terminal. [Chat docs](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>What is the Paradev license, what does it cost, and which platforms does it run on?</summary>
+<br />
+
+Paradev is open source under the MIT License. The Free plan covers local workspaces with the desktop app and the CLI. Paid plans add features such as automations and cloud workspaces. The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not available yet. [Pricing](https://paradev.com/pricing) · [FAQ docs](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Is Paradev the same as Superset? Is it related to Apache Superset?</summary>
+<br />
+
+Paradev was previously named Superset, which is why the CLI command is still `superset`. It is not related to Apache Superset, the business intelligence tool. [Install docs](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Which coding agents does Paradev support, and do I keep my own subscriptions?</summary>
+<br />
+
+Paradev has built-in support for Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp, and more, and you can add any other CLI agent. Claude Code, Codex, OpenCode, and Pi can also run as a chat. Agents use your own subscriptions and API keys, and Paradev does not proxy model calls. [Supported agents docs](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
 <summary>How do I keep multiple coding agents from overwriting each other in one repository?</summary>
 <br />
 
@@ -187,7 +227,55 @@ Paradev gives each agent its own workspace: a Git worktree on its own branch, wi
 <summary>I have too many Claude Code terminal sessions. How do I keep track of them?</summary>
 <br />
 
-Paradev shows every agent session in one sidebar, grouped by project, with a status for each. Claude Code reports when it finishes and when it waits for your input, and the sidebar flags workspaces that need you. [Agent status docs](https://docs.paradev.com/agent-status)
+Paradev shows every agent session in one sidebar, grouped by project, with a status for each, whether the session runs as a chat or in a terminal. Claude Code reports when it finishes and when it waits for your input, and the sidebar flags workspaces that need you. [Agent status docs](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Can I run two coding agents on the same task and compare the results?</summary>
+<br />
+
+Yes, in Paradev you give the same prompt to two or more workspaces, each on its own branch, with the same agent or different agents. You then compare the diffs and keep the best result. [Race agents recipe](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>Can I use Claude Code and Codex together, with one writing code and the other reviewing it?</summary>
+<br />
+
+Yes, Paradev runs Claude Code and Codex side by side, each as a chat or in a terminal. To get a review, select lines in a pull request's **Code** tab and send them to the other agent, or use **Continue with another agent** to start a session of a different agent with the recent context. [Agent sessions docs](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>How do I review a coding agent's diff and send follow-ups before I merge?</summary>
+<br />
+
+Paradev shows each workspace's changes in a diff viewer, where you commit, push, and open a pull request. In the pull request's **Code** tab, select lines and send a comment to a running agent or a new session; posting it to GitHub is optional. You can watch the checks and merge from the same view. [Pull requests docs](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>How do I keep each branch's dev server, ports, and preview apart?</summary>
+<br />
+
+Paradev keeps each branch in its own worktree and shows the ports that each workspace's processes listen on, grouped by workspace. Select a port to open that branch's dev server in the in-app browser. Paradev does not assign port ranges, so set per-workspace config in a setup script, which runs in each new workspace with variables such as `SUPERSET_WORKSPACE_PATH`. [Ports docs](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>Can I click an element in my running web app and have a coding agent change it?</summary>
+<br />
+
+Yes, Paradev has a Design mode in its in-app browser: open your dev server, turn on **Design**, and click the element. You then describe the change, and the agent gets the element's details and a screenshot with your note. [Browser docs](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>Can I get notified when a coding agent needs my input?</summary>
+<br />
+
+Yes, the Paradev desktop app notifies you when an agent finishes or stops to wait for your input, and the macOS dock icon shows a badge. Support varies by agent: Claude Code reports both states, and some agents report only when they finish. On the mobile app, a dot on the workspace shows that an agent needs your permission; push notifications are not available yet. [Agent status docs](https://docs.paradev.com/agent-status)
 
 </details>
 
@@ -208,10 +296,18 @@ Yes, Paradev automations run an agent on an hourly, daily, weekly, or custom sch
 </details>
 
 <details>
-<summary>Can I get notified when a coding agent needs my input?</summary>
+<summary>Can I start a coding agent from Slack, Linear, Sentry, or a GitHub pull request?</summary>
 <br />
 
-Yes, the Paradev desktop app notifies you when an agent finishes or stops to wait for your input, and the macOS dock icon shows a badge. Support varies by agent: Claude Code reports both states, and some agents report only when they finish. On the mobile app, a dot on the workspace shows that an agent needs your permission; push notifications are not available yet. [Agent status docs](https://docs.paradev.com/agent-status)
+Yes, Paradev automations start an agent when a GitHub pull request event, a Slack message, a Linear issue, a Sentry issue, or a webhook arrives, and the agent gets the event details with your prompt. You can also mention the Paradev bot in Slack to start a cloud workspace and agent. Automations and the Slack integration need the Pro plan. [Automations docs](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Can I start coding agents from the command line or from another agent?</summary>
+<br />
+
+Yes, the Paradev CLI creates workspaces and starts agents in them from a shell script or from another agent. Agents can also use the Paradev MCP server to work with workspaces and terminals. The desktop app includes an orchestrate skill that lets one agent coordinate workers in separate workspaces. [CLI docs](https://docs.paradev.com/cli/getting-started)
 
 </details>
 
@@ -232,50 +328,26 @@ Yes, a Paradev workspace stays on disk as a Git worktree on its branch until you
 </details>
 
 <details>
-<summary>Can I start a coding agent from Slack, Linear, Sentry, or a GitHub pull request?</summary>
+<summary>Can a small team share one machine for coding agents?</summary>
 <br />
 
-Yes, Paradev automations start an agent when a GitHub pull request event, a Slack message, a Linear issue, a Sentry issue, or a webhook arrives, and the agent gets the event details with your prompt. You can also mention the Paradev bot in Slack to start a cloud workspace and agent. Automations and the Slack integration need the Pro plan. [Automations docs](https://docs.paradev.com/automations)
+Yes, a Paradev host can be a shared machine, such as a Mac mini, that teammates reach through remote access (Pro plan). When the host first comes online, only the person who started it has access. That person adds teammates under **Settings → Hosts**. [Remote access docs](https://docs.paradev.com/remote-access)
 
 </details>
 
 <details>
-<summary>Can I use Claude Code and Codex together, with one writing code and the other reviewing it?</summary>
+<summary>How is Paradev different from Conductor, Orca, and Cursor?</summary>
 <br />
 
-Yes, Paradev runs Claude Code and Codex side by side, each in its own terminal or workspace. To get a review, select lines in the diff and send them to the other agent, or use **Continue with another agent** to start a session of a different agent with the recent context. [Agent sessions docs](https://docs.paradev.com/agent-sessions)
+Paradev, Conductor, and Orca all run coding agents in parallel Git worktrees, and Cursor is an AI editor built around its own agent. Paradev runs any CLI agent on your own subscriptions, and it opens a workspace in Cursor when you want to edit there. Orca is also open source and runs on Windows, which Paradev does not support yet. Conductor is joining Meta and is closed to new users, and Paradev has a guide to move Conductor workspaces over. [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor)
 
 </details>
 
 <details>
-<summary>Can I click an element in my running web app and have a coding agent change it?</summary>
+<summary>Is Paradev a replacement for tmux?</summary>
 <br />
 
-Yes, Paradev has a Design mode in its in-app browser: open your dev server, turn on **Design**, and click the element. You then describe the change, and the agent gets the element's details and a screenshot with your note. [Browser docs](https://docs.paradev.com/browser)
-
-</details>
-
-<details>
-<summary>Which coding agents does Paradev support, and do I keep my own subscriptions?</summary>
-<br />
-
-Paradev has built-in support for Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp, and more, and you can add any other CLI agent. Agents use your own subscriptions and API keys. Paradev does not proxy model calls, so your provider bills you directly. [Supported agents docs](https://docs.paradev.com/supported-agents)
-
-</details>
-
-<details>
-<summary>What is the Paradev license, what does it cost, and which platforms does it run on?</summary>
-<br />
-
-Paradev is open source under the MIT License. The Free plan covers local workspaces with the desktop app and the CLI. Paid plans add features such as automations and cloud workspaces. The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not available yet. [FAQ docs](https://docs.paradev.com/faq)
-
-</details>
-
-<details>
-<summary>Is Paradev the same as Superset? Is it related to Apache Superset?</summary>
-<br />
-
-Paradev was previously named Superset, which is why the CLI command is still `superset`. It is not related to Apache Superset, the business intelligence tool. [Install docs](https://docs.paradev.com/install)
+Yes, for running coding agents Paradev can replace tmux: its terminal sessions keep running when you close, quit, or update the app. Each workspace also gets its own worktree and status in the sidebar. You can still run tmux inside a Paradev terminal. [Keep agents running docs](https://docs.paradev.com/keep-agents-running)
 
 </details>
 
