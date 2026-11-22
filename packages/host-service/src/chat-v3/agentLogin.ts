@@ -4,6 +4,7 @@ const LOGINS: Record<string, { command: string; profileEnv?: string }> = {
 	claude: { command: "claude auth login", profileEnv: "CLAUDE_CONFIG_DIR" },
 	codex: { command: "codex login", profileEnv: "CODEX_HOME" },
 	opencode: { command: "opencode auth login" },
+	agy: { command: "agy acp --login" },
 };
 
 /**

@@ -13,6 +13,7 @@ describe("acpHarnessForPreset", () => {
 		expect(acpHarnessForPreset("opencode")).toBe("opencode-acp");
 		expect(acpHarnessForPreset("pi")).toBe("pi-acp");
 		expect(acpHarnessForPreset("pdev")).toBe("pdev-acp");
+		expect(acpHarnessForPreset("agy")).toBe("agy-acp");
 	});
 
 	test("anything else is not a chat", () => {
@@ -44,7 +45,7 @@ describe("presetForAnyHarness", () => {
 
 describe("acpStartModes", () => {
 	test("a start mode's default is one of its modes, and agents without known modes offer none", () => {
-		for (const preset of ["claude", "codex", "pdev"]) {
+		for (const preset of ["claude", "codex", "pdev", "agy"]) {
 			const start = acpStartModes(preset);
 			expect(start?.modes.some((mode) => mode.id === start.defaultModeId)).toBe(
 				true,

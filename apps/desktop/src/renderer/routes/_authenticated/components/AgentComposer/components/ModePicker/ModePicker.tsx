@@ -33,7 +33,12 @@ type ModeCopy = {
 	unrestricted?: boolean;
 };
 
-const HIDDEN_MODE_IDS = new Set(["plan", "acceptEdits", "workspace-write"]);
+const HIDDEN_MODE_IDS = new Set([
+	"plan",
+	"acceptEdits",
+	"accept-edits",
+	"workspace-write",
+]);
 const SOLID_ICONS = new Set<LucideIcon>([Pause, Play, FastForward]);
 const UNRESTRICTED_TINT = "text-highlight";
 

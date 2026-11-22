@@ -9,5 +9,6 @@ test("signs in the profile the agent launched with", () => {
 	expect(agentLoginCommand("codex", { CODEX_HOME: "/h/it's" })).toBe(
 		"CODEX_HOME='/h/it'\\''s' codex login",
 	);
+	expect(agentLoginCommand("agy", {})).toBe("agy acp --login");
 	expect(agentLoginCommand("gemini", {})).toBeUndefined();
 });

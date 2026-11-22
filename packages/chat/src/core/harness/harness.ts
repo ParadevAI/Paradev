@@ -10,6 +10,7 @@
 const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 	claude: "claude-acp",
 	codex: "codex-acp",
+	agy: "agy-acp",
 	opencode: "opencode-acp",
 	pi: "pi-acp",
 	pdev: "pdev-acp",
@@ -39,6 +40,15 @@ const ACP_START_MODES: Record<
 			{ id: "agent-full-access", label: "Full access" },
 		],
 		defaultModeId: "agent-full-access",
+	},
+	"agy-acp": {
+		modes: [
+			{ id: "default", label: "Ask for approval" },
+			{ id: "accept-edits", label: "Approve edits" },
+			{ id: "auto", label: "Approve for me" },
+			{ id: "plan", label: "Plan" },
+		],
+		defaultModeId: "auto",
 	},
 	"pdev-acp": {
 		modes: [
