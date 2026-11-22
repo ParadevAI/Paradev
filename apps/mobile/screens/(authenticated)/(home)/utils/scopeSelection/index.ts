@@ -1,0 +1,18 @@
+export {
+	canTickHost,
+	defaultSelection,
+	everythingSelection,
+	isAllHostsOffered,
+	isEverything,
+	MAX_SELECTED_HOSTS,
+	resolveSelection,
+	type ScopeSelection,
+	type SelectableHost,
+	type SelectionLabel,
+	selectedHosts,
+	selectionLabel,
+	selectionScope,
+	toggleCloud,
+	toggleHost,
+	type WorkspaceScope,
+} from "./scopeSelection";

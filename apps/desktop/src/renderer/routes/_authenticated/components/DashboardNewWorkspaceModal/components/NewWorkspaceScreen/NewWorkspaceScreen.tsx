@@ -92,6 +92,7 @@ import {
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
+import { useBaseBranchReset } from "./hooks/useBaseBranchReset";
 import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
@@ -440,41 +441,18 @@ export function NewWorkspaceScreen({
 	);
 	useLinkedIssueNaming(linkedIssues);
 
-	// Reset baseBranch when what it branches from changes, defaulting to the
-	// user's last branch there — the draft store is global, so a stale branch
-	// from another repository would otherwise ride into the create. On the
-	// cloud that is the environment's repository, not the project's.
 	const branchDefaultKey = isCloudHost
 		? resolvedEnvironment
 			? environmentBranchKey(resolvedEnvironment.id)
 			: null
 		: projectId;
-	const persistedBaseBranchDefault = useWorkspaceCreateDefaultsStore((state) =>
-		branchDefaultKey
-			? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
-			: null,
-	);
+	useBaseBranchReset({ branchDefaultKey, hostId, updateDraft });
 	const setBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.setBaseBranchDefault,
 	);
 	const clearBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.clearBaseBranchDefault,
 	);
-	const previousBranchDefaultKeyRef = useRef(branchDefaultKey);
-	const previousHostIdRef = useRef(hostId);
-	useEffect(() => {
-		if (
-			previousBranchDefaultKeyRef.current !== branchDefaultKey ||
-			previousHostIdRef.current !== hostId
-		) {
-			previousBranchDefaultKeyRef.current = branchDefaultKey;
-			previousHostIdRef.current = hostId;
-			updateDraft({
-				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
-				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
-			});
-		}
-	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
 
 	// ── Agent / model / effort ───────────────────────────────────────
 	const launchHostUrl = useMemo(() => {

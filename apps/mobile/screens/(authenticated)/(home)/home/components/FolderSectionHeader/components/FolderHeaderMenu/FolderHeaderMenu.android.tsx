@@ -62,7 +62,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 				accessible
 				accessibilityRole="button"
 				accessibilityLabel={t({ message: "Group actions" })}
-				className="size-9 items-center justify-center"
+				className="size-6 items-center justify-center"
 			>
 				<Icon as={Ellipsis} className="text-muted-foreground size-4" />
 			</View>

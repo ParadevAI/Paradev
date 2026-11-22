@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# ukryty projekt} few {# ukryte projekty} many {# ukryt
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# element historii} few {# elementy historii} many {# elementów historii} other {# elementu historii}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} few {# hosty} many {# hostów} other {# hosta}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# etykieta} few {# etykiety} many {# etykiet} other {# etykiety}}"
@@ -187,6 +191,10 @@ msgstr "{0, plural, one {# etykieta} few {# etykiety} many {# etykiet} other {# 
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# logowanie} few {# logowania} many {# logowań} other {# logowania}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# wymaga danych} few {# wymagają danych} many {# wymaga danych} other {# wymaga danych}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -222,6 +230,10 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektów} other {
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# pull request} few {# pull requesty} many {# pull requestów} other {# pull requesta}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# gotowe} few {# gotowe} many {# gotowych} other {# gotowego}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +243,14 @@ msgstr "{0, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} ot
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repozytorium} few {# repozytoria} many {# repozytoriów} other {# repozytorium}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# wynik na wszystkich hostach} few {# wyniki na wszystkich hostach} many {# wyników na wszystkich hostach} other {# wyniku na wszystkich hostach}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# wynik w wybranych miejscach} few {# wyniki w wybranych miejscach} many {# wyników w wybranych miejscach} other {# wyniku w wybranych miejscach}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +299,10 @@ msgstr "{0, plural, one {# działający terminal} few {# działające terminale}
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# niezmieniony wiersz} few {# niezmienione wiersze} many {# niezmienionych wierszy} other {# niezmienionego wiersza}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# pracuje} few {# pracują} many {# pracuje} other {# pracuje}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -884,6 +908,9 @@ msgstr "{count, plural, one {# terminal pozostał w starym obszarze roboczym.} f
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {# terminal został zatrzymany i nie udało się go uruchomić ponownie.} few {# terminale zostały zatrzymane i nie udało się ich uruchomić ponownie.} many {# terminali zostało zatrzymanych i nie udało się ich uruchomić ponownie.} other {# terminala zostało zatrzymanych i nie udało się ich uruchomić ponownie.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {# obszar roboczy} few {# obszary robocze} many {# obszarów roboczych} other {# obszaru roboczego}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree w tym repozytorium nie ma obszaru roboczego. Zostanie zaimportowany jako obszar roboczy.} few {# worktree w tym repozytorium nie mają obszaru roboczego. Zostaną zaimportowane jako obszary robocze.} many {# worktree w tym repozytorium nie ma obszaru roboczego. Zostaną zaimportowane jako obszary robocze.} other {# worktree w tym repozytorium nie ma obszaru roboczego. Zostaną zaimportowane jako obszary robocze.}}"
 
@@ -1141,6 +1168,9 @@ msgstr "{machineSize} (poza Twoim planem)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, one {Maksymalnie # host naraz} few {Maksymalnie # hosty naraz} many {Maksymalnie # hostów naraz} other {Maksymalnie # hosta naraz}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Kopiowanie rozmowy (# wiadomość)} few {Kopiowanie rozmowy (# wiadomości)} many {Kopiowanie rozmowy (# wiadomości)} other {Kopiowanie rozmowy (# wiadomości)}}"
@@ -2588,6 +2618,9 @@ msgstr "Wszystkie funkcje obok siebie"
 
 msgid "All files exceed the maximum size."
 msgstr "Wszystkie pliki przekraczają maksymalny rozmiar."
+
+msgid "All hosts"
+msgstr "Wszystkie hosty"
 
 msgid "All in a new tab (split panes)"
 msgstr "Wszystkie w nowej karcie (podzielone panele)"
@@ -4058,6 +4091,9 @@ msgstr "Może wyświetlać"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Czy możesz ujednolicić tooltipy w całej aplikacji?"
+
+msgid "can’t check"
+msgstr "nie można sprawdzić"
 
 msgid "Can’t check {hostName}"
 msgstr "Nie można sprawdzić {hostName}"
@@ -13315,6 +13351,9 @@ msgstr "Żadne stanowisko do mnie nie pasuje. Czy mimo to warto się odezwać?"
 msgid "No runs yet"
 msgstr "Brak uruchomień"
 
+msgid "No saved workspaces"
+msgstr "Brak zapisanych obszarów roboczych"
+
 msgid "No screenshots yet"
 msgstr "Brak zrzutów ekranu"
 
@@ -13620,6 +13659,9 @@ msgstr "Pod {pathname} nic nie ma."
 msgid "Nothing needs a retry"
 msgstr "Nic nie wymaga ponowienia"
 
+msgid "Nothing needs you right now"
+msgstr "Teraz nic na Ciebie nie czeka"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nic jeszcze nie opublikowano w ciągu ostatnich 30 dni. Twoja pozycja pojawi się, gdy zsynchronizuje się użycie z tej maszyny — publikacja jako <0>{handle}</0>."
 
@@ -13733,11 +13775,12 @@ msgstr "Offline"
 msgid "Offline / local-first mode"
 msgstr "Tryb offline / local-first"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "offline, widziany {0}"
+
 msgid "OK"
 msgstr "OK"
-
-msgid "Older"
-msgstr "Starsze"
 
 msgid "On"
 msgstr "Wł."
@@ -20909,9 +20952,6 @@ msgstr "Ten tenant Microsoft jest już połączony z inną organizacją Paradev.
 msgid "This model isn't available"
 msgstr "Ten model jest niedostępny"
 
-msgid "This month"
-msgstr "W tym miesiącu"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "To przenoszenie zostało zatrzymane. Czat nadal jest w poprzednim obszarze roboczym."
 
@@ -21082,9 +21122,6 @@ msgstr "Ten użytkownik uruchamia usługę hosta dla tego urządzenia i musi poz
 
 msgid "This view hit an error"
 msgstr "Ten widok napotkał błąd"
-
-msgid "This week"
-msgstr "W tym tygodniu"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Wszystkie otwarte pull requesty do #{prNumber} zostaną atomowo scalone z {base} za pomocą commita scalającego."

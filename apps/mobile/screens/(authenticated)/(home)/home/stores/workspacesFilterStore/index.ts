@@ -3,6 +3,5 @@ export {
 	type CloudStatusFilter,
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
-	type WorkspaceScope,
 	type WorkspaceSort,
 } from "./workspacesFilterStore";

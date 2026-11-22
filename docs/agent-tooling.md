@@ -16,6 +16,23 @@ Everything else links to those:
 | `.cursor/commands` | `../.agents/commands` |
 | `.codex/commands`, `.codex/prompts` | `../.agents/commands` |
 
+## Skill names after the Paradev rename
+
+Paradev was called Superset. Skill text says Paradev, and a description says
+"Paradev (formerly Superset)" so that agents and search connect the two names. Names that agents
+and released builds look up keep `superset`:
+
+- The CLI command `superset` (`paradev` is the same binary) and the `SUPERSET_*` variables.
+- Repo skill `superset-settings` (`/superset-settings`, `$superset-settings`).
+- Managed skills: the `superset` plugin in `~/.claude/skills/superset/` (`superset:<skill>`), the
+  `superset-<skill>` directories in `~/.agents/skills/`, the `~/.agents/commands/superset/`
+  commands, `<!-- superset-managed-skill v1 -->` and `.superset-managed`.
+- Disabled-skill keys (`superset/<skill>`) in saved settings.
+
+Do not rename these. Agents have no skill alias: if a skill has two names, it shows two times
+in the list. If it has only the new name, saved prompts and old habits that use the old name stop
+working.
+
 ## Per-tool notes
 
 - **Codex** layers trusted repo settings from `.codex/config.toml`; launch it normally from the repo

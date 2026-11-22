@@ -256,7 +256,7 @@ iOSアプリも近日公開予定です。スマートフォンからエージ�
 デスクトップアプリをダウンロード:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage)(実験的。macOSが主要ターゲットです)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(実験的。macOSが主要ターゲットです)
 - **Windows**: 現時点では未対応
 - [すべてのビルド](https://github.com/paradevai/paradev/releases/latest)
 

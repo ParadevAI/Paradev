@@ -85,7 +85,7 @@ export function NewChatWidget({
 		targets.find((target) => target.key === targetKey) ?? defaultTarget;
 	const isCloudTarget = selectedTarget?.kind === "cloud";
 	const isSessionTarget = selectedTarget?.projectId === null;
-	const cloudScope = useWorkspaceScope() === "cloud";
+	const cloudOnlyScope = useWorkspaceScope() === "cloud";
 	const { environment: selectedEnvironment, repository: cloudRepository } =
 		useCloudCreateSelection();
 
@@ -296,7 +296,7 @@ export function NewChatWidget({
 	// structure yet, so the chip is the place itself. The repo it clones comes
 	// from the environment.
 	const headerChips = [
-		cloudScope
+		isCloudTarget
 			? {
 					id: "project",
 					label: t({ message: "Cloud" }),
@@ -307,7 +307,7 @@ export function NewChatWidget({
 					avatar: !isSessionTarget,
 					iconUri: selectedTarget?.projectIconUrl ?? undefined,
 				},
-		...(cloudScope
+		...(isCloudTarget
 			? [
 					{
 						id: "environment",
@@ -401,7 +401,7 @@ export function NewChatWidget({
 				});
 			}}
 			onChipPress={(id) => {
-				if (id === "project" && cloudScope) return;
+				if (id === "project" && cloudOnlyScope) return;
 				void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 				if (id === "environment") {
 					router.push("/(authenticated)/(home)/new-session/environment");

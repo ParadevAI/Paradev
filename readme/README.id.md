@@ -256,7 +256,7 @@ Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
 Unduh aplikasi desktop:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (eksperimental; macOS adalah target utama)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (eksperimental; macOS adalah target utama)
 - **Windows**: belum tersedia
 - [Semua build](https://github.com/paradevai/paradev/releases/latest)
 
