@@ -4,6 +4,10 @@ import { resolveOrganizationId } from "../../../lib/config";
 import { resolvePluginName } from "../../../lib/plugins/connection-ref";
 import { readStdin } from "../../../lib/plugins/inputs";
 import { connectPluginMcp } from "../../../lib/plugins/mcp-client";
+import {
+	keepSessionId,
+	keptSessionId,
+} from "../../../lib/plugins/mcp-sessions";
 
 export default command({
 	description: "Call a tool on a connected plugin",
@@ -40,13 +44,17 @@ export default command({
 			);
 		}
 
-		const { client } = await connectPluginMcp(
+		const account = options.account as string | undefined;
+		const agentId = process.env.SUPERSET_AGENT_ID?.trim();
+		const sessionKey = agentId && `${agentId}:${pluginName}:${account ?? ""}`;
+		const { client, transport } = await connectPluginMcp(
 			pluginName,
 			{
 				bearer: ctx.bearer,
 				organizationId: resolveOrganizationId(ctx.config),
 			},
-			options.account as string | undefined,
+			account,
+			sessionKey ? keptSessionId(sessionKey) : undefined,
 		);
 		try {
 			const result = await client.callTool({
@@ -58,6 +66,13 @@ export default command({
 				message: JSON.stringify(result, null, 2),
 			};
 		} finally {
+			if (sessionKey && transport.sessionId) {
+				keepSessionId(sessionKey, transport.sessionId);
+			} else {
+				// The call already succeeded or failed on its own; a proxy that
+				// cannot end the session lets it expire.
+				await transport.terminateSession().catch(() => {});
+			}
 			await client.close();
 		}
 	},
