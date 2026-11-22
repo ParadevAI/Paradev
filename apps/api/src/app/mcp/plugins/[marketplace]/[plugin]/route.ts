@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
 	isMcpUnauthorized,
@@ -8,10 +9,13 @@ import {
 	AmbiguousConnectionError,
 	AmbiguousPluginError,
 	buildPluginServer,
+	endUpstreamSessions,
 	PluginTargetError,
 	resolveTarget,
 	sandboxAllowsPlugin,
+	upstreamSessions,
 } from "@superset/trpc/plugins-proxy";
+import { Redis } from "@upstash/redis";
 import { z } from "zod";
 import { env } from "@/env";
 import {
@@ -24,6 +28,11 @@ import {
 	mcpProtectedResourceMetadataUrl,
 	mcpUnauthorizedResponse,
 } from "@/lib/oauth-metadata";
+
+const redis = new Redis({
+	url: env.KV_REST_API_URL,
+	token: env.KV_REST_API_TOKEN,
+});
 
 interface RouteParams {
 	params: Promise<{ marketplace: string; plugin: string }>;
@@ -130,6 +139,12 @@ async function handle(
 		);
 	}
 
+	const callerSessionId = req.headers.get("mcp-session-id");
+	const sessions =
+		callerSessionId && z.uuid().safeParse(callerSessionId).success
+			? upstreamSessions(redis, ctx.userId, callerSessionId)
+			: undefined;
+
 	let server: Awaited<ReturnType<typeof buildPluginServer>>;
 	try {
 		const target = await resolveTarget({
@@ -139,7 +154,10 @@ async function handle(
 			plugin,
 			connectionId,
 		});
-		server = await buildPluginServer(target);
+		if (req.method === "DELETE" && sessions) {
+			await endUpstreamSessions(target, sessions);
+		}
+		server = await buildPluginServer(target, { sessions });
 	} catch (error) {
 		if (error instanceof PluginTargetError) {
 			return withRateLimitHeaders(
@@ -173,6 +191,9 @@ async function handle(
 			extra: { mcpContext: ctx },
 		},
 	});
+	if (!callerSessionId && req.method === "POST") {
+		response.headers.set("mcp-session-id", randomUUID());
+	}
 	return withRateLimitHeaders(response, rateLimitState);
 }
 
