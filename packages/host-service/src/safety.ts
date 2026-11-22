@@ -41,8 +41,10 @@ export function installUpgradeSocketGuard(server: {
 		const requestPath = request.url?.split("?")[0] ?? "<unknown>";
 		socket.on("error", (error: NodeJS.ErrnoException) => {
 			console.warn(
-				`[host-service] upgrade socket error on ${requestPath} from ${request.socket.remoteAddress ?? "<unknown>"}:`,
-				error.code ?? error.message,
+				"[host-service] upgrade socket error (path, from):",
+				requestPath,
+				request.socket.remoteAddress ?? "<unknown>",
+				error,
 			);
 		});
 	});

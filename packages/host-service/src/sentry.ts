@@ -42,11 +42,11 @@ export function hostSentryOptions(
 		enableLogs: boxLogs,
 		beforeSendLog: boxLogs
 			? createBoxLogFilter({
-					secrets: () => ({
-						...getManagedEnv(),
-						HOST_SERVICE_SECRET: env.HOST_SERVICE_SECRET ?? "",
-						HOST_SERVICE_SENTRY_DSN: dsn,
-					}),
+					secrets: () => [
+						...Object.values(getManagedEnv()),
+						env.HOST_SERVICE_SECRET ?? "",
+						dsn,
+					],
 					reportDropped: (dropped, windowStartedAt) =>
 						logBoxEvent(
 							"box.logs.dropped",

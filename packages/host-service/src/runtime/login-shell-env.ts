@@ -56,7 +56,8 @@ export async function applyLoginShellEnvToProcess(
 		if (missing.length === 0) return;
 		targetEnv.PATH = [...current, ...missing].join(path.delimiter);
 		console.log(
-			`[host-service] merged ${missing.length} login-shell PATH entries into process env`,
+			"[host-service] merged login-shell PATH entries into process env (count):",
+			missing.length,
 		);
 	} catch (error) {
 		console.warn(

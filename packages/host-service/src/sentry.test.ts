@@ -51,13 +51,13 @@ describe("hostSentryOptions", () => {
 		expect(
 			hostSentryOptions(env, "org")?.beforeSendLog?.({
 				level: "info",
-				message: `[sandbox] gate ${env.HOST_SERVICE_SECRET}`,
-				attributes: { "sentry.origin": "auto.log.console" },
+				message: `[sandbox] gate: ${env.HOST_SERVICE_SECRET}`,
+				attributes: {
+					"sentry.origin": "auto.log.console",
+					"sentry.message.template": "[sandbox] gate: {}",
+					"sentry.message.parameter.0": env.HOST_SERVICE_SECRET,
+				},
 			}),
-		).toEqual({
-			level: "info",
-			message: "box.logs.withheld",
-			attributes: { "sentry.origin": "auto.log.console" },
-		});
+		).toEqual({ level: "info", message: "box.logs.withheld" });
 	});
 });

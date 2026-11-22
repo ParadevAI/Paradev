@@ -64,7 +64,7 @@ export function startVitalsLog(): () => void {
 			};
 			lastUtilization = utilization;
 			loopDelay.reset();
-			console.log(`[host-service:vitals] ${JSON.stringify(vitals)}`);
+			console.log("[host-service:vitals]", JSON.stringify(vitals));
 		} catch (error) {
 			console.warn("[host-service:vitals] sample failed:", error);
 		}

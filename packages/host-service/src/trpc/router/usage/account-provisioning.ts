@@ -73,7 +73,8 @@ export async function provisionSelectedAccounts(db: HostDb): Promise<void> {
 			await provision();
 		} catch (error) {
 			console.warn(
-				`[host-service] provisioning the selected account ${dir} failed (continuing):`,
+				"[host-service] provisioning the selected account failed, continuing (dir):",
+				dir,
 				error,
 			);
 		}

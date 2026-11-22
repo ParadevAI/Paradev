@@ -240,28 +240,27 @@ never sends one. `createBoxLogFilter`
 (`packages/host-service/src/runtime/box-log-filter/box-log-filter.ts`)
 decides what a record holds:
 
-- A typed box event (`logBoxEvent`: `agent.ended`, `box.reaped`,
-  `hook.finished`, `box.logs.dropped`) goes out as it is: ids, counts and
+- A typed box event (`logBoxEvent`) goes out as it is: ids, counts and
   durations only. The hourly cap does not apply to it.
-- A `console` line whose `[prefix]` is in `BOX_LOG_PREFIXES` goes out as
-  the call site's first argument; each later argument (an error, command
-  output) shows as `{}` and its value is not sent. Those call sites print ids,
-  counts, versions, paths, plugin and integration names, agent names and
-  URLs, so paths, repository and branch names can leave the box in them.
-- Any other `console` line goes out as its prefix and level only. `debug`
-  lines are not sent.
+- A `console` line whose `[prefix]` is in `BOX_LOG_PREFIXES` goes out as its
+  template, the call site's constant first argument with `{}` for each later
+  argument, plus the later arguments that are strings, numbers or booleans.
+  Objects, which include every error, are not sent. Those call sites pass ids,
+  counts, versions, ports, paths, agent, plugin and integration names and
+  URLs, so paths, repository and branch names can leave the box in them. A
+  test keeps their first argument free of `${}`.
+- Any other `console` line goes out as its prefix only. `debug` lines are not
+  sent.
 
-What a console line keeps then passes `createBoxLogScrub`
-(`packages/shared/src/sandbox/box-log-scrub.ts`). A value after the name of a
-managed variable (`KEY=`, `"KEY":`, `KEY:`) and every token shape it knows
-are replaced with `[redacted]`. A line that still holds 12 characters in a row
-of any managed value, the host secret or the DSN (raw, JSON-escaped once or
-twice, URL-encoded, hex, base64, the password of a URL value, or one line of a
-multi-line value), or a private key header, goes out as `box.logs.withheld`
-with its level only. Limits: a value shorter than 8 characters is found only
-after its name; a run shorter than 12 characters of a value is not found; a
-token is found only if its shape is in the list. A box sends at most 1,000
-filtered records an hour; the record that reaches the cap is
+The template and each string go through `createBoxLogScrub`
+(`packages/shared/src/sandbox/box-log-scrub.ts`). A record that holds a
+managed value, the host secret or the DSN, raw, JSON-escaped or URL-encoded,
+goes out as `box.logs.withheld` with its level only; URL userinfo, `Bearer`
+and `Basic` credentials, GitHub, Stripe and `sk-` keys are replaced with
+`[redacted]`. Limits: a value shorter than 8 characters is not matched; part
+of a value, or a value in another encoding, is not matched; a token that is
+not a managed value is found only if its shape is in that list. A box sends
+at most 1,000 filtered records an hour; the record that reaches the cap is
 `box.logs.capped`, and the next hour starts with `box.logs.dropped` and the
 count. Sentry error events (`captureException`, uncaught exceptions) are not
 log records and do not pass this filter.

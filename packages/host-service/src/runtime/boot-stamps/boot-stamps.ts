@@ -28,7 +28,7 @@ export function recordBootStamp(phase: string, at = Date.now()): void {
 	try {
 		appendFileSync(path, `${at} ${phase}\n`);
 	} catch (error) {
-		console.warn(`[boot-stamps] could not write ${phase}`, error);
+		console.warn("[boot-stamps] could not write (phase):", phase, error);
 	}
 }
 

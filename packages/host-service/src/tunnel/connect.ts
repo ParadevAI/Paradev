@@ -38,7 +38,7 @@ async function resolveRelayUrl(
 	} catch (error) {
 		console.warn(
 			"[host-service] relay endpoint lookup failed, using fallback:",
-			error instanceof Error ? error.message : error,
+			error,
 		);
 	}
 	return fallback;
@@ -72,11 +72,14 @@ export async function connectRelay(
 			);
 			if (options.signal?.aborted) return null;
 			recordRegistrationSuccess();
-			console.log(`[host-service] registered as host ${host.machineId}`);
+			console.log(
+				"[host-service] registered as host (machine):",
+				host.machineId,
+			);
 
 			const relayUrl = await resolveRelayUrl(options.api, options.relayUrl);
 			if (options.signal?.aborted) return null;
-			console.log(`[host-service] relay: ${relayUrl}`);
+			console.log("[host-service] relay:", relayUrl);
 
 			const clientOptions = {
 				relayUrl,
@@ -98,7 +101,8 @@ export async function connectRelay(
 				REGISTER_RETRY_MAX_MS,
 			);
 			console.error(
-				`[host-service] failed to register/connect relay (retrying in ${Math.round(delay / 1000)}s):`,
+				"[host-service] failed to register or connect the relay (retry in s):",
+				Math.round(delay / 1000),
 				error,
 			);
 			// unref: the HTTP server keeps the process alive between retries;

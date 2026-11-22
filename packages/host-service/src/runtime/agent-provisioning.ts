@@ -65,8 +65,8 @@ export async function provisionAgentIntegrations(): Promise<void> {
 		const effectiveDir = getAgentSetupTemplatesDir();
 		if (!existsSync(path.join(effectiveDir, "notify-hook.template.sh"))) {
 			console.error(
-				`[host-service] agent-setup templates missing at ${effectiveDir} — agent hooks will NOT work on this host. ` +
-					"Reinstall the CLI or set SUPERSET_AGENT_TEMPLATES_DIR.",
+				"[host-service] agent-setup templates missing; agent hooks will NOT work on this host. Reinstall the CLI or set SUPERSET_AGENT_TEMPLATES_DIR (dir):",
+				effectiveDir,
 			);
 		}
 		setupAgentIntegrations();
@@ -95,7 +95,9 @@ export async function provisionAgentIntegrations(): Promise<void> {
 		for (const report of reports) {
 			if (report.wrote) {
 				console.log(
-					`[host-service] ${report.agent} MCP config updated: ${report.stale.join(", ")}`,
+					"[host-service] MCP config updated (agent, servers):",
+					report.agent,
+					report.stale.join(", "),
 				);
 			}
 		}

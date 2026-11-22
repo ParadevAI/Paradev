@@ -304,7 +304,9 @@ async function startRunTerminalOnce(
 		return { terminalId: existing, pid: null };
 	const started = await starter.start(run);
 	if ("error" in started) {
-		console.warn("[sandbox] run terminal not started:", started.error);
+		console.warn("[sandbox] run terminal not started", {
+			error: started.error,
+		});
 		return started;
 	}
 	writeFileSync(files.runTerminal, `${started.terminalId}\n`);
@@ -361,7 +363,7 @@ export async function runSandboxStartHook(
 		}
 		writeFileSync(files.marker, `${started.pid ?? ""}\n`);
 		console.log(
-			hookOutcomeLine(
+			...hookOutcomeLine(
 				"start",
 				`running in terminal ${started.terminalId}`,
 				plan.run.command,
@@ -417,7 +419,7 @@ export async function runSandboxStartHook(
 	});
 	if (failure !== null && failure !== 0) {
 		console.error(
-			hookOutcomeLine("start", `failed (exit ${failure})`, command),
+			...hookOutcomeLine("start", `failed (exit ${failure})`, command),
 		);
 		return {
 			started: false,
@@ -430,7 +432,7 @@ export async function runSandboxStartHook(
 	// Written only now: a hook that failed to start must be runnable again on
 	// this boot, and the marker is what makes the next call a no-op.
 	writeFileSync(files.marker, `${pid}\n`);
-	console.log(hookOutcomeLine("start", `running (pid ${pid})`, command));
+	console.log(...hookOutcomeLine("start", `running (pid ${pid})`, command));
 	return { started: true, pid, command };
 }
 
@@ -478,7 +480,8 @@ function approveClaudeApiKey(): void {
 			// Rewriting a file this process cannot read would destroy whatever
 			// Claude keeps in it; leave the prompt to the person instead.
 			console.warn(
-				`[sandbox] ${path} is not readable JSON, key not approved`,
+				"[sandbox] not readable JSON, key not approved (path):",
+				path,
 				error,
 			);
 			return;
@@ -621,13 +624,17 @@ export async function launchSandboxAgentOnce(
 					terminalId: run.sessionId,
 				}));
 		console.log(
-			`[sandbox] launched ${agent} for workspace ${identity.workspaceId}`,
+			"[sandbox] launched (agent, workspace):",
+			agent,
+			identity.workspaceId,
 		);
 		await rememberLaunchReport(ctx, identity, report);
 	} catch (error) {
 		await rm(identity.launchMarkerPath, { force: true });
 		console.error(
-			`[sandbox] could not launch ${agent} for workspace ${identity.workspaceId}`,
+			"[sandbox] could not launch (agent, workspace):",
+			agent,
+			identity.workspaceId,
 			error,
 		);
 	}
@@ -654,7 +661,8 @@ async function rememberLaunchReport(
 		await flushPendingLaunchReport(ctx, identity);
 	} catch (error) {
 		console.warn(
-			`[sandbox] could not keep the launch report for workspace ${identity.workspaceId}`,
+			"[sandbox] could not keep the launch report (workspace):",
+			identity.workspaceId,
 			error,
 		);
 	}
@@ -689,7 +697,8 @@ async function reportLaunch(
 		return true;
 	} catch (error) {
 		console.warn(
-			`[sandbox] could not report the launch for workspace ${workspaceId}`,
+			"[sandbox] could not report the launch (workspace):",
+			workspaceId,
 			error,
 		);
 		return false;

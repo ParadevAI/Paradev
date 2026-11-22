@@ -230,7 +230,10 @@ export function reconcileMissingTerminalSessions(
 	const total = recoverable + disposed;
 	if (total > 0) {
 		console.log(
-			`[host-service] terminal reaper: reconciled ${total} daemon-lost session(s) (${recoverable} recoverable, ${disposed} disposed)`,
+			"[host-service] terminal reaper reconciled daemon-lost sessions (total, recoverable, disposed):",
+			total,
+			recoverable,
+			disposed,
 		);
 	}
 	return total;
@@ -256,7 +259,8 @@ function applyPortScanSync(
 		}
 		if (plan.register.length > 0) {
 			console.log(
-				`[host-service] port-scan sync: registered ${plan.register.length} unattached daemon session(s) for scanning`,
+				"[host-service] port-scan sync registered unattached daemon sessions for scanning (count):",
+				plan.register.length,
 			);
 		}
 		for (const terminalId of plan.unregister) {
@@ -399,7 +403,9 @@ export function startTerminalReaper(db: HostDb): () => void {
 			.then((result) => {
 				if (result.reaped > 0 || result.failed > 0) {
 					console.log(
-						`[host-service] terminal reaper: ${result.reaped} reaped, ${result.failed} failed`,
+						"[host-service] terminal reaper (reaped, failed):",
+						result.reaped,
+						result.failed,
 					);
 				}
 			})

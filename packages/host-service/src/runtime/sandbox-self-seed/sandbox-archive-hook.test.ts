@@ -75,9 +75,10 @@ describe("runSandboxArchiveHook", () => {
 			spy.mockRestore();
 		}
 		expect(printed).toEqual([
-			expect.stringMatching(
-				/^\[sandbox\] archive hook exited 0 \(command of \d+ chars\)$/,
-			),
+			"[sandbox] hook outcome (hook, outcome, command chars):",
+			"archive",
+			"exited 0",
+			expect.any(Number),
 		]);
 	});
 

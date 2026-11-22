@@ -2,53 +2,57 @@ import { describe, expect, it } from "bun:test";
 import { createBoxLogScrub } from "./box-log-scrub";
 
 // Made-up values in the shapes a real box's managed environment holds.
-const VALUES = {
-	DATABASE_URL:
-		"postgresql://app_owner:npg_Q7r/T2mWx9KpL@ep-quiet-sky-a1b2c3d4-pooler.us-east-2.aws.neon.tech/app",
-	LINEAR_CLIENT_SECRET: "3f9a1c0e8b7d6a5f4e3d2c1b0a9f8e7d6c5b4a39",
-	DB_PASSWORD: 'p@ss"w\\rd/2024+x=y&z',
-	SHORT_PIN: "8213",
-};
-const scrub = createBoxLogScrub(VALUES);
+const DATABASE_URL =
+	"postgresql://app_owner:npg_Q7rT2mWx9KpL@ep-quiet-sky-pooler.us-east-2.aws.neon.tech/app";
+const CLIENT_SECRET = "3f9a1c0e8b7d6a5f4e3d2c1b0a9f8e7d6c5b4a39";
+const PASSWORD = 'p@ss"w\\rd/2024+x=y&z';
+const scrub = createBoxLogScrub([
+	DATABASE_URL,
+	CLIENT_SECRET,
+	PASSWORD,
+	"3000",
+]);
 
 describe("createBoxLogScrub", () => {
-	it("leaves an operational line as it is", () => {
-		for (const line of [
-			"1795305352803 host.exec 2.0.11+78482465 node=/opt/superset/host/current/node",
-			"[sandbox] start hook running (pid 2134) (command of 25 chars)",
-			"[host-service] listening on http://[::]:4879",
-			"1795305369241 memguard rank pid=2152 bun -900->500",
+	it("leaves an operational text as it is", () => {
+		for (const text of [
+			"[sandbox] launched (agent, workspace): {} {}",
+			"/var/lib/superset/host.db",
+			"claude",
+			"listening on 3000",
 		]) {
-			expect(scrub(line)).toBe(line);
+			expect(scrub(text)).toBe(text);
 		}
 	});
 
-	it("withholds a line that holds twelve characters of a value in a row, in any form", () => {
-		const secret = VALUES.LINEAR_CLIENT_SECRET;
-		for (const line of [
-			`client ${secret}`,
-			`tail: ${secret.slice(9, 21)}`,
-			`json ${JSON.stringify(VALUES.DB_PASSWORD)}`,
-			`url ?p=${encodeURIComponent(VALUES.DB_PASSWORD)}`,
-			`hex ${Buffer.from(secret).toString("hex").slice(6, 40)}`,
-			`b64 ${Buffer.from(`x${secret}`).toString("base64")}`,
-			"password npg_Q7r/T2mWx9KpL alone",
+	it("returns null for a text that holds a secret raw, JSON-escaped or URL-encoded", () => {
+		for (const text of [
+			`db ${DATABASE_URL}`,
+			`client=${CLIENT_SECRET}`,
+			JSON.stringify({ pw: PASSWORD }),
+			`?state=${encodeURIComponent(PASSWORD)}`,
 		]) {
-			expect(scrub(line)).toBeNull();
+			expect(scrub(text)).toBeNull();
 		}
 	});
 
-	it("redacts a value of any length after its key name", () => {
-		expect(scrub("pin SHORT_PIN=8213 ok")).toBe("pin SHORT_PIN=[redacted] ok");
-		expect(scrub('{"SHORT_PIN":"8213"}')).toBe('{"SHORT_PIN":[redacted]}');
-		expect(scrub("SHORT_PIN: 8213")).toBe("SHORT_PIN: [redacted]");
-	});
-
-	it("withholds a line with a private key header", () => {
-		expect(scrub("-----BEGIN OPENSSH PRIVATE KEY-----")).toBeNull();
-	});
-
-	it("does not find a short value without its key", () => {
-		expect(scrub("listening on 8213")).toBe("listening on 8213");
+	it("redacts token shapes that are not one of the values", () => {
+		const cases: Array<[string, string]> = [
+			[
+				"https://x-access-token:ghs_AbCdEfGhIjKlMnOpQrStUvWxYz0123456789@github.com/o/r.git",
+				"https://[redacted]@github.com/o/r.git",
+			],
+			[
+				"Authorization: Bearer abc.def-ghi_jkl012",
+				"Authorization: Bearer [redacted]",
+			],
+			["token ghp_AbCdEfGhIjKlMnOpQrStUvWxYz012345", "token [redacted]"],
+			["key github_pat_11ABCDEFG0abcdefghij_klmnop", "key [redacted]"],
+			["stripe sk_live_51HxAbCdEfGhIjKlMn", "stripe [redacted]"],
+			["using sk-ant-api03-AbCdEfGhIjKlMnOpQr", "using [redacted]"],
+		];
+		for (const [text, expected] of cases) {
+			expect(scrub(text)).toBe(expected);
+		}
 	});
 });

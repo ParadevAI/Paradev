@@ -68,10 +68,7 @@ export async function getDaemonClient(): Promise<DaemonClient> {
 	const sockPath = await ptyDaemonSocketPath();
 	const client = new DaemonClient({ socketPath: sockPath });
 	client.onDisconnect((err) => {
-		console.error(
-			"[host-service] pty-daemon disconnected:",
-			err?.message ?? "",
-		);
+		console.error("[host-service] pty-daemon disconnected:", err);
 		if (cached === client) cached = null;
 		for (const listener of disconnectListeners) {
 			try {

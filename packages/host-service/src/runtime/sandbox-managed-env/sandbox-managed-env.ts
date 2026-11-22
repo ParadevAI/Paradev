@@ -58,7 +58,7 @@ async function writeGitIdentity(
 		try {
 			await run("git", ["config", "--global", key, value]);
 		} catch (error) {
-			console.warn(`[sandbox] could not write git ${key}`, error);
+			console.warn("[sandbox] could not write git config (key):", key, error);
 		}
 	}
 }

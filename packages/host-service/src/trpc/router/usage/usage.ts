@@ -269,7 +269,8 @@ export const usageRouter = router({
 						: provisionCodexAccount(input.selection));
 				} catch (error) {
 					console.warn(
-						`[host-service] provisioning ${input.agent} account failed (continuing):`,
+						"[host-service] provisioning an account failed, continuing (agent, selection):",
+						input.agent,
 						input.selection,
 						error,
 					);

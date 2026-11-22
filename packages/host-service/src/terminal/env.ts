@@ -95,10 +95,9 @@ export async function resolveTerminalBaseEnv(): Promise<
 	try {
 		return await getStrictShellEnvironment();
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
 		console.warn(
 			"[host-service] Shell env snapshot failed, falling back to process.env:",
-			message,
+			error,
 		);
 		const fallback = snapshotStringEnv(process.env);
 		augmentPathForMacOS(fallback);

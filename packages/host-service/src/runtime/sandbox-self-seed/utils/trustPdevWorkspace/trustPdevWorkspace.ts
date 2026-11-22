@@ -32,7 +32,8 @@ export function trustPdevWorkspace(root: string, agentDir: string): void {
 			// pdev refuses to start on a trust store it cannot parse, so
 			// overwriting it would hide the problem rather than fix it.
 			console.warn(
-				`[sandbox] ${path} is not readable JSON, workspace not trusted`,
+				"[sandbox] not readable JSON, workspace not trusted (path):",
+				path,
 				error,
 			);
 			return;
