@@ -142,8 +142,9 @@ export function buildCloudSection(
 				offline: false,
 			});
 			if (folderCollapsed) continue;
-			for (const row of folder.workspaces)
-				items.push({ kind: "cloudRow", row });
+			for (const row of folder.workspaces) {
+				items.push({ kind: "cloudRow", row, grouped: true });
+			}
 		}
 	}
 	return items;

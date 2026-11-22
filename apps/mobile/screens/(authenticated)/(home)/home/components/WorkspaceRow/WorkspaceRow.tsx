@@ -29,6 +29,7 @@ import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import type { GroupBarSpan } from "../../types";
 import { GroupBar } from "../GroupBar";
 import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
+import { RowHairline } from "../RowHairline";
 import { WorkspaceLead } from "../WorkspaceLead";
 import {
 	WorkspaceRowMenu,
@@ -53,6 +54,7 @@ export function WorkspaceRow({
 	group,
 	detail,
 	disabled = false,
+	separator = false,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -73,6 +75,8 @@ export function WorkspaceRow({
 	detail?: string;
 	/** Rows of a host that can't answer: shown, not opened. */
 	disabled?: boolean;
+	/** Draws a hairline under the row. */
+	separator?: boolean;
 }) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
@@ -220,6 +224,7 @@ export function WorkspaceRow({
 							) : null}
 						</View>
 					) : null}
+					{separator && !card ? <RowHairline grouped={grouped} /> : null}
 				</Pressable>
 			</WorkspaceRowMenu>
 		</RowLink>

@@ -19,6 +19,7 @@ import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { CloudPullRequest } from "../../hooks/useCloudPullRequests";
 import { cloudRowAttention } from "../../utils/needsMe";
 import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
+import { RowHairline } from "../RowHairline";
 import { WorkspaceLead } from "../WorkspaceLead";
 import { ArchivedCloudRowMenu } from "./components/ArchivedCloudRowMenu";
 import { CloudWorkspaceRowMenu } from "./components/CloudWorkspaceRowMenu";
@@ -36,6 +37,8 @@ export function CloudWorkspaceRow({
 	onCopied,
 	card = false,
 	detail,
+	grouped = false,
+	separator = false,
 }: {
 	row: CloudWorkspaceRowData;
 	pullRequest?: CloudPullRequest;
@@ -46,6 +49,10 @@ export function CloudWorkspaceRow({
 	card?: boolean;
 	/** Replaces the branch in the detail line, e.g. "repo · Cloud" outside the Cloud list. */
 	detail?: string;
+	/** A row inside a group, indented as a host's grouped row. */
+	grouped?: boolean;
+	/** Draws a hairline under the row. */
+	separator?: boolean;
 }) {
 	const { t } = useLingui();
 	const attentionLabel = useAttentionLabel();
@@ -105,7 +112,7 @@ export function CloudWorkspaceRow({
 		<Pressable
 			className={cn(
 				"bg-background flex-row items-center gap-3 rounded-xl py-3",
-				card ? "px-3" : "min-h-12 px-4",
+				card ? "px-3" : cn("min-h-12 pr-4", grouped ? "pl-8" : "pl-4"),
 			)}
 			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
 			accessibilityRole="button"
@@ -157,6 +164,7 @@ export function CloudWorkspaceRow({
 					textClassName="text-[7px]"
 				/>
 			) : null}
+			{separator && !card ? <RowHairline grouped={grouped} /> : null}
 		</Pressable>
 	);
 

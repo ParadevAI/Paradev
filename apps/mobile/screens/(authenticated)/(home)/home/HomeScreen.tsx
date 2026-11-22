@@ -112,6 +112,7 @@ import {
 	needsMeCount,
 } from "./utils/needsMe";
 import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
+import { withRowSeparators } from "./utils/withRowSeparators";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -611,9 +612,11 @@ export function HomeScreen() {
 	// A section label at the top sits close to the chips, as a first host header does.
 	const listItems = useMemo<HomeListItem[]>(() => {
 		const [head, ...rest] = builtItems;
-		return head?.kind === "sectionLabel"
-			? [{ ...head, first: true }, ...rest]
-			: builtItems;
+		return withRowSeparators(
+			head?.kind === "sectionLabel"
+				? [{ ...head, first: true }, ...rest]
+				: builtItems,
+		);
 	}, [builtItems]);
 
 	const composerWorkspaces = useMemo(
@@ -796,6 +799,8 @@ export function HomeScreen() {
 						onCopied={handleCopied}
 						card={card}
 						detail={item.detail}
+						grouped={item.grouped}
+						separator={item.separator}
 					/>
 				);
 			}
@@ -920,6 +925,7 @@ export function HomeScreen() {
 					group={item.group}
 					detail={item.detail}
 					disabled={item.offline}
+					separator={item.separator}
 					groups={
 						groups && actions
 							? {

@@ -84,6 +84,8 @@ export type HomeListItem =
 			offline?: boolean;
 			/** Replaces the branch line, e.g. "project · host" under Needs me. */
 			detail?: string;
+			/** Draws a hairline under the row. */
+			separator?: boolean;
 	  }
 	| {
 			kind: "hostOffline";
@@ -97,7 +99,14 @@ export type HomeListItem =
 			/** The list's first item. */
 			first?: boolean;
 	  }
-	| { kind: "cloudRow"; row: CloudWorkspaceRow; detail?: string };
+	| {
+			kind: "cloudRow";
+			row: CloudWorkspaceRow;
+			detail?: string;
+			/** A row inside a group, indented as a host's grouped row. */
+			grouped?: boolean;
+			separator?: boolean;
+	  };
 
 export function homeListItemKey(item: HomeListItem): string {
 	switch (item.kind) {
