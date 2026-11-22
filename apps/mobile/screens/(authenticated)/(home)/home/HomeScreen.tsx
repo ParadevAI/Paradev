@@ -25,10 +25,7 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import { useCloudWorkspaceItems } from "@/hooks/useCloudWorkspaceItems";
-import {
-	type CloudWorkspaceRow,
-	useCloudWorkspaces,
-} from "@/hooks/useCloudWorkspaces";
+import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
 import { useHostsProjects } from "@/hooks/useHostProjects";
 import {
 	type HostWorkspaceItem,
@@ -43,6 +40,7 @@ import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
+import { useRowAttention } from "@/screens/(authenticated)/(home)/hooks/useRowAttention";
 import { useScopeLabel } from "@/screens/(authenticated)/(home)/hooks/useScopeLabel";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
@@ -61,7 +59,6 @@ import {
 } from "@/screens/(authenticated)/hooks/usePullRequests";
 import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
-import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import { pullRequestStatus } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
 import { CloudWorkspaceRow as CloudWorkspaceListRow } from "./components/CloudWorkspaceRow";
 import { FolderSectionHeader } from "./components/FolderSectionHeader";
@@ -108,7 +105,6 @@ import { buildPlacesList, CLOUD_PLACE_ID } from "./utils/buildPlacesList";
 import { homeListItemKey } from "./utils/homeListItemKey";
 import {
 	buildNeedsMeList,
-	cloudRowAttention,
 	countAttention,
 	type NeedsMeCandidate,
 	needsMeCount,
@@ -202,8 +198,6 @@ export function HomeScreen() {
 	const cloudInMulti = multiScope && cloudSelected;
 	const [needsMeActive, setNeedsMeActive] = useState(false);
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
-	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
-	const cloudReadAt = useUnreadWorkspacesStore((state) => state.cloudReadAt);
 	const lastWorkspaceId = useLastWorkspaceStore((state) => state.workspaceId);
 	const {
 		workspaces,
@@ -315,13 +309,8 @@ export function HomeScreen() {
 		[sort, terminalsByWorkspace],
 	);
 
-	// What a row would show, for the collapsed header that hides it.
-	const rowAttention = useCallback(
-		(workspace: HostWorkspaceItem) =>
-			attentionByWorkspace.get(workspace.id) ??
-			(manualUnread[workspace.id] ? "review" : null),
-		[attentionByWorkspace, manualUnread],
-	);
+	const { host: rowAttention, cloud: cloudRowAttentionOf } =
+		useRowAttention(attentionByWorkspace);
 
 	const noProjectName = t({ message: "No project" });
 	const cloudName = t({ message: "Cloud" });
@@ -343,13 +332,6 @@ export function HomeScreen() {
 		],
 	);
 	const cloudRepos = useCloudRepos();
-	const cloudRowAttentionOf = useCallback(
-		(row: CloudWorkspaceRow) =>
-			isArchivedCloudWorkspaceStatus(row.status)
-				? null
-				: cloudRowAttention(row, cloudReadAt[row.id], !!manualUnread[row.id]),
-		[cloudReadAt, manualUnread],
-	);
 	// Pinned rows leave their project for the Pinned section at the top.
 	const pinned = useMemo(() => {
 		const projectName = (

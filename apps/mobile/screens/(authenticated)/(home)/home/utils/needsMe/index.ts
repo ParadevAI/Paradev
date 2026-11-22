@@ -3,6 +3,8 @@ export {
 	buildNeedsMeList,
 	cloudRowAttention,
 	countAttention,
+	hostRowAttention,
+	isCloudRowUnread,
 	type NeedsMeBucket,
 	type NeedsMeCandidate,
 	needsMeBucket,

@@ -80,6 +80,30 @@ export function buildNeedsMeList(
 	});
 }
 
+/** A host row's attention: its sessions' state, else a manual unread mark. */
+export function hostRowAttention(
+	workspaceId: string,
+	attentionByWorkspace: ReadonlyMap<string, TerminalAttention>,
+	manualUnread: Readonly<Record<string, unknown>>,
+): TerminalAttention | null {
+	return (
+		attentionByWorkspace.get(workspaceId) ??
+		(manualUnread[workspaceId] ? "review" : null)
+	);
+}
+
+/** Unread: marked by hand, or the agent's review landed after you last looked. */
+export function isCloudRowUnread(
+	row: { agentStatus: string | null; agentStatusAt: Date | null },
+	readAt: number | undefined,
+	manuallyUnread: boolean,
+): boolean {
+	if (manuallyUnread) return true;
+	const isRead =
+		row.agentStatusAt === null || (readAt ?? 0) >= row.agentStatusAt.getTime();
+	return row.agentStatus === "review" && !isRead;
+}
+
 /** A cloud row's attention, read the way its row marks it. */
 export function cloudRowAttention(
 	row: {
@@ -93,12 +117,5 @@ export function cloudRowAttention(
 	if (row.status === "failed" || row.agentStatus === "failed") return "failed";
 	if (row.agentStatus === "permission") return "permission";
 	if (row.agentStatus === "working") return "working";
-	const isRead =
-		!manuallyUnread &&
-		(row.agentStatusAt === null ||
-			(readAt ?? 0) >= row.agentStatusAt.getTime());
-	if (manuallyUnread || (row.agentStatus === "review" && !isRead)) {
-		return "review";
-	}
-	return null;
+	return isCloudRowUnread(row, readAt, manuallyUnread) ? "review" : null;
 }

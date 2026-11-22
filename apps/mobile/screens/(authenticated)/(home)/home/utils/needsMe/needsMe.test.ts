@@ -4,6 +4,8 @@ import {
 	buildNeedsMeList,
 	cloudRowAttention,
 	countAttention,
+	hostRowAttention,
+	isCloudRowUnread,
 	type NeedsMeCandidate,
 	needsMeCount,
 } from "./needsMe";
@@ -86,5 +88,25 @@ describe("cloudRowAttention", () => {
 		};
 		expect(cloudRowAttention(row, undefined, false)).toBe("review");
 		expect(cloudRowAttention(row, 100, false)).toBeNull();
+	});
+});
+
+describe("hostRowAttention", () => {
+	test("prefers the sessions' state, else reads a manual mark as review", () => {
+		const live = new Map([["a", "working" as const]]);
+		expect(hostRowAttention("a", live, { a: true })).toBe("working");
+		expect(hostRowAttention("b", live, { b: true })).toBe("review");
+		expect(hostRowAttention("c", live, {})).toBeNull();
+	});
+});
+
+describe("isCloudRowUnread", () => {
+	test("is unread when marked, or a review landed after the last read", () => {
+		const row = { agentStatus: "review", agentStatusAt: new Date(100) };
+		expect(isCloudRowUnread(row, 50, false)).toBe(true);
+		expect(isCloudRowUnread(row, 100, false)).toBe(false);
+		expect(isCloudRowUnread({ ...row, agentStatus: "idle" }, 0, true)).toBe(
+			true,
+		);
 	});
 });

@@ -14,10 +14,10 @@ import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/u
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import {
 	type AttentionCounts,
-	cloudRowAttention,
 	countAttention,
 } from "@/screens/(authenticated)/(home)/home/utils/needsMe";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
+import { useRowAttention } from "@/screens/(authenticated)/(home)/hooks/useRowAttention";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { getLastSeenTime } from "@/screens/(authenticated)/(home)/utils/getLastSeenTime";
 import {
@@ -30,7 +30,6 @@ import {
 } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
-import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 
 /**
  * Which places the list shows: Cloud and up to three machines, each ticked
@@ -44,8 +43,6 @@ export function ScopeFilterScreen() {
 	const { selection, cloudEnabled, allOffered, everything } =
 		useScopeSelection();
 	const setSelection = useWorkspacesFilterStore((store) => store.setSelection);
-	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
-	const cloudReadAt = useUnreadWorkspacesStore((state) => state.cloudReadAt);
 
 	const { presence } = useHostsPresence(hosts);
 
@@ -76,6 +73,7 @@ export function ScopeFilterScreen() {
 	);
 	const { byHost } = useHostsWorkspaces(countedHosts);
 	const { attentionByWorkspace } = useHostsTerminals(onlineCountedHosts);
+	const rowAttention = useRowAttention(attentionByWorkspace);
 	const { workspaces: activeCloud } = useCloudWorkspaces();
 	const cloudFilters = useCloudFilters();
 
@@ -87,11 +85,7 @@ export function ScopeFilterScreen() {
 				countAttention(
 					(byHost.get(host.machineId)?.workspaces ?? [])
 						.filter((workspace) => workspace.worktreeExists !== false)
-						.map(
-							(workspace) =>
-								attentionByWorkspace.get(workspace.id) ??
-								(manualUnread[workspace.id] ? "review" : null),
-						),
+						.map(rowAttention.host),
 				),
 			);
 		}
@@ -100,20 +94,16 @@ export function ScopeFilterScreen() {
 			countAttention(
 				activeCloud
 					.filter((row) => cloudFilters.matchesCreator(row.createdByUserId))
-					.map((row) =>
-						cloudRowAttention(row, cloudReadAt[row.id], !!manualUnread[row.id]),
-					),
+					.map(rowAttention.cloud),
 			),
 		);
 		return counts;
 	}, [
 		onlineCountedHosts,
 		byHost,
-		attentionByWorkspace,
-		manualUnread,
+		rowAttention,
 		activeCloud,
 		cloudFilters.matchesCreator,
-		cloudReadAt,
 	]);
 
 	const countsLine = (placeId: string) => {

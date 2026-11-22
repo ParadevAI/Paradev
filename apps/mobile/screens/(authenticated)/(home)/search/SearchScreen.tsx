@@ -1,5 +1,4 @@
 import { Plural, useLingui } from "@lingui/react/macro";
-import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	type NativeStackNavigationProp,
 	useNavigation,
@@ -32,8 +31,8 @@ import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCl
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { cloudRepoName } from "@/screens/(authenticated)/(home)/home/utils/buildCloudSection";
-import { cloudRowAttention } from "@/screens/(authenticated)/(home)/home/utils/needsMe";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
+import { useRowAttention } from "@/screens/(authenticated)/(home)/hooks/useRowAttention";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
 import {
@@ -42,7 +41,6 @@ import {
 } from "@/screens/(authenticated)/(home)/utils/placeStatus";
 import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
-import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
 
 /**
@@ -112,8 +110,7 @@ export function SearchScreen() {
 		useHostsTerminals(terminalHosts);
 	const attentionLabel = useAttentionLabel();
 	const noProjectName = t({ message: "No project" });
-	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
-	const cloudReadAt = useUnreadWorkspacesStore((state) => state.cloudReadAt);
+	const rowAttention = useRowAttention(attentionByWorkspace);
 	const { workspaces: activeCloud } = useCloudWorkspaces();
 	const cloudRowsById = useMemo(
 		() =>
@@ -304,15 +301,8 @@ export function SearchScreen() {
 						: cloudRepoName(cloudRepos, workspace.id);
 					const cloudRow = cloudRowsById.get(workspace.id);
 					const attention = cloudRow
-						? isArchivedCloudWorkspaceStatus(cloudRow.status)
-							? null
-							: cloudRowAttention(
-									cloudRow,
-									cloudReadAt[cloudRow.id],
-									!!manualUnread[cloudRow.id],
-								)
-						: (attentionByWorkspace.get(workspace.id) ??
-							(manualUnread[workspace.id] ? "review" : null));
+						? rowAttention.cloud(cloudRow)
+						: rowAttention.host(workspace);
 					const detailParts = rowDetailParts({
 						state: attention ? attentionLabel(attention) : null,
 						pullRequest: null,

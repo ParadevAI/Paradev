@@ -13,7 +13,7 @@ import {
 } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { CloudPullRequest } from "../../hooks/useCloudPullRequests";
-import { cloudRowAttention } from "../../utils/needsMe";
+import { cloudRowAttention, isCloudRowUnread } from "../../utils/needsMe";
 import { rowDetailParts } from "../RowDetailLine";
 import { WorkspaceLead } from "../WorkspaceLead";
 import { WorkspaceRowFrame } from "../WorkspaceRowFrame";
@@ -70,11 +70,7 @@ export function CloudWorkspaceRow({
 	const markCloudRead = useUnreadWorkspacesStore(
 		(state) => state.markCloudRead,
 	);
-	const isRead =
-		!manuallyUnread &&
-		(row.agentStatusAt === null ||
-			(readAt ?? 0) >= row.agentStatusAt.getTime());
-	const isUnread = manuallyUnread || (row.agentStatus === "review" && !isRead);
+	const isUnread = isCloudRowUnread(row, readAt, manuallyUnread);
 	const toggleUnread = () => {
 		if (!isUnread) {
 			setManualUnread(row.id);
