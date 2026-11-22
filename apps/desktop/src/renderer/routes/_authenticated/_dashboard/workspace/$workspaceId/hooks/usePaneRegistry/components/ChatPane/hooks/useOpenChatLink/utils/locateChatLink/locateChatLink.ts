@@ -1,4 +1,4 @@
-import { bareWebUrl } from "../../../../../ChatSession/utils/bareWebUrl";
+import { bareWebUrl } from "renderer/lib/bareWebUrl";
 import { type LocatedPath, locatePath } from "../locatePath";
 
 export type ChatLinkTarget =

@@ -2,8 +2,8 @@ import { Trans } from "@lingui/react/macro";
 import { ShimmerLabel } from "@superset/ui/ai-elements/shimmer-label";
 import { cn } from "@superset/ui/utils";
 import { FileIcon } from "renderer/lib/fileIcons";
+import { isLocalPathText } from "renderer/lib/pathText";
 import { useChatPaneActions } from "../../../../../../providers/ChatPaneActionsProvider";
-import { isLocalPathText } from "../../../../../../utils/pathText";
 import { fileName } from "../../../../utils/fileChange";
 import {
 	intentLocation,

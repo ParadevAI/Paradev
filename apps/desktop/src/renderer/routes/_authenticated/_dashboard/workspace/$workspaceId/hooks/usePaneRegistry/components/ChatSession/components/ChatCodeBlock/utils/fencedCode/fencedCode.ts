@@ -4,7 +4,7 @@ import {
 	isLocalPathText,
 	pathFileName,
 	stripLocation,
-} from "../../../../utils/pathText";
+} from "renderer/lib/pathText";
 
 const LANGUAGE_CLASS = /(?:^|\s)language-([^\s]+)/;
 const LINE_RANGE_PATH = /^(\d+):\d+:(.+)$/;
