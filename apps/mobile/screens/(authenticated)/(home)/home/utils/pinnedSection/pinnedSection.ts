@@ -79,7 +79,6 @@ export function withPinnedSection(
 			kind: "hostLabel",
 			placeId: PINNED_PLACE_ID,
 			name: pinned.label,
-			cloud: false,
 			status: "online",
 			first: true,
 			collapsible: true,

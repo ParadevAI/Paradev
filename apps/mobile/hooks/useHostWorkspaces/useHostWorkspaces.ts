@@ -36,12 +36,9 @@ export interface HostWorkspacesCacheOps {
 	invalidateHost: (hostId: string) => void;
 }
 
-export interface UseHostWorkspacesResult
+export interface UseHostsWorkspacesResult
 	extends Omit<HostWorkspacesState, "failed"> {
 	cache: HostWorkspacesCacheOps;
-}
-
-export interface UseHostsWorkspacesResult extends UseHostWorkspacesResult {
 	byHost: Map<string, HostWorkspacesState>;
 }
 
@@ -126,13 +123,4 @@ export function useHostsWorkspaces(
 	}, [stableHosts, queryClient]);
 
 	return { workspaces, isReady, cache, byHost };
-}
-
-/** One host's workspaces; see useHostsWorkspaces. */
-export function useHostWorkspaces(
-	host: WorkspacesHost | null,
-): UseHostWorkspacesResult {
-	const hosts = useMemo(() => (host ? [host] : []), [host]);
-	const { workspaces, isReady, cache } = useHostsWorkspaces(hosts);
-	return { workspaces, isReady, cache };
 }

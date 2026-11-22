@@ -410,7 +410,6 @@ export function HomeScreen() {
 	const sectionOptions = useMemo<HostSectionOptions>(
 		() => ({
 			sort,
-			pinnedAt,
 			activityTs,
 			rowAttention,
 			isCollapsed: (machineId, key) =>
@@ -420,7 +419,6 @@ export function HomeScreen() {
 		}),
 		[
 			sort,
-			pinnedAt,
 			activityTs,
 			rowAttention,
 			collapsed,
@@ -665,7 +663,6 @@ export function HomeScreen() {
 					kind: "hostLabel",
 					placeId: selectedHost.machineId,
 					name: selectedHost.name,
-					cloud: false,
 					status: statusOf(selectedHost),
 					lastSeenAt: selectedHost.lastSeenAt,
 					retry: true,

@@ -32,7 +32,7 @@ export const CLOUD_PLACE_ID = "cloud";
 function placeItems(
 	placeId: string,
 	place: PlaceContent,
-	header: { cloud: boolean; status: PlaceStatus; lastSeenAt?: number | null },
+	header: { status: PlaceStatus; lastSeenAt?: number | null },
 ): HomeListItem[] {
 	const attentions = place.attentions ?? [];
 	const collapsed = place.collapsed ?? false;
@@ -70,7 +70,6 @@ export function buildAllHostsList({
 		a.name.localeCompare(b.name);
 	const hostItems = (host: AllHostsPlace) =>
 		placeItems(host.machineId, host, {
-			cloud: false,
 			status: host.status,
 			lastSeenAt: host.lastSeenAt,
 		});
@@ -79,9 +78,7 @@ export function buildAllHostsList({
 			.filter((host) => !isPlaceUnreachable(host.status))
 			.sort(byName)
 			.flatMap(hostItems),
-		...(cloud
-			? placeItems(CLOUD_PLACE_ID, cloud, { cloud: true, status: "online" })
-			: []),
+		...(cloud ? placeItems(CLOUD_PLACE_ID, cloud, { status: "online" }) : []),
 		...hosts
 			.filter((host) => isPlaceUnreachable(host.status))
 			.sort(byName)

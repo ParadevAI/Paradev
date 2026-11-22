@@ -7,7 +7,7 @@ import { useSession } from "@/lib/auth/client";
 import { apiClient } from "@/lib/trpc/client";
 import type { CloudRepos } from "../../utils/buildCloudSection";
 
-export function getCloudReposQueryKey(organizationId: string | null) {
+function cloudReposQueryKey(organizationId: string | null) {
 	return ["cloud", "cloudWorkspace", "repositories", organizationId] as const;
 }
 
@@ -19,7 +19,7 @@ export function useCloudRepos(): CloudRepos {
 	const { workspaces } = useCloudWorkspaces();
 
 	const query = useQuery({
-		queryKey: getCloudReposQueryKey(organizationId),
+		queryKey: cloudReposQueryKey(organizationId),
 		enabled: enabledByFlag && organizationId !== null,
 		staleTime: 5 * 60_000,
 		queryFn: () =>

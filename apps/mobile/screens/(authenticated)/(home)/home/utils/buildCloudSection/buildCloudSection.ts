@@ -121,12 +121,7 @@ export function buildCloudSection(
 			section.rows,
 			[],
 		);
-		for (const child of orderProjectChildren(
-			grouped,
-			sort,
-			time,
-			() => false,
-		)) {
+		for (const child of orderProjectChildren(grouped, sort, time)) {
 			if (child.type === "workspace") {
 				items.push({ kind: "cloudRow", row: child.workspace });
 				continue;

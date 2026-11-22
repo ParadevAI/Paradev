@@ -14,11 +14,6 @@ interface CollapsedProjectsStore {
 	/** False until AsyncStorage answers — sections would flash open before it. */
 	hasHydrated: boolean;
 	toggleProject: (machineId: string, projectId: string) => void;
-	setAllCollapsed: (
-		machineId: string,
-		projectIds: string[],
-		collapsed: boolean,
-	) => void;
 	/** Forgets collapsed places (machines, Cloud) that no longer exist. */
 	prunePlaces: (placeIds: readonly string[]) => void;
 }
@@ -48,17 +43,6 @@ export const useCollapsedProjectsStore = create<CollapsedProjectsStore>()(
 				set((state) => {
 					const collapsed = prunePlaceKeys(state.collapsed, placeIds);
 					return collapsed === state.collapsed ? state : { collapsed };
-				});
-			},
-			setAllCollapsed: (machineId, projectIds, collapsed) => {
-				set((state) => {
-					const next = { ...state.collapsed };
-					for (const projectId of projectIds) {
-						const key = collapsedProjectKey(machineId, projectId);
-						if (collapsed) next[key] = true;
-						else delete next[key];
-					}
-					return { collapsed: next };
 				});
 			},
 		}),

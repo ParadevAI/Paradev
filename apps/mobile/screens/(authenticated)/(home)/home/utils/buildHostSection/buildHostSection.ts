@@ -22,13 +22,12 @@ export interface HostSectionInput {
 
 export interface HostSectionOptions {
 	sort: WorkspaceSort;
-	pinnedAt: Readonly<Record<string, number>>;
 	activityTs: (workspace: HostWorkspaceItem) => number;
 	rowAttention: (workspace: HostWorkspaceItem) => TerminalAttention | null;
 	isCollapsed: (machineId: string, key: string) => boolean;
 	noProjectName: string;
 	/** Rows listed in the Pinned section instead of under their project. */
-	lifted?: ReadonlySet<string>;
+	lifted: ReadonlySet<string>;
 }
 
 /** One host's projects, groups and rows, as Home lists a single machine. */
@@ -36,7 +35,6 @@ export function buildHostSection(
 	{ machineId, workspaces, projects, tagSettings, offline }: HostSectionInput,
 	{
 		sort,
-		pinnedAt,
 		activityTs,
 		rowAttention,
 		isCollapsed,
@@ -46,15 +44,7 @@ export function buildHostSection(
 ): HomeListItem[] {
 	const items: HomeListItem[] = [];
 
-	// Pinned first (oldest pin leads, desktop's ordering), then newest.
-	const byPinThenActivity = (a: HostWorkspaceItem, b: HostWorkspaceItem) => {
-		const aPin = pinnedAt[a.id];
-		const bPin = pinnedAt[b.id];
-		if (aPin !== undefined || bPin !== undefined) {
-			if (aPin === undefined) return 1;
-			if (bPin === undefined) return -1;
-			return aPin - bPin;
-		}
+	const newestFirst = (a: HostWorkspaceItem, b: HostWorkspaceItem) => {
 		const diff = activityTs(b) - activityTs(a);
 		return Number.isNaN(diff) ? a.name.localeCompare(b.name) : diff;
 	};
@@ -66,7 +56,7 @@ export function buildHostSection(
 	// shell nothing can run in — not worth a list slot.
 	const pool = hostRows.filter(
 		(workspace) =>
-			workspace.worktreeExists !== false && !lifted?.has(workspace.id),
+			workspace.worktreeExists !== false && !lifted.has(workspace.id),
 	);
 
 	// A project id the host no longer reports is as good as none: grouping
@@ -99,9 +89,7 @@ export function buildHostSection(
 	]
 		.map((section) => ({
 			...section,
-			workspaces: (byProject.get(section.projectId) ?? []).sort(
-				byPinThenActivity,
-			),
+			workspaces: (byProject.get(section.projectId) ?? []).sort(newestFirst),
 		}))
 		.filter((section) => section.workspaces.length > 0)
 		// Projects keep one order in every mode, as on desktop: newest first.
@@ -147,12 +135,7 @@ export function buildHostSection(
 				(workspace) => workspace.projectId === projectId,
 			),
 		};
-		const children = orderProjectChildren(
-			grouped,
-			sort,
-			activityTs,
-			(workspace) => pinnedAt[workspace.id] !== undefined,
-		);
+		const children = orderProjectChildren(grouped, sort, activityTs);
 		for (const child of children) {
 			if (child.type === "workspace") {
 				items.push({

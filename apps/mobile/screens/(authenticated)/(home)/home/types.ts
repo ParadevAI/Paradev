@@ -27,7 +27,6 @@ export type HomeListItem =
 			/** A machine id, or "cloud". */
 			placeId: string;
 			name: string;
-			cloud: boolean;
 			status: PlaceStatus;
 			lastSeenAt?: number | null;
 			/** Offers Try again, for the single-host offline notice. */

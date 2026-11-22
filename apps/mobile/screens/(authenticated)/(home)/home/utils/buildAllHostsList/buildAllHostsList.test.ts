@@ -22,7 +22,7 @@ const workspace = (
 
 const options = {
 	sort: "manual" as const,
-	pinnedAt: {},
+	lifted: new Set<string>(),
 	activityTs: () => 0,
 	rowAttention: () => null,
 	isCollapsed: () => false,
@@ -184,7 +184,6 @@ describe("buildAllHostsList", () => {
 		}));
 		const ticked = selectedHosts(org, {
 			hosts: ["delta", "beta"],
-			cloud: false,
 		});
 		const list = buildAllHostsList({
 			hosts: ticked.map((host) => ({

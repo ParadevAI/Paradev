@@ -15,8 +15,7 @@ const rank = (time: number) =>
  *
  * - `manual`: ungrouped rows, then folders, as on a desktop sidebar nobody
  *   has dragged.
- * - `active` and `created`: pinned rows first, then rows and folders mixed,
- *   newest first. A folder's activity is its newest row's. Its creation time
+ * - `active` and `created`: rows and folders mixed, newest first. A folder's activity is its newest row's. Its creation time
  *   is unknown here, so under `created` folders sink below the rows, as
  *   desktop's folders without a stored row do.
  */
@@ -24,7 +23,6 @@ export function orderProjectChildren<W extends { name: string }>(
 	{ ungrouped, folders }: ProjectTagFolders<W>,
 	sort: WorkspaceSort,
 	time: (workspace: W) => number,
-	isPinned: (workspace: W) => boolean,
 ): ProjectChild<W>[] {
 	const rows = ungrouped.map(
 		(workspace): ProjectChild<W> => ({ type: "workspace", workspace }),
@@ -42,14 +40,10 @@ export function orderProjectChildren<W extends { name: string }>(
 			...child.folder.workspaces.map((workspace) => rank(time(workspace))),
 		);
 	};
-	const pinned = (child: ProjectChild<W>) =>
-		child.type === "workspace" && isPinned(child.workspace);
 	const name = (child: ProjectChild<W>) =>
 		child.type === "workspace" ? child.workspace.name : child.folder.name;
 
 	return [...rows, ...groups].sort((a, b) => {
-		if (pinned(a) !== pinned(b)) return pinned(a) ? -1 : 1;
-		if (pinned(a)) return 0;
 		const diff = childTime(b) - childTime(a);
 		if (diff > 0 || diff < 0) return diff;
 		return name(a).localeCompare(name(b));

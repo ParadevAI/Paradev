@@ -1,12 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { i18n } from "@superset/i18n";
-import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { View } from "react-native";
 import { RowLink } from "@/components/RowLink";
 import { Text } from "@/components/ui/text";
-import type { CloudWorkspaceStatus } from "@/hooks/useCloudWorkspaceItems";
 import type {
 	HostWorkspaceItem,
 	HostWorkspacesCacheOps,
@@ -45,7 +43,6 @@ export function WorkspaceRow({
 	cache,
 	attention,
 	sessions,
-	cloudStatus,
 	onCopied,
 	card = false,
 	groups,
@@ -61,8 +58,6 @@ export function WorkspaceRow({
 	cache: HostWorkspacesCacheOps;
 	attention?: TerminalAttention | null;
 	sessions: TerminalRowData[];
-	/** Set for a cloud workspace; drives the row's pending/failed treatment. */
-	cloudStatus?: CloudWorkspaceStatus;
 	/** Copy ID landed on the pasteboard; the screen shows its "Copied" notice. */
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row indented under its project. */
@@ -93,8 +88,8 @@ export function WorkspaceRow({
 		shareWorkspace,
 		isUnread,
 		toggleUnread,
-	} = useWorkspaceRowActions(workspace, cache, sessions, cloudStatus, onCopied);
-	const move = useWorkspaceMove(workspace, cache, cloudStatus !== undefined);
+	} = useWorkspaceRowActions(workspace, cache, sessions, undefined, onCopied);
+	const move = useWorkspaceMove(workspace, cache, false);
 	// A manual mark reads as `review` — desktop's rollup ranks it lowest, so
 	// any live status the sessions are reporting keeps the slot.
 	const rowAttention = attention ?? (isUnread ? "review" : null);
@@ -103,7 +98,7 @@ export function WorkspaceRow({
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
-	const state = cloudStatus === "failed" ? "failed" : (rowAttention ?? null);
+	const state = rowAttention ?? null;
 	const detailParts = rowDetailParts({
 		state: state ? attentionLabel(state) : null,
 		pullRequest:
@@ -123,15 +118,11 @@ export function WorkspaceRow({
 	return (
 		<RowLink href={href}>
 			<WorkspaceRowMenu
-				// A sandbox that doesn't exist yet has nothing to rename or delete; a
-				// failed one only needs disposing of. Deleting a local workspace
-				// retires the record and leaves the checkout alone, so every row on
-				// a host is deletable.
-				canRename={
-					cloudStatus === undefined || isLiveCloudWorkspaceStatus(cloudStatus)
-				}
-				canDelete={cloudStatus === undefined || cloudStatus !== "provisioning"}
-				isCloud={cloudStatus !== undefined}
+				// Deleting a local workspace retires the record and leaves the
+				// checkout alone, so every row on a host is deletable.
+				canRename
+				canDelete
+				isCloud={false}
 				isUnread={isUnread}
 				onToggleUnread={toggleUnread}
 				pinned={pinned}
@@ -148,8 +139,8 @@ export function WorkspaceRow({
 					lead={
 						<WorkspaceLead
 							attention={rowAttention}
-							creating={cloudStatus === "provisioning"}
-							failed={cloudStatus === "failed"}
+							creating={false}
+							failed={false}
 							pullRequest={
 								prIcon && pullRequest
 									? {
@@ -206,12 +197,7 @@ export function WorkspaceRow({
 					accessibilityLabel={[
 						workspace.name,
 						...detailParts.map((part) => part.text),
-						cloudStatus === "provisioning"
-							? t({ message: "Creating the sandbox" })
-							: null,
-					]
-						.filter(Boolean)
-						.join(", ")}
+					].join(", ")}
 					phLabel="workspace-row"
 				/>
 			</WorkspaceRowMenu>

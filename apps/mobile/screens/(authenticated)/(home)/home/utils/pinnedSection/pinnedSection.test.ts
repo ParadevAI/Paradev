@@ -64,7 +64,6 @@ describe("withPinnedSection", () => {
 			kind: "hostLabel",
 			placeId: "m1",
 			name: "Alpha",
-			cloud: false,
 			status: "online",
 			first: true,
 		},
