@@ -88,7 +88,7 @@ import { useTagFolderActions } from "./hooks/useTagFolderActions";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
 import {
 	collapsedProjectKey,
-	PLACE_COLLAPSE_KEY,
+	isPlaceCollapsed,
 	useCollapsedProjectsStore,
 } from "./stores/collapsedProjectsStore";
 import { useComposerFocusStore } from "./stores/composerFocusStore";
@@ -97,13 +97,13 @@ import {
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
 import { type HomeListItem, homeListItemKey } from "./types";
-import { buildAllHostsList, CLOUD_PLACE_ID } from "./utils/buildAllHostsList";
 import { buildCloudSection, repoShortName } from "./utils/buildCloudSection";
 import {
 	buildHostSection,
 	type HostSectionOptions,
 	NO_PROJECT_SECTION_ID,
 } from "./utils/buildHostSection";
+import { buildPlacesList, CLOUD_PLACE_ID } from "./utils/buildPlacesList";
 import {
 	buildNeedsMeList,
 	cloudRowAttention,
@@ -291,6 +291,7 @@ export function HomeScreen() {
 	const toggleProject = useCollapsedProjectsStore(
 		(state) => state.toggleProject,
 	);
+	const togglePlace = useCollapsedProjectsStore((state) => state.togglePlace);
 	const prunePlaces = useCollapsedProjectsStore((state) => state.prunePlaces);
 	// Only an answered roster says a machine is gone.
 	useEffect(() => {
@@ -582,9 +583,8 @@ export function HomeScreen() {
 				nothingSaved: t({ message: "No saved workspaces" }),
 			};
 			const placeCollapsed = (placeId: string) =>
-				collapseHydrated &&
-				!!collapsed[collapsedProjectKey(placeId, PLACE_COLLAPSE_KEY)];
-			return buildAllHostsList({
+				collapseHydrated && isPlaceCollapsed(collapsed, placeId);
+			return buildPlacesList({
 				hosts: scopeHosts.map((host) => {
 					const status = statusOf(host);
 					const state = workspacesByHost.get(host.machineId);
@@ -660,7 +660,7 @@ export function HomeScreen() {
 		if (hostOffline) {
 			return [
 				{
-					kind: "hostLabel",
+					kind: "placeLabel",
 					placeId: selectedHost.machineId,
 					name: selectedHost.name,
 					status: statusOf(selectedHost),
@@ -724,10 +724,7 @@ export function HomeScreen() {
 							: cloudRowAttentionOf(entry.row),
 					),
 					collapsed:
-						collapseHydrated &&
-						!!collapsed[
-							collapsedProjectKey(PINNED_PLACE_ID, PLACE_COLLAPSE_KEY)
-						],
+						collapseHydrated && isPlaceCollapsed(collapsed, PINNED_PLACE_ID),
 				},
 			),
 		);
@@ -890,7 +887,7 @@ export function HomeScreen() {
 			if (item.kind === "placeEmpty") {
 				return <PlaceEmptyNote label={item.label} />;
 			}
-			if (item.kind === "hostLabel") {
+			if (item.kind === "placeLabel") {
 				return (
 					<HostLabel
 						name={item.name}
@@ -905,7 +902,7 @@ export function HomeScreen() {
 							item.collapsible
 								? () => {
 										void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-										toggleProject(item.placeId, PLACE_COLLAPSE_KEY);
+										togglePlace(item.placeId);
 									}
 								: undefined
 						}
@@ -1093,6 +1090,7 @@ export function HomeScreen() {
 			attentionByWorkspace,
 			terminalsByWorkspace,
 			toggleProject,
+			togglePlace,
 			refreshPresence,
 			setTargetKey,
 			requestComposerFocus,

@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { prunePlaceKeys } from "./prunePlaceKeys";
+import { PLACE_COLLAPSE_KEY, prunePlaceKeys } from "./prunePlaceKeys";
 
 /**
  * Which project sections are shut, keyed `machineId:projectId` — collapse is
@@ -14,6 +14,8 @@ interface CollapsedProjectsStore {
 	/** False until AsyncStorage answers — sections would flash open before it. */
 	hasHydrated: boolean;
 	toggleProject: (machineId: string, projectId: string) => void;
+	/** Folds a whole place (a machine, Cloud, Pinned) under its label. */
+	togglePlace: (placeId: string) => void;
 	/** Forgets collapsed places (machines, Cloud) that no longer exist. */
 	prunePlaces: (placeIds: readonly string[]) => void;
 }
@@ -24,11 +26,20 @@ export function collapsedProjectKey(machineId: string, projectId: string) {
 
 export { PLACE_COLLAPSE_KEY } from "./prunePlaceKeys";
 
+export function isPlaceCollapsed(
+	collapsed: Readonly<Record<string, true>>,
+	placeId: string,
+): boolean {
+	return !!collapsed[collapsedProjectKey(placeId, PLACE_COLLAPSE_KEY)];
+}
+
 export const useCollapsedProjectsStore = create<CollapsedProjectsStore>()(
 	persist(
-		(set) => ({
+		(set, get) => ({
 			collapsed: {},
 			hasHydrated: false,
+			togglePlace: (placeId) =>
+				get().toggleProject(placeId, PLACE_COLLAPSE_KEY),
 			toggleProject: (machineId, projectId) => {
 				set((state) => {
 					const key = collapsedProjectKey(machineId, projectId);

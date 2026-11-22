@@ -61,7 +61,7 @@ describe("pinnedRows", () => {
 describe("withPinnedSection", () => {
 	const list: HomeListItem[] = [
 		{
-			kind: "hostLabel",
+			kind: "placeLabel",
 			placeId: "m1",
 			name: "Alpha",
 			status: "online",
@@ -78,7 +78,7 @@ describe("withPinnedSection", () => {
 			collapsed: false,
 		});
 		expect(items[0]).toMatchObject({
-			kind: "hostLabel",
+			kind: "placeLabel",
 			placeId: "pinned",
 			count: 1,
 			first: true,

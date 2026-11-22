@@ -23,7 +23,7 @@ export interface ProjectGroups {
 
 export type HomeListItem =
 	| {
-			kind: "hostLabel";
+			kind: "placeLabel";
 			/** A machine id, or "cloud". */
 			placeId: string;
 			name: string;
@@ -114,7 +114,7 @@ export type HomeListItem =
 
 export function homeListItemKey(item: HomeListItem): string {
 	switch (item.kind) {
-		case "hostLabel":
+		case "placeLabel":
 			return `host:${item.placeId}`;
 		case "placeEmpty":
 			return `empty:${item.placeId}`;

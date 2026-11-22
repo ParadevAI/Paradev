@@ -3,7 +3,7 @@ import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import { selectedHosts } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import type { HomeListItem } from "../../types";
 import { buildHostSection } from "../buildHostSection";
-import { buildAllHostsList } from "./buildAllHostsList";
+import { buildPlacesList } from "./buildPlacesList";
 
 const workspace = (
 	id: string,
@@ -40,7 +40,7 @@ const project = {
 
 const describeItem = (item: HomeListItem) => {
 	switch (item.kind) {
-		case "hostLabel":
+		case "placeLabel":
 			return `label:${item.name}${item.status === "online" ? "" : `:${item.status}`}`;
 		case "projectHeader":
 			return `project:${item.name}${item.offline ? ":offline" : ""}`;
@@ -55,7 +55,7 @@ const describeItem = (item: HomeListItem) => {
 	}
 };
 
-describe("buildAllHostsList", () => {
+describe("buildPlacesList", () => {
 	test("lists online hosts by name, then Cloud, then offline hosts with their cached rows", () => {
 		const section = (machineId: string, offline: boolean) =>
 			buildHostSection(
@@ -68,7 +68,7 @@ describe("buildAllHostsList", () => {
 				},
 				options,
 			);
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: [
 				{
 					machineId: "m3",
@@ -111,7 +111,7 @@ describe("buildAllHostsList", () => {
 	});
 
 	test("says why an empty place has no rows, and only when that is known", () => {
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: [
 				{
 					machineId: "m1",
@@ -144,7 +144,7 @@ describe("buildAllHostsList", () => {
 	});
 
 	test("keeps a host with pending presence among the reachable ones, loading", () => {
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: [
 				{
 					machineId: "m1",
@@ -164,7 +164,7 @@ describe("buildAllHostsList", () => {
 	});
 
 	test("marks only the first label as the list's first item", () => {
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: [
 				{ machineId: "m1", name: "Alpha", status: "online", items: [] },
 				{ machineId: "m2", name: "Beta", status: "online", items: [] },
@@ -172,7 +172,7 @@ describe("buildAllHostsList", () => {
 			cloud: null,
 		});
 		expect(
-			list.map((item) => (item.kind === "hostLabel" ? !!item.first : null)),
+			list.map((item) => (item.kind === "placeLabel" ? !!item.first : null)),
 		).toEqual([true, false]);
 	});
 
@@ -185,7 +185,7 @@ describe("buildAllHostsList", () => {
 		const ticked = selectedHosts(org, {
 			hosts: ["delta", "beta"],
 		});
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: ticked.map((host) => ({
 				machineId: host.machineId,
 				name: host.name,
@@ -201,7 +201,7 @@ describe("buildAllHostsList", () => {
 	});
 
 	test("a collapsed host hides its rows and empty note, keeping its header", () => {
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: [
 				{
 					machineId: "m1",
@@ -232,7 +232,7 @@ describe("buildAllHostsList", () => {
 
 	test("a collapsed place's header rolls up the most urgent state and the count", () => {
 		const place = (collapsed: boolean) =>
-			buildAllHostsList({
+			buildPlacesList({
 				hosts: [
 					{
 						machineId: "m1",
@@ -246,7 +246,7 @@ describe("buildAllHostsList", () => {
 				cloud: null,
 			})[0];
 		expect(place(true)).toMatchObject({
-			kind: "hostLabel",
+			kind: "placeLabel",
 			collapsed: true,
 			count: 4,
 			attention: "permission",
@@ -255,7 +255,7 @@ describe("buildAllHostsList", () => {
 	});
 
 	test("leaves Cloud out where it is not offered", () => {
-		const list = buildAllHostsList({
+		const list = buildPlacesList({
 			hosts: [
 				{
 					machineId: "m1",

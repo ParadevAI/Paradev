@@ -16,7 +16,7 @@ interface PlaceContent {
 	attentions?: readonly (TerminalAttention | null | undefined)[];
 }
 
-export interface AllHostsPlace extends PlaceContent {
+export interface Place extends PlaceContent {
 	machineId: string;
 	status: PlaceStatus;
 	lastSeenAt?: number | null;
@@ -37,7 +37,7 @@ function placeItems(
 	const attentions = place.attentions ?? [];
 	const collapsed = place.collapsed ?? false;
 	const label: HomeListItem = {
-		kind: "hostLabel",
+		kind: "placeLabel",
 		placeId,
 		name: place.name,
 		...header,
@@ -58,17 +58,16 @@ function placeItems(
  * nesting: hosts that are or may be online by name, then Cloud, then hosts
  * that can't answer by name.
  */
-export function buildAllHostsList({
+export function buildPlacesList({
 	hosts,
 	cloud,
 }: {
-	hosts: readonly AllHostsPlace[];
+	hosts: readonly Place[];
 	/** Null where Cloud is not offered. */
 	cloud: PlaceContent | null;
 }): HomeListItem[] {
-	const byName = (a: AllHostsPlace, b: AllHostsPlace) =>
-		a.name.localeCompare(b.name);
-	const hostItems = (host: AllHostsPlace) =>
+	const byName = (a: Place, b: Place) => a.name.localeCompare(b.name);
+	const hostItems = (host: Place) =>
 		placeItems(host.machineId, host, {
 			status: host.status,
 			lastSeenAt: host.lastSeenAt,
@@ -85,6 +84,6 @@ export function buildAllHostsList({
 			.flatMap(hostItems),
 	];
 	const [head] = list;
-	if (head?.kind === "hostLabel") list[0] = { ...head, first: true };
+	if (head?.kind === "placeLabel") list[0] = { ...head, first: true };
 	return list;
 }

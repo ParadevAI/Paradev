@@ -1,7 +1,7 @@
 import type { HomeListItem } from "../../types";
 
 const isSectionLabel = (item: HomeListItem | undefined) =>
-	item?.kind === "hostLabel" || item?.kind === "sectionLabel";
+	item?.kind === "placeLabel" || item?.kind === "sectionLabel";
 
 /**
  * What each item draws from its neighbours: a row's hairline (none before a

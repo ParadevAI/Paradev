@@ -70,13 +70,13 @@ export function withPinnedSection(
 ): HomeListItem[] {
 	if (pinned.rows.length === 0) return [...list];
 	const rest = list.map((item, index) =>
-		index === 0 && (item.kind === "hostLabel" || item.kind === "sectionLabel")
+		index === 0 && (item.kind === "placeLabel" || item.kind === "sectionLabel")
 			? { ...item, first: false }
 			: item,
 	);
 	return [
 		{
-			kind: "hostLabel",
+			kind: "placeLabel",
 			placeId: PINNED_PLACE_ID,
 			name: pinned.label,
 			status: "online",
