@@ -1659,14 +1659,8 @@ msgstr "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 
-msgid "<0>Download on the</0><1>App Store</1>"
-msgstr "<0>Download on the</0><1>App Store</1>"
-
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · you are here"
-
-msgid "<0>Get it on</0><1>Google Play</1>"
-msgstr "<0>Get it on</0><1>Google Play</1>"
 
 msgid "<0>Nerd Fonts</0> are recommended."
 msgstr "<0>Nerd Fonts</0> are recommended."

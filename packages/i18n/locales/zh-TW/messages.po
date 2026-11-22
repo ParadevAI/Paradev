@@ -1659,14 +1659,8 @@ msgstr "<0>#{0}</0> <1>／排行榜 {1} 人中</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> 或 <1>apiKeyHelper</1>"
 
-msgid "<0>Download on the</0><1>App Store</1>"
-msgstr "<1>App Store</1><0>下載</0>"
-
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · 你在這裡"
-
-msgid "<0>Get it on</0><1>Google Play</1>"
-msgstr "<1>Google Play</1><0>下載</0>"
 
 msgid "<0>Nerd Fonts</0> are recommended."
 msgstr "推薦使用<0>Nerd Fonts</0>。"
