@@ -13773,9 +13773,6 @@ msgstr "Не в мережі, був {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Старіші"
-
 msgid "On"
 msgstr "Увімкнено"
 
@@ -20946,9 +20943,6 @@ msgstr "Цей тенант Microsoft уже підключено до іншо�
 msgid "This model isn't available"
 msgstr "Ця модель недоступна"
 
-msgid "This month"
-msgstr "Цього місяця"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Це перенесення зупинено. Чат досі в попередньому робочому просторі."
 
@@ -21119,9 +21113,6 @@ msgstr "Цей користувач запускає службу хоста д�
 
 msgid "This view hit an error"
 msgstr "У цьому вигляді сталася помилка"
-
-msgid "This week"
-msgstr "Цього тижня"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Усі відкриті пул-реквести до #{prNumber} буде атомарно злито в {base} за допомогою коміту злиття."

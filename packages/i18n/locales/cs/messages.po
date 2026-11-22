@@ -13779,9 +13779,6 @@ msgstr "Offline, naposledy {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Starší"
-
 msgid "On"
 msgstr "Zapnuto"
 
@@ -20952,9 +20949,6 @@ msgstr "Tento tenant Microsoftu už má připojený jiná organizace Paradev."
 msgid "This model isn't available"
 msgstr "Tento model není dostupný"
 
-msgid "This month"
-msgstr "Tento měsíc"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Tento přesun se zastavil. Chat je stále v původním pracovním prostoru."
 
@@ -21125,9 +21119,6 @@ msgstr "Tento uživatel provozuje host service pro toto zařízení a musí zůs
 
 msgid "This view hit an error"
 msgstr "V tomto zobrazení došlo k chybě"
-
-msgid "This week"
-msgstr "Tento týden"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Všechny otevřené pull requesty až po #{prNumber} budou atomicky sloučeny do {base} pomocí slučovacího commitu."

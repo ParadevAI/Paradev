@@ -50,6 +50,7 @@ export type HomeListItem =
 	  }
 	| {
 			kind: "projectHeader";
+			/** A machine id, or "cloud" for a Cloud repository's section. */
 			machineId: string;
 			projectId: string;
 			name: string;
@@ -58,17 +59,21 @@ export type HomeListItem =
 			collapsed: boolean;
 			attention: TerminalAttention | null;
 			offline: boolean;
+			/** A Cloud repository: no "+", the composer has one Cloud target. */
+			cloud?: boolean;
 	  }
-	| {
+	| ({
 			kind: "folderHeader";
 			machineId: string;
-			folder: TagFolderGroup<HostWorkspaceItem>;
 			collapsed: boolean;
 			attention: TerminalAttention | null;
-			groups: ProjectGroups;
 			offline: boolean;
 			bar?: GroupBarSpan | null;
-	  }
+	  } & (
+			| { folder: TagFolderGroup<HostWorkspaceItem>; groups: ProjectGroups }
+			/** A Cloud group: read-only, its tag has no folder settings. */
+			| { folder: TagFolderGroup<CloudWorkspaceRow>; groups: null }
+	  ))
 	| {
 			kind: "workspace";
 			workspace: HostWorkspaceItem;
@@ -86,7 +91,7 @@ export type HomeListItem =
 			lastSeenAt: number | null | undefined;
 	  }
 	| {
-			kind: "periodHeader";
+			kind: "sectionLabel";
 			key: string;
 			label: string;
 			/** The list's first item. */
@@ -106,8 +111,8 @@ export function homeListItemKey(item: HomeListItem): string {
 			return `folder:${item.machineId}:${item.folder.key}`;
 		case "workspace":
 			return `ws:${item.workspace.id}`;
-		case "periodHeader":
-			return `period:${item.key}`;
+		case "sectionLabel":
+			return `label:${item.key}`;
 		case "cloudRow":
 			return `cloud:${item.row.id}`;
 		default:

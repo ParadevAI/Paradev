@@ -42,7 +42,7 @@ export function CloudWorkspaceRow({
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row of the Cloud list. */
 	card?: boolean;
-	/** A muted second line, e.g. "repo · Cloud" outside the Cloud list. */
+	/** Replaces the branch line, e.g. "repo · Cloud" outside the Cloud list. */
 	detail?: string;
 }) {
 	const { t } = useLingui();
@@ -83,6 +83,8 @@ export function CloudWorkspaceRow({
 		: null;
 	const [prOwner, prRepo] = pullRequest?.repoFullName.split("/") ?? [];
 	const provisioning = row.status === "provisioning";
+	const secondLine =
+		detail ?? (row.branch && row.branch !== row.name ? row.branch : null);
 	const attention = archived
 		? null
 		: cloudRowAttention(row, readAt, manuallyUnread);
@@ -134,12 +136,12 @@ export function CloudWorkspaceRow({
 				>
 					{row.name || t({ message: "Untitled workspace" })}
 				</Text>
-				{detail ? (
+				{secondLine ? (
 					<Text
 						className="text-muted-foreground mt-1 text-[13px]"
 						numberOfLines={enlargedText ? undefined : 1}
 					>
-						{detail}
+						{secondLine}
 					</Text>
 				) : null}
 			</View>

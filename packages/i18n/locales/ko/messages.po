@@ -13779,9 +13779,6 @@ msgstr "오프라인, 마지막 확인 {0}"
 msgid "OK"
 msgstr "확인"
 
-msgid "Older"
-msgstr "이전"
-
 msgid "On"
 msgstr "켬"
 
@@ -20952,9 +20949,6 @@ msgstr "이 Microsoft 테넌트는 이미 다른 Paradev 조직이 연결했습�
 msgid "This model isn't available"
 msgstr "이 모델은 사용할 수 없습니다"
 
-msgid "This month"
-msgstr "이번 달"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "이 옮기기가 중지되었습니다. 채팅은 이전 워크스페이스에 그대로 있습니다."
 
@@ -21125,9 +21119,6 @@ msgstr "이 사용자는 이 기기의 호스트 서비스를 실행 중이므�
 
 msgid "This view hit an error"
 msgstr "이 화면에서 오류가 발생했습니다"
-
-msgid "This week"
-msgstr "이번 주"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 머지 커밋으로 {base}에 원자적으로 머지합니다."

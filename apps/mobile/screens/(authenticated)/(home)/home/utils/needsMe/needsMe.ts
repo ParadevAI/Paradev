@@ -69,7 +69,7 @@ export function buildNeedsMeList(
 		if (!list) return [];
 		return [
 			{
-				kind: "periodHeader",
+				kind: "sectionLabel",
 				key: `needs-me:${bucket}`,
 				label: labels[bucket],
 			},

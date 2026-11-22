@@ -26,6 +26,10 @@ import { cn } from "@/lib/utils";
 import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCloudRepos";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
+import {
+	type CloudRepo,
+	repoShortName,
+} from "@/screens/(authenticated)/(home)/home/utils/buildCloudSection";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import {
@@ -49,6 +53,9 @@ import { searchRowDetail } from "./utils/searchRowDetail";
  * selected machine's workspaces, or Cloud's sandboxes — machines outside the
  * scope aren't in memory to search. The count row says which pool answered.
  */
+const repoNameOf = (repo: CloudRepo | undefined) =>
+	repo ? repoShortName(repo.fullName) : null;
+
 export function SearchScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
@@ -281,7 +288,9 @@ export function SearchScreen() {
 						? (workspace.projectId &&
 								projectNamesById.get(workspace.projectId)) ||
 							null
-						: (cloudRepos.get(workspace.id)?.split("/")[1] ?? null);
+						: cloudRepos.status === "success"
+							? repoNameOf(cloudRepos.byWorkspace.get(workspace.id))
+							: null;
 					const unreachable = isUnreachable(workspace);
 					return (
 						<RowLink href={`/workspace/${workspace.id}`}>

@@ -13779,9 +13779,6 @@ msgstr "オフライン、最終確認 {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "それ以前"
-
 msgid "On"
 msgstr "オン"
 
@@ -20952,9 +20949,6 @@ msgstr "このMicrosoftテナントは別のParadev組織がすでに接続し�
 msgid "This model isn't available"
 msgstr "このモデルは利用できません"
 
-msgid "This month"
-msgstr "今月"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "この移動は停止しました。チャットは元のワークスペースにあります。"
 
@@ -21125,9 +21119,6 @@ msgstr "このユーザーはこのデバイスのホストサービスを実行
 
 msgid "This view hit an error"
 msgstr "このビューでエラーが発生しました"
-
-msgid "This week"
-msgstr "今週"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "#{prNumber} までのすべてのオープンなプルリクエストを マージコミットで {base} にアトミックにマージします。"

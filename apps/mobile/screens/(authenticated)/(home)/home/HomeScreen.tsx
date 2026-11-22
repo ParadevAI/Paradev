@@ -2,8 +2,6 @@ import { LegendList } from "@legendapp/list/react-native";
 import { useLingui } from "@lingui/react/macro";
 import { ForwardSwipe } from "@superset/forward-swipe";
 import { i18n } from "@superset/i18n";
-import { useFormat } from "@superset/i18n/react";
-import { groupCloudWorkspacesByTime } from "@superset/shared/cloud-workspace-groups";
 import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,7 +25,10 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import { useCloudWorkspaceItems } from "@/hooks/useCloudWorkspaceItems";
-import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
+import {
+	type CloudWorkspaceRow,
+	useCloudWorkspaces,
+} from "@/hooks/useCloudWorkspaces";
 import { useHostsProjects } from "@/hooks/useHostProjects";
 import {
 	type HostWorkspaceItem,
@@ -82,7 +83,6 @@ import { useFirstPaint } from "./hooks/useFirstPaint";
 import { GRID_GAP, useHomeGrid } from "./hooks/useHomeGrid";
 import { useHostTagFolders } from "./hooks/useHostTagFolders";
 import { useHostsTerminals } from "./hooks/useHostTerminals";
-import { useNow } from "./hooks/useNow";
 import { useRefreshHostsPresence } from "./hooks/useRefreshHostsPresence";
 import { useTagFolderActions } from "./hooks/useTagFolderActions";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
@@ -98,6 +98,7 @@ import {
 } from "./stores/workspacesFilterStore";
 import { type HomeListItem, homeListItemKey } from "./types";
 import { buildAllHostsList, CLOUD_PLACE_ID } from "./utils/buildAllHostsList";
+import { buildCloudSection, repoShortName } from "./utils/buildCloudSection";
 import {
 	buildHostSection,
 	type HostSectionOptions,
@@ -120,12 +121,6 @@ const VIEWABILITY_CONFIG = {
 const MAX_VISIBLE_DIFF_STATS = 20;
 
 const NAVIGATION_BAR_HEIGHT = 44;
-
-/**
- * Each machine and Cloud sit under a flat label under All hosts, never a
- * collapsible level, so the list is no deeper than one machine's. Cloud rows
- * belong to no host project, so they stay grouped by time.
- */
 
 type HomeListEntry = HomeListItem | GridRow<HomeListItem>;
 
@@ -216,9 +211,7 @@ export function HomeScreen() {
 	const { workspaces: archivedCloud, isReady: archivedReady } =
 		useArchivedCloudWorkspaces({ enabled: showArchived });
 	const { workspaces: activeCloud } = useCloudWorkspaces();
-	const { formatRelativePeriod } = useFormat();
 	const viewerId = useSession().data?.user?.id ?? null;
-	const now = useNow(30_000);
 	// Only online machines are asked. No session marks for cloud rows: a
 	// request per sandbox keeps each one awake for as long as Home is on screen.
 	const onlineScopeHosts = useMemo(
@@ -381,8 +374,6 @@ export function HomeScreen() {
 	}, [needsMeHidden]);
 	const needsMeOn = needsMeActive && !needsMeHidden;
 
-	// Under Cloud the list is desktop's: grouped by when each workspace last
-	// heard from its agent (or was archived), newest first.
 	const cloudListRows = useMemo(
 		() =>
 			cloudScope || cloudInMulti
@@ -399,27 +390,35 @@ export function HomeScreen() {
 			cloudFilters.matchesCreator,
 		],
 	);
-	const cloudListItems = useMemo<HomeListItem[]>(() => {
-		const items: HomeListItem[] = [];
-		const groups = groupCloudWorkspacesByTime({
-			workspaces: cloudListRows,
-			now,
-			sort: sort === "created" ? "created" : "activity",
-			at: showArchived ? (row) => row.deletedAt ?? row.createdAt : undefined,
-		});
-		for (const { period, workspaces: grouped } of groups) {
-			const key = `${showArchived ? "archived" : "active"}:${period.unit}:${period.count}`;
-			items.push({
-				kind: "periodHeader",
-				key,
-				label: formatRelativePeriod(period),
-			});
-			for (const row of grouped) items.push({ kind: "cloudRow", row });
-		}
-		return items;
-	}, [cloudListRows, now, sort, showArchived, formatRelativePeriod]);
-
 	const cloudRepos = useCloudRepos();
+	const cloudRowAttentionOf = useCallback(
+		(row: CloudWorkspaceRow) =>
+			isArchivedCloudWorkspaceStatus(row.status)
+				? null
+				: cloudRowAttention(row, cloudReadAt[row.id], !!manualUnread[row.id]),
+		[cloudReadAt, manualUnread],
+	);
+	// Null until the repositories answer: a row is not filed under no
+	// repository before then.
+	const cloudListItems = useMemo(
+		() =>
+			buildCloudSection(cloudListRows, cloudRepos, {
+				sort,
+				archived: showArchived,
+				rowAttention: cloudRowAttentionOf,
+				isCollapsed: sectionOptions.isCollapsed,
+				noProjectName,
+			}),
+		[
+			cloudListRows,
+			cloudRepos,
+			sort,
+			showArchived,
+			cloudRowAttentionOf,
+			sectionOptions.isCollapsed,
+			noProjectName,
+		],
+	);
 
 	// Rows waiting on you across the scope. An offline machine's attention is
 	// not known here, so its cached rows are left out.
@@ -451,18 +450,18 @@ export function HomeScreen() {
 		}
 		if (!showArchived) {
 			for (const row of cloudListRows) {
-				const repoName = cloudRepos.get(row.id)?.split("/")[1];
+				const repo =
+					cloudRepos.status === "success"
+						? cloudRepos.byWorkspace.get(row.id)
+						: undefined;
+				const repoName = repo ? repoShortName(repo.fullName) : null;
 				candidates.push({
 					item: {
 						kind: "cloudRow",
 						row,
 						detail: repoName ? `${repoName} · ${cloudName}` : cloudName,
 					},
-					attention: cloudRowAttention(
-						row,
-						cloudReadAt[row.id],
-						!!manualUnread[row.id],
-					),
+					attention: cloudRowAttentionOf(row),
 					ts: (row.agentStatusAt ?? row.createdAt).getTime(),
 				});
 			}
@@ -478,8 +477,7 @@ export function HomeScreen() {
 		showArchived,
 		cloudListRows,
 		cloudRepos,
-		cloudReadAt,
-		manualUnread,
+		cloudRowAttentionOf,
 		cloudName,
 	]);
 	const needsMeTotal = useMemo(
@@ -500,7 +498,7 @@ export function HomeScreen() {
 				working: t({ message: "Working" }),
 			});
 		}
-		if (cloudScope) return cloudListItems;
+		if (cloudScope) return cloudListItems ?? [];
 		if (multiScope) {
 			const emptyLabels: Record<PlaceEmptyState, string | null> = {
 				loading: null,
@@ -544,19 +542,17 @@ export function HomeScreen() {
 					? {
 							name: cloudName,
 							collapsed: placeCollapsed(CLOUD_PLACE_ID),
-							attentions: cloudListRows.map((row) =>
-								cloudRowAttention(
-									row,
-									cloudReadAt[row.id],
-									!!manualUnread[row.id],
-								),
-							),
-							items: cloudListItems,
+							attentions: cloudListRows.map(cloudRowAttentionOf),
+							items: cloudListItems ?? [],
 							empty: {
 								label:
-									activeCloud.length > 0
-										? t({ message: "No cloud workspaces match these filters" })
-										: t({ message: "No cloud workspaces yet" }),
+									cloudListItems === null
+										? null
+										: activeCloud.length > 0
+											? t({
+													message: "No cloud workspaces match these filters",
+												})
+											: t({ message: "No cloud workspaces yet" }),
 							},
 						}
 					: null,
@@ -608,15 +604,14 @@ export function HomeScreen() {
 		collapseHydrated,
 		rowAttention,
 		cloudListRows,
-		cloudReadAt,
-		manualUnread,
+		cloudRowAttentionOf,
 		cloudName,
 		t,
 	]);
 	// A section label at the top sits close to the chips, as a first host header does.
 	const listItems = useMemo<HomeListItem[]>(() => {
 		const [head, ...rest] = builtItems;
-		return head?.kind === "periodHeader"
+		return head?.kind === "sectionLabel"
 			? [{ ...head, first: true }, ...rest]
 			: builtItems;
 	}, [builtItems]);
@@ -763,7 +758,7 @@ export function HomeScreen() {
 
 	const renderListItem = useCallback(
 		(item: HomeListItem, card: boolean) => {
-			if (item.kind === "periodHeader") {
+			if (item.kind === "sectionLabel") {
 				return <SectionLabel label={item.label} first={item.first} />;
 			}
 			if (item.kind === "placeEmpty") {
@@ -815,8 +810,10 @@ export function HomeScreen() {
 				);
 			}
 			if (item.kind === "folderHeader") {
-				const { folder, groups } = item;
-				const actions = item.offline ? null : folderActionsFor(item.machineId);
+				const { folder } = item;
+				const hostGroup = item.groups ? item : null;
+				const actions =
+					hostGroup && !item.offline ? folderActionsFor(item.machineId) : null;
 				return (
 					<View className={item.offline ? "opacity-50" : undefined}>
 						<FolderSectionHeader
@@ -831,17 +828,24 @@ export function HomeScreen() {
 								toggleProject(item.machineId, folder.key);
 							}}
 							menu={
-								actions
+								hostGroup && actions
 									? {
 											onRename: () =>
-												void actions.renameFolder(groups.projectId, folder),
+												void actions.renameFolder(
+													hostGroup.groups.projectId,
+													hostGroup.folder,
+												),
 											onSetColor: (color) =>
-												actions.setFolderColor(groups.projectId, folder, color),
+												actions.setFolderColor(
+													hostGroup.groups.projectId,
+													hostGroup.folder,
+													color,
+												),
 											onDelete: () =>
 												void actions.deleteFolder(
-													groups.projectId,
-													folder,
-													groups.workspaces,
+													hostGroup.groups.projectId,
+													hostGroup.folder,
+													hostGroup.groups.workspaces,
 												),
 										}
 									: undefined
@@ -871,7 +875,7 @@ export function HomeScreen() {
 								toggleProject(machineId, item.projectId);
 							}}
 							onNewWorkspace={
-								item.offline
+								item.offline || item.cloud
 									? undefined
 									: () => {
 											void Haptics.impactAsync(
@@ -1169,7 +1173,7 @@ export function HomeScreen() {
 						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 					}
 					ListEmptyComponent={
-						contentReady ? (
+						contentReady && !(cloudScope && cloudListItems === null) ? (
 							<View className="items-center justify-center py-20">
 								<Text className="text-center text-muted-foreground">
 									{showArchived

@@ -13779,9 +13779,6 @@ msgstr "Ngoại tuyến, thấy lần cuối {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Cũ hơn"
-
 msgid "On"
 msgstr "Bật"
 
@@ -20952,9 +20949,6 @@ msgstr "Tenant Microsoft này đã được một tổ chức Paradev khác kế
 msgid "This model isn't available"
 msgstr "Mô hình này không khả dụng"
 
-msgid "This month"
-msgstr "Tháng này"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Việc chuyển này đã dừng. Cuộc trò chuyện vẫn ở không gian làm việc cũ."
 
@@ -21125,9 +21119,6 @@ msgstr "Người dùng này đang chạy dịch vụ host cho thiết bị này 
 
 msgid "This view hit an error"
 msgstr "Khung hiển thị này gặp lỗi"
-
-msgid "This week"
-msgstr "Tuần này"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Thao tác này sẽ merge nguyên tử mọi pull request đang mở cho đến #{prNumber} vào {base} bằng commit merge."

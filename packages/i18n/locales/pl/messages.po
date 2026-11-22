@@ -13779,9 +13779,6 @@ msgstr "Offline, widziany {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Starsze"
-
 msgid "On"
 msgstr "Wł."
 
@@ -20952,9 +20949,6 @@ msgstr "Ten tenant Microsoft jest już połączony z inną organizacją Paradev.
 msgid "This model isn't available"
 msgstr "Ten model jest niedostępny"
 
-msgid "This month"
-msgstr "W tym miesiącu"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "To przenoszenie zostało zatrzymane. Czat nadal jest w poprzednim obszarze roboczym."
 
@@ -21125,9 +21119,6 @@ msgstr "Ten użytkownik uruchamia usługę hosta dla tego urządzenia i musi poz
 
 msgid "This view hit an error"
 msgstr "Ten widok napotkał błąd"
-
-msgid "This week"
-msgstr "W tym tygodniu"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Wszystkie otwarte pull requesty do #{prNumber} zostaną atomowo scalone z {base} za pomocą commita scalającego."

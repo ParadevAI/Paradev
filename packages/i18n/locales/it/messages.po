@@ -13779,9 +13779,6 @@ msgstr "Offline, visto {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Più vecchi"
-
 msgid "On"
 msgstr "On"
 
@@ -20952,9 +20949,6 @@ msgstr "Questo tenant Microsoft è già collegato da un'altra organizzazione Par
 msgid "This model isn't available"
 msgstr "Questo modello non è disponibile"
 
-msgid "This month"
-msgstr "Questo mese"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Questo spostamento si è interrotto. La chat è ancora nel workspace precedente."
 
@@ -21125,9 +21119,6 @@ msgstr "Questo utente esegue il servizio host per questo dispositivo e deve rest
 
 msgid "This view hit an error"
 msgstr "Questa vista ha riscontrato un errore"
-
-msgid "This week"
-msgstr "Questa settimana"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Tutte le pull request aperte fino a #{prNumber} verranno unite in modo atomico in {base} con un merge commit."

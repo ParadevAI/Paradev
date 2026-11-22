@@ -42,7 +42,7 @@ describe("needsMe", () => {
 		);
 		expect(
 			list.map((item) =>
-				item.kind === "periodHeader"
+				item.kind === "sectionLabel"
 					? item.label
 					: item.kind === "workspace"
 						? item.workspace.id

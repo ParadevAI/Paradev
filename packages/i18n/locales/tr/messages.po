@@ -13779,9 +13779,6 @@ msgstr "Çevrimdışı, son görülme {0}"
 msgid "OK"
 msgstr "Tamam"
 
-msgid "Older"
-msgstr "Daha eski"
-
 msgid "On"
 msgstr "Açık"
 
@@ -20952,9 +20949,6 @@ msgstr "Bu Microsoft kiracısı başka bir Paradev kuruluşu tarafından zaten b
 msgid "This model isn't available"
 msgstr "Bu model kullanılamıyor"
 
-msgid "This month"
-msgstr "Bu ay"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Bu taşıma durdu. Sohbet hâlâ eski çalışma alanında."
 
@@ -21125,9 +21119,6 @@ msgstr "Bu kullanıcı bu cihazın host hizmetini çalıştırıyor ve sahip ola
 
 msgid "This view hit an error"
 msgstr "Bu görünüm bir hatayla karşılaştı"
-
-msgid "This week"
-msgstr "Bu hafta"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "#{prNumber} dahil tüm açık pull request'ler birleştirme commit'i ile {base} dalına atomik olarak birleştirilecek."

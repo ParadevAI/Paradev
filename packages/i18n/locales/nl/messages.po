@@ -13779,9 +13779,6 @@ msgstr "Offline, gezien {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Ouder"
-
 msgid "On"
 msgstr "Aan"
 
@@ -20952,9 +20949,6 @@ msgstr "Deze Microsoft-tenant is al gekoppeld door een andere Paradev-organisati
 msgid "This model isn't available"
 msgstr "Dit model is niet beschikbaar"
 
-msgid "This month"
-msgstr "Deze maand"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Dit verplaatsen is gestopt. De chat staat nog in de oude werkruimte."
 
@@ -21125,9 +21119,6 @@ msgstr "Deze gebruiker draait de hostservice voor dit apparaat en moet eigenaar 
 
 msgid "This view hit an error"
 msgstr "Deze weergave liep tegen een fout aan"
-
-msgid "This week"
-msgstr "Deze week"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Hiermee worden alle open pull requests tot en met #{prNumber} atomair in {base} gemerged met een mergecommit."

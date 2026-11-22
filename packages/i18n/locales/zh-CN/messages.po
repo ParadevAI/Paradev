@@ -13779,9 +13779,6 @@ msgstr "离线，上次在线 {0}"
 msgid "OK"
 msgstr "确定"
 
-msgid "Older"
-msgstr "更早"
-
 msgid "On"
 msgstr "开启"
 
@@ -20952,9 +20949,6 @@ msgstr "这个Microsoft租户已被另一个Paradev组织连接。"
 msgid "This model isn't available"
 msgstr "此模型不可用"
 
-msgid "This month"
-msgstr "本月"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "此次移动已停止。聊天仍在原来的工作区中。"
 
@@ -21125,9 +21119,6 @@ msgstr "此用户在此设备上运行主机服务，必须保持所有者身份
 
 msgid "This view hit an error"
 msgstr "此视图出错了"
-
-msgid "This week"
-msgstr "本周"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "这将使用合并提交把截至 #{prNumber} 的所有打开的拉取请求原子地合并到 {base}。"

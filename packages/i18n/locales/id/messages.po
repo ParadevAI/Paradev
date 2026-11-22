@@ -13779,9 +13779,6 @@ msgstr "Offline, terlihat {0}"
 msgid "OK"
 msgstr "OK"
 
-msgid "Older"
-msgstr "Lebih lama"
-
 msgid "On"
 msgstr "Nyala"
 
@@ -20952,9 +20949,6 @@ msgstr "Tenant Microsoft ini sudah terhubung oleh organisasi Paradev lain."
 msgid "This model isn't available"
 msgstr "Model ini tidak tersedia"
 
-msgid "This month"
-msgstr "Bulan ini"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Pemindahan ini berhenti. Chat masih ada di workspace lamanya."
 
@@ -21125,9 +21119,6 @@ msgstr "Pengguna ini menjalankan layanan host untuk perangkat ini dan harus teta
 
 msgid "This view hit an error"
 msgstr "Tampilan ini mengalami kesalahan"
-
-msgid "This week"
-msgstr "Minggu ini"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Ini akan me-merge secara atomik setiap pull request terbuka hingga #{prNumber} ke {base} menggunakan commit merge."

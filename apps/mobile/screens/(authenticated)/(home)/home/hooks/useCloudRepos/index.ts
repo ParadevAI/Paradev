@@ -1,1 +1,1 @@
-export { useCloudRepos } from "./useCloudRepos";
+export { getCloudReposQueryKey, useCloudRepos } from "./useCloudRepos";
