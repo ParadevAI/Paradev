@@ -201,6 +201,26 @@ describe("scanClaudeSlashCommands", () => {
 		expect(result.every((entry) => entry.source === "plugin")).toBe(true);
 	});
 
+	it("lists paradev:x once, with the old superset:x as its alias", async () => {
+		for (const name of ["paradev", "superset"]) {
+			const pluginDir = join(configDir, "skills", name);
+			write(join(pluginDir, "plugin.json"), JSON.stringify({ name }));
+			write(
+				join(pluginDir, "skills", "orchestrate", "SKILL.md"),
+				skill("Coordinate agents"),
+			);
+		}
+
+		const result = customs(
+			await scanClaudeSlashCommands({ worktreePath: worktree, configDir }),
+		);
+		expect(result).toHaveLength(1);
+		expect(result[0]).toMatchObject({
+			name: "paradev:orchestrate",
+			aliases: ["superset:orchestrate"],
+		});
+	});
+
 	it("ignores a nested dir in skills/ that has no plugin manifest", async () => {
 		const nested = join(worktree, ".claude", "skills", "group", "inner");
 		mkdirSync(nested, { recursive: true });
