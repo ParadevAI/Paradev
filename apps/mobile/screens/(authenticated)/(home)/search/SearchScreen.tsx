@@ -6,7 +6,6 @@ import {
 } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, View } from "react-native";
-import { RowLink } from "@/components/RowLink";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import {
@@ -22,11 +21,7 @@ import {
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { HeaderToolbar } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { rowDetailParts } from "@/screens/(authenticated)/(home)/home/components/RowDetailLine";
 import { SECTION_LABEL } from "@/screens/(authenticated)/(home)/home/components/SectionLabel";
-import { WorkspaceLead } from "@/screens/(authenticated)/(home)/home/components/WorkspaceLead";
-import { WorkspaceRowFrame } from "@/screens/(authenticated)/(home)/home/components/WorkspaceRowFrame";
-import { useAttentionLabel } from "@/screens/(authenticated)/(home)/home/hooks/useAttentionLabel";
 import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCloudRepos";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
@@ -34,7 +29,6 @@ import { cloudRepoName } from "@/screens/(authenticated)/(home)/home/utils/build
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useRowAttention } from "@/screens/(authenticated)/(home)/hooks/useRowAttention";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
-import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
 import {
 	isPlaceUnreachable,
 	placeStatus,
@@ -42,6 +36,7 @@ import {
 import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
+import { SearchResultRow } from "./components/SearchResultRow";
 
 /**
  * The native search bar lives in this sheet, not on the home screen: on a
@@ -108,7 +103,6 @@ export function SearchScreen() {
 	);
 	const { terminalsByWorkspace, attentionByWorkspace } =
 		useHostsTerminals(terminalHosts);
-	const attentionLabel = useAttentionLabel();
 	const noProjectName = t({ message: "No project" });
 	const rowAttention = useRowAttention(attentionByWorkspace);
 	const { workspaces: activeCloud } = useCloudWorkspaces();
@@ -294,52 +288,28 @@ export function SearchScreen() {
 				}
 				renderItem={({ item: workspace, index }) => {
 					const host = hostsById.get(workspace.hostId);
-					const projectName = host
-						? (workspace.projectId &&
-								projectNamesById.get(workspace.projectId)) ||
-							noProjectName
-						: cloudRepoName(cloudRepos, workspace.id);
 					const cloudRow = cloudRowsById.get(workspace.id);
-					const attention = cloudRow
-						? rowAttention.cloud(cloudRow)
-						: rowAttention.host(workspace);
-					const detailParts = rowDetailParts({
-						state: attention ? attentionLabel(attention) : null,
-						pullRequest: null,
-						diff: null,
-						name: workspace.name,
-						branch: workspace.branch,
-						context: placeDetail({
-							placeName: host?.name ?? t({ message: "Cloud" }),
-							projectName,
-						}),
-						noChanges: t({ message: "No changes" }),
-					});
-					const unreachable = isUnreachable(workspace);
 					return (
-						<RowLink href={`/workspace/${workspace.id}`}>
-							<View className={unreachable ? "opacity-50" : undefined}>
-								<WorkspaceRowFrame
-									lead={
-										<WorkspaceLead
-											attention={attention}
-											creating={cloudRow?.status === "provisioning"}
-											failed={false}
-										/>
-									}
-									name={workspace.name}
-									detailParts={detailParts}
-									separator={index < results.length - 1}
-									onPress={() => open(workspace)}
-									disabled={unreachable}
-									accessibilityLabel={[
-										workspace.name,
-										...detailParts.map((part) => part.text),
-									].join(", ")}
-									phLabel="search-workspace-row"
-								/>
-							</View>
-						</RowLink>
+						<SearchResultRow
+							workspace={workspace}
+							placeName={host?.name ?? t({ message: "Cloud" })}
+							projectName={
+								host
+									? (workspace.projectId &&
+											projectNamesById.get(workspace.projectId)) ||
+										noProjectName
+									: cloudRepoName(cloudRepos, workspace.id)
+							}
+							attention={
+								cloudRow
+									? rowAttention.cloud(cloudRow)
+									: rowAttention.host(workspace)
+							}
+							creating={cloudRow?.status === "provisioning"}
+							separator={index < results.length - 1}
+							unreachable={isUnreachable(workspace)}
+							onOpen={() => open(workspace)}
+						/>
 					);
 				}}
 				ListEmptyComponent={
