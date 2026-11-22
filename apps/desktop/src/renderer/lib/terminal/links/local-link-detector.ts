@@ -16,6 +16,7 @@ import {
 } from "@superset/shared/terminal-link-parsing";
 import { bareWebUrl } from "renderer/lib/bareWebUrl";
 import { splitLineAnchor } from "renderer/lib/fileLocation";
+import { pathFileName } from "renderer/lib/pathText";
 import type { TerminalLinkResolver } from "./link-resolver";
 
 const MAX_LINE_LENGTH = 2000;
@@ -124,7 +125,7 @@ export class LocalLinkDetector {
 
 			const resolved =
 				(await this._resolver.resolveMultipleCandidates(allCandidates)) ??
-				(candidates[0]
+				(candidates[0] && pathFileName(candidates[0])
 					? await this._fileFinder?.resolveLink(candidates[0])
 					: null);
 
@@ -132,7 +133,8 @@ export class LocalLinkDetector {
 			const linkEnd = parsedLink.suffix
 				? parsedLink.suffix.suffix.index + parsedLink.suffix.suffix.text.length
 				: parsedLink.path.index + parsedLink.path.text.length;
-			const url = resolved ? null : bareWebUrl(parsedLink.path.text);
+			const url =
+				resolved || parsedLink.suffix ? null : bareWebUrl(parsedLink.path.text);
 
 			if (url) {
 				links.push({

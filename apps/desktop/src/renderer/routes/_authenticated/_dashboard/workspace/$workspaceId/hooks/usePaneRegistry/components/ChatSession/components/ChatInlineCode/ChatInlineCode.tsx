@@ -2,9 +2,9 @@ import { chatMarkdownComponents } from "@superset/chat-ui/ChatMarkdown";
 import { cn } from "@superset/ui/utils";
 import type { ComponentProps, KeyboardEvent } from "react";
 import { FileIcon } from "renderer/lib/fileIcons";
+import { isLocalPathText, pathFileName } from "renderer/lib/pathText";
 import { useIsInsideChatLink } from "../../providers/ChatLinkProvider";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
-import { isLocalPathText, pathFileName } from "../../utils/pathText";
 import { FileLinkMenu } from "../FileLinkMenu";
 
 const PlainInlineCode = chatMarkdownComponents.inlineCode;

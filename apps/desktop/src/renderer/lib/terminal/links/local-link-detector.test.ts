@@ -314,6 +314,24 @@ describe("LocalLinkDetector", () => {
 			]);
 		});
 
+		it("does not ask the file finder for a bare word", async () => {
+			const asked: string[] = [];
+			const detector = new LocalLinkDetector(
+				new TerminalLinkResolver(noFile),
+				new TerminalLinkResolver(async (path) => {
+					asked.push(path);
+					return { isDirectory: false, resolvedPath: `/repo/src/${path}` };
+				}),
+			);
+			expect(await detector.detect("version 12")).toEqual([]);
+			expect(asked).toEqual([]);
+		});
+
+		it("does not link a file location as a website", async () => {
+			const detector = new LocalLinkDetector(new TerminalLinkResolver(noFile));
+			expect(await detector.detect("error at main.io:12:4 here")).toEqual([]);
+		});
+
 		it("links a schemeless website that is not a file", async () => {
 			const detector = new LocalLinkDetector(new TerminalLinkResolver(noFile));
 			const result = await detector.detect("docs at example.com/docs/intro ok");
