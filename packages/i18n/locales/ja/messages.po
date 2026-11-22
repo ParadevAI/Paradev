@@ -188,6 +188,10 @@ msgstr "{0, plural, other {# 個のラベル}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#件のログイン情報} other {#件のログイン情報}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {入力待ち#件} other {入力待ち#件}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# 件の新しい返信}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェ
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# 件のプルリクエスト}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {レビュー可能#件} other {レビュー可能#件}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, other {# 件の返信}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {#件のリポジトリ} other {#件のリポジトリ}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {すべてのホストで#件} other {すべてのホストで#件}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, other {ターミナル # 個が実行中}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {変更なし #行} other {変更なし #行}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {実行中#件} other {実行中#件}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "全機能を並べて比較"
 msgid "All files exceed the maximum size."
 msgstr "すべてのファイルが最大サイズを超えています。"
 
+msgid "All hosts"
+msgstr "すべてのホスト"
+
 msgid "All in a new tab (split panes)"
 msgstr "すべて新しいタブで(ペイン分割)"
 
@@ -4058,6 +4077,9 @@ msgstr "閲覧可"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "アプリ全体のtooltipを統一できますか?"
+
+msgid "can’t check"
+msgstr "確認できません"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}を確認できません"
@@ -13620,6 +13642,9 @@ msgstr "{pathname}には何もありません。"
 msgid "Nothing needs a retry"
 msgstr "再実行が必要なものはありません"
 
+msgid "Nothing needs you right now"
+msgstr "今対応が必要なものはありません"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "直近30日に公開された実績はまだありません。このマシンの利用状況が同期されるとランクが表示されます(<0>{handle}</0>として公開)。"
 
@@ -13732,6 +13757,14 @@ msgstr "オフライン"
 
 msgid "Offline / local-first mode"
 msgstr "オフライン/ローカルファーストモード"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "オフライン、最終確認 {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "オフライン、最終確認 {0}"
 
 msgid "OK"
 msgstr "OK"

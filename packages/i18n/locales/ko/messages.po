@@ -188,6 +188,10 @@ msgstr "{0, plural, other {라벨 #개}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {로그인 #개} other {로그인 #개}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {입력 필요 #개} other {입력 필요 #개}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {새 답글 #개}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {풀 리퀘스트 #개}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {준비됨 #개} other {준비됨 #개}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, other {답글 #개}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {리포지토리 #개} other {리포지토리 #개}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {모든 호스트에서 결과 #개} other {모든 호스트에서 결과 #개}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, other {터미널 #개 실행 중}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, other {변경 없는 줄 #개}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {작업 중 #개} other {작업 중 #개}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "모든 기능 한눈에 비교"
 msgid "All files exceed the maximum size."
 msgstr "모든 파일이 최대 크기를 초과합니다."
 
+msgid "All hosts"
+msgstr "모든 호스트"
+
 msgid "All in a new tab (split panes)"
 msgstr "모두 새 탭에서 (분할 패널)"
 
@@ -4058,6 +4077,9 @@ msgstr "보기 가능"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "앱 전반의 툴팁을 표준화해 줄 수 있나요?"
+
+msgid "can’t check"
+msgstr "확인할 수 없음"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}을(를) 확인할 수 없습니다"
@@ -13620,6 +13642,9 @@ msgstr "{pathname}에는 아무것도 없습니다."
 msgid "Nothing needs a retry"
 msgstr "재시도가 필요한 항목이 없습니다"
 
+msgid "Nothing needs you right now"
+msgstr "지금 확인할 항목이 없습니다"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기기의 사용량이 동기화되면 <0>{handle}</0>(으)로 게시되며 순위가 표시됩니다."
 
@@ -13732,6 +13757,14 @@ msgstr "오프라인"
 
 msgid "Offline / local-first mode"
 msgstr "오프라인 / 로컬 우선 모드"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "오프라인, 마지막 확인 {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "오프라인, 마지막 확인 {0}"
 
 msgid "OK"
 msgstr "확인"

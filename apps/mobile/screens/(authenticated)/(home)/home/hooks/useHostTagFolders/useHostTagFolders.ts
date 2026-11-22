@@ -1,6 +1,6 @@
 import type { TagFolderSettingInput } from "@superset/shared/workspace-tag-folders";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { type UseQueryResult, useQueries } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import type { WorkspacesHost } from "@/hooks/useHostWorkspaces";
 import {
 	getHostServiceClientByUrl,
@@ -11,42 +11,60 @@ const TAG_FOLDERS_REFETCH_INTERVAL_MS = 30_000;
 
 const NO_SETTINGS: TagFolderSettingInput[] = [];
 
-export function hostTagFoldersQueryKey(
-	machineId: string | undefined,
-	hostUrl: string | null,
-) {
-	return ["host-service", "tag-folders", "list", machineId, hostUrl] as const;
+export function hostTagFoldersQueryKey(machineId: string) {
+	return ["host-service", "tag-folders", "list", machineId] as const;
 }
 
+type TagFolderRows = Awaited<
+	ReturnType<
+		ReturnType<typeof getHostServiceClientByUrl>["tagFolders"]["list"]["query"]
+	>
+>;
+
 /**
- * The folder names, colors and order desktop saved on this host. A host that
- * cannot answer leaves folders named by their tag, in tag order.
+ * The folder names, colors and order desktop saved on each host, by machine
+ * id. A host that cannot answer leaves folders named by their tag, in tag
+ * order.
  */
 export function useHostTagFolders(
-	host: WorkspacesHost | null,
-): TagFolderSettingInput[] {
-	const hostUrl = host
-		? hostServiceUrl(host.organizationId, host.machineId)
-		: null;
+	hosts: readonly WorkspacesHost[],
+): Map<string, TagFolderSettingInput[]> {
+	const hostsKey = hosts
+		.map((host) => `${host.organizationId}:${host.machineId}:${host.isOnline}`)
+		.join("|");
+	// biome-ignore lint/correctness/useExhaustiveDependencies: hostsKey stands for `hosts`
+	const stableHosts = useMemo(() => hosts, [hostsKey]);
 
-	const query = useQuery({
-		queryKey: hostTagFoldersQueryKey(host?.machineId, hostUrl),
-		enabled: hostUrl !== null && (host?.isOnline ?? false),
-		refetchInterval: TAG_FOLDERS_REFETCH_INTERVAL_MS,
-		networkMode: "always" as const,
-		retry: 1,
-		queryFn: async () => {
-			if (!hostUrl) return [];
-			return getHostServiceClientByUrl(hostUrl).tagFolders.list.query();
+	const combine = useCallback(
+		(results: UseQueryResult<TagFolderRows>[]) => {
+			const byHost = new Map<string, TagFolderSettingInput[]>();
+			stableHosts.forEach((host, index) => {
+				byHost.set(
+					host.machineId,
+					results[index]?.data?.map(({ scope, ...setting }) => ({
+						projectId: scope,
+						...setting,
+					})) ?? NO_SETTINGS,
+				);
+			});
+			return byHost;
 		},
-	});
-
-	return useMemo(
-		() =>
-			query.data?.map(({ scope, ...setting }) => ({
-				projectId: scope,
-				...setting,
-			})) ?? NO_SETTINGS,
-		[query.data],
+		[stableHosts],
 	);
+
+	return useQueries({
+		queries: stableHosts.map((host) => {
+			const hostUrl = hostServiceUrl(host.organizationId, host.machineId);
+			return {
+				queryKey: hostTagFoldersQueryKey(host.machineId),
+				enabled: host.isOnline,
+				refetchInterval: TAG_FOLDERS_REFETCH_INTERVAL_MS,
+				networkMode: "always" as const,
+				retry: 1,
+				queryFn: () =>
+					getHostServiceClientByUrl(hostUrl).tagFolders.list.query(),
+			};
+		}),
+		combine,
+	});
 }

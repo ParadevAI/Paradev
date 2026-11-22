@@ -22,7 +22,9 @@ export function FilterScreen() {
 	const router = useRouter();
 	const theme = useTheme();
 	const selectedHost = useSelectedHost();
-	const cloud = useWorkspaceScope() === "cloud";
+	const scope = useWorkspaceScope();
+	const cloud = scope === "cloud";
+	const all = scope === "all";
 	const sort = useWorkspacesFilterStore((store) => store.sort);
 
 	const sortOption = SORT_OPTIONS.find((option) => option.value === sort);
@@ -48,7 +50,13 @@ export function FilterScreen() {
 				label={t({ message: "Scope" })}
 				trailing={
 					<ListRowValue
-						value={cloud ? t({ message: "Cloud" }) : (selectedHost?.name ?? "")}
+						value={
+							cloud
+								? t({ message: "Cloud" })
+								: all
+									? t({ message: "All hosts" })
+									: (selectedHost?.name ?? "")
+						}
 						accessory={
 							cloud ? (
 								<Icon
@@ -56,7 +64,7 @@ export function FilterScreen() {
 									className="text-muted-foreground size-4"
 									strokeWidth={2}
 								/>
-							) : selectedHost ? (
+							) : !all && selectedHost ? (
 								<HostStatusDot isOnline={selectedHost.isOnline} />
 							) : undefined
 						}

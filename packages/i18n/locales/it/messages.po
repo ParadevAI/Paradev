@@ -188,6 +188,10 @@ msgstr "{0, plural, one {# etichetta} other {# etichette}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# accesso} other {# accessi}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# richiede input} other {# richiedono input}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nuova risposta} other {# nuove risposte}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# progetto} other {# progetti}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# pull request} other {# pull request}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# pronto} other {# pronti}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, one {# risposta} other {# risposte}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repository}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# risultato su tutti gli host} other {# risultati su tutti gli host}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, one {# terminale in esecuzione} other {# terminali in esecuz
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# riga non modificata} other {# righe non modificate}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# in corso} other {# in corso}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "Tutte le funzioni, a confronto"
 msgid "All files exceed the maximum size."
 msgstr "Tutti i file superano la dimensione massima."
 
+msgid "All hosts"
+msgstr "Tutti gli host"
+
 msgid "All in a new tab (split panes)"
 msgstr "Tutti in una nuova scheda (pannelli divisi)"
 
@@ -4058,6 +4077,9 @@ msgstr "Può visualizzare"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Puoi standardizzare i tooltip in tutta l'app?"
+
+msgid "can’t check"
+msgstr "impossibile verificare"
 
 msgid "Can’t check {hostName}"
 msgstr "Impossibile controllare {hostName}"
@@ -13620,6 +13642,9 @@ msgstr "Non c'è niente in {pathname}."
 msgid "Nothing needs a retry"
 msgstr "Non c'è nulla da riprovare"
 
+msgid "Nothing needs you right now"
+msgstr "Niente ti aspetta in questo momento"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Ancora nessuna pubblicazione negli ultimi 30 giorni. La tua posizione comparirà una volta sincronizzato l'utilizzo di questa macchina, pubblicando come <0>{handle}</0>."
 
@@ -13732,6 +13757,14 @@ msgstr "Offline"
 
 msgid "Offline / local-first mode"
 msgstr "Modalità offline / local-first"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "offline, visto {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "Offline, visto {0}"
 
 msgid "OK"
 msgstr "OK"

@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
+import { getLastSeenTime } from "@/screens/(authenticated)/(home)/utils/getLastSeenTime";
 import { HintRow } from "./components/HintRow";
 import { HostPresenceUnknownView } from "./components/HostPresenceUnknownView";
 import { HostSetupPendingView } from "./components/HostSetupPendingView";
 import { useRefreshHostsPresence } from "./hooks/useRefreshHostsPresence";
-import { getLastSeenTime } from "./utils/getLastSeenTime";
 
 export function HostOfflineView({
 	hostName,

@@ -2,14 +2,14 @@ import { useLingui } from "@lingui/react/macro";
 import { useQueries } from "@tanstack/react-query";
 import { compareDesc } from "date-fns";
 import { useMemo } from "react";
-import { toHostProjectItem } from "@/hooks/useHostProjects";
-import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import {
-	getHostServiceClientByUrl,
-	hostServiceUrl,
-} from "@/lib/host-service/client";
-import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
-import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+	hostProjectsQueryOptions,
+	toHostProjectItem,
+} from "@/hooks/useHostProjects";
+import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
+import { hostServiceUrl } from "@/lib/host-service/client";
+import { useScopeHosts } from "@/screens/(authenticated)/(home)/hooks/useScopeHosts";
+import { useCloudScopeEnabled } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
 import { useWorkspacesFilterStore } from "../../../../stores/workspacesFilterStore";
 import { useNewSessionPreferencesStore } from "../../stores/newSessionPreferencesStore";
 
@@ -35,19 +35,19 @@ export function targetKeyFor(projectId: string | null, machineId: string) {
 }
 
 /**
- * Where a new chat workspace can be created under the current Home scope: the
- * selected machine's projects (its `project.list`), or a cloud target per
- * API-listed project when the scope is Cloud. The place is picked by the scope
- * filter at the top of Home — never here. The default pick: last used target,
- * else the most recently updated workspace's target.
+ * Where a new chat workspace can be created under the current Home scope:
+ * each online machine's projects (its `project.list`), plus Cloud where the
+ * scope includes it. The default pick: last used target, else the most
+ * recently updated workspace's target.
  */
 export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 	targets: NewChatTarget[];
 	defaultTarget: NewChatTarget | null;
 } {
 	const { t } = useLingui();
-	const scope = useWorkspaceScope();
-	const selectedHost = useSelectedHost();
+	const { scope, hosts: scopeHosts } = useScopeHosts();
+	const cloudEnabled = useCloudScopeEnabled();
+	const offersCloud = scope === "cloud" || (scope === "all" && cloudEnabled);
 	const persistedTargetKey = useNewSessionPreferencesStore(
 		(state) => state.targetKey,
 	);
@@ -58,34 +58,23 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 		(state) => state.hasHydrated,
 	);
 
-	// An offline selected machine offers nothing rather than quietly falling
-	// back to another host or Cloud — the scope pick is the user's alone.
+	// An offline machine offers nothing rather than quietly falling back to
+	// another place — the scope pick is the user's alone.
 	const scopedHosts = useMemo(
 		() =>
-			scope === "host" && selectedHost?.isOnline
-				? [
-						{
-							machineId: selectedHost.machineId,
-							name: selectedHost.name,
-							hostUrl: hostServiceUrl(
-								selectedHost.organizationId,
-								selectedHost.machineId,
-							),
-						},
-					]
-				: [],
-		[scope, selectedHost],
+			scopeHosts
+				.filter((host) => host.isOnline)
+				.map((host) => ({
+					host,
+					machineId: host.machineId,
+					name: host.name,
+					hostUrl: hostServiceUrl(host.organizationId, host.machineId),
+				})),
+		[scopeHosts],
 	);
 
 	const projectListQueries = useQueries({
-		queries: scopedHosts.map((host) => ({
-			queryKey: ["host-service", "projects", "list", host.machineId],
-			queryFn: () =>
-				getHostServiceClientByUrl(host.hostUrl).project.list.query(),
-			staleTime: 60_000,
-			retry: 1,
-			networkMode: "always" as const,
-		})),
+		queries: scopedHosts.map(({ host }) => hostProjectsQueryOptions(host)),
 	});
 
 	const targets = useMemo<NewChatTarget[]>(() => {
@@ -119,7 +108,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 		});
 		// One target: every cloud workspace clones the same repository, so there
 		// is nothing to choose between.
-		if (scope === "cloud") {
+		if (offersCloud) {
 			result.push({
 				key: targetKeyFor(CLOUD_TARGET_ID, CLOUD_TARGET_ID),
 				kind: "cloud",
@@ -133,10 +122,12 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 		}
 		return result.sort(
 			(a, b) =>
+				Number(a.kind === "cloud") - Number(b.kind === "cloud") ||
+				a.hostName.localeCompare(b.hostName) ||
 				Number(b.projectId === null) - Number(a.projectId === null) ||
 				a.projectName.localeCompare(b.projectName),
 		);
-	}, [scope, scopedHosts, projectListQueries, t]);
+	}, [offersCloud, scopedHosts, projectListQueries, t]);
 
 	const defaultTarget = useMemo<NewChatTarget | null>(() => {
 		if (targets.length === 0) return null;

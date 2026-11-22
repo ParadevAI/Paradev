@@ -188,6 +188,10 @@ msgstr "{0, plural, other {# nhãn}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# đăng nhập} other {# đăng nhập}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# cần nhập thêm} other {# cần nhập thêm}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# câu trả lời mới}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# dự án} other {# dự án}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# pull request}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# sẵn sàng} other {# sẵn sàng}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, other {# câu trả lời}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repository}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# kết quả trên tất cả host} other {# kết quả trên tất cả host}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, other {# terminal đang chạy}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, other {# dòng không thay đổi}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# đang chạy} other {# đang chạy}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "Toàn bộ tính năng, đặt cạnh nhau"
 msgid "All files exceed the maximum size."
 msgstr "Mọi tệp đều vượt quá kích thước tối đa."
 
+msgid "All hosts"
+msgstr "Tất cả host"
+
 msgid "All in a new tab (split panes)"
 msgstr "Tất cả trong một tab mới (chia khung)"
 
@@ -4058,6 +4077,9 @@ msgstr "Có thể xem"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Bạn chuẩn hóa tooltip trên toàn ứng dụng được không?"
+
+msgid "can’t check"
+msgstr "không thể kiểm tra"
 
 msgid "Can’t check {hostName}"
 msgstr "Không thể kiểm tra {hostName}"
@@ -13620,6 +13642,9 @@ msgstr "Không có gì ở {pathname}."
 msgid "Nothing needs a retry"
 msgstr "Không có gì cần chạy lại"
 
+msgid "Nothing needs you right now"
+msgstr "Hiện không có gì cần bạn"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Chưa có gì được công khai trong 30 ngày qua. Thứ hạng của bạn sẽ xuất hiện khi dữ liệu sử dụng từ máy này đồng bộ, công khai dưới tên <0>{handle}</0>."
 
@@ -13732,6 +13757,14 @@ msgstr "Ngoại tuyến"
 
 msgid "Offline / local-first mode"
 msgstr "Chế độ ngoại tuyến / ưu tiên cục bộ"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "ngoại tuyến, thấy lần cuối {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "Ngoại tuyến, thấy lần cuối {0}"
 
 msgid "OK"
 msgstr "OK"

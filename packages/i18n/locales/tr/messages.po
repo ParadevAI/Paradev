@@ -188,6 +188,10 @@ msgstr "{0, plural, one {# etiket} other {# etiket}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# oturum bilgisi} other {# oturum bilgisi}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# giriş bekliyor} other {# giriş bekliyor}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# yeni yanıt}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# proje} other {# proje}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# pull request} other {# pull request}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# hazır} other {# hazır}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, other {# yanıt}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# depo} other {# depo}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {Tüm host'larda # sonuç} other {Tüm host'larda # sonuç}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, one {# terminal çalışıyor} other {# terminal çalışıy
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# değişmemiş satır} other {# değişmemiş satır}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# çalışıyor} other {# çalışıyor}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "Tüm özellikler, yan yana"
 msgid "All files exceed the maximum size."
 msgstr "Tüm dosyalar en büyük boyutu aşıyor."
 
+msgid "All hosts"
+msgstr "Tüm host'lar"
+
 msgid "All in a new tab (split panes)"
 msgstr "Tümü yeni bir sekmede (bölünmüş bölmeler)"
 
@@ -4058,6 +4077,9 @@ msgstr "Görüntüleyebilir"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Uygulama genelindeki tooltip'leri standartlaştırabilir misin?"
+
+msgid "can’t check"
+msgstr "kontrol edilemiyor"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName} kontrol edilemiyor"
@@ -13620,6 +13642,9 @@ msgstr "{pathname} yolunda bir şey yok."
 msgid "Nothing needs a retry"
 msgstr "Yeniden denenecek bir şey yok"
 
+msgid "Nothing needs you right now"
+msgstr "Şu an seni bekleyen bir şey yok"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Son 30 günde henüz hiçbir şey yayınlanmadı. Bu makinedeki kullanım eşitlendiğinde sıralamanız görünür; <0>{handle}</0> olarak yayınlanıyor."
 
@@ -13732,6 +13757,14 @@ msgstr "Çevrimdışı"
 
 msgid "Offline / local-first mode"
 msgstr "Çevrimdışı / yerel öncelikli mod"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "çevrimdışı, son görülme {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "Çevrimdışı, son görülme {0}"
 
 msgid "OK"
 msgstr "Tamam"

@@ -32,6 +32,7 @@ export function CloudWorkspaceRow({
 	cache,
 	onCopied,
 	card = false,
+	detail,
 }: {
 	row: CloudWorkspaceRowData;
 	repoFullName?: string;
@@ -42,6 +43,8 @@ export function CloudWorkspaceRow({
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row of the Cloud list. */
 	card?: boolean;
+	/** A muted second line, e.g. "repo · Cloud" outside the Cloud list. */
+	detail?: string;
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
@@ -81,6 +84,33 @@ export function CloudWorkspaceRow({
 		: null;
 	const [prOwner, prRepo] = pullRequest?.repoFullName.split("/") ?? [];
 
+	const titleLine = (
+		<View
+			className={cn(
+				"min-w-0 flex-row items-center gap-1.5",
+				!detail && "flex-1",
+			)}
+		>
+			<Text
+				className={cn(
+					"shrink font-medium text-[15px]",
+					archived && "text-muted-foreground",
+				)}
+				numberOfLines={enlargedText ? undefined : 1}
+			>
+				{row.name || t({ message: "Untitled workspace" })}
+			</Text>
+			{owner && !isMine ? (
+				<UserAvatar
+					name={owner.name}
+					image={owner.image}
+					className="size-[18px]"
+					textClassName="text-[7px]"
+				/>
+			) : null}
+		</View>
+	);
+
 	const body = (
 		<Pressable
 			className={cn(
@@ -97,25 +127,19 @@ export function CloudWorkspaceRow({
 				}
 				size={20}
 			/>
-			<View className="min-w-0 flex-1 flex-row items-center gap-1.5">
-				<Text
-					className={cn(
-						"shrink font-medium text-[15px]",
-						archived && "text-muted-foreground",
-					)}
-					numberOfLines={enlargedText ? undefined : 1}
-				>
-					{row.name || t({ message: "Untitled workspace" })}
-				</Text>
-				{owner && !isMine ? (
-					<UserAvatar
-						name={owner.name}
-						image={owner.image}
-						className="size-[18px]"
-						textClassName="text-[7px]"
-					/>
-				) : null}
-			</View>
+			{detail ? (
+				<View className="min-w-0 flex-1">
+					{titleLine}
+					<Text
+						className="text-muted-foreground text-[13px]"
+						numberOfLines={enlargedText ? undefined : 1}
+					>
+						{detail}
+					</Text>
+				</View>
+			) : (
+				titleLine
+			)}
 			{pullRequest && prStatus && !archived ? (
 				<Button
 					accessibilityLabel={t({

@@ -1,5 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import {
+	type UseQueryResult,
+	useQueries,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import {
 	getHostServiceClientByUrl,
 	type HostWorkspaceRow,
@@ -21,11 +25,9 @@ export interface WorkspacesHost {
 
 const WORKSPACES_REFETCH_INTERVAL_MS = 30_000;
 
-export function getHostWorkspacesQueryKey(
-	machineId: string | null,
-	hostUrl: string | null,
-) {
-	return ["host-service", "workspaces", "list", machineId, hostUrl] as const;
+/** Independent of the host's URL, so an offline host keeps its cached rows. */
+export function getHostWorkspacesQueryKey(machineId: string | null) {
+	return ["host-service", "workspaces", "list", machineId] as const;
 }
 
 export interface HostWorkspacesCacheOps {
@@ -37,63 +39,98 @@ export interface HostWorkspacesCacheOps {
 	invalidateHost: (hostId: string) => void;
 }
 
-export interface UseHostWorkspacesResult {
+export interface HostWorkspacesState {
 	workspaces: HostWorkspaceItem[];
 	/**
-	 * True once the host answered or failed (or is offline). Gates empty
+	 * True once the host answered or failed, or is offline. Gates empty
 	 * states only — existing rows always render (cache-first rule).
 	 */
 	isReady: boolean;
+}
+
+export interface UseHostWorkspacesResult extends HostWorkspacesState {
 	cache: HostWorkspacesCacheOps;
 }
 
+export interface UseHostsWorkspacesResult extends UseHostWorkspacesResult {
+	byHost: Map<string, HostWorkspacesState>;
+}
+
+const NO_WORKSPACES: HostWorkspaceItem[] = [];
+
 /**
- * Workspaces served by one host's `workspace.list` over the relay. The
- * 30s poll plus focus/pull refetch is the healing path; an offline host
- * serves nothing and the UI shows a placeholder.
+ * Workspaces served by each host's `workspace.list` over the relay. Only
+ * online hosts are asked; an offline host serves the rows it last returned.
+ * The 30s poll plus focus/pull refetch is the healing path.
  */
-export function useHostWorkspaces(
-	host: WorkspacesHost | null,
-): UseHostWorkspacesResult {
+export function useHostsWorkspaces(
+	hosts: readonly WorkspacesHost[],
+): UseHostsWorkspacesResult {
 	const queryClient = useQueryClient();
 
-	const hostUrl = host?.isOnline
-		? hostServiceUrl(host.organizationId, host.machineId)
-		: null;
-	const machineId = host?.machineId ?? null;
-	const queryKey = getHostWorkspacesQueryKey(machineId, hostUrl);
+	const hostsKey = hosts
+		.map((host) => `${host.organizationId}:${host.machineId}:${host.isOnline}`)
+		.join("|");
+	// biome-ignore lint/correctness/useExhaustiveDependencies: hostsKey stands for `hosts`
+	const stableHosts = useMemo(() => hosts, [hostsKey]);
 
-	const query = useQuery({
-		queryKey,
-		enabled: hostUrl !== null,
-		refetchInterval: WORKSPACES_REFETCH_INTERVAL_MS,
-		retry: 1,
-		networkMode: "always" as const,
-		queryFn: async (): Promise<HostWorkspaceRow[]> => {
-			if (!hostUrl) return [];
-			return getHostServiceClientByUrl(hostUrl).workspace.list.query();
+	const combine = useCallback(
+		(results: UseQueryResult<HostWorkspaceRow[]>[]) => {
+			const byHost = new Map<string, HostWorkspacesState>();
+			stableHosts.forEach((host, index) => {
+				const query = results[index];
+				const reachable = host.isOnline && !query?.isError;
+				byHost.set(host.machineId, {
+					workspaces:
+						query?.data?.map((row) => ({ ...row, hostReachable: reachable })) ??
+						NO_WORKSPACES,
+					isReady: !host.isOnline || !!query?.isSuccess || !!query?.isError,
+				});
+			});
+			return byHost;
 		},
-	});
-
-	const workspaces = useMemo<HostWorkspaceItem[]>(
-		() =>
-			(query.data ?? []).map((row) => ({
-				...row,
-				hostReachable: !query.isError,
-			})),
-		[query.data, query.isError],
+		[stableHosts],
 	);
 
-	const isReady = hostUrl === null || query.isSuccess || query.isError;
+	const byHost = useQueries({
+		queries: stableHosts.map((host) => {
+			const hostUrl = host.isOnline
+				? hostServiceUrl(host.organizationId, host.machineId)
+				: null;
+			return {
+				queryKey: getHostWorkspacesQueryKey(host.machineId),
+				enabled: hostUrl !== null,
+				refetchInterval: WORKSPACES_REFETCH_INTERVAL_MS,
+				retry: 1,
+				networkMode: "always" as const,
+				queryFn: async (): Promise<HostWorkspaceRow[]> => {
+					if (!hostUrl) return [];
+					return getHostServiceClientByUrl(hostUrl).workspace.list.query();
+				},
+			};
+		}),
+		combine,
+	});
+
+	const workspaces = useMemo(
+		() => [...byHost.values()].flatMap((state) => state.workspaces),
+		[byHost],
+	);
+	const isReady = [...byHost.values()].every((state) => state.isReady);
 
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
-		const key = getHostWorkspacesQueryKey(machineId, hostUrl);
+		const known = new Map(stableHosts.map((host) => [host.machineId, host]));
 		return {
-			resolveHostUrl: (hostId) => (hostId === machineId ? hostUrl : null),
+			resolveHostUrl: (hostId) => {
+				const host = known.get(hostId);
+				return host?.isOnline
+					? hostServiceUrl(host.organizationId, host.machineId)
+					: null;
+			},
 			upsertWorkspace: (row) => {
-				if (row.hostId !== machineId) return;
+				if (!known.has(row.hostId)) return;
 				queryClient.setQueryData<HostWorkspaceRow[] | undefined>(
-					key,
+					getHostWorkspacesQueryKey(row.hostId),
 					(rows) => {
 						if (!rows) return [row];
 						const exists = rows.some((existing) => existing.id === row.id);
@@ -106,11 +143,22 @@ export function useHostWorkspaces(
 				);
 			},
 			invalidateHost: (hostId) => {
-				if (hostId !== machineId) return;
-				void queryClient.invalidateQueries({ queryKey: key });
+				if (!known.has(hostId)) return;
+				void queryClient.invalidateQueries({
+					queryKey: getHostWorkspacesQueryKey(hostId),
+				});
 			},
 		};
-	}, [machineId, hostUrl, queryClient]);
+	}, [stableHosts, queryClient]);
 
+	return { workspaces, isReady, cache, byHost };
+}
+
+/** One host's workspaces; see useHostsWorkspaces. */
+export function useHostWorkspaces(
+	host: WorkspacesHost | null,
+): UseHostWorkspacesResult {
+	const hosts = useMemo(() => (host ? [host] : []), [host]);
+	const { workspaces, isReady, cache } = useHostsWorkspaces(hosts);
 	return { workspaces, isReady, cache };
 }

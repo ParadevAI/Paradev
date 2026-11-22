@@ -188,6 +188,10 @@ msgstr "{0, plural, one {# etykieta} few {# etykiety} many {# etykiet} other {# 
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# logowanie} few {# logowania} many {# logowań} other {# logowania}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# wymaga danych} few {# wymagają danych} many {# wymaga danych} other {# wymaga danych}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nowa odpowiedź} few {# nowe odpowiedzi} many {# nowych odpowiedzi} other {# nowej odpowiedzi}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektów} other {
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# pull request} few {# pull requesty} many {# pull requestów} other {# pull requesta}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# gotowe} few {# gotowe} many {# gotowych} other {# gotowego}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} ot
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repozytorium} few {# repozytoria} many {# repozytoriów} other {# repozytorium}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# wynik na wszystkich hostach} few {# wyniki na wszystkich hostach} many {# wyników na wszystkich hostach} other {# wyniku na wszystkich hostach}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, one {# działający terminal} few {# działające terminale}
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# niezmieniony wiersz} few {# niezmienione wiersze} many {# niezmienionych wierszy} other {# niezmienionego wiersza}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# pracuje} few {# pracują} many {# pracuje} other {# pracuje}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "Wszystkie funkcje obok siebie"
 msgid "All files exceed the maximum size."
 msgstr "Wszystkie pliki przekraczają maksymalny rozmiar."
 
+msgid "All hosts"
+msgstr "Wszystkie hosty"
+
 msgid "All in a new tab (split panes)"
 msgstr "Wszystkie w nowej karcie (podzielone panele)"
 
@@ -4058,6 +4077,9 @@ msgstr "Może wyświetlać"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Czy możesz ujednolicić tooltipy w całej aplikacji?"
+
+msgid "can’t check"
+msgstr "nie można sprawdzić"
 
 msgid "Can’t check {hostName}"
 msgstr "Nie można sprawdzić {hostName}"
@@ -13620,6 +13642,9 @@ msgstr "Pod {pathname} nic nie ma."
 msgid "Nothing needs a retry"
 msgstr "Nic nie wymaga ponowienia"
 
+msgid "Nothing needs you right now"
+msgstr "Teraz nic na Ciebie nie czeka"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nic jeszcze nie opublikowano w ciągu ostatnich 30 dni. Twoja pozycja pojawi się, gdy zsynchronizuje się użycie z tej maszyny — publikacja jako <0>{handle}</0>."
 
@@ -13732,6 +13757,14 @@ msgstr "Offline"
 
 msgid "Offline / local-first mode"
 msgstr "Tryb offline / local-first"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "offline, widziany {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "Offline, widziany {0}"
 
 msgid "OK"
 msgstr "OK"

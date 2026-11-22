@@ -25,7 +25,7 @@ const SANDBOX_REFETCH_INTERVAL_MS = 30_000;
  */
 function sandboxWorkspacesQuery(target: SandboxTarget) {
 	return {
-		queryKey: getHostWorkspacesQueryKey(target.workspaceId, target.url),
+		queryKey: getHostWorkspacesQueryKey(target.workspaceId),
 		refetchInterval: SANDBOX_REFETCH_INTERVAL_MS,
 		retry: 1,
 		networkMode: "always" as const,
@@ -100,7 +100,7 @@ export function useWorkspaceHost(
 		queries: [
 			...(sandbox ? [sandboxWorkspacesQuery(sandbox)] : []),
 			...targets.map(({ host, hostUrl }) => ({
-				queryKey: getHostWorkspacesQueryKey(host.machineId, hostUrl),
+				queryKey: getHostWorkspacesQueryKey(host.machineId),
 				enabled: workspaceId !== null,
 				staleTime: 30_000,
 				retry: 1,

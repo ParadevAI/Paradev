@@ -1,0 +1,84 @@
+import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
+import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
+import type { TerminalAttention } from "./hooks/useHostTerminals/attention";
+import type { TagFolderGroup } from "./utils/groupByTagFolder";
+
+/** A project's groups, for the group menus of its rows and headers. */
+export interface ProjectGroups {
+	machineId: string;
+	projectId: string | null;
+	folders: TagFolderGroup<HostWorkspaceItem>[];
+	folderTags: string[];
+	/** Every workspace in the scope, hidden ones included, for Delete group. */
+	workspaces: HostWorkspaceItem[];
+}
+
+export type HomeListItem =
+	| {
+			kind: "hostLabel";
+			/** A machine id, or "cloud". */
+			placeId: string;
+			name: string;
+			cloud: boolean;
+			online: boolean;
+			lastSeenAt?: number | null;
+	  }
+	| {
+			kind: "projectHeader";
+			machineId: string;
+			projectId: string;
+			name: string;
+			iconUrl?: string | null;
+			count: number;
+			collapsed: boolean;
+			attention: TerminalAttention | null;
+			offline: boolean;
+	  }
+	| {
+			kind: "folderHeader";
+			machineId: string;
+			folder: TagFolderGroup<HostWorkspaceItem>;
+			collapsed: boolean;
+			attention: TerminalAttention | null;
+			groups: ProjectGroups;
+			offline: boolean;
+	  }
+	| {
+			kind: "workspace";
+			workspace: HostWorkspaceItem;
+			groups?: ProjectGroups;
+			folderTag?: string | null;
+			offline?: boolean;
+			/** Replaces the branch line, e.g. "project · host" under Needs me. */
+			detail?: string;
+	  }
+	| {
+			kind: "hostOffline";
+			hostName: string;
+			lastSeenAt: number | null | undefined;
+	  }
+	| {
+			kind: "periodHeader";
+			key: string;
+			label: string;
+	  }
+	| { kind: "cloudRow"; row: CloudWorkspaceRow; detail?: string };
+
+export function homeListItemKey(item: HomeListItem): string {
+	switch (item.kind) {
+		case "hostLabel":
+			return `host:${item.placeId}`;
+		case "projectHeader":
+			return `project:${item.machineId}:${item.projectId}`;
+		case "folderHeader":
+			return `folder:${item.machineId}:${item.folder.key}`;
+		case "workspace":
+			return `ws:${item.workspace.id}`;
+		case "periodHeader":
+			return `period:${item.key}`;
+		case "cloudRow":
+			return `cloud:${item.row.id}`;
+		default:
+			return "host-offline";
+	}
+}

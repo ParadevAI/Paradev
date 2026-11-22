@@ -182,6 +182,10 @@ msgstr "{0, plural, one {# мітка} few {# мітки} many {# міток} ot
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# логін} few {# логіни} many {# логінів} other {# логіна}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# чекає на введення} few {# чекають на введення} many {# чекають на введення} other {# чекають на введення}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# нова відповідь} few {# нові відповіді} many {# нових відповідей} other {# нової відповіді}}"
@@ -216,6 +220,10 @@ msgstr "{0, plural, one {# проєкт} few {# проєкти} many {# проє
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# пул-реквест} few {# пул-реквести} many {# пул-реквестів} other {# пул-реквесту}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# готово} few {# готово} many {# готово} other {# готово}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -225,6 +233,10 @@ msgstr "{0, plural, one {# відповідь} few {# відповіді} many {
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# репозиторій} few {# репозиторії} many {# репозиторіїв} other {# репозиторію}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# результат на всіх хостах} few {# результати на всіх хостах} many {# результатів на всіх хостах} other {# результату на всіх хостах}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -273,6 +285,10 @@ msgstr "{0, plural, one {Запущено # термінал} few {Запуще�
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# рядок без змін} few {# рядки без змін} many {# рядків без змін} other {# рядка без змін}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# працює} few {# працюють} many {# працюють} other {# працюють}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2583,6 +2599,9 @@ msgstr "Усі можливості поруч"
 msgid "All files exceed the maximum size."
 msgstr "Усі файли перевищують максимальний розмір."
 
+msgid "All hosts"
+msgstr "Усі хости"
+
 msgid "All in a new tab (split panes)"
 msgstr "Усе в новій вкладці (розділені панелі)"
 
@@ -4052,6 +4071,9 @@ msgstr "Може переглядати"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Можеш уніфікувати підказки в усьому застосунку?"
+
+msgid "can’t check"
+msgstr "не вдається перевірити"
 
 msgid "Can’t check {hostName}"
 msgstr "Не вдається перевірити {hostName}"
@@ -13614,6 +13636,9 @@ msgstr "За адресою {pathname} нічого немає."
 msgid "Nothing needs a retry"
 msgstr "Нічого не потребує повторної спроби"
 
+msgid "Nothing needs you right now"
+msgstr "Зараз нічого не чекає на вас"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "За останні 30 днів ще нічого не опубліковано. Ваше місце з'явиться, щойно синхронізується використання з цього комп'ютера; публікація від імені <0>{handle}</0>."
 
@@ -13726,6 +13751,14 @@ msgstr "Офлайн"
 
 msgid "Offline / local-first mode"
 msgstr "Офлайн / режим local-first"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "не в мережі, був {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "Не в мережі, був {0}"
 
 msgid "OK"
 msgstr "OK"

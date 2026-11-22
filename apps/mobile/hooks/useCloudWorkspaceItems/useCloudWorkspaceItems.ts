@@ -79,7 +79,7 @@ export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
 		const keyFor = (hostId: string) => {
 			const access = getSandboxAccess(hostId);
-			return access ? getHostWorkspacesQueryKey(hostId, access.url) : null;
+			return access ? getHostWorkspacesQueryKey(hostId) : null;
 		};
 		return {
 			resolveHostUrl: (hostId) => getSandboxAccess(hostId)?.url ?? null,

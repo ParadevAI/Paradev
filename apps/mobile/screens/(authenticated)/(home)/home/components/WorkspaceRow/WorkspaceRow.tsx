@@ -47,6 +47,7 @@ export function WorkspaceRow({
 	card = false,
 	groups,
 	inGroup = false,
+	detail,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -62,6 +63,8 @@ export function WorkspaceRow({
 	card?: boolean;
 	groups?: WorkspaceRowMenuProps["groups"];
 	inGroup?: boolean;
+	/** Replaces the branch line, e.g. "project · host" outside its project. */
+	detail?: string;
 }) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
@@ -89,10 +92,12 @@ export function WorkspaceRow({
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
 	const grouped = !card && inGroup;
-	const showBranch = workspace.branch !== workspace.name;
+	const showBranch = !detail && workspace.branch !== workspace.name;
 	const showDiff =
-		diffStats !== null && (diffStats.additions > 0 || diffStats.deletions > 0);
-	const hasDetail = showBranch || showDiff;
+		!detail &&
+		diffStats !== null &&
+		(diffStats.additions > 0 || diffStats.deletions > 0);
+	const hasDetail = Boolean(detail) || showBranch || showDiff;
 
 	const href = `/workspace/${workspace.id}`;
 
@@ -133,7 +138,7 @@ export function WorkspaceRow({
 					accessibilityRole="button"
 					accessibilityLabel={[
 						workspace.name,
-						showBranch ? workspace.branch : null,
+						detail ?? (showBranch ? workspace.branch : null),
 						cloudStatus === "failed"
 							? attentionLabel("failed")
 							: cloudStatus === "provisioning"
@@ -182,6 +187,14 @@ export function WorkspaceRow({
 						>
 							{/* A workspace named after its branch says it twice otherwise —
 						    common now that every project shows its `main`. */}
+							{detail ? (
+								<Text
+									className="text-muted-foreground shrink text-[13px]"
+									numberOfLines={enlargedText ? undefined : 1}
+								>
+									{detail}
+								</Text>
+							) : null}
 							{showBranch ? (
 								<Text
 									className="text-muted-foreground shrink text-[13px]"

@@ -59,7 +59,7 @@ export function useDeleteWorkspace() {
 				return;
 			}
 			const client = getHostServiceClientByUrl(hostUrl);
-			const listKey = getHostWorkspacesQueryKey(hostId, hostUrl);
+			const listKey = getHostWorkspacesQueryKey(hostId);
 
 			const destroy = async (skipTeardown: boolean): Promise<void> => {
 				try {

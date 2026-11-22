@@ -302,10 +302,7 @@ export function WorkspaceScreen() {
 		if (!pollingActive || !pendingCreate) return;
 		const interval = setInterval(() => {
 			void queryClient.invalidateQueries({
-				queryKey: getHostWorkspacesQueryKey(
-					pendingCreate.hostId,
-					pendingCreate.hostUrl,
-				),
+				queryKey: getHostWorkspacesQueryKey(pendingCreate.hostId),
 			});
 			void queryClient.invalidateQueries({
 				queryKey: getHostTerminalsQueryKey(pendingCreate.hostId),
@@ -402,7 +399,7 @@ export function WorkspaceScreen() {
 				// screen onto the real workspace.
 				clearPendingCreate(workspaceId);
 				void queryClient.invalidateQueries({
-					queryKey: getHostWorkspacesQueryKey(hostId, hostUrl),
+					queryKey: getHostWorkspacesQueryKey(hostId),
 				});
 				return;
 			}

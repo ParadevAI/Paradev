@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import type { WorkspaceScope } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
@@ -5,6 +6,7 @@ import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
 import { Chip } from "./components/Chip";
 import { CloudFilterChips } from "./components/CloudFilterChips";
+import { NeedsMeChip } from "./components/NeedsMeChip";
 
 interface ScopeBarProps {
 	scope: WorkspaceScope;
@@ -13,6 +15,7 @@ interface ScopeBarProps {
 	sortLabel: string | null;
 	onPressScope: () => void;
 	onPressSort: () => void;
+	needsMe: { count: number; active: boolean; onPress: () => void } | null;
 }
 
 /**
@@ -33,8 +36,11 @@ export function ScopeBar({
 	sortLabel,
 	onPressScope,
 	onPressSort,
+	needsMe,
 }: ScopeBarProps) {
+	const { t } = useLingui();
 	const cloud = scope === "cloud";
+	const all = scope === "all";
 	return (
 		<ScrollView
 			horizontal
@@ -42,9 +48,15 @@ export function ScopeBar({
 			showsHorizontalScrollIndicator={false}
 			contentContainerClassName="flex-row items-center gap-2 px-4 pb-2 pt-1"
 		>
-			{cloud || hostName ? (
+			{cloud || all || hostName ? (
 				<Chip
-					label={cloud ? "Cloud" : (hostName ?? "")}
+					label={
+						cloud
+							? "Cloud"
+							: all
+								? t({ message: "All hosts" })
+								: (hostName ?? "")
+					}
 					leading={
 						cloud ? (
 							<Icon
@@ -59,8 +71,17 @@ export function ScopeBar({
 					onPress={onPressScope}
 				/>
 			) : null}
-			{cloud ? <CloudFilterChips /> : null}
-			{sortLabel ? <Chip label={sortLabel} onPress={onPressSort} /> : null}
+			{needsMe ? (
+				<NeedsMeChip
+					count={needsMe.count}
+					active={needsMe.active}
+					onPress={needsMe.onPress}
+				/>
+			) : null}
+			{cloud && !needsMe?.active ? <CloudFilterChips /> : null}
+			{sortLabel && !needsMe?.active ? (
+				<Chip label={sortLabel} onPress={onPressSort} />
+			) : null}
 		</ScrollView>
 	);
 }

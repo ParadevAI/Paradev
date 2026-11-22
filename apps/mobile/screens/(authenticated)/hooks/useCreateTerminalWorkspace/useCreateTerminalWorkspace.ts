@@ -163,10 +163,7 @@ export function useCreateTerminalWorkspace() {
 
 				const refetchCreated = () => {
 					void queryClient.invalidateQueries({
-						queryKey: getHostWorkspacesQueryKey(
-							target.machineId,
-							target.hostUrl,
-						),
+						queryKey: getHostWorkspacesQueryKey(target.machineId),
 					});
 					void queryClient.invalidateQueries({
 						queryKey: getHostTerminalsQueryKey(target.machineId),

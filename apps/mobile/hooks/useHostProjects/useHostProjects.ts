@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { type UseQueryResult, useQueries } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import type { WorkspacesHost } from "@/hooks/useHostWorkspaces";
 import {
 	getHostServiceClientByUrl,
@@ -49,40 +49,79 @@ export interface UseHostProjectsResult {
 }
 
 /**
- * Projects served by one host's `project.list` over the relay — projects
- * are fully local (host.db owns them; the cloud collection is retired), so
- * the host is the only source that includes local-first projects.
+ * One host's `project.list`. Only an online host is asked; an offline host
+ * serves the projects it last returned.
  */
-export function useHostProjects(
-	host: WorkspacesHost | null,
-): UseHostProjectsResult {
-	const hostUrl = host
-		? hostServiceUrl(host.organizationId, host.machineId)
-		: null;
-
-	const query = useQuery({
-		queryKey: ["host-service", "projects", "list", host?.machineId, hostUrl],
-		enabled: hostUrl !== null && (host?.isOnline ?? false),
+export function hostProjectsQueryOptions(host: WorkspacesHost) {
+	const hostUrl = hostServiceUrl(host.organizationId, host.machineId);
+	return {
+		queryKey: ["host-service", "projects", "list", host.machineId, hostUrl],
+		enabled: host.isOnline,
 		refetchInterval: PROJECTS_REFETCH_INTERVAL_MS,
 		networkMode: "always" as const,
 		retry: 1,
-		queryFn: async () => {
-			if (!hostUrl) return [];
-			return getHostServiceClientByUrl(hostUrl).project.list.query();
-		},
-	});
+		queryFn: () => getHostServiceClientByUrl(hostUrl).project.list.query(),
+	};
+}
 
-	const projects = useMemo(
-		() => (query.data ?? []).map(toHostProjectItem),
-		[query.data],
+type ProjectListRows = Awaited<
+	ReturnType<ReturnType<typeof hostProjectsQueryOptions>["queryFn"]>
+>;
+
+export interface UseHostsProjectsResult {
+	byHost: Map<string, HostProjectItem[]>;
+	isReady: boolean;
+}
+
+const NO_PROJECTS: HostProjectItem[] = [];
+
+/**
+ * Projects served by each host's `project.list` over the relay — projects
+ * are fully local (host.db owns them; the cloud collection is retired), so
+ * the host is the only source that includes local-first projects.
+ */
+export function useHostsProjects(
+	hosts: readonly WorkspacesHost[],
+): UseHostsProjectsResult {
+	const hostsKey = hosts
+		.map((host) => `${host.organizationId}:${host.machineId}:${host.isOnline}`)
+		.join("|");
+	// biome-ignore lint/correctness/useExhaustiveDependencies: hostsKey stands for `hosts`
+	const stableHosts = useMemo(() => hosts, [hostsKey]);
+
+	const combine = useCallback(
+		(results: UseQueryResult<ProjectListRows>[]) => {
+			const byHost = new Map<string, HostProjectItem[]>();
+			let isReady = true;
+			stableHosts.forEach((host, index) => {
+				const query = results[index];
+				byHost.set(
+					host.machineId,
+					query?.data?.map(toHostProjectItem) ?? NO_PROJECTS,
+				);
+				if (host.isOnline && !query?.isSuccess && !query?.isError) {
+					isReady = false;
+				}
+			});
+			return { byHost, isReady };
+		},
+		[stableHosts],
 	);
 
+	return useQueries({
+		queries: stableHosts.map(hostProjectsQueryOptions),
+		combine,
+	});
+}
+
+/** One host's projects; see useHostsProjects. */
+export function useHostProjects(
+	host: WorkspacesHost | null,
+): UseHostProjectsResult {
+	const hosts = useMemo(() => (host ? [host] : []), [host]);
+	const { byHost, isReady } = useHostsProjects(hosts);
 	return {
-		projects,
-		isReady:
-			query.isSuccess ||
-			query.isError ||
-			host === null ||
-			host.isOnline === false,
+		projects: (host && byHost.get(host.machineId)) || NO_PROJECTS,
+		isReady,
 	};
 }

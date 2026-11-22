@@ -188,6 +188,10 @@ msgstr "{0, plural, one {# štítek} few {# štítky} many {# štítku} other {#
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# přihlášení} few {# přihlášení} many {# přihlášení} other {# přihlášení}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# čeká na vstup} few {# čekají na vstup} many {# čeká na vstup} other {# čeká na vstup}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, one {# nová odpověď} few {# nové odpovědi} many {# nových odpovědí} other {# nových odpovědí}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# projekt} few {# projekty} many {# projektu} other {# 
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# pull request} few {# pull requesty} many {# pull requestu} other {# pull requestů}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# připraven} few {# připraveny} many {# připraveno} other {# připraveno}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, one {# odpověď} few {# odpovědi} many {# odpovědí} othe
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repozitář} few {# repozitáře} many {# repozitáře} other {# repozitářů}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# výsledek na všech hostech} few {# výsledky na všech hostech} many {# výsledku na všech hostech} other {# výsledků na všech hostech}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, one {# běžící terminál} few {# běžící terminály} m
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# nezměněný řádek} few {# nezměněné řádky} many {# nezměněného řádku} other {# nezměněných řádků}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# pracuje} few {# pracují} many {# pracuje} other {# pracuje}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "Všechny funkce vedle sebe"
 msgid "All files exceed the maximum size."
 msgstr "Všechny soubory překračují maximální velikost."
 
+msgid "All hosts"
+msgstr "Všechny hosty"
+
 msgid "All in a new tab (split panes)"
 msgstr "Vše v nové kartě (rozdělené panely)"
 
@@ -4058,6 +4077,9 @@ msgstr "Může zobrazit"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Můžeš sjednotit tooltipy napříč aplikací?"
+
+msgid "can’t check"
+msgstr "nelze ověřit"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName} nelze zkontrolovat"
@@ -13620,6 +13642,9 @@ msgstr "Na {pathname} nic není."
 msgid "Nothing needs a retry"
 msgstr "Není co opakovat"
 
+msgid "Nothing needs you right now"
+msgstr "Teď na vás nic nečeká"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Za posledních 30 dní zatím nebylo nic publikováno. Vaše pozice se objeví, jakmile se synchronizuje využití z tohoto počítače; publikujete jako <0>{handle}</0>."
 
@@ -13732,6 +13757,14 @@ msgstr "Offline"
 
 msgid "Offline / local-first mode"
 msgstr "Offline / local-first režim"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "offline, naposledy {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "Offline, naposledy {0}"
 
 msgid "OK"
 msgstr "OK"

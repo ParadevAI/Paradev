@@ -188,6 +188,10 @@ msgstr "{0, plural, other {# 個標籤}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#項登入資訊} other {#項登入資訊}}"
 
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {#個需要輸入} other {#個需要輸入}}"
+
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
 msgstr "{0, plural, other {# 則新回覆}}"
@@ -222,6 +226,10 @@ msgstr "{0, plural, one {# 個專案} other {# 個專案}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# 個拉取請求}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {#個待審查} other {#個待審查}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +239,10 @@ msgstr "{0, plural, other {# 則回覆}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {#個儲存庫} other {#個儲存庫}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {所有主機中#個結果} other {所有主機中#個結果}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +291,10 @@ msgstr "{0, plural, other {# 個終端機正在執行}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, other {# 行未修改}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {#個執行中} other {#個執行中}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -2589,6 +2605,9 @@ msgstr "所有功能逐項對比"
 msgid "All files exceed the maximum size."
 msgstr "所有檔案都超過了大小上限。"
 
+msgid "All hosts"
+msgstr "所有主機"
+
 msgid "All in a new tab (split panes)"
 msgstr "全部在新分頁（分屏窗格）"
 
@@ -4058,6 +4077,9 @@ msgstr "可檢視"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "能把整個應用的tooltip樣式統一一下嗎？"
+
+msgid "can’t check"
+msgstr "無法檢查"
 
 msgid "Can’t check {hostName}"
 msgstr "無法檢查{hostName}"
@@ -13620,6 +13642,9 @@ msgstr "{pathname}下沒有任何內容。"
 msgid "Nothing needs a retry"
 msgstr "沒有需要重試的執行"
 
+msgid "Nothing needs you right now"
+msgstr "目前沒有需要你處理的項目"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "最近 30 天尚未發佈任何資料。這台機器的用量同步後即會顯示你的排名，將以 <0>{handle}</0> 發佈。"
 
@@ -13732,6 +13757,14 @@ msgstr "離線"
 
 msgid "Offline / local-first mode"
 msgstr "離線/本地優先模式"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "離線，上次上線 {0}"
+
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "Offline, seen {0}"
+msgstr "離線，上次上線 {0}"
 
 msgid "OK"
 msgstr "確定"
