@@ -45,7 +45,7 @@ and any tradeoffs you made.
 
 ```bash
 for agent in claude codex opencode; do
-  superset workspaces create --project <projectId> \
+  paradev workspaces create --project <projectId> \
     --name "race-$agent" --branch "race/$agent" --local \
     --agent "$agent" --prompt "$(cat prompt.md)"
 done

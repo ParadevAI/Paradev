@@ -21,9 +21,14 @@ function withDefault(
 	defaultLabel: string,
 	entries: readonly Entry[],
 	selected: string | null,
+	defaultDescription?: string,
 ): Pick<SessionConfigOption, "currentValue" | "options"> {
 	const options = [
-		{ id: AGENT_DEFAULT_OPTION_ID, label: defaultLabel },
+		{
+			id: AGENT_DEFAULT_OPTION_ID,
+			label: defaultLabel,
+			...(defaultDescription ? { description: defaultDescription } : {}),
+		},
 		...entries.map(({ id, label }) => ({ id, label })),
 	];
 	return {
@@ -39,6 +44,8 @@ export function launchConfigOptions(input: {
 	selectedModel: string | null;
 	efforts: readonly AgentEffortOption[];
 	selectedEffort: string | null;
+	/** What the agent's own default effort resolves to, when its runtime says. */
+	defaultEffortLabel?: string;
 	labels: LaunchConfigLabels;
 }): SessionConfigOption[] {
 	const { labels } = input;
@@ -60,7 +67,12 @@ export function launchConfigOptions(input: {
 			id: LAUNCH_EFFORT_OPTION_ID,
 			label: labels.effort,
 			category: "thought_level",
-			...withDefault(labels.defaultEffort, input.efforts, input.selectedEffort),
+			...withDefault(
+				labels.defaultEffort,
+				input.efforts,
+				input.selectedEffort,
+				input.defaultEffortLabel,
+			),
 		});
 	}
 	return options;

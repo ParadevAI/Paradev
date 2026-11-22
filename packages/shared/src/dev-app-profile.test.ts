@@ -36,6 +36,8 @@ describe("isDevAppProfileDirName", () => {
 		expect(isDevAppProfileDirName("Superset")).toBe(false);
 		expect(isDevAppProfileDirName("Superset Dev")).toBe(false);
 		expect(isDevAppProfileDirName("Superset Canary")).toBe(false);
+		expect(isDevAppProfileDirName("Paradev")).toBe(false);
+		expect(isDevAppProfileDirName("Paradev Canary")).toBe(false);
 	});
 
 	test("leaves unrelated application-data directories alone", () => {

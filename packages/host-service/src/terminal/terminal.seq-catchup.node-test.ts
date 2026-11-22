@@ -355,8 +355,12 @@ class SeqRenderer {
 		});
 	}
 
-	sendResize(cols: number, rows: number): void {
-		this.ws?.send(JSON.stringify({ type: "resize", cols, rows }));
+	sendResize(
+		cols: number,
+		rows: number,
+		options: { repaint?: boolean } = {},
+	): void {
+		this.ws?.send(JSON.stringify({ type: "resize", cols, rows, ...options }));
 	}
 
 	sendVisible(visible: boolean): void {
@@ -892,6 +896,47 @@ test(
 			await witness.disconnect().catch(() => {});
 			renderer.dispose();
 			witness.dispose();
+			await disposeSessionAndWait(terminalId, db).catch(() => {});
+		}
+	},
+);
+
+test(
+	"an exact reattach repaints when the client says its screen is stale",
+	{ timeout: 60_000 },
+	async () => {
+		const terminalId = `seq-stale-${randomUUID().slice(0, 8)}`;
+		const session = await createTerminalSessionInternal({
+			terminalId,
+			workspaceId,
+			db,
+			listed: true,
+			cols: COLS,
+			rows: ROWS,
+			initialCommand: `exec bash '${path.join(TEST_HOME, "tui.sh")}'`,
+		});
+		if ("error" in session) assert.fail(session.error);
+
+		const renderer = new SeqRenderer();
+		try {
+			await renderer.connect(terminalId);
+			await renderer.waitVisible("TUI READY");
+			await quiesce(renderer);
+			await renderer.disconnect();
+
+			await renderer.connect(terminalId, { autoResize: false });
+			assert.equal((await renderer.waitSynced()).mode, "exact");
+			await renderer.drain();
+			assert.ok(
+				!visibleText(renderer.term).includes("FULL-REDRAW"),
+				"nothing may redraw before the client asks",
+			);
+			// Same size as the PTY, so no SIGWINCH comes on its own.
+			renderer.sendResize(COLS, ROWS, { repaint: true });
+			await renderer.waitVisible("FULL-REDRAW", 15_000);
+		} finally {
+			await renderer.disconnect().catch(() => {});
+			renderer.dispose();
 			await disposeSessionAndWait(terminalId, db).catch(() => {});
 		}
 	},

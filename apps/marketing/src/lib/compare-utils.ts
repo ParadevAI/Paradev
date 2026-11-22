@@ -3,6 +3,9 @@
  * These can be safely imported in both server and client components.
  */
 
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { BRAND } from "@superset/shared/brand";
 import { formatContentDate } from "./content-utils";
 
 export type ComparisonPageType = "1v1" | "roundup" | "tutorial";
@@ -30,6 +33,15 @@ export function formatCompareDate(date: string): string {
 	return formatContentDate(date, "short");
 }
 
+export const COMPARISON_PAGE_TYPE_LABELS: Record<
+	ComparisonPageType,
+	MessageDescriptor
+> = {
+	"1v1": msg({ message: "Comparison", context: "compare page type" }),
+	roundup: msg({ message: "Roundup", context: "compare page type" }),
+	tutorial: msg({ message: "Tutorial", context: "compare page type" }),
+};
+
 export function getComparisonPageTypeLabel(type: ComparisonPageType): string {
 	switch (type) {
 		case "roundup":
@@ -43,23 +55,50 @@ export function getComparisonPageTypeLabel(type: ComparisonPageType): string {
 
 const FAQ_HEADING = /^##\s+(Frequently Asked Questions|FAQ)\s*$/i;
 
+function faqHeadingIndex(lines: string[]): number {
+	for (let index = 0; index < lines.length; index++) {
+		const line = lines[index]?.trim() ?? "";
+		if (FAQ_HEADING.test(line)) return index;
+		// Translated bodies retain the original FAQ anchor immediately before its translated heading.
+		if (!/^<span id="(frequently-asked-questions|faq)" \/>$/.test(line))
+			continue;
+		let next = index + 1;
+		while (next < lines.length && !lines[next]?.trim()) next++;
+		if (/^##\s+/.test(lines[next] ?? "")) return next;
+	}
+	return -1;
+}
+
 export function splitComparisonFaq(content: string): {
 	body: string;
 	faq: string | null;
 } {
 	const lines = content.split("\n");
-	const faqStart = lines.findIndex((line) => FAQ_HEADING.test(line.trim()));
+	const faqStart = faqHeadingIndex(lines);
 	if (faqStart === -1) {
 		return { body: content, faq: null };
 	}
+	let fragmentStart = faqStart;
+	while (fragmentStart > 0 && !lines[fragmentStart - 1]?.trim())
+		fragmentStart--;
+	if (
+		/^<span id="(frequently-asked-questions|faq)" \/>$/.test(
+			lines[fragmentStart - 1]?.trim() ?? "",
+		)
+	) {
+		fragmentStart--;
+	} else {
+		fragmentStart = faqStart;
+	}
 	return {
-		body: lines.slice(0, faqStart).join("\n"),
-		faq: lines.slice(faqStart).join("\n"),
+		body: lines.slice(0, fragmentStart).join("\n"),
+		faq: lines.slice(fragmentStart).join("\n"),
 	};
 }
 
 function stripMarkdownFormatting(value: string): string {
 	return value
+		.replace(/<span id="[^"]*" \/>/g, "")
 		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
 		.replace(/`([^`]+)`/g, "$1")
 		.replace(/[*_~>#]/g, "")
@@ -72,6 +111,7 @@ export function extractComparisonFaqItems(
 ): ComparisonFaqItem[] {
 	const lines = content.split("\n");
 	const items: ComparisonFaqItem[] = [];
+	const faqStart = faqHeadingIndex(lines);
 
 	let inFaqSection = false;
 	let currentQuestion: string | undefined;
@@ -99,10 +139,10 @@ export function extractComparisonFaqItems(
 		currentAnswerLines = [];
 	};
 
-	for (const line of lines) {
+	for (const [lineIndex, line] of lines.entries()) {
 		const trimmedLine = line.trim();
 
-		if (FAQ_HEADING.test(trimmedLine)) {
+		if (lineIndex === faqStart) {
 			inFaqSection = true;
 			continue;
 		}
@@ -179,4 +219,32 @@ export function extractRoundupItems(content: string): string[] {
 	}
 
 	return items;
+}
+
+// Google cuts result titles at about 60 characters.
+const SEARCH_TITLE_MAX_LENGTH = 65;
+
+export function compareSearchTitle(
+	title: string,
+	introNames: readonly string[] = [
+		BRAND.INTRO_NAME,
+		`${BRAND.NAME} (ex-${BRAND.FORMER_NAME})`,
+	],
+): string {
+	for (const introName of introNames) {
+		const candidate = `${title} | ${introName}`;
+		if (candidate.length <= SEARCH_TITLE_MAX_LENGTH) return candidate;
+	}
+	return `${title} | ${BRAND.NAME}`;
+}
+
+export function compareSearchDescription(
+	description: string,
+	introName: string = BRAND.INTRO_NAME,
+): string {
+	if (BRAND.NAME === BRAND.FORMER_NAME) return description;
+	return description.replace(
+		new RegExp(`\\b${BRAND.NAME}\\b(?!'s| \\(formerly)`),
+		introName,
+	);
 }

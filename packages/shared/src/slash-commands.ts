@@ -120,3 +120,31 @@ export function sortSlashCommandMatches<
 		})
 		.map((item) => item.command);
 }
+
+const LEGACY_PLUGIN_PREFIX = "superset:";
+const CURRENT_PLUGIN_PREFIX = "paradev:";
+
+/**
+ * Claude sees the bundled plugin twice, as `paradev:<x>` and the old
+ * `superset:<x>`. Menus show one entry: the old name becomes an alias of the
+ * new one, so typing it still finds the entry. A `superset:` entry with no
+ * `paradev:` twin (a host from before the rename) stays as it is.
+ */
+export function foldLegacyPluginCommands<T extends { name: string }>(
+	commands: T[],
+): Array<{ command: T; legacyAliases: string[] }> {
+	const names = new Set(commands.map((command) => command.name));
+	const legacyOf = new Map<string, string>();
+	for (const { name } of commands) {
+		if (!name.startsWith(LEGACY_PLUGIN_PREFIX)) continue;
+		const current = `${CURRENT_PLUGIN_PREFIX}${name.slice(LEGACY_PLUGIN_PREFIX.length)}`;
+		if (names.has(current)) legacyOf.set(current, name);
+	}
+	const folded = new Set(legacyOf.values());
+	return commands
+		.filter((command) => !folded.has(command.name))
+		.map((command) => {
+			const legacy = legacyOf.get(command.name);
+			return { command, legacyAliases: legacy ? [legacy] : [] };
+		});
+}

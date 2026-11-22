@@ -1,14 +1,15 @@
 ---
 title: Getting Started
+seoTitle: "Paradev CLI (formerly Superset CLI): Getting Started"
 description: Install the Paradev CLI, sign in, and run your first commands.
 ---
 
-The Paradev CLI (`superset`) is a single static binary that uses the same
+The Paradev CLI (`paradev`) is a single static binary that uses the same
 backend as the desktop app. Use it to manage workspaces, tasks, automations,
 and the local host server from a terminal or CI. Scripts and other agents can
 also [dispatch agent tasks](#dispatch-agent-tasks-from-a-script-or-another-agent)
-with it. `paradev` is an alias for `superset`: every install below puts both on
-`PATH`.
+with it. `superset` still works as an alias for `paradev`: every install below
+puts both on `PATH`, so scripts written for `superset` keep working.
 
 <YouTubeVideo id="8g-l5kYEGBc" title="Paradev CLI + Skills Demo" thumbnail="/images/cli-skills-demo.jpg" />
 
@@ -46,7 +47,7 @@ brew install paradevai/tap/superset
 ## Sign in
 
 ```bash
-superset auth login
+paradev auth login
 ```
 
 The CLI starts a loopback callback server on `127.0.0.1:51789` (or `51790`
@@ -57,22 +58,22 @@ If you belong to multiple organizations, the CLI asks you to pick one. To
 skip the prompt:
 
 ```bash
-superset auth login --organization acme
+paradev auth login --organization acme
 ```
 
 In CI or other non-interactive environments with no browser, use an API
 key. Store it once with `auth login --api-key`:
 
 ```bash
-superset auth login --api-key sk_live_…
-superset auth whoami
+paradev auth login --api-key sk_live_…
+paradev auth whoami
 ```
 
 Or set `SUPERSET_API_KEY` without writing anything to disk:
 
 ```bash
 export SUPERSET_API_KEY=sk_live_…
-superset auth whoami
+paradev auth whoami
 ```
 
 API keys are issued from the **Settings → API Keys** page in the desktop app.
@@ -80,7 +81,7 @@ API keys are issued from the **Settings → API Keys** page in the desktop app.
 ## Verify your session
 
 ```bash
-superset auth whoami
+paradev auth whoami
 ```
 
 ```text
@@ -91,10 +92,10 @@ Auth: Session (expires in 32 min)
 
 ## Explore interactively
 
-Bare `superset` in a terminal opens an interactive command browser. Use
+Bare `paradev` in a terminal opens an interactive command browser. Use
 the arrow keys to browse commands and flags, and fill in required inputs
 with guided prompts. A confirmation screen shows the exact command before
-it runs. `superset --help` prints the same catalog as static help. Agents
+it runs. `paradev --help` prints the same catalog as static help. Agents
 and CI always get static help.
 
 ![The interactive command browser](/images/cli-command-browser.png)
@@ -105,7 +106,7 @@ List the projects on this machine. Each one has an `id`, which later
 commands take as `PROJECT_ID`:
 
 ```bash
-superset projects list
+paradev projects list
 ```
 
 If your repo isn't there yet, register it on this machine. Clone from a
@@ -113,25 +114,25 @@ Git URL or import an existing checkout:
 
 ```bash
 # Clone from a URL
-superset projects create --name "my-app" --local \
+paradev projects create --name "my-app" --local \
   --clone https://github.com/org/my-app.git \
   --parent-dir ~/code
 
 # Or register an existing local checkout
-superset projects create --name "my-app" --local --import ~/code/my-app
+paradev projects create --name "my-app" --local --import ~/code/my-app
 ```
 
 If the project already exists in your org but isn't on this machine,
 attach to it instead of creating a duplicate:
 
 ```bash
-superset projects setup PROJECT_ID --local --parent-dir ~/code
+paradev projects setup PROJECT_ID --local --parent-dir ~/code
 ```
 
 Then create a workspace against it:
 
 ```bash
-superset workspaces create \
+paradev workspaces create \
   --project PROJECT_ID \
   --name "fix-login-bug" \
   --branch fix/login-bug \
@@ -141,10 +142,10 @@ superset workspaces create \
 ## Dispatch agent tasks from a script or another agent
 
 One command creates a workspace on its own branch and starts an agent in it
-with a prompt. Get `PROJECT_ID` from `superset projects list`:
+with a prompt. Get `PROJECT_ID` from `paradev projects list`:
 
 ```bash
-superset workspaces create \
+paradev workspaces create \
   --project PROJECT_ID \
   --name "flaky-tests-2026-10-30" \
   --branch flaky-tests-2026-10-30 \
@@ -162,7 +163,7 @@ it, next to any agent already working there.
 runner usually exits when the job ends, so from CI target a host that
 stays on with `--host HOST_ID` (see [Local vs. remote hosts](#local-vs-remote-hosts)).
 Projects belong to a host, so use the same `--host HOST_ID` on every
-command: get `PROJECT_ID` from `superset projects list --host HOST_ID`, and
+command: get `PROJECT_ID` from `paradev projects list --host HOST_ID`, and
 pass `--host HOST_ID` instead of `--local` to `workspaces create`,
 `agents create`, and the `terminals` commands below.
 
@@ -172,7 +173,7 @@ The JSON output has the workspace ID in `workspace.id`. For each agent,
 agent fails to start, so a script should check `ok`:
 
 ```bash
-superset workspaces create --project PROJECT_ID --name "flaky-tests-2026-10-30" \
+paradev workspaces create --project PROJECT_ID --name "flaky-tests-2026-10-30" \
   --branch flaky-tests-2026-10-30 --local --agent claude \
   --prompt "Find the flaky test in CI and propose a fix. Do not merge." --json \
   | jq -e '.agents[0].ok'
@@ -181,7 +182,7 @@ superset workspaces create --project PROJECT_ID --name "flaky-tests-2026-10-30" 
 To start another agent in a workspace that already exists:
 
 ```bash
-superset agents create --workspace WORKSPACE_ID --local --agent codex --prompt "Review the diff and list risks."
+paradev agents create --workspace WORKSPACE_ID --local --agent codex --prompt "Review the diff and list risks."
 ```
 
 Check on the work and read what an agent printed. `workspaces list` prints
@@ -189,10 +190,10 @@ each `WORKSPACE_ID`. `terminals list` prints only a count in a terminal, so
 use `--json` to get each `TERMINAL_ID`:
 
 ```bash
-superset workspaces list --local
-superset terminals list --workspace WORKSPACE_ID --local --json \
+paradev workspaces list --local
+paradev terminals list --workspace WORKSPACE_ID --local --json \
   | jq -r '.sessions[].terminalId'
-superset terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local
+paradev terminals read --workspace WORKSPACE_ID --terminal TERMINAL_ID --local
 ```
 
 Each dispatched task opens in the desktop and iPhone apps like any other
@@ -207,9 +208,9 @@ POST to its URL.
 Run an automation immediately:
 
 ```bash
-superset automations list               # each automation's id is AUTOMATION_ID
-superset automations run AUTOMATION_ID
-superset automations logs AUTOMATION_ID
+paradev automations list               # each automation's id is AUTOMATION_ID
+paradev automations run AUTOMATION_ID
+paradev automations logs AUTOMATION_ID
 ```
 
 ## Output modes
@@ -223,8 +224,8 @@ output for scripts:
 | `--quiet` | One ID per line for arrays of objects with `id`; the ID for single objects; JSON otherwise. |
 
 ```bash
-superset tasks list --assignee-me --json | jq '.[].title'
-superset workspaces list --quiet | xargs -L1 superset workspaces archive
+paradev tasks list --assignee-me --json | jq '.[].title'
+paradev workspaces list --quiet | xargs -L1 paradev workspaces archive
 ```
 
 When the CLI detects an agent or CI environment (`CLAUDE_CODE`,
@@ -235,15 +236,15 @@ output unless you pass `--quiet`.
 ## Local vs. remote hosts
 
 Commands that touch a host accept `--host HOST_ID` to pick which host
-handles the request, or `--local` for this machine. `superset hosts list`
+handles the request, or `--local` for this machine. `paradev hosts list`
 gives each `HOST_ID`. Local calls go straight to the host server over
 loopback and work offline. Remote calls route through the cloud API and the
 relay.
 
 ```bash
-superset hosts list
-superset workspaces list --local          # this machine
-superset workspaces list --host HOST_ID   # another host
+paradev hosts list
+paradev workspaces list --local          # this machine
+paradev workspaces list --host HOST_ID   # another host
 ```
 
 Every host-scoped command targets exactly one host. `projects list`

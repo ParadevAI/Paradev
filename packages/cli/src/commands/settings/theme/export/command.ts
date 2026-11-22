@@ -25,7 +25,7 @@ export default command({
 			}
 			return {
 				data: theme,
-				message: `Exported "${theme.id}" to ${options.out}. Edit it, then: superset settings theme import '${options.out}'`,
+				message: `Exported "${theme.id}" to ${options.out}. Edit it, then: paradev settings theme import '${options.out}'`,
 			};
 		}
 		return { data: theme, message: json };

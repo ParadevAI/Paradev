@@ -11,7 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { openUrl } from "@/lib/open-url";
 import { posthog } from "@/lib/posthog";
-import { useRefreshHostsPresence } from "../../hooks/useRefreshHostsPresence";
+import { useRefreshHostsPresence } from "@/screens/(authenticated)/(home)/home/hooks/useRefreshHostsPresence";
 import { HintRow } from "../HintRow";
 import { StepNumber } from "./components/StepNumber";
 

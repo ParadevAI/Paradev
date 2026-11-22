@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { getBinDir } from "./paths";
 
 /**
@@ -8,6 +9,6 @@ import { getBinDir } from "./paths";
  * helper would print `Bearer ` and fail every call.
  */
 export function mcpHeadersHelperCommand(): string | undefined {
-	if (process.env.SUPERSET_SANDBOX_WORKSPACE_ID) return undefined;
+	if (readPublicEnv("SANDBOX_WORKSPACE_ID")) return undefined;
 	return `${path.join(getBinDir(), "superset")} auth mcp-headers`;
 }

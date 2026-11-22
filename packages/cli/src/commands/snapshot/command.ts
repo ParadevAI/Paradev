@@ -32,7 +32,7 @@ export default command({
 		if (options.workspace && workspaces.length === 0) {
 			throw new CLIError(
 				`Workspace ${options.workspace} is not on this host`,
-				"List them with `superset workspaces list`, or pass --host",
+				"List them with `paradev workspaces list`, or pass --host",
 			);
 		}
 		const layouts = new Map(

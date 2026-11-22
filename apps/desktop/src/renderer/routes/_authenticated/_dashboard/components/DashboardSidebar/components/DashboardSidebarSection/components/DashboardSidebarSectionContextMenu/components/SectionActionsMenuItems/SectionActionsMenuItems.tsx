@@ -42,7 +42,7 @@ export function SectionActionsMenuItems({
 	const colorOptions: { name: string; value: string }[] = [
 		{
 			name: t({
-				message: "Default",
+				message: "None",
 			}),
 			value: PROJECT_COLOR_DEFAULT,
 		},

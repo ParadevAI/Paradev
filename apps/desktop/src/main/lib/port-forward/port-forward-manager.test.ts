@@ -310,6 +310,99 @@ describe("PortForwardManager", () => {
 		echo.close();
 	});
 
+	test("a forward asked for explicitly outlives every window and stops on Stop", async () => {
+		const echo = await startEcho();
+		const m = manager(echoTransport(echo.port));
+		const port = await freePort();
+		const [forward] = await m.forward({
+			hostUrl: HOST,
+			workspaceId: "cloud-ws",
+			remotePort: port,
+		});
+		expect(forward?.explicit).toBe(true);
+		expect(await roundTrip(port, "hello")).toBe("hello");
+		// Leaving the workspace syncs an empty set; the forward stays.
+		await m.sync({ clientId: "w1", hostUrl: "", workspaceId: "", ports: [] });
+		await m.releaseClient("w1");
+		expect(m.list().map((f) => f.target.remotePort)).toEqual([port]);
+		await m.stopForward(forward?.id ?? "");
+		expect(m.list()).toEqual([]);
+		expect(await freeToBind(port)).toBe(true);
+		echo.close();
+	});
+
+	test("an explicit forward moves to a free port when its own is busy", async () => {
+		const echo = await startEcho();
+		const m = manager(echoTransport(echo.port));
+		const taken = net.createServer();
+		const port = await new Promise<number>((resolve) =>
+			taken.listen(0, "127.0.0.1", () =>
+				resolve((taken.address() as net.AddressInfo).port),
+			),
+		);
+		const [forward] = await m.forward({
+			hostUrl: HOST,
+			workspaceId: "cloud-ws",
+			remotePort: port,
+		});
+		expect(forward?.status.state).toBe("active");
+		const localPort =
+			forward?.status.state === "active" ? forward.status.localPort : 0;
+		expect(localPort).not.toBe(port);
+		expect(await roundTrip(localPort, "moved")).toBe("moved");
+		m.stopAll();
+		taken.close();
+		echo.close();
+	});
+
+	test("an explicit forward made while the host is unreachable recovers on the first good connection", async () => {
+		const echo = await startEcho();
+		const transport = echoTransport(echo.port);
+		transport.probe = async () => {
+			throw new Error("Host did not answer");
+		};
+		const m = manager(transport);
+		const port = await freePort();
+		const [forward] = await m.forward({
+			hostUrl: HOST,
+			workspaceId: "cloud-ws",
+			remotePort: port,
+		});
+		expect(forward?.status).toEqual({
+			state: "error",
+			message: "Host did not answer",
+		});
+		expect(forward?.localPort).toBe(port);
+
+		expect(await roundTrip(port, "awake")).toBe("awake");
+		expect(m.list()[0]?.status).toEqual({ state: "active", localPort: port });
+		m.stopAll();
+		echo.close();
+	});
+
+	test("stopExplicit ends explicit forwards and leaves a window's own", async () => {
+		const echo = await startEcho();
+		const m = manager(echoTransport(echo.port));
+		const mine = await freePort();
+		const windows = await freePort();
+		await m.forward({
+			hostUrl: HOST,
+			workspaceId: "cloud-ws",
+			remotePort: mine,
+		});
+		await m.sync({
+			clientId: "w1",
+			hostUrl: HOST,
+			workspaceId: "remote-ws",
+			ports: [windows],
+		});
+		await m.stopExplicit();
+		expect(m.list().map((f) => f.target.remotePort)).toEqual([windows]);
+		expect(await freeToBind(mine)).toBe(true);
+		m.stopAll();
+		echo.close();
+	});
+
 	test("two clients wanting different forwards do not fight", async () => {
 		const echo = await startEcho();
 		const m = manager(echoTransport(echo.port));

@@ -4,7 +4,7 @@ import { cn } from "@superset/ui/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
-import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import {
 	AgentSessionPicker,
 	type AgentTarget,
@@ -31,7 +31,7 @@ interface PullRequestCommentComposerProps {
 	}) => void | Promise<void>;
 }
 
-// A twin of the v2-workspace DiffPane's AgentCommentComposer: same popover
+// A twin of the workspace DiffPane's AgentCommentComposer: same popover
 // chrome, agent-target picker, esc-to-dismiss, ⌘/Ctrl+Enter to submit — the
 // PR Code tab has no fixed workspaceId to source sessions from (a PR may not
 // have an open workspace at all yet), so `linkedWorkspaceId` is nullable and
@@ -54,7 +54,7 @@ export function PullRequestCommentComposer({
 			),
 		[bindings],
 	);
-	const { data: configs = [] } = useV2AgentConfigs(hostUrl);
+	const { data: configs = [] } = useAgentConfigs(hostUrl);
 	const { value, resolved, onValueChange } = useAgentSessionTarget({
 		sessions,
 		configs,

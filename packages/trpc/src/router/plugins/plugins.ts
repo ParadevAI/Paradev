@@ -30,6 +30,7 @@ import {
 } from "../utils/active-org";
 import {
 	AmbiguousPluginError,
+	accountOrOrganizationInstalls,
 	installedPlugin,
 	installRecord,
 } from "./connections";
@@ -215,6 +216,7 @@ const marketplacesRouter = {
 					and(
 						eq(pluginInstalls.userId, ctx.session.user.id),
 						eq(pluginInstalls.marketplace, input.name),
+						accountOrOrganizationInstalls(ctx.activeOrganizationId),
 					),
 				);
 			if (dependents.length) {
@@ -253,6 +255,8 @@ const connectionsRouter = {
 	list: personProcedure
 		.input(z.object({ plugin: z.string().min(1).optional() }).optional())
 		.query(async ({ ctx, input }) => {
+			const organizationId = ctx.activeOrganizationId;
+			if (!organizationId) return [];
 			const install = input?.plugin
 				? await installedPlugin(ctx.session.user.id, input.plugin).catch(
 						() => null,
@@ -273,6 +277,7 @@ const connectionsRouter = {
 				.from(connections)
 				.where(
 					and(
+						eq(connections.organizationId, organizationId),
 						eq(connections.connectedByUserId, ctx.session.user.id),
 						isNull(connections.disconnectedAt),
 						wanted ? eq(connections.connector, wanted) : undefined,
@@ -298,6 +303,7 @@ const connectionsRouter = {
 				.where(
 					and(
 						eq(connections.id, input.connectionId),
+						eq(connections.organizationId, requireActiveOrgId(ctx)),
 						eq(connections.connectedByUserId, ctx.session.user.id),
 						isNull(connections.disconnectedAt),
 					),
@@ -358,20 +364,23 @@ export const pluginsRouter = createTRPCRouter({
 					.from(pluginInstalls)
 					.where(eq(pluginInstalls.userId, ctx.session.user.id))
 					.orderBy(asc(pluginInstalls.pluginName)),
-				db
-					.select({
-						id: connections.id,
-						connector: connections.connector,
-						account: connections.externalAccountLabel,
-						user: connections.externalUserLabel,
-					})
-					.from(connections)
-					.where(
-						and(
-							eq(connections.connectedByUserId, ctx.session.user.id),
-							isNull(connections.disconnectedAt),
-						),
-					),
+				ctx.activeOrganizationId
+					? db
+							.select({
+								id: connections.id,
+								connector: connections.connector,
+								account: connections.externalAccountLabel,
+								user: connections.externalUserLabel,
+							})
+							.from(connections)
+							.where(
+								and(
+									eq(connections.organizationId, ctx.activeOrganizationId),
+									eq(connections.connectedByUserId, ctx.session.user.id),
+									isNull(connections.disconnectedAt),
+								),
+							)
+					: [],
 				organizationId
 					? db
 							.select()
@@ -647,6 +656,7 @@ export const pluginsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			const install = await installRecord(
 				ctx.session.user.id,
+				ctx.activeOrganizationId,
 				input.name,
 				input.marketplace,
 			).catch(ambiguous);
@@ -676,6 +686,7 @@ export const pluginsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			const install = await installRecord(
 				ctx.session.user.id,
+				ctx.activeOrganizationId,
 				input.name,
 				input.marketplace,
 			).catch(ambiguous);

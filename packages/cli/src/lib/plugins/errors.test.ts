@@ -18,7 +18,7 @@ describe("withPluginHints", () => {
 
 		expect(error).toBeInstanceOf(CLIError);
 		expect(error.suggestion).toBe(
-			"Some marketplaces could not be updated: superset: offline Run: superset plugins list --available",
+			"Some marketplaces could not be updated: superset: offline Run: paradev plugins list --available",
 		);
 	});
 

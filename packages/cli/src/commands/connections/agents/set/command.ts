@@ -114,7 +114,7 @@ export default command({
 		if (!value?.trim()) {
 			throw new CLIError(
 				"No value given",
-				`${hint}, or pipe it: printf '%s' "$TOKEN" | superset connections agents set ${agent} --kind ${options.kind}`,
+				`${hint}, or pipe it: printf '%s' "$TOKEN" | paradev connections agents set ${agent} --kind ${options.kind}`,
 			);
 		}
 		const saved = await ctx.api.agentCredential.set.mutate({

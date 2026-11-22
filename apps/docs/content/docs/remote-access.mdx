@@ -33,25 +33,25 @@ See the CLI's [Getting Started](/cli/getting-started) and [Host Server](/cli/hos
 On the machine to add, sign in and start the host server.
 
 ```bash
-superset auth login
-superset start --daemon
+paradev auth login
+paradev start --daemon
 ```
 
-`superset start --daemon` runs the host server in the background and registers the machine with the relay so other clients in your organization can find it.
+`paradev start --daemon` runs the host server in the background and registers the machine with the relay so other clients in your organization can find it.
 
 Check that it is online:
 
 ```bash
-superset status
+paradev status
 ```
 
 ### Headless (sandbox, CI, or server)
 
-On a machine with no browser to complete an interactive login, authenticate with an API key instead. Create one in **Settings → API Keys**, then export it. The CLI reads `SUPERSET_API_KEY` automatically (no `superset auth login` needed):
+On a machine with no browser to complete an interactive login, authenticate with an API key instead. Create one in **Settings → API Keys**, then export it. The CLI reads `SUPERSET_API_KEY` automatically (no `paradev auth login` needed):
 
 ```bash
 export SUPERSET_API_KEY=sk_live_…
-superset start --daemon --org <id|slug|name>
+paradev start --daemon --org <id|slug|name>
 ```
 
 `--org` picks the organization the host registers under. It is required when your key belongs to more than one organization; with one, you can omit it. The host claims itself to the key's user on first registration. No desktop step is needed.
@@ -59,8 +59,8 @@ superset start --daemon --org <id|slug|name>
 Every `hosts` and `status` command takes the same `--org`:
 
 ```bash
-superset hosts list --org <id|slug|name>
-superset status --org <id|slug|name>
+paradev hosts list --org <id|slug|name>
+paradev status --org <id|slug|name>
 ```
 
 ## Set Up a Host Over SSH
@@ -115,6 +115,10 @@ Forwarded traffic passes through the Paradev relay, like terminal traffic does. 
 ## Turning access off
 
 - **Desktop**: flip the toggle in **Settings → Remote Access** back off. The host service restarts and stops accepting relay traffic.
-- **CLI**: run `superset stop` on the host machine.
+- **CLI**: run `paradev stop` on the host machine.
 
 In both cases, in-flight terminals and host-backed work on that machine are interrupted.
+
+## Related Guide
+
+- [How to Run Coding Agents on a Remote Machine or Always-On Host](https://paradev.com/compare/run-coding-agents-on-remote-machine)

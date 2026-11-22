@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import type * as React from "react";
-import { LuMinus, LuX } from "react-icons/lu";
+import { LuX } from "react-icons/lu";
 import { i18n } from "../../lib/i18n";
 import { cn } from "../../lib/utils";
 import { Badge } from "./badge";
@@ -8,6 +8,7 @@ import { Button } from "./button";
 
 interface SidebarCardProps {
 	badge?: string;
+	tone?: "default" | "warning";
 	title: string;
 	description?: string;
 	actionLabel?: string;
@@ -23,6 +24,7 @@ interface SidebarCardProps {
 
 function SidebarCard({
 	badge,
+	tone = "default",
 	title,
 	description,
 	actionLabel,
@@ -33,6 +35,10 @@ function SidebarCard({
 	className,
 	children,
 }: SidebarCardProps) {
+	const badgeClassName =
+		tone === "warning"
+			? "border-warning/40 bg-warning/10 text-warning"
+			: undefined;
 	const dismissLabel = i18n._(
 		msg({
 			message: "Dismiss",
@@ -45,17 +51,19 @@ function SidebarCard({
 				data-slot="sidebar-card"
 				className={cn(
 					"group relative isolate overflow-hidden rounded-xl border border-white/10 bg-black shadow-sm",
-					"transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg",
+					"transition-shadow duration-300 ease-out hover:shadow-lg",
 					className,
 				)}
 			>
 				<div className="relative">
-					<div className="transition-transform duration-500 ease-out group-hover:scale-[1.04]">
-						{media}
-					</div>
+					{media}
 					<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 via-35% to-transparent to-70%" />
 					<div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5">
-						{badge && <Badge variant="box">{badge}</Badge>}
+						{badge && (
+							<Badge variant="box" className={badgeClassName}>
+								{badge}
+							</Badge>
+						)}
 						<p
 							className={cn("text-sm font-medium text-white", badge && "mt-2")}
 						>
@@ -83,9 +91,9 @@ function SidebarCard({
 						type="button"
 						onClick={onDismiss}
 						aria-label={dismissLabel}
-						className="absolute top-1.5 right-1.5 z-20 flex size-6 items-center justify-center rounded-md text-white/70 opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-white/10 hover:text-white focus-visible:opacity-100 group-hover:opacity-100"
+						className="absolute top-1.5 right-1.5 z-20 flex size-6 items-center justify-center rounded-full bg-black/35 text-white/80 backdrop-blur-sm opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-black/55 hover:text-white focus-visible:opacity-100 group-hover:opacity-100"
 					>
-						<LuMinus className="size-3.5" />
+						<LuX className="size-3.5" strokeWidth={2} />
 					</button>
 				)}
 
@@ -111,7 +119,7 @@ function SidebarCard({
 		<div
 			data-slot="sidebar-card"
 			className={cn(
-				"relative rounded-lg border border-border bg-card p-3",
+				"group relative rounded-lg border border-border bg-card p-3",
 				onClick && "transition-colors hover:bg-accent/40",
 				className,
 			)}
@@ -125,16 +133,20 @@ function SidebarCard({
 				/>
 			)}
 
-			{badge && <Badge variant="box">{badge}</Badge>}
+			{badge && (
+				<Badge variant="box" className={badgeClassName}>
+					{badge}
+				</Badge>
+			)}
 
 			{onDismiss && (
 				<button
 					type="button"
 					onClick={onDismiss}
 					aria-label={dismissLabel}
-					className="absolute top-2.5 right-2.5 z-10 text-muted-foreground hover:text-foreground transition-colors"
+					className="absolute top-1.5 right-1.5 z-10 flex size-6 items-center justify-center rounded-md text-foreground/70 opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
 				>
-					<LuX className="size-3.5" />
+					<LuX className="size-3.5" strokeWidth={2} />
 				</button>
 			)}
 

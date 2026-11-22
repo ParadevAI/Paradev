@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { MachineSize } from "@superset/shared/billing";
 import {
 	DropdownMenu,
@@ -12,7 +13,7 @@ import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useM
 
 interface MachineSizePickerProps {
 	value: MachineSize | null;
-	onChange: (machineSize: MachineSize) => void;
+	onChange: (machineSize: MachineSize | null) => void;
 	className?: string;
 	disabled?: boolean;
 }
@@ -23,10 +24,9 @@ export function MachineSizePicker({
 	className,
 	disabled,
 }: MachineSizePickerProps) {
-	const { options, defaultSize } = useMachineSizeOptions();
-	const selected =
-		options.find((option) => option.size === value) ??
-		options.find((option) => option.size === defaultSize);
+	const { t } = useLingui();
+	const { options } = useMachineSizeOptions();
+	const selected = options.find((option) => option.size === value);
 
 	return (
 		<DropdownMenu>
@@ -35,11 +35,23 @@ export function MachineSizePicker({
 					disabled={disabled}
 					className={className}
 					icon={<LuCpu className="size-4 shrink-0" />}
-					label={selected?.name ?? value ?? defaultSize}
+					label={
+						selected?.name ?? value ?? t({ message: "Environment's size" })
+					}
 					title={selected?.spec}
 				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-64">
+				<DropdownMenuItem
+					onSelect={() => onChange(null)}
+					className="items-start gap-2"
+				>
+					<LuCpu className="mt-0.5 size-4 shrink-0" />
+					<span className="flex-1">
+						<Trans>Environment's size</Trans>
+					</span>
+					{value === null && <HiCheck className="mt-0.5 size-4 shrink-0" />}
+				</DropdownMenuItem>
 				{options.map((option) => (
 					<DropdownMenuItem
 						key={option.size}

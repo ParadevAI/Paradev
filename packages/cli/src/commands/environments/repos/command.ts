@@ -15,7 +15,7 @@ export default command({
 	run: async ({ ctx }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const repositories =
 			await ctx.api.integration.github.listRepositories.query({
@@ -24,7 +24,7 @@ export default command({
 		if (repositories.length === 0) {
 			throw new CLIError(
 				"No repositories connected to this organization",
-				"Run: superset integrations github connect",
+				"Run: paradev integrations github connect",
 			);
 		}
 		return repositories

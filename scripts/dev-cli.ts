@@ -85,13 +85,21 @@ console.error(
 	`[dev-cli] targeting local host org ${host.organizationId} @ ${host.endpoint}`,
 );
 
+const apiKey =
+	process.env.SUPERSET_API_KEY ||
+	process.env.PARADEV_API_KEY ||
+	"sk_dev_local_placeholder";
+
 const env: NodeJS.ProcessEnv = {
 	...process.env,
 	SUPERSET_HOME_DIR: homeDir,
+	PARADEV_HOME_DIR: homeDir,
 	SUPERSET_ORGANIZATION_ID: host.organizationId,
+	PARADEV_ORGANIZATION_ID: host.organizationId,
 	// Placeholder just satisfies the "logged in" gate and bypasses OAuth refresh;
 	// local host commands authenticate with the manifest token, not this.
-	SUPERSET_API_KEY: process.env.SUPERSET_API_KEY ?? "sk_dev_local_placeholder",
+	SUPERSET_API_KEY: apiKey,
+	PARADEV_API_KEY: apiKey,
 };
 
 try {

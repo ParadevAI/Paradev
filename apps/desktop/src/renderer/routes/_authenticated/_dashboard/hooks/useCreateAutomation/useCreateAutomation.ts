@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
-import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import {
@@ -41,7 +41,7 @@ export function useCreateAutomation(): {
 	const navigate = useNavigate();
 	const utils = cloudTrpc.useUtils();
 	const { machineId, activeHostUrl } = useLocalHostService();
-	const { agents: agentChoices } = useV2AgentChoices(activeHostUrl);
+	const { agents: agentChoices } = useAgentChoices(activeHostUrl);
 	const { runGatedFeature } = usePaywall();
 
 	const { mutateAsync, isPending } = useMutation({

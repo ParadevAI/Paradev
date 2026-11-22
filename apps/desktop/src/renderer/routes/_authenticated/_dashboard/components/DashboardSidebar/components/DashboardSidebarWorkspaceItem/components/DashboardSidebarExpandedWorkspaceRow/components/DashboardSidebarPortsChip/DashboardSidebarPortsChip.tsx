@@ -83,14 +83,14 @@ export function DashboardSidebarPortsChip({
 						isOpen
 							? t({
 									message: plural(ports.length, {
-										one: "# active port — hide details",
-										other: "# active ports — hide details",
+										one: "# active port: hide details",
+										other: "# active ports: hide details",
 									}),
 								})
 							: t({
 									message: plural(ports.length, {
-										one: "# active port — show details",
-										other: "# active ports — show details",
+										one: "# active port: show details",
+										other: "# active ports: show details",
 									}),
 								})
 					}

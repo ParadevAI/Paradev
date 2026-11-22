@@ -11,6 +11,6 @@ export async function resolveSource(api: ApiClient, ref: string) {
 		matches.length
 			? `${ref} has more than one source; name it by id.`
 			: `No source ${ref}.`,
-		"See them: superset plugins organization sources list",
+		"See them: paradev plugins organization sources list",
 	);
 }

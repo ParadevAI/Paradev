@@ -256,7 +256,7 @@ brew install paradevai/tap/superset
 Tải ứng dụng desktop:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (thử nghiệm; macOS là nền tảng chính)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (thử nghiệm; macOS là nền tảng chính)
 - **Windows**: chưa có
 - [Tất cả các bản build](https://github.com/paradevai/paradev/releases/latest)
 

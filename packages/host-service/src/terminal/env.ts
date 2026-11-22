@@ -22,6 +22,8 @@ import fs from "node:fs";
 import os from "node:os";
 import { resolveAppHomeDir } from "@superset/agent-setup";
 import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
+import { addPublicEnvAliases } from "@superset/shared/public-env";
+import { caught } from "../runtime/box-log-filter";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
 	augmentPathForMacOS,
@@ -95,9 +97,9 @@ export async function resolveTerminalBaseEnv(): Promise<
 	try {
 		return await getStrictShellEnvironment();
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
 		console.warn(
-			`[host-service] Shell env snapshot failed, falling back to process.env: ${message}`,
+			"[host-service] Shell env snapshot failed, falling back to process.env:",
+			caught(error),
 		);
 		const fallback = snapshotStringEnv(process.env);
 		augmentPathForMacOS(fallback);
@@ -148,7 +150,10 @@ export function startTerminalBaseEnvResolution(): void {
 	// so swallow a background failure rather than crash on an unhandled
 	// rejection. resolveTerminalBaseEnv already falls back internally.
 	promise.catch((err) => {
-		console.warn("[host-service] terminal base env resolution failed:", err);
+		console.warn(
+			"[host-service] terminal base env resolution failed:",
+			caught(err),
+		);
 	});
 	_terminalBaseEnvReady = promise;
 }
@@ -194,8 +199,6 @@ interface BuildV2TerminalEnvParams {
 	workspacePath: string;
 	rootPath: string;
 	supersetEnv: "development" | "production";
-	agentHookPort: string;
-	agentHookVersion: string;
 	/**
 	 * tRPC URL for the host-service notifications.hook mutation.
 	 * Endpoint is unauthenticated by design — it broadcasts chimes and
@@ -234,8 +237,6 @@ export function buildHostLaunchEnv(params: {
 		rootPath: params.rootPath,
 		supersetEnv:
 			process.env.NODE_ENV === "development" ? "development" : "production",
-		agentHookPort: process.env.SUPERSET_AGENT_HOOK_PORT || "",
-		agentHookVersion: process.env.SUPERSET_AGENT_HOOK_VERSION || "",
 		hostAgentHookUrl: params.hostAgentHookUrl,
 	});
 }
@@ -259,8 +260,6 @@ export function buildV2TerminalEnv(
 		workspacePath,
 		rootPath,
 		supersetEnv,
-		agentHookPort,
-		agentHookVersion,
 		hostAgentHookUrl,
 	} = params;
 
@@ -305,13 +304,9 @@ export function buildV2TerminalEnv(
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;
 	env.SUPERSET_ENV = supersetEnv;
-	env.SUPERSET_AGENT_HOOK_PORT = agentHookPort;
-	env.SUPERSET_AGENT_HOOK_VERSION = agentHookVersion;
-	// v2 — agent posts to host-service so the renderer can play the sound
-	// client-side. No auth token: the endpoint is unauthenticated by design
-	// (chimes plus an idempotent linked-task In Progress nudge). The
-	// notify-hook script falls back to the electron endpoint when this URL
-	// isn't set.
+	// Agent hooks post here; without it the notify-hook script finds the
+	// host-service through the host manifests. No auth token: the endpoint is
+	// unauthenticated by design (chimes plus an idempotent linked-task nudge).
 	if (hostAgentHookUrl) {
 		env.SUPERSET_HOST_AGENT_HOOK_URL = hostAgentHookUrl;
 	}
@@ -319,6 +314,7 @@ export function buildV2TerminalEnv(
 	if (supersetHomeDir) {
 		env.SUPERSET_HOME_DIR = supersetHomeDir;
 	}
+	addPublicEnvAliases(env);
 
 	if (process.env.SUPERSET_HOST_RUN_MODE === "sandbox") {
 		// The environment's variables and the credential placeholders arrive

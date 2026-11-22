@@ -29,10 +29,20 @@ tmux new-session -d -s paradev -n stack -c "$ROOT_DIR" \
   "export NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; bunx turbo run dev --filter=@superset/api --filter=@superset/web --filter=// 2>&1 | tee '$LOG_DIR/dev-stack.log'"
 if [ "$MEMORY_MB" -ge "$DESKTOP_DEV_MIN_MB" ]; then
   tmux new-window -t paradev -n desktop -c "$ROOT_DIR/apps/desktop" \
-    "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; unset SUPERSET_SANDBOX_WORKSPACE_ID; bun run dev 2>&1 | tee '$LOG_DIR/desktop-dev.log'"
+    "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ROOT_DIR/.env'; set +a; unset SUPERSET_SANDBOX_WORKSPACE_ID PARADEV_SANDBOX_WORKSPACE_ID; bun run dev 2>&1 | tee '$LOG_DIR/desktop-dev.log'"
 else
   echo "dev-stack: ${MEMORY_MB} MB box; skipping the desktop dev build (needs ${DESKTOP_DEV_MIN_MB})"
 fi
 tmux new-window -t paradev -n realtime -c "$ROOT_DIR" \
   "bash '$ROOT_DIR/apps/realtime/scripts/dev-local.sh' 2>&1 | tee '$LOG_DIR/realtime-dev.log'"
+# shellcheck source=/dev/null
+. "$ROOT_DIR/.paradev/lib/admin.sh"
+if ADMIN_DIR="$(admin_checkout_dir)"; then
+  if [ -f "$ADMIN_DIR/.env.workspace" ] && [ -d "$ADMIN_DIR/node_modules" ]; then
+    tmux new-window -t paradev -n admin -c "$ADMIN_DIR" \
+      "export NODE_ENV=development; bun run dev 2>&1 | tee '$LOG_DIR/admin-dev.log'"
+  else
+    echo "dev-stack: admin checkout at $ADMIN_DIR is not set up; not starting the admin app"
+  fi
+fi
 echo "dev-stack: started (tmux attach -t paradev)"

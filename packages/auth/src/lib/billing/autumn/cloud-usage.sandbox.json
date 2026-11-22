@@ -1,0 +1,323 @@
+{
+	"_source": "Autumn sandbox, 2026-11-19: the meter's own calls on Team v4 (live settings: overage off, absolute limit 0) and Pro (300% of its grant). Rows as customers.get returned them.",
+	"team-at-limit-past-it-dropped": {
+		"plan": "team",
+		"overage": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 72000,
+			"usage": 72000,
+			"remaining": 0,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1797657308452,
+			"breakdown": [
+				{
+					"id": "row-0",
+					"planId": null,
+					"includedGrant": 72000,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 72000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": null,
+					"expiresAt": null
+				},
+				{
+					"id": "row-1",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				},
+				{
+					"id": "row-2",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "one_off",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 0.06,
+						"billingUnits": 60,
+						"billingMethod": "prepaid",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		}
+	},
+	"pro-at-cap": {
+		"plan": "pro",
+		"overage": true,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 50000,
+			"usage": 200000,
+			"remaining": 0,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1797657308452,
+			"breakdown": [
+				{
+					"id": "row-0",
+					"planId": "pro",
+					"includedGrant": 50000,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 200000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		}
+	},
+	"team-pack-before-reset": {
+		"plan": "team",
+		"overage": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 78000,
+			"usage": 75000,
+			"remaining": 3000,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1797657308452,
+			"breakdown": [
+				{
+					"id": "row-0",
+					"planId": null,
+					"includedGrant": 72000,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 72000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": null,
+					"expiresAt": null
+				},
+				{
+					"id": "row-1",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				},
+				{
+					"id": "row-2",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 6000,
+					"remaining": 3000,
+					"usage": 3000,
+					"unlimited": false,
+					"reset": {
+						"interval": "one_off",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 0.06,
+						"billingUnits": 60,
+						"billingMethod": "prepaid",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		}
+	},
+	"team-pack-after-reset": {
+		"plan": "team",
+		"overage": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 78000,
+			"usage": 4000,
+			"remaining": 74000,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1797657308452,
+			"breakdown": [
+				{
+					"id": "row-0",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				},
+				{
+					"id": "row-1",
+					"planId": null,
+					"includedGrant": 72000,
+					"prepaidGrant": 0,
+					"remaining": 71000,
+					"usage": 1000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": null,
+					"expiresAt": null
+				},
+				{
+					"id": "row-2",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 6000,
+					"remaining": 3000,
+					"usage": 3000,
+					"unlimited": false,
+					"reset": {
+						"interval": "one_off",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 0.06,
+						"billingUnits": 60,
+						"billingMethod": "prepaid",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		}
+	},
+	"team-priced-row-then-overage-off": {
+		"plan": "team",
+		"overage": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 72000,
+			"usage": 80000,
+			"remaining": 0,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1797657308452,
+			"breakdown": [
+				{
+					"id": "row-0",
+					"planId": null,
+					"includedGrant": 72000,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 72000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": null,
+					"expiresAt": null
+				},
+				{
+					"id": "row-1",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 8000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				},
+				{
+					"id": "row-2",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "one_off",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 0.06,
+						"billingUnits": 60,
+						"billingMethod": "prepaid",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		}
+	}
+}

@@ -5,8 +5,11 @@ import { pageStorageSocketUrl } from "@superset/shared/page-storage-ticket";
 import {
 	PageCommentsView,
 	type PageToolHost,
+	PageUpdateBanner,
+	usePageUpdateOffer,
 } from "@superset/ui/page-comments";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { env } from "@/env";
 import { useTRPC } from "@/trpc/react";
@@ -16,11 +19,15 @@ export function PageCommentsFrame({
 	pageId,
 	src,
 	title,
+	version,
+	viewerId,
 	previewing = false,
 }: {
 	pageId: string;
 	src: string;
 	title: string;
+	version: number;
+	viewerId: string;
 	previewing?: boolean;
 }) {
 	const storageTicket = useCallback(
@@ -44,7 +51,41 @@ export function PageCommentsFrame({
 			: null;
 	}, [pageId]);
 
+	const router = useRouter();
 	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const { onPublished, offered, viewOffered } = usePageUpdateOffer({
+		pageKey: pageId,
+		check: async () => {
+			const [page, versions] = await Promise.all([
+				queryClient.fetchQuery({
+					...trpc.page.pull.queryOptions({ id: pageId }),
+					staleTime: 0,
+				}),
+				queryClient.fetchQuery({
+					...trpc.page.versions.queryOptions({ id: pageId }),
+					staleTime: 0,
+				}),
+			]);
+			return {
+				version: page.version,
+				publishedBy: versions.find((row) => row.version === page.version)
+					?.createdByUserId,
+			};
+		},
+		apply: () => {
+			const url = new URL(window.location.href);
+			if (!url.searchParams.has("v")) {
+				router.refresh();
+				return;
+			}
+			url.searchParams.delete("v");
+			router.replace(`${url.pathname}${url.search}`);
+		},
+		shownVersion: version,
+		viewerId,
+	});
+
 	const callTool = useMutation(trpc.page.callTool.mutationOptions());
 	const grantTool = useMutation(trpc.page.grantTool.mutationOptions());
 	const install = useMutation(trpc.plugins.install.mutationOptions());
@@ -65,11 +106,18 @@ export function PageCommentsFrame({
 	);
 
 	return (
-		<PageCommentsView
-			pageId={pageId}
-			src={src}
-			title={title}
-			{...(previewing ? {} : { storageTicket, presenceUrl, toolHost })}
-		/>
+		<div className="relative h-full">
+			{offered && !previewing ? (
+				<PageUpdateBanner version={offered.version} onView={viewOffered} />
+			) : null}
+			<PageCommentsView
+				pageId={pageId}
+				src={src}
+				title={title}
+				{...(previewing
+					? {}
+					: { storageTicket, presenceUrl, onPublished, toolHost })}
+			/>
+		</div>
 	);
 }
