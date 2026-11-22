@@ -256,7 +256,7 @@ iOS 앱도 곧 출시됩니다. 휴대폰에서 에이전트를 확인할 수 �
 데스크톱 앱 다운로드:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (실험적; macOS가 주 지원 대상입니다)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (실험적; macOS가 주 지원 대상입니다)
 - **Windows**: 아직 제공되지 않음
 - [모든 빌드](https://github.com/paradevai/paradev/releases/latest)
 

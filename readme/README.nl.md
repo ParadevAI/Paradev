@@ -256,7 +256,7 @@ Er komt binnenkort een iOS-app zodat je je agents vanaf je telefoon kunt checken
 Download de desktop-app:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimenteel; macOS is het primaire doelplatform)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimenteel; macOS is het primaire doelplatform)
 - **Windows**: nog niet beschikbaar
 - [Alle builds](https://github.com/paradevai/paradev/releases/latest)
 

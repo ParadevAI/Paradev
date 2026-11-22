@@ -35,10 +35,43 @@ export function nextRecoveryDelayMs(
 	return Math.min(backoff * (0.5 + random), SESSION_RECOVERY_MAX_DELAY_MS);
 }
 
+export function isSessionRecovering({
+	hasLocalToken,
+	isOnline,
+	hasUser,
+	error,
+}: {
+	hasLocalToken: boolean;
+	isOnline: boolean;
+	hasUser: boolean;
+	error: { status?: number } | null;
+}): boolean {
+	return (
+		hasLocalToken &&
+		isOnline &&
+		!hasUser &&
+		!!error &&
+		error.status !== 401 &&
+		error.status !== 403
+	);
+}
+
 export function useSessionRecovery() {
-	const { data: session, isPending, refetch } = authClient.useSession();
+	const {
+		data: session,
+		error,
+		isPending,
+		isRefetching,
+		refetch,
+	} = authClient.useSession();
 	const isOnline = useOnlineStatus();
 	const hasLocalToken = !!getAuthToken();
+	const isRecovering = isSessionRecovering({
+		hasLocalToken,
+		isOnline,
+		hasUser: !!session?.user,
+		error,
+	});
 
 	const recoveryInFlightRef = useRef(false);
 	const attemptRef = useRef(0);
@@ -78,7 +111,7 @@ export function useSessionRecovery() {
 		try {
 			await refetch();
 		} catch (error) {
-			console.warn("[sign-in] session recovery refetch failed", error);
+			console.warn("[auth] session recovery refetch failed", error);
 		} finally {
 			recoveryInFlightRef.current = false;
 
@@ -135,7 +168,11 @@ export function useSessionRecovery() {
 
 	return {
 		hasLocalToken,
+		isOnline,
 		isPending,
+		isRecovering,
+		isRefetching,
+		refetch,
 		session,
 	};
 }

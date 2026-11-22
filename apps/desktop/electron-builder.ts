@@ -177,7 +177,12 @@ const config: Configuration = {
 	// fpm's default xz takes ~15 minutes on the 2 GB tree; gzip takes about
 	// one and costs roughly a tenth in download size.
 	// The in-app update runs dpkg -i, which must replace the installed package.
-	deb: { compression: "gz", packageName: "superset" },
+	// The control file's Vendor defaults to the maintainer.
+	deb: {
+		compression: "gz",
+		packageName: "superset",
+		maintainer: "Paradev <support@paradev.com>",
+	},
 
 	// Deep linking protocol
 	protocols: {

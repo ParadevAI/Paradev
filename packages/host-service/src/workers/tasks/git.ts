@@ -17,7 +17,7 @@ import {
 	type ResolvedGitInfo,
 	readGitIdentity,
 } from "../../runtime/git/identity.ts";
-import { resolveRef } from "../../runtime/git/refs.ts";
+import { resolveRef, resolveUpstream } from "../../runtime/git/refs.ts";
 import { createUserSimpleGit } from "../../runtime/git/simple-git.ts";
 import { isMissingPath } from "../../runtime/path-state/index.ts";
 import {
@@ -644,45 +644,31 @@ export const gitPushTask = defineWorkerTask<
 		// head feature-x), so the linked PR's head branch decides: matching
 		// upstream → push to it; anything else → publish under the branch's
 		// own name and re-point the upstream there (v1's push flow).
-		const upstreamRef = await git
-			.raw(["rev-parse", "--abbrev-ref", "@{upstream}"])
-			.then(
-				(ref) => ref.trim(),
-				() => null,
-			);
-		// `branch.<name>.remote` distinguishes remote tracking from tracking
-		// a local branch ("."), where @{upstream} prints a bare branch name
-		// that must never be mistaken for a remote.
-		const configuredRemote = (
-			await git.raw(["config", `branch.${branch}.remote`]).catch(() => "")
-		).trim();
-		const hasRemoteUpstream =
-			upstreamRef != null && !!configuredRemote && configuredRemote !== ".";
-		const upstreamBranch = !hasRemoteUpstream
-			? null
-			: upstreamRef.startsWith(`${configuredRemote}/`)
-				? upstreamRef.slice(configuredRemote.length + 1)
-				: upstreamRef.split("/").slice(1).join("/");
+		// Config, not `@{upstream}`, names the upstream: a fork tracked by URL
+		// (as `gh pr checkout` leaves it) has no remote-tracking ref.
+		const upstream = await resolveUpstream(git, branch);
+		const remoteUpstream = upstream?.remote === "." ? null : upstream;
 
-		if (hasRemoteUpstream && upstreamBranch === branch) {
+		if (remoteUpstream?.remoteBranch === branch) {
 			await git.raw(["push"]);
 			return { ok: true };
 		}
 
 		const remotes = await git.getRemotes(false).catch(() => []);
-		const fallbackRemote =
-			remotes.find((r) => r.name === "origin")?.name ?? remotes[0]?.name;
-		const remote = hasRemoteUpstream ? configuredRemote : fallbackRemote;
+		const remote =
+			remoteUpstream?.remote ??
+			remotes.find((r) => r.name === "origin")?.name ??
+			remotes[0]?.name;
 		if (!remote) return { ok: false, reason: "no-remote" };
 
-		if (
-			hasRemoteUpstream &&
-			upstreamBranch != null &&
-			linkedPrHeadBranch === upstreamBranch
-		) {
+		if (remoteUpstream && linkedPrHeadBranch === remoteUpstream.remoteBranch) {
 			// PR checkout: the upstream deliberately points at the PR's head
 			// under a different local name. Push there and keep the tracking.
-			await git.raw(["push", remote, `HEAD:refs/heads/${upstreamBranch}`]);
+			await git.raw([
+				"push",
+				remote,
+				`HEAD:refs/heads/${remoteUpstream.remoteBranch}`,
+			]);
 			return { ok: true };
 		}
 
