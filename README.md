@@ -30,7 +30,7 @@ Claude Code, Codex, and OpenCode are the agents. Paradev is where you run many o
 3. **Create a workspace**, choose your CLI agent, and describe a small change.
 4. **Review the result** in **Changes**, run the tests, and preview your app in the browser pane before you commit.
 
-You only need [Git](https://git-scm.com/) installed. [gh](https://cli.github.com/) is optional and enables the pull request workflows; Paradev offers to install it for you. For a full walkthrough, see [Your First Parallel Session](https://docs.paradev.com/first-workspace).
+You need [Git](https://git-scm.com/) and at least one coding agent you already use. [gh](https://cli.github.com/) is optional and enables the pull request workflows; Paradev offers to install it for you. For a full walkthrough, see [Your First Parallel Session](https://docs.paradev.com/first-workspace).
 
 The `superset` CLI comes with the desktop app. You can also install it on its own:
 
@@ -188,7 +188,6 @@ The script starts local Postgres and Redis with Docker and seeds a dev account. 
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: chat with the team and community
 - **[X](https://x.com/paradevai)**: follow for updates and announcements
 - **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: report bugs and request features
-- **[GitHub Discussions](https://github.com/paradevai/paradev/discussions)**: ask questions and share ideas
 - **Docs for agents**: [a Markdown index](https://docs.paradev.com/llms.txt) or [one full-text file](https://docs.paradev.com/llms-full.txt)
 
 [![Avi on X](https://img.shields.io/badge/Avi-@avimakesrobots-555?logo=x)](https://x.com/avimakesrobots)
