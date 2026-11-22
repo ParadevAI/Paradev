@@ -432,6 +432,17 @@ function usageFacts(
 		.as(options.days ? facts.unionAll(options.days) : facts);
 }
 
+/** The billing days wholly inside the window: from `firstWhole` up to, not including, `endWhole`. */
+function wholeBillingDays(window: CloudUsageWindow) {
+	const from = sql`${window.from.toISOString()}::timestamptz`;
+	const to = sql`${window.to.toISOString()}::timestamptz`;
+	const fromDay = sql`public.cloud_billing_day(${from})`;
+	return {
+		firstWhole: sql`(case when public.cloud_billing_day_start(${fromDay}) = ${from} then ${fromDay} else ${fromDay} + 1 end)`,
+		endWhole: sql`public.cloud_billing_day(${to})`,
+	};
+}
+
 /**
  * Usage by billing day from the daily rollup: its rows for the billing days wholly inside the
  * window, and `sentWhere` for the events of the partial days at the window's edges. Each event
@@ -447,11 +458,7 @@ function billingDayRollup(
 	if (filters.workspace || filters.status?.length || filters.search) {
 		return null;
 	}
-	const from = sql`${window.from.toISOString()}::timestamptz`;
-	const to = sql`${window.to.toISOString()}::timestamptz`;
-	const fromDay = sql`public.cloud_billing_day(${from})`;
-	const firstWhole = sql`(case when public.cloud_billing_day_start(${fromDay}) = ${from} then ${fromDay} else ${fromDay} + 1 end)`;
-	const endWhole = sql`public.cloud_billing_day(${to})`;
+	const { firstWhole, endWhole } = wholeBillingDays(window);
 	return {
 		sentWhere: sql`(${events.sentAt} < public.cloud_billing_day_start(${firstWhole}) or ${events.sentAt} >= public.cloud_billing_day_start(${endWhole}))`,
 		days: db
