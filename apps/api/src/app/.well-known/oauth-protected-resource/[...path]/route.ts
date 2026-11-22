@@ -1,5 +1,10 @@
 import { auth } from "@superset/auth/server";
-import { buildProtectedResourceMetadata } from "@/lib/oauth-metadata";
+import { CANONICAL_URLS } from "@superset/shared/constants";
+import { env } from "@/env";
+import {
+	buildProtectedResourceMetadata,
+	MCP_RESOURCE_PATH,
+} from "@/lib/oauth-metadata";
 
 interface RouteContext {
 	params: Promise<{
@@ -19,12 +24,13 @@ export async function GET(
 
 	return Response.json(
 		buildProtectedResourceMetadata(request, resourcePath, {
+			resourceUrl: `${env.NEXT_PUBLIC_API_URL}${MCP_RESOURCE_PATH}`,
 			authorizationServerUrl:
 				typeof authServerMetadata.issuer === "string"
 					? authServerMetadata.issuer
 					: undefined,
-			resourceName: "Superset MCP Server",
-			resourceDocumentation: "https://superset.sh/auth.md",
+			resourceName: "Paradev MCP Server",
+			resourceDocumentation: `${CANONICAL_URLS.MARKETING}/auth.md`,
 			scopesSupported: Array.isArray(authServerMetadata.scopes_supported)
 				? authServerMetadata.scopes_supported
 				: undefined,

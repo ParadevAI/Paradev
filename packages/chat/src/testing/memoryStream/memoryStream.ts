@@ -49,6 +49,7 @@ export function createMemoryStreamServer(
 		const sessionId = decodeURIComponent(match?.[1] ?? "");
 		const since = parseSince(parsed.searchParams.get("since"));
 		const deltas = parseDeltas(parsed.searchParams.get("deltas"));
+		const nestedSubagents = parsed.searchParams.get("nestedSubagents") === "1";
 
 		let closed = false;
 		let subscription: { unsubscribe(): void } | null = null;
@@ -90,7 +91,7 @@ export function createMemoryStreamServer(
 			socket.onopen?.();
 			subscription = runtime.subscribe(
 				sessionId,
-				{ since, deltas },
+				{ since, deltas, nestedSubagents },
 				createWsSink(serverSocket),
 			);
 		});

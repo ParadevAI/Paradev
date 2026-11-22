@@ -38,44 +38,71 @@ function findUsage(value: unknown, depth = 0): JsonObject | null {
 	return null;
 }
 
+interface TokenFields {
+	input: number;
+	cached: number;
+	cacheRead: number;
+	output: number;
+	reasoning: number;
+}
+
+function readTokens(usage: JsonObject): TokenFields {
+	return {
+		input: numberAt(usage, [
+			"input_tokens",
+			"inputTokens",
+			"prompt_token_count",
+			"promptTokenCount",
+		]),
+		cached: numberAt(usage, [
+			"cached_input_tokens",
+			"cachedInputTokens",
+			"cached_content_token_count",
+			"cachedContentTokenCount",
+		]),
+		// agy counts cache reads outside input_tokens; Gemini counts them inside.
+		cacheRead: numberAt(usage, ["cache_read_tokens", "cacheReadTokens"]),
+		output: numberAt(usage, [
+			"output_tokens",
+			"outputTokens",
+			"candidates_token_count",
+			"candidatesTokenCount",
+		]),
+		reasoning: numberAt(usage, [
+			"reasoning_tokens",
+			"reasoningTokens",
+			"thoughts_token_count",
+			"thoughtsTokenCount",
+		]),
+	};
+}
+
+function hasTokens(tokens: TokenFields): boolean {
+	return tokens.input + tokens.cached + tokens.cacheRead + tokens.output > 0;
+}
+
 export function parseAgyTranscriptLine(
 	line: string,
 	sessionId: string,
 	cwd: string | null,
 ): UsageLogEntry | null {
-	let value: JsonObject;
+	let value: JsonObject | null;
 	try {
-		value = JSON.parse(line) as JsonObject;
+		value = object(JSON.parse(line));
 	} catch {
 		return null;
 	}
-	const usage = findUsage(value);
-	if (!usage) return null;
-	const input = numberAt(usage, [
-		"input_tokens",
-		"inputTokens",
-		"prompt_token_count",
-		"promptTokenCount",
-	]);
-	const cached = numberAt(usage, [
-		"cached_input_tokens",
-		"cachedInputTokens",
-		"cached_content_token_count",
-		"cachedContentTokenCount",
-	]);
-	const output = numberAt(usage, [
-		"output_tokens",
-		"outputTokens",
-		"candidates_token_count",
-		"candidatesTokenCount",
-	]);
-	const reasoning = numberAt(usage, [
-		"reasoning_tokens",
-		"reasoningTokens",
-		"thoughts_token_count",
-		"thoughtsTokenCount",
-	]);
-	if (input + cached + output === 0) return null;
+	if (!value) return null;
+	let usage = value;
+	let tokens = readTokens(value);
+	if (!hasTokens(tokens)) {
+		const nested = findUsage(value);
+		if (!nested) return null;
+		usage = nested;
+		tokens = readTokens(nested);
+	}
+	if (!hasTokens(tokens)) return null;
+	const { input, cached, cacheRead, output, reasoning } = tokens;
 	const rawTimestamp =
 		value.created_at ?? value.timestamp ?? value.createdAt ?? usage.timestamp;
 	const timestampMs =
@@ -99,7 +126,7 @@ export function parseAgyTranscriptLine(
 		cwd,
 		sessionId,
 		uncachedInput: Math.max(0, input - cached),
-		cachedInput: Math.min(input, cached),
+		cachedInput: Math.min(input, cached) + cacheRead,
 		cacheWrite5m: 0,
 		cacheWrite1h: 0,
 		output,

@@ -47,6 +47,8 @@ export interface GitHubAvailabilityStatus {
 	since: number;
 	/** Epoch ms when the gate lets the next lookup through. */
 	until: number;
+	/** What the failing call reported, for the UI to show on hover. */
+	detail: string;
 }
 
 /**
@@ -107,6 +109,57 @@ export function isGitHubUnreachableError(error: unknown): boolean {
 		current = (current as { cause?: unknown }).cause;
 	}
 	return false;
+}
+
+const MAX_DETAIL_LENGTH = 200;
+
+function firstLine(text: string): string {
+	return (
+		text
+			.split("\n")
+			.find((line) => line.trim())
+			?.trim() ?? ""
+	);
+}
+
+/**
+ * One line for the hover: `gh` prefixes transport failures with the full
+ * request and socket addresses (`Get "https://...": read tcp a->b: read:
+ * connection reset by peer`), which hide the part that says what went wrong.
+ */
+function cleanFailureLine(line: string): string {
+	const cause = line.replace(/^[A-Za-z]+ "[^"]*": /, "");
+	const socketError = /^(?:read|write|dial) (?:tcp|udp)\b.*: (.+)$/.exec(cause);
+	return (socketError?.[1] ?? cause).slice(0, MAX_DETAIL_LENGTH);
+}
+
+export function describeGitHubFailure(error: unknown): string {
+	let current: unknown = error;
+	// The innermost message is the specific one ("fetch failed" wraps
+	// "getaddrinfo ENOTFOUND api.github.com").
+	let message = "";
+	for (let depth = 0; depth < MAX_CAUSE_DEPTH && current; depth++) {
+		if (typeof current !== "object") break;
+		const fields = current as {
+			killed?: unknown;
+			signal?: unknown;
+			stderr?: unknown;
+			message?: unknown;
+		};
+		if (fields.killed === true && typeof fields.signal === "string") {
+			return "gh did not answer before its timeout";
+		}
+		const stderrLine = firstLine(
+			typeof fields.stderr === "string" ? fields.stderr : "",
+		);
+		if (stderrLine) return cleanFailureLine(stderrLine);
+		const messageLine = firstLine(
+			typeof fields.message === "string" ? fields.message : "",
+		);
+		if (messageLine) message = messageLine;
+		current = (current as { cause?: unknown }).cause;
+	}
+	return cleanFailureLine(message || String(error));
 }
 
 const HOLD_DESCRIPTION: Record<GitHubHoldReason, string> = {
@@ -198,7 +251,12 @@ export class GitHubAvailabilityGate {
 			this.streak += 1;
 			holdMs = Math.min(BASE_BLOCK_MS * 2 ** (this.streak - 1), MAX_BLOCK_MS);
 		}
-		this.hold = { reason, since: now, until: now + holdMs };
+		this.hold = {
+			reason,
+			since: now,
+			until: now + holdMs,
+			detail: describeGitHubFailure(error),
+		};
 		return { reason, holdMs, opened: true };
 	}
 

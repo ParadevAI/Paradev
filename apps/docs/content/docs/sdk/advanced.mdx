@@ -7,11 +7,11 @@ description: Real-world recipes that combine the SDK's primitives (webhooks, tri
 The SDK is in early alpha. It is not meant for production use and may be removed in the future. Stay on the latest version (`@superset_sh/sdk@latest`) while we iterate.
 </Callout>
 
-The SDK's individual methods are simple. The interesting part is what you compose them into. These are end-to-end recipes you can copy as starting points.
+End-to-end recipes to copy as starting points.
 
 ## Sentry webhook → agent on the bug
 
-When Sentry fires an alert, file a task and spawn an agent to investigate, all in two SDK calls. (In production, verify the Sentry signature header before trusting any payload. That part is omitted here for clarity.)
+When Sentry fires an alert, file a task and spawn an agent to investigate. In production, verify the Sentry signature header before trusting a payload. This example omits that check.
 
 ```ts title="sentry-webhook.ts"
 import { Hono } from 'hono';
@@ -37,9 +37,7 @@ app.post('/webhooks/sentry', async (c) => {
     labels: ['sentry', 'bug'],
   });
 
-  // 2. Spin up a worktree on a developer's machine and dispatch an agent
-  //    inside it. The SDK creates the worktree, then runs the agent with
-  //    your prompt; you don't manage the dispatch loop.
+  // 2. Create a worktree on a developer's machine and run an agent in it
   const result = await client.workspaces.create({
     hostId: TARGET_HOST_ID,
     projectId: PROJECT_ID,
@@ -72,13 +70,13 @@ app.post('/webhooks/sentry', async (c) => {
 export default app;
 ```
 
-What just happened, end-to-end:
+Result:
 
-- The task lives in the cloud and shows up in the dashboard for everyone.
-- The workspace is a real `git worktree` on the target machine, ready for a human to take over if the agent gets stuck.
-- The agent runs inside the new workspace, with the prompt above and access to the codebase + whatever MCP servers the host has configured.
+- The task shows up in the dashboard for everyone.
+- The workspace is a real `git worktree` on the target machine. A human can take over if the agent gets stuck.
+- The agent runs in the new workspace with the prompt above, the codebase, and any MCP servers the host has configured.
 
-You can spawn multiple agents in parallel by adding more entries to `agents`:
+To spawn several agents in parallel, add entries to `agents`:
 
 ```ts
 agents: [
@@ -89,7 +87,7 @@ agents: [
 
 ## Burn down the P0 backlog overnight
 
-Pick up every urgent task in the queue and spawn an agent on each one in parallel. Comes back the next morning with a branch and a comment per task.
+Spawn an agent on every urgent task in parallel. Each agent pushes a branch and updates its task.
 
 ```ts title="burn-p0s.ts"
 import Superset from '@superset_sh/sdk';
@@ -129,11 +127,11 @@ const dispatched = await Promise.all(
 console.log(`dispatched ${dispatched.length} agents across the P0 backlog`);
 ```
 
-Run it from a daily cron on a beefy host and you wake up to a branch per bug. Ones the agent could fix have a PR-ready branch; ones it couldn't have a comment explaining why so a human picks up where the agent stopped.
+Run it from a daily cron on a powerful host. Fixed bugs get a PR-ready branch. Others get a comment explaining where the agent stopped.
 
 ## Sweep a refactor across every repo
 
-Internal API rename, dependency bump, lint rule rollout. Anything that has to land identically in dozens of repos is a one-loop, fan-out problem:
+Use one loop for changes that must land the same way in many repos, such as an API rename, a dependency bump, or a lint rule rollout:
 
 ```ts title="sweep-rename-getUser.ts"
 import Superset from '@superset_sh/sdk';
@@ -175,15 +173,15 @@ const totalAgents = wave.reduce(
 console.log(`launched ${totalAgents} agents across ${projects.length} repos`);
 ```
 
-Same loop works for "bump TypeScript to 5.7", "swap Sentry SDK for the new one", "add a `lint:strict` script to every package.json". Anything you'd otherwise farm out to a long Slack thread.
+The same loop works for "bump TypeScript to 5.7" or "add a `lint:strict` script to every package.json".
 
 ## On-demand agent dispatch from your tools
 
-If you've already created a recurring automation in the dashboard, the SDK can fire it off-schedule from anywhere (a Slack slash command, a CI job, an internal admin panel):
+Fire an existing automation off-schedule from anywhere, such as a Slack slash command, a CI job, or an admin panel:
 
 ```ts
 const run = await client.automations.run('<automation-id>');
 console.log(`dispatched run ${run.runId} for automation ${run.automationId}`);
 ```
 
-The automation's pinned host has to be online and tunneling. The SDK will surface a `503 Host not connected` error if it isn't, so you can retry later or page someone.
+The automation's pinned host must be online and tunneling. Otherwise the SDK throws a `503 Host not connected` error.

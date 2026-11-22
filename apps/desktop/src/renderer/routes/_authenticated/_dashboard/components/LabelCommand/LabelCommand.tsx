@@ -1,7 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	LABELS_MAX_PER_WORKSPACE,
+	labelDepth,
+	labelLeafName,
+	labelParentName,
 	normalizeLabelName,
+	sortLabelsAsTree,
 } from "@superset/shared/labels";
 import { Checkbox } from "@superset/ui/checkbox";
 import {
@@ -41,7 +45,14 @@ export function LabelCommand({
 	const { t } = useLingui();
 	const [query, setQuery] = useState("");
 	const applied = new Map(labels.map((label) => [label.name, label]));
-	const others = knownLabels.filter((label) => !applied.has(label.name));
+	const others = sortLabelsAsTree(
+		knownLabels.filter((label) => !applied.has(label.name)),
+	);
+	const otherNames = new Set(others.map((label) => label.name));
+	const showsAsChild = (name: string) => {
+		const parent = labelParentName(name);
+		return !query && parent !== null && otherNames.has(parent);
+	};
 	const atLimit = labels.length >= LABELS_MAX_PER_WORKSPACE;
 	const newLabel = normalizeLabelName(query);
 	const canCreate =
@@ -66,9 +77,11 @@ export function LabelCommand({
 				placeholder={t({ message: "Change or add labels…" })}
 			/>
 			<CommandList>
-				<CommandEmpty>
-					<Trans>No labels</Trans>
-				</CommandEmpty>
+				{!canCreate && (
+					<CommandEmpty>
+						<Trans>No labels</Trans>
+					</CommandEmpty>
+				)}
 				{labels.length > 0 && (
 					<CommandGroup>
 						{labels.map((label) => (
@@ -95,9 +108,22 @@ export function LabelCommand({
 								disabled={atLimit}
 								onSelect={() => toggle(label.name)}
 							>
-								<Checkbox checked={false} className="pointer-events-none" />
-								<CloudWorkspaceLabelDot color={label.color} />
-								{label.name}
+								<span
+									className="flex min-w-0 items-center gap-2"
+									style={
+										showsAsChild(label.name)
+											? { paddingLeft: labelDepth(label.name) * 14 }
+											: undefined
+									}
+								>
+									<Checkbox checked={false} className="pointer-events-none" />
+									<CloudWorkspaceLabelDot color={label.color} />
+									<span className="truncate">
+										{showsAsChild(label.name)
+											? labelLeafName(label.name)
+											: label.name}
+									</span>
+								</span>
 							</CommandItem>
 						))}
 					</CommandGroup>
@@ -105,6 +131,7 @@ export function LabelCommand({
 				{canCreate && newLabel && (
 					<CommandGroup>
 						<CommandItem
+							forceMount
 							value={`create:${newLabel}`}
 							onSelect={() => toggle(newLabel)}
 						>

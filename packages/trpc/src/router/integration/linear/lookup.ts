@@ -1,5 +1,6 @@
 export const linearStatusFilterValues = [
 	"all",
+	"open",
 	"active",
 	"backlog",
 	"unstarted",

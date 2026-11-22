@@ -18,13 +18,6 @@ const testSupersetHomeDir = fs.mkdtempSync(
 process.env.SUPERSET_HOME_DIR = testSupersetHomeDir;
 const tokenFile = path.join(testSupersetHomeDir, "auth-token.enc");
 
-// Keep this unit test independent from suite-global host-info mocks. The
-// persistence behavior under test only needs a reversible storage boundary.
-mock.module("./crypto-storage", () => ({
-	encrypt: (plaintext: string) => Buffer.from(plaintext),
-	decrypt: (data: Buffer) => data.toString("utf8"),
-}));
-
 const {
 	authEvents,
 	clearToken,
@@ -76,7 +69,7 @@ afterAll(() => {
 });
 
 describe("auth token storage", () => {
-	test("atomically stores credentials only in the test Superset home", async () => {
+	test("atomically stores credentials only in the test Paradev home", async () => {
 		await saveToken({ token: "token", expiresAt: "2099-01-01" });
 
 		expect(fs.statSync(tokenFile).isFile()).toBe(true);
@@ -170,7 +163,10 @@ describe("auth token storage", () => {
 				state,
 			});
 
-			expect(failedResult.success).toBe(false);
+			expect(failedResult).toMatchObject({
+				success: false,
+				reason: "save-failed",
+			});
 			expect(stateStore.has(state)).toBe(true);
 		} finally {
 			errorSpy.mockRestore();

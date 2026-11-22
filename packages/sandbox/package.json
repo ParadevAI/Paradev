@@ -8,23 +8,25 @@
 		"image": "bun run src/image.ts",
 		"pin": "bun run src/pin.ts",
 		"assets": "bun run src/assets/produce.ts",
+		"inventory": "bun run src/inventory.ts",
 		"release": "bun run src/environments/release.ts",
-		"seed": "bun run src/environments/seed.ts",
-		"test": "bun test --isolate",
+		"agent-tools": "bun run src/agent-tools.ts",
+		"record-bundle": "bun run src/environments/record-bundle.ts",
+		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {
 		"@superset/db": "workspace:*",
 		"@superset/shared": "workspace:*",
 		"@superset/trpc": "workspace:*",
-		"@vercel/sandbox": "3.2.2",
+		"@vercel/sandbox": "4.0.0",
 		"aws4fetch": "1.0.20",
 		"drizzle-orm": "0.45.2",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

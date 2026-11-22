@@ -1,5 +1,7 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
+import { readRootDomain } from "@superset/shared/app-identity";
+import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
 import { config as dotenvConfig } from "dotenv";
 import { createMDX } from "fumadocs-mdx/next";
 
@@ -23,7 +25,7 @@ const config = {
 		swcPlugins: [["@lingui/swc-plugin", {}]],
 	},
 	async redirects() {
-		return [
+		const redirects = [
 			{
 				source: "/docs",
 				destination: "/",
@@ -61,13 +63,47 @@ const config = {
 				destination: "/terminal-scripts",
 				permanent: true,
 			},
+			{
+				source: "/cli",
+				destination: "/cli/getting-started",
+				permanent: true,
+			},
 			// Remote Workspaces was renamed to Remote Access.
 			{
 				source: "/remote-workspaces",
 				destination: "/remote-access",
 				permanent: true,
 			},
+			{
+				source: "/port-management",
+				destination: "/ports",
+				permanent: true,
+			},
+			{
+				source: "/agent-status-notifications",
+				destination: "/agent-status",
+				permanent: true,
+			},
+			{
+				source: "/claude-code",
+				destination: "/agents/claude-code",
+				permanent: true,
+			},
+			{
+				source: "/changelog",
+				destination: "https://paradev.com/changelog",
+				permanent: true,
+			},
+			{
+				source: "/agent-orchestration",
+				destination: "https://paradev.com/agent-orchestration",
+				permanent: true,
+			},
 		];
+		return withLegacyHostRedirects(redirects, {
+			rootDomain: readRootDomain(),
+			site: "docs",
+		});
 	},
 	async headers() {
 		// Keep raw markdown surfaces out of the index (they duplicate rendered pages).

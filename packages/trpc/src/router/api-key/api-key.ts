@@ -1,15 +1,16 @@
 import { db } from "@superset/db/client";
 import { apikeys } from "@superset/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-
-import { protectedProcedure, userError } from "../../trpc";
+import { withAuthUserErrors } from "../../lib/auth-user-error";
+import { personProcedure, userError } from "../../trpc";
 
 export const apiKeyRouter = {
 	// API keys mint a session as their creator, so they are personal
 	// credentials: list and revoke are scoped to the session user, never
 	// the organization.
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		return db
 			.select({
 				id: apikeys.id,
@@ -23,7 +24,7 @@ export const apiKeyRouter = {
 			.orderBy(desc(apikeys.createdAt));
 	}),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(z.object({ name: z.string().min(1) }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = ctx.activeOrganizationId;
@@ -35,23 +36,38 @@ export const apiKeyRouter = {
 				});
 			}
 
-			const result = await ctx.auth.api.createApiKey({
-				headers: ctx.headers,
-				body: {
-					name: input.name,
-					metadata: { organizationId },
-				},
-			});
+			// A server call naming the user, since better-auth cannot resolve the
+			// synthesized session of a CLI OAuth token from the request headers.
+			const result = await withAuthUserErrors(
+				ctx.auth.api.createApiKey({
+					body: {
+						userId: ctx.session.user.id,
+						name: input.name,
+						metadata: { organizationId },
+					},
+				}),
+			);
 
 			return { key: result.key };
 		}),
 
-	revoke: protectedProcedure
+	revoke: personProcedure
 		.input(z.object({ id: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			await ctx.auth.api.deleteApiKey({
-				headers: ctx.headers,
-				body: { keyId: input.id },
-			});
+			const [deleted] = await db
+				.delete(apikeys)
+				.where(
+					and(
+						eq(apikeys.id, input.id),
+						eq(apikeys.referenceId, ctx.session.user.id),
+					),
+				)
+				.returning({ id: apikeys.id });
+			if (!deleted) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "API key not found",
+				});
+			}
 		}),
 };

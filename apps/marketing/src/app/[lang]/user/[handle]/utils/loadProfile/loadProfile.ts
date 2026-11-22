@@ -8,13 +8,10 @@ import {
 export type ProfileLookup =
 	| { state: "found"; profile: ParticipantProfile }
 	| { state: "missing" }
-	| { state: "rate-limited" };
+	| { state: "rate-limited" }
+	| { state: "unavailable" };
 
-/**
- * Shared by the page and its metadata. Only a refused read becomes a state
- * of its own, cached for a moment; any other failure throws and is not cached.
- */
-export async function loadProfile(handle: string): Promise<ProfileLookup> {
+async function loadCachedProfile(handle: string): Promise<ProfileLookup> {
 	"use cache";
 	try {
 		const profile = await fetchParticipant(handle, { period: "all" });
@@ -24,5 +21,14 @@ export async function loadProfile(handle: string): Promise<ProfileLookup> {
 		if (!isRateLimited(error)) throw error;
 		cacheLife("seconds");
 		return { state: "rate-limited" };
+	}
+}
+
+export async function loadProfile(handle: string): Promise<ProfileLookup> {
+	try {
+		return await loadCachedProfile(handle);
+	} catch (error) {
+		console.error("[marketing/profile] Failed to load profile", error);
+		return { state: "unavailable" };
 	}
 }

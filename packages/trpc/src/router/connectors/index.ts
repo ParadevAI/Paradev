@@ -16,7 +16,7 @@ import {
 	requireConnector,
 	upsertConnection,
 } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { forgetUpstreamTools } from "../plugins/proxy";
 
@@ -29,7 +29,7 @@ function methodSummary(method: ConnectorMethod) {
 }
 
 export const connectorsRouter = {
-	catalog: protectedProcedure.query(() =>
+	catalog: personProcedure.query(() =>
 		CONNECTOR_SLUGS.map((slug) => {
 			const connector = requireConnector(slug);
 			return {
@@ -43,7 +43,7 @@ export const connectorsRouter = {
 		}),
 	),
 
-	get: protectedProcedure
+	get: personProcedure
 		.input(z.object({ slug: z.string() }))
 		.query(({ input }) => {
 			const connector = getConnector(input.slug);
@@ -62,7 +62,7 @@ export const connectorsRouter = {
 			};
 		}),
 
-	status: protectedProcedure
+	status: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -104,11 +104,12 @@ export const connectorsRouter = {
 				)
 				.map(({ disconnectedAt, disconnectReason, ...row }) => ({
 					...row,
+					externalUserLabel: row.nickname ?? row.externalUserLabel,
 					needsReauth: disconnectedAt !== null,
 				}));
 		}),
 
-	connectApiKey: protectedProcedure
+	connectApiKey: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -171,15 +172,20 @@ export const connectorsRouter = {
 			return { connectionId: result.connectionId };
 		}),
 
-	rename: protectedProcedure
+	rename: personProcedure
 		.input(
-			z.object({
-				organizationId: z.uuid(),
-				connectionId: z.uuid(),
-				// Empty clears it and falls back to the provider's own label, so the
-				// row can never end up titled with the empty string.
-				nickname: z.string().max(64).nullable(),
-			}),
+			z
+				.object({
+					organizationId: z.uuid(),
+					connectionId: z.uuid(),
+					label: z.string().trim().min(1).max(64).optional(),
+					/** @deprecated desktop 1.36.0 sends this; use `label`. */
+					nickname: z.string().max(64).nullable().optional(),
+				})
+				.refine(
+					(input) => input.label !== undefined || input.nickname !== undefined,
+					{ message: "Pass label." },
+				),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -214,10 +220,13 @@ export const connectorsRouter = {
 			else if (existing.connectedByUserId !== ctx.session.user.id)
 				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
 
-			const trimmed = input.nickname?.trim();
+			const label = input.label ?? (input.nickname?.trim() || undefined);
 			const [row] = await db
 				.update(connections)
-				.set({ nickname: trimmed ? trimmed : null })
+				.set({
+					...(label === undefined ? {} : { externalUserLabel: label }),
+					nickname: null,
+				})
 				.where(
 					and(
 						eq(connections.id, input.connectionId),
@@ -225,14 +234,17 @@ export const connectorsRouter = {
 						reachable,
 					),
 				)
-				.returning({ id: connections.id, nickname: connections.nickname });
+				.returning({
+					id: connections.id,
+					label: connections.externalUserLabel,
+				});
 
 			if (!row)
 				throw new TRPCError({ code: "NOT_FOUND", message: "No connection" });
-			return row;
+			return { ...row, nickname: row.label };
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid(), connectionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

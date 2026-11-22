@@ -22,6 +22,7 @@ export function pageStorageRuntimeSource({
 	const HELLO_TIMEOUT_MS = ${helloTimeoutMs};
 	const POLL_INTERVAL_MS = ${POLL_INTERVAL_MS};
 	const CALL_TIMEOUT_MS = ${CALL_TIMEOUT_MS};
+	const SCOPES = ["slot", "private", "shared"];
 	const DOCUMENT = Math.random().toString(36).slice(2, 10);
 
 	const pending = new Map();
@@ -69,7 +70,7 @@ export function pageStorageRuntimeSource({
 			return;
 		}
 		if (data.type === "records") {
-			const fns = watchers.get(data.key);
+			const fns = watchers.get(watchKey(data.scope || "slot", data.key));
 			if (fns) for (const fn of fns) fn.push(data.records);
 			return;
 		}
@@ -85,7 +86,12 @@ export function pageStorageRuntimeSource({
 			let data;
 			try { data = JSON.parse(event.data); } catch { return; }
 			if (data.type === "hello") {
-				identity = { viewer: data.viewer, author: data.author, writable: data.writable };
+				identity = {
+					viewer: data.viewer,
+					author: data.author,
+					writable: data.writable,
+					scopes: data.scopes === true,
+				};
 				available = true;
 				settle(true);
 				revive();
@@ -141,6 +147,14 @@ export function pageStorageRuntimeSource({
 				throw fail("unavailable", "Page storage is not available in this view");
 			}
 		}
+		if (!(identity && identity.scopes)) {
+			if (request.op === "list") {
+				throw fail("unavailable", "This page's storage cannot list keys yet");
+			}
+			if (request.scope) {
+				throw fail("unavailable", "This page's storage does not support the " + request.scope + " scope yet");
+			}
+		}
 		const id = DOCUMENT + "." + ++seq;
 		return new Promise((resolve, reject) => {
 			pending.set(id, { resolve, reject });
@@ -165,6 +179,22 @@ export function pageStorageRuntimeSource({
 		return key;
 	};
 
+	const checkScope = (options) => {
+		if (options != null && (typeof options !== "object" || Array.isArray(options))) {
+			throw fail("invalid", "A storage scope is slot, private or shared");
+		}
+		const scope = options && options.scope !== undefined ? options.scope : "slot";
+		if (!SCOPES.includes(scope)) {
+			throw fail("invalid", "A storage scope is slot, private or shared");
+		}
+		return scope;
+	};
+
+	const withScope = (request, scope) =>
+		scope === "slot" ? request : { ...request, scope };
+
+	const watchKey = (scope, key) => scope + "\u0000" + key;
+
 	const checkValue = (value) => {
 		let encoded;
 		try {
@@ -186,22 +216,36 @@ export function pageStorageRuntimeSource({
 		get viewer() { return identity ? identity.viewer : null; },
 		get author() { return identity ? identity.author : false; },
 		get writable() { return identity ? identity.writable : null; },
-		async get(key) {
-			const result = await call({ op: "get", key: checkKey(key) });
+		async get(key, options) {
+			const scope = checkScope(options);
+			const result = await call(withScope({ op: "get", key: checkKey(key) }, scope));
 			return result.value ?? null;
 		},
-		async getAll(key) {
-			const result = await call({ op: "getAll", key: checkKey(key) });
+		async getAll(key, options) {
+			const scope = checkScope(options);
+			const result = await call(withScope({ op: "getAll", key: checkKey(key) }, scope));
 			return result.records || [];
 		},
-		async set(key, value) {
-			await call({ op: "set", key: checkKey(key), value: checkValue(value) });
+		async set(key, value, options) {
+			const scope = checkScope(options);
+			await call(withScope({ op: "set", key: checkKey(key), value: checkValue(value) }, scope));
 		},
-		async remove(key) {
-			await call({ op: "remove", key: checkKey(key) });
+		async remove(key, options) {
+			const scope = checkScope(options);
+			await call(withScope({ op: "remove", key: checkKey(key) }, scope));
 		},
-		subscribe(key, onRecords) {
+		async list(prefix, options) {
+			if (prefix !== undefined && (typeof prefix !== "string" || prefix.length > MAX_KEY_LENGTH)) {
+				throw fail("invalid", "A storage key prefix is at most " + MAX_KEY_LENGTH + " characters");
+			}
+			const scope = checkScope(options);
+			const result = await call(withScope(prefix ? { op: "list", prefix } : { op: "list" }, scope));
+			return result.keys || [];
+		},
+		subscribe(key, onRecords, options) {
 			checkKey(key);
+			const scope = checkScope(options);
+			const watched = watchKey(scope, key);
 			let stopped = false;
 			let timer = 0;
 			let inFlight = false;
@@ -212,7 +256,7 @@ export function pageStorageRuntimeSource({
 				if (inFlight) { again = true; return; }
 				inFlight = true;
 				try {
-					const records = await storage.getAll(key);
+					const records = await storage.getAll(key, options);
 					if (!stopped) onRecords(records);
 				} catch (error) {
 					console.warn("superset.storage: subscription to " + key + " failed", error);
@@ -225,9 +269,9 @@ export function pageStorageRuntimeSource({
 				refresh: read,
 				push: (records) => { if (!stopped) onRecords(records); },
 			};
-			const fns = watchers.get(key) || new Set();
+			const fns = watchers.get(watched) || new Set();
 			fns.add(entry);
-			watchers.set(key, fns);
+			watchers.set(watched, fns);
 
 			const tick = () => {
 				read();
@@ -246,7 +290,7 @@ export function pageStorageRuntimeSource({
 				stopped = true;
 				if (timer) clearTimeout(timer);
 				fns.delete(entry);
-				if (!fns.size) watchers.delete(key);
+				if (!fns.size) watchers.delete(watched);
 				removeEventListener("visibilitychange", onFocus);
 				removeEventListener("focus", onFocus);
 			};

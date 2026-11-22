@@ -6,17 +6,19 @@
  *
  *   bun run src/real-sandbox.ts            (VERCEL_SANDBOX_*, SANDBOX_GATE_SECRET, CDN_R2_*)
  *
- * Publishes the bundle first so the box can fetch it if the image is older.
+ * Publishes the bundle first so the box can fetch it if the image is older,
+ * and its agent-tools drive, which the box mounts.
  * Leaves the sandbox up for inspection on failure; deletes it on success.
  */
 
 import { randomUUID } from "node:crypto";
+import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
-} from "@superset/shared/sandbox-contract";
-import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/contract";
+import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";
@@ -46,9 +48,35 @@ if (
 const { buildBundle, publishBundle } = await import("./build");
 const bundle = buildBundle();
 await publishBundle(bundle, { dry: false });
+const agentTools = await import("./agent-tools");
+const drives = [
+	{
+		region: DEFAULT_SANDBOX_REGION,
+		result: await agentTools.publishAgentToolsDrive({
+			host: agentTools.vercelDriveHost(credentials),
+			region: DEFAULT_SANDBOX_REGION,
+			bundleSha: bundle.sha256,
+			assets: bundle.assets,
+		}),
+	},
+];
+for (const line of agentTools.describeAgentToolsPublish(drives, bundle.assets))
+	log(line);
+const gaps = agentTools.agentToolsGaps(
+	drives,
+	new Set([DEFAULT_SANDBOX_REGION]),
+);
+if (gaps.length) {
+	console.error(`agent-tools: ${gaps.join("; ")}`);
+	process.exit(1);
+}
 
-const { deleteSandbox, provisionSandbox, sandboxHostSecretFor, wakeSandbox } =
-	await import("@superset/trpc/lib/sandbox");
+const { deleteSandbox, provisionSandbox, wakeSandbox } = await import(
+	"@superset/trpc/lib/sandbox/vercel"
+);
+const { sandboxHostSecretFor } = await import(
+	"@superset/trpc/lib/sandbox/access"
+);
 const { checkWakeLog, probeBox } = await import("./environments/probe");
 
 const name = `ws-real-check-${Date.now().toString(36)}`;
@@ -64,7 +92,7 @@ const identity: SandboxIdentity = {
 	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
-			url: "https://github.com/superset-sh/superset.git",
+			url: "https://github.com/paradevai/paradev.git",
 			branch: workingBranch,
 			baseBranch: "main",
 			path: ".",
@@ -79,6 +107,8 @@ const claim = {
 	hostSecret,
 	managedEnv: { SUPERSET_REAL_CHECK: "1" },
 	networkPolicy: "allow-all" as const,
+	vcpus: GOLDEN_BOX_VCPUS,
+	agentTools: true,
 };
 
 log(
@@ -109,6 +139,7 @@ for (;;) {
 	}
 }
 const woken = await wakeSandbox({ providerSandboxId: name, claim });
+if (!woken) throw new Error(`${name} did not wake`);
 log(
 	`host-service answered at ${woken.hostTarget} (${Date.now() - started} ms since start)`,
 );

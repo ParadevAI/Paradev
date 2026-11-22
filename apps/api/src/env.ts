@@ -1,3 +1,4 @@
+import { parseOriginList } from "@superset/shared/origin-list";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
@@ -8,10 +9,16 @@ export const env = createEnv({
 			.default("development"),
 	},
 	server: {
+		DOMAIN_MOVE_ENABLED: z.string().optional(),
+		BROWSER_API_URL: z.string().url().optional(),
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),
 		GOOGLE_CLIENT_ID: z.string().min(1),
 		GOOGLE_CLIENT_SECRET: z.string().min(1),
+		// Google connections (Gmail triggers and the Gmail plugin) sign in with
+		// this client; GOOGLE_CLIENT_ID is for Sign in with Google only.
+		GOOGLE_CONNECTIONS_CLIENT_ID: z.string().min(1),
+		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1),
 		GH_CLIENT_ID: z.string().min(1),
 		GH_CLIENT_SECRET: z.string().min(1),
 		// Gmail push: the Pub/Sub topic `users.watch` publishes to, and the
@@ -55,6 +62,8 @@ export const env = createEnv({
 		KV_URL: z.string().url(),
 		STRIPE_SECRET_KEY: z.string(),
 		STRIPE_WEBHOOK_SECRET: z.string(),
+		AUTUMN_SECRET_KEY: z.string().min(1),
+		AUTUMN_WEBHOOK_SECRET: z.string().startsWith("whsec_"),
 		STRIPE_PRO_MONTHLY_PRICE_ID: z.string(),
 		STRIPE_PRO_YEARLY_PRICE_ID: z.string(),
 		// YC Bookface deal redemption webhook (deal 13843). The route answers
@@ -62,7 +71,7 @@ export const env = createEnv({
 		// edit page, under the webhook documentation.
 		YC_DEALS_WEBHOOK_SECRET: z.string().min(1).optional(),
 		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
-		YC_BOOKFACE_COUPON_ID: z.string().min(1).default("yc-bookface-6mo"),
+		YC_BOOKFACE_REWARD_ID: z.string().min(1).default("yc-bookface-3mo-team"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app
@@ -72,6 +81,22 @@ export const env = createEnv({
 		// The published app's slug, used to build the install URL.
 		SENTRY_APP_SLUG: z.string().optional(),
 		RELAY_URL: z.string().url().default("https://relay.superset.sh"),
+		REALTIME_URL: z.string().url().default("https://realtime.superset.sh"),
+		// Where the mobile app is served on the web. Unset allows none.
+		MOBILE_WEB_ORIGINS: z
+			.string()
+			.optional()
+			.refine(
+				(value) => {
+					try {
+						parseOriginList(value);
+						return true;
+					} catch {
+						return false;
+					}
+				},
+				{ message: "Comma-separated origins, without wildcards" },
+			),
 	},
 	client: {
 		NEXT_PUBLIC_API_URL: z.string().url(),

@@ -147,6 +147,16 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		nonInteractiveCommand: "pi --no-tools -p",
 	}),
 	createBuiltinTerminalAgent({
+		id: "pdev",
+		label: "pdev",
+		description:
+			"Coding agent built on Pi that routes each task to a model through its router.",
+		command: "pdev",
+		resumeCommand: "pdev --session",
+		forkCommand: "pdev --fork {sessionId}",
+		nonInteractiveCommand: "pdev -p",
+	}),
+	createBuiltinTerminalAgent({
 		id: "copilot",
 		label: "Copilot",
 		description:
@@ -231,9 +241,9 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		label: "Antigravity",
 		description:
 			"Google's Antigravity CLI for reasoning, editing, and running code from the terminal.",
-		command: "agy --mode accept-edits",
-		promptCommand: "agy --mode accept-edits -i",
-		resumeCommand: "agy --mode accept-edits --conversation",
+		command: "agy --dangerously-skip-permissions",
+		promptCommand: "agy --dangerously-skip-permissions -i",
+		resumeCommand: "agy --dangerously-skip-permissions --conversation",
 		nonInteractiveCommand: "agy -p",
 	}),
 	createBuiltinTerminalAgent({

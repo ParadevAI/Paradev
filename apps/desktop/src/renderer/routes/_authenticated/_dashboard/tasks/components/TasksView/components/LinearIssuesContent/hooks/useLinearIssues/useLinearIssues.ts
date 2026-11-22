@@ -9,6 +9,7 @@ const ISSUES_STALE_MS = 30_000;
 
 export interface LinearIssueFilters {
 	teamId: string | null;
+	projectId?: string | null;
 	status: TabValue;
 	assignee: string | null;
 	search: string;
@@ -22,6 +23,7 @@ export function useLinearIssues(filters: LinearIssueFilters) {
 		{
 			organizationId: organizationId ?? "",
 			teamId: filters.teamId,
+			projectId: filters.projectId ?? null,
 			status: filters.status,
 			assignee: filters.assignee,
 			search: search || null,

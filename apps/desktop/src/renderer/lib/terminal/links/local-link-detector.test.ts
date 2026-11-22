@@ -6,7 +6,11 @@
 import { describe, expect, it } from "bun:test";
 import type { StatCallback } from "./link-resolver";
 import { TerminalLinkResolver } from "./link-resolver";
-import { LocalLinkDetector } from "./local-link-detector";
+import {
+	type DetectedLink,
+	isWebLink,
+	LocalLinkDetector,
+} from "./local-link-detector";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -50,9 +54,16 @@ function createDetector(validPaths: string[], workspaceRoot = "/parent/cwd") {
 		}
 		return null;
 	};
-	const resolver = new TerminalLinkResolver(statMock);
-	return new LocalLinkDetector(resolver);
+	const detector = new LocalLinkDetector(new TerminalLinkResolver(statMock));
+	return {
+		detect: async (text: string) =>
+			(await detector.detect(text)).filter(
+				(link): link is DetectedLink => !isWebLink(link),
+			),
+	};
 }
+
+const noFile: StatCallback = async () => null;
 
 function formatLink(
 	fmt: string,
@@ -274,6 +285,77 @@ describe("LocalLinkDetector", () => {
 			expect(result).toHaveLength(1);
 			// Should have line info from primary suffix detection
 			expect(result[0]?.row).toBe(10);
+		});
+	});
+
+	describe("paths that do not exist as written", () => {
+		it("reads a #L line anchor", async () => {
+			const detector = createDetector(["/parent/cwd/src/file.ts"]);
+			const result = await detector.detect("see src/file.ts#L12-L20 here");
+			expect(result).toHaveLength(1);
+			expect(result[0]?.resolvedPath).toBe("/parent/cwd/src/file.ts");
+			expect(result[0]?.row).toBe(12);
+			expect(result[0]?.text).toBe("src/file.ts#L12-L20");
+		});
+
+		it("asks the file finder for a shortened path, without its line", async () => {
+			const asked: string[] = [];
+			const detector = new LocalLinkDetector(
+				new TerminalLinkResolver(noFile),
+				new TerminalLinkResolver(async (path) => {
+					asked.push(path);
+					return { isDirectory: false, resolvedPath: "/repo/apps/api/a.ts" };
+				}),
+			);
+			const result = await detector.detect("in api/a.ts:17-33 now");
+			expect(asked).toEqual(["api/a.ts"]);
+			expect(result).toMatchObject([
+				{ resolvedPath: "/repo/apps/api/a.ts", row: 17 },
+			]);
+		});
+
+		it("does not ask the file finder for a bare word", async () => {
+			const asked: string[] = [];
+			const detector = new LocalLinkDetector(
+				new TerminalLinkResolver(noFile),
+				new TerminalLinkResolver(async (path) => {
+					asked.push(path);
+					return { isDirectory: false, resolvedPath: `/repo/src/${path}` };
+				}),
+			);
+			expect(await detector.detect("version 12")).toEqual([]);
+			expect(asked).toEqual([]);
+		});
+
+		it("does not link a file location as a website", async () => {
+			const detector = new LocalLinkDetector(new TerminalLinkResolver(noFile));
+			expect(await detector.detect("error at main.io:12:4 here")).toEqual([]);
+		});
+
+		it("links a schemeless website that is not a file", async () => {
+			const detector = new LocalLinkDetector(new TerminalLinkResolver(noFile));
+			const result = await detector.detect("docs at example.com/docs/intro ok");
+			expect(result).toEqual([
+				{
+					text: "example.com/docs/intro",
+					startIndex: 8,
+					endIndex: 30,
+					url: "https://example.com/docs/intro",
+				},
+			]);
+		});
+
+		it("keeps a file over a website of the same name", async () => {
+			const detector = new LocalLinkDetector(
+				new TerminalLinkResolver(async (path) => ({
+					isDirectory: false,
+					resolvedPath: `/repo/${path}`,
+				})),
+			);
+			const result = await detector.detect("docs at example.com/docs/intro ok");
+			expect(result).toMatchObject([
+				{ resolvedPath: "/repo/example.com/docs/intro" },
+			]);
 		});
 	});
 

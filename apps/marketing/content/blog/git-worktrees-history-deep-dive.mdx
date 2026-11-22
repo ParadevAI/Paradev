@@ -75,9 +75,14 @@ The [GitHub announcement](https://github.blog/open-source/git/git-2-5-including-
 
 The feature shipped with an experimental label and warnings about submodules. Submodule support remains incomplete in the [Git worktree documentation](https://git-scm.com/docs/git-worktree); check those limits before using multiple checkouts of a superproject.
 
-The initial commit message laid out the vision:
+The documentation that shipped with it laid out the vision:
 
-> "A git repository can support multiple working trees, allowing you to check out more than one branch at a time."
+<figure>
+  <blockquote>
+    <p>A git repository can support multiple working trees, allowing you to check out more than one branch at a time.</p>
+  </blockquote>
+  <figcaption><cite>[git-worktree documentation](https://git-scm.com/docs/git-worktree)</cite></figcaption>
+</figure>
 
 The idea: a git repository is really two things:
 1. **The object store**: All your commits, trees, and blobs (the `.git/objects` directory)

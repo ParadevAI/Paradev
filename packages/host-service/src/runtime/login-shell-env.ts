@@ -1,5 +1,6 @@
 import path from "node:path";
 import { getTerminalBaseEnv, waitForTerminalBaseEnv } from "../terminal/env";
+import { caught } from "./box-log-filter";
 
 /**
  * Never imported from the login shell: these change how the host-service
@@ -56,12 +57,13 @@ export async function applyLoginShellEnvToProcess(
 		if (missing.length === 0) return;
 		targetEnv.PATH = [...current, ...missing].join(path.delimiter);
 		console.log(
-			`[host-service] merged ${missing.length} login-shell PATH entries into process env`,
+			"[host-service] merged login-shell PATH entries into process env (count):",
+			missing.length,
 		);
 	} catch (error) {
 		console.warn(
 			"[host-service] login-shell env merge failed (continuing):",
-			error,
+			caught(error),
 		);
 	}
 }

@@ -4,7 +4,10 @@ import {
 	makeSection,
 	makeWorkspace,
 } from "../testProjectFixtures";
-import { filterDashboardSidebarProjects } from "./filterDashboardSidebarProjects";
+import {
+	filterDashboardSidebarHiddenProjects,
+	filterDashboardSidebarProjects,
+} from "./filterDashboardSidebarProjects";
 
 const projects = [
 	makeProject({
@@ -112,5 +115,22 @@ describe("filterDashboardSidebarProjects", () => {
 		if (section?.type !== "section") throw new Error("expected section");
 		expect(section.section.isCollapsed).toBe(true);
 		expect(section.section.workspaces).toHaveLength(2);
+	});
+});
+
+describe("filterDashboardSidebarHiddenProjects", () => {
+	const hidden = [
+		{ id: "h1", name: "premiere-plugin", iconUrl: null, color: null },
+		{ id: "h2", name: "nango-test", iconUrl: null, color: null },
+	];
+
+	it("keeps only the hidden projects whose name matches", () => {
+		expect(
+			filterDashboardSidebarHiddenProjects(hidden, "PREMIER").map((p) => p.id),
+		).toEqual(["h1"]);
+	});
+
+	it("returns the list untouched without a query", () => {
+		expect(filterDashboardSidebarHiddenProjects(hidden, "  ")).toBe(hidden);
 	});
 });

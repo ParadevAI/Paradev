@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import {
 	buildWrapperScript,
@@ -7,19 +6,19 @@ import {
 	isSupersetManagedHookCommand,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
-import { getTemplatePath, getV1NotificationsPort } from "./config";
+import { getTemplatePath } from "./config";
 import {
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
-import { getHooksDir } from "./paths";
+import { APP_HOME_DIR_NAME, getHooksDir, resolveUserHomeDir } from "./paths";
 
 export const GEMINI_HOOK_SCRIPT_NAME = "gemini-hook.sh";
 
 const GEMINI_HOOK_SIGNATURE = "# Superset gemini hook";
-const GEMINI_HOOK_VERSION = "v7";
+const GEMINI_HOOK_VERSION = "v8";
 export const GEMINI_HOOK_MARKER = `${GEMINI_HOOK_SIGNATURE} ${GEMINI_HOOK_VERSION}`;
 
 interface GeminiHookDefinition {
@@ -34,7 +33,7 @@ export function getGeminiHookScriptPath(): string {
 }
 
 export function getGeminiSettingsJsonPath(): string {
-	return path.join(os.homedir(), ".gemini", "settings.json");
+	return path.join(resolveUserHomeDir(), ".gemini", "settings.json");
 }
 
 export function getGeminiHookScriptContent(): string {
@@ -44,7 +43,7 @@ export function getGeminiHookScriptContent(): string {
 	);
 	return template
 		.replace("{{MARKER}}", GEMINI_HOOK_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 // HookEventName values from gemini-cli's packages/core/src/hooks/types.ts.
@@ -104,7 +103,7 @@ export function createGeminiHookScript(): void {
 	const scriptPath = getGeminiHookScriptPath();
 	const content = getGeminiHookScriptContent();
 	const changed = writeFileIfChanged(scriptPath, content, 0o755);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Gemini hook script`,
 	);
 }

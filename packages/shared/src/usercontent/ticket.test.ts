@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
+	signAgentSessionTicket,
 	signFileTicket,
 	signPageConnectTicket,
 	signPageTicket,
+	verifyAgentSessionTicket,
 	verifyFileTicket,
 	verifyPageConnectTicket,
 	verifyPageTicket,
@@ -168,5 +170,30 @@ describe("page connect tickets", () => {
 		const [payload] = ticket.split(".");
 		const forged = `${payload}.deadbeef`;
 		expect(await verifyPageConnectTicket(SECRET, forged, NOW)).toBeNull();
+	});
+});
+
+describe("agent session tickets", () => {
+	test("round-trips and rejects other kinds, other secrets and expired tickets", async () => {
+		const exp = Math.floor(Date.now() / 1000) + 60;
+		const ticket = await signAgentSessionTicket("s1", {
+			sessionId: "sess",
+			scope: "read",
+			userId: "u1",
+			exp,
+		});
+		expect(await verifyAgentSessionTicket("s1", ticket)).toEqual({
+			sessionId: "sess",
+			scope: "read",
+			userId: "u1",
+			exp,
+		});
+		expect(await verifyAgentSessionTicket("s2", ticket)).toBeNull();
+		expect(await verifyPageTicket("s1", ticket)).toBeNull();
+		expect(
+			await verifyAgentSessionTicket("s1", ticket, (exp + 1) * 1000),
+		).toBeNull();
+		const page = await signPageTicket("s1", { pageId: "p", exp });
+		expect(await verifyAgentSessionTicket("s1", page)).toBeNull();
 	});
 });

@@ -3,8 +3,10 @@ import {
 	type InsertTaskImport,
 	members,
 	taskImports,
+	taskSequences,
 	taskStatuses,
 	tasks,
+	teams,
 	users,
 } from "@superset/db/schema";
 import { seedDefaultStatuses } from "@superset/db/seed-default-statuses";
@@ -28,7 +30,7 @@ import {
 	toStoredDocument,
 } from "../../lib/document-files";
 import { setTaskLabels } from "../../lib/labels";
-import { protectedProcedure, type TRPCContext } from "../../trpc";
+import { personProcedure, type TRPCContext } from "../../trpc";
 import { getIssue, type LinearStateType } from "../integration/linear/api";
 import { withLinear } from "../integration/linear/live";
 import { verifyOrgMembership } from "../integration/utils";
@@ -128,6 +130,47 @@ async function getTaskBySlug(
 	return task ?? null;
 }
 
+async function getTaskTeamId(
+	executor: Executor,
+	organizationId: string,
+	value: string,
+) {
+	const orgTeams = await executor
+		.select({
+			id: teams.id,
+			name: teams.name,
+			slug: teams.slug,
+			key: taskSequences.key,
+		})
+		.from(teams)
+		.leftJoin(taskSequences, eq(taskSequences.teamId, teams.id))
+		.where(eq(teams.organizationId, organizationId))
+		.orderBy(asc(teams.createdAt));
+	const needle = value.trim().toLowerCase();
+	const label = (t: (typeof orgTeams)[number]) => t.key ?? t.slug;
+	const exact =
+		orgTeams.find((t) => t.id === needle) ??
+		orgTeams.find((t) => t.key?.toLowerCase() === needle) ??
+		orgTeams.find((t) => t.slug.toLowerCase() === needle);
+	if (exact) return exact.id;
+
+	const named = orgTeams.filter((t) => t.name.toLowerCase() === needle);
+	if (named.length > 1) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `Several teams are named ${value}. Use one of: ${named.map(label).join(", ")}`,
+		});
+	}
+	const [team] = named;
+	if (!team) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: `Team not found: ${value}. Teams: ${orgTeams.map(label).join(", ")}`,
+		});
+	}
+	return team.id;
+}
+
 async function getScopedStatusId(
 	executor: Executor,
 	organizationId: string,
@@ -213,7 +256,26 @@ async function createTask(
 	importedFrom?: ImportSource,
 ) {
 	const organizationId = await requireActiveOrgMembership(ctx);
+	return insertTask({
+		organizationId,
+		creatorId: ctx.session.user.id,
+		input,
+		importedFrom,
+	});
+}
 
+/** Creates a task in an organization; the task routes and a Dev's `start_task` share it. */
+export async function insertTask({
+	organizationId,
+	creatorId,
+	input,
+	importedFrom,
+}: {
+	organizationId: string;
+	creatorId: string;
+	input: z.infer<typeof createTaskSchema>;
+	importedFrom?: ImportSource;
+}) {
 	const result = await dbWs.transaction(async (tx) => {
 		const statusId = input.statusId
 			? await getScopedStatusId(
@@ -233,6 +295,10 @@ async function createTask(
 				)
 			: null;
 
+		const teamId = input.team
+			? await getTaskTeamId(tx, organizationId, input.team)
+			: undefined;
+
 		const taskId = crypto.randomUUID();
 		const [task] = await tx
 			.insert(tasks)
@@ -248,8 +314,9 @@ async function createTask(
 				statusId,
 				priority: input.priority ?? "none",
 				organizationId,
-				creatorId: ctx.session.user.id,
+				creatorId,
 				assigneeId,
+				teamId,
 				estimate: input.estimate ?? null,
 				dueDate: input.dueDate ?? null,
 			})
@@ -270,7 +337,7 @@ async function createTask(
 				...importedFrom,
 				taskId: task.id,
 				organizationId,
-				importedByUserId: ctx.session.user.id,
+				importedByUserId: creatorId,
 			});
 		}
 
@@ -330,7 +397,7 @@ async function nativeStatusIdFor(
 
 async function findImportedTask(organizationId: string, externalId: string) {
 	const [row] = await db
-		.select({ task: tasks })
+		.select({ task: taskColumns })
 		.from(taskImports)
 		.innerJoin(tasks, eq(taskImports.taskId, tasks.id))
 		.where(
@@ -403,7 +470,7 @@ function selectTaskListRows() {
 		.leftJoin(status, eq(tasks.statusId, status.id));
 }
 
-function buildTaskListFilters(
+async function buildTaskListFilters(
 	organizationId: string,
 	userId: string,
 	input: TaskListFilterInput | null | undefined,
@@ -424,17 +491,115 @@ function buildTaskListFilters(
 	return buildTaskListConditions({
 		organizationId,
 		nativeOnly: input?.nativeOnly ?? undefined,
+		teamId: input?.team
+			? await getTaskTeamId(db, organizationId, input.team)
+			: undefined,
 		statusId: input?.statusId ?? undefined,
 		priority: input?.priority ?? undefined,
 		assigneeId: input?.assigneeMe ? userId : (input?.assigneeId ?? undefined),
 		creatorId: input?.creatorMe ? userId : undefined,
 		search: input?.search ?? undefined,
-		externalProjectId: input?.externalProjectId ?? undefined,
-		externalProjectName: input?.externalProjectName ?? undefined,
-		externalCycleId: input?.externalCycleId ?? undefined,
+		labels: input?.labels ?? undefined,
 		dueDateFrom: dueDateRange.from,
 		dueDateTo: dueDateRange.to,
 	});
+}
+
+/**
+ * Moves a task to the organization's first "started"-type status (e.g.
+ * "In Progress") when work begins on it — a workspace is created from it
+ * or an agent starts working. No-op unless the task is currently in a
+ * "backlog"/"unstarted" status, so it never regresses tasks that are
+ * already in progress or done. An unassigned task is assigned to the
+ * acting user; an existing assignee is never overwritten.
+ */
+export async function moveTaskToStarted(
+	tx: DbWsTransaction,
+	{
+		taskId,
+		organizationId,
+		actorUserId,
+	}: { taskId: string; organizationId: string; actorUserId: string },
+) {
+	const [current] = await tx
+		.select({
+			statusId: tasks.statusId,
+			statusType: taskStatuses.type,
+			statusProvider: taskStatuses.externalProvider,
+			assigneeId: tasks.assigneeId,
+		})
+		.from(tasks)
+		.innerJoin(taskStatuses, eq(tasks.statusId, taskStatuses.id))
+		.where(and(eq(tasks.id, taskId), isNull(tasks.deletedAt)))
+		.limit(1);
+
+	if (
+		!current ||
+		(current.statusType !== "backlog" && current.statusType !== "unstarted")
+	) {
+		return null;
+	}
+
+	// Stay within the status set the task already lives in (Linear
+	// statuses vs local defaults) so the transition is meaningful
+	// to the provider that owns the task's workflow.
+	const [startedStatus] = await tx
+		.select({ id: taskStatuses.id })
+		.from(taskStatuses)
+		.where(
+			and(
+				eq(taskStatuses.organizationId, organizationId),
+				eq(taskStatuses.type, "started"),
+				current.statusProvider
+					? eq(taskStatuses.externalProvider, current.statusProvider)
+					: isNull(taskStatuses.externalProvider),
+			),
+		)
+		.orderBy(asc(taskStatuses.position))
+		.limit(1);
+
+	if (!startedStatus) {
+		return null;
+	}
+
+	const unassigned = current.assigneeId === null;
+
+	// Compare-and-set on the observed status so a concurrent move to
+	// completed/canceled between the read and this write is never
+	// dragged back to started. No row updated = no-op.
+	const [task] = await tx
+		.update(tasks)
+		.set({
+			statusId: startedStatus.id,
+			...(unassigned ? { assigneeId: actorUserId } : {}),
+		})
+		.where(
+			and(
+				eq(tasks.id, taskId),
+				eq(tasks.statusId, current.statusId),
+				isNull(tasks.deletedAt),
+			),
+		)
+		.returning(taskColumns);
+
+	if (!task) {
+		return null;
+	}
+
+	await recordTaskActivity(
+		tx,
+		task.id,
+		{ kind: "user", userId: actorUserId },
+		diffTaskActivity(
+			{
+				...task,
+				statusId: current.statusId,
+				assigneeId: current.assigneeId,
+			},
+			task,
+		),
+	);
+	return task;
 }
 
 export const taskRouter = {
@@ -445,7 +610,7 @@ export const taskRouter = {
 	 * shipped CLI on `main` keeps compiling against the new backend during
 	 * the CLI-v1 split rollout.
 	 */
-	all: protectedProcedure.query(async ({ ctx }) => {
+	all: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const assignee = alias(users, "assignee");
 		const creator = alias(users, "creator");
@@ -472,12 +637,12 @@ export const taskRouter = {
 			.orderBy(desc(tasks.createdAt));
 	}),
 
-	list: protectedProcedure
+	list: personProcedure
 		.input(taskListInputSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 
-			const filters = buildTaskListFilters(
+			const filters = await buildTaskListFilters(
 				organizationId,
 				ctx.session.user.id,
 				input,
@@ -495,12 +660,12 @@ export const taskRouter = {
 				.offset(input?.offset ?? 0);
 		}),
 
-	listPage: protectedProcedure
+	listPage: personProcedure
 		.input(taskListPageInputSchema)
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
 
-			const filters = buildTaskListFilters(
+			const filters = await buildTaskListFilters(
 				organizationId,
 				ctx.session.user.id,
 				input,
@@ -532,7 +697,7 @@ export const taskRouter = {
 			return { items, nextCursor };
 		}),
 
-	byOrganization: protectedProcedure
+	byOrganization: personProcedure
 		.input(z.string().uuid())
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input);
@@ -544,16 +709,16 @@ export const taskRouter = {
 				.orderBy(desc(tasks.createdAt));
 		}),
 
-	byId: protectedProcedure
+	byId: personProcedure
 		.input(z.string().uuid())
 		.query(({ ctx, input }) => getTaskById(ctx.session.user.id, input)),
 
-	bySlug: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+	bySlug: personProcedure.input(z.string()).query(async ({ ctx, input }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		return getTaskBySlug(ctx.session.user.id, organizationId, input);
 	}),
 
-	byIdOrSlug: protectedProcedure
+	byIdOrSlug: personProcedure
 		.input(z.string().min(1))
 		.query(async ({ ctx, input }) => {
 			const looksLikeUuid =
@@ -584,15 +749,15 @@ export const taskRouter = {
 	 * shipped renderer/CLI on `main` keep working during the CLI-v1 split
 	 * rollout.
 	 */
-	createFromUi: protectedProcedure
+	createFromUi: personProcedure
 		.input(createTaskSchema)
 		.mutation(({ ctx, input }) => createTask(ctx, input)),
 
-	create: protectedProcedure
+	create: personProcedure
 		.input(createTaskSchema)
 		.mutation(({ ctx, input }) => createTask(ctx, input)),
 
-	importSource: protectedProcedure
+	importSource: personProcedure
 		.input(z.string().uuid())
 		.query(async ({ ctx, input }) => {
 			await getTaskAccess(db, ctx.session.user.id, input);
@@ -607,7 +772,7 @@ export const taskRouter = {
 			return source ?? null;
 		}),
 
-	importFromLinear: protectedProcedure
+	importFromLinear: personProcedure
 		.input(z.object({ issueId: z.string().min(1) }))
 		.mutation(({ ctx, input }) => importLinearIssue(ctx, input.issueId)),
 
@@ -617,11 +782,9 @@ export const taskRouter = {
 	 * or an agent starts working. No-op unless the task is currently in a
 	 * "backlog"/"unstarted" status, so it never regresses tasks that are
 	 * already in progress or done. An unassigned task is assigned to the
-	 * acting user; an existing assignee (internal or external snapshot) is
-	 * never overwritten. Changes are pushed to the external provider
-	 * (Linear) via the regular sync path.
+	 * acting user; an existing assignee is never overwritten.
 	 */
-	start: protectedProcedure
+	start: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const result = await dbWs.transaction(async (tx) => {
@@ -630,88 +793,12 @@ export const taskRouter = {
 					ctx.session.user.id,
 					input.id,
 				);
-
-				const [current] = await tx
-					.select({
-						statusId: tasks.statusId,
-						statusType: taskStatuses.type,
-						statusProvider: taskStatuses.externalProvider,
-						assigneeId: tasks.assigneeId,
-						assigneeExternalId: tasks.assigneeExternalId,
-					})
-					.from(tasks)
-					.innerJoin(taskStatuses, eq(tasks.statusId, taskStatuses.id))
-					.where(and(eq(tasks.id, input.id), isNull(tasks.deletedAt)))
-					.limit(1);
-
-				if (
-					!current ||
-					(current.statusType !== "backlog" &&
-						current.statusType !== "unstarted")
-				) {
-					return { task: null, txid: null };
-				}
-
-				// Stay within the status set the task already lives in (Linear
-				// statuses vs local defaults) so the transition is meaningful
-				// to the provider that owns the task's workflow.
-				const [startedStatus] = await tx
-					.select({ id: taskStatuses.id })
-					.from(taskStatuses)
-					.where(
-						and(
-							eq(taskStatuses.organizationId, taskAccess.organizationId),
-							eq(taskStatuses.type, "started"),
-							current.statusProvider
-								? eq(taskStatuses.externalProvider, current.statusProvider)
-								: isNull(taskStatuses.externalProvider),
-						),
-					)
-					.orderBy(asc(taskStatuses.position))
-					.limit(1);
-
-				if (!startedStatus) {
-					return { task: null, txid: null };
-				}
-
-				const unassigned =
-					current.assigneeId === null && current.assigneeExternalId === null;
-
-				// Compare-and-set on the observed status so a concurrent move to
-				// completed/canceled between the read and this write is never
-				// dragged back to started. No row updated = no-op.
-				const [task] = await tx
-					.update(tasks)
-					.set({
-						statusId: startedStatus.id,
-						...(unassigned ? { assigneeId: ctx.session.user.id } : {}),
-					})
-					.where(
-						and(
-							eq(tasks.id, input.id),
-							eq(tasks.statusId, current.statusId),
-							isNull(tasks.deletedAt),
-						),
-					)
-					.returning(taskColumns);
-
-				if (!task) {
-					return { task: null, txid: null };
-				}
-
-				await recordTaskActivity(
-					tx,
-					task.id,
-					{ kind: "user", userId: ctx.session.user.id },
-					diffTaskActivity(
-						{
-							...task,
-							statusId: current.statusId,
-							assigneeId: current.assigneeId,
-						},
-						task,
-					),
-				);
+				const task = await moveTaskToStarted(tx, {
+					taskId: input.id,
+					organizationId: taskAccess.organizationId,
+					actorUserId: ctx.session.user.id,
+				});
+				if (!task) return { task: null, txid: null };
 
 				const txid = await getCurrentTxid(tx);
 
@@ -721,7 +808,7 @@ export const taskRouter = {
 			return result;
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(updateTaskSchema)
 		.mutation(async ({ ctx, input }) => {
 			const { id, labels, ...data } = input;
@@ -739,7 +826,6 @@ export const taskRouter = {
 					.from(tasks)
 					.where(eq(tasks.id, id));
 
-				// Enforce assignee invariant: setting internal assignee clears external snapshot
 				const updateData: Record<string, unknown> = { ...data };
 				if (data.description) {
 					updateData.description = toStoredDocument(data.description, {
@@ -757,23 +843,26 @@ export const taskRouter = {
 					);
 				}
 
-				if ("assigneeId" in data) {
+				if (data.assigneeId !== undefined) {
 					updateData.assigneeId = await getScopedAssigneeId(
 						tx,
 						taskAccess.organizationId,
-						data.assigneeId ?? null,
+						data.assigneeId,
 						"Assignee must belong to the task organization",
 					);
-					updateData.assigneeExternalId = null;
-					updateData.assigneeDisplayName = null;
-					updateData.assigneeAvatarUrl = null;
 				}
 
 				const [updated] = await tx
 					.update(tasks)
 					.set({ ...updateData, updatedAt: new Date() })
 					.where(and(eq(tasks.id, id), isNull(tasks.deletedAt)))
-					.returning();
+					.returning({
+						title: tasks.title,
+						description: tasks.description,
+						statusId: tasks.statusId,
+						priority: tasks.priority,
+						assigneeId: tasks.assigneeId,
+					});
 
 				const labelChanges =
 					updated && labels
@@ -825,7 +914,7 @@ export const taskRouter = {
 			return result;
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(z.string().uuid())
 		.mutation(async ({ ctx, input }) => {
 			const result = await dbWs.transaction(async (tx) => {

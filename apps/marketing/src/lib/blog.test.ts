@@ -8,12 +8,12 @@ import {
 	getListedBlogPosts,
 	getRelatedPosts,
 } from "./blog";
+import { extractComparisonFaqItems } from "./compare-utils";
 
 const unlistedSlugs = [
-	"claude-code-codex-iphone",
-	"scheduled-agent-maintenance",
-	"parallel-coding-agents-guide",
-	"superset-mobile",
+	"change-ui-with-your-coding-agent",
+	"send-pr-feedback-to-your-agent",
+	"review-agent-work-with-pages",
 ];
 
 test("preserves recorded blog updates without generating missing dates", () => {
@@ -54,4 +54,12 @@ describe("unlisted blog posts", () => {
 			),
 		).toBe(false);
 	});
+});
+
+test("posts with a frontmatter FAQ do not repeat it in the body", () => {
+	for (const post of getBlogPosts()) {
+		if (!post.faq) continue;
+		expect(post.faq.length).toBeGreaterThan(0);
+		expect(extractComparisonFaqItems(post.content)).toEqual([]);
+	}
 });

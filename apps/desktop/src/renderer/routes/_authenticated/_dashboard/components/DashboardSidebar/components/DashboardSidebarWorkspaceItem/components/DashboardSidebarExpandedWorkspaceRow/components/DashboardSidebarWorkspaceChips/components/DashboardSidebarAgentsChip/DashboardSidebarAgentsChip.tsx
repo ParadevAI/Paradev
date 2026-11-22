@@ -8,7 +8,7 @@ import {
 } from "@superset/ui/hover-card";
 import { cn } from "@superset/ui/utils";
 import { STATUS_PRIORITY } from "shared/tabs-types";
-import { useDashboardSidebarChipHoverSuppression } from "../../hooks/useDashboardSidebarChipHoverSuppression";
+import { useDashboardSidebarChipHoverSuppression } from "../../../../hooks/useDashboardSidebarChipHoverSuppression";
 import type { DashboardSidebarRunningAgent } from "../../hooks/useDashboardSidebarWorkspaceRunningAgents";
 import { DashboardSidebarAgentAvatar } from "./components/DashboardSidebarAgentAvatar";
 import { DashboardSidebarAgentHoverRow } from "./components/DashboardSidebarAgentHoverRow";
@@ -29,7 +29,7 @@ export function DashboardSidebarAgentsChip({
 	agents,
 }: DashboardSidebarAgentsChipProps) {
 	const { t } = useLingui();
-	const { isOpen, onOpenChange, onPointerEnter, onPointerLeave, toggleOpen } =
+	const { isOpen, onOpenChange, onPointerLeave, toggleOpen } =
 		useDashboardSidebarChipHoverSuppression();
 
 	const subagentCount = agents.reduce(
@@ -57,7 +57,6 @@ export function DashboardSidebarAgentsChip({
 				<Badge asChild variant="secondary">
 					<button
 						type="button"
-						onPointerEnter={onPointerEnter}
 						onPointerLeave={onPointerLeave}
 						onPointerDown={(event) => {
 							event.stopPropagation();
@@ -76,14 +75,14 @@ export function DashboardSidebarAgentsChip({
 							isOpen
 								? t({
 										message: plural(agents.length, {
-											one: "# running agent — hide details",
-											other: "# running agents — hide details",
+											one: "# running agent: hide details",
+											other: "# running agents: hide details",
 										}),
 									})
 								: t({
 										message: plural(agents.length, {
-											one: "# running agent — show details",
-											other: "# running agents — show details",
+											one: "# running agent: show details",
+											other: "# running agents: show details",
 										}),
 									}),
 							subagentCount > 0

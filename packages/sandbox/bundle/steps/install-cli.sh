@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Puts `superset` on PATH for everything in the box. The binary sync-assets
-# staged is named by version; the link is what terminals and agents find.
+# Puts `superset` and its alias `paradev` on PATH for everything in the box.
+# The binary sync-assets staged is named by version; the links are what
+# terminals and agents find.
 set -euo pipefail
 . /etc/superset/contract.sh
 
@@ -17,3 +18,5 @@ chmod 0755 "$binary"
 install -d /usr/local/bin
 ln -sfn "$binary" /usr/local/bin/superset.tmp
 mv -T /usr/local/bin/superset.tmp /usr/local/bin/superset
+ln -sfn superset /usr/local/bin/paradev.tmp
+mv -T /usr/local/bin/paradev.tmp /usr/local/bin/paradev

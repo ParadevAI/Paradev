@@ -1,0 +1,55 @@
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@superset/i18n";
+
+export const TERMINAL_SESSION_LIST_REFETCH_INTERVAL_MS = 2_000;
+export const TERMINAL_SESSION_LIST_STALE_MS = 5_000;
+export const TERMINAL_SESSION_LIST_CLOSED_STALE_MS = 5 * 60_000;
+export const TERMINAL_TITLE_SETTLE_MS = 1_500;
+
+export function shouldQueryTerminalSessionList(
+	isOpen: boolean,
+	isAgentSession: boolean,
+): boolean {
+	return isOpen || isAgentSession;
+}
+
+export function getTerminalSessionListStaleTime(isOpen: boolean): number {
+	return isOpen
+		? TERMINAL_SESSION_LIST_STALE_MS
+		: TERMINAL_SESSION_LIST_CLOSED_STALE_MS;
+}
+
+export function getTerminalSessionListRefetchInterval(
+	isOpen: boolean,
+): false | number {
+	return isOpen ? TERMINAL_SESSION_LIST_REFETCH_INTERVAL_MS : false;
+}
+
+export function getTerminalDisplayTitle({
+	titleOverride,
+	customTitle,
+	agentLabel,
+	runtimeTitle,
+	sessionTitle,
+}: {
+	titleOverride?: string;
+	customTitle?: string | null;
+	agentLabel?: string;
+	runtimeTitle?: string | null;
+	sessionTitle?: string | null;
+}): string {
+	// Explicit pane titles come from user/preset labels, so they should not be
+	// hidden by transient shell-reported titles such as "zsh" or "Terminal".
+	const liveTitle =
+		agentLabel && !customTitle ? agentLabel : (runtimeTitle ?? customTitle);
+	return (
+		titleOverride ??
+		liveTitle ??
+		sessionTitle ??
+		i18n._(
+			msg({
+				message: "Terminal",
+			}),
+		)
+	);
+}

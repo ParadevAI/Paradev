@@ -147,6 +147,16 @@ export function seedDefaultsIfEmpty(db: HostDb): HostAgentConfigRow[] {
 	return listOrdered(db);
 }
 
+export function ensurePresetRow(db: HostDb, presetId: string): void {
+	const existing = seedDefaultsIfEmpty(db);
+	if (existing.some((row) => row.presetId === presetId)) return;
+	const preset = getPresetById(presetId);
+	if (!preset) return;
+	const nextOrder =
+		Math.max(-1, ...existing.map((row) => row.displayOrder)) + 1;
+	db.insert(hostAgentConfigs).values(rowFromPreset(preset, nextOrder)).run();
+}
+
 /**
  * Defaults are seeded once, when the table is empty, so an install that
  * predates a preset gaining fork support would keep an empty `forkArgs`
@@ -170,6 +180,34 @@ function backfillPresetForkArgs(
 		if (!rowMatchesPresetLaunch(row, preset)) continue;
 		db.update(hostAgentConfigs)
 			.set({ forkArgsJson: JSON.stringify(preset.forkArgs) })
+			.where(eq(hostAgentConfigs.id, row.id))
+			.run();
+		changed = true;
+	}
+	return changed ? listOrdered(db) : rows;
+}
+
+/** Launch args a preset shipped before, keyed by preset id. */
+const SUPERSEDED_PRESET_ARGS: Record<string, string[]> = {
+	agy: ["--mode", "accept-edits"],
+};
+
+/**
+ * Moves a row still on a preset's earlier launch args to the current ones.
+ * A row with any other edit to its launch settings is left alone.
+ */
+function backfillSupersededPresetArgs(
+	db: HostDb,
+	rows: HostAgentConfigRow[],
+): HostAgentConfigRow[] {
+	let changed = false;
+	for (const row of rows) {
+		const superseded = SUPERSEDED_PRESET_ARGS[row.presetId];
+		const preset = getPresetById(row.presetId);
+		if (!superseded || !preset) continue;
+		if (!rowMatchesPresetLaunch(row, { ...preset, args: superseded })) continue;
+		db.update(hostAgentConfigs)
+			.set({ argsJson: JSON.stringify(preset.args) })
 			.where(eq(hostAgentConfigs.id, row.id))
 			.run();
 		changed = true;
@@ -252,7 +290,10 @@ export const agentConfigsRouter = router({
 	 * on first call when no configs exist.
 	 */
 	list: protectedProcedure.query(({ ctx }) => {
-		const rows = backfillPresetForkArgs(ctx.db, seedDefaultsIfEmpty(ctx.db));
+		const rows = backfillPresetForkArgs(
+			ctx.db,
+			backfillSupersededPresetArgs(ctx.db, seedDefaultsIfEmpty(ctx.db)),
+		);
 		return rows.map(toOutput);
 	}),
 

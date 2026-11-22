@@ -28,7 +28,7 @@ const meta = {
 		workspace: {
 			id: "lag-repro-01",
 			name: "lag-repro-01",
-			status: "ready",
+			status: "awake",
 			agentStatus: "working",
 			agentStatusAt: ago(2),
 			createdAt: ago(2),
@@ -45,10 +45,10 @@ const meta = {
 				{ fullName: "superset-sh/superset", branch: "superset/lag-repro-01" },
 			],
 			presence: [
-				{ ...avi, lastSeenAt: ago(3) },
-				{ ...kiet, lastSeenAt: ago(1) },
-				{ ...harshith, lastSeenAt: ago(2) },
-				{ ...satya, lastSeenAt: ago(120) },
+				{ ...avi, lastSeenAt: ago(3).getTime(), active: true },
+				{ ...kiet, lastSeenAt: ago(1).getTime(), active: true },
+				{ ...harshith, lastSeenAt: ago(2).getTime(), active: true },
+				{ ...satya, lastSeenAt: ago(120).getTime(), active: false },
 			],
 			prompt:
 				"Reproduce the sidebar lag Harshith reported when 40+ workspaces are open. Profile the renderer, find the hot path, and open a PR with the fix and a before/after trace.",
@@ -72,8 +72,6 @@ const meta = {
 			{
 				id: "t1",
 				slug: "SUPER-2311",
-				externalProvider: null,
-				externalKey: null,
 				title:
 					"Figure out how to get plugins and skills working in cloud boxes",
 				status: { type: "started", color: "#f2c94c", progressPercent: 50 },
@@ -125,8 +123,6 @@ const meta = {
 				task: {
 					id: "t2",
 					slug: "SUPER-2384",
-					externalProvider: null,
-					externalKey: null,
 					title: "Mobile: block comment popover on small screens",
 					status: { type: "started", color: "#f2c94c", progressPercent: 50 },
 				},
@@ -138,8 +134,6 @@ const meta = {
 				task: {
 					id: "t3",
 					slug: "SUPER-2452",
-					externalProvider: null,
-					externalKey: null,
 					title: "No mechanism for reporting sidebar lag",
 					status: {
 						type: "unstarted",
@@ -261,8 +255,6 @@ const meta = {
 				task: {
 					id: "t1",
 					slug: "SUPER-2311",
-					externalProvider: null,
-					externalKey: null,
 					title:
 						"Figure out how to get plugins and skills working in cloud boxes",
 					status: { type: "started", color: "#f2c94c", progressPercent: 50 },
@@ -292,8 +284,6 @@ const meta = {
 				task: {
 					id: "t4",
 					slug: "SUPER-2470",
-					externalProvider: null,
-					externalKey: null,
 					title: "Sidebar hover lag with 40+ workspaces",
 					status: {
 						type: "unstarted",

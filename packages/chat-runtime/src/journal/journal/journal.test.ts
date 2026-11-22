@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { DurableEnvelope } from "@superset/chat/protocol";
 import { gt } from "drizzle-orm";
 import { CHAT_DB_FILENAME, chatJournal } from "../../db";
 import { type ChatRuntime, createChatRuntime } from "../../index";
@@ -12,6 +13,7 @@ import {
 	userMessage,
 } from "../../testing/fixtures";
 import { createBunChatDb, createTestRuntime } from "../../testing/testRuntime";
+import type { ChatSessionChange } from "./journal";
 
 const SESSION = "session-1";
 
@@ -104,6 +106,63 @@ describe("ChatJournal", () => {
 			status: "idle",
 			title: "Fix the build",
 		});
+	});
+
+	test("reports changes to the session listing, not every append", () => {
+		const changes: ChatSessionChange[] = [];
+		const watched = createTestRuntime({
+			onSessionChanged: (change) => {
+				changes.push(change);
+			},
+		});
+		watched.journal.open(init());
+		watched.journal.append(SESSION, {
+			type: "session",
+			session: sessionState({ status: "starting" }),
+		});
+		watched.journal.append(SESSION, {
+			type: "session",
+			session: sessionState({ status: "running" }),
+		});
+		watched.journal.append(SESSION, {
+			type: "item",
+			item: agentMessage("a", "a"),
+			turnId: "turn-1",
+		});
+		watched.journal.append(SESSION, {
+			type: "session",
+			session: sessionState({ status: "running", title: "Renamed" }),
+		});
+		watched.journal.append(SESSION, {
+			type: "session",
+			session: sessionState({ status: "idle" }),
+		});
+		watched.journal.discard(SESSION);
+
+		expect(changes).toHaveLength(5);
+		for (const change of changes) {
+			expect(change).toEqual({
+				sessionId: SESSION,
+				scopeId: "workspace-1",
+				occurredAt: expect.any(Number),
+			});
+		}
+	});
+
+	test("a throwing session listener does not fail the append", () => {
+		const watched = createTestRuntime({
+			onSessionChanged: () => {
+				throw new Error("listener failed");
+			},
+		});
+		watched.journal.open(init());
+		const cursor = watched.journal.append(SESSION, {
+			type: "session",
+			session: sessionState({ status: "running" }),
+		});
+
+		expect(cursor.seq).toBe(1);
+		expect(watched.sessions.get(SESSION)?.status).toBe("running");
 	});
 
 	test("projects queued_count from queued user messages", () => {
@@ -244,5 +303,51 @@ describe("chat.db lifecycle", () => {
 		});
 		expect(existsSync(join(dataDir, CHAT_DB_FILENAME))).toBe(true);
 		await runtime.dispose();
+	});
+});
+
+describe("ChatJournal onAppend", () => {
+	test("reports each durable event once it is written", () => {
+		const seen: DurableEnvelope[] = [];
+		const runtime = createTestRuntime({
+			onAppend: (envelope) => seen.push(envelope),
+		});
+		runtime.journal.open({
+			sessionId: "s",
+			scopeId: "w",
+			harness: "fake",
+		});
+		runtime.journal.append("s", {
+			type: "item",
+			turnId: "t1",
+			item: agentMessage("m", "hi"),
+		});
+		expect(seen.map((envelope) => envelope.cursor.seq)).toEqual([1]);
+	});
+
+	test("reports a listener's rejected promise with the event it failed on", async () => {
+		const logged = spyOn(console, "error").mockImplementation(() => {});
+		const runtime = createTestRuntime({
+			onAppend: async () => {
+				throw new Error("listener failed");
+			},
+		});
+		runtime.journal.open({ sessionId: "s", scopeId: "w", harness: "fake" });
+		runtime.journal.append("s", {
+			type: "item",
+			turnId: "t1",
+			item: agentMessage("m", "hi"),
+		});
+		await Promise.resolve();
+		await Promise.resolve();
+		try {
+			expect(logged).toHaveBeenCalledWith(
+				"[chat-journal] onAppend listener failed",
+				{ sessionId: "s", cursor: { epoch: expect.any(String), seq: 1 } },
+				expect.any(Error),
+			);
+		} finally {
+			logged.mockRestore();
+		}
 	});
 });

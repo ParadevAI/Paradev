@@ -1,13 +1,9 @@
+import { quoteShellToken } from "@superset/shared/agent-prompt-launch";
 import { parse } from "shell-quote";
 
-const SAFE_SHELL_TOKEN = /^[A-Za-z0-9_@%+=:,./~-]+$/;
-const ENV_KEY = /^[A-Za-z_][A-Za-z0-9_]*$/;
+export { quoteShellToken };
 
-export function quoteShellToken(value: string): string {
-	if (value === "") return "''";
-	if (SAFE_SHELL_TOKEN.test(value)) return value;
-	return `'${value.replaceAll("'", "'\\''")}'`;
-}
+const ENV_KEY = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 function parseTokens(input: string): string[] {
 	return parse(input).filter(

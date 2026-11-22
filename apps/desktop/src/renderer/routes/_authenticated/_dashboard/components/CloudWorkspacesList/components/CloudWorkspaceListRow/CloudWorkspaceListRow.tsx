@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { AvatarStack } from "@superset/ui/atoms/AvatarStack";
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
@@ -6,7 +7,6 @@ import { cn } from "@superset/ui/utils";
 import { HiMiniXMark } from "react-icons/hi2";
 import { LuRotateCcw } from "react-icons/lu";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
-import { ACTIVE_WITHIN_MS } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacePresenceStack";
 import { CloudWorkspaceStatus } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspaceStatus";
 import type { CloudPullRequest } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { CloudWorkspacePullRequestsBadge } from "./components/CloudWorkspacePullRequestsBadge";
@@ -17,7 +17,6 @@ export interface CloudWorkspaceListItem {
 		CloudWorkspaceRow,
 		| "id"
 		| "name"
-		| "presence"
 		| "status"
 		| "agentStatus"
 		| "agentStatusAt"
@@ -28,8 +27,6 @@ export interface CloudWorkspaceListItem {
 	pullRequests: CloudPullRequest[];
 	isInSidebar: boolean;
 	isMine: boolean;
-	/** False while the viewer is the only one present. */
-	showsPresence: boolean;
 	isRead: boolean;
 }
 
@@ -56,7 +53,7 @@ export function CloudWorkspaceListRow({
 }: CloudWorkspaceListRowProps) {
 	const { t } = useLingui();
 	const { workspace, repos, pullRequests, isInSidebar } = item;
-	const isArchived = workspace.status === "deleted";
+	const isArchived = isArchivedCloudWorkspaceStatus(workspace.status);
 	const canUnarchive = isArchived && onUnarchive !== undefined;
 	return (
 		<tr
@@ -100,23 +97,6 @@ export function CloudWorkspaceListRow({
 							onOpenPullRequest={onOpenPullRequest}
 						/>
 					</span>
-				</span>
-			</td>
-			<td className="w-0 pr-3">
-				<span className="flex min-w-[50px] justify-end">
-					{item.showsPresence && (
-						<AvatarStack
-							people={workspace.presence.map((person) => ({
-								id: person.userId,
-								name: person.name,
-								image: person.image,
-								isActive:
-									now.getTime() - person.lastSeenAt.getTime() <
-									ACTIVE_WITHIN_MS,
-							}))}
-							size={20}
-						/>
-					)}
 				</span>
 			</td>
 			<td className="w-0 pr-3 text-right">

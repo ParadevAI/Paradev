@@ -213,6 +213,34 @@ export const HOTKEYS_REGISTRY = {
 			message: "Navigate to the next workspace in the sidebar",
 		}),
 	},
+	OPEN_WORKSPACE_LIST: {
+		key: {
+			mac: L("meta+period"),
+			windows: L("ctrl+period"),
+			linux: L("ctrl+period"),
+		},
+		label: msg({
+			message: "Switch Workspace",
+		}),
+		category: "Workspace",
+		description: msg({
+			message: "Search your workspaces and open one, or start a new workspace",
+		}),
+	},
+	OPEN_ACTIVE_WORKSPACE_SWITCHER: {
+		key: {
+			mac: L("meta+semicolon"),
+			windows: L("ctrl+alt+semicolon"),
+			linux: L("ctrl+alt+semicolon"),
+		},
+		label: msg({
+			message: "Switch to Active Workspace",
+		}),
+		category: "Workspace",
+		description: msg({
+			message: "Same as Switch Workspace",
+		}),
+	},
 	CLOSE_WORKSPACE: {
 		key: {
 			mac: "meta+shift+backspace",
@@ -227,16 +255,16 @@ export const HOTKEYS_REGISTRY = {
 			message: "Close or delete the current workspace",
 		}),
 	},
-	UNDO_ARCHIVE_WORKSPACE: {
+	UNDO: {
 		key: {
 			mac: L("meta+z"),
 			windows: L("ctrl+z"),
 			linux: L("ctrl+z"),
 		},
-		label: msg({ message: "Undo Archive" }),
+		label: msg({ message: "Undo" }),
 		category: "Workspace",
 		description: msg({
-			message: "Restore the workspace you just archived",
+			message: "Undo the last archived workspace or closed chats",
 		}),
 	},
 	NEW_WORKSPACE: {
@@ -299,10 +327,10 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+alt+o"),
 			linux: L("ctrl+shift+alt+o"),
 		},
-		label: msg({ message: "Open Project" }),
+		label: msg({ message: "Add Project from Folder" }),
 		category: "Workspace",
 		description: msg({
-			message: "Open an existing project folder",
+			message: "Pick a folder on disk and add it as a project",
 		}),
 	},
 	OPEN_PR: {
@@ -325,16 +353,26 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+l"),
 			linux: L("ctrl+shift+l"),
 		},
-		label: msg({
-			message: "Toggle Sidebar",
-		}),
+		label: msg({ message: "Toggle Right Sidebar" }),
 		category: "Layout",
 	},
-	OPEN_DIFF_VIEWER: {
+	TOGGLE_RIGHT_PANE_FULL_SCREEN: {
 		key: {
 			mac: L("meta+shift+l"),
 			windows: L("ctrl+shift+alt+l"),
 			linux: L("ctrl+shift+alt+l"),
+		},
+		label: msg({ message: "Toggle Right Pane Full Screen" }),
+		category: "Layout",
+		description: msg({
+			message: "Expand the right pane to fill the window, or restore it",
+		}),
+	},
+	OPEN_DIFF_VIEWER: {
+		key: {
+			mac: L("meta+shift+g"),
+			windows: L("ctrl+shift+alt+g"),
+			linux: L("ctrl+shift+alt+g"),
 		},
 		label: msg({
 			message: "Open Changes",
@@ -385,7 +423,7 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+e"),
 			linux: L("ctrl+shift+e"),
 		},
-		label: msg({ message: "Split Pane Auto" }),
+		label: msg({ message: "Split Along Longer Side" }),
 		category: "Layout",
 		description: msg({
 			message: "Split the current pane along its longer side",
@@ -411,9 +449,7 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+alt+y"),
 			linux: L("ctrl+shift+alt+y"),
 		},
-		label: msg({
-			message: "Split with Desktop",
-		}),
+		label: msg({ message: "Split with Sandbox Desktop" }),
 		category: "Layout",
 		description: msg({
 			message: "Split the current pane and open the sandbox desktop",
@@ -499,7 +535,7 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Find in File Viewer",
 		}),
-		category: "Terminal",
+		category: "Navigation",
 		description: msg({
 			message: "Search text in the rendered file viewer",
 		}),
@@ -511,7 +547,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+f"),
 		},
 		label: msg({ message: "Find in Chat" }),
-		category: "Terminal",
+		category: "Chat",
 		description: msg({
 			message: "Search text in the active chat",
 		}),
@@ -525,9 +561,23 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Find in Changes",
 		}),
-		category: "Terminal",
+		category: "Navigation",
 		description: msg({
 			message: "Search text in the changes diff",
+		}),
+	},
+	FIND_IN_PAGE: {
+		key: {
+			mac: L("meta+f"),
+			windows: L("ctrl+shift+f"),
+			linux: L("ctrl+shift+f"),
+		},
+		label: msg({
+			message: "Find in Page",
+		}),
+		category: "Navigation",
+		description: msg({
+			message: "Search text in the active page",
 		}),
 	},
 	NEW_GROUP: {
@@ -546,7 +596,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+r"),
 		},
 		label: msg({ message: "Reopen Closed Tab" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	NEW_BROWSER: {
 		key: {
@@ -555,7 +605,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+b"),
 		},
 		label: msg({ message: "New Browser" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	CLOSE_TERMINAL: {
 		key: {
@@ -575,7 +625,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+w"),
 		},
 		label: msg({ message: "Close Tab" }),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Close the current tab",
 		}),
@@ -611,15 +661,13 @@ export const HOTKEYS_REGISTRY = {
 			windows: "ctrl+shift+tab",
 			linux: "ctrl+shift+tab",
 		},
-		label: msg({
-			message: "Previous Tab (Alt)",
-		}),
-		category: "Terminal",
+		label: msg({ message: "Previous Tab (Second Shortcut)" }),
+		category: "Layout",
 	},
 	NEXT_TAB_ALT: {
 		key: { mac: "ctrl+tab", windows: "ctrl+tab", linux: "ctrl+tab" },
-		label: msg({ message: "Next Tab (Alt)" }),
-		category: "Terminal",
+		label: msg({ message: "Next Tab (Second Shortcut)" }),
+		category: "Layout",
 	},
 	PREV_TAB: {
 		key: {
@@ -628,7 +676,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: "ctrl+shift+alt+left",
 		},
 		label: msg({ message: "Previous Tab" }),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Focus the previous tab in the active workspace",
 		}),
@@ -640,9 +688,47 @@ export const HOTKEYS_REGISTRY = {
 			linux: "ctrl+shift+alt+right",
 		},
 		label: msg({ message: "Next Tab" }),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Focus the next tab in the active workspace",
+		}),
+	},
+	PREV_RIGHT_SIDEBAR_TAB: {
+		key: {
+			mac: "meta+ctrl+left",
+			windows: "ctrl+shift+alt+pageup",
+			linux: "ctrl+shift+alt+pageup",
+		},
+		label: msg({ message: "Previous Right Sidebar Tab" }),
+		category: "Layout",
+		description: msg({
+			message:
+				"Show the previous tab in the right sidebar without moving focus",
+		}),
+	},
+	NEXT_RIGHT_SIDEBAR_TAB: {
+		key: {
+			mac: "meta+ctrl+right",
+			windows: "ctrl+shift+alt+pagedown",
+			linux: "ctrl+shift+alt+pagedown",
+		},
+		label: msg({ message: "Next Right Sidebar Tab" }),
+		category: "Layout",
+		description: msg({
+			message: "Show the next tab in the right sidebar without moving focus",
+		}),
+	},
+	TOGGLE_RIGHT_SIDEBAR_FOCUS: {
+		key: {
+			mac: L("meta+alt+l"),
+			windows: L("ctrl+shift+alt+e"),
+			linux: L("ctrl+shift+alt+e"),
+		},
+		label: msg({ message: "Toggle Right Sidebar Focus" }),
+		category: "Layout",
+		description: msg({
+			message:
+				"Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed",
 		}),
 	},
 	FOCUS_PANE_LEFT: {
@@ -650,7 +736,7 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Focus Pane Left",
 		}),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Focus the pane to the left of the active pane",
 		}),
@@ -660,7 +746,7 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Focus Pane Right",
 		}),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Focus the pane to the right of the active pane",
 		}),
@@ -668,7 +754,7 @@ export const HOTKEYS_REGISTRY = {
 	FOCUS_PANE_UP: {
 		key: { mac: null, windows: null, linux: null },
 		label: msg({ message: "Focus Pane Up" }),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Focus the pane above the active pane",
 		}),
@@ -678,7 +764,7 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Focus Pane Down",
 		}),
-		category: "Terminal",
+		category: "Layout",
 		description: msg({
 			message: "Focus the pane below the active pane",
 		}),
@@ -690,7 +776,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+1"),
 		},
 		label: msg({ message: "Switch to Tab 1" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_2: {
 		key: {
@@ -699,7 +785,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+2"),
 		},
 		label: msg({ message: "Switch to Tab 2" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_3: {
 		key: {
@@ -708,7 +794,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+3"),
 		},
 		label: msg({ message: "Switch to Tab 3" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_4: {
 		key: {
@@ -717,7 +803,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+4"),
 		},
 		label: msg({ message: "Switch to Tab 4" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_5: {
 		key: {
@@ -726,7 +812,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+5"),
 		},
 		label: msg({ message: "Switch to Tab 5" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_6: {
 		key: {
@@ -735,7 +821,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+6"),
 		},
 		label: msg({ message: "Switch to Tab 6" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_7: {
 		key: {
@@ -744,7 +830,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+7"),
 		},
 		label: msg({ message: "Switch to Tab 7" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_8: {
 		key: {
@@ -753,7 +839,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+8"),
 		},
 		label: msg({ message: "Switch to Tab 8" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	JUMP_TO_TAB_9: {
 		key: {
@@ -762,7 +848,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+9"),
 		},
 		label: msg({ message: "Switch to Tab 9" }),
-		category: "Terminal",
+		category: "Layout",
 	},
 	OPEN_PRESET_1: {
 		key: { mac: L("ctrl+1"), windows: L("ctrl+1"), linux: L("ctrl+1") },
@@ -838,7 +924,16 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Focus Chat Input",
 		}),
-		category: "Terminal",
+		category: "Chat",
+	},
+	NEW_CHAT: {
+		key: {
+			mac: L("meta+shift+j"),
+			windows: L("ctrl+shift+alt+j"),
+			linux: L("ctrl+shift+alt+j"),
+		},
+		label: msg({ message: "New Chat" }),
+		category: "Chat",
 	},
 	CHAT_ADD_ATTACHMENT: {
 		key: {
@@ -846,10 +941,8 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+u"),
 			linux: L("ctrl+shift+u"),
 		},
-		label: msg({
-			message: "Add Attachment",
-		}),
-		category: "Terminal",
+		label: msg({ message: "Add Attachment" }),
+		category: "Chat",
 	},
 
 	// Window
@@ -898,10 +991,11 @@ export const HOTKEYS_REGISTRY = {
 			windows: L("ctrl+shift+o"),
 			linux: L("ctrl+shift+o"),
 		},
-		label: msg({ message: "Open in App" }),
-		category: "Window",
+		label: msg({ message: "Open in Editor" }),
+		category: "Workspace",
 		description: msg({
-			message: "Open workspace in external app (Cursor, VS Code, etc.)",
+			message:
+				"Open the workspace in the app picked in the Open In menu (VS Code, Cursor, etc.)",
 		}),
 	},
 	COPY_PATH: {
@@ -911,7 +1005,7 @@ export const HOTKEYS_REGISTRY = {
 			linux: L("ctrl+shift+alt+c"),
 		},
 		label: msg({ message: "Copy Path" }),
-		category: "Window",
+		category: "Workspace",
 		description: msg({
 			message: "Copy the workspace path to the clipboard",
 		}),
@@ -929,7 +1023,7 @@ export const HOTKEYS_REGISTRY = {
 	},
 	SHOW_HOTKEYS: {
 		key: {
-			mac: L("meta+shift+slash"),
+			mac: L("meta+slash"),
 			windows: L("ctrl+shift+slash"),
 			linux: L("ctrl+shift+slash"),
 		},

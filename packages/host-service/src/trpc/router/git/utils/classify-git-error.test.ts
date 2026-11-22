@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { TRPCError } from "@trpc/server";
 import { simpleGit } from "simple-git";
-import { rethrowEnvironmentalGitError } from "./classify-git-error";
+import {
+	GIT_TOOLS_MISSING_MESSAGE,
+	rethrowEnvironmentalGitError,
+	rethrowGitToolsMissing,
+} from "./classify-git-error";
 
 function capture(error: unknown): TRPCError | null {
 	try {
@@ -52,6 +56,31 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(thrown?.code).toBe("BAD_REQUEST");
 		expect(causeKind(thrown)).toBe("NOT_GIT_REPO");
 		expect(thrown?.message).toBe(message);
+	});
+
+	test("git 2.56+ gitfile pointing at no repository → BAD_REQUEST / NOT_GIT_REPO", () => {
+		const message =
+			"fatal: gitfile does not point to a valid repository: /worktrees/repo/feature/.git\n";
+		const thrown = capture(new Error(message));
+		expect(thrown?.code).toBe("BAD_REQUEST");
+		expect(causeKind(thrown)).toBe("NOT_GIT_REPO");
+		expect(thrown?.message).toBe(message);
+	});
+
+	test("leaves malformed gitfiles and the sentence mid-line unclassified", () => {
+		expect(
+			capture(new Error("fatal: invalid gitfile format: /repo/.git\n")),
+		).toBeNull();
+		expect(
+			capture(new Error("fatal: no path in gitfile: /repo/.git\n")),
+		).toBeNull();
+		expect(
+			capture(
+				new Error(
+					"hook output: gitfile does not point to a valid repository: x\n",
+				),
+			),
+		).toBeNull();
 	});
 
 	test("simple-git construct error → NOT_FOUND / WORKTREE_MISSING", () => {
@@ -139,6 +168,9 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(thrown?.code).toBe("PRECONDITION_FAILED");
 		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
 		expect(thrown?.message).toBe(message);
+		expect(thrown?.cause).toMatchObject({
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		});
 	});
 
 	test("unreadable tree object → PRECONDITION_FAILED / GIT_REPO_DAMAGED", () => {
@@ -396,6 +428,9 @@ describe("rethrowEnvironmentalGitError", () => {
 		const thrown = capture(new Error(message));
 		expect(thrown?.code).toBe("PRECONDITION_FAILED");
 		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
+		expect(thrown?.cause).toMatchObject({
+			reason: "COMMAND_LINE_TOOLS_MISSING",
+		});
 		expect(thrown?.message).toBe(message);
 	});
 
@@ -429,6 +464,9 @@ describe("rethrowEnvironmentalGitError", () => {
 		expect(thrown?.code).toBe("PRECONDITION_FAILED");
 		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
 		expect(thrown?.message).toBe(message);
+		expect(thrown?.cause).toMatchObject({
+			reason: "XCODE_LICENSE_NOT_ACCEPTED",
+		});
 	});
 
 	test("does not claim the license refusal alongside a failure of git's own", () => {
@@ -571,6 +609,19 @@ describe("rethrowEnvironmentalGitError", () => {
 		).toBe("GIT_ENVIRONMENT");
 	});
 
+	test("object or worktree file its storage cannot deliver → PRECONDITION_FAILED / GIT_ENVIRONMENT", () => {
+		const canceled = "fatal: mmap failed: Operation canceled\n";
+		const thrown = capture(new Error(canceled));
+		expect(thrown?.code).toBe("PRECONDITION_FAILED");
+		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
+		expect(thrown?.message).toBe(canceled);
+		expect(
+			causeKind(
+				capture(new Error("fatal: mmap failed: Operation timed out\n")),
+			),
+		).toBe("GIT_ENVIRONMENT");
+	});
+
 	test("does not claim other index mapping failures or network timeouts", () => {
 		expect(
 			capture(
@@ -578,6 +629,9 @@ describe("rethrowEnvironmentalGitError", () => {
 					"fatal: .git/index: unable to map index file: Cannot allocate memory\n",
 				),
 			),
+		).toBeNull();
+		expect(
+			capture(new Error("fatal: mmap failed: Cannot allocate memory\n")),
 		).toBeNull();
 		expect(
 			capture(
@@ -594,5 +648,32 @@ describe("rethrowEnvironmentalGitError", () => {
 				),
 			),
 		).toBeNull();
+	});
+});
+
+describe("rethrowGitToolsMissing", () => {
+	const stub =
+		"Cloning into '/Users/me/Paradev/Hello-World'...\n" +
+		"xcode-select: note: No developer tools were found, requesting install.\n" +
+		"If developer tools are located at a non-default location on disk, use `sudo xcode-select --switch path/to/Xcode.app` to specify the Xcode that you wish to use for command line developer tools, and cancel the installation dialog.\n";
+
+	test("turns the stub's refusal into a plain PRECONDITION_FAILED", () => {
+		let thrown: unknown = null;
+		try {
+			rethrowGitToolsMissing(new Error(stub));
+		} catch (error) {
+			thrown = error;
+		}
+		expect(thrown).toBeInstanceOf(TRPCError);
+		expect((thrown as TRPCError).code).toBe("PRECONDITION_FAILED");
+		expect((thrown as TRPCError).message).toBe(GIT_TOOLS_MISSING_MESSAGE);
+	});
+
+	test("leaves ordinary git failures alone", () => {
+		expect(() =>
+			rethrowGitToolsMissing(
+				new Error("fatal: repository 'https://github.com/a/b/' not found"),
+			),
+		).not.toThrow();
 	});
 });

@@ -5,7 +5,7 @@ import {
 	type TagFolderRef,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 import type { WorkspaceTransactionSnapshot } from "renderer/stores/workspace-creates";
-import { getV2WorkspaceDisplayName } from "renderer/utils/getV2WorkspaceDisplayName";
+import { getWorkspaceDisplayName } from "renderer/utils/getWorkspaceDisplayName";
 import type {
 	DashboardSidebarPinnedWorkspace,
 	DashboardSidebarProject,
@@ -54,7 +54,7 @@ export interface SidebarWorkspaceInput {
 	projectId: string | null;
 	hostId: string;
 	type: DashboardSidebarWorkspaceType;
-	hostIsOnline: boolean;
+	hostIsOnline: boolean | null;
 	name: string;
 	branch: string;
 	taskId: string | null;
@@ -106,7 +106,7 @@ function decorateSidebarWorkspace(
 		type: workspace.type,
 		hostIsOnline: hostType === "remote-device" ? workspace.hostIsOnline : null,
 		accentColor: null,
-		name: getV2WorkspaceDisplayName(workspace),
+		name: getWorkspaceDisplayName(workspace),
 		branch: workspace.branch,
 		pullRequest: pullRequestsByWorkspaceId.get(workspace.id) ?? null,
 		repoUrl:
@@ -124,6 +124,9 @@ function decorateSidebarWorkspace(
 		taskId: workspace.taskId,
 		isPinned: workspace.pinnedAt != null,
 		pendingTransaction: workspace.pendingTransaction,
+		isMine: null,
+		creator: null,
+		sandboxStatus: null,
 	};
 }
 
@@ -291,7 +294,7 @@ export function buildDashboardSidebarSessions({
 	return { children, workspaces };
 }
 
-export interface BuildDashboardSidebarProjectsParams {
+interface BuildDashboardSidebarProjectsParams {
 	sidebarProjects: SidebarProjectInput[];
 	sidebarSections: SidebarSectionInput[];
 	visibleSidebarWorkspaces: SidebarWorkspaceInput[];

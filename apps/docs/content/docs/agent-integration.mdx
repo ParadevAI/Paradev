@@ -5,7 +5,7 @@ description: Use Claude Code and other AI agents
 
 ## Overview
 
-Run AI coding agents in isolated workspaces. Each agent works independently without interfering with others.
+Run AI coding agents in separate workspaces. Each workspace has its own Git worktree and branch, so agents don't edit the same files.
 
 ![AI Agents](/images/agents.png)
 
@@ -36,33 +36,30 @@ Run AI coding agents in isolated workspaces. Each agent works independently with
 
 ## Chat
 
-Superset includes a built-in chat panel for AI interactions without leaving the app.
+Paradev has a built-in chat panel.
 
-- Use the model picker to choose supported models and connect providers
-- Chat session titles are generated automatically from the conversation
-- Use the thinking level control to adjust reasoning effort for the selected model
+- Use the model picker to choose supported models and connect providers.
+- Session titles are generated from the conversation.
+- Use the thinking level control to set reasoning effort for the selected model.
 
 ## Models and Reasoning Effort
 
-The model pickers include **GPT-6 Astra**, **GPT-6 Sol**, and **GPT-6 Luna**,
-and **Opus 5.5** and **Sonnet 5.5**, wherever the agent supports them: Claude
-Code (Claude models), Codex (GPT models), Copilot, OpenCode, Oh My Pi, and Superset
-Chat. In the Codex picker, **GPT-5.5** is under **Retiring 2026-10-14**, and
-the retired GPT-5.4 and GPT-5.3 Codex are gone. Available reasoning levels depend on the agent and model; see the [launch options](/cli/cli-reference#agent-effort-levels).
+The model pickers include **GPT-6 Astra**, **GPT-6 Sol**, **GPT-6 Luna**, **Opus 5.5**, and **Sonnet 5.5**, wherever the agent supports them: Claude Code (Claude models), Codex (GPT models), Copilot, OpenCode, Oh My Pi, and Paradev Chat. The Codex picker also has **GPT-6.1 Sol** and **GPT-6.1 Terra**; GPT-5.5, GPT-5.4, and GPT-5.3 Codex are retired. Available reasoning levels depend on the agent and model; see the [launch options](/cli/cli-reference#agent-effort-levels).
 
 ## Agent Settings
 
-Go to **Settings → Agents** to customize launch behavior for each built-in agent.
+Go to **Settings → Agents** to change how each agent launches, reorder agents, or add your own.
 
-- **Enabled** - Show or hide the agent in launchers
-- **Command (No Prompt)** - Base command for terminal agents
-- **Command (With Prompt)** - Prompt-aware command for terminal agents
-- **Prompt Command Suffix** - Optional flags appended after the prompt payload
-- **Task Prompt Template** - Template used when launching an agent from a task
-- **Resume Args** - Arguments used to restore a killed session by its id (e.g. `--resume`)
-- **Fork Args** - Arguments used to clone a session by its id. Put `{sessionId}` where the id belongs (e.g. `--resume {sessionId} --fork-session`); leave empty if the agent cannot fork
-- **Model Override** - Optional model override for Superset Chat
-- **Reset to Defaults** - Restore the shipped configuration for that agent
+- **Label** and **Icon** - How the agent appears in launchers and the list
+- **Command** - The command used to launch the agent
+- **Prompt-only args** - Arguments added only when Paradev launches the agent with a prompt
+- **Prompt transport** - How the prompt is delivered to the process (as an argument or on stdin)
+- **Resume args** - Arguments used to restore a session by its id (e.g. `--resume`)
+- **Fork args** - Arguments used to clone a session by its id. Put `{sessionId}` where the id belongs (e.g. `--resume {sessionId} --fork-session`); leave empty if the agent cannot fork
+- **Paradev hooks** - Whether Paradev installs its status hooks for the agent
+- **Restore defaults** - Restore the shipped configuration for a built-in agent
+
+To add an agent that isn't built in, choose **Add agent → Custom agent…**. A custom agent runs in its own worktree like any other. To see which features each built-in agent supports, see [Supported Agents](/supported-agents).
 
 ## Usage
 
@@ -76,8 +73,8 @@ claude "Add error handling to fetchUser"
 
 When launching an agent from a task, the **Auto-run command** toggle controls whether it executes immediately.
 
-- **On** - Terminal agents run their command right away, and Superset Chat sends the task prompt immediately
-- **Off** - Terminal agents stage the command without pressing Enter, and Superset Chat opens as a draft instead
+- **On** - Terminal agents run their command right away, and Paradev Chat sends the task prompt immediately
+- **Off** - Terminal agents stage the command without pressing Enter, and Paradev Chat opens as a draft instead
 
 The setting is remembered between sessions.
 
@@ -89,24 +86,24 @@ Resume an interrupted session, fork a session, or hand its work to another agent
 
 ## Parallel Agents
 
-Create multiple workspaces and run an agent in each. Compare results and merge the best solution.
-
-## Inline Prompts
-
-Agents can pause and ask questions, request tool approval, and ask for plan review directly in the chat pane.
+Run an agent in each of several workspaces, compare results, and merge the best one.
 
 ## Sandbox Access
 
-When an agent needs access to files outside its workspace, it will prompt for permission in chat so you can approve or deny the request inline.
+When an agent needs files outside its workspace, it asks for permission in chat. You approve or deny inline.
+
+## Inline Prompts
+
+Prompts, approvals, and plan reviews appear in the chat pane.
 
 ## Notifications
 
-Get notified when agents finish. Configure sounds in Settings.
+You are notified when agents finish. Configure sounds in Settings. See [Agent Status & Notifications](/agent-status).
 
 ## Agent Skills
 
-Teach any agent to drive Superset itself with the official [skills](https://github.com/superset-sh/skills), one for the `superset` CLI and one for the [MCP server](/mcp-server):
+Teach an agent to drive Paradev with the official [skills](https://github.com/paradevai/skills), one for the `superset` CLI and one for the [MCP server](/mcp-server):
 
 ```bash
-npx skills add superset-sh/skills
+npx skills add paradevai/skills
 ```

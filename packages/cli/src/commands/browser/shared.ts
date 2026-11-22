@@ -13,7 +13,7 @@ import {
  */
 export async function resolveBrowserTarget(
 	ctx: CliContext,
-	options: { workspace: string; host?: string | null },
+	options: { host?: string | null },
 ): Promise<{ client: HostServiceClient; hostId: string; ws: HostWsEndpoint }> {
 	const organizationId = ctx.config.organizationId;
 	if (!organizationId) {

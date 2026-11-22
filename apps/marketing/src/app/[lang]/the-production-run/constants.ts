@@ -54,7 +54,7 @@ export const MEASURED_VARIABLES: MeasuredVariable[] = [
 		name: "agentPrsMerged",
 		grain: "per day",
 		definition:
-			"PRs merged from a Superset workspace that ran an agent, or whose workspace has since been archived.",
+			"PRs merged from a Paradev workspace that ran an agent, or whose workspace has since been archived.",
 		feeds: "Output",
 	},
 	{
@@ -94,7 +94,7 @@ export const GRADED_AXES: GradedAxis[] = [
 		name: "Output",
 		source: "agentPrsMerged",
 		rationale:
-			"Whether the work lands. Counted from PRs merged out of a Superset workspace that ran an agent. Hard to reach by accident; possible to fake on purpose, which is what the flag button is for.",
+			"Whether the work lands. Counted from PRs merged out of a Paradev workspace that ran an agent. Hard to reach by accident; possible to fake on purpose, which is what the flag button is for.",
 	},
 	{
 		name: "Sustain",

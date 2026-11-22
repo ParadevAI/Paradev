@@ -4,4 +4,5 @@ export {
 	resetManagedEnvForTests,
 	setManagedEnv,
 	waitForManagedEnv,
+	waitForSandboxManagedEnv,
 } from "./sandbox-managed-env";

@@ -1,1 +1,0 @@
-export { PullRequestCommentCard } from "./PullRequestCommentCard";

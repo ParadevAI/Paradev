@@ -3,27 +3,37 @@ import { usePageComments } from "@superset/cloud-client";
 import { errorMessage } from "@superset/i18n/errors";
 import { pageCommentUser } from "@superset/shared/page-comments";
 import type { PageLinkClick } from "@superset/shared/page-comments-runtime";
+import { pagePresenceUrl } from "@superset/shared/page-presence";
 import { pageStorageSocketUrl } from "@superset/shared/page-storage-ticket";
 import {
 	AllCommentsButton,
 	CommentProvider,
 	CommentsPanel,
 	PageCommentsView,
+	type PageToolHost,
+	PageUpdateBanner,
 	PageVersionBanner,
 } from "@superset/ui/page-comments";
 import { toast } from "@superset/ui/sonner";
 import { Spinner } from "@superset/ui/spinner";
 import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "renderer/env.renderer";
-import { authClient, getJwt } from "renderer/lib/auth-client";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useDispatchChord, useHotkey } from "renderer/hotkeys";
+import { authClient, ensureFreshJwt, getJwt } from "renderer/lib/auth-client";
+import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
+import { usePluginMutations } from "renderer/routes/_authenticated/_dashboard/hooks/usePluginMutations";
+import { canonicalizeChord } from "shared/hotkey-chord";
+import { CommentDeepLink } from "./components/CommentDeepLink";
+import { MarkCommentsRead } from "./components/MarkCommentsRead";
 import { PageViewerMessage } from "./components/PageViewerMessage";
+import { usePageUpdates } from "./hooks/usePageUpdates";
 
 const scrollPositions = new Map<string, number>();
 
-export interface ResolvedPage {
+interface ResolvedPage {
 	id: string;
 	slug: string;
 	title: string | null;
@@ -37,9 +47,13 @@ interface PageViewerProps {
 	onCommentsEnabledChange: (enabled: boolean) => void;
 	onResolved?: (page: ResolvedPage) => void;
 	onFramePointerDown?: () => void;
+	initialThreadId?: string | null;
+	initialPanelOpen?: boolean;
 	onLinkClick?: (click: PageLinkClick) => void;
 	version?: number | null;
 	onExitPreview?: () => void;
+	/** Whether the find shortcut belongs to this viewer: its pane is focused. */
+	findActive?: boolean;
 }
 
 export function PageViewer({
@@ -50,6 +64,8 @@ export function PageViewer({
 	onCommentsEnabledChange,
 	onResolved,
 	onFramePointerDown,
+	initialThreadId = null,
+	initialPanelOpen = false,
 	onLinkClick = (click) => {
 		void electronTrpcClient.external.openUrl
 			.mutate(click.url)
@@ -57,11 +73,29 @@ export function PageViewer({
 	},
 	version,
 	onExitPreview,
+	findActive = false,
 }: PageViewerProps) {
 	const { t } = useLingui();
+	const [findRequest, setFindRequest] = useState(0);
+	const findEnabled = usePaneHotkeyEnabled(findActive);
+	useHotkey("FIND_IN_PAGE", () => setFindRequest((count) => count + 1), {
+		enabled: findEnabled,
+	});
+	const findChord = useDispatchChord("FIND_IN_PAGE");
+	const find = useMemo(
+		() => ({
+			request: findRequest,
+			chords: findEnabled && findChord ? [canonicalizeChord(findChord)] : [],
+		}),
+		[findEnabled, findChord, findRequest],
+	);
 	const { data: session } = authClient.useSession();
+	const pageRef = useMemo(
+		() => (pageId ? { id: pageId } : { slug }),
+		[pageId, slug],
+	);
 	const pull = cloudTrpc.page.pull.useQuery({
-		...(pageId ? { id: pageId } : { slug }),
+		...pageRef,
 		...(version ? { version } : {}),
 	});
 	const resolvedPageId = pageId ?? pull.data?.id;
@@ -85,6 +119,61 @@ export function PageViewer({
 			}),
 		[resolvedPageId],
 	);
+	const pluginMutations = usePluginMutations();
+	const toolHost = useMemo<PageToolHost | undefined>(
+		() =>
+			resolvedPageId
+				? {
+						callTool: (request) =>
+							cloudTrpcClient.page.callTool.mutate({
+								pageId: resolvedPageId,
+								...request,
+							}),
+						grant: async (input) => {
+							await cloudTrpcClient.page.grantTool.mutate({
+								pageId: resolvedPageId,
+								...input,
+							});
+						},
+						install: async (plugin) => {
+							if (!(await pluginMutations.install(plugin))) {
+								throw new Error(`${plugin} was not installed`);
+							}
+						},
+						openUrl: (url) => {
+							void electronTrpcClient.external.openUrl
+								.mutate(url)
+								.catch(console.error);
+						},
+					}
+				: undefined,
+		[resolvedPageId, pluginMutations.install],
+	);
+	const presenceUrl = useCallback(async () => {
+		const token = await ensureFreshJwt();
+		return token && resolvedPageId
+			? pagePresenceUrl({
+					realtimeUrl: env.REALTIME_URL,
+					pageId: resolvedPageId,
+					token,
+				})
+			: null;
+	}, [resolvedPageId]);
+	const previewing = Boolean(
+		pull.data &&
+			pull.data.servedVersion !== null &&
+			pull.data.version !== pull.data.servedVersion,
+	);
+	const { onPublished, offeredVersion, viewOffered } = usePageUpdates({
+		pageRef,
+		pageId: resolvedPageId,
+		slug,
+		shownVersion: pull.data?.version,
+		pinnedVersion: version,
+		previewing,
+		viewerId: session?.user.id,
+		onUnpin: onExitPreview,
+	});
 	const scrollKey = `${resolvedPageId ?? slug}:${pull.data?.version ?? 0}`;
 
 	const onResolvedRef = useRef(onResolved);
@@ -134,10 +223,6 @@ export function PageViewer({
 		);
 	}
 
-	const previewing =
-		pull.data.servedVersion !== null &&
-		pull.data.version !== pull.data.servedVersion;
-
 	return (
 		<CommentProvider
 			key={resolvedPageId}
@@ -147,6 +232,11 @@ export function PageViewer({
 			user={user}
 			pageOwnerId={pull.data?.createdByUserId}
 		>
+			<CommentDeepLink
+				threadId={initialThreadId}
+				openPanel={initialPanelOpen}
+			/>
+			{resolvedPageId ? <MarkCommentsRead pageId={resolvedPageId} /> : null}
 			<div className="flex h-full w-full flex-col">
 				{previewing && onExitPreview ? (
 					<PageVersionBanner
@@ -155,8 +245,12 @@ export function PageViewer({
 					/>
 				) : null}
 				<div className="relative flex min-h-0 w-full flex-1">
+					{offeredVersion !== null && !previewing ? (
+						<PageUpdateBanner version={offeredVersion} onView={viewOffered} />
+					) : null}
 					<div className="min-h-0 min-w-0 flex-1">
 						<PageCommentsView
+							pageId={resolvedPageId}
 							pinchZoomEnabled
 							src={pull.data.viewUrl}
 							title={resolvedTitle}
@@ -164,7 +258,11 @@ export function PageViewer({
 							onScrollYChange={(y) => scrollPositions.set(scrollKey, y)}
 							onFramePointerDown={onFramePointerDown}
 							onLinkClick={onLinkClick}
-							{...(resolvedPageId && !previewing ? { storageTicket } : {})}
+							find={find}
+							{...(resolvedPageId ? { presenceUrl, onPublished } : {})}
+							{...(resolvedPageId && !previewing
+								? { storageTicket, toolHost }
+								: {})}
 						/>
 					</div>
 					<AllCommentsButton />

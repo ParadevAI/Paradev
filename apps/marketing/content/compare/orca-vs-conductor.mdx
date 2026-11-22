@@ -1,8 +1,8 @@
 ---
 title: "Orca vs Conductor (2026): Agent Development Environments Compared"
-description: "Compare Orca and Conductor for running AI coding agents in parallel Git worktrees. Platform support, agent coverage, pricing, and where Superset fits as an agent-agnostic alternative."
+description: "Conductor is joining Meta and winding down. How Orca and Conductor compared for running AI coding agents in parallel Git worktrees, what Conductor users can do now, and where Paradev fits."
 date: 2026-08-30
-lastUpdated: 2026-09-24
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - orca
@@ -13,41 +13,46 @@ keywords:
   - orca alternative
   - conductor alternative
   - conductor competitors
+  - conductor shutting down
   - agent development environment
 ---
 
-Orca and Conductor solve the same problem from opposite ends. Both run multiple AI coding agents at once, each in its own Git worktree, with review and merge in the app. Orca is open source under MIT, cross-platform, and covers 25+ agents plus any custom CLI you add. Conductor is a proprietary macOS app focused on Claude Code, Codex, Cursor, and OpenCode, with a paid tier for cloud and team features.
+On November 4, 2026, Conductor announced that it is joining Meta. It takes no new sign-ups, and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down. See [Conductor's announcement](https://www.conductor.build/announcement). Existing Conductor users can follow [Migrate from Conductor](https://docs.paradev.com/migrate-from-conductor) or [Migrate from Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) to move to Paradev.
 
-[Superset](/compare/superset-vs-conductor) runs the same worktree-per-task model and is the option to look at if you want other software to drive it, through an MCP server and a TypeScript SDK.
+This page shows how Orca and Conductor compared. They solve the same problem from opposite ends. Both run several AI coding agents at once, each in its own Git worktree, with review and merge in the app. Orca is free, MIT-licensed, cross-platform, and supports a long list of agents. Conductor is a polished, proprietary Mac app for four agents, which had managed cloud workspaces, Routines, and an iOS app on its paid plans.
+
+For a three-way comparison that includes Paradev, see [Paradev vs Orca vs Conductor](/compare/superset-vs-orca-vs-conductor).
+
+Conductor facts were checked against its own site, docs, changelog, and pricing on October 13, 2026, and its status against its announcement on November 4, 2026. Orca facts were rechecked against its site, docs, and GitHub releases on November 5, 2026.
 
 ---
 
 ## At a Glance
 
-| | **Orca** | **Conductor** | **Superset** |
-|---|---|---|---|
-| **Platform** | macOS, Windows, Linux | macOS | macOS; experimental Linux AppImage; Windows unavailable |
-| **License** | Open source | Proprietary | Source available |
-| **Agent coverage** | 25+ prebuilt, plus custom CLI agents | Claude Code, Codex, Cursor, OpenCode | Any CLI agent |
-| **Isolation** | Git worktree per task | Git worktree per workspace | Git worktrees for local branch-based workspaces |
-| **Remote work** | SSH remote worktrees | Cloud workspaces on paid tiers | Remote hosts and cloud workspaces |
-| **Task intake** | GitHub, Linear, GitHub Projects | GitHub, Linear | GitHub, Linear, Slack |
-| **Mobile** | iOS and Android | Announced, not released | iOS |
-| **Pricing** | Free, open source | Free tier, Pro $50/mo, Teams $60/user/mo | Free tier, paid plans |
+| | **Orca** | **Conductor** |
+|---|---|---|
+| **Status** | Available | Joining Meta; closed to new users; Mac app winds down after early 2027 |
+| **Platforms** | macOS, Windows, Linux | macOS only |
+| **License and price** | MIT; free | Proprietary; plans no longer on sale; existing Pro users keep Pro features at no cost |
+| **Agents** | More than 25 named, including Claude Code, Codex, Gemini, Cursor, Copilot, OpenCode, Amp, Pi, Goose, Kiro, Droid, and Qwen Code, plus any CLI agent | Claude Code, Codex, Cursor, OpenCode |
+| **Isolation** | Git worktree per task | Workspace and branch per task |
+| **Review** | Inline diff comments sent back to the agent; GitHub and Linear PRs and issues in the app | Diff, checks, pull request, merge, and archive |
+| **Remote and cloud** | SSH worktrees; Remote Orca Servers (beta) with headless `orca serve`; experimental cloud VMs on your own provider | Conductor Cloud: managed Linux sandboxes; read-only November 13, 2026, shuts down November 20, 2026 |
+| **Automation** | Scheduled automations from the CLI and desktop; orchestration (Orchestrator V3) is an experimental setting | Routines on a schedule or from a GitHub action, run in the cloud (end with Conductor Cloud); API and Conductor MCP |
+| **Mobile** | iOS app and Android APK, both beta, with terminals, chat, and source-control review | iOS app (October 2, 2026); worked with cloud workspaces, which shut down November 20, 2026 |
+| **Enterprise** | SOC 2 readiness, self-hostable desktop and server | SOC 2 Type II |
 
 ---
 
 ## What Is Orca?
 
-Orca calls itself an Agent Development Environment: an MIT-licensed desktop app for macOS, Windows, and Linux that runs parallel agents in isolated worktrees, with terminals, editors, task workflows, and browser previews in one window.
-
-Its differentiator is breadth of agent support. Orca ships prebuilt configurations for more than 25 agents, including Claude Code, Codex, OpenCode, Cursor CLI, GitHub Copilot, Gemini, Grok, Pi, Goose, Cline, Continue, Kilocode, and Qwen Code. It also ships SSH remote worktrees, a design mode that opens a real Chromium window per worktree, GitHub PR, issue and Project boards alongside Linear, an account switcher showing Claude and Codex quota with reset times, and companion mobile apps for iOS and Android.
+Orca calls itself "the agent development environment." It is an MIT-licensed desktop app for macOS, Windows, and Linux that runs agents in parallel worktrees, with terminals or a Chat UI (out of experimental since November 2, 2026), an embedded browser with Design Mode, inline diff comments sent back to the agent, and GitHub and Linear PRs and issues in the app. It names more than 25 supported agents plus any other CLI agent, tracks usage and resets for about a dozen agents and plans, including Claude Code, Codex, Gemini, Kimi Code, and MiniMax, with an account switcher for Claude and Codex, and has iOS and Android companion apps in beta. It also has plugins, a Jira drawer, and computer use for desktop apps. For remote work it supports SSH worktrees, Remote Orca Servers in beta, and a headless `orca serve`. Its CLI covers worktrees, browser automation, and scheduled automations; multi-agent orchestration is an experimental setting.
 
 ## What Is Conductor?
 
-Conductor is a native macOS app for running Claude Code, Codex, Cursor, and OpenCode in parallel, each agent on an isolated copy of your codebase.
+Conductor describes itself as a way to "run parallel coding agents on your Mac." It runs Claude Code, Codex, Cursor, and OpenCode, each task in its own workspace and branch, and takes a change through diff, checks, pull request, merge, and archive. Conductor Cloud, launched in July 2026, ran workspaces in managed Linux sandboxes on Pro and above. Routines, added in September, ran agents on a schedule or from a GitHub action in the cloud. Conductor also has an API and an MCP server, and on October 2, 2026, it added an iOS app for chatting with agents and merging PRs, which worked with cloud workspaces.
 
-Its differentiator is coordination and polish rather than breadth. Conductor spawns agent teams with named roles (Researcher, Builder, Reviewer, Reporter) across four coordination patterns: Supervisor, Pipeline, Consensus, and Swarm. It also manages context explicitly: when the window compacts, it extracts decisions, files, and tasks and reinjects them. The app leans on native macOS conventions, with a command palette and a session browser for resuming past conversations.
+Conductor is now joining Meta and is closed to new users. Conductor Cloud shuts down on November 20, 2026, and Conductor then begins to delete cloud data. The local Mac app winds down after early 2027. Conductor says its team will ship something new early next year.
 
 ---
 
@@ -55,56 +60,62 @@ Its differentiator is coordination and polish rather than breadth. Conductor spa
 
 ### Platform and License
 
-Orca runs on macOS, Windows, and Linux and is open source, so you can read it, fork it, and self-host the pieces you care about. Conductor is macOS only and proprietary. On this axis the choice often gets made for you: if your team is not all on Macs, Conductor is out.
+Orca runs on macOS, Windows, and Linux and is open source. Conductor is a Mac app and proprietary, and it is now closed to new users.
 
 ### Agent Coverage
 
-Orca's 25+ prebuilt agents against Conductor's four is the starkest difference, and Orca also documents adding a custom CLI agent by name, binary, and default arguments. So if you switch models often, or want an agent no vendor has heard of, Orca and Superset both handle it and Conductor does not. Conductor's narrower list is a deliberate trade for a more opinionated experience on the agents it does support.
+Orca supports far more agents out of the box and runs any other CLI agent. Conductor supports four. If you switch agents often, Orca is the broader option.
 
-### Coordination Model
+### Cloud and Remote Work
 
-This is where Conductor pulls ahead. Named team roles and four coordination patterns are a real feature, not a wrapper around parallel terminals, and its explicit context reinjection on compaction addresses a genuine failure mode. Orca's model is closer to a fleet of independent agents you supervise.
+Conductor's cloud was managed: Conductor ran the sandboxes for you (on Vercel), on paid plans, with collaboration and Routines built on top. It shuts down on November 20, 2026. Orca's remote options run on machines you control: SSH worktrees, Remote Orca Servers, and experimental cloud VMs on your own provider. Orca does not sell hosting.
+
+### Mobile
+
+Orca's iOS and Android apps control your desktop and are in beta. Conductor's iOS app, released in October, worked with its cloud workspaces, which shut down on November 20, 2026.
 
 ### Pricing
 
-Orca is free and open source. Conductor has a free individual tier, with Pro at $50 per month adding Conductor Cloud workspace hours and multiplayer for up to five people, and Teams at $60 per user per month. It has announced a mobile app that has not shipped yet. Whether that is worth it depends on how much you need the cloud and collaboration half.
+Orca is free. Conductor's plans are no longer on sale. Existing free users cannot upgrade, existing Pro users keep Pro features at no cost, and active Conductor Cloud subscribers get refunds.
 
 ---
 
-## Where Superset Fits
+## Where Paradev Fits
 
-Orca covers much of this ground already. It runs cross-platform and ships a design mode, SSH remote worktrees, PR and issue browsing, and mobile apps, so the honest gap is narrower than a feature list would suggest.
-
-Superset runs CLI agents on macOS and experimental Linux; Windows is not available. Against Orca it comes down to one thing, which is what can drive the tool from outside. Superset exposes an MCP server and a TypeScript SDK, so agents and your own scripts can create workspaces, launch agents, and read results as a first-class interface. Orca consumes MCP servers without exposing one, and otherwise takes direction through its CLI. Superset also dispatches work from Slack and has an enterprise track with SSO, SCIM, and audit logs. See [Superset vs Orca](/compare/superset-vs-orca) and [Superset vs Conductor](/compare/superset-vs-conductor) for the head-to-heads.
+[Paradev](/) runs the same worktree-per-task model with any CLI agent, on your own subscriptions, on your machines or in cloud workspaces. Against both, its main differences are what can drive it from outside, through an MCP server, a TypeScript SDK, a CLI, and a Slack bot, and a review loop that commits, pushes, opens PRs, shows CI checks, and sends line comments back to agents. Besides your own machines, it can run on a Linux server in your own cloud account with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) or in [cloud workspaces](https://docs.paradev.com/cloud-workspaces). Its iPhone and iPad app connects to cloud workspaces, BYOC servers, and macOS or Linux hosts you own. Paradev is open source under the MIT License and runs on macOS with an experimental Linux build; Windows is not yet available. See [Paradev vs Orca](/compare/superset-vs-orca) and [Paradev vs Conductor](/compare/superset-vs-conductor).
 
 ---
 
 ## Which Should You Choose?
 
-- **Choose Orca** if you want open source and free, the widest prebuilt agent list, and mobile on both iOS and Android.
-- **Choose Conductor** if you are on macOS, work primarily in Claude Code or Codex, and want structured multi-agent coordination with managed context.
-- **Choose Superset** if you want orchestration other software can drive: an MCP server and TypeScript SDK, Slack dispatch, and an enterprise track with SSO and SCIM.
+- **Choose Orca** if you want free and open source, Windows or Linux, the widest agent list, and Android. Orca also publishes its own [Migrate from Conductor](https://www.onorca.dev/docs/migrate-from-conductor) guide.
+- **If you use Conductor today**, plan a move. Export your Conductor Cloud chats before November 20, 2026. To move to Paradev, follow the [local app guide](https://docs.paradev.com/migrate-from-conductor) or the [Conductor Cloud guide](https://docs.paradev.com/migrate-from-conductor-cloud). Conductor is closed to new users, so it is no longer an option to pick.
+- **Choose Paradev** if you want any CLI agent on machines you own or in cloud workspaces, with orchestration other software can drive and an enterprise track with SAML SSO and SCIM.
 
 ---
 
 ## Frequently Asked Questions
 
+### Is Conductor shutting down?
+
+Conductor is joining Meta. It takes no new sign-ups, and the app can no longer be downloaded. Conductor Cloud becomes read-only on November 13, 2026, and shuts down on November 20, 2026. The local Mac app gets new models and critical bug fixes until early 2027, then winds down.
+
 ### Do Orca and Conductor both use Git worktrees?
 
-Yes. Both give each workspace its own Git worktree, so agents in separate workspaces never edit the same files. Conductor also supports running more than one agent inside a single workspace when the work belongs on the same branch, and those agents do share files. Superset uses the same worktree-per-workspace model.
+Yes. Each gives every task its own Git worktree or branch, so agents in separate workspaces do not edit the same files. Paradev uses the same model.
 
 ### Does Conductor run on Windows or Linux?
 
-No. Conductor is a native macOS app. Orca runs on macOS, Windows, and Linux. Superset supports macOS and an experimental Linux AppImage; Windows is not available. See [Superset downloads](/download).
+No. Conductor is a Mac app, and it is now closed to new users. Its cloud workspaces ran in Linux sandboxes until Conductor Cloud shuts down on November 20, 2026. Orca runs on macOS, Windows, and Linux. Paradev supports macOS and an experimental Linux AppImage.
 
 ### Which supports the most coding agents?
 
-Orca ships prebuilt configurations for more than 25 agents and lets you add a custom CLI agent, against Conductor's Claude Code, Codex, Cursor, and OpenCode. Superset is agent-agnostic and runs any CLI agent. On this axis Orca and Superset are close; Conductor is the narrow one.
+Orca names more than 25 agents and runs any other CLI agent. Conductor supports Claude Code, Codex, Cursor, and OpenCode. Paradev runs any CLI agent, with built-in presets for more than 20.
 
 ### Is Orca free?
 
-Yes. Orca is open source and free to run. Conductor has a free individual tier, with Pro at $50 per month and Teams at $60 per user per month for cloud workspace hours and collaboration.
+Yes. Orca is MIT-licensed and free. Conductor's plans are no longer on sale.
 
 ### Can I use my existing Claude or Codex subscription?
 
-Yes, with all three. In local workspaces, Orca, Conductor, and Superset run the agent CLIs on your machine under your own login, so you keep your existing plan rather than paying per token through the tool. Conductor Cloud is the exception to the local part: those sessions run in Conductor-managed Linux sandboxes rather than on your machine.
+Yes. Orca and Paradev run the agent CLIs under your own login in local workspaces, so you keep your existing plan. The Conductor Mac app does the same for existing users.

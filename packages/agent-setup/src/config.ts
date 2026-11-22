@@ -26,34 +26,39 @@ export function getTemplatePath(name: string): string {
 	return path.join(getAgentSetupTemplatesDir(), name);
 }
 
-/**
- * The repo's Claude Code plugin (skills + commands) is overlaid at
- * templates/plugin by each distribution's copy step. When running from TS
- * source nothing performs that copy, so fall back to the plugin's in-repo
- * location.
- */
-export function getBundledPluginDir(): string {
-	const bundled = path.join(getAgentSetupTemplatesDir(), "plugin");
-	if (fs.existsSync(path.join(bundled, "skills"))) return bundled;
-	const repoPlugin = path.join(
+function repoPluginsDir(): string {
+	return path.join(
 		path.dirname(fileURLToPath(import.meta.url)),
 		"..",
 		"..",
 		"..",
 		"plugins",
-		"superset",
 	);
-	return fs.existsSync(path.join(repoPlugin, "skills")) ? repoPlugin : bundled;
 }
 
 /**
- * Default port of the desktop's v1 localhost notifications server, baked into
- * hook scripts as the v1 fallback endpoint. Kept overridable via the same env
- * var the desktop uses so dev workspaces stay isolated.
+ * The repo's Claude Code plugin (skills + commands). The desktop and the CLI
+ * copy it alone to templates/plugin; the sandbox tarball carries it inside the
+ * marketplace tree instead, and running from TS source performs no copy.
  */
-export function getV1NotificationsPort(): number {
-	const parsed = Number(process.env.DESKTOP_NOTIFICATIONS_PORT);
-	return Number.isInteger(parsed) && parsed >= 1 && parsed <= 65535
-		? parsed
-		: 51741;
+export function getBundledPluginDir(): string {
+	const bundled = path.join(getAgentSetupTemplatesDir(), "plugin");
+	if (fs.existsSync(path.join(bundled, "skills"))) return bundled;
+	for (const candidate of [
+		path.join(getBundledMarketplaceDir(), "superset"),
+		path.join(repoPluginsDir(), "superset"),
+	]) {
+		if (fs.existsSync(path.join(candidate, "skills"))) return candidate;
+	}
+	return bundled;
+}
+
+/**
+ * Every installable first-party tree. Only the sandbox tarball overlays it at
+ * templates/plugins — the desktop and the CLI ship `superset` alone — so
+ * outside host-service this falls back to the repo and exists only from source.
+ */
+export function getBundledMarketplaceDir(): string {
+	const bundled = path.join(getAgentSetupTemplatesDir(), "plugins");
+	return fs.existsSync(bundled) ? bundled : repoPluginsDir();
 }

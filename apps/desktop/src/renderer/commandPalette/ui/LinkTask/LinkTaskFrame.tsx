@@ -6,6 +6,7 @@ import {
 	CommandItem as RawCommandItem,
 } from "@superset/ui/command";
 import { toast } from "@superset/ui/sonner";
+import { keepPreviousData } from "@tanstack/react-query";
 import { useDeferredValue, useMemo } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import {
@@ -14,6 +15,7 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/components/shared/StatusIcon";
 import { useHybridSearch } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/hooks/useHybridSearch";
 import { TASK_PICKER_INPUT } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/hooks/useTasksData";
+import { withSearchMatches } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/utils/withSearchMatches";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions/useOptimisticActions";
 import { useFrameStackStore } from "../../core/frames";
 import { useCommandPaletteQuery } from "../CommandPalette/CommandPalette";
@@ -50,23 +52,28 @@ export function LinkTaskFrame({ workspaceId }: LinkTaskFrameProps) {
 
 	const { data: taskPage } =
 		cloudTrpc.task.listPage.useQuery(TASK_PICKER_INPUT);
+	const { data: searchedPage, isFetching: isSearching } =
+		cloudTrpc.task.listPage.useQuery(
+			{ ...TASK_PICKER_INPUT, search: deferredQuery },
+			{ enabled: deferredQuery !== "", placeholderData: keepPreviousData },
+		);
 
 	const tasks = useMemo(
 		() =>
-			(taskPage?.items ?? []).map(({ task }) => ({
+			withSearchMatches(
+				taskPage?.items ?? [],
+				deferredQuery ? searchedPage?.items : undefined,
+			).map(({ task }) => ({
 				id: task.id,
 				slug: task.slug,
-				externalProvider: task.externalProvider,
-				externalKey: task.externalKey,
 				title: task.title,
 				description: task.description,
 				labels: task.labels,
 				statusId: task.statusId,
 				priority: task.priority,
-				externalUrl: task.externalUrl,
 				updatedAt: task.updatedAt,
 			})),
-		[taskPage],
+		[taskPage, searchedPage, deferredQuery],
 	);
 
 	const { data: statuses = [] } =
@@ -135,7 +142,11 @@ export function LinkTaskFrame({ workspaceId }: LinkTaskFrameProps) {
 	return (
 		<CommandList className="max-h-[400px]">
 			<CommandEmpty>
-				<Trans>No tasks found.</Trans>
+				{deferredQuery && isSearching ? (
+					<Trans>Loading…</Trans>
+				) : (
+					<Trans>No tasks found.</Trans>
+				)}
 			</CommandEmpty>
 			{filtered.length > 0 && (
 				<CommandGroup

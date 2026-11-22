@@ -9,6 +9,7 @@ import { formatDistanceStrict } from "date-fns";
 import { useNow } from "renderer/hooks/useNow";
 import { describeRunError } from "../../../utils/runErrorHelp";
 import { RUN_STATUS_META } from "../../../utils/runStatus";
+import { runWorkspaceSearch } from "../../../utils/runWorkspaceSearch";
 
 type Run = RouterOutputs["automation"]["listOrgRuns"]["runs"][number];
 
@@ -57,11 +58,9 @@ export function PreviousRunsList({
 		if (!workspaceId) return;
 		localStorage.setItem("lastViewedWorkspaceId", workspaceId);
 		navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId },
-			search: {
-				terminalId: run.terminalSessionId ?? undefined,
-			},
+			search: runWorkspaceSearch(run),
 		});
 	};
 

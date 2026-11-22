@@ -13,7 +13,10 @@ import {
 	getXtermLineContent,
 	getXtermRangesByAttr,
 } from "./buffer-helpers";
-import type { DetectedLink, LocalLinkDetector } from "./local-link-detector";
+import type {
+	DetectedTerminalLink,
+	LocalLinkDetector,
+} from "./local-link-detector";
 
 /** Maximum characters of context to gather around the hovered line. */
 const MAX_LINK_LENGTH = 500;
@@ -43,9 +46,12 @@ export class LinkDetectorAdapter implements ILinkProvider {
 		private readonly _detector: LocalLinkDetector,
 		private readonly _onActivate?: (
 			event: MouseEvent,
-			link: DetectedLink,
+			link: DetectedTerminalLink,
 		) => void,
-		private readonly _onHover?: (event: MouseEvent, link: DetectedLink) => void,
+		private readonly _onHover?: (
+			event: MouseEvent,
+			link: DetectedTerminalLink,
+		) => void,
 		private readonly _onLeave?: () => void,
 	) {}
 
@@ -208,7 +214,7 @@ export class LinkDetectorAdapter implements ILinkProvider {
 	}
 
 	private _mapDetectedLinks(
-		detectedLinks: DetectedLink[],
+		detectedLinks: DetectedTerminalLink[],
 		lines: IBufferLine[],
 		cols: number,
 		startLine: number,

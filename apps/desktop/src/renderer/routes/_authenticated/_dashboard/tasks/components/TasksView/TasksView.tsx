@@ -7,6 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useTaskTracker } from "renderer/hooks/useTaskTracker";
 import { useDebouncedSearchNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDebouncedSearchNavigation";
 import { useProjectQueryTargets } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import {
@@ -32,36 +33,36 @@ import type { TaskWithStatus } from "./hooks/useTasksData";
 interface TasksViewProps {
 	initialTab?: TabValue;
 	initialAssignee?: string;
+	initialLabel?: string;
 	initialSearch?: string;
 	initialType?: TypeTab;
 	initialProjects?: string[];
-	initialLinearProject?: string;
 	initialState?: "open" | "all";
 }
 
 export function TasksView({
 	initialTab,
 	initialAssignee,
+	initialLabel,
 	initialSearch,
 	initialType,
 	initialProjects,
-	initialLinearProject,
 	initialState,
 }: TasksViewProps) {
 	const navigate = useNavigate();
 	const {
 		tab: storedTab,
 		assignee: storedAssignee,
+		label: storedLabel,
 		search: storedSearch,
 		typeTab: storedTypeTab,
 		projectFilters: storedProjectFilters,
-		linearProjectFilter: storedLinearProjectFilter,
 		setTab: storeSetTab,
 		setAssignee: storeSetAssignee,
+		setLabel: storeSetLabel,
 		setSearch: storeSetSearch,
 		setTypeTab: storeSetTypeTab,
 		setProjectFilters: storeSetProjectFilters,
-		setLinearProjectFilter: storeSetLinearProjectFilter,
 		linearTeamFilter,
 		setLinearTeamFilter,
 		linearAssigneeFilter,
@@ -75,9 +76,10 @@ export function TasksView({
 	const [searchQuery, setSearchQuery] = useState(initialSearch ?? storedSearch);
 	const deferredSearchQuery = useDeferredValue(searchQuery);
 	const assigneeFilter = initialAssignee ?? storedAssignee;
+	const labelFilter = initialLabel ?? storedLabel;
 	const typeTab: TypeTab = initialType ?? storedTypeTab;
+	const taskTracker = useTaskTracker();
 	const projectFilters = initialProjects ?? storedProjectFilters;
-	const linearProjectFilter = initialLinearProject ?? storedLinearProjectFilter;
 	const includeClosedIssues =
 		initialState === undefined
 			? storedIncludeClosedIssues
@@ -94,10 +96,10 @@ export function TasksView({
 		(overrides: {
 			tab?: TabValue;
 			assignee?: string | null;
+			label?: string | null;
 			search?: string;
 			type?: TypeTab;
 			projects?: string[];
-			linearProject?: string | null;
 			includeClosedIssues?: boolean;
 		}) =>
 			tasksSearchFromFilters({
@@ -106,26 +108,23 @@ export function TasksView({
 					overrides.assignee !== undefined
 						? overrides.assignee
 						: assigneeFilter,
+				label: overrides.label !== undefined ? overrides.label : labelFilter,
 				search: overrides.search !== undefined ? overrides.search : searchQuery,
 				typeTab: overrides.type ?? typeTab,
 				projectFilters:
 					overrides.projects !== undefined
 						? overrides.projects
 						: projectFilters,
-				linearProjectFilter:
-					overrides.linearProject !== undefined
-						? overrides.linearProject
-						: linearProjectFilter,
 				includeClosedIssues:
 					overrides.includeClosedIssues ?? includeClosedIssues,
 			}),
 		[
 			currentTab,
 			assigneeFilter,
+			labelFilter,
 			searchQuery,
 			typeTab,
 			projectFilters,
-			linearProjectFilter,
 			includeClosedIssues,
 		],
 	);
@@ -162,6 +161,10 @@ export function TasksView({
 	}, [assigneeFilter, storeSetAssignee]);
 
 	useEffect(() => {
+		storeSetLabel(labelFilter);
+	}, [labelFilter, storeSetLabel]);
+
+	useEffect(() => {
 		storeSetSearch(searchQuery);
 	}, [searchQuery, storeSetSearch]);
 
@@ -174,10 +177,6 @@ export function TasksView({
 	}, [projectFilters, storeSetProjectFilters]);
 
 	useEffect(() => {
-		storeSetLinearProjectFilter(linearProjectFilter);
-	}, [linearProjectFilter, storeSetLinearProjectFilter]);
-
-	useEffect(() => {
 		storeSetIncludeClosedIssues(includeClosedIssues);
 	}, [includeClosedIssues, storeSetIncludeClosedIssues]);
 
@@ -187,7 +186,7 @@ export function TasksView({
 		projects: hostProjects,
 		targets: projectTargets,
 	} = useProjectQueryTargets(projectFilters);
-	const v2Projects = useMemo(
+	const projectOptions = useMemo(
 		() =>
 			hostProjects.map((project) => ({
 				id: project.projectKey,
@@ -198,7 +197,7 @@ export function TasksView({
 
 	useEffect(() => {
 		if (!areProjectsReady) return;
-		const availableIds = new Set(v2Projects.map((project) => project.id));
+		const availableIds = new Set(projectOptions.map((project) => project.id));
 		const availableFilters = projectFilters.filter((projectId) =>
 			availableIds.has(projectId),
 		);
@@ -212,7 +211,7 @@ export function TasksView({
 	}, [
 		areProjectsReady,
 		projectFilters,
-		v2Projects,
+		projectOptions,
 		cancelPendingSearchNavigation,
 		navigate,
 		buildSearch,
@@ -232,6 +231,16 @@ export function TasksView({
 		navigate({
 			to: "/tasks",
 			search: buildSearch({ assignee }),
+			replace: true,
+		});
+	};
+
+	const handleLabelFilterChange = (label: string | null) => {
+		cancelPendingSearchNavigation();
+		storeSetLabel(label);
+		navigate({
+			to: "/tasks",
+			search: buildSearch({ label }),
 			replace: true,
 		});
 	};
@@ -321,10 +330,18 @@ export function TasksView({
 		});
 	};
 
-	const showTasks = typeTab === "tasks";
-	const showLinear = typeTab === "linear";
 	const showIssues = typeTab === "issues";
-	const taskSource: TaskSource = typeTab;
+	const taskSource: TaskSource = showIssues
+		? "issues"
+		: taskTracker === "linear"
+			? "linear"
+			: "tasks";
+	const showTasks = taskSource === "tasks";
+	const showLinear = taskSource === "linear";
+
+	if (!showIssues && !taskTracker) {
+		return <div className="flex-1" />;
+	}
 
 	return (
 		<div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
@@ -335,6 +352,8 @@ export function TasksView({
 				onSearchChange={handleSearchChange}
 				assigneeFilter={assigneeFilter}
 				onAssigneeFilterChange={handleAssigneeFilterChange}
+				labelFilter={labelFilter}
+				onLabelFilterChange={handleLabelFilterChange}
 				selectedTasks={selectedTasks}
 				onClearSelection={handleClearSelection}
 				selectedIssues={selectedIssues}
@@ -360,7 +379,7 @@ export function TasksView({
 							filterTab={currentTab}
 							searchQuery={deferredSearchQuery}
 							assigneeFilter={assigneeFilter}
-							linearProjectFilter={linearProjectFilter}
+							labelFilter={labelFilter}
 							onTaskClick={handleTaskClick}
 						/>
 					) : (
@@ -368,7 +387,7 @@ export function TasksView({
 							filterTab={currentTab}
 							searchQuery={deferredSearchQuery}
 							assigneeFilter={assigneeFilter}
-							linearProjectFilter={linearProjectFilter}
+							labelFilter={labelFilter}
 							onTaskClick={handleTaskClick}
 							onSelectionChange={handleSelectionChange}
 						/>
@@ -390,7 +409,7 @@ export function TasksView({
 						projectFilters={projectFilters}
 						projectTargets={projectTargets}
 						areProjectsReady={areProjectsReady}
-						hasProjects={v2Projects.length > 0}
+						hasProjects={projectOptions.length > 0}
 						searchQuery={searchQuery}
 						includeClosed={includeClosedIssues}
 						onSelectionChange={handleIssueSelectionChange}

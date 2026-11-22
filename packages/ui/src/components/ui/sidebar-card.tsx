@@ -8,47 +8,145 @@ import { Button } from "./button";
 
 interface SidebarCardProps {
 	badge?: string;
+	tone?: "default" | "warning";
 	title: string;
 	description?: string;
 	actionLabel?: string;
 	onAction?: () => void;
 	onDismiss?: () => void;
+	/** Makes the whole card a button. */
+	onClick?: () => void;
+	/** Rendered edge to edge above the title. */
+	media?: React.ReactNode;
 	className?: string;
 	children?: React.ReactNode;
 }
 
 function SidebarCard({
 	badge,
+	tone = "default",
 	title,
 	description,
 	actionLabel,
 	onAction,
 	onDismiss,
+	onClick,
+	media,
 	className,
 	children,
 }: SidebarCardProps) {
+	const badgeClassName =
+		tone === "warning"
+			? "border-warning/40 bg-warning/10 text-warning"
+			: undefined;
+	const dismissLabel = i18n._(
+		msg({
+			message: "Dismiss",
+		}),
+	);
+
+	if (media) {
+		return (
+			<div
+				data-slot="sidebar-card"
+				className={cn(
+					"group relative isolate overflow-hidden rounded-xl border border-white/10 bg-black shadow-sm",
+					"transition-shadow duration-300 ease-out hover:shadow-lg",
+					className,
+				)}
+			>
+				<div className="relative">
+					{media}
+					<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 via-35% to-transparent to-70%" />
+					<div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5">
+						{badge && (
+							<Badge variant="box" className={badgeClassName}>
+								{badge}
+							</Badge>
+						)}
+						<p
+							className={cn("text-sm font-medium text-white", badge && "mt-2")}
+						>
+							{title}
+						</p>
+						{description && (
+							<p className="mt-0.5 text-sm text-white/55 leading-snug">
+								{description}
+							</p>
+						)}
+					</div>
+				</div>
+
+				{onClick && (
+					<button
+						type="button"
+						onClick={onClick}
+						aria-label={title}
+						className="absolute inset-0 z-10 rounded-xl focus-visible:outline-2 focus-visible:outline-ring"
+					/>
+				)}
+
+				{onDismiss && (
+					<button
+						type="button"
+						onClick={onDismiss}
+						aria-label={dismissLabel}
+						className="absolute top-1.5 right-1.5 z-20 flex size-6 items-center justify-center rounded-full bg-black/35 text-white/80 backdrop-blur-sm opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-black/55 hover:text-white focus-visible:opacity-100 group-hover:opacity-100"
+					>
+						<LuX className="size-3.5" strokeWidth={2} />
+					</button>
+				)}
+
+				{children}
+
+				{actionLabel && onAction && (
+					<div className="relative z-20 px-3 pb-3">
+						<Button
+							variant="outline"
+							size="sm"
+							className="w-full h-7 text-xs"
+							onClick={onAction}
+						>
+							{actionLabel}
+						</Button>
+					</div>
+				)}
+			</div>
+		);
+	}
+
 	return (
 		<div
 			data-slot="sidebar-card"
 			className={cn(
-				"relative rounded-lg border border-border bg-card p-3",
+				"group relative rounded-lg border border-border bg-card p-3",
+				onClick && "transition-colors hover:bg-accent/40",
 				className,
 			)}
 		>
-			{badge && <Badge variant="box">{badge}</Badge>}
+			{onClick && (
+				<button
+					type="button"
+					onClick={onClick}
+					aria-label={title}
+					className="absolute inset-0 rounded-lg focus-visible:outline-2 focus-visible:outline-ring"
+				/>
+			)}
+
+			{badge && (
+				<Badge variant="box" className={badgeClassName}>
+					{badge}
+				</Badge>
+			)}
 
 			{onDismiss && (
 				<button
 					type="button"
 					onClick={onDismiss}
-					aria-label={i18n._(
-						msg({
-							message: "Dismiss",
-						}),
-					)}
-					className="absolute top-2.5 right-2.5 text-muted-foreground hover:text-foreground transition-colors"
+					aria-label={dismissLabel}
+					className="absolute top-1.5 right-1.5 z-10 flex size-6 items-center justify-center rounded-md text-foreground/70 opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
 				>
-					<LuX className="size-3.5" />
+					<LuX className="size-3.5" strokeWidth={2} />
 				</button>
 			)}
 

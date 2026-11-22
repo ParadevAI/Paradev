@@ -18,6 +18,7 @@ export interface AutomationLastRun {
 	at: number;
 	/** The run's host or cloud workspace; both open at the same route. */
 	workspaceId: string | null;
+	sessionKind: SelectAutomationRun["sessionKind"];
 	chatSessionId: string | null;
 	terminalSessionId: string | null;
 }
@@ -58,6 +59,7 @@ export function useFailedAutomations(): FailedAutomations {
 				status: run.status,
 				at,
 				workspaceId: run.v2WorkspaceId ?? run.cloudWorkspaceId ?? null,
+				sessionKind: run.sessionKind ?? null,
 				chatSessionId: run.chatSessionId ?? null,
 				terminalSessionId: run.terminalSessionId ?? null,
 			});

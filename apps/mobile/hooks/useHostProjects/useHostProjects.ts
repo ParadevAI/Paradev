@@ -13,6 +13,8 @@ export interface HostProjectItem {
 	iconUrl: string | null;
 	repoOwner: string | null;
 	repoName: string | null;
+	/** Epoch ms; 0 when the host predates the field. */
+	createdAt: number;
 }
 
 const PROJECTS_REFETCH_INTERVAL_MS = 30_000;
@@ -36,6 +38,7 @@ export function toHostProjectItem(
 		iconUrl,
 		repoOwner,
 		repoName: row.repoName ?? null,
+		createdAt: row.createdAt ?? 0,
 	};
 }
 

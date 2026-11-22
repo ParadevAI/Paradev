@@ -96,6 +96,7 @@ export function NewProjectDialog({
 
 	return (
 		<Dialog
+			modal
 			open={open}
 			onOpenChange={(next) => {
 				if (!next) reset();

@@ -15,12 +15,14 @@ export type CloudWorkspaceRow = RouterOutputs["cloudWorkspace"]["list"][number];
  */
 const PROVISIONING_POLL_MS = 1_000;
 
-export interface CloudWorkspacesValue {
+interface CloudWorkspacesValue {
 	/** Undefined until the list has been fetched; empty when it never will be. */
 	workspaces: CloudWorkspaceRow[] | undefined;
 	organizationId: string | null;
 	/** False until the server has answered; a copy restored from disk is stale. */
 	isFresh: boolean;
+	/** True only while the first fetch is in flight with nothing to show; false once it answered, failed, or never runs. */
+	isLoading: boolean;
 }
 
 /**
@@ -68,5 +70,6 @@ export function useCloudWorkspaces(): CloudWorkspacesValue {
 		workspaces: enabled ? workspaces : [],
 		organizationId,
 		isFresh: query.isSuccess && !query.isStale,
+		isLoading: query.isLoading,
 	};
 }

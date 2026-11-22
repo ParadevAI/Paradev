@@ -105,16 +105,16 @@ export async function fetchSearch(
 	query: string,
 	options: MetricQuery = {},
 	signal?: AbortSignal,
-): Promise<StandingRow[]> {
+): Promise<StandingRow[] | null> {
 	try {
 		return await leaderboardClient.leaderboard.public.search.query(
 			{ query, ...options },
 			{ signal },
 		);
 	} catch (error) {
-		if (signal?.aborted) return [];
+		if (signal?.aborted) return null;
 		console.error("[marketing/leaderboard] search error:", error);
-		return [];
+		return null;
 	}
 }
 

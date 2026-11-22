@@ -7,7 +7,7 @@ import type {
 } from "@slack/types";
 import type { PagePreview } from "@superset/trpc/page-preview";
 
-const SUPERSET_PRODUCT_NAME = "Superset";
+const SUPERSET_PRODUCT_NAME = "Paradev";
 
 export function parsePageSlugFromUrl(url: string): string | null {
 	try {

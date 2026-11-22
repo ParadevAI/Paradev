@@ -1,26 +1,19 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
+import { stub } from "../../../test/stub";
+import * as activationEvents from "../../lib/activation-events";
+import { posthog } from "../../lib/analytics";
 
 const membership = (organizationId: string) => ({
 	organizationId,
 	organization: { id: organizationId },
 });
 
-mock.module("@superset/db/client", () => ({
-	db: {
-		query: {
-			members: {
-				findMany: async () => [membership("box-org"), membership("other-org")],
-			},
-		},
-	},
-	dbWs: {},
-}));
-mock.module("../../lib/analytics", () => ({
-	posthog: { capture: () => {}, isFeatureEnabled: async () => false },
-}));
-mock.module("../../lib/activation-events", () => ({
-	emitAppFirstOpened: async () => {},
-}));
+stub(db.query.members, {
+	findMany: async () => [membership("box-org"), membership("other-org")],
+});
+stub(posthog, { capture: () => {}, isFeatureEnabled: async () => false });
+stub(activationEvents, { emitAppFirstOpened: async () => {} });
 
 const { userRouter } = await import("./user");
 const { createCallerFactory, createTRPCContext, createTRPCRouter } =
@@ -52,13 +45,14 @@ describe("user.myOrganizations", () => {
 			organizationId: "box-org",
 			userId: "creator",
 		});
-		expect(await box.user.myOrganizations()).toEqual([{ id: "box-org" }]);
+		expect((await box.user.myOrganizations()).map((org) => org.id)).toEqual([
+			"box-org",
+		]);
 	});
 
 	test("lists every organization for a signed-in client", async () => {
-		expect(await callerFor(null).user.myOrganizations()).toEqual([
-			{ id: "box-org" },
-			{ id: "other-org" },
-		]);
+		expect(
+			(await callerFor(null).user.myOrganizations()).map((org) => org.id),
+		).toEqual(["box-org", "other-org"]);
 	});
 });

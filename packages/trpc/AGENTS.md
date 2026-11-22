@@ -14,15 +14,15 @@ enough.**
    changes are safe: a new optional input field, a new output field. For anything else, add a new
    procedure. This is the fix in `router/page/page.ts` (#7756):
    ```ts
-   list: protectedProcedure.input(legacyListPagesSchema).query(/* still Page[] */),
-   listPaginated: protectedProcedure.input(listPagesSchema).query(/* { items, nextCursor } */),
+   list: personProcedure.input(legacyListPagesSchema).query(/* still Page[] */),
+   listPaginated: personProcedure.input(listPagesSchema).query(/* { items, nextCursor } */),
    ```
 2. **Add, do not change.** Do not rename, remove, or retype a procedure, input field, or output
    field. Keep a replaced procedure as a `@deprecated` alias (`task.all` → `task.list`).
 3. **New input fields are optional**, with a default in the handler.
 4. **Do not tighten existing inputs**: no new `.min()`/`.max()`/`.uuid()`/`.refine()`/
    `.strict()`, no narrower enum, no `nullish()` → `optional()`, no new required header or
-   stricter auth (for example `publicProcedure` → `protectedProcedure`).
+   stricter auth (for example `publicProcedure` → `personProcedure`).
 5. **Keep output shapes stable**: no removed, renamed, retyped, wrapped, or newly nullable field.
    A `db.query.*.findMany/findFirst` without `columns` passes table columns through to the output,
    so a column change in `packages/db` is an output change. Pick columns explicitly when you touch

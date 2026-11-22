@@ -1,1 +1,0 @@
-export { DiffSectionLabel } from "./DiffSectionLabel";

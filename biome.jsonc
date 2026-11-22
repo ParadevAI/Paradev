@@ -12,14 +12,17 @@
 			"!**/*.template.js",
 			"!**/*.template.sh",
 			"!**/*.template.ts",
-			"!**/plans",
+			"!plans",
+			"!apps/*/plans",
 			"!**/*.generated.ts",
 			// Lingui catalogs: .po plus compiled messages.ts (lingui compile output).
 			"!packages/i18n/locales",
 			"!apps/mobile/uniwind-types.d.ts",
 			"!packages/sdk/src",
 			// Vendored Vale style packages (synced by `vale sync`); don't reformat.
-			"!apps/marketing/vale-styles"
+			"!apps/marketing/vale-styles",
+			// Written by the CLA bot on every signature; reformatting it would fight the bot.
+			"!signatures"
 		]
 	},
 	"formatter": {
@@ -50,6 +53,17 @@
 							"child_process": {
 								"importNames": ["execSync", "spawnSync", "execFileSync"],
 								"message": "Sync subprocesses freeze the serving event loop (Electron main / host-service / pty-daemon) until the child exits — every request queues behind them. Prefer async spawn/execFile: the caller awaits the same result, but the loop keeps serving while the child runs. Git reads belong in the worker pools."
+							},
+							"@vercel/sandbox": "Most calls on a raw sandbox handle resume a stopped box. Use the functions in packages/trpc/src/lib/sandbox, where only a wake or a create may resume one.",
+							"@superset/db/cloud-usage-query": {
+								"importNames": [
+									"queryFleetCloudUsage",
+									"queryFleetCloudUsageByWorkspaceDay",
+									"queryFleetCloudUsageSeries",
+									"listFleetCloudBoots",
+									"getFleetCloudBoot"
+								],
+								"message": "These read every organization and are for staff tools only (the admin app). A customer procedure uses queryCloudUsage and listCloudBoots, which take one organization."
 							}
 						}
 					}
@@ -82,6 +96,18 @@
 				"**/test-helpers.ts",
 				"**/scripts/**"
 			],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": "off"
+					}
+				}
+			}
+		},
+		{
+			// The one place that holds sandbox handles, and the release tooling that
+			// builds its own boxes. Neither runs on a desktop or host-service loop.
+			"includes": ["packages/trpc/src/lib/sandbox/**", "packages/sandbox/**"],
 			"linter": {
 				"rules": {
 					"style": {

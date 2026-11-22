@@ -4,6 +4,7 @@ import { getHostId, getHostName } from "@superset/shared/host-info";
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { getHostInstallSource, HOST_SERVICE_VERSION } from "../install-source";
 import type { JwtApiAuthProvider } from "../providers/auth/JwtAuthProvider/JwtAuthProvider";
+import { caught } from "../runtime/box-log-filter";
 import type { ApiClient } from "../types";
 import {
 	recordRegistrationFailure,
@@ -38,7 +39,7 @@ async function resolveRelayUrl(
 	} catch (error) {
 		console.warn(
 			"[host-service] relay endpoint lookup failed, using fallback:",
-			error instanceof Error ? error.message : error,
+			caught(error),
 		);
 	}
 	return fallback;
@@ -72,11 +73,14 @@ export async function connectRelay(
 			);
 			if (options.signal?.aborted) return null;
 			recordRegistrationSuccess();
-			console.log(`[host-service] registered as host ${host.machineId}`);
+			console.log(
+				"[host-service] registered as host (machine):",
+				host.machineId,
+			);
 
 			const relayUrl = await resolveRelayUrl(options.api, options.relayUrl);
 			if (options.signal?.aborted) return null;
-			console.log(`[host-service] relay: ${relayUrl}`);
+			console.log("[host-service] relay:", relayUrl);
 
 			const clientOptions = {
 				relayUrl,
@@ -98,8 +102,9 @@ export async function connectRelay(
 				REGISTER_RETRY_MAX_MS,
 			);
 			console.error(
-				`[host-service] failed to register/connect relay (retrying in ${Math.round(delay / 1000)}s):`,
-				error,
+				"[host-service] failed to register or connect the relay (retry in s):",
+				Math.round(delay / 1000),
+				caught(error),
 			);
 			// unref: the HTTP server keeps the process alive between retries;
 			// this timer must not stall shutdown once the server closes.

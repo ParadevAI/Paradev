@@ -14,3 +14,6 @@
 "Could not start dictation" = "無法啟動聽寫";
 "Uploading" = "正在上傳";
 "Upload failed" = "上傳失敗";
+"Stop" = "停止";
+"Dictation stopped. What was heard so far is in your message." = "聽寫已停止。目前聽到的內容已在訊息中。";
+"Transcription took too long. The last few words may be missing." = "轉錄耗時過久，最後幾個字可能遺漏。";

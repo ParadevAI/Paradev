@@ -1,5 +1,5 @@
 import os from "node:os";
-import { EXEC_TIMEOUT_MS, runTolerant } from "./exec.ts";
+import { EXEC_TIMEOUT_MS, psCommand, runTolerant } from "./exec.ts";
 import { pickEnvValue, readEnvValuesLinuxProcfs } from "./procfs.ts";
 
 /**
@@ -80,12 +80,12 @@ async function readTerminalIdsDarwin(
 	if (pids.length > PS_WHOLE_TABLE_THRESHOLD) {
 		const wanted = new Set(pids);
 		const commands = await runTolerant(
-			"ps",
+			psCommand(),
 			["-ww", "-axo", "pid=,command="],
 			options,
 		);
 		const output = await runTolerant(
-			"ps",
+			psCommand(),
 			["-Eww", "-axo", "pid=,command="],
 			options,
 		);
@@ -100,12 +100,12 @@ async function readTerminalIdsDarwin(
 	for (let i = 0; i < pids.length; i += PS_PID_BATCH) {
 		const batch = pids.slice(i, i + PS_PID_BATCH);
 		const commands = await runTolerant(
-			"ps",
+			psCommand(),
 			["-ww", "-o", "pid=,command=", "-p", batch.join(",")],
 			options,
 		);
 		const output = await runTolerant(
-			"ps",
+			psCommand(),
 			["-Eww", "-o", "pid=,command=", "-p", batch.join(",")],
 			options,
 		);

@@ -1,9 +1,9 @@
 ---
 name: superset-settings
-description: Read and update the Superset desktop app's user settings (theme, fonts, terminal, git, notifications, behavior) via the superset CLI, including creating and installing custom themes from JSON. Use when asked to change app settings, switch or create a theme, adjust fonts, or configure desktop preferences without opening the settings UI.
+description: Read and update the Paradev desktop app's user settings (theme, fonts, terminal, git, notifications, behavior) via the superset CLI, including creating and installing custom themes from JSON. Use when asked to change app settings, switch or create a theme, adjust fonts, or configure desktop preferences without opening the settings UI.
 ---
 
-# Superset settings via CLI
+# Paradev settings via CLI
 
 Change the desktop app's user settings from the command line with
 `superset settings`. Works offline, no login required; everything is local
@@ -29,9 +29,9 @@ superset settings theme remove <id>                 # delete a custom theme
 
 Prefer `--json` (auto-on in agent environments; parse it rather than
 matching the human sentences) and `superset settings list` to discover keys
-and allowed values instead of guessing. In Superset terminals `superset` is
+and allowed values instead of guessing. In Paradev terminals `superset` is
 already on PATH. `SUPERSET_HOME_DIR` overrides the target profile
-(`~/.superset` by default); useful for testing against a sandbox copy.
+(`~/.paradev` by default); useful for testing against a sandbox copy.
 
 ## Creating custom themes
 
@@ -107,7 +107,7 @@ app" means the nudge landed. The notes below are the fallback behavior when
 no app acknowledged (app not running, or an older app version):
 
 - **Regular settings** (most of `settings set`): written to
-  `~/.superset/local.db`. A running older app picks them up the next time
+  `local.db` in the target profile (`$SUPERSET_HOME_DIR`, else `~/.paradev`). A running older app picks them up the next time
   its window regains focus; no restart needed.
 - **Git settings** (`branchPrefixMode`, `branchPrefixCustom`,
   `worktreeBaseDir`): host-wide values written through the local host
@@ -119,7 +119,7 @@ no app acknowledged (app not running, or an older app version):
 - **Theme** (`settings theme set`): applies live when the nudge lands. If
   the output shows the restart fallback instead: quit the app cleanly first,
   then set, then relaunch; a running older app overwrites the file on its
-  own writes. If you are an agent running inside a Superset terminal, never
+  own writes. If you are an agent running inside a Paradev terminal, never
   kill the app yourself (that kills your own session); ask the user to
   restart instead.
 - Both stores are created by the desktop app. On a machine that never ran
@@ -133,7 +133,7 @@ Booleans accept `true/false/on/off/1/0/yes/no`.
 | --- | --- |
 | behavior | `confirmOnQuit`, `fileOpenMode` (`split-pane\|new-tab`), `showResourceMonitor`, `showUsageInSidebar`, `openLinksInApp`, `defaultEditor` (vscode, cursor, zed, ...) |
 | git | `branchPrefixMode` (`none\|github\|author\|custom`), `branchPrefixCustom`, `worktreeBaseDir`; host-wide, written through the local host service, so the app (or `superset start`) must be running |
-| notifications | `selectedRingtoneId` (shamisen, arcade, ping, quick, doowap, woman, african, afrobeat, edm, comeback, shabala), `notificationSoundsMuted`, `notificationVolume` (0-100) |
+| notifications | `selectedRingtoneId` (shamisen, arcade, ping, quick, doowap, woman, african, afrobeat, edm, comeback, shabala, tribute), `notificationSoundsMuted`, `notificationVolume` (0-100) |
 | terminal | `terminalLinkBehavior` (`external-editor\|file-viewer`), `terminalParkedRuntimeCap` (2-64), `showPresetsBar`, `useCompactTerminalAddButton`, `autoApplyDefaultPreset`, `waitForSetupBeforeAgent` |
 | terminal appearance | `terminalFontFamily`, `terminalFontSize` (10-24, 0.5 steps), `terminalLineHeight` (1-2.5), `terminalLetterSpacing` (-2-4), `terminalFontWeight` (100-900), `terminalLigatures`, `terminalMinimumContrast` (1\|3\|4.5\|7), `terminalCursorStyle` (`block\|bar\|underline`), `terminalCursorBlink` |
 | editor appearance | `editorFontFamily`, `editorFontSize`, `editorLineHeight`, `editorLetterSpacing`, `editorFontWeight`, `editorLigatures` |

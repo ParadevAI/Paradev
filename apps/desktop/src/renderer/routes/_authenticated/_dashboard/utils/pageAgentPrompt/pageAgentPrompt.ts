@@ -1,10 +1,10 @@
 // Agent instructions, not interface copy. Claude plugins use superset:page;
 // managed skill directories expose the same skill as superset-page.
 const INTRO =
-	"Help me create and publish a Superset Page using the Superset Pages skill.";
+	"Help me create and publish a Paradev Page using the Paradev Pages skill.";
 
 const LOAD_SKILL =
-	"First load and follow the Pages skill: superset:page in the Superset plugin, or superset-page in your available skills. Read its SKILL.md before creating content. If neither name is available, look for the installed Superset Pages skill; if it is missing, explain that setup is needed instead of substituting a generic HTML workflow or a Claude artifact.";
+	"First load and follow the Pages skill: superset:page in the Paradev plugin, or superset-page in your available skills. Read its SKILL.md before creating content. If neither name is available, look for the installed Paradev Pages skill; if it is missing, explain that setup is needed instead of substituting a generic HTML workflow or a Claude artifact.";
 
 const ASK_WHAT_TO_CREATE =
 	"Explain briefly that you will publish a page my teammates can open and comment on, then ask what I want to create and who it is for. Examples include a design doc, report, or proposal. Gather any source material needed.";

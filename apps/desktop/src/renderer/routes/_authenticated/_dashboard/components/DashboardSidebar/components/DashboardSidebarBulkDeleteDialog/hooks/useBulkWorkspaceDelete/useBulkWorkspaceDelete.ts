@@ -9,7 +9,7 @@ import {
 	destroyWorkspaceAtHost,
 	inspectWorkspaceAtHost,
 } from "renderer/hooks/host-service/useDestroyWorkspace";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences/useUserPreferences";
 import { useNavigateAwayFromWorkspace } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace";
 import {
 	type BulkWorkspaceDeleteFailure,
@@ -77,7 +77,7 @@ export function useBulkWorkspaceDelete({
 	const { cache: hostWorkspacesCache } = useHostWorkspaces();
 	const { navigateAwayFromWorkspace } = useNavigateAwayFromWorkspace();
 	const { removeWorkspaceFromSidebar } = useDashboardSidebarState();
-	const { preferences, setDeleteLocalBranch } = useV2UserPreferences();
+	const { preferences, setDeleteLocalBranch } = useUserPreferences();
 	const phase = useBulkDeleteWorkspacesIntent((s) => s.phase);
 	const failures = useBulkDeleteWorkspacesIntent((s) => s.failures);
 	const [inspections, setInspections] = useState<
@@ -306,11 +306,11 @@ export function useBulkWorkspaceDelete({
 						description:
 							deletedIds.length > 0
 								? t({
-										message: "Reload Superset to refresh the workspace list.",
+										message: "Reload Paradev to refresh the workspace list.",
 									})
 								: t({
 										message:
-											"Try again. If the problem continues, reload Superset.",
+											"Try again. If the problem continues, reload Paradev.",
 									}),
 					},
 				);

@@ -1,0 +1,1 @@
+ALTER TABLE "channels" ADD COLUMN "linear_project_id" text;

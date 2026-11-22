@@ -1,0 +1,1 @@
+export { DiffPaneScope } from "./DiffPaneScope";

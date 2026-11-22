@@ -4,6 +4,7 @@
  * Keyed by presetId / iconId from the host's `settings.agentConfigs`.
  */
 export const AGENT_ICONS: Record<string, number> = {
+	agy: require("@/assets/agents/agy.png"),
 	amp: require("@/assets/agents/amp.png"),
 	claude: require("@/assets/agents/claude.png"),
 	codex: require("@/assets/agents/codex.png"),
@@ -16,6 +17,7 @@ export const AGENT_ICONS: Record<string, number> = {
 	kimi: require("@/assets/agents/kimi.png"),
 	mastracode: require("@/assets/agents/mastracode.png"),
 	opencode: require("@/assets/agents/opencode.png"),
+	pdev: require("@/assets/agents/pdev.png"),
 	pi: require("@/assets/agents/pi.png"),
 	polygraph: require("@/assets/agents/polygraph.png"),
 	superset: require("@/assets/agents/superset.png"),

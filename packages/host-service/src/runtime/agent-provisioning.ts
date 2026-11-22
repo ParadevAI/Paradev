@@ -4,13 +4,27 @@ import { fileURLToPath } from "node:url";
 import {
 	getAgentSetupTemplatesDir,
 	mcpHeadersHelperCommand,
-	readInstalledPluginSources,
-	readPluginConnections,
+	readEnabledPlugins,
 	reconcileMcpServers,
 	setAgentSetupTemplatesDir,
 	setupAgentIntegrations,
 } from "@superset/agent-setup";
 import { desiredPluginMcpServers } from "@superset/shared/plugins";
+import { createApiClient } from "../api/createApiClient";
+import { env } from "../env";
+import { SandboxApiAuthProvider } from "../providers/auth";
+import { caught } from "./box-log-filter";
+import { seedSandboxPlugins } from "./sandbox-plugins";
+
+function organizationBundleFetcher() {
+	if (env.SUPERSET_HOST_RUN_MODE !== "sandbox") return undefined;
+	const api = createApiClient(
+		env.SUPERSET_API_URL,
+		new SandboxApiAuthProvider(),
+		env.ORGANIZATION_ID,
+	);
+	return (name: string) => api.plugins.organization.bundle.query({ name });
+}
 
 /**
  * Locates the agent-setup template assets for this deployment. The CLI
@@ -31,7 +45,7 @@ function resolveAgentTemplatesDir(): string | undefined {
 }
 
 /**
- * Provisions agent lifecycle hooks (~/.superset/hooks/notify.sh + managed
+ * Provisions agent lifecycle hooks (~/.paradev/hooks/notify.sh + managed
  * entries in each agent's global config), PATH wrappers, and the zsh/bash
  * bootstrap files host-service's shell-launch path expects. The Electron app
  * does this at boot for hosts it spawns; a standalone (CLI-launched) host has
@@ -39,18 +53,21 @@ function resolveAgentTemplatesDir(): string | undefined {
  * (#6254). Headless hosts have no per-agent disable setting, so every
  * supported agent is provisioned.
  */
-export function provisionAgentIntegrations(): void {
+export async function provisionAgentIntegrations(): Promise<void> {
 	try {
 		const templatesDir = resolveAgentTemplatesDir();
 		if (templatesDir) setAgentSetupTemplatesDir(templatesDir);
+		// The ledger has to be on disk, and resolved against the templates dir
+		// just applied, before setupAgentIntegrations reads it.
+		await seedSandboxPlugins(process.env, organizationBundleFetcher());
 		// Individual writers soft-fail on missing templates (each is
 		// try/caught), which is exactly the silence that hid #6254 — surface a
 		// broken install loudly instead of one warn per agent.
 		const effectiveDir = getAgentSetupTemplatesDir();
 		if (!existsSync(path.join(effectiveDir, "notify-hook.template.sh"))) {
 			console.error(
-				`[host-service] agent-setup templates missing at ${effectiveDir} — agent hooks will NOT work on this host. ` +
-					"Reinstall the CLI or set SUPERSET_AGENT_TEMPLATES_DIR.",
+				"[host-service] agent-setup templates missing; agent hooks will NOT work on this host. Reinstall the CLI or set SUPERSET_AGENT_TEMPLATES_DIR (dir):",
+				effectiveDir,
 			);
 		}
 		setupAgentIntegrations();
@@ -61,23 +78,34 @@ export function provisionAgentIntegrations(): void {
 		// config; and a write can be declined when a same-named server is
 		// configured elsewhere. This reads two files and does nothing when they
 		// already agree, which is the usual case.
-		const reports = reconcileMcpServers(
-			desiredPluginMcpServers(readInstalledPluginSources() ?? [], {
-				connections: readPluginConnections(),
-				headersHelper: mcpHeadersHelperCommand(),
-			}),
-		);
+		// An unreadable ledger is not an empty one, and reconciling reaps
+		// whatever is absent from the desired set: a torn write would take the
+		// agent's managed servers with it.
+		const enabled =
+			process.env.NODE_ENV === "development" ||
+			process.env.SUPERSET_ENV === "development"
+				? null
+				: readEnabledPlugins();
+		const reports = enabled
+			? reconcileMcpServers(
+					desiredPluginMcpServers(enabled, {
+						headersHelper: mcpHeadersHelperCommand(),
+					}),
+				)
+			: [];
 		for (const report of reports) {
 			if (report.wrote) {
 				console.log(
-					`[host-service] ${report.agent} MCP config updated: ${report.stale.join(", ")}`,
+					"[host-service] MCP config updated (agent, servers):",
+					report.agent,
+					report.stale.join(", "),
 				);
 			}
 		}
 	} catch (error) {
 		console.warn(
 			"[host-service] agent integration provisioning failed (continuing):",
-			error,
+			caught(error),
 		);
 	}
 }

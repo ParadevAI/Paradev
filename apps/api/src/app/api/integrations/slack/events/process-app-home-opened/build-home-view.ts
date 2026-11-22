@@ -1,4 +1,5 @@
 import type { KnownBlock } from "@slack/types";
+import { env } from "@/env";
 import { DEFAULT_SLACK_MODEL, SLACK_MODELS } from "../../constants";
 
 interface BuildHomeViewParams {
@@ -25,7 +26,7 @@ export function buildHomeView({
 			type: "header",
 			text: {
 				type: "plain_text",
-				text: "Welcome to Superset",
+				text: "Welcome to Paradev",
 				emoji: true,
 			},
 		},
@@ -33,7 +34,7 @@ export function buildHomeView({
 			type: "section",
 			text: {
 				type: "mrkdwn",
-				text: "Superset is your AI coding assistant - spin up cloud agents, plan tasks, do code reviews, and more, all without leaving Slack.",
+				text: "Paradev is your AI coding assistant - spin up cloud agents, plan tasks, do code reviews, and more, all without leaving Slack.",
 			},
 		},
 		{ type: "divider" },
@@ -107,7 +108,7 @@ export function buildHomeView({
 							title: { type: "plain_text", text: "Disconnect Account" },
 							text: {
 								type: "mrkdwn",
-								text: "Are you sure you want to disconnect your Superset account?",
+								text: "Are you sure you want to disconnect your Paradev account?",
 							},
 							confirm: { type: "plain_text", text: "Disconnect" },
 							deny: { type: "plain_text", text: "Cancel" },
@@ -122,7 +123,7 @@ export function buildHomeView({
 				type: "section",
 				text: {
 					type: "mrkdwn",
-					text: "Link your Slack account to your Superset account to personalize your experience.",
+					text: "Link your Slack account to your Paradev account to personalize your experience.",
 				},
 			},
 			{
@@ -156,7 +157,7 @@ export function buildHomeView({
 			type: "section",
 			text: {
 				type: "mrkdwn",
-				text: "*DM the bot* — Start a direct message with Superset for instant access to AI assistance.\n\n*@mention in channels* — Mention <@superset> in any channel to get help in context.\n\n*Link unfurling* — Paste a Superset task or page link and it will automatically preview in the conversation.",
+				text: "*DM the bot* — Start a direct message with Paradev for instant access to AI assistance.\n\n*@mention in channels* — Mention <@superset> in any channel to get help in context.\n\n*Link unfurling* — Paste a Paradev task or page link and it will automatically preview in the conversation.",
 			},
 		},
 		{ type: "divider" },
@@ -167,10 +168,10 @@ export function buildHomeView({
 					type: "button",
 					text: {
 						type: "plain_text",
-						text: "Open Superset",
+						text: "Open Paradev",
 						emoji: true,
 					},
-					url: "https://app.superset.sh",
+					url: env.NEXT_PUBLIC_WEB_URL,
 					style: "primary",
 				},
 			],

@@ -1,3 +1,4 @@
+export { buildOptions } from "./build";
 export type { Audience, CommandConfig, CommandResult } from "./command";
 export { createCommand } from "./command";
 export {
@@ -5,7 +6,7 @@ export {
 	generateZshCompletion,
 } from "./completion";
 export type { CliConfig } from "./config";
-export { defineConfig } from "./config";
+export { defineConfig, loadConfig } from "./config";
 export { CLIError, suggestSimilar } from "./errors";
 export type { CliDescription, CommandNode } from "./help";
 export {
@@ -36,3 +37,4 @@ export type {
 	SchemaOption,
 } from "./schema";
 export { generateSchema } from "./schema";
+export { wrapText } from "./wrap-text";

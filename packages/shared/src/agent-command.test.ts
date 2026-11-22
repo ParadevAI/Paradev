@@ -7,7 +7,13 @@ import {
 	buildAgentFileCommand,
 	buildAgentPromptCommand,
 } from "./agent-command";
-import { getPresetById } from "./host-agent-presets";
+import { DEFAULT_TERMINAL_PRESET_AGENT_TYPES } from "./builtin-terminal-agents";
+import { FEATURE_FLAGS } from "./constants";
+import {
+	getDefaultSeedPresets,
+	getPresetById,
+	isAgentPresetEnabled,
+} from "./host-agent-presets";
 
 describe("UFO launches", () => {
 	it("passes a multiline prompt literally as one positional argument", () => {
@@ -184,7 +190,7 @@ describe("agy agent registration", () => {
 		});
 
 		expect(command).toStartWith(
-			"agy --mode accept-edits -i \"$(cat <<'SUPERSET_PROMPT_agy1234'",
+			"agy --dangerously-skip-permissions -i \"$(cat <<'SUPERSET_PROMPT_agy1234'",
 		);
 		expect(command).toEndWith('\n)"');
 	});
@@ -192,7 +198,7 @@ describe("agy agent registration", () => {
 	it("derives host preset args and id-based resume from the base command", () => {
 		const preset = getPresetById("agy");
 		expect(preset?.command).toBe("agy");
-		expect(preset?.args).toEqual(["--mode", "accept-edits"]);
+		expect(preset?.args).toEqual(["--dangerously-skip-permissions"]);
 		expect(preset?.promptArgs).toEqual(["-i"]);
 		expect(preset?.resumeArgs).toEqual(["--conversation"]);
 	});
@@ -331,5 +337,30 @@ describe("grok agent registration", () => {
 		expect(preset?.command).toBe("grok");
 		expect(preset?.args).toEqual(["--always-approve"]);
 		expect(preset?.promptArgs).toEqual([]);
+	});
+});
+
+describe("pdev agent registration", () => {
+	it("is a registered terminal agent with Pi-style session args", () => {
+		expect(AGENT_LABELS.pdev).toBe("pdev");
+		const preset = getPresetById("pdev");
+		expect(preset?.command).toBe("pdev");
+		expect(preset?.args).toEqual([]);
+		expect(preset?.resumeArgs).toEqual(["--session"]);
+		expect(preset?.forkArgs).toEqual(["--fork", "{sessionId}"]);
+	});
+
+	it("is never a default terminal preset or a seeded host agent", () => {
+		expect(DEFAULT_TERMINAL_PRESET_AGENT_TYPES).not.toContain("pdev");
+		const seeded = getDefaultSeedPresets().map((preset) => preset.presetId);
+		expect(seeded).not.toContain("pdev");
+		expect(seeded).toContain("pi");
+	});
+
+	it("is enabled only while the pdev-agent flag is active", () => {
+		expect(isAgentPresetEnabled("pdev", [])).toBe(false);
+		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.PDEV_AGENT])).toBe(true);
+		expect(isAgentPresetEnabled("pi", [])).toBe(true);
+		expect(isAgentPresetEnabled("custom:pdev", [])).toBe(true);
 	});
 });

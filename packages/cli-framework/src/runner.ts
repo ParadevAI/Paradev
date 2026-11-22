@@ -1,4 +1,4 @@
-import type { Audience, CommandConfig } from "./command";
+import type { Audience, CommandConfig, CommandResult } from "./command";
 import { CLIError } from "./errors";
 import {
 	type CliDescription,
@@ -24,6 +24,7 @@ import {
 	filterByAudience,
 	routeCommand,
 } from "./router";
+import { wrapText } from "./wrap-text";
 
 export interface CommandTree {
 	commands: CliCommand[];
@@ -148,7 +149,7 @@ export function formatError(
 			const tier = requiredPlan === "enterprise" ? "Enterprise" : "Pro";
 			return {
 				message: error.message,
-				hint: `Needs the ${tier} plan. Upgrade at https://superset.sh/pricing, or in the app under Settings → Billing.`,
+				hint: `Needs the ${tier} plan. Upgrade at https://paradev.com/pricing, or in the app under Settings → Billing.`,
 			};
 		}
 		if (code === "NOT_FOUND") {
@@ -175,7 +176,9 @@ async function handleError(
 	signal?: AbortSignal,
 ): Promise<never> {
 	const { message, hint } = formatError(error, cliName);
-	const text = `Error: ${message}\n${hint ? `Hint: ${hint}\n` : ""}`;
+	const columns = process.stderr.isTTY ? process.stderr.columns : 0;
+	const wrap = (line: string) => (columns ? wrapText(line, columns) : line);
+	const text = `${wrap(`Error: ${message}`)}\n${hint ? `${wrap(`Hint: ${hint}`)}\n` : ""}`;
 	// Same drain rule as stdout (see writeStream): exiting before the pipe
 	// reader catches up would drop the message. Best effort; a failed stderr
 	// write must not mask the exit code.
@@ -475,12 +478,24 @@ async function execute(
 	// Agent-mode auto-JSON only when --quiet wasn't passed; --quiet beats it.
 	const isJson = jsonFlag ?? (!isQuiet && isAgentMode());
 
-	const result = await cmd.run({
-		options: parsed.options as never,
-		args: argsResult as never,
-		ctx: ctx as never,
-		signal,
-	});
+	let result: CommandResult;
+	try {
+		result = await cmd.run({
+			options: parsed.options as never,
+			args: argsResult as never,
+			ctx: ctx as never,
+			signal,
+		});
+	} catch (error) {
+		if (isJson && error instanceof CLIError && error.data !== undefined) {
+			await writeStream(
+				process.stdout,
+				`${JSON.stringify(error.data, null, 2)}\n`,
+				signal,
+			).catch(() => {});
+		}
+		throw error;
+	}
 
 	if (result !== undefined) {
 		const output = formatOutput(result, cmd.display, {

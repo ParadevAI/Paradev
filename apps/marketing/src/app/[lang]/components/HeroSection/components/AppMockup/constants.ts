@@ -1,104 +1,134 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { AgentTab, FileChange, WorkspaceData } from "./types";
+import type {
+	ActiveDemo,
+	FileDiffData,
+	PagePhase,
+	SceneConfig,
+	SessionData,
+	SessionGroupData,
+} from "./types";
 
-export const WORKSPACES: WorkspaceData[] = [
+export const CLOUD_GROUP_ID = "paradev/cloud";
+
+export const NEW_CLOUD_SESSION: SessionData = {
+	title: "Nightly evals",
+	agent: "claude",
+	status: "working",
+};
+
+export const SESSION_GROUPS: SessionGroupData[] = [
 	{
-		name: "fix onboarding crash",
-		branch: "fix-onboarding-crash",
-		add: 46,
-		del: 1,
-		pr: "#733",
-		isActive: true,
-		status: "working",
+		id: "pinned",
+		label: msg({ message: "Pinned" }),
+		sessions: [
+			{ title: "Settings → modal", agent: "claude", status: "needs" },
+			{ title: "Command palette v2", agent: "codex" },
+		],
 	},
 	{
-		name: "billing webhooks",
-		branch: "billing-webhooks",
-		add: 193,
-		del: 0,
-		pr: "#815",
-		status: "review",
+		id: "working",
+		label: msg({ message: "Working" }),
+		sessions: [
+			{ title: "Fix flaky auth tests", agent: "opencode", status: "working" },
+			{ title: "Linear → PR automation", agent: "cursor", status: "working" },
+		],
 	},
 	{
-		name: "refactor auth flow",
-		branch: "refactor-auth-flow",
-		add: 394,
-		del: 23,
-		pr: "#884",
+		id: "paradev/desktop",
+		label: "paradev/desktop",
+		sessions: [
+			{ title: "Publish pricing comparison", agent: "gemini", status: "needs" },
+			{ title: "Terminal go brrr", agent: "vibe" },
+		],
 	},
 	{
-		name: "speed up cold start",
-		branch: "speed-up-cold-start",
-		add: 33,
-		del: 0,
-		pr: "#816",
-		status: "permission",
+		id: "paradev/web",
+		label: "paradev/web",
+		sessions: [
+			{ title: "Onboarding copy pass", agent: "pi", status: "needs" },
+			{ title: "Changelog page", agent: "kiro" },
+		],
 	},
 	{
-		name: "bump dependencies",
-		branch: "bump-dependencies",
-		add: 127,
-		del: 8,
-		pr: "#902",
-		icon: "branch",
+		id: CLOUD_GROUP_ID,
+		label: "paradev/cloud",
+		sessions: [
+			{ title: "Team usage panel", agent: "devin" },
+			{ title: "Sentry triage → issues", agent: "grok" },
+		],
 	},
 ];
 
-export const CLOUD_WORKSPACES: WorkspaceData[] = [
-	{
-		name: "nightly evals",
-		branch: "nightly-evals",
-		add: 812,
-		del: 64,
-		status: "working",
-		icon: "cloud",
+export const SCENES: Record<ActiveDemo, SceneConfig> = {
+	"Orchestrate Parallel Agents": {
+		rail: "workspaces",
+		activeSession: "Settings → modal",
+		showChanges: true,
 	},
-	{
-		name: "api hotfix",
-		branch: "api-hotfix",
-		add: 12,
-		del: 3,
-		icon: "cloud",
+	"Cloud Workspaces": {
+		rail: "workspaces",
+		activeSession: NEW_CLOUD_SESSION.title,
+		showChanges: false,
 	},
-	{
-		name: "docs refresh",
-		branch: "docs-refresh",
-		add: 58,
-		del: 0,
-		icon: "cloud",
+	"Automate Tasks": {
+		rail: "automations",
+		activeSession: null,
+		showChanges: false,
 	},
-];
+	"Publish Pages": {
+		rail: "pages",
+		activeSession: "Onboarding copy pass",
+		showChanges: true,
+	},
+};
 
-export const FILE_CHANGES: FileChange[] = [
-	{ path: "packages/db/src/schema", type: "folder" },
-	{ path: "cloud-workspace.ts", add: 119, del: 0, type: "add", indent: 1 },
-	{ path: "enums.ts", add: 21, del: 0, type: "edit", indent: 1 },
-	{ path: "apps/desktop/src/renderer", type: "folder" },
-	{ path: "CloudTerminal.tsx", add: 169, del: 0, type: "add", indent: 1 },
-	{ path: "useCloudWorkspaces.ts", add: 84, del: 0, type: "add", indent: 1 },
+export const FILE_DIFFS: FileDiffData[] = [
 	{
-		path: "LegacyTerminalPane.tsx",
-		add: 0,
-		del: 42,
-		type: "delete",
-		indent: 1,
-	},
-];
-
-export const AGENT_TABS: AgentTab[] = [
-	{ src: "/app-icons/codex.svg", alt: "Codex", label: "codex", delay: 0.1 },
-	{
-		src: "/app-icons/cursor-agent.svg",
-		alt: "Cursor",
-		label: "cursor",
-		delay: 0.2,
-	},
-	{
-		src: "/app-icons/opencode.svg",
-		alt: "OpenCode",
-		label: "opencode",
-		delay: 0.3,
+		path: "src/hotkeys/useHotkeys.ts",
+		add: 27,
+		rows: [
+			{ kind: "separator", lines: 11 },
+			{ kind: "line", number: 12, code: 'import { useEffect } from "react";' },
+			{
+				kind: "line",
+				number: 13,
+				code: 'import { hotkeys } from "./registry";',
+			},
+			{
+				kind: "line",
+				number: 14,
+				change: "add",
+				code: 'import { openSettings } from "@/settings";',
+			},
+			{ kind: "line", number: 15, code: "" },
+			{
+				kind: "line",
+				number: 16,
+				code: "export function useHotkeys(scope: Scope) {",
+			},
+			{ kind: "line", number: 17, code: "  useEffect(function bind() {" },
+			{
+				kind: "line",
+				number: 18,
+				change: "add",
+				code: "    // ⌘, opens Settings from anywhere",
+			},
+			{
+				kind: "line",
+				number: 19,
+				change: "add",
+				code: '    hotkeys.bind("mod+comma", openSettings,',
+			},
+			{
+				kind: "line",
+				number: 20,
+				change: "add",
+				code: "      { global: true });",
+			},
+			{ kind: "line", number: 21, code: "    return hotkeys.attach(scope);" },
+			{ kind: "separator", lines: 38 },
+		],
 	},
 ];
 
@@ -139,12 +169,20 @@ export const AUTOMATIONS: AutomationRow[] = [
 		}),
 	},
 	{
-		name: "roadmap-sync",
+		name: "pr-review",
 		schedule: msg({
-			message: "monthly",
+			message: "on review request",
 		}),
 		lastRun: msg({
-			message: "✓ 3d ago",
+			message: "✓ 12m ago",
 		}),
 	},
 ];
+
+export const PAGE_PHASES: readonly PagePhase[] = [
+	"published",
+	"commented",
+	"revised",
+];
+
+export const PAGE_PHASE_MS = [1800, 2400, 5000] as const;

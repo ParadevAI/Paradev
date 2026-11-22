@@ -1,6 +1,6 @@
 "use client";
 
-import { COMPANY } from "@superset/shared/constants";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { useEffect } from "react";
 import { MCP_SERVER_URL } from "@/lib/api-url";
 import { PRODUCT_SUMMARY } from "@/lib/product-facts";
@@ -36,7 +36,7 @@ function getModelContext(): ModelContext | undefined {
 
 const INSTALL_COMMANDS: Record<string, string> = {
 	macos: `Download the desktop app from ${COMPANY.MARKETING_URL}/download`,
-	cli: "brew install superset-sh/tap/superset (or: curl -fsSL https://superset.sh/cli/install.sh | sh)",
+	cli: `brew install paradevai/tap/superset (or: curl -fsSL ${CANONICAL_URLS.MARKETING}/cli/install.sh | sh)`,
 	mcp: `claude mcp add --transport http superset ${MCP_SERVER_URL}`,
 };
 
@@ -46,7 +46,7 @@ function buildTools(): ModelContextTool[] {
 		{
 			name: "superset_product_facts",
 			description:
-				"What Superset is, what it costs, which platforms and coding agents it supports, and where the docs and API live.",
+				"What Paradev is, what it costs, which platforms and coding agents it supports, and where the docs and API live.",
 			inputSchema: { type: "object", properties: {} },
 			annotations: { readOnlyHint: true },
 			execute: () => ({
@@ -62,7 +62,7 @@ function buildTools(): ModelContextTool[] {
 		{
 			name: "superset_install_command",
 			description:
-				"The install command for a Superset surface: the macOS desktop app, the CLI, or the MCP server in an MCP client.",
+				"The install command for a Paradev surface: the macOS desktop app, the CLI, or the MCP server in an MCP client.",
 			inputSchema: {
 				type: "object",
 				properties: {
@@ -83,7 +83,7 @@ function buildTools(): ModelContextTool[] {
 		{
 			name: "superset_open_page",
 			description:
-				"Navigate this tab to a Superset page: pricing, docs, download, blog, changelog, compare, or mcp-install.",
+				"Navigate this tab to a Paradev page: pricing, docs, download, blog, changelog, compare, or mcp-install.",
 			inputSchema: {
 				type: "object",
 				properties: {

@@ -49,7 +49,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 				<Avatar src={testimonial.avatar} name={testimonial.author} />
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-2">
-						<span className="font-semibold text-foreground text-sm">
+						<span className="font-medium text-foreground text-sm">
 							{testimonial.author}
 						</span>
 					</div>
@@ -58,7 +58,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 					</span>
 				</div>
 			</div>
-			<p className="mt-3 text-foreground/90 text-[15px] leading-relaxed whitespace-pre-line">
+			<p className="mt-3 text-foreground text-sm leading-relaxed whitespace-pre-line">
 				{showOriginal ? testimonial.originalContent : testimonial.content}
 			</p>
 			{hasTranslation && (
@@ -95,8 +95,8 @@ export function WallOfLoveSection() {
 		<section className="relative py-24 sm:py-32">
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				<div className="max-w-2xl mb-12 sm:mb-16">
-					<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.1] text-foreground">
-						<Trans>What builders say about Superset</Trans>
+					<h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.1] text-foreground">
+						<Trans>What builders say about Paradev</Trans>
 					</h2>
 				</div>
 

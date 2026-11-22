@@ -1,0 +1,2 @@
+ALTER TABLE "cloud_workspace_boots" ADD COLUMN "pending_usage_events" jsonb;--> statement-breakpoint
+CREATE INDEX "cloud_workspace_boots_pending_usage_idx" ON "cloud_workspace_boots" USING btree ("id") WHERE "cloud_workspace_boots"."pending_usage_events" is not null;

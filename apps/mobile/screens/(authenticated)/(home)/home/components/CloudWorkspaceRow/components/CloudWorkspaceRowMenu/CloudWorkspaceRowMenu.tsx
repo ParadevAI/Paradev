@@ -1,3 +1,5 @@
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
+import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { itemFromCloudRow } from "@/hooks/useCloudWorkspaceItems";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
@@ -20,17 +22,17 @@ export function CloudWorkspaceRowMenu({
 	onCopied: () => void;
 	children: ReactNode;
 }) {
-	const { renameWorkspace, deleteWorkspace, copyId, shareWorkspace } =
-		useWorkspaceRowActions(
-			itemFromCloudRow(row),
-			cache,
-			[],
-			row.status,
-			onCopied,
-		);
+	const router = useRouter();
+	const { renameWorkspace, deleteWorkspace, copyId } = useWorkspaceRowActions(
+		itemFromCloudRow(row),
+		cache,
+		[],
+		row.status,
+		onCopied,
+	);
 	return (
 		<WorkspaceRowMenu
-			canRename={row.status === "ready"}
+			canRename={isLiveCloudWorkspaceStatus(row.status)}
 			canDelete={row.status !== "provisioning"}
 			isCloud
 			isUnread={isUnread}
@@ -39,7 +41,13 @@ export function CloudWorkspaceRowMenu({
 			onRename={() => void renameWorkspace()}
 			onDelete={deleteWorkspace}
 			onCopyId={copyId}
-			onShare={shareWorkspace}
+			onShare={() =>
+				router.push({
+					pathname: "/(authenticated)/workspace/[id]/share",
+					params: { id: row.id },
+				})
+			}
+			link={{ href: `/workspace/${row.id}`, onCopied }}
 		>
 			{children}
 		</WorkspaceRowMenu>

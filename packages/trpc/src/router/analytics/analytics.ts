@@ -2,12 +2,10 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
 import { posthog } from "../../lib/analytics";
-import { fetchInsightResults } from "../../lib/posthog-client";
-import { adminProcedure, protectedProcedure } from "../../trpc";
-import { ADMIN_INSIGHT_KEYS, ADMIN_INSIGHTS } from "./insight-registry";
+import { personProcedure } from "../../trpc";
 
 export const analyticsRouter = {
-	captureEvent: protectedProcedure
+	captureEvent: personProcedure
 		.input(
 			z.object({
 				source: z.string().min(1).max(50),
@@ -39,7 +37,7 @@ export const analyticsRouter = {
 	// clients without a PostHog SDK (e.g. the CLI binary) evaluate flags
 	// without us baking the PostHog project key into their build. Returns
 	// `null` when the flag is off or has no payload configured.
-	featureFlagPayload: protectedProcedure
+	featureFlagPayload: personProcedure
 		.input(z.object({ key: z.string().min(1).max(100) }))
 		.query(async ({ ctx, input }) => {
 			try {
@@ -52,8 +50,4 @@ export const analyticsRouter = {
 				return null;
 			}
 		}),
-
-	getInsightResults: adminProcedure
-		.input(z.object({ insight: z.enum(ADMIN_INSIGHT_KEYS) }))
-		.query(({ input }) => fetchInsightResults(ADMIN_INSIGHTS[input.insight])),
 } satisfies TRPCRouterRecord;

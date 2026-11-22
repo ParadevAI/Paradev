@@ -60,7 +60,7 @@ export default async function SlackIntegrationPage() {
 			withoutParam: i18n._(
 				msg({
 					message:
-						"This Slack workspace is already connected by another Superset organization.",
+						"This Slack workspace is already connected by another Paradev organization.",
 				}),
 			),
 		},

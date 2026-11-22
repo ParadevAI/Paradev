@@ -40,11 +40,16 @@ export function useConnector(
 		status.data?.filter((row) => row.connector === slug) ?? EMPTY;
 	const connection = connections[0] ?? null;
 
-	const previousCount = useRef(connections.length);
+	const loaded = status.data !== undefined;
+	const previousCount = useRef<number | null>(null);
 	useEffect(() => {
-		if (connections.length > previousCount.current) onConnected?.();
+		if (!loaded) return;
+		const previous = previousCount.current;
 		previousCount.current = connections.length;
-	}, [connections.length, onConnected]);
+		if (previous === null || previous === connections.length) return;
+		void utils.plugins.list.invalidate();
+		if (connections.length > previous) onConnected?.();
+	}, [loaded, connections.length, onConnected, utils]);
 
 	const invalidate = () =>
 		utils.connectors.status.invalidate({ organizationId });
@@ -70,12 +75,18 @@ export function useConnector(
 	});
 
 	const rename = cloudTrpc.connectors.rename.useMutation({
-		onMutate: async ({ connectionId, nickname }) => {
+		onMutate: async ({ connectionId, label }) => {
 			await utils.connectors.status.cancel({ organizationId });
 			const previous = utils.connectors.status.getData({ organizationId });
 			utils.connectors.status.setData({ organizationId }, (rows) =>
 				(rows ?? []).map((row) =>
-					row.id === connectionId ? { ...row, nickname } : row,
+					row.id === connectionId
+						? {
+								...row,
+								externalUserLabel: label ?? row.externalUserLabel,
+								nickname: null,
+							}
+						: row,
 				),
 			);
 			return { previous };
@@ -87,12 +98,13 @@ export function useConnector(
 		onSettled: invalidate,
 	});
 
-	const openOAuth = (method: string) => {
+	const openOAuth = (method: string, plugin?: string) => {
 		const url = new URL(
 			`${env.NEXT_PUBLIC_API_URL}/api/connectors/${slug}/connect`,
 		);
 		url.searchParams.set("organizationId", organizationId);
 		url.searchParams.set("method", method);
+		if (plugin) url.searchParams.set("plugin", plugin);
 		window.open(url.toString(), "_blank", "noopener,noreferrer");
 	};
 
@@ -113,11 +125,11 @@ export function useConnector(
 		},
 		rename: {
 			...rename,
-			mutate: (input: { connectionId: string; nickname: string | null }) =>
+			mutate: (input: { connectionId: string; label: string }) =>
 				rename.mutate({
 					organizationId,
 					connectionId: input.connectionId,
-					nickname: input.nickname?.trim() ? input.nickname.trim() : null,
+					label: input.label.trim(),
 				}),
 		},
 		openOAuth,

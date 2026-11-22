@@ -1,0 +1,1 @@
+export { isWindowTooNarrowForSidebar } from "./isWindowTooNarrowForSidebar";

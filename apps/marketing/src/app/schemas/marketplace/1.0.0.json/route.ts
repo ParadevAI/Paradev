@@ -6,7 +6,7 @@ export function GET() {
 	const schema = {
 		$schema: "https://json-schema.org/draft/2020-12/schema",
 		$id: `${base}/schemas/marketplace/1.0.0.json`,
-		title: "Superset plugin marketplace",
+		title: "Paradev plugin marketplace",
 		type: "object",
 		required: ["name", "plugins"],
 		properties: {

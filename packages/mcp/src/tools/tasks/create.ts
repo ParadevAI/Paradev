@@ -35,7 +35,7 @@ export function register(server: McpServer): void {
 				.min(1)
 				.nullish()
 				.describe(
-					"Linear only: team key, e.g. ENG. Needed when the Linear workspace has several teams.",
+					"Team key or name, e.g. ENG. For Linear, needed when the workspace has several teams. Omit for the default team.",
 				),
 			priority: z
 				.enum(["urgent", "high", "medium", "low", "none"])
@@ -45,7 +45,7 @@ export function register(server: McpServer): void {
 				.string()
 				.nullish()
 				.describe(
-					"Assignee: a Superset user ID, or for Linear a Linear user id or email. Omit for unassigned.",
+					"Assignee: a Paradev user ID, or for Linear a Linear user id or email. Omit for unassigned.",
 				),
 			estimate: z
 				.number()
@@ -57,14 +57,13 @@ export function register(server: McpServer): void {
 			labels: z
 				.array(z.string())
 				.nullish()
-				.describe("Superset only: free-text labels."),
+				.describe("Paradev only: free-text labels."),
 		},
 		handler: async (input, ctx) => {
 			const caller = createMcpCaller(ctx);
 			const { tracker, team, ...task } = input;
 			if ((await resolveTracker(caller, tracker)) === "superset") {
-				if (team) throw new Error("team only applies to Linear issues");
-				return caller.task.create(task);
+				return caller.task.create({ ...task, team });
 			}
 
 			rejectUnsupported({ labels: task.labels });

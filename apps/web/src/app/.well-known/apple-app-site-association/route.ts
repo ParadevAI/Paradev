@@ -8,7 +8,7 @@ export function GET(): Response {
 			details: [
 				{
 					appIDs: [IOS_APP.APP_ID],
-					components: [{ "/": "/page/*" }],
+					components: [{ "/": "/page/*" }, { "/": "/workspaces/*" }],
 				},
 			],
 		},

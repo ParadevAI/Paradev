@@ -7,6 +7,10 @@ on:
         type: string
         required: true
 
+defaults:
+  tools:
+    bun: 1.4.3
+
 jobs:
   approve:
     name: Approve production update
@@ -18,7 +22,6 @@ jobs:
     type: update
     environment: production
     params:
-      platform: ios
       channel: production
       message: ${{ inputs.message }}
       private_key_path: $UPDATES_SIGNING_KEY

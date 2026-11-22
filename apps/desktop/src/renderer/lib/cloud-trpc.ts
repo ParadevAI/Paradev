@@ -37,7 +37,14 @@ export const CLOUD_TRPC_ROUTER_ROOTS = [
 	"apiKey",
 	"automation",
 	"billing",
+	"channel",
+	"channelMessage",
+	"channelTask",
+	"channelThread",
 	"chat",
+	"chatHistory",
+	"chatMove",
+	"cloud",
 	"environment",
 	"githubUser",
 	"host",
@@ -51,6 +58,7 @@ export const CLOUD_TRPC_ROUTER_ROOTS = [
 	"team",
 	"user",
 	"v2Project",
+	"workspaceMove",
 ] as const;
 
 export const cloudTrpcClient = cloudTrpc.createClient({

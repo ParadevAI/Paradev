@@ -29,7 +29,7 @@ export function register(server: McpServer): void {
 				.uuid()
 				.nullish()
 				.describe(
-					"Superset only: filter by status ID. Call tasks_statuses_list if you don't have one.",
+					"Paradev only: filter by status ID. Call tasks_statuses_list if you don't have one.",
 				),
 			linearStatus: z
 				.enum(linearStatusFilterValues)
@@ -39,17 +39,17 @@ export function register(server: McpServer): void {
 				.string()
 				.min(1)
 				.nullish()
-				.describe("Linear only: team key, e.g. ENG."),
+				.describe("Filter by team key or name, e.g. ENG."),
 			priority: z
 				.enum(["urgent", "high", "medium", "low", "none"])
 				.nullish()
-				.describe("Superset only: filter by priority."),
+				.describe("Paradev only: filter by priority."),
 			assigneeId: z
 				.string()
 				.min(1)
 				.nullish()
 				.describe(
-					"Filter by assignee: a Superset user ID, or for Linear a Linear user id or email.",
+					"Filter by assignee: a Paradev user ID, or for Linear a Linear user id or email.",
 				),
 			assigneeMe: z
 				.boolean()
@@ -58,12 +58,19 @@ export function register(server: McpServer): void {
 			creatorMe: z
 				.boolean()
 				.nullish()
-				.describe("Superset only: tasks created by the calling user."),
+				.describe("Paradev only: tasks created by the calling user."),
 			search: z
 				.string()
 				.min(1)
 				.nullish()
 				.describe("Free-text search on title."),
+			labels: z
+				.array(z.string().trim().min(1))
+				.max(20)
+				.nullish()
+				.describe(
+					"Paradev only: label names. A task must have all of them (case-insensitive). A label also matches its sub-labels: acme matches acme/web.",
+				),
 			limit: z
 				.number()
 				.int()
@@ -82,10 +89,10 @@ export function register(server: McpServer): void {
 			const caller = createMcpCaller(ctx);
 			const { tracker, linearStatus, team, ...filters } = input;
 			if ((await resolveTracker(caller, tracker)) === "superset") {
-				if (team || linearStatus) {
-					throw new Error("team and linearStatus only apply to Linear issues");
+				if (linearStatus) {
+					throw new Error("linearStatus only applies to Linear issues");
 				}
-				return caller.task.list(filters);
+				return caller.task.list({ ...filters, team });
 			}
 			if (filters.offset + filters.limit > MAX_LINEAR_ISSUES) {
 				throw new Error(
@@ -97,6 +104,7 @@ export function register(server: McpServer): void {
 				statusId: filters.statusId,
 				priority: filters.priority,
 				creatorMe: filters.creatorMe,
+				labels: filters.labels,
 			});
 			const organizationId = ctx.organizationId;
 			const workspace =

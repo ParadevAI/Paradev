@@ -254,6 +254,12 @@ export interface EditorSyntaxColors {
 	tagName: string;
 	attributeName: string;
 	invalid: string;
+	operator: string;
+	punctuation: string;
+	property: string;
+	parameter: string;
+	heading: string;
+	link: string;
 }
 
 /**
@@ -295,6 +301,7 @@ export interface Theme {
 	terminal?: TerminalColors;
 	/** Code editor and diff colors (optional, otherwise derived from UI + terminal tokens) */
 	editor?: EditorThemeOverrides;
+	css?: string;
 
 	/** Whether this is a built-in theme */
 	isBuiltIn?: boolean;

@@ -26,12 +26,16 @@ import { useConnector } from "./hooks/useConnector";
 interface ConnectorSectionProps {
 	slug: string;
 	organizationId?: string | null;
+	connectOnly?: boolean;
+	plugin?: string;
 	onConnected?: () => void;
 }
 
 export function ConnectorSection({
 	slug,
 	organizationId,
+	connectOnly = false,
+	plugin,
 	onConnected,
 }: ConnectorSectionProps) {
 	const { t } = useLingui();
@@ -64,7 +68,7 @@ export function ConnectorSection({
 		(entry) => entry.type !== "api_key",
 	);
 
-	const connected = connections.length > 0 && (
+	const connected = !connectOnly && connections.length > 0 && (
 		<div className="w-full min-w-0 divide-y divide-border/40 rounded-lg border border-border/60">
 			{connections.map((connection) => {
 				const { title, subtitle } = accountLabels(
@@ -97,7 +101,7 @@ export function ConnectorSection({
 								variant="ghost"
 								size="sm"
 								className="shrink-0"
-								onClick={() => openOAuth(oauthMethod.type)}
+								onClick={() => openOAuth(oauthMethod.type, plugin)}
 							>
 								<Trans>Reconnect</Trans>
 							</Button>
@@ -134,15 +138,15 @@ export function ConnectorSection({
 				onOpenChange={(open) => {
 					if (!open) setRenaming(null);
 				}}
-				onSubmit={(nickname) => {
-					if (renaming) rename.mutate({ connectionId: renaming, nickname });
+				onSubmit={(label) => {
+					if (renaming) rename.mutate({ connectionId: renaming, label });
 					setRenaming(null);
 				}}
 			/>
 		</div>
 	);
 
-	if (connections.length > 0 && !addingAccount) {
+	if (!connectOnly && connections.length > 0 && !addingAccount) {
 		return (
 			<div className="w-full min-w-0 space-y-3">
 				{connected}
@@ -238,7 +242,10 @@ export function ConnectorSection({
 					</Button>
 				</form>
 			) : (
-				<Button className="w-full" onClick={() => openOAuth(method.type)}>
+				<Button
+					className="w-full"
+					onClick={() => openOAuth(method.type, plugin)}
+				>
 					{t({ message: `Continue to ${connector.displayName}` })}
 					<LuExternalLink className="ml-1.5 size-3.5" />
 				</Button>

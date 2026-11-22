@@ -11,14 +11,14 @@
 	},
 	"scripts": {
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
-		"test": "bun test --isolate --pass-with-no-tests"
+		"test": "bun test --pass-with-no-tests"
 	},
 	"dependencies": {
 		"superjson": "2.2.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
-		"@types/bun": "1.4.2",
+		"@types/bun": "1.4.3",
 		"@types/node": "24.12.0",
 		"typescript": "7.0.2"
 	}

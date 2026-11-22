@@ -48,6 +48,13 @@ final class ComposerModel {
   /// chevron button reporting its id. Empty for agents that have none.
   var launchOptions: [ComposerMenuOption] = []
 
+  /// The agent's permission modes, drawn as one menu beside `+`. Empty hides it.
+  var modeOptions: [ComposerModeOption] = []
+  var selectedModeId: String?
+
+  /// The agent is working. With an empty draft, send turns into stop.
+  var canStop = false
+
   /// A submit is in flight. The caller owns this — only it knows when delivery
   /// finished — and while it is true the send button shows a spinner and the
   /// mic gets out of the way.
@@ -123,6 +130,8 @@ final class ComposerModel {
   @ObservationIgnored var onDictationError: ((String) -> Void)?
   @ObservationIgnored var onModelPress: (() -> Void)?
   @ObservationIgnored var onLaunchOptionPress: ((String) -> Void)?
+  @ObservationIgnored var onModeSelect: ((String) -> Void)?
+  @ObservationIgnored var onStop: (() -> Void)?
   @ObservationIgnored var onChipPress: ((String) -> Void)?
   @ObservationIgnored var onQuickKeyPress: ((String) -> Void)?
   /// The session strip reports by id and knows nothing else. Selecting swaps
@@ -219,11 +228,11 @@ final class ComposerModel {
     onDraftChange?(text)
   }
 
-  /// Empties the draft. Animated, so the card shrinks back, but reports
-  /// nothing out: React Native calls this while clearing its own copy, so an
-  /// echo would be a bridge round trip to tell the caller what it just did.
+  /// Reported out even though React Native clears its own copy first: a
+  /// change the field sent before this (losing focus on send) can still be in
+  /// flight, and would land after that clear and restore the sent text.
   func clearDraft() {
-    withAnimation(ComposerMetrics.typingGrowth) { draft = "" }
+    setDraft("")
   }
 
   /// The draft React Native saved for this surface, put back once as the view
@@ -245,7 +254,7 @@ final class ComposerModel {
     let addition = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !addition.isEmpty else { return }
     let base = draft.trimmingCharacters(in: .whitespaces)
-    setDraft(base.isEmpty ? addition : base + " " + addition)
+    setDraft(ComposerDictatedText.join(base, addition))
   }
 
   func submit() {

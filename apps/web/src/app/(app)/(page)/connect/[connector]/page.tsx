@@ -81,7 +81,7 @@ export default async function ConnectorPage({
 						{i18n._(
 							msg({
 								message:
-									"Authorize Superset so your plugins, automations and triggers can act on your behalf.",
+									"Authorize Paradev so your plugins, automations and triggers can act on your behalf.",
 							}),
 						)}
 					</CardDescription>
@@ -97,7 +97,6 @@ export default async function ConnectorPage({
 							id: row.id,
 							externalAccountLabel: row.externalAccountLabel,
 							externalUserLabel: row.externalUserLabel,
-							nickname: row.nickname,
 							needsReauth: row.needsReauth,
 						}))}
 					/>

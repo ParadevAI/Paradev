@@ -8,11 +8,19 @@ import type {
 	Decision,
 	UserContent,
 } from "@superset/chat/protocol";
+import { attachedFilesBlock } from "../../attachedFiles";
 import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
 } from "../../types";
+import {
+	type AskedQuestion,
+	answeredInput,
+	askedQuestions,
+	questionForm,
+} from "../askUserQuestion";
 import { ClaudeTranslator } from "../translateStream";
 
 type SdkParams = Parameters<typeof sdkQuery>[0];
@@ -26,6 +34,7 @@ type SdkOptions = NonNullable<SdkParams["options"]>;
 export type ClaudeQueryOptions = Pick<
 	SdkOptions,
 	| "abortController"
+	| "allowDangerouslySkipPermissions"
 	| "canUseTool"
 	| "cwd"
 	| "env"
@@ -41,9 +50,26 @@ type PermissionResult = Awaited<
 	ReturnType<NonNullable<SdkOptions["canUseTool"]>>
 >;
 
+type ClaudePermissionMode = NonNullable<SdkOptions["permissionMode"]>;
+
 export type ClaudeSession = AsyncIterable<unknown> & {
 	interrupt?: () => Promise<unknown>;
+	setPermissionMode?: (mode: ClaudePermissionMode) => Promise<unknown>;
 };
+
+export const CLAUDE_MODES = [
+	{ id: "default", label: "Ask for approval" },
+	{ id: "acceptEdits", label: "Approve edits" },
+	{ id: "auto", label: "Approve for me" },
+	{ id: "plan", label: "Plan" },
+	{ id: "bypassPermissions", label: "Full access" },
+] as const satisfies readonly { id: ClaudePermissionMode; label: string }[];
+
+export const DEFAULT_CLAUDE_MODE: ClaudePermissionMode = "bypassPermissions";
+
+function claudeMode(modeId: string | undefined): ClaudePermissionMode {
+	return CLAUDE_MODES.find((mode) => mode.id === modeId)?.id ?? "default";
+}
 
 export type ClaudeQuery = (params: {
 	prompt: SdkParams["prompt"];
@@ -59,13 +85,17 @@ export type ClaudeAdapterOptions = {
 	query: ClaudeQuery;
 	pathToClaudeCodeExecutable?: string;
 	launch?: () => Promise<ClaudeLaunch>;
+	resolveAttachment?: ResolveAttachment;
 	now?: () => number;
 	mintId?: () => string;
 };
 
 type PendingApproval = {
 	toolUseId: string;
+	turnId: string;
 	input: Record<string, unknown>;
+	reason: string | undefined;
+	questions: AskedQuestion[] | undefined;
 	settle: (result: PermissionResult) => void;
 };
 
@@ -150,10 +180,29 @@ class PromptQueue {
 	}
 }
 
+type SdkUserContent = SDKUserMessage["message"]["content"];
+type SdkContentBlock = Exclude<SdkUserContent, string>[number];
+type ClaudeImageType = "image/png" | "image/jpeg" | "image/gif" | "image/webp";
+
+const CLAUDE_IMAGE_TYPES = new Set<string>([
+	"image/png",
+	"image/jpeg",
+	"image/gif",
+	"image/webp",
+] satisfies ClaudeImageType[]);
+
 function promptText(content: UserContent[]): string {
 	return content
-		.map((part) => (part.type === "text" ? part.text : `[${part.name}]`))
+		.map((part) => (part.type === "text" ? part.text : ""))
 		.join("\n");
+}
+
+function userMessage(content: SdkUserContent): SDKUserMessage {
+	return {
+		type: "user",
+		message: { role: "user", content },
+		parent_tool_use_id: null,
+	};
 }
 
 export class ClaudeAdapter implements HarnessAdapter {
@@ -163,7 +212,10 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private readonly abortController = new AbortController();
 	private translator: ClaudeTranslator | null = null;
 	private session: ClaudeSession | null = null;
+	private sessionId: string | null = null;
+	private modeId: ClaudePermissionMode = "default";
 	private pump: Promise<void> | null = null;
+	private resolvingPrompt: Promise<void> | null = null;
 	private disposed = false;
 
 	constructor(private readonly options: ClaudeAdapterOptions) {}
@@ -176,6 +228,14 @@ export class ClaudeAdapter implements HarnessAdapter {
 		});
 		this.translator = translator;
 
+		this.modeId = claudeMode(
+			startOptions.modeId ??
+				(startOptions.resume ? undefined : DEFAULT_CLAUDE_MODE),
+		);
+		this.events.push({
+			kind: "session",
+			session: { modeId: this.modeId, availableModes: [...CLAUDE_MODES] },
+		});
 		void this.begin(startOptions, translator);
 		const events = this.events;
 		return {
@@ -214,11 +274,12 @@ export class ClaudeAdapter implements HarnessAdapter {
 				env: launch?.env,
 				includePartialMessages: true,
 				settingSources: [],
-				permissionMode: "default",
+				permissionMode: this.modeId,
+				allowDangerouslySkipPermissions: true,
 				abortController: this.abortController,
 				resume: startOptions.resume?.harnessSessionId,
-				canUseTool: (_toolName, input, { toolUseID }) =>
-					this.requestApproval(input, toolUseID),
+				canUseTool: (toolName, input, { toolUseID, decisionReason }) =>
+					this.requestApproval(toolName, input, toolUseID, decisionReason),
 			},
 		});
 
@@ -227,11 +288,57 @@ export class ClaudeAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
-		this.prompts.push({
-			type: "user",
-			message: { role: "user", content: promptText(content) },
-			parent_tool_use_id: null,
+		const hasAttachment = content.some((part) => part.type === "attachment");
+		if (!hasAttachment && !this.resolvingPrompt) {
+			this.prompts.push(userMessage(promptText(content)));
+			return;
+		}
+		const blocks = this.contentBlocks(content);
+		const queued = (this.resolvingPrompt ?? Promise.resolve())
+			.then(() => blocks)
+			.then((resolved) => this.prompts.push(userMessage(resolved)));
+		this.resolvingPrompt = queued;
+		void queued.finally(() => {
+			if (this.resolvingPrompt === queued) this.resolvingPrompt = null;
 		});
+	}
+
+	private async contentBlocks(
+		content: UserContent[],
+	): Promise<SdkContentBlock[]> {
+		const blocks: SdkContentBlock[] = [];
+		for (const part of content) {
+			if (part.type === "text") {
+				if (part.text) blocks.push({ type: "text", text: part.text });
+				continue;
+			}
+			const file = await (
+				this.options.resolveAttachment?.(part) ?? Promise.resolve(null)
+			).catch(() => null);
+			if (!file) {
+				blocks.push({
+					type: "text",
+					text: `[${part.name}: could not be read]`,
+				});
+				continue;
+			}
+			blocks.push(
+				CLAUDE_IMAGE_TYPES.has(file.mimeType)
+					? {
+							type: "image",
+							source: {
+								type: "base64",
+								media_type: file.mimeType as ClaudeImageType,
+								data: file.data,
+							},
+						}
+					: {
+							type: "text",
+							text: attachedFilesBlock([{ name: part.name, path: file.path }]),
+						},
+			);
+		}
+		return blocks;
 	}
 
 	cancelTurn(): void {
@@ -251,7 +358,14 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (!pending) return;
 		this.approvals.delete(approvalId);
 
-		if (decision.type === "accept" || decision.type === "accept_for_session") {
+		if (pending.questions) {
+			pending.settle(
+				questionResult(pending.input, pending.questions, decision),
+			);
+		} else if (
+			decision.type === "accept" ||
+			decision.type === "accept_for_session"
+		) {
 			pending.settle({ behavior: "allow", updatedInput: pending.input });
 		} else {
 			this.translator?.markDeclined(pending.toolUseId);
@@ -262,12 +376,31 @@ export class ClaudeAdapter implements HarnessAdapter {
 			});
 		}
 
-		this.emitApproval(approvalId, pending.toolUseId, "answered", decision);
+		this.emitApproval(approvalId, pending, "answered", decision);
+		if (this.approvals.size === 0) {
+			const status = this.translator?.currentTurnId ? "running" : "idle";
+			this.events.push({ kind: "session", session: { status } });
+		}
 		if (decision.type === "cancel") this.cancelTurn();
 	}
 
-	setMode(modeId: string): void {
-		this.events.push({ kind: "session", session: { modeId } });
+	setMode(modeId: string): Promise<boolean> {
+		const previous = this.modeId;
+		const next = claudeMode(modeId);
+		this.modeId = next;
+		this.events.push({ kind: "session", session: { modeId: next } });
+		const applied = this.session?.setPermissionMode?.(next);
+		if (!applied) return Promise.resolve(true);
+		return applied.then(
+			() => true,
+			() => {
+				if (this.modeId === next) {
+					this.modeId = previous;
+					this.events.push({ kind: "session", session: { modeId: previous } });
+				}
+				return false;
+			},
+		);
 	}
 
 	async dispose(): Promise<void> {
@@ -289,49 +422,106 @@ export class ClaudeAdapter implements HarnessAdapter {
 		try {
 			for await (const message of stream) {
 				if (this.disposed) return;
-				for (const event of translator.translate(message)) {
-					this.events.push(event);
-				}
+				this.reportSessionId(message);
+				this.pushAll(translator.translate(message));
 			}
 		} catch (error) {
-			for (const event of translator.interrupt(String(error))) {
-				this.events.push(event);
+			const waiting = this.approvals.size > 0;
+			const message = error instanceof Error ? error.message : String(error);
+			const canceled =
+				this.abortController.signal.aborted || translator.interruptRequested;
+			this.pushAll(
+				canceled ? translator.interrupt(message) : translator.fail(message),
+			);
+			if (waiting) {
+				this.events.push({ kind: "session", session: { status: "idle" } });
+				return;
+			}
+		}
+		if (this.staleApprovals()) {
+			this.events.push({ kind: "session", session: { status: "idle" } });
+		}
+		if (!this.disposed) this.events.close();
+	}
+
+	private pushAll(events: AdapterEvent[]): void {
+		for (const event of events) {
+			this.events.push(event);
+			if (event.kind === "turn" && event.turn.status !== "running") {
+				this.staleApprovals();
 			}
 		}
 	}
 
+	private staleApprovals(): boolean {
+		const stale = [...this.approvals];
+		this.approvals.clear();
+		for (const [approvalId, pending] of stale) {
+			pending.settle({ behavior: "deny", message: "The turn ended." });
+			this.emitApproval(approvalId, pending, "stale");
+		}
+		return stale.length > 0;
+	}
+
+	private reportSessionId(message: unknown): void {
+		if (typeof message !== "object" || message === null) return;
+		const sessionId = (message as { session_id?: unknown }).session_id;
+		if (typeof sessionId !== "string" || sessionId === this.sessionId) return;
+		this.sessionId = sessionId;
+		this.events.push({
+			kind: "session",
+			session: { harnessSessionId: sessionId },
+		});
+	}
+
 	private requestApproval(
+		toolName: string,
 		input: Record<string, unknown>,
 		toolUseId: string,
+		decisionReason: string | undefined,
 	): Promise<PermissionResult> {
+		const questions =
+			toolName === "AskUserQuestion" ? askedQuestions(input) : undefined;
+		if (questions === null) {
+			return Promise.resolve({
+				behavior: "deny",
+				message: "AskUserQuestion called with no valid questions.",
+			});
+		}
+		const reason = questions ? undefined : decisionReason?.trim() || undefined;
 		const approvalId = this.mintId();
+		const turnId = this.translator?.currentTurnId ?? "unattributed";
 		return new Promise<PermissionResult>((settle) => {
-			this.approvals.set(approvalId, { toolUseId, input, settle });
-			this.emitApproval(approvalId, toolUseId, "pending");
+			const pending = { toolUseId, turnId, input, reason, questions, settle };
+			this.approvals.set(approvalId, pending);
+			this.emitApproval(approvalId, pending, "pending");
+			this.events.push({
+				kind: "session",
+				session: { status: "awaiting_input" },
+			});
 		});
 	}
 
 	private emitApproval(
 		approvalId: string,
-		toolUseId: string,
+		{ toolUseId, turnId, reason, questions }: PendingApproval,
 		status: ApprovalRequest["status"],
 		decision?: Decision,
 	): void {
+		const form = questions ? questionForm(questions) : undefined;
 		const item: ApprovalRequest = {
 			id: approvalId,
 			kind: "approval_request",
 			startedAtMs: this.now(),
 			...(status === "pending" ? {} : { completedAtMs: this.now() }),
 			targetItemId: toolUseId,
-			title: "Allow this tool call?",
+			title: form?.message ?? "Allow this tool call?",
+			...(form ? { form } : {}),
+			...(reason ? { reason } : {}),
 			status,
 			...(decision ? { decision } : {}),
 		};
-		this.events.push({
-			kind: "item",
-			item,
-			turnId: this.translator?.currentTurnId ?? "unattributed",
-		});
+		this.events.push({ kind: "item", item, turnId });
 	}
 
 	private now(): number {
@@ -341,4 +531,21 @@ export class ClaudeAdapter implements HarnessAdapter {
 	private mintId(): string {
 		return (this.options.mintId ?? randomUUID)();
 	}
+}
+
+function questionResult(
+	input: Record<string, unknown>,
+	questions: AskedQuestion[],
+	decision: Decision,
+): PermissionResult {
+	if (decision.type === "cancel") {
+		return { behavior: "deny", message: "User canceled.", interrupt: true };
+	}
+	return {
+		behavior: "allow",
+		updatedInput:
+			decision.type === "form"
+				? answeredInput(input, questions, decision.values)
+				: { ...input, answers: {} },
+	};
 }
