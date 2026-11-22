@@ -64,6 +64,7 @@ import { targetKeyFor } from "./components/NewChatWidget/hooks/useNewChatTargets
 import { useNewSessionPreferencesStore } from "./components/NewChatWidget/stores/newSessionPreferencesStore";
 import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton";
 import { PeriodHeader } from "./components/PeriodHeader";
+import { PlaceEmptyNote } from "./components/PlaceEmptyNote";
 import { ProjectSectionHeader } from "./components/ProjectSectionHeader";
 import { ScopeBar } from "./components/ScopeBar";
 import { WorkspaceRow } from "./components/WorkspaceRow";
@@ -474,8 +475,22 @@ export function HomeScreen() {
 					online: host.isOnline,
 					lastSeenAt: host.lastSeenAt,
 					items: hostSections.get(host.machineId) ?? [],
+					emptyLabel: !host.isOnline
+						? t({ message: "No saved workspaces" })
+						: workspacesByHost.get(host.machineId)?.isReady
+							? t({ message: "No workspaces on this host yet" })
+							: undefined,
 				})),
-				cloud: cloudInAll ? { name: "Cloud", items: cloudListItems } : null,
+				cloud: cloudInAll
+					? {
+							name: "Cloud",
+							items: cloudListItems,
+							emptyLabel:
+								activeCloud.length > 0
+									? t({ message: "No cloud workspaces match these filters" })
+									: t({ message: "No cloud workspaces yet" }),
+						}
+					: null,
 			});
 		}
 		if (!selectedHost) return [];
@@ -511,6 +526,8 @@ export function HomeScreen() {
 		allScope,
 		scopeHosts,
 		hostSections,
+		workspacesByHost,
+		activeCloud,
 		cloudInAll,
 		selectedHost,
 		showOfflinePlaceholder,
@@ -661,6 +678,9 @@ export function HomeScreen() {
 		(item: HomeListItem, card: boolean) => {
 			if (item.kind === "periodHeader") {
 				return <PeriodHeader label={item.label} />;
+			}
+			if (item.kind === "placeEmpty") {
+				return <PlaceEmptyNote label={item.label} />;
 			}
 			if (item.kind === "hostLabel") {
 				return (

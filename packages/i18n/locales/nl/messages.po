@@ -13337,6 +13337,9 @@ msgstr "Geen enkele vacature past bij mij. Moet ik toch contact opnemen?"
 msgid "No runs yet"
 msgstr "Nog geen runs"
 
+msgid "No saved workspaces"
+msgstr "Geen opgeslagen werkruimtes"
+
 msgid "No screenshots yet"
 msgstr "Nog geen screenshots"
 

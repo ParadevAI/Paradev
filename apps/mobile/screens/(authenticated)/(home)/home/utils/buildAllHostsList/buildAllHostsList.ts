@@ -6,9 +6,20 @@ export interface AllHostsPlace {
 	online: boolean;
 	lastSeenAt?: number | null;
 	items: HomeListItem[];
+	/** Says why a place has no rows; unset while that is not known yet. */
+	emptyLabel?: string;
 }
 
 export const CLOUD_PLACE_ID = "cloud";
+
+const withEmptyNote = (
+	placeId: string,
+	items: HomeListItem[],
+	emptyLabel: string | undefined,
+): HomeListItem[] =>
+	items.length === 0 && emptyLabel
+		? [{ kind: "placeEmpty", placeId, label: emptyLabel }]
+		: items;
 
 /**
  * Every place in one list, each under a flat label rather than a level of
@@ -20,7 +31,7 @@ export function buildAllHostsList({
 }: {
 	hosts: readonly AllHostsPlace[];
 	/** Null where Cloud is not offered. */
-	cloud: { name: string; items: HomeListItem[] } | null;
+	cloud: { name: string; items: HomeListItem[]; emptyLabel?: string } | null;
 }): HomeListItem[] {
 	const byName = (a: AllHostsPlace, b: AllHostsPlace) =>
 		a.name.localeCompare(b.name);
@@ -33,7 +44,7 @@ export function buildAllHostsList({
 			online: host.online,
 			lastSeenAt: host.lastSeenAt,
 		},
-		...host.items,
+		...withEmptyNote(host.machineId, host.items, host.emptyLabel),
 	];
 	return [
 		...hosts
@@ -49,7 +60,7 @@ export function buildAllHostsList({
 						cloud: true,
 						online: true,
 					} satisfies HomeListItem,
-					...cloud.items,
+					...withEmptyNote(CLOUD_PLACE_ID, cloud.items, cloud.emptyLabel),
 				]
 			: []),
 		...hosts

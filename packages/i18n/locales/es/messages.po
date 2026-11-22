@@ -13337,6 +13337,9 @@ msgstr "Ningún puesto encaja conmigo. ¿Debería escribirles igualmente?"
 msgid "No runs yet"
 msgstr "Aún no hay ejecuciones"
 
+msgid "No saved workspaces"
+msgstr "No hay espacios de trabajo guardados"
+
 msgid "No screenshots yet"
 msgstr "Aún no hay capturas"
 

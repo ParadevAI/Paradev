@@ -13337,6 +13337,9 @@ msgstr "Мне не подходит ни одна вакансия. Стоит 
 msgid "No runs yet"
 msgstr "Запусков пока нет"
 
+msgid "No saved workspaces"
+msgstr "Нет сохранённых рабочих областей"
+
 msgid "No screenshots yet"
 msgstr "Скриншотов пока нет"
 

@@ -13337,6 +13337,9 @@ msgstr "Żadne stanowisko do mnie nie pasuje. Czy mimo to warto się odezwać?"
 msgid "No runs yet"
 msgstr "Brak uruchomień"
 
+msgid "No saved workspaces"
+msgstr "Brak zapisanych obszarów roboczych"
+
 msgid "No screenshots yet"
 msgstr "Brak zrzutów ekranu"
 

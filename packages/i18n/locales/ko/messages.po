@@ -13337,6 +13337,9 @@ msgstr "맞는 포지션이 없어요. 그래도 연락해도 될까요?"
 msgid "No runs yet"
 msgstr "아직 실행 기록이 없습니다"
 
+msgid "No saved workspaces"
+msgstr "저장된 워크스페이스가 없습니다"
+
 msgid "No screenshots yet"
 msgstr "아직 스크린샷이 없습니다"
 

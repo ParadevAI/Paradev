@@ -13337,6 +13337,9 @@ msgstr "Nenhuma vaga combina comigo. Ainda assim devo entrar em contato?"
 msgid "No runs yet"
 msgstr "Nenhuma execução ainda"
 
+msgid "No saved workspaces"
+msgstr "Nenhuma área de trabalho salva"
+
 msgid "No screenshots yet"
 msgstr "Nenhuma captura de tela ainda"
 

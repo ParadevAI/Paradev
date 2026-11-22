@@ -13337,6 +13337,9 @@ msgstr "No role fits me. Should I still reach out?"
 msgid "No runs yet"
 msgstr "No runs yet"
 
+msgid "No saved workspaces"
+msgstr "No saved workspaces"
+
 msgid "No screenshots yet"
 msgstr "No screenshots yet"
 

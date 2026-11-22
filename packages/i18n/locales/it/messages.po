@@ -13337,6 +13337,9 @@ msgstr "Nessun ruolo fa per me. Devo comunque contattarvi?"
 msgid "No runs yet"
 msgstr "Nessuna esecuzione"
 
+msgid "No saved workspaces"
+msgstr "Nessun workspace salvato"
+
 msgid "No screenshots yet"
 msgstr "Ancora nessuno screenshot"
 

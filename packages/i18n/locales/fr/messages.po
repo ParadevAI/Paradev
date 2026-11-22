@@ -13337,6 +13337,9 @@ msgstr "Aucun poste ne me correspond. Dois-je quand même vous contacter ?"
 msgid "No runs yet"
 msgstr "Aucune exécution pour l'instant"
 
+msgid "No saved workspaces"
+msgstr "Aucun espace de travail enregistré"
+
 msgid "No screenshots yet"
 msgstr "Aucune capture d'écran pour l'instant"
 

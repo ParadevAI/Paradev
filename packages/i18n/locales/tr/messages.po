@@ -13337,6 +13337,9 @@ msgstr "Bana uyan bir pozisyon yok. Yine de iletişime geçmeli miyim?"
 msgid "No runs yet"
 msgstr "Henüz çalıştırma yok"
 
+msgid "No saved workspaces"
+msgstr "Kayıtlı çalışma alanı yok"
+
 msgid "No screenshots yet"
 msgstr "Henüz ekran görüntüsü yok"
 

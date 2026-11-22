@@ -13337,6 +13337,9 @@ msgstr "Không có vị trí nào phù hợp với tôi. Tôi có nên liên h�
 msgid "No runs yet"
 msgstr "Chưa có lần chạy nào"
 
+msgid "No saved workspaces"
+msgstr "Không có workspace đã lưu"
+
 msgid "No screenshots yet"
 msgstr "Chưa có ảnh chụp màn hình nào"
 

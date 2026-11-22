@@ -47,6 +47,8 @@ const describeItem = (item: HomeListItem) => {
 			return `ws:${item.workspace.id}${item.offline ? ":offline" : ""}`;
 		case "cloudRow":
 			return `cloud:${item.row.id}`;
+		case "placeEmpty":
+			return `empty:${item.label}`;
 		default:
 			return item.kind;
 	}
@@ -104,6 +106,34 @@ describe("buildAllHostsList", () => {
 			"label:Studio:offline",
 			"project:demo:offline",
 			"ws:m3-ws:offline",
+		]);
+	});
+
+	test("says why an empty place has no rows, and only when that is known", () => {
+		const list = buildAllHostsList({
+			hosts: [
+				{ machineId: "m1", name: "Alpha", online: true, items: [] },
+				{
+					machineId: "m2",
+					name: "Studio",
+					online: false,
+					lastSeenAt: null,
+					items: [],
+					emptyLabel: "No saved workspaces",
+				},
+			],
+			cloud: {
+				name: "Cloud",
+				items: [],
+				emptyLabel: "No cloud workspaces yet",
+			},
+		});
+		expect(list.map(describeItem)).toEqual([
+			"label:Alpha",
+			"label:Cloud",
+			"empty:No cloud workspaces yet",
+			"label:Studio:offline",
+			"empty:No saved workspaces",
 		]);
 	});
 

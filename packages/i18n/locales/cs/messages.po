@@ -13337,6 +13337,9 @@ msgstr "Žádná pozice mi nesedí. Mám se i tak ozvat?"
 msgid "No runs yet"
 msgstr "Zatím žádné běhy"
 
+msgid "No saved workspaces"
+msgstr "Žádné uložené pracovní prostory"
+
 msgid "No screenshots yet"
 msgstr "Zatím žádné snímky obrazovky"
 

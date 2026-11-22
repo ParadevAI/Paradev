@@ -13337,6 +13337,9 @@ msgstr "没有适合我的职位，还可以联系你们吗？"
 msgid "No runs yet"
 msgstr "还没有运行过"
 
+msgid "No saved workspaces"
+msgstr "没有已保存的工作区"
+
 msgid "No screenshots yet"
 msgstr "暂无截图"
 

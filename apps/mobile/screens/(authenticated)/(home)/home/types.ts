@@ -24,6 +24,11 @@ export type HomeListItem =
 			lastSeenAt?: number | null;
 	  }
 	| {
+			kind: "placeEmpty";
+			placeId: string;
+			label: string;
+	  }
+	| {
 			kind: "projectHeader";
 			machineId: string;
 			projectId: string;
@@ -68,6 +73,8 @@ export function homeListItemKey(item: HomeListItem): string {
 	switch (item.kind) {
 		case "hostLabel":
 			return `host:${item.placeId}`;
+		case "placeEmpty":
+			return `empty:${item.placeId}`;
 		case "projectHeader":
 			return `project:${item.machineId}:${item.projectId}`;
 		case "folderHeader":

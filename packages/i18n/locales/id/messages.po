@@ -13337,6 +13337,9 @@ msgstr "Tidak ada posisi yang cocok untuk saya. Apakah saya tetap boleh menghubu
 msgid "No runs yet"
 msgstr "Belum ada run"
 
+msgid "No saved workspaces"
+msgstr "Tidak ada workspace tersimpan"
+
 msgid "No screenshots yet"
 msgstr "Belum ada tangkapan layar"
 

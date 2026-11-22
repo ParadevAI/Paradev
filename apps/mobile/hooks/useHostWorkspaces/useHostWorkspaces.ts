@@ -10,25 +10,21 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 
+import {
+	combineHostWorkspaces,
+	getHostWorkspacesQueryKey,
+	type HostWorkspacesState,
+	hostWorkspacesQueryOptions,
+	type WorkspacesHost,
+} from "./hostWorkspacesQuery";
+
 export type { HostWorkspaceRow } from "@/lib/host-service/client";
-
-export interface HostWorkspaceItem extends HostWorkspaceRow {
-	/** False when the rows are cached and the host stopped answering. */
-	hostReachable: boolean;
-}
-
-export interface WorkspacesHost {
-	organizationId: string;
-	machineId: string;
-	isOnline: boolean;
-}
-
-const WORKSPACES_REFETCH_INTERVAL_MS = 30_000;
-
-/** Independent of the host's URL, so an offline host keeps its cached rows. */
-export function getHostWorkspacesQueryKey(machineId: string | null) {
-	return ["host-service", "workspaces", "list", machineId] as const;
-}
+export {
+	getHostWorkspacesQueryKey,
+	type HostWorkspaceItem,
+	type HostWorkspacesState,
+	type WorkspacesHost,
+} from "./hostWorkspacesQuery";
 
 export interface HostWorkspacesCacheOps {
 	/** Resolve the URL to reach the host owning `hostId` (null = unreachable). */
@@ -39,15 +35,6 @@ export interface HostWorkspacesCacheOps {
 	invalidateHost: (hostId: string) => void;
 }
 
-export interface HostWorkspacesState {
-	workspaces: HostWorkspaceItem[];
-	/**
-	 * True once the host answered or failed, or is offline. Gates empty
-	 * states only — existing rows always render (cache-first rule).
-	 */
-	isReady: boolean;
-}
-
 export interface UseHostWorkspacesResult extends HostWorkspacesState {
 	cache: HostWorkspacesCacheOps;
 }
@@ -56,7 +43,8 @@ export interface UseHostsWorkspacesResult extends UseHostWorkspacesResult {
 	byHost: Map<string, HostWorkspacesState>;
 }
 
-const NO_WORKSPACES: HostWorkspaceItem[] = [];
+const listWorkspaces = (hostUrl: string): Promise<HostWorkspaceRow[]> =>
+	getHostServiceClientByUrl(hostUrl).workspace.list.query();
 
 /**
  * Workspaces served by each host's `workspace.list` over the relay. Only
@@ -75,40 +63,19 @@ export function useHostsWorkspaces(
 	const stableHosts = useMemo(() => hosts, [hostsKey]);
 
 	const combine = useCallback(
-		(results: UseQueryResult<HostWorkspaceRow[]>[]) => {
-			const byHost = new Map<string, HostWorkspacesState>();
-			stableHosts.forEach((host, index) => {
-				const query = results[index];
-				const reachable = host.isOnline && !query?.isError;
-				byHost.set(host.machineId, {
-					workspaces:
-						query?.data?.map((row) => ({ ...row, hostReachable: reachable })) ??
-						NO_WORKSPACES,
-					isReady: !host.isOnline || !!query?.isSuccess || !!query?.isError,
-				});
-			});
-			return byHost;
-		},
+		(results: UseQueryResult<HostWorkspaceRow[]>[]) =>
+			combineHostWorkspaces(stableHosts, results),
 		[stableHosts],
 	);
 
 	const byHost = useQueries({
-		queries: stableHosts.map((host) => {
-			const hostUrl = host.isOnline
-				? hostServiceUrl(host.organizationId, host.machineId)
-				: null;
-			return {
-				queryKey: getHostWorkspacesQueryKey(host.machineId),
-				enabled: hostUrl !== null,
-				refetchInterval: WORKSPACES_REFETCH_INTERVAL_MS,
-				retry: 1,
-				networkMode: "always" as const,
-				queryFn: async (): Promise<HostWorkspaceRow[]> => {
-					if (!hostUrl) return [];
-					return getHostServiceClientByUrl(hostUrl).workspace.list.query();
-				},
-			};
-		}),
+		queries: stableHosts.map((host) =>
+			hostWorkspacesQueryOptions(
+				host,
+				hostServiceUrl(host.organizationId, host.machineId),
+				listWorkspaces,
+			),
+		),
 		combine,
 	});
 

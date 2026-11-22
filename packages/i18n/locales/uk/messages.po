@@ -13331,6 +13331,9 @@ msgstr "Мені не підходить жодна роль. Чи варто в
 msgid "No runs yet"
 msgstr "Запусків ще немає"
 
+msgid "No saved workspaces"
+msgstr "Немає збережених робочих просторів"
+
 msgid "No screenshots yet"
 msgstr "Знімків екрана ще немає"
 
