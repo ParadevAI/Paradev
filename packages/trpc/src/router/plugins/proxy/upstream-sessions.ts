@@ -1,6 +1,6 @@
 import type { Redis } from "@upstash/redis";
 
-export const UPSTREAM_SESSION_IDLE_SECONDS = 60 * 60;
+const UPSTREAM_SESSION_IDLE_SECONDS = 60 * 60;
 
 export interface ResumableSession {
 	sessionId: string;
