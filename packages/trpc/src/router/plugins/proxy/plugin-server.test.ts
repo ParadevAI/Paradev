@@ -9,9 +9,14 @@ import {
 	type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { at } from "../../../../test/at";
+import { memoryRedis, unreachableRedis } from "../../../../test/session-redis";
 import { buildPluginServer, endUpstreamSessions } from "./plugin-server";
 import { type PluginTarget, PluginTargetError } from "./resolve-target";
-import type { ResumableSession, UpstreamSessions } from "./upstream-sessions";
+import {
+	type ResumableSession,
+	type UpstreamSessions,
+	upstreamSessions,
+} from "./upstream-sessions";
 
 const TOOL: Tool = {
 	name: "send_email",
@@ -626,6 +631,8 @@ describe("a vendor that keeps state per MCP session", () => {
 			initialized: 0,
 			deleted: [] as string[],
 			resumedWith: [] as (string | null)[],
+			refuseNextResumed: undefined as number | undefined,
+			refuseAll: undefined as number | undefined,
 		};
 
 		const open = async () => {
@@ -664,32 +671,33 @@ describe("a vendor that keeps state per MCP session", () => {
 			init?: RequestInit,
 		) => {
 			const request = new Request(url, init);
+			if (vendor.refuseAll)
+				return new Response(null, { status: vendor.refuseAll });
 			const id = request.headers.get("mcp-session-id");
 			if (!id) return (await open()).handleRequest(request);
 			const transport = live.get(id);
 			if (!transport) return new Response(null, { status: 404 });
+			const refusal = vendor.refuseNextResumed;
+			if (refusal && request.method === "POST") {
+				vendor.refuseNextResumed = undefined;
+				return new Response(null, { status: refusal });
+			}
 			vendor.resumedWith.push(request.headers.get("mcp-protocol-version"));
 			return transport.handleRequest(request);
 		}) as typeof fetch);
 		return vendor;
 	}
 
-	function memorySessions(): UpstreamSessions & {
-		stored: Map<string, ResumableSession>;
-	} {
-		const stored = new Map<string, ResumableSession>();
-		return {
-			stored,
-			get: async (connectionId) => stored.get(connectionId) ?? null,
-			set: async (connectionId, session) => {
-				stored.set(connectionId, session);
-			},
-			takeAll: async () => {
-				const all = Object.fromEntries(stored);
-				stored.clear();
-				return all;
-			},
-		};
+	function callerSession(userId = "user-a") {
+		const store = memoryRedis();
+		const sessions = upstreamSessions(store.redis, userId, randomUUID());
+		const stored = () =>
+			[...store.hashes.values()].flatMap((fields) =>
+				[...fields.values()].map(
+					(session) => (session as ResumableSession).sessionId,
+				),
+			);
+		return { ...store, sessions, stored };
 	}
 
 	const remote: PluginTarget = {
@@ -705,8 +713,9 @@ describe("a vendor that keeps state per MCP session", () => {
 		sessions: UpstreamSessions | undefined,
 		name: string,
 		args: Record<string, unknown> = {},
+		rejected: string[] = [],
 	): Promise<string> {
-		const { client, close } = await connect(remote, [], sessions);
+		const { client, close } = await connect(remote, rejected, sessions);
 		try {
 			const result = await client.callTool({ name, arguments: args });
 			return JSON.stringify(result.content);
@@ -721,7 +730,7 @@ describe("a vendor that keeps state per MCP session", () => {
 
 	test("a value set in one request is still there in the next", async () => {
 		const vendor = stubVendor();
-		const sessions = memorySessions();
+		const { sessions } = callerSession();
 
 		await callOnce(sessions, "switch_project", { project: "Production" });
 		expect(await callOnce(sessions, "project_get")).toContain("Production");
@@ -731,36 +740,113 @@ describe("a vendor that keeps state per MCP session", () => {
 
 	test("two caller sessions on one connection get separate vendor sessions", async () => {
 		stubVendor();
-		const first = memorySessions();
 
-		await callOnce(first, "switch_project", { project: "Production" });
-		expect(await callOnce(memorySessions(), "project_get")).toContain(
+		await callOnce(callerSession().sessions, "switch_project", {
+			project: "Production",
+		});
+		expect(await callOnce(callerSession().sessions, "project_get")).toContain(
 			"Default",
 		);
 	});
 
 	test("a session the vendor expired is opened again and the call runs", async () => {
 		const vendor = stubVendor();
-		const sessions = memorySessions();
+		const { sessions, stored } = callerSession();
 
 		await callOnce(sessions, "switch_project", { project: "Production" });
-		const expired = sessions.stored.get("id-posthog")?.sessionId ?? "";
+		const expired = at(stored());
 		vendor.live.delete(expired);
 
 		expect(await callOnce(sessions, "project_get")).toContain("Default");
-		expect(sessions.stored.get("id-posthog")?.sessionId).not.toBe(expired);
+		expect(stored()).not.toContain(expired);
+		expect(stored()).toHaveLength(1);
+	});
+
+	for (const status of [400, 401]) {
+		test(`a resumed session answered ${status} is replaced once, with no rejection recorded`, async () => {
+			const vendor = stubVendor();
+			const { sessions, stored } = callerSession();
+			const rejected: string[] = [];
+
+			await callOnce(sessions, "switch_project", { project: "Production" });
+			const dropped = at(stored());
+			vendor.refuseNextResumed = status;
+
+			expect(await callOnce(sessions, "project_get", {}, rejected)).toContain(
+				"Default",
+			);
+			expect(stored()).not.toContain(dropped);
+			expect(rejected).toEqual([]);
+		});
+	}
+
+	test("a fresh session that is rejected too records the rejection", async () => {
+		const vendor = stubVendor();
+		const { sessions } = callerSession();
+		const rejected: string[] = [];
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		vendor.refuseAll = 401;
+		await callOnce(sessions, "project_get", {}, rejected);
+
+		expect(rejected).toEqual(["id-posthog"]);
+	});
+
+	test("a failed resumed call does not extend the session", async () => {
+		const vendor = stubVendor();
+		const { sessions, expired } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		const before = expired.length;
+		vendor.refuseNextResumed = 500;
+		await expect(callOnce(sessions, "project_get")).rejects.toThrow();
+
+		expect(expired).toHaveLength(before);
+	});
+
+	test("two first calls at once keep one vendor session and end the other", async () => {
+		const vendor = stubVendor();
+		const { sessions, stored } = callerSession();
+
+		await Promise.all([
+			callOnce(sessions, "project_get"),
+			callOnce(sessions, "project_get"),
+		]);
+
+		expect(vendor.initialized).toBe(2);
+		expect(stored()).toHaveLength(1);
+		expect(vendor.deleted).toHaveLength(1);
+		expect([...vendor.live.keys()]).toEqual(stored());
+	});
+
+	test("an unreachable session store falls back to one vendor session per call", async () => {
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		const vendor = stubVendor();
+		const sessions = upstreamSessions(
+			unreachableRedis(),
+			"user-a",
+			randomUUID(),
+		);
+		try {
+			await callOnce(sessions, "switch_project", { project: "Production" });
+			expect(await callOnce(sessions, "project_get")).toContain("Default");
+			expect(vendor.live.size).toBe(0);
+			expect(vendor.deleted).toHaveLength(2);
+		} finally {
+			warn.mockRestore();
+		}
 	});
 
 	test("ending the caller's session ends the vendor session", async () => {
 		const vendor = stubVendor();
-		const sessions = memorySessions();
+		const { sessions, stored, hashes } = callerSession();
 
 		await callOnce(sessions, "switch_project", { project: "Production" });
-		const { sessionId } = at([...sessions.stored.values()]);
+		const sessionId = at(stored());
 		await endUpstreamSessions(remote, sessions);
 
 		expect(vendor.deleted).toEqual([sessionId]);
-		expect(sessions.stored.size).toBe(0);
+		expect(hashes.size).toBe(0);
 	});
 
 	test("a caller with no session ends the vendor session after each call", async () => {

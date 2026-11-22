@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
 	isMcpUnauthorized,
@@ -28,6 +27,7 @@ import {
 	mcpProtectedResourceMetadataUrl,
 	mcpUnauthorizedResponse,
 } from "@/lib/oauth-metadata";
+import { callerSessionId, withIssuedSessionId } from "./utils/callerSession";
 
 const redis = new Redis({
 	url: env.KV_REST_API_URL,
@@ -139,11 +139,10 @@ async function handle(
 		);
 	}
 
-	const callerSessionId = req.headers.get("mcp-session-id");
-	const sessions =
-		callerSessionId && z.uuid().safeParse(callerSessionId).success
-			? upstreamSessions(redis, ctx.userId, callerSessionId)
-			: undefined;
+	const sessionId = callerSessionId(req);
+	const sessions = sessionId
+		? upstreamSessions(redis, ctx.userId, sessionId)
+		: undefined;
 
 	let server: Awaited<ReturnType<typeof buildPluginServer>>;
 	try {
@@ -191,10 +190,10 @@ async function handle(
 			extra: { mcpContext: ctx },
 		},
 	});
-	if (!callerSessionId && req.method === "POST") {
-		response.headers.set("mcp-session-id", randomUUID());
-	}
-	return withRateLimitHeaders(response, rateLimitState);
+	return withRateLimitHeaders(
+		withIssuedSessionId(req, response),
+		rateLimitState,
+	);
 }
 
 export const maxDuration = 800;

@@ -23,7 +23,6 @@ export interface UpstreamSession {
 	client: Client;
 	/** Null when the vendor keeps no session. */
 	resumable(): ResumableSession | null;
-	/** Ends the vendor session; `client.close()` alone leaves it open. */
 	close(): Promise<void>;
 }
 
@@ -64,6 +63,9 @@ export async function upstreamClient(
 	};
 }
 
+// What a vendor answers for a session it has dropped, before it runs the call.
+const SESSION_GONE = new Set([400, 401, 404]);
+
 export async function callUpstream(
 	target: UpstreamTarget & { connectionId: string },
 	params: CallToolRequest["params"],
@@ -76,26 +78,35 @@ export async function callUpstream(
 		})) as CallToolResult;
 
 	const stored = await sessions?.get(target.connectionId);
-	if (stored) {
+	if (sessions && stored) {
 		const session = await upstreamClient(target, stored);
 		try {
-			return await call(session);
+			const result = await call(session);
+			await sessions.touch();
+			return result;
 		} catch (error) {
-			// The vendor answers 404 for a session it has expired, before it runs
-			// the call, so a fresh session can run it.
-			if (!(error instanceof StreamableHTTPError && error.code === 404))
+			if (
+				!(
+					error instanceof StreamableHTTPError &&
+					SESSION_GONE.has(error.code ?? 0)
+				)
+			)
 				throw error;
+			await sessions.drop(target.connectionId);
 		} finally {
 			await session.client.close();
 		}
 	}
 
 	const session = await upstreamClient(target);
-	const keep = sessions ? session.resumable() : null;
-	if (sessions && keep) await sessions.set(target.connectionId, keep);
+	const resumable = session.resumable();
+	const kept =
+		sessions && resumable
+			? await sessions.claim(target.connectionId, resumable)
+			: false;
 	try {
 		return await call(session);
 	} finally {
-		await (keep ? session.client.close() : session.close());
+		await (kept ? session.client.close() : session.close());
 	}
 }
