@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import {
+	isSessionRecovering,
 	nextRecoveryDelayMs,
 	SESSION_RECOVERY_BASE_DELAY_MS,
 	SESSION_RECOVERY_MAX_ATTEMPTS,
@@ -72,5 +73,37 @@ describe("nextRecoveryDelayMs", () => {
 			expect(lo as number).toBeGreaterThan(0);
 			expect(hi as number).toBeGreaterThanOrEqual(lo as number);
 		}
+	});
+});
+
+describe("isSessionRecovering", () => {
+	const savedSession = { hasLocalToken: true, isOnline: true, hasUser: false };
+
+	it("keeps recovering a saved session on a network error or 5xx", () => {
+		expect(
+			isSessionRecovering({ ...savedSession, error: { status: undefined } }),
+		).toBe(true);
+		expect(
+			isSessionRecovering({ ...savedSession, error: { status: 503 } }),
+		).toBe(true);
+	});
+
+	it("stops recovering when the server rejects the session", () => {
+		expect(
+			isSessionRecovering({ ...savedSession, error: { status: 401 } }),
+		).toBe(false);
+		expect(
+			isSessionRecovering({ ...savedSession, error: { status: 403 } }),
+		).toBe(false);
+	});
+
+	it("does not recover without a saved token", () => {
+		expect(
+			isSessionRecovering({
+				...savedSession,
+				hasLocalToken: false,
+				error: { status: undefined },
+			}),
+		).toBe(false);
 	});
 });
