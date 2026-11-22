@@ -119,14 +119,14 @@ const t = initTRPC.context<TRPCContext>().create({
 	},
 });
 
+const organizationInput = z.object({ organizationId: z.string() });
+
 /**
  * A box may only reach what `superset` inside it needs, and only in its own
  * organization, whether the header or the input names it. Everything else is a
  * person's call, made from a client they signed into — the credential is
  * unstealable, but every process in the box can use it.
  */
-const organizationInput = z.object({ organizationId: z.string() });
-
 const sandboxScope = t.middleware(async ({ ctx, path, getRawInput, next }) => {
 	if (!ctx.sandboxCaller) return next();
 	if (!sandboxMayCall(path)) {
