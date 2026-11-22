@@ -191,3 +191,31 @@ for (const phase of ["attaching", "attached"] as const) {
 		await subscription;
 	});
 }
+
+test("close does not wait forever for an aborted listener's hung native subscribe", async () => {
+	const rootPath = await root();
+	const controller = new AbortController();
+	const entered = deferred<void>();
+	const manager = new FsWatcherManager({
+		teardownTimeoutMs: 5,
+		backend: {
+			name: "test",
+			subscribe() {
+				entered.resolve();
+				return new Promise(() => {});
+			},
+		},
+	});
+	managers.push(manager);
+	void manager
+		.subscribe({ absolutePath: rootPath, signal: controller.signal }, () => {})
+		.catch(() => {});
+	await entered.promise;
+	controller.abort();
+	const hung = new Promise<string>((resolve) => {
+		setTimeout(() => resolve("hung"), 500).unref?.();
+	});
+	expect(await Promise.race([manager.close().then(() => "closed"), hung])).toBe(
+		"closed",
+	);
+});

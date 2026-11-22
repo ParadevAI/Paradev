@@ -250,21 +250,31 @@ interface WatcherState {
 	throttler: ThrottledWorker<FsWatchEvent>;
 }
 
+const TEARDOWN_TIMEOUT_MS = 5_000;
+
+async function settleWithin(
+	work: Promise<unknown>,
+	timeoutMs: number,
+): Promise<void> {
+	await Promise.race([
+		work.catch(() => {}),
+		new Promise<void>((resolve) => {
+			const timer = setTimeout(resolve, timeoutMs);
+			timer.unref?.();
+		}),
+	]);
+}
+
 // A dead FSEvents stream's unsubscribe can hang forever (observed after the
 // watch root is deleted out from under it); never let it block teardown.
 async function unsubscribeQuietly(
 	subscription: NativeWatchSubscription | null,
+	timeoutMs = TEARDOWN_TIMEOUT_MS,
 ): Promise<void> {
 	if (!subscription) {
 		return;
 	}
-	await Promise.race([
-		subscription.unsubscribe().catch(() => {}),
-		new Promise<void>((resolve) => {
-			const timer = setTimeout(resolve, 5_000);
-			timer.unref?.();
-		}),
-	]);
+	await settleWithin(subscription.unsubscribe(), timeoutMs);
 }
 
 function internalToFsWatchEvent(event: InternalWatchEvent): FsWatchEvent {
@@ -323,6 +333,8 @@ export interface FsWatcherManagerOptions {
 	overflowRescanMaxMs?: number;
 	overflowBackoffResetMs?: number;
 	growthReattachMinMs?: number;
+	/** Limit on native subscribe and unsubscribe during teardown. Test-only override. */
+	teardownTimeoutMs?: number;
 	now?: () => number;
 }
 
@@ -349,6 +361,7 @@ export class FsWatcherManager {
 	private readonly overflowRescanMaxMs: number;
 	private readonly overflowBackoffResetMs: number;
 	private readonly growthReattachMinMs: number;
+	private readonly teardownTimeoutMs: number;
 	private readonly now: () => number;
 	private readonly watchers = new Map<string, WatcherState>();
 	/**
@@ -394,6 +407,7 @@ export class FsWatcherManager {
 			options.overflowBackoffResetMs ?? OVERFLOW_BACKOFF_RESET_MS;
 		this.growthReattachMinMs =
 			options.growthReattachMinMs ?? IGNORE_GROWTH_REATTACH_MIN_MS;
+		this.teardownTimeoutMs = options.teardownTimeoutMs ?? TEARDOWN_TIMEOUT_MS;
 		this.now = options.now ?? Date.now;
 	}
 
@@ -442,7 +456,9 @@ export class FsWatcherManager {
 			if (pending && this.pending.get(absolutePath) === pending) {
 				this.pending.delete(absolutePath);
 				pending.controller.abort();
-				await this.trackRelease(Promise.allSettled([pending.promise]));
+				await this.trackRelease(
+					settleWithin(pending.promise, this.teardownTimeoutMs),
+				);
 			}
 			const current = this.watchers.get(absolutePath);
 			if (current?.listeners === listeners) {
@@ -510,7 +526,7 @@ export class FsWatcherManager {
 		state.throttler.dispose();
 		const subscription = state.subscription;
 		state.subscription = null;
-		await unsubscribeQuietly(subscription);
+		await unsubscribeQuietly(subscription, this.teardownTimeoutMs);
 	}
 
 	/**
