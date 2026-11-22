@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const CONFIG_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 export const MAX_PREVIEW_PORTS = 13;
+const MCP_PLUGIN_PATTERN = /^[^@\s]+@[^@\s]+$/;
 
 const commandSchema = z.union([z.string(), z.array(z.string())]);
 const cwdSchema = z.string().trim().min(1);
@@ -35,6 +36,20 @@ const portSchema = z.strictObject({
 	preview: z.boolean().optional(),
 });
 
+const mcpSchema = z.strictObject({
+	enabled: z.boolean().optional(),
+	allow: z
+		.array(
+			z
+				.string()
+				.regex(
+					MCP_PLUGIN_PATTERN,
+					"Write each plugin as name@marketplace, such as linear@superset",
+				),
+		)
+		.optional(),
+});
+
 const nameSchema = z
 	.string()
 	.regex(
@@ -49,6 +64,7 @@ export const projectConfigSchema = z
 		archive: phaseSchema.optional(),
 		terminals: z.record(nameSchema, terminalSchema).optional(),
 		ports: z.record(nameSchema, portSchema).optional(),
+		mcp: mcpSchema.optional(),
 	})
 	.superRefine((config, ctx) => {
 		const previews = Object.values(config.ports ?? {}).filter(

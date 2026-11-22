@@ -1,8 +1,6 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useLingui as useTranslation } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
-import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import {
 	Select,
@@ -12,11 +10,7 @@ import {
 	SelectValue,
 } from "@superset/ui/select";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-	HiArrowsUpDown,
-	HiMagnifyingGlass,
-	HiOutlinePlus,
-} from "react-icons/hi2";
+import { HiArrowsUpDown, HiMagnifyingGlass } from "react-icons/hi2";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { SecretRow } from "./components/SecretRow";
 
@@ -59,14 +53,12 @@ interface EnvironmentVariablesListProps {
 	environmentId: string;
 	/** Bumped by the parent after a save; refetches without remounting. */
 	refreshToken?: number;
-	onAdd: () => void;
 	onEdit: (secret: Secret) => void;
 }
 
 export function EnvironmentVariablesList({
 	environmentId,
 	refreshToken,
-	onAdd,
 	onEdit,
 }: EnvironmentVariablesListProps) {
 	const { _: translate } = useTranslation();
@@ -107,13 +99,6 @@ export function EnvironmentVariablesList({
 
 	return (
 		<div className="space-y-4">
-			<div className="flex items-center justify-end">
-				<Button size="sm" onClick={onAdd}>
-					<HiOutlinePlus className="h-4 w-4 mr-1.5" />
-					<Trans>Add Environment Variable</Trans>
-				</Button>
-			</div>
-
 			{secrets.length > 0 && (
 				<div className="flex items-center gap-3">
 					<div className="relative flex-1">

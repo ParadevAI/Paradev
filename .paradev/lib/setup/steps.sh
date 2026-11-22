@@ -454,6 +454,7 @@ step_write_env() {
     # so a later workspace rename never needs this file rewritten.
     write_env_var "SUPERSET_WORKSPACE_NAME" "${WORKSPACE_NAME:-$(basename "$PWD")}"
     write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
+    write_env_var "PARADEV_HOME_DIR" "$PWD/$DEV_DATA_DIR"
     echo ""
     echo "# Workspace Database (Neon Branch)"
     if [ -n "${BRANCH_ID:-}" ]; then

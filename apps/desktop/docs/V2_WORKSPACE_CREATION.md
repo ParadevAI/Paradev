@@ -38,7 +38,7 @@ type BranchRow = {
   isLocal: boolean;
   isRemote: boolean;
   recency: number | null;       // reflog ordinal, 0 = most recent
-  worktreePath: string | null;  // only Superset worktrees under <repo>/.worktrees/
+  worktreePath: string | null;  // only Paradev worktrees under <repo>/.worktrees/
   hasWorkspace: boolean;        // workspaces row exists for (project, branch) on this host
   isCheckedOut: boolean;        // true if in any git worktree (incl. primary)
 };
@@ -52,7 +52,7 @@ Executed on every `searchBranches` call:
 
 1. If `refresh` is set and the 30s per-project TTL has elapsed, `git fetch --prune --quiet --no-tags`. The TTL prevents keystroke-level thrash.
 2. `git for-each-ref --sort=-committerdate refs/heads/ refs/remotes/origin/` — one call, both namespaces, ~20ms on 10k refs.
-3. `git worktree list --porcelain` → two maps: `worktreeMap` (Superset-managed only, under `.worktrees/<branch>/`) and `checkedOutBranches` (every worktree incl. primary).
+3. `git worktree list --porcelain` → two maps: `worktreeMap` (Paradev-managed only, under `.worktrees/<branch>/`) and `checkedOutBranches` (every worktree incl. primary).
 4. `git log -g --pretty=%gs --grep-reflog=checkout: -n 500` → reflog recency ordinals per branch.
 5. Parse refs using the **full** refname prefix (`refs/heads/` vs `refs/remotes/origin/`) — a structural namespace that can't appear inside a branch name. Short-name prefixes like `origin/` are unsafe because a local branch can legitimately be named `origin/foo`. See `GIT_REFS.md`.
 6. Collapse local+remote pairs by name; attach worktree + recency + hasWorkspace flags.

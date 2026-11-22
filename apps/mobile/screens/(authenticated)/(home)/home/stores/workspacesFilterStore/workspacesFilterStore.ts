@@ -3,12 +3,14 @@ import { msg } from "@lingui/core/macro";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import type { ScopeSelection } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
+import {
+	migrateWorkspacesFilter,
+	WORKSPACES_FILTER_VERSION,
+} from "./migrateWorkspacesFilter";
 
 /** Desktop sidebar's sort modes. Projects keep their order in every mode. */
 export type WorkspaceSort = "manual" | "active" | "created";
-
-/** Cloud is a place you scope to, not a machine you own. */
-export type WorkspaceScope = "cloud" | "host";
 
 export type CloudStatusFilter = "active" | "archived";
 
@@ -36,15 +38,14 @@ export const SORT_OPTIONS: {
 ];
 
 interface WorkspacesFilterStore {
-	hostFilter: string | null;
-	scope: WorkspaceScope;
+	/** Null until the user picks places: Home then applies its default. */
+	selection: ScopeSelection | null;
 	sort: WorkspaceSort;
 	cloudStatus: CloudStatusFilter;
 	cloudCreator: CloudCreatorFilter;
 	/** False until AsyncStorage has answered — the saved filter isn't here yet. */
 	hasHydrated: boolean;
-	setHostFilter: (machineId: string | null) => void;
-	setScopeCloud: () => void;
+	setSelection: (selection: ScopeSelection) => void;
 	setSort: (sort: WorkspaceSort) => void;
 	setCloudStatus: (status: CloudStatusFilter) => void;
 	setCloudCreator: (creator: CloudCreatorFilter) => void;
@@ -53,17 +54,12 @@ interface WorkspacesFilterStore {
 export const useWorkspacesFilterStore = create<WorkspacesFilterStore>()(
 	persist(
 		(set) => ({
-			hostFilter: null,
-			scope: "host",
+			selection: null,
 			sort: "manual",
 			cloudStatus: "active",
 			cloudCreator: "me",
 			hasHydrated: false,
-			// Picking a machine is also how you leave Cloud; the machine is
-			// remembered either way so Cloud → machine returns you where you were.
-			setHostFilter: (machineId) =>
-				set({ hostFilter: machineId, scope: "host" }),
-			setScopeCloud: () => set({ scope: "cloud" }),
+			setSelection: (selection) => set({ selection }),
 			setSort: (sort) => set({ sort }),
 			setCloudStatus: (cloudStatus) => set({ cloudStatus }),
 			setCloudCreator: (cloudCreator) => set({ cloudCreator }),
@@ -71,22 +67,14 @@ export const useWorkspacesFilterStore = create<WorkspacesFilterStore>()(
 		{
 			name: "workspaces-filter",
 			storage: createJSONStorage(() => AsyncStorage),
-			// Version 0 stored "updatedAt" as its default, so it cannot tell a
-			// choice from the default; it maps to desktop's default instead.
-			version: 1,
-			migrate: (persisted, version) => {
-				const state = persisted as Partial<
-					Omit<WorkspacesFilterStore, "sort"> & { sort: string }
-				>;
-				if (version >= 1) return state as WorkspacesFilterStore;
-				return {
-					...state,
-					sort: state.sort === "createdAt" ? "created" : "manual",
-				} as WorkspacesFilterStore;
-			},
-			partialize: ({ hostFilter, scope, sort, cloudCreator }) => ({
-				hostFilter,
-				scope,
+			version: WORKSPACES_FILTER_VERSION,
+			migrate: (persisted, version) =>
+				migrateWorkspacesFilter(
+					persisted,
+					version,
+				) as unknown as WorkspacesFilterStore,
+			partialize: ({ selection, sort, cloudCreator }) => ({
+				selection,
 				sort,
 				cloudCreator,
 			}),

@@ -18,7 +18,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 	const { t } = useLingui();
 	const { theme } = useUniwind();
 	const colors = [
-		{ value: null, title: t({ message: "Default" }) },
+		{ value: null, title: t({ message: "None" }) },
 		...GROUP_COLORS.map((option) => ({
 			value: option.value,
 			title: i18n._(option.label),
@@ -62,7 +62,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 				accessible
 				accessibilityRole="button"
 				accessibilityLabel={t({ message: "Group actions" })}
-				className="size-9 items-center justify-center"
+				className="size-6 items-center justify-center"
 			>
 				<Icon as={Ellipsis} className="text-muted-foreground size-4" />
 			</View>

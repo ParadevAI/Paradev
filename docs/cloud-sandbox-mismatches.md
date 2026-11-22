@@ -102,6 +102,17 @@ fails with a message that says so. Only HTTP calls work: the firewall refuses
 WebSocket upgrades on a host whose headers it rewrites, so live terminal
 streams from a box to a host do not.
 
+**A box's credential reaches only the configured API host. Open.** On a laptop,
+`api.superset.sh` and `api.paradev.com` serve the same API, so either URL works
+with a bearer token. A box has no bearer: the firewall adds
+`x-superset-sandbox-credential` only for the host of `NEXT_PUBLIC_API_URL`
+(`apiHost()` in `packages/trpc/src/lib/sandbox/credentials.ts`), which is
+`api.superset.sh`. So from a box, a plugin MCP URL on `api.superset.sh`
+answers `initialize`, and the same path on `api.paradev.com` returns
+`401 Missing bearer token` (probed 2026-11-22). Do not move plugin manifests,
+saved MCP configs or the box's `SUPERSET_API_URL` to `api.paradev.com` until
+the firewall adds the credential for both hosts.
+
 **A box's agent status doesn't come from the box.** A host row's dot is a
 live subscription to that host's terminal bindings; the sidebar deliberately
 opens no such socket to a sandbox, since holding one keeps the VM awake all
@@ -619,7 +630,7 @@ leaked: this repository's per-workspace Neon branches piled up until 383 were
 deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
 calls `sandbox.runArchiveHook` on the still-running box (direct with the host
 secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
-`.paradev/config.toml` resolved for the cloud. A failing hook never blocks the
+the environment's config resolved for the cloud. A failing hook never blocks the
 stop, and an undo that lands during the hook re-runs setup (`runStartHook`
 with `force`) instead of stopping the box. A box whose host-service predates
 the procedure answers 404 and is stopped as before, so the fix reaches a box
@@ -635,6 +646,23 @@ branch through Neon's own expiry. **Open:** running `[archive]` at least once,
 in a fresh short-lived box from the environment's image when the original is
 stopped or gone. That works because `[archive]` only releases outside
 resources: it needs the workspace's identity and secrets, not its disk.
+
+**The project config can be the environment's, not the repository's.**
+Locally, host-service reads `.paradev/config.toml` from the worktree, so a
+branch can change its own setup. A cloud environment builds one snapshot for
+every workspace, and a build runs before any workspace or branch exists, so
+its `[install]` had to come from the base branch: an environment could not be
+set up until its config change merged. An environment can now store its own
+`config.toml` (`environments.config`). When it has one, builds read `[install]`
+from it, a create publishes its `preview = true` ports from it, and every
+create and wake writes it to `SANDBOX_PATHS.environmentConfig` before boot,
+where host-service reads it for the primary checkout instead of that
+repository's files; other checkouts in a multi-repository box keep their own.
+When it has none, that file is empty and everything reads the repository's
+own files as before: builds and ports from the base branch, a box from its
+checkout. `[mcp]` is read only from the environment's config. **Open:** a saved config reaches a running box only on its next wake
+or restart. The desktop's project settings still edit the repository file on a
+cloud host, where it no longer applies once the environment has a config.
 
 **Sidebar affordances are driven by local state, not by the row.** Visibility,
 pinning and ordering live in `v2WorkspaceLocalState`; a section that renders
@@ -1029,29 +1057,30 @@ provider secret — has to go through the resolver instead: a `--require`
 preload patching `dns.lookup` for Node, `--host-resolver-rules` for Chrome.
 Binding 443 and using sudo otherwise work.
 
-## The desktop dev build's bundled CLI thinks it is in a sandbox — open
+## The desktop dev build's bundled CLI thinks it is in a sandbox — closed
 
 Found verifying organization plugins in the desktop dev build, 2026-10-22.
 
 **The app assumes:** the desktop runs its bundled `superset` CLI on a person's
-machine, so `plugins install`, `uninstall` and `sync` (all `sandbox: false`)
-are there to call.
+machine, so its machine-only commands are there to call.
 
 **A sandbox is:** a box whose environment carries
-`SUPERSET_SANDBOX_WORKSPACE_ID` and `IS_SANDBOX`, which the desktop dev build
-inherits from `dev-stack.cloud.sh` and passes to the CLI it spawns. The CLI
-then hides every machine-only command, and each plugin action logs
-`Unknown command: install` while the UI reports success. A desktop started
-from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1` and dies at
-`electron.app.commandLine` before a window opens.
+`SUPERSET_SANDBOX_WORKSPACE_ID`, which the desktop dev build inherited from
+`dev-stack.cloud.sh` and passed to the CLI it spawns. The CLI then hid every
+`sandbox: false` command, which then included the plugin commands, so each
+plugin action logged `Unknown command: install` while the UI reported success.
+A desktop started from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1`
+and dies at `electron.app.commandLine` before a window opens.
 
-**What we did:** started the desktop window with
-`unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID IS_SANDBOX`, after
-which plugin installs reached `paradev-dev-data/plugins`. Nothing in
-`dev-stack.cloud.sh` does that yet. The box also has no object store for
-`R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses `minio/minio` and
-MinIO's binary download answers 410, so an in-memory S3 stand-in on that port
-was used for the test.
+**What we did:** `dev-stack.cloud.sh` now unsets
+`SUPERSET_SANDBOX_WORKSPACE_ID` and `PARADEV_SANDBOX_WORKSPACE_ID` (the CLI
+reads either) for the desktop window, and the plugin
+commands are no longer `sandbox: false`, because every plugin route works from
+a cloud workspace. A desktop started by hand still needs
+`unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID PARADEV_SANDBOX_WORKSPACE_ID`. The box also has no
+object store for `R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses
+`minio/minio` and MinIO's binary download answers 410, so an in-memory S3
+stand-in on that port was used for the test.
 
 ## Shared memory is 64 MB
 

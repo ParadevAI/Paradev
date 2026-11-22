@@ -1,5 +1,5 @@
+import { stripLocation } from "renderer/lib/pathText";
 import { parseGithubWorkItemUrl } from "../githubWorkItem";
-import { stripLocation } from "../pathText";
 import { parseSupersetAppLink } from "../supersetAppLink";
 
 export type LinkUnfurl = {

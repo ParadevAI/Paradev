@@ -15,7 +15,7 @@ function downloadFailed(version: number, cause: unknown): CLIError {
 	return new CLIError(`Could not download version ${version}`, detail);
 }
 
-const SIGN_IN = "Run: superset auth login";
+const SIGN_IN = "Run: paradev auth login";
 
 async function servedToAnyone(
 	api: ApiClient,

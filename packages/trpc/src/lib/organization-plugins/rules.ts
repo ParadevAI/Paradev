@@ -20,13 +20,13 @@ export function organizationPluginProblem(
 	manifest: PluginManifest,
 ): string | null {
 	if (PLUGIN_CATALOG.some((plugin) => plugin.name === manifest.name)) {
-		return `"${manifest.name}" is the name of a Superset plugin`;
+		return `"${manifest.name}" is the name of a Paradev plugin`;
 	}
 
 	const slug = pluginConnector(manifest);
 	if (slug) {
 		const connector = getConnector(slug);
-		if (!connector) return `"${slug}" is not a connector Superset knows`;
+		if (!connector) return `"${slug}" is not a connector Paradev knows`;
 		if (!connector.methods.some((method) => connectorServer(method))) {
 			return `the ${slug} connector has no tool server of its own, so an organization plugin cannot use it`;
 		}

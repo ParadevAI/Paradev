@@ -1,4 +1,5 @@
 import { CLIError, string, table } from "@superset/cli-framework";
+import { reservedKeyReason } from "@superset/shared/environment-secrets";
 import { command } from "../../../../lib/command";
 import { resolveEnvironment } from "../../../../lib/environments";
 
@@ -6,20 +7,25 @@ export default command({
 	description: "List an environment's variables; values are never shown",
 	options: {
 		environment: string().desc(
-			"Environment ID (see: superset environments list); required when the organization has several",
+			"Environment ID (see: paradev environments list); required when the organization has several",
 		),
 	},
 	display: (data) =>
 		table(
-			(data as { secrets: Record<string, unknown>[] }).secrets ?? [],
-			["key", "visibility", "updatedAt"],
-			["NAME", "VISIBILITY", "UPDATED"],
-			[48, 10, 24],
+			((data as { secrets: Record<string, unknown>[] }).secrets ?? []).map(
+				(row) => ({
+					...row,
+					note: row.ignoredReason ? "not passed to workspaces" : "",
+				}),
+			),
+			["key", "visibility", "updatedAt", "note"],
+			["NAME", "VISIBILITY", "UPDATED", "NOTE"],
+			[48, 10, 24, 26],
 		),
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const environment = await resolveEnvironment(
 			ctx.api,
@@ -36,6 +42,7 @@ export default command({
 					key: row.key,
 					visibility: row.sensitive ? "secret" : "visible",
 					updatedAt: row.updatedAt.toISOString(),
+					ignoredReason: reservedKeyReason(row.key),
 				})),
 			},
 		};

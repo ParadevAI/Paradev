@@ -186,7 +186,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"sentry": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "sentry",
-		"version": "1.0.3",
+		"version": "1.0.4",
 		"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
 		"author": {
 			"name": "Paradev",

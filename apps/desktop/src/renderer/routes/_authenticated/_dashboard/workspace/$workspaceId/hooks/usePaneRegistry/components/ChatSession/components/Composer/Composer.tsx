@@ -17,6 +17,7 @@ import type {
 } from "@superset/chat-ui/PromptInput";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { usePaneFocus } from "@superset/panes";
+import { foldLegacyPluginCommands } from "@superset/shared/slash-commands";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
@@ -94,7 +95,6 @@ export type ComposerHandle = Pick<
 	"restoreDraft" | "addFiles" | "focus"
 > & {
 	returnFocus: (recallHistory?: boolean) => void;
-	/** Opens the model picker on this agent's models only. */
 	openModelPicker: () => void;
 };
 
@@ -158,17 +158,20 @@ function toMenuCommands(
 	groups: { commands: string; mcp: string },
 ): PromptInputCommand[] {
 	const sigilSkills = commands.some((command) => isSigilSkill(command.name));
-	return commands.map((command) => ({
-		id: command.name,
-		title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
-		...(command.hint ? { hint: command.hint } : {}),
-		description: command.description ?? "",
-		group: command.category === "mcp" ? groups.mcp : groups.commands,
-		inline: !sigilSkills || isSigilSkill(command.name),
-		onSelect: (ctx) => {
-			ctx.insertChip(commandChip(command.name, command.description));
-		},
-	}));
+	return foldLegacyPluginCommands(commands).map(
+		({ command, legacyAliases }) => ({
+			id: command.name,
+			title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
+			...(legacyAliases.length > 0 ? { searchAliases: legacyAliases } : {}),
+			...(command.hint ? { hint: command.hint } : {}),
+			description: command.description ?? "",
+			group: command.category === "mcp" ? groups.mcp : groups.commands,
+			inline: !sigilSkills || isSigilSkill(command.name),
+			onSelect: (ctx) => {
+				ctx.insertChip(commandChip(command.name, command.description));
+			},
+		}),
+	);
 }
 
 const FOCUS_HANDOFF_MS = 1000;
@@ -271,11 +274,9 @@ export const Composer = memo(function Composer({
 	const { returnFocus } = drawerEntry;
 	const mcpPicker = useMcpServerPicker({ workspaceId, presetId });
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
-	const [agentModelsOnly, setAgentModelsOnly] = useState(false);
 	const changeModelPickerOpen = useCallback(
 		(open: boolean) => {
 			setModelPickerOpen(open);
-			if (!open) setAgentModelsOnly(false);
 			onModelPickerOpenChange?.(open);
 		},
 		[onModelPickerOpenChange],
@@ -288,10 +289,7 @@ export const Composer = memo(function Composer({
 			addFiles: (files: File[]) => promptInputRef.current?.addFiles(files),
 			focus: focusInput,
 			returnFocus,
-			openModelPicker: () => {
-				setAgentModelsOnly(true);
-				changeModelPickerOpen(true);
-			},
+			openModelPicker: () => changeModelPickerOpen(true),
 		}),
 		[focusInput, returnFocus, changeModelPickerOpen],
 	);
@@ -741,7 +739,7 @@ export const Composer = memo(function Composer({
 								)}
 								{configOptions && onSetConfigOption && (
 									<ModelPicker
-										agentSwitcher={agentModelsOnly ? undefined : agentSwitcher}
+										agentSwitcher={agentSwitcher}
 										configOptions={configOptions}
 										hideEffortLabel={footerTier >= 1}
 										hideModelLabel={footerTier >= 3}

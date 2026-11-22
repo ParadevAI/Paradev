@@ -1,6 +1,6 @@
 [test]
 # Isolates SUPERSET_HOME_DIR so a test can never write the developer's real
-# ~/.superset. See scripts/test-preload.ts for what went wrong without it.
+# ~/.paradev. See scripts/test-preload.ts for what went wrong without it.
 preload = ["./scripts/test-preload.ts"]
 
 [install]

@@ -75,7 +75,7 @@ describe("checkConfig", () => {
 			{
 				severity: "warning",
 				message:
-					'`auth.expiresAt` is in the past and there is no refresh token: the next command fails with "Session expired" (run: superset auth login)',
+					'`auth.expiresAt` is in the past and there is no refresh token: the next command fails with "Session expired" (run: paradev auth login)',
 			},
 		]);
 	});
@@ -130,7 +130,7 @@ describe("checkConfig", () => {
 			},
 		});
 		expect(result.issues.map((i) => i.message)).toEqual([
-			"`auth.refreshStartedAt` is in the future: if it is more than 5 minutes ahead, the next command drops the refresh token (run: superset auth login)",
+			"`auth.refreshStartedAt` is in the future: if it is more than 5 minutes ahead, the next command drops the refresh token (run: paradev auth login)",
 		]);
 	});
 
@@ -244,7 +244,7 @@ describe("checkConfig", () => {
 			{
 				severity: "warning",
 				message:
-					"No `auth` or `apiKey`: this file holds no login (run: superset auth login)",
+					"No `auth` or `apiKey`: this file holds no login (run: paradev auth login)",
 			},
 		]);
 	});

@@ -30,7 +30,7 @@ export default command({
 					)
 			: await ctx.api.user.myOrganization.query();
 		if (!organization)
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 
 		const manifest = readManifest(organization.id);
 		if (manifest) {

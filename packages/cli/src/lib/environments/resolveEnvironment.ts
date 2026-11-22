@@ -20,7 +20,7 @@ export async function resolveEnvironment(
 	if (environments.length === 0) {
 		throw new CLIError(
 			"No environments in this organization",
-			"Create one with: superset environments create",
+			"Create one with: paradev environments create",
 		);
 	}
 	const [only] = environments;

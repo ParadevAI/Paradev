@@ -1,5 +1,10 @@
 #!/bin/bash
 {{MARKER}}
+# SUPERSET_* wins so existing overrides keep working; PARADEV_* fills in when it is unset.
+SUPERSET_TERMINAL_ID="${SUPERSET_TERMINAL_ID:-${PARADEV_TERMINAL_ID:-}}"
+SUPERSET_TAB_ID="${SUPERSET_TAB_ID:-${PARADEV_TAB_ID:-}}"
+SUPERSET_HOME_DIR="${SUPERSET_HOME_DIR:-${PARADEV_HOME_DIR:-}}"
+SUPERSET_HOST_AGENT_HOOK_URL="${SUPERSET_HOST_AGENT_HOOK_URL:-${PARADEV_HOST_AGENT_HOOK_URL:-}}"
 # Gemini CLI lifecycle hook. JSON in via stdin; MUST print valid JSON to
 # stdout before exit so gemini doesn't block on the hook.
 

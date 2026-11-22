@@ -6,13 +6,14 @@ import { screenshots } from "@superset/local-db";
 import { desc, eq, isNull } from "drizzle-orm";
 import { app, shell } from "electron";
 import { localDb } from "../local-db";
+import { resolveScreenshotsDir } from "./screenshots-dir";
 
 const MAX_LISTED_SCREENSHOTS = 200;
 const MAX_LISTED_DEVICE_SCREENSHOTS = 20;
 const THUMBNAIL_WIDTH = 200;
 
 function screenshotsDir(): string {
-	const dir = join(app.getPath("pictures"), "Superset Screenshots");
+	const dir = resolveScreenshotsDir(app.getPath("pictures"));
 	mkdirSync(dir, { recursive: true });
 	return dir;
 }

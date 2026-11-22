@@ -59,6 +59,7 @@
 								"importNames": [
 									"queryFleetCloudUsage",
 									"queryFleetCloudUsageByWorkspaceDay",
+									"queryFleetCloudUsageSeries",
 									"listFleetCloudBoots",
 									"getFleetCloudBoot"
 								],

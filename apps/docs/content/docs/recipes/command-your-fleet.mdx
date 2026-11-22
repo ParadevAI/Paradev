@@ -18,11 +18,11 @@ Workspaces are host-owned, and these loops target the machine you run them on. I
 Print the last few lines of every terminal in every workspace of a project:
 
 ```bash
-superset workspaces list --project my-app --quiet | while read ws; do
-  superset terminals list --workspace "$ws" --json 2>/dev/null \
+paradev workspaces list --project my-app --quiet | while read ws; do
+  paradev terminals list --workspace "$ws" --json 2>/dev/null \
     | jq -r '.sessions[].terminalId' | while read t; do
       echo "=== $ws / $t ==="
-      superset terminals read --workspace "$ws" --terminal "$t" --max-lines 5 --json | jq -r '.text'
+      paradev terminals read --workspace "$ws" --terminal "$t" --max-lines 5 --json | jq -r '.text'
   done
 done
 ```
@@ -34,10 +34,10 @@ done
 Send the same instruction to every running agent in the project:
 
 ```bash
-superset workspaces list --project my-app --quiet | while read ws; do
-  superset terminals list --workspace "$ws" --json 2>/dev/null \
+paradev workspaces list --project my-app --quiet | while read ws; do
+  paradev terminals list --workspace "$ws" --json 2>/dev/null \
     | jq -r '.sessions[].terminalId' | while read t; do
-      superset terminals send --workspace "$ws" --terminal "$t" \
+      paradev terminals send --workspace "$ws" --terminal "$t" \
         --text "Status check: summarize what you have done and what remains in 2 sentences."
   done
 done
@@ -50,7 +50,7 @@ One caveat: `send` delivers to *every* terminal, including plain shells, where t
 ## Clean Up When You're Done
 
 ```bash
-superset workspaces list --project my-app --quiet | xargs -L1 superset workspaces archive
+paradev workspaces list --project my-app --quiet | xargs -L1 paradev workspaces archive
 ```
 
 Archives every listed workspace (the project's `main` workspace cannot be archived). An archived workspace loses its uncommitted changes. Filter with `--search` to target only the fleet you launched.

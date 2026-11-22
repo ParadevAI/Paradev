@@ -1,8 +1,9 @@
 {
 	"name": "@superset/desktop",
-	"productName": "Superset",
+	"productName": "Paradev",
+	"desktopName": "superset.desktop",
 	"description": "The last developer tool you'll ever need",
-	"version": "2.0.10",
+	"version": "2.0.11",
 	"main": "./dist/main/index.js",
 	"resources": "src/resources",
 	"repository": {

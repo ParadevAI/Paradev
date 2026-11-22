@@ -1,5 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SessionConfigOption } from "@superset/chat/protocol";
+import {
+	DEFAULT_ALIAS_MODEL_ID,
+	filterModelCatalog,
+	type ModelMetadata,
+} from "@superset/shared/agent-models";
 import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { cn } from "@superset/ui/utils";
@@ -10,7 +15,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { LuCheck, LuSearch, LuStar } from "react-icons/lu";
+import { LuCheck, LuLoaderCircle, LuSearch, LuStar } from "react-icons/lu";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -25,6 +30,8 @@ type Row = {
 	label: string;
 	description?: string;
 	agentLabel?: string;
+	hint?: string;
+	metadata?: ModelMetadata;
 };
 
 const FAVORITES_TAB = "favorites";
@@ -62,6 +69,8 @@ export function ModelPanel({
 	const currentPresetId = agentSwitcher?.currentPresetId ?? "";
 	const [query, setQuery] = useState("");
 	const [tab, setTab] = useState(currentPresetId);
+	const [provider, setProvider] = useState("");
+	const [showAllModels, setShowAllModels] = useState(false);
 	const { favorites, toggle } = useFavoriteModels();
 	const listRef = useRef<HTMLDivElement>(null);
 
@@ -77,25 +86,64 @@ export function ModelPanel({
 				favorite.presetId === row.presetId && favorite.id === row.id,
 		);
 	const rowsFor = (presetId: string): Row[] => {
+		const agent = agentSwitcher?.agents.find(
+			(entry) => entry.presetId === presetId,
+		);
 		if (presetId === currentPresetId && model) {
-			return model.options.map((option) => ({ ...option, presetId }));
+			return model.options.map((option) => ({
+				...agent?.models.find((entry) => entry.id === option.id),
+				...option,
+				...(option.id === DEFAULT_ALIAS_MODEL_ID
+					? { label: t({ message: "Default" }), hint: option.description }
+					: {}),
+				...(option.id === agentSwitcher?.defaultOptionId
+					? { hint: agent?.defaultModelLabel }
+					: {}),
+				presetId,
+			}));
 		}
-		const models =
-			presetId === currentPresetId
-				? []
-				: (agentSwitcher?.agents.find((agent) => agent.presetId === presetId)
-						?.models ?? []);
-		return models.length > 0
-			? models.map((entry) => ({ ...entry, presetId }))
-			: [{ presetId, id: null, label: t({ message: "Default" }) }];
+		const models = presetId === currentPresetId ? [] : (agent?.models ?? []);
+		return [
+			{
+				presetId,
+				id: null,
+				label: t({ message: "Default" }),
+				hint: agent?.defaultModelLabel,
+			},
+			...models.map((entry) => ({ ...entry, presetId })),
+		];
 	};
 	const onFavoritesTab = tab === FAVORITES_TAB;
+	const tabAgent = agentSwitcher?.agents.find(
+		(agent) => agent.presetId === tab,
+	);
+	const runtimeModels =
+		tab === currentPresetId && model && tabAgent?.runtimeModels;
+	const loadRef = useRef(tabAgent?.onLoad);
+	loadRef.current = tabAgent?.onLoad;
+	const catalogKey = tabAgent?.catalogKey;
+	const favoriteLoadsRef = useRef<Array<(() => void) | undefined>>([]);
+	favoriteLoadsRef.current = (agentSwitcher?.agents ?? [])
+		.filter((agent) =>
+			favorites.some((favorite) => favorite.presetId === agent.presetId),
+		)
+		.map((agent) => agent.onLoad);
+	useEffect(() => {
+		if (tab === FAVORITES_TAB)
+			for (const load of favoriteLoadsRef.current) load?.();
+		else if (catalogKey) loadRef.current?.();
+	}, [tab, catalogKey]);
 	const rows: Row[] = onFavoritesTab
 		? favorites.flatMap((favorite) => {
 				const agent = agentSwitcher?.agents.find(
 					(entry) => entry.presetId === favorite.presetId,
 				);
-				return agent ? [{ ...favorite, agentLabel: agent.label }] : [];
+				const available = rowsFor(favorite.presetId).find(
+					(row) => row.id === favorite.id,
+				);
+				return agent && available
+					? [{ ...available, agentLabel: agent.label }]
+					: [];
 			})
 		: rowsFor(tab);
 	const pickRow = (row: Row) => {
@@ -109,10 +157,40 @@ export function ModelPanel({
 		);
 	};
 
+	const providers = [
+		...new Set(
+			rows.flatMap((row) => (row.metadata ? [row.metadata.provider] : [])),
+		),
+	].sort();
+	const activeProvider = providers.includes(provider) ? provider : "";
 	const needle = query.trim().toLowerCase();
-	const matches = rows.filter((row) =>
-		`${row.label} ${row.agentLabel ?? ""}`.toLowerCase().includes(needle),
-	);
+	const matchingRows = (includeAll: boolean) =>
+		rows.filter(
+			(row) =>
+				filterModelCatalog(
+					[
+						{
+							...row,
+							id: row.id ?? "default",
+							label: `${row.label} ${row.agentLabel ?? ""}`,
+						},
+					],
+					{
+						query: needle,
+						providers: activeProvider ? [activeProvider] : undefined,
+						requireTools: !includeAll,
+						requireTextOutput: !includeAll,
+						includeDeprecated: includeAll,
+						selectedId:
+							row.presetId === currentPresetId
+								? model?.currentValue
+								: undefined,
+					},
+				).length > 0,
+		);
+	const matches = matchingRows(showAllModels);
+	const hasHiddenModels =
+		!showAllModels && matchingRows(true).length > matches.length;
 	const starred = onFavoritesTab ? [] : matches.filter(isFavorite);
 	const rest = onFavoritesTab
 		? matches
@@ -139,6 +217,9 @@ export function ModelPanel({
 	const selectTab = (next: string) => {
 		if (next === tab) return;
 		setTab(next);
+		setShowAllModels(false);
+		listRef.current?.scrollTo({ top: 0 });
+		setProvider("");
 		setQuery("");
 	};
 	const cycleTab = (direction: 1 | -1) => {
@@ -195,7 +276,12 @@ export function ModelPanel({
 				onSelect={() => pickRow(row)}
 				title={row.description}
 			>
-				<span className="min-w-0 flex-1 truncate">{row.label}</span>
+				<span className="flex min-w-0 flex-1 items-baseline gap-1.5">
+					<span className="truncate">{row.label}</span>
+					{row.hint ? (
+						<span className="truncate text-muted-foreground">{row.hint}</span>
+					) : null}
+				</span>
 				{row.agentLabel ? (
 					<span className="max-w-24 shrink-0 truncate text-[11px] text-muted-foreground">
 						{row.agentLabel}
@@ -326,6 +412,26 @@ export function ModelPanel({
 					value={query}
 				/>
 			</label>
+			{providers.length > 1 ? (
+				<div className="flex flex-wrap gap-1 border-b p-1.5">
+					{["", ...providers].map((value) => (
+						<button
+							key={value}
+							type="button"
+							aria-pressed={activeProvider === value}
+							className={cn(
+								"rounded px-2 py-1 text-xs",
+								activeProvider === value
+									? "bg-accent text-accent-foreground"
+									: "text-muted-foreground",
+							)}
+							onClick={() => setProvider(value)}
+						>
+							{value || t({ message: "All" })}
+						</button>
+					))}
+				</div>
+			) : null}
 			<div
 				className="max-h-[200px] min-h-20 overflow-y-auto overscroll-contain p-1"
 				ref={listRef}
@@ -349,7 +455,28 @@ export function ModelPanel({
 						</div>
 					))
 				)}
+				{hasHiddenModels ? (
+					<DropdownMenuItem
+						className={cn(
+							MENU_ROW_CLASS,
+							"justify-center text-muted-foreground",
+						)}
+						onSelect={(event) => {
+							event.preventDefault();
+							setShowAllModels(true);
+							searchRef.current?.focus();
+						}}
+					>
+						{t({ message: "Show all models" })}
+					</DropdownMenuItem>
+				) : null}
 			</div>
+			{tabAgent?.loading && !runtimeModels ? (
+				<div className="flex h-7 shrink-0 items-center gap-1.5 px-2.5 text-[11px] text-muted-foreground/70">
+					<LuLoaderCircle className="size-3 animate-spin" />
+					{t({ message: "Loading..." })}
+				</div>
+			) : null}
 		</div>
 	);
 }

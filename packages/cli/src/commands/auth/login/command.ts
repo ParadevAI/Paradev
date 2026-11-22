@@ -96,7 +96,7 @@ async function runApiKeyLogin({
 	apiKey: string;
 	requestedOrganization: string | undefined;
 }): Promise<LoginOutput> {
-	p.intro("superset auth login");
+	p.intro("paradev auth login");
 
 	const api = createApiClient({ bearer: apiKey });
 
@@ -203,7 +203,7 @@ export default command({
 		};
 
 		if (!inkInstance) {
-			p.intro("superset auth login");
+			p.intro("paradev auth login");
 		}
 
 		let result: Awaited<ReturnType<typeof login>> | null = null;

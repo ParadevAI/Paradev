@@ -53,7 +53,7 @@ export default command({
 
 		return {
 			data: result.files.map((file) => ({ file: `${result.dir}/${file}` })),
-			message: `Created ${name} (${result.files.length} files) and added it to ${ctx.marketplace.name}. Edit ${result.dir}/plugin.json, then run: superset plugins publish ${name}`,
+			message: `Created ${name} (${result.files.length} files) and added it to ${ctx.marketplace.name}. Edit ${result.dir}/plugin.json, then run: paradev plugins publish ${name}`,
 		};
 	},
 });

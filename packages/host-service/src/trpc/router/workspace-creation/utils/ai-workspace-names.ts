@@ -367,7 +367,7 @@ async function generateNamesViaAgentCli(
 		});
 		child.on("close", (code) => {
 			if (code !== 0 && !stopping) {
-				console.warn(
+				console.debug(
 					`[generateNamesViaAgentCli] exit ${code}; stderr tail: ${stderr.slice(-500)}; stdout tail: ${stdout.slice(-200)}`,
 				);
 			}
@@ -378,7 +378,7 @@ async function generateNamesViaAgentCli(
 
 	const names = extractNamesJson(output);
 	if (!names) {
-		console.warn(
+		console.debug(
 			`[generateNamesViaAgentCli] no JSON names in output tail: ${output.slice(-300)}`,
 		);
 		return null;

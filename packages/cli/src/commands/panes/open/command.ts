@@ -38,7 +38,7 @@ export default command({
 		if (tool === "file" && !path) {
 			throw new CLIError(
 				"Say which file to open",
-				"superset panes open file src/app.ts",
+				"paradev panes open file src/app.ts",
 			);
 		}
 		if (path && tool !== "file" && tool !== "changes") {

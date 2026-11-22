@@ -22,6 +22,8 @@ import fs from "node:fs";
 import os from "node:os";
 import { resolveAppHomeDir } from "@superset/agent-setup";
 import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
+import { addPublicEnvAliases } from "@superset/shared/public-env";
+import { caught } from "../runtime/box-log-filter";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
 	augmentPathForMacOS,
@@ -95,9 +97,9 @@ export async function resolveTerminalBaseEnv(): Promise<
 	try {
 		return await getStrictShellEnvironment();
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
 		console.warn(
-			`[host-service] Shell env snapshot failed, falling back to process.env: ${message}`,
+			"[host-service] Shell env snapshot failed, falling back to process.env:",
+			caught(error),
 		);
 		const fallback = snapshotStringEnv(process.env);
 		augmentPathForMacOS(fallback);
@@ -148,7 +150,10 @@ export function startTerminalBaseEnvResolution(): void {
 	// so swallow a background failure rather than crash on an unhandled
 	// rejection. resolveTerminalBaseEnv already falls back internally.
 	promise.catch((err) => {
-		console.warn("[host-service] terminal base env resolution failed:", err);
+		console.warn(
+			"[host-service] terminal base env resolution failed:",
+			caught(err),
+		);
 	});
 	_terminalBaseEnvReady = promise;
 }
@@ -309,6 +314,7 @@ export function buildV2TerminalEnv(
 	if (supersetHomeDir) {
 		env.SUPERSET_HOME_DIR = supersetHomeDir;
 	}
+	addPublicEnvAliases(env);
 
 	if (process.env.SUPERSET_HOST_RUN_MODE === "sandbox") {
 		// The environment's variables and the credential placeholders arrive

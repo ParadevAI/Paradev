@@ -115,6 +115,14 @@ by `packages/trpc/src/lib/secret-box.ts` under `SECRETS_ENCRYPTION_KEY` and atta
 `packages/trpc/src/router/plugins/proxy/`, so a tool call goes out from the API, not from the
 agent.
 
+The proxy gives each caller an `Mcp-Session-Id` and keeps one vendor MCP session per caller session
+and connection, so state that a vendor keeps per session (an active project or organization) lasts
+from one call to the next. The vendor session id is in Redis for one hour after its last successful use. A
+caller that does not send the id back, or any caller while Redis cannot be reached, gets a new vendor
+session for each call. `superset mcp call-tool` keeps its session between runs of one agent
+launch (`SUPERSET_AGENT_LAUNCH_ID`, which the agent wrapper sets once per launch) in
+`plugin-mcp-sessions.json` under the Superset home, and ends it at the end of a run anywhere else.
+
 ## Install state on a machine
 
 One file, `$SUPERSET_HOME_DIR/plugins/installed_plugins.json`, records what is materialized. Note
@@ -142,6 +150,16 @@ each one reads the file and rewrites it, so two that overlap lose one's change. 
 Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vibe, and Kimi read
 natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
 read the shared convention.
+
+Claude gets two plugin directories with the same skills: `~/.claude/skills/paradev` (skills answer
+to `paradev:<skill>`) and `~/.claude/skills/superset`, the old name, which saved prompts, automations
+and released builds still use. The `superset` copy keeps each skill's body, but its description only
+tells the model to use the `paradev:` name. Composers fold `superset:<x>` into
+`paradev:<x>` as an alias (`foldLegacyPluginCommands` in `@superset/shared/slash-commands`). Do not
+remove the `superset` directory: builds from before the rename provision only it and reap
+`paradev`, so `superset:` is the one name that resolves on every build. If the user owns a
+`paradev` directory, `superset` stays the full plugin. The `~/.agents/skills/superset-<skill>` names
+and the source directory `plugins/superset/` did not change.
 
 Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
 `~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors

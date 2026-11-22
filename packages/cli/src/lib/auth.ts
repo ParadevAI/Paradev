@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { createServer, type Server } from "node:http";
 import { CLIError } from "@superset/cli-framework";
 import { readOAuthErrorCode } from "@superset/shared/oauth-refresh";
+import { oauthResource } from "@superset/shared/oauth-resource";
 import { env } from "./env";
 import { canReachDesktop, openUrl } from "./open-url";
 
@@ -10,7 +11,7 @@ const PASTE_REDIRECT_PATH = "/cli/auth/code";
 const SCOPE = "openid profile email offline_access";
 const LOOPBACK_PORTS = [51789, 51790, 51791, 51792, 51793];
 const CALLBACK_TIMEOUT_MS = 5 * 60 * 1000;
-const LOGIN_AGAIN_SUGGESTION = "Run `superset auth login` again.";
+const LOGIN_AGAIN_SUGGESTION = "Run `paradev auth login` again.";
 
 export interface LoginResult {
 	accessToken: string;
@@ -183,7 +184,7 @@ function buildAuthorizeUrl({
 	url.searchParams.set("code_challenge_method", "S256");
 	url.searchParams.set("state", state);
 	url.searchParams.set("prompt", "consent");
-	url.searchParams.set("resource", apiUrl);
+	url.searchParams.set("resource", oauthResource(apiUrl));
 	return url;
 }
 
@@ -207,7 +208,7 @@ async function exchangeCodeForToken({
 			code_verifier: codeVerifier,
 			client_id: CLIENT_ID,
 			redirect_uri: redirectUri,
-			resource: apiUrl,
+			resource: oauthResource(apiUrl),
 		}),
 	});
 
@@ -260,7 +261,7 @@ export async function refreshAccessToken(
 			grant_type: "refresh_token",
 			refresh_token: refreshToken,
 			client_id: CLIENT_ID,
-			resource: apiUrl,
+			resource: oauthResource(apiUrl),
 		}),
 	});
 
@@ -382,7 +383,7 @@ export async function login(
 						if (returnedState !== state) {
 							throw new CLIError(
 								"State mismatch",
-								"The pasted code does not match this login attempt. Run `superset auth login` again.",
+								"The pasted code does not match this login attempt. Run `paradev auth login` again.",
 							);
 						}
 						settle(() => {

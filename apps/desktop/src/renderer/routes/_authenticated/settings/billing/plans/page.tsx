@@ -250,7 +250,7 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 					message: "Mobile app",
 				}),
 				values: [null, true, true],
-				href: COMPANY.APP_STORE_URL,
+				href: COMPANY.MOBILE_INSTALL_URL,
 			},
 			{
 				label: msg({

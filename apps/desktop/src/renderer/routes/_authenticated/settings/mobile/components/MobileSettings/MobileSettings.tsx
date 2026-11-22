@@ -38,12 +38,14 @@ export function MobileSettings() {
 							>
 								1
 							</span>
-							<Trans>Install on your iPhone</Trans>
+							<Trans>Install on your phone</Trans>
 						</h3>
 						<div className="flex flex-wrap items-center gap-6 pl-9">
 							<AppStoreQr
 								className="size-[180px]"
-								label={t({ message: "Scan to download Paradev for iPhone" })}
+								label={t({
+									message: "Scan to download Paradev for iPhone or Android",
+								})}
 							/>
 							<p className="min-w-56 max-w-sm flex-1 text-sm leading-relaxed text-muted-foreground">
 								<Trans>

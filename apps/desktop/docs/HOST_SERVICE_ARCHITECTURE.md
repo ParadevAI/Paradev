@@ -43,7 +43,7 @@ The host service must be deployable standalone with zero Electron awareness.
 │  Does NOT own:                                               │
 │  - How it was started (Electron vs systemd vs docker)        │
 │  - Credential discovery (keychain, ~/.claude, git cred mgr) │
-│  - Default paths like ~/.superset/host.db                    │
+│  - Default paths like ~/.paradev/host.db                    │
 │  - Electron concepts (resourcesPath, manifests, etc.)        │
 └──────────────────────────────────────────────────────────────┘
 ```

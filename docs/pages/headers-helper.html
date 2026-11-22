@@ -176,17 +176,17 @@
   "linear-lu-1": {
     "type": "http",
     "url": "https://api.superset.sh/mcp/plugins/superset/linear?connection=conn-work",
-    "headersHelper": "/Users/you/.superset/bin/superset auth mcp-headers"
+    "headersHelper": "/Users/you/.paradev/bin/superset auth mcp-headers"
   }
 }</code></pre>
 
       <p class="cap">~/.codex/config.toml</p>
       <pre><code>[mcp_servers.linear-lu-1]
 url = "https://api.superset.sh/mcp/plugins/superset/linear?connection=conn-work"
-http_headers_helper = "/Users/you/.superset/bin/superset auth mcp-headers"</code></pre>
+http_headers_helper = "/Users/you/.paradev/bin/superset auth mcp-headers"</code></pre>
 
       <p>
-        The path is the managed shim at <code>~/.superset/bin/superset</code>,
+        The path is the managed shim at <code>~/.paradev/bin/superset</code>,
         not the bare word <code>superset</code>. The agent runs this command
         itself, and its environment is not the Paradev terminal's — a bare name
         would resolve only when the agent happened to inherit our PATH.
@@ -231,7 +231,7 @@ http_headers_helper = "/Users/you/.superset/bin/superset auth mcp-headers"</code
         install ledger, and both writers read it from there.
       </p>
 
-      <p class="cap">~/.superset/plugins/connections.json</p>
+      <p class="cap">~/.paradev/plugins/connections.json</p>
       <pre><code>{
   "connections": [
     { "connector": "linear", "connectionId": "conn-work", "externalUserId": "lu-1" },

@@ -27,7 +27,7 @@ export default command({
 	run: async ({ ctx, options, signal }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 
 		const { target } = await resolveWorkspaceTarget(
@@ -58,7 +58,7 @@ export default command({
 		if (timedOut) {
 			throw new CLIError(
 				`Timed out after ${options.timeout}s; agent is ${state}`,
-				"Raise --timeout, or check it with `superset terminals read`",
+				"Raise --timeout, or check it with `paradev terminals read`",
 			);
 		}
 		return {

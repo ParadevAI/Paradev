@@ -1,4 +1,5 @@
 import type {
+	DashboardSidebarHiddenProject,
 	DashboardSidebarProject,
 	DashboardSidebarProjectChild,
 } from "../../types";
@@ -79,4 +80,14 @@ export function filterDashboardSidebarProjects(
 		if (childrenUnchanged) return [expandProject(project)];
 		return [{ ...project, isCollapsed: false, children }];
 	});
+}
+
+/** Names only: the workspaces of a hidden project are never built. */
+export function filterDashboardSidebarHiddenProjects(
+	projects: DashboardSidebarHiddenProject[],
+	query: string,
+): DashboardSidebarHiddenProject[] {
+	const normalizedQuery = query.trim().toLowerCase();
+	if (normalizedQuery === "") return projects;
+	return projects.filter((project) => matches(project.name, normalizedQuery));
 }

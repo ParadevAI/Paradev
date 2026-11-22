@@ -3,24 +3,22 @@ import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { FaAndroid } from "react-icons/fa";
 import { PhoneShowcase } from "@/app/[lang]/components/PhoneShowcase";
 import { StoreBadges } from "@/app/[lang]/components/StoreBadges";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { AppStoreQr } from "./components/AppStoreQr";
 import { MobileTestimonials } from "./components/MobileTestimonials";
-import { MobileWaitlist } from "./components/MobileWaitlist";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
 	const i18n = getI18nInstance(lang);
 	return {
-		title: i18n._(msg({ message: "Paradev for iPhone and iPad" })),
+		title: i18n._(msg({ message: "Paradev for iPhone, iPad, and Android" })),
 		description: i18n._(
 			msg({
 				message:
-					"Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon.",
+					"Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play.",
 			}),
 		),
 		alternates: localizedAlternates(lang, "/mobile"),
@@ -36,7 +34,7 @@ export default async function MobilePage() {
 				<section className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-8">
 					<div>
 						<p className="font-mono text-brand text-xs uppercase tracking-wider">
-							<Trans>Paradev for iPhone and iPad</Trans>
+							<Trans>Paradev for iPhone, iPad, and Android</Trans>
 						</p>
 						<h1 className="mt-4 font-medium text-4xl text-foreground tracking-tight sm:text-5xl">
 							<Trans>
@@ -47,8 +45,9 @@ export default async function MobilePage() {
 						</h1>
 						<p className="mt-5 max-w-md text-lg text-muted-foreground leading-relaxed">
 							<Trans>
-								Start agents, follow them live, and review the diff from your
-								iPhone or iPad. Your code stays on your machines.
+								Check in on your agents from anywhere with our mobile app. Start
+								work on your computer, cloud or remote machine. Comes with
+								native PR, diff, and page viewer.
 							</Trans>
 						</p>
 						<div className="mt-8">
@@ -58,8 +57,8 @@ export default async function MobilePage() {
 							<AppStoreQr />
 							<p className="max-w-[15rem] text-muted-foreground text-xs leading-relaxed">
 								<Trans>
-									Requires iOS 26 or iPadOS 26 or later. Included with Paradev
-									Pro.
+									On iPhone and iPad, requires iOS 26 or iPadOS 26 or later.
+									Included with Paradev Pro.
 								</Trans>
 							</p>
 						</div>
@@ -102,24 +101,6 @@ export default async function MobilePage() {
 						sizes="(min-width: 768px) 520px, 100vw"
 						className="h-auto w-full"
 					/>
-				</section>
-
-				<section
-					id="android"
-					className="mt-12 grid scroll-mt-24 items-center gap-8 border border-border p-6 sm:mt-16 sm:p-8 md:grid-cols-2"
-				>
-					<div>
-						<h2 className="flex items-center gap-2 font-mono text-brand text-xs uppercase tracking-wider">
-							<FaAndroid aria-hidden="true" className="size-4" />
-							Android
-						</h2>
-						<p className="mt-3 font-light text-foreground text-xl">
-							<Trans>
-								Android is on the way. Be first to know when it ships.
-							</Trans>
-						</p>
-					</div>
-					<MobileWaitlist platform="android" />
 				</section>
 			</main>
 		</div>

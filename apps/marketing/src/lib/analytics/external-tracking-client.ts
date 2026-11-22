@@ -6,8 +6,7 @@ export type ExternalTrackingForm =
 	| "contact"
 	| "enterprise"
 	| "windows-linux-waitlist"
-	| "ios-waitlist"
-	| "android-waitlist";
+	| "ios-waitlist";
 
 export interface TrackingPage {
 	url: string;

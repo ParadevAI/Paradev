@@ -1,4 +1,5 @@
 import { number, string, table } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { PAGE_LIST_MAX_LIMIT } from "@superset/trpc/page-schema";
 import { type CliContext, command } from "../../../lib/command";
 import { listWorkspacesOnHost } from "../../../lib/host-workspaces";
@@ -99,9 +100,7 @@ export default command({
 	},
 	run: async ({ ctx, options }) => {
 		const asked = options.workspace !== undefined;
-		const workspace = asked
-			? options.workspace
-			: process.env.SUPERSET_WORKSPACE_ID;
+		const workspace = asked ? options.workspace : readPublicEnv("WORKSPACE_ID");
 		const workspaceId = workspace
 			? await resolveWorkspaceId({
 					value: workspace,

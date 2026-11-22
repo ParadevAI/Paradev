@@ -48,6 +48,15 @@ const MAX_FILE_WATCHES_PER_CLIENT = 256;
  */
 export const MAX_GIT_WATCHES_PER_CLIENT = 2000;
 
+type WorkspaceCreateSettledMessage = Extract<
+	ServerMessage,
+	{ type: "workspace:create-settled" }
+>;
+
+/** Matches the desktop's `CREATE_SETTLE_TIMEOUT_MS`, the longest a client waits. */
+const CREATE_SETTLED_REPLAY_TTL_MS = 10 * 60_000;
+const CREATE_SETTLED_REPLAY_MAX_ENTRIES = 50;
+
 type WorkspaceChangedListener = (
 	message: Omit<Extract<ServerMessage, { type: "workspace:changed" }>, "type">,
 ) => void;
@@ -100,6 +109,7 @@ export interface EventBusOptions {
 	db: HostDb;
 	filesystem: WorkspaceFilesystemManager;
 	gitWatcher: GitWatcher;
+	now?: () => number;
 }
 
 /**
@@ -121,10 +131,16 @@ export class EventBus {
 	private readonly filesystem: WorkspaceFilesystemManager;
 	private removeGitListener: (() => void) | null = null;
 	private removePortListeners: (() => void) | null = null;
+	private readonly now: () => number;
+	private readonly recentCreateSettled = new Map<
+		string,
+		{ message: WorkspaceCreateSettledMessage; expiresAt: number }
+	>();
 
 	constructor(options: EventBusOptions) {
 		this.filesystem = options.filesystem;
 		this.gitWatcher = options.gitWatcher;
+		this.now = options.now ?? Date.now;
 	}
 
 	start(): void {
@@ -169,6 +185,17 @@ export class EventBus {
 			fileWatches: new Map(),
 			gitSubscriptions: new Set(),
 		});
+		this.pruneCreateSettled();
+		try {
+			for (const { message } of this.recentCreateSettled.values()) {
+				sendMessage(socket, message);
+			}
+		} catch (error) {
+			console.error("[event-bus] create-settled replay failed — dropping", {
+				error,
+			});
+			this.handleClose(socket);
+		}
 	}
 
 	handleMessage(socket: WsSocket, data: unknown): void {
@@ -319,6 +346,17 @@ export class EventBus {
 				});
 			}
 		}
+		if (message.eventType === "deleted") {
+			for (const [workspaceId, { message: settled }] of this
+				.recentCreateSettled) {
+				if (
+					workspaceId === message.workspaceId ||
+					settled.canonicalWorkspaceId === message.workspaceId
+				) {
+					this.recentCreateSettled.delete(workspaceId);
+				}
+			}
+		}
 		this.broadcast({ type: "workspace:changed", ...message });
 	}
 
@@ -344,7 +382,33 @@ export class EventBus {
 			"type"
 		>,
 	): void {
-		this.broadcast({ type: "workspace:create-settled", ...message });
+		const settled: WorkspaceCreateSettledMessage = {
+			type: "workspace:create-settled",
+			...message,
+		};
+		// Retry reuses the id and subscribes before its request reaches us, so
+		// a replayed failure could fail the retry with the old error.
+		if (message.ok) {
+			this.recentCreateSettled.delete(message.workspaceId);
+			this.recentCreateSettled.set(message.workspaceId, {
+				message: settled,
+				expiresAt: this.now() + CREATE_SETTLED_REPLAY_TTL_MS,
+			});
+			this.pruneCreateSettled();
+		}
+		this.broadcast(settled);
+	}
+
+	private pruneCreateSettled(): void {
+		const now = this.now();
+		for (const [workspaceId, entry] of this.recentCreateSettled) {
+			if (entry.expiresAt <= now) this.recentCreateSettled.delete(workspaceId);
+		}
+		while (this.recentCreateSettled.size > CREATE_SETTLED_REPLAY_MAX_ENTRIES) {
+			const oldest = this.recentCreateSettled.keys().next().value;
+			if (oldest === undefined) break;
+			this.recentCreateSettled.delete(oldest);
+		}
 	}
 
 	broadcastWorkspaceNamingFailed(

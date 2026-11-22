@@ -59,14 +59,13 @@ async function organizationPlugin(
 	if (!plugin && named) {
 		throw new CLIError(
 			`Your organization has no plugin "${name}".`,
-			"See what it has: superset plugins organization list",
+			"See what it has: paradev plugins organization list",
 		);
 	}
 	return plugin ?? null;
 }
 
 export default command({
-	sandbox: false,
 	description:
 		"Install a plugin: connect its account first if it needs one, then materialize its skills locally and record it on your account",
 	args: [
@@ -124,7 +123,7 @@ export default command({
 			if (connected.status === "authorize") {
 				return {
 					data: [{ name, connection: "authorize", url: connected.url }],
-					message: `Open this URL to connect ${name}:\n  ${connected.url}\nThen run superset plugins install ${name} again to install it.`,
+					message: `Open this URL to connect ${name}:\n  ${connected.url}\nThen run paradev plugins install ${name} again to install it.`,
 				};
 			}
 
@@ -270,6 +269,6 @@ async function connectFirst({
 	}
 	throw new CLIError(
 		`${name} was not connected in 5 minutes, so it was not installed`,
-		`Run: superset plugins install ${name}`,
+		`Run: paradev plugins install ${name}`,
 	);
 }

@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaApple, FaGithub } from "react-icons/fa";
+import { FaApple, FaGithub, FaGooglePlay } from "react-icons/fa";
 import { DownloadButton } from "@/app/[lang]/components/DownloadButton";
 import { EdgeGlare } from "@/app/[lang]/components/EdgeGlare";
 import { BoidsBackground } from "@/app/[lang]/components/HeroSection/components/BoidsBackground";
@@ -21,14 +21,17 @@ export function LandingHero({
 	emphasis: string;
 }) {
 	const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
-	const [isIOS, setIsIOS] = useState(false);
+	const [deviceStore, setDeviceStore] = useState<
+		"app_store" | "google_play" | null
+	>(null);
 
 	useEffect(() => {
-		setIsIOS(
+		const isIOS =
 			/iphone|ipad|ipod/i.test(navigator.userAgent) ||
-				(/macintosh/i.test(navigator.userAgent) &&
-					navigator.maxTouchPoints > 1),
-		);
+			(/macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+		if (isIOS) setDeviceStore("app_store");
+		else if (/android/i.test(navigator.userAgent))
+			setDeviceStore("google_play");
 	}, []);
 	const { t, i18n } = useLingui();
 
@@ -46,10 +49,6 @@ export function LandingHero({
 							}
 							className="group relative mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
-							<span
-								aria-hidden="true"
-								className="size-1.5 shrink-0 rounded-full bg-brand"
-							/>
 							<span>
 								<Trans>
 									Superset is now Paradev. Also, we raised an $11.5M seed
@@ -73,7 +72,7 @@ export function LandingHero({
 							>
 								<Trans>
 									The open-source workspace for Claude Code, Codex, and any
-									coding agent.
+									agent. Locally or in the cloud.
 								</Trans>
 							</p>
 						</div>
@@ -85,24 +84,32 @@ export function LandingHero({
 							/>
 							<Link
 								href={
-									isIOS
+									deviceStore === "app_store"
 										? COMPANY.APP_STORE_URL
-										: i18n.locale === "en"
-											? "/mobile"
-											: `/${i18n.locale}/mobile`
+										: deviceStore === "google_play"
+											? COMPANY.PLAY_STORE_URL
+											: i18n.locale === "en"
+												? "/mobile"
+												: `/${i18n.locale}/mobile`
 								}
 								onClick={() =>
-									isIOS
+									deviceStore
 										? track("mobile_store_clicked", {
-												store: "app_store",
+												store: deviceStore,
 												source: "hero",
 											})
 										: track("mobile_page_clicked", { source: "hero" })
 								}
-								aria-label={t({ message: "Paradev for iPhone and iPad" })}
+								aria-label={t({
+									message: "Paradev for iPhone, iPad, and Android",
+								})}
 								className="flex size-11 shrink-0 items-center justify-center border border-border bg-background text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand sm:size-12"
 							>
-								<FaApple aria-hidden="true" className="size-5" />
+								{deviceStore === "google_play" ? (
+									<FaGooglePlay aria-hidden="true" className="size-4" />
+								) : (
+									<FaApple aria-hidden="true" className="size-5" />
+								)}
 							</Link>
 							<button
 								type="button"

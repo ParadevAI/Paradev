@@ -6,9 +6,8 @@ const POLL_MS = 5_000;
 const WAIT_MS = 15 * 60_000;
 
 export default command({
-	sandbox: false,
 	description:
-		"Build an environment's snapshot again from [install] on its base branch; new workspaces keep starting from the current one until it succeeds",
+		"Build an environment's snapshot again from its [install]; new workspaces keep starting from the current one until it succeeds",
 	args: [positional("environment").required().desc("Environment ID")],
 	options: {
 		wait: boolean().desc("Wait for the build to finish; exit 1 if it fails"),
@@ -16,7 +15,7 @@ export default command({
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const { id } = await resolveEnvironment(
 			ctx.api,

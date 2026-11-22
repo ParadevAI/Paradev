@@ -5,6 +5,7 @@ import { m, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { type ActiveDemo, AppMockup } from "../AppMockup";
 import { SelectorPill } from "./components/SelectorPill";
+import { SelectorTrack } from "./components/SelectorTrack";
 import { DEMO_OPTIONS } from "./constants";
 
 // Scroll range (px) over which the demo docks and the selector opens
@@ -68,9 +69,13 @@ export function ProductDemo() {
 	return (
 		<div className="relative w-full max-w-full flex flex-col gap-4 lg:flex-row lg:gap-0">
 			{/* Mobile/tablet: static horizontal strip */}
-			<div className="flex items-center gap-2 px-4 overflow-x-auto scrollbar-hide sm:px-0 lg:hidden">
+			<SelectorTrack
+				orientation="horizontal"
+				activeKey={activeOption}
+				className="lg:hidden"
+			>
 				{options}
-			</div>
+			</SelectorTrack>
 
 			{/* Desktop: vertical radio column, opened by scroll */}
 			<m.div
@@ -81,7 +86,13 @@ export function ProductDemo() {
 					opacity: selectorOpacity,
 				}}
 			>
-				<div className="w-60 pr-6 flex flex-col gap-1">{options}</div>
+				<SelectorTrack
+					orientation="vertical"
+					activeKey={activeOption}
+					className="w-60 pr-6"
+				>
+					{options}
+				</SelectorTrack>
 			</m.div>
 
 			{/* Mockup: oversized, lower hero state that docks as you scroll */}

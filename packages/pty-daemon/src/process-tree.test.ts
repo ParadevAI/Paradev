@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
 	collectProcessSignalTargets,
+	hasRunningForegroundProcess,
+	parseForegroundProcessState,
 	parseProcessTable,
 } from "./process-tree.ts";
 
@@ -89,5 +91,22 @@ describe("collectProcessSignalTargets — caller-ancestry protection", () => {
 		expect(pids).toEqual(expect.arrayContaining([100, 900]));
 		expect(pids).not.toContain(4000);
 		expect(pids).not.toContain(process.pid);
+	});
+});
+
+describe("hasRunningForegroundProcess", () => {
+	test("parseForegroundProcessState compares tpgid and pgid", () => {
+		expect(parseForegroundProcessState("  100   100\n")).toBe(false);
+		expect(parseForegroundProcessState("  250   100\n")).toBe(true);
+		expect(parseForegroundProcessState("")).toBe(false);
+		expect(parseForegroundProcessState("  -1   100\n")).toBe(false);
+		expect(parseForegroundProcessState("  0   100\n")).toBe(false);
+	});
+
+	test("returns false immediately for invalid pids", async () => {
+		expect(await hasRunningForegroundProcess(0)).toBe(false);
+		expect(await hasRunningForegroundProcess(-5)).toBe(false);
+		expect(await hasRunningForegroundProcess(Number.NaN)).toBe(false);
+		expect(await hasRunningForegroundProcess(1.5)).toBe(false);
 	});
 });

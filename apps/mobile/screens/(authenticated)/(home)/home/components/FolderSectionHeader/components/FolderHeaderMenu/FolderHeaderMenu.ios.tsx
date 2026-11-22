@@ -26,7 +26,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 	const { t } = useLingui();
 	const theme = useTheme();
 	return (
-		<View className="size-9 items-center justify-center">
+		<View className="size-6 items-center justify-center">
 			<Host matchContents>
 				<SwiftUIMenu
 					modifiers={[accessibilityLabel(t({ message: "Group actions" }))]}
@@ -52,7 +52,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 						systemImage="paintpalette"
 					>
 						<SwiftUIButton
-							label={t({ message: "Default" })}
+							label={t({ message: "None" })}
 							systemImage={color === null ? "checkmark" : undefined}
 							onPress={() => onSetColor(null)}
 						/>
