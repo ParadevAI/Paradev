@@ -146,6 +146,7 @@ async function strandedQueues(organizationId: string | undefined) {
 	return rows.map((row) => row.sessionId);
 }
 
+/** A random batch, so turns that stay healthy cannot keep the others from being checked. */
 function staleRunningTurns(organizationId: string | undefined) {
 	return db
 		.select({
@@ -167,6 +168,7 @@ function staleRunningTurns(organizationId: string | undefined) {
 				sql`${agentTurns.startedAt} < now() - ${TURN_GRACE}::interval`,
 			),
 		)
+		.orderBy(sql`random()`)
 		.limit(BATCH);
 }
 
