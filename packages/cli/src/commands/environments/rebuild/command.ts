@@ -6,7 +6,6 @@ const POLL_MS = 5_000;
 const WAIT_MS = 15 * 60_000;
 
 export default command({
-	sandbox: false,
 	description:
 		"Build an environment's snapshot again from its [install]; new workspaces keep starting from the current one until it succeeds",
 	args: [positional("environment").required().desc("Environment ID")],
