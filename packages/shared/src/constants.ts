@@ -25,6 +25,12 @@ export const PROTOCOL_SCHEMES = {
 	PROD: "superset",
 } as const;
 
+/** Released builds without `paradev` ignore those links, so links still use `PROTOCOL_SCHEMES.PROD`. */
+export const ACCEPTED_PROTOCOL_SCHEMES = [
+	PROTOCOL_SCHEMES.PROD,
+	"paradev",
+] as const;
+
 // Company
 // Root domain flips the whole brand at cutover. Default keeps superset.sh so
 // nothing changes until NEXT_PUBLIC_ROOT_DOMAIN is set. All

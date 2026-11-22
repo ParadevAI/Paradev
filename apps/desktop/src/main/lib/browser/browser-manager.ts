@@ -1,14 +1,13 @@
 import { EventEmitter } from "node:events";
 import { totalmem } from "node:os";
-import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
 import { app, BrowserWindow, Menu, webContents } from "electron";
 import { writeClipboardImage } from "main/lib/clipboard-image";
+import { isDeepLinkUrl } from "main/lib/deep-link";
 import type {
 	DesignModeRect,
 	DesignModeScreenshot,
 	DesignModeSelectionResult,
 } from "shared/browser-design-mode";
-import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
 import { cookieRefusal, redactCookies } from "./cdp-cookie-guard";
 import { createExtensionWorldFilter } from "./cdp-extension-worlds";
@@ -123,13 +122,6 @@ function sanitizeUrl(url: string): string {
 // the pane.
 const ALLOWED_GUEST_SCHEMES = new Set(["http:", "https:", "about:"]);
 
-// A published page links back with the shipped `superset://` scheme; a dev
-// instance registers `superset-<workspace>` and must honour both.
-const DEEP_LINK_SCHEMES = new Set([
-	`${PROTOCOL_SCHEMES.PROD}:`,
-	`${PROTOCOL_SCHEME}:`,
-]);
-
 function protocolOf(url: string): string | null {
 	try {
 		return new URL(url).protocol;
@@ -141,11 +133,6 @@ function protocolOf(url: string): string | null {
 export function isAllowedGuestUrl(url: string): boolean {
 	const protocol = protocolOf(url);
 	return protocol !== null && ALLOWED_GUEST_SCHEMES.has(protocol);
-}
-
-function isDeepLinkUrl(url: string): boolean {
-	const protocol = protocolOf(url);
-	return protocol !== null && DEEP_LINK_SCHEMES.has(protocol);
 }
 
 /**

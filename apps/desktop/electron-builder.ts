@@ -6,6 +6,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
+import { ACCEPTED_PROTOCOL_SCHEMES } from "@superset/shared/constants";
 import type { Configuration } from "electron-builder";
 import pkg from "./package.json";
 import {
@@ -187,7 +188,7 @@ const config: Configuration = {
 	// Deep linking protocol
 	protocols: {
 		name: productName,
-		schemes: ["superset"],
+		schemes: [...ACCEPTED_PROTOCOL_SCHEMES],
 	},
 
 	// Linux
