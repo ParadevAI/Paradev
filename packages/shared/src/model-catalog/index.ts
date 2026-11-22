@@ -1,0 +1,107 @@
+export type ModelMetadata = {
+	provider: string;
+	family?: string;
+	toolCall?: boolean;
+	reasoning?: boolean;
+	inputModalities?: string[];
+	outputModalities?: string[];
+	contextWindow?: number;
+	outputLimit?: number;
+	status?: string;
+};
+
+export type CatalogModel = {
+	id: string;
+	label: string;
+	description?: string;
+	group?: string;
+	metadata?: ModelMetadata;
+};
+
+export type AgentModelCatalog = {
+	models: CatalogModel[];
+	/** "reported" when the agent listed these itself; "unknown" for the bundled list. */
+	availability: "reported" | "unknown";
+	/** The model a launch without a model override runs on, when the runtime says. */
+	defaultModel?: { id: string; label: string };
+	/** The reasoning effort a launch without an effort override runs at. */
+	defaultEffort?: { id: string; label: string };
+};
+
+export type ModelFilters = {
+	query?: string;
+	providers?: readonly string[];
+	hiddenIds?: readonly string[];
+	requireTools?: boolean;
+	requireTextOutput?: boolean;
+	includeDeprecated?: boolean;
+	selectedId?: string;
+};
+
+export function filterModelCatalog(
+	models: readonly CatalogModel[],
+	filters: ModelFilters = {},
+): CatalogModel[] {
+	const query = filters.query?.trim().toLowerCase();
+	return models.filter((model) => {
+		const metadata = model.metadata;
+		if (model.id !== filters.selectedId) {
+			if (filters.hiddenIds?.includes(model.id)) return false;
+			if (
+				filters.providers?.length &&
+				(!metadata || !filters.providers.includes(metadata.provider))
+			)
+				return false;
+			if (filters.requireTools && metadata?.toolCall === false) return false;
+			if (
+				filters.requireTextOutput &&
+				metadata?.outputModalities &&
+				!metadata.outputModalities.includes("text")
+			)
+				return false;
+			if (
+				filters.includeDeprecated === false &&
+				metadata?.status === "deprecated"
+			)
+				return false;
+		}
+		return (
+			!query ||
+			`${model.id} ${model.label} ${metadata?.provider ?? ""}`
+				.toLowerCase()
+				.includes(query)
+		);
+	});
+}
+
+/** The id a runtime uses for "whatever model the agent picks itself". */
+export const DEFAULT_ALIAS_MODEL_ID = "default";
+
+export function runtimeDefaultOption(
+	models: readonly Omit<CatalogModel, "metadata">[],
+	currentId: string | undefined,
+): AgentModelCatalog["defaultModel"] {
+	const current = models.find((model) => model.id === currentId);
+	if (!current) return undefined;
+	if (current.id !== DEFAULT_ALIAS_MODEL_ID)
+		return { id: current.id, label: current.label };
+	return current.description
+		? { id: current.id, label: current.description }
+		: undefined;
+}
+
+export function uniqueModels(models: readonly CatalogModel[]): CatalogModel[] {
+	const seen = new Set<string>();
+	return models.filter((model) => {
+		if (
+			!model.id ||
+			Array.from(model.id).some(
+				(char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127,
+			) ||
+			seen.has(model.id)
+		)
+			return false;
+		seen.add(model.id);
+		return true;
+	});
+}

@@ -16,13 +16,14 @@ import { z } from "zod";
 
 import { findOrganizationSolelyOwnedBy } from "../../lib/account-purge";
 import { emitAppFirstOpened } from "../../lib/activation-events";
+import { queueRulesReapply } from "../../lib/sandbox/reapply-rules";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 
 export const userRouter = {
-	me: protectedProcedure.query(({ ctx }) => ctx.session.user),
+	me: personProcedure.query(({ ctx }) => ctx.session.user),
 
-	myOrganization: protectedProcedure.query(async ({ ctx }) => {
+	myOrganization: personProcedure.query(async ({ ctx }) => {
 		const activeOrganizationId = ctx.activeOrganizationId;
 
 		const membership = await db.query.members.findFirst({
@@ -41,7 +42,7 @@ export const userRouter = {
 		return membership?.organization ?? null;
 	}),
 
-	myOrganizations: protectedProcedure.query(async ({ ctx }) => {
+	myOrganizations: personProcedure.query(async ({ ctx }) => {
 		const memberships = await db.query.members.findMany({
 			where: eq(members.userId, ctx.session.user.id),
 			orderBy: desc(members.createdAt),
@@ -56,7 +57,7 @@ export const userRouter = {
 			.map((m) => m.organization);
 	}),
 
-	updateProfile: protectedProcedure
+	updateProfile: personProcedure
 		.input(z.object({ name: z.string().min(1).max(100) }))
 		.mutation(async ({ ctx, input }) => {
 			const [updatedUser] = await db
@@ -64,6 +65,7 @@ export const userRouter = {
 				.set({ name: input.name })
 				.where(eq(users.id, ctx.session.user.id))
 				.returning();
+			await queueRulesReapply({ userId: ctx.session.user.id });
 			return updatedUser;
 		}),
 
@@ -72,7 +74,7 @@ export const userRouter = {
 	 * untouched so reactivation within the window restores everything; the
 	 * daily purge-expired-deletions job in apps/api purges once the window
 	 * has passed. */
-	deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
+	deleteAccount: personProcedure.mutation(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
 		if (await findOrganizationSolelyOwnedBy(userId)) {
@@ -100,7 +102,7 @@ export const userRouter = {
 
 	// Preferred UI language, written through from clients so async surfaces
 	// (web SSR, email) can render in it; null = auto-detect on each device.
-	updateLocale: protectedProcedure
+	updateLocale: personProcedure
 		.input(
 			z.object({
 				locale: z
@@ -117,7 +119,7 @@ export const userRouter = {
 			return { success: true };
 		}),
 
-	reactivateAccount: protectedProcedure.mutation(async ({ ctx }) => {
+	reactivateAccount: personProcedure.mutation(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 
 		const user = await db.query.users.findFirst({
@@ -142,7 +144,7 @@ export const userRouter = {
 		return { success: true };
 	}),
 
-	completeOnboarding: protectedProcedure.mutation(async ({ ctx }) => {
+	completeOnboarding: personProcedure.mutation(async ({ ctx }) => {
 		const userId = ctx.session.user.id;
 		const existing = await db.query.users.findFirst({
 			columns: { email: true, createdAt: true, onboardedAt: true },
@@ -162,7 +164,7 @@ export const userRouter = {
 		return updatedUser;
 	}),
 
-	uploadAvatar: protectedProcedure
+	uploadAvatar: personProcedure
 		.input(
 			z.object({
 				fileData: z.string(),

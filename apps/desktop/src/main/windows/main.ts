@@ -1,12 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
-import { msg } from "@lingui/core/macro";
 import * as Sentry from "@sentry/electron/main";
-import { i18n } from "@superset/i18n";
-import { workspaces, worktrees } from "@superset/local-db";
-import { eq } from "drizzle-orm";
 import type { BrowserWindow } from "electron";
-import { app, Notification, nativeTheme } from "electron";
+import { app, nativeTheme } from "electron";
 import log from "electron-log/main";
 import { createWindow } from "lib/electron-app/factories/windows/create";
 import { createTrpcContext } from "lib/trpc/context";
@@ -14,14 +10,15 @@ import { createAppRouter } from "lib/trpc/routers";
 import { getProductDisplayName } from "main/lib/app-display-name";
 import { resolveDevWorkspaceName } from "main/lib/dev-workspace-name";
 import { getIconPath } from "main/lib/dock-icon";
-import { localDb } from "main/lib/local-db";
 import { isExpectedRendererExit } from "main/lib/renderer-exit";
-import { NOTIFICATION_EVENTS, PLATFORM } from "shared/constants";
+import {
+	APP_PARTITION,
+	PLATFORM,
+	TITLE_BAR_OVERLAY_HEIGHT,
+} from "shared/constants";
 import { env } from "shared/env.shared";
-import type { AgentLifecycleEvent } from "shared/notification-types";
 import { createIPCHandler } from "trpc-electron/main";
 import {
-	appState,
 	isAppStateInitialized,
 	pruneWindowScopedState,
 } from "../lib/app-state";
@@ -29,18 +26,7 @@ import { browserManager } from "../lib/browser/browser-manager";
 import { attachEditContextMenu } from "../lib/edit-context-menu";
 import { createApplicationMenu } from "../lib/menu";
 import { menuEmitter } from "../lib/menu-events";
-import { playNotificationSound } from "../lib/notification-sound";
-import { NotificationManager } from "../lib/notifications/notification-manager";
-import {
-	notificationsApp,
-	notificationsEmitter,
-} from "../lib/notifications/server";
-import {
-	extractWorkspaceIdFromUrl,
-	getNotificationTitle,
-	getWorkspaceName,
-} from "../lib/notifications/utils";
-import { recordV1TerminalExit } from "../lib/notifications/v1-agent-sessions";
+import { notificationsApp } from "../lib/notifications/server";
 import {
 	getAllWindows,
 	getFocusedOrLastWindow,
@@ -59,7 +45,6 @@ import {
 	saveWindows,
 	type WindowState,
 } from "../lib/window-state";
-import { getWorkspaceRuntimeRegistry } from "../lib/workspace-runtime";
 
 // Singleton IPC handler — created once, shared by every window. Each window is
 // attached/detached individually via attachWindow/detachWindow.
@@ -69,36 +54,6 @@ let ipcHandler: ReturnType<typeof createIPCHandler> | null = null;
 // window. With multi-window support that is the most-recently-focused window
 // (tracked by the window registry) rather than a single stored reference.
 const getWindow = (): BrowserWindow | null => getFocusedOrLastWindow();
-
-function fallbackWorkspaceName(): string {
-	return i18n._(
-		msg({
-			message: "Workspace",
-		}),
-	);
-}
-
-function getWorkspaceNameFromDb(workspaceId: string | undefined): string {
-	if (!workspaceId) return fallbackWorkspaceName();
-	try {
-		const workspace = localDb
-			.select()
-			.from(workspaces)
-			.where(eq(workspaces.id, workspaceId))
-			.get();
-		const worktree = workspace?.worktreeId
-			? localDb
-					.select()
-					.from(worktrees)
-					.where(eq(worktrees.id, workspace.worktreeId))
-					.get()
-			: undefined;
-		return getWorkspaceName({ workspace, worktree });
-	} catch (error) {
-		console.error("[notifications] Failed to get workspace name:", error);
-		return fallbackWorkspaceName();
-	}
-}
 
 // invalidate() alone may not rebuild corrupted GPU layers — a tiny resize
 // forces Chromium to reconstruct the compositor layer tree.
@@ -179,11 +134,9 @@ export function initAppServices(): void {
 // they are never double-initialized by additional windows.
 let notificationsServer: ReturnType<typeof notificationsApp.listen> | null =
 	null;
-let notificationManager: NotificationManager | null = null;
-let agentLifecycleHandler: ((event: AgentLifecycleEvent) => void) | null = null;
 
 function startSharedServices(): void {
-	if (notificationManager) return;
+	if (notificationsServer) return;
 
 	notificationsServer = notificationsApp.listen(
 		env.DESKTOP_NOTIFICATIONS_PORT,
@@ -194,97 +147,12 @@ function startSharedServices(): void {
 			);
 		},
 	);
-
-	notificationManager = new NotificationManager({
-		isSupported: () => Notification.isSupported(),
-		createNotification: (opts) => new Notification(opts),
-		playSound: playNotificationSound,
-		onNotificationClick: (ids) => {
-			const win = getFocusedOrLastWindow();
-			win?.show();
-			win?.focus();
-			if (ids.workspaceId && ids.terminalId) {
-				notificationsEmitter.emit(
-					NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE,
-					{
-						workspaceId: ids.workspaceId,
-						source: { type: "terminal", id: ids.terminalId },
-					},
-				);
-				return;
-			}
-			notificationsEmitter.emit(NOTIFICATION_EVENTS.FOCUS_TAB, ids);
-		},
-		getVisibilityContext: () => {
-			const win = getFocusedOrLastWindow();
-			return {
-				isFocused: win?.isFocused() ?? false,
-				currentWorkspaceId: win
-					? extractWorkspaceIdFromUrl(win.webContents.getURL())
-					: null,
-				tabsState: appState.data?.tabsState,
-			};
-		},
-		getWorkspaceName: getWorkspaceNameFromDb,
-		getNotificationTitle: (event) =>
-			getNotificationTitle({
-				tabId: event.tabId,
-				paneId: event.paneId,
-				tabs: appState.data?.tabsState?.tabs,
-				panes: appState.data?.tabsState?.panes,
-			}),
-	});
-	notificationManager.start();
-
-	agentLifecycleHandler = (event: AgentLifecycleEvent) => {
-		notificationManager?.handleAgentLifecycle(event);
-	};
-	notificationsEmitter.on(
-		NOTIFICATION_EVENTS.AGENT_LIFECYCLE,
-		agentLifecycleHandler,
-	);
-
-	// Forward low-volume terminal lifecycle events to the renderer via the
-	// existing notifications subscription. Used only for correctness (e.g.
-	// clearing stuck agent lifecycle statuses when terminal panes aren't
-	// mounted).
-	getWorkspaceRuntimeRegistry()
-		.getDefault()
-		.terminal.on(
-			"terminalExit",
-			(event: {
-				paneId: string;
-				exitCode: number;
-				signal?: number;
-				reason?: "killed" | "exited" | "error";
-			}) => {
-				// A goodbye hook just before this death was the agent's SIGHUP
-				// death gasp — keep the session resumable across migration.
-				recordV1TerminalExit(event.paneId);
-				notificationsEmitter.emit(NOTIFICATION_EVENTS.TERMINAL_EXIT, {
-					paneId: event.paneId,
-					exitCode: event.exitCode,
-					signal: event.signal,
-					reason: event.reason,
-				});
-			},
-		);
 }
 
 function stopSharedServices(): void {
 	browserManager.unregisterAll();
 	notificationsServer?.close();
 	notificationsServer = null;
-	notificationManager?.dispose();
-	notificationManager = null;
-	if (agentLifecycleHandler) {
-		notificationsEmitter.off(
-			NOTIFICATION_EVENTS.AGENT_LIFECYCLE,
-			agentLifecycleHandler,
-		);
-		agentLifecycleHandler = null;
-	}
-	getWorkspaceRuntimeRegistry().getDefault().terminal.detachAllListeners();
 }
 
 // ---------------------------------------------------------------------------
@@ -364,10 +232,18 @@ export async function restoreWindows(): Promise<void> {
  */
 
 /** The overlay's colours follow the OS theme until the renderer's theme store sets its own. */
-export function titleBarOverlayColors(): Electron.TitleBarOverlay {
+function titleBarOverlayColors(): Electron.TitleBarOverlay {
 	return nativeTheme.shouldUseDarkColors
-		? { color: "#252525", symbolColor: "#e5e5e5", height: 40 }
-		: { color: "#ffffff", symbolColor: "#1f1f1f", height: 40 };
+		? {
+				color: "#252525",
+				symbolColor: "#e5e5e5",
+				height: TITLE_BAR_OVERLAY_HEIGHT,
+			}
+		: {
+				color: "#ffffff",
+				symbolColor: "#1f1f1f",
+				height: TITLE_BAR_OVERLAY_HEIGHT,
+			};
 }
 
 export async function createPlatformWindow({
@@ -394,7 +270,7 @@ export async function createPlatformWindow({
 	const workspaceName = isDev ? resolveDevWorkspaceName() : undefined;
 	const displayName = getProductDisplayName();
 	const windowTitle = workspaceName
-		? `${displayName} — ${workspaceName}`
+		? `${displayName} · ${workspaceName}`
 		: displayName;
 
 	const window = createWindow({
@@ -434,7 +310,7 @@ export async function createPlatformWindow({
 			plugins: true,
 			// Isolate Electron session from system browser cookies
 			// This ensures desktop uses bearer token auth, not web cookies
-			partition: "persist:superset",
+			partition: APP_PARTITION,
 		},
 	});
 
@@ -490,6 +366,16 @@ export async function createPlatformWindow({
 	ipcHandler?.attachWindow(window);
 	browserManager.registerHostWindow(window.webContents);
 
+	// A pane leaving HTML fullscreen can leave its <webview> as this document's
+	// fullscreen element. Exiting before the macOS animation ends never settles.
+	window.on("leave-full-screen", () => {
+		window.webContents
+			.executeJavaScript(
+				"document.fullscreenElement && document.exitFullscreen().catch(() => {})",
+			)
+			.catch(() => {});
+	});
+
 	// macOS Sequoia+: occluded/minimized windows can lose compositor layers
 	if (PLATFORM.IS_MAC) {
 		window.on("restore", () => {
@@ -542,6 +428,7 @@ export async function createPlatformWindow({
 
 	window.webContents.on("did-finish-load", () => {
 		console.log("[main-window] Renderer loaded successfully");
+		if (window.isDestroyed()) return;
 
 		if (persistedZoomLevel !== undefined) {
 			window.webContents.setZoomLevel(persistedZoomLevel);
@@ -564,6 +451,7 @@ export async function createPlatformWindow({
 			console.error(`  Error code: ${errorCode}`);
 			console.error(`  Description: ${errorDescription}`);
 			console.error(`  URL: ${validatedURL}`);
+			if (window.isDestroyed()) return;
 			// Show the window anyway so user can see something is wrong
 			window.show();
 		},

@@ -5,8 +5,18 @@ import { ARTIFACT_GUARD_SCRIPT_NAME } from "./artifact-guard-hook";
 import { NOTIFY_SCRIPT_NAME } from "./notify-hook";
 import { getBinDir } from "./paths";
 
-export const WRAPPER_MARKER = "# Superset agent-wrapper v5";
 export { SUPERSET_MANAGED_BINARIES };
+
+export const WRAPPER_MARKER_PREFIX = "# Superset agent-wrapper";
+export const WRAPPER_MARKER = `${WRAPPER_MARKER_PREFIX} v5`;
+
+/** Wrapper passes allowed per binary in one process tree before it refuses to run. */
+export const MAX_WRAPPER_NESTING = 8;
+export const WRAPPER_LOOP_EXIT_STATUS = 126;
+
+export function getWrapperDepthVar(binaryName: string): string {
+	return `SUPERSET_WRAPPER_DEPTH_${binaryName.replace(/[^A-Za-z0-9]/g, "_")}`;
+}
 
 /** Path (under SUPERSET_HOME_DIR) of the runtime notify hook script. */
 export const MANAGED_NOTIFY_RELATIVE_PATH = `hooks/${NOTIFY_SCRIPT_NAME}`;
@@ -30,9 +40,16 @@ export const DYNAMIC_NOTIFY_PATH_MARKER = `$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_R
  * `~/.claude/settings.json`, and an agent's tool call can launch a second CLI
  * whose config fires under the terminal's agent — and the notify script uses
  * the disagreement to drop those events instead of relabeling the terminal.
+ *
+ * `eventType` sets `SUPERSET_HOOK_EVENT` for harnesses whose payload does not
+ * name the event (Antigravity); the notify script prefers it over the payload.
  */
-export function getManagedNotifyHookCommand(agentId: string): string {
-	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
+export function getManagedNotifyHookCommand(
+	agentId: string,
+	eventType?: string,
+): string {
+	const eventAssignment = eventType ? ` SUPERSET_HOOK_EVENT=${eventType}` : "";
+	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId}${eventAssignment} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
 }
 
 export const MANAGED_ARTIFACT_GUARD_RELATIVE_PATH = `hooks/${ARTIFACT_GUARD_SCRIPT_NAME}`;
@@ -43,11 +60,11 @@ export function getManagedArtifactGuardHookCommand(): string {
 	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" ] && "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" || true`;
 }
 
-// Dev setup (.superset/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
-// $PWD/superset-dev-data — without a leading dot — so we must recognize that
+// Dev setup (.paradev/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
+// $PWD/paradev-dev-data — without a leading dot — so we must recognize that
 // variant to reap stale notify.sh paths from deleted worktrees.
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =
-	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|(?:paradev|superset)-dev-data)\//;
 
 import { writeFileIfChanged } from "./write-file-if-changed";
 
@@ -110,23 +127,55 @@ export function isManagedArtifactGuardCommand(
 	);
 }
 
+/**
+ * A candidate is never the real binary when it is this wrapper (`-ef` follows
+ * symlinks, so aliased bin dirs, links elsewhere on PATH and relative or
+ * duplicate entries all match) or any other Superset wrapper, found by the
+ * marker on its second line. Neither check depends on HOME or on where the
+ * wrapper was generated.
+ */
 function buildRealBinaryResolver(): string {
 	return `find_real_binary() {
   local name="$1"
   local IFS=:
+  local dir candidate first_line marker_line
   for dir in $PATH; do
     [ -z "$dir" ] && continue
     dir="\${dir%/}"
     case "$dir" in
-      "${getBinDir()}"|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
+      "${getBinDir()}"|"$HOME"/.paradev/bin|"$HOME"/.paradev-*/bin|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
     esac
-    if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
-      printf "%s\\n" "$dir/$name"
-      return 0
-    fi
+    candidate="$dir/$name"
+    [ -x "$candidate" ] && [ ! -d "$candidate" ] || continue
+    [ "$candidate" -ef "$0" ] && continue
+    marker_line=""
+    { IFS= read -r -n 256 first_line; IFS= read -r -n 256 marker_line; } 2>/dev/null <"$candidate"
+    case "$marker_line" in
+      "${WRAPPER_MARKER_PREFIX}"*) continue ;;
+    esac
+    printf "%s\\n" "$candidate"
+    return 0
   done
   return 1
 }
+`;
+}
+
+/**
+ * Last line of defense if the resolver ever lets the wrapper find itself: the
+ * counter lives in the environment, which every re-entry inherits (child or
+ * exec), so the loop ends after a few passes with a clear message.
+ */
+function buildLoopGuard(binaryName: string): string {
+	const depthVar = getWrapperDepthVar(binaryName);
+	return `_superset_depth="\${${depthVar}:-0}"
+case "$_superset_depth" in *[!0-9]*) _superset_depth=0 ;; esac
+if [ "$_superset_depth" -ge ${MAX_WRAPPER_NESTING} ]; then
+  echo "Paradev: ${binaryName} wrapper started ${MAX_WRAPPER_NESTING} times in one process tree. Either a PATH entry leads back to this wrapper ($0), or ${binaryName} is nested more than ${MAX_WRAPPER_NESTING} levels deep. Run 'type -a ${binaryName}' to see each ${binaryName} on PATH." >&2
+  exit ${WRAPPER_LOOP_EXIT_STATUS}
+fi
+export ${depthVar}=$((10#$_superset_depth + 1))
+
 `;
 }
 
@@ -252,7 +301,7 @@ ${buildLaunchReportBlock()}fi
 ${WRAPPER_MARKER}
 # Superset wrapper for ${binaryName}
 
-${buildRealBinaryResolver()}
+${buildLoopGuard(binaryName)}${buildRealBinaryResolver()}
 REAL_BIN="$(find_real_binary "${binaryName}")"
 if [ -z "$REAL_BIN" ]; then
   echo "${getMissingBinaryMessage(binaryName)}" >&2
@@ -265,7 +314,7 @@ ${options.beforeLaunch ?? ""}${identity}${execLine}
 
 export function createWrapper(binaryName: string, script: string): void {
 	const changed = writeFileIfChanged(getWrapperPath(binaryName), script, 0o755);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} ${binaryName} wrapper`,
 	);
 }

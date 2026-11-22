@@ -2,6 +2,7 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { HostDb } from "../../db/index.ts";
 import { terminalAgentBindings, terminalSessions } from "../../db/schema.ts";
 import { chatPortTerminalIds, portManager } from "../../ports/port-manager.ts";
+import { caught } from "../../runtime/box-log-filter";
 import { markTerminalAgentBindingEnded } from "../../terminal-agents/persistence.ts";
 import { getDaemonClient } from "../daemon-client-singleton.ts";
 import {
@@ -230,7 +231,10 @@ export function reconcileMissingTerminalSessions(
 	const total = recoverable + disposed;
 	if (total > 0) {
 		console.log(
-			`[host-service] terminal reaper: reconciled ${total} daemon-lost session(s) (${recoverable} recoverable, ${disposed} disposed)`,
+			"[host-service] terminal reaper reconciled daemon-lost sessions (total, recoverable, disposed):",
+			total,
+			recoverable,
+			disposed,
 		);
 	}
 	return total;
@@ -256,14 +260,15 @@ function applyPortScanSync(
 		}
 		if (plan.register.length > 0) {
 			console.log(
-				`[host-service] port-scan sync: registered ${plan.register.length} unattached daemon session(s) for scanning`,
+				"[host-service] port-scan sync registered unattached daemon sessions for scanning (count):",
+				plan.register.length,
 			);
 		}
 		for (const terminalId of plan.unregister) {
 			portManager.unregisterSession(terminalId);
 		}
 	} catch (err) {
-		console.warn("[host-service] port-scan sync failed:", err);
+		console.warn("[host-service] port-scan sync failed:", caught(err));
 	}
 }
 
@@ -331,7 +336,7 @@ async function reapOrphanedSessions(
 			missingObservations.reset();
 			console.warn(
 				"[host-service] missing-session reconciliation failed:",
-				err,
+				caught(err),
 			);
 		}
 	}
@@ -399,13 +404,15 @@ export function startTerminalReaper(db: HostDb): () => void {
 			.then((result) => {
 				if (result.reaped > 0 || result.failed > 0) {
 					console.log(
-						`[host-service] terminal reaper: ${result.reaped} reaped, ${result.failed} failed`,
+						"[host-service] terminal reaper (reaped, failed):",
+						result.reaped,
+						result.failed,
 					);
 				}
 			})
 			.catch((err) => {
 				missingObservations.reset();
-				console.warn("[host-service] terminal reaper failed:", err);
+				console.warn("[host-service] terminal reaper failed:", caught(err));
 			})
 			.finally(() => {
 				running = false;
@@ -420,7 +427,10 @@ export function startTerminalReaper(db: HostDb): () => void {
 	const warmupTimers = PORT_SCAN_WARMUP_DELAYS_MS.map((delay) =>
 		setTimeout(() => {
 			void syncPortScans(db).catch((err) => {
-				console.warn("[host-service] port-scan warm-up sync failed:", err);
+				console.warn(
+					"[host-service] port-scan warm-up sync failed:",
+					caught(err),
+				);
 			});
 		}, delay),
 	);

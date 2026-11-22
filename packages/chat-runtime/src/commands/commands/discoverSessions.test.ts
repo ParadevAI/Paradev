@@ -6,6 +6,7 @@ import type {
 	HarnessAdapter,
 } from "../../harness";
 import { createTestRuntime } from "../../testing/testRuntime";
+import { pathKey } from "./commands";
 
 const HARNESS = "listing";
 
@@ -14,10 +15,12 @@ function probedRuntime(page: DiscoverSessionsResult | Error | null) {
 		started: 0,
 		disposed: 0,
 		factoryCalls: 0,
+		configs: [] as (string | undefined)[],
 		queries: [] as DiscoverNativeSessionsInput[],
 	};
-	const adapter = (): HarnessAdapter => {
+	const adapter = (options: { agentConfigId?: string }): HarnessAdapter => {
 		probe.factoryCalls += 1;
+		probe.configs.push(options.agentConfigId);
 		return {
 			start(): AsyncIterable<never> {
 				probe.started += 1;
@@ -26,7 +29,7 @@ function probedRuntime(page: DiscoverSessionsResult | Error | null) {
 			prompt() {},
 			cancelTurn() {},
 			respondToApproval() {},
-			setMode() {},
+			setMode: () => Promise.resolve(true),
 			...(page === null
 				? {}
 				: {
@@ -75,6 +78,50 @@ describe("discoverSessions", () => {
 		}
 	});
 
+	test("drops sessions from other worktrees of the same repository", async () => {
+		const { runtime } = probedRuntime({
+			supported: true,
+			sessions: [
+				{ sessionId: "here", cwd: "/work/repo" },
+				{ sessionId: "here-trailing-slash", cwd: "/work/repo/" },
+				{ sessionId: "sibling", cwd: "/work/repo-feature" },
+			],
+			nextCursor: "page-2",
+		});
+
+		const page = await runtime.commands.discoverSessions(query);
+
+		expect(page.sessions.map((session) => session.sessionId)).toEqual([
+			"here",
+			"here-trailing-slash",
+		]);
+		expect(page.nextCursor).toBe("page-2");
+		await runtime.dispose();
+	});
+
+	test("lists an account's history through an adapter of that account", async () => {
+		const { runtime, probe } = probedRuntime({ supported: true, sessions: [] });
+		runtime.commands.createSession({
+			commandId: randomUUID(),
+			...query,
+			agentConfigId: "config-a",
+		});
+
+		await runtime.commands.discoverSessions({
+			...query,
+			agentConfigId: "config-a",
+		});
+		expect(probe.configs).toEqual(["config-a"]);
+		await runtime.commands.discoverSessions({
+			...query,
+			agentConfigId: "config-b",
+		});
+
+		expect(probe.configs).toEqual(["config-a", "config-b"]);
+		expect(probe.queries).toHaveLength(2);
+		await runtime.dispose();
+	});
+
 	test("reuses a live adapter in the same scope only", async () => {
 		const { runtime, probe } = probedRuntime({ supported: true, sessions: [] });
 		runtime.commands.createSession({ commandId: randomUUID(), ...query });
@@ -94,5 +141,14 @@ describe("discoverSessions", () => {
 		]);
 		expect(probe.disposed).toBe(1);
 		await runtime.dispose();
+	});
+
+	test("matches Windows paths regardless of case", () => {
+		expect(pathKey("c:\\Src\\Repo\\", "win32")).toBe(
+			pathKey("C:\\src\\repo", "win32"),
+		);
+		expect(pathKey("/work/Repo", "linux")).not.toBe(
+			pathKey("/work/repo", "linux"),
+		);
 	});
 });

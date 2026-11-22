@@ -7,7 +7,7 @@ import {
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
 import { getTemplatePath } from "./config";
-import { resolveUserHomeDir } from "./paths";
+import { APP_HOME_DIR_NAME, resolveUserHomeDir } from "./paths";
 
 /**
  * Creates the Amp wrapper that preserves Superset's terminal environment.
@@ -51,14 +51,16 @@ export function getAmpPluginContent(): string {
 		getTemplatePath("amp-plugin.template.ts"),
 		"utf-8",
 	);
-	return template.replace("{{MARKER}}", AMP_PLUGIN_MARKER);
+	return template
+		.replace("{{MARKER}}", AMP_PLUGIN_MARKER)
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 export function createAmpPlugin(): void {
 	const pluginPath = getAmpGlobalPluginPath();
 	fs.mkdirSync(path.dirname(pluginPath), { recursive: true });
 	const changed = writeFileIfChanged(pluginPath, getAmpPluginContent(), 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Amp lifecycle plugin`,
 	);
 }

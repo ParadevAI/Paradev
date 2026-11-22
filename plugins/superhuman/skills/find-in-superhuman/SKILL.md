@@ -19,6 +19,10 @@ otherwise. When the question could span accounts (a personal and a work inbox),
 run it once per account and say which one each result came from. An empty
 result from the wrong account looks exactly like a thread that does not exist.
 
+Through Paradev each call also takes `superset_account`, which picks the
+connection when there are several; `acting_email` picks a linked account
+inside it. Pick the connection first.
+
 ## 2. Filter on people and time before words
 
 `list_threads` takes `from`, `to`, `subject_contains`, `body_contains`,

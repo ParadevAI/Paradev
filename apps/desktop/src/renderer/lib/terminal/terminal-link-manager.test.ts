@@ -2,7 +2,7 @@ import { describe, expect, it, mock } from "bun:test";
 import type { ILinkProvider, Terminal as XTerm } from "@xterm/xterm";
 import { TerminalLinkManager } from "./terminal-link-manager";
 
-function createMockTerminal() {
+function createMockTerminal({ hasSelection = false } = {}) {
 	const registeredProviders: ILinkProvider[] = [];
 	const disposedProviders: ILinkProvider[] = [];
 	const terminal = {
@@ -23,6 +23,7 @@ function createMockTerminal() {
 			},
 		},
 		cols: 80,
+		hasSelection: () => hasSelection,
 	} as unknown as XTerm;
 
 	return { terminal, registeredProviders, disposedProviders };
@@ -67,6 +68,29 @@ describe("TerminalLinkManager", () => {
 			url: "https://example.com",
 		});
 		expect(onLinkLeave).toHaveBeenCalled();
+	});
+
+	it("ignores a plain click that ends a text selection", () => {
+		const { terminal } = createMockTerminal({ hasSelection: true });
+		const manager = new TerminalLinkManager(terminal);
+		const onUrlClick = mock();
+		manager.setHandlers({ stat: async () => null, onUrlClick });
+		const range = { start: { x: 1, y: 1 }, end: { x: 20, y: 1 } };
+
+		terminal.options.linkHandler?.activate(
+			{} as MouseEvent,
+			"https://example.com",
+			range,
+		);
+		expect(onUrlClick).not.toHaveBeenCalled();
+
+		const modified = { metaKey: true } as MouseEvent;
+		terminal.options.linkHandler?.activate(
+			modified,
+			"https://example.com",
+			range,
+		);
+		expect(onUrlClick).toHaveBeenCalledWith(modified, "https://example.com");
 	});
 
 	it("clears only the OSC link handler it installed", () => {

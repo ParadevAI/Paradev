@@ -1,5 +1,5 @@
 import { deriveWorkspaceTitleFromPrompt } from "@superset/shared/workspace-launch";
-import { getLocalProject } from "../../../../projects/local-project-store";
+import { getProjectIncludingDeleted } from "../../../../projects/local-project-store";
 import { createGitEnvResolver } from "../../../../runtime/git/git";
 import type { HostServiceContext } from "../../../../types";
 import { getHostWorkerPool } from "../../../../workers/host-worker-pool";
@@ -160,7 +160,7 @@ export function scheduleWorkspaceNaming(
 				? naming.agent
 				: undefined;
 		const project = row.projectId
-			? getLocalProject(ctx.db, row.projectId)
+			? getProjectIncludingDeleted(ctx.db, row.projectId)
 			: undefined;
 		const links = agent
 			? await resolveNamingLinks(

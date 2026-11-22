@@ -4,6 +4,8 @@ import {
 	catalogPlansFrom,
 	fromAutumnRest,
 	isSelfServeAutumnPlan,
+	lineupRatePerGbHour,
+	planCatalogFromAutumn,
 	seatLicensePlan,
 	seatPriceOf,
 } from "@superset/shared/billing";
@@ -68,6 +70,11 @@ export async function catalogAutumnPlans(): Promise<AutumnCatalogPlan[]> {
 		);
 		return lastKnown;
 	}
+}
+
+/** The price per GB-hour for an organization with no plan of its own. */
+export async function listRatePerGbHour(): Promise<number | null> {
+	return lineupRatePerGbHour(planCatalogFromAutumn(await catalogAutumnPlans()));
 }
 
 export async function isSelfServePlan(planId: string): Promise<boolean> {

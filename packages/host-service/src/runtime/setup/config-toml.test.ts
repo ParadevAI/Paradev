@@ -15,7 +15,7 @@ import {
 let root: string;
 let repoPath: string;
 let worktreePath: string;
-let homeDir: string;
+let appHomeDir: string;
 const projectId = "proj-1";
 
 function write(dir: string, name: string, content: string) {
@@ -27,21 +27,26 @@ beforeEach(() => {
 	root = mkdtempSync(join(tmpdir(), "config-toml-test-"));
 	repoPath = join(root, "repo");
 	worktreePath = join(root, "worktree");
-	homeDir = join(root, "home");
-	for (const dir of [repoPath, worktreePath, homeDir]) {
+	appHomeDir = join(root, "home");
+	for (const dir of [repoPath, worktreePath, appHomeDir]) {
 		mkdirSync(dir, { recursive: true });
 	}
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
+	// Never the box's own /etc/superset/environment.toml, which a cloud workspace running these tests has.
+	process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(root, "environment.toml");
 });
 
 afterEach(() => {
+	delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
+	delete process.env.SUPERSET_SANDBOX_WORKSPACE_PATH;
+	delete process.env.SUPERSET_SANDBOX_REPOSITORIES;
 	rmSync(root, { recursive: true, force: true });
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
 });
 
-const args = () => ({ repoPath, projectId, worktreePath, homeDir });
+const args = () => ({ repoPath, projectId, worktreePath, appHomeDir });
 
 type LoadArgs =
 	| ReturnType<typeof args>
@@ -112,17 +117,52 @@ describe("loadProjectConfig with config.toml", () => {
 		});
 	});
 
-	it("the cloud reads the cloud tables, without the personal file", () => {
+	it("the cloud reads the environment's config with its cloud tables, not the repository's files", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
-		write(
-			repoPath,
-			"config.toml",
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(
+			join(root, "environment.toml"),
 			'[setup]\nrun = "local-setup"\n[setup.cloud]\nrun = "cloud-setup"\n',
 		);
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
 		write(repoPath, "config.local.toml", '[setup]\nrun = "personal"\n');
 		expect(resolved({ repoPath, projectId }).setup.commands).toEqual([
 			"cloud-setup",
 		]);
+	});
+
+	it("in a box with several repositories, only the primary takes the environment's config", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		process.env.SUPERSET_SANDBOX_WORKSPACE_PATH = root;
+		process.env.SUPERSET_SANDBOX_REPOSITORIES = JSON.stringify([
+			{ url: "https://github.com/acme/web", branch: "main", path: "repo" },
+			{ url: "https://github.com/acme/docs", branch: "main", path: "docs" },
+		]);
+		writeFileSync(join(root, "environment.toml"), '[setup]\nrun = "env"\n');
+		const docsPath = join(root, "docs");
+		write(docsPath, "config.toml", '[setup]\nrun = "docs"\n');
+		expect(resolved({ repoPath, projectId }).setup.commands).toEqual(["env"]);
+		expect(resolved({ repoPath: docsPath, projectId }).setup.commands).toEqual([
+			"docs",
+		]);
+	});
+
+	it("an environment config that does not parse runs nothing and says why", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(join(root, "environment.toml"), "[setup\n");
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
+		expect(loadProjectConfig({ repoPath, projectId })?.kind).toBe("invalid");
 	});
 
 	it("a local app launched from a sandbox terminal still resolves as local", () => {
@@ -148,7 +188,21 @@ describe("loadProjectConfig with config.toml", () => {
 	});
 });
 
-describe("loadProjectConfig with v1 in the cloud", () => {
+describe("loadProjectConfig in the cloud without an environment config", () => {
+	it("reads the repository's config, as before environments had their own", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(join(root, "environment.toml"), "\n");
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
+		const loaded = loadProjectConfig({ repoPath, projectId, appHomeDir });
+		expect(loaded?.kind === "ok" && loaded.resolved.setup.commands).toEqual([
+			"repository",
+		]);
+	});
+
 	it("keeps v1's cloud behavior: only start runs, and no teardown", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
 		write(
@@ -166,7 +220,7 @@ describe("loadProjectConfig with v1 in the cloud", () => {
 describe("hasProjectConfig and describeProjectConfigSources", () => {
 	it("a config.toml counts as configured and reports no legacy sources", () => {
 		write(repoPath, "config.toml", "");
-		expect(hasProjectConfig({ repoPath, projectId, homeDir })).toBe(true);
+		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(true);
 		expect(describeProjectConfigSources(args())).toEqual({
 			format: "toml",
 			legacySources: [],
@@ -185,7 +239,7 @@ describe("hasProjectConfig and describeProjectConfigSources", () => {
 			JSON.stringify({ setup: { after: ["c"] } }),
 		);
 		write(repoPath, "teardown.sh", "echo");
-		const userDir = join(homeDir, ".superset", "projects", projectId);
+		const userDir = join(appHomeDir, "projects", projectId);
 		mkdirSync(userDir, { recursive: true });
 		writeFileSync(join(userDir, "config.json"), "{}");
 		const expected: LegacyConfigSource[] = [
@@ -203,6 +257,34 @@ describe("hasProjectConfig and describeProjectConfigSources", () => {
 
 	it("nothing configured reports none", () => {
 		expect(describeProjectConfigSources(args()).format).toBe("none");
-		expect(hasProjectConfig({ repoPath, projectId, homeDir })).toBe(false);
+		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(false);
+	});
+});
+
+describe("config folder", () => {
+	function writeIn(folder: string, name: string, content: string) {
+		mkdirSync(join(repoPath, folder), { recursive: true });
+		writeFileSync(join(repoPath, folder, name), content, "utf-8");
+	}
+
+	it("reads config from .paradev", () => {
+		writeIn(".paradev", "config.toml", '[setup]\nrun = "echo from-paradev"\n');
+
+		expect(setupCommand({ repoPath, projectId })).toEqual({
+			command: "echo from-paradev",
+		});
+	});
+
+	it("keeps reading .superset when .paradev holds only pdev's files", () => {
+		writeIn(".paradev", "settings.json", "{}");
+		writeIn(
+			".superset",
+			"config.toml",
+			'[setup]\nrun = "echo from-superset"\n',
+		);
+
+		expect(setupCommand({ repoPath, projectId })).toEqual({
+			command: "echo from-superset",
+		});
 	});
 });

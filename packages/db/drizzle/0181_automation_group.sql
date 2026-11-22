@@ -1,0 +1,1 @@
+ALTER TABLE "automations" ADD COLUMN "group_name" text;

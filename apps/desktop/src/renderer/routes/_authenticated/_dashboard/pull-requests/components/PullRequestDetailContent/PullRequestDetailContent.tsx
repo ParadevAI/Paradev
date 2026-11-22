@@ -1,9 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { cn } from "@superset/ui/utils";
 import { lazy, type ReactNode, Suspense } from "react";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { WorkItemDetailState } from "../../../components/WorkItemDetailState";
 import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
-import { pullRequestReadErrorMessage } from "../../utils/combinePullRequestReadErrors";
+import type { PullRequestPreview } from "../../hooks/usePullRequestListPreview";
+import { needsGithubConnection } from "../../utils/pullRequestClient";
 import type { PullRequestActivityThreads } from "../PullRequestActivity";
 import type { PullRequestCommentTarget } from "../PullRequestConversationComposer";
 import { PullRequestDetailSkeleton } from "../PullRequestDetailSkeleton";
@@ -30,6 +33,7 @@ export function PullRequestDetailContent({
 	threads,
 	summaryAside,
 	commentTarget = null,
+	preview = null,
 }: {
 	activeTab: PullRequestDetailTab;
 	projectId: string | null;
@@ -49,6 +53,8 @@ export function PullRequestDetailContent({
 	summaryAside?: ReactNode;
 	/** Where a conversation comment posts; null hides the composer. */
 	commentTarget?: PullRequestCommentTarget | null;
+	/** Shown in the loading skeleton's header slot until the detail arrives. */
+	preview?: PullRequestPreview | null;
 }) {
 	const { t } = useLingui();
 	if (prNumber === null || (!repoFullName && !projectId && !detail.isLoading)) {
@@ -59,23 +65,35 @@ export function PullRequestDetailContent({
 			/>
 		);
 	}
-	if (detail.isResolvingProject) return <PullRequestDetailSkeleton />;
+	if (detail.isResolvingProject)
+		return <PullRequestDetailSkeleton preview={preview} />;
 	const prUrl =
 		detail.data?.url ??
 		(repoFullName
 			? `https://github.com/${repoFullName}/pull/${prNumber}`
 			: null);
 	const detailState = detail.data ? null : detail.isLoading ? (
-		<PullRequestDetailSkeleton />
+		<PullRequestDetailSkeleton preview={preview} />
 	) : (
 		<WorkItemDetailState
 			message={
 				detail.error
-					? pullRequestReadErrorMessage(detail.error)
+					? errorMessage(detail.error)
 					: t({ message: "Pull request not found" })
 			}
 			isError={!!detail.error}
 			onRetry={detail.error ? () => void detail.refetch() : undefined}
+			action={
+				needsGithubConnection(detail.error)
+					? {
+							label: t({ message: "Connect GitHub" }),
+							onClick: () =>
+								void cloudTrpcClient.githubUser.connect
+									.mutate()
+									.then(({ url }) => window.open(url, "_blank")),
+						}
+					: undefined
+			}
 		/>
 	);
 	return (

@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { automationGroupInputSchema } from "@superset/shared/automation-group";
 import {
 	describeEnvironments,
 	selectCloudEnvironment,
@@ -95,12 +96,17 @@ export function register(server: McpServer): void {
 				.boolean()
 				.optional()
 				.describe(
-					"Deliver each run's prompt into the agent session the previous run left behind instead of starting another beside it. Requires a pinned v2WorkspaceId or cloudWorkspaceId — that is where the session lives. Use for an automation that should build up one conversation (triaging items one by one) rather than starting clean each time.",
+					"Deliver each run's prompt into the agent session the previous run left behind instead of starting another beside it. With no pinned v2WorkspaceId or cloudWorkspaceId, the first run's workspace is kept and reused, since that is where the session lives. Use for an automation that should build up one conversation (triaging items one by one) rather than starting clean each time.",
 				),
 			tags: workspaceTagsInputSchema
 				.optional()
 				.describe(
 					"Workspace tags applied to each run's created workspace; each tag files it into a sidebar folder of the same name. Defaults to ['automation'] so runs group out of the box.",
+				),
+			group: automationGroupInputSchema
+				.optional()
+				.describe(
+					"Group the automation is listed under in the automations table. Omit to leave it ungrouped. At most 64 characters; a name matching an existing group in any case joins that group.",
 				),
 		},
 		handler: async (input, ctx) => {

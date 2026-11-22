@@ -5,8 +5,8 @@ import { CloudSection } from "renderer/routes/_authenticated/_dashboard/componen
 import { CloudWorkspacesList } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacesList";
 import type { CloudWorkspaceListItem } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacesList/components/CloudWorkspaceListRow";
 import { CreateTaskDialog } from "renderer/routes/_authenticated/_dashboard/components/CreateTaskDialog";
+import { ProjectTaskList } from "renderer/routes/_authenticated/_dashboard/components/ProjectTaskList";
 import type { ProjectRecord } from "../../../../types";
-import { ProjectTaskList } from "./components/ProjectTaskList";
 
 interface ProjectProgressTabProps {
 	project: ProjectRecord;

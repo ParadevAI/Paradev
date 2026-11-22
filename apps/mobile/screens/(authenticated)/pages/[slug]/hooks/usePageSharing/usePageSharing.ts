@@ -51,7 +51,7 @@ export function usePageSharingActions(pageId: string | undefined) {
 	return { setVisibility, setSharedVersion };
 }
 
-export type PageShareRole = "view" | "comment";
+export type PageShareRole = "view" | "comment" | "edit";
 
 const sharingKey = (pageId: string | undefined) => [
 	"cloud",

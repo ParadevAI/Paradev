@@ -19,6 +19,7 @@ import {
 	shouldSurfaceDiagnosis,
 } from "./attach-retry-diagnosis";
 import { terminalQueryColors } from "./terminal-query-colors";
+import { writeReplayedOutput } from "./terminal-replay-write";
 import {
 	classifyTerminalFailure,
 	type TerminalFailureClassification,
@@ -46,7 +47,7 @@ type TerminalServerMessage =
 	// `code: "session-gone"` = the server says the session is permanently
 	// destroyed (not found / disposed / exited), not a transient attach failure.
 	| { type: "error"; message: string; code?: string }
-	| { type: "exit"; exitCode: number; signal: number }
+	| { type: "exit"; exitCode: number; signal: number; shellExited?: boolean }
 	| { type: "title"; title: string | null }
 	// The PTY's size: the smallest box across the clients showing it. Sent
 	// after each of our resizes and whenever it changes.
@@ -59,6 +60,8 @@ type TerminalServerMessage =
 			type: "synced";
 			epoch: string;
 			seq: number;
+			// Live stream position; bytes before it are replayed. Old hosts omit it.
+			head?: number;
 			mode: "exact" | "tail" | "reanchor";
 	  }
 	// Liveness probe. The host drops a client that answered before and then
@@ -91,11 +94,17 @@ export interface TerminalTransport {
 	 * True once the server has said the PTY is gone for good (live `exit`
 	 * message or a `session-gone` attach error). Distinct from `_terminated`,
 	 * which also covers access denials and unknown errors where the PTY may
-	 * still be alive. Persistence paths must clear — never write — the
-	 * persisted scrollback of a session-ended terminal. Reset on `attached`
-	 * (the session was re-created under the same id).
+	 * still be alive. Reset on `attached` (the session was re-created under the
+	 * same id).
 	 */
 	sessionEnded: boolean;
+	/** Set by a live `exit`; null when the session ended without one (`session-gone`). */
+	exitStatus: {
+		exitCode: number;
+		signal: number;
+		/** The interactive shell ended by itself; absent from older hosts. */
+		shellExited?: boolean;
+	} | null;
 	/**
 	 * True while the PTY is narrower than this pane because a smaller client
 	 * (another device, or a narrower split) is showing the same terminal.
@@ -103,9 +112,6 @@ export interface TerminalTransport {
 	narrowedByOtherClient: boolean;
 	narrowedListeners: Set<() => void>;
 
-	/** Internal: invoked once each time the session-ended signal arrives, so
-	 * the owner can drop persisted scrollback immediately. */
-	_onSessionEnded: (() => void) | null;
 	/** Internal: the shared reconnecting relay socket (partysocket). Created
 	 * once on first connect; it re-signs the URL and runs the relay preflight
 	 * before every (re)dial and retries indefinitely. */
@@ -190,12 +196,20 @@ export interface TerminalTransport {
 	 * With `_seqCounting` still false at close time, it means a pre-seq host
 	 * fed the xterm uncounted bytes — the anchor is invalidated. */
 	_bytesSinceAttach: boolean;
+	/** Replayed bytes still to come on this connection, from `synced`. */
+	_replayBytesLeft: number;
 	/**
 	 * True when the xterm was born with content (restored snapshot or seeded
 	 * from a sibling instance). Without an anchor, such an xterm must never
 	 * request the ring tail (`seq=new`) — it would double-paint.
 	 */
 	_xtermHadContent: boolean;
+	/**
+	 * "needed": the xterm may not match the PTY's screen (it came from a
+	 * snapshot, or its rows changed while detached), so the next resize asks
+	 * the host for a repaint. "sent": waiting for the host's `size` answer.
+	 */
+	_repaintRequest: "none" | "needed" | "sent";
 	/** Internal: wall-clock-gap watchdog for laptop sleep/wake detection. */
 	_livenessTimer: ReturnType<typeof setInterval> | null;
 	/** Internal: Date.now() at the last watchdog tick. */
@@ -218,6 +232,9 @@ export interface TerminalTransport {
 	 * on every attach: a reconnecting socket starts out assumed visible.
 	 */
 	_visible: boolean;
+	/** Hidden with its relay socket still open. If that socket drops, it parks
+	 * instead of redialing, so hidden panes stay out of reconnect storms. */
+	_backgrounded: boolean;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -306,10 +323,28 @@ function setNarrowedByOtherClient(
 	}
 }
 
-function markSessionEnded(transport: TerminalTransport) {
-	if (transport.sessionEnded) return;
+// A re-attach to an exited session replays its `exit`; the line is already there.
+function lastNonEmptyLine(terminal: XTerm): string | null {
+	const buffer = terminal.buffer?.active;
+	if (!buffer) return null;
+	for (let row = buffer.length - 1; row >= 0; row--) {
+		let text = buffer.getLine(row)?.translateToString(true);
+		if (!text) continue;
+		for (let start = row; start > 0 && buffer.getLine(start)?.isWrapped; ) {
+			start--;
+			text = `${buffer.getLine(start)?.translateToString(false) ?? ""}${text}`;
+		}
+		return text;
+	}
+	return null;
+}
+
+function markSessionEnded(
+	transport: TerminalTransport,
+	exitStatus: TerminalTransport["exitStatus"] = null,
+) {
+	transport.exitStatus ??= exitStatus;
 	transport.sessionEnded = true;
-	transport._onSessionEnded?.();
 }
 
 // Input typed before an attach completes is sent once it attaches. Input older
@@ -408,11 +443,7 @@ export function clearLogs(transport: TerminalTransport) {
 }
 
 export function createTransport(
-	options: {
-		onSessionEnded?: () => void;
-		createSocket?: typeof createRelaySocket;
-		now?: () => number;
-	} = {},
+	options: { createSocket?: typeof createRelaySocket; now?: () => number } = {},
 ): TerminalTransport {
 	return {
 		connectionState: "disconnected",
@@ -424,9 +455,9 @@ export function createTransport(
 		logListeners: new Set(),
 		lastDiagnosis: null,
 		sessionEnded: false,
+		exitStatus: null,
 		narrowedByOtherClient: false,
 		narrowedListeners: new Set(),
-		_onSessionEnded: options.onSessionEnded ?? null,
 		_socket: null,
 		_createSocket: options.createSocket ?? createRelaySocket,
 		_terminal: null,
@@ -447,13 +478,16 @@ export function createTransport(
 		seqAnchor: null,
 		_seqCounting: false,
 		_seqEverSynced: false,
+		_replayBytesLeft: 0,
 		_bytesSinceAttach: false,
 		_xtermHadContent: false,
+		_repaintRequest: "none",
 		_livenessTimer: null,
 		_lastLivenessTick: 0,
 		_resumeListener: null,
 		_disposeFocusListeners: null,
 		_visible: true,
+		_backgrounded: false,
 	};
 }
 
@@ -474,6 +508,10 @@ function forceReconnect(transport: TerminalTransport) {
 	if (transport._terminated) return;
 	const socket = transport._socket;
 	if (!socket) return;
+	if (transport._backgrounded) {
+		park(transport);
+		return;
+	}
 	transport._diagnosisLogged = false;
 	transport.lastDiagnosis = null;
 	resetAttachRetryState(transport._attachRetry);
@@ -609,6 +647,7 @@ export function connect(
 	wsUrl: string,
 ) {
 	const base = stripToken(wsUrl);
+	transport._backgrounded = false;
 
 	// Idempotent: a live socket already pointed at this endpoint just needs the
 	// latest token-bearing URL refreshed (the socket re-signs per dial anyway) —
@@ -781,7 +820,15 @@ function attachSocketListeners(
 			if (transport._seqCounting && transport.seqAnchor) {
 				transport.seqAnchor.seq += data.byteLength;
 			}
-			transport._writeCoalescer?.push(new Uint8Array(data));
+			let bytes = new Uint8Array(data);
+			if (transport._replayBytesLeft > 0) {
+				const replayed = bytes.subarray(0, transport._replayBytesLeft);
+				transport._replayBytesLeft -= replayed.byteLength;
+				bytes = bytes.subarray(replayed.byteLength);
+				transport._writeCoalescer?.flushSync();
+				writeReplayedOutput(terminal, replayed);
+			}
+			if (bytes.byteLength > 0) transport._writeCoalescer?.push(bytes);
 			transport._hasReceivedBytes = true;
 			transport._bytesSinceAttach = true;
 			return;
@@ -807,6 +854,9 @@ function attachSocketListeners(
 		}
 
 		if (message.type === "size") {
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "none";
+			}
 			setNarrowedByOtherClient(transport, message.cols < terminal.cols);
 			return;
 		}
@@ -821,14 +871,20 @@ function attachSocketListeners(
 			// A successful attach means the session exists again (re-created or
 			// respawned under the same id) — its scrollback is worth keeping.
 			transport.sessionEnded = false;
+			transport.exitStatus = null;
 			// Counting stays disarmed until this attach's `synced` arrives —
 			// bytes before it are host-synthesized (preamble/notice) or from a
 			// pre-seq host, and neither advances the stream position.
 			transport._seqCounting = false;
 			transport._bytesSinceAttach = false;
+			transport._replayBytesLeft = 0;
 			setConnectionState(transport, "open");
 			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
+			// The last connection ended before the host answered the request.
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "needed";
+			}
 			sendResize(transport, terminal.cols, terminal.rows);
 			flushPendingInput(transport);
 			return;
@@ -838,6 +894,10 @@ function attachSocketListeners(
 			transport.seqAnchor = { epoch: message.epoch, seq: message.seq };
 			transport._seqCounting = true;
 			transport._seqEverSynced = true;
+			transport._replayBytesLeft = Math.max(
+				0,
+				(message.head ?? message.seq) - message.seq,
+			);
 			// Re-assert current keyboard focus so the running program's focus
 			// state can't stay stale across the reattach (tmux does the same on
 			// client attach). xterm's own DECSET-1004 self-report fires while
@@ -904,15 +964,20 @@ function attachSocketListeners(
 		if (message.type === "exit") {
 			transport._writeCoalescer?.flushSync();
 			transport._terminated = true;
-			markSessionEnded(transport);
+			markSessionEnded(transport, {
+				exitCode: message.exitCode,
+				signal: message.signal,
+				shellExited: message.shellExited,
+			});
 			transport.lastDiagnosis = {
 				category: "unknown",
 				message: `The terminal session ended (exit code ${message.exitCode}).`,
 			};
 			socket.close();
-			terminal.writeln(
-				`\r\n[terminal] exited with code ${message.exitCode} (signal ${message.signal})`,
-			);
+			const exitLine = `[terminal] exited with code ${message.exitCode} (signal ${message.signal})`;
+			if (lastNonEmptyLine(terminal) !== exitLine) {
+				terminal.writeln(`\r\n${exitLine}`);
+			}
 		}
 	});
 
@@ -924,6 +989,10 @@ function attachSocketListeners(
 		// Render whatever arrived before the close instead of holding it for a
 		// frame that may never come (e.g. hidden window).
 		transport._writeCoalescer?.flushSync();
+		if (transport._backgrounded) {
+			park(transport);
+			return;
+		}
 		// A connection that delivered bytes but never a `synced` was a pre-seq
 		// host (downgrade skew): those bytes advanced the xterm without
 		// advancing the anchor, so the anchor is poisoned — drop it rather
@@ -1039,6 +1108,7 @@ function attachSocketListeners(
  * bytes (or reanchors past the 2 MB ring), so parking loses nothing.
  */
 export function park(transport: TerminalTransport) {
+	transport._backgrounded = false;
 	// A pre-seq host (bytes delivered, `synced` never seen) cannot replay a
 	// parked gap: it ignores `?seq=` and `replay=0` suppresses its legacy
 	// FIFO replay, so closing this socket would silently drop everything
@@ -1080,6 +1150,19 @@ export function park(transport: TerminalTransport) {
 	if (transport.connectionState !== "disconnected") {
 		setConnectionState(transport, "disconnected");
 	}
+}
+
+/** Like park(), but an open relay socket stays open for the next connect(). */
+export function background(transport: TerminalTransport) {
+	if (
+		transport._terminated ||
+		transport.connectionState !== "open" ||
+		!isRelayHostUrl(transport.currentUrl)
+	) {
+		park(transport);
+		return;
+	}
+	transport._backgrounded = true;
 }
 
 /**
@@ -1174,7 +1257,11 @@ export function sendResize(
 	const socket = transport._socket;
 	if (!socket || socket.readyState !== WebSocket.OPEN) return;
 	if (transport.connectionState !== "open") return;
-	socket.send(JSON.stringify({ type: "resize", cols, rows }));
+	const repaint = transport._repaintRequest === "needed" || undefined;
+	if (repaint) {
+		transport._repaintRequest = "sent";
+	}
+	socket.send(JSON.stringify({ type: "resize", cols, rows, repaint }));
 }
 
 export function sendDispose(transport: TerminalTransport) {
@@ -1201,7 +1288,7 @@ export function disposeTransport(transport: TerminalTransport) {
 	transport._diagnosisLogged = false;
 	transport._terminated = false;
 	transport.sessionEnded = false;
-	transport._onSessionEnded = null;
+	transport.exitStatus = null;
 	transport.lastDiagnosis = null;
 	resetAttachRetryState(transport._attachRetry);
 	setTerminalTitle(transport, undefined);

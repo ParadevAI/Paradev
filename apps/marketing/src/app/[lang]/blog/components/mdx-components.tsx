@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { SupportedLocale } from "@superset/i18n";
+import { isValidElement, type ReactNode } from "react";
 import { HiMiniArrowDownTray } from "react-icons/hi2";
 import type { BundledLanguage } from "shiki";
 import { Investors } from "@/app/[lang]/components/Investors";
@@ -8,6 +9,7 @@ import { StoreBadges } from "@/app/[lang]/components/StoreBadges";
 import { StoryPhoto } from "@/app/[lang]/components/StoryPhoto";
 import { getAbout } from "@/lib/about";
 import { slugify } from "@/lib/blog-utils";
+import { localizeMdxHref } from "@/lib/localized-mdx";
 import { getPublicImageSize } from "@/lib/public-image-size";
 import { BlogCodeBlock } from "./BlogCodeBlock";
 import { Testimonial } from "./Testimonial";
@@ -38,6 +40,15 @@ function extractCodeFromChildren(children: React.ReactNode): {
 	return { code: String(children ?? ""), language: "text" as BundledLanguage };
 }
 
+function textContent(node: ReactNode): string {
+	if (typeof node === "string" || typeof node === "number") return String(node);
+	if (Array.isArray(node)) return node.map(textContent).join("");
+	if (isValidElement<{ children?: ReactNode }>(node)) {
+		return textContent(node.props.children);
+	}
+	return "";
+}
+
 function Video({ src, title }: { src: string; title?: string }) {
 	return (
 		<span className="block my-8 not-prose">
@@ -60,22 +71,16 @@ function Video({ src, title }: { src: string; title?: string }) {
 }
 
 export const mdxComponents = {
-	h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
-		const id = typeof children === "string" ? slugify(children) : undefined;
-		return (
-			<h2 id={id} {...props}>
-				{children}
-			</h2>
-		);
-	},
-	h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
-		const id = typeof children === "string" ? slugify(children) : undefined;
-		return (
-			<h3 id={id} {...props}>
-				{children}
-			</h3>
-		);
-	},
+	h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+		<h2 id={slugify(textContent(children)) || undefined} {...props}>
+			{children}
+		</h2>
+	),
+	h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+		<h3 id={slugify(textContent(children)) || undefined} {...props}>
+			{children}
+		</h3>
+	),
 	pre: ({ children }: React.HTMLAttributes<HTMLPreElement>) => {
 		const { code, language } = extractCodeFromChildren(children);
 		return <BlogCodeBlock code={code} language={language} />;
@@ -173,3 +178,33 @@ export const mdxComponents = {
 		</div>
 	),
 };
+
+export function getMdxComponents(locale: SupportedLocale = "en") {
+	if (locale === "en") return mdxComponents;
+	const BaseCta = mdxComponents.CTAButton;
+	return {
+		...mdxComponents,
+		a: ({
+			children,
+			href,
+			...props
+		}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+			<a {...props} href={localizeMdxHref(locale, href)}>
+				{children}
+			</a>
+		),
+		h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+			<h2 id={slugify(textContent(children), locale) || undefined} {...props}>
+				{children}
+			</h2>
+		),
+		h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+			<h3 id={slugify(textContent(children), locale) || undefined} {...props}>
+				{children}
+			</h3>
+		),
+		CTAButton: ({ href, children }: { href: string; children: ReactNode }) => (
+			<BaseCta href={localizeMdxHref(locale, href) ?? href}>{children}</BaseCta>
+		),
+	};
+}

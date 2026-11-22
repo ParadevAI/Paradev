@@ -5,9 +5,11 @@ import {
 	type SerializedLexicalNode,
 	type Spread,
 } from "lexical";
-import type { JSX } from "react";
+import { type JSX, useContext } from "react";
 import { Chip } from "../../../Chip";
+import { useRenderChip } from "../../providers/ChipRenderProvider";
 import type { ComposerChip } from "../../types";
+import { ChipRendererContext } from "./chipRenderer";
 
 function MentionChipComponent({
 	nodeKey,
@@ -17,7 +19,24 @@ function MentionChipComponent({
 	chip: ComposerChip;
 }) {
 	const [isSelected] = useLexicalNodeSelection(nodeKey);
-	return <Chip chip={chip} mention selected={isSelected} />;
+	const custom = useContext(ChipRendererContext)?.(chip);
+	const renderChip = useRenderChip();
+	if (custom) {
+		return (
+			<span
+				data-mention-chip
+				data-selected={isSelected || undefined}
+				className="cursor-pointer select-none rounded-[4px] data-[selected]:ring-1 data-[selected]:ring-ring"
+			>
+				{custom}
+			</span>
+		);
+	}
+	const wrapped = renderChip?.(
+		chip,
+		<Chip chip={chip} mention selected={isSelected} tooltip={false} />,
+	);
+	return wrapped ?? <Chip chip={chip} mention selected={isSelected} />;
 }
 
 export type SerializedMentionChipNode = Spread<
@@ -31,6 +50,20 @@ export type SerializedMentionChipNode = Spread<
 	},
 	SerializedLexicalNode
 >;
+
+export function chipFromJSON(
+	serialized: SerializedMentionChipNode,
+): ComposerChip {
+	return {
+		label: serialized.label,
+		serialized: serialized.serialized,
+		brandColor: serialized.brandColor ?? undefined,
+		iconUrl: serialized.iconUrl ?? undefined,
+		...(serialized.description ? { description: serialized.description } : {}),
+		data:
+			serialized.dataJson == null ? undefined : JSON.parse(serialized.dataJson),
+	};
+}
 
 export class MentionChipNode extends DecoratorNode<JSX.Element> {
 	__label: string;

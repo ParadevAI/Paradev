@@ -51,8 +51,8 @@ export function HowWeWork({ className = "" }: { className?: string }) {
 					}
 				>
 					<Trans>
-						Paradev is source-available. Every pull request, review and bug is
-						public on GitHub.
+						Paradev is open source. Every pull request, review and bug is public
+						on GitHub.
 					</Trans>
 				</Principle>
 			</div>

@@ -3,7 +3,7 @@ import { msg } from "@lingui/core/macro";
 
 export interface Feature {
 	id: string;
-	tag: MessageDescriptor;
+	href?: string;
 	title: MessageDescriptor;
 	description: MessageDescriptor;
 }
@@ -11,93 +11,45 @@ export interface Feature {
 export const FEATURES: Feature[] = [
 	{
 		id: "agent-independence",
-		tag: msg({
-			message: "Agent Independence",
-		}),
 		title: msg({
-			message: "Switch agents. Keep your workflow",
+			message: "Use the best agent. Never get locked in.",
 		}),
 		description: msg({
 			message:
-				"Use Claude Code, Codex, OpenCode, or any coding agent for each task. Your workspaces, branches, and review flow stay the same.",
+				"Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them.",
 		}),
 	},
 	{
 		id: "parallel-execution",
-		tag: msg({
-			message: "Parallel Execution",
-		}),
+		href: "/parallel-coding-agents",
 		title: msg({
-			message: "Scale to 100+ agents",
+			message: "Scale to 100s of agents, maintain quality bar",
 		}),
 		description: msg({
 			message:
-				"Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you.",
+				"Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app.",
 		}),
 	},
 	{
 		id: "automations",
-		tag: msg({
-			message: "Automations",
-		}),
+		href: "/automations",
 		title: msg({
-			message: "Start agents on events or a schedule",
+			message: "Fix bugs the moment they're filed",
 		}),
 		description: msg({
 			message:
-				"Turn chores into agents that run on a schedule or when an event comes in: issue triage, changelog drafts, dependency bumps. They run on their own and open PRs for you to review.",
-		}),
-	},
-	{
-		id: "isolation",
-		tag: msg({
-			message: "Isolation",
-		}),
-		title: msg({
-			message: "Changes are isolated",
-		}),
-		description: msg({
-			message:
-				"Each agent runs in its own isolated Git worktree. No overwriting each other's files. Review and merge work when you're ready.",
-		}),
-	},
-	{
-		id: "remote-access",
-		tag: msg({
-			message: "Remote Access",
-		}),
-		title: msg({
-			message: "Run workspaces anywhere",
-		}),
-		description: msg({
-			message:
-				"Add any machine as a host. Workspaces keep running when your laptop sleeps, and you can check in from wherever you are.",
+				"Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself.",
 		}),
 	},
 	{
 		id: "cli-sdk",
-		tag: msg({
-			message: "CLI & SDK",
-		}),
+		href: "/mcp-install",
 		title: msg({
-			message: "Drive it from the terminal",
+			message: "Built to be driven by agents",
 		}),
 		description: msg({
 			message:
-				"Everything is scriptable. Spawn workspaces and agents from the CLI, wire Paradev into CI with the SDK, or let your agent drive it over MCP.",
-		}),
-	},
-	{
-		id: "open-anywhere",
-		tag: msg({
-			message: "Open Anywhere",
-		}),
-		title: msg({
-			message: "Open in any IDE",
-		}),
-		description: msg({
-			message:
-				"Jump into your favorite editor with one click. VS Code, Cursor, Xcode, JetBrains IDEs, or any terminal: open worktrees exactly where you need them.",
+				"Drive the entire app and cloud from the CLI, the SDK, or over MCP.",
 		}),
 	},
 ];

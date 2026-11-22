@@ -73,6 +73,56 @@ async function promptIdle(
 }
 
 describe("createChatRouter", () => {
+	test("reads and undoes a turn only in the worktree of the session's own workspace", async () => {
+		const { harnesses } = fakeHarnessRegistry(SCRIPT);
+		const asked: string[] = [];
+		const runtime = createTestRuntime({
+			harnesses,
+			checkpoints: {
+				capture: async () => null,
+				turnStarted: async () => {},
+				turnSettled: async () => {},
+				changes: async ({ cwd }) => {
+					asked.push(`changes ${cwd}`);
+					return null;
+				},
+				undo: async ({ cwd }) => {
+					asked.push(`undo ${cwd}`);
+					return { status: "undone", restored: [], skipped: [] };
+				},
+			},
+		});
+		const caller = createChatCallerFactory(
+			createChatRouter(runtime, {
+				resolveCwd: (workspaceId) => `/worktrees/${workspaceId}`,
+			}),
+		)({});
+		const { sessionId } = await caller.createSession(createSessionInput());
+		const turn = { sessionId, turnId: "t1" };
+		const undo = (workspaceId: string) =>
+			caller.undoTurnFiles({
+				...turn,
+				workspaceId,
+				commandId: randomUUID(),
+				paths: ["a.ts"],
+			});
+
+		expect(
+			await caller.getTurnChanges({ ...turn, workspaceId: "workspace-2" }),
+		).toBeNull();
+		expect(await undo("workspace-2")).toEqual({
+			status: "refused",
+			reason: "missing",
+		});
+		await caller.getTurnChanges({ ...turn, workspaceId: "workspace-1" });
+		await undo("workspace-1");
+		expect(asked).toEqual([
+			"changes /worktrees/workspace-1",
+			"undo /worktrees/workspace-1",
+		]);
+		await runtime.dispose();
+	});
+
 	test("create, prompt and getItems round trip through the router", async () => {
 		const { runtime, caller, resolvedWorkspaceIds } = newCaller();
 		const created = await caller.createSession(createSessionInput());

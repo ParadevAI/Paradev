@@ -5,11 +5,11 @@ import {
 } from "@tanstack/react-db";
 import {
 	DEFAULT_V2_USER_PREFERENCES,
-	healV2UserPreferences,
+	healUserPreferences,
 	healWorkspaceLocalState,
+	type UserPreferencesRow,
+	userPreferencesSchema,
 	V2_USER_PREFERENCES_ID,
-	type V2UserPreferencesRow,
-	v2UserPreferencesSchema,
 	type WorkspaceLocalStateRow,
 	workspaceLocalStateSchema,
 } from "./dashboardSidebarLocal";
@@ -35,6 +35,58 @@ const noopEvents = {
 	addEventListener: () => {},
 	removeEventListener: () => {},
 };
+
+it("workspace activity choices survive saving and reopening the workspace collection", async () => {
+	const { api: storage } = makeMapStorage();
+	const makeCollection = (id: string) =>
+		createCollection(
+			localStorageCollectionOptions(
+				withReadHeal(
+					{
+						id,
+						storageKey: "test-activity-visibility",
+						schema: workspaceLocalStateSchema,
+						getKey: (item: WorkspaceLocalStateRow) => item.workspaceId,
+						storage,
+						storageEventApi: noopEvents,
+					},
+					healWorkspaceLocalState,
+				),
+			),
+		);
+	const hiddenId = "11111111-1111-4111-8111-111111111111";
+	const shownId = "22222222-2222-4222-8222-222222222222";
+	const before = makeCollection("activity-before");
+	await before.preload();
+	for (const workspaceId of [hiddenId, shownId]) {
+		await before.insert({
+			workspaceId,
+			createdAt: new Date(),
+			sidebarState: { projectId: null },
+			paneLayout: { version: 1, tabs: [], activeTabId: null },
+		}).isPersisted.promise;
+	}
+	for (const [workspaceId, hidden] of [
+		[hiddenId, true],
+		[shownId, false],
+	] as const) {
+		await before.update(workspaceId, (draft) => {
+			draft.activityPanelHidden = hidden;
+		}).isPersisted.promise;
+	}
+	await before.cleanup();
+	const after = makeCollection("activity-after");
+	await after.preload();
+	expect(after.get(hiddenId)?.activityPanelHidden).toBe(true);
+	expect(after.get(shownId)?.activityPanelHidden).toBe(false);
+	await after.delete(hiddenId).isPersisted.promise;
+	await after.cleanup();
+	const reopened = makeCollection("activity-reopened");
+	await reopened.preload();
+	expect(reopened.has(hiddenId)).toBe(false);
+	expect(reopened.get(shownId)?.activityPanelHidden).toBe(false);
+	await reopened.cleanup();
+});
 
 describe("withReadHeal parser", () => {
 	it("heals each entry's data through the heal fn while preserving the envelope", () => {
@@ -111,7 +163,7 @@ describe("withReadHeal end-to-end via real localStorageCollectionOptions", () =>
 	it("exposes healed rows when storage holds a pre-schema-add shape", async () => {
 		const { store, api: storage } = makeMapStorage();
 		// Pre-populate storage with the exact shape that crashed buildHint:
-		// a v2-user-preferences row missing `sidebarFileLinks`.
+		// a user-preferences row missing `sidebarFileLinks`.
 		const stale = {
 			id: "preferences",
 			fileLinks: { plain: null, shift: null, meta: "pane", metaShift: null },
@@ -134,12 +186,12 @@ describe("withReadHeal end-to-end via real localStorageCollectionOptions", () =>
 					{
 						id: "test-prefs",
 						storageKey: "test-prefs",
-						schema: v2UserPreferencesSchema,
-						getKey: (item: V2UserPreferencesRow) => item.id as string,
+						schema: userPreferencesSchema,
+						getKey: (item: UserPreferencesRow) => item.id as string,
 						storage,
 						storageEventApi: noopEvents,
 					},
-					healV2UserPreferences,
+					healUserPreferences,
 				),
 			),
 		);
@@ -177,7 +229,7 @@ describe("withReadHeal end-to-end via real localStorageCollectionOptions", () =>
 			localStorageCollectionOptions({
 				id: "test-prefs-naked",
 				storageKey: "test-prefs-naked",
-				schema: v2UserPreferencesSchema,
+				schema: userPreferencesSchema,
 				getKey: (item) => item.id as string,
 				storage,
 				storageEventApi: noopEvents,
@@ -289,9 +341,9 @@ describe("withReadHeal end-to-end via real localStorageCollectionOptions", () =>
 	});
 });
 
-describe("healV2UserPreferences hiddenBuiltinPresetIds pruning", () => {
+describe("healUserPreferences hiddenBuiltinPresetIds pruning", () => {
 	it("drops ids that are not known built-in presets", () => {
-		const healed = healV2UserPreferences({
+		const healed = healUserPreferences({
 			id: "preferences",
 			hiddenBuiltinPresetIds: ["superset-cli", "retired-preset"],
 		});
@@ -299,7 +351,7 @@ describe("healV2UserPreferences hiddenBuiltinPresetIds pruning", () => {
 	});
 
 	it("defaults a malformed value to an empty array", () => {
-		const healed = healV2UserPreferences({
+		const healed = healUserPreferences({
 			id: "preferences",
 			hiddenBuiltinPresetIds: "superset-cli",
 		});

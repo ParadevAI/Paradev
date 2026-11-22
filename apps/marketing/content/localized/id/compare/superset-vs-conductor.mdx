@@ -1,0 +1,85 @@
+---
+title: "Paradev vs Conductor: agen lokal, ruang kerja cloud, dan peninjauan"
+description: "Bandingkan Paradev dan Conductor untuk agen coding paralel, ruang kerja lokal dan cloud, peninjauan, kolaborasi tim, serta akses seluler."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset vs conductor
+  - alternatif conductor
+  - orkestrasi agen ai
+  - pengelolaan agen coding
+  - conductor vs superset
+  - conductor berhenti beroperasi
+  - migrasi dari conductor
+---
+
+Jika Anda memilih untuk berpindah, lihat [Beralih dari Conductor ke Paradev](/conductor) untuk opsi migrasi, atau ikuti [Migrasi dari Conductor](https://docs.paradev.com/migrate-from-conductor) untuk aplikasi lokal atau [Migrasi dari Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) untuk ruang kerja cloud.
+
+Paradev dan Conductor sama-sama mengatur tugas coding paralel ke dalam ruang kerja terpisah. Conductor menawarkan ruang kerja cloud, percakapan tim bersama, API dan server MCP, Routines terjadwal, serta aplikasi iOS dengan akses cloud dan kendali jarak jauh eksperimental atas ruang kerja Mac lokal. Aplikasi iPhone dan iPad Paradev terhubung ke ruang kerja cloud dan host milik Anda, sehingga Anda dapat melanjutkan penggunaan terminal ruang kerja dan meninjau diff di mana pun agen berjalan.
+
+## Sekilas
+
+| Kebutuhan | Paradev | Conductor |
+|---|---|---|
+| Agen | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp, dan agen CLI kustom apa pun yang Anda tambahkan | Claude Code, Codex, Cursor, OpenCode |
+| Lokasi kerja | Ruang kerja lokal, host terhubung, server Linux milik Anda ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), dan [ruang kerja cloud](https://docs.paradev.com/cloud-workspaces) | Ruang kerja Mac lokal dan sandbox cloud |
+| Peninjauan | Panel Changes melakukan commit, push, dan membuka PR; panel PR menampilkan pemeriksaan, utas peninjauan, dan merge | Diff, pemeriksaan, pull request, merge, dan arsip |
+| Akses tim | Host yang Anda tambahkan, dengan akses yang diberikan per anggota, serta akses organisasi | Ruang kerja dan percakapan cloud bersama |
+| Browser | Panel browser dalam aplikasi dengan Design Mode: pilih elemen dan kirim ke agen | Pratinjau browser |
+| Otomatisasi | Pro menjalankan agen terjadwal di host pilihan, dengan riwayat proses dan percobaan ulang untuk proses yang gagal | Routines terjadwal atau dipicu oleh tindakan GitHub, berjalan di cloud |
+| Kendali terprogram | CLI, SDK TypeScript, dan server MCP | API dan Conductor MCP |
+| Ponsel | Aplikasi iPhone dan iPad di App Store, iOS atau iPadOS 26+, Pro; berfungsi dengan ruang kerja cloud dan host milik Anda | Aplikasi iOS; ruang kerja cloud dan [kendali jarak jauh eksperimental atas ruang kerja Mac lokal](https://www.conductor.build/docs/reference/remote-control). Mac harus tetap terbuka, aktif, dan online agar kendali jarak jauh berfungsi. |
+| Harga | Gratis; Pro {{price:pro}}/pengguna/bulan atau {{price:pro:yearly}} ditagihkan tahunan; Team {{price:team}} atau {{price:team:yearly}} ditagihkan tahunan; Ultra {{price:ultra}}; Enterprise dengan harga khusus. Paket berbayar dapat mengakses cloud; lihat [harga](/pricing) untuk penggunaan inklusif dan tambahan yang ditagihkan sesuai pemakaian. | Lihat [paket dan akses akun terkini](https://www.conductor.build/docs/cloud/faq) dari Conductor |
+
+[Pengenalan](https://www.conductor.build/docs) Conductor mencantumkan empat harness agen dan alur peninjauannya. [Dokumentasi Cloud](https://www.conductor.build/docs/cloud) menjelaskan lingkungan bersama dan sandbox terisolasi. Dokumentasi terkininya juga menjelaskan [kendali jarak jauh eksperimental atas ruang kerja Mac lokal dari iPhone](https://www.conductor.build/docs/reference/remote-control).
+
+## Persyaratan Paradev
+
+Paradev menjalankan agen coding CLI di ruang kerja terpisah, dengan terminal dan peninjauan diff dalam satu aplikasi. Versi desktop mendukung macOS dan AppImage Linux eksperimental. Windows belum tersedia. Paradev adalah sumber terbuka di bawah Lisensi MIT. Pengguna Conductor yang menyukai fitur chat dapat menggunakan [antarmuka chat](https://docs.paradev.com/chat) untuk Claude Code, Codex, OpenCode, dan Pi.
+
+Untuk menangani banyak sesi sekaligus, halaman Workspaces mengelompokkan ruang kerja berdasarkan status (Needs attention, Working, Needs review, Idle, Merged) di semua host Anda. Sesi agen yang terputus dapat dilanjutkan di panel yang sama, dan subagen yang dimulai Claude Code atau Codex ditampilkan di bawah agen induknya.
+
+Untuk menggunakan [Paradev di iPhone dan iPad](/mobile), Anda memerlukan iOS 26 atau iPadOS 26 atau yang lebih baru, serta Pro. Ruang kerja cloud berfungsi tanpa perlu menjaga komputer sendiri tetap terhubung; untuk ruang kerja di mesin Anda sendiri, host tersebut harus tetap online. Akses jarak jauh dan otomatisasi juga memerlukan paket berbayar. Lihat [harga](/pricing) dan [penyiapan akses jarak jauh](https://docs.paradev.com/remote-access).
+
+## Coba di repositori Anda
+
+Perbandingan ini diterbitkan oleh Paradev. Dokumentasi Conductor yang ditautkan mendukung deskripsi fitur; uji coba di bawah ini adalah metode evaluasi, bukan pemeringkatan kinerja berdasarkan pengukuran.
+
+Untuk membandingkan aplikasi, gunakan commit repositori, agen, model, dan dua prompt tugas independen yang sama di setiap aplikasi. Catat versi aplikasi dan agen, tanggal, serta perbedaan penyiapan. [Panduan tugas paralel](/blog/parallel-coding-agents-guide) mencakup prompt dengan cakupan yang jelas.
+
+| Langkah uji coba | Bukti yang dicatat |
+|---|---|
+| Buat dua tugas independen | Jalur ruang kerja dan nama branch; langkah penyiapan yang diperlukan sebelum pengujian berjalan |
+| Biarkan setiap agen menyelesaikan perubahan kecil | Prompt, model, file yang diubah, dan keluaran pemeriksaan |
+| Minta satu koreksi | Apakah Anda dapat menemukan dan melanjutkan sesi yang benar |
+| Tinjau dan gabungkan kedua perubahan | Langkah peninjauan, konflik, dan hasil pengujian gabungan |
+| Coba akses jarak jauh jika diperlukan | Ketersediaan host, paket yang diperlukan, dan apa yang terjadi saat koneksi terputus |
+
+Ukur waktu penyiapan dan peninjauan secara terpisah dari waktu eksekusi agen. Ulangi sebelum menyimpulkan soal kecepatan: keluaran agen bervariasi, dan proses yang lebih cepat tetap dapat menghasilkan diff yang lebih buruk. Git worktree memisahkan file kerja; fitur ini tidak menjamin integrasi bebas konflik atau izin sandbox untuk agen.
+
+![Meninjau perubahan di Paradev.](/images/readme/diff-viewer.png)
+
+## Yang dapat dilakukan pengguna Conductor sekarang
+
+Jika memilih untuk berpindah, simpan branch dan ekspor catatan yang ingin Anda pertahankan.
+
+Pilih Paradev jika Anda ingin merespons agen dari iPhone dan meninjau perubahannya saat tugas berjalan di komputer sendiri, host, atau ruang kerja cloud, dengan agen CLI apa pun. Validasi penyiapan melalui [panduan penggunaan ponsel](/blog/claude-code-codex-iphone). Untuk memindahkan pekerjaan, ikuti [panduan aplikasi lokal](https://docs.paradev.com/migrate-from-conductor) atau [panduan Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
+
+Bandingkan [paket Paradev](/pricing) saat ini, termasuk biaya komputasi dan penyedia agen. Penggunaan penyedia agen ditagihkan secara terpisah.
+
+## Pertanyaan yang Sering Diajukan
+
+### Apakah Conductor hanya untuk pekerjaan lokal?
+
+Tidak. Dokumentasi Conductor mencakup ruang kerja Mac lokal dan [sandbox cloud](https://www.conductor.build/docs/cloud), termasuk ruang kerja cloud bersama. Aplikasi iOS-nya juga menawarkan [kendali jarak jauh eksperimental atas ruang kerja Mac lokal](https://www.conductor.build/docs/reference/remote-control).
+
+### Bisakah Conductor menjalankan OpenCode?
+
+Ya. Pengenalannya mencantumkan OpenCode bersama Claude Code, Codex, dan Cursor.
+
+### Apakah Paradev mengharuskan saya beralih editor?
+
+Tidak. Anda dapat membuka direktori ruang kerja di editor sambil Paradev mengelola terminal dan ruang kerjanya. Tetapkan satu pengelola untuk perubahan yang tumpang tindih.

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 import { writeFileIfChanged } from "./write-file-if-changed";
 
 export const AGENT_HOOKS_STATE_FILE = "agent-hooks.json";
@@ -18,7 +18,7 @@ export const AGENT_HOOKS_STATE_FILE = "agent-hooks.json";
  * for hosts whose machine never runs the desktop).
  */
 export function getAgentHooksStateFilePath(): string {
-	return path.join(resolveSupersetHomeDir(), AGENT_HOOKS_STATE_FILE);
+	return path.join(resolveAppHomeDir(), AGENT_HOOKS_STATE_FILE);
 }
 
 export function readSharedDisabledAgentIds(): string[] {
@@ -38,7 +38,7 @@ export function readSharedDisabledAgentIds(): string[] {
 
 export function writeSharedDisabledAgentIds(ids: readonly string[]): void {
 	try {
-		fs.mkdirSync(resolveSupersetHomeDir(), { recursive: true });
+		fs.mkdirSync(resolveAppHomeDir(), { recursive: true });
 		writeFileIfChanged(
 			getAgentHooksStateFilePath(),
 			`${JSON.stringify({ disabledAgentIds: [...ids].sort() }, null, "\t")}\n`,

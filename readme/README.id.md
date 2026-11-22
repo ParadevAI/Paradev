@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Lalu jalankan setup pengembangan dari terminal workspace tersebut:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Lihat [**DEVELOPMENT.md**](../DEVELOPMENT.md) untuk panduan lengkap: apa yang di
 
 ## Konfigurasi
 
-Konfigurasikan skrip setup, teardown, dan run workspace di `.superset/config.json`. Lihat [dokumentasi lengkap](https://docs.paradev.com/setup-teardown-scripts).
+Konfigurasikan skrip setup, teardown, dan run workspace di `.paradev/config.json`. Lihat [dokumentasi lengkap](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -321,7 +321,6 @@ Pintasan keyboard bisa dikustomisasi lewat **Pengaturan → Pintasan Keyboard** 
 
 ## Privat Secara Default
 
-- **Sumber tersedia**: kode sumber lengkap ada di GitHub di bawah Elastic License 2.0 (ELv2).
 - **Koneksi eksplisit**: Anda yang memilih agen, provider, dan integrasi mana yang dihubungkan.
 
 ## Berkontribusi
@@ -351,4 +350,4 @@ Bergabunglah dengan komunitas Paradev untuk mendapat bantuan, berbagi umpan bali
 
 **Aplikasi desktop gratis selamanya.** Menjalankan agen secara paralel di mesin Anda sendiri tidak akan pernah memerlukan pembayaran. Apa pun yang kami kenakan biaya akan berupa layanan opsional di atasnya.
 
-Seluruh aplikasi ada di repositori ini di bawah [Elastic License 2.0](../LICENSE.md): gunakan, fork, modifikasi, self-host untuk tim Anda. Satu-satunya yang tidak boleh adalah mengemas ulang Paradev itu sendiri sebagai layanan yang Anda jual ke orang lain.
+Seluruh aplikasi ada di repositori ini di bawah [Lisensi MIT](../LICENSE.md): gunakan, fork, modifikasi, self-host, dan distribusikan ulang.

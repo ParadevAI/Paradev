@@ -10,7 +10,7 @@ export function register(server: McpServer): void {
 		name: "workspaces_delete",
 		annotations: { destructiveHint: true },
 		description:
-			"Delete a workspace by UUID. Without hostId it is a cloud workspace: its sandbox is torn down, which is what stops it billing (nothing else does, including leaving it idle), and everything inside is destroyed, so push or save work first; returns { deleted: false } when no such workspace exists. With hostId, the host runs the project's teardown script (.superset/config.json teardown commands or .superset/teardown.sh, if configured), then removes the git worktree; a teardown failure does not block the delete and is reported in `warnings`, and 'main'-type workspaces cannot be deleted. `found: false` means the host has no workspace with that id and nothing was deleted (hosts older than this field omit it).",
+			"Delete a workspace by UUID. Without hostId it is a cloud workspace: its sandbox is torn down, which is what stops it billing (nothing else does, including leaving it idle), and everything inside is destroyed, so push or save work first; returns { deleted: false } when no such workspace exists. With hostId, the host runs the project's teardown script (the teardown commands in .paradev/config.toml or config.json, or .paradev/teardown.sh; repos not yet moved use .superset/, if configured), then removes the git worktree; a teardown failure does not block the delete and is reported in `warnings`, and 'main'-type workspaces cannot be deleted. `found: false` means the host has no workspace with that id and nothing was deleted (hosts older than this field omit it).",
 		inputSchema: {
 			hostId: z
 				.string()

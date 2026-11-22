@@ -40,11 +40,16 @@ export function useConnector(
 		status.data?.filter((row) => row.connector === slug) ?? EMPTY;
 	const connection = connections[0] ?? null;
 
-	const previousCount = useRef(connections.length);
+	const loaded = status.data !== undefined;
+	const previousCount = useRef<number | null>(null);
 	useEffect(() => {
-		if (connections.length > previousCount.current) onConnected?.();
+		if (!loaded) return;
+		const previous = previousCount.current;
 		previousCount.current = connections.length;
-	}, [connections.length, onConnected]);
+		if (previous === null || previous === connections.length) return;
+		void utils.plugins.list.invalidate();
+		if (connections.length > previous) onConnected?.();
+	}, [loaded, connections.length, onConnected, utils]);
 
 	const invalidate = () =>
 		utils.connectors.status.invalidate({ organizationId });

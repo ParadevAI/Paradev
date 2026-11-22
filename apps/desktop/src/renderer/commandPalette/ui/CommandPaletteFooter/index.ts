@@ -1,0 +1,1 @@
+export { CommandPaletteFooter } from "./CommandPaletteFooter";

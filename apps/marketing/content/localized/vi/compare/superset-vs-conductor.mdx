@@ -1,0 +1,85 @@
+---
+title: "Paradev và Conductor: agent cục bộ, workspace trên đám mây và đánh giá"
+description: "So sánh Paradev và Conductor về coding agent chạy song song, workspace cục bộ và trên đám mây, đánh giá, cộng tác nhóm và truy cập từ thiết bị di động."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset vs conductor
+  - lựa chọn thay thế conductor
+  - điều phối ai agent
+  - quản lý coding agent
+  - conductor vs superset
+  - conductor ngừng hoạt động
+  - di chuyển từ conductor
+---
+
+Nếu bạn chọn chuyển đổi, hãy xem [Chuyển từ Conductor sang Paradev](/conductor) để biết các phương án di chuyển, hoặc làm theo hướng dẫn [Di chuyển từ Conductor](https://docs.paradev.com/migrate-from-conductor) dành cho ứng dụng cục bộ hay [Di chuyển từ Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) dành cho workspace trên đám mây.
+
+Paradev và Conductor đều sắp xếp các tác vụ lập trình song song thành những workspace riêng biệt. Conductor cung cấp workspace trên đám mây, các cuộc trò chuyện nhóm dùng chung, API và máy chủ MCP, Routines theo lịch, cùng ứng dụng iOS có quyền truy cập đám mây và tính năng điều khiển từ xa thử nghiệm đối với workspace Mac cục bộ. Ứng dụng iPhone và iPad của Paradev kết nối với workspace trên đám mây và các host bạn sở hữu, để bạn có thể tiếp tục dùng terminal của workspace và đánh giá diff ở bất cứ nơi nào agent chạy.
+
+## So sánh nhanh
+
+| Nhu cầu | Paradev | Conductor |
+|---|---|---|
+| Agent | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp và mọi CLI agent tùy chỉnh bạn thêm vào | Claude Code, Codex, Cursor, OpenCode |
+| Nơi chạy workspace | Workspace cục bộ, host đã kết nối, máy chủ Linux riêng ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)) và [workspace trên đám mây](https://docs.paradev.com/cloud-workspaces) | Workspace Mac cục bộ và sandbox trên đám mây |
+| Đánh giá | Khung Changes commit, push và mở PR; khung PR hiển thị bước kiểm tra, luồng nhận xét và thao tác gộp | Diff, bước kiểm tra, pull request, gộp và lưu trữ |
+| Quyền truy cập nhóm | Host bạn thêm, cấp quyền truy cập cho từng thành viên, cùng quyền truy cập của tổ chức | Workspace trên đám mây và cuộc trò chuyện dùng chung |
+| Trình duyệt | Khung trình duyệt trong ứng dụng có Design Mode: chọn phần tử rồi gửi cho agent | Xem trước trong trình duyệt |
+| Tự động hóa | Pro chạy agent theo lịch trên host được chọn, có lịch sử chạy và thử lại lượt chạy thất bại | Routines chạy theo lịch hoặc từ GitHub action, trên đám mây |
+| Điều khiển bằng chương trình | CLI, SDK TypeScript và máy chủ MCP | API và Conductor MCP |
+| Điện thoại | Ứng dụng iPhone và iPad trên App Store, iOS hoặc iPadOS 26+; cần Pro; hoạt động với workspace trên đám mây và host riêng | Ứng dụng iOS; workspace trên đám mây và [tính năng điều khiển từ xa thử nghiệm đối với workspace Mac cục bộ](https://www.conductor.build/docs/reference/remote-control). Mac phải luôn mở, không ngủ và trực tuyến để có thể điều khiển từ xa. |
+| Giá | Miễn phí; Pro {{price:pro}}/người dùng/tháng hoặc {{price:pro:yearly}} thanh toán theo năm; Team {{price:team}} hoặc {{price:team:yearly}} thanh toán theo năm; Ultra {{price:ultra}}; Enterprise theo thỏa thuận riêng. Các gói trả phí có thể truy cập đám mây; xem [giá](/pricing) để biết lượng sử dụng đi kèm và phần vượt mức tính phí theo mức sử dụng. | Xem Conductor để biết [các gói hiện tại và quyền truy cập tài khoản](https://www.conductor.build/docs/cloud/faq) |
+
+[Phần giới thiệu](https://www.conductor.build/docs) của Conductor liệt kê bốn bộ công cụ agent và quy trình đánh giá. [Tài liệu Cloud](https://www.conductor.build/docs/cloud) giải thích về môi trường dùng chung và sandbox riêng biệt. Tài liệu hiện tại cũng mô tả [tính năng điều khiển từ xa thử nghiệm workspace Mac cục bộ bằng iPhone](https://www.conductor.build/docs/reference/remote-control).
+
+## Yêu cầu của Paradev
+
+Paradev chạy coding agent CLI trong các workspace riêng biệt, với terminal và tính năng xem diff để đánh giá trong cùng một ứng dụng. Bản máy tính để bàn hỗ trợ macOS và AppImage Linux thử nghiệm. Hiện chưa có Windows. Paradev là phần mềm mã nguồn mở theo Giấy phép MIT. Người dùng Conductor yêu thích tính năng trò chuyện có thể dùng [giao diện trò chuyện](https://docs.paradev.com/chat) cho Claude Code, Codex, OpenCode và Pi.
+
+Để quản lý nhiều phiên cùng lúc, trang Workspaces nhóm các workspace theo trạng thái (Cần chú ý, Đang làm việc, Cần đánh giá, Rảnh, Đã gộp) trên tất cả host của bạn. Phiên agent bị gián đoạn sẽ tiếp tục trong cùng khung, còn các agent con do Claude Code hoặc Codex khởi chạy sẽ xuất hiện bên dưới agent cha.
+
+Để dùng [Paradev trên iPhone và iPad](/mobile), bạn cần iOS 26 hoặc iPadOS 26 trở lên, cùng gói Pro. Workspace trên đám mây hoạt động mà không cần duy trì kết nối với máy tính riêng của bạn; nếu workspace chạy trên máy của bạn, host đó phải luôn trực tuyến. Quyền truy cập từ xa và tính năng tự động hóa cũng cần gói trả phí. Xem [giá](/pricing) và [thiết lập quyền truy cập từ xa](https://docs.paradev.com/remote-access).
+
+## Thử trên kho mã của bạn
+
+Bài so sánh này do Paradev xuất bản. Tài liệu Conductor được liên kết làm căn cứ cho phần mô tả tính năng; phép thử bên dưới là phương pháp đánh giá, không phải xếp hạng hiệu suất dựa trên số đo.
+
+Để so sánh các ứng dụng, hãy dùng cùng một commit của kho mã, cùng agent và model, cùng hai prompt tác vụ độc lập trong mỗi ứng dụng. Ghi lại phiên bản ứng dụng và agent, ngày thử nghiệm và mọi khác biệt trong thiết lập. [Hướng dẫn tác vụ song song](/blog/parallel-coding-agents-guide) có các prompt được giới hạn phạm vi.
+
+| Bước thử nghiệm | Bằng chứng cần ghi lại |
+|---|---|
+| Tạo hai tác vụ độc lập | Đường dẫn workspace và tên nhánh; các bước thiết lập cần thiết trước khi chạy kiểm tra |
+| Để mỗi agent hoàn thành một thay đổi nhỏ | Prompt, model, tệp đã thay đổi và kết quả kiểm tra |
+| Yêu cầu sửa một điểm | Bạn có tìm và tiếp tục đúng phiên được không |
+| Đánh giá và tích hợp cả hai thay đổi | Các bước đánh giá, xung đột và kết quả kiểm tra sau khi gộp |
+| Thử truy cập từ xa nếu cần | Tình trạng khả dụng của host, gói cần dùng và điều gì xảy ra khi mất kết nối |
+
+Hãy đo riêng thời gian thiết lập và đánh giá, không gộp với thời gian agent thực thi. Thử lại trước khi kết luận về tốc độ: kết quả của agent thay đổi theo từng lần, và lượt chạy nhanh hơn vẫn có thể tạo ra diff kém hơn. Git worktree tách biệt các tệp đang làm; chúng không bảo đảm việc tích hợp không xung đột hay quyền của agent được giới hạn trong sandbox.
+
+![Đang đánh giá một thay đổi trong Paradev.](/images/readme/diff-viewer.png)
+
+## Người dùng Conductor có thể làm gì ngay bây giờ
+
+Nếu chọn chuyển đổi, hãy lưu các nhánh và xuất những bản ghi bạn muốn giữ lại.
+
+Hãy chọn Paradev nếu bạn muốn phản hồi agent từ iPhone và đánh giá thay đổi khi tác vụ đang chạy trên máy tính của bạn, một host hoặc workspace trên đám mây, với bất kỳ CLI agent nào. Hãy xác thực thiết lập bằng [hướng dẫn sử dụng điện thoại](/blog/claude-code-codex-iphone). Để chuyển công việc, hãy làm theo [hướng dẫn ứng dụng cục bộ](https://docs.paradev.com/migrate-from-conductor) hoặc [hướng dẫn Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
+
+So sánh [các gói Paradev hiện tại](/pricing), bao gồm chi phí tính toán và chi phí nhà cung cấp agent. Mức sử dụng của nhà cung cấp agent được tính phí riêng.
+
+## Câu hỏi thường gặp
+
+### Conductor chỉ dành cho công việc cục bộ phải không?
+
+Không. Tài liệu Conductor nói về workspace Mac cục bộ và [sandbox trên đám mây](https://www.conductor.build/docs/cloud), bao gồm workspace trên đám mây dùng chung. Ứng dụng iOS cũng có [tính năng điều khiển từ xa thử nghiệm workspace Mac cục bộ](https://www.conductor.build/docs/reference/remote-control).
+
+### Conductor có chạy được OpenCode không?
+
+Có. Phần giới thiệu liệt kê OpenCode cùng Claude Code, Codex và Cursor.
+
+### Dùng Paradev có cần đổi trình soạn thảo không?
+
+Không. Bạn có thể mở thư mục workspace trong trình soạn thảo của mình, còn Paradev quản lý terminal và workspace. Hãy chỉ định một nơi làm chủ đối với các chỉnh sửa có phần giao nhau.

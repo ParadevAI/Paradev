@@ -36,8 +36,6 @@ export const MUSE_HOOK_ENV_VARS = [
 	"SUPERSET_PANE_ID",
 	"SUPERSET_WORKSPACE_ID",
 	"SUPERSET_AGENT_ID",
-	"SUPERSET_PORT",
-	"SUPERSET_HOOK_VERSION",
 	"SUPERSET_HOST_AGENT_HOOK_URL",
 	"SUPERSET_ENV",
 	"SUPERSET_DEBUG_HOOKS",
@@ -74,13 +72,13 @@ export function createMuseManagedHooksFile(): void {
 		getMuseManagedHooksContent(),
 		0o644,
 	);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Muse managed hooks file`,
 	);
 }
 
 const SUPERSET_OWNED_MUSE_HOOKS_PATTERN =
-	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\/hooks\/muse\/hooks\.json$/;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|(?:paradev|superset)-dev-data)\/hooks\/muse\/hooks\.json$/;
 
 function isSupersetOwnedMuseHooksPath(value: unknown): value is string {
 	return (
@@ -181,7 +179,7 @@ export function createMuseSettingsJson(): void {
 		return;
 	}
 	const changed = writeFileIfChanged(settingsPath, content, 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Muse settings.json`,
 	);
 }

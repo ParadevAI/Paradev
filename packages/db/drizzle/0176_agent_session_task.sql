@@ -1,0 +1,4 @@
+ALTER TABLE "agent_sessions" ADD COLUMN "task_id" uuid;--> statement-breakpoint
+ALTER TABLE "agent_sessions" ADD CONSTRAINT "agent_sessions_task_id_tasks_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."tasks"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "agent_sessions_task_idx" ON "agent_sessions" USING btree ("task_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "agent_sessions_active_writer_per_task_unique" ON "agent_sessions" USING btree ("task_id") WHERE "agent_sessions"."task_id" is not null and "agent_sessions"."role" = 'writer' and "agent_sessions"."task_status" in ('queued', 'running');

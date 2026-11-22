@@ -32,7 +32,7 @@ export function FAQSection({ items }: { items?: FAQSectionItem[] }) {
 			<div className="max-w-7xl mx-auto px-6 sm:px-8">
 				<div className="grid grid-cols-1 xl:grid-cols-[1fr_1.5fr] gap-12 xl:gap-20">
 					<div className="xl:sticky xl:top-24 xl:self-start">
-						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-foreground leading-[1.1]">
+						<h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-foreground leading-[1.1]">
 							<Trans>
 								Frequently
 								<br />
@@ -53,7 +53,7 @@ export function FAQSection({ items }: { items?: FAQSectionItem[] }) {
 									{item.link && (
 										<Link
 											href={item.link.href}
-											className="inline-block text-brand hover:text-brand-light transition-colors"
+											className="inline-block text-foreground underline underline-offset-4 decoration-border hover:decoration-foreground transition-colors"
 										>
 											{item.link.label} →
 										</Link>

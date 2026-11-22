@@ -8,6 +8,7 @@ import {
 	gbHourPackPricePerGbHour,
 	gbHourPurchase,
 	isCloudUsageRefusal,
+	lineupRatePerGbHour,
 	machineSpec,
 	maxYearlyDiscount,
 	offeredMachineSizes,
@@ -155,6 +156,7 @@ describe("isCloudUsageRefusal", () => {
 			"serverError.cloudWorkspace.usageLimitReached",
 		]) {
 			expect(isCloudUsageRefusal({ data: { i18nKey } })).toBe(true);
+			expect(isCloudUsageRefusal({ cause: { i18nKey } })).toBe(true);
 		}
 		expect(
 			isCloudUsageRefusal({
@@ -255,6 +257,14 @@ describe("planCatalogFromAutumn", () => {
 		expect(pro?.gbMinutesPerSeat).toBe(19200);
 		expect(pro?.overagePerGbHour).toBe(0.06);
 		expect(pro?.pack).toEqual({ gbMinutes: 1000, price: 1 });
+	});
+
+	test("Pro keeps its GB-minute grant but does not advertise cloud", () => {
+		const [pro, ultra] = lineup;
+		if (!pro || !ultra) throw new Error("lineup");
+		expect(pro.gbMinutesPerSeat).toBe(19200);
+		expect(pro.advertisedGbHoursPerSeat).toBeNull();
+		expect(ultra.advertisedGbHoursPerSeat).toBe(4000);
 	});
 
 	test("a GB-hour purchase rounds up to whole pack units, never past the maximum", () => {
@@ -399,5 +409,34 @@ describe("seatPriceOf", () => {
 		const plans = [license, current, retired];
 		expect(seatPriceOf(current, plans)?.interval).toBe("year");
 		expect(seatPriceOf(retired, plans)?.interval).toBe("year");
+	});
+});
+
+describe("lineupRatePerGbHour", () => {
+	test("is the GB-hour price every self-serve family charges", () => {
+		expect(lineup.every((family) => family.overagePerGbHour === 0.06)).toBe(
+			true,
+		);
+		expect(lineupRatePerGbHour(lineup)).toBe(0.06);
+	});
+
+	test("is null when the families disagree, so no family's price is shown as the list price", () => {
+		const [pro, ultra] = lineup;
+		if (!pro || !ultra) throw new Error("lineup has pro and ultra");
+		expect(
+			lineupRatePerGbHour([pro, { ...ultra, overagePerGbHour: 0.08 }]),
+		).toBeNull();
+	});
+
+	test("ignores a family that does not sell GB-minutes, and is null with none that does", () => {
+		const [pro, ultra] = lineup;
+		if (!pro || !ultra) throw new Error("lineup has pro and ultra");
+		expect(
+			lineupRatePerGbHour([pro, { ...ultra, overagePerGbHour: null }]),
+		).toBe(0.06);
+		expect(
+			lineupRatePerGbHour([{ ...pro, overagePerGbHour: null }]),
+		).toBeNull();
+		expect(lineupRatePerGbHour([])).toBeNull();
 	});
 });

@@ -100,6 +100,72 @@ describe("createChatAgentBridge", () => {
 		bridge.stopped("chat-1");
 	});
 
+	it("a turn the user stopped settles quietly, with no Finished notification", () => {
+		const { bridge, lifecycle, status, start, publish, terminalAgentStore } =
+			setup();
+		start("chat-1");
+		status("chat-1", "idle");
+		status("chat-1", "running");
+		const startedAt = terminalAgentStore.getChat(TERMINAL)?.lastEventAt;
+		publish("chat-1", {
+			type: "turn",
+			turn: { id: "turn-1", status: "interrupted", startedAtMs: 1 },
+		});
+		status("chat-1", "idle");
+
+		expect(lifecycle.mock.calls.map(([event]) => event.eventType)).toEqual([
+			"Start",
+		]);
+		expect(terminalAgentStore.getChat(TERMINAL)).toMatchObject({
+			lastEventType: "Stop",
+			lastEventAt: startedAt,
+		});
+		bridge.stopped("chat-1");
+	});
+
+	it("a turn that failed while the chat lives on reports Failed, not Finished", () => {
+		const { bridge, lifecycle, status, start, publish } = setup();
+		start("chat-1");
+		status("chat-1", "idle");
+		status("chat-1", "running");
+		publish("chat-1", {
+			type: "turn",
+			turn: {
+				id: "turn-1",
+				status: "failed",
+				error: { message: "exited", kind: "crashed" },
+				startedAtMs: 1,
+			},
+		});
+		status("chat-1", "idle");
+
+		expect(lifecycle.mock.calls.map(([event]) => event.eventType)).toEqual([
+			"Start",
+			"Failed",
+		]);
+		bridge.stopped("chat-1");
+	});
+
+	it("a chat Paradev closed mid-turn comes back unseen, without a notification", () => {
+		const { bridge, lifecycle, terminalAgentStore } = setup();
+		bridge.closedMidTurn({
+			sessionId: "chat-1",
+			scopeId: WORKSPACE,
+			harness: "claude-acp",
+			harnessSessionId: "agent-1",
+			terminalId: TERMINAL,
+			interrupted: true,
+			prompts: [],
+			pausedPrompts: [],
+		});
+
+		expect(terminalAgentStore.getChat(TERMINAL)).toMatchObject({
+			lastEventType: "Stop",
+			chatSessionId: "chat-1",
+		});
+		expect(lifecycle).not.toHaveBeenCalled();
+	});
+
 	it("keeps the main agent's reply as the preview when a subagent speaks last", () => {
 		const { bridge, lifecycle, status, reply, start, publish } = setup();
 		start("chat-1");
@@ -119,6 +185,40 @@ describe("createChatAgentBridge", () => {
 		});
 		status("chat-1", "idle");
 		expect(lifecycle.mock.calls[1]?.[0].preview).toBe("Done.");
+		bridge.stopped("chat-1");
+	});
+
+	it("updates the binding when only a subagent's status or controls change", () => {
+		const { bridge, terminalAgentStore, start, publish } = setup();
+		start("chat-1");
+		const publishTask = (fields: Record<string, unknown>) =>
+			publish("chat-1", {
+				type: "session",
+				session: {
+					status: "running",
+					harness: "claude-acp",
+					backgroundTasks: [
+						{
+							id: "subagent:c1",
+							kind: "subagent",
+							name: "Explore",
+							canStop: true,
+							startedAtMs: 0,
+							...fields,
+						},
+					],
+				},
+			});
+		publishTask({ subagentStatus: "running", canBackground: false });
+		publishTask({ subagentStatus: "running", canBackground: true });
+		expect(
+			terminalAgentStore.getChat(TERMINAL)?.backgroundTasks?.[0]?.canBackground,
+		).toBe(true);
+		publishTask({ subagentStatus: "idle", canBackground: true });
+		expect(
+			terminalAgentStore.getChat(TERMINAL)?.backgroundTasks?.[0]
+				?.subagentStatus,
+		).toBe("idle");
 		bridge.stopped("chat-1");
 	});
 

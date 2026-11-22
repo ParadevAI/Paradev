@@ -5,35 +5,32 @@ description: Let agents operate native desktop applications through an accessibi
 
 ## Overview
 
-Paradev includes a `computer` skill that teaches agents to operate native
-desktop applications through an accessibility-first driver. It can inspect
-windows, read accessibility state and screenshots, click, type, scroll, use
-native menus, and verify the resulting UI state on macOS, Windows, and Linux.
+Paradev includes a `computer` skill that lets agents operate native desktop
+applications through an accessibility-first driver. Agents can inspect windows,
+read accessibility state and screenshots, click, type, scroll, use native
+menus, and verify the resulting UI state on macOS, Windows, and Linux.
 
-The skill's workflow is driver-agnostic; [Cua
-Driver](https://cua.ai/docs/cua-driver) is the default. On macOS,
-[Peekaboo](https://peekaboo.sh) works as an alternative — agents use whichever
-supported driver you have installed, and ask before installing one.
+[Cua Driver](https://cua.ai/docs/cua-driver) is the default driver. On macOS,
+[Peekaboo](https://peekaboo.sh) also works. Agents use whichever supported
+driver is installed, and ask before installing one.
 
-The agent works in the actual app window you can see. Cua Driver targets a
+The agent works in the real app window you can see. Cua Driver targets a
 specific process and window and uses background interaction when the platform
-supports it, so routine automation does not need to take over your mouse or
-bring the target app to the front.
+supports it, so it does not need to take over your mouse or bring the app to
+the front.
 
 ## Install a driver
 
 <Callout type="info" title="Optional third-party software">
-	Drivers are not built or maintained by Paradev — Cua Driver comes from
+	Paradev does not build or maintain drivers. Cua Driver comes from
 	[Cua](https://cua.ai) and Peekaboo from [its open-source
-	project](https://peekaboo.sh) — and nothing in Paradev requires one:
-	without a driver installed, this skill simply isn't used. Installing a
-	driver and granting it Accessibility and Screen Recording gives it, and
-	agents driving it, deep control of your machine — extend it the same trust
-	as any system-level tool.
+	project](https://peekaboo.sh). Nothing in Paradev requires one; without a
+	driver, the skill is not used. A driver with Accessibility and Screen
+	Recording permission gives the driver, and any agent using it, deep control
+	of your machine. Trust both as you would any system-level tool.
 </Callout>
 
-The skill is bundled with Paradev, but the driver runtime is installed
-separately. Cua Driver is the default:
+The skill is bundled with Paradev. Install the driver separately. Cua Driver is the default:
 
 **macOS and Linux**
 
@@ -71,8 +68,7 @@ brew install steipete/tap/peekaboo
 ```
 
 [Peekaboo](https://peekaboo.sh) needs the same Accessibility and Screen
-Recording permissions. Agents use whichever supported driver is installed, so
-installing Peekaboo instead of Cua Driver selects it.
+Recording permissions. Installing it instead of Cua Driver selects it.
 
 ## Hand an app to your agent
 
@@ -88,10 +84,10 @@ Use the open design app to export the current canvas as a PNG, then verify the
 file appeared in the chosen folder.
 ```
 
-The skill makes the agent declare a task-scoped session, identify the exact app
-and window, take a fresh state snapshot before every action, and verify the UI
+The agent declares a task-scoped session, identifies the exact app and window,
+takes a fresh state snapshot before every action, and verifies the UI
 afterward. It starts with accessibility targets, uses pixels only when needed,
-and escalates to foreground or full-desktop control only after observed failure.
+and escalates to foreground or full-desktop control only after a failure.
 
 ## Computer or browser?
 

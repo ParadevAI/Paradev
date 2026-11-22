@@ -20,6 +20,11 @@ interface Variant {
 	queue: Promise<unknown>;
 }
 
+/** Past this, a scoped re-read costs as much as a full walk. */
+export const MAX_PENDING_PATHS = 1_000;
+/** Base branches cached per workspace; the least recently read is evicted. */
+export const MAX_VARIANTS_PER_WORKSPACE = 4;
+
 interface ReadInput {
 	workspaceId: string;
 	baseBranch: string | null;
@@ -49,6 +54,7 @@ export class GitStatusStore {
 				continue;
 			}
 			for (const path of paths) variant.pending.add(path);
+			if (variant.pending.size > MAX_PENDING_PATHS) variant.pending = null;
 		}
 	}
 
@@ -58,10 +64,16 @@ export class GitStatusStore {
 
 		const key = input.baseBranch ?? "";
 		let variant = variants.get(key);
-		if (!variant) {
+		if (variant) {
+			variants.delete(key);
+		} else {
 			variant = { cached: null, pending: null, queue: Promise.resolve() };
-			variants.set(key, variant);
+			if (variants.size >= MAX_VARIANTS_PER_WORKSPACE) {
+				const leastRecent = variants.keys().next().value;
+				if (leastRecent !== undefined) variants.delete(leastRecent);
+			}
 		}
+		variants.set(key, variant);
 
 		const run = variant.queue.then(() => this.readVariant(input, variant));
 		variant.queue = run.catch(() => {});
@@ -84,7 +96,7 @@ export class GitStatusStore {
 		try {
 			partial = await input.computePartial(paths);
 		} catch (error) {
-			if (variant.pending) for (const path of paths) variant.pending.add(path);
+			variant.pending = null;
 			throw error;
 		}
 

@@ -10,7 +10,7 @@ function stringArray(value: unknown): string[] | undefined {
 }
 
 /**
- * Translates a v1 `.superset/config.json` object into the v2 shape, keeping
+ * Translates a v1 `config.json` object into the v2 shape, keeping
  * what it did in the cloud, where v1 boot ran only `start`:
  * setup → [setup] (start → [setup.cloud]), teardown → [archive] (off in the
  * cloud), run → [terminals.dev] (default locally only),
@@ -65,6 +65,23 @@ export function fromV1Json(json: unknown): ProjectConfig {
 	return config;
 }
 
+const STRING_VALUE_LINE = /^(\s*[\w."-]+ = )("(?:[^"\\]|\\.)*")$/gm;
+// biome-ignore lint/suspicious/noControlCharactersInRegex: a literal string cannot hold these
+const NOT_LITERAL_SAFE = /'''|[\u0000-\u0008\u000b-\u001f\u007f]/;
+
+/** A value that spans lines, such as a script, is written as a `'''` block, which keeps it as typed. */
+function multilineLiteral(line: string, key: string, value: string): string {
+	let text: string;
+	try {
+		text = JSON.parse(value);
+	} catch {
+		return line;
+	}
+	if (!text.includes("\n") || NOT_LITERAL_SAFE.test(text)) return line;
+	return `${key}'''\n${text}'''`;
+}
+
 export function toTomlText(config: ProjectConfig): string {
-	return `${stringify(config).trim()}\n`;
+	const text = stringify(config).replace(STRING_VALUE_LINE, multilineLiteral);
+	return `${text.trim()}\n`;
 }

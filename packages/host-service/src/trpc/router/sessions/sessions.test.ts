@@ -5,14 +5,17 @@ import {
 	type ChatRuntime,
 	FakeHarness,
 	type HarnessFactoryOptions,
+	type HarnessStartOptions,
 } from "@superset/chat-runtime";
 import { createTestRuntime, waitFor } from "@superset/chat-runtime/testing";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import { TerminalAgentStore } from "../../../terminal-agents";
 import type { HostServiceContext } from "../../../types";
+import { createChatSessionInWorkspace } from "./session-service";
 import { sessionsRouter } from "./sessions";
 
 const WORKSPACE = "11111111-1111-4111-8111-111111111111";
@@ -21,11 +24,14 @@ let runtime: ChatRuntime;
 let db: HostDb;
 let startDead: boolean;
 let launches: HarnessFactoryOptions[];
+let starts: HarnessStartOptions[];
 let caller: ReturnType<typeof sessionsRouter.createCaller>;
+let ctx: HostServiceContext;
 
 beforeEach(() => {
 	startDead = false;
 	launches = [];
+	starts = [];
 	const sqlite = new Database(":memory:");
 	db = drizzle(sqlite, { schema }) as unknown as HostDb;
 	migrate(db as never, {
@@ -74,7 +80,7 @@ beforeEach(() => {
 				"claude-acp",
 				(options: HarnessFactoryOptions) => {
 					launches.push(options);
-					return new FakeHarness({
+					const harness = new FakeHarness({
 						start: [
 							{
 								kind: "session",
@@ -88,11 +94,17 @@ beforeEach(() => {
 						],
 						turns: [[], []],
 					});
+					const start = harness.start.bind(harness);
+					harness.start = (startOptions) => {
+						starts.push(startOptions);
+						return start(startOptions);
+					};
+					return harness;
 				},
 			],
 		]),
 	});
-	const ctx = {
+	ctx = {
 		db,
 		runtime: { chat: () => runtime },
 		terminalAgentStore,
@@ -204,6 +216,29 @@ describe("sessions router", () => {
 		).toHaveLength(1);
 	});
 
+	test("starts the agent at the reasoning effort the caller asked for", async () => {
+		const created = await createChatSessionInWorkspace(ctx, {
+			workspaceId: WORKSPACE,
+			agent: "claude",
+			prompt: "go",
+			effort: "high",
+		});
+		expect(created.kind).toBe("chat");
+		await waitFor(() => starts.length > 0);
+		expect(starts[0]?.effortId).toBe("high");
+	});
+
+	test("launches under the terminal id a cloud launch was promised", async () => {
+		const terminalId = crypto.randomUUID();
+		const created = await createChatSessionInWorkspace(
+			ctx,
+			{ workspaceId: WORKSPACE, agent: "claude", prompt: "go" },
+			{ terminalId },
+		);
+		expect(created.terminalId).toBe(terminalId);
+		expect(runtime.live.get(created.sessionId)?.terminalId).toBe(terminalId);
+	});
+
 	test("pages read with the before cursor without duplicate or lost events", async () => {
 		const created = await caller.create({
 			workspaceId: WORKSPACE,
@@ -306,5 +341,55 @@ describe("sessions router", () => {
 		expect(launches[1]?.resume?.harnessSessionId).toBe(
 			`native-${created.sessionId}`,
 		);
+	});
+	test("resumes on the stored config, else on the default account with a notice", async () => {
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "personal-config",
+				presetId: "custom",
+				command: "claude",
+				promptTransport: "argv",
+				label: "Claude (personal)",
+				displayOrder: 1,
+			})
+			.run();
+		const stopAndResume = async (sessionId: string) => {
+			await waitFor(() => runtime.sessions.get(sessionId)?.status === "idle");
+			await caller.close({ workspaceId: WORKSPACE, sessionId });
+			return caller.resume({ workspaceId: WORKSPACE, sessionId });
+		};
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "personal-config",
+		});
+		const second = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "personal-config",
+		});
+		const kept = await stopAndResume(created.sessionId);
+		expect(launches.at(-1)?.agentConfigId).toBe("personal-config");
+		expect("notice" in kept).toBe(false);
+
+		db.update(schema.hostAgentConfigs)
+			.set({ command: "codex" })
+			.where(eq(schema.hostAgentConfigs.id, "personal-config"))
+			.run();
+		const moved = await stopAndResume(kept.sessionId);
+		expect("notice" in moved && moved.notice).toContain("no longer runs");
+		expect(launches.at(-1)?.agentConfigId).toBeUndefined();
+		expect(runtime.sessions.get(moved.sessionId)?.agentConfigId).toBeNull();
+		expect(launches.at(-1)?.resume?.harnessSessionId).toBe(
+			`native-${created.sessionId}`,
+		);
+
+		const again = await stopAndResume(moved.sessionId);
+		expect("notice" in again).toBe(false);
+
+		db.delete(schema.hostAgentConfigs)
+			.where(eq(schema.hostAgentConfigs.id, "personal-config"))
+			.run();
+		const deleted = await stopAndResume(second.sessionId);
+		expect("notice" in deleted && deleted.notice).toContain("was deleted");
+		expect(launches.at(-1)?.agentConfigId).toBeUndefined();
 	});
 });

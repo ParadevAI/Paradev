@@ -1,4 +1,6 @@
+import { AutumnError } from "autumn-js";
 import { autumnClient, autumnRest } from "../../../autumn";
+import { isAwsMarketplaceOrganization } from "../aws-marketplace/organization";
 import { LEGACY_CLIENT_PLAN_IDS } from "../legacy/plan-ids";
 import { alertBilling } from "./alert";
 import { seatLicenseFor } from "./catalog";
@@ -121,15 +123,24 @@ export async function setAutumnSeats(
 	members: number,
 ): Promise<boolean> {
 	const label = `${organizationId} (${members} seats)`;
-	let customer: Awaited<ReturnType<typeof getAutumnCustomer>>;
+	let customer: Awaited<ReturnType<typeof getAutumnCustomer>> | null;
 	try {
-		customer = await withRetry(() => getAutumnCustomer(organizationId));
+		customer = await withRetry(() =>
+			getAutumnCustomer(organizationId).catch((error: unknown) => {
+				if (error instanceof AutumnError && error.statusCode === 404) {
+					return null;
+				}
+				throw error;
+			}),
+		);
 	} catch (error) {
 		await alertBilling(`Seat sync for ${label} could not read Autumn`, error);
 		return true;
 	}
+	if (!customer) return false;
 	const planId = paidPlanIdFromFlags(customer.flags);
 	if (!planId) return false;
+	if (await isAwsMarketplaceOrganization(organizationId)) return true;
 	try {
 		const license = await seatLicenseFor(planId);
 		if (license) {

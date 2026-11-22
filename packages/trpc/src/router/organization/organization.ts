@@ -24,14 +24,11 @@ import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+import { withAuthUserErrors } from "../../lib/auth-user-error";
+import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
 import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
-import {
-	jwtProcedure,
-	protectedProcedure,
-	publicProcedure,
-	userError,
-} from "../../trpc";
+import { personProcedure, publicProcedure, userError } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { organizationMembersRouter } from "./members";
@@ -88,7 +85,7 @@ function countEffects<T extends { automations: unknown[]; hosts: unknown[] }>(
 export const organizationRouter = {
 	members: organizationMembersRouter,
 
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		return db
 			.select({
 				id: organizations.id,
@@ -103,7 +100,7 @@ export const organizationRouter = {
 			.orderBy(organizations.name);
 	}),
 
-	listMembers: protectedProcedure
+	listMembers: personProcedure
 		.input(
 			z.object({ includeDeactivated: z.boolean().default(false) }).nullish(),
 		)
@@ -132,7 +129,7 @@ export const organizationRouter = {
 				.where(and(...conditions));
 		}),
 
-	listInvitations: protectedProcedure.query(async ({ ctx }) => {
+	listInvitations: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		return db
 			.select({
@@ -161,7 +158,7 @@ export const organizationRouter = {
 			.orderBy(desc(invitations.createdAt));
 	}),
 
-	listTeams: protectedProcedure.query(async ({ ctx }) => {
+	listTeams: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireActiveOrgMembership(ctx);
 		const [teamRows, teamMemberRows] = await Promise.all([
 			db
@@ -206,7 +203,7 @@ export const organizationRouter = {
 		}));
 	}),
 
-	getActive: protectedProcedure.query(async ({ ctx }) => {
+	getActive: personProcedure.query(async ({ ctx }) => {
 		const orgId = ctx.activeOrganizationId;
 		if (!orgId) return null;
 
@@ -225,32 +222,33 @@ export const organizationRouter = {
 		return org ?? null;
 	}),
 
-	getActiveFromJwt: jwtProcedure.query(async ({ ctx }) => {
-		if (!ctx.activeOrganizationId) return null;
+	getActiveFromJwt: personProcedure.query(async ({ ctx }) => {
+		const organizationId = organizationOrFirst(ctx);
+		if (!organizationId) return null;
 
 		const membership = await db.query.members.findFirst({
 			where: and(
-				eq(members.userId, ctx.userId),
-				eq(members.organizationId, ctx.activeOrganizationId),
+				eq(members.userId, ctx.principal.userId),
+				eq(members.organizationId, organizationId),
 			),
 		});
 		if (!membership) return null;
 
 		const org = await db.query.organizations.findFirst({
-			where: eq(organizations.id, ctx.activeOrganizationId),
+			where: eq(organizations.id, organizationId),
 			columns: { id: true, name: true, slug: true, taskTracker: true },
 		});
 		return org ?? null;
 	}),
 
-	getByIdFromJwt: jwtProcedure
+	getByIdFromJwt: personProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.id)) return null;
+			if (!(await isMember(ctx, input.id))) return null;
 
 			const membership = await db.query.members.findFirst({
 				where: and(
-					eq(members.userId, ctx.userId),
+					eq(members.userId, ctx.principal.userId),
 					eq(members.organizationId, input.id),
 				),
 			});
@@ -263,7 +261,7 @@ export const organizationRouter = {
 			return org ?? null;
 		}),
 
-	getInvitation: protectedProcedure
+	getInvitation: personProcedure
 		.input(z.uuid())
 		.query(async ({ ctx, input }) => {
 			const invitation = await getInvitationById(input);
@@ -340,7 +338,7 @@ export const organizationRouter = {
 				},
 			};
 		}),
-	create: protectedProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				name: z.string().min(1),
@@ -364,14 +362,16 @@ export const organizationRouter = {
 				}
 			}
 
-			const organization = await auth.api.createOrganization({
-				body: {
-					name: input.name,
-					slug: input.slug,
-					logo: input.logo,
-					userId: ctx.session.user.id,
-				},
-			});
+			const organization = await withAuthUserErrors(
+				auth.api.createOrganization({
+					body: {
+						name: input.name,
+						slug: input.slug,
+						logo: input.logo,
+						userId: ctx.session.user.id,
+					},
+				}),
+			);
 
 			if (!organization) {
 				throw userError({
@@ -384,7 +384,7 @@ export const organizationRouter = {
 			return organization;
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -478,7 +478,7 @@ export const organizationRouter = {
 			return organization;
 		}),
 
-	uploadLogo: protectedProcedure
+	uploadLogo: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -551,7 +551,7 @@ export const organizationRouter = {
 			}
 		}),
 
-	addMember: protectedProcedure
+	addMember: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -560,18 +560,19 @@ export const organizationRouter = {
 		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
-			const member = await ctx.auth.api.addMember({
-				body: {
-					organizationId: input.organizationId,
-					userId: input.userId,
-					role: "member",
-				},
-				headers: ctx.headers,
-			});
-			return member;
+			return withAuthUserErrors(
+				ctx.auth.api.addMember({
+					body: {
+						organizationId: input.organizationId,
+						userId: input.userId,
+						role: "member",
+					},
+					headers: ctx.headers,
+				}),
+			);
 		}),
 
-	removeMember: protectedProcedure
+	removeMember: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -636,13 +637,15 @@ export const organizationRouter = {
 				});
 			}
 
-			await ctx.auth.api.removeMember({
-				body: {
-					organizationId: input.organizationId,
-					memberIdOrEmail: targetMember.id, // Use member ID, not user ID
-				},
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.removeMember({
+					body: {
+						organizationId: input.organizationId,
+						memberIdOrEmail: targetMember.id, // Use member ID, not user ID
+					},
+					headers: ctx.headers,
+				}),
+			);
 
 			const cleanup = await cleanupRemovedMember({
 				userId: input.userId,
@@ -657,7 +660,7 @@ export const organizationRouter = {
 	 * happens. Anyone may ask about themselves; asking about someone else is
 	 * an admin question.
 	 */
-	memberRemovalEffects: protectedProcedure
+	memberRemovalEffects: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -673,7 +676,7 @@ export const organizationRouter = {
 			return countEffects(await findMemberRemovalEffects(input));
 		}),
 
-	leave: protectedProcedure
+	leave: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -695,10 +698,12 @@ export const organizationRouter = {
 				});
 			}
 
-			const leaveResult = await ctx.auth.api.leaveOrganization({
-				body: { organizationId: input.organizationId },
-				headers: ctx.headers,
-			});
+			const leaveResult = await withAuthUserErrors(
+				ctx.auth.api.leaveOrganization({
+					body: { organizationId: input.organizationId },
+					headers: ctx.headers,
+				}),
+			);
 
 			if (!leaveResult) {
 				throw userError({
@@ -739,7 +744,7 @@ export const organizationRouter = {
 			};
 		}),
 
-	updateMemberRole: protectedProcedure
+	updateMemberRole: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -812,14 +817,16 @@ export const organizationRouter = {
 				});
 			}
 
-			await ctx.auth.api.updateMemberRole({
-				body: {
-					organizationId: input.organizationId,
-					memberId: input.memberId,
-					role: [input.role],
-				},
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.updateMemberRole({
+					body: {
+						organizationId: input.organizationId,
+						memberId: input.memberId,
+						role: [input.role],
+					},
+					headers: ctx.headers,
+				}),
+			);
 
 			const updatedMember = await db.query.members.findFirst({
 				where: eq(members.id, input.memberId),

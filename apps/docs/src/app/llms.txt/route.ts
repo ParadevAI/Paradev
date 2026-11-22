@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { DOCS_BASE_URL } from "@/lib/docs-mcp-server";
 import { source } from "@/lib/source";
 
@@ -5,9 +6,9 @@ export const revalidate = false;
 
 export function GET() {
 	const lines = [
-		"# Paradev Documentation",
+		`# ${BRAND.INTRO_NAME} Documentation`,
 		"",
-		"> Official documentation for Paradev — run parallel AI coding agents in isolated Git worktrees on your machine.",
+		`> Official documentation for ${BRAND.INTRO_NAME} — run parallel AI coding agents in isolated Git worktrees on your machine.`,
 		"",
 		"Fetch the relevant Markdown pages linked below. Each page includes its source URL and description, followed by the full documentation content.",
 		"",

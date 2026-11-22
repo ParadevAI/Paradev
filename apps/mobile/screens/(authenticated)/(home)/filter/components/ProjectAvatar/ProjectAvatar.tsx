@@ -36,6 +36,7 @@ export function ProjectAvatar({
 			}}
 		>
 			<Text
+				allowFontScaling={false}
 				className="font-bold"
 				style={{
 					fontSize: size * 0.45,

@@ -2,13 +2,32 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { cp, rename, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
+	findInstalledTree,
 	getBundledMarketplaceDir,
 	type InstalledPluginEntry,
 	pluginCachePath,
 	writeInstalledPlugins,
+	writePluginTree,
 } from "@superset/agent-setup";
-import { DEFAULT_MARKETPLACE } from "@superset/shared/plugins";
-import { sandboxPluginsSchema } from "@superset/shared/sandbox-contract";
+import {
+	DEFAULT_MARKETPLACE,
+	isOrganizationMarketplace,
+	manifestHasTools,
+} from "@superset/shared/plugins";
+import {
+	pluginBundleHash,
+	unpackPluginBundle,
+} from "@superset/shared/plugins/bundle";
+import { sandboxPluginsSchema } from "@superset/shared/sandbox/contract";
+import { caught } from "../box-log-filter";
+
+function readManifest(file: string): unknown {
+	try {
+		return JSON.parse(readFileSync(file, "utf8"));
+	} catch {
+		return null;
+	}
+}
 
 function treeVersion(dir: string, fallback: string): string {
 	try {
@@ -36,7 +55,11 @@ async function cacheShippedTree(
 	try {
 		target = pluginCachePath(marketplace, name, version);
 	} catch (error) {
-		console.warn(`[sandbox] ${name}: ${(error as Error).message}`);
+		console.warn(
+			"[sandbox] plugin has no cache path (plugin):",
+			name,
+			caught(error),
+		);
 		return undefined;
 	}
 	if (existsSync(join(target, "plugin.json"))) return target;
@@ -56,13 +79,57 @@ async function cacheShippedTree(
 		return target;
 	} catch (error) {
 		await rm(staging, { recursive: true, force: true }).catch(() => {});
-		console.warn(`[sandbox] ${name}: could not cache its tree:`, error);
+		console.warn(
+			"[sandbox] could not cache a plugin tree (plugin):",
+			name,
+			caught(error),
+		);
+		return undefined;
+	}
+}
+
+export interface OrganizationPluginBundle {
+	name: string;
+	marketplace: string;
+	version: string;
+	contentHash: string;
+	bundle: string;
+}
+
+async function cacheOrganizationTree(
+	name: string,
+	fetchBundle: (name: string) => Promise<OrganizationPluginBundle>,
+): Promise<{ version: string; installPath: string } | undefined> {
+	try {
+		const download = await fetchBundle(name);
+		const bundle = Buffer.from(download.bundle, "base64");
+		if (pluginBundleHash(bundle) !== download.contentHash) {
+			throw new Error("the download does not match its hash");
+		}
+		const { files, executable } = unpackPluginBundle(bundle);
+		return {
+			version: download.version,
+			installPath: writePluginTree(
+				download.marketplace,
+				download.name,
+				download.version,
+				files,
+				executable,
+			),
+		};
+	} catch (error) {
+		console.warn(
+			"[sandbox] could not fetch a plugin tree (plugin):",
+			name,
+			caught(error),
+		);
 		return undefined;
 	}
 }
 
 export async function seedSandboxPlugins(
 	env: NodeJS.ProcessEnv = process.env,
+	fetchOrganizationBundle?: (name: string) => Promise<OrganizationPluginBundle>,
 ): Promise<void> {
 	const raw = env.SUPERSET_SANDBOX_PLUGINS;
 	if (!raw) return;
@@ -90,15 +157,36 @@ export async function seedSandboxPlugins(
 		const shipped =
 			plugin.marketplace === DEFAULT_MARKETPLACE &&
 			existsSync(join(dir, "plugin.json"));
-		const version = shipped ? treeVersion(dir, plugin.version) : plugin.version;
+		const fetched =
+			!shipped &&
+			fetchOrganizationBundle &&
+			isOrganizationMarketplace(plugin.marketplace)
+				? await cacheOrganizationTree(plugin.name, fetchOrganizationBundle)
+				: undefined;
+		const cached =
+			!shipped && !fetched && isOrganizationMarketplace(plugin.marketplace)
+				? findInstalledTree(plugin.marketplace, plugin.name)
+				: null;
+		const usableCache =
+			cached && existsSync(join(cached.installPath, "plugin.json"))
+				? cached
+				: null;
+		const version = shipped
+			? treeVersion(dir, plugin.version)
+			: (fetched?.version ?? usableCache?.version ?? plugin.version);
 		const installPath = shipped
 			? await cacheShippedTree(dir, plugin.marketplace, plugin.name, version)
-			: undefined;
+			: (fetched?.installPath ?? usableCache?.installPath);
+		const tools =
+			installPath && isOrganizationMarketplace(plugin.marketplace)
+				? manifestHasTools(readManifest(join(installPath, "plugin.json")))
+				: undefined;
 		entries.push({
 			marketplace: plugin.marketplace,
 			name: plugin.name,
 			version,
 			...(installPath ? { installPath } : {}),
+			...(tools === undefined ? {} : { tools }),
 			installedAt,
 			enabled: plugin.enabled,
 		});
@@ -107,8 +195,8 @@ export async function seedSandboxPlugins(
 	writeInstalledPlugins(entries);
 	const toolsOnly = entries.filter((entry) => !entry.installPath).length;
 	console.log(
-		`[sandbox] Seeded ${entries.length} plugin(s) into the ledger${
-			toolsOnly ? ` (${toolsOnly} with no tree in this runtime)` : ""
-		}`,
+		"[sandbox] Seeded plugins into the ledger (count, with no tree in this runtime):",
+		entries.length,
+		toolsOnly,
 	);
 }

@@ -23,6 +23,16 @@ export function formatNumber(
 	return new Intl.NumberFormat(locale, options).format(value);
 }
 
+// 12.345 -> "12.3", 0.04 -> "<0.1": a small amount still reads as used.
+export function formatGbHours(
+	gbHours: number,
+	locale = getActiveLocale(),
+): string {
+	return gbHours > 0 && gbHours < 0.1
+		? `<${formatNumber(0.1, undefined, locale)}`
+		: formatNumber(gbHours, { maximumFractionDigits: 1 }, locale);
+}
+
 // 0.123 -> "12.3%"
 export function formatPercent(
 	value: number,
@@ -109,6 +119,20 @@ export function formatDateTime(
 	locale = getActiveLocale(),
 ): string {
 	return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
+// A clock time without AM/PM, "11:11", for where the period is obvious from
+// the message above it. 24-hour locales come out unchanged.
+export function formatClockTime(
+	date: Date | number,
+	locale = getActiveLocale(),
+): string {
+	return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" })
+		.formatToParts(date)
+		.filter((part) => part.type !== "dayPeriod")
+		.map((part) => part.value)
+		.join("")
+		.trim();
 }
 
 // Relative time: -3600_000 -> "1 hour ago", 86_400_000 -> "tomorrow".

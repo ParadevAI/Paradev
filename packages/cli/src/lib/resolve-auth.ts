@@ -14,7 +14,15 @@ import {
 	SessionExpiredError,
 } from "./oauth-refresh";
 
-export type AuthSource = "override" | "host" | "config" | "oauth" | "sandbox";
+export const NOT_LOGGED_IN = "Not logged in";
+
+export type AuthSource =
+	| "override"
+	| "host"
+	| "config"
+	| "oauth"
+	| "sandbox"
+	| "signed_out";
 
 export type ResolvedAuth = {
 	config: SupersetConfig;
@@ -25,7 +33,10 @@ export type ResolvedAuth = {
 
 export async function resolveAuth(
 	apiKeyOption: string | undefined,
-	{ useHostToken = true }: { useHostToken?: boolean } = {},
+	{
+		useHostToken = true,
+		allowSignedOut = false,
+	}: { useHostToken?: boolean; allowSignedOut?: boolean } = {},
 ): Promise<ResolvedAuth> {
 	let config = readConfig();
 
@@ -67,9 +78,12 @@ export async function resolveAuth(
 		// person. Nothing to send from here, and nothing to refresh.
 		bearer = "";
 		authSource = "sandbox";
+	} else if (allowSignedOut) {
+		bearer = "";
+		authSource = "signed_out";
 	} else {
 		throw new CLIError(
-			"Not logged in",
+			NOT_LOGGED_IN,
 			"Run: superset auth login (or set SUPERSET_API_KEY)",
 		);
 	}

@@ -13,13 +13,13 @@ import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Redirect } from "renderer/components/Redirect";
+import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
 import { useSessionRecovery } from "renderer/hooks/useSessionRecovery";
 import { track } from "renderer/lib/analytics";
 import { setAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { SupersetLogo } from "./components/SupersetLogo";
 
 export const Route = createFileRoute("/sign-in/")({
 	component: SignInPage,
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/sign-in/")({
 
 const LAST_USED_METHOD_KEY = "superset-last-auth-method";
 
-const workspaceRedirect = <Redirect to="/workspace" replace />;
+const workspaceRedirect = <Redirect to="/new-workspace" replace />;
 
 const SESSION_PENDING_TIMEOUT_MS = 15_000;
 
@@ -144,7 +144,7 @@ function SignInPage() {
 			).toISOString();
 			await persistToken.mutateAsync({ token, expiresAt });
 			setAuthToken(token);
-			await navigate({ to: "/workspace", replace: true });
+			await navigate({ to: "/new-workspace", replace: true });
 		} catch (error) {
 			setDevError(
 				error instanceof Error ? error.message : "Dev sign-in failed",

@@ -1,5 +1,5 @@
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
+import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import {
 	PRODUCT_DISAMBIGUATION,
 	PRODUCT_PLATFORMS,
@@ -41,7 +41,8 @@ export function OrganizationJsonLd() {
 		"@context": "https://schema.org",
 		"@type": "Organization",
 		"@id": `${COMPANY.MARKETING_URL}/#organization`,
-		name: BRAND.INTRO_NAME,
+		name: BRAND.NAME,
+		alternateName: BRAND.FORMER_NAME,
 		legalName: COMPANY.LEGAL_NAME,
 		url: COMPANY.MARKETING_URL,
 		logo: `${COMPANY.MARKETING_URL}/apple-touch-icon.png`,
@@ -67,18 +68,27 @@ export function OrganizationJsonLd() {
 			COMPANY.X_URL,
 			COMPANY.LINKEDIN_URL,
 			COMPANY.YOUTUBE_URL,
+			"https://github.com/superset-sh/superset",
+			"https://github.com/superset-sh",
+			SOCIAL.X_FORMER.url,
+			"https://www.linkedin.com/company/superset-sh",
 		],
 	};
 
 	return <JsonLdScript schema={schema} />;
 }
 
-export function SoftwareApplicationJsonLd() {
+export function SoftwareApplicationJsonLd({
+	dateModified,
+}: {
+	dateModified?: string;
+}) {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "SoftwareApplication",
 		"@id": `${COMPANY.MARKETING_URL}/#software`,
-		name: BRAND.INTRO_NAME,
+		name: BRAND.NAME,
+		alternateName: BRAND.FORMER_NAME,
 		operatingSystem: PRODUCT_PLATFORMS,
 		license: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
 		publisher: { "@id": `${COMPANY.MARKETING_URL}/#organization` },
@@ -92,6 +102,7 @@ export function SoftwareApplicationJsonLd() {
 		description: PRODUCT_SUMMARY,
 		disambiguatingDescription: PRODUCT_DISAMBIGUATION,
 		url: COMPANY.MARKETING_URL,
+		...(dateModified && { dateModified }),
 	};
 
 	return <JsonLdScript schema={schema} />;
@@ -136,7 +147,7 @@ export function ArticleJsonLd({
 		},
 		publisher: {
 			"@type": "Organization",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -189,7 +200,8 @@ export function ComparisonJsonLd({
 		...(keywords && keywords.length > 0 && { keywords }),
 		publisher: {
 			"@type": "Organization",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
+			alternateName: BRAND.FORMER_NAME,
 			logo: {
 				"@type": "ImageObject",
 				url: `${COMPANY.MARKETING_URL}/logo.png`,
@@ -216,7 +228,8 @@ export function WebsiteJsonLd() {
 	const schema = {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: BRAND.INTRO_NAME,
+		name: BRAND.NAME,
+		alternateName: [BRAND.FORMER_NAME, new URL(COMPANY.MARKETING_URL).hostname],
 		url: COMPANY.MARKETING_URL,
 	};
 
@@ -232,7 +245,7 @@ export function HomeWebPageJsonLd() {
 		name: `${BRAND.INTRO_NAME}: Run an army of coding agents`,
 		isPartOf: {
 			"@type": "WebSite",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		speakable: {
@@ -251,10 +264,10 @@ export function ServiceJsonLd() {
 		name: `${BRAND.INTRO_NAME} agent orchestration`,
 		serviceType: "AI coding agent orchestration platform",
 		description:
-			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel with isolated Git worktrees, diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
+			"Bring Claude Code, Codex, OpenCode, or any CLI-based coding agent into one workspace. Run tasks in parallel, each in its own Git worktree and branch, with diff review, persistent terminals, automations that run on events or a schedule, and an MCP server for programmatic control.",
 		provider: {
 			"@type": "Organization",
-			name: BRAND.INTRO_NAME,
+			name: BRAND.NAME,
 			url: COMPANY.MARKETING_URL,
 		},
 		url: COMPANY.MARKETING_URL,

@@ -78,6 +78,7 @@ jobs:
       electron_builder_config: electron-builder.canary.ts
       artifact_prefix: desktop-canary
       artifact_retention_days: 7
+      environment: canary
     secrets: inherit
 
   release:
@@ -110,8 +111,10 @@ jobs:
           for file in *.AppImage; do
             if [[ -f "$file" ]]; then
               arch=$(echo "$file" | sed -E 's/.*-([^-]+)\.AppImage$/\1/')
-              cp "$file" "Superset-Canary-${arch}.AppImage"
-              echo "Created canary copy: Superset-Canary-${arch}.AppImage"
+              for alias in "Paradev-Canary-${arch}.AppImage" "Superset-Canary-${arch}.AppImage"; do
+                cp "$file" "$alias"
+                echo "Created canary copy: $alias"
+              done
             fi
           done
           # Prerelease builds may request canary-linux.yml; keep latest-linux.yml as fallback.
@@ -142,7 +145,7 @@ jobs:
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: desktop-canary
-          name: "Superset Desktop Canary"
+          name: "Paradev Desktop Canary"
           body: |
             **Internal Testing Build**
 

@@ -17,6 +17,9 @@ type AccessPage = Pick<
 export interface PageAccess {
 	canRead: boolean;
 	canComment: boolean;
+	/** Publish versions, change details, and share. */
+	canEdit: boolean;
+	/** Delete it: the person who created it. */
 	canManage: boolean;
 }
 
@@ -31,12 +34,17 @@ export function pageAccess(
 ): PageAccess {
 	const owner = page.createdByUserId === userId;
 	const general = page.visibility !== "just_me";
+	const editor =
+		owner ||
+		shareRole === "edit" ||
+		(general && page.organizationRole === "edit");
 	return {
 		canRead: owner || general || shareRole !== null,
 		canComment:
-			owner ||
+			editor ||
 			shareRole === "comment" ||
 			(general && page.organizationRole === "comment"),
+		canEdit: editor && !page.takenDownAt,
 		canManage: owner && !page.takenDownAt,
 	};
 }
@@ -117,6 +125,32 @@ export function assertPageWritable(
 	shareRole: PageShareRole | null = null,
 ): void {
 	assertPageReadable(page, userId, shareRole);
+	if (page.takenDownAt) {
+		throw userError({
+			code: "FORBIDDEN",
+			message: "This page was taken down and can no longer be changed",
+			i18nKey: "serverError.page.thisPageWasTakenDown",
+		});
+	}
+	if (!pageAccess(page, userId, shareRole).canEdit) {
+		throw userError({
+			code: "FORBIDDEN",
+			message: "You can view this page but not change it",
+			i18nKey: "serverError.page.cannotEdit",
+		});
+	}
+}
+
+/** `assertPageWritable`, looking up the caller's share role. */
+export async function assertPageEditable(
+	page: AccessPage,
+	userId: string,
+): Promise<void> {
+	assertPageWritable(page, userId, await loadPageShareRole(page, userId));
+}
+
+/** For a page the caller already read; only its creator may delete it. */
+export function assertPageOwned(page: AccessPage, userId: string): void {
 	if (page.takenDownAt) {
 		throw userError({
 			code: "FORBIDDEN",

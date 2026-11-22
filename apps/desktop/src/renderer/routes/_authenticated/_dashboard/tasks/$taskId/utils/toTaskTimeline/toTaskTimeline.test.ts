@@ -38,6 +38,7 @@ const change = (
 	priority: null,
 	assignee: null,
 	project: null,
+	channel: null,
 	...fields,
 });
 

@@ -23,7 +23,8 @@ import {
 	targetKey,
 } from "./resolve-target";
 import { forgetUpstreamTools, upstreamTools } from "./upstream-catalog";
-import { upstreamClient } from "./upstream-client";
+import { callUpstream, upstreamClient } from "./upstream-client";
+import type { UpstreamSessions } from "./upstream-sessions";
 
 function authenticateTool(problem: string): Tool {
 	return {
@@ -98,6 +99,7 @@ function firstPartyServer(
 function remoteServer(
 	target: Extract<PluginTarget, { kind: "remote" }>,
 	recordRejection: RecordRejection,
+	sessions: UpstreamSessions | undefined,
 ): Server {
 	const server = bare(target.plugin, target.version);
 
@@ -121,16 +123,12 @@ function remoteServer(
 		);
 		if (!checked.ok) return errorResult(checked.message);
 		try {
-			const session = await upstreamClient(target);
-			try {
-				return await session.client.callTool(
-					{ ...request.params, arguments: checked.args },
-					undefined,
-					{ signal: extra.signal },
-				);
-			} finally {
-				await session.close();
-			}
+			return await callUpstream(
+				target,
+				{ ...request.params, arguments: checked.args },
+				extra.signal,
+				sessions,
+			);
 		} catch (error) {
 			if (!credentialRejected(error)) throw error;
 			await recordRejection(target.connectionId, target.storedAccessToken);
@@ -252,6 +250,7 @@ function errorResult(text: string): CallToolResult {
 function multiServer(
 	target: Extract<PluginTarget, { kind: "multi" }>,
 	recordRejection: RecordRejection,
+	sessions: UpstreamSessions | undefined,
 ): Server {
 	const server = new Server(
 		{ name: target.plugin, version: target.version },
@@ -457,16 +456,7 @@ function multiServer(
 							choice.rest,
 							resolved.build.credential(resolved.secrets),
 						)
-					: await (async () => {
-							const session = await upstreamClient(resolved);
-							try {
-								return (await session.client.callTool(params, undefined, {
-									signal: extra.signal,
-								})) as CallToolResult;
-							} finally {
-								await session.close();
-							}
-						})();
+					: await callUpstream(resolved, params, extra.signal, sessions);
 		} catch (error) {
 			if (!credentialRejected(error)) throw error;
 			layouts.delete(layoutKey(target));
@@ -494,7 +484,10 @@ function multiServer(
 
 export async function buildPluginServer(
 	target: PluginTarget,
-	recordRejection: RecordRejection = markRejected,
+	{
+		sessions,
+		recordRejection = markRejected,
+	}: { sessions?: UpstreamSessions; recordRejection?: RecordRejection } = {},
 ): Promise<Server> {
 	switch (target.kind) {
 		case "needs-auth":
@@ -502,8 +495,26 @@ export async function buildPluginServer(
 		case "first-party":
 			return firstPartyServer(target, recordRejection);
 		case "remote":
-			return remoteServer(target, recordRejection);
+			return remoteServer(target, recordRejection, sessions);
 		case "multi":
-			return multiServer(target, recordRejection);
+			return multiServer(target, recordRejection, sessions);
 	}
+}
+
+export async function endUpstreamSessions(
+	target: PluginTarget,
+	sessions: UpstreamSessions,
+): Promise<void> {
+	const stored = await sessions.takeAll();
+	// The caller's session is gone either way; a vendor that cannot be reached
+	// lets its own session expire.
+	await Promise.allSettled(
+		Object.entries(stored).map(async ([connectionId, session]) => {
+			const resolved =
+				target.kind === "multi" ? await target.resolve(connectionId) : target;
+			if (resolved.kind !== "remote" || resolved.connectionId !== connectionId)
+				return;
+			await (await upstreamClient(resolved, session)).close();
+		}),
+	);
 }

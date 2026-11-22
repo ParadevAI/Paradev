@@ -25,6 +25,13 @@ export function accessRefetchInterval(
 	return Math.max(ACCESS_RETRY_MS, (expiresAt - now) * REFRESH_AT);
 }
 
+export function wakeRefetchInterval(
+	state: AccessQueryState,
+	keepaliveMs: number,
+): number {
+	return state.error ? accessRefetchInterval(state) : keepaliveMs;
+}
+
 /**
  * react-query's errorUpdateCount never resets on success, so remember it at
  * each success and count only the failures since. One entry per access query.
