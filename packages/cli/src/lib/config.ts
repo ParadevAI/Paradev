@@ -72,7 +72,6 @@ export function writeConfig(
 	writePrivateJson(getSupersetConfigPath(), config, fs);
 }
 
-/** Writes JSON readable only by this user, so a parallel reader never sees half a file. */
 export function writePrivateJson(
 	path: string,
 	value: unknown,

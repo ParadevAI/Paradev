@@ -1,8 +1,11 @@
 import { afterAll, afterEach, beforeEach, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { env } from "../../../lib/env";
 import { keepSessionId } from "../../../lib/plugins/mcp-sessions";
 import { withTempSupersetHome } from "../../../lib/settings/test-helpers";
@@ -111,5 +114,15 @@ test("a kept id the proxy no longer knows starts a fresh session", async () => {
 
 	expect(await callTool("get_value")).toContain("none");
 	await callTool("set_value", { value: "Production" });
+	expect(await callTool("get_value")).toContain("Production");
+});
+
+test("a session file that holds no object does not hide the tool result", async () => {
+	inAgent("4242-1795305367");
+	writeFileSync(join(resolveAppHomeDir(), "plugin-mcp-sessions.json"), "null");
+
+	expect(await callTool("set_value", { value: "Production" })).toContain(
+		"Production",
+	);
 	expect(await callTool("get_value")).toContain("Production");
 });

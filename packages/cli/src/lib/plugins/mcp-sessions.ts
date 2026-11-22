@@ -19,7 +19,10 @@ function readSessions(): Record<string, KeptSession> {
 	const path = sessionsPath();
 	if (!existsSync(path)) return {};
 	try {
-		return JSON.parse(readFileSync(path, "utf8"));
+		const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
+		return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+			? (parsed as Record<string, KeptSession>)
+			: {};
 	} catch {
 		return {};
 	}
@@ -33,7 +36,9 @@ export function keptSessionId(key: string): string | undefined {
 export function keepSessionId(key: string, sessionId: string): void {
 	const now = Date.now();
 	const kept = Object.fromEntries(
-		Object.entries(readSessions()).filter(([, entry]) => entry.expiresAt > now),
+		Object.entries(readSessions()).filter(
+			([, entry]) => entry?.expiresAt > now,
+		),
 	);
 	kept[key] = { sessionId, expiresAt: now + KEPT_SESSION_MS };
 	writePrivateJson(sessionsPath(), kept);
