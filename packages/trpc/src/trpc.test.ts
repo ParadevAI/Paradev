@@ -41,6 +41,12 @@ const router = createTRPCRouter({
 		setVisibility: reached,
 		restart: reached,
 	}),
+	connectors: createTRPCRouter({ connectApiKey: reached }),
+	plugins: createTRPCRouter({
+		organization: createTRPCRouter({
+			sources: createTRPCRouter({ add: reached }),
+		}),
+	}),
 	user: createTRPCRouter({
 		myOrganization: personProcedure.query(
 			({ ctx }) => ctx.activeOrganizationId,
@@ -105,6 +111,16 @@ describe("what a cloud workspace may call", () => {
 		["setDescription", () => box.cloudWorkspace.setDescription()],
 		["sleep", () => box.cloudWorkspace.sleep()],
 	])("a box reaches cloudWorkspace.%s", async (_name, call) => {
+		expect(await outcome(call)).toBe("reached");
+	});
+
+	test.each([
+		[
+			"plugins.organization.sources.add",
+			() => box.plugins.organization.sources.add(),
+		],
+		["connectors.connectApiKey", () => box.connectors.connectApiKey()],
+	])("a box reaches %s", async (_name, call) => {
 		expect(await outcome(call)).toBe("reached");
 	});
 

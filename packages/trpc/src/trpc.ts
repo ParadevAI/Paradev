@@ -23,8 +23,8 @@ import {
 } from "./lib/agent-turn/turn-token";
 import { posthog } from "./lib/analytics";
 import {
-	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
+	sandboxMayCall,
 } from "./lib/sandbox/api-credential";
 import { tokenOrganizationIds } from "./lib/token-organizations";
 import {
@@ -124,7 +124,7 @@ const t = initTRPC.context<TRPCContext>().create({
  * unstealable, but every process in the box can use it.
  */
 const sandboxScope = t.middleware(async ({ ctx, path, next }) => {
-	if (ctx.sandboxCaller && !SANDBOX_ALLOWED_PROCEDURES.has(path)) {
+	if (ctx.sandboxCaller && !sandboxMayCall(path)) {
 		throw userError({
 			code: "FORBIDDEN",
 			message: `A cloud workspace cannot call ${path}. Run this from a client you are signed into.`,
