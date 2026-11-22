@@ -76,7 +76,7 @@ export function FolderSectionHeader({
 					>
 						{name}
 					</Text>
-					<Text className="text-muted-foreground text-[13px] tabular-nums">
+					<Text className="text-muted-foreground text-[14px] tabular-nums">
 						{count}
 					</Text>
 					{attention ? <AttentionMark attention={attention} /> : null}

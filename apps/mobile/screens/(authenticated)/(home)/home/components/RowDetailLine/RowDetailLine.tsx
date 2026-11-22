@@ -9,7 +9,7 @@ export function RowDetailLine({ parts }: { parts: RowDetailPart[] }) {
 	const enlargedText = useEnlargedText();
 	return (
 		<Text
-			className="text-muted-foreground mt-1 text-[13px]"
+			className="text-muted-foreground mt-1 text-[14px]"
 			numberOfLines={enlargedText ? undefined : 1}
 		>
 			{parts.map((part, index) => (
@@ -17,7 +17,7 @@ export function RowDetailLine({ parts }: { parts: RowDetailPart[] }) {
 					{index > 0 ? " · " : null}
 					<Text
 						className={cn(
-							"text-[13px]",
+							"text-[14px]",
 							part.ink ?? "text-muted-foreground",
 							part.key === "diff" && "tabular-nums",
 						)}

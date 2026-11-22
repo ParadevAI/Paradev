@@ -22,7 +22,7 @@ export function Chip({ label, leading, onPress }: ChipProps) {
 		>
 			{leading}
 			<Text
-				className="text-foreground max-w-40 text-[13px] leading-4"
+				className="text-foreground max-w-40 text-[14px] leading-4"
 				numberOfLines={1}
 			>
 				{label}

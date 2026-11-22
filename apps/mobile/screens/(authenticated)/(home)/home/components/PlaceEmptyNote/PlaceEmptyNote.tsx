@@ -8,7 +8,7 @@ export function PlaceEmptyNote({ label }: { label: string | null }) {
 			{label === null ? (
 				<ActivityIndicator size="small" />
 			) : (
-				<Text className="text-muted-foreground text-[13px]">{label}</Text>
+				<Text className="text-muted-foreground text-[14px]">{label}</Text>
 			)}
 		</View>
 	);

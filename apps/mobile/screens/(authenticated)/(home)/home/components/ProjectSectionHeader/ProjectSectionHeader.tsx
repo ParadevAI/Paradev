@@ -77,7 +77,7 @@ export function ProjectSectionHeader({
 					>
 						{name}
 					</Text>
-					<Text className="text-muted-foreground ml-2 text-[13px] tabular-nums">
+					<Text className="text-muted-foreground ml-2 text-[14px] tabular-nums">
 						{count}
 					</Text>
 					{/* Two icons rather than one rotated: a transform on the icon itself

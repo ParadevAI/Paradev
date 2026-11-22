@@ -52,7 +52,7 @@ export function SheetRow({
 				</Text>
 				{subtitle ? (
 					<Text
-						className="text-muted-foreground mt-1 text-[13px]"
+						className="text-muted-foreground mt-1 text-[14px]"
 						numberOfLines={enlargedText ? undefined : 1}
 					>
 						{subtitle}

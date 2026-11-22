@@ -190,7 +190,7 @@ export function WorkspaceRow({
 									</View>
 								))}
 								{sessions.length > MAX_SESSION_MARKS ? (
-									<Text className="text-muted-foreground pl-1 text-[13px] tabular-nums">
+									<Text className="text-muted-foreground pl-1 text-[14px] tabular-nums">
 										+{sessions.length - MAX_SESSION_MARKS}
 									</Text>
 								) : null}

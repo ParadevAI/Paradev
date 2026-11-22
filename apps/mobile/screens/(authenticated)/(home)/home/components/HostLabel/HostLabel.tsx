@@ -34,7 +34,7 @@ interface HostLabelProps {
 
 /**
  * Labels the place the rows under it live on, as desktop labels its sidebar
- * sections: uppercase small text at the screen margin, the count, and a
+ * sections: muted text at the screen margin, the count, and a
  * caret that stays visible since a phone has no hover.
  */
 export function HostLabel({
@@ -61,9 +61,9 @@ export function HostLabel({
 				? null
 				: typeof lastSeenAt === "number"
 					? t({
-							message: `Offline, seen ${formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)}`,
+							message: `offline, seen ${formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)}`,
 						})
-					: t({ message: "Offline" });
+					: t({ message: "offline" });
 	const unreachable = statusText !== null;
 	const Caret = collapsed ? ChevronRight : ChevronDown;
 	const content = (
@@ -141,7 +141,7 @@ export function HostLabel({
 						void onRetry().finally(() => setChecking(false));
 					}}
 				>
-					<Text className="text-primary font-medium text-[13px]">
+					<Text className="text-primary font-medium text-[14px]">
 						{checking
 							? t({ message: "Checking…" })
 							: t({ message: "Try again" })}

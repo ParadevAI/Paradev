@@ -361,7 +361,7 @@ export function SearchScreen() {
 				}}
 				ListEmptyComponent={
 					<View className="items-center py-16">
-						<Text className="text-muted-foreground text-sm">
+						<Text className="text-muted-foreground text-[14px]">
 							{searching
 								? t({
 										message: "No workspaces match your search",

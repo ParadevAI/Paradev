@@ -62,7 +62,7 @@ export function StatusFilterScreen() {
 					}
 					label={option.label}
 					trailing={
-						<Text className="text-muted-foreground text-[16px] tabular-nums">
+						<Text className="text-muted-foreground text-[14px] tabular-nums">
 							{formatNumber(option.count)}
 						</Text>
 					}

@@ -1310,7 +1310,7 @@ export function HomeScreen() {
 					ListEmptyComponent={
 						contentReady && !(cloudScope && cloudListItems === null) ? (
 							<View className="items-center justify-center py-20">
-								<Text className="text-center text-muted-foreground">
+								<Text className="text-center text-muted-foreground text-[14px]">
 									{showArchived
 										? t({ message: "No archived workspaces" })
 										: !needsMeOn && cloudScope && activeCloud.length > 0

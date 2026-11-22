@@ -4,7 +4,7 @@ import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { cn } from "@/lib/utils";
 import { SECTION_LABEL } from "./sectionLabelClasses";
 
-/** A section label that does not fold: dates under Cloud, Needs me's groups. */
+/** A section label that does not fold, as Needs me's groups use. */
 export function SectionLabel({
 	label,
 	first = false,
