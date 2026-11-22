@@ -3,7 +3,6 @@ import { command } from "../../../lib/command";
 import { resolveEnvironment } from "../../../lib/environments";
 
 export default command({
-	sandbox: false,
 	description: "List an environment's builds, newest first",
 	args: [positional("environment").required().desc("Environment ID")],
 	options: {
