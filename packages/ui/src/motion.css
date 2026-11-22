@@ -1,10 +1,12 @@
 @theme inline {
-	--animate-shimmer: shimmer var(--shimmer-duration, 2s) linear infinite;
+	--animate-shimmer-window: shimmer-window var(--shimmer-duration, 2s) linear
+		infinite;
+	--animate-shimmer-text: shimmer-text var(--shimmer-duration, 2s) linear
+		infinite;
 	--animate-spin-slow: spin-slow 3.6s linear infinite;
 	--animate-block-fade: block-fade 320ms ease-out both;
 	--animate-thinking-pulse: thinking-pulse 1.8s ease-in-out infinite;
 	--animate-wave-cell: wave-cell 1.2s steps(3, end) infinite both;
-	--animate-braille-spin: braille-spin 1.25s step-end infinite;
 
 	@keyframes wave-cell {
 		0%,
@@ -18,46 +20,21 @@
 		}
 	}
 
-	@keyframes braille-spin {
-		0% {
-			content: "⠋";
+	@keyframes shimmer-window {
+		from {
+			transform: translateX(-75%);
 		}
-		10% {
-			content: "⠙";
-		}
-		20% {
-			content: "⠹";
-		}
-		30% {
-			content: "⠸";
-		}
-		40% {
-			content: "⠼";
-		}
-		50% {
-			content: "⠴";
-		}
-		60% {
-			content: "⠦";
-		}
-		70% {
-			content: "⠧";
-		}
-		80% {
-			content: "⠇";
-		}
-		90%,
-		100% {
-			content: "⠏";
+		to {
+			transform: translateX(75%);
 		}
 	}
 
-	@keyframes shimmer {
+	@keyframes shimmer-text {
 		from {
-			background-position: 100% center;
+			transform: translateX(75%);
 		}
 		to {
-			background-position: 0% center;
+			transform: translateX(-75%);
 		}
 	}
 
@@ -81,5 +58,34 @@
 		50% {
 			opacity: 0.9;
 		}
+	}
+}
+
+/* A column of the ten frames stepped with transform, so it stays on the
+ * compositor. The hidden ::after glyph gives the box its size and baseline.
+ * The frames wrap at spaces because Biome strips the "\A" newline escape. */
+@utility braille-spin {
+	position: relative;
+	display: inline-block;
+	clip-path: inset(0);
+
+	&::after {
+		content: "⠋";
+		visibility: hidden;
+	}
+
+	&::before {
+		content: "⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏";
+		position: absolute;
+		inset: 0 0 auto;
+		width: min-content;
+		margin-inline: auto;
+		animation: braille-spin 0.8s steps(10, end) infinite;
+	}
+}
+
+@keyframes braille-spin {
+	to {
+		transform: translateY(-100%);
 	}
 }
