@@ -1,10 +1,13 @@
 import { afterAll, afterEach, describe, expect, test } from "bun:test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, renderHook, waitFor } from "@testing-library/react";
+import { initTRPC } from "@trpc/server";
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import type { ContextType, ReactNode } from "react";
 import { HostWorkspacesContext } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { LocalHostServiceContext } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import superjson from "superjson";
 import { nativeWebGlobals } from "~/test-setup";
 import { useDiffStats } from "./useDiffStats";
 
@@ -25,8 +28,8 @@ afterAll(() => {
 });
 
 const WORKSPACE_ID = "workspace-1";
+const LIVE_WORKSPACE_ID = "workspace-2";
 const MACHINE_ID = "this-machine";
-const WATCH_SETTLE_MS = 500;
 
 let stopHost: (() => void) | undefined;
 
@@ -37,30 +40,50 @@ afterEach(() => {
 });
 
 function startHost() {
-	const commands: string[] = [];
-	const requests: string[] = [];
+	const commands: { type: string; workspaceId?: string }[] = [];
+	let statusReads = 0;
+	const t = initTRPC.create({ transformer: superjson });
+	const router = t.router({
+		git: t.router({
+			getStatus: t.procedure
+				.input((input) => input)
+				.query(() => {
+					statusReads += 1;
+					return { againstBase: [], staged: [], unstaged: [] };
+				}),
+		}),
+	});
 	const server = Bun.serve({
 		port: 0,
 		hostname: "127.0.0.1",
 		fetch(request, bunServer) {
 			if (bunServer.upgrade(request)) return;
-			requests.push(new URL(request.url).pathname);
-			return new Response(null, { status: 404 });
+			return fetchRequestHandler({
+				endpoint: "/trpc",
+				req: request,
+				router,
+				allowMethodOverride: true,
+			});
 		},
 		websocket: {
 			message(_socket, raw) {
-				const command = JSON.parse(String(raw)) as { type: string };
-				commands.push(command.type);
+				commands.push(JSON.parse(String(raw)));
 			},
 		},
 	});
 	stopHost = () => void server.stop(true);
-	const statusReads = () =>
-		requests.filter((pathname) => pathname.includes("git.getStatus")).length;
-	return { commands, statusReads, url: `http://127.0.0.1:${server.port}` };
+	const watched = () =>
+		commands
+			.filter((command) => command.type === "git:watch")
+			.map((command) => command.workspaceId);
+	return {
+		watched,
+		statusReads: () => statusReads,
+		url: `http://127.0.0.1:${server.port}`,
+	};
 }
 
-function renderDiffStats(hostUrl: string, options?: { live?: boolean }) {
+function createWrapper(hostUrl: string) {
 	const queryClient = new QueryClient({
 		defaultOptions: { queries: { retry: false } },
 	});
@@ -78,13 +101,11 @@ function renderDiffStats(hostUrl: string, options?: { live?: boolean }) {
 				<HostWorkspacesContext.Provider
 					value={
 						{
-							workspaces: [
-								{
-									id: WORKSPACE_ID,
-									hostId: MACHINE_ID,
-									organizationId: "org-1",
-								},
-							],
+							workspaces: [WORKSPACE_ID, LIVE_WORKSPACE_ID].map((id) => ({
+								id,
+								hostId: MACHINE_ID,
+								organizationId: "org-1",
+							})),
 							isReady: true,
 						} as NonNullable<ContextType<typeof HostWorkspacesContext>>
 					}
@@ -93,7 +114,7 @@ function renderDiffStats(hostUrl: string, options?: { live?: boolean }) {
 						value={{
 							targets: [],
 							isReady: true,
-							agentCredentialsChangedWorkspaceId: null,
+							agentsToRestart: null,
 							usageRefusal: null,
 							wakeOpenWorkspace: async () => {},
 						}}
@@ -104,23 +125,45 @@ function renderDiffStats(hostUrl: string, options?: { live?: boolean }) {
 			</LocalHostServiceContext.Provider>
 		</QueryClientProvider>
 	);
-	return renderHook(() => useDiffStats(WORKSPACE_ID, options), { wrapper });
+	return wrapper;
 }
 
 describe("useDiffStats", () => {
 	test("subscribes to git:changed by default so the stats stay live", async () => {
 		const host = startHost();
-		renderDiffStats(host.url);
+		renderHook(() => useDiffStats(WORKSPACE_ID), {
+			wrapper: createWrapper(host.url),
+		});
 
-		await waitFor(() => expect(host.commands).toContain("git:watch"));
+		await waitFor(() => expect(host.watched()).toContain(WORKSPACE_ID));
 	});
 
-	test("a one-shot read fetches the stats without subscribing to git:changed", async () => {
+	test("a one-shot read fetches the stats without a git watch", async () => {
 		const host = startHost();
-		renderDiffStats(host.url, { live: false });
+		const wrapper = createWrapper(host.url);
+		renderHook(() => useDiffStats(WORKSPACE_ID, { live: false }), {
+			wrapper,
+		});
+		await waitFor(() => expect(host.statusReads()).toBe(1));
 
-		await waitFor(() => expect(host.statusReads()).toBeGreaterThan(0));
-		await new Promise((resolve) => setTimeout(resolve, WATCH_SETTLE_MS));
-		expect(host.commands).not.toContain("git:watch");
+		renderHook(() => useDiffStats(LIVE_WORKSPACE_ID), { wrapper });
+		await waitFor(() => expect(host.watched()).toContain(LIVE_WORKSPACE_ID));
+		expect(host.watched()).not.toContain(WORKSPACE_ID);
+	});
+
+	test("a one-shot read reads again each time it mounts", async () => {
+		const host = startHost();
+		const wrapper = createWrapper(host.url);
+		const first = renderHook(
+			() => useDiffStats(WORKSPACE_ID, { live: false }),
+			{ wrapper },
+		);
+		await waitFor(() => expect(host.statusReads()).toBe(1));
+		first.unmount();
+
+		renderHook(() => useDiffStats(WORKSPACE_ID, { live: false }), {
+			wrapper,
+		});
+		await waitFor(() => expect(host.statusReads()).toBe(2));
 	});
 });

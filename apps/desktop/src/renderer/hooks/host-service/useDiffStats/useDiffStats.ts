@@ -9,11 +9,6 @@ export interface DiffStats {
 	deletions: number;
 }
 
-// A one-shot read (the sidebar hover card) gets no git:changed subscription:
-// that would make the host attach a recursive watch of the whole worktree
-// just to show two numbers.
-const ONE_SHOT_STALE_MS = 30_000;
-
 export function getDiffStatsQueryKey(
 	hostUrl: string | null,
 	workspaceId: string,
@@ -45,7 +40,9 @@ export function useDiffStats(
 			});
 		},
 		refetchOnWindowFocus: false,
-		staleTime: live ? Number.POSITIVE_INFINITY : ONE_SHOT_STALE_MS,
+		// Not live: nothing tells this read the counts changed, so it reads
+		// again on each mount instead of a host worktree watch.
+		staleTime: live ? Number.POSITIVE_INFINITY : 0,
 	});
 
 	const invalidate = useCallback(() => {
