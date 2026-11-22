@@ -34,6 +34,16 @@ export function repoShortName(fullName: string): string {
 	return fullName.slice(fullName.indexOf("/") + 1);
 }
 
+/** A workspace's primary repository by short name, once the repositories answered. */
+export function cloudRepoName(
+	repos: CloudRepos,
+	workspaceId: string,
+): string | null {
+	if (repos.status !== "success") return null;
+	const repo = repos.byWorkspace.get(workspaceId);
+	return repo ? repoShortName(repo.fullName) : null;
+}
+
 /** The time a cloud row ranks by, as a host row does under the same sort. */
 export function cloudRowSortTime(
 	row: CloudWorkspaceRow,

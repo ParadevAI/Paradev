@@ -1,5 +1,5 @@
-/** Where a search result lives, as Needs me names it: project · place. */
-export function searchRowDetail({
+/** Where a row lives when it is listed away from its project: project · place. */
+export function placeDetail({
 	placeName,
 	projectName,
 }: {

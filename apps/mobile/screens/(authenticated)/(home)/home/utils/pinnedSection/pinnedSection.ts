@@ -1,5 +1,6 @@
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
+import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import type { HomeListItem } from "../../types";
 import { strongestAttention } from "../strongestAttention";
@@ -42,15 +43,19 @@ export function pinnedRows(
 			? {
 					kind: "workspace",
 					workspace: entry.workspace,
-					detail: `${entry.projectName} · ${entry.hostName}`,
+					detail: placeDetail({
+						projectName: entry.projectName,
+						placeName: entry.hostName,
+					}),
 					offline: entry.offline,
 				}
 			: {
 					kind: "cloudRow",
 					row: entry.row,
-					detail: entry.repoName
-						? `${entry.repoName} · ${cloudName}`
-						: cloudName,
+					detail: placeDetail({
+						projectName: entry.repoName,
+						placeName: cloudName,
+					}),
 				},
 	);
 }

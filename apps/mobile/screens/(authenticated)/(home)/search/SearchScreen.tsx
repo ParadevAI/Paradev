@@ -31,13 +31,11 @@ import { useAttentionLabel } from "@/screens/(authenticated)/(home)/home/hooks/u
 import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCloudRepos";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
-import {
-	type CloudRepo,
-	repoShortName,
-} from "@/screens/(authenticated)/(home)/home/utils/buildCloudSection";
+import { cloudRepoName } from "@/screens/(authenticated)/(home)/home/utils/buildCloudSection";
 import { cloudRowAttention } from "@/screens/(authenticated)/(home)/home/utils/needsMe";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
+import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
 import {
 	isPlaceUnreachable,
 	placeStatus,
@@ -46,7 +44,6 @@ import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/worksp
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
-import { searchRowDetail } from "./utils/searchRowDetail";
 
 /**
  * The native search bar lives in this sheet, not on the home screen: on a
@@ -60,8 +57,6 @@ import { searchRowDetail } from "./utils/searchRowDetail";
  * selected machine's workspaces, or Cloud's sandboxes — machines outside the
  * scope aren't in memory to search. The count row says which pool answered.
  */
-const repoNameOf = (repo: CloudRepo | undefined) =>
-	repo ? repoShortName(repo.fullName) : null;
 
 export function SearchScreen() {
 	const { t } = useLingui();
@@ -306,9 +301,7 @@ export function SearchScreen() {
 						? (workspace.projectId &&
 								projectNamesById.get(workspace.projectId)) ||
 							noProjectName
-						: cloudRepos.status === "success"
-							? repoNameOf(cloudRepos.byWorkspace.get(workspace.id))
-							: null;
+						: cloudRepoName(cloudRepos, workspace.id);
 					const cloudRow = cloudRowsById.get(workspace.id);
 					const attention = cloudRow
 						? isArchivedCloudWorkspaceStatus(cloudRow.status)
@@ -326,7 +319,7 @@ export function SearchScreen() {
 						diff: null,
 						name: workspace.name,
 						branch: workspace.branch,
-						context: searchRowDetail({
+						context: placeDetail({
 							placeName: host?.name ?? t({ message: "Cloud" }),
 							projectName,
 						}),

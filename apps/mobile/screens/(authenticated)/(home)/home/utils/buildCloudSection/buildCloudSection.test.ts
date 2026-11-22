@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import type { HomeListItem } from "../../types";
-import { buildCloudSection, type CloudRepos } from "./buildCloudSection";
+import {
+	buildCloudSection,
+	type CloudRepos,
+	cloudRepoName,
+} from "./buildCloudSection";
 
 const row = (
 	id: string,
@@ -52,6 +56,14 @@ const describeItems = (items: HomeListItem[] | null) =>
 				return item.kind;
 		}
 	}) ?? null;
+
+describe("cloudRepoName", () => {
+	test("names the repository without its owner, nothing before an answer", () => {
+		expect(cloudRepoName(answered({ a: "acme/web" }), "a")).toBe("web");
+		expect(cloudRepoName(answered({}), "a")).toBeNull();
+		expect(cloudRepoName({ status: "pending" }, "a")).toBeNull();
+	});
+});
 
 describe("buildCloudSection", () => {
 	test("puts each row under its primary repository by short name, no repository last", () => {

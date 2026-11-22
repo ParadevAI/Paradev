@@ -1,1 +1,0 @@
-export { searchRowDetail } from "./searchRowDetail";

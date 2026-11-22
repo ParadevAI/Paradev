@@ -45,6 +45,7 @@ import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useScopeLabel } from "@/screens/(authenticated)/(home)/hooks/useScopeLabel";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
+import { placeDetail } from "@/screens/(authenticated)/(home)/utils/placeDetail";
 import {
 	isPlaceUnreachable,
 	type PlaceEmptyState,
@@ -97,7 +98,7 @@ import {
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
 import type { HomeListItem } from "./types";
-import { buildCloudSection, repoShortName } from "./utils/buildCloudSection";
+import { buildCloudSection, cloudRepoName } from "./utils/buildCloudSection";
 import {
 	buildHostSection,
 	type HostSectionOptions,
@@ -380,18 +381,14 @@ export function HomeScreen() {
 		);
 		const cloudEntries = showArchived
 			? []
-			: cloudListRows.map((row): PinnedEntry => {
-					const repo =
-						cloudRepos.status === "success"
-							? cloudRepos.byWorkspace.get(row.id)
-							: undefined;
-					return {
+			: cloudListRows.map(
+					(row): PinnedEntry => ({
 						id: row.id,
 						kind: "cloud",
 						row,
-						repoName: repo ? repoShortName(repo.fullName) : null,
-					};
-				});
+						repoName: cloudRepoName(cloudRepos, row.id),
+					}),
+				);
 		return pickPinned([...hostEntries, ...cloudEntries], pinnedAt);
 	}, [
 		scopeHosts,
@@ -518,7 +515,7 @@ export function HomeScreen() {
 					item: {
 						kind: "workspace",
 						workspace,
-						detail: `${projectName} · ${host.name}`,
+						detail: placeDetail({ projectName, placeName: host.name }),
 					},
 					attention: rowAttention(workspace),
 					ts: activityTs(workspace),
@@ -527,16 +524,14 @@ export function HomeScreen() {
 		}
 		if (!showArchived) {
 			for (const row of cloudListRows) {
-				const repo =
-					cloudRepos.status === "success"
-						? cloudRepos.byWorkspace.get(row.id)
-						: undefined;
-				const repoName = repo ? repoShortName(repo.fullName) : null;
 				candidates.push({
 					item: {
 						kind: "cloudRow",
 						row,
-						detail: repoName ? `${repoName} · ${cloudName}` : cloudName,
+						detail: placeDetail({
+							projectName: cloudRepoName(cloudRepos, row.id),
+							placeName: cloudName,
+						}),
 					},
 					attention: cloudRowAttentionOf(row),
 					ts: (row.agentStatusAt ?? row.createdAt).getTime(),
