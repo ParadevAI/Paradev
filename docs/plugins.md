@@ -120,8 +120,8 @@ and connection, so state that a vendor keeps per session (an active project or o
 from one call to the next. The vendor session id is in Redis for one hour after its last successful use. A
 caller that does not send the id back, or any caller while Redis cannot be reached, gets a new vendor
 session for each call. `superset mcp call-tool` keeps its session between runs of one agent
-(`SUPERSET_AGENT_ID`) in `plugin-mcp-sessions.json` under the Superset home, and ends it at the end
-of a run anywhere else.
+launch (`SUPERSET_AGENT_LAUNCH_ID`, which the agent wrapper sets once per launch) in
+`plugin-mcp-sessions.json` under the Superset home, and ends it at the end of a run anywhere else.
 
 ## Install state on a machine
 

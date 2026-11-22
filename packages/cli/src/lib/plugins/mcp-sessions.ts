@@ -1,14 +1,9 @@
-import {
-	chmodSync,
-	existsSync,
-	mkdirSync,
-	readFileSync,
-	writeFileSync,
-} from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { writePrivateJson } from "../config";
 
-// The proxy forgets a session an hour after its last use.
+// The proxy forgets a session an hour after its last successful use.
 const KEPT_SESSION_MS = 60 * 60_000;
 
 interface KeptSession {
@@ -41,8 +36,5 @@ export function keepSessionId(key: string, sessionId: string): void {
 		Object.entries(readSessions()).filter(([, entry]) => entry.expiresAt > now),
 	);
 	kept[key] = { sessionId, expiresAt: now + KEPT_SESSION_MS };
-	const path = sessionsPath();
-	mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-	writeFileSync(path, JSON.stringify(kept), { mode: 0o600 });
-	chmodSync(path, 0o600);
+	writePrivateJson(sessionsPath(), kept);
 }

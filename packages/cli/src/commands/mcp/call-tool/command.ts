@@ -45,8 +45,8 @@ export default command({
 		}
 
 		const account = options.account as string | undefined;
-		const agentId = process.env.SUPERSET_AGENT_ID?.trim();
-		const sessionKey = agentId && `${agentId}:${pluginName}:${account ?? ""}`;
+		const launchId = process.env.SUPERSET_AGENT_LAUNCH_ID?.trim();
+		const sessionKey = launchId && `${launchId}:${pluginName}:${account ?? ""}`;
 		const { client, transport } = await connectPluginMcp(
 			pluginName,
 			{

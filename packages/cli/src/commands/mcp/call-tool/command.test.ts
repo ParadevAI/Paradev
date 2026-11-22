@@ -4,67 +4,69 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { env } from "../../../lib/env";
+import { keepSessionId } from "../../../lib/plugins/mcp-sessions";
 import { withTempSupersetHome } from "../../../lib/settings/test-helpers";
 import callToolCommand from "./command";
 
-const live = new Map<string, WebStandardStreamableHTTPServerTransport>();
 const values = new Map<string, string>();
 const deleted: string[] = [];
 
-async function openSession(): Promise<WebStandardStreamableHTTPServerTransport> {
-	const transport = new WebStandardStreamableHTTPServerTransport({
-		sessionIdGenerator: randomUUID,
-		enableJsonResponse: true,
-		onsessioninitialized: (id) => {
-			live.set(id, transport);
-		},
-		onsessionclosed: (id) => {
-			live.delete(id);
-			deleted.push(id);
-		},
-	});
-	const server = new Server(
-		{ name: "stub", version: "1.0.0" },
-		{ capabilities: { tools: {} } },
-	);
-	server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
-		const session = extra.sessionId ?? "";
-		if (request.params.name === "set_value")
-			values.set(session, String(request.params.arguments?.value));
-		const text = values.get(session) ?? "none";
-		return { content: [{ type: "text" as const, text }] };
-	});
-	await server.connect(transport);
-	return transport;
-}
-
+// Like the plugin route: stateless, an id issued on a POST without one, and
+// an id it does not know is a fresh vendor session.
 const proxy = Bun.serve({
 	port: 0,
 	async fetch(request) {
 		const id = request.headers.get("mcp-session-id");
-		if (!id) return (await openSession()).handleRequest(request);
-		const transport = live.get(id);
-		return transport
-			? transport.handleRequest(request)
-			: new Response(null, { status: 404 });
+		if (request.method === "DELETE") {
+			if (id) deleted.push(id);
+			return new Response(null, { status: 200 });
+		}
+		const transport = new WebStandardStreamableHTTPServerTransport({
+			enableJsonResponse: true,
+		});
+		const server = new Server(
+			{ name: "stub", version: "1.0.0" },
+			{ capabilities: { tools: {} } },
+		);
+		server.setRequestHandler(CallToolRequestSchema, async (call) => {
+			const session = id ?? "";
+			if (call.params.name === "set_value")
+				values.set(session, String(call.params.arguments?.value));
+			const text = values.get(session) ?? "none";
+			return { content: [{ type: "text" as const, text }] };
+		});
+		await server.connect(transport);
+		const response = await transport.handleRequest(request);
+		if (!id && request.method === "POST")
+			response.headers.set("mcp-session-id", randomUUID());
+		return response;
 	},
 });
 afterAll(() => proxy.stop(true));
 
 withTempSupersetHome("superset-cli-call-tool-");
+const AGENT_VARS = ["SUPERSET_AGENT_ID", "SUPERSET_AGENT_LAUNCH_ID"] as const;
 const originalApiUrl = env.SUPERSET_API_URL;
-const originalAgentId = process.env.SUPERSET_AGENT_ID;
+const originalAgent = AGENT_VARS.map((name) => process.env[name]);
 
 beforeEach(() => {
 	env.SUPERSET_API_URL = `http://localhost:${proxy.port}`;
-	delete process.env.SUPERSET_AGENT_ID;
+	for (const name of AGENT_VARS) delete process.env[name];
 	deleted.length = 0;
 });
 afterEach(() => {
 	env.SUPERSET_API_URL = originalApiUrl;
-	if (originalAgentId === undefined) delete process.env.SUPERSET_AGENT_ID;
-	else process.env.SUPERSET_AGENT_ID = originalAgentId;
+	AGENT_VARS.forEach((name, index) => {
+		const value = originalAgent[index];
+		if (value === undefined) delete process.env[name];
+		else process.env[name] = value;
+	});
 });
+
+function inAgent(launchId: string): void {
+	process.env.SUPERSET_AGENT_ID = "claude";
+	process.env.SUPERSET_AGENT_LAUNCH_ID = launchId;
+}
 
 async function callTool(
 	tool: string,
@@ -79,8 +81,8 @@ async function callTool(
 	return result.message;
 }
 
-test("an agent's runs share one session", async () => {
-	process.env.SUPERSET_AGENT_ID = "agent-1";
+test("one agent's runs share one session", async () => {
+	inAgent("4242-1795305367");
 
 	await callTool("set_value", { value: "Production" });
 
@@ -88,11 +90,11 @@ test("an agent's runs share one session", async () => {
 	expect(deleted).toEqual([]);
 });
 
-test("another agent does not see that session", async () => {
-	process.env.SUPERSET_AGENT_ID = "agent-a";
+test("two agents of the same program do not share a session", async () => {
+	inAgent("4242-1795305367");
 	await callTool("set_value", { value: "Production" });
 
-	process.env.SUPERSET_AGENT_ID = "agent-b";
+	inAgent("5151-1795305390");
 	expect(await callTool("get_value")).toContain("none");
 });
 
@@ -101,4 +103,13 @@ test("a run outside an agent ends its session", async () => {
 
 	expect(deleted).toHaveLength(1);
 	expect(await callTool("get_value")).toContain("none");
+});
+
+test("a kept id the proxy no longer knows starts a fresh session", async () => {
+	inAgent("4242-1795305367");
+	keepSessionId("4242-1795305367:stub:", randomUUID());
+
+	expect(await callTool("get_value")).toContain("none");
+	await callTool("set_value", { value: "Production" });
+	expect(await callTool("get_value")).toContain("Production");
 });
