@@ -44,7 +44,7 @@ the pane verbs already cover those.
    and require `list`, `open`, `navigate`, `screenshot`, `eval`, `console`, and
    `cdp`. The `--help` fallback covers a CLI older than 1.34.0 (no `schema`) and
    a machine without `jq`. If the verbs are absent, run `superset update`
-   and recheck. The app-bundled CLI (`~/.superset/bin/superset`) updates only
+   and recheck. The app-bundled CLI (`~/.paradev/bin/superset`) updates only
    with the desktop app, so if it lacks `browser`, updating the app is the fix;
    check `type -a superset` for another install before giving up.
 2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`;

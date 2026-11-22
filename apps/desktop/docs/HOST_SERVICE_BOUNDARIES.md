@@ -249,7 +249,7 @@ Host Service (N)
 ├── <another org>
 │   └── ...
 ├── ─────────
-├── Open Superset
+├── Open Paradev
 ├── Settings
 ├── Check for Updates
 ├── ─────────
@@ -292,7 +292,7 @@ interface Manifest {
 
 Minimal — just enough to reconnect. No version or protocol fields; the coordinator queries `host.info` after adoption for metadata if needed.
 
-Lives at `~/.superset/host/<organizationId>/manifest.json`. The coordinator writes and reads it. Remote deployments don't use manifests.
+Lives at `~/.paradev/host/<organizationId>/manifest.json`. The coordinator writes and reads it. Remote deployments don't use manifests.
 
 ---
 
@@ -306,8 +306,8 @@ Lives at `~/.superset/host/<organizationId>/manifest.json`. The coordinator writ
 | `ORGANIZATION_ID` from `process.env` | `health.ts` | Removed | Org info served via `host.info`, fetched from cloud at registration |
 | `LocalModelProvider` as default | `app.ts` | Injected by caller | `modelResolver` is required, no default |
 | `LocalGitCredentialProvider` as default | `app.ts` | Injected by caller | `credentials` is required, no default |
-| Default `~/.superset/host.db` | `app.ts` | Injected by caller | `dbPath` is required, no default |
-| `~/.superset/chat-anthropic-env.json` | `anthropic-runtime-env.ts` | Moves with `LocalModelProvider` | Desktop-only path |
+| Default `~/.paradev/host.db` | `app.ts` | Injected by caller | `dbPath` is required, no default |
+| `~/.paradev/chat-anthropic-env.json` | `anthropic-runtime-env.ts` | Moves with `LocalModelProvider` | Desktop-only path |
 | macOS Keychain reads | `resolveAnthropicCredential.ts` | Moves with `LocalModelProvider` | macOS-only |
 | `~/.claude/` credential reads | `resolveAnthropicCredential.ts` | Moves with `LocalModelProvider` | Claude Desktop-only |
 | `project.removeFromDevice` | `project.ts` | Rename to `project.remove` | "Device" framing is wrong |
@@ -394,4 +394,4 @@ createApp({
 });
 ```
 
-No `if (process.resourcesPath)`. No `if (platform() === "darwin")`. No `~/.superset` defaults. The host service is a pure server; the caller decides how it's configured.
+No `if (process.resourcesPath)`. No `if (platform() === "darwin")`. No `~/.paradev` defaults. The host service is a pure server; the caller decides how it's configured.

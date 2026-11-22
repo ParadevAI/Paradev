@@ -25,7 +25,7 @@ main area unless the user asks for the sidebar.
    and require `list`, `split`, `new-tab`, `resize`, `equalize`, `move`, `swap`,
    `focus`, and `close`; sidebar control also needs `open` and `sidebar`.
    `panes` is new in CLI 1.38.0. If it is missing, run
-   `superset update` and recheck. The app-bundled CLI (`~/.superset/bin/superset`)
+   `superset update` and recheck. The app-bundled CLI (`~/.paradev/bin/superset`)
    updates only with the desktop app, so if it still lacks `panes`, updating
    the app is the fix.
 2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`;

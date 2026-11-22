@@ -43,7 +43,7 @@ pane data. `TerminalPane` attaches the PTY through the terminal WebSocket.
 │                                                             │
 │     kind == "terminal":                                     │
 │       • for each attachment: workspaceTrpc.filesystem       │
-│         .writeFile → <worktree>/.superset/attachments/…     │
+│         .writeFile → <worktree>/.paradev/attachments/…     │
 │       • pendingRow.terminalLaunch = { command, name }       │
 │                                                             │
 │     kind == "chat":                                         │
@@ -147,7 +147,7 @@ can override per-agent in settings.
 #### Scenarios
 
 - [ ] **Prompt only**. Type "add a README". Submit. Workspace opens; Claude's terminal receives the prompt as an argv.
-- [ ] **Prompt + attachment**. Drop a small text file. Submit. File lands at `<worktree>/.superset/attachments/<filename>`; prompt includes `- .superset/attachments/<filename>`.
+- [ ] **Prompt + attachment**. Drop a small text file. Submit. File lands at `<worktree>/.paradev/attachments/<filename>`; prompt includes `- .paradev/attachments/<filename>`.
 - [ ] **Prompt + linked GitHub issue**. Link an issue via `@` mention. Submit. Prompt includes `# <issue title>`. (Body is empty — see known gaps.)
 - [ ] **Prompt + linked task**. Link an internal task. Submit. Prompt includes `# Task <id> — <title>`; `taskSlug` in launch request matches task slug.
 - [ ] **Prompt + linked PR**. Link a PR. Submit. Prompt includes `# <PR title>`.

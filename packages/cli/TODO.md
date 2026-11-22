@@ -2,7 +2,7 @@
 
 ## Infrastructure changes (before CLI can be built)
 
-- [ ] **Host service writes `~/.superset/device.json`** on startup with `{ deviceId, deviceName }` for CLI auto-detection
+- [ ] **Host service writes `~/.paradev/device.json`** on startup with `{ deviceId, deviceName }` for CLI auto-detection
 - [ ] **Move port scanner to host service** — currently lives in Electron (`apps/desktop/src/main/lib/terminal/port-manager.ts`). Host service needs its own port scanning so headless/CLI-driven terminals get port detection too
 - [ ] **Add `ports` table to host service SQLite** — track detected and claimed ports per workspace/terminal session
 - [ ] **Consolidate host/client identity** — drop `id` UUID surrogate on both `v2_hosts` and `v2_clients`. `machineId` (output of `getHashedDeviceId()` on desktop; OS-provided device IDs on mobile; persisted localStorage UUIDs on web) becomes the canonical row identity end-to-end. New PKs: `v2_hosts(organizationId, machineId)`, `v2_clients(organizationId, userId, machineId)`. Four FKs on the host side migrate uuid → text composite (`v2_users_hosts.hostId`, `v2_workspaces.hostId`, `automations.targetHostId`, `automation_runs.hostId`); v2_clients has zero FKs to migrate. Drop the dead `session_hosts` table (no writes anywhere in the codebase, no renderer consumers). Code search-and-replace in `packages/trpc/src/router/{device,automation/automation,automation/dispatch,v2-workspace}/...`. Required prereq for CLI v1's local-detection routing — see `packages/cli/CLI_SPEC_TARGET.md`.
