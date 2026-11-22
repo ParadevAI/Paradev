@@ -4391,6 +4391,9 @@ msgstr "檢查更新"
 msgid "Check for Updates..."
 msgstr "檢查更新..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "用我們的行動應用程式隨時隨地查看 agent。在你的電腦、雲端或遠端機器上開始工作。內建原生的 PR、diff 和頁面檢視器。"
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "在 iPhone、iPad 或 Android 上查看代理程式並審查它們的工作。"
 
@@ -19368,9 +19371,6 @@ msgstr "啟動代理程式"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "自動啟動代理程式：由 Sentry 錯誤、Linear 議題、GitHub 拉取請求觸發，或依代理程式自行設定的排程執行。"
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "在 iPhone、iPad 或 Android 手機上啟動 agent、即時追蹤並審查差異。你的程式碼始終留在你的機器上。"
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "依排程、根據你所用工具中的事件，或透過 webhook 啟動代理程式。每次執行都會開啟一個可供你檢視的工作區。"

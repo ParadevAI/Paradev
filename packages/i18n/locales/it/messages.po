@@ -4391,6 +4391,9 @@ msgstr "Controlla aggiornamenti"
 msgid "Check for Updates..."
 msgstr "Controlla aggiornamenti..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Controlla i tuoi agenti ovunque con la nostra app mobile. Avvia il lavoro sul tuo computer, nel cloud o su una macchina remota. Include visualizzatori nativi per PR, diff e pagine."
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "Controlla gli agenti e rivedi il loro lavoro da iPhone, iPad o Android."
 
@@ -19368,9 +19371,6 @@ msgstr "Avvia agente"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Avvia gli agenti automaticamente: da un errore di Sentry, una issue di Linear, una pull request di GitHub o una pianificazione che l’agente imposta da sé."
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "Avvia gli agenti, seguili in tempo reale e rivedi il diff dal tuo iPhone, iPad o telefono Android. Il tuo codice resta sulle tue macchine."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Avvia un agente a orario, su un evento dei tuoi strumenti o tramite webhook. Ogni esecuzione apre un workspace che puoi rivedere."

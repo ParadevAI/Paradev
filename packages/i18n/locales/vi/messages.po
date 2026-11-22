@@ -4391,6 +4391,9 @@ msgstr "Kiểm tra cập nhật"
 msgid "Check for Updates..."
 msgstr "Kiểm tra cập nhật..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Theo dõi agent của bạn từ bất cứ đâu với ứng dụng di động của chúng tôi. Bắt đầu công việc trên máy tính, đám mây hoặc máy từ xa. Có sẵn trình xem PR, diff và trang gốc."
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "Theo dõi agent và review công việc của chúng từ iPhone, iPad hoặc Android."
 
@@ -19368,9 +19371,6 @@ msgstr "Bắt đầu agent"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Tự động khởi chạy agent: từ một lỗi Sentry, một issue Linear, một pull request GitHub, hoặc theo lịch do chính agent đặt ra."
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "Khởi chạy agent, theo dõi trực tiếp và xem xét diff từ iPhone, iPad hoặc điện thoại Android. Mã của bạn vẫn nằm trên máy của bạn."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Khởi chạy agent theo lịch, theo sự kiện trong công cụ của bạn hoặc qua webhook. Mỗi lượt chạy mở một workspace để bạn xem lại."

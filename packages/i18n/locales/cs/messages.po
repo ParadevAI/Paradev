@@ -4391,6 +4391,9 @@ msgstr "Zkontrolovat aktualizace"
 msgid "Check for Updates..."
 msgstr "Zkontrolovat aktualizace..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Sledujte své agenty odkudkoli v naší mobilní aplikaci. Práci spusťte na svém počítači, v cloudu nebo na vzdáleném stroji. S nativním prohlížečem PR, diffů a stránek."
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "Sledujte agenty a kontrolujte jejich práci z iPhonu, iPadu nebo Androidu."
 
@@ -19368,9 +19371,6 @@ msgstr "Spustit agenta"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Spouštějte agenty automaticky: na základě chyby v Sentry, úkolu v Linear, pull requestu na GitHubu nebo podle plánu, který si agent nastaví sám."
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "Spouštějte agenty, sledujte je živě a kontrolujte diff z iPhonu, iPadu nebo telefonu s Androidem. Váš kód zůstává na vašich počítačích."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Spusťte agenta podle plánu, při události ve vašich nástrojích nebo přes webhook. Každý běh otevře pracovní prostor, který můžete zkontrolovat."

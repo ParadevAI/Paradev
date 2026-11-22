@@ -4391,6 +4391,9 @@ msgstr "Güncellemeleri denetle"
 msgid "Check for Updates..."
 msgstr "Güncellemeleri denetle..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Mobil uygulamamızla ajanlarınızı her yerden takip edin. İşi bilgisayarınızda, bulutta veya uzak bir makinede başlatın. Yerel PR, diff ve sayfa görüntüleyicisiyle gelir."
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "Ajanları takip edin ve işlerini iPhone, iPad veya Android'den inceleyin."
 
@@ -19368,9 +19371,6 @@ msgstr "Ajanı başlat"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Ajanları otomatik başlatın: bir Sentry hatasından, bir Linear kaydından, bir GitHub pull request'inden veya ajanın kendi belirlediği bir zamanlamadan."
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "iPhone, iPad veya Android telefonunuzdan ajanları başlatın, canlı takip edin ve diff'i inceleyin. Kodunuz makinelerinizde kalır."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Bir ajanı zamanlamayla, araçlarınızdaki bir olayla veya bir webhook ile başlatın. Her çalıştırma inceleyebileceğiniz bir çalışma alanı açar."

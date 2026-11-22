@@ -4391,6 +4391,9 @@ msgstr "アップデートを確認"
 msgid "Check for Updates..."
 msgstr "アップデートを確認..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "モバイルアプリで、どこからでもエージェントの様子を確認できます。コンピューター、クラウド、リモートマシンで作業を開始。ネイティブの PR、diff、ページビューアを搭載。"
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "iPhone、iPad、Android からエージェントの様子を確認し、作業をレビューできます。"
 
@@ -19368,9 +19371,6 @@ msgstr "エージェントを開始"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "エージェントを自動で起動: Sentry のエラー、Linear の課題、GitHub のプルリクエスト、またはエージェント自身が設定するスケジュールをきっかけに。"
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "iPhone、iPad、Android スマートフォンからエージェントを起動し、ライブで見守り、差分をレビュー。コードはあなたのマシンに残ります。"
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "スケジュール、ツールのイベント、またはWebhookでエージェントを起動します。実行ごとに、確認できるワークスペースが開きます。"

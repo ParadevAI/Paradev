@@ -45,9 +45,9 @@ export default async function MobilePage() {
 						</h1>
 						<p className="mt-5 max-w-md text-lg text-muted-foreground leading-relaxed">
 							<Trans>
-								Start agents, follow them live, and review the diff from your
-								iPhone, iPad, or Android phone. Your code stays on your
-								machines.
+								Check in on your agents from anywhere with our mobile app. Start
+								work on your computer, cloud or remote machine. Comes with
+								native PR, diff, and page viewer.
 							</Trans>
 						</p>
 						<div className="mt-8">

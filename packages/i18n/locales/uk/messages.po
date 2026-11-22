@@ -4385,6 +4385,9 @@ msgstr "Перевірити оновлення"
 msgid "Check for Updates..."
 msgstr "Перевірити оновлення..."
 
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Стежте за агентами звідусіль у нашому мобільному застосунку. Починайте роботу на своєму комп'ютері, у хмарі чи на віддаленій машині. Є нативний перегляд PR, diff і сторінок."
+
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "Стежте за агентами й переглядайте їхню роботу з iPhone, iPad або Android."
 
@@ -19362,9 +19365,6 @@ msgstr "Запустити агента"
 
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Запускайте агентів автоматично: за помилкою в Sentry, тікетом у Linear, пул-реквестом у GitHub або за розкладом, який агент задає сам."
-
-msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
-msgstr "Запускайте агентів, стежте за ними наживо й переглядайте diff з iPhone, iPad або телефона з Android. Ваш код залишається на ваших комп'ютерах."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Запускайте агента за розкладом, за подією у ваших інструментах або через вебхук. Кожен запуск відкриває робочий простір, який можна перевірити."
