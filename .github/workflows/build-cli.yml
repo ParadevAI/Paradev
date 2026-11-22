@@ -24,6 +24,7 @@ jobs:
       matrix:
         include: ${{ fromJSON(inputs.targets) }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -86,6 +87,7 @@ jobs:
           RELAY_URL: ${{ secrets.RELAY_URL }}
           SUPERSET_API_URL: ${{ secrets.SUPERSET_API_URL }}
           SUPERSET_WEB_URL: ${{ secrets.SUPERSET_WEB_URL }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
         run: bun run build:dist --target=${{ matrix.target }}
 
       - name: Smoke test binary

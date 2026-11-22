@@ -7,11 +7,16 @@ interface Storage {
 	viewer: { userId: string; name: string; image: string | null } | null;
 	author: boolean;
 	writable: boolean | null;
-	get(key: string): Promise<unknown>;
-	getAll(key: string): Promise<unknown[]>;
-	set(key: string, value: unknown): Promise<void>;
-	remove(key: string): Promise<void>;
-	subscribe(key: string, onRecords: (records: unknown[]) => void): () => void;
+	get(key: string, options?: { scope?: string }): Promise<unknown>;
+	getAll(key: string, options?: { scope?: string }): Promise<unknown[]>;
+	set(key: string, value: unknown, options?: { scope?: string }): Promise<void>;
+	remove(key: string, options?: { scope?: string }): Promise<void>;
+	list(prefix?: string, options?: { scope?: string }): Promise<unknown[]>;
+	subscribe(
+		key: string,
+		onRecords: (records: unknown[]) => void,
+		options?: { scope?: string },
+	): () => void;
 }
 
 interface Harness {
@@ -92,6 +97,18 @@ function mount({ framed = true, helloTimeoutMs = 2000 } = {}): Harness {
 		},
 		socketOpened: () => socketUrl,
 	};
+}
+
+async function connect(h: Harness): Promise<void> {
+	h.toFrame({ type: "connect", url: "wss://realtime/socket" });
+	h.fromHub({
+		type: "hello",
+		viewer: { userId: "u1", name: "Ada", image: null },
+		author: false,
+		writable: true,
+		scopes: true,
+	});
+	await h.storage.ready;
 }
 
 const lastCall = (sent: Record<string, unknown>[]) =>
@@ -218,6 +235,145 @@ describe("page storage runtime, socket path", () => {
 			message: "slow down",
 		});
 		await expect(pending).rejects.toMatchObject({ code: "rate_limited" });
+	});
+});
+
+describe("page storage runtime, scopes", () => {
+	test("a scope rides on the call; a slot call carries none", async () => {
+		const h = mount();
+		await connect(h);
+		void h.storage.set("draft", "x", { scope: "private" });
+		void h.storage.set("vote", "y");
+		await flush();
+		expect(h.sent.map((m) => m.request)).toEqual([
+			{ op: "set", key: "draft", value: "x", scope: "private" },
+			{ op: "set", key: "vote", value: "y" },
+		]);
+	});
+
+	test("refuses an unknown scope before sending", async () => {
+		const h = mount();
+		await connect(h);
+		await expect(
+			h.storage.set("k", 1, { scope: "public" }),
+		).rejects.toMatchObject({ code: "invalid" });
+		expect(h.sent).toEqual([]);
+	});
+
+	test("refuses options that are not an object before sending", async () => {
+		const h = mount();
+		await connect(h);
+		await expect(
+			h.storage.set("k", 1, "private" as never),
+		).rejects.toMatchObject({ code: "invalid" });
+		expect(h.sent).toEqual([]);
+	});
+
+	test("refuses an array as options before sending", async () => {
+		const h = mount();
+		await connect(h);
+		for (const options of [[], ["shared"]]) {
+			await expect(
+				h.storage.set("k", 1, options as never),
+			).rejects.toMatchObject({ code: "invalid" });
+		}
+		expect(h.sent).toEqual([]);
+	});
+
+	test("a hub that does not announce scopes refuses scoped calls but serves slot calls", async () => {
+		const h = mount();
+		h.toFrame({ type: "connect", url: "wss://realtime/socket" });
+		h.fromHub({
+			type: "hello",
+			viewer: { userId: "u1", name: "Ada", image: null },
+			author: false,
+			writable: true,
+		});
+		await h.storage.ready;
+		for (const scope of ["private", "shared"]) {
+			await expect(h.storage.set("k", 1, { scope })).rejects.toMatchObject({
+				code: "unavailable",
+			});
+		}
+		expect(h.sent).toEqual([]);
+		void h.storage.set("k", 1);
+		await flush();
+		expect(h.sent.map((m) => m.request)).toEqual([
+			{ op: "set", key: "k", value: 1 },
+		]);
+	});
+
+	test("a push reaches only the subscriber of that scope", async () => {
+		const h = mount();
+		await connect(h);
+		const shared: unknown[][] = [];
+		const slots: unknown[][] = [];
+		h.storage.subscribe("k", (r) => shared.push(r), { scope: "shared" });
+		h.storage.subscribe("k", (r) => slots.push(r));
+		await flush();
+		expect(h.sent.map((m) => m.request)).toEqual([
+			{ op: "getAll", key: "k", scope: "shared" },
+			{ op: "getAll", key: "k" },
+		]);
+		h.fromHub({ type: "records", key: "k", scope: "shared", records: [1] });
+		expect(shared).toEqual([[1]]);
+		expect(slots).toEqual([]);
+	});
+});
+
+describe("page storage runtime, list", () => {
+	test("sends the prefix and scope, and a plain slot list as just the op", async () => {
+		const h = mount();
+		await connect(h);
+		const listed = h.storage.list("pipeline:", { scope: "shared" });
+		void h.storage.list();
+		void h.storage.list("", {});
+		await flush();
+		expect(h.sent.map((m) => m.request)).toEqual([
+			{ op: "list", prefix: "pipeline:", scope: "shared" },
+			{ op: "list" },
+			{ op: "list" },
+		]);
+		const keys = [{ key: "pipeline:1", records: 1, updatedAt: "t" }];
+		h.fromHub({
+			type: "result",
+			id: h.sent[0]?.id as string,
+			ok: true,
+			result: { op: "list", keys },
+		});
+		expect(await listed).toEqual(keys);
+	});
+
+	test("refuses a bad prefix or scope before sending", async () => {
+		const h = mount();
+		await connect(h);
+		for (const [prefix, options] of [
+			[42, undefined],
+			["x".repeat(129), undefined],
+			["p", { scope: "public" }],
+			["p", ["shared"]],
+		]) {
+			await expect(
+				h.storage.list(prefix as never, options as never),
+			).rejects.toMatchObject({ code: "invalid" });
+		}
+		expect(h.sent).toEqual([]);
+	});
+
+	test("a hub that does not announce scopes refuses list", async () => {
+		const h = mount();
+		h.toFrame({ type: "connect", url: "wss://realtime/socket" });
+		h.fromHub({
+			type: "hello",
+			viewer: { userId: "u1", name: "Ada", image: null },
+			author: false,
+			writable: true,
+		});
+		await h.storage.ready;
+		await expect(h.storage.list()).rejects.toMatchObject({
+			code: "unavailable",
+		});
+		expect(h.sent).toEqual([]);
 	});
 });
 

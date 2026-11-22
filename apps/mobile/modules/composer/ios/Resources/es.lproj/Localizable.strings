@@ -14,3 +14,6 @@
 "Could not start dictation" = "No se pudo iniciar el dictado";
 "Uploading" = "Subiendo";
 "Upload failed" = "Error al subir";
+"Stop" = "Detener";
+"Dictation stopped. What was heard so far is in your message." = "El dictado se detuvo. Lo que se escuchó hasta ahora está en tu mensaje.";
+"Transcription took too long. The last few words may be missing." = "La transcripción tardó demasiado. Es posible que falten las últimas palabras.";

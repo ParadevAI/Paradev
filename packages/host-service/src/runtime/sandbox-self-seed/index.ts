@@ -1,7 +1,15 @@
 export {
+	ARCHIVE_HOOK_TIMEOUT_MS,
+	type ArchiveHookResult,
+	runSandboxArchiveHook,
+} from "./sandbox-archive-hook";
+export {
+	getStartHookRunTerminalId,
 	getStartHookState,
 	launchSandboxAgentOnce,
+	readPendingSandboxLaunch,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 	runSandboxStartHook,
 	type SandboxIdentity,

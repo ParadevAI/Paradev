@@ -1,4 +1,8 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
+import type { MachineSize } from "@superset/shared/billing";
+import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
+import createWorkspaceCommand from "./command";
 
 let localCreateError: Error | undefined;
 let createProcedure: string | undefined;
@@ -7,56 +11,29 @@ let sessionInput: Record<string, unknown> | undefined;
 
 let cloudAvailable = false;
 
-mock.module("../../../lib/cloud-workspaces", () => ({
-	resolveWorkspaceHost: async (flags: { host?: string; local?: boolean }) =>
-		flags.local
-			? "host-1"
-			: (flags.host ?? (cloudAvailable ? undefined : "host-1")),
-	resolveCloudEnvironment: () => {
-		throw new Error("Unexpected environment lookup");
+withLocalHostService("org-1", {
+	"workspaces.createLocal": (input) => {
+		createProcedure = "createLocal";
+		if (localCreateError) throw localCreateError;
+		createInput = input;
+		return {
+			workspace: { id: "ws-local", name: "local" },
+			alreadyExists: false,
+		};
 	},
-}));
-
-mock.module("../../../lib/host-target", () => ({
-	requireHostTarget: () => "host-1",
-	resolveHostTarget: () => ({
-		hostId: "host-1",
-		client: {
-			workspaces: {
-				createLocal: {
-					mutate: async (input: Record<string, unknown>) => {
-						createProcedure = "createLocal";
-						if (localCreateError) throw localCreateError;
-						createInput = input;
-						return { workspace: { name: "local" }, alreadyExists: false };
-					},
-				},
-				createSession: {
-					mutate: async (input: Record<string, unknown>) => {
-						sessionInput = input;
-						return { workspace: { name: "scratch" } };
-					},
-				},
-				create: {
-					mutate: async (input: Record<string, unknown>) => {
-						createProcedure = "create";
-						createInput = input;
-						return {
-							workspace: { name: "agent-effort" },
-							alreadyExists: false,
-						};
-					},
-				},
-			},
-		},
-	}),
-}));
-
-mock.module("../../../lib/upload-attachments", () => ({
-	uploadAttachments: async () => [],
-}));
-
-const { default: createWorkspaceCommand } = await import("./command");
+	"workspaces.createSession": (input) => {
+		sessionInput = input;
+		return { workspace: { id: "ws-session", name: "scratch" } };
+	},
+	"workspaces.create": (input) => {
+		createProcedure = "create";
+		createInput = input;
+		return {
+			workspace: { id: "ws-1", name: "agent-effort" },
+			alreadyExists: false,
+		};
+	},
+});
 
 function invoke(
 	overrides: {
@@ -71,10 +48,16 @@ function invoke(
 		model?: string;
 		checkout?: string;
 		pr?: number;
+		machineSize?: MachineSize;
 	} = {},
 ) {
 	return createWorkspaceCommand.run({
 		ctx: {
+			api: {
+				cloudWorkspace: {
+					available: { query: async () => ({ available: cloudAvailable }) },
+				},
+			},
 			config: { organizationId: "org-1" },
 			bearer: "bearer",
 		} as never,
@@ -131,6 +114,26 @@ describe("workspaces create", () => {
 		expect(sessionInput).toMatchObject({ name: "agent-effort" });
 		expect(createInput).toBeUndefined();
 	});
+
+	for (const [kind, overrides, id] of [
+		["worktree", {}, "ws-1"],
+		["local checkout", { checkout: "local", branch: undefined }, "ws-local"],
+		[
+			"session",
+			{ project: undefined, branch: undefined, session: true },
+			"ws-session",
+		],
+	] as const) {
+		test(`reports the new ${kind} workspace's desktop and web links`, async () => {
+			const links = workspaceLinks(id);
+			const result = (await invoke(overrides)) as {
+				data: Record<string, unknown>;
+				message: string;
+			};
+			expect(result.data).toMatchObject(links);
+			expect(result.message.split("\n").at(-1)).toBe(links.webUrl);
+		});
+	}
 
 	test("forwards model to the agent launched with the workspace", async () => {
 		await invoke({
@@ -244,6 +247,13 @@ describe("workspaces create", () => {
 		await expect(invoke({ checkout: "clone" })).rejects.toThrow(
 			/Unknown checkout/,
 		);
+	});
+
+	test("rejects --machine-size for a workspace on a host", async () => {
+		await expect(invoke({ machineSize: "small" })).rejects.toThrow(
+			/--machine-size applies to cloud workspaces/,
+		);
+		expect(createInput).toBeUndefined();
 	});
 
 	test("rejects --checkout on a project-less session", async () => {

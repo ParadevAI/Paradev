@@ -6,10 +6,15 @@ import { type QueryClient, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useSession } from "@/lib/auth/client";
 import { openNudgeSocket } from "@/lib/realtime";
+import { emitRealtimeNudge } from "@/lib/realtime/nudgeBus";
 import type { CloudWorkspaceRow } from "../useCloudWorkspaces";
 import { patchCloudWorkspaceRows } from "./patchCloudWorkspaceRows";
 
-const ALL_KINDS: readonly RealtimeNudgeKind[] = ["hosts", "cloud_workspaces"];
+const ALL_KINDS: readonly RealtimeNudgeKind[] = [
+	"hosts",
+	"cloud_workspaces",
+	"pull_requests",
+];
 
 function invalidate(
 	queryClient: QueryClient,
@@ -26,6 +31,11 @@ function invalidate(
 			case "cloud_workspaces":
 				void queryClient.invalidateQueries({
 					queryKey: ["cloud", "cloudWorkspace"],
+				});
+				break;
+			case "pull_requests":
+				void queryClient.invalidateQueries({
+					queryKey: ["cloud", "cloudWorkspace", "pullRequests", organizationId],
 				});
 				break;
 		}
@@ -46,7 +56,7 @@ function patch(
 
 /**
  * One socket to the realtime Worker while signed in. The API sends a nudge
- * after it writes hosts or cloud workspaces: a kind refetches, a patch edits
+ * after it writes hosts, cloud workspaces or pull requests: a kind refetches, a patch edits
  * the cached rows in place.
  */
 export function useRealtimeNudges(): void {
@@ -61,6 +71,7 @@ export function useRealtimeNudges(): void {
 			onMessage: (message) => {
 				patch(queryClient, organizationId, message.updates);
 				invalidate(queryClient, organizationId, message.kinds);
+				emitRealtimeNudge(message);
 			},
 			onReopen: () => invalidate(queryClient, organizationId, ALL_KINDS),
 		});

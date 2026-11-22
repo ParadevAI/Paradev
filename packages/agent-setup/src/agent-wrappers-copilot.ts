@@ -5,13 +5,13 @@ import {
 	createWrapper,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
-import { getTemplatePath, getV1NotificationsPort } from "./config";
-import { getHooksDir } from "./paths";
+import { getTemplatePath } from "./config";
+import { APP_HOME_DIR_NAME, getHooksDir } from "./paths";
 
 export const COPILOT_HOOK_SCRIPT_NAME = "copilot-hook.sh";
 
 const COPILOT_HOOK_SIGNATURE = "# Superset copilot hook";
-const COPILOT_HOOK_VERSION = "v6";
+const COPILOT_HOOK_VERSION = "v7";
 export const COPILOT_HOOK_MARKER = `${COPILOT_HOOK_SIGNATURE} ${COPILOT_HOOK_VERSION}`;
 
 export function getCopilotHookScriptPath(): string {
@@ -25,14 +25,14 @@ export function getCopilotHookScriptContent(): string {
 	);
 	return template
 		.replace("{{MARKER}}", COPILOT_HOOK_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 export function createCopilotHookScript(): void {
 	const scriptPath = getCopilotHookScriptPath();
 	const content = getCopilotHookScriptContent();
 	const changed = writeFileIfChanged(scriptPath, content, 0o755);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Copilot hook script`,
 	);
 }

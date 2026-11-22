@@ -1,0 +1,85 @@
+---
+title: "Paradev vs Conductor: lokální agenti, cloudové pracovní prostory a kontrola změn"
+description: "Srovnání Paradev a Conductor pro souběžné kódovací agenty, lokální a cloudové pracovní prostory, kontrolu změn, týmovou spolupráci a mobilní přístup."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - Superset vs Conductor
+  - alternativa k Conductor
+  - orchestrace AI agentů
+  - správa kódovacích agentů
+  - Conductor vs Superset
+  - ukončení provozu Conductor
+  - migrace z Conductor
+---
+
+Pokud se rozhodnete přejít, informace o možnostech migrace najdete v článku [Přechod z Conductor na Paradev](/conductor), případně postupujte podle návodu [Migrace z Conductor](https://docs.paradev.com/migrate-from-conductor) pro lokální aplikaci nebo [Migrace z Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) pro cloudové pracovní prostory.
+
+Paradev i Conductor organizují souběžné kódovací úlohy do samostatných pracovních prostorů. Conductor nabízí cloudové pracovní prostory, sdílené týmové konverzace, API a server MCP, plánované Routines a aplikaci pro iOS s přístupem ke cloudu a experimentálním vzdáleným ovládáním lokálních pracovních prostorů na Macu. Aplikace Paradev pro iPhone a iPad se připojuje k cloudovým pracovním prostorům i k vašim vlastním hostitelům, takže můžete pokračovat v práci v terminálech pracovních prostorů a kontrolovat rozdíly odkudkoli, bez ohledu na to, kde agenti běží.
+
+## Stručný přehled
+
+| Požadavek | Paradev | Conductor |
+|---|---|---|
+| Agenti | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp a libovolný vlastní agent CLI, kterého přidáte | Claude Code, Codex, Cursor, OpenCode |
+| Kde běží | Lokální pracovní prostory, připojení hostitelé, vlastní linuxový server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)) a [cloudové pracovní prostory](https://docs.paradev.com/cloud-workspaces) | Lokální pracovní prostory na Macu a cloudová sandboxová prostředí |
+| Kontrola změn | Panel Changes potvrzuje a odesílá změny a otevírá PR; panel PR zobrazuje kontroly, vlákna recenzí a sloučení | Rozdíly, kontroly, pull requesty, sloučení a archivace |
+| Přístup týmu | Hostitelé, které přidáte, s přístupem udělovaným jednotlivým členům, a také přístup organizace | Sdílené cloudové pracovní prostory a konverzace |
+| Prohlížeč | Panel prohlížeče v aplikaci s režimem návrhu: vyberte prvek a odešlete ho agentovi | Náhled v prohlížeči |
+| Automatizace | Plánované běhy agentů v tarifu Pro na vybraném hostiteli, s historií běhů a opakováním neúspěšných běhů | Routines podle plánu nebo na základě akce GitHubu, běžící v cloudu |
+| Programové ovládání | CLI, TypeScript SDK a server MCP | API a Conductor MCP |
+| Telefon | Aplikace pro iPhone a iPad v App Storu, iOS nebo iPadOS 26+, Pro; funguje s cloudovými pracovními prostory i vlastními hostiteli | Aplikace pro iOS; cloudové pracovní prostory a [experimentální vzdálené ovládání lokálních pracovních prostorů na Macu](https://www.conductor.build/docs/reference/remote-control). Mac musí zůstat zapnutý, probuzený a online, aby vzdálené ovládání fungovalo. |
+| Ceny | Zdarma; Pro {{price:pro}}/uživatel/měsíc nebo {{price:pro:yearly}} při roční fakturaci; Team {{price:team}} nebo {{price:team:yearly}} při roční fakturaci; Ultra {{price:ultra}}; Enterprise na míru. Placené tarify umožňují přístup ke cloudu; informace o zahrnutém využití a dodatečném účtování podle spotřeby najdete v [ceníku](/pricing). | Aktuální tarify a přístup k účtům najdete u Conductoru v části [tarify a přístup k účtům](https://www.conductor.build/docs/cloud/faq) |
+
+Úvodní [představení](https://www.conductor.build/docs) Conductoru uvádí čtyři agentní nástroje a jeho postup kontroly změn. Jeho [dokumentace ke cloudu](https://www.conductor.build/docs/cloud) vysvětluje sdílená prostředí a izolovaná sandboxová prostředí. Aktuální dokumentace popisuje také [experimentální vzdálené ovládání lokálních pracovních prostorů na Macu z iPhonu](https://www.conductor.build/docs/reference/remote-control).
+
+## Požadavky Paradev
+
+Paradev spouští kódovací agenty CLI v samostatných pracovních prostorech a spojuje terminály a kontrolu rozdílů v jedné aplikaci. Desktopová aplikace podporuje macOS a experimentální AppImage pro Linux. Windows zatím není k dispozici. Paradev je open source pod licencí MIT. Uživatelé Conductoru, kterým vyhovoval jeho chat, mohou využít [chatovací rozhraní](https://docs.paradev.com/chat) pro Claude Code, Codex, OpenCode a Pi.
+
+Stránka Workspaces seskupuje větší množství relací podle stavu (Vyžaduje pozornost, Pracuje, Vyžaduje kontrolu, Nečinný, Sloučeno) napříč všemi vašimi hostiteli. Přerušené relace agenta pokračují ve stejném panelu a dílčí agenti, které spustí Claude Code nebo Codex, se zobrazují pod svým nadřazeným agentem.
+
+K použití [Paradev na iPhonu a iPadu](/mobile) potřebujete iOS 26 nebo iPadOS 26 či novější a tarif Pro. Cloudové pracovní prostory fungují i bez připojení vašeho vlastního počítače; pokud pracovní prostor běží na vašem počítači, tento hostitel musí zůstat online. Vzdálený přístup a automatizace také vyžadují placený tarif. Viz [ceník](/pricing) a [nastavení vzdáleného přístupu](https://docs.paradev.com/remote-access).
+
+## Vyzkoušejte v repozitáři
+
+Toto srovnání vydává Paradev. Odkazovaná dokumentace Conductoru dokládá popis funkcí; následující zkouška je způsob, jak nástroje vyhodnotit, nikoli měřené pořadí výkonu.
+
+Chcete-li aplikace porovnat, v každé použijte stejný commit repozitáře, agenta, model a dvě nezávislá zadání úloh. Zaznamenejte verze aplikací a agentů, datum a případné rozdíly v nastavení. [Průvodce souběžnými úlohami](/blog/parallel-coding-agents-guide) obsahuje zadání s jasně vymezeným rozsahem.
+
+| Krok zkoušky | Zaznamenané podklady |
+|---|---|
+| Vytvořte dvě nezávislé úlohy | Cesty k pracovním prostorům a názvy větví; kroky nastavení nutné před spuštěním testů |
+| Nechte každého agenta dokončit menší změnu | Zadání, model, změněné soubory a výstup kontrol |
+| Požádejte o jednu opravu | Zda dokážete najít a obnovit správnou relaci |
+| Zkontrolujte a začleňte obě změny | Kroky kontroly, konflikty a výsledek společného testu |
+| Vyzkoušejte vzdálený přístup, pokud ho potřebujete | Dostupnost hostitele, požadovaný tarif a chování při odpojení |
+
+Dobu nastavení a kontroly měřte odděleně od doby běhu agenta. Než vyvodíte závěr o rychlosti, zkoušku opakujte: výstupy agentů se liší a rychlejší běh může stále vytvořit horší rozdíly. Pracovní stromy Git oddělují pracovní soubory, ale nezaručují začlenění bez konfliktů ani oprávnění sandboxu pro agenta.
+
+![Kontrola změny v Paradev.](/images/readme/diff-viewer.png)
+
+## Co mohou uživatelé Conductoru udělat teď
+
+Pokud se rozhodnete přejít, uložte si své větve a exportujte záznamy, které chcete zachovat.
+
+Paradev si vyberte, pokud chcete agentovi odpovídat z iPhonu a kontrolovat jeho změny během práce na vlastním počítači, hostiteli nebo v cloudovém pracovním prostoru, a to s libovolným agentem CLI. Nastavení ověřte pomocí [návodu pro telefon](/blog/claude-code-codex-iphone). Chcete-li přesunout svou práci, postupujte podle [návodu pro lokální aplikaci](https://docs.paradev.com/migrate-from-conductor) nebo [návodu pro Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
+
+Porovnejte aktuální [tarify Paradev](/pricing), včetně nákladů na výpočetní prostředky a poskytovatele agentů. Využití poskytovatelů agentů se účtuje zvlášť.
+
+## Často kladené otázky
+
+### Je Conductor určený jen pro lokální práci?
+
+Ne. Dokumentace Conductoru popisuje lokální pracovní prostory na Macu i [cloudová sandboxová prostředí](https://www.conductor.build/docs/cloud), včetně sdílených cloudových pracovních prostorů. Aplikace pro iOS nabízí také [experimentální vzdálené ovládání lokálních pracovních prostorů na Macu](https://www.conductor.build/docs/reference/remote-control).
+
+### Může Conductor spouštět OpenCode?
+
+Ano. V úvodu uvádí OpenCode spolu s Claude Code, Codexem a Cursorem.
+
+### Vyžaduje Paradev změnu editoru?
+
+Ne. Adresář pracovního prostoru můžete otevřít ve svém editoru, zatímco Paradev spravuje jeho terminály a pracovní prostory. U překrývajících se úprav ponechte jednoho správce.

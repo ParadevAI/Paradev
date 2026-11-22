@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import {
 	buildDefaultAccountResolver,
@@ -9,6 +8,7 @@ import {
 	getManagedNotifyHookCommand,
 	isManagedArtifactGuardCommand,
 	isManagedNotifyCommand,
+	removeOwnedFileIfMarked,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
 import { getArtifactGuardScriptPath } from "./artifact-guard-hook";
@@ -22,13 +22,20 @@ import {
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
 import { getNotifyScriptPath } from "./notify-hook";
-import { getOpenCodeConfigDir, getOpenCodePluginDir } from "./paths";
+import {
+	getOpenCodeConfigDir,
+	getOpenCodePluginDir,
+	getOpenCodeTuiPluginDir,
+	resolveUserHomeDir,
+} from "./paths";
 
 export const OPENCODE_PLUGIN_FILE = "superset-notify.js";
 
 const OPENCODE_PLUGIN_SIGNATURE = "// Superset opencode plugin";
 const OPENCODE_PLUGIN_VERSION = "v11";
 export const OPENCODE_PLUGIN_MARKER = `${OPENCODE_PLUGIN_SIGNATURE} ${OPENCODE_PLUGIN_VERSION}`;
+const OPENCODE_TUI_PLUGIN_SIGNATURE = "// Superset opencode tui plugin";
+export const OPENCODE_TUI_PLUGIN_MARKER = `${OPENCODE_TUI_PLUGIN_SIGNATURE} v2`;
 
 /**
  * Returns the environment-scoped OpenCode plugin path under Superset home.
@@ -37,12 +44,16 @@ export function getOpenCodePluginPath(): string {
 	return path.join(getOpenCodePluginDir(), OPENCODE_PLUGIN_FILE);
 }
 
+export function getOpenCodeTuiPluginPath(): string {
+	return path.join(getOpenCodeTuiPluginDir(), "tui.js");
+}
+
 /** @see https://opencode.ai/docs/plugins */
 export function getOpenCodeGlobalPluginPath(): string {
 	const xdgConfigHome = process.env.XDG_CONFIG_HOME?.trim();
 	const configHome = xdgConfigHome?.length
 		? xdgConfigHome
-		: path.join(os.homedir(), ".config");
+		: path.join(resolveUserHomeDir(), ".config");
 	return path.join(configHome, "opencode", "plugin", OPENCODE_PLUGIN_FILE);
 }
 
@@ -68,7 +79,7 @@ export const CLAUDE_ARTIFACT_GUARD_MATCHER = "Artifact";
  * Returns the global Claude settings path used for native hook registration.
  */
 export function getClaudeGlobalSettingsJsonPath(): string {
-	return path.join(os.homedir(), ".claude", "settings.json");
+	return path.join(resolveUserHomeDir(), ".claude", "settings.json");
 }
 
 // StopFailure is the API-error hook; it fires while the session stays alive,
@@ -175,7 +186,7 @@ export function ensureClaudeManagedHooksAt(configDir: string): void {
  * Returns the global Codex hooks.json path used for fallback hook registration.
  */
 export function getCodexGlobalHooksJsonPath(): string {
-	return path.join(os.homedir(), ".codex", "hooks.json");
+	return path.join(resolveUserHomeDir(), ".codex", "hooks.json");
 }
 
 // SubagentStart/SubagentStop fire for spawn_agent children (multi_agent is
@@ -287,6 +298,16 @@ export function getOpenCodePluginContent(notifyPath: string): string {
 		.replace("{{NOTIFY_PATH}}", notifyPath);
 }
 
+export function getOpenCodeTuiPluginContent(notifyPath: string): string {
+	const template = fs.readFileSync(
+		getTemplatePath("opencode-tui-plugin.template.js"),
+		"utf-8",
+	);
+	return template
+		.replace("{{MARKER}}", OPENCODE_TUI_PLUGIN_MARKER)
+		.replace("{{NOTIFY_PATH}}", () => JSON.stringify(notifyPath));
+}
+
 /**
  * Wrapper for Claude: forwards SUPERSET_* env vars into the agent process
  * tree and follows the Usage-tab account switch at launch time. Hooks live
@@ -344,8 +365,29 @@ export function createOpenCodePlugin(): void {
 	const notifyPath = getNotifyScriptPath();
 	const content = getOpenCodePluginContent(notifyPath);
 	const changed = writeFileIfChanged(pluginPath, content, 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} OpenCode plugin`,
+	);
+}
+
+export function createOpenCodeTuiPlugin(): void {
+	fs.mkdirSync(getOpenCodeTuiPluginDir(), { recursive: true });
+	const content = getOpenCodeTuiPluginContent(getNotifyScriptPath());
+	const changed = writeFileIfChanged(
+		getOpenCodeTuiPluginPath(),
+		content,
+		0o644,
+	);
+	(changed ? console.log : console.debug)(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} OpenCode TUI plugin`,
+	);
+}
+
+export function removeOpenCodeTuiPlugin(): void {
+	removeOwnedFileIfMarked(
+		getOpenCodeTuiPluginPath(),
+		OPENCODE_TUI_PLUGIN_SIGNATURE,
+		"OpenCode TUI plugin",
 	);
 }
 

@@ -9,6 +9,7 @@ import {
 	Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
+import { COMPANY } from "@superset/shared/constants";
 import type { ReactNode } from "react";
 import { emailTheme } from "../EmailLayout";
 
@@ -69,12 +70,13 @@ export function PersonalLayout({
 						<Text
 							style={{
 								margin: 0,
+								fontFamily: "Arial, Helvetica, sans-serif",
 								fontSize: "12px",
 								lineHeight: "18px",
 								color: "#8E8E8E",
 							}}
 						>
-							Superset, Inc., San Francisco, CA
+							{COMPANY.LEGAL_NAME}, San Francisco, CA
 							{unsubscribeUrl ? (
 								<>
 									{" "}

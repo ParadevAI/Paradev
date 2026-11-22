@@ -48,10 +48,12 @@ tight and healthy queries time out under load.
 | `filesystem.listDirectory`, `filesystem.getMetadata` | 5s | Fast in practice |
 | `filesystem.readFile` | 30s | Large files (e.g. lockfiles, generated bundles) |
 | `filesystem.searchFiles` | 30s | ripgrep on large repos |
+| `filesystem.resolveFileReference` | 30s | May build the file index on a cold worktree |
 | `filesystem.searchContent` | 60s | content search worst case |
 | `git.listBranches`, `git.getBaseBranch`, `git.getPullRequest` | 5s | Cheap reads |
 | `git.getStatus`, `git.getCommitFiles` | 15s | Slow on big working trees |
 | `git.listCommits`, `git.getDiff`, `git.getBranchSyncStatus`, `git.getPullRequestThreads` | 30s | Long history, big diffs, GitHub API |
+| `linkPreview.get` | 20s | A page fetch, then an icon fetch, 7s each |
 
 ## What the timeout does *not* do
 

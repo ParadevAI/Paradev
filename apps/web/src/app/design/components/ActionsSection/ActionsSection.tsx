@@ -211,7 +211,7 @@ export function ActionsSection() {
 						<Trans>https://</Trans>
 					</ButtonGroupText>
 					<Button variant="outline">
-						<Trans>superset.sh</Trans>
+						<Trans>paradev.com</Trans>
 					</Button>
 					<Button
 						variant="outline"

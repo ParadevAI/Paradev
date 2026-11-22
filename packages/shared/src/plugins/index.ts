@@ -1,12 +1,78 @@
 export * from "./manifests.generated";
 
+import type { OrganizationRole } from "../auth/roles/roles";
 import { firstPartyManifest } from "./manifests.generated";
 
 export const DEFAULT_MARKETPLACE = "superset";
-export const DEFAULT_MARKETPLACE_REPO = "superset-sh/superset";
+export const DEFAULT_MARKETPLACE_REPO = "paradevai/paradev";
 export const DEFAULT_MARKETPLACE_REF = "main";
 
-export const SUPERSET_HOSTED_PLUGINS = ["gmail", "slack", "ynab"] as const;
+const ORGANIZATION_MARKETPLACE_PREFIX = "organization-";
+
+/** Every organization has its own marketplace name, so two organizations' same-named plugins never share an install key. */
+export function organizationMarketplace(organizationId: string): string {
+	return `${ORGANIZATION_MARKETPLACE_PREFIX}${organizationId}`;
+}
+
+export function organizationIdOfMarketplace(
+	marketplace: string,
+): string | null {
+	return isOrganizationMarketplace(marketplace)
+		? marketplace.slice(ORGANIZATION_MARKETPLACE_PREFIX.length) || null
+		: null;
+}
+
+/** Whether a plugin manifest names a connector or its own MCP server. */
+export function manifestHasTools(manifest: unknown): boolean {
+	const superset = (
+		manifest as {
+			extensions?: {
+				superset?: { connector?: { slug?: unknown }; mcp?: { url?: unknown } };
+			};
+		}
+	)?.extensions?.superset;
+	return (
+		typeof superset?.connector?.slug === "string" ||
+		typeof superset?.mcp?.url === "string"
+	);
+}
+
+export function isOrganizationMarketplace(marketplace: string): boolean {
+	return marketplace.startsWith(ORGANIZATION_MARKETPLACE_PREFIX);
+}
+
+export const ORGANIZATION_PLUGIN_ACCESS = [
+	"unavailable",
+	"available",
+	"installed",
+] as const;
+
+export type OrganizationPluginAccess =
+	(typeof ORGANIZATION_PLUGIN_ACCESS)[number];
+
+export type OrganizationPluginPolicy = Partial<
+	Record<OrganizationRole, OrganizationPluginAccess>
+>;
+
+/** A plugin a repository sync adds stays with the admins until one of them opens it to members. */
+export const DEFAULT_ORGANIZATION_PLUGIN_POLICY: OrganizationPluginPolicy = {
+	owner: "available",
+	admin: "available",
+};
+
+export function organizationPluginAccess(
+	policy: OrganizationPluginPolicy,
+	role: string,
+): OrganizationPluginAccess {
+	return policy[role as OrganizationRole] ?? "unavailable";
+}
+
+export const SUPERSET_HOSTED_PLUGINS = [
+	"gmail",
+	"google-calendar",
+	"slack",
+	"ynab",
+] as const;
 export type SupersetHostedPlugin = (typeof SUPERSET_HOSTED_PLUGINS)[number];
 
 export function isSupersetHosted(name: string): boolean {
@@ -39,10 +105,8 @@ export type PluginMcpServerConfig =
 			headers?: Record<string, string>;
 			/**
 			 * A command printing a JSON object of headers on stdout, run per
-			 * connection. Both supported agents have this and it is the only way to
-			 * attach a credential without writing one to disk: Claude calls it
-			 * `headersHelper`, Codex `http_headers_helper`, so the dialect writers
-			 * rename it rather than this type carrying both spellings.
+			 * connection without persisting credentials. Claude and pdev call it
+			 * `headersHelper`; Codex calls it `http_headers_helper`.
 			 */
 			headersHelper?: string;
 	  }
@@ -76,6 +140,8 @@ export interface PluginCatalogEntry {
 	interface: {
 		displayName: string;
 		category: PluginCategory;
+		/** A built-in icon key, or an image path inside the plugin (`./assets/icon.png`). */
+		icon?: string;
 	};
 	/**
 	 * Server-name → config. Names land verbatim as config keys in agent CLIs
@@ -225,11 +291,11 @@ export function getPluginComponentKinds(
 export const SUPERSET_MANAGED_SKILLS = [
 	{
 		name: "10x",
-		description: "Personalized audit of Superset features you're not using yet",
+		description: "Personalized audit of Paradev features you're not using yet",
 	},
 	{
 		name: "automate",
-		description: "Turn a recurring chore into a Superset automation",
+		description: "Turn a recurring chore into a Paradev automation",
 	},
 	{
 		name: "browser",
@@ -241,9 +307,9 @@ export const SUPERSET_MANAGED_SKILLS = [
 	},
 	{
 		name: "contribute",
-		description: "Set up an open-source contribution to Superset",
+		description: "Set up an open-source contribution to Paradev",
 	},
-	{ name: "doctor", description: "Diagnose and fix Superset problems" },
+	{ name: "doctor", description: "Diagnose and fix Paradev problems" },
 	{ name: "feedback", description: "Report bugs and request features" },
 	{
 		name: "orchestrate",
@@ -254,16 +320,16 @@ export const SUPERSET_MANAGED_SKILLS = [
 		description:
 			"Install plugins, connect their accounts, and call their MCP tools",
 	},
-	{ name: "setup", description: "Make a repository Superset-ready" },
-	{ name: "standup", description: "Digest of what your Superset agents did" },
+	{ name: "setup", description: "Make a repository Paradev-ready" },
+	{ name: "standup", description: "Digest of what your Paradev agents did" },
 ] as const;
 
 export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 	{
 		name: "superset",
 		version: "1.0.0",
-		description: "Manage Superset workspaces, tasks, and automations",
-		interface: { displayName: "Superset", category: "Productivity" },
+		description: "Manage Paradev workspaces, tasks, and automations",
+		interface: { displayName: "Paradev", category: "Productivity" },
 		mcpServers: {
 			superset: { type: "http", url: "https://api.superset.sh/mcp" },
 		},
@@ -323,6 +389,16 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "autumn",
+		version: "1.0.0",
+		description: "Manage customers, plans, and billing in Autumn",
+		interface: { displayName: "Autumn", category: "Data & APIs" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			autumn: { type: "http", url: "https://mcp.useautumn.com/mcp" },
+		},
+	},
+	{
 		name: "stripe",
 		version: "1.0.0",
 		description: "Query payments data and Stripe docs",
@@ -338,6 +414,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		interface: { displayName: "Neon", category: "Data & APIs" },
 		mcpServers: {
 			neon: { type: "http", url: "https://mcp.neon.tech/mcp" },
+		},
+	},
+	{
+		name: "exa",
+		version: "1.0.1",
+		description: "Search the web, companies, and people",
+		interface: { displayName: "Exa", category: "Data & APIs" },
+		mcpServers: {
+			exa: { type: "http", url: "https://mcp.exa.ai/mcp" },
 		},
 	},
 	{
@@ -376,12 +461,30 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		mcpServers: {},
 	},
 	{
+		name: "google-calendar",
+		version: "1.0.0",
+		description: "Read and manage your Google Calendar",
+		interface: { displayName: "Google Calendar", category: "Productivity" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {},
+	},
+	{
 		name: "vercel",
 		version: "1.0.0",
 		description: "Manage deployments, projects, and logs",
 		interface: { displayName: "Vercel", category: "Developer tools" },
 		mcpServers: {
 			vercel: { type: "http", url: "https://mcp.vercel.com" },
+		},
+	},
+	{
+		name: "resend",
+		version: "1.0.0",
+		description: "Send and debug email",
+		interface: { displayName: "Resend", category: "Developer tools" },
+		auth: [{ type: "oauth2" }],
+		mcpServers: {
+			resend: { type: "http", url: "https://mcp.resend.com/mcp" },
 		},
 	},
 	{
@@ -400,6 +503,75 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		interface: { displayName: "PostHog", category: "Data & APIs" },
 		mcpServers: {
 			posthog: { type: "http", url: "https://mcp.posthog.com/mcp" },
+		},
+	},
+	{
+		name: "peec",
+		version: "1.0.0",
+		description: "Track your brand in AI search",
+		interface: { displayName: "Peec AI", category: "Data & APIs" },
+		mcpServers: {
+			peec: { type: "http", url: "https://api.peec.ai/mcp" },
+		},
+	},
+	{
+		name: "sazabi",
+		version: "1.0.0",
+		description: "Investigate production logs and issues",
+		interface: { displayName: "Sazabi", category: "Developer tools" },
+		mcpServers: {
+			sazabi: { type: "http", url: "https://mcp.sazabi.com/mcp" },
+		},
+	},
+	{
+		name: "inngest",
+		version: "1.0.0",
+		description: "Debug runs and operate functions",
+		interface: { displayName: "Inngest", category: "Developer tools" },
+		mcpServers: {
+			inngest: { type: "http", url: "https://api.inngest.com/mcp" },
+		},
+	},
+	{
+		name: "firecrawl",
+		version: "1.0.0",
+		description: "Search, scrape, and crawl the web",
+		interface: { displayName: "Firecrawl", category: "Data & APIs" },
+		mcpServers: {
+			firecrawl: {
+				type: "http",
+				url: "https://mcp.firecrawl.dev/v2/mcp-oauth",
+			},
+		},
+	},
+	{
+		name: "ahrefs",
+		version: "1.0.0",
+		description: "Research backlinks, keywords, and rankings",
+		interface: { displayName: "Ahrefs", category: "Data & APIs" },
+		mcpServers: {
+			ahrefs: { type: "http", url: "https://api.ahrefs.com/mcp/mcp" },
+		},
+	},
+	{
+		name: "planetscale",
+		version: "1.0.0",
+		description: "Inspect databases and branches and run SQL",
+		interface: { displayName: "PlanetScale", category: "Data & APIs" },
+		mcpServers: {
+			planetscale: {
+				type: "http",
+				url: "https://mcp.pscale.dev/mcp/planetscale",
+			},
+		},
+	},
+	{
+		name: "wispr",
+		version: "1.0.0",
+		description: "Search your meeting notes and transcripts",
+		interface: { displayName: "Wispr Flow", category: "Productivity" },
+		mcpServers: {
+			wispr: { type: "http", url: "https://api.wisprflow.ai/connect/mcp" },
 		},
 	},
 	{
@@ -476,95 +648,30 @@ export const SUPERSET_API_URL = "https://api.superset.sh";
  * which the manifest already determines. Writing it out per plugin would only
  * add somewhere for it to be wrong.
  */
-/** A live connection, as the MCP entry writer needs to see it. */
-export interface PluginConnectionRef {
-	/** Connector slug, matching the plugin manifest's `connector.slug`. */
-	connector: string;
-	connectionId: string;
-	/** The provider's id for the person; what tells two accounts apart. */
-	externalUserId: string | null;
-	/** What the person called this account, if they named it. */
-	nickname?: string | null;
-	/** The provider's own label for the account — an email, a username. */
-	label?: string | null;
-}
-
-/** Codex table keys and MCP server names are identifiers, not free text. */
-function slugSegment(value: string): string {
-	return value
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "")
-		.slice(0, 32);
-}
-
-/**
- * How an account shows up in a server name. The agent reads this to choose an
- * account, so it is the one place a human word beats a correct id: a nickname
- * the person set, else the provider's label, else the id that is merely stable.
- */
-function accountSegments(
-	connections: readonly PluginConnectionRef[],
-): string[] {
-	const byId = connections.map((connection) =>
-		slugSegment(connection.externalUserId ?? connection.connectionId),
-	);
-
-	const preferred = connections.map((connection) =>
-		slugSegment(connection.nickname || connection.label || ""),
-	);
-
-	// All or nothing. Two labels can slug to the same word, and mixing a label
-	// for one account with a raw id for its twin reads as two unrelated schemes.
-	const usable =
-		preferred.every((segment) => segment.length > 0) &&
-		new Set(preferred).size === preferred.length;
-
-	return usable ? preferred : byId;
-}
-
 export function pluginProxyMcpServers(
 	name: string,
 	marketplace: string = DEFAULT_MARKETPLACE,
-	options: {
-		connections?: readonly PluginConnectionRef[];
-		headersHelper?: string;
-	} = {},
+	options: { headersHelper?: string } = {},
 ): Record<string, PluginMcpServerConfig> | undefined {
-	const extension = firstPartyManifest(name)?.extensions?.superset as
-		| { connector?: { slug: string } }
-		| undefined;
-	if (!extension?.connector) return undefined;
+	if (!pluginConnectorSlug(name)) return undefined;
+	return proxyMcpServer(name, marketplace, options);
+}
 
-	const base = `${SUPERSET_API_URL}/mcp/plugins/${marketplace}/${name}`;
-	const helper = options.headersHelper
-		? { headersHelper: options.headersHelper }
-		: {};
-	const mine = (options.connections ?? []).filter(
-		(connection) => connection.connector === extension.connector?.slug,
-	);
-
-	// One account needs no disambiguation, and naming it `<plugin>-<id>` would
-	// rename the entry the moment a second arrived — which orphans the token
-	// the agent stored against the old name. The plain name stays the plain
-	// name until there is genuinely a choice to express.
-	if (mine.length < 2) {
-		return { [name]: { type: "http", url: base, ...helper } };
-	}
-
-	// Two or more: one entry each, pinned, so the agent picks an account by
-	// calling a differently-named server. Unpinned would be a 409 on every
-	// request, tool list included.
-	const servers: Record<string, PluginMcpServerConfig> = {};
-	const segments = accountSegments(mine);
-	mine.forEach((connection, index) => {
-		servers[`${name}-${segments[index]}`] = {
+function proxyMcpServer(
+	name: string,
+	marketplace: string,
+	options: { headersHelper?: string },
+	key: string = name,
+): Record<string, PluginMcpServerConfig> {
+	return {
+		[key]: {
 			type: "http",
-			url: `${base}?connection=${encodeURIComponent(connection.connectionId)}`,
-			...helper,
-		};
-	});
-	return servers;
+			url: `${SUPERSET_API_URL}/mcp/plugins/${marketplace}/${name}`,
+			...(options.headersHelper
+				? { headersHelper: options.headersHelper }
+				: {}),
+		},
+	};
 }
 
 /**
@@ -580,21 +687,41 @@ export function desiredPluginMcpServers(
 		name: string;
 		marketplace?: string;
 		enabled?: boolean;
+		tools?: boolean;
 	}[],
 	options: {
-		/** Live connections, so a connector with two accounts emits one entry each. */
-		connections?: readonly PluginConnectionRef[];
 		/** Command printing the auth header, so no entry needs its own OAuth. */
 		headersHelper?: string;
 	} = {},
 ): Record<string, PluginMcpServerConfig> {
 	const desired: Record<string, PluginMcpServerConfig> = {};
+	const organizationNames = new Map<string, number>();
+	for (const install of installed) {
+		if (install.marketplace && isOrganizationMarketplace(install.marketplace)) {
+			organizationNames.set(
+				install.name,
+				(organizationNames.get(install.name) ?? 0) + 1,
+			);
+		}
+	}
 	for (const install of installed) {
 		if (install.enabled === false) continue;
 		// This catalog is the first-party one, and the proxy URL names the
 		// marketplace it came from: another marketplace's same-named plugin
 		// would otherwise be served Superset's.
 		const marketplace = install.marketplace || DEFAULT_MARKETPLACE;
+		if (isOrganizationMarketplace(marketplace)) {
+			if (install.tools === false) continue;
+			const shared = (organizationNames.get(install.name) ?? 0) > 1;
+			const key = shared
+				? `${install.name}-${organizationIdOfMarketplace(marketplace)?.slice(0, 8)}`
+				: install.name;
+			Object.assign(
+				desired,
+				proxyMcpServer(install.name, marketplace, options, key),
+			);
+			continue;
+		}
 		if (marketplace !== DEFAULT_MARKETPLACE) continue;
 		const entry = PLUGIN_CATALOG.find((p) => p.name === install.name);
 		if (!entry) continue;
@@ -602,6 +729,13 @@ export function desiredPluginMcpServers(
 		Object.assign(desired, proxied ?? entry.mcpServers);
 	}
 	return desired;
+}
+
+export function pluginConnectorSlug(name: string): string | undefined {
+	const extension = firstPartyManifest(name)?.extensions?.superset as
+		| { connector?: { slug: string } }
+		| undefined;
+	return extension?.connector?.slug;
 }
 
 export function getPluginByName(name: string): PluginCatalogEntry | undefined {
@@ -612,9 +746,10 @@ export function getPluginByName(name: string): PluginCatalogEntry | undefined {
 }
 
 /**
- * One install record, persisted as a JSON array on the local-db settings
- * singleton (mirrors `disabledAgentHooks`). Read by the main process at boot
- * to converge agent configs on the installed set.
+ * The desktop's old install record in local-db settings. Nothing writes it
+ * now. The desktop reads it at each boot only to copy entries it has not seen
+ * into installed_plugins.json; the column stays so a build from before the
+ * move can still open the database.
  */
 export interface InstalledPlugin {
 	name: string;

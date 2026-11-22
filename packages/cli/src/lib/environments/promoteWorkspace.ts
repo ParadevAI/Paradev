@@ -1,5 +1,6 @@
 import { CLIError } from "@superset/cli-framework";
 import { type ApiClient, ApiHttpError } from "../api-client";
+import { environmentLimitHint } from "./environmentLimitHint";
 
 type EnvironmentScope = "organization" | "personal";
 
@@ -79,7 +80,7 @@ export async function promoteWorkspace({
 						? error.cause
 						: undefined;
 			if (httpError && httpError.status >= 502) return waitForRow();
-			throw error;
+			return environmentLimitHint(error);
 		});
 	if (!saved) throw new CLIError("The environment was not saved");
 	return saved;

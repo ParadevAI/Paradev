@@ -8,3 +8,14 @@ export function workspaceIdsForSectionMove(
 			(sectionByWorkspaceId.get(workspaceId) ?? null) !== targetSectionId,
 	);
 }
+
+export function splitBulkRemovalTargets<Workspace extends { hostType: string }>(
+	workspaces: readonly Workspace[],
+): { deletable: Workspace[]; archivable: Workspace[] } {
+	const deletable: Workspace[] = [];
+	const archivable: Workspace[] = [];
+	for (const workspace of workspaces) {
+		(workspace.hostType === "cloud" ? archivable : deletable).push(workspace);
+	}
+	return { deletable, archivable };
+}

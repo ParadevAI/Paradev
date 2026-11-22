@@ -13,22 +13,20 @@ import {
 	HiOutlineViewColumns,
 	HiXMark,
 } from "react-icons/hi2";
-import { SiLinear } from "react-icons/si";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { CreateTaskDialog } from "renderer/routes/_authenticated/_dashboard/components/CreateTaskDialog";
 import { OpenClosedFilter } from "renderer/routes/_authenticated/_dashboard/components/OpenClosedFilter";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { ProjectFilter } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter";
 import { WorkItemsSearch } from "renderer/routes/_authenticated/_dashboard/components/WorkItemsSearch";
 import type { ViewMode } from "../../../../stores/tasks-filter-state";
-import { RunInWorkspacePopoverV2 } from "../../../RunInWorkspacePopoverV2";
+import { RunInWorkspacePopover } from "../../../RunInWorkspacePopover";
 import type { TaskWithStatus } from "../../hooks/useTasksData";
 import type { SelectedIssue } from "../GitHubIssuesContent";
 import { AssigneeFilter } from "./components/AssigneeFilter";
 import { CreateLinearIssueDialog } from "./components/CreateLinearIssueDialog";
+import { LabelFilter } from "./components/LabelFilter";
 import { LinearAssigneeFilter } from "./components/LinearAssigneeFilter";
 import { LinearTeamFilter } from "./components/LinearTeamFilter";
-import { RunInWorkspacePopover } from "./components/RunInWorkspacePopover";
 import { RunIssuesInWorkspacePopover } from "./components/RunIssuesInWorkspacePopover";
 import { StatusFilter } from "./components/StatusFilter";
 
@@ -49,6 +47,8 @@ interface TasksTopBarProps {
 	onSearchChange: (query: string) => void;
 	assigneeFilter: string | null;
 	onAssigneeFilterChange: (value: string | null) => void;
+	labelFilter: string | null;
+	onLabelFilterChange: (value: string | null) => void;
 	selectedTasks?: TaskWithStatus[];
 	onClearSelection?: () => void;
 	selectedIssues?: SelectedIssue[];
@@ -67,9 +67,11 @@ interface TasksTopBarProps {
 	onIncludeClosedIssuesChange: (includeClosed: boolean) => void;
 }
 
-const TASK_SOURCES: ReadonlyArray<{ value: TaskSource; Icon: IconType }> = [
+const SOURCE_TABS: ReadonlyArray<{
+	value: Exclude<TaskSource, "linear">;
+	Icon: IconType;
+}> = [
 	{ value: "tasks", Icon: HiOutlineClipboardDocumentList },
-	{ value: "linear", Icon: SiLinear },
 	{ value: "issues", Icon: GoIssueOpened },
 ];
 
@@ -80,6 +82,8 @@ export function TasksTopBar({
 	onSearchChange,
 	assigneeFilter,
 	onAssigneeFilterChange,
+	labelFilter,
+	onLabelFilterChange,
 	selectedTasks = [],
 	onClearSelection,
 	selectedIssues = [],
@@ -99,11 +103,10 @@ export function TasksTopBar({
 }: TasksTopBarProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
-	const taskSourceLabels: Record<TaskSource, string> = {
+	const sourceTabLabels: Record<Exclude<TaskSource, "linear">, string> = {
 		tasks: t({
 			message: "Tasks",
 		}),
-		linear: t({ message: "Linear" }),
 		issues: t({
 			message: "GitHub issues",
 		}),
@@ -128,7 +131,6 @@ export function TasksTopBar({
 			: null;
 	const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 	const [isCreateLinearIssueOpen, setIsCreateLinearIssueOpen] = useState(false);
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 
 	const hasSelection = selectedCount > 0;
 
@@ -163,11 +165,6 @@ export function TasksTopBar({
 										projectFilter={selectedIssueProject}
 										onComplete={onClearIssueSelection ?? (() => {})}
 									/>
-								) : isV2CloudEnabled ? (
-									<RunInWorkspacePopoverV2
-										tasks={selectedTasks}
-										onComplete={onClearSelection ?? (() => {})}
-									/>
 								) : (
 									<RunInWorkspacePopover
 										tasks={selectedTasks}
@@ -178,14 +175,14 @@ export function TasksTopBar({
 						) : (
 							<>
 								<Tabs
-									value={taskSource}
+									value={taskSource === "issues" ? "issues" : "tasks"}
 									onValueChange={(value) =>
 										onTaskSourceChange(value as TaskSource)
 									}
 									className="flex-row gap-0"
 								>
 									<TabsList className="h-8 gap-0.5 rounded-md bg-muted/50 p-0.5">
-										{TASK_SOURCES.map((source) => {
+										{SOURCE_TABS.map((source) => {
 											const Icon = source.Icon;
 											return (
 												<TabsTrigger
@@ -194,7 +191,7 @@ export function TasksTopBar({
 													className="h-7 rounded-sm px-2 text-xs shadow-none data-[state=active]:shadow-none"
 												>
 													<Icon className="size-3.5" />
-													<span>{taskSourceLabels[source.value]}</span>
+													<span>{sourceTabLabels[source.value]}</span>
 												</TabsTrigger>
 											);
 										})}
@@ -223,6 +220,10 @@ export function TasksTopBar({
 										<AssigneeFilter
 											value={assigneeFilter}
 											onChange={onAssigneeFilterChange}
+										/>
+										<LabelFilter
+											value={labelFilter}
+											onChange={onLabelFilterChange}
 										/>
 									</>
 								) : (
@@ -362,6 +363,7 @@ export function TasksTopBar({
 					const search: Record<string, string> = {};
 					if (currentTab !== "all") search.tab = currentTab;
 					if (assigneeFilter) search.assignee = assigneeFilter;
+					if (labelFilter) search.label = labelFilter;
 					if (searchQuery) search.search = searchQuery;
 					navigate({
 						to: "/tasks/$taskId",

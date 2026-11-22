@@ -12,15 +12,16 @@
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
-		"test": "bun test --isolate",
+		"test": "bun test",
 		"build:types": "tsc -p tsconfig.types.json"
 	},
 	"dependencies": {
+		"@superset/shared": "workspace:*",
 		"pidtree": "0.6.0"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
-		"bun-types": "1.4.2",
+		"bun-types": "1.4.3",
 		"typescript": "7.0.2"
 	}
 }

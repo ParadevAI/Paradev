@@ -1,0 +1,1 @@
+export { ChatTable } from "./ChatTable";

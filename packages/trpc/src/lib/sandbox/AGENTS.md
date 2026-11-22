@@ -36,9 +36,10 @@ Two habits that pay for themselves here:
   a fix that only exists on your machine.
 - **The claim is the whole handoff.** `buildSandboxClaim` assembles what a box
   needs to be one workspace — the identity file, the firewall rules, the
-  managed environment, the host secret — and `provisionSandbox`, `wakeSandbox`
-  and `promoteSandboxToEnvironment` all take it, so a create, a wake and a
-  restart after promote hand the box the same thing.
+  managed environment, the host secret — and `provisionSandbox` and
+  `wakeSandbox` take it. A restart after promote is a wake (`wakeAfterStop`),
+  so a create, a wake and that restart hand the box the same thing, and each
+  new session gets a boot row.
 
 `docs/cloud-sandbox-considerations.md` is the companion list: what we still owe
 before a non-internal user can create a sandbox. Several entries there are only

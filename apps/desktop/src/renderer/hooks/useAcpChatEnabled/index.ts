@@ -1,5 +1,5 @@
 export {
-	type AcpChatAvailability,
 	useAcpChatEnabled,
-	useAwaitAcpChatEnabled,
+	useAcpChatSettled,
+	useResolveAcpChatEnabled,
 } from "./useAcpChatEnabled";

@@ -3,15 +3,18 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { toast } from "@superset/ui/sonner";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
 import { usePluginCatalog } from "renderer/hooks/usePluginCatalog";
+import { useInstallAfterConnect } from "renderer/routes/_authenticated/_dashboard/hooks/useInstallAfterConnect";
 import { PluginDetail } from "./components/PluginDetail";
 
 export type PluginDetailSearch = {
+	connect?: boolean;
 	connected?: string;
 	error?: string;
+	owner?: string;
 };
 
 export const Route = createFileRoute(
@@ -19,23 +22,28 @@ export const Route = createFileRoute(
 )({
 	component: PluginDetailPage,
 	validateSearch: (search: Record<string, unknown>): PluginDetailSearch => ({
+		connect: search.connect === true ? true : undefined,
 		connected:
 			typeof search.connected === "string" ? search.connected : undefined,
 		error: typeof search.error === "string" ? search.error : undefined,
+		owner: typeof search.owner === "string" ? search.owner : undefined,
 	}),
 });
 
-function useConnectOutcome(plugin: string) {
+function useConnectOutcome(plugin: string, onConnected: () => void) {
 	const { t } = useLingui();
 	const navigate = Route.useNavigate();
-	const { connected, error } = Route.useSearch();
+	const { connected, error, owner } = Route.useSearch();
+	const onConnectedRef = useRef(onConnected);
+	onConnectedRef.current = onConnected;
 
 	useEffect(() => {
 		if (connected === undefined && !error) return;
 
 		if (connected !== undefined) {
-			const label = connected || plugin;
+			const label = plugin;
 			toast.success(t({ message: `Connected ${label}` }));
+			onConnectedRef.current();
 		} else if (error === "oauth_denied") {
 			toast.error(
 				t({ message: `You declined the ${plugin} authorization request.` }),
@@ -48,18 +56,28 @@ function useConnectOutcome(plugin: string) {
 					message: `That ${plugin} sign-in link expired. Try connecting again.`,
 				}),
 			);
-		} else if (error === "client_unconfigured") {
+		} else if (error === "not_configured") {
 			toast.error(
 				t({
 					message: `${plugin} has no OAuth client configured on this deployment yet.`,
 				}),
+			);
+		} else if (error === "account_already_linked") {
+			toast.error(
+				owner
+					? t({
+							message: `This ${plugin} account is already connected to another Paradev organization by ${owner}. Ask them to disconnect it there first.`,
+						})
+					: t({
+							message: `This ${plugin} account is already connected by another Paradev organization.`,
+						}),
 			);
 		} else {
 			toast.error(t({ message: `Could not connect ${plugin}. Try again.` }));
 		}
 
 		void navigate({ search: {}, replace: true });
-	}, [connected, error, navigate, plugin, t]);
+	}, [connected, error, owner, navigate, plugin, t]);
 }
 
 function PluginDetailPage() {
@@ -67,15 +85,42 @@ function PluginDetailPage() {
 	const isEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS);
 	const { plugins, isLoading } = usePluginCatalog();
 	const plugin = plugins.find((entry) => entry.name === pluginName);
+	const { connect } = Route.useSearch();
+	const navigate = Route.useNavigate();
 
-	useConnectOutcome(pluginName);
+	const installAfterConnect = useInstallAfterConnect();
+	const onConnected = useCallback(
+		() => void installAfterConnect(pluginName),
+		[installAfterConnect, pluginName],
+	);
+	const [connectedCount, setConnectedCount] = useState(0);
+	const onConnectOutcome = useCallback(() => {
+		setConnectedCount((count) => count + 1);
+		onConnected();
+	}, [onConnected]);
+
+	useConnectOutcome(
+		plugin?.interface.displayName ?? pluginName,
+		onConnectOutcome,
+	);
+
+	useEffect(() => {
+		if (connect) void navigate({ search: {}, replace: true });
+	}, [connect, navigate]);
 
 	if (env.NODE_ENV !== "development") {
 		if (isEnabled === undefined) return null;
-		if (!isEnabled) return <Redirect to="/v2-workspaces" />;
+		if (!isEnabled) return <Redirect to="/workspaces" />;
 	}
 	if (isLoading) return null;
 	if (!plugin) return <Redirect to="/plugins" />;
 
-	return <PluginDetail plugin={plugin} />;
+	return (
+		<PluginDetail
+			plugin={plugin}
+			openConnect={connect}
+			connectedCount={connectedCount}
+			onConnected={onConnected}
+		/>
+	);
 }

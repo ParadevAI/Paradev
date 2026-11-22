@@ -1,0 +1,1 @@
+export { closeFilePanes } from "./closeFilePanes";

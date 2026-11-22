@@ -26,7 +26,7 @@ export type Slot =
 	| "assignee"
 	| "commentFilter";
 
-export type SentencePart = { text: string } | { slot: Slot };
+type SentencePart = { text: string } | { slot: Slot };
 
 export const GITHUB_SENTENCES: Record<GithubTriggerEvent, SentencePart[]> = {
 	draft_opened: [
@@ -49,6 +49,12 @@ export const GITHUB_SENTENCES: Record<GithubTriggerEvent, SentencePart[]> = {
 	],
 	"pull_request.merged": [
 		{ text: "PR merged in" },
+		{ slot: "repositories" },
+		{ text: "by" },
+		{ slot: "actor" },
+	],
+	"pull_request.closed": [
+		{ text: "PR closed without merging in" },
 		{ slot: "repositories" },
 		{ text: "by" },
 		{ slot: "actor" },
@@ -210,6 +216,12 @@ export const GITHUB_MENU: TriggerMenuEntry<GithubConfig>[] = [
 					message: "Merged",
 				}),
 				"pull_request.merged",
+			),
+			leaf(
+				msg({
+					message: "Closed",
+				}),
+				"pull_request.closed",
 			),
 			leaf(
 				msg({

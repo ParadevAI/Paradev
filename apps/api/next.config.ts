@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
+import { withWorkflow } from "workflow/next";
 
 if (process.env.NODE_ENV !== "production") {
 	dotenvConfig({
@@ -21,7 +22,7 @@ const config: NextConfig = {
 	},
 };
 
-export default withSentryConfig(config, {
+export default withSentryConfig(withWorkflow(config), {
 	org: "superset-sh",
 	project: "api",
 	silent: !process.env.CI,

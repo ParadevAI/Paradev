@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it, spyOn } from "bun:test";
+import * as Sentry from "@sentry/node";
 import {
 	type TerminalAgentBindingPersistence,
 	TerminalAgentStore,
@@ -12,6 +13,32 @@ describe("TerminalAgentStore", () => {
 
 	beforeEach(() => {
 		store = new TerminalAgentStore();
+	});
+
+	it("reports every hook event as activity, a subagent's included, even when the status does not change", () => {
+		let activity = 0;
+		store.on("activity", () => {
+			activity += 1;
+		});
+		for (const occurredAt of [1, 2, 3]) {
+			store.recordEvent({
+				terminalId: "t1",
+				workspaceId: WORKSPACE,
+				eventType: "Start",
+				agentId: "claude",
+				occurredAt,
+			});
+		}
+		expect(activity).toBe(3);
+
+		store.recordSubagentEvent({
+			terminalId: "t1",
+			workspaceId: WORKSPACE,
+			eventType: "SubagentStart",
+			subagentId: "a1",
+			occurredAt: 4,
+		});
+		expect(activity).toBe(4);
 	});
 
 	describe("subagent roster", () => {
@@ -850,4 +877,51 @@ describe("session account attribution", () => {
 		store.clearWorkspaceStatuses("ws-failed");
 		expect(store.listByWorkspace("ws-failed")[0]?.lastEventType).toBe("Failed");
 	});
+
+	it("keeps a chat's account through its later events", () => {
+		const store = new TerminalAgentStore();
+		const account = {
+			agent: "claude" as const,
+			selection: null,
+			credentialKind: "api_key" as const,
+			identity: "api-env" as const,
+		};
+		const chat = {
+			terminalId: "chat-terminal",
+			workspaceId: "ws-account",
+			agentId: "claude" as const,
+			chatSessionId: "chat-1",
+		};
+		store.recordChatEvent({
+			...chat,
+			eventType: "Attached",
+			account,
+			occurredAt: 1,
+		});
+		store.recordChatEvent({ ...chat, eventType: "Stop", occurredAt: 2 });
+		expect(store.listByWorkspace("ws-account")[0]?.account).toEqual(account);
+	});
+});
+
+it("logs an agent id a hook made up as custom", () => {
+	const info = spyOn(Sentry.logger, "info").mockImplementation(() => {});
+	const store = new TerminalAgentStore();
+	store.recordEvent({
+		terminalId: "t1",
+		workspaceId: WORKSPACE,
+		eventType: "Start",
+		agentId: "acme-secret-agent" as TerminalAgentBinding["agentId"],
+		occurredAt: Date.now(),
+	});
+	store.markTerminalExited("t1");
+	expect(info.mock.calls).toEqual([
+		[
+			"agent.ended",
+			expect.objectContaining({
+				"agent.id": "custom",
+				"agent.end_reason": "terminal-exited",
+			}),
+		],
+	]);
+	info.mockRestore();
 });

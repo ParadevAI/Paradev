@@ -38,12 +38,10 @@ interface ConnectorConnectProps {
 		id: string;
 		externalAccountLabel: string | null;
 		externalUserLabel: string | null;
-		nickname: string | null;
 		needsReauth: boolean;
 	}[];
 }
 
-/** Nickname first, then whatever the provider called it. Never the id. */
 function initials(label: string): string {
 	const parts = label
 		.trim()
@@ -123,10 +121,12 @@ export function ConnectorConnect({
 							className="space-y-2 p-3"
 							onSubmit={(e) => {
 								e.preventDefault();
+								const label = draftName.trim();
+								if (!label) return;
 								rename.mutate({
 									organizationId,
 									connectionId: connection.id,
-									nickname: draftName,
+									label,
 								});
 							}}
 						>
@@ -135,11 +135,15 @@ export function ConnectorConnect({
 								autoFocus
 								value={draftName}
 								maxLength={64}
-								placeholder={t({ message: "Nickname" })}
+								placeholder={t({ message: "Account name" })}
 								onChange={(e) => setDraftName(e.target.value)}
 							/>
 							<div className="flex gap-2">
-								<Button type="submit" size="sm" disabled={rename.isPending}>
+								<Button
+									type="submit"
+									size="sm"
+									disabled={rename.isPending || !draftName.trim()}
+								>
 									<Trans>Save</Trans>
 								</Button>
 								<Button
@@ -184,7 +188,7 @@ export function ConnectorConnect({
 							variant="ghost"
 							onClick={() => {
 								setRenaming(connection.id);
-								setDraftName(connection.nickname ?? "");
+								setDraftName(connection.externalUserLabel ?? "");
 							}}
 						>
 							<Trans>Rename</Trans>
@@ -242,7 +246,7 @@ export function ConnectorConnect({
 			{/* Answers "should I grant this?", which is decided once. Shown only
 			    before the first grant, like the desktop dialog — this screen is
 			    reached from a share link, where the person may not know what
-			    Superset is about to be allowed to do. */}
+			    Paradev is about to be allowed to do. */}
 			{connections.length === 0 && (
 				<div className="divide-y divide-border rounded-lg border">
 					<div className="px-4 py-3">
@@ -251,7 +255,7 @@ export function ConnectorConnect({
 						</div>
 						<p className="mt-0.5 text-muted-foreground text-xs">
 							<Trans>
-								Superset only receives the permissions this connector asks for.
+								Paradev only receives the permissions this connector asks for.
 								Disconnect at any time to revoke them.
 							</Trans>
 						</p>
@@ -262,7 +266,7 @@ export function ConnectorConnect({
 						</div>
 						<p className="mt-0.5 text-muted-foreground text-xs">
 							<Trans>
-								Tokens are held by Superset and attached to requests there. They
+								Tokens are held by Paradev and attached to requests there. They
 								are never written into your local agent config.
 							</Trans>
 						</p>

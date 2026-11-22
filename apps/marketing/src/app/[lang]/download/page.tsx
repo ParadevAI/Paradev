@@ -13,12 +13,12 @@ export async function generateMetadata(): Promise<Metadata> {
 	return {
 		title: i18n._(
 			msg({
-				message: "Download Superset",
+				message: "Download Paradev",
 			}),
 		),
 		description: i18n._(
 			msg({
-				message: "Your Superset download is starting.",
+				message: "Your Paradev download is starting.",
 			}),
 		),
 		// The page fires the download on arrival, so it must not be a search
@@ -33,7 +33,7 @@ export default async function DownloadPage() {
 
 	return (
 		<main className="mx-auto w-full max-w-6xl px-6 py-12 sm:px-8 sm:py-16">
-			<DownloadInterstitial latestRelease={releases[0] ?? null} />
+			<DownloadInterstitial />
 			<SurfaceCards />
 			<div className="mt-12 sm:mt-16">
 				<ReleaseList releases={releases} />

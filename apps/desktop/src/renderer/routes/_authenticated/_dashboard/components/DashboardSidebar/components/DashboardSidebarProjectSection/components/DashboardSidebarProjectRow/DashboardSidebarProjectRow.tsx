@@ -17,7 +17,8 @@ interface DashboardSidebarProjectRowProps
 	onRenameValueChange: (value: string) => void;
 	onSubmitRename: () => void;
 	onCancelRename: () => void;
-	onStartRename: () => void;
+	/** Absent when the name is not the user's to change. */
+	onStartRename?: () => void;
 	onToggleCollapse: () => void;
 	onNewWorkspace: () => void;
 }

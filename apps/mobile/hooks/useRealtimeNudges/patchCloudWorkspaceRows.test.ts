@@ -2,19 +2,11 @@ import { describe, expect, test } from "bun:test";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import { patchCloudWorkspaceRows } from "./patchCloudWorkspaceRows";
 
-const person = (userId: string, lastSeenAt: Date | string) => ({
-	userId,
-	name: userId,
-	image: null,
-	lastSeenAt,
-});
-
-const row = (id: string, presence: ReturnType<typeof person>[] = []) =>
+const row = (id: string) =>
 	({
 		id,
 		agentStatus: null,
 		agentStatusAt: null,
-		presence,
 	}) as unknown as CloudWorkspaceRow;
 
 describe("patchCloudWorkspaceRows", () => {
@@ -69,25 +61,5 @@ describe("patchCloudWorkspaceRows", () => {
 			],
 		);
 		expect(a?.agentStatus).toBe("review");
-	});
-
-	test("merges presence with a persisted row whose dates are strings", () => {
-		const [a] = patchCloudWorkspaceRows(
-			[
-				row("a", [
-					person("old", new Date(5_000).toISOString()),
-					person("same", new Date(1_000).toISOString()),
-				]),
-			],
-			[
-				{
-					kind: "cloud_workspaces",
-					workspaceId: "a",
-					presence: [person("same", 9_000) as never],
-				},
-			],
-		);
-		expect(a?.presence.map((p) => p.userId)).toEqual(["same", "old"]);
-		expect(new Date(a?.presence[0]?.lastSeenAt ?? 0).getTime()).toBe(9_000);
 	});
 });

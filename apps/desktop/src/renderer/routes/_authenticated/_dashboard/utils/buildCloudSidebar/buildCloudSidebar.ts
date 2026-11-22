@@ -12,7 +12,7 @@ type SidebarWorkspace = Pick<
 >;
 
 export function isInCloudSidebar(
-	workspace: Pick<CloudWorkspaceRow, "createdBy">,
+	workspace: { createdBy: { userId: string } | null },
 	entry: CloudSidebarEntry | undefined,
 	userId: string | null,
 ): boolean {

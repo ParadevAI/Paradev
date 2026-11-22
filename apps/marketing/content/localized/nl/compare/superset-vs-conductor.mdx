@@ -1,0 +1,85 @@
+---
+title: "Paradev versus Conductor: lokale agents, cloudwerkruimten en review"
+description: "Vergelijk Paradev en Conductor voor parallelle coding agents, lokale en cloudwerkruimten, review, teamsamenwerking en mobiele toegang."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset-vs-conductor
+  - conductor-alternatief
+  - ai-agentorkestratie
+  - beheer-van-coding-agents
+  - conductor-vs-superset
+  - conductor-stopt
+  - migreren-van-conductor
+---
+
+Als je wilt overstappen, lees dan [Overstappen van Conductor naar Paradev](/conductor) voor de migratieopties, of volg [Migreren vanuit Conductor](https://docs.paradev.com/migrate-from-conductor) voor de lokale app of [Migreren vanuit Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) voor cloudwerkruimten.
+
+Paradev en Conductor organiseren parallelle codetaken allebei in aparte werkruimten. Conductor biedt cloudwerkruimten, gedeelde teamgesprekken, een API en MCP-server, geplande Routines en een iOS-app met cloudtoegang en experimentele externe bediening van lokale Mac-werkruimten. De iPhone- en iPad-app van Paradev maakt verbinding met de cloudwerkruimten en de hosts die je zelf beheert, zodat je terminals van werkruimten kunt blijven gebruiken en diffs kunt beoordelen, ongeacht waar de agents draaien.
+
+## In één oogopslag
+
+| Vereiste | Paradev | Conductor |
+|---|---|---|
+| Agents | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp en elke aangepaste CLI-agent die je toevoegt | Claude Code, Codex, Cursor, OpenCode |
+| Waar werk draait | Lokale werkruimten, gekoppelde hosts, je eigen Linux-server ([Gebruik je eigen cloud](https://docs.paradev.com/bring-your-own-cloud)) en [cloudwerkruimten](https://docs.paradev.com/cloud-workspaces) | Lokale Mac-werkruimten en cloudsandboxen |
+| Review | Deelvenster Wijzigingen maakt commits, pusht en opent PR's; het PR-deelvenster toont checks, reviewthreads en de mogelijkheid te mergen | Diffs, checks, pullrequests, mergen en archiveren |
+| Toegang voor teams | Hosts die je toevoegt, met toegang per lid, plus toegang voor de organisatie | Gedeelde cloudwerkruimten en gesprekken |
+| Browser | In-appbrowserdeelvenster met Ontwerpmodus: selecteer een element en stuur het naar een agent | Browserversie |
+| Automatiseringen | Geplande agentruns met Pro op een geselecteerde host, met runhistorie en opnieuw proberen bij mislukte runs | Routines volgens schema of op basis van een GitHub Action, uitgevoerd in de cloud |
+| Programmatische bediening | CLI, TypeScript-SDK en MCP-server | API en Conductor MCP |
+| Telefoon | iPhone- en iPad-app in de App Store, iOS of iPadOS 26+, Pro; werkt met cloudwerkruimten en je eigen hosts | iOS-app; cloudwerkruimten en [experimentele externe bediening van lokale Mac-werkruimten](https://www.conductor.build/docs/reference/remote-control). De Mac moet ingeschakeld en wakker blijven en online zijn voor externe bediening. |
+| Prijzen | Gratis; Pro {{price:pro}}/gebruiker/maand of {{price:pro:yearly}} jaarlijks gefactureerd; Team {{price:team}} of {{price:team:yearly}} jaarlijks gefactureerd; Ultra {{price:ultra}}; Enterprise op maat. Betaalde abonnementen bieden toegang tot de cloud; zie [prijzen](/pricing) voor inbegrepen gebruik en extra gebruik op basis van verbruik. | Bekijk bij Conductor de [actuele abonnementen en accounttoegang](https://www.conductor.build/docs/cloud/faq) |
+
+De [introductie](https://www.conductor.build/docs) van Conductor beschrijft vier agentharnassen en het reviewproces. De [Cloud-documentatie](https://www.conductor.build/docs/cloud) legt gedeelde omgevingen en geïsoleerde sandboxen uit. De actuele documentatie beschrijft ook [experimentele externe bediening van lokale Mac-werkruimten vanaf een iPhone](https://www.conductor.build/docs/reference/remote-control).
+
+## Vereisten voor Paradev
+
+Paradev voert coding agents via de CLI uit in aparte werkruimten, met terminals en diffreview in één app. De desktopapp ondersteunt macOS en een experimentele Linux AppImage. Windows is nog niet beschikbaar. Paradev is opensource onder de MIT-licentie. Conductor-gebruikers die de chat prettig vonden, kunnen de [chatinterface](https://docs.paradev.com/chat) gebruiken voor Claude Code, Codex, OpenCode en Pi.
+
+Als je veel sessies tegelijk hebt, groepeert de pagina Werkruimten ze op status (Aandacht nodig, Bezig, Review nodig, Inactief, Samengevoegd) op al je hosts. Onderbroken agentsessies worden in hetzelfde deelvenster hervat, en subagents die Claude Code of Codex starten, verschijnen onder hun bovenliggende agent.
+
+Voor [Paradev op iPhone en iPad](/mobile) heb je iOS 26 of iPadOS 26 of nieuwer en Pro nodig. Cloudwerkruimten werken zonder dat je eigen computer verbonden blijft; voor werkruimten op je eigen machine moet die host online blijven. Voor externe toegang en automatiseringen is ook een betaald abonnement nodig. Zie [prijzen](/pricing) en [instellen van externe toegang](https://docs.paradev.com/remote-access).
+
+## Probeer het in je repository
+
+Deze vergelijking is gepubliceerd door Paradev. De gekoppelde documentatie van Conductor onderbouwt de functiebeschrijvingen; de proef hieronder is een evaluatiemethode, geen gemeten prestatierangschikking.
+
+Vergelijk de apps met dezelfde commit van de repository, dezelfde agent en hetzelfde model, en twee onafhankelijke taakprompts in elke app. Noteer de versies van de app en agent, de datum en eventuele verschillen in de configuratie. De [gids voor parallelle taken](/blog/parallel-coding-agents-guide) bevat prompts met een afgebakende scope.
+
+| Stap van de proef | Vast te leggen gegevens |
+|---|---|
+| Maak twee onafhankelijke taken aan | Paden van de werkruimten en branchnamen; configuratiestappen die nodig zijn voordat tests draaien |
+| Laat elke agent een kleine wijziging afronden | Prompt, model, gewijzigde bestanden en uitvoer van checks |
+| Vraag om één correctie | Of je de juiste sessie kunt vinden en hervatten |
+| Review en integreer beide wijzigingen | Reviewstappen, conflicten en gecombineerd testresultaat |
+| Probeer externe toegang als je die nodig hebt | Beschikbaarheid van de host, vereist abonnement en wat er gebeurt bij een verbroken verbinding |
+
+Meet de configuratie- en reviewtijd afzonderlijk van de uitvoeringstijd van de agent. Herhaal de proef voordat je een conclusie over snelheid trekt: de uitvoer van agents varieert en een snellere run kan toch een slechtere diff opleveren. Git-worktrees scheiden werkbestanden, maar garanderen geen conflictloze integratie of sandboxmachtigingen voor agents.
+
+![Een wijziging beoordelen in Paradev.](/images/readme/diff-viewer.png)
+
+## Wat Conductor-gebruikers nu kunnen doen
+
+Als je wilt overstappen, bewaar dan je branches en exporteer de gegevens die je wilt houden.
+
+Kies Paradev als je een agent vanaf je iPhone wilt antwoorden en de wijzigingen wilt beoordelen terwijl de taak draait op je eigen computer, een host of een cloudwerkruimte, met elke CLI-agent. Controleer de configuratie met de [uitleg voor de telefoon](/blog/claude-code-codex-iphone). Volg de [gids voor de lokale app](https://docs.paradev.com/migrate-from-conductor) of de [gids voor Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud) om je werk over te zetten.
+
+Vergelijk de actuele [abonnementen van Paradev](/pricing), waaronder de kosten voor rekenkracht en agentproviders. Gebruik van agentproviders wordt afzonderlijk gefactureerd.
+
+## Veelgestelde vragen
+
+### Is Conductor alleen voor lokaal werk?
+
+Nee. Conductor documenteert lokale Mac-werkruimten en [cloudsandboxen](https://www.conductor.build/docs/cloud), waaronder gedeelde cloudwerkruimten. De iOS-app biedt ook [experimentele externe bediening van lokale Mac-werkruimten](https://www.conductor.build/docs/reference/remote-control).
+
+### Kan Conductor OpenCode uitvoeren?
+
+Ja. In de introductie staat OpenCode naast Claude Code, Codex en Cursor.
+
+### Moet ik voor Paradev van editor wisselen?
+
+Nee. Je kunt een werkruimtemap in je editor openen terwijl Paradev de terminals en werkruimten beheert. Laat overlappende bewerkingen door één partij beheren.

@@ -4,6 +4,7 @@ import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
 import { TRPCClientError } from "@trpc/client";
 import * as Network from "expo-network";
+import { billingRefusalCopy } from "./billingRefusal";
 import { TransportError } from "./transport-fetch";
 
 /**
@@ -97,5 +98,5 @@ export function errorCopy(error: unknown): string {
 	const kind = transportFailureKind(error);
 	if (kind) return i18n._(TRANSPORT_COPY[kind]);
 	if (isExpoNativeError(error)) return i18n._(GENERIC);
-	return errorMessage(error);
+	return billingRefusalCopy(error) ?? errorMessage(error);
 }

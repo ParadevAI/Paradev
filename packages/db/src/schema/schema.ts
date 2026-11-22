@@ -1,5 +1,5 @@
 import type { ActiveAgentStatus } from "@superset/shared/agent-status";
-import { desc, sql } from "drizzle-orm";
+import { desc, type SQL, sql } from "drizzle-orm";
 import {
 	type AnyPgColumn,
 	bigint,
@@ -10,6 +10,7 @@ import {
 	index,
 	integer,
 	jsonb,
+	numeric,
 	pgEnum,
 	pgTable,
 	primaryKey,
@@ -20,7 +21,8 @@ import {
 	uniqueIndex,
 	uuid,
 } from "drizzle-orm/pg-core";
-import { organizations, teams, users } from "./auth";
+import { invitations, organizations, teams, users } from "./auth";
+import { channels } from "./channels";
 import type { PageReportReason } from "./enums";
 import {
 	actorKindValues,
@@ -30,13 +32,20 @@ import {
 	automationRunStatusValues,
 	automationSessionKindValues,
 	automationTriggerKindValues,
+	cloudUsageFeatureValues,
 	cloudWorkspaceActivityEventValues,
+	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceBootOriginValues,
+	cloudWorkspaceFailureReasonValues,
 	cloudWorkspaceStatusValues,
 	cloudWorkspaceVisibilityValues,
 	commandStatusValues,
 	desktopNoticeCtaActionValues,
 	desktopNoticeSeverityValues,
 	desktopNoticeTriggerValues,
+	environmentBuildKindValues,
+	environmentBuildStatusValues,
+	environmentBuildTriggerValues,
 	environmentScopeValues,
 	environmentSourceKindValues,
 	integrationProviderValues,
@@ -44,6 +53,7 @@ import {
 	pageCommentAuthorKindValues,
 	pageCommentIntentValues,
 	pageReportStatusValues,
+	pageShareRoleValues,
 	pageVisibilityValues,
 	suggestionEntityValues,
 	suggestionKindValues,
@@ -59,7 +69,9 @@ import {
 import { githubRepositories } from "./github";
 import type {
 	AutomationEventDispatchInput,
+	CloudWorkspaceBootPhase,
 	IntegrationConfig,
+	PendingUsageEvent,
 	TriggerConfig,
 	UserIdentityMetadata,
 } from "./types";
@@ -83,6 +95,22 @@ export const cloudWorkspaceStatus = pgEnum(
 export const cloudWorkspaceVisibility = pgEnum(
 	"cloud_workspace_visibility",
 	cloudWorkspaceVisibilityValues,
+);
+export const cloudWorkspaceBootEndReason = pgEnum(
+	"cloud_workspace_boot_end_reason",
+	cloudWorkspaceBootEndReasonValues,
+);
+export const cloudWorkspaceBootOrigin = pgEnum(
+	"cloud_workspace_boot_origin",
+	cloudWorkspaceBootOriginValues,
+);
+export const cloudWorkspaceFailureReason = pgEnum(
+	"cloud_workspace_failure_reason",
+	cloudWorkspaceFailureReasonValues,
+);
+export const cloudUsageFeature = pgEnum(
+	"cloud_usage_feature",
+	cloudUsageFeatureValues,
 );
 export const actorKind = pgEnum("actor_kind", actorKindValues);
 export const cloudWorkspaceActivityEvent = pgEnum(
@@ -110,6 +138,18 @@ export const environmentScope = pgEnum(
 	"environment_scope",
 	environmentScopeValues,
 );
+export const environmentBuildStatus = pgEnum(
+	"environment_build_status",
+	environmentBuildStatusValues,
+);
+export const environmentBuildTrigger = pgEnum(
+	"environment_build_trigger",
+	environmentBuildTriggerValues,
+);
+export const environmentBuildKind = pgEnum(
+	"environment_build_kind",
+	environmentBuildKindValues,
+);
 export const v2ClientType = pgEnum("v2_client_type", v2ClientTypeValues);
 export const v2UsersHostRole = pgEnum(
 	"v2_users_host_role",
@@ -120,6 +160,7 @@ export const v2WorkspaceType = pgEnum(
 	v2WorkspaceTypeValues,
 );
 export const pageVisibility = pgEnum("page_visibility", pageVisibilityValues);
+export const pageShareRole = pgEnum("page_share_role", pageShareRoleValues);
 export const pageCommentAnchorKind = pgEnum(
 	"page_comment_anchor_kind",
 	pageCommentAnchorKindValues,
@@ -239,29 +280,6 @@ export const tasks = pgTable(
 		branch: text(),
 		prUrl: text("pr_url"),
 
-		// External sync (null if local-only task)
-		externalProvider: integrationProvider("external_provider"),
-		externalId: text("external_id"),
-		externalKey: text("external_key"), // "SUPER-172", "#123"
-		externalUrl: text("external_url"),
-		lastSyncedAt: timestamp("last_synced_at"),
-		syncError: text("sync_error"),
-		// The provider's own updatedAt, recorded on every write in either
-		// direction. An inbound event no newer than this is our own echo or a
-		// redelivery that arrived late, and is not applied.
-		externalUpdatedAt: timestamp("external_updated_at"),
-
-		// External project/cycle snapshot (from Linear)
-		externalProjectId: text("external_project_id"),
-		externalProjectName: text("external_project_name"),
-		externalCycleId: text("external_cycle_id"),
-		externalCycleName: text("external_cycle_name"),
-
-		// External assignee snapshot (for unmatched Linear users)
-		assigneeExternalId: text("assignee_external_id"),
-		assigneeDisplayName: text("assignee_display_name"),
-		assigneeAvatarUrl: text("assignee_avatar_url"),
-
 		startedAt: timestamp("started_at"),
 		completedAt: timestamp("completed_at"),
 		deletedAt: timestamp("deleted_at"),
@@ -280,16 +298,6 @@ export const tasks = pgTable(
 		index("tasks_creator_id_idx").on(table.creatorId),
 		index("tasks_status_id_idx").on(table.statusId),
 		index("tasks_created_at_idx").on(table.createdAt),
-		index("tasks_external_provider_idx").on(table.externalProvider),
-		index("tasks_external_project_id_idx").on(table.externalProjectId),
-		index("tasks_external_project_name_idx").on(table.externalProjectName),
-		index("tasks_external_cycle_id_idx").on(table.externalCycleId),
-		index("tasks_assignee_external_id_idx").on(table.assigneeExternalId),
-		unique("tasks_external_unique").on(
-			table.organizationId,
-			table.externalProvider,
-			table.externalId,
-		),
 		unique("tasks_org_slug_unique").on(table.organizationId, table.slug),
 		unique("tasks_team_number_unique").on(table.teamId, table.number),
 	],
@@ -366,6 +374,12 @@ export const taskActivity = pgTable(
 		toProjectId: uuid("to_project_id").references(() => taskProjects.id, {
 			onDelete: "set null",
 		}),
+		fromChannelId: uuid("from_channel_id").references(() => channels.id, {
+			onDelete: "set null",
+		}),
+		toChannelId: uuid("to_channel_id").references(() => channels.id, {
+			onDelete: "set null",
+		}),
 		descriptionEdited: boolean("description_edited").notNull().default(false),
 		addedLabelIds: uuid("added_label_ids").array(),
 		removedLabelIds: uuid("removed_label_ids").array(),
@@ -382,6 +396,8 @@ export const taskActivity = pgTable(
 		index("task_activity_to_assignee_id_idx").on(table.toAssigneeId),
 		index("task_activity_from_project_id_idx").on(table.fromProjectId),
 		index("task_activity_to_project_id_idx").on(table.toProjectId),
+		index("task_activity_from_channel_id_idx").on(table.fromChannelId),
+		index("task_activity_to_channel_id_idx").on(table.toChannelId),
 	],
 );
 
@@ -503,15 +519,14 @@ export const connections = pgTable(
 
 		issuer: text(),
 		resource: text(),
+		/** The dynamic client the grant was issued to; its refresh token is bound to it. */
+		oauthClientId: text("oauth_client_id"),
 
 		externalAccountId: text("external_account_id").notNull(),
 		externalAccountLabel: text("external_account_label"),
 		externalUserId: text("external_user_id"),
 		externalUserLabel: text("external_user_label"),
 
-		// What the person calls this account. Two accounts on one connector are
-		// told apart by the provider's own labels otherwise, and those are often
-		// the same word twice — "harshith@tegon.ai · harshith@tegon.ai".
 		nickname: text(),
 
 		config: jsonb().$type<Record<string, string | null>>(),
@@ -638,6 +653,67 @@ export const dealRedemptions = pgTable(
 
 export type InsertDealRedemption = typeof dealRedemptions.$inferInsert;
 export type SelectDealRedemption = typeof dealRedemptions.$inferSelect;
+
+export const awsMarketplaceCustomerStatusValues = [
+	"pending",
+	"active",
+	"inactive",
+] as const;
+export type AwsMarketplaceCustomerStatus =
+	(typeof awsMarketplaceCustomerStatusValues)[number];
+
+export const awsMarketplaceCustomers = pgTable(
+	"aws_marketplace_customers",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		licenseArn: text("license_arn").notNull(),
+		awsAccountId: text("aws_account_id").notNull(),
+		customerIdentifier: text("customer_identifier"),
+		productCode: text("product_code").notNull(),
+		agreementId: text("agreement_id"),
+		organizationId: uuid("organization_id").references(() => organizations.id, {
+			onDelete: "set null",
+		}),
+		linkedByUserId: uuid("linked_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		linkedAt: timestamp("linked_at"),
+		claimTokenHash: text("claim_token_hash"),
+		claimExpiresAt: timestamp("claim_expires_at"),
+		status: text()
+			.$type<AwsMarketplaceCustomerStatus>()
+			.notNull()
+			.default("pending"),
+		planId: text("plan_id"),
+		seats: integer(),
+		entitlementExpiresAt: timestamp("entitlement_expires_at"),
+		entitlementsSyncedAt: timestamp("entitlements_synced_at"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		uniqueIndex("aws_marketplace_customers_license_arn_unique").on(
+			table.licenseArn,
+		),
+		uniqueIndex("aws_marketplace_customers_organization_id_unique")
+			.on(table.organizationId)
+			.where(sql`${table.organizationId} is not null`),
+		uniqueIndex("aws_marketplace_customers_claim_token_hash_unique").on(
+			table.claimTokenHash,
+		),
+		index("aws_marketplace_customers_aws_account_id_idx").on(
+			table.awsAccountId,
+		),
+	],
+);
+
+export type InsertAwsMarketplaceCustomer =
+	typeof awsMarketplaceCustomers.$inferInsert;
+export type SelectAwsMarketplaceCustomer =
+	typeof awsMarketplaceCustomers.$inferSelect;
 
 // Device presence — v1 concept. Tracks per-(user, machine) presence for
 // MCP ownership verification. Untouched by the v2 host consolidation; will
@@ -836,17 +912,21 @@ export const environments = pgTable(
 		sourceRef: text("source_ref").notNull(),
 		/** Where its golden lives and every box forked from it runs; a snapshot only exists in its region. */
 		region: text().notNull().default("sfo1"),
-		/** The sandbox bundle every workspace of this environment boots on; null keeps the image's own. */
-		bundleSha: text("bundle_sha"),
+		/** The sandbox bundle every workspace of this environment boots on: the newest `sandbox_bundles` row at create, moved by every release. */
+		bundleSha: text("bundle_sha").notNull(),
 		/**
-		 * Which of the environment's repositories carries the `.superset/config.json`
-		 * the box acts on; null means none does and only `hooks` applies.
+		 * The repository a workspace opens on. Its Paradev config is the one
+		 * the box runs. Null only after the repository is removed from GitHub.
 		 */
-		hooksRepositoryId: uuid("hooks_repository_id").references(
+		primaryRepositoryId: uuid("primary_repository_id").references(
 			() => githubRepositories.id,
 			{ onDelete: "set null" },
 		),
 		scope: environmentScope().notNull().default("organization"),
+		/** The size a workspace boots at when its create names none; null means the organization's default. */
+		machineSize: text("machine_size"),
+		/** The `config.toml` its builds and boxes run; null falls back to the primary repository's own file. */
+		config: text(),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -865,9 +945,21 @@ export const environments = pgTable(
 );
 
 /**
- * The repositories an environment checks out, in order; the first is the
- * primary. An environment with none (the shared image environment) takes
- * its repositories at workspace create.
+ * Every sandbox bundle a release published, so "the current bundle" is a row
+ * and not whichever environment the release last touched. The newest is what
+ * a new environment pins to; rolling back is inserting the previous sha.
+ */
+export const sandboxBundles = pgTable("sandbox_bundles", {
+	sha: text().primaryKey(),
+	imageRef: text("image_ref").notNull(),
+	releasedAt: timestamp("released_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+});
+
+/**
+ * The repositories an environment checks out. Which one is primary is
+ * `environments.primary_repository_id`.
  */
 export const environmentRepositories = pgTable(
 	"environment_repositories",
@@ -888,6 +980,32 @@ export const environmentRepositories = pgTable(
 		index("environment_repositories_environment_id_idx").on(
 			table.environmentId,
 		),
+	],
+);
+
+/** Projects an environment is linked to; the new-workspace picker offers linked environments first. */
+export const environmentProjects = pgTable(
+	"environment_projects",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		/** A host project's key; projects live on hosts, so there is no row to reference. */
+		projectId: text("project_id").notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		unique("environment_projects_environment_id_project_id_unique").on(
+			table.environmentId,
+			table.projectId,
+		),
+		index("environment_projects_project_id_idx").on(table.projectId),
 	],
 );
 
@@ -925,6 +1043,48 @@ export const environmentSecrets = pgTable(
 		index("environment_secrets_organization_id_idx").on(table.organizationId),
 	],
 );
+
+/**
+ * One build of an environment's golden from `[install]`. The running row is
+ * the lock: at most one per environment. A build keeps the newest goldens
+ * and deletes older ones, setting `golden_deleted_at`; a kept one can be
+ * restored.
+ */
+export const environmentBuilds = pgTable(
+	"environment_builds",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		// No foreign keys to the auth tables: creating one locks a hot parent.
+		organizationId: uuid("organization_id").notNull(),
+		status: environmentBuildStatus().notNull().default("running"),
+		trigger: environmentBuildTrigger().notNull(),
+		kind: environmentBuildKind().notNull(),
+		repositoryIds: uuid("repository_ids").array().notNull(),
+		primaryRepositoryId: uuid("primary_repository_id"),
+		commitSha: text("commit_sha"),
+		goldenRef: text("golden_ref"),
+		goldenDeletedAt: timestamp("golden_deleted_at", { withTimezone: true }),
+		error: text(),
+		startedAt: timestamp("started_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		finishedAt: timestamp("finished_at", { withTimezone: true }),
+	},
+	(table) => [
+		index("environment_builds_environment_id_started_at_idx").on(
+			table.environmentId,
+			desc(table.startedAt),
+		),
+		uniqueIndex("environment_builds_one_running_idx")
+			.on(table.environmentId)
+			.where(sql`${table.status} = 'running'`),
+	],
+);
+
+export type SelectEnvironmentBuild = typeof environmentBuilds.$inferSelect;
 
 export const cloudWorkspaces = pgTable(
 	"cloud_workspaces",
@@ -964,9 +1124,19 @@ export const cloudWorkspaces = pgTable(
 			onDelete: "set null",
 		}),
 		deletedAt: timestamp("deleted_at", { withTimezone: true }),
+		/** When the box stops because its organization reached its usage limit; null otherwise. */
+		usageStopAt: timestamp("usage_stop_at", { withTimezone: true }),
+		/** When the box's session ends unless extended; past once it stopped, null if never seen. */
+		sandboxExpiresAt: timestamp("sandbox_expires_at", { withTimezone: true }),
+		/** Vercel's id for the box's current session; a stop or sweep writes asleep only while it is unchanged. */
+		sandboxSessionId: text("sandbox_session_id"),
+		/** Null on workspaces made before sizes existed; they run large. */
+		machineSize: text("machine_size"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
+		failureReason: cloudWorkspaceFailureReason("failure_reason"),
+		failedAt: timestamp("failed_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -985,9 +1155,65 @@ export const cloudWorkspaces = pgTable(
 );
 
 /**
+ * Who something is shared with beyond its general access. Each row grants to
+ * exactly one of: a member, a team (whoever is in it now), or a pending org
+ * invitation that becomes a member row when the invitee joins.
+ */
+const shareColumns = () => ({
+	id: uuid().primaryKey().defaultRandom(),
+	userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+	teamId: uuid("team_id").references(() => teams.id, { onDelete: "cascade" }),
+	invitationId: uuid("invitation_id").references(() => invitations.id, {
+		onDelete: "cascade",
+	}),
+	sharedByUserId: uuid("shared_by_user_id").references(() => users.id, {
+		onDelete: "set null",
+	}),
+	createdAt: timestamp("created_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+});
+
+const oneGrantee = sql`num_nonnulls(user_id, team_id, invitation_id) = 1`;
+
+export const cloudWorkspaceShares = pgTable(
+	"cloud_workspace_shares",
+	{
+		...shareColumns(),
+		cloudWorkspaceId: uuid("cloud_workspace_id")
+			.notNull()
+			.references(() => cloudWorkspaces.id, { onDelete: "cascade" }),
+	},
+	(table) => [
+		uniqueIndex("cloud_workspace_shares_user_unique").on(
+			table.cloudWorkspaceId,
+			table.userId,
+		),
+		uniqueIndex("cloud_workspace_shares_team_unique").on(
+			table.cloudWorkspaceId,
+			table.teamId,
+		),
+		uniqueIndex("cloud_workspace_shares_invitation_unique").on(
+			table.cloudWorkspaceId,
+			table.invitationId,
+		),
+		index("cloud_workspace_shares_user_id_idx").on(table.userId),
+		index("cloud_workspace_shares_team_id_idx").on(table.teamId),
+		index("cloud_workspace_shares_invitation_id_idx").on(table.invitationId),
+		index("cloud_workspace_shares_shared_by_user_id_idx").on(
+			table.sharedByUserId,
+		),
+		check("cloud_workspace_shares_one_grantee", oneGrantee),
+	],
+);
+
+export type SelectCloudWorkspaceShare =
+	typeof cloudWorkspaceShares.$inferSelect;
+
+/**
  * What a cloud workspace checked out, fixed at create: each repository on a
- * branch at a path under the workspace root. The first is the primary, the
- * one the workspace opens on.
+ * branch at a path under the workspace root. The primary is the environment's
+ * `primary_repository_id`.
  */
 export const cloudWorkspaceRepositories = pgTable(
 	"cloud_workspace_repositories",
@@ -1012,26 +1238,184 @@ export const cloudWorkspaceRepositories = pgTable(
 	],
 );
 
-/** Who has opened a cloud workspace, and when they were last in it. */
-export const cloudWorkspacePresence = pgTable(
-	"cloud_workspace_presence",
+/**
+ * Plain-string tags on cloud workspaces: the sidebar's folder membership,
+ * the same model as host-service `workspace_tags`. They live here rather
+ * than in the sandbox's host.db because the sidebar files a box while it
+ * sleeps. `tag` is stored already-normalized (`@superset/shared/workspace-tags`).
+ * A tag belongs to whoever applied it, so one member's folders never appear
+ * in a teammate's sidebar.
+ */
+export const cloudWorkspaceTags = pgTable(
+	"cloud_workspace_tags",
 	{
 		cloudWorkspaceId: uuid("cloud_workspace_id")
 			.notNull()
 			.references(() => cloudWorkspaces.id, { onDelete: "cascade" }),
-		userId: uuid("user_id")
+		tag: text().notNull(),
+		createdByUserId: uuid("created_by_user_id")
 			.notNull()
 			.references(() => users.id, { onDelete: "cascade" }),
-		firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
-			.notNull()
-			.defaultNow(),
-		lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
 	},
 	(table) => [
-		primaryKey({ columns: [table.cloudWorkspaceId, table.userId] }),
-		index("cloud_workspace_presence_user_id_idx").on(table.userId),
+		primaryKey({
+			columns: [table.cloudWorkspaceId, table.tag, table.createdByUserId],
+		}),
+	],
+);
+
+/** A boot with usage left to finalize or a lock left to give back: the reconcile's open set. */
+export function openBoot(boot: {
+	stoppedAt: AnyPgColumn;
+	finalizedThrough: AnyPgColumn;
+	lockOpen: AnyPgColumn;
+}): SQL {
+	return sql`(${boot.stoppedAt} is null or ${boot.finalizedThrough} is null or ${boot.finalizedThrough} < ${boot.stoppedAt} or ${boot.lockOpen})`;
+}
+
+export const cloudWorkspaceBoots = pgTable(
+	"cloud_workspace_boots",
+	{
+		id: text().primaryKey(),
+		vercelSessionId: text("vercel_session_id").unique(),
+		organizationId: uuid("organization_id").notNull(),
+		cloudWorkspaceId: uuid("cloud_workspace_id").references(
+			() => cloudWorkspaces.id,
+			{ onDelete: "set null" },
+		),
+		memoryMb: integer("memory_mb").notNull(),
+		vcpus: integer().notNull(),
+		startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+		stoppedAt: timestamp("stopped_at", { withTimezone: true }),
+		lockSeq: integer("lock_seq").notNull().default(0),
+		lockOpen: boolean("lock_open").notNull().default(true),
+		finalizedThrough: timestamp("finalized_through", { withTimezone: true }),
+		settleLeaseUntil: timestamp("settle_lease_until", { withTimezone: true }),
+		endReason: cloudWorkspaceBootEndReason("end_reason"),
+		origin: cloudWorkspaceBootOrigin(),
+		activeCpuMs: bigint("active_cpu_ms", { mode: "number" }),
+		egressBytes: bigint("egress_bytes", { mode: "number" }),
+		phases: jsonb().$type<CloudWorkspaceBootPhase[]>(),
+		traceId: text("trace_id"),
+		/** Usage rows Autumn accepted that could not be written; the meter's reconcile writes them. */
+		pendingUsageEvents: jsonb("pending_usage_events").$type<
+			PendingUsageEvent[]
+		>(),
+		// No foreign key, like organization_id: the boot keeps who it bills after the user is deleted.
+		createdByUserId: uuid("created_by_user_id"),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("cloud_workspace_boots_cloud_workspace_id_idx").on(
+			table.cloudWorkspaceId,
+		),
+		index("cloud_workspace_boots_organization_id_idx").on(table.organizationId),
+		index("cloud_workspace_boots_pending_usage_idx")
+			.on(table.id)
+			.where(sql`${table.pendingUsageEvents} is not null`),
+		index("cloud_workspace_boots_open_or_locked_idx")
+			.on(table.startedAt)
+			.where(openBoot(table)),
+	],
+);
+
+/** One amount we sent to Autumn: one window of one lock of a boot, for one feature. */
+export const cloudUsageEvents = pgTable(
+	"cloud_usage_events",
+	{
+		bootId: text("boot_id")
+			.notNull()
+			.references(() => cloudWorkspaceBoots.id),
+		lockSeq: integer("lock_seq").notNull(),
+		feature: cloudUsageFeature().notNull(),
+		// The attribution as sent to Autumn, so no foreign keys: a deleted row must not change billed history.
+		organizationId: uuid("organization_id").notNull(),
+		cloudWorkspaceId: uuid("cloud_workspace_id"),
+		userId: uuid("user_id"),
+		windowFrom: timestamp("window_from", { withTimezone: true }).notNull(),
+		windowTo: timestamp("window_to", { withTimezone: true }).notNull(),
+		amount: numeric({ precision: 20, scale: 6 }).notNull(),
+		sentAt: timestamp("sent_at", { withTimezone: true }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.bootId, table.lockSeq, table.feature, table.windowFrom],
+		}),
+		index("cloud_usage_events_organization_id_sent_at_idx").on(
+			table.organizationId,
+			table.sentAt,
+		),
+		index("cloud_usage_events_unsent_idx")
+			.on(table.createdAt)
+			.where(sql`${table.sentAt} is null`),
+	],
+);
+
+export type InsertCloudUsageEvent = typeof cloudUsageEvents.$inferInsert;
+export type SelectCloudUsageEvent = typeof cloudUsageEvents.$inferSelect;
+
+/**
+ * Billed box_gb_minutes events per billing day of sent_at: Vercel's day, Pacific time with daylight saving.
+ * Written only by the trigger cloud_usage_daily on cloud_usage_events, through cloud_usage_daily_apply and
+ * cloud_usage_daily_add. It keys on the boot's vcpus when the event is written, so a boot's vcpus must not
+ * change after its first event.
+ */
+export const cloudUsageDaily = pgTable(
+	"cloud_usage_daily",
+	{
+		organizationId: uuid("organization_id").notNull(),
+		day: date({ mode: "string" }).notNull(),
+		userId: uuid("user_id"),
+		vcpus: integer().notNull(),
+		gbMinutes: numeric("gb_minutes").notNull(),
+		seconds: numeric().notNull(),
+		events: integer().notNull(),
+	},
+	(table) => [
+		unique("cloud_usage_daily_key")
+			.on(table.organizationId, table.day, table.userId, table.vcpus)
+			.nullsNotDistinct(),
+	],
+);
+
+export const cloudWorkspacePullRequests = pgTable(
+	"cloud_workspace_pull_requests",
+	{
+		cloudWorkspaceId: uuid("cloud_workspace_id")
+			.notNull()
+			.references(() => cloudWorkspaces.id, { onDelete: "cascade" }),
+		repositoryId: uuid("repository_id")
+			.notNull()
+			.references(() => githubRepositories.id, { onDelete: "cascade" }),
+		prNumber: integer("pr_number").notNull(),
+		linkedAt: timestamp("linked_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		primaryKey({
+			name: "cloud_workspace_pull_requests_pk",
+			columns: [table.cloudWorkspaceId, table.repositoryId, table.prNumber],
+		}),
+		index("cloud_workspace_pull_requests_repository_id_idx").on(
+			table.repositoryId,
+		),
 	],
 );
 
@@ -1097,6 +1481,13 @@ export const cloudWorkspaceActivity = pgTable(
 		toName: text("to_name"),
 		fromVisibility: cloudWorkspaceVisibility("from_visibility"),
 		toVisibility: cloudWorkspaceVisibility("to_visibility"),
+		targetUserId: uuid("target_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		targetTeamId: uuid("target_team_id").references(() => teams.id, {
+			onDelete: "set null",
+		}),
+		targetEmail: text("target_email"),
 		fromProjectId: uuid("from_project_id").references(() => taskProjects.id, {
 			onDelete: "set null",
 		}),
@@ -1131,6 +1522,8 @@ export const cloudWorkspaceActivity = pgTable(
 		index("cloud_workspace_activity_unlinked_task_id_idx").on(
 			table.unlinkedTaskId,
 		),
+		index("cloud_workspace_activity_target_user_id_idx").on(table.targetUserId),
+		index("cloud_workspace_activity_target_team_id_idx").on(table.targetTeamId),
 	],
 );
 
@@ -1314,6 +1707,11 @@ export const v2Hosts = pgTable(
 		version: text(),
 		platform: text(),
 		installSource: text("install_source"),
+		// Whether the owner lets their cloud workspaces reach this host through
+		// the relay.
+		allowCloudWorkspaces: boolean("allow_cloud_workspaces")
+			.notNull()
+			.default(false),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -1496,6 +1894,11 @@ export const chatSessions = pgTable(
 		}),
 		v2WorkspaceId: uuid("v2_workspace_id"),
 		title: text(),
+		harness: text(),
+		harnessSessionId: text("harness_session_id"),
+		epoch: text(),
+		lastSeq: integer("last_seq"),
+		status: text(),
 		lastActiveAt: timestamp("last_active_at").notNull().defaultNow(),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -1576,6 +1979,9 @@ export const automations = pgTable(
 		// clearing the set in the editor is the opt-out.
 		tags: jsonb().$type<string[]>().notNull().default(["automation"]),
 
+		// Groups the automation in the automations list. Null = ungrouped.
+		group: text("group_name"),
+
 		// Deliver each run's prompt into the agent session the previous run
 		// left behind, rather than starting another beside it. Needs a pinned
 		// v2WorkspaceId or cloudWorkspaceId — that is where the session lives.
@@ -1585,9 +1991,14 @@ export const automations = pgTable(
 		continueAgentSession: boolean("continue_agent_session")
 			.notNull()
 			.default(false),
+		// With no pinned workspace, keep the one the first run creates as the
+		// pin, so later runs reuse it.
+		reuseWorkspace: boolean("reuse_workspace").notNull().default(false),
+		machineSize: text("machine_size"),
 
 		// The schedule lives in the automation's `schedule` trigger.
 		enabled: boolean().notNull().default(true),
+		archivedAt: timestamp("archived_at", { withTimezone: true }),
 
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
@@ -1966,6 +2377,10 @@ export const pages = pgTable(
 		title: text().notNull(),
 		description: text(),
 		visibility: pageVisibility().notNull().default("just_me"),
+		/** What general access lets org members and public readers do; public readers can never comment. */
+		organizationRole: pageShareRole("organization_role")
+			.notNull()
+			.default("comment"),
 		sharedVersion: integer("shared_version"),
 		takenDownAt: timestamp("taken_down_at", { withTimezone: true }),
 		takenDownByUserId: uuid("taken_down_by_user_id").references(
@@ -1997,6 +2412,32 @@ export const pages = pgTable(
 
 export type InsertPage = typeof pages.$inferInsert;
 export type SelectPage = typeof pages.$inferSelect;
+
+export const pageShares = pgTable(
+	"page_shares",
+	{
+		...shareColumns(),
+		pageId: uuid("page_id")
+			.notNull()
+			.references(() => pages.id, { onDelete: "cascade" }),
+		role: pageShareRole().notNull().default("comment"),
+	},
+	(table) => [
+		uniqueIndex("page_shares_user_unique").on(table.pageId, table.userId),
+		uniqueIndex("page_shares_team_unique").on(table.pageId, table.teamId),
+		uniqueIndex("page_shares_invitation_unique").on(
+			table.pageId,
+			table.invitationId,
+		),
+		index("page_shares_user_id_idx").on(table.userId),
+		index("page_shares_team_id_idx").on(table.teamId),
+		index("page_shares_invitation_id_idx").on(table.invitationId),
+		index("page_shares_shared_by_user_id_idx").on(table.sharedByUserId),
+		check("page_shares_one_grantee", oneGrantee),
+	],
+);
+
+export type SelectPageShare = typeof pageShares.$inferSelect;
 
 export const pageVersions = pgTable(
 	"page_versions",
@@ -2095,6 +2536,30 @@ export const workspacePages = pgTable(
 export type InsertWorkspacePage = typeof workspacePages.$inferInsert;
 export type SelectWorkspacePage = typeof workspacePages.$inferSelect;
 
+export const pageToolGrants = pgTable(
+	"page_tool_grants",
+	{
+		pageId: uuid("page_id")
+			.notNull()
+			.references(() => pages.id, { onDelete: "cascade" }),
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		plugin: text().notNull(),
+		connectionId: uuid("connection_id"),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.pageId, table.userId, table.plugin] }),
+		index("page_tool_grants_user_id_idx").on(table.userId),
+	],
+);
+
+export type InsertPageToolGrant = typeof pageToolGrants.$inferInsert;
+export type SelectPageToolGrant = typeof pageToolGrants.$inferSelect;
+
 export const fileStatus = pgEnum("file_status", ["pending", "ready"]);
 
 export const attachmentParentKind = pgEnum("attachment_parent_kind", [
@@ -2113,6 +2578,8 @@ export const attachmentParentKind = pgEnum("attachment_parent_kind", [
 	"task_comment",
 	// A file in a project's description; the parent id is the project's.
 	"project_description",
+	// A file sent in a channel; the parent id is the channel_messages row's.
+	"channel_message",
 ]);
 
 /**
@@ -2281,6 +2748,33 @@ export const pageComments = pgTable(
 
 export type InsertPageComment = typeof pageComments.$inferInsert;
 export type SelectPageComment = typeof pageComments.$inferSelect;
+
+/**
+ * The viewer's read watermark for a page's comments: everything on the page
+ * created at or before `lastSeenAt` counts as seen by that user. One row per
+ * (user, page), advanced whenever they view the page's comments.
+ */
+export const pageCommentReads = pgTable(
+	"page_comment_reads",
+	{
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		pageId: uuid("page_id")
+			.notNull()
+			.references(() => pages.id, { onDelete: "cascade" }),
+		lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.userId, table.pageId] }),
+		index("page_comment_reads_page_id_idx").on(table.pageId),
+	],
+);
+
+export type InsertPageCommentRead = typeof pageCommentReads.$inferInsert;
+export type SelectPageCommentRead = typeof pageCommentReads.$inferSelect;
 
 /**
  * A person's own agent sign-in, used when they start a cloud workspace. The

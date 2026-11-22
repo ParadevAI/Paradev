@@ -11,7 +11,7 @@ interface OpenInSupersetButtonProps {
 
 export function OpenInSupersetButton({ slug }: OpenInSupersetButtonProps) {
 	const { t } = useLingui();
-	const label = t({ message: "Open in Superset" });
+	const label = t({ message: "Open in Paradev" });
 
 	return (
 		<Tooltip>

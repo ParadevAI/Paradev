@@ -9,12 +9,17 @@ const MAX_ENTRIES = 100;
 
 type LocationState = HistoryLocation["state"];
 
+// Entries saved without this marker come from builds where `/workspace` was
+// the v1 route and v2 lived under `/v2-workspace`.
+const ROUTE_SCHEME = 2;
+
 interface PersistedState {
 	entries: string[];
 	index: number;
+	routes?: number;
 }
 
-export interface HistoryEntry {
+interface HistoryEntry {
 	path: string;
 	timestamp: number;
 }
@@ -34,7 +39,11 @@ function loadPersistedState(): PersistedState {
 					Math.max(parsed.index, 0),
 					parsed.entries.length - 1,
 				);
-				return { entries: parsed.entries, index };
+				const entries =
+					parsed.routes === ROUTE_SCHEME
+						? parsed.entries
+						: parsed.entries.map(restoreLegacyEntry);
+				return { entries, index };
 			}
 		}
 	} catch {}
@@ -53,7 +62,11 @@ function persistState(entries: string[], index: number) {
 				: index;
 		localStorage.setItem(
 			STORAGE_KEY,
-			JSON.stringify({ entries: capped, index: cappedIndex }),
+			JSON.stringify({
+				entries: capped,
+				index: cappedIndex,
+				routes: ROUTE_SCHEME,
+			}),
 		);
 	} catch {}
 }
@@ -103,8 +116,15 @@ function parseHref(href: string, state: LocationState): HistoryLocation {
 	};
 }
 
-export interface PersistentHashHistory extends RouterHistory {
+interface PersistentHashHistory extends RouterHistory {
 	getEntries: () => HistoryEntry[];
+}
+
+const RETIRED_V1_ROUTE = /^\/(?:project|workspaces?)(?:\/|$|\?)/;
+
+function restoreLegacyEntry(entry: string): string {
+	if (RETIRED_V1_ROUTE.test(entry)) return "/";
+	return entry.replace(/^\/v2-workspace(s)?(?=\/|$|\?)/, "/workspace$1");
 }
 
 export function createPersistentHashHistory(): PersistentHashHistory {

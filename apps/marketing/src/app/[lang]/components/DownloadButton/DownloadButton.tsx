@@ -4,17 +4,19 @@ import { Trans } from "@lingui/react/macro";
 import { useRouter } from "next/navigation";
 import {
 	HiMiniArrowDownTray,
+	HiMiniArrowRight,
 	HiMiniClock,
 	HiMiniEnvelope,
 } from "react-icons/hi2";
-import { track } from "@/lib/analytics";
+import { type DownloadSource, track } from "@/lib/analytics";
 import { isMacPlatform, Platform, usePlatform } from "../../hooks/useOS";
 
 interface DownloadButtonProps {
 	size?: "sm" | "md";
 	className?: string;
-	source?: "header" | "hero" | "footer";
+	source?: DownloadSource;
 	onJoinWaitlist?: () => void;
+	signInUrl?: string;
 }
 
 const INTERSTITIAL_PATH = "/download";
@@ -24,6 +26,7 @@ export function DownloadButton({
 	className = "",
 	source,
 	onJoinWaitlist,
+	signInUrl,
 }: DownloadButtonProps) {
 	const router = useRouter();
 	const { platform } = usePlatform();
@@ -76,6 +79,37 @@ export function DownloadButton({
 				</span>
 				{downloadIcon}
 			</button>
+		);
+	}
+
+	if (platform === Platform.Linux) {
+		return (
+			<button
+				type="button"
+				className={buttonClasses}
+				onClick={goToInterstitial}
+			>
+				<span className="hidden sm:inline">
+					<Trans>Download for Linux</Trans>
+				</span>
+				<span className="sm:hidden">
+					<Trans>Download</Trans>
+				</span>
+				{downloadIcon}
+			</button>
+		);
+	}
+
+	if (signInUrl) {
+		return (
+			<a
+				href={signInUrl}
+				className={buttonClasses}
+				onClick={() => track("sign_in_clicked", { platform, source })}
+			>
+				<Trans>Sign in</Trans>
+				<HiMiniArrowRight className="size-4" />
+			</a>
 		);
 	}
 

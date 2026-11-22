@@ -1,37 +1,40 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
 import type { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { stub } from "../test/stub";
+import { posthog } from "./lib/analytics";
 
 const CREATOR_ORGS = ["box-org", "other-org"];
+let membership: { id: string } | undefined = { id: "membership" };
 
-mock.module("@superset/db/client", () => ({
-	db: {
-		query: {
-			members: {
-				findMany: async () =>
-					CREATOR_ORGS.map((organizationId) => ({ organizationId })),
-				findFirst: async () => ({ id: "membership" }),
-			},
-		},
-	},
-	dbWs: {},
-}));
-mock.module("./lib/analytics", () => ({
-	posthog: { capture: () => {}, isFeatureEnabled: async () => false },
-}));
+stub(db.query.members, {
+	findMany: async () =>
+		CREATOR_ORGS.map((organizationId) => ({ organizationId })),
+	findFirst: async () => membership,
+});
+stub(posthog, { capture: () => {}, isFeatureEnabled: async () => false });
 
 const {
 	createCallerFactory,
 	createTRPCContext,
 	createTRPCRouter,
-	jwtProcedure,
-	protectedProcedure,
+	personProcedure,
 } = await import("./trpc");
+const { isMember } = await import("./lib/cloud-guards");
 
-const reached = jwtProcedure.mutation(() => "reached");
+const reached = personProcedure.mutation(() => "reached");
+const organizationInput = z.object({ organizationId: z.string() });
 
 const router = createTRPCRouter({
 	cloudWorkspace: createTRPCRouter({
-		list: jwtProcedure.query(({ ctx }) => ctx.organizationIds),
+		list: personProcedure.query(async ({ ctx }) => {
+			const visible: string[] = [];
+			for (const id of CREATOR_ORGS) {
+				if (await isMember(ctx, id)) visible.push(id);
+			}
+			return visible;
+		}),
 		delete: reached,
 		rename: reached,
 		setDescription: reached,
@@ -40,8 +43,20 @@ const router = createTRPCRouter({
 		setVisibility: reached,
 		restart: reached,
 	}),
+	connectors: createTRPCRouter({
+		connectApiKey: personProcedure
+			.input(organizationInput)
+			.mutation(() => "reached"),
+		disconnect: reached,
+		status: personProcedure.input(organizationInput).query(() => "reached"),
+	}),
+	plugins: createTRPCRouter({
+		organization: createTRPCRouter({
+			sources: createTRPCRouter({ add: reached }),
+		}),
+	}),
 	user: createTRPCRouter({
-		myOrganization: protectedProcedure.query(
+		myOrganization: personProcedure.query(
 			({ ctx }) => ctx.activeOrganizationId,
 		),
 	}),
@@ -60,26 +75,27 @@ const session = {
 
 const callerFor = ({
 	sandboxCaller = BOX as typeof BOX | null,
-	bearer = false,
 	organization,
+	tokenOrganizations,
 }: {
 	sandboxCaller?: typeof BOX | null;
-	bearer?: boolean;
 	organization?: string;
+	tokenOrganizations?: string[];
 } = {}) => {
 	const headers = new Headers();
-	if (bearer) headers.set("authorization", "Bearer token");
 	if (organization) headers.set("x-superset-organization-id", organization);
 	return createCallerFactory(router)(
 		createTRPCContext({
-			session: session as never,
-			auth: {
-				api: {
-					verifyJWT: async () => ({
-						payload: { sub: "creator", organizationIds: CREATOR_ORGS },
-					}),
-				},
-			} as never,
+			session: (tokenOrganizations
+				? {
+						...session,
+						session: {
+							activeOrganizationId: null,
+							organizationIds: tokenOrganizations,
+						},
+					}
+				: session) as never,
+			auth: {} as never,
 			headers,
 			sandboxCaller,
 		}),
@@ -107,10 +123,24 @@ describe("what a cloud workspace may call", () => {
 	});
 
 	test.each([
-		["unarchive", () => box.cloudWorkspace.unarchive()],
-		["setVisibility", () => box.cloudWorkspace.setVisibility()],
-		["restart", () => box.cloudWorkspace.restart()],
-	])("a box is refused cloudWorkspace.%s", async (_name, call) => {
+		[
+			"plugins.organization.sources.add",
+			() => box.plugins.organization.sources.add(),
+		],
+		[
+			"connectors.connectApiKey",
+			() => box.connectors.connectApiKey({ organizationId: "box-org" }),
+		],
+	])("a box reaches %s", async (_name, call) => {
+		expect(await outcome(call)).toBe("reached");
+	});
+
+	test.each([
+		["cloudWorkspace.unarchive", () => box.cloudWorkspace.unarchive()],
+		["cloudWorkspace.setVisibility", () => box.cloudWorkspace.setVisibility()],
+		["cloudWorkspace.restart", () => box.cloudWorkspace.restart()],
+		["connectors.disconnect", () => box.connectors.disconnect()],
+	])("a box is refused %s", async (_name, call) => {
 		expect(await outcome(call)).toBe("FORBIDDEN");
 	});
 
@@ -123,24 +153,29 @@ describe("what a cloud workspace may call", () => {
 });
 
 describe("the organization a cloud workspace acts in", () => {
-	test.each([
-		["its session", false],
-		["a bearer", true],
-	])("a box sees only its own organization through %s", async (_name, bearer) => {
-		const box = callerFor({ bearer });
-		expect(await box.cloudWorkspace.list()).toEqual(["box-org"]);
+	test("a box is a member of its own organization only", async () => {
+		expect(await callerFor().cloudWorkspace.list()).toEqual(["box-org"]);
+	});
+
+	test("a box may not name another of its creator's organizations", async () => {
+		expect(
+			await outcome(() =>
+				callerFor({ organization: "other-org" }).user.myOrganization(),
+			),
+		).toBe("FORBIDDEN");
 	});
 
 	test.each([
 		[
-			"jwtProcedure",
-			() => callerFor({ organization: "other-org" }).cloudWorkspace.list(),
+			"connectors.connectApiKey",
+			() =>
+				callerFor().connectors.connectApiKey({ organizationId: "other-org" }),
 		],
 		[
-			"protectedProcedure",
-			() => callerFor({ organization: "other-org" }).user.myOrganization(),
+			"connectors.status",
+			() => callerFor().connectors.status({ organizationId: "other-org" }),
 		],
-	])("%s refuses a box another of its creator's organizations", async (_name, call) => {
+	])("a box may not name another organization in the input of %s", async (_name, call) => {
 		expect(await outcome(call)).toBe("FORBIDDEN");
 	});
 
@@ -157,5 +192,52 @@ describe("the organization a cloud workspace acts in", () => {
 		});
 		expect(await client.cloudWorkspace.list()).toEqual(CREATOR_ORGS);
 		expect(await client.user.myOrganization()).toBe("other-org");
+	});
+});
+
+describe("a bearer's token", () => {
+	test("vouches for the organizations it lists without a lookup", async () => {
+		membership = undefined;
+		try {
+			const bearer = callerFor({
+				sandboxCaller: null,
+				organization: "other-org",
+				tokenOrganizations: ["other-org"],
+			});
+			expect(await bearer.user.myOrganization()).toBe("other-org");
+			expect(await bearer.cloudWorkspace.list()).toEqual(["other-org"]);
+		} finally {
+			membership = { id: "membership" };
+		}
+	});
+
+	test("an organization joined since the token was minted is looked up", async () => {
+		const bearer = callerFor({
+			sandboxCaller: null,
+			organization: "other-org",
+			tokenOrganizations: ["box-org"],
+		});
+		expect(await bearer.user.myOrganization()).toBe("other-org");
+	});
+});
+
+describe("a caller outside the organization it asks for", () => {
+	test("is told which account it is signed in as and how to fix it", async () => {
+		membership = undefined;
+		try {
+			const client = callerFor({
+				sandboxCaller: null,
+				organization: "foreign-org",
+			});
+			const error = (await client.user
+				.myOrganization()
+				.catch((thrown: unknown) => thrown)) as TRPCError;
+			expect(error.code).toBe("FORBIDDEN");
+			expect(error.message).toContain("foreign-org");
+			expect(error.message).toContain("creator@example.com");
+			expect(error.message).toContain("superset auth login");
+		} finally {
+			membership = { id: "membership" };
+		}
 	});
 });

@@ -2,11 +2,11 @@ import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
 import { COMPANY } from "@superset/shared/constants";
-import { githubRepoSlug } from "@superset/shared/github-stars";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { getGitHubStars } from "../utils/getGitHubStars";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -20,34 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
 		description: i18n._(
 			msg({
 				message:
-					"Join the Superset community to get help, share ideas, and stay up to date with the latest news and updates.",
+					"Join the Paradev community to get help, share ideas, and stay up to date with the latest news and updates.",
 			}),
 		),
 		alternates: localizedAlternates(lang, "/community"),
 	};
-}
-
-interface GitHubRepoResponse {
-	stargazers_count: number;
-}
-
-async function getGitHubStars(): Promise<number | null> {
-	try {
-		const response = await fetch(
-			`https://api.github.com/repos/${githubRepoSlug()}`,
-			{
-				headers: { Accept: "application/vnd.github.v3+json" },
-				next: { revalidate: 3600 },
-			},
-		);
-
-		if (!response.ok) return null;
-
-		const data: GitHubRepoResponse = await response.json();
-		return data.stargazers_count;
-	} catch {
-		return null;
-	}
 }
 
 const COMMUNITY_LINKS = [
@@ -66,7 +43,7 @@ const COMMUNITY_LINKS = [
 	},
 	{
 		name: "YOUTUBE",
-		href: "https://www.youtube.com/@superset-sh",
+		href: COMPANY.YOUTUBE_URL,
 		cta: msg({
 			message: "SUBSCRIBE",
 		}),
@@ -79,7 +56,7 @@ const COMMUNITY_LINKS = [
 	},
 	{
 		name: "LINKEDIN",
-		href: "https://www.linkedin.com/company/superset-sh",
+		href: COMPANY.LINKEDIN_URL,
 		cta: msg({
 			message: "FOLLOW US",
 		}),
@@ -134,7 +111,7 @@ export default async function CommunityPage() {
 					</h1>
 					<p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
 						<Trans>
-							Join the <span className="font-semibold italic">Superset</span>{" "}
+							Join the <span className="font-semibold italic">Paradev</span>{" "}
 							community to get help, share ideas, and stay up to date with the
 							latest news and updates.
 						</Trans>

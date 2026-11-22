@@ -1,0 +1,1 @@
+export { useWorkspaceOpenInHotkey } from "./useWorkspaceOpenInHotkey";

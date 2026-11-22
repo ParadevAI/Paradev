@@ -1,12 +1,26 @@
 import { useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { cn } from "@superset/ui/utils";
-import type { ReactNode } from "react";
+import { lazy, type ReactNode, Suspense } from "react";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { WorkItemDetailState } from "../../../components/WorkItemDetailState";
 import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
-import { pullRequestReadErrorMessage } from "../../utils/combinePullRequestReadErrors";
-import { PullRequestCodeTab } from "../PullRequestCodeTab";
+import type { PullRequestPreview } from "../../hooks/usePullRequestListPreview";
+import { needsGithubConnection } from "../../utils/pullRequestClient";
+import type { PullRequestActivityThreads } from "../PullRequestActivity";
+import type { PullRequestCommentTarget } from "../PullRequestConversationComposer";
+import { PullRequestDetailSkeleton } from "../PullRequestDetailSkeleton";
 import type { PullRequestDetailTab } from "../PullRequestDetailTabs";
 import { PullRequestSummaryContent } from "../PullRequestSummaryContent";
+import { PullRequestTabTitle } from "../PullRequestTabTitle";
+
+// The diff renderer and its worker pool are heavy and only the Changes tab
+// needs them, so the Summary paints without waiting on that chunk.
+const PullRequestCodeTab = lazy(() =>
+	import("../PullRequestCodeTab").then((module) => ({
+		default: module.PullRequestCodeTab,
+	})),
+);
 
 export function PullRequestDetailContent({
 	activeTab,
@@ -16,7 +30,10 @@ export function PullRequestDetailContent({
 	prNumber,
 	repoFullName,
 	detail,
-	children,
+	threads,
+	summaryAside,
+	commentTarget = null,
+	preview = null,
 }: {
 	activeTab: PullRequestDetailTab;
 	projectId: string | null;
@@ -31,7 +48,13 @@ export function PullRequestDetailContent({
 		error: unknown;
 		refetch: () => unknown;
 	};
-	children?: ReactNode;
+	/** The workspace pane's review threads for the Summary's activity rail. */
+	threads?: PullRequestActivityThreads;
+	summaryAside?: ReactNode;
+	/** Where a conversation comment posts; null hides the composer. */
+	commentTarget?: PullRequestCommentTarget | null;
+	/** Shown in the loading skeleton's header slot until the detail arrives. */
+	preview?: PullRequestPreview | null;
 }) {
 	const { t } = useLingui();
 	if (prNumber === null || (!repoFullName && !projectId && !detail.isLoading)) {
@@ -43,48 +66,69 @@ export function PullRequestDetailContent({
 		);
 	}
 	if (detail.isResolvingProject)
-		return (
-			<WorkItemDetailState
-				message={t({ message: "Loading pull request…" })}
-				isLoading
-			/>
-		);
+		return <PullRequestDetailSkeleton preview={preview} />;
 	const prUrl =
 		detail.data?.url ??
 		(repoFullName
 			? `https://github.com/${repoFullName}/pull/${prNumber}`
 			: null);
+	const detailState = detail.data ? null : detail.isLoading ? (
+		<PullRequestDetailSkeleton preview={preview} />
+	) : (
+		<WorkItemDetailState
+			message={
+				detail.error
+					? errorMessage(detail.error)
+					: t({ message: "Pull request not found" })
+			}
+			isError={!!detail.error}
+			onRetry={detail.error ? () => void detail.refetch() : undefined}
+			action={
+				needsGithubConnection(detail.error)
+					? {
+							label: t({ message: "Connect GitHub" }),
+							onClick: () =>
+								void cloudTrpcClient.githubUser.connect
+									.mutate()
+									.then(({ url }) => window.open(url, "_blank")),
+						}
+					: undefined
+			}
+		/>
+	);
 	return (
 		<>
 			{detail.data ? (
 				<div
-					className={cn("min-h-0 flex-1", activeTab !== "summary" && "hidden")}
+					className={cn(
+						"flex min-h-0 flex-1 flex-col",
+						activeTab !== "summary" && "hidden",
+					)}
 				>
-					<PullRequestSummaryContent data={detail.data}>
-						{children}
-					</PullRequestSummaryContent>
+					<PullRequestSummaryContent
+						data={detail.data}
+						commentTarget={commentTarget}
+						threads={threads}
+						aside={summaryAside}
+					/>
 				</div>
 			) : activeTab === "summary" || !prUrl ? (
-				<WorkItemDetailState
-					message={
-						detail.error
-							? pullRequestReadErrorMessage(detail.error)
-							: t({ message: "Loading pull request…" })
-					}
-					isLoading={detail.isLoading}
-					isError={!!detail.error}
-					onRetry={detail.error ? () => void detail.refetch() : undefined}
-				/>
+				detailState
 			) : null}
 			{activeTab === "code" && prUrl && (
-				<PullRequestCodeTab
-					key={`${repoFullName}#${prNumber}`}
-					projectId={projectId}
-					hostUrl={hostUrl ?? ""}
-					hostId={hostId}
-					prNumber={prNumber}
-					prUrl={prUrl}
-				/>
+				<div className="@container/detail flex min-h-0 flex-1 flex-col">
+					{detail.data ? <PullRequestTabTitle data={detail.data} /> : null}
+					<Suspense fallback={<PullRequestDetailSkeleton variant="diff" />}>
+						<PullRequestCodeTab
+							key={`${repoFullName}#${prNumber}`}
+							projectId={projectId}
+							hostUrl={hostUrl ?? ""}
+							hostId={hostId}
+							prNumber={prNumber}
+							prUrl={prUrl}
+						/>
+					</Suspense>
+				</div>
 			)}
 		</>
 	);

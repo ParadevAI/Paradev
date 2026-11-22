@@ -1,0 +1,1 @@
+export { markdownText } from "./markdownText";

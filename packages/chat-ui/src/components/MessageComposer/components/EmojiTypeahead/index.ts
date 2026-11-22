@@ -1,0 +1,1 @@
+export { EmojiTypeahead } from "./EmojiTypeahead";

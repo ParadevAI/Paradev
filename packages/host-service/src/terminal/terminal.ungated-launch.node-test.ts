@@ -228,6 +228,37 @@ describe("ungated launch protection", () => {
 			}
 		},
 	);
+
+	test(
+		"unattached session answers DA1 with the desktop identity",
+		{ timeout: 30_000 },
+		async () => {
+			// fish and tmux wait for DA1. A renderer does not answer queries it
+			// replays, so with none attached only the host can answer, and it
+			// must advertise what an attached desktop pane does (sixel).
+			const replyFile = path.join(TEST_HOME, `da1-reply-${process.pid}`);
+			const fakeShell = path.join(TEST_HOME, "da1-asker");
+			fs.writeFileSync(
+				fakeShell,
+				[
+					"#!/bin/bash",
+					"printf '\\033[c'",
+					"IFS='' read -r -d 'c' -t 5 _reply || true",
+					`printf '%s' "$_reply" > "${replyFile}"`,
+					"exec /bin/bash --noprofile --norc -i",
+					"",
+				].join("\n"),
+				{ mode: 0o755 },
+			);
+			__setAccountShellForTesting(fakeShell);
+			try {
+				await launchAndMeasure("date +%s");
+				assert.equal(fs.readFileSync(replyFile, "utf8"), "\x1b[?62;4;9;22");
+			} finally {
+				__setAccountShellForTesting("/bin/bash");
+			}
+		},
+	);
 });
 
 async function waitFor(predicate: () => boolean, ms: number): Promise<void> {

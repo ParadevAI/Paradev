@@ -2,20 +2,19 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { createElement, useState } from "react";
+import { createElement } from "react";
 import { LuArchive } from "react-icons/lu";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useArchivingCloudWorkspaceIds } from "renderer/hooks/useArchivingCloudWorkspaceIds";
-import { useHotkey } from "renderer/hotkeys";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useNavigateAwayFromWorkspace } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace";
 import type { WorkspaceRemovalNavigationTarget } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace/navigationTarget";
 import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
 import { moveCloudWorkspaceRow } from "renderer/routes/_authenticated/_dashboard/utils/moveCloudWorkspaceRow";
+import { useUndoStack } from "renderer/stores/undo-stack";
 
 interface ArchivedWorkspace {
 	id: string;
-	name: string;
 	toastId: string | number;
 }
 
@@ -27,7 +26,6 @@ export function useArchiveCloudWorkspace() {
 	const utils = cloudTrpc.useUtils();
 	const { navigateAwayFromWorkspace } = useNavigateAwayFromWorkspace();
 	const unarchive = useUnarchiveCloudWorkspace();
-	const [undoable, setUndoable] = useState<ArchivedWorkspace | null>(null);
 	const archiving = useArchivingCloudWorkspaceIds();
 	const { mutateAsync } = cloudTrpc.cloudWorkspace.delete.useMutation({
 		onMutate: async ({ id }) =>
@@ -54,28 +52,17 @@ export function useArchiveCloudWorkspace() {
 			]),
 	});
 
+	const undoEntryId = (id: string) => `archive-workspace:${id}`;
 	const clearUndoable = (id: string) =>
-		setUndoable((current) => (current?.id === id ? null : current));
+		useUndoStack.getState().remove(undoEntryId(id));
 
-	const undo = ({ id, name, toastId }: ArchivedWorkspace) => {
+	const undo = ({ id, toastId }: ArchivedWorkspace) => {
 		clearUndoable(id);
 		toast.dismiss(toastId);
 		unarchive(id, {
-			onSuccess: () => toast.success(t({ message: `Restored "${name}"` })),
+			onSuccess: () => toast.success(t({ message: "Workspace restored" })),
 		});
 	};
-
-	useHotkey(
-		"UNDO_ARCHIVE_WORKSPACE",
-		() => {
-			if (undoable) undo(undoable);
-		},
-		{
-			enabled: undoable !== null,
-			enableOnFormTags: false,
-			enableOnContentEditable: false,
-		},
-	);
 
 	const returnIfStillAt = (
 		id: string,
@@ -85,19 +72,19 @@ export function useArchiveCloudWorkspace() {
 		const { pathname } = router.state.location;
 		const stillAtTarget =
 			target.kind === "workspace"
-				? pathname.startsWith(`/v2-workspace/${target.workspaceId}`)
+				? pathname.startsWith(`/workspace/${target.workspaceId}`)
 				: pathname === "/new-workspace";
 		if (!stillAtTarget) return;
 		void navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId: id },
 			replace: true,
 		});
 	};
 
-	return ({ id, name }: { id: string; name: string }) => {
+	return (id: string, archivedWithIds?: ReadonlySet<string>) => {
 		if (archiving.includes(id)) return;
-		const target = navigateAwayFromWorkspace(id);
+		const target = navigateAwayFromWorkspace(id, archivedWithIds);
 		// Unarchive only succeeds once the row is archived, so the undo waits
 		// for the server.
 		mutateAsync({ id })
@@ -106,7 +93,7 @@ export function useArchiveCloudWorkspace() {
 					returnIfStillAt(id, target);
 					return;
 				}
-				const toastId = toast(t({ message: `Archived "${name}"` }), {
+				const toastId = toast(t({ message: "Workspace archived" }), {
 					icon: createElement(LuArchive, { className: "size-4" }),
 					classNames: {
 						cancelButton:
@@ -118,19 +105,22 @@ export function useArchiveCloudWorkspace() {
 						onClick: () => {
 							clearUndoable(id);
 							void navigate({
-								to: "/cloud-workspaces/$workspaceId",
+								to: "/workspace/$workspaceId",
 								params: { workspaceId: id },
 							});
 						},
 					},
 					action: {
 						label: t({ message: "Undo" }),
-						onClick: () => undo({ id, name, toastId }),
+						onClick: () => undo({ id, toastId }),
 					},
 					onDismiss: () => clearUndoable(id),
 					onAutoClose: () => clearUndoable(id),
 				});
-				setUndoable({ id, name, toastId });
+				useUndoStack.getState().push({
+					id: undoEntryId(id),
+					undo: () => undo({ id, toastId }),
+				});
 			})
 			.catch(() => returnIfStillAt(id, target));
 	};

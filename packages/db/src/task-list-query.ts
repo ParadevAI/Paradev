@@ -1,3 +1,7 @@
+import {
+	LABEL_PATH_SEPARATOR,
+	normalizeLabelName,
+} from "@superset/shared/labels";
 import type { SQL } from "drizzle-orm";
 import {
 	and,
@@ -47,7 +51,10 @@ const { legacyLabels: _legacyLabels, ...taskTableColumns } =
 	getTableColumns(tasks);
 
 /** A task's columns with its label names, for selecting whole tasks. */
-export const taskColumns = { ...taskTableColumns, labels: taskLabelNames };
+export const taskColumns = {
+	...taskTableColumns,
+	labels: taskLabelNames,
+};
 
 /**
  * Sort by this rather than the column: with an org filter and a LIMIT, Postgres otherwise walks the
@@ -67,9 +74,6 @@ export interface TaskListFilters {
 	priority?: TaskPriority;
 	labels?: string[];
 	search?: string;
-	externalProjectId?: string;
-	externalProjectName?: string;
-	externalCycleId?: string;
 	dueDateFrom?: Date;
 	dueDateTo?: Date;
 }
@@ -132,37 +136,26 @@ export function buildTaskListConditions(
 	}
 
 	for (const name of filters.labels ?? []) {
+		const stored = name.trim().toLowerCase();
+		const normalized = normalizeLabelName(name);
+		const matches = normalized
+			? sql`(label.name = ${stored} or label.name = ${normalized} or label.name like ${`${escapeLikePattern(normalized)}${LABEL_PATH_SEPARATOR}%`})`
+			: sql`label.name = ${stored}`;
 		conditions.push(
-			sql`exists (select 1 from task_label_assignments assignment join task_labels label on label.id = assignment.label_id where assignment.task_id = "tasks"."id" and label.name = ${name.trim().toLowerCase()})`,
+			sql`exists (select 1 from task_label_assignments assignment join task_labels label on label.id = assignment.label_id where assignment.task_id = "tasks"."id" and ${matches})`,
 		);
 	}
 
 	if (filters.search) {
 		const pattern = `%${escapeLikePattern(filters.search)}%`;
 		const searchCondition = or(
+			ilike(tasks.slug, pattern),
 			ilike(tasks.title, pattern),
 			ilike(tasks.description, pattern),
 		);
 		if (searchCondition) {
 			conditions.push(searchCondition);
 		}
-	}
-
-	if (filters.externalProjectId) {
-		conditions.push(eq(tasks.externalProjectId, filters.externalProjectId));
-	}
-
-	if (filters.externalProjectName) {
-		conditions.push(
-			ilike(
-				tasks.externalProjectName,
-				`${escapeLikePattern(filters.externalProjectName)}%`,
-			),
-		);
-	}
-
-	if (filters.externalCycleId) {
-		conditions.push(eq(tasks.externalCycleId, filters.externalCycleId));
 	}
 
 	if (filters.dueDateFrom) {
@@ -188,7 +181,7 @@ function priorityRank(): SQL<number> {
 export function buildTaskListOrderBy(
 	sortBy: TaskListSortBy = "createdAt",
 	sortOrder: TaskListSortOrder = "desc",
-): SQL<unknown>[] {
+): [SQL<unknown>, SQL<unknown>] {
 	const dir = sortOrder === "asc" ? asc : desc;
 	const primary = (() => {
 		switch (sortBy) {

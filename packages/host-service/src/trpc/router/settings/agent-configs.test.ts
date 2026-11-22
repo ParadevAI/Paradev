@@ -10,7 +10,7 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "../../../db/schema";
 import type { HostServiceContext } from "../../../types";
-import { agentConfigsRouter } from "./agent-configs";
+import { agentConfigsRouter, ensurePresetRow } from "./agent-configs";
 
 function presetBody(presetId: string) {
 	const preset = getPresetById(presetId);
@@ -62,10 +62,16 @@ describe("agentConfigsRouter", () => {
 			expect(result.map((row) => row.order)).toEqual(DEFAULT_PRESET_ORDERS);
 		});
 
-		it("does not seed Superset", async () => {
+		it("does not seed Paradev", async () => {
 			const caller = createCaller();
 			const result = await caller.list();
 			expect(result.find((row) => row.presetId === "superset")).toBeUndefined();
+		});
+
+		it("does not seed pdev, which a feature flag gates", async () => {
+			const caller = createCaller();
+			const result = await caller.list();
+			expect(result.find((row) => row.presetId === "pdev")).toBeUndefined();
 		});
 
 		it("seeds Claude with its most permissive flag", async () => {
@@ -183,6 +189,30 @@ describe("agentConfigsRouter", () => {
 			expect(
 				after.find((row) => row.presetId === "opencode")?.forkArgs,
 			).toEqual([]);
+		});
+
+		it("moves an untouched Antigravity row off its earlier launch args", async () => {
+			const { caller, db } = createCallerWithDb();
+			ensurePresetRow(db as unknown as HostServiceContext["db"], "agy");
+			db.update(schema.hostAgentConfigs)
+				.set({ argsJson: JSON.stringify(["--mode", "accept-edits"]) })
+				.where(eq(schema.hostAgentConfigs.presetId, "agy"))
+				.run();
+
+			const moved = await caller.list();
+			expect(moved.find((row) => row.presetId === "agy")?.args).toEqual([
+				"--dangerously-skip-permissions",
+			]);
+
+			db.update(schema.hostAgentConfigs)
+				.set({ argsJson: JSON.stringify(["--mode", "plan"]) })
+				.where(eq(schema.hostAgentConfigs.presetId, "agy"))
+				.run();
+			const kept = await caller.list();
+			expect(kept.find((row) => row.presetId === "agy")?.args).toEqual([
+				"--mode",
+				"plan",
+			]);
 		});
 
 		it("returns existing rows on subsequent calls without re-seeding", async () => {
@@ -629,5 +659,20 @@ describe("agentConfigsRouter", () => {
 			// extra row added above is dropped.
 			expect(result.filter((row) => row.presetId === "omp")).toHaveLength(1);
 		});
+	});
+});
+
+describe("ensurePresetRow", () => {
+	it("adds a cloud workspace's flag-gated launch agent after the defaults", async () => {
+		const { caller, db } = createCallerWithDb();
+		const hostDb = db as unknown as HostServiceContext["db"];
+		ensurePresetRow(hostDb, "pdev");
+		ensurePresetRow(hostDb, "pdev");
+		const rows = await caller.list();
+		expect(rows.map((row) => row.presetId)).toEqual([
+			...DEFAULT_PRESET_IDS,
+			"pdev",
+		]);
+		expect(rows.at(-1)?.order).toBe(DEFAULT_PRESET_IDS.length);
 	});
 });

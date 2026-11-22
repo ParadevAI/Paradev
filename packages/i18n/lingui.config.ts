@@ -21,6 +21,7 @@ export default defineConfig({
 		"id",
 		"cs",
 		"vi",
+		"uk",
 	],
 	// Origins follow filesystem order, which differs between macOS and Linux
 	// and would dirty the CI diff.
@@ -34,13 +35,13 @@ export default defineConfig({
 				"<rootDir>/../../apps/desktop/src",
 				"<rootDir>/../../apps/web/src",
 				"<rootDir>/../../apps/marketing/src",
-				"<rootDir>/../../apps/admin/src",
 				"<rootDir>/../../apps/docs/src",
 				"<rootDir>/../../apps/mobile/app",
 				"<rootDir>/../../apps/mobile/screens",
 				"<rootDir>/../../apps/mobile/components",
 				"<rootDir>/../../apps/mobile/hooks",
 				"<rootDir>/../../apps/mobile/lib",
+				"<rootDir>/../../apps/mobile/modules",
 				"<rootDir>/../../packages/ui/src",
 				"<rootDir>/../../packages/panes/src",
 				"<rootDir>/../../packages/chat-ui/src",

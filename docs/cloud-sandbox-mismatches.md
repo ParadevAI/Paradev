@@ -15,6 +15,32 @@ context.
 
 ## Identity and ownership
 
+**An automation dispatch finishes before its cloud chat exists.** A machine-owned host returns the
+chat session ID during dispatch. A fresh sandbox creates that session only on first boot, after the
+API has queued provisioning. The run now binds its cloud workspace before provisioning and carries
+its run ID in the launch environment. Host-service reports the actual chat/terminal identity through
+a sandbox-scoped procedure; the API checks the run, workspace, organization, and creator before
+linking it. Failed reports stay in the launch marker for retry on restart, without relaunching the
+agent. **Open:** a process crash between session creation and writing the report can still lose the
+session link. Changes in this path require a published host-service/sandbox bundle.
+
+**A box asks the API as its own credential, not as a signed-in person.** Host-service on a
+machine someone owns calls `chatHistory.syncEnabled` with the person's session. A box calls it with
+the sandbox credential, and the sandbox scope refuses any procedure missing from
+`SANDBOX_ALLOWED_PROCEDURES`. `syncEnabled` was missing, so every box logged `[chat-sync] could not
+ask whether to sync` every 5 minutes and stored no chats. We added it to the list. Any new procedure
+host-service calls on a box must go in that list too.
+
+Automation reads were allowed while updates were blocked by the same list. Cloud workspaces now
+allow `automation.update`, `setPrompt`, `setGroup`, and `setEnabled`, so the CLI can edit automation
+settings, prompts, groups, and enabled state. Existing organization and automation permission checks
+still apply. Writes also check the resolved target against the relay's cloud workspace access
+policy: the creator must own the host and its owner must have enabled cloud workspace access. A
+cloud workspace cannot leave the host unspecified, since dispatch could then select a closed host.
+Prompt, group, and enabled-state updates check the existing target too, and their writes must
+still match that target so a concurrent retarget cannot bypass the check. Signed-in clients keep
+their existing access. This is an API change; existing boxes do not need a new host-service bundle.
+
 **The workspace's name belongs to the cloud row, not the sandbox.** For a local
 or remote host, `host.db` owns the workspace because the user created it there.
 A cloud workspace is created, named (by the API's namer) and listed by the
@@ -63,6 +89,19 @@ the filesystem snapshot with no processes, so host-service is started again)
 and extends a running one so it never hits the idle stop while someone is in
 it. `resolveSandboxAddress` is the one place that knows the difference.
 
+**A box reaches other hosts only through the relay, and only if they allow
+it.** The CLI assumed its bearer is a user token the relay accepts. A box has
+no bearer: its credential is a header the firewall adds, so `--host` calls
+used to fail as "Session expired" while `auth whoami` worked, and `host.list`
+showed every host offline because it forwarded the caller's absent bearer for
+presence. Now `host.list` mints a server presence token when the caller has no
+bearer, the firewall adds the workspace credential for the relay host too, and
+the relay checks it with the API per call. A host is reachable only when its
+owner allowed cloud workspaces on the host's settings page; otherwise the call
+fails with a message that says so. Only HTTP calls work: the firewall refuses
+WebSocket upgrades on a host whose headers it rewrites, so live terminal
+streams from a box to a host do not.
+
 **A box's agent status doesn't come from the box.** A host row's dot is a
 live subscription to that host's terminal bindings; the sidebar deliberately
 opens no such socket to a sandbox, since holding one keeps the VM awake all
@@ -76,6 +115,30 @@ carries it so open clients patch their cache rather than refetch the list.
 A closed box's dot is therefore at most a few seconds behind; the open box's
 own subscribers stay live as before. Reaches a box only through a
 host-service release.
+
+**A closed box's pull requests are not on its creation branch.**
+`cloud_workspaces.branch` is the branch the box was cut on, and an agent
+moves on from it: new branches, one PR each. Looking PRs up by that branch
+showed a stale or missing PR for every box but the open one, which the host
+fan-out reaches. The box's PR runtime already keeps every PR it has linked
+(`workspace_pull_requests` in host.db), so the box reports each one once to
+`cloudWorkspace.reportPullRequests` (`sandbox-pull-requests` in
+host-service: everything on boot, then each new link as the runtime records
+it), and the API records it in `cloud_workspace_pull_requests` for the
+repositories the workspace checked out. State still comes from
+`github_pull_requests`. After a successful send, a PR reaches the table at
+most a sweep of the PR runtime (5 minutes) after it is opened; a failed send
+retries with back-off up to 5 minutes more. Reaches a box only through a host-service release.
+`cloudWorkspace.pullRequests` is what desktop and mobile list, badge and
+hover-card a cloud workspace with: every linked PR, plus the PR on
+`cloud_workspaces.branch` for a box that has not reported yet, open ones first
+and then the newest link. It does not poll: a new link, and every GitHub
+webhook or sync write to a PR some cloud workspace shows, sends a
+`pull_requests` nudge that refetches only this query. Inside an open workspace
+both apps still ask the box itself.
+**Open:** a repository renamed or transferred
+after the box linked a PR is reported under its old name; the API answers with
+it in `ignored` and the link is lost.
 
 **Nobody on the box knows who is in it.** A host is one person's machine, so
 a workspace row implies its owner and the sidebar never had to say. A cloud
@@ -104,6 +167,21 @@ next token refresh minutes later. What a person sees now: the pane
 reconnects, the lost session is reported gone, and the agent is resumed into
 a fresh terminal with its scrollback (the cold-restore path), about 15–20 s
 after opening.
+
+**A stored chat survives a stop, but its agent process does not.** A cached
+`getSession` result can still say `live: true` when a resumed box has no chat
+process. The transcript socket can reconnect and replay that stored session
+before recovery checks its liveness, so an immediate prompt fails with
+"Couldn't send your message. It's back in the composer." Switching tabs or
+workspaces remounts the chat and used to be what reran a liveness check that
+failed during boot, so the resume notice could appear only after returning.
+The desktop now rechecks liveness on mount, host reconnect and address change,
+and holds prompts in the pane's pending queue until that check finishes and
+recovery resumes the agent. The client's existing outbox stays paused too; if recovery
+replaces the session, never-attempted text returns to the same composer draft
+rather than being sent to the stopped process. Failed liveness checks retry
+even if the connection stays open, and never reuse the cached live flag. This
+is a client change; existing boxes do not need a new host-service bundle.
 
 **Two gates sit between the renderer and a sandbox**, and both fail as a bare
 `TypeError: Failed to fetch`: the renderer's CSP `connect-src` allowlist
@@ -144,6 +222,49 @@ rewrite. An environment variable by a credential's name is ignored and never
 reaches the box; a cloud workspace has no way to carry an app's own provider
 key.
 
+**A ChatGPT sign-in is a file and a session, not a key.** Codex on a ChatGPT
+plan reads `~/.codex/auth.json`, and its refresh token works once: two holders
+of one session sign each other out ("refresh token was already used"). The API
+runs Codex's device-code sign-in itself, so the session is Paradev's own and
+never the one on the person's laptop, and renews it under a row lock before
+the access token lapses. The box gets an `auth.json` of placeholders (an
+unsigned id token rebuilt from the claims, a last refresh far ahead so Codex
+never tries to renew) written with the identity on every create and wake; the
+firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
+including a forced rotation while it ran.
+
+An hourly QStash job (`/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins`)
+renews every session near expiry, also with no box running. Each renewal
+queues a re-apply of the claim on that person's awake boxes. Not yet verified
+on a real box. Only a refusal that names a dead
+session (`refresh_token_expired`, `refresh_token_reused`,
+`refresh_token_invalidated`, `invalid_grant`) removes the sign-in; any other
+failure keeps it and goes to Sentry, tagged `chatgpt_refresh_code`. **Open:** Codex in the box cannot recover
+from a 401 by itself: it refreshes with the placeholder against
+`auth.openai.com`, which nothing swaps, and asks the person to sign in again.
+
+**Some people keep the agent signed in themselves.** The brokering above assumes Paradev owns the
+model credential. Some teams run their own script that rotates Claude or Codex logins, and our
+placeholder overrides it: `CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY` take precedence over
+`~/.claude/.credentials.json` in Claude Code. A Manual row (`agent_credentials.provider =
+"manual"`, no secret) makes `resolveAgentSignIns` skip that agent, so create, wake and the
+every claim re-apply hand the box no variable, firewall rule or login file for it. The box
+reaches the provider through the `"*"` catch-all with whatever the script wrote. **Open:** a
+`~/.codex/auth.json` of placeholders written by an earlier ChatGPT sign-in stays on the box until
+the script replaces it; the auth-failure card knows about Manual only in the viewer's own box.
+
+**The firewall refuses a WebSocket upgrade on a host whose headers it
+rewrites.** Codex's built-in provider opens `wss://chatgpt.com/...` first; with
+the bearer swap in place the upgrade fails ("Attack attempt detected") and
+Codex spends ~10 s on retries before it falls back to HTTPS, once per session.
+The built-in provider cannot be reconfigured, so the claim writes
+`/etc/codex/config.toml` (Codex's system layer, below the person's own config)
+with the same endpoint and `supports_websockets = false`. Measured: 13.3 s →
+3.6 s for one `codex exec`. An OpenAI API key has the same problem on
+`api.openai.com` (or `OPENAI_BASE_URL`'s host), so it gets an `openai-api-key`
+provider for that endpoint, with `env_key = "OPENAI_API_KEY"` and no
+WebSockets. Measured on Codex 0.170.0: 8.7 s → 1.9 s.
+
 **The firewall terminates TLS for the domains it rewrites, and the terminal
 must trust its CA.** The CA is in the image's system bundle, which curl, git,
 gh, python and bun read. Node does not read it, and the platform sets no CA
@@ -163,12 +284,51 @@ rule applies to every process in the box, so that list is the boundary —
 widen it deliberately, and never to a procedure that can grant more access.
 A box acts in its own organization only. In `packages/trpc/src/trpc.ts`,
 `jwtProcedure` drops the creator's other memberships, both builders refuse an
-organization header that names one, and `protectedProcedure` keeps the box's
+organization header that names one, and `personProcedure` keeps the box's
 organization as the active one; `user.myOrganizations` lists only the box's.
 Archiving the box from inside it
-(`workspaces delete`) cuts off the box's API access at once and stops the box
-about a minute later: put the box's own id last when deleting several, and
-unarchive from a signed-in client.
+(`workspaces archive`) cuts off the box's API access at once and stops the box
+about a minute later: put the box's own id last when archiving several, and
+unarchive from a signed-in client. Resizing the box's own workspace
+(`workspaces update --machine-size`) restarts it, which ends the agent that
+asked, usually before the answer comes back; resize it last, as with archive.
+
+**A box could create a workspace but not label or read it. Fixed (2026-11-12).**
+On a laptop the CLI calls any procedure the person can. In a box,
+`workspaces get` and `workspaces update --add-label` / `--remove-label` /
+`--task` failed with "A cloud workspace cannot call cloudWorkspace.get", because
+`get`, `addLabel`, `removeLabel`, `linkTask` and `unlinkTask` were missing from
+`SANDBOX_ALLOWED_PROCEDURES`. An agent that created a batch of review
+workspaces could not file them under one label. We added those, plus
+`taskLabel.list` (the label picker's options), `cloudWorkspace.pullRequests`
+and `attachment.createUpload` (`workspaces create --attachment`). Each reaches
+only the workspaces `cloudWorkspace.list` already shows the box. Sharing,
+visibility, `unarchive`, `restart` and `activity` stay out: they change or
+show who can see a workspace, or restart a box. `get` returns presigned URLs
+for a workspace's attachments, so a box can read files attached to any
+workspace its creator can see. Labels and tags are different things: a
+label is the organization's and everyone sees it; a tag is the caller's own
+sidebar folder, and a box files it as its creator. `workspaces create --tag`
+works for the cloud from CLI builds that include #9638. A box gets it only
+from the next sandbox release, which builds the box's CLI from the checkout
+it runs on; boxes released before that still refuse `--tag`.
+
+**pdev signs in to its router with the box's credential.** On a laptop pdev
+gets a token from `superset auth mcp-headers`, which a box refuses because it
+holds no token. The firewall adds the same `x-superset-sandbox-credential` to
+requests for `router.superset.sh`, and the router passes it to `user.me` and
+`user.myOrganization`, so pdev runs as the workspace's creator in the box's
+organization. The box sets `PDEV_TOKEN` to the placeholder only so pdev skips
+the CLI; the router ignores a key without the `pdev_` prefix.
+
+The same credential also names the box itself, which is what host-service's
+own calls about its workspace need: an automation's workspace has no creator,
+and a box keeps working after its creator leaves the organization. Those calls
+are the `sandbox` router, built on `sandboxProcedure`, which takes the
+workspace from the credential and never from the input and needs no creator
+or allowlist entry. Anything in the box can call them, so each must be safe
+for an agent to call on its own workspace. `agent-status` and `credentials`
+predate it and are still plain routes authenticated by the host secret.
 
 **Docker is installed but not started.** An environment whose repository needs
 containers starts it from its own `start` command, which is also where it
@@ -179,6 +339,29 @@ waits for the daemon:
             "until docker info >/dev/null 2>&1; do sleep 0.2; done",
             "docker compose up"] }
 ```
+
+**`gh` runs in a clean login shell, so the sandbox's `GH_TOKEN` never reaches
+it.** Host-service shells out to `gh` for pull-request reads and writes
+(`pullRequests.getContent`, `addComment`, `setDraft`, the content read behind
+the PR page) through `getToolEnvironment()`, which rebuilds the environment
+from a login shell the way a person's machine would have it. On a machine a
+person owns that is where `gh auth login` left its credentials. A sandbox has
+no `gh auth login`; its GitHub access is the `GH_TOKEN` the provider injects
+into the *process* environment, which the clean shell drops. The PR page then
+fails its first content read with a gh auth error. **What we did:** the review
+run wrote a temporary `~/.config/gh/hosts.yml` from the token and deleted it
+afterwards. The durable fix is for `getToolEnvironment()` to carry `GH_TOKEN`
+(and `GITHUB_TOKEN`) through from the host-service process when the shell did
+not provide one. Since 2026-10-23 the PR pane, the workspace PR badge, the diff
+pane's review threads, the Review tab and mobile no longer use a host's GitHub
+access at all. Writes always act as the person looking: the desktop with the
+GitHub login on that person's own machine (the `viewerGithub` router in the
+main process), otherwise and on mobile through the API's
+`integration.github.*PullRequest*` procedures with their Superset connection
+(`githubUserTokenFor`). Reads take the same path. A person with neither is
+asked to connect GitHub; the organization's App installation is not a
+fallback, because its rate limit is shared by everything the organization
+runs.
 
 ## Runtime environment
 
@@ -194,6 +377,31 @@ boot, host-service holds them in memory (`sandbox-managed-env`) and
 terminals and agent launches inherit the pushed set; open terminals keep the
 one they started with; nothing is written to disk. A host-service restart
 comes up with an empty set until the next push, which every wake performs.
+
+**Listening precedes the managed environment push.** Chat launches and boot-time
+agent resumes used to build their environment as soon as the listener opened,
+before the control plane supplied credential placeholders. They now use the
+same bounded 120-second environment wait as the initial sandbox agent launch;
+local hosts do not wait. This part requires a published host-service bundle.
+A slow bundle update can also exceed the control plane's 60-second health wait,
+so that wake never reaches the environment push. The desktop now retries failed
+wakes after 30 seconds with bounded backoff, rather than waiting for the normal
+ten-minute keepalive. Successful wakes keep that normal interval. These are
+code-level startup gaps, not a verified explanation of any particular user's
+delay.
+
+**Cloud agent registration cannot depend on the first launch.** The creation picker knows which
+CLIs the image installs, but the chat picker reads the sandbox's persisted agent configurations.
+Flag-gated pdev was excluded from default configurations and only added when it was the initial
+launch agent, so Claude-created and idle boxes hid it. The cloud launch gate also allowed only
+Claude to chat, sending pdev to a terminal even when ACP chat was enabled. **Fixed:** every boot
+ensures configurations for all installed cloud agents and seeds pdev folder trust, including on
+existing boxes. Both new-workspace and pinned-automation dispatch allow pdev chat through the
+existing `acp-chat` flag; clients still apply `pdev-agent` visibility. Registration and trust repair
+require a published host-service/sandbox bundle, an updated environment bundle pin, and a box
+restart. Trust repair is best-effort: a failed pdev trust write must not prevent host-service from
+starting. This does not remove unrelated
+default agent configurations or make their CLIs available in the image.
 
 **Agent CLIs are pre-configured in the image.** A first run otherwise opens a
 theme picker, an API-key approval and a workspace trust dialog — three
@@ -225,7 +433,7 @@ is frozen because its golden was built for it. host-service seeds one
 project and one workspace row per checkout; the primary's row carries the cloud workspace's
 id, the others get ids derived from it and the path, so anything keyed on the cloud id (the
 desktop route, the agent launch, the terminals) lands in the primary and the rest are
-siblings. The `start` hook runs in the hooks repository's checkout, not in `/workspace`.
+siblings. The `start` hook runs in the primary repository's checkout, not in `/workspace`.
 
 **The checkout is the workspace.** No worktrees and no base repo — anything
 assuming a worktree can be created or discarded next to a main checkout has
@@ -238,13 +446,36 @@ forwards Ctrl+V and lets the TUI (Claude Code, Codex) read the image from the
 OS clipboard — of the machine the PTY runs on. A sandbox (or any
 relay-reached host) never holds the user's local screenshot, so the paste
 silently did nothing or surfaced "Failed to paste image". Fixed renderer-side:
-for non-local hosts the desktop ships the clipboard bytes over
-`filesystem.writeFile` into the shared `.superset/attachments/` worktree dir
-(the same convention the agent-launch terminal adapter and the mobile
-composer use — mobile proved the pattern) and pastes the worktree-relative
-path instead (`setImagePasteOverride` in the terminal runtime registry).
-Chosen over a new host endpoint because deployed sandboxes never update
-their baked host-service.
+for non-local hosts the desktop writes the clipboard files into the worktree
+and pastes their worktree-relative paths instead (`setImagePasteOverride` in
+the terminal runtime registry, `useSendAttachments` in the pane registry).
+The bytes go where the workspace lives. A box gets them through storage:
+`attachment.createUpload`, a presigned PUT, `cloudWorkspace.attachFiles`,
+then `attachments.materializeIntoWorkspace` on the box. A relay-reached
+machine gets them as base64 `filesystem.writeFile`, capped at
+`MAX_INLINE_ATTACHMENT_BYTES`, so they never reach our servers. A workspace
+on the same machine as the desktop gets them from the desktop's main process
+(`attachments.writeIntoWorktree`), which copies a file from disk with no cap.
+Chat attachments follow the same rule as parts: a `fileId` for a box, an
+`attachmentId` in the host's store otherwise. A file on this machine too big
+for a part goes as a copied path instead.
+
+**The ingress drops an upload the host answers early.** tRPC's streamed batch
+(`httpBatchStreamLink`, `trpc-accept: application/jsonl`) returns its response
+head before it has read the request body. Behind a Vercel sandbox's ingress
+(`sb-*.vercel.run`, which the gate forwards to) that early response ends the
+exchange: the rest of the upload is dropped, the procedure never runs, and the
+client sees a stream that ends after the head line — "value$1 is not iterable"
+in tRPC's consumer. It is a race, not a size limit: a 500 KB body on a home
+uplink loses it about half the time, a 1 MB body on a datacenter link wins
+it. This is why shipping file bytes through `filesystem.writeFile` broke
+(SUPER-2658) and why attachments go through storage instead. host-service now
+buffers every `/trpc/*` body before handing it to tRPC, so no response starts
+before the request is complete. A box runs that host-service from its next
+boot (see "A box's host-service is as new as its last boot"); one that never
+sleeps keeps the race until it restarts. Reproducing with curl: pass
+`-H "Expect:"` — curl's automatic `Expect: 100-continue` on bodies ≥1 MB
+masks the bug, and browsers never send it.
 
 **A URL launcher succeeds and reaches nobody.** The image ships `xdg-utils`
 (`packages/sandbox/bundle/rootfs/usr/local/share/superset/desktop.Aptfile`)
@@ -259,6 +490,16 @@ host-service in sandbox-mode PTY env), `SSH_CONNECTION` or `SSH_TTY`. It is
 deliberately not `shouldOpenBrowser()` from `lib/auth.ts`, whose extra TTY
 test is right for an interactive login prompt and wrong for an agent running
 the CLI with piped stdout.
+
+**A copy lands on the box's clipboard.** The same `DISPLAY` makes the box's
+X clipboard reachable, so a TUI that prefers the native clipboard writes there
+and reports success. Codex sends OSC 52 to the user's terminal only under SSH
+or tmux, so select-and-copy in a cloud terminal reached nobody (SUPER-3146).
+Claude Code sends OSC 52 either way, which hid it. A box terminal sets
+`SSH_CONNECTION` (`buildV2TerminalEnv`), so agents treat it as the remote
+session it is and copy through the desktop's xterm. A tool that checks only
+for a display, such as Neovim with `clipboard=unnamedplus`, still writes the
+box's clipboard.
 
 **A box has no agents until something lists them. Worked around, Open.**
 `agents.run` finds its agent in host-service's `host_agent_configs` table, and
@@ -292,11 +533,125 @@ missing. The CLI bundle has the same gap.
 
 ## Lifecycle
 
+**A box's host-service is as new as its last boot.** A sandbox bundle release
+repins every live environment (`environments.bundleSha`, set by
+`packages/sandbox/src/environments/release.ts`), and every wake builds the
+box's claim from its environment (`wakeCloudWorkspace` → `buildSandboxClaim`).
+When the box boots, `superset-boot` installs the pinned bundle if its hash
+differs from the one installed. So a cold wake, a restart or a new box runs
+the current host-service. A warm resume does not boot, and a box that never
+sleeps keeps the host-service it last booted with. Do not assume a box is
+frozen at the bundle it was provisioned with, and do not assume it is current
+either: gate a new host feature on the version the box reports
+(`health.check`), the same way as a remote host. The chat attachment parts
+floor (`ATTACHMENT_PARTS_MIN_HOST_VERSION`) works like this.
+
+**A machine someone owns is visibly on or off; a box falls asleep without
+telling anyone.** A session ends at its idle timeout, and Vercel sends no
+webhook for that or for a crash. The client cannot ask either: one
+provider read per row per client costs a `Sandbox.get` and a ticket mint, and
+an org-wide `Sandbox.list` pages 50 boxes at a time in creation order.
+**What we did:** every path that starts, extends or stops a box records when
+its session ends (`cloud_workspaces.sandbox_expires_at`) and which Vercel
+session it is (`sandbox_session_id`), and moves the row between `awake` and
+`asleep`; our own stops write `asleep` at once. A QStash watch runs just after
+each expiry, confirms the stop with one provider read, writes `asleep` and
+nudges clients; an extension only moves the expiry, which the watch follows. A
+stop we did not cause (about 0.5% of sessions end `failed`), or a lost watch,
+is corrected by the 30-minute reconcile. Every write is decided from a Vercel
+read that can be stale by the time it lands, so an `asleep` write needs the row
+to still record the session that stopped, and an `awake` write flips an asleep
+row only for a new session: Vercel never resumes a session, it starts a new
+one. Opening an `asleep` workspace wakes it like an `awake` one
+(`isLiveCloudWorkspaceStatus`). Code: `sandbox-sleep.ts`, `sandbox-expiry.ts`;
+model: `.agents/skills/verify-sandbox-asleep`.
+
+**Deleting a file does not shrink a snapshot.** On a machine someone owns,
+`rm` frees the space. A Vercel sandbox snapshot is a full block-level copy of
+the disk, not a delta over its parent, and the disk has no discard, so blocks a
+deleted file freed stay in every later snapshot. At stop, processes get SIGTERM
+and at least 10 s before the snapshot is taken. Zero-filling freed space
+shrinks the stored snapshot (measured 4.06 GB → 0.84 GB) but slows every
+restore of it: the same box resumed in 12 s and 20 s after a fill, against
+about 1.5 s before (2026-11-16). Restore time follows how many blocks were ever
+written, not the stored size. So the only fix is to not write the bytes to the
+root disk: tmpfs for throwaway data, a drive for large state. A golden is
+forked by every workspace of its environment, so each of its blocks is paid
+once per fork. **What we did:** the golden setup hook
+(`packages/sandbox/src/environments/satya-setup.sh`) keeps its npm, Electron
+and node-gyp download caches in `/dev/shm`. **Open:** workspace snapshots
+carry every block a box ever wrote. Boxes have had no swap since 2026-11-17,
+so swap no longer adds to that; a snapshot that already holds swap keeps it.
+
+**A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
+reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
+session length. Vercel's server-side tag filter uses creation-order pagination
+even when that sort is requested. An old stopped entry therefore hid older
+workspaces that had resumed recently, leaving them running without meter records.
+`listActiveWorkspaceSandboxes` now lists without the tag filter and checks
+`kind: workspace` locally, so the status-time cutoff is safe.
+
 **Delete was not wired.** The generic delete routed to the owning host, which
 for a cloud workspace deleted the row *inside* the sandbox and left the
 sandbox running (and billing) plus the `cloud_workspaces` row intact — the
 workspace reappeared on the next refetch. **Fixed:** `useDestroyWorkspace`
 sends a cloud workspace to `cloudWorkspace.delete`.
+
+**The boot-started Run command was invisible. Fixed.** Locally, Run starts the
+default terminal when the person asks for it. A box starts it at boot, so the
+workspace opens with its dev server up. It used to run as a detached bash beside
+`[setup]`, with no terminal: the port scanner, which only attributes processes
+under a terminal session, never saw its ports, so nothing forwarded them, and
+the desktop's Run started a second copy (`next dev` then fails with "Another
+next dev server is already running"). `runSandboxStartHook` now starts the
+default terminal in a terminal session once setup ends, records its id under
+`/run/superset`, and on startup re-attaches that session (or starts it, if the
+restart lost setup's exit). `sandbox.status` reports it as `runTerminalId`
+while it is live. The desktop reads it when the workspace opens and again when
+Run is pressed, and adopts a running one instead of starting a second copy
+(SUPER-3421). There is no push for it, so a workspace open while setup ends
+shows Run until it is pressed.
+
+**Archive ran no teardown.** Locally, deleting a workspace runs the repository's
+teardown before the worktree goes. A cloud archive only stopped the box and
+deleted it seven days later, so anything `setup` created outside the box
+leaked: this repository's per-workspace Neon branches piled up until 383 were
+deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
+calls `sandbox.runArchiveHook` on the still-running box (direct with the host
+secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
+the environment's config resolved for the cloud. A failing hook never blocks the
+stop, and an undo that lands during the hook re-runs setup (`runStartHook`
+with `force`) instead of stopping the box. A box whose host-service predates
+the procedure answers 404 and is stopped as before, so the fix reaches a box
+only after a sandbox release.
+
+The hook is best effort, not a guarantee. It runs only when the box is still
+running at the stop stage, and boxes stop on their own after four hours idle,
+which is exactly the state an archived workspace is usually in. So a resource
+must not depend on it: this repository's Neon branch is a lease
+(`NEON_BRANCH_LEASE_DAYS=7` in `setup.cloud.sh`), set when the branch is
+created and renewed on every boot, so a box that stops renewing releases its
+branch through Neon's own expiry. **Open:** running `[archive]` at least once,
+in a fresh short-lived box from the environment's image when the original is
+stopped or gone. That works because `[archive]` only releases outside
+resources: it needs the workspace's identity and secrets, not its disk.
+
+**The project config can be the environment's, not the repository's.**
+Locally, host-service reads `.paradev/config.toml` from the worktree, so a
+branch can change its own setup. A cloud environment builds one snapshot for
+every workspace, and a build runs before any workspace or branch exists, so
+its `[install]` had to come from the base branch: an environment could not be
+set up until its config change merged. An environment can now store its own
+`config.toml` (`environments.config`). When it has one, builds read `[install]`
+from it, a create publishes its `preview = true` ports from it, and every
+create and wake writes it to `SANDBOX_PATHS.environmentConfig` before boot,
+where host-service reads it for the primary checkout instead of that
+repository's files; other checkouts in a multi-repository box keep their own.
+When it has none, that file is empty and everything reads the repository's
+own files as before: builds and ports from the base branch, a box from its
+checkout. `[mcp]` is read only from the environment's config. **Open:** a saved config reaches a running box only on its next wake
+or restart. The desktop's project settings still edit the repository file on a
+cloud host, where it no longer applies once the environment has a config.
 
 **Sidebar affordances are driven by local state, not by the row.** Visibility,
 pinning and ordering live in `v2WorkspaceLocalState`; a section that renders
@@ -305,6 +660,14 @@ rows read the same collection as every other row.
 
 **Drag ordering isn't wired** — the cloud section sits outside the DnD
 containers. **Open.**
+
+**Sleep stops nothing a sandbox started on a third party.** On a machine
+someone owns, quitting the app disposes host-service, which stops what it
+started. A sandbox that goes to sleep is stopped from outside, so a remote
+resource started from it keeps running. Measured with an EAS simulator
+session: it stayed `IN_PROGRESS` (and billed) after `workspaces sleep`.
+**Open**; `apps/mobile/scripts/eas-dev.sh` starts its session with an idle
+timeout, which bounds it.
 
 **A sandbox's host-service is frozen at the version it was provisioned with,
 and nothing updates it. Open, and the most consequential item on this list.**
@@ -368,6 +731,12 @@ live cwd. An interrupted clone (a wake that ends the session mid-fetch)
 leaves a repository that can fetch nothing; the runner reclones rather than
 failing every boot.
 
+**GitHub names are case-insensitive; the release database lookup was not.** After the repository
+rename, production stored `ParadevAI/Paradev` while the release requested `paradevai/paradev`.
+An exact SQL comparison reported an installed repository as disconnected and stopped the release
+before environment pins advanced. **Fixed:** the release compares normalized names while retaining
+the organization constraint. No repository reconnection or production data rewrite is needed.
+
 **A freshly pushed image is not usable for a few minutes.** VCR reports the
 tag `Preparing` while it optimises a `linux/amd64` build (a gigabyte takes
 about four minutes), and `Sandbox.create` answers 409 `image_not_ready` until
@@ -382,15 +751,39 @@ wedged every exec — the reason goldens ran at 32 GB. The internal golden runs
 the same: at 4 vCPU / 8 GB an agent that brought up the dev stack and an
 Electron instance took the VM down (2026-09-11).
 
+**A resize does not reach a running session.** `sandbox.update({ resources })`
+changes the sandbox's configured size at once, but a running session keeps the
+vCPUs and memory it booted with; only the next session gets the new size. So
+`sandbox.vcpus` is the configured size, and what a running box has is
+`sandbox.currentSession().vcpus`. Checked on a probe box (2026-11-04): after a
+2 → 4 vCPU update the session still had `nproc` 2 and 4 GB; after stop and
+resume it had 4 and 8 GB, with its files kept and its processes gone. That is
+why `cloudWorkspace.setMachineSize` restarts a running box, and why
+`describeSandbox` reports the session's vCPUs.
+
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, four hours, extended while a workspace is open) or on
+(`SESSION_TIMEOUT_MS`, fifteen minutes, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a
 new session from that snapshot with *no processes*: uncommitted files survive,
 a running agent does not. Blaxel froze the VM instead, processes intact. So
-an unattended agent run has to finish within a session, and the idle stop
-must not fire on a workspace someone is using — which is what the open
-workspace's `wake` on every token refresh is for. Sessions cap at 24 hours on
-the plan; past that the extension is refused and the next open resumes.
+the idle stop must not fire on a workspace someone is using — which is what
+the open workspace's `wake` on every token refresh is for — nor under an
+agent that is still working. For that the box itself asks: on agent activity
+(any hook event from a terminal agent or one of its subagents, any item of a
+chat turn), at most every five minutes, `sandbox-keepalive` in host-service
+calls `sandbox.keepalive` with that interval, and the API tops the session up
+past the next ping (`topUpSandboxSession`, `keepaliveWindowMs`): a full
+timeout for a box that pings every five minutes, twenty minutes for a bundle
+that does not send the interval and pings every fifteen. The timeout is saved
+on the sandbox at create and reused on every resume, so `wakeSandbox` resets
+it on a stopped box made with an older one. The box then stops a
+session timeout after its agent last did anything. An agent waiting on a
+permission prompt, a hung one, and a background shell or dev server left
+running after the turn all count as idle. A single tool call that runs longer
+than the timeout without a hook event is also idle, and is stopped. Top-ups go
+through the session, never `Sandbox.extendTimeout`, which resumes a session
+that stopped meanwhile. Sessions cap at 24 hours on the plan; past that the
+extension is refused, the session ends and the next open resumes.
 
 **A fork starts from the source's snapshot, not its live filesystem.** A
 golden is therefore a *stopped* sandbox: `promoteSandboxToEnvironment` takes
@@ -407,9 +800,31 @@ obvious tidy-up once the golden exists — leaves the workspace unable to ever
 resume (`410 Cannot resume sandbox: no snapshot available`), which is how one
 e2e workspace died. So the snapshot stays (`keepLastSnapshots` evicts it on
 the source's next stop), and a source that was running is started again
-before promote returns. A row whose sandbox is gone or unresumable is marked
-`failed` by the next `access`, so it gets the failed screen and a Remove
-button rather than a sidebar entry that never opens.
+before promote returns, through `wakeAfterStop`: the new session is a wake,
+authorized and metered like any other. Until 2026-11 the restart ran the boot
+command directly, and 69 sessions in a week ran with no boot row. A row whose
+sandbox is gone or unresumable is marked `failed` by the next `access`, so it
+gets the failed screen and a Remove button rather than a sidebar entry that
+never opens.
+
+**Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
+`runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a
+"stopped" answer it resumes and retries. A box read `running` that hits its
+timeout a moment later is resumed by the next call on that object, and no
+code chose to start it. Measured: 9 sessions in a week started 0.8–1.5 s after
+a timeout stop. `wakeSandbox` passes `onResume` to `Sandbox.get` and runs
+`beforeResume` (which authorizes the boot) for such a session; a refused one is
+stopped at once. **What we did:** only `wakeSandbox` and `provisionSandbox`
+get a full handle (`getSandboxToWake` in `vercel.ts`). Every other caller gets
+`getSandbox`, typed to the members that cannot resume (`stop`, `update`,
+`delete`, `listSessions`, `currentSession()` and reads), and acts on a running
+box through the session, whose calls answer 410 or 422 on a stopped one
+instead. Top-up and a claim re-apply treat that answer as "not
+running"; promote builds a stopped source's golden from the snapshot its
+stop took (measured: a create from that automatic snapshot has the stopped
+box's files). An HTTP request to a stopped box's port does not resume it
+either: measured, it answers `410 This sandbox was stopped` and no session
+starts, so the archive hook and other host-service calls cannot wake a box.
 
 **`stop()` returns before the stop's snapshot is current.** The sandbox is
 still `stopping` when the call resolves, and a fork taken then boots from
@@ -434,6 +849,22 @@ unless overridden. Both Blaxel limitations — routing fixed at creation, forks
 unable to have the proxy at all — are gone, which is why every sandbox now
 brokers its model credentials at the firewall. A custom policy denies everything it doesn't
 list: the `"*": []` catch-all is what keeps npm, git and the rest reachable.
+
+**A firewall rule binds to a connection when it opens.** A policy update
+reaches the next connection, not the ones already open: a running agent keeps
+the value it connected with. Measured 2026-11-19 on a real box (Claude Code
+2.1.280, Codex 0.162.1). Codex opened a new connection per request and used a
+new value on its next request. Claude Code kept about seven connections to
+Anthropic and used the old value until they closed, about 5 min after its last
+request, and longer while it stayed busy. So a disconnect does not stop a busy
+Claude at once: it keeps working on the open connections for up to about 5 min
+idle. The secret still never enters the box. We accept that; only a restart
+cuts it off at once. A change of credential *kind* (an API key to a
+subscription, an API key to ChatGPT) needs a restart of that agent: each CLI
+fixes the variable, provider and login file it reads at start, and ignores
+rewritten files. The API pushes the claim to awake boxes when something in it
+changes or a token in it nears expiry (`lib/sandbox/reapply-rules.ts`), and
+asks for a restart only for an agent whose kind changed.
 
 **A fork copies the source's config; every field we pass is an override.**
 Resources, timeout, ports, tags, network policy, persistence and env are all
@@ -516,6 +947,18 @@ Alpine) and only the pinned version ships prebuilds at all; better-sqlite3 must
 match what host-service was built against or it crashes on load. The image
 asserts the prebuild exists rather than letting something compile silently.
 
+**The desktop's native modules compile for Electron, and bookworm's compilers
+cannot.** No better-sqlite3 prebuild exists for Electron 44 on linux-x64, so
+`install:deps` (run by the root postinstall) builds it from source. Electron
+44's V8 headers fail on gcc 12 and on clang 14 (`std::source_location`), so
+`bun install` exited 1 and `bun run dev` in `apps/desktop` died on "Could not
+locate the bindings file". Postinstall uses `clang-16` when `CC` is unset. The
+image ships bookworm's `clang-16` in place of its default clang 14 (one LLVM,
+not two), and `clang`/`clang++` point at it through update-alternatives, so
+every environment builds the desktop without an extra install. A box made
+before this image keeps clang 14: an Aptfile change only rewrites the copy
+under `/usr/local/share/superset/` at boot and installs no package.
+
 **Local dev cannot exercise a sandbox, and the failure mode if you force it is
 silent.** `setup.local.sh` copies `.env.local.example` to `.env`, which sets
 `VERCEL_SANDBOX_TOKEN=fake-vercel-sandbox-token` — so provisioning fails at the
@@ -541,13 +984,42 @@ and provider. Keep the workspace id on both sides: a provisioning failure is
 recorded against the API and a runtime failure against the sandbox, and that id
 is the only thing that joins the two halves of one broken workspace.
 
+**A drive mount lasts one session and a fork does not inherit it — open.**
+For organizations with the `sandbox-agent-tools-drive` PostHog flag, the agent
+CLIs come from the bundle's `agent-tools-<region>-<bundle sha 12>` drive,
+mounted read-only at `/opt/agents`. A machine someone owns keeps a mount; a
+sandbox gets one only from `Sandbox.create`, `Sandbox.fork` or
+`sandbox.update({ mounts })` before the session starts, so `provisionSandbox`
+and `wakeSandbox` both pass it. A drive lives in one region and mounts only in
+that region. A session without the mount leaves links in `/usr/local/bin`
+that point nowhere; `superset-boot` re-runs `install-agent-clis` to put the
+image's agents back. OpenCode and Pi exist only on the drive, so for them it
+deletes the link instead.
+
+**An agent on the drive cannot update itself.** On a machine someone owns,
+OpenCode and Pi update in place, beside their binary. On a box they run from
+a read-only mount and are pinned by the bundle. `/etc/profile.d/superset.sh`
+turns off their update checks (`OPENCODE_DISABLE_AUTOUPDATE`,
+`PI_SKIP_VERSION_CHECK`), the same way `DISABLE_AUTOUPDATER` does for
+Claude. They keep their state under `~/.local/share/opencode`,
+`~/.config/opencode` and `~/.pi/agent`, as they do on a laptop.
+
+**A read-only snapshot mount taken while a writer holds the drive is corrupt.**
+Measured 2026-11-17: a box that mounted the snapshot while the builder still
+had the drive read-write got `ro,norecovery`, `ls` answered "Bad message" and
+codex segfaulted. On a disk someone owns, a second reader of a live
+filesystem is just slow. Here a drive is never written after it is
+published: one drive per bundle, written by a builder that is stopped before
+any environment row names the bundle, and the control plane mounts only a
+drive that exists and is detached.
+
 ## Running this repo's own dev stack inside a sandbox
 
 Reproducing an app bug end to end from a cloud workspace means bringing up
 `apps/web` + `apps/api` inside the sandbox. Three of the documented ways to do
 that do not exist there (found driving GHSA-2cp5-f6gg-w5fp, 2026-09-24).
 
-**The app assumes:** `./.superset/setup.local.sh` can stand up Postgres,
+**The app assumes:** `./.paradev/setup.local.sh` can stand up Postgres,
 neon-proxy and Redis with `docker compose`, which is the whole point of the
 zero-credential local path in `DEVELOPMENT.md`.
 
@@ -573,6 +1045,30 @@ a local stand-in — the usual way to drive an OAuth callback without a real
 provider secret — has to go through the resolver instead: a `--require`
 preload patching `dns.lookup` for Node, `--host-resolver-rules` for Chrome.
 Binding 443 and using sudo otherwise work.
+
+## The desktop dev build's bundled CLI thinks it is in a sandbox — closed
+
+Found verifying organization plugins in the desktop dev build, 2026-10-22.
+
+**The app assumes:** the desktop runs its bundled `superset` CLI on a person's
+machine, so its machine-only commands are there to call.
+
+**A sandbox is:** a box whose environment carries
+`SUPERSET_SANDBOX_WORKSPACE_ID`, which the desktop dev build inherited from
+`dev-stack.cloud.sh` and passed to the CLI it spawns. The CLI then hid every
+`sandbox: false` command, which then included the plugin commands, so each
+plugin action logged `Unknown command: install` while the UI reported success.
+A desktop started from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1`
+and dies at `electron.app.commandLine` before a window opens.
+
+**What we did:** `dev-stack.cloud.sh` now unsets
+`SUPERSET_SANDBOX_WORKSPACE_ID` for the desktop window, and the plugin
+commands are no longer `sandbox: false`, because every plugin route works from
+a cloud workspace. A desktop started by hand still needs
+`unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID`. The box also has no
+object store for `R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses
+`minio/minio` and MinIO's binary download answers 410, so an in-memory S3
+stand-in on that port was used for the test.
 
 ## Shared memory is 64 MB
 

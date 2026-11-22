@@ -1588,6 +1588,175 @@ describe("default-branch guard", () => {
 		);
 	});
 
+	test("drops a merged head=main PR from the default-branch workspace", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-promote",
+			prNumber: 350,
+			headBranch: "main",
+			headSha: "old-main-sha",
+			title: "getting staging up to date",
+			state: "merged",
+		});
+		seedWorkspace(db, {
+			id: "ws-main",
+			branch: "main",
+			headSha: "main-sha",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "main",
+			pullRequestId: "pr-promote",
+		});
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({
+				main: makePrNode({
+					number: 350,
+					headRef: "main",
+					headSha: "old-main-sha",
+					title: "getting staging up to date",
+					state: "closed",
+					mergedAt: "2026-01-05T10:00:00Z",
+				}),
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-main"]);
+
+		expect(getWorkspace(db, "ws-main")?.pullRequestId).toBeNull();
+	});
+
+	function seedMainWorkspaceWithHistory(
+		db: HostDb,
+		history: { pullRequestId: string; linkedAt: number }[],
+	) {
+		seedWorkspace(db, {
+			id: "ws-main",
+			branch: "main",
+			headSha: "main-sha",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "main",
+		});
+		for (const row of history) {
+			db.insert(schema.workspacePullRequests)
+				.values({ workspaceId: "ws-main", ...row })
+				.run();
+		}
+	}
+
+	async function historyNumbers(manager: PullRequestRuntimeManager) {
+		const [entry] = await manager.getPullRequestHistoryByWorkspaces([
+			"ws-main",
+		]);
+		return entry?.pullRequests.map((pr) => pr.number) ?? [];
+	}
+
+	test("drops a head=main PR linked after it merged from the default-branch workspace's link history", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-promote",
+			prNumber: 350,
+			headBranch: "main",
+			headSha: "old-main-sha",
+			state: "merged",
+			mergedAt: Date.parse("2026-01-05T10:00:00Z"),
+		});
+		seedMainWorkspaceWithHistory(db, [
+			{
+				pullRequestId: "pr-promote",
+				linkedAt: Date.parse("2026-11-01T00:00:00Z"),
+			},
+		]);
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({
+				main: makePrNode({
+					number: 350,
+					headRef: "main",
+					headSha: "old-main-sha",
+					state: "closed",
+					mergedAt: "2026-01-05T10:00:00Z",
+				}),
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-main"]);
+
+		expect(await historyNumbers(manager)).toEqual([]);
+	});
+
+	test("drops an older stale head=main PR from link history while a new one is open", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-promote",
+			prNumber: 350,
+			headBranch: "main",
+			headSha: "old-main-sha",
+			state: "merged",
+			mergedAt: Date.parse("2026-01-05T10:00:00Z"),
+		});
+		seedMainWorkspaceWithHistory(db, [
+			{
+				pullRequestId: "pr-promote",
+				linkedAt: Date.parse("2026-11-01T00:00:00Z"),
+			},
+		]);
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({
+				main: makePrNode({
+					number: 5700,
+					headRef: "main",
+					headSha: "main-sha",
+				}),
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-main"]);
+
+		expect(await historyNumbers(manager)).toEqual([5700]);
+	});
+
+	test("keeps a head=main PR that was linked while open in link history after it merges", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-release",
+			prNumber: 400,
+			headBranch: "main",
+			headSha: "main-sha",
+			state: "merged",
+			mergedAt: Date.parse("2026-11-05T10:00:00Z"),
+		});
+		seedMainWorkspaceWithHistory(db, [
+			{
+				pullRequestId: "pr-release",
+				linkedAt: Date.parse("2026-11-01T00:00:00Z"),
+			},
+		]);
+		const manager = createManager(db, {
+			git: defaultBranchGit("main"),
+			execGh: routeGh({
+				main: makePrNode({
+					number: 400,
+					headRef: "main",
+					headSha: "main-sha",
+					state: "closed",
+					mergedAt: "2026-11-05T10:00:00Z",
+				}),
+			}),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws-main"]);
+
+		expect(getWorkspace(db, "ws-main")?.pullRequestId).toBeNull();
+		expect(await historyNumbers(manager)).toEqual([400]);
+	});
+
 	test("still links a fork PR whose head branch is named main", async () => {
 		const db = createRealDb();
 		seedProject(db);
@@ -1998,6 +2167,152 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		);
 	});
 
+	test("a past PR closed after the workspace moved on shows as closed", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "branch-a",
+			headSha: "sha-branch-a",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "branch-a",
+		});
+		const prsByBranch = new Map([["branch-a", 101]]);
+		const closed = new Set<number>();
+		const serveHistory = historyExecGh(prsByBranch);
+		const numberLookups: number[] = [];
+		const manager = createManager(db, {
+			execGh: async (args) => {
+				const byNumber = args
+					.find((arg) =>
+						arg.startsWith(`repos/${REPO.owner}/${REPO.name}/pulls/`),
+					)
+					?.match(/\/pulls\/(\d+)$/);
+				if (byNumber?.[1]) {
+					const prNumber = Number(byNumber[1]);
+					numberLookups.push(prNumber);
+					return makePrNode({
+						number: prNumber,
+						headRef: "branch-a",
+						headSha: "sha-branch-a",
+						state: closed.has(prNumber) ? "closed" : "open",
+					});
+				}
+				return serveHistory(args);
+			},
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		db.update(workspaces)
+			.set({
+				branch: "branch-b",
+				headSha: "sha-branch-b",
+				upstreamBranch: "branch-b",
+			})
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		prsByBranch.set("branch-b", 102);
+		prsByBranch.delete("branch-a");
+		closed.add(101);
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const history = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history[0]?.pullRequests.map((pr) => [pr.number, pr.state])).toEqual(
+			[
+				[102, "open"],
+				[101, "closed"],
+			],
+		);
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		expect(numberLookups).toEqual([101]);
+	});
+
+	test("a past PR that left the merge queue but is still open shows as open", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-old",
+			prNumber: 101,
+			headBranch: "branch-a",
+			headSha: "sha-branch-a",
+			state: "queued",
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "branch-b",
+			headSha: "sha-branch-b",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "branch-b",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "pr-old", linkedAt: 1 })
+			.run();
+		const serveHistory = historyExecGh(new Map());
+		const manager = createManager(db, {
+			execGh: async (args) =>
+				args.includes(`repos/${REPO.owner}/${REPO.name}/pulls/101`)
+					? makePrNode({
+							number: 101,
+							headRef: "branch-a",
+							headSha: "sha-branch-a",
+						})
+					: serveHistory(args),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getPrById(db, "pr-old")?.state).toBe("open");
+	});
+
+	test("a past PR with a new head commit drops the old head's checks", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-old",
+			prNumber: 101,
+			headBranch: "branch-a",
+			headSha: "sha-a1",
+			checksStatus: "success",
+			checksJson: JSON.stringify([
+				{ name: "ci", status: "success", url: null },
+			]),
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "branch-b",
+			headSha: "sha-branch-b",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "branch-b",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "pr-old", linkedAt: 1 })
+			.run();
+		const serveHistory = historyExecGh(new Map());
+		const manager = createManager(db, {
+			execGh: async (args) =>
+				args.includes(`repos/${REPO.owner}/${REPO.name}/pulls/101`)
+					? makePrNode({
+							number: 101,
+							headRef: "branch-a",
+							headSha: "sha-a2",
+						})
+					: serveHistory(args),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const row = getPrById(db, "pr-old");
+		expect([row?.headSha, row?.checksStatus, row?.checksJson]).toEqual([
+			"sha-a2",
+			"none",
+			"[]",
+		]);
+	});
+
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
 		const db = createRealDb();
 		seedProject(db);
@@ -2300,6 +2615,7 @@ describe("PullRequestRuntimeManager GitHub traffic", () => {
 				reason: "rate-limited",
 				since: t0,
 				until: t0 + 605_000,
+				detail: "API rate limit exceeded for user ID 1.",
 			});
 
 			// Polling spawns nothing while the hold lasts.

@@ -6,7 +6,7 @@ import { failureDiagnostic } from "../../lib/failure-diagnostic/failure-diagnost
 import { reportRendererError } from "../../lib/report-renderer-error";
 import { FailureLayout } from "../FailureLayout";
 
-export interface RendererErrorBoundaryProps {
+interface RendererErrorBoundaryProps {
 	children: ReactNode;
 }
 
@@ -58,7 +58,7 @@ export class RendererErrorBoundary extends Component<
 						{i18n._(
 							msg({
 								message:
-									"Superset hit an unexpected error. Reload to try again.",
+									"Paradev hit an unexpected error. Reload to try again.",
 							}),
 						)}
 					</p>

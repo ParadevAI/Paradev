@@ -19,8 +19,9 @@ import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
-} from "@superset/shared/sandbox-contract";
-import { PACKAGE_ROOT } from "./build";
+} from "@superset/shared/sandbox/contract";
+import { BUNDLE_SRC, PACKAGE_ROOT } from "./build";
+import { discardingSteps, loadAssets, loadSteps } from "./manifest";
 
 const IMAGE = process.env.SANDBOX_IMAGE ?? "superset-sandbox:local";
 const NAME = `superset-boot-twice-${Date.now().toString(36)}`;
@@ -75,6 +76,11 @@ function bootAsUser(): string {
 	return `${new TextDecoder().decode(proc.stdout)}${new TextDecoder().decode(proc.stderr)}exit=${proc.exitCode}`;
 }
 
+const assets = loadAssets(join(BUNDLE_SRC, "assets.json"));
+const discarded = [
+	...discardingSteps(loadSteps(join(BUNDLE_SRC, "steps.json"))).keys(),
+].map((key) => assets[key]?.dest ?? key);
+
 const failures: string[] = [];
 function expect(label: string, ok: boolean, detail = ""): void {
 	console.log(`${ok ? "ok  " : "FAIL"} ${label}${detail ? `: ${detail}` : ""}`);
@@ -89,7 +95,7 @@ const identity = renderSandboxConf({
 	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
-			url: "https://github.com/superset-sh/superset.git",
+			url: "https://github.com/paradevai/paradev.git",
 			branch: "main",
 			path: ".",
 		},
@@ -134,7 +140,22 @@ try {
 	docker(["exec", "-i", NAME, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
 		stdin: identity,
 	});
-	const boot = (_n: number) => {
+	// host-service answers before the remaining steps finish; a log read for
+	// what the steps did waits for this boot's steps.end.
+	const waitForSteps = () =>
+		exec(
+			`for i in $(seq 1 3000); do awk '/ boot\\.start/ { d = 0 } / steps\\.end/ { d = 1 } END { exit !d }' ${SANDBOX_PATHS.bootLog} && exit 0; sleep 0.2; done; exit 1`,
+			{ check: false },
+		);
+	const sinceBootStart = (log: string, phase: string) => {
+		const boot = log.split(/(?=^\d+ boot\.start)/m).at(-1) ?? "";
+		const at = (p: string) =>
+			Number(
+				new RegExp(`^(\\d+) ${p.replace(".", "\\.")}\\b`, "m").exec(boot)?.[1],
+			);
+		return at(phase) - at("boot.start");
+	};
+	const boot = (n: number) => {
 		const started = Date.now();
 		bootAsUser();
 		// Wait for host-service (up to 60 s) so the second boot sees a clean run dir cleared by the first.
@@ -142,7 +163,13 @@ try {
 			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
 			{ check: false },
 		);
-		return Date.now() - started;
+		const elapsed = Date.now() - started;
+		waitForSteps();
+		const log = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+		console.log(
+			`boot ${n}: boot.start to host.ready ${sinceBootStart(log, "host.ready")} ms, to steps.end ${sinceBootStart(log, "steps.end")} ms`,
+		);
+		return elapsed;
 	};
 
 	const first = boot(1);
@@ -248,6 +275,17 @@ try {
 		`curl -fs -X POST -H 'Authorization: Bearer boot-twice-secret' -H 'Content-Type: application/json' -d '{"json":{"variables":{"FOO":"bar"}}}' http://127.0.0.1:${SANDBOX_PORTS.hostService}/trpc/sandbox.setEnvironment`,
 		{ check: false },
 	);
+	// The clone outlives host-service's readiness; a wake that interrupts it
+	// is its own case (the runner reclones), not this test's.
+	expect(
+		"first boot: checkout done",
+		/ready/.test(
+			exec(
+				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+				{ check: false },
+			),
+		),
+	);
 	expect(
 		"start hook: the runner asked host-service once the push landed",
 		/hook\.(none|started)/.test(
@@ -265,6 +303,14 @@ try {
 			),
 		),
 	);
+	const leftover = exec(
+		`for f in ${discarded.join(" ")}; do [ -e "$f" ] && echo "$f"; [ -f "$f.hash" ] || echo "no sidecar $f"; done; true`,
+	).trim();
+	expect(
+		"first boot: every consumed archive is gone, its sidecar kept",
+		leftover === "",
+		leftover.replace(/\n/g, ", "),
+	);
 	expect(
 		"status prints every step current",
 		!/pending|never run|failed/.test(
@@ -275,24 +321,18 @@ try {
 		).trim(),
 	);
 
-	// The clone outlives host-service's readiness; a wake that interrupts it
-	// is its own case (the runner reclones), not this test's.
-	expect(
-		"first boot: checkout done",
-		/ready/.test(
-			exec(
-				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
-				{ check: false },
-			),
-		),
-	);
 	// Second boot: stop everything the way a wake would (no processes survive), then boot again.
 	exec(
 		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,
 		{ check: false },
 	);
-	exec(`: > ${SANDBOX_PATHS.bootLog}`);
+	exec(
+		`: > ${SANDBOX_PATHS.bootLog}; mkdir -p ${SANDBOX_PATHS.hostRoot}/previous-runtime && touch ${SANDBOX_PATHS.hostRoot}/previous-runtime/host-service.js`,
+	);
 	const second = boot(2);
+	const runtimes = exec(
+		`for i in $(seq 1 100); do [ ! -e ${SANDBOX_PATHS.hostRoot}/previous-runtime ] && break; sleep 0.1; done; find ${SANDBOX_PATHS.hostRoot} -mindepth 1 -maxdepth 1 -type d`,
+	).trim();
 	const log2 = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect("second boot: run dir cleared", /run\.cleared/.test(log2));
 	expect(
@@ -301,10 +341,25 @@ try {
 	);
 	expect("second boot: nothing fetched", !/fetched \//.test(log2));
 	expect("second boot: every step skipped", !/step \S+ running/.test(log2));
+	const binaries = exec(
+		"claude --version && superset --version && echo binaries-ok",
+		{ user: "ubuntu", check: false },
+	);
+	expect(
+		"second boot: claude and superset still run from the media dir",
+		/binaries-ok/.test(binaries),
+		binaries.trim().replace(/\n/g, " | "),
+	);
 	expect(
 		"second boot: host-service ready",
 		/host\.ready/.test(log2),
 		`${second} ms to ready`,
+	);
+	expect(
+		"second boot: only the current runtime is left once host-service answers",
+		runtimes.split("\n").length === 1 &&
+			runtimes === exec(`readlink -f ${SANDBOX_PATHS.hostRoot}/current`).trim(),
+		runtimes.replaceAll("\n", " "),
 	);
 	expect(
 		"second boot: checkout marker respected",
@@ -312,6 +367,63 @@ try {
 		log2.match(/checkout\..*/)?.[0],
 	);
 	console.log(`\nboot log (second boot):\n${log2}`);
+
+	// The agent-tools drive, stubbed as a directory at its mount path: the
+	// listed agent is linked from it, and a session without it falls back to
+	// the image's agents rather than to links that point nowhere.
+	const stop = () =>
+		exec(
+			`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,
+			{ check: false },
+		);
+	const stubSha = "f".repeat(64);
+	stop();
+	exec(
+		`: > ${SANDBOX_PATHS.bootLog}; for name in claude pi; do mkdir -p ${SANDBOX_PATHS.agents}/$name/${stubSha} && printf '#!/bin/sh\\necho drive-%s\\n' $name > ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name && chmod 755 ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name; done && printf '%s' '${JSON.stringify(
+			[
+				{ name: "claude", sha: stubSha, bin: "claude" },
+				{ name: "pi", sha: stubSha, bin: "pi" },
+			],
+		)}' > ${SANDBOX_PATHS.agents}/manifest.json`,
+	);
+	boot(3);
+	const logDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+	expect(
+		"drive: listed agents linked",
+		/agents\.linked 2/.test(logDrive) &&
+			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })) &&
+			/drive-pi/.test(exec("pi", { check: false, user: "ubuntu" })),
+		logDrive.match(/agents\..*/)?.[0],
+	);
+	stop();
+	exec(`: > ${SANDBOX_PATHS.bootLog}; rm -rf ${SANDBOX_PATHS.agents}`);
+	const noDriveExit = bootAsUser();
+	exec(
+		`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
+		{ check: false },
+	);
+	const logNoDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+	expect(
+		"no drive: boot exits 0 and host-service ready",
+		/exit=0/.test(noDriveExit) && /host\.ready/.test(logNoDrive),
+	);
+	expect(
+		"no drive: stamped unavailable",
+		/agents\.unavailable/.test(logNoDrive),
+	);
+	expect(
+		"no drive: image claude back on PATH",
+		exec("readlink -f /usr/local/bin/claude", { check: false }).startsWith(
+			SANDBOX_PATHS.media,
+		),
+		exec("readlink -f /usr/local/bin/claude", { check: false }).trim(),
+	);
+	expect(
+		"no drive: a drive-only agent's link is gone",
+		exec("test -L /usr/local/bin/pi && echo dangling", {
+			check: false,
+		}).trim() === "",
+	);
 
 	// Third boot, with host-service deliberately broken: the box must stay
 	// alive, the desktop must still come up, and the log must say so.

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const PLAN_TIERS = ["free", "pro", "enterprise"] as const;
 export type PlanTier = (typeof PLAN_TIERS)[number];
 
@@ -74,6 +76,14 @@ export const PLAN_RANK: Record<PlanTier, number> = {
 	enterprise: 2,
 };
 
+/**
+ * Environments an organization may hold when its plan carries no
+ * `environments` feature in Autumn.
+ * TODO(harshith): remove once every plan in Autumn sets `environments`; the
+ * fallback exists only so the cap ships before the dashboard is configured.
+ */
+export const DEFAULT_ENVIRONMENT_LIMIT = 10;
+
 /** The tier an org needs to create, run, or resume an automation. */
 export const AUTOMATIONS_REQUIRED_PLAN: Exclude<PlanTier, "free"> = "pro";
 
@@ -133,4 +143,463 @@ export function requiredPlanForTriggerKind(
 export function planAllowsTriggerKind(plan: PlanTier, kind: string): boolean {
 	const required = TRIGGER_KIND_REQUIRED_PLAN[kind];
 	return required === undefined || PLAN_RANK[plan] >= PLAN_RANK[required];
+}
+
+export const CLOUD_USAGE_REFUSAL_KEYS = [
+	"serverError.cloudWorkspace.cloudNeedsPaidPlan",
+	"serverError.cloudWorkspace.usageLimitReached",
+] as const;
+
+/** Clients read the key from `data`; the server's own `TRPCError` still holds it in `cause`. */
+export function cloudUsageRefusalKey(
+	error: unknown,
+): (typeof CLOUD_USAGE_REFUSAL_KEYS)[number] | null {
+	const { data, cause } =
+		(error as {
+			data?: { i18nKey?: unknown } | null;
+			cause?: { i18nKey?: unknown } | null;
+		} | null) ?? {};
+	const i18nKey = data?.i18nKey ?? cause?.i18nKey;
+	return CLOUD_USAGE_REFUSAL_KEYS.find((key) => key === i18nKey) ?? null;
+}
+
+export function isCloudUsageRefusal(error: unknown): boolean {
+	return cloudUsageRefusalKey(error) !== null;
+}
+
+export const PLAN_PRICE_CURRENCY = "USD";
+
+/** Autumn plan metadata keys that make a plan purchasable and place it in the lineup. */
+export const PLAN_METADATA = {
+	selfServe: "self_serve",
+	family: "family",
+	displayOrder: "display_order",
+} as const;
+
+export interface CatalogPrice {
+	amount?: number | null;
+	interval?: string | null;
+	billingUnits?: number | null;
+}
+
+export interface AutumnCatalogPlan {
+	id: string;
+	name: string;
+	metadata?: Record<string, unknown> | null;
+	price?: CatalogPrice | null;
+	licenses?: Array<{ licensePlanId: string }> | null;
+	items: Array<{
+		featureId: string;
+		included?: number | null;
+		price?: CatalogPrice | null;
+	}>;
+}
+
+export interface AutumnRestPlan {
+	id: string;
+	name: string;
+	metadata?: Record<string, unknown> | null;
+	price?: { amount?: number | null; interval?: string | null } | null;
+	licenses?: Array<{ license_plan_id: string }> | null;
+	items: Array<{
+		feature_id: string;
+		included?: number | null;
+		price?: {
+			amount?: number | null;
+			interval?: string | null;
+			billing_units?: number | null;
+		} | null;
+	}>;
+}
+
+export function fromAutumnRest(plan: AutumnRestPlan): AutumnCatalogPlan {
+	return {
+		id: plan.id,
+		name: plan.name,
+		metadata: plan.metadata,
+		price: plan.price
+			? { amount: plan.price.amount, interval: plan.price.interval }
+			: null,
+		licenses: plan.licenses?.map((license) => ({
+			licensePlanId: license.license_plan_id,
+		})),
+		items: plan.items.map((item) => ({
+			featureId: item.feature_id,
+			included: item.included,
+			price: item.price
+				? {
+						amount: item.price.amount,
+						interval: item.price.interval,
+						billingUnits: item.price.billing_units,
+					}
+				: null,
+		})),
+	};
+}
+
+export type PlanInterval = "month" | "year";
+
+export interface CatalogPlan {
+	id: string;
+	name: string;
+	interval: PlanInterval;
+	seatPrice: number;
+}
+
+export interface PlanFamily {
+	family: string;
+	name: string;
+	displayOrder: number;
+	monthly: CatalogPlan | null;
+	yearly: CatalogPlan | null;
+	legacy: CatalogPlan[];
+	gbMinutesPerSeat: number | null;
+	/** The GB-hours per seat the family is sold with; null where it is not sold with cloud. */
+	advertisedGbHoursPerSeat: number | null;
+	overagePerGbHour: number | null;
+	pack: GbHourPack | null;
+	environments: number | null;
+}
+
+/** A one-off purchase of cloud GB-minutes that never expires. */
+export interface GbHourPack {
+	gbMinutes: number;
+	price: number;
+}
+
+export function isSelfServeAutumnPlan(plan: AutumnCatalogPlan): boolean {
+	return (
+		plan.metadata?.[PLAN_METADATA.selfServe] === true &&
+		typeof plan.metadata?.[PLAN_METADATA.family] === "string"
+	);
+}
+
+/** The seat license plan a parent plan sells, when seats are licenses. */
+export function seatLicensePlan(
+	plan: AutumnCatalogPlan,
+	plans: AutumnCatalogPlan[],
+): AutumnCatalogPlan | null {
+	const licensePlanId = plan.licenses?.[0]?.licensePlanId;
+	return plans.find((candidate) => candidate.id === licensePlanId) ?? null;
+}
+
+/** Self-serve plans plus the license and legacy plans the lineup refers to. */
+export function catalogPlansFrom(
+	plans: AutumnCatalogPlan[],
+	legacyPlanIds: readonly string[],
+): AutumnCatalogPlan[] {
+	const selfServe = plans.filter(isSelfServeAutumnPlan);
+	const licenseIds = new Set(
+		selfServe.flatMap(
+			(plan) => plan.licenses?.map((license) => license.licensePlanId) ?? [],
+		),
+	);
+	return plans.filter(
+		(plan) =>
+			isSelfServeAutumnPlan(plan) ||
+			licenseIds.has(plan.id) ||
+			legacyPlanIds.includes(plan.id),
+	);
+}
+
+function positiveNumber(value: unknown): number | null {
+	return typeof value === "number" && Number.isFinite(value) && value > 0
+		? value
+		: null;
+}
+
+/** The seat price a plan bills, whether seats are licenses or a feature quantity. */
+export function seatPriceOf(
+	plan: AutumnCatalogPlan,
+	plans: AutumnCatalogPlan[],
+): CatalogPrice | null | undefined {
+	const license = seatLicensePlan(plan, plans);
+	return license
+		? license.price
+		: plan.items.find((item) => item.featureId === "seats")?.price;
+}
+
+function catalogPlan(
+	plan: AutumnCatalogPlan,
+	plans: AutumnCatalogPlan[],
+): CatalogPlan | null {
+	const price = seatPriceOf(plan, plans);
+	const interval = price?.interval;
+	if (price?.amount == null || (interval !== "month" && interval !== "year")) {
+		return null;
+	}
+	return { id: plan.id, name: plan.name, interval, seatPrice: price.amount };
+}
+
+/** The Autumn features a cloud workspace boot is billed on; also the usage events' features. */
+export const BOX_GB_MINUTES_FEATURE_ID = "box_gb_minutes";
+export const ACTIVE_CPU_MINUTES_FEATURE_ID = "active_cpu_minutes";
+
+function gbMinutesPerSeat(
+	plan: AutumnCatalogPlan,
+	plans: AutumnCatalogPlan[],
+): number | null {
+	return positiveNumber(
+		seatLicensePlan(plan, plans)?.items.find(
+			(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID,
+		)?.included,
+	);
+}
+
+function environmentLimit(plan: AutumnCatalogPlan): number | null {
+	return positiveNumber(
+		plan.items.find((item) => item.featureId === "environments")?.included,
+	);
+}
+
+/** The plan's monthly price for a GB-hour beyond the allowance, when it sells overage. */
+export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
+	const price = plan.items.find(
+		(item) =>
+			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+			item.price?.interval === "month",
+	)?.price;
+	if (price?.amount == null) return null;
+	return (price.amount * 60) / (price.billingUnits ?? 1);
+}
+
+/** The plan's one-off GB-minute purchase, when it sells one. */
+export function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
+	const price = plan.items.find(
+		(item) =>
+			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+			item.price?.interval === "one_off",
+	)?.price;
+	const gbMinutes = positiveNumber(price?.billingUnits);
+	const amount = positiveNumber(price?.amount);
+	return gbMinutes && amount ? { gbMinutes, price: amount } : null;
+}
+
+export const GB_HOUR_PURCHASE = { min: 100, max: 30_000 };
+export const AUTO_TOPUP_MONTHLY_LIMIT = 10;
+
+/** The limit's next step: buy more GB-hours when the organization's plan sells a pack, else upgrade. */
+export function offersGbHourPack(
+	plan: { pack: GbHourPack | null } | null | undefined,
+): boolean {
+	return Boolean(plan?.pack);
+}
+
+/** What buying about `gbHours` costs: whole pack units, never past the maximum. */
+export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
+	const unitsFor = (hours: number) => (hours * 60) / pack.gbMinutes;
+	const units = Math.min(
+		Math.max(1, Math.floor(unitsFor(GB_HOUR_PURCHASE.max))),
+		Math.max(1, Math.ceil(unitsFor(gbHours))),
+	);
+	return {
+		gbMinutes: units * pack.gbMinutes,
+		price: units * pack.price,
+	};
+}
+
+/** The allowance fields a billing value can fail to give; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_FIELDS = [
+	"seats",
+	"bought",
+	"freeCredits",
+	"extraUsageLimit",
+	"limitReached",
+] as const;
+
+/** Why a billing value cannot give a field; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_REASONS = [
+	"not_read",
+	"percent_of_allowance",
+	"not_tracked",
+] as const;
+
+/** Exact: rounding is the formatter's, at display. */
+export function gbMinutesUsd(
+	gbMinutes: number,
+	overagePerGbHour: number | null,
+) {
+	return overagePerGbHour === null ? null : (gbMinutes / 60) * overagePerGbHour;
+}
+
+export function gbHourPackPricePerGbHour(pack: GbHourPack): number {
+	return (pack.price * 60) / pack.gbMinutes;
+}
+
+/** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
+const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
+
+/** The purchasable lineup, one entry per family, ordered for display. */
+export function planCatalogFromAutumn(
+	plans: AutumnCatalogPlan[],
+): PlanFamily[] {
+	const families = new Map<string, PlanFamily>();
+	for (const plan of plans.filter(isSelfServeAutumnPlan)) {
+		const priced = catalogPlan(plan, plans);
+		if (!priced) continue;
+		const key = plan.metadata?.[PLAN_METADATA.family] as string;
+		const family = families.get(key) ?? {
+			family: key,
+			name: plan.name,
+			displayOrder: Number.POSITIVE_INFINITY,
+			monthly: null,
+			yearly: null,
+			legacy: [],
+			gbMinutesPerSeat: null,
+			advertisedGbHoursPerSeat: null,
+			overagePerGbHour: null,
+			pack: null,
+			environments: null,
+		};
+		if (priced.interval === "month") {
+			family.monthly = priced;
+			family.name = plan.name;
+		} else {
+			family.yearly = priced;
+		}
+		family.displayOrder = Math.min(
+			family.displayOrder,
+			positiveNumber(plan.metadata?.[PLAN_METADATA.displayOrder]) ??
+				Number.POSITIVE_INFINITY,
+		);
+		family.gbMinutesPerSeat ??= gbMinutesPerSeat(plan, plans);
+		family.advertisedGbHoursPerSeat =
+			family.gbMinutesPerSeat === null ||
+			FAMILIES_WITHOUT_ADVERTISED_CLOUD.includes(key)
+				? null
+				: family.gbMinutesPerSeat / 60;
+		family.overagePerGbHour ??= overagePerGbHour(plan);
+		family.pack ??= gbHourPack(plan);
+		family.environments ??= environmentLimit(plan);
+		families.set(key, family);
+	}
+	for (const plan of plans) {
+		if (isSelfServeAutumnPlan(plan)) continue;
+		const family = families.get(
+			plan.metadata?.[PLAN_METADATA.family] as string,
+		);
+		const priced = family && catalogPlan(plan, plans);
+		if (priced) family.legacy.push(priced);
+	}
+	return [...families.values()].sort(
+		(a, b) =>
+			a.displayOrder - b.displayOrder || a.family.localeCompare(b.family),
+	);
+}
+
+/** The GB-hour price every self-serve family charges; null when none sells GB-minutes or they disagree. */
+export function lineupRatePerGbHour(lineup: PlanFamily[]): number | null {
+	const rates = new Set(
+		lineup.flatMap((family) =>
+			family.overagePerGbHour === null ? [] : [family.overagePerGbHour],
+		),
+	);
+	return rates.size === 1 ? ([...rates][0] ?? null) : null;
+}
+
+/** Yearly only counts as an option when it costs less than twelve months. */
+export function offersYearlyDiscount(family: PlanFamily): boolean {
+	return Boolean(
+		family.monthly &&
+			family.yearly &&
+			family.yearly.seatPrice < family.monthly.seatPrice * 12,
+	);
+}
+
+export function planForInterval(
+	family: PlanFamily,
+	yearly: boolean,
+): CatalogPlan | null {
+	if (yearly && offersYearlyDiscount(family)) return family.yearly;
+	return family.monthly ?? family.yearly;
+}
+
+/** The per-seat monthly price a family's card shows for the chosen interval. */
+export function seatPricePerMonth(family: PlanFamily, yearly: boolean): number {
+	const plan = planForInterval(family, yearly);
+	if (!plan) return 0;
+	return plan.interval === "year" ? plan.seatPrice / 12 : plan.seatPrice;
+}
+
+export function familyForPlan(
+	catalog: PlanFamily[],
+	autumnPlanId: string | null | undefined,
+): { family: PlanFamily; interval: PlanInterval } | null {
+	for (const family of catalog) {
+		if (family.monthly?.id === autumnPlanId) {
+			return { family, interval: "month" };
+		}
+		if (family.yearly?.id === autumnPlanId) return { family, interval: "year" };
+		const legacy = family.legacy.find((plan) => plan.id === autumnPlanId);
+		if (legacy) return { family, interval: legacy.interval };
+	}
+	return null;
+}
+
+export function maxYearlyDiscount(catalog: PlanFamily[]): number {
+	return Math.max(
+		0,
+		...catalog
+			.filter(offersYearlyDiscount)
+			.map((family) =>
+				family.monthly && family.yearly
+					? 1 - family.yearly.seatPrice / (family.monthly.seatPrice * 12)
+					: 0,
+			),
+	);
+}
+
+export const MEMORY_GB_PER_VCPU = 2;
+/** The size an environment's golden box is built at. */
+export const GOLDEN_BOX_VCPUS = 8;
+
+export const MACHINE_SIZE_VCPUS = {
+	small: 2,
+	medium: 4,
+	large: 8,
+	xlarge: 16,
+	"2xlarge": 32,
+} as const;
+export type MachineSize = keyof typeof MACHINE_SIZE_VCPUS;
+export const MACHINE_SIZES = Object.keys(MACHINE_SIZE_VCPUS) as [
+	MachineSize,
+	...MachineSize[],
+];
+export const machineSizeSchema = z.enum(MACHINE_SIZES);
+/** Every organization can run these; the rest need an Autumn feature each. */
+export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
+	"small",
+	"medium",
+	"large",
+];
+export const DEFAULT_MACHINE_SIZE: MachineSize = "medium";
+/** The size of a workspace with no stored size: it was made before sizes existed. */
+export const LEGACY_MACHINE_SIZE: MachineSize = "large";
+
+export function isMachineSize(value: unknown): value is MachineSize {
+	return typeof value === "string" && Object.hasOwn(MACHINE_SIZE_VCPUS, value);
+}
+
+export function offeredMachineSizes(
+	gated: readonly MachineSize[],
+): MachineSize[] {
+	return MACHINE_SIZES.filter(
+		(size) => OPEN_MACHINE_SIZES.includes(size) || gated.includes(size),
+	);
+}
+
+export function defaultMachineSize(
+	offered: readonly MachineSize[],
+): MachineSize {
+	return offered.includes(DEFAULT_MACHINE_SIZE)
+		? DEFAULT_MACHINE_SIZE
+		: (offered[0] ?? DEFAULT_MACHINE_SIZE);
+}
+
+export function machineSpec(size: MachineSize): {
+	vcpus: number;
+	memoryGb: number;
+} {
+	const vcpus = MACHINE_SIZE_VCPUS[size];
+	return { vcpus, memoryGb: vcpus * MEMORY_GB_PER_VCPU };
 }

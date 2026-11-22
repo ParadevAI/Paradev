@@ -1,13 +1,21 @@
 import { auth, mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
+import {
+	productAudiences,
+	verifyUserBearer,
+} from "@superset/shared/verify-jwt";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
 } from "@superset/trpc/lib/sandbox";
-import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
+import {
+	TokenOrganizationError,
+	tokenOrganizationId,
+} from "./token-organization";
 
 export interface McpContext {
 	userId: string;
@@ -15,6 +23,8 @@ export interface McpContext {
 	organizationId: string;
 	organizationIds: string[];
 	source: "api-key" | "oauth" | "sandbox";
+	/** The cloud workspace a sandbox credential belongs to; absent for every other source. */
+	sandboxWorkspaceId?: string;
 	clientLabel: string | null;
 	requestId: string;
 	bearerToken: string;
@@ -128,33 +138,26 @@ async function resolveApiKey(token: string): Promise<{
 async function resolveOAuth(
 	token: string,
 	apiUrl: string,
+	requestedOrganizationId: string | null,
 ): Promise<{
 	userId: string;
 	organizationId: string;
 	clientLabel: string | null;
 }> {
-	let payload: Record<string, unknown>;
+	const payload = await verifyUserBearer(
+		token,
+		apiUrl,
+		productAudiences(apiUrl),
+	);
+	if (!payload) throw new McpUnauthorizedError("Invalid OAuth token");
+	let organizationId: string;
 	try {
-		payload = (await verifyAccessToken(token, {
-			jwksUrl: `${apiUrl}/api/auth/jwks`,
-			verifyOptions: {
-				issuer: apiUrl,
-				audience: [
-					apiUrl,
-					`${apiUrl}/`,
-					`${apiUrl}/api/v2/agent/mcp`,
-					`${apiUrl}/mcp`,
-				],
-			},
-		})) as Record<string, unknown>;
-	} catch {
-		throw new McpUnauthorizedError("Invalid OAuth token");
-	}
-	if (typeof payload.sub !== "string" || !payload.sub) {
-		throw new McpUnauthorizedError("OAuth token missing sub claim");
-	}
-	if (typeof payload.organizationId !== "string" || !payload.organizationId) {
-		throw new McpUnauthorizedError("OAuth token missing organizationId claim");
+		organizationId = tokenOrganizationId(payload, requestedOrganizationId);
+	} catch (error) {
+		if (error instanceof TokenOrganizationError) {
+			throw new McpUnauthorizedError(error.message);
+		}
+		throw error;
 	}
 	const clientLabel =
 		typeof payload.client_name === "string" && payload.client_name
@@ -162,7 +165,7 @@ async function resolveOAuth(
 			: null;
 	return {
 		userId: payload.sub,
-		organizationId: payload.organizationId,
+		organizationId,
 		clientLabel,
 	};
 }
@@ -186,6 +189,7 @@ async function sandboxContext(
 		organizationId: caller.organizationId,
 		organizationIds,
 		source: "sandbox",
+		sandboxWorkspaceId: caller.workspaceId,
 		clientLabel: `cloud-workspace:${caller.workspaceId}`,
 		requestId: crypto.randomUUID(),
 		bearerToken: "",
@@ -224,6 +228,7 @@ export async function resolveMcpContext(
 		({ userId, organizationId, clientLabel } = await resolveOAuth(
 			token,
 			apiUrl,
+			req.headers.get(ORGANIZATION_HEADER)?.trim() || null,
 		));
 		source = "oauth";
 	} else {

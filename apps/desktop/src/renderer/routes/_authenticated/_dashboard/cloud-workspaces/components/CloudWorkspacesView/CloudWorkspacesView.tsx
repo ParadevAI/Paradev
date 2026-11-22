@@ -11,7 +11,6 @@ import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useNow } from "renderer/hooks/useNow";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { ACTIVE_WITHIN_MS } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacePresenceStack";
 import { CloudWorkspacesList } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspacesList";
 import { useCloudWorkspaceListItems } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceListItems";
 import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
@@ -60,12 +59,7 @@ export function CloudWorkspacesView({ search }: CloudWorkspacesViewProps) {
 	const people = [
 		...new Map(
 			workspaces
-				.flatMap((workspace) => [
-					workspace.createdBy,
-					...workspace.presence.map(
-						({ lastSeenAt: _seen, ...person }) => person,
-					),
-				])
+				.map((workspace) => workspace.createdBy)
 				.filter((person) => person !== null)
 				.map((person) => [person.userId, person] as const),
 		).values(),
@@ -127,8 +121,7 @@ export function CloudWorkspacesView({ search }: CloudWorkspacesViewProps) {
 		}
 		if (
 			personIds.length > 0 &&
-			!personIds.includes(workspace.createdBy?.userId ?? "") &&
-			!workspace.presence.some((person) => personIds.includes(person.userId))
+			!personIds.includes(workspace.createdBy?.userId ?? "")
 		) {
 			return false;
 		}
@@ -145,8 +138,6 @@ export function CloudWorkspacesView({ search }: CloudWorkspacesViewProps) {
 					groups: groupCloudWorkspaces({
 						workspaces: matching,
 						userId,
-						now,
-						activeWithinMs: ACTIVE_WITHIN_MS,
 						sort: display.sort,
 					}).map(({ person, workspaces: grouped }) => ({
 						key: person?.userId ?? "",

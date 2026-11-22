@@ -12,13 +12,11 @@ enum ComposerMetrics {
   static let maxWidth: CGFloat = 720
   /// Gap between the composer and the bottom safe area, per frame 1.
   static let bottomGap: CGFloat = 8
-  static let pillRadius: CGFloat = 26
+  static let pillRadius: CGFloat = 28
   static let cardRadius: CGFloat = 28
-  /// Proportions taken from the reference crops rather than guessed: the
-  /// circle is ~0.6 of the row's height and sits ~15% of that height in from
-  /// the edge. Sizing the circle to the row with only 4pt of padding — the
-  /// first attempt — reads as the controls being jammed against the sides.
-  static let controlDiameter: CGFloat = 32
+  /// Sized to the Claude app's composer controls: 32pt read as too small to hit
+  /// on a phone. Keep `rowPadding` at 8 or the controls jam against the sides.
+  static let controlDiameter: CGFloat = 38
   static let rowSpacing: CGFloat = 8
   static let rowPadding: CGFloat = 8
   static let textInset: CGFloat = 8
@@ -43,6 +41,8 @@ enum ComposerMetrics {
   /// field expand to fill that height instead of hugging its content, which
   /// leaves an empty card the size of the cap.
   static let maxLines = 8
+  /// Trailing words of what is being heard drawn as still unsure.
+  static let unsureWords = 5
   static let grabberSize = CGSize(width: 36, height: 5)
   /// The chips and the model picker, measured off frames 4 and 10: the
   /// reference's chrome is ~14pt, not the 17pt body every `Text` inherits by
@@ -384,7 +384,7 @@ struct ComposerRootView: View {
       if !holds && isExpanded { isFocused = true }
     }
     .fullScreenCover(item: $viewing) { attachment in
-      ComposerImageViewer(attachment: attachment) { viewing = nil }
+      ComposerImageViewer(uri: attachment.uri) { viewing = nil }
     }
     .onChange(of: isExpanded) { publishInteractiveFrame() }
     .onChange(of: model.backdrop) { publishInteractiveFrame() }
@@ -514,18 +514,26 @@ struct ComposerRootView: View {
   }
 
   private var editor: some View {
-    TextField(model.placeholder, text: Binding(
-      get: { model.draft },
-      set: { text in
-        model.setDraft(text)
+    Group {
+      // Swapped for the whole session rather than per guess: the field takes
+      // focus on appear, and toggling it would raise the keyboard mid-dictation.
+      if model.isDictating {
+        dictationPreview
+      } else {
+        TextField(model.placeholder, text: Binding(
+          get: { model.draft },
+          set: { text in
+            model.setDraft(text)
+          }
+        ), axis: .vertical)
+          .lineLimit(1...ComposerMetrics.maxLines)
+          .textInputAutocapitalization(model.autocapitalization)
+          .focused($isFocused)
+          // The editor exists only while expanded, so this is the first moment
+          // it can take first responder.
+          .onAppear { isFocused = true }
       }
-    ), axis: .vertical)
-      .lineLimit(1...ComposerMetrics.maxLines)
-      .textInputAutocapitalization(model.autocapitalization)
-      .focused($isFocused)
-      // The editor exists only while expanded, so this is the first moment it
-      // can take first responder.
-      .onAppear { isFocused = true }
+    }
       .frame(
         minHeight: model.compactEditor
           ? ComposerMetrics.editorMinHeightCompact
@@ -536,6 +544,53 @@ struct ComposerRootView: View {
       .padding(.bottom, ComposerMetrics.textInset)
   }
 
+  /// The draft, then what is being heard. Only the last few words of it are
+  /// dimmed italics: the engine settles a phrase only when it ends, and asking
+  /// it to settle sooner drops words, but words this far back rarely change.
+  /// Shown head-truncated, collapsed or expanded, so the words being spoken
+  /// stay in view.
+  private var dictatedText: AttributedString {
+    let volatile = model.dictation.volatileText
+    guard model.hasDraft || !volatile.isEmpty else {
+      var placeholder = AttributedString(model.placeholder)
+      placeholder.foregroundColor = .secondary
+      return placeholder
+    }
+    let base = model.draft.trimmingCharacters(in: .whitespaces)
+    let heard = String(ComposerDictatedText.join(base, volatile).dropFirst(base.count))
+    let unsure = Self.trailingWords(heard, count: ComposerMetrics.unsureWords)
+    var tail = AttributedString(String(heard.suffix(unsure)))
+    tail.font = .body.italic()
+    tail.foregroundColor = .secondary
+    return AttributedString(base + heard.dropLast(unsure)) + tail
+  }
+
+  private var dictationPreview: some View {
+    Text(dictatedText)
+      .lineLimit(ComposerMetrics.maxLines)
+      .truncationMode(.head)
+      // The default crossfade ghosts the words while they are still changing.
+      .contentTransition(.identity)
+      .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  /// Characters taken by the last `count` words, with the space before them.
+  /// Unspaced scripts (Chinese, Japanese) have no words to count, so all of
+  /// it stays unsure.
+  private static func trailingWords(_ text: String, count: Int) -> Int {
+    var words = 0
+    var index = text.endIndex
+    while index > text.startIndex {
+      let previous = text.index(before: index)
+      if text[previous].isWhitespace, index < text.endIndex, !text[index].isWhitespace {
+        words += 1
+        if words == count { return text.distance(from: previous, to: text.endIndex) }
+      }
+      index = previous
+    }
+    return text.count
+  }
+
   // MARK: - Control row
 
   private var controlRow: some View {
@@ -543,10 +598,18 @@ struct ComposerRootView: View {
       if model.showsAttachments {
         Button { model.onAttachmentsPress?() } label: {
           Image(systemName: "plus")
-            .font(.system(size: 17, weight: .regular))
+            .font(.system(size: 20, weight: .regular))
         }
         .buttonStyle(.composerControl)
         .accessibilityLabel(composerLocalized("Add attachment"))
+      }
+
+      if isExpanded && !model.modeOptions.isEmpty {
+        ComposerModeMenu(
+          options: model.modeOptions,
+          selectedId: model.selectedModeId,
+          onSelect: { model.onModeSelect?($0) }
+        )
       }
 
       if !isExpanded {
@@ -565,6 +628,8 @@ struct ComposerRootView: View {
       // rather than competing with the recording pill.
       if model.hasContent && !model.isDictating {
         sendButton
+      } else if model.canStop && !model.isDictating {
+        stopButton
       }
     }
     .padding(ComposerMetrics.rowPadding)
@@ -605,7 +670,7 @@ struct ComposerRootView: View {
     case .idle:
       Button { model.dictation.start() } label: {
         Image(systemName: "mic")
-          .font(.system(size: 17, weight: .regular))
+          .font(.system(size: 20, weight: .regular))
       }
       .buttonStyle(.composerControl)
       .accessibilityLabel(composerLocalized("Dictate"))
@@ -630,7 +695,7 @@ struct ComposerRootView: View {
         ComposerSpinner()
       } else {
         Image(systemName: "arrow.up")
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: 19, weight: .semibold))
       }
     }
     // While busy the button drops back to the ordinary control fill, so the
@@ -639,6 +704,16 @@ struct ComposerRootView: View {
     .buttonStyle(isBusy ? .composerControl : .composerSend)
     .disabled(isBusy)
     .accessibilityLabel(sendLabel)
+    .transition(.opacity)
+  }
+
+  private var stopButton: some View {
+    Button { model.onStop?() } label: {
+      Image(systemName: "stop.fill")
+        .font(.system(size: 15, weight: .semibold))
+    }
+    .buttonStyle(.composerStop)
+    .accessibilityLabel(composerLocalized("Stop"))
     .transition(.opacity)
   }
 
@@ -666,17 +741,26 @@ struct ComposerRootView: View {
 
   /// Frame 5: collapsing shows the head of the draft on one line,
   /// tail-truncated. It is a summary, not a viewport — no caret, no scroll
-  /// offset, and not editable. Tapping it expands the composer.
+  /// offset, and not editable. Tapping it expands the composer. While
+  /// dictating it follows the words being spoken instead.
   private var draftPreview: some View {
-    Text(model.hasDraft ? model.draft : model.placeholder)
-      .foregroundStyle(model.hasDraft ? .primary : .secondary)
-      .lineLimit(1)
-      .truncationMode(.tail)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.leading, ComposerMetrics.previewGap - ComposerMetrics.rowSpacing)
-      .padding(.trailing, ComposerMetrics.textInset)
-      .contentShape(.rect)
-      .onTapGesture { expand() }
+    Group {
+      if model.isDictating {
+        Text(dictatedText)
+          .truncationMode(.head)
+          .contentTransition(.identity)
+      } else {
+        Text(model.hasDraft ? model.draft : model.placeholder)
+          .foregroundStyle(model.hasDraft ? .primary : .secondary)
+          .truncationMode(.tail)
+      }
+    }
+    .lineLimit(1)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.leading, ComposerMetrics.previewGap - ComposerMetrics.rowSpacing)
+    .padding(.trailing, ComposerMetrics.textInset)
+    .contentShape(.rect)
+    .onTapGesture { expand() }
   }
 
   /// The agent, then its launch settings: `✱ Claude ⌄ · Opus ⌄ · High ⌄`.

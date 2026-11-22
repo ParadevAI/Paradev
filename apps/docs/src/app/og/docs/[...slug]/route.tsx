@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { generate as DefaultImage } from "fumadocs-ui/og";
 import { notFound } from "next/navigation";
@@ -18,7 +19,7 @@ export async function GET(
 		<DefaultImage
 			title={page.data.title}
 			description={page.data.description}
-			site={COMPANY.NAME}
+			site={BRAND.NAME}
 			icon={
 				// biome-ignore lint/performance/noImgElement: Satori requires plain HTML elements
 				<img

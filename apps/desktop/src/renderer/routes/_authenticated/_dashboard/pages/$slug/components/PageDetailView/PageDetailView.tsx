@@ -4,6 +4,7 @@ import {
 	CommentModeButton,
 	PageHeader as PageTitleBar,
 } from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
 import { Spinner } from "@superset/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
@@ -14,9 +15,15 @@ import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hoo
 
 interface PageDetailViewProps {
 	slug: string;
+	initialThreadId?: string | null;
+	initialPanelOpen?: boolean;
 }
 
-export function PageDetailView({ slug }: PageDetailViewProps) {
+export function PageDetailView({
+	slug,
+	initialThreadId = null,
+	initialPanelOpen = false,
+}: PageDetailViewProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const [commentsEnabled, setCommentsEnabled] = useState(false);
@@ -31,6 +38,9 @@ export function PageDetailView({ slug }: PageDetailViewProps) {
 		onRename,
 		onRefresh,
 		onDelete,
+		onDuplicate,
+		sharing,
+		canComment,
 	} = usePageHeaderData({ slug, version: previewVersion });
 
 	const goBack = () => navigate({ to: "/pages" });
@@ -65,23 +75,42 @@ export function PageDetailView({ slug }: PageDetailViewProps) {
 						currentUserId={currentUserId}
 						leading={backButton}
 						trailing={
-							<CommentModeButton
-								enabled={commentsEnabled}
-								openCount={threads.filter((thread) => !thread.resolved).length}
-								onToggle={() => setCommentsEnabled(!commentsEnabled)}
-							/>
+							<>
+								<PagePresenceStack pageId={page.id} viewerId={currentUserId} />
+								{canComment ? (
+									<CommentModeButton
+										enabled={commentsEnabled}
+										openCount={
+											threads.filter((thread) => !thread.resolved).length
+										}
+										onToggle={() => setCommentsEnabled(!commentsEnabled)}
+									/>
+								) : null}
+							</>
 						}
 						onSetVisibility={onSetVisibility}
 						onSetSharedVersion={onSetSharedVersion}
+						sharing={sharing}
 						onRename={onRename}
 						onRefresh={onRefresh}
-						onPreviewVersion={setPreviewVersion}
+						onPreviewVersion={(next) =>
+							setPreviewVersion(next === page.servedVersion ? null : next)
+						}
 						previewVersion={
 							previewVersion === page.servedVersion ? null : previewVersion
 						}
 						onDelete={async () => {
 							await onDelete();
 							goBack();
+						}}
+						onDuplicate={async (title) => {
+							const copy = await onDuplicate(title);
+							if (copy) {
+								await navigate({
+									to: "/pages/$slug",
+									params: { slug: copy.slug },
+								});
+							}
 						}}
 					/>
 				</PageHeader>
@@ -102,8 +131,11 @@ export function PageDetailView({ slug }: PageDetailViewProps) {
 					key={slug}
 					slug={slug}
 					version={previewVersion}
-					commentsEnabled={commentsEnabled}
+					commentsEnabled={commentsEnabled && canComment}
 					onCommentsEnabledChange={setCommentsEnabled}
+					initialThreadId={initialThreadId}
+					initialPanelOpen={initialPanelOpen}
+					findActive
 				/>
 			</div>
 		</div>

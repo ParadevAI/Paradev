@@ -1,0 +1,28 @@
+---
+title: Resend
+description: Send email, check sending domains, and find out why an email did not arrive
+---
+
+Send email, check sending domains, and find out why an email did not arrive.
+
+## Skills
+
+| Skill | What it does |
+|:------|:-------------|
+| `send-with-resend` | Checks the sending domain, tests on Resend's test addresses, and gets your confirmation before mail goes to a real inbox |
+| `debug-resend-delivery` | Finds where an email stopped: the API log, its delivery status, the suppression list, the domain's DNS records, or the webhook |
+
+Skills are named `resend-<skill>`. In Claude Code they appear as `superset:resend-<skill>`.
+
+## MCP Server
+
+Tools come from Resend's own MCP server at `https://mcp.resend.com/mcp`. Paradev proxies each call and adds your credentials. Resend decides which tools the server offers, so see Resend's documentation for the current list.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Resend in your browser. Paradev registers itself with Resend when you connect, so there is no app to set up first. |
+| API key | Paste a key from Resend's **API Keys** page. Give it **Full access**: a sending-only key can send email and do nothing else. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

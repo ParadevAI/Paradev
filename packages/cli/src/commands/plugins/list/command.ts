@@ -18,7 +18,9 @@ export default command({
 			[16, 9, 24, 24, 38],
 		),
 	run: async ({ ctx, options }) => {
-		const plugins = await ctx.api.plugins.list.query();
+		const plugins = await ctx.api.plugins.list.query({
+			includeOrganization: true,
+		});
 
 		const visible = options.available
 			? plugins

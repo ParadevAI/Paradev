@@ -1,7 +1,6 @@
 import { afterAll, afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 // Guards the RenderDebouncer hunk of the bun patch on @xterm/xterm
 // (DESKTOP-27 / DESKTOP-CS, see patches/README.md). Unpatched, dispose()
@@ -15,11 +14,6 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 // patchedDependencies is keyed to an exact version, so a bump silently drops
 // the patch while everything still builds. If this fails after a bump,
 // regenerate the patch per patches/README.md; do NOT delete it.
-
-// happy-dom over the preloaded plain-object document: Terminal.open() needs
-// a real DOM. Globals are process-wide, so unregister in afterAll.
-const alreadyRegistered = GlobalRegistrator.isRegistered;
-if (!alreadyRegistered) GlobalRegistrator.register();
 
 // The DOM renderer measures glyphs through a 2d context happy-dom does not
 // implement (it prefers OffscreenCanvas when present); widths only need to be
@@ -52,14 +46,12 @@ afterAll(async () => {
 		if (descriptor) Object.defineProperty(prototype, "getContext", descriptor);
 		else delete (prototype as { getContext?: unknown }).getContext;
 	}
-	if (!alreadyRegistered) await GlobalRegistrator.unregister();
 });
 
 const { Terminal } = await import("@xterm/xterm");
 
 // The frame stubs below live on the process-wide window, which outlives this
-// file when another suite registered happy-dom first (`alreadyRegistered`, so
-// afterAll does not unregister). Leaving a queue that only this file drains
+// file. Leaving a queue that only this file drains
 // would silently strand every later rAF, so restore after each test.
 let restoreFrames: (() => void) | undefined;
 afterEach(() => {
@@ -109,7 +101,11 @@ describe("@xterm/xterm RenderDebouncer dispose patch", () => {
 		test(`${name} carries the patch`, () => {
 			const src = readFileSync(join(libDir, name), "utf8");
 			expect(src).toContain("this._isDisposed=!0,this._refreshCallbacks=[]");
-			expect(src).toContain("if(this._isDisposed)return 0;");
+			expect(src).toContain("this._isDisposed?0:(this._refreshCallbacks.push(");
+			expect(src).toContain("{if(this._isDisposed)return;");
+			// Event.ts: an emitter disposed by one of its own listeners must not
+			// truncate the array fire() is iterating.
+			expect(src).toContain("this._disposed=!0,this._listeners=[]");
 		});
 	}
 

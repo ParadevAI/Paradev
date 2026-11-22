@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { PortForward } from "shared/types";
 import { usePortForward } from "../../providers/PortForwardsProvider";
 import type { DashboardSidebarPort } from "../useDashboardSidebarPortsData";
@@ -18,10 +18,13 @@ type OpenablePort = Pick<
  */
 export function getPortBrowserUrl(
 	port: Pick<DashboardSidebarPort, "port" | "hostType">,
-	forward: Pick<PortForward, "status"> | null,
+	forward:
+		| (Pick<PortForward, "status"> & Partial<Pick<PortForward, "localPort">>)
+		| null,
 ): string | null {
 	const localPort =
-		forward?.status.state === "active" ? forward.status.localPort : null;
+		forward?.localPort ??
+		(forward?.status.state === "active" ? forward.status.localPort : null);
 	if (port.hostType !== "local-device" && localPort === null) return null;
 	return `http://localhost:${localPort ?? port.port}`;
 }
@@ -34,7 +37,7 @@ export function getPortBrowserUrl(
 export function usePortOpener() {
 	const navigate = useNavigate();
 	const openUrl = electronTrpc.external.openUrl.useMutation();
-	const { preferences } = useV2UserPreferences();
+	const { preferences } = useUserPreferences();
 
 	const openExternal = (url: string) => {
 		if (!openUrl.isPending) openUrl.mutate(url);
@@ -42,11 +45,13 @@ export function usePortOpener() {
 
 	const openPort = (
 		port: OpenablePort,
-		forward: Pick<PortForward, "status"> | null,
+		forward:
+			| (Pick<PortForward, "status"> & Partial<Pick<PortForward, "localPort">>)
+			| null,
 	) => {
 		const url = getPortBrowserUrl(port, forward);
 		if (url === null) {
-			void navigateToV2Workspace(port.workspaceId, navigate, {
+			void navigateToWorkspace(port.workspaceId, navigate, {
 				search: {
 					terminalId: port.terminalId,
 					focusRequestId: crypto.randomUUID(),
@@ -58,7 +63,7 @@ export function usePortOpener() {
 			openExternal(url);
 			return;
 		}
-		void navigateToV2Workspace(port.workspaceId, navigate, {
+		void navigateToWorkspace(port.workspaceId, navigate, {
 			search: {
 				openUrl: url,
 				openUrlTarget:

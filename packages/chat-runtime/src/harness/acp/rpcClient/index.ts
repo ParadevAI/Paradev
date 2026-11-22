@@ -6,4 +6,9 @@ export type {
 	AcpTransportHandlers,
 	SpawnAcpOptions,
 } from "./rpcClient";
-export { AcpRpcClient, AcpRpcError, spawnAcpTransport } from "./rpcClient";
+export {
+	AcpRpcClient,
+	AcpRpcError,
+	AcpTimeoutError,
+	spawnAcpTransport,
+} from "./rpcClient";

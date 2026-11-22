@@ -1,7 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { DurableEnvelope, Envelope } from "../../protocol/envelope";
 import type { Item } from "../../protocol/items";
-import { displayText, emptySnapshot, reduce, reduceMany } from "./reducer";
+import {
+	displayText,
+	emptySnapshot,
+	liveStream,
+	reduce,
+	reduceMany,
+} from "./reducer";
 
 let seqCounter = 0;
 
@@ -193,5 +199,40 @@ describe("reduce", () => {
 			reset: { reason: "journal_missing" },
 		});
 		expect(snapshot.pendingReset).toBe("journal_missing");
+	});
+});
+
+describe("background steps", () => {
+	const step = (itemId: string, append: string): Envelope => ({
+		v: 1,
+		sessionId: "s1",
+		ts: 1,
+		delta: { type: "background", itemId, append },
+	});
+	const tasks = (...ids: string[]) =>
+		durable({
+			type: "session",
+			session: {
+				status: "running",
+				harness: "acp",
+				backgroundTasks: ids.map((id) => ({
+					id,
+					kind: "subagent" as const,
+					name: id,
+					canStop: true,
+					startedAtMs: 1,
+				})),
+			},
+		});
+
+	test("a task's step goes when the task leaves the list", () => {
+		const running = reduceMany(emptySnapshot(), [
+			tasks("subagent:a", "subagent:b"),
+			step("subagent:a", "sleep 10"),
+			step("subagent:b", "ls"),
+		]);
+		const idle = reduce(running, tasks("subagent:b"));
+		expect(liveStream(idle, "background", "subagent:a")).toBeUndefined();
+		expect(liveStream(idle, "background", "subagent:b")).toBe("ls");
 	});
 });

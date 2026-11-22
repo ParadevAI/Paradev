@@ -162,6 +162,30 @@ export async function getDefaultBranchName(
 	}
 }
 
+// `origin/HEAD` is only set by `git clone`; a repo wired up with
+// `remote add` + `fetch` lacks it.
+const CONVENTIONAL_DEFAULT_BRANCHES = ["main", "master"];
+
+async function findConventionalOriginDefault(
+	git: SimpleGit,
+): Promise<string | null> {
+	for (const branch of CONVENTIONAL_DEFAULT_BRANCHES) {
+		const exists = await git
+			.raw([
+				"rev-parse",
+				"--verify",
+				"--quiet",
+				`refs/remotes/origin/${branch}`,
+			])
+			.then(
+				(output) => output.trim() !== "",
+				() => false,
+			);
+		if (exists) return branch;
+	}
+	return null;
+}
+
 /**
  * Resolve the base comparison for "this branch vs its upstream default"
  * views. Honors the local default branch's configured upstream
@@ -178,7 +202,10 @@ export async function resolveBaseComparison(
 	// tracks another local branch and there is nothing to fetch.
 	fetchTarget: { remote: string; branch: string } | null;
 } | null> {
-	const branchName = explicitBranch ?? (await getDefaultBranchName(git));
+	const branchName =
+		explicitBranch ??
+		(await getDefaultBranchName(git)) ??
+		(await findConventionalOriginDefault(git));
 	if (!branchName) return null;
 	const upstream = await resolveUpstream(git, branchName);
 	// Git encodes a branch tracking another local branch as
@@ -410,9 +437,8 @@ export async function detectUnstagedRenames(
 		const tempIndex = join(tempDir, "index");
 		await copyFile(indexPath, tempIndex);
 
-		const tempGit = createUserSimpleGit(worktreePath).env({
-			...process.env,
-			GIT_INDEX_FILE: tempIndex,
+		const tempGit = createUserSimpleGit(worktreePath, {
+			env: { ...process.env, GIT_INDEX_FILE: tempIndex },
 		});
 
 		await tempGit.raw([
@@ -527,10 +553,31 @@ export interface DiffCategoryRefs {
 	toRef?: string;
 }
 
+const EMPTY_TREE_HASH = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+
+async function resolveCommitBaseRef(
+	git: SimpleGit,
+	commitHash: string,
+	fromHash: string | undefined,
+	includeFrom: boolean | undefined,
+): Promise<string> {
+	if (!includeFrom || !fromHash) return fromHash ?? `${commitHash}^`;
+
+	const parents = await git.raw(["rev-list", "--parents", "-n", "1", fromHash]);
+	const refs = parents.trim().split(/\s+/);
+	if (!refs[0]) throw new Error(`Could not resolve commit ${fromHash}`);
+	return refs[1] ?? EMPTY_TREE_HASH;
+}
+
 export async function resolveDiffCategoryRefs(
 	git: SimpleGit,
 	category: DiffCategory,
-	opts: { baseBranch?: string; commitHash?: string; fromHash?: string },
+	opts: {
+		baseBranch?: string;
+		commitHash?: string;
+		fromHash?: string;
+		includeFrom?: boolean;
+	},
 ): Promise<DiffCategoryRefs> {
 	if (category === "against-base") {
 		const base = await resolveBaseComparison(git, opts.baseBranch);
@@ -552,7 +599,12 @@ export async function resolveDiffCategoryRefs(
 			});
 		}
 		return {
-			fromRef: opts.fromHash ?? `${opts.commitHash}^`,
+			fromRef: await resolveCommitBaseRef(
+				git,
+				opts.commitHash,
+				opts.fromHash,
+				opts.includeFrom,
+			),
 			toRef: opts.commitHash,
 		};
 	}

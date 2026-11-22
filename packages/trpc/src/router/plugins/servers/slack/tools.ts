@@ -9,7 +9,7 @@ interface SlackResponse {
 	[key: string]: unknown;
 }
 
-async function slack(
+export async function slack(
 	accessToken: string,
 	method: string,
 	params: Record<string, unknown> = {},
@@ -42,7 +42,11 @@ async function slack(
 
 	const payload = (await response.json()) as SlackResponse;
 	if (!payload.ok) {
-		throw new Error(`Slack API error: ${payload.error ?? "Unknown error"}`);
+		const rejected = ["invalid_auth", "token_revoked", "account_inactive"];
+		throw Object.assign(
+			new Error(`Slack API error: ${payload.error ?? "Unknown error"}`),
+			rejected.includes(payload.error ?? "") ? { code: 401 } : {},
+		);
 	}
 	return payload;
 }
@@ -51,7 +55,7 @@ function text(value: string): ToolResult {
 	return { content: [{ type: "text", text: value }] };
 }
 
-interface SlackMessage {
+export interface SlackMessage {
 	ts?: string;
 	user?: string;
 	username?: string;
@@ -81,7 +85,7 @@ interface SlackChannel {
 	purpose?: { value?: string };
 }
 
-interface SlackUser {
+export interface SlackUser {
 	id: string;
 	name?: string;
 	real_name?: string;
@@ -939,6 +943,7 @@ export async function callTool(
 				return { ...text(`Unknown tool: ${name}`), isError: true };
 		}
 	} catch (error) {
+		if ((error as { code?: unknown }).code === 401) throw error;
 		return {
 			...text(
 				`Error: ${error instanceof Error ? error.message : String(error)}`,

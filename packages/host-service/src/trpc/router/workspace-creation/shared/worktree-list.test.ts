@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import simpleGit, { type SimpleGit } from "simple-git";
+import { type SimpleGit, simpleGit } from "simple-git";
 import { listGitWorktrees, parseWorktreeList } from "./worktree-list";
 
 describe("parseWorktreeList", () => {
@@ -25,6 +25,15 @@ describe("parseWorktreeList", () => {
 				prunable: null,
 			},
 		]);
+	});
+
+	test("keeps trailing whitespace in a worktree path", () => {
+		const raw = [
+			"worktree /repo ",
+			"HEAD abc123",
+			"branch refs/heads/main",
+		].join("\n");
+		expect(parseWorktreeList(raw)[0]?.path).toBe("/repo ");
 	});
 
 	test("parses a detached worktree", () => {

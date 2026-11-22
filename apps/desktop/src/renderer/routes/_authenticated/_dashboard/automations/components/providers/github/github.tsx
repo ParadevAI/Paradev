@@ -35,7 +35,7 @@ export const githubProvider: TriggerProvider<GithubConfig> = {
 		if (!configHasMeScope(config)) return [];
 		if ((options.github?.viewer ?? []).length > 0) return [];
 		return [
-			'This trigger filters by "Me", but no GitHub account is connected for you — it will not fire until one is.',
+			'This trigger filters by "Me", but no GitHub account is connected for you. It will not fire until one is.',
 		];
 	},
 };

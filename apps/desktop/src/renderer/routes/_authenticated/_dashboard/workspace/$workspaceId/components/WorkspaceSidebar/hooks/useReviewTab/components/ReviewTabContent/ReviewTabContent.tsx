@@ -1,0 +1,97 @@
+import { Trans } from "@lingui/react/macro";
+import { memo } from "react";
+import type { OpenPullRequestPane } from "renderer/lib/github/openPullRequestLink";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import type { CommentPaneData, DiffFocusSide } from "../../../../../../types";
+import {
+	CommentsSection,
+	type CommentsUnavailable,
+} from "../../../../../CommentsSection";
+import type { NormalizedComment, NormalizedPR } from "../../types";
+import { ChecksSection } from "../ChecksSection";
+import { PRHeader } from "../PRHeader";
+
+interface ReviewTabContentProps {
+	workspaceId: string;
+	pullRequest: PullRequestTarget | null;
+	commentsUnavailable: CommentsUnavailable;
+	pr: NormalizedPR | null;
+	comments: NormalizedComment[];
+	isLoading: boolean;
+	isError: boolean;
+	isCommentsLoading: boolean;
+	onOpenComment?: (comment: CommentPaneData) => void;
+	onOpenPullRequest?: OpenPullRequestPane;
+	onOpenInDiff?: (
+		path: string,
+		line?: number,
+		openInNewTab?: boolean,
+		side?: DiffFocusSide,
+	) => void;
+}
+
+export const ReviewTabContent = memo(function ReviewTabContent({
+	workspaceId,
+	pullRequest,
+	commentsUnavailable,
+	pr,
+	comments,
+	isLoading,
+	isError,
+	isCommentsLoading,
+	onOpenComment,
+	onOpenPullRequest,
+	onOpenInDiff,
+}: ReviewTabContentProps) {
+	if (isError) {
+		return (
+			<div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+				<Trans>Unable to load review status</Trans>
+			</div>
+		);
+	}
+
+	if (isLoading && !pr) {
+		return (
+			<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+				<Trans>Loading review...</Trans>
+			</div>
+		);
+	}
+
+	if (!pr) {
+		return (
+			<div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+				<Trans>
+					Open a pull request to view review status, checks, and comments.
+				</Trans>
+			</div>
+		);
+	}
+
+	return (
+		<div className="flex h-full min-h-0 min-w-0 flex-col overflow-x-hidden overflow-y-auto">
+			<PRHeader pr={pr} onOpenPullRequest={onOpenPullRequest} />
+
+			<div className="my-1 border-b border-border/70" />
+
+			<ChecksSection
+				workspaceId={workspaceId}
+				checks={pr.checks}
+				checksStatus={pr.checksStatus}
+				prUrl={pr.url}
+			/>
+
+			<div className="my-1 border-b border-border/70" />
+
+			<CommentsSection
+				pullRequest={pullRequest}
+				unavailable={commentsUnavailable}
+				comments={comments}
+				isLoading={isCommentsLoading}
+				onOpenComment={onOpenComment}
+				onOpenInDiff={onOpenInDiff}
+			/>
+		</div>
+	);
+});

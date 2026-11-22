@@ -16,11 +16,16 @@ import {
 	type PageViewportZoom,
 } from "@superset/shared/page-zoom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useJoinPresence } from "../../../Presence";
 import { usePageStorageConnect } from "../../hooks/usePageStorageConnect";
+import { type PageToolHost, usePageTools } from "../../hooks/usePageTools";
 import { useComments } from "../../providers/CommentProvider";
 import { PageFrame } from "../PageFrame";
+import { PageToolConsentDialog } from "../PageToolConsentDialog";
 import { CommentBubble, pinClassName } from "./components/CommentBubble";
 import { CommentPopover } from "./components/CommentPopover";
+import { PageFindBar } from "./components/PageFindBar";
+import { type PageFindOptions, usePageFind } from "./hooks/usePageFind";
 import {
 	type PinPoint,
 	pinPointOf,
@@ -29,6 +34,7 @@ import {
 } from "./utils/pinLayout";
 
 interface PageCommentsViewProps {
+	pageId?: string;
 	/** The page's own origin, which serves it with the comment runtime injected. */
 	src: string;
 	title: string;
@@ -42,9 +48,15 @@ interface PageCommentsViewProps {
 	onFramePointerDown?: () => void;
 	onLinkClick?: (click: PageLinkClick) => void;
 	storageTicket?: () => Promise<string | null>;
+	presenceUrl?: () => Promise<string | null>;
+	onPublished?: () => void;
+	toolHost?: PageToolHost;
+	/** Opt in to the find bar; a browser host leaves it to its own find. */
+	find?: PageFindOptions;
 }
 
 export function PageCommentsView({
+	pageId,
 	src,
 	title,
 	initialScrollY,
@@ -53,6 +65,10 @@ export function PageCommentsView({
 	onFramePointerDown,
 	onLinkClick,
 	storageTicket,
+	presenceUrl,
+	onPublished,
+	toolHost,
+	find: findOptions,
 }: PageCommentsViewProps) {
 	const onLinkClickRef = useRef(onLinkClick);
 	onLinkClickRef.current = onLinkClick;
@@ -97,6 +113,13 @@ export function PageCommentsView({
 	const frameOrigin = useMemo(() => new URL(src).origin, [src]);
 
 	usePageStorageConnect({ frameRef, frameOrigin, ticket: storageTicket });
+	const tools = usePageTools({
+		frameRef,
+		frameOrigin,
+		host: toolHost,
+		pageId,
+	});
+	useJoinPresence({ roomId: pageId, url: presenceUrl, onPublished });
 
 	const [lastHoverRect, setLastHoverRect] = useState<FrameRect | null>(null);
 	useEffect(() => {
@@ -152,6 +175,15 @@ export function PageCommentsView({
 		},
 		[frameOrigin],
 	);
+
+	const find = usePageFind({
+		frameRef,
+		frameOrigin,
+		send,
+		options: findOptions,
+	});
+	const findOpen = find.state.open;
+	const closeFind = find.close;
 
 	const popoverThread = panelOpen
 		? null
@@ -238,7 +270,10 @@ export function PageCommentsView({
 					setActiveThreadId(null);
 				}
 			}
-			if (data.type === "escape") dismiss();
+			if (data.type === "escape") {
+				if (findOpen) closeFind();
+				else dismiss();
+			}
 			if (data.type === "rects")
 				setRects(
 					data.entries.map((entry) => ({
@@ -257,8 +292,10 @@ export function PageCommentsView({
 		window.addEventListener("message", onMessage);
 		return () => window.removeEventListener("message", onMessage);
 	}, [
+		closeFind,
 		discardDraft,
 		dismiss,
+		findOpen,
 		frameOrigin,
 		pinchZoomEnabled,
 		notifyFramePointerDown,
@@ -314,6 +351,8 @@ export function PageCommentsView({
 		[pins],
 	);
 	const stackIndex = useMemo(() => stackPins(pins), [pins]);
+
+	const commentsButtonShown = !panelOpen && (threads.length > 0 || enabled);
 
 	const activePoint = popoverThread ? pinPoints.get(popoverThread.id) : null;
 	const draftRect = draft ? (rects[PENDING_ANCHOR_ID] ?? draft.rect) : null;
@@ -398,12 +437,14 @@ export function PageCommentsView({
 						container={container}
 						thread={null}
 						initialValue={draft.body}
+						initialAttachments={draft.attachments}
 						onDismiss={discardDraft}
-						onSubmit={(body) =>
+						onSubmit={(body, attachments) =>
 							createThread({
 								anchor: draft.anchor,
 								anchorText: draft.anchor.text,
 								body,
+								attachments,
 							})
 						}
 						onQuick={(body, intent) => {
@@ -426,7 +467,9 @@ export function PageCommentsView({
 						container={container}
 						thread={popoverThread}
 						onDismiss={() => setActiveThreadId(null)}
-						onSubmit={(body) => addReply(popoverThread.id, body)}
+						onSubmit={(body, attachments) =>
+							addReply(popoverThread.id, body, attachments)
+						}
 						onEdit={(commentId, body) =>
 							editComment(popoverThread.id, commentId, body)
 						}
@@ -437,6 +480,28 @@ export function PageCommentsView({
 					/>
 				) : null}
 			</div>
+
+			{findOpen ? (
+				<PageFindBar
+					state={find.state}
+					className={commentsButtonShown ? "top-14" : "top-3"}
+					onQueryChange={find.setQuery}
+					onNext={find.next}
+					onPrevious={find.previous}
+					onClose={closeFind}
+				/>
+			) : null}
+
+			<PageToolConsentDialog
+				key={
+					tools.prompt
+						? `${tools.prompt.kind}:${tools.prompt.pluginLabel}`
+						: "none"
+				}
+				pageTitle={title}
+				prompt={tools.prompt}
+				onAnswer={tools.answer}
+			/>
 		</div>
 	);
 }

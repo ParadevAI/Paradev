@@ -1,9 +1,10 @@
 import { PostHog } from "posthog-react-native";
 import { env } from "../env";
+import { posthogHost } from "./utils/posthogHost";
 
 export const posthogConfig = {
 	apiKey: env.EXPO_PUBLIC_POSTHOG_KEY,
-	host: env.EXPO_PUBLIC_POSTHOG_HOST,
+	host: posthogHost,
 	options: {
 		enableSessionReplay: true,
 		sessionReplayConfig: {

@@ -8,7 +8,7 @@ body:
       label: Where did this happen?
       options:
         - Desktop app (macOS)
-        - Web app (app.superset.sh)
+        - Web app (app.paradev.com)
         - CLI
         - Building from source
         - Other
@@ -18,7 +18,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: "Desktop: Superset > About Superset. CLI: superset --version. Source builds: the commit SHA."
+      description: "Desktop: Paradev > About Paradev. CLI: superset --version. Source builds: the commit SHA."
       placeholder: "e.g. 1.15.0"
     validations:
       required: true

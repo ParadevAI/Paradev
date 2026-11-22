@@ -34,21 +34,21 @@ function isFilterTab(value: unknown): value is FilterTab {
 interface TasksFilterState {
 	tab: FilterTab;
 	assignee: string | null;
+	label: string | null;
 	search: string;
 	viewMode: ViewMode;
 	typeTab: TypeTab;
 	projectFilters: string[];
-	linearProjectFilter: string | null;
 	linearTeamFilter: string | null;
 	linearAssigneeFilter: string | null;
 	includeClosedIssues: boolean;
 	setTab: (tab: FilterTab) => void;
 	setAssignee: (assignee: string | null) => void;
+	setLabel: (label: string | null) => void;
 	setSearch: (search: string) => void;
 	setViewMode: (viewMode: ViewMode) => void;
 	setTypeTab: (typeTab: TypeTab) => void;
 	setProjectFilters: (projectFilters: string[]) => void;
-	setLinearProjectFilter: (linearProjectFilter: string | null) => void;
 	setLinearTeamFilter: (linearTeamFilter: string | null) => void;
 	setLinearAssigneeFilter: (linearAssigneeFilter: string | null) => void;
 	setIncludeClosedIssues: (includeClosedIssues: boolean) => void;
@@ -60,7 +60,6 @@ type PersistedTasksFilterState = Pick<
 	| "viewMode"
 	| "typeTab"
 	| "projectFilters"
-	| "linearProjectFilter"
 	| "linearTeamFilter"
 	| "linearAssigneeFilter"
 	| "includeClosedIssues"
@@ -85,11 +84,6 @@ export function migrateTasksFilterState(
 			state.projectFilters ??
 				(typeof state.projectFilter === "string" ? [state.projectFilter] : []),
 		),
-		linearProjectFilter:
-			typeof state.linearProjectFilter === "string" &&
-			state.linearProjectFilter.trim().length > 0
-				? state.linearProjectFilter.trim()
-				: null,
 		linearTeamFilter:
 			typeof state.linearTeamFilter === "string"
 				? state.linearTeamFilter
@@ -106,16 +100,17 @@ export const useTasksFilterStore = create<TasksFilterState>()(
 		(set) => ({
 			tab: "all",
 			assignee: null,
+			label: null,
 			search: "",
 			viewMode: "table",
 			typeTab: "tasks",
 			projectFilters: [],
-			linearProjectFilter: null,
 			linearTeamFilter: null,
 			linearAssigneeFilter: null,
 			includeClosedIssues: false,
 			setTab: (tab) => set({ tab }),
 			setAssignee: (assignee) => set({ assignee }),
+			setLabel: (label) => set({ label }),
 			setSearch: (search) => set({ search }),
 			setViewMode: (viewMode) => set({ viewMode }),
 			setTypeTab: (typeTab) => set({ typeTab }),
@@ -128,8 +123,6 @@ export const useTasksFilterStore = create<TasksFilterState>()(
 						? state
 						: { projectFilters: next };
 				}),
-			setLinearProjectFilter: (linearProjectFilter) =>
-				set({ linearProjectFilter }),
 			setLinearTeamFilter: (linearTeamFilter) => set({ linearTeamFilter }),
 			setLinearAssigneeFilter: (linearAssigneeFilter) =>
 				set({ linearAssigneeFilter }),
@@ -138,11 +131,10 @@ export const useTasksFilterStore = create<TasksFilterState>()(
 		}),
 		{
 			name: "tasks-filter-state",
-			version: 5,
+			version: 6,
 			migrate: migrateTasksFilterState,
 			partialize: (state) => ({
 				projectFilters: state.projectFilters,
-				linearProjectFilter: state.linearProjectFilter,
 				linearTeamFilter: state.linearTeamFilter,
 				linearAssigneeFilter: state.linearAssigneeFilter,
 				tab: state.tab,
@@ -154,13 +146,13 @@ export const useTasksFilterStore = create<TasksFilterState>()(
 	),
 );
 
-export interface TasksFilters {
+interface TasksFilters {
 	tab: FilterTab;
 	assignee: string | null;
+	label: string | null;
 	search: string;
 	typeTab: TypeTab;
 	projectFilters: string[];
-	linearProjectFilter: string | null;
 	includeClosedIssues: boolean;
 }
 
@@ -170,12 +162,11 @@ export function tasksSearchFromFilters(
 	const out: Record<string, string> = {};
 	if (filters.tab !== "all") out.tab = filters.tab;
 	if (filters.assignee) out.assignee = filters.assignee;
+	if (filters.label) out.label = filters.label;
 	if (filters.search) out.search = filters.search;
 	if (filters.typeTab !== "tasks") out.type = filters.typeTab;
 	const projects = serializeProjectFilters(filters.projectFilters);
 	if (projects) out.projects = projects;
-	if (filters.linearProjectFilter)
-		out.linearProject = filters.linearProjectFilter;
 	if (filters.typeTab === "issues" && filters.includeClosedIssues)
 		out.state = "all";
 	return out;

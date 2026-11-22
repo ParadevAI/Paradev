@@ -18,7 +18,6 @@ import {
 	HiOutlineChevronRight,
 } from "react-icons/hi2";
 import { LuRefreshCw } from "react-icons/lu";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { UsageSeverityBadge } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/ResourceConsumption/components/UsageSeverityBadge";
 import { useResourceNavigation } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/ResourceConsumption/hooks/useResourceNavigation";
 import { useResourceSnapshot } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/ResourceConsumption/hooks/useResourceSnapshot";
@@ -40,7 +39,7 @@ import {
 	sortProjectGroups,
 	sortWorkspaces,
 } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/ResourceConsumption/utils/workspaceGrouping";
-import { ResourceSparkline } from "./components/ResourceSparkline";
+import { ResourceSparkline } from "renderer/routes/_authenticated/components/ResourceSparkline";
 import { useResourceSampleBuffer } from "./hooks/useResourceSampleBuffer";
 
 const SORT_LABELS: Record<SortOption, MessageDescriptor> = {
@@ -164,13 +163,13 @@ function SystemOverview({ snapshot }: { snapshot: ResourceMetricsSnapshot }) {
 			<div className="grid grid-cols-3 gap-x-4 gap-y-1 border-y py-2 md:grid-cols-6">
 				<Stat
 					label={t({
-						message: "Superset CPU",
+						message: "Paradev CPU",
 					})}
 					value={formatCpu(snapshot.totalCpu)}
 				/>
 				<Stat
 					label={t({
-						message: "Superset memory",
+						message: "Paradev memory",
 					})}
 					value={formatMemory(snapshot.totalMemory)}
 				/>
@@ -203,7 +202,7 @@ function SystemOverview({ snapshot }: { snapshot: ResourceMetricsSnapshot }) {
 				role="img"
 				className="flex h-1.5 w-full gap-px overflow-hidden rounded-full bg-muted/60"
 				aria-label={t({
-					message: `System RAM: Superset ${formatMemory(snapshot.totalMemory)}, other apps ${formatMemory(otherUsedMemory)}, free ${formatMemory(freeMemory)}`,
+					message: `System RAM: Paradev ${formatMemory(snapshot.totalMemory)}, other apps ${formatMemory(otherUsedMemory)}, free ${formatMemory(freeMemory)}`,
 				})}
 			>
 				<div
@@ -221,7 +220,7 @@ function SystemOverview({ snapshot }: { snapshot: ResourceMetricsSnapshot }) {
 			<div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-muted-foreground">
 				<MemoryLegendItem
 					colorClass={trackedBarColorClass}
-					label="Superset"
+					label="Paradev"
 					value={formatMemory(snapshot.totalMemory)}
 				/>
 				<MemoryLegendItem
@@ -255,8 +254,6 @@ function toggleSetMember(previous: Set<string>, member: string): Set<string> {
 
 export function UsageResourcesPage() {
 	const { t } = useLingui();
-	const isV2 = useIsV2CloudEnabled();
-	const surface = isV2 ? "v2" : "v1";
 	const [sortOption, setSortOption] = useState<SortOption>("memory");
 	const [collapsedProjects, setCollapsedProjects] = useState<Set<string>>(
 		new Set(),
@@ -271,10 +268,10 @@ export function UsageResourcesPage() {
 		isFetching,
 		sidebarProjectOrder,
 		sidebarWorkspaceOrder,
-	} = useResourceSnapshot(surface);
+	} = useResourceSnapshot();
 
 	const { getPaneName, navigateToWorkspace, navigateToPane } =
-		useResourceNavigation({ surface, onNavigate: () => {} });
+		useResourceNavigation({ onNavigate: () => {} });
 
 	const samples = useResourceSampleBuffer(snapshot);
 
@@ -371,7 +368,7 @@ export function UsageResourcesPage() {
 					<div className="grid gap-3 sm:grid-cols-2">
 						<ResourceSparkline
 							label={t({
-								message: "Superset CPU · last 5 min",
+								message: "Paradev CPU · last 5 min",
 							})}
 							current={formatCpu(snapshot.totalCpu)}
 							color="var(--chart-1)"
@@ -381,7 +378,7 @@ export function UsageResourcesPage() {
 						/>
 						<ResourceSparkline
 							label={t({
-								message: "Superset memory · last 5 min",
+								message: "Paradev memory · last 5 min",
 							})}
 							current={formatMemory(snapshot.totalMemory)}
 							color="var(--chart-2)"
@@ -411,7 +408,7 @@ export function UsageResourcesPage() {
 						<div className="flex items-center gap-3 px-3 py-2">
 							<div className="flex min-w-0 flex-1 items-center gap-1.5">
 								<span className="truncate text-[13px] font-medium">
-									<Trans>Superset app</Trans>
+									<Trans>Paradev app</Trans>
 								</span>
 								<UsageSeverityBadge
 									severity={getUsageSeverity(snapshot.app, totalUsage)}

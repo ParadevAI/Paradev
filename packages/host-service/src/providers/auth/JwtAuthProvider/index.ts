@@ -1,1 +1,4 @@
-export { JwtApiAuthProvider } from "./JwtAuthProvider";
+export {
+	JwtApiAuthProvider,
+	SESSION_REJECTED_ERROR_NAME,
+} from "./JwtAuthProvider";

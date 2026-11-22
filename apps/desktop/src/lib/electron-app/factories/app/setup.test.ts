@@ -1,6 +1,5 @@
-// Reads setup.ts as source rather than importing it: importing links its named
-// electron imports against whichever `mock.module("electron")` an earlier test
-// file installed, and Bun cannot add an export the linked mock lacks.
+// Reads setup.ts as source: importing it applies Chromium switches through
+// app.commandLine, which the electron fake in test-setup.ts does not have.
 
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
@@ -12,5 +11,20 @@ describe("app setup GPU policy", () => {
 	test("leaves GPU acceleration to Chromium's blocklist (#5948)", () => {
 		expect(setupSource).not.toMatch(/disableHardwareAcceleration\s*\(/);
 		expect(setupSource).not.toMatch(/appendSwitch\(\s*["']disable-gpu/);
+	});
+});
+
+describe("app setup debug port", () => {
+	test("strips both remote debugging switches outside dev", () => {
+		const elseBlock = /\}\s*else\s*\{([^}]*)\}/g;
+		const outsideDev = [...setupSource.matchAll(elseBlock)]
+			.map((match) => match[1])
+			.find((body) => body?.includes("remote-debugging"));
+		expect(outsideDev).toMatch(
+			/removeSwitch\(\s*["']remote-debugging-port["']/,
+		);
+		expect(outsideDev).toMatch(
+			/removeSwitch\(\s*["']remote-debugging-pipe["']/,
+		);
 	});
 });

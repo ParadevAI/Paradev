@@ -1,8 +1,10 @@
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef } from "react";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useHotkey } from "renderer/hotkeys";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import type {
@@ -15,9 +17,7 @@ import { getProjectChildrenWorkspaces } from "../../utils/projectChildren";
 interface WorkspaceLocation {
 	/** Null for the Sessions section — no project row to expand. */
 	projectId: string | null;
-	projectIsCollapsed: boolean;
 	sectionId: string | null;
-	sectionIsCollapsed: boolean;
 }
 
 const MAX_SHORTCUT_COUNT = 9;
@@ -74,9 +74,8 @@ export function useDashboardSidebarShortcuts(
 		pinnedWorkspaces = [],
 	}: UseDashboardSidebarShortcutsOptions = {},
 ) {
-	const navigate = useNavigate();
-	const { toggleProjectCollapsed, toggleSectionCollapsed } =
-		useDashboardSidebarState();
+	const router = useRouter();
+	const { expandProject, expandSection } = useDashboardSidebarState();
 	const deletingIds = useDeletingWorkspacesStore((state) => state.deletingIds);
 	const flattenedWorkspaces = useMemo(
 		() =>
@@ -108,18 +107,14 @@ export function useDashboardSidebarShortcuts(
 				if (child.type === "workspace") {
 					map.set(child.workspace.id, {
 						projectId: project.id,
-						projectIsCollapsed: project.isCollapsed,
 						sectionId: null,
-						sectionIsCollapsed: false,
 					});
 					continue;
 				}
 				for (const workspace of child.section.workspaces) {
 					map.set(workspace.id, {
 						projectId: project.id,
-						projectIsCollapsed: project.isCollapsed,
 						sectionId: child.section.id,
-						sectionIsCollapsed: child.section.isCollapsed,
 					});
 				}
 			}
@@ -127,9 +122,7 @@ export function useDashboardSidebarShortcuts(
 		for (const workspace of sessionWorkspaces) {
 			map.set(workspace.id, {
 				projectId: null,
-				projectIsCollapsed: false,
 				sectionId: null,
-				sectionIsCollapsed: false,
 			});
 		}
 		for (const child of sessionChildren) {
@@ -137,9 +130,7 @@ export function useDashboardSidebarShortcuts(
 			for (const workspace of child.section.workspaces) {
 				map.set(workspace.id, {
 					projectId: null,
-					projectIsCollapsed: false,
 					sectionId: child.section.id,
-					sectionIsCollapsed: child.section.isCollapsed,
 				});
 			}
 		}
@@ -151,39 +142,31 @@ export function useDashboardSidebarShortcuts(
 			if (pinnedWorkspaces.some((workspace) => workspace.id === workspaceId)) {
 				const { collapsed, toggle } =
 					useSidebarSectionsCollapseStore.getState();
-				// The Pinned section itself only renders while the Workspaces
-				// list isn't collapsed — un-collapsing "pinned" alone still
-				// leaves the target invisible if "workspaces" is collapsed too.
-				if (collapsed.workspaces) toggle("workspaces");
 				if (collapsed.pinned) toggle("pinned");
 				return;
 			}
 			const location = workspaceLocations.get(workspaceId);
 			if (!location) return;
-			if (location.projectId !== null && location.projectIsCollapsed) {
-				toggleProjectCollapsed(location.projectId);
+			if (location.projectId !== null) {
+				expandProject(location.projectId);
 			}
-			if (location.sectionId && location.sectionIsCollapsed) {
-				toggleSectionCollapsed(location.sectionId);
+			if (location.sectionId !== null) {
+				expandSection(location.sectionId);
 			}
 		},
-		[
-			pinnedWorkspaces,
-			workspaceLocations,
-			toggleProjectCollapsed,
-			toggleSectionCollapsed,
-		],
+		[pinnedWorkspaces, workspaceLocations, expandProject, expandSection],
 	);
 
 	const switchToWorkspace = useCallback(
 		(index: number) => {
 			const workspace = flattenedWorkspaces[index];
 			if (workspace) {
-				if (revealCollapsed) revealWorkspace(workspace.id);
-				navigateToV2Workspace(workspace.id, navigate);
+				void navigateToWorkspaceAndThen(workspace.id, router, () => {
+					if (revealCollapsed) revealWorkspace(workspace.id);
+				}).catch(reportRendererError);
 			}
 		},
-		[flattenedWorkspaces, navigate, revealCollapsed, revealWorkspace],
+		[flattenedWorkspaces, router, revealCollapsed, revealWorkspace],
 	);
 
 	useHotkey("JUMP_TO_WORKSPACE_1", () => switchToWorkspace(0));
@@ -198,7 +181,7 @@ export function useDashboardSidebarShortcuts(
 
 	const matchRoute = useMatchRoute();
 	const currentWorkspaceMatch = matchRoute({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const currentWorkspaceId =
@@ -211,8 +194,9 @@ export function useDashboardSidebarShortcuts(
 		);
 		const prevIndex = index <= 0 ? navigationWorkspaces.length - 1 : index - 1;
 		const target = navigationWorkspaces[prevIndex];
-		revealWorkspace(target.id);
-		navigateToV2Workspace(target.id, navigate);
+		void navigateToWorkspaceAndThen(target.id, router, () => {
+			if (revealCollapsed) revealWorkspace(target.id);
+		}).catch(reportRendererError);
 	});
 
 	useHotkey("NEXT_WORKSPACE", () => {
@@ -222,8 +206,9 @@ export function useDashboardSidebarShortcuts(
 		);
 		const nextIndex = index >= navigationWorkspaces.length - 1 ? 0 : index + 1;
 		const target = navigationWorkspaces[nextIndex];
-		revealWorkspace(target.id);
-		navigateToV2Workspace(target.id, navigate);
+		void navigateToWorkspaceAndThen(target.id, router, () => {
+			if (revealCollapsed) revealWorkspace(target.id);
+		}).catch(reportRendererError);
 	});
 
 	return workspaceShortcutLabels;

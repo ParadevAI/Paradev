@@ -1,0 +1,1 @@
+export { PageToolConsentDialog } from "./PageToolConsentDialog";
