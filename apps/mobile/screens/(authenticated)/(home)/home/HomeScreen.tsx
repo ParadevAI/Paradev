@@ -42,8 +42,8 @@ import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
-import { useScopeHosts } from "@/screens/(authenticated)/(home)/hooks/useScopeHosts";
-import { useCloudScopeEnabled } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useScopeLabel } from "@/screens/(authenticated)/(home)/hooks/useScopeLabel";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import {
 	isPlaceUnreachable,
 	type PlaceEmptyState,
@@ -183,11 +183,16 @@ export function HomeScreen() {
 	const { isLoadingOrganizations, activeOrganization, activeOrganizationId } =
 		useOrganizations();
 
-	const { scope, selectedHost, hosts: scopeHosts } = useScopeHosts();
+	const {
+		scope,
+		selectedHost,
+		hosts: scopeHosts,
+		cloud: cloudSelected,
+	} = useScopeSelection();
+	const scopeLabel = useScopeLabel();
 	const cloudScope = scope === "cloud";
-	const allScope = scope === "all";
-	const cloudEnabled = useCloudScopeEnabled();
-	const cloudInAll = allScope && cloudEnabled;
+	const multiScope = scope === "multi";
+	const cloudInMulti = multiScope && cloudSelected;
 	const [needsMeActive, setNeedsMeActive] = useState(false);
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
 	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
@@ -272,7 +277,7 @@ export function HomeScreen() {
 			: !presencePending &&
 				workspacesReady &&
 				projectsReady &&
-				(!cloudInAll || cloudReady));
+				(!cloudInMulti || cloudReady));
 
 	const hasPainted = useFirstPaint(contentReady);
 
@@ -372,14 +377,14 @@ export function HomeScreen() {
 	// heard from its agent (or was archived), newest first.
 	const cloudListRows = useMemo(
 		() =>
-			cloudScope || cloudInAll
+			cloudScope || cloudInMulti
 				? (showArchived ? archivedCloud : activeCloud).filter((row) =>
 						cloudFilters.matchesCreator(row.createdByUserId),
 					)
 				: [],
 		[
 			cloudScope,
-			cloudInAll,
+			cloudInMulti,
 			showArchived,
 			archivedCloud,
 			activeCloud,
@@ -488,7 +493,7 @@ export function HomeScreen() {
 			});
 		}
 		if (cloudScope) return cloudListItems;
-		if (allScope) {
+		if (multiScope) {
 			const emptyLabels: Record<PlaceEmptyState, string | null> = {
 				loading: null,
 				failed: t({ message: "Could not reach the workspace host" }),
@@ -516,7 +521,7 @@ export function HomeScreen() {
 						},
 					};
 				}),
-				cloud: cloudInAll
+				cloud: cloudInMulti
 					? {
 							name: cloudName,
 							items: cloudListItems,
@@ -562,12 +567,12 @@ export function HomeScreen() {
 		needsMeCandidates,
 		cloudScope,
 		cloudListItems,
-		allScope,
+		multiScope,
 		scopeHosts,
 		hostSections,
 		workspacesByHost,
 		activeCloud,
-		cloudInAll,
+		cloudInMulti,
 		selectedHost,
 		showOfflinePlaceholder,
 		hostOffline,
@@ -954,9 +959,9 @@ export function HomeScreen() {
 	const scopeBar = (
 		<ScopeBar
 			scope={scope}
-			hostName={selectedHost?.name ?? null}
+			label={scopeLabel}
 			hostOnline={
-				allScope
+				multiScope
 					? scopeHosts.some((host) => host.isOnline)
 					: (selectedHost?.isOnline ?? false)
 			}

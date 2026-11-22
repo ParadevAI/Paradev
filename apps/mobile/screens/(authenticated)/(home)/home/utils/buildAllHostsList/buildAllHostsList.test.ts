@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
+import { selectedHosts } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import type { HomeListItem } from "../../types";
 import { buildHostSection } from "../buildHostSection";
 import { buildAllHostsList } from "./buildAllHostsList";
@@ -173,6 +174,31 @@ describe("buildAllHostsList", () => {
 		expect(
 			list.map((item) => (item.kind === "hostLabel" ? !!item.first : null)),
 		).toEqual([true, false]);
+	});
+
+	test("lists only the ticked hosts of a 2-of-4 selection, with Cloud unticked", () => {
+		const org = ["Alpha", "Beta", "Gamma", "Delta"].map((name) => ({
+			machineId: name.toLowerCase(),
+			name,
+			isOnline: name !== "Delta",
+		}));
+		const ticked = selectedHosts(org, {
+			hosts: ["delta", "beta"],
+			cloud: false,
+		});
+		const list = buildAllHostsList({
+			hosts: ticked.map((host) => ({
+				machineId: host.machineId,
+				name: host.name,
+				status: host.isOnline ? ("online" as const) : ("offline" as const),
+				items: [],
+			})),
+			cloud: null,
+		});
+		expect(list.map(describeItem)).toEqual([
+			"label:Beta",
+			"label:Delta:offline",
+		]);
 	});
 
 	test("leaves Cloud out where it is not offered", () => {

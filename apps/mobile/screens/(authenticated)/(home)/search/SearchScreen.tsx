@@ -27,8 +27,7 @@ import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCl
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
-import { useScopeHosts } from "@/screens/(authenticated)/(home)/hooks/useScopeHosts";
-import { useCloudScopeEnabled } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import {
 	isPlaceUnreachable,
 	placeStatus,
@@ -59,11 +58,15 @@ export function SearchScreen() {
 	const [query, setQuery] = useState("");
 	const clearQuery = useCallback(() => setQuery(""), []);
 	const sort = useWorkspacesFilterStore((store) => store.sort);
-	const { scope, hosts: scopeHosts } = useScopeHosts();
+	const {
+		scope,
+		hosts: scopeHosts,
+		cloud: cloudSelected,
+		everything,
+	} = useScopeSelection();
 	const cloudScope = scope === "cloud";
-	const allScope = scope === "all";
-	const cloudEnabled = useCloudScopeEnabled();
-	const cloudInAll = allScope && cloudEnabled;
+	const multiScope = scope === "multi";
+	const cloudInMulti = multiScope && cloudSelected;
 	const { workspaces } = useHostsWorkspaces(scopeHosts);
 	const { items: cloudItems } = useCloudWorkspaceItems();
 	const cloudFilters = useCloudFilters();
@@ -165,7 +168,7 @@ export function SearchScreen() {
 					...workspaces.filter(
 						(workspace) => workspace.worktreeExists !== false,
 					),
-					...(cloudInAll
+					...(cloudInMulti
 						? cloudItems.filter((workspace) =>
 								cloudFilters.matchesCreator(workspace.createdByUserId),
 							)
@@ -179,7 +182,7 @@ export function SearchScreen() {
 		archivedCloud,
 		cloudFilters.matchesCreator,
 		workspaces,
-		cloudInAll,
+		cloudInMulti,
 		matchesQuery,
 		byPinThenActivity,
 	]);
@@ -250,11 +253,17 @@ export function SearchScreen() {
 									one="# result in Cloud"
 									other="# results in Cloud"
 								/>
-							) : allScope ? (
+							) : multiScope && everything ? (
 								<Plural
 									value={results.length}
 									one="# result across all hosts"
 									other="# results across all hosts"
+								/>
+							) : multiScope ? (
+								<Plural
+									value={results.length}
+									one="# result across the selected places"
+									other="# results across the selected places"
 								/>
 							) : (
 								<Plural
@@ -302,7 +311,7 @@ export function SearchScreen() {
 										numberOfLines={1}
 									>
 										{searchRowDetail({
-											placeName: allScope
+											placeName: multiScope
 												? (host?.name ?? t({ message: "Cloud" }))
 												: null,
 											projectName,
@@ -325,7 +334,7 @@ export function SearchScreen() {
 									? t({
 											message: "No cloud workspaces yet",
 										})
-									: allScope
+									: multiScope
 										? t({ message: "No workspaces yet" })
 										: t({
 												message: "No workspaces on this host yet",

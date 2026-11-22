@@ -8,8 +8,7 @@ import {
 } from "@/hooks/useHostProjects";
 import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import { hostServiceUrl } from "@/lib/host-service/client";
-import { useScopeHosts } from "@/screens/(authenticated)/(home)/hooks/useScopeHosts";
-import { useCloudScopeEnabled } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { useWorkspacesFilterStore } from "../../../../stores/workspacesFilterStore";
 import { useNewSessionPreferencesStore } from "../../stores/newSessionPreferencesStore";
 
@@ -45,9 +44,7 @@ export function useNewChatTargets(workspaces: HostWorkspaceItem[] = []): {
 	defaultTarget: NewChatTarget | null;
 } {
 	const { t } = useLingui();
-	const { scope, hosts: scopeHosts } = useScopeHosts();
-	const cloudEnabled = useCloudScopeEnabled();
-	const offersCloud = scope === "cloud" || (scope === "all" && cloudEnabled);
+	const { hosts: scopeHosts, cloud: offersCloud } = useScopeSelection();
 	const persistedTargetKey = useNewSessionPreferencesStore(
 		(state) => state.targetKey,
 	);

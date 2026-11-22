@@ -1,9 +1,8 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
-import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
 import { useHostsPresence } from "@/hooks/useHostsPresence";
@@ -18,41 +17,34 @@ import {
 	countAttention,
 } from "@/screens/(authenticated)/(home)/home/utils/needsMe";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
-import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
-import {
-	useAllHostsOffered,
-	useCloudScopeEnabled,
-	useWorkspaceScope,
-} from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { getLastSeenTime } from "@/screens/(authenticated)/(home)/utils/getLastSeenTime";
+import {
+	canTickHost,
+	everythingSelection,
+	MAX_SELECTED_HOSTS,
+	type ScopeSelection,
+	toggleCloud,
+	toggleHost,
+} from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowCheck } from "@/screens/(authenticated)/components/ListRowCheck";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 
-const NO_HOSTS: never[] = [];
-
 /**
- * Where the list looks: every place at once where there are few enough to
- * ask, Cloud where it is enabled, or one of your machines. Counts show only
- * while All hosts is offered: past that, Home never asks every machine.
+ * Which places the list shows: Cloud and up to three machines, each ticked
+ * on its own; at least one stays ticked. The sheet stays open while you
+ * tick. Counts show for every row only in an org of three machines or
+ * fewer; past that, only for ticked machines, since Home never asks more.
  */
 export function ScopeFilterScreen() {
 	const { t } = useLingui();
-	const router = useRouter();
 	const { hosts } = useOrgHosts();
-	const selectedHost = useSelectedHost();
-	const scope = useWorkspaceScope();
-	const cloudEnabled = useCloudScopeEnabled();
-	const allOffered = useAllHostsOffered();
-	const setHostFilter = useWorkspacesFilterStore(
-		(store) => store.setHostFilter,
-	);
-	const setScopeCloud = useWorkspacesFilterStore(
-		(store) => store.setScopeCloud,
-	);
-	const setScopeAll = useWorkspacesFilterStore((store) => store.setScopeAll);
+	const { selection, cloudEnabled, allOffered, everything } =
+		useScopeSelection();
+	const setSelection = useWorkspacesFilterStore((store) => store.setSelection);
 	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
 	const cloudReadAt = useUnreadWorkspacesStore((state) => state.cloudReadAt);
 
@@ -69,7 +61,16 @@ export function ScopeFilterScreen() {
 		[hosts, presence],
 	);
 
-	const countedHosts = allOffered ? sortedHosts : NO_HOSTS;
+	const smallOrg = sortedHosts.length <= MAX_SELECTED_HOSTS;
+	const countedHosts = useMemo(
+		() =>
+			smallOrg
+				? sortedHosts
+				: sortedHosts.filter((host) =>
+						selection.hosts.includes(host.machineId),
+					),
+		[smallOrg, sortedHosts, selection.hosts],
+	);
 	const onlineCountedHosts = useMemo(
 		() => countedHosts.filter((host) => host.isOnline),
 		[countedHosts],
@@ -81,7 +82,6 @@ export function ScopeFilterScreen() {
 
 	const countsByPlace = useMemo(() => {
 		const counts = new Map<string, AttentionCounts>();
-		if (!allOffered) return counts;
 		for (const host of onlineCountedHosts) {
 			counts.set(
 				host.machineId,
@@ -108,7 +108,6 @@ export function ScopeFilterScreen() {
 		);
 		return counts;
 	}, [
-		allOffered,
 		onlineCountedHosts,
 		byHost,
 		attentionByWorkspace,
@@ -159,9 +158,10 @@ export function ScopeFilterScreen() {
 		});
 	};
 
-	const close = (filter: "all" | "cloud" | "machine") => {
+	const apply = (next: ScopeSelection, filter: "all" | "cloud" | "machine") => {
+		if (next === selection) return;
+		setSelection(next);
 		posthog.capture("filter_applied", { filter: "host", value: filter });
-		router.back();
 	};
 
 	return (
@@ -172,11 +172,10 @@ export function ScopeFilterScreen() {
 			{allOffered ? (
 				<ListRow
 					label={t({ message: "All hosts" })}
-					trailing={<ListRowCheck visible={scope === "all"} />}
-					onPress={() => {
-						setScopeAll();
-						close("all");
-					}}
+					trailing={<ListRowCheck visible={everything} />}
+					onPress={() =>
+						apply(everythingSelection(sortedHosts, cloudEnabled), "all")
+					}
 					isLast={!cloudEnabled && sortedHosts.length === 0}
 				/>
 			) : null}
@@ -191,38 +190,44 @@ export function ScopeFilterScreen() {
 					}
 					label={t({ message: "Cloud" })}
 					subtitle={countsLine("cloud")}
-					trailing={<ListRowCheck visible={scope === "cloud"} />}
-					onPress={() => {
-						setScopeCloud();
-						close("cloud");
-					}}
+					trailing={<ListRowCheck visible={selection.cloud} />}
+					onPress={() => apply(toggleCloud(selection), "cloud")}
 					isLast={sortedHosts.length === 0}
 				/>
 			) : null}
-			{sortedHosts.map((host, index) => (
-				<ListRow
-					key={host.machineId}
-					icon={<HostStatusDot isOnline={host.isOnline} />}
-					label={host.name}
-					subtitle={
-						host.isOnline
-							? countsLine(host.machineId)
-							: offlineLine(host.lastSeenAt)
-					}
-					trailing={
-						<ListRowCheck
-							visible={
-								scope === "host" && host.machineId === selectedHost?.machineId
+			{sortedHosts.map((host, index) => {
+				const ticked = selection.hosts.includes(host.machineId);
+				const tickable = canTickHost(selection, host.machineId);
+				const showStatus = smallOrg || ticked;
+				return (
+					<View
+						key={host.machineId}
+						className={tickable ? undefined : "opacity-50"}
+					>
+						<ListRow
+							icon={<HostStatusDot isOnline={host.isOnline} />}
+							label={host.name}
+							subtitle={
+								!tickable
+									? t({ message: "Up to 3 hosts at a time" })
+									: !showStatus
+										? undefined
+										: host.isOnline
+											? countsLine(host.machineId)
+											: offlineLine(host.lastSeenAt)
 							}
+							trailing={<ListRowCheck visible={ticked} />}
+							onPress={
+								tickable
+									? () =>
+											apply(toggleHost(selection, host.machineId), "machine")
+									: undefined
+							}
+							isLast={index === sortedHosts.length - 1}
 						/>
-					}
-					onPress={() => {
-						setHostFilter(host.machineId);
-						close("machine");
-					}}
-					isLast={index === sortedHosts.length - 1}
-				/>
-			))}
+					</View>
+				);
+			})}
 		</ScrollView>
 	);
 }

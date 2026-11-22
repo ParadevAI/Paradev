@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# skrytý projekt} few {# skryté projekty} many {# skr
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# položka historie} few {# položky historie} many {# položky historie} other {# položek historie}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} few {# hosty} many {# hostu} other {# hostů}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# štítek} few {# štítky} many {# štítku} other {# štítků}}"
@@ -243,6 +247,10 @@ msgstr "{0, plural, one {# repozitář} few {# repozitáře} many {# repozitář
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
 msgstr "{0, plural, one {# výsledek na všech hostech} few {# výsledky na všech hostech} many {# výsledku na všech hostech} other {# výsledků na všech hostech}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# výsledek ve vybraných místech} few {# výsledky ve vybraných místech} many {# výsledku ve vybraných místech} other {# výsledků ve vybraných místech}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -21916,6 +21924,9 @@ msgstr "Nejvýše {MAX_SAVED_VIEWS} uložených pohledů"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Až 25. Běh začne, když se spustí kterýkoli z nich."
+
+msgid "Up to 3 hosts at a time"
+msgstr "Najednou nejvýše 3 hosty"
 
 msgid "Up to date"
 msgstr "Aktuální"

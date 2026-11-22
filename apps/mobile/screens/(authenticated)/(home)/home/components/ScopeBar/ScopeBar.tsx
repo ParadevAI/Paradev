@@ -1,7 +1,6 @@
-import { useLingui } from "@lingui/react/macro";
 import { ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
-import type { WorkspaceScope } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
+import type { WorkspaceScope } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
 import { Chip } from "./components/Chip";
@@ -10,7 +9,8 @@ import { NeedsMeChip } from "./components/NeedsMeChip";
 
 interface ScopeBarProps {
 	scope: WorkspaceScope;
-	hostName: string | null;
+	/** The place's name, All hosts, or how many places. */
+	label: string;
 	hostOnline: boolean;
 	sortLabel: string | null;
 	onPressScope: () => void;
@@ -31,16 +31,14 @@ interface ScopeBarProps {
  */
 export function ScopeBar({
 	scope,
-	hostName,
+	label,
 	hostOnline,
 	sortLabel,
 	onPressScope,
 	onPressSort,
 	needsMe,
 }: ScopeBarProps) {
-	const { t } = useLingui();
 	const cloud = scope === "cloud";
-	const all = scope === "all";
 	return (
 		<ScrollView
 			horizontal
@@ -48,15 +46,9 @@ export function ScopeBar({
 			showsHorizontalScrollIndicator={false}
 			contentContainerClassName="flex-row items-center gap-2 px-4 pb-2 pt-1"
 		>
-			{cloud || all || hostName ? (
+			{label ? (
 				<Chip
-					label={
-						cloud
-							? "Cloud"
-							: all
-								? t({ message: "All hosts" })
-								: (hostName ?? "")
-					}
+					label={label}
 					leading={
 						cloud ? (
 							<Icon

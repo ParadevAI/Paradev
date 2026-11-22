@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# gizli proje} other {# gizli proje}}"
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# geçmiş öğesi} other {# geçmiş öğesi}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} other {# host}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# etiket} other {# etiket}}"
@@ -243,6 +247,10 @@ msgstr "{0, plural, one {# depo} other {# depo}}"
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
 msgstr "{0, plural, one {Tüm host'larda # sonuç} other {Tüm host'larda # sonuç}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {Seçili yerlerde # sonuç} other {Seçili yerlerde # sonuç}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -21916,6 +21924,9 @@ msgstr "En fazla {MAX_SAVED_VIEWS} kayıtlı görünüm"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "En fazla 25. Herhangi biri çalıştığında bir çalıştırma başlar."
+
+msgid "Up to 3 hosts at a time"
+msgstr "Aynı anda en fazla 3 host"
 
 msgid "Up to date"
 msgstr "Güncel"

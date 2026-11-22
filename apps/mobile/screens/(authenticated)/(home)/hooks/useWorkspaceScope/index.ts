@@ -1,5 +1,2 @@
-export {
-	useAllHostsOffered,
-	useCloudScopeEnabled,
-	useWorkspaceScope,
-} from "./useWorkspaceScope";
+export { useCloudScopeEnabled } from "./useCloudScopeEnabled";
+export { useWorkspaceScope } from "./useWorkspaceScope";

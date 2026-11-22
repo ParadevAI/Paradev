@@ -180,6 +180,10 @@ msgstr "{0, plural, one {숨긴 프로젝트 #개} other {숨긴 프로젝트 #�
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {기록 #개} other {기록 #개}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {호스트 #개} other {호스트 #개}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, other {라벨 #개}}"
@@ -243,6 +247,10 @@ msgstr "{0, plural, one {리포지토리 #개} other {리포지토리 #개}}"
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
 msgstr "{0, plural, one {모든 호스트에서 결과 #개} other {모든 호스트에서 결과 #개}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {선택한 위치에서 결과 #개} other {선택한 위치에서 결과 #개}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -21916,6 +21924,9 @@ msgstr "저장된 뷰는 최대 {MAX_SAVED_VIEWS}개"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "최대 25개입니다. 그중 하나라도 실행되면 실행이 시작됩니다."
+
+msgid "Up to 3 hosts at a time"
+msgstr "한 번에 최대 3개 호스트"
 
 msgid "Up to date"
 msgstr "최신 상태"

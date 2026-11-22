@@ -174,6 +174,10 @@ msgstr "{0, plural, one {# прихований проєкт} few {# прихо�
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# запис історії} few {# записи історії} many {# записів історії} other {# запису історії}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# хост} few {# хости} many {# хостів} other {# хоста}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# мітка} few {# мітки} many {# міток} other {# мітки}}"
@@ -237,6 +241,10 @@ msgstr "{0, plural, one {# репозиторій} few {# репозиторії
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
 msgstr "{0, plural, one {# результат на всіх хостах} few {# результати на всіх хостах} many {# результатів на всіх хостах} other {# результату на всіх хостах}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# результат у вибраних місцях} few {# результати у вибраних місцях} many {# результатів у вибраних місцях} other {# результату у вибраних місцях}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -21910,6 +21918,9 @@ msgstr "До {MAX_SAVED_VIEWS} збережених подань"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "До 25. Запуск починається, щойно спрацює будь-який із них."
+
+msgid "Up to 3 hosts at a time"
+msgstr "Не більше 3 хостів одночасно"
 
 msgid "Up to date"
 msgstr "Актуально"

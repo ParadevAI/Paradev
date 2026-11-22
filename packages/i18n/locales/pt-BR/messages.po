@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# projeto oculto} other {# projetos ocultos}}"
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# item de histórico} other {# itens de histórico}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} other {# hosts}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# rótulo} other {# rótulos}}"
@@ -243,6 +247,10 @@ msgstr "{0, plural, one {# repositório} other {# repositórios}}"
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
 msgstr "{0, plural, one {# resultado em todos os hosts} other {# resultados em todos os hosts}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# resultado nos lugares selecionados} other {# resultados nos lugares selecionados}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -21916,6 +21924,9 @@ msgstr "Até {MAX_SAVED_VIEWS} visualizações salvas"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Até 25. Uma execução começa quando qualquer um deles dispara."
+
+msgid "Up to 3 hosts at a time"
+msgstr "Até 3 hosts por vez"
 
 msgid "Up to date"
 msgstr "Atualizado"

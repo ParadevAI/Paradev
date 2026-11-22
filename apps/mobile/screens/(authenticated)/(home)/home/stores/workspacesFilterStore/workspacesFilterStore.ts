@@ -3,6 +3,7 @@ import { msg } from "@lingui/core/macro";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import type { ScopeSelection } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import {
 	migrateWorkspacesFilter,
 	WORKSPACES_FILTER_VERSION,
@@ -10,12 +11,6 @@ import {
 
 /** Desktop sidebar's sort modes. Projects keep their order in every mode. */
 export type WorkspaceSort = "manual" | "active" | "created";
-
-/** Cloud is a place you scope to, not a machine you own. "all" lists every place. */
-export type WorkspaceScope = "cloud" | "host" | "all";
-
-/** Null until the user picks a scope: Home then applies its default rule. */
-export type SavedWorkspaceScope = WorkspaceScope | null;
 
 export type CloudStatusFilter = "active" | "archived";
 
@@ -43,16 +38,14 @@ export const SORT_OPTIONS: {
 ];
 
 interface WorkspacesFilterStore {
-	hostFilter: string | null;
-	scope: SavedWorkspaceScope;
+	/** Null until the user picks places: Home then applies its default. */
+	selection: ScopeSelection | null;
 	sort: WorkspaceSort;
 	cloudStatus: CloudStatusFilter;
 	cloudCreator: CloudCreatorFilter;
 	/** False until AsyncStorage has answered — the saved filter isn't here yet. */
 	hasHydrated: boolean;
-	setHostFilter: (machineId: string | null) => void;
-	setScopeCloud: () => void;
-	setScopeAll: () => void;
+	setSelection: (selection: ScopeSelection) => void;
 	setSort: (sort: WorkspaceSort) => void;
 	setCloudStatus: (status: CloudStatusFilter) => void;
 	setCloudCreator: (creator: CloudCreatorFilter) => void;
@@ -61,18 +54,12 @@ interface WorkspacesFilterStore {
 export const useWorkspacesFilterStore = create<WorkspacesFilterStore>()(
 	persist(
 		(set) => ({
-			hostFilter: null,
-			scope: null,
+			selection: null,
 			sort: "manual",
 			cloudStatus: "active",
 			cloudCreator: "me",
 			hasHydrated: false,
-			// Picking a machine is also how you leave Cloud; the machine is
-			// remembered either way so Cloud → machine returns you where you were.
-			setHostFilter: (machineId) =>
-				set({ hostFilter: machineId, scope: "host" }),
-			setScopeCloud: () => set({ scope: "cloud" }),
-			setScopeAll: () => set({ scope: "all" }),
+			setSelection: (selection) => set({ selection }),
 			setSort: (sort) => set({ sort }),
 			setCloudStatus: (cloudStatus) => set({ cloudStatus }),
 			setCloudCreator: (cloudCreator) => set({ cloudCreator }),
@@ -86,9 +73,8 @@ export const useWorkspacesFilterStore = create<WorkspacesFilterStore>()(
 					persisted,
 					version,
 				) as unknown as WorkspacesFilterStore,
-			partialize: ({ hostFilter, scope, sort, cloudCreator }) => ({
-				hostFilter,
-				scope,
+			partialize: ({ selection, sort, cloudCreator }) => ({
+				selection,
 				sort,
 				cloudCreator,
 			}),

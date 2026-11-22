@@ -10,8 +10,8 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
-import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
-import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useScopeLabel } from "@/screens/(authenticated)/(home)/hooks/useScopeLabel";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
@@ -21,10 +21,9 @@ export function FilterScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
 	const theme = useTheme();
-	const selectedHost = useSelectedHost();
-	const scope = useWorkspaceScope();
+	const { scope, selectedHost } = useScopeSelection();
+	const scopeLabel = useScopeLabel();
 	const cloud = scope === "cloud";
-	const all = scope === "all";
 	const sort = useWorkspacesFilterStore((store) => store.sort);
 
 	const sortOption = SORT_OPTIONS.find((option) => option.value === sort);
@@ -50,13 +49,7 @@ export function FilterScreen() {
 				label={t({ message: "Scope" })}
 				trailing={
 					<ListRowValue
-						value={
-							cloud
-								? t({ message: "Cloud" })
-								: all
-									? t({ message: "All hosts" })
-									: (selectedHost?.name ?? "")
-						}
+						value={scopeLabel}
 						accessory={
 							cloud ? (
 								<Icon
@@ -64,7 +57,7 @@ export function FilterScreen() {
 									className="text-muted-foreground size-4"
 									strokeWidth={2}
 								/>
-							) : !all && selectedHost ? (
+							) : selectedHost ? (
 								<HostStatusDot isOnline={selectedHost.isOnline} />
 							) : undefined
 						}

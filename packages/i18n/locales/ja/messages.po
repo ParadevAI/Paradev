@@ -180,6 +180,10 @@ msgstr "{0, plural, one {非表示のプロジェクト #件} other {非表示�
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {#件の履歴} other {#件の履歴}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {#台のホスト} other {#台のホスト}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, other {# 個のラベル}}"
@@ -243,6 +247,10 @@ msgstr "{0, plural, one {#件のリポジトリ} other {#件のリポジトリ}}
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
 msgstr "{0, plural, one {すべてのホストで#件} other {すべてのホストで#件}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {選択した場所で#件} other {選択した場所で#件}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -21916,6 +21924,9 @@ msgstr "保存できるビューは {MAX_SAVED_VIEWS} 個まで"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "最大25個です。どれか1つが発火すると実行が始まります。"
+
+msgid "Up to 3 hosts at a time"
+msgstr "一度に選べるホストは3台まで"
 
 msgid "Up to date"
 msgstr "最新"
