@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { observable } from "@trpc/server/observable";
 import { dialog, Menu } from "electron";
 import { menuEmitter } from "main/lib/menu-events";
 import { getOrg, setOrg } from "main/lib/window-registry/window-registry";
@@ -47,6 +48,28 @@ export const createWindowRouter = () => {
 			const window = ctx.senderWindow;
 			if (!window) return false;
 			return window.isMaximized();
+		}),
+
+		// macOS reports a minimized window as visible to the page: the app turns
+		// off occlusion tracking (see disable-backgrounding-occluded-windows).
+		onShownChange: publicProcedure.subscription(({ ctx }) => {
+			return observable<boolean>((emit) => {
+				const window = ctx.senderWindow;
+				if (!window) return;
+				const push = () =>
+					emit.next(window.isVisible() && !window.isMinimized());
+				window.on("minimize", push);
+				window.on("restore", push);
+				window.on("hide", push);
+				window.on("show", push);
+				push();
+				return () => {
+					window.off("minimize", push);
+					window.off("restore", push);
+					window.off("hide", push);
+					window.off("show", push);
+				};
+			});
 		}),
 
 		/** Open a new platform window on the same org as the calling window. */
