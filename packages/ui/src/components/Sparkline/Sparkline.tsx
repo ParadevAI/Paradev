@@ -27,7 +27,7 @@ export function Sparkline({ points, title, className }: SparklineProps) {
 			width={WIDTH}
 			viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
 			preserveAspectRatio="none"
-			style={{ display: "block", width: "100%", maxWidth: WIDTH }}
+			style={{ display: "block", width: "100%" }}
 			className={className}
 		>
 			<path

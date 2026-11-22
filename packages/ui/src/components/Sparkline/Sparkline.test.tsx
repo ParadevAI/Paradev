@@ -11,11 +11,12 @@ describe("Sparkline", () => {
 		expect(pathOf(render({}))).toBe("M0,18L80,2");
 	});
 
-	test("is 80 by 20, fills its cell up to 80 px, and keeps its stroke width", () => {
+	test("is 80 by 20, fills its cell at any width, and keeps its stroke width", () => {
 		const markup = render({});
 		expect(markup).toContain('viewBox="0 0 80 20"');
 		expect(markup).toContain('preserveAspectRatio="none"');
-		expect(markup).toContain("width:100%;max-width:80px");
+		expect(markup).toContain("display:block;width:100%");
+		expect(markup).not.toContain("max-width");
 		expect(markup).toContain('vector-effect="non-scaling-stroke"');
 	});
 
