@@ -5,6 +5,7 @@ import {
 	shouldSelectAllShortcut,
 } from "./clipboard-shortcuts";
 import { translateLineEditChord } from "./line-edit-translations";
+import { sendUserInput } from "./terminal-replay-write";
 
 interface TerminalKeyEventHandlerOptions {
 	platform?: string;
@@ -62,7 +63,7 @@ function createTerminalKeyEventHandler(
 		if (translation !== null) {
 			if (event.type === "keydown") {
 				event.preventDefault();
-				terminal.input(translation, true);
+				sendUserInput(terminal, translation);
 			}
 			return false;
 		}
