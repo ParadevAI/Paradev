@@ -18,7 +18,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 	const { t } = useLingui();
 	const { theme } = useUniwind();
 	const colors = [
-		{ value: null, title: t({ message: "Default" }) },
+		{ value: null, title: t({ message: "None" }) },
 		...GROUP_COLORS.map((option) => ({
 			value: option.value,
 			title: i18n._(option.label),

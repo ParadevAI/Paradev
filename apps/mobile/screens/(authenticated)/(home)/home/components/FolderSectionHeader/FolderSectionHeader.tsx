@@ -1,10 +1,11 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { ChevronDown, ChevronRight, Folder } from "lucide-react-native";
+import { ChevronDown, ChevronRight } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { useTheme } from "@/hooks/useTheme";
+import { cn } from "@/lib/utils";
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import { AttentionMark } from "../AttentionMark";
@@ -40,9 +41,10 @@ export function FolderSectionHeader({
 	const theme = useTheme();
 	const enlargedText = useEnlargedText();
 	const Caret = collapsed ? ChevronRight : ChevronDown;
+	const swatch = color?.startsWith("#") ? color : null;
 	return (
 		// The toggle and the menu are siblings so VoiceOver reaches both.
-		<View className="flex-row items-center pr-3 pt-2">
+		<View className="flex-row items-center pr-3 pt-1">
 			<Pressable
 				onPress={onToggle}
 				accessibilityRole="button"
@@ -58,17 +60,20 @@ export function FolderSectionHeader({
 					.filter(Boolean)
 					.join(", ")}
 				accessibilityState={{ expanded: !collapsed }}
-				className="web:hover:opacity-80 flex-1 flex-row items-center gap-2 py-1 pl-8 pr-2 active:opacity-60"
+				className="web:hover:opacity-80 min-h-11 flex-1 flex-row items-center gap-3 pl-3 pr-2 active:opacity-60"
 			>
-				<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
-				<Folder
-					size={14}
-					color={color?.startsWith("#") ? color : theme.mutedForeground}
-					strokeWidth={2}
-				/>
+				<View className="size-6 items-center justify-center">
+					<View
+						className={cn(
+							"size-2.5 rounded-[3px]",
+							!swatch && "border-muted-foreground/60 border",
+						)}
+						style={swatch ? { backgroundColor: swatch } : undefined}
+					/>
+				</View>
 				<View className="shrink flex-row items-center gap-2">
 					<Text
-						className="text-muted-foreground shrink text-[14px] font-medium"
+						className="text-muted-foreground shrink text-[15px] font-medium"
 						numberOfLines={enlargedText ? undefined : 1}
 					>
 						{name}
@@ -76,6 +81,7 @@ export function FolderSectionHeader({
 					<Text className="text-muted-foreground font-mono text-[12px]">
 						{count}
 					</Text>
+					<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
 					{attention ? <AttentionMark attention={attention} /> : null}
 				</View>
 			</Pressable>

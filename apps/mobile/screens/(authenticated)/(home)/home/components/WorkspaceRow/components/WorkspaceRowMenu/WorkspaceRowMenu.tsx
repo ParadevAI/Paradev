@@ -125,16 +125,6 @@ export function WorkspaceRowMenu({
 						) : null}
 					</Link.Menu>
 				) : null}
-				{canDelete && isCloud ? (
-					<Link.MenuAction icon="archivebox" onPress={onDelete}>
-						{t({ message: "Archive" })}
-					</Link.MenuAction>
-				) : null}
-				{canDelete && !isCloud ? (
-					<Link.MenuAction icon="trash" destructive onPress={onDelete}>
-						{t({ message: "Delete" })}
-					</Link.MenuAction>
-				) : null}
 				<Link.Menu inline>
 					<Link.MenuAction icon="doc.on.doc" onPress={onCopyId}>
 						{t({ message: "Copy ID" })}
@@ -146,6 +136,19 @@ export function WorkspaceRowMenu({
 						{t({ message: "Share" })}
 					</Link.MenuAction>
 				</Link.Menu>
+				{canDelete ? (
+					<Link.Menu inline>
+						{isCloud ? (
+							<Link.MenuAction icon="archivebox" onPress={onDelete}>
+								{t({ message: "Archive" })}
+							</Link.MenuAction>
+						) : (
+							<Link.MenuAction icon="trash" destructive onPress={onDelete}>
+								{t({ message: "Delete" })}
+							</Link.MenuAction>
+						)}
+					</Link.Menu>
+				) : null}
 			</Link.Menu>
 		</Link>
 	);
