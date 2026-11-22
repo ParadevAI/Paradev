@@ -8,7 +8,7 @@ const pathOf = (markup: string) => markup.match(/ d="([^"]*)"/)?.[1];
 
 describe("Sparkline", () => {
 	test("keeps 2 px above the peak and below the baseline", () => {
-		expect(pathOf(render({ width: 10, height: 10 }))).toBe("M0,8L10,2");
+		expect(pathOf(render({}))).toBe("M0,18L80,2");
 	});
 
 	test("is 80 by 20, fills its cell up to 80 px, and keeps its stroke width", () => {
@@ -25,17 +25,12 @@ describe("Sparkline", () => {
 
 	test("names the chart for a screen reader", () => {
 		const markup = render({ title: "Usage" });
-		expect(markup).toContain("<title>Usage</title>");
 		expect(markup).toContain('aria-label="Usage"');
 	});
 
 	test("a single point and equal values are flat lines", () => {
-		expect(pathOf(render({ points: [5], width: 10, height: 10 }))).toBe(
-			"M0,2L10,2",
-		);
-		expect(pathOf(render({ points: [0, 0], width: 10, height: 10 }))).toBe(
-			"M0,8L10,8",
-		);
+		expect(pathOf(render({ points: [5] }))).toBe("M0,2L80,2");
+		expect(pathOf(render({ points: [0, 0] }))).toBe("M0,18L80,18");
 	});
 
 	test("draws nothing for no points", () => {

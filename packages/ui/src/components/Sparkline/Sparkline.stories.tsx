@@ -11,13 +11,6 @@ const meta = {
 			0, 0, 311, 540, 770, 902, 650, 480, 300, 220, 410, 530, 480, 260,
 		],
 	},
-	decorators: [
-		(Story) => (
-			<div className="text-muted-foreground">
-				<Story />
-			</div>
-		),
-	],
 } satisfies Meta<typeof Sparkline>;
 
 export default meta;
