@@ -2,7 +2,7 @@
 
 <a href="https://paradev.com"><img width="100%" alt="Paradev: run many coding agents in parallel. The Paradev desktop app with a sidebar of agent sessions grouped by project, and Claude Code finishing one task while other agents work." src="apps/marketing/public/images/readme/banner.gif" /></a>
 
-### Paradev (formerly Superset)
+### Paradev
 
 The open-source workspace for Claude Code, Codex, and any coding agent.
 
