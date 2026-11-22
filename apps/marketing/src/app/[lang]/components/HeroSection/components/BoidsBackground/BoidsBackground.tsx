@@ -28,11 +28,11 @@ const W_SEEK = 0.5;
 const SEEK_ARRIVE_RADIUS = 280;
 const TRAIL_DECAY = 0.996;
 
-// the simulation is tuned in 60 Hz steps; glyphs snap to the grid, so drawing
-// at half that rate looks the same
 const STEP_MS = 1000 / 60;
 const DRAW_INTERVAL_MS = 1000 / 30;
-const MAX_STEPS_PER_DRAW = 3;
+const MAX_CATCH_UP_STEPS = 3;
+// frame times jitter around the display interval
+const FRAME_JITTER_MS = 1;
 
 const RIPPLE_SPEED = 14;
 const RIPPLE_BAND = 110;
@@ -318,7 +318,7 @@ export function BoidsBackground() {
 			if (!p) return;
 			mouse.x = p.x;
 			mouse.y = p.y;
-			// only follow the cursor while it is over the hero
+			// only follow the cursor while it is over the flock
 			mouse.active = p.x >= 0 && p.x <= width && p.y >= 0 && p.y <= height;
 		}
 
@@ -371,24 +371,37 @@ export function BoidsBackground() {
 		}
 
 		let raf = 0;
+		let lastFrame = 0;
 		let lastDraw = 0;
+		let unsteppedMs = 0;
+		let changed = false;
 		function frame(now: number) {
 			raf = requestAnimationFrame(frame);
 			if (!visible || width === 0) {
+				lastFrame = 0;
+				return;
+			}
+			if (lastFrame === 0) {
+				unsteppedMs = STEP_MS;
 				lastDraw = 0;
-				return;
+			} else {
+				unsteppedMs = Math.min(
+					unsteppedMs + now - lastFrame,
+					MAX_CATCH_UP_STEPS * STEP_MS,
+				);
 			}
-			const elapsed = lastDraw === 0 ? DRAW_INTERVAL_MS : now - lastDraw;
-			// a ripple is direct feedback to a click, so it draws on every frame
-			if (ripples.length === 0 && elapsed < DRAW_INTERVAL_MS - STEP_MS / 2) {
-				return;
+			lastFrame = now;
+			while (unsteppedMs >= STEP_MS - FRAME_JITTER_MS) {
+				step();
+				unsteppedMs -= STEP_MS;
+				changed = true;
 			}
+			if (!changed) return;
+			// a ripple is direct feedback to a click, so it draws on every step
+			const drawDue = now - lastDraw >= DRAW_INTERVAL_MS - FRAME_JITTER_MS;
+			if (ripples.length === 0 && !drawDue) return;
 			lastDraw = now;
-			const steps = Math.min(
-				MAX_STEPS_PER_DRAW,
-				Math.max(1, Math.round(elapsed / STEP_MS)),
-			);
-			for (let i = 0; i < steps; i++) step();
+			changed = false;
 			draw();
 		}
 		raf = requestAnimationFrame(frame);
