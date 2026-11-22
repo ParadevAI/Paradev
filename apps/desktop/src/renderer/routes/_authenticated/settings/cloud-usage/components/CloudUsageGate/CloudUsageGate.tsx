@@ -1,8 +1,8 @@
-import { PERIODS_INPUT, QueryStatus } from "@superset/ui/cloud-usage-page";
+import { QueryStatus } from "@superset/ui/cloud-usage-page";
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect } from "react";
+import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
 import { useOrganizationMembership } from "renderer/hooks/useOrganizationMembership";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 /** Waits for the member's role, and leaves the cloud usage pages when the router says the flag is off. */
 export function CloudUsageGate({
@@ -12,8 +12,7 @@ export function CloudUsageGate({
 }) {
 	const navigate = useNavigate();
 	const { role, ...membership } = useOrganizationMembership();
-	const periods = cloudTrpc.cloud.periods.list.useQuery(PERIODS_INPUT);
-	const isDisabled = periods.error?.data?.code === "FORBIDDEN";
+	const isDisabled = useCloudUsageEnabled() === false;
 
 	useEffect(() => {
 		if (isDisabled) navigate({ to: "/settings/account", replace: true });
