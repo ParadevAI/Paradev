@@ -73,7 +73,7 @@ for (const { kind, isLocalWorkspace, isCloudWorkspace } of KINDS) {
 	});
 }
 
-test("Fork from here runs the row's fork action after the context menu closes", async () => {
+test("Fork here runs the row's fork action after the context menu closes", async () => {
 	let forks = 0;
 	render(
 		<QueryClientProvider client={new QueryClient()}>
@@ -106,6 +106,6 @@ test("Fork from here runs the row's fork action after the context menu closes", 
 		</QueryClientProvider>,
 	);
 	fireEvent.contextMenu(screen.getByText("fork source row"));
-	fireEvent.click(await screen.findByText("Fork from here"));
+	fireEvent.click(await screen.findByText("Fork here"));
 	await waitFor(() => expect(forks).toBe(1));
 });

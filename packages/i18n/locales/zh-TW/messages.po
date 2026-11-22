@@ -93,6 +93,9 @@ msgstr "（無輸出）"
 msgid "(you)"
 msgstr "（你）"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[提示詞]"
 
@@ -1538,9 +1541,6 @@ msgstr "{waiting}人等待"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} 額度：已使用 {percent}"
-
-msgid "{workspaceName} fork"
-msgstr "{workspaceName} 分支副本"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}：主機不可用"
@@ -9416,7 +9416,7 @@ msgstr "分支參數"
 msgid "Fork conversation"
 msgstr "分岔對話"
 
-msgid "Fork from here"
+msgid "Fork here"
 msgstr "從此處建立分支副本"
 
 msgid "Fork into Chat"

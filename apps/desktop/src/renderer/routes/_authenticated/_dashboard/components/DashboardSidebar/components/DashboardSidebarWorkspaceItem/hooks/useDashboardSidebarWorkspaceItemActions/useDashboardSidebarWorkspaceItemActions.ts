@@ -97,7 +97,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId,
-					name: t`${workspaceName} fork`,
+					name: t`[Fork] ${workspaceName}`,
 					forkFromWorkspaceId: workspaceId,
 				},
 			});

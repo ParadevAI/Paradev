@@ -93,6 +93,9 @@ msgstr "(nessun output)"
 msgid "(you)"
 msgstr "(tu)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -1538,9 +1541,6 @@ msgstr "{waiting} in attesa"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Limite {windowLabel}: {percent} utilizzato"
-
-msgid "{workspaceName} fork"
-msgstr "Fork di {workspaceName}"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: host non disponibile"
@@ -9416,7 +9416,7 @@ msgstr "Argomenti di fork"
 msgid "Fork conversation"
 msgstr "Dirama conversazione"
 
-msgid "Fork from here"
+msgid "Fork here"
 msgstr "Crea fork da qui"
 
 msgid "Fork into Chat"

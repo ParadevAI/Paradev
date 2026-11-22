@@ -87,6 +87,9 @@ msgstr "(немає виводу)"
 msgid "(you)"
 msgstr "(ви)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[промпт]"
 
@@ -1532,9 +1535,6 @@ msgstr "Очікують: {waiting}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Ліміт «{windowLabel}»: використано {percent}"
-
-msgid "{workspaceName} fork"
-msgstr "Копія {workspaceName}"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: хост недоступний"
@@ -9410,7 +9410,7 @@ msgstr "Аргументи форка"
 msgid "Fork conversation"
 msgstr "Форкнути розмову"
 
-msgid "Fork from here"
+msgid "Fork here"
 msgstr "Створити копію звідси"
 
 msgid "Fork into Chat"

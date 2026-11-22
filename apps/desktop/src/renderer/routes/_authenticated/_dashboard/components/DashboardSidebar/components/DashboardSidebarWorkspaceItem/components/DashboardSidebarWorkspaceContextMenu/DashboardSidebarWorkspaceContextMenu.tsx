@@ -88,7 +88,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 				{onFork && (
 					<ContextMenuItem onSelect={() => runAfterClose(onFork)}>
 						<LuGitFork className="size-4 mr-2" />
-						<Trans>Fork from here</Trans>
+						<Trans>Fork here</Trans>
 					</ContextMenuItem>
 				)}
 				<WorkspaceMenuItems

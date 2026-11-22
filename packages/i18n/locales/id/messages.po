@@ -93,6 +93,9 @@ msgstr "(tidak ada keluaran)"
 msgid "(you)"
 msgstr "(Anda)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -1538,9 +1541,6 @@ msgstr "{waiting} Menunggu"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Batas {windowLabel}: {percent} terpakai"
-
-msgid "{workspaceName} fork"
-msgstr "Fork {workspaceName}"
 
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: host tidak tersedia"
@@ -9416,7 +9416,7 @@ msgstr "Argumen fork"
 msgid "Fork conversation"
 msgstr "Cabangkan percakapan"
 
-msgid "Fork from here"
+msgid "Fork here"
 msgstr "Buat fork dari sini"
 
 msgid "Fork into Chat"
