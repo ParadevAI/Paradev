@@ -256,7 +256,7 @@ Ajanlarınızı telefonunuzdan kontrol edebilmeniz için bir iOS uygulaması da 
 Masaüstü uygulamasını indirin:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (deneysel; birincil hedef macOS)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (deneysel; birincil hedef macOS)
 - **Windows**: henüz mevcut değil
 - [Tüm derlemeler](https://github.com/paradevai/paradev/releases/latest)
 

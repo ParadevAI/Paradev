@@ -256,7 +256,7 @@ Eine iOS-App kommt bald, damit du vom Smartphone aus nach deinen Agenten sehen k
 Lade die Desktop-App herunter:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64-AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimentell; macOS ist die primäre Zielplattform)
+- **Linux**: [x64-AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimentell; macOS ist die primäre Zielplattform)
 - **Windows**: noch nicht verfügbar
 - [Alle Builds](https://github.com/paradevai/paradev/releases/latest)
 

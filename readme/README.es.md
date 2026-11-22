@@ -256,7 +256,7 @@ Pronto llegará una app para iOS para que puedas seguir a tus agentes desde el t
 Descarga la app de escritorio:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimental; macOS es el objetivo principal)
+- **Linux**: [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimental; macOS es el objetivo principal)
 - **Windows**: aún no disponible
 - [Todas las builds](https://github.com/paradevai/paradev/releases/latest)
 
