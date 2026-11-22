@@ -79,17 +79,38 @@ describe("createBoxLogFilter", () => {
 });
 
 describe("BOX_LOG_PREFIXES call sites", () => {
+	const src = join(import.meta.dirname, "../..");
+	const calls = readdirSync(src, { recursive: true, encoding: "utf8" })
+		.filter((file) => file.endsWith(".ts") && !/test\.ts$/.test(file))
+		.flatMap((file) => {
+			const text = readFileSync(join(src, file), "utf8");
+			const caughtNames = [
+				...text.matchAll(/catch\s*\(\s*(\w+)|\.catch\(\s*\(?\s*(\w+)/g),
+			].map((match) => match[1] ?? match[2]);
+			return [
+				...text.matchAll(
+					/console\.(?:log|info|warn|error)\(\s*([`"])\[([\w:-]+)\]([\s\S]*?)\);/g,
+				),
+			]
+				.filter((match) => BOX_LOG_PREFIXES.has(match[2] ?? ""))
+				.map(([, quote, prefix, rest = ""]) => ({
+					site: `${file}: [${prefix}]`,
+					interpolated: quote === "`" && /^[^`]*\$\{/.test(rest),
+					bareCaught: caughtNames.some((name) =>
+						new RegExp(`,\\s*${name}\\s*(?:,|$)`).test(rest.trim()),
+					),
+				}));
+		});
+
 	it("keep their first argument constant, so no value is in the template", () => {
-		const src = join(import.meta.dirname, "../..");
-		const firstArgument =
-			/console\.(?:log|info|warn|error)\(\s*`\[([\w:-]+)\][^`]*\$\{/g;
-		const interpolated = readdirSync(src, { recursive: true, encoding: "utf8" })
-			.filter((file) => file.endsWith(".ts") && !/test\.ts$/.test(file))
-			.flatMap((file) =>
-				[...readFileSync(join(src, file), "utf8").matchAll(firstArgument)]
-					.filter((match) => BOX_LOG_PREFIXES.has(match[1] ?? ""))
-					.map((match) => `${file}: [${match[1]}]`),
-			);
-		expect(interpolated).toEqual([]);
+		expect(
+			calls.filter((call) => call.interpolated).map((call) => call.site),
+		).toEqual([]);
+	});
+
+	it("pass a caught value only through caught(), so a string rejection never leaves", () => {
+		expect(
+			calls.filter((call) => call.bareCaught).map((call) => call.site),
+		).toEqual([]);
 	});
 });
