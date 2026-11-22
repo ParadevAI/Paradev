@@ -61,7 +61,7 @@ describe("link preview fetch", () => {
 		});
 		expect(sent[0]?.redirect).toBe("manual");
 		expect(new Headers(sent[0]?.headers).get("user-agent")).toContain(
-			"Superset",
+			"Paradev",
 		);
 	});
 

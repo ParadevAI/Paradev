@@ -9,14 +9,16 @@ const failure = (httpStatus: number) =>
 let store: EventEmitter;
 let failures: Error[];
 let calls: number;
+let reported: number[];
 let stop: () => void;
 
 function start() {
 	stop = startSandboxKeepalive({
 		store: store as never,
 		timing,
-		keepalive: async () => {
+		keepalive: async (pingsEveryMs) => {
 			calls += 1;
+			reported.push(pingsEveryMs);
 			const error = failures.shift();
 			if (error) throw error;
 		},
@@ -34,6 +36,7 @@ beforeEach(() => {
 	store = new EventEmitter();
 	failures = [];
 	calls = 0;
+	reported = [];
 });
 
 afterEach(() => {
@@ -59,6 +62,7 @@ describe("startSandboxKeepalive", () => {
 
 		await advance(80);
 		expect(calls).toBe(2);
+		expect(reported).toEqual([timing.intervalMs, timing.intervalMs]);
 	});
 
 	test("retries a server error or a lost connection, but not a refusal", async () => {

@@ -6,6 +6,8 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
 	type CloudAgentLaunch,
+	describeCloudAgentLaunch,
+	type PendingCloudAgentLaunch,
 	readCloudAgentLaunch,
 } from "@superset/shared/cloud-agent-launch";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -15,10 +17,11 @@ import {
 	type SandboxRepository,
 	sandboxCheckoutDir,
 	sandboxRepositoriesSchema,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
+import { logBoxEvent } from "../../sentry";
 import {
 	createTerminalSessionInternal,
 	isAgentTerminalAlive,
@@ -32,6 +35,8 @@ import { importCloudAttachments } from "../../trpc/router/attachments/attachment
 import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session-service";
 import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
+import { recordBootStamp } from "../boot-stamps";
+import { caught } from "../box-log-filter";
 import {
 	getManagedEnv,
 	waitForManagedEnv,
@@ -50,6 +55,7 @@ import {
 	withPendingLaunchReport,
 } from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
+import { hookOutcomeLine } from "./utils/hookOutcomeLine";
 import { seedSandboxAgents } from "./utils/seedSandboxAgents";
 import { terminalFallbackMode } from "./utils/terminalFallbackMode";
 
@@ -299,7 +305,9 @@ async function startRunTerminalOnce(
 		return { terminalId: existing, pid: null };
 	const started = await starter.start(run);
 	if ("error" in started) {
-		console.warn(`[sandbox] run terminal not started: ${started.error}`);
+		console.warn("[sandbox] run terminal not started", {
+			error: started.error,
+		});
 		return started;
 	}
 	writeFileSync(files.runTerminal, `${started.terminalId}\n`);
@@ -356,7 +364,11 @@ export async function runSandboxStartHook(
 		}
 		writeFileSync(files.marker, `${started.pid ?? ""}\n`);
 		console.log(
-			`[sandbox] start hook running in terminal ${started.terminalId}: ${plan.run.command}`,
+			...hookOutcomeLine(
+				"start",
+				`running in terminal ${started.terminalId}`,
+				plan.run.command,
+			),
 		);
 		return {
 			started: true,
@@ -375,8 +387,16 @@ export async function runSandboxStartHook(
 	});
 	child.unref();
 	const pid = child.pid ?? 0;
-	startHookState = { state: "running", command, pid, since: Date.now() };
-	child.on("exit", (code) => {
+	const since = Date.now();
+	startHookState = { state: "running", command, pid, since };
+	child.on("exit", (code, signal) => {
+		const ms = Date.now() - since;
+		recordBootStamp(
+			code === 0
+				? `hook.exited exit=0 ms=${ms}`
+				: `hook.failed exit=${code ?? signal} ms=${ms}`,
+		);
+		logBoxEvent("hook.finished", { "hook.exit": code ?? signal ?? -1, ms });
 		startHookState = {
 			state: "exited",
 			command,
@@ -385,7 +405,7 @@ export async function runSandboxStartHook(
 			log: readTail(files.log),
 		};
 		startRun().catch((error) => {
-			console.error("[sandbox] run terminal not started", error);
+			console.error("[sandbox] run terminal not started", caught(error));
 		});
 	});
 
@@ -399,7 +419,9 @@ export async function runSandboxStartHook(
 		});
 	});
 	if (failure !== null && failure !== 0) {
-		console.error(`[sandbox] start hook failed (exit ${failure}): ${command}`);
+		console.error(
+			...hookOutcomeLine("start", `failed (exit ${failure})`, command),
+		);
 		return {
 			started: false,
 			reason: "failed",
@@ -411,7 +433,7 @@ export async function runSandboxStartHook(
 	// Written only now: a hook that failed to start must be runnable again on
 	// this boot, and the marker is what makes the next call a no-op.
 	writeFileSync(files.marker, `${pid}\n`);
-	console.log(`[sandbox] start hook running (pid ${pid}): ${command}`);
+	console.log(...hookOutcomeLine("start", `running (pid ${pid})`, command));
 	return { started: true, pid, command };
 }
 
@@ -459,8 +481,9 @@ function approveClaudeApiKey(): void {
 			// Rewriting a file this process cannot read would destroy whatever
 			// Claude keeps in it; leave the prompt to the person instead.
 			console.warn(
-				`[sandbox] ${path} is not readable JSON, key not approved`,
-				error,
+				"[sandbox] not readable JSON, key not approved (path):",
+				path,
+				caught(error),
 			);
 			return;
 		}
@@ -483,6 +506,23 @@ function approveClaudeApiKey(): void {
 		rejected: rejected.filter((entry) => entry !== suffix),
 	};
 	writeFileSync(path, JSON.stringify(config, null, 2));
+}
+
+/**
+ * The launch a client can open a waiting pane for: promised a terminal id
+ * and not yet claimed by `launchSandboxAgentOnce`.
+ */
+export async function readPendingSandboxLaunch(
+	workspaceId: string,
+	env: NodeJS.ProcessEnv = process.env,
+): Promise<PendingCloudAgentLaunch | null> {
+	if (env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
+	const identity = readSandboxIdentity(env);
+	if (identity?.workspaceId !== workspaceId) return null;
+	if (!identity.launch?.terminalId) return null;
+	if (existsSync(identity.launchMarkerPath)) return null;
+	const descriptor = await describeCloudAgentLaunch(identity.launch);
+	return descriptor && { ...descriptor, prompt: identity.launch.prompt };
 }
 
 /**
@@ -534,7 +574,10 @@ export async function launchSandboxAgentOnce(
 				const imported = await importCloudAttachments(ctx, attachmentFileIds);
 				attachmentIds = imported.map((item) => item.attachmentId);
 			} catch (error) {
-				console.error("[sandbox] could not import prompt attachments", error);
+				console.error(
+					"[sandbox] could not import prompt attachments",
+					caught(error),
+				);
 			}
 		}
 		const chatTarget =
@@ -585,14 +628,18 @@ export async function launchSandboxAgentOnce(
 					terminalId: run.sessionId,
 				}));
 		console.log(
-			`[sandbox] launched ${agent} for workspace ${identity.workspaceId}`,
+			"[sandbox] launched (agent, workspace):",
+			agent,
+			identity.workspaceId,
 		);
 		await rememberLaunchReport(ctx, identity, report);
 	} catch (error) {
 		await rm(identity.launchMarkerPath, { force: true });
 		console.error(
-			`[sandbox] could not launch ${agent} for workspace ${identity.workspaceId}`,
-			error,
+			"[sandbox] could not launch (agent, workspace):",
+			agent,
+			identity.workspaceId,
+			caught(error),
 		);
 	}
 }
@@ -618,8 +665,9 @@ async function rememberLaunchReport(
 		await flushPendingLaunchReport(ctx, identity);
 	} catch (error) {
 		console.warn(
-			`[sandbox] could not keep the launch report for workspace ${identity.workspaceId}`,
-			error,
+			"[sandbox] could not keep the launch report (workspace):",
+			identity.workspaceId,
+			caught(error),
 		);
 	}
 }
@@ -653,8 +701,9 @@ async function reportLaunch(
 		return true;
 	} catch (error) {
 		console.warn(
-			`[sandbox] could not report the launch for workspace ${workspaceId}`,
-			error,
+			"[sandbox] could not report the launch (workspace):",
+			workspaceId,
+			caught(error),
 		);
 		return false;
 	}

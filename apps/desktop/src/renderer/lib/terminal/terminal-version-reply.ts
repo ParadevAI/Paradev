@@ -6,7 +6,7 @@ import type { IDisposable, Terminal } from "@xterm/xterm";
 // native-grade stream kitty and Ghostty send, so we answer with a name that
 // keeps the xterm.js marker (other TUIs match it as a substring) but does not
 // start with it, and Claude scrolls as it does in a native terminal.
-export const TERMINAL_VERSION_NAME = "Superset (xterm.js)";
+export const TERMINAL_VERSION_NAME = "Paradev (xterm.js)";
 
 export function installTerminalVersionReply(
 	terminal: Pick<Terminal, "parser" | "input">,

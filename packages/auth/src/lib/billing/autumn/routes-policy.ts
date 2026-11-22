@@ -13,6 +13,10 @@ export const ROUTE_ROLES = {
 	listPlans: ["owner", "admin", "member"],
 } as const satisfies Record<string, readonly BillingRole[]>;
 
+/** Routes that would bill through Stripe, which AWS Marketplace organizations must not use. */
+export const STRIPE_BILLED_ROUTES: ReadonlySet<keyof typeof ROUTE_ROLES> =
+	new Set(["attach", "buyGbHours", "setAutoTopup", "updateSubscription"]);
+
 export const OWNER_EXPAND = [
 	"subscriptions.plan",
 	"flags.feature",

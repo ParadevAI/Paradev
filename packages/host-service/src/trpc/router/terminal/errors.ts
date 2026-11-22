@@ -29,6 +29,8 @@ export function toTerminalSessionError(
 				message,
 				cause: { kind },
 			});
+		case "CHAT_NEEDS_SUBMITTED_TEXT":
+			return new TRPCError({ code: "BAD_REQUEST", message, cause: { kind } });
 		case "TERMINAL_START_FAILED":
 			return new TRPCError({ code: "INTERNAL_SERVER_ERROR", message });
 		default: {

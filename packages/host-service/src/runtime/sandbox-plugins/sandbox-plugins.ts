@@ -18,7 +18,8 @@ import {
 	pluginBundleHash,
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
-import { sandboxPluginsSchema } from "@superset/shared/sandbox-contract";
+import { sandboxPluginsSchema } from "@superset/shared/sandbox/contract";
+import { caught } from "../box-log-filter";
 
 function readManifest(file: string): unknown {
 	try {
@@ -54,7 +55,11 @@ async function cacheShippedTree(
 	try {
 		target = pluginCachePath(marketplace, name, version);
 	} catch (error) {
-		console.warn(`[sandbox] ${name}: ${(error as Error).message}`);
+		console.warn(
+			"[sandbox] plugin has no cache path (plugin):",
+			name,
+			caught(error),
+		);
 		return undefined;
 	}
 	if (existsSync(join(target, "plugin.json"))) return target;
@@ -74,7 +79,11 @@ async function cacheShippedTree(
 		return target;
 	} catch (error) {
 		await rm(staging, { recursive: true, force: true }).catch(() => {});
-		console.warn(`[sandbox] ${name}: could not cache its tree:`, error);
+		console.warn(
+			"[sandbox] could not cache a plugin tree (plugin):",
+			name,
+			caught(error),
+		);
 		return undefined;
 	}
 }
@@ -109,7 +118,11 @@ async function cacheOrganizationTree(
 			),
 		};
 	} catch (error) {
-		console.warn(`[sandbox] ${name}: could not fetch its tree:`, error);
+		console.warn(
+			"[sandbox] could not fetch a plugin tree (plugin):",
+			name,
+			caught(error),
+		);
 		return undefined;
 	}
 }
@@ -182,8 +195,8 @@ export async function seedSandboxPlugins(
 	writeInstalledPlugins(entries);
 	const toolsOnly = entries.filter((entry) => !entry.installPath).length;
 	console.log(
-		`[sandbox] Seeded ${entries.length} plugin(s) into the ledger${
-			toolsOnly ? ` (${toolsOnly} with no tree in this runtime)` : ""
-		}`,
+		"[sandbox] Seeded plugins into the ledger (count, with no tree in this runtime):",
+		entries.length,
+		toolsOnly,
 	);
 }

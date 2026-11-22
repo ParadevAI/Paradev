@@ -17,6 +17,11 @@ step). One entry point: **`bun run release`**. Design/rationale lives in
   update` won't deliver it) and fails the host-service min-version floor
   (`semver.satisfies` excludes prereleases). Everything stays plain.
 - **pty-daemon** is on its own `0.x` track, bumped only with `--daemon`.
+- **API status floors.** The API sends old cloud workspace status names to clients
+  below `SLEEP_STATUS_CLIENT_FLOORS` in
+  `packages/trpc/src/router/cloud-workspace/client-status.ts` (desktop/CLI 2.0.10,
+  mobile 1.2.3, SDK 0.0.1-alpha.13), so a build at or above a floor must contain
+  #9800, and an older-code hotfix must never be numbered into that range.
 
 ## Commands
 

@@ -1,4 +1,3 @@
-import { Button } from "@expo/ui/swift-ui";
 import { useLingui } from "@lingui/react/macro";
 import { formatDate } from "@superset/i18n/format";
 import { View } from "react-native";
@@ -42,25 +41,26 @@ export function SharedVersionRow({
 				</Text>
 			</View>
 			{canManage ? (
-				<ValueMenu label={label} a11yLabel={t({ message: "Shared version" })}>
-					<Button
-						label={latestLabel}
-						systemImage={sharedVersion === null ? "checkmark" : undefined}
-						onPress={() => onChange(null)}
-					/>
-					{versions
-						.filter((entry) => entry.version !== latestVersion)
-						.map((entry) => (
-							<Button
-								key={entry.version}
-								label={`${t({ message: `Version ${entry.version}` })} · ${entry.label ?? formatDate(entry.createdAt)}`}
-								systemImage={
-									sharedVersion === entry.version ? "checkmark" : undefined
-								}
-								onPress={() => onChange(entry.version)}
-							/>
-						))}
-				</ValueMenu>
+				<ValueMenu
+					label={label}
+					a11yLabel={t({ message: "Shared version" })}
+					items={[
+						{
+							key: "latest",
+							label: latestLabel,
+							checked: sharedVersion === null,
+							onSelect: () => onChange(null),
+						},
+						...versions
+							.filter((entry) => entry.version !== latestVersion)
+							.map((entry) => ({
+								key: String(entry.version),
+								label: `${t({ message: `Version ${entry.version}` })} · ${entry.label ?? formatDate(entry.createdAt)}`,
+								checked: sharedVersion === entry.version,
+								onSelect: () => onChange(entry.version),
+							})),
+					]}
+				/>
 			) : (
 				<Text className="text-muted-foreground shrink-0 text-xs">{label}</Text>
 			)}

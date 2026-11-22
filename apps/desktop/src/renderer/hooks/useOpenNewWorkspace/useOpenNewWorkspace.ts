@@ -1,26 +1,19 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
-import { useNewWorkspaceModalStore } from "renderer/stores/new-workspace-modal";
 
 interface NewWorkspaceHandoff {
-	isV2CloudEnabled: boolean;
 	machineId: string | null | undefined;
 	navigate: ReturnType<typeof useNavigate>;
 }
 
 export function openNewWorkspace(
-	{ isV2CloudEnabled, navigate }: NewWorkspaceHandoff,
+	{ navigate }: NewWorkspaceHandoff,
 	projectId?: string | null,
 	requestedHostId?: string,
 	repository?: string | null,
 ) {
-	if (!isV2CloudEnabled) {
-		useNewWorkspaceModalStore.getState().openModal(projectId ?? undefined);
-		return;
-	}
 	if (projectId) {
 		useNewWorkspaceDraftStore.getState().selectProject(projectId, repository);
 	}
@@ -33,26 +26,14 @@ export function openNewWorkspace(
 	});
 }
 
-export function openNewSession({
-	isV2CloudEnabled,
-	navigate,
-}: NewWorkspaceHandoff) {
-	if (!isV2CloudEnabled) {
-		useNewWorkspaceModalStore.getState().openSessionModal();
-		return;
-	}
+export function openNewSession({ navigate }: NewWorkspaceHandoff) {
 	useNewWorkspaceDraftStore.getState().selectSession();
 	void navigate({ to: "/new-workspace", search: { session: true } });
 }
 
-/**
- * Opens the new-workspace surface. v2 has no modal — the create surface is
- * the `/new-workspace` route — so this navigates there. v1 installs still
- * open the dialog through the store.
- */
+/** Opens the `/new-workspace` create surface. */
 export function useOpenNewWorkspace() {
 	const navigate = useNavigate();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { machineId } = useLocalHostService();
 
 	return useCallback(
@@ -62,12 +43,12 @@ export function useOpenNewWorkspace() {
 			repository?: string | null,
 		) =>
 			openNewWorkspace(
-				{ isV2CloudEnabled, machineId, navigate },
+				{ machineId, navigate },
 				projectId,
 				requestedHostId,
 				repository,
 			),
-		[isV2CloudEnabled, machineId, navigate],
+		[machineId, navigate],
 	);
 }
 
@@ -80,27 +61,22 @@ export function openNewWorkspaceForLocalProject(
 
 export function useOpenNewWorkspaceForLocalProject() {
 	const navigate = useNavigate();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { machineId } = useLocalHostService();
 	return useCallback(
 		(projectId: string) =>
-			openNewWorkspaceForLocalProject(
-				{ isV2CloudEnabled, machineId, navigate },
-				projectId,
-			),
-		[isV2CloudEnabled, machineId, navigate],
+			openNewWorkspaceForLocalProject({ machineId, navigate }, projectId),
+		[machineId, navigate],
 	);
 }
 
 /** Same, with "No project" (session) preselected. */
 export function useOpenNewSession() {
 	const navigate = useNavigate();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { machineId } = useLocalHostService();
 
 	return useCallback(
-		() => openNewSession({ isV2CloudEnabled, machineId, navigate }),
-		[isV2CloudEnabled, machineId, navigate],
+		() => openNewSession({ machineId, navigate }),
+		[machineId, navigate],
 	);
 }
 
@@ -110,20 +86,11 @@ export function useOpenNewSession() {
  */
 export function useOpenNewWorkspaceForHost() {
 	const navigate = useNavigate();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 
 	return useCallback(
 		(hostId: string, projectId?: string) => {
-			if (!isV2CloudEnabled) {
-				useNewWorkspaceModalStore.getState().openHostModal(hostId);
-				return;
-			}
-			openNewWorkspace(
-				{ isV2CloudEnabled, machineId: null, navigate },
-				projectId,
-				hostId,
-			);
+			openNewWorkspace({ machineId: null, navigate }, projectId, hostId);
 		},
-		[isV2CloudEnabled, navigate],
+		[navigate],
 	);
 }

@@ -20,7 +20,6 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import type {
 	WorkspacesCreateAnyInput,
 	WorkspacesCreateInput,
-	WorkspacesCreateSessionInput,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -30,24 +29,22 @@ import { resolveChatAgentIds } from "./resolveChatAgentIds";
 import { useWorkspaceTransactionsStore } from "./workspaceTransactions";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
-export type { WorkspacesCreateInput, WorkspacesCreateSessionInput };
-
-export interface SubmitArgs {
+interface SubmitArgs {
 	hostId: string;
 	/** `projectId: null` routes to `workspaces.createSession`. */
 	snapshot: WorkspacesCreateAnyInput;
 }
 
-export type SubmitOutcome =
+type SubmitOutcome =
 	| { ok: true; workspaceId: string }
 	| { ok: false; error: string };
 
-export interface SubmitHandle {
+interface SubmitHandle {
 	workspaceId: string;
 	completed: Promise<SubmitOutcome>;
 }
 
-export interface UseWorkspaceCreatesApi {
+interface UseWorkspaceCreatesApi {
 	submit: (args: SubmitArgs) => SubmitHandle;
 }
 
@@ -271,8 +268,8 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			};
 
 			const deleteWorkspaceLocalState = (id: string) => {
-				if (collections.v2WorkspaceLocalState.get(id)) {
-					collections.v2WorkspaceLocalState.delete(id);
+				if (collections.workspaceLocalState.get(id)) {
+					collections.workspaceLocalState.delete(id);
 				}
 			};
 

@@ -9,8 +9,11 @@ import path from "node:path";
  * not automatically adopted because multiple workspaces may have shared one.
  */
 
-/** `productName` in apps/desktop/package.json — what Electron names the app. */
+/** The app name before the Paradev rename; dev profile names keep it so existing ones still match. */
 const APP_NAME = "Superset";
+
+/** `productName` in apps/desktop/package.json. */
+const PRODUCT_NAME = "Paradev";
 
 /** Prefix shared by every per-workspace dev profile. */
 const DEV_PROFILE_PREFIX = `${APP_NAME} (`;
@@ -20,11 +23,13 @@ const DEV_PROFILE_PREFIX = `${APP_NAME} (`;
  * cannot collide with the prefix above, but the check is explicit so a future
  * change to the naming can't silently make it possible.
  */
-const INSTALLED_APP_PROFILE_DIR_NAMES = new Set([
-	APP_NAME,
-	`${APP_NAME} Dev`,
-	`${APP_NAME} Canary`,
-]);
+const INSTALLED_APP_PROFILE_DIR_NAMES = new Set(
+	[APP_NAME, PRODUCT_NAME].flatMap((name) => [
+		name,
+		`${name} Dev`,
+		`${name} Canary`,
+	]),
+);
 
 /** The app name a dev build takes for `workspaceName`, and so its profile dir. */
 export function devAppProfileDirName(workspaceName: string): string {

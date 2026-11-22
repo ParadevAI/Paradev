@@ -2,9 +2,9 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import type { PortChangedPayload } from "@superset/workspace-client";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -44,7 +44,7 @@ export function useDashboardSidebarPortsData(enabled = true): {
 
 	const { targets: sandboxes } = useSandboxAccess();
 	const openMatch = useMatchRoute()({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;

@@ -18,25 +18,25 @@ describe("organizationPluginProblem", () => {
 		).toBeNull();
 	});
 
-	test("a connector served from Superset's own servers is refused", () => {
+	test("a connector served from Paradev's own servers is refused", () => {
 		expect(
 			organizationPluginProblem(manifest({ connector: { slug: "slack" } })),
 		).toContain("no tool server of its own");
 	});
 
-	test("a connector Superset does not define is refused", () => {
+	test("a connector Paradev does not define is refused", () => {
 		expect(
 			organizationPluginProblem(manifest({ connector: { slug: "acme" } })),
 		).toContain("not a connector");
 	});
 
-	test("a Superset plugin's name is refused", () => {
+	test("a Paradev plugin's name is refused", () => {
 		expect(
 			organizationPluginProblem({
 				...manifest({ connector: { slug: "neon_mcp" } }),
 				name: "neon",
 			}),
-		).toContain("name of a Superset plugin");
+		).toContain("name of a Paradev plugin");
 	});
 
 	test("a plugin with only skills is allowed", () => {

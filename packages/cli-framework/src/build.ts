@@ -1,22 +1,14 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { loadConfig } from "./config";
+import { type LoadedConfig, loadConfig } from "./config";
 import { createCommandsPlugin } from "./plugin";
 
-export async function runBuild(argv: string[]): Promise<void> {
-	const { config, configPath, root } = await loadConfig(process.cwd());
+export function buildOptions({
+	config,
+	configPath,
+	root,
+}: LoadedConfig): Pick<Bun.BuildConfig, "entrypoints" | "plugins" | "define"> {
 	const commandsDir = resolve(root, config.commandsDir);
-
-	let target: Bun.Build.CompileTarget | undefined;
-	let outfile = resolve(root, config.outfile ?? `./dist/${config.name}`);
-	for (const arg of argv) {
-		if (arg.startsWith("--target=")) {
-			target = arg.slice("--target=".length) as Bun.Build.CompileTarget;
-		} else if (arg.startsWith("--outfile=")) {
-			outfile = resolve(root, arg.slice("--outfile=".length));
-		}
-	}
-
 	const cacheDir = resolve(root, "node_modules/.cache/cli-framework");
 	mkdirSync(cacheDir, { recursive: true });
 	const entryPath = resolve(cacheDir, "entry.ts");
@@ -38,11 +30,30 @@ await run({
 `,
 	);
 
-	const result = await Bun.build({
+	return {
 		entrypoints: [entryPath],
 		plugins: [createCommandsPlugin({ commandsDir }), ...(config.plugins ?? [])],
-		compile: target ? { target, outfile } : { outfile },
 		define: config.define,
+	};
+}
+
+export async function runBuild(argv: string[]): Promise<void> {
+	const loaded = await loadConfig(process.cwd());
+	const { config, root } = loaded;
+
+	let target: Bun.Build.CompileTarget | undefined;
+	let outfile = resolve(root, config.outfile ?? `./dist/${config.name}`);
+	for (const arg of argv) {
+		if (arg.startsWith("--target=")) {
+			target = arg.slice("--target=".length) as Bun.Build.CompileTarget;
+		} else if (arg.startsWith("--outfile=")) {
+			outfile = resolve(root, arg.slice("--outfile=".length));
+		}
+	}
+
+	const result = await Bun.build({
+		...buildOptions(loaded),
+		compile: target ? { target, outfile } : { outfile },
 	});
 
 	if (!result.success) {

@@ -181,7 +181,7 @@ Under this real-PTY streaming workload, eviction closes the WebSocket of release
 
 ## Verified findings — host-service / pty-daemon
 
-- **`spawnSync("ps")` blocks the host-service event loop in-process** (code, import chain confirmed): `packages/host-service/src/terminal/terminal.ts:5` imports `hasRunningForegroundProcess` directly from `@superset/pty-daemon/process-tree` and calls it at `:369` (pane-close probe). `spawnSync` sites: `process-tree.ts:103,145`, `Pty/Pty.ts:147,302`.
+- **Pane-close `ps` probe no longer waits for `ps` on the host-service event loop — fixed in PR #9812.** `hasRunningForegroundProcess` (`process-tree.ts`), which host-service imports in-process, now uses async `execFile`. In the dev host-service, 200 probes of a busy session blocked the loop per call for p50 11.5 ms, p99 85–93 ms before, and p50 3–5 ms, p99 67 ms after. The remaining block is the child spawn itself. Other `spawnSync` sites are cold paths: the kill-chain `ps` read in `process-tree.ts` and the shell probe and shutdown diagnostics in `Pty/Pty.ts`.
 - **PTY buffering is well-bounded** (code): 64 KB replay ring/session (`SessionStore.ts:4`, `terminal.ts:163`), 8 MB socket caps (`Server.ts:46`, `terminal.ts:177`), slow consumers dropped, sessions deleted on exit. Per-session extras: headless-xterm `ModeTracker` + decoders (`terminal.ts:1183`).
 - In-process keyword search/fuzzy scoring reads candidate files onto the heap (`workspace-fs/src/search.ts:618+`, 1 MB/file, 500 results, LRU 12 indexes) — CPU+heap on the service loop (code).
 - Process topology (CDP-era `ps`): 2 host-service processes per dev app (321/465 MB RSS), each with a pty-daemon child (~60 MB).

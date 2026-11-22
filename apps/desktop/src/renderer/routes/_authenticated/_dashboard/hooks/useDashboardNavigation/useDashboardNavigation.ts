@@ -1,6 +1,7 @@
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
 import {
@@ -15,10 +16,6 @@ import {
 	tasksSearchFromFilters,
 	useTasksFilterStore,
 } from "renderer/routes/_authenticated/_dashboard/tasks/stores/tasks-filter-state";
-import {
-	getUsageLastSection,
-	usageSectionPath,
-} from "renderer/routes/_authenticated/settings/usage/utils/usageLastSection";
 
 /** The rail's destinations. Each list screen reopens with the filters it last showed. */
 export function useDashboardNavigation() {
@@ -66,8 +63,8 @@ export function useDashboardNavigation() {
 				: navigate({ to: "/channels/threads" });
 		},
 
-		isWorkspacesOpen: !!matchRoute({ to: "/v2-workspaces" }),
-		openWorkspaces: () => navigate({ to: "/v2-workspaces" }),
+		isWorkspacesOpen: !!matchRoute({ to: "/workspaces" }),
+		openWorkspaces: () => navigate({ to: "/workspaces" }),
 
 		isAutomationsOpen: !!matchRoute({ to: "/automations", fuzzy: true }),
 		openAutomations,
@@ -117,9 +114,5 @@ export function useDashboardNavigation() {
 
 		isPluginsOpen: !!matchRoute({ to: "/plugins", fuzzy: true }),
 		openPlugins: () => navigate({ to: "/plugins" }),
-
-		// Reopens whichever Usage section (token / machine resources) was
-		// visited last.
-		openUsage: () => navigate({ to: usageSectionPath(getUsageLastSection()) }),
 	};
 }

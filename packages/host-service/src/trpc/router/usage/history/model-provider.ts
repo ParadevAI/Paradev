@@ -32,5 +32,6 @@ export function inferModelProvider(
 	if (normalized.includes("grok") || normalized.startsWith("xai/"))
 		return "xai";
 	if (normalized.startsWith("swe-")) return "cognition";
+	if (agent === "agy") return "google";
 	return "other";
 }

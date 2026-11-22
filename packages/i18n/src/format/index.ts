@@ -23,6 +23,16 @@ export function formatNumber(
 	return new Intl.NumberFormat(locale, options).format(value);
 }
 
+// 12.345 -> "12.3", 0.04 -> "<0.1": a small amount still reads as used.
+export function formatGbHours(
+	gbHours: number,
+	locale = getActiveLocale(),
+): string {
+	return gbHours > 0 && gbHours < 0.1
+		? `<${formatNumber(0.1, undefined, locale)}`
+		: formatNumber(gbHours, { maximumFractionDigits: 1 }, locale);
+}
+
 // 0.123 -> "12.3%"
 export function formatPercent(
 	value: number,

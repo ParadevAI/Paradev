@@ -7,6 +7,7 @@ export {
 	getStartHookRunTerminalId,
 	getStartHookState,
 	launchSandboxAgentOnce,
+	readPendingSandboxLaunch,
 	readSandboxIdentity,
 	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,

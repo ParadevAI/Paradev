@@ -12,7 +12,12 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { electronTrpcClient } from "../../lib/trpc-client";
 import { trpcThemeStorage } from "../../lib/trpc-storage";
-import { applyUIColors, toXtermTheme, updateThemeClass } from "./utils";
+import {
+	applyThemeCss,
+	applyUIColors,
+	toXtermTheme,
+	updateThemeClass,
+} from "./utils";
 
 /** Special theme ID for system preference (follows OS dark/light mode) */
 export const SYSTEM_THEME_ID = "system";
@@ -40,8 +45,17 @@ interface ThemeState {
 	/** Terminal theme in xterm.js format (derived from activeTheme) */
 	terminalTheme: ITheme | null;
 
+	/** Theme shown in place of the active one while a picker previews it; never persisted */
+	previewThemeId: string | null;
+
 	/** Set the active theme by ID (can be "system" or a specific theme ID) */
 	setTheme: (themeId: string) => void;
+
+	/** Show a theme without making it the active one */
+	previewTheme: (themeId: string) => void;
+
+	/** Drop the preview and show the active theme again */
+	endThemePreview: () => void;
 
 	/** Set which theme to use for a given system mode (light or dark) */
 	setSystemThemePreference: (mode: "light" | "dark", themeId: string) => void;
@@ -148,14 +162,31 @@ function syncThemeToLocalStorage(theme: Theme): void {
 	}
 }
 
+type OverlayColor = (ui: Theme["ui"]) => string;
+const pageBackground: OverlayColor = (ui) => ui.background;
+let titleBarOverlayColor = pageBackground;
+
+/**
+ * The window-controls overlay sits over whatever row is at the top of the
+ * window. A row in another colour than the page sets its colour here while
+ * it is mounted, so every theme change paints the overlay to match it.
+ */
+export function setTitleBarOverlayColor(color: OverlayColor | null): void {
+	titleBarOverlayColor = color ?? pageBackground;
+}
+
 /**
  * Apply a theme to the UI and terminal
  */
-function applyTheme(theme: Theme): {
+function applyTheme(
+	theme: Theme,
+	{ preview = false }: { preview?: boolean } = {},
+): {
 	terminalTheme: ITheme;
 } {
 	// Apply UI colors to CSS variables
 	applyUIColors(theme.ui);
+	applyThemeCss(theme.css);
 
 	// The window-controls overlay (Windows, Linux) is painted by the window,
 	// not the page, so it follows the theme from here. Electron parses only
@@ -163,7 +194,7 @@ function applyTheme(theme: Theme): {
 	// as hex.
 	electronTrpcClient.window.setTitleBarOverlay
 		.mutate({
-			color: toHex(theme.ui.background),
+			color: toHex(titleBarOverlayColor(theme.ui)),
 			symbolColor: toHex(theme.ui.foreground),
 		})
 		.catch(() => {});
@@ -171,7 +202,9 @@ function applyTheme(theme: Theme): {
 	// Update dark/light class
 	updateThemeClass(theme.type);
 
-	syncThemeToLocalStorage(theme);
+	// The boot cache must keep the active theme, or a crash mid-preview
+	// would start the next launch in the previewed one.
+	if (!preview) syncThemeToLocalStorage(theme);
 
 	// Convert to editor-specific formats
 	return {
@@ -189,6 +222,7 @@ export const useThemeStore = create<ThemeState>()(
 				systemDarkThemeId: DEFAULT_DARK_THEME_ID,
 				activeTheme: null,
 				terminalTheme: null,
+				previewThemeId: null,
 
 				setTheme: (themeId: string) => {
 					const state = get();
@@ -211,7 +245,43 @@ export const useThemeStore = create<ThemeState>()(
 						activeThemeId: themeId,
 						activeTheme: theme,
 						terminalTheme,
+						previewThemeId: null,
 					});
+				},
+
+				previewTheme: (themeId: string) => {
+					const state = get();
+					if (state.previewThemeId === themeId) return;
+					const resolvedId = resolveThemeId(
+						themeId,
+						state.systemLightThemeId,
+						state.systemDarkThemeId,
+						state.customThemes,
+					);
+					const theme = findTheme(resolvedId, state.customThemes);
+					if (!theme) return;
+
+					const { terminalTheme } = applyTheme(theme, { preview: true });
+					set({ previewThemeId: themeId, activeTheme: theme, terminalTheme });
+				},
+
+				endThemePreview: () => {
+					const state = get();
+					if (state.previewThemeId === null) return;
+					const resolvedId = resolveThemeId(
+						state.activeThemeId,
+						state.systemLightThemeId,
+						state.systemDarkThemeId,
+						state.customThemes,
+					);
+					const theme = findTheme(resolvedId, state.customThemes);
+					if (!theme) {
+						set({ previewThemeId: null });
+						return;
+					}
+
+					const { terminalTheme } = applyTheme(theme);
+					set({ previewThemeId: null, activeTheme: theme, terminalTheme });
 				},
 
 				applyExternalThemeState: (external: {
@@ -254,6 +324,7 @@ export const useThemeStore = create<ThemeState>()(
 						systemDarkThemeId,
 						activeTheme: theme,
 						terminalTheme,
+						previewThemeId: null,
 					});
 				},
 
@@ -345,6 +416,7 @@ export const useThemeStore = create<ThemeState>()(
 						customThemes,
 						activeTheme: resolvedTheme,
 						terminalTheme,
+						previewThemeId: null,
 					});
 
 					return { added, updated, skipped };

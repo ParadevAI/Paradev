@@ -66,8 +66,8 @@ export interface DashboardSidebarWorkspace {
 	/** Whether the signed-in user created it; null when the host doesn't say. */
 	isMine: boolean | null;
 	creator: DashboardSidebarWorkspaceCreator | null;
-	/** A cloud sandbox still being made, or one that failed; null otherwise. */
-	sandboxStatus: "provisioning" | "failed" | null;
+	/** A cloud sandbox still being made, failed, or asleep; null otherwise. */
+	sandboxStatus: "provisioning" | "failed" | "asleep" | null;
 }
 
 /**

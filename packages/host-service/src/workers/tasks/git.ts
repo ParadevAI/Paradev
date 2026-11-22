@@ -104,15 +104,29 @@ export const gitCommitFilesTask = defineWorkerTask<
 		worktreePath: string;
 		commitHash: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	ChangedFile[]
 >({
 	type: "git/getCommitFiles",
-	handler: async ({ worktreePath, commitHash, fromHash, gitEnv }) => {
+	handler: async ({
+		worktreePath,
+		commitHash,
+		fromHash,
+		includeFrom,
+		gitEnv,
+	}) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
-		const from = fromHash ? fromHash : `${commitHash}^`;
-		return getChangedFilesForDiff(git, [from, commitHash]);
+		const refs = await resolveDiffCategoryRefs(git, "commit", {
+			commitHash,
+			fromHash,
+			includeFrom,
+		});
+		if (!refs.fromRef || !refs.toRef) {
+			throw new Error("Could not resolve commit diff refs");
+		}
+		return getChangedFilesForDiff(git, [refs.fromRef, refs.toRef]);
 	},
 });
 
@@ -128,6 +142,7 @@ export const gitDiffBulkTask = defineWorkerTask<
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	{
@@ -146,12 +161,13 @@ export const gitDiffBulkTask = defineWorkerTask<
 		baseBranch,
 		commitHash,
 		fromHash,
+		includeFrom,
 		gitEnv,
 	}) => {
 		const refs = await resolveDiffCategoryRefs(
 			createUserSimpleGit(worktreePath, { env: gitEnv }),
 			category,
-			{ baseBranch, commitHash, fromHash },
+			{ baseBranch, commitHash, fromHash, includeFrom },
 		);
 
 		const diffs = await mapWithConcurrency(
@@ -187,6 +203,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	{ patch: string }
@@ -200,6 +217,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		baseBranch,
 		commitHash,
 		fromHash,
+		includeFrom,
 		gitEnv,
 	}) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
@@ -207,6 +225,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 			baseBranch,
 			commitHash,
 			fromHash,
+			includeFrom,
 		});
 		const patch = await buildDiffPatch({
 			cwd: worktreePath,
@@ -240,6 +259,7 @@ export const gitDiffSideBlobTask = defineWorkerTask<
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	DiffSideBlobResult
@@ -254,6 +274,7 @@ export const gitDiffSideBlobTask = defineWorkerTask<
 		baseBranch,
 		commitHash,
 		fromHash,
+		includeFrom,
 		gitEnv,
 	}) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
@@ -261,6 +282,7 @@ export const gitDiffSideBlobTask = defineWorkerTask<
 			baseBranch,
 			commitHash,
 			fromHash,
+			includeFrom,
 		});
 		const spec = diffSideObjectSpec(category, side, path, refs);
 		if (!spec) return { kind: "missing" };
@@ -835,9 +857,9 @@ export const gitDetectExternalWorktreesTask = defineWorkerTask<
 const SNAPSHOT_COMMIT_MESSAGE = "Work in progress, moved to a cloud workspace";
 /** Used only when git has no identity of the user's own. */
 const SNAPSHOT_IDENTITY = {
-	GIT_AUTHOR_NAME: "Superset",
+	GIT_AUTHOR_NAME: "Paradev",
 	GIT_AUTHOR_EMAIL: "teleport@superset.sh",
-	GIT_COMMITTER_NAME: "Superset",
+	GIT_COMMITTER_NAME: "Paradev",
 	GIT_COMMITTER_EMAIL: "teleport@superset.sh",
 };
 

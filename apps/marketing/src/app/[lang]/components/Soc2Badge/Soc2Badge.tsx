@@ -50,7 +50,7 @@ export function Soc2Badge({ size = 96, className }: Soc2BadgeProps) {
 				letterSpacing="1.1"
 				fill="currentColor"
 				fillOpacity="0.7"
-				style={{ fontFamily: "var(--font-ibm-plex-mono), monospace" }}
+				style={{ fontFamily: "var(--font-geist-mono), monospace" }}
 			>
 				<textPath href={`#${ringId}-top`} startOffset="50%">
 					SERVICE ORGANIZATION CONTROLS
@@ -62,7 +62,7 @@ export function Soc2Badge({ size = 96, className }: Soc2BadgeProps) {
 				letterSpacing="1.1"
 				fill="currentColor"
 				fillOpacity="0.7"
-				style={{ fontFamily: "var(--font-ibm-plex-mono), monospace" }}
+				style={{ fontFamily: "var(--font-geist-mono), monospace" }}
 			>
 				<textPath href={`#${ringId}-bottom`} startOffset="50%">
 					INDEPENDENTLY AUDITED
@@ -78,7 +78,7 @@ export function Soc2Badge({ size = 96, className }: Soc2BadgeProps) {
 				fontSize="17"
 				fontWeight="500"
 				fill="currentColor"
-				style={{ fontFamily: "var(--font-inter), sans-serif" }}
+				style={{ fontFamily: "var(--font-geist-sans), sans-serif" }}
 			>
 				SOC 2
 			</text>
@@ -90,7 +90,7 @@ export function Soc2Badge({ size = 96, className }: Soc2BadgeProps) {
 				letterSpacing="2"
 				fill="currentColor"
 				fillOpacity="0.7"
-				style={{ fontFamily: "var(--font-ibm-plex-mono), monospace" }}
+				style={{ fontFamily: "var(--font-geist-mono), monospace" }}
 			>
 				TYPE II
 			</text>

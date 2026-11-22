@@ -5,13 +5,13 @@
  * firewall adds it on the way out, nothing inside the box can read it.
  *
  * It grants the creator's identity, so what it may do is deliberately narrow:
- * see SANDBOX_ALLOWED_PROCEDURES. Anything else is a person's call, from a
+ * see sandboxMayCall. Anything else is a person's call, from a
  * client they signed into.
  */
 import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, members } from "@superset/db/schema";
-import { sandboxApiCredential } from "@superset/shared/sandbox-gate";
+import { sandboxApiCredential } from "@superset/shared/sandbox/gate";
 import { and, eq, isNull } from "drizzle-orm";
 import { env } from "../../env";
 
@@ -21,7 +21,7 @@ export interface SandboxCaller {
 	userId: string;
 }
 
-/** Everything `superset` in a box legitimately does, and nothing else. */
+/** Everything else `superset` in a box legitimately does, and nothing more. */
 export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"attachment.createUpload",
 	"attachment.resolve",
@@ -29,6 +29,10 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"automation.getPrompt",
 	"automation.list",
 	"automation.reportCloudLaunch",
+	"automation.setEnabled",
+	"automation.setGroup",
+	"automation.setPrompt",
+	"automation.update",
 	"chatHistory.completeTranscriptUpload",
 	"chatHistory.createTranscriptUpload",
 	"chatHistory.push",
@@ -52,10 +56,14 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"cloudWorkspace.setTags",
 	"cloudWorkspace.sleep",
 	"cloudWorkspace.unlinkTask",
+	"connectors.connectApiKey",
 	"connectors.get",
 	"connectors.status",
+	"environment.builds",
+	"environment.create",
 	"environment.get",
 	"environment.list",
+	"environment.rebuild",
 	"environment.secrets.list",
 	"githubUser.get",
 	"host.cloudWorkspaceAccess",
@@ -83,14 +91,6 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"pageComment.listForOrganization",
 	"pageComment.reply",
 	"pageComment.resolve",
-	"plugins.install",
-	"plugins.list",
-	"plugins.marketplaces.add",
-	"plugins.marketplaces.list",
-	"plugins.marketplaces.remove",
-	"plugins.organization.bundle",
-	"plugins.setEnabled",
-	"plugins.uninstall",
 	"support.submitFeedback",
 	"task.byIdOrSlug",
 	"task.create",
@@ -102,6 +102,9 @@ export const SANDBOX_ALLOWED_PROCEDURES: ReadonlySet<string> = new Set([
 	"user.myOrganization",
 	"user.myOrganizations",
 ]);
+
+export const sandboxMayCall = (path: string): boolean =>
+	path.startsWith("plugins.") || SANDBOX_ALLOWED_PROCEDURES.has(path);
 
 function equal(a: string, b: string): boolean {
 	const left = Buffer.from(a);
