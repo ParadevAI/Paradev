@@ -1,12 +1,12 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
+import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import {
 	CircleCheck,
 	CircleDot,
 	CircleSlash,
-	ExternalLink,
 	GitCompare,
 	GitMerge,
 	GitPullRequest,
@@ -15,11 +15,13 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 import type { MouseEvent } from "react";
+import { FaGithub } from "react-icons/fa";
 import { useNow } from "renderer/hooks/useNow";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../utils/githubWorkItem";
 import {
 	GITHUB_WORK_ITEM_TONE_TEXT,
+	type GithubWorkItemTone,
 	githubWorkItemTone,
 } from "../../../../utils/githubWorkItemTone";
 
@@ -46,6 +48,13 @@ export type GithubWorkItemLoad =
 const MAX_LABELS = 3;
 const MAX_ASSIGNEES = 3;
 
+const STATUS_BACKGROUND = {
+	neutral: "bg-muted",
+	open: "bg-emerald-500/15",
+	done: "bg-violet-500/15",
+	closed: "bg-destructive/15",
+};
+
 const STATE_LABELS = {
 	pr: msg({ message: "Pull request" }),
 	issue: msg({ message: "Issue" }),
@@ -61,19 +70,18 @@ function statusOf(
 ): {
 	Icon: LucideIcon;
 	label: (typeof STATE_LABELS)[keyof typeof STATE_LABELS];
-	className: string;
+	tone: GithubWorkItemTone;
 } {
 	const tone = githubWorkItemTone(kind, item);
-	const className = GITHUB_WORK_ITEM_TONE_TEXT[tone];
 	if (!item) {
 		return {
 			Icon: kind === "pr" ? GitPullRequest : CircleDot,
 			label: kind === "pr" ? STATE_LABELS.pr : STATE_LABELS.issue,
-			className,
+			tone,
 		};
 	}
 	if (item.state === "merged") {
-		return { Icon: GitMerge, label: STATE_LABELS.merged, className };
+		return { Icon: GitMerge, label: STATE_LABELS.merged, tone };
 	}
 	if (item.state === "closed") {
 		const Icon =
@@ -82,15 +90,19 @@ function statusOf(
 				: tone === "done"
 					? CircleCheck
 					: CircleSlash;
-		return { Icon, label: STATE_LABELS.closed, className };
+		return { Icon, label: STATE_LABELS.closed, tone };
 	}
 	if (item.draft) {
-		return { Icon: GitPullRequestDraft, label: STATE_LABELS.draft, className };
+		return {
+			Icon: GitPullRequestDraft,
+			label: STATE_LABELS.draft,
+			tone,
+		};
 	}
 	return {
 		Icon: kind === "pr" ? GitPullRequest : CircleDot,
 		label: STATE_LABELS.open,
-		className,
+		tone,
 	};
 }
 
@@ -121,7 +133,7 @@ function Avatar({
 	) : (
 		<span
 			aria-hidden="true"
-			className="grid shrink-0 place-items-center rounded-full border border-background bg-foreground/10 font-medium text-foreground/50"
+			className="grid shrink-0 place-items-center rounded-full border border-background bg-foreground/10 font-medium text-muted-foreground"
 			style={{ width: size, height: size, fontSize: Math.max(8, size * 0.45) }}
 		>
 			{login.charAt(0).toUpperCase() || "?"}
@@ -156,23 +168,27 @@ export function GithubWorkItemCard({
 			? { base: item.baseRefName, head: item.headRefName }
 			: null;
 	return (
-		<div className="min-w-0 p-3.5 text-left font-sans text-foreground">
-			<div className="flex min-w-0 items-center gap-2 text-[11px]">
+		<div className="min-w-0 text-left font-sans">
+			<div className="flex min-w-0 items-center gap-1.5 text-xs">
 				<status.Icon
 					aria-hidden="true"
-					className={cn("size-4 shrink-0", status.className)}
+					className={cn(
+						"size-4 shrink-0",
+						GITHUB_WORK_ITEM_TONE_TEXT[status.tone],
+					)}
 				/>
-				<span className="min-w-0 truncate font-medium text-foreground/65">
+				<span className="min-w-0 truncate font-medium text-muted-foreground">
 					{link.owner}/{link.repo}
 				</span>
 				<span className="shrink-0 text-foreground/35">·</span>
-				<span className="shrink-0 font-mono text-foreground/50 tabular-nums">
+				<span className="shrink-0 font-mono text-muted-foreground tabular-nums">
 					#{link.number}
 				</span>
 				<span
 					className={cn(
-						"ml-auto shrink-0 rounded-full bg-foreground/[0.07] px-2 py-0.5 font-medium",
-						status.className,
+						"ml-auto shrink-0 rounded-md px-1.5 py-0.5 font-medium text-[10px]",
+						GITHUB_WORK_ITEM_TONE_TEXT[status.tone],
+						STATUS_BACKGROUND[status.tone],
 					)}
 				>
 					{i18n._(status.label)}
@@ -193,7 +209,7 @@ export function GithubWorkItemCard({
 						</a>
 					</h3>
 					{item.summary && (
-						<p className="mt-1.5 line-clamp-3 text-[11px] text-foreground/55 leading-[1.45]">
+						<p className="mt-1.5 line-clamp-3 text-[11px] text-muted-foreground leading-[1.45]">
 							{item.summary}
 						</p>
 					)}
@@ -208,7 +224,7 @@ export function GithubWorkItemCard({
 					<div className="h-2 w-2/3 rounded bg-foreground/[0.07] motion-safe:animate-pulse" />
 				</output>
 			) : (
-				<p className="mt-2 text-[11px] text-foreground/50 leading-relaxed">
+				<p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
 					<Trans>
 						Details are not available here, but the link still opens.
 					</Trans>
@@ -216,7 +232,7 @@ export function GithubWorkItemCard({
 			)}
 
 			{item && (item.author || item.updatedAt) && (
-				<div className="mt-2.5 flex min-w-0 items-center gap-1.5 text-[10px] text-foreground/45">
+				<div className="mt-2.5 flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
 					{item.author && (
 						<span className="inline-flex min-w-0 items-center gap-1.5">
 							<Avatar
@@ -224,7 +240,7 @@ export function GithubWorkItemCard({
 								login={item.author.login}
 								size={16}
 							/>
-							<span className="min-w-0 truncate font-medium text-foreground/55">
+							<span className="min-w-0 truncate font-medium text-muted-foreground">
 								{item.author.login}
 							</span>
 						</span>
@@ -239,7 +255,7 @@ export function GithubWorkItemCard({
 			)}
 
 			{branches && (
-				<div className="mt-2 flex min-w-0 items-center gap-1.5 rounded-md bg-foreground/[0.045] px-2 py-1.5 text-[10px] text-foreground/50">
+				<div className="mt-2 flex min-w-0 items-center gap-1.5 rounded-md bg-muted px-2 py-1.5 text-[10px] text-muted-foreground">
 					<GitCompare aria-hidden="true" className="size-3.5 shrink-0" />
 					<span className="min-w-0 truncate font-mono">
 						{branches.base} ← {branches.head}
@@ -252,7 +268,7 @@ export function GithubWorkItemCard({
 					<div className="flex min-w-0 flex-1 flex-wrap gap-1">
 						{labels.slice(0, MAX_LABELS).map((label) => (
 							<span
-								className="inline-flex max-w-28 items-center gap-1 rounded-full border border-foreground/10 bg-foreground/[0.035] px-1.5 py-0.5 text-[9px] text-foreground/55"
+								className="inline-flex max-w-28 items-center gap-1 rounded-full border border-foreground/10 bg-foreground/[0.035] px-1.5 py-0.5 text-[9px] text-muted-foreground"
 								key={label.name}
 							>
 								<span
@@ -284,17 +300,13 @@ export function GithubWorkItemCard({
 				</div>
 			)}
 
-			<div className="mt-3 border-foreground/[0.07] border-t pt-2">
-				<a
-					className="inline-flex items-center gap-1 rounded-sm font-medium text-[11px] text-foreground/55 no-underline outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
-					href={url}
-					onClick={open}
-					rel="noreferrer"
-					target="_blank"
-				>
-					<ExternalLink aria-hidden="true" className="size-3" />
-					<Trans>Open on GitHub</Trans>
-				</a>
+			<div className="mt-3 border-t border-border pt-2">
+				<Button variant="outline" size="xs" className="w-full" asChild>
+					<a href={url} onClick={open} rel="noreferrer" target="_blank">
+						<FaGithub aria-hidden="true" className="size-3" />
+						<Trans>View on GitHub</Trans>
+					</a>
+				</Button>
 			</div>
 		</div>
 	);

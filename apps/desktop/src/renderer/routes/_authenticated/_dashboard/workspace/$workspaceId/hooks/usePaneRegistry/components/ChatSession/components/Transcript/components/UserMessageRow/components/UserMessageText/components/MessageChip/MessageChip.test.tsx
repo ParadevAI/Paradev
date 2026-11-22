@@ -92,7 +92,7 @@ test("a pull request chip looks as the composer drew it and asks for details onl
 	]);
 	const card = screen
 		.getByText("superset-sh/superset")
-		.closest("div[class*=p-3]") as HTMLElement;
+		.closest('[data-slot="hover-card-content"]') as HTMLElement;
 	expect(card.textContent).toContain("Merged");
 	expect(card.textContent).toContain("main ← feat/chat-whole-sessions");
 	expect(card.textContent).toContain("desktop");
@@ -155,7 +155,7 @@ test("the card links to the pasted URL, and opening it closes the card", async (
 	const title = await screen.findByText("feat(chat): load whole sessions");
 	expect(title.closest("a")?.getAttribute("href")).toBe(files);
 
-	fireEvent.click(screen.getByText("Open on GitHub"));
+	fireEvent.click(screen.getByRole("link", { name: "View on GitHub" }));
 	expect(openLink.mock.calls.map(([href]) => href)).toEqual([files]);
 	await waitFor(() =>
 		expect(screen.queryByText("feat(chat): load whole sessions")).toBeNull(),

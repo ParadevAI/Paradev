@@ -68,7 +68,7 @@ export function HostGithubWorkItemHoverCard({
 			</HoverCardTrigger>
 			<HoverCardContent
 				align="start"
-				className="w-[360px] max-w-[calc(100vw-2rem)] rounded-xl border-foreground/[0.08] p-0 shadow-xl"
+				className="w-72 max-w-[calc(100vw-2rem)]"
 				side="top"
 				sideOffset={6}
 			>

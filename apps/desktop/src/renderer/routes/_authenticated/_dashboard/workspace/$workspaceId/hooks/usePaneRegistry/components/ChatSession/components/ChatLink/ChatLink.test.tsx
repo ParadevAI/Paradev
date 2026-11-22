@@ -108,7 +108,10 @@ test("a pull request link gets the GitHub card, with a link to open it", async (
 	await screen.findByText("feat(chat): load whole sessions");
 	expect(asked.map(({ path }) => path)).toEqual(["github.getWorkItem"]);
 	expect(
-		screen.getByText("Open on GitHub").closest("a")?.getAttribute("href"),
+		screen
+			.getByRole("link", { name: "View on GitHub" })
+			.closest("a")
+			?.getAttribute("href"),
 	).toBe(PR);
 });
 
