@@ -8,13 +8,13 @@ export default command({
 	args: [positional("name").required().desc("Variable name")],
 	options: {
 		environment: string().desc(
-			"Environment ID (see: superset environments list); required when the organization has several",
+			"Environment ID (see: paradev environments list); required when the organization has several",
 		),
 	},
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const environment = await resolveEnvironment(
 			ctx.api,

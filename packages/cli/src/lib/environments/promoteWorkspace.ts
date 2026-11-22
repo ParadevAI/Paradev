@@ -61,7 +61,7 @@ export async function promoteWorkspace({
 		}
 		throw new CLIError(
 			`The snapshot did not finish in ${Math.round(pollTimeoutMs / 60_000)} minutes`,
-			"Check with: superset environments list",
+			"Check with: paradev environments list",
 		);
 	};
 

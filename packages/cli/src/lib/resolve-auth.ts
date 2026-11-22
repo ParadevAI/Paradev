@@ -84,7 +84,7 @@ export async function resolveAuth(
 	} else {
 		throw new CLIError(
 			NOT_LOGGED_IN,
-			"Run: superset auth login (or set PARADEV_API_KEY)",
+			"Run: paradev auth login (or set PARADEV_API_KEY)",
 		);
 	}
 
@@ -109,10 +109,10 @@ function refreshFailureToCLIError(error: unknown): CLIError {
 		);
 	}
 	if (error instanceof SessionExpiredError) {
-		return new CLIError("Session expired", "Run: superset auth login");
+		return new CLIError("Session expired", "Run: paradev auth login");
 	}
 	return new CLIError(
 		"Could not renew the login",
-		"Retry in a minute. If it keeps failing, run: superset auth login",
+		"Retry in a minute. If it keeps failing, run: paradev auth login",
 	);
 }

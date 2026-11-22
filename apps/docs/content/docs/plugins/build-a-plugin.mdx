@@ -24,7 +24,7 @@ Plugins live in a marketplace: a git repository with an `.agent-marketplace.json
 From the repository root, scaffold the plugin. Use `--kind url` for a plugin with MCP tools, or `--kind none --skills` for a plugin with skills only:
 
 ```bash
-superset plugins create acme \
+paradev plugins create acme \
   --kind url \
   --url https://mcp.acme.com/mcp \
   --skills \
@@ -113,13 +113,13 @@ description: Triage a new Acme project request. Use when the user asks to triage
 Record the plugin's version in the marketplace, validate it, then add your checkout as a marketplace and install from it:
 
 ```bash
-superset plugins publish acme
-superset plugins validate plugins/acme
-superset plugins marketplace add .
-superset plugins install acme --marketplace acme
+paradev plugins publish acme
+paradev plugins validate plugins/acme
+paradev plugins marketplace add .
+paradev plugins install acme --marketplace acme
 ```
 
-Start a new agent session and mention the plugin in a prompt. After you edit the plugin, run `superset plugins install acme --marketplace acme --update` to copy the change to your machine.
+Start a new agent session and mention the plugin in a prompt. After you edit the plugin, run `paradev plugins install acme --marketplace acme --update` to copy the change to your machine.
 
 <Callout type="warn">
 A plugin installed from your own marketplace gets its skills only, not its MCP tools. To test the tools, add the repository as an [organization plugin](/plugins/organization-plugins) source.
@@ -140,8 +140,8 @@ There are three ways to share a plugin:
 Push the repository to GitHub. Anyone can then add it and install from it:
 
 ```bash
-superset plugins marketplace add acme/paradev-plugins
-superset plugins install acme --marketplace acme
+paradev plugins marketplace add acme/paradev-plugins
+paradev plugins install acme --marketplace acme
 ```
 
 Plugins from a marketplace you add this way install their skills only. For MCP tools, use organization plugins or submit the plugin to the Paradev marketplace.
@@ -155,10 +155,10 @@ An owner or admin can sync your repository into a Paradev organization. Members 
 To make a plugin available to every Paradev user, open a pull request that adds it to the [Paradev repository](https://github.com/paradevai/paradev). The repository is itself a marketplace, so you build the plugin there with the same commands. Plugins in the Paradev marketplace are listed at [paradev.com/marketplace/plugins](https://paradev.com/marketplace/plugins) and in **Plugins** in the desktop app.
 
 1. Fork and clone the repository, then run `bun install`. See [CONTRIBUTING.md](https://github.com/paradevai/paradev/blob/main/CONTRIBUTING.md).
-2. From the repository root, run `superset plugins create <name> --kind url --url <server-url>`, or `superset plugins create <name> --kind none --skills` for a skills-only plugin. Then write the manifest and skills as described above.
+2. From the repository root, run `paradev plugins create <name> --kind url --url <server-url>`, or `paradev plugins create <name> --kind none --skills` for a skills-only plugin. Then write the manifest and skills as described above.
 3. If the MCP server needs a sign-in, add a connector to `packages/shared/src/connectors/connectors.json` and name it in `connector.slug`. A server that supports OAuth dynamic client registration needs only a connector with `"client": "dynamic"`; copy the `granola_mcp` entry. If the server needs a pre-registered OAuth app, say so in the pull request, and we register one.
 4. Add an entry for the plugin to `PLUGIN_CATALOG` in `packages/shared/src/plugins/index.ts`, with the same name and display name as `plugin.json`. A test fails until every published plugin has one.
-5. Run `superset plugins publish <name>`. This records the version in `.agent-marketplace.json` and regenerates `packages/shared/src/plugins/manifests.generated.ts`. Do not edit that file by hand.
+5. Run `paradev plugins publish <name>`. This records the version in `.agent-marketplace.json` and regenerates `packages/shared/src/plugins/manifests.generated.ts`. Do not edit that file by hand.
 6. Run the checks CI runs:
 
    ```bash
@@ -175,7 +175,7 @@ An icon and a guide under [Available Plugins](/plugins/available) are optional. 
 Bump the version for every change, then commit and push:
 
 ```bash
-superset plugins publish acme --bump patch
+paradev plugins publish acme --bump patch
 git add .agent-marketplace.json plugins/acme
 git commit -m "publish acme@0.1.1"
 git push
@@ -184,8 +184,8 @@ git push
 `publish` bumps the version in `plugin.json` and `.agent-marketplace.json`. To get the new version, users fetch your marketplace again and update the plugin:
 
 ```bash
-superset plugins marketplace add acme/paradev-plugins
-superset plugins install acme --marketplace acme --update
+paradev plugins marketplace add acme/paradev-plugins
+paradev plugins install acme --marketplace acme --update
 ```
 
-For a plugin in the Paradev repository, run `superset plugins publish <name> --bump patch` in your pull request, and commit `packages/shared/src/plugins/manifests.generated.ts` with the plugin. CI fails if that file is out of date. The new version ships when the pull request merges.
+For a plugin in the Paradev repository, run `paradev plugins publish <name> --bump patch` in your pull request, and commit `packages/shared/src/plugins/manifests.generated.ts` with the plugin. CI fails if that file is out of date. The new version ships when the pull request merges.

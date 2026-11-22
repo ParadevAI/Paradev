@@ -7,7 +7,7 @@ export default command({
 	description: "List an environment's variables; values are never shown",
 	options: {
 		environment: string().desc(
-			"Environment ID (see: superset environments list); required when the organization has several",
+			"Environment ID (see: paradev environments list); required when the organization has several",
 		),
 	},
 	display: (data) =>
@@ -25,7 +25,7 @@ export default command({
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const environment = await resolveEnvironment(
 			ctx.api,

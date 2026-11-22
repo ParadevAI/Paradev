@@ -52,7 +52,7 @@ Browser panes run Chrome extensions, so password managers, passkeys, and content
 
 When Paradev has signed Chrome Web Store hashes for an extension, it checks the extension's files against them at every start. Extensions installed before this check existed are recorded on first use and checked from then on. If a file changed, the extension is turned off and shows as greyed out in the menu. Reinstall it to keep its data, or remove it.
 
-Extensions run in your own browser session. Panes that agents open run in a separate session with none of your extensions and none of your logins unless you import them. Agents can manage extensions with [`superset browser extensions`](/cli/cli-reference#browser), and every install and removal still asks you in the app.
+Extensions run in your own browser session. Panes that agents open run in a separate session with none of your extensions and none of your logins unless you import them. Agents can manage extensions with [`paradev browser extensions`](/cli/cli-reference#browser), and every install and removal still asks you in the app.
 
 ## Ports Integration
 
@@ -62,25 +62,25 @@ For workspaces on a [remote host](/remote-access), the desktop app forwards dete
 
 ## Drive it from the CLI and agents
 
-The [`superset browser`](/cli/cli-reference#browser) commands let an agent open, read, screenshot, and interact with a page in the pane you are watching.
+The [`paradev browser`](/cli/cli-reference#browser) commands let an agent open, read, screenshot, and interact with a page in the pane you are watching.
 
 ```bash
 # Open a page and get its pane id back
-superset browser open --workspace <id> --url http://localhost:3000 --target new-tab
+paradev browser open --workspace <id> --url http://localhost:3000 --target new-tab
 
 # Read, screenshot, and evaluate in the pane
-superset browser eval --workspace <id> --pane <paneId> --code "document.title"
-superset browser screenshot --workspace <id> --pane <paneId> --out shot.png
-superset browser console --workspace <id> --pane <paneId>
+paradev browser eval --workspace <id> --pane <paneId> --code "document.title"
+paradev browser screenshot --workspace <id> --pane <paneId> --out shot.png
+paradev browser console --workspace <id> --pane <paneId>
 ```
 
-For clicking, typing, scrolling, and form flows, `superset browser cdp` prints a raw [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) WebSocket endpoint for a browser-use or Playwright-class client. The endpoint drives only that pane's page (never the Paradev app itself), and pane operations are scoped to their workspace.
+For clicking, typing, scrolling, and form flows, `paradev browser cdp` prints a raw [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) WebSocket endpoint for a browser-use or Playwright-class client. The endpoint drives only that pane's page (never the Paradev app itself), and pane operations are scoped to their workspace.
 
 Agents use this through the [`superset:browser` skill](/skills). A pane you open runs in your logged-in browser session. Panes that agents open use a separate session with none of your logins unless you import them. Agents are instructed to confirm before consequential actions.
 
 ## Pane or standalone browser?
 
-The `superset:browser` skill defaults to the in-app pane. When a page is or can be open in a workspace pane (previewing a dev server, verifying UI, clicking through a flow), agents use the `superset browser` commands above.
+The `superset:browser` skill defaults to the in-app pane. When a page is or can be open in a workspace pane (previewing a dev server, verifying UI, clicking through a flow), agents use the `paradev browser` commands above.
 
 For targets a pane cannot reach (a real Chrome window outside Paradev, a host without the desktop app attached, or an isolated or cloud browser), the skill uses [Browser Use 3.0](https://docs.browser-use.com/open-source/browser-use-cli) as a second engine.
 
@@ -101,7 +101,7 @@ You can also run `uvx --from 'browser-use[cli]' browser-use …`. This does not 
 
 By default it attaches to your running Chrome (your real, signed-in profile), so the skill needs your explicit consent first. Otherwise agents use a scratch browser or a Browser Use cloud browser (which bills until stopped, so they ask first and stop it after). `browser-use --doctor` diagnoses connection problems, and `browser-use skill` prints the engine's own usage reference.
 
-Browser Use can also drive an in-app pane: set `BU_CDP_WS` to the endpoint from `superset browser cdp`, and the pane appears as a single page target. The `superset browser` commands are the simpler default for panes.
+Browser Use can also drive an in-app pane: set `BU_CDP_WS` to the endpoint from `paradev browser cdp`, and the pane appears as a single page target. The `paradev browser` commands are the simpler default for panes.
 
 ## Related Guide
 

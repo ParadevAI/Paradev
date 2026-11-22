@@ -4,15 +4,15 @@ import { CLIError } from "@superset/cli-framework";
 function commandHint(error: PluginError): string | undefined {
 	switch (error.code) {
 		case "not-found":
-			return "Run: superset plugins list --available";
+			return "Run: paradev plugins list --available";
 		case "ambiguous":
 			return `Name one with --marketplace <name>, or ${error.plugin}@<marketplace>.`;
 		case "already-installed":
-			return `Run: superset plugins install ${error.plugin} --update`;
+			return `Run: paradev plugins install ${error.plugin} --update`;
 		case "not-installed":
-			return `Run: superset plugins install ${error.plugin}`;
+			return `Run: paradev plugins install ${error.plugin}`;
 		case "marketplace-not-installed":
-			return "Run: superset plugins marketplace add <owner/repo>";
+			return "Run: paradev plugins marketplace add <owner/repo>";
 		default:
 			return undefined;
 	}

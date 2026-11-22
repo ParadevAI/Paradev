@@ -16,7 +16,7 @@ export default command({
 			data: sources,
 			message: sources.length
 				? `${sources.length} source${sources.length === 1 ? "" : "s"}.`
-				: "No sources. Add one: superset plugins organization sources add <owner/repo>",
+				: "No sources. Add one: paradev plugins organization sources add <owner/repo>",
 		};
 	},
 });

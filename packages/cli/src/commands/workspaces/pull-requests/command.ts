@@ -31,7 +31,7 @@ export default command({
 				: readPublicEnv("SANDBOX_WORKSPACE_ID"));
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const rows = await ctx.api.cloudWorkspace.pullRequests.query({
 			organizationId,

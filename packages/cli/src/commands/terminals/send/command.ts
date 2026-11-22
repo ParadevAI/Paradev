@@ -40,7 +40,7 @@ export default command({
 	run: async ({ ctx, options, signal }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		if ((options.text === undefined) === (options.keys === undefined)) {
 			throw new CLIError("Pass exactly one of --text or --keys");
@@ -68,7 +68,7 @@ export default command({
 		if (options.wait && !before) {
 			throw new CLIError(
 				`No agent is running in terminal ${options.terminal}`,
-				"--wait follows an agent's state; for a plain shell use `superset terminals wait --match`",
+				"--wait follows an agent's state; for a plain shell use `paradev terminals wait --match`",
 			);
 		}
 
@@ -107,7 +107,7 @@ export default command({
 		if (stalled) {
 			throw new CLIError(
 				`The agent showed no activity within 10s of the send; it is ${state}`,
-				"The text may be sitting in its input box: check with `superset terminals read`",
+				"The text may be sitting in its input box: check with `paradev terminals read`",
 			);
 		}
 		if (state === "exited") {
@@ -118,7 +118,7 @@ export default command({
 		if (timedOut) {
 			throw new CLIError(
 				`Timed out after ${options.timeout}s; agent is ${state}`,
-				"Raise --timeout, or check it with `superset terminals read`",
+				"Raise --timeout, or check it with `paradev terminals read`",
 			);
 		}
 		return {

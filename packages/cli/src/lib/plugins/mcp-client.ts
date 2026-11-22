@@ -67,8 +67,8 @@ export async function connectPluginMcp(
 		// connected" is the wrong hint for that: it is connected twice, which is
 		// the problem.
 		const hint = message.includes("AMBIGUOUS_CONNECTION")
-			? `Pass --account <id> to pick one. Run: superset plugins list  (the CONNECTION column holds the id)`
-			: "Run: superset plugins list  (check the plugin is installed and connected)";
+			? `Pass --account <id> to pick one. Run: paradev plugins list  (the CONNECTION column holds the id)`
+			: "Run: paradev plugins list  (check the plugin is installed and connected)";
 		throw new CLIError(
 			`Could not reach the "${ref.plugin}" plugin: ${message}`,
 			hint,

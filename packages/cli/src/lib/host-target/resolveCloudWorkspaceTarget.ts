@@ -124,7 +124,7 @@ async function askApi(
 			`Cloud workspace ${options.workspaceId}: ${error.message}`,
 			code === "TIMEOUT"
 				? "The sandbox is still starting; try again in a few seconds"
-				: "Check it with: superset workspaces list",
+				: "Check it with: paradev workspaces list",
 		);
 	}
 }

@@ -64,8 +64,8 @@ export default command({
 		if (!target) {
 			throw new CLIError(
 				marketplace
-					? `"${name}" is not installed from "${marketplace}". Run: superset plugins install ${name} --marketplace ${marketplace}`
-					: `"${name}" is not installed. Run: superset plugins install ${name}`,
+					? `"${name}" is not installed from "${marketplace}". Run: paradev plugins install ${name} --marketplace ${marketplace}`
+					: `"${name}" is not installed. Run: paradev plugins install ${name}`,
 			);
 		}
 
@@ -144,7 +144,7 @@ export default command({
 				`Open this URL to authorize ${name}:`,
 				`  ${url}`,
 				"",
-				`Then confirm with: superset plugins list`,
+				`Then confirm with: paradev plugins list`,
 			].join("\n"),
 		};
 	},

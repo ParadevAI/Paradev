@@ -34,30 +34,30 @@ Go to **Settings → Terminal → Terminal Scripts**, then click **Add Script**.
 You can also add one from a terminal:
 
 ```bash
-superset scripts add --name dev --command "bun run dev"
+paradev scripts add --name dev --command "bun run dev"
 ```
 
 Repeat `--command` for a grouped script. Use `--execution-mode` to set the layout:
 
 ```bash
-superset scripts add \
+paradev scripts add \
   --name services \
   --command "docker compose up" \
   --command "bun run dev" \
   --execution-mode split-pane
 ```
 
-To change or remove a script, use its id from `superset scripts list`:
+To change or remove a script, use its id from `paradev scripts list`:
 
 ```bash
-superset scripts list
-superset scripts edit <id> --command "gh pr view --web"
-superset scripts delete <id>
+paradev scripts list
+paradev scripts edit <id> --command "gh pr view --web"
+paradev scripts delete <id>
 ```
 
-`superset scripts add --upsert` replaces the script with the same name instead of adding a copy. CLI changes reach the app the next time it opens or refocuses with the same organization active, and a running app picks them up immediately. Scripts created in Settings live in the app profile only, so `superset scripts list` does not show them.
+`paradev scripts add --upsert` replaces the script with the same name instead of adding a copy. CLI changes reach the app the next time it opens or refocuses with the same organization active, and a running app picks them up immediately. Scripts created in Settings live in the app profile only, so `paradev scripts list` does not show them.
 
-`superset presets add` remains an alias for compatibility. See the
+`paradev presets add` remains an alias for compatibility. See the
 [CLI reference](/cli/cli-reference#scripts) for every option.
 
 ## Launch Modes
@@ -97,7 +97,7 @@ A terminal script can participate in three workspace actions:
 - **New terminal tab**: launch the script when a terminal tab opens
 
 These are per-script controls. Launching a script from the bar, menu, or keyboard shortcut always works, whatever its workspace-action settings. On v1 desktop builds, the global auto-apply settings (such as
-`autoApplyDefaultPreset`, visible in `superset settings list`) also gate
+`autoApplyDefaultPreset`, visible in `paradev settings list`) also gate
 auto-run behavior.
 
 If more than one Run source matches a workspace, Paradev uses the first of these:

@@ -30,7 +30,7 @@ export function publishResult({
 	watching: boolean;
 	watchNote: string | null;
 }): { data: Record<string, unknown>; message: string } {
-	const republish = `superset pages publish ${
+	const republish = `paradev pages publish ${
 		/\s/.test(path) ? JSON.stringify(path) : path
 	} --page ${page.id}`;
 	const lines = [`Published "${page.title}" v${page.version}`, page.url];

@@ -35,7 +35,7 @@ describe("refreshAccessToken", () => {
 		const error = thrown as CLIError;
 		const visibleText = `${error.message} ${error.suggestion ?? ""}`;
 		expect(visibleText).toContain("Token refresh failed: 400");
-		expect(visibleText).toContain("superset auth login");
+		expect(visibleText).toContain("paradev auth login");
 		expect(visibleText).not.toContain("access-secret");
 		expect(visibleText).not.toContain("refresh-secret");
 		expect(visibleText).not.toContain("session-secret");

@@ -17,7 +17,7 @@ export default command({
 		if (existing) {
 			return {
 				data: { connection: existing },
-				message: `Already connected as ${existing.login}. To switch accounts, run: superset connections github disconnect`,
+				message: `Already connected as ${existing.login}. To switch accounts, run: paradev connections github disconnect`,
 			};
 		}
 		const { url } = await ctx.api.githubUser.connect.mutate();
@@ -49,7 +49,7 @@ export default command({
 		}
 		throw new CLIError(
 			"GitHub was not connected in 5 minutes",
-			"Run: superset connections github connect",
+			"Run: paradev connections github connect",
 		);
 	},
 });

@@ -17,6 +17,7 @@ import type {
 } from "@superset/chat-ui/PromptInput";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { usePaneFocus } from "@superset/panes";
+import { foldLegacyPluginCommands } from "@superset/shared/slash-commands";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
@@ -157,17 +158,20 @@ function toMenuCommands(
 	groups: { commands: string; mcp: string },
 ): PromptInputCommand[] {
 	const sigilSkills = commands.some((command) => isSigilSkill(command.name));
-	return commands.map((command) => ({
-		id: command.name,
-		title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
-		...(command.hint ? { hint: command.hint } : {}),
-		description: command.description ?? "",
-		group: command.category === "mcp" ? groups.mcp : groups.commands,
-		inline: !sigilSkills || isSigilSkill(command.name),
-		onSelect: (ctx) => {
-			ctx.insertChip(commandChip(command.name, command.description));
-		},
-	}));
+	return foldLegacyPluginCommands(commands).map(
+		({ command, legacyAliases }) => ({
+			id: command.name,
+			title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
+			...(legacyAliases.length > 0 ? { searchAliases: legacyAliases } : {}),
+			...(command.hint ? { hint: command.hint } : {}),
+			description: command.description ?? "",
+			group: command.category === "mcp" ? groups.mcp : groups.commands,
+			inline: !sigilSkills || isSigilSkill(command.name),
+			onSelect: (ctx) => {
+				ctx.insertChip(commandChip(command.name, command.description));
+			},
+		}),
+	);
 }
 
 const FOCUS_HANDOFF_MS = 1000;

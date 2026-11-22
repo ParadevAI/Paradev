@@ -35,7 +35,7 @@ export default command({
 			ctx.config.organizationId,
 			options.org,
 		);
-		p.intro(`superset hosts remove ${target}`);
+		p.intro(`paradev hosts remove ${target}`);
 		const ssh = await SshSession.open(target);
 		try {
 			const probe = await ssh.run(PROBE_SCRIPT);
@@ -53,7 +53,7 @@ export default command({
 			if (hostId === getHostId()) {
 				throw new CLIError(
 					`${target} is this machine`,
-					"Stop the host here with: superset stop",
+					"Stop the host here with: paradev stop",
 				);
 			}
 
