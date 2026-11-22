@@ -76,11 +76,12 @@ export function DashboardSidebarHoverCardOverlay({
 			{children}
 			<PopoverAnchor virtualRef={virtualRef as RefObject<Measurable>} />
 			{payload && (
+				// Separate the card from dark sidebar and editor surfaces.
 				<PopoverContent
 					ref={contentRef}
 					side="right"
 					align="start"
-					className="w-72"
+					className="w-72 dark:bg-neutral-800 dark:border-neutral-600"
 					data-dashboard-sidebar-hover-card={hasPositioned ? "ready" : ""}
 					onOpenAutoFocus={(event) => event.preventDefault()}
 					onPointerEnter={cancelClose}
