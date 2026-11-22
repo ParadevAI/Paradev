@@ -5,7 +5,7 @@ import {
 	setInterval,
 	setTimeout,
 } from "node:timers";
-import { findAgentAncestry } from "./agent-processes.ts";
+import { type AgentLaunch, findAgentAncestry } from "./agent-processes.ts";
 import { DetachedProcessResolver } from "./detached.ts";
 import {
 	buildProcessTrees,
@@ -142,11 +142,11 @@ export interface PortManagerOptions {
 	killFn: KillFn;
 }
 
-/** The pid of the agent in a terminal, or of the wrapper that launched it. */
+/** The process that started the agent in a terminal, if one runs there. */
 export type AgentPidSource = (
 	terminalId: string,
 	sessionPid: number,
-) => number | null;
+) => AgentLaunch | null;
 
 export class PortManager extends EventEmitter {
 	private ports = new Map<string, DetectedPort>();
@@ -421,28 +421,30 @@ export class PortManager extends EventEmitter {
 		}
 	}
 
-	private agentPidsInTrees(
+	private agentLaunchesInTrees(
 		terminals: Iterable<
 			[terminalId: string, sessionPid: number, tree: number[]]
 		>,
-	): number[] {
-		const agentPids: number[] = [];
+	): AgentLaunch[] {
+		const launches: AgentLaunch[] = [];
 		for (const [terminalId, sessionPid, tree] of terminals) {
-			const agentPid = this.agentPidSource(terminalId, sessionPid);
-			if (agentPid !== null && tree.includes(agentPid))
-				agentPids.push(agentPid);
+			const launch = this.agentPidSource(terminalId, sessionPid);
+			if (launch && tree.includes(launch.pid)) launches.push(launch);
 		}
-		return agentPids;
+		return launches;
 	}
 
 	private async findAgentAncestry(
 		table: ProcessTableEntry[],
-		agentPids: number[],
+		launches: AgentLaunch[],
 		signal: AbortSignal,
 	): Promise<Set<number>> {
-		if (agentPids.length === 0) return new Set();
-		const argv0 = await readProcessArgv0(agentPids, signal);
-		return findAgentAncestry(table, agentPids, argv0);
+		if (launches.length === 0) return new Set();
+		const argv0 = await readProcessArgv0(
+			launches.flatMap(({ pid, agentIsChild }) => (agentIsChild ? [] : [pid])),
+			signal,
+		);
+		return findAgentAncestry(table, launches, argv0);
 	}
 
 	private async buildPortsByTerminal({
@@ -462,7 +464,7 @@ export class PortManager extends EventEmitter {
 				? new Set<number>()
 				: await this.findAgentAncestry(
 						table,
-						this.agentPidsInTrees(
+						this.agentLaunchesInTrees(
 							[...terminalPortMap].flatMap(([terminalId, { pids, session }]) =>
 								session.pid === null
 									? []
@@ -744,7 +746,7 @@ export class PortManager extends EventEmitter {
 			}
 			const agentAncestry = await this.findAgentAncestry(
 				table,
-				this.agentPidsInTrees([[terminalId, session.pid, tree]]),
+				this.agentLaunchesInTrees([[terminalId, session.pid, tree]]),
 				signal,
 			);
 			if (agentAncestry.has(detectedPort.pid)) return { success: false };

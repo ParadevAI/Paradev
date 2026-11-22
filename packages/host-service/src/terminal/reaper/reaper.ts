@@ -1,7 +1,7 @@
 import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { HostDb } from "../../db/index.ts";
 import { terminalAgentBindings, terminalSessions } from "../../db/schema.ts";
-import { chatPortTerminalIds, portManager } from "../../ports/port-manager.ts";
+import { chatPortTerminals, portManager } from "../../ports/port-manager.ts";
 import { caught } from "../../runtime/box-log-filter";
 import { markTerminalAgentBindingEnded } from "../../terminal-agents/persistence.ts";
 import { getDaemonClient } from "../daemon-client-singleton.ts";
@@ -252,8 +252,7 @@ function applyPortScanSync(
 			rowById,
 			registeredTerminalIds: portManager.getRegisteredTerminalIds(),
 			isLive: (terminalId) =>
-				isLiveTerminalSession(terminalId) ||
-				chatPortTerminalIds.has(terminalId),
+				isLiveTerminalSession(terminalId) || chatPortTerminals.has(terminalId),
 		});
 		for (const entry of plan.register) {
 			portManager.upsertSession(entry.terminalId, entry.workspaceId, entry.pid);

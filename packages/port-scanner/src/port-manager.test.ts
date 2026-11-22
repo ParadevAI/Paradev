@@ -1079,7 +1079,7 @@ describe("PortManager — agent processes", () => {
 			},
 		});
 		manager.setAgentPidSource((terminalId) =>
-			terminalId === "p1" ? 1001 : null,
+			terminalId === "p1" ? { pid: 1001, agentIsChild: false } : null,
 		);
 		manager.upsertSession("p1", "ws1", 1000);
 	});
@@ -1102,10 +1102,18 @@ describe("PortManager — agent processes", () => {
 		expect(killed).toEqual([1003]);
 	});
 
+	it("hides the port of the agent that a chat's ACP adapter runs as its child", async () => {
+		argv0.set(1001, "/usr/bin/node");
+		manager.setAgentPidSource(() => ({ pid: 1001, agentIsChild: true }));
+		await manager.forceScan();
+
+		expect(listedPorts()).toEqual([3003]);
+	});
+
 	it("refuses a close request that was listed before the agent started", async () => {
 		manager.setAgentPidSource(() => null);
 		await manager.forceScan();
-		manager.setAgentPidSource(() => 1001);
+		manager.setAgentPidSource(() => ({ pid: 1001, agentIsChild: false }));
 		argv0.set(1001, "/bin/bash");
 
 		expect((await closePort(3001)).success).toBe(false);
@@ -1117,7 +1125,7 @@ describe("PortManager — agent processes", () => {
 		processTable.push({ pid: 2000, ppid: 500 });
 		manager.upsertSession("p2", "ws1", 2000);
 		manager.setAgentPidSource((terminalId) =>
-			terminalId === "p2" ? 1002 : null,
+			terminalId === "p2" ? { pid: 1002, agentIsChild: false } : null,
 		);
 		await manager.forceScan();
 

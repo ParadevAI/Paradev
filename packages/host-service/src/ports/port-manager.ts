@@ -6,18 +6,20 @@ export const portManager = new PortManager({
 	killFn: treeKillWithEscalation,
 });
 
-export const chatPortTerminalIds = new Set<string>();
+/** Chat terminal id → whether its session pid is an ACP adapter that runs the agent as a child. */
+export const chatPortTerminals = new Map<string, { agentIsChild: boolean }>();
 
-/** A chat session pid is its agent. A terminal agent launch id starts with the wrapper pid. */
+/** A terminal agent launch id starts with the wrapper pid. */
 export function agentPidSource(
 	store: Pick<TerminalAgentStore, "get">,
 ): AgentPidSource {
 	return (terminalId, sessionPid) => {
-		if (chatPortTerminalIds.has(terminalId)) return sessionPid;
+		const chat = chatPortTerminals.get(terminalId);
+		if (chat) return { pid: sessionPid, agentIsChild: chat.agentIsChild };
 		const launchPid = Number.parseInt(
 			store.get(terminalId)?.launchId ?? "",
 			10,
 		);
-		return launchPid > 0 ? launchPid : null;
+		return launchPid > 0 ? { pid: launchPid, agentIsChild: false } : null;
 	};
 }

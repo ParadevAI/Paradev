@@ -14,11 +14,11 @@ import {
 	type AgentIdentityId,
 } from "@superset/shared/agent-catalog";
 import type { AgentLifecycleEventType } from "../events";
-import { chatPortTerminalIds, portManager } from "../ports/port-manager";
+import { chatPortTerminals, portManager } from "../ports/port-manager";
 import { fanOutAgentLifecycle } from "../trpc/router/notifications/fan-out-agent-lifecycle";
 import type { SessionAccount } from "../trpc/router/usage/session-account/session-account";
 import type { HostServiceContext } from "../types";
-import { harnessBinary } from "./acpCatalogue";
+import { ACP_HARNESSES, harnessBinary } from "./acpCatalogue";
 import type { ClosedChat } from "./resumeAfterUpdate";
 
 const LIFECYCLE_BY_STATUS: Partial<
@@ -205,7 +205,9 @@ export function createChatAgentBridge(
 			};
 			chats.set(options.sessionId, chat);
 			sessionByTerminal.set(chat.terminalId, options.sessionId);
-			chatPortTerminalIds.add(chat.terminalId);
+			chatPortTerminals.set(chat.terminalId, {
+				agentIsChild: Boolean(ACP_HARNESSES[options.harness]?.adapter),
+			});
 			portManager.upsertSession(chat.terminalId, chat.workspaceId, null);
 			attach(chat);
 		},
@@ -349,7 +351,7 @@ export function createChatAgentBridge(
 				return;
 			}
 			sessionByTerminal.delete(chat.terminalId);
-			chatPortTerminalIds.delete(chat.terminalId);
+			chatPortTerminals.delete(chat.terminalId);
 			portManager.unregisterSession(chat.terminalId);
 			ctx.terminalAgentStore.endChat(chat.terminalId);
 			bindingsChanged(chat.workspaceId);

@@ -43,7 +43,7 @@ import { isProcessAlive, readPtyDaemonManifest } from "../daemon/manifest.ts";
 import type { HostDb } from "../db/index.ts";
 import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
-import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
+import { chatPortTerminals, portManager } from "../ports/port-manager.ts";
 import { getProjectIncludingDeleted } from "../projects/local-project-store.ts";
 import {
 	getPathState,
@@ -2832,7 +2832,7 @@ async function disposeSessionUnlocked(
 		closePromise = closeDaemonSessionById(terminalId, "SIGHUP");
 	}
 
-	if (!chatPortTerminalIds.has(terminalId))
+	if (!chatPortTerminals.has(terminalId))
 		portManager.unregisterSession(terminalId);
 
 	const closeResult = closePromise
@@ -3502,7 +3502,7 @@ async function createTerminalSessionUnlocked({
 				);
 				const occurredAt = Date.now();
 
-				if (!chatPortTerminalIds.has(terminalId))
+				if (!chatPortTerminals.has(terminalId))
 					portManager.unregisterSession(terminalId);
 
 				db.update(terminalSessions)

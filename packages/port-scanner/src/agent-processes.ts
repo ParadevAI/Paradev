@@ -3,23 +3,33 @@ import type { ProcessTableEntry } from "./scanner.ts";
 
 const SHELLS = new Set(["bash", "sh", "zsh"]);
 
+/** The process that started an agent. When `agentIsChild`, the agent is one of its children. */
+export interface AgentLaunch {
+	pid: number;
+	agentIsChild: boolean;
+}
+
 /**
  * Agent processes and their ancestors. Killing any of these kills an agent.
  *
- * An agent pid is the process that runs the agent or the wrapper that
- * launched it. A wrapper that is still a shell did not exec the agent, so
- * the agent is one of its children.
+ * A launch pid that is still a shell is a wrapper that did not exec, so the
+ * agent is one of its children too.
  */
 export function findAgentAncestry(
 	table: ProcessTableEntry[],
-	agentPids: number[],
+	launches: AgentLaunch[],
 	argv0: Map<number, string>,
 ): Set<number> {
 	const parents = new Map(table.map(({ pid, ppid }) => [pid, ppid]));
 	const launchers = new Set(
-		agentPids.filter((pid) => SHELLS.has(path.basename(argv0.get(pid) ?? ""))),
+		launches
+			.filter(
+				({ pid, agentIsChild }) =>
+					agentIsChild || SHELLS.has(path.basename(argv0.get(pid) ?? "")),
+			)
+			.map(({ pid }) => pid),
 	);
-	const agents = new Set(agentPids);
+	const agents = new Set(launches.map(({ pid }) => pid));
 	for (const { pid, ppid } of table) if (launchers.has(ppid)) agents.add(pid);
 	const ancestry = new Set<number>();
 	for (const agent of agents) {

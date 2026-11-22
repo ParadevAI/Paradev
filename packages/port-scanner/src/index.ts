@@ -1,3 +1,4 @@
+export type { AgentLaunch } from "./agent-processes.ts";
 export {
 	type AgentPidSource,
 	type KillFn,
