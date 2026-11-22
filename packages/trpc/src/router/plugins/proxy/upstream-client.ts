@@ -1,5 +1,9 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import type {
+	CallToolRequest,
+	CallToolResult,
+} from "@modelcontextprotocol/sdk/types.js";
 import { credentialFetch } from "../manifest";
 
 const UPSTREAM_TIMEOUT_MS = 120_000;
@@ -42,4 +46,19 @@ export async function upstreamClient(
 			await client.close();
 		},
 	};
+}
+
+export async function callUpstream(
+	target: UpstreamTarget,
+	params: CallToolRequest["params"],
+	signal: AbortSignal,
+): Promise<CallToolResult> {
+	const session = await upstreamClient(target);
+	try {
+		return (await session.client.callTool(params, undefined, {
+			signal,
+		})) as CallToolResult;
+	} finally {
+		await session.close();
+	}
 }
