@@ -60,7 +60,7 @@ The watchdog only runs when `HOST_PARENT_PID` is set in the child env — CLI-sp
 
 ### Manifest
 
-Each host-service still writes `~/.superset/host/{orgId}/manifest.json` (pid, endpoint, authToken, app version). Electron's coordinator no longer reads it for adoption; the manifest is now consumed by:
+Each host-service still writes `~/.paradev/host/{orgId}/manifest.json` (pid, endpoint, authToken, app version). Electron's coordinator no longer reads it for adoption; the manifest is now consumed by:
 
 - **CLI** (`packages/cli`) — finds and talks to a running host-service for `status`/`stop`/`start` commands.
 - **`coordinator.reset()`** — SIGKILLs whatever pid the manifest names as a recovery escape hatch when a wedged host-service has been left behind (superset-sh/superset#4299).

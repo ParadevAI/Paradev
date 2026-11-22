@@ -19,7 +19,7 @@ Branch `<branch>` is checked out in this workspace — commits you make continue
 
 # Attached files
 ...
-- .superset/attachments/<file>
+- .paradev/attachments/<file>
 ```
 
 Bodies are empty because `buildResolveCtxFromPending` stubs return
@@ -30,7 +30,7 @@ empty strings. The pipeline otherwise works end-to-end.
 1. **Inline in prompt.** Bodies go directly into the prompt via
    `{{issues}}` / `{{prs}}` / `{{tasks}}` template variables. No file
    writes for linked context. Only user-uploaded attachments write to
-   `.superset/attachments/`.
+   `.paradev/attachments/`.
 2. **PR checkout is true.** The fork-from-PR flow checks out the PR's
    head branch. Prompt says so.
 3. **No body truncation** (or very high cap, e.g. 200 KB/source). Modern
@@ -106,7 +106,7 @@ collections in the task view (live-query from cloud). Options:
 - `apiTrpcClient.tasks.get.query({ id })` if such a procedure exists.
 - Read from the existing `collections.tasks` live-query data (already
   in renderer memory from the task view).
-- Host-service proxies the Superset API.
+- Host-service proxies the Paradev API.
 
 Need to inspect the task view's data source to find the right shape.
 The pending row already has `{ id, slug, title }` from the picker;
@@ -181,11 +181,11 @@ existing sessions on first request...
 # Attached files
 
 The user attached these files alongside the prompt. They've been
-written into the worktree at `.superset/attachments/`. Read them
+written into the worktree at `.paradev/attachments/`. Read them
 to understand the request.
 
-- .superset/attachments/trace.log
-- .superset/attachments/notes.md
+- .paradev/attachments/trace.log
+- .paradev/attachments/notes.md
 ```
 
 ## Sequence

@@ -22,9 +22,9 @@ Pair with `V2_LAUNCH_CONTEXT.md` for architectural background and
 - [ ] **A1. Prompt only** — "add a README explaining this repo." Claude pane
       opens. The command includes the prompt. No errors.
 - [ ] **A2. Prompt + text attachment** — drag `v2-launch-test-artifacts/trace.log`
-      into the modal. After launch: verify `.superset/attachments/trace.log`
-      exists in the worktree (terminal: `ls .superset/attachments/`).
-      Claude prompt contains `![trace.log](.superset/attachments/trace.log)`.
+      into the modal. After launch: verify `.paradev/attachments/trace.log`
+      exists in the worktree (terminal: `ls .paradev/attachments/`).
+      Claude prompt contains `![trace.log](.paradev/attachments/trace.log)`.
 - [ ] **A3. Prompt + image** — drag `v2-launch-test-artifacts/sample.png`.
       Same as A2 with the image.
 - [ ] **A4. Duplicate filename** — drag `trace.log` twice. Both files exist;

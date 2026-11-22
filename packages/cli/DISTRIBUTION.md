@@ -39,7 +39,7 @@ superset-darwin-arm64/
 
 ```
 superset start
-  └─ reads ~/.superset/config.json (auth token, org ID, API URL)
+  └─ reads ~/.paradev/config.json (auth token, org ID, API URL)
   └─ resolves superset-host binary (sibling in bin/)
   └─ spawns: superset-host (which runs: lib/node lib/host-service.js)
   └─ passes env: AUTH_TOKEN, SUPERSET_API_URL, HOST_DB_PATH, RELAY_URL, etc.
@@ -48,7 +48,7 @@ superset start
   └─ prints "Host service running on port XXXXX"
 
 superset start --daemon
-  └─ same but detached, writes manifest to ~/.superset/host/<orgId>/manifest.json
+  └─ same but detached, writes manifest to ~/.paradev/host/<orgId>/manifest.json
   └─ manifest: { pid, port, secret, startedAt }
 ```
 
@@ -216,7 +216,7 @@ superset host install   # writes systemd unit or launchd plist
 | `packages/cli/src/commands/host/status/command.ts` | Host status command (stub) |
 | `packages/cli/src/commands/host/install/command.ts` | Host install command (stub) |
 | `packages/cli/src/lib/auth.ts` | OAuth device flow |
-| `packages/cli/src/lib/config.ts` | ~/.superset/config.json read/write |
+| `packages/cli/src/lib/config.ts` | ~/.paradev/config.json read/write |
 | `packages/cli/package.json` | Build scripts, cross-compile targets |
 | `packages/host-service/src/serve.ts` | Standalone host service entry point |
 | `packages/host-service/src/app.ts` | createApp() — core setup |

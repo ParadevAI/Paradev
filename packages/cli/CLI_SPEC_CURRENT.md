@@ -145,18 +145,19 @@ CI
 ## Runtime State
 
 CLI runtime state is under `SUPERSET_HOME_DIR`, defaulting to
-`~/.superset`.
+`~/.paradev`. Older installs used `~/.superset`; the first current CLI, app or
+host to start moves it to `~/.paradev` and leaves `~/.superset` as a link.
 
 | Path | Purpose |
 | --- | --- |
-| `~/.superset/config.json` | OAuth token, expiry, and active organization ID. |
-| `~/.superset/host/<organizationId>/manifest.json` | Host service PID, endpoint, auth token, and organization ID. |
-| `~/.superset/host/<organizationId>/host.db` | Host service SQLite database. |
+| `~/.paradev/config.json` | OAuth token, expiry, and active organization ID. |
+| `~/.paradev/host/<organizationId>/manifest.json` | Host service PID, endpoint, auth token, and organization ID. |
+| `~/.paradev/host/<organizationId>/host.db` | Host service SQLite database. |
 
 ## Desktop Shim And Standalone Install
 
 The desktop app installs an app-managed shim at
-`<SUPERSET_HOME_DIR>/bin/superset` (`~/.superset/bin/superset` by default)
+`<SUPERSET_HOME_DIR>/bin/superset` (`~/.paradev/bin/superset` by default)
 when the app starts. Paradev desktop terminals prepend that directory to
 `PATH`, so the bundled CLI is available in app-launched terminals without a
 standalone install.

@@ -1,30 +1,34 @@
-# External Files Written by Superset Desktop
+# External Files Written by Paradev Desktop
 
-This document lists all files written by the Superset desktop app outside of user projects.
+This document lists all files written by the Paradev desktop app outside of user projects.
 Understanding these files is critical for maintaining workspace isolation and avoiding conflicts.
 
 ## Workspace-Specific Directories
 
 The app uses different home directories based on workspace:
-- **Default**: `~/.superset/`
-- **Named workspace**: `~/.superset-{workspace}/` (e.g. `~/.superset-my-feature/`)
+- **Default**: `~/.paradev/`
+- **Named workspace**: `~/.paradev-{workspace}/` (e.g. `~/.paradev-my-feature/`)
 
 This separation prevents multiple instances from interfering with each other.
 
-## Files in `~/.superset[-{workspace}]/`
+Older installs used `~/.superset/`. The first time a current app, CLI or host
+starts, it moves that folder to `~/.paradev/` and leaves `~/.superset` as a
+link to it, so older builds and scripts still work.
+
+## Files in `~/.paradev[-{workspace}]/`
 
 ### `bin/` - Agent Wrapper Scripts
 
 | File | Purpose |
 |------|---------|
-| `amp` | Wrapper for Amp CLI that preserves Superset terminal context |
+| `amp` | Wrapper for Amp CLI that preserves Paradev terminal context |
 | `claude` | Wrapper for Claude Code CLI that injects notification hooks |
 | `codex` | Wrapper for Codex CLI that enables native hooks and session-log signals |
-| `droid` | Wrapper for Factory Droid CLI that preserves Superset hook integration |
+| `droid` | Wrapper for Factory Droid CLI that preserves Paradev hook integration |
 | `opencode` | Wrapper for OpenCode CLI that sets `OPENCODE_CONFIG_DIR` |
 
 These wrappers are added to `PATH` via shell integration, allowing them to intercept
-agent commands and inject Superset-specific configuration.
+agent commands and inject Paradev-specific configuration.
 
 ### `hooks/` - Notification Hook Scripts
 
@@ -36,7 +40,7 @@ agent commands and inject Superset-specific configuration.
 
 ## Global Tool Settings Files
 
-Some CLIs only support global user settings for hook registration. Superset merges
+Some CLIs only support global user settings for hook registration. Paradev merges
 its hook entries into these files while preserving user-defined entries:
 
 | File | Purpose |
@@ -47,18 +51,18 @@ its hook entries into these files while preserving user-defined entries:
 | `~/.omp/agent/extensions/superset-hooks.ts` (or `$OMP_CODING_AGENT_DIR/extensions/superset-hooks.ts`) | Oh My Pi lifecycle extension (`session_start`, `agent_start`, `before_agent_start`, `tool_execution_end`, `agent_end`, `session_end`, `session_shutdown`) |
 | `~/.pi/agent/extensions/superset-hooks.ts` | Pi lifecycle extension (`session_start`, `before_agent_start`, `agent_end`, `session_end`) |
 
-For Codex specifically, Superset now relies on native `~/.codex/hooks.json`
+For Codex specifically, Paradev now relies on native `~/.codex/hooks.json`
 registration for durable prompt/tool lifecycle events. The wrapper in
-`~/.superset[-{workspace}]/bin/codex` enables those hooks — appending
+`~/.paradev[-{workspace}]/bin/codex` enables those hooks — appending
 `--dangerously-bypass-hook-trust` when the launch command doesn't already pass
-it, because Codex silently skips untrusted `hooks.json` entries and Superset
+it, because Codex silently skips untrusted `hooks.json` entries and Paradev
 would otherwise lose lifecycle signals — and keeps the session-log watcher as
 a best-effort compatibility bridge for Start and permission events on older
 Codex releases. Native `Stop` reports normal turn completion, `Interrupt`
 reports an aborted turn, and `SessionEnd` reports session teardown. The wrapper
 also keeps its clean-exit SessionEnd report for older Codex releases. It does
 not override the legacy `notify` callback because that callback cannot
-distinguish main-agent and subagent completions. On startup, Superset rewrites
+distinguish main-agent and subagent completions. On startup, Paradev rewrites
 only its own managed entries in `~/.codex/hooks.json` to point at the current
 environment's `notify.sh`, while preserving any user-defined Codex hooks.
 
@@ -71,7 +75,7 @@ environment's `notify.sh`, while preserving any user-defined Codex hooks.
 
 Shell integration keeps interactive startup close to native shell behavior:
 - Interactive startup applies idempotent PATH prepend only (no persistent command interception functions).
-- App-owned non-interactive `-c` command execution still routes managed binaries through absolute Superset wrapper paths.
+- App-owned non-interactive `-c` command execution still routes managed binaries through absolute Paradev wrapper paths.
 
 ## Global Files (AVOID ADDING NEW ONES)
 
@@ -91,12 +95,12 @@ with our marker is deleted to prevent conflicts from older versions.
 
 ## Shell RC File Modifications
 
-The app modifies shell RC files to add the Superset bin directory to PATH:
+The app modifies shell RC files to add the Paradev bin directory to PATH:
 
 | Shell | RC File | Modification |
 |-------|---------|--------------|
-| Zsh | `~/.zshrc` | Prepends `~/.superset[-{workspace}]/bin` to PATH |
-| Bash | `~/.bashrc` | Prepends `~/.superset[-{workspace}]/bin` to PATH |
+| Zsh | `~/.zshrc` | Prepends `~/.paradev[-{workspace}]/bin` to PATH |
+| Bash | `~/.bashrc` | Prepends `~/.paradev[-{workspace}]/bin` to PATH |
 
 ## Terminal Environment Variables
 
@@ -117,7 +121,7 @@ Each terminal session receives these environment variables:
 
 ## Adding New External Files
 
-Before adding new files outside of `~/.superset[-{workspace}]/`:
+Before adding new files outside of `~/.paradev[-{workspace}]/`:
 
 1. **Consider if it's necessary** - Can you use the environment-specific directory instead?
 2. **Check for conflicts** - Will dev and prod overwrite each other?
