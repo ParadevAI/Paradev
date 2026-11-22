@@ -11,8 +11,6 @@ The open-source workspace for Claude Code, Codex, and any coding agent.
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE.md)
 
-We ship every day. Star this repo to follow along.
-
 </div>
 
 ## Why Paradev
@@ -186,6 +184,7 @@ The script starts local Postgres and Redis with Docker and seeds a dev account. 
 
 ## Community
 
+- **[Star this repo](https://github.com/paradevai/paradev)**: we ship every day, and a star lets you follow along
 - **[Discord](https://discord.gg/cZeD9WYcV7)**: chat with the team and community
 - **[X](https://x.com/paradevai)**: follow for updates and announcements
 - **[GitHub Issues](https://github.com/paradevai/paradev/issues)**: report bugs and request features
