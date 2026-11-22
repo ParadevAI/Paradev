@@ -554,6 +554,17 @@ export const Composer = memo(function Composer({
 		[appCommands.commands, availableCommands, hiddenAgentNames, t],
 	);
 
+	const keepDraft = useCallback(
+		(draft: ComposerDraft) => {
+			const input = promptInputRef.current;
+			const sink = blockedDraftSink.current;
+			if (sink) sink(draft);
+			else if (input) input.restoreDraft(draft);
+			else prependToDraft(draftKey, [draft]);
+		},
+		[draftKey],
+	);
+
 	const send = useCallback(
 		async (
 			text: string,
@@ -565,17 +576,12 @@ export const Composer = memo(function Composer({
 			const upload = await uploadAttachments(files);
 			if (!upload.ok) {
 				const keep = new Set(upload.keep);
-				const restored: ComposerDraft = {
+				keepDraft({
 					...draft,
 					attachments: draft.attachments.filter((attachment) =>
 						keep.has(attachment.file),
 					),
-				};
-				const input = promptInputRef.current;
-				const sink = blockedDraftSink.current;
-				if (sink) sink(restored);
-				else if (input) input.restoreDraft(restored);
-				else prependToDraft(draftKey, [restored]);
+				});
 				return;
 			}
 			const { tags, parts } = upload;
@@ -616,7 +622,7 @@ export const Composer = memo(function Composer({
 			onSend,
 			uploadAttachments,
 			clearDraft,
-			draftKey,
+			keepDraft,
 			mcpPicker.serverNameOf,
 			otherHostOf,
 		],
@@ -632,7 +638,7 @@ export const Composer = memo(function Composer({
 				return Promise.resolve(typed.ready).then(
 					() => send(typed.text, files, mentions, steer, draft),
 					() => {
-						promptInputRef.current?.restoreDraft(draft);
+						keepDraft(draft);
 						toast.error(t({ message: "Could not change the mode" }));
 					},
 				);
@@ -649,7 +655,7 @@ export const Composer = memo(function Composer({
 			}
 			return send(text, files, mentions, steer, draft);
 		},
-		[availableCommands, blocked, runTyped, send, t, target],
+		[availableCommands, blocked, keepDraft, runTyped, send, t, target],
 	);
 
 	const insertSetupPrompt = useCallback((prompt: string) => {
