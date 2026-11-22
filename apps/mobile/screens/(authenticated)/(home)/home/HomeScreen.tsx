@@ -813,6 +813,7 @@ export function HomeScreen() {
 					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
 					onCopied={handleCopied}
 					card={card}
+					inGroup={Boolean(item.folderTag)}
 					groups={
 						groups
 							? {

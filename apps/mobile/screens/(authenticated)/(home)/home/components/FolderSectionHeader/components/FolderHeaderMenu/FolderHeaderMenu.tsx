@@ -23,7 +23,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 }) => {
 	const { t } = useLingui();
 	const colors = [
-		{ value: null, label: t({ message: "Default" }) },
+		{ value: null, label: t({ message: "None" }) },
 		...GROUP_COLORS.map((option) => ({
 			value: option.value,
 			label: i18n._(option.label),

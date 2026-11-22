@@ -52,7 +52,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 						systemImage="paintpalette"
 					>
 						<SwiftUIButton
-							label={t({ message: "Default" })}
+							label={t({ message: "None" })}
 							systemImage={color === null ? "checkmark" : undefined}
 							onPress={() => onSetColor(null)}
 						/>

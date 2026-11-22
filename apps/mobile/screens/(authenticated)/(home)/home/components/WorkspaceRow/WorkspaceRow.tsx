@@ -2,11 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
-import { FolderGit2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { RowLink } from "@/components/RowLink";
-import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceStatus } from "@/hooks/useCloudWorkspaceItems";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
@@ -17,18 +14,18 @@ import type {
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
-import { AsciiSpinner } from "@/screens/(authenticated)/components/AsciiSpinner";
-import { PingDot } from "@/screens/(authenticated)/components/PingDot";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import {
 	PULL_REQUEST_STATUS,
 	pullRequestStatus,
 } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
+import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type {
 	TerminalAttention,
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
+import { WorkspaceLead } from "./components/WorkspaceLead";
 import {
 	WorkspaceRowMenu,
 	type WorkspaceRowMenuProps,
@@ -36,8 +33,6 @@ import {
 import { useWorkspaceMove } from "./hooks/useWorkspaceMove";
 import { useWorkspaceRowActions } from "./hooks/useWorkspaceRowActions";
 
-// PR state replaces the host icon in the icon slot — same treatment as
-// desktop's DashboardSidebarWorkspaceIcon.
 const MAX_SESSION_MARKS = 3;
 
 export function WorkspaceRow({
@@ -51,6 +46,7 @@ export function WorkspaceRow({
 	onCopied,
 	card = false,
 	groups,
+	inGroup = false,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -65,9 +61,11 @@ export function WorkspaceRow({
 	/** A cell of Home's wide grid rather than a row indented under its project. */
 	card?: boolean;
 	groups?: WorkspaceRowMenuProps["groups"];
+	inGroup?: boolean;
 }) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
+	const attentionLabel = useAttentionLabel();
 	const router = useRouter();
 	const theme = useTheme();
 	const prIcon = pullRequest
@@ -89,6 +87,8 @@ export function WorkspaceRow({
 		(state) => workspace.id in state.pinnedAt,
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
+
+	const grouped = !card && inGroup;
 
 	const href = `/workspace/${workspace.id}`;
 
@@ -121,65 +121,48 @@ export function WorkspaceRow({
 				<Pressable
 					className={cn(
 						"bg-background web:hover:bg-accent/60 flex-row items-center gap-3 rounded-xl pr-3",
-						card ? "py-3 pl-3" : "py-2 pl-10",
+						card ? "py-3 pl-3" : "min-h-12 py-2.5",
+						!card && (grouped ? "pl-7" : "pl-3"),
 					)}
 					onPress={() => router.navigate(`/(authenticated)${href}`)}
+					accessibilityRole="button"
+					accessibilityLabel={[
+						workspace.name,
+						cloudStatus === "failed"
+							? attentionLabel("failed")
+							: cloudStatus === "provisioning"
+								? t({ message: "Creating the sandbox" })
+								: rowAttention
+									? attentionLabel(rowAttention)
+									: null,
+					]
+						.filter(Boolean)
+						.join(", ")}
 					ph-label="workspace-row"
 				>
-					{/* Desktop WorkspaceIcon semantics: working replaces the icon with
-				    the braille spinner; other statuses overlay a corner ping on the
-				    base icon (PR state when one exists, else the workspace mark). */}
-					{rowAttention === "working" || cloudStatus === "provisioning" ? (
-						<View className="size-6 items-center justify-center">
-							<AsciiSpinner />
-						</View>
-					) : (
-						<View className="size-6 items-center justify-center">
-							{prIcon && pullRequest ? (
-								<Button
-									accessibilityLabel={t({
-										message: `Pull request #${pullRequest.prNumber}`,
-									})}
-									ph-label="workspace-row-pull-request"
-									variant="ghost"
-									size="icon"
-									className="size-6"
-									hitSlop={8}
-									onPress={() =>
-										router.push(
-											`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
-										)
+					<WorkspaceLead
+						attention={rowAttention}
+						creating={cloudStatus === "provisioning"}
+						failed={cloudStatus === "failed"}
+						pullRequest={
+							prIcon && pullRequest
+								? {
+										icon: prIcon.icon,
+										ink: prIcon.ink,
+										label: t({
+											message: `Pull request #${pullRequest.prNumber}`,
+										}),
+										onPress: () =>
+											router.push(
+												`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
+											),
 									}
-								>
-									<Icon
-										as={prIcon.icon}
-										className={`size-5 ${prIcon.ink}`}
-										strokeWidth={1.75}
-									/>
-								</Button>
-							) : (
-								<Icon
-									as={FolderGit2}
-									className="text-muted-foreground/80 size-4.5"
-									strokeWidth={1.75}
-								/>
-							)}
-							{rowAttention === "permission" ? (
-								<View className="absolute -right-0.5 -top-0.5">
-									<PingDot color="#eab308" size={7} />
-								</View>
-							) : rowAttention === "failed" || cloudStatus === "failed" ? (
-								<View className="absolute -right-0.5 -top-0.5">
-									<PingDot color="#ef4444" size={7} />
-								</View>
-							) : rowAttention === "review" ? (
-								<View className="bg-green-500 absolute -right-0.5 -top-0.5 size-2 rounded-full" />
-							) : null}
-						</View>
-					)}
+								: null
+						}
+					/>
 					<View className="flex-1">
 						<Text
-							className="font-medium text-[15px]"
+							className="font-medium text-[16px]"
 							numberOfLines={enlargedText ? undefined : 1}
 						>
 							{workspace.name}
@@ -194,7 +177,7 @@ export function WorkspaceRow({
 						    common now that every project shows its `main`. */}
 							{workspace.branch === workspace.name ? null : (
 								<Text
-									className="text-muted-foreground shrink text-xs"
+									className="text-muted-foreground shrink text-[13px]"
 									numberOfLines={enlargedText ? undefined : 1}
 								>
 									{workspace.branch}
@@ -204,9 +187,9 @@ export function WorkspaceRow({
 							(diffStats.additions > 0 || diffStats.deletions > 0) ? (
 								<>
 									{workspace.branch === workspace.name ? null : (
-										<Text className="text-muted-foreground text-xs">•</Text>
+										<Text className="text-muted-foreground text-[13px]">•</Text>
 									)}
-									<Text className="text-muted-foreground font-mono text-xs">
+									<Text className="text-muted-foreground font-mono text-[13px]">
 										+{diffStats.additions} −{diffStats.deletions}
 									</Text>
 								</>
