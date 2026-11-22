@@ -1,4 +1,8 @@
-import type { DurableEnvelope } from "@superset/chat/protocol";
+import type {
+	DurableEnvelope,
+	Notice,
+	ToolCall,
+} from "@superset/chat/protocol";
 import {
 	type ChatDb,
 	type ChatRuntime,
@@ -27,13 +31,16 @@ export type ChatSync = {
 	/** Pushes everything not yet pushed for one chat, and resolves once it is acked. */
 	syncSession(sessionId: string): Promise<void>;
 	/**
-	 * Records an append. A chat is pushed when a turn starts or ends and when
-	 * its title changes, so a turn costs the database two writes; the rest
-	 * waits in the journal. A chat that is moving pushes every append.
+	 * Records an append. A chat is pushed at once when a turn starts or ends,
+	 * its title or status changes, it asks its user something or it reports an
+	 * error. A finished tool call pushes it at most once per checkpoint gap. The
+	 * rest waits in the journal. A chat that is moving pushes every append.
 	 */
 	noteAppend(envelope: DurableEnvelope): void;
 	/** Keeps pushing every chat that changes, retrying with backoff. */
 	start(): () => void;
+	/** The least time between two pushes of a chat that a finished tool call makes; null makes none. */
+	setCheckpointGap(ms: number | null): void;
 	/**
 	 * Keeps pushing one chat while it moves away, on a host that does not
 	 * sync otherwise, so the move can see a turn taken after it began.
@@ -107,6 +114,10 @@ export function createChatSync(args: {
 	const inFlight = new Map<string, Promise<unknown>>();
 	const lastTurn = new Map<string, string>();
 	const lastTitle = new Map<string, string | null>();
+	const lastStatus = new Map<string, string>();
+	const lastPushAt = new Map<string, number>();
+	const checkpoints = new Map<string, () => void>();
+	let checkpointGapMs: number | null = null;
 	let running = false;
 	let cancelTimer: (() => void) | null = null;
 	let retryMs = MIN_RETRY_MS;
@@ -163,7 +174,8 @@ export function createChatSync(args: {
 					events,
 				});
 				writePushed(db, sessionId, session.epoch, ackedSeq);
-				return true;
+				lastPushAt.set(sessionId, now());
+				return rows.length === batchEvents || events.length < rows.length;
 			} catch (error) {
 				const code = errorCode(error);
 				if (!code || !REJECTED_CODES.has(code)) throw error;
@@ -292,24 +304,67 @@ export function createChatSync(args: {
 		cancelTimer = schedule(() => void drain(), ms);
 	};
 
-	/** A turn that started or ended, or a new title: what makes a chat worth a write. */
-	const isMilestone = (
+	/** Whether an append makes a chat worth a write now, at its next checkpoint, or not on its own. */
+	const pushFor = (
 		sessionId: string,
 		event: DurableEnvelope["event"],
-	): boolean => {
+	): "now" | "checkpoint" | null => {
 		if (event.type === "turn") {
 			const key = `${event.turn.id}:${event.turn.status}`;
-			if (lastTurn.get(sessionId) === key) return false;
+			if (lastTurn.get(sessionId) === key) return null;
 			lastTurn.set(sessionId, key);
-			return true;
+			return "now";
 		}
-		if (event.type === "session" && "title" in event.session) {
-			const title = event.session.title ?? null;
-			if (lastTitle.get(sessionId) === title) return false;
-			lastTitle.set(sessionId, title);
-			return true;
+		if (event.type === "session") {
+			let changed = false;
+			if ("title" in event.session) {
+				const title = event.session.title ?? null;
+				changed = lastTitle.get(sessionId) !== title;
+				lastTitle.set(sessionId, title);
+			}
+			if (lastStatus.get(sessionId) !== event.session.status) {
+				lastStatus.set(sessionId, event.session.status);
+				changed = true;
+			}
+			return changed ? "now" : null;
 		}
-		return false;
+		const { item } = event;
+		if (
+			item.kind === "approval_request" ||
+			(item.kind === "notice" && (item as Notice).noticeKind === "error")
+		) {
+			return "now";
+		}
+		if (item.kind === "tool_call" && (item as ToolCall).status !== "running") {
+			return "checkpoint";
+		}
+		return null;
+	};
+
+	/**
+	 * Waits out the gap from the chat's latest push, counting one in flight as
+	 * just made. Never brings a push forward past a retry waiting out a failure.
+	 */
+	const checkpoint = (sessionId: string) => {
+		if (checkpointGapMs === null || checkpoints.has(sessionId)) return;
+		const due = () => {
+			checkpoints.delete(sessionId);
+			if (checkpointGapMs === null) return;
+			const last = inFlight.has(sessionId) ? now() : lastPushAt.get(sessionId);
+			const wait = last === undefined ? 0 : last + checkpointGapMs - now();
+			if (wait > 0) {
+				checkpoints.set(sessionId, schedule(due, wait));
+				return;
+			}
+			dirty.add(sessionId);
+			wake(SETTLE_MS);
+		};
+		due();
+	};
+
+	const cancelCheckpoint = (sessionId: string) => {
+		checkpoints.get(sessionId)?.();
+		checkpoints.delete(sessionId);
 	};
 
 	return {
@@ -317,11 +372,16 @@ export function createChatSync(args: {
 		noteAppend(envelope) {
 			const { sessionId, event } = envelope;
 			if (!syncs(sessionId)) return;
-			const milestone = isMilestone(sessionId, event);
-			const moving = isFollowed(sessionId);
-			if (!milestone && !moving) return;
-			dirty.add(sessionId);
-			wake(milestone ? 0 : SETTLE_MS);
+			const push = pushFor(sessionId, event);
+			if (push === "now") {
+				dirty.add(sessionId);
+				wake(0);
+			} else if (isFollowed(sessionId)) {
+				dirty.add(sessionId);
+				wake(SETTLE_MS);
+			} else if (push === "checkpoint") {
+				checkpoint(sessionId);
+			}
 		},
 		follow(sessionId) {
 			moved.delete(sessionId);
@@ -332,6 +392,9 @@ export function createChatSync(args: {
 			followed.delete(sessionId);
 			lastTurn.delete(sessionId);
 			lastTitle.delete(sessionId);
+			lastStatus.delete(sessionId);
+			lastPushAt.delete(sessionId);
+			cancelCheckpoint(sessionId);
 		},
 		start() {
 			started = true;
@@ -340,9 +403,15 @@ export function createChatSync(args: {
 			return () => {
 				started = false;
 				followed.clear();
+				for (const sessionId of [...checkpoints.keys()]) {
+					cancelCheckpoint(sessionId);
+				}
 				cancelTimer?.();
 				cancelTimer = null;
 			};
+		},
+		setCheckpointGap(ms) {
+			checkpointGapMs = ms;
 		},
 	};
 }

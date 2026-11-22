@@ -33,6 +33,22 @@ export function goldensToDelete<T extends { goldenRef: string }>(
 		.slice(KEPT_GOLDENS - 1);
 }
 
+/** The goldens retention keeps, the active one included; the complement of `goldensToDelete`. */
+export function keptGoldenRefs(
+	goldens: readonly { goldenRef: string }[],
+	activeRef: string,
+): Set<string> {
+	const deleted = new Set(
+		goldensToDelete(goldens, activeRef).map((golden) => golden.goldenRef),
+	);
+	return new Set([
+		activeRef,
+		...goldens
+			.map((golden) => golden.goldenRef)
+			.filter((ref) => !deleted.has(ref)),
+	]);
+}
+
 /**
  * When the next manual build may start, or null for now. Takes the start
  * times of the environment's manual builds in the last hour.

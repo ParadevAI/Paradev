@@ -39,7 +39,9 @@ export function createDb(dbPath: string, migrationsFolder: string) {
 	const db = drizzle(sqlite, { schema });
 
 	console.error(
-		`[host-service:db] Initialized at ${dbPath}, migrations from ${migrationsFolder}`,
+		"[host-service:db] Initialized (db, migrations):",
+		dbPath,
+		migrationsFolder,
 	);
 
 	// Migrations run with foreign keys OFF. Drizzle's generated table
@@ -75,7 +77,9 @@ export function createDb(dbPath: string, migrationsFolder: string) {
 	}
 	if (after.size > 0) {
 		console.error(
-			`[host-service:db] Pre-existing foreign key violation(s) survive at ${dbPath} (not introduced by migration, serving anyway): ${JSON.stringify([...after.entries()])}`,
+			"[host-service:db] Pre-existing foreign key violations survive, not introduced by migration, serving anyway (db, violations):",
+			dbPath,
+			JSON.stringify([...after.entries()]),
 		);
 	}
 	sqlite.pragma("foreign_keys = ON");

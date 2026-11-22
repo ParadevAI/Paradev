@@ -48,7 +48,7 @@ function findRow(id: string) {
 }
 
 /**
- * Runs the repository's cloud `[archive]` on the still-running box, so what
+ * Runs the workspace's cloud `[archive]` on the still-running box, so what
  * its `setup` created outside the box is released. Best effort: the stop
  * goes ahead whatever happens. Returns false when the workspace was
  * unarchived while the hook ran, so the caller must not stop the box.

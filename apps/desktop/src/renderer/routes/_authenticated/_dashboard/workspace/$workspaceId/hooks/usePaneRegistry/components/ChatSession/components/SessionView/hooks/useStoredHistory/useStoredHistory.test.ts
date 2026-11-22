@@ -77,6 +77,21 @@ test("keeps the stored history in front of a live chat that starts later", () =>
 	expect(displayText(result.current, "b")).toBe("second (live)!");
 });
 
+test("a kept copy's streamed text gives way to a stored chat further along", () => {
+	const stored = reduceMany(emptySnapshot(), [
+		item(1, "a", "first"),
+		item(2, "b", "second, finished"),
+		item(3, "c", "third"),
+	]);
+	const kept = reduce(
+		reduceMany(emptySnapshot(), [item(1, "a", "first"), item(2, "b", "")]),
+		delta("b", "second, so f"),
+	);
+	const { result } = renderHook(() => useStoredHistory(stored, kept));
+	expect([...result.current.items.keys()]).toEqual(["a", "b", "c"]);
+	expect(displayText(result.current, "b")).toBe("second, finished");
+});
+
 test("returns the live chat when there is no stored one", () => {
 	const live = reduceMany(emptySnapshot(), [item(1, "a", "first")]);
 	const { result } = renderHook(() => useStoredHistory(null, live));

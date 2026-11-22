@@ -42,7 +42,7 @@ const geist = Geist({
 
 const siteDescription = msg({
 	message:
-		"The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place.",
+		"The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place.",
 });
 
 export async function generateMetadata(): Promise<Metadata> {

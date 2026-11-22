@@ -60,7 +60,7 @@ export function createAmpPlugin(): void {
 	const pluginPath = getAmpGlobalPluginPath();
 	fs.mkdirSync(path.dirname(pluginPath), { recursive: true });
 	const changed = writeFileIfChanged(pluginPath, getAmpPluginContent(), 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Amp lifecycle plugin`,
 	);
 }

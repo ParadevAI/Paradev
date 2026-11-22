@@ -27,13 +27,18 @@ on:
         required: false
         type: number
         default: 30
+      environment:
+        description: "GitHub environment the build reads its secrets from"
+        required: false
+        type: string
+        default: production
 
 jobs:
   build-macos:
     name: Build - macOS (${{ matrix.arch }})
     runs-on: macos-latest
     timeout-minutes: 90
-    environment: production
+    environment: ${{ inputs.environment }}
 
     strategy:
       fail-fast: false
@@ -258,7 +263,7 @@ jobs:
     name: Build - Linux (x64)
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    environment: production
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Checkout code

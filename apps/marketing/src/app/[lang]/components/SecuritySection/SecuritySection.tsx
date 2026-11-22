@@ -23,7 +23,7 @@ const SECURITY_FEATURES: {
 }[] = [
 	{
 		id: "open-source",
-		icon: <HiOutlineCodeBracket className="w-5 h-5 text-foreground/70" />,
+		icon: <HiOutlineCodeBracket className="size-5 text-muted-foreground" />,
 		title: msg({
 			message: "Open Source",
 		}),
@@ -38,7 +38,7 @@ const SECURITY_FEATURES: {
 	},
 	{
 		id: "local-first",
-		icon: <HiOutlineServerStack className="w-5 h-5 text-foreground/70" />,
+		icon: <HiOutlineServerStack className="size-5 text-muted-foreground" />,
 		title: msg({
 			message: "Local First",
 		}),
@@ -49,7 +49,7 @@ const SECURITY_FEATURES: {
 	},
 	{
 		id: "your-accounts",
-		icon: <HiOutlineSignal className="w-5 h-5 text-foreground/70" />,
+		icon: <HiOutlineSignal className="size-5 text-muted-foreground" />,
 		title: msg({
 			message: "Bring Your Own Subscription",
 		}),
@@ -107,7 +107,7 @@ export function SecuritySection() {
 
 				{/* Features Grid */}
 				<m.div
-					className="grid grid-cols-1 md:grid-cols-3 gap-6"
+					className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10"
 					initial={{ opacity: 0, y: 20 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -116,19 +116,17 @@ export function SecuritySection() {
 					{SECURITY_FEATURES.map((feature, index) => (
 						<m.div
 							key={feature.id}
-							className="relative p-6 rounded-[2px] border border-foreground/[0.1] bg-foreground/[0.03]"
+							className="border-t border-border pt-6"
 							initial={{ opacity: 0, y: 20 }}
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true }}
 							transition={{ duration: 0.5, delay: 0.1 * index }}
 						>
-							<div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-[2px] bg-muted border border-border">
-								{feature.icon}
-							</div>
-							<h3 className="text-lg font-medium text-foreground mb-2">
+							<div className="mb-6 [&_svg]:stroke-[1.5]">{feature.icon}</div>
+							<h3 className="text-base sm:text-lg font-medium text-foreground mb-2">
 								{t(feature.title)}
 							</h3>
-							<p className="text-base leading-relaxed text-muted-foreground">
+							<p className="max-w-sm text-base leading-relaxed text-muted-foreground">
 								{t(feature.description)}
 							</p>
 							{feature.link && (

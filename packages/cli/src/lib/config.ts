@@ -9,7 +9,7 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { resolveWriteTarget } from "@superset/agent-setup/write-file-if-changed";
 import type { StoredOAuth } from "@superset/shared/oauth-refresh";
@@ -69,18 +69,26 @@ export function writeConfig(
 	config: SupersetConfig,
 	fs: ConfigWriteFs = { writeFileSync, renameSync, unlinkSync },
 ): void {
+	writePrivateJson(getSupersetConfigPath(), config, fs);
+}
+
+export function writePrivateJson(
+	path: string,
+	value: unknown,
+	fs: ConfigWriteFs = { writeFileSync, renameSync, unlinkSync },
+): void {
 	ensureDir();
-	const configPath = resolveWriteTarget(getSupersetConfigPath());
+	const target = resolveWriteTarget(path);
 	const tempPath = join(
-		dirname(configPath),
-		`.${randomUUID()}.${process.pid}.config.tmp`,
+		dirname(target),
+		`.${randomUUID()}.${process.pid}.${basename(target, ".json")}.tmp`,
 	);
-	fs.writeFileSync(tempPath, JSON.stringify(config, null, 2), { mode: 0o600 });
+	fs.writeFileSync(tempPath, JSON.stringify(value, null, 2), { mode: 0o600 });
 	try {
 		chmodSync(tempPath, 0o600);
 	} catch {}
 	try {
-		fs.renameSync(tempPath, configPath);
+		fs.renameSync(tempPath, target);
 	} catch (error) {
 		try {
 			fs.unlinkSync(tempPath);
@@ -88,7 +96,7 @@ export function writeConfig(
 		throw error;
 	}
 	try {
-		chmodSync(configPath, 0o600);
+		chmodSync(target, 0o600);
 	} catch {}
 }
 

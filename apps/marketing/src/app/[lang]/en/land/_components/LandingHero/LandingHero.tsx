@@ -69,7 +69,7 @@ export function LandingHero({
 							>
 								<Trans>
 									The open-source workspace for Claude Code, Codex, and any
-									coding agent.
+									agent. Locally or in the cloud.
 								</Trans>
 							</p>
 						</div>

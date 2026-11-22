@@ -1,14 +1,20 @@
 import { describe, expect, it } from "bun:test";
 import { syncWhenEnabled } from "./syncWhenEnabled";
 
-function setup(answers: Array<boolean | Error>) {
+type Answer = { enabled: boolean; checkpointGapMs?: number | null };
+
+function setup(answers: Array<boolean | Answer | Error>) {
 	let starts = 0;
+	const gaps: Array<number | null> = [];
 	const pending: Array<{ run: () => void; ms: number }> = [];
 	const stop = syncWhenEnabled({
 		chatSync: {
 			start: () => {
 				starts += 1;
 				return () => {};
+			},
+			setCheckpointGap: (ms) => {
+				gaps.push(ms);
 			},
 		},
 		api: {
@@ -17,6 +23,7 @@ function setup(answers: Array<boolean | Error>) {
 					query: async () => {
 						const answer = answers.shift();
 						if (answer instanceof Error) throw answer;
+						if (typeof answer === "object") return answer;
 						return { enabled: answer ?? false };
 					},
 				},
@@ -28,7 +35,7 @@ function setup(answers: Array<boolean | Error>) {
 		},
 	});
 	const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
-	return { starts: () => starts, pending, settle, stop };
+	return { starts: () => starts, gaps, pending, settle, stop };
 }
 
 describe("syncWhenEnabled", () => {
@@ -47,5 +54,18 @@ describe("syncWhenEnabled", () => {
 		box.pending.at(-1)?.run();
 		await box.settle();
 		expect(box.starts()).toBe(1);
+	});
+
+	it("keeps asking once syncing, and takes each checkpoint gap the API names", async () => {
+		const box = setup([
+			{ enabled: true, checkpointGapMs: 3_000 },
+			{ enabled: true, checkpointGapMs: null },
+		]);
+		await box.settle();
+		expect(box.pending.at(-1)?.ms).toBe(60 * 60 * 1000);
+		box.pending.at(-1)?.run();
+		await box.settle();
+		expect(box.starts()).toBe(1);
+		expect(box.gaps).toEqual([3_000, null]);
 	});
 });

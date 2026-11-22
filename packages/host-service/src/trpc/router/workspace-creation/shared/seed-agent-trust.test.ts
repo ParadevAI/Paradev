@@ -20,6 +20,7 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../../db";
 import * as schema from "../../../../db/schema";
 import {
+	inheritAgyWorktreeTrust,
 	resolveTrustFamily,
 	resolveTrustTarget,
 	seedAgentFolderTrust,
@@ -57,7 +58,7 @@ describe("resolveTrustFamily", () => {
 		expect(
 			resolveTrustFamily({
 				presetId: "agy",
-				command: "agy --mode accept-edits",
+				command: "agy --dangerously-skip-permissions",
 			}),
 		).toBe("agy");
 	});
@@ -362,6 +363,18 @@ describe("seedAgyFolderTrust", () => {
 			"/tmp/session-b",
 		);
 		expect(readdirSync(dir)).toEqual([]);
+	});
+});
+
+describe("inheritAgyWorktreeTrust", () => {
+	test("trusts a worktree only when its main checkout is trusted", async () => {
+		const file = join(dir, "settings.json");
+		writeFileSync(file, JSON.stringify({ trustedWorkspaces: ["/repo"] }));
+		await inheritAgyWorktreeTrust(file, "/other-repo", "/worktrees/b");
+		await inheritAgyWorktreeTrust(file, "/repo", "/worktrees/a");
+		expect(JSON.parse(readFileSync(file, "utf-8"))).toEqual({
+			trustedWorkspaces: ["/repo", "/worktrees/a"],
+		});
 	});
 });
 

@@ -432,6 +432,17 @@ function usageFacts(
 		.as(options.days ? facts.unionAll(options.days) : facts);
 }
 
+/** The billing days wholly inside the window: from `firstWhole` up to, not including, `endWhole`. */
+function wholeBillingDays(window: CloudUsageWindow) {
+	const from = sql`${window.from.toISOString()}::timestamptz`;
+	const to = sql`${window.to.toISOString()}::timestamptz`;
+	const fromDay = sql`public.cloud_billing_day(${from})`;
+	return {
+		firstWhole: sql`(case when public.cloud_billing_day_start(${fromDay}) = ${from} then ${fromDay} else ${fromDay} + 1 end)`,
+		endWhole: sql`public.cloud_billing_day(${to})`,
+	};
+}
+
 /**
  * Usage by billing day from the daily rollup: its rows for the billing days wholly inside the
  * window, and `sentWhere` for the events of the partial days at the window's edges. Each event
@@ -447,11 +458,7 @@ function billingDayRollup(
 	if (filters.workspace || filters.status?.length || filters.search) {
 		return null;
 	}
-	const from = sql`${window.from.toISOString()}::timestamptz`;
-	const to = sql`${window.to.toISOString()}::timestamptz`;
-	const fromDay = sql`public.cloud_billing_day(${from})`;
-	const firstWhole = sql`(case when public.cloud_billing_day_start(${fromDay}) = ${from} then ${fromDay} else ${fromDay} + 1 end)`;
-	const endWhole = sql`public.cloud_billing_day(${to})`;
+	const { firstWhole, endWhole } = wholeBillingDays(window);
 	return {
 		sentWhere: sql`(${events.sentAt} < public.cloud_billing_day_start(${firstWhole}) or ${events.sentAt} >= public.cloud_billing_day_start(${endWhole}))`,
 		days: db
@@ -1021,6 +1028,91 @@ export async function queryFleetCloudUsageByWorkspaceDay(
 			gbHours,
 		};
 	});
+}
+
+const SERIES_MAX_POINTS = 60;
+
+/**
+ * GB-hours per billing day of each organization or user in `keys`, from the daily rollup in one
+ * query. Only whole billing days count: partial days at both edges of the window are left out, so
+ * the open day is never drawn. A window longer than 60 days is summed into buckets of `stepDays`
+ * whole days that end on the window's last whole day; the leading days that do not fill a bucket
+ * are dropped. `starts` holds each bucket's first billing day. Every key has one point per bucket,
+ * zero where it has no usage. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function queryFleetCloudUsageSeries(
+	db: Db,
+	options: { window: CloudUsageWindow; keys: string[] } & (
+		| { by: "organization" }
+		| { by: "user"; organizationId: string }
+	),
+) {
+	const { window, keys } = options;
+	const { firstWhole, endWhole } = wholeBillingDays(window);
+	const step = sql`greatest(1, ceil((raw."end" - raw.first) / ${SERIES_MAX_POINTS}::numeric))::int`;
+	const days = sql`(raw."end" - raw.first) / ${step} * ${step}`;
+	const span = db.$with("span").as(
+		db
+			.select({
+				first: sql<string>`raw."end" - ${days}`.as("first"),
+				end: sql<string>`raw."end"`.as("end"),
+				days: sql<number>`${days}`.as("days"),
+				step: sql<number>`${step}`.as("step"),
+			})
+			.from(sql`(select ${firstWhole} as first, ${endWhole} as "end") as raw`),
+	);
+	const keyColumn =
+		options.by === "organization" ? daily.organizationId : daily.userId;
+	const bucket = sql<number>`(${daily.day} - ${span.first}) / ${span.step}`;
+	const sums = db.$with("sums").as(
+		db
+			.select({
+				key: sql<string>`${keyColumn}`.as("key"),
+				bucket: bucket.as("bucket"),
+				gbMinutes: sql<string>`sum(${daily.gbMinutes})`.as("gb_minutes"),
+			})
+			.from(daily)
+			.innerJoin(span, sql`true`)
+			.where(
+				and(
+					options.by === "user"
+						? eq(daily.organizationId, options.organizationId)
+						: undefined,
+					inArray(keyColumn, keys),
+					sql`${daily.day} >= ${span.first}`,
+					sql`${daily.day} < ${span.end}`,
+				),
+			)
+			.groupBy(keyColumn, bucket),
+	);
+	const rows = await db
+		.with(span, sums)
+		.select({
+			first: sql<string>`to_char(${span.first}, 'YYYY-MM-DD')`,
+			days: span.days,
+			stepDays: span.step,
+			key: sums.key,
+			bucket: sums.bucket,
+			gbMinutes: sums.gbMinutes,
+		})
+		.from(span)
+		.leftJoin(sums, sql`true`);
+	const head = rows[0];
+	if (!head) throw new Error("A usage series has no span.");
+	const { first, stepDays } = head;
+	const count = Math.ceil(head.days / stepDays);
+	const day = Date.parse(`${first}T00:00:00Z`);
+	const starts = Array.from({ length: count }, (_, i) =>
+		new Date(day + i * stepDays * 86_400_000).toISOString().slice(0, 10),
+	);
+	const series: Record<string, number[]> = Object.fromEntries(
+		keys.map((key) => [key, starts.map(() => 0)]),
+	);
+	for (const { key, bucket, gbMinutes } of rows) {
+		const points = key === null ? undefined : series[key];
+		if (points && bucket !== null) points[bucket] = Number(gbMinutes) / 60;
+	}
+	return { starts, stepDays, series };
 }
 
 const NO_USAGE: MetricRow = {
