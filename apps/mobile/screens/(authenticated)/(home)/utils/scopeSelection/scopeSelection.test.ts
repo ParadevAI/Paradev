@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import {
 	canTickHost,
 	defaultSelection,
+	isAllHostsOffered,
+	isEverything,
 	resolveSelection,
 	selectedHosts,
 	selectionLabel,
@@ -125,5 +127,65 @@ describe("selectionScope", () => {
 				(h) => h.machineId,
 			),
 		).toEqual(["b", "d"]);
+	});
+});
+
+describe("resolveSelection before the roster answers", () => {
+	test("keeps the saved pick, unchecked, rather than falling back", () => {
+		expect(
+			resolveSelection({
+				saved: { hosts: ["gone"], cloud: true },
+				hosts: [],
+				cloudEnabled: true,
+				hostsAnswered: false,
+			}),
+		).toEqual({ hosts: ["gone"], cloud: true });
+	});
+
+	test("slices a saved pick of more than three hosts to the cap", () => {
+		const saved = { hosts: ["a", "b", "c", "d"], cloud: false };
+		expect(
+			resolveSelection({
+				saved,
+				hosts: [],
+				cloudEnabled: true,
+				hostsAnswered: false,
+			}).hosts,
+		).toEqual(["a", "b", "c"]);
+		expect(
+			resolveSelection({
+				saved,
+				hosts: four,
+				cloudEnabled: true,
+				hostsAnswered: true,
+			}).hosts,
+		).toEqual(["a", "b", "c"]);
+	});
+});
+
+describe("isAllHostsOffered", () => {
+	test("offers All hosts for two to three places' worth of choice", () => {
+		expect(isAllHostsOffered(1, true)).toBe(true);
+		expect(isAllHostsOffered(1, false)).toBe(false);
+		expect(isAllHostsOffered(3, false)).toBe(true);
+		expect(isAllHostsOffered(4, true)).toBe(false);
+	});
+});
+
+describe("isEverything", () => {
+	test("needs every host ticked, and Cloud where it is offered", () => {
+		const hosts = [host("a"), host("b")];
+		expect(isEverything({ hosts: ["a", "b"], cloud: true }, hosts, true)).toBe(
+			true,
+		);
+		expect(isEverything({ hosts: ["a", "b"], cloud: false }, hosts, true)).toBe(
+			false,
+		);
+		expect(
+			isEverything({ hosts: ["a", "b"], cloud: false }, hosts, false),
+		).toBe(true);
+		expect(isEverything({ hosts: ["a"], cloud: true }, hosts, true)).toBe(
+			false,
+		);
 	});
 });

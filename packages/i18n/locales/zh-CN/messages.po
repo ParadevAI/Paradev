@@ -13779,10 +13779,6 @@ msgstr "离线/本地优先模式"
 msgid "offline, seen {0}"
 msgstr "离线，上次在线 {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "离线，上次在线 {0}"
-
 msgid "OK"
 msgstr "确定"
 

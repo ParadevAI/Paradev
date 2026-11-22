@@ -13779,10 +13779,6 @@ msgstr "Offline / local-first režim"
 msgid "offline, seen {0}"
 msgstr "offline, naposledy {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Offline, naposledy {0}"
-
 msgid "OK"
 msgstr "OK"
 

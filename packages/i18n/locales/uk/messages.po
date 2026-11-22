@@ -13773,10 +13773,6 @@ msgstr "Офлайн / режим local-first"
 msgid "offline, seen {0}"
 msgstr "не в мережі, був {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Не в мережі, був {0}"
-
 msgid "OK"
 msgstr "OK"
 

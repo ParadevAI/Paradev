@@ -13779,10 +13779,6 @@ msgstr "오프라인 / 로컬 우선 모드"
 msgid "offline, seen {0}"
 msgstr "오프라인, 마지막 확인 {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "오프라인, 마지막 확인 {0}"
-
 msgid "OK"
 msgstr "확인"
 

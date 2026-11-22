@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { ChevronDown, ChevronRight } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -43,6 +44,7 @@ export function FolderSectionHeader({
 	const attentionLabel = useAttentionLabel();
 	const { t } = useLingui();
 	const theme = useTheme();
+	const { formatNumber } = useFormat();
 	const enlargedText = useEnlargedText();
 	const Caret = collapsed ? ChevronRight : ChevronDown;
 	return (
@@ -77,7 +79,7 @@ export function FolderSectionHeader({
 						{name}
 					</Text>
 					<Text className="text-muted-foreground text-[14px] tabular-nums">
-						{count}
+						{formatNumber(count)}
 					</Text>
 					{attention ? <AttentionMark attention={attention} /> : null}
 				</View>

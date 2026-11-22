@@ -141,10 +141,10 @@ export function ScopeFilterScreen() {
 
 	const offlineLine = (lastSeenAt: number | null | undefined) => {
 		if (lastSeenAt === undefined) return undefined;
-		if (lastSeenAt === null) return t({ message: "Offline" });
+		if (lastSeenAt === null) return t({ message: "offline" });
 		const now = Date.now();
 		return t({
-			message: `Offline, seen ${formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)}`,
+			message: `offline, seen ${formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)}`,
 		});
 	};
 

@@ -13779,10 +13779,6 @@ msgstr "Mode hors ligne / local d'abord"
 msgid "offline, seen {0}"
 msgstr "hors ligne, vu {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Hors ligne, vu {0}"
-
 msgid "OK"
 msgstr "OK"
 

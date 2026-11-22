@@ -1,3 +1,5 @@
+import { formatNumber } from "@superset/i18n/format";
+
 export interface RowDetailInput {
 	/** The row's live state, e.g. "Needs input"; null when it has none. */
 	state: string | null;
@@ -41,7 +43,7 @@ export function rowDetailParts({
 	if (diff && (diff.additions > 0 || diff.deletions > 0)) {
 		parts.push({
 			key: "diff",
-			text: `+${diff.additions} −${diff.deletions}`,
+			text: `+${formatNumber(diff.additions)} −${formatNumber(diff.deletions)}`,
 			ink: null,
 		});
 	}

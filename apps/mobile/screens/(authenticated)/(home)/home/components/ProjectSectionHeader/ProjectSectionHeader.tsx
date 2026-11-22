@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { ChevronDown, ChevronRight, Plus } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
@@ -48,6 +49,7 @@ export function ProjectSectionHeader({
 	const attentionLabel = useAttentionLabel();
 	const { t } = useLingui();
 	const theme = useTheme();
+	const { formatNumber } = useFormat();
 	const enlargedText = useEnlargedText();
 	const Caret = collapsed ? ChevronRight : ChevronDown;
 	return (
@@ -85,7 +87,7 @@ export function ProjectSectionHeader({
 						{name}
 					</Text>
 					<Text className="text-muted-foreground ml-2 text-[14px] tabular-nums">
-						{count}
+						{formatNumber(count)}
 					</Text>
 					{/* Two icons rather than one rotated: a transform on the icon itself
 					    doesn't reach the underlying SVG, so it renders nothing. */}

@@ -13779,10 +13779,6 @@ msgstr "Modo sin conexión / local primero"
 msgid "offline, seen {0}"
 msgstr "sin conexión, visto {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Sin conexión, visto {0}"
-
 msgid "OK"
 msgstr "Aceptar"
 

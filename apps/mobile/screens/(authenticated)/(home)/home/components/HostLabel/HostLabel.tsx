@@ -1,6 +1,7 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
+import { useFormat } from "@superset/i18n/react";
 import { ChevronDown, ChevronRight } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
@@ -50,6 +51,7 @@ export function HostLabel({
 }: HostLabelProps) {
 	const { t } = useLingui();
 	const theme = useTheme();
+	const { formatNumber } = useFormat();
 	const attentionLabel = useAttentionLabel();
 	const enlargedText = useEnlargedText();
 	const [checking, setChecking] = useState(false);
@@ -82,7 +84,9 @@ export function HostLabel({
 			</Text>
 			{onToggle ? (
 				<>
-					<Text className={cn(SECTION_LABEL.count, "ml-2")}>{count}</Text>
+					<Text className={cn(SECTION_LABEL.count, "ml-2")}>
+						{formatNumber(count)}
+					</Text>
 					<View className="ml-1">
 						<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
 					</View>

@@ -13779,10 +13779,6 @@ msgstr "Tryb offline / local-first"
 msgid "offline, seen {0}"
 msgstr "offline, widziany {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Offline, widziany {0}"
-
 msgid "OK"
 msgstr "OK"
 

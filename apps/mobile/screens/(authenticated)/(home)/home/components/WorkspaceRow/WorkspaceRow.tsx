@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { i18n } from "@superset/i18n";
+import { useFormat } from "@superset/i18n/react";
 import { useRouter } from "expo-router";
 import { View } from "react-native";
 import { RowLink } from "@/components/RowLink";
@@ -78,6 +79,7 @@ export function WorkspaceRow({
 	const attentionLabel = useAttentionLabel();
 	const router = useRouter();
 	const theme = useTheme();
+	const { formatNumber } = useFormat();
 	const prIcon = pullRequest
 		? PULL_REQUEST_STATUS[pullRequestStatus(pullRequest)]
 		: null;
@@ -182,7 +184,7 @@ export function WorkspaceRow({
 								))}
 								{sessions.length > MAX_SESSION_MARKS ? (
 									<Text className="text-muted-foreground pl-1 text-[14px] tabular-nums">
-										+{sessions.length - MAX_SESSION_MARKS}
+										+{formatNumber(sessions.length - MAX_SESSION_MARKS)}
 									</Text>
 								) : null}
 							</View>

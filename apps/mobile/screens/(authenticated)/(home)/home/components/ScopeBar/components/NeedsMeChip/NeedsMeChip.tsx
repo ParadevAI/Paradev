@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ interface NeedsMeChipProps {
 /** Narrows the list to rows waiting on you; the count leaves out Working. */
 export function NeedsMeChip({ count, active, onPress }: NeedsMeChipProps) {
 	const { t } = useLingui();
+	const { formatNumber } = useFormat();
 	return (
 		<Pressable
 			onPress={onPress}
@@ -38,7 +40,7 @@ export function NeedsMeChip({ count, active, onPress }: NeedsMeChipProps) {
 						active ? "text-background" : "text-yellow-500",
 					)}
 				>
-					{count}
+					{formatNumber(count)}
 				</Text>
 			) : null}
 		</Pressable>

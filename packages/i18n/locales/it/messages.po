@@ -13779,10 +13779,6 @@ msgstr "Modalità offline / local-first"
 msgid "offline, seen {0}"
 msgstr "offline, visto {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Offline, visto {0}"
-
 msgid "OK"
 msgstr "OK"
 

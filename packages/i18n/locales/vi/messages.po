@@ -13779,10 +13779,6 @@ msgstr "Chế độ ngoại tuyến / ưu tiên cục bộ"
 msgid "offline, seen {0}"
 msgstr "ngoại tuyến, thấy lần cuối {0}"
 
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "Offline, seen {0}"
-msgstr "Ngoại tuyến, thấy lần cuối {0}"
-
 msgid "OK"
 msgstr "OK"
 
