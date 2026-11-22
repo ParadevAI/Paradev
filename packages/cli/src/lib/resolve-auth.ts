@@ -1,4 +1,5 @@
 import { CLIError } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { type ApiClient, createApiClient } from "./api-client";
 import {
 	readConfig,
@@ -40,10 +41,9 @@ export async function resolveAuth(
 ): Promise<ResolvedAuth> {
 	let config = readConfig();
 
-	// An explicit --api-key wins; otherwise SUPERSET_API_KEY env acts as an
+	// An explicit --api-key wins; otherwise PARADEV_API_KEY (or SUPERSET_API_KEY) env acts as an
 	// override for this invocation (headless/CI). Both beat stored config/OAuth.
-	const overrideKey =
-		apiKeyOption?.trim() || process.env.SUPERSET_API_KEY?.trim();
+	const overrideKey = apiKeyOption?.trim() || readPublicEnv("API_KEY")?.trim();
 	let bearer: string | undefined;
 	let authSource: AuthSource;
 	const hostToken =
@@ -72,7 +72,7 @@ export async function resolveAuth(
 			bearer = auth.accessToken;
 		}
 		authSource = "oauth";
-	} else if (process.env.SUPERSET_SANDBOX_WORKSPACE_ID) {
+	} else if (readPublicEnv("SANDBOX_WORKSPACE_ID")) {
 		// A cloud workspace holds no credential: the firewall adds one to
 		// requests for the API, and it names the workspace rather than a
 		// person. Nothing to send from here, and nothing to refresh.
@@ -84,7 +84,7 @@ export async function resolveAuth(
 	} else {
 		throw new CLIError(
 			NOT_LOGGED_IN,
-			"Run: superset auth login (or set SUPERSET_API_KEY)",
+			"Run: superset auth login (or set PARADEV_API_KEY)",
 		);
 	}
 

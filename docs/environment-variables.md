@@ -178,3 +178,14 @@ build again.
 
 Do not change the shared secrets to move desktop: the legacy API uses
 `NEXT_PUBLIC_API_URL` as its token issuer and audience.
+
+## Not this: variables a terminal sees
+
+This page is for deploy and server variables. The variables the app sets in
+terminals, agents and hooks (`SUPERSET_TERMINAL_ID`, `SUPERSET_WORKSPACE_ID`,
+`SUPERSET_HOME_DIR`, …) are listed in `PUBLIC_ENV_NAMES`
+(`packages/shared/src/public-env.ts`). Each is set under both `SUPERSET_` and
+`PARADEV_` with the same value. Read one with `readPublicEnv`, which prefers
+`PARADEV_`. Never remove the `SUPERSET_` name: released CLIs and the hook
+scripts on users' machines read only that one. Both prefixes are reserved for
+cloud environment variables (`packages/shared/src/environment-secrets.ts`).

@@ -61,6 +61,7 @@ export function stripTerminalRuntimeEnv(
 		if (NODE_APP_KEYS.has(key)) continue;
 		if (STRIP_PREFIXES.some((prefix) => key.startsWith(prefix))) continue;
 		if (key.startsWith("SUPERSET_") && !SUPERSET_KEEP_KEYS.has(key)) continue;
+		if (key.startsWith("PARADEV_")) continue;
 
 		result[key] = value;
 	}

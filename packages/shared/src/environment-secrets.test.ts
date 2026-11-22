@@ -7,6 +7,7 @@ describe("reservedKeyReason", () => {
 			"VERCEL_SANDBOX_",
 		);
 		expect(reservedKeyReason("SUPERSET_WORKSPACE_ID")).toContain("SUPERSET_");
+		expect(reservedKeyReason("PARADEV_WORKSPACE_ID")).toContain("PARADEV_");
 		expect(reservedKeyReason("path")).toContain("PATH");
 	});
 

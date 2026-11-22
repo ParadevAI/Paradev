@@ -8,6 +8,10 @@ const RESERVED_PREFIXES: Array<{ prefix: string; reason: string }> = [
 		prefix: "SUPERSET_",
 		reason: "carries the workspace's identity into the sandbox",
 	},
+	{
+		prefix: "PARADEV_",
+		reason: "carries the workspace's identity into the sandbox",
+	},
 	{ prefix: "HOST_SERVICE_", reason: "configures the sandbox's own server" },
 	{ prefix: "VERCEL_SANDBOX_", reason: "provisions the box itself" },
 ];

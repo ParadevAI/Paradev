@@ -18,7 +18,17 @@ import {
 } from "./vite/helpers";
 
 // override: true ensures .env values take precedence over inherited env vars
-config({ path: resolve(__dirname, "../../.env"), override: true, quiet: true });
+const dotenv = config({
+	path: resolve(__dirname, "../../.env"),
+	override: true,
+	quiet: true,
+});
+// A worktree .env written before PARADEV_HOME_DIR existed sets only the old
+// name; without this the PARADEV_HOME_DIR a Paradev terminal exports would win.
+const envHomeDir = dotenv.parsed?.SUPERSET_HOME_DIR;
+if (envHomeDir && !dotenv.parsed?.PARADEV_HOME_DIR) {
+	process.env.PARADEV_HOME_DIR = envHomeDir;
+}
 
 const DEV_SERVER_PORT = Number(process.env.DESKTOP_VITE_PORT);
 

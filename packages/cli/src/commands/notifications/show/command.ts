@@ -1,4 +1,5 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { command } from "../../../lib/command";
 import { resolveHostClient } from "../../../lib/resolve-host-client";
 
@@ -10,11 +11,9 @@ function clickTarget(options: {
 }) {
 	const fromEnv = !options.host;
 	const workspaceId =
-		options.workspace ??
-		(fromEnv ? process.env.SUPERSET_WORKSPACE_ID : undefined);
+		options.workspace ?? (fromEnv ? readPublicEnv("WORKSPACE_ID") : undefined);
 	const terminalId =
-		options.terminal ??
-		(fromEnv ? process.env.SUPERSET_TERMINAL_ID : undefined);
+		options.terminal ?? (fromEnv ? readPublicEnv("TERMINAL_ID") : undefined);
 	return workspaceId && terminalId ? { workspaceId, terminalId } : undefined;
 }
 

@@ -1,4 +1,5 @@
 import { CANONICAL_URLS } from "@superset/shared/constants";
+import { readPublicEnv } from "@superset/shared/public-env";
 
 /**
  * Where this CLI points. Production is the default; a dev build is pointed
@@ -15,7 +16,7 @@ export const LEGACY_WEB_URL = "https://app.superset.sh";
 export const env = {
 	RELAY_URL: process.env.RELAY_URL || "https://relay.superset.sh",
 	REALTIME_URL: process.env.REALTIME_URL || "https://realtime.superset.sh",
-	SUPERSET_API_URL: process.env.SUPERSET_API_URL || CANONICAL_URLS.API,
+	SUPERSET_API_URL: readPublicEnv("API_URL") || CANONICAL_URLS.API,
 	SUPERSET_WEB_URL: process.env.SUPERSET_WEB_URL || LEGACY_WEB_URL,
 	VERSION: process.env.SUPERSET_VERSION || "0.0.0-dev",
 };

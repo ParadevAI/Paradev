@@ -388,7 +388,7 @@ await stopAndSnapshot(golden);
 log(`golden: ${golden} stripped, stopped and snapshotted`);
 
 // 4. probe, as a workspace
-const RESERVED_PREFIXES = ["SUPERSET_", "HOST_SERVICE_", "VERCEL_"];
+const RESERVED_PREFIXES = ["SUPERSET_", "PARADEV_", "HOST_SERVICE_", "VERCEL_"];
 const RESERVED_KEYS = new Set([
 	// A box the release throws away must not be able to create a database
 	// branch: setup then keeps the environment's own DATABASE_URL, which is

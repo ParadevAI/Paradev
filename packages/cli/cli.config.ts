@@ -1,6 +1,7 @@
 import { boolean, defineConfig, string } from "@superset/cli-framework";
 import { linguiMacroPlugin } from "@superset/i18n/bun-plugin";
 import { CANONICAL_URLS } from "@superset/shared/constants";
+import { readPublicEnv } from "@superset/shared/public-env";
 import pkg from "./package.json" with { type: "json" };
 
 const VERSION = pkg.version;
@@ -24,15 +25,17 @@ export default defineConfig({
 		json: boolean().desc("Output as JSON (auto-on under CI/agent envs)"),
 		quiet: boolean().desc("Output IDs only"),
 		apiKey: string()
-			.env("SUPERSET_API_KEY")
-			.desc("Use a Paradev API key (sk_live_…) instead of OAuth login"),
+			.env("PARADEV_API_KEY")
+			.desc(
+				"Use a Paradev API key (sk_live_…) instead of OAuth login. $SUPERSET_API_KEY also works",
+			),
 	},
 	audiences: () =>
 		process.env.SUPERSET_CLI_AUDIENCE === "internal" ||
-		process.env.SUPERSET_SANDBOX_WORKSPACE_ID
+		readPublicEnv("SANDBOX_WORKSPACE_ID")
 			? ["internal", "public"]
 			: ["public"],
-	sandbox: () => Boolean(process.env.SUPERSET_SANDBOX_WORKSPACE_ID),
+	sandbox: () => Boolean(readPublicEnv("SANDBOX_WORKSPACE_ID")),
 	help: {
 		tagline: "Command your fleet of coding agents from any shell.",
 		docsUrl: `${CANONICAL_URLS.DOCS}/cli/getting-started`,

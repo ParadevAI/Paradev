@@ -13,6 +13,7 @@ import { basename, dirname, join } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { resolveWriteTarget } from "@superset/agent-setup/write-file-if-changed";
 import type { StoredOAuth } from "@superset/shared/oauth-refresh";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { env } from "./env";
 
 export { AUTH_REFRESH_LEEWAY_MS } from "@superset/shared/oauth-refresh";
@@ -57,7 +58,7 @@ export function readConfig(): SupersetConfig {
 export function resolveOrganizationId(
 	config: SupersetConfig,
 ): string | undefined {
-	return process.env.SUPERSET_ORGANIZATION_ID?.trim() || config.organizationId;
+	return readPublicEnv("ORGANIZATION_ID")?.trim() || config.organizationId;
 }
 
 type ConfigWriteFs = Pick<

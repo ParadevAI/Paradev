@@ -2,6 +2,7 @@ import { exec } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import { getShellEnv } from "@superset/agent-setup/shell-wrappers";
+import { addPublicEnvAliases } from "@superset/shared/public-env";
 import defaultShell from "default-shell";
 import { env } from "shared/env.shared";
 
@@ -462,6 +463,7 @@ export function buildTerminalEnv(params: {
 	};
 
 	delete terminalEnv.GOOGLE_API_KEY;
+	addPublicEnvAliases(terminalEnv);
 
 	// Electron child processes can't access macOS Keychain for TLS cert verification,
 	// causing "x509: OSStatus -26276" in Go binaries like `gh`. File-based fallback.

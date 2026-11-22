@@ -31,6 +31,7 @@ delete process.env.SUPERSET_SANDBOX_WORKSPACE_ID;
 afterEach(() => {
 	clearConfig();
 	delete process.env.SUPERSET_API_KEY;
+	delete process.env.PARADEV_API_KEY;
 	delete process.env.SUPERSET_ORGANIZATION_ID;
 	delete process.env.SUPERSET_WORKSPACE_ID;
 });
@@ -117,6 +118,13 @@ describe("resolveAuth", () => {
 		const result = await resolveAuth(undefined);
 		expect(result.bearer).toBe("sk_live_env");
 		expect(result.authSource).toBe("override");
+	});
+
+	it("prefers PARADEV_API_KEY over SUPERSET_API_KEY", async () => {
+		process.env.SUPERSET_API_KEY = "sk_live_old";
+		process.env.PARADEV_API_KEY = "sk_live_new";
+		const result = await resolveAuth(undefined);
+		expect(result.bearer).toBe("sk_live_new");
 	});
 
 	it("prefers the --api-key flag over SUPERSET_API_KEY env", async () => {

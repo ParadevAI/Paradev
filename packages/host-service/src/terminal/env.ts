@@ -22,6 +22,7 @@ import fs from "node:fs";
 import os from "node:os";
 import { resolveAppHomeDir } from "@superset/agent-setup";
 import { TERMINAL_IDENTITY_ENV_KEYS } from "@superset/shared/constants";
+import { addPublicEnvAliases } from "@superset/shared/public-env";
 import { caught } from "../runtime/box-log-filter";
 import { getManagedEnv } from "../runtime/sandbox-managed-env/sandbox-managed-env.ts";
 import {
@@ -313,6 +314,7 @@ export function buildV2TerminalEnv(
 	if (supersetHomeDir) {
 		env.SUPERSET_HOME_DIR = supersetHomeDir;
 	}
+	addPublicEnvAliases(env);
 
 	if (process.env.SUPERSET_HOST_RUN_MODE === "sandbox") {
 		// The environment's variables and the credential placeholders arrive

@@ -379,7 +379,7 @@ function notAMemberOfOrganization(
 	const account = signedInAs ? ` (signed in as ${signedInAs})` : "";
 	return new TRPCError({
 		code: "FORBIDDEN",
-		message: `Not a member of organization ${organizationId}, which was asked for in the x-superset-organization-id header${account}. Run \`superset auth login\` with an account in that organization, or unset SUPERSET_API_KEY if it names another account.`,
+		message: `Not a member of organization ${organizationId}, which was asked for in the x-superset-organization-id header${account}. Run \`superset auth login\` with an account in that organization, or unset PARADEV_API_KEY and SUPERSET_API_KEY if they name another account.`,
 	});
 }
 

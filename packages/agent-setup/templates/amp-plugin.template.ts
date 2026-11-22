@@ -75,12 +75,12 @@ export default function supersetAmpLifecyclePlugin(amp: AmpApi) {
 	supersetGlobal.__supersetAmpLifecyclePluginV1 = true;
 
 	const env = typeof process === "undefined" ? {} : process.env ?? {};
-	if (!env.SUPERSET_TERMINAL_ID && !env.SUPERSET_TAB_ID) {
+	if (!(env.PARADEV_TERMINAL_ID || env.SUPERSET_TERMINAL_ID) && !(env.PARADEV_TAB_ID || env.SUPERSET_TAB_ID)) {
 		debugLog("disabled: missing Paradev terminal env");
 		return;
 	}
 
-	const supersetHome = env.SUPERSET_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
+	const supersetHome = env.PARADEV_HOME_DIR || env.SUPERSET_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
 	const notifyPath = join(supersetHome, "hooks", "notify.sh");
 	if (!existsSync(notifyPath)) {
 		debugLog("disabled: notify hook missing at " + notifyPath);
@@ -89,9 +89,9 @@ export default function supersetAmpLifecyclePlugin(amp: AmpApi) {
 
 	debugLog(
 		"enabled terminalId=" +
-			(env.SUPERSET_TERMINAL_ID || "") +
+			(env.PARADEV_TERMINAL_ID || env.SUPERSET_TERMINAL_ID || "") +
 			" tabId=" +
-			(env.SUPERSET_TAB_ID || "") +
+			(env.PARADEV_TAB_ID || env.SUPERSET_TAB_ID || "") +
 			" notify=" +
 			notifyPath,
 	);
@@ -124,7 +124,7 @@ export default function supersetAmpLifecyclePlugin(amp: AmpApi) {
 					" sessionId=" +
 					(sessionId || "") +
 					" terminalId=" +
-					(env.SUPERSET_TERMINAL_ID || ""),
+					(env.PARADEV_TERMINAL_ID || env.SUPERSET_TERMINAL_ID || ""),
 			);
 		} catch (error) {
 			// Best effort only. Superset notifications must never interrupt Amp.

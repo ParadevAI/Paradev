@@ -1,5 +1,8 @@
 #!/bin/bash
 {{MARKER}}
+# PARADEV_* wins when set; builds before the rename set only SUPERSET_*.
+SUPERSET_TERMINAL_ID="${PARADEV_TERMINAL_ID:-${SUPERSET_TERMINAL_ID:-}}"
+SUPERSET_TAB_ID="${PARADEV_TAB_ID:-${SUPERSET_TAB_ID:-}}"
 
 INPUT=$(cat)
 

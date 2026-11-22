@@ -1,4 +1,5 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { TRPCClientError } from "@trpc/client";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
@@ -22,8 +23,7 @@ export default command({
 			),
 	},
 	run: async ({ ctx, args, options }) => {
-		const id =
-			(args.id as string | undefined) ?? process.env.SUPERSET_WORKSPACE_ID;
+		const id = (args.id as string | undefined) ?? readPublicEnv("WORKSPACE_ID");
 		if (!id) {
 			throw new CLIError(
 				"No workspace id",
