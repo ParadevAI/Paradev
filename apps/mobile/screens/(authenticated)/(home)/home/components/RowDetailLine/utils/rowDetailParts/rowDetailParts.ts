@@ -8,6 +8,8 @@ export interface RowDetailInput {
 	branch: string | null;
 	/** Replaces the branch, e.g. "project · host" outside its project. */
 	context?: string | null;
+	/** The section above already names the state, as under Needs me. */
+	omitState?: boolean;
 	noChanges: string;
 }
 
@@ -26,10 +28,13 @@ export function rowDetailParts({
 	name,
 	branch,
 	context,
+	omitState = false,
 	noChanges,
 }: RowDetailInput): RowDetailPart[] {
 	const parts: RowDetailPart[] = [];
-	if (state) parts.push({ key: "state", text: state, ink: null });
+	if (omitState) {
+		// The section label says it.
+	} else if (state) parts.push({ key: "state", text: state, ink: null });
 	else if (pullRequest) {
 		parts.push({ key: "state", text: pullRequest.label, ink: pullRequest.ink });
 	}

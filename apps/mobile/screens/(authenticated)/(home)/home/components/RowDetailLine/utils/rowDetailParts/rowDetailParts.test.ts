@@ -47,6 +47,18 @@ describe("rowDetailParts", () => {
 		expect(line({})).toBe("No changes");
 	});
 
+	test("leaves the state and PR word out where the section names the state", () => {
+		expect(
+			line({
+				state: "Needs input",
+				pullRequest: { label: "Open", ink: "text-emerald-500" },
+				diff: { additions: 2, deletions: 0 },
+				context: "web · Cloud",
+				omitState: true,
+			}),
+		).toBe("+2 −0 · web · Cloud");
+	});
+
 	test("context replaces only the branch", () => {
 		expect(
 			line({

@@ -88,6 +88,8 @@ export type HomeListItem =
 			detail?: string;
 			/** Draws a hairline under the row. */
 			separator?: boolean;
+			/** Under a label that names the state, as under Needs me. */
+			stateInLabel?: boolean;
 	  }
 	| {
 			kind: "hostOffline";
@@ -108,6 +110,7 @@ export type HomeListItem =
 			/** A row inside a group, indented as a host's grouped row. */
 			grouped?: boolean;
 			separator?: boolean;
+			stateInLabel?: boolean;
 	  };
 
 export function homeListItemKey(item: HomeListItem): string {

@@ -75,7 +75,7 @@ export function buildNeedsMeList(
 			},
 			...[...list]
 				.sort((a, b) => (b.ts || 0) - (a.ts || 0))
-				.map((candidate) => candidate.item),
+				.map((candidate) => ({ ...candidate.item, stateInLabel: true })),
 		];
 	});
 }

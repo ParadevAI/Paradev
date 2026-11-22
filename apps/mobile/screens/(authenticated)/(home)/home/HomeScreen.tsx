@@ -927,6 +927,7 @@ export function HomeScreen() {
 						detail={item.detail}
 						grouped={item.grouped}
 						separator={item.separator}
+						stateInLabel={item.stateInLabel}
 					/>
 				);
 			}
@@ -1053,6 +1054,7 @@ export function HomeScreen() {
 					detail={item.detail}
 					disabled={item.offline}
 					separator={item.separator}
+					stateInLabel={item.stateInLabel}
 					groups={
 						groups && actions
 							? {

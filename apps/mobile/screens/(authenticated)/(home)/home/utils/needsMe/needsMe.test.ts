@@ -59,6 +59,11 @@ describe("needsMe", () => {
 		]);
 	});
 
+	test("marks its rows as under a label that names their state", () => {
+		const [, row] = buildNeedsMeList([candidate("a", "permission")], labels);
+		expect(row).toMatchObject({ kind: "workspace", stateInLabel: true });
+	});
+
 	test("counts needs input and review but not working", () => {
 		const counts = countAttention([
 			"permission",
