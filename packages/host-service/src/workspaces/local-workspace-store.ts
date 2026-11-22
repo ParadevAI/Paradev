@@ -320,10 +320,8 @@ export interface UpdateLocalWorkspacePatch {
 }
 
 /**
- * Patch a local row, bump `updatedAt`, and broadcast. An archived row is
- * still written (the board's history reads it) but never broadcast: clients
- * dropped it on the archive's `deleted` event, and an `updated` would
- * resurrect it in their lists.
+ * Patch a local row and bump `updatedAt`. Only a live row is broadcast: clients
+ * dropped an archived row on its `deleted` event, and `updated` adds it back.
  */
 export function updateLocalWorkspace(
 	ctx: WorkspaceStoreContext,
