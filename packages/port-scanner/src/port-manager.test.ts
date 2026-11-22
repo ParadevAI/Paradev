@@ -1110,6 +1110,52 @@ describe("PortManager — agent processes", () => {
 		expect(listedPorts()).toEqual([3003]);
 	});
 
+	const addServer = (pid: number, ppid: number) => {
+		processTable.push({ pid, ppid });
+		listeningPorts.push({
+			port: pid + 2000,
+			pid,
+			address: "127.0.0.1",
+			processName: "python3",
+		});
+	};
+
+	it("hides the port of an agent that a wrapper shell runs through a node shim", async () => {
+		argv0.set(1001, "/bin/bash");
+		argv0.set(1002, "node");
+		argv0.set(1003, "/opt/codex/bin/codex");
+		addServer(1004, 1003);
+		await manager.forceScan();
+
+		expect(listedPorts()).toEqual([3004]);
+		expect((await closePort(3004)).success).toBe(true);
+		expect(killed).toEqual([1004]);
+	});
+
+	it("hides the port of an agent that a chat adapter runs through its wrapper shell", async () => {
+		manager.setAgentPidSource(() => ({ pid: 1001, agentIsChild: true }));
+		argv0.set(1001, "/usr/bin/node");
+		argv0.set(1002, "/bin/bash");
+		argv0.set(1003, "node");
+		addServer(1004, 1003);
+		argv0.set(1004, "/opt/codex/bin/codex");
+		addServer(1005, 1004);
+		await manager.forceScan();
+
+		expect(listedPorts()).toEqual([3005]);
+	});
+
+	it("lists the servers of a node agent that a chat adapter runs directly", async () => {
+		manager.setAgentPidSource(() => ({ pid: 1001, agentIsChild: true }));
+		argv0.set(1001, "/usr/bin/node");
+		argv0.set(1002, "node");
+		argv0.set(1003, "/bin/zsh");
+		addServer(1004, 1003);
+		await manager.forceScan();
+
+		expect(listedPorts()).toEqual([3003, 3004]);
+	});
+
 	it("refuses a close request that was listed before the agent started", async () => {
 		manager.setAgentPidSource(() => null);
 		await manager.forceScan();

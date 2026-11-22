@@ -5,7 +5,11 @@ import {
 	setInterval,
 	setTimeout,
 } from "node:timers";
-import { type AgentLaunch, findAgentAncestry } from "./agent-processes.ts";
+import {
+	type AgentLaunch,
+	findAgentAncestry,
+	launcherCandidates,
+} from "./agent-processes.ts";
 import { DetachedProcessResolver } from "./detached.ts";
 import {
 	buildProcessTrees,
@@ -441,7 +445,7 @@ export class PortManager extends EventEmitter {
 	): Promise<Set<number>> {
 		if (launches.length === 0) return new Set();
 		const argv0 = await readProcessArgv0(
-			launches.flatMap(({ pid, agentIsChild }) => (agentIsChild ? [] : [pid])),
+			launcherCandidates(table, launches),
 			signal,
 		);
 		return findAgentAncestry(table, launches, argv0);
