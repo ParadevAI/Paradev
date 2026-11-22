@@ -723,6 +723,14 @@ describe("deep links from guest pages", () => {
 		stop();
 	});
 
+	test("a paradev:// link click is handed to the app", () => {
+		const wc = register("pane-deep-link-paradev");
+		const { urls, stop } = collectDeepLinks();
+		expect(navigate(wc, "paradev://pages/my-page")).toBe(true);
+		expect(urls).toEqual(["paradev://pages/my-page"]);
+		stop();
+	});
+
 	test("the instance's own registered scheme is handled the same way", () => {
 		const wc = register("pane-deep-link-own");
 		const { urls, stop } = collectDeepLinks();

@@ -1,4 +1,7 @@
-import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
+import {
+	ACCEPTED_PROTOCOL_SCHEMES,
+	PROTOCOL_SCHEMES,
+} from "@superset/shared/constants";
 import { getWorkspaceName } from "./env.shared";
 
 export const PLATFORM = {
@@ -11,6 +14,13 @@ const workspace = getWorkspaceName();
 export const PROTOCOL_SCHEME = workspace
 	? `superset-${workspace}`
 	: PROTOCOL_SCHEMES.PROD;
+/** A dev build claims only its own scheme so it never takes links from the installed app. */
+export const REGISTERED_PROTOCOL_SCHEMES: readonly string[] = workspace
+	? [PROTOCOL_SCHEME]
+	: ACCEPTED_PROTOCOL_SCHEMES;
+export const DEEP_LINK_SCHEMES: readonly string[] = [
+	...new Set([PROTOCOL_SCHEME, ...ACCEPTED_PROTOCOL_SCHEMES]),
+];
 /** Height of the Windows/Linux window-controls overlay the window opens with. */
 export const TITLE_BAR_OVERLAY_HEIGHT = 40;
 
