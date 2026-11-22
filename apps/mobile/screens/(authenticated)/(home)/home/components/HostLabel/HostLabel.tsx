@@ -1,10 +1,9 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
-import { ChevronDown, ChevronRight, Cloud, Monitor } from "lucide-react-native";
+import { ChevronDown, ChevronRight } from "lucide-react-native";
 import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import { Icon } from "@/components/ui/icon";
+import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { useTheme } from "@/hooks/useTheme";
@@ -15,12 +14,18 @@ import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import { AttentionMark } from "../AttentionMark";
 
-/** The header's size and colour: a quiet section label. */
-const HEADER_TEXT = "text-[13px] text-muted-foreground";
+/**
+ * Desktop's sidebar section header (DashboardSidebarSectionHeader), at the
+ * iOS minimum of 11 rather than its 10.
+ */
+const HEADER = {
+	label:
+		"text-muted-foreground font-semibold text-[11px] uppercase tracking-[0.075em]",
+	count: "text-muted-foreground text-[11px] tracking-[0.075em] tabular-nums",
+};
 
 interface HostLabelProps {
 	name: string;
-	cloud: boolean;
 	status: PlaceStatus;
 	/** Null = never reached the relay. */
 	lastSeenAt?: number | null;
@@ -37,12 +42,12 @@ interface HostLabelProps {
 }
 
 /**
- * Labels the place the rows under it live on: a quiet section label, set
- * apart by the rule above it and its glyph rather than by size.
+ * Labels the place the rows under it live on, as desktop labels its sidebar
+ * sections: uppercase small text at the screen margin, the count, and a
+ * caret that stays visible since a phone has no hover.
  */
 export function HostLabel({
 	name,
-	cloud,
 	status,
 	lastSeenAt,
 	onRetry,
@@ -73,56 +78,32 @@ export function HostLabel({
 	const content = (
 		<View
 			className={cn(
-				"min-w-0 flex-1 flex-row items-center gap-3",
+				"min-w-0 flex-1 flex-row items-center gap-1.5",
+				enlargedText && "flex-wrap",
 				unreachable && "opacity-60",
 			)}
 		>
-			<View className="size-6 items-center justify-center">
-				<Icon
-					as={cloud ? Cloud : Monitor}
-					className="text-muted-foreground size-4"
-					strokeWidth={2}
-				/>
-			</View>
-			<View
-				className={cn(
-					"min-w-0 flex-1 flex-row items-center gap-x-2",
-					enlargedText && "flex-wrap",
-				)}
+			<Text
+				className={cn(HEADER.label, "shrink")}
+				numberOfLines={enlargedText ? undefined : 1}
 			>
-				<Text
-					className={cn(HEADER_TEXT, "shrink font-semibold")}
-					numberOfLines={enlargedText ? undefined : 1}
-				>
-					{name}
-				</Text>
-				{statusText ? (
-					<Text
-						className="text-muted-foreground shrink text-[13px]"
-						numberOfLines={enlargedText ? undefined : 1}
-					>
-						{`· ${statusText}`}
-					</Text>
-				) : null}
-				{onToggle ? (
-					<>
-						<Text className="text-muted-foreground text-[13px] tabular-nums">
-							{count}
-						</Text>
-						<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
-						{attention ? <AttentionMark attention={attention} /> : null}
-					</>
-				) : null}
-			</View>
+				{statusText ? `${name} · ${statusText}` : name}
+			</Text>
+			{onToggle ? (
+				<>
+					<Text className={HEADER.count}>{count}</Text>
+					<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
+					{attention ? <AttentionMark attention={attention} /> : null}
+				</>
+			) : null}
 		</View>
 	);
 	return (
 		<View
 			className={cn(
-				"flex-row items-center gap-3 px-4 pb-1 pt-2",
-				!first && "border-border mt-3",
+				"flex-row items-center gap-3 px-4 pb-0",
+				first ? "pt-2" : "pt-6",
 			)}
-			style={first ? undefined : { borderTopWidth: StyleSheet.hairlineWidth }}
 		>
 			{onToggle ? (
 				// The toggle and Try again are siblings so VoiceOver reaches both.
@@ -149,7 +130,9 @@ export function HostLabel({
 					{content}
 				</Pressable>
 			) : (
-				content
+				<View className="min-h-11 min-w-0 flex-1 flex-row items-center">
+					{content}
+				</View>
 			)}
 			{onRetry && unreachable ? (
 				<Pressable

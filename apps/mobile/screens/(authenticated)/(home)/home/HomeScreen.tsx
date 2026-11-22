@@ -766,7 +766,6 @@ export function HomeScreen() {
 				return (
 					<HostLabel
 						name={item.name}
-						cloud={item.cloud}
 						status={item.status}
 						lastSeenAt={item.lastSeenAt}
 						onRetry={item.retry ? refreshPresence : undefined}
