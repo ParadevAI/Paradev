@@ -1,3 +1,4 @@
+import { withoutSignInPrompt } from "./non-interactive-env";
 import { createUserSimpleGit } from "./simple-git";
 import type { GitCredentialProvider, GitFactory } from "./types";
 import { getRemoteUrl } from "./utils";
@@ -75,9 +76,11 @@ export function createGitEnvResolver(provider: GitCredentialProvider) {
 
 export function createGitFactory(provider: GitCredentialProvider): GitFactory {
 	const resolveEnv = createGitEnvResolver(provider);
-	return async (repoPath, options) =>
-		createUserSimpleGit(repoPath, {
+	return async (repoPath, { interactive = true, ...options } = {}) => {
+		const env = await resolveEnv(repoPath);
+		return createUserSimpleGit(repoPath, {
 			...options,
-			env: await resolveEnv(repoPath),
+			env: interactive ? env : withoutSignInPrompt(env),
 		});
+	};
 }

@@ -204,11 +204,11 @@ function runStatusSnapshot(
 						() =>
 							workerPool.run(
 								gitFetchBaseRefTask,
-								{ worktreePath, target, gitEnv },
+								{ worktreePath, target, gitEnv, interactive: false },
 								{
 									timeoutMs: 30_000,
 									strategy: "coalesce",
-									dedupeKey: `${worktreePath}:base-ref:${target.remote}/${target.branch}`,
+									dedupeKey: `${worktreePath}:base-ref-background:${target.remote}/${target.branch}`,
 								},
 							),
 					).then((staleWorkspaceIds) => {
@@ -625,6 +625,7 @@ export const gitRouter = router({
 				workspaceId: z.string(),
 				branches: z.array(branchName).max(20),
 				missingOnly: z.boolean().default(false),
+				interactive: z.boolean().default(true),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -638,6 +639,7 @@ export const gitRouter = router({
 						branches: input.branches,
 						missingOnly: input.missingOnly,
 						gitEnv,
+						interactive: input.interactive,
 					},
 					{ timeoutMs: 120_000 },
 				)

@@ -39,7 +39,9 @@ export const searchBranches = protectedProcedure
 			};
 		}
 
-		const git = await ctx.git(requireProjectRepoPath(localProject));
+		const git = await ctx.git(requireProjectRepoPath(localProject), {
+			interactive: false,
+		});
 
 		// Honor `refresh` only if TTL elapsed — prevents thrashing `git fetch`
 		// on every keystroke when the client tags first-page requests.

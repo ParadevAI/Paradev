@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { unlink } from "node:fs/promises";
 import { promisify } from "node:util";
 import { resolveCommand } from "@superset/shared/resolve-command";
+import { withoutSignInPrompt } from "../../../runtime/git/non-interactive-env";
 import type {
 	CredentialProblem,
 	GitCredentialProvider,
@@ -125,7 +126,10 @@ export class LocalGitCredentialProvider implements GitCredentialProvider {
 	): Promise<string | null> {
 		// Launched from a terminal with no credential helper, git would prompt
 		// on the tty and sit there until the timeout.
-		const env = { ...(await this.envResolver()), GIT_TERMINAL_PROMPT: "0" };
+		const env = withoutSignInPrompt({
+			...(await this.envResolver()),
+			GIT_TERMINAL_PROMPT: "0",
+		});
 		return new Promise((resolve) => {
 			const child = execFile(
 				resolveCommand("git", { env }),

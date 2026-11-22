@@ -148,3 +148,16 @@ describe("LocalGitCredentialProvider token sources", () => {
 		});
 	});
 });
+
+/** A credential helper that answers with the GCM_INTERACTIVE it was given. */
+const GIT_HELPER_ECHOES_GCM_INTERACTIVE_STUB = `#!/bin/sh
+cat > /dev/null
+printf 'password=%s\\n' "\${GCM_INTERACTIVE:-unset}"
+`;
+
+describe("LocalGitCredentialProvider token lookup", () => {
+	test("asks the credential helper without letting it open a sign-in window", async () => {
+		const provider = providerWith({}, GIT_HELPER_ECHOES_GCM_INTERACTIVE_STUB);
+		expect(await provider.getToken("dev.azure.com")).toBe("never");
+	});
+});

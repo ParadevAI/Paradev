@@ -17,6 +17,7 @@ import {
 	type ResolvedGitInfo,
 	readGitIdentity,
 } from "../../runtime/git/identity.ts";
+import { withoutSignInPrompt } from "../../runtime/git/non-interactive-env.ts";
 import { resolveRef, resolveUpstream } from "../../runtime/git/refs.ts";
 import { createUserSimpleGit } from "../../runtime/git/simple-git.ts";
 import { isMissingPath } from "../../runtime/path-state/index.ts";
@@ -89,12 +90,15 @@ export const gitFetchBaseRefTask = defineWorkerTask<
 		worktreePath: string;
 		target: BaseRefFetchTarget;
 		gitEnv: GitTaskEnv;
+		interactive: boolean;
 	},
 	void
 >({
 	type: "git/fetchBaseRef",
-	handler: async ({ worktreePath, target, gitEnv }) => {
-		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+	handler: async ({ worktreePath, target, gitEnv, interactive }) => {
+		const git = createUserSimpleGit(worktreePath, {
+			env: interactive ? gitEnv : withoutSignInPrompt(gitEnv),
+		});
 		await git.fetch([target.remote, target.branch, "--quiet", "--no-tags"]);
 	},
 });
@@ -558,12 +562,21 @@ export const gitFetchBranchesTask = defineWorkerTask<
 		/** Skip the branches `git switch` can already resolve. */
 		missingOnly: boolean;
 		gitEnv: GitTaskEnv;
+		interactive: boolean;
 	},
 	{ fetched: string[] }
 >({
 	type: "git/fetchBranches",
-	handler: async ({ worktreePath, branches, missingOnly, gitEnv }) => {
-		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+	handler: async ({
+		worktreePath,
+		branches,
+		missingOnly,
+		gitEnv,
+		interactive,
+	}) => {
+		const git = createUserSimpleGit(worktreePath, {
+			env: interactive ? gitEnv : withoutSignInPrompt(gitEnv),
+		});
 		let wanted = branches;
 		if (missingOnly) {
 			const known = await knownBranchNames(git);
