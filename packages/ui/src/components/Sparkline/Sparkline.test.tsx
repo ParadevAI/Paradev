@@ -2,29 +2,43 @@ import { describe, expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Sparkline } from "./Sparkline";
 
-const pointsOf = (markup: string) =>
-	markup.match(/points="([^"]*)"/)?.[1]?.split(" ");
+const render = (props: Partial<Parameters<typeof Sparkline>[0]>) =>
+	renderToStaticMarkup(<Sparkline title="t" points={[0, 10]} {...props} />);
+const pathOf = (markup: string) => markup.match(/ d="([^"]*)"/)?.[1];
 
 describe("Sparkline", () => {
-	test("draws the highest point at the top and zero at the bottom", () => {
-		const markup = renderToStaticMarkup(
-			<Sparkline title="t" points={[0, 10]} width={11} height={11} />,
-		);
-		expect(pointsOf(markup)).toEqual(["1,10", "10,1"]);
+	test("keeps 2 px above the peak and below the baseline", () => {
+		expect(pathOf(render({ width: 10, height: 10 }))).toBe("M0,8L10,2");
+	});
+
+	test("is 80 by 20, fills its cell up to 80 px, and keeps its stroke width", () => {
+		const markup = render({});
+		expect(markup).toContain('viewBox="0 0 80 20"');
+		expect(markup).toContain('preserveAspectRatio="none"');
+		expect(markup).toContain("width:100%;max-width:80px");
+		expect(markup).toContain('vector-effect="non-scaling-stroke"');
+	});
+
+	test("joins the points with a curve, not straight segments", () => {
+		expect(pathOf(render({ points: [0, 10, 0, 10] }))).toContain("C");
 	});
 
 	test("names the chart for a screen reader", () => {
-		const markup = renderToStaticMarkup(
-			<Sparkline title="Usage" points={[1]} />,
-		);
+		const markup = render({ title: "Usage" });
 		expect(markup).toContain("<title>Usage</title>");
 		expect(markup).toContain('aria-label="Usage"');
 	});
 
-	test("an all-zero series is a flat line at the bottom", () => {
-		const markup = renderToStaticMarkup(
-			<Sparkline title="t" points={[0, 0]} width={11} height={11} />,
+	test("a single point and equal values are flat lines", () => {
+		expect(pathOf(render({ points: [5], width: 10, height: 10 }))).toBe(
+			"M0,2L10,2",
 		);
-		expect(pointsOf(markup)).toEqual(["1,10", "10,10"]);
+		expect(pathOf(render({ points: [0, 0], width: 10, height: 10 }))).toBe(
+			"M0,8L10,8",
+		);
+	});
+
+	test("draws nothing for no points", () => {
+		expect(render({ points: [] })).toBe("");
 	});
 });

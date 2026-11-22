@@ -1,3 +1,5 @@
+import { curveMonotoneX, line } from "d3-shape";
+
 export interface SparklineProps {
 	points: number[];
 	title: string;
@@ -6,38 +8,41 @@ export interface SparklineProps {
 	className?: string;
 }
 
-const PADDING = 1;
+const PADDING = 2;
 
 export function Sparkline({
 	points,
 	title,
-	width = 96,
-	height = 24,
+	width = 80,
+	height = 20,
 	className,
 }: SparklineProps) {
-	const line = points.length === 1 ? [...points, ...points] : points;
-	const top = Math.max(...line, 0) || 1;
-	const x = (index: number) =>
-		PADDING + (index * (width - 2 * PADDING)) / (line.length - 1);
-	const y = (value: number) =>
-		height - PADDING - (value / top) * (height - 2 * PADDING);
+	if (points.length === 0) return null;
+	const values = points.length === 1 ? [...points, ...points] : points;
+	const top = Math.max(...values, 0) || 1;
+	const path = line<number>()
+		.curve(curveMonotoneX)
+		.x((_, i) => (i * width) / (values.length - 1))
+		.y((value) => height - PADDING - (value / top) * (height - 2 * PADDING));
 	return (
 		<svg
 			role="img"
 			aria-label={title}
-			width={width}
 			height={height}
+			width={width}
 			viewBox={`0 0 ${width} ${height}`}
+			preserveAspectRatio="none"
+			style={{ display: "block", width: "100%", maxWidth: width }}
 			className={className}
 		>
 			<title>{title}</title>
-			<polyline
-				points={line.map((value, i) => `${x(i)},${y(value)}`).join(" ")}
-				fill="none"
-				stroke="currentColor"
-				strokeWidth={1.5}
+			<path
+				d={path(values) ?? ""}
+				fill="transparent"
+				className="stroke-chart-1"
+				strokeWidth={2}
 				strokeLinecap="round"
-				strokeLinejoin="round"
+				vectorEffect="non-scaling-stroke"
 			/>
 		</svg>
 	);

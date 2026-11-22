@@ -27,6 +27,16 @@ export const Default: Story = {};
 
 export const NoUsage: Story = { args: { points: Array(30).fill(0) } };
 
-export const OneDay: Story = { args: { points: [12] } };
+export const NoPoints: Story = { args: { points: [] } };
 
-export const Wide: Story = { args: { width: 240, height: 48 } };
+export const OnePoint: Story = { args: { points: [12] } };
+
+export const Narrow: Story = {
+	decorators: [
+		(Story) => (
+			<div className="w-10">
+				<Story />
+			</div>
+		),
+	],
+};
