@@ -19,6 +19,7 @@ import {
 	shouldSurfaceDiagnosis,
 } from "./attach-retry-diagnosis";
 import { terminalQueryColors } from "./terminal-query-colors";
+import { writeReplayedOutput } from "./terminal-replay-write";
 import {
 	classifyTerminalFailure,
 	type TerminalFailureClassification,
@@ -59,6 +60,8 @@ type TerminalServerMessage =
 			type: "synced";
 			epoch: string;
 			seq: number;
+			// Live stream position; bytes before it are replayed. Old hosts omit it.
+			head?: number;
 			mode: "exact" | "tail" | "reanchor";
 	  }
 	// Liveness probe. The host drops a client that answered before and then
@@ -193,6 +196,8 @@ export interface TerminalTransport {
 	 * With `_seqCounting` still false at close time, it means a pre-seq host
 	 * fed the xterm uncounted bytes — the anchor is invalidated. */
 	_bytesSinceAttach: boolean;
+	/** Replayed bytes still to come on this connection, from `synced`. */
+	_replayBytesLeft: number;
 	/**
 	 * True when the xterm was born with content (restored snapshot or seeded
 	 * from a sibling instance). Without an anchor, such an xterm must never
@@ -473,6 +478,7 @@ export function createTransport(
 		seqAnchor: null,
 		_seqCounting: false,
 		_seqEverSynced: false,
+		_replayBytesLeft: 0,
 		_bytesSinceAttach: false,
 		_xtermHadContent: false,
 		_repaintRequest: "none",
@@ -814,7 +820,15 @@ function attachSocketListeners(
 			if (transport._seqCounting && transport.seqAnchor) {
 				transport.seqAnchor.seq += data.byteLength;
 			}
-			transport._writeCoalescer?.push(new Uint8Array(data));
+			let bytes = new Uint8Array(data);
+			if (transport._replayBytesLeft > 0) {
+				const replayed = bytes.subarray(0, transport._replayBytesLeft);
+				transport._replayBytesLeft -= replayed.byteLength;
+				bytes = bytes.subarray(replayed.byteLength);
+				transport._writeCoalescer?.flushSync();
+				writeReplayedOutput(terminal, replayed);
+			}
+			if (bytes.byteLength > 0) transport._writeCoalescer?.push(bytes);
 			transport._hasReceivedBytes = true;
 			transport._bytesSinceAttach = true;
 			return;
@@ -863,6 +877,7 @@ function attachSocketListeners(
 			// pre-seq host, and neither advances the stream position.
 			transport._seqCounting = false;
 			transport._bytesSinceAttach = false;
+			transport._replayBytesLeft = 0;
 			setConnectionState(transport, "open");
 			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
@@ -879,6 +894,10 @@ function attachSocketListeners(
 			transport.seqAnchor = { epoch: message.epoch, seq: message.seq };
 			transport._seqCounting = true;
 			transport._seqEverSynced = true;
+			transport._replayBytesLeft = Math.max(
+				0,
+				(message.head ?? message.seq) - message.seq,
+			);
 			// Re-assert current keyboard focus so the running program's focus
 			// state can't stay stale across the reattach (tmux does the same on
 			// client attach). xterm's own DECSET-1004 self-report fires while

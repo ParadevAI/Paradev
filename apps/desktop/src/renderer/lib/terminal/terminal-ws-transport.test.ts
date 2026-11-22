@@ -8,6 +8,7 @@ import {
 	test,
 } from "bun:test";
 import type { createRelaySocket } from "@superset/workspace-client/relay-socket";
+import { Terminal as HeadlessTerminal } from "@xterm/headless";
 import type { Terminal as XTerm } from "@xterm/xterm";
 import {
 	background,
@@ -1136,5 +1137,39 @@ describe("background", () => {
 		expect(socket.closed).toBe(true);
 		expect(socket.reconnectCount).toBe(0);
 		expect(transport.connectionState).toBe("disconnected");
+	});
+});
+
+describe("replayed output", () => {
+	test("queries in bytes before the synced head are not answered; live ones are", async () => {
+		const transport = createTransport();
+		const terminal = new HeadlessTerminal({ allowProposedApi: true });
+		connect(transport, terminal as unknown as XTerm, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		const replayed = "$ \x1b[c\x1b[6n";
+		socket.message(
+			JSON.stringify({
+				type: "synced",
+				epoch: "e1",
+				seq: 0,
+				head: replayed.length,
+				mode: "tail",
+			}),
+		);
+		const frame = new TextEncoder().encode(`${replayed}\x1b[c`);
+		socket.message(frame.buffer);
+		transport._writeCoalescer?.flushSync();
+		await new Promise<void>((resolve) => terminal.write("", resolve));
+
+		const inputs = socket.sent
+			.map((raw) => JSON.parse(raw) as { type: string; data?: string })
+			.filter((message) => message.type === "input");
+		expect(inputs).toEqual([{ type: "input", data: "\x1b[?1;2c" }]);
+		expect(transport.seqAnchor).toEqual({ epoch: "e1", seq: frame.length });
+		disconnect(transport);
+		terminal.dispose();
 	});
 });
