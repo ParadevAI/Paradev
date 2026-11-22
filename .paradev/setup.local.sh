@@ -211,6 +211,7 @@ local_write_env() {
     echo "# ===== Local workspace overrides (setup.local.sh) ====="
     write_env_var "SUPERSET_WORKSPACE_NAME" "${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
     write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
+    write_env_var "PARADEV_HOME_DIR" "$PWD/$DEV_DATA_DIR"
     write_env_var "SUPERSET_PORT_BASE" "$BASE"
     echo ""
     echo "# Per-workspace local DB stack (docker compose project $LOCAL_DB_PROJECT)"

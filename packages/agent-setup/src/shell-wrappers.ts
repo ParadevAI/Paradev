@@ -32,17 +32,17 @@ function getShellName(shell: string): string {
 }
 
 /**
- * Shell snippet to save all SUPERSET_* env vars before sourcing user RC files.
+ * Shell snippet to save all SUPERSET_* and PARADEV_* env vars before sourcing user RC files.
  * Used in tandem with {@link SUPERSET_ENV_RESTORE} to prevent user shell
  * configs from overriding Superset-managed environment variables (e.g.
  * SUPERSET_WORKSPACE_NAME).
  *
  * @see https://github.com/AidenIO/superset/issues/2386
  */
-const SUPERSET_ENV_SAVE = `_superset_saved_env="$(export -p 2>/dev/null | grep ' SUPERSET_')"`;
+const SUPERSET_ENV_SAVE = `_superset_saved_env="$(export -p 2>/dev/null | grep -E ' (SUPERSET|PARADEV)_')"`;
 
 /**
- * Shell snippet to restore previously saved SUPERSET_* env vars after
+ * Shell snippet to restore previously saved SUPERSET_* and PARADEV_* env vars after
  * sourcing user RC files.
  */
 const SUPERSET_ENV_RESTORE = `eval "$_superset_saved_env" 2>/dev/null || true`;

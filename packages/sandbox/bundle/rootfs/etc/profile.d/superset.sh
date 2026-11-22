@@ -3,6 +3,7 @@
 export LANG="${LANG:-C.UTF-8}" LC_ALL="${LC_ALL:-C.UTF-8}"
 [ -f /etc/superset/contract.sh ] && . /etc/superset/contract.sh
 export SUPERSET_WORKSPACE_PATH="${SUPERSET_WORKSPACE_DIR:-/workspace}"
+export PARADEV_WORKSPACE_PATH="$SUPERSET_WORKSPACE_PATH"
 export BROWSER=/usr/local/bin/google-chrome
 export DISPLAY="${DISPLAY:-${SUPERSET_DISPLAY:-:1}}"
 # The desktop session's bus, written by superset-desktop-init once it is up.

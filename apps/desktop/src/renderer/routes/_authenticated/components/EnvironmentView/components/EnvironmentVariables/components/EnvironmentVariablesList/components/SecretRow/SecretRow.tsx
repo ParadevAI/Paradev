@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { formatDate } from "@superset/i18n/format";
+import { isReservedKey } from "@superset/shared/environment-secrets";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -116,6 +117,21 @@ export function SecretRow({
 					<span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
 						<Trans>Sensitive</Trans>
 					</span>
+				)}
+				{isReservedKey(secret.key) && (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-destructive/10 text-destructive shrink-0">
+								<Trans>Not passed to workspaces</Trans>
+							</span>
+						</TooltipTrigger>
+						<TooltipContent className="max-w-xs">
+							<Trans>
+								Paradev reserves this name, so workspaces do not receive it.
+								Delete it and add the value under another name.
+							</Trans>
+						</TooltipContent>
+					</Tooltip>
 				)}
 			</div>
 

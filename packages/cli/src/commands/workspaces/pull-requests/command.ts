@@ -1,4 +1,5 @@
 import { boolean, CLIError, positional, table } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { command } from "../../../lib/command";
 
 export default command({
@@ -27,7 +28,7 @@ export default command({
 			(args.id as string | undefined) ??
 			(options.all || options.archived
 				? undefined
-				: process.env.SUPERSET_SANDBOX_WORKSPACE_ID);
+				: readPublicEnv("SANDBOX_WORKSPACE_ID"));
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: paradev auth login");

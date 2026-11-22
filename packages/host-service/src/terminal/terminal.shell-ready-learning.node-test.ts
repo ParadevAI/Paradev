@@ -80,7 +80,7 @@ let workspaceId: string;
  * through .zshenv/.zprofile/.zshrc, marker hook registered last in .zlogin.
  */
 function writeZshWrappers(zshDir: string): void {
-	const SAVE = `_superset_saved_env="$(export -p 2>/dev/null | grep ' SUPERSET_')"`;
+	const SAVE = `_superset_saved_env="$(export -p 2>/dev/null | grep -E ' (SUPERSET|PARADEV)_')"`;
 	const RESTORE = `eval "$_superset_saved_env" 2>/dev/null || true`;
 	const quoted = `'${zshDir}'`;
 	fs.mkdirSync(zshDir, { recursive: true });

@@ -7,6 +7,8 @@
  * untouched (version managers, proxy config, etc.).
  */
 
+import { RESERVED_PARADEV_ENV_KEYS } from "@superset/shared/public-env";
+
 /**
  * Exact keys injected by desktop into host-service.
  *
@@ -61,6 +63,7 @@ export function stripTerminalRuntimeEnv(
 		if (NODE_APP_KEYS.has(key)) continue;
 		if (STRIP_PREFIXES.some((prefix) => key.startsWith(prefix))) continue;
 		if (key.startsWith("SUPERSET_") && !SUPERSET_KEEP_KEYS.has(key)) continue;
+		if (RESERVED_PARADEV_ENV_KEYS.includes(key)) continue;
 
 		result[key] = value;
 	}

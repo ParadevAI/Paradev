@@ -628,6 +628,20 @@ describe("env", () => {
 			}
 		});
 
+		it("keeps the PARADEV_ aliases through the PTY session's buildSafeEnv", () => {
+			const result = buildSafeEnv(buildTerminalEnv(baseParams));
+			expect(result.PARADEV_WORKSPACE_ID).toBe("ws-1");
+			expect(result.PARADEV_PANE_ID).toBe(result.SUPERSET_PANE_ID);
+		});
+
+		it("sets the terminal variables under PARADEV_ too", () => {
+			const result = buildTerminalEnv(baseParams);
+			expect(result.PARADEV_PANE_ID).toBe("pane-1");
+			expect(result.PARADEV_TAB_ID).toBe("tab-1");
+			expect(result.PARADEV_WORKSPACE_ID).toBe("ws-1");
+			expect(result.PARADEV_ENV).toBe(result.SUPERSET_ENV);
+		});
+
 		describe("excludes non-allowlisted vars from terminals", () => {
 			it("should exclude NODE_ENV from Electron's process.env", () => {
 				process.env.NODE_ENV = "production";

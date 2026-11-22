@@ -125,6 +125,10 @@
 			"types": "./src/env-file.ts",
 			"default": "./src/env-file.ts"
 		},
+		"./public-env": {
+			"types": "./src/public-env.ts",
+			"default": "./src/public-env.ts"
+		},
 		"./environment-secrets": {
 			"types": "./src/environment-secrets.ts",
 			"default": "./src/environment-secrets.ts"

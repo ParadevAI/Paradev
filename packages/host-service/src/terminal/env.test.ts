@@ -510,6 +510,28 @@ describe("buildV2TerminalEnv", () => {
 		expect(env.LANG).toContain("UTF-8");
 	});
 
+	test("sets every terminal variable under PARADEV_ too, replacing inherited ones", () => {
+		const env = buildV2TerminalEnv({
+			...baseParams,
+			baseEnv: {
+				...baseParams.baseEnv,
+				PARADEV_TERMINAL_ID: "outer-term",
+				PARADEV_HOME_DIR: "/elsewhere",
+				PARADEV_FOO: "users-own",
+			},
+		});
+		expect(env).toMatchObject({
+			PARADEV_TERMINAL_ID: "term-1",
+			PARADEV_ORGANIZATION_ID: "org-1",
+			PARADEV_WORKSPACE_ID: "ws-1",
+			PARADEV_WORKSPACE_PATH: "/tmp/workspace",
+			PARADEV_ROOT_PATH: "/tmp/repo",
+			PARADEV_ENV: "production",
+			PARADEV_HOME_DIR: "/Users/test/.superset",
+		});
+		expect(env.PARADEV_FOO).toBe("users-own");
+	});
+
 	test("claims no terminal identity, even one inherited from the parent", () => {
 		const env = buildV2TerminalEnv({
 			...baseParams,

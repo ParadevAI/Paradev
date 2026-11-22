@@ -42,7 +42,7 @@ run_json localWorkspaces workspaces list --local
 run_json agents agents list --local
 run_json hosts hosts list
 run_json tasks tasks list
-(unset SUPERSET_WORKSPACE_ID; run_json pages pages list)
+(unset SUPERSET_WORKSPACE_ID PARADEV_WORKSPACE_ID; run_json pages pages list)
 
 args=()
 for key in whoami automations workspaces localWorkspaces agents hosts tasks pages; do

@@ -1062,10 +1062,11 @@ A desktop started from an agent's shell also inherits `ELECTRON_RUN_AS_NODE=1`
 and dies at `electron.app.commandLine` before a window opens.
 
 **What we did:** `dev-stack.cloud.sh` now unsets
-`SUPERSET_SANDBOX_WORKSPACE_ID` for the desktop window, and the plugin
+`SUPERSET_SANDBOX_WORKSPACE_ID` and `PARADEV_SANDBOX_WORKSPACE_ID` (the CLI
+reads either) for the desktop window, and the plugin
 commands are no longer `sandbox: false`, because every plugin route works from
 a cloud workspace. A desktop started by hand still needs
-`unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID`. The box also has no
+`unset ELECTRON_RUN_AS_NODE SUPERSET_SANDBOX_WORKSPACE_ID PARADEV_SANDBOX_WORKSPACE_ID`. The box also has no
 object store for `R2_ENDPOINT` (`localhost:9000`): Docker Hub refuses
 `minio/minio` and MinIO's binary download answers 410, so an in-memory S3
 stand-in on that port was used for the test.

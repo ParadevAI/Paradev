@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { CANONICAL_URLS } from "@superset/shared/constants";
 import { HOST_INSTALL_SOURCE_ENV } from "@superset/shared/host-version";
+import { publicEnvPair } from "@superset/shared/public-env";
 import {
 	MAX_HOST_LOG_BYTES,
 	openRotatingLogFd,
@@ -170,7 +171,7 @@ export async function spawnHostService(
 			// (host-service-coordinator.ts); without it the host's PTYs get no
 			// SUPERSET_HOME_DIR and every managed agent hook self-disables on
 			// its own guard (#6254).
-			SUPERSET_HOME_DIR: resolveAppHomeDir(),
+			...publicEnvPair("HOME_DIR", resolveAppHomeDir()),
 		},
 	});
 

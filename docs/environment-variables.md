@@ -178,3 +178,23 @@ build again.
 
 Do not change the shared secrets to move desktop: the legacy API uses
 `NEXT_PUBLIC_API_URL` as its token issuer and audience.
+
+## Not this: variables a terminal sees
+
+This page is for deploy and server variables. The variables the app sets in
+terminals, agents and hooks (`SUPERSET_TERMINAL_ID`, `SUPERSET_WORKSPACE_ID`,
+`SUPERSET_HOME_DIR`, …) are listed in `PUBLIC_ENV_NAMES`
+(`packages/shared/src/public-env.ts`). Each is set under both `SUPERSET_` and
+`PARADEV_` with the same value. Read one with `readPublicEnv`: the `SUPERSET_`
+value wins when it is set and not empty, and `PARADEV_` is used only when it is
+not. Existing scripts and profiles override the old name, so it must keep
+winning. For the same reason, code that clears one of these variables must
+unset both names. Never remove the `SUPERSET_` name: released CLIs and the
+hook scripts on users' machines read only that one.
+
+For cloud environment variables (`packages/shared/src/environment-secrets.ts`),
+the whole `SUPERSET_` prefix is reserved, but only the exact `PARADEV_` names
+in `IDENTITY_ENV_NAMES` are. Customers saved other `PARADEV_*` variables (for
+example `PARADEV_API_KEY`) before the rename, and those still reach their
+boxes. In a cloud workspace the CLI reads only `SUPERSET_API_KEY` and
+`SUPERSET_API_URL`, so such a saved variable does not change how it signs in.

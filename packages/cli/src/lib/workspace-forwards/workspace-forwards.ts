@@ -1,4 +1,5 @@
 import { CLIError } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import type { ApiClient } from "../api-client";
 
 export interface ForwardRow {
@@ -10,7 +11,7 @@ export interface ForwardRow {
 }
 
 export function forwardsWorkspaceId(option: string | null | undefined): string {
-	const id = option ?? process.env.SUPERSET_WORKSPACE_ID;
+	const id = option ?? readPublicEnv("WORKSPACE_ID");
 	if (!id) {
 		throw new CLIError(
 			"No workspace",
