@@ -15,12 +15,14 @@ The open-source workspace for Claude Code, Codex, and any coding agent.
 
 ## Why Paradev
 
-Paradev is the workspace for parallel coding agents.
+Paradev is the workspace for running parallel coding agents. You can run any coding agent, like Claude Code or Codex.
 
 - **Agents run in parallel and never touch each other's files.** Every task gets its own worktree, branch, and terminal.
-- **Your sessions keep running.** Closing your laptop doesn't kill them, and you can upgrade the app while they run.
-- **You can view Git changes right in the app.** Read the diff, check the pull request, and merge without leaving.
-- **It is open, so you can fork it and inspect it.** Paradev runs Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, and any other CLI agent on the plans and API keys you already have. Model calls go straight to your provider.
+- **Run on your laptop, in the cloud, or on a remote machine.** Closing your laptop doesn't kill your agents.
+- **Agents can drive it too.** Our CLI, MCP server, and skills let agents drive the entire app and orchestrate other agents.
+- **Check in from anywhere** with our mobile and web apps.
+- **View Git changes right in the app.** Read the diff, check the pull request, and merge without leaving.
+- **Use the agents you already have.** Paradev runs Claude Code, Codex, OpenCode, Gemini, Cursor Agent, and any other CLI agent on the plans and API keys you already have.
 
 ## Get started
 
