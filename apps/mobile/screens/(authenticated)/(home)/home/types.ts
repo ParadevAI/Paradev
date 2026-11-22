@@ -27,6 +27,13 @@ export type HomeListItem =
 			retry?: boolean;
 			/** The list's first item. */
 			first?: boolean;
+			/** Under several places the header folds its place away. */
+			collapsible?: boolean;
+			collapsed?: boolean;
+			/** Workspaces listed under the place. */
+			count?: number;
+			/** The most urgent state among rows a collapsed place hides. */
+			attention?: TerminalAttention | null;
 	  }
 	| {
 			kind: "placeEmpty";

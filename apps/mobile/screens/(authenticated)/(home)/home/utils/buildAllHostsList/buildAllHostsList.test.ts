@@ -201,6 +201,60 @@ describe("buildAllHostsList", () => {
 		]);
 	});
 
+	test("a collapsed host hides its rows and empty note, keeping its header", () => {
+		const list = buildAllHostsList({
+			hosts: [
+				{
+					machineId: "m1",
+					name: "Alpha",
+					status: "online",
+					collapsed: true,
+					attentions: [null],
+					items: [{ kind: "workspace", workspace: workspace("a", "m1") }],
+				},
+				{
+					machineId: "m2",
+					name: "Studio",
+					status: "offline",
+					collapsed: true,
+					items: [],
+					empty: { label: "No saved workspaces" },
+				},
+			],
+			cloud: { name: "Cloud", items: [], empty: { label: "None yet" } },
+		});
+		expect(list.map(describeItem)).toEqual([
+			"label:Alpha",
+			"label:Cloud",
+			"empty:None yet",
+			"label:Studio:offline",
+		]);
+	});
+
+	test("a collapsed place's header rolls up the most urgent state and the count", () => {
+		const place = (collapsed: boolean) =>
+			buildAllHostsList({
+				hosts: [
+					{
+						machineId: "m1",
+						name: "Alpha",
+						status: "online",
+						collapsed,
+						attentions: ["review", "permission", "working", null],
+						items: [],
+					},
+				],
+				cloud: null,
+			})[0];
+		expect(place(true)).toMatchObject({
+			kind: "hostLabel",
+			collapsed: true,
+			count: 4,
+			attention: "permission",
+		});
+		expect(place(false)).toMatchObject({ count: 4, attention: null });
+	});
+
 	test("leaves Cloud out where it is not offered", () => {
 		const list = buildAllHostsList({
 			hosts: [

@@ -88,6 +88,7 @@ import { useTagFolderActions } from "./hooks/useTagFolderActions";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
 import {
 	collapsedProjectKey,
+	PLACE_COLLAPSE_KEY,
 	useCollapsedProjectsStore,
 } from "./stores/collapsedProjectsStore";
 import { useComposerFocusStore } from "./stores/composerFocusStore";
@@ -96,7 +97,7 @@ import {
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
 import { type HomeListItem, homeListItemKey } from "./types";
-import { buildAllHostsList } from "./utils/buildAllHostsList";
+import { buildAllHostsList, CLOUD_PLACE_ID } from "./utils/buildAllHostsList";
 import {
 	buildHostSection,
 	type HostSectionOptions,
@@ -188,6 +189,7 @@ export function HomeScreen() {
 		selectedHost,
 		hosts: scopeHosts,
 		cloud: cloudSelected,
+		orgHosts,
 	} = useScopeSelection();
 	const scopeLabel = useScopeLabel();
 	const cloudScope = scope === "cloud";
@@ -288,6 +290,12 @@ export function HomeScreen() {
 	const toggleProject = useCollapsedProjectsStore(
 		(state) => state.toggleProject,
 	);
+	const prunePlaces = useCollapsedProjectsStore((state) => state.prunePlaces);
+	// Only an answered roster says a machine is gone.
+	useEffect(() => {
+		if (!collapseHydrated || !hostsQuery.isSuccess) return;
+		prunePlaces([...orgHosts.map((host) => host.machineId), CLOUD_PLACE_ID]);
+	}, [collapseHydrated, hostsQuery.isSuccess, orgHosts, prunePlaces]);
 
 	const activityTs = useCallback(
 		(workspace: HostWorkspaceItem) =>
@@ -500,6 +508,9 @@ export function HomeScreen() {
 				empty: t({ message: "No workspaces on this host yet" }),
 				nothingSaved: t({ message: "No saved workspaces" }),
 			};
+			const placeCollapsed = (placeId: string) =>
+				collapseHydrated &&
+				!!collapsed[collapsedProjectKey(placeId, PLACE_COLLAPSE_KEY)];
 			return buildAllHostsList({
 				hosts: scopeHosts.map((host) => {
 					const status = statusOf(host);
@@ -509,6 +520,14 @@ export function HomeScreen() {
 						name: host.name,
 						status,
 						lastSeenAt: host.lastSeenAt,
+						collapsed: placeCollapsed(host.machineId),
+						attentions: (state?.workspaces ?? [])
+							.filter(
+								(workspace) =>
+									workspace.hostId === host.machineId &&
+									workspace.worktreeExists !== false,
+							)
+							.map(rowAttention),
 						items: hostSections.get(host.machineId) ?? [],
 						empty: {
 							label:
@@ -524,6 +543,14 @@ export function HomeScreen() {
 				cloud: cloudInMulti
 					? {
 							name: cloudName,
+							collapsed: placeCollapsed(CLOUD_PLACE_ID),
+							attentions: cloudListRows.map((row) =>
+								cloudRowAttention(
+									row,
+									cloudReadAt[row.id],
+									!!manualUnread[row.id],
+								),
+							),
 							items: cloudListItems,
 							empty: {
 								label:
@@ -577,6 +604,12 @@ export function HomeScreen() {
 		showOfflinePlaceholder,
 		hostOffline,
 		statusOf,
+		collapsed,
+		collapseHydrated,
+		rowAttention,
+		cloudListRows,
+		cloudReadAt,
+		manualUnread,
 		cloudName,
 		t,
 	]);
@@ -738,6 +771,17 @@ export function HomeScreen() {
 						lastSeenAt={item.lastSeenAt}
 						onRetry={item.retry ? refreshPresence : undefined}
 						first={item.first}
+						collapsed={item.collapsed}
+						count={item.count}
+						attention={item.attention}
+						onToggle={
+							item.collapsible
+								? () => {
+										void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+										toggleProject(item.placeId, PLACE_COLLAPSE_KEY);
+									}
+								: undefined
+						}
 					/>
 				);
 			}

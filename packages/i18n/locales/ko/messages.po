@@ -908,6 +908,9 @@ msgstr "{count, plural, one {터미널 #개가 이전 워크스페이스에 남�
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {터미널 #개가 중지되었고 다시 시작할 수 없었습니다.} other {터미널 #개가 중지되었고 다시 시작할 수 없었습니다.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {워크스페이스 #개} other {워크스페이스 #개}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.} other {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.}}"
 

@@ -2,32 +2,60 @@ import {
 	isPlaceUnreachable,
 	type PlaceStatus,
 } from "@/screens/(authenticated)/(home)/utils/placeStatus";
+import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import type { HomeListItem } from "../../types";
+import { strongestAttention } from "../strongestAttention";
 
-export interface AllHostsPlace {
-	machineId: string;
+interface PlaceContent {
 	name: string;
-	status: PlaceStatus;
-	lastSeenAt?: number | null;
 	items: HomeListItem[];
 	/** Says why a place has no rows; a null label means it is still loading. */
 	empty?: { label: string | null };
+	collapsed?: boolean;
+	/** Each listed workspace's attention, for the count and a collapsed rollup. */
+	attentions?: readonly (TerminalAttention | null | undefined)[];
+}
+
+export interface AllHostsPlace extends PlaceContent {
+	machineId: string;
+	status: PlaceStatus;
+	lastSeenAt?: number | null;
 }
 
 export const CLOUD_PLACE_ID = "cloud";
 
-const withEmptyNote = (
+/**
+ * A place's header and what sits under it. A collapsed place hides its
+ * rows and its empty note; its header carries their count and the most
+ * urgent state among them.
+ */
+function placeItems(
 	placeId: string,
-	items: HomeListItem[],
-	empty: { label: string | null } | undefined,
-): HomeListItem[] =>
-	items.length === 0 && empty
-		? [{ kind: "placeEmpty", placeId, label: empty.label }]
-		: items;
+	place: PlaceContent,
+	header: { cloud: boolean; status: PlaceStatus; lastSeenAt?: number | null },
+): HomeListItem[] {
+	const attentions = place.attentions ?? [];
+	const collapsed = place.collapsed ?? false;
+	const label: HomeListItem = {
+		kind: "hostLabel",
+		placeId,
+		name: place.name,
+		...header,
+		collapsible: true,
+		collapsed,
+		count: attentions.length,
+		attention: collapsed ? strongestAttention(attentions) : null,
+	};
+	if (collapsed) return [label];
+	if (place.items.length === 0 && place.empty) {
+		return [label, { kind: "placeEmpty", placeId, label: place.empty.label }];
+	}
+	return [label, ...place.items];
+}
 
 /**
- * Every place in one list, each under a flat label rather than a level of
- * its own: hosts that are or may be online by name, then Cloud, then hosts
+ * Every place in one list, each under a header rather than a level of
+ * nesting: hosts that are or may be online by name, then Cloud, then hosts
  * that can't answer by name.
  */
 export function buildAllHostsList({
@@ -36,41 +64,23 @@ export function buildAllHostsList({
 }: {
 	hosts: readonly AllHostsPlace[];
 	/** Null where Cloud is not offered. */
-	cloud: {
-		name: string;
-		items: HomeListItem[];
-		empty?: { label: string | null };
-	} | null;
+	cloud: PlaceContent | null;
 }): HomeListItem[] {
 	const byName = (a: AllHostsPlace, b: AllHostsPlace) =>
 		a.name.localeCompare(b.name);
-	const hostItems = (host: AllHostsPlace): HomeListItem[] => [
-		{
-			kind: "hostLabel",
-			placeId: host.machineId,
-			name: host.name,
+	const hostItems = (host: AllHostsPlace) =>
+		placeItems(host.machineId, host, {
 			cloud: false,
 			status: host.status,
 			lastSeenAt: host.lastSeenAt,
-		},
-		...withEmptyNote(host.machineId, host.items, host.empty),
-	];
+		});
 	const list: HomeListItem[] = [
 		...hosts
 			.filter((host) => !isPlaceUnreachable(host.status))
 			.sort(byName)
 			.flatMap(hostItems),
 		...(cloud
-			? [
-					{
-						kind: "hostLabel",
-						placeId: CLOUD_PLACE_ID,
-						name: cloud.name,
-						cloud: true,
-						status: "online",
-					} satisfies HomeListItem,
-					...withEmptyNote(CLOUD_PLACE_ID, cloud.items, cloud.empty),
-				]
+			? placeItems(CLOUD_PLACE_ID, cloud, { cloud: true, status: "online" })
 			: []),
 		...hosts
 			.filter((host) => isPlaceUnreachable(host.status))

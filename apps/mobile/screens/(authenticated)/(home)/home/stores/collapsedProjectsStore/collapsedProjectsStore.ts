@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { prunePlaceKeys } from "./prunePlaceKeys";
 
 /**
  * Which project sections are shut, keyed `machineId:projectId` — collapse is
@@ -18,11 +19,15 @@ interface CollapsedProjectsStore {
 		projectIds: string[],
 		collapsed: boolean,
 	) => void;
+	/** Forgets collapsed places (machines, Cloud) that no longer exist. */
+	prunePlaces: (placeIds: readonly string[]) => void;
 }
 
 export function collapsedProjectKey(machineId: string, projectId: string) {
 	return `${machineId}:${projectId}`;
 }
+
+export { PLACE_COLLAPSE_KEY } from "./prunePlaceKeys";
 
 export const useCollapsedProjectsStore = create<CollapsedProjectsStore>()(
 	persist(
@@ -37,6 +42,12 @@ export const useCollapsedProjectsStore = create<CollapsedProjectsStore>()(
 						return { collapsed };
 					}
 					return { collapsed: { ...state.collapsed, [key]: true as const } };
+				});
+			},
+			prunePlaces: (placeIds) => {
+				set((state) => {
+					const collapsed = prunePlaceKeys(state.collapsed, placeIds);
+					return collapsed === state.collapsed ? state : { collapsed };
 				});
 			},
 			setAllCollapsed: (machineId, projectIds, collapsed) => {
