@@ -2,26 +2,15 @@ import { describe, expect, test } from "bun:test";
 import { searchRowDetail } from "./searchRowDetail";
 
 describe("searchRowDetail", () => {
-	test("names the place under All hosts", () => {
+	test("names the project and the place", () => {
 		expect(
-			searchRowDetail({
-				placeName: "Studio-Mini",
-				projectName: "demo-app",
-				branch: "main",
-			}),
+			searchRowDetail({ placeName: "Studio-Mini", projectName: "demo-app" }),
 		).toBe("demo-app · Studio-Mini");
-		expect(
-			searchRowDetail({ placeName: "Cloud", projectName: null, branch: "x" }),
-		).toBe("Cloud");
 	});
 
-	test("shows project and branch inside one place", () => {
-		expect(
-			searchRowDetail({
-				placeName: null,
-				projectName: "demo-app",
-				branch: "main",
-			}),
-		).toBe("demo-app · main");
+	test("names only the place when there is no project", () => {
+		expect(searchRowDetail({ placeName: "Cloud", projectName: null })).toBe(
+			"Cloud",
+		);
 	});
 });

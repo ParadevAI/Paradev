@@ -3,18 +3,16 @@ import type { SelectGithubPullRequest } from "@superset/db/schema";
 import { i18n } from "@superset/i18n";
 import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { RowLink } from "@/components/RowLink";
 import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceStatus } from "@/hooks/useCloudWorkspaceItems";
-import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type {
 	HostWorkspaceItem,
 	HostWorkspacesCacheOps,
 } from "@/hooks/useHostWorkspaces";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
-import { RowHairline } from "@/screens/(authenticated)/(home)/components/RowHairline";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import {
@@ -28,9 +26,9 @@ import type {
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import type { GroupBarSpan } from "../../types";
-import { GroupBar } from "../GroupBar";
-import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
+import { rowDetailParts } from "../RowDetailLine";
 import { WorkspaceLead } from "../WorkspaceLead";
+import { WorkspaceRowFrame } from "../WorkspaceRowFrame";
 import {
 	WorkspaceRowMenu,
 	type WorkspaceRowMenuProps,
@@ -82,7 +80,6 @@ export function WorkspaceRow({
 	stateInLabel?: boolean;
 }) {
 	const { t } = useLingui();
-	const enlargedText = useEnlargedText();
 	const attentionLabel = useAttentionLabel();
 	const router = useRouter();
 	const theme = useTheme();
@@ -106,8 +103,6 @@ export function WorkspaceRow({
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
-	const grouped = !card && group !== undefined;
-	const bar = grouped ? group.bar : null;
 	const state = cloudStatus === "failed" ? "failed" : (rowAttention ?? null);
 	const detailParts = rowDetailParts({
 		state: state ? attentionLabel(state) : null,
@@ -149,18 +144,65 @@ export function WorkspaceRow({
 				move={move}
 				groups={groups}
 			>
-				{/* Default press behavior on purpose: the system context-menu lift
-			    owns the hold animation, and custom press feedback fights it. */}
-				<Pressable
-					className={cn(
-						"bg-background web:hover:bg-accent/60 min-h-16 flex-row items-center gap-3 rounded-xl py-2",
-						card ? "px-3" : "pr-4",
-						!card && (grouped ? "pl-8" : "pl-4"),
-					)}
+				<WorkspaceRowFrame
+					lead={
+						<WorkspaceLead
+							attention={rowAttention}
+							creating={cloudStatus === "provisioning"}
+							failed={cloudStatus === "failed"}
+							pullRequest={
+								prIcon && pullRequest
+									? {
+											icon: prIcon.icon,
+											ink: prIcon.ink,
+											label: t({
+												message: `Pull request #${pullRequest.prNumber}`,
+											}),
+											onPress: () =>
+												router.push(
+													`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
+												),
+										}
+									: null
+							}
+						/>
+					}
+					name={workspace.name}
+					detailParts={detailParts}
+					trailing={
+						sessions.length > 0 ? (
+							// Overlapping avatar-style stack — stays ~fixed-width as
+							// sessions grow instead of eating the row.
+							<View className="flex-row items-center">
+								{sessions.slice(0, MAX_SESSION_MARKS).map((session, index) => (
+									<View
+										key={session.terminalId}
+										className={cn(
+											"bg-secondary size-6 items-center justify-center rounded-full",
+											index > 0 && "-ml-2",
+										)}
+									>
+										<AgentMark
+											agentId={session.agentId ?? ""}
+											size={12}
+											color={theme.mutedForeground}
+										/>
+									</View>
+								))}
+								{sessions.length > MAX_SESSION_MARKS ? (
+									<Text className="text-muted-foreground pl-1 text-[13px] tabular-nums">
+										+{sessions.length - MAX_SESSION_MARKS}
+									</Text>
+								) : null}
+							</View>
+						) : null
+					}
+					card={card}
+					grouped={group !== undefined}
+					bar={group?.bar ?? null}
+					separator={separator}
 					onPress={() => router.navigate(`/(authenticated)${href}`)}
 					disabled={disabled}
-					accessibilityState={{ disabled }}
-					accessibilityRole="button"
 					accessibilityLabel={[
 						workspace.name,
 						...detailParts.map((part) => part.text),
@@ -170,66 +212,8 @@ export function WorkspaceRow({
 					]
 						.filter(Boolean)
 						.join(", ")}
-					ph-label="workspace-row"
-				>
-					{bar ? <GroupBar span={bar} /> : null}
-					<WorkspaceLead
-						attention={rowAttention}
-						creating={cloudStatus === "provisioning"}
-						failed={cloudStatus === "failed"}
-						pullRequest={
-							prIcon && pullRequest
-								? {
-										icon: prIcon.icon,
-										ink: prIcon.ink,
-										label: t({
-											message: `Pull request #${pullRequest.prNumber}`,
-										}),
-										onPress: () =>
-											router.push(
-												`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
-											),
-									}
-								: null
-						}
-					/>
-					<View className="flex-1">
-						<Text
-							className="text-[16px]"
-							numberOfLines={enlargedText ? undefined : 1}
-						>
-							{workspace.name}
-						</Text>
-						<RowDetailLine parts={detailParts} />
-					</View>
-					{sessions.length > 0 ? (
-						// Overlapping avatar-style stack — stays ~fixed-width as sessions
-						// grow instead of eating the row.
-						<View className="flex-row items-center">
-							{sessions.slice(0, MAX_SESSION_MARKS).map((session, index) => (
-								<View
-									key={session.terminalId}
-									className={cn(
-										"bg-secondary size-6 items-center justify-center rounded-full",
-										index > 0 && "-ml-2",
-									)}
-								>
-									<AgentMark
-										agentId={session.agentId ?? ""}
-										size={12}
-										color={theme.mutedForeground}
-									/>
-								</View>
-							))}
-							{sessions.length > MAX_SESSION_MARKS ? (
-								<Text className="text-muted-foreground pl-1 text-[13px] tabular-nums">
-									+{sessions.length - MAX_SESSION_MARKS}
-								</Text>
-							) : null}
-						</View>
-					) : null}
-					{separator && !card ? <RowHairline grouped={grouped} /> : null}
-				</Pressable>
+					phLabel="workspace-row"
+				/>
 			</WorkspaceRowMenu>
 		</RowLink>
 	);

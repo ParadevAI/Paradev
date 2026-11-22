@@ -2,14 +2,9 @@ import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
 import { RowLink } from "@/components/RowLink";
-import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceRow as CloudWorkspaceRowData } from "@/hooks/useCloudWorkspaces";
-import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
-import { cn } from "@/lib/utils";
-import { RowHairline } from "@/screens/(authenticated)/(home)/components/RowHairline";
 import { UserAvatar } from "@/screens/(authenticated)/settings/components/UserAvatar";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import {
@@ -19,8 +14,9 @@ import {
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { CloudPullRequest } from "../../hooks/useCloudPullRequests";
 import { cloudRowAttention } from "../../utils/needsMe";
-import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
+import { rowDetailParts } from "../RowDetailLine";
 import { WorkspaceLead } from "../WorkspaceLead";
+import { WorkspaceRowFrame } from "../WorkspaceRowFrame";
 import { ArchivedCloudRowMenu } from "./components/ArchivedCloudRowMenu";
 import { CloudWorkspaceRowMenu } from "./components/CloudWorkspaceRowMenu";
 import { UnarchiveButton } from "./components/UnarchiveButton";
@@ -60,7 +56,6 @@ export function CloudWorkspaceRow({
 	const { t } = useLingui();
 	const attentionLabel = useAttentionLabel();
 	const router = useRouter();
-	const enlargedText = useEnlargedText();
 	const archived = isArchivedCloudWorkspaceStatus(row.status);
 	const readAt = useUnreadWorkspacesStore((state) => state.cloudReadAt[row.id]);
 	const manuallyUnread = useUnreadWorkspacesStore(
@@ -113,13 +108,48 @@ export function CloudWorkspaceRow({
 	});
 
 	const body = (
-		<Pressable
-			className={cn(
-				"bg-background min-h-16 flex-row items-center gap-3 rounded-xl py-2",
-				card ? "px-3" : cn("pr-4", grouped ? "pl-8" : "pl-4"),
-			)}
+		<WorkspaceRowFrame
+			lead={
+				<WorkspaceLead
+					attention={attention}
+					creating={provisioning}
+					failed={false}
+					pullRequest={
+						prStatus && pullRequest && !archived
+							? {
+									icon: prStatus.icon,
+									ink: prStatus.ink,
+									label: t({
+										message: `Pull request #${pullRequest.number}`,
+									}),
+									onPress: () =>
+										router.push(
+											`/(authenticated)/workspace/${row.id}/pull-request/${pullRequest.number}?owner=${encodeURIComponent(prOwner ?? "")}&repo=${encodeURIComponent(prRepo ?? "")}`,
+										),
+								}
+							: null
+					}
+				/>
+			}
+			name={row.name || t({ message: "Untitled workspace" })}
+			nameMuted={archived}
+			detailParts={detailParts}
+			trailing={
+				archived ? (
+					<UnarchiveButton workspaceId={row.id} />
+				) : owner && !isMine ? (
+					<UserAvatar
+						name={owner.name}
+						image={owner.image}
+						className="size-[18px]"
+						textClassName="text-[7px]"
+					/>
+				) : null
+			}
+			card={card}
+			grouped={grouped}
+			separator={separator}
 			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
-			accessibilityRole="button"
 			accessibilityLabel={[
 				row.name || t({ message: "Untitled workspace" }),
 				...detailParts.map((part) => part.text),
@@ -127,49 +157,8 @@ export function CloudWorkspaceRow({
 			]
 				.filter(Boolean)
 				.join(", ")}
-			ph-label="cloud-workspace-row"
-		>
-			<WorkspaceLead
-				attention={attention}
-				creating={provisioning}
-				failed={false}
-				pullRequest={
-					prStatus && pullRequest && !archived
-						? {
-								icon: prStatus.icon,
-								ink: prStatus.ink,
-								label: t({
-									message: `Pull request #${pullRequest.number}`,
-								}),
-								onPress: () =>
-									router.push(
-										`/(authenticated)/workspace/${row.id}/pull-request/${pullRequest.number}?owner=${encodeURIComponent(prOwner ?? "")}&repo=${encodeURIComponent(prRepo ?? "")}`,
-									),
-							}
-						: null
-				}
-			/>
-			<View className="min-w-0 flex-1">
-				<Text
-					className={cn("text-[16px]", archived && "text-muted-foreground")}
-					numberOfLines={enlargedText ? undefined : 1}
-				>
-					{row.name || t({ message: "Untitled workspace" })}
-				</Text>
-				<RowDetailLine parts={detailParts} />
-			</View>
-			{archived ? (
-				<UnarchiveButton workspaceId={row.id} />
-			) : owner && !isMine ? (
-				<UserAvatar
-					name={owner.name}
-					image={owner.image}
-					className="size-[18px]"
-					textClassName="text-[7px]"
-				/>
-			) : null}
-			{separator && !card ? <RowHairline grouped={grouped} /> : null}
-		</Pressable>
+			phLabel="cloud-workspace-row"
+		/>
 	);
 
 	return (

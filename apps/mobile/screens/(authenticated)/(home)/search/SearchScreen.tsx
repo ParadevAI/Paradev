@@ -1,20 +1,20 @@
 import { Plural, useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	type NativeStackNavigationProp,
 	useNavigation,
 	useRouter,
 } from "expo-router";
-import { FolderGit2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Pressable, View } from "react-native";
+import { FlatList, View } from "react-native";
 import { RowLink } from "@/components/RowLink";
-import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import {
 	itemFromCloudRow,
 	useCloudWorkspaceItems,
 } from "@/hooks/useCloudWorkspaceItems";
+import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
 import { useHostsProjects } from "@/hooks/useHostProjects";
 import {
 	type HostWorkspaceItem,
@@ -23,6 +23,11 @@ import {
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { HeaderToolbar } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { rowDetailParts } from "@/screens/(authenticated)/(home)/home/components/RowDetailLine";
+import { SECTION_LABEL } from "@/screens/(authenticated)/(home)/home/components/SectionLabel";
+import { WorkspaceLead } from "@/screens/(authenticated)/(home)/home/components/WorkspaceLead";
+import { WorkspaceRowFrame } from "@/screens/(authenticated)/(home)/home/components/WorkspaceRowFrame";
+import { useAttentionLabel } from "@/screens/(authenticated)/(home)/home/hooks/useAttentionLabel";
 import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCloudRepos";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
@@ -30,6 +35,7 @@ import {
 	type CloudRepo,
 	repoShortName,
 } from "@/screens/(authenticated)/(home)/home/utils/buildCloudSection";
+import { cloudRowAttention } from "@/screens/(authenticated)/(home)/home/utils/needsMe";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import {
@@ -38,6 +44,7 @@ import {
 } from "@/screens/(authenticated)/(home)/utils/placeStatus";
 import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
+import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
 import { searchRowDetail } from "./utils/searchRowDetail";
 
@@ -106,7 +113,18 @@ export function SearchScreen() {
 		() => scopeHosts.filter((host) => host.isOnline),
 		[scopeHosts],
 	);
-	const { terminalsByWorkspace } = useHostsTerminals(terminalHosts);
+	const { terminalsByWorkspace, attentionByWorkspace } =
+		useHostsTerminals(terminalHosts);
+	const attentionLabel = useAttentionLabel();
+	const noProjectName = t({ message: "No project" });
+	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
+	const cloudReadAt = useUnreadWorkspacesStore((state) => state.cloudReadAt);
+	const { workspaces: activeCloud } = useCloudWorkspaces();
+	const cloudRowsById = useMemo(
+		() =>
+			new Map([...activeCloud, ...archivedCloud].map((row) => [row.id, row])),
+		[activeCloud, archivedCloud],
+	);
 
 	const projectNamesById = useMemo(
 		() =>
@@ -253,7 +271,7 @@ export function SearchScreen() {
 				keyboardShouldPersistTaps="handled"
 				ListHeaderComponent={
 					searching ? (
-						<Text className="text-muted-foreground px-4 pb-1 pt-2 font-semibold text-xs">
+						<Text className={cn(SECTION_LABEL.label, "px-4 pb-1 pt-2")}>
 							{cloudScope ? (
 								<Plural
 									value={results.length}
@@ -282,53 +300,62 @@ export function SearchScreen() {
 						</Text>
 					) : undefined
 				}
-				renderItem={({ item: workspace }) => {
+				renderItem={({ item: workspace, index }) => {
 					const host = hostsById.get(workspace.hostId);
 					const projectName = host
 						? (workspace.projectId &&
 								projectNamesById.get(workspace.projectId)) ||
-							null
+							noProjectName
 						: cloudRepos.status === "success"
 							? repoNameOf(cloudRepos.byWorkspace.get(workspace.id))
 							: null;
+					const cloudRow = cloudRowsById.get(workspace.id);
+					const attention = cloudRow
+						? isArchivedCloudWorkspaceStatus(cloudRow.status)
+							? null
+							: cloudRowAttention(
+									cloudRow,
+									cloudReadAt[cloudRow.id],
+									!!manualUnread[cloudRow.id],
+								)
+						: (attentionByWorkspace.get(workspace.id) ??
+							(manualUnread[workspace.id] ? "review" : null));
+					const detailParts = rowDetailParts({
+						state: attention ? attentionLabel(attention) : null,
+						pullRequest: null,
+						diff: null,
+						name: workspace.name,
+						branch: workspace.branch,
+						context: searchRowDetail({
+							placeName: host?.name ?? t({ message: "Cloud" }),
+							projectName,
+						}),
+						noChanges: t({ message: "No changes" }),
+					});
 					const unreachable = isUnreachable(workspace);
 					return (
 						<RowLink href={`/workspace/${workspace.id}`}>
-							<Pressable
-								className={cn(
-									"web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5",
-									unreachable && "opacity-50",
-								)}
-								onPress={() => open(workspace)}
-								disabled={unreachable}
-								accessibilityState={{ disabled: unreachable }}
-								ph-label="search-workspace-row"
-							>
-								<View className="size-6 items-center justify-center">
-									<Icon
-										as={FolderGit2}
-										className="text-muted-foreground size-5"
-										strokeWidth={1.75}
-									/>
-								</View>
-								<View className="min-w-0 flex-1">
-									<Text className="font-semibold text-[14px]" numberOfLines={1}>
-										{workspace.name}
-									</Text>
-									<Text
-										className="text-muted-foreground text-[11.5px]"
-										numberOfLines={1}
-									>
-										{searchRowDetail({
-											placeName: multiScope
-												? (host?.name ?? t({ message: "Cloud" }))
-												: null,
-											projectName,
-											branch: workspace.branch,
-										})}
-									</Text>
-								</View>
-							</Pressable>
+							<View className={unreachable ? "opacity-50" : undefined}>
+								<WorkspaceRowFrame
+									lead={
+										<WorkspaceLead
+											attention={attention}
+											creating={cloudRow?.status === "provisioning"}
+											failed={false}
+										/>
+									}
+									name={workspace.name}
+									detailParts={detailParts}
+									separator={index < results.length - 1}
+									onPress={() => open(workspace)}
+									disabled={unreachable}
+									accessibilityLabel={[
+										workspace.name,
+										...detailParts.map((part) => part.text),
+									].join(", ")}
+									phLabel="search-workspace-row"
+								/>
+							</View>
 						</RowLink>
 					);
 				}}
