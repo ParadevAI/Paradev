@@ -279,7 +279,15 @@ type TerminalServerMessage =
 	//               content bytes are sent — the client's screen is presumed
 	//               better than anything we could synthesize (see #6290) — and
 	//               a repaint nudge asks the running program to redraw itself.
-	| { type: "synced"; epoch: string; seq: number; mode: SyncedMode }
+	// Bytes from `seq` up to `head` are replayed: the client must not answer
+	// the queries in them.
+	| {
+			type: "synced";
+			epoch: string;
+			seq: number;
+			head: number;
+			mode: SyncedMode;
+	  }
 	// Liveness probe; the client answers with `pong`. Sent once on attach and
 	// then every CLIENT_PING_INTERVAL_MS while the socket is attached.
 	| { type: "ping" };
@@ -614,10 +622,10 @@ interface TerminalSession {
 	 */
 	echoProbe: ((bytes: Uint8Array) => void) | null;
 	/**
-	 * Trailing bytes of the previous output chunk (up to 3), so a DSR cursor
-	 * query (`ESC[6n`) straddling a chunk boundary is still recognized.
+	 * Trailing bytes of the previous output chunk, so a CPR or DA1 query
+	 * split across chunks is still found.
 	 */
-	dsrCarry: Uint8Array;
+	queryCarry: Uint8Array;
 	initialCommandQueued: boolean;
 	trackCommandCompletion: boolean;
 	commandCompletionArmed: boolean;
@@ -1603,70 +1611,80 @@ function readRetainedFrom(session: TerminalSession, from: number): Uint8Array {
 	return out;
 }
 
+type UnattachedQuery = "cursor" | "deviceAttributes";
+
+const UNATTACHED_QUERIES: ReadonlyArray<{
+	bytes: Uint8Array;
+	query: UnattachedQuery;
+}> = [
+	{ bytes: new Uint8Array([0x1b, 0x5b, 0x36, 0x6e]), query: "cursor" }, // ESC [ 6 n
+	{ bytes: new Uint8Array([0x1b, 0x5b, 0x63]), query: "deviceAttributes" }, // ESC [ c
+	{
+		bytes: new Uint8Array([0x1b, 0x5b, 0x30, 0x63]), // ESC [ 0 c
+		query: "deviceAttributes",
+	},
+];
+
+const UNATTACHED_QUERY_CARRY_BYTES =
+	Math.max(...UNATTACHED_QUERIES.map(({ bytes }) => bytes.length)) - 1;
+
+// What the desktop xterm with its image addon answers (sixel).
+const DEVICE_ATTRIBUTES_REPLY = "\x1b[?62;4;9;22c";
+
+/**
+ * Find the CPR and DA1 queries in this chunk, joined with the previous
+ * chunk's tail so a query split across chunks is still found.
+ */
+function scanForUnattachedQueries(
+	session: TerminalSession,
+	chunk: Uint8Array,
+): UnattachedQuery[] {
+	const carry = session.queryCarry;
+	const joined = new Uint8Array(carry.length + chunk.length);
+	joined.set(carry, 0);
+	joined.set(chunk, carry.length);
+	const found: UnattachedQuery[] = [];
+	for (let i = 0; i < joined.length; i++) {
+		if (joined[i] !== 0x1b) continue;
+		for (const { bytes, query } of UNATTACHED_QUERIES) {
+			// A match that ends inside the carry was found with the last chunk.
+			if (i + bytes.length <= carry.length) continue;
+			if (i + bytes.length > joined.length) continue;
+			if (bytes.every((byte, j) => joined[i + j] === byte)) found.push(query);
+		}
+	}
+	session.queryCarry = joined.slice(
+		Math.max(0, joined.length - UNATTACHED_QUERY_CARRY_BYTES),
+	);
+	return found;
+}
+
+/**
+ * Answer CPR and DA1 when no client is attached to answer them. reedline
+ * (nushell) waits for CPR before it paints its prompt (#6024); fish waits for
+ * DA1. A client does not answer the queries in bytes it replays, so a program
+ * that asks while no client is attached gets its answer only from here.
+ */
+function answerUnattachedQueries(
+	session: TerminalSession,
+	queries: UnattachedQuery[],
+) {
+	if (queries.length === 0 || session.exited) return;
+	if (pruneAndCountOpenSockets(session) > 0) return;
+	const { x, y } = session.modeTracker.cursorPosition();
+	for (const query of queries) {
+		session.pty.write(
+			query === "cursor" ? `\x1b[${y + 1};${x + 1}R` : DEVICE_ATTRIBUTES_REPLY,
+		);
+	}
+}
+
 /**
  * Single choke point for PTY output: mode tracker, catch-up ring, then
  * broadcast (falling back to the legacy zero-socket FIFO). Every byte that
  * counts toward `outputSeq` MUST flow through here and nowhere else, or
  * seq-aware clients drift out of sync.
  */
-/** ESC [ 6 n — DSR cursor position report request. */
-const DSR_CURSOR_QUERY = new Uint8Array([0x1b, 0x5b, 0x36, 0x6e]);
-
-/**
- * Count DSR cursor queries in this chunk (joined with the previous chunk's
- * tail so boundary-straddling sequences still match) and update the carry.
- */
-function scanForDsrCursorQueries(
-	session: TerminalSession,
-	chunk: Uint8Array,
-): number {
-	const joined = new Uint8Array(session.dsrCarry.length + chunk.length);
-	joined.set(session.dsrCarry, 0);
-	joined.set(chunk, session.dsrCarry.length);
-	let count = 0;
-	// Start where a match could involve carried bytes; matches wholly inside
-	// the carry were already counted last chunk.
-	for (
-		let i = Math.max(
-			0,
-			session.dsrCarry.length - (DSR_CURSOR_QUERY.length - 1),
-		);
-		i + DSR_CURSOR_QUERY.length <= joined.length;
-		i++
-	) {
-		let matched = true;
-		for (let j = 0; j < DSR_CURSOR_QUERY.length; j++) {
-			if (joined[i + j] !== DSR_CURSOR_QUERY[j]) {
-				matched = false;
-				break;
-			}
-		}
-		if (matched) count++;
-	}
-	session.dsrCarry = joined.slice(
-		Math.max(0, joined.length - (DSR_CURSOR_QUERY.length - 1)),
-	);
-	return count;
-}
-
-/**
- * Answer a program's DSR cursor query when no renderer is attached to do it.
- * reedline (nushell) asks `ESC[6n` after init and will not paint its prompt —
- * or accept input — until the terminal answers; a preset launch into an
- * unattached session therefore wedged forever (#6024). An attached renderer's
- * xterm answers by itself (so we stay silent then, like tmux does for
- * attached clients); for unattached sessions the mirrored headless screen is
- * the truth and answers with the real cursor position.
- */
-function answerDsrCursorQueries(session: TerminalSession, count: number) {
-	if (count === 0 || session.exited) return;
-	if (pruneAndCountOpenSockets(session) > 0) return;
-	const { x, y } = session.modeTracker.cursorPosition();
-	for (let i = 0; i < count; i++) {
-		session.pty.write(`\x1b[${y + 1};${x + 1}R`);
-	}
-}
-
 function deliverOutput(session: TerminalSession, bytes: Uint8Array) {
 	session.modeTracker.feed(bytes);
 	retainOutput(session, bytes);
@@ -1807,6 +1825,7 @@ function resumeHiddenSocket(session: TerminalSession, ws: TerminalSocket) {
 		sendMessage(ws, {
 			type: "synced",
 			epoch: session.epoch,
+			head: session.outputSeq,
 			seq: session.outputSeq,
 			mode: "reanchor",
 		});
@@ -2053,6 +2072,7 @@ function sendSeqAttach(
 		sendMessage(socket, {
 			type: "synced",
 			epoch: session.epoch,
+			head: session.outputSeq,
 			seq: request.seq,
 			mode: "exact",
 		});
@@ -2067,6 +2087,7 @@ function sendSeqAttach(
 		sendMessage(socket, {
 			type: "synced",
 			epoch: session.epoch,
+			head: session.outputSeq,
 			seq: session.retainedStartSeq,
 			mode: "tail",
 		});
@@ -2084,6 +2105,7 @@ function sendSeqAttach(
 	sendMessage(socket, {
 		type: "synced",
 		epoch: session.epoch,
+		head: session.outputSeq,
 		seq: session.outputSeq,
 		mode: "reanchor",
 	});
@@ -3380,7 +3402,7 @@ async function createTerminalSessionUnlocked({
 		usedMissingMarkerGrace: false,
 		lateMarkerRecorded: false,
 		echoProbe: null,
-		dsrCarry: new Uint8Array(0),
+		queryCarry: new Uint8Array(0),
 		// Adopted sessions have already run their initialCommand in the prior
 		// host-service lifetime — flag it as queued so we don't double-fire it.
 		initialCommandQueued: isAdopted,
@@ -3485,11 +3507,11 @@ async function createTerminalSessionUnlocked({
 				// — the chunk is still output and must refresh the idle clock.
 				portManager.checkOutputForHint(terminalId, hintText);
 
-				const dsrQueries = scanForDsrCursorQueries(session, bytes);
+				const queries = scanForUnattachedQueries(session, bytes);
 				deliverOutput(session, bytes);
 				// After deliverOutput so the mirror has consumed this chunk and
 				// the reported cursor position is current.
-				answerDsrCursorQueries(session, dsrQueries);
+				answerUnattachedQueries(session, queries);
 			},
 			onExit({ code, signal }) {
 				if (sessions.get(terminalId) !== session) return;
