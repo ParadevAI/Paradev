@@ -15,7 +15,9 @@ import { isProcessAlive, readManifest } from "../host/manifest";
 import { getRelayUrl } from "../host/relay-url";
 import { readJwtSubject } from "./readJwtSubject";
 
-const MAX_BATCH_ITEMS = 20;
+// Node answers 431 when the request line and headers are more than 16 KiB.
+// The other half is for the headers.
+export const HOST_MAX_URL_LENGTH = 8_192;
 
 export type HostServiceClient = ReturnType<
 	typeof createTRPCClient<HostServiceRouter>
@@ -80,7 +82,7 @@ export async function resolveHostTarget(
 				links: [
 					httpBatchLink({
 						url: `${manifest.endpoint}/trpc`,
-						maxItems: MAX_BATCH_ITEMS,
+						maxURLLength: HOST_MAX_URL_LENGTH,
 						transformer: SuperJSON,
 						headers: {
 							Authorization: `Bearer ${manifest.authToken}`,
@@ -117,7 +119,7 @@ export async function resolveHostTarget(
 			links: [
 				httpBatchLink({
 					url: `${relayUrl}/hosts/${routingKey}/trpc`,
-					maxItems: MAX_BATCH_ITEMS,
+					maxURLLength: HOST_MAX_URL_LENGTH,
 					transformer: SuperJSON,
 					// A cloud workspace has no bearer; its firewall adds its credential.
 					headers: {

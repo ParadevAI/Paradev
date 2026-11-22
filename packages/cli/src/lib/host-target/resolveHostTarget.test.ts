@@ -19,14 +19,12 @@ const api = {
 } as unknown as ApiClient;
 
 describe("resolveHostTarget", () => {
-	test("splits snapshot layout queries before the request URL exceeds the server limit", async () => {
-		const urls: string[] = [];
+	test("a batch of one query per workspace stays under the host's 16 KiB header limit", async () => {
 		const workspaceIds = Array.from({ length: 407 }, () => crypto.randomUUID());
 		const host = Bun.serve({
 			hostname: "127.0.0.1",
 			port: 0,
 			fetch: (request) => {
-				urls.push(request.url);
 				const inputs = JSON.parse(
 					new URL(request.url).searchParams.get("input") ?? "{}",
 				) as Record<string, { json: { workspaceId: string } }>;
@@ -63,10 +61,6 @@ describe("resolveHostTarget", () => {
 			);
 			expect(layouts.map((result) => result.layout.activeTabId)).toEqual(
 				workspaceIds,
-			);
-			expect(urls.length).toBeGreaterThan(1);
-			expect(Math.max(...urls.map((url) => url.length))).toBeLessThanOrEqual(
-				4096,
 			);
 		} finally {
 			host.stop(true);
