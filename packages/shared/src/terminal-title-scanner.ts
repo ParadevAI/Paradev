@@ -87,7 +87,6 @@ function isInsideUtf8Char(input: Uint8Array, index: number): boolean {
 	return index - lead < utf8SequenceLength(leadByte);
 }
 
-// Start of an unfinished UTF-8 character at the end of input, else input.length.
 function incompleteUtf8TailStart(input: Uint8Array): number {
 	for (let i = input.length - 1; i >= 0 && input.length - i <= 3; i--) {
 		const b = input[i] as number;

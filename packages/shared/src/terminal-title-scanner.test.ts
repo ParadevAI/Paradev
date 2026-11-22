@@ -161,20 +161,22 @@ describe("terminal title scanner", () => {
 		expect(scanForTerminalTitle(state, b).updates).toEqual(["Hi 🙂!"]);
 	});
 
-	it("does not read 0x9C/0x9D inside a UTF-8 character as C1 controls", () => {
-		// 本 is E6 9C AC and ✳ is E2 9C B3: the 0x9C is a continuation byte,
-		// not a string terminator, so the title must not be cut there.
+	it("does not end a title at a 0x9C continuation byte", () => {
+		// ✳ is E2 9C B3, 本 is E6 9C AC, 😜 is F0 9F 98 9C.
 		const state = createTerminalTitleScanState();
 
 		expect(
-			scanForTerminalTitle(state, enc.encode("\x1b]0;日本語\x07")).updates,
-		).toEqual(["日本語"]);
-		expect(
-			scanForTerminalTitle(state, enc.encode("\x1b]0;✳ Claude Code\x07"))
-				.updates,
-		).toEqual(["✳ Claude Code"]);
-		// ŝ is C5 9D: plain output text must not open an OSC that swallows
-		// the real title sequence after it.
+			scanForTerminalTitle(
+				state,
+				enc.encode("\x1b]0;✳ Claude Code\x07\x1b]0;日本語\x07\x1b]0;ok 😜\x07"),
+			).updates,
+		).toEqual(["✳ Claude Code", "日本語", "ok 😜"]);
+	});
+
+	it("does not start an OSC at a 0x9D continuation byte in plain output", () => {
+		// ŝ is C5 9D.
+		const state = createTerminalTitleScanState();
+
 		expect(
 			scanForTerminalTitle(state, enc.encode("ŝ text\x1b]0;Real\x07")).updates,
 		).toEqual(["Real"]);
