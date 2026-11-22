@@ -78,6 +78,7 @@ jobs:
       electron_builder_config: electron-builder.canary.ts
       artifact_prefix: desktop-canary
       artifact_retention_days: 7
+      environment: canary
     secrets: inherit
 
   release:
