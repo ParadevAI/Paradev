@@ -76,7 +76,7 @@ export const pluginManifestSchema = z
 		id: "PluginManifest",
 		title: "Paradev plugin manifest",
 		description:
-			"plugin.json for a Paradev marketplace plugin. Authoring guide: https://docs.superset.sh",
+			"plugin.json for a Paradev marketplace plugin. Authoring guide: https://docs.paradev.com",
 	});
 
 export type PluginManifestInput = z.input<typeof pluginManifestSchema>;

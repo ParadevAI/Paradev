@@ -77,7 +77,7 @@ A webhook trigger runs the automation when something sends a POST to its URL.
 3. Send a JSON body to the URL, with the token as a bearer header or as a `?token=` query parameter:
 
 ```bash
-curl -X POST "https://api.superset.sh/api/automations/webhook/<automationId>" \
+curl -X POST "https://api.paradev.com/api/automations/webhook/<automationId>" \
   -H "Authorization: Bearer sset_wh_..." \
   -H "Content-Type: application/json" \
   -d '{"service": "checkout", "status": "failed"}'

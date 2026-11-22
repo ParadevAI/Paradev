@@ -102,6 +102,17 @@ fails with a message that says so. Only HTTP calls work: the firewall refuses
 WebSocket upgrades on a host whose headers it rewrites, so live terminal
 streams from a box to a host do not.
 
+**A box's credential reaches only the configured API host. Open.** On a laptop,
+`api.superset.sh` and `api.paradev.com` serve the same API, so either URL works
+with a bearer token. A box has no bearer: the firewall adds
+`x-superset-sandbox-credential` only for the host of `NEXT_PUBLIC_API_URL`
+(`apiHost()` in `packages/trpc/src/lib/sandbox/credentials.ts`), which is
+`api.superset.sh`. So from a box, a plugin MCP URL on `api.superset.sh`
+answers `initialize`, and the same path on `api.paradev.com` returns
+`401 Missing bearer token` (probed 2026-11-22). Do not move plugin manifests,
+saved MCP configs or the box's `SUPERSET_API_URL` to `api.paradev.com` until
+the firewall adds the credential for both hosts.
+
 **A box's agent status doesn't come from the box.** A host row's dot is a
 live subscription to that host's terminal bindings; the sidebar deliberately
 opens no such socket to a sandbox, since holding one keeps the VM awake all
