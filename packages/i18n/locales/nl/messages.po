@@ -4569,8 +4569,8 @@ msgstr "Verduidelijk dit"
 msgid "Claude Code sessions, with claude --resume"
 msgstr "Claude Code-sessies, met claude --resume"
 
-msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
-msgstr "Claude Code, Codex en OpenCode zijn de agents; Paradev is waar je er veel tegelijk draait. Elke taak krijgt een eigen Git-worktree en branch, zodat tien agents tegelijk aan tien branches kunnen werken terwijl jij vanaf één plek monitort, reviewt en merget."
+msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once, in a chat interface or a terminal. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
+msgstr "Claude Code, Codex en OpenCode zijn de agents; Paradev is waar je er veel tegelijk draait, in een chatinterface of een terminal. Elke taak krijgt een eigen Git-worktree en branch, zodat tien agents tegelijk aan tien branches kunnen werken terwijl jij vanaf één plek monitort, reviewt en merget."
 
 msgid "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, any CLI"
 msgstr "Claude Code, Codex, Cursor Agent, OpenCode, Gemini, Amp, elke CLI"
