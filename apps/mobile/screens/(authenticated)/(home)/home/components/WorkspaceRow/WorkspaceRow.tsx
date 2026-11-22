@@ -133,6 +133,7 @@ export function WorkspaceRow({
 					accessibilityRole="button"
 					accessibilityLabel={[
 						workspace.name,
+						showBranch ? workspace.branch : null,
 						cloudStatus === "failed"
 							? attentionLabel("failed")
 							: cloudStatus === "provisioning"
