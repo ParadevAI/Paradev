@@ -62,7 +62,7 @@ export function createOmpExtension(): void {
 	const content = getOmpExtensionContent();
 	fs.mkdirSync(path.dirname(extensionPath), { recursive: true });
 	const changed = writeFileIfChanged(extensionPath, content, 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Oh My Pi extension`,
 	);
 }

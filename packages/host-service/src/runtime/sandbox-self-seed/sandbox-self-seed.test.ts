@@ -197,7 +197,7 @@ describe("start hook run terminal", () => {
 		}
 		expect(JSON.stringify(printed)).not.toMatch(/LINE-ONE|LINE-TWO-SECRET/);
 		expect(printed.join("\n")).toMatch(
-			/\[sandbox\] start hook failed \(exit 3\) \(command of \d+ chars\)/,
+			/\[sandbox\] hook outcome \(hook, outcome, command chars\):\nstart\nfailed \(exit 3\)\n\d+/,
 		);
 		expect(readFileSync(bootLog, "utf8")).toMatch(
 			/^\d{13} hook\.failed exit=3 ms=\d+\n$/,

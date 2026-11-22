@@ -13,6 +13,7 @@ import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
 import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
+import { caught } from "./runtime/box-log-filter";
 import { readSandboxBoxResources } from "./runtime/box-resources";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
@@ -39,13 +40,18 @@ async function main(): Promise<void> {
 	detachFromLaunchDirectory();
 
 	console.log(
-		`[host-service] starting (org=${env.ORGANIZATION_ID}, port=${env.PORT}, NODE_ENV=${process.env.NODE_ENV ?? "unset"})`,
+		"[host-service] starting (org, port, NODE_ENV):",
+		env.ORGANIZATION_ID,
+		env.PORT,
+		process.env.NODE_ENV ?? "unset",
 	);
 
 	const appHome = moveLegacyAppHome();
 	if (appHome.move === "moved" || appHome.move === "failed") {
 		console.log(
-			`[host-service] app home: ${appHome.homeDir} (${appHome.move})`,
+			"[host-service] app home (dir, move):",
+			appHome.homeDir,
+			appHome.move,
 		);
 	}
 
@@ -134,14 +140,15 @@ async function main(): Promise<void> {
 			if (shuttingDown) return;
 			shuttingDown = true;
 			console.log(
-				`[host-service] dev-mode ${signal} — stopping pty-daemon for clean iteration`,
+				"[host-service] dev-mode signal, stopping pty-daemon for clean iteration:",
+				signal,
 			);
 			try {
 				await getSupervisor().stop(env.ORGANIZATION_ID);
 			} catch (err) {
 				console.error(
 					"[host-service] dev shutdown: supervisor.stop failed:",
-					err,
+					caught(err),
 				);
 			} finally {
 				process.exit(0);
@@ -163,7 +170,11 @@ async function main(): Promise<void> {
 		const address = info.address.includes(":")
 			? `[${info.address}]`
 			: info.address;
-		console.log(`[host-service] listening on http://${address}:${info.port}`);
+		console.log(
+			"[host-service] listening (address, port):",
+			address,
+			info.port,
+		);
 		recordBootStamp("host.listening");
 
 		startTerminalReaper(db);
@@ -253,7 +264,7 @@ async function main(): Promise<void> {
 }
 
 void main().catch(async (error) => {
-	console.error("[host-service] Failed to start:", error);
+	console.error("[host-service] Failed to start:", caught(error));
 	await captureFatalStartupError(error);
 	process.exit(1);
 });
