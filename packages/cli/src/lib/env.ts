@@ -13,10 +13,22 @@ import { readPublicEnv } from "@superset/shared/public-env";
 // Keep it until the web/API migration moves the CLI to the new root domain.
 export const LEGACY_WEB_URL = "https://app.superset.sh";
 
+/**
+ * In a cloud workspace, a saved `PARADEV_API_KEY` or `PARADEV_API_URL` can be
+ * the customer's own variable from before the rename, so there the CLI reads
+ * only the old name.
+ */
+export function readApiEnv(name: "API_KEY" | "API_URL"): string | undefined {
+	if (readPublicEnv("SANDBOX_WORKSPACE_ID")) {
+		return process.env[`SUPERSET_${name}`];
+	}
+	return readPublicEnv(name);
+}
+
 export const env = {
 	RELAY_URL: process.env.RELAY_URL || "https://relay.superset.sh",
 	REALTIME_URL: process.env.REALTIME_URL || "https://realtime.superset.sh",
-	SUPERSET_API_URL: readPublicEnv("API_URL") || CANONICAL_URLS.API,
+	SUPERSET_API_URL: readApiEnv("API_URL") || CANONICAL_URLS.API,
 	SUPERSET_WEB_URL: process.env.SUPERSET_WEB_URL || LEGACY_WEB_URL,
 	VERSION: process.env.SUPERSET_VERSION || "0.0.0-dev",
 };

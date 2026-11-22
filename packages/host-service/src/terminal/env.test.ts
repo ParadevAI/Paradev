@@ -517,7 +517,7 @@ describe("buildV2TerminalEnv", () => {
 				...baseParams.baseEnv,
 				PARADEV_TERMINAL_ID: "outer-term",
 				PARADEV_HOME_DIR: "/elsewhere",
-				PARADEV_API_URL: "http://outer",
+				PARADEV_FOO: "users-own",
 			},
 		});
 		expect(env).toMatchObject({
@@ -529,7 +529,7 @@ describe("buildV2TerminalEnv", () => {
 			PARADEV_ENV: "production",
 			PARADEV_HOME_DIR: "/Users/test/.superset",
 		});
-		expect(env.PARADEV_API_URL).toBeUndefined();
+		expect(env.PARADEV_FOO).toBe("users-own");
 	});
 
 	test("claims no terminal identity, even one inherited from the parent", () => {

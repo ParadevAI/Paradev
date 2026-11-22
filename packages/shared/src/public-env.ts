@@ -1,12 +1,8 @@
 export const LEGACY_ENV_PREFIX = "SUPERSET_";
 export const ENV_PREFIX = "PARADEV_";
 
-/**
- * Variables that terminals, agents and scripts see under both prefixes.
- * The `SUPERSET_` name is never removed: released CLIs and hook scripts
- * already on disk read only that one.
- */
-export const PUBLIC_ENV_NAMES = [
+/** What the platform sets in every box and terminal. */
+export const IDENTITY_ENV_NAMES = [
 	"TERMINAL_ID",
 	"PANE_ID",
 	"TAB_ID",
@@ -19,11 +15,24 @@ export const PUBLIC_ENV_NAMES = [
 	"ENV",
 	"HOST_AGENT_HOOK_URL",
 	"HOME_DIR",
+] as const;
+
+/**
+ * Variables that terminals, agents and scripts may see under both prefixes.
+ * The `SUPERSET_` name is never removed: released CLIs and hook scripts
+ * already on disk read only that one.
+ */
+export const PUBLIC_ENV_NAMES = [
+	...IDENTITY_ENV_NAMES,
 	"API_KEY",
 	"API_URL",
 ] as const;
 
 export type PublicEnvName = (typeof PUBLIC_ENV_NAMES)[number];
+
+/** The `PARADEV_` names a user value must not override. */
+export const RESERVED_PARADEV_ENV_KEYS: readonly string[] =
+	IDENTITY_ENV_NAMES.map((name) => `${ENV_PREFIX}${name}`);
 
 type EnvSource = Record<string, string | undefined>;
 

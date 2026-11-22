@@ -14,6 +14,8 @@ describe("reservedKeyReason", () => {
 	test("a deploy CLI's token is an ordinary variable", () => {
 		expect(reservedKeyReason("VERCEL_TOKEN")).toBeNull();
 		expect(reservedKeyReason("VERCEL_ORG_ID")).toBeNull();
+		expect(reservedKeyReason("PARADEV_API_KEY")).toBeNull();
+		expect(reservedKeyReason("PARADEV_FOO")).toBeNull();
 		expect(reservedKeyReason("EXPO_TOKEN")).toBeNull();
 	});
 });

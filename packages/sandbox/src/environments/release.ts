@@ -38,6 +38,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
+import { RESERVED_PARADEV_ENV_KEYS } from "@superset/shared/public-env";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	SANDBOX_PATHS,
@@ -388,8 +389,9 @@ await stopAndSnapshot(golden);
 log(`golden: ${golden} stripped, stopped and snapshotted`);
 
 // 4. probe, as a workspace
-const RESERVED_PREFIXES = ["SUPERSET_", "PARADEV_", "HOST_SERVICE_", "VERCEL_"];
+const RESERVED_PREFIXES = ["SUPERSET_", "HOST_SERVICE_", "VERCEL_"];
 const RESERVED_KEYS = new Set([
+	...RESERVED_PARADEV_ENV_KEYS,
 	// A box the release throws away must not be able to create a database
 	// branch: setup then keeps the environment's own DATABASE_URL, which is
 	// what a check of the image wants anyway.

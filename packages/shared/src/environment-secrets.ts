@@ -1,3 +1,5 @@
+import { RESERVED_PARADEV_ENV_KEYS } from "./public-env";
+
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const MAX_KEY_LENGTH = 256;
 const MAX_VALUE_SIZE = 16 * 1024;
@@ -6,10 +8,6 @@ const MAX_TOTAL_SIZE = 128 * 1024;
 const RESERVED_PREFIXES: Array<{ prefix: string; reason: string }> = [
 	{
 		prefix: "SUPERSET_",
-		reason: "carries the workspace's identity into the sandbox",
-	},
-	{
-		prefix: "PARADEV_",
 		reason: "carries the workspace's identity into the sandbox",
 	},
 	{ prefix: "HOST_SERVICE_", reason: "configures the sandbox's own server" },
@@ -31,6 +29,7 @@ const RESERVED_KEYS = new Set([
 	"PWD",
 	"LANG",
 	"IS_SANDBOX",
+	...RESERVED_PARADEV_ENV_KEYS,
 ]);
 
 export function reservedKeyReason(key: string): string | null {

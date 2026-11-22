@@ -6,6 +6,7 @@ import {
 	resolveOrganizationId,
 	type SupersetConfig,
 } from "./config";
+import { readApiEnv } from "./env";
 import { readHostApiToken } from "./host-api-token";
 import {
 	isAuthFresh,
@@ -43,7 +44,7 @@ export async function resolveAuth(
 
 	// An explicit --api-key wins; otherwise SUPERSET_API_KEY (or PARADEV_API_KEY) env acts as an
 	// override for this invocation (headless/CI). Both beat stored config/OAuth.
-	const overrideKey = apiKeyOption?.trim() || readPublicEnv("API_KEY")?.trim();
+	const overrideKey = apiKeyOption?.trim() || readApiEnv("API_KEY")?.trim();
 	let bearer: string | undefined;
 	let authSource: AuthSource;
 	const hostToken =
