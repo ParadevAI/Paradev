@@ -23,7 +23,7 @@ import {
 	targetKey,
 } from "./resolve-target";
 import { forgetUpstreamTools, upstreamTools } from "./upstream-catalog";
-import { upstreamClient } from "./upstream-client";
+import { callUpstream } from "./upstream-client";
 
 function authenticateTool(problem: string): Tool {
 	return {
@@ -121,16 +121,11 @@ function remoteServer(
 		);
 		if (!checked.ok) return errorResult(checked.message);
 		try {
-			const session = await upstreamClient(target);
-			try {
-				return await session.client.callTool(
-					{ ...request.params, arguments: checked.args },
-					undefined,
-					{ signal: extra.signal },
-				);
-			} finally {
-				await session.close();
-			}
+			return await callUpstream(
+				target,
+				{ ...request.params, arguments: checked.args },
+				extra.signal,
+			);
 		} catch (error) {
 			if (!credentialRejected(error)) throw error;
 			await recordRejection(target.connectionId, target.storedAccessToken);
@@ -457,16 +452,7 @@ function multiServer(
 							choice.rest,
 							resolved.build.credential(resolved.secrets),
 						)
-					: await (async () => {
-							const session = await upstreamClient(resolved);
-							try {
-								return (await session.client.callTool(params, undefined, {
-									signal: extra.signal,
-								})) as CallToolResult;
-							} finally {
-								await session.close();
-							}
-						})();
+					: await callUpstream(resolved, params, extra.signal);
 		} catch (error) {
 			if (!credentialRejected(error)) throw error;
 			layouts.delete(layoutKey(target));
