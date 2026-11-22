@@ -14,7 +14,9 @@ const CODE =
 	"isolate:true})flock.align({perception:75,cohesion:0.8})if(!agent.idle())thrownewAgentBusyError" +
 	'("BOID_1")terminal.attach({pty:daemon,rows:42})pr.merge({squash:true,title:"feat(desktop):flock"})';
 
-const NUM_BOIDS = 90;
+const MAX_BOIDS = 90;
+const MIN_BOIDS = 24;
+const AREA_PER_BOID = 22000;
 const PERCEPTION = 90;
 const SEPARATION_DIST = 44;
 const MAX_SPEED = 1.2;
@@ -26,11 +28,23 @@ const W_SEEK = 0.5;
 const SEEK_ARRIVE_RADIUS = 280;
 const TRAIL_DECAY = 0.996;
 
-const RIPPLE_SPEED = 7;
+// the simulation is tuned in 60 Hz steps; glyphs snap to the grid, so drawing
+// at half that rate looks the same
+const STEP_MS = 1000 / 60;
+const DRAW_INTERVAL_MS = 1000 / 30;
+const MAX_STEPS_PER_DRAW = 3;
+
+const RIPPLE_SPEED = 14;
 const RIPPLE_BAND = 110;
 
 // glyphs blend toward the brand ember inside a click ripple
 const ORANGE: readonly [number, number, number] = [190, 80, 18];
+
+// The flock fades out above the product demo so the mockup sits on a clean
+// backdrop instead of glyph noise. Percentages are of the hero height.
+const FLOCK_HEIGHT_PERCENT = 65;
+const FADE_START_PERCENT = (40 / FLOCK_HEIGHT_PERCENT) * 100;
+const FADE = `linear-gradient(to bottom, transparent ${FADE_START_PERCENT}%, var(--background) 100%)`;
 
 function trailGray(): number {
 	const r = Math.random();
@@ -39,18 +53,19 @@ function trailGray(): number {
 	return 68;
 }
 
-function glyphStyle(gray: number, alpha: number, heat: number): string {
-	if (heat <= 0) return `rgba(${gray}, ${gray}, ${gray}, ${alpha})`;
+function heatedColor(gray: number, heat: number): string {
 	const r = Math.round(gray + (ORANGE[0] - gray) * heat);
 	const g = Math.round(gray + (ORANGE[1] - gray) * heat);
 	const b = Math.round(gray + (ORANGE[2] - gray) * heat);
-	return `rgba(${r}, ${g}, ${b}, ${Math.min(1, alpha + heat * 0.3)})`;
+	return `rgb(${r}, ${g}, ${b})`;
 }
 
 interface TrailGlyph {
 	char: string;
 	gray: number;
 	alpha: number;
+	x: number;
+	y: number;
 }
 
 interface Ripple {
@@ -61,10 +76,12 @@ interface Ripple {
 
 export function BoidsBackground() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const solidRegionRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (!canvas) return;
+		const solidRegion = solidRegionRef.current;
+		if (!canvas || !solidRegion) return;
 		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
@@ -83,6 +100,24 @@ export function BoidsBackground() {
 			ctx.font = `${FONT_SIZE * dpr}px ui-monospace, SFMono-Regular, Menlo, monospace`;
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
+		}
+
+		const grayColors = new Map<number, string>();
+		let fillColor = "";
+
+		function setGlyphStyle(gray: number, alpha: number, heat: number) {
+			if (!ctx) return;
+			let color = grayColors.get(gray);
+			if (!color) {
+				color = `rgb(${gray}, ${gray}, ${gray})`;
+				grayColors.set(gray, color);
+			}
+			if (heat > 0) color = heatedColor(gray, heat);
+			if (color !== fillColor) {
+				ctx.fillStyle = color;
+				fillColor = color;
+			}
+			ctx.globalAlpha = heat > 0 ? Math.min(1, alpha + heat * 0.3) : alpha;
 		}
 
 		function rippleHeat(x: number, y: number): number {
@@ -228,6 +263,8 @@ export function BoidsBackground() {
 							char,
 							gray: trailGray(),
 							alpha: 0.22 + Math.random() * 0.1,
+							x: cx * cell,
+							y: cy * cell,
 						});
 					}
 				}
@@ -238,7 +275,7 @@ export function BoidsBackground() {
 				if (!ctx) return;
 				const cx = Math.round(this.x / cell) * cell;
 				const cy = Math.round(this.y / cell) * cell;
-				ctx.fillStyle = glyphStyle(52, 0.35, rippleHeat(cx, cy));
+				setGlyphStyle(52, 0.35, rippleHeat(cx, cy));
 				ctx.fillText(this.headChar === " " ? "." : this.headChar, cx, cy);
 			}
 		}
@@ -252,9 +289,14 @@ export function BoidsBackground() {
 			height = rect.height * dpr;
 			canvas.width = width;
 			canvas.height = height;
+			fillColor = "";
 			setFont();
 			if (boids.length === 0 && width > 0 && height > 0) {
-				boids = Array.from({ length: NUM_BOIDS }, () => new Boid());
+				const count = Math.round((rect.width * rect.height) / AREA_PER_BOID);
+				boids = Array.from(
+					{ length: Math.min(MAX_BOIDS, Math.max(MIN_BOIDS, count)) },
+					() => new Boid(),
+				);
 			}
 		}
 
@@ -294,20 +336,14 @@ export function BoidsBackground() {
 		window.addEventListener("mousedown", onMouseDown);
 		document.addEventListener("mouseleave", onMouseLeave);
 
-		// pause the simulation while the hero is scrolled out of view
+		// pause the simulation once only the faded part of the flock is on screen
 		let visible = true;
 		const intersection = new IntersectionObserver((entries) => {
 			visible = entries[0]?.isIntersecting ?? true;
 		});
-		intersection.observe(canvas);
+		intersection.observe(solidRegion);
 
-		let raf = 0;
-		function frame() {
-			raf = requestAnimationFrame(frame);
-			if (!ctx || !visible || width === 0) return;
-
-			ctx.clearRect(0, 0, width, height);
-
+		function step() {
 			for (let i = ripples.length - 1; i >= 0; i--) {
 				const rp = ripples[i];
 				if (!rp) continue;
@@ -316,25 +352,44 @@ export function BoidsBackground() {
 					ripples.splice(i, 1);
 				}
 			}
-
 			for (const [key, g] of trail) {
 				g.alpha *= TRAIL_DECAY;
-				if (g.alpha < 0.03) {
-					trail.delete(key);
-					continue;
-				}
-				const [cx, cy] = key.split(",");
-				const px = Number(cx) * cell;
-				const py = Number(cy) * cell;
-				ctx.fillStyle = glyphStyle(g.gray, g.alpha, rippleHeat(px, py));
-				ctx.fillText(g.char, px, py);
+				if (g.alpha < 0.03) trail.delete(key);
 			}
-
 			for (const b of boids) b.flock(boids);
-			for (const b of boids) {
-				b.update();
-				b.drawHead();
+			for (const b of boids) b.update();
+		}
+
+		function draw() {
+			if (!ctx) return;
+			ctx.clearRect(0, 0, width, height);
+			for (const g of trail.values()) {
+				setGlyphStyle(g.gray, g.alpha, rippleHeat(g.x, g.y));
+				ctx.fillText(g.char, g.x, g.y);
 			}
+			for (const b of boids) b.drawHead();
+		}
+
+		let raf = 0;
+		let lastDraw = 0;
+		function frame(now: number) {
+			raf = requestAnimationFrame(frame);
+			if (!visible || width === 0) {
+				lastDraw = 0;
+				return;
+			}
+			const elapsed = lastDraw === 0 ? DRAW_INTERVAL_MS : now - lastDraw;
+			// a ripple is direct feedback to a click, so it draws on every frame
+			if (ripples.length === 0 && elapsed < DRAW_INTERVAL_MS - STEP_MS / 2) {
+				return;
+			}
+			lastDraw = now;
+			const steps = Math.min(
+				MAX_STEPS_PER_DRAW,
+				Math.max(1, Math.round(elapsed / STEP_MS)),
+			);
+			for (let i = 0; i < steps; i++) step();
+			draw();
 		}
 		raf = requestAnimationFrame(frame);
 
@@ -350,21 +405,20 @@ export function BoidsBackground() {
 
 	return (
 		<m.div
-			className="absolute inset-0 pointer-events-none z-0"
+			className="absolute inset-x-0 top-0 pointer-events-none z-0"
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 1.2, ease: "easeOut" }}
 			aria-hidden="true"
-			style={{
-				// Fade the flock out above the product demo so the mockup sits on a
-				// clean backdrop instead of glyph noise
-				maskImage:
-					"linear-gradient(to bottom, black 0%, black 40%, transparent 65%)",
-				WebkitMaskImage:
-					"linear-gradient(to bottom, black 0%, black 40%, transparent 65%)",
-			}}
+			style={{ height: `${FLOCK_HEIGHT_PERCENT}%` }}
 		>
+			<div
+				ref={solidRegionRef}
+				className="absolute inset-x-0 top-0"
+				style={{ height: `${FADE_START_PERCENT}%` }}
+			/>
 			<canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+			<div className="absolute inset-0" style={{ background: FADE }} />
 		</m.div>
 	);
 }
