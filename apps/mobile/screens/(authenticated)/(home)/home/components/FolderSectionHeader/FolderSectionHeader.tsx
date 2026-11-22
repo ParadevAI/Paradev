@@ -73,12 +73,12 @@ export function FolderSectionHeader({
 				</View>
 				<View className="shrink flex-row items-center gap-2">
 					<Text
-						className="text-muted-foreground shrink text-[16px] font-medium"
+						className="text-muted-foreground shrink text-[16px]"
 						numberOfLines={enlargedText ? undefined : 1}
 					>
 						{name}
 					</Text>
-					<Text className="text-muted-foreground font-mono text-[13px]">
+					<Text className="text-muted-foreground text-[13px] tabular-nums">
 						{count}
 					</Text>
 					<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />

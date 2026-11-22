@@ -13773,10 +13773,6 @@ msgid "Offline / local-first mode"
 msgstr "オフライン/ローカルファーストモード"
 
 #. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "offline, seen {0}"
-msgstr "オフライン、最終確認 {0}"
-
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
 msgid "Offline, seen {0}"
 msgstr "オフライン、最終確認 {0}"
 

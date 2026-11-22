@@ -13773,10 +13773,6 @@ msgid "Offline / local-first mode"
 msgstr "Çevrimdışı / yerel öncelikli mod"
 
 #. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
-msgid "offline, seen {0}"
-msgstr "çevrimdışı, son görülme {0}"
-
-#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
 msgid "Offline, seen {0}"
 msgstr "Çevrimdışı, son görülme {0}"
 

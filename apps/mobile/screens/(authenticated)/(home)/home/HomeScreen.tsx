@@ -786,14 +786,11 @@ export function HomeScreen() {
 				);
 			}
 			if (item.kind === "cloudRow") {
-				const repoFullName = cloudRepos.get(item.row.id);
 				return (
 					<CloudWorkspaceListRow
 						row={item.row}
-						repoFullName={repoFullName}
 						pullRequest={cloudPullRequests.get(item.row.id)?.[0]}
 						viewerId={viewerId}
-						now={now}
 						cache={cloudCache}
 						onCopied={handleCopied}
 						card={card}
@@ -944,10 +941,8 @@ export function HomeScreen() {
 		},
 		[
 			pullRequestsByRepoBranch,
-			cloudRepos,
 			cloudPullRequests,
 			viewerId,
-			now,
 			repoPrefixesByProject,
 			diffStats,
 			cache,

@@ -5,7 +5,7 @@ import { useEnlargedText } from "@/hooks/useEnlargedText";
 export function PeriodHeader({ label }: { label: string }) {
 	const enlargedText = useEnlargedText();
 	return (
-		<View className="px-4 pb-1 pt-5">
+		<View className="pb-1 pl-13 pr-4 pt-5">
 			<Text
 				className="text-muted-foreground font-medium text-[13px]"
 				numberOfLines={enlargedText ? undefined : 1}

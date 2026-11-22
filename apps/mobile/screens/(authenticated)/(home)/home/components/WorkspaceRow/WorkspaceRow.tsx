@@ -25,7 +25,7 @@ import type {
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
-import { WorkspaceLead } from "./components/WorkspaceLead";
+import { WorkspaceLead } from "../WorkspaceLead";
 import {
 	WorkspaceRowMenu,
 	type WorkspaceRowMenuProps,
@@ -177,7 +177,7 @@ export function WorkspaceRow({
 					/>
 					<View className="flex-1">
 						<Text
-							className="font-medium text-[16px]"
+							className="text-[16px]"
 							numberOfLines={enlargedText ? undefined : 1}
 						>
 							{workspace.name}
@@ -212,7 +212,7 @@ export function WorkspaceRow({
 									{showBranch ? (
 										<Text className="text-muted-foreground text-[13px]">•</Text>
 									) : null}
-									<Text className="text-muted-foreground font-mono text-[13px]">
+									<Text className="text-muted-foreground text-[13px] tabular-nums">
 										+{diffStats.additions} −{diffStats.deletions}
 									</Text>
 								</>
@@ -239,7 +239,7 @@ export function WorkspaceRow({
 								</View>
 							))}
 							{sessions.length > MAX_SESSION_MARKS ? (
-								<Text className="text-muted-foreground pl-1 text-[11px]">
+								<Text className="text-muted-foreground pl-1 text-[13px] tabular-nums">
 									+{sessions.length - MAX_SESSION_MARKS}
 								</Text>
 							) : null}

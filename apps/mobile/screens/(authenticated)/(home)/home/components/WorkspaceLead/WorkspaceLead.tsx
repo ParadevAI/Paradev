@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { AsciiSpinner } from "@/screens/(authenticated)/components/AsciiSpinner";
 import { PingDot } from "@/screens/(authenticated)/components/PingDot";
-import type { TerminalAttention } from "../../../../hooks/useHostTerminals";
+import type { TerminalAttention } from "../../hooks/useHostTerminals";
 
 interface WorkspaceLeadProps {
 	attention: TerminalAttention | null;
