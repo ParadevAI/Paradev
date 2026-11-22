@@ -36,7 +36,7 @@ Dành thời gian để ship, không phải để chờ.
 
 ## Code nhanh gấp 10 lần mà không tốn chi phí chuyển ngữ cảnh
 
-Paradev chạy song song các coding agent dạng CLI trong những git worktree cách ly, với terminal, review và luồng mở-trong-editor tích hợp sẵn.
+Paradev chạy song song các coding agent dạng CLI trong những git worktree cách ly, trong terminal hoặc dưới dạng chat, với terminal, review và luồng mở-trong-editor tích hợp sẵn.
 
 - **Chạy nhiều agent cùng lúc** mà không mất công chuyển ngữ cảnh
 - **Cách ly từng tác vụ** trong git worktree riêng để các agent không giẫm chân nhau
@@ -229,6 +229,188 @@ Agent nhận được nhiều hơn một chiếc terminal:
 - **Agent tùy chỉnh**: thêm bất kỳ terminal agent nào với icon riêng và nó hoạt động như agent tích hợp sẵn
 - **Trạng thái và thông báo**: chỉ báo đang làm việc, âm báo hoàn thành và badge trên Dock khi một agent cần bạn
 - **Chat tích hợp**: trò chuyện với các model trong khung chat, với phê duyệt công cụ inline và review kế hoạch
+
+<details>
+<summary><strong>Câu hỏi thường gặp</strong></summary>
+<br />
+
+<details>
+<summary>Paradev là ứng dụng terminal hay ứng dụng desktop?</summary>
+<br />
+
+Paradev là ứng dụng desktop, không phải ứng dụng terminal. Các agent chạy bên trong nó dưới dạng chat hoặc trong terminal. Bên cạnh đó bạn có trình xem diff, pull request, trình duyệt trong ứng dụng và trình soạn file. [Tài liệu câu hỏi thường gặp](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Tôi có bắt buộc dùng terminal không, hay có thể chat với coding agent?</summary>
+<br />
+
+Không bắt buộc. Paradev có thể hiển thị phiên agent dưới dạng chat thay vì terminal, và bạn duyệt hoặc từ chối hành động của agent bằng một cú nhấp. Chat hoạt động với Claude Code, Codex, OpenCode và Pi; Paradev chạy CLI bạn đã cài sẵn, nên vẫn giữ thông tin đăng nhập và cài đặt của bạn. Nút chuyển **CLI** / **Chat** đổi chế độ của một phiên đang chạy mà không mất ngữ cảnh, còn các agent khác chạy trong terminal của Paradev. [Tài liệu Chat](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>Paradev dùng giấy phép gì, giá bao nhiêu và chạy trên những nền tảng nào?</summary>
+<br />
+
+Paradev là mã nguồn mở theo Giấy phép MIT. Gói Free bao gồm workspace cục bộ với ứng dụng desktop và CLI. Các gói trả phí bổ sung những tính năng như tự động hóa và workspace trên đám mây. Ứng dụng desktop chạy trên macOS, kèm bản AppImage cho Linux đang ở giai đoạn thử nghiệm; Windows hiện chưa được hỗ trợ. [Bảng giá](https://paradev.com/pricing) · [Tài liệu câu hỏi thường gặp](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Paradev có phải là Superset không? Nó có liên quan đến Apache Superset không?</summary>
+<br />
+
+Paradev trước đây có tên là Superset, vì vậy lệnh CLI vẫn là `superset`. Nó không liên quan đến Apache Superset, một công cụ business intelligence. [Tài liệu cài đặt](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Paradev hỗ trợ những coding agent nào, và tôi có giữ được gói đăng ký của mình không?</summary>
+<br />
+
+Paradev hỗ trợ sẵn Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp và nhiều agent khác, và bạn có thể thêm bất kỳ CLI agent nào khác. Claude Code, Codex, OpenCode và Pi cũng có thể chạy dưới dạng chat. Các agent dùng gói đăng ký và API key của chính bạn, và Paradev không làm proxy cho các lệnh gọi model. [Tài liệu agent được hỗ trợ](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>Làm sao để nhiều coding agent không ghi đè lên nhau trong cùng một repository?</summary>
+<br />
+
+Paradev cấp cho mỗi agent một workspace riêng: một git worktree trên nhánh riêng, với terminal riêng. Các agent sửa những bản sao riêng biệt của file làm việc, nên agent này không ghi đè thay đổi của agent khác. Worktree không cô lập tiến trình trong sandbox, và các nhánh vẫn có thể xung đột khi bạn merge chúng. [Tài liệu workspace](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>Tôi có quá nhiều phiên terminal Claude Code. Làm sao để theo dõi hết?</summary>
+<br />
+
+Paradev hiển thị mọi phiên agent trong một thanh bên, nhóm theo dự án, kèm trạng thái của từng phiên, dù phiên đó chạy dưới dạng chat hay trong terminal. Claude Code báo khi nó hoàn thành và khi nó đang chờ bạn nhập, và thanh bên đánh dấu những workspace cần đến bạn. [Tài liệu trạng thái agent](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Tôi có thể chạy hai coding agent cho cùng một tác vụ rồi so sánh kết quả không?</summary>
+<br />
+
+Có. Trong Paradev, bạn đưa cùng một prompt cho hai workspace trở lên, mỗi workspace trên nhánh riêng, với cùng một agent hoặc các agent khác nhau. Sau đó bạn so sánh các diff và giữ lại kết quả tốt nhất. [Công thức cho các agent chạy đua](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>Tôi có thể dùng Claude Code và Codex cùng nhau, một bên viết code và bên kia review không?</summary>
+<br />
+
+Có. Paradev chạy Claude Code và Codex song song, mỗi agent dưới dạng chat hoặc trong terminal. Để được review, hãy chọn các dòng trong tab **Code** của một pull request và gửi chúng cho agent còn lại, hoặc dùng **Continue with another agent** để bắt đầu phiên của một agent khác với ngữ cảnh gần đây. [Tài liệu phiên agent](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>Làm sao để review diff của coding agent và gửi yêu cầu tiếp theo trước khi merge?</summary>
+<br />
+
+Paradev hiển thị thay đổi của từng workspace trong trình xem diff, nơi bạn commit, push và mở pull request. Trong tab **Code** của pull request, chọn các dòng và gửi bình luận cho một agent đang chạy hoặc một phiên mới; việc đăng bình luận lên GitHub là tùy chọn. Bạn có thể theo dõi các check và merge ngay trong cùng màn hình đó. [Tài liệu pull request](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>Làm sao để tách riêng dev server, cổng và bản xem trước của từng nhánh?</summary>
+<br />
+
+Paradev giữ mỗi nhánh trong worktree riêng và hiển thị các cổng mà tiến trình của từng workspace đang lắng nghe, nhóm theo workspace. Chọn một cổng để mở dev server của nhánh đó trong trình duyệt trong ứng dụng. Paradev không cấp phát dải cổng, vì vậy hãy đặt cấu hình riêng cho từng workspace trong một script thiết lập; script này chạy trong mỗi workspace mới với các biến như `SUPERSET_WORKSPACE_PATH`. [Tài liệu cổng](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>Tôi có thể nhấp vào một phần tử trong web app đang chạy và để coding agent sửa nó không?</summary>
+<br />
+
+Có. Paradev có chế độ Design trong trình duyệt trong ứng dụng: mở dev server của bạn, bật **Design** và nhấp vào phần tử. Sau đó bạn mô tả thay đổi, và agent nhận thông tin chi tiết của phần tử cùng một ảnh chụp màn hình kèm ghi chú của bạn. [Tài liệu trình duyệt](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>Tôi có nhận được thông báo khi coding agent cần tôi nhập không?</summary>
+<br />
+
+Có. Ứng dụng desktop Paradev thông báo cho bạn khi một agent hoàn thành hoặc dừng lại để chờ bạn nhập, và biểu tượng trên Dock của macOS hiển thị badge. Mức hỗ trợ tùy theo agent: Claude Code báo cả hai trạng thái, còn một số agent chỉ báo khi hoàn thành. Trên ứng dụng di động, một dấu chấm trên workspace cho biết agent cần bạn cấp quyền; thông báo đẩy hiện chưa có. [Tài liệu trạng thái agent](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Tôi có thể theo dõi coding agent và trả lời chúng từ iPhone không?</summary>
+<br />
+
+Có. Paradev cho iPhone và iPad cho phép bạn khởi chạy agent, theo dõi phiên của chúng theo thời gian thực, trả lời chúng và review thay đổi. Ứng dụng cần iOS 26 hoặc iPadOS 26 trở lên cùng Paradev Pro, và cũng có ứng dụng Android trên Google Play. Với các workspace trên máy tính của bạn, hãy bật Truy cập từ xa và giữ máy tính luôn thức và trực tuyến. [Tài liệu ứng dụng di động](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>Coding agent có thể chạy theo lịch, như bảo trì hằng đêm hay kiểm tra flaky test hằng tuần không?</summary>
+<br />
+
+Có. Tự động hóa của Paradev chạy agent theo lịch hằng giờ, hằng ngày, hằng tuần hoặc tùy chỉnh. Mỗi lần chạy tạo một workspace để bạn review thay đổi và tiếp tục công việc. Tự động hóa cần gói Pro. [Tài liệu tự động hóa](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Tôi có thể khởi chạy coding agent từ Slack, Linear, Sentry hoặc một pull request GitHub không?</summary>
+<br />
+
+Có. Tự động hóa của Paradev khởi chạy agent khi có sự kiện pull request GitHub, tin nhắn Slack, issue Linear, issue Sentry hoặc webhook gửi đến, và agent nhận thông tin sự kiện cùng prompt của bạn. Bạn cũng có thể nhắc đến bot Paradev trong Slack để khởi tạo một workspace trên đám mây và một agent. Tự động hóa và tích hợp Slack cần gói Pro. [Tài liệu tự động hóa](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Tôi có thể khởi chạy coding agent từ dòng lệnh hoặc từ một agent khác không?</summary>
+<br />
+
+Có. Paradev CLI tạo workspace và khởi chạy agent trong đó từ một shell script hoặc từ một agent khác. Agent cũng có thể dùng MCP server của Paradev để làm việc với workspace và terminal. Ứng dụng desktop có sẵn skill orchestrate, cho phép một agent điều phối các worker trong những workspace riêng biệt. [Tài liệu CLI](https://docs.paradev.com/cli/getting-started)
+
+</details>
+
+<details>
+<summary>Tôi có thể chạy coding agent trên máy từ xa hoặc trên đám mây và review thay đổi từ laptop không?</summary>
+<br />
+
+Có. Với truy cập từ xa của Paradev (gói Pro), bạn mở từ laptop các workspace được host trên một máy khác, như Mac mini hoặc một server. Workspace trên đám mây (gói Team và Ultra) chạy mỗi workspace trên một máy đám mây riêng, nên agent vẫn tiếp tục làm việc khi laptop của bạn gập lại. [Tài liệu truy cập từ xa](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Tôi có thể quay lại một tác vụ sau đó mà phiên agent và nhánh vẫn còn nguyên không?</summary>
+<br />
+
+Có. Một workspace Paradev vẫn nằm trên ổ đĩa dưới dạng git worktree trên nhánh của nó cho đến khi bạn xóa. Terminal thuộc về một tiến trình nền, nên chúng vẫn chạy và giữ lịch sử cuộn khi bạn đóng hoặc cập nhật ứng dụng. Nếu một terminal dừng sau sự cố hoặc khởi động lại, Paradev có thể tiếp tục phiên agent với những agent hỗ trợ resume, như Claude Code và Codex. [Tài liệu giữ agent luôn chạy](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>Một nhóm nhỏ có thể dùng chung một máy cho coding agent không?</summary>
+<br />
+
+Có. Host của Paradev có thể là một máy dùng chung, như Mac mini, mà đồng đội kết nối qua truy cập từ xa (gói Pro). Khi host lần đầu trực tuyến, chỉ người khởi chạy nó mới có quyền truy cập. Người đó thêm đồng đội trong **Settings → Hosts**. [Tài liệu truy cập từ xa](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Paradev khác gì so với Conductor, Orca và Cursor?</summary>
+<br />
+
+Paradev, Conductor và Orca đều chạy coding agent trong các git worktree song song, còn Cursor là một AI editor xây dựng quanh agent riêng của nó. Paradev chạy bất kỳ CLI agent nào bằng gói đăng ký của chính bạn, và mở workspace trong Cursor khi bạn muốn chỉnh sửa ở đó. Orca cũng là mã nguồn mở và chạy trên Windows, nền tảng mà Paradev chưa hỗ trợ. Conductor đang gia nhập Meta và đã đóng với người dùng mới, và Paradev có hướng dẫn để chuyển workspace từ Conductor sang. [Chuyển từ Conductor](https://docs.paradev.com/migrate-from-conductor)
+
+</details>
+
+<details>
+<summary>Paradev có thay thế được tmux không?</summary>
+<br />
+
+Có, để chạy coding agent thì Paradev có thể thay thế tmux: các phiên terminal của nó vẫn chạy khi bạn đóng, thoát hoặc cập nhật ứng dụng. Mỗi workspace cũng có worktree và trạng thái riêng trên thanh bên. Bạn vẫn có thể chạy tmux bên trong terminal của Paradev. [Tài liệu giữ agent luôn chạy](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+</details>
 
 ## Nhiều hơn một ứng dụng desktop
 

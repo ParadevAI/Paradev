@@ -36,7 +36,7 @@ Claude Code、Codex、その他あらゆるCLIエージェントを、それぞ�
 
 ## 切り替えコストなしで10倍速くコーディング
 
-Paradevは、CLIベースのコーディングエージェントを独立したgit worktree間で並列実行します。ターミナル、レビュー、エディタで開くワークフローも内蔵しています。
+Paradevは、CLIベースのコーディングエージェントを独立したgit worktree間で並列に、ターミナルまたはチャットとして実行します。ターミナル、レビュー、エディタで開くワークフローも内蔵しています。
 
 - **複数のエージェントを同時に実行** — コンテキスト切り替えのオーバーヘッドはありません
 - **各タスクを独立したgit worktreeに分離** — エージェント同士が干渉しません
@@ -229,6 +229,188 @@ Paradevは、次のものを含むあらゆるCLIベースのコーディング�
 - **カスタムエージェント**: 任意のターミナルエージェントを独自のアイコン付きで追加すれば、内蔵エージェントと同じように動作します
 - **ステータスと通知**: 作業中インジケーター、完了チャイム、エージェントが対応を必要とするときのDockバッジ
 - **内蔵チャット**: チャットペインでモデルと対話。インラインのツール承認とプランレビュー付きです
+
+<details>
+<summary><strong>よくある質問</strong></summary>
+<br />
+
+<details>
+<summary>Paradevはターミナルアプリですか？それともデスクトップアプリですか？</summary>
+<br />
+
+Paradevはターミナルアプリではなく、デスクトップアプリです。エージェントはアプリの中で、チャットとして、またはターミナルで動作します。そのすぐ横で、差分ビューア、プルリクエスト、アプリ内ブラウザ、ファイルエディタを使えます。[FAQドキュメント](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>ターミナルを使う必要がありますか？それともコーディングエージェントとチャットできますか？</summary>
+<br />
+
+ターミナルは必須ではありません。Paradevはエージェントセッションをターミナルの代わりにチャットとして表示でき、エージェントの操作はクリックで承認または拒否できます。チャットはClaude Code、Codex、OpenCode、Piで使えます。Paradevはインストール済みのCLIをそのまま実行するため、ログイン情報と設定はそのまま引き継がれます。**CLI** / **Chat** トグルを使うと、実行中のセッションをコンテキストを失わずに切り替えられます。その他のエージェントはParadevのターミナルで動作します。[チャットのドキュメント](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>Paradevのライセンス、料金、対応プラットフォームを教えてください。</summary>
+<br />
+
+ParadevはMITライセンスのオープンソースです。Freeプランでは、デスクトップアプリとCLIでローカルワークスペースを利用できます。有料プランでは、オートメーションやクラウドワークスペースなどの機能が加わります。デスクトップアプリはmacOSで動作し、実験的なLinux版AppImageもあります。Windowsにはまだ対応していません。[料金](https://paradev.com/pricing) · [FAQドキュメント](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>ParadevはSupersetと同じですか？Apache Supersetと関係がありますか？</summary>
+<br />
+
+Paradevの旧名はSupersetです。そのため、CLIコマンドは今も`superset`のままです。BIツールのApache Supersetとは関係ありません。[インストールのドキュメント](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Paradevはどのコーディングエージェントに対応していますか？自分のサブスクリプションはそのまま使えますか？</summary>
+<br />
+
+ParadevはClaude Code、Codex、OpenCode、Cursor Agent、Gemini CLI、Ampなどを標準でサポートしており、その他のCLIエージェントも追加できます。Claude Code、Codex、OpenCode、Piはチャットとしても実行できます。エージェントはあなた自身のサブスクリプションとAPIキーを使い、Paradevがモデル呼び出しをプロキシすることはありません。[対応エージェントのドキュメント](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>1つのリポジトリで、複数のコーディングエージェントが互いの変更を上書きしないようにするには？</summary>
+<br />
+
+Paradevはエージェントごとに専用のワークスペースを用意します。ワークスペースは専用のブランチ上のGit worktreeで、専用のターミナルを持ちます。各エージェントは作業ファイルの別々のコピーを編集するため、あるエージェントが別のエージェントの変更を上書きすることはありません。ただし、worktreeはプロセスをサンドボックス化しません。また、ブランチをマージするときに競合が起きる可能性はあります。[ワークスペースのドキュメント](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>Claude Codeのターミナルセッションが多すぎます。どうすれば把握できますか？</summary>
+<br />
+
+Paradevはすべてのエージェントセッションを1つのサイドバーにプロジェクトごとにまとめて表示し、セッションがチャットとターミナルのどちらで動作していても、それぞれのステータスを示します。Claude Codeは作業が完了したときと入力を待っているときに通知し、サイドバーは対応が必要なワークスペースに印を付けます。[エージェントステータスのドキュメント](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>同じタスクを2つのコーディングエージェントに実行させて、結果を比較できますか？</summary>
+<br />
+
+はい。Paradevでは、同じプロンプトを2つ以上のワークスペースに渡せます。各ワークスペースは専用のブランチで動作し、エージェントは同じでも異なっていても構いません。その後、差分を比較して最良の結果を残します。[エージェントを競わせるレシピ](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>Claude CodeとCodexを組み合わせて、片方にコードを書かせ、もう片方にレビューさせることはできますか？</summary>
+<br />
+
+はい。ParadevはClaude CodeとCodexを並べて実行でき、それぞれチャットとしてもターミナルでも動かせます。レビューを依頼するには、プルリクエストの **Code** タブで行を選択してもう一方のエージェントに送るか、**Continue with another agent** を使って、直近のコンテキストを引き継いだ別のエージェントのセッションを開始します。[エージェントセッションのドキュメント](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>マージ前に、コーディングエージェントの差分をレビューして追加の指示を送るには？</summary>
+<br />
+
+Paradevは各ワークスペースの変更を差分ビューアに表示し、そこからコミット、プッシュ、プルリクエストの作成ができます。プルリクエストの **Code** タブで行を選択すると、実行中のエージェントまたは新しいセッションにコメントを送れます。GitHubへの投稿は任意です。チェックの確認とマージも同じ画面で行えます。[プルリクエストのドキュメント](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>ブランチごとの開発サーバー、ポート、プレビューを分けておくには？</summary>
+<br />
+
+Paradevは各ブランチを専用のworktreeに置き、各ワークスペースのプロセスが待ち受けているポートをワークスペースごとにまとめて表示します。ポートを選択すると、そのブランチの開発サーバーがアプリ内ブラウザで開きます。Paradevはポート範囲を割り当てないため、ワークスペースごとの設定はセットアップスクリプトで行ってください。セットアップスクリプトは新しいワークスペースごとに実行され、`SUPERSET_WORKSPACE_PATH`などの変数を使えます。[ポートのドキュメント](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>実行中のWebアプリで要素をクリックして、コーディングエージェントに変更させることはできますか？</summary>
+<br />
+
+はい。Paradevのアプリ内ブラウザにはDesignモードがあります。開発サーバーを開き、**Design** をオンにして、要素をクリックします。続いて変更内容を説明すると、エージェントはあなたのメモと一緒に、要素の詳細とスクリーンショットを受け取ります。[ブラウザのドキュメント](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>コーディングエージェントが入力を必要としたときに通知を受け取れますか？</summary>
+<br />
+
+はい。Paradevのデスクトップアプリは、エージェントが作業を終えたときや入力待ちで止まったときに通知し、macOSのDockアイコンにバッジを表示します。対応状況はエージェントによって異なります。Claude Codeは両方の状態を報告しますが、完了時にしか報告しないエージェントもあります。モバイルアプリでは、エージェントが許可を求めているとワークスペースにドットが表示されます。プッシュ通知にはまだ対応していません。[エージェントステータスのドキュメント](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>iPhoneからコーディングエージェントの様子を確認して、応答できますか？</summary>
+<br />
+
+はい。iPhone・iPad向けのParadevでは、エージェントの開始、セッションのライブ表示、エージェントへの応答、変更のレビューができます。iOS 26またはiPadOS 26以降とParadev Proが必要です。Google PlayではAndroidアプリも提供しています。お使いのコンピューター上のワークスペースを使うには、リモートアクセスをオンにし、コンピューターをスリープさせずオンラインの状態に保ってください。[モバイルアプリのドキュメント](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>夜間のメンテナンスや週次の不安定なテストのチェックなど、コーディングエージェントをスケジュール実行できますか？</summary>
+<br />
+
+はい。Paradevのオートメーションは、毎時、毎日、毎週、またはカスタムのスケジュールでエージェントを実行します。実行のたびにワークスペースが作成され、そこで変更をレビューして作業を続けられます。オートメーションにはProプランが必要です。[オートメーションのドキュメント](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Slack、Linear、Sentry、またはGitHubのプルリクエストからコーディングエージェントを起動できますか？</summary>
+<br />
+
+はい。Paradevのオートメーションは、GitHubのプルリクエストイベント、Slackのメッセージ、Linearのissue、Sentryのissue、またはWebhookを受け取るとエージェントを起動します。エージェントは、イベントの詳細をあなたのプロンプトと一緒に受け取ります。SlackでParadevボットにメンションして、クラウドワークスペースとエージェントを起動することもできます。オートメーションとSlack連携にはProプランが必要です。[オートメーションのドキュメント](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>コマンドラインや別のエージェントから、コーディングエージェントを起動できますか？</summary>
+<br />
+
+はい。Paradev CLIを使うと、シェルスクリプトや別のエージェントからワークスペースを作成し、その中でエージェントを起動できます。エージェントはParadev MCPサーバーを使って、ワークスペースやターミナルを操作することもできます。デスクトップアプリにはorchestrateスキルが含まれており、1つのエージェントが別々のワークスペースにいるワーカーを統括できます。[CLIのドキュメント](https://docs.paradev.com/cli/getting-started)
+
+</details>
+
+<details>
+<summary>リモートマシンやクラウドでコーディングエージェントを実行し、ノートPCから変更をレビューできますか？</summary>
+<br />
+
+はい。Paradevのリモートアクセス（Proプラン）を使えば、Mac miniやサーバーなど別のマシンでホストされているワークスペースをノートPCから開けます。クラウドワークスペース（TeamプランとUltraプラン）では各ワークスペースが専用のクラウドマシンで動作するため、ノートPCを閉じてもエージェントは作業を続けます。[リモートアクセスのドキュメント](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>エージェントセッションとブランチを残したまま、後でタスクに戻れますか？</summary>
+<br />
+
+はい。Paradevのワークスペースは、削除するまでブランチ上のGit worktreeとしてディスクに残ります。ターミナルはバックグラウンドプロセスに属しているため、アプリを閉じたりアップデートしたりしても動作を続け、スクロールバックも保持されます。クラッシュや再起動でターミナルが止まった場合でも、Claude CodeやCodexなど再開に対応したエージェントであれば、Paradevがエージェントセッションを再開できます。[エージェントを動かし続けるためのドキュメント](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>小規模なチームで、1台のマシンをコーディングエージェント用に共有できますか？</summary>
+<br />
+
+はい。ParadevのホストにはMac miniなどの共有マシンを使えます。チームメイトはリモートアクセス（Proプラン）経由で接続します。ホストが初めてオンラインになったときは、起動した本人だけがアクセスできます。その人が **Settings → Hosts** でチームメイトを追加します。[リモートアクセスのドキュメント](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>ParadevはConductor、Orca、Cursorとどう違いますか？</summary>
+<br />
+
+Paradev、Conductor、Orcaはいずれもコーディングエージェントを並列のGit worktreeで実行します。Cursorは独自のエージェントを中心に作られたAIエディタです。Paradevはあなた自身のサブスクリプションであらゆるCLIエージェントを実行でき、Cursorで編集したいときはワークスペースをCursorで開けます。Orcaもオープンソースで、ParadevがまだサポートしていないWindowsでも動作します。ConductorはMetaに合流する予定で、新規ユーザーの受け付けを終了しています。ParadevにはConductorのワークスペースを移行するためのガイドがあります。[Conductorからの移行](https://docs.paradev.com/migrate-from-conductor)
+
+</details>
+
+<details>
+<summary>Paradevはtmuxの代わりになりますか？</summary>
+<br />
+
+はい。コーディングエージェントを実行する用途なら、Paradevはtmuxの代わりになります。Paradevのターミナルセッションは、アプリを閉じても、終了しても、アップデートしても動作し続けます。さらに、各ワークスペースには専用のworktreeとサイドバーのステータスがあります。Paradevのターミナル内でtmuxを実行することもできます。[エージェントを動かし続けるためのドキュメント](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+</details>
 
 ## デスクトップアプリだけではありません
 

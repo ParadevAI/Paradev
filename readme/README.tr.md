@@ -36,7 +36,7 @@ Zamanınızı beklemeye değil, ürün çıkarmaya ayırın.
 
 ## Bağlam Değiştirme Maliyeti Olmadan 10 Kat Hızlı Kod Yazın
 
-Paradev, CLI tabanlı kodlama ajanlarını izole git worktree'lerinde paralel çalıştırır; yerleşik terminal, inceleme ve editörde açma iş akışlarıyla birlikte gelir.
+Paradev, CLI tabanlı kodlama ajanlarını izole git worktree'lerinde paralel olarak, terminalde ya da sohbet şeklinde çalıştırır; yerleşik terminal, inceleme ve editörde açma iş akışlarıyla birlikte gelir.
 
 - **Birden fazla ajanı aynı anda çalıştırın** — bağlam değiştirme yükü olmadan
 - **Her görevi kendi git worktree'sinde izole edin** — ajanlar birbirine karışmaz
@@ -229,6 +229,188 @@ Ajanlar bir terminalden fazlasını elde eder:
 - **Özel ajanlar**: kendi simgesiyle herhangi bir terminal ajanı ekleyin; yerleşik bir ajan gibi çalışır
 - **Durum ve bildirimler**: çalışma göstergeleri, tamamlanma sesleri ve bir ajan sizi beklediğinde dock rozetleri
 - **Yerleşik sohbet**: bir sohbet bölmesinde modellerle konuşun; satır içi araç onayları ve plan incelemesiyle
+
+<details>
+<summary><strong>Sık Sorulan Sorular</strong></summary>
+<br />
+
+<details>
+<summary>Paradev bir terminal uygulaması mı, yoksa masaüstü uygulaması mı?</summary>
+<br />
+
+Paradev bir terminal uygulaması değil, masaüstü uygulamasıdır. Ajanlar onun içinde sohbet olarak veya bir terminalde çalışır. Yanlarında fark görüntüleyici, pull request'ler, uygulama içi tarayıcı ve dosya editörü bulunur. [SSS belgeleri](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Terminal kullanmak zorunda mıyım, yoksa kodlama ajanıyla sohbet edebilir miyim?</summary>
+<br />
+
+Zorunda değilsiniz; Paradev bir ajan oturumunu terminal yerine sohbet olarak gösterebilir ve ajanın eylemlerini tek tıkla onaylar veya reddedersiniz. Sohbet Claude Code, Codex, OpenCode ve Pi ile çalışır; Paradev zaten kurulu olan CLI'ı çalıştırır, bu yüzden oturum açma bilgileriniz ve ayarlarınız korunur. **CLI** / **Chat** anahtarı çalışan bir oturumu bağlamı kaybetmeden değiştirir; diğer ajanlar ise bir Paradev terminalinde çalışır. [Sohbet belgeleri](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>Paradev'in lisansı nedir, ne kadar tutar ve hangi platformlarda çalışır?</summary>
+<br />
+
+Paradev, MIT Lisansı ile açık kaynaktır. Free planı, masaüstü uygulaması ve CLI ile yerel çalışma alanlarını kapsar. Ücretli planlar otomasyonlar ve bulut çalışma alanları gibi özellikler ekler. Masaüstü uygulaması macOS'ta çalışır, ayrıca deneysel bir Linux AppImage sürümü vardır; Windows henüz desteklenmiyor. [Fiyatlandırma](https://paradev.com/pricing) · [SSS belgeleri](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Paradev, Superset ile aynı mı? Apache Superset ile bir ilgisi var mı?</summary>
+<br />
+
+Paradev'in önceki adı Superset'ti; CLI komutunun hâlâ `superset` olmasının nedeni bu. Bir iş zekâsı aracı olan Apache Superset ile ilgisi yoktur. [Kurulum belgeleri](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Paradev hangi kodlama ajanlarını destekliyor ve kendi aboneliklerimi kullanmaya devam edebilir miyim?</summary>
+<br />
+
+Paradev; Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp ve daha fazlası için yerleşik destek sunar, ayrıca başka herhangi bir CLI ajanını da ekleyebilirsiniz. Claude Code, Codex, OpenCode ve Pi sohbet olarak da çalışabilir. Ajanlar kendi aboneliklerinizi ve API anahtarlarınızı kullanır; Paradev model çağrılarını proxy üzerinden geçirmez. [Desteklenen ajanlar belgeleri](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>Tek bir depoda birden fazla kodlama ajanının birbirinin üzerine yazmasını nasıl önlerim?</summary>
+<br />
+
+Paradev her ajana kendi çalışma alanını verir: kendi dalında, kendi terminaline sahip bir git worktree. Ajanlar çalışma dosyalarının ayrı kopyalarını düzenler, böylece bir ajan diğerinin değişikliklerinin üzerine yazmaz. Worktree'ler süreçleri sandbox içine almaz ve dallar merge edilirken yine de çakışabilir. [Çalışma alanları belgeleri](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>Çok fazla Claude Code terminal oturumum var. Bunları nasıl takip ederim?</summary>
+<br />
+
+Paradev her ajan oturumunu projeye göre gruplanmış şekilde tek bir kenar çubuğunda, her biri için bir durumla gösterir; oturum ister sohbet olarak ister terminalde çalışsın. Claude Code işini bitirdiğinde ve sizden girdi beklediğinde bunu bildirir; kenar çubuğu da size ihtiyaç duyan çalışma alanlarını işaretler. [Ajan durumu belgeleri](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Aynı görevde iki kodlama ajanı çalıştırıp sonuçları karşılaştırabilir miyim?</summary>
+<br />
+
+Evet, Paradev'de aynı istemi her biri kendi dalında olan iki veya daha fazla çalışma alanına, aynı ajanla ya da farklı ajanlarla verirsiniz. Ardından farkları karşılaştırır ve en iyi sonucu tutarsınız. [Ajan yarıştırma tarifi](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>Claude Code ve Codex'i birlikte, biri kod yazarken diğeri inceleme yapacak şekilde kullanabilir miyim?</summary>
+<br />
+
+Evet, Paradev Claude Code ve Codex'i yan yana, her birini sohbet olarak veya bir terminalde çalıştırır. İnceleme almak için bir pull request'in **Code** sekmesinde satırları seçip diğer ajana gönderin ya da son bağlamla farklı bir ajanın oturumunu başlatmak için **Continue with another agent** seçeneğini kullanın. [Ajan oturumları belgeleri](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>Merge etmeden önce bir kodlama ajanının farkını nasıl incelerim ve ona nasıl geri bildirim gönderirim?</summary>
+<br />
+
+Paradev her çalışma alanının değişikliklerini bir fark görüntüleyicide gösterir; burada commit, push yapar ve pull request açarsınız. Pull request'in **Code** sekmesinde satırları seçip çalışan bir ajana veya yeni bir oturuma yorum gönderin; yorumu GitHub'a göndermek isteğe bağlıdır. Kontrolleri izleyip aynı görünümden merge edebilirsiniz. [Pull request belgeleri](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>Her dalın geliştirme sunucusunu, portlarını ve önizlemesini nasıl ayrı tutarım?</summary>
+<br />
+
+Paradev her dalı kendi worktree'sinde tutar ve her çalışma alanının süreçlerinin dinlediği portları çalışma alanına göre gruplanmış olarak gösterir. O dalın geliştirme sunucusunu uygulama içi tarayıcıda açmak için bir port seçin. Paradev port aralığı atamaz; bu yüzden çalışma alanına özel yapılandırmayı bir kurulum betiğinde ayarlayın. Bu betik her yeni çalışma alanında `SUPERSET_WORKSPACE_PATH` gibi değişkenlerle çalışır. [Port belgeleri](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>Çalışan web uygulamamda bir öğeye tıklayıp bir kodlama ajanına değiştirtebilir miyim?</summary>
+<br />
+
+Evet, Paradev'in uygulama içi tarayıcısında bir Design modu var: geliştirme sunucunuzu açın, **Design**'ı açın ve öğeye tıklayın. Ardından değişikliği tarif edersiniz; ajan, notunuzla birlikte öğenin ayrıntılarını ve bir ekran görüntüsünü alır. [Tarayıcı belgeleri](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>Bir kodlama ajanı girdime ihtiyaç duyduğunda bildirim alabilir miyim?</summary>
+<br />
+
+Evet, Paradev masaüstü uygulaması bir ajan işini bitirdiğinde veya girdinizi beklemek için durduğunda sizi bilgilendirir ve macOS Dock simgesinde bir rozet gösterilir. Destek ajana göre değişir: Claude Code her iki durumu da bildirir, bazı ajanlar ise yalnızca bitirdiklerinde bildirir. Mobil uygulamada çalışma alanındaki bir nokta, bir ajanın izninize ihtiyaç duyduğunu gösterir; anlık bildirimler henüz kullanılamıyor. [Ajan durumu belgeleri](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Kodlama ajanlarımı iPhone'umdan kontrol edip onlara yanıt verebilir miyim?</summary>
+<br />
+
+Evet, iPhone ve iPad için Paradev; ajan başlatmanıza, oturumlarını canlı takip etmenize, onlara yanıt vermenize ve değişikliklerini incelemenize olanak tanır. iOS 26 veya iPadOS 26 ya da üzeri ve Paradev Pro gerekir; ayrıca Google Play'de bir Android uygulaması da vardır. Bilgisayarınızdaki çalışma alanları için uzak erişimi açın ve bilgisayarı uyanık ve çevrimiçi tutun. [Mobil uygulama belgeleri](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>Bir kodlama ajanı, gece bakımı veya haftalık kararsız test kontrolü gibi bir zamanlamayla çalışabilir mi?</summary>
+<br />
+
+Evet, Paradev otomasyonları bir ajanı saatlik, günlük, haftalık veya özel bir zamanlamayla çalıştırır. Her çalıştırma, değişiklikleri inceleyip işe devam ettiğiniz bir çalışma alanı oluşturur. Otomasyonlar için Pro planı gerekir. [Otomasyon belgeleri](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Slack, Linear, Sentry veya bir GitHub pull request'inden kodlama ajanı başlatabilir miyim?</summary>
+<br />
+
+Evet, Paradev otomasyonları bir GitHub pull request olayı, bir Slack mesajı, bir Linear issue'su, bir Sentry issue'su veya bir webhook geldiğinde bir ajan başlatır ve ajan, isteminizle birlikte olayın ayrıntılarını alır. Ayrıca Slack'te Paradev botundan bahsederek bir bulut çalışma alanı ve ajan başlatabilirsiniz. Otomasyonlar ve Slack entegrasyonu için Pro planı gerekir. [Otomasyon belgeleri](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Kodlama ajanlarını komut satırından veya başka bir ajandan başlatabilir miyim?</summary>
+<br />
+
+Evet, Paradev CLI bir kabuk betiğinden veya başka bir ajandan çalışma alanları oluşturur ve içlerinde ajan başlatır. Ajanlar ayrıca çalışma alanları ve terminallerle çalışmak için Paradev MCP sunucusunu kullanabilir. Masaüstü uygulaması, bir ajanın ayrı çalışma alanlarındaki çalışanları koordine etmesini sağlayan bir orchestrate becerisi içerir. [CLI belgeleri](https://docs.paradev.com/cli/getting-started)
+
+</details>
+
+<details>
+<summary>Kodlama ajanlarını uzak bir makinede veya bulutta çalıştırıp değişiklikleri dizüstü bilgisayarımdan inceleyebilir miyim?</summary>
+<br />
+
+Evet, Paradev uzak erişimi (Pro planı) ile Mac mini veya bir sunucu gibi başka bir makinede barındırılan çalışma alanlarını dizüstü bilgisayarınızdan açarsınız. Bulut çalışma alanları (Team ve Ultra planları) her çalışma alanını kendi bulut makinesinde çalıştırır, böylece dizüstü bilgisayarınız kapalıyken de ajanlar çalışmaya devam eder. [Uzak erişim belgeleri](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Bir göreve daha sonra, ajan oturumu ve dalı hâlâ yerindeyken geri dönebilir miyim?</summary>
+<br />
+
+Evet, bir Paradev çalışma alanı siz silene kadar diskte kendi dalındaki bir git worktree olarak kalır. Terminaller bir arka plan sürecine aittir, bu yüzden uygulamayı kapattığınızda veya güncellediğinizde çalışmaya devam eder ve kaydırma geçmişlerini korur. Bir terminal çökme veya yeniden başlatma sonrasında durursa Paradev, Claude Code ve Codex gibi devam ettirmeyi destekleyen ajanların oturumunu sürdürebilir. [Ajanları çalışır tutma belgeleri](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>Küçük bir ekip kodlama ajanları için tek bir makineyi paylaşabilir mi?</summary>
+<br />
+
+Evet, bir Paradev host'u, ekip arkadaşlarının uzak erişim (Pro planı) üzerinden ulaştığı Mac mini gibi paylaşılan bir makine olabilir. Host ilk kez çevrimiçi olduğunda yalnızca onu başlatan kişinin erişimi olur. Bu kişi ekip arkadaşlarını **Settings → Hosts** altından ekler. [Uzak erişim belgeleri](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Paradev'in Conductor, Orca ve Cursor'dan farkı nedir?</summary>
+<br />
+
+Paradev, Conductor ve Orca kodlama ajanlarını paralel git worktree'lerinde çalıştırır; Cursor ise kendi ajanı etrafında kurulmuş bir yapay zekâ editörüdür. Paradev herhangi bir CLI ajanını kendi aboneliklerinizle çalıştırır ve orada düzenleme yapmak istediğinizde bir çalışma alanını Cursor'da açar. Orca da açık kaynaktır ve Paradev'in henüz desteklemediği Windows'ta çalışır. Conductor, Meta'ya katılıyor ve yeni kullanıcılara kapalı; Paradev'in Conductor çalışma alanlarını taşımak için bir rehberi var. [Conductor'dan geçiş](https://docs.paradev.com/migrate-from-conductor)
+
+</details>
+
+<details>
+<summary>Paradev, tmux'un yerini tutar mı?</summary>
+<br />
+
+Evet, kodlama ajanlarını çalıştırmak için Paradev tmux'un yerini tutabilir: terminal oturumları, uygulamayı kapattığınızda, sonlandırdığınızda veya güncellediğinizde çalışmaya devam eder. Her çalışma alanı ayrıca kendi worktree'sine ve kenar çubuğunda kendi durumuna sahip olur. tmux'u yine de bir Paradev terminalinin içinde çalıştırabilirsiniz. [Ajanları çalışır tutma belgeleri](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+</details>
 
 ## Bir Masaüstü Uygulamasından Fazlası
 

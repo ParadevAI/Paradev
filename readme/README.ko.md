@@ -36,7 +36,7 @@ Claude Code, Codex를 비롯한 모든 CLI 에이전트를 각각 격리된 work
 
 ## 전환 비용 없이 10배 빠른 코딩
 
-Paradev는 CLI 기반 코딩 에이전트를 격리된 git worktree에서 병렬로 실행하며, 터미널, 리뷰, 에디터로 열기 워크플로를 기본 제공합니다.
+Paradev는 CLI 기반 코딩 에이전트를 격리된 git worktree에서 병렬로, 터미널 또는 채팅으로 실행하며, 터미널, 리뷰, 에디터로 열기 워크플로를 기본 제공합니다.
 
 - **여러 에이전트를 동시에 실행** — 컨텍스트 전환 부담이 없습니다
 - **각 작업을 격리된 git worktree에 분리** — 에이전트끼리 서로 간섭하지 않습니다
@@ -229,6 +229,188 @@ Paradev는 다음을 포함한 모든 CLI 기반 코딩 에이전트와 함께 �
 - **커스텀 에이전트**: 어떤 터미널 에이전트든 전용 아이콘과 함께 추가하면 내장 에이전트처럼 작동
 - **상태와 알림**: 작업 중 표시, 완료 알림음, 에이전트가 개입을 필요로 할 때의 Dock 배지
 - **내장 채팅**: 채팅 패널에서 모델과 대화. 인라인 도구 승인과 계획 리뷰 지원
+
+<details>
+<summary><strong>자주 묻는 질문</strong></summary>
+<br />
+
+<details>
+<summary>Paradev는 터미널 앱인가요, 데스크톱 앱인가요?</summary>
+<br />
+
+Paradev는 터미널 앱이 아니라 데스크톱 앱입니다. 에이전트는 앱 안에서 채팅으로 또는 터미널에서 실행됩니다. 바로 옆에서 차이 뷰어, 풀 리퀘스트, 앱 내 브라우저, 파일 에디터를 함께 사용할 수 있습니다. [FAQ 문서](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>터미널을 꼭 써야 하나요, 아니면 코딩 에이전트와 채팅할 수 있나요?</summary>
+<br />
+
+터미널을 꼭 쓸 필요는 없습니다. Paradev는 에이전트 세션을 터미널 대신 채팅으로 보여 줄 수 있고, 에이전트의 작업은 클릭 한 번으로 승인하거나 거절할 수 있습니다. 채팅은 Claude Code, Codex, OpenCode, Pi에서 동작합니다. Paradev는 이미 설치한 CLI를 그대로 실행하므로 로그인과 설정이 그대로 유지됩니다. **CLI** / **Chat** 토글로 실행 중인 세션을 컨텍스트 손실 없이 전환할 수 있으며, 다른 에이전트는 Paradev 터미널에서 실행됩니다. [채팅 문서](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>Paradev의 라이선스, 비용, 지원 플랫폼은 어떻게 되나요?</summary>
+<br />
+
+Paradev는 MIT 라이선스로 공개된 오픈 소스입니다. Free 요금제에서는 데스크톱 앱과 CLI로 로컬 워크스페이스를 사용할 수 있습니다. 유료 요금제에는 자동화, 클라우드 워크스페이스 같은 기능이 추가됩니다. 데스크톱 앱은 macOS에서 실행되며, 실험적인 Linux AppImage도 있습니다. Windows는 아직 지원하지 않습니다. [가격](https://paradev.com/pricing) · [FAQ 문서](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Paradev는 Superset과 같은 건가요? Apache Superset과 관련이 있나요?</summary>
+<br />
+
+Paradev의 이전 이름은 Superset이었고, 그래서 CLI 명령어가 여전히 `superset`입니다. 비즈니스 인텔리전스 도구인 Apache Superset과는 관련이 없습니다. [설치 문서](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Paradev는 어떤 코딩 에이전트를 지원하나요? 제 구독을 그대로 쓸 수 있나요?</summary>
+<br />
+
+Paradev는 Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp 등을 기본 지원하며, 다른 CLI 에이전트도 얼마든지 추가할 수 있습니다. Claude Code, Codex, OpenCode, Pi는 채팅으로도 실행할 수 있습니다. 에이전트는 여러분의 구독과 API 키를 사용하며, Paradev는 모델 호출을 프록시하지 않습니다. [지원 에이전트 문서](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>한 저장소에서 여러 코딩 에이전트가 서로의 변경을 덮어쓰지 않게 하려면 어떻게 하나요?</summary>
+<br />
+
+Paradev는 에이전트마다 별도의 워크스페이스를 제공합니다. 각 워크스페이스는 자체 브랜치 위의 Git worktree이며, 전용 터미널을 갖습니다. 에이전트들은 작업 파일의 서로 다른 사본을 편집하므로, 한 에이전트가 다른 에이전트의 변경 사항을 덮어쓰지 않습니다. 다만 worktree는 프로세스를 샌드박스로 격리하지 않으며, 브랜치를 머지할 때는 여전히 충돌이 생길 수 있습니다. [워크스페이스 문서](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>Claude Code 터미널 세션이 너무 많아요. 어떻게 관리하나요?</summary>
+<br />
+
+Paradev는 모든 에이전트 세션을 하나의 사이드바에 프로젝트별로 묶어 보여 주며, 세션이 채팅으로 실행되든 터미널에서 실행되든 각각의 상태를 표시합니다. Claude Code는 작업을 마쳤을 때와 입력을 기다릴 때 이를 알리고, 사이드바는 확인이 필요한 워크스페이스를 표시해 줍니다. [에이전트 상태 문서](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>같은 작업에 코딩 에이전트 두 개를 실행해 결과를 비교할 수 있나요?</summary>
+<br />
+
+네, Paradev에서는 같은 프롬프트를 두 개 이상의 워크스페이스에 줄 수 있습니다. 각 워크스페이스는 자체 브랜치에서 동작하며, 같은 에이전트를 써도 되고 다른 에이전트를 써도 됩니다. 그런 다음 각 diff를 비교해 가장 좋은 결과를 남기면 됩니다. [에이전트 경쟁 레시피](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>Claude Code와 Codex를 함께 써서, 하나는 코드를 작성하고 다른 하나는 리뷰하게 할 수 있나요?</summary>
+<br />
+
+네, Paradev는 Claude Code와 Codex를 나란히 실행하며, 각각 채팅으로 또는 터미널에서 실행할 수 있습니다. 리뷰를 받으려면 풀 리퀘스트의 **Code** 탭에서 줄을 선택해 다른 에이전트에게 보내거나, **Continue with another agent**를 사용해 최근 컨텍스트를 이어받은 다른 에이전트의 세션을 시작하세요. [에이전트 세션 문서](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>머지하기 전에 코딩 에이전트의 diff를 리뷰하고 후속 지시를 보내려면 어떻게 하나요?</summary>
+<br />
+
+Paradev는 각 워크스페이스의 변경 사항을 차이 뷰어에 보여 주며, 여기서 커밋, 푸시, 풀 리퀘스트 생성을 할 수 있습니다. 풀 리퀘스트의 **Code** 탭에서 줄을 선택해 실행 중인 에이전트나 새 세션에 코멘트를 보내세요. GitHub에 게시하는 것은 선택 사항입니다. 같은 화면에서 체크를 확인하고 머지할 수도 있습니다. [풀 리퀘스트 문서](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>브랜치마다 개발 서버, 포트, 미리보기를 분리하려면 어떻게 하나요?</summary>
+<br />
+
+Paradev는 각 브랜치를 자체 worktree에 두고, 각 워크스페이스의 프로세스가 수신 대기 중인 포트를 워크스페이스별로 묶어 보여 줍니다. 포트를 선택하면 해당 브랜치의 개발 서버가 앱 내 브라우저에서 열립니다. Paradev는 포트 범위를 할당하지 않으므로, 워크스페이스별 설정은 설정 스크립트에서 지정하세요. 설정 스크립트는 새 워크스페이스마다 실행되며, `SUPERSET_WORKSPACE_PATH` 같은 변수를 사용할 수 있습니다. [포트 문서](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>실행 중인 웹 앱에서 요소를 클릭해 코딩 에이전트가 바꾸게 할 수 있나요?</summary>
+<br />
+
+네, Paradev의 앱 내 브라우저에는 Design 모드가 있습니다. 개발 서버를 열고 **Design**을 켠 다음 요소를 클릭하세요. 이어서 원하는 변경을 설명하면, 에이전트는 여러분의 메모와 함께 요소의 세부 정보와 스크린샷을 받습니다. [브라우저 문서](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>코딩 에이전트가 입력을 필요로 할 때 알림을 받을 수 있나요?</summary>
+<br />
+
+네, Paradev 데스크톱 앱은 에이전트가 작업을 마치거나 입력을 기다리며 멈추면 알림을 보내고, macOS Dock 아이콘에 배지를 표시합니다. 지원 범위는 에이전트마다 다릅니다. Claude Code는 두 상태를 모두 알리지만, 일부 에이전트는 작업을 마쳤을 때만 알립니다. 모바일 앱에서는 에이전트에 권한 승인이 필요하면 워크스페이스에 점이 표시됩니다. 푸시 알림은 아직 지원하지 않습니다. [에이전트 상태 문서](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>iPhone에서 코딩 에이전트를 확인하고 응답할 수 있나요?</summary>
+<br />
+
+네, iPhone 및 iPad용 Paradev에서 에이전트를 시작하고, 세션을 실시간으로 지켜보고, 응답하고, 변경 사항을 리뷰할 수 있습니다. iOS 26 또는 iPadOS 26 이상과 Paradev Pro가 필요하며, Google Play에서 Android 앱도 받을 수 있습니다. 컴퓨터에 있는 워크스페이스를 사용하려면 원격 접속을 켜고, 컴퓨터가 잠자기 상태로 전환되지 않고 온라인을 유지하도록 하세요. [모바일 앱 문서](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>야간 유지보수나 주간 flaky 테스트 점검처럼 코딩 에이전트를 일정에 맞춰 실행할 수 있나요?</summary>
+<br />
+
+네, Paradev 자동화는 매시간, 매일, 매주 또는 사용자 지정 일정으로 에이전트를 실행합니다. 실행할 때마다 워크스페이스가 생성되며, 그곳에서 변경 사항을 리뷰하고 작업을 이어 갈 수 있습니다. 자동화에는 Pro 요금제가 필요합니다. [자동화 문서](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Slack, Linear, Sentry 또는 GitHub 풀 리퀘스트에서 코딩 에이전트를 시작할 수 있나요?</summary>
+<br />
+
+네, Paradev 자동화는 GitHub 풀 리퀘스트 이벤트, Slack 메시지, Linear 이슈, Sentry 이슈 또는 웹훅이 들어오면 에이전트를 시작하며, 에이전트는 여러분의 프롬프트와 함께 이벤트 세부 정보를 받습니다. Slack에서 Paradev 봇을 멘션해 클라우드 워크스페이스와 에이전트를 시작할 수도 있습니다. 자동화와 Slack 연동에는 Pro 요금제가 필요합니다. [자동화 문서](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>명령줄이나 다른 에이전트에서 코딩 에이전트를 시작할 수 있나요?</summary>
+<br />
+
+네, Paradev CLI는 셸 스크립트나 다른 에이전트에서 워크스페이스를 만들고 그 안에서 에이전트를 시작합니다. 에이전트는 Paradev MCP 서버를 사용해 워크스페이스와 터미널을 다룰 수도 있습니다. 데스크톱 앱에는 orchestrate 스킬이 포함되어 있어, 하나의 에이전트가 별도 워크스페이스에 있는 작업자 에이전트들을 조율할 수 있습니다. [CLI 문서](https://docs.paradev.com/cli/getting-started)
+
+</details>
+
+<details>
+<summary>원격 머신이나 클라우드에서 코딩 에이전트를 실행하고, 노트북에서 변경 사항을 리뷰할 수 있나요?</summary>
+<br />
+
+네, Paradev 원격 접속(Pro 요금제)을 사용하면 Mac mini나 서버 같은 다른 머신에서 호스팅되는 워크스페이스를 노트북에서 열 수 있습니다. 클라우드 워크스페이스(Team 및 Ultra 요금제)는 각 워크스페이스를 전용 클라우드 머신에서 실행하므로, 노트북을 닫아도 에이전트가 계속 작업합니다. [원격 접속 문서](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>에이전트 세션과 브랜치를 그대로 둔 채, 나중에 작업으로 돌아올 수 있나요?</summary>
+<br />
+
+네, Paradev 워크스페이스는 삭제하기 전까지 해당 브랜치의 Git worktree로 디스크에 남아 있습니다. 터미널은 백그라운드 프로세스에 속해 있으므로, 앱을 닫거나 업데이트해도 계속 실행되고 스크롤백도 유지됩니다. 크래시나 재시작으로 터미널이 멈추더라도, Claude Code나 Codex처럼 재개를 지원하는 에이전트라면 Paradev가 에이전트 세션을 재개할 수 있습니다. [에이전트 계속 실행하기 문서](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>소규모 팀이 코딩 에이전트용으로 머신 한 대를 공유할 수 있나요?</summary>
+<br />
+
+네, Paradev 호스트는 Mac mini 같은 공유 머신이 될 수 있으며, 팀원은 원격 접속(Pro 요금제)으로 연결합니다. 호스트가 처음 온라인 상태가 되면 호스트를 시작한 사람만 접근할 수 있습니다. 그 사람이 **Settings → Hosts**에서 팀원을 추가합니다. [원격 접속 문서](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Paradev는 Conductor, Orca, Cursor와 어떻게 다른가요?</summary>
+<br />
+
+Paradev, Conductor, Orca는 모두 코딩 에이전트를 병렬 Git worktree에서 실행하며, Cursor는 자체 에이전트를 중심으로 만든 AI 에디터입니다. Paradev는 여러분의 구독으로 어떤 CLI 에이전트든 실행하고, Cursor에서 편집하고 싶을 때는 워크스페이스를 Cursor에서 열어 줍니다. Orca도 오픈 소스이며, Paradev가 아직 지원하지 않는 Windows에서 실행됩니다. Conductor는 Meta에 합류할 예정이며 신규 사용자를 더 이상 받지 않습니다. Paradev에는 Conductor 워크스페이스를 옮겨 오는 가이드가 있습니다. [Conductor에서 마이그레이션](https://docs.paradev.com/migrate-from-conductor)
+
+</details>
+
+<details>
+<summary>Paradev가 tmux를 대체할 수 있나요?</summary>
+<br />
+
+네, 코딩 에이전트를 실행하는 용도라면 Paradev가 tmux를 대체할 수 있습니다. Paradev의 터미널 세션은 앱을 닫거나, 종료하거나, 업데이트해도 계속 실행됩니다. 각 워크스페이스에는 자체 worktree와 사이드바 상태도 있습니다. Paradev 터미널 안에서 tmux를 계속 실행할 수도 있습니다. [에이전트 계속 실행하기 문서](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+</details>
 
 ## 데스크톱 앱, 그 이상
 
