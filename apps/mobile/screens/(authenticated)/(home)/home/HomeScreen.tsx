@@ -96,7 +96,7 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
-import { type HomeListItem, homeListItemKey } from "./types";
+import type { HomeListItem } from "./types";
 import { buildCloudSection, repoShortName } from "./utils/buildCloudSection";
 import {
 	buildHostSection,
@@ -104,6 +104,7 @@ import {
 	NO_PROJECT_SECTION_ID,
 } from "./utils/buildHostSection";
 import { buildPlacesList, CLOUD_PLACE_ID } from "./utils/buildPlacesList";
+import { homeListItemKey } from "./utils/homeListItemKey";
 import {
 	buildNeedsMeList,
 	cloudRowAttention,

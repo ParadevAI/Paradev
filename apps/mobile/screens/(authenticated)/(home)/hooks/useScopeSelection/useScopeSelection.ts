@@ -12,7 +12,7 @@ import {
 	selectionScope,
 	type WorkspaceScope,
 } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
-import { useCloudScopeEnabled } from "../useWorkspaceScope/useCloudScopeEnabled";
+import { useCloudScopeEnabled } from "../useCloudScopeEnabled";
 
 export interface ScopeSelectionValue {
 	selection: ScopeSelection;

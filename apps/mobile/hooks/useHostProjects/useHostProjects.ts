@@ -1,6 +1,7 @@
 import { type UseQueryResult, useQueries } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import type { WorkspacesHost } from "@/hooks/useHostWorkspaces";
+import { useStableHosts } from "@/hooks/useStableHosts";
 import {
 	getHostServiceClientByUrl,
 	type HostProjectRow,
@@ -83,11 +84,7 @@ const NO_PROJECTS: HostProjectItem[] = [];
 export function useHostsProjects(
 	hosts: readonly WorkspacesHost[],
 ): UseHostsProjectsResult {
-	const hostsKey = hosts
-		.map((host) => `${host.organizationId}:${host.machineId}:${host.isOnline}`)
-		.join("|");
-	// biome-ignore lint/correctness/useExhaustiveDependencies: hostsKey stands for `hosts`
-	const stableHosts = useMemo(() => hosts, [hostsKey]);
+	const stableHosts = useStableHosts(hosts);
 
 	const combine = useCallback(
 		(results: UseQueryResult<ProjectListRows>[]) => {

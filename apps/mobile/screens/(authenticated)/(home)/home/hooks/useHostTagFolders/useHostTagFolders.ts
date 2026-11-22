@@ -1,7 +1,8 @@
 import type { TagFolderSettingInput } from "@superset/shared/workspace-tag-folders";
 import { type UseQueryResult, useQueries } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import type { WorkspacesHost } from "@/hooks/useHostWorkspaces";
+import { useStableHosts } from "@/hooks/useStableHosts";
 import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
@@ -27,11 +28,7 @@ type TagFolderRows = Awaited<
 export function useHostTagFolders(
 	hosts: readonly WorkspacesHost[],
 ): Map<string, TagFolderSettingInput[]> {
-	const hostsKey = hosts
-		.map((host) => `${host.organizationId}:${host.machineId}:${host.isOnline}`)
-		.join("|");
-	// biome-ignore lint/correctness/useExhaustiveDependencies: hostsKey stands for `hosts`
-	const stableHosts = useMemo(() => hosts, [hostsKey]);
+	const stableHosts = useStableHosts(hosts);
 
 	const combine = useCallback(
 		(results: UseQueryResult<TagFolderRows>[]) => {

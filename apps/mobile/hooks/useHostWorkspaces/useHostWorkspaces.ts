@@ -4,6 +4,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
+import { useStableHosts } from "@/hooks/useStableHosts";
 import {
 	getHostServiceClientByUrl,
 	type HostWorkspaceRow,
@@ -55,11 +56,7 @@ export function useHostsWorkspaces(
 ): UseHostsWorkspacesResult {
 	const queryClient = useQueryClient();
 
-	const hostsKey = hosts
-		.map((host) => `${host.organizationId}:${host.machineId}:${host.isOnline}`)
-		.join("|");
-	// biome-ignore lint/correctness/useExhaustiveDependencies: hostsKey stands for `hosts`
-	const stableHosts = useMemo(() => hosts, [hostsKey]);
+	const stableHosts = useStableHosts(hosts);
 
 	const combine = useCallback(
 		(results: UseQueryResult<HostWorkspaceRow[]>[]) =>

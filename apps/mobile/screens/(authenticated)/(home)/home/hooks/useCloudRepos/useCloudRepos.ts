@@ -1,10 +1,9 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQuery } from "@tanstack/react-query";
-import { useFeatureFlag } from "posthog-react-native";
 import { useEffect, useMemo, useRef } from "react";
 import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
 import { useSession } from "@/lib/auth/client";
 import { apiClient } from "@/lib/trpc/client";
+import { useCloudScopeEnabled } from "@/screens/(authenticated)/(home)/hooks/useCloudScopeEnabled";
 import type { CloudRepos } from "../../utils/buildCloudSection";
 
 function cloudReposQueryKey(organizationId: string | null) {
@@ -15,7 +14,7 @@ function cloudReposQueryKey(organizationId: string | null) {
 export function useCloudRepos(): CloudRepos {
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
-	const enabledByFlag = Boolean(useFeatureFlag(FEATURE_FLAGS.CLOUD_WORKSPACES));
+	const enabledByFlag = useCloudScopeEnabled();
 	const { workspaces } = useCloudWorkspaces();
 
 	const query = useQuery({
