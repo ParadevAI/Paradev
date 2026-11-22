@@ -51,6 +51,13 @@ export function AgentUpdateRestartToast() {
 		.sort()
 		.join(",");
 
+	useEffect(
+		() => () => {
+			toast.dismiss(TOAST_ID);
+		},
+		[],
+	);
+
 	useEffect(() => {
 		if (!idleTerminalIds) {
 			toast.dismiss(TOAST_ID);
