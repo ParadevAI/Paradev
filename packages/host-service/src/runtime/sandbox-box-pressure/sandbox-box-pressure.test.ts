@@ -77,7 +77,10 @@ test("logs each memory guard reap once, with sizes and no process name", async (
 	await step(0, reaped);
 	await step(5_000, reaped);
 	expect(warn.mock.calls).toEqual([
-		["box.reaped", { "reap.rss_mb": 5100, "memory.limit_mb": 8192 }],
+		[
+			"box.reaped",
+			{ "reap.rss_mb": 5100, "memory.limit_mb": 8192, "box.event": true },
+		],
 	]);
 	warn.mockRestore();
 });

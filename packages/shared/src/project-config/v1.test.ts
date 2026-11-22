@@ -52,4 +52,13 @@ describe("fromV1Json", () => {
 		const reparsed = parseProjectConfig(toTomlText(config));
 		expect(reparsed.ok && reparsed.config).toEqual(config);
 	});
+
+	test("writes a script that spans lines as a literal block and reads it back as typed", () => {
+		const script =
+			"#!/usr/bin/env bash\nset -euo pipefail\n\nif [ -f x ]; then\n\techo 'a \\ b'\nfi";
+		const text = toTomlText({ install: { run: script } });
+		expect(text).toContain("run = '''\n#!/usr/bin/env bash");
+		const reparsed = parseProjectConfig(text);
+		expect(reparsed.ok && reparsed.config.install?.run).toBe(script);
+	});
 });

@@ -314,7 +314,7 @@ ${options.beforeLaunch ?? ""}${identity}${execLine}
 
 export function createWrapper(binaryName: string, script: string): void {
 	const changed = writeFileIfChanged(getWrapperPath(binaryName), script, 0o755);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} ${binaryName} wrapper`,
 	);
 }

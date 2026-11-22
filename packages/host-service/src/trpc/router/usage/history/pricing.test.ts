@@ -224,4 +224,12 @@ describe("matchModelRate", () => {
 			outputPerM: 15,
 		});
 	});
+
+	test("prices agy rows without a model id as Gemini Pro, marked approximate", () => {
+		expect(matchModelRate("agy", "antigravity")).toMatchObject({
+			inputPerM: 2,
+			outputPerM: 12,
+			approximate: true,
+		});
+	});
 });

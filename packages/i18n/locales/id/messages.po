@@ -164,8 +164,7 @@ msgstr "{0, plural, one {# gagal} other {# gagal}}"
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# file berubah} other {# file berubah}}"
 
-#. placeholder {0}: 2
-#. placeholder {0}: 5
+#. placeholder {0}: 4
 msgid "{0, plural, one {# file} other {# files}}"
 msgstr "{0, plural, one {# file} other {# file}}"
 
@@ -276,6 +275,10 @@ msgstr "{0, plural, one {# tugas} other {# tugas}}"
 #. placeholder {0}: person.runningTerminalCount
 msgid "{0, plural, one {# terminal running} other {# terminals running}}"
 msgstr "{0, plural, other {# terminal berjalan}}"
+
+#. placeholder {0}: row.lines
+msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
+msgstr "{0, plural, other {# baris tidak diubah}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -1698,9 +1701,6 @@ msgstr "1 pengguna"
 msgid "10+ concurrent workstreams without dropped state"
 msgstr "10+ alur kerja bersamaan tanpa kehilangan konteks"
 
-msgid "12m ago"
-msgstr "12m lalu"
-
 msgid "145,000+ across 180 countries"
 msgstr "145.000+ di 180 negara"
 
@@ -1709,9 +1709,6 @@ msgstr "15 mnt"
 
 msgid "15k+ stars, 100+ contributors"
 msgstr "15k+ bintang, 100+ kontributor"
-
-msgid "1d ago"
-msgstr "1h lalu"
 
 msgid "2 agents · 14 files changed"
 msgstr "2 agen · 14 file berubah"
@@ -1727,9 +1724,6 @@ msgstr "2025 sampai sekarang"
 
 msgid "2027"
 msgstr "2027"
-
-msgid "2h ago"
-msgstr "2j lalu"
 
 msgctxt "machine size"
 msgid "2X-Large"
@@ -2164,7 +2158,7 @@ msgstr "Tambahkan Deskripsi"
 msgid "Add description..."
 msgstr "Tambah deskripsi..."
 
-msgid "Add Environment Variable"
+msgid "Add environment variables"
 msgstr "Tambah variabel environment"
 
 msgid "Add extension"
@@ -2204,9 +2198,6 @@ msgstr "Tambah lagi…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Tambahkan satu dari menu di sidebar untuk memulai."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Tambahkan satu atau beberapa variabel environment. Anda juga bisa menyeret dan melepas file .env."
-
 msgid "Add people"
 msgstr "Tambah orang"
 
@@ -2218,6 +2209,9 @@ msgstr "Tambahkan Orang ke Saluran"
 
 msgid "Add photos or files"
 msgstr "Tambah foto atau file"
+
+msgid "Add port"
+msgstr "Tambah port"
 
 msgid "Add project"
 msgstr "Tambah proyek"
@@ -2254,6 +2248,9 @@ msgstr "Tambah NPWP/tax ID"
 
 msgid "Add team member..."
 msgstr "Tambah anggota tim..."
+
+msgid "Add terminal"
+msgstr "Tambah terminal"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Tambahkan tes untuk kode paling berisiko yang belum diuji…"
@@ -2293,6 +2290,9 @@ msgstr "Tambahkan ke sidebar"
 
 msgid "Add to workspace"
 msgstr "Tambahkan ke workspace"
+
+msgid "Add variables"
+msgstr "Tambah variabel"
 
 msgid "Add what it does"
 msgstr "Tambahkan apa yang dilakukannya"
@@ -2396,9 +2396,6 @@ msgstr "Konfigurasi Agen"
 msgid "Agent finished"
 msgstr "Agen selesai"
 
-msgid "Agent Independence"
-msgstr "Independensi Agen"
-
 msgid "Agent is working"
 msgstr "Agen sedang bekerja"
 
@@ -2489,9 +2486,6 @@ msgstr "Agen hanya melihat placeholder. Paradev menambahkan login Anda ke permin
 
 msgid "Agents that run while you're away"
 msgstr "Agen yang berjalan saat Anda pergi"
-
-msgid "Agents triage issues, draft changelogs, and bump dependencies on their own."
-msgstr "Agen memilah issue, menyusun changelog, dan memperbarui dependensi sendiri."
 
 msgid "Agents use this account when they call Linear tools."
 msgstr "Agen memakai akun ini saat memanggil tool Linear."
@@ -2640,6 +2634,9 @@ msgstr "Semua halaman"
 msgid "All plans"
 msgstr "Semua paket"
 
+msgid "All plugins"
+msgstr "Semua plugin"
+
 msgid "All posts"
 msgstr "Semua tulisan"
 
@@ -2729,6 +2726,9 @@ msgstr "Diizinkan"
 
 msgid "Allowed for session"
 msgstr "Diizinkan untuk sesi ini"
+
+msgid "Allowed plugins"
+msgstr "Plugin yang diizinkan"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Sudah dipindahkan ke organisasi lain. Beralih ke organisasi itu untuk melihat proyek ini."
@@ -2823,6 +2823,9 @@ msgstr "Otomatisasi hanya bisa menggunakan workspace cloud yang kamu buat"
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Lingkungan menyimpan repositori, variabel, dan region Anda. Mulai workspace sebanyak yang Anda perlukan darinya."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Repositori environment tidak bisa diubah. Buat environment baru untuk repositori lain."
+
 msgid "An error occurred"
 msgstr "Terjadi kesalahan"
 
@@ -2873,6 +2876,9 @@ msgstr "Asisten AI lain"
 
 msgid "another device"
 msgstr "perangkat lain"
+
+msgid "Another row already uses this name."
+msgstr "Baris lain sudah memakai nama ini."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Jawab pertanyaan di terminal di bawah, misalnya kata sandi."
@@ -3290,6 +3296,9 @@ msgstr "Setidaknya satu tim yang bisa kami sebut namanya, termasuk tim kami, mel
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Paling banyak {AUTO_TOPUP_MONTHLY_LIMIT} kali isi ulang per bulan, jadi hingga {monthlyMax} per bulan."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Paling banyak {MAX_PREVIEW_PORTS} port dapat memiliki pratinjau."
+
 msgid "at once"
 msgstr "sekaligus"
 
@@ -3597,9 +3606,6 @@ msgstr "Direktori dasar untuk workspace worktree baru di host ini."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Direktori dasar untuk worktree baru di {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Image dasar · belum ada checkpoint"
-
 msgid "Base URL"
 msgstr "URL dasar"
 
@@ -3815,6 +3821,9 @@ msgstr "Impor ruang kerja Anda"
 msgid "Bring v1 projects, workspaces, and terminal scripts over to v2. Each item is imported individually and can be retried."
 msgstr "Bawa proyek, workspace, dan skrip terminal v1 ke v2. Tiap item diimpor satu per satu dan bisa dicoba ulang."
 
+msgid "Bring Your Own Subscription"
+msgstr "Bawa Langganan Anda Sendiri"
+
 msgid "Bringing over your v1 projects"
 msgstr "Memindahkan proyek v1 Anda"
 
@@ -3875,11 +3884,20 @@ msgstr "Membangun perangkat lunak yang terakhir"
 msgid "Building the last piece of software."
 msgstr "Membangun perangkat lunak yang terakhir."
 
+msgid "Building…"
+msgstr "Sedang build…"
+
+msgid "Builds fail until there is an install script."
+msgstr "Build gagal sampai ada skrip instalasi."
+
 msgid "Built a plugin? Submit it here."
 msgstr "Sudah membuat plugin? Kirimkan di sini."
 
 msgid "Built in Paradev"
 msgstr "Dibangun di Paradev"
+
+msgid "Built to be driven by agents"
+msgstr "Dibuat untuk dikendalikan oleh agen"
 
 msgid "builtin"
 msgstr "bawaan"
@@ -4413,10 +4431,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · sebelum refactor tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint tersimpan {0}"
-
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint disimpan ke {name}"
 
@@ -4621,9 +4635,6 @@ msgstr "Membersihkan…"
 
 msgid "CLI"
 msgstr "CLI"
-
-msgid "CLI & SDK"
-msgstr "CLI & SDK"
 
 msgid "CLI docs"
 msgstr "Dokumentasi CLI"
@@ -4859,6 +4870,9 @@ msgstr "Cloud"
 
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
+
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Agen cloud tidak mendapat server MCP di lingkungan ini."
 
 msgid "Cloud environment setup"
 msgstr "Penyiapan environment cloud"
@@ -5185,6 +5199,9 @@ msgstr "Conductor adalah merek dagang milik pemiliknya. {0} tidak berafiliasi de
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Workspace Conductor adalah Git worktree biasa. {0} menggunakannya di lokasi aslinya."
+
+msgid "Config"
+msgstr "Konfigurasi"
 
 msgid "Config file contents"
 msgstr "Isi file konfigurasi"
@@ -6238,6 +6255,9 @@ msgstr "Tidak bisa memuat otomatisasi: {0}"
 msgid "Couldn't load automations"
 msgstr "Tidak bisa memuat otomatisasi"
 
+msgid "Couldn't load builds"
+msgstr "Tidak bisa memuat build"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Tidak bisa memuat kontributor. Ketik username saja."
 
@@ -6631,9 +6651,6 @@ msgstr "Buat dengan AI"
 msgid "Create workspace"
 msgstr "Buat workspace"
 
-msgid "Create workspaces and start agents from the CLI, the SDK, or over MCP."
-msgstr "Buat workspace dan jalankan agen dari CLI, SDK, atau lewat MCP."
-
 msgid "Create workspaces, launch agents, and read their output from any terminal or script. macOS and Linux."
 msgstr "Buat workspace, jalankan agen, dan baca outputnya dari terminal atau skrip mana pun. macOS dan Linux."
 
@@ -6983,8 +7000,14 @@ msgstr "Model bawaan"
 msgid "Default team for new tasks"
 msgstr "Tim bawaan untuk tugas baru"
 
+msgid "Default terminal"
+msgstr "Terminal bawaan"
+
 msgid "Default terminal theme"
 msgstr "Tema terminal bawaan"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Terminal bawaan: {terminalName}"
 
 msgid "Delegated"
 msgstr "Didelegasikan"
@@ -7433,6 +7456,9 @@ msgstr "Direktori"
 msgid "Disable"
 msgstr "Nonaktifkan"
 
+msgid "Disable MCP servers"
+msgstr "Nonaktifkan server MCP"
+
 msgid "Disable skill"
 msgstr "Nonaktifkan skill"
 
@@ -7750,9 +7776,6 @@ msgstr "Draf dibuka"
 msgid "Draft PR #2841"
 msgstr "Draft PR #2841"
 
-msgid "drafted 3 support replies"
-msgstr "menyusun 3 draf balasan dukungan"
-
 msgid "Drag <0>Paradev</0> into your <1>Applications</1> folder"
 msgstr "Seret <0>Paradev</0> ke folder <1>Aplikasi</1>"
 
@@ -7765,8 +7788,8 @@ msgstr "Seret workspace untuk mengatur ulang dalam Urutan manual"
 msgid "Drawer"
 msgstr "Drawer"
 
-msgid "Drive it from the terminal"
-msgstr "Kendalikan dari terminal"
+msgid "Drive the entire app and cloud from the CLI, the SDK, or over MCP."
+msgstr "Kendalikan seluruh aplikasi dan cloud dari CLI, SDK, atau melalui MCP."
 
 msgid "Drive workspaces, agents, and sessions programmatically from scripts, CI, or your own tools."
 msgstr "Kendalikan workspace, agen, dan sesi secara terprogram dari skrip, CI, atau alat Anda sendiri."
@@ -7849,6 +7872,9 @@ msgstr "Setiap kursi menambahkan jam paketnya ke satu kumpulan yang dibagi selur
 
 msgid "Each session resumes where it left off."
 msgstr "Setiap sesi melanjutkan dari titik terakhir."
+
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Setiap build yang berhasil menyimpan snapshot. Workspace baru dimulai dari snapshot saat ini, dan kamu bisa memulihkan snapshot sebelumnya."
 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Tiap permukaan punya tipografinya sendiri. Perubahan langsung terlihat di pratinjau."
@@ -7949,6 +7975,9 @@ msgstr "Diedit"
 
 msgid "Edited {ago}"
 msgstr "Diedit {ago}"
+
+msgid "Edited <0>SettingsDialog.tsx</0>"
+msgstr "Mengedit <0>SettingsDialog.tsx</0>"
 
 msgid "Editing"
 msgstr "Pengeditan"
@@ -8057,6 +8086,9 @@ msgstr "Mengakhiri panggilan"
 msgid "Ensure no regression"
 msgstr "Pastikan tidak ada regresi"
 
+msgid "Enter a command."
+msgstr "Masukkan perintah."
+
 msgid "Enter a full email address"
 msgstr "Masukkan alamat email lengkap"
 
@@ -8068,6 +8100,9 @@ msgstr "Masukkan direktori induk di {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Masukkan sebuah path di {hostName}"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Masukkan port dari 1 sampai 65535."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Masukkan URL ke bilah pencarian di atas."
@@ -8113,6 +8148,9 @@ msgstr "Lingkungan"
 
 msgid "Environment archived"
 msgstr "Environment diarsipkan"
+
+msgid "Environment history"
+msgstr "Riwayat environment"
 
 msgid "Environment not found"
 msgstr "Environment tidak ditemukan"
@@ -8871,11 +8909,8 @@ msgstr "FAQ"
 msgid "Fast"
 msgstr "Cepat"
 
-msgid "Fast mode off"
-msgstr "Mode cepat nonaktif"
-
-msgid "Fast mode on"
-msgstr "Mode cepat aktif"
+msgid "Fast mode is not available for this model. Choose a model that supports it."
+msgstr "Mode cepat tidak tersedia untuk model ini. Pilih model yang mendukungnya."
 
 msgid "Fault"
 msgstr "Kegagalan"
@@ -9093,9 +9128,6 @@ msgstr "Selesai"
 msgid "Finished · unread"
 msgstr "Selesai · belum dibaca"
 
-msgid "finished · worked for 7s"
-msgstr "selesai · bekerja 7 dtk"
-
 msgid "Finishing the move…"
 msgstr "Menyelesaikan pemindahan…"
 
@@ -9110,6 +9142,9 @@ msgstr "Sesuaikan"
 
 msgid "Fix all failing checks"
 msgstr "Perbaiki semua check yang gagal"
+
+msgid "Fix bugs the moment they're filed"
+msgstr "Perbaiki bug begitu dilaporkan"
 
 msgid "Fix cart total for empty carts. Adds a test that reproduces the TypeError."
 msgstr "Memperbaiki total keranjang untuk keranjang kosong. Menambahkan tes yang mereproduksi TypeError."
@@ -9128,6 +9163,9 @@ msgstr "Perbaiki temuan"
 
 msgid "Fix new errors in web. Reproduce each one in a test and open a draft pull request."
 msgstr "Perbaiki error baru di web. Reproduksi masing-masing dalam tes dan buka draft pull request."
+
+msgid "Fix production bugs"
+msgstr "Perbaiki bug produksi"
 
 msgid "fix-auth-redirect"
 msgstr "fix-auth-redirect"
@@ -9492,9 +9530,6 @@ msgstr "File hasil generate disembunyikan"
 
 msgid "Generated image"
 msgstr "Gambar yang dihasilkan"
-
-msgid "Generating"
-msgstr "Membuat"
 
 msgid "Generating..."
 msgstr "Membuat..."
@@ -10543,6 +10578,9 @@ msgstr "Pasang Paradev MCP di klien Anda"
 
 msgid "Install plugin"
 msgstr "Instal plugin"
+
+msgid "Install script"
+msgstr "Skrip instalasi"
 
 msgid "Install the desktop app"
 msgstr "Pasang aplikasi desktop"
@@ -11610,9 +11648,6 @@ msgstr "Workspace lokal"
 msgid "Local workspaces"
 msgstr "Workspace lokal"
 
-msgid "Local workspaces run on your machine. You decide what connects to them."
-msgstr "Workspace lokal berjalan di mesin Anda. Anda yang menentukan apa yang terhubung."
-
 msgid "Local, on a host, or in the cloud"
 msgstr "Lokal, di host, atau di cloud"
 
@@ -11664,6 +11699,9 @@ msgstr "Keandalan jangka panjang melewati ambang batas. Pekerjaan yang diberikan
 
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip khusus pintasan saat hover lama; gaya chip-nya kini menjadi bawaan TooltipContent"
+
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Perintah yang berjalan lama, seperti dev server. Setiap workspace membuka terminal bawaan saat dimulai."
 
 msgid "Looking at {what}"
 msgstr "Melihat {what}"
@@ -11905,6 +11943,9 @@ msgstr "Ukuran maksimum 256 KB."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "Daftar izin MCP"
 
 msgid "MCP manager"
 msgstr "Manajer MCP"
@@ -12174,8 +12215,8 @@ msgstr "Aplikasi mobile"
 msgid "Mobile App"
 msgstr "Aplikasi Mobile"
 
-msgid "Mobile, Cloud, or bring your own Cloud"
-msgstr "Seluler, cloud, atau cloud Anda sendiri"
+msgid "Mobile, Cloud, or bring your own fleet"
+msgstr "Seluler, Cloud, atau armada Anda sendiri"
 
 msgid "Mode"
 msgstr "Mode"
@@ -12305,6 +12346,9 @@ msgstr "Pindahkan pekerjaan cloud"
 
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
+
+msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
+msgstr "Pindahkan Pengaturan ke modal agar orang tidak perlu meninggalkan ruang kerja mereka. Pertahankan pemfilteran pencarian, dan buat ⌘, membukanya dari mana saja."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Pindahkan workspace ini ke {computerName}?"
@@ -12808,6 +12852,9 @@ msgstr "Tidak ada boot pada periode ini."
 msgid "No branches found"
 msgstr "Tidak ada branch ditemukan"
 
+msgid "No builds yet"
+msgstr "Belum ada build"
+
 msgid "No changed files."
 msgstr "Tidak ada file yang berubah."
 
@@ -13152,6 +13199,9 @@ msgstr "Tidak ada orang yang tercatat"
 
 msgid "No plugins available yet."
 msgstr "Belum ada plugin yang tersedia."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Tidak ada plugin yang terinstal, jadi agen cloud tidak mendapat server MCP di sini."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13899,6 +13949,9 @@ msgstr "Hanya pemilik atau pemilik organisasi yang dapat mengarsipkan otomatisas
 msgid "Only the people listed above can open it"
 msgstr "Hanya orang yang tercantum di atas yang dapat membukanya"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Hanya orang yang membuat environment ini atau admin organisasi yang dapat mengubah konfigurasinya."
+
 msgid "Only the person who created this page can change it"
 msgstr "Hanya orang yang membuat halaman ini yang bisa mengubahnya"
 
@@ -13907,6 +13960,9 @@ msgstr "Hanya orang yang membuat halaman ini yang dapat mengubahnya."
 
 msgid "Only the person who created this workspace can change these."
 msgstr "Hanya orang yang membuat workspace ini yang dapat mengubahnya."
+
+msgid "Only the plugins below"
+msgstr "Hanya plugin di bawah"
 
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Hanya penulis thread atau pemilik halaman yang bisa menghapusnya"
@@ -14257,6 +14313,9 @@ msgstr "Buka Halaman di Browser Bawaan"
 msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
 msgstr "Buka halaman dan balas komentar dari aplikasi Paradev di iPhone dan iPad."
 
+msgid "Open PR"
+msgstr "Buka PR"
+
 #. placeholder {0}: pr.number
 msgid "Open PR #{0}"
 msgstr "Buka PR #{0}"
@@ -14308,6 +14367,9 @@ msgstr "Open Source"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source dengan lisensi MIT. Gunakan agen apa pun dengan langganan dan kunci Anda sendiri."
+
+msgid "Open source.<0/>Secure by design."
+msgstr "Open source.<0/>Aman sejak dirancang."
 
 msgid "Open System Settings"
 msgstr "Buka System Settings"
@@ -14396,9 +14458,6 @@ msgstr "OpenAI menolak kunci API ini."
 msgid "Opened"
 msgstr "Dibuka"
 
-msgid "opened PR #841 for review"
-msgstr "membuka PR #841 untuk direview"
-
 msgid "Opening {appName}…"
 msgstr "Membuka {appName}…"
 
@@ -14476,9 +14535,6 @@ msgstr "Organisasi sudah ada"
 
 msgid "Organization created successfully!"
 msgstr "Organisasi berhasil dibuat!"
-
-msgid "Organization default ({defaultName})"
-msgstr "Bawaan organisasi ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organisasi dihapus"
@@ -14909,9 +14965,6 @@ msgstr "Agen paralel"
 msgid "Parallel agents guide"
 msgstr "Panduan agen paralel"
 
-msgid "Parallel Execution"
-msgstr "Eksekusi Paralel"
-
 msgid "Parallel sessions per developer doubling every seven months, crossing the Operator, Plant Manager and Henry Ford thresholds between August 2026 and August 2028"
 msgstr "Sesi paralel per pengembang berlipat ganda setiap tujuh bulan, melewati ambang Operator, Manajer Pabrik, dan Henry Ford antara Agustus 2026 dan Agustus 2028"
 
@@ -15201,11 +15254,18 @@ msgctxt "billing"
 msgid "Plan"
 msgstr "Paket"
 
+msgctxt "Name of an agent chat view in the app mockup"
+msgid "Plan"
+msgstr "Rencana"
+
 msgid "Plan restored"
 msgstr "Paket dipulihkan"
 
 msgid "Plan updated"
 msgstr "Paket diperbarui"
+
+msgid "Plan: extract <0>SettingsPage</0> into <1>SettingsDialog</1>, route ⌘, through the global hotkey layer, keep search as-is. Starting now."
+msgstr "Rencana: ekstrak <0>SettingsPage</0> menjadi <1>SettingsDialog</1>, arahkan ⌘, melalui lapisan hotkey global, biarkan pencarian apa adanya. Mulai sekarang."
 
 msgctxt "project state"
 msgid "Planned"
@@ -15301,6 +15361,18 @@ msgstr "Populer"
 msgid "Popular models"
 msgstr "Model populer"
 
+msgid "Port"
+msgstr "Port"
+
+msgid "Port label"
+msgstr "Label port"
+
+msgid "Port name"
+msgstr "Nama port"
+
+msgid "Port number"
+msgstr "Nomor port"
+
 msgid "Ports"
 msgstr "Port"
 
@@ -15312,6 +15384,9 @@ msgstr "Port di host jarak jauh"
 
 msgid "Ports on this computer"
 msgstr "Port di komputer ini"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Port yang didengarkan aplikasi. Port pratinjau mendapat tautan yang bisa Anda buka dari workspace."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Port: {totalPortCount} aktif"
@@ -15522,9 +15597,6 @@ msgstr "Kebijakan Privasi"
 
 msgid "Private"
 msgstr "Privat"
-
-msgid "Private by default.<0/>You're in control."
-msgstr "Privat secara bawaan.<0/>Anda yang mengendalikan."
 
 msgid "Private: only specific people"
 msgstr "Privat: hanya orang tertentu"
@@ -15810,9 +15882,6 @@ msgstr "Push branch Anda, lalu lanjutkan di Mac atau di workspace cloud {company
 msgid "Pushed"
 msgstr "Di-push"
 
-msgid "Pushed and opened a draft PR."
-msgstr "Sudah di-push dan membuka draf PR."
-
 msgid "Pushing..."
 msgstr "Melakukan push…"
 
@@ -15929,6 +15998,9 @@ msgstr "Radix memutar pembungkus panah tooltip per sisi,"
 msgid "Radix Tooltip docs"
 msgstr "Dokumentasi Radix Tooltip"
 
+msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
+msgstr "Menjalankan <0>bun test settings</0> · 14 lulus · 1 gagal"
+
 msgid "Random icon"
 msgstr "Ikon acak"
 
@@ -15983,6 +16055,9 @@ msgstr "Dibaca"
 msgctxt "shell intent"
 msgid "Read"
 msgstr "Dibaca"
+
+msgid "Read 3 files"
+msgstr "Membaca 3 file"
 
 msgid "Read a list of your most visited websites"
 msgstr "Membaca daftar situs web yang paling sering Anda kunjungi"
@@ -16128,6 +16203,9 @@ msgstr "Rebase & Merge"
 
 msgid "Rebase and merge"
 msgstr "Rebase dan merge"
+
+msgid "Rebuild environment"
+msgstr "Build ulang environment"
 
 msgid "Recall what was said in meetings"
 msgstr "Ingat kembali apa yang dibahas dalam rapat"
@@ -16438,6 +16516,9 @@ msgstr "Hapus mention {path}"
 msgid "Remove pasted text"
 msgstr "Hapus teks yang ditempel"
 
+msgid "Remove port"
+msgstr "Hapus port"
+
 msgid "Remove PR Link"
 msgstr "Hapus Tautan PR"
 
@@ -16453,8 +16534,14 @@ msgstr "Hapus skrip"
 msgid "Remove team member?"
 msgstr "Hapus anggota tim?"
 
+msgid "Remove terminal"
+msgstr "Hapus terminal"
+
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Hapus terminal {createdAtLabel}"
+
+msgid "Remove terminal {terminalName}"
+msgstr "Hapus terminal {terminalName}"
 
 msgid "Remove terminal session"
 msgstr "Hapus sesi terminal"
@@ -16617,6 +16704,9 @@ msgstr "Balas"
 
 msgid "Reply in thread"
 msgstr "Balas di utas"
+
+msgid "Reply to Claude Code…"
+msgstr "Balas Claude Code…"
 
 msgid "Reply to thread…"
 msgstr "Balas thread…"
@@ -17224,6 +17314,9 @@ msgstr "Jalankan 10+ agen coding paralel di mesin Anda."
 msgid "Run again"
 msgstr "Jalankan lagi"
 
+msgid "Run agents in parallel, each on its own branch. Review their work with built-in diffs, PR checks, and agent review, then merge without leaving the app."
+msgstr "Jalankan agen secara paralel, masing-masing di branch-nya sendiri. Tinjau hasil kerja mereka dengan diff bawaan, pemeriksaan PR, dan tinjauan oleh agen, lalu merge tanpa meninggalkan aplikasi."
+
 msgid "Run agents on a schedule or when something happens."
 msgstr "Jalankan agen sesuai jadwal atau saat sesuatu terjadi."
 
@@ -17278,9 +17371,6 @@ msgstr "Jalankan sesuai jadwal atau saat ada event, sesuai permintaan, jeda, lan
 
 msgid "Run on any machine"
 msgstr "Di mesin mana pun"
-
-msgid "Run parallel coding agents on features, fixes, and refactors. Each one works on its own branch, locally or in the cloud."
-msgstr "Jalankan agen coding paralel untuk fitur, perbaikan, dan refactor. Masing-masing bekerja di branch sendiri, secara lokal atau di cloud."
 
 msgid "Run parallel coding agents with Paradev"
 msgstr "Jalankan agen coding paralel dengan Paradev"
@@ -17360,6 +17450,12 @@ msgstr "Menjalankan perintah lokal di mesin Anda"
 
 msgid "Runs appear here once an automation fires."
 msgstr "Run muncul di sini setelah otomatisasi terpicu."
+
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Berjalan sebagai skrip bash di setiap workspace cloud baru sebelum agen mulai."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Berjalan sebagai skrip bash saat lingkungan di-build. Workspace baru dimulai dari hasilnya."
 
 msgid "Runs in"
 msgstr "Berjalan di"
@@ -17473,8 +17569,14 @@ msgstr "{name} disimpan"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} disimpan, tetapi workspace penyiapannya tidak dapat dimulai: {reason}"
 
+msgid "Saved from a workspace"
+msgstr "Disimpan dari workspace"
+
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
+
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Tersimpan. Workspace baru dan build berikutnya memakainya; workspace yang berjalan menerapkannya saat dimulai ulang."
 
 msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
 msgstr "Menyimpan workspace ini seperti sekarang, dengan semua yang terpasang di dalamnya. Workspace baru dari {name} akan dimulai dari checkpoint ini. Workspace berhenti sebentar saat menyimpan."
@@ -17494,8 +17596,8 @@ msgstr "Menyimpan..."
 msgid "Saving…"
 msgstr "Menyimpan…"
 
-msgid "Scale to 100+ agents"
-msgstr "Tingkatkan hingga lebih dari 100 agen"
+msgid "Scale to 100s of agents, maintain quality bar"
+msgstr "Skalakan hingga ratusan agen, pertahankan standar kualitas"
 
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Pindai kode QR, lalu masuk dengan akun Paradev yang sama dan pilih organisasi ini."
@@ -18267,6 +18369,9 @@ msgstr "Pengaturan..."
 msgid "settings.ts"
 msgstr "settings.ts"
 
+msgid "Settled"
+msgstr "Selesai"
+
 msgid "Setup"
 msgstr "Setup"
 
@@ -18865,9 +18970,6 @@ msgstr "Smiley & Orang"
 msgid "Smoother onboarding"
 msgstr "Onboarding yang lebih mulus"
 
-msgid "Snapshot"
-msgstr "Snapshot"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Ambil snapshot worktree sebelum dan sesudah setiap giliran chat, agar kartunya mencantumkan setiap file yang berubah, termasuk edit lewat shell, dan dapat membatalkannya. Setiap prompt menunggu snapshot-nya lebih dulu."
 
@@ -18934,11 +19036,17 @@ msgstr "Seseorang"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Orang lain sudah menerbitkan {entryPath} dari workspace ini. Terbitkan dengan id halaman yang eksplisit untuk menambahkan versi ke halaman mereka, atau pindahkan berkasnya."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Orang lain menyimpan konfigurasi environment ini saat Anda sedang mengeditnya"
+
 msgid "Someone is moving this workspace…"
 msgstr "Seseorang sedang memindahkan workspace ini…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Seseorang dari tim Paradev akan meninjau halaman ini. Kami hanya menghubungi Anda jika perlu informasi tambahan."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Seseorang menyimpan konfigurasi ini saat Anda sedang mengeditnya. Menyimpan akan menggantikan versinya."
 
 msgid "Something else"
 msgstr "Hal lain"
@@ -19209,8 +19317,8 @@ msgstr "Mulai sesi"
 msgid "Start agent"
 msgstr "Mulai agen"
 
-msgid "Start agents on events or a schedule"
-msgstr "Jalankan agen saat ada event atau sesuai jadwal"
+msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
+msgstr "Mulai agen secara otomatis: dari error Sentry, isu Linear, pull request GitHub, atau jadwal yang diatur sendiri oleh agen."
 
 msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
 msgstr "Mulai agen, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Kode Anda tetap di mesin Anda."
@@ -19253,6 +19361,9 @@ msgstr "Mulai satu dengan + di bilah tab."
 
 msgid "Start or stop the workspace run command"
 msgstr "Mulai atau hentikan perintah run workspace"
+
+msgid "Start script"
+msgstr "Skrip mulai"
 
 msgid "Start voice mode"
 msgstr "Mulai mode suara"
@@ -19580,9 +19691,6 @@ msgstr "Konsistensi · hari aktif dari 30"
 
 msgid "Switch account"
 msgstr "Ganti akun"
-
-msgid "Switch agents. Keep your workflow"
-msgstr "Ganti agen. Pertahankan alur kerja Anda"
 
 msgid "Switch host"
 msgstr "Ganti host"
@@ -19926,6 +20034,9 @@ msgstr "Terminal"
 msgid "Terminal agent launch configuration"
 msgstr "Konfigurasi peluncuran agen terminal"
 
+msgid "Terminal command"
+msgstr "Perintah terminal"
+
 msgid "Terminal connection: {label}"
 msgstr "Koneksi terminal: {label}"
 
@@ -19940,6 +20051,9 @@ msgstr "Ukuran font terminal saat terminal difokuskan, zoom halaman di panel bro
 
 msgid "Terminal input"
 msgstr "Input terminal"
+
+msgid "Terminal name"
+msgstr "Nama terminal"
 
 msgid "Terminal removed"
 msgstr "Terminal dihapus"
@@ -19967,9 +20081,6 @@ msgstr "Tipografi terminal"
 
 msgid "Terminals"
 msgstr "Terminal"
-
-msgid "Terminals ({TERMINAL_COUNT})"
-msgstr "Terminal ({TERMINAL_COUNT})"
 
 msgid "Terminals aren't responding"
 msgstr "Terminal tidak merespons"
@@ -20116,6 +20227,15 @@ msgstr "Agen terbaik akan berganti.<0/>Alur kerja Anda tidak perlu."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Mesin aktif kembali dengan {actual} vCPU, bukan {wanted}. Mulai ulang untuk mencoba lagi."
 
+msgid "The build is no longer running"
+msgstr "Build tidak lagi berjalan"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "Build berjalan lebih dari {BUILD_LIMIT_MINUTES} menit dan dihentikan"
+
+msgid "The build stopped unexpectedly"
+msgstr "Build berhenti secara tak terduga"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 
@@ -20181,6 +20301,12 @@ msgstr "Munculnya sang pengatur"
 
 msgid "The endpoint must use https."
 msgstr "Endpoint harus menggunakan https."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "Environment berubah selama build; snapshot saat ini dipertahankan"
+
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Environment berubah saat sedang dipulihkan. Coba lagi."
 
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Environment yang digunakan otomatisasi ini untuk memulai workspace cloud telah diarsipkan atau tidak memiliki repositori. Pilih environment lain di pengaturan otomatisasi."
@@ -20330,11 +20456,11 @@ msgstr "Nama ini ditampilkan di bilah samping."
 msgid "The network connection changed"
 msgstr "Koneksi jaringan berubah"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "Workspace open source untuk Claude Code, Codex, dan agen apa pun. Secara lokal atau di cloud."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen apa pun, secara lokal atau di cloud. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
 msgid "The organization reached its usage limit."
 msgstr "Organisasi telah mencapai batas penggunaannya."
@@ -20607,6 +20733,9 @@ msgstr "Otomatisasi ini berada di organisasi lain"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Browser ini belum masuk ke Paradev. Masuk untuk melanjutkan ke {connectorName}."
 
+msgid "This build has no snapshot to restore"
+msgstr "Build ini tidak memiliki snapshot untuk dipulihkan"
+
 msgid "This cannot be undone."
 msgstr "Ini tidak bisa dibatalkan."
 
@@ -20652,6 +20781,13 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
 
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Konfigurasi ini berisi pengaturan yang tidak bisa ditampilkan versi Paradev ini, jadi tidak bisa diedit di sini. Perbarui Paradev, atau ubah dengan superset environments update."
+
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Konfigurasi ini tidak valid: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
 
@@ -20683,17 +20819,14 @@ msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak m
 msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
 msgstr "Lingkungan ini dapat memulai 3 build manual per jam. Coba lagi dalam {0} menit."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Environment ini tidak memiliki [install] untuk di-build. Tambahkan di .paradev/config.toml pada branch dasarnya."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Environment ini tidak punya [install] untuk di-build. Tambahkan ke konfigurasinya di Pengaturan, Environment."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Lingkungan ini membuka {environmentRepository}, bukan {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Repositori environment ini sudah tetap; promosikan workspace lagi untuk mengubahnya"
 
 msgid "this file"
 msgstr "file ini"
@@ -21325,9 +21458,6 @@ msgstr "Triase email dan buat draf balasan"
 
 msgid "Triage new issues"
 msgstr "Triase issue baru"
-
-msgid "triaging 12 new issues…"
-msgstr "mentriase 12 issue baru…"
 
 msgid "Tries a fix for each bug someone posts in #bugs."
 msgstr "Mencoba memperbaiki setiap bug yang diposting di #bugs."
@@ -21969,9 +22099,6 @@ msgstr "Pakai sebagai run workspace"
 msgid "Use cases"
 msgstr "Kasus penggunaan"
 
-msgid "Use Claude Code, Codex, OpenCode, or any CLI agent. Your workspaces, branches, and review stay the same."
-msgstr "Gunakan Claude Code, Codex, OpenCode, atau agen CLI apa pun. Workspace, branch, dan proses review Anda tetap sama."
-
 msgid "Use Claude Code, Codex, or any coding agent. Choose per task or run several side by side."
 msgstr "Pakai Claude Code, Codex, atau agen coding apa pun. Pilih per tugas atau jalankan beberapa berdampingan."
 
@@ -21980,6 +22107,9 @@ msgstr "Pakai untuk agen baru"
 
 msgid "Use global default"
 msgstr "Pakai bawaan global"
+
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Gunakan huruf kecil, angka, dan garis bawah, diawali huruf."
 
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gunakan huruf kecil, angka, tanda hubung, dan garis bawah"
@@ -22004,6 +22134,12 @@ msgstr "Gunakan Paradev di ponsel dengan Pro."
 
 msgid "Use the agent plans and API keys you already have. Model calls go straight to your provider."
 msgstr "Gunakan paket agen dan kunci API yang sudah Anda punya. Panggilan model langsung ke penyedia Anda."
+
+msgid "Use the best agent. Never get locked in."
+msgstr "Gunakan agen terbaik. Tanpa pernah terkunci."
+
+msgid "Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them."
+msgstr "Gunakan agen terbaik begitu dirilis. Artefak, branch, dan plugin Anda berfungsi di semuanya."
 
 msgid "Use the desktop app to start running parallel coding agents."
 msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."
@@ -22238,6 +22374,9 @@ msgstr "Lihat stack, pull request {position} dari {size}"
 msgid "View usage"
 msgstr "Lihat penggunaan"
 
+msgid "Viewed"
+msgstr "Dilihat"
+
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Dilihat"
@@ -22422,6 +22561,9 @@ msgstr "Kami merekrut engineer di San Francisco. Mari bangun alat yang digunakan
 msgid "We're hiring in San Francisco"
 msgstr "Kami sedang merekrut di San Francisco"
 
+msgid "Web app"
+msgstr "Aplikasi web"
+
 msgid "Web Fetch"
 msgstr "Pengambilan web"
 
@@ -22564,6 +22706,9 @@ msgstr "Apa yang diotomatisasi tim"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Yang menjadi acuannya sudah tidak ada di halaman, jadi tidak punya penanda."
 
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "Yang dijalankan build dan workspace cloud environment ini. Tanpanya, cloud membaca .paradev/config.toml milik repositori utama."
+
 msgid "What we believe"
 msgstr "Yang kami yakini"
 
@@ -22650,6 +22795,9 @@ msgstr "Agen coding AI mana saja yang didukung?"
 
 msgid "Which plans include automations?"
 msgstr "Paket mana yang menyertakan otomatisasi?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "Plugin yang server MCP-nya bisa dipakai agen cloud di environment ini."
 
 msgid "Who can open it"
 msgstr "Siapa yang bisa membuka"
@@ -23175,9 +23323,6 @@ msgstr "Agen Anda menerbitkan desain dan laporan. Tim Anda berkomentar, lalu age
 
 msgid "Your agent subscriptions and keys"
 msgstr "Langganan dan kunci agen Anda"
-
-msgid "Your Agents, Your Accounts"
-msgstr "Agen Anda, Akun Anda"
 
 msgid "Your AWS Marketplace subscription is active"
 msgstr "Langganan AWS Marketplace Anda aktif"

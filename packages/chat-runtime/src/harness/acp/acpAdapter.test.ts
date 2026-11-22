@@ -6415,6 +6415,63 @@ describe("AcpAdapter config options", () => {
 		await adapter.dispose();
 	});
 
+	it("shows the agent's boolean fast option as a toggle and sets it with a boolean", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [
+			MODEL_OPTION,
+			{ id: "fast", name: "Fast mode", type: "boolean", currentValue: false },
+			{
+				id: "ultracode",
+				name: "Ultracode",
+				type: "boolean",
+				currentValue: false,
+			},
+		];
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		const options = sessionsOf(events).pop()?.configOptions ?? [];
+		expect(options.map((option) => option.id)).toEqual(["model", "fast"]);
+		expect(options[1]).toMatchObject({
+			currentValue: "off",
+			options: [
+				{ id: "on", label: "On" },
+				{ id: "off", label: "Off" },
+			],
+		});
+
+		expect(await adapter.setConfigOption("fast", "on")).toBe(true);
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params),
+		).toEqual([
+			{ sessionId: "sess-1", configId: "fast", type: "boolean", value: true },
+		]);
+
+		await adapter.dispose();
+	});
+
+	it("sets a boolean fast option with a boolean on ACP v2", async () => {
+		const agent = new FakeAcpAgent();
+		agent.newSessionConfigOptions = [
+			{ id: "fast", name: "Fast mode", type: "boolean", currentValue: false },
+		];
+		const { adapter } = startAdapter(agent);
+		await flush();
+
+		expect(await adapter.setConfigOption("fast", "off")).toBe(true);
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params),
+		).toEqual([
+			{ sessionId: "sess-1", configId: "fast", type: "boolean", value: false },
+		]);
+
+		await adapter.dispose();
+	});
+
 	it("turns fast mode on once the agent has taken the start model", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;

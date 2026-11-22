@@ -9,46 +9,37 @@ import {
 } from "@superset/ui/select";
 import { useMachineSizeOptions } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 
-const ORGANIZATION_DEFAULT = "default";
-
 interface EnvironmentMachineSizeProps {
 	id: string;
 	className: string;
+	/** Null boots at the plan's default size, which is what it shows. */
 	machineSize: string | null;
 	disabled: boolean;
-	onChange: (machineSize: MachineSize | null) => void;
+	onChange: (machineSize: MachineSize) => void;
 }
 
 export function EnvironmentMachineSize({
 	id,
 	className,
-	machineSize,
+	machineSize: saved,
 	disabled,
 	onChange,
 }: EnvironmentMachineSizeProps) {
 	const { options, defaultSize } = useMachineSizeOptions();
-	const defaultName =
-		options.find((option) => option.size === defaultSize)?.name ?? defaultSize;
-	const isOffered =
-		machineSize === null ||
-		options.some((option) => option.size === machineSize);
+	const machineSize = saved ?? defaultSize;
+	const isOffered = options.some((option) => option.size === machineSize);
 
 	return (
 		<Select
 			disabled={disabled}
-			onValueChange={(value) =>
-				onChange(value === ORGANIZATION_DEFAULT ? null : (value as MachineSize))
-			}
-			value={machineSize ?? ORGANIZATION_DEFAULT}
+			onValueChange={(next) => onChange(next as MachineSize)}
+			value={machineSize}
 		>
 			<SelectTrigger className={className} id={id}>
 				<SelectValue />
 			</SelectTrigger>
 			<SelectContent>
-				<SelectItem value={ORGANIZATION_DEFAULT}>
-					<Trans>Organization default ({defaultName})</Trans>
-				</SelectItem>
-				{!isOffered && machineSize && (
+				{!isOffered && (
 					<SelectItem disabled value={machineSize}>
 						<Trans>{machineSize} (not on your plan)</Trans>
 					</SelectItem>

@@ -43,7 +43,9 @@ interface DashboardSidebarWorkspaceContextMenuProps
 	/** Its folder membership is a tag the API keeps, so it groups like any other row. */
 	isCloudWorkspace?: boolean;
 	showDeleteHotkey?: boolean;
-	environmentItem?: React.ReactNode;
+	renderEnvironmentItems?: (
+		runAfterClose: (action: () => void) => void,
+	) => React.ReactNode;
 	onCreateSection: () => void;
 	onMoveToSection: (sectionId: string | null) => void;
 	children: React.ReactNode;
@@ -56,7 +58,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	isInSection,
 	isCloudWorkspace = false,
 	showDeleteHotkey = false,
-	environmentItem,
+	renderEnvironmentItems,
 	onCreateSection,
 	onMoveToSection,
 	onRename,
@@ -132,7 +134,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 									)}
 								</>
 							)}
-							{environmentItem}
+							{renderEnvironmentItems?.(runAfterClose)}
 						</>
 					}
 					afterMoveItems={

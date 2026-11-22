@@ -1,9 +1,9 @@
 import * as Updates from "expo-updates";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { AppState } from "react-native";
+import { createForegroundUpdateCheck } from "./utils/createForegroundUpdateCheck";
 
 const FOREGROUND_CHECK_MIN_INTERVAL_MS = 15 * 60 * 1000;
-const APPLY_AFTER_BACKGROUND_MS = 5 * 60 * 1000;
 
 async function downloadIfAvailable() {
 	const check = await Updates.checkForUpdateAsync();
@@ -13,43 +13,19 @@ async function downloadIfAvailable() {
 /**
  * expo-updates only checks on cold launch, and phones rarely cold-launch, so
  * this also checks on foreground. A downloaded update applies on the next cold
- * launch, or on return from a long enough stay in the background.
+ * launch: reloading a running app crashed it (Sentry MOBILE-1C).
  */
 export function useOtaUpdates() {
-	const { isUpdatePending } = Updates.useUpdates();
-	const isUpdatePendingRef = useRef(isUpdatePending);
-	isUpdatePendingRef.current = isUpdatePending;
-	const lastCheckedAt = useRef(Date.now());
-	const backgroundedAt = useRef<number | null>(null);
-
 	useEffect(() => {
 		if (!Updates.isEnabled || __DEV__) return;
-		const subscription = AppState.addEventListener("change", (status) => {
-			if (status === "background") {
-				backgroundedAt.current = Date.now();
-				return;
-			}
-			if (status !== "active") return;
-
-			const awayFor =
-				backgroundedAt.current === null
-					? 0
-					: Date.now() - backgroundedAt.current;
-			backgroundedAt.current = null;
-			if (isUpdatePendingRef.current && awayFor >= APPLY_AFTER_BACKGROUND_MS) {
-				void Updates.reloadAsync().catch(() => {});
-				return;
-			}
-
-			if (
-				Date.now() - lastCheckedAt.current <
-				FOREGROUND_CHECK_MIN_INTERVAL_MS
-			) {
-				return;
-			}
-			lastCheckedAt.current = Date.now();
-			void downloadIfAvailable().catch(() => {});
-		});
+		const subscription = AppState.addEventListener(
+			"change",
+			createForegroundUpdateCheck({
+				minIntervalMs: FOREGROUND_CHECK_MIN_INTERVAL_MS,
+				now: Date.now,
+				download: () => void downloadIfAvailable().catch(() => {}),
+			}),
+		);
 		return () => subscription.remove();
 	}, []);
 }

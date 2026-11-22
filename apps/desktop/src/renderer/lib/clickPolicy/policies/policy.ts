@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { buildHint } from "../hint";
-import { tierFor } from "../tiers";
+import { tierFor, withPlainDefault } from "../tiers";
 import type {
 	LinkAction,
 	LinkTierMap,
@@ -65,9 +65,14 @@ export function usePolicy(
 	key: MapKey,
 	surface: Surface,
 	mode: TierMode,
+	plainDefault?: LinkAction,
 ): ClickPolicy {
 	const { preferences } = useUserPreferences();
-	const map = preferences[key];
+	const stored = preferences[key];
+	const map = useMemo(
+		() => (plainDefault ? withPlainDefault(stored, plainDefault) : stored),
+		[stored, plainDefault],
+	);
 	const resolve = useCallback(
 		(event: ModifierEvent): ResolvedClick => {
 			const tier = tierFor(event, mode);

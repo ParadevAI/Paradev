@@ -1,23 +1,17 @@
 "use client";
 
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { m } from "framer-motion";
-import Image from "next/image";
-import { LuGitPullRequest } from "react-icons/lu";
-import { AUTOMATIONS } from "../../constants";
+import { useLingui } from "@lingui/react/macro";
+import { LuGitFork, LuX, LuZap } from "react-icons/lu";
+import { AgentLogo } from "@/app/[lang]/components/AgentLogo";
+import { SCENES } from "../../constants";
 import type { ActiveDemo, PagePhase } from "../../types";
-import { AsciiSpinner } from "../AsciiSpinner";
-import { ClaudeMascot } from "./components/ClaudeMascot";
+import { IconButton } from "../IconButton";
+import { AutomationsScene } from "./components/AutomationsScene";
 import { DitherClouds } from "./components/DitherClouds";
 import { NewCloudWorkspaceDialog } from "./components/NewCloudWorkspaceDialog";
-
-function TokenChip({ children }: { children: React.ReactNode }) {
-	return (
-		<span className="rounded-sm bg-foreground/[0.07] px-1 py-px">
-			{children}
-		</span>
-	);
-}
+import { OrchestrateScene } from "./components/OrchestrateScene";
+import { PagesScene } from "./components/PagesScene";
+import { SceneLayer } from "./components/SceneLayer";
 
 interface MainPanelProps {
 	activeDemo: ActiveDemo;
@@ -29,225 +23,69 @@ export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 	const isAutomate = activeDemo === "Automate Tasks";
 	const isCloud = activeDemo === "Cloud Workspaces";
 	const isPages = activeDemo === "Publish Pages";
-	const isDefault = !isAutomate && !isCloud && !isPages;
+	const isOrchestrate = activeDemo === "Orchestrate Parallel Agents";
+
+	const titles: Record<ActiveDemo, string> = {
+		"Orchestrate Parallel Agents": t({
+			message: "Plan",
+			context: "Name of an agent chat view in the app mockup",
+		}),
+		"Cloud Workspaces": t({ message: "New workspace" }),
+		"Automate Tasks": t({ message: "Automations" }),
+		"Publish Pages": t({ message: "Summary" }),
+	};
 
 	return (
-		<div className="flex min-w-0 flex-1 flex-col bg-background">
-			<div className="relative flex-1 overflow-hidden p-5 font-mono text-[11px] leading-relaxed">
-				<m.div
-					className="flex h-full flex-col"
-					initial={false}
-					animate={{ opacity: isDefault ? 1 : 0 }}
-					aria-hidden={!isDefault}
-					transition={{ duration: 0.2 }}
-				>
-					<div>
-						<div className="mb-5 flex items-start gap-4">
-							<ClaudeMascot />
-							<div className="min-w-0 text-[11px] text-muted-foreground">
-								<div>
-									<span className="font-medium text-foreground">
-										Claude Code
-									</span>{" "}
-									v2.1.278
-								</div>
-								<div>Fable 5.1 with high effort · Claude Max</div>
-								<div className="truncate text-muted-foreground/65">
-									~/.paradev/worktrees/paradev/cloud-ws
-								</div>
-							</div>
-						</div>
+		<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-r-xl bg-[#161616]">
+			<div className="flex h-10 shrink-0 items-center justify-between py-1.5 pr-1.5 pl-3">
+				<div className="flex items-center gap-2.5">
+					{isAutomate ? (
+						<LuZap className="size-4 text-neutral-100/90" />
+					) : (
+						<AgentLogo agent="claude" />
+					)}
+					<span className="font-medium text-neutral-100/90">
+						{titles[activeDemo]}
+					</span>
+				</div>
+				<div className="flex items-center gap-0.5">
+					{SCENES[activeDemo].showChanges && (
+						<span className="flex h-7 items-center gap-1.5 rounded-md bg-neutral-100/[0.06] pr-2 pl-1.5 font-medium tabular-nums">
+							<LuGitFork className="size-4 text-neutral-100/70" />
+							<span className="text-[#58da98]">+128</span>
+							<span className="text-[#ff6557]">−41</span>
+						</span>
+					)}
+					<IconButton icon={LuX} />
+				</div>
+			</div>
 
-						<div className="mb-5 text-foreground">
-							<span className="text-muted-foreground/55">❯</span>{" "}
-							<TokenChip>
-								<span className="text-brand-light">/mcp</span>
-							</TokenChip>
-						</div>
+			<div className="relative min-h-0 flex-1">
+				<SceneLayer visible={isOrchestrate}>
+					<OrchestrateScene />
+				</SceneLayer>
 
-						<div className="space-y-2.5 border-t border-border/60 pt-4">
-							<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-								MCP Servers
-							</div>
-							<div className="text-[11px] text-muted-foreground">
-								1 connected
-							</div>
+				<SceneLayer visible={isAutomate}>
+					<AutomationsScene />
+				</SceneLayer>
 
-							<div>
-								<span className="text-muted-foreground/55">❯</span>
-								<span className="ml-1 text-foreground">1.</span>
-								<span className="ml-1 text-brand-light">superset-mcp</span>
-								<span className="ml-2 text-emerald-400/85">✓ connected</span>
-							</div>
-
-							<div className="text-muted-foreground/65">
-								config:{" "}
-								<TokenChip>
-									<span className="text-muted-foreground/70">.mcp.json</span>
-								</TokenChip>
-							</div>
-						</div>
-					</div>
-
-					{/* Elevated agent card: the story moment, floating like Linear's
-					    agent panel */}
-					<div className="absolute bottom-16 right-4 z-10 w-[290px] rounded-lg border border-white/[0.08] bg-card font-sans shadow-[0_1px_1px_rgba(0,0,0,0.4),0_16px_50px_-12px_rgba(0,0,0,0.7)]">
-						<div className="pointer-events-none absolute inset-0 rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" />
-						<div className="flex items-center gap-2 px-3 pt-2.5">
-							<Image
-								src="/app-icons/claude.svg"
-								alt="Claude"
-								width={12}
-								height={12}
-							/>
-							<span className="text-[11px] font-medium text-foreground/95">
-								claude
-							</span>
-							<span className="text-[10px] text-muted-foreground/55">
-								<Trans>finished · worked for 7s</Trans>
-							</span>
-						</div>
-						<div className="px-3 pt-1.5 pb-2.5 text-[11px] leading-relaxed text-muted-foreground">
-							<Trans>Pushed and opened a draft PR.</Trans>
-						</div>
-						<div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
-							<div className="flex items-center gap-1.5 font-mono text-[10px] tabular-nums">
-								<LuGitPullRequest className="size-2.5 text-muted-foreground/55" />
-								<span className="text-muted-foreground/75">
-									<Plural value={2} one="# file" other="# files" />
-								</span>
-								<span className="text-emerald-400/85">+46</span>
-								<span className="text-rose-400/75">−1</span>
-							</div>
-							<button
-								type="button"
-								className="rounded-full border border-white/[0.08] px-2.5 py-0.5 text-[10px] text-foreground/90 hover:bg-foreground/[0.05]"
-							>
-								<Trans>Preview</Trans>
-							</button>
-						</div>
-					</div>
-
-					<div className="mt-auto border-t border-border/60 pt-3 pb-1">
-						<div className="flex items-center gap-2.5">
-							<span className="text-muted-foreground/55">❯</span>
-							<span className="h-3.5 w-[7px] bg-foreground/60" />
-							<span className="flex-1 text-[11px] text-muted-foreground/40">
-								<Trans>Type a task for Claude…</Trans>
-							</span>
-						</div>
-					</div>
-				</m.div>
-
-				{/* Automate Tasks: scheduled agents running on their own */}
-				<m.div
-					className="absolute inset-0 p-5 font-mono text-[11px] leading-relaxed"
-					initial={false}
-					animate={{ opacity: isAutomate ? 1 : 0 }}
-					transition={{ duration: 0.3, ease: "easeOut" }}
-					style={{ pointerEvents: isAutomate ? "auto" : "none" }}
-					aria-hidden={!isAutomate}
-				>
-					<div className="mb-5 text-foreground">
-						<span className="text-muted-foreground/55">❯</span>{" "}
-						<TokenChip>
-							<span className="text-brand-light">superset automations</span>
-						</TokenChip>
-					</div>
-					<div className="grid max-w-[380px] grid-cols-[1fr_auto_auto] gap-x-8 gap-y-2">
-						<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-							<Trans>Name</Trans>
-						</div>
-						<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-							<Trans>Schedule</Trans>
-						</div>
-						<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-							<Trans>Last run</Trans>
-						</div>
-						{AUTOMATIONS.map((automation) => (
-							<div key={automation.name} className="contents">
-								<div className="text-foreground/90">{automation.name}</div>
-								<div className="text-muted-foreground/65">
-									{t(automation.schedule)}
-								</div>
-								{automation.running ? (
-									<div className="flex items-center gap-1.5">
-										<AsciiSpinner
-											className="text-[10px]"
-											toneClassName="text-brand-light"
-										/>
-										<span className="text-brand-light">
-											<Trans>running</Trans>
-										</span>
-									</div>
-								) : (
-									<div className="text-muted-foreground/55">
-										{t(automation.lastRun)}
-									</div>
-								)}
-							</div>
-						))}
-					</div>
-				</m.div>
-
-				<m.div
-					className="absolute inset-0 p-5 font-mono text-[11px] leading-relaxed"
-					initial={false}
-					animate={{ opacity: isCloud ? 1 : 0 }}
-					transition={{ duration: 0.3, ease: "easeOut" }}
-					style={{ pointerEvents: isCloud ? "auto" : "none" }}
-					aria-hidden={!isCloud}
-				>
+				<SceneLayer visible={isCloud}>
 					<DitherClouds
 						visible={isCloud}
 						className="pointer-events-none absolute inset-0 h-full w-full"
 					/>
-					<div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-16">
-						<m.div
-							initial={false}
-							animate={{ y: isCloud ? 0 : 10, scale: isCloud ? 1 : 0.98 }}
-							transition={{ duration: 0.25, ease: "easeOut" }}
+					<div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-24">
+						<div
+							className={`transition-transform duration-[250ms] ease-out motion-reduce:transition-none ${isCloud ? "" : "translate-y-2.5 scale-[0.98]"}`}
 						>
 							<NewCloudWorkspaceDialog active={isCloud} />
-						</m.div>
+						</div>
 					</div>
-				</m.div>
+				</SceneLayer>
 
-				<m.div
-					className="absolute inset-0 p-5 font-mono text-[11px] leading-relaxed"
-					initial={false}
-					animate={{ opacity: isPages ? 1 : 0 }}
-					transition={{ duration: 0.3, ease: "easeOut" }}
-					style={{ pointerEvents: isPages ? "auto" : "none" }}
-					aria-hidden={!isPages}
-				>
-					<div className="mb-3 text-foreground">
-						<span className="text-muted-foreground/55">❯</span>{" "}
-						<Trans>turn the onboarding findings into a page</Trans>
-					</div>
-					<div className="space-y-1.5 text-muted-foreground">
-						<div>
-							<span className="text-muted-foreground/55">●</span>{" "}
-							<TokenChip>
-								<span className="text-brand-light">
-									superset pages publish onboarding.html
-								</span>
-							</TokenChip>
-						</div>
-						<div>
-							<span className="text-emerald-400/85">✓</span>{" "}
-							<Trans>Published version 1.</Trans>
-						</div>
-						<m.div
-							initial={false}
-							animate={{ opacity: pagePhase === "revised" ? 1 : 0 }}
-							transition={{ duration: 0.25 }}
-						>
-							<span className="text-emerald-400/85">✓</span>{" "}
-							<Trans>Rewrote it and published version 2.</Trans>
-						</m.div>
-					</div>
-				</m.div>
+				<SceneLayer visible={isPages}>
+					<PagesScene phase={pagePhase} />
+				</SceneLayer>
 			</div>
 		</div>
 	);

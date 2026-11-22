@@ -14,6 +14,9 @@ import {
 	type IParsedLink,
 	removeLinkSuffix,
 } from "@superset/shared/terminal-link-parsing";
+import { bareWebUrl } from "renderer/lib/bareWebUrl";
+import { splitLineAnchor } from "renderer/lib/fileLocation";
+import { pathFileName } from "renderer/lib/pathText";
 import type { TerminalLinkResolver } from "./link-resolver";
 
 const MAX_LINE_LENGTH = 2000;
@@ -46,6 +49,20 @@ export interface DetectedLink {
 	parsedLink?: IParsedLink;
 }
 
+/** Path-like text that is no file on the host but names a website. */
+export interface DetectedWebLink {
+	text: string;
+	startIndex: number;
+	endIndex: number;
+	url: string;
+}
+
+export type DetectedTerminalLink = DetectedLink | DetectedWebLink;
+
+export function isWebLink(link: DetectedTerminalLink): link is DetectedWebLink {
+	return "url" in link;
+}
+
 /**
  * Detects local file-system links in a line of terminal text.
  *
@@ -60,14 +77,21 @@ export interface DetectedLink {
  * host service, not in the renderer.
  */
 export class LocalLinkDetector {
-	constructor(private readonly _resolver: TerminalLinkResolver) {}
+	/**
+	 * @param _resolver checks that a path exists as written
+	 * @param _fileFinder finds the file a shortened path most plausibly means
+	 */
+	constructor(
+		private readonly _resolver: TerminalLinkResolver,
+		private readonly _fileFinder?: TerminalLinkResolver,
+	) {}
 
-	async detect(text: string): Promise<DetectedLink[]> {
+	async detect(text: string): Promise<DetectedTerminalLink[]> {
 		if (!text || text.length > MAX_LINE_LENGTH) {
 			return [];
 		}
 
-		const links: DetectedLink[] = [];
+		const links: DetectedTerminalLink[] = [];
 		let resolvedCount = 0;
 
 		const os = getCurrentOS();
@@ -83,8 +107,12 @@ export class LocalLinkDetector {
 				continue;
 			}
 
-			// Build candidate paths to try
-			const candidates = this._buildCandidates(parsedLink.path.text);
+			const anchor = parsedLink.suffix
+				? null
+				: splitLineAnchor(parsedLink.path.text);
+			const candidates = this._buildCandidates(
+				anchor?.path ?? parsedLink.path.text,
+			);
 
 			// Also generate trimmed candidates (strip trailing punctuation)
 			const trimmedCandidates: string[] = [];
@@ -96,23 +124,34 @@ export class LocalLinkDetector {
 			const allCandidates = [...candidates, ...trimmedCandidates];
 
 			const resolved =
-				await this._resolver.resolveMultipleCandidates(allCandidates);
+				(await this._resolver.resolveMultipleCandidates(allCandidates)) ??
+				(candidates[0] && pathFileName(candidates[0])
+					? await this._fileFinder?.resolveLink(candidates[0])
+					: null);
 
-			if (resolved) {
-				const linkStart = parsedLink.prefix?.index ?? parsedLink.path.index;
-				const linkEnd = parsedLink.suffix
-					? parsedLink.suffix.suffix.index +
-						parsedLink.suffix.suffix.text.length
-					: parsedLink.path.index + parsedLink.path.text.length;
+			const linkStart = parsedLink.prefix?.index ?? parsedLink.path.index;
+			const linkEnd = parsedLink.suffix
+				? parsedLink.suffix.suffix.index + parsedLink.suffix.suffix.text.length
+				: parsedLink.path.index + parsedLink.path.text.length;
+			const url =
+				resolved || parsedLink.suffix ? null : bareWebUrl(parsedLink.path.text);
 
+			if (url) {
+				links.push({
+					text: parsedLink.path.text,
+					startIndex: parsedLink.path.index,
+					endIndex: parsedLink.path.index + parsedLink.path.text.length,
+					url,
+				});
+			} else if (resolved) {
 				links.push({
 					text: text.substring(linkStart, linkEnd),
 					startIndex: linkStart,
 					endIndex: linkEnd,
 					resolvedPath: resolved.path,
 					isDirectory: resolved.isDirectory,
-					row: parsedLink.suffix?.row,
-					col: parsedLink.suffix?.col,
+					row: parsedLink.suffix?.row ?? anchor?.row,
+					col: parsedLink.suffix?.col ?? anchor?.col,
 					rowEnd: parsedLink.suffix?.rowEnd,
 					colEnd: parsedLink.suffix?.colEnd,
 					parsedLink,

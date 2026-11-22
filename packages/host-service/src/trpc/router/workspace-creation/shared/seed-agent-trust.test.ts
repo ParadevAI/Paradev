@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
 	chmodSync,
@@ -6,19 +7,35 @@ import {
 	mkdtempSync,
 	readdirSync,
 	readFileSync,
+	realpathSync,
 	rmSync,
 	statSync,
 	symlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { homedir, tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import type { HostDb } from "../../../../db";
+import * as schema from "../../../../db/schema";
 import {
+	inheritAgyWorktreeTrust,
 	resolveTrustFamily,
+	resolveTrustTarget,
+	seedAgentFolderTrust,
 	seedAgyFolderTrust,
 	seedClaudeFolderTrust,
 	seedCodexFolderTrust,
 } from "./seed-agent-trust";
+
+function createTestDb(): HostDb {
+	const db = drizzle(new Database(":memory:"), { schema });
+	migrate(db, {
+		migrationsFolder: resolve(import.meta.dir, "../../../../../drizzle"),
+	});
+	return db as unknown as HostDb;
+}
 
 let dir: string;
 
@@ -41,7 +58,7 @@ describe("resolveTrustFamily", () => {
 		expect(
 			resolveTrustFamily({
 				presetId: "agy",
-				command: "agy --mode accept-edits",
+				command: "agy --dangerously-skip-permissions",
 			}),
 		).toBe("agy");
 	});
@@ -59,6 +76,41 @@ describe("resolveTrustFamily", () => {
 				command: "C:\\tools\\codex.exe",
 			}),
 		).toBe("codex");
+	});
+
+	test("sees through env wrappers and inline assignments", () => {
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command:
+					"env CLAUDE_CONFIG_DIR=/p claude --dangerously-skip-permissions",
+			}),
+		).toBe("claude");
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command: "/usr/bin/env",
+				args: ["CODEX_HOME=/p", "A=1", "codex"],
+			}),
+		).toBe("codex");
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command: "CLAUDE_CONFIG_DIR=/p claude",
+			}),
+		).toBe("claude");
+		expect(
+			resolveTrustFamily({ presetId: "custom", command: "env my-agent" }),
+		).toBe(null);
+	});
+
+	test("keeps backslashes in a Windows path with arguments", () => {
+		expect(
+			resolveTrustFamily({
+				presetId: "custom",
+				command: "C:\\Users\\me\\claude.exe --resume",
+			}),
+		).toBe("claude");
 	});
 
 	test("returns null for providers without a known trust store", () => {
@@ -162,6 +214,134 @@ describe("seedClaudeFolderTrust", () => {
 	});
 });
 
+describe("seedAgentFolderTrust", () => {
+	test("seeds the CLAUDE_CONFIG_DIR named by an env wrapper", async () => {
+		const profile = join(dir, "second-profile");
+		const session = join(dir, "session");
+		mkdirSync(profile);
+		mkdirSync(session);
+		await seedAgentFolderTrust(createTestDb(), session, {
+			presetId: "custom",
+			command: "env",
+			args: [`CLAUDE_CONFIG_DIR=${profile}`, "claude", "--verbose"],
+			env: { CLAUDE_CONFIG_DIR: join(dir, "overridden") },
+		});
+		const state = JSON.parse(
+			readFileSync(join(profile, ".claude.json"), "utf-8"),
+		);
+		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
+			true,
+		);
+	});
+
+	test("reads a quoted CLAUDE_CONFIG_DIR from a raw command string", async () => {
+		const profile = join(dir, "profile with spaces");
+		const session = join(dir, "session");
+		mkdirSync(profile);
+		mkdirSync(session);
+		await seedAgentFolderTrust(createTestDb(), session, {
+			presetId: "custom",
+			command: `env CLAUDE_CONFIG_DIR='${profile}' claude --verbose && true`,
+			env: {},
+		});
+		const state = JSON.parse(
+			readFileSync(join(profile, ".claude.json"), "utf-8"),
+		);
+		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
+			true,
+		);
+	});
+
+	test("resolves a relative CLAUDE_CONFIG_DIR against the session folder", async () => {
+		const session = join(dir, "session");
+		mkdirSync(join(session, "profile"), { recursive: true });
+		await seedAgentFolderTrust(createTestDb(), session, {
+			presetId: "custom",
+			command: "env CLAUDE_CONFIG_DIR=profile claude",
+			env: {},
+		});
+		const state = JSON.parse(
+			readFileSync(join(session, "profile", ".claude.json"), "utf-8"),
+		);
+		expect(state.projects[realpathSync(session)].hasTrustDialogAccepted).toBe(
+			true,
+		);
+	});
+});
+
+describe("resolveTrustTarget", () => {
+	test("expands variables and honours HOME set by the wrapper", () => {
+		const target = (command: string) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "custom",
+				command,
+				env: {},
+			})?.file;
+		expect(target('env CLAUDE_CONFIG_DIR="$HOME/agent-profile" claude')).toBe(
+			join(`${process.env.HOME ?? ""}/agent-profile`, ".claude.json"),
+		);
+		expect(target("env HOME=/isolated claude")).toBe(
+			join("/isolated", ".claude.json"),
+		);
+	});
+
+	test("env -i and -u drop the inherited CLAUDE_CONFIG_DIR", () => {
+		const target = (args: string[]) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "claude",
+				command: "env",
+				args: [...args, "claude"],
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file;
+		const defaultFile = join(homedir(), ".claude.json");
+		expect(target([])).toBe(join("/agent-profile", ".claude.json"));
+		expect(target(["-i"])).toBe(defaultFile);
+		expect(target(["-u", "CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
+		expect(target(["--unset=CLAUDE_CONFIG_DIR"])).toBe(defaultFile);
+		expect(target(["-uCLAUDE_CONFIG_DIR"])).toBe(defaultFile);
+		expect(target(["-i", "CLAUDE_CONFIG_DIR=/p"])).toBe(
+			join("/p", ".claude.json"),
+		);
+	});
+
+	test("parses clustered env options", () => {
+		const target = (args: string[]) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "claude",
+				command: "env",
+				args: [...args, "CLAUDE_CONFIG_DIR=/p", "claude"],
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file;
+		expect(target(["-iuCLAUDE_CONFIG_DIR"])).toBe(join("/p", ".claude.json"));
+		expect(target(["-iu", "X"])).toBe(join("/p", ".claude.json"));
+		expect(
+			resolveTrustTarget(createTestDb(), {
+				presetId: "custom",
+				command: "env -iuCLAUDE_CONFIG_DIR claude",
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file,
+		).toBe(join(homedir(), ".claude.json"));
+	});
+
+	test("reads env options from a raw command string", () => {
+		const target = (command: string) =>
+			resolveTrustTarget(createTestDb(), {
+				presetId: "custom",
+				command,
+				env: { CLAUDE_CONFIG_DIR: "/agent-profile" },
+			})?.file;
+		const defaultFile = join(homedir(), ".claude.json");
+		expect(target("env -u CLAUDE_CONFIG_DIR claude --verbose")).toBe(
+			defaultFile,
+		);
+		expect(target("env --ignore-environment claude")).toBe(defaultFile);
+		expect(target("env -uCLAUDE_CONFIG_DIR claude")).toBe(defaultFile);
+		expect(target("env -i CLAUDE_CONFIG_DIR=/p claude")).toBe(
+			join("/p", ".claude.json"),
+		);
+	});
+});
+
 describe("seedAgyFolderTrust", () => {
 	test("appends to trustedWorkspaces, preserving other keys", async () => {
 		const file = join(dir, "settings.json");
@@ -183,6 +363,18 @@ describe("seedAgyFolderTrust", () => {
 			"/tmp/session-b",
 		);
 		expect(readdirSync(dir)).toEqual([]);
+	});
+});
+
+describe("inheritAgyWorktreeTrust", () => {
+	test("trusts a worktree only when its main checkout is trusted", async () => {
+		const file = join(dir, "settings.json");
+		writeFileSync(file, JSON.stringify({ trustedWorkspaces: ["/repo"] }));
+		await inheritAgyWorktreeTrust(file, "/other-repo", "/worktrees/b");
+		await inheritAgyWorktreeTrust(file, "/repo", "/worktrees/a");
+		expect(JSON.parse(readFileSync(file, "utf-8"))).toEqual({
+			trustedWorkspaces: ["/repo", "/worktrees/a"],
+		});
 	});
 });
 
