@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { i18n } from "@superset/i18n";
 import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
@@ -17,6 +18,7 @@ import {
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { CloudPullRequest } from "../../hooks/useCloudPullRequests";
 import { cloudRowAttention } from "../../utils/needsMe";
+import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
 import { WorkspaceLead } from "../WorkspaceLead";
 import { ArchivedCloudRowMenu } from "./components/ArchivedCloudRowMenu";
 import { CloudWorkspaceRowMenu } from "./components/CloudWorkspaceRowMenu";
@@ -42,7 +44,7 @@ export function CloudWorkspaceRow({
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row of the Cloud list. */
 	card?: boolean;
-	/** Replaces the branch line, e.g. "repo · Cloud" outside the Cloud list. */
+	/** Replaces the branch in the detail line, e.g. "repo · Cloud" outside the Cloud list. */
 	detail?: string;
 }) {
 	const { t } = useLingui();
@@ -83,11 +85,21 @@ export function CloudWorkspaceRow({
 		: null;
 	const [prOwner, prRepo] = pullRequest?.repoFullName.split("/") ?? [];
 	const provisioning = row.status === "provisioning";
-	const secondLine =
-		detail ?? (row.branch && row.branch !== row.name ? row.branch : null);
 	const attention = archived
 		? null
 		: cloudRowAttention(row, readAt, manuallyUnread);
+	const detailParts = rowDetailParts({
+		state: attention ? attentionLabel(attention) : null,
+		pullRequest:
+			prStatus && !archived
+				? { label: i18n._(prStatus.label), ink: prStatus.ink }
+				: null,
+		diff: null,
+		name: row.name,
+		branch: row.branch,
+		context: detail,
+		noChanges: t({ message: "No changes" }),
+	});
 
 	const body = (
 		<Pressable
@@ -99,11 +111,8 @@ export function CloudWorkspaceRow({
 			accessibilityRole="button"
 			accessibilityLabel={[
 				row.name || t({ message: "Untitled workspace" }),
-				provisioning
-					? t({ message: "Creating the sandbox" })
-					: attention
-						? attentionLabel(attention)
-						: null,
+				...detailParts.map((part) => part.text),
+				provisioning ? t({ message: "Creating the sandbox" }) : null,
 			]
 				.filter(Boolean)
 				.join(", ")}
@@ -136,14 +145,7 @@ export function CloudWorkspaceRow({
 				>
 					{row.name || t({ message: "Untitled workspace" })}
 				</Text>
-				{secondLine ? (
-					<Text
-						className="text-muted-foreground mt-1 text-[13px]"
-						numberOfLines={enlargedText ? undefined : 1}
-					>
-						{secondLine}
-					</Text>
-				) : null}
+				<RowDetailLine parts={detailParts} />
 			</View>
 			{archived ? (
 				<UnarchiveButton workspaceId={row.id} />

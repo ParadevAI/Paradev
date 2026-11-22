@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
+import { i18n } from "@superset/i18n";
 import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
@@ -27,6 +28,7 @@ import type {
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import type { GroupBarSpan } from "../../types";
 import { GroupBar } from "../GroupBar";
+import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
 import { WorkspaceLead } from "../WorkspaceLead";
 import {
 	WorkspaceRowMenu,
@@ -67,7 +69,7 @@ export function WorkspaceRow({
 	groups?: WorkspaceRowMenuProps["groups"];
 	/** Set for a row inside a group: its colour and piece of the group's bar. */
 	group?: { color: string | null; bar: GroupBarSpan | null };
-	/** Replaces the branch line, e.g. "project · host" outside its project. */
+	/** Replaces the branch in the detail line, e.g. "project · host" outside its project. */
 	detail?: string;
 	/** Rows of a host that can't answer: shown, not opened. */
 	disabled?: boolean;
@@ -99,12 +101,19 @@ export function WorkspaceRow({
 
 	const grouped = !card && group !== undefined;
 	const bar = grouped ? group.bar : null;
-	const showBranch = !detail && workspace.branch !== workspace.name;
-	const showDiff =
-		!detail &&
-		diffStats !== null &&
-		(diffStats.additions > 0 || diffStats.deletions > 0);
-	const hasDetail = Boolean(detail) || showBranch || showDiff;
+	const state = cloudStatus === "failed" ? "failed" : (rowAttention ?? null);
+	const detailParts = rowDetailParts({
+		state: state ? attentionLabel(state) : null,
+		pullRequest:
+			prIcon && pullRequest
+				? { label: i18n._(prIcon.label), ink: prIcon.ink }
+				: null,
+		diff: diffStats,
+		name: workspace.name,
+		branch: workspace.branch,
+		context: detail,
+		noChanges: t({ message: "No changes" }),
+	});
 
 	const href = `/workspace/${workspace.id}`;
 
@@ -146,14 +155,10 @@ export function WorkspaceRow({
 					accessibilityRole="button"
 					accessibilityLabel={[
 						workspace.name,
-						detail ?? (showBranch ? workspace.branch : null),
-						cloudStatus === "failed"
-							? attentionLabel("failed")
-							: cloudStatus === "provisioning"
-								? t({ message: "Creating the sandbox" })
-								: rowAttention
-									? attentionLabel(rowAttention)
-									: null,
+						...detailParts.map((part) => part.text),
+						cloudStatus === "provisioning"
+							? t({ message: "Creating the sandbox" })
+							: null,
 					]
 						.filter(Boolean)
 						.join(", ")}
@@ -187,42 +192,7 @@ export function WorkspaceRow({
 						>
 							{workspace.name}
 						</Text>
-						<View
-							className={cn(
-								"flex-row items-center gap-1",
-								hasDetail && "mt-1",
-								enlargedText && "flex-wrap",
-							)}
-						>
-							{/* A workspace named after its branch says it twice otherwise —
-						    common now that every project shows its `main`. */}
-							{detail ? (
-								<Text
-									className="text-muted-foreground shrink text-[13px]"
-									numberOfLines={enlargedText ? undefined : 1}
-								>
-									{detail}
-								</Text>
-							) : null}
-							{showBranch ? (
-								<Text
-									className="text-muted-foreground shrink text-[13px]"
-									numberOfLines={enlargedText ? undefined : 1}
-								>
-									{workspace.branch}
-								</Text>
-							) : null}
-							{showDiff ? (
-								<>
-									{showBranch ? (
-										<Text className="text-muted-foreground text-[13px]">•</Text>
-									) : null}
-									<Text className="text-muted-foreground text-[13px] tabular-nums">
-										+{diffStats.additions} −{diffStats.deletions}
-									</Text>
-								</>
-							) : null}
-						</View>
+						<RowDetailLine parts={detailParts} />
 					</View>
 					{sessions.length > 0 ? (
 						// Overlapping avatar-style stack — stays ~fixed-width as sessions
