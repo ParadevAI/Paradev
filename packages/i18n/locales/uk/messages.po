@@ -1163,6 +1163,9 @@ msgstr "{machineSize} (немає у вашому тарифі)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
 
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, one {Не більше # хоста одночасно} other {Не більше # хостів одночасно}}"
+
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Копіювання розмови (# повідомлення)} few {Копіювання розмови (# повідомлення)} many {Копіювання розмови (# повідомлень)} other {Копіювання розмови (# повідомлення)}}"
 
@@ -21912,9 +21915,6 @@ msgstr "До {MAX_SAVED_VIEWS} збережених подань"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "До 25. Запуск починається, щойно спрацює будь-який із них."
-
-msgid "Up to 3 hosts at a time"
-msgstr "Не більше 3 хостів одночасно"
 
 msgid "Up to date"
 msgstr "Актуально"

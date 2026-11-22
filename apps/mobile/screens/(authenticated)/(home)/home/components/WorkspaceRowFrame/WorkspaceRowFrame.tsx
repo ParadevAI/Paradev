@@ -4,6 +4,7 @@ import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { cn } from "@/lib/utils";
 import { RowHairline } from "@/screens/(authenticated)/(home)/components/RowHairline";
+import { LIST_GRID } from "@/screens/(authenticated)/(home)/utils/listGrid";
 import type { GroupBarSpan } from "../../types";
 import { GroupBar } from "../GroupBar";
 import { RowDetailLine, type RowDetailPart } from "../RowDetailLine";
@@ -52,7 +53,11 @@ export function WorkspaceRowFrame({
 		<Pressable
 			className={cn(
 				"bg-background web:hover:bg-accent/60 min-h-16 flex-row items-center gap-3 rounded-xl py-2",
-				card ? "px-3" : cn("pr-4", inGroup ? "pl-8" : "pl-4"),
+				card
+					? "px-3"
+					: inGroup
+						? LIST_GRID.rowPadding.grouped
+						: LIST_GRID.rowPadding.plain,
 			)}
 			onPress={onPress}
 			disabled={disabled}

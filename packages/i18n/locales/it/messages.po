@@ -1169,6 +1169,9 @@ msgstr "{machineSize} (non incluso nel tuo piano)"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, other {Fino a # host alla volta}}"
+
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Copia della conversazione (# messaggio)} many {Copia della conversazione (# messaggi)} other {Copia della conversazione (# messaggi)}}"
 
@@ -21918,9 +21921,6 @@ msgstr "Fino a {MAX_SAVED_VIEWS} viste salvate"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "Fino a 25. Un'esecuzione parte quando scatta uno qualsiasi."
-
-msgid "Up to 3 hosts at a time"
-msgstr "Fino a 3 host alla volta"
 
 msgid "Up to date"
 msgstr "Aggiornato"

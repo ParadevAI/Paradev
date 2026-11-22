@@ -1169,6 +1169,9 @@ msgstr "{machineSize}（不在你的方案中）"
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
 
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, other {一次最多 # 台主機}}"
+
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {正在複製對話（# 則訊息）} other {正在複製對話（# 則訊息）}}"
 
@@ -21918,9 +21921,6 @@ msgstr "最多儲存 {MAX_SAVED_VIEWS} 個檢視"
 
 msgid "Up to 25. A run starts when any one of them fires."
 msgstr "最多 25 個。任何一個觸發時都會開始執行。"
-
-msgid "Up to 3 hosts at a time"
-msgstr "一次最多 3 台主機"
 
 msgid "Up to date"
 msgstr "已是最新"

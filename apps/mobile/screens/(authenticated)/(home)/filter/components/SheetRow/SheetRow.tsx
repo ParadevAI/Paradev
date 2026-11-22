@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
+import { cn } from "@/lib/utils";
 import { RowHairline } from "@/screens/(authenticated)/(home)/components/RowHairline";
+import { LIST_GRID } from "@/screens/(authenticated)/(home)/utils/listGrid";
 import { ListRowCheck } from "@/screens/(authenticated)/components/ListRowCheck";
 
 /**
@@ -40,7 +42,10 @@ export function SheetRow({
 			}
 			// Not the row's own label: some of these are host names.
 			ph-label="sheet-row"
-			className="web:hover:opacity-80 min-h-16 flex-row items-center gap-3 px-4 py-2 active:opacity-60"
+			className={cn(
+				"web:hover:opacity-80 min-h-16 flex-row items-center gap-3 py-2 active:opacity-60",
+				LIST_GRID.rowPadding.plain,
+			)}
 		>
 			<View className="size-6 items-center justify-center">{icon}</View>
 			<View className="min-w-0 flex-1">

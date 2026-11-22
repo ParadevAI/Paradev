@@ -12,6 +12,7 @@ import { posthog } from "@/lib/posthog";
 import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
+import { CLOUD_PLACE_ID } from "@/screens/(authenticated)/(home)/home/utils/buildPlacesList";
 import {
 	type AttentionCounts,
 	countAttention,
@@ -90,7 +91,7 @@ export function ScopeFilterScreen() {
 			);
 		}
 		counts.set(
-			"cloud",
+			CLOUD_PLACE_ID,
 			countAttention(
 				activeCloud
 					.filter((row) => cloudFilters.matchesCreator(row.createdByUserId))
@@ -178,7 +179,7 @@ export function ScopeFilterScreen() {
 						/>
 					}
 					label={t({ message: "Cloud" })}
-					subtitle={countsLine("cloud")}
+					subtitle={countsLine(CLOUD_PLACE_ID)}
 					checked={selection.cloud}
 					onPress={() => apply(toggleCloud(selection), "cloud")}
 					isLast={sortedHosts.length === 0}
@@ -198,7 +199,12 @@ export function ScopeFilterScreen() {
 							label={host.name}
 							subtitle={
 								!tickable
-									? t({ message: "Up to 3 hosts at a time" })
+									? t({
+											message: plural(MAX_SELECTED_HOSTS, {
+												one: "Up to # host at a time",
+												other: "Up to # hosts at a time",
+											}),
+										})
 									: !showStatus
 										? undefined
 										: host.isOnline
