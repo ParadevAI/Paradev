@@ -113,7 +113,7 @@ export type ComposerProps = {
 	agentSwitcher?: AgentSwitcher;
 	modes?: SessionMode[];
 	currentModeId?: string;
-	onSetMode?: (modeId: string) => void;
+	onSetMode?: (modeId: string) => unknown;
 	onSend: (
 		content: UserContent[],
 		options: { steer: boolean; draft: ComposerDraft },
@@ -628,6 +628,11 @@ export const Composer = memo(function Composer({
 			const typed = runTyped(text, files.length > 0);
 			if (typed === "ran") return;
 			if (typed === "kept") return false;
+			if (typed !== "not-app") {
+				return Promise.resolve(typed.ready)
+					.catch(() => undefined)
+					.then(() => send(typed.text, files, mentions, steer, draft));
+			}
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (
 				name &&

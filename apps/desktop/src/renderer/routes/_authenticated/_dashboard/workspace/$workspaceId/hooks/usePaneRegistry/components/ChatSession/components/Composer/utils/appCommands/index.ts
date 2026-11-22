@@ -4,4 +4,5 @@ export {
 	type AppCommandChoice,
 	type AppCommandContext,
 	type AppCommandOutcome,
+	matchAppCommand,
 } from "./appCommands";

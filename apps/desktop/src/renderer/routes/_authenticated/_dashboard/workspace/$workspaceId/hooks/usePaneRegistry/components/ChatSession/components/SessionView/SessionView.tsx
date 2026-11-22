@@ -442,7 +442,7 @@ export function SessionView({
 	const onSetMode = useCallback(
 		(modeId: string) => {
 			onModeChange?.(modeId);
-			void setMode(modeId);
+			return setMode(modeId);
 		},
 		[onModeChange, setMode],
 	);

@@ -17,7 +17,12 @@ import {
 	Zap,
 } from "lucide-react";
 import type { ChatForkTarget } from "../../../../types";
-import { FORK_TARGET_ARGS, parseForkTarget, parseSwitch } from "../commandArgs";
+import {
+	FORK_TARGET_ARGS,
+	parseForkTarget,
+	parseSwitch,
+	splitInvocation,
+} from "../commandArgs";
 
 /** What the chat can do right now; a missing action hides its commands. */
 export type AppCommandContext = {
@@ -38,7 +43,7 @@ export type AppCommandContext = {
 	createAutomation?: (prompt: string) => void;
 };
 
-export type AppCommandOutcome = "done" | "bad-args";
+export type AppCommandOutcome = "done" | "continue" | "bad-args";
 
 export type AppCommandChoice = { arg: string; description: MessageDescriptor };
 
@@ -50,6 +55,7 @@ export type AppCommand = {
 	hint?: string | MessageDescriptor;
 	/** Picking it from the menu leaves it in the composer for the text it takes. */
 	takesText?: boolean;
+	acceptsAttachments?: boolean;
 	/** One menu row per choice, each running the command with its argument. */
 	choices?: (context: AppCommandContext) => AppCommandChoice[];
 	available: (context: AppCommandContext) => boolean;
@@ -116,9 +122,13 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		name: "plan",
 		icon: NotebookPen,
 		description: msg({ message: "Read and plan without changing anything" }),
+		acceptsAttachments: true,
 		available: (context) => context.plan !== undefined,
 		listed: (context) => context.plan?.active === false,
-		run: (context, args) => withoutArgs(args, context.plan?.enter),
+		run: (context, args) => {
+			context.plan?.enter();
+			return args ? "continue" : "done";
+		},
 	},
 	{
 		name: "default",
@@ -200,3 +210,24 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		},
 	},
 ];
+
+export function matchAppCommand(
+	entries: readonly { command: AppCommand; aliases: readonly string[] }[],
+	text: string,
+	withAttachments: boolean,
+):
+	| { kind: "none" }
+	| { kind: "reject-attachments"; command: AppCommand }
+	| { kind: "match"; command: AppCommand; args: string } {
+	const invocation = splitInvocation(text);
+	if (!invocation) return { kind: "none" };
+	const entry = entries.find(
+		({ command, aliases }) =>
+			command.name === invocation.name || aliases.includes(invocation.name),
+	);
+	if (!entry) return { kind: "none" };
+	if (withAttachments && !entry.command.acceptsAttachments) {
+		return { kind: "reject-attachments", command: entry.command };
+	}
+	return { kind: "match", command: entry.command, args: invocation.args };
+}

@@ -11,7 +11,7 @@ import type {
 } from "@superset/chat-ui/PromptInput";
 import { COMPANY } from "@superset/shared/constants";
 import { toast } from "@superset/ui/sonner";
-import { type RefObject, useCallback, useMemo, useState } from "react";
+import { type RefObject, useCallback, useMemo, useRef, useState } from "react";
 import { useCreateAutomation } from "renderer/routes/_authenticated/_dashboard/hooks/useCreateAutomation";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { fastOption } from "renderer/routes/_authenticated/components/AgentComposer/utils/toggleOption";
@@ -21,15 +21,20 @@ import {
 	APP_COMMANDS,
 	type AppCommand,
 	type AppCommandContext,
+	type AppCommandOutcome,
+	matchAppCommand,
 } from "../../utils/appCommands";
-import { splitInvocation } from "../../utils/commandArgs";
 import { resolveCollisions } from "../../utils/commandCollisions";
 import { PLAN_ID, type PlanSwitch, planControl } from "../../utils/planControl";
 import { restoreCommand } from "../../utils/restoreCommand";
 
 const CLAUDE_PRESET_ID = "claude";
 
-export type TypedCommandOutcome = "not-app" | "ran" | "kept";
+export type TypedCommandOutcome =
+	| "not-app"
+	| "ran"
+	| "kept"
+	| { kind: "send"; text: string; ready?: Promise<unknown> | null };
 
 function hintText(command: AppCommand, i18n: I18n): string | undefined {
 	if (typeof command.hint === "string") return command.hint;
@@ -44,7 +49,7 @@ export type UseAppCommandsOptions = {
 	onSetConfigOption?: (configId: string, value: string) => unknown;
 	modes?: { id: string }[];
 	currentModeId?: string;
-	onSetMode?: (modeId: string) => void;
+	onSetMode?: (modeId: string) => unknown;
 	openModelPicker?: () => void;
 	onNewChat?: () => void;
 	onFork?: (target: ChatForkTarget) => void;
@@ -86,6 +91,7 @@ export function useAppCommands({
 	const projectId = workspace.projectId;
 
 	const [modeBeforePlan, setModeBeforePlan] = useState(currentModeId);
+	const pendingPlanSwitch = useRef<Promise<unknown> | null>(null);
 	if (
 		currentModeId &&
 		currentModeId !== PLAN_ID &&
@@ -115,8 +121,11 @@ export function useAppCommands({
 			modeBeforePlan,
 		});
 		const apply = (change: PlanSwitch) => {
-			if ("modeId" in change) onSetMode?.(change.modeId);
-			else onSetConfigOption?.(change.configId, change.value);
+			const result =
+				"modeId" in change
+					? onSetMode?.(change.modeId)
+					: onSetConfigOption?.(change.configId, change.value);
+			pendingPlanSwitch.current = result instanceof Promise ? result : null;
 		};
 		return {
 			...mcp,
@@ -151,7 +160,9 @@ export function useAppCommands({
 				? {
 						plan: {
 							active: plan.active,
-							enter: () => apply(plan.enter),
+							enter: () => {
+								if (!plan.active) apply(plan.enter);
+							},
 							leave: () => apply(plan.leave),
 						},
 					}
@@ -228,8 +239,9 @@ export function useAppCommands({
 			command: AppCommand,
 			args: string,
 			composer: ComposerActionContext,
-		): boolean => {
-			if (command.run(context, args, composer) === "done") return true;
+		): AppCommandOutcome => {
+			const outcome = command.run(context, args, composer);
+			if (outcome !== "bad-args") return outcome;
 			const name = command.name;
 			const hint = hintText(command, i18n);
 			toast.error(
@@ -237,7 +249,7 @@ export function useAppCommands({
 					? t({ message: `Usage: /${name} ${hint}` })
 					: t({ message: `/${name} doesn't take arguments` }),
 			);
-			return false;
+			return "bad-args";
 		},
 		[context, i18n, t],
 	);
@@ -288,16 +300,12 @@ export function useAppCommands({
 
 	const runTyped = useCallback(
 		(text: string, withAttachments: boolean): TypedCommandOutcome => {
-			const invocation = splitInvocation(text);
 			const input = inputRef.current;
-			if (!invocation || !input) return "not-app";
-			const entry = resolved.app.find(
-				({ command, aliases }) =>
-					command.name === invocation.name || aliases.includes(invocation.name),
-			);
-			if (!entry) return "not-app";
-			if (withAttachments) {
-				const name = entry.command.name;
+			if (!input) return "not-app";
+			const matched = matchAppCommand(resolved.app, text, withAttachments);
+			if (matched.kind === "none") return "not-app";
+			if (matched.kind === "reject-attachments") {
+				const name = matched.command.name;
 				toast.error(t({ message: `/${name} doesn't take attachments` }));
 				return "kept";
 			}
@@ -307,7 +315,17 @@ export function useAppCommands({
 				openPanel: input.openPanel,
 				query: "",
 			};
-			return run(entry.command, invocation.args, composer) ? "ran" : "kept";
+			pendingPlanSwitch.current = null;
+			const outcome = run(matched.command, matched.args, composer);
+			if (outcome === "bad-args") return "kept";
+			if (outcome === "continue" || withAttachments) {
+				return {
+					kind: "send",
+					text: matched.args,
+					ready: pendingPlanSwitch.current,
+				};
+			}
+			return "ran";
 		},
 		[inputRef, resolved, run, t],
 	);
