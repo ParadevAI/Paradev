@@ -196,6 +196,11 @@ const config: NextConfig = {
 				permanent: false,
 			},
 			{
+				source: "/ios",
+				destination: COMPANY.APP_STORE_URL,
+				permanent: false,
+			},
+			{
 				source: "/get-app",
 				has: [
 					{ type: "header" as const, key: "user-agent", value: ".*Android.*" },

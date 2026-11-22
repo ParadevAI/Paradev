@@ -9615,6 +9615,9 @@ msgstr "Destek al"
 msgid "Get the best out of Pro"
 msgstr "Pro’dan en iyi şekilde yararlanın"
 
+msgid "Get the mobile app"
+msgstr "Mobil uygulamayı edinin"
+
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
 
@@ -10597,8 +10600,8 @@ msgstr "GitHub App'i kur"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI'yi yükle"
 
-msgid "Install on your iPhone"
-msgstr "iPhone’unuza yükleyin"
+msgid "Install on your phone"
+msgstr "Telefonunuza yükleyin"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "Bir kez kurun. Her ajan alır, makinelerinizde ve bulutta."
@@ -14109,9 +14112,6 @@ msgstr "Yine de aç"
 
 msgid "Open Anyway"
 msgstr "Yine de aç"
-
-msgid "Open App Store"
-msgstr "App Store’u aç"
 
 msgid "Open as comment pane"
 msgstr "Yorum bölmesi olarak aç"
@@ -17651,8 +17651,8 @@ msgstr "Kalite çıtasını koruyarak yüzlerce ajana ölçeklenin"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "QR kodunu tarayın, ardından aynı Paradev hesabıyla oturum açıp bu kuruluşu seçin."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "iPhone için Paradev’i indirmek üzere tarayın"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "iPhone veya Android için Paradev’i indirmek üzere tarayın"
 
 msgid "Scanning transcript logs…"
 msgstr "Kayıt günlükleri taranıyor…"

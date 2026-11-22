@@ -9615,6 +9615,9 @@ msgstr "Nhận hỗ trợ"
 msgid "Get the best out of Pro"
 msgstr "Tận dụng tối đa Pro"
 
+msgid "Get the mobile app"
+msgstr "Tải ứng dụng di động"
+
 msgid "Gets an invite to join {organizationName}"
 msgstr "Sẽ nhận lời mời tham gia {organizationName}"
 
@@ -10597,8 +10600,8 @@ msgstr "Cài GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Cài đặt GitHub CLI"
 
-msgid "Install on your iPhone"
-msgstr "Cài đặt trên iPhone"
+msgid "Install on your phone"
+msgstr "Cài đặt trên điện thoại"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "Cài một lần. Mọi agent đều có, trên máy của bạn và trên cloud."
@@ -14109,9 +14112,6 @@ msgstr "Vẫn mở"
 
 msgid "Open Anyway"
 msgstr "Vẫn mở"
-
-msgid "Open App Store"
-msgstr "Mở App Store"
 
 msgid "Open as comment pane"
 msgstr "Mở dạng khung bình luận"
@@ -17651,8 +17651,8 @@ msgstr "Mở rộng lên hàng trăm agent mà vẫn giữ chuẩn chất lượ
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Quét mã QR, sau đó đăng nhập bằng cùng tài khoản Paradev và chọn tổ chức này."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "Quét để tải Paradev cho iPhone"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "Quét để tải Paradev cho iPhone hoặc Android"
 
 msgid "Scanning transcript logs…"
 msgstr "Đang quét log transcript…"

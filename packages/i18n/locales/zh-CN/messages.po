@@ -9615,6 +9615,9 @@ msgstr "获取支持"
 msgid "Get the best out of Pro"
 msgstr "充分利用 Pro"
 
+msgid "Get the mobile app"
+msgstr "获取移动应用"
+
 msgid "Gets an invite to join {organizationName}"
 msgstr "将收到加入 {organizationName} 的邀请"
 
@@ -10597,8 +10600,8 @@ msgstr "安装GitHub App"
 msgid "Install GitHub CLI"
 msgstr "安装 GitHub CLI"
 
-msgid "Install on your iPhone"
-msgstr "在 iPhone 上安装"
+msgid "Install on your phone"
+msgstr "在手机上安装"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "只需安装一次，所有智能体都能用，无论在你的设备上还是云端。"
@@ -14109,9 +14112,6 @@ msgstr "仍然打开"
 
 msgid "Open Anyway"
 msgstr "仍然打开"
-
-msgid "Open App Store"
-msgstr "打开 App Store"
 
 msgid "Open as comment pane"
 msgstr "作为评论面板打开"
@@ -17651,8 +17651,8 @@ msgstr "扩展到数百个智能体，质量标准不降"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "扫描二维码，然后使用同一个 Paradev 账号登录并选择此组织。"
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "扫码下载 iPhone 版 Paradev"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "扫码下载 iPhone 或 Android 版 Paradev"
 
 msgid "Scanning transcript logs…"
 msgstr "正在扫描会话记录日志…"

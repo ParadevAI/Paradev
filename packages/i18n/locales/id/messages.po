@@ -9615,6 +9615,9 @@ msgstr "Dapatkan bantuan"
 msgid "Get the best out of Pro"
 msgstr "Maksimalkan Pro"
 
+msgid "Get the mobile app"
+msgstr "Dapatkan aplikasi seluler"
+
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
 
@@ -10597,8 +10600,8 @@ msgstr "Pasang GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Pasang GitHub CLI"
 
-msgid "Install on your iPhone"
-msgstr "Instal di iPhone Anda"
+msgid "Install on your phone"
+msgstr "Instal di ponsel Anda"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "Instal sekali. Setiap agen mendapatkannya, di mesin Anda dan di cloud."
@@ -14109,9 +14112,6 @@ msgstr "Tetap buka"
 
 msgid "Open Anyway"
 msgstr "Tetap Buka"
-
-msgid "Open App Store"
-msgstr "Buka App Store"
 
 msgid "Open as comment pane"
 msgstr "Buka sebagai panel komentar"
@@ -17651,8 +17651,8 @@ msgstr "Skalakan hingga ratusan agen, pertahankan standar kualitas"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Pindai kode QR, lalu masuk dengan akun Paradev yang sama dan pilih organisasi ini."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "Pindai untuk mengunduh Paradev untuk iPhone"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "Pindai untuk mengunduh Paradev untuk iPhone atau Android"
 
 msgid "Scanning transcript logs…"
 msgstr "Memindai log transkrip…"

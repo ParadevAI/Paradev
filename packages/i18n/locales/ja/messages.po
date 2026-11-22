@@ -9615,6 +9615,9 @@ msgstr "サポートを受ける"
 msgid "Get the best out of Pro"
 msgstr "Proを最大限に活用する"
 
+msgid "Get the mobile app"
+msgstr "モバイルアプリを入手"
+
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
 
@@ -10597,8 +10600,8 @@ msgstr "GitHub Appをインストール"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI をインストール"
 
-msgid "Install on your iPhone"
-msgstr "iPhoneにインストール"
+msgid "Install on your phone"
+msgstr "スマートフォンにインストール"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "一度インストールするだけ。手元のマシンでもクラウドでも、すべてのエージェントが使えます。"
@@ -14109,9 +14112,6 @@ msgstr "それでも開く"
 
 msgid "Open Anyway"
 msgstr "それでも開く"
-
-msgid "Open App Store"
-msgstr "App Store を開く"
 
 msgid "Open as comment pane"
 msgstr "コメントペインとして開く"
@@ -17651,8 +17651,8 @@ msgstr "数百のエージェントに拡張しても、品質基準は維持"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "QRコードをスキャンし、同じParadevアカウントでサインインして、この組織を選択してください。"
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "スキャンして iPhone 用 Paradev をダウンロード"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "スキャンして iPhone または Android 用 Paradev をダウンロード"
 
 msgid "Scanning transcript logs…"
 msgstr "トランスクリプトログをスキャン中…"

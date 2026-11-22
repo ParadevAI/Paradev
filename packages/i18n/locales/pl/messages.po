@@ -9615,6 +9615,9 @@ msgstr "Uzyskaj pomoc"
 msgid "Get the best out of Pro"
 msgstr "Wykorzystaj w pełni Pro"
 
+msgid "Get the mobile app"
+msgstr "Pobierz aplikację mobilną"
+
 msgid "Gets an invite to join {organizationName}"
 msgstr "Otrzyma zaproszenie do {organizationName}"
 
@@ -10597,8 +10600,8 @@ msgstr "Zainstaluj aplikację GitHub"
 msgid "Install GitHub CLI"
 msgstr "Zainstaluj GitHub CLI"
 
-msgid "Install on your iPhone"
-msgstr "Zainstaluj na iPhonie"
+msgid "Install on your phone"
+msgstr "Zainstaluj na telefonie"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "Zainstaluj raz. Każdy agent ją dostaje, na twoich komputerach i w chmurze."
@@ -14109,9 +14112,6 @@ msgstr "Otwórz mimo to"
 
 msgid "Open Anyway"
 msgstr "Otwórz mimo to"
-
-msgid "Open App Store"
-msgstr "Otwórz App Store"
 
 msgid "Open as comment pane"
 msgstr "Otwórz jako panel komentarzy"
@@ -17651,8 +17651,8 @@ msgstr "Skaluj do setek agentów, utrzymując poprzeczkę jakości"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Zeskanuj kod QR, a następnie zaloguj się na to samo konto Paradev i wybierz tę organizację."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "Zeskanuj, aby pobrać Paradev na iPhone’a"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "Zeskanuj, aby pobrać Paradev na iPhone’a lub Androida"
 
 msgid "Scanning transcript logs…"
 msgstr "Skanowanie logów transkryptów…"
