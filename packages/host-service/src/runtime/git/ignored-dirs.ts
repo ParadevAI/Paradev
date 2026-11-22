@@ -1,13 +1,15 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { resolveCommand } from "@superset/shared/resolve-command";
+import { DEFAULT_IGNORE_DIR_NAMES } from "@superset/workspace-fs/ignore-defaults";
 
 const execFileAsync = promisify(execFile);
 
-// Bounds for a pathological repo (thousands of ignored entries): the caller
-// turns each dir into a per-event glob/prefix check, so an unbounded list
-// would trade watcher churn for matcher churn.
-const MAX_IGNORED_DIRS = 200;
+// Bounds the non-generated remainder for a pathological repo (thousands of
+// ignored entries). Dirs named like generated output (node_modules, build,
+// dist, …) are never capped: they are the subtrees that must not be watched,
+// and a monorepo can have more of them than any fixed cap.
+const MAX_OTHER_IGNORED_DIRS = 200;
 const TIMEOUT_MS = 3_000;
 const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
 
@@ -56,10 +58,16 @@ export async function listGitIgnoredDirs(
 			},
 		);
 		const dirs: string[] = [];
+		let others = 0;
 		for (const entry of stdout.split("\0")) {
 			if (!entry.endsWith("/")) continue;
-			dirs.push(entry.slice(0, -1));
-			if (dirs.length >= MAX_IGNORED_DIRS) break;
+			const dir = entry.slice(0, -1);
+			const name = dir.slice(dir.lastIndexOf("/") + 1);
+			if (!DEFAULT_IGNORE_DIR_NAMES.has(name)) {
+				if (others >= MAX_OTHER_IGNORED_DIRS) continue;
+				others += 1;
+			}
+			dirs.push(dir);
 		}
 		return dirs;
 	} catch (error) {

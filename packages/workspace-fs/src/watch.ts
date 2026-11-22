@@ -8,10 +8,12 @@ import {
 } from "node:timers";
 import { toErrorMessage } from "./error-message";
 import { findNestedRepoRoots } from "./find-nested-repos";
-import { normalizeAbsolutePath } from "./paths";
 import {
 	DEFAULT_IGNORE_DIR_NAMES,
 	DEFAULT_IGNORE_PATTERNS,
+} from "./ignore-defaults";
+import { normalizeAbsolutePath } from "./paths";
+import {
 	invalidateSearchIndexesForRoot,
 	patchSearchIndexesForRoot,
 	type SearchPatchEvent,
