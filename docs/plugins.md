@@ -154,7 +154,7 @@ read the shared convention.
 Claude gets two plugin directories with the same skills: `~/.claude/skills/paradev` (skills answer
 to `paradev:<skill>`) and `~/.claude/skills/superset`, the old name, which saved prompts, automations
 and released builds still use. The `superset` copy keeps each skill's body, but its description only
-says to use the `paradev:` name, so the model picks the new one. Composers fold `superset:<x>` into
+tells the model to use the `paradev:` name. Composers fold `superset:<x>` into
 `paradev:<x>` as an alias (`foldLegacyPluginCommands` in `@superset/shared/slash-commands`). Do not
 remove the `superset` directory: builds from before the rename provision only it and reap
 `paradev`, so `superset:` is the one name that resolves on every build. If the user owns a
