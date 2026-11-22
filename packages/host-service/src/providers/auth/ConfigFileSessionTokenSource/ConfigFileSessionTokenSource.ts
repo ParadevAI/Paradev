@@ -19,6 +19,7 @@ import {
 	refreshStoredAuth,
 	type StoredOAuth,
 } from "@superset/shared/oauth-refresh";
+import { oauthResource } from "@superset/shared/oauth-resource";
 
 const CLIENT_ID = "superset-cli";
 const LOGIN_AGAIN_MESSAGE = "Session expired. Run: superset auth login";
@@ -180,7 +181,7 @@ export class ConfigFileSessionTokenSource {
 				grant_type: "refresh_token",
 				refresh_token: refreshToken,
 				client_id: CLIENT_ID,
-				resource: this.apiUrl,
+				resource: oauthResource(this.apiUrl),
 			}),
 		});
 		if (!response.ok) {
