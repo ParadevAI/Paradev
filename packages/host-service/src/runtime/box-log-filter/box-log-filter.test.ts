@@ -86,6 +86,27 @@ describe("createBoxLogFilter", () => {
 		});
 	});
 
+	it("scrubs a box log file line and keeps only its source", () => {
+		const { filter } = setup();
+		const fileLine = (message: string): Log => ({
+			level: "info",
+			message,
+			attributes: { "log.source": "boot" },
+		});
+		expect(filter(fileLine("1795306593806 boot.start pid=801"))).toEqual({
+			level: "info",
+			message: "1795306593806 boot.start pid=801",
+			attributes: { "log.source": "boot" },
+		});
+		expect(
+			filter(fileLine(`1795306593900 setup step failed: ${SECRET}`)),
+		).toEqual({
+			level: "info",
+			message: "box.logs.withheld",
+			attributes: { "log.source": "boot" },
+		});
+	});
+
 	it("says when the cap is reached, drops the rest of the hour, and reports the count when the next hour starts", () => {
 		const { filter, reports, advance } = setup(3);
 		for (let i = 0; i < 3; i++) {
