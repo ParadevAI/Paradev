@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { organizationPlugins, pluginInstalls } from "@superset/db/schema";
-import { and, asc, countDistinct, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { accessibleTo, memberRole } from "../../lib/organization-plugins";
 import { installConnector, type PluginManifest } from "./manifest";
 
@@ -122,7 +122,7 @@ export async function installRecord(
 	userId: string,
 	pluginName: string,
 	marketplace?: string,
-): Promise<{ id: string; marketplace: string; siblings: number } | null> {
+): Promise<{ id: string; marketplace: string } | null> {
 	const rows = await db
 		.select({
 			id: pluginInstalls.id,
@@ -145,20 +145,7 @@ export async function installRecord(
 		);
 	}
 
-	const row = rows[0];
-	if (!row) return null;
-
-	const [{ count } = { count: 0 }] = await db
-		.select({ count: countDistinct(pluginInstalls.id) })
-		.from(pluginInstalls)
-		.where(
-			and(
-				eq(pluginInstalls.userId, userId),
-				eq(pluginInstalls.pluginName, pluginName),
-			),
-		);
-
-	return { id: row.id, marketplace: row.marketplace, siblings: count };
+	return rows[0] ?? null;
 }
 
 export async function installById(

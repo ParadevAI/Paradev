@@ -46,7 +46,7 @@ stub(pluginConnections, {
 	installRecord: (_userId: string, pluginName: string) => {
 		const row = installs.find((entry) => entry.pluginName === pluginName);
 		return Promise.resolve(
-			row && { id: row.id, marketplace: row.marketplace, siblings: 1 },
+			row && { id: row.id, marketplace: row.marketplace },
 		);
 	},
 });
