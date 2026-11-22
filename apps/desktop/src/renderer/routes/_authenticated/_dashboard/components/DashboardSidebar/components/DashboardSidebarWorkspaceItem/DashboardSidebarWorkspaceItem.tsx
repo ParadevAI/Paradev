@@ -108,6 +108,7 @@ export function DashboardSidebarWorkspaceItem({
 		handleCopyPath,
 		handleCopyBranchName,
 		handleCopyWorkspaceId,
+		handleFork,
 		handleCreateSection,
 		handleMoveToSection,
 		handleRemoveFromSidebar,
@@ -124,6 +125,7 @@ export function DashboardSidebarWorkspaceItem({
 		submitRename,
 	} = useDashboardSidebarWorkspaceItemActions({
 		workspaceId: id,
+		hostId: workspace.hostId,
 		projectId,
 		isSessionWorkspace,
 		isCloudWorkspace,
@@ -303,6 +305,7 @@ export function DashboardSidebarWorkspaceItem({
 							isPinned={workspace.isPinned}
 							onTogglePin={handleTogglePin}
 							onCreateSection={handleCreateSection}
+							onFork={projectId && !isCloudWorkspace ? handleFork : undefined}
 							showDeleteHotkey={isActive}
 							onMoveToSection={handleMoveToSection}
 							onCopyPath={handleCopyPath}
@@ -391,6 +394,7 @@ export function DashboardSidebarWorkspaceItem({
 						hasStatus={!!workspaceStatus}
 						hasPullRequest={!!pullRequest}
 						onCreateSection={handleCreateSection}
+						onFork={projectId && !isCloudWorkspace ? handleFork : undefined}
 						onMoveToSection={handleMoveToSection}
 						isLocalWorkspace={hostType === "local-device"}
 						isCloudWorkspace={isCloudWorkspace}

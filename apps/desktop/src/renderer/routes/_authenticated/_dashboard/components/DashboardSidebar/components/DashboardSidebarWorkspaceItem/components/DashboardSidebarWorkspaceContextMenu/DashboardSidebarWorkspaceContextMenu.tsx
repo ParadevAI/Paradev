@@ -15,6 +15,7 @@ import {
 	LuCpu,
 	LuFolderPlus,
 	LuFolderSymlink,
+	LuGitFork,
 } from "react-icons/lu";
 import { CONTEXT_MENU_PARTS } from "renderer/lib/menuParts";
 import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
@@ -46,6 +47,7 @@ interface DashboardSidebarWorkspaceContextMenuProps
 	renderEnvironmentItems?: (
 		runAfterClose: (action: () => void) => void,
 	) => React.ReactNode;
+	onFork?: () => void;
 	onCreateSection: () => void;
 	onMoveToSection: (sectionId: string | null) => void;
 	children: React.ReactNode;
@@ -59,6 +61,7 @@ export function DashboardSidebarWorkspaceContextMenu({
 	isCloudWorkspace = false,
 	showDeleteHotkey = false,
 	renderEnvironmentItems,
+	onFork,
 	onCreateSection,
 	onMoveToSection,
 	onRename,
@@ -82,6 +85,12 @@ export function DashboardSidebarWorkspaceContextMenu({
 		<ContextMenu onOpenChange={setContextMenuOpen}>
 			<ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 			<ContextMenuContent onCloseAutoFocus={onCloseAutoFocus}>
+				{onFork && (
+					<ContextMenuItem onSelect={() => runAfterClose(onFork)}>
+						<LuGitFork className="size-4 mr-2" />
+						<Trans>Fork from here</Trans>
+					</ContextMenuItem>
+				)}
 				<WorkspaceMenuItems
 					parts={CONTEXT_MENU_PARTS}
 					state={{

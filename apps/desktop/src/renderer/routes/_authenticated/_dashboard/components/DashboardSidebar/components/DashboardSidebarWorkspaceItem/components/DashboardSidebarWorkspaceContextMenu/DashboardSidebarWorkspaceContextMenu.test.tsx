@@ -72,3 +72,40 @@ for (const { kind, isLocalWorkspace, isCloudWorkspace } of KINDS) {
 		}
 	});
 }
+
+test("Fork from here runs the row's fork action after the context menu closes", async () => {
+	let forks = 0;
+	render(
+		<QueryClientProvider client={new QueryClient()}>
+			<DashboardSidebarHoverProvider>
+				<DashboardSidebarWorkspaceContextMenu
+					workspaceId={WORKSPACE_ID}
+					projectId="project-1"
+					isLocalWorkspace
+					isCloudWorkspace={false}
+					isPinned={false}
+					isUnread={false}
+					hasStatus={false}
+					hasPullRequest={false}
+					onFork={() => {
+						forks++;
+					}}
+					onTogglePin={noop}
+					onCreateSection={noop}
+					onMoveToSection={noop}
+					onCopyPath={noop}
+					onCopyBranchName={noop}
+					onCopyWorkspaceId={noop}
+					onToggleUnread={noop}
+					onClearStatus={noop}
+					onRemovePullRequest={noop}
+				>
+					<span>fork source row</span>
+				</DashboardSidebarWorkspaceContextMenu>
+			</DashboardSidebarHoverProvider>
+		</QueryClientProvider>,
+	);
+	fireEvent.contextMenu(screen.getByText("fork source row"));
+	fireEvent.click(await screen.findByText("Fork from here"));
+	await waitFor(() => expect(forks).toBe(1));
+});

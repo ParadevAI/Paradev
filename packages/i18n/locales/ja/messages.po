@@ -1539,6 +1539,9 @@ msgstr "{waiting}件待機中"
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} の上限: {percent} 使用済み"
 
+msgid "{workspaceName} fork"
+msgstr "{workspaceName} のフォーク"
+
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: ホストが利用できません"
 
@@ -6268,6 +6271,9 @@ msgstr "このチャットの移動の状況がわかりません。移動して
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
 
+msgid "Couldn't fork workspace"
+msgstr "ワークスペースをフォークできませんでした"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "ポート {portNumber} を転送できませんでした"
 
@@ -9409,6 +9415,9 @@ msgstr "フォーク引数"
 
 msgid "Fork conversation"
 msgstr "会話を分岐"
+
+msgid "Fork from here"
+msgstr "ここからフォーク"
 
 msgid "Fork into Chat"
 msgstr "チャットにフォーク"
@@ -21996,6 +22005,9 @@ msgstr "このデバイスのホストサービスを更新してから、もう
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "<0>{key}</0> の値を更新"
+
+msgid "Update this host to fork worktrees"
+msgstr "ワークツリーをフォークするには、このホストを更新してください"
 
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"

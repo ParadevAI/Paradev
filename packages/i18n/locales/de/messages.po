@@ -1539,6 +1539,9 @@ msgstr "{waiting} ausstehend"
 msgid "{windowLabel} limit {percent} used"
 msgstr "Limit {windowLabel}: {percent} verbraucht"
 
+msgid "{workspaceName} fork"
+msgstr "{workspaceName} – Fork"
+
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: Host ist nicht verfügbar"
 
@@ -6268,6 +6271,9 @@ msgstr "Der Stand des Verschiebens dieses Chats ist nicht bekannt. Wurde er nich
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Das Löschen der Arbeitsbereiche konnte nicht abgeschlossen werden"
 
+msgid "Couldn't fork workspace"
+msgstr "Workspace konnte nicht geforkt werden"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Port {portNumber} konnte nicht weitergeleitet werden"
 
@@ -9409,6 +9415,9 @@ msgstr "Fork-Argumente"
 
 msgid "Fork conversation"
 msgstr "Unterhaltung verzweigen"
+
+msgid "Fork from here"
+msgstr "Von hier forken"
 
 msgid "Fork into Chat"
 msgstr "In Chat abzweigen"
@@ -21996,6 +22005,9 @@ msgstr "Aktualisiere den Host-Dienst auf diesem Gerät und versuche es erneut."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Wert für <0>{key}</0> aktualisieren"
+
+msgid "Update this host to fork worktrees"
+msgstr "Aktualisiere diesen Host, um Worktrees zu forken"
 
 msgid "Update this host to message subagents"
 msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden"

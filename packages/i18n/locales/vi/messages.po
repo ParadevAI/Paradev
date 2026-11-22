@@ -1539,6 +1539,9 @@ msgstr "{waiting} đang chờ"
 msgid "{windowLabel} limit {percent} used"
 msgstr "Giới hạn {windowLabel}: đã dùng {percent}"
 
+msgid "{workspaceName} fork"
+msgstr "Bản phân nhánh {workspaceName}"
+
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: host không khả dụng"
 
@@ -6268,6 +6271,9 @@ msgstr "Không rõ việc chuyển cuộc trò chuyện này đang thế nào. N
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Không xóa xong các workspace"
 
+msgid "Couldn't fork workspace"
+msgstr "Không thể phân nhánh không gian làm việc"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Không chuyển tiếp được cổng {portNumber}"
 
@@ -9409,6 +9415,9 @@ msgstr "Tham số fork"
 
 msgid "Fork conversation"
 msgstr "Tách cuộc trò chuyện"
+
+msgid "Fork from here"
+msgstr "Phân nhánh từ đây"
 
 msgid "Fork into Chat"
 msgstr "Tách sang Trò chuyện"
@@ -21996,6 +22005,9 @@ msgstr "Hãy cập nhật dịch vụ host trên thiết bị này rồi thử l
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Cập nhật giá trị cho <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Cập nhật máy chủ này để phân nhánh cây làm việc"
 
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"

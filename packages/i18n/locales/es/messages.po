@@ -1539,6 +1539,9 @@ msgstr "{waiting} en espera"
 msgid "{windowLabel} limit {percent} used"
 msgstr "Límite {windowLabel}: {percent} usado"
 
+msgid "{workspaceName} fork"
+msgstr "Bifurcación de {workspaceName}"
+
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: el host no está disponible"
 
@@ -6268,6 +6271,9 @@ msgstr "No se sabe cómo va el traslado de este chat. Si no se trasladó, sigue 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "No se pudo terminar de eliminar los espacios de trabajo"
 
+msgid "Couldn't fork workspace"
+msgstr "No se pudo bifurcar el espacio de trabajo"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "No se pudo reenviar el puerto {portNumber}"
 
@@ -9409,6 +9415,9 @@ msgstr "Argumentos de fork"
 
 msgid "Fork conversation"
 msgstr "Bifurcar conversación"
+
+msgid "Fork from here"
+msgstr "Bifurcar desde aquí"
 
 msgid "Fork into Chat"
 msgstr "Bifurcar en el chat"
@@ -21996,6 +22005,9 @@ msgstr "Actualiza el servicio de host en este dispositivo y vuelve a intentarlo.
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Actualiza el valor de <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Actualiza este host para bifurcar árboles de trabajo"
 
 msgid "Update this host to message subagents"
 msgstr "Actualiza este host para enviar mensajes a los subagentes"

@@ -19,6 +19,10 @@ import { resolveRef } from "../../../runtime/git/refs";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
+	captureWorktreeState,
+	restoreWorktreeState,
+} from "../../../workers/tasks/checkpoints";
+import {
 	gitAuthorNameTask,
 	gitFetchBaseRefTask,
 	gitRestoreWorktreeTask,
@@ -129,6 +133,7 @@ const createInputSchema = z
 		skipBranchPrefix: z.boolean().optional(),
 		pr: z.number().int().positive().optional(),
 		baseBranch: z.string().min(1).optional(),
+		forkFromWorkspaceId: z.string().uuid().optional(),
 		taskId: z.string().uuid().optional(),
 		agents: z.array(agentLaunchSchema).optional(),
 		// Desktop "Wait for workspace setup before starting agents" setting,
@@ -149,6 +154,19 @@ const createInputSchema = z
 		runSetup: z.boolean().optional(),
 		tags: workspaceTagsInputSchema.optional(),
 	})
+	.refine(
+		(value) =>
+			!value.forkFromWorkspaceId ||
+			(value.checkout !== "local" &&
+				!value.branch &&
+				!value.pr &&
+				!value.baseBranch &&
+				!value.worktreePath),
+		{
+			message:
+				"A fork creates a new branch from its source worktree; branch, PR, base, local checkout and adoption inputs cannot be combined with it",
+		},
+	)
 	.refine((value) => !(value.branch && value.pr), {
 		message: "`branch` and `pr` cannot both be set",
 	})
@@ -718,6 +736,23 @@ export const workspacesRouter = router({
 				!!composerPrompt;
 			const namingAgent = input.agents?.[0]?.agent ?? input.namingAgent;
 
+			const forkSource = input.forkFromWorkspaceId
+				? getLocalWorkspace(ctx.db, input.forkFromWorkspaceId)
+				: undefined;
+			if (
+				input.forkFromWorkspaceId &&
+				(!forkSource ||
+					forkSource.projectId !== input.projectId ||
+					forkSource.archivedAt != null)
+			) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Fork source must be an active workspace in this project",
+				});
+			}
+			const forkSnapshot = forkSource
+				? await captureWorktreeState(forkSource.worktreePath)
+				: null;
 			const git = await ctx.git(repoPath);
 			const fetchBaseRefOffLoop = createWorkerBaseRefFetcher(ctx, repoPath);
 			const worktreeBaseDir =
@@ -1105,11 +1140,13 @@ export const workspacesRouter = router({
 					}
 				} else {
 					const [startPoint, existing] = await Promise.all([
-						resolveNewBranchStartPoint(
-							git,
-							input.baseBranch,
-							fetchBaseRefOffLoop,
-						),
+						forkSnapshot
+							? Promise.resolve({ kind: "head" as const })
+							: resolveNewBranchStartPoint(
+									git,
+									input.baseBranch,
+									fetchBaseRefOffLoop,
+								),
 						listBranchNames(ctx, repoPath),
 					]);
 					const prefix = await resolveProjectBranchPrefix({
@@ -1132,6 +1169,7 @@ export const workspacesRouter = router({
 						branch: resolvedBranch,
 						startPoint,
 						usedExistingBranch: false,
+						...(forkSnapshot ? { startCommit: forkSnapshot.head } : {}),
 					};
 				}
 
@@ -1140,6 +1178,11 @@ export const workspacesRouter = router({
 					input.projectId,
 					resolvedBranch,
 				);
+				if (forkSnapshot && existing)
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: "Fork branch was claimed by another workspace; try again",
+					});
 				if (existing) {
 					workspaceRow = existing;
 					alreadyExists = true;
@@ -1151,6 +1194,11 @@ export const workspacesRouter = router({
 						await listWorktreeBranches(git)
 					).worktreeMap.get(resolvedBranch);
 
+					if (forkSnapshot && existingWorktreePath)
+						throw new TRPCError({
+							code: "CONFLICT",
+							message: "Fork branch already has a worktree; try again",
+						});
 					if (existingWorktreePath) {
 						worktreePath = existingWorktreePath;
 						const baseShortName =
@@ -1208,7 +1256,18 @@ export const workspacesRouter = router({
 								worktreePath,
 								sparsePaths,
 							});
+							if (forkSnapshot) {
+								try {
+									await restoreWorktreeState(worktreePath, forkSnapshot);
+								} catch (error) {
+									await rollbackWorktree();
+									await git.raw(["branch", "-D", resolvedBranch]);
+									throw error;
+								}
+							}
 						} catch (err) {
+							// A fork must never adopt a worktree whose files belong to another request.
+							if (forkSnapshot) throw err;
 							// Branch is already claimed by another worktree that the
 							// pre-check missed (auto-gen path, or a race). Adopt at
 							// whatever path git reports.

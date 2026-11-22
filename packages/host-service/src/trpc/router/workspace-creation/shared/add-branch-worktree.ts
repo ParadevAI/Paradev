@@ -7,6 +7,8 @@ export interface BranchSourcePlan {
 	branch: string;
 	startPoint: ResolvedRef;
 	usedExistingBranch: boolean;
+	/** Exact source HEAD for a worktree fork; never refresh it from an upstream. */
+	startCommit?: string;
 }
 
 export async function addBranchWorktree(args: {
@@ -73,11 +75,12 @@ export async function addBranchWorktree(args: {
 	// ahead/behind counts pointing at the branch's own upstream once
 	// push.autoSetupRemote sets it on first push.
 	const startPointArg =
-		plan.startPoint.kind === "head"
+		plan.startCommit ??
+		(plan.startPoint.kind === "head"
 			? "HEAD"
 			: plan.startPoint.kind === "remote-tracking"
 				? plan.startPoint.remoteShortName
-				: plan.startPoint.shortName;
+				: plan.startPoint.shortName);
 	await addWorktreeWithSparseCheckout({
 		git,
 		worktreeArgs: [

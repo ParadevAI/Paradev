@@ -160,6 +160,68 @@ async function withScratchIndex<T>(
 	}
 }
 
+export type WorktreeState = {
+	head: string;
+	indexTree: string;
+	worktreeTree: string;
+	intentToAdd: string[];
+};
+
+/** Snapshot files and staging separately; the real index and branch must stay untouched. */
+export async function captureWorktreeState(
+	cwd: string,
+): Promise<WorktreeState> {
+	const repo = await repoAt(cwd);
+	if (!repo) throw new Error("Source worktree is not a Git repository");
+	return withScratchIndex(repo, async (git) => {
+		const head = await readRef(git, "HEAD");
+		if (!head)
+			throw new Error(
+				"Commit the source repository's first commit before forking",
+			);
+		const sparse = await git
+			.raw(["config", "--bool", "core.sparseCheckout"])
+			.catch(() => "");
+		if (sparse.trim() === "true")
+			throw new Error("Forking a sparse checkout is not supported yet");
+		const intentToAdd = nulFields(
+			await git.raw(["diff", "--name-only", "--diff-filter=A", "-z"]),
+		);
+		const indexTree = (await git.raw(["write-tree"])).trim();
+		await git.raw(["add", "-A"]);
+		if (/^160000 /m.test(await git.raw(["ls-files", "--stage"]))) {
+			throw new Error(
+				"Submodule working directories cannot be copied into a fork yet",
+			);
+		}
+		const worktreeTree = (await git.raw(["write-tree"])).trim();
+		if ((await readRef(git, "HEAD")) !== head)
+			throw new Error("Source HEAD changed while forking; try again");
+		return { head, indexTree, worktreeTree, intentToAdd };
+	});
+}
+
+export async function restoreWorktreeState(
+	cwd: string,
+	snapshot: WorktreeState,
+): Promise<void> {
+	const git = gitAt(cwd);
+	if ((await readRef(git, "HEAD")) !== snapshot.head)
+		throw new Error("Fork must start at the source commit");
+	await git.raw(["read-tree", "--reset", "-u", snapshot.worktreeTree]);
+	await git.raw(["read-tree", snapshot.indexTree]);
+	// A tree omits intent-to-add flags, so restore them after rebuilding the index.
+	for (let i = 0; i < snapshot.intentToAdd.length; i += PATH_BATCH) {
+		await git.raw([
+			"add",
+			"-f",
+			"-N",
+			"--",
+			...snapshot.intentToAdd.slice(i, i + PATH_BATCH),
+		]);
+	}
+}
+
 /**
  * Runs git against the worktree's snapshot index, kept beside the real one so
  * a file git already hashed, untracked ones included, is hashed again only

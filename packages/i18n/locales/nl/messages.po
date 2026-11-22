@@ -1539,6 +1539,9 @@ msgstr "{waiting} wachten"
 msgid "{windowLabel} limit {percent} used"
 msgstr "Limiet {windowLabel}: {percent} gebruikt"
 
+msgid "{workspaceName} fork"
+msgstr "{workspaceName} fork"
+
 msgid "{workspaceName}: host is unavailable"
 msgstr "{workspaceName}: host is niet beschikbaar"
 
@@ -6268,6 +6271,9 @@ msgstr "Onbekend hoe het verplaatsen van deze chat gaat. Als hij niet is verplaa
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Kon het verwijderen van werkruimtes niet afronden"
 
+msgid "Couldn't fork workspace"
+msgstr "Werkruimte kon niet worden geforkt"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Kan poort {portNumber} niet doorsturen"
 
@@ -9409,6 +9415,9 @@ msgstr "Fork-argumenten"
 
 msgid "Fork conversation"
 msgstr "Gesprek afsplitsen"
+
+msgid "Fork from here"
+msgstr "Vanaf hier forken"
 
 msgid "Fork into Chat"
 msgstr "Afsplitsen naar chat"
@@ -21996,6 +22005,9 @@ msgstr "Werk de hostservice op dit apparaat bij en probeer het opnieuw."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Werk de waarde van <0>{key}</0> bij"
+
+msgid "Update this host to fork worktrees"
+msgstr "Werk deze host bij om worktrees te forken"
 
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
