@@ -1,19 +1,11 @@
-export type { IRange } from "./buffer-helpers";
-export {
-	convertLinkRangeToBuffer,
-	getXtermLineContent,
-} from "./buffer-helpers";
-
 export { LinkDetectorAdapter } from "./link-detector-adapter";
 
-export {
-	type ResolvedLink,
-	type StatCallback,
-	TerminalLinkResolver,
-} from "./link-resolver";
+export { type StatCallback, TerminalLinkResolver } from "./link-resolver";
 
 export {
 	type DetectedLink,
+	type DetectedTerminalLink,
+	isWebLink,
 	LocalLinkDetector,
 } from "./local-link-detector";
 

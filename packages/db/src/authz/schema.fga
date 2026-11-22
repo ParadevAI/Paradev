@@ -1,0 +1,22 @@
+model
+  schema 1.1
+
+type user
+
+type agent
+
+type organization
+  relations
+    define member: [user, agent]
+
+type channel
+  relations
+    define organization: [organization]
+    define member: [user, agent]
+    define can_read: member
+    define can_post: member
+
+type cloud_workspace
+  relations
+    define operator: [agent]
+    define can_operate: operator

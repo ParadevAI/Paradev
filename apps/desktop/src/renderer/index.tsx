@@ -1,5 +1,5 @@
 import "./globals.css";
-import "./styles/bundled-fonts.css";
+import "./styles/bundled-fonts";
 import { initSentry } from "./lib/sentry";
 
 initSentry();
@@ -14,10 +14,13 @@ import {
 	markBootMounted,
 	reportBootError,
 } from "./lib/boot-errors";
+import { trackOpenOverlays } from "./lib/overlayOpenClass";
+import { parseDeepLinkPath } from "./lib/parseDeepLinkPath";
 import { sweepDeadPersistedKeys } from "./lib/persisted-keys";
 import { persistentHistory } from "./lib/persistent-hash-history";
 import { posthog } from "./lib/posthog";
 import { pruneExpiredTerminalState } from "./lib/terminal/terminal-buffer-gc";
+import { throttleLoopingAnimations } from "./lib/throttleLoopingAnimations";
 import { electronQueryClient } from "./providers/ElectronTRPCProvider";
 import { NotFound } from "./routes/not-found";
 import { routeTree } from "./routeTree.gen";
@@ -30,6 +33,8 @@ initBootErrorHandling(rootElement);
 pruneExpiredTerminalState();
 // Keys from removed features otherwise live on user profiles forever.
 sweepDeadPersistedKeys();
+trackOpenOverlays();
+throttleLoopingAnimations();
 
 const router = createRouter({
 	routeTree,
@@ -50,7 +55,8 @@ const unsubscribe = router.subscribe("onResolved", (event) => {
 
 const handleDeepLink = (path: string) => {
 	console.log("[deep-link] Navigating to:", path);
-	router.navigate({ to: path });
+	const { to, search } = parseDeepLinkPath(path);
+	router.navigate({ to, search } as never);
 };
 const ipcRenderer = window.ipcRenderer as typeof window.ipcRenderer | undefined;
 if (ipcRenderer) {

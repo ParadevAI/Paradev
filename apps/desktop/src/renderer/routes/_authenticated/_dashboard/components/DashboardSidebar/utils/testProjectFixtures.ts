@@ -27,6 +27,9 @@ export function makeWorkspace(
 		taskId: null,
 		isPinned: false,
 		pendingTransaction: null,
+		isMine: null,
+		creator: null,
+		sandboxStatus: null,
 		...overrides,
 	};
 }

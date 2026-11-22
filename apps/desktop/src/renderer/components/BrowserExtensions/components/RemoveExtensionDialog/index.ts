@@ -1,0 +1,1 @@
+export { RemoveExtensionDialog } from "./RemoveExtensionDialog";

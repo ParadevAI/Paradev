@@ -5,10 +5,13 @@ import { join } from "node:path";
 import {
 	type Assets,
 	deriveStepVersions,
+	discardingSteps,
+	loadSteps,
 	renderAssetsTsv,
 	renderStepsTsv,
 	renderToolsTsv,
 	sha256,
+	upstreamSteps,
 	walkRootfs,
 } from "./manifest";
 
@@ -138,6 +141,22 @@ describe("deriveStepVersions", () => {
 		expect(build({ salt: "x" })[1]?.version).not.toBe(build({})[1]?.version);
 	});
 
+	test("refuses a step that consumes a drive-only row", () => {
+		const f = fixture();
+		expect(() =>
+			deriveStepVersions({
+				steps: [
+					{ name: "one", assets: ["agent"], after: [], inputs: [], salt: "" },
+				],
+				assets: {
+					agent: { sha256: "d".repeat(64), suffix: ".tar.gz", mode: "0644" },
+				},
+				tools: walkRootfs(f.rootfs),
+				stepsDir: f.steps,
+			}),
+		).toThrow(/drive-only/);
+	});
+
 	test("refuses unknown assets, missing inputs and forward references", () => {
 		const f = fixture();
 		const tools = walkRootfs(f.rootfs);
@@ -184,5 +203,164 @@ describe("deriveStepVersions", () => {
 		expect(renderAssetsTsv(fixture().assets)).toMatch(
 			/^0644\ta{64}\t\.tar\.gz\t/,
 		);
+	});
+});
+
+describe("upstreamSteps", () => {
+	const step = (name: string, after: string[] = []) => ({
+		name,
+		assets: [],
+		after,
+		inputs: [],
+		salt: "",
+	});
+
+	test("closes `after` transitively, in manifest order, and leaves unrelated steps out", () => {
+		const closure = upstreamSteps([
+			step("a"),
+			step("b", ["a"]),
+			step("c"),
+			step("d", ["c", "b"]),
+		]);
+		expect(Object.fromEntries(closure)).toEqual({
+			a: [],
+			b: ["a"],
+			c: [],
+			d: ["a", "b", "c"],
+		});
+	});
+
+	test("refuses a forward reference", () => {
+		expect(() => upstreamSteps([step("a", ["b"]), step("b")])).toThrow(
+			/not an earlier step/,
+		);
+	});
+
+	test("renders the closure as the fourth steps.tsv column", () => {
+		const steps = [step("a"), step("b", ["a"])];
+		const closure = upstreamSteps(steps);
+		const rows = renderStepsTsv(
+			steps.map((s, i) => ({
+				...s,
+				version: `v${i}`,
+				upstream: closure.get(s.name) ?? [],
+			})),
+		)
+			.split("\n")
+			.filter(Boolean)
+			.map((l) => l.split("\t"));
+		expect(rows).toEqual([
+			["a", "v0", "", "", ""],
+			["b", "v1", "", "a", ""],
+		]);
+	});
+
+	test("marks a before-host step in the fifth column", () => {
+		const rows = renderStepsTsv([
+			{ ...step("a"), beforeHost: true, version: "v0", upstream: [] },
+		]).split("\t");
+		expect(rows[4]).toBe("host\n");
+	});
+
+	test("refuses a before-host step that runs after one that is not", () => {
+		expect(() =>
+			upstreamSteps([step("a"), { ...step("b", ["a"]), beforeHost: true }]),
+		).toThrow(/runs before host-service, after a/);
+	});
+
+	test("refuses a before-host step with an asset it does not discard", () => {
+		expect(() =>
+			upstreamSteps([{ ...step("a"), assets: ["x"], beforeHost: true }]),
+		).toThrow(/does not discard x/);
+	});
+
+	test("in the bundle, only install-host runs before host-service", () => {
+		const steps = loadSteps(
+			join(import.meta.dir, "..", "bundle", "steps.json"),
+		);
+		upstreamSteps(steps);
+		expect(steps.filter((s) => s.beforeHost).map((s) => s.name)).toEqual([
+			"install-host",
+		]);
+	});
+
+	test("in the bundle, a Chrome failure skips only configure-chrome", () => {
+		const closure = upstreamSteps(
+			loadSteps(join(import.meta.dir, "..", "bundle", "steps.json")),
+		);
+		const downstream = [...closure]
+			.filter(([, upstream]) => upstream.includes("install-chrome"))
+			.map(([name]) => name);
+		expect(downstream).toEqual(["configure-chrome"]);
+	});
+});
+
+describe("renderAssetsTsv", () => {
+	const step = (name: string, assets: string[], discards?: string[]) => ({
+		name,
+		assets,
+		after: [],
+		inputs: [],
+		salt: "",
+		discards,
+	});
+	const assets: Assets = {
+		...fixture().assets,
+		tool: {
+			sha256: "c".repeat(64),
+			suffix: "",
+			dest: "/usr/local/share/superset/media/tool-1",
+			mode: "0755",
+		},
+	};
+	const columns = (tsv: string) =>
+		tsv
+			.split("\n")
+			.filter(Boolean)
+			.map((line) => line.split("\t"));
+
+	test("names the step that discards a row in a fifth column, empty for a row that stays", () => {
+		const rows = columns(
+			renderAssetsTsv(assets, [step("install", ["thing", "tool"], ["thing"])]),
+		);
+		expect(rows.map((r) => [r[1]?.[0], r[4]])).toEqual([
+			["a", "install"],
+			["c", ""],
+		]);
+		expect(rows.map((r) => r.length)).toEqual([5, 5]);
+		expect(Buffer.from(rows[1]?.[3] ?? "", "base64").toString()).toBe(
+			"/usr/local/share/superset/media/tool-1",
+		);
+	});
+
+	test("a drive-only row has no line, so no box fetches it", () => {
+		const tsv = renderAssetsTsv({
+			...assets,
+			agent: { sha256: "d".repeat(64), suffix: ".tar.gz", mode: "0644" },
+		});
+		expect(tsv).toBe(renderAssetsTsv(assets));
+	});
+
+	test("refuses a discard that is not the step's asset, or one two steps claim", () => {
+		expect(() => discardingSteps([step("one", ["tool"], ["thing"])])).toThrow(
+			/not one of its assets/,
+		);
+		expect(() =>
+			discardingSteps([
+				step("one", ["thing"], ["thing"]),
+				step("two", ["thing"], ["thing"]),
+			]),
+		).toThrow(/both discard thing/);
+	});
+
+	test("the bundle keeps the binaries it runs in place and discards the archives", () => {
+		const owners = discardingSteps(
+			loadSteps(join(import.meta.dir, "..", "bundle", "steps.json")),
+		);
+		expect(owners.has("claude")).toBe(false);
+		expect(owners.has("cli")).toBe(false);
+		expect(owners.get("codex")).toBe("install-agent-clis");
+		expect(owners.get("chrome")).toBe("install-chrome");
+		expect(owners.get("host-service")).toBe("install-host");
 	});
 });

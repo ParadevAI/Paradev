@@ -1,6 +1,6 @@
 import { CLIError } from "@superset/cli-framework";
 import { rawErrorMessage } from "@superset/i18n/errors";
-import { buildTerminalSessionHandoffPrompt } from "@superset/shared/terminal-session-handoff";
+import { buildTerminalSessionHandoffPrompt } from "@superset/shared/session-handoff";
 import type { HostServiceClient } from "./host-target";
 
 /**

@@ -3,10 +3,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useState } from "react";
 import { LuRadioTower } from "react-icons/lu";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useDashboardSidebarAllPorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import { usePortsDisplayMode } from "renderer/stores/inline-workspace-ports";
+import { PortsCountIcon } from "../PortsCountIcon";
 import { PortsFooter } from "./components/PortsFooter";
 import { PortsGroup } from "./components/PortsGroup";
 
@@ -15,7 +15,7 @@ import { PortsGroup } from "./components/PortsGroup";
  * the live port count, opening a dropdown that lists every detected port
  * across all visible workspaces and hosts.
  *
- * Also mounted in the v2 workspace tab bar's trailing slot, which replaces
+ * Also mounted in the workspace tab bar's trailing slot, which replaces
  * the top bar on that route. Port data comes from the
  * DashboardSidebarPortsProvider instance in the dashboard layout — this
  * component remounts on workspace navigation, so it must not own the data
@@ -27,16 +27,11 @@ interface PortsDropdownProps {
 
 export function PortsDropdown({ align = "end" }: PortsDropdownProps) {
 	const { t } = useLingui();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const portsDisplayMode = usePortsDisplayMode();
 	const [open, setOpen] = useState(false);
 	const { workspacePortGroups, totalPortCount } = useDashboardSidebarAllPorts();
 
-	if (
-		!isV2CloudEnabled ||
-		portsDisplayMode !== "topbar" ||
-		totalPortCount === 0
-	) {
+	if (portsDisplayMode !== "topbar" || totalPortCount === 0) {
 		return null;
 	}
 
@@ -50,12 +45,11 @@ export function PortsDropdown({ align = "end" }: PortsDropdownProps) {
 						<button
 							type="button"
 							aria-label={t({
-								message: `Ports — ${totalPortCount} live`,
+								message: `Ports: ${totalPortCount} live`,
 							})}
-							className="flex items-center gap-1.5 rounded-md px-2 py-1 text-muted-foreground text-xs transition-colors hover:bg-fill-hover hover:text-foreground data-[state=open]:bg-fill-hover data-[state=open]:text-foreground"
+							className="no-drag flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground data-[state=open]:bg-fill-hover data-[state=open]:text-foreground"
 						>
-							<LuRadioTower className="size-3.5" strokeWidth={STROKE_WIDTH} />
-							<span className="font-medium tabular-nums">{totalPortCount}</span>
+							<PortsCountIcon count={totalPortCount} />
 						</button>
 					</PopoverTrigger>
 				</TooltipTrigger>

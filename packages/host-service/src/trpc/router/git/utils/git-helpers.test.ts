@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ChangedFile } from "../types";
@@ -268,5 +269,47 @@ describe("countUntrackedFileLines", () => {
 		const file = await count("huge.txt", "a\n".repeat(600_000)); // ~1.2MB
 		expect(file.additions).toBe(SENTINEL);
 		expect(file.isBinary).toBeUndefined();
+	});
+
+	test("checks for binary only in the first 8KB", async () => {
+		const file = await count(
+			"late-nul.txt",
+			Buffer.concat([Buffer.from("a\n".repeat(5_000)), Buffer.from([0, 0x0a])]),
+		);
+		expect(file.additions).toBe(5_001);
+		expect(file.isBinary).toBeUndefined();
+	});
+
+	test("a symlink inside the worktree counts its target", async () => {
+		await writeFile(join(dir, "target.txt"), "1\n2\n3\n");
+		await symlink("target.txt", join(dir, "inside.link"));
+		const file = makeFile("inside.link");
+		await countUntrackedFileLines(dir, [file]);
+		expect(file.additions).toBe(3);
+	});
+
+	test("skips paths that resolve outside the worktree", async () => {
+		const outside = await mkdtemp(join(tmpdir(), "untracked-outside-"));
+		try {
+			await writeFile(join(outside, "secret.txt"), "a\n");
+			await symlink(join(outside, "secret.txt"), join(dir, "outside.link"));
+			const files = [makeFile("outside.link"), makeFile("../escape.txt")];
+			await countUntrackedFileLines(dir, files);
+			expect(files.map((f) => f.additions)).toEqual([SENTINEL, SENTINEL]);
+		} finally {
+			await rm(outside, { recursive: true, force: true });
+		}
+	});
+
+	test("skips a FIFO, a directory and a missing file", async () => {
+		execFileSync("mkfifo", [join(dir, "pipe")]);
+		await mkdir(join(dir, "subdir"));
+		const files = [makeFile("pipe"), makeFile("subdir"), makeFile("gone.txt")];
+		await countUntrackedFileLines(dir, files);
+		expect(files.map((f) => f.additions)).toEqual([
+			SENTINEL,
+			SENTINEL,
+			SENTINEL,
+		]);
 	});
 });

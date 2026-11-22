@@ -6,7 +6,11 @@ import {
 } from "@superset/shared/connectors";
 import { generateCodeChallenge } from "better-auth/oauth2";
 import { credentialFetch, readPath } from "../../router/plugins/manifest";
-import { forgetClient, resolveClientIdentity } from "./client-identity";
+import {
+	type ClientFor,
+	forgetClient,
+	resolveClientIdentity,
+} from "./client-identity";
 import { discoverServer, sameIssuer } from "./discovery";
 
 const TEMPLATE = /\$\{(env|params|config)\.([\w.-]+)\}/g;
@@ -109,6 +113,7 @@ export async function resolveEndpoints(
 	slug: string,
 	method: ConnectorMethod,
 	redirectUri: string,
+	client: ClientFor,
 ): Promise<ResolvedEndpoints> {
 	if (method.type !== "oauth2")
 		throw new Error(`Connector "${slug}" is not an oauth2 method.`);
@@ -124,6 +129,7 @@ export async function resolveEndpoints(
 			server,
 			method,
 			redirectUri,
+			client,
 		);
 		return {
 			authorizationEndpoint: server.metadata.authorization_endpoint,
@@ -174,7 +180,13 @@ export interface AuthorizeTarget {
 export async function authorizeUrl(
 	slug: string,
 	method: ConnectorMethod,
-	options: { redirectUri: string; state: string; codeVerifier?: string | null },
+	options: {
+		redirectUri: string;
+		state: string;
+		codeVerifier?: string | null;
+		/** Already resolved by the caller, so the URL names the client it recorded. */
+		endpoints?: ResolvedEndpoints;
+	},
 ): Promise<AuthorizeTarget> {
 	const env = connectorEnv(slug, method);
 
@@ -189,7 +201,10 @@ export async function authorizeUrl(
 
 	const endpoints =
 		method.type === "oauth2"
-			? await resolveEndpoints(slug, method, options.redirectUri)
+			? (options.endpoints ??
+				(await resolveEndpoints(slug, method, options.redirectUri, {
+					newGrant: true,
+				})))
 			: null;
 
 	const base =
@@ -243,6 +258,8 @@ export interface ConnectorTokens {
 	scopes: string[] | null;
 	stored: Record<string, unknown>;
 	raw: Record<string, unknown>;
+	/** The dynamic client the grant was issued to. */
+	clientId?: string;
 }
 
 export class IssuerMismatchError extends Error {}
@@ -280,6 +297,8 @@ export async function exchangeCode(
 		codeVerifier?: string | null;
 		params?: Record<string, string | undefined>;
 		issuer?: string | null;
+		/** The client the authorize request went out as; null when the flow did not record it. */
+		clientId: string | null;
 	},
 ): Promise<ConnectorTokens> {
 	if (method.type === "api_key")
@@ -287,7 +306,9 @@ export async function exchangeCode(
 
 	const endpoints =
 		method.type === "oauth2"
-			? await resolveEndpoints(slug, method, options.redirectUri)
+			? await resolveEndpoints(slug, method, options.redirectUri, {
+					issuedTo: options.clientId,
+				})
 			: null;
 	if (endpoints)
 		assertRespondingIssuer(slug, endpoints, options.issuer ?? null);
@@ -378,6 +399,7 @@ export async function exchangeCode(
 				: null,
 		stored,
 		raw: payload,
+		...(endpoints?.issuer ? { clientId } : {}),
 	};
 }
 
@@ -472,12 +494,12 @@ async function mcpIdentity(
 		const text = await response.text();
 		if (!response.ok)
 			throw new Error(
-				`Connector "${slug}" identity probe failed: ${response.status} ${text.slice(0, 200)}`,
+				`Connector "${slug}" identity probe failed at ${method}: ${response.status} ${text.slice(0, 200)}`,
 			);
 		const message = readJsonRpc(text, id);
 		if (message.error)
 			throw new Error(
-				`Connector "${slug}" identity probe failed: ${message.error.message}`,
+				`Connector "${slug}" identity probe failed at ${method}: ${message.error.message}`,
 			);
 		return message.result ?? {};
 	};
@@ -495,6 +517,22 @@ async function mcpIdentity(
 		const result = (await request("tools/call", {
 			name: probe.tool,
 			arguments: probe.arguments,
+		}).catch(async (error: unknown) => {
+			const listed = await request("tools/list", {}).then(
+				(tools) =>
+					(tools.tools as { name?: string; inputSchema?: unknown }[]).map(
+						(tool) =>
+							tool.name === probe.tool
+								? `${tool.name} ${JSON.stringify(tool.inputSchema)}`
+								: tool.name,
+					),
+				(listError: unknown) => [
+					`tools/list failed: ${listError instanceof Error ? listError.message : String(listError)}`,
+				],
+			);
+			throw new Error(
+				`${error instanceof Error ? error.message : String(error)}; server said ${JSON.stringify(init).slice(0, 1500)}; tools: ${listed.join(", ").slice(0, 1500)}`,
+			);
 		})) as {
 			structuredContent?: Record<string, unknown>;
 			content?: { type: string; text?: string }[];
@@ -511,7 +549,13 @@ async function mcpIdentity(
 		if (result.structuredContent) return result.structuredContent;
 		if (!firstText)
 			throw new Error(`Connector "${slug}" identity tool returned no content.`);
-		return JSON.parse(firstText) as Record<string, unknown>;
+		try {
+			return JSON.parse(firstText) as Record<string, unknown>;
+		} catch {
+			throw new Error(
+				`Connector "${slug}" identity tool returned text that is not JSON: ${firstText.slice(0, 400)}`,
+			);
+		}
 	} finally {
 		if (session)
 			await credentialFetch(
@@ -529,6 +573,16 @@ async function mcpIdentity(
 				`Connector "${slug}" identity`,
 			).catch(() => {});
 	}
+}
+
+/** A value's keys and types without its contents, so an error can show what came back and leak nothing. */
+function shapeOf(value: unknown): unknown {
+	if (Array.isArray(value)) return value.slice(0, 1).map(shapeOf);
+	if (value && typeof value === "object")
+		return Object.fromEntries(
+			Object.entries(value).map(([key, entry]) => [key, shapeOf(entry)]),
+		);
+	return typeof value;
 }
 
 export async function probeIdentity(
@@ -591,7 +645,7 @@ export async function probeIdentity(
 	const accountId = read(probe.account.id);
 	if (!accountId)
 		throw new Error(
-			`Connector "${slug}" identity probe returned nothing at ${probe.account.id}.`,
+			`Connector "${slug}" identity probe returned nothing at ${probe.account.id}. The result has the shape ${JSON.stringify(shapeOf(payload)).slice(0, 800)}`,
 		);
 
 	const userId = probe.user ? read(probe.user.id) : null;
@@ -631,8 +685,10 @@ export {
 	connectionBotToken,
 	connectionById,
 	connectorConnections,
+	grantSharedWithAnotherConnection,
 	orgConnection,
 	userConnection,
+	userConnections,
 } from "./lookup";
 export {
 	ConnectorUnavailableError,

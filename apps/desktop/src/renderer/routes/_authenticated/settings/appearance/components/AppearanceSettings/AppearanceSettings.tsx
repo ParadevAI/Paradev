@@ -64,7 +64,7 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 					<Trans>Appearance</Trans>
 				</h2>
 				<p className="text-sm text-muted-foreground mt-1">
-					<Trans>Customize how Superset looks on your device</Trans>
+					<Trans>Customize how Paradev looks on your device</Trans>
 				</p>
 			</div>
 

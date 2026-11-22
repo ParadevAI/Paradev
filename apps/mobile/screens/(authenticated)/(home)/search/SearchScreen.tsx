@@ -1,32 +1,42 @@
 import { Plural, useLingui } from "@lingui/react/macro";
-import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import {
 	type NativeStackNavigationProp,
-	Stack,
 	useNavigation,
 	useRouter,
 } from "expo-router";
-import { FolderGit2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Pressable, View } from "react-native";
-import type { SearchBarCommands } from "react-native-screens";
-import { Icon } from "@/components/ui/icon";
+import { FlatList, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import { useCloudWorkspaceItems } from "@/hooks/useCloudWorkspaceItems";
-import { useHostProjects } from "@/hooks/useHostProjects";
+import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
+import {
+	itemFromCloudRow,
+	useCloudWorkspaceItems,
+} from "@/hooks/useCloudWorkspaceItems";
+import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
+import { useHostsProjects } from "@/hooks/useHostProjects";
 import {
 	type HostWorkspaceItem,
-	useHostWorkspaces,
+	useHostsWorkspaces,
 } from "@/hooks/useHostWorkspaces";
-import { useTheme } from "@/hooks/useTheme";
-import {
-	type TerminalsHost,
-	useHostsTerminals,
-} from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
+import { useOrgHosts } from "@/hooks/useOrgHosts";
+import { HeaderToolbar } from "@/lib/navigation";
+import { cn } from "@/lib/utils";
+import { SECTION_LABEL } from "@/screens/(authenticated)/(home)/home/components/SectionLabel";
+import { useCloudRepos } from "@/screens/(authenticated)/(home)/home/hooks/useCloudRepos";
+import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
-import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
-import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { cloudRepoName } from "@/screens/(authenticated)/(home)/home/utils/buildCloudSection";
+import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
+import { useRowAttention } from "@/screens/(authenticated)/(home)/hooks/useRowAttention";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
+import {
+	isPlaceUnreachable,
+	placeStatus,
+} from "@/screens/(authenticated)/(home)/utils/placeStatus";
+import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
+import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
+import { SearchResultRow } from "./components/SearchResultRow";
 
 /**
  * The native search bar lives in this sheet, not on the home screen: on a
@@ -36,37 +46,80 @@ import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinne
  * properly — results tap, search dismisses (verified iOS 26.0). A nested
  * Stack inside the sheet never activates the controller, so no cancel ✕.
  *
- * The pool mirrors the home list's scope: the selected machine's workspaces,
- * or Cloud's sandboxes — the workspace query is per-host, so other machines
- * aren't in memory to search. The count row says which pool answered.
+ * The pool mirrors the home list's scope: every place under All hosts, the
+ * selected machine's workspaces, or Cloud's sandboxes — machines outside the
+ * scope aren't in memory to search. The count row says which pool answered.
  */
+
 export function SearchScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
 	const navigation =
 		useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
-	const theme = useTheme();
-	const searchBarRef = useRef<SearchBarCommands>(null);
+	const searchBarRef = useRef<SearchBarHandle>(null);
 	const [query, setQuery] = useState("");
+	const clearQuery = useCallback(() => setQuery(""), []);
 	const sort = useWorkspacesFilterStore((store) => store.sort);
-	const selectedHost = useSelectedHost();
-	const cloudScope = useWorkspaceScope() === "cloud";
-	const { workspaces } = useHostWorkspaces(selectedHost);
+	const {
+		scope,
+		hosts: scopeHosts,
+		cloud: cloudSelected,
+		everything,
+	} = useScopeSelection();
+	const cloudScope = scope === "cloud";
+	const multiScope = scope === "multi";
+	const cloudInMulti = multiScope && cloudSelected;
+	const { workspaces } = useHostsWorkspaces(scopeHosts);
 	const { items: cloudItems } = useCloudWorkspaceItems();
-	const { projects } = useHostProjects(selectedHost);
+	const cloudFilters = useCloudFilters();
+	const searchArchived = cloudScope && cloudFilters.status === "archived";
+	const { workspaces: archivedCloud } = useArchivedCloudWorkspaces({
+		enabled: searchArchived,
+	});
+	const { byHost: projectsByHost } = useHostsProjects(scopeHosts);
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
+	const { presenceStatus } = useOrgHosts();
+	const cloudRepos = useCloudRepos();
+	const hostsById = useMemo(
+		() => new Map(scopeHosts.map((host) => [host.machineId, host])),
+		[scopeHosts],
+	);
+	// Rows of a machine that can't answer are listed, dimmed, as on Home.
+	const isUnreachable = useCallback(
+		(workspace: HostWorkspaceItem) => {
+			const host = hostsById.get(workspace.hostId);
+			return (
+				!!host && isPlaceUnreachable(placeStatus(host.isOnline, presenceStatus))
+			);
+		},
+		[hostsById, presenceStatus],
+	);
 
 	// Same hosts the home list polls, so the query keys are shared and the
 	// sheet decorates from cache instead of paying its own fan-out.
-	const terminalHosts = useMemo<TerminalsHost[]>(
-		() => (cloudScope || !selectedHost ? [] : [selectedHost]),
-		[selectedHost, cloudScope],
+	const terminalHosts = useMemo(
+		() => scopeHosts.filter((host) => host.isOnline),
+		[scopeHosts],
 	);
-	const { terminalsByWorkspace } = useHostsTerminals(terminalHosts);
+	const { terminalsByWorkspace, attentionByWorkspace } =
+		useHostsTerminals(terminalHosts);
+	const noProjectName = t({ message: "No project" });
+	const rowAttention = useRowAttention(attentionByWorkspace);
+	const { workspaces: activeCloud } = useCloudWorkspaces();
+	const cloudRowsById = useMemo(
+		() =>
+			new Map([...activeCloud, ...archivedCloud].map((row) => [row.id, row])),
+		[activeCloud, archivedCloud],
+	);
 
 	const projectNamesById = useMemo(
-		() => new Map(projects.map((project) => [project.id, project.name])),
-		[projects],
+		() =>
+			new Map(
+				[...projectsByHost.values()]
+					.flat()
+					.map((project) => [project.id, project.name]),
+			),
+		[projectsByHost],
 	);
 
 	const matchesQuery = useCallback(
@@ -91,15 +144,12 @@ export function SearchScreen() {
 	);
 
 	const activityTs = useCallback(
-		(workspace: HostWorkspaceItem) => {
-			if (sort !== "updatedAt") return new Date(workspace[sort]).getTime();
-			const workspaceTs = getWorkspaceActivityTime(workspace);
-			const terminalTs = (terminalsByWorkspace.get(workspace.id) ?? []).reduce(
-				(newest, row) => Math.max(newest, row.ts),
-				0,
-			);
-			return Math.max(workspaceTs, terminalTs);
-		},
+		(workspace: HostWorkspaceItem) =>
+			workspaceSortTime(
+				workspace,
+				sort,
+				(terminalsByWorkspace.get(workspace.id) ?? []).map((row) => row.ts),
+			),
 		[sort, terminalsByWorkspace],
 	);
 
@@ -119,18 +169,31 @@ export function SearchScreen() {
 
 	const results = useMemo(() => {
 		const pool = cloudScope
-			? cloudItems
-			: workspaces.filter(
-					(workspace) =>
-						workspace.worktreeExists !== false &&
-						workspace.hostId === selectedHost?.machineId,
-				);
+			? (searchArchived
+					? archivedCloud.map(itemFromCloudRow)
+					: cloudItems
+				).filter((workspace) =>
+					cloudFilters.matchesCreator(workspace.createdByUserId),
+				)
+			: [
+					...workspaces.filter(
+						(workspace) => workspace.worktreeExists !== false,
+					),
+					...(cloudInMulti
+						? cloudItems.filter((workspace) =>
+								cloudFilters.matchesCreator(workspace.createdByUserId),
+							)
+						: []),
+				];
 		return pool.filter(matchesQuery).sort(byPinThenActivity);
 	}, [
 		cloudScope,
 		cloudItems,
+		searchArchived,
+		archivedCloud,
+		cloudFilters.matchesCreator,
 		workspaces,
-		selectedHost,
+		cloudInMulti,
 		matchesQuery,
 		byPinThenActivity,
 	]);
@@ -157,32 +220,32 @@ export function SearchScreen() {
 		},
 		[router],
 	);
+	const close = useCallback(() => router.back(), [router]);
+	const openFirst = useCallback(() => {
+		const first = results.find((workspace) => !isUnreachable(workspace));
+		if (first) open(first);
+	}, [results, open, isUnreachable]);
 
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					onPress={() => router.back()}
+					onPress={close}
 				/>
-			</Stack.Toolbar>
-			<Stack.SearchBar
+			</HeaderToolbar>
+			<SearchBar
 				ref={searchBarRef}
 				placeholder={t({
 					message: "Search workspaces",
 				})}
-				placement="stacked"
-				hideWhenScrolling={false}
-				hideNavigationBar={false}
-				obscureBackground={false}
-				textColor={theme.foreground}
-				hintTextColor={theme.mutedForeground}
-				tintColor={theme.foreground}
-				onChangeText={(event) => setQuery(event.nativeEvent.text)}
-				onCancelButtonPress={() => setQuery("")}
+				onChangeText={setQuery}
+				onCancel={clearQuery}
+				onSubmit={openFirst}
+				onClose={close}
 			/>
 			<FlatList
 				className="bg-background"
@@ -194,12 +257,24 @@ export function SearchScreen() {
 				keyboardShouldPersistTaps="handled"
 				ListHeaderComponent={
 					searching ? (
-						<Text className="text-muted-foreground px-4 pb-1 pt-2 font-semibold text-xs">
+						<Text className={cn(SECTION_LABEL.label, "px-4 pb-1 pt-2")}>
 							{cloudScope ? (
 								<Plural
 									value={results.length}
 									one="# result in Cloud"
 									other="# results in Cloud"
+								/>
+							) : multiScope && everything ? (
+								<Plural
+									value={results.length}
+									one="# result across all hosts"
+									other="# results across all hosts"
+								/>
+							) : multiScope ? (
+								<Plural
+									value={results.length}
+									one="# result across the selected places"
+									other="# results across the selected places"
 								/>
 							) : (
 								<Plural
@@ -209,44 +284,37 @@ export function SearchScreen() {
 								/>
 							)}
 						</Text>
-					) : null
+					) : undefined
 				}
-				renderItem={({ item: workspace }) => {
-					const projectName = workspace.projectId
-						? projectNamesById.get(workspace.projectId)
-						: undefined;
+				renderItem={({ item: workspace, index }) => {
+					const host = hostsById.get(workspace.hostId);
+					const cloudRow = cloudRowsById.get(workspace.id);
 					return (
-						<Pressable
-							className="flex-row items-center gap-3 px-4 py-2.5"
-							onPress={() => open(workspace)}
-							ph-label="search-workspace-row"
-						>
-							<View className="size-6 items-center justify-center">
-								<Icon
-									as={FolderGit2}
-									className="text-muted-foreground size-5"
-									strokeWidth={1.75}
-								/>
-							</View>
-							<View className="min-w-0 flex-1">
-								<Text className="font-semibold text-[14px]" numberOfLines={1}>
-									{workspace.name}
-								</Text>
-								<Text
-									className="text-muted-foreground text-[11.5px]"
-									numberOfLines={1}
-								>
-									{projectName
-										? `${projectName} · ${workspace.branch}`
-										: workspace.branch}
-								</Text>
-							</View>
-						</Pressable>
+						<SearchResultRow
+							workspace={workspace}
+							placeName={host?.name ?? t({ message: "Cloud" })}
+							projectName={
+								host
+									? (workspace.projectId &&
+											projectNamesById.get(workspace.projectId)) ||
+										noProjectName
+									: cloudRepoName(cloudRepos, workspace.id)
+							}
+							attention={
+								cloudRow
+									? rowAttention.cloud(cloudRow)
+									: rowAttention.host(workspace)
+							}
+							creating={cloudRow?.status === "provisioning"}
+							separator={index < results.length - 1}
+							unreachable={isUnreachable(workspace)}
+							onOpen={() => open(workspace)}
+						/>
 					);
 				}}
 				ListEmptyComponent={
 					<View className="items-center py-16">
-						<Text className="text-muted-foreground text-sm">
+						<Text className="text-muted-foreground text-[14px]">
 							{searching
 								? t({
 										message: "No workspaces match your search",
@@ -255,9 +323,11 @@ export function SearchScreen() {
 									? t({
 											message: "No cloud workspaces yet",
 										})
-									: t({
-											message: "No workspaces on this host yet",
-										})}
+									: multiScope
+										? t({ message: "No workspaces yet" })
+										: t({
+												message: "No workspaces on this host yet",
+											})}
 						</Text>
 					</View>
 				}

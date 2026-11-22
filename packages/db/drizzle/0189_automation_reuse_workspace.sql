@@ -1,0 +1,1 @@
+ALTER TABLE "automations" ADD COLUMN "reuse_workspace" boolean DEFAULT false NOT NULL;

@@ -1,39 +1,54 @@
+import type { MessageDescriptor } from "@lingui/core";
+import type { AgentId } from "@/app/[lang]/components/AgentLogo";
+
 export type ActiveDemo =
 	| "Orchestrate Parallel Agents"
+	| "Cloud Workspaces"
 	| "Automate Tasks"
-	| "Remote Access"
-	| "See Changes";
+	| "Publish Pages";
 
-export type WorkspaceStatus = "permission" | "working" | "review";
+export type PagePhase = "published" | "commented" | "revised";
 
-export type FileChangeType = "folder" | "add" | "edit" | "delete";
+export type SessionStatus = "needs" | "working";
 
-export interface WorkspaceData {
-	name: string;
-	branch: string;
-	add?: number;
-	del?: number;
-	pr?: string;
-	isActive?: boolean;
-	status?: WorkspaceStatus;
-	icon?: "cloud" | "branch";
+export type RailSection = "workspaces" | "automations" | "pages";
+
+export interface SessionData {
+	title: string;
+	agent: AgentId;
+	status?: SessionStatus;
 }
 
-export interface FileChange {
+export interface SessionGroupData {
+	id: string;
+	label: string | MessageDescriptor;
+	sessions: SessionData[];
+}
+
+export interface SceneConfig {
+	rail: RailSection;
+	activeSession: string | null;
+	showChanges: boolean;
+}
+
+export type DiffRow =
+	| { kind: "separator"; lines: number }
+	| {
+			kind: "line";
+			number: number;
+			change?: "add" | "del";
+			code: string;
+			mark?: string;
+	  };
+
+export interface FileDiffData {
 	path: string;
-	add?: number;
+	add: number;
 	del?: number;
-	indent?: number;
-	type: FileChangeType;
-}
-
-export interface AgentTab {
-	src: string;
-	alt: string;
-	label: string;
-	delay: number;
+	rows: DiffRow[];
 }
 
 export interface AppMockupProps {
 	activeDemo?: ActiveDemo;
+	edgeGlare?: boolean;
 }

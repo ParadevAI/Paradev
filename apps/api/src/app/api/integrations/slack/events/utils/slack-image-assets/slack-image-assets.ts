@@ -64,7 +64,7 @@ export function formatSlackImageAssetError(error: unknown): string {
 	}
 
 	if (error.code === "reauth_required") {
-		return "I couldn't access one or more Slack images because this workspace needs updated Slack permissions (`files:read`). Please reconnect the Superset Slack integration and try again.";
+		return "I couldn't access one or more Slack images because this workspace needs updated Slack permissions (`files:read`). Please reconnect the Paradev Slack integration and try again.";
 	}
 
 	return error.message;

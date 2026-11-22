@@ -1,9 +1,12 @@
 import type { RouterOutputs } from "@superset/trpc";
 
-/** Recently-viewed entries resolve by id or slug, so fetch a wide page. */
 export const TASK_LOOKUP_LIMIT = 200;
 
 type TaskListRow = RouterOutputs["task"]["listPage"]["items"][number];
+export type RecentTaskFields = Pick<
+	TaskListRow["task"],
+	"id" | "slug" | "title" | "statusId"
+>;
 type TaskStatusRow = RouterOutputs["task"]["statuses"]["list"][number];
 
 export interface RecentTaskEntry {
@@ -16,7 +19,7 @@ export interface RecentTaskEntry {
 }
 
 export function joinTasksWithStatuses(
-	tasks: TaskListRow[],
+	tasks: { task: RecentTaskFields }[],
 	statuses: TaskStatusRow[],
 ): RecentTaskEntry[] {
 	const statusById = new Map(statuses.map((status) => [status.id, status]));

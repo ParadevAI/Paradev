@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { DetailRow, EmailLayout } from "../../components";
 
 interface MemberAddedBillingEmailProps {
@@ -36,10 +36,6 @@ export function MemberAddedBillingEmail({
 		<EmailLayout
 			preview={`Billing update: ${newMemberName} was added to ${organizationName}`}
 		>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				New member added to {organizationName}
-			</Heading>
-
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {recipientName ?? "there"},
 			</Text>
@@ -66,7 +62,7 @@ export function MemberAddedBillingEmail({
 
 			<Text className="text-[13px] leading-5 text-muted m-0 mb-4">
 				{hasPreview
-					? `Your next invoice is ${nextInvoiceTotal} — the new plan total plus ${prorationAmount} for the part of the current period the new seat covers.`
+					? `Your next invoice is ${nextInvoiceTotal}. That's the new plan total plus ${prorationAmount} for the new seat for the rest of this period.`
 					: "Your next invoice adds a prorated charge for the rest of the current period, so it will be higher than the plan total above."}
 			</Text>
 

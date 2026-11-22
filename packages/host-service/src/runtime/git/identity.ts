@@ -4,6 +4,7 @@
 import { execFile } from "node:child_process";
 import { homedir } from "node:os";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import type { SimpleGit } from "simple-git";
 import { createUserSimpleGit } from "./simple-git";
 
@@ -35,7 +36,7 @@ export async function getGitHubUsernameViaGh(
 ): Promise<string | null> {
 	try {
 		const { stdout } = await execFileAsync(
-			"gh",
+			resolveCommand("gh", { env: shellEnv }),
 			["api", "user", "--jq", ".login"],
 			{ encoding: "utf8", timeout: 10_000, env: shellEnv },
 		);

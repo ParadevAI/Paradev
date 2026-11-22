@@ -16,9 +16,9 @@ export async function GET() {
 	const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Superset Blog</title>
+    <title>Paradev Blog</title>
     <link>${baseUrl}/blog</link>
-    <description>News, updates, and insights from the Superset team about parallel coding agents and developer productivity.</description>
+    <description>News, updates, and insights from the Paradev team about parallel coding agents and developer productivity.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${baseUrl}/feed.xml" rel="self" type="application/rss+xml"/>

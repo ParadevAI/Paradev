@@ -1,6 +1,6 @@
 ---
 name: ticket-format
-description: Canonical three-section structure for Linear and Superset tickets in this repo. Use when creating, drafting, or grooming a ticket.
+description: Canonical three-section structure for Linear and Paradev tickets in this repo. Use when creating, drafting, or grooming a ticket.
 ---
 
 # Ticket Format

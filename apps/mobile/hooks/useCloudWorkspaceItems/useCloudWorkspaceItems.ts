@@ -29,7 +29,7 @@ export interface CloudWorkspaceItem extends HostWorkspaceItem {
  * sandbox self-seeds its workspace as `local`. `hostReachable` is false so
  * decoration that needs the host (diff stats) waits for the workspace to open.
  */
-function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
+export function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
 	return {
 		id: cloud.id,
 		organizationId: cloud.organizationId,
@@ -44,8 +44,7 @@ function itemFromCloudRow(cloud: CloudWorkspaceRow): CloudWorkspaceItem {
 		tags: [],
 		createdAt: cloud.createdAt,
 		updatedAt: cloud.updatedAt,
-		// Agent activity is stamped by the sandbox host; unknown until opened.
-		lastActivityAt: null,
+		lastActivityAt: (cloud.agentStatusAt ?? cloud.createdAt).getTime(),
 		worktreePath: "",
 		worktreeExists: true,
 		projectName: null,
@@ -70,7 +69,11 @@ export interface CloudWorkspaceItemsValue {
  */
 export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 	const queryClient = useQueryClient();
-	const { workspaces: cloudRows, isReady } = useCloudWorkspaces();
+	const {
+		workspaces: cloudRows,
+		isReady,
+		organizationId,
+	} = useCloudWorkspaces();
 
 	const items = useMemo<CloudWorkspaceItem[]>(
 		() => cloudRows.map((cloud) => itemFromCloudRow(cloud)),
@@ -80,7 +83,7 @@ export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
 		const keyFor = (hostId: string) => {
 			const access = getSandboxAccess(hostId);
-			return access ? getHostWorkspacesQueryKey(hostId, access.url) : null;
+			return access ? getHostWorkspacesQueryKey(hostId, organizationId) : null;
 		};
 		return {
 			resolveHostUrl: (hostId) => getSandboxAccess(hostId)?.url ?? null,
@@ -105,7 +108,7 @@ export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 				if (key) void queryClient.invalidateQueries({ queryKey: key });
 			},
 		};
-	}, [queryClient]);
+	}, [queryClient, organizationId]);
 
 	return { items, cache, isReady };
 }

@@ -1,0 +1,28 @@
+---
+title: Peec AI
+description: See how AI search engines answer questions in your market, find out why they leave you out, and track the fixes
+---
+
+See how ChatGPT, Gemini, Perplexity, Google AI Overviews and other AI search engines answer questions in your market. Find out why they leave you out, and track the fixes in Peec AI.
+
+## Skills
+
+| Skill | What it does |
+|:------|:-------------|
+| `diagnose-ai-visibility` | Reads the answers and the sources they cite for the prompts you lose, then decides if your page is broken, missing, weak, or outweighed by third-party sites, with one fix for each |
+| `work-peec-actions` | Works through Peec's recommended actions with site fixes first, and logs the work you shipped on the date it shipped so Peec's Impact view can measure it |
+
+Skills are named `peec-<skill>`. In Claude Code they appear as `superset:peec-<skill>`.
+
+## MCP Server
+
+Tools come from Peec AI's own MCP server at `https://api.peec.ai/mcp`. Paradev proxies each call and adds your credentials. Peec decides which tools the server offers, so see [Peec's tools reference](https://docs.peec.ai/mcp/tools) for the current list. Some tools appear only when the matching feature is turned on for your Peec project.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Peec AI in your browser. Paradev registers itself with Peec when you connect, so there is no app to set up first. |
+| Personal access token | Paste a token from Peec's **API Keys → Personal Access Tokens** page. Use it when you cannot sign in through a browser. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them. Write tools need company member access on the Peec project.

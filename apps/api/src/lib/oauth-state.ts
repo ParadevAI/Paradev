@@ -28,8 +28,14 @@ export const pluginStateSchema = z.object({
 
 export type PluginState = z.infer<typeof pluginStateSchema>;
 
+export const linearStateSchema = basePayloadSchema.extend({
+	trackTasksInLinear: z.boolean().optional(),
+});
+
 export const connectorStateSchema = basePayloadSchema.extend({
 	codeVerifier: z.string().optional(),
+	plugin: z.string().optional(),
+	clientId: z.string().optional(),
 });
 
 export type ConnectorState = z.infer<typeof connectorStateSchema>;

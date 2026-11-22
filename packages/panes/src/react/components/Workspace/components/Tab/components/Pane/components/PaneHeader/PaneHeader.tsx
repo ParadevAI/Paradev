@@ -1,6 +1,8 @@
 import { cn } from "@superset/ui/utils";
 import { type ReactNode, useCallback, useRef } from "react";
 import { useDrag } from "react-dnd";
+import { usePaneAppearance } from "../../../../../../../../hooks/usePaneAppearance";
+import { usePaneAreaFocused } from "../../../../../../../../hooks/usePaneAreaFocused";
 import { DefaultHeaderContent } from "./components/DefaultHeaderContent";
 
 interface PaneHeaderProps {
@@ -12,6 +14,7 @@ interface PaneHeaderProps {
 	actionsContent: ReactNode;
 	toolbar?: ReactNode;
 	paneId?: string;
+	store?: unknown;
 	onClick?: () => void;
 	onMiddleClick?: () => void;
 }
@@ -27,19 +30,23 @@ export function PaneHeader({
 	actionsContent,
 	toolbar,
 	paneId,
+	store,
 	onClick,
 	onMiddleClick,
 }: PaneHeaderProps) {
+	const isCards = usePaneAppearance() === "cards";
+	const isAreaFocused = usePaneAreaFocused();
+	const looksActive = isActive && isAreaFocused;
 	const [{ isDragging }, connectDrag] = useDrag(
 		() => ({
 			type: PANE_DRAG_TYPE,
-			item: { paneId },
+			item: { paneId, store },
 			canDrag: !!paneId,
 			collect: (monitor) => ({
 				isDragging: monitor.isDragging(),
 			}),
 		}),
-		[paneId],
+		[paneId, store],
 	);
 
 	const nodeRef = useRef<HTMLDivElement>(null);
@@ -61,10 +68,15 @@ export function PaneHeader({
 				// this a stacking context, trapping the URL-bar suggestions
 				// (an absolute z-50 box inside the header) under later siblings
 				// like the import banner. The pane root carries the container.
-				"flex h-7 shrink-0 cursor-grab items-center border-b border-border/20 bg-muted/30 transition-opacity duration-150",
-				!isActive &&
+				isCards
+					? "flex h-8 shrink-0 cursor-grab items-center transition-opacity duration-150"
+					: "flex h-7 shrink-0 cursor-grab items-center border-b border-border/20 bg-muted/30 transition-opacity duration-150",
+				!looksActive &&
 					!isDragging &&
-					"opacity-60 hover:opacity-100 focus-within:opacity-100",
+					cn(
+						isCards ? "opacity-70" : "opacity-60",
+						"hover:opacity-100 focus-within:opacity-100",
+					),
 				isDragging && "opacity-30",
 			)}
 			onClick={onClick}
@@ -79,7 +91,7 @@ export function PaneHeader({
 				<DefaultHeaderContent
 					title={title}
 					icon={icon}
-					isActive={isActive}
+					isActive={looksActive}
 					titleContent={titleContent}
 					headerExtras={headerExtras}
 					actionsContent={actionsContent}

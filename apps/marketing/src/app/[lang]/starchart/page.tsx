@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { formatStarCount, githubRepoSlug } from "@superset/shared/github-stars";
 import { Button } from "@superset/ui/button";
@@ -12,7 +13,9 @@ import {
 	StarChart,
 } from "@superset/ui/star-chart";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
+import { TrackedLink } from "@/app/[lang]/components/TrackedLink";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import { getStarHistory } from "./utils/getStarHistory";
@@ -29,21 +32,21 @@ export async function generateMetadata(): Promise<Metadata> {
 		...msg({
 			message: "See how {companyName}'s GitHub stars have grown over time.",
 		}),
-		values: { companyName: COMPANY.NAME },
+		values: { companyName: BRAND.NAME },
 	});
 	return {
 		title,
 		description,
 		alternates: localizedAlternates(lang, "/starchart"),
 		openGraph: {
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			url: localeUrl(lang, "/starchart"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | ${COMPANY.NAME}`,
+			title: `${title} | ${BRAND.NAME}`,
 			description,
 			images: ["/og-image.png"],
 		},
@@ -61,7 +64,10 @@ function formatWeekDate(date: string, locale: string): string {
 	);
 }
 
+export const instant = false;
+
 export default async function StarChartPage() {
+	await connection();
 	await initServerI18n();
 
 	const { t, i18n } = useLingui();
@@ -162,13 +168,15 @@ export default async function StarChartPage() {
 					)}
 
 					<Button asChild size="sm" className="mt-6">
-						<a
+						<TrackedLink
 							href={COMPANY.GITHUB_URL}
+							event="github_clicked"
+							properties={{ source: "starchart" }}
 							target="_blank"
 							rel="noopener noreferrer"
 						>
 							<Trans>Star on GitHub</Trans>
-						</a>
+						</TrackedLink>
 					</Button>
 
 					<GridCross className="bottom-0 left-0" />

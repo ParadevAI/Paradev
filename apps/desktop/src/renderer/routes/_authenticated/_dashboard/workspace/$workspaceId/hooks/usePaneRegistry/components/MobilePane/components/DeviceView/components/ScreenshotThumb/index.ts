@@ -1,0 +1,1 @@
+export { ScreenshotThumb } from "./ScreenshotThumb";

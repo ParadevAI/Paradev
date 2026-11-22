@@ -13,17 +13,24 @@ export type NotionConfig = Extract<TriggerConfigInput, { kind: "notion" }>;
  * event names its own words and slots, and the row renders them in order.
  */
 
-export type Slot = "dataSources" | "pages" | "actor" | "mentionedUser";
+export type Slot =
+	| "account"
+	| "dataSources"
+	| "pages"
+	| "actor"
+	| "mentionedUser";
 
-export type SentencePart = { text: string } | { slot: Slot };
+type SentencePart = { text: string } | { slot: Slot };
 
 export const NOTION_SENTENCES: Record<NotionTriggerEvent, SentencePart[]> = {
 	"data_source.content_updated": [
 		{ text: "Rows changed in" },
+		{ slot: "account" },
 		{ slot: "dataSources" },
 	],
 	"comment.created": [
 		{ text: "Comment added in" },
+		{ slot: "account" },
 		{ slot: "dataSources" },
 		{ text: "on" },
 		{ slot: "pages" },
@@ -34,6 +41,7 @@ export const NOTION_SENTENCES: Record<NotionTriggerEvent, SentencePart[]> = {
 		{ text: "Comment mentions" },
 		{ slot: "mentionedUser" },
 		{ text: "in" },
+		{ slot: "account" },
 		{ slot: "dataSources" },
 		{ text: "on" },
 		{ slot: "pages" },
@@ -69,7 +77,7 @@ function leaf(label: MessageDescriptor, event: NotionTriggerEvent) {
  * A new trigger of this event: the data source still to be chosen, every
  * optional filter wide open.
  */
-export function createNotionConfig(event: NotionTriggerEvent): NotionConfig {
+function createNotionConfig(event: NotionTriggerEvent): NotionConfig {
 	// An empty list matches nothing, so an unfinished trigger cannot fire on
 	// every data source; the form refuses to save until one is chosen.
 	const base = {

@@ -1,4 +1,5 @@
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import type { PendingChatHandoff } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
 /**
@@ -10,13 +11,13 @@ import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
  */
 export function queuePendingChatHandoff(
 	collections: AppCollections,
-	workspace: { id: string; projectId: string },
-	handoff: { agentId: string; prompt: string },
+	workspace: { id: string; projectId: string | null },
+	handoff: PendingChatHandoff,
 ): void {
-	if (!collections.v2WorkspaceLocalState.get(workspace.id)) {
+	if (!collections.workspaceLocalState.get(workspace.id)) {
 		writeWorkspacePaneLayout(collections, workspace, [], []);
 	}
-	collections.v2WorkspaceLocalState.update(workspace.id, (draft) => {
+	collections.workspaceLocalState.update(workspace.id, (draft) => {
 		draft.pendingChatHandoff = handoff;
 	});
 }

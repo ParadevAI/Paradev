@@ -10,18 +10,19 @@ export type GmailConfig = Extract<TriggerConfigInput, { kind: "gmail" }>;
  */
 
 export type GmailSlot =
+	| "account"
 	| "from"
 	| "to"
 	| "subjectFilter"
 	| "labels"
 	| "hasAttachment";
 
-export type SentencePart<Slot extends string> =
-	| { text: string }
-	| { slot: Slot };
+type SentencePart<Slot extends string> = { text: string } | { slot: Slot };
 
 export const GMAIL_SENTENCE: SentencePart<GmailSlot>[] = [
-	{ text: "Email received from" },
+	{ text: "Email received" },
+	{ slot: "account" },
+	{ text: "from" },
 	{ slot: "from" },
 	{ text: "to" },
 	{ slot: "to" },
@@ -62,7 +63,7 @@ export const GMAIL_MENU: TriggerMenuEntry<GmailConfig>[] = [
  * The sender is the primary scope and starts unchosen for the same reason a
  * GitHub repository does; the rest default to "any".
  */
-export function createGmailConfig(): GmailConfig {
+function createGmailConfig(): GmailConfig {
 	return {
 		kind: "gmail",
 		event: "message.received",

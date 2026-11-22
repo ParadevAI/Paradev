@@ -2,13 +2,17 @@ import { describe, expect, test } from "bun:test";
 import { i18n, initI18n } from "../index";
 import {
 	formatAge,
+	formatClockTime,
 	formatCompactNumber,
 	formatCompactRelativeTime,
 	formatCurrency,
 	formatDate,
+	formatElapsed,
+	formatGbHours,
 	formatNumber,
 	formatPercent,
 	formatPrice,
+	formatRelativePeriod,
 	formatRelativeTime,
 	getActiveLocale,
 } from "./index";
@@ -18,6 +22,18 @@ initI18n();
 describe("format helpers (en)", () => {
 	test("active locale defaults to en", () => {
 		expect(getActiveLocale()).toBe("en");
+	});
+
+	test("formatClockTime drops the day period", () => {
+		const time = new Date(2026, 9, 26, 23, 11);
+		expect(formatClockTime(time)).toBe("11:11");
+		expect(formatClockTime(time, "de")).toBe("23:11");
+	});
+
+	test("formatGbHours rounds to one decimal and marks a small amount", () => {
+		expect(formatGbHours(0)).toBe("0");
+		expect(formatGbHours(0.04)).toBe("<0.1");
+		expect(formatGbHours(1234.56)).toBe("1,234.6");
 	});
 
 	test("formatNumber groups digits", () => {
@@ -130,6 +146,19 @@ describe("formatRelativeTime", () => {
 		}
 	});
 
+	test("elapsed time counts seconds before it counts minutes", () => {
+		const start = new Date("2026-08-28T12:00:00Z").getTime();
+		const cases = [
+			[0, "0s"],
+			[45 * 1000, "45s"],
+			[60 * 1000, "1m"],
+			[61 * 60 * 1000, "1h"],
+		] as const;
+		for (const [elapsed, expected] of cases) {
+			expect(formatElapsed(start, start + elapsed)).toBe(expected);
+		}
+	});
+
 	test("compact form never reads as a negative number", () => {
 		expect(
 			formatCompactRelativeTime(
@@ -157,5 +186,20 @@ describe("formatRelativeTime", () => {
 		} finally {
 			i18n.activate("en");
 		}
+	});
+});
+
+describe("formatRelativePeriod", () => {
+	test("names recent periods the way a list heading would", () => {
+		expect(formatRelativePeriod({ unit: "day", count: 0 }, "en")).toBe("Today");
+		expect(formatRelativePeriod({ unit: "day", count: 1 }, "en")).toBe(
+			"Yesterday",
+		);
+		expect(formatRelativePeriod({ unit: "day", count: 3 }, "en")).toBe(
+			"3 days ago",
+		);
+		expect(formatRelativePeriod({ unit: "week", count: 1 }, "en")).toBe(
+			"Last week",
+		);
 	});
 });

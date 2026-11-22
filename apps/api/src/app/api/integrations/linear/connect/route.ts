@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
@@ -15,13 +16,18 @@ export async function GET(request: Request) {
 
 	return beginOAuthFlow({
 		cookie: STATE_COOKIES.linear,
-		payload: { organizationId: member.organizationId, userId: member.userId },
+		payload: {
+			organizationId: member.organizationId,
+			userId: member.userId,
+			trackTasksInLinear:
+				new URL(request.url).searchParams.get("taskTracker") === "linear",
+		},
 		authorizeUrl: (state) => {
 			const linearAuthUrl = new URL("https://linear.app/oauth/authorize");
 			linearAuthUrl.searchParams.set("client_id", env.LINEAR_CLIENT_ID);
 			linearAuthUrl.searchParams.set(
 				"redirect_uri",
-				`${env.NEXT_PUBLIC_API_URL}/api/integrations/linear/callback`,
+				`${getBrowserApiUrl(env)}/api/integrations/linear/callback`,
 			);
 			linearAuthUrl.searchParams.set("response_type", "code");
 			linearAuthUrl.searchParams.set("scope", "read,write,issues:create");

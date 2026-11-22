@@ -66,7 +66,7 @@ describe("LiveSessionRegistry", () => {
 				prompt: () => undefined,
 				cancelTurn: () => undefined,
 				respondToApproval: () => undefined,
-				setMode: () => undefined,
+				setMode: () => Promise.resolve(true),
 				dispose: async () => {
 					disposed = true;
 				},
@@ -77,6 +77,23 @@ describe("LiveSessionRegistry", () => {
 		expect(runtime.sessions.list()).toEqual([]);
 		expect(disposed).toBe(true);
 
+		await runtime.dispose();
+	});
+
+	test("closing a scope stops only that scope's sessions", async () => {
+		const runtime = createTestRuntime({ harnesses: registryOf(idleAdapter) });
+		const kept = createSession(runtime);
+		const removed = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-2",
+			harness: HARNESS,
+			cwd: "/tmp/workspace-2",
+		}).sessionId;
+
+		await runtime.commands.closeScope("workspace-2");
+
+		expect(runtime.live.get(removed)).toBeNull();
+		expect(runtime.live.get(kept)).not.toBeNull();
 		await runtime.dispose();
 	});
 

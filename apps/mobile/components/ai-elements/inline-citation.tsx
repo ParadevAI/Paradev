@@ -12,7 +12,11 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import type {
+	NativeScrollEvent,
+	NativeSyntheticEvent,
+	ScrollViewInstance,
+} from "react-native";
 import { Pressable, ScrollView, View } from "react-native";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/ui/icon";
@@ -96,7 +100,7 @@ interface InlineCitationCarouselContextType {
 	currentIndex: number;
 	itemCount: number;
 	itemWidth: number;
-	scrollViewRef: RefObject<ScrollView | null>;
+	scrollViewRef: RefObject<ScrollViewInstance | null>;
 	setCurrentIndex: (index: number) => void;
 	setItemCount: (count: number) => void;
 	scrollToIndex: (index: number) => void;
@@ -127,7 +131,7 @@ export const InlineCitationCarousel = ({
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [itemCount, setItemCount] = useState(0);
 	const [itemWidth, setItemWidth] = useState(0);
-	const scrollViewRef = useRef<ScrollView | null>(null);
+	const scrollViewRef = useRef<ScrollViewInstance | null>(null);
 
 	const scrollToIndex = useCallback(
 		(index: number) => {

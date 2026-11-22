@@ -6,6 +6,7 @@ import {
 } from "@superset/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { connectionById, userConnection } from "../../../lib/connectors";
+import { GMAIL_READ_SCOPES } from "./constants";
 
 /**
  * The per-connection sync state lives in `connections.state`, plaintext beside
@@ -32,6 +33,21 @@ export async function findGoogleConnection(
 	return userConnection(organizationId, "google", userId);
 }
 
+/** A member can connect more than one Google account; a live one wins. */
+export function summarizeGoogleConnections(rows: SelectConnection[]) {
+	const live = rows.filter((row) => row.disconnectedAt === null);
+	const connection = live[0] ?? rows[0];
+	if (!connection) return null;
+	return {
+		id: connection.id,
+		email: connection.externalAccountId,
+		emails: live.map((row) => row.externalAccountId),
+		connectedByUserId: connection.connectedByUserId,
+		connectedAt: connection.createdAt,
+		needsReconnect: connection.disconnectedAt !== null,
+	};
+}
+
 export async function findGoogleConnectionById(
 	connectionId: string,
 ): Promise<SelectConnection | null> {
@@ -56,4 +72,10 @@ export async function patchGmailState(
 			)`,
 		})
 		.where(eq(connections.id, connectionId));
+}
+
+/** Rows migrated from the legacy table carry no scopes; that flow required Gmail. */
+export function canReadGmail(scopes: string[] | null): boolean {
+	if (!scopes) return true;
+	return GMAIL_READ_SCOPES.some((scope) => scopes.includes(scope));
 }

@@ -14,3 +14,6 @@
 "Could not start dictation" = "音声入力を開始できませんでした";
 "Uploading" = "アップロード中";
 "Upload failed" = "アップロードに失敗しました";
+"Stop" = "停止";
+"Dictation stopped. What was heard so far is in your message." = "音声入力が停止しました。ここまでの内容はメッセージに入っています。";
+"Transcription took too long. The last few words may be missing." = "文字起こしに時間がかかりすぎました。最後の数語が欠けている可能性があります。";

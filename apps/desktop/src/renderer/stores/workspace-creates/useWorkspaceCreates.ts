@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import type { WorkspaceCreateSettledPayload } from "@superset/workspace-client";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback } from "react";
@@ -19,33 +20,31 @@ import { useCollections } from "renderer/routes/_authenticated/providers/Collect
 import type {
 	WorkspacesCreateAnyInput,
 	WorkspacesCreateInput,
-	WorkspacesCreateSessionInput,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { useStarNagStore } from "renderer/stores/star-nag";
 import { queueWorkspaceCreationPresets } from "./queueWorkspaceCreationPresets";
+import { recoverAgentLaunches } from "./recoverAgentLaunches";
+import { resolveChatAgentIds } from "./resolveChatAgentIds";
 import { useWorkspaceTransactionsStore } from "./workspaceTransactions";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
-export type { WorkspacesCreateInput, WorkspacesCreateSessionInput };
-
-export interface SubmitArgs {
+interface SubmitArgs {
 	hostId: string;
 	/** `projectId: null` routes to `workspaces.createSession`. */
 	snapshot: WorkspacesCreateAnyInput;
 }
 
-export type SubmitOutcome =
+type SubmitOutcome =
 	| { ok: true; workspaceId: string }
 	| { ok: false; error: string };
 
-export interface SubmitHandle {
+interface SubmitHandle {
 	workspaceId: string;
 	completed: Promise<SubmitOutcome>;
 }
 
-export interface UseWorkspaceCreatesApi {
+interface UseWorkspaceCreatesApi {
 	submit: (args: SubmitArgs) => SubmitHandle;
 }
 
@@ -63,7 +62,14 @@ interface CreateOutcome {
 	workspace: { id: string; projectId: string | null };
 	terminals: Array<{ terminalId: string; label?: string }>;
 	agents: Array<
-		| { ok: true; kind: "terminal"; sessionId: string; label: string }
+		| {
+				ok: true;
+				kind: "terminal";
+				sessionId: string;
+				label: string;
+				chatSessionId?: string;
+				chatAgentId?: string;
+		  }
 		| { ok: false; error: string }
 	>;
 	/**
@@ -74,14 +80,6 @@ interface CreateOutcome {
 	 * the same as `true` (don't count it), never as `false`.
 	 */
 	alreadyExists?: boolean;
-}
-
-/** Older hosts don't have `workspaces.createEnqueued` yet. */
-function isMissingProcedureError(error: unknown): boolean {
-	return (
-		error instanceof TRPCClientError &&
-		/no procedure found on path/i.test(error.message)
-	);
 }
 
 /** An `AbortSignal.timeout` firing — host reachable but slow, as opposed to
@@ -198,16 +196,14 @@ async function createViaEnqueue(
 
 		if (outcome === "timeout") {
 			// The event was lost, not necessarily the create. If the row exists
-			// the workspace is real — recover with an EMPTY pane seed rather
-			// than tearing down a workspace the user can already see. Launched
-			// terminals/agents aren't recoverable without the event; the
-			// background-session auto-adopt path surfaces them on open.
+			// the workspace is real: keep it, and read the agents it launched back
+			// from the host instead of tearing down a workspace the user can see.
 			const row = await probeWorkspaceRow(client, workspaceId);
 			if (row === "exists") {
 				return {
 					workspace: { id: workspaceId, projectId: payload.projectId },
 					terminals: [],
-					agents: [],
+					agents: await recoverAgentLaunches(client, workspaceId),
 				};
 			}
 			throw new Error(
@@ -272,8 +268,8 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			};
 
 			const deleteWorkspaceLocalState = (id: string) => {
-				if (collections.v2WorkspaceLocalState.get(id)) {
-					collections.v2WorkspaceLocalState.delete(id);
+				if (collections.workspaceLocalState.get(id)) {
+					collections.workspaceLocalState.delete(id);
 				}
 			};
 
@@ -364,7 +360,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 						// ultimately successful session create must not be recorded
 						// as failed (the row would pop back via workspace:changed).
 						// Spaced probes cover a create that hasn't inserted its row
-						// yet; the empty pane seed is healed by session auto-adopt.
+						// yet; the agents it launched are read back from the host.
 						if (
 							isTimeoutAbort(error) &&
 							(await probeWorkspaceRowWithRetries(client, workspaceId)) ===
@@ -373,7 +369,7 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 							return {
 								workspace: { id: workspaceId, projectId: null },
 								terminals: [],
-								agents: [],
+								agents: await recoverAgentLaunches(client, workspaceId),
 							};
 						}
 						throw error;
@@ -401,7 +397,12 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			);
 
 			const completed = createPromise
-				.then<SubmitOutcome>((result) => {
+				.then<SubmitOutcome>(async (result) => {
+					const agents = await resolveChatAgentIds(
+						getHostServiceClientByUrl(hostUrl),
+						result.workspace.id,
+						result.agents,
+					);
 					writeWorkspacePaneLayout(
 						collections,
 						{
@@ -409,25 +410,22 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 							projectId: result.workspace.projectId,
 						},
 						result.terminals,
-						result.agents,
+						agents,
 					);
 					if (result.workspace.id !== workspaceId) {
 						deleteWorkspaceLocalState(workspaceId);
 						hostWorkspacesCache.removeWorkspace(args.hostId, workspaceId);
 					}
-					// Only genuinely new worktrees count as created — never reopened
-					// ones or project-less sessions (createSession has no
+					// Creation presets run only for genuinely new worktrees — never
+					// reopened ones or project-less sessions (createSession has no
 					// alreadyExists signal, so an undefined value here is treated as
-					// "not new").
+					// "not new"). They also skip adopting an existing worktree (the
+					// host reports that as new) and creates that opted out of setup,
+					// e.g. "Import worktrees" with "Run setup" off.
 					if (
 						result.workspace.projectId !== null &&
 						result.alreadyExists === false
 					) {
-						useStarNagStore.getState().recordWorkspaceCreated();
-						// Creation presets follow the same rule, and additionally skip
-						// adopting an existing worktree (the host reports that as new)
-						// and creates that opted out of setup, e.g. "Import worktrees"
-						// with "Run setup" off.
 						const adoptsWorktree =
 							"worktreePath" in snapshot && !!snapshot.worktreePath;
 						const skipsSetup =

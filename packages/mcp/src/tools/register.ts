@@ -6,6 +6,7 @@ import {
 
 import * as agentsCreate from "./agents/create";
 import * as agentsList from "./agents/list";
+import * as automationsArchive from "./automations/archive";
 import * as automationsCreate from "./automations/create";
 import * as automationsDelete from "./automations/delete";
 import * as automationsGet from "./automations/get";
@@ -27,6 +28,7 @@ import * as pagesGet from "./pages/get";
 import * as pagesList from "./pages/list";
 import * as pagesPublish from "./pages/publish";
 import * as pagesPull from "./pages/pull";
+import * as pagesStorage from "./pages/storage";
 import * as pagesVersions from "./pages/versions";
 import * as projectsList from "./projects/list";
 import * as tasksCreate from "./tasks/create";
@@ -59,6 +61,7 @@ const REGISTRARS = [
 	automationsCreate,
 	automationsUpdate,
 	automationsSetPrompt,
+	automationsArchive,
 	automationsDelete,
 	automationsPause,
 	automationsResume,
@@ -80,6 +83,7 @@ const REGISTRARS = [
 	pagesGet,
 	pagesVersions,
 	pagesPull,
+	pagesStorage,
 	pagesPublish,
 	pagesCommentsList,
 	pagesCommentsReply,

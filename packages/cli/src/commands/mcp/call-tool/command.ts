@@ -1,8 +1,13 @@
 import { CLIError, positional, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
+import { resolveOrganizationId } from "../../../lib/config";
 import { resolvePluginName } from "../../../lib/plugins/connection-ref";
 import { readStdin } from "../../../lib/plugins/inputs";
 import { connectPluginMcp } from "../../../lib/plugins/mcp-client";
+import {
+	keepSessionId,
+	keptSessionId,
+} from "../../../lib/plugins/mcp-sessions";
 
 export default command({
 	description: "Call a tool on a connected plugin",
@@ -14,6 +19,9 @@ export default command({
 	],
 	options: {
 		plugin: string().desc("Plugin name from `superset plugins list`"),
+		account: string().desc(
+			"Connection id, when the plugin's connector has more than one account",
+		),
 		connection: string().desc("Deprecated alias for --plugin"),
 		pluginId: string().desc("Deprecated alias for --plugin"),
 	},
@@ -36,7 +44,18 @@ export default command({
 			);
 		}
 
-		const { client } = await connectPluginMcp(pluginName, ctx.bearer);
+		const account = options.account as string | undefined;
+		const launchId = process.env.SUPERSET_AGENT_LAUNCH_ID?.trim();
+		const sessionKey = launchId && `${launchId}:${pluginName}:${account ?? ""}`;
+		const { client, transport } = await connectPluginMcp(
+			pluginName,
+			{
+				bearer: ctx.bearer,
+				organizationId: resolveOrganizationId(ctx.config),
+			},
+			account,
+			sessionKey ? keptSessionId(sessionKey) : undefined,
+		);
 		try {
 			const result = await client.callTool({
 				name: tool,
@@ -47,6 +66,13 @@ export default command({
 				message: JSON.stringify(result, null, 2),
 			};
 		} finally {
+			if (sessionKey && transport.sessionId) {
+				keepSessionId(sessionKey, transport.sessionId);
+			} else {
+				// The call already succeeded or failed on its own; a proxy that
+				// cannot end the session lets it expire.
+				await transport.terminateSession().catch(() => {});
+			}
 			await client.close();
 		}
 	},

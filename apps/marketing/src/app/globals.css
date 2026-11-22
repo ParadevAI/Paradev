@@ -1,10 +1,11 @@
 @import "tailwindcss";
 @import "@superset/ui/globals.css";
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
+@source "./*/pages";
 
 @theme {
-	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-	--font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+	--font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+	--font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @theme inline {
@@ -25,13 +26,6 @@
 }
 
 @layer base {
-	/* Linear-style Inter: optical sizing (Display cut at large sizes) +
-	   alternate glyphs. Feature settings are ignored by the mono/pixel fonts. */
-	body {
-		font-optical-sizing: auto;
-		font-feature-settings: "cv01", "ss03";
-	}
-
 	button:not(:disabled),
 	[role="button"]:not([aria-disabled="true"]) {
 		cursor: pointer;
@@ -43,37 +37,48 @@
 	}
 }
 
-/* Cyber HUD frame: four L-shaped corner brackets drawn as background strips
-   (two strips per corner). Sized in em so it scales with the text. */
-@utility corner-brackets {
-	background-image:
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand)),
-		linear-gradient(var(--brand), var(--brand));
-	background-repeat: no-repeat;
-	background-size:
-		0.15em 4px,
-		4px 0.15em,
-		0.15em 4px,
-		4px 0.15em,
-		0.15em 4px,
-		4px 0.15em,
-		0.15em 4px,
-		4px 0.15em;
-	background-position:
-		0 0,
-		0 0,
-		100% 0,
-		100% 0,
-		0 100%,
-		0 100%,
-		100% 100%,
-		100% 100%;
+.headline-marks {
+	padding: 0 0.3em;
+	white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+	.headline-marks {
+		padding: 0 0.2em;
+	}
+}
+
+.headline-rise > .headline-marks {
+	position: relative;
+}
+
+.headline-rise-clip {
+	display: inline-block;
+	overflow: hidden;
+	padding-bottom: 0.14em;
+	margin-bottom: -0.14em;
+	vertical-align: bottom;
+}
+
+.headline-rise-line {
+	display: inline-block;
+	animation: headline-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.headline-marks .headline-rise-line {
+	animation-delay: 120ms;
+}
+
+@keyframes headline-rise {
+	from {
+		transform: translateY(105%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.headline-rise-line {
+		animation: none;
+	}
 }
 
 @utility scrollbar-hide {
@@ -129,22 +134,22 @@
 	line-height: 1.75;
 }
 
-.prose ul,
-.prose ol {
+.prose ul:not(.not-prose *),
+.prose ol:not(.not-prose *) {
 	margin-top: 1.25rem;
 	margin-bottom: 1.25rem;
 	padding-left: 1.5rem;
 }
 
-.prose ul {
+.prose ul:not(.not-prose *) {
 	list-style: disc;
 }
 
-.prose ol {
+.prose ol:not(.not-prose *) {
 	list-style: decimal;
 }
 
-.prose li {
+.prose li:not(.not-prose *) {
 	margin-top: 0.5rem;
 	margin-bottom: 0.5rem;
 }
@@ -256,6 +261,26 @@
 	--animate-belt-march: belt-march 900ms linear infinite;
 	--animate-rail-extend: rail-extend 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 	--animate-station-pulse: station-pulse 2.4s ease-in-out infinite;
+	--animate-shimmer-window: shimmer-window 2.4s linear infinite;
+	--animate-shimmer-text: shimmer-text 2.4s linear infinite;
+}
+
+@keyframes shimmer-window {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes shimmer-text {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(-100%);
+	}
 }
 
 @keyframes belt-march {
@@ -291,5 +316,27 @@
 	.animate-rail-extend,
 	.animate-station-pulse {
 		animation: none;
+	}
+}
+
+@keyframes dock-shelf-in {
+	from {
+		opacity: 0;
+		translate: 0 18px;
+		scale: 0.98;
+	}
+}
+
+@keyframes dock-icon-in {
+	from {
+		opacity: 0;
+		translate: 0 16px;
+		scale: 0.88;
+	}
+}
+
+@keyframes dock-icon-float {
+	50% {
+		transform: translateY(-6px);
 	}
 }

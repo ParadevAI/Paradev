@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { TRPCClientError } from "@trpc/client";
 import { ApiHttpError } from "../../../lib/api-client";
 import submitCommand, {
+	desktopAppLogPaths,
 	MAX_ATTACHMENT_TOTAL_BASE64_CHARS,
 	MAX_ATTACHMENT_TOTAL_BYTES,
 	planAttachmentUploads,
@@ -242,5 +243,20 @@ describe("feedback submit attachments", () => {
 		const error = await invoke([path]).catch((thrown) => thrown);
 
 		expect(error).toBe(unauthorized);
+	});
+});
+
+describe("desktopAppLogPaths", () => {
+	test("reads the pre-rename log folder when only it exists", () => {
+		const legacy = /[\\/]Superset[\\/]/;
+		const paths = desktopAppLogPaths((path) => legacy.test(path));
+		expect(paths).toHaveLength(1);
+		expect(paths[0]).toMatch(legacy);
+	});
+
+	test("names the new log folder when neither exists", () => {
+		const paths = desktopAppLogPaths(() => false);
+		expect(paths).toHaveLength(1);
+		expect(paths[0]).toMatch(/[\\/]Paradev[\\/]/);
 	});
 });

@@ -4,8 +4,7 @@ import { ChevronRight } from "lucide-react-native";
 import { Pressable, ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
-import { hostServiceUrl } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { useWorkspacePullRequests } from "../hooks/useWorkspacePullRequest";
 import { PULL_REQUEST_STATUS, pullRequestStatus } from "../utils/pullRequest";
 import { RowDiffstat } from "./components/RowDiffstat";
@@ -15,8 +14,8 @@ import { RowDiffstat } from "./components/RowDiffstat";
 const DIFFSTAT_ROW_LIMIT = 20;
 
 /**
- * Every pull request this workspace has produced, oldest first, so the list
- * reads as the history of the workspace and the newest sits nearest the thumb.
+ * Every pull request this workspace has produced, current first, then newest
+ * first.
  *
  * The state is carried by the leading glyph alone: with the number and title on
  * one line and the diffstat opposite, a status word would be a third thing
@@ -26,14 +25,7 @@ export function PullRequestsSheet() {
 	const { t } = useLingui();
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const router = useRouter();
-	const { host } = useWorkspaceHost(id ?? null);
-	const hostUrl =
-		host?.isOnline === true
-			? hostServiceUrl(host.organizationId, host.machineId)
-			: null;
-	// The hook hands back current-then-newest, which is what the strip's chip
-	// colours itself from; only the list wants the other direction.
-	const pullRequests = useWorkspacePullRequests(id ?? null).toReversed();
+	const pullRequests = useWorkspacePullRequests(id ?? null);
 
 	return (
 		<>
@@ -44,15 +36,15 @@ export function PullRequestsSheet() {
 					}),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					icon="xmark"
+					icon="close"
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentContainerClassName="px-4 pb-10 pt-2"
@@ -89,8 +81,7 @@ export function PullRequestsSheet() {
 								#{pullRequest.prNumber} {pullRequest.title}
 							</Text>
 							<RowDiffstat
-								enabled={index >= pullRequests.length - DIFFSTAT_ROW_LIMIT}
-								hostUrl={hostUrl}
+								enabled={index < DIFFSTAT_ROW_LIMIT}
 								pullRequest={pullRequest}
 							/>
 							<Icon

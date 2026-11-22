@@ -3,6 +3,7 @@ import {
 	buildUpstreamHeaders,
 	parseHostRoutingKey,
 } from "@superset/shared/host-routing";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import { RELAY_CLOSE } from "@superset/shared/tunnel-protocol";
 import { type AuthContext, verifyJWT } from "@superset/shared/verify-jwt";
 import type { Context, MiddlewareHandler } from "hono";
@@ -14,13 +15,19 @@ import {
 	accessDenialMessage,
 	type Caller,
 	callerOf,
+	checkCloudWorkspaceAccess,
 	checkHostAccessForRegister,
 	checkOrgAccess,
 	isServerPresenceScope,
 } from "./access";
 import { HostTunnel } from "./host-tunnel";
 import { placeHost, readPlacement } from "./placement";
-import { isTrpcPath, trpcErrorResponse } from "./trpc-error";
+import {
+	HOST_TRPC_ROUTERS,
+	type HostTrpcRouter,
+	hostTrpcRouter,
+	trpcErrorResponse,
+} from "./trpc-error";
 import type { RelayEnv } from "./types";
 
 type AppContext = {
@@ -76,12 +83,29 @@ type Denial = { status: 401 | 403 | 500; message: string };
 // host's object's decision, made inside each call it serves; a host's own
 // control connect is the exception, checked against the API here because its
 // object may not exist yet.
+type Authenticated = {
+	auth: AuthContext;
+	token: string;
+	cloudWorkspaceId?: string;
+};
+
 async function authenticate(
 	c: Context<AppContext>,
 	hostId: string,
 	purpose: "register" | "reach",
-): Promise<{ auth: AuthContext; token: string } | Denial> {
+): Promise<Authenticated | Denial> {
 	const token = extractToken(c);
+	const boxCredential = c.req.header(SANDBOX_API_CREDENTIAL_HEADER);
+	if (!token && boxCredential && purpose === "reach") {
+		// A stream would outlive the per-call access check.
+		if (isWsUpgrade(c)) {
+			return {
+				status: 403,
+				message: "Forbidden: a cloud workspace can only make HTTP calls",
+			};
+		}
+		return authenticateCloudWorkspace(c, hostId, boxCredential);
+	}
 	if (!token) return { status: 401, message: "Unauthorized" };
 	const auth = await verifyJWT(token, c.env.NEXT_PUBLIC_API_URL);
 	if (!auth) return { status: 401, message: "Unauthorized" };
@@ -96,6 +120,34 @@ async function authenticate(
 			: checkOrgAccess(auth, hostId);
 	if (!access.ok) return denial(access.reason);
 	return { auth, token };
+}
+
+// A box holds no token; its firewall adds the workspace credential.
+async function authenticateCloudWorkspace(
+	c: Context<AppContext>,
+	hostId: string,
+	credential: string,
+): Promise<Authenticated | Denial> {
+	const access = await checkCloudWorkspaceAccess(
+		credential,
+		hostId,
+		c.env.NEXT_PUBLIC_API_URL,
+	);
+	if (!access.ok) {
+		return access.reason === "unauthorized"
+			? { status: 401, message: "Unauthorized" }
+			: denial(access.reason);
+	}
+	const organizationId = parseHostRoutingKey(hostId)?.organizationId ?? "";
+	return {
+		auth: {
+			sub: access.userId,
+			organizationIds: [organizationId],
+			teamIds: [],
+		},
+		token: "",
+		cloudWorkspaceId: access.workspaceId,
+	};
 }
 
 function denial(reason: AccessDenial): Denial {
@@ -131,16 +183,19 @@ app.get("/v2/control", async (c) => {
 		);
 	}
 
-	const placement = await placeHost(
-		c.env,
-		hostId,
-		c.req.raw.cf as IncomingRequestCfProperties | undefined,
-	);
+	const cf = c.req.raw.cf as IncomingRequestCfProperties | undefined;
+	const placement = await placeHost(c.env, hostId, cf);
 	const stub = await getServerByName(c.env.HostTunnel, placement.name);
-	return stub.fetch(
-		`https://relay/register?hostId=${encodeURIComponent(hostId)}`,
-		{ headers: { Upgrade: "websocket", "x-relay-token": result.token } },
-	);
+	const params = new URLSearchParams({
+		hostId,
+		generation: String(placement.generation),
+	});
+	if (cf?.colo) params.set("colo", cf.colo);
+	if (cf?.country) params.set("country", cf.country);
+	if (cf?.asn) params.set("asn", String(cf.asn));
+	return stub.fetch(`https://relay/register?${params}`, {
+		headers: { Upgrade: "websocket", "x-relay-token": result.token },
+	});
 });
 
 // ── Host dial-back (stream attach) ──────────────────────────────────
@@ -226,7 +281,7 @@ app.get("/hosts/:hostId/_whoowns", async (c) => {
 	}
 	const stub = await tunnelStub(c, hostId);
 	if (!stub) return c.json({ error: "Host not connected" }, 503);
-	const connected = await stub.isConnected(callerOf(result.auth, result.token));
+	const connected = await stub.isConnected(callerFor(result));
 	if (connected.access !== "allowed") {
 		const refused = accessDenial(connected.access);
 		return c.json({ error: refused.message }, refused.status);
@@ -240,36 +295,60 @@ app.get("/hosts/:hostId/_whoowns", async (c) => {
 const authMiddleware: MiddlewareHandler<AppContext> = async (c, next) => {
 	const hostId = c.req.param("hostId");
 	if (!hostId) return c.json({ error: "Missing hostId" }, 400);
+	const path = pathAfterHost(c);
+	if (path !== "" && (!path.startsWith("/") || path.startsWith("//"))) {
+		return c.json({ error: "Invalid path" }, 400);
+	}
 	const result = await authenticate(c, hostId, "reach");
 	if (isDenial(result)) {
-		if (isTrpcPath(pathAfterHost(c))) {
+		const router = hostTrpcRouter(path);
+		if (router) {
 			return trpcErrorResponse(
 				c,
-				result.status === 403 ? "FORBIDDEN" : "UNAUTHORIZED",
+				router,
+				result.status === 403
+					? "FORBIDDEN"
+					: result.status === 500
+						? "INTERNAL_SERVER_ERROR"
+						: "UNAUTHORIZED",
 				result.message,
 			);
 		}
 		return c.json({ error: result.message }, result.status);
 	}
 	c.set("auth", result.auth);
-	c.set("caller", callerOf(result.auth, result.token));
+	c.set("caller", callerFor(result));
 	c.set("hostId", hostId);
 	return next();
 };
 
+function callerFor(result: Authenticated): Caller {
+	return result.cloudWorkspaceId
+		? { userId: result.auth.sub, token: "", preAuthorized: true }
+		: callerOf(result.auth, result.token);
+}
+
 app.use("/hosts/:hostId/*", authMiddleware);
 
-app.all("/hosts/:hostId/trpc/*", async (c) => {
+const proxyHostHttp = async (
+	c: Context<AppContext>,
+	router: HostTrpcRouter,
+) => {
 	const hostId = c.get("hostId");
 	const url = new URL(c.req.url);
-	const path = pathAfterHost(c) || "/";
+	const path = pathAfterHost(c);
 	const query = url.search.slice(1);
 
 	const headers = buildUpstreamHeaders(c.req.raw.headers, c.get("auth").sub);
 
 	const stub = await tunnelStub(c, hostId);
 	if (!stub) {
-		return trpcErrorResponse(c, "SERVICE_UNAVAILABLE", "Host is not online");
+		return trpcErrorResponse(
+			c,
+			router,
+			"SERVICE_UNAVAILABLE",
+			"Host is not online",
+		);
 	}
 	const caller = c.get("caller");
 	const result = await stub.proxyHttp(caller, {
@@ -285,6 +364,7 @@ app.all("/hosts/:hostId/trpc/*", async (c) => {
 			);
 			return trpcErrorResponse(
 				c,
+				router,
 				refused.status === 403 ? "FORBIDDEN" : "INTERNAL_SERVER_ERROR",
 				refused.message,
 			);
@@ -292,20 +372,30 @@ app.all("/hosts/:hostId/trpc/*", async (c) => {
 		if (result.reason === "dial-failed") {
 			return trpcErrorResponse(
 				c,
+				router,
 				"BAD_GATEWAY",
 				"Host could not reach the relay",
 			);
 		}
 		const connected = await stub.isConnected(caller);
 		return connected.access === "allowed" && connected.connected
-			? trpcErrorResponse(c, "BAD_GATEWAY", "Request timed out")
-			: trpcErrorResponse(c, "SERVICE_UNAVAILABLE", "Host is not online");
+			? trpcErrorResponse(c, router, "BAD_GATEWAY", "Request timed out")
+			: trpcErrorResponse(
+					c,
+					router,
+					"SERVICE_UNAVAILABLE",
+					"Host is not online",
+				);
 	}
 	return new Response(result.body.byteLength > 0 ? result.body : null, {
 		status: result.status,
 		headers: result.headers,
 	});
-});
+};
+
+for (const router of HOST_TRPC_ROUTERS) {
+	app.all(`/hosts/:hostId${router.prefix}/*`, (c) => proxyHostHttp(c, router));
+}
 
 app.get("/hosts/:hostId/*", async (c) => {
 	if (!isWsUpgrade(c)) {
@@ -314,7 +404,6 @@ app.get("/hosts/:hostId/*", async (c) => {
 	const hostId = c.get("hostId");
 	const url = new URL(c.req.url);
 	const path = pathAfterHost(c) || "/";
-	if (path.startsWith("//")) return c.json({ error: "Invalid path" }, 400);
 	const query = url.search.slice(1);
 	const ticket = crypto.randomUUID();
 

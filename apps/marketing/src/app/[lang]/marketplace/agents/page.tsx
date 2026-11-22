@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 		description: i18n._(
 			msg({
 				message:
-					"The future home for reusable Superset agent configs, prompts, and setup guides.",
+					"The future home for reusable Paradev agent configs, prompts, and setup guides.",
 			}),
 		),
 		alternates: localizedAlternates(lang, "/marketplace/agents"),

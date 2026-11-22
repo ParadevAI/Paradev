@@ -2,7 +2,7 @@
 name: find-in-notion
 description: Find what the workspace already says before you answer or write — search Notion, tell the canonical page from the stale copy, and cite what you used. Use when the user asks what's in Notion, refers to a doc, spec, or meeting note, or asks a question the workspace probably already answers.
 argument-hint: the question, doc, or topic to look up
-allowed-tools: mcp__notion__notion-search, mcp__notion__notion-fetch, mcp__notion__notion-query-data-sources
+allowed-tools: mcp__notion__notion-search, mcp__notion__notion-fetch, mcp__notion__notion-query-data-sources, mcp__notion__notion-list-page-backlinks
 ---
 
 # Find what the workspace already says
@@ -17,9 +17,6 @@ Run the user's words first, then run the vocabulary the workspace is likely to u
 A question about "our refund rules" lives on a page called "Billing policy" or
 "Support runbook"; the word "refund" may appear nowhere in the title. Two or three
 searches with different vocabulary beats one search with better phrasing.
-
-Search titles and body separately when the tools allow it. A title match is usually
-the canonical page; a body match is usually someone referring to it.
 
 ## 2. Decide which page is canonical
 

@@ -17,11 +17,11 @@ function TaskDetailPage() {
 	const {
 		tab,
 		assignee,
+		label,
 		search: searchQuery,
 		type,
 		project,
 		projects,
-		linearProject,
 		state,
 	} = TasksLayoutRoute.useSearch();
 	const navigate = useNavigate();
@@ -30,22 +30,13 @@ function TaskDetailPage() {
 		return tasksSearchFromFilters({
 			tab: tab ?? "all",
 			assignee: assignee ?? null,
+			label: label ?? null,
 			search: searchQuery ?? "",
 			typeTab: type === "issues" ? "issues" : "tasks",
 			projectFilters: resolveProjectFilterParams(projects, project, []),
-			linearProjectFilter: linearProject ?? null,
 			includeClosedIssues: state === "all",
 		});
-	}, [
-		tab,
-		assignee,
-		searchQuery,
-		type,
-		project,
-		projects,
-		linearProject,
-		state,
-	]);
+	}, [tab, assignee, label, searchQuery, type, project, projects, state]);
 	useEscapeToNavigate("/tasks", { search: backSearch });
 
 	return (

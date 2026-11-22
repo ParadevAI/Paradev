@@ -1,0 +1,1 @@
+export { saveInstallation } from "./saveInstallation";

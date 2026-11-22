@@ -144,6 +144,38 @@ for (const backend of [parcelWatchBackend, chokidarWatchBackend]) {
 	});
 }
 
+describe("parcel watch backend lifetime", () => {
+	test("a subscribe issued while the last unsubscribe is in flight still delivers", async () => {
+		const rootA = await makeRoot();
+		const rootB = await makeRoot();
+		const subscriptionA = await parcelWatchBackend.subscribe({
+			rootPath: rootA,
+			ignore: [],
+			generation: 1,
+			onEvents: () => {},
+			onError: () => {},
+		});
+		const events: NativeWatchEvent[] = [];
+		const [, subscriptionB] = await Promise.all([
+			subscriptionA.unsubscribe(),
+			parcelWatchBackend.subscribe({
+				rootPath: rootB,
+				ignore: [],
+				generation: 1,
+				onEvents: (batch) => events.push(...batch),
+				onError: () => {},
+			}),
+		]);
+		cleanups.push(() => subscriptionB.unsubscribe());
+		const file = path.join(rootB, "after-swap.txt");
+		await writeFile(file, "x");
+		await waitFor(
+			() => events.some((event) => event.path === file),
+			"event after swap",
+		);
+	});
+});
+
 describe("createIgnoreMatcher", () => {
 	const isIgnored = createIgnoreMatcher("/repo", [
 		"**/node_modules/**",

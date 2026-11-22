@@ -1,258 +1,28 @@
-"use client";
-
-import { Trans, useLingui } from "@lingui/react/macro";
-import { authClient } from "@superset/auth/client";
-import {
-	DEV_EMAIL,
-	DEV_NAME,
-	DEV_PASSWORD,
-} from "@superset/shared/dev-credentials";
-import { Button } from "@superset/ui/button";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import { connectorNameFromRedirect } from "@/app/utils/connectorNameFromRedirect";
 import { env } from "@/env";
+import { SignInForm } from "./components/SignInForm";
 
-const LAST_USED_METHOD_KEY = "superset-last-auth-method";
-const ERROR_CODE = /^[A-Za-z0-9_-]{1,64}$/;
-
-type AuthMethod = "github" | "google" | "dev";
-
-function readLastUsedMethod(): AuthMethod | null {
-	try {
-		const stored = window.localStorage.getItem(LAST_USED_METHOD_KEY);
-		return stored === "github" || stored === "google" || stored === "dev"
-			? stored
-			: null;
-	} catch {
-		return null;
-	}
-}
-
-function rememberLastUsedMethod(method: AuthMethod) {
-	try {
-		window.localStorage.setItem(LAST_USED_METHOD_KEY, method);
-	} catch {
-		// localStorage unavailable; skip persisting
-	}
-}
-
-export default function SignInPage() {
-	const { t } = useLingui();
-	const searchParams = useSearchParams();
-	const redirect = searchParams.get("redirect");
-	const callbackURL = redirect
-		? `${env.NEXT_PUBLIC_WEB_URL}${redirect}`
-		: env.NEXT_PUBLIC_WEB_URL;
-
-	const callbackErrorParam = searchParams.get("error");
-	const callbackError =
-		callbackErrorParam && ERROR_CODE.test(callbackErrorParam)
-			? callbackErrorParam
-			: null;
-
-	const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
-	const [isLoadingGithub, setIsLoadingGithub] = useState(false);
-	const [error, setError] = useState<string | null>(() => {
-		if (!callbackError) return null;
-		if (callbackError === "account_not_linked") {
-			return t({
-				message:
-					"This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before.",
-			});
-		}
-		const reason = callbackError;
-		return t({
-			message: `Sign-in failed (${reason}). Please try again.`,
-		});
-	});
-	const [lastUsedMethod, setLastUsedMethod] = useState<AuthMethod | null>(null);
-
-	useEffect(() => {
-		setLastUsedMethod(readLastUsedMethod());
-	}, []);
-
-	const signInWithGoogle = async () => {
-		setIsLoadingGoogle(true);
-		setError(null);
-		rememberLastUsedMethod("google");
-
-		try {
-			await authClient.signIn.social({
-				provider: "google",
-				callbackURL,
-			});
-		} catch (err) {
-			console.error("Sign in failed:", err);
-			setError(
-				t({
-					message: "Failed to sign in. Please try again.",
-				}),
-			);
-			setIsLoadingGoogle(false);
-		}
+export default async function SignInPage({
+	searchParams,
+}: {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+	const params = await searchParams;
+	const param = (name: string) => {
+		const value = params[name];
+		return typeof value === "string" ? value : null;
 	};
-
-	const signInWithGithub = async () => {
-		setIsLoadingGithub(true);
-		setError(null);
-		rememberLastUsedMethod("github");
-
-		try {
-			await authClient.signIn.social({
-				provider: "github",
-				callbackURL,
-			});
-		} catch (err) {
-			console.error("Sign in failed:", err);
-			setError(
-				t({
-					message: "Failed to sign in. Please try again.",
-				}),
-			);
-			setIsLoadingGithub(false);
-		}
-	};
-
-	const [isLoadingDev, setIsLoadingDev] = useState(false);
-
-	const signInAsDev = async () => {
-		setIsLoadingDev(true);
-		setError(null);
-		rememberLastUsedMethod("dev");
-
-		try {
-			let res = await authClient.signIn.email({
-				email: DEV_EMAIL,
-				password: DEV_PASSWORD,
-			});
-			if (res.error) {
-				const signUpRes = await authClient.signUp.email({
-					email: DEV_EMAIL,
-					password: DEV_PASSWORD,
-					name: DEV_NAME,
-				});
-				if (signUpRes.error) throw new Error(signUpRes.error.message);
-				res = await authClient.signIn.email({
-					email: DEV_EMAIL,
-					password: DEV_PASSWORD,
-				});
-			}
-			if (res.error) throw new Error(res.error.message);
-			window.location.href = callbackURL;
-		} catch (err) {
-			console.error("Dev sign in failed:", err);
-			setError(
-				err instanceof Error
-					? err.message
-					: t({ message: "Dev sign-in failed" }),
-			);
-			setIsLoadingDev(false);
-		}
-	};
-
-	const isLoading = isLoadingGoogle || isLoadingGithub || isLoadingDev;
-
-	const lastUsedBadge = (
-		<span className="bg-muted text-muted-foreground absolute right-3 rounded-full px-2 py-0.5 text-xs">
-			<Trans>Last used</Trans>
-		</span>
-	);
+	const redirect = param("redirect");
 
 	return (
-		<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-			<div className="flex flex-col space-y-2 text-center">
-				<h1 className="text-2xl font-semibold tracking-tight">
-					<Trans>Welcome back</Trans>
-				</h1>
-				<p className="text-muted-foreground text-sm">
-					<Trans>Sign in to continue to Superset</Trans>
-				</p>
-			</div>
-			<div className="grid gap-4">
-				{error && (
-					<p className="text-destructive text-center text-sm">{error}</p>
-				)}
-				{process.env.NODE_ENV === "development" && (
-					<Button
-						variant="outline"
-						disabled={isLoading}
-						onClick={signInAsDev}
-						className="relative w-full"
-					>
-						{isLoadingDev ? (
-							<Trans>Signing in...</Trans>
-						) : (
-							<Trans>Sign in as Local Admin (dev)</Trans>
-						)}
-						{lastUsedMethod === "dev" && lastUsedBadge}
-					</Button>
-				)}
-				<Button
-					variant="outline"
-					disabled={isLoading}
-					onClick={signInWithGithub}
-					className="relative w-full"
-				>
-					<FaGithub className="mr-2 size-4" />
-					{isLoadingGithub ? (
-						<Trans>Loading...</Trans>
-					) : (
-						<Trans>Sign in with GitHub</Trans>
-					)}
-					{lastUsedMethod === "github" && lastUsedBadge}
-				</Button>
-				<Button
-					variant="outline"
-					disabled={isLoading}
-					onClick={signInWithGoogle}
-					className="relative w-full"
-				>
-					<FcGoogle className="mr-2 size-4" />
-					{isLoadingGoogle ? (
-						<Trans>Loading...</Trans>
-					) : (
-						<Trans>Sign in with Google</Trans>
-					)}
-					{lastUsedMethod === "google" && lastUsedBadge}
-				</Button>
-				<p className="text-muted-foreground px-8 text-center text-sm">
-					<Trans>
-						By clicking continue, you agree to our{" "}
-						<a
-							href={`${env.NEXT_PUBLIC_MARKETING_URL}/terms`}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="hover:text-primary underline underline-offset-4"
-						>
-							Terms of Service
-						</a>{" "}
-						and{" "}
-						<a
-							href={`${env.NEXT_PUBLIC_MARKETING_URL}/privacy`}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="hover:text-primary underline underline-offset-4"
-						>
-							Privacy Policy
-						</a>
-						.
-					</Trans>
-				</p>
-				<p className="text-center text-sm">
-					<Trans>
-						Don&apos;t have an account?{" "}
-						<Link
-							href="/sign-up"
-							className="hover:text-primary underline underline-offset-4"
-						>
-							Sign up
-						</Link>
-					</Trans>
-				</p>
-			</div>
-		</div>
+		<SignInForm
+			redirect={redirect}
+			callbackErrorParam={param("error")}
+			connectorName={connectorNameFromRedirect({
+				redirect,
+				apiUrl: env.NEXT_PUBLIC_API_URL,
+			})}
+			sessionExpired={param("reason") === "session_expired"}
+		/>
 	);
 }

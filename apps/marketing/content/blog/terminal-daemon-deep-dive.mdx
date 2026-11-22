@@ -9,11 +9,11 @@ relatedSlugs:
   - how-to-get-hit
 ---
 
-Superset keeps terminal sessions running when the desktop app restarts. [Andreas Asprou](https://x.com/andyasprou) led the work. This post explains how we separated the terminals from the app process.
+Paradev keeps terminal sessions running when the desktop app restarts. [Andreas Asprou](https://x.com/andyasprou) led the work. This post explains how we separated the terminals from the app process.
 
 ---
 
-Our original terminal processes ended when the app closed. That made updates expensive: restarting Superset meant interrupting work across every open workspace. An app crash could do the same.
+Our original terminal processes ended when the app closed. That made updates expensive: restarting Paradev meant interrupting work across every open workspace. An app crash could do the same.
 
 tmux showed that terminal sessions could outlive the interface attached to them.
 
@@ -376,4 +376,4 @@ Today, `LocalTerminalRuntime` wraps our daemon. Tomorrow, `CloudTerminalRuntime`
 
 ---
 
-*Want to dive deeper? Check out the [Superset desktop source](https://github.com/superset-sh/superset) for the full implementation.*
+*Want to dive deeper? Check out the [Paradev desktop source](https://github.com/paradevai/paradev) for the full implementation.*

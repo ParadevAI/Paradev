@@ -1,0 +1,1 @@
+export { DiffPaneMoreMenu } from "./DiffPaneMoreMenu";

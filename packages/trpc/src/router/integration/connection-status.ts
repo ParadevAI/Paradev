@@ -4,7 +4,7 @@ import { getConnector } from "@superset/shared/connectors";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { NEEDS_REAUTH } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgMembership } from "./utils";
 
 /**
@@ -22,19 +22,34 @@ import { verifyOrgMembership } from "./utils";
  * with `needsReauth`, because a trigger built on one will not fire until the
  * user reconnects, and "not connected" would send them to the wrong button.
  */
-export interface ProviderConnection {
-	connected: boolean;
+export interface ProviderAccount {
+	id: string;
+	label: string | null;
+	/** @deprecated desktop 1.36.0 reads this; use `label`. */
+	identity: string | null;
+	/** @deprecated desktop 1.36.0 reads this; use `label`. */
+	nickname: string | null;
 	needsReauth: boolean;
 }
 
-export const connectionStatusProcedure = protectedProcedure
+export interface ProviderConnection {
+	connected: boolean;
+	needsReauth: boolean;
+	accounts: ProviderAccount[];
+}
+
+export const connectionStatusProcedure = personProcedure
 	.input(z.object({ organizationId: z.uuid() }))
 	.query(
 		async ({ ctx, input }): Promise<Record<string, ProviderConnection>> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const [connectorRows, installation] = await Promise.all([
+			const [connectorRows, activeInstallation] = await Promise.all([
 				db.query.connections.findMany({
+					// Oldest first, and stable: the editor pins a new trigger to the
+					// first account, and an unordered read returns heap order, which
+					// moves every time a row is updated — a token refresh is an update.
+					orderBy: (row, { asc }) => [asc(row.createdAt), asc(row.id)],
 					where: and(
 						eq(connections.organizationId, input.organizationId),
 						or(
@@ -43,14 +58,21 @@ export const connectionStatusProcedure = protectedProcedure
 						),
 					),
 					columns: {
+						id: true,
 						connector: true,
 						connectedByUserId: true,
 						disconnectedAt: true,
+						externalAccountLabel: true,
+						externalUserLabel: true,
+						nickname: true,
 					},
 				}),
 				db.query.githubInstallations.findFirst({
-					where: eq(githubInstallations.organizationId, input.organizationId),
-					columns: { suspended: true },
+					where: and(
+						eq(githubInstallations.organizationId, input.organizationId),
+						eq(githubInstallations.suspended, false),
+					),
+					columns: { id: true },
 				}),
 			]);
 
@@ -62,15 +84,30 @@ export const connectionStatusProcedure = protectedProcedure
 				)
 					continue;
 				const needsReauth = row.disconnectedAt !== null;
+				let entry = connected[row.connector];
+				if (!entry) {
+					entry = { connected: false, needsReauth: false, accounts: [] };
+					connected[row.connector] = entry;
+				}
+				const identity =
+					row.externalUserLabel ?? row.externalAccountLabel ?? null;
+				entry.accounts.push({
+					id: row.id,
+					label: row.nickname ?? identity,
+					identity,
+					nickname: row.nickname,
+					needsReauth,
+				});
 				// A live row wins over an expired one for the same connector.
-				if (connected[row.connector]?.connected && needsReauth) continue;
-				connected[row.connector] = { connected: !needsReauth, needsReauth };
+				if (entry.connected && needsReauth) continue;
+				entry.connected = !needsReauth;
+				entry.needsReauth = needsReauth;
 			}
 
-			// A suspended installation still has a row, and delivers nothing.
 			connected.github = {
-				connected: installation !== undefined && !installation.suspended,
+				connected: activeInstallation !== undefined,
 				needsReauth: false,
+				accounts: [],
 			};
 
 			return connected;

@@ -2,10 +2,6 @@ import { exec } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import { getShellEnv } from "@superset/agent-setup/shell-wrappers";
-import {
-	TERMINAL_TERM_PROGRAM,
-	TERMINAL_TERM_PROGRAM_VERSION,
-} from "@superset/shared/constants";
 import defaultShell from "default-shell";
 import { env } from "shared/env.shared";
 
@@ -38,13 +34,6 @@ function startLocaleProbe(): void {
 		},
 	);
 }
-
-/**
- * Current hook protocol version.
- * Increment when making breaking changes to the hook protocol.
- * The server logs this for debugging version mismatches.
- */
-export const HOOK_PROTOCOL_VERSION = "2";
 
 export const FALLBACK_SHELL = os.platform() === "win32" ? "cmd.exe" : "/bin/sh";
 export const SHELL_CRASH_THRESHOLD_MS = 1000;
@@ -111,24 +100,6 @@ export function getLocale(baseEnv: Record<string, string>): string {
 	startLocaleProbe();
 	cachedUtf8Locale = "en_US.UTF-8";
 	return cachedUtf8Locale;
-}
-
-/**
- * Precompute expensive locale fallback resolution early in app startup so
- * the first terminal create/attach path does not pay a synchronous probe.
- */
-export function prewarmTerminalEnv(): void {
-	const rawBaseEnv = sanitizeEnv(process.env) || {};
-	const directLocale = rawBaseEnv.LANG?.includes("UTF-8")
-		? rawBaseEnv.LANG
-		: rawBaseEnv.LC_ALL?.includes("UTF-8")
-			? rawBaseEnv.LC_ALL
-			: null;
-	if (directLocale) {
-		cachedUtf8Locale = directLocale;
-		return;
-	}
-	startLocaleProbe();
 }
 
 export function sanitizeEnv(
@@ -213,9 +184,11 @@ const ALLOWED_ENV_VARS = new Set([
 
 	// Terminal/display
 	"DISPLAY",
+	// X11 auth cookie and Wayland socket. Needed alongside DISPLAY so
+	// clipboard tools (xclip/xsel/wl-paste) can reach the display server. (#5003)
+	"XAUTHORITY",
+	"WAYLAND_DISPLAY",
 	"COLORTERM",
-	"TERM_PROGRAM",
-	"TERM_PROGRAM_VERSION",
 	"COLUMNS",
 	"LINES",
 
@@ -474,8 +447,6 @@ export function buildTerminalEnv(params: {
 	const terminalEnv: Record<string, string> = {
 		...baseEnv,
 		...shellEnv,
-		TERM_PROGRAM: TERMINAL_TERM_PROGRAM,
-		TERM_PROGRAM_VERSION: TERMINAL_TERM_PROGRAM_VERSION,
 		COLORTERM: "truecolor",
 		COLORFGBG: colorFgBg,
 		TERM_THEME: termTheme,
@@ -486,11 +457,8 @@ export function buildTerminalEnv(params: {
 		SUPERSET_WORKSPACE_NAME: workspaceName || "",
 		SUPERSET_WORKSPACE_PATH: workspacePath || "",
 		SUPERSET_ROOT_PATH: rootPath || "",
-		SUPERSET_PORT: String(env.DESKTOP_NOTIFICATIONS_PORT),
 		// Environment identifier for dev/prod separation
 		SUPERSET_ENV: env.NODE_ENV === "development" ? "development" : "production",
-		// Hook protocol version for forward compatibility
-		SUPERSET_HOOK_VERSION: HOOK_PROTOCOL_VERSION,
 	};
 
 	delete terminalEnv.GOOGLE_API_KEY;

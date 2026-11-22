@@ -1,0 +1,1 @@
+export { usePaneThird } from "./usePaneThird";

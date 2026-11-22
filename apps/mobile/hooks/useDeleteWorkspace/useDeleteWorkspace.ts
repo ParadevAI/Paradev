@@ -2,9 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { Alert } from "react-native";
-import { useCloudWorkspaceActions } from "@/hooks/useCloudWorkspaceActions";
 import {
-	getHostWorkspacesQueryKey,
+	getHostWorkspacesQueryPrefix,
 	type HostWorkspaceRow,
 } from "@/hooks/useHostWorkspaces";
 import { errorCopy, isTransportError } from "@/lib/errors";
@@ -15,12 +14,10 @@ export interface DeleteWorkspaceTarget {
 	id: string;
 	name: string;
 	type: HostWorkspaceRow["type"];
-	/** Host owning the worktree. Unused for a cloud workspace. */
+	/** Host owning the worktree. */
 	hostId: string | null;
 	/** Where that host answers — null when it is offline. */
 	hostUrl: string | null;
-	/** Only the API can destroy a cloud workspace; its sandbox cannot. */
-	isCloud: boolean;
 }
 
 /** Codes the relay answers with itself, about its tunnel and not the delete. */
@@ -49,44 +46,9 @@ const RELAY_ERROR_CODES = new Set(["BAD_GATEWAY", "SERVICE_UNAVAILABLE"]);
 export function useDeleteWorkspace() {
 	const { t } = useLingui();
 	const queryClient = useQueryClient();
-	const cloud = useCloudWorkspaceActions();
 
 	return useCallback(
 		(target: DeleteWorkspaceTarget, onConfirmed?: () => void) => {
-			if (target.isCloud) {
-				Alert.alert(
-					t({
-						message: "Delete cloud workspace",
-					}),
-					t({
-						message: `Delete "${target.name}"? This shuts down its sandbox and everything in it.`,
-					}),
-					[
-						{
-							style: "cancel",
-							text: t({ message: "Cancel" }),
-						},
-						{
-							onPress: () => {
-								onConfirmed?.();
-								void cloud.remove(target.id).catch(() =>
-									Alert.alert(
-										t({
-											message: "Delete failed",
-										}),
-									),
-								);
-							},
-							style: "destructive",
-							text: t({
-								message: "Delete",
-							}),
-						},
-					],
-				);
-				return;
-			}
-
 			const { hostId, hostUrl } = target;
 			if (!hostId || !hostUrl) {
 				Alert.alert(
@@ -97,7 +59,7 @@ export function useDeleteWorkspace() {
 				return;
 			}
 			const client = getHostServiceClientByUrl(hostUrl);
-			const listKey = getHostWorkspacesQueryKey(hostId, hostUrl);
+			const listKey = getHostWorkspacesQueryPrefix(hostId);
 
 			const destroy = async (skipTeardown: boolean): Promise<void> => {
 				try {
@@ -162,8 +124,9 @@ export function useDeleteWorkspace() {
 							// Drop the row now. The host's archive lands within
 							// milliseconds and every later refetch agrees; a failure
 							// un-archives and the invalidate above brings it back.
-							queryClient.setQueryData<HostWorkspaceRow[]>(listKey, (rows) =>
-								rows?.filter((row) => row.id !== target.id),
+							queryClient.setQueriesData<HostWorkspaceRow[]>(
+								{ queryKey: listKey },
+								(rows) => rows?.filter((row) => row.id !== target.id),
 							);
 							onConfirmed?.();
 							void destroy(false);
@@ -176,7 +139,7 @@ export function useDeleteWorkspace() {
 				],
 			);
 		},
-		[cloud, queryClient, t],
+		[queryClient, t],
 	);
 }
 

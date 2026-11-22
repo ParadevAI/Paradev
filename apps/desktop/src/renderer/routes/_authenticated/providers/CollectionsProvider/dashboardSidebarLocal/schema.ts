@@ -15,6 +15,23 @@ const persistedDateSchema = z
 	.union([z.string(), z.date()])
 	.transform((value) => (typeof value === "string" ? new Date(value) : value));
 
+export const pendingChatHandoffSchema = z.object({
+	agentId: z.string(),
+	prompt: z.string(),
+	attachments: z
+		.array(
+			z.object({
+				attachmentId: z.string(),
+				name: z.string(),
+				mimeType: z.string(),
+			}),
+		)
+		.optional(),
+	modelId: z.string().optional(),
+	modeId: z.string().optional(),
+});
+export type PendingChatHandoff = z.infer<typeof pendingChatHandoffSchema>;
+
 export const dashboardSidebarProjectSchema = z.object({
 	projectId: z.string().uuid(),
 	createdAt: persistedDateSchema,
@@ -134,6 +151,7 @@ const changesFilterSchema = z.discriminatedUnion("kind", [
 		kind: z.literal("range"),
 		fromHash: z.string(),
 		toHash: z.string(),
+		includeFrom: z.boolean().optional(),
 	}),
 ]);
 
@@ -191,6 +209,17 @@ export const workspaceLocalStateSchema = z.object({
 		suppressedPullRequestUrl: z.string().nullable().default(null),
 	}),
 	paneLayout: paneWorkspaceStateSchema,
+	rightPaneLayout: paneWorkspaceStateSchema.optional(),
+	rightSidebarOpen: z.boolean().optional(),
+	activityPanelHidden: z.boolean().optional(),
+	// TODO(2027-01-31): delete with useRestoreExpandedPaneArea / restoreExpandedPaneArea once builds that wrote it are gone.
+	rightPaneAreaExpansion: z
+		.object({
+			movedTabIds: z.array(z.string()),
+			centerActiveTabId: z.string().nullable(),
+			rightActiveTabId: z.string().nullable(),
+		})
+		.optional(),
 	viewedFiles: z.array(z.string()).default([]),
 	recentlyViewedFiles: z
 		.array(
@@ -220,7 +249,7 @@ export const workspaceLocalStateSchema = z.object({
 		.default([]),
 	// Terminal presets tagged "auto-run on workspace creation" that matched
 	// this workspace's project when the create resolved. Presets live in
-	// renderer localStorage, so the host can't run them; the v2 workspace
+	// renderer localStorage, so the host can't run them; the workspace
 	// page drains this queue once on first open (see
 	// useRunWorkspaceCreationPresets) and clears it before running.
 	pendingCreationPresetIds: z.array(z.string()).default([]),
@@ -229,10 +258,7 @@ export const workspaceLocalStateSchema = z.object({
 	// the new chat is started with the conversation as its first message. The
 	// v2 workspace page drains this once on first open (see
 	// useRunPendingChatHandoff) and clears it before running.
-	pendingChatHandoff: z
-		.object({ agentId: z.string(), prompt: z.string() })
-		.nullable()
-		.default(null),
+	pendingChatHandoff: pendingChatHandoffSchema.nullable().default(null),
 });
 
 // Defaults for fields heal can synthesize. Identity fields (workspaceId,
@@ -265,7 +291,7 @@ const WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS = {
 		v1PaneId: string | null;
 	}>,
 	pendingCreationPresetIds: [] as string[],
-	pendingChatHandoff: null as { agentId: string; prompt: string } | null,
+	pendingChatHandoff: null as PendingChatHandoff | null,
 };
 
 /**
@@ -294,7 +320,7 @@ export const dashboardSidebarSectionSchema = z.object({
 	tag: z.string().nullable().default(null),
 });
 
-const v2ExecutionModeSchema = z.enum([
+const executionModeSchema = z.enum([
 	"split-pane",
 	"new-tab",
 	"new-tab-split-pane",
@@ -303,7 +329,7 @@ const v2ExecutionModeSchema = z.enum([
 
 // projectIds uses plain z.string() (not uuid) because v1 accepts arbitrary
 // string IDs and the migration copies them verbatim.
-export const v2TerminalPresetSchema = z.object({
+export const terminalPresetSchema = z.object({
 	id: z.string().uuid(),
 	name: z.string(),
 	description: z.string().optional(),
@@ -314,7 +340,7 @@ export const v2TerminalPresetSchema = z.object({
 	useAsWorkspaceRun: z.boolean().optional(),
 	applyOnWorkspaceCreated: z.boolean().optional(),
 	applyOnNewTab: z.boolean().optional(),
-	executionMode: v2ExecutionModeSchema.default("new-tab"),
+	executionMode: executionModeSchema.default("new-tab"),
 	tabOrder: z.number().int().default(0),
 	createdAt: persistedDateSchema,
 	// When set, the preset is live-linked to a host-service agent config id.
@@ -328,17 +354,16 @@ export type DashboardSidebarProjectRow = z.infer<
 	typeof dashboardSidebarProjectSchema
 >;
 export type WorkspaceLocalStateRow = z.infer<typeof workspaceLocalStateSchema>;
-export type WorkspaceRunState = z.infer<typeof workspaceRunStateSchema>;
 export type WorkspaceRunTerminalState = z.infer<
 	typeof workspaceRunTerminalStateSchema
 >;
 export type DashboardSidebarSectionRow = z.infer<
 	typeof dashboardSidebarSectionSchema
 >;
-export type V2TerminalPresetRow = z.infer<typeof v2TerminalPresetSchema>;
+export type TerminalPresetRow = z.infer<typeof terminalPresetSchema>;
 
 /**
- * Singleton row of v2 user-scoped preferences.
+ * Singleton row of user-scoped preferences.
  *
  * fileLinks / urlLinks / sidebarFileLinks map click tiers
  * (plain, ⇧, ⌘, ⌘⇧) to an action:
@@ -346,6 +371,7 @@ export type V2TerminalPresetRow = z.infer<typeof v2TerminalPresetSchema>;
  *   - "pane"      → open in current tab/pane (file viewer, in-app browser)
  *   - "newTab"    → open in a new tab/pane
  *   - "external"  → open in the external app (editor / system browser)
+ *   - "rightPane" → open URLs in the right pane area (falls back to "pane")
  *
  * Surfaces:
  *   - fileLinks / urlLinks: links embedded in terminal output and markdown.
@@ -359,7 +385,7 @@ export type V2TerminalPresetRow = z.infer<typeof v2TerminalPresetSchema>;
  *
  * Resolution and labels live in src/renderer/lib/clickPolicy.
  */
-const linkActionSchema = z.enum(["pane", "newTab", "external"]);
+const linkActionSchema = z.enum(["pane", "newTab", "external", "rightPane"]);
 
 export type LinkAction = z.infer<typeof linkActionSchema>;
 
@@ -469,7 +495,16 @@ export type SidebarProjectSortMode = z.infer<
 const persistedSidebarProjectSortModeSchema =
 	sidebarProjectSortModeSchema.catch("manual");
 
-export const v2UserPreferencesSchema = z.object({
+const sidebarProjectHostFilterSchema = z.enum(["all", "local", "cloud"]);
+
+export type SidebarProjectHostFilter = z.infer<
+	typeof sidebarProjectHostFilterSchema
+>;
+
+const persistedSidebarProjectHostFilterSchema =
+	sidebarProjectHostFilterSchema.catch("all");
+
+export const userPreferencesSchema = z.object({
 	id: z.literal("preferences"),
 	fileLinks: linkTierMapSchema.default(DEFAULT_LINK_TIER_MAP),
 	urlLinks: linkTierMapSchema.default(DEFAULT_URL_LINKS),
@@ -481,13 +516,19 @@ export const v2UserPreferencesSchema = z.object({
 	rightSidebarOpen: z.boolean().default(true),
 	rightSidebarTab: z.enum(["changes", "files"]).default("changes"),
 	rightSidebarWidth: z.number().default(340),
+	rightPaneAreaWidth: z.number().optional(),
+	changesFileListWidth: z.number().optional(),
+	changesFileListOpen: z.boolean().default(true),
 	deleteLocalBranch: z.boolean().default(false),
-	showPresetsBar: z.boolean().default(true),
+	showPresetsBar: z.boolean().default(false),
 	changesViewMode: changesViewModeSchema.default("folders"),
 	// Ordering of the dashboard sidebar's Projects list; manual = drag order.
 	sidebarProjectSortMode: persistedSidebarProjectSortModeSchema,
+	// Which workspaces the Projects list shows: every row, only the ones on
+	// a device, or only cloud sandboxes.
+	sidebarProjectHostFilter: persistedSidebarProjectHostFilterSchema,
 	// Built-in (synthetic, app-shipped) presets the user hid from the preset
-	// bar. Synthetic presets have no v2TerminalPresets row, so visibility can't
+	// bar. Synthetic presets have no terminalPresets row, so visibility can't
 	// live on the row's pinnedToBar like user presets. Pruned against
 	// KNOWN_BUILTIN_PRESET_IDS at heal time so retired ids can't persist.
 	hiddenBuiltinPresetIds: z.array(z.string()).default([]),
@@ -505,11 +546,11 @@ export const KNOWN_BUILTIN_PRESET_IDS = ["superset-cli"] as const;
 
 export const MAX_FAVORITE_PAGE_IDS = 200;
 
-export type V2UserPreferencesRow = z.infer<typeof v2UserPreferencesSchema>;
+export type UserPreferencesRow = z.infer<typeof userPreferencesSchema>;
 
 export const V2_USER_PREFERENCES_ID = "preferences" as const;
 
-export const DEFAULT_V2_USER_PREFERENCES: V2UserPreferencesRow = {
+export const DEFAULT_V2_USER_PREFERENCES: UserPreferencesRow = {
 	id: V2_USER_PREFERENCES_ID,
 	fileLinks: DEFAULT_LINK_TIER_MAP,
 	urlLinks: DEFAULT_URL_LINKS,
@@ -521,10 +562,12 @@ export const DEFAULT_V2_USER_PREFERENCES: V2UserPreferencesRow = {
 	rightSidebarOpen: true,
 	rightSidebarTab: "changes",
 	rightSidebarWidth: 340,
+	changesFileListOpen: true,
 	deleteLocalBranch: false,
-	showPresetsBar: true,
+	showPresetsBar: false,
 	changesViewMode: "folders",
 	sidebarProjectSortMode: "manual",
+	sidebarProjectHostFilter: "all",
 	hiddenBuiltinPresetIds: [],
 	favoritePageIds: [],
 	hiddenTagFolders: {},
@@ -549,6 +592,10 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		// undefined node. Passed through untouched before, which white-screened
 		// the workspace view on a corrupt layout.
 		paneLayout: sanitizePaneLayout(r.paneLayout),
+		rightPaneLayout:
+			r.rightPaneLayout === undefined
+				? undefined
+				: sanitizePaneLayout(r.rightPaneLayout),
 		viewedFiles:
 			r.viewedFiles ?? WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.viewedFiles,
 		recentlyViewedFiles:
@@ -577,16 +624,16 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 }
 
 /**
- * Heal a stored v2 user-preferences row against current defaults. Used by the
+ * Heal a stored user-preferences row against current defaults. Used by the
  * localStorage collection's read-time parser so rows persisted before a field
  * was added (top-level or nested in a LinkTierMap) don't surface as undefined
  * to consumers. Per-tier defaults vary by map, so we deep-merge each tier map
  * against its own default rather than relying on a single Zod default.
  */
-export function healV2UserPreferences(raw: unknown): V2UserPreferencesRow {
+export function healUserPreferences(raw: unknown): UserPreferencesRow {
 	const r = (
 		raw && typeof raw === "object" ? raw : {}
-	) as Partial<V2UserPreferencesRow>;
+	) as Partial<UserPreferencesRow>;
 	const sidebarFileLinks = r.sidebarFileLinks
 		? {
 				...DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks,
@@ -620,6 +667,9 @@ export function healV2UserPreferences(raw: unknown): V2UserPreferencesRow {
 		},
 		sidebarProjectSortMode: persistedSidebarProjectSortModeSchema.parse(
 			r.sidebarProjectSortMode,
+		),
+		sidebarProjectHostFilter: persistedSidebarProjectHostFilterSchema.parse(
+			r.sidebarProjectHostFilter,
 		),
 		// Prune retired/stray built-in ids so the array stays bounded.
 		hiddenBuiltinPresetIds: (Array.isArray(r.hiddenBuiltinPresetIds)

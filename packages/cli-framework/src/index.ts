@@ -1,3 +1,4 @@
+export { buildOptions } from "./build";
 export type { Audience, CommandConfig, CommandResult } from "./command";
 export { createCommand } from "./command";
 export {
@@ -5,7 +6,7 @@ export {
 	generateZshCompletion,
 } from "./completion";
 export type { CliConfig } from "./config";
-export { defineConfig } from "./config";
+export { defineConfig, loadConfig } from "./config";
 export { CLIError, suggestSimilar } from "./errors";
 export type { CliDescription, CommandNode } from "./help";
 export {
@@ -28,7 +29,7 @@ export { createCommandsPlugin } from "./plugin";
 export type { CliCommand, CliGroup } from "./router";
 export { buildTree, filterByAudience, routeCommand } from "./router";
 export type { CommandTree, RunOptions } from "./runner";
-export { introspectCli, run } from "./runner";
+export { formatError, introspectCli, run } from "./runner";
 export type {
 	CliSchema,
 	SchemaArg,
@@ -36,3 +37,4 @@ export type {
 	SchemaOption,
 } from "./schema";
 export { generateSchema } from "./schema";
+export { wrapText } from "./wrap-text";

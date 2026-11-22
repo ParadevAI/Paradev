@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { Client } from "@upstash/qstash";
 import { env } from "../../env";
 
@@ -21,6 +22,8 @@ export async function publishCloudWorkspaceJob<Body>(args: {
 	path: string;
 	body: Body;
 	delaySeconds?: number;
+	/** QStash drops a second message with the same id; local runs do not dedupe. */
+	deduplicationId?: string;
 	runLocally: (body: Body) => Promise<unknown>;
 }): Promise<void> {
 	if (isLocalApi) {
@@ -37,7 +40,18 @@ export async function publishCloudWorkspaceJob<Body>(args: {
 	await qstash.publishJSON({
 		url: `${env.NEXT_PUBLIC_API_URL}${args.path}`,
 		body: args.body,
+		headers: traceHeaders(),
 		retries: 2,
 		...(args.delaySeconds ? { delay: args.delaySeconds } : {}),
+		...(args.deduplicationId ? { deduplicationId: args.deduplicationId } : {}),
 	});
+}
+
+/** The queuing span's `sentry-trace` and `baggage`, which QStash forwards so the job can continue its trace. */
+function traceHeaders(): Record<string, string> {
+	return Object.fromEntries(
+		Object.entries(Sentry.getTraceData()).filter(
+			(entry): entry is [string, string] => entry[1] !== undefined,
+		),
+	);
 }

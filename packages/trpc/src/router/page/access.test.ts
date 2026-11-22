@@ -1,7 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { SelectPage } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
-import { assertPageReadable, assertPageWritable } from "./access";
+import {
+	assertPageCommentable,
+	assertPageOwned,
+	assertPageReadable,
+	assertPageWritable,
+	pageAccess,
+} from "./access";
 
 const OWNER = "user-owner";
 const OTHER = "user-other";
@@ -66,5 +72,99 @@ describe("assertPageWritable", () => {
 	test("a page that was never taken down is unaffected", () => {
 		const row = page({ takenDownAt: null });
 		expect(codeOf(() => assertPageWritable(row, OWNER))).toBeUndefined();
+	});
+});
+
+describe("pageAccess", () => {
+	const at = (
+		overrides: Partial<SelectPage>,
+		shareRole: "view" | "comment" | null,
+	) => pageAccess(page(overrides), OTHER, shareRole);
+
+	test("a private page shared with someone becomes readable to them", () => {
+		expect(at({ visibility: "just_me" }, "view").canRead).toBe(true);
+		expect(at({ visibility: "just_me" }, null).canRead).toBe(false);
+	});
+
+	test("comment access follows the share role on a private page", () => {
+		expect(at({ visibility: "just_me" }, "view").canComment).toBe(false);
+		expect(at({ visibility: "just_me" }, "comment").canComment).toBe(true);
+	});
+
+	test("general access comments only when its role allows it", () => {
+		expect(at({ organizationRole: "comment" }, null).canComment).toBe(true);
+		expect(at({ organizationRole: "view" }, null).canComment).toBe(false);
+	});
+
+	test("a comment share outranks a view-only organization", () => {
+		expect(at({ organizationRole: "view" }, "comment").canComment).toBe(true);
+	});
+
+	test("only the owner manages, and not once the page is taken down", () => {
+		expect(pageAccess(page(), OWNER, null).canManage).toBe(true);
+		expect(at({}, "comment").canManage).toBe(false);
+		expect(
+			pageAccess(page({ takenDownAt: new Date() }), OWNER, null).canManage,
+		).toBe(false);
+	});
+});
+
+describe("assertPageCommentable", () => {
+	test("a viewer is told they can view but not comment", () => {
+		const row = page({ organizationRole: "view" });
+		expect(codeOf(() => assertPageCommentable(row, OTHER, null))).toBe(
+			"FORBIDDEN",
+		);
+	});
+
+	test("an outsider to a private page still gets NOT_FOUND", () => {
+		const row = page({ visibility: "just_me" });
+		expect(codeOf(() => assertPageCommentable(row, OTHER, null))).toBe(
+			"NOT_FOUND",
+		);
+	});
+});
+
+describe("assertPageWritable with a share", () => {
+	test("someone a private page is shared with is told they can't change it", () => {
+		const row = page({ visibility: "just_me" });
+		expect(codeOf(() => assertPageWritable(row, OTHER, "comment"))).toBe(
+			"FORBIDDEN",
+		);
+	});
+});
+
+describe("editors", () => {
+	test("an edit share lets someone change a private page, comment, but not delete it", () => {
+		const row = page({ visibility: "just_me" });
+		expect(
+			codeOf(() => assertPageWritable(row, OTHER, "edit")),
+		).toBeUndefined();
+		expect(pageAccess(row, OTHER, "edit")).toMatchObject({
+			canComment: true,
+			canEdit: true,
+			canManage: false,
+		});
+		expect(codeOf(() => assertPageOwned(row, OTHER))).toBe("FORBIDDEN");
+	});
+
+	test("an org-wide edit role makes every member an editor of an org page", () => {
+		const row = page({ organizationRole: "edit" });
+		expect(codeOf(() => assertPageWritable(row, OTHER))).toBeUndefined();
+		expect(
+			codeOf(() =>
+				assertPageWritable(
+					page({ organizationRole: "edit", visibility: "just_me" }),
+					OTHER,
+				),
+			),
+		).toBe("NOT_FOUND");
+	});
+
+	test("nobody edits a page that was taken down", () => {
+		const row = page({ takenDownAt: new Date() });
+		expect(codeOf(() => assertPageWritable(row, OTHER, "edit"))).toBe(
+			"FORBIDDEN",
+		);
 	});
 });

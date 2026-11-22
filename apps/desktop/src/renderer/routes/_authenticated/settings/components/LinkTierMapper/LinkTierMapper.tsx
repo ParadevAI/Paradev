@@ -17,6 +17,7 @@ import {
 	type Surface,
 } from "renderer/lib/clickPolicy";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
 type SlotValue = LinkAction | "none";
@@ -32,13 +33,15 @@ function fromSlot(slot: SlotValue): LinkAction | null {
 	return slot === "none" ? null : slot;
 }
 
-export interface LinkTierMapperProps {
+interface LinkTierMapperProps {
 	title: string;
 	description: string;
 	value: LinkTierMap;
 	onChange: (next: LinkTierMap) => void;
 	idPrefix: string;
 	surface: Surface;
+	/** What an unbound plain click does here. Hides "Do nothing" for it. */
+	plainDefault?: LinkAction;
 }
 
 export function LinkTierMapper({
@@ -48,8 +51,10 @@ export function LinkTierMapper({
 	onChange,
 	idPrefix,
 	surface,
+	plainDefault,
 }: LinkTierMapperProps) {
 	const searchQuery = useSettingsSearchQuery();
+	const isRightPaneAreaEnabled = useRightPaneAreaEnabled() === true;
 	const pick = useCallback(
 		(tier: LinkTier, nextSlot: SlotValue) => {
 			const nextAction = fromSlot(nextSlot);
@@ -70,6 +75,12 @@ export function LinkTierMapper({
 			<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
 				{TIERS.map((tier) => {
 					const id = `${idPrefix}-${tier}`;
+					const fallback = tier === "plain" ? plainDefault : undefined;
+					const actions: LinkAction[] =
+						surface === "url" &&
+						(isRightPaneAreaEnabled || value[tier] === "rightPane")
+							? [...ACTIONS, "rightPane"]
+							: ACTIONS;
 					return (
 						<div
 							key={tier}
@@ -79,7 +90,7 @@ export function LinkTierMapper({
 								{modifierLabel(tier)}
 							</Label>
 							<Select
-								value={toSlot(value[tier])}
+								value={toSlot(value[tier] ?? fallback ?? null)}
 								onValueChange={(v) => pick(tier, v as SlotValue)}
 							>
 								<SelectTrigger
@@ -90,10 +101,16 @@ export function LinkTierMapper({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="none">
-										<Trans>Do nothing</Trans>
-									</SelectItem>
-									{ACTIONS.map((action) => (
+									{!fallback && (
+										<SelectItem value="none">
+											{surface === "url" && tier === "plain" ? (
+												<Trans>Show link menu</Trans>
+											) : (
+												<Trans>Do nothing</Trans>
+											)}
+										</SelectItem>
+									)}
+									{actions.map((action) => (
 										<SelectItem key={action} value={action}>
 											{actionLabel(action, surface)}
 										</SelectItem>

@@ -13,6 +13,7 @@ type LocalStateRow = {
 		sectionId: string | null;
 		isHidden: boolean;
 	};
+	rightSidebarOpen?: boolean;
 };
 
 type SectionRow = { sectionId: string; projectId: string; tabOrder: number };
@@ -47,23 +48,23 @@ function draggedRow(
 }
 
 function makeCollections(rows: LocalStateRow[], sections: SectionRow[] = []) {
-	const v2WorkspaceLocalState = makeCollection(
+	const workspaceLocalState = makeCollection(
 		(row: LocalStateRow) => row.workspaceId,
 		rows,
 	);
 	const collections = {
-		v2WorkspaceLocalState,
-		v2SidebarSections: makeCollection(
+		workspaceLocalState,
+		sidebarSections: makeCollection(
 			(row: SectionRow) => row.sectionId,
 			sections,
 		),
-		v2SidebarProjects: makeCollection(
+		sidebarProjects: makeCollection(
 			(row: { projectId: string }) => row.projectId,
 			[],
 		),
 	} as unknown as AppCollections;
 	const projectOrder = (projectId: string) =>
-		[...v2WorkspaceLocalState.state.values()]
+		[...workspaceLocalState.state.values()]
 			.filter((row) => row.sidebarState.projectId === projectId)
 			.sort(
 				(left, right) =>
@@ -71,7 +72,7 @@ function makeCollections(rows: LocalStateRow[], sections: SectionRow[] = []) {
 			)
 			.map((row) => row.workspaceId);
 	const tabOrderOf = (workspaceId: string) =>
-		v2WorkspaceLocalState.state.get(workspaceId)?.sidebarState.tabOrder;
+		workspaceLocalState.state.get(workspaceId)?.sidebarState.tabOrder;
 	return { collections, projectOrder, tabOrderOf };
 }
 
@@ -148,5 +149,32 @@ describe("writeWorkspacePaneLayout", () => {
 		create(collections, "alpha");
 
 		expect(projectOrder(PROJECT_ID)).toEqual(["zeta", "alpha"]);
+	});
+
+	it("starts a new workspace with the right sidebar closed", () => {
+		const { collections } = makeCollections([]);
+
+		create(collections, "beta");
+
+		expect(collections.workspaceLocalState.get("beta")?.rightSidebarOpen).toBe(
+			false,
+		);
+	});
+
+	it("keeps the right sidebar state of a workspace that already has a row", () => {
+		const { collections } = makeCollections([
+			{ ...draggedRow("alpha", 1), rightSidebarOpen: true },
+			draggedRow("zeta", 2),
+		]);
+
+		create(collections, "alpha");
+		create(collections, "zeta");
+
+		expect(collections.workspaceLocalState.get("alpha")?.rightSidebarOpen).toBe(
+			true,
+		);
+		expect(
+			collections.workspaceLocalState.get("zeta")?.rightSidebarOpen,
+		).toBeUndefined();
 	});
 });

@@ -1,11 +1,11 @@
+import type { TagFolderContext } from "@superset/shared/workspace-tag-folders";
 import { useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import {
 	mergeHostTagFoldersWithLegacy,
 	useHostTagFolders,
 } from "renderer/hooks/host-projects/useHostTagFolders";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
-import type { TagFolderContext } from "./workspaceTagFolders";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 
 /**
  * The one presentation context every membership pass shares: host-side tag
@@ -16,7 +16,7 @@ import type { TagFolderContext } from "./workspaceTagFolders";
 export function useTagFolderContext(): TagFolderContext {
 	const { hostResults: tagFolderHostResults } = useHostTagFolders();
 	const { hostResults: projectHostResults } = useHostProjects();
-	const { preferences } = useV2UserPreferences();
+	const { preferences } = useUserPreferences();
 	const hiddenTagFolders = preferences.hiddenTagFolders;
 	return useMemo(
 		() => ({

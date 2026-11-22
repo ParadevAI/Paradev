@@ -1,0 +1,1 @@
+export { useReleaseNotesCard } from "./useReleaseNotesCard";

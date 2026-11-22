@@ -1,14 +1,22 @@
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import type { RouterOutputs } from "@superset/trpc";
+import {
+	type HostConnectionStatus,
+	peekEventBusConnectionStatus,
+} from "@superset/workspace-client";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
+import { hostPresence } from "./utils/hostPresence";
 
 type HostRow = RouterOutputs["host"]["roster"][number];
 
-export type KnownHostRow = HostRow & { isOnline: boolean };
+export type KnownHostRow = HostRow & {
+	isOnline: boolean;
+	isConnecting: boolean;
+};
 
 const NO_ROWS: HostRow[] = [];
 
@@ -54,7 +62,7 @@ export function useKnownHosts(): {
 		() =>
 			rows.map((row) => ({
 				...row,
-				isOnline: presence.get(row.machineId) ?? false,
+				...hostPresence(presence.get(row.machineId)),
 			})),
 		[rows, presence],
 	);
@@ -64,7 +72,7 @@ export function useKnownHosts(): {
 function useRelayPresence(
 	relayUrl: string,
 	rows: HostRow[],
-): Map<string, boolean> {
+): Map<string, HostConnectionStatus> {
 	const hostUrls = useMemo(
 		() =>
 			rows.map(
@@ -76,15 +84,13 @@ function useRelayPresence(
 			),
 		[rows, relayUrl],
 	);
-	const [presence, setPresence] = useState<Map<string, boolean>>(
-		() => new Map(),
-	);
+	const [presence, setPresence] = useState(() => peekPresence(hostUrls));
 	useEffect(() => {
 		const read = () =>
 			new Map(
 				hostUrls.map(([machineId, hostUrl]) => [
 					machineId,
-					getHostEventBus(hostUrl).getConnectionStatus().state === "open",
+					getHostEventBus(hostUrl).getConnectionStatus(),
 				]),
 			);
 		setPresence(read());
@@ -103,5 +109,16 @@ function useRelayPresence(
 			for (const cleanup of cleanups) cleanup();
 		};
 	}, [hostUrls]);
+	return presence;
+}
+
+function peekPresence(
+	hostUrls: ReadonlyArray<readonly [string, string]>,
+): Map<string, HostConnectionStatus> {
+	const presence = new Map<string, HostConnectionStatus>();
+	for (const [machineId, hostUrl] of hostUrls) {
+		const status = peekEventBusConnectionStatus(hostUrl);
+		if (status) presence.set(machineId, status);
+	}
 	return presence;
 }

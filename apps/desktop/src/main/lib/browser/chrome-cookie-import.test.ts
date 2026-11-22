@@ -6,7 +6,10 @@ import {
 	deriveCookieKey,
 	type ImportedCookie,
 	importCookies,
+	isProtectedCookieHost,
 	mapCookieRow,
+	mapCookieRows,
+	PROTECTED_COOKIE_DOMAINS,
 	safeStorageServiceFor,
 } from "./chrome-cookie-import";
 
@@ -33,11 +36,47 @@ function encryptV10(
 
 const KEY = deriveCookieKey("test-password");
 
+describe("isProtectedCookieHost", () => {
+	it("protects both production domains by default", () => {
+		expect(PROTECTED_COOKIE_DOMAINS).toEqual(["superset.sh", "paradev.com"]);
+		expect(isProtectedCookieHost("superset.sh")).toBe(true);
+		expect(isProtectedCookieHost(".app.superset.sh")).toBe(true);
+		expect(isProtectedCookieHost(".app.paradev.com")).toBe(true);
+		expect(isProtectedCookieHost("notsuperset.sh")).toBe(false);
+	});
+
+	it("protects both the configured and the legacy domain after a change", () => {
+		const domains = ["example.org", "superset.sh"];
+		for (const host of [
+			"example.org",
+			".example.org",
+			"app.example.org",
+			".superset.sh",
+			"api.superset.sh",
+		]) {
+			expect(isProtectedCookieHost(host, domains)).toBe(true);
+		}
+		expect(isProtectedCookieHost("notexample.org", domains)).toBe(false);
+		expect(isProtectedCookieHost("example.com", domains)).toBe(false);
+	});
+
+	it("compares hosts and configured domains case-insensitively", () => {
+		const domains = ["Example.ORG"];
+		expect(isProtectedCookieHost("example.org", domains)).toBe(true);
+		expect(isProtectedCookieHost(".APP.example.org", domains)).toBe(true);
+		expect(isProtectedCookieHost("App.Example.Org", domains)).toBe(true);
+		expect(isProtectedCookieHost("notexample.org", domains)).toBe(false);
+	});
+});
+
 describe("safeStorageServiceFor", () => {
 	it("maps browser keys to their Keychain service names", () => {
 		expect(safeStorageServiceFor("chrome")).toBe("Chrome Safe Storage");
 		expect(safeStorageServiceFor("brave")).toBe("Brave Safe Storage");
 		expect(safeStorageServiceFor("arc")).toBe("Arc Safe Storage");
+		expect(safeStorageServiceFor("aside")).toBe("Aside Safe Storage");
+		expect(safeStorageServiceFor("helium")).toBe("Helium Storage Key");
+		expect(safeStorageServiceFor("opera-gx")).toBe("Opera Safe Storage");
 		expect(safeStorageServiceFor("unknown")).toBeNull();
 	});
 });
@@ -79,6 +118,38 @@ describe("decryptCookieValue", () => {
 		expect(
 			decryptCookieValue(enc, deriveCookieKey("other-password")),
 		).toBeNull();
+	});
+});
+
+describe("mapCookieRows", () => {
+	const row = (encrypted_value: Buffer) => ({
+		host_key: ".example.com",
+		name: "sid",
+		value: "",
+		encrypted_value,
+		path: "/",
+		expires_utc: 0,
+		is_secure: 1,
+		is_httponly: 1,
+		samesite: 1,
+		is_persistent: 0,
+	});
+
+	it("returns an empty list for a profile with no cookies", () => {
+		expect(mapCookieRows([], KEY)).toEqual([]);
+	});
+
+	it("returns null when no cookie decrypts with the key", () => {
+		const otherKey = deriveCookieKey("another-browser");
+		expect(mapCookieRows([row(encryptV10("a", otherKey))], KEY)).toBeNull();
+	});
+
+	it("keeps the cookies that decrypt", () => {
+		const cookies = mapCookieRows(
+			[row(encryptV10("a", KEY)), row(Buffer.from("v20xxxxxxxxxxxxxxxx"))],
+			KEY,
+		);
+		expect(cookies?.map((cookie) => cookie.value)).toEqual(["a"]);
 	});
 });
 
@@ -394,7 +465,7 @@ describe("importCookies", () => {
 		]);
 	});
 
-	it("skips Superset's own hosts, host-only or domain", async () => {
+	it("skips Paradev's own hosts, host-only or domain", async () => {
 		const s = fakeSession();
 		const result = await importCookies(s.session, [
 			imported("app.superset.sh", "session", "x"),

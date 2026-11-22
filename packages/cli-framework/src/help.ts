@@ -6,6 +6,8 @@ export type CommandNode = {
 	aliases?: string[];
 	children: Map<string, CommandNode>;
 	hasCommand: boolean;
+	/** Runnable, but kept out of help and completion. */
+	hidden?: boolean;
 	options?: Record<string, ProcessedBuilderConfig>;
 	args?: ProcessedBuilderConfig[];
 };
@@ -13,6 +15,8 @@ export type CommandNode = {
 /** A whole CLI, every node populated; the root node's options are the globals. */
 export interface CliDescription {
 	name: string;
+	/** Other executable names that run this CLI; completion registers them too. */
+	binAliases?: string[];
 	version: string;
 	root: CommandNode;
 }
@@ -26,7 +30,10 @@ export function visibleChildren(
 	node: CommandNode,
 ): Array<[string, CommandNode]> {
 	return [...node.children.entries()]
-		.filter(([, child]) => child.children.size > 0 || child.hasCommand)
+		.filter(
+			([, child]) =>
+				!child.hidden && (child.children.size > 0 || child.hasCommand),
+		)
 		.sort(([a], [b]) => byName(a, b));
 }
 
@@ -175,14 +182,14 @@ export function generateGroupHelp(
 		lines.push("");
 	}
 
-	if (node.children.size > 0) {
+	const listed = [...node.children.entries()]
+		.filter(([, child]) => !child.hidden)
+		.sort(([a], [b]) => a.localeCompare(b));
+	if (listed.length > 0) {
 		lines.push("Commands:");
-		const entries = [...node.children.entries()].sort(([a], [b]) =>
-			a.localeCompare(b),
-		);
-		const maxLen = Math.max(...entries.map(([n]) => n.length));
+		const maxLen = Math.max(...listed.map(([n]) => n.length));
 
-		for (const [cmdName, child] of entries) {
+		for (const [cmdName, child] of listed) {
 			lines.push(`  ${cmdName.padEnd(maxLen + 2)}${child.description ?? ""}`);
 		}
 		lines.push("");

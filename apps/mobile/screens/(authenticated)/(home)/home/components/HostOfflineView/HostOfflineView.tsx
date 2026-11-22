@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { formatRelativeTime } from "@superset/i18n/format";
+import { BRAND } from "@superset/shared/brand";
 import { useRouter } from "expo-router";
 import { CloudOff, Moon, Power, ToggleLeft } from "lucide-react-native";
 import { useState } from "react";
@@ -8,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
+import { useRefreshHostsPresence } from "@/screens/(authenticated)/(home)/home/hooks/useRefreshHostsPresence";
+import { getLastSeenTime } from "@/screens/(authenticated)/(home)/utils/getLastSeenTime";
 import { HintRow } from "./components/HintRow";
 import { HostPresenceUnknownView } from "./components/HostPresenceUnknownView";
 import { HostSetupPendingView } from "./components/HostSetupPendingView";
-import { useRefreshHostsPresence } from "./hooks/useRefreshHostsPresence";
-import { getLastSeenTime } from "./utils/getLastSeenTime";
 
 export function HostOfflineView({
 	hostName,
@@ -22,6 +23,7 @@ export function HostOfflineView({
 	lastSeenAt: number | null | undefined;
 }) {
 	const { t } = useLingui();
+	const appName = BRAND.NAME;
 	const router = useRouter();
 	const { hosts } = useOrgHosts();
 	const refreshPresence = useRefreshHostsPresence();
@@ -65,7 +67,7 @@ export function HostOfflineView({
 				<HintRow
 					leading={<Icon as={Power} className="text-muted-foreground size-4" />}
 				>
-					<Trans>Superset may be closed</Trans>
+					<Trans>{appName} may be closed</Trans>
 				</HintRow>
 				<HintRow
 					leading={

@@ -7,6 +7,7 @@ import {
 	disposeTerminalHostClient,
 	getTerminalHostClient,
 } from "main/lib/terminal-host/client";
+import { terminalHostSocketPath } from "../terminal-host/socket-path";
 
 const TERMINAL_STATE_PATHS = [
 	"terminal-history",
@@ -34,7 +35,10 @@ export async function resetTerminalStateDev(): Promise<void> {
 	}
 
 	for (const relativePath of TERMINAL_STATE_PATHS) {
-		const fullPath = join(SUPERSET_HOME_DIR, relativePath);
+		const fullPath =
+			relativePath === "terminal-host.sock"
+				? terminalHostSocketPath(SUPERSET_HOME_DIR)
+				: join(SUPERSET_HOME_DIR, relativePath);
 		await rm(fullPath, { recursive: true, force: true }).catch((error) => {
 			console.warn(
 				"[dev/reset-terminal-state] Failed to remove state path:",

@@ -1,22 +1,61 @@
 import { randomUUID } from "node:crypto";
+import {
+	type ChatSelections,
+	type SelectionCategory,
+	selectionCategoryOf,
+} from "@superset/chat/core";
 import type {
 	ApprovalRequest,
+	AvailableCommand,
 	Decision,
+	DiscoverSessionsResult,
+	FormField,
 	Item,
-	Plan,
+	ItemAttachment,
+	SessionConfigOption,
 	SessionState,
+	SessionUsage,
+	SubagentStatus,
 	ToolCall,
-	ToolContent,
-	ToolKind,
 	Turn,
+	TurnError,
+	UsageLimit,
 	UserContent,
 } from "@superset/chat/protocol";
+import { AGENT_DEFAULT_MODE, isHiddenText } from "@superset/chat/protocol";
+import { z } from "zod";
+import { BackgroundTasks } from "../backgroundTasks";
 import { EventQueue } from "../eventQueue";
+import { classifyTurnFailure } from "../turnFailure";
 import type {
 	AdapterEvent,
 	HarnessAdapter,
 	HarnessStartOptions,
+	ResolveAttachment,
+	ResolvedAttachment,
 } from "../types";
+import {
+	type RefusedWindow,
+	refusedWindow,
+	USAGE_LIMIT_TEXT,
+} from "../usageLimit";
+import {
+	AIR_ASYNC_TASK_STOP_METHOD,
+	AIR_AUTONOMOUS_TURN_TASK_TYPE,
+	AIR_CLIENT_META,
+	airAsyncTaskProgressSchema,
+	airAsyncTaskSpawnedSchema,
+	airAsyncTaskStateSchema,
+	airForkPointMeta,
+	airPermissionReason,
+	airSubagentSpawnedSchema,
+	airSubagentStateSchema,
+	isCompactionCall,
+	isSubagentControlCall,
+	isTerminalAirState,
+} from "./air";
+import { type AcpImageSource, imageSourceOf } from "./imageBlocks";
+import { imageDimensions } from "./imageDimensions";
 import type {
 	AcpNotification,
 	AcpServerRequest,
@@ -24,26 +63,45 @@ import type {
 	AcpTransportHandlers,
 	SpawnAcpOptions,
 } from "./rpcClient";
-import { AcpRpcClient, spawnAcpTransport } from "./rpcClient";
 import {
+	AcpRpcClient,
+	AcpRpcError,
+	AcpTimeoutError,
+	spawnAcpTransport,
+} from "./rpcClient";
+import { messageIdOf, SessionStream } from "./sessionStream";
+import { startOptionId } from "./startOption";
+import type {
+	AcpConfigSelectOption,
+	AcpElicitationProperty,
+	AcpPromptUsage,
+	AcpUsageUpdate,
+} from "./wire";
+import {
+	ACP_STEERING_METHOD,
 	type AcpContentBlock,
-	type AcpToolCallContent,
+	type AcpSubagentUpdate,
 	acpAvailableCommandsUpdateSchema,
 	acpConfigOptionUpdateSchema,
 	acpContentBlockSchema,
+	acpCreateElicitationParamsSchema,
 	acpInitializeResponseSchema,
-	acpMessageSchema,
+	acpListSessionsResponseSchema,
 	acpNewSessionResponseSchema,
-	acpPlanSchema,
-	acpPlanUpdateSchema,
 	acpPromptResponseSchema,
 	acpRequestPermissionParamsSchema,
+	acpSessionInfoUpdateSchema,
+	acpSessionMessageChunkSchema,
+	acpSessionMessageSchema,
 	acpSessionNotificationSchema,
 	acpSessionUpdateSchema,
 	acpStateUpdateSchema,
+	acpSteeringResponseSchema,
 	acpSubagentUpdateSchema,
-	acpToolCallContentChunkSchema,
 	acpToolCallUpdateSchema,
+	acpUsageUpdateSchema,
+	acpUsdCostSchema,
+	SUBAGENT_BACKGROUND_METHOD,
 } from "./wire";
 
 /**
@@ -54,65 +112,37 @@ import {
  */
 const LATEST_PROTOCOL_VERSION = 2;
 
+const FAST_CONFIG_ID = "fast";
+const TOGGLE_ON = "on";
+const TOGGLE_OFF = "off";
+
 /** Who `initialize` says we are; v2 requires a name and a version. */
 const CLIENT_INFO = { name: "superset", version: "1.0.0" };
 
-const TOOL_KIND_BY_ACP: Record<string, ToolKind> = {
-	read: "read",
-	edit: "edit",
-	delete: "delete",
-	move: "move",
-	search: "search",
-	execute: "execute",
-	think: "think",
-	fetch: "fetch",
-	switch_mode: "other",
-	other: "other",
-};
-
-function toolKind(kind: string | undefined): ToolKind {
-	return (kind && TOOL_KIND_BY_ACP[kind]) || "other";
+function clientCapabilitiesFor(protocolVersion: number) {
+	const heldAtV1 = protocolVersion < LATEST_PROTOCOL_VERSION;
+	return {
+		fs: { readTextFile: false, writeTextFile: false },
+		terminal: false,
+		elicitation: { form: {} },
+		...(heldAtV1 ? { plan: {} } : {}),
+		session: {
+			compaction: {},
+			notices: {},
+			...(heldAtV1 ? { configOptions: { boolean: {} } } : {}),
+		},
+		_meta: AIR_CLIENT_META,
+	};
 }
 
-function toolStatus(status: string | undefined): ToolCall["status"] {
-	switch (status) {
-		case "completed":
-			return "completed";
-		case "failed":
-			return "failed";
-		// v2 added `cancelled` alongside `pending`, which is still pre-run.
-		case "cancelled":
-			return "canceled";
-		default:
-			return "running";
-	}
+function unconfirmedSelectionMessage(error: AcpTimeoutError): string {
+	return `${error.message}. The agent can still apply the change, so the selection stays as you set it.`;
 }
 
-function toolCallSettled(status: string | null | undefined): boolean {
-	return (
-		status === "completed" || status === "failed" || status === "cancelled"
-	);
-}
-
-function planEntryStatus(status: string): Plan["entries"][number]["status"] {
-	if (status === "in_progress" || status === "completed") return status;
-	return "pending";
-}
-
-function planEntryItems(
-	entries: ReadonlyArray<{ content: string; status: string }>,
-): Plan["entries"] {
-	return entries.map((entry) => ({
-		text: entry.content,
-		status: planEntryStatus(entry.status),
-	}));
-}
-
-function messageText(content: readonly AcpContentBlock[]): string {
-	return content
-		.filter((block) => block.type === "text")
-		.map((block) => block.text ?? "")
-		.join("");
+function commandCategory(
+	category: unknown,
+): Pick<AvailableCommand, "category"> {
+	return category === "native" || category === "mcp" ? { category } : {};
 }
 
 /**
@@ -126,7 +156,121 @@ const SESSION_STATUS_BY_ACP_STATE: Record<string, SessionState["status"]> = {
 	requires_action: "awaiting_input",
 };
 
+const ACTIVE_SUBAGENT_STATES = new Set(["requires_action", "unknown"]);
+
+const SUBAGENT_STATUS_BY_END_STATE: Record<string, SubagentStatus> = {
+	failed: "failed",
+	disconnected: "failed",
+	cancelled: "stopped",
+	stopped: "stopped",
+};
+
+function subagentStatusOfEnd({
+	state,
+	stopReason,
+}: {
+	state: string;
+	stopReason?: string | null;
+}): SubagentStatus {
+	if (state !== "idle") return SUBAGENT_STATUS_BY_END_STATE[state] ?? "idle";
+	if (stopReason === "error") return "failed";
+	return stopReason === "cancelled" ? "stopped" : "idle";
+}
+
+const GATEWAY_MODEL_PREFIX = "vercel-ai-gateway/";
+
+// pdev sends `_meta.piAcp.model` as an id or a { provider, modelId } pair.
+function resolvedModelOf(raw: unknown): string | undefined {
+	const meta = (raw as { _meta?: unknown })._meta;
+	const piAcp =
+		typeof meta === "object" &&
+		meta !== null &&
+		typeof (meta as Record<string, unknown>).piAcp === "object"
+			? ((meta as Record<string, unknown>).piAcp as Record<string, unknown>)
+			: undefined;
+	const reported = piAcp?.model;
+	const id =
+		typeof reported === "string"
+			? reported
+			: typeof reported === "object" &&
+					reported !== null &&
+					typeof (reported as Record<string, unknown>).modelId === "string"
+				? (reported as Record<string, unknown>).modelId
+				: undefined;
+	if (typeof id !== "string" || id === "") return undefined;
+	return id.startsWith(GATEWAY_MODEL_PREFIX)
+		? id.slice(GATEWAY_MODEL_PREFIX.length)
+		: id;
+}
+
+type AcpStateUpdate = z.infer<typeof acpStateUpdateSchema>;
+
+type V2Turn = {
+	id: string;
+	inserted: boolean;
+	idle?: AcpStateUpdate & { seq: number };
+};
+
+export type AcpAttachment = ResolvedAttachment;
+
+/** `path` is relative to the session cwd. */
+export type AcpStoredImage = { path: string };
+
+export type AcpImageStoreContext = {
+	sessionId: string;
+	referenceId: string;
+	replaying: boolean;
+};
+
+const STARTUP_TIMEOUT_MS = 120_000;
+const START_OPTIONS_GRACE_MS = 1_000;
+const REQUEST_TIMEOUT_MS = 30_000;
+const STDERR_TAIL_CHARS = 4000;
+const ASK_MODE_ID = "default";
+const QUESTION_FIELD_ID = "answer";
+const SHELL_POLL_MS = 2000;
+const JSON_RPC_INVALID_REQUEST = -32600;
+const JSON_RPC_INVALID_PARAMS = -32602;
+const CLIENT_APPROVAL_MODES = [
+	{ id: ASK_MODE_ID, label: "Ask for approval" },
+	{ id: "auto", label: "Approve for me" },
+	{ id: "bypassPermissions", label: "Full access" },
+];
+
+function sessionMissing(error: unknown): boolean {
+	return (
+		error instanceof AcpRpcError &&
+		(error.code === -32002 ||
+			/unknown sessionid|session not found|no conversation found|no rollout found/i.test(
+				error.message,
+			))
+	);
+}
+
 export type AcpAdapterOptions = SpawnAcpOptions & {
+	launch?: () => Promise<
+		Pick<SpawnAcpOptions, "command" | "args" | "env"> & {
+			loginCommand?: string;
+		}
+	>;
+	/** Selected for a new session that asks for no mode, when the agent offers it. */
+	defaultModeId?: string;
+	clientApprovalModes?: boolean;
+	forkAtMessage?: boolean;
+	protocolVersion?: number;
+	shellPollMs?: number;
+	startupTimeoutMs?: number;
+	requestTimeoutMs?: number;
+	startOptionsGraceMs?: number;
+	resolveAttachment?: ResolveAttachment;
+	/** Without it, images the agent sends are dropped. */
+	storeImage?: (
+		image: AcpImageSource,
+		cwd: string,
+		context?: AcpImageStoreContext,
+	) => AcpStoredImage | null;
+	onSpawn?: (pid: number) => void;
+	backgroundDetailIntervalMs?: number;
 	now?: () => number;
 	mintId?: () => string;
 	createTransport?(
@@ -135,21 +279,46 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	): AcpTransport;
 };
 
-type OpenText = {
-	itemId: string;
-	kind: "agent_message" | "reasoning" | "user_message";
-	/** v2's message identity; v1 chunks carry none and group by kind and turn. */
-	messageId: string | null;
-	text: string;
+type SubagentRun = {
+	item: ToolCall;
 	turnId: string;
-	startedAtMs: number;
+	stream: SessionStream;
+	parentSessionId: string;
+	parentTaskId?: string;
+	steers: Set<{ echoes: Set<string>; shared: boolean }>;
 };
+
+type SubagentControls = {
+	canStop: boolean;
+	canSteer: boolean;
+	canBackground: boolean;
+};
+
+const NO_SUBAGENT_CONTROLS: SubagentControls = {
+	canStop: false,
+	canSteer: false,
+	canBackground: false,
+};
+
+const TOOL_CALL_STATUS_BY_SUBAGENT_STATUS = {
+	running: "running",
+	idle: "completed",
+	stopped: "canceled",
+	failed: "failed",
+} as const satisfies Record<SubagentStatus, ToolCall["status"]>;
 
 type PendingApproval = {
 	requestId: number | string;
 	turnId: string;
 	item: ApprovalRequest;
+	fieldTypes?: Record<string, string | undefined>;
+	selectsOption?: boolean;
+	otherOptionId?: string;
 };
+
+type AcpSessionModes = NonNullable<
+	ReturnType<typeof acpNewSessionResponseSchema.parse>["modes"]
+>;
 
 /**
  * Bridges an Agent Client Protocol subprocess (Claude Code / Codex ACP
@@ -157,40 +326,260 @@ type PendingApproval = {
  * round trip; ACP `session/update` notifications stream into chat items and
  * deltas; `session/request_permission` becomes an approval item.
  */
+const APPROVAL_OPTION_KINDS = new Set([
+	"allow_once",
+	"allow_always",
+	"reject_once",
+	"reject_always",
+]);
+
+const MAIN_AGENT_ACTIVITY = new Set([
+	"agent_message_chunk",
+	"agent_thought_chunk",
+	"agent_message",
+	"agent_thought",
+	"tool_call",
+	"tool_call_update",
+	"tool_call_content_chunk",
+	"plan",
+	"plan_update",
+	"notice",
+	"compaction_update",
+	"compaction_summary_chunk",
+]);
+
+function isApprovalOptionKind(
+	kind: string | undefined,
+): kind is "allow_once" | "allow_always" | "reject_once" | "reject_always" {
+	return kind !== undefined && APPROVAL_OPTION_KINDS.has(kind);
+}
+
+type AcpEnumOption = { const: string; title?: string; description?: string };
+
+function enumOptions(
+	values: string[] | undefined,
+	names?: string[],
+): AcpEnumOption[] | undefined {
+	return values?.map((value, index) => ({
+		const: value,
+		title: names?.[index] ?? value,
+	}));
+}
+
+function formField(
+	id: string,
+	property: AcpElicitationProperty,
+	required: boolean,
+): FormField {
+	const base = {
+		id,
+		...(property.title ? { title: property.title } : {}),
+		...(property.description ? { description: property.description } : {}),
+		...(required ? { required } : {}),
+	};
+	if (property.type === "boolean") return { ...base, input: "boolean" };
+	const choices: AcpEnumOption[] | undefined =
+		property.type === "array"
+			? (property.items?.anyOf ?? enumOptions(property.items?.enum))
+			: (property.oneOf ?? enumOptions(property.enum, property.enumNames));
+	if (!choices) {
+		if (property.type === "integer") return { ...base, input: "integer" };
+		if (property.type === "number") return { ...base, input: "number" };
+		return { ...base, input: "text" };
+	}
+	return {
+		...base,
+		input: property.type === "array" ? "multi" : "single",
+		options: choices.map((choice) => ({
+			value: choice.const,
+			label: choice.title ?? choice.const,
+			...(choice.description ? { description: choice.description } : {}),
+		})),
+	};
+}
+
+function formContent(
+	values: Record<string, string | string[]>,
+	fieldTypes: Record<string, string | undefined>,
+): Record<string, unknown> {
+	const content: Record<string, unknown> = {};
+	for (const [id, value] of Object.entries(values)) {
+		const type = fieldTypes[id];
+		if (Array.isArray(value)) content[id] = value;
+		else if (type === "boolean") content[id] = value === "true";
+		else if (type === "number" || type === "integer")
+			content[id] = Number(value);
+		else content[id] = value;
+	}
+	return content;
+}
+
+function formErrors(
+	values: Record<string, string | string[]>,
+	fields: readonly FormField[],
+	fieldTypes: Record<string, string | undefined>,
+): string[] {
+	const errors: string[] = [];
+	for (const field of fields) {
+		const value = values[field.id];
+		const empty =
+			value === undefined ||
+			(Array.isArray(value) ? value.length === 0 : value.trim() === "");
+		if (empty) {
+			if (field.required) errors.push(field.id);
+			continue;
+		}
+		const type = fieldTypes[field.id];
+		if (type !== "number" && type !== "integer") continue;
+		const parsed = Number(value);
+		if (
+			typeof value !== "string" ||
+			!Number.isFinite(parsed) ||
+			(type === "integer" && !Number.isInteger(parsed))
+		) {
+			errors.push(field.id);
+		}
+	}
+	return errors;
+}
+
 export class AcpAdapter implements HarnessAdapter {
 	private readonly queue = new EventQueue();
-	private readonly toolCalls = new Map<string, ToolCall>();
 	private readonly pendingApprovals = new Map<string, PendingApproval>();
+	private readonly main: SessionStream;
+	private readonly subagents = new Map<string, SubagentRun>();
+	private readonly finishedSubagents = new Set<string>();
 	/**
-	 * Text and start of each v2 message that has already flushed, so a later
-	 * chunk or whole-message patch for the same id reopens the item it had
-	 * rather than a second one beside it.
+	 * The adapter drops a task's updates once the subagent that started it
+	 * finishes, so the task ends with its subagent.
 	 */
-	private readonly messages = new Map<
-		string,
-		{ text: string; startedAtMs: number }
-	>();
-	/** Children announced by `subagent_update`, so each is noted once. */
-	private readonly subagents = new Set<string>();
-	/** Start of each named v2 plan, so a revision keeps its place in the order. */
-	private readonly planItems = new Map<string, number>();
+	private readonly subagentTasks = new Map<string, Set<string>>();
+	private readonly backgroundTasks: BackgroundTasks;
 	private client: AcpRpcClient | null = null;
+	/** Shared by `start` and native discovery so a list never spawns a second agent. */
+	private connection: Promise<void> | null = null;
 	private sessionId: string | null = null;
+	private refused: RefusedWindow = null;
+	private lastModel: string | null = null;
+	private loadingSessionId: string | null = null;
 	private cwd = process.cwd();
-	private openText: OpenText | null = null;
 	private currentTurn: Turn | null = null;
 	private historyTurnId: string | null = null;
+	private v2Turn: V2Turn | null = null;
+	private readonly insertions = new Map<string, number>();
+	private insertionSeq = 0;
+	private lastIdleSeq = 0;
 	private lastStartMs = 0;
 	/** What `initialize` settled on; v2 features stay dark below it. */
 	private negotiatedVersion = 1;
 	private agentCapabilities: Record<string, unknown> = {};
+	private supportsSteering = false;
+	private cycleEnded = false;
+	private steeredCyclePending = false;
+	private sessionUsage: SessionUsage | undefined;
+	private reportedCostUsd: number | undefined;
+	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
+	/** Async task id of each turn the agent started on its own, to the turn shown for it. */
+	private readonly autonomousTurns = new Map<string, string>();
+	private lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
+	private awaitingBackground = false;
 	/** The v2 config option that stands in for v1's session mode, once seen. */
 	private modeConfigId: string | null = null;
+	private modeId: string | undefined;
+	private readonly selectionsInFlight = new Set<Promise<void>>();
+	private pendingStart: { apply: (listed: boolean) => void } | null = null;
+	private settleStartSelections: (taken: ChatSelections) => void = () => {};
+	private readonly takenStartSelections = new Promise<ChatSelections>(
+		(resolve) => {
+			this.settleStartSelections = resolve;
+		},
+	);
+	private configOptions: SessionConfigOption[] = [];
+	private booleanConfigIds = new Set<string>();
+	private unavailableStartModel: string | undefined;
+	private modelSetSinceStart = false;
 	private replaying = false;
+	private agentName: string | null = null;
+	private quietReplay = false;
+	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
+	/** The session could not open signed out; each prompt fails with this until a restart. */
+	private signedOut: TurnError | null = null;
 	private disposed = false;
+	private dead = false;
+	private stderrTail = "";
+	private turnStderr = "";
+	private loginCommand: string | undefined;
+	private customAnswer: string | null = null;
+	private heldTurnId: string | null = null;
+	private readonly shellPids = new Map<string, number>();
+	private shellPoll: ReturnType<typeof setInterval> | null = null;
+	/** Claude aborts a running compaction when a steer arrives, so steers wait for these. */
+	private readonly compactions = new Set<string>();
+	private compactionsSettled: Promise<void> = Promise.resolve();
+	private settleCompactions: (() => void) | null = null;
 
-	constructor(private readonly options: AcpAdapterOptions) {}
+	constructor(private readonly options: AcpAdapterOptions) {
+		this.main = new SessionStream({
+			idPrefix: "",
+			scopeIdsByTurn: true,
+			streamUserMessages: false,
+			emitItem: (item, turnId) => this.emitItem(item, turnId),
+			emitTextDelta: (itemId, append) => this.emitTextDelta(itemId, append),
+			attachmentOf: (block, referenceId) =>
+				this.attachmentOf(block, referenceId),
+			reportedModel: resolvedModelOf,
+			defaultModel: () =>
+				this.replaying || this.isPdevAgent()
+					? undefined
+					: this.currentModelLabel(),
+			onNotify: (level, text) => {
+				if (level === "error" && text) this.emitNotice("error", text);
+			},
+			nextStartMs: () => this.nextStartMs(),
+			now: () => this.now(),
+			mintId: () => this.mintId(),
+		});
+		this.backgroundTasks = new BackgroundTasks(
+			(tasks) => {
+				const live = new Set(tasks.map((task) => task.id));
+				for (const id of this.backgroundTaskTurns.keys()) {
+					if (live.has(id)) continue;
+					this.backgroundTaskTurns.delete(id);
+					this.lastBackgroundEndMs = this.now();
+				}
+				for (const id of live) {
+					if (!this.backgroundTaskTurns.has(id)) {
+						this.backgroundTaskTurns.set(id, this.currentTurn?.id);
+					}
+				}
+				this.emitSession({ backgroundTasks: tasks });
+				this.syncAwaitingBackground();
+			},
+			(taskId, detail) =>
+				this.emit({
+					kind: "delta",
+					delta: { type: "background", itemId: taskId, append: detail },
+				}),
+			options.backgroundDetailIntervalMs,
+		);
+	}
+
+	async discoverModels(cwd: string): Promise<SessionConfigOption[]> {
+		await this.ensureConnected(cwd);
+		if (!this.client) throw new Error("Agent did not connect");
+		// ACP exposes models on session/new; no prompt or mode change is sent.
+		const response = await this.client.request(
+			"session/new",
+			{ cwd, mcpServers: [] },
+			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
+		);
+		const session = acpNewSessionResponseSchema.parse(response);
+		this.sessionId = session.sessionId;
+		this.handleConfigOptions(response);
+		if (this.configOptions.length === 0) await this.awaitStartOptions({});
+		return this.configOptions;
+	}
 
 	start(startOptions: HarnessStartOptions): AsyncIterable<AdapterEvent> {
 		this.cwd = startOptions.cwd;
@@ -199,6 +588,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
+		if (this.signedOut) {
+			this.failSignedOutTurn(this.signedOut);
+			return;
+		}
 		if (!this.client || !this.sessionId) {
 			this.queuedPrompts.push(content);
 			return;
@@ -206,20 +599,120 @@ export class AcpAdapter implements HarnessAdapter {
 		void this.runTurn(content);
 	}
 
+	canSteer(): boolean {
+		return (
+			(this.supportsSteering || this.v2TurnIsCurrent()) &&
+			this.currentTurn?.status === "running" &&
+			this.heldTurnId !== this.currentTurn.id
+		);
+	}
+
+	async steer(content: UserContent[]): Promise<boolean> {
+		const client = this.client;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId || !this.canSteer()) return false;
+		const prompt = await this.toAcpPrompt(content);
+		while (this.compactions.size > 0) await this.compactionsSettled;
+		if (!this.canSteer()) return false;
+		const v2TurnId = this.v2TurnIsCurrent() ? this.v2Turn?.id : undefined;
+		if (v2TurnId) {
+			const response = await client.request("session/prompt", {
+				sessionId,
+				prompt,
+			});
+			const parsed = acpPromptResponseSchema.safeParse(response).data;
+			if (parsed?.messageId !== undefined && parsed.stopReason === undefined) {
+				this.steerInserted(v2TurnId, parsed.messageId);
+				return true;
+			}
+			return parsed?.stopReason !== undefined;
+		}
+		const response = await client.request(ACP_STEERING_METHOD, {
+			sessionId,
+			prompt,
+			_meta: { steering: { idleBehavior: "promptRequired" } },
+		});
+		const outcome = acpSteeringResponseSchema.safeParse(response).data?.outcome;
+		if (outcome === "injected") {
+			this.steeredCyclePending = true;
+			this.cycleEnded = false;
+			this.syncAwaitingBackground();
+		}
+		return outcome === "injected" || outcome === "startedNewTurn";
+	}
+
 	cancelTurn(): void {
 		if (!this.client || !this.sessionId) return;
 		if (this.currentTurn?.status !== "running") return;
-		this.client.notify("session/cancel", { sessionId: this.sessionId });
+		if (this.heldTurnId === this.currentTurn.id) {
+			this.heldTurnId = null;
+			this.emitTurn({
+				...this.currentTurn,
+				status: "interrupted",
+				completedAtMs: this.now(),
+			});
+			this.emitSession({ status: "idle" });
+			return;
+		}
+		const turnId = this.currentTurn.id;
+		const autonomousTask = [...this.autonomousTurns].find(
+			([, id]) => id === turnId,
+		)?.[0];
+		if (autonomousTask) void this.stopAutonomousTurn(autonomousTask, turnId);
+		else this.client.notify("session/cancel", { sessionId: this.sessionId });
+		if (this.cancelPendingApprovals(turnId)) {
+			this.emitSession({ status: this.statusAfterApprovals() });
+		}
+	}
+
+	/** `session/cancel` would also stop the session's background workflows. */
+	private async stopAutonomousTurn(
+		asyncTaskId: string,
+		turnId: string,
+	): Promise<void> {
+		const client = this.client;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId) return;
+		const response = await client
+			.request(
+				AIR_ASYNC_TASK_STOP_METHOD,
+				{ sessionId, asyncTaskId },
+				this.requestTimeoutMs(),
+			)
+			.catch(() => null);
+		if ((response as { stopped?: unknown } | null)?.stopped === true) return;
+		if (
+			this.autonomousTurns.get(asyncTaskId) === turnId &&
+			this.currentTurn?.id === turnId &&
+			this.currentTurn.status === "running"
+		)
+			client.notify("session/cancel", { sessionId });
 	}
 
 	respondToApproval(approvalId: string, decision: Decision): void {
 		const pending = this.pendingApprovals.get(approvalId);
 		if (!pending || !this.client) return;
+		if (
+			decision.type === "form" &&
+			pending.item.form &&
+			formErrors(
+				decision.values,
+				pending.item.form.fields,
+				pending.fieldTypes ?? {},
+			).length > 0
+		) {
+			this.emitNotice(
+				"error",
+				"That answer is missing a required field or has an invalid number, so it was not sent.",
+			);
+			return;
+		}
 		this.pendingApprovals.delete(approvalId);
 		this.client.respond(
 			pending.requestId,
 			this.approvalOutcome(pending, decision),
 		);
+		if (this.currentTurn?.status !== "running") this.sendCustomAnswer();
 		this.emitItem(
 			{
 				...pending.item,
@@ -229,29 +722,210 @@ export class AcpAdapter implements HarnessAdapter {
 			},
 			pending.turnId,
 		);
-		this.emitSession({ status: "running" });
+		this.emitSession({ status: this.statusAfterApprovals() });
 	}
 
-	setMode(modeId: string): void {
+	setMode(modeId: string): Promise<boolean> {
+		if (this.options.clientApprovalModes) {
+			if (!isClientApprovalMode(modeId)) return Promise.resolve(false);
+			this.emitSession({ modeId });
+			if (autoApproves(modeId)) this.approvePendingPermissions();
+			return Promise.resolve(true);
+		}
+		const previous = this.modeId;
 		this.emitSession({ modeId });
-		if (!this.client || !this.sessionId) return;
+		if (!this.client || !this.sessionId) return Promise.resolve(false);
 		// v2 dropped session/set_mode outright: a mode is a config option there,
 		// and `config_option_update` is what told us which one.
 		const pending =
 			this.negotiatedVersion >= 2 && this.modeConfigId
-				? this.client.request("session/set_config_option", {
-						sessionId: this.sessionId,
-						configId: this.modeConfigId,
-						type: "id",
-						value: modeId,
-					})
-				: this.client.request("session/set_mode", {
-						sessionId: this.sessionId,
-						modeId,
-					});
-		void pending.catch((error: Error) =>
-			this.emitNotice("error", error.message),
+				? this.client.request(
+						"session/set_config_option",
+						{
+							sessionId: this.sessionId,
+							configId: this.modeConfigId,
+							type: "id",
+							value: modeId,
+						},
+						this.requestTimeoutMs(),
+					)
+				: this.client.request(
+						"session/set_mode",
+						{ sessionId: this.sessionId, modeId },
+						this.requestTimeoutMs(),
+					);
+		this.trackSelection(pending);
+		void pending.catch((error: Error) => {
+			if (error instanceof AcpTimeoutError) {
+				this.emitNotice("error", unconfirmedSelectionMessage(error));
+				return;
+			}
+			if (previous && this.modeId === modeId) {
+				this.emitSession({ modeId: previous });
+			}
+			this.emitNotice("error", error.message);
+		});
+		return pending.then(
+			() => true,
+			() => false,
 		);
+	}
+
+	private trackSelection(request: Promise<unknown>): void {
+		const settled = request.then(
+			() => undefined,
+			() => undefined,
+		);
+		this.selectionsInFlight.add(settled);
+		void settled.then(() => this.selectionsInFlight.delete(settled));
+	}
+
+	/** An agent may run a prompt before it applies a mode or model it was just sent. */
+	private async selectionsApplied(): Promise<void> {
+		while (this.selectionsInFlight.size > 0) {
+			await Promise.all(this.selectionsInFlight);
+		}
+	}
+
+	setConfigOption(configId: string, value: string): Promise<boolean> {
+		const client = this.client;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId) return Promise.resolve(false);
+		const previous = this.configOptions;
+		const changesModel = previous.some(
+			(option) => option.id === configId && option.category === "model",
+		);
+		const previousModeId =
+			configId === this.modeConfigId ? this.modeId : undefined;
+		this.configOptions = previous.map((option) =>
+			option.id === configId ? { ...option, currentValue: value } : option,
+		);
+		this.emitSession({
+			configOptions: this.configOptions,
+			...(configId === this.modeConfigId ? { modeId: value } : {}),
+		});
+		const isBoolean = this.booleanConfigIds.has(configId);
+		const request = client.request(
+			"session/set_config_option",
+			{
+				sessionId,
+				configId,
+				...(isBoolean
+					? { type: "boolean", value: value === TOGGLE_ON }
+					: {
+							value,
+							...(this.negotiatedVersion >= 2 ? { type: "id" } : {}),
+						}),
+			},
+			this.requestTimeoutMs(),
+		);
+		this.trackSelection(request);
+		request
+			.then((response) => this.handleConfigOptions(response))
+			.catch((error: Error) => {
+				if (error instanceof AcpTimeoutError) {
+					this.emitNotice("error", unconfirmedSelectionMessage(error));
+					return;
+				}
+				this.configOptions = previous;
+				this.emitSession({
+					configOptions: previous,
+					...(previousModeId ? { modeId: previousModeId } : {}),
+				});
+				this.emitNotice("error", error.message);
+			});
+		return request.then(
+			() => {
+				if (changesModel) {
+					this.unavailableStartModel = undefined;
+					this.modelSetSinceStart = true;
+				}
+				return true;
+			},
+			() => false,
+		);
+	}
+
+	async stopBackgroundTask(taskId: string): Promise<boolean> {
+		const shellPid = this.shellPids.get(taskId);
+		if (shellPid !== undefined) return stopProcessGroup(shellPid);
+		if (!this.client || !this.sessionId) return false;
+		const subagentSessionId = this.subagentSessionOf(taskId);
+		const run = subagentSessionId && this.subagents.get(subagentSessionId);
+		if (subagentSessionId) {
+			if (!run || run.item.canStop !== true) return false;
+			this.client.notify("session/cancel", { sessionId: subagentSessionId });
+			this.cancelSubagentApprovals(subagentSessionId, run);
+			return true;
+		}
+		if (!this.backgroundTasks.canStop(taskId)) return false;
+		const response = await this.client.request(
+			AIR_ASYNC_TASK_STOP_METHOD,
+			{ sessionId: this.sessionId, asyncTaskId: taskId },
+			this.requestTimeoutMs(),
+		);
+		return (response as { stopped?: unknown } | null)?.stopped === true;
+	}
+
+	async steerSubagent(
+		taskId: string,
+		content: UserContent[],
+	): Promise<boolean> {
+		const client = this.client;
+		const subagentSessionId = this.subagentSessionOf(taskId);
+		const run = subagentSessionId && this.subagents.get(subagentSessionId);
+		if (!client || !subagentSessionId || !run || run.item.canSteer !== true)
+			return false;
+		const steer = { echoes: new Set<string>(), shared: run.steers.size > 0 };
+		for (const other of run.steers) other.shared = true;
+		run.steers.add(steer);
+		try {
+			await client.request("session/prompt", {
+				sessionId: subagentSessionId,
+				prompt: await this.toAcpPrompt(content),
+			});
+			return true;
+		} catch (error) {
+			if (
+				error instanceof AcpRpcError &&
+				error.code === JSON_RPC_INVALID_REQUEST
+			)
+				return !steer.shared && steer.echoes.size > 0;
+			throw error;
+		} finally {
+			run.steers.delete(steer);
+		}
+	}
+
+	async backgroundSubagent(taskId: string): Promise<boolean> {
+		const client = this.client;
+		const subagentSessionId = this.subagentSessionOf(taskId);
+		if (
+			!client ||
+			!subagentSessionId ||
+			this.subagents.get(subagentSessionId)?.item.canBackground !== true
+		)
+			return false;
+		try {
+			await client.request(
+				SUBAGENT_BACKGROUND_METHOD,
+				{ sessionId: subagentSessionId },
+				this.requestTimeoutMs(),
+			);
+			return true;
+		} catch (error) {
+			if (
+				error instanceof AcpRpcError &&
+				(error.code === JSON_RPC_INVALID_REQUEST ||
+					error.code === JSON_RPC_INVALID_PARAMS)
+			)
+				return false;
+			throw error;
+		}
+	}
+
+	private subagentSessionOf(taskId: string): string | undefined {
+		return [...this.subagents].find(([, run]) => run.item.id === taskId)?.[0];
 	}
 
 	/**
@@ -259,14 +933,20 @@ export class AcpAdapter implements HarnessAdapter {
 	 * advertise it. The agent copies its own session; the caller decides what to
 	 * attach to the id that comes back.
 	 */
-	async fork(): Promise<string | null> {
+	async fork(cut?: { upToMessageId: string }): Promise<string | null> {
 		if (!this.client || !this.sessionId) return null;
 		if (!this.supportsSessionCapability("fork")) return null;
-		const response = await this.client.request("session/fork", {
-			sessionId: this.sessionId,
-			cwd: this.cwd,
-			mcpServers: [],
-		});
+		if (cut && !this.options.forkAtMessage) return null;
+		const response = await this.client.request(
+			"session/fork",
+			{
+				sessionId: this.sessionId,
+				cwd: this.cwd,
+				mcpServers: [],
+				...(cut ? { _meta: airForkPointMeta(cut.upToMessageId) } : {}),
+			},
+			this.requestTimeoutMs(),
+		);
 		const parsed = acpNewSessionResponseSchema.safeParse(response);
 		return parsed.success ? parsed.data.sessionId : null;
 	}
@@ -279,104 +959,203 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 	}
 
+	/**
+	 * v1 advertises `sessionCapabilities.list` (null means absent). v2 makes
+	 * `session/list` a baseline method of any `capabilities.session` object.
+	 */
+	private supportsSessionList(): boolean {
+		const caps = this.agentCapabilities.sessionCapabilities;
+		if (caps && typeof caps === "object" && "list" in caps) {
+			const list = (caps as { list?: unknown }).list;
+			if (list !== undefined && list !== null) return true;
+		}
+		if (this.negotiatedVersion < 2) return false;
+		const session = this.agentCapabilities.session;
+		return session !== null && typeof session === "object";
+	}
+
+	/**
+	 * Lists the agent's own sessions. Initializes when this adapter has not
+	 * started, and never sends `session/new`.
+	 */
+	async discoverSessions(input: {
+		cwd: string;
+		cursor?: string;
+	}): Promise<DiscoverSessionsResult> {
+		if (this.disposed) throw new Error("acp adapter is disposed");
+		await this.ensureConnected(input.cwd);
+		if (this.disposed || !this.client) {
+			throw new Error("acp adapter is disposed");
+		}
+		if (!this.supportsSessionList()) {
+			return { supported: false, sessions: [] };
+		}
+		const response = await this.client.request(
+			"session/list",
+			{
+				cwd: input.cwd,
+				...(input.cursor ? { cursor: input.cursor } : {}),
+			},
+			this.requestTimeoutMs(),
+		);
+		return listedSessions(response);
+	}
+
 	async dispose(): Promise<void> {
 		if (this.disposed) return;
 		this.disposed = true;
+		this.pendingStart?.apply(false);
+		this.settleStartSelections({});
 		this.stalePendingApprovals();
+		this.backgroundTasks.dispose();
+		this.endCompactions();
+		if (this.shellPoll) clearInterval(this.shellPoll);
 		await this.client?.close();
 		this.queue.close();
+	}
+
+	private ensureConnected(cwd: string): Promise<void> {
+		if (!this.connection) {
+			this.connection = this.initializeAgent(cwd);
+		}
+		return this.connection;
+	}
+
+	/** Spawns the agent and runs `initialize` only. Does not open a session. */
+	private async initializeAgent(cwd: string): Promise<void> {
+		const launch = await this.options.launch?.();
+		if (this.disposed) return;
+		this.loginCommand = launch?.loginCommand;
+		const client = new AcpRpcClient({
+			createTransport: (handlers) => {
+				const transport = (this.options.createTransport ?? spawnAcpTransport)(
+					{
+						command: launch?.command ?? this.options.command,
+						args: launch?.args ?? this.options.args,
+						cwd,
+						env: launch?.env ?? this.options.env,
+					},
+					handlers,
+				);
+				if (transport.pid !== undefined) this.options.onSpawn?.(transport.pid);
+				return transport;
+			},
+			onNotification: (notification) => this.handleNotification(notification),
+			onServerRequest: (request) => this.handleServerRequest(request),
+			onStderr: (chunk) => {
+				this.stderrTail = (this.stderrTail + chunk).slice(-STDERR_TAIL_CHARS);
+				this.turnStderr = (this.turnStderr + chunk).slice(-STDERR_TAIL_CHARS);
+			},
+			onDispatchError: (error, method) =>
+				this.emitNotice(
+					"error",
+					`acp ${method} could not be read: ${error instanceof Error ? error.message : String(error)}`,
+				),
+			onExit: (code) => this.handleExit(code),
+		});
+		this.client = client;
+		if (this.disposed) {
+			await client.close();
+			return;
+		}
+
+		const protocolVersion =
+			this.options.protocolVersion ?? LATEST_PROTOCOL_VERSION;
+		const initialized = await client.request(
+			"initialize",
+			{
+				protocolVersion,
+				// v2 requires `info` and renamed `clientCapabilities` to
+				// `capabilities`, so both names go out and one request serves either
+				// side of the bump.
+				info: CLIENT_INFO,
+				// v2 moved fs and terminal out of client capabilities entirely.
+				// Without form elicitation, claude-agent-acp drops AskUserQuestion.
+				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
+				// Do not advertise fs/terminal: the agent falls back to its own
+				// Read/Edit/Bash tools, which run headless in the workspace.
+				clientCapabilities: clientCapabilitiesFor(protocolVersion),
+			},
+			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
+		);
+		if (this.disposed) return;
+
+		const negotiated = acpInitializeResponseSchema.safeParse(initialized);
+		if (!negotiated.success) return;
+		this.negotiatedVersion =
+			negotiated.data.protocolVersion ?? this.negotiatedVersion;
+		this.agentName =
+			negotiated.data.agentInfo?.name ?? negotiated.data.info?.name ?? null;
+		this.agentCapabilities =
+			negotiated.data.capabilities ?? negotiated.data.agentCapabilities ?? {};
+		this.supportsSteering = negotiated.data._meta?.steering?.supported === true;
 	}
 
 	private async bootstrap(startOptions: HarnessStartOptions): Promise<void> {
 		this.emitSession({ status: "starting" });
 		try {
-			const client = new AcpRpcClient({
-				createTransport: (handlers) =>
-					(this.options.createTransport ?? spawnAcpTransport)(
-						{
-							command: this.options.command,
-							args: this.options.args,
-							cwd: startOptions.cwd,
-							env: this.options.env,
-						},
-						handlers,
-					),
-				onNotification: (notification) => this.handleNotification(notification),
-				onServerRequest: (request) => this.handleServerRequest(request),
-				onStderr: () => undefined,
-				onDispatchError: (error, method) =>
-					this.emitNotice(
-						"error",
-						`acp ${method} could not be read: ${error instanceof Error ? error.message : String(error)}`,
-					),
-				onExit: (code) => this.handleExit(code),
-			});
-			this.client = client;
-
-			const initialized = await client.request("initialize", {
-				protocolVersion: LATEST_PROTOCOL_VERSION,
-				// v2 requires `info` and renamed `clientCapabilities` to
-				// `capabilities`, so both names go out and one request serves either
-				// side of the bump.
-				info: CLIENT_INFO,
-				// Nothing to advertise either way: v2 moved fs and terminal out of
-				// client capabilities entirely, and receiving `subagent_update` is a
-				// baseline v2 requirement rather than a capability.
-				capabilities: {},
-				// Do not advertise fs/terminal: the agent falls back to its own
-				// Read/Edit/Bash tools, which run headless in the workspace.
-				clientCapabilities: {
-					fs: { readTextFile: false, writeTextFile: false },
-					terminal: false,
-				},
-			});
-
-			const negotiated = acpInitializeResponseSchema.safeParse(initialized);
-			if (negotiated.success) {
-				this.negotiatedVersion =
-					negotiated.data.protocolVersion ?? this.negotiatedVersion;
-				this.agentCapabilities =
-					negotiated.data.capabilities ??
-					negotiated.data.agentCapabilities ??
-					{};
-			}
+			await this.ensureConnected(startOptions.cwd);
+			if (this.disposed || !this.client) return;
+			const client = this.client;
+			const startupTimeoutMs =
+				this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS;
 
 			let response: unknown;
+			let resumed = false;
 			if (startOptions.resume) {
 				this.replaying = true;
+				this.quietReplay = startOptions.resume.quiet === true;
+				this.loadingSessionId = startOptions.resume.harnessSessionId;
+				const resumeMethod =
+					this.negotiatedVersion >= 2 ? "session/resume" : "session/load";
 				try {
-					response = await client.request("session/load", {
-						sessionId: startOptions.resume.harnessSessionId,
-						cwd: startOptions.cwd,
-						mcpServers: [],
-					});
+					response = await client.request(
+						resumeMethod,
+						{
+							sessionId: startOptions.resume.harnessSessionId,
+							cwd: startOptions.cwd,
+							mcpServers: [],
+							...(this.negotiatedVersion >= 2
+								? { replayFrom: { type: "start" } }
+								: {}),
+						},
+						startupTimeoutMs,
+					);
+					resumed = true;
 				} catch (loadError) {
-					// An agent that was started but never prompted has a session id and
-					// no transcript behind it, so loading one answers "not found".
-					// There is no conversation to lose in that case, and none to
-					// recover in the other, so opening a new session is the only thing
-					// left to do either way — do it, and say so quietly rather than
-					// handing back an error the reader cannot act on.
+					// A session that was started but never prompted has no transcript,
+					// so the agent answers "not found". Any other failure keeps the
+					// conversation, and a new session would hide it from the agent.
+					if (!sessionMissing(loadError)) {
+						throw new Error(
+							`Could not reopen this conversation. ${(loadError as Error).message}`,
+						);
+					}
 					this.emitNotice(
 						"info",
 						"No earlier conversation to open, so this is a new one.",
 					);
-					console.warn("[acp] session/load failed", loadError);
-					response = await client.request("session/new", {
-						cwd: startOptions.cwd,
-						mcpServers: [],
-					});
+					console.warn(`[acp] ${resumeMethod} failed`, loadError);
+					response = await client.request(
+						"session/new",
+						{ cwd: startOptions.cwd, mcpServers: [] },
+						startupTimeoutMs,
+					);
 				} finally {
+					if (this.quietReplay) this.main.discardOpen();
 					this.replaying = false;
+					this.quietReplay = false;
+					this.loadingSessionId = null;
 					// Nothing follows the replay, so the last item it opened has no
 					// later turn to flush it.
-					this.flushOpenText();
+					this.main.flush();
 				}
 			} else {
-				response = await client.request("session/new", {
-					cwd: startOptions.cwd,
-					mcpServers: [],
-				});
+				response = await client.request(
+					"session/new",
+					{ cwd: startOptions.cwd, mcpServers: [] },
+					startupTimeoutMs,
+				);
 			}
 
 			// session/load returns null after replaying history via session/update.
@@ -387,80 +1166,231 @@ export class AcpAdapter implements HarnessAdapter {
 
 			if (!this.sessionId) {
 				this.emitNotice("error", "acp agent returned no session id");
+				this.dead = true;
 				this.emitSession({ status: "dead" });
 				this.queue.close();
+				this.closeAfterFailure();
 				return;
 			}
 
 			this.emitSession({
 				status: "idle",
 				harnessSessionId: this.sessionId,
-				...(parsed.success && parsed.data.modes?.currentModeId
-					? { modeId: parsed.data.modes.currentModeId }
-					: {}),
-				...(parsed.success && parsed.data.modes?.availableModes
+				...(this.options.clientApprovalModes
 					? {
-							availableModes: parsed.data.modes.availableModes.map((mode) => ({
-								id: mode.id,
-								label: mode.name,
-							})),
+							modeId:
+								[this.modeId, this.startModeId(startOptions, resumed)].find(
+									isClientApprovalMode,
+								) ?? ASK_MODE_ID,
+							availableModes: CLIENT_APPROVAL_MODES,
 						}
-					: {}),
+					: {
+							...(parsed.success && parsed.data.modes?.currentModeId
+								? { modeId: parsed.data.modes.currentModeId }
+								: {}),
+							...(parsed.success && parsed.data.modes?.availableModes
+								? {
+										availableModes: parsed.data.modes.availableModes.map(
+											(mode) => ({
+												id: mode.id,
+												label: mode.name,
+											}),
+										),
+									}
+								: {}),
+						}),
 			});
+			this.handleConfigOptions(response);
+			this.applyStartSelections(
+				startOptions,
+				parsed.success ? parsed.data.modes : undefined,
+				resumed,
+			);
 
 			const queued = this.queuedPrompts.splice(0, this.queuedPrompts.length);
 			for (const content of queued) await this.runTurn(content);
 		} catch (error) {
-			this.emitNotice("error", this.authAwareMessage(error));
+			const failure = this.turnError(error);
+			if (failure.kind === "auth") {
+				this.signedOut = failure;
+				this.emitSession({ status: this.statusAfterApprovals() });
+				if (this.queuedPrompts.splice(0).length > 0) {
+					this.failSignedOutTurn(failure);
+				}
+				return;
+			}
+			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
+			this.dead = true;
 			this.emitSession({ status: "dead" });
 			this.queue.close();
+			this.closeAfterFailure();
 		}
 	}
 
 	private async runTurn(content: UserContent[]): Promise<void> {
-		const client = this.client;
-		if (!client || !this.sessionId) return;
+		if (!this.client || !this.sessionId) return;
+		this.refused = null;
 		const turnId = this.mintId();
-		this.emitTurn({ id: turnId, status: "running", startedAtMs: this.now() });
-		this.emitSession({ status: "running" });
+		this.emitTurn({
+			id: turnId,
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		});
+		this.emitSession({ status: this.statusAfterApprovals() });
+		this.heldTurnId = turnId;
+		await this.selectionsApplied();
+		if (this.unavailableStartModel) {
+			this.failTurn(turnId, {
+				kind: "model_unavailable",
+				message: this.unavailableStartModel,
+			});
+			this.heldTurnId = null;
+			return;
+		}
+		if (this.heldTurnId !== turnId) return;
+		this.heldTurnId = null;
+		const client = this.client;
+		if (!client || !this.sessionId || this.currentTurn?.id !== turnId) return;
+		const v2 = this.negotiatedVersion >= 2;
+		if (v2) this.v2Turn = { id: turnId, inserted: false };
+		this.turnStderr = "";
 		try {
 			const response = await client.request("session/prompt", {
 				sessionId: this.sessionId,
-				prompt: this.toAcpPrompt(content),
+				prompt: await this.toAcpPrompt(content),
 			});
-			this.flushOpenText();
-			const stopReason =
-				acpPromptResponseSchema.safeParse(response).data?.stopReason;
-			this.emitTurn({
-				id: turnId,
-				status: stopReason === "cancelled" ? "interrupted" : "completed",
-				startedAtMs: this.currentTurn?.startedAtMs ?? this.now(),
-				completedAtMs: this.now(),
-			});
-			if (stopReason === "refusal")
-				this.emitNotice("info", "The agent declined to continue.");
-			this.emitSession({ status: "idle" });
+			const parsed = acpPromptResponseSchema.safeParse(response).data;
+			if (
+				v2 &&
+				parsed?.messageId !== undefined &&
+				parsed.stopReason === undefined
+			) {
+				this.promptInserted(turnId, parsed.messageId);
+				return;
+			}
+			if (this.v2Turn?.id === turnId) this.v2Turn = null;
+			this.finishTurn(turnId, parsed?.stopReason, parsed?.usage);
 		} catch (error) {
-			this.flushOpenText();
-			this.emitTurn({
-				id: turnId,
-				status: "failed",
-				error: { message: (error as Error).message },
-				startedAtMs: this.currentTurn?.startedAtMs ?? this.now(),
-				completedAtMs: this.now(),
-			});
-			this.emitNotice("error", (error as Error).message);
-			this.emitSession({ status: "idle" });
+			this.endCompactions();
+			if (this.v2Turn?.id === turnId) this.v2Turn = null;
+			if (this.dead) return;
+			this.failRefusedTurn(turnId, this.turnError(error));
 		}
 	}
 
+	private v2TurnIsCurrent(): boolean {
+		return this.v2Turn !== null && this.v2Turn.id === this.currentTurn?.id;
+	}
+
+	private insertedAfterLastIdle(messageId: string): boolean {
+		const insertedAt = this.insertions.get(messageId);
+		this.insertions.delete(messageId);
+		return insertedAt === undefined || insertedAt > this.lastIdleSeq;
+	}
+
+	private promptInserted(turnId: string, messageId: string): void {
+		const turn = this.v2Turn;
+		if (turn?.id !== turnId) return;
+		turn.inserted = true;
+		const idle = turn.idle;
+		turn.idle = undefined;
+		if (!idle) return;
+		const insertedAt = this.insertions.get(messageId);
+		this.insertions.delete(messageId);
+		if (insertedAt !== undefined && insertedAt > idle.seq) return;
+		this.endV2Turn(turnId, idle);
+	}
+
+	private steerInserted(turnId: string, messageId: string): void {
+		const insertedAfterLastIdle = this.insertedAfterLastIdle(messageId);
+		if (this.v2Turn?.id === turnId || this.currentTurn?.id !== turnId) return;
+		if (this.currentTurn.status === "running" || !insertedAfterLastIdle) return;
+		const id = this.mintId();
+		this.turnStderr = "";
+		this.emitTurn({ id, status: "running", startedAtMs: this.now() });
+		this.emitSession({ status: this.statusAfterApprovals() });
+		this.v2Turn = { id, inserted: true };
+	}
+
+	private endV2Turn(turnId: string, idle: AcpStateUpdate): void {
+		this.v2Turn = null;
+		if (idle.stopReason === "error")
+			this.failRefusedTurn(
+				turnId,
+				this.turnError(
+					idle.error?.message ?? "The agent stopped with an error.",
+				),
+			);
+		else this.finishTurn(turnId, idle.stopReason ?? undefined);
+	}
+
+	private finishTurn(
+		turnId: string,
+		stopReason: string | undefined,
+		usage?: AcpPromptUsage,
+	): void {
+		this.endCompactions();
+		this.main.flush();
+		this.emitTurn({
+			id: turnId,
+			status: stopReason === "cancelled" ? "interrupted" : "completed",
+			startedAtMs: this.currentTurn?.startedAtMs ?? this.now(),
+			completedAtMs: this.now(),
+			...(usage ? { usage: this.turnUsage(usage) } : {}),
+		});
+		if (stopReason === "refusal")
+			this.emitNotice("info", "The agent declined to continue.");
+		this.cancelPendingApprovals(turnId);
+		this.emitSession({ status: this.statusAfterApprovals() });
+		this.sendCustomAnswer();
+	}
+
+	/** A failed turn, reported as a usage limit when the agent refused for usage. */
+	private failRefusedTurn(turnId: string, failure: TurnError): void {
+		const limit = this.usageLimitFrom(failure.message);
+		if (limit) this.emitSession({ usageLimit: limit });
+		this.failTurn(
+			turnId,
+			limit ? { ...failure, kind: "usage_limit" } : failure,
+		);
+	}
+
+	private failSignedOutTurn(failure: TurnError): void {
+		const turnId = this.mintId();
+		this.emitTurn({
+			id: turnId,
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		});
+		this.failTurn(turnId, failure);
+	}
+
+	private failTurn(turnId: string, error: TurnError): void {
+		this.endCompactions();
+		this.customAnswer = null;
+		this.main.flush();
+		this.cancelPendingApprovals(turnId);
+		this.emitTurn({
+			id: turnId,
+			status: "failed",
+			error,
+			startedAtMs: this.currentTurn?.startedAtMs ?? this.now(),
+			completedAtMs: this.now(),
+		});
+		this.emitNotice("error", error.message);
+		this.emitSession({ status: this.statusAfterApprovals() });
+	}
+
 	private handleNotification({ method, params }: AcpNotification): void {
+		if (method === "$/cancel_request") {
+			this.dropCancelledRequest(params);
+			return;
+		}
 		if (method !== "session/update") return;
 		const outer = acpSessionNotificationSchema.safeParse(params);
 		if (!outer.success) return;
 		const update = acpSessionUpdateSchema.safeParse(outer.data.update);
 		if (!update.success) return;
-		const raw = outer.data.update as { content?: unknown };
 		const variant = update.data.sessionUpdate;
 
 		// Live, a user message echoes a prompt the runtime already recorded. In a
@@ -468,75 +1398,128 @@ export class AcpAdapter implements HarnessAdapter {
 		// this session has never seen them, so dropping them starts the transcript
 		// at the agent's first reply. Each one opens a turn of its own, or the
 		// whole replay lands in one group whose order comes down to item id.
-		if (variant === "user_message_chunk" || variant === "user_message") {
-			if (!this.replaying) return;
-			if (this.openText?.kind !== "user_message") {
-				this.flushOpenText();
+		const childSession =
+			this.subagents.has(outer.data.sessionId) ||
+			this.finishedSubagents.has(outer.data.sessionId);
+		if (
+			!childSession &&
+			(variant === "user_message_chunk" || variant === "user_message")
+		) {
+			if (!this.replaying) {
+				const messageId = messageIdOf(outer.data.update);
+				if (
+					messageId &&
+					this.negotiatedVersion >= 2 &&
+					outer.data.sessionId === this.sessionId &&
+					!this.insertions.has(messageId)
+				)
+					this.insertions.set(messageId, ++this.insertionSeq);
+				return;
+			}
+			if (isHiddenUserMessage(outer.data.update)) return;
+			if (this.main.openKind() !== "user_message") {
+				this.main.flush();
 				// emitTurn leaves the history turn as `currentTurn`, which
 				// resolveTurnId answers with first — both have to go for the next
 				// resolve to mint a fresh turn.
 				this.currentTurn = null;
 				this.historyTurnId = null;
 			}
-			const replayTurnId = this.resolveTurnId();
-			if (variant === "user_message")
-				this.handleMessage("user_message", outer.data.update, replayTurnId);
-			else
-				this.appendText(
-					"user_message",
-					this.contentBlock(raw.content),
-					replayTurnId,
-					this.messageIdOf(outer.data.update),
-				);
+			this.main.handleUpdate(variant, outer.data.update, this.resolveTurnId());
 			return;
+		}
+
+		switch (variant) {
+			case "async_task_spawned":
+				this.handleAsyncTaskSpawned(outer.data.sessionId, outer.data.update);
+				return;
+			case "async_task_progress":
+				this.handleAsyncTaskProgress(outer.data.update);
+				return;
+			case "async_task_state_update":
+				this.handleAsyncTaskState(outer.data.update);
+				return;
+			case "subagent_spawned":
+				this.handleSubagentSpawned(outer.data.update, outer.data.sessionId);
+				return;
+			case "subagent_state_update":
+				this.handleSubagentState(outer.data.update);
+				return;
+			case "subagent_update":
+				this.handleSubagentUpdate(outer.data.update, outer.data.sessionId);
+				return;
+			case "session_info_update": {
+				if (this.isForeignSession(outer.data.sessionId)) return;
+				const info = acpSessionInfoUpdateSchema.safeParse(outer.data.update);
+				if (info.success && info.data.title)
+					this.emitSession({ title: info.data.title });
+				return;
+			}
+		}
+
+		if (this.isForeignSession(outer.data.sessionId) || childSession) {
+			this.handleSubagentActivity(
+				outer.data.sessionId,
+				variant,
+				outer.data.update,
+			);
+			return;
+		}
+
+		if (variant === "usage_update") {
+			const usage = acpUsageUpdateSchema.safeParse(outer.data.update);
+			if (usage.success && usage.data._meta?.["_claude/rateLimit"]) {
+				this.refused = refusedWindow(usage.data._meta["_claude/rateLimit"]);
+			}
+			if (typeof usage.data?._meta?.["_claude/model"] === "string") {
+				this.lastModel = usage.data._meta["_claude/model"];
+			}
+			if (usage.success && usage.data.cost !== undefined) this.main.flush();
+			if (
+				usage.success &&
+				usage.data.cost !== undefined &&
+				!this.steeredCyclePending
+			) {
+				this.cycleEnded = true;
+				this.syncAwaitingBackground();
+			}
+			if (usage.success) this.recordSessionUsage(usage.data);
+			return;
+		}
+		if (MAIN_AGENT_ACTIVITY.has(variant)) {
+			this.steeredCyclePending = false;
+			if (this.cycleEnded) {
+				this.cycleEnded = false;
+				this.syncAwaitingBackground();
+			}
 		}
 
 		const turnId = this.resolveTurnId();
 
 		switch (variant) {
 			case "agent_message_chunk":
-				this.appendText(
-					"agent_message",
-					this.contentBlock(raw.content),
-					turnId,
-					this.messageIdOf(outer.data.update),
-				);
-				return;
 			case "agent_thought_chunk":
-				this.appendText(
-					"reasoning",
-					this.contentBlock(raw.content),
-					turnId,
-					this.messageIdOf(outer.data.update),
-				);
-				return;
 			case "agent_message":
-				this.handleMessage("agent_message", outer.data.update, turnId);
-				return;
 			case "agent_thought":
-				this.handleMessage("reasoning", outer.data.update, turnId);
+			case "tool_call_content_chunk":
+			case "plan":
+			case "plan_update":
+			case "notice":
+				this.main.handleUpdate(variant, outer.data.update, turnId);
 				return;
-			// v1 opened a tool call with `tool_call` and amended it with
-			// `tool_call_update`; v2 dropped the former and made the latter upsert,
-			// which is what handleToolCall has always done.
 			case "tool_call":
 			case "tool_call_update":
 				this.handleToolCall(outer.data.update, turnId);
 				return;
-			case "tool_call_content_chunk":
-				this.handleToolCallContentChunk(outer.data.update, turnId);
-				return;
-			case "plan":
-				this.handlePlan(outer.data.update, turnId);
-				return;
-			case "plan_update":
-				this.handlePlanUpdate(outer.data.update, turnId);
+			case "compaction_update":
+			case "compaction_summary_chunk":
+				this.handleCompaction(variant, outer.data.update, turnId);
 				return;
 			case "available_commands_update":
 				this.handleAvailableCommands(outer.data.update);
 				return;
 			case "current_mode_update":
-				if (update.data.currentModeId)
+				if (update.data.currentModeId && !this.options.clientApprovalModes)
 					this.emitSession({ modeId: update.data.currentModeId });
 				return;
 			case "config_option_update":
@@ -545,17 +1528,14 @@ export class AcpAdapter implements HarnessAdapter {
 			case "state_update":
 				this.handleStateUpdate(outer.data.update);
 				return;
-			case "subagent_update":
-				this.handleSubagentUpdate(outer.data.update);
-				return;
 			default:
 				return;
 		}
 	}
 
-	private messageIdOf(raw: unknown): string | null {
-		const messageId = (raw as { messageId?: unknown }).messageId;
-		return typeof messageId === "string" && messageId !== "" ? messageId : null;
+	private isForeignSession(sessionId: string): boolean {
+		const own = this.sessionId ?? this.loadingSessionId;
+		return own !== null && sessionId !== own;
 	}
 
 	private handleAvailableCommands(raw: unknown): void {
@@ -569,335 +1549,821 @@ export class AcpAdapter implements HarnessAdapter {
 					name: command.name,
 					...(command.description ? { description: command.description } : {}),
 					...(command.input?.hint ? { hint: command.input.hint } : {}),
+					...commandCategory(command._meta?.command_category),
 				})),
 		});
 	}
 
-	private contentBlock(raw: unknown): AcpContentBlock | undefined {
-		const parsed = acpContentBlockSchema.safeParse(raw);
-		return parsed.success ? parsed.data : undefined;
+	private currentModelLabel(): string | undefined {
+		const option = this.configOptions.find(
+			(entry) => entry.category === "model",
+		);
+		return option?.options.find((entry) => entry.id === option.currentValue)
+			?.label;
 	}
 
-	private appendText(
-		kind: OpenText["kind"],
-		content: AcpContentBlock | undefined,
-		turnId: string,
-		messageId: string | null = null,
-	): void {
-		const chunk = content?.type === "text" ? (content.text ?? "") : "";
-		if (!chunk) return;
-		const open = this.openMessage(kind, turnId, messageId);
-		open.text += chunk;
-		if (kind === "user_message") return;
-		this.emit({
-			kind: "delta",
-			delta: { type: "text", itemId: open.itemId, append: chunk },
-		});
+	private optionLabel(name: string): string {
+		return this.isPdevAgent() ? name.replace(/^pdev\//, "") : name;
 	}
 
-	/**
-	 * The open text item this content belongs to, started if it is not already.
-	 * v1 groups by kind and turn; v2 names the message, and a new name starts a
-	 * new item even within the same kind and turn.
-	 */
-	private openMessage(
-		kind: OpenText["kind"],
-		turnId: string,
-		messageId: string | null,
-	): OpenText {
-		const open = this.openText;
-		if (
-			open &&
-			open.kind === kind &&
-			open.turnId === turnId &&
-			open.messageId === messageId
-		)
-			return open;
-		this.flushOpenText();
-		// A v2 message can be appended to or patched after it flushed, so it
-		// reopens on the id and text it already had.
-		const flushed = messageId ? this.messages.get(messageId) : undefined;
-		const next: OpenText = {
-			itemId: messageId
-				? `${kind}:${turnId}:${messageId}`
-				: `${kind}:${turnId}:${this.mintId()}`,
-			kind,
-			messageId,
-			text: flushed?.text ?? "",
-			turnId,
-			startedAtMs: flushed?.startedAtMs ?? this.nextStartMs(),
-		};
-		this.openText = next;
-		// A user message has no text field to stream into, so it is recorded
-		// once, whole, when it flushes.
-		if (kind !== "user_message") this.emitItem(this.textItem(next), turnId);
-		return next;
-	}
-
-	/**
-	 * A whole v2 message, which patches the item its chunks produced: omitted
-	 * content leaves what was streamed alone, null and [] clear it, and an array
-	 * replaces it.
-	 */
-	private handleMessage(
-		kind: OpenText["kind"],
-		raw: unknown,
-		turnId: string,
-	): void {
-		const parsed = acpMessageSchema.safeParse(raw);
-		if (!parsed.success) return;
-		const open = this.openMessage(kind, turnId, parsed.data.messageId);
-		if (parsed.data.content !== undefined)
-			open.text = messageText(parsed.data.content ?? []);
-		this.flushOpenText();
-	}
-
-	private flushOpenText(): void {
-		if (!this.openText) return;
-		const open = this.openText;
-		this.openText = null;
-		if (open.messageId)
-			this.messages.set(open.messageId, {
-				text: open.text,
-				startedAtMs: open.startedAtMs,
-			});
-		this.emitItem(this.textItem(open), open.turnId);
-	}
-
-	private textItem(open: OpenText): Item {
-		const base = {
-			id: open.itemId,
-			startedAtMs: open.startedAtMs,
-			completedAtMs: this.now(),
-		};
-		switch (open.kind) {
-			case "agent_message":
-				return { ...base, kind: "agent_message", text: open.text };
-			case "user_message":
-				return {
-					...base,
-					kind: "user_message",
-					content: [{ type: "text", text: open.text }],
-				};
-			default:
-				return { ...base, kind: "reasoning", text: open.text };
-		}
+	private isPdevAgent(): boolean {
+		return this.agentName === "paradev" || this.agentName === "pdev";
 	}
 
 	private handleToolCall(raw: unknown, turnId: string): void {
 		const parsed = acpToolCallUpdateSchema.safeParse(raw);
 		if (!parsed.success) return;
-		this.flushOpenText();
 		const update = parsed.data;
-		const prior = this.toolCalls.get(update.toolCallId);
-		// Patch semantics in both versions: an omitted field leaves the stored
-		// value alone, and v2 added null to clear it.
-		const content =
-			update.content === undefined
-				? (prior?.content ?? [])
-				: this.toToolContent(update.content ?? []);
-		const locations =
-			update.locations === undefined
-				? prior?.locations
-				: (update.locations ?? undefined);
-		const rawInput =
-			update.rawInput === undefined ? prior?.rawInput : update.rawInput;
-		const rawOutput =
-			update.rawOutput === undefined ? prior?.rawOutput : update.rawOutput;
-		const item: ToolCall = {
-			id: update.toolCallId,
-			kind: "tool_call",
-			title: update.title ?? prior?.title ?? "Tool call",
-			toolKind: update.kind
-				? toolKind(update.kind)
-				: (prior?.toolKind ?? "other"),
-			toolName: update.name ?? update.kind ?? prior?.toolName ?? "tool",
-			status: update.status
-				? toolStatus(update.status)
-				: (prior?.status ?? "running"),
-			content,
-			...(locations?.length ? { locations } : {}),
-			startedAtMs: prior?.startedAtMs ?? this.nextStartMs(),
-			...(toolCallSettled(update.status)
-				? { completedAtMs: this.now() }
-				: prior?.completedAtMs !== undefined
-					? { completedAtMs: prior.completedAtMs }
-					: {}),
-			...(rawInput !== undefined ? { rawInput } : {}),
-			...(rawOutput !== undefined ? { rawOutput } : {}),
-		};
-		this.toolCalls.set(update.toolCallId, item);
-		this.emitItem(item, turnId);
+		this.main.flush();
+		if (
+			!this.main.toolCall(update.toolCallId) &&
+			!update.title &&
+			update.status !== "failed" &&
+			isSubagentControlCall(raw)
+		)
+			return;
+		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
+		if (!item || this.replaying) return;
+		this.trackBackgroundShell(item);
+		if (this.compactions.has(item.id) || isCompactionCall(raw))
+			this.trackCompaction(item.id, item.status === "running");
 	}
 
-	/**
-	 * v2 streams tool output a content item at a time, appending to whatever the
-	 * tool call already holds. A chunk may name a call no update has opened yet,
-	 * so it opens one.
-	 */
-	private handleToolCallContentChunk(raw: unknown, turnId: string): void {
-		const parsed = acpToolCallContentChunkSchema.safeParse(raw);
-		if (!parsed.success) return;
-		this.flushOpenText();
-		const { toolCallId, content } = parsed.data;
-		const prior = this.toolCalls.get(toolCallId);
-		const item: ToolCall = {
-			id: toolCallId,
-			kind: "tool_call",
-			title: prior?.title ?? "Tool call",
-			toolKind: prior?.toolKind ?? "other",
-			toolName: prior?.toolName ?? "tool",
-			status: prior?.status ?? "running",
-			content: [...(prior?.content ?? []), ...this.toToolContent([content])],
-			...(prior?.locations?.length ? { locations: prior.locations } : {}),
-			startedAtMs: prior?.startedAtMs ?? this.nextStartMs(),
-			...(prior?.completedAtMs !== undefined
-				? { completedAtMs: prior.completedAtMs }
-				: {}),
-			...(prior?.rawInput !== undefined ? { rawInput: prior.rawInput } : {}),
-			...(prior?.rawOutput !== undefined ? { rawOutput: prior.rawOutput } : {}),
-		};
-		this.toolCalls.set(toolCallId, item);
-		this.emitItem(item, turnId);
+	private handleCompaction(
+		variant: "compaction_update" | "compaction_summary_chunk",
+		raw: unknown,
+		turnId: string,
+	): void {
+		const notice = this.main.handleCompaction(variant, raw, turnId);
+		if (!notice || this.replaying) return;
+		this.trackCompaction(notice.id, notice.completedAtMs === undefined);
 	}
 
-	private toToolContent(content: AcpToolCallContent[]): ToolContent[] {
-		const mapped: ToolContent[] = [];
-		for (const entry of content) {
-			if (entry.type === "content" && entry.content?.type === "text") {
-				mapped.push({ type: "text", text: entry.content.text ?? "" });
-			} else if (
-				entry.type === "diff" &&
-				entry.path &&
-				entry.newText !== undefined
-			) {
-				mapped.push({
-					type: "diff",
-					path: entry.path,
-					oldText: entry.oldText ?? null,
-					newText: entry.newText,
-				});
-			} else if (entry.type === "diff") {
-				// v2 reports a diff as structured changes plus patch text rather than
-				// the before and after of one file, which is all a diff item can
-				// hold, so the patch is shown as the text it already is.
-				const patch =
-					entry.patch?.text ??
-					(entry.changes ?? [])
-						.map((change) => `${change.operation ?? "modify"} ${change.path}`)
-						.join("\n");
-				if (patch) mapped.push({ type: "text", text: patch });
-			} else if (entry.type === "terminal" && entry.terminalId) {
-				mapped.push({ type: "text", text: `[terminal ${entry.terminalId}]` });
-			}
+	private trackCompaction(itemId: string, running: boolean): void {
+		if (!running) {
+			this.compactions.delete(itemId);
+			if (this.compactions.size === 0) this.endCompactions();
+			return;
 		}
-		return mapped;
+		if (this.compactions.size === 0) {
+			this.compactionsSettled = new Promise((resolve) => {
+				this.settleCompactions = resolve;
+			});
+		}
+		this.compactions.add(itemId);
 	}
 
-	private handlePlan(raw: unknown, turnId: string): void {
-		const parsed = acpPlanSchema.safeParse(raw);
-		if (!parsed.success) return;
-		this.flushOpenText();
-		this.emitItem(
-			{
-				id: `plan:${turnId}`,
-				kind: "plan",
-				startedAtMs: this.nextStartMs(),
-				entries: planEntryItems(parsed.data.entries),
-			},
-			turnId,
-		);
+	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
+	private endCompactions(): void {
+		if (!this.disposed)
+			for (const itemId of this.compactions) this.main.cancelCompaction(itemId);
+		this.compactions.clear();
+		this.settleCompactions?.();
+		this.settleCompactions = null;
 	}
 
-	/**
-	 * v2 replaced `plan` with a named plan carrying one of several bodies, and
-	 * only the entry list maps to a plan item — a `file` or `markdown` body has
-	 * no entries and is left alone.
-	 */
-	private handlePlanUpdate(raw: unknown, turnId: string): void {
-		const parsed = acpPlanUpdateSchema.safeParse(raw);
-		if (!parsed.success) return;
-		const { planId, entries } = parsed.data.plan;
-		if (!entries) return;
-		this.flushOpenText();
-		const prior = this.planItems.get(planId);
-		const startedAtMs = prior ?? this.nextStartMs();
-		this.planItems.set(planId, startedAtMs);
-		this.emitItem(
-			{
-				id: `plan:${turnId}:${planId}`,
-				kind: "plan",
-				startedAtMs,
-				entries: planEntryItems(entries),
-			},
-			turnId,
+	private trackBackgroundShell(item: ToolCall): void {
+		const details = piShellDetailsSchema.safeParse(
+			(item.rawOutput as { details?: unknown } | undefined)?.details,
 		);
+		if (!details.success) return;
+		const { shellId, status, pid } = details.data;
+		if (status !== "running") {
+			this.endBackgroundShell(shellId);
+			return;
+		}
+		if (this.backgroundTasks.has(shellId)) return;
+		const input = piShellInputSchema.safeParse(item.rawInput);
+		this.backgroundTasks.start({
+			id: shellId,
+			kind: "process",
+			name:
+				(input.success && (input.data.description || input.data.command)) ||
+				shellId,
+			canStop: pid !== undefined,
+			startedAtMs: this.now(),
+		});
+		if (pid === undefined) return;
+		this.shellPids.set(shellId, pid);
+		this.shellPoll ??= setInterval(() => {
+			for (const [id, shellPid] of this.shellPids) {
+				if (!processAlive(shellPid)) this.endBackgroundShell(id);
+			}
+		}, this.options.shellPollMs ?? SHELL_POLL_MS);
+	}
+
+	private endBackgroundShell(shellId: string): void {
+		this.shellPids.delete(shellId);
+		this.backgroundTasks.end(shellId);
+		if (this.shellPids.size === 0 && this.shellPoll) {
+			clearInterval(this.shellPoll);
+			this.shellPoll = null;
+		}
+	}
+
+	private attachmentOf(
+		block: AcpContentBlock | undefined,
+		referenceId?: string,
+	): ItemAttachment | null {
+		const source = imageSourceOf(block);
+		if (!source) return null;
+		const sessionId = this.sessionId ?? this.loadingSessionId;
+		const context =
+			source.kind === "file" && sessionId
+				? {
+						sessionId,
+						referenceId: referenceId ?? `image:${this.unkeyedImageSequence++}`,
+						replaying: this.replaying,
+					}
+				: undefined;
+		let stored: AcpStoredImage | null = null;
+		try {
+			stored = this.options.storeImage?.(source, this.cwd, context) ?? null;
+		} catch (error) {
+			console.warn("[acp] could not keep an image the agent sent", error);
+		}
+		if (!stored) return null;
+		const dimensions =
+			source.kind === "bytes" ? imageDimensions(source.bytes) : null;
+		return {
+			type: "image",
+			path: stored.path,
+			mimeType: source.mimeType,
+			...(source.name ? { alt: source.name } : {}),
+			...(dimensions ?? {}),
+		};
 	}
 
 	private handleStateUpdate(raw: unknown): void {
 		const parsed = acpStateUpdateSchema.safeParse(raw);
 		if (!parsed.success) return;
+		if (parsed.data.state === "idle") {
+			this.lastIdleSeq = this.insertionSeq;
+			const turn = this.v2Turn;
+			if (turn && !turn.inserted) {
+				turn.idle = { ...parsed.data, seq: this.insertionSeq };
+				return;
+			}
+			if (turn) {
+				this.endV2Turn(turn.id, parsed.data);
+				return;
+			}
+		}
+		if (
+			parsed.data.state === "requires_action" &&
+			this.options.clientApprovalModes
+		)
+			return;
+		if (parsed.data.state === "running" && this.cycleEnded) {
+			this.cycleEnded = false;
+			this.syncAwaitingBackground();
+		}
 		const status = SESSION_STATUS_BY_ACP_STATE[parsed.data.state];
-		if (status) this.emitSession({ status });
+		if (!status) return;
+		this.emitSession({
+			status: this.pendingApprovals.size > 0 ? "awaiting_input" : status,
+		});
 	}
 
 	/**
-	 * A child session the parent spawned. v2 requires no client capability to
-	 * receive these — understanding them is baseline — and this surfaces the
-	 * announcement as a note; a child-session view is a later slice.
+	 * A child session the parent spawned. The announcing session ids the
+	 * parent: a subagent announcing its own child nests the grandchild under
+	 * the subagent's item.
 	 */
-	private handleSubagentUpdate(raw: unknown): void {
+	private handleSubagentUpdate(raw: unknown, parentSessionId: string): void {
 		const parsed = acpSubagentUpdateSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const { sessionId, title, description } = parsed.data;
-		// Only the first update for a child announces it; the rest patch metadata
-		// this view does not show.
-		if (this.subagents.has(sessionId)) return;
-		this.subagents.add(sessionId);
-		const name = title ?? sessionId;
-		this.emitNotice(
-			"info",
-			description ? `Subagent ${name}: ${description}` : `Subagent ${name}`,
+		const { sessionId, title, description, state, capabilities } = parsed.data;
+		if (this.finishedSubagents.has(sessionId)) return;
+		const meta = parsed.data._meta?.["sh.superset"];
+		const controls =
+			capabilities === undefined
+				? undefined
+				: this.subagentControls(capabilities);
+		const run = this.subagents.get(sessionId);
+		if (!run) {
+			this.startSubagent(
+				sessionId,
+				meta?.name ?? title,
+				description,
+				parentSessionId,
+				{
+					toolCallId: meta?.toolCallId,
+					...this.subagentControls(capabilities ?? null),
+					...(meta?.status ? { subagentStatus: meta.status } : {}),
+				},
+			);
+		} else if (!meta?.status && controls) {
+			this.setSubagentItem(run, { ...run.item, ...controls });
+			this.backgroundTasks.update(run.item.id, controls);
+		}
+		if (meta?.status) {
+			this.applySubagentStatus(
+				sessionId,
+				meta.status,
+				meta.name,
+				controls,
+				capabilities,
+			);
+			return;
+		}
+		if (
+			state &&
+			!ACTIVE_SUBAGENT_STATES.has(state.state) &&
+			isTerminalAirState(state.state)
+		) {
+			this.finishSubagent(sessionId, subagentStatusOfEnd(state));
+		}
+	}
+
+	private subagentControls(
+		capabilities: AcpSubagentUpdate["capabilities"],
+	): SubagentControls {
+		const extension = capabilities?._meta?.["sh.superset"];
+		return {
+			canStop: capabilities?.cancel != null,
+			canSteer: !this.replaying && extension?.prompt != null,
+			canBackground: !this.replaying && extension?.background != null,
+		};
+	}
+
+	private setSubagentItem(run: SubagentRun, item: ToolCall): void {
+		const changed = JSON.stringify(item) !== JSON.stringify(run.item);
+		run.item = item;
+		if (changed) this.emitItem(item, run.turnId);
+	}
+
+	private applySubagentStatus(
+		sessionId: string,
+		status: SubagentStatus,
+		name: string | undefined,
+		controls: SubagentControls | undefined,
+		capabilities: AcpSubagentUpdate["capabilities"],
+	): void {
+		const run = this.subagents.get(sessionId);
+		if (!run) return;
+		const title = name ?? run.item.title;
+		const item = { ...run.item, ...controls, title };
+		if (status === "running") {
+			const { completedAtMs: _completedAtMs, ...running } = item;
+			this.setSubagentItem(run, {
+				...running,
+				status: "running",
+				subagentStatus: status,
+			});
+			if (this.backgroundTasks.has(run.item.id))
+				this.backgroundTasks.update(run.item.id, {
+					name: title,
+					subagentStatus: status,
+					...this.controlsOf(run.item),
+				});
+			else this.startSubagentTask(run, this.now());
+			return;
+		}
+		const open =
+			(status === "idle" || status === "failed") &&
+			!this.replaying &&
+			(capabilities === undefined
+				? run.item.canSteer === true
+				: capabilities?._meta?.["sh.superset"] != null);
+		const idleControls = controls
+			? {}
+			: { canStop: false, canBackground: false };
+		this.endSubagent(
+			sessionId,
+			run,
+			{
+				...item,
+				...(open ? idleControls : NO_SUBAGENT_CONTROLS),
+				status: TOOL_CALL_STATUS_BY_SUBAGENT_STATUS[status],
+				subagentStatus: status,
+				completedAtMs: this.now(),
+			},
+			open,
 		);
 	}
 
+	private controlsOf(item: ToolCall): Partial<SubagentControls> {
+		return {
+			...(item.canStop !== undefined ? { canStop: item.canStop } : {}),
+			...(item.canSteer !== undefined ? { canSteer: item.canSteer } : {}),
+			...(item.canBackground !== undefined
+				? { canBackground: item.canBackground }
+				: {}),
+		};
+	}
+
+	private startSubagentTask(run: SubagentRun, startedAtMs: number): void {
+		this.backgroundTasks.start({
+			id: run.item.id,
+			kind: "subagent",
+			name: run.item.title,
+			canStop: run.item.canStop ?? false,
+			...this.controlsOf(run.item),
+			...(run.item.subagentStatus
+				? { subagentStatus: run.item.subagentStatus }
+				: {}),
+			startedAtMs,
+			...(run.parentTaskId ? { parentId: run.parentTaskId } : {}),
+		});
+	}
+
+	private endSubagentTasks(sessionId: string): void {
+		for (const taskId of this.subagentTasks.get(sessionId) ?? [])
+			this.backgroundTasks.end(taskId);
+		this.subagentTasks.delete(sessionId);
+	}
+
+	private handleSubagentSpawned(raw: unknown, parentSessionId: string): void {
+		const parsed = airSubagentSpawnedSchema.safeParse(raw);
+		if (!parsed.success) return;
+		const { subagentSessionId, name, task } = parsed.data;
+		if (
+			this.subagents.has(subagentSessionId) ||
+			this.finishedSubagents.has(subagentSessionId)
+		)
+			return;
+		this.startSubagent(subagentSessionId, name, task, parentSessionId);
+	}
+
+	private handleSubagentState(raw: unknown): void {
+		const parsed = airSubagentStateSchema.safeParse(raw);
+		if (!parsed.success || !isTerminalAirState(parsed.data.state)) return;
+		const { subagentSessionId } = parsed.data;
+		this.finishSubagent(subagentSessionId, subagentStatusOfEnd(parsed.data));
+	}
+
+	private startSubagent(
+		sessionId: string,
+		name: string | null | undefined,
+		task: string | null | undefined,
+		parentSessionId: string,
+		rfd?: {
+			toolCallId?: string;
+			canStop: boolean;
+			canSteer: boolean;
+			canBackground: boolean;
+			subagentStatus?: SubagentStatus;
+		},
+	): void {
+		const parent = this.subagents.get(parentSessionId);
+		(parent?.stream ?? this.main).flush();
+		const title = name || task || "";
+		const startedAtMs = this.nextStartMs();
+		const toolCallId = rfd?.toolCallId;
+		const parentItemId = !toolCallId
+			? parent?.item.id
+			: parent
+				? parent.stream.toolItemId(toolCallId)
+				: this.isForeignSession(parentSessionId)
+					? undefined
+					: toolCallId;
+		const item: ToolCall = {
+			id: `subagent:${sessionId}`,
+			kind: "tool_call",
+			title,
+			toolKind: "think",
+			toolName: "subagent",
+			status: "running",
+			content: task ? [{ type: "text", text: task }] : [],
+			startedAtMs,
+			subagent: true,
+			...(rfd
+				? {
+						canStop: rfd.canStop,
+						canSteer: rfd.canSteer,
+						canBackground: rfd.canBackground,
+					}
+				: {}),
+			...(rfd?.subagentStatus ? { subagentStatus: rfd.subagentStatus } : {}),
+			...(parentItemId ? { parentItemId } : {}),
+		};
+		const turnId = this.resolveTurnId();
+		const stream = new SessionStream({
+			idPrefix: `sub:${sessionId}:`,
+			scopeIdsByTurn: false,
+			parentItemId: item.id,
+			streamUserMessages: true,
+			emitItem: (child, childTurnId) => this.emitItem(child, childTurnId),
+			emitTextDelta: (itemId, append) =>
+				this.emitTextDelta(itemId, append, item.id),
+			attachmentOf: (block, referenceId) =>
+				this.attachmentOf(
+					block,
+					referenceId ? `sub:${sessionId}:${referenceId}` : undefined,
+				),
+			nextStartMs: () => this.nextStartMs(),
+			now: () => this.now(),
+			mintId: () => this.mintId(),
+		});
+		const run: SubagentRun = {
+			item,
+			turnId,
+			stream,
+			parentSessionId,
+			...(parent ? { parentTaskId: parent.item.id } : {}),
+			steers: new Set(),
+		};
+		this.subagents.set(sessionId, run);
+		this.emitItem(item, turnId);
+		this.startSubagentTask(run, startedAtMs);
+	}
+
+	private finishSubagent(sessionId: string, status: SubagentStatus): void {
+		const run = this.subagents.get(sessionId);
+		if (!run) return;
+		const item = {
+			...run.item,
+			...(run.item.canSteer === undefined ? {} : NO_SUBAGENT_CONTROLS),
+		};
+		this.endSubagent(
+			sessionId,
+			run,
+			run.item.subagentStatus === "idle"
+				? item
+				: {
+						...item,
+						status: TOOL_CALL_STATUS_BY_SUBAGENT_STATUS[status],
+						...(run.item.subagentStatus ? { subagentStatus: status } : {}),
+						completedAtMs: this.now(),
+					},
+		);
+	}
+
+	private endSubagent(
+		sessionId: string,
+		run: SubagentRun,
+		item: ToolCall,
+		open = false,
+	): void {
+		run.stream.flush();
+		run.stream.cancelCompactions();
+		this.cancelSubagentApprovals(sessionId, run);
+		this.endSubagentTasks(sessionId);
+		this.backgroundTasks.end(run.item.id);
+		if (!open) {
+			this.subagents.delete(sessionId);
+			this.finishedSubagents.add(sessionId);
+		}
+		this.setSubagentItem(run, item);
+	}
+
+	private handleSubagentActivity(
+		sessionId: string,
+		variant: string,
+		raw: unknown,
+	): void {
+		const run = this.subagents.get(sessionId);
+		if (!run) return;
+		if (variant === "session_message" || variant === "session_message_chunk") {
+			this.handleSessionMessage(run, sessionId, variant, raw);
+			return;
+		}
+		const echo = messageIdOf(raw);
+		if (
+			echo &&
+			(variant === "user_message" || variant === "user_message_chunk")
+		)
+			for (const steer of run.steers) steer.echoes.add(echo);
+		run.stream.handleUpdate(variant, raw, run.turnId);
+		if (variant !== "tool_call" && variant !== "tool_call_update") return;
+		const update = acpToolCallUpdateSchema.safeParse(raw);
+		if (update.success && update.data.title) {
+			this.backgroundTasks.update(run.item.id, { detail: update.data.title });
+		}
+	}
+
+	private handleSessionMessage(
+		run: SubagentRun,
+		childSessionId: string,
+		variant: "session_message" | "session_message_chunk",
+		raw: unknown,
+	): void {
+		const parsed = (
+			variant === "session_message"
+				? acpSessionMessageSchema
+				: acpSessionMessageChunkSchema
+		).safeParse(raw);
+		if (
+			!parsed.success ||
+			parsed.data.recipientSessionId !== childSessionId ||
+			parsed.data.senderSessionId === childSessionId
+		)
+			return;
+		const childVariant =
+			variant === "session_message" ? "user_message" : "user_message_chunk";
+		if (parsed.data.senderSessionId === run.parentSessionId)
+			run.stream.handleParentMessage(childVariant, parsed.data, run.turnId);
+		else run.stream.handleUpdate(childVariant, parsed.data, run.turnId);
+	}
+
+	private handleAsyncTaskSpawned(sessionId: string, raw: unknown): void {
+		const parsed = airAsyncTaskSpawnedSchema.safeParse(raw);
+		if (!parsed.success) return;
+		const { asyncTaskId, name, description, canStop, taskType } = parsed.data;
+		if (taskType === AIR_AUTONOMOUS_TURN_TASK_TYPE) {
+			if (sessionId === this.sessionId) this.startAutonomousTurn(asyncTaskId);
+			return;
+		}
+		if (this.finishedSubagents.has(sessionId)) return;
+		const owner = this.subagents.get(sessionId);
+		if (owner) {
+			const tasks = this.subagentTasks.get(sessionId) ?? new Set<string>();
+			this.subagentTasks.set(sessionId, tasks.add(asyncTaskId));
+		}
+		this.backgroundTasks.start({
+			id: asyncTaskId,
+			kind: "process",
+			name: name || description || "",
+			canStop: canStop ?? false,
+			startedAtMs: this.now(),
+			...(owner ? { parentId: owner.item.id } : {}),
+		});
+	}
+
+	private handleAsyncTaskProgress(raw: unknown): void {
+		const parsed = airAsyncTaskProgressSchema.safeParse(raw);
+		if (!parsed.success) return;
+		const { asyncTaskId, summary } = parsed.data;
+		if (summary) this.backgroundTasks.update(asyncTaskId, { detail: summary });
+	}
+
+	private handleAsyncTaskState(raw: unknown): void {
+		const parsed = airAsyncTaskStateSchema.safeParse(raw);
+		if (!parsed.success || !isTerminalAirState(parsed.data.state)) return;
+		const { asyncTaskId, state } = parsed.data;
+		if (this.autonomousTurns.has(asyncTaskId)) {
+			this.endAutonomousTurn(asyncTaskId, state);
+			return;
+		}
+		this.backgroundTasks.end(asyncTaskId);
+	}
+
 	/**
-	 * v2 has no session mode: a mode is a `select` config option whose category
-	 * says so, and `session/set_config_option` sets it.
+	 * A turn the agent starts after its answer, such as the reply to a
+	 * finished background subagent, reopens the latest turn, so the reply
+	 * reads as part of it and the turn's clock stays its last line.
 	 */
+	private startAutonomousTurn(asyncTaskId: string): void {
+		const latest = this.currentTurn;
+		if (latest?.status === "running") return;
+		if (!latest || !this.continuesBackgroundWork(latest)) {
+			const turnId = this.mintId();
+			this.autonomousTurns.set(asyncTaskId, turnId);
+			this.emitTurn({
+				id: turnId,
+				status: "running",
+				startedAtMs: this.nextStartMs(),
+			});
+		} else {
+			const { completedAtMs: _completedAtMs, ...reopened } = latest;
+			this.lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
+			this.autonomousTurns.set(asyncTaskId, latest.id);
+			this.emitTurn({ ...reopened, status: "running" });
+		}
+		this.emitSession({ status: this.statusAfterApprovals() });
+	}
+
+	/**
+	 * Only a reply to background work continues the turn. A stopped or failed
+	 * turn keeps its ending, and a scheduled wakeup gets a turn of its own.
+	 */
+	private continuesBackgroundWork(turn: Turn): boolean {
+		return (
+			turn.status === "completed" &&
+			(this.backgroundTaskTurns.size > 0 ||
+				this.lastBackgroundEndMs >= turn.startedAtMs)
+		);
+	}
+
+	private endAutonomousTurn(asyncTaskId: string, state: string): void {
+		const turnId = this.autonomousTurns.get(asyncTaskId);
+		this.autonomousTurns.delete(asyncTaskId);
+		const turn = this.currentTurn;
+		if (!turnId || turn?.id !== turnId || turn.status !== "running") return;
+		this.endCompactions();
+		this.main.flush();
+		this.emitTurn({
+			...turn,
+			status: state === "cancelled" ? "interrupted" : "completed",
+			completedAtMs: this.now(),
+		});
+		this.emitSession({ status: this.statusAfterApprovals() });
+		this.sendCustomAnswer();
+	}
+
 	private handleConfigOptions(raw: unknown): void {
 		const parsed = acpConfigOptionUpdateSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const mode = parsed.data.configOptions.find(
-			(option) => option.category === "mode",
-		);
-		if (!mode) return;
-		this.modeConfigId = mode.configId;
-		// Options arrive either flat or grouped under headers.
-		const options = (mode.options ?? []).flatMap((entry) =>
-			entry.options
-				? entry.options
-				: entry.value
-					? [{ value: entry.value, name: entry.name }]
-					: [],
-		);
-		const session: Partial<SessionState> = {
-			...(typeof mode.currentValue === "string"
-				? { modeId: mode.currentValue }
-				: {}),
-			...(options.length
+		this.booleanConfigIds = new Set();
+		this.configOptions = parsed.data.configOptions.flatMap((option) => {
+			const id = option.configId ?? option.id;
+			if (!id) return [];
+			if (option.type === "boolean") {
+				if (id !== FAST_CONFIG_ID) return [];
+				this.booleanConfigIds.add(id);
+				return [
+					{
+						id,
+						label: this.optionLabel(option.name),
+						...(option.category ? { category: option.category } : {}),
+						currentValue: option.currentValue === true ? TOGGLE_ON : TOGGLE_OFF,
+						options: [
+							{ id: TOGGLE_ON, label: "On" },
+							{ id: TOGGLE_OFF, label: "Off" },
+						],
+					},
+				];
+			}
+			if (option.type && option.type !== "select") return [];
+			return [
+				{
+					id,
+					label: this.optionLabel(option.name),
+					...(option.category ? { category: option.category } : {}),
+					...(typeof option.currentValue === "string"
+						? { currentValue: option.currentValue }
+						: {}),
+					options: flattenSelectOptions(option.options ?? [], (name) =>
+						this.optionLabel(name),
+					),
+				},
+			];
+		});
+		const mode = this.options.clientApprovalModes
+			? undefined
+			: this.configOptions.find((option) => option.category === "mode");
+		if (mode) this.modeConfigId = mode.id;
+		this.emitSession({
+			configOptions: this.configOptions,
+			...(mode?.currentValue ? { modeId: mode.currentValue } : {}),
+			...(mode?.options.length
 				? {
-						availableModes: options.map((option) => ({
-							id: option.value,
-							label: option.name,
+						availableModes: mode.options.map((option) => ({
+							id: option.id,
+							label: option.label,
 						})),
 					}
 				: {}),
+		});
+		if (this.pendingStart && this.configOptions.length > 0) {
+			this.pendingStart.apply(true);
+		}
+	}
+
+	private startModeId(
+		startOptions: HarnessStartOptions,
+		resumed: boolean,
+	): string | undefined {
+		if (startOptions.modeId === AGENT_DEFAULT_MODE) return undefined;
+		if (startOptions.modeId) return startOptions.modeId;
+		return resumed ? undefined : this.options.defaultModeId;
+	}
+
+	/** Resolves to the value the agent took, or undefined when it took none. */
+	private applyStartSelection(
+		category: SelectionCategory,
+		wanted: string | undefined,
+	): Promise<string | undefined> {
+		const option = this.configOptions.find(
+			(entry) => selectionCategoryOf(entry) === category,
+		);
+		if (!wanted || !option) return Promise.resolve(undefined);
+		const value =
+			category === "mode" || category === "fast"
+				? option.options.some((entry) => entry.id === wanted)
+					? wanted
+					: undefined
+				: startOptionId(option.options, wanted);
+		if (!value) return Promise.resolve(undefined);
+		if (option.currentValue === value) return Promise.resolve(value);
+		return this.setConfigOption(option.id, value).then((taken) =>
+			taken ? value : undefined,
+		);
+	}
+
+	private applyConfigSelections(
+		wanted: ChatSelections,
+	): Promise<ChatSelections> {
+		const model = this.applyStartSelection("model", wanted.modelId);
+		const { effortId } = wanted;
+		// The effort levels on offer belong to the model, so they are only known once it is set.
+		const effort = model.then((modelId) =>
+			effortId && (modelId || !wanted.modelId)
+				? this.applyStartSelection("thought_level", effortId)
+				: undefined,
+		);
+		this.trackSelection(effort);
+		// Fast mode also belongs to the model. It waits for effort too: a refused
+		// setting rolls back every option to before it was sent.
+		const fast = wanted.fast
+			? effort
+					.then(() => model)
+					.then((modelId) =>
+						modelId || !wanted.modelId
+							? this.applyStartSelection("fast", wanted.fast)
+							: undefined,
+					)
+			: Promise.resolve(undefined);
+		if (wanted.fast) this.trackSelection(fast);
+		const mode = this.applyStartSelection("mode", wanted.modeId);
+		return Promise.all([model, effort, mode, fast]).then(
+			([modelId, effortId, modeId, fastTaken]) => ({
+				...(modelId ? { modelId } : {}),
+				...(effortId ? { effortId } : {}),
+				...(modeId ? { modeId } : {}),
+				...(fastTaken ? { fast: fastTaken } : {}),
+			}),
+		);
+	}
+
+	/** An agent may list its options after `session/new`; the first prompt waits a moment for them. */
+	private awaitStartOptions(wanted: ChatSelections): Promise<ChatSelections> {
+		const taken = new Promise<ChatSelections>((resolve) => {
+			const timer = setTimeout(
+				() => this.pendingStart?.apply(false),
+				this.options.startOptionsGraceMs ?? START_OPTIONS_GRACE_MS,
+			);
+			this.pendingStart = {
+				apply: (listed) => {
+					clearTimeout(timer);
+					this.pendingStart = null;
+					resolve(listed ? this.applyConfigSelections(wanted) : {});
+				},
+			};
+		});
+		this.trackSelection(taken);
+		return taken;
+	}
+
+	private applyStartSelections(
+		startOptions: HarnessStartOptions,
+		sessionModes: AcpSessionModes | undefined,
+		resumed: boolean,
+	): void {
+		const modeId = this.startModeId(startOptions, resumed);
+		const wanted: ChatSelections = {
+			...(startOptions.modelId ? { modelId: startOptions.modelId } : {}),
+			...(startOptions.effortId ? { effortId: startOptions.effortId } : {}),
+			...(startOptions.fast ? { fast: startOptions.fast } : {}),
+			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
 		};
-		if (Object.keys(session).length > 0) this.emitSession(session);
+		const configured: Promise<ChatSelections> =
+			this.configOptions.length > 0
+				? this.applyConfigSelections(wanted)
+				: Object.keys(wanted).length > 0
+					? this.awaitStartOptions(wanted)
+					: Promise.resolve({});
+		this.modelSetSinceStart = false;
+		const confirmed = configured.then((taken) => {
+			if (!this.modelSetSinceStart)
+				this.unavailableStartModel =
+					wanted.modelId && !taken.modelId ? wanted.modelId : undefined;
+			return taken;
+		});
+		this.trackSelection(confirmed);
+		let sessionMode: Promise<string | undefined> = Promise.resolve(
+			this.options.clientApprovalModes && modeId && isClientApprovalMode(modeId)
+				? modeId
+				: undefined,
+		);
+		if (
+			modeId &&
+			!this.modeConfigId &&
+			sessionModes?.currentModeId === modeId
+		) {
+			sessionMode = Promise.resolve(modeId);
+		} else if (
+			modeId &&
+			!this.modeConfigId &&
+			sessionModes?.availableModes?.some((mode) => mode.id === modeId)
+		) {
+			sessionMode = this.setMode(modeId).then((taken) =>
+				taken ? modeId : undefined,
+			);
+		}
+		void Promise.all([confirmed, sessionMode]).then(([taken, takenMode]) => {
+			if (wanted.effortId && !taken.effortId)
+				console.warn(
+					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
+				);
+			this.settleStartSelections({
+				...taken,
+				...(takenMode ? { modeId: takenMode } : {}),
+			});
+		});
+	}
+
+	/** The start model, effort and mode the agent took. */
+	startSelections(): Promise<ChatSelections> {
+		return this.takenStartSelections;
 	}
 
 	private handleServerRequest(request: AcpServerRequest): void {
+		if (request.method === "elicitation/create") {
+			this.handleElicitation(request);
+			return;
+		}
 		if (request.method !== "session/request_permission") {
 			this.client?.respondWithError(
 				request.id,
@@ -915,35 +2381,208 @@ export class AcpAdapter implements HarnessAdapter {
 			);
 			return;
 		}
+		const allow = parsed.data.options.find((option) =>
+			/^allow\b/i.test(option.name),
+		);
+		const title =
+			parsed.data.title ??
+			parsed.data.toolCall?.title ??
+			parsed.data.subject?.toolCall?.title ??
+			"Permission required";
+		const description = parsed.data.description;
+		const reason = airPermissionReason(request.params);
+		const asking = [...this.main.allToolCalls()].some(
+			(call) => call.status === "running" && call.title === "ask_user_question",
+		);
+		const permission = !asking && Boolean(allow) && /^allow\b/i.test(title);
+		if (
+			this.options.clientApprovalModes &&
+			permission &&
+			allow &&
+			autoApproves(this.modeId)
+		) {
+			this.client?.respond(request.id, {
+				outcome: { outcome: "selected", optionId: allow.optionId },
+			});
+			return;
+		}
+		const question = this.options.clientApprovalModes === true && !permission;
+		const other = parsed.data.options.find((option) =>
+			/^other\b/i.test(option.name),
+		);
+		const choices = parsed.data.options.filter((option) => option !== other);
+		const headed = title.match(/^([^:\n]{1,40}):\s+([\s\S]+)$/);
+		const header = headed?.[1];
+		const questionText = headed?.[2] ?? title;
 		const turnId = this.resolveTurnId();
-		const targetItemId = parsed.data.toolCall?.toolCallId ?? null;
-		const approvalId = `approval:${targetItemId ?? this.mintId()}`;
+		const placement = this.approvalPlacement(
+			parsed.data.sessionId,
+			parsed.data.toolCall?.toolCallId,
+		);
+		const approvalId = `approval:${placement.targetItemId ?? this.mintId()}`;
 		const item: ApprovalRequest = {
 			id: approvalId,
 			kind: "approval_request",
-			targetItemId,
-			title: parsed.data.toolCall?.title ?? "Permission required",
+			...placement,
+			title,
+			...(description && description !== title
+				? { detail: [{ type: "text" as const, text: description }] }
+				: {}),
+			...(reason ? { reason } : {}),
 			status: "pending",
 			startedAtMs: this.nextStartMs(),
-			options: parsed.data.options.map((option) => ({
-				optionId: option.optionId,
-				label: option.name,
-			})),
+			...(question
+				? {
+						form: {
+							message: questionText,
+							fields: [
+								{
+									id: QUESTION_FIELD_ID,
+									...(header ? { title: header } : {}),
+									input: "single" as const,
+									options: choices.map((option) => ({
+										value: option.optionId,
+										label: option.name,
+									})),
+								},
+								...(other
+									? [
+											{
+												id: `${QUESTION_FIELD_ID}_custom`,
+												title: "Other",
+												description: "Type your own answer (optional).",
+												input: "text" as const,
+											},
+										]
+									: []),
+							],
+						},
+					}
+				: {
+						options: parsed.data.options.map((option) => ({
+							optionId: option.optionId,
+							label: option.name,
+							...(this.options.clientApprovalModes
+								? { kind: optionKindFromLabel(option.name) }
+								: isApprovalOptionKind(option.kind)
+									? { kind: option.kind }
+									: {}),
+						})),
+					}),
 		};
-		this.pendingApprovals.set(approvalId, {
+		this.raiseApproval({
 			requestId: request.id,
 			turnId,
 			item,
+			...(question ? { selectsOption: true } : {}),
+			...(question && other ? { otherOptionId: other.optionId } : {}),
 		});
-		this.emitItem(item, turnId);
+	}
+
+	private approvalPlacement(
+		sessionId: string | null | undefined,
+		toolCallId: string | null | undefined,
+	): Pick<ApprovalRequest, "targetItemId" | "parentItemId"> {
+		const owner = sessionId ? this.subagents.get(sessionId) : undefined;
+		return {
+			targetItemId: toolCallId
+				? (owner?.stream.toolItemId(toolCallId) ?? toolCallId)
+				: null,
+			...(owner ? { parentItemId: owner.item.id } : {}),
+		};
+	}
+
+	private raiseApproval(pending: PendingApproval): void {
+		this.pendingApprovals.set(pending.item.id, pending);
+		this.emitItem(pending.item, pending.turnId);
 		this.emitSession({ status: "awaiting_input" });
+	}
+
+	private sendCustomAnswer(): void {
+		const text = this.customAnswer;
+		if (!text) return;
+		this.customAnswer = null;
+		void this.runTurn([{ type: "text", text }]);
+	}
+
+	private approvePendingPermissions(): void {
+		for (const [approvalId, pending] of this.pendingApprovals) {
+			if (!pending.item.form) {
+				this.respondToApproval(approvalId, { type: "accept" });
+			}
+		}
+	}
+
+	private handleElicitation(request: AcpServerRequest): void {
+		const parsed = acpCreateElicitationParamsSchema.safeParse(request.params);
+		if (!parsed.success || (parsed.data.mode ?? "form") !== "form") {
+			this.client?.respondWithError(
+				request.id,
+				-32602,
+				"invalid elicitation request",
+			);
+			return;
+		}
+		const turnId = this.resolveTurnId();
+		const approvalId = `elicitation:${this.mintId()}`;
+		const properties = parsed.data.requestedSchema?.properties ?? {};
+		const required = new Set(parsed.data.requestedSchema?.required ?? []);
+		const item: ApprovalRequest = {
+			id: approvalId,
+			kind: "approval_request",
+			...this.approvalPlacement(parsed.data.sessionId, parsed.data.toolCallId),
+			title: parsed.data.message,
+			status: "pending",
+			startedAtMs: this.nextStartMs(),
+			form: {
+				message: parsed.data.message,
+				fields: Object.entries(properties).map(([id, property]) =>
+					formField(id, property, required.has(id)),
+				),
+			},
+		};
+		this.raiseApproval({
+			requestId: request.id,
+			turnId,
+			item,
+			fieldTypes: Object.fromEntries(
+				Object.entries(properties).map(([id, property]) => [id, property.type]),
+			),
+		});
 	}
 
 	private approvalOutcome(
 		pending: PendingApproval,
 		decision: Decision,
 	): unknown {
-		if (decision.type === "cancel")
+		if (pending.selectsOption) {
+			const typed =
+				decision.type === "form"
+					? decision.values[`${QUESTION_FIELD_ID}_custom`]
+					: null;
+			if (typeof typed === "string" && typed.trim() && pending.otherOptionId) {
+				this.customAnswer = typed.trim();
+				return {
+					outcome: { outcome: "selected", optionId: pending.otherOptionId },
+				};
+			}
+			const optionId =
+				decision.type === "form" ? decision.values[QUESTION_FIELD_ID] : null;
+			return typeof optionId === "string"
+				? { outcome: { outcome: "selected", optionId } }
+				: { outcome: { outcome: "cancelled" } };
+		}
+		if (pending.item.form) {
+			if (decision.type === "form") {
+				return {
+					action: "accept",
+					content: formContent(decision.values, pending.fieldTypes ?? {}),
+				};
+			}
+			if (decision.type === "cancel") return { action: "cancel" };
+			return { action: "decline" };
+		}
+		if (decision.type === "cancel" || decision.type === "form")
 			return { outcome: { outcome: "cancelled" } };
 		if (decision.type === "option") {
 			return { outcome: { outcome: "selected", optionId: decision.optionId } };
@@ -965,29 +2604,193 @@ export class AcpAdapter implements HarnessAdapter {
 			: { outcome: { outcome: "cancelled" } };
 	}
 
-	private toAcpPrompt(content: UserContent[]): unknown[] {
+	private async toAcpPrompt(content: UserContent[]): Promise<unknown[]> {
 		const blocks: unknown[] = [];
-		let skippedAttachment = false;
+		const dropped: string[] = [];
+		const takesImages =
+			(
+				this.agentCapabilities as {
+					promptCapabilities?: { image?: boolean };
+				}
+			).promptCapabilities?.image === true;
+
 		for (const entry of content) {
-			if (entry.type === "text")
+			if (entry.type === "text") {
 				blocks.push({ type: "text", text: entry.text });
-			else skippedAttachment = true;
+				continue;
+			}
+			const attachment = await this.options
+				.resolveAttachment?.(entry)
+				.catch(() => null);
+			if (!attachment) {
+				dropped.push(entry.name);
+				continue;
+			}
+			if (takesImages && attachment.mimeType.startsWith("image/")) {
+				blocks.push({
+					type: "image",
+					mimeType: attachment.mimeType,
+					data: attachment.data,
+				});
+				continue;
+			}
+			blocks.push({
+				type: "resource_link",
+				uri: `file://${attachment.path}`,
+				name: entry.name,
+				mimeType: attachment.mimeType,
+			});
 		}
-		if (skippedAttachment) {
+
+		if (dropped.length > 0) {
 			this.emitNotice(
 				"info",
-				"Attachments are not supported by the ACP harness and were omitted",
+				`Could not read ${dropped.join(", ")}, so ${dropped.length === 1 ? "it was" : "they were"} left out of this message.`,
 			);
 		}
 		return blocks;
 	}
 
 	private handleExit(code: number | null): void {
-		if (this.disposed) return;
+		if (this.disposed || this.dead) return;
+		this.dead = true;
 		this.stalePendingApprovals();
-		this.emitNotice("error", `acp agent exited (code ${code ?? "null"})`);
+		for (const sessionId of [...this.subagents.keys()]) {
+			this.finishSubagent(sessionId, "failed");
+		}
+		this.backgroundTasks.clear();
+		this.endCompactions();
+		const message = `acp agent exited (code ${code ?? "null"})`;
+		if (this.stderrTail) console.warn(`[acp] ${message}\n${this.stderrTail}`);
+		if (this.currentTurn?.status === "running") {
+			this.main.flush();
+			const detail = this.turnStderr.trim();
+			this.emitTurn({
+				...this.currentTurn,
+				status: "failed",
+				error: { message, kind: "crashed", ...(detail ? { detail } : {}) },
+				completedAtMs: this.now(),
+			});
+		}
+		this.emitNotice("error", this.withStderr(message));
 		this.emitSession({ status: "dead" });
 		this.queue.close();
+	}
+
+	private closeAfterFailure(): void {
+		this.client
+			?.close()
+			.catch((error) => console.warn("[acp] could not close the agent", error));
+	}
+
+	private turnError(error: unknown): TurnError {
+		const message =
+			error instanceof AcpRpcError
+				? error.detail
+				: error instanceof Error
+					? error.message
+					: String(error);
+		const kind = classifyTurnFailure({
+			message,
+			...(error instanceof AcpTimeoutError ? { timedOut: true } : {}),
+			...(error instanceof AcpRpcError ? { code: error.code } : {}),
+		});
+		const detail = this.turnStderr.trim();
+		return {
+			message,
+			kind,
+			...(detail ? { detail } : {}),
+			...(kind === "auth" && this.loginCommand
+				? { loginCommand: this.loginCommand }
+				: {}),
+		};
+	}
+
+	private withStderr(message: string): string {
+		const tail = this.stderrTail.trim();
+		return tail ? `${message}\n\n${tail}` : message;
+	}
+
+	private requestTimeoutMs(): number {
+		return this.options.requestTimeoutMs ?? REQUEST_TIMEOUT_MS;
+	}
+
+	private cancelPendingApprovals(turnId: string): boolean {
+		const liveRuns = new Set(
+			[...this.subagents.values()].map((run) => run.item.id),
+		);
+		return this.cancelApprovals(
+			(pending) =>
+				pending.turnId === turnId &&
+				!liveRuns.has(pending.item.parentItemId ?? ""),
+		);
+	}
+
+	private cancelSubagentApprovals(sessionId: string, run: SubagentRun): void {
+		const sessions = new Set([sessionId]);
+		const runItems = new Set([run.item.id]);
+		let grew = true;
+		while (grew) {
+			grew = false;
+			for (const [childId, child] of this.subagents) {
+				if (sessions.has(childId) || !sessions.has(child.parentSessionId))
+					continue;
+				sessions.add(childId);
+				runItems.add(child.item.id);
+				grew = true;
+			}
+		}
+		if (
+			this.cancelApprovals((pending) =>
+				runItems.has(pending.item.parentItemId ?? ""),
+			)
+		)
+			this.emitSession({ status: this.statusAfterApprovals() });
+	}
+
+	private statusAfterApprovals(): SessionState["status"] {
+		if (this.pendingApprovals.size > 0) return "awaiting_input";
+		return this.currentTurn?.status === "running" && !this.awaitingBackground
+			? "running"
+			: "idle";
+	}
+
+	private cancelApprovals(
+		matches: (pending: PendingApproval) => boolean,
+	): boolean {
+		let cancelled = false;
+		for (const [approvalId, pending] of [...this.pendingApprovals]) {
+			if (!matches(pending)) continue;
+			cancelled = true;
+			this.pendingApprovals.delete(approvalId);
+			this.client?.respond(
+				pending.requestId,
+				this.approvalOutcome(pending, { type: "cancel" }),
+			);
+			this.emitItem(
+				{ ...pending.item, status: "stale", completedAtMs: this.now() },
+				pending.turnId,
+			);
+		}
+		return cancelled;
+	}
+
+	private dropCancelledRequest(params: unknown): void {
+		const requestId = (params as { requestId?: unknown } | undefined)
+			?.requestId;
+		let dropped = false;
+		for (const [approvalId, pending] of [...this.pendingApprovals]) {
+			if (pending.requestId !== requestId) continue;
+			this.pendingApprovals.delete(approvalId);
+			dropped = true;
+			this.emitItem(
+				{ ...pending.item, status: "stale", completedAtMs: this.now() },
+				pending.turnId,
+			);
+		}
+		if (dropped && this.pendingApprovals.size === 0) {
+			this.emitSession({ status: this.statusAfterApprovals() });
+		}
 	}
 
 	private stalePendingApprovals(): void {
@@ -1003,7 +2806,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private authAwareMessage(error: unknown): string {
 		const message = error instanceof Error ? error.message : String(error);
 		if (/auth/i.test(message)) {
-			return `${message}. Run the agent's login in a terminal (e.g. \`claude /login\`), then reopen this chat.`;
+			return this.loginCommand
+				? `${message}. Run \`${this.loginCommand}\` in a terminal, then reopen this chat.`
+				: `${message}. Sign in to the agent in a terminal, then reopen this chat.`;
 		}
 		return message;
 	}
@@ -1044,12 +2849,86 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	private emitTurn(turn: Turn): void {
-		this.currentTurn = turn;
-		this.emit({ kind: "turn", turn });
+		if (turn.status !== "running" || turn.id !== this.currentTurn?.id) {
+			this.cycleEnded = false;
+			this.steeredCyclePending = false;
+		}
+		const next = this.sessionUsage
+			? { ...turn, sessionUsage: this.sessionUsage }
+			: turn;
+		this.currentTurn = next;
+		this.emit({ kind: "turn", turn: next });
+		this.syncAwaitingBackground();
+	}
+
+	private recordSessionUsage({ used, size, cost }: AcpUsageUpdate): void {
+		this.reportedCostUsd =
+			acpUsdCostSchema.safeParse(cost).data?.amount ?? this.reportedCostUsd;
+		const previous = this.sessionUsage;
+		const contextUsed = used ?? previous?.contextUsed;
+		const contextSize = size ?? previous?.contextSize;
+		if (contextUsed === undefined || contextSize === undefined) return;
+		const costUsd = this.reportedCostUsd;
+		if (
+			previous?.contextUsed === contextUsed &&
+			previous.contextSize === contextSize &&
+			previous.costUsd === costUsd
+		)
+			return;
+		this.sessionUsage = {
+			contextUsed,
+			contextSize,
+			...(costUsd === undefined ? {} : { costUsd }),
+		};
+		if (this.currentTurn) this.emitTurn(this.currentTurn);
+	}
+
+	private turnUsage(usage: AcpPromptUsage): NonNullable<Turn["usage"]> {
+		return {
+			inputTokens: usage.inputTokens,
+			cachedInputTokens: usage.cachedReadTokens ?? 0,
+			outputTokens: usage.outputTokens,
+			...(this.sessionUsage
+				? {
+						contextUsed: this.sessionUsage.contextUsed,
+						contextSize: this.sessionUsage.contextSize,
+					}
+				: {}),
+		};
+	}
+
+	private syncAwaitingBackground(): void {
+		const awaiting =
+			this.supportsSteering &&
+			this.currentTurn?.status === "running" &&
+			this.cycleEnded &&
+			[...this.backgroundTaskTurns.values()].includes(this.currentTurn.id);
+		if (awaiting === this.awaitingBackground) return;
+		this.awaitingBackground = awaiting;
+		this.emitSession({
+			awaitingBackground: awaiting,
+			status: this.statusAfterApprovals(),
+		});
 	}
 
 	private emitItem(item: Item, turnId: string): void {
 		this.emit({ kind: "item", item, turnId });
+	}
+
+	private emitTextDelta(
+		itemId: string,
+		append: string,
+		parentItemId?: string,
+	): void {
+		this.emit({
+			kind: "delta",
+			delta: {
+				type: "text",
+				itemId,
+				append,
+				...(parentItemId ? { parentItemId } : {}),
+			},
+		});
 	}
 
 	private emitNotice(
@@ -1069,11 +2948,34 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 	}
 
+	/**
+	 * The agent forwards Claude's `rate_limit_event` on its usage updates and
+	 * ends a refused turn with the CLI's own words. A refusal paid for by extra
+	 * usage reports nothing, and a turn that survives one is not a limit.
+	 */
+	private usageLimitFrom(message: string): UsageLimit | null {
+		const refused = this.refused;
+		this.refused = null;
+		if (!refused && !USAGE_LIMIT_TEXT.test(message)) return null;
+		return {
+			hitAtMs: this.now(),
+			...(refused?.resetsAtMs ? { resetsAtMs: refused.resetsAtMs } : {}),
+			...(refused?.window ? { window: refused.window } : {}),
+			...(this.lastModel ? { model: this.lastModel } : {}),
+		};
+	}
+
 	private emitSession(session: Partial<SessionState>): void {
+		if (session.modeId) this.modeId = session.modeId;
 		this.emit({ kind: "session", session });
 	}
 
 	private emit(event: AdapterEvent): void {
+		if (
+			this.quietReplay &&
+			(event.kind === "item" || event.kind === "turn" || event.kind === "delta")
+		)
+			return;
 		this.queue.push(event);
 	}
 
@@ -1086,6 +2988,97 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 }
 
+function isClientApprovalMode(modeId: string | undefined): modeId is string {
+	return CLIENT_APPROVAL_MODES.some((mode) => mode.id === modeId);
+}
+
+function autoApproves(modeId: string | undefined): boolean {
+	return modeId === "auto" || modeId === "bypassPermissions";
+}
+
+function optionKindFromLabel(
+	label: string,
+): "allow_once" | "allow_always" | "reject_once" {
+	if (/^(deny|reject|no)\b/i.test(label)) return "reject_once";
+	if (/always|session/i.test(label)) return "allow_always";
+	return "allow_once";
+}
+
+const piShellDetailsSchema = z.looseObject({
+	shellId: z.string().min(1),
+	status: z.string(),
+	pid: z.number().int().positive().optional(),
+});
+
+const piShellInputSchema = z.looseObject({
+	command: z.string().optional(),
+	description: z.string().optional(),
+});
+
+function processAlive(pid: number): boolean {
+	try {
+		process.kill(pid, 0);
+		return true;
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "EPERM";
+	}
+}
+
+function stopProcessGroup(pid: number): boolean {
+	for (const target of [-pid, pid]) {
+		try {
+			process.kill(target, "SIGTERM");
+			return true;
+		} catch {}
+	}
+	return false;
+}
+
 export function createAcpAdapter(options: AcpAdapterOptions): HarnessAdapter {
 	return new AcpAdapter(options);
+}
+
+function isHiddenUserMessage(raw: unknown): boolean {
+	const content = (raw as { content?: unknown } | null)?.content;
+	const block = acpContentBlockSchema.safeParse(
+		Array.isArray(content) ? content[0] : content,
+	);
+	return (
+		block.success &&
+		block.data.text !== undefined &&
+		isHiddenText(block.data.text)
+	);
+}
+
+function listedSessions(response: unknown): DiscoverSessionsResult {
+	const parsed = acpListSessionsResponseSchema.safeParse(response);
+	if (!parsed.success) {
+		throw new Error("acp session/list returned an unreadable page");
+	}
+	const nextCursor = parsed.data.nextCursor || undefined;
+	return {
+		supported: true,
+		sessions: parsed.data.sessions.map((session) => ({
+			sessionId: session.sessionId,
+			cwd: session.cwd,
+			...(session.title ? { title: session.title } : {}),
+			...(session.updatedAt ? { updatedAt: session.updatedAt } : {}),
+		})),
+		...(nextCursor ? { nextCursor } : {}),
+	};
+}
+
+function flattenSelectOptions(
+	entries: AcpConfigSelectOption[],
+	labelOf: (name: string) => string,
+): SessionConfigOption["options"] {
+	return entries.flatMap((entry) => {
+		const leaves =
+			entry.options ?? (entry.value ? [{ ...entry, value: entry.value }] : []);
+		return leaves.map((leaf) => ({
+			id: leaf.value,
+			label: labelOf(leaf.name),
+			...(leaf.description ? { description: leaf.description } : {}),
+		}));
+	});
 }

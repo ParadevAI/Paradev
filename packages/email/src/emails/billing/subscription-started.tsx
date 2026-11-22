@@ -1,4 +1,4 @@
-import { Heading, Hr, Text } from "@react-email/components";
+import { Hr, Text } from "@react-email/components";
 import { DetailRow, EmailLayout } from "../../components";
 
 interface SubscriptionStartedEmailProps {
@@ -8,6 +8,29 @@ interface SubscriptionStartedEmailProps {
 	billingInterval: "monthly" | "yearly";
 	amount: string;
 	seatCount: number;
+	/** The plan one step below, when this plan builds on another paid plan. */
+	previousPlanName?: string | null;
+	cloudHoursPerSeat?: number | null;
+}
+
+export function planFeatureLines({
+	previousPlanName,
+	cloudHoursPerSeat,
+}: Pick<
+	SubscriptionStartedEmailProps,
+	"previousPlanName" | "cloudHoursPerSeat"
+>): string[] {
+	const cloud = cloudHoursPerSeat
+		? [`Cloud workspaces: ${cloudHoursPerSeat} hours per seat each month`]
+		: [];
+	if (previousPlanName) return [`Everything in ${previousPlanName}`, ...cloud];
+	return [
+		...cloud,
+		"Remote access",
+		"Automations",
+		"Linear and Slack integrations",
+		"Mobile",
+	];
 }
 
 export function SubscriptionStartedEmail({
@@ -17,15 +40,14 @@ export function SubscriptionStartedEmail({
 	billingInterval = "monthly",
 	amount = "$10.00",
 	seatCount = 1,
+	previousPlanName = null,
+	cloudHoursPerSeat = null,
 }: SubscriptionStartedEmailProps) {
 	const intervalText = billingInterval === "monthly" ? "month" : "year";
+	const features = planFeatureLines({ previousPlanName, cloudHoursPerSeat });
 
 	return (
-		<EmailLayout preview={`Welcome to Superset ${planName}!`}>
-			<Heading className="text-[22px] font-medium leading-8 text-foreground m-0 mb-4">
-				Welcome to Superset {planName}
-			</Heading>
-
+		<EmailLayout preview={`Welcome to Paradev ${planName}!`}>
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {ownerName ?? "there"},
 			</Text>
@@ -46,9 +68,11 @@ export function SubscriptionStartedEmail({
 			</Text>
 
 			<Text className="text-[15px] leading-7 text-foreground m-0 mb-6">
-				✓ Unlimited team members
-				<br />✓ Remote access
-				<br />✓ Linear and Slack integrations
+				{features.map((feature, index) => (
+					<span key={feature}>
+						{index > 0 && <br />}✓ {feature}
+					</span>
+				))}
 			</Text>
 
 			<Text className="text-[13px] leading-5 text-muted m-0">

@@ -1,0 +1,1 @@
+export { WisprIcon } from "./WisprIcon";

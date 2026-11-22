@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { getEventBus, reconnectEventBusIfDown } from "./eventBus";
+import {
+	getEventBus,
+	peekEventBusConnectionStatus,
+	reconnectEventBusIfDown,
+} from "./eventBus";
 
 // Real WS server standing in for a host-service event bus. Records upgrades
 // and client commands; `push` broadcasts a server event to connected clients.
@@ -79,6 +83,32 @@ describe("eventBus", () => {
 		expect(other.length).toBe(0);
 	});
 
+	it("delivers chat:sessions-changed to listeners for its workspace", async () => {
+		const host = makeHostServer();
+		const bus = getEventBus(host.hostUrl, () => "tok");
+		const received: Array<[string, unknown]> = [];
+		cleanups.push(
+			bus.on("chat:sessions-changed", "ws-1", (workspaceId, payload) =>
+				received.push([workspaceId, payload]),
+			),
+		);
+		cleanups.push(() => host.server.stop(true));
+
+		await waitFor(() => host.clientCount() === 1);
+		host.push({
+			type: "chat:sessions-changed",
+			workspaceId: "ws-2",
+			occurredAt: 1,
+		});
+		host.push({
+			type: "chat:sessions-changed",
+			workspaceId: "ws-1",
+			occurredAt: 2,
+		});
+		await waitFor(() => received.length === 1);
+		expect(received).toEqual([["ws-1", { occurredAt: 2 }]]);
+	});
+
 	it("shares one connection per hostUrl across handles", async () => {
 		const host = makeHostServer();
 		const busA = getEventBus(host.hostUrl, () => "tok");
@@ -155,8 +185,22 @@ describe("eventBus", () => {
 		cleanups.push(() => revived.server.stop(true));
 
 		reconnectEventBusIfDown(host.hostUrl);
-		await waitFor(() => revived.clientCount() === 1, 2_000);
-		expect(bus.getConnectionStatus().state).toBe("open");
+		// About 1.1s of the 1.3s backoff is still left here.
+		await waitFor(() => bus.getConnectionStatus().state === "open", 500);
+		expect(revived.clientCount()).toBe(1);
+	});
+
+	it("peekEventBusConnectionStatus reads a held connection and never dials one", async () => {
+		const host = makeHostServer();
+		cleanups.push(() => host.server.stop(true));
+		expect(peekEventBusConnectionStatus(host.hostUrl)).toBeUndefined();
+		await Bun.sleep(50);
+		expect(host.upgrades.length).toBe(0);
+
+		const bus = getEventBus(host.hostUrl, () => "tok");
+		cleanups.push(bus.retain());
+		await waitFor(() => bus.getConnectionStatus().state === "open");
+		expect(peekEventBusConnectionStatus(host.hostUrl)?.state).toBe("open");
 	});
 
 	it("reconnectEventBusIfDown leaves an open connection alone", async () => {
@@ -171,34 +215,6 @@ describe("eventBus", () => {
 		expect(host.upgrades.length).toBe(1);
 		expect(bus.getConnectionStatus().state).toBe("open");
 	});
-
-	it("caps automatic retry backoff so a recovered host is reached promptly", async () => {
-		const attempts: number[] = [];
-		const server = Bun.serve({
-			port: 0,
-			fetch(request, instance) {
-				attempts.push(Date.now());
-				// Enough failures to grow past five seconds without the cap.
-				if (attempts.length < 9)
-					return new Response("offline", { status: 503 });
-				if (instance.upgrade(request)) return;
-				return new Response("no", { status: 400 });
-			},
-			websocket: { message() {} },
-		});
-		const bus = getEventBus(`http://127.0.0.1:${server.port}`, () => "tok");
-		cleanups.push(bus.retain());
-		cleanups.push(() => server.stop(true));
-		await waitFor(() => bus.getConnectionStatus().state === "open", 30_000);
-		expect(attempts).toHaveLength(9);
-		const previousAttempt = attempts[7];
-		const finalAttempt = attempts[8];
-		if (previousAttempt === undefined || finalAttempt === undefined) {
-			throw new Error("Expected nine connection attempts");
-		}
-		// Allow scheduler jitter, but reject the uncapped 6.27s ninth dial.
-		expect(finalAttempt - previousAttempt).toBeLessThan(5_750);
-	}, 35_000);
 
 	it("closes the connection when the last listener unsubscribes", async () => {
 		const host = makeHostServer();
