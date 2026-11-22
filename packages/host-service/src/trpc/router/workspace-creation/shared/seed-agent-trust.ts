@@ -30,10 +30,9 @@ import {
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
-import { eq } from "drizzle-orm";
 import { parse } from "shell-quote";
 import type { HostDb } from "../../../../db";
-import { projects as projectsTable } from "../../../../db/schema";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
 type TrustFamily = "claude" | "codex" | "agy";
@@ -387,9 +386,7 @@ export async function seedWorkspaceAgentTrust(
 	try {
 		const target = resolveTrustTarget(db, config);
 		if (target?.family !== "agy") return;
-		const project = db.query.projects
-			.findFirst({ where: eq(projectsTable.id, workspace.projectId) })
-			.sync();
+		const project = getLocalProject(db, workspace.projectId);
 		if (!project) return;
 		await inheritAgyWorktreeTrust(
 			target.file,
