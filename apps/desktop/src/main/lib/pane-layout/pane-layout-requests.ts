@@ -82,7 +82,7 @@ class PaneLayoutRequests extends EventEmitter {
 		const focusedId =
 			focused && !focused.isDestroyed() ? focused.webContents.id : null;
 		const showing = [...this.subscribers.keys()].filter((id) =>
-			webContents.fromId(id)?.getURL().includes(`/v2-workspace/${workspaceId}`),
+			webContents.fromId(id)?.getURL().includes(`/workspace/${workspaceId}`),
 		);
 		if (showing.length > 0) {
 			return focusedId !== null && showing.includes(focusedId)

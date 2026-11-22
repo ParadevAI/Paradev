@@ -303,6 +303,66 @@ describe("readPullRequestDetail", () => {
 		]);
 	});
 
+	test("check runs a fine-grained token may not read mark the checks unavailable", async () => {
+		const page = pullRequest({
+			reviewThreads: {
+				pageInfo: { hasNextPage: false, endCursor: null },
+				nodes: [],
+			},
+		});
+		const contexts = page.repository.pullRequest.statusCheckRollup?.contexts;
+		const refused = Object.assign(
+			new Error("Resource not accessible by personal access token"),
+			{
+				errors: [
+					{
+						type: "FORBIDDEN",
+						message: "Resource not accessible by personal access token",
+						path: [
+							"repository",
+							"pullRequest",
+							"statusCheckRollup",
+							"contexts",
+							"nodes",
+							0,
+						],
+					},
+				],
+				data: {
+					repository: {
+						...page.repository,
+						pullRequest: {
+							...page.repository.pullRequest,
+							statusCheckRollup: {
+								contexts: contexts && {
+									...contexts,
+									nodes: [null, contexts.nodes[1]],
+								},
+							},
+						},
+					},
+				},
+			},
+		);
+		const read = (refuse: boolean) =>
+			readPullRequestDetail(
+				{
+					graphql: async <T>(query: string) => {
+						if (isAppGatedRead(query)) return appGatedRead() as T;
+						if (refuse) throw refused;
+						return page as T;
+					},
+					requestedReviewers: async () => ({ users: [], teams: [] }),
+				},
+				input,
+			);
+		const detail = await read(true);
+		expect(detail.pullRequest.title).toBe("Widgets");
+		expect(detail.checks.map((check) => check.name)).toEqual(["lint"]);
+		expect(detail.checksUnavailable).toBe(true);
+		expect((await read(false)).checksUnavailable).toBe(false);
+	});
+
 	test("a refusal outside the checks, or next to another error, still fails the read", async () => {
 		const failures = [
 			{

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { renewChatgptSignInsAndBoxes } from "@superset/trpc/lib/sandbox";
+import { renewChatgptSignIns } from "@superset/trpc/lib/sandbox";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +7,6 @@ export const maxDuration = 300;
 
 // Cloudflare returns 524 after ~100s of silence and QStash then retries, so
 // a run stops early; the next run takes the rest.
-const RENEW_BUDGET_MS = 40_000;
 const RUN_BUDGET_MS = 60_000;
 
 /**
@@ -25,13 +24,7 @@ export async function POST(request: Request): Promise<Response> {
 
 	const outcome = await Sentry.withMonitor(
 		"renew-chatgpt-sign-ins",
-		() => {
-			const startedAt = Date.now();
-			return renewChatgptSignInsAndBoxes({
-				renewUntil: startedAt + RENEW_BUDGET_MS,
-				updateBoxesUntil: startedAt + RUN_BUDGET_MS,
-			});
-		},
+		() => renewChatgptSignIns({ deadline: Date.now() + RUN_BUDGET_MS }),
 		{ schedule: { type: "crontab", value: "0 * * * *" } },
 	);
 	// Turbopack builds do not wrap route handlers, so nothing else flushes the closing check-in.

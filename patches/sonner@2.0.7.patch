@@ -1,0 +1,44 @@
+diff --git a/dist/index.js b/dist/index.js
+index bd21e898f431298b70e941833c78819a1eb53a36..ce9290348d63e4cd9588748b69adae0f34e578cc 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -500,7 +500,7 @@ const Toast = (props)=>{
+     ]);
+     const isDocumentHidden = useIsDocumentHidden();
+     const invert = toast.invert || ToasterInvert;
+-    const disabled = toastType === 'loading';
++    const disabled = false;
+     offset.current = React__default.default.useMemo(()=>heightIndex * gap + toastsHeightBefore, [
+         heightIndex,
+         toastsHeightBefore
+@@ -783,7 +783,7 @@ const Toast = (props)=>{
+             (_toastRef_current = toastRef.current) == null ? void 0 : _toastRef_current.style.setProperty('--swipe-amount-x', `${swipeAmount.x}px`);
+             (_toastRef_current1 = toastRef.current) == null ? void 0 : _toastRef_current1.style.setProperty('--swipe-amount-y', `${swipeAmount.y}px`);
+         }
+-    }, closeButton && !toast.jsx && toastType !== 'loading' ? /*#__PURE__*/ React__default.default.createElement("button", {
++    }, closeButton && !toast.jsx ? /*#__PURE__*/ React__default.default.createElement("button", {
+         "aria-label": closeButtonAriaLabel,
+         "data-disabled": disabled,
+         "data-close-button": true,
+diff --git a/dist/index.mjs b/dist/index.mjs
+index d0c7a5a1fa1ed8b19c27bea968bb404f2437a07e..9730e8fdb46b4dee9b36db6a7a5c0a3fe3fa39ad 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -493,7 +493,7 @@ const Toast = (props)=>{
+     ]);
+     const isDocumentHidden = useIsDocumentHidden();
+     const invert = toast.invert || ToasterInvert;
+-    const disabled = toastType === 'loading';
++    const disabled = false;
+     offset.current = React.useMemo(()=>heightIndex * gap + toastsHeightBefore, [
+         heightIndex,
+         toastsHeightBefore
+@@ -776,7 +776,7 @@ const Toast = (props)=>{
+             (_toastRef_current = toastRef.current) == null ? void 0 : _toastRef_current.style.setProperty('--swipe-amount-x', `${swipeAmount.x}px`);
+             (_toastRef_current1 = toastRef.current) == null ? void 0 : _toastRef_current1.style.setProperty('--swipe-amount-y', `${swipeAmount.y}px`);
+         }
+-    }, closeButton && !toast.jsx && toastType !== 'loading' ? /*#__PURE__*/ React.createElement("button", {
++    }, closeButton && !toast.jsx ? /*#__PURE__*/ React.createElement("button", {
+         "aria-label": closeButtonAriaLabel,
+         "data-disabled": disabled,
+         "data-close-button": true,

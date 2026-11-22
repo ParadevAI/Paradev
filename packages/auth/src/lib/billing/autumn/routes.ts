@@ -1,7 +1,9 @@
 import { db } from "@superset/db/client";
 import { members, subscriptions } from "@superset/db/schema";
 import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
 	AUTO_TOPUP_MONTHLY_LIMIT,
+	BOX_GB_MINUTES_FEATURE_ID,
 	GB_HOUR_PURCHASE,
 	gbHourPack,
 	gbHourPurchase,
@@ -18,6 +20,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { autumnClient, billingUsesAutumn } from "../../../autumn";
 import { countBillableSeats } from "../../../utils/billing";
+import { isAwsMarketplaceOrganization } from "../aws-marketplace/organization";
 import {
 	currentPlanIdForLegacy,
 	isProFamilyPlan,
@@ -34,10 +37,6 @@ import {
 	heldAutumnPlanId,
 } from "./customer";
 import { paidPlanIdFromFlags } from "./entitlements";
-import {
-	ACTIVE_CPU_MINUTES_FEATURE_ID,
-	BOX_GB_MINUTES_FEATURE_ID,
-} from "./features";
 import { invalidateOrganizationBilling } from "./plan-state";
 import { syncOrganizationSubscription } from "./projection";
 import {
@@ -46,6 +45,7 @@ import {
 	checkoutSessionParams,
 	OWNER_EXPAND,
 	ROUTE_ROLES,
+	STRIPE_BILLED_ROUTES,
 } from "./routes-policy";
 import { yearlyChangeStart } from "./seat-policy";
 import { seatPurchase } from "./seats";
@@ -88,6 +88,15 @@ async function billingCaller(
 	if (!role || !(ROUTE_ROLES[route] as readonly BillingRole[]).includes(role)) {
 		throw new APIError("FORBIDDEN", {
 			message: "You don't have permission to manage billing",
+		});
+	}
+	if (
+		STRIPE_BILLED_ROUTES.has(route) &&
+		(await isAwsMarketplaceOrganization(organizationId))
+	) {
+		throw new APIError("FORBIDDEN", {
+			message:
+				"This organization is billed through AWS Marketplace. Change its plan or seats in AWS Marketplace.",
 		});
 	}
 	return { organizationId, userId: session.user.id, role };

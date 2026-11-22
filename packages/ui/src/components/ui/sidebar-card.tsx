@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import type * as React from "react";
-import { LuMinus } from "react-icons/lu";
+import { LuX } from "react-icons/lu";
 import { i18n } from "../../lib/i18n";
 import { cn } from "../../lib/utils";
 import { Badge } from "./badge";
@@ -51,14 +51,12 @@ function SidebarCard({
 				data-slot="sidebar-card"
 				className={cn(
 					"group relative isolate overflow-hidden rounded-xl border border-white/10 bg-black shadow-sm",
-					"transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg",
+					"transition-shadow duration-300 ease-out hover:shadow-lg",
 					className,
 				)}
 			>
 				<div className="relative">
-					<div className="transition-transform duration-500 ease-out group-hover:scale-[1.04]">
-						{media}
-					</div>
+					{media}
 					<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/70 via-35% to-transparent to-70%" />
 					<div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5">
 						{badge && (
@@ -93,9 +91,9 @@ function SidebarCard({
 						type="button"
 						onClick={onDismiss}
 						aria-label={dismissLabel}
-						className="absolute top-1.5 right-1.5 z-20 flex size-6 items-center justify-center rounded-md text-white/70 opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-white/10 hover:text-white focus-visible:opacity-100 group-hover:opacity-100"
+						className="absolute top-1.5 right-1.5 z-20 flex size-6 items-center justify-center rounded-full bg-black/35 text-white/80 backdrop-blur-sm opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-black/55 hover:text-white focus-visible:opacity-100 group-hover:opacity-100"
 					>
-						<LuMinus className="size-3.5" />
+						<LuX className="size-3.5" strokeWidth={2} />
 					</button>
 				)}
 
@@ -146,9 +144,9 @@ function SidebarCard({
 					type="button"
 					onClick={onDismiss}
 					aria-label={dismissLabel}
-					className="absolute top-1.5 right-1.5 z-10 flex size-6 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
+					className="absolute top-1.5 right-1.5 z-10 flex size-6 items-center justify-center rounded-md text-foreground/70 opacity-0 transition-[opacity,color,background-color] duration-200 hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
 				>
-					<LuMinus className="size-3.5" />
+					<LuX className="size-3.5" strokeWidth={2} />
 				</button>
 			)}
 

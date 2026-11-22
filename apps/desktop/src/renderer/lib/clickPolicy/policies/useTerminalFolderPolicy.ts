@@ -1,6 +1,8 @@
-import { useCallback } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
-import type { ModifierEvent } from "../types";
+import { useCallback, useMemo } from "react";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
+import { withPlainDefault } from "../tiers";
+import type { ModifierEvent, TierMode } from "../types";
+import { FOLDER_LINK_PLAIN_DEFAULT } from "./agentOutputLinks";
 import {
 	type FolderIntent,
 	type FolderTierMap,
@@ -12,13 +14,19 @@ export interface FolderClickPolicy {
 	map: FolderTierMap;
 }
 
-/** Settings-driven click policy for folder links in terminal output. */
-export function useTerminalFolderPolicy(): FolderClickPolicy {
-	const { preferences } = useV2UserPreferences();
-	const map = preferences.folderLinks;
-	const getIntent = useCallback(
-		(event: ModifierEvent) => folderIntentForMap(event, map),
-		[map],
+/** Settings-driven click policy for folder links in terminal and chat output. */
+export function useTerminalFolderPolicy(
+	mode: TierMode = "4-tier",
+): FolderClickPolicy {
+	const { preferences } = useUserPreferences();
+	const stored = preferences.folderLinks;
+	const map = useMemo(
+		() => withPlainDefault(stored, FOLDER_LINK_PLAIN_DEFAULT),
+		[stored],
 	);
-	return { getIntent, map };
+	const getIntent = useCallback(
+		(event: ModifierEvent) => folderIntentForMap(event, map, mode),
+		[map, mode],
+	);
+	return useMemo(() => ({ getIntent, map }), [getIntent, map]);
 }

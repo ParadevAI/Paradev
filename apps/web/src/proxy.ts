@@ -1,10 +1,12 @@
 import { auth } from "@superset/auth/server";
 import { isStaffEmail } from "@superset/shared/constants";
 import { withDomainMove } from "@superset/shared/domain-move";
+import { getSessionCookie } from "better-auth/cookies";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import {
+	adminReturnUrl,
 	agentsRewriteUrl,
 	isAgentsRoute,
 	isAuthPageRoute,
@@ -55,10 +57,10 @@ async function legacyProxy(
 		pathname.startsWith("/trpc/");
 
 	if (session && isAuthPageRoute(pathname)) {
-		const target = safeRedirectUrl(
-			req.nextUrl.searchParams.get("redirect"),
-			req.nextUrl.origin,
-		);
+		const redirect = req.nextUrl.searchParams.get("redirect");
+		const target =
+			safeRedirectUrl(redirect, req.nextUrl.origin) ??
+			adminReturnUrl(redirect, process.env.NEXT_PUBLIC_ADMIN_URL);
 		return NextResponse.redirect(target ?? new URL("/", req.url));
 	}
 
@@ -72,6 +74,8 @@ async function legacyProxy(
 	if (!session && !isPublicRoute(pathname)) {
 		const signInUrl = new URL("/sign-in", req.url);
 		signInUrl.searchParams.set("redirect", pathname + req.nextUrl.search);
+		if (getSessionCookie(req))
+			signInUrl.searchParams.set("reason", "session_expired");
 		return NextResponse.redirect(signInUrl);
 	}
 

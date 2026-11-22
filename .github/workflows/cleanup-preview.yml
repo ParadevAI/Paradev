@@ -31,7 +31,7 @@ jobs:
         run: |
           failed=0
           for host in "pr-$PR_NUMBER.paradev.com" "app.pr-$PR_NUMBER.paradev.com" "api.pr-$PR_NUMBER.paradev.com"; do
-            bunx vercel@50.22.1 alias rm "$host" --yes --scope="$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" || failed=1
+            bunx vercel@50.31.0 alias rm "$host" --yes --scope="$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" || failed=1
           done
           exit "$failed"
 

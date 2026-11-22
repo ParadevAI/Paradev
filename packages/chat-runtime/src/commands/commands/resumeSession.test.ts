@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
+import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type { SessionState, UserContent } from "@superset/chat/protocol";
 import { FakeHarness } from "../../harness/fake";
 import type { HarnessFactoryOptions, HarnessRegistry } from "../../sessions";
@@ -12,6 +13,7 @@ import {
 } from "../../testing/testUtils";
 
 const text = (value: string): UserContent[] => [{ type: "text", text: value }];
+const PROCEED = text(CONTINUE_PROMPT);
 
 function runtimeWithStartedAgents(session: Partial<SessionState> = {}) {
 	const started: HarnessFactoryOptions[] = [];
@@ -223,6 +225,34 @@ describe("resuming chats after a restart", () => {
 		]);
 		expect(restored.turn).toBeNull();
 		await after.runtime.dispose();
+	});
+
+	test("a continue left in a paused queue counts as an interruption, not a queued prompt", async () => {
+		const { runtime } = runtimeWithStartedAgents();
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+		});
+		await waitFor(() => runtime.live.get(sessionId)?.state.status === "idle");
+		const live = runtime.live.require(sessionId);
+		live.prompt(text("first"), randomUUID());
+		await waitFor(() => live.turn?.status === "running");
+		for (const content of [text("held"), PROCEED, PROCEED]) {
+			live.prompt(content, randomUUID());
+		}
+		live.cancelTurn(undefined, true);
+		await waitFor(() => live.turn?.status === "interrupted");
+
+		expect(runtime.live.unfinished()).toEqual([
+			expect.objectContaining({
+				interrupted: true,
+				prompts: [],
+				pausedPrompts: [text("held")],
+			}),
+		]);
+		await runtime.dispose();
 	});
 
 	test("an idle chat with a command running in the background is unfinished", async () => {

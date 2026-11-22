@@ -8,6 +8,7 @@ import {
 	test,
 } from "bun:test";
 import type { createRelaySocket } from "@superset/workspace-client/relay-socket";
+import { Terminal as HeadlessTerminal } from "@xterm/headless";
 import type { Terminal as XTerm } from "@xterm/xterm";
 import {
 	background,
@@ -17,6 +18,7 @@ import {
 	park,
 	reconnect,
 	sendColors,
+	sendResize,
 } from "./terminal-ws-transport";
 
 // The transport builds on createRelaySocket (partysocket) — reconnection,
@@ -450,6 +452,57 @@ describe("terminal-ws-transport", () => {
 			{ type: "input", data: "a" },
 			{ type: "input", data: "b" },
 		]);
+	});
+
+	test("asks for a repaint on the first resize after the screen went stale", () => {
+		const transport = createTransport();
+		const terminal = createMockTerminal();
+		transport._repaintRequest = "needed";
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances[0];
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		sendResize(transport, 101, 27);
+
+		expect(
+			socket.sent.map((payload) => JSON.parse(payload) as unknown),
+		).toEqual([
+			{ type: "visible", visible: true },
+			{ type: "resize", cols: 101, rows: 27, repaint: true },
+			{ type: "resize", cols: 101, rows: 27 },
+		]);
+	});
+
+	test("asks for the repaint again when the connection ended before the host answered", () => {
+		const transport = createTransport();
+		const terminal = createMockTerminal();
+		transport._repaintRequest = "needed";
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances[0];
+		if (!socket) throw new Error("expected relay socket instance");
+		const attach = () => {
+			socket.open();
+			socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		};
+
+		attach();
+		socket.drop();
+		attach();
+		socket.message(JSON.stringify({ type: "size", cols: 101, rows: 27 }));
+		socket.drop();
+		attach();
+
+		expect(
+			socket.sent
+				.map(
+					(payload) => JSON.parse(payload) as { type: string; repaint?: true },
+				)
+				.filter((message) => message.type === "resize")
+				.map((message) => message.repaint === true),
+		).toEqual([true, true, false]);
 	});
 
 	test("never gives up: keeps one socket and never self-closes on repeated failures", () => {
@@ -1084,5 +1137,39 @@ describe("background", () => {
 		expect(socket.closed).toBe(true);
 		expect(socket.reconnectCount).toBe(0);
 		expect(transport.connectionState).toBe("disconnected");
+	});
+});
+
+describe("replayed output", () => {
+	test("queries in bytes before the synced head are not answered; live ones are", async () => {
+		const transport = createTransport();
+		const terminal = new HeadlessTerminal({ allowProposedApi: true });
+		connect(transport, terminal as unknown as XTerm, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		const replayed = "$ \x1b[c\x1b[6n";
+		socket.message(
+			JSON.stringify({
+				type: "synced",
+				epoch: "e1",
+				seq: 0,
+				head: replayed.length,
+				mode: "tail",
+			}),
+		);
+		const frame = new TextEncoder().encode(`${replayed}\x1b[c`);
+		socket.message(frame.buffer);
+		transport._writeCoalescer?.flushSync();
+		await new Promise<void>((resolve) => terminal.write("", resolve));
+
+		const inputs = socket.sent
+			.map((raw) => JSON.parse(raw) as { type: string; data?: string })
+			.filter((message) => message.type === "input");
+		expect(inputs).toEqual([{ type: "input", data: "\x1b[?1;2c" }]);
+		expect(transport.seqAnchor).toEqual({ epoch: "e1", seq: frame.length });
+		disconnect(transport);
+		terminal.dispose();
 	});
 });

@@ -321,23 +321,28 @@ function CheckRows({ checks }: { checks: PullRequestCheck[] }) {
 function ChecksSection({
 	variant,
 	checks,
+	unavailable,
 }: {
 	variant: PullRequestInfoVariant;
 	checks: PullRequestCheck[];
+	unavailable: boolean;
 }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
 	const summary = summarizePullRequestChecks(checks);
+	const empty = (
+		<span className="text-muted-foreground">
+			{unavailable ? (
+				<Trans>Checks unavailable</Trans>
+			) : (
+				<Trans>No checks</Trans>
+			)}
+		</span>
+	);
 	if (variant === "column") {
 		return (
 			<InfoSection variant="column" label={t({ message: "Checks" })}>
-				{checks.length === 0 ? (
-					<span className="text-muted-foreground">
-						<Trans>No checks</Trans>
-					</span>
-				) : (
-					<CheckRows checks={checks} />
-				)}
+				{checks.length === 0 ? empty : <CheckRows checks={checks} />}
 			</InfoSection>
 		);
 	}
@@ -358,9 +363,7 @@ function ChecksSection({
 			icon={<ListChecks strokeWidth={1.75} className="size-4" />}
 		>
 			{checks.length === 0 ? (
-				<span className="text-muted-foreground">
-					<Trans>No checks</Trans>
-				</span>
+				empty
 			) : (
 				<Collapsible
 					open={open}
@@ -418,7 +421,11 @@ export function PullRequestInfo({ data, variant }: PullRequestInfoProps) {
 				<CommentsSection variant={variant} count={data.comments.length} />
 			) : null}
 			<ReviewsSection variant={variant} data={data} />
-			<ChecksSection variant={variant} checks={data.checks} />
+			<ChecksSection
+				variant={variant}
+				checks={data.checks}
+				unavailable={data.checksUnavailable === true}
+			/>
 		</div>
 	);
 }

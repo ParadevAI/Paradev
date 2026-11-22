@@ -1,4 +1,4 @@
-import type { TagFolderWorkspaceInput } from "./workspaceTagFolders";
+import type { TagFolderWorkspaceInput } from "@superset/shared/workspace-tag-folders";
 
 export interface HostTagFolderWorkspace extends TagFolderWorkspaceInput {
 	hostId: string;

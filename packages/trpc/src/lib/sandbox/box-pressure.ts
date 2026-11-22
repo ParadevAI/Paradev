@@ -31,7 +31,7 @@ export async function reportSandboxBoxPressure(args: {
 		.where(
 			and(
 				eq(cloudWorkspaces.id, args.workspaceId),
-				ne(cloudWorkspaces.status, "deleted"),
+				ne(cloudWorkspaces.status, "archived"),
 			),
 		);
 	if (!row) return "unknown";

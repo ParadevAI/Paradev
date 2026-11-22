@@ -255,7 +255,9 @@ beside the job route.
 
 `billing.recordUpgradeIntent` emits `billing.upgrade_nudge_due` (payload
 `featureName`, `upgradeUrl`) at most once per user per 7 days, through a KV
-claim. It skips organizations on a paid plan and unsubscribed contacts. The
+claim. It goes to organization owners only, the people who can pay on the
+billing page it links to, and skips organizations on a paid plan and
+unsubscribed contacts. The
 `upgrade-nudge` automation in `scripts/sync-automations.ts` sends the
 `billing-upgrade-nudge` template. That path gives the email Resend's unsubscribe
 link and `List-Unsubscribe` headers, which a direct `emails.send()` does not get.

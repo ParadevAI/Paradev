@@ -2,9 +2,8 @@ import { positional, string } from "@superset/cli-framework";
 import { command } from "../../../../../lib/command";
 
 export default command({
-	sandbox: false,
 	description:
-		"Sync your organization's plugins from a GitHub repository the Superset GitHub App is installed on",
+		"Sync your organization's plugins from a GitHub repository the Paradev GitHub App is installed on",
 	args: [positional("repo").required().desc("owner/name")],
 	options: {
 		ref: string().desc(

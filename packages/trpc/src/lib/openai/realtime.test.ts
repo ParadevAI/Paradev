@@ -46,16 +46,15 @@ describe("mintRealtimeClientSecret", () => {
 	});
 
 	test("surfaces an upstream failure with its status", async () => {
-		const fetchImpl = (async () =>
-			new Response("rate limited", { status: 429 })) as typeof fetch;
+		const fetchImpl = async () => new Response("rate limited", { status: 429 });
 		await expect(
 			mintRealtimeClientSecret(input, fetchImpl),
 		).rejects.toBeInstanceOf(RealtimeMintError);
 	});
 
 	test("rejects a response without a secret", async () => {
-		const fetchImpl = (async () =>
-			new Response(JSON.stringify({}), { status: 200 })) as typeof fetch;
+		const fetchImpl = async () =>
+			new Response(JSON.stringify({}), { status: 200 });
 		await expect(mintRealtimeClientSecret(input, fetchImpl)).rejects.toThrow(
 			/missing value/,
 		);

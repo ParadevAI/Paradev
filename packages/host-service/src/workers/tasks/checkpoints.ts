@@ -23,9 +23,9 @@ const GIT_TIMEOUT_MS = 15_000;
 const PATH_BATCH = 200;
 const REGULAR_FILE_MODES = new Set(["100644", "100755"]);
 const CHECKPOINT_IDENTITY = {
-	GIT_AUTHOR_NAME: "Superset",
+	GIT_AUTHOR_NAME: "Paradev",
 	GIT_AUTHOR_EMAIL: "checkpoints@superset.sh",
-	GIT_COMMITTER_NAME: "Superset",
+	GIT_COMMITTER_NAME: "Paradev",
 	GIT_COMMITTER_EMAIL: "checkpoints@superset.sh",
 };
 export const SHARED_TURN_TRAILER = "Superset-Shared-Turn: true";

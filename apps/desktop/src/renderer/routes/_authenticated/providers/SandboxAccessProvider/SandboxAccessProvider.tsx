@@ -1,4 +1,5 @@
 import { isCloudUsageRefusal } from "@superset/shared/billing";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	type QueryClient,
 	type UseQueryResult,
@@ -35,7 +36,7 @@ import {
  */
 const OPEN_WORKSPACE_KEEPALIVE_MS = 10 * 60 * 1000;
 
-export interface SandboxTarget {
+interface SandboxTarget {
 	/** The cloud workspace's id, which is also its host address key. */
 	workspaceId: string;
 	organizationId: string;
@@ -44,12 +45,12 @@ export interface SandboxTarget {
 	desktopUrl: string;
 }
 
-export interface SandboxAccessValue {
+interface SandboxAccessValue {
 	targets: SandboxTarget[];
 	/** False until the cloud list is known and every ready workspace in it has been addressed once. */
 	isReady: boolean;
-	/** The open workspace, when its box booted with agent sign-ins its creator has since changed. */
-	agentCredentialsChangedWorkspaceId: string | null;
+	/** The open workspace's agents whose sign-in kind changed since its box booted. */
+	agentsToRestart: { workspaceId: string; agents: string[] } | null;
 	usageRefusal: { workspaceId: string; error: unknown } | null;
 	wakeOpenWorkspace: () => Promise<void>;
 }
@@ -110,18 +111,18 @@ function combineAccess(results: UseQueryResult<SandboxAccess>[]) {
 export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 	const { workspaces: cloudWorkspaces, organizationId } = useCloudWorkspaces();
 	const openMatch = useMatchRoute()({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;
 
-	// Only a `ready` row has a sandbox to address: `access` refuses anything
+	// Only an `awake` or `asleep` row has a sandbox to address: `access` refuses anything
 	// else, and a provisioning workspace asking for a ticket every few seconds
 	// would be a retry loop against a guaranteed rejection.
 	const workspaces = useMemo(
 		() =>
-			(cloudWorkspaces ?? []).filter(
-				(workspace) => workspace.status === "ready",
+			(cloudWorkspaces ?? []).filter((workspace) =>
+				isLiveCloudWorkspaceStatus(workspace.status),
 			),
 		[cloudWorkspaces],
 	);
@@ -216,9 +217,9 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 		() => ({
 			targets,
 			isReady: cloudWorkspaces !== undefined && access.allFetched,
-			agentCredentialsChangedWorkspaceId:
-				openWorkspace && wake.data?.agentCredentialsChanged
-					? openWorkspace.id
+			agentsToRestart:
+				openWorkspace && wake.data?.agentsToRestart?.length
+					? { workspaceId: openWorkspace.id, agents: wake.data.agentsToRestart }
 					: null,
 			usageRefusal:
 				openWorkspace && isCloudUsageRefusal(wake.error)
@@ -247,7 +248,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 const NO_SANDBOX_ACCESS: SandboxAccessValue = {
 	targets: [],
 	isReady: true,
-	agentCredentialsChangedWorkspaceId: null,
+	agentsToRestart: null,
 	usageRefusal: null,
 	wakeOpenWorkspace: async () => {},
 };

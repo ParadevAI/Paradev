@@ -16,10 +16,12 @@ import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
+import { getConnector } from "@superset/shared/connectors";
 import { COMPANY } from "@superset/shared/constants";
 import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
+import { productAudiences } from "@superset/shared/verify-jwt";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -62,6 +64,7 @@ import {
 	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
+import { nullOnRejectedApiKey } from "./lib/rejected-api-key";
 import { resend } from "./lib/resend";
 import {
 	resolveSessionOrganizationState,
@@ -112,6 +115,10 @@ const desktopDevOrigins =
 				`http://127.0.0.1:${desktopDevPort}`,
 			]
 		: [];
+
+const adminMcpUrl = getConnector("paradev_admin_mcp")?.methods.find(
+	(method) => method.type === "oauth2",
+)?.authorization_url;
 
 export const auth = betterAuth({
 	baseURL: getBrowserApiUrl(env),
@@ -408,10 +415,8 @@ export const auth = betterAuth({
 			allowUnauthenticatedClientRegistration: true,
 			accessTokenExpiresIn: 60 * 60 * 24 * 7,
 			validAudiences: [
-				env.NEXT_PUBLIC_API_URL,
-				`${env.NEXT_PUBLIC_API_URL}/`,
-				`${env.NEXT_PUBLIC_API_URL}/api/v2/agent/mcp`,
-				`${env.NEXT_PUBLIC_API_URL}/mcp`,
+				...productAudiences(env.NEXT_PUBLIC_API_URL),
+				...(adminMcpUrl ? [adminMcpUrl] : []),
 			],
 			silenceWarnings: {
 				oauthAuthServerConfig: true,
@@ -611,7 +616,10 @@ export const auth = betterAuth({
 							),
 						);
 					if ((otherMemberships?.value ?? 0) === 0) {
-						throw new Error("You should be a member of at least one team");
+						throw new APIError("BAD_REQUEST", {
+							message: "You should be a member of at least one team",
+							code: "MUST_BELONG_TO_A_TEAM",
+						});
 					}
 				},
 
@@ -1279,6 +1287,11 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
+
+/** `auth.api.getSession` for a request, where a rejected API key means no session instead of a thrown error. */
+export function getRequestSession(headers: Headers) {
+	return nullOnRejectedApiKey(auth.api.getSession({ headers }));
+}
 
 /**
  * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT

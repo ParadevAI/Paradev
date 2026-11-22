@@ -13,7 +13,7 @@ const calm: BoxResources = {
 	memoryStalledNowPercent: 0,
 	memoryUsedMb: 2000,
 	memoryLimitMb: 8192,
-	recentReap: null,
+	memguardActions: [],
 };
 const start: BoxPressureState = { pressure: null, since: 0 };
 
@@ -44,20 +44,22 @@ describe("nextBoxPressure", () => {
 		expect(nextBoxPressure(busy, calm, 10_000)).toBe(busy);
 	});
 
-	test("a memguard kill is critical and the kill is kept while critical", () => {
-		const reap = { processName: "tsc", rssMb: 3100, at: 5 };
-		const critical = nextBoxPressure(start, { ...calm, recentReap: reap }, 0);
-		expect(critical.pressure).toMatchObject({
-			level: "critical",
-			limitedBy: ["memory"],
-			reap,
-		});
-		const stalled = nextBoxPressure(
-			critical,
-			{ ...calm, memoryStalledNowPercent: 20 },
-			BOX_PRESSURE_MIN_DWELL_MS * 2,
-		);
-		expect(stalled.pressure?.reap).toEqual(reap);
+	test("goes critical on a memory stall and ignores a process kill", () => {
+		const reap = {
+			kind: "reap" as const,
+			at: 0,
+			rssMb: 4700,
+			adj: 500,
+			availableMb: 500,
+			floorMb: 650,
+		};
+		expect(
+			nextBoxPressure(start, { ...calm, memguardActions: [reap] }, 0).pressure,
+		).toBeNull();
+		expect(
+			nextBoxPressure(start, { ...calm, memoryStalledNowPercent: 35 }, 0)
+				.pressure,
+		).toMatchObject({ level: "critical", limitedBy: ["memory"] });
 	});
 
 	test("a heartbeat sample with the same state keeps its start time", () => {

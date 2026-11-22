@@ -1,0 +1,1 @@
+export { strongestAttention } from "./strongestAttention";

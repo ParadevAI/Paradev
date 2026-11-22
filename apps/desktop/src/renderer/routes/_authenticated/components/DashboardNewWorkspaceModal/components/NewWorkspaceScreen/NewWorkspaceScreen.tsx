@@ -23,22 +23,20 @@ import { HistoryIcon, Settings2Icon } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
-import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
-import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
-import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
 import { track } from "renderer/lib/analytics";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
@@ -63,12 +61,13 @@ import {
 	withEnvironmentSetupSkill,
 } from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
 	environmentBranchKey,
 	NO_PROJECT_KEY,
-	useV2WorkspaceCreateDefaultsStore,
-} from "renderer/stores/v2-workspace-create-defaults";
+	useWorkspaceCreateDefaultsStore,
+} from "renderer/stores/workspace-create-defaults";
 import { useDashboardNewWorkspaceDraft } from "../../DashboardNewWorkspaceDraftContext";
 import { resolveRemoteHostPresence } from "../../utils/resolveRemoteHostPresence";
 import { DevicePicker } from "../DashboardNewWorkspaceForm/components/DevicePicker";
@@ -90,13 +89,14 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
-import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
+import { useBaseBranchReset } from "./hooks/useBaseBranchReset";
 import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
+import { useLaunchModels } from "./hooks/useLaunchModels";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
@@ -107,6 +107,7 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
+import { launchPresetIdOf } from "./utils/launchPresetIdOf";
 import {
 	type PendingEnvironmentSetup,
 	planEnvironmentSetup,
@@ -132,13 +133,9 @@ interface NewWorkspaceScreenProps {
 }
 
 /**
- * The v2 workspace-creation surface: heading, sample prompts, and a minimal
+ * The workspace-creation surface: heading, sample prompts, and a minimal
  * composer, filling the window rather than a dialog.
  */
-function launchPresetIdOf(agent: AgentSelectAgent): string {
-	return agent.launchPresetId ?? agent.presetId ?? agent.iconId ?? agent.id;
-}
-
 export function NewWorkspaceScreen({
 	isOpen,
 	preSelectedProjectId,
@@ -147,6 +144,7 @@ export function NewWorkspaceScreen({
 }: NewWorkspaceScreenProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const navigate = useNavigate();
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
@@ -163,13 +161,13 @@ export function NewWorkspaceScreen({
 	const relayUrl = useRelayUrl();
 	const activeOrganizationId = useActiveOrganizationId();
 
-	const setLastProjectId = useV2WorkspaceCreateDefaultsStore(
+	const setLastProjectId = useWorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectId,
 	);
-	const lastHostId = useV2WorkspaceCreateDefaultsStore(
+	const lastHostId = useWorkspaceCreateDefaultsStore(
 		(state) => state.lastHostId,
 	);
-	const setLastHostId = useV2WorkspaceCreateDefaultsStore(
+	const setLastHostId = useWorkspaceCreateDefaultsStore(
 		(state) => state.setLastHostId,
 	);
 	const hostId = resolveLaunchHost({
@@ -192,22 +190,22 @@ export function NewWorkspaceScreen({
 	});
 	const isCloudHost = hostId === CLOUD_HOST_ID;
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
-	const setLastProjectChoice = useV2WorkspaceCreateDefaultsStore(
+	const setLastProjectChoice = useWorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectChoice,
 	);
-	const setCheckoutDefault = useV2WorkspaceCreateDefaultsStore(
+	const setCheckoutDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.setCheckout,
 	);
-	const cloudChoices = useV2WorkspaceCreateDefaultsStore(
+	const cloudChoices = useWorkspaceCreateDefaultsStore(
 		(state) => state.cloudChoices,
 	);
-	const setCloudChoice = useV2WorkspaceCreateDefaultsStore(
+	const setCloudChoice = useWorkspaceCreateDefaultsStore(
 		(state) => state.setCloudChoice,
 	);
-	const samplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
+	const samplePromptsDismissed = useWorkspaceCreateDefaultsStore(
 		(state) => state.samplePromptsDismissed,
 	);
-	const setSamplePromptsDismissed = useV2WorkspaceCreateDefaultsStore(
+	const setSamplePromptsDismissed = useWorkspaceCreateDefaultsStore(
 		(state) => state.setSamplePromptsDismissed,
 	);
 
@@ -266,7 +264,7 @@ export function NewWorkspaceScreen({
 	);
 	const selectableProjects = isCloudHost ? cloudProjects : projects;
 
-	const lastProjectChoice = useV2WorkspaceCreateDefaultsStore(
+	const lastProjectChoice = useWorkspaceCreateDefaultsStore(
 		(state) =>
 			state.lastProjectChoice[isCloudHost ? "cloud" : "device"] ?? null,
 	);
@@ -443,42 +441,18 @@ export function NewWorkspaceScreen({
 	);
 	useLinkedIssueNaming(linkedIssues);
 
-	// Reset baseBranch when what it branches from changes, defaulting to the
-	// user's last branch there — the draft store is global, so a stale branch
-	// from another repository would otherwise ride into the create. On the
-	// cloud that is the environment's repository, not the project's.
 	const branchDefaultKey = isCloudHost
 		? resolvedEnvironment
 			? environmentBranchKey(resolvedEnvironment.id)
 			: null
 		: projectId;
-	const persistedBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
-		(state) =>
-			branchDefaultKey
-				? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
-				: null,
-	);
-	const setBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
+	useBaseBranchReset({ branchDefaultKey, hostId, updateDraft });
+	const setBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.setBaseBranchDefault,
 	);
-	const clearBaseBranchDefault = useV2WorkspaceCreateDefaultsStore(
+	const clearBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.clearBaseBranchDefault,
 	);
-	const previousBranchDefaultKeyRef = useRef(branchDefaultKey);
-	const previousHostIdRef = useRef(hostId);
-	useEffect(() => {
-		if (
-			previousBranchDefaultKeyRef.current !== branchDefaultKey ||
-			previousHostIdRef.current !== hostId
-		) {
-			previousBranchDefaultKeyRef.current = branchDefaultKey;
-			previousHostIdRef.current = hostId;
-			updateDraft({
-				baseBranch: persistedBaseBranchDefault?.branchName ?? null,
-				baseBranchSource: persistedBaseBranchDefault?.source ?? null,
-			});
-		}
-	}, [branchDefaultKey, hostId, persistedBaseBranchDefault, updateDraft]);
 
 	// ── Agent / model / effort ───────────────────────────────────────
 	const launchHostUrl = useMemo(() => {
@@ -588,14 +562,20 @@ export function NewWorkspaceScreen({
 	}, [setSamplePromptsDismissed]);
 
 	const { agents: hostAgents, isFetched: hostAgentsFetched } =
-		useV2AgentChoices(launchHostUrl);
+		useAgentChoices(launchHostUrl);
 	const cloudAgents = useCloudAgentChoices();
 	// Under Cloud the built-in presets stand in for a host's agent list.
-	const v2Agents = isCloudHost ? cloudAgents : hostAgents;
-	const v2AgentsFetched = isCloudHost || hostAgentsFetched;
+	const agentConfigs = useMemo(
+		() =>
+			(isCloudHost ? cloudAgents : hostAgents).filter(
+				(agent) => launchPresetIdOf(agent) !== "mastracode",
+			),
+		[isCloudHost, cloudAgents, hostAgents],
+	);
+	const agentsFetched = isCloudHost || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
-		() => v2Agents.map((agent) => agent.id),
-		[v2Agents],
+		() => agentConfigs.map((agent) => agent.id),
+		[agentConfigs],
 	);
 	const { selectedAgent, setSelectedAgent } =
 		useAgentLaunchPreferences<WorkspaceCreateAgent>({
@@ -603,20 +583,31 @@ export function NewWorkspaceScreen({
 			defaultAgent: selectableAgentIds[0] ?? "none",
 			fallbackAgent: selectableAgentIds[0] ?? "none",
 			validAgents: selectableAgentIds,
-			agentsReady: v2AgentsFetched,
+			agentsReady: agentsFetched,
 		});
 
 	const selectedPresetId = useMemo(() => {
-		const agent = v2Agents.find((candidate) => candidate.id === selectedAgent);
+		const agent = agentConfigs.find(
+			(candidate) => candidate.id === selectedAgent,
+		);
 		return agent ? launchPresetIdOf(agent) : null;
-	}, [v2Agents, selectedAgent]);
-	const modelSupport = selectedPresetId
-		? getAgentModelSupport(selectedPresetId)
-		: undefined;
-	const { selectedModel, setSelectedModel } = useAgentModelPreference(
-		MODEL_STORAGE_KEY,
-		modelSupport ? selectedPresetId : null,
-	);
+	}, [agentConfigs, selectedAgent]);
+	const acpChatEnabled = useAcpChatEnabled();
+	const {
+		catalogs,
+		defaultEffortLabel,
+		modelSupport,
+		selectedModel,
+		setSelectedModel,
+		modelForLaunch,
+	} = useLaunchModels({
+		agents: agentConfigs,
+		selectedAgent,
+		selectedPresetId,
+		hostUrl: launchHostUrl,
+		projectId: isCloudHost ? undefined : (projectId ?? undefined),
+		storageKey: MODEL_STORAGE_KEY,
+	});
 	const effortSupport = selectedPresetId
 		? getAgentEffortSupport(selectedPresetId)
 		: undefined;
@@ -631,7 +622,11 @@ export function NewWorkspaceScreen({
 	// launches) as the agent default.
 	const effortOptions = useMemo(
 		() =>
-			selectedPresetId
+			selectedPresetId &&
+			(!selectedModel ||
+				getAgentModelSupport(selectedPresetId)?.models.some(
+					(entry) => entry.id === selectedModel,
+				))
 				? getAgentEfforts(selectedPresetId, selectedModel ?? undefined)
 				: [],
 		[selectedPresetId, selectedModel],
@@ -644,7 +639,6 @@ export function NewWorkspaceScreen({
 	const modeSupport = selectedPresetId
 		? getAgentModeSupport(selectedPresetId)
 		: undefined;
-	const acpChatEnabled = useAcpChatEnabled();
 	const startModes = acpChatEnabled
 		? acpStartModes(selectedPresetId)
 		: undefined;
@@ -657,7 +651,7 @@ export function NewWorkspaceScreen({
 							id: AGENT_DEFAULT_OPTION_ID,
 							label: t({ message: "Direct mode" }),
 						},
-						...modeSupport.modes.map(({ id, label }) => ({ id, label })),
+						...modeSupport.modes.map((entry) => ({ ...entry })),
 					]
 				: undefined),
 		[startModes, modeSupport, t],
@@ -679,14 +673,22 @@ export function NewWorkspaceScreen({
 				selectedModel,
 				efforts: effortOptions,
 				selectedEffort,
+				defaultEffortLabel: selectedModel ? undefined : defaultEffortLabel,
 				labels: {
 					model: t({ message: "Model" }),
-					defaultModel: t({ message: "Default model" }),
+					defaultModel: t({ message: "Default" }),
 					effort: t({ message: "Effort" }),
 					defaultEffort: t({ message: "Default" }),
 				},
 			}),
-		[effortOptions, modelSupport, selectedEffort, selectedModel, t],
+		[
+			effortOptions,
+			modelSupport,
+			selectedEffort,
+			selectedModel,
+			defaultEffortLabel,
+			t,
+		],
 	);
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
 	const selectLaunchOption = useCallback(
@@ -699,7 +701,7 @@ export function NewWorkspaceScreen({
 	);
 	const pendingSwitchModel = useRef<{
 		agent: WorkspaceCreateAgent;
-		model: string;
+		model: string | null;
 	} | null>(null);
 	useEffect(() => {
 		const pending = pendingSwitchModel.current;
@@ -711,22 +713,30 @@ export function NewWorkspaceScreen({
 		if (selectedAgent === "none") return undefined;
 		return {
 			currentPresetId: selectedAgent,
-			agents: v2Agents.map((agent) => ({
+			defaultOptionId: AGENT_DEFAULT_OPTION_ID,
+			agents: agentConfigs.map((agent) => ({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
+				loading: catalogs[agent.id]?.loading,
+				onLoad: catalogs[agent.id]?.load,
+				catalogKey: catalogs[agent.id]?.key,
+				defaultModelLabel: catalogs[agent.id]?.defaultModel?.label,
 				models: (
-					getAgentModelSupport(launchPresetIdOf(agent))?.models ?? []
-				).map(({ id, label }) => ({ id, label })),
+					catalogs[agent.id]?.models ??
+					getAgentModelSupport(launchPresetIdOf(agent))?.models ??
+					[]
+				).map((entry) => ({ ...entry })),
 			})),
 			onSwitch: (agentId, model) => {
-				pendingSwitchModel.current = model
-					? { agent: agentId, model: model.id }
-					: null;
+				pendingSwitchModel.current = {
+					agent: agentId,
+					model: model?.id ?? null,
+				};
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, v2Agents]);
+	}, [selectedAgent, setSelectedAgent, agentConfigs, catalogs]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(
@@ -779,7 +789,7 @@ export function NewWorkspaceScreen({
 		projectId,
 		selectedAgent,
 		selectedPresetId,
-		modelSupport ? selectedModel : null,
+		modelForLaunch,
 		effortForLaunch,
 		modeForLaunch,
 		uploadAttachments,
@@ -1184,12 +1194,24 @@ export function NewWorkspaceScreen({
 		</Button>
 	);
 
-	if (isParadevShell) {
+	if (isNewPage) {
 		return (
-			<ComposerDropZone className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background">
-				<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
-					{headerActions}
-				</div>
+			<ComposerDropZone
+				data-theme-surface="new-workspace"
+				className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background"
+			>
+				{isParadevShell ? (
+					<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
+						{headerActions}
+					</div>
+				) : (
+					<PageHeader
+						className="sticky top-0 z-10 w-full bg-background"
+						end={
+							<div className="flex items-center gap-0.5">{headerActions}</div>
+						}
+					/>
+				)}
 				<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
 					<h1 className="sr-only">
 						<Trans>What should we build next?</Trans>
@@ -1258,16 +1280,12 @@ export function NewWorkspaceScreen({
 						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
 							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{modePicker}
-								<AgentPickerPill
-									agents={v2Agents}
-									selectedAgentId={selectedAgent}
-									onSelect={setSelectedAgent}
-								/>
 							</div>
 							<div className="flex shrink-0 items-center gap-1.5">
 								{setupButton}
-								{selectedAgent !== "none" && (
+								{agentSwitcher && (
 									<ModelPicker
+										agentSwitcher={agentSwitcher}
 										configOptions={launchOptions}
 										onOpenChange={setModelPickerOpen}
 										onSelect={selectLaunchOption}
@@ -1284,7 +1302,10 @@ export function NewWorkspaceScreen({
 
 	// ── Render ───────────────────────────────────────────────────────
 	return (
-		<ComposerDropZone className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background">
+		<ComposerDropZone
+			data-theme-surface="new-workspace"
+			className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background"
+		>
 			<PageHeader
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}

@@ -64,7 +64,7 @@ export async function resolveTurnHost(turn: {
 		throw noAccess();
 	}
 
-	if (row.status === "deleted" || row.status === "failed") {
+	if (row.status === "archived" || row.status === "failed") {
 		throw new TRPCError({ code: "NOT_FOUND", message: "Workspace is gone." });
 	}
 	if (row.status === "provisioning") {

@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import type { MachineSize } from "@superset/shared/billing";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { toast } from "@superset/ui/sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
@@ -76,7 +77,7 @@ export function useChangeMachineSize(workspaceId: string) {
 		currentSize,
 		currentOption: options.find((option) => option.size === currentSize),
 		isResizing,
-		isReady: row?.status === "ready",
+		isReady: row !== undefined && isLiveCloudWorkspaceStatus(row.status),
 		change,
 	};
 }

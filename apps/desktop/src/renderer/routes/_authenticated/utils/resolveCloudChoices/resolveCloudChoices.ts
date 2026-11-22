@@ -2,7 +2,7 @@ import {
 	type CloudCreateChoice,
 	latestCloudChoice,
 	NO_PROJECT_KEY,
-} from "renderer/stores/v2-workspace-create-defaults";
+} from "renderer/stores/workspace-create-defaults";
 import { groupEnvironmentsForProject } from "../groupEnvironmentsForProject";
 
 interface ResolvableEnvironment {

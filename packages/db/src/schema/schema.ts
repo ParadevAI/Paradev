@@ -1,5 +1,5 @@
 import type { ActiveAgentStatus } from "@superset/shared/agent-status";
-import { desc, sql } from "drizzle-orm";
+import { desc, type SQL, sql } from "drizzle-orm";
 import {
 	type AnyPgColumn,
 	bigint,
@@ -10,6 +10,7 @@ import {
 	index,
 	integer,
 	jsonb,
+	numeric,
 	pgEnum,
 	pgTable,
 	primaryKey,
@@ -31,13 +32,20 @@ import {
 	automationRunStatusValues,
 	automationSessionKindValues,
 	automationTriggerKindValues,
+	cloudUsageFeatureValues,
 	cloudWorkspaceActivityEventValues,
+	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceBootOriginValues,
+	cloudWorkspaceFailureReasonValues,
 	cloudWorkspaceStatusValues,
 	cloudWorkspaceVisibilityValues,
 	commandStatusValues,
 	desktopNoticeCtaActionValues,
 	desktopNoticeSeverityValues,
 	desktopNoticeTriggerValues,
+	environmentBuildKindValues,
+	environmentBuildStatusValues,
+	environmentBuildTriggerValues,
 	environmentScopeValues,
 	environmentSourceKindValues,
 	integrationProviderValues,
@@ -61,7 +69,9 @@ import {
 import { githubRepositories } from "./github";
 import type {
 	AutomationEventDispatchInput,
+	CloudWorkspaceBootPhase,
 	IntegrationConfig,
+	PendingUsageEvent,
 	TriggerConfig,
 	UserIdentityMetadata,
 } from "./types";
@@ -85,6 +95,22 @@ export const cloudWorkspaceStatus = pgEnum(
 export const cloudWorkspaceVisibility = pgEnum(
 	"cloud_workspace_visibility",
 	cloudWorkspaceVisibilityValues,
+);
+export const cloudWorkspaceBootEndReason = pgEnum(
+	"cloud_workspace_boot_end_reason",
+	cloudWorkspaceBootEndReasonValues,
+);
+export const cloudWorkspaceBootOrigin = pgEnum(
+	"cloud_workspace_boot_origin",
+	cloudWorkspaceBootOriginValues,
+);
+export const cloudWorkspaceFailureReason = pgEnum(
+	"cloud_workspace_failure_reason",
+	cloudWorkspaceFailureReasonValues,
+);
+export const cloudUsageFeature = pgEnum(
+	"cloud_usage_feature",
+	cloudUsageFeatureValues,
 );
 export const actorKind = pgEnum("actor_kind", actorKindValues);
 export const cloudWorkspaceActivityEvent = pgEnum(
@@ -111,6 +137,18 @@ export const environmentSourceKind = pgEnum(
 export const environmentScope = pgEnum(
 	"environment_scope",
 	environmentScopeValues,
+);
+export const environmentBuildStatus = pgEnum(
+	"environment_build_status",
+	environmentBuildStatusValues,
+);
+export const environmentBuildTrigger = pgEnum(
+	"environment_build_trigger",
+	environmentBuildTriggerValues,
+);
+export const environmentBuildKind = pgEnum(
+	"environment_build_kind",
+	environmentBuildKindValues,
 );
 export const v2ClientType = pgEnum("v2_client_type", v2ClientTypeValues);
 export const v2UsersHostRole = pgEnum(
@@ -616,6 +654,67 @@ export const dealRedemptions = pgTable(
 export type InsertDealRedemption = typeof dealRedemptions.$inferInsert;
 export type SelectDealRedemption = typeof dealRedemptions.$inferSelect;
 
+export const awsMarketplaceCustomerStatusValues = [
+	"pending",
+	"active",
+	"inactive",
+] as const;
+export type AwsMarketplaceCustomerStatus =
+	(typeof awsMarketplaceCustomerStatusValues)[number];
+
+export const awsMarketplaceCustomers = pgTable(
+	"aws_marketplace_customers",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		licenseArn: text("license_arn").notNull(),
+		awsAccountId: text("aws_account_id").notNull(),
+		customerIdentifier: text("customer_identifier"),
+		productCode: text("product_code").notNull(),
+		agreementId: text("agreement_id"),
+		organizationId: uuid("organization_id").references(() => organizations.id, {
+			onDelete: "set null",
+		}),
+		linkedByUserId: uuid("linked_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		linkedAt: timestamp("linked_at"),
+		claimTokenHash: text("claim_token_hash"),
+		claimExpiresAt: timestamp("claim_expires_at"),
+		status: text()
+			.$type<AwsMarketplaceCustomerStatus>()
+			.notNull()
+			.default("pending"),
+		planId: text("plan_id"),
+		seats: integer(),
+		entitlementExpiresAt: timestamp("entitlement_expires_at"),
+		entitlementsSyncedAt: timestamp("entitlements_synced_at"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		uniqueIndex("aws_marketplace_customers_license_arn_unique").on(
+			table.licenseArn,
+		),
+		uniqueIndex("aws_marketplace_customers_organization_id_unique")
+			.on(table.organizationId)
+			.where(sql`${table.organizationId} is not null`),
+		uniqueIndex("aws_marketplace_customers_claim_token_hash_unique").on(
+			table.claimTokenHash,
+		),
+		index("aws_marketplace_customers_aws_account_id_idx").on(
+			table.awsAccountId,
+		),
+	],
+);
+
+export type InsertAwsMarketplaceCustomer =
+	typeof awsMarketplaceCustomers.$inferInsert;
+export type SelectAwsMarketplaceCustomer =
+	typeof awsMarketplaceCustomers.$inferSelect;
+
 // Device presence — v1 concept. Tracks per-(user, machine) presence for
 // MCP ownership verification. Untouched by the v2 host consolidation; will
 // be retired when v1 is removed.
@@ -826,6 +925,8 @@ export const environments = pgTable(
 		scope: environmentScope().notNull().default("organization"),
 		/** The size a workspace boots at when its create names none; null means the organization's default. */
 		machineSize: text("machine_size"),
+		/** The `config.toml` its builds and boxes run; null falls back to the primary repository's own file. */
+		config: text(),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -943,6 +1044,48 @@ export const environmentSecrets = pgTable(
 	],
 );
 
+/**
+ * One build of an environment's golden from `[install]`. The running row is
+ * the lock: at most one per environment. A build keeps the newest goldens
+ * and deletes older ones, setting `golden_deleted_at`; a kept one can be
+ * restored.
+ */
+export const environmentBuilds = pgTable(
+	"environment_builds",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		// No foreign keys to the auth tables: creating one locks a hot parent.
+		organizationId: uuid("organization_id").notNull(),
+		status: environmentBuildStatus().notNull().default("running"),
+		trigger: environmentBuildTrigger().notNull(),
+		kind: environmentBuildKind().notNull(),
+		repositoryIds: uuid("repository_ids").array().notNull(),
+		primaryRepositoryId: uuid("primary_repository_id"),
+		commitSha: text("commit_sha"),
+		goldenRef: text("golden_ref"),
+		goldenDeletedAt: timestamp("golden_deleted_at", { withTimezone: true }),
+		error: text(),
+		startedAt: timestamp("started_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		finishedAt: timestamp("finished_at", { withTimezone: true }),
+	},
+	(table) => [
+		index("environment_builds_environment_id_started_at_idx").on(
+			table.environmentId,
+			desc(table.startedAt),
+		),
+		uniqueIndex("environment_builds_one_running_idx")
+			.on(table.environmentId)
+			.where(sql`${table.status} = 'running'`),
+	],
+);
+
+export type SelectEnvironmentBuild = typeof environmentBuilds.$inferSelect;
+
 export const cloudWorkspaces = pgTable(
 	"cloud_workspaces",
 	{
@@ -983,11 +1126,17 @@ export const cloudWorkspaces = pgTable(
 		deletedAt: timestamp("deleted_at", { withTimezone: true }),
 		/** When the box stops because its organization reached its usage limit; null otherwise. */
 		usageStopAt: timestamp("usage_stop_at", { withTimezone: true }),
+		/** When the box's session ends unless extended; past once it stopped, null if never seen. */
+		sandboxExpiresAt: timestamp("sandbox_expires_at", { withTimezone: true }),
+		/** Vercel's id for the box's current session; a stop or sweep writes asleep only while it is unchanged. */
+		sandboxSessionId: text("sandbox_session_id"),
 		/** Null on workspaces made before sizes existed; they run large. */
 		machineSize: text("machine_size"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
+		failureReason: cloudWorkspaceFailureReason("failure_reason"),
+		failedAt: timestamp("failed_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -1118,6 +1267,15 @@ export const cloudWorkspaceTags = pgTable(
 	],
 );
 
+/** A boot with usage left to finalize or a lock left to give back: the reconcile's open set. */
+export function openBoot(boot: {
+	stoppedAt: AnyPgColumn;
+	finalizedThrough: AnyPgColumn;
+	lockOpen: AnyPgColumn;
+}): SQL {
+	return sql`(${boot.stoppedAt} is null or ${boot.finalizedThrough} is null or ${boot.finalizedThrough} < ${boot.stoppedAt} or ${boot.lockOpen})`;
+}
+
 export const cloudWorkspaceBoots = pgTable(
 	"cloud_workspace_boots",
 	{
@@ -1136,6 +1294,18 @@ export const cloudWorkspaceBoots = pgTable(
 		lockOpen: boolean("lock_open").notNull().default(true),
 		finalizedThrough: timestamp("finalized_through", { withTimezone: true }),
 		settleLeaseUntil: timestamp("settle_lease_until", { withTimezone: true }),
+		endReason: cloudWorkspaceBootEndReason("end_reason"),
+		origin: cloudWorkspaceBootOrigin(),
+		activeCpuMs: bigint("active_cpu_ms", { mode: "number" }),
+		egressBytes: bigint("egress_bytes", { mode: "number" }),
+		phases: jsonb().$type<CloudWorkspaceBootPhase[]>(),
+		traceId: text("trace_id"),
+		/** Usage rows Autumn accepted that could not be written; the meter's reconcile writes them. */
+		pendingUsageEvents: jsonb("pending_usage_events").$type<
+			PendingUsageEvent[]
+		>(),
+		// No foreign key, like organization_id: the boot keeps who it bills after the user is deleted.
+		createdByUserId: uuid("created_by_user_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -1149,11 +1319,78 @@ export const cloudWorkspaceBoots = pgTable(
 			table.cloudWorkspaceId,
 		),
 		index("cloud_workspace_boots_organization_id_idx").on(table.organizationId),
-		index("cloud_workspace_boots_open_idx")
+		index("cloud_workspace_boots_pending_usage_idx")
+			.on(table.id)
+			.where(sql`${table.pendingUsageEvents} is not null`),
+		index("cloud_workspace_boots_open_or_locked_idx")
 			.on(table.startedAt)
-			.where(
-				sql`${table.stoppedAt} is null or ${table.finalizedThrough} is null or ${table.finalizedThrough} < ${table.stoppedAt}`,
-			),
+			.where(openBoot(table)),
+	],
+);
+
+/** One amount we sent to Autumn: one window of one lock of a boot, for one feature. */
+export const cloudUsageEvents = pgTable(
+	"cloud_usage_events",
+	{
+		bootId: text("boot_id")
+			.notNull()
+			.references(() => cloudWorkspaceBoots.id),
+		lockSeq: integer("lock_seq").notNull(),
+		feature: cloudUsageFeature().notNull(),
+		// The attribution as sent to Autumn, so no foreign keys: a deleted row must not change billed history.
+		organizationId: uuid("organization_id").notNull(),
+		cloudWorkspaceId: uuid("cloud_workspace_id"),
+		userId: uuid("user_id"),
+		windowFrom: timestamp("window_from", { withTimezone: true }).notNull(),
+		windowTo: timestamp("window_to", { withTimezone: true }).notNull(),
+		amount: numeric({ precision: 20, scale: 6 }).notNull(),
+		sentAt: timestamp("sent_at", { withTimezone: true }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.bootId, table.lockSeq, table.feature, table.windowFrom],
+		}),
+		index("cloud_usage_events_organization_id_sent_at_idx").on(
+			table.organizationId,
+			table.sentAt,
+		),
+		index("cloud_usage_events_unsent_idx")
+			.on(table.createdAt)
+			.where(sql`${table.sentAt} is null`),
+	],
+);
+
+export type InsertCloudUsageEvent = typeof cloudUsageEvents.$inferInsert;
+export type SelectCloudUsageEvent = typeof cloudUsageEvents.$inferSelect;
+
+/**
+ * Billed box_gb_minutes events per billing day of sent_at: Vercel's day, Pacific time with daylight saving.
+ * Written only by the trigger cloud_usage_daily on cloud_usage_events, through cloud_usage_daily_apply and
+ * cloud_usage_daily_add. It keys on the boot's vcpus when the event is written, so a boot's vcpus must not
+ * change after its first event.
+ */
+export const cloudUsageDaily = pgTable(
+	"cloud_usage_daily",
+	{
+		organizationId: uuid("organization_id").notNull(),
+		day: date({ mode: "string" }).notNull(),
+		userId: uuid("user_id"),
+		vcpus: integer().notNull(),
+		gbMinutes: numeric("gb_minutes").notNull(),
+		seconds: numeric().notNull(),
+		events: integer().notNull(),
+	},
+	(table) => [
+		unique("cloud_usage_daily_key")
+			.on(table.organizationId, table.day, table.userId, table.vcpus)
+			.nullsNotDistinct(),
 	],
 );
 

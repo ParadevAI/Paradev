@@ -4,6 +4,7 @@ import { getCurrentTxid } from "@superset/db/utils";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+import { withAuthUserErrors } from "../../lib/auth-user-error";
 import { personProcedure, userError } from "../../trpc";
 import { verifyOrgAdmin } from "../integration/utils";
 import { requireActiveOrgId } from "../utils/active-org";
@@ -35,10 +36,12 @@ export const teamRouter = {
 			await verifyOrgAdmin(ctx.session.user.id, organizationId);
 			await requireTeamInActiveOrg(input.teamId, organizationId);
 
-			await ctx.auth.api.addTeamMember({
-				body: { teamId: input.teamId, userId: input.userId },
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.addTeamMember({
+					body: { teamId: input.teamId, userId: input.userId },
+					headers: ctx.headers,
+				}),
+			);
 			return { success: true };
 		}),
 
@@ -60,10 +63,12 @@ export const teamRouter = {
 			// The ≥1-team invariant is enforced by the beforeRemoveTeamMember
 			// org hook, so any caller (this procedure, direct authClient, future
 			// API surfaces) gets the same guarantee.
-			await ctx.auth.api.removeTeamMember({
-				body: { teamId: input.teamId, userId: input.userId },
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.removeTeamMember({
+					body: { teamId: input.teamId, userId: input.userId },
+					headers: ctx.headers,
+				}),
+			);
 			return { success: true };
 		}),
 

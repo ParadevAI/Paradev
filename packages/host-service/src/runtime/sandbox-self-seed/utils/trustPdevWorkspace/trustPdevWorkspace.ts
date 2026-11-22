@@ -7,6 +7,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { caught } from "../../../box-log-filter";
 
 export function pdevAgentDir(env: NodeJS.ProcessEnv = process.env): string {
 	return env.PDEV_CODING_AGENT_DIR || join(homedir(), ".paradev", "agent");
@@ -32,8 +33,9 @@ export function trustPdevWorkspace(root: string, agentDir: string): void {
 			// pdev refuses to start on a trust store it cannot parse, so
 			// overwriting it would hide the problem rather than fix it.
 			console.warn(
-				`[sandbox] ${path} is not readable JSON, workspace not trusted`,
-				error,
+				"[sandbox] not readable JSON, workspace not trusted (path):",
+				path,
+				caught(error),
 			);
 			return;
 		}

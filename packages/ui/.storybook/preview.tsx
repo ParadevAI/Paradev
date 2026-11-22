@@ -16,9 +16,19 @@ const preview: Preview = {
 				dynamicTitle: true,
 			},
 		},
+		shell: {
+			description: "Settings shell whose content width a page story uses",
+			toolbar: {
+				title: "Shell",
+				icon: "browser",
+				items: ["web", "desktop"],
+				dynamicTitle: true,
+			},
+		},
 	},
 	initialGlobals: {
 		theme: "dark",
+		shell: "web",
 	},
 	decorators: [
 		(Story, context) => {

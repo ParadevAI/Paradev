@@ -1,5 +1,6 @@
 ---
 title: Paradev CLI Reference
+seoTitle: "Paradev CLI Reference (formerly Superset CLI)"
 description: Complete reference for Paradev command-line interface, including commands and flags.
 ---
 
@@ -1255,9 +1256,36 @@ Create an environment for cloud workspaces to start from.
 	options={[
 		{ flag: "--name <name>", description: "New name." },
 		{ flag: "--scope <personal|organization>", description: "Who can use it." },
+		{ flag: "--config <path>", description: "A config.toml to store as the environment's config. Without one, the cloud reads the primary repository's .paradev/config.toml." },
+		{ flag: "--clear-config", description: "Remove the environment's config." },
 	]}
 >
-Rename an environment or change who can use it.
+Rename an environment, change who can use it, or set the config.toml its builds and cloud workspaces run.
+</Command>
+
+<Command
+	name="superset environments rebuild <environment>"
+	options={[
+		{ flag: "--wait", description: "Wait for the build to finish; exit 1 if it fails." },
+	]}
+>
+Build an environment's snapshot again from its `[install]`. New workspaces keep starting from the current snapshot until the build succeeds.
+</Command>
+
+<Command
+	name="superset environments builds <environment>"
+	options={[
+		{ flag: "--limit <n>", description: "How many builds to show. Default: 20." },
+	]}
+>
+List an environment's builds, newest first, with each failure's reason.
+</Command>
+
+<Command
+	name="superset environments restore <environment> <build>"
+	options={[]}
+>
+Make an earlier build's snapshot the one new workspaces start from, without building. The current snapshot and the 2 newest others are kept and can be restored.
 </Command>
 
 <Command
@@ -2341,7 +2369,7 @@ superset mcp tools --plugin slack
 	name="superset mcp call-tool <tool> [arguments]"
 	args={[
 		{ name: "tool", required: true, description: "Tool name, from `superset mcp tools`." },
-		{ name: "arguments", description: "Tool arguments as JSON (default `{}`)." },
+		{ name: "arguments", description: "Tool arguments as JSON (default `{}`), or `-` to read them from stdin." },
 	]}
 	options={[
 		{ flag: "--plugin <name>", required: true, description: "Plugin name, e.g. `slack` or `google-calendar`." },

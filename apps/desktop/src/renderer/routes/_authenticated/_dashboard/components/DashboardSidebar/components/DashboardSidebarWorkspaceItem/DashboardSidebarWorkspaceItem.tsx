@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { SaveCheckpointDialog } from "renderer/routes/_authenticated/_dashboard/components/SaveCheckpointDialog";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
@@ -28,7 +29,7 @@ import {
 	useWorkspaceRowContextMenu,
 } from "./components/DashboardSidebarWorkspaceBulkContextMenu";
 import { DashboardSidebarWorkspaceContextMenu } from "./components/DashboardSidebarWorkspaceContextMenu/DashboardSidebarWorkspaceContextMenu";
-import { ManageEnvironmentItem } from "./components/ManageEnvironmentItem";
+import { EnvironmentMenuItems } from "./components/EnvironmentMenuItems";
 import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSidebarWorkspaceItemActions";
 
 interface DashboardSidebarWorkspaceItemProps {
@@ -74,9 +75,22 @@ export function DashboardSidebarWorkspaceItem({
 	} = workspace;
 	const isSessionWorkspace = workspace.type === "session";
 	const isCloudWorkspace = hostType === "cloud";
-	const environmentItem = isCloudWorkspace ? (
-		<ManageEnvironmentItem workspaceId={id} />
-	) : undefined;
+	const [checkpointOpen, setCheckpointOpen] = useState(false);
+	const renderEnvironmentItems = isCloudWorkspace
+		? (runAfterClose: (action: () => void) => void) => (
+				<EnvironmentMenuItems
+					workspaceId={id}
+					onSaveCheckpoint={() => runAfterClose(() => setCheckpointOpen(true))}
+				/>
+			)
+		: undefined;
+	const checkpointDialog = checkpointOpen ? (
+		<SaveCheckpointDialog
+			cloudWorkspaceId={id}
+			open
+			onOpenChange={setCheckpointOpen}
+		/>
+	) : null;
 	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
 	const move =
 		moveDirections.length > 0
@@ -130,12 +144,12 @@ export function DashboardSidebarWorkspaceItem({
 		[pendingName, workspace],
 	);
 
-	const { v2Workspaces: v2WorkspaceActions } = useOptimisticActions();
+	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const [renameBranchTarget, setRenameBranchTarget] = useState<string | null>(
 		null,
 	);
 	const handleAfterBranchRename = (newBranchName: string) => {
-		v2WorkspaceActions.updateWorkspace(id, { branch: newBranchName });
+		workspaceActions.updateWorkspace(id, { branch: newBranchName });
 	};
 	const isPending = pendingTransaction?.type === "insert";
 
@@ -298,7 +312,7 @@ export function DashboardSidebarWorkspaceItem({
 							onRemovePullRequest={handleRemovePullRequest}
 							onRename={startRename}
 							onDelete={requestDelete}
-							environmentItem={environmentItem}
+							renderEnvironmentItems={renderEnvironmentItems}
 							onToggleUnread={handleToggleUnread}
 							onClearStatus={handleClearStatus}
 						>
@@ -307,6 +321,7 @@ export function DashboardSidebarWorkspaceItem({
 					)}
 				</div>
 
+				{checkpointDialog}
 				{renameBranchTarget && (
 					<RenameBranchDialog
 						workspaceId={id}
@@ -389,7 +404,7 @@ export function DashboardSidebarWorkspaceItem({
 						onRemovePullRequest={handleRemovePullRequest}
 						onRename={startRename}
 						onDelete={requestDelete}
-						environmentItem={environmentItem}
+						renderEnvironmentItems={renderEnvironmentItems}
 						onToggleUnread={handleToggleUnread}
 						onClearStatus={handleClearStatus}
 					>
@@ -398,6 +413,7 @@ export function DashboardSidebarWorkspaceItem({
 				)}
 			</div>
 
+			{checkpointDialog}
 			{renameBranchTarget && (
 				<RenameBranchDialog
 					workspaceId={id}
