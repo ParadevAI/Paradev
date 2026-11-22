@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 
@@ -50,6 +50,12 @@ export function AgentUpdateRestartToast() {
 		.map((session) => session.terminalId)
 		.sort()
 		.join(",");
+
+	/** Read in `onDismiss`, which also runs when this component closes the toast after its sessions stop being idle. */
+	const latestIdleTerminalIdsRef = useRef(idleTerminalIds);
+	useEffect(() => {
+		latestIdleTerminalIdsRef.current = idleTerminalIds;
+	}, [idleTerminalIds]);
 
 	useEffect(
 		() => () => {
@@ -106,7 +112,19 @@ export function AgentUpdateRestartToast() {
 					});
 				},
 			},
-			onDismiss: markOffered,
+			onDismiss: () => {
+				const stillIdleTerminalIds =
+					latestIdleTerminalIdsRef.current.split(",");
+				setOfferedTerminalIds(
+					(offered) =>
+						new Set([
+							...offered,
+							...terminalIds.filter((terminalId) =>
+								stillIdleTerminalIds.includes(terminalId),
+							),
+						]),
+				);
+			},
 		});
 	}, [idleTerminalIds, offeredTerminalIds, restartSessions, t]);
 
