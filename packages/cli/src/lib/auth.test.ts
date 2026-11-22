@@ -45,7 +45,7 @@ describe("refreshAccessToken", () => {
 });
 
 describe("getPasteRedirectUri", () => {
-	test("defaults to app.superset.sh when the root domain moved and no web URL is set", () => {
+	test("defaults to app.paradev.com when no web URL is set", () => {
 		const { SUPERSET_WEB_URL: _, ...env } = process.env;
 		const result = Bun.spawnSync({
 			cmd: [
@@ -57,7 +57,7 @@ describe("getPasteRedirectUri", () => {
 			env: { ...env, NEXT_PUBLIC_ROOT_DOMAIN: "paradev.com" },
 		});
 		expect(result.stdout.toString().trim()).toBe(
-			"https://app.superset.sh/cli/auth/code",
+			"https://app.paradev.com/cli/auth/code",
 		);
 	});
 });

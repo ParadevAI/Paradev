@@ -18,7 +18,7 @@ export default defineConfig({
 			process.env.SUPERSET_CLI_CHANNEL ?? "standalone",
 		),
 		"process.env.NEXT_PUBLIC_ROOT_DOMAIN": JSON.stringify(
-			process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh",
+			process.env.NEXT_PUBLIC_ROOT_DOMAIN || "paradev.com",
 		),
 	},
 	globals: {

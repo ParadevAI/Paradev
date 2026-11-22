@@ -11,7 +11,7 @@ import { z } from "zod/v4";
 
 // electron.vite.config.ts loads this file in Node, which cannot resolve
 // @superset/shared's extensionless imports, so derive the defaults here.
-const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "paradev.com";
 
 export const env = createEnv({
 	server: {
@@ -19,7 +19,7 @@ export const env = createEnv({
 			.enum(["development", "production", "test"])
 			.default("development"),
 		NEXT_PUBLIC_API_URL: z.url().default("https://api.paradev.com"),
-		NEXT_PUBLIC_STREAMS_URL: z.url().default(`https://streams.${rootDomain}`),
+		NEXT_PUBLIC_STREAMS_URL: z.url().default("https://streams.superset.sh"),
 		NEXT_PUBLIC_WEB_URL: z.url().default("https://app.paradev.com"),
 		NEXT_PUBLIC_MARKETING_URL: z.url().default(`https://${rootDomain}`),
 		NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
