@@ -25,6 +25,8 @@ export type HomeListItem =
 			lastSeenAt?: number | null;
 			/** Offers Try again, for the single-host offline notice. */
 			retry?: boolean;
+			/** The list's first item. */
+			first?: boolean;
 	  }
 	| {
 			kind: "placeEmpty";

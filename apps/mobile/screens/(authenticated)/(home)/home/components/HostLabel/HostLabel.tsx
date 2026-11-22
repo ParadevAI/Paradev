@@ -19,15 +19,21 @@ interface HostLabelProps {
 	lastSeenAt?: number | null;
 	/** Asks again whether the machine is online. */
 	onRetry?: () => Promise<void>;
+	/** The list's first item: no section gap above it. */
+	first?: boolean;
 }
 
-/** Names the place the rows under it live on. A label, not a level. */
+/**
+ * Titles the place the rows under it live on: the list's top level, so its
+ * strongest text, though not a collapsible level of its own.
+ */
 export function HostLabel({
 	name,
 	cloud,
 	status,
 	lastSeenAt,
 	onRetry,
+	first = false,
 }: HostLabelProps) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
@@ -45,7 +51,12 @@ export function HostLabel({
 					: t({ message: "offline" });
 	const unreachable = statusText !== null;
 	return (
-		<View className="flex-row items-center gap-3 px-4 pb-1 pt-5">
+		<View
+			className={cn(
+				"flex-row items-center gap-3 px-4 pb-1",
+				first ? "pt-2" : "pt-6",
+			)}
+		>
 			<View
 				className={cn(
 					"min-w-0 flex-1 flex-row items-center gap-3",
@@ -56,19 +67,34 @@ export function HostLabel({
 					{cloud ? (
 						<Icon
 							as={CloudIcon}
-							className="text-muted-foreground size-3"
+							className="text-foreground/70 size-4"
 							strokeWidth={2}
 						/>
 					) : (
 						<HostStatusDot isOnline={status === "online"} />
 					)}
 				</View>
-				<Text
-					className="text-muted-foreground shrink font-medium text-[13px]"
-					numberOfLines={enlargedText ? undefined : 1}
+				<View
+					className={cn(
+						"min-w-0 flex-1 flex-row items-baseline gap-x-2",
+						enlargedText && "flex-wrap",
+					)}
 				>
-					{statusText ? `${name} · ${statusText}` : name}
-				</Text>
+					<Text
+						className="text-foreground shrink font-semibold text-[20px]"
+						numberOfLines={enlargedText ? undefined : 1}
+					>
+						{name}
+					</Text>
+					{statusText ? (
+						<Text
+							className="text-muted-foreground text-[13px]"
+							numberOfLines={enlargedText ? undefined : 1}
+						>
+							{statusText}
+						</Text>
+					) : null}
+				</View>
 			</View>
 			{onRetry && unreachable ? (
 				<Pressable

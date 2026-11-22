@@ -162,6 +162,19 @@ describe("buildAllHostsList", () => {
 		]);
 	});
 
+	test("marks only the first label as the list's first item", () => {
+		const list = buildAllHostsList({
+			hosts: [
+				{ machineId: "m1", name: "Alpha", status: "online", items: [] },
+				{ machineId: "m2", name: "Beta", status: "online", items: [] },
+			],
+			cloud: null,
+		});
+		expect(
+			list.map((item) => (item.kind === "hostLabel" ? !!item.first : null)),
+		).toEqual([true, false]);
+	});
+
 	test("leaves Cloud out where it is not offered", () => {
 		const list = buildAllHostsList({
 			hosts: [

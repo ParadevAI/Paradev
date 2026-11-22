@@ -55,7 +55,7 @@ export function buildAllHostsList({
 		},
 		...withEmptyNote(host.machineId, host.items, host.empty),
 	];
-	return [
+	const list: HomeListItem[] = [
 		...hosts
 			.filter((host) => !isPlaceUnreachable(host.status))
 			.sort(byName)
@@ -77,4 +77,7 @@ export function buildAllHostsList({
 			.sort(byName)
 			.flatMap(hostItems),
 	];
+	const [head] = list;
+	if (head?.kind === "hostLabel") list[0] = { ...head, first: true };
+	return list;
 }

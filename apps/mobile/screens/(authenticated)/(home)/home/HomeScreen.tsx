@@ -551,6 +551,7 @@ export function HomeScreen() {
 					status: statusOf(selectedHost),
 					lastSeenAt: selectedHost.lastSeenAt,
 					retry: true,
+					first: true,
 				},
 				...section,
 			];
@@ -731,6 +732,7 @@ export function HomeScreen() {
 						status={item.status}
 						lastSeenAt={item.lastSeenAt}
 						onRetry={item.retry ? refreshPresence : undefined}
+						first={item.first}
 					/>
 				);
 			}
