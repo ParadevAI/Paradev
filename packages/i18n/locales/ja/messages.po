@@ -1659,12 +1659,6 @@ msgstr "<0>#{0}</0> <1>リーダーボード{1}人中</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> または <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<1>Google Play</1><0>で近日公開</0>"
-
-msgid "<0>Download on the</0><1>App Store</1>"
-msgstr "<1>App Store</1><0>からダウンロード</0>"
-
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · 現在地"
 
@@ -2490,8 +2484,8 @@ msgstr "クラウドワークスペースのエージェントが <0>--host</0> 
 msgid "Agents in your pocket"
 msgstr "エージェントをポケットに"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "エージェントはクラウドで動き続けます。デスクトップ、iPhone、iPad からワークスペースをもう一度開けます。"
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "エージェントはクラウドで動き続けます。デスクトップやスマートフォンからワークスペースをもう一度開けます。"
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "ノートPCを閉じてもエージェントは動き続けます。"
@@ -2871,8 +2865,8 @@ msgstr "OpenAIのAPIキー。"
 msgid "An update is ready to install."
 msgstr "アップデートをインストールする準備ができました。"
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Android 版を準備中です。リリース時にいち早くお知らせします。"
+msgid "Android app"
+msgstr "Androidアプリ"
 
 msgid "Animals & Nature"
 msgstr "動物と自然"
@@ -4391,11 +4385,14 @@ msgstr "アップデートを確認"
 msgid "Check for Updates..."
 msgstr "アップデートを確認..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "iPhone や iPad からエージェントの様子を確認し、作業をレビューできます。"
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "モバイルアプリで、どこからでもエージェントの様子を確認できます。コンピューター、クラウド、リモートマシンで作業を開始。ネイティブの PR、diff、ページビューアを搭載。"
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "実行中のエージェントの状況を確認し、変更内容を iPhone や iPad から読めます。"
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "iPhone、iPad、Android からエージェントの様子を確認し、作業をレビューできます。"
+
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "実行中のエージェントの状況を確認し、変更内容を iPhone、iPad、Android スマートフォンから読めます。"
 
 msgid "Check plans and balances"
 msgstr "プランと残高を確認"
@@ -7915,8 +7912,8 @@ msgstr "ビルドが成功するたびにスナップショットが保存され
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "サーフェスごとに独自のタイポグラフィがあります。変更はライブプレビューに即座に反映されます。"
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "ワークスペースごとに専用のクラウドマシンが割り当てられ、ノートパソコンを閉じても動き続けます。デスクトップ、iPhone、iPad から様子を確認できます。"
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "ワークスペースごとに専用のクラウドマシンが割り当てられ、ノートパソコンを閉じても動き続けます。デスクトップやスマートフォンから様子を確認できます。"
 
 msgid "Earlier period"
 msgstr "前の期間"
@@ -9615,8 +9612,8 @@ msgstr "サポートを受ける"
 msgid "Get the best out of Pro"
 msgstr "Proを最大限に活用する"
 
-msgid "Get the iPhone and iPad app"
-msgstr "iPhone・iPad アプリを入手"
+msgid "Get the mobile app"
+msgstr "モバイルアプリを入手"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName}への招待が届きます"
@@ -10600,8 +10597,8 @@ msgstr "GitHub Appをインストール"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI をインストール"
 
-msgid "Install on your iPhone"
-msgstr "iPhoneにインストール"
+msgid "Install on your phone"
+msgstr "スマートフォンにインストール"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "一度インストールするだけ。手元のマシンでもクラウドでも、すべてのエージェントが使えます。"
@@ -10782,8 +10779,8 @@ msgstr "iOSシミュレーターのペイン"
 msgid "IP restrictions"
 msgstr "IP制限"
 
-msgid "iPhone and iPad"
-msgstr "iPhone と iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone、iPad、Android"
 
 msgid "Is {companyName} open source?"
 msgstr "{companyName} はオープンソースですか？"
@@ -12289,6 +12286,9 @@ msgstr "スマートフォンからエージェントを確認できます。"
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "外出先でもワークスペースを確認し、タスクを管理できます。どこからでも会話を続けられます。"
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Androidスマートフォンから、エージェントを監視し、指示を出し、詰まりを解消できます。"
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "iPhoneやiPadから、エージェントを監視し、指示を出し、詰まりを解消できます。"
@@ -13803,6 +13803,9 @@ msgstr "フォーカス変更時"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "GitHub ではスター 1.5 万以上、フォーク 1,000 以上、コントリビューター 100 人以上を数えます。Product Hunt でも 1 位を獲得しました。"
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "iPhone と iPad では iOS 26 または iPadOS 26 以降が必要です。Paradev Pro に含まれています。"
+
 msgid "On our radar. Order and scope may change."
 msgstr "視野には入っています。順序や範囲は変わる可能性があります。"
 
@@ -14107,9 +14110,6 @@ msgstr "それでも開く"
 msgid "Open Anyway"
 msgstr "それでも開く"
 
-msgid "Open App Store"
-msgstr "App Store を開く"
-
 msgid "Open as comment pane"
 msgstr "コメントペインとして開く"
 
@@ -14356,8 +14356,8 @@ msgstr "OpenAI のデバイスサインインページを開きます。"
 msgid "Open Page in Default Browser"
 msgstr "ページを既定のブラウザで開く"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "Paradev の iPhone・iPad アプリからページを開き、コメントに返信できます。"
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "Paradev の iPhone・iPad・Android アプリからページを開き、コメントに返信できます。"
 
 msgid "Open PR"
 msgstr "PR を作成"
@@ -14867,8 +14867,8 @@ msgstr "Paradev には「{name}」を読み取る権限がありません。"
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterpriseは、チーム向けのParadevです。含まれる内容や組織での活用方法については、お問い合わせください。"
 
-msgid "Paradev for iPhone and iPad"
-msgstr "iPhone・iPad 用 Paradev"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "iPhone・iPad・Android 用 Paradev"
 
 msgid "Paradev for your team"
 msgstr "チームのためのParadev"
@@ -16850,9 +16850,6 @@ msgstr "必須"
 msgid "Required version: {minimumVersion}+"
 msgstr "必要バージョン: {minimumVersion}+"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "iOS 26 または iPadOS 26 以降が必要です。Paradev Pro に含まれています。"
-
 msgid "Resend invite"
 msgstr "招待を再送信"
 
@@ -17651,8 +17648,8 @@ msgstr "数百のエージェントに拡張しても、品質基準は維持"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "QRコードをスキャンし、同じParadevアカウントでサインインして、この組織を選択してください。"
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "スキャンして iPhone 用 Paradev をダウンロード"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "スキャンして iPhone または Android 用 Paradev をダウンロード"
 
 msgid "Scanning transcript logs…"
 msgstr "トランスクリプトログをスキャン中…"
@@ -19369,9 +19366,6 @@ msgstr "エージェントを開始"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "エージェントを自動で起動: Sentry のエラー、Linear の課題、GitHub のプルリクエスト、またはエージェント自身が設定するスケジュールをきっかけに。"
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "iPhone や iPad からエージェントを起動し、ライブで見守り、差分をレビュー。コードはあなたのマシンに残ります。"
-
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "スケジュール、ツールのイベント、またはWebhookでエージェントを起動します。実行ごとに、確認できるワークスペースが開きます。"
 
@@ -19384,8 +19378,8 @@ msgstr "ブラウジングを開始"
 msgid "Start building in two."
 msgstr "ツーステップで開発を始めよう。"
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "iPhone や iPad からコーディングエージェントを起動し、ライブで見守り、差分をレビュー。App Store で配信中。Android 版は近日公開。"
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "iPhone、iPad、Android スマートフォンからコーディングエージェントを起動し、ライブで見守り、差分をレビュー。App Store と Google Play で配信中。"
 
 msgid "Start date"
 msgstr "開始日"
@@ -20330,8 +20324,8 @@ msgstr "デーモンは実行中のセッションを新しいバイナリに引
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "デスクトップアプリは現在macOSとLinuxに対応しています。メールアドレスをご登録いただければ、Windows版がリリースされ次第すぐにお知らせします。"
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "デスクトップアプリはmacOSで動作し、Linux向けには実験的なAppImageがあります。Windowsはまだ利用できません。デスクトップアプリのほかにCLI、TypeScript SDK、MCPサーバーがあるので、スクリプトやターミナル、他のエージェントからParadevを操作できます。App StoreのiPhone・iPadアプリを使えば、デスクを離れていてもエージェントの状況を確認し、差分をレビューできます。"
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "デスクトップアプリはmacOSとLinuxで動作します。Windowsはまだ利用できません。AppleとAndroidのスマートフォンでも使えます。アプリのほかにCLI、TypeScript SDK、MCPサーバーがあるので、スクリプトやターミナル、他のエージェントからParadevを操作できます。"
 
 msgid "The Dev can't post there."
 msgstr "Dev はそこに投稿できません。"
@@ -22579,9 +22573,6 @@ msgstr "折り返しご連絡します。"
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "再接続でき次第、元の画面に戻ります。"
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Android 版 Paradev の準備ができたらメールでお知らせします。"
 
 msgid "We'll get back to you shortly."
 msgstr "折り返しご連絡します。"

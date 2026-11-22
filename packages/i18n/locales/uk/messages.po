@@ -1653,12 +1653,6 @@ msgstr "<0>#{0}</0> <1>з {1} у таблиці лідерів</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> або <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<0>Незабаром у</0><1>Google Play</1>"
-
-msgid "<0>Download on the</0><1>App Store</1>"
-msgstr "<0>Завантажте в</0><1>App Store</1>"
-
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · ви тут"
 
@@ -2484,8 +2478,8 @@ msgstr "Агенти у ваших хмарних робочих простор�
 msgid "Agents in your pocket"
 msgstr "Агенти в кишені"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері, iPhone або iPad."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "Агенти працюють далі в хмарі. Знову відкрийте робочий простір на комп'ютері або телефоні."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "Агенти працюють далі, коли ноутбук закрито."
@@ -2865,8 +2859,8 @@ msgstr "Ключ API OpenAI."
 msgid "An update is ready to install."
 msgstr "Оновлення готове до встановлення."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Версія для Android уже на підході. Дізнайтеся про вихід першими."
+msgid "Android app"
+msgstr "Застосунок для Android"
 
 msgid "Animals & Nature"
 msgstr "Тварини й природа"
@@ -4385,11 +4379,14 @@ msgstr "Перевірити оновлення"
 msgid "Check for Updates..."
 msgstr "Перевірити оновлення..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "Стежте за агентами й переглядайте їхню роботу з iPhone або iPad."
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Стежте за агентами звідусіль у нашому мобільному застосунку. Починайте роботу на своєму комп'ютері, у хмарі чи на віддаленій машині. Є нативний перегляд PR, diff і сторінок."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "Стежте за роботою агентів і переглядайте їхні зміни з iPhone чи iPad."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "Стежте за агентами й переглядайте їхню роботу з iPhone, iPad або Android."
+
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "Стежте за роботою агентів і переглядайте їхні зміни з iPhone, iPad чи телефона з Android."
 
 msgid "Check plans and balances"
 msgstr "Перевірити тарифи й баланси"
@@ -7909,8 +7906,8 @@ msgstr "Кожна успішна збірка зберігає знімок. Н
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Кожна поверхня має власну типографіку. Зміни одразу видно в живому попередньому перегляді."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "Кожен робочий простір отримує власну хмарну машину і працює далі, коли ноутбук закрито. Стежте за ним з комп'ютера, iPhone або iPad."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "Кожен робочий простір отримує власну хмарну машину і працює далі, коли ноутбук закрито. Стежте за ним з комп'ютера або телефона."
 
 msgid "Earlier period"
 msgstr "Попередній період"
@@ -9609,8 +9606,8 @@ msgstr "Отримати підтримку"
 msgid "Get the best out of Pro"
 msgstr "Використовуйте Pro на повну"
 
-msgid "Get the iPhone and iPad app"
-msgstr "Завантажити застосунок для iPhone та iPad"
+msgid "Get the mobile app"
+msgstr "Отримати мобільний застосунок"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "Отримає запрошення приєднатися до {organizationName}"
@@ -10594,8 +10591,8 @@ msgstr "Встановити GitHub App"
 msgid "Install GitHub CLI"
 msgstr "Встановити GitHub CLI"
 
-msgid "Install on your iPhone"
-msgstr "Встановити на iPhone"
+msgid "Install on your phone"
+msgstr "Встановити на телефон"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "Встановіть один раз. Його отримає кожен агент, на ваших машинах і в хмарі."
@@ -10776,8 +10773,8 @@ msgstr "Панель симулятора iOS"
 msgid "IP restrictions"
 msgstr "Обмеження за IP"
 
-msgid "iPhone and iPad"
-msgstr "iPhone та iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad та Android"
 
 msgid "Is {companyName} open source?"
 msgstr "Чи {companyName} має відкритий код?"
@@ -12283,6 +12280,9 @@ msgstr "Стежте за агентами з телефона."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Стежте за робочими просторами й керуйте завданнями в дорозі. Продовжуйте розмови звідусіль."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Стежте за агентами, спрямовуйте та розблоковуйте їх з телефона з Android."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "Стежте за агентами, спрямовуйте та розблоковуйте їх з iPhone або iPad."
@@ -13797,6 +13797,9 @@ msgstr "Під час зміни фокуса"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "На GitHub у нього 15k+ зірок, 1000+ форків і 100+ контриб'юторів. Також він посів #1 на Product Hunt."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "На iPhone та iPad потрібна iOS 26 або iPadOS 26 чи новіша. Входить у Paradev Pro."
+
 msgid "On our radar. Order and scope may change."
 msgstr "У наших планах. Порядок і обсяг можуть змінитися."
 
@@ -14101,9 +14104,6 @@ msgstr "Усе одно відкрити"
 msgid "Open Anyway"
 msgstr "Усе одно відкрити"
 
-msgid "Open App Store"
-msgstr "Відкрити App Store"
-
 msgid "Open as comment pane"
 msgstr "Відкрити як панель коментарів"
 
@@ -14350,8 +14350,8 @@ msgstr "Відкрийте сторінку входу з пристрою OpenA
 msgid "Open Page in Default Browser"
 msgstr "Відкрити сторінку в браузері за замовчуванням"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "Відкривайте сторінки й відповідайте на коментарі в застосунку Paradev на iPhone та iPad."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "Відкривайте сторінки й відповідайте на коментарі в застосунку Paradev на iPhone, iPad та Android."
 
 msgid "Open PR"
 msgstr "Відкрити PR"
@@ -14861,8 +14861,8 @@ msgstr "Paradev не має дозволу на читання «{name}»."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise призначений для команд. Зв'яжіться з нами, щоб дізнатися більше про те, що входить у тариф і як він може працювати для вашої організації."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "Paradev для iPhone та iPad"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "Paradev для iPhone, iPad та Android"
 
 msgid "Paradev for your team"
 msgstr "Paradev для вашої команди"
@@ -16844,9 +16844,6 @@ msgstr "Обов'язково"
 msgid "Required version: {minimumVersion}+"
 msgstr "Потрібна версія: {minimumVersion}+"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "Потрібна iOS 26 або iPadOS 26 чи новіша. Входить у Paradev Pro."
-
 msgid "Resend invite"
 msgstr "Надіслати запрошення повторно"
 
@@ -17645,8 +17642,8 @@ msgstr "Масштабуйтеся до сотень агентів, трима�
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "Відскануйте QR-код, потім увійдіть у той самий обліковий запис Paradev і виберіть цю організацію."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "Відскануйте, щоб завантажити Paradev для iPhone"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "Відскануйте, щоб завантажити Paradev для iPhone або Android"
 
 msgid "Scanning transcript logs…"
 msgstr "Сканування логів транскриптів…"
@@ -19363,9 +19360,6 @@ msgstr "Запустити агента"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Запускайте агентів автоматично: за помилкою в Sentry, тікетом у Linear, пул-реквестом у GitHub або за розкладом, який агент задає сам."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "Запускайте агентів, стежте за ними наживо й переглядайте diff з iPhone або iPad. Ваш код залишається на ваших комп'ютерах."
-
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Запускайте агента за розкладом, за подією у ваших інструментах або через вебхук. Кожен запуск відкриває робочий простір, який можна перевірити."
 
@@ -19378,8 +19372,8 @@ msgstr "Почати перегляд"
 msgid "Start building in two."
 msgstr "Почніть створювати за два."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "Запускайте кодинг-агентів, стежте за ними наживо й переглядайте diff з iPhone або iPad. Доступно в App Store; версія для Android незабаром."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "Запускайте кодинг-агентів, стежте за ними наживо й переглядайте diff з iPhone, iPad або телефона з Android. Доступно в App Store і Google Play."
 
 msgid "Start date"
 msgstr "Дата початку"
@@ -20324,8 +20318,8 @@ msgstr "Демону не вдалося передати ваші активн�
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Десктопний застосунок уже працює на macOS і Linux. Залиште свою електронну адресу, і ми повідомимо вас, щойно вийде збірка для Windows."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Десктопний застосунок працює на macOS, а для Linux є експериментальний AppImage; Windows поки не підтримується. Окрім десктопного застосунку, є CLI, TypeScript SDK і MCP-сервер, тож ви можете керувати Paradev зі скриптів, терміналів та інших агентів. Застосунок для iPhone та iPad в App Store дає змогу стежити за агентами й переглядати їхні diff, коли ви не за робочим столом."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "Десктопний застосунок працює на macOS і Linux. Windows поки не підтримується. Він також працює на телефонах Apple та Android. Окрім застосунку, є CLI, TypeScript SDK і MCP-сервер, тож ви можете керувати Paradev зі скриптів, терміналів та інших агентів."
 
 msgid "The Dev can't post there."
 msgstr "Dev не може публікувати там повідомлення."
@@ -22573,9 +22567,6 @@ msgstr "Ми скоро з вами зв'яжемося."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Ми повернемо вас, щойно знову під'єднаємося."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Ми надішлемо вам лист, коли Paradev для Android буде готовий."
 
 msgid "We'll get back to you shortly."
 msgstr "Ми скоро вам відповімо."

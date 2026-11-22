@@ -74,12 +74,12 @@ export function FeaturePreview({ selectedFeature }: FeaturePreviewProps) {
 				</span>
 				{selectedFeature.id === "mobile-app" && (
 					<a
-						href={COMPANY.APP_STORE_URL}
+						href={COMPANY.MOBILE_INSTALL_URL}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="mt-3 text-sm text-foreground underline underline-offset-4 hover:text-foreground/80"
 					>
-						<Trans>Open App Store</Trans>
+						<Trans>Get the mobile app</Trans>
 					</a>
 				)}
 			</div>

@@ -21,7 +21,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { FaApple } from "react-icons/fa";
+import { FaApple, FaGooglePlay } from "react-icons/fa";
 import { track } from "@/lib/analytics";
 import { Soc2Badge } from "../Soc2Badge";
 import { SocialLinks } from "../SocialLinks";
@@ -239,6 +239,21 @@ export function Footer({
 								}
 							>
 								<FaApple aria-hidden="true" className="size-5" />
+							</a>
+							<a
+								href={COMPANY.PLAY_STORE_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label="Google Play"
+								className="text-muted-foreground hover:text-foreground transition-colors p-1 sm:p-2"
+								onClick={() =>
+									track("mobile_store_clicked", {
+										store: "google_play",
+										source: "footer",
+									})
+								}
+							>
+								<FaGooglePlay aria-hidden="true" className="size-4" />
 							</a>
 						</div>
 						<a

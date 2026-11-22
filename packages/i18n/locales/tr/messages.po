@@ -1659,12 +1659,6 @@ msgstr "<0>#{0}</0> <1>— liderlik tablosundaki {1} kişi arasında</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> veya bir <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<1>Google Play</1><0>'de yakında</0>"
-
-msgid "<0>Download on the</0><1>App Store</1>"
-msgstr "<1>App Store</1><0>'dan indirin</0>"
-
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · buradasınız"
 
@@ -2490,8 +2484,8 @@ msgstr "Bulut çalışma alanlarındaki ajanlar <0>--host</0> ile bu host üzeri
 msgid "Agents in your pocket"
 msgstr "Ajanlar cebinizde"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "Ajanlar bulutta çalışmaya devam eder. Çalışma alanını masaüstünden, iPhone'dan veya iPad'den yeniden açın."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "Ajanlar bulutta çalışmaya devam eder. Çalışma alanını masaüstünden veya telefonunuzdan yeniden açın."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "Dizüstü bilgisayarınız kapalıyken ajanlar çalışmaya devam eder."
@@ -2871,8 +2865,8 @@ msgstr "Bir OpenAI API anahtarı."
 msgid "An update is ready to install."
 msgstr "Yüklenmeye hazır bir güncelleme var."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Android yolda. Çıktığında ilk siz haberdar olun."
+msgid "Android app"
+msgstr "Android uygulaması"
 
 msgid "Animals & Nature"
 msgstr "Hayvanlar ve Doğa"
@@ -4391,11 +4385,14 @@ msgstr "Güncellemeleri denetle"
 msgid "Check for Updates..."
 msgstr "Güncellemeleri denetle..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "Ajanları takip edin ve işlerini iPhone veya iPad'den inceleyin."
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "Mobil uygulamamızla ajanlarınızı her yerden takip edin. İşi bilgisayarınızda, bulutta veya uzak bir makinede başlatın. Yerel PR, diff ve sayfa görüntüleyicisiyle gelir."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "Çalışan ajanları kontrol edin ve neleri değiştirdiklerini iPhone veya iPad'inizden okuyun."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "Ajanları takip edin ve işlerini iPhone, iPad veya Android'den inceleyin."
+
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "Çalışan ajanları kontrol edin ve neleri değiştirdiklerini iPhone, iPad veya Android telefonunuzdan okuyun."
 
 msgid "Check plans and balances"
 msgstr "Planları ve bakiyeleri kontrol edin"
@@ -7915,8 +7912,8 @@ msgstr "Her başarılı derleme bir anlık görüntü kaydeder. Yeni çalışma 
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Her yüzeyin kendi tipografisi vardır. Değişiklikler canlı önizlemelerde hemen görünür."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "Her çalışma alanı kendi bulut makinesini alır ve dizüstünüz kapalıyken de çalışmaya devam eder. Masaüstünden, iPhone'dan veya iPad'den kontrol edin."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "Her çalışma alanı kendi bulut makinesini alır ve dizüstünüz kapalıyken de çalışmaya devam eder. Masaüstünden veya telefonunuzdan kontrol edin."
 
 msgid "Earlier period"
 msgstr "Önceki dönem"
@@ -9615,8 +9612,8 @@ msgstr "Destek al"
 msgid "Get the best out of Pro"
 msgstr "Pro’dan en iyi şekilde yararlanın"
 
-msgid "Get the iPhone and iPad app"
-msgstr "iPhone ve iPad uygulamasını edinin"
+msgid "Get the mobile app"
+msgstr "Mobil uygulamayı edinin"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} kuruluşuna katılma daveti alır"
@@ -10600,8 +10597,8 @@ msgstr "GitHub App'i kur"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI'yi yükle"
 
-msgid "Install on your iPhone"
-msgstr "iPhone’unuza yükleyin"
+msgid "Install on your phone"
+msgstr "Telefonunuza yükleyin"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "Bir kez kurun. Her ajan alır, makinelerinizde ve bulutta."
@@ -10782,8 +10779,8 @@ msgstr "iOS simülatörü bölmesi"
 msgid "IP restrictions"
 msgstr "IP kısıtlamaları"
 
-msgid "iPhone and iPad"
-msgstr "iPhone ve iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad ve Android"
 
 msgid "Is {companyName} open source?"
 msgstr "{companyName} açık kaynak mı?"
@@ -12289,6 +12286,9 @@ msgstr "Ajanları telefonunuzdan izleyin."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Yolda çalışma alanlarını izleyin ve görevleri yönetin. Konuşmalara her yerden devam edin."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Ajanlarınızı Android telefonunuzdan izleyin, yönlendirin ve önlerini açın."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "Ajanlarınızı iPhone veya iPad'inizden izleyin, yönlendirin ve önlerini açın."
@@ -13803,6 +13803,9 @@ msgstr "Odak değiştiğinde"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "GitHub'da 15k+ yıldızı, 1.000+ fork'u ve 100+ katkıda bulunanı var. Product Hunt'ta da 1 numara oldu."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "iPhone ve iPad'de iOS 26 veya iPadOS 26 ya da üstü gerekir. Paradev Pro'ya dahildir."
+
 msgid "On our radar. Order and scope may change."
 msgstr "Radarımızda. Sıra ve kapsam değişebilir."
 
@@ -14107,9 +14110,6 @@ msgstr "Yine de aç"
 msgid "Open Anyway"
 msgstr "Yine de aç"
 
-msgid "Open App Store"
-msgstr "App Store’u aç"
-
 msgid "Open as comment pane"
 msgstr "Yorum bölmesi olarak aç"
 
@@ -14356,8 +14356,8 @@ msgstr "OpenAI'ın cihaz giriş sayfasını açın."
 msgid "Open Page in Default Browser"
 msgstr "Sayfayı varsayılan tarayıcıda aç"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "iPhone ve iPad'deki Paradev uygulamasından sayfaları açın ve yorumlara yanıt verin."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "iPhone, iPad ve Android'deki Paradev uygulamasından sayfaları açın ve yorumlara yanıt verin."
 
 msgid "Open PR"
 msgstr "PR aç"
@@ -14867,8 +14867,8 @@ msgstr "Paradev'in \"{name}\" dosyasını okuma izni yok."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise, takımlar için Paradev'dir. Nelerin dahil olduğunu ve kuruluşunuzda nasıl işleyebileceğini öğrenmek için bize ulaşın."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "iPhone ve iPad için Paradev"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "iPhone, iPad ve Android için Paradev"
 
 msgid "Paradev for your team"
 msgstr "Takımınız için Paradev"
@@ -16850,9 +16850,6 @@ msgstr "Gerekli"
 msgid "Required version: {minimumVersion}+"
 msgstr "Gerekli sürüm: {minimumVersion}+"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "iOS 26 veya iPadOS 26 ya da üstü gerekir. Paradev Pro'ya dahildir."
-
 msgid "Resend invite"
 msgstr "Daveti yeniden gönder"
 
@@ -17651,8 +17648,8 @@ msgstr "Kalite çıtasını koruyarak yüzlerce ajana ölçeklenin"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "QR kodunu tarayın, ardından aynı Paradev hesabıyla oturum açıp bu kuruluşu seçin."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "iPhone için Paradev’i indirmek üzere tarayın"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "iPhone veya Android için Paradev’i indirmek üzere tarayın"
 
 msgid "Scanning transcript logs…"
 msgstr "Kayıt günlükleri taranıyor…"
@@ -19369,9 +19366,6 @@ msgstr "Ajanı başlat"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Ajanları otomatik başlatın: bir Sentry hatasından, bir Linear kaydından, bir GitHub pull request'inden veya ajanın kendi belirlediği bir zamanlamadan."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "iPhone veya iPad'inizden ajanları başlatın, canlı takip edin ve diff'i inceleyin. Kodunuz makinelerinizde kalır."
-
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Bir ajanı zamanlamayla, araçlarınızdaki bir olayla veya bir webhook ile başlatın. Her çalıştırma inceleyebileceğiniz bir çalışma alanı açar."
 
@@ -19384,8 +19378,8 @@ msgstr "Taramaya başlayın"
 msgid "Start building in two."
 msgstr "İki adımda geliştirmeye başlayın."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "iPhone veya iPad'inizden kodlama ajanlarını başlatın, canlı takip edin ve diff'i inceleyin. App Store'da mevcut; Android yakında geliyor."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "iPhone, iPad veya Android telefonunuzdan kodlama ajanlarını başlatın, canlı takip edin ve diff'i inceleyin. App Store'da ve Google Play'de mevcut."
 
 msgid "Start date"
 msgstr "Başlangıç tarihi"
@@ -20330,8 +20324,8 @@ msgstr "Daemon, canlı oturumlarınızı yeni ikili dosyaya devredemedi. Nedeni:
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Paradev'i Windows ve Linux'a getiriyoruz. E-postanızı bırakın, hazır olduğu anda haber verelim."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Masaüstü uygulaması macOS'ta çalışır; deneysel bir Linux AppImage vardır, Windows henüz kullanılamıyor. Masaüstü uygulamasının ötesinde bir CLI, bir TypeScript SDK ve bir MCP sunucusu var; böylece Paradev'i betiklerden, terminallerden ve diğer ajanlardan yönetebilirsiniz. App Store'daki iPhone ve iPad uygulamasıyla masanızdan uzaktayken de ajanlarınızı takip edebilir ve diff'lerini inceleyebilirsiniz."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "Masaüstü uygulaması macOS ve Linux'ta çalışır. Windows henüz kullanılamıyor. Apple ve Android telefonlarda da çalışır. Uygulamanın ötesinde bir CLI, bir TypeScript SDK ve bir MCP sunucusu var; böylece Paradev'i betiklerden, terminallerden ve diğer ajanlardan yönetebilirsiniz."
 
 msgid "The Dev can't post there."
 msgstr "Dev oraya gönderi yapamaz."
@@ -22579,9 +22573,6 @@ msgstr "Kısa süre içinde sizinle iletişime geçeceğiz."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Bağlantı yeniden kurulur kurulmaz kaldığınız yere döneceksiniz."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Android için Paradev hazır olduğunda size e-posta göndereceğiz."
 
 msgid "We'll get back to you shortly."
 msgstr "Kısa süre içinde size döneceğiz."

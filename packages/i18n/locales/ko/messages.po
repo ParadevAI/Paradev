@@ -1659,12 +1659,6 @@ msgstr "<0>#{0}</0> <1>· 리더보드 {1}명 중</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> 또는 <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<1>Google Play</1><0>출시 예정</0>"
-
-msgid "<0>Download on the</0><1>App Store</1>"
-msgstr "<1>App Store</1><0>에서 다운로드</0>"
-
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · 현재 위치"
 
@@ -2490,8 +2484,8 @@ msgstr "이후 클라우드 워크스페이스의 에이전트가 <0>--host</0>�
 msgid "Agents in your pocket"
 msgstr "주머니 속 에이전트"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱, iPhone, iPad에서 워크스페이스를 다시 열 수 있습니다."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "에이전트는 클라우드에서 계속 작업합니다. 데스크톱이나 휴대폰에서 워크스페이스를 다시 열 수 있습니다."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "노트북을 닫아도 에이전트는 계속 작업합니다."
@@ -2871,8 +2865,8 @@ msgstr "OpenAI API 키."
 msgid "An update is ready to install."
 msgstr "설치할 업데이트가 준비되었습니다."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Android 버전이 곧 나옵니다. 출시되면 가장 먼저 알려드릴게요."
+msgid "Android app"
+msgstr "Android 앱"
 
 msgid "Animals & Nature"
 msgstr "동물 및 자연"
@@ -4391,11 +4385,14 @@ msgstr "업데이트 확인"
 msgid "Check for Updates..."
 msgstr "업데이트 확인..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "iPhone이나 iPad에서 에이전트를 확인하고 작업을 검토하세요."
+msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
+msgstr "모바일 앱으로 어디서나 에이전트를 확인하세요. 내 컴퓨터, 클라우드, 원격 머신에서 작업을 시작할 수 있습니다. 네이티브 PR, diff, 페이지 뷰어를 제공합니다."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "iPhone이나 iPad에서 실행 중인 에이전트를 확인하고 변경 내용을 읽어 보세요."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "iPhone, iPad, Android에서 에이전트를 확인하고 작업을 검토하세요."
+
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "iPhone, iPad, Android 휴대폰에서 실행 중인 에이전트를 확인하고 변경 내용을 읽어 보세요."
 
 msgid "Check plans and balances"
 msgstr "요금제와 잔액 확인"
@@ -7915,8 +7912,8 @@ msgstr "빌드가 성공할 때마다 스냅샷이 저장됩니다. 새 워크�
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "각 화면마다 타이포그래피를 따로 설정합니다. 변경 사항은 실시간 미리보기에 바로 반영됩니다."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "워크스페이스마다 전용 클라우드 머신이 있어 노트북을 덮어도 계속 작업합니다. 데스크톱, iPhone, iPad에서 확인하세요."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "워크스페이스마다 전용 클라우드 머신이 있어 노트북을 덮어도 계속 작업합니다. 데스크톱이나 휴대폰에서 확인하세요."
 
 msgid "Earlier period"
 msgstr "이전 기간"
@@ -9615,8 +9612,8 @@ msgstr "지원 받기"
 msgid "Get the best out of Pro"
 msgstr "Pro를 최대한 활용하기"
 
-msgid "Get the iPhone and iPad app"
-msgstr "iPhone 및 iPad 앱 받기"
+msgid "Get the mobile app"
+msgstr "모바일 앱 받기"
 
 msgid "Gets an invite to join {organizationName}"
 msgstr "{organizationName} 가입 초대를 받습니다"
@@ -10600,8 +10597,8 @@ msgstr "GitHub App 설치"
 msgid "Install GitHub CLI"
 msgstr "GitHub CLI 설치"
 
-msgid "Install on your iPhone"
-msgstr "iPhone에 설치"
+msgid "Install on your phone"
+msgstr "휴대폰에 설치"
 
 msgid "Install once. Every agent gets it, on your machines and in the cloud."
 msgstr "한 번 설치하면 내 머신과 클라우드에서 모든 에이전트가 씁니다."
@@ -10782,8 +10779,8 @@ msgstr "iOS 시뮬레이터 패널"
 msgid "IP restrictions"
 msgstr "IP 제한"
 
-msgid "iPhone and iPad"
-msgstr "iPhone 및 iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad 및 Android"
 
 msgid "Is {companyName} open source?"
 msgstr "{companyName}는 오픈 소스인가요?"
@@ -12289,6 +12286,9 @@ msgstr "휴대폰에서 에이전트를 모니터링합니다."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "이동 중에도 워크스페이스를 확인하고 작업을 관리하세요. 어디서든 대화를 이어갈 수 있습니다."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Android 휴대폰에서 에이전트를 모니터링하고, 방향을 잡아 주고, 막힌 부분을 풀어 주세요."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "iPhone이나 iPad에서 에이전트를 모니터링하고, 방향을 잡아 주고, 막힌 부분을 풀어 주세요."
@@ -13803,6 +13803,9 @@ msgstr "포커스 변경 시"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "GitHub에서 스타 15k+, 포크 1,000+, 기여자 100명 이상을 보유하고 있습니다. Product Hunt에서도 1위를 차지했습니다."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "iPhone 및 iPad에서는 iOS 26 또는 iPadOS 26 이상이 필요합니다. Paradev Pro에 포함되어 있습니다."
+
 msgid "On our radar. Order and scope may change."
 msgstr "지켜보고 있습니다. 순서와 범위는 바뀔 수 있습니다."
 
@@ -14107,9 +14110,6 @@ msgstr "그래도 열기"
 msgid "Open Anyway"
 msgstr "그래도 열기"
 
-msgid "Open App Store"
-msgstr "App Store 열기"
-
 msgid "Open as comment pane"
 msgstr "코멘트 패널으로 열기"
 
@@ -14356,8 +14356,8 @@ msgstr "OpenAI의 기기 로그인 페이지를 여세요."
 msgid "Open Page in Default Browser"
 msgstr "기본 브라우저에서 페이지 열기"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "iPhone 및 iPad용 Paradev 앱에서 페이지를 열고 댓글에 답글을 남기세요."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "iPhone, iPad 및 Android용 Paradev 앱에서 페이지를 열고 댓글에 답글을 남기세요."
 
 msgid "Open PR"
 msgstr "PR 열기"
@@ -14867,8 +14867,8 @@ msgstr "Paradev에 \"{name}\"을(를) 읽을 권한이 없습니다."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise는 팀을 위한 Paradev입니다. 어떤 기능이 포함되고 조직에 어떻게 적용할 수 있는지 문의해 주세요."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "iPhone 및 iPad용 Paradev"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "iPhone, iPad 및 Android용 Paradev"
 
 msgid "Paradev for your team"
 msgstr "팀을 위한 Paradev"
@@ -16850,9 +16850,6 @@ msgstr "필수"
 msgid "Required version: {minimumVersion}+"
 msgstr "필요한 버전: {minimumVersion} 이상"
 
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "iOS 26 또는 iPadOS 26 이상이 필요합니다. Paradev Pro에 포함되어 있습니다."
-
 msgid "Resend invite"
 msgstr "초대 다시 보내기"
 
@@ -17651,8 +17648,8 @@ msgstr "에이전트 수백 개로 확장해도 품질 기준은 그대로"
 msgid "Scan the QR code, then sign in with the same Paradev account and select this organization."
 msgstr "QR 코드를 스캔한 후 동일한 Paradev 계정으로 로그인하고 이 조직을 선택하세요."
 
-msgid "Scan to download Paradev for iPhone"
-msgstr "스캔하여 iPhone용 Paradev 다운로드"
+msgid "Scan to download Paradev for iPhone or Android"
+msgstr "스캔하여 iPhone 또는 Android용 Paradev 다운로드"
 
 msgid "Scanning transcript logs…"
 msgstr "트랜스크립트 로그를 스캔하는 중…"
@@ -19369,9 +19366,6 @@ msgstr "에이전트 시작"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "에이전트를 자동으로 시작하세요: Sentry 오류, Linear 이슈, GitHub 풀 리퀘스트, 또는 에이전트가 스스로 정한 일정에 따라."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "iPhone이나 iPad에서 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. 코드는 내 머신에 그대로 남습니다."
-
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "일정, 도구의 이벤트, 또는 웹훅으로 에이전트를 시작하세요. 실행마다 검토할 수 있는 워크스페이스가 열립니다."
 
@@ -19384,8 +19378,8 @@ msgstr "탐색 시작"
 msgid "Start building in two."
 msgstr "두 단계로 빌드를 시작하세요."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "iPhone이나 iPad에서 코딩 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. App Store에서 이용할 수 있으며 Android는 곧 출시됩니다."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "iPhone, iPad, Android 휴대폰에서 코딩 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. App Store와 Google Play에서 이용할 수 있습니다."
 
 msgid "Start date"
 msgstr "시작일"
@@ -20330,8 +20324,8 @@ msgstr "데몬이 실행 중인 세션을 새 바이너리로 넘기지 못했�
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Paradev를 Windows와 Linux로 확장하고 있습니다. 이메일을 남겨 주시면 준비되는 대로 알려 드립니다."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "데스크톱 앱은 macOS에서 실행되며 실험적인 Linux AppImage가 있습니다. Windows는 아직 지원하지 않습니다. 데스크톱 앱 외에 CLI, TypeScript SDK, MCP 서버가 있어 스크립트, 터미널, 다른 에이전트에서 Paradev를 조작할 수 있습니다. App Store의 iPhone 및 iPad 앱으로 자리를 비운 동안에도 에이전트를 확인하고 diff를 검토할 수 있습니다."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "데스크톱 앱은 macOS와 Linux에서 실행됩니다. Windows는 아직 지원하지 않습니다. Apple 및 Android 휴대폰에서도 실행됩니다. 앱 외에 CLI, TypeScript SDK, MCP 서버가 있어 스크립트, 터미널, 다른 에이전트에서 Paradev를 조작할 수 있습니다."
 
 msgid "The Dev can't post there."
 msgstr "Dev는 그곳에 게시할 수 없습니다."
@@ -22579,9 +22573,6 @@ msgstr "곧 연락드리겠습니다."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "다시 연결되면 원래 화면으로 돌아갈게요."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Android용 Paradev가 준비되면 이메일로 알려드리겠습니다."
 
 msgid "We'll get back to you shortly."
 msgstr "곧 회신드리겠습니다."

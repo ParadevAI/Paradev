@@ -23,7 +23,7 @@ Paradev and Orca both support parallel coding work, remote hosts, mobile access,
 |---|---|---|
 | Parallel work | Separate workspaces and Git worktrees | Worktrees with terminals and browser tools |
 | Desktop | macOS; experimental Linux; Windows unavailable | macOS, Windows, Linux |
-| Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; Android waitlist | iOS app on the App Store and an Android APK (not on Google Play), both documented as beta |
+| Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; Android app on Google Play, Pro | iOS app on the App Store and an Android APK (not on Google Play), both documented as beta |
 | Scheduling | Pro automations on a selected host, with run history and retry for failed runs | Scheduled automations through CLI and desktop |
 | Review | Changes pane that commits, pushes, and opens PRs; inline diff comments sent to a running agent or a new session; PR pane with checks, review threads, and merge; Linear and GitHub issues in a Tasks view; diff review with line comments on iPhone and iPad | Inline diff comments sent back to the agent, plus GitHub and Linear PRs and issues in the app; source-control review on mobile |
 | Chat | Chat interface for Claude Code, Codex, OpenCode, and Pi, with a CLI / Chat toggle on the same session | Chat UI or terminal for each agent, out of experimental since November 2, 2026; chat also works on the phone |
@@ -41,7 +41,7 @@ Paradev runs CLI coding agents in separate workspaces, with terminals and diff r
 
 Inside the app, a Workspaces page groups every workspace by state (Needs attention, Working, Needs review, Idle, Merged), so you can see which agents need you. The Changes pane commits, pushes, and opens a pull request, and the pull request pane shows checks and review threads beside the diff.
 
-To use [Paradev on iPhone and iPad](/mobile), you need iOS 26 or iPadOS 26 or later, Pro, and a host that stays online or a cloud workspace. The iPhone and iPad app is on the App Store; from it you can check on agents, review diffs, and read Pages. Remote access and automations also require a paid plan. See [pricing](/pricing) and [remote access setup](https://docs.paradev.com/remote-access).
+To use [Paradev on iPhone, iPad, or Android](/mobile), you need Pro and a host that stays online or a cloud workspace. On iPhone and iPad it requires iOS 26 or iPadOS 26 or later. The apps are on the App Store and Google Play; from them you can check on agents, review diffs, and read Pages. Remote access and automations also require a paid plan. See [pricing](/pricing) and [remote access setup](https://docs.paradev.com/remote-access).
 
 ## Try it in your repository
 
@@ -51,7 +51,7 @@ Run one of your usual tasks in each app with the same agent and model. Open the 
 
 ## Which should you choose?
 
-Choose Paradev if you want to send instructions to your coding agents and review their diffs from an iPhone, then continue in the same workspace on desktop. Follow the [phone walkthrough](/blog/claude-code-codex-iphone) and [scheduled-maintenance guide](/blog/scheduled-agent-maintenance) to test those requirements.
+Choose Paradev if you want to send instructions to your coding agents and review their diffs from your phone, then continue in the same workspace on desktop. Follow the [phone walkthrough](/blog/claude-code-codex-iphone) and [scheduled-maintenance guide](/blog/scheduled-agent-maintenance) to test those requirements.
 
 Orca is a strong candidate if Windows or Android is a requirement. Both apps track agent usage and switch between accounts. Orca's usage tracking also covers Gemini, Kimi Code, MiniMax, and GLM Coding Plans, which Paradev does not track, and it names more than 25 supported agents. Orca also adds a plugin catalog, a Jira drawer, and computer use for desktop apps. If both products meet your platform needs, try the same task in each and compare the review workflow.
 
@@ -65,7 +65,7 @@ Yes. Orca documents scheduled automations. Paradev also supports scheduled agent
 
 ### Does Paradev have a mobile app?
 
-Yes. Paradev's iPhone and iPad app is on the App Store. It requires iOS 26 or iPadOS 26 or later, Pro, and a connected host or a cloud workspace. Android is on the waitlist.
+Yes. Paradev's iPhone and iPad app is on the App Store. It requires iOS 26 or iPadOS 26 or later, Pro, and a connected host or a cloud workspace. The Android app is on [Google Play](https://play.google.com/store/apps/details?id=com.paradev.mobile) with the same plan and host requirements.
 
 ### Do worktrees prevent all conflicts?
 
