@@ -2312,6 +2312,9 @@ msgstr "Dodaj do kolejki scalania"
 msgid "Add to project"
 msgstr "Dodaj do projektu"
 
+msgid "Add to prompt"
+msgstr "Dodaj do promptu"
+
 msgid "Add to queue"
 msgstr "Dodaj do kolejki"
 

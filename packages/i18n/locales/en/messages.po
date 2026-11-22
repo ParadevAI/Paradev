@@ -2312,6 +2312,9 @@ msgstr "Add to merge queue"
 msgid "Add to project"
 msgstr "Add to project"
 
+msgid "Add to prompt"
+msgstr "Add to prompt"
+
 msgid "Add to queue"
 msgstr "Add to queue"
 

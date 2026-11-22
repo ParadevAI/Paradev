@@ -2312,6 +2312,9 @@ msgstr "Thêm vào hàng đợi merge"
 msgid "Add to project"
 msgstr "Thêm vào dự án"
 
+msgid "Add to prompt"
+msgstr "Thêm vào lời nhắc"
+
 msgid "Add to queue"
 msgstr "Thêm vào hàng đợi"
 

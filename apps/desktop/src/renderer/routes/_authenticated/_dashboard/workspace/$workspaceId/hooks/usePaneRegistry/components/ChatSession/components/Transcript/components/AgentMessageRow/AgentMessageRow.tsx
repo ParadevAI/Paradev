@@ -36,7 +36,7 @@ export function AgentMessageRow({
 	return (
 		// Actions stay out of the way until the message is pointed at, and stay
 		// reachable by keyboard regardless.
-		<div className="group/message flex flex-col gap-1">
+		<div className="group/message flex flex-col gap-1" data-chat-response>
 			<MarkdownView
 				className="text-foreground"
 				fading={fading}

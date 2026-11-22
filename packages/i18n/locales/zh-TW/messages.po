@@ -2312,6 +2312,9 @@ msgstr "加入合併佇列"
 msgid "Add to project"
 msgstr "新增至專案"
 
+msgid "Add to prompt"
+msgstr "新增至提示詞"
+
 msgid "Add to queue"
 msgstr "加入佇列"
 

@@ -77,6 +77,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { SelectionComment } from "./components/SelectionComment";
 import { SubagentNotice } from "./components/SubagentNotice";
 import {
 	type SwitchAccount,
@@ -796,7 +797,16 @@ export function SessionView({
 					scrollEdgeThreshold={RESUME_FOLLOW_PX}
 					scrollPreviousItemPeek={0}
 				>
-					<div className="@container relative flex min-h-0 flex-1">
+					<SelectionComment
+						key={subagent.draftKey}
+						enabled={!subagentBlocked}
+						onAddToPrompt={(prompt) =>
+							restoreDraft(
+								{ segments: [{ type: "text", text: prompt }], attachments: [] },
+								subagent.draftKey,
+							)
+						}
+					>
 						<SessionModeProvider value={sessionState?.modeId}>
 							<TranscriptPluginsProvider value={plugins}>
 								<NestedItemsProvider value={nestedItems}>
@@ -839,7 +849,7 @@ export function SessionView({
 								onMessageSelect={setRevealMessageId}
 							/>
 						)}
-					</div>
+					</SelectionComment>
 				</MessageScroller.Provider>
 				{!focusedSubagentId && (
 					<ComposerChips

@@ -2312,6 +2312,9 @@ msgstr "Tambahkan ke antrean merge"
 msgid "Add to project"
 msgstr "Tambahkan ke proyek"
 
+msgid "Add to prompt"
+msgstr "Tambahkan ke prompt"
+
 msgid "Add to queue"
 msgstr "Masukkan ke antrean"
 

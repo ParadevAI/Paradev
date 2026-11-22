@@ -2312,6 +2312,9 @@ msgstr "Añadir a la cola de fusión"
 msgid "Add to project"
 msgstr "Añadir a un proyecto"
 
+msgid "Add to prompt"
+msgstr "Añadir al prompt"
+
 msgid "Add to queue"
 msgstr "Añadir a la cola"
 

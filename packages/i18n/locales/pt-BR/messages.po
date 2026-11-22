@@ -2312,6 +2312,9 @@ msgstr "Adicionar à fila de merge"
 msgid "Add to project"
 msgstr "Adicionar a um projeto"
 
+msgid "Add to prompt"
+msgstr "Adicionar ao prompt"
+
 msgid "Add to queue"
 msgstr "Adicionar à fila"
 

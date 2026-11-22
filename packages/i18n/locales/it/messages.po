@@ -2312,6 +2312,9 @@ msgstr "Aggiungi alla coda di unione"
 msgid "Add to project"
 msgstr "Aggiungi a un progetto"
 
+msgid "Add to prompt"
+msgstr "Aggiungi al prompt"
+
 msgid "Add to queue"
 msgstr "Metti in coda"
 

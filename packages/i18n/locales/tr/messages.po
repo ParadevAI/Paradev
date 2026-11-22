@@ -2312,6 +2312,9 @@ msgstr "Birleştirme kuyruğuna ekle"
 msgid "Add to project"
 msgstr "Projeye ekle"
 
+msgid "Add to prompt"
+msgstr "İsteme ekle"
+
 msgid "Add to queue"
 msgstr "Kuyruğa ekle"
 

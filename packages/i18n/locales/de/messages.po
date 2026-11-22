@@ -2312,6 +2312,9 @@ msgstr "Zur Merge-Warteschlange hinzufügen"
 msgid "Add to project"
 msgstr "Zu Projekt hinzufügen"
 
+msgid "Add to prompt"
+msgstr "Zum Prompt hinzufügen"
+
 msgid "Add to queue"
 msgstr "Zur Warteschlange"
 

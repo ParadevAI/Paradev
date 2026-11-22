@@ -2312,6 +2312,9 @@ msgstr "머지 대기열에 추가"
 msgid "Add to project"
 msgstr "프로젝트에 추가"
 
+msgid "Add to prompt"
+msgstr "프롬프트에 추가"
+
 msgid "Add to queue"
 msgstr "대기열에 추가"
 
