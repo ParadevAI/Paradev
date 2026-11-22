@@ -150,3 +150,55 @@ test("the quote reaches the real prompt while preserving its draft and attachmen
 		true,
 	);
 });
+
+test("cmd/ctrl+enter submits the comment", async () => {
+	const view = fixture();
+	select(view.paragraphs[0].firstChild);
+	fireEvent.click(view.getByRole("button", { name: "Add comment" }));
+	const comment = view.getByRole("textbox", { name: "Comment" });
+	fireEvent.change(comment, { target: { value: "Why?" } });
+	fireEvent.keyDown(comment, { key: "Enter", metaKey: true });
+	await waitFor(() =>
+		expect(view.add).toHaveBeenCalledWith(
+			"> First line\n> Second line\n\nWhy?\n\n",
+		),
+	);
+});
+
+test("keeps the commented text highlighted and its response framed while the popover is open", () => {
+	const registry = new Map<string, unknown>();
+	const previous = {
+		CSS: Object.getOwnPropertyDescriptor(globalThis, "CSS"),
+		Highlight: Object.getOwnPropertyDescriptor(globalThis, "Highlight"),
+	};
+	const define = (name: string, value: unknown) =>
+		Object.defineProperty(globalThis, name, {
+			value,
+			configurable: true,
+			writable: true,
+		});
+	define("CSS", { highlights: registry });
+	define(
+		"Highlight",
+		class {
+			constructor(readonly range: Range) {}
+		},
+	);
+	try {
+		const view = fixture();
+		select(view.paragraphs[0].firstChild);
+		fireEvent.click(view.getByRole("button", { name: "Add comment" }));
+		expect(registry.has("chat-comment")).toBe(true);
+		expect(view.paragraphs[0].hasAttribute("data-commenting")).toBe(true);
+		act(() => window.getSelection()?.removeAllRanges());
+		expect(registry.has("chat-comment")).toBe(true);
+		fireEvent.click(view.getByRole("button", { name: "Cancel" }));
+		expect(registry.has("chat-comment")).toBe(false);
+		expect(view.paragraphs[0].hasAttribute("data-commenting")).toBe(false);
+	} finally {
+		for (const [name, descriptor] of Object.entries(previous))
+			descriptor
+				? Object.defineProperty(globalThis, name, descriptor)
+				: Reflect.deleteProperty(globalThis, name);
+	}
+});

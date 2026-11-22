@@ -3,7 +3,11 @@ import { Button } from "@superset/ui/button";
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Textarea } from "@superset/ui/textarea";
+import { MessageSquarePlus } from "lucide-react";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+
+/** Matches the `icon-xs` button size (size-7). */
+const TRIGGER_SIZE = 28;
 
 export function SelectionComment({
 	children,
@@ -21,11 +25,28 @@ export function SelectionComment({
 	const commentId = useId();
 	const [selection, setSelection] = useState<{
 		text: string;
+		range: Range;
+		response: Element;
 		left: number;
 		top: number;
 	} | null>(null);
 	const [open, setOpen] = useState(false);
 	const [comment, setComment] = useState("");
+
+	// Focus moves to the textarea when the popover opens, which hides the native
+	// selection; keep the commented text tinted and its response framed instead.
+	useEffect(() => {
+		if (!open || !selection) return;
+		const { range, response } = selection;
+		if (typeof CSS !== "undefined" && CSS.highlights)
+			CSS.highlights.set("chat-comment", new Highlight(range));
+		response.setAttribute("data-commenting", "");
+		return () => {
+			if (typeof CSS !== "undefined" && CSS.highlights)
+				CSS.highlights.delete("chat-comment");
+			response.removeAttribute("data-commenting");
+		};
+	}, [open, selection]);
 
 	useEffect(() => {
 		if (!enabled || open) return;
@@ -49,17 +70,23 @@ export function SelectionComment({
 				setSelection(null);
 				return;
 			}
-			const rect = range.getBoundingClientRect();
+			// Anchor the trigger just above where the selection ends (where the
+			// pointer usually is), dropping below it when there is no room above.
+			const rects = range.getClientRects();
+			const rect = rects[rects.length - 1] ?? range.getBoundingClientRect();
 			const bounds = root.getBoundingClientRect();
+			const above = rect.top - bounds.top - TRIGGER_SIZE - 4;
 			setSelection({
 				text,
+				range: range.cloneRange(),
+				response,
 				left: Math.max(
 					0,
-					Math.min(rect.left - bounds.left, bounds.width - 128),
+					Math.min(rect.right - bounds.left, bounds.width - TRIGGER_SIZE),
 				),
-				top: Math.max(
-					0,
-					Math.min(rect.bottom - bounds.top, bounds.height - 32),
+				top: Math.min(
+					above >= 0 ? above : rect.bottom - bounds.top + 4,
+					bounds.height - TRIGGER_SIZE,
 				),
 			});
 		};
@@ -80,14 +107,16 @@ export function SelectionComment({
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
 						<Button
+							aria-label={t({ message: "Add comment" })}
+							title={t({ message: "Add comment" })}
 							className="absolute z-50 shadow-md"
 							style={{ left: selection.left, top: selection.top }}
-							size="sm"
+							size="icon-xs"
 							variant="outline"
 							onMouseDown={(event) => event.preventDefault()}
 							onClick={() => setComment("")}
 						>
-							<Trans>Add comment</Trans>
+							<MessageSquarePlus />
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent
@@ -129,6 +158,15 @@ export function SelectionComment({
 								placeholder={t({ message: "Comment" })}
 								value={comment}
 								onChange={(event) => setComment(event.target.value)}
+								onKeyDown={(event) => {
+									if (
+										event.key === "Enter" &&
+										(event.metaKey || event.ctrlKey)
+									) {
+										event.preventDefault();
+										event.currentTarget.form?.requestSubmit();
+									}
+								}}
 							/>
 							<div className="flex justify-end gap-2">
 								<Button
