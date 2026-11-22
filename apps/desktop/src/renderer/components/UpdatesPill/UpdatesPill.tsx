@@ -224,7 +224,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 							/>
 							<span
 								aria-hidden="true"
-								className="tracking-tighter before:animate-[ascii-bar_480ms_step-end_infinite]"
+								className="tracking-tighter before:animate-[ascii-bar_750ms_step-end_infinite]"
 							/>
 						</>
 					) : isDownloading ? (

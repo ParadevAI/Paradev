@@ -1,4 +1,1 @@
-export {
-	LOOPING_ANIMATION_FPS,
-	throttleLoopingAnimations,
-} from "./throttleLoopingAnimations";
+export { throttleLoopingAnimations } from "./throttleLoopingAnimations";

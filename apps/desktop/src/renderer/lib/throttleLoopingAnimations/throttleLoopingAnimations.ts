@@ -1,18 +1,10 @@
-// Measured on a Core Ultra laptop: 8 fps costs about the same as no animation,
-// 12-15 fps keeps the CPU out of deep idle and costs 1-2 W more.
-export const LOOPING_ANIMATION_FPS = 8;
+// Measured: 12-15 fps kept the CPU out of deep idle (1-2 W more); 8 fps did not.
+const FPS = 8;
 
-type AnimationHost = Pick<
-	Window,
-	"addEventListener" | "removeEventListener" | "setInterval" | "clearInterval"
-> & {
+type AnimationHost = Pick<Window, "setInterval" | "clearInterval"> & {
 	document: Pick<
 		Document,
-		| "addEventListener"
-		| "removeEventListener"
-		| "getAnimations"
-		| "hasFocus"
-		| "visibilityState"
+		"addEventListener" | "getAnimations" | "visibilityState"
 	>;
 	performance: Pick<Performance, "now">;
 };
@@ -24,24 +16,15 @@ function loops(animation: Animation): boolean {
 	);
 }
 
-// A running looping animation makes Chromium and the compositor draw a frame
-// on every display refresh (120 Hz here). Hold every looping animation and
-// step it from one timer instead, and stop stepping when nobody can see it.
-export function throttleLoopingAnimations(
-	host: AnimationHost = window,
-	fps = LOOPING_ANIMATION_FPS,
-): () => void {
+export function throttleLoopingAnimations(host: AnimationHost = window): void {
 	const { document, performance } = host;
 	const held = new Set<Animation>();
 	let timer: number | undefined;
 	let lastTick = 0;
 
-	const hold = () => {
-		for (const animation of document.getAnimations()) {
-			if (animation.playState !== "running" || !loops(animation)) continue;
-			animation.pause();
-			held.add(animation);
-		}
+	const stopTimer = () => {
+		host.clearInterval(timer);
+		timer = undefined;
 	};
 
 	const tick = () => {
@@ -49,44 +32,32 @@ export function throttleLoopingAnimations(
 		const elapsed = now - lastTick;
 		lastTick = now;
 		for (const animation of held) {
-			// "idle" means the animation's class or element went away.
-			if (animation.playState !== "paused") {
+			// A CSS animation whose class or element went away is "idle".
+			if (animation.playState === "paused") {
+				animation.currentTime = Number(animation.currentTime ?? 0) + elapsed;
+			} else {
 				held.delete(animation);
-				continue;
 			}
-			animation.currentTime = Number(animation.currentTime ?? 0) + elapsed;
 		}
-		hold();
+		if (held.size === 0) stopTimer();
 	};
 
 	const sync = () => {
-		hold();
-		const visible =
-			document.hasFocus() && document.visibilityState === "visible";
-		if (visible && timer === undefined) {
+		for (const animation of document.getAnimations()) {
+			if (animation.playState !== "running" || !loops(animation)) continue;
+			animation.pause();
+			held.add(animation);
+		}
+		const shouldTick = document.visibilityState === "visible" && held.size > 0;
+		if (shouldTick && timer === undefined) {
 			lastTick = performance.now();
-			timer = host.setInterval(tick, 1000 / fps);
-		} else if (!visible && timer !== undefined) {
-			host.clearInterval(timer);
-			timer = undefined;
+			timer = host.setInterval(tick, 1000 / FPS);
+		} else if (!shouldTick && timer !== undefined) {
+			stopTimer();
 		}
 	};
 
-	host.addEventListener("focus", sync);
-	host.addEventListener("blur", sync);
+	document.addEventListener("animationstart", sync);
 	document.addEventListener("visibilitychange", sync);
-	document.addEventListener("animationstart", hold);
 	sync();
-
-	return () => {
-		host.removeEventListener("focus", sync);
-		host.removeEventListener("blur", sync);
-		document.removeEventListener("visibilitychange", sync);
-		document.removeEventListener("animationstart", hold);
-		if (timer !== undefined) host.clearInterval(timer);
-		for (const animation of held) {
-			if (animation.playState === "paused") animation.play();
-		}
-		held.clear();
-	};
 }
