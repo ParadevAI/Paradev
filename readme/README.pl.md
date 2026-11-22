@@ -256,7 +256,7 @@ Wkrótce pojawi się aplikacja na iOS, aby doglądać agentów z telefonu.
 Pobierz aplikację desktopową:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (eksperymentalne; głównym celem jest macOS)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (eksperymentalne; głównym celem jest macOS)
 - **Windows**: jeszcze niedostępne
 - [Wszystkie kompilacje](https://github.com/paradevai/paradev/releases/latest)
 

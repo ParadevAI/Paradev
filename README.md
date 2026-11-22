@@ -28,7 +28,7 @@ Paradev is the workspace for running parallel coding agents. You can run any cod
 
 1. **Download the app.**
    - macOS: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x64.dmg)
-   - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimental; macOS is the primary target)
+   - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimental; macOS is the primary target)
    - Windows: not yet available
 2. **Add a repository** from your computer, or clone one.
 3. **Create a workspace**, choose your CLI agent, and describe a small change.
