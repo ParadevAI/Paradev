@@ -54,7 +54,7 @@ async function cacheShippedTree(
 	try {
 		target = pluginCachePath(marketplace, name, version);
 	} catch (error) {
-		console.warn(`[sandbox] ${name}: ${(error as Error).message}`);
+		console.warn(`[sandbox] ${name}:`, (error as Error).message);
 		return undefined;
 	}
 	if (existsSync(join(target, "plugin.json"))) return target;

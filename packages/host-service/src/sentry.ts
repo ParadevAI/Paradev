@@ -42,12 +42,11 @@ export function hostSentryOptions(
 		enableLogs: boxLogs,
 		beforeSendLog: boxLogs
 			? createBoxLogFilter({
-					secrets: () =>
-						[
-							...Object.values(getManagedEnv()),
-							env.HOST_SERVICE_SECRET,
-							dsn,
-						].filter((value): value is string => Boolean(value)),
+					secrets: () => ({
+						...getManagedEnv(),
+						HOST_SERVICE_SECRET: env.HOST_SERVICE_SECRET ?? "",
+						HOST_SERVICE_SENTRY_DSN: dsn,
+					}),
 					reportDropped: (dropped, windowStartedAt) =>
 						logBoxEvent(
 							"box.logs.dropped",
@@ -107,7 +106,7 @@ export function logBoxEvent<E extends keyof BoxEventAttributes>(
 	attributes: BoxEventAttributes[E],
 	level: "info" | "warn" = "info",
 ): void {
-	Sentry.logger[level](event, attributes);
+	Sentry.logger[level](event, { ...attributes, "box.event": true });
 }
 
 /** A file a user attached that the agent did not get. */

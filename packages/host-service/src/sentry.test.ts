@@ -40,7 +40,7 @@ describe("hostSentryOptions", () => {
 		).toBe(false);
 	});
 
-	it("sends a flagged box's console lines through the scrub", () => {
+	it("sends a flagged box's lines through the filter", () => {
 		const env = {
 			HOST_SERVICE_SENTRY_DSN: DSN,
 			SUPERSET_HOST_RUN_MODE: "sandbox",
@@ -51,12 +51,13 @@ describe("hostSentryOptions", () => {
 		expect(
 			hostSentryOptions(env, "org")?.beforeSendLog?.({
 				level: "info",
-				message: `gate ${env.HOST_SERVICE_SECRET} via ${DSN}`,
+				message: `[sandbox] gate ${env.HOST_SERVICE_SECRET}`,
+				attributes: { "sentry.origin": "auto.log.console" },
 			}),
 		).toEqual({
 			level: "info",
-			message: "gate [redacted] via [redacted]",
-			attributes: {},
+			message: "box.logs.withheld",
+			attributes: { "sentry.origin": "auto.log.console" },
 		});
 	});
 });

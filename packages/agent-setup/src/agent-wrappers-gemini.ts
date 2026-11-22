@@ -103,7 +103,7 @@ export function createGeminiHookScript(): void {
 	const scriptPath = getGeminiHookScriptPath();
 	const content = getGeminiHookScriptContent();
 	const changed = writeFileIfChanged(scriptPath, content, 0o755);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Gemini hook script`,
 	);
 }

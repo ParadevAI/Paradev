@@ -304,7 +304,7 @@ async function startRunTerminalOnce(
 		return { terminalId: existing, pid: null };
 	const started = await starter.start(run);
 	if ("error" in started) {
-		console.warn(`[sandbox] run terminal not started: ${started.error}`);
+		console.warn("[sandbox] run terminal not started:", started.error);
 		return started;
 	}
 	writeFileSync(files.runTerminal, `${started.terminalId}\n`);

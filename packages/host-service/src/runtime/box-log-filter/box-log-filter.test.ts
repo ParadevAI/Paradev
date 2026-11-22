@@ -4,12 +4,13 @@ import { createBoxLogFilter } from "./box-log-filter";
 
 const SECRET = "3f9a1c0e8b7d6a5f4e3d2c1b0a9f8e7d6c5b4a39";
 const HOUR_MS = 60 * 60_000;
+const CONSOLE = { "sentry.origin": "auto.log.console" };
 
 function setup(cap = 3) {
 	let now = 0;
 	const reports: Array<[number, number]> = [];
 	const filter = createBoxLogFilter({
-		secrets: () => [SECRET],
+		secrets: () => ({ LINEAR_CLIENT_SECRET: SECRET }),
 		reportDropped: (dropped, windowStartedAt) =>
 			reports.push([dropped, windowStartedAt]),
 		cap,
@@ -24,66 +25,105 @@ function setup(cap = 3) {
 	};
 }
 
-const line = (message: string): Log => ({ level: "info", message });
+const consoleLine = (message: string): Log => ({
+	level: "info",
+	message,
+	attributes: CONSOLE,
+});
 
 describe("createBoxLogFilter", () => {
-	it("scrubs the body and every attribute, objects included", () => {
-		const { filter } = setup();
-		const scrubbed = filter({
-			level: "warn",
-			message: `[sandbox] could not write git user.email ${SECRET}`,
-			attributes: {
-				"sentry.origin": "auto.log.console",
-				"sentry.message.parameter.0": { stderr: `fatal: ${SECRET}` },
-				pid: 2134,
-			},
-		});
-		expect(scrubbed).toEqual({
-			level: "warn",
-			message: "[sandbox] could not write git user.email [redacted]",
-			attributes: {
-				"sentry.origin": "auto.log.console",
-				"sentry.message.parameter.0": '{"stderr":"fatal: [redacted]"}',
-				pid: 2134,
-			},
-		});
-	});
-
-	it("sends box.logs.withheld, and nothing of the line, in place of a line it cannot scrub", () => {
+	it("sends an allowlisted line as its call site's text, never the later arguments", () => {
 		const { filter } = setup();
 		expect(
 			filter({
-				level: "error",
-				message: `push failed: ${SECRET.slice(0, 20)}`,
-				attributes: { "sentry.message.parameter.0": "safe" },
+				level: "warn",
+				message: "[host-service] project purge failed: Error: fatal: <stderr>",
+				attributes: {
+					...CONSOLE,
+					"sentry.message.template": "[host-service] project purge failed: {}",
+					"sentry.message.parameter.0": "Error: fatal: <stderr>",
+				},
 			}),
-		).toEqual({ level: "error", message: "box.logs.withheld" });
+		).toEqual({
+			level: "warn",
+			message: "[host-service] project purge failed: {}",
+			attributes: CONSOLE,
+		});
+	});
+
+	it("sends any other line as its prefix and level only", () => {
+		const { filter } = setup();
+		expect(
+			filter(
+				consoleLine(
+					"[generateNamesViaAgentCli] exit 1; stderr tail: <model output>",
+				),
+			),
+		).toEqual({
+			level: "info",
+			message: "[generateNamesViaAgentCli]",
+			attributes: CONSOLE,
+		});
+		expect(
+			filter(consoleLine('{"component":"pty-daemon-supervisor"}'))?.message,
+		).toBe("(no prefix)");
+		expect(filter(consoleLine("[host-service] count %s of %d"))?.message).toBe(
+			"[host-service]",
+		);
+	});
+
+	it("sends box.logs.withheld in place of an allowlisted line that still holds a value", () => {
+		const { filter } = setup();
+		expect(
+			filter({
+				...consoleLine(`[sandbox] could not write git ${SECRET.slice(3, 20)}`),
+				level: "error",
+			}),
+		).toEqual({
+			level: "error",
+			message: "box.logs.withheld",
+			attributes: CONSOLE,
+		});
 	});
 
 	it("says when the cap is reached, drops the rest of the hour, and reports the count when the next hour starts", () => {
 		const { filter, reports, advance } = setup(3);
 		for (let i = 0; i < 3; i++) {
-			expect(filter(line(`line ${i}`))?.message).toBe(`line ${i}`);
+			expect(filter(consoleLine(`[sandbox] line ${i}`))?.message).toBe(
+				`[sandbox] line ${i}`,
+			);
 		}
-		expect(filter(line("line 3"))).toEqual({
+		expect(filter(consoleLine("[sandbox] line 3"))).toEqual({
 			level: "warn",
 			message: "box.logs.capped",
 			attributes: { "box.logs.cap": 3 },
 		});
-		expect(filter(line("line 4"))).toBeNull();
-		expect(filter(line("line 5"))).toBeNull();
+		expect(filter(consoleLine("[sandbox] line 4"))).toBeNull();
 		expect(reports).toEqual([]);
 
 		advance(HOUR_MS);
-		expect(filter(line("next hour"))?.message).toBe("next hour");
-		expect(reports).toEqual([[3, 0]]);
+		expect(filter(consoleLine("[sandbox] next hour"))?.message).toBe(
+			"[sandbox] next hour",
+		);
+		expect(reports).toEqual([[2, 0]]);
 	});
 
-	it("reports nothing for an hour that stayed under the cap", () => {
-		const { filter, reports, advance } = setup(3);
-		filter(line("one"));
-		advance(HOUR_MS);
-		filter(line("two"));
-		expect(reports).toEqual([]);
+	it("never caps or rewrites a typed box event, and a console line cannot pass as one", () => {
+		const { filter } = setup(1);
+		filter(consoleLine("[sandbox] one"));
+		filter(consoleLine("[sandbox] two"));
+		const event: Log = {
+			level: "info",
+			message: "agent.ended",
+			attributes: { "agent.id": "claude", ms: 10, "box.event": true },
+		};
+		expect(filter(event)).toBe(event);
+		expect(
+			filter({
+				level: "info",
+				message: `{"box.event":true,"x":"${SECRET}"}`,
+				attributes: { ...CONSOLE, "box.event": true },
+			}),
+		).toBeNull();
 	});
 });

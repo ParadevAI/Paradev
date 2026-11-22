@@ -233,21 +233,42 @@ reaped while its terminal survived.
 ## Box logs leave the box
 
 When the organization's PostHog flag `sandbox-box-logs` is on, the claim sets
-`SUPERSET_SANDBOX_BOX_LOGS=1` and host-service turns on the Sentry SDK's logs
-(`hostSentryOptions` in `packages/host-service/src/sentry.ts`), on a box only:
-a desktop user's own host-service never sends a line. The box sends its fixed
-events (`logBoxEvent`) and every `console` line host-service writes except
-`debug`. Each record passes `scrubBoxLogLine`
-(`packages/shared/src/sandbox/box-log-scrub.ts`): every managed environment
-value, the host secret and token shapes are removed, and a line it cannot make
-safe goes out as `box.logs.withheld` with nothing of the line. So paths,
-branch and repository names and integration names can leave the box; secrets
-and environment values cannot. A box sends at most `BOX_LOG_RECORDS_PER_HOUR`
-records an hour; the record that reaches it is `box.logs.capped`, and the
-next hour starts with `box.logs.dropped` and the count. A box whose host-service never answers is
-reported by the control plane: `SandboxNotReadyError` names the boot phases
-`boot.log` reached, not the step output between them. `memguard.log`,
-`desktop.log` and `checkout.log` stay on the box.
+`SUPERSET_SANDBOX_BOX_LOGS=1`, and host-service on that box sends log records
+to Sentry Logs (`hostSentryOptions` in `packages/host-service/src/sentry.ts`).
+A host-service not in run mode `sandbox`, which is every desktop user's own,
+never sends one. `createBoxLogFilter`
+(`packages/host-service/src/runtime/box-log-filter/box-log-filter.ts`)
+decides what a record holds:
+
+- A typed box event (`logBoxEvent`: `agent.ended`, `box.reaped`,
+  `hook.finished`, `box.logs.dropped`) goes out as it is: ids, counts and
+  durations only. The hourly cap does not apply to it.
+- A `console` line whose `[prefix]` is in `BOX_LOG_PREFIXES` goes out as
+  the call site's first argument; each later argument (an error, command
+  output) shows as `{}` and its value is not sent. Those call sites print ids,
+  counts, versions, paths, plugin and integration names, agent names and
+  URLs, so paths, repository and branch names can leave the box in them.
+- Any other `console` line goes out as its prefix and level only. `debug`
+  lines are not sent.
+
+What a console line keeps then passes `createBoxLogScrub`
+(`packages/shared/src/sandbox/box-log-scrub.ts`). A value after the name of a
+managed variable (`KEY=`, `"KEY":`, `KEY:`) and every token shape it knows
+are replaced with `[redacted]`. A line that still holds 12 characters in a row
+of any managed value, the host secret or the DSN (raw, JSON-escaped once or
+twice, URL-encoded, hex, base64, the password of a URL value, or one line of a
+multi-line value), or a private key header, goes out as `box.logs.withheld`
+with its level only. Limits: a value shorter than 8 characters is found only
+after its name; a run shorter than 12 characters of a value is not found; a
+token is found only if its shape is in the list. A box sends at most 1,000
+filtered records an hour; the record that reaches the cap is
+`box.logs.capped`, and the next hour starts with `box.logs.dropped` and the
+count. Sentry error events (`captureException`, uncaught exceptions) are not
+log records and do not pass this filter.
+
+A box whose host-service never answers is reported by the control plane:
+`SandboxNotReadyError` names the boot phases `boot.log` reached, not the step
+output between them. The files under `/var/log/superset` stay on the box.
 Before the flag is on for a customer organization, the policy wording (L1)
 must be live.
 

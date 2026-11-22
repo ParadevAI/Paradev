@@ -97,7 +97,8 @@ export async function resolveTerminalBaseEnv(): Promise<
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		console.warn(
-			`[host-service] Shell env snapshot failed, falling back to process.env: ${message}`,
+			"[host-service] Shell env snapshot failed, falling back to process.env:",
+			message,
 		);
 		const fallback = snapshotStringEnv(process.env);
 		augmentPathForMacOS(fallback);

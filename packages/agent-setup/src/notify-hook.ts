@@ -25,5 +25,7 @@ export function createNotifyScript(): void {
 	const notifyPath = getNotifyScriptPath();
 	const script = getNotifyScriptContent();
 	const changed = writeFileIfChanged(notifyPath, script, 0o755);
-	console.log(`[agent-setup] ${changed ? "Updated" : "Verified"} notify hook`);
+	(changed ? console.log : console.debug)(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} notify hook`,
+	);
 }

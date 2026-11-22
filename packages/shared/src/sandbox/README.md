@@ -12,7 +12,7 @@ lifecycle (provider, boot, wake, credentials) is in
 | `access.ts` | `createSandboxAccess`: one grant per workspace, address vs wake, one wake at a time |
 | `reach.ts` | `callWithWake` for one call; `probeSandboxHost`, `isSandboxStopped` |
 | `watch.ts` | `watchForStoppedSandbox` for a socket that stays open |
-| `box-log-scrub.ts` | `scrubBoxLogLine`: what may leave the box in a log line |
+| `box-log-scrub.ts` | `createBoxLogScrub`: what of a log line may leave the box |
 
 ## The rule
 

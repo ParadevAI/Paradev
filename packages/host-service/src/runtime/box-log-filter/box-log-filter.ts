@@ -1,47 +1,48 @@
 import type { Log } from "@sentry/node";
-import { scrubBoxLogLine } from "@superset/shared/sandbox/box-log-scrub";
+import { createBoxLogScrub } from "@superset/shared/sandbox/box-log-scrub";
 
 /**
- * Records one box may send in an hour. A create boot measured about 285
- * (boot, host-service, memguard, desktop, vitals) and a steady hour about 90,
- * so this is about 3.5 times the busiest hour seen; at about 1 KB a record
- * it bounds one box at 1 MB an hour.
+ * The console prefixes whose text leaves a box. Their call sites print ids,
+ * counts, versions, paths and names, and pass error objects and command output
+ * as later arguments, which are never sent. Any other line is sent as its
+ * prefix and level only.
  */
-export const BOX_LOG_RECORDS_PER_HOUR = 1_000;
+const BOX_LOG_PREFIXES: ReadonlySet<string> = new Set([
+	"host-service",
+	"host-service:db",
+	"host-service:vitals",
+	"sandbox",
+	"supervisor",
+	"boot-stamps",
+]);
+
+const BOX_LOG_RECORDS_PER_HOUR = 1_000;
 const HOUR_MS = 60 * 60_000;
 
-function scrubRecord(log: Log, secrets: readonly string[]): Log | null {
-	const message = scrubBoxLogLine(String(log.message), secrets);
-	if (message === null) return null;
-	const attributes: Record<string, unknown> = {};
-	for (const [key, value] of Object.entries(log.attributes ?? {})) {
-		if (
-			value == null ||
-			typeof value === "number" ||
-			typeof value === "boolean"
-		) {
-			attributes[key] = value;
-			continue;
-		}
-		const text = scrubBoxLogLine(
-			typeof value === "string" ? value : JSON.stringify(value),
-			secrets,
-		);
-		if (text === null) return null;
-		attributes[key] = text;
-	}
-	return { ...log, message, attributes };
+const PREFIX = /^\[([A-Za-z0-9:_-]{1,40})\]/;
+const CONSOLE_SUBSTITUTION = /%[sdifocO]/;
+
+/** The call site's own text: a later argument shows as `{}` and its value is dropped. */
+function consoleText(log: Log): string {
+	const message = String(log.message);
+	const prefix = PREFIX.exec(message)?.[1];
+	if (!prefix) return "(no prefix)";
+	if (!BOX_LOG_PREFIXES.has(prefix)) return `[${prefix}]`;
+	const template = log.attributes?.["sentry.message.template"];
+	if (typeof template === "string") return template;
+	return CONSOLE_SUBSTITUTION.test(message) ? `[${prefix}]` : message;
 }
 
 /**
- * The `beforeSendLog` of a box: scrubs every record, sends
- * `box.logs.withheld` in place of one it cannot scrub, and stops at
- * `cap` records an hour. The record that reaches the cap becomes
- * `box.logs.capped`; the first record of the next hour is preceded by
- * `reportDropped` with how many the cap dropped.
+ * The `beforeSendLog` of a box. A typed box event goes out as it is. A
+ * console line goes out as `consoleText`, any other record as itself;
+ * both then pass the scrub, and one it cannot make safe goes out as
+ * `box.logs.withheld`. These stop at `cap` records an hour: the record that
+ * reaches it becomes `box.logs.capped`, and `reportDropped` gives the count
+ * when the next hour starts.
  */
 export function createBoxLogFilter(options: {
-	secrets: () => readonly string[];
+	secrets: () => Readonly<Record<string, string>>;
 	reportDropped: (dropped: number, windowStartedAt: number) => void;
 	cap?: number;
 	now?: () => number;
@@ -52,10 +53,16 @@ export function createBoxLogFilter(options: {
 		cap = BOX_LOG_RECORDS_PER_HOUR,
 		now = Date.now,
 	} = options;
+	let scrubFor = "";
+	let scrub = createBoxLogScrub({});
 	let windowStartedAt = now();
 	let sent = 0;
 	let dropped = 0;
 	return (log) => {
+		const origin = log.attributes?.["sentry.origin"];
+		if (origin === undefined && log.attributes?.["box.event"] === true) {
+			return log;
+		}
 		const at = now();
 		if (at - windowStartedAt >= HOUR_MS) {
 			const last = { dropped, windowStartedAt };
@@ -77,11 +84,19 @@ export function createBoxLogFilter(options: {
 				attributes: { "box.logs.cap": cap },
 			};
 		}
-		return (
-			scrubRecord(log, secrets()) ?? {
-				level: log.level,
-				message: "box.logs.withheld",
-			}
-		);
+		const values = secrets();
+		const key = JSON.stringify(values);
+		if (key !== scrubFor) {
+			scrubFor = key;
+			scrub = createBoxLogScrub(values);
+		}
+		const isConsole = origin === "auto.log.console";
+		const attributes = isConsole
+			? { "sentry.origin": origin }
+			: { "log.source": log.attributes?.["log.source"] };
+		const message = scrub(isConsole ? consoleText(log) : String(log.message));
+		return message === null
+			? { level: log.level, message: "box.logs.withheld", attributes }
+			: { level: log.level, message, attributes };
 	};
 }
