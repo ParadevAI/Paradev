@@ -327,6 +327,7 @@ const ALLOWED_ENV_VARS = new Set([
  */
 const ALLOWED_PREFIXES = [
 	"SUPERSET_", // Our own metadata vars
+	"PARADEV_",
 	"LC_", // Locale settings
 ];
 
