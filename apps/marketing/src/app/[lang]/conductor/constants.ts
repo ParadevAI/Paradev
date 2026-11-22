@@ -38,7 +38,8 @@ export const HIGHLIGHTS: Highlight[] = [
 	{
 		title: msg({ message: "Mobile" }),
 		detail: msg({
-			message: "Check on agents and review their work from iPhone or iPad.",
+			message:
+				"Check on agents and review their work from iPhone, iPad, or Android.",
 		}),
 	},
 ];
@@ -139,7 +140,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 	{
 		id: "phone",
 		label: msg({ message: "Phone" }),
-		paradev: msg({ message: "iPhone and iPad" }),
+		paradev: msg({ message: "iPhone, iPad, and Android" }),
 		conductor: msg({
 			message: "iOS app; cloud and experimental local Mac remote control",
 		}),

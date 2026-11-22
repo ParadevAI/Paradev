@@ -100,10 +100,10 @@ export function SurfaceCards() {
 						<p className={CARD_COPY_CLASS}>
 							<Trans>
 								Check on running agents and read what they changed from your
-								iPhone or iPad.
+								iPhone, iPad, or Android phone.
 							</Trans>
 						</p>
-						<div className={CARD_ACTION_CLASS}>
+						<div className={`${CARD_ACTION_CLASS} flex-wrap gap-2`}>
 							<a
 								href={COMPANY.APP_STORE_URL}
 								onClick={() =>
@@ -114,7 +114,20 @@ export function SurfaceCards() {
 								}
 								className="group flex items-center gap-2 bg-foreground px-5 py-2.5 font-normal text-background text-sm transition-colors hover:bg-brand hover:text-white"
 							>
-								<Trans>Get the iPhone and iPad app</Trans>
+								App Store
+								<HiMiniArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+							</a>
+							<a
+								href={COMPANY.PLAY_STORE_URL}
+								onClick={() =>
+									track("mobile_store_clicked", {
+										store: "google_play",
+										source: "download_page",
+									})
+								}
+								className="group flex items-center gap-2 border border-border px-5 py-2.5 font-normal text-foreground text-sm transition-colors hover:border-foreground"
+							>
+								Google Play
 								<HiMiniArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
 							</a>
 						</div>

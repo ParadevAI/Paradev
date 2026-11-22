@@ -1659,14 +1659,14 @@ msgstr "<0>#{0}</0> <1>из {1} в рейтинге</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> или <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<0>Скоро в</0><1>Google Play</1>"
-
 msgid "<0>Download on the</0><1>App Store</1>"
 msgstr "<0>Загрузите в</0><1>App Store</1>"
 
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · вы здесь"
+
+msgid "<0>Get it on</0><1>Google Play</1>"
+msgstr "<0>Доступно в</0><1>Google Play</1>"
 
 msgid "<0>Nerd Fonts</0> are recommended."
 msgstr "Рекомендуются <0>Nerd Fonts</0>."
@@ -2490,8 +2490,8 @@ msgstr "Агенты в ваших облачных рабочих област�
 msgid "Agents in your pocket"
 msgstr "Агенты в кармане"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "Агенты продолжают работать в облаке. Снова откройте рабочую область на компьютере, iPhone или iPad."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "Агенты продолжают работать в облаке. Снова откройте рабочую область на компьютере или телефоне."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "Агенты продолжают работать, когда ноутбук закрыт."
@@ -2871,8 +2871,8 @@ msgstr "Ключ API OpenAI."
 msgid "An update is ready to install."
 msgstr "Обновление готово к установке."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Версия для Android уже в работе. Узнайте о выходе первыми."
+msgid "Android app"
+msgstr "Приложение для Android"
 
 msgid "Animals & Nature"
 msgstr "Животные и природа"
@@ -4391,11 +4391,11 @@ msgstr "Проверить обновления"
 msgid "Check for Updates..."
 msgstr "Проверить обновления..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "Следите за агентами и проверяйте их работу с iPhone или iPad."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "Следите за агентами и проверяйте их работу с iPhone, iPad или Android."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "Проверяйте запущенных агентов и смотрите, что они изменили, с iPhone или iPad."
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "Проверяйте запущенных агентов и смотрите, что они изменили, с iPhone, iPad или телефона на Android."
 
 msgid "Check plans and balances"
 msgstr "Проверяйте тарифы и балансы"
@@ -7915,8 +7915,8 @@ msgstr "Каждая успешная сборка сохраняет снимо
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "У каждой поверхности своя типографика. Изменения сразу видны в живом предпросмотре."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "Каждая рабочая область получает свою облачную машину и продолжает работать, когда ноутбук закрыт. Следите за ней с компьютера, iPhone или iPad."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "Каждая рабочая область получает свою облачную машину и продолжает работать, когда ноутбук закрыт. Следите за ней с компьютера или телефона."
 
 msgid "Earlier period"
 msgstr "Предыдущий период"
@@ -9615,9 +9615,6 @@ msgstr "Получить поддержку"
 msgid "Get the best out of Pro"
 msgstr "Используйте Pro по максимуму"
 
-msgid "Get the iPhone and iPad app"
-msgstr "Скачать приложение для iPhone и iPad"
-
 msgid "Gets an invite to join {organizationName}"
 msgstr "Получит приглашение в {organizationName}"
 
@@ -10782,8 +10779,8 @@ msgstr "Панель симулятора iOS"
 msgid "IP restrictions"
 msgstr "Ограничения по IP"
 
-msgid "iPhone and iPad"
-msgstr "iPhone и iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad и Android"
 
 msgid "Is {companyName} open source?"
 msgstr "{companyName} — open source?"
@@ -12289,6 +12286,9 @@ msgstr "Следите за агентами с телефона."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Следите за рабочими областями и управляйте задачами на ходу. Продолжайте диалоги откуда угодно."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Следите за агентами, направляйте их и снимайте блокировки с телефона на Android."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "Следите за агентами, направляйте их и снимайте блокировки с iPhone или iPad."
@@ -13803,6 +13803,9 @@ msgstr "При смене фокуса"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "На GitHub у проекта более 15 тыс. звёзд, более 1000 форков и более 100 контрибьюторов. Он также занял 1-е место на Product Hunt."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "На iPhone и iPad нужна iOS 26 или iPadOS 26 или новее. Входит в Paradev Pro."
+
 msgid "On our radar. Order and scope may change."
 msgstr "У нас на радаре. Порядок и объём могут измениться."
 
@@ -14356,8 +14359,8 @@ msgstr "Откройте страницу входа устройств OpenAI."
 msgid "Open Page in Default Browser"
 msgstr "Открыть страницу в браузере по умолчанию"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "Открывайте страницы и отвечайте на комментарии в приложении Paradev на iPhone и iPad."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "Открывайте страницы и отвечайте на комментарии в приложении Paradev на iPhone, iPad и Android."
 
 msgid "Open PR"
 msgstr "Открыть PR"
@@ -14867,8 +14870,8 @@ msgstr "У Paradev нет разрешения на чтение «{name}»."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise — это Paradev для команд. Напишите нам, чтобы узнать, что входит и как это подойдёт вашей организации."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "Paradev для iPhone и iPad"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "Paradev для iPhone, iPad и Android"
 
 msgid "Paradev for your team"
 msgstr "Paradev для вашей команды"
@@ -16849,9 +16852,6 @@ msgstr "Обязательное"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Требуемая версия: {minimumVersion}+"
-
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "Нужна iOS 26 или iPadOS 26 или новее. Входит в Paradev Pro."
 
 msgid "Resend invite"
 msgstr "Отправить приглашение повторно"
@@ -19369,8 +19369,8 @@ msgstr "Запустить агента"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Запускайте агентов автоматически: по ошибке в Sentry, задаче в Linear, пул-реквесту в GitHub или по расписанию, которое агент задаёт сам."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "Запускайте агентов, следите за ними в реальном времени и проверяйте diff с iPhone или iPad. Ваш код остаётся на ваших машинах."
+msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
+msgstr "Запускайте агентов, следите за ними в реальном времени и проверяйте diff с iPhone, iPad или телефона на Android. Ваш код остаётся на ваших машинах."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Запускайте агента по расписанию, по событию в ваших инструментах или через вебхук. Каждый запуск открывает рабочую область, которую можно проверить."
@@ -19384,8 +19384,8 @@ msgstr "Начните просмотр"
 msgid "Start building in two."
 msgstr "Начните разработку за два."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "Запускайте агентов для кода, следите за ними в реальном времени и проверяйте diff с iPhone или iPad. Доступно в App Store; Android скоро."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "Запускайте агентов для кода, следите за ними в реальном времени и проверяйте diff с iPhone, iPad или телефона на Android. Доступно в App Store и Google Play."
 
 msgid "Start date"
 msgstr "Дата начала"
@@ -20330,8 +20330,8 @@ msgstr "Демону не удалось передать живые сесси�
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Мы готовим Paradev для Windows и Linux. Оставьте email, и мы сообщим, как только будет готово."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Десктопное приложение работает на macOS, есть экспериментальный AppImage для Linux; Windows пока нет. Кроме приложения есть CLI, TypeScript SDK и сервер MCP, так что Paradev можно водить из скриптов, терминалов и других агентов. Приложение для iPhone и iPad в App Store позволяет следить за агентами и просматривать их диффы, даже когда вы не за рабочим столом."
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
+msgstr "Десктопное приложение работает на macOS, есть экспериментальный AppImage для Linux; Windows пока нет. Кроме приложения есть CLI, TypeScript SDK и сервер MCP, так что Paradev можно водить из скриптов, терминалов и других агентов. Приложения для iPhone и iPad в App Store и для Android в Google Play позволяют следить за агентами и просматривать их диффы, даже когда вы не за рабочим столом."
 
 msgid "The Dev can't post there."
 msgstr "Dev не может публиковать там."
@@ -22579,9 +22579,6 @@ msgstr "Скоро свяжемся."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Вы вернётесь к работе, как только связь восстановится."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Мы напишем вам, когда Paradev для Android будет готов."
 
 msgid "We'll get back to you shortly."
 msgstr "Скоро ответим."

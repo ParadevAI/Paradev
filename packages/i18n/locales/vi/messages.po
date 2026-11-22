@@ -1659,14 +1659,14 @@ msgstr "<0>#{0}</0> <1>trên {1} trong bảng xếp hạng</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> hoặc một <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<0>Sắp có trên</0><1>Google Play</1>"
-
 msgid "<0>Download on the</0><1>App Store</1>"
 msgstr "<0>Tải về trên</0><1>App Store</1>"
 
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · bạn đang ở đây"
+
+msgid "<0>Get it on</0><1>Google Play</1>"
+msgstr "<0>Tải về trên</0><1>Google Play</1>"
 
 msgid "<0>Nerd Fonts</0> are recommended."
 msgstr "Khuyến nghị dùng <0>Nerd Fonts</0>."
@@ -2490,8 +2490,8 @@ msgstr "Agent trong các workspace cloud của bạn khi đó có thể dùng <0
 msgid "Agents in your pocket"
 msgstr "Agent trong túi bạn"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính, iPhone hoặc iPad."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "Agent tiếp tục làm việc trên đám mây. Mở lại không gian làm việc từ máy tính hoặc điện thoại."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "Agent vẫn tiếp tục làm việc khi bạn gập laptop."
@@ -2871,8 +2871,8 @@ msgstr "Một khóa API OpenAI."
 msgid "An update is ready to install."
 msgstr "Đã có bản cập nhật sẵn sàng để cài đặt."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Bản Android đang đến. Hãy là người đầu tiên biết khi nó ra mắt."
+msgid "Android app"
+msgstr "Ứng dụng Android"
 
 msgid "Animals & Nature"
 msgstr "Động vật & Thiên nhiên"
@@ -4391,11 +4391,11 @@ msgstr "Kiểm tra cập nhật"
 msgid "Check for Updates..."
 msgstr "Kiểm tra cập nhật..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "Theo dõi agent và review công việc của chúng từ iPhone hoặc iPad."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "Theo dõi agent và review công việc của chúng từ iPhone, iPad hoặc Android."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "Kiểm tra các agent đang chạy và đọc những gì chúng đã thay đổi từ iPhone hoặc iPad."
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "Kiểm tra các agent đang chạy và đọc những gì chúng đã thay đổi từ iPhone, iPad hoặc điện thoại Android."
 
 msgid "Check plans and balances"
 msgstr "Xem gói và số dư"
@@ -7915,8 +7915,8 @@ msgstr "Mỗi lần build thành công sẽ lưu một ảnh chụp. Workspace m
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Mỗi bề mặt có kiểu chữ riêng. Thay đổi hiện ra ngay trong phần xem trước trực tiếp."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "Mỗi không gian làm việc có một máy đám mây riêng và vẫn làm việc khi laptop của bạn đã gập. Theo dõi từ máy tính, iPhone hoặc iPad."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "Mỗi không gian làm việc có một máy đám mây riêng và vẫn làm việc khi laptop của bạn đã gập. Theo dõi từ máy tính hoặc điện thoại."
 
 msgid "Earlier period"
 msgstr "Kỳ trước"
@@ -9615,9 +9615,6 @@ msgstr "Nhận hỗ trợ"
 msgid "Get the best out of Pro"
 msgstr "Tận dụng tối đa Pro"
 
-msgid "Get the iPhone and iPad app"
-msgstr "Tải ứng dụng cho iPhone và iPad"
-
 msgid "Gets an invite to join {organizationName}"
 msgstr "Sẽ nhận lời mời tham gia {organizationName}"
 
@@ -10782,8 +10779,8 @@ msgstr "Ngăn trình mô phỏng iOS"
 msgid "IP restrictions"
 msgstr "Giới hạn IP"
 
-msgid "iPhone and iPad"
-msgstr "iPhone và iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad và Android"
 
 msgid "Is {companyName} open source?"
 msgstr "{companyName} có phải mã nguồn mở không?"
@@ -12289,6 +12286,9 @@ msgstr "Theo dõi agent ngay trên điện thoại."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Theo dõi workspace và quản lý tác vụ khi đang di chuyển. Tiếp tục cuộc trò chuyện từ bất cứ đâu."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Theo dõi, điều hướng và gỡ vướng cho agent từ điện thoại Android của bạn."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "Theo dõi, điều hướng và gỡ vướng cho agent từ iPhone hoặc iPad của bạn."
@@ -13803,6 +13803,9 @@ msgstr "Khi thay đổi tiêu điểm"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "Trên GitHub, Paradev có hơn 15k sao, hơn 1.000 fork và hơn 100 người đóng góp. Paradev cũng từng đứng #1 trên Product Hunt."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "Trên iPhone và iPad, yêu cầu iOS 26 hoặc iPadOS 26 trở lên. Đã bao gồm trong Paradev Pro."
+
 msgid "On our radar. Order and scope may change."
 msgstr "Đang trong tầm ngắm. Thứ tự và phạm vi có thể thay đổi."
 
@@ -14356,8 +14359,8 @@ msgstr "Mở trang đăng nhập thiết bị của OpenAI."
 msgid "Open Page in Default Browser"
 msgstr "Mở trang trong trình duyệt mặc định"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "Mở trang và trả lời bình luận từ ứng dụng Paradev trên iPhone và iPad."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "Mở trang và trả lời bình luận từ ứng dụng Paradev trên iPhone, iPad và Android."
 
 msgid "Open PR"
 msgstr "Mở PR"
@@ -14867,8 +14870,8 @@ msgstr "Paradev không có quyền đọc \"{name}\"."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise là Paradev dành cho đội nhóm. Hãy liên hệ để biết thêm về những gì được bao gồm và cách nó phù hợp với tổ chức của bạn."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "Paradev cho iPhone và iPad"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "Paradev cho iPhone, iPad và Android"
 
 msgid "Paradev for your team"
 msgstr "Paradev cho đội ngũ của bạn"
@@ -16849,9 +16852,6 @@ msgstr "Bắt buộc"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Phiên bản yêu cầu: {minimumVersion}+"
-
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "Yêu cầu iOS 26 hoặc iPadOS 26 trở lên. Đã bao gồm trong Paradev Pro."
 
 msgid "Resend invite"
 msgstr "Gửi lại lời mời"
@@ -19369,8 +19369,8 @@ msgstr "Bắt đầu agent"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Tự động khởi chạy agent: từ một lỗi Sentry, một issue Linear, một pull request GitHub, hoặc theo lịch do chính agent đặt ra."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "Khởi chạy agent, theo dõi trực tiếp và xem xét diff từ iPhone hoặc iPad. Mã của bạn vẫn nằm trên máy của bạn."
+msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
+msgstr "Khởi chạy agent, theo dõi trực tiếp và xem xét diff từ iPhone, iPad hoặc điện thoại Android. Mã của bạn vẫn nằm trên máy của bạn."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Khởi chạy agent theo lịch, theo sự kiện trong công cụ của bạn hoặc qua webhook. Mỗi lượt chạy mở một workspace để bạn xem lại."
@@ -19384,8 +19384,8 @@ msgstr "Bắt đầu duyệt web"
 msgid "Start building in two."
 msgstr "Bắt đầu xây dựng trong hai bước."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "Khởi chạy agent lập trình, theo dõi trực tiếp và xem xét diff từ iPhone hoặc iPad. Có trên App Store; Android sắp ra mắt."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "Khởi chạy agent lập trình, theo dõi trực tiếp và xem xét diff từ iPhone, iPad hoặc điện thoại Android. Có trên App Store và Google Play."
 
 msgid "Start date"
 msgstr "Ngày bắt đầu"
@@ -20330,8 +20330,8 @@ msgstr "Daemon không chuyển được các phiên đang chạy sang bản bina
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Chúng tôi đang đưa Paradev lên Windows & Linux. Để lại email và chúng tôi sẽ báo ngay khi sẵn sàng."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux thử nghiệm; Windows chưa có. Ngoài ứng dụng máy tính còn có CLI, SDK TypeScript và server MCP, nên bạn có thể điều khiển Paradev từ script, terminal và các agent khác. Ứng dụng cho iPhone và iPad trên App Store cho phép bạn theo dõi các agent và xem lại diff của chúng khi không ngồi tại bàn làm việc."
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
+msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux thử nghiệm; Windows chưa có. Ngoài ứng dụng máy tính còn có CLI, SDK TypeScript và server MCP, nên bạn có thể điều khiển Paradev từ script, terminal và các agent khác. Ứng dụng cho iPhone và iPad trên App Store và cho Android trên Google Play cho phép bạn theo dõi các agent và xem lại diff của chúng khi không ngồi tại bàn làm việc."
 
 msgid "The Dev can't post there."
 msgstr "Dev không thể đăng ở đó."
@@ -22579,9 +22579,6 @@ msgstr "Chúng tôi sẽ liên hệ sớm."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Bạn sẽ quay lại ngay khi kết nối được khôi phục."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Chúng tôi sẽ gửi email cho bạn khi Paradev cho Android sẵn sàng."
 
 msgid "We'll get back to you shortly."
 msgstr "Chúng tôi sẽ phản hồi sớm."

@@ -1659,14 +1659,14 @@ msgstr "<0>#{0}</0> <1>dari {1} di papan peringkat</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> atau <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<0>Segera hadir di</0><1>Google Play</1>"
-
 msgid "<0>Download on the</0><1>App Store</1>"
 msgstr "<0>Unduh di</0><1>App Store</1>"
 
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · Anda di sini"
+
+msgid "<0>Get it on</0><1>Google Play</1>"
+msgstr "<0>Dapatkan di</0><1>Google Play</1>"
 
 msgid "<0>Nerd Fonts</0> are recommended."
 msgstr "<0>Nerd Fonts</0> disarankan."
@@ -2490,8 +2490,8 @@ msgstr "Agen di workspace cloud Anda lalu bisa memakai <0>--host</0> untuk menja
 msgid "Agents in your pocket"
 msgstr "Agen di saku Anda"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop, iPhone, atau iPad."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "Agen tetap bekerja di cloud. Buka lagi workspace dari desktop atau ponsel Anda."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "Agen tetap bekerja saat laptop Anda tertutup."
@@ -2871,8 +2871,8 @@ msgstr "Kunci API OpenAI."
 msgid "An update is ready to install."
 msgstr "Pembaruan siap dipasang."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Android sedang dalam perjalanan. Jadilah yang pertama tahu saat dirilis."
+msgid "Android app"
+msgstr "Aplikasi Android"
 
 msgid "Animals & Nature"
 msgstr "Hewan & Alam"
@@ -4391,11 +4391,11 @@ msgstr "Periksa Pembaruan"
 msgid "Check for Updates..."
 msgstr "Periksa Pembaruan..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "Pantau agen dan tinjau pekerjaan mereka dari iPhone atau iPad."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "Pantau agen dan tinjau pekerjaan mereka dari iPhone, iPad, atau Android."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "Pantau agen yang sedang berjalan dan baca apa yang mereka ubah dari iPhone atau iPad Anda."
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "Pantau agen yang sedang berjalan dan baca apa yang mereka ubah dari iPhone, iPad, atau ponsel Android Anda."
 
 msgid "Check plans and balances"
 msgstr "Periksa paket dan saldo"
@@ -7915,8 +7915,8 @@ msgstr "Setiap build yang berhasil menyimpan snapshot. Workspace baru dimulai da
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Tiap permukaan punya tipografinya sendiri. Perubahan langsung terlihat di pratinjau."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "Setiap workspace mendapat mesin cloud sendiri dan tetap bekerja saat laptop Anda tertutup. Pantau dari desktop, iPhone, atau iPad."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "Setiap workspace mendapat mesin cloud sendiri dan tetap bekerja saat laptop Anda tertutup. Pantau dari desktop atau ponsel Anda."
 
 msgid "Earlier period"
 msgstr "Periode sebelumnya"
@@ -9615,9 +9615,6 @@ msgstr "Dapatkan bantuan"
 msgid "Get the best out of Pro"
 msgstr "Maksimalkan Pro"
 
-msgid "Get the iPhone and iPad app"
-msgstr "Dapatkan aplikasi iPhone dan iPad"
-
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
 
@@ -10782,8 +10779,8 @@ msgstr "Panel simulator iOS"
 msgid "IP restrictions"
 msgstr "Pembatasan IP"
 
-msgid "iPhone and iPad"
-msgstr "iPhone dan iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad, dan Android"
 
 msgid "Is {companyName} open source?"
 msgstr "Apakah {companyName} open source?"
@@ -12289,6 +12286,9 @@ msgstr "Pantau agen dari ponsel Anda."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Pantau workspace dan kelola tugas saat bepergian. Lanjutkan percakapan dari mana saja."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Pantau, arahkan, dan bantu agen Anda yang tertahan dari ponsel Android."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "Pantau, arahkan, dan bantu agen Anda yang tertahan dari iPhone atau iPad."
@@ -13803,6 +13803,9 @@ msgstr "Saat fokus berubah"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "Di GitHub, Paradev memiliki lebih dari 15k bintang, lebih dari 1.000 fork, dan lebih dari 100 kontributor. Paradev juga meraih peringkat #1 di Product Hunt."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "Di iPhone dan iPad, memerlukan iOS 26 atau iPadOS 26 atau lebih baru. Termasuk dalam Paradev Pro."
+
 msgid "On our radar. Order and scope may change."
 msgstr "Ada di radar kami. Urutan dan cakupannya bisa berubah."
 
@@ -14356,8 +14359,8 @@ msgstr "Buka halaman masuk perangkat OpenAI."
 msgid "Open Page in Default Browser"
 msgstr "Buka Halaman di Browser Bawaan"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "Buka halaman dan balas komentar dari aplikasi Paradev di iPhone dan iPad."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "Buka halaman dan balas komentar dari aplikasi Paradev di iPhone, iPad, dan Android."
 
 msgid "Open PR"
 msgstr "Buka PR"
@@ -14867,8 +14870,8 @@ msgstr "Paradev tidak memiliki izin untuk membaca \"{name}\"."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise adalah Paradev untuk tim. Hubungi kami untuk tahu lebih banyak soal apa saja yang termasuk dan bagaimana cocoknya untuk organisasi Anda."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "Paradev untuk iPhone dan iPad"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "Paradev untuk iPhone, iPad, dan Android"
 
 msgid "Paradev for your team"
 msgstr "Paradev untuk tim Anda"
@@ -16849,9 +16852,6 @@ msgstr "Wajib"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Versi yang diperlukan: {minimumVersion}+"
-
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "Memerlukan iOS 26 atau iPadOS 26 atau lebih baru. Termasuk dalam Paradev Pro."
 
 msgid "Resend invite"
 msgstr "Kirim ulang undangan"
@@ -19369,8 +19369,8 @@ msgstr "Mulai agen"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Mulai agen secara otomatis: dari error Sentry, isu Linear, pull request GitHub, atau jadwal yang diatur sendiri oleh agen."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "Mulai agen, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Kode Anda tetap di mesin Anda."
+msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
+msgstr "Mulai agen, ikuti secara langsung, dan tinjau diff dari iPhone, iPad, atau ponsel Android Anda. Kode Anda tetap di mesin Anda."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Mulai agen dari jadwal, peristiwa di alat Anda, atau webhook. Setiap run membuka workspace yang bisa Anda tinjau."
@@ -19384,8 +19384,8 @@ msgstr "Mulai menjelajah"
 msgid "Start building in two."
 msgstr "Mulai membangun dalam dua."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "Mulai agen coding, ikuti secara langsung, dan tinjau diff dari iPhone atau iPad Anda. Tersedia di App Store; Android segera hadir."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "Mulai agen coding, ikuti secara langsung, dan tinjau diff dari iPhone, iPad, atau ponsel Android Anda. Tersedia di App Store dan Google Play."
 
 msgid "Start date"
 msgstr "Tanggal mulai"
@@ -20330,8 +20330,8 @@ msgstr "Daemon tidak bisa menyerahkan sesi aktif Anda ke biner yang baru. Alasan
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Kami sedang membawa Paradev ke Windows & Linux. Tinggalkan email Anda dan kami akan mengabari begitu siap."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Aplikasi desktopnya berjalan di macOS, dengan AppImage Linux eksperimental; Windows belum tersedia. Selain aplikasi desktop ada CLI, SDK TypeScript, dan server MCP, jadi Anda bisa mengendalikan Paradev dari skrip, terminal, dan agen lain. Aplikasi iPhone dan iPad di App Store memungkinkan Anda memantau agen dan meninjau diff mereka saat jauh dari meja."
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
+msgstr "Aplikasi desktopnya berjalan di macOS, dengan AppImage Linux eksperimental; Windows belum tersedia. Selain aplikasi desktop ada CLI, SDK TypeScript, dan server MCP, jadi Anda bisa mengendalikan Paradev dari skrip, terminal, dan agen lain. Aplikasi iPhone dan iPad di App Store serta aplikasi Android di Google Play memungkinkan Anda memantau agen dan meninjau diff mereka saat jauh dari meja."
 
 msgid "The Dev can't post there."
 msgstr "Dev tidak dapat memposting di sana."
@@ -22579,9 +22579,6 @@ msgstr "Kami akan segera menghubungi Anda."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Anda akan kembali begitu koneksi tersambung lagi."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Kami akan mengirim email saat Paradev untuk Android sudah siap."
 
 msgid "We'll get back to you shortly."
 msgstr "Kami akan segera menghubungi Anda kembali."

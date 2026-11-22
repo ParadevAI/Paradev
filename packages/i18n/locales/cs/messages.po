@@ -1659,14 +1659,14 @@ msgstr "<0>#{0}</0> <1>z {1} v žebříčku</1>"
 msgid "<0>~/.claude/.credentials.json</0> or an <1>apiKeyHelper</1>"
 msgstr "<0>~/.claude/.credentials.json</0> nebo <1>apiKeyHelper</1>"
 
-msgid "<0>Coming soon to</0><1>Google Play</1>"
-msgstr "<0>Již brzy na</0><1>Google Play</1>"
-
 msgid "<0>Download on the</0><1>App Store</1>"
 msgstr "<0>Stáhnout v</0><1>App Store</1>"
 
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · jste tady"
+
+msgid "<0>Get it on</0><1>Google Play</1>"
+msgstr "<0>Nyní na</0><1>Google Play</1>"
 
 msgid "<0>Nerd Fonts</0> are recommended."
 msgstr "Doporučujeme <0>Nerd Fonts</0>."
@@ -2490,8 +2490,8 @@ msgstr "Agenti ve vašich cloudových pracovních prostorech pak mohou pomocí <
 msgid "Agents in your pocket"
 msgstr "Agenti v kapse"
 
-msgid "Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad."
-msgstr "Agenti pracují dál v cloudu. Pracovní prostor znovu otevřete na počítači, iPhonu nebo iPadu."
+msgid "Agents keep working in the cloud. Open the workspace again from your desktop or phone."
+msgstr "Agenti pracují dál v cloudu. Pracovní prostor znovu otevřete na počítači nebo telefonu."
 
 msgid "Agents keep working when your laptop is closed."
 msgstr "Agenti pracují dál, i když máte notebook zavřený."
@@ -2871,8 +2871,8 @@ msgstr "Klíč API od OpenAI."
 msgid "An update is ready to install."
 msgstr "Aktualizace je připravena k instalaci."
 
-msgid "Android is on the way. Be first to know when it ships."
-msgstr "Android je na cestě. Dozvíte se jako první, až vyjde."
+msgid "Android app"
+msgstr "Aplikace pro Android"
 
 msgid "Animals & Nature"
 msgstr "Zvířata a příroda"
@@ -4391,11 +4391,11 @@ msgstr "Zkontrolovat aktualizace"
 msgid "Check for Updates..."
 msgstr "Zkontrolovat aktualizace..."
 
-msgid "Check on agents and review their work from iPhone or iPad."
-msgstr "Sledujte agenty a kontrolujte jejich práci z iPhonu nebo iPadu."
+msgid "Check on agents and review their work from iPhone, iPad, or Android."
+msgstr "Sledujte agenty a kontrolujte jejich práci z iPhonu, iPadu nebo Androidu."
 
-msgid "Check on running agents and read what they changed from your iPhone or iPad."
-msgstr "Kontrolujte běžící agenty a čtěte, co změnili, na iPhonu nebo iPadu."
+msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
+msgstr "Kontrolujte běžící agenty a čtěte, co změnili, na iPhonu, iPadu nebo telefonu s Androidem."
 
 msgid "Check plans and balances"
 msgstr "Kontrolujte tarify a zůstatky"
@@ -7915,8 +7915,8 @@ msgstr "Každé úspěšné sestavení uloží snímek. Nové pracovní prostory
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Každá plocha má vlastní typografii. Změny se okamžitě projeví v živých náhledech."
 
-msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
-msgstr "Každý pracovní prostor dostane vlastní cloudový stroj a pracuje dál i se zavřeným notebookem. Stav sledujte na počítači, iPhonu nebo iPadu."
+msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from your desktop or phone."
+msgstr "Každý pracovní prostor dostane vlastní cloudový stroj a pracuje dál i se zavřeným notebookem. Stav sledujte na počítači nebo telefonu."
 
 msgid "Earlier period"
 msgstr "Předchozí období"
@@ -9615,9 +9615,6 @@ msgstr "Získat podporu"
 msgid "Get the best out of Pro"
 msgstr "Využijte Pro naplno"
 
-msgid "Get the iPhone and iPad app"
-msgstr "Stáhnout aplikaci pro iPhone a iPad"
-
 msgid "Gets an invite to join {organizationName}"
 msgstr "Dostane pozvánku do {organizationName}"
 
@@ -10782,8 +10779,8 @@ msgstr "Panel se simulátorem iOS"
 msgid "IP restrictions"
 msgstr "Omezení podle IP"
 
-msgid "iPhone and iPad"
-msgstr "iPhone a iPad"
+msgid "iPhone, iPad, and Android"
+msgstr "iPhone, iPad a Android"
 
 msgid "Is {companyName} open source?"
 msgstr "Je {companyName} open source?"
@@ -12289,6 +12286,9 @@ msgstr "Sledujte agenty z telefonu."
 
 msgid "Monitor workspaces and manage tasks on the go. Continue conversations from anywhere."
 msgstr "Sledujte pracovní prostory a spravujte úkoly na cestách. Pokračujte v konverzacích odkudkoli."
+
+msgid "Monitor, steer, and unblock your agents from your Android phone."
+msgstr "Sledujte, řiďte a odblokujte své agenty z telefonu s Androidem."
 
 msgid "Monitor, steer, and unblock your agents from your iPhone or iPad."
 msgstr "Sledujte, řiďte a odblokujte své agenty z iPhonu nebo iPadu."
@@ -13803,6 +13803,9 @@ msgstr "Při změně zaměření"
 msgid "On GitHub, it has 15k+ stars, 1,000+ forks, and 100+ contributors. It also hit #1 on Product Hunt."
 msgstr "Na GitHubu má přes 15 tis. hvězdiček, přes 1 000 forků a přes 100 přispěvatelů. Dostal se také na 1. místo na Product Hunt."
 
+msgid "On iPhone and iPad, requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
+msgstr "Na iPhonu a iPadu vyžaduje iOS 26 nebo iPadOS 26 či novější. Součást Paradev Pro."
+
 msgid "On our radar. Order and scope may change."
 msgstr "Máme to na radaru. Pořadí i rozsah se můžou změnit."
 
@@ -14356,8 +14359,8 @@ msgstr "Otevřete stránku OpenAI pro přihlášení zařízení."
 msgid "Open Page in Default Browser"
 msgstr "Otevřít stránku ve výchozím prohlížeči"
 
-msgid "Open pages and reply to comments from the Paradev app on iPhone and iPad."
-msgstr "Otevírejte stránky a odpovídejte na komentáře v aplikaci Paradev na iPhonu a iPadu."
+msgid "Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android."
+msgstr "Otevírejte stránky a odpovídejte na komentáře v aplikaci Paradev na iPhonu, iPadu a Androidu."
 
 msgid "Open PR"
 msgstr "Otevřít PR"
@@ -14867,8 +14870,8 @@ msgstr "Paradev nemá oprávnění ke čtení „{name}“."
 msgid "Paradev Enterprise is Paradev for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Paradev Enterprise je Paradev pro týmy. Ozvěte se a řekneme vám, co obsahuje a jak může fungovat ve vaší organizaci."
 
-msgid "Paradev for iPhone and iPad"
-msgstr "Paradev pro iPhone a iPad"
+msgid "Paradev for iPhone, iPad, and Android"
+msgstr "Paradev pro iPhone, iPad a Android"
 
 msgid "Paradev for your team"
 msgstr "Paradev pro váš tým"
@@ -16849,9 +16852,6 @@ msgstr "Povinné"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Vyžadovaná verze: {minimumVersion}+"
-
-msgid "Requires iOS 26 or iPadOS 26 or later. Included with Paradev Pro."
-msgstr "Vyžaduje iOS 26 nebo iPadOS 26 či novější. Součást Paradev Pro."
 
 msgid "Resend invite"
 msgstr "Znovu odeslat pozvánku"
@@ -19369,8 +19369,8 @@ msgstr "Spustit agenta"
 msgid "Start agents automatically: from a Sentry error, a Linear issue, a GitHub pull request, or a schedule the agent sets itself."
 msgstr "Spouštějte agenty automaticky: na základě chyby v Sentry, úkolu v Linear, pull requestu na GitHubu nebo podle plánu, který si agent nastaví sám."
 
-msgid "Start agents, follow them live, and review the diff from your iPhone or iPad. Your code stays on your machines."
-msgstr "Spouštějte agenty, sledujte je živě a kontrolujte diff z iPhonu nebo iPadu. Váš kód zůstává na vašich počítačích."
+msgid "Start agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Your code stays on your machines."
+msgstr "Spouštějte agenty, sledujte je živě a kontrolujte diff z iPhonu, iPadu nebo telefonu s Androidem. Váš kód zůstává na vašich počítačích."
 
 msgid "Start an agent from a schedule, an event in your tools, or a webhook. Each run opens a workspace you can review."
 msgstr "Spusťte agenta podle plánu, při události ve vašich nástrojích nebo přes webhook. Každý běh otevře pracovní prostor, který můžete zkontrolovat."
@@ -19384,8 +19384,8 @@ msgstr "Začněte prohlížet"
 msgid "Start building in two."
 msgstr "Začněte stavět ve dvou."
 
-msgid "Start coding agents, follow them live, and review the diff from your iPhone or iPad. Available on the App Store; Android is coming soon."
-msgstr "Spouštějte kódovací agenty, sledujte je živě a kontrolujte diff z iPhonu nebo iPadu. K dispozici v App Storu; Android brzy."
+msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
+msgstr "Spouštějte kódovací agenty, sledujte je živě a kontrolujte diff z iPhonu, iPadu nebo telefonu s Androidem. K dispozici v App Storu a na Google Play."
 
 msgid "Start date"
 msgstr "Datum zahájení"
@@ -20330,8 +20330,8 @@ msgstr "Démon nedokázal předat vaše živé relace nové binárce. Důvod:"
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Paradev chystáme i pro Windows a Linux. Nechte nám e-mail a dáme vám vědět, jakmile bude hotovo."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
-msgstr "Desktopová aplikace běží na macOS, k tomu je experimentální AppImage pro Linux; Windows zatím nejsou dostupné. Kromě desktopové aplikace je tu CLI, TypeScript SDK a MCP server, takže Paradev můžete řídit ze skriptů, terminálů i jiných agentů. Aplikace pro iPhone a iPad z App Storu vám umožní kontrolovat agenty a procházet jejich diffy, i když nejste u stolu."
+msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
+msgstr "Desktopová aplikace běží na macOS, k tomu je experimentální AppImage pro Linux; Windows zatím nejsou dostupné. Kromě desktopové aplikace je tu CLI, TypeScript SDK a MCP server, takže Paradev můžete řídit ze skriptů, terminálů i jiných agentů. Aplikace pro iPhone a iPad z App Storu a pro Android z Google Play vám umožní kontrolovat agenty a procházet jejich diffy, i když nejste u stolu."
 
 msgid "The Dev can't post there."
 msgstr "Dev tam nemůže psát."
@@ -22579,9 +22579,6 @@ msgstr "Brzy se vám ozveme."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Jakmile se spojení obnoví, vrátíme vás zpět."
-
-msgid "We'll email you when Paradev for Android is ready."
-msgstr "Pošleme vám e-mail, až bude Paradev pro Android připraven."
 
 msgid "We'll get back to you shortly."
 msgstr "Brzy se vám ozveme."
