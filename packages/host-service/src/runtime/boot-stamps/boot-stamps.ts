@@ -5,8 +5,8 @@ import {
 	type BootStamp,
 	parseBootStamps,
 } from "@superset/shared/sandbox/boot-stamps";
-import { caught } from "../box-log-filter";
 import { logBoxEvent } from "../../sentry";
+import { caught } from "../box-log-filter";
 
 export interface SandboxBootReport {
 	/** The current boot's stamps in order, starting at its `boot.start`. */

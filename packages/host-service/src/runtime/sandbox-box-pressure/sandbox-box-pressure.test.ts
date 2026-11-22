@@ -98,6 +98,7 @@ describe("memguard actions", () => {
 				"box.reaped",
 				{
 					"log.source": "memguard",
+					"box.event": true,
 					"reap.class": "session",
 					"reap.rss_mb": 5100,
 					"memory.available_mb": 500,
@@ -109,6 +110,7 @@ describe("memguard actions", () => {
 				"box.memory_low",
 				{
 					"log.source": "memguard",
+					"box.event": true,
 					"memory.available_mb": 600,
 					"memory.floor_mb": 650,
 					"memory.limit_mb": 8192,

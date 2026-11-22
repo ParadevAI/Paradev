@@ -94,18 +94,21 @@ describe("startSandboxBootPhaseLog", () => {
 		expect(info.mock.calls.map(([, attributes]) => attributes)).toEqual([
 			{
 				"log.source": "boot",
+				"box.event": true,
 				"boot.phase": "boot.start",
 				"boot.at": 1789000000000,
 				"boot.ms": 0,
 			},
 			{
 				"log.source": "boot",
+				"box.event": true,
 				"boot.phase": "checkout.cloned",
 				"boot.at": 1789000000200,
 				"boot.ms": 200,
 			},
 			{
 				"log.source": "boot",
+				"box.event": true,
 				"boot.phase": "checkout.end",
 				"boot.at": 1789000009000,
 				"boot.ms": 9000,
