@@ -141,6 +141,31 @@ describe("gitRouter.getDiffPatch", () => {
 		).rejects.toThrow();
 	});
 
+	test("a commit that does not resolve stays an internal error", async () => {
+		await expect(
+			createCaller(repo).getDiffPatch({
+				workspaceId: "ws",
+				category: "commit",
+				commitHash: "0000000000000000000000000000000000000000",
+				paths: ["tracked.txt"],
+			}),
+		).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR" });
+	});
+
+	test("a base branch whose ref is gone is NOT_FOUND", async () => {
+		await expect(
+			createCaller(repo).getDiffPatch({
+				workspaceId: "ws",
+				category: "against-base",
+				baseBranch: "gone",
+				paths: ["tracked.txt"],
+			}),
+		).rejects.toMatchObject({
+			code: "NOT_FOUND",
+			cause: { kind: "BASE_REF_MISSING" },
+		});
+	});
+
 	test("the patch is a fraction of the bytes the file contents would be", async () => {
 		const big = Array.from({ length: 5_000 }, (_, i) => `line ${i}`).join("\n");
 		await writeFile(join(repo, "big.txt"), `${big}\n`);

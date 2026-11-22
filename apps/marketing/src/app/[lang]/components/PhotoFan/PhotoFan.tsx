@@ -59,9 +59,13 @@ const RESTING: FlipFrame = { x: 0, y: 0, scale: 1, rotate: 0 };
 
 interface PhotoFanProps {
 	photos: About["photos"];
+	cardSpacingPx?: number;
 }
 
-export function PhotoFan({ photos }: PhotoFanProps) {
+export function PhotoFan({
+	photos,
+	cardSpacingPx = CARD_SPACING_PX,
+}: PhotoFanProps) {
 	const reduceMotion = useReducedMotion();
 	const cardRefs = useRef<Array<HTMLLIElement | null>>([]);
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -148,7 +152,7 @@ export function PhotoFan({ photos }: PhotoFanProps) {
 					const [, jitterX, jitterY, scale] =
 						CARD_JITTER[index % CARD_JITTER.length] ?? NO_JITTER;
 					const fanStyle = {
-						"--fan-x": `${offset * CARD_SPACING_PX + jitterX}px`,
+						"--fan-x": `${offset * cardSpacingPx + jitterX}px`,
 						"--fan-y": `${offset * offset * CARD_DROP_PX + jitterY}px`,
 						"--fan-r": `${cardTilt(index)}deg`,
 						"--fan-s": scale,

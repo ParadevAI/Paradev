@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
+		BROWSER_API_URL: z.string().url().optional(),
 		NODE_ENV: z
 			.enum(["development", "production", "test"])
 			.default("development"),
@@ -32,6 +33,14 @@ export const env = createEnv({
 		MEDIA_URL: z.string().url(),
 		STATIC_URL: z.string().url(),
 		USERCONTENT_TOKEN_SECRET: z.string().min(32),
+		AGENT_WORKER_SECRET: z.string().min(32),
+		AGENT_TURN_SIGNING_SECRET: z.string().min(32),
+		AGENT_SESSION_SECRET: z.string().min(32),
+		TEMPORAL_ADDRESS: z.string().min(1).optional(),
+		TEMPORAL_NAMESPACE: z.string().min(1).default("default"),
+		TEMPORAL_API_KEY: z.string().min(1).optional(),
+		// Local only: on Vercel the channel router calls Jev with the deployment's OIDC token.
+		VERCEL_AI_GATEWAY_KEY: z.string().min(1).optional(),
 		// Optional: page thumbnails are skipped wherever this is unset.
 		CLOUDFLARE_BROWSER_RENDERING_TOKEN: z.string().min(1).optional(),
 		POSTHOG_API_KEY: z.string(),
@@ -60,6 +69,8 @@ export const env = createEnv({
 		VERCEL_SANDBOX_TOKEN: z.string().min(1),
 		VERCEL_SANDBOX_TEAM_ID: z.string().min(1),
 		VERCEL_SANDBOX_PROJECT_ID: z.string().min(1),
+		// Set by Vercel on every deployment; unset in local dev.
+		VERCEL_ENV: z.enum(["production", "preview", "development"]).optional(),
 		// Shared with the gate Worker: signs the tickets clients present
 		// there and derives the secret each sandbox's host-service is booted with.
 		SANDBOX_GATE_SECRET: z.string().min(32),
@@ -97,19 +108,14 @@ export const env = createEnv({
 		// Optional: the Google connector, and so the Gmail plugin, reports "not
 		// configured" wherever these are unset, and every other connector and
 		// the Google sign-in above keep working.
-		GOOGLE_TEMP_CLIENT_ID: z.string().min(1).optional(),
-		GOOGLE_TEMP_CLIENT_SECRET: z.string().min(1).optional(),
+		GOOGLE_CONNECTIONS_CLIENT_ID: z.string().min(1).optional(),
+		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1).optional(),
 		SENTRY_CLIENT_ID: z.string().optional(),
 		SENTRY_CLIENT_SECRET: z.string().optional(),
 		// Optional: the Teams integration is off wherever these are unset, and
 		// every other environment keeps booting.
 		MICROSOFT_CLIENT_ID: z.string().min(1).optional(),
 		MICROSOFT_CLIENT_SECRET: z.string().min(1).optional(),
-		// Optional, falls back to NEXT_PUBLIC_API_URL: the origin an
-		// authorization server fetches a plugin's client id metadata document
-		// from. Only needs setting where NEXT_PUBLIC_API_URL is unreachable from
-		// the public internet, which in practice means local dev behind a tunnel.
-		PLUGIN_CLIENT_METADATA_BASE_URL: z.string().url().optional(),
 	},
 	clientPrefix: "PUBLIC_",
 	client: {},

@@ -9,7 +9,7 @@ export type HostServiceAvailabilityStatus =
 	| "stopped"
 	| "unknown";
 
-export interface HostServiceUnavailableContext {
+interface HostServiceUnavailableContext {
 	activeOrganizationId?: string | null;
 	activeOrganizationName?: string | null;
 	hostServiceStatus?: HostServiceAvailabilityStatus | null;
@@ -21,7 +21,7 @@ export interface HostServiceUnavailableContext {
  * the fragment lands inside a full catalog sentence, so it has to be
  * translatable on its own and picked from a closed set.
  */
-export type HostServiceAction =
+type HostServiceAction =
 	| "addAgent"
 	| "cloneRepository"
 	| "createProject"
@@ -189,7 +189,7 @@ function getRecoveryText(status: HostServiceAvailabilityStatus): string {
 			return i18n._(
 				msg({
 					message:
-						"Use the Superset tray menu > Host Service > Restart, then retry.",
+						"Use the Paradev tray menu > Host Service > Restart, then retry.",
 				}),
 			);
 		case "running":
@@ -201,7 +201,7 @@ function getRecoveryText(status: HostServiceAvailabilityStatus): string {
 		case "unknown":
 			return i18n._(
 				msg({
-					message: "Retry in a few seconds; if it persists, restart Superset.",
+					message: "Retry in a few seconds; if it persists, restart Paradev.",
 				}),
 			);
 	}

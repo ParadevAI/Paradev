@@ -125,8 +125,6 @@ describe("stripTerminalRuntimeEnv", () => {
 		SHELL: "/bin/zsh",
 		EDITOR: "vim",
 		SUPERSET_HOME_DIR: "/Users/test/.superset",
-		SUPERSET_AGENT_HOOK_PORT: "51741",
-		SUPERSET_AGENT_HOOK_VERSION: "2",
 	};
 
 	test("app/runtime secrets do not reach PTY env", () => {
@@ -224,11 +222,9 @@ describe("stripTerminalRuntimeEnv", () => {
 		expect(result.EDITOR).toBe("vim");
 	});
 
-	test("explicit Superset support keys are kept", () => {
+	test("explicit Paradev support keys are kept", () => {
 		const result = stripTerminalRuntimeEnv(secretsEnv);
 		expect(result.SUPERSET_HOME_DIR).toBe("/Users/test/.superset");
-		expect(result.SUPERSET_AGENT_HOOK_PORT).toBe("51741");
-		expect(result.SUPERSET_AGENT_HOOK_VERSION).toBe("2");
 	});
 
 	test("shell-derived env preserves user tooling vars", () => {
@@ -495,8 +491,6 @@ describe("buildV2TerminalEnv", () => {
 		workspacePath: "/tmp/workspace",
 		rootPath: "/tmp/repo",
 		supersetEnv: "production" as const,
-		agentHookPort: "51741",
-		agentHookVersion: "2",
 	};
 
 	test("injects the public terminal contract and retained v2 metadata", () => {
@@ -511,8 +505,6 @@ describe("buildV2TerminalEnv", () => {
 			SUPERSET_WORKSPACE_PATH: "/tmp/workspace",
 			SUPERSET_ROOT_PATH: "/tmp/repo",
 			SUPERSET_ENV: "production",
-			SUPERSET_AGENT_HOOK_PORT: "51741",
-			SUPERSET_AGENT_HOOK_VERSION: "2",
 		});
 		expect(env.SHELL).toBe("/bin/zsh");
 		expect(env.LANG).toContain("UTF-8");
@@ -540,7 +532,7 @@ describe("buildV2TerminalEnv", () => {
 		expect(env.SHELL).toBe("/opt/homebrew/bin/fish");
 	});
 
-	test("allows empty root path and alternate Superset env without breaking the contract", () => {
+	test("allows empty root path and alternate Paradev env without breaking the contract", () => {
 		const env = buildV2TerminalEnv({ ...baseParams, rootPath: "" });
 		expect(env.SUPERSET_ROOT_PATH).toBe("");
 
@@ -639,8 +631,6 @@ describe("v2 env contract boundary", () => {
 			workspacePath: "/tmp/ws",
 			rootPath: "",
 			supersetEnv: "production",
-			agentHookPort: "51741",
-			agentHookVersion: "2",
 		});
 
 		// None of the runtime secrets should be present

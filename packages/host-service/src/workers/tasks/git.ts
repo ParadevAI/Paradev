@@ -4,7 +4,14 @@
 // the credential provider) and crosses as plain data.
 
 import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import {
+	detectExternalWorktrees,
+	EXTERNAL_WORKTREE_SOURCES,
+	type ExternalWorktreeRepo,
+} from "../../projects/external-worktrees/index.ts";
 import {
 	getGitAuthorName,
 	type ResolvedGitInfo,
@@ -97,15 +104,29 @@ export const gitCommitFilesTask = defineWorkerTask<
 		worktreePath: string;
 		commitHash: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	ChangedFile[]
 >({
 	type: "git/getCommitFiles",
-	handler: async ({ worktreePath, commitHash, fromHash, gitEnv }) => {
+	handler: async ({
+		worktreePath,
+		commitHash,
+		fromHash,
+		includeFrom,
+		gitEnv,
+	}) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
-		const from = fromHash ? fromHash : `${commitHash}^`;
-		return getChangedFilesForDiff(git, [from, commitHash]);
+		const refs = await resolveDiffCategoryRefs(git, "commit", {
+			commitHash,
+			fromHash,
+			includeFrom,
+		});
+		if (!refs.fromRef || !refs.toRef) {
+			throw new Error("Could not resolve commit diff refs");
+		}
+		return getChangedFilesForDiff(git, [refs.fromRef, refs.toRef]);
 	},
 });
 
@@ -121,6 +142,7 @@ export const gitDiffBulkTask = defineWorkerTask<
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	{
@@ -139,12 +161,13 @@ export const gitDiffBulkTask = defineWorkerTask<
 		baseBranch,
 		commitHash,
 		fromHash,
+		includeFrom,
 		gitEnv,
 	}) => {
 		const refs = await resolveDiffCategoryRefs(
 			createUserSimpleGit(worktreePath, { env: gitEnv }),
 			category,
-			{ baseBranch, commitHash, fromHash },
+			{ baseBranch, commitHash, fromHash, includeFrom },
 		);
 
 		const diffs = await mapWithConcurrency(
@@ -180,6 +203,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	{ patch: string }
@@ -193,6 +217,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 		baseBranch,
 		commitHash,
 		fromHash,
+		includeFrom,
 		gitEnv,
 	}) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
@@ -200,6 +225,7 @@ export const gitDiffPatchTask = defineWorkerTask<
 			baseBranch,
 			commitHash,
 			fromHash,
+			includeFrom,
 		});
 		const patch = await buildDiffPatch({
 			cwd: worktreePath,
@@ -233,6 +259,7 @@ export const gitDiffSideBlobTask = defineWorkerTask<
 		baseBranch?: string;
 		commitHash?: string;
 		fromHash?: string;
+		includeFrom?: boolean;
 		gitEnv: GitTaskEnv;
 	},
 	DiffSideBlobResult
@@ -247,6 +274,7 @@ export const gitDiffSideBlobTask = defineWorkerTask<
 		baseBranch,
 		commitHash,
 		fromHash,
+		includeFrom,
 		gitEnv,
 	}) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
@@ -254,6 +282,7 @@ export const gitDiffSideBlobTask = defineWorkerTask<
 			baseBranch,
 			commitHash,
 			fromHash,
+			includeFrom,
 		});
 		const spec = diffSideObjectSpec(category, side, path, refs);
 		if (!spec) return { kind: "missing" };
@@ -462,6 +491,86 @@ export const gitRenameBranchTask = defineWorkerTask<
 			from,
 			to,
 		]);
+	},
+});
+
+/** Branch names `git switch` can resolve without a fetch: local, or tracked from origin. */
+async function knownBranchNames(
+	git: ReturnType<typeof createUserSimpleGit>,
+): Promise<Set<string>> {
+	const refs = await git.raw([
+		"for-each-ref",
+		"--format=%(refname)",
+		"refs/heads",
+		"refs/remotes/origin",
+	]);
+	return new Set(
+		refs
+			.split("\n")
+			.map((ref) => ref.replace(/^refs\/(heads|remotes\/origin)\//, "").trim())
+			.filter(Boolean),
+	);
+}
+
+export const gitCheckoutBranchTask = defineWorkerTask<
+	{ worktreePath: string; branch: string; gitEnv: GitTaskEnv },
+	| { ok: true }
+	| {
+			ok: false;
+			reason: "dirty" | "held-elsewhere" | "fetch-failed" | "not-found";
+	  }
+>({
+	type: "git/checkoutBranch",
+	handler: async ({ worktreePath, branch, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+		if (!(await git.status()).isClean()) return { ok: false, reason: "dirty" };
+		const holder = parseWorktreeList(
+			await git.raw(["worktree", "list", "--porcelain"]),
+		).find((worktree) => worktree.branch === branch);
+		if (
+			holder &&
+			normalizeWorktreePath(holder.path) !== normalizeWorktreePath(worktreePath)
+		) {
+			return { ok: false, reason: "held-elsewhere" };
+		}
+		if (!(await knownBranchNames(git)).has(branch)) {
+			try {
+				await git.fetch(["origin", branch]);
+			} catch (error) {
+				if (!/couldn't find remote ref/i.test(String(error))) {
+					return { ok: false, reason: "fetch-failed" };
+				}
+			}
+		}
+		try {
+			await git.raw(["switch", branch]);
+		} catch {
+			return { ok: false, reason: "not-found" };
+		}
+		return { ok: true };
+	},
+});
+
+export const gitFetchBranchesTask = defineWorkerTask<
+	{
+		worktreePath: string;
+		branches: string[];
+		/** Skip the branches `git switch` can already resolve. */
+		missingOnly: boolean;
+		gitEnv: GitTaskEnv;
+	},
+	{ fetched: string[] }
+>({
+	type: "git/fetchBranches",
+	handler: async ({ worktreePath, branches, missingOnly, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+		let wanted = branches;
+		if (missingOnly) {
+			const known = await knownBranchNames(git);
+			wanted = branches.filter((branch) => !known.has(branch));
+		}
+		if (wanted.length > 0) await git.fetch(["origin", ...wanted]);
+		return { fetched: wanted };
 	},
 });
 
@@ -724,6 +833,109 @@ export const gitRestoreWorktreeTask = defineWorkerTask<
 	},
 });
 
+export const gitDetectExternalWorktreesTask = defineWorkerTask<
+	{ homeDir: string; trackedWorktreePaths: string[]; gitEnv: GitTaskEnv },
+	ExternalWorktreeRepo[]
+>({
+	type: "git/detectExternalWorktrees",
+	handler: ({ homeDir, trackedWorktreePaths, gitEnv }) =>
+		detectExternalWorktrees({
+			homeDir,
+			sources: EXTERNAL_WORKTREE_SOURCES,
+			trackedWorktreePaths: new Set(trackedWorktreePaths),
+			listWorktrees: async (repoPath) =>
+				parseWorktreeList(
+					await createUserSimpleGit(repoPath, { env: gitEnv }).raw([
+						"worktree",
+						"list",
+						"--porcelain",
+					]),
+				),
+		}),
+});
+
+const SNAPSHOT_COMMIT_MESSAGE = "Work in progress, moved to a cloud workspace";
+/** Used only when git has no identity of the user's own. */
+const SNAPSHOT_IDENTITY = {
+	GIT_AUTHOR_NAME: "Paradev",
+	GIT_AUTHOR_EMAIL: "teleport@superset.sh",
+	GIT_COMMITTER_NAME: "Paradev",
+	GIT_COMMITTER_EMAIL: "teleport@superset.sh",
+};
+
+/** The remote a snapshot goes to (`origin`, else the first), and every URL `git push` uses for it. */
+export const gitSnapshotRemoteTask = defineWorkerTask<
+	{ worktreePath: string; gitEnv: GitTaskEnv },
+	{ remote: string; pushUrls: string[] } | null
+>({
+	type: "git/snapshotRemote",
+	handler: async ({ worktreePath, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+		const remotes = await git.getRemotes(false);
+		const remote =
+			remotes.find((entry) => entry.name === "origin")?.name ??
+			remotes[0]?.name;
+		if (!remote) return null;
+		const pushUrls = (
+			await git.raw(["remote", "get-url", "--push", "--all", remote])
+		)
+			.split("\n")
+			.map((url) => url.trim())
+			.filter(Boolean);
+		return { remote, pushUrls };
+	},
+});
+
+/**
+ * Pushes the worktree as it is now, with uncommitted and untracked files, to
+ * `branch` on `remote`. The snapshot is staged in a separate index, so the
+ * user's index, working tree and branch do not change.
+ */
+export const gitPushSnapshotTask = defineWorkerTask<
+	{ worktreePath: string; remote: string; branch: string; gitEnv: GitTaskEnv },
+	{ commit: string }
+>({
+	type: "git/pushSnapshot",
+	handler: async ({ worktreePath, remote, branch, gitEnv }) => {
+		const scratch = await mkdtemp(join(tmpdir(), "superset-snapshot-"));
+		try {
+			const identity = await createUserSimpleGit(worktreePath, { env: gitEnv })
+				.raw(["var", "GIT_COMMITTER_IDENT"])
+				.then(() => ({}))
+				.catch(() => SNAPSHOT_IDENTITY);
+			const git = createUserSimpleGit(worktreePath, {
+				env: {
+					...gitEnv,
+					...identity,
+					GIT_INDEX_FILE: join(scratch, "index"),
+				},
+			});
+			const head = (await git.revparse(["HEAD"])).trim();
+			await git.raw(["read-tree", head]);
+			await git.raw(["add", "-A"]);
+			const tree = (await git.raw(["write-tree"])).trim();
+			const headTree = (await git.revparse([`${head}^{tree}`])).trim();
+			const commit =
+				tree === headTree
+					? head
+					: (
+							await git.raw([
+								"commit-tree",
+								tree,
+								"-p",
+								head,
+								"-m",
+								SNAPSHOT_COMMIT_MESSAGE,
+							])
+						).trim();
+			await git.raw(["push", remote, `${commit}:refs/heads/${branch}`]);
+			return { commit };
+		} finally {
+			await rm(scratch, { recursive: true, force: true });
+		}
+	},
+});
+
 export const gitTasks = [
 	gitStatusSnapshotTask,
 	gitStatusPartialTask,
@@ -740,9 +952,14 @@ export const gitTasks = [
 	gitDeleteBranchTask,
 	gitAutomaticBranchRenamableTask,
 	gitRenameBranchTask,
+	gitCheckoutBranchTask,
+	gitFetchBranchesTask,
 	gitStagePathsTask,
 	gitCommitTask,
 	gitPushTask,
+	gitSnapshotRemoteTask,
+	gitPushSnapshotTask,
 	gitPrHeadBaseTask,
 	gitRestoreWorktreeTask,
+	gitDetectExternalWorktreesTask,
 ];

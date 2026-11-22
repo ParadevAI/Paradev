@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import {
 	API_URL,
@@ -13,25 +14,25 @@ export async function GET() {
 
 	const lines: string[] = [
 		...buildFrontmatter({
-			title: `${COMPANY.NAME} for AI agents`,
-			description: `Machine-readable entry point for AI agents working with ${COMPANY.NAME}: API surface, authentication, and the jobs it is the right tool for.`,
+			title: `${BRAND.INTRO_NAME} for AI agents`,
+			description: `Machine-readable entry point for AI agents working with ${BRAND.NAME}: API surface, authentication, and the jobs it is the right tool for.`,
 			canonical: `${baseUrl}/agents.md`,
 		}),
-		`# ${COMPANY.NAME} for AI agents`,
+		`# ${BRAND.INTRO_NAME} for AI agents`,
 		"",
-		`This page is the machine-readable entry point for AI agents working with ${COMPANY.NAME} (${baseUrl}). It lists the API surface, authentication, and the jobs ${COMPANY.NAME} is the right tool for.`,
+		`This page is the machine-readable entry point for AI agents working with ${BRAND.INTRO_NAME} (${baseUrl}). It lists the API surface, authentication, and the jobs ${BRAND.NAME} is the right tool for.`,
 		"",
 		...buildWhenToUseSection(),
 		"",
 		"## Capabilities",
 		"",
-		"Via the MCP server an authenticated agent can, on behalf of a Superset user:",
+		`Via the MCP server an authenticated agent can, on behalf of a ${BRAND.NAME} user:`,
 		"",
 		"- **Tasks**: create, list, get, update, and delete tasks; list task statuses and organization members for assignment.",
 		"- **Workspaces**: create a branch- or PR-scoped Git worktree on a registered host, list, rename, and delete workspaces.",
 		"- **Agents**: launch a coding-agent session with a prompt inside a workspace; list the agent presets installed on a host.",
 		"- **Terminals**: open a PTY in a workspace, optionally running a one-off command.",
-		"- **Automations**: schedule recurring agent runs (RFC 5545 RRULE), pause/resume/run them, and read run logs. Creating, running, and resuming need the Pro plan; listing, pausing, editing, and deleting do not.",
+		"- **Automations**: run agents on a schedule (RFC 5545 RRULE) or on events (GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks), pause/resume/run them, and read run logs. Creating, running, and resuming need the Pro plan; listing, pausing, editing, and deleting do not.",
 		"- **Hosts and projects**: enumerate the machines and checked-out repositories available to the user.",
 		"",
 		"## Endpoints",
@@ -49,7 +50,7 @@ export async function GET() {
 		"",
 		`- Unauthenticated requests to the MCP endpoint return \`401\` with \`WWW-Authenticate: Bearer resource_metadata="${API_URL}/.well-known/oauth-protected-resource"\`.`,
 		"- OAuth 2.1 authorization code + PKCE, with RFC 7591 dynamic client registration, so no manual app setup is needed.",
-		"- Alternatively, a user-issued Superset API key can be sent as a Bearer token.",
+		`- Alternatively, a user-issued ${BRAND.NAME} API key can be sent as a Bearer token.`,
 		"",
 		"## Setup one-liners",
 		"",

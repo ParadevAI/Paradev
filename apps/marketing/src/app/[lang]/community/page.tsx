@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 		description: i18n._(
 			msg({
 				message:
-					"Join the Superset community to get help, share ideas, and stay up to date with the latest news and updates.",
+					"Join the Paradev community to get help, share ideas, and stay up to date with the latest news and updates.",
 			}),
 		),
 		alternates: localizedAlternates(lang, "/community"),
@@ -43,7 +43,7 @@ const COMMUNITY_LINKS = [
 	},
 	{
 		name: "YOUTUBE",
-		href: "https://www.youtube.com/@superset-sh",
+		href: COMPANY.YOUTUBE_URL,
 		cta: msg({
 			message: "SUBSCRIBE",
 		}),
@@ -56,7 +56,7 @@ const COMMUNITY_LINKS = [
 	},
 	{
 		name: "LINKEDIN",
-		href: "https://www.linkedin.com/company/superset-sh",
+		href: COMPANY.LINKEDIN_URL,
 		cta: msg({
 			message: "FOLLOW US",
 		}),
@@ -111,7 +111,7 @@ export default async function CommunityPage() {
 					</h1>
 					<p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
 						<Trans>
-							Join the <span className="font-semibold italic">Superset</span>{" "}
+							Join the <span className="font-semibold italic">Paradev</span>{" "}
 							community to get help, share ideas, and stay up to date with the
 							latest news and updates.
 						</Trans>

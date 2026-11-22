@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { getInitials } from "@superset/shared/names";
+import type { PresenceVisitor } from "@superset/shared/page-presence";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,7 +9,7 @@ import { Text } from "@/components/ui/text";
 const SHOWN = 4;
 
 interface PresenceAvatarsProps {
-	people: { id: string; name: string; image: string | null; color: string }[];
+	people: PresenceVisitor[];
 }
 
 export function PresenceAvatars({ people }: PresenceAvatarsProps) {
@@ -26,14 +27,14 @@ export function PresenceAvatars({ people }: PresenceAvatarsProps) {
 		>
 			{people.slice(0, SHOWN).map((person, index) => (
 				<Avatar
-					key={person.id}
+					key={person.userId}
 					alt={person.name}
 					className="border-popover size-7 border-2"
 					style={{ marginLeft: index > 0 ? -8 : 0 }}
 				>
 					{person.image ? <AvatarImage source={{ uri: person.image }} /> : null}
-					<AvatarFallback style={{ backgroundColor: person.color }}>
-						<Text className="font-medium text-[10px] text-white">
+					<AvatarFallback>
+						<Text className="font-medium text-[10px]">
 							{getInitials(person.name) || "?"}
 						</Text>
 					</AvatarFallback>

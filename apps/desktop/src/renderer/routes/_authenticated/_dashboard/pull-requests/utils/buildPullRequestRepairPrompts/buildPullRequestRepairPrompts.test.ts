@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import {
 	buildFixFindingsPrompt,
 	buildResolveConflictsPrompt,
+	buildRestackPrompt,
 } from "./buildPullRequestRepairPrompts";
 
 const detail = {
@@ -22,6 +23,7 @@ const detail = {
 			body: "nice",
 			createdAt: "2026-10-01T10:00:00Z",
 			reviewState: null,
+			url: null,
 		},
 		{
 			id: "r1",
@@ -59,6 +61,7 @@ describe("buildFixFindingsPrompt", () => {
 					body: "LGTM",
 					createdAt: "2026-10-03T10:00:00Z",
 					reviewState: "APPROVED",
+					url: null,
 				},
 				{
 					id: "c2",
@@ -67,6 +70,7 @@ describe("buildFixFindingsPrompt", () => {
 					body: "### Unused import\n\nLow severity\n\nDrop it.",
 					createdAt: "2026-10-04T10:00:00Z",
 					reviewState: null,
+					url: null,
 				},
 			],
 		});
@@ -86,5 +90,20 @@ describe("buildResolveConflictsPrompt", () => {
 		const prompt = buildResolveConflictsPrompt(detail);
 		expect(prompt).toContain("conflicts with its base branch `main`");
 		expect(prompt).toContain("`feat/x`");
+	});
+});
+
+describe("buildRestackPrompt", () => {
+	it("gives the rebase boundary and the branch to land on", () => {
+		const prompt = buildRestackPrompt({
+			number: 12,
+			url: "https://github.com/o/r/pull/12",
+			headRefName: "feat/top",
+			baseRefName: "main",
+			merged: { number: 11, headRefOid: "abc123" },
+		});
+		expect(prompt).toContain("was stacked on PR #11");
+		expect(prompt).toContain("git rebase --onto <remote>/main abc123");
+		expect(prompt).toContain("--force-with-lease");
 	});
 });

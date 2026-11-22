@@ -102,6 +102,7 @@ export function CreateTeamButton({ organizationId }: CreateTeamButtonProps) {
 				<Trans>Create team</Trans>
 			</Button>
 			<Dialog
+				modal
 				open={isOpen}
 				onOpenChange={(open) => {
 					setIsOpen(open);

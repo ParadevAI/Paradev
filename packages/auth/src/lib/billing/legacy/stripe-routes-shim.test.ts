@@ -75,6 +75,7 @@ function fakeDeps(): AutumnBillingDeps {
 			calls.push({ method: "ensureCustomer", params: id });
 		},
 		currentPlanId: async () => (live ? "pro" : null),
+		isProFamilyPlan: async (planId) => planId.startsWith("pro"),
 		findLiveSubscription: async () => live,
 		countBillableSeats: async () => 3,
 		sync: async (id) => {
@@ -132,8 +133,14 @@ describe("released clients keep the same routes", () => {
 			expect(after).not.toBe(before);
 			expect(after.path).toBe(before.path);
 			expect(after.options.method).toEqual(before.options.method);
-			expect(String(after.options.body)).toBe(String(before.options.body));
-			expect(after.options.use?.length).toBe(before.options.use?.length);
+			const bodyOf = (options: object) =>
+				"body" in options ? options.body : undefined;
+			const middlewareOf = (options: object) =>
+				"use" in options && Array.isArray(options.use)
+					? options.use.length
+					: undefined;
+			expect(bodyOf(after.options)).toBe(bodyOf(before.options));
+			expect(middlewareOf(after.options)).toBe(middlewareOf(before.options));
 		});
 	}
 
@@ -280,6 +287,36 @@ describe("upgrade", () => {
 			baseURL: API,
 			body: { ...body, annual: true },
 		});
+		expect(calls.some((call) => call.method === "attach")).toBe(true);
+	});
+
+	test("an organization on Team is not switched to Pro by a released client", async () => {
+		live = liveSubscription();
+		await expect(
+			upgradeWithAutumn(
+				{ ...fakeDeps(), currentPlanId: async () => "team_annual" },
+				{
+					userId: "user_1",
+					referenceId: ORG,
+					baseURL: API,
+					body: { ...body, annual: true },
+				},
+			),
+		).rejects.toThrow("Update the app to change this plan.");
+		expect(calls).toEqual([]);
+	});
+
+	test("an organization on the current Pro plan can switch its interval from a released client", async () => {
+		live = liveSubscription();
+		await upgradeWithAutumn(
+			{ ...fakeDeps(), currentPlanId: async () => "pro_v2" },
+			{
+				userId: "user_1",
+				referenceId: ORG,
+				baseURL: API,
+				body: { ...body, annual: true },
+			},
+		);
 		expect(calls.some((call) => call.method === "attach")).toBe(true);
 	});
 });

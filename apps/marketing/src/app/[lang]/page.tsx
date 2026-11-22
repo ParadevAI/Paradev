@@ -31,9 +31,6 @@ const SecuritySection = dynamic(() =>
 const FAQSection = dynamic(() =>
 	import("./components/FAQSection").then((mod) => mod.FAQSection),
 );
-const CTASection = dynamic(() =>
-	import("./components/CTASection").then((mod) => mod.CTASection),
-);
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -64,7 +61,6 @@ export default async function Home() {
 			<WallOfLoveSection />
 			<SecuritySection />
 			<FAQSection />
-			<CTASection />
 		</main>
 	);
 }

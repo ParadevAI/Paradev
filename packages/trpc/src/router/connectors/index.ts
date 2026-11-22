@@ -16,7 +16,7 @@ import {
 	requireConnector,
 	upsertConnection,
 } from "../../lib/connectors";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { forgetUpstreamTools } from "../plugins/proxy";
 
@@ -29,7 +29,7 @@ function methodSummary(method: ConnectorMethod) {
 }
 
 export const connectorsRouter = {
-	catalog: protectedProcedure.query(() =>
+	catalog: personProcedure.query(() =>
 		CONNECTOR_SLUGS.map((slug) => {
 			const connector = requireConnector(slug);
 			return {
@@ -43,7 +43,7 @@ export const connectorsRouter = {
 		}),
 	),
 
-	get: protectedProcedure
+	get: personProcedure
 		.input(z.object({ slug: z.string() }))
 		.query(({ input }) => {
 			const connector = getConnector(input.slug);
@@ -62,7 +62,7 @@ export const connectorsRouter = {
 			};
 		}),
 
-	status: protectedProcedure
+	status: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
@@ -109,7 +109,7 @@ export const connectorsRouter = {
 				}));
 		}),
 
-	connectApiKey: protectedProcedure
+	connectApiKey: personProcedure
 		.input(
 			z.object({
 				organizationId: z.uuid(),
@@ -172,7 +172,7 @@ export const connectorsRouter = {
 			return { connectionId: result.connectionId };
 		}),
 
-	rename: protectedProcedure
+	rename: personProcedure
 		.input(
 			z
 				.object({
@@ -244,7 +244,7 @@ export const connectorsRouter = {
 			return { ...row, nickname: row.label };
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid(), connectionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);

@@ -15,3 +15,5 @@
 "Uploading" = "Przesyłanie";
 "Upload failed" = "Przesyłanie nie powiodło się";
 "Stop" = "Zatrzymaj";
+"Dictation stopped. What was heard so far is in your message." = "Dyktowanie zostało przerwane. To, co zostało usłyszane, jest w wiadomości.";
+"Transcription took too long. The last few words may be missing." = "Transkrypcja trwała zbyt długo. Może brakować kilku ostatnich słów.";

@@ -4,6 +4,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { canonicalPathname } from "@/lib/canonical-pathname";
 
+export function proxy(request: NextRequest) {
+	return route(request);
+}
+
 /**
  * Locale routing. The whole route tree lives under app/[lang], but English
  * keeps the bare URLs it has always had — every inbound link and its
@@ -18,7 +22,7 @@ import { canonicalPathname } from "@/lib/canonical-pathname";
  * localized pages from crawlers (which send en or nothing) and break shared
  * links. Discovery is hreflang, the sitemap, and the visible switcher.
  */
-export function proxy(request: NextRequest) {
+function route(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 	const canonical = canonicalPathname(pathname);
 	const segments = canonical.split("/").slice(1);
@@ -72,7 +76,20 @@ export function proxy(request: NextRequest) {
 	}
 
 	const url = request.nextUrl.clone();
-	url.pathname = `/en${pathname}`;
+	// Keep /land available as a profile handle. Only these English child URLs
+	// use the internal /en/en tree; direct /en URLs still canonicalize above.
+	const barePath = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+	const landingPage =
+		barePath === "/land/claude-code-parallel-sessions" ||
+		barePath === "/land/claude-code-worktrees" ||
+		barePath === "/land/codex-cli-worktrees";
+	if (landingPage && barePath !== pathname) {
+		// NextURL retains the inbound trailing-slash flag when serialized.
+		const target = new URL(request.url);
+		target.pathname = barePath;
+		return NextResponse.redirect(target, 308);
+	}
+	url.pathname = landingPage ? `/en/en${pathname}` : `/en${pathname}`;
 	return NextResponse.rewrite(url);
 }
 

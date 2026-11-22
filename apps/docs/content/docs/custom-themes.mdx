@@ -1,6 +1,6 @@
 ---
 title: Custom Themes
-description: Build, edit, and import your own Superset theme files
+description: Build, edit, and import your own Paradev theme files
 ---
 
 import { COMPANY } from "@superset/shared/constants";
@@ -22,16 +22,16 @@ Marketplace themes are available from the <a href={`${COMPANY.MARKETING_URL}/mar
 After downloading the base file, you can prompt an agent with something like:
 
 ```text
-Customize this Superset theme JSON to feel like a neon cyberpunk arcade.
+Customize this Paradev theme JSON to feel like a neon cyberpunk arcade.
 Keep the schema valid. Preserve all required ui and terminal keys.
 Return the full JSON file contents only.
 ```
 
-Then save the returned JSON and import it in Superset.
+Then save the returned JSON and import it in Paradev.
 
 ## Theme File Format
 
-Superset accepts:
+Paradev accepts:
 
 - A single theme object
 - An array of theme objects
@@ -43,8 +43,9 @@ The importer supports:
 - `ui` color overrides
 - `terminal` color overrides
 - `colors` as an alias for `terminal`
+- `css`: an optional stylesheet (up to 65,536 characters) filtered before import and every time the theme is applied
 
-Missing values fall back to Superset defaults for the selected theme type.
+Missing values fall back to Paradev defaults for the selected theme type.
 
 ## Example: Single Theme
 
@@ -90,3 +91,48 @@ Missing values fall back to Superset defaults for the selected theme type.
 
 - Theme IDs must be unique and not reserved (`system`, built-in theme IDs like `dark`/`light`).
 - Very large files are rejected in the desktop importer.
+
+## Custom CSS restrictions
+
+Import only themes from sources you trust. Importing can replace the active theme.
+The desktop asks for confirmation before opening the import file picker.
+
+CSS Tree parses custom CSS; Paradev applies a security policy on import and
+again whenever the theme is applied. External, relative, and file URLs, imports,
+SVG images, attribute extraction, executable legacy properties, and unsupported
+functions or at-rules are removed. Embedded base64 PNG, JPEG, and WebP images
+are supported. Malformed, oversized, or overly complex stylesheets fail closed.
+
+Layout, visibility, animations, generated content, nesting, and selectors are
+allowed. Theme custom properties and their references are namespaced so they
+cannot supply unchecked values to the app's own CSS rules. This also means theme
+CSS cannot reference app-owned custom properties. Unsupported CSS may change how
+a third-party theme looks.
+
+CSS Tree handles parsing, not the security policy. Filtering reduces risk; it
+does not certify themes or protect against every browser vulnerability. T3 skins
+use their own color schema and selectors; this is not a complete T3 skin importer.
+
+## Stable background selectors
+
+Use these desktop hooks instead of layout classes or DOM relationships:
+
+| Selector | Surface |
+| --- | --- |
+| `[data-theme-surface="chat"]` | The non-scrolling container around the message viewport, including subagent chats |
+| `[data-theme-surface="new-workspace"]` | The New Workspace screen, including its project selection layout |
+
+For example, add this stylesheet as the theme's `css` string:
+
+```css
+[data-theme-surface="chat"],
+[data-theme-surface="new-workspace"] {
+  background-image: radial-gradient(ellipse at top, #314b73, transparent 70%);
+}
+```
+
+The chat hook keeps artwork outside the scrolling message content. The New
+Workspace surface itself can scroll. Preserve each surface's positioning and
+scroll behavior when styling it. These hooks are part of the custom theme
+contract and should remain available when the layout changes. Older desktop
+versions without these attributes need their existing fallback selectors.

@@ -33,6 +33,8 @@ export function userMessageText(
 	separator = "\n",
 ): string {
 	return message.content
-		.flatMap((part) => (part.type === "text" ? [part.text] : []))
+		.flatMap((part) =>
+			part.type === "text" && !part.hidden ? [part.text] : [],
+		)
 		.join(separator);
 }

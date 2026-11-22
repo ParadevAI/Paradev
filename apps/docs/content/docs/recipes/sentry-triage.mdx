@@ -1,0 +1,42 @@
+---
+title: Triage New Sentry Issues
+description: An agent reproduces each new Sentry error and opens a draft pull request with a fix
+---
+
+<Callout type="info" title="Use when">
+	Sentry gets more new errors than your team has time to look at, and most of them are small bugs with a clear stack trace.
+</Callout>
+
+## The Idea
+
+A Sentry **Issue created** trigger starts a run for each new issue. The agent gets the issue's title, link, and event payload in its prompt, finds the code in the stack trace, reproduces the bug in a test, and opens a draft pull request.
+
+## Steps
+
+1. Connect Sentry under **Integrations**.
+2. Go to **Automations → New automation**. Pick the project for the repository the Sentry project reports from, a device that stays online, and an agent.
+3. Under **Triggers**, click **Add Trigger → Sentry → Issue created**. Pick the Sentry project and set the level to **Error** and **Fatal**, so warnings don't start runs. Press **Save**.
+4. Write a prompt that proves the bug before it fixes it:
+
+```text
+A new Sentry issue is in the event above. Find the code in its stack trace.
+Write a failing test that reproduces the error. If you can't reproduce it,
+stop and write what you found to TRIAGE.md.
+If you can, fix it, run the test suite, and open a draft pull request with
+`gh pr create --draft`. Link the Sentry issue in the description, and say
+what caused the error and how the test proves the fix.
+If a pull request for this Sentry issue already exists, stop.
+```
+
+5. Open the run from **Run History**, read `TRIAGE.md` or the draft pull request, and mark it ready for review when you agree.
+
+## Tips
+
+- **Reproduce first**: a failing test shows that the fix works. Without one, you cannot tell.
+- **Draft only**: `--draft` keeps CI and reviewers out until you have looked at it.
+- **Duplicates**: the same event can be delivered twice. The "already exists" check stops the second run.
+
+## Variations
+
+- **Regressions**: use **Issue unresolved** to catch a bug that came back after it was marked resolved.
+- **Assign to the agent**: use **Issue assigned** so only the issues someone hands over start a run.

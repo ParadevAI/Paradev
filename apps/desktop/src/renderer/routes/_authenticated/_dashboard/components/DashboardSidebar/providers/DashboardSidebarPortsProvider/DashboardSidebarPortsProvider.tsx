@@ -1,8 +1,16 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { useStableList } from "renderer/hooks/useStableList";
 import {
 	type DashboardSidebarPortGroup,
 	useDashboardSidebarPortsData,
 } from "../../hooks/useDashboardSidebarPortsData";
+
+function isSamePortGroup(
+	previous: DashboardSidebarPortGroup,
+	next: DashboardSidebarPortGroup,
+): boolean {
+	return JSON.stringify(previous) === JSON.stringify(next);
+}
 
 interface DashboardSidebarPortsContextValue {
 	workspacePortGroups: DashboardSidebarPortGroup[];
@@ -28,8 +36,14 @@ export function DashboardSidebarPortsProvider({
 	enabled?: boolean;
 	children: ReactNode;
 }) {
-	const { workspacePortGroups, totalPortCount } =
+	const { workspacePortGroups: nextWorkspacePortGroups, totalPortCount } =
 		useDashboardSidebarPortsData(enabled);
+	// The groups are rebuilt on every workspace change; every sidebar row reads
+	// this context, so keep the old list while no port changed.
+	const workspacePortGroups = useStableList(
+		nextWorkspacePortGroups,
+		isSamePortGroup,
+	);
 
 	const value = useMemo<DashboardSidebarPortsContextValue>(
 		() => ({

@@ -77,7 +77,7 @@ function clonePreset(preset: HostAgentPreset): HostAgentPreset {
 
 /**
  * Presets shown only to users with the flag on. Hosts cannot read flags, so
- * these are never seeded, and clients hide their rows while the flag is off.
+ * these are excluded from default seeds, and clients hide their rows while the flag is off.
  */
 export const AGENT_PRESET_FEATURE_FLAGS: ReadonlyMap<string, string> = new Map([
 	["pdev", FEATURE_FLAGS.PDEV_AGENT],

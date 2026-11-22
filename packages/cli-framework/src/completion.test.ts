@@ -172,6 +172,26 @@ describe("generateBashCompletion", () => {
 		expect(script).toContain("complete -F _my_cli my-cli");
 	});
 
+	it.skipIf(!Bun.which("bash"))(
+		"registers binary aliases and completes under them",
+		() => {
+			const aliased = generateBashCompletion({
+				...cli,
+				binAliases: ["paradev"],
+			});
+			expect(aliased).toContain("complete -F _superset superset paradev");
+			const program = [
+				aliased,
+				"COMP_WORDS=(paradev term)",
+				"COMP_CWORD=1",
+				"_superset",
+				`printf "%s\\n" "\${COMPREPLY[@]}"`,
+			].join("\n");
+			const result = Bun.spawnSync(["bash", "-c", program]);
+			expect(result.stdout.toString().trim()).toBe("terminals");
+		},
+	);
+
 	const script = generateBashCompletion(cli);
 
 	/** What bash would offer with the cursor on the last word. */

@@ -48,8 +48,8 @@ export function V2FlipWelcome({ organizationId }: { organizationId: string }) {
 
 	return (
 		<FlipNoticeCard
-			title={translate(msg({ message: "Welcome to the new Superset" }))}
-			body="Same Superset, upgraded. Everything came with you: projects and workspaces in the sidebar, and fresh terminals in each workspace's old folders."
+			title={translate(msg({ message: "Welcome to the new Paradev" }))}
+			body="Same Paradev, upgraded. Everything came with you: projects and workspaces in the sidebar, and fresh terminals in each workspace's old folders."
 			ctaLabel="Got it"
 			onDismiss={dismiss}
 		/>

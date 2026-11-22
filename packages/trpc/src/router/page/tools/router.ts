@@ -8,7 +8,7 @@ import { Redis } from "@upstash/redis";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../../env";
-import { protectedProcedure, userError } from "../../../trpc";
+import { personProcedure, userError } from "../../../trpc";
 import {
 	type PluginManifest,
 	pluginNeedsConnection,
@@ -16,6 +16,7 @@ import {
 } from "../../plugins/manifest";
 import { resolveTarget } from "../../plugins/proxy";
 import { requireActiveOrgMembership } from "../../utils/active-org";
+import { loadPageShareRole } from "../access";
 import { callPageTool, pageToolAccess, pinForGrant } from "./call-page-tool";
 import { callPluginTool } from "./call-plugin-tool";
 
@@ -43,7 +44,11 @@ async function readablePage(
 		.from(pages)
 		.where(and(eq(pages.id, pageId), eq(pages.organizationId, organizationId)))
 		.limit(1);
-	if (!page || pageToolAccess(page, userId) === "not_found") {
+	if (
+		!page ||
+		pageToolAccess(page, userId, await loadPageShareRole(page, userId)) ===
+			"not_found"
+	) {
 		throw userError({
 			code: "NOT_FOUND",
 			message: "Page not found",
@@ -95,7 +100,7 @@ async function withinRateLimit(key: string): Promise<boolean> {
 }
 
 export const pageToolRouter = {
-	callTool: protectedProcedure
+	callTool: personProcedure
 		.input(
 			z.object({
 				pageId: z.string().uuid(),
@@ -161,7 +166,7 @@ export const pageToolRouter = {
 			);
 		}),
 
-	grantTool: protectedProcedure
+	grantTool: personProcedure
 		.input(
 			z.object({
 				pageId: z.string().uuid(),
@@ -202,7 +207,7 @@ export const pageToolRouter = {
 			return { ok: true as const };
 		}),
 
-	revokeTool: protectedProcedure
+	revokeTool: personProcedure
 		.input(z.object({ pageId: z.string().uuid(), plugin: name }))
 		.mutation(async ({ ctx, input }) => {
 			await db
@@ -217,7 +222,7 @@ export const pageToolRouter = {
 			return { ok: true as const };
 		}),
 
-	toolGrants: protectedProcedure
+	toolGrants: personProcedure
 		.input(z.object({ pageId: z.string().uuid() }))
 		.query(async ({ ctx, input }) =>
 			db

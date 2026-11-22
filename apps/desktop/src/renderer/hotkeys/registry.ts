@@ -213,6 +213,20 @@ export const HOTKEYS_REGISTRY = {
 			message: "Navigate to the next workspace in the sidebar",
 		}),
 	},
+	OPEN_WORKSPACE_LIST: {
+		key: {
+			mac: L("meta+period"),
+			windows: L("ctrl+period"),
+			linux: L("ctrl+period"),
+		},
+		label: msg({
+			message: "Switch Workspace",
+		}),
+		category: "Workspace",
+		description: msg({
+			message: "Search your workspaces and open one, or start a new workspace",
+		}),
+	},
 	OPEN_ACTIVE_WORKSPACE_SWITCHER: {
 		key: {
 			mac: L("meta+semicolon"),
@@ -224,8 +238,7 @@ export const HOTKEYS_REGISTRY = {
 		}),
 		category: "Workspace",
 		description: msg({
-			message:
-				"Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running",
+			message: "Same as Switch Workspace",
 		}),
 	},
 	CLOSE_WORKSPACE: {
@@ -343,11 +356,23 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({ message: "Toggle Right Sidebar" }),
 		category: "Layout",
 	},
-	OPEN_DIFF_VIEWER: {
+	TOGGLE_RIGHT_PANE_FULL_SCREEN: {
 		key: {
 			mac: L("meta+shift+l"),
 			windows: L("ctrl+shift+alt+l"),
 			linux: L("ctrl+shift+alt+l"),
+		},
+		label: msg({ message: "Toggle Right Pane Full Screen" }),
+		category: "Layout",
+		description: msg({
+			message: "Expand the right pane to fill the window, or restore it",
+		}),
+	},
+	OPEN_DIFF_VIEWER: {
+		key: {
+			mac: L("meta+shift+g"),
+			windows: L("ctrl+shift+alt+g"),
+			linux: L("ctrl+shift+alt+g"),
 		},
 		label: msg({
 			message: "Open Changes",
@@ -541,6 +566,20 @@ export const HOTKEYS_REGISTRY = {
 			message: "Search text in the changes diff",
 		}),
 	},
+	FIND_IN_PAGE: {
+		key: {
+			mac: L("meta+f"),
+			windows: L("ctrl+shift+f"),
+			linux: L("ctrl+shift+f"),
+		},
+		label: msg({
+			message: "Find in Page",
+		}),
+		category: "Navigation",
+		description: msg({
+			message: "Search text in the active page",
+		}),
+	},
 	NEW_GROUP: {
 		key: {
 			mac: L("meta+t"),
@@ -652,6 +691,44 @@ export const HOTKEYS_REGISTRY = {
 		category: "Layout",
 		description: msg({
 			message: "Focus the next tab in the active workspace",
+		}),
+	},
+	PREV_RIGHT_SIDEBAR_TAB: {
+		key: {
+			mac: "meta+ctrl+left",
+			windows: "ctrl+shift+alt+pageup",
+			linux: "ctrl+shift+alt+pageup",
+		},
+		label: msg({ message: "Previous Right Sidebar Tab" }),
+		category: "Layout",
+		description: msg({
+			message:
+				"Show the previous tab in the right sidebar without moving focus",
+		}),
+	},
+	NEXT_RIGHT_SIDEBAR_TAB: {
+		key: {
+			mac: "meta+ctrl+right",
+			windows: "ctrl+shift+alt+pagedown",
+			linux: "ctrl+shift+alt+pagedown",
+		},
+		label: msg({ message: "Next Right Sidebar Tab" }),
+		category: "Layout",
+		description: msg({
+			message: "Show the next tab in the right sidebar without moving focus",
+		}),
+	},
+	TOGGLE_RIGHT_SIDEBAR_FOCUS: {
+		key: {
+			mac: L("meta+alt+l"),
+			windows: L("ctrl+shift+alt+e"),
+			linux: L("ctrl+shift+alt+e"),
+		},
+		label: msg({ message: "Toggle Right Sidebar Focus" }),
+		category: "Layout",
+		description: msg({
+			message:
+				"Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed",
 		}),
 	},
 	FOCUS_PANE_LEFT: {
@@ -847,6 +924,15 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({
 			message: "Focus Chat Input",
 		}),
+		category: "Chat",
+	},
+	NEW_CHAT: {
+		key: {
+			mac: L("meta+shift+j"),
+			windows: L("ctrl+shift+alt+j"),
+			linux: L("ctrl+shift+alt+j"),
+		},
+		label: msg({ message: "New Chat" }),
 		category: "Chat",
 	},
 	CHAT_ADD_ATTACHMENT: {

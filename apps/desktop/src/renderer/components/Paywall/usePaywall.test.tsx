@@ -131,6 +131,19 @@ describe("gateFeature while the plan is still resolving", () => {
 		expect(planRequestCount).toBe(1);
 	});
 
+	test("resolves true for the click that ran and false for the one dropped", async () => {
+		const { result } = renderPaywall();
+		const outcomes: Promise<boolean>[] = [];
+
+		act(() => {
+			outcomes.push(result.current.runGatedFeature("automations", () => {}));
+			outcomes.push(result.current.runGatedFeature("automations", () => {}));
+		});
+		await answerPlan(proPlanFor(WINDOW_ORG));
+		await settle();
+		expect(await Promise.all(outcomes)).toEqual([true, false]);
+	});
+
 	test("accepts a new click once the first has settled", async () => {
 		const { result } = renderPaywall();
 		const callback = mock(() => {});

@@ -1,0 +1,35 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "superset-agent-worker",
+	"main": "cloudflare/worker.ts",
+	// Not on the realtime Worker: a deploy there must not restart running agent turns.
+	"workers_dev": false,
+	"compatibility_date": "2026-07-01",
+	"compatibility_flags": ["nodejs_compat"],
+	"vars": {
+		"AGENT_API_URL": "https://api.superset.sh",
+		"AGENT_ROUTER_URL": "https://router.superset.sh",
+		"AGENT_MAIN_MODEL": "vercel-ai-gateway/anthropic/claude-sonnet-5.5"
+	},
+	// Secrets come from GitHub on each deploy (deploy-production.yml): AGENT_WORKER_SECRET and TEMPORAL_*.
+	"containers": [
+		{
+			"class_name": "AgentWorker",
+			"image": "./container/Dockerfile",
+			"image_build_context": ".",
+			"image_vars": {
+				"PDEV_VERSION": "0.2.3",
+				"PDEV_SHA256": "4f98a7f1a34ee30ece56664dab2cfc872ff3f146630696269356a8dc7efb4130"
+			},
+			"instance_type": "standard-4",
+			"max_instances": 1,
+			"rollout_active_grace_period": 0
+		}
+	],
+	"durable_objects": {
+		"bindings": [{ "name": "AGENT_WORKER", "class_name": "AgentWorker" }]
+	},
+	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["AgentWorker"] }],
+	"triggers": { "crons": ["* * * * *"] },
+	"observability": { "enabled": true }
+}

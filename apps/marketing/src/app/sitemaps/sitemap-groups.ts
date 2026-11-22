@@ -45,6 +45,11 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.8,
 		},
 		{
+			url: `${baseUrl}/conductor`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
 			url: `${baseUrl}/mobile`,
 			changeFrequency: "monthly",
 			priority: 0.8,
@@ -65,12 +70,22 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.8,
 		},
 		{
+			url: `${baseUrl}/plugins`,
+			changeFrequency: "monthly",
+			priority: 0.8,
+		},
+		{
 			url: baseUrl,
 			changeFrequency: "weekly",
 			priority: 1.0,
 		},
 		{
 			url: `${baseUrl}/marketplace`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
+			url: `${baseUrl}/marketplace/plugins`,
 			changeFrequency: "weekly",
 			priority: 0.8,
 		},
@@ -153,6 +168,11 @@ export async function buildSitemapGroups(): Promise<
 			url: `${baseUrl}/roadmap`,
 			changeFrequency: "weekly",
 			priority: 0.7,
+		},
+		{
+			url: `${baseUrl}/press`,
+			changeFrequency: "weekly",
+			priority: 0.6,
 		},
 		{
 			url: `${baseUrl}/contact`,

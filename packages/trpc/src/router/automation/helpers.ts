@@ -311,8 +311,12 @@ export const automationBaseColumns = {
 	cloudWorkspaceId: automations.cloudWorkspaceId,
 	environmentId: automations.environmentId,
 	tags: automations.tags,
+	group: automations.group,
 	continueAgentSession: automations.continueAgentSession,
+	reuseWorkspace: automations.reuseWorkspace,
+	machineSize: automations.machineSize,
 	enabled: automations.enabled,
+	archivedAt: automations.archivedAt,
 	createdAt: automations.createdAt,
 	updatedAt: automations.updatedAt,
 };
@@ -366,8 +370,8 @@ export async function automationNotFound(
 	});
 }
 
-/** Deleting runs nothing on anyone's machine, so an organization owner may do it for any automation. */
-export async function requireAutomationDeleteAccess(
+/** Archiving and deleting run nothing on anyone's machine, so an organization owner may do them for any automation. */
+export async function requireAutomationArchiveAccess(
 	userId: string,
 	organizationId: string,
 	id: string,
@@ -406,8 +410,40 @@ export async function requireAutomationDeleteAccess(
 	throw userError({
 		code: "FORBIDDEN",
 		message:
-			"Only the owner or an organization owner can delete this automation",
-		i18nKey: "serverError.automation.onlyTheOwnerOrAnOrganizationOwner",
+			"Only the owner or an organization owner can archive this automation",
+		i18nKey:
+			"serverError.automation.onlyTheOwnerOrAnOrganizationOwnerCanArchive",
+	});
+}
+
+/**
+ * The organization's existing spelling of a group, matched without regard to
+ * case, so "launch watch" from the CLI joins the "Launch watch" group.
+ */
+export async function resolveAutomationGroup(
+	organizationId: string,
+	group: string | null,
+): Promise<string | null> {
+	if (group === null) return null;
+	const [existing] = await db
+		.select({ group: automations.group })
+		.from(automations)
+		.where(
+			and(
+				eq(automations.organizationId, organizationId),
+				sql`lower(${automations.group}) = lower(${group})`,
+			),
+		)
+		.limit(1);
+	return existing?.group ?? group;
+}
+
+export function assertNotArchived(automation: { archivedAt: Date | null }) {
+	if (automation.archivedAt === null) return;
+	throw userError({
+		code: "PRECONDITION_FAILED",
+		message: "This automation is archived. Restore it first.",
+		i18nKey: "serverError.automation.automationIsArchived",
 	});
 }
 

@@ -11,8 +11,9 @@
  *
  * Each store is the CLI's own sanctioned escape hatch: Claude's untrusted-
  * folder error says to set `projects[<path>].hasTrustDialogAccepted: true`
- * in its state file, and Codex persists `trust_level = "trusted"` in
- * config.toml the same way. Everything here is best-effort — a failed seed
+ * in its state file, Codex persists `trust_level = "trusted"` in
+ * config.toml the same way, and Antigravity lists trusted folders under
+ * `trustedWorkspaces` in its settings.json. Everything here is best-effort — a failed seed
  * just means the dialog shows once.
  */
 
@@ -29,31 +30,108 @@ import {
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
+import { parse } from "shell-quote";
 import type { HostDb } from "../../../../db";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
-type TrustFamily = "claude" | "codex";
+type TrustFamily = "claude" | "codex" | "agy";
+
+type LaunchCommand = { command: string; args?: readonly string[] };
+
+type AgentLaunchConfig = LaunchCommand & {
+	presetId: string;
+	env: Record<string, string>;
+};
 
 interface TrustTarget {
 	family: TrustFamily;
 	file: string;
 }
 
+const ENV_ASSIGNMENT = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s;
+
+function programName(token: string): string {
+	return (token.split(/[\\/]/).pop() ?? "").toLowerCase().replace(/\.exe$/, "");
+}
+
+function commandTokens(config: LaunchCommand): string[] {
+	const command = config.command.trim();
+	const args = config.args ?? [];
+	if (!/\s/.test(command)) return [command, ...args];
+	const [first = ""] = command.split(/\s+/);
+	// shell-quote reads backslashes as escapes, which breaks Windows paths.
+	if (programName(first) !== "env" && !ENV_ASSIGNMENT.test(first)) {
+		return [first];
+	}
+	const tokens: string[] = [];
+	for (const token of parse(command, (key) => process.env[key] ?? "")) {
+		if (typeof token === "string") tokens.push(token);
+		else if ("op" in token && token.op === "glob") tokens.push(token.pattern);
+		else break;
+	}
+	return [...tokens, ...args];
+}
+
+function unwrapEnvCommand(config: LaunchCommand): {
+	executable: string;
+	env: Record<string, string>;
+	clearsInherited: boolean;
+	unset: string[];
+} {
+	const tokens = commandTokens(config);
+	let index = 0;
+	let clearsInherited = false;
+	const unset: string[] = [];
+	if (programName(tokens[0] ?? "") === "env") {
+		for (index = 1; index < tokens.length; index++) {
+			const token = tokens[index] ?? "";
+			const short = /^-(i*)(?:u(.*))?$/s.exec(token);
+			if (token === "--ignore-environment") {
+				clearsInherited = true;
+			} else if (token === "--unset" && tokens[index + 1]) {
+				unset.push(tokens[++index] ?? "");
+			} else if (token.startsWith("--unset=")) {
+				unset.push(token.slice("--unset=".length));
+			} else if (short) {
+				if (short[1] || short[2] === undefined) clearsInherited = true;
+				if (short[2] !== undefined) {
+					const name = short[2] || tokens[++index];
+					if (!name) break;
+					unset.push(name);
+				}
+			} else {
+				if (token === "--") index++;
+				break;
+			}
+		}
+	}
+	const env: Record<string, string> = {};
+	for (; index < tokens.length; index++) {
+		const match = ENV_ASSIGNMENT.exec(tokens[index] ?? "");
+		if (!match?.[1]) break;
+		env[match[1]] = match[2] ?? "";
+	}
+	const program = tokens[index] ?? "";
+	return {
+		executable: programName(program),
+		env,
+		clearsInherited,
+		unset,
+	};
+}
+
 /**
  * Provider family of an agent config, from its preset id or launch
  * executable. The executable check covers custom presets that still run the
- * stock `claude`/`codex` binaries (possibly via absolute paths or wrappers
- * named after them).
+ * stock `claude`/`codex` binaries (possibly via absolute paths, `env`
+ * wrappers, or wrappers named after them).
  */
-export function resolveTrustFamily(config: {
-	presetId: string;
-	command: string;
-}): TrustFamily | null {
-	const [token = ""] = config.command.trim().split(/\s+/);
-	const executable = (token.split(/[\\/]/).pop() ?? "")
-		.toLowerCase()
-		.replace(/\.exe$/, "");
-	for (const family of ["claude", "codex"] as const) {
+export function resolveTrustFamily(
+	config: LaunchCommand & { presetId: string },
+): TrustFamily | null {
+	const { executable } = unwrapEnvCommand(config);
+	for (const family of ["claude", "codex", "agy"] as const) {
 		if (config.presetId === family || executable === family) return family;
 	}
 	return null;
@@ -63,28 +141,41 @@ export function resolveTrustFamily(config: {
  * Trust-store file for one agent config, mirroring launch-time resolution:
  * per-agent env wins over the host-default account selection
  * (`{...accountEnv, ...config.env}` in buildTerminalAgentLaunch, and the
- * agent wrapper's pointer-file fallback reads the same DB-backed selection).
+ * agent wrapper's pointer-file fallback reads the same DB-backed selection),
+ * and an `env VAR=value` wrapper in the command wins over both.
  * Claude keeps state inside a custom CLAUDE_CONFIG_DIR but next door at
  * `~/.claude.json` for the default home; Codex always uses
  * `$CODEX_HOME/config.toml`.
  */
-function resolveTrustTarget(
+export function resolveTrustTarget(
 	db: HostDb,
-	config: { presetId: string; command: string; env: Record<string, string> },
+	config: AgentLaunchConfig,
 ): TrustTarget | null {
 	const family = resolveTrustFamily(config);
 	if (family === null) return null;
-	const env = { ...resolveDefaultAccountEnv(db, family), ...config.env };
+	if (family === "agy") {
+		return {
+			family,
+			file: join(homedir(), ".gemini", "antigravity-cli", "settings.json"),
+		};
+	}
+	const wrapper = unwrapEnvCommand(config);
+	const inherited: Record<string, string> = wrapper.clearsInherited
+		? {}
+		: { ...resolveDefaultAccountEnv(db, family), ...config.env };
+	for (const name of wrapper.unset) delete inherited[name];
+	const env = { ...inherited, ...wrapper.env };
+	const home = env.HOME || homedir();
 	if (family === "claude") {
 		const configDir = env.CLAUDE_CONFIG_DIR;
 		return {
 			family,
 			file: configDir
 				? join(configDir, ".claude.json")
-				: join(homedir(), ".claude.json"),
+				: join(home, ".claude.json"),
 		};
 	}
-	const codexHome = env.CODEX_HOME || join(homedir(), ".codex");
+	const codexHome = env.CODEX_HOME || join(home, ".codex");
 	return { family, file: join(codexHome, "config.toml") };
 }
 
@@ -191,6 +282,53 @@ export async function seedCodexFolderTrust(
 	await atomicWrite(configFile, next);
 }
 
+/**
+ * Append `folderPath` to `trustedWorkspaces` in Antigravity's settings.json,
+ * preserving every other key. A corrupt file throws instead of being
+ * clobbered. No-op when the folder is already listed.
+ */
+export async function seedAgyFolderTrust(
+	settingsFile: string,
+	folderPath: string,
+): Promise<void> {
+	let settings: Record<string, unknown> = {};
+	if (existsSync(settingsFile)) {
+		settings = JSON.parse(await readFile(settingsFile, "utf-8"));
+	} else if (!existsSync(dirname(settingsFile))) {
+		return;
+	}
+	const trusted = Array.isArray(settings.trustedWorkspaces)
+		? settings.trustedWorkspaces
+		: [];
+	if (trusted.includes(folderPath)) return;
+	settings.trustedWorkspaces = [...trusted, folderPath];
+	await atomicWrite(settingsFile, JSON.stringify(settings, null, 2));
+}
+
+/**
+ * Antigravity does not carry a main checkout's trust over to its worktrees,
+ * as Claude and Codex do. Trust the worktree when the user already trusted
+ * the main checkout.
+ */
+export async function inheritAgyWorktreeTrust(
+	settingsFile: string,
+	mainRepoPath: string,
+	worktreePath: string,
+): Promise<void> {
+	if (!existsSync(settingsFile)) return;
+	const settings = JSON.parse(await readFile(settingsFile, "utf-8"));
+	const trusted: unknown[] = Array.isArray(settings.trustedWorkspaces)
+		? settings.trustedWorkspaces
+		: [];
+	const mainRepo = normalizeFolderPath(mainRepoPath);
+	const mainRepoTrusted = trusted.some(
+		(entry) =>
+			typeof entry === "string" && normalizeFolderPath(entry) === mainRepo,
+	);
+	if (!mainRepoTrusted) return;
+	await seedAgyFolderTrust(settingsFile, normalizeFolderPath(worktreePath));
+}
+
 function normalizeFolderPath(path: string): string {
 	try {
 		return realpathSync(path);
@@ -208,20 +346,56 @@ function normalizeFolderPath(path: string): string {
 export async function seedAgentFolderTrust(
 	db: HostDb,
 	folderPath: string,
-	config: { presetId: string; command: string; env: Record<string, string> },
+	config: AgentLaunchConfig,
 ): Promise<void> {
 	try {
 		const target = resolveTrustTarget(db, config);
 		if (target === null) return;
 		const normalized = normalizeFolderPath(folderPath);
+		// A relative config dir is relative to the agent's cwd, the session folder.
+		const file = resolve(folderPath, target.file);
 		if (target.family === "claude") {
-			await seedClaudeFolderTrust(target.file, normalized);
+			await seedClaudeFolderTrust(file, normalized);
+		} else if (target.family === "agy") {
+			await seedAgyFolderTrust(file, normalized);
 		} else {
-			await seedCodexFolderTrust(target.file, normalized);
+			await seedCodexFolderTrust(file, normalized);
 		}
 	} catch (err) {
 		console.warn(
 			`[agents.run] failed to pre-trust session folder '${folderPath}' for agent '${config.presetId}':`,
+			err,
+		);
+	}
+}
+
+/**
+ * Trust a workspace folder for the agent about to launch in it. A session
+ * folder is seeded outright; a worktree only gets the trust its main checkout
+ * already has.
+ */
+export async function seedWorkspaceAgentTrust(
+	db: HostDb,
+	workspace: { projectId: string | null; worktreePath: string },
+	config: AgentLaunchConfig,
+): Promise<void> {
+	if (workspace.projectId === null) {
+		await seedAgentFolderTrust(db, workspace.worktreePath, config);
+		return;
+	}
+	try {
+		const target = resolveTrustTarget(db, config);
+		if (target?.family !== "agy") return;
+		const project = getLocalProject(db, workspace.projectId);
+		if (!project) return;
+		await inheritAgyWorktreeTrust(
+			target.file,
+			project.repoPath,
+			workspace.worktreePath,
+		);
+	} catch (err) {
+		console.warn(
+			`[agents.run] failed to carry folder trust to worktree '${workspace.worktreePath}' for agent '${config.presetId}':`,
 			err,
 		);
 	}

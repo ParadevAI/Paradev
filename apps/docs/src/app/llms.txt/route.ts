@@ -1,18 +1,20 @@
+import { BRAND } from "@superset/shared/brand";
+import { DOCS_BASE_URL } from "@/lib/docs-mcp-server";
 import { source } from "@/lib/source";
 
 export const revalidate = false;
 
 export function GET() {
 	const lines = [
-		"# Superset Documentation",
+		`# ${BRAND.INTRO_NAME} Documentation`,
 		"",
-		"> Official documentation for Superset — run parallel AI coding agents in isolated Git worktrees on your machine.",
+		`> Official documentation for ${BRAND.INTRO_NAME} — run parallel AI coding agents in isolated Git worktrees on your machine.`,
 		"",
 		"Fetch the relevant Markdown pages linked below. Each page includes its source URL and description, followed by the full documentation content.",
 		"",
-		"Any documentation page is available as Markdown at https://docs.superset.sh/llms.mdx/<path>, for example https://docs.superset.sh/llms.mdx/cli/getting-started.",
+		`Any documentation page is available as Markdown at ${DOCS_BASE_URL}/llms.mdx/<path>, for example ${DOCS_BASE_URL}/llms.mdx/cli/getting-started.`,
 		"",
-		"The full documentation corpus is available at https://docs.superset.sh/llms-full.txt.",
+		`The full documentation corpus is available at ${DOCS_BASE_URL}/llms-full.txt.`,
 		"",
 		"## Pages",
 		"",
@@ -21,7 +23,7 @@ export function GET() {
 				typeof page.data.description === "string" && page.data.description
 					? `: ${page.data.description}`
 					: "";
-			return `- [${page.data.title}](https://docs.superset.sh/llms.mdx${page.url})${description}`;
+			return `- [${page.data.title}](${DOCS_BASE_URL}/llms.mdx${page.url})${description}`;
 		}),
 	];
 

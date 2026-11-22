@@ -1,6 +1,7 @@
 import {
 	pageReportReasonValues,
 	pageReportStatusValues,
+	pageShareRoleEnum,
 } from "@superset/db/schema";
 import { z } from "zod";
 
@@ -102,7 +103,7 @@ export const PAGE_LIST_MAX_LIMIT = 200;
  */
 export const PAGE_LIST_MAX_IDS = 200;
 
-export const PAGE_LIST_SCOPES = ["all", "team", "mine"] as const;
+export const PAGE_LIST_SCOPES = ["all", "team", "mine", "shared"] as const;
 
 export type PageListScope = (typeof PAGE_LIST_SCOPES)[number];
 
@@ -190,6 +191,11 @@ export const setPageVisibilitySchema = z.object({
 	visibility: pageFields.visibility,
 });
 
+export const setPageOrganizationRoleSchema = z.object({
+	id: pageFields.id,
+	role: pageShareRoleEnum,
+});
+
 export const setSharedVersionSchema = z.object({
 	id: pageFields.id,
 	version: pageFields.version.nullable(),
@@ -198,6 +204,11 @@ export const setSharedVersionSchema = z.object({
 export const deletePageSchema = z.object({
 	id: pageFields.id,
 	onlyIfEmpty: z.boolean().optional(),
+});
+
+export const duplicatePageSchema = z.object({
+	id: pageFields.id,
+	title: pageFields.title.optional(),
 });
 
 export const reportPageSchema = z.object({
@@ -235,7 +246,10 @@ export const setPageWatchSchema = z.object({
 
 export const clearPageWatchSchema = z.object({ id: pageFields.id });
 
-export const publicPageSchema = z.object({ slug: pageFields.slug });
+export const publicPageSchema = z.object({
+	slug: pageFields.slug,
+	download: z.boolean().optional(),
+});
 
 export const pagePreviewSchema = z.object({ slug: pageFields.slug });
 

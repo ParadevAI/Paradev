@@ -3,6 +3,7 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { LuCopy, LuExternalLink, LuLoaderCircle, LuX } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { CloudPortForwardActions } from "renderer/routes/_authenticated/_dashboard/components/CloudPortForwardActions";
 import { useDashboardSidebarPortKill } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortKill";
 import type { DashboardSidebarPort } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortsData";
 import { usePortOpenActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/usePortOpenActions";
@@ -95,6 +96,11 @@ export function PortRow({ port, onNavigate }: PortRowProps) {
 			{forward?.status.state === "busy" && (
 				<div className="px-2 pb-1.5">
 					<PortForwardBusyActions forward={forward} />
+				</div>
+			)}
+			{port.hostType === "cloud" && (!forward || forward.explicit) && (
+				<div className="flex px-2 pb-1.5">
+					<CloudPortForwardActions port={port} forward={forward} />
 				</div>
 			)}
 			<div className="absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center gap-px rounded-md border border-border bg-popover/95 p-px opacity-0 transition-opacity focus-within:opacity-100 group-hover/port:opacity-100">

@@ -25,7 +25,7 @@ export function useHiringCard({
 			message: "We're hiring",
 		}),
 		title: t({
-			message: "Like building with Superset?",
+			message: "Like building with Paradev?",
 		}),
 		description: t({
 			message: "You're one of our most active users. Come help us build it.",

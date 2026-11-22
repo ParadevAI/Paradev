@@ -1,6 +1,6 @@
 import {
 	MAX_PAGE_GUESTS,
-	type PagePresenceViewer,
+	MAX_PRESENCE_VISITORS,
 	PRESENCE_COLOR_COUNT,
 } from "@superset/shared/page-presence";
 import {
@@ -32,6 +32,16 @@ import {
 } from "@superset/shared/usercontent";
 import { type Connection, type ConnectionContext, Server } from "partyserver";
 import type { RealtimeEnv } from "./types";
+import {
+	broadcastPresence,
+	type PresenceReceiver,
+	type PresentViewer,
+	type SeenVersions,
+	SWEEP_MS,
+	scheduleSweep,
+	sweepSilent,
+	versionMoved,
+} from "./utils/presence";
 
 interface Pinned {
 	userId: string;
@@ -49,6 +59,7 @@ interface Pinned {
 	colorSlot?: number;
 	viewerKey?: string;
 	connectedAt?: number;
+	seen?: SeenVersions;
 }
 
 interface PresenceClaims {
@@ -64,9 +75,14 @@ export const CLAIMS_HEADER = "x-superset-page-claims";
 const CALLS_PER_WINDOW = 60;
 const WINDOW_MS = 10_000;
 const MANIFEST_TTL_MS = 60_000;
-const SWEEP_MS = 30_000;
-const SILENT_MS = 75_000;
 const NO_VIEWER = "\u0000";
+
+function seenVersions(manifest: PageManifest): SeenVersions {
+	return {
+		latestVersion: manifest.latestVersion,
+		sharedVersion: manifest.sharedVersion,
+	};
+}
 
 export class PageHub extends Server<RealtimeEnv> {
 	static options = { hibernate: true };
@@ -152,7 +168,21 @@ export class PageHub extends Server<RealtimeEnv> {
 						userId: pinned.userId,
 						organizationIds: [...pinned.organizationIds],
 					});
-			if (!allowed) this.revoke(connection);
+			if (!allowed) {
+				this.revoke(connection);
+			} else if (
+				pinned.presence &&
+				versionMoved(pinned.seen, manifest, pinned.guest === true)
+			) {
+				connection.setState({
+					...pinned,
+					organizationIds: [...pinned.organizationIds],
+					seen: seenVersions(manifest),
+				});
+				try {
+					connection.send(JSON.stringify({ type: "published" }));
+				} catch {}
+			}
 		}
 		this.announce();
 	}
@@ -297,46 +327,44 @@ export class PageHub extends Server<RealtimeEnv> {
 				colorSlot: this.colorSlotFor(claims.userId),
 				viewerKey,
 				connectedAt: Date.now(),
+				seen: seenVersions(manifest),
 			});
 		} finally {
 			if (claims.guest) this.connectingGuests--;
 		}
-		this.announce();
-		if ((await this.ctx.storage.getAlarm()) === null) {
-			await this.ctx.storage.setAlarm(Date.now() + SWEEP_MS);
+		if (!claims.guest) {
+			this.records.recordVisit(
+				{ userId: claims.userId, name: claims.name, image: claims.image },
+				Date.now(),
+			);
 		}
+		this.announce();
+		await scheduleSweep(this.ctx.storage, Date.now());
 	}
 
 	async onAlarm(): Promise<void> {
 		const now = Date.now();
-		let remaining = 0;
-		let evicted = false;
-		for (const connection of this.getConnections<Pinned>()) {
-			const heardAt =
-				this.ctx.getWebSocketAutoResponseTimestamp(connection)?.getTime() ??
-				connection.state?.connectedAt;
-			if (heardAt && now - heardAt > SILENT_MS) {
-				try {
-					connection.close(4408, "silent");
-				} catch {}
-				evicted = true;
-				continue;
-			}
-			remaining++;
+		const { evicted, remaining } = sweepSilent(
+			[...this.getConnections<Pinned>()].map((connection) => ({
+				connection,
+				connectedAt: connection.state?.connectedAt,
+				heardAt: this.ctx.getWebSocketAutoResponseTimestamp(connection),
+			})),
+			now,
+		);
+		if (evicted) {
+			this.schema();
+			this.announce();
 		}
-		if (evicted) this.announce();
 		if (remaining > 0) await this.ctx.storage.setAlarm(now + SWEEP_MS);
 	}
 
 	async onClose(connection: Connection<Pinned>): Promise<void> {
 		const pinned = connection.state;
 		if (!pinned) return;
-		if (pinned.presence) {
-			this.announce(connection.id);
-			return;
-		}
 		this.schema();
-		this.records.touchVisit(pinned.userId, Date.now());
+		if (!pinned.guest) this.records.touchVisit(pinned.userId, Date.now());
+		if (pinned.presence) this.announce(connection.id);
 	}
 
 	async onMessage(
@@ -619,15 +647,18 @@ export class PageHub extends Server<RealtimeEnv> {
 	}
 
 	private announce(leaving?: string): void {
-		const present: {
-			connection: Connection<Pinned>;
-			viewer: PagePresenceViewer;
-		}[] = [];
+		const receivers: PresenceReceiver[] = [];
+		const present: PresentViewer[] = [];
 		for (const connection of this.getConnections<Pinned>()) {
 			const state = connection.state;
 			if (!state?.presence || connection.id === leaving) continue;
-			present.push({
+			receivers.push({
 				connection,
+				userId: state.userId,
+				seesVisitors: state.guest !== true,
+			});
+			present.push({
+				userId: state.userId,
 				viewer: {
 					id: connection.id,
 					key: state.viewerKey ?? connection.id,
@@ -639,15 +670,11 @@ export class PageHub extends Server<RealtimeEnv> {
 				},
 			});
 		}
-		for (const { connection } of present) {
-			const userId = connection.state?.userId;
-			const viewers = present
-				.filter((other) => other.connection.state?.userId !== userId)
-				.map((other) => other.viewer);
-			try {
-				connection.send(JSON.stringify({ type: "presence", viewers }));
-			} catch {}
-		}
+		broadcastPresence(
+			receivers,
+			present,
+			this.records.recentVisits(MAX_PRESENCE_VISITORS),
+		);
 	}
 
 	async apply(request: PageStorageHubRequest): Promise<PageStorageHubResponse> {

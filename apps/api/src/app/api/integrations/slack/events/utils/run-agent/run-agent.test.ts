@@ -756,7 +756,7 @@ describe("plugin tools", () => {
 		]);
 	});
 
-	test("a failure resolving plugin connections leaves the run with Superset tools only", async () => {
+	test("a failure resolving plugin connections leaves the run with Paradev tools only", async () => {
 		resolveTarget.mockImplementation(async ({ plugin }) => {
 			if (plugin === "linear") throw new Error("ambiguous install");
 			return { kind: "needs-auth", plugin, version: "0.0.0" };

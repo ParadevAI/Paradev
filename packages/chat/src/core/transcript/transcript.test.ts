@@ -42,7 +42,7 @@ describe("runningTurnId", () => {
 });
 
 describe("userMessageText", () => {
-	test("joins the text parts and skips attachments", () => {
+	test("joins the text parts and skips attachments and hidden parts", () => {
 		const message = {
 			content: [
 				{ type: "text" as const, text: "a" },
@@ -53,6 +53,7 @@ describe("userMessageText", () => {
 					mimeType: "image/png",
 				},
 				{ type: "text" as const, text: "b" },
+				{ type: "text" as const, text: "hint", hidden: true },
 			],
 		};
 		expect(userMessageText(message)).toBe("a\nb");

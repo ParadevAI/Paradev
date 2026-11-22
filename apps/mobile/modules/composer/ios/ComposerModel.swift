@@ -35,10 +35,6 @@ final class ComposerModel {
   /// the outside tap any more.
   var backdrop: ComposerBackdrop = .dim
 
-  /// Whether the caller listens to `onEdgeChange`. Sampling the edge costs a
-  /// display link, so a composer nobody reads (Home, a terminal) runs none.
-  var reportsEdge = false
-
   /// Mirrors React Native's tray. The composer renders it and reports removals
   /// and taps back out; it never owns the list.
   var attachments: [ComposerAttachment] = []
@@ -164,9 +160,6 @@ final class ComposerModel {
   /// already tracks that, and it arrives there with a duration and a curve
   /// worth animating to.
   @ObservationIgnored var onHeightChange: ((CGFloat) -> Void)?
-  /// Where the composer's top edge is on screen, as a distance above the
-  /// bottom of the window, on every frame it moves: keyboard, growth and drag.
-  @ObservationIgnored var onEdgeChange: ((CGFloat) -> Void)?
   @ObservationIgnored var onRemoveAttachment: ((String) -> Void)?
   @ObservationIgnored var onAttachmentPress: ((String) -> Void)?
   /// Lets the caller restore the composer only when it was actually open —
@@ -261,7 +254,7 @@ final class ComposerModel {
     let addition = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !addition.isEmpty else { return }
     let base = draft.trimmingCharacters(in: .whitespaces)
-    setDraft(base.isEmpty ? addition : base + " " + addition)
+    setDraft(ComposerDictatedText.join(base, addition))
   }
 
   func submit() {

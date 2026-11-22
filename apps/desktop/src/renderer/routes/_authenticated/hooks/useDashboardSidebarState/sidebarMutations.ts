@@ -1,4 +1,5 @@
 import type { WorkspaceState } from "@superset/panes";
+import type { Collection, WritableDeep } from "@tanstack/db";
 import type { PaneLifecycleRow } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { getPrependTabOrder } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
@@ -20,6 +21,30 @@ export function createEmptyPaneLayout(): WorkspaceState<unknown> {
 type CleanupPaneRuntimes = (rows: PaneLifecycleRow[]) => void;
 
 /**
+ * Writes many rows as one transaction. A localStorage collection re-serializes
+ * the whole store and notifies every live query on each `update`, so a loop of
+ * single-row updates costs one full save and one React commit per row.
+ */
+export function updateRows<TInput extends object, TValue>(
+	// biome-ignore lint/suspicious/noExplicitAny: only the input row type matters here
+	collection: Collection<any, string, any, any, TInput>,
+	valuesByKey: ReadonlyMap<string, TValue>,
+	apply: (draft: WritableDeep<TInput>, value: TValue) => void,
+): void {
+	if (valuesByKey.size === 0) return;
+	const entries = Array.from(valuesByKey);
+	collection.update(
+		entries.map(([key]) => key),
+		(drafts) => {
+			drafts.forEach((draft, index) => {
+				const entry = entries[index];
+				if (entry) apply(draft, entry[1]);
+			});
+		},
+	);
+}
+
+/**
  * Hides a single workspace while keeping its project in the sidebar, by leaving
  * a hidden "tombstone" row rather than deleting it. A local `main` workspace
  * with no local-state row is re-surfaced by the gated auto-include path, so
@@ -27,14 +52,14 @@ type CleanupPaneRuntimes = (rows: PaneLifecycleRow[]) => void;
  * would let it reappear.
  */
 export function tombstoneSidebarWorkspaceRecord(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<AppCollections, "workspaceLocalState">,
 	workspaceId: string,
 	projectId: string | null,
 	cleanupPaneRuntimes: CleanupPaneRuntimes,
 ): void {
-	const existing = collections.v2WorkspaceLocalState.get(workspaceId);
+	const existing = collections.workspaceLocalState.get(workspaceId);
 	if (!existing) {
-		collections.v2WorkspaceLocalState.insert({
+		collections.workspaceLocalState.insert({
 			workspaceId,
 			createdAt: new Date(),
 			sidebarState: {
@@ -49,7 +74,7 @@ export function tombstoneSidebarWorkspaceRecord(
 	}
 
 	cleanupPaneRuntimes([existing]);
-	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+	collections.workspaceLocalState.update(workspaceId, (draft) => {
 		draft.sidebarState.projectId = projectId;
 		draft.sidebarState.sectionId = null;
 		draft.sidebarState.isHidden = true;
@@ -58,7 +83,6 @@ export function tombstoneSidebarWorkspaceRecord(
 		draft.sidebarState.pinnedAt = null;
 		draft.paneLayout = createEmptyPaneLayout();
 		delete draft.rightPaneLayout;
-		delete draft.rightPaneAreaExpansion;
 	});
 }
 
@@ -70,27 +94,27 @@ export function tombstoneSidebarWorkspaceRecord(
  * workspace created by the CLI or an agent must not undo an explicit hide.
  */
 export function ensureSidebarProjectRecord(
-	collections: Pick<AppCollections, "v2SidebarProjects">,
+	collections: Pick<AppCollections, "sidebarProjects">,
 	projectId: string,
 	{ reveal = true }: { reveal?: boolean } = {},
 ): void {
-	const existing = collections.v2SidebarProjects.get(projectId);
+	const existing = collections.sidebarProjects.get(projectId);
 	if (existing) {
 		if (existing.isHidden && reveal) {
-			collections.v2SidebarProjects.update(projectId, (draft) => {
+			collections.sidebarProjects.update(projectId, (draft) => {
 				draft.isHidden = false;
 			});
 		}
 		return;
 	}
 
-	collections.v2SidebarProjects.insert({
+	collections.sidebarProjects.insert({
 		projectId,
 		createdAt: new Date(),
 		// Prepend, matching new workspaces: the project you just added is
 		// the one you're about to work in.
 		tabOrder: getPrependTabOrder([
-			...collections.v2SidebarProjects.state.values(),
+			...collections.sidebarProjects.state.values(),
 		]),
 		isCollapsed: false,
 		isHidden: false,
@@ -103,12 +127,12 @@ export function ensureSidebarProjectRecord(
  * reversible alternative to deleting the project: nothing on any host changes.
  */
 export function setSidebarProjectHidden(
-	collections: Pick<AppCollections, "v2SidebarProjects">,
+	collections: Pick<AppCollections, "sidebarProjects">,
 	projectId: string,
 	hidden: boolean,
 ): void {
-	if (!collections.v2SidebarProjects.get(projectId)) return;
-	collections.v2SidebarProjects.update(projectId, (draft) => {
+	if (!collections.sidebarProjects.get(projectId)) return;
+	collections.sidebarProjects.update(projectId, (draft) => {
 		draft.isHidden = hidden;
 	});
 }

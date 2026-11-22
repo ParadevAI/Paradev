@@ -1,3 +1,4 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { AGENT_DID } from "@/lib/agent-identity";
 import { API_URL, MCP_SERVER_URL } from "@/lib/llms";
@@ -16,11 +17,10 @@ export function GET() {
 	const entries = [
 		{
 			identifier: urn("mcp", "superset"),
-			displayName: "Superset MCP server",
+			displayName: `${BRAND.NAME} MCP server`,
 			type: "application/mcp-server-card+json",
 			url: `${baseUrl}/.well-known/mcp/server-card.json`,
-			description:
-				"Create Git-worktree workspaces, launch coding-agent sessions, open terminals, schedule automations, and manage tasks on behalf of a Superset user. OAuth 2.1 + PKCE or API key.",
+			description: `Create Git-worktree workspaces, launch coding-agent sessions, open terminals, set up automations, and manage tasks on behalf of a ${BRAND.NAME} user. OAuth 2.1 + PKCE or API key.`,
 			tags: [
 				"coding-agents",
 				"workspaces",
@@ -40,7 +40,7 @@ export function GET() {
 			],
 			representativeQueries: [
 				"create a workspace on a new branch and start Claude Code on it",
-				"list my open Superset tasks",
+				`list my open ${BRAND.NAME} tasks`,
 				"schedule a nightly agent run that audits the repo",
 				"show what my coding agents are doing right now",
 			],
@@ -48,36 +48,33 @@ export function GET() {
 		},
 		{
 			identifier: urn("mcp", "docs"),
-			displayName: "Superset docs MCP server",
+			displayName: `${BRAND.NAME} docs MCP server`,
 			type: "application/mcp-server-card+json",
 			url: `${docsUrl}/.well-known/mcp/server-card.json`,
-			description:
-				"Read-only search and retrieval over the Superset documentation. No authentication.",
+			description: `Read-only search and retrieval over the ${BRAND.NAME} documentation. No authentication.`,
 			tags: ["documentation", "search", "mcp"],
 			capabilities: ["docs_search", "docs_read"],
 			representativeQueries: [
-				"how do I install the Superset CLI",
-				"what does a Superset automation do",
+				`how do I install the ${BRAND.NAME} CLI`,
+				`what does a ${BRAND.NAME} automation do`,
 			],
 			trustManifest: TRUST,
 		},
 		{
 			identifier: urn("agent", "superset"),
-			displayName: "Superset agent card (A2A)",
+			displayName: `${BRAND.NAME} agent card (A2A)`,
 			type: "application/a2a-agent-card+json",
 			url: `${baseUrl}/.well-known/agent-card.json`,
-			description:
-				"A2A-style capability card for the Superset orchestration service. Skills: workspaces, agents, tasks, automations, terminals.",
+			description: `A2A-style capability card for the ${BRAND.NAME} orchestration service. Skills: workspaces, agents, tasks, automations, terminals.`,
 			tags: ["a2a", "orchestration", "coding-agents"],
 			trustManifest: TRUST,
 		},
 		{
 			identifier: urn("api", "superset"),
-			displayName: "Superset API",
+			displayName: `${BRAND.NAME} API`,
 			type: "application/vnd.oai.openapi+json;version=3.1",
 			url: `${API_URL}/openapi.json`,
-			description:
-				"OpenAPI 3.1 description of the Superset HTTP surface: the MCP endpoint, OAuth 2.1 endpoints, and discovery metadata.",
+			description: `OpenAPI 3.1 description of the ${BRAND.NAME} HTTP surface: the MCP endpoint, OAuth 2.1 endpoints, and discovery metadata.`,
 			tags: ["api", "openapi", "oauth"],
 			trustManifest: TRUST,
 		},
@@ -86,7 +83,7 @@ export function GET() {
 			displayName: name,
 			type: "application/ai-skill+md",
 			url: `${baseUrl}/.well-known/agent-skills/${name}/SKILL.md`,
-			description: `Agent skill: ${name.replace(/^superset-/, "")} with the Superset CLI and MCP server.`,
+			description: `Agent skill: ${name.replace(/^superset-/, "")} with the ${BRAND.NAME} CLI and MCP server.`,
 			tags: ["skill", "superset"],
 			trustManifest: TRUST,
 		})),
@@ -95,7 +92,7 @@ export function GET() {
 	const catalog = {
 		specVersion: "1.0",
 		host: {
-			displayName: COMPANY.NAME,
+			displayName: BRAND.INTRO_NAME,
 			identifier: AGENT_DID,
 			url: baseUrl,
 			documentationUrl: `${docsUrl}/mcp-server`,

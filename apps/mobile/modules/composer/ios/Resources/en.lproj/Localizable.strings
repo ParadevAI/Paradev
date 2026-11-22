@@ -15,3 +15,5 @@
 "Uploading" = "Uploading";
 "Upload failed" = "Upload failed";
 "Stop" = "Stop";
+"Dictation stopped. What was heard so far is in your message." = "Dictation stopped. What was heard so far is in your message.";
+"Transcription took too long. The last few words may be missing." = "Transcription took too long. The last few words may be missing.";

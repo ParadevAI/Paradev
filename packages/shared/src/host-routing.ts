@@ -1,3 +1,5 @@
+import { SANDBOX_API_CREDENTIAL_HEADER } from "./sandbox/gate";
+
 /**
  * Routing key the relay uses to identify a host service tunnel. The same
  * physical machine can be a host in multiple orgs, so machineId alone is
@@ -40,6 +42,11 @@ export const SUPERSET_USER_ID_HEADER = "x-superset-user-id";
  */
 export const SUPERSET_RELAYED_HEADER = "x-superset-relayed";
 
+/** Names the caller that asked a host to start an agent, for analytics only. */
+export const SUPERSET_LAUNCH_SOURCE_HEADER = "x-superset-launch-source";
+export const LAUNCH_SOURCES = ["cli", "automation"] as const;
+export type LaunchSource = (typeof LAUNCH_SOURCES)[number];
+
 /**
  * Headers a relay forwards to a host over its tunnel. The relay is the only
  * party that verified the caller's JWT, so it is the one that names the user:
@@ -54,13 +61,19 @@ export function buildUpstreamHeaders(
 ): Record<string, string> {
 	const headers: Record<string, string> = {};
 	for (const [key, value] of incoming.entries()) {
-		if (key === "host" || key === "authorization") continue;
-		if (key === SUPERSET_USER_ID_HEADER) continue;
+		if (NEVER_FORWARDED_HEADERS.has(key)) continue;
 		headers[key] = value;
 	}
 	headers[SUPERSET_USER_ID_HEADER] = userId;
 	return headers;
 }
+
+const NEVER_FORWARDED_HEADERS = new Set([
+	"host",
+	"authorization",
+	SANDBOX_API_CREDENTIAL_HEADER,
+	SUPERSET_USER_ID_HEADER,
+]);
 
 /** The host id for the cloud. A cloud workspace has no `v2_hosts` row. */
 export const CLOUD_HOST_ID = "cloud";

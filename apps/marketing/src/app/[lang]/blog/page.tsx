@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	const description = i18n._(
 		msg({
 			message:
-				"News, updates, and insights from the Superset team about parallel coding agents and developer productivity.",
+				"News, updates, and insights from the Paradev team about parallel coding agents and developer productivity.",
 		}),
 	);
 	return {
@@ -33,14 +33,14 @@ export async function generateMetadata(): Promise<Metadata> {
 			languages: localizedAlternates(lang, "/blog").languages,
 		},
 		openGraph: {
-			title: `${title} | Superset`,
+			title: `${title} | Paradev`,
 			description: description,
 			url: localeUrl(lang, "/blog"),
 			images: ["/og-image.png"],
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: `${title} | Superset`,
+			title: `${title} | Paradev`,
 			description: description,
 			images: ["/og-image.png"],
 		},
@@ -91,7 +91,7 @@ export default async function BlogPage() {
 					</h1>
 					<p className="text-muted-foreground mt-3 max-w-lg">
 						<Trans>
-							Insights from the Superset team about parallel coding agents and
+							Insights from the Paradev team about parallel coding agents and
 							developer productivity.
 						</Trans>
 					</p>

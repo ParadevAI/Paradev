@@ -1,0 +1,1 @@
+ALTER TABLE "automations" ADD COLUMN "archived_at" timestamp with time zone;

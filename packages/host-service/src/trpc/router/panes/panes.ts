@@ -1,4 +1,10 @@
-import { PANE_SPLIT_DIRECTIONS } from "@superset/shared/pane-layout-ops";
+import { presetForAcpHarness } from "@superset/chat/core";
+import {
+	allLayoutTabs,
+	PANE_AREAS,
+	PANE_SPLIT_DIRECTIONS,
+	SIDEBAR_TOOLS,
+} from "@superset/shared/pane-layout-ops";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -8,14 +14,18 @@ import { listTerminalSessions } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { createCallerFactory, protectedProcedure, router } from "../../index";
+import { requireChatSession } from "../sessions/session-service";
 import { terminalRouter } from "../terminal";
 import { addPaneDetails } from "./add-pane-details";
+import { closeChatsOnTerminal } from "./close-chats-on-terminal";
+import { resolveOpenPath } from "./resolve-open-path";
 
 const createTerminalCaller = createCallerFactory(terminalRouter);
 
 type PaneLayoutOp = Parameters<PaneLayoutBridgeClient["apply"]>[0]["op"];
 
 const direction = z.enum(PANE_SPLIT_DIRECTIONS);
+const area = z.enum(PANE_AREAS);
 const paneInput = z.object({ workspaceId: z.string(), paneId: z.string() });
 
 async function applyOp(
@@ -50,6 +60,26 @@ async function applyOp(
 				.map((binding) => [binding.terminalId, binding]),
 		),
 	});
+}
+
+function chatTabTarget(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	sessionId: string,
+) {
+	const { chat, session } = requireChatSession(ctx, workspaceId, sessionId);
+	const agentId = presetForAcpHarness(session.harness);
+	if (!agentId) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "This is not an ACP chat session.",
+		});
+	}
+	return {
+		sessionId,
+		terminalId: chat.live.get(sessionId)?.terminalId ?? sessionId,
+		agentId,
+	};
 }
 
 function requireWorkspaceTerminal(
@@ -94,12 +124,38 @@ export const panesRouter = router({
 		}),
 
 	newTab: protectedProcedure
-		.input(z.object({ workspaceId: z.string(), terminalId: z.string().min(1) }))
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				/** Exactly one of `terminalId` and `sessionId`. */
+				terminalId: z.string().min(1).optional(),
+				sessionId: z.string().min(1).optional(),
+				area: area.optional(),
+				focus: z.boolean().optional(),
+			}),
+		)
 		.mutation(({ ctx, input }) => {
-			requireWorkspaceTerminal(ctx, input.workspaceId, input.terminalId);
+			if (!input.terminalId === !input.sessionId) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Pass a terminalId or a sessionId, not both",
+				});
+			}
+			if (input.sessionId) {
+				return applyOp(ctx, input.workspaceId, {
+					type: "newTab",
+					chat: chatTabTarget(ctx, input.workspaceId, input.sessionId),
+					area: input.area,
+					focus: input.focus,
+				});
+			}
+			const terminalId = input.terminalId as string;
+			requireWorkspaceTerminal(ctx, input.workspaceId, terminalId);
 			return applyOp(ctx, input.workspaceId, {
 				type: "newTab",
-				terminalId: input.terminalId,
+				terminalId,
+				area: input.area,
+				focus: input.focus,
 			});
 		}),
 
@@ -132,7 +188,7 @@ export const panesRouter = router({
 		.input(paneInput.extend({ keepTerminal: z.boolean().default(false) }))
 		.mutation(async ({ ctx, input }) => {
 			const before = await applyOp(ctx, input.workspaceId, { type: "list" });
-			const terminalId = before.layout.tabs
+			const terminalId = allLayoutTabs(before.layout)
 				.flatMap((tab) => tab.panes)
 				.find((pane) => pane.id === input.paneId)?.terminalId;
 			const result = await applyOp(ctx, input.workspaceId, {
@@ -140,13 +196,14 @@ export const panesRouter = router({
 				paneId: input.paneId,
 				keepTerminal: input.keepTerminal,
 			});
-			// A live terminal left without a pane is re-adopted into a new tab
-			// by the desktop, so closing ends it unless it was backgrounded.
+			// A live terminal or chat left without a pane is re-adopted into a new
+			// tab by the desktop, so closing ends it unless it was backgrounded.
 			if (terminalId && !input.keepTerminal) {
 				await createTerminalCaller(ctx).killSession({
 					workspaceId: input.workspaceId,
 					terminalId,
 				});
+				await closeChatsOnTerminal(ctx, input.workspaceId, terminalId);
 			}
 			return { ...result, terminalId: terminalId ?? null };
 		}),
@@ -162,12 +219,15 @@ export const panesRouter = router({
 			}),
 		),
 
-	moveToNewTab: protectedProcedure.input(paneInput).mutation(({ ctx, input }) =>
-		applyOp(ctx, input.workspaceId, {
-			type: "moveToNewTab",
-			paneId: input.paneId,
-		}),
-	),
+	moveToNewTab: protectedProcedure
+		.input(paneInput.extend({ area: area.optional() }))
+		.mutation(({ ctx, input }) =>
+			applyOp(ctx, input.workspaceId, {
+				type: "moveToNewTab",
+				paneId: input.paneId,
+				area: input.area,
+			}),
+		),
 
 	swap: protectedProcedure
 		.input(paneInput.extend({ withPaneId: z.string() }))
@@ -176,6 +236,55 @@ export const panesRouter = router({
 				type: "swap",
 				paneId: input.paneId,
 				withPaneId: input.withPaneId,
+			}),
+		),
+
+	open: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				tool: z.enum(SIDEBAR_TOOLS),
+				url: z.string().min(1).optional(),
+				slug: z.string().min(1).optional(),
+				path: z.string().min(1).optional(),
+				line: z.number().int().positive().optional(),
+				background: z.boolean().optional(),
+			}),
+		)
+		.mutation(({ ctx, input }) => {
+			const { tool, path } = input;
+			const worktreePath = getLocalWorkspace(
+				ctx.db,
+				input.workspaceId,
+			)?.worktreePath;
+			const resolvedPath =
+				path && worktreePath && (tool === "file" || tool === "changes")
+					? resolveOpenPath(tool, path, worktreePath)
+					: path;
+			return applyOp(ctx, input.workspaceId, {
+				type: "open",
+				tool,
+				url: input.url,
+				slug: input.slug,
+				path: resolvedPath,
+				line: input.line,
+				background: input.background,
+			});
+		}),
+
+	sidebar: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				open: z.boolean(),
+				fullScreen: z.boolean().optional(),
+			}),
+		)
+		.mutation(({ ctx, input }) =>
+			applyOp(ctx, input.workspaceId, {
+				type: "sidebar",
+				open: input.open,
+				fullScreen: input.fullScreen,
 			}),
 		),
 });

@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import { connections } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import {
 	connectorMethod,
 	requireConnector,
@@ -42,9 +43,9 @@ export async function GET(request: Request) {
 		signal: AbortSignal.timeout(GOOGLE_CALL_TIMEOUT_MS),
 		body: new URLSearchParams({
 			grant_type: "authorization_code",
-			client_id: env.GOOGLE_CLIENT_ID,
-			client_secret: env.GOOGLE_CLIENT_SECRET,
-			redirect_uri: `${env.NEXT_PUBLIC_API_URL}/api/integrations/google/callback`,
+			client_id: env.GOOGLE_CONNECTIONS_CLIENT_ID,
+			client_secret: env.GOOGLE_CONNECTIONS_CLIENT_SECRET,
+			redirect_uri: `${getBrowserApiUrl(env)}/api/integrations/google/callback`,
 			code: params.code,
 		}),
 	});

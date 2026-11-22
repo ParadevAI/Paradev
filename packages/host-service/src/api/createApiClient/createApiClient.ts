@@ -66,7 +66,7 @@ export function createApiClient(
 					// Pin every host→cloud request to this host's bound org. The
 					// host's session-exchanged JWT (better-auth jwt plugin) only
 					// carries `organizationIds`, not a singular active org, so
-					// `protectedProcedure` would otherwise reject any call that
+					// `personProcedure` would otherwise reject any call that
 					// reads `ctx.activeOrganizationId`. The cloud middleware
 					// validates membership before honoring this header.
 					return {

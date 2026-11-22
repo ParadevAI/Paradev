@@ -190,7 +190,7 @@ describe("agy agent registration", () => {
 		});
 
 		expect(command).toStartWith(
-			"agy --mode accept-edits -i \"$(cat <<'SUPERSET_PROMPT_agy1234'",
+			"agy --dangerously-skip-permissions -i \"$(cat <<'SUPERSET_PROMPT_agy1234'",
 		);
 		expect(command).toEndWith('\n)"');
 	});
@@ -198,7 +198,7 @@ describe("agy agent registration", () => {
 	it("derives host preset args and id-based resume from the base command", () => {
 		const preset = getPresetById("agy");
 		expect(preset?.command).toBe("agy");
-		expect(preset?.args).toEqual(["--mode", "accept-edits"]);
+		expect(preset?.args).toEqual(["--dangerously-skip-permissions"]);
 		expect(preset?.promptArgs).toEqual(["-i"]);
 		expect(preset?.resumeArgs).toEqual(["--conversation"]);
 	});
@@ -359,7 +359,6 @@ describe("pdev agent registration", () => {
 
 	it("is enabled only while the pdev-agent flag is active", () => {
 		expect(isAgentPresetEnabled("pdev", [])).toBe(false);
-		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.ACP_CHAT])).toBe(false);
 		expect(isAgentPresetEnabled("pdev", [FEATURE_FLAGS.PDEV_AGENT])).toBe(true);
 		expect(isAgentPresetEnabled("pi", [])).toBe(true);
 		expect(isAgentPresetEnabled("custom:pdev", [])).toBe(true);

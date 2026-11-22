@@ -8,9 +8,14 @@ import {
 	AmbiguousConnectionError,
 	AmbiguousPluginError,
 	buildPluginServer,
+	endUpstreamSessions,
 	PluginTargetError,
 	resolveTarget,
+	sandboxAllowsPlugin,
+	upstreamSessions,
 } from "@superset/trpc/plugins-proxy";
+import { Redis } from "@upstash/redis";
+import { z } from "zod";
 import { env } from "@/env";
 import {
 	checkRateLimit,
@@ -22,6 +27,15 @@ import {
 	mcpProtectedResourceMetadataUrl,
 	mcpUnauthorizedResponse,
 } from "@/lib/oauth-metadata";
+import { callerSessionId, withIssuedSessionId } from "./utils/callerSession";
+
+// Retries would hold every tool call for seconds while Redis is down, and the
+// session store already falls back to no stored session.
+const redis = new Redis({
+	url: env.KV_REST_API_URL,
+	token: env.KV_REST_API_TOKEN,
+	retry: { retries: 0 },
+});
 
 interface RouteParams {
 	params: Promise<{ marketplace: string; plugin: string }>;
@@ -47,9 +61,9 @@ function describeServer(
 			marketplace,
 			transport: "streamable-http",
 			url: `${origin}/mcp/plugins/${marketplace}/${plugin}`,
-			description: `Superset MCP endpoint for the "${plugin}" plugin. Tools run against the calling user's connected ${plugin} account.`,
+			description: `Paradev MCP endpoint for the "${plugin}" plugin. Tools run against the calling user's connected ${plugin} account.`,
 			usage:
-				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Superset API key). Add ?connection=<id> to pin a specific connected account.",
+				"POST JSON-RPC 2.0 messages to this URL with `Accept: application/json, text/event-stream` and a Bearer token (OAuth 2.1 access token or Paradev API key). Add ?connection=<id> to pin a specific connected account.",
 			authentication: {
 				type: "oauth2",
 				resourceMetadataUrl: mcpProtectedResourceMetadataUrl(req),
@@ -95,6 +109,44 @@ async function handle(
 		throw error;
 	}
 
+	const connectionId = new URL(req.url).searchParams.get("connection");
+	if (connectionId && !z.uuid().safeParse(connectionId).success) {
+		return withRateLimitHeaders(
+			errorResponse(
+				"INVALID_CONNECTION",
+				"connection must be a connection id.",
+				400,
+			),
+			rateLimitState,
+		);
+	}
+
+	if (
+		ctx.source === "sandbox" &&
+		!(
+			ctx.sandboxWorkspaceId &&
+			(await sandboxAllowsPlugin({
+				workspaceId: ctx.sandboxWorkspaceId,
+				marketplace,
+				plugin,
+			}))
+		)
+	) {
+		return withRateLimitHeaders(
+			errorResponse(
+				"PLUGIN_NOT_ALLOWED",
+				`This environment does not allow the ${plugin} plugin.`,
+				403,
+			),
+			rateLimitState,
+		);
+	}
+
+	const sessionId = callerSessionId(req);
+	const sessions = sessionId
+		? upstreamSessions(redis, ctx.userId, sessionId)
+		: undefined;
+
 	let server: Awaited<ReturnType<typeof buildPluginServer>>;
 	try {
 		const target = await resolveTarget({
@@ -102,9 +154,12 @@ async function handle(
 			organizationId: ctx.organizationId,
 			marketplace,
 			plugin,
-			connectionId: new URL(req.url).searchParams.get("connection"),
+			connectionId,
 		});
-		server = await buildPluginServer(target);
+		if (req.method === "DELETE" && sessions) {
+			await endUpstreamSessions(target, sessions);
+		}
+		server = await buildPluginServer(target, { sessions });
 	} catch (error) {
 		if (error instanceof PluginTargetError) {
 			return withRateLimitHeaders(
@@ -138,7 +193,10 @@ async function handle(
 			extra: { mcpContext: ctx },
 		},
 	});
-	return withRateLimitHeaders(response, rateLimitState);
+	return withRateLimitHeaders(
+		withIssuedSessionId(req, response),
+		rateLimitState,
+	);
 }
 
 export const maxDuration = 800;

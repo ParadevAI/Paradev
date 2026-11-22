@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -69,6 +69,7 @@ function mockFetch(
 
 afterEach(() => {
 	globalThis.fetch = originalFetch;
+	mock.restore();
 });
 
 describe("JwtApiAuthProvider with config-backed host auth", () => {
@@ -374,5 +375,86 @@ describe("JwtApiAuthProvider with config-backed host auth", () => {
 			Authorization: "Bearer static.jwt.token",
 		});
 		expect(fetchMock).not.toHaveBeenCalled();
+	});
+});
+
+describe("JwtApiAuthProvider mint failures", () => {
+	function sessionProvider(
+		getSessionToken: () => Promise<string>,
+		mintTimeoutMs?: number,
+	) {
+		return new JwtApiAuthProvider({
+			getSessionToken,
+			apiUrl: API_URL,
+			mintTimeoutMs,
+		});
+	}
+
+	test("a rejected mint waits out a growing backoff before calling the API again", async () => {
+		let now = 1_000_000;
+		spyOn(Date, "now").mockImplementation(() => now);
+		const fetchMock = mockFetch(
+			async () => new Response(null, { status: 401 }),
+		);
+		const provider = sessionProvider(async () => "session-token");
+
+		await expect(provider.getJwt()).rejects.toThrow("Failed to mint JWT: 401");
+		await expect(provider.getJwt()).rejects.toThrow("Failed to mint JWT: 401");
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+
+		now += 5_000;
+		await expect(provider.getJwt()).rejects.toThrow();
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+
+		now += 5_000;
+		await expect(provider.getJwt()).rejects.toThrow();
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+
+		now += 5_000;
+		await expect(provider.getJwt()).rejects.toThrow();
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+	});
+
+	test("a new session token mints right away after a rejection", async () => {
+		let sessionToken = "old-session";
+		const fetchMock = mockFetch(async (_input, init) => {
+			const auth = new Headers(init?.headers).get("authorization");
+			return auth === "Bearer new-session"
+				? Response.json({ token: "minted.jwt.token" })
+				: new Response(null, { status: 401 });
+		});
+		const provider = sessionProvider(async () => sessionToken);
+
+		await expect(provider.getJwt()).rejects.toThrow();
+		sessionToken = "new-session";
+		await expect(provider.getJwt()).resolves.toBe("minted.jwt.token");
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	test("concurrent callers share one mint request", async () => {
+		const fetchMock = mockFetch(async () =>
+			Response.json({ token: "minted.jwt.token" }),
+		);
+		const provider = sessionProvider(async () => "session-token");
+
+		const tokens = await Promise.all([provider.getJwt(), provider.getJwt()]);
+		expect(tokens).toEqual(["minted.jwt.token", "minted.jwt.token"]);
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+	});
+
+	test("a stalled mint gives up at its deadline instead of holding every caller", async () => {
+		mockFetch(
+			(_input, init) =>
+				new Promise<Response>((_resolve, reject) => {
+					init?.signal?.addEventListener("abort", () =>
+						reject(init.signal?.reason),
+					);
+				}),
+		);
+		const provider = sessionProvider(async () => "session-token", 20);
+
+		await expect(
+			Promise.all([provider.getJwt(), provider.getJwt()]),
+		).rejects.toThrow();
 	});
 });

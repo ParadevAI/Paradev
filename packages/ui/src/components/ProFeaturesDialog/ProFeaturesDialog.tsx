@@ -47,7 +47,7 @@ export function ProFeaturesDialog({
 						<Trans>Cancel</Trans>
 					</Button>
 					<Button onClick={onUpgrade}>
-						<Trans>Get Superset Pro</Trans>
+						<Trans>Get Paradev Pro</Trans>
 					</Button>
 				</div>
 			</DialogContent>

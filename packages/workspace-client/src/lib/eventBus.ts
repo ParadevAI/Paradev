@@ -516,6 +516,16 @@ export function reconnectEventBusIfDown(hostUrl: string): void {
 	setConnectionStatus(state, { state: "connecting" });
 }
 
+/**
+ * A host's connection status, or undefined when nothing holds a connection to
+ * it. Never creates a connection, so render code can call it.
+ */
+export function peekEventBusConnectionStatus(
+	hostUrl: string,
+): HostConnectionStatus | undefined {
+	return connections.get(hostUrl)?.status;
+}
+
 function maybeCleanupConnection(hostUrl: string): void {
 	const key = hostUrl;
 	const state = connections.get(key);

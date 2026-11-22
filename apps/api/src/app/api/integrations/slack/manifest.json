@@ -1,9 +1,9 @@
 {
 	"display_information": {
-		"name": "Superset",
-		"description": "Superset's supercharged AI coding assistant",
+		"name": "Paradev",
+		"description": "Paradev (formerly Superset), a supercharged AI coding assistant",
 		"background_color": "#0a0a0a",
-		"long_description": "Supercharge your coding workflows with Superset, an AI Coding agent. Spin up a cloud sandbox, open worktrees on your desktop app, or plan out work. Just start a DM with Superset for instant access without leaving Slack.\r\n\r\nSuperset can make mistakes. Please take care with prompts."
+		"long_description": "Supercharge your coding workflows with Paradev, an AI Coding agent. Spin up a cloud sandbox, open worktrees on your desktop app, or plan out work. Just start a DM with Paradev for instant access without leaving Slack.\r\n\r\nSuperset can make mistakes. Please take care with prompts."
 	},
 	"features": {
 		"app_home": {
@@ -12,16 +12,16 @@
 			"messages_tab_read_only_enabled": false
 		},
 		"bot_user": {
-			"display_name": "Superset",
+			"display_name": "Paradev",
 			"always_online": true
 		},
-		"unfurl_domains": ["app.superset.sh"],
+		"unfurl_domains": ["app.superset.sh", "app.paradev.com"],
 		"assistant_view": {
-			"assistant_description": "Superset's AI Coding Agent - spin up sandboxes, plan out work, run agents and more",
+			"assistant_description": "Paradev's AI Coding Agent - spin up sandboxes, plan out work, run agents and more",
 			"suggested_prompts": [
 				{
 					"title": "Create Task",
-					"message": "Help me create a task for learning about how the Superset Slack agent works"
+					"message": "Help me create a task for learning about how the Paradev Slack agent works"
 				}
 			]
 		},

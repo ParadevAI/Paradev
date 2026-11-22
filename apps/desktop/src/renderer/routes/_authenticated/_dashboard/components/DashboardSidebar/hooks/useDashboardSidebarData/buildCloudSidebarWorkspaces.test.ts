@@ -1,5 +1,4 @@
 import { describe, expect, it } from "bun:test";
-import { cloudPullRequestRefKey } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import {
 	type BuildCloudSidebarWorkspacesParams,
 	buildCloudSidebarWorkspaces,
@@ -20,7 +19,7 @@ function makeCloudWorkspace(
 		createdAt: DATE,
 		updatedAt: DATE,
 		agentStatusAt: null,
-		createdBy: { userId: ME },
+		createdBy: { userId: ME, name: "Me", image: null },
 		...overrides,
 	};
 }
@@ -48,13 +47,35 @@ function build(overrides: Partial<BuildCloudSidebarWorkspacesParams> = {}) {
 		projects: [],
 		repoFullNameById: new Map(),
 		branchById: new Map(),
-		pullRequestsByRef: new Map(),
+		pullRequestsById: new Map(),
 		unknownRepoProjectName: "Cloud",
 		...overrides,
 	});
 }
 
 describe("buildCloudSidebarWorkspaces", () => {
+	it("carries the server's sandbox status, so only an asleep row reads asleep", () => {
+		const layout = build({
+			cloudWorkspaces: [
+				makeCloudWorkspace({ id: "asleep", status: "asleep" }),
+				makeCloudWorkspace({ id: "awake", status: "awake" }),
+				makeCloudWorkspace({ id: "older-api" }),
+				makeCloudWorkspace({ id: "provisioning", status: "provisioning" }),
+			],
+		});
+		const statusById = Object.fromEntries(
+			layout.repoProjects
+				.flatMap((project) => project.cloudWorkspaces)
+				.map((row) => [row.id, row.sandboxStatus]),
+		);
+		expect(statusById).toEqual({
+			asleep: "asleep",
+			awake: null,
+			"older-api": null,
+			provisioning: "provisioning",
+		});
+	});
+
 	it("files a workspace under the project with the same GitHub repo", () => {
 		const layout = build({
 			cloudWorkspaces: [makeCloudWorkspace({ id: "ws-1" })],
@@ -144,13 +165,18 @@ describe("buildCloudSidebarWorkspaces", () => {
 				makeCloudWorkspace({ id: "mine" }),
 				makeCloudWorkspace({
 					id: "theirs-opted-in",
-					createdBy: { userId: "user-other" },
+					createdBy: { userId: "user-other", name: "Other", image: null },
 				}),
 			],
 		});
 
 		const rows = layout.repoProjects[0]?.cloudWorkspaces ?? [];
 		expect(rows.map((row) => row.isMine)).toEqual([true, false]);
+		expect(rows[1]?.creator).toEqual({
+			userId: "user-other",
+			name: "Other",
+			image: null,
+		});
 	});
 
 	it("orders rows by latest agent message first", () => {
@@ -174,20 +200,28 @@ describe("buildCloudSidebarWorkspaces", () => {
 		);
 	});
 
-	it("looks the pull request up by repo and the live branch", () => {
+	it("ranks a row with no agent message by creation, not by updatedAt", () => {
+		const layout = build({
+			cloudWorkspaces: [
+				makeCloudWorkspace({
+					id: "restarted",
+					updatedAt: new Date("2026-01-05T00:00:00.000Z"),
+				}),
+			],
+		});
+
+		const rows = layout.repoProjects[0]?.cloudWorkspaces ?? [];
+		expect(rows[0]?.lastActivityAt).toBe(DATE.getTime());
+	});
+
+	it("badges the workspace's first pull request, on the live branch", () => {
 		const pullRequest = makePullRequest({ isDraft: true });
 		const layout = build({
 			cloudWorkspaces: [makeCloudWorkspace({ id: "ws-1", branch: "stale" })],
 			repoFullNameById: new Map([["ws-1", "acme/app"]]),
 			branchById: new Map([["ws-1", "live"]]),
-			pullRequestsByRef: new Map([
-				[
-					cloudPullRequestRefKey({
-						repoFullName: "acme/app",
-						headBranch: "live",
-					}),
-					pullRequest,
-				],
+			pullRequestsById: new Map([
+				["ws-1", [pullRequest, makePullRequest({ number: 8 })]],
 			]),
 		});
 

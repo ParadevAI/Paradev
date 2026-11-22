@@ -6,13 +6,22 @@ import { autumnClient } from "../../../autumn";
 import { env } from "../../../env";
 import { stripeClient } from "../../../stripe";
 import { countBillableSeats } from "../../../utils/billing";
-import { ensureAutumnCustomer, paidAutumnPlanId } from "../autumn/customer";
+import { catalogAutumnPlans } from "../autumn/catalog";
+import {
+	ensureAutumnCustomer,
+	heldAutumnPlanId,
+	paidAutumnPlanId,
+} from "../autumn/customer";
+import { SEATS_FEATURE_ID } from "../autumn/features";
 import {
 	completeCheckout,
 	syncFromStripeEvent,
 	syncOrganizationSubscription,
 } from "../autumn/projection";
+import { yearlyRenewalStart } from "../autumn/routes";
+import { seatPurchase } from "../autumn/seats";
 import { handleStripeBillingEvent } from "../stripe-billing-events";
+import { currentPlanIdForLegacy, isProFamilyPlan } from "./plan-ids";
 import { stripeFallback } from "./stripe-fallback";
 import type { AutumnBillingDeps } from "./stripe-routes-shim";
 
@@ -30,7 +39,31 @@ const SYNCED_STRIPE_EVENTS = new Set([
 export function autumnBillingDeps(): AutumnBillingDeps {
 	const autumn = autumnClient;
 	return {
-		attach: (params) => autumn.billing.attach(params),
+		attach: async ({ featureQuantities, ...params }) => {
+			const quantity = featureQuantities?.find(
+				(item) => item.featureId === SEATS_FEATURE_ID,
+			)?.quantity;
+			if (quantity === undefined)
+				throw new Error("Missing checkout seat quantity");
+			const planId = currentPlanIdForLegacy(
+				params.planId,
+				await catalogAutumnPlans(),
+			);
+			const { quantities } = await seatPurchase(planId, quantity);
+			const startsAt = await yearlyRenewalStart(params.customerId, planId, () =>
+				autumn.billing.previewAttach({
+					customerId: params.customerId,
+					planId,
+					...quantities,
+				}),
+			);
+			return autumn.billing.attach({
+				...params,
+				planId,
+				...quantities,
+				...(startsAt && { startsAt }),
+			});
+		},
 		update: (params) => autumn.billing.update(params),
 		managedByAutumn: async (organizationId) =>
 			(await paidAutumnPlanId(organizationId).catch(() => null)) !== null,
@@ -39,7 +72,9 @@ export function autumnBillingDeps(): AutumnBillingDeps {
 			yearly: env.STRIPE_PRO_YEARLY_PRICE_ID,
 		}),
 		ensureCustomer: ensureAutumnCustomer,
-		currentPlanId: paidAutumnPlanId,
+		currentPlanId: heldAutumnPlanId,
+		isProFamilyPlan: async (planId) =>
+			isProFamilyPlan(planId, await catalogAutumnPlans()),
 		findLiveSubscription: async (organizationId) =>
 			(await db.query.subscriptions.findFirst({
 				where: and(

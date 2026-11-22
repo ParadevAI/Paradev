@@ -164,4 +164,14 @@ describe("terminal.daemon tRPC procedures", () => {
 		expect(result.ok).toBe(false);
 		expect(result.ok === false ? result.reason : "").toMatch(/ENOSPC/);
 	});
+
+	test("terminal.hasRunningProcess returns false asynchronously for unknown sessions", async () => {
+		const caller = makeCaller();
+		const result = await caller.terminal.hasRunningProcess({
+			terminalId: "missing-terminal",
+			workspaceId: "missing-workspace",
+		});
+
+		expect(result).toEqual({ running: false });
+	});
 });

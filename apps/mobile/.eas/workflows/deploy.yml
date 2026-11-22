@@ -16,7 +16,7 @@ on:
 
 defaults:
   tools:
-    bun: 1.4.2
+    bun: 1.4.3
 
 jobs:
   fingerprint:
@@ -74,13 +74,38 @@ jobs:
     params:
       build_id: ${{ needs.build_production.outputs.build_id }}
 
+  get_production_build_android:
+    name: Find Android production build for this fingerprint
+    needs: [fingerprint]
+    type: get-build
+    params:
+      platform: android
+      profile: production
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      wait_for_in_progress: true
+
+  build_production_android:
+    name: Build Android production
+    needs: [get_production_build_android]
+    if: ${{ !needs.get_production_build_android.outputs.build_id }}
+    type: build
+    params:
+      platform: android
+      profile: production
+
+  upload_to_play_internal:
+    name: Upload to the Play internal track
+    needs: [build_production_android]
+    type: submit
+    params:
+      build_id: ${{ needs.build_production_android.outputs.build_id }}
+
   publish_preview:
     name: Publish update to preview
     needs: [fingerprint_preview]
     type: update
     environment: preview
     params:
-      platform: ios
       channel: preview
       private_key_path: $UPDATES_SIGNING_KEY
       upload_sentry_sourcemaps: true
@@ -91,7 +116,6 @@ jobs:
     type: update
     environment: production
     params:
-      platform: ios
       channel: production
       private_key_path: $UPDATES_SIGNING_KEY
       upload_sentry_sourcemaps: true

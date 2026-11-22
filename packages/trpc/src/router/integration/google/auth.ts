@@ -12,6 +12,7 @@ import {
 	encryptOptional,
 	encryptSecret,
 } from "../../../lib/connectors";
+import { markDisconnected } from "../token-refresh";
 import {
 	GOOGLE_SCOPES,
 	REFRESH_BUFFER_MS,
@@ -48,7 +49,7 @@ const LEGACY_FLOW_SCOPES = new Set<string>([
 
 /**
  * A refresh token only works with the client that issued it, and no column
- * records which. Connector-flow rows (GOOGLE_TEMP client) carry wider scopes.
+ * records which. Connector-flow rows (GOOGLE_CONNECTIONS client) carry wider scopes.
  */
 export function refreshClientsFor(
 	scopes: string[] | null,
@@ -66,10 +67,10 @@ function configuredRefreshClients(scopes: string[] | null) {
 	return refreshClientsFor(
 		scopes,
 		{ clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET },
-		env.GOOGLE_TEMP_CLIENT_ID && env.GOOGLE_TEMP_CLIENT_SECRET
+		env.GOOGLE_CONNECTIONS_CLIENT_ID && env.GOOGLE_CONNECTIONS_CLIENT_SECRET
 			? {
-					clientId: env.GOOGLE_TEMP_CLIENT_ID,
-					clientSecret: env.GOOGLE_TEMP_CLIENT_SECRET,
+					clientId: env.GOOGLE_CONNECTIONS_CLIENT_ID,
+					clientSecret: env.GOOGLE_CONNECTIONS_CLIENT_SECRET,
 				}
 			: null,
 	);
@@ -165,14 +166,9 @@ class ConnectionOAuth2Client extends OAuth2Client {
 			} catch (error) {
 				// The grant was revoked (or the app's access removed in the account
 				// settings). Nothing here can recover it; the person has to reconnect.
+				// Not through `tx`: the rethrow rolls it back.
 				if (isInvalidGrant(error)) {
-					await tx
-						.update(connections)
-						.set({
-							disconnectedAt: new Date(),
-							disconnectReason: "invalid_grant",
-						})
-						.where(eq(connections.id, this.connectionId));
+					await markDisconnected(this.connectionId, "invalid_grant");
 				}
 				throw error;
 			}

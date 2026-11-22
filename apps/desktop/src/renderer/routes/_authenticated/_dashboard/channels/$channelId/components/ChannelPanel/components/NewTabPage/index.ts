@@ -1,0 +1,1 @@
+export { NewTabPage } from "./NewTabPage";

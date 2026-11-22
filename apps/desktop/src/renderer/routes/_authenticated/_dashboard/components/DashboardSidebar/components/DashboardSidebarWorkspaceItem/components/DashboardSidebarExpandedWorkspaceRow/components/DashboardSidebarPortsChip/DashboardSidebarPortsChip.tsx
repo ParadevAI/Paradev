@@ -30,10 +30,8 @@ export function DashboardSidebarPortsChip({
 }: DashboardSidebarPortsChipProps) {
 	const { t } = useLingui();
 	const { isPending, killPorts } = useDashboardSidebarPortKill();
-	const { isOpen, onOpenChange, onPointerEnter, onPointerLeave, toggleOpen } =
-		useDashboardSidebarChipHoverSuppression({
-			suppressWorkspaceCardOn: "open",
-		});
+	const { isOpen, onOpenChange, onPointerLeave, toggleOpen } =
+		useDashboardSidebarChipHoverSuppression();
 	const safeTriangle = useHoverCardSafeTriangle(isOpen, onOpenChange);
 
 	const handleCloseAll = async () => {
@@ -62,7 +60,6 @@ export function DashboardSidebarPortsChip({
 			<HoverCardTrigger asChild>
 				<button
 					type="button"
-					onPointerEnter={onPointerEnter}
 					onPointerLeave={(event) => {
 						onPointerLeave();
 						safeTriangle.onTriggerPointerLeave(event);
@@ -86,14 +83,14 @@ export function DashboardSidebarPortsChip({
 						isOpen
 							? t({
 									message: plural(ports.length, {
-										one: "# active port — hide details",
-										other: "# active ports — hide details",
+										one: "# active port: hide details",
+										other: "# active ports: hide details",
 									}),
 								})
 							: t({
 									message: plural(ports.length, {
-										one: "# active port — show details",
-										other: "# active ports — show details",
+										one: "# active port: show details",
+										other: "# active ports: show details",
 									}),
 								})
 					}

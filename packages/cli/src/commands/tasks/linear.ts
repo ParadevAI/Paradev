@@ -55,7 +55,7 @@ export function rejectUnsupported(options: Record<string, unknown>) {
 	if (passed.length > 0) {
 		throw new CLIError(
 			`Not supported for Linear issues: ${passed.join(", ")}`,
-			"Pass --tracker superset to work on Superset tasks",
+			"Pass --tracker superset to work on Paradev tasks",
 		);
 	}
 }

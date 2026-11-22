@@ -49,7 +49,7 @@ export function register(server: McpServer): void {
 				.min(1)
 				.optional()
 				.describe(
-					"The agent CLI's own session id to restore instead of starting fresh (e.g. `claude --resume <id>`). NOT the `sessionId` this tool returns — that is a Superset terminal id. Use the id the agent reported (e.g. from the agent's own session list). Fails for agents without an id-based resume.",
+					"The agent CLI's own session id to restore instead of starting fresh (e.g. `claude --resume <id>`). NOT the `sessionId` this tool returns — that is a Paradev terminal id. Use the id the agent reported (e.g. from the agent's own session list). Fails for agents without an id-based resume.",
 				),
 			attachmentIds: z
 				.array(z.string().uuid())

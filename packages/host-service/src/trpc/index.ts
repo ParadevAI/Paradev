@@ -11,9 +11,13 @@ import type { HostServiceContext } from "../types";
 import { readErrorDiagnostics } from "./error-diagnostics";
 import {
 	type DeleteInProgressCause,
+	type GitEnvironmentReason,
 	isDeleteInProgressCause,
+	isGitEnvironmentCause,
+	isProjectDirMissingCause,
 	isProjectNotSetupCause,
 	isTeardownFailureCause,
+	type ProjectDirMissingCause,
 	type ProjectNotSetupCause,
 	type TeardownFailureCause,
 } from "./error-types";
@@ -56,10 +60,19 @@ const t = initTRPC
 							projectId: error.cause.projectId,
 						}
 					: undefined;
+			const projectDirMissing: ProjectDirMissingCause | undefined =
+				isProjectDirMissingCause(error.cause)
+					? { kind: "PROJECT_DIR_MISSING", repoPath: error.cause.repoPath }
+					: undefined;
 			const deleteInProgress: DeleteInProgressCause | undefined =
 				isDeleteInProgressCause(error.cause)
 					? { kind: "DELETE_IN_PROGRESS" }
 					: undefined;
+			const gitEnvironment:
+				| { kind: "GIT_ENVIRONMENT"; reason: GitEnvironmentReason | null }
+				| undefined = isGitEnvironmentCause(error.cause)
+				? { kind: "GIT_ENVIRONMENT", reason: error.cause.reason ?? null }
+				: undefined;
 			const i18nCause = isI18nErrorCause(error.cause) ? error.cause : null;
 			return {
 				...shape,
@@ -67,7 +80,9 @@ const t = initTRPC
 					...shape.data,
 					teardownFailure,
 					projectNotSetup,
+					projectDirMissing,
 					deleteInProgress,
+					gitEnvironment,
 					i18nKey: i18nCause?.i18nKey ?? null,
 					i18nParams: i18nCause?.i18nParams ?? null,
 				},

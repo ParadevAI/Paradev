@@ -99,17 +99,21 @@ function expandTildeAbsolute(input: string): string {
 	return normalize(trimmed);
 }
 
+function translateWorkspaceNotFound(error: unknown): never {
+	if (error instanceof WorkspaceNotFoundError) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: error.message,
+		});
+	}
+	throw error;
+}
+
 function getFilesystemService(ctx: HostServiceContext, workspaceId: string) {
 	try {
 		return ctx.runtime.filesystem.getServiceForWorkspace(workspaceId);
 	} catch (error) {
-		if (error instanceof WorkspaceNotFoundError) {
-			throw new TRPCError({
-				code: "NOT_FOUND",
-				message: error.message,
-			});
-		}
-		throw error;
+		translateWorkspaceNotFound(error);
 	}
 }
 
@@ -230,9 +234,21 @@ export const filesystemRouter = router({
 		.query(async ({ ctx, input, signal }) => {
 			const { workspaceId, ...serviceInput } = input;
 			const service = getFilesystemService(ctx, workspaceId);
-			return await withFsErrorTranslation(() =>
-				service.listDirectory(serviceInput, { signal }),
-			);
+			try {
+				return await withFsErrorTranslation(() =>
+					service.listDirectory(serviceInput, { signal }),
+				);
+			} catch (error) {
+				// The HTTP server aborts the request with a string reason when the
+				// client disconnects; throwIfAborted() rethrows that string as-is.
+				if (signal?.aborted && error === signal.reason) {
+					throw new TRPCError({
+						code: "CLIENT_CLOSED_REQUEST",
+						message: String(signal.reason),
+					});
+				}
+				throw error;
+			}
 		}),
 
 	readFile: queryProcedure
@@ -303,9 +319,14 @@ export const filesystemRouter = router({
 				resolvedPath: string;
 				isDirectory: boolean;
 			} | null> => {
-				const resolvedRoot = ctx.runtime.filesystem.resolveWorkspaceRoot(
-					input.workspaceId,
-				);
+				let resolvedRoot: string;
+				try {
+					resolvedRoot = ctx.runtime.filesystem.resolveWorkspaceRoot(
+						input.workspaceId,
+					);
+				} catch (error) {
+					translateWorkspaceNotFound(error);
+				}
 
 				let targetPath: string;
 				if (input.path.startsWith("~")) {

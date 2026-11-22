@@ -41,17 +41,25 @@ export async function connectPluginMcp(
 	name: string,
 	auth: { bearer: string; organizationId: string | undefined },
 	connection?: string,
-): Promise<{ client: Client; ref: PluginRef }> {
+	sessionId?: string,
+): Promise<{
+	client: Client;
+	transport: StreamableHTTPClientTransport;
+	ref: PluginRef;
+}> {
 	const ref = parsePluginRef(name);
 	const client = new Client({ name: "superset-cli", version: "1.0.0" });
+	const transport = new StreamableHTTPClientTransport(
+		pluginMcpUrl(ref, connection),
+		{
+			requestInit: {
+				headers: pluginMcpHeaders(auth.bearer, auth.organizationId),
+			},
+			sessionId,
+		},
+	);
 	try {
-		await client.connect(
-			new StreamableHTTPClientTransport(pluginMcpUrl(ref, connection), {
-				requestInit: {
-					headers: pluginMcpHeaders(auth.bearer, auth.organizationId),
-				},
-			}),
-		);
+		await client.connect(transport);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		// The server answers 409 AMBIGUOUS_CONNECTION when the plugin's connector
@@ -66,5 +74,5 @@ export async function connectPluginMcp(
 			hint,
 		);
 	}
-	return { client, ref };
+	return { client, transport, ref };
 }

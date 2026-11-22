@@ -9,12 +9,12 @@ export interface SidebarCardEntry {
 	/** Stable identity — drives the animation key and "did the winner change". */
 	id: string;
 	badge?: string;
+	tone?: "default" | "warning";
 	title: string;
 	description?: string;
 	actionLabel?: string;
 	onAction?: () => void;
-	/** Omit to make the card non-dismissible. */
-	onDismiss?: () => void;
+	onDismiss: () => void;
 	onClick?: () => void;
 	media?: ReactNode;
 	className?: string;

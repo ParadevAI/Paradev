@@ -2,10 +2,15 @@ import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import { Webhooks } from "@octokit/webhooks";
 import { db } from "@superset/db/client";
 import {
+	cloudWorkspacePullRequests,
+	cloudWorkspaceRepositories,
+	cloudWorkspaces,
 	githubInstallations,
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import { queueRulesReapply } from "@superset/trpc/lib/sandbox";
+import { nudge } from "@superset/trpc/realtime";
 import { and, eq } from "drizzle-orm";
 
 import { env } from "@/env";
@@ -50,12 +55,16 @@ webhooks.on(
 			"[github/webhook] Installation unsuspended:",
 			payload.installation.id,
 		);
-		await db
+		const installations = await db
 			.update(githubInstallations)
 			.set({ suspended: false, suspendedAt: null })
 			.where(
 				eq(githubInstallations.installationId, String(payload.installation.id)),
-			);
+			)
+			.returning({ organizationId: githubInstallations.organizationId });
+		for (const { organizationId } of installations) {
+			await queueRulesReapply({ organizationId });
+		}
 	},
 );
 
@@ -126,7 +135,42 @@ webhooks.on(
 	},
 );
 
-function upsertPullRequest(
+async function nudgeCloudWorkspacesShowing(
+	repo: { id: string; organizationId: string },
+	pullRequest: { number: number; headBranch: string },
+) {
+	const [linked, onBranch] = await Promise.all([
+		db
+			.select({ id: cloudWorkspacePullRequests.cloudWorkspaceId })
+			.from(cloudWorkspacePullRequests)
+			.where(
+				and(
+					eq(cloudWorkspacePullRequests.repositoryId, repo.id),
+					eq(cloudWorkspacePullRequests.prNumber, pullRequest.number),
+				),
+			)
+			.limit(1),
+		db
+			.select({ id: cloudWorkspaces.id })
+			.from(cloudWorkspaceRepositories)
+			.innerJoin(
+				cloudWorkspaces,
+				eq(cloudWorkspaceRepositories.cloudWorkspaceId, cloudWorkspaces.id),
+			)
+			.where(
+				and(
+					eq(cloudWorkspaceRepositories.repositoryId, repo.id),
+					eq(cloudWorkspaces.branch, pullRequest.headBranch),
+				),
+			)
+			.limit(1),
+	]);
+	if (linked.length > 0 || onBranch.length > 0) {
+		nudge(repo.organizationId, "pull_requests");
+	}
+}
+
+async function upsertPullRequest(
 	repo: { id: string; organizationId: string },
 	pr: {
 		number: number;
@@ -147,7 +191,7 @@ function upsertPullRequest(
 	},
 ) {
 	const upstreamUpdatedAt = new Date(pr.updated_at);
-	return db
+	await db
 		.insert(githubPullRequests)
 		.values({
 			repositoryId: repo.id,
@@ -190,6 +234,10 @@ function upsertPullRequest(
 				updatedAt: upstreamUpdatedAt,
 			},
 		});
+	await nudgeCloudWorkspacesShowing(repo, {
+		number: pr.number,
+		headBranch: pr.head.ref,
+	});
 }
 
 webhooks.on(
@@ -319,6 +367,10 @@ webhooks.on(
 					),
 				);
 		}
+		await nudgeCloudWorkspacesShowing(repo, {
+			number: pr.number,
+			headBranch: pr.head.ref,
+		});
 	},
 );
 
@@ -410,6 +462,10 @@ webhooks.on(
 					lastSyncedAt: new Date(),
 				})
 				.where(eq(githubPullRequests.id, currentPr.id));
+			await nudgeCloudWorkspacesShowing(repo, {
+				number: currentPr.prNumber,
+				headBranch: currentPr.headBranch,
+			});
 		}
 	},
 );

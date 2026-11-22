@@ -40,6 +40,7 @@ export function V1ImportModal() {
 
 	return (
 		<Dialog
+			modal
 			open={isOpen}
 			onOpenChange={(open) => {
 				if (!open) close();
@@ -54,7 +55,7 @@ export function V1ImportModal() {
 			>
 				<DialogTitle className="sr-only">
 					{page === "welcome"
-						? "Welcome to Superset v2"
+						? "Welcome to Paradev v2"
 						: page === "intro"
 							? "Let's get you started"
 							: "Import from v1"}

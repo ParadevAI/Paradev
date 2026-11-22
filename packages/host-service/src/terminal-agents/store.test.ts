@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it, spyOn } from "bun:test";
+import * as Sentry from "@sentry/node";
 import {
 	type TerminalAgentBindingPersistence,
 	TerminalAgentStore,
@@ -12,6 +13,32 @@ describe("TerminalAgentStore", () => {
 
 	beforeEach(() => {
 		store = new TerminalAgentStore();
+	});
+
+	it("reports every hook event as activity, a subagent's included, even when the status does not change", () => {
+		let activity = 0;
+		store.on("activity", () => {
+			activity += 1;
+		});
+		for (const occurredAt of [1, 2, 3]) {
+			store.recordEvent({
+				terminalId: "t1",
+				workspaceId: WORKSPACE,
+				eventType: "Start",
+				agentId: "claude",
+				occurredAt,
+			});
+		}
+		expect(activity).toBe(3);
+
+		store.recordSubagentEvent({
+			terminalId: "t1",
+			workspaceId: WORKSPACE,
+			eventType: "SubagentStart",
+			subagentId: "a1",
+			occurredAt: 4,
+		});
+		expect(activity).toBe(4);
 	});
 
 	describe("subagent roster", () => {
@@ -874,4 +901,27 @@ describe("session account attribution", () => {
 		store.recordChatEvent({ ...chat, eventType: "Stop", occurredAt: 2 });
 		expect(store.listByWorkspace("ws-account")[0]?.account).toEqual(account);
 	});
+});
+
+it("logs an agent id a hook made up as custom", () => {
+	const info = spyOn(Sentry.logger, "info").mockImplementation(() => {});
+	const store = new TerminalAgentStore();
+	store.recordEvent({
+		terminalId: "t1",
+		workspaceId: WORKSPACE,
+		eventType: "Start",
+		agentId: "acme-secret-agent" as TerminalAgentBinding["agentId"],
+		occurredAt: Date.now(),
+	});
+	store.markTerminalExited("t1");
+	expect(info.mock.calls).toEqual([
+		[
+			"agent.ended",
+			expect.objectContaining({
+				"agent.id": "custom",
+				"agent.end_reason": "terminal-exited",
+			}),
+		],
+	]);
+	info.mockRestore();
 });

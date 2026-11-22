@@ -2,10 +2,13 @@ import type { Octokit } from "@octokit/rest";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import type { AppRouter } from "@superset/trpc";
 import type { TRPCClient } from "@trpc/client";
+import type { ChatSync } from "./chat-sync";
+import type { ClosedMidTurnChat } from "./chat-v3/closedMidTurn";
 import type { HostDb } from "./db";
 import type { EventBus } from "./events";
 import type { PageWatchManager } from "./page-watch/index.ts";
 import type { ApiAuthProvider } from "./providers/auth/types";
+import type { AgentJobRunner } from "./runtime/agent-jobs";
 import type { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider, GitFactory } from "./runtime/git";
 import type { PullRequestRuntimeManager } from "./runtime/pull-requests";
@@ -19,7 +22,14 @@ export interface HostServiceRuntime {
 	pullRequests: PullRequestRuntimeManager;
 	pageWatch: PageWatchManager;
 	chat?: () => ChatRuntime;
+	chatSync?: ChatSync;
 	closeChats?: (scopeId: string) => Promise<void>;
+	closedMidTurn?: {
+		list(): ClosedMidTurnChat[];
+		resume(): Promise<number>;
+		keepPaused(): void;
+	};
+	agentJobs?: AgentJobRunner;
 }
 
 export interface HostServiceContext {

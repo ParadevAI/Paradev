@@ -15,3 +15,5 @@
 "Uploading" = "Téléversement en cours";
 "Upload failed" = "Échec du téléversement";
 "Stop" = "Arrêter";
+"Dictation stopped. What was heard so far is in your message." = "La dictée s’est arrêtée. Ce qui a été entendu jusqu’ici est dans votre message.";
+"Transcription took too long. The last few words may be missing." = "La transcription a pris trop de temps. Les derniers mots peuvent manquer.";

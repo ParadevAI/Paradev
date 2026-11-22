@@ -5,54 +5,6 @@ import {
 } from "./cloud-workspace-groups";
 
 describe("groupCloudWorkspaces", () => {
-	test("groups each box under whoever is in it now, else its creator", () => {
-		const groups = groupCloudWorkspaces({
-			workspaces: [
-				{
-					id: "kiets-box-satya-is-in",
-					createdAt: new Date("2026-09-25T09:00:00Z"),
-					agentStatusAt: null,
-					createdBy: { userId: "kiet", name: "Kiet Ho", image: null },
-					presence: [
-						{
-							userId: "satya",
-							name: "Satya Patel",
-							image: null,
-							lastSeenAt: new Date("2026-09-25T11:58:00Z"),
-						},
-					],
-				},
-				{
-					id: "kiets-quiet-box",
-					createdAt: new Date("2026-09-25T08:00:00Z"),
-					agentStatusAt: null,
-					createdBy: { userId: "kiet", name: "Kiet Ho", image: null },
-					presence: [
-						{
-							userId: "satya",
-							name: "Satya Patel",
-							image: null,
-							lastSeenAt: new Date("2026-09-24T12:00:00Z"),
-						},
-					],
-				},
-			],
-			userId: "satya",
-			now: new Date("2026-09-25T12:00:00Z"),
-			activeWithinMs: 15 * 60 * 1000,
-		});
-
-		expect(
-			groups.map(({ person, workspaces }) => [
-				person?.name,
-				workspaces.map((workspace) => workspace.id),
-			]),
-		).toEqual([
-			["Satya Patel", ["kiets-box-satya-is-in"]],
-			["Kiet Ho", ["kiets-quiet-box"]],
-		]);
-	});
-
 	test("puts your group first, others by name, and no-one last", () => {
 		const groups = groupCloudWorkspaces({
 			workspaces: [
@@ -61,33 +13,27 @@ describe("groupCloudWorkspaces", () => {
 					createdAt: new Date("2026-09-25T11:00:00Z"),
 					agentStatusAt: null,
 					createdBy: null,
-					presence: [],
 				},
 				{
 					id: "kiets",
 					createdAt: new Date("2026-09-25T10:00:00Z"),
 					agentStatusAt: null,
 					createdBy: { userId: "kiet", name: "Kiet Ho", image: null },
-					presence: [],
 				},
 				{
 					id: "avis",
 					createdAt: new Date("2026-09-25T09:00:00Z"),
 					agentStatusAt: null,
 					createdBy: { userId: "avi", name: "Avi Peltz", image: null },
-					presence: [],
 				},
 				{
 					id: "mine",
 					createdAt: new Date("2026-09-25T08:00:00Z"),
 					agentStatusAt: null,
 					createdBy: { userId: "satya", name: "Satya Patel", image: null },
-					presence: [],
 				},
 			],
 			userId: "satya",
-			now: new Date("2026-09-25T12:00:00Z"),
-			activeWithinMs: 15 * 60 * 1000,
 		});
 
 		expect(groups.map(({ person }) => person?.name ?? null)).toEqual([
@@ -106,22 +52,18 @@ describe("groupCloudWorkspaces", () => {
 				createdAt: new Date("2026-09-20T09:00:00Z"),
 				agentStatusAt: new Date("2026-09-25T11:00:00Z"),
 				createdBy: avi,
-				presence: [],
 			},
 			{
 				id: "new-and-quiet",
 				createdAt: new Date("2026-09-25T09:00:00Z"),
 				agentStatusAt: null,
 				createdBy: avi,
-				presence: [],
 			},
 		];
 		const ids = (sort?: "activity" | "created") =>
 			groupCloudWorkspaces({
 				workspaces,
 				userId: null,
-				now: new Date("2026-09-25T12:00:00Z"),
-				activeWithinMs: 15 * 60 * 1000,
 				sort,
 			})[0]?.workspaces.map((workspace) => workspace.id);
 		expect(ids()).toEqual(["old-but-busy", "new-and-quiet"]);

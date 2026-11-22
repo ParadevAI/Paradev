@@ -1,0 +1,1 @@
+export { WorkspaceOwnerAvatar } from "./WorkspaceOwnerAvatar";

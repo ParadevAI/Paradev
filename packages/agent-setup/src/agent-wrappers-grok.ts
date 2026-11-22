@@ -99,7 +99,7 @@ export function createGrokHooksJson(): void {
 		getGrokHooksJsonContent(),
 		0o644,
 	);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Grok hooks json`,
 	);
 }
@@ -125,7 +125,7 @@ function buildGrokCompatBlock(base: string): string {
 
 	const body = [
 		GROK_COMPAT_MARKER_START,
-		"# Superset registers its own Grok hooks; replaying Superset-managed",
+		"# Paradev registers its own Grok hooks; replaying Paradev-managed",
 		"# Claude/Cursor hook configs here would mislabel grok sessions.",
 		...vendors.flatMap((vendor) => [`[compat.${vendor}]`, "hooks = false", ""]),
 	]

@@ -1,3 +1,5 @@
+import { isOwnOriginTwin } from "@superset/shared/own-domains";
+
 export function parseSupersetPageUrl(
 	url: string,
 	webUrl: string,
@@ -11,7 +13,7 @@ export function parseSupersetPageUrl(
 		return null;
 	}
 
-	if (parsed.origin !== web.origin) return null;
+	if (!isOwnOriginTwin(parsed.origin, web.origin)) return null;
 
 	const match = parsed.pathname.match(/^\/page\/([^/]+)\/?$/);
 	const slug = match?.[1];

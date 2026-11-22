@@ -1,7 +1,5 @@
-import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
+import { AvatarStack } from "@superset/ui/atoms/AvatarStack";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
@@ -18,48 +16,28 @@ import { LuArchive } from "react-icons/lu";
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { HotkeyLabel } from "renderer/hotkeys";
-import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
+import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
+import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
+import { useBoxPressure } from "renderer/stores/box-pressure";
 import { useInlineWorkspacePortsEnabled } from "renderer/stores/inline-workspace-ports";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 import type { ActivePaneStatus } from "shared/tabs-types";
 import type {
 	DashboardSidebarWorkspace,
 	DashboardSidebarWorkspaceIndentation,
-	DashboardSidebarWorkspacePullRequest,
 } from "../../../../types";
 import { DashboardSidebarWorkspaceQueuedBadge } from "../DashboardSidebarWorkspaceQueuedBadge";
+import { DashboardSidebarOpenCloudHostGlyph } from "./components/DashboardSidebarOpenCloudHostGlyph";
 import { DashboardSidebarPortsChip } from "./components/DashboardSidebarPortsChip";
 import { DashboardSidebarRowEventBoundary } from "./components/DashboardSidebarRowEventBoundary";
 import { DashboardSidebarWorkspaceChips } from "./components/DashboardSidebarWorkspaceChips";
 import { DashboardSidebarWorkspaceHostGlyph } from "./components/DashboardSidebarWorkspaceHostGlyph";
 import { DashboardSidebarWorkspaceLeadIndicator } from "./components/DashboardSidebarWorkspaceLeadIndicator";
-
-const PR_STATE_LABEL: Record<
-	DashboardSidebarWorkspacePullRequest["state"],
-	MessageDescriptor
-> = {
-	open: msg({
-		message: "Open",
-		context: "status",
-	}),
-	merged: msg({
-		message: "Merged",
-	}),
-	closed: msg({
-		message: "Closed",
-	}),
-	draft: msg({
-		message: "Draft",
-	}),
-	queued: msg({
-		message: "Queued",
-	}),
-};
 
 interface DashboardSidebarExpandedWorkspaceRowProps
 	extends ComponentPropsWithoutRef<"div"> {
@@ -128,10 +106,13 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			branch,
 			pullRequest,
 			pendingTransaction,
+			isMine,
+			creator,
 		} = workspace;
 		const isPending = pendingTransaction?.type === "insert";
 		const localRef = useRef<HTMLDivElement>(null);
 		const navigate = useNavigate();
+		const linkPolicy = usePullRequestLinkPolicy();
 		// Drives the name's hover-reveal for keyboard users: the row, not the
 		// name span, is what's actually tabbable.
 		const {
@@ -141,16 +122,19 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		} = useFocusVisible();
 
 		useEffect(() => {
-			if (isActive) {
+			if (!isActive) return;
+			const frame = requestAnimationFrame(() => {
 				localRef.current?.scrollIntoView({
 					block: "nearest",
 					behavior: "smooth",
 				});
-			}
+			});
+			return () => cancelAnimationFrame(frame);
 		}, [isActive]);
 
 		const creationStatusText = isPending ? t({ message: "Creating…" }) : null;
 		const isCloudWorkspace = hostType === "cloud";
+		const boxPressure = useBoxPressure(isCloudWorkspace ? workspace.id : null);
 		const closeLabel = isCloudWorkspace
 			? t({ message: "Archive workspace" })
 			: t({ message: "Delete workspace" });
@@ -231,59 +215,37 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 							<HiCheck className="size-3.5" />
 						</span>
 					) : showsPullRequest && pullRequest ? (
-						<Tooltip delayDuration={500}>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={(event) => {
-										event.stopPropagation();
-										// Lands in the workspace with its PR pane open, rather
-										// than on GitHub; the pane keeps the GitHub link.
-										const ref = pullRequestRefFromUrl(pullRequest.url);
-										if (!ref) {
-											window.open(pullRequest.url, "_blank");
-											return;
-										}
+						<button
+							type="button"
+							onClick={(event) => {
+								event.stopPropagation();
+								// Lands in the workspace with its PR pane open, rather
+								// than on GitHub; the pane keeps the GitHub link.
+								openPullRequestLink(
+									pullRequest.url,
+									linkPolicy.getAction(event),
+									(ref, placement) => {
 										usePullRequestPaneIntent.getState().request({
 											workspaceId: workspace.id,
 											...ref,
+											placement,
 										});
-										void navigateToV2Workspace(workspace.id, navigate);
-									}}
-									onKeyDown={(event) => {
-										if (event.key === "Enter" || event.key === " ") {
-											event.stopPropagation();
-										}
-									}}
-									aria-label={t({
-										message: `Open pull request #${pullRequest.number}`,
-									})}
-									className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
-								>
-									{leadIndicator}
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="right" sideOffset={8}>
-								<p className="text-xs font-medium">
-									<Trans>
-										PR #{pullRequest.number} —{" "}
-										{i18n._(PR_STATE_LABEL[pullRequest.state])}
-									</Trans>
-								</p>
-								{(sandboxLabel ??
-									(workspaceStatus && getStatusTooltip(workspaceStatus))) && (
-									<p className="text-xs text-muted-foreground">
-										{sandboxLabel ??
-											(workspaceStatus
-												? getStatusTooltip(workspaceStatus)
-												: null)}
-									</p>
-								)}
-								<p className="text-xs text-muted-foreground">
-									<Trans>Click to open the pull request</Trans>
-								</p>
-							</TooltipContent>
-						</Tooltip>
+										void navigateToWorkspace(workspace.id, navigate);
+									},
+								);
+							}}
+							onKeyDown={(event) => {
+								if (event.key === "Enter" || event.key === " ") {
+									event.stopPropagation();
+								}
+							}}
+							aria-label={t({
+								message: `Open pull request #${pullRequest.number}`,
+							})}
+							className="mr-2 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-foreground/10"
+						>
+							{leadIndicator}
+						</button>
 					) : sandboxLabel || (workspaceStatus && !isPending) ? (
 						<Tooltip delayDuration={500}>
 							<TooltipTrigger asChild>
@@ -343,7 +305,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								)}
 							/>
 						) : (
-							<>
+							<div className="flex min-w-0 items-center">
 								<WorkspaceNameMarquee
 									name={name || branch}
 									prefix={
@@ -356,7 +318,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 									}
 									forceActive={isFocused}
 									className={cn(
-										"text-[13px] leading-tight transition-colors",
+										"min-w-0 text-[13px] leading-tight transition-colors",
 										isActive || isSelected
 											? "text-foreground"
 											: "text-foreground/80",
@@ -367,7 +329,20 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 										<Trans>, selected</Trans>
 									</span>
 								)}
-							</>
+								{creator && isMine === false && (
+									<AvatarStack
+										people={[
+											{
+												id: creator.userId,
+												name: creator.name,
+												image: creator.image,
+											},
+										]}
+										size={16}
+										className="ml-1.5"
+									/>
+								)}
+							</div>
 						)}
 
 						<div className="col-start-2 row-start-1 flex h-5 shrink-0 items-center gap-2">
@@ -381,21 +356,32 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 								/>
 							)}
 							<div className="grid items-center justify-items-end [&>*]:col-start-1 [&>*]:row-start-1">
+								{/* Not plain focus-within: a clicked row keeps focus, and the open cloud row's glyph must stay in view while it connects. */}
 								<span
 									className={cn(
 										"flex",
 										!isPending &&
 											!isSelected &&
-											"group-hover:invisible group-focus-within:invisible",
+											"group-hover:invisible group-[:focus-within:not(:focus:not(:focus-visible))]:invisible",
 									)}
 								>
-									<DashboardSidebarWorkspaceHostGlyph
-										hostType={hostType}
-										hostIsOnline={hostIsOnline}
-									/>
+									{isCloudWorkspace && isActive ? (
+										<DashboardSidebarOpenCloudHostGlyph
+											workspaceId={workspace.id}
+										/>
+									) : (
+										<DashboardSidebarWorkspaceHostGlyph
+											hostType={hostType}
+											hostIsOnline={hostIsOnline}
+											pressure={boxPressure?.level ?? null}
+											cloudState={
+												workspace.sandboxStatus === "asleep" ? "asleep" : "on"
+											}
+										/>
+									)}
 								</span>
 								{!isPending && !isSelected && (
-									<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-focus-within:flex">
+									<div className="hidden items-center justify-end gap-1.5 group-hover:flex group-[:focus-within:not(:focus:not(:focus-visible))]:flex">
 										{shortcutLabel && (
 											<span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
 												{shortcutLabel}

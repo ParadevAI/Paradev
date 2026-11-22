@@ -1,11 +1,10 @@
 import { Trans } from "@lingui/react/macro";
-import * as AppleAuthentication from "expo-apple-authentication";
-import * as Crypto from "expo-crypto";
+import { BRAND } from "@superset/shared/brand";
+import { COMPANY } from "@superset/shared/constants";
 import { useState } from "react";
 import { Image, View } from "react-native";
 
 import { Text } from "@/components/ui/text";
-import { signIn } from "@/lib/auth/client";
 import { env } from "@/lib/env";
 import { errorCopy } from "@/lib/errors";
 import { openUrl } from "@/lib/open-url";
@@ -14,71 +13,27 @@ import { DevSignInOptions } from "./components/DevSignInOptions";
 import { EmailSignInLink } from "./components/EmailSignInLink";
 import type { SocialProvider } from "./components/SocialButton";
 import { SocialButton } from "./components/SocialButton";
+import { signInInBrowser } from "./utils/signInInBrowser";
+import { signInWithApple } from "./utils/signInWithApple";
+import { signInWithGoogle } from "./utils/signInWithGoogle";
+import { SOCIAL_PROVIDERS } from "./utils/socialProviders";
 
-const TERMS_URL = "https://superset.sh/terms";
-const PRIVACY_URL = "https://superset.sh/privacy";
+const SIGN_IN: Record<SocialProvider, () => Promise<void>> = {
+	apple: signInWithApple,
+	github: () => signInInBrowser("github"),
+	google: signInWithGoogle,
+};
 
 export function SignInScreen() {
+	const appName = BRAND.NAME;
 	const [error, setError] = useState<string | null>(null);
 
 	const handleSignIn = async (provider: SocialProvider) => {
 		setError(null);
 		try {
-			await signIn.social({
-				provider,
-				callbackURL: "/",
-			});
+			await SIGN_IN[provider]();
 		} catch (err) {
-			console.error("[sign-in] Error:", err);
-			setError(errorCopy(err));
-		}
-	};
-
-	const handleAppleSignIn = async () => {
-		setError(null);
-		try {
-			// Apple puts SHA256(nonce) in the identity token; the server gets the
-			// raw nonce and better-auth compares against the hashed claim.
-			const rawNonce = Crypto.randomUUID();
-			const hashedNonce = await Crypto.digestStringAsync(
-				Crypto.CryptoDigestAlgorithm.SHA256,
-				rawNonce,
-			);
-			const credential = await AppleAuthentication.signInAsync({
-				requestedScopes: [
-					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-					AppleAuthentication.AppleAuthenticationScope.EMAIL,
-				],
-				nonce: hashedNonce,
-			});
-			if (!credential.identityToken) {
-				throw new Error("Apple did not return an identity token");
-			}
-			await signIn.social({
-				provider: "apple",
-				idToken: {
-					token: credential.identityToken,
-					nonce: rawNonce,
-					// Apple only sends name/email on the very first authorization
-					user: {
-						name: {
-							firstName: credential.fullName?.givenName ?? undefined,
-							lastName: credential.fullName?.familyName ?? undefined,
-						},
-						email: credential.email ?? undefined,
-					},
-				},
-				callbackURL: "/",
-			});
-		} catch (err) {
-			if (
-				err instanceof Error &&
-				"code" in err &&
-				err.code === "ERR_REQUEST_CANCELED"
-			) {
-				return;
-			}
-			console.error("[sign-in] Apple error:", err);
+			console.error(`[sign-in] ${provider} error:`, err);
 			setError(errorCopy(err));
 		}
 	};
@@ -92,7 +47,7 @@ export function SignInScreen() {
 
 			<View className="items-center gap-2">
 				<Text className="text-2xl font-semibold text-foreground">
-					<Trans>Welcome to Superset</Trans>
+					<Trans>Welcome to {appName}</Trans>
 				</Text>
 				<Text className="text-base text-muted-foreground">
 					<Trans>Sign in to get started</Trans>
@@ -100,21 +55,14 @@ export function SignInScreen() {
 			</View>
 
 			<View className="w-full items-center gap-3">
-				<SocialButton
-					provider="apple"
-					onPress={handleAppleSignIn}
-					className="w-4/5 max-w-sm"
-				/>
-				<SocialButton
-					provider="github"
-					onPress={() => handleSignIn("github")}
-					className="w-4/5 max-w-sm"
-				/>
-				<SocialButton
-					provider="google"
-					onPress={() => handleSignIn("google")}
-					className="w-4/5 max-w-sm"
-				/>
+				{SOCIAL_PROVIDERS.map((provider) => (
+					<SocialButton
+						key={provider}
+						provider={provider}
+						onPress={() => handleSignIn(provider)}
+						className="w-4/5 max-w-sm"
+					/>
+				))}
 				{(__DEV__ || env.EXPO_PUBLIC_E2E === "1") && <DevSignInOptions />}
 				<EmailSignInLink onError={setError} />
 			</View>
@@ -128,14 +76,14 @@ export function SignInScreen() {
 					By signing in, you agree to our{"\n"}
 					<Text
 						className="text-xs text-muted-foreground underline"
-						onPress={() => openUrl(TERMS_URL)}
+						onPress={() => openUrl(COMPANY.TERMS_URL)}
 					>
 						Terms of Service
 					</Text>{" "}
 					and{" "}
 					<Text
 						className="text-xs text-muted-foreground underline"
-						onPress={() => openUrl(PRIVACY_URL)}
+						onPress={() => openUrl(COMPANY.PRIVACY_URL)}
 					>
 						Privacy Policy
 					</Text>

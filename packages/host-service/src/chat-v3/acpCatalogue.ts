@@ -1,6 +1,11 @@
 type AcpTranslator =
-	| { adapter: string; executableEnv: string }
-	| { adapter?: undefined; executableEnv?: undefined };
+	| {
+			adapter: string;
+			executableEnv: string;
+			/** Variables the bundled translator itself reads. */
+			adapterEnv?: Record<string, string>;
+	  }
+	| { adapter?: undefined; executableEnv?: undefined; adapterEnv?: undefined };
 
 export type AcpHarness = {
 	registryId: string;
@@ -11,6 +16,9 @@ export type AcpHarness = {
 	/** The agent's own id for its unrestricted mode; chats start in it. */
 	fullAccessModeId?: string;
 	clientApprovalModes?: boolean;
+	/** Forks a session up to a given message (JetBrains AIR fork point), so a rewind keeps the agent's own history. */
+	forkAtMessage?: boolean;
+	protocolVersion?: number;
 	note: string;
 } & AcpTranslator;
 
@@ -24,9 +32,14 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		minVersion: "2.1.226",
 		adapter: "@agentclientprotocol/claude-agent-acp",
 		executableEnv: "CLAUDE_CODE_EXECUTABLE",
+		// The adapter serves ACP v2 since 0.95, where steering is not yet
+		// supported and turns end differently. Chat is built and tested on v1.
+		adapterEnv: { CLAUDE_AGENT_ACP_PROTOCOL: "v1" },
+		protocolVersion: 1,
 		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
 		fullAccessModeId: "bypassPermissions",
-		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286.",
+		forkAtMessage: true,
+		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 verified with 2.1.226 and 2.1.311: a background subagent ends the turn at its reply, the follow-up arrives as a `turn` async task, and steering is advertised.",
 	},
 	"codex-acp": {
 		registryId: "codex-acp",
@@ -37,6 +50,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		executableEnv: "CODEX_PATH",
 		upgrade: "npm i -g @openai/codex@latest",
 		fullAccessModeId: "agent-full-access",
+		forkAtMessage: true,
 		note: "Conservative: the adapter drives `codex app-server`, and the release that introduced it is not pinned. The native codex adapter's MIN_CODEX_VERSION is 0.143.0, so this floor is probably lowerable once app-server is verified against an older build.",
 	},
 	"gemini-acp": {
@@ -71,6 +85,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		minVersion: UNGATED_VERSION,
 		fullAccessModeId: "bypassPermissions",
 		clientApprovalModes: true,
+		forkAtMessage: true,
 		note: "Ungated: every release, from 0.1.0 on, ships `pdev acp`, so there is no older build to reject and no upgrade command. `pdev acp` is its own ACP server, so no adapter. The desktop bundles it and needs no env: pdev signs in to the router through the superset CLI on PATH.",
 	},
 };
@@ -100,4 +115,11 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 
 export function acpHarnessForPreset(presetId: string): string | undefined {
 	return ACP_HARNESS_BY_PRESET[presetId];
+}
+
+export function harnessBinary(harness: string): string {
+	return (
+		ACP_HARNESSES[harness]?.binary ??
+		(harness === "claude-code" ? "claude" : harness)
+	);
 }

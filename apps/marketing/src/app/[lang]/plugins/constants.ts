@@ -15,6 +15,16 @@ export interface CatalogPlugin {
 	installed?: boolean;
 }
 
+export const AGENT_TARGETS: { name: string; icon: string }[] = [
+	{ name: "Claude Code", icon: "/app-icons/claude.svg" },
+	{ name: "Codex", icon: "/app-icons/codex.svg" },
+	{ name: "Cursor Agent", icon: "/app-icons/cursor-agent.svg" },
+	{ name: "OpenCode", icon: "/app-icons/opencode.svg" },
+	{ name: "Gemini CLI", icon: "/app-icons/gemini.svg" },
+	{ name: "Mistral Vibe", icon: "/app-icons/vibe.svg" },
+	{ name: "Kimi Code", icon: "/app-icons/kimi.svg" },
+];
+
 export const CATALOG: {
 	category: MessageDescriptor;
 	plugins: CatalogPlugin[];
@@ -47,6 +57,11 @@ export const CATALOG: {
 				name: "circleback",
 				displayName: "Circleback",
 				description: msg({ message: "Work the action items from a call" }),
+			},
+			{
+				name: "wispr",
+				displayName: "Wispr Flow",
+				description: msg({ message: "Recall what was said in meetings" }),
 			},
 			{
 				name: "ynab",
@@ -96,6 +111,21 @@ export const CATALOG: {
 				displayName: "Vercel",
 				description: msg({ message: "Read deployment and build logs" }),
 			},
+			{
+				name: "resend",
+				displayName: "Resend",
+				description: msg({ message: "Send email and debug delivery" }),
+			},
+			{
+				name: "sazabi",
+				displayName: "Sazabi",
+				description: msg({ message: "Investigate production logs and issues" }),
+			},
+			{
+				name: "inngest",
+				displayName: "Inngest",
+				description: msg({ message: "Debug failed runs and rerun functions" }),
+			},
 		],
 	},
 	{
@@ -107,6 +137,11 @@ export const CATALOG: {
 				description: msg({ message: "Inspect branches and run SQL" }),
 			},
 			{
+				name: "supabase",
+				displayName: "Supabase",
+				description: msg({ message: "Inspect tables and apply migrations" }),
+			},
+			{
 				name: "posthog",
 				displayName: "PostHog",
 				description: msg({ message: "Query events and feature flags" }),
@@ -115,6 +150,26 @@ export const CATALOG: {
 				name: "stripe",
 				displayName: "Stripe",
 				description: msg({ message: "Trace charges and subscriptions" }),
+			},
+			{
+				name: "autumn",
+				displayName: "Autumn",
+				description: msg({ message: "Check plans and balances" }),
+			},
+			{
+				name: "exa",
+				displayName: "Exa",
+				description: msg({ message: "Search the web" }),
+			},
+			{
+				name: "firecrawl",
+				displayName: "Firecrawl",
+				description: msg({ message: "Scrape and crawl websites" }),
+			},
+			{
+				name: "peec",
+				displayName: "Peec AI",
+				description: msg({ message: "Track your brand in AI search" }),
 			},
 		],
 	},
@@ -125,23 +180,21 @@ export const STEPS: (PluginsItem & { id: StepId })[] = [
 		id: "install",
 		title: msg({ message: "Install." }),
 		description: msg({
-			message:
-				"Open Plugins in the Superset app and pick one. The install is saved to your account.",
+			message: "Pick one in the Paradev app. It's saved to your account.",
 		}),
 	},
 	{
 		id: "connect",
 		title: msg({ message: "Connect." }),
 		description: msg({
-			message:
-				"Sign in to the app once. Superset keeps the connection for you.",
+			message: "Sign in once. Paradev keeps the connection.",
 		}),
 	},
 	{
 		id: "mention",
 		title: msg({ message: "Mention." }),
 		description: msg({
-			message: "Type @linear in a prompt to point the agent at the plugin.",
+			message: "Type @linear in any prompt.",
 		}),
 	},
 	{
@@ -149,38 +202,37 @@ export const STEPS: (PluginsItem & { id: StepId })[] = [
 		title: msg({ message: "Run." }),
 		description: msg({
 			message:
-				"The agent follows the plugin's skills and calls its tools. The issue shows up in Linear.",
+				"The agent uses its skills and tools. The issue lands in Linear.",
 		}),
 	},
 ];
 
 export const FEATURES: PluginsItem[] = [
 	{
-		title: msg({ message: "On every machine you sign into" }),
+		title: msg({ message: "Works in every agent" }),
 		description: msg({
 			message:
-				"Install a plugin once. Superset adds its skills on each machine where you use your account.",
+				"Claude Code, Codex, Cursor, OpenCode and more. No setup per agent.",
 		}),
 	},
 	{
 		title: msg({ message: "Tokens stay off your machine" }),
 		description: msg({
 			message:
-				"Superset stores each connection encrypted. Tool calls go out from Superset, so the agent never sees a token.",
+				"Paradev holds the token and makes the calls. Agents never see it.",
 		}),
 	},
 	{
-		title: msg({ message: "Works with Claude Code and Codex" }),
+		title: msg({ message: "Local and cloud" }),
 		description: msg({
 			message:
-				"Superset puts plugin skills and tools where these agents look for them.",
+				"Ready on every machine you sign into and in every cloud workspace.",
 		}),
 	},
 	{
-		title: msg({ message: "Install from the terminal" }),
+		title: msg({ message: "Publish from your own repo" }),
 		description: msg({
-			message:
-				"Run superset plugins install linear from any shell. The plugin shows up in the app too.",
+			message: "Share plugins from a GitHub repo. Pin releases with git tags.",
 		}),
 	},
 ];

@@ -45,7 +45,7 @@ export function register(server: McpServer): void {
 				.string()
 				.nullish()
 				.describe(
-					"Assignee: a Superset user ID, or for Linear a Linear user id or email. Omit for unassigned.",
+					"Assignee: a Paradev user ID, or for Linear a Linear user id or email. Omit for unassigned.",
 				),
 			estimate: z
 				.number()
@@ -57,7 +57,7 @@ export function register(server: McpServer): void {
 			labels: z
 				.array(z.string())
 				.nullish()
-				.describe("Superset only: free-text labels."),
+				.describe("Paradev only: free-text labels."),
 		},
 		handler: async (input, ctx) => {
 			const caller = createMcpCaller(ctx);

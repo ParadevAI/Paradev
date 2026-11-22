@@ -98,8 +98,16 @@ export interface LinearWorkspace {
 	users: LinearUser[];
 }
 
+export interface LinearProject {
+	id: string;
+	name: string;
+	icon: string | null;
+	color: string;
+}
+
 export interface LinearIssueFilter {
 	team?: { id: { eq: string } };
+	project?: { id: { eq: string } };
 	state?: { type: { in: LinearStateType[] } };
 	assignee?: { null: true } | { id: { eq: string } } | { isMe: { eq: true } };
 }
@@ -333,6 +341,38 @@ export async function createIssue(
 	return toIssue(data.issueCreate.issue);
 }
 
+const PROJECT_PAGE_SIZE = 100;
+const MAX_PROJECT_PAGES = 10;
+
+/** The workspace's projects that are not finished, by name. */
+export async function listProjects(
+	client: LinearClient,
+): Promise<LinearProject[]> {
+	const projects: LinearProject[] = [];
+	let after: string | null = null;
+	for (let page = 0; page < MAX_PROJECT_PAGES; page++) {
+		const data: {
+			projects: {
+				nodes: LinearProject[];
+				pageInfo: { hasNextPage: boolean; endCursor: string | null };
+			};
+		} = await request(
+			client,
+			`query SupersetLinearProjects($first: Int!, $after: String) {
+				projects(first: $first, after: $after, filter: { status: { type: { nin: ["completed", "canceled"] } } }) {
+					nodes { id name icon color }
+					pageInfo { hasNextPage endCursor }
+				}
+			}`,
+			{ first: PROJECT_PAGE_SIZE, after },
+		);
+		projects.push(...data.projects.nodes);
+		if (!data.projects.pageInfo.hasNextPage) break;
+		after = data.projects.pageInfo.endCursor;
+	}
+	return projects.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export async function getWorkspace(
 	client: LinearClient,
 ): Promise<LinearWorkspace> {
@@ -418,11 +458,13 @@ const STATE_TYPES_BY_FILTER: Record<
 
 export function issueFilterFor(input: {
 	teamId?: string | null;
+	projectId?: string | null;
 	status: LinearStatusFilter;
 	assignee?: string | null;
 }): LinearIssueFilter {
 	const filter: LinearIssueFilter = {};
 	if (input.teamId) filter.team = { id: { eq: input.teamId } };
+	if (input.projectId) filter.project = { id: { eq: input.projectId } };
 	if (input.status !== "all") {
 		filter.state = { type: { in: STATE_TYPES_BY_FILTER[input.status] } };
 	}

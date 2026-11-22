@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { PagePresenceViewer } from "./page-presence";
+import type { PagePresenceViewer, PresenceVisitor } from "./page-presence";
 import { openPagePresence } from "./page-presence-client";
 
 type Event = { data?: unknown; code?: number };
@@ -34,10 +34,16 @@ async function until(condition: () => boolean) {
 }
 
 function harness(
-	options: { heartbeatMs?: number; urls?: (string | null)[] } = {},
+	options: {
+		heartbeatMs?: number;
+		urls?: (string | null)[];
+		recheckJitterMs?: number;
+	} = {},
 ) {
 	const sockets: FakeSocket[] = [];
 	const states: PagePresenceViewer[][] = [];
+	const visits: PresenceVisitor[][] = [];
+	let published = 0;
 	const urls = [...(options.urls ?? [])];
 	let dialled = 0;
 	const client = openPagePresence({
@@ -46,12 +52,17 @@ function harness(
 			return urls.length ? (urls.shift() ?? null) : `wss://hub/${dialled}`;
 		},
 		onViewers: (viewers) => states.push(viewers),
+		onVisitors: (visitors) => visits.push(visitors),
+		onPublished: () => {
+			published += 1;
+		},
 		createSocket: (address) => {
 			const socket = new FakeSocket(address);
 			sockets.push(socket);
 			return socket;
 		},
 		retryBaseMs: 1,
+		recheckJitterMs: options.recheckJitterMs ?? 1,
 		heartbeatMs: options.heartbeatMs ?? 60_000,
 	});
 	const opened = async () => {
@@ -60,7 +71,15 @@ function harness(
 		socket.emit("open");
 		return socket;
 	};
-	return { client, sockets, states, opened, dialled: () => dialled };
+	return {
+		client,
+		sockets,
+		states,
+		visits,
+		opened,
+		dialled: () => dialled,
+		published: () => published,
+	};
 }
 
 const grace = {
@@ -79,6 +98,72 @@ describe("openPagePresence", () => {
 		const socket = await h.opened();
 		socket.hub({ type: "presence", viewers: [grace, { id: 7 }] });
 		expect(h.states.at(-1)).toEqual([grace]);
+		h.client.stop();
+	});
+
+	test("takes the visitor history from the hub, validated", async () => {
+		const h = harness();
+		const socket = await h.opened();
+		const ada = {
+			userId: "u1",
+			name: "Ada",
+			image: null,
+			lastSeenAt: 5,
+			active: true,
+		};
+		socket.hub({
+			type: "presence",
+			viewers: [],
+			visitors: [ada, { userId: "u2", name: "Bob" }],
+		});
+		expect(h.visits.at(-1)).toEqual([ada]);
+		socket.emit("close", { code: 1006 });
+		expect(h.visits.at(-1)).toEqual([{ ...ada, active: false }]);
+		h.client.stop();
+	});
+
+	test("tells the host when the hub says a version was published", async () => {
+		const h = harness();
+		const socket = await h.opened();
+		socket.hub({ type: "presence", viewers: [grace] });
+		expect(h.published()).toBe(0);
+		socket.hub({ type: "published" });
+		expect(h.published()).toBe(1);
+		expect(h.states.at(-1)).toEqual([grace]);
+		h.client.stop();
+	});
+
+	test("checks for a missed publish after a reconnect, not on the first connect", async () => {
+		const h = harness();
+		const socket = await h.opened();
+		expect(h.published()).toBe(0);
+		socket.emit("close", { code: 1006 });
+		await until(() => h.sockets.length === 2);
+		h.sockets[1]?.emit("open");
+		await until(() => h.published() === 1);
+		h.client.stop();
+	});
+
+	test("checks for a missed publish when the first dial failed and a retry connects", async () => {
+		const h = harness({ urls: [null] });
+		const socket = await h.opened();
+		expect(h.sockets).toHaveLength(1);
+		expect(h.dialled()).toBe(2);
+		await until(() => h.published() === 1);
+		socket.hub({ type: "presence", viewers: [] });
+		h.client.stop();
+	});
+
+	test("a published message cancels the pending reconnect check", async () => {
+		const h = harness({ recheckJitterMs: 50 });
+		const first = await h.opened();
+		first.emit("close", { code: 1006 });
+		await until(() => h.sockets.length === 2);
+		const second = h.sockets[1] as FakeSocket;
+		second.emit("open");
+		second.hub({ type: "published" });
+		await sleep(80);
+		expect(h.published()).toBe(1);
 		h.client.stop();
 	});
 

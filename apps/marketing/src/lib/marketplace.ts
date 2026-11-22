@@ -45,7 +45,7 @@ export const themeListings: ThemeListing[] = [
 		author: "GitHub (primer/github-vscode-theme)",
 		submittedBy: "tkcel",
 		description:
-			"A GitHub-inspired dark theme adapted for Superset with strong blue, amber, and green contrast.",
+			"A GitHub-inspired dark theme adapted for Paradev with strong blue, amber, and green contrast.",
 		addedOn: "March 26, 2026",
 		source: {
 			label: "Download",
@@ -81,7 +81,7 @@ export const themeListings: ThemeListing[] = [
 		type: "dark",
 		author: "Catppuccin",
 		submittedBy: "tamarazuk",
-		description: "The Mocha variant from the Catppuccin theme PR for Superset.",
+		description: "The Mocha variant from the Catppuccin theme PR for Paradev.",
 		addedOn: "March 21, 2026",
 		source: {
 			label: "Download",
@@ -118,7 +118,7 @@ export const themeListings: ThemeListing[] = [
 		author: "Catppuccin",
 		submittedBy: "tamarazuk",
 		description:
-			"The Macchiato variant from the Catppuccin theme PR for Superset.",
+			"The Macchiato variant from the Catppuccin theme PR for Paradev.",
 		addedOn: "March 21, 2026",
 		source: {
 			label: "Download",
@@ -154,8 +154,7 @@ export const themeListings: ThemeListing[] = [
 		type: "dark",
 		author: "Catppuccin",
 		submittedBy: "tamarazuk",
-		description:
-			"The Frappé variant from the Catppuccin theme PR for Superset.",
+		description: "The Frappé variant from the Catppuccin theme PR for Paradev.",
 		addedOn: "March 21, 2026",
 		source: {
 			label: "Download",
@@ -189,7 +188,7 @@ export const themeListings: ThemeListing[] = [
 		slug: "ember",
 		name: "Ember",
 		type: "dark",
-		author: "Superset",
+		author: "Paradev",
 		submittedBy: "AviPeltz",
 		description:
 			"The standalone Ember theme introduced before its palette became the default Dark theme.",
@@ -198,7 +197,7 @@ export const themeListings: ThemeListing[] = [
 			label: "Download",
 			href: "/marketplace/themes/ember.json",
 		},
-		tags: ["Superset", "Dark", "Warm"],
+		tags: ["Paradev", "Dark", "Warm"],
 		ui: {
 			background: "#151110",
 			foreground: "#eae8e6",
@@ -1005,13 +1004,13 @@ export const themeListings: ThemeListing[] = [
 		author: "0x962",
 		submittedBy: "0x962",
 		description:
-			"A near-black theme with cool greys and Superset's ember accent.",
+			"A near-black theme with cool greys and Paradev's ember accent.",
 		addedOn: "August 22, 2026",
 		source: {
 			label: "Download",
 			href: "/marketplace/themes/darker.json",
 		},
-		tags: ["Dark", "Near-black", "Cool", "Superset"],
+		tags: ["Dark", "Near-black", "Cool", "Paradev"],
 		ui: {
 			background: "#08090a",
 			foreground: "#f7f8f8",

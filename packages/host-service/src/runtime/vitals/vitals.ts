@@ -1,4 +1,5 @@
 import { monitorEventLoopDelay, performance } from "node:perf_hooks";
+import { caught } from "../box-log-filter";
 
 const VITALS_INTERVAL_MS = 60_000;
 const LOOP_DELAY_RESOLUTION_MS = 20;
@@ -64,9 +65,9 @@ export function startVitalsLog(): () => void {
 			};
 			lastUtilization = utilization;
 			loopDelay.reset();
-			console.log(`[host-service:vitals] ${JSON.stringify(vitals)}`);
+			console.log("[host-service:vitals]", JSON.stringify(vitals));
 		} catch (error) {
-			console.warn("[host-service:vitals] sample failed:", error);
+			console.warn("[host-service:vitals] sample failed:", caught(error));
 		}
 	}, VITALS_INTERVAL_MS);
 	timer.unref();

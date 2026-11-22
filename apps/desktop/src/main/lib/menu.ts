@@ -1,9 +1,11 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { COMPANY } from "@superset/shared/constants";
-import { app, BrowserWindow, Menu, shell } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import { env } from "main/env.main";
+import { safeOpenExternal } from "main/lib/safe-url";
 import { resetTerminalStateDev } from "main/lib/terminal/dev-reset";
+import { getAppDisplayName } from "./app-display-name";
 import {
 	checkForUpdatesInteractive,
 	simulateDownloading,
@@ -14,6 +16,7 @@ import { menuEmitter } from "./menu-events";
 import { confirmAndQuitCompletely } from "./quit-completely";
 
 export function createApplicationMenu() {
+	const displayName = getAppDisplayName();
 	const reloadAccelerator = "CmdOrCtrl+R";
 	const closeAccelerator = "CmdOrCtrl+Shift+Q";
 	const openSettingsAccelerator = "CmdOrCtrl+,";
@@ -86,7 +89,9 @@ export function createApplicationMenu() {
 							{ type: "separator" },
 							{ role: "quit" },
 							{
-								label: i18n._(msg({ message: "Quit Superset Completely" })),
+								label: i18n._(
+									msg({ message: `Quit ${displayName} Completely` }),
+								),
 								click: () => {
 									void confirmAndQuitCompletely();
 								},
@@ -196,7 +201,7 @@ export function createApplicationMenu() {
 						}),
 					),
 					click: () => {
-						shell.openExternal(COMPANY.DOCS_URL);
+						void safeOpenExternal(COMPANY.DOCS_URL);
 					},
 				},
 				{ type: "separator" },
@@ -207,7 +212,7 @@ export function createApplicationMenu() {
 						}),
 					),
 					click: () => {
-						shell.openExternal(COMPANY.MAIL_TO);
+						void safeOpenExternal(COMPANY.MAIL_TO);
 					},
 				},
 				{
@@ -217,7 +222,7 @@ export function createApplicationMenu() {
 						}),
 					),
 					click: () => {
-						shell.openExternal(COMPANY.REPORT_ISSUE_URL);
+						void safeOpenExternal(COMPANY.REPORT_ISSUE_URL);
 					},
 				},
 				{
@@ -227,7 +232,7 @@ export function createApplicationMenu() {
 						}),
 					),
 					click: () => {
-						shell.openExternal(COMPANY.DISCORD_URL);
+						void safeOpenExternal(COMPANY.DISCORD_URL);
 					},
 				},
 				{ type: "separator" },
@@ -282,10 +287,17 @@ export function createApplicationMenu() {
 	}
 
 	if (process.platform === "darwin") {
+		// Electron's built-in role labels are English and use app.name.
+		const renamed = displayName !== app.name;
 		template.unshift({
-			label: app.name,
+			label: displayName,
 			submenu: [
-				{ role: "about" },
+				{
+					role: "about",
+					...(renamed && {
+						label: i18n._(msg({ message: `About ${displayName}` })),
+					}),
+				},
 				{ type: "separator" },
 				{
 					label: i18n._(
@@ -311,15 +323,25 @@ export function createApplicationMenu() {
 				{ type: "separator" },
 				{ role: "services" },
 				{ type: "separator" },
-				{ role: "hide" },
+				{
+					role: "hide",
+					...(renamed && {
+						label: i18n._(msg({ message: `Hide ${displayName}` })),
+					}),
+				},
 				{ role: "hideOthers" },
 				{ role: "unhide" },
 				{ type: "separator" },
-				{ role: "quit" },
+				{
+					role: "quit",
+					...(renamed && {
+						label: i18n._(msg({ message: `Quit ${displayName}` })),
+					}),
+				},
 				{
 					label: i18n._(
 						msg({
-							message: "Quit Superset Completely",
+							message: `Quit ${displayName} Completely`,
 						}),
 					),
 					click: () => {

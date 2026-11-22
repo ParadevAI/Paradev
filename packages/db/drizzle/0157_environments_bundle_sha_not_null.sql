@@ -1,0 +1,1 @@
+ALTER TABLE "environments" ALTER COLUMN "bundle_sha" SET NOT NULL;
