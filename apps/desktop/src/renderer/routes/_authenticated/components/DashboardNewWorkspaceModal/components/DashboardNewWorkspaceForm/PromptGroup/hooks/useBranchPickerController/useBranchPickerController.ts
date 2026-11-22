@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import type { BaseBranchSource } from "../../../../../DashboardNewWorkspaceDraftContext";
+import type { RemoteHostPresence } from "../../../../../utils/resolveRemoteHostPresence";
 import {
 	type BranchFilter,
 	type CloudRepository,
@@ -17,9 +18,10 @@ import type {
 
 type PickerProps = React.ComponentProps<typeof CompareBaseBranchPicker>;
 
-export interface UseBranchPickerControllerArgs {
+interface UseBranchPickerControllerArgs {
 	projectId: string | null;
 	hostId: string | null;
+	remoteHostPresence: RemoteHostPresence | null;
 	/** Cloud only: the primary repository whose branches are offered. */
 	cloudRepository?: CloudRepository | null;
 	baseBranch: string | null;
@@ -37,6 +39,7 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 	const {
 		projectId,
 		hostId,
+		remoteHostPresence,
 		cloudRepository = null,
 		baseBranch,
 		typedWorkspaceName,
@@ -61,6 +64,9 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 		defaultBranch,
 		isLoading: isBranchesLoading,
 		isError: isBranchesError,
+		error: branchesError,
+		isRefetching: isBranchesRefetching,
+		refetch: refetchBranches,
 		isFetchingNextPage,
 		hasNextPage,
 		fetchNextPage,
@@ -70,6 +76,7 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 		branchSearch,
 		branchFilter,
 		cloudRepository,
+		remoteHostPresence !== "offline" && remoteHostPresence !== "connecting",
 	);
 
 	const effectiveCompareBaseBranch = baseBranch || defaultBranch || null;
@@ -117,13 +124,13 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 				},
 			});
 			void navigate({
-				to: "/v2-workspace/$workspaceId",
+				to: "/workspace/$workspaceId",
 				params: { workspaceId },
 			});
 			void completed.then((outcome) => {
 				if (outcome.ok && outcome.workspaceId !== workspaceId) {
 					void navigate({
-						to: "/v2-workspace/$workspaceId",
+						to: "/workspace/$workspaceId",
 						params: { workspaceId: outcome.workspaceId },
 						replace: true,
 					});
@@ -152,11 +159,19 @@ export function useBranchPickerController(args: UseBranchPickerControllerArgs) {
 		void fetchNextPage();
 	}, [fetchNextPage]);
 
+	const onRetryBranches = useCallback(() => {
+		void refetchBranches();
+	}, [refetchBranches]);
+
 	const pickerProps: PickerProps = {
 		effectiveCompareBaseBranch,
 		defaultBranch,
-		isBranchesLoading,
+		isBranchesLoading: isBranchesLoading || remoteHostPresence === "connecting",
 		isBranchesError,
+		branchesError,
+		isBranchesRefetching,
+		onRetryBranches,
+		isHostOffline: remoteHostPresence === "offline",
 		branches,
 		branchSearch,
 		onBranchSearchChange: setBranchSearch,

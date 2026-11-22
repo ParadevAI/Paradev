@@ -1,4 +1,4 @@
-import { i18n } from "../index";
+import { i18n } from "@lingui/core";
 import { DEFAULT_LOCALE } from "../locales";
 
 // Locale-aware wrappers around Intl.*. Every user-facing number, currency,
@@ -21,6 +21,16 @@ export function formatNumber(
 	locale = getActiveLocale(),
 ): string {
 	return new Intl.NumberFormat(locale, options).format(value);
+}
+
+// 12.345 -> "12.3", 0.04 -> "<0.1": a small amount still reads as used.
+export function formatGbHours(
+	gbHours: number,
+	locale = getActiveLocale(),
+): string {
+	return gbHours > 0 && gbHours < 0.1
+		? `<${formatNumber(0.1, undefined, locale)}`
+		: formatNumber(gbHours, { maximumFractionDigits: 1 }, locale);
 }
 
 // 0.123 -> "12.3%"
@@ -109,6 +119,20 @@ export function formatDateTime(
 	locale = getActiveLocale(),
 ): string {
 	return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
+// A clock time without AM/PM, "11:11", for where the period is obvious from
+// the message above it. 24-hour locales come out unchanged.
+export function formatClockTime(
+	date: Date | number,
+	locale = getActiveLocale(),
+): string {
+	return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" })
+		.formatToParts(date)
+		.filter((part) => part.type !== "dayPeriod")
+		.map((part) => part.value)
+		.join("")
+		.trim();
 }
 
 // Relative time: -3600_000 -> "1 hour ago", 86_400_000 -> "tomorrow".
@@ -223,6 +247,14 @@ export function formatAge(
 		);
 	}
 	const [unit, count] = age;
+	return formatNarrowUnit(locale, unit, count);
+}
+
+function formatNarrowUnit(
+	locale: string,
+	unit: Intl.NumberFormatOptions["unit"],
+	count: number,
+): string {
 	const narrow = formatUnit(locale, unit, count, "narrow");
 	// Some locales have no narrow form for a unit and fall back to English
 	// letters ("4w" in Japanese).
@@ -230,4 +262,28 @@ export function formatAge(
 	return !isLatinScript && /[a-z]/i.test(narrow)
 		? formatUnit(locale, unit, count, "short")
 		: narrow;
+}
+
+export function formatElapsed(
+	start: Date | number,
+	now: Date | number = Date.now(),
+	locale = getActiveLocale(),
+): string {
+	const elapsedMs = Math.max(
+		0,
+		(now instanceof Date ? now.getTime() : now) -
+			(start instanceof Date ? start.getTime() : start),
+	);
+	if (elapsedMs >= MINUTE_MS) return formatAge(start, now, locale);
+	return formatNarrowUnit(locale, "second", Math.floor(elapsedMs / 1000));
+}
+
+export function formatRelativePeriod(
+	{ unit, count }: { unit: "day" | "week" | "month" | "year"; count: number },
+	locale = getActiveLocale(),
+): string {
+	const label = new Intl.RelativeTimeFormat(locale, {
+		numeric: "auto",
+	}).format(-count, unit);
+	return label.charAt(0).toLocaleUpperCase(locale) + label.slice(1);
 }

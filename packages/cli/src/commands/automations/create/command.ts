@@ -1,28 +1,36 @@
 import { readFileSync } from "node:fs";
 import { boolean, CLIError, string } from "@superset/cli-framework";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { command } from "../../../lib/command";
 import { resolveHostFilter } from "../../../lib/host-target";
 import { formatAutomationDate } from "../format";
+import { assertTriggersConnected } from "../missingConnectionError";
 import { resolveAutomationTarget } from "../resolveAutomationTarget";
 import {
 	refuseHostFlagsForCloud,
 	resolveCloudAutomationTarget,
+	splitCloudHost,
 } from "../resolveCloudAutomationTarget";
+import { resolveTriggers } from "../resolveTriggers";
 
 const DEFAULT_TIMEZONE =
 	Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
 export default command({
-	description: "Create a scheduled automation",
+	description: "Create an automation that runs on a schedule or on events",
 	options: {
 		name: string().required().desc("Human-readable automation name"),
 		prompt: string().desc("Prompt to send to the agent"),
 		promptFile: string().desc("Path to a file containing the prompt"),
-		rrule: string()
-			.required()
-			.desc(
-				"RFC 5545 RRULE body, e.g. FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9;BYMINUTE=0",
-			),
+		rrule: string().desc(
+			"RFC 5545 RRULE body, e.g. FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9;BYMINUTE=0. Omit when passing --triggers",
+		),
+		triggers: string().desc(
+			"Trigger set as a JSON array, for event triggers (Slack, GitHub, Linear, ...). See --triggers-file",
+		),
+		triggersFile: string().desc(
+			"Path to a JSON file holding the trigger set. Run `superset automations trigger-options --group slack` to resolve the ids a scope filters on",
+		),
 		timezone: string().desc(`IANA timezone (default: host TZ, else UTC)`),
 		dtstart: string().desc("ISO 8601 start anchor (default: now)"),
 		project: string().desc(
@@ -37,11 +45,16 @@ export default command({
 		environment: string().desc(
 			"Id of the environment each run's cloud workspace starts from. Implies --cloud; required when several environments have repositories",
 		),
+		machineSize: string()
+			.enum(...MACHINE_SIZES)
+			.desc(
+				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Implies --cloud",
+			),
 		continueSession: boolean().desc(
-			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace",
+			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Without --workspace, the first run's workspace is kept for the next runs",
 		),
 		host: string().desc(
-			"Host the target project/workspace lives on (default: this machine)",
+			"Host the target project/workspace lives on, or `cloud` for --cloud (default: this machine)",
 		),
 		local: boolean().desc("Run the automation on this machine (the default)"),
 		agent: string()
@@ -52,6 +65,9 @@ export default command({
 			.desc(
 				"Workspace tag applied to each run's created workspace. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
 			),
+		group: string().desc(
+			"Group the automation is listed under in the automations table",
+		),
 	},
 	run: async ({ ctx, options }) => {
 		const prompt = options.prompt
@@ -63,14 +79,28 @@ export default command({
 			throw new Error("Provide --prompt <text> or --prompt-file <path>");
 		}
 
+		const triggers = resolveTriggers(options);
+		if (!triggers && !options.rrule) {
+			throw new CLIError(
+				"An automation needs something to fire it",
+				"Pass --rrule <RRULE> for a schedule, or --triggers-file <path> for event triggers",
+			);
+		}
+
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
 			throw new CLIError("No active organization", "Run: superset auth login");
 		}
-		const cloud = Boolean(options.cloud || options.environment);
+		const hostFlag = splitCloudHost(options.host);
+		const cloud = Boolean(
+			options.cloud ||
+				hostFlag.cloud ||
+				options.environment ||
+				options.machineSize,
+		);
 		if (cloud) {
 			refuseHostFlagsForCloud({
-				"--host": options.host,
+				"--host": hostFlag.host,
 				"--local": options.local,
 				"--project": options.project,
 				"--tag": options.tag?.length ? options.tag : undefined,
@@ -93,7 +123,7 @@ export default command({
 						userJwt: ctx.bearer,
 						api: ctx.api,
 						hostId: resolveHostFilter({
-							host: options.host ?? undefined,
+							host: hostFlag.host,
 							local: options.local ?? undefined,
 						}),
 						workspaceId: options.workspace ?? undefined,
@@ -102,25 +132,33 @@ export default command({
 					v2WorkspaceId: options.workspace ?? undefined,
 				};
 
+		await assertTriggersConnected(ctx.api, organizationId, triggers);
+
 		const result = await ctx.api.automation.create.mutate({
 			name: options.name,
 			prompt,
 			agent: options.agent,
 			...target,
 			continueAgentSession: options.continueSession ?? undefined,
-			rrule: options.rrule,
+			...(options.machineSize ? { machineSize: options.machineSize } : {}),
+			rrule: options.rrule ?? undefined,
 			dtstart: options.dtstart ? new Date(options.dtstart) : undefined,
 			timezone: options.timezone ?? DEFAULT_TIMEZONE,
+			...(triggers ? { triggers } : {}),
 			...(options.tag?.length ? { tags: options.tag } : {}),
+			...(options.group ? { group: options.group } : {}),
 		});
 
+		const schedule = result.nextRunAt
+			? `\nNext run: ${formatAutomationDate(result.nextRunAt, result.timezone)}`
+			: "";
 		return {
 			data: result,
-			message: [
-				`Created automation "${result.name}" (${result.id})`,
-				...(cloudTarget ? [`Runs ${cloudTarget.placement}`] : []),
-				`Next run: ${formatAutomationDate(result.nextRunAt, result.timezone)}`,
-			].join("\n"),
+			message:
+				[
+					`Created automation "${result.name}" (${result.id})`,
+					...(cloudTarget ? [`Runs ${cloudTarget.placement}`] : []),
+				].join("\n") + schedule,
 		};
 	},
 });

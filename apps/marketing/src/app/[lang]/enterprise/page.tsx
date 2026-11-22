@@ -1,14 +1,17 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { getI18nInstance } from "@superset/i18n/server";
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { GridCross } from "@/app/[lang]/blog/components/GridCross";
 import { Soc2Badge } from "@/app/[lang]/components/Soc2Badge";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { FAQPageJsonLd } from "@/components/JsonLd";
 import { EnterpriseContactForm } from "./components/EnterpriseContactForm";
 import { EnterpriseFAQ } from "./components/EnterpriseFAQ";
+import { ENTERPRISE_FAQ_ITEMS } from "./components/EnterpriseFAQ/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const lang = await initServerI18n();
@@ -24,19 +27,26 @@ export async function generateMetadata(): Promise<Metadata> {
 				message:
 					"Bring {companyName} to your team. Get in touch to learn more about enterprise plans and deployment options.",
 			}),
-			values: { companyName: COMPANY.NAME },
+			values: { companyName: BRAND.NAME },
 		}),
 		alternates: localizedAlternates(lang, "/enterprise"),
 	};
 }
 
 export default async function EnterprisePage() {
-	await initServerI18n();
+	const locale = await initServerI18n();
+	const i18n = getI18nInstance(locale);
 
 	const { t } = useLingui();
 
 	return (
 		<main className="relative min-h-screen">
+			<FAQPageJsonLd
+				items={ENTERPRISE_FAQ_ITEMS.map((item) => ({
+					question: i18n._(item.question),
+					answer: i18n._(item.answer),
+				}))}
+			/>
 			{/* Vertical guide lines */}
 			<div
 				className="absolute inset-0 pointer-events-none"
@@ -59,13 +69,13 @@ export default async function EnterprisePage() {
 								<Trans>Enterprise</Trans>
 							</span>
 							<h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mt-4">
-								<Trans>Superset for your team</Trans>
+								<Trans>Paradev for your team</Trans>
 							</h1>
 							<p className="text-muted-foreground mt-3 max-w-lg">
 								<Trans>
-									Interested in bringing Superset to your organization? Reach
-									out and we&apos;ll work with you to find the right setup for
-									your team.
+									Interested in bringing Paradev to your organization? Reach out
+									and we&apos;ll work with you to find the right setup for your
+									team.
 								</Trans>
 							</p>
 						</div>

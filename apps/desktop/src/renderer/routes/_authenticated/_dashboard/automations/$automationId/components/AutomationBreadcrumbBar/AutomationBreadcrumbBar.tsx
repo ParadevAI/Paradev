@@ -14,6 +14,7 @@ import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components
 interface AutomationBreadcrumbBarProps {
 	/** Omitted when the automation could not be loaded — the crumb stops at the list. */
 	name?: string;
+	group?: string | null;
 	/** The header's right-hand actions, if there are any. */
 	children?: ReactNode;
 }
@@ -24,6 +25,7 @@ interface AutomationBreadcrumbBarProps {
  */
 export function AutomationBreadcrumbBar({
 	name,
+	group,
 	children,
 }: AutomationBreadcrumbBarProps) {
 	return (
@@ -39,6 +41,14 @@ export function AutomationBreadcrumbBar({
 								</Link>
 							</BreadcrumbLink>
 						</BreadcrumbItem>
+						{name !== undefined && group && (
+							<>
+								<BreadcrumbSeparator />
+								<BreadcrumbItem className="min-w-0">
+									<span className="truncate">{group}</span>
+								</BreadcrumbItem>
+							</>
+						)}
 						{name !== undefined && (
 							<>
 								<BreadcrumbSeparator />

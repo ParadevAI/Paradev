@@ -16,13 +16,14 @@ export type MicrosoftTeamsConfig = Extract<
  * event names its words and slots, the renderer knows only slots.
  */
 export type Slot =
+	| "account"
 	| "teams"
 	| "channels"
 	| "actor"
 	| "messageFilter"
 	| "nameFilter";
 
-export type SentencePart = { text: string } | { slot: Slot };
+type SentencePart = { text: string } | { slot: Slot };
 
 export const TEAMS_SENTENCES: Record<
 	MicrosoftTeamsTriggerEvent,
@@ -31,6 +32,7 @@ export const TEAMS_SENTENCES: Record<
 	message_in_channel: [
 		{ slot: "messageFilter" },
 		{ text: "in" },
+		{ slot: "account" },
 		{ slot: "teams" },
 		{ text: "›" },
 		{ slot: "channels" },
@@ -39,6 +41,7 @@ export const TEAMS_SENTENCES: Record<
 	],
 	channel_created: [
 		{ text: "Channel created in" },
+		{ slot: "account" },
 		{ slot: "teams" },
 		{ slot: "nameFilter" },
 	],
@@ -69,7 +72,7 @@ function leaf(label: MessageDescriptor, event: MicrosoftTeamsTriggerEvent) {
  * nothing until someone picks — the same safety property as GitHub's
  * repositories.
  */
-export function createTeamsConfig(
+function createTeamsConfig(
 	event: MicrosoftTeamsTriggerEvent,
 ): MicrosoftTeamsConfig {
 	return {

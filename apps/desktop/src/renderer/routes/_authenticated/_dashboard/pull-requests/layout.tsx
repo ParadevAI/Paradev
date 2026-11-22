@@ -26,8 +26,10 @@ const MIN_DETAIL_PANE_WIDTH = 420;
 export type PullRequestsSearch = {
 	search?: string;
 	project?: string;
+	repo?: string;
 	projects?: string;
 	author?: string;
+	reviewer?: string;
 	review?: string;
 	state?: "open" | "all" | "merged";
 };
@@ -38,9 +40,11 @@ export const Route = createFileRoute(
 	component: PullRequestsLayout,
 	validateSearch: (search: Record<string, unknown>): PullRequestsSearch => ({
 		search: typeof search.search === "string" ? search.search : undefined,
+		repo: typeof search.repo === "string" ? search.repo : undefined,
 		project: typeof search.project === "string" ? search.project : undefined,
 		projects: typeof search.projects === "string" ? search.projects : undefined,
 		author: typeof search.author === "string" ? search.author : undefined,
+		reviewer: typeof search.reviewer === "string" ? search.reviewer : undefined,
 		review: typeof search.review === "string" ? search.review : undefined,
 		state: ["open", "all", "merged"].includes(search.state as string)
 			? (search.state as PullRequestsSearch["state"])
@@ -58,7 +62,7 @@ export const Route = createFileRoute(
  * always reveals the other, since hiding both would leave nothing on screen.
  */
 function PullRequestsLayout() {
-	const { search, project, projects, author, review, state } =
+	const { search, project, repo, projects, author, reviewer, review, state } =
 		Route.useSearch();
 	const params = useParams({ strict: false }) as { prNumber?: string };
 	const selectedPrNumber = params.prNumber
@@ -72,10 +76,6 @@ function PullRequestsLayout() {
 	);
 	const listWidth = usePullRequestsSplitViewStore((s) => s.width);
 	const setListWidth = usePullRequestsSplitViewStore((s) => s.setWidth);
-	const isResizingList = usePullRequestsSplitViewStore((s) => s.isResizing);
-	const setIsResizingList = usePullRequestsSplitViewStore(
-		(s) => s.setIsResizing,
-	);
 	// Stable identity: effects downstream key off this array.
 	const initialProjects = useMemo(
 		() => resolveProjectFilterParams(projects, project, undefined),
@@ -111,10 +111,12 @@ function PullRequestsLayout() {
 			initialSearch={search}
 			initialProjects={initialProjects}
 			initialAuthor={author}
+			initialReviewer={reviewer}
 			initialReview={review}
 			initialState={state}
 			selectedPrNumber={selectedPrNumber}
 			selectedPrProjectId={project ?? null}
+			selectedPrRepo={repo ?? null}
 		/>
 	);
 
@@ -128,8 +130,6 @@ function PullRequestsLayout() {
 					disabled={isDetailCollapsed}
 					width={displayListWidth}
 					onWidthChange={setListWidth}
-					isResizing={isResizingList}
-					onResizingChange={setIsResizingList}
 					minWidth={MIN_PULL_REQUESTS_LIST_WIDTH}
 					maxWidth={MAX_PULL_REQUESTS_LIST_WIDTH}
 					handleSide="right"

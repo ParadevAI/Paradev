@@ -1,4 +1,7 @@
 import { Trans } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
+import { useFeatureFlagEnabled } from "posthog-js/react";
+import { SiLinear } from "react-icons/si";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import { CloudPullRequestRow } from "renderer/routes/_authenticated/_dashboard/components/CloudPullRequestRow";
 import { CloudSection } from "renderer/routes/_authenticated/_dashboard/components/CloudSection";
@@ -11,12 +14,14 @@ import {
 import type { CloudPullRequest } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import type { TaskProjectValue, TaskRecord } from "../../../../types";
 import { AssigneeProperty } from "./components/AssigneeProperty";
+import { ChannelProperty } from "./components/ChannelProperty";
 import { PriorityProperty } from "./components/PriorityProperty";
 import { StatusProperty } from "./components/StatusProperty";
 import { TaskWorkspaceRow } from "./components/TaskWorkspaceRow";
 
 interface TaskRecordSideProps {
 	task: TaskRecord;
+	importSource: { externalUrl: string } | null;
 	now: Date;
 	project: TaskProjectValue | null;
 	projects: TaskProjectValue[];
@@ -34,6 +39,7 @@ interface TaskRecordSideProps {
 
 export function TaskRecordSide({
 	task,
+	importSource,
 	now,
 	project,
 	projects,
@@ -48,6 +54,8 @@ export function TaskRecordSide({
 	onOpenWorkspace,
 	onOpenPullRequest,
 }: TaskRecordSideProps) {
+	const channelsEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	return (
 		<aside className="space-y-4 px-3 py-[18px] text-[13px]">
 			<CloudSection title={<Trans>Properties</Trans>}>
@@ -68,6 +76,22 @@ export function TaskRecordSide({
 						onCreateProject={onCreateProject}
 					/>
 				</PropertyRow>
+				{channelsEnabled && (
+					<PropertyRow label={<Trans>Channel</Trans>}>
+						<ChannelProperty taskId={task.id} />
+					</PropertyRow>
+				)}
+				{importSource && (
+					<a
+						href={importSource.externalUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+					>
+						<SiLinear className="size-3.5" />
+						<Trans>Imported from Linear</Trans>
+					</a>
+				)}
 			</CloudSection>
 			<CloudSection title={<Trans>Labels</Trans>}>
 				<div className="px-2 py-1">

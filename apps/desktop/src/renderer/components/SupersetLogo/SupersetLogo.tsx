@@ -1,0 +1,61 @@
+import { Trans } from "@lingui/react/macro";
+import { cn } from "@superset/ui/utils";
+import { useId } from "react";
+
+interface SupersetLogoProps {
+	className?: string;
+	gradient?: boolean;
+}
+
+export function SupersetLogo({
+	className,
+	gradient = false,
+}: SupersetLogoProps) {
+	const reactId = useId();
+	const gradientId = `superset-logo-gradient-${reactId}`;
+
+	return (
+		<svg
+			width="270"
+			height="50"
+			viewBox="0 0 270 50"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			className={cn("text-foreground", className)}
+			aria-label="Paradev"
+		>
+			<title>
+				<Trans>Paradev</Trans>
+			</title>
+			{gradient && (
+				<defs>
+					<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+						<stop offset="0%" stopColor="currentColor" stopOpacity="0.35" />
+						<stop offset="45%" stopColor="currentColor" stopOpacity="0.45" />
+						<stop offset="50%" stopColor="currentColor" stopOpacity="1" />
+						<stop offset="55%" stopColor="currentColor" stopOpacity="0.45" />
+						<stop offset="100%" stopColor="currentColor" stopOpacity="0.35" />
+						<animate
+							attributeName="x1"
+							values="-100%;100%;100%"
+							keyTimes="0;0.55;1"
+							dur="1.6s"
+							repeatCount="indefinite"
+						/>
+						<animate
+							attributeName="x2"
+							values="0%;200%;200%"
+							keyTimes="0;0.55;1"
+							dur="1.6s"
+							repeatCount="indefinite"
+						/>
+					</linearGradient>
+				</defs>
+			)}
+			<path
+				d="M0 0H30V10H0ZM40 0H70V10H40ZM80 0H110V10H80ZM120 0H150V10H120ZM160 0H180V10H160ZM200 0H230V10H200ZM240 0H250V10H240ZM260 0H270V10H260ZM0 10H10V20H0ZM20 10H30V20H20ZM40 10H50V20H40ZM60 10H70V20H60ZM80 10H90V20H80ZM100 10H110V20H100ZM120 10H130V20H120ZM140 10H150V20H140ZM160 10H170V20H160ZM180 10H190V20H180ZM200 10H210V20H200ZM240 10H250V20H240ZM260 10H270V20H260ZM0 20H30V30H0ZM40 20H70V30H40ZM80 20H100V30H80ZM120 20H150V30H120ZM160 20H170V30H160ZM180 20H190V30H180ZM200 20H220V30H200ZM240 20H250V30H240ZM260 20H270V30H260ZM0 30H10V40H0ZM40 30H50V40H40ZM60 30H70V40H60ZM80 30H90V40H80ZM100 30H110V40H100ZM120 30H130V40H120ZM140 30H150V40H140ZM160 30H170V40H160ZM180 30H190V40H180ZM200 30H210V40H200ZM240 30H250V40H240ZM260 30H270V40H260ZM0 40H10V50H0ZM40 40H50V50H40ZM60 40H70V50H60ZM80 40H90V50H80ZM100 40H110V50H100ZM120 40H130V50H120ZM140 40H150V50H140ZM160 40H180V50H160ZM200 40H230V50H200ZM250 40H260V50H250Z"
+				fill={gradient ? `url(#${gradientId})` : "currentColor"}
+			/>
+		</svg>
+	);
+}

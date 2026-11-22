@@ -8,7 +8,7 @@ export function register(server: McpServer): void {
 		name: "automations_run",
 		annotations: { destructiveHint: false },
 		description:
-			"Dispatch an automation immediately, outside its normal schedule. Returns the new run ID; does not wait for completion. Use automations_logs to track progress.",
+			"Dispatch an automation immediately, without waiting for a schedule or event. Returns the new run ID; does not wait for completion. Use automations_logs to track progress.",
 		inputSchema: {
 			id: z.string().uuid().describe("Automation UUID."),
 		},

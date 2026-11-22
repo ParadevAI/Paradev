@@ -1,28 +1,18 @@
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { withLocalHostService } from "../../../lib/host/test-helpers";
+import { workspaceLinks } from "../../../lib/open-url";
+import getCommand from "./command";
 
-// Control what `resolveWorkspaceTarget` resolves per test. The command imports
-// it from the lib barrel, so mock that module before importing the SUT.
-type FindResult = {
-	hostId: string;
-	workspace: Record<string, unknown> | undefined;
-};
-let findResult: FindResult = { hostId: "host-1", workspace: undefined };
-mock.module("../../../lib/host-workspaces", () => ({
-	resolveWorkspaceTarget: async () => {
-		if (!findResult.workspace) {
-			throw new Error(`Workspace not found on host ${findResult.hostId}`);
-		}
-		return { ...findResult, target: {} };
-	},
-}));
+let workspaces: Array<Record<string, unknown>> = [];
+let previousWorkspaceId: string | undefined;
 
-const { default: getCommand } = await import("./command");
+withLocalHostService("org-1", { "workspace.list": () => workspaces });
 
 const WORKSPACE = {
 	id: "b502bf30-8693-4815-be65-795035e0ce5f",
 	organizationId: "org-1",
 	projectId: "proj-1",
-	projectName: "Superset",
+	projectName: "Paradev",
 	hostId: "host-1",
 	name: "ludicrous-candytuft",
 	branch: "setup",
@@ -64,20 +54,29 @@ function invoke(args: { id?: string }, options: { field?: string } = {}) {
 	});
 }
 
-afterEach(() => {
-	findResult = { hostId: "host-1", workspace: undefined };
+beforeEach(() => {
+	previousWorkspaceId = process.env.SUPERSET_WORKSPACE_ID;
 	delete process.env.SUPERSET_WORKSPACE_ID;
+});
+
+afterEach(() => {
+	workspaces = [];
+	if (previousWorkspaceId === undefined) {
+		delete process.env.SUPERSET_WORKSPACE_ID;
+	} else {
+		process.env.SUPERSET_WORKSPACE_ID = previousWorkspaceId;
+	}
 });
 
 describe("workspaces get", () => {
 	test("resolves by explicit id and enriches project/host names", async () => {
-		findResult = { hostId: "host-1", workspace: { ...WORKSPACE } };
+		workspaces = [WORKSPACE];
 		const result = (await invoke({ id: WORKSPACE.id })) as {
 			data: Record<string, unknown>;
 			message: string;
 		};
 		expect(result.data.name).toBe("ludicrous-candytuft");
-		expect(result.data.projectName).toBe("Superset");
+		expect(result.data.projectName).toBe("Paradev");
 		expect(result.data.hostName).toBe("Town-Hall");
 		expect(result.data.worktreePath).toBe(WORKSPACE.worktreePath);
 		expect(result.message).toContain("name");
@@ -86,7 +85,7 @@ describe("workspaces get", () => {
 
 	test("defaults the id to $SUPERSET_WORKSPACE_ID when no arg is given", async () => {
 		process.env.SUPERSET_WORKSPACE_ID = WORKSPACE.id;
-		findResult = { hostId: "host-1", workspace: { ...WORKSPACE } };
+		workspaces = [WORKSPACE];
 		const result = (await invoke({})) as { data: Record<string, unknown> };
 		expect(result.data.id).toBe(WORKSPACE.id);
 	});
@@ -96,7 +95,7 @@ describe("workspaces get", () => {
 	});
 
 	test("--field prints the raw value as the message, data stays full", async () => {
-		findResult = { hostId: "host-1", workspace: { ...WORKSPACE } };
+		workspaces = [WORKSPACE];
 		const result = (await invoke({ id: WORKSPACE.id }, { field: "name" })) as {
 			data: Record<string, unknown>;
 			message: string;
@@ -105,8 +104,24 @@ describe("workspaces get", () => {
 		expect(result.data.branch).toBe("setup");
 	});
 
+	test("shows the desktop and web links, and --field prints the web one raw", async () => {
+		workspaces = [WORKSPACE];
+		const { url, webUrl } = workspaceLinks(WORKSPACE.id);
+		const result = (await invoke({ id: WORKSPACE.id })) as {
+			data: Record<string, unknown>;
+			message: string;
+		};
+		expect(result.data.url).toBe(url);
+		expect(result.data.webUrl).toBe(webUrl);
+		expect(result.message).toContain(webUrl);
+		const field = (await invoke({ id: WORKSPACE.id }, { field: "webUrl" })) as {
+			message: string;
+		};
+		expect(field.message).toBe(webUrl);
+	});
+
 	test("--field with a null value yields an empty message", async () => {
-		findResult = { hostId: "host-1", workspace: { ...WORKSPACE } };
+		workspaces = [WORKSPACE];
 		const result = (await invoke(
 			{ id: WORKSPACE.id },
 			{ field: "taskId" },
@@ -117,29 +132,25 @@ describe("workspaces get", () => {
 	});
 
 	test("--field rejects an unknown field name", async () => {
-		findResult = { hostId: "host-1", workspace: { ...WORKSPACE } };
+		workspaces = [WORKSPACE];
 		await expect(
 			invoke({ id: WORKSPACE.id }, { field: "bogus" }),
 		).rejects.toThrow(/Unknown field: bogus/);
 	});
 
 	test("--field rejects inherited Object.prototype keys", async () => {
-		findResult = { hostId: "host-1", workspace: { ...WORKSPACE } };
+		workspaces = [WORKSPACE];
 		await expect(
 			invoke({ id: WORKSPACE.id }, { field: "toString" }),
 		).rejects.toThrow(/Unknown field: toString/);
 	});
 
 	test("errors when the workspace is not on the target host", async () => {
-		findResult = { hostId: "host-1", workspace: undefined };
 		await expect(invoke({ id: WORKSPACE.id })).rejects.toThrow(/not found/);
 	});
 
 	test("falls back to ids when the row has no project name and host lookup fails", async () => {
-		findResult = {
-			hostId: "host-1",
-			workspace: { ...WORKSPACE, projectName: null },
-		};
+		workspaces = [{ ...WORKSPACE, projectName: null }];
 		const result = (await getCommand.run({
 			ctx: {
 				api: {

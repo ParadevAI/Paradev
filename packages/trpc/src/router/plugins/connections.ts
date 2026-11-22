@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
-import { pluginInstalls } from "@superset/db/schema";
-import { and, asc, countDistinct, eq } from "drizzle-orm";
+import { organizationPlugins, pluginInstalls } from "@superset/db/schema";
+import { and, asc, eq, isNull, or } from "drizzle-orm";
+import { accessibleTo, memberRole } from "../../lib/organization-plugins";
 import { installConnector, type PluginManifest } from "./manifest";
 
 export interface InstalledPlugin {
@@ -8,6 +9,65 @@ export interface InstalledPlugin {
 	manifest: PluginManifest;
 	marketplace: string;
 	connector: string | undefined;
+	organizationId?: string;
+}
+
+interface InstallRow {
+	id: string;
+	manifest: unknown;
+	marketplace: string;
+	organizationPluginId: string | null;
+}
+
+/**
+ * The manifest an install runs with. An organization plugin is read from the
+ * organization's row every time: the copy on the install is whatever was
+ * current when the member installed it, and an admin may have changed the
+ * plugin or taken it away from the member's role since.
+ */
+async function resolveInstall(
+	userId: string,
+	row: InstallRow & { organizationId: string | null },
+	pluginName: string,
+): Promise<InstalledPlugin | null> {
+	if (!row.organizationPluginId) {
+		return {
+			id: row.id,
+			manifest: row.manifest as PluginManifest,
+			marketplace: row.marketplace,
+			connector: installConnector({ ...row, pluginName }),
+		};
+	}
+
+	const role = row.organizationId
+		? await memberRole(userId, row.organizationId)
+		: null;
+	const [published] = await db
+		.select({
+			manifest: organizationPlugins.manifest,
+			organizationId: organizationPlugins.organizationId,
+		})
+		.from(organizationPlugins)
+		.where(
+			and(
+				eq(organizationPlugins.id, row.organizationPluginId),
+				accessibleTo(role),
+			),
+		)
+		.limit(1);
+	if (!published) return null;
+
+	return {
+		id: row.id,
+		manifest: published.manifest as PluginManifest,
+		marketplace: row.marketplace,
+		connector: installConnector({
+			marketplace: row.marketplace,
+			pluginName,
+			manifest: published.manifest,
+		}),
+		organizationId: published.organizationId,
+	};
 }
 
 export class AmbiguousPluginError extends Error {
@@ -31,6 +91,8 @@ export async function installedPlugin(
 			id: pluginInstalls.id,
 			manifest: pluginInstalls.manifest,
 			marketplace: pluginInstalls.marketplace,
+			organizationPluginId: pluginInstalls.organizationPluginId,
+			organizationId: pluginInstalls.organizationId,
 		})
 		.from(pluginInstalls)
 		.where(
@@ -53,19 +115,24 @@ export async function installedPlugin(
 
 	const row = rows[0];
 	if (!row) return null;
-	return {
-		id: row.id,
-		manifest: row.manifest as PluginManifest,
-		marketplace: row.marketplace,
-		connector: installConnector({ ...row, pluginName }),
-	};
+	return resolveInstall(userId, row, pluginName);
 }
+
+/** The caller's account installs and those of the organization it acts in. */
+export const accountOrOrganizationInstalls = (organizationId: string | null) =>
+	or(
+		isNull(pluginInstalls.organizationId),
+		organizationId
+			? eq(pluginInstalls.organizationId, organizationId)
+			: undefined,
+	);
 
 export async function installRecord(
 	userId: string,
+	organizationId: string | null,
 	pluginName: string,
 	marketplace?: string,
-): Promise<{ id: string; marketplace: string; siblings: number } | null> {
+): Promise<{ id: string; marketplace: string } | null> {
 	const rows = await db
 		.select({
 			id: pluginInstalls.id,
@@ -77,6 +144,7 @@ export async function installRecord(
 				eq(pluginInstalls.userId, userId),
 				eq(pluginInstalls.pluginName, pluginName),
 				marketplace ? eq(pluginInstalls.marketplace, marketplace) : undefined,
+				accountOrOrganizationInstalls(organizationId),
 			),
 		)
 		.orderBy(asc(pluginInstalls.marketplace));
@@ -88,20 +156,7 @@ export async function installRecord(
 		);
 	}
 
-	const row = rows[0];
-	if (!row) return null;
-
-	const [{ count } = { count: 0 }] = await db
-		.select({ count: countDistinct(pluginInstalls.id) })
-		.from(pluginInstalls)
-		.where(
-			and(
-				eq(pluginInstalls.userId, userId),
-				eq(pluginInstalls.pluginName, pluginName),
-			),
-		);
-
-	return { id: row.id, marketplace: row.marketplace, siblings: count };
+	return rows[0] ?? null;
 }
 
 export async function installById(
@@ -114,6 +169,8 @@ export async function installById(
 			manifest: pluginInstalls.manifest,
 			marketplace: pluginInstalls.marketplace,
 			pluginName: pluginInstalls.pluginName,
+			organizationPluginId: pluginInstalls.organizationPluginId,
+			organizationId: pluginInstalls.organizationId,
 		})
 		.from(pluginInstalls)
 		.where(
@@ -126,12 +183,7 @@ export async function installById(
 		.limit(1);
 
 	if (!row) return null;
-	return {
-		id: row.id,
-		manifest: row.manifest as PluginManifest,
-		marketplace: row.marketplace,
-		connector: installConnector(row),
-	};
+	return resolveInstall(userId, row, row.pluginName);
 }
 
 export async function installedManifest(

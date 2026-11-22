@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type EnrichedSubscription,
+	formatPlanChanged,
 	formatSubscriptionCancelled,
+	type PreviousPlan,
+	planChangeDirection,
+	planLabel,
 } from "./slack-blocks";
 
 function createEnrichedSubscription(
@@ -114,5 +118,58 @@ describe("formatSubscriptionCancelled", () => {
 		expect(serializedBlocks).toContain("&amp;");
 		expect(serializedBlocks).toContain("&lt;https://example.com|link&gt;");
 		expect(serializedBlocks).toContain("...");
+	});
+});
+
+describe("planLabel", () => {
+	test("capitalizes a known plan", () => {
+		expect(planLabel("pro")).toBe("Pro");
+	});
+
+	test("falls back to Unknown when the plan is missing", () => {
+		expect(planLabel(null)).toBe("Unknown");
+		expect(planLabel(undefined)).toBe("Unknown");
+	});
+});
+
+describe("formatPlanChanged", () => {
+	const previous: PreviousPlan = {
+		planName: "Pro",
+		pricePerSeatCents: 2000,
+		interval: "monthly",
+		seatCount: 3,
+	};
+
+	test("labels a move to a more expensive plan as an upgrade", () => {
+		const blocks = formatPlanChanged(
+			createEnrichedSubscription({ planName: "Team", pricePerSeatCents: 6000 }),
+			previous,
+		);
+		const serialized = JSON.stringify(blocks);
+
+		expect(serialized).toContain("Plan Upgraded");
+		expect(serialized).toContain("Pro -> Team");
+		expect(serialized).toContain("$20.00/seat/mo -> $60.00/seat/mo");
+	});
+
+	test("compares yearly and monthly prices per month", () => {
+		const enriched = createEnrichedSubscription({
+			pricePerSeatCents: 18000,
+			interval: "yearly",
+		});
+
+		expect(planChangeDirection(enriched, previous)).toBe("downgrade");
+	});
+
+	test("keeps the generic header without a previous price", () => {
+		const blocks = formatPlanChanged(
+			createEnrichedSubscription(),
+			null,
+			"yearly",
+		);
+		const serialized = JSON.stringify(blocks);
+
+		expect(serialized).toContain("Plan Changed");
+		expect(serialized).toContain("yearly -> monthly");
 	});
 });

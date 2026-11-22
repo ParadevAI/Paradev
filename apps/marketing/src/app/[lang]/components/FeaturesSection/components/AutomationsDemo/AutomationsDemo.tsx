@@ -1,158 +1,72 @@
 "use client";
 
-import type { MessageDescriptor } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { m, useInView } from "framer-motion";
 import { useRef } from "react";
+import { LuClock, LuGitPullRequestDraft } from "react-icons/lu";
+import { SiSentry } from "react-icons/si";
+import { DemoWindow } from "../DemoWindow";
 
-const AUTOMATIONS: {
-	name: string;
-	schedule: MessageDescriptor;
-	lastRun: MessageDescriptor;
-	running?: boolean;
-}[] = [
-	{
-		name: "daily-triage",
-		schedule: msg({
-			message: "daily 9:00",
-		}),
-		lastRun: msg({
-			message: "running",
-		}),
-		running: true,
-	},
-	{
-		name: "changelog-draft",
-		schedule: msg({
-			message: "sun 11:00",
-		}),
-		lastRun: msg({
-			message: "2h ago",
-		}),
-	},
-	{
-		name: "dep-upgrades",
-		schedule: msg({
-			message: "weekly",
-		}),
-		lastRun: msg({
-			message: "1d ago",
-		}),
-	},
-	{
-		name: "roadmap-sync",
-		schedule: msg({
-			message: "monthly",
-		}),
-		lastRun: msg({
-			message: "3d ago",
-		}),
-	},
-];
-
-const LOG_LINES: { id: string; message: MessageDescriptor }[] = [
-	{
-		id: "triaging",
-		message: msg({
-			message: "triaging 12 new issues…",
-		}),
-	},
-	{
-		id: "drafted",
-		message: msg({
-			message: "drafted 3 support replies",
-		}),
-	},
-	{
-		id: "opened-pr",
-		message: msg({
-			message: "opened PR #841 for review",
-		}),
-	},
-];
+const CHIP =
+	"inline-flex h-5 items-center rounded-[5px] bg-neutral-100/[0.08] px-1.5 text-neutral-100/90";
+const TRIGGER = "flex h-8 items-center gap-2 px-2.5 text-neutral-100/55";
 
 export function AutomationsDemo() {
-	const { t } = useLingui();
 	const ref = useRef<HTMLDivElement>(null);
 	const isInView = useInView(ref, { once: true, margin: "-100px" });
 
 	return (
-		<m.div
-			ref={ref}
-			className="relative w-full max-w-md overflow-hidden rounded-lg border border-border bg-background shadow-[0_1px_1px_rgba(0,0,0,0.4),0_24px_70px_-16px_rgba(0,0,0,0.75)]"
-			initial={{ opacity: 0, y: 20 }}
-			animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-			transition={{ duration: 0.5 }}
+		<DemoWindow
+			windowRef={ref}
+			inView={isInView}
+			className="w-full max-w-md gap-4 p-5"
 		>
-			<div className="pointer-events-none absolute inset-0 z-10 rounded-lg ring-1 ring-inset ring-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" />
-
-			<div className="relative flex h-8 items-center border-b border-border/60 bg-card px-3">
-				<div className="flex items-center gap-1.5">
-					<div className="size-2 rounded-full bg-[#ff5f57]/85" />
-					<div className="size-2 rounded-full bg-[#febc2e]/85" />
-					<div className="size-2 rounded-full bg-[#28c840]/85" />
-				</div>
-				<span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[10px] tracking-tight text-muted-foreground/60">
-					automations
+			<div className="flex items-center gap-2.5">
+				<span className="text-[15px] font-medium text-neutral-100/90">
+					<Trans>Fix production bugs</Trans>
+				</span>
+				<span className="flex h-3.5 w-6 items-center justify-end rounded-full bg-[#58da98]/80 p-0.5">
+					<span className="size-2.5 rounded-full bg-white" />
 				</span>
 			</div>
 
-			<div className="p-4 font-mono text-[11px] leading-relaxed">
-				<div className="grid grid-cols-[1fr_auto_auto] gap-x-6 gap-y-2">
-					<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-						<Trans>Name</Trans>
-					</div>
-					<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-						<Trans>Schedule</Trans>
-					</div>
-					<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-						<Trans>Last run</Trans>
-					</div>
-					{AUTOMATIONS.map((automation, index) => (
-						<m.div
-							key={automation.name}
-							className="contents"
-							initial={{ opacity: 0 }}
-							animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-							transition={{ duration: 0.3, delay: 0.15 + index * 0.08 }}
-						>
-							<div className="text-foreground/90">{automation.name}</div>
-							<div className="text-muted-foreground/65">
-								{t(automation.schedule)}
-							</div>
-							{automation.running ? (
-								<div className="text-brand-light">
-									⠋ <Trans>running</Trans>
-								</div>
-							) : (
-								<div className="text-muted-foreground/55">
-									<span className="text-emerald-400/85">✓</span>{" "}
-									{t(automation.lastRun)}
-								</div>
-							)}
-						</m.div>
-					))}
+			<div className="rounded-lg bg-black/20 py-1 shadow-[inset_0_0_0_1px_rgb(245_245_245/0.06)]">
+				<div className={TRIGGER}>
+					<SiSentry className="size-3.5 shrink-0" />
+					<span>
+						<Trans>
+							Sentry issue created in <span className={CHIP}>web</span>
+						</Trans>
+					</span>
 				</div>
-
-				<div className="mt-4 space-y-1 border-t border-border/60 pt-3">
-					<div className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground/65">
-						daily-triage
-					</div>
-					{LOG_LINES.map((line, index) => (
-						<m.div
-							key={line.id}
-							className="text-muted-foreground/70"
-							initial={{ opacity: 0 }}
-							animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-							transition={{ duration: 0.3, delay: 0.5 + index * 0.15 }}
-						>
-							<span className="text-muted-foreground/45">→</span>{" "}
-							{t(line.message)}
-						</m.div>
-					))}
+				<div className={TRIGGER}>
+					<LuClock className="size-3.5 shrink-0" />
+					<span>
+						<Trans>
+							Every day at <span className={CHIP}>9:00 AM</span>
+						</Trans>
+					</span>
 				</div>
 			</div>
-		</m.div>
+
+			<m.div
+				className="-mt-4 flex flex-col items-start"
+				initial={{ opacity: 0, y: 6 }}
+				animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+				transition={{ duration: 0.4, delay: 0.6 }}
+			>
+				<span className="ml-[17px] h-5 w-px bg-neutral-100/15" />
+				<div className="flex h-9 w-full items-center gap-2 rounded-lg bg-neutral-100/[0.06] px-2.5">
+					<LuGitPullRequestDraft className="size-4 shrink-0 text-neutral-100/55" />
+					<span className="text-neutral-100/90">
+						<Trans>Draft PR #2841</Trans>
+					</span>
+					<span className="ml-auto font-mono text-[12px] tabular-nums">
+						<span className="text-[#58da98]">+24</span>{" "}
+						<span className="text-[#ff6557]">−3</span>
+					</span>
+				</div>
+			</m.div>
+		</DemoWindow>
 	);
 }

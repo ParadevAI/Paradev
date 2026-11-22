@@ -39,6 +39,25 @@ describe("filesystem router integration", () => {
 		).rejects.toBeInstanceOf(TRPCClientError);
 	});
 
+	test("resolveFileReference finds the file a shortened path means", async () => {
+		const directory = join(scenario.repo.repoPath, "src", "hooks", "useThing");
+		mkdirSync(directory, { recursive: true });
+		writeFileSync(join(directory, "useThing.ts"), "export {};\n");
+
+		const found =
+			await scenario.host.trpc.filesystem.resolveFileReference.query({
+				workspaceId: scenario.workspaceId,
+				reference: "useThing/useThing.ts",
+			});
+		expect(found).toEqual({ resolvedPath: join(directory, "useThing.ts") });
+		expect(
+			await scenario.host.trpc.filesystem.resolveFileReference.query({
+				workspaceId: scenario.workspaceId,
+				reference: "nowhere/missing.ts",
+			}),
+		).toBeNull();
+	});
+
 	test("readFile returns text content", async () => {
 		const filePath = join(scenario.repo.repoPath, "hello.txt");
 		writeFileSync(filePath, "hello world");
@@ -94,6 +113,23 @@ describe("filesystem router integration", () => {
 			path: "nope.txt",
 		});
 		expect(result).toBeNull();
+	});
+
+	test("movePath onto a taken name is a CONFLICT and moves nothing", async () => {
+		const sourcePath = join(scenario.repo.repoPath, "source.txt");
+		const takenPath = join(scenario.repo.repoPath, "taken.txt");
+		writeFileSync(sourcePath, "source");
+		writeFileSync(takenPath, "taken");
+
+		await expect(
+			scenario.host.trpc.filesystem.movePath.mutate({
+				workspaceId: scenario.workspaceId,
+				sourceAbsolutePath: sourcePath,
+				destinationAbsolutePath: takenPath,
+			}),
+		).rejects.toMatchObject({ data: { code: "CONFLICT" } });
+		expect(readFileSync(sourcePath, "utf8")).toBe("source");
+		expect(readFileSync(takenPath, "utf8")).toBe("taken");
 	});
 
 	test("searchFiles with empty query returns no matches", async () => {

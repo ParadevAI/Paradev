@@ -4,6 +4,7 @@ import * as Haptics from "expo-haptics";
 import { router, Stack } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { ViewInstance } from "react-native";
 import {
 	ActivityIndicator,
 	Linking,
@@ -15,8 +16,18 @@ import {
 } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useReadableInset } from "@/hooks/useReadableInset";
+import {
+	githubAccessFailure,
+	useGithubConnection,
+} from "@/lib/github-connection";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
+import {
+	anchorOf,
+	ToolbarAnchor,
+} from "@/screens/(authenticated)/components/ToolbarAnchor";
 import { PullRequestCard } from "./components/PullRequestCard";
 import { PullRequestDescription } from "./components/PullRequestDescription";
 import { PullRequestHeader } from "./components/PullRequestHeader";
@@ -44,6 +55,8 @@ export function PullRequestScreen() {
 
 	// Once per pull request the screen shows, not once per refetch.
 	const openedPullRequestRef = useRef<string | null>(null);
+	const shareAnchorRef = useRef<ViewInstance>(null);
+	const readableInset = useReadableInset();
 	useEffect(() => {
 		const key = `${workspaceId}:${pullNumber}`;
 		if (pullNumber === null || openedPullRequestRef.current === key) return;
@@ -55,7 +68,6 @@ export function PullRequestScreen() {
 	}, [workspaceId, pullNumber]);
 
 	const merge = useMergePullRequest({
-		workspaceId,
 		owner,
 		repo,
 		pullNumber,
@@ -68,13 +80,13 @@ export function PullRequestScreen() {
 		},
 	});
 	const actions = usePullRequestActions({
-		workspaceId,
 		owner,
 		repo,
 		pullNumber,
 		onDone: () => void refetch(),
 	});
 	const askAgent = useAskAgent({ workspaceId });
+	const github = useGithubConnection();
 
 	const [notice, setNotice] = useState<string | null>(null);
 	const hideNotice = useCallback(() => setNotice(null), []);
@@ -104,17 +116,42 @@ export function PullRequestScreen() {
 	}
 
 	if (error || !detail) {
+		const failure = githubAccessFailure(error);
 		return (
 			<View className="bg-background flex-1 items-center justify-center gap-5 px-10">
 				<Text className="text-muted-foreground text-center text-[15px] leading-[21px]">
-					{error
+					{failure === "not-connected"
 						? t({
-								message: "Could not reach the host to load this pull request.",
+								message:
+									"Connect your GitHub account to load this pull request as you.",
 							})
-						: t({
-								message: "This pull request is no longer available.",
-							})}
+						: failure === "no-access"
+							? t({
+									message:
+										"You don't have access to this pull request on GitHub, or it no longer exists.",
+								})
+							: error
+								? t({ message: "Could not load this pull request." })
+								: t({
+										message: "This pull request is no longer available.",
+									})}
 				</Text>
+				{failure === "not-connected" ? (
+					<Pressable
+						accessibilityRole="button"
+						className="bg-primary h-[38px] items-center justify-center rounded-md px-5 active:opacity-80"
+						disabled={github.connect.isPending}
+						onPress={() =>
+							github.connect.mutate(undefined, {
+								onSuccess: () => void refetch(),
+							})
+						}
+					>
+						<Text className="text-primary-foreground font-medium text-[15px]">
+							{t({ message: "Connect GitHub" })}
+						</Text>
+					</Pressable>
+				) : null}
 				<Pressable
 					accessibilityRole="button"
 					className="bg-secondary h-[38px] items-center justify-center rounded-md px-5 active:opacity-80"
@@ -162,8 +199,8 @@ export function PullRequestScreen() {
 						: undefined,
 				}}
 			/>
-			<Stack.Toolbar placement="right">
-				<Stack.Toolbar.Button
+			<HeaderToolbar placement="right">
+				<HeaderToolbar.Button
 					accessibilityLabel={t({
 						message: "Copy link to pull request",
 					})}
@@ -171,39 +208,42 @@ export function PullRequestScreen() {
 					onPress={() => void copyLink()}
 					separateBackground
 				/>
-				<Stack.Toolbar.Menu
+				<HeaderToolbar.Menu
 					accessibilityLabel={t({
 						message: "Pull request actions",
 					})}
-					icon="ellipsis"
+					icon="overflow"
 					separateBackground
 				>
-					<Stack.Toolbar.MenuAction
-						icon="doc.on.doc"
-						onPress={() => void copyLink()}
-					>
+					<HeaderToolbar.MenuAction icon="copy" onPress={() => void copyLink()}>
 						{t({ message: "Copy link" })}
-					</Stack.Toolbar.MenuAction>
-					<Stack.Toolbar.MenuAction
-						icon="arrow.up.right"
+					</HeaderToolbar.MenuAction>
+					<HeaderToolbar.MenuAction
+						icon="openLink"
 						onPress={() => void Linking.openURL(detail.pullRequest.url)}
 					>
 						{t({
 							message: "Open in GitHub",
 						})}
-					</Stack.Toolbar.MenuAction>
-					<Stack.Toolbar.MenuAction
-						icon="square.and.arrow.up"
-						onPress={() => void Share.share({ url: detail.pullRequest.url })}
+					</HeaderToolbar.MenuAction>
+					<HeaderToolbar.MenuAction
+						icon="share"
+						onPress={() =>
+							void Share.share(
+								{ url: detail.pullRequest.url },
+								{ anchor: anchorOf(shareAnchorRef) },
+							)
+						}
 					>
 						{t({ message: "Share" })}
-					</Stack.Toolbar.MenuAction>
-				</Stack.Toolbar.Menu>
-			</Stack.Toolbar>
+					</HeaderToolbar.MenuAction>
+				</HeaderToolbar.Menu>
+			</HeaderToolbar>
 			<ScrollView
 				alwaysBounceVertical
 				className="bg-background flex-1"
 				contentContainerClassName="gap-4 py-4"
+				contentContainerStyle={{ paddingHorizontal: readableInset }}
 				contentInsetAdjustmentBehavior="automatic"
 				refreshControl={
 					// Bound to the pull, not the query, so background polls stay silent.
@@ -279,6 +319,7 @@ export function PullRequestScreen() {
 					</Pressable>
 				</View>
 			</ScrollView>
+			<ToolbarAnchor ref={shareAnchorRef} />
 		</>
 	);
 }

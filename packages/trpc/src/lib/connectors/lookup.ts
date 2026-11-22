@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { connections, type SelectConnection } from "@superset/db/schema";
-import { and, asc, desc, eq, isNull, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, notInArray, type SQL } from "drizzle-orm";
 import { decryptSecret } from "../../router/plugins/crypto";
 import { ensureFreshConnection } from "./refresh";
 
@@ -12,16 +12,17 @@ const NEWEST_FIRST = [desc(connections.updatedAt), desc(connections.id)];
  * Two live connections match one lookup, so there is no single account to run
  * under. Picking the newest would silently bind tool calls to whichever was
  * touched last — behaviour people would come to rely on before anyone noticed
- * it was arbitrary. Callers surface this as a conflict the user resolves by
- * disconnecting one.
+ * it was arbitrary.
  */
 export class AmbiguousConnectionError extends Error {
 	constructor(
 		readonly connector: string,
 		readonly connectionIds: string[],
 	) {
+		// Reaches a shell as often as a fetch, so it names both ways rather than
+		// only the query parameter a CLI user cannot type.
 		super(
-			`More than one ${connector} connection matches; disconnect the one you do not want.`,
+			`More than one ${connector} account is connected. Name one: --account <id> from the CLI, or ?connection=<id> on the endpoint.`,
 		);
 		this.name = "AmbiguousConnectionError";
 	}
@@ -92,6 +93,25 @@ export async function userConnection(
 	return single(rows, connector);
 }
 
+export async function userConnections(
+	organizationId: string,
+	connector: string,
+	userId: string,
+	options: ConnectionLookupOptions = {},
+): Promise<SelectConnection[]> {
+	return db
+		.select()
+		.from(connections)
+		.where(
+			live(options, [
+				eq(connections.organizationId, organizationId),
+				eq(connections.connector, connector),
+				eq(connections.connectedByUserId, userId),
+			]),
+		)
+		.orderBy(...NEWEST_FIRST);
+}
+
 export async function accountConnection(
 	connector: string,
 	externalAccountId: string,
@@ -137,6 +157,29 @@ export async function connectorConnections(
 		.from(connections)
 		.where(live(options, [eq(connections.connector, connector)]))
 		.orderBy(asc(connections.id));
+}
+
+/**
+ * Whether another live connection holds the same upstream grant as this one.
+ * Revoking the grant upstream would also cut that connection off.
+ */
+export async function grantSharedWithAnotherConnection(
+	connection: Pick<SelectConnection, "id" | "connector" | "externalUserId">,
+	alsoLeaving: readonly string[] = [],
+): Promise<boolean> {
+	if (!connection.externalUserId) return false;
+	const [row] = await db
+		.select({ id: connections.id })
+		.from(connections)
+		.where(
+			live({}, [
+				eq(connections.connector, connection.connector),
+				eq(connections.externalUserId, connection.externalUserId),
+				notInArray(connections.id, [connection.id, ...alsoLeaving]),
+			]),
+		)
+		.limit(1);
+	return row !== undefined;
 }
 
 export async function connectionById(

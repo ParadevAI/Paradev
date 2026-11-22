@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { GOOGLE_SCOPES } from "@superset/trpc/integrations/google";
 
 import { env } from "@/env";
@@ -13,10 +14,10 @@ export async function GET(request: Request) {
 		payload: { organizationId: member.organizationId, userId: member.userId },
 		authorizeUrl: (state) => {
 			const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-			authUrl.searchParams.set("client_id", env.GOOGLE_CLIENT_ID);
+			authUrl.searchParams.set("client_id", env.GOOGLE_CONNECTIONS_CLIENT_ID);
 			authUrl.searchParams.set(
 				"redirect_uri",
-				`${env.NEXT_PUBLIC_API_URL}/api/integrations/google/callback`,
+				`${getBrowserApiUrl(env)}/api/integrations/google/callback`,
 			);
 			authUrl.searchParams.set("response_type", "code");
 			authUrl.searchParams.set("scope", GOOGLE_SCOPES.join(" "));

@@ -1,15 +1,16 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import type { AutomationRunErrorCode } from "@superset/db/enums";
+import { i18n } from "@superset/i18n";
 
 const HELP: Record<AutomationRunErrorCode, MessageDescriptor> = {
 	host_offline: msg({
 		message:
-			"The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again.",
+			"The device was offline when this run started. It may have been asleep or shut down.",
 	}),
 	agent_not_found: msg({
 		message:
-			"The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings.",
+			"The agent this automation was set to run no longer exists on its host. The host's agents may have been reset or removed. Re-select an agent in the automation's settings.",
 	}),
 	workspace_not_found: msg({
 		message:
@@ -26,6 +27,10 @@ const HELP: Record<AutomationRunErrorCode, MessageDescriptor> = {
 	cloud_environment_unusable: msg({
 		message:
 			"The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings.",
+	}),
+	cloud_usage_limit_reached: msg({
+		message:
+			"Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device.",
 	}),
 	no_instructions: msg({
 		message:
@@ -54,4 +59,18 @@ export function dispatchErrorCode(error: unknown): string | null {
 	return typeof data?.automationErrorCode === "string"
 		? data.automationErrorCode
 		: null;
+}
+
+/**
+ * How a failed run reads wherever it is shown. Leads with the plain-language
+ * fix and keeps the raw host error for bug reports; both run lists call this
+ * so the same run never reads two ways.
+ */
+export function describeRunError(run: {
+	error?: string | null;
+	errorCode?: string | null;
+}): string {
+	const error = run.error ?? "";
+	const help = runErrorHelp(run.errorCode);
+	return help ? `${i18n._(help)}\n\n(${error})` : error;
 }

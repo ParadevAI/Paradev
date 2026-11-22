@@ -1,6 +1,6 @@
 extends: existence
 message: "'%s' is enterprise-speak the canon warns against; state the concrete capability instead."
-link: https://github.com/superset-sh/superset/blob/main/apps/marketing/docs/copywriting-references.md
+link: https://github.com/paradevai/paradev/blob/main/apps/marketing/docs/copywriting-references.md
 level: error
 ignorecase: true
 tokens:

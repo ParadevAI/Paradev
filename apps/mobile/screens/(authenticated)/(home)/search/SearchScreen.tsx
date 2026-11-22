@@ -1,32 +1,37 @@
 import { Plural, useLingui } from "@lingui/react/macro";
-import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import {
 	type NativeStackNavigationProp,
-	Stack,
 	useNavigation,
 	useRouter,
 } from "expo-router";
 import { FolderGit2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
-import type { SearchBarCommands } from "react-native-screens";
+import { RowLink } from "@/components/RowLink";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useCloudWorkspaceItems } from "@/hooks/useCloudWorkspaceItems";
+import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
+import {
+	itemFromCloudRow,
+	useCloudWorkspaceItems,
+} from "@/hooks/useCloudWorkspaceItems";
 import { useHostProjects } from "@/hooks/useHostProjects";
 import {
 	type HostWorkspaceItem,
 	useHostWorkspaces,
 } from "@/hooks/useHostWorkspaces";
-import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
 import {
 	type TerminalsHost,
 	useHostsTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
+import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
+import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
 
 /**
  * The native search bar lives in this sheet, not on the home screen: on a
@@ -45,14 +50,19 @@ export function SearchScreen() {
 	const router = useRouter();
 	const navigation =
 		useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
-	const theme = useTheme();
-	const searchBarRef = useRef<SearchBarCommands>(null);
+	const searchBarRef = useRef<SearchBarHandle>(null);
 	const [query, setQuery] = useState("");
+	const clearQuery = useCallback(() => setQuery(""), []);
 	const sort = useWorkspacesFilterStore((store) => store.sort);
 	const selectedHost = useSelectedHost();
 	const cloudScope = useWorkspaceScope() === "cloud";
 	const { workspaces } = useHostWorkspaces(selectedHost);
 	const { items: cloudItems } = useCloudWorkspaceItems();
+	const cloudFilters = useCloudFilters();
+	const searchArchived = cloudScope && cloudFilters.status === "archived";
+	const { workspaces: archivedCloud } = useArchivedCloudWorkspaces({
+		enabled: searchArchived,
+	});
 	const { projects } = useHostProjects(selectedHost);
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
 
@@ -91,15 +101,12 @@ export function SearchScreen() {
 	);
 
 	const activityTs = useCallback(
-		(workspace: HostWorkspaceItem) => {
-			if (sort !== "updatedAt") return new Date(workspace[sort]).getTime();
-			const workspaceTs = getWorkspaceActivityTime(workspace);
-			const terminalTs = (terminalsByWorkspace.get(workspace.id) ?? []).reduce(
-				(newest, row) => Math.max(newest, row.ts),
-				0,
-			);
-			return Math.max(workspaceTs, terminalTs);
-		},
+		(workspace: HostWorkspaceItem) =>
+			workspaceSortTime(
+				workspace,
+				sort,
+				(terminalsByWorkspace.get(workspace.id) ?? []).map((row) => row.ts),
+			),
 		[sort, terminalsByWorkspace],
 	);
 
@@ -119,7 +126,12 @@ export function SearchScreen() {
 
 	const results = useMemo(() => {
 		const pool = cloudScope
-			? cloudItems
+			? (searchArchived
+					? archivedCloud.map(itemFromCloudRow)
+					: cloudItems
+				).filter((workspace) =>
+					cloudFilters.matchesCreator(workspace.createdByUserId),
+				)
 			: workspaces.filter(
 					(workspace) =>
 						workspace.worktreeExists !== false &&
@@ -129,6 +141,9 @@ export function SearchScreen() {
 	}, [
 		cloudScope,
 		cloudItems,
+		searchArchived,
+		archivedCloud,
+		cloudFilters.matchesCreator,
 		workspaces,
 		selectedHost,
 		matchesQuery,
@@ -157,32 +172,32 @@ export function SearchScreen() {
 		},
 		[router],
 	);
+	const close = useCallback(() => router.back(), [router]);
+	const openFirst = useCallback(() => {
+		const first = results[0];
+		if (first) open(first);
+	}, [results, open]);
 
 	return (
 		<>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
-					onPress={() => router.back()}
+					onPress={close}
 				/>
-			</Stack.Toolbar>
-			<Stack.SearchBar
+			</HeaderToolbar>
+			<SearchBar
 				ref={searchBarRef}
 				placeholder={t({
 					message: "Search workspaces",
 				})}
-				placement="stacked"
-				hideWhenScrolling={false}
-				hideNavigationBar={false}
-				obscureBackground={false}
-				textColor={theme.foreground}
-				hintTextColor={theme.mutedForeground}
-				tintColor={theme.foreground}
-				onChangeText={(event) => setQuery(event.nativeEvent.text)}
-				onCancelButtonPress={() => setQuery("")}
+				onChangeText={setQuery}
+				onCancel={clearQuery}
+				onSubmit={openFirst}
+				onClose={close}
 			/>
 			<FlatList
 				className="bg-background"
@@ -209,39 +224,41 @@ export function SearchScreen() {
 								/>
 							)}
 						</Text>
-					) : null
+					) : undefined
 				}
 				renderItem={({ item: workspace }) => {
 					const projectName = workspace.projectId
 						? projectNamesById.get(workspace.projectId)
 						: undefined;
 					return (
-						<Pressable
-							className="flex-row items-center gap-3 px-4 py-2.5"
-							onPress={() => open(workspace)}
-							ph-label="search-workspace-row"
-						>
-							<View className="size-6 items-center justify-center">
-								<Icon
-									as={FolderGit2}
-									className="text-muted-foreground size-5"
-									strokeWidth={1.75}
-								/>
-							</View>
-							<View className="min-w-0 flex-1">
-								<Text className="font-semibold text-[14px]" numberOfLines={1}>
-									{workspace.name}
-								</Text>
-								<Text
-									className="text-muted-foreground text-[11.5px]"
-									numberOfLines={1}
-								>
-									{projectName
-										? `${projectName} · ${workspace.branch}`
-										: workspace.branch}
-								</Text>
-							</View>
-						</Pressable>
+						<RowLink href={`/workspace/${workspace.id}`}>
+							<Pressable
+								className="web:hover:bg-accent/60 web:rounded-lg flex-row items-center gap-3 px-4 py-2.5"
+								onPress={() => open(workspace)}
+								ph-label="search-workspace-row"
+							>
+								<View className="size-6 items-center justify-center">
+									<Icon
+										as={FolderGit2}
+										className="text-muted-foreground size-5"
+										strokeWidth={1.75}
+									/>
+								</View>
+								<View className="min-w-0 flex-1">
+									<Text className="font-semibold text-[14px]" numberOfLines={1}>
+										{workspace.name}
+									</Text>
+									<Text
+										className="text-muted-foreground text-[11.5px]"
+										numberOfLines={1}
+									>
+										{projectName
+											? `${projectName} · ${workspace.branch}`
+											: workspace.branch}
+									</Text>
+								</View>
+							</Pressable>
+						</RowLink>
 					);
 				}}
 				ListEmptyComponent={

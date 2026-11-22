@@ -1,8 +1,8 @@
 {
 	"ios": {
-		"NSSpeechRecognitionUsageDescription": "Superset, sesinizi metne dönüştürmek için konuşma tanımayı kullanır.",
-		"NSPhotoLibraryUsageDescription": "Superset, sohbet mesajlarına görsel ekleyebilmeniz için fotoğraf arşivinize erişim gerektirir.",
-		"NSCameraUsageDescription": "Superset, sohbet mesajlarına fotoğraf ekleyebilmeniz için kamerayı kullanır.",
-		"NSMicrophoneUsageDescription": "Superset, sohbet mesajlarını dikte edebilmeniz için mikrofonu kullanır."
+		"NSSpeechRecognitionUsageDescription": "Paradev, sesinizi metne dönüştürmek için konuşma tanımayı kullanır.",
+		"NSPhotoLibraryUsageDescription": "Paradev, sohbet mesajlarına görsel ekleyebilmeniz için fotoğraf arşivinize erişim gerektirir.",
+		"NSCameraUsageDescription": "Paradev, sohbet mesajlarına fotoğraf ekleyebilmeniz için kamerayı kullanır.",
+		"NSMicrophoneUsageDescription": "Paradev, sohbet mesajlarını dikte edebilmeniz için mikrofonu kullanır."
 	}
 }

@@ -91,6 +91,7 @@ async function githubPass(deadline: number) {
 	let processed = 0;
 	for (const installation of toSuspend) {
 		if (Date.now() > deadline) break;
+		if (await organizationSyncsNow(installation.organizationId)) continue;
 		const outcome = await suspendInstallation(installation);
 		outcomes[outcome] += 1;
 		processed += 1;
@@ -137,6 +138,7 @@ async function linearPass(deadline: number) {
 		.where(
 			and(
 				eq(connections.connector, "linear"),
+				eq(connections.authMethod, "oauth2"),
 				isNull(connections.disconnectedAt),
 				not(organizationSyncs(connections.organizationId)),
 			),

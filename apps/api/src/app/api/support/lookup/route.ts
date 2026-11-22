@@ -1,4 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
 	members,
@@ -123,6 +125,15 @@ export async function GET(request: Request): Promise<Response> {
 	const actualSeats = new Map(
 		seatCounts.map((s) => [s.organizationId, s.seats]),
 	);
+	const autumnPlans = billingUsesAutumn
+		? new Map(
+				await Promise.all(
+					[...byOrg.keys()].map(
+						async (id) => [id, await organizationPlanFromAutumn(id)] as const,
+					),
+				),
+			)
+		: null;
 
 	return Response.json({
 		found: true,
@@ -133,7 +144,8 @@ export async function GET(request: Request): Promise<Response> {
 			slug: m.organizationSlug,
 			role: m.role,
 			stripeCustomerId: m.stripeCustomerId,
-			plan: m.subscription?.plan ?? "free",
+			plan:
+				autumnPlans?.get(m.organizationId) ?? m.subscription?.plan ?? "free",
 			subscription: m.subscription
 				? {
 						status: m.subscription.status,

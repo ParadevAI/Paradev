@@ -15,15 +15,7 @@ Apply clean code philosophy to the code, with special emphasis on comments:
 - Are commented-out code blocks (delete them - version control exists)
 - Are TODO/FIXME that will never be addressed
 
-**Keep or add comments only when:**
-- Explaining *why* a non-obvious decision was made
-- Documenting design intent or architectural decisions (e.g., "shared by X and Y paths", "deferred because Z")
-- Documenting external constraints or business rules not evident from code
-- Warning about non-intuitive behavior or edge cases
-- Noting the origin of a pattern when it aids future maintenance (e.g., "VS Code pattern")
-- Required for public API documentation (JSDoc, docstrings)
-
-**When in doubt, keep the comment.** Removing a comment that captured intent is destructive — the reasoning is lost and cannot be recovered from code alone. Only remove a comment when you are confident the code *fully* communicates the same information.
+**Keep or add a comment only when** it states an external constraint or a trap the code cannot express (AGENTS.md "Comments"): first try to name, structure, or type it. Rationale goes in the commit message and the PR, not the code.
 
 ## Code Simplification
 

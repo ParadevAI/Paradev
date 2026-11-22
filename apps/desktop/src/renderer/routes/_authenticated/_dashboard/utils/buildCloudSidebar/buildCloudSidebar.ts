@@ -1,3 +1,4 @@
+import { sortByLastAgentMessage } from "@superset/shared/cloud-workspace-groups";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
 import type {
 	CloudSidebarEntry,
@@ -10,20 +11,8 @@ type SidebarWorkspace = Pick<
 	"id" | "createdAt" | "createdBy" | "agentStatusAt"
 >;
 
-const lastAgentMessageAt = (
-	workspace: Pick<CloudWorkspaceRow, "agentStatusAt" | "createdAt">,
-) => (workspace.agentStatusAt ?? workspace.createdAt).getTime();
-
-export function sortByLastAgentMessage<
-	Workspace extends Pick<CloudWorkspaceRow, "agentStatusAt" | "createdAt">,
->(workspaces: Workspace[]): Workspace[] {
-	return [...workspaces].sort(
-		(left, right) => lastAgentMessageAt(right) - lastAgentMessageAt(left),
-	);
-}
-
 export function isInCloudSidebar(
-	workspace: Pick<CloudWorkspaceRow, "createdBy">,
+	workspace: { createdBy: { userId: string } | null },
 	entry: CloudSidebarEntry | undefined,
 	userId: string | null,
 ): boolean {

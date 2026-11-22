@@ -4,6 +4,7 @@ import {
 	type IntegrationProvider,
 	offeredIntegrations,
 } from "@superset/shared/integrations";
+import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { Skeleton } from "@superset/ui/skeleton";
 import { useFeatureFlagPayload } from "posthog-js/react";
@@ -12,6 +13,11 @@ import { BsMicrosoftTeams } from "react-icons/bs";
 import { FaGithub, FaGoogle, FaSlack } from "react-icons/fa";
 import { HiOutlineArrowTopRightOnSquare } from "react-icons/hi2";
 import { SiLinear, SiNotion, SiSentry } from "react-icons/si";
+import {
+	GATED_FEATURES,
+	type GatedFeature,
+	usePaywall,
+} from "renderer/components/Paywall";
 import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
@@ -47,6 +53,11 @@ const INTEGRATION_ICONS: Record<IntegrationProvider, React.ReactNode> = {
 	google: <FaGoogle className="size-5" />,
 };
 
+const PRO_GATED: Partial<Record<IntegrationProvider, GatedFeature>> = {
+	linear: GATED_FEATURES.TASKS,
+	github: GATED_FEATURES.REMOTE_ACCESS,
+};
+
 interface ProviderState {
 	isConnected: boolean;
 	connectedOrgName?: string | null;
@@ -61,6 +72,7 @@ export function IntegrationsSettings({
 	// window against the other one's organization.
 	const activeOrganizationId = useActiveOrganizationId();
 	const searchQuery = useSettingsSearchQuery();
+	const { gateFeature, hasAccess, isReady: planReady } = usePaywall();
 
 	const enabledTriggerKinds = useFeatureFlagPayload(
 		FEATURE_FLAGS.AUTOMATION_EVENT_TRIGGERS,
@@ -84,6 +96,12 @@ export function IntegrationsSettings({
 			{ enabled: !!activeOrganizationId },
 		);
 
+	const { data: linearConnection, isPending: isLinearPending } =
+		cloudTrpc.integration.linear.getConnection.useQuery(
+			{ organizationId: activeOrganizationId ?? "" },
+			{ enabled: !!activeOrganizationId },
+		);
+
 	// These three keep a disconnected row around, which integration.list does
 	// not filter out — their per-provider getConnection does.
 	const { data: sentryConnection, isPending: isSentryPending } =
@@ -102,11 +120,12 @@ export function IntegrationsSettings({
 			{ enabled: !!activeOrganizationId },
 		);
 
-	const [githubInstallation, setGithubInstallation] =
-		useState<GithubInstallation | null>(null);
+	const [githubInstallations, setGithubInstallations] = useState<
+		GithubInstallation[]
+	>([]);
 	const [isLoadingGithub, setIsLoadingGithub] = useState(true);
 
-	const fetchGithubInstallation = useCallback(async () => {
+	const fetchGithubInstallations = useCallback(async () => {
 		if (!activeOrganizationId) {
 			setIsLoadingGithub(false);
 			return;
@@ -114,33 +133,42 @@ export function IntegrationsSettings({
 
 		try {
 			const result =
-				await apiTrpcClient.integration.github.getInstallation.query({
+				await apiTrpcClient.integration.github.listInstallations.query({
 					organizationId: activeOrganizationId,
 				});
-			setGithubInstallation(result);
+			setGithubInstallations(result);
 		} catch (err) {
-			console.error("[integrations] Failed to fetch GitHub installation:", err);
+			console.error(
+				"[integrations] Failed to fetch GitHub installations:",
+				err,
+			);
 		} finally {
 			setIsLoadingGithub(false);
 		}
 	}, [activeOrganizationId]);
 
 	useEffect(() => {
-		fetchGithubInstallation();
-	}, [fetchGithubInstallation]);
+		fetchGithubInstallations();
+	}, [fetchGithubInstallations]);
 
-	const linearConnection = integrations?.find((i) => i.provider === "linear");
+	const activeGithubInstallations = githubInstallations.filter(
+		(installation) => !installation.suspended,
+	);
+
 	const slackConnection = integrations?.find((i) => i.provider === "slack");
 
 	const providerStates: Record<IntegrationProvider, ProviderState> = {
 		linear: {
-			isConnected: !!linearConnection,
+			isConnected: !!linearConnection && !linearConnection.needsReconnect,
 			connectedOrgName: linearConnection?.externalOrgName,
-			isLoading: isIntegrationsPending,
+			isLoading: isLinearPending,
 		},
 		github: {
-			isConnected: !!githubInstallation && !githubInstallation.suspended,
-			connectedOrgName: githubInstallation?.accountLogin,
+			isConnected: activeGithubInstallations.length > 0,
+			connectedOrgName:
+				activeGithubInstallations
+					.map((installation) => installation.accountLogin)
+					.join(", ") || null,
 			isLoading: isLoadingGithub,
 		},
 		slack: {
@@ -212,6 +240,8 @@ export function IntegrationsSettings({
 					const itemId = integrationSettingItemId(integration.provider);
 					if (!isItemVisible(itemId, visibleItems)) return null;
 					const state = providerStates[integration.provider];
+					const gate = PRO_GATED[integration.provider];
+					const openWeb = () => handleOpenWeb(integration.webPath);
 					return (
 						<IntegrationRow
 							key={integration.provider}
@@ -223,7 +253,8 @@ export function IntegrationsSettings({
 							isConnected={state.isConnected}
 							connectedOrgName={state.connectedOrgName}
 							isLoading={state.isLoading}
-							onManage={() => handleOpenWeb(integration.webPath)}
+							showProBadge={!!gate && planReady && !hasAccess(gate)}
+							onManage={gate ? () => gateFeature(gate, openWeb) : openWeb}
 						/>
 					);
 				})}
@@ -245,6 +276,7 @@ interface IntegrationRowProps {
 	isConnected: boolean;
 	connectedOrgName?: string | null;
 	isLoading?: boolean;
+	showProBadge?: boolean;
 	onManage: () => void;
 }
 
@@ -255,6 +287,7 @@ function IntegrationRow({
 	isConnected,
 	connectedOrgName,
 	isLoading,
+	showProBadge = false,
 	onManage,
 }: IntegrationRowProps) {
 	const status = isLoading ? (
@@ -289,7 +322,14 @@ function IntegrationRow({
 					{icon}
 				</div>
 				<div className="min-w-0">
-					<div className="text-sm font-medium">{name}</div>
+					<div className="flex items-center gap-2 text-sm font-medium">
+						{name}
+						{showProBadge && (
+							<Badge variant="default">
+								<Trans>PRO</Trans>
+							</Badge>
+						)}
+					</div>
 					<div className="text-xs text-muted-foreground mt-0.5 truncate">
 						{description}
 					</div>

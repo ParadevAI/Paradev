@@ -2,6 +2,8 @@ export class CLIError extends Error {
 	constructor(
 		message: string,
 		public suggestion?: string,
+		/** Printed to stdout under --json before the error is reported. */
+		public data?: unknown,
 	) {
 		super(message);
 		this.name = "CLIError";

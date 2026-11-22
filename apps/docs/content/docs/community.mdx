@@ -3,16 +3,18 @@ title: Community & Support
 description: Get help, follow along, and talk to us
 ---
 
+import { COMPANY } from "@superset/shared/constants";
+
 ## Get Help
 
 <Cards>
-	<Card icon={<MessageCircle />} title="Discord" href="https://discord.gg/cZeD9WYcV7">
+	<Card icon={<MessageCircle />} title="Discord" href={COMPANY.DISCORD_URL}>
 		The fastest way to get answers, from the team and other users.
 	</Card>
-	<Card icon={<Github />} title="GitHub Issues" href="https://github.com/superset-sh/superset/issues">
+	<Card icon={<Github />} title="GitHub Issues" href={`${COMPANY.GITHUB_URL}/issues`}>
 		Bug reports and feature requests.
 	</Card>
-	<Card icon={<Mail />} title="Email Support" href="mailto:support@superset.sh">
+	<Card icon={<Mail />} title="Email Support" href={COMPANY.MAIL_TO}>
 		Account, billing, and anything private.
 	</Card>
 </Cards>
@@ -22,16 +24,16 @@ Before filing: check [Troubleshooting](/troubleshooting) and the [FAQ](/faq).
 ## Follow Along
 
 <Cards>
-	<Card icon={<Newspaper />} title="Changelog" href="https://superset.sh/changelog">
+	<Card icon={<Newspaper />} title="Changelog" href={COMPANY.CHANGELOG_URL}>
 		What shipped, weekly.
 	</Card>
-	<Card icon={<Twitter />} title="X" href="https://x.com/superset_sh">
+	<Card icon={<Twitter />} title="X" href={COMPANY.X_URL}>
 		Launches and demos.
 	</Card>
-	<Card icon={<Youtube />} title="YouTube" href="https://www.youtube.com/@superset-sh">
+	<Card icon={<Youtube />} title="YouTube" href={COMPANY.YOUTUBE_URL}>
 		Walkthroughs and feature videos.
 	</Card>
-	<Card icon={<Linkedin />} title="LinkedIn" href="https://www.linkedin.com/company/superset-sh">
+	<Card icon={<Linkedin />} title="LinkedIn" href={COMPANY.LINKEDIN_URL}>
 		Company news.
 	</Card>
 </Cards>

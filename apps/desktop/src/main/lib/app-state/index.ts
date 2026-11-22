@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { JSONFilePreset } from "lowdb/node";
 import { APP_STATE_PATH } from "../app-environment";
+import { pruneTabsState } from "./prune-tabs-state";
+import { pruneV1AgentSessions } from "./prune-v1-agent-sessions";
 import type { AppState } from "./schemas";
 import { defaultAppState } from "./schemas";
 
@@ -13,25 +15,27 @@ let _appState: AppStateDB | null = null;
  * Handles legacy app-state.json files that may have a different structure
  * (e.g., from old electron-store format with keys like "tabs-storage").
  */
-function ensureValidShape(data: Partial<AppState>): AppState {
-	const tabsState = {
+export function ensureValidShape(
+	data: Partial<AppState>,
+	liveWorkspaceIds: ReadonlySet<string> | null = null,
+): AppState {
+	const withLiveTabs = (state: AppState["tabsState"]) =>
+		liveWorkspaceIds ? pruneTabsState(state, liveWorkspaceIds) : state;
+	const tabsState = withLiveTabs({
 		...defaultAppState.tabsState,
 		...(data.tabsState ?? {}),
-	};
-	// Agent-session captures are keyed by pane id; drop entries whose pane is
-	// gone so the record can't grow past the pane set. Optional-chain: legacy
-	// app-state.json variants can carry a null panes map.
-	const v1AgentSessions = Object.fromEntries(
-		Object.entries(data.v1AgentSessions ?? {}).filter(
-			([paneId]) => tabsState.panes?.[paneId] !== undefined,
-		),
-	);
+	});
 	const tabsStateByWindow = Object.fromEntries(
 		Object.entries(data.tabsStateByWindow ?? {}).map(([key, state]) => [
 			key,
-			{ ...defaultAppState.tabsState, ...(state ?? {}) },
+			withLiveTabs({ ...defaultAppState.tabsState, ...(state ?? {}) }),
 		]),
 	);
+	// Keyed by pane id; dropping entries of gone panes bounds the record.
+	const v1AgentSessions = pruneV1AgentSessions(data.v1AgentSessions ?? {}, [
+		tabsState,
+		...Object.values(tabsStateByWindow),
+	]);
 	return {
 		tabsState,
 		tabsStateByWindow,
@@ -83,13 +87,41 @@ export function reloadThemeStateFromDisk(): AppState["themeState"] | null {
 	}
 }
 
-export async function initAppState(): Promise<void> {
+/**
+ * `listLiveWorkspaceIds` scopes the persisted v1 tab layout to workspaces that
+ * still exist; a deleted workspace never removed its tabs, so the file grew
+ * without bound. When it throws, nothing is pruned.
+ */
+export async function initAppState(
+	listLiveWorkspaceIds?: () => Iterable<string>,
+): Promise<void> {
 	if (_appState) return;
 
 	_appState = await JSONFilePreset<AppState>(APP_STATE_PATH, defaultAppState);
 
-	// Reshape data to ensure it has the correct structure (handles legacy formats)
-	_appState.data = ensureValidShape(_appState.data);
+	let liveWorkspaceIds: ReadonlySet<string> | null = null;
+	try {
+		if (listLiveWorkspaceIds)
+			liveWorkspaceIds = new Set(listLiveWorkspaceIds());
+	} catch (error) {
+		console.error(
+			"[app-state] Skipping tabs prune, workspaces unreadable:",
+			error,
+		);
+	}
+	const sizeBefore = JSON.stringify(_appState.data).length;
+	_appState.data = ensureValidShape(_appState.data, liveWorkspaceIds);
+	const sizeAfter = JSON.stringify(_appState.data).length;
+	if (sizeAfter < sizeBefore) {
+		try {
+			await _appState.write();
+			console.log(
+				`[app-state] Pruned stale tabs: ${sizeBefore} -> ${sizeAfter} bytes`,
+			);
+		} catch (error) {
+			console.error("[app-state] Failed to write pruned tabs:", error);
+		}
+	}
 
 	console.log(`App state initialized at: ${APP_STATE_PATH}`);
 }

@@ -7,7 +7,7 @@ env:
   HOST_NAME: "E2E Mac mini"
 ---
 - stopApp
-- openLink: "superset://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- openLink: "superset://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081&disableAutoLaunch=1&disableFab=1"
 - extendedWaitUntil:
     visible: "One step left"
     timeout: 60000

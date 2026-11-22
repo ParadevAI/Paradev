@@ -4,13 +4,15 @@
  * check talks to the box the way a client would (its published ports) or
  * the way the boot runner left it (its log and run directory).
  */
+import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
+import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
 import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
-} from "@superset/shared/sandbox-contract";
-import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox";
+} from "@superset/shared/sandbox/contract";
+import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox/access";
 import { Sandbox } from "@vercel/sandbox";
 
 export interface ProbeArgs {
@@ -30,6 +32,9 @@ export interface ProbeArgs {
 	gate?: { workspaceId: string; userId: string } | null;
 	log: (line: string) => void;
 }
+
+/** host-service answers before the boot's remaining steps finish; their end is `steps.end`. */
+const currentBootHasStepsEnd = `awk '/ boot\\.start/ { done = 0 } / steps\\.end/ { done = 1 } END { print done ? "steps done" : "steps running" }' ${SANDBOX_PATHS.bootLog}`;
 
 export async function probeBox(args: ProbeArgs): Promise<number> {
 	const { log } = args;
@@ -85,6 +90,12 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		})) === 200,
 	);
 
+	await until(
+		"boot: the steps after host-service finished",
+		currentBootHasStepsEnd,
+		/steps done/,
+		300,
+	);
 	const bootLog = await run(`cat ${SANDBOX_PATHS.bootLog}`);
 	check(
 		"boot: host-service ready",
@@ -118,6 +129,28 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 			),
 		),
 	);
+	for (const preset of HOST_AGENT_PRESETS) {
+		if (!isCloudAgentId(preset.presetId)) continue;
+		const resolved = (
+			await run(`readlink -f "$(command -v ${preset.command})"`)
+		).trim();
+		check(
+			`${preset.presetId} runs from the agents drive`,
+			resolved.startsWith(`${SANDBOX_PATHS.agents}/`),
+			resolved,
+		);
+		const out = await run(
+			`cd /tmp && timeout 15 ${[preset.command, ...preset.args].join(" ")} </dev/null >/tmp/preset.out 2>&1; echo "exit=$?"; head -5 /tmp/preset.out`,
+		);
+		check(
+			`${preset.presetId} accepts its preset's flags`,
+			!/^exit=12[67]$/m.test(out) &&
+				!/unknown option|unexpected argument|not found in PATH/i.test(out),
+			out.trim().split("\n").slice(0, 2).join(" "),
+		);
+	}
+	const cliVersion = await run("superset --version");
+	check("superset runs", /^\d+\.\d+\.\d+/m.test(cliVersion), cliVersion.trim());
 	if (
 		!(await until(
 			"checkout on the branch",
@@ -203,7 +236,7 @@ export async function checkWakeLog(args: {
 	});
 	const result = await sandbox.runCommand("bash", [
 		"-lc",
-		`cat ${SANDBOX_PATHS.bootLog}`,
+		`for i in $(seq 1 150); do ${currentBootHasStepsEnd} | grep -q 'steps done' && break; sleep 2; done; cat ${SANDBOX_PATHS.bootLog}`,
 	]);
 	const text = await result.stdout();
 	const boots = text.split(/(?=^\d+ boot\.start)/m);
@@ -219,6 +252,10 @@ export async function checkWakeLog(args: {
 	check("wake: every step skipped", !/step \S+ running/.test(last));
 	check("wake: checkout kept", /checkout\.skipped/.test(last));
 	check("wake: host-service ready", /host\.ready/.test(last));
+	check(
+		"wake: agents linked from the remounted drive",
+		/agents\.linked [1-9]/.test(last) && !/agents\.unavailable/.test(last),
+	);
 	return failed;
 }
 

@@ -1,0 +1,22 @@
+# Home shows the host's tag folders under each project, after the untagged
+# rows, newest project first. Seeded by scripts/e2e/tag-folders.sh. Workspace
+# rows are not in the accessibility tree, so order is read from the headers.
+appId: sh.superset.mobile
+---
+# Home polls the host every 30s, and the folder names are written last.
+- extendedWaitUntil:
+    visible: "Feature work group, 2 workspaces"
+    timeout: 70000
+- assertVisible:
+    text: "infra group, 1 workspace"
+    below: "api-server, 2 workspaces"
+- assertVisible:
+    text: "demo-app, 6 workspaces"
+    below: "infra group, 1 workspace"
+- assertVisible:
+    text: "Feature work group, 2 workspaces"
+    below: "demo-app, 6 workspaces"
+- assertVisible:
+    text: "bugs group, 2 workspaces"
+    below: "Feature work group, 2 workspaces"
+- takeScreenshot: tag-folders-grouped

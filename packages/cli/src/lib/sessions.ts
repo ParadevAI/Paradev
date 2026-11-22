@@ -1,0 +1,114 @@
+import { boolean, CLIError, string } from "@superset/cli-framework";
+import type { CliContext } from "./command";
+import type { HostServiceClient, ResolvedHostTarget } from "./host-target";
+import {
+	type HostWorkspaceRow,
+	resolveWorkspaceTarget,
+} from "./host-workspaces";
+
+type SessionsClient = Pick<
+	HostServiceClient["sessions"],
+	"create" | "list" | "get" | "read" | "send" | "close" | "resume"
+>;
+export type SessionPageResult = Awaited<
+	ReturnType<SessionsClient["read"]["query"]>
+>;
+export type SessionDurableEnvelope = Extract<
+	SessionPageResult,
+	{ ok: true }
+>["envelopes"][number];
+
+export const sessionWorkspaceOptions = {
+	workspace: string().required().desc("Workspace ID"),
+	host: string().desc(
+		"Host the workspace lives on, or `cloud` (default: the cloud if your account has cloud workspaces, else this machine)",
+	),
+	local: boolean().desc("The workspace is on this machine"),
+};
+
+export async function callSessions<T>(call: () => Promise<T>): Promise<T> {
+	try {
+		return await call();
+	} catch (error) {
+		if (
+			error instanceof Error &&
+			/No procedure found on path "?sessions\./.test(error.message)
+		) {
+			throw new CLIError(
+				"This host is too old for `superset sessions` — update host-service",
+				"Update host-service or the Paradev desktop app on that host",
+			);
+		}
+		throw error;
+	}
+}
+
+function sessionsClient(client: HostServiceClient): SessionsClient {
+	const raw = client.sessions;
+	return {
+		create: { mutate: (input) => callSessions(() => raw.create.mutate(input)) },
+		list: { query: (input) => callSessions(() => raw.list.query(input)) },
+		get: { query: (input) => callSessions(() => raw.get.query(input)) },
+		read: { query: (input) => callSessions(() => raw.read.query(input)) },
+		send: { mutate: (input) => callSessions(() => raw.send.mutate(input)) },
+		close: { mutate: (input) => callSessions(() => raw.close.mutate(input)) },
+		resume: { mutate: (input) => callSessions(() => raw.resume.mutate(input)) },
+	};
+}
+
+export function desktopTabNote(opened: boolean): string {
+	return opened
+		? ", opened in a desktop tab"
+		: ". No desktop tab was opened yet; the Paradev desktop app adds one when it shows this workspace";
+}
+
+export async function resolveSessionWorkspace(
+	ctx: CliContext,
+	options: { workspace: string; host?: string | null; local?: boolean | null },
+): Promise<{
+	workspace: HostWorkspaceRow;
+	target: ResolvedHostTarget;
+	sessions: SessionsClient;
+	/** Shows a chat session in a background desktop tab; false when no desktop on that host can. */
+	openTab: (sessionId: string) => Promise<boolean>;
+}> {
+	const organizationId = ctx.config.organizationId;
+	if (!organizationId)
+		throw new CLIError("No active organization", "Run: superset auth login");
+	const { workspace, target } = await resolveWorkspaceTarget(
+		{
+			organizationId,
+			userJwt: ctx.bearer,
+			api: ctx.api,
+			host: options.host ?? undefined,
+			local: options.local ?? undefined,
+		},
+		options.workspace,
+	);
+	return {
+		workspace,
+		target,
+		sessions: sessionsClient(target.client),
+		openTab: async (sessionId) => {
+			try {
+				await target.client.panes.newTab.mutate({
+					workspaceId: options.workspace,
+					sessionId,
+				});
+				return true;
+			} catch (error) {
+				const code = (error as { data?: { code?: string } } | null)?.data?.code;
+				const message = error instanceof Error ? error.message : String(error);
+				const expected =
+					code === "PRECONDITION_FAILED" ||
+					/No procedure found on path "?panes\./.test(message);
+				if (!expected) {
+					process.stderr.write(
+						`Could not open chat session ${sessionId} in a desktop tab: ${message}\n`,
+					);
+				}
+				return false;
+			}
+		},
+	};
+}

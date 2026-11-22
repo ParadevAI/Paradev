@@ -1,0 +1,1 @@
+export { useMergeMethodLabels } from "./useMergeMethodLabels";

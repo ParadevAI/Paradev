@@ -12,8 +12,8 @@ const RESULTS = [
 		url: "https://electric-sql.com/docs/intro",
 	},
 	{
-		title: "Superset — Orchestrate coding agents",
-		url: "https://superset.sh/docs/workspaces",
+		title: "Paradev — Orchestrate coding agents",
+		url: "https://docs.paradev.com/workspaces",
 	},
 	{
 		title: "Drizzle ORM - next gen TypeScript ORM",

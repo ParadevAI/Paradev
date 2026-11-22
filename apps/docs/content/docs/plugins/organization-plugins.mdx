@@ -1,0 +1,102 @@
+---
+title: Organization Plugins
+description: Sync your organization's own plugins from a GitHub repository and choose which roles get them
+---
+
+Organization plugins are plugins only your Paradev organization can see. An owner or admin syncs them from a GitHub repository, then chooses which roles can install each one. Unlike plugins from a marketplace you add yourself, organization plugins can have MCP tools as well as skills.
+
+## Set Up the Repository
+
+The repository is a marketplace: an `.agent-marketplace.json` file and one folder per plugin. [Build a Plugin](/plugins/build-a-plugin) shows how to create one.
+
+```
+.agent-marketplace.json
+plugins/
+└── deploy-runbook/
+    ├── plugin.json
+    └── skills/
+        └── deploy-runbook/
+            ├── SKILL.md
+            └── scripts/
+```
+
+Each plugin's `source` in `.agent-marketplace.json` is a `./` folder in the repository. Paradev copies the whole folder, so skills can use `scripts/`, `assets/`, and other files next to them. Executable files stay executable.
+
+- A plugin can have at most 500 files and about 12 MB of files in total, and must compress to 2 MB or less.
+- `.git`, `node_modules`, and `hooks/` are left out. Paradev does not run hooks.
+- A plugin cannot use the name of a plugin in the [Paradev marketplace](/plugins/available).
+- A plugin with MCP tools must name a connector that has its own tool server, or give an `mcp.url` that is a public `https` address.
+
+## Add a Repository
+
+You must be an owner or admin, have GitHub connected in **Integrations**, and the Paradev GitHub App must have access to the repository.
+
+1. Open **Plugins** in the sidebar.
+2. Under **Your organization**, click **Add repository**.
+3. Enter the repository as `owner/name`. Optionally, enter a branch or tag, and the path to `.agent-marketplace.json` if it is not at the repository root.
+
+From the CLI:
+
+```bash
+superset plugins organization sources add acme/paradev-plugins \
+  --ref main \
+  --path tools/plugins
+```
+
+The plugins appear when the first sync finishes.
+
+## Sync
+
+Paradev syncs a repository when it is added, and again when an admin clicks **Sync now** in **Settings → Plugins** or runs:
+
+```bash
+superset plugins organization sources sync acme/paradev-plugins
+```
+
+There is no automatic schedule. Sync after you push a change.
+
+- **Syncs use the GitHub account of the admin who added the repository.** Settings shows this as "Syncs as @login". If that person leaves, or is no longer an admin, another admin adds the same repository again to take it over.
+- **Only changed plugins are downloaded again.**
+- **Bump the version when the content changes.** A sync that finds changed files under a version it already has refuses that plugin.
+- **A failed sync keeps the last good version.** The problem is listed on the repository in Settings.
+- **A plugin removed from the repository is marked "No longer in source".** Members who have it keep it, but no one can install it again.
+
+## Choose Who Gets Each Plugin
+
+Each plugin has a setting for each role: owner, admin, and member.
+
+| Setting | What it does |
+|:--------|:-------------|
+| **Unavailable** | The role cannot see or install the plugin, and its tools stop working at once. Existing installs are removed: each machine deletes its copy the next time it syncs plugins. |
+| **Available** | Members of the role can install it from **Plugins**. |
+| **Installed** | Everyone in the role gets it. They can disable it but not remove it. |
+
+A new plugin is available to owners and admins only. Change the settings in **Settings → Plugins**, or from the CLI:
+
+```bash
+superset plugins organization access deploy-runbook --member installed
+```
+
+A change applies only to the roles you name. Moving a role from **Installed** back to **Available** keeps the installs it already made.
+
+To see your organization's plugins and their settings:
+
+```bash
+superset plugins organization list
+```
+
+## Remove a Repository
+
+Removing a repository removes its plugins from the organization and from every member. Remove it in **Settings → Plugins**, or run:
+
+```bash
+superset plugins organization sources remove acme/paradev-plugins
+```
+
+## Multiple Organizations
+
+If you belong to more than one organization, your machine keeps the plugins of each one, and their tools work whichever organization is active. Two organizations can have plugins with the same name; they install separately.
+
+## Credentials
+
+Tool calls go through Paradev, which adds the connected account's credentials, the same as for other plugins. Credentials never reach the agent or your machine. See [Overview](/plugins/overview).

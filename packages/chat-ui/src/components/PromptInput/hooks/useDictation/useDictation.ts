@@ -4,6 +4,7 @@ import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import type { PromptInputDictationError } from "../../types";
+import { DictationError } from "../../utils/dictationError";
 
 const BAR_SPACING = 4;
 const BAR_WIDTH = 2;
@@ -15,9 +16,14 @@ const SILENCE_ALPHA = 0.35;
 export type DictationStatus = "idle" | "recording" | "transcribing" | "error";
 
 export type UseDictationOptions = {
-	transcribe: (audio: Blob) => Promise<string> | string;
+	transcribe: (
+		audio: Blob,
+		options: { signal: AbortSignal },
+	) => Promise<string> | string;
 	onTranscript: (text: string) => void;
 	onError?: (error: PromptInputDictationError) => void;
+	maxSeconds?: number;
+	audioBitsPerSecond?: number;
 };
 
 export type Dictation = {
@@ -84,6 +90,8 @@ function describeStartError(error: unknown): PromptInputDictationError {
 }
 
 function describeTranscribeError(error: unknown): PromptInputDictationError {
+	if (error instanceof DictationError)
+		return { message: error.message, canRetry: error.canRetry };
 	const text = error instanceof Error ? error.message.toLowerCase() : "";
 	if (
 		text.includes("fetch failed") ||
@@ -108,36 +116,57 @@ function describeTranscribeError(error: unknown): PromptInputDictationError {
 	};
 }
 
+type RecordingSession = {
+	stream: MediaStream;
+	recorder: MediaRecorder;
+	audioContext: AudioContext;
+	chunks: Blob[];
+	frame: number;
+	// A timer, not the frame loop: frames pause while the window is hidden.
+	stopTimer?: ReturnType<typeof setTimeout>;
+};
+
+function releaseSession(session: RecordingSession) {
+	cancelAnimationFrame(session.frame);
+	clearTimeout(session.stopTimer);
+	for (const track of session.stream.getTracks()) track.stop();
+	session.audioContext.close().catch(() => {});
+}
+
 export function useDictation({
 	transcribe,
 	onTranscript,
 	onError,
+	maxSeconds,
+	audioBitsPerSecond,
 }: UseDictationOptions): Dictation {
 	const [status, setStatus] = useState<DictationStatus>("idle");
 	const [seconds, setSeconds] = useState(0);
 	const [error, setError] = useState<PromptInputDictationError | null>(null);
 	const retryAudioRef = useRef<Blob | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const sessionRef = useRef<{
-		stream: MediaStream;
-		recorder: MediaRecorder;
-		audioContext: AudioContext;
-		chunks: Blob[];
-		frame: number;
-	} | null>(null);
+	const sessionRef = useRef<RecordingSession | null>(null);
 	const historyRef = useRef<number[]>([]);
 	const bucketPeakRef = useRef(0);
 	const nextBarAtRef = useRef(0);
 	const startedAtRef = useRef(0);
+	const startingRef = useRef(false);
+	const disposedRef = useRef(false);
+	// Bumped to drop a transcription still in flight (cancel, unmount).
+	const transcriptionRef = useRef(0);
+	const transcriptionAbortRef = useRef<AbortController | null>(null);
+	const finishRef = useRef<() => Promise<void>>(async () => {});
 
 	useEffect(() => {
+		disposedRef.current = false;
 		return () => {
+			disposedRef.current = true;
+			transcriptionRef.current += 1;
+			transcriptionAbortRef.current?.abort();
 			const session = sessionRef.current;
 			if (!session) return;
-			cancelAnimationFrame(session.frame);
-			for (const track of session.stream.getTracks()) track.stop();
-			session.audioContext.close().catch(() => {});
 			sessionRef.current = null;
+			releaseSession(session);
 		};
 	}, []);
 
@@ -186,16 +215,27 @@ export function useDictation({
 	};
 
 	const start = async () => {
-		if (sessionRef.current) return;
+		if (sessionRef.current || startingRef.current) return;
 		setError(null);
 		retryAudioRef.current = null;
-		let stream: MediaStream;
+		let stream: MediaStream | undefined;
 		let recorder: MediaRecorder;
+		startingRef.current = true;
 		try {
 			stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			recorder = new MediaRecorder(stream);
+			recorder = new MediaRecorder(
+				stream,
+				audioBitsPerSecond ? { audioBitsPerSecond } : undefined,
+			);
 		} catch (cause) {
+			for (const track of stream?.getTracks() ?? []) track.stop();
 			onError?.(describeStartError(cause));
+			return;
+		} finally {
+			startingRef.current = false;
+		}
+		if (disposedRef.current) {
+			for (const track of stream.getTracks()) track.stop();
 			return;
 		}
 		const chunks: Blob[] = [];
@@ -244,24 +284,40 @@ export function useDictation({
 			audioContext,
 			chunks,
 			frame: requestAnimationFrame(tick),
+			stopTimer: maxSeconds
+				? setTimeout(() => void finishRef.current(), maxSeconds * 1000)
+				: undefined,
 		};
 	};
 
 	const runTranscription = async (audio: Blob) => {
+		const run = ++transcriptionRef.current;
 		setStatus("transcribing");
 		try {
-			const text = await Promise.resolve(transcribe(audio));
+			const controller = new AbortController();
+			transcriptionAbortRef.current = controller;
+			const text = await Promise.resolve(
+				transcribe(audio, { signal: controller.signal }),
+			);
+			if (run !== transcriptionRef.current) return;
 			if (text) onTranscript(text);
 			retryAudioRef.current = null;
 			setError(null);
 			setStatus("idle");
 		} catch (cause) {
-			// Keep the recording so a retry never loses the user's speech.
+			if (run !== transcriptionRef.current) return;
 			const described = describeTranscribeError(cause);
+			onError?.(described);
+			if (!described.canRetry) {
+				retryAudioRef.current = null;
+				setError(null);
+				setStatus("idle");
+				return;
+			}
+			// Keep the recording so a retry never loses the user's speech.
 			retryAudioRef.current = audio;
 			setError(described);
 			setStatus("error");
-			onError?.(described);
 		}
 	};
 
@@ -270,15 +326,22 @@ export function useDictation({
 		if (!session) return;
 		sessionRef.current = null;
 		cancelAnimationFrame(session.frame);
+		clearTimeout(session.stopTimer);
+		const generation = transcriptionRef.current;
 		const audio = await new Promise<Blob>((resolve) => {
 			session.recorder.onstop = () =>
 				resolve(new Blob(session.chunks, { type: session.recorder.mimeType }));
 			session.recorder.stop();
 		});
-		for (const track of session.stream.getTracks()) track.stop();
-		session.audioContext.close().catch(() => {});
+		releaseSession(session);
+		if (transcriptionRef.current !== generation) return;
+		if (audio.size === 0) {
+			setStatus("idle");
+			return;
+		}
 		await runTranscription(audio);
 	};
+	finishRef.current = finish;
 
 	const retry = async () => {
 		const audio = retryAudioRef.current;
@@ -286,16 +349,16 @@ export function useDictation({
 		await runTranscription(audio);
 	};
 
-	// Abort without transcribing: tears down a live recording or clears the
-	// error state.
+	// Abort without inserting anything: tears down a live recording, drops a
+	// transcription in flight, or clears the error state.
 	const cancel = () => {
+		transcriptionRef.current += 1;
+		transcriptionAbortRef.current?.abort();
 		const session = sessionRef.current;
 		if (session) {
 			sessionRef.current = null;
-			cancelAnimationFrame(session.frame);
 			session.recorder.stop();
-			for (const track of session.stream.getTracks()) track.stop();
-			session.audioContext.close().catch(() => {});
+			releaseSession(session);
 		}
 		retryAudioRef.current = null;
 		setError(null);

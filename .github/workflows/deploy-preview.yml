@@ -3,46 +3,47 @@ name: Deploy Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignore:
-      - "apps/desktop/**"
 
 concurrency:
   group: preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 env:
-  VERCEL_CLI_VERSION: 50.22.1
+  VERCEL_CLI_VERSION: 50.31.0
   PR_NUMBER: ${{ github.event.pull_request.number }}
   API_ALIAS: api-pr-${{ github.event.pull_request.number }}-superset.vercel.app
-  WEB_ALIAS: web-pr-${{ github.event.pull_request.number }}-superset.vercel.app
-  MARKETING_ALIAS: marketing-pr-${{ github.event.pull_request.number }}-superset.vercel.app
+  BROWSER_API_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('api.pr-{0}.paradev.com', github.event.pull_request.number) || format('api-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
+  WEB_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('app.pr-{0}.paradev.com', github.event.pull_request.number) || format('web-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
+  AGENTS_ALIAS: agents-pr-${{ github.event.pull_request.number }}-superset.vercel.app
+  MARKETING_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || format('marketing-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}
   ADMIN_ALIAS: admin-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   DOCS_ALIAS: docs-pr-${{ github.event.pull_request.number }}-superset.vercel.app
 
 jobs:
-  deploy-database:
-    name: Deploy Database (Neon)
+  create-database:
+    name: Create Database (Neon)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: preview
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Setup Bun
-        id: setup-bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: .bun-version
-
-      - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
-
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
+      - name: Validate Paradev project preview configuration
+        if: contains(github.event.pull_request.labels.*.name, 'paradev-project-preview')
+        env:
+          DOMAIN_PREVIEW: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') }}
+          VERCEL_PARADEV_API_PROJECT_ID: ${{ vars.VERCEL_PARADEV_API_PROJECT_ID }}
+          VERCEL_PARADEV_WEB_PROJECT_ID: ${{ vars.VERCEL_PARADEV_WEB_PROJECT_ID }}
+        run: |
+          if [ "$DOMAIN_PREVIEW" != "true" ]; then
+            echo "::error::paradev-project-preview requires the domain-preview PR label for browser API and OAuth hosts."
+            exit 1
+          fi
+          for name in VERCEL_PARADEV_API_PROJECT_ID VERCEL_PARADEV_WEB_PROJECT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::paradev-project-preview requires the GitHub repository variable $name."
+              exit 1
+            fi
+          done
 
       - name: Create Neon branch
         id: create-branch
@@ -52,18 +53,7 @@ jobs:
           branch_name: ${{ github.head_ref }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
-      - name: Validate and push database schema
-        working-directory: packages/db
-        env:
-          DATABASE_URL: ${{ steps.create-branch.outputs.db_url_pooled }}
-          DATABASE_URL_UNPOOLED: ${{ steps.create-branch.outputs.db_url }}
-          PGOPTIONS: -c lock_timeout=5s -c statement_timeout=60s
-        run: |
-          bun drizzle-kit check
-          bun drizzle-kit migrate
-          bun run src/verify-migrations-applied.ts
-
-      - name: Save database success status
+      - name: Save database connection
         run: |
           cat > database-status.env << EOF
           DATABASE_STATUS="✅"
@@ -79,11 +69,12 @@ jobs:
           name: database-status
           path: database-status.env
 
-  deploy-api:
-    name: Deploy API
+  deploy-database:
+    name: Deploy Database (Neon)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: preview
-    needs: deploy-database
+    needs: create-database
 
     steps:
       - name: Checkout repository
@@ -94,6 +85,55 @@ jobs:
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install dependencies
+        run: bun install --frozen --ignore-scripts
+
+      - name: Download database info
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: database-status
+
+      - name: Validate and push database schema
+        working-directory: packages/db
+        env:
+          PGOPTIONS: -c lock_timeout=5s -c statement_timeout=60s
+        run: |
+          set -a
+          source ../../database-status.env
+          set +a
+          bun drizzle-kit check
+          bun drizzle-kit migrate
+          bun run src/verify-migrations-applied.ts
+
+  deploy-api:
+    name: Deploy API
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
+    environment: preview
+    needs: create-database
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
 
       - name: Download database info
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -106,24 +146,23 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
           echo "DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED" >> $GITHUB_ENV
 
-      - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
-
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
-
       - name: Install Vercel CLI
-        run: npm install --global vercel@$VERCEL_CLI_VERSION
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      # Production deploys on main write this cache; a PR only reads it.
+      - name: Restore Next.js build cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: apps/api/.next/cache
+          key: next-api-${{ github.sha }}
+          restore-keys: next-api-
 
       - name: Build and Deploy API
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ contains(github.event.pull_request.labels.*.name, 'paradev-project-preview') && vars.VERCEL_PARADEV_API_PROJECT_ID || secrets.VERCEL_API_PROJECT_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ env.DATABASE_URL_UNPOOLED }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -133,28 +172,34 @@ jobs:
           R2_PUBLIC_BUCKET: superset-public-dev
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
           USERCONTENT_URL: ${{ secrets.USERCONTENT_URL }}
+          MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           USERCONTENT_TOKEN_SECRET: ${{ secrets.USERCONTENT_TOKEN_SECRET_DEV }}
+          AGENT_WORKER_SECRET: ${{ secrets.AGENT_WORKER_SECRET }}
+          AGENT_TURN_SIGNING_SECRET: ${{ secrets.AGENT_TURN_SIGNING_SECRET }}
+          AGENT_SESSION_SECRET: ${{ secrets.AGENT_SESSION_SECRET }}
           CLOUDFLARE_BROWSER_RENDERING_TOKEN: ${{ secrets.CLOUDFLARE_BROWSER_RENDERING_TOKEN }}
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          BROWSER_API_URL: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('https://api.pr-{0}.paradev.com', github.event.pull_request.number) || secrets.BROWSER_API_URL }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_TEMP_CLIENT_ID: ${{ secrets.GOOGLE_TEMP_CLIENT_ID }}
-          GOOGLE_TEMP_CLIENT_SECRET: ${{ secrets.GOOGLE_TEMP_CLIENT_SECRET }}
+          GOOGLE_CONNECTIONS_CLIENT_ID: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_ID }}
+          GOOGLE_CONNECTIONS_CLIENT_SECRET: ${{ secrets.GOOGLE_CONNECTIONS_CLIENT_SECRET }}
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          MOBILE_WEB_ORIGINS: ${{ secrets.MOBILE_WEB_ORIGINS }}
           NEXT_PUBLIC_SENTRY_DSN_API: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_API }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
-          GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT }}
           PLUGIN_CLIENT_METADATA_BASE_URL: ${{ secrets.PLUGIN_CLIENT_METADATA_BASE_URL }}
           POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
           KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
@@ -162,6 +207,7 @@ jobs:
           LEADERBOARD_INTERNAL_TOKEN: ${{ secrets.LEADERBOARD_INTERNAL_TOKEN }}
           KV_URL: ${{ secrets.KV_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
           LINEAR_CLIENT_ID: ${{ secrets.LINEAR_CLIENT_ID }}
           LINEAR_CLIENT_SECRET: ${{ secrets.LINEAR_CLIENT_SECRET }}
           LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
@@ -191,10 +237,20 @@ jobs:
           VERCEL_SANDBOX_TOKEN: ${{ secrets.VERCEL_SANDBOX_TOKEN }}
           VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
           VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
+          AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
+          AUTUMN_WEBHOOK_SECRET: ${{ secrets.AUTUMN_WEBHOOK_SECRET }}
+          AWS_MARKETPLACE_PRODUCT_CODE: ${{ secrets.AWS_MARKETPLACE_PRODUCT_CODE }}
+          AWS_MARKETPLACE_REGION: ${{ secrets.AWS_MARKETPLACE_REGION }}
+          AWS_MARKETPLACE_ACCESS_KEY_ID: ${{ secrets.AWS_MARKETPLACE_ACCESS_KEY_ID }}
+          AWS_MARKETPLACE_SECRET_ACCESS_KEY: ${{ secrets.AWS_MARKETPLACE_SECRET_ACCESS_KEY }}
+          AWS_MARKETPLACE_SELLER_ACCOUNT_ID: ${{ secrets.AWS_MARKETPLACE_SELLER_ACCOUNT_ID }}
+          AWS_MARKETPLACE_EVENTS_TOKEN: ${{ secrets.AWS_MARKETPLACE_EVENTS_TOKEN }}
+          AWS_MARKETPLACE_ENTERPRISE_PLAN_ID: ${{ secrets.AWS_MARKETPLACE_ENTERPRISE_PLAN_ID }}
+          BILLING_PROVIDER: ${{ secrets.BILLING_PROVIDER }}
           SANDBOX_GATE_SECRET: ${{ secrets.SANDBOX_GATE_SECRET }}
           SANDBOX_GATE_ORIGIN: ${{ secrets.SANDBOX_GATE_ORIGIN }}
           SENTRY_DSN_SANDBOX: ${{ secrets.SENTRY_DSN_SANDBOX }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SERVER_OPENAI_API_KEY: ${{ secrets.SERVER_OPENAI_API_KEY }}
           GH_APP_SLUG: ${{ secrets.GH_APP_SLUG }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
@@ -209,27 +265,34 @@ jobs:
             --env R2_PUBLIC_BUCKET=$R2_PUBLIC_BUCKET \
             --env R2_ENDPOINT=$R2_ENDPOINT \
             --env USERCONTENT_URL=$USERCONTENT_URL \
+            --env MEDIA_URL=$MEDIA_URL \
             --env STATIC_URL=$STATIC_URL \
             --env USERCONTENT_TOKEN_SECRET=$USERCONTENT_TOKEN_SECRET \
+            --env AGENT_WORKER_SECRET=$AGENT_WORKER_SECRET \
+            --env AGENT_TURN_SIGNING_SECRET=$AGENT_TURN_SIGNING_SECRET \
+            --env AGENT_SESSION_SECRET=$AGENT_SESSION_SECRET \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
             --env GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
-            --env GOOGLE_TEMP_CLIENT_ID=$GOOGLE_TEMP_CLIENT_ID \
-            --env GOOGLE_TEMP_CLIENT_SECRET=$GOOGLE_TEMP_CLIENT_SECRET \
+            --env GOOGLE_CONNECTIONS_CLIENT_ID=$GOOGLE_CONNECTIONS_CLIENT_ID \
+            --env GOOGLE_CONNECTIONS_CLIENT_SECRET=$GOOGLE_CONNECTIONS_CLIENT_SECRET \
             --env GH_CLIENT_ID=$GH_CLIENT_ID \
             --env GH_CLIENT_SECRET=$GH_CLIENT_SECRET \
+            --env MOBILE_WEB_ORIGINS=$MOBILE_WEB_ORIGINS \
             --env NEXT_PUBLIC_SENTRY_DSN_API=$NEXT_PUBLIC_SENTRY_DSN_API \
             --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
+            --env DOMAIN_MOVE_ENABLED="$DOMAIN_MOVE_ENABLED" \
             --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
             --env POSTHOG_API_KEY=$POSTHOG_API_KEY \
-            --env GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT="$GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT" \
             --env PLUGIN_CLIENT_METADATA_BASE_URL="$PLUGIN_CLIENT_METADATA_BASE_URL" \
             --env POSTHOG_PROJECT_ID=$POSTHOG_PROJECT_ID \
             --env KV_REST_API_URL=$KV_REST_API_URL \
@@ -237,6 +300,7 @@ jobs:
             --env LEADERBOARD_INTERNAL_TOKEN=$LEADERBOARD_INTERNAL_TOKEN \
             --env KV_URL=$KV_URL \
             --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
             --env LINEAR_CLIENT_ID=$LINEAR_CLIENT_ID \
             --env LINEAR_CLIENT_SECRET=$LINEAR_CLIENT_SECRET \
             --env LINEAR_WEBHOOK_SECRET=$LINEAR_WEBHOOK_SECRET \
@@ -266,12 +330,25 @@ jobs:
             --env VERCEL_SANDBOX_TOKEN=$VERCEL_SANDBOX_TOKEN \
             --env VERCEL_SANDBOX_TEAM_ID=$VERCEL_SANDBOX_TEAM_ID \
             --env VERCEL_SANDBOX_PROJECT_ID=$VERCEL_SANDBOX_PROJECT_ID \
+            --env AUTUMN_SECRET_KEY=$AUTUMN_SECRET_KEY \
+            --env AUTUMN_WEBHOOK_SECRET=$AUTUMN_WEBHOOK_SECRET \
+            --env AWS_MARKETPLACE_PRODUCT_CODE=$AWS_MARKETPLACE_PRODUCT_CODE \
+            --env AWS_MARKETPLACE_REGION=$AWS_MARKETPLACE_REGION \
+            --env AWS_MARKETPLACE_ACCESS_KEY_ID=$AWS_MARKETPLACE_ACCESS_KEY_ID \
+            --env AWS_MARKETPLACE_SECRET_ACCESS_KEY=$AWS_MARKETPLACE_SECRET_ACCESS_KEY \
+            --env AWS_MARKETPLACE_SELLER_ACCOUNT_ID=$AWS_MARKETPLACE_SELLER_ACCOUNT_ID \
+            --env AWS_MARKETPLACE_EVENTS_TOKEN=$AWS_MARKETPLACE_EVENTS_TOKEN \
+            --env AWS_MARKETPLACE_ENTERPRISE_PLAN_ID=$AWS_MARKETPLACE_ENTERPRISE_PLAN_ID \
+            --env BILLING_PROVIDER=$BILLING_PROVIDER \
             --env SANDBOX_GATE_SECRET=$SANDBOX_GATE_SECRET \
             --env SANDBOX_GATE_ORIGIN=$SANDBOX_GATE_ORIGIN \
             --env SENTRY_DSN_SANDBOX=$SENTRY_DSN_SANDBOX \
-            --env OPENAI_API_KEY=$OPENAI_API_KEY \
+            --env SERVER_OPENAI_API_KEY=$SERVER_OPENAI_API_KEY \
             --env GH_APP_SLUG=$GH_APP_SLUG)
           vercel alias $VERCEL_URL ${{ env.API_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+          if [ "${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') }}" = "true" ]; then
+            vercel alias $VERCEL_URL ${{ env.BROWSER_API_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+          fi
           echo "vercel_url=$VERCEL_URL" >> $GITHUB_OUTPUT
 
       - name: Save API success status
@@ -290,11 +367,12 @@ jobs:
 
   deploy-web:
     name: Deploy Web
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
     environment:
       name: preview
       url: https://${{ env.WEB_ALIAS }}
-    needs: deploy-database
+    needs: create-database
 
     steps:
       - name: Checkout repository
@@ -323,39 +401,49 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
           echo "DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
-
       - name: Install Vercel CLI
-        run: npm install --global vercel@$VERCEL_CLI_VERSION
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      # Production deploys on main write this cache; a PR only reads it.
+      - name: Restore Next.js build cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: apps/web/.next/cache
+          key: next-web-${{ github.sha }}
+          restore-keys: next-web-
 
       - name: Build and Deploy Web
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ contains(github.event.pull_request.labels.*.name, 'paradev-project-preview') && vars.VERCEL_PARADEV_WEB_PROJECT_ID || secrets.VERCEL_WEB_PROJECT_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ env.DATABASE_URL_UNPOOLED }}
-          NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          NEXT_PUBLIC_API_URL: https://${{ env.BROWSER_API_ALIAS }}
+          BROWSER_API_URL: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('https://api.pr-{0}.paradev.com', github.event.pull_request.number) || secrets.BROWSER_API_URL }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
           NEXT_PUBLIC_DOCS_URL: https://${{ env.DOCS_ALIAS }}
           NEXT_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
+          NEXT_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
           USERCONTENT_URL: ${{ secrets.USERCONTENT_URL }}
+          MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          DOMAIN_MOVE_ENABLED: ${{ secrets.DOMAIN_MOVE_ENABLED }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_WEB: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_WEB }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
           KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
           KV_URL: ${{ secrets.KV_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
@@ -365,6 +453,8 @@ jobs:
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
           RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_BACKUP_URL: ${{ secrets.RELAY_BACKUP_URL }}
+          AGENTS_URL: https://${{ env.AGENTS_ALIAS }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
           vercel build --token=$VERCEL_TOKEN
@@ -373,15 +463,21 @@ jobs:
             --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
+            --env AGENTS_URL=$AGENTS_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_DOCS_URL=$NEXT_PUBLIC_DOCS_URL \
             --env NEXT_PUBLIC_RELAY_URL=$NEXT_PUBLIC_RELAY_URL \
+            --env NEXT_PUBLIC_REALTIME_URL=$NEXT_PUBLIC_REALTIME_URL \
             --env USERCONTENT_URL=$USERCONTENT_URL \
+            --env MEDIA_URL=$MEDIA_URL \
             --env STATIC_URL=$STATIC_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
+            --env DOMAIN_MOVE_ENABLED="$DOMAIN_MOVE_ENABLED" \
             --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
             --env NEXT_PUBLIC_SENTRY_DSN_WEB=$NEXT_PUBLIC_SENTRY_DSN_WEB \
             --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
@@ -389,6 +485,7 @@ jobs:
             --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
             --env KV_URL=$KV_URL \
             --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
             --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
             --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
             --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
@@ -417,11 +514,91 @@ jobs:
           name: web-status
           path: web-status.env
 
+  deploy-agents:
+    name: Deploy Agents Web
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 15
+    environment:
+      name: preview
+      url: https://${{ env.WEB_ALIAS }}/agents
+
+    steps:
+      - name: Check the agents project is configured
+        id: agents-config
+        env:
+          AGENTS_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+        run: echo "configured=$([ -n "$AGENTS_PROJECT_ID" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        if: steps.agents-config.outputs.configured == 'true'
+        id: setup-bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install dependencies
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun install --frozen --ignore-scripts
+
+      - name: Compile translations
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun run --filter=@superset/i18n build
+
+      - name: Install Vercel CLI
+        if: steps.agents-config.outputs.configured == 'true'
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      - name: Build and Deploy Agents Web
+        if: steps.agents-config.outputs.configured == 'true'
+        working-directory: apps/mobile
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_AGENTS_PROJECT_ID }}
+          EXPO_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
+          EXPO_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
+          EXPO_PUBLIC_RELAY_URL: ${{ secrets.RELAY_URL }}
+          EXPO_PUBLIC_REALTIME_URL: ${{ secrets.REALTIME_URL }}
+          EXPO_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          EXPO_PUBLIC_SENTRY_DSN_MOBILE: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN_MOBILE }}
+          EXPO_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
+        run: |
+          bun scripts/build-web.ts
+          VERCEL_URL=$(vercel deploy --prebuilt --archive=tgz --token=$VERCEL_TOKEN)
+          vercel alias $VERCEL_URL ${{ env.AGENTS_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
+
+      - name: Save agents success status
+        if: steps.agents-config.outputs.configured == 'true'
+        run: |
+          cat > agents-status.env << EOF
+          AGENTS_STATUS="✅"
+          AGENTS_LINK="<a href=\"https://${{ env.WEB_ALIAS }}/agents\">Open Preview</a>"
+          EOF
+
+      - name: Upload agents status
+        if: steps.agents-config.outputs.configured == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: agents-status
+          path: agents-status.env
+
   deploy-marketing:
     name: Deploy Marketing
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
     environment: preview
-    needs: deploy-database
+    needs: create-database
 
     steps:
       - name: Checkout repository
@@ -432,6 +609,12 @@ jobs:
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
 
       - name: Download database info
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -444,18 +627,11 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
           echo "DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED" >> $GITHUB_ENV
 
-      - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
-
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
-
       - name: Install Vercel CLI
-        run: npm install --global vercel@$VERCEL_CLI_VERSION
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
 
+      # No .next/cache step here: a Turbopack cache from another commit
+      # shipped a stale globals.css to production (#8697)
       - name: Build and Deploy Marketing
         id: deploy
         env:
@@ -467,19 +643,21 @@ jobs:
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('pr-{0}.paradev.com', github.event.pull_request.number) || secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_MARKETING: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_MARKETING }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
           KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
           LEADERBOARD_INTERNAL_TOKEN: ${{ secrets.LEADERBOARD_INTERNAL_TOKEN }}
+          POSTHOG_PROJECT_SECRET_KEY: ${{ secrets.POSTHOG_PROJECT_SECRET_KEY }}
           KV_URL: ${{ secrets.KV_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_SENDING_DOMAIN: ${{ secrets.EMAIL_SENDING_DOMAIN }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
@@ -488,6 +666,7 @@ jobs:
           SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
           SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
+          AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
         run: |
           vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
           vercel build --token=$VERCEL_TOKEN
@@ -498,6 +677,7 @@ jobs:
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
             --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
+            --env NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN \
             --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
             --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
             --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
@@ -507,8 +687,10 @@ jobs:
             --env KV_REST_API_URL=$KV_REST_API_URL \
             --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
             --env LEADERBOARD_INTERNAL_TOKEN=$LEADERBOARD_INTERNAL_TOKEN \
+            --env POSTHOG_PROJECT_SECRET_KEY=$POSTHOG_PROJECT_SECRET_KEY \
             --env KV_URL=$KV_URL \
             --env RESEND_API_KEY=$RESEND_API_KEY \
+            --env EMAIL_SENDING_DOMAIN=$EMAIL_SENDING_DOMAIN \
             --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
             --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
             --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
@@ -516,6 +698,7 @@ jobs:
             --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
             --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
+            --env AUTUMN_SECRET_KEY=$AUTUMN_SECRET_KEY \
             --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY)
           vercel alias $VERCEL_URL ${{ env.MARKETING_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
           echo "vercel_url=$VERCEL_URL" >> $GITHUB_OUTPUT
@@ -526,7 +709,7 @@ jobs:
       - name: Smoke test marketing routes
         run: |
           bun scripts/smoke-routes.ts "https://${{ env.MARKETING_ALIAS }}" --localized \
-            / /pricing /enterprise /download /join-us /community /contact \
+            / /pricing /enterprise /download /careers /community /contact \
             /blog /changelog /compare /roadmap /leaderboard /marketplace \
             /agent-orchestration /parallel-coding-agents /factory-2026 \
             /mcp-install /stats /team /starchart /the-production-run
@@ -555,135 +738,12 @@ jobs:
           name: marketing-status
           path: marketing-status.env
 
-  deploy-admin:
-    name: Deploy Admin
-    runs-on: ubuntu-latest
-    environment: preview
-    needs: deploy-database
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Setup Bun
-        id: setup-bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: .bun-version
-
-      - name: Download database info
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: database-status
-
-      - name: Load database URL
-        run: |
-          source database-status.env
-          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
-          echo "DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED" >> $GITHUB_ENV
-
-      - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
-
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@$VERCEL_CLI_VERSION
-
-      - name: Build and Deploy Admin
-        id: deploy
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DATABASE_URL_UNPOOLED: ${{ env.DATABASE_URL_UNPOOLED }}
-          NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
-          NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
-          NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
-          NEXT_PUBLIC_ADMIN_URL: https://${{ env.ADMIN_ALIAS }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
-          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
-          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
-          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
-          GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT }}
-          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
-          NEXT_PUBLIC_SENTRY_DSN_ADMIN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_ADMIN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
-          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
-          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
-          KV_URL: ${{ secrets.KV_URL }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          STRIPE_PRO_MONTHLY_PRICE_ID: ${{ secrets.STRIPE_PRO_MONTHLY_PRICE_ID }}
-          STRIPE_PRO_YEARLY_PRICE_ID: ${{ secrets.STRIPE_PRO_YEARLY_PRICE_ID }}
-          STRIPE_ENTERPRISE_YEARLY_PRICE_ID: ${{ secrets.STRIPE_ENTERPRISE_YEARLY_PRICE_ID }}
-          SLACK_BILLING_WEBHOOK_URL: ${{ secrets.SLACK_BILLING_WEBHOOK_URL }}
-          SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
-          SERVER_ANTHROPIC_API_KEY: ${{ secrets.SERVER_ANTHROPIC_API_KEY }}
-        run: |
-          vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
-          vercel build --token=$VERCEL_TOKEN
-          VERCEL_URL=$(vercel deploy --prebuilt --archive=tgz --token=$VERCEL_TOKEN \
-            --env DATABASE_URL=$DATABASE_URL \
-            --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
-            --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
-            --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-            --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
-            --env NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL \
-            --env NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL \
-            --env NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN \
-            --env NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY \
-            --env NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST \
-            --env POSTHOG_API_KEY=$POSTHOG_API_KEY \
-            --env GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT="$GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT" \
-            --env POSTHOG_PROJECT_ID=$POSTHOG_PROJECT_ID \
-            --env NEXT_PUBLIC_SENTRY_DSN_ADMIN=$NEXT_PUBLIC_SENTRY_DSN_ADMIN \
-            --env NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT \
-            --env KV_REST_API_URL=$KV_REST_API_URL \
-            --env KV_REST_API_TOKEN=$KV_REST_API_TOKEN \
-            --env KV_URL=$KV_URL \
-            --env RESEND_API_KEY=$RESEND_API_KEY \
-            --env STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
-            --env STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
-            --env STRIPE_PRO_MONTHLY_PRICE_ID=$STRIPE_PRO_MONTHLY_PRICE_ID \
-            --env STRIPE_PRO_YEARLY_PRICE_ID=$STRIPE_PRO_YEARLY_PRICE_ID \
-            --env STRIPE_ENTERPRISE_YEARLY_PRICE_ID=$STRIPE_ENTERPRISE_YEARLY_PRICE_ID \
-            --env SLACK_BILLING_WEBHOOK_URL=$SLACK_BILLING_WEBHOOK_URL \
-            --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
-            --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY)
-          vercel alias $VERCEL_URL ${{ env.ADMIN_ALIAS }} --scope=$VERCEL_ORG_ID --token=$VERCEL_TOKEN
-          echo "vercel_url=$VERCEL_URL" >> $GITHUB_OUTPUT
-
-      - name: Smoke test admin routes
-        run: |
-          bun scripts/smoke-routes.ts "https://${{ env.ADMIN_ALIAS }}" /
-
-      - name: Save admin success status
-        run: |
-          cat > admin-status.env << EOF
-          ADMIN_STATUS="✅"
-          ADMIN_LINK="<a href=\"https://${{ env.ADMIN_ALIAS }}\">Open Preview</a>"
-          EOF
-
-      - name: Upload admin status
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: admin-status
-          path: admin-status.env
-
   deploy-docs:
     name: Deploy Docs
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 10
     environment: preview
-    needs: deploy-database
+    needs: create-database
 
     steps:
       - name: Checkout repository
@@ -694,6 +754,12 @@ jobs:
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
+
+      - name: Cache dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
 
       - name: Download database info
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -706,17 +772,16 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
           echo "DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED" >> $GITHUB_ENV
 
-      - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ steps.setup-bun.outputs.bun-revision }}-${{ hashFiles('bun.lock') }}
-
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
-
       - name: Install Vercel CLI
-        run: npm install --global vercel@$VERCEL_CLI_VERSION
+        run: bun add --global vercel@$VERCEL_CLI_VERSION
+
+      # Production deploys on main write this cache; a PR only reads it.
+      - name: Restore Next.js build cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: apps/docs/.next/cache
+          key: next-docs-${{ github.sha }}
+          restore-keys: next-docs-
 
       - name: Build and Deploy Docs
         id: deploy
@@ -729,10 +794,10 @@ jobs:
           NEXT_PUBLIC_API_URL: https://${{ env.API_ALIAS }}
           NEXT_PUBLIC_WEB_URL: https://${{ env.WEB_ALIAS }}
           NEXT_PUBLIC_MARKETING_URL: https://${{ env.MARKETING_ALIAS }}
+          NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_DOCS: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_DOCS }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ secrets.NEXT_PUBLIC_SENTRY_ENVIRONMENT }}
           SECRETS_ENCRYPTION_KEY: ${{ secrets.SECRETS_ENCRYPTION_KEY }}
         run: |
@@ -769,8 +834,9 @@ jobs:
   post-final-comment:
     name: Post Deployment Comment
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: always()
-    needs: [deploy-database, deploy-api, deploy-web, deploy-marketing, deploy-admin, deploy-docs]
+    needs: [create-database, deploy-database, deploy-api, deploy-web, deploy-agents, deploy-marketing, deploy-docs]
     permissions:
       contents: read
       pull-requests: write
@@ -793,15 +859,18 @@ jobs:
           API_LINK="Failed to deploy"
           WEB_STATUS="❌"
           WEB_LINK="Failed to deploy"
+          AGENTS_STATUS="❌"
+          AGENTS_LINK="Failed to deploy"
           MARKETING_STATUS="❌"
           MARKETING_LINK="Failed to deploy"
-          ADMIN_STATUS="❌"
-          ADMIN_LINK="Failed to deploy"
           DOCS_STATUS="❌"
           DOCS_LINK="Failed to deploy"
 
-          if [[ "${{ needs.deploy-database.result }}" == "success" ]]; then
+          if [[ "${{ needs.create-database.result }}" == "success" ]]; then
             source database-status.env
+          fi
+          if [[ "${{ needs.deploy-database.result }}" != "success" ]]; then
+            DATABASE_STATUS="❌"
           fi
 
           if [[ "${{ needs.deploy-api.result }}" == "success" ]]; then
@@ -812,19 +881,24 @@ jobs:
             source web-status.env
           fi
 
-          if [[ "${{ needs.deploy-marketing.result }}" == "success" ]]; then
-            source marketing-status.env
+          if [[ "${{ needs.deploy-agents.result }}" == "success" ]]; then
+            if [[ -f agents-status.env ]]; then
+              source agents-status.env
+            else
+              AGENTS_STATUS="➖"
+              AGENTS_LINK="Not set up"
+            fi
           fi
 
-          if [[ "${{ needs.deploy-admin.result }}" == "success" ]]; then
-            source admin-status.env
+          if [[ "${{ needs.deploy-marketing.result }}" == "success" ]]; then
+            source marketing-status.env
           fi
 
           if [[ "${{ needs.deploy-docs.result }}" == "success" ]]; then
             source docs-status.env
           fi
 
-          export DATABASE_STATUS DATABASE_LINK API_STATUS API_LINK WEB_STATUS WEB_LINK MARKETING_STATUS MARKETING_LINK ADMIN_STATUS ADMIN_LINK DOCS_STATUS DOCS_LINK
+          export DATABASE_STATUS DATABASE_LINK API_STATUS API_LINK WEB_STATUS WEB_LINK AGENTS_STATUS AGENTS_LINK MARKETING_STATUS MARKETING_LINK DOCS_STATUS DOCS_LINK
           envsubst < .github/templates/preview-comment.md > final-comment.md
 
       - name: Post final deployment comment

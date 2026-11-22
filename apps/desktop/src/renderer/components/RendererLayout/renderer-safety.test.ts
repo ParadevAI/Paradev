@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import ts from "typescript";
+import ts from "@typescript/typescript6";
 
 const renderer = resolve(import.meta.dir, "../..");
 
@@ -192,8 +192,6 @@ test("every production failure boundary is included in the renderer audit", asyn
 			"routes/__root.tsx: notFoundComponent",
 			"routes/_authenticated/components/ContentBoundary/ContentBoundary.tsx: CatchBoundary",
 			"routes/_authenticated/components/ContentBoundary/ContentBoundary.tsx: errorComponent",
-			"routes/_authenticated/_dashboard/project/$projectId/page.tsx: notFoundComponent",
-			"routes/_authenticated/_dashboard/workspace/$workspaceId/page.tsx: notFoundComponent",
 			"routes/_authenticated/settings/hosts/$hostId/page.tsx: notFoundComponent",
 			"routes/_authenticated/settings/projects/$projectId/page.tsx: notFoundComponent",
 		].sort(),

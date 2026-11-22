@@ -6,6 +6,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { and, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { env } from "../../env";
+import { requesterIp } from "../../lib/requester-ip";
 import { adminProcedure, publicProcedure, userError } from "../../trpc";
 import {
 	listPageReportsSchema,
@@ -26,14 +27,6 @@ const reportRateLimit =
 				prefix: "ratelimit:page:report",
 			})
 		: null;
-
-function reporterIp(headers: Headers): string {
-	return (
-		headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-		headers.get("x-real-ip") ||
-		"unknown"
-	);
-}
 
 function hashReporterIp(ip: string): string {
 	return createHmac("sha256", env.USERCONTENT_TOKEN_SECRET)
@@ -89,7 +82,7 @@ export const pageReportRouter = {
 	report: publicProcedure
 		.input(reportPageSchema)
 		.mutation(async ({ ctx, input }) => {
-			const ipHash = hashReporterIp(reporterIp(ctx.headers));
+			const ipHash = hashReporterIp(requesterIp(ctx.headers));
 			await enforceReportRateLimit(ctx.session?.user.id ?? ipHash);
 
 			const [page] = await db

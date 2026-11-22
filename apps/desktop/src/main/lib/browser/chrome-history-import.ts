@@ -17,7 +17,7 @@ const CHROME_EPOCH_OFFSET_MS = 11_644_473_600_000;
 /** Cap a single import so a huge profile can't stall the transaction. */
 const MAX_HISTORY_ROWS = 10_000;
 
-export interface ImportedHistoryEntry {
+interface ImportedHistoryEntry {
 	url: string;
 	title: string;
 	visitCount: number;
@@ -112,7 +112,7 @@ export async function readHistoryFromProfile(
 	}
 }
 
-export interface ChromeImportSource {
+interface ChromeImportSource {
 	/** Absolute profile directory path; also used as the opaque source id. */
 	id: string;
 	/** Stable browser key, e.g. "chrome", "comet". */
@@ -140,6 +140,20 @@ export function listChromeImportSources(): ChromeImportSource[] {
 }
 
 /**
+ * Sources whose logins can be imported: only browsers that still have a
+ * Keychain key, checked once per browser.
+ */
+export async function listLoginImportSources(
+	hasKey: (browserKey: string) => Promise<boolean>,
+	sources: ChromeImportSource[] = listChromeImportSources(),
+): Promise<ChromeImportSource[]> {
+	const browserKeys = [...new Set(sources.map((source) => source.browserKey))];
+	const results = await Promise.all(browserKeys.map(hasKey));
+	const keyed = new Set(browserKeys.filter((_, index) => results[index]));
+	return sources.filter((source) => keyed.has(source.browserKey));
+}
+
+/**
  * Resolves a source id back to its profile directory, but only if it matches a
  * currently-detected profile. This prevents the renderer from asking us to read
  * an arbitrary path via the import mutation.
@@ -157,11 +171,10 @@ export function resolveImportSource(id: string): string | null {
  */
 export function resolveImportProfile(
 	id: string,
-): { profileDir: string; browserKey: string } | null {
-	const match = listAllChromiumProfiles().find(
+	homeDir?: string,
+): (ChromeImportSource & { profileDir: string }) | null {
+	const match = listAllChromiumProfiles(homeDir).find(
 		(profile) => profile.profileDir === id,
 	);
-	return match
-		? { profileDir: match.profileDir, browserKey: match.browser.key }
-		: null;
+	return match ? { ...toSource(match), profileDir: match.profileDir } : null;
 }

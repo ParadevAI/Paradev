@@ -31,11 +31,13 @@ const { default: proxy } = await import("./proxy");
  * Empties the Authorization header for the unauthenticated cases. */
 async function callProxy(
 	path: string,
-	{ auth }: { auth?: string } = {},
+	{ auth, cookie }: { auth?: string; cookie?: string } = {},
 ): Promise<Response> {
 	if (auth) sessionHeaders.set("authorization", auth);
 	else sessionHeaders.delete("authorization");
-	return proxy(new NextRequest(path));
+	return proxy(
+		new NextRequest(path, { headers: cookie ? { cookie } : undefined }),
+	);
 }
 
 describe("proxy: unauthenticated API requests return JSON 401, never a sign-in redirect", () => {
@@ -69,6 +71,22 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 		expect(res.headers.get("location")).toContain("/sign-in");
 	});
 
+	it("tells a browser whose session cookie no longer resolves that its session expired", async () => {
+		const signedOut = await callProxy("https://app.superset.sh/dashboard");
+		const stale = await callProxy("https://app.superset.sh/dashboard", {
+			cookie: "__Secure-better-auth.session_token=revoked.signature",
+		});
+
+		expect(
+			new URL(signedOut.headers.get("location") ?? "").searchParams.has(
+				"reason",
+			),
+		).toBe(false);
+		expect(
+			new URL(stale.headers.get("location") ?? "").searchParams.get("reason"),
+		).toBe("session_expired");
+	});
+
 	it("does not treat /apiary or /trpcfoo as API routes (slash-delimited child only)", async () => {
 		// P2 (cubic) + coderabbit: only exact /api|/trpc or /api/|/trpc/ match.
 		const apiary = await callProxy("https://app.superset.sh/apiary");
@@ -79,6 +97,29 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 		expect(apiary.headers.get("location")).toContain("/sign-in");
 		expect(trpcfoo.status).toBe(307);
 		expect(trpcfoo.headers.get("location")).toContain("/sign-in");
+	});
+
+	it("leaves the apple-app-site-association file reachable unauthenticated", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/.well-known/apple-app-site-association",
+		);
+
+		expect(res.status).toBe(200);
+	});
+
+	it("leaves the Android assetlinks.json file reachable unauthenticated", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/.well-known/assetlinks.json",
+		);
+
+		expect(res.status).toBe(200);
+	});
+
+	it("does not extend that exemption to other .well-known routes", async () => {
+		const res = await callProxy("https://app.superset.sh/.well-known/secrets");
+
+		expect(res.status).toBe(307);
+		expect(res.headers.get("location")).toContain("/sign-in");
 	});
 
 	it("leaves public API routes (e.g. /api/auth/desktop) reachable unauthenticated", async () => {
@@ -98,5 +139,70 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 		});
 
 		expect(res.status).toBe(200);
+	});
+});
+
+describe("proxy: signed-in visits to auth pages", () => {
+	const signedIn = { auth: "Bearer valid-token" };
+
+	it("follows a same-origin redirect param instead of dropping it", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2Fsettings%3Ftab%3Dbilling",
+			signedIn,
+		);
+
+		expect(res.status).toBe(307);
+		expect(res.headers.get("location")).toBe(
+			"https://app.superset.sh/settings?tab=billing",
+		);
+	});
+
+	it("ignores a redirect param that points at another origin", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2F%2Fevil.example",
+			signedIn,
+		);
+
+		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
+	});
+
+	it("ignores a redirect that a tab turns into another origin", async () => {
+		const res = await callProxy(
+			"https://app.superset.sh/sign-in?redirect=%2F%09%2Fevil.example",
+			signedIn,
+		);
+
+		expect(res.headers.get("location")).toBe("https://app.superset.sh/");
+	});
+});
+
+describe("proxy: /agents", () => {
+	it("sends a signed-out visitor to sign-in with a redirect back", async () => {
+		const res = await callProxy("https://app.superset.sh/agents/workspace/abc");
+
+		expect(res.status).toBe(307);
+		expect(res.headers.get("location")).toBe(
+			"https://app.superset.sh/sign-in?redirect=%2Fagents%2Fworkspace%2Fabc",
+		);
+	});
+
+	it("rewrites a signed-in request to the agents deployment", async () => {
+		const previous = process.env.AGENTS_URL;
+		process.env.AGENTS_URL = "https://superset-agents.vercel.app";
+		try {
+			const res = await callProxy(
+				"https://app.superset.sh/agents/workspace/abc",
+				{
+					auth: "Bearer valid-token",
+				},
+			);
+
+			expect(res.headers.get("x-middleware-rewrite")).toBe(
+				"https://superset-agents.vercel.app/agents/workspace/abc",
+			);
+		} finally {
+			if (previous === undefined) delete process.env.AGENTS_URL;
+			else process.env.AGENTS_URL = previous;
+		}
 	});
 });

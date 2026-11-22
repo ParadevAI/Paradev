@@ -1,0 +1,18 @@
+---
+title: Firecrawl
+description: Search the web, scrape and crawl sites, extract structured data, and parse documents with Firecrawl
+---
+
+Search the web, scrape and crawl sites, extract structured data, and parse documents with Firecrawl.
+
+## MCP Server
+
+Tools come from Firecrawl's own MCP server at `https://mcp.firecrawl.dev/v2/mcp-oauth`. Paradev proxies each call and adds your credentials. Firecrawl decides which tools the server offers, so see [Firecrawl's tools reference](https://docs.firecrawl.dev/mcp-server/tools) for the current list. Calls use your team's Firecrawl credits.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Firecrawl in your browser and approve a team. Paradev registers itself with Firecrawl when you connect, so there is no app to set up first. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

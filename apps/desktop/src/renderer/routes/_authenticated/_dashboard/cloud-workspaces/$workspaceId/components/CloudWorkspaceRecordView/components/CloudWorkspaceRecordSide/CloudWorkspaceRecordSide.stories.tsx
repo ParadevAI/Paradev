@@ -27,7 +27,7 @@ const meta = {
 		workspace: {
 			id: "lag-repro-01",
 			name: "lag-repro-01",
-			status: "ready",
+			status: "awake",
 			agentStatus: "working",
 			agentStatusAt: ago(2),
 			createdAt: ago(240),
@@ -46,9 +46,9 @@ const meta = {
 				{ fullName: "superset-sh/docs", branch: "superset/lag-repro-01" },
 			],
 			presence: [
-				{ ...kiet, lastSeenAt: ago(1) },
-				{ ...harshith, lastSeenAt: ago(2) },
-				{ ...satya, lastSeenAt: ago(120) },
+				{ ...kiet, lastSeenAt: ago(1).getTime(), active: true },
+				{ ...harshith, lastSeenAt: ago(2).getTime(), active: true },
+				{ ...satya, lastSeenAt: ago(120).getTime(), active: false },
 			],
 			prompt: null,
 			description: null,

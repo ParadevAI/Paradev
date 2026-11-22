@@ -1,7 +1,7 @@
-import type { MessageDescriptor } from "@lingui/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { SelectAutomationRun, SelectUser } from "@superset/db/schema";
+import type { SelectUser } from "@superset/db/schema";
 import { i18n } from "@superset/i18n";
 import { formatCompactRelativeTime } from "@superset/i18n/format";
 import { useFormat } from "@superset/i18n/react";
@@ -12,6 +12,7 @@ import {
 } from "@superset/shared/rrule";
 import type { RouterOutputs } from "@superset/trpc";
 import { Button } from "@superset/ui/button";
+import { Checkbox } from "@superset/ui/checkbox";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -31,6 +32,9 @@ import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hook
 import type { AutomationLastRun } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import type { ProjectOption } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
+import type { RowSelectEvent } from "../../hooks/useRowSelection";
+import { RUN_STATUS_META } from "../../utils/runStatus";
+import { runWorkspaceSearch } from "../../utils/runWorkspaceSearch";
 import { AutomationActionsMenuItems } from "./components/AutomationActionsMenuItems";
 
 type AutomationListItem = RouterOutputs["automation"]["list"][number];
@@ -47,59 +51,36 @@ interface AutomationRowProps {
 	/** Shared ticking clock so relative times stay fresh without per-row timers. */
 	now: Date;
 	isOwner: boolean;
+	canArchive: boolean;
 	/** True while a run/retry dispatch for this automation is in flight. */
 	isRetrying: boolean;
+	/** Every group in the organization, for "Move to group". */
+	groups: string[];
+	/** Indents the name under a group header, or to make room for checkboxes. */
+	indented: boolean;
+	/** Drag to another group's section. Omitted when the table isn't grouped. */
+	drag?: {
+		/** Only your own automations move. */
+		enabled: boolean;
+		/** Part of what is being dragged. */
+		dimmed: boolean;
+		/** The section under the pointer is this row's section. */
+		dropActive: boolean;
+	};
+	/** Omitted when the row can't be selected (someone else's automation). */
+	selection?: {
+		selected: boolean;
+		/** Some row is selected: checkboxes show only while selecting. */
+		active: boolean;
+		onSelect: (event: RowSelectEvent) => void;
+	};
 	onRunNow: (automation: AutomationListItem) => void;
 	onToggleEnabled: (automation: AutomationListItem) => void;
+	onMoveToGroup: (automation: AutomationListItem, group: string | null) => void;
+	onArchive: (automation: AutomationListItem) => void;
+	onRestore: (automation: AutomationListItem) => void;
 	onDelete: (automation: AutomationListItem) => void;
 }
-
-// A run's terminal success state is workspace creation — say so.
-const LAST_RUN_META: Record<
-	SelectAutomationRun["status"],
-	{ dot: string; label: MessageDescriptor; failed?: boolean }
-> = {
-	dispatched: {
-		dot: "bg-emerald-500",
-		label: msg({
-			message: "created",
-		}),
-	},
-	dispatching: {
-		dot: "bg-amber-500",
-		label: msg({
-			message: "creating",
-		}),
-	},
-	skipped_offline: {
-		dot: "bg-red-500",
-		label: msg({
-			message: "failed",
-		}),
-		failed: true,
-	},
-	dispatch_failed: {
-		dot: "bg-red-500",
-		label: msg({
-			message: "failed",
-		}),
-		failed: true,
-	},
-	// Neither created a workspace, so neither is `failed` — that flag offers to
-	// open one.
-	debounced: {
-		dot: "bg-slate-400",
-		label: msg({
-			message: "superseded",
-		}),
-	},
-	rejected: {
-		dot: "bg-amber-500",
-		label: msg({
-			message: "blocked",
-		}),
-	},
-};
 
 // Both directions come from Intl.RelativeTimeFormat: it renders the compact
 // "3d ago" / "in 2h" shape in every locale, so these need no catalog entries
@@ -127,9 +108,17 @@ export function AutomationRow({
 	lastRun,
 	now,
 	isOwner,
+	canArchive,
 	isRetrying,
+	groups,
+	indented,
+	drag,
+	selection,
 	onRunNow,
 	onToggleEnabled,
+	onMoveToGroup,
+	onArchive,
+	onRestore,
 	onDelete,
 }: AutomationRowProps) {
 	const { formatDateTime } = useFormat();
@@ -164,11 +153,9 @@ export function AutomationRow({
 		if (!lastRun?.workspaceId) return;
 		localStorage.setItem("lastViewedWorkspaceId", lastRun.workspaceId);
 		navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId: lastRun.workspaceId },
-			search: {
-				terminalId: lastRun.terminalSessionId ?? undefined,
-			},
+			search: runWorkspaceSearch(lastRun),
 		});
 	};
 
@@ -176,35 +163,113 @@ export function AutomationRow({
 		<AutomationActionsMenuItems
 			kind={kind}
 			isOwner={isOwner}
+			canArchive={canArchive}
+			archived={automation.archivedAt !== null}
 			enabled={automation.enabled}
+			groups={groups}
+			currentGroup={automation.group}
 			onEdit={openDetail}
 			onCopyLink={() => copyShareLink(`automations/${automation.id}`)}
 			onRunNow={() => onRunNow(automation)}
 			onToggleEnabled={() => onToggleEnabled(automation)}
 			onHistory={openHistory}
+			onMoveToGroup={(group) => onMoveToGroup(automation, group)}
+			onArchive={() => onArchive(automation)}
+			onRestore={() => onRestore(automation)}
 			onDelete={() => onDelete(automation)}
 		/>
 	);
 
-	const lastRunMeta = lastRun ? LAST_RUN_META[lastRun.status] : null;
+	const draggable = useDraggable({
+		id: automation.id,
+		disabled: !drag?.enabled,
+	});
+	const droppable = useDroppable({
+		id: `row:${automation.id}`,
+		data: { group: automation.group },
+		disabled: !drag,
+	});
+	const setRowRef = (node: HTMLTableRowElement | null) => {
+		draggable.setNodeRef(node);
+		droppable.setNodeRef(node);
+	};
+
+	const lastRunMeta = lastRun ? RUN_STATUS_META[lastRun.status] : null;
 	const lastRunClickable = !!lastRun?.workspaceId;
 
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
 				<TableRow
+					ref={setRowRef}
 					tabIndex={0}
-					onClick={openDetail}
+					data-state={selection?.selected ? "selected" : undefined}
+					data-drop-active={drag?.dropActive || undefined}
+					onMouseDown={(event) => {
+						// Shift-click selects a range; keep it from selecting text.
+						if (selection && event.shiftKey) {
+							event.preventDefault();
+							return;
+						}
+						if (drag?.enabled) draggable.listeners?.onMouseDown?.(event);
+					}}
+					onTouchStart={(event) => {
+						if (drag?.enabled) draggable.listeners?.onTouchStart?.(event);
+					}}
+					onClick={(event) => {
+						if (
+							selection &&
+							(event.metaKey || event.ctrlKey || event.shiftKey)
+						) {
+							selection.onSelect({ shiftKey: event.shiftKey });
+							return;
+						}
+						openDetail();
+					}}
 					onKeyDown={(event) => {
 						if (event.target !== event.currentTarget) return;
+						if (
+							selection &&
+							(event.key === "x" || event.key === "X") &&
+							!event.metaKey &&
+							!event.ctrlKey &&
+							!event.altKey
+						) {
+							event.preventDefault();
+							selection.onSelect({ shiftKey: event.shiftKey });
+							return;
+						}
 						if (event.key === "Enter" || event.key === " ") {
 							event.preventDefault();
 							openDetail();
 						}
 					}}
-					className="group/row h-10 cursor-pointer border-border/50 text-sm outline-none transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset"
+					className={cn(
+						"group/row h-10 cursor-pointer border-border/50 text-sm outline-none transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 data-[state=selected]:bg-accent/70 data-[drop-active]:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset",
+						drag?.dimmed && "opacity-40",
+					)}
 				>
-					<TableCell className="pl-4">
+					<TableCell
+						className={cn(
+							"relative transition-[padding] duration-150",
+							indented ? "pl-11" : "pl-4",
+						)}
+					>
+						{selection?.active && (
+							<Checkbox
+								checked={selection.selected}
+								onMouseDown={(event) => {
+									if (event.shiftKey) event.preventDefault();
+								}}
+								onClick={(event) => {
+									event.preventDefault();
+									event.stopPropagation();
+									selection.onSelect({ shiftKey: event.shiftKey });
+								}}
+								aria-label={t({ message: `Select ${automation.name}` })}
+								className="absolute inset-y-0 left-3.5 my-auto !translate-y-0 animate-in fade-in duration-150"
+							/>
+						)}
 						<span className="flex min-w-0 items-center gap-2">
 							<span
 								className={cn(
@@ -288,12 +353,7 @@ export function AutomationRow({
 						{lastRun && lastRunMeta ? (
 							(() => {
 								const cell = (
-									<span
-										className={cn(
-											"flex items-center gap-1.5",
-											lastRunMeta.failed && "text-red-600 dark:text-red-400",
-										)}
-									>
+									<span className="flex items-center gap-1.5">
 										<span
 											className={cn(
 												"inline-block size-1.5 shrink-0 rounded-full",
@@ -325,27 +385,7 @@ export function AutomationRow({
 												</button>
 											</TooltipTrigger>
 											<TooltipContent>
-												{lastRunMeta.failed ? (
-													<Trans>
-														The last run failed. Open its workspace to see why
-													</Trans>
-												) : (
-													<Trans>Open the run's workspace</Trans>
-												)}
-											</TooltipContent>
-										</Tooltip>
-									);
-								}
-								if (lastRunMeta.failed) {
-									return (
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<span className="block">{cell}</span>
-											</TooltipTrigger>
-											<TooltipContent>
-												<Trans>
-													The last run failed. Click the row to see why.
-												</Trans>
+												<Trans>Open the run's workspace</Trans>
 											</TooltipContent>
 										</Tooltip>
 									);
@@ -359,7 +399,7 @@ export function AutomationRow({
 
 					<TableCell className="pr-4">
 						<span className="flex items-center justify-end gap-0.5">
-							{isOwner && (
+							{isOwner && automation.archivedAt === null && (
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<Button

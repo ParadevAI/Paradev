@@ -1,0 +1,8 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#07131A"/>
+  <rect x="4.5" y="4.5" width="55" height="55" rx="11.5" fill="#0D1F28" stroke="#173845"/>
+  <circle cx="15" cy="15" r="2.2" fill="#2D5969"/>
+  <circle cx="22" cy="15" r="2.2" fill="#2D5969"/>
+  <circle cx="29" cy="15" r="2.2" fill="#2D5969"/>
+  <text x="10" y="38" fill="#73F0C7" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace" font-weight="700" xml:space="preserve">&gt;ce_</text>
+</svg>

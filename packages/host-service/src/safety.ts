@@ -16,6 +16,7 @@
 import type { IncomingMessage } from "node:http";
 import type { Duplex } from "node:stream";
 import * as Sentry from "@sentry/node";
+import { caught } from "./runtime/box-log-filter";
 
 let safetyNetInstalled = false;
 
@@ -41,7 +42,10 @@ export function installUpgradeSocketGuard(server: {
 		const requestPath = request.url?.split("?")[0] ?? "<unknown>";
 		socket.on("error", (error: NodeJS.ErrnoException) => {
 			console.warn(
-				`[host-service] upgrade socket error (${error.code ?? error.message}) on ${requestPath} from ${request.socket.remoteAddress ?? "<unknown>"}`,
+				"[host-service] upgrade socket error (path, from):",
+				requestPath,
+				request.socket.remoteAddress ?? "<unknown>",
+				caught(error),
 			);
 		});
 	});

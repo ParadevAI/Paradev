@@ -1,6 +1,8 @@
 import type { SelectConnection } from "@superset/db/schema";
+import { grantSharedWithAnotherConnection } from "../../../lib/connectors";
 import { decryptOptional, decryptSecret } from "../../plugins/crypto";
 import { markDisconnected } from "../token-refresh";
+import { trackTasksInSupersetWithoutLinear } from "./tracker";
 
 export const SYNC_SUSPENDED = "sync_suspended";
 
@@ -15,21 +17,24 @@ export type RevokeOutcome = "revoked" | "rate_limited" | "failed";
  *
  * Both tokens are revoked: the docs describe the endpoint per token and do
  * not say that revoking one invalidates the other. An already-revoked token
- * answers 400, which is the outcome wanted.
+ * answers 400, which is the outcome wanted. Nothing is revoked while another
+ * connection holds the same Linear user's grant; only this row is disconnected.
  */
 export async function revokeLinearConnection(
 	connection: SelectConnection,
 ): Promise<RevokeOutcome> {
-	const tokens = [
-		{
-			token: await decryptSecret(connection.accessToken),
-			hint: "access_token",
-		},
-		{
-			token: await decryptOptional(connection.refreshToken),
-			hint: "refresh_token",
-		},
-	];
+	const tokens = (await grantSharedWithAnotherConnection(connection))
+		? []
+		: [
+				{
+					token: await decryptSecret(connection.accessToken),
+					hint: "access_token",
+				},
+				{
+					token: await decryptOptional(connection.refreshToken),
+					hint: "refresh_token",
+				},
+			];
 	for (const { token, hint } of tokens) {
 		if (!token) continue;
 		const response = await fetch("https://api.linear.app/oauth/revoke", {
@@ -47,5 +52,6 @@ export async function revokeLinearConnection(
 		}
 	}
 	await markDisconnected(connection.id, SYNC_SUSPENDED, { clearTokens: true });
+	await trackTasksInSupersetWithoutLinear(connection.organizationId);
 	return "revoked";
 }

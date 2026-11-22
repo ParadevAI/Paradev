@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { HeadlessTerminal } from "./headless-xterm";
 import { reconstructTerminalTranscript } from "./terminal-transcript";
 
 const ESC = String.fromCharCode(27);
@@ -71,6 +72,82 @@ describe("reconstructTerminalTranscript", () => {
 			rows: 24,
 		});
 		expect(distinct(text, /line-(\d+)/g)).toBe(300);
+	});
+
+	test.each([
+		"normal",
+		"alternate",
+	] as const)("preserves intentionally identical scrolling lines on the %s screen", (screen) => {
+		const lines = [
+			"connecting",
+			...Array<string>(300).fill("retrying connection"),
+			"connected",
+		];
+		const enter = screen === "alternate" ? `${ESC}[?1049h` : "";
+		const log =
+			screen === "alternate"
+				? lines.map((line) => `${ESC}[32m${line}${ESC}[0m`)
+				: lines;
+		const text = reconstructTerminalTranscript(
+			`${enter}${log.join("\r\n")}\r\n`,
+			{ cols: 80, rows: 24 },
+		);
+		expect(text.split("\n")).toEqual(lines);
+	});
+
+	test("does not duplicate a header above a scrolling region", () => {
+		const blankLines = "\r\n".repeat(80);
+		const stream = `persistent header\r\n${ESC}[3;24r${ESC}[24;1H${blankLines}`;
+		const text = reconstructTerminalTranscript(stream, { cols: 80, rows: 24 });
+		expect(text).toBe("persistent header");
+	});
+
+	test("does not append an unchanged redraw that crosses a sample boundary", () => {
+		const size = { cols: 80, rows: 24 };
+		const frame = "unchanged status\r\n".repeat(size.rows);
+		const paddingSoCursorHomeEndsASample = `${ESC}[0m`.repeat(8);
+		const redraw = `${paddingSoCursorHomeEndsASample}${ESC}[H${frame}`;
+		expect(reconstructTerminalTranscript(frame + redraw.repeat(12), size)).toBe(
+			reconstructTerminalTranscript(frame, size),
+		);
+	});
+
+	test("keeps scrolling lines after a sample ends mid-line on the last row", () => {
+		const line = "retrying connection";
+		const stream =
+			`${line}\r\n`.repeat(23) +
+			`${line}${ESC}[3J\r\n` +
+			`${line}\r\n`.repeat(24);
+		const text = reconstructTerminalTranscript(stream, { cols: 80, rows: 24 });
+		expect(text.split("\n")).toEqual(Array<string>(48).fill(line));
+	});
+
+	test("falls back to text matching when xterm hides its scroll region", () => {
+		const probe = new HeadlessTerminal({ cols: 80, rows: 24 });
+		let owner = Object.getPrototypeOf(
+			(probe as unknown as { _core: object })._core,
+		);
+		probe.dispose();
+		while (owner && !Object.getOwnPropertyDescriptor(owner, "buffer")) {
+			owner = Object.getPrototypeOf(owner);
+		}
+		const buffer = Object.getOwnPropertyDescriptor(owner, "buffer");
+		if (!buffer) throw new Error("xterm core no longer has a buffer getter");
+		Object.defineProperty(owner, "buffer", {
+			configurable: true,
+			get: () => undefined,
+		});
+		try {
+			let stream = "";
+			for (let i = 0; i < 300; i++) stream += `line-${i}\r\n`;
+			const text = reconstructTerminalTranscript(stream, {
+				cols: 80,
+				rows: 24,
+			});
+			expect(distinct(text, /line-(\d+)/g)).toBe(300);
+		} finally {
+			Object.defineProperty(owner, "buffer", buffer);
+		}
 	});
 
 	test("keeps wrapped double-width output, which code-unit chunking lost", () => {

@@ -1,18 +1,23 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { m } from "framer-motion";
 import {
-	LuChevronDown,
-	LuChevronRight,
-	LuLayers,
-	LuPlus,
-	LuZap,
+	LuArrowLeft,
+	LuArrowRight,
+	LuPanelLeft,
+	LuSearch,
+	LuSquarePen,
 } from "react-icons/lu";
-import { CLOUD_WORKSPACES, WORKSPACES } from "../../constants";
+import {
+	CLOUD_GROUP_ID,
+	NEW_CLOUD_SESSION,
+	SCENES,
+	SESSION_GROUPS,
+} from "../../constants";
 import type { ActiveDemo } from "../../types";
-import { AsciiSpinner } from "../AsciiSpinner";
-import { WorkspaceItem } from "../WorkspaceItem";
+import { IconButton } from "../IconButton";
+import { WindowRail } from "../WindowRail";
+import { SessionRow } from "./components/SessionRow";
 
 interface LeftSidebarProps {
 	activeDemo: ActiveDemo;
@@ -20,152 +25,79 @@ interface LeftSidebarProps {
 
 export function LeftSidebar({ activeDemo }: LeftSidebarProps) {
 	const { t } = useLingui();
-	const isOrchestrate = activeDemo === "Orchestrate Parallel Agents";
-	const isRemote = activeDemo === "Remote Access";
+	const scene = SCENES[activeDemo];
+	const isCloud = activeDemo === "Cloud Workspaces";
 
 	return (
-		<div className="flex w-[232px] shrink-0 flex-col border-r border-border/60 bg-card text-[11px]">
-			<div className="flex h-9 items-center gap-1.5 px-3">
-				<div className="size-2.5 rounded-full bg-[#ff5f57]" />
-				<div className="size-2.5 rounded-full bg-[#febc2e]" />
-				<div className="size-2.5 rounded-full bg-[#28c840]" />
+		<div className="flex w-[268px] shrink-0 flex-col">
+			<div className="flex h-10 shrink-0 items-center gap-3 pl-3.5">
+				<div className="flex items-center gap-2">
+					<div className="size-3 rounded-full bg-[#ff5f57]" />
+					<div className="size-3 rounded-full bg-[#febc2e]" />
+					<div className="size-3 rounded-full bg-[#28c840]" />
+				</div>
+				<div className="flex items-center">
+					<IconButton icon={LuPanelLeft} />
+					<IconButton icon={LuArrowLeft} />
+					<IconButton icon={LuArrowRight} tone="faint" />
+				</div>
 			</div>
 
-			<div className="space-y-px px-1.5 pt-1">
-				<NavRow
-					icon={LuLayers}
-					label={t({
-						message: "Workspaces",
-					})}
-				/>
-				<NavRow
-					icon={LuZap}
-					label={t({
-						message: "Automations",
-					})}
-				/>
-				<NavRow
-					icon={LuPlus}
-					label={t({
-						message: "New Workspace",
-					})}
-				/>
-			</div>
+			<div className="flex min-h-0 flex-1">
+				<WindowRail active={scene.rail} />
+				<div className="flex min-w-0 flex-1 flex-col pb-1">
+					<div className="flex min-h-0 flex-1 flex-col gap-3 rounded-l-xl bg-[#121212] px-2 pt-1.5 pb-2 opacity-60">
+						<div className="flex items-center gap-1">
+							<div className="flex h-7 min-w-0 flex-1 items-center gap-2 rounded-md bg-neutral-100/[0.06] pr-1 pl-2">
+								<LuSearch className="size-4 shrink-0 text-neutral-100/55" />
+								<span className="min-w-0 flex-1 truncate text-neutral-100/40">
+									<Trans>Search</Trans>
+								</span>
+							</div>
+							<IconButton icon={LuSquarePen} />
+						</div>
 
-			<div className="mt-6 flex-1 overflow-hidden">
-				<GroupHeader label="desktop" count={5} expanded />
+						<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+							{SESSION_GROUPS.map((group) => (
+								<div key={group.id} className="flex flex-col gap-0.5">
+									<div className="flex h-6 items-center gap-1.5 pr-1.5 pl-2 text-[12px] leading-4">
+										<span className="min-w-0 flex-1 truncate font-medium text-neutral-100/50">
+											{typeof group.label === "string"
+												? group.label
+												: t(group.label)}
+										</span>
+									</div>
+									{group.id === CLOUD_GROUP_ID && (
+										<div
+											aria-hidden={!isCloud}
+											className={`grid transition-[grid-template-rows,opacity] duration-[250ms] ease-out motion-reduce:transition-none ${isCloud ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+										>
+											<div className="min-h-0 overflow-hidden">
+												<div className="pb-0.5">
+													<SessionRow session={NEW_CLOUD_SESSION} active />
+												</div>
+											</div>
+										</div>
+									)}
+									{group.sessions.map((session) => (
+										<SessionRow
+											key={session.title}
+											session={session}
+											active={session.title === scene.activeSession}
+										/>
+									))}
+								</div>
+							))}
+						</div>
 
-				<m.div
-					className="overflow-hidden"
-					initial={{ height: 0, opacity: 0 }}
-					animate={{
-						height: isOrchestrate ? "auto" : 0,
-						opacity: isOrchestrate ? 1 : 0,
-					}}
-					transition={{ duration: 0.25, ease: "easeOut" }}
-				>
-					<div className="relative flex h-7 items-center gap-2.5 bg-brand/[0.10] pl-4 pr-3">
-						<span className="absolute inset-y-1 left-0 w-[2px] bg-brand" />
-						<AsciiSpinner
-							className="text-[10px]"
-							toneClassName="text-brand-light"
-						/>
-						<span className="truncate text-foreground/95">new workspace</span>
-						<span className="ml-auto font-mono text-[10px] text-muted-foreground/55">
-							<Trans>creating</Trans>
-						</span>
+						<div className="flex h-6 shrink-0 items-center gap-1.5 pr-1.5 pl-2 text-[12px] leading-4">
+							<span className="min-w-0 flex-1 truncate font-medium text-neutral-100/50">
+								<Trans>Settled</Trans>
+							</span>
+						</div>
 					</div>
-				</m.div>
-
-				<div className="mt-1 space-y-0.5">
-					{WORKSPACES.map((workspace) => (
-						<WorkspaceItem
-							key={workspace.branch}
-							name={workspace.name}
-							branch={workspace.branch}
-							add={workspace.add}
-							del={workspace.del}
-							pr={workspace.pr}
-							isActive={!isOrchestrate && !isRemote && workspace.isActive}
-							status={workspace.status}
-							icon={workspace.icon}
-						/>
-					))}
-				</div>
-
-				<div className="mt-3">
-					<GroupHeader label="cloud" count={3} expanded={isRemote} />
-				</div>
-				<m.div
-					className="overflow-hidden"
-					initial={{ height: 0, opacity: 0 }}
-					animate={{
-						height: isRemote ? "auto" : 0,
-						opacity: isRemote ? 1 : 0,
-					}}
-					transition={{ duration: 0.25, ease: "easeOut" }}
-				>
-					<div className="mt-1 space-y-0.5">
-						{CLOUD_WORKSPACES.map((workspace, index) => (
-							<WorkspaceItem
-								key={workspace.branch}
-								name={workspace.name}
-								branch={workspace.branch}
-								add={workspace.add}
-								del={workspace.del}
-								isActive={isRemote && index === 0}
-								status={workspace.status}
-								icon={workspace.icon}
-							/>
-						))}
-					</div>
-				</m.div>
-				<div className="mt-1">
-					<GroupHeader label="gpu-box" count={14} />
-				</div>
-				<div className="mt-1">
-					<GroupHeader label="mobile" count={1} />
-				</div>
-				<div className="mt-1">
-					<GroupHeader label="cli" count={4} />
 				</div>
 			</div>
-		</div>
-	);
-}
-
-function NavRow({
-	icon: Icon,
-	label,
-}: {
-	icon: typeof LuLayers;
-	label: string;
-}) {
-	return (
-		<div className="flex h-6 cursor-pointer items-center gap-2 px-2 text-muted-foreground/55 hover:text-foreground/80">
-			<Icon className="size-3.5 text-muted-foreground/55" />
-			<span>{label}</span>
-		</div>
-	);
-}
-
-function GroupHeader({
-	label,
-	count,
-	expanded,
-}: {
-	label: string;
-	count: number;
-	expanded?: boolean;
-}) {
-	const ChevronIcon = expanded ? LuChevronDown : LuChevronRight;
-	return (
-		<div className="flex h-6 items-center gap-1.5 px-3 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground/65">
-			<ChevronIcon className="size-2.5 text-muted-foreground/45" />
-			<span className="truncate">{label}</span>
-			<span className="ml-auto font-mono tabular-nums text-muted-foreground/40">
-				{count}
-			</span>
 		</div>
 	);
 }

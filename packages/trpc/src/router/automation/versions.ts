@@ -7,7 +7,7 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { getAutomationForUser, recordPromptVersion } from "./helpers";
 
@@ -15,7 +15,7 @@ const DEFAULT_VERSION_LIMIT = 100;
 const MAX_VERSION_LIMIT = 200;
 
 export const automationVersionsRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(
 			z.object({
 				automationId: z.string().uuid(),
@@ -57,7 +57,7 @@ export const automationVersionsRouter = {
 			return rows;
 		}),
 
-	getContent: protectedProcedure
+	getContent: personProcedure
 		.input(z.object({ versionId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -93,7 +93,7 @@ export const automationVersionsRouter = {
 			return row;
 		}),
 
-	restore: protectedProcedure
+	restore: personProcedure
 		.input(z.object({ versionId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);

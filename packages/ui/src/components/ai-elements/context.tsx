@@ -3,7 +3,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { formatCompactNumber } from "@superset/i18n/format";
-import { useFormat } from "@superset/i18n/react";
+import { useFormat } from "@superset/i18n/use-format";
 import type { LanguageModelUsage } from "ai";
 import { type ComponentProps, createContext, useContext } from "react";
 import { getUsage } from "tokenlens";

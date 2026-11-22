@@ -1,12 +1,13 @@
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
-import { useV2AgentChoices } from "renderer/hooks/useV2AgentChoices";
-import { CLOUD_AGENT_CHOICES } from "renderer/hooks/useV2AgentChoices/cloud-agent-choices";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
+import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 
 /** The agents an automation on `hostId` can run; a cloud one has no host to ask. */
 export function useAutomationAgentChoices(hostId: string | null | undefined) {
 	const cloud = hostId === CLOUD_HOST_ID;
-	const hostUrl = useHostUrl(cloud ? undefined : hostId);
-	const hostChoices = useV2AgentChoices(hostUrl);
-	return cloud ? { agents: CLOUD_AGENT_CHOICES, isFetched: true } : hostChoices;
+	const hostUrl = useHostUrl(hostId);
+	const hostChoices = useAgentChoices(hostUrl);
+	const cloudChoices = useCloudAgentChoices();
+	return cloud ? { agents: cloudChoices, isFetched: true } : hostChoices;
 }

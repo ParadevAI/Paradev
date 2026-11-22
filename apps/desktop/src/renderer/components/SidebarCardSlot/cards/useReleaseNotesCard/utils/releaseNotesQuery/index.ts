@@ -1,0 +1,1 @@
+export { releaseNotesQuery } from "./releaseNotesQuery";

@@ -6,8 +6,9 @@ import type { WorkspaceFilesystemManager } from "../runtime/filesystem";
 import { EventBus } from "./event-bus";
 import type { GitWatcher } from "./git-watcher";
 
-function createEventBus(): EventBus {
+function createEventBus(now?: () => number): EventBus {
 	return new EventBus({
+		now,
 		db: {} as unknown as HostDb,
 		filesystem: {
 			resolveWorkspaceRoot: () => "/tmp/missing-workspace",
@@ -42,6 +43,145 @@ describe("EventBus agent binding events", () => {
 			workspaceId: "workspace-1",
 			occurredAt: 1_700_000_000_000,
 		});
+	});
+});
+
+describe("EventBus workspace:create-settled replay", () => {
+	const settled = {
+		workspaceId: "workspace-1",
+		ok: true,
+		canonicalWorkspaceId: "workspace-1",
+		projectId: "project-1",
+		terminals: [],
+		agents: [],
+		alreadyExists: false,
+		occurredAt: 1_700_000_000_000,
+	};
+
+	const kept = {
+		...settled,
+		workspaceId: "workspace-2",
+		canonicalWorkspaceId: "workspace-2",
+	};
+
+	function connect(eventBus: EventBus): unknown[] {
+		const received: unknown[] = [];
+		eventBus.handleOpen({
+			readyState: 1,
+			send(data: string) {
+				received.push(JSON.parse(data));
+			},
+			close() {},
+		});
+		return received;
+	}
+
+	it("replays a successful settle to a client that connects after it, until it expires", () => {
+		let now = 0;
+		const eventBus = createEventBus(() => now);
+		const connected = connect(eventBus);
+		eventBus.broadcastWorkspaceCreateSettled(settled);
+		expect(connected).toHaveLength(1);
+
+		now = 9 * 60_000;
+		expect(connect(eventBus)).toEqual([
+			{ type: "workspace:create-settled", ...settled },
+		]);
+
+		now = 10 * 60_000;
+		expect(connect(eventBus)).toEqual([]);
+	});
+
+	it("does not replay a failed settle, which a retry of the same id would take as its own", () => {
+		const eventBus = createEventBus(() => 0);
+		eventBus.broadcastWorkspaceCreateSettled({
+			...settled,
+			ok: false,
+			error: "boom",
+		});
+		eventBus.broadcastWorkspaceCreateSettled(kept);
+
+		expect(connect(eventBus)).toEqual([
+			{ type: "workspace:create-settled", ...kept },
+		]);
+	});
+
+	it("drops a settle once its workspace is deleted", () => {
+		const eventBus = createEventBus(() => 0);
+		eventBus.broadcastWorkspaceCreateSettled({
+			...settled,
+			canonicalWorkspaceId: "workspace-canonical",
+		});
+		eventBus.broadcastWorkspaceChanged({
+			workspaceId: "workspace-canonical",
+			eventType: "deleted",
+			workspace: null,
+			occurredAt: 0,
+		});
+		eventBus.broadcastWorkspaceCreateSettled(kept);
+
+		expect(connect(eventBus)).toEqual([
+			{ type: "workspace:create-settled", ...kept },
+		]);
+	});
+
+	it("drops a client whose replay send fails", () => {
+		const eventBus = createEventBus(() => 0);
+		eventBus.broadcastWorkspaceCreateSettled(settled);
+		let sends = 0;
+		eventBus.handleOpen({
+			readyState: 1,
+			send() {
+				sends++;
+				throw new Error("socket gone");
+			},
+			close() {},
+		});
+
+		eventBus.broadcastWorkspaceCreateSettled(kept);
+
+		expect(sends).toBe(1);
+	});
+
+	it("keeps only the newest 50 settles", () => {
+		const eventBus = createEventBus(() => 0);
+		for (let i = 0; i < 51; i++) {
+			eventBus.broadcastWorkspaceCreateSettled({
+				...settled,
+				workspaceId: `workspace-${i}`,
+			});
+		}
+
+		const replayed = connect(eventBus) as Array<{ workspaceId: string }>;
+		expect(replayed).toHaveLength(50);
+		expect(replayed[0]?.workspaceId).toBe("workspace-1");
+	});
+});
+
+describe("EventBus chat session events", () => {
+	it("nudges every client to refetch a workspace's chat sessions", () => {
+		const eventBus = createEventBus();
+		const sentMessages: string[] = [];
+		eventBus.handleOpen({
+			readyState: 1,
+			send(data: string) {
+				sentMessages.push(data);
+			},
+			close() {},
+		});
+
+		eventBus.broadcastChatSessionsChanged({
+			workspaceId: "workspace-1",
+			occurredAt: 1_700_000_000_000,
+		});
+
+		expect(sentMessages.map((data) => JSON.parse(data))).toEqual([
+			{
+				type: "chat:sessions-changed",
+				workspaceId: "workspace-1",
+				occurredAt: 1_700_000_000_000,
+			},
+		]);
 	});
 });
 

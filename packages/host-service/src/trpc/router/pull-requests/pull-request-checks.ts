@@ -1,8 +1,6 @@
+import { computeChecksStatus } from "@superset/shared/pull-request-checks";
 import { z } from "zod";
-import {
-	computeChecksStatus,
-	parseCheckContexts,
-} from "../../../runtime/pull-requests/utils/pull-request-mappers";
+import { parseCheckContexts } from "../../../runtime/pull-requests/utils/pull-request-mappers";
 
 const checkRunSchema = z.object({
 	__typename: z.literal("CheckRun").optional().default("CheckRun"),

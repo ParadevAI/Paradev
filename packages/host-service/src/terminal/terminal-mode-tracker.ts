@@ -2,6 +2,10 @@ import {
 	TerminalModes,
 	type TerminalModesSnapshot,
 } from "@superset/pty-daemon/terminal-modes";
+import {
+	SHELL_READY_MARKER_PAYLOAD,
+	SHELL_READY_OSC_ID,
+} from "@superset/shared/leaked-input-mode-reclaim";
 import { HeadlessTerminal } from "./headless-xterm.ts";
 
 export interface ModeTracker {
@@ -18,6 +22,7 @@ export interface ModeTracker {
 }
 
 export interface ModeTrackerOptions {
+	onShellReady?: () => void;
 	/**
 	 * Called with disarm bytes when a shell prompt marker (OSC 777) flows
 	 * through the stream while TUI-only input-reporting modes (kitty keyboard,
@@ -88,19 +93,25 @@ export function createModeTracker(
 	let disposed = false;
 
 	let flushScheduled = false;
+	if (options.onShellReady) {
+		term.parser.registerOscHandler(SHELL_READY_OSC_ID, (data) => {
+			if (data !== SHELL_READY_MARKER_PAYLOAD) return false;
+			options.onShellReady?.();
+			return false;
+		});
+	}
 
 	const buildPreamble = () => modes.buildPreamble();
 
 	const snapshot = (maxLines?: number): TerminalSnapshot => {
 		const buffer = term.buffer.active;
-		const total = buffer.length;
-		const start = maxLines && maxLines > 0 ? Math.max(0, total - maxLines) : 0;
+		const readLine = (y: number) =>
+			buffer.getLine(y)?.translateToString(true) ?? "";
+		let end = buffer.length;
+		while (end > 0 && readLine(end - 1) === "") end--;
+		const start = maxLines && maxLines > 0 ? Math.max(0, end - maxLines) : 0;
 		const lines: string[] = [];
-		for (let y = start; y < total; y++) {
-			lines.push(buffer.getLine(y)?.translateToString(true) ?? "");
-		}
-		// Trim trailing blank rows so the snapshot ends at real content.
-		while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+		for (let y = start; y < end; y++) lines.push(readLine(y));
 		return { cols: term.cols, rows: term.rows, text: lines.join("\n") };
 	};
 

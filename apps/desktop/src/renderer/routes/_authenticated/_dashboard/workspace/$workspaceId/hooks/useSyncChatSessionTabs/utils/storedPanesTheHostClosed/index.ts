@@ -1,0 +1,1 @@
+export { storedPanesTheHostClosed } from "./storedPanesTheHostClosed";

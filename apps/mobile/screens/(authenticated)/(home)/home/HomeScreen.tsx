@@ -1,8 +1,11 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { useLingui } from "@lingui/react/macro";
+import { ForwardSwipe } from "@superset/forward-swipe";
 import { i18n } from "@superset/i18n";
+import { useFormat } from "@superset/i18n/react";
+import { groupCloudWorkspacesByTime } from "@superset/shared/cloud-workspace-groups";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import { useQueryClient } from "@tanstack/react-query";
 import { isAfter } from "date-fns";
 import * as Haptics from "expo-haptics";
@@ -13,6 +16,7 @@ import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
+	Alert,
 	RefreshControl,
 	ScrollView,
 	useWindowDimensions,
@@ -21,42 +25,64 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
+import { useCloudWorkspaceItems } from "@/hooks/useCloudWorkspaceItems";
 import {
-	type CloudWorkspaceStatus,
-	useCloudWorkspaceItems,
-} from "@/hooks/useCloudWorkspaceItems";
+	type CloudWorkspaceRow,
+	useCloudWorkspaces,
+} from "@/hooks/useCloudWorkspaces";
 import { useHostProjects } from "@/hooks/useHostProjects";
 import {
 	type HostWorkspaceItem,
 	useHostWorkspaces,
 } from "@/hooks/useHostWorkspaces";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
+import { useReadableInset } from "@/hooks/useReadableInset";
+import { useSession } from "@/lib/auth/client";
+import { errorCopy } from "@/lib/errors";
+import { listSideInset } from "@/lib/layout";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
+import { useVoiceSession } from "@/lib/voice/useVoiceSession";
+import { useVoiceActive } from "@/lib/voice/voiceStore";
+import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { HeaderNotice } from "@/screens/(authenticated)/components/HeaderNotice";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import {
 	type OrgPullRequest,
 	usePullRequests,
 } from "@/screens/(authenticated)/hooks/usePullRequests";
+import { useLastWorkspaceStore } from "@/screens/(authenticated)/stores/lastWorkspaceStore";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
+import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import { pullRequestStatus } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
+import { CloudWorkspaceRow as CloudWorkspaceListRow } from "./components/CloudWorkspaceRow";
+import { FolderSectionHeader } from "./components/FolderSectionHeader";
 import { HostOfflineView } from "./components/HostOfflineView";
 import { NewChatWidget } from "./components/NewChatWidget";
 import { targetKeyFor } from "./components/NewChatWidget/hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "./components/NewChatWidget/stores/newSessionPreferencesStore";
 import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton";
+import { PeriodHeader } from "./components/PeriodHeader";
 import { ProjectSectionHeader } from "./components/ProjectSectionHeader";
 import { ScopeBar } from "./components/ScopeBar";
 import { WorkspaceRow } from "./components/WorkspaceRow";
 import { useAgentLiveActivity } from "./hooks/useAgentLiveActivity";
 import { useAppReviewPrompt } from "./hooks/useAppReviewPrompt";
-import { useCloudRepoPrefixes } from "./hooks/useCloudRepoPrefixes";
+import { useCloudPullRequests } from "./hooks/useCloudPullRequests";
+import { useCloudRepos } from "./hooks/useCloudRepos";
 import { useFirstPaint } from "./hooks/useFirstPaint";
+import { GRID_GAP, useHomeGrid } from "./hooks/useHomeGrid";
+import { useHostTagFolders } from "./hooks/useHostTagFolders";
 import {
+	type TerminalAttention,
 	type TerminalsHost,
 	useHostsTerminals,
 } from "./hooks/useHostTerminals";
+import { useNow } from "./hooks/useNow";
+import { useTagFolderActions } from "./hooks/useTagFolderActions";
 import { useVisibleDiffStats } from "./hooks/useVisibleDiffStats";
 import {
 	collapsedProjectKey,
@@ -67,6 +93,13 @@ import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "./stores/workspacesFilterStore";
+import {
+	groupByTagFolder,
+	type TagFolderGroup,
+} from "./utils/groupByTagFolder";
+import { orderProjectChildren } from "./utils/orderProjectChildren";
+import { strongestAttention } from "./utils/strongestAttention";
+import { type GridRow, gridRowKey, toGridRows } from "./utils/toGridRows";
 
 const VIEWABILITY_CONFIG = {
 	itemVisiblePercentThreshold: 50,
@@ -88,6 +121,15 @@ const NO_PROJECT_SECTION_ID = "__none";
  * sidebar can afford a permanent section, a phone list is the whole screen.
  */
 
+/** A project's groups, for the group menus of its rows and headers. */
+interface ProjectGroups {
+	projectId: string | null;
+	folders: TagFolderGroup<HostWorkspaceItem>[];
+	folderTags: string[];
+	/** Every workspace in the scope, hidden ones included, for Delete group. */
+	workspaces: HostWorkspaceItem[];
+}
+
 type HomeListItem =
 	| {
 			kind: "projectHeader";
@@ -96,27 +138,59 @@ type HomeListItem =
 			iconUrl?: string | null;
 			count: number;
 			collapsed: boolean;
+			attention: TerminalAttention | null;
+	  }
+	| {
+			kind: "folderHeader";
+			folder: TagFolderGroup<HostWorkspaceItem>;
+			collapsed: boolean;
+			attention: TerminalAttention | null;
+			groups: ProjectGroups;
 	  }
 	| {
 			kind: "workspace";
 			workspace: HostWorkspaceItem;
-			cloudStatus?: CloudWorkspaceStatus;
+			groups?: ProjectGroups;
+			folderTag?: string | null;
 	  }
 	| {
 			kind: "hostOffline";
 			hostName: string;
 			lastSeenAt: number | null | undefined;
-	  };
+	  }
+	| {
+			kind: "periodHeader";
+			key: string;
+			label: string;
+	  }
+	| { kind: "cloudRow"; row: CloudWorkspaceRow };
 
 function homeListItemKey(item: HomeListItem): string {
 	switch (item.kind) {
 		case "projectHeader":
 			return `project:${item.projectId}`;
+		case "folderHeader":
+			return `folder:${item.folder.key}`;
 		case "workspace":
 			return `ws:${item.workspace.id}`;
+		case "periodHeader":
+			return `period:${item.key}`;
+		case "cloudRow":
+			return `cloud:${item.row.id}`;
 		default:
 			return "host-offline";
 	}
+}
+
+type HomeListEntry = HomeListItem | GridRow<HomeListItem>;
+
+const isGridCell = (item: HomeListItem) =>
+	item.kind === "workspace" || item.kind === "cloudRow";
+
+function homeListEntryKey(entry: HomeListEntry): string {
+	return entry.kind === "gridRow"
+		? gridRowKey(entry, homeListItemKey)
+		: homeListItemKey(entry);
 }
 
 const NOTICE_MS = 1500;
@@ -124,6 +198,9 @@ const NOTICE_MS = 1500;
 export function HomeScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
+	const voice = useVoiceSession();
+	const voiceActive = useVoiceActive();
+	const voiceEnabled = Boolean(useFeatureFlag(FEATURE_FLAGS.MOBILE_VOICE_MODE));
 	const sort = useWorkspacesFilterStore((store) => store.sort);
 	const hasHydrated = useWorkspacesFilterStore((store) => store.hasHydrated);
 	const [visibleIds, setVisibleIds] = useState<string[]>([]);
@@ -145,6 +222,12 @@ export function HomeScreen() {
 	const { height: windowHeight } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
 	const headerHeight = useHeaderHeight();
+	const readableInset = useReadableInset();
+	const grid = useHomeGrid();
+	const columns = grid?.columns ?? 1;
+	const cellWidth = grid?.cellWidth ?? 0;
+	const listInset = grid?.inset ?? readableInset;
+	const sideInset = useMemo(() => listSideInset(listInset), [listInset]);
 	const queryClient = useQueryClient();
 	useAppReviewPrompt();
 	const setTargetKey = useNewSessionPreferencesStore(
@@ -158,6 +241,8 @@ export function HomeScreen() {
 
 	const selectedHost = useSelectedHost();
 	const pinnedAt = usePinnedWorkspacesStore((state) => state.pinnedAt);
+	const manualUnread = useUnreadWorkspacesStore((state) => state.manualUnread);
+	const lastWorkspaceId = useLastWorkspaceStore((state) => state.workspaceId);
 	const {
 		workspaces,
 		isReady: workspacesReady,
@@ -169,6 +254,14 @@ export function HomeScreen() {
 		isReady: cloudReady,
 	} = useCloudWorkspaceItems();
 	const cloudScope = useWorkspaceScope() === "cloud";
+	const cloudFilters = useCloudFilters();
+	const showArchived = cloudScope && cloudFilters.status === "archived";
+	const { workspaces: archivedCloud, isReady: archivedReady } =
+		useArchivedCloudWorkspaces({ enabled: showArchived });
+	const { workspaces: activeCloud } = useCloudWorkspaces();
+	const { formatRelativePeriod } = useFormat();
+	const viewerId = useSession().data?.user?.id ?? null;
+	const now = useNow(30_000);
 	// No session marks for cloud rows: a request per sandbox keeps each one
 	// awake for as long as Home is on screen.
 	const terminalHosts = useMemo<TerminalsHost[]>(
@@ -180,6 +273,11 @@ export function HomeScreen() {
 
 	// Projects are fully local — served by the selected host, not the cloud.
 	const { projects, isReady: projectsReady } = useHostProjects(selectedHost);
+	const tagSettings = useHostTagFolders(cloudScope ? null : selectedHost);
+	const folderActions = useTagFolderActions(
+		cloudScope ? null : selectedHost,
+		cache,
+	);
 
 	// Mirrors the rows above onto the Lock Screen and Dynamic Island while the
 	// app is open. Foreground-only for now: nothing server-side knows an agent
@@ -209,7 +307,9 @@ export function HomeScreen() {
 		!isLoadingOrganizations &&
 		(!activeOrganizationId || !hostsQuery.isPending) &&
 		(cloudScope
-			? cloudReady
+			? showArchived
+				? archivedReady
+				: cloudReady
 			: !presencePending && workspacesReady && projectsReady);
 
 	const hasPainted = useFirstPaint(contentReady);
@@ -222,22 +322,17 @@ export function HomeScreen() {
 		(state) => state.toggleProject,
 	);
 
-	// Recency ranks a workspace by its latest activity — the newest of its
-	// own and its terminals'.
 	const activityTs = useCallback(
-		(workspace: HostWorkspaceItem) => {
-			if (sort !== "updatedAt") return new Date(workspace[sort]).getTime();
-			const workspaceTs = getWorkspaceActivityTime(workspace);
-			const terminalTs = (terminalsByWorkspace.get(workspace.id) ?? []).reduce(
-				(newest, row) => Math.max(newest, row.ts),
-				0,
-			);
-			return Math.max(workspaceTs, terminalTs);
-		},
+		(workspace: HostWorkspaceItem) =>
+			workspaceSortTime(
+				workspace,
+				sort,
+				(terminalsByWorkspace.get(workspace.id) ?? []).map((row) => row.ts),
+			),
 		[sort, terminalsByWorkspace],
 	);
 
-	// Pinned first (oldest pin leads, desktop's ordering), then activity.
+	// Pinned first (oldest pin leads, desktop's ordering), then newest.
 	const byPinThenActivity = useCallback(
 		(a: HostWorkspaceItem, b: HostWorkspaceItem) => {
 			const aPin = pinnedAt[a.id];
@@ -247,7 +342,8 @@ export function HomeScreen() {
 				if (bPin === undefined) return -1;
 				return aPin - bPin;
 			}
-			return activityTs(b) - activityTs(a);
+			const diff = activityTs(b) - activityTs(a);
+			return Number.isNaN(diff) ? a.name.localeCompare(b.name) : diff;
 		},
 		[pinnedAt, activityTs],
 	);
@@ -262,15 +358,26 @@ export function HomeScreen() {
 	const listItems = useMemo<HomeListItem[]>(() => {
 		const items: HomeListItem[] = [];
 
-		// Under Cloud the sandboxes are the whole list: flat, no project headers
-		// to group them by and no machine to be offline.
+		// Under Cloud the list is desktop's: grouped by when each workspace last
+		// heard from its agent (or was archived), newest first.
 		if (cloudScope) {
-			for (const workspace of [...cloudItems].sort(byPinThenActivity)) {
+			const rows = (showArchived ? archivedCloud : activeCloud).filter((row) =>
+				cloudFilters.matchesCreator(row.createdByUserId),
+			);
+			const groups = groupCloudWorkspacesByTime({
+				workspaces: rows,
+				now,
+				sort: sort === "created" ? "created" : "activity",
+				at: showArchived ? (row) => row.deletedAt ?? row.createdAt : undefined,
+			});
+			for (const { period, workspaces: grouped } of groups) {
+				const key = `${showArchived ? "archived" : "active"}:${period.unit}:${period.count}`;
 				items.push({
-					kind: "workspace",
-					workspace,
-					cloudStatus: workspace.cloud.status,
+					kind: "periodHeader",
+					key,
+					label: formatRelativePeriod(period),
 				});
+				for (const row of grouped) items.push({ kind: "cloudRow", row });
 			}
 			return items;
 		}
@@ -285,6 +392,11 @@ export function HomeScreen() {
 			});
 			return items;
 		}
+
+		// What a row would show, for the collapsed header that hides it.
+		const rowAttention = (workspace: HostWorkspaceItem) =>
+			attentionByWorkspace.get(workspace.id) ??
+			(manualUnread[workspace.id] ? "review" : null);
 
 		const pool = liveWorkspaces.filter(
 			(workspace) => workspace.hostId === selectedHost?.machineId,
@@ -311,11 +423,13 @@ export function HomeScreen() {
 				projectId: project.id,
 				name: project.name,
 				iconUrl: project.iconUrl,
+				createdAt: project.createdAt,
 			})),
 			{
 				projectId: NO_PROJECT_SECTION_ID,
 				name: t({ message: "No project" }),
 				iconUrl: null,
+				createdAt: Number.NEGATIVE_INFINITY,
 			},
 		]
 			.map((section) => ({
@@ -328,18 +442,11 @@ export function HomeScreen() {
 			// composer's project picker is where you start work in a project that
 			// has none yet.
 			.filter((section) => section.workspaces.length > 0)
-			.sort((a, b) => {
-				// Sections rank by their liveliest workspace, so the project you
-				// were last in leads; empty ones fall to the bottom alphabetically.
-				const first = (section: (typeof sections)[number]) =>
-					section.workspaces[0];
-				const aFirst = first(a);
-				const bFirst = first(b);
-				const aTs = aFirst ? activityTs(aFirst) : 0;
-				const bTs = bFirst ? activityTs(bFirst) : 0;
-				if (aTs !== bTs) return bTs - aTs;
-				return a.name.localeCompare(b.name);
-			});
+			// Projects keep one order in every mode, as on desktop: newest
+			// first, where desktop puts each new project before any drag.
+			.sort(
+				(a, b) => b.createdAt - a.createdAt || a.name.localeCompare(b.name),
+			);
 
 		for (const section of sections) {
 			const isCollapsed =
@@ -354,22 +461,96 @@ export function HomeScreen() {
 				iconUrl: section.iconUrl,
 				count: section.workspaces.length,
 				collapsed: isCollapsed,
+				attention: isCollapsed
+					? strongestAttention(section.workspaces.map(rowAttention))
+					: null,
 			});
 			if (isCollapsed) continue;
-			for (const workspace of section.workspaces) {
-				items.push({ kind: "workspace", workspace });
+			const projectId =
+				section.projectId === NO_PROJECT_SECTION_ID ? null : section.projectId;
+			// "No project" also holds rows of projects the host stopped
+			// reporting; only true sessions can be grouped there.
+			const canGroup = (workspace: HostWorkspaceItem) =>
+				projectId !== null || workspace.projectId === null;
+			const groupable = section.workspaces.filter(canGroup);
+			const grouped = groupByTagFolder(projectId, groupable, tagSettings);
+			const loose = new Set(grouped.ungrouped);
+			grouped.ungrouped = section.workspaces.filter(
+				(workspace) => loose.has(workspace) || !canGroup(workspace),
+			);
+			const groups: ProjectGroups = {
+				projectId,
+				folders: grouped.folders,
+				folderTags: grouped.folderTags,
+				workspaces: workspaces.filter(
+					(workspace) =>
+						workspace.hostId === selectedHost?.machineId &&
+						workspace.projectId === projectId,
+				),
+			};
+			const children = orderProjectChildren(
+				grouped,
+				sort,
+				activityTs,
+				(workspace) => pinnedAt[workspace.id] !== undefined,
+			);
+			for (const child of children) {
+				if (child.type === "workspace") {
+					items.push({
+						kind: "workspace",
+						workspace: child.workspace,
+						groups: canGroup(child.workspace) ? groups : undefined,
+						folderTag: null,
+					});
+					continue;
+				}
+				const { folder } = child;
+				const folderCollapsed =
+					collapseHydrated &&
+					!!collapsed[
+						collapsedProjectKey(selectedHost?.machineId ?? "", folder.key)
+					];
+				items.push({
+					kind: "folderHeader",
+					folder,
+					collapsed: folderCollapsed,
+					attention: folderCollapsed
+						? strongestAttention(folder.workspaces.map(rowAttention))
+						: null,
+					groups,
+				});
+				if (folderCollapsed) continue;
+				for (const workspace of folder.workspaces) {
+					items.push({
+						kind: "workspace",
+						workspace,
+						groups: canGroup(workspace) ? groups : undefined,
+						folderTag: folder.tag,
+					});
+				}
 			}
 		}
 
 		return items;
 	}, [
+		workspaces,
 		liveWorkspaces,
-		cloudItems,
 		cloudScope,
+		showArchived,
+		archivedCloud,
+		activeCloud,
+		cloudFilters.matchesCreator,
+		sort,
+		formatRelativePeriod,
+		now,
 		selectedHost,
 		projects,
+		tagSettings,
 		byPinThenActivity,
 		activityTs,
+		pinnedAt,
+		attentionByWorkspace,
+		manualUnread,
 		collapsed,
 		collapseHydrated,
 		t,
@@ -435,12 +616,16 @@ export function HomeScreen() {
 		({
 			viewableItems,
 		}: {
-			viewableItems: Array<{ item: HomeListItem; isViewable: boolean }>;
+			viewableItems: Array<{ item: HomeListEntry; isViewable: boolean }>;
 		}) => {
 			setVisibleIds(
 				viewableItems
 					.filter((viewable) => viewable.isViewable)
-					.map((viewable) => viewable.item)
+					.flatMap((viewable) =>
+						viewable.item.kind === "gridRow"
+							? viewable.item.cells
+							: [viewable.item],
+					)
 					.filter((item) => item.kind === "workspace")
 					.slice(0, MAX_VISIBLE_DIFF_STATS)
 					.map((item) => item.workspace.id),
@@ -486,7 +671,19 @@ export function HomeScreen() {
 	// Projects are fully local: PR rows are matched by repo coordinates
 	// parsed from the PR URL (cloud repo UUIDs aren't known host-side).
 	// Cloud rows' projects come from the API instead.
-	const cloudRepoPrefixes = useCloudRepoPrefixes();
+	const cloudRepos = useCloudRepos();
+	const cloudPullRequests = useCloudPullRequests({
+		active: listItems.some(
+			(item) =>
+				item.kind === "cloudRow" &&
+				!isArchivedCloudWorkspaceStatus(item.row.status),
+		),
+		archived: listItems.some(
+			(item) =>
+				item.kind === "cloudRow" &&
+				isArchivedCloudWorkspaceStatus(item.row.status),
+		),
+	});
 	const repoPrefixesByProject = useMemo(
 		() =>
 			new Map<string, string | null>([
@@ -500,8 +697,26 @@ export function HomeScreen() {
 		[projects],
 	);
 
-	const renderItem = useCallback(
-		({ item }: { item: HomeListItem }) => {
+	const renderListItem = useCallback(
+		(item: HomeListItem, card: boolean) => {
+			if (item.kind === "periodHeader") {
+				return <PeriodHeader label={item.label} />;
+			}
+			if (item.kind === "cloudRow") {
+				const repoFullName = cloudRepos.get(item.row.id);
+				return (
+					<CloudWorkspaceListRow
+						row={item.row}
+						repoFullName={repoFullName}
+						pullRequest={cloudPullRequests.get(item.row.id)?.[0]}
+						viewerId={viewerId}
+						now={now}
+						cache={cloudCache}
+						onCopied={handleCopied}
+						card={card}
+					/>
+				);
+			}
 			if (item.kind === "hostOffline") {
 				return (
 					<View className="py-16">
@@ -510,6 +725,34 @@ export function HomeScreen() {
 							lastSeenAt={item.lastSeenAt}
 						/>
 					</View>
+				);
+			}
+			if (item.kind === "folderHeader") {
+				const { folder, groups } = item;
+				return (
+					<FolderSectionHeader
+						name={folder.name}
+						color={folder.color}
+						count={folder.workspaces.length}
+						collapsed={item.collapsed}
+						attention={item.attention}
+						onToggle={() => {
+							void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+							toggleProject(selectedHost?.machineId ?? "", folder.key);
+						}}
+						menu={{
+							onRename: () =>
+								void folderActions.renameFolder(groups.projectId, folder),
+							onSetColor: (color) =>
+								folderActions.setFolderColor(groups.projectId, folder, color),
+							onDelete: () =>
+								void folderActions.deleteFolder(
+									groups.projectId,
+									folder,
+									groups.workspaces,
+								),
+						}}
+					/>
 				);
 			}
 			if (item.kind === "projectHeader") {
@@ -527,6 +770,7 @@ export function HomeScreen() {
 						}
 						count={item.count}
 						collapsed={item.collapsed}
+						attention={item.attention}
 						onToggle={() => {
 							void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 							toggleProject(machineId ?? "", item.projectId);
@@ -548,12 +792,11 @@ export function HomeScreen() {
 					/>
 				);
 			}
-			const { workspace, cloudStatus } = item;
-			const repoPrefix = cloudStatus
-				? (cloudRepoPrefixes.get(workspace.id) ?? null)
-				: workspace.projectId
-					? repoPrefixesByProject.get(workspace.projectId)
-					: undefined;
+			const { workspace, groups } = item;
+			const folderTags = groups?.folderTags ?? [];
+			const repoPrefix = workspace.projectId
+				? repoPrefixesByProject.get(workspace.projectId)
+				: undefined;
 			return (
 				<WorkspaceRow
 					workspace={workspace}
@@ -565,17 +808,40 @@ export function HomeScreen() {
 							: undefined
 					}
 					diffStats={diffStats.get(workspace.id) ?? null}
-					cache={cloudStatus === undefined ? cache : cloudCache}
+					cache={cache}
 					attention={attentionByWorkspace.get(workspace.id) ?? null}
 					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
-					cloudStatus={cloudStatus}
 					onCopied={handleCopied}
+					card={card}
+					inGroup={Boolean(item.folderTag)}
+					groups={
+						groups
+							? {
+									options: groups.folders.map((folder) => ({
+										tag: folder.tag,
+										name: folder.name,
+									})),
+									current: item.folderTag ?? null,
+									onMove: (tag) =>
+										folderActions.moveToFolder(workspace, folderTags, tag),
+									onCreate: () =>
+										void folderActions.createFolder(
+											workspace,
+											groups.projectId,
+											folderTags,
+										),
+								}
+							: undefined
+					}
 				/>
 			);
 		},
 		[
 			pullRequestsByRepoBranch,
-			cloudRepoPrefixes,
+			cloudRepos,
+			cloudPullRequests,
+			viewerId,
+			now,
 			repoPrefixesByProject,
 			diffStats,
 			cache,
@@ -587,7 +853,39 @@ export function HomeScreen() {
 			setTargetKey,
 			requestComposerFocus,
 			handleCopied,
+			folderActions,
 		],
+	);
+
+	const listEntries = useMemo(
+		() => toGridRows(listItems, columns, isGridCell),
+		[listItems, columns],
+	);
+
+	const renderItem = useCallback(
+		({ item }: { item: HomeListEntry }) => {
+			const row =
+				item.kind !== "gridRow" ? (
+					renderListItem(item, false)
+				) : (
+					<View
+						className="flex-row"
+						style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
+					>
+						{item.cells.map((cell) => (
+							<View
+								key={homeListItemKey(cell)}
+								className="border-border rounded-xl border"
+								style={{ width: cellWidth }}
+							>
+								{renderListItem(cell, true)}
+							</View>
+						))}
+					</View>
+				);
+			return sideInset.row ? <View style={sideInset.row}>{row}</View> : row;
+		},
+		[renderListItem, cellWidth, sideInset.row],
 	);
 
 	// The native splash is still up until hideSplash() below; nothing to draw.
@@ -601,7 +899,7 @@ export function HomeScreen() {
 			scope={cloudScope ? "cloud" : "host"}
 			hostName={selectedHost?.name ?? null}
 			hostOnline={selectedHost?.isOnline ?? false}
-			sortLabel={sortLabel}
+			sortLabel={showArchived ? null : sortLabel}
 			onPressScope={() => {
 				void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 				router.push("/(authenticated)/(home)/filter/scope");
@@ -615,6 +913,14 @@ export function HomeScreen() {
 
 	return (
 		<>
+			<ForwardSwipe
+				enabled={lastWorkspaceId !== null}
+				onSwipeBegin={() => {
+					if (lastWorkspaceId) {
+						router.push(`/(authenticated)/workspace/${lastWorkspaceId}`);
+					}
+				}}
+			/>
 			<OrganizationHeaderButton
 				isLoading={isLoadingOrganizations}
 				name={activeOrganization?.name}
@@ -631,7 +937,7 @@ export function HomeScreen() {
 			    offline — its list isn't shown, so there is nothing to search. */}
 			<Stack.Screen
 				options={{
-					headerTransparent: true,
+					headerTransparent: contentScrollsUnderHeader,
 					headerTitle: notice
 						? () => (
 								<HeaderNotice
@@ -644,10 +950,28 @@ export function HomeScreen() {
 						: undefined,
 				}}
 			/>
-			{selectedHost && hostOffline ? null : (
-				<Stack.Toolbar placement="right">
-					<Stack.Toolbar.Button
-						icon="magnifyingglass"
+			{selectedHost && hostOffline && !voiceEnabled ? null : (
+				<HeaderToolbar placement="right">
+					{voiceEnabled ? (
+						<HeaderToolbar.Button
+							icon="voice"
+							accessibilityLabel={t({ message: "Start voice mode" })}
+							onPress={() => {
+								void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+								void voice
+									.start()
+									.catch((error: unknown) =>
+										Alert.alert(
+											t({ message: "Couldn't start voice mode" }),
+											errorCopy(error),
+										),
+									);
+							}}
+						/>
+					) : null}
+					<HeaderToolbar.Button
+						hidden={Boolean(selectedHost && hostOffline)}
+						icon="search"
 						accessibilityLabel={t({
 							message: "Search workspaces",
 						})}
@@ -656,7 +980,7 @@ export function HomeScreen() {
 							router.push("/(authenticated)/(home)/search");
 						}}
 					/>
-				</Stack.Toolbar>
+				</HeaderToolbar>
 			)}
 			{selectedHost && hostOffline ? (
 				<View
@@ -665,6 +989,9 @@ export function HomeScreen() {
 						minHeight:
 							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
 						paddingTop: headerHeight,
+						// On the outer view, not the ScrollView: the scope bar sits
+						// outside it here, and both belong in the list's column.
+						paddingHorizontal: readableInset,
 					}}
 				>
 					{scopeBar}
@@ -689,16 +1016,29 @@ export function HomeScreen() {
 					keyboardDismissMode="on-drag"
 					keyboardShouldPersistTaps="handled"
 					contentContainerStyle={{
-						minHeight:
-							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
+						// Fills the screen under a transparent header; an opaque header
+						// already takes its height, so the list would scroll empty.
+						minHeight: contentScrollsUnderHeader
+							? windowHeight -
+								insets.top -
+								NAVIGATION_BAR_HEIGHT -
+								insets.bottom
+							: undefined,
 						paddingBottom: 112,
 						paddingTop: 8,
+						...sideInset.content,
 					}}
-					data={listItems}
+					data={listEntries}
 					extraData={renderItem}
-					keyExtractor={homeListItemKey}
+					keyExtractor={homeListEntryKey}
 					renderItem={renderItem}
-					ListHeaderComponent={scopeBar}
+					ListHeaderComponent={
+						sideInset.row ? (
+							<View style={sideInset.row}>{scopeBar}</View>
+						) : (
+							scopeBar
+						)
+					}
 					viewabilityConfig={VIEWABILITY_CONFIG}
 					onViewableItemsChanged={onViewableItemsChanged}
 					refreshControl={
@@ -708,13 +1048,19 @@ export function HomeScreen() {
 						contentReady ? (
 							<View className="items-center justify-center py-20">
 								<Text className="text-center text-muted-foreground">
-									{cloudScope
-										? t({
-												message: "No cloud workspaces yet",
-											})
-										: t({
-												message: "No projects on this host yet",
-											})}
+									{showArchived
+										? t({ message: "No archived workspaces" })
+										: cloudScope && activeCloud.length > 0
+											? t({
+													message: "No cloud workspaces match these filters",
+												})
+											: cloudScope
+												? t({
+														message: "No cloud workspaces yet",
+													})
+												: t({
+														message: "No projects on this host yet",
+													})}
 								</Text>
 							</View>
 						) : (
@@ -730,7 +1076,7 @@ export function HomeScreen() {
 			{/* Cloud rows included: the row's "+" targets a workspace by id, and
 			    the composer has to find a sandbox workspace as readily as a
 			    machine's to start an agent in it. */}
-			<NewChatWidget workspaces={composerWorkspaces} />
+			{voiceActive ? null : <NewChatWidget workspaces={composerWorkspaces} />}
 		</>
 	);
 }

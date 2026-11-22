@@ -1,4 +1,6 @@
 export {
 	agentCredentialRouter,
-	resolveAgentCredentialEnv,
+	renewChatgptSignIns,
+	resolveAgentSignIns,
 } from "./agent-credential";
+export type { AgentSignIns, CodexChatgptSignIn } from "./utils/sign-ins";

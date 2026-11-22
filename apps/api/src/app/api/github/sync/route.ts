@@ -4,8 +4,9 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import { nudge } from "@superset/trpc/realtime";
 import { subDays } from "date-fns";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "@/env";
 import { githubApp } from "../octokit";
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
 		console.log(`[github/sync] Found ${repos.length} repositories`);
 
 		for (const repo of repos) {
-			await db
+			const [savedRepo] = await db
 				.insert(githubRepositories)
 				.values({
 					installationId: installation.id,
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
 				.onConflictDoUpdate({
 					target: [githubRepositories.repoId],
 					set: {
+						installationId: installation.id,
 						organizationId,
 						owner: repo.owner.login,
 						name: repo.name,
@@ -82,7 +84,18 @@ export async function POST(request: Request) {
 						isPrivate: repo.private,
 						updatedAt: new Date(),
 					},
-				});
+				})
+				.returning({ id: githubRepositories.id });
+			if (!savedRepo) continue;
+			await db
+				.update(githubPullRequests)
+				.set({ organizationId })
+				.where(
+					and(
+						eq(githubPullRequests.repositoryId, savedRepo.id),
+						ne(githubPullRequests.organizationId, organizationId),
+					),
+				);
 		}
 
 		const thirtyDaysAgo = subDays(new Date(), 30);
@@ -220,6 +233,7 @@ export async function POST(request: Request) {
 			.set({ lastSyncedAt: new Date() })
 			.where(eq(githubInstallations.id, installation.id));
 
+		nudge(organizationId, "pull_requests");
 		console.log("[github/sync] Sync completed successfully");
 		return Response.json({
 			success: true,

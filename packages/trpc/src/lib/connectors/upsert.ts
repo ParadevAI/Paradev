@@ -1,4 +1,4 @@
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import {
 	connections,
 	type IntegrationConfig,
@@ -15,8 +15,23 @@ import {
 } from "../../router/plugins/crypto";
 import type { ConnectorIdentity, ConnectorTokens } from "./index";
 import { userConnection } from "./lookup";
+import {
+	liveConnectionIds,
+	pinTriggersToExistingAccount,
+} from "./trigger-pins";
 
-export type ConnectionConflict = { ownerEmail: string | null };
+export type ConnectionConflict = {
+	ownerEmail: string | null;
+	ownerOrganizationId: string | null;
+};
+
+// Their inbound events resolve to one org, so a second org on the same
+// account would take over the first org's events.
+const SINGLE_ORG_CONNECTORS: ReadonlySet<string> = new Set([
+	"slack",
+	"microsoft_teams",
+	"sentry",
+]);
 
 export async function connectionConflict(
 	connector: string,
@@ -24,7 +39,10 @@ export async function connectionConflict(
 	organizationId: string,
 ): Promise<ConnectionConflict | null> {
 	const [conflict] = await db
-		.select({ email: users.email })
+		.select({
+			email: users.email,
+			organizationId: connections.organizationId,
+		})
 		.from(connections)
 		.innerJoin(users, eq(users.id, connections.connectedByUserId))
 		.where(
@@ -36,7 +54,12 @@ export async function connectionConflict(
 			),
 		)
 		.limit(1);
-	return conflict ? { ownerEmail: conflict.email } : null;
+	return conflict
+		? {
+				ownerEmail: conflict.email,
+				ownerOrganizationId: conflict.organizationId,
+			}
+		: null;
 }
 
 export type UpsertConnectionResult =
@@ -58,12 +81,22 @@ export async function upsertConnection(input: {
 }): Promise<UpsertConnectionResult> {
 	const { connector, slug, organizationId, userId, tokens, identity } = input;
 
-	const conflict = await connectionConflict(
-		slug,
-		identity.account.id,
-		organizationId,
-	);
-	if (conflict) return { conflict };
+	if (SINGLE_ORG_CONNECTORS.has(slug)) {
+		const conflict = await connectionConflict(
+			slug,
+			identity.account.id,
+			organizationId,
+		);
+		if (conflict) {
+			console.warn(`[connectors/${slug}] account already linked`, {
+				organizationId,
+				userId,
+				externalAccountId: identity.account.id,
+				ownerOrganizationId: conflict.ownerOrganizationId,
+			});
+			return { conflict };
+		}
+	}
 
 	const ownerKind = connector.scope;
 	const target =
@@ -82,55 +115,84 @@ export async function upsertConnection(input: {
 					targetWhere: sql`${connections.ownerKind} = 'user'`,
 				};
 
+	// Encryption first: it is CPU-bound and touches no database, so holding a
+	// transaction open across it would only lengthen the lock.
 	const accessToken = await encryptSecret(tokens.accessToken);
 	const refreshToken = await encryptOptional(tokens.refreshToken);
 	const config = await encryptStored(tokens.stored);
 
-	const [row] = await db
-		.insert(connections)
-		.values({
-			organizationId,
-			connectedByUserId: userId,
-			connector: slug,
-			ownerKind,
-			authMethod: input.authMethod,
-			accessToken,
-			refreshToken,
-			tokenExpiresAt: tokens.expiresAt,
-			scopes: tokens.scopes,
-			externalAccountId: identity.account.id,
-			externalAccountLabel: identity.account.label,
-			externalUserId: identity.user?.id ?? null,
-			externalUserLabel: identity.user?.label ?? null,
-			config,
-			state: input.state ?? null,
-			disconnectedAt: null,
-			disconnectReason: null,
-		})
-		.onConflictDoUpdate({
-			...target,
-			set: {
+	// The prior-account read, the write, and the pin that depends on the
+	// difference between them commit together. Split apart, a failed pin left
+	// the new account connected with every existing trigger still unpinned —
+	// matching both accounts — and the retry could not repair it, because by
+	// then the new row is in `previousConnectionIds` and the transition it
+	// keys on has already happened.
+	return dbWs.transaction(async (tx) => {
+		const previousConnectionIds =
+			ownerKind === "user"
+				? await liveConnectionIds(organizationId, slug, userId, tx)
+				: [];
+
+		const [row] = await tx
+			.insert(connections)
+			.values({
+				organizationId,
+				connectedByUserId: userId,
+				connector: slug,
+				ownerKind,
+				authMethod: input.authMethod,
 				accessToken,
 				refreshToken,
 				tokenExpiresAt: tokens.expiresAt,
 				scopes: tokens.scopes,
+				oauthClientId: tokens.clientId ?? null,
+				externalAccountId: identity.account.id,
 				externalAccountLabel: identity.account.label,
 				externalUserId: identity.user?.id ?? null,
 				externalUserLabel: identity.user?.label ?? null,
 				config,
-				...(input.stateOnUpdate
-					? { state: input.stateOnUpdate }
-					: input.state !== undefined
-						? { state: input.state }
-						: {}),
+				state: input.state ?? null,
 				disconnectedAt: null,
 				disconnectReason: null,
-			},
-		})
-		.returning({ id: connections.id });
+			})
+			.onConflictDoUpdate({
+				...target,
+				set: {
+					accessToken,
+					refreshToken,
+					tokenExpiresAt: tokens.expiresAt,
+					scopes: tokens.scopes,
+					oauthClientId: tokens.clientId ?? null,
+					externalAccountLabel: identity.account.label,
+					externalUserId: identity.user?.id ?? null,
+					config,
+					...(input.stateOnUpdate
+						? { state: input.stateOnUpdate }
+						: input.state !== undefined
+							? { state: input.state }
+							: {}),
+					disconnectedAt: null,
+					disconnectReason: null,
+				},
+			})
+			.returning({ id: connections.id });
 
-	if (!row) return { conflict: { ownerEmail: null } };
-	return { connectionId: row.id };
+		if (!row)
+			return { conflict: { ownerEmail: null, ownerOrganizationId: null } };
+
+		if (ownerKind === "user") {
+			await pinTriggersToExistingAccount({
+				organizationId,
+				connector: slug,
+				userId,
+				previousConnectionIds,
+				connectionId: row.id,
+				tx,
+			});
+		}
+
+		return { connectionId: row.id };
+	});
 }
 
 async function encryptStored(

@@ -91,7 +91,13 @@ export async function POST(request: Request): Promise<Response> {
 				break;
 			}
 			const outcome = attempt.result;
-			if (outcome.status === "purged") purged.push(id);
+			if (outcome.status === "purged") {
+				console.info(`[account/purge-expired-deletions] ${id} purged`);
+				purged.push(id);
+			}
+			if (outcome.status === "already purged") {
+				console.info(`[account/purge-expired-deletions] ${id} already purged`);
+			}
 			if (outcome.status === "sole owner") {
 				console.warn(
 					`[account/purge-expired-deletions] ${id} is the only owner of ${outcome.organizationId}, which has other members; left unpurged`,

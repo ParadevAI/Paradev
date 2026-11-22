@@ -24,5 +24,5 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const LongValue: Story = {
-	args: { children: "Superset marketing site preview" },
+	args: { children: "Paradev marketing site preview" },
 };

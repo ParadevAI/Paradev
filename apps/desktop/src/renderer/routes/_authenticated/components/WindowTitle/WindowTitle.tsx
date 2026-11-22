@@ -1,7 +1,7 @@
 import { useEffect } from "react";
+import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { productName } from "~/package.json";
 
 /**
  * Sets this window's document title to the active organization's name so each
@@ -23,7 +23,7 @@ export function WindowTitle() {
 	useEffect(() => {
 		// Org name alone: the macOS Window menu lists these titles under the
 		// Superset menu bar, so a "— Superset" suffix on every entry is noise.
-		document.title = activeOrganization?.name ?? productName;
+		document.title = activeOrganization?.name ?? env.DESKTOP_DISPLAY_NAME;
 	}, [activeOrganization?.name]);
 
 	return null;

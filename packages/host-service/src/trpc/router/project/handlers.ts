@@ -1,18 +1,21 @@
 import { randomUUID } from "node:crypto";
 import { rm } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { projects } from "../../../db/schema";
+import {
+	getLiveProjectAtPath,
+	getProjectAtPathIncludingDeleted,
+} from "../../../projects/local-project-store";
 import { restoreProject } from "../../../projects/project-deletion";
 import type { HostServiceContext } from "../../../types";
+import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { persistLocalProject } from "./utils/persist-project";
 import {
+	adoptLocalRepo,
 	cloneRepoInto,
 	cloneTemplateInto,
 	initEmptyRepo,
 	initLocalRepoInPlace,
 	type ResolvedRepo,
-	resolveLocalRepo,
 	tryRevParseGitRoot,
 } from "./utils/resolve-repo";
 
@@ -28,6 +31,15 @@ function dirNameForEmpty(name: string): string {
 		});
 	}
 	return slug;
+}
+
+async function classifyGitFailure<T>(work: Promise<T>): Promise<T> {
+	try {
+		return await work;
+	} catch (err) {
+		rethrowEnvironmentalGitError(err);
+		throw err;
+	}
 }
 
 export interface CreateResult {
@@ -78,12 +90,13 @@ async function persistFromResolved(
 
 export async function createFromClone(
 	ctx: HostServiceContext,
-	args: { name: string; parentDir: string; url: string },
+	args: { name: string; parentDir: string; url: string; signal?: AbortSignal },
 ): Promise<CreateResult> {
 	const resolved = await cloneRepoInto(
 		args.url,
 		args.parentDir,
 		ctx.credentials,
+		args.signal,
 	);
 	return persistFromResolved(ctx, {
 		name: args.name,
@@ -101,9 +114,9 @@ async function resolveOrInitLocalRepo(
 	repoPath: string,
 	initIfNeeded: boolean,
 ): Promise<ResolvedRepo> {
-	if (!initIfNeeded) return resolveLocalRepo(repoPath);
+	if (!initIfNeeded) return adoptLocalRepo(repoPath);
 	const root = await tryRevParseGitRoot(repoPath);
-	return root ? resolveLocalRepo(root) : initLocalRepoInPlace(repoPath);
+	return root ? adoptLocalRepo(root) : initLocalRepoInPlace(repoPath);
 }
 
 export async function createFromImportLocal(
@@ -118,10 +131,11 @@ export async function createFromImportLocal(
 	// Idempotency guard: importing a repo that is already a project on this
 	// device returns the existing project instead of minting a duplicate
 	// row. Deliberately leaves the row untouched (no rename, no repo-field
-	// refresh) — the user may have customized it in v2.
-	const existing = ctx.db.query.projects
-		.findFirst({ where: eq(projects.repoPath, resolved.repoPath) })
-		.sync();
+	// refresh) — the user may have customized it in v2. A live row wins over
+	// a deleted one; a deleted one is restored.
+	const existing =
+		getLiveProjectAtPath(ctx.db, resolved.repoPath) ??
+		getProjectAtPathIncludingDeleted(ctx.db, resolved.repoPath);
 	if (existing) {
 		restoreProject(ctx, existing.id);
 		return {
@@ -147,9 +161,8 @@ export async function createFromEmpty(
 	ctx: HostServiceContext,
 	args: { name: string; parentDir: string },
 ): Promise<CreateResult> {
-	const resolved = await initEmptyRepo(
-		args.parentDir,
-		dirNameForEmpty(args.name),
+	const resolved = await classifyGitFailure(
+		initEmptyRepo(args.parentDir, dirNameForEmpty(args.name)),
 	);
 	return persistFromResolved(ctx, {
 		name: args.name,
@@ -167,11 +180,13 @@ export async function createFromTemplate(
 	ctx: HostServiceContext,
 	args: { name: string; parentDir: string; url: string },
 ): Promise<CreateResult> {
-	const resolved = await cloneTemplateInto(
-		args.url,
-		args.parentDir,
-		dirNameForEmpty(args.name),
-		ctx.credentials,
+	const resolved = await classifyGitFailure(
+		cloneTemplateInto(
+			args.url,
+			args.parentDir,
+			dirNameForEmpty(args.name),
+			ctx.credentials,
+		),
 	);
 	return persistFromResolved(ctx, {
 		name: args.name,

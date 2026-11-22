@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createServer, type Server } from "node:http";
 import { CLIError } from "@superset/cli-framework";
+import { readOAuthErrorCode } from "@superset/shared/oauth-refresh";
 import { env } from "./env";
 import { canReachDesktop, openUrl } from "./open-url";
 
@@ -40,6 +41,10 @@ function generateState(): string {
 
 export function getWebUrl(): string {
 	return env.SUPERSET_WEB_URL;
+}
+
+export function getPasteRedirectUri(): string {
+	return new URL(PASTE_REDIRECT_PATH, getWebUrl()).toString();
 }
 
 function shouldOpenBrowser(): boolean {
@@ -135,9 +140,7 @@ function waitForCallback({
 			}
 			response
 				.writeHead(200, { "Content-Type": "text/html" })
-				.end(
-					"<h1>Signed in to Superset CLI</h1><p>You can close this tab.</p>",
-				);
+				.end("<h1>Signed in to Paradev CLI</h1><p>You can close this tab.</p>");
 			finish(null, code);
 		});
 	});
@@ -230,12 +233,28 @@ async function exchangeCodeForToken({
 	};
 }
 
+/**
+ * Upper bound on one refresh round trip. The refresh lock in oauth-refresh.ts
+ * stays alive by heartbeat for as long as this runs.
+ */
+const REFRESH_TIMEOUT_MS = 60_000;
+
+export class TokenRefreshHttpError extends CLIError {
+	constructor(
+		readonly status: number,
+		readonly oauthError: string | undefined,
+	) {
+		super(`Token refresh failed: ${status}`, LOGIN_AGAIN_SUGGESTION);
+	}
+}
+
 export async function refreshAccessToken(
 	refreshToken: string,
 ): Promise<LoginResult> {
 	const apiUrl = env.SUPERSET_API_URL;
 	const response = await fetch(`${apiUrl}/api/auth/oauth2/token`, {
 		method: "POST",
+		signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS),
 		headers: { "Content-Type": "application/x-www-form-urlencoded" },
 		body: new URLSearchParams({
 			grant_type: "refresh_token",
@@ -246,9 +265,9 @@ export async function refreshAccessToken(
 	});
 
 	if (!response.ok) {
-		throw new CLIError(
-			`Token refresh failed: ${response.status}`,
-			LOGIN_AGAIN_SUGGESTION,
+		throw new TokenRefreshHttpError(
+			response.status,
+			await readOAuthErrorCode(response),
 		);
 	}
 
@@ -272,7 +291,6 @@ export async function login(
 	callbacks: LoginCallbacks,
 ): Promise<LoginResult> {
 	const apiUrl = env.SUPERSET_API_URL;
-	const webUrl = getWebUrl();
 
 	const codeVerifier = generateCodeVerifier();
 	const codeChallenge = generateCodeChallenge(codeVerifier);
@@ -282,7 +300,7 @@ export async function login(
 	const loopbackRedirectUri = loopback
 		? `http://127.0.0.1:${loopback.port}/callback`
 		: null;
-	const pasteRedirectUri = new URL(PASTE_REDIRECT_PATH, webUrl).toString();
+	const pasteRedirectUri = getPasteRedirectUri();
 
 	const pasteAuthorizeUrl = buildAuthorizeUrl({
 		apiUrl,

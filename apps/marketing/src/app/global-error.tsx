@@ -4,6 +4,8 @@ import * as Sentry from "@sentry/nextjs";
 import NextError from "next/error";
 import { useEffect } from "react";
 
+import { withPosthog } from "@/lib/analytics/lazy";
+
 export default function GlobalError({
 	error,
 }: {
@@ -11,6 +13,9 @@ export default function GlobalError({
 }) {
 	useEffect(() => {
 		Sentry.captureException(error);
+		withPosthog((posthog) => {
+			posthog.captureException(error, { digest: error?.digest });
+		});
 	}, [error]);
 
 	return (
