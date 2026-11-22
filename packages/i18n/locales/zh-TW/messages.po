@@ -20330,8 +20330,8 @@ msgstr "守護程式無法將你的活動會話移交給新的二進位檔案。
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "我們正在把Paradev帶到Windows和Linux。留下電子郵件，一上線就通知你。"
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
-msgstr "桌面應用程式支援macOS，另有實驗性的Linux AppImage；Windows暫未提供。除了桌面應用程式，還有CLI、TypeScript SDK和MCP伺服器，你可以從指令碼、終端和其他代理程式來驅動Paradev。App Store上的iPhone和iPad應用程式以及Google Play上的Android應用程式讓你離開座位時也能查看代理並審閱它們的差異。"
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "桌面應用程式支援macOS和Linux。Windows暫未提供。它也可以在Apple和Android手機上執行。除了應用程式，還有CLI、TypeScript SDK和MCP伺服器，你可以從指令碼、終端和其他代理程式來驅動Paradev。"
 
 msgid "The Dev can't post there."
 msgstr "該 Dev 無法在那裡發文。"

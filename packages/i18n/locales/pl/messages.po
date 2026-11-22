@@ -20330,8 +20330,8 @@ msgstr "Demon nie zdołał przekazać aktywnych sesji nowej wersji. Powód:"
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Pracujemy nad Paradev na Windows i Linux. Zostaw e-mail, a damy znać, gdy tylko będzie gotowy."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
-msgstr "Aplikacja desktopowa działa na macOS, z eksperymentalnym AppImage dla Linuksa; Windows nie jest jeszcze dostępny. Poza aplikacją są też CLI, SDK w TypeScripcie i serwer MCP, więc Paradev można sterować ze skryptów, terminali i innych agentów. Aplikacje na iPhone’a i iPada z App Store oraz na Androida z Google Play pozwalają sprawdzać agentów i przeglądać ich diffy z dala od biurka."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "Aplikacja desktopowa działa na macOS i Linuksie. Windows nie jest jeszcze dostępny. Działa też na telefonach Apple i z Androidem. Poza aplikacją są też CLI, SDK w TypeScripcie i serwer MCP, więc Paradev można sterować ze skryptów, terminali i innych agentów."
 
 msgid "The Dev can't post there."
 msgstr "Dev nie może tam publikować."

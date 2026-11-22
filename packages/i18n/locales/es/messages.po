@@ -20330,8 +20330,8 @@ msgstr "El daemon no pudo traspasar tus sesiones activas al binario nuevo. Motiv
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Estamos llevando Paradev a Windows y Linux. Déjanos tu correo y te avisaremos en cuanto esté listo."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
-msgstr "La app de escritorio funciona en macOS, con un AppImage experimental para Linux; Windows todavía no está disponible. Además de la app de escritorio hay una CLI, un SDK de TypeScript y un servidor MCP, así que puedes manejar Paradev desde scripts, terminales y otros agentes. Las apps para iPhone y iPad en la App Store y para Android en Google Play te permiten consultar el estado de tus agentes y revisar sus diffs lejos de tu escritorio."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "La app de escritorio funciona en macOS y Linux. Windows todavía no está disponible. También funciona en el teléfono, en dispositivos Apple y Android. Además de la app hay una CLI, un SDK de TypeScript y un servidor MCP, así que puedes manejar Paradev desde scripts, terminales y otros agentes."
 
 msgid "The Dev can't post there."
 msgstr "El Dev no puede publicar allí."

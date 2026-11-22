@@ -20330,8 +20330,8 @@ msgstr "Daemon, canlı oturumlarınızı yeni ikili dosyaya devredemedi. Nedeni:
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Paradev'i Windows ve Linux'a getiriyoruz. E-postanızı bırakın, hazır olduğu anda haber verelim."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
-msgstr "Masaüstü uygulaması macOS'ta çalışır; deneysel bir Linux AppImage vardır, Windows henüz kullanılamıyor. Masaüstü uygulamasının ötesinde bir CLI, bir TypeScript SDK ve bir MCP sunucusu var; böylece Paradev'i betiklerden, terminallerden ve diğer ajanlardan yönetebilirsiniz. App Store'daki iPhone ve iPad uygulaması ve Google Play'deki Android uygulamasıyla masanızdan uzaktayken de ajanlarınızı takip edebilir ve diff'lerini inceleyebilirsiniz."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "Masaüstü uygulaması macOS ve Linux'ta çalışır. Windows henüz kullanılamıyor. Apple ve Android telefonlarda da çalışır. Uygulamanın ötesinde bir CLI, bir TypeScript SDK ve bir MCP sunucusu var; böylece Paradev'i betiklerden, terminallerden ve diğer ajanlardan yönetebilirsiniz."
 
 msgid "The Dev can't post there."
 msgstr "Dev oraya gönderi yapamaz."

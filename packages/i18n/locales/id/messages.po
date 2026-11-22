@@ -20330,8 +20330,8 @@ msgstr "Daemon tidak bisa menyerahkan sesi aktif Anda ke biner yang baru. Alasan
 msgid "The desktop app runs on macOS and Linux today. Drop your email and we'll let you know the moment the Windows build ships."
 msgstr "Kami sedang membawa Paradev ke Windows & Linux. Tinggalkan email Anda dan kami akan mengabari begitu siap."
 
-msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. Apps for iPhone and iPad on the App Store and for Android on Google Play let you check on agents and review their diffs away from your desk."
-msgstr "Aplikasi desktopnya berjalan di macOS, dengan AppImage Linux eksperimental; Windows belum tersedia. Selain aplikasi desktop ada CLI, SDK TypeScript, dan server MCP, jadi Anda bisa mengendalikan Paradev dari skrip, terminal, dan agen lain. Aplikasi iPhone dan iPad di App Store serta aplikasi Android di Google Play memungkinkan Anda memantau agen dan meninjau diff mereka saat jauh dari meja."
+msgid "The desktop app runs on macOS and Linux. Windows is not yet available. It also runs on the phone for Apple and Android devices. Beyond the app there's a CLI, TypeScript SDK, and MCP server so you can drive Paradev from scripts, terminals, and other agents."
+msgstr "Aplikasi desktopnya berjalan di macOS dan Linux. Windows belum tersedia. Aplikasi ini juga berjalan di ponsel, untuk perangkat Apple dan Android. Selain aplikasi ada CLI, SDK TypeScript, dan server MCP, jadi Anda bisa mengendalikan Paradev dari skrip, terminal, dan agen lain."
 
 msgid "The Dev can't post there."
 msgstr "Dev tidak dapat memposting di sana."
