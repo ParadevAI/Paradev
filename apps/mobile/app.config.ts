@@ -62,7 +62,8 @@ export default ({ config }: ConfigContext) => ({
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	userInterfaceStyle: "dark",
-	scheme: "superset",
+	// The first scheme is the one Linking.createURL emits.
+	scheme: ["superset", "paradev"],
 	runtimeVersion: { policy: "fingerprint" as const },
 	updates: {
 		url: "https://u.expo.dev/fa9332a8-896a-4d2a-be5b-d82469b46e5d",
