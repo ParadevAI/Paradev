@@ -8,7 +8,7 @@ export async function GET() {
 	const scanned = await Promise.all(scan);
 	const header = [
 		`# ${BRAND.INTRO_NAME} Documentation`,
-		`> Official documentation for ${BRAND.INTRO_NAME} — run parallel AI coding agents in isolated Git worktrees on your machine.`,
+		`> Official documentation for ${BRAND.INTRO_NAME}: run parallel AI coding agents in a chat or a terminal, each in an isolated Git worktree on your machine.`,
 	].join("\n\n");
 
 	return new Response([header, ...scanned].join("\n\n---\n\n"), {
