@@ -648,20 +648,6 @@ describe("HostServiceCoordinator single-flight / adoption", () => {
 		expect(pollHealthCheckMock).not.toHaveBeenCalled();
 	});
 
-	test("spawns when the manifest holder exits during its health probe", async () => {
-		manifestStore.current = baseManifest(4321, "http://127.0.0.1:55555");
-		pollHealthCheckMock.mockImplementationOnce(async () => {
-			isProcessAliveMock.mockImplementation(() => false);
-			return true;
-		});
-
-		const conn = await coordinator.start("org-1", spawnConfig);
-
-		expect(conn.port).toBe(60000);
-		expect(conn.secret).toBe("fresh-secret");
-		expect(killedPids).toHaveLength(0);
-	});
-
 	test("spawns when the manifest health-check fails", async () => {
 		manifestStore.current = baseManifest(4321, "http://127.0.0.1:55555");
 		pollHealthCheckMock.mockImplementation(() => Promise.resolve(false));

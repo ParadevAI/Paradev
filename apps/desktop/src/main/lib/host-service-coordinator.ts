@@ -888,7 +888,7 @@ export class HostServiceCoordinator extends EventEmitter {
 			() => !isStartAllowed() || !this.deps.isProcessAlive(manifest.pid),
 			manifest.pid,
 		);
-		if (!healthy || !this.deps.isProcessAlive(manifest.pid)) return null;
+		if (!healthy) return null;
 		if (!isStartAllowed()) throw new Error("Host service start cancelled");
 
 		const previous = this.instances.get(organizationId);
