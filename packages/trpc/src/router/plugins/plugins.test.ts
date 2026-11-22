@@ -41,6 +41,7 @@ const inReach = (values: unknown[], organizationId: string | undefined) => {
 let installs: InstallRow[] = [];
 let live: ConnectionRow[] = [];
 let forgotten: string[] = [];
+let installRecordCalls: unknown[][] = [];
 
 const rows = <T>(value: T[]) =>
 	Object.assign(Promise.resolve(value), {
@@ -52,16 +53,9 @@ stub(posthog, { capture: () => {} });
 stub(proxy, { forgetUpstreamTools: (id: string) => forgotten.push(id) });
 
 stub(pluginConnections, {
-	installRecord: (
-		_userId: string,
-		organizationId: string | null,
-		pluginName: string,
-	) => {
-		const row = installs.find(
-			(entry) =>
-				entry.pluginName === pluginName &&
-				(!entry.organizationId || entry.organizationId === organizationId),
-		);
+	installRecord: (...args: unknown[]) => {
+		installRecordCalls.push(args);
+		const row = installs.find((entry) => entry.pluginName === args[2]);
 		return Promise.resolve(row && { id: row.id, marketplace: row.marketplace });
 	},
 });
@@ -343,13 +337,28 @@ describe("a cloud workspace acts in its own organization", () => {
 		expect(listed.map((row) => row.id)).toEqual(["conn-here"]);
 	});
 
-	test("cannot disable its creator's install from another organization", async () => {
-		installs = [
-			install({ organizationId: OTHER_ORG, marketplace: `org:${OTHER_ORG}` }),
-		];
+	test("looks installs up in its own organization", async () => {
+		installRecordCalls = [];
+		await box.plugins
+			.setEnabled({ name: "notion", enabled: false })
+			.catch(() => {});
+		expect(installRecordCalls).toEqual([[USER_ID, ORG, "notion", undefined]]);
+	});
+});
 
-		await expect(
-			box.plugins.setEnabled({ name: "notion", enabled: false }),
-		).rejects.toThrow(/not installed/);
+test("an install lookup reaches account installs and one organization's", () => {
+	const render = (organizationId: string | null) => {
+		const { sql, params } = dialect.sqlToQuery(
+			pluginConnections.accountOrOrganizationInstalls(organizationId) as SQL,
+		);
+		return { sql, params };
+	};
+	expect(render(ORG)).toEqual({
+		sql: '("plugin_installs"."organization_id" is null or "plugin_installs"."organization_id" = $1)',
+		params: [ORG],
+	});
+	expect(render(null)).toEqual({
+		sql: '"plugin_installs"."organization_id" is null',
+		params: [],
 	});
 });
