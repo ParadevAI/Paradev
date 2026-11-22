@@ -27,6 +27,7 @@ interface GitWatcherInternals {
 	scheduleFlush(workspaceId: string): void;
 	getOrCreateIgnoredDirsState(workspaceId: string): {
 		dirs: ReadonlySet<string>;
+		lastRefreshAt: number;
 		rulesChanged: boolean;
 	};
 	refreshIgnoredDirs(workspaceId: string, worktreePath: string): void;
@@ -231,14 +232,13 @@ describe("GitWatcher ignore-rule staleness flag", () => {
 		expect(filtered.sawGitignoreChange).toBe(true);
 	});
 
-	test("a rule change soon after the last refresh still re-checks the native prune", async () => {
+	test("a rule change right after a refresh re-checks the native prune", async () => {
 		const repo = await mkdtemp(join(tmpdir(), "git-watcher-rules-"));
 		await simpleGit(repo).init();
-		let rechecked = () => {};
-		const nextRecheck = () =>
-			new Promise<void>((resolve) => {
-				rechecked = resolve;
-			});
+		let rechecked: () => void = () => {};
+		const recheck = new Promise<void>((resolve) => {
+			rechecked = resolve;
+		});
 		const watcher = new GitWatcher(
 			{} as unknown as ConstructorParameters<typeof GitWatcher>[0],
 			{
@@ -248,10 +248,6 @@ describe("GitWatcher ignore-rule staleness flag", () => {
 				},
 			} as unknown as ConstructorParameters<typeof GitWatcher>[1],
 		);
-		const editRules = () => {
-			internals(watcher).getOrCreateIgnoredDirsState("w").rulesChanged = true;
-			internals(watcher).refreshIgnoredDirs("w", repo);
-		};
 		try {
 			internals(watcher).watched.set("w", {
 				controller: new AbortController(),
@@ -260,13 +256,13 @@ describe("GitWatcher ignore-rule staleness flag", () => {
 				watcher: { close() {} },
 				disposeWorktreeWatch() {},
 			});
-			let recheck = nextRecheck();
-			editRules();
-			await recheck;
-			await new Promise((resolve) => setTimeout(resolve, 0));
+			const state = internals(watcher).getOrCreateIgnoredDirsState("w");
+			state.lastRefreshAt = Date.now();
+			state.rulesChanged = true;
 
-			recheck = nextRecheck();
-			editRules();
+			internals(watcher).refreshIgnoredDirs("w", repo);
+
+			expect(state.rulesChanged).toBe(false);
 			await recheck;
 		} finally {
 			watcher.close();

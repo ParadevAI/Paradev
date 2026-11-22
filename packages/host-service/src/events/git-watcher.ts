@@ -419,7 +419,8 @@ export class GitWatcher {
 	/**
 	 * Re-ask git which dirs are fully ignored. Rides on emitted `git:changed`
 	 * events (plus one call at watch start), so filtered-out churn never spawns
-	 * git; `force` bypasses the min-interval for the initial load.
+	 * git. An ignore-rule change and `force` (the initial load) bypass the
+	 * min-interval.
 	 */
 	private refreshIgnoredDirs(
 		workspaceId: string,
@@ -485,7 +486,7 @@ export class GitWatcher {
 				// is stale and the emit that flagged it was swallowed by the
 				// `refreshing` guard — run once more.
 				if (state.rulesChanged && stillCurrent()) {
-					this.refreshIgnoredDirs(workspaceId, worktreePath, true);
+					this.refreshIgnoredDirs(workspaceId, worktreePath);
 				}
 			});
 	}
