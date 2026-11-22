@@ -15,6 +15,7 @@ import {
 	mkdirSync,
 	readFileSync,
 	rmSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -69,7 +70,9 @@ const {
 	buildCodexWrapperExecLine,
 	buildCopilotWrapperExecLine,
 	buildWrapperScript,
+	createClaudeManagedSettingsJson,
 	createClaudeSettingsJson,
+	createClaudeWrapper,
 	createCodexHooksJson,
 	createCodexWrapper,
 	COPILOT_HOOK_MARKER,
@@ -82,6 +85,8 @@ const {
 	createUfoWrapper,
 	getClaudeGlobalSettingsJsonContent,
 	getClaudeManagedHookCommand,
+	getClaudeManagedSettingsJsonContent,
+	getClaudeManagedSettingsJsonPath,
 	getCodexGlobalHooksJsonContent,
 	getCursorHooksJsonContent,
 	getCopilotHookScriptPath,
@@ -2176,6 +2181,326 @@ describe("agent-wrappers claude settings.json", () => {
 		expect(
 			getClaudeGlobalSettingsJsonContent("/tmp/.superset/hooks/notify.sh"),
 		).toBeNull();
+	});
+
+	it("writes a Paradev-owned hooks-only Claude settings file without leaking ~/.claude/settings.json", () => {
+		const globalSettingsPath = path.join(
+			TEST_HOME_DIR,
+			".claude",
+			"settings.json",
+		);
+		mkdirSync(path.dirname(globalSettingsPath), { recursive: true });
+		writeFileSync(
+			globalSettingsPath,
+			JSON.stringify(
+				{
+					model: "us.anthropic.claude-sonnet-4-6",
+					modelOverrides: { sonnet: "us.anthropic.claude-sonnet-4-6" },
+					availableModels: ["us.anthropic.claude-sonnet-4-6"],
+					enforceAvailableModels: true,
+					env: { AWS_REGION: "us-east-1" },
+					awsCredentialExport: "aws-sso-export",
+					permissions: { allow: ["Bash(*)"] },
+					hooks: {
+						Stop: [
+							{ hooks: [{ type: "command", command: "/opt/user-stop.sh" }] },
+						],
+					},
+				},
+				null,
+				2,
+			),
+		);
+
+		createClaudeManagedSettingsJson();
+
+		const managedPath = getClaudeManagedSettingsJsonPath();
+		expect(managedPath).toBe(path.join(TEST_HOOKS_DIR, "claude-settings.json"));
+		const raw = readFileSync(managedPath, "utf-8");
+		expect(raw).toBe(getClaudeManagedSettingsJsonContent());
+
+		const parsed = JSON.parse(raw) as Record<string, unknown>;
+		expect(Object.keys(parsed)).toEqual(["hooks"]);
+
+		const hooks = parsed.hooks as Record<
+			string,
+			Array<{
+				matcher?: string;
+				hooks: Array<{ type: string; command: string }>;
+			}>
+		>;
+		for (const eventName of [
+			"SessionStart",
+			"SessionEnd",
+			"UserPromptSubmit",
+			"Stop",
+			"StopFailure",
+			"SubagentStart",
+			"SubagentStop",
+			"PostToolUse",
+			"PostToolUseFailure",
+			"PermissionRequest",
+		]) {
+			expect(
+				hooks[eventName]?.some((def) =>
+					def.hooks.some((hook) => hook.command === managedClaudeHookCommand),
+				),
+			).toBe(true);
+		}
+		expect(
+			hooks.PreToolUse?.some(
+				(def) =>
+					def.matcher === "Artifact" &&
+					def.hooks.some(
+						(hook) => hook.command === managedArtifactGuardCommand,
+					),
+			),
+		).toBe(true);
+		expect(raw).not.toContain("/opt/user-stop.sh");
+		expect(raw).not.toContain("AWS_REGION");
+		expect(raw).not.toContain("modelOverrides");
+	});
+
+	it("removes only a Paradev-written hooks-only Claude settings file on teardown", () => {
+		const managedPath = getClaudeManagedSettingsJsonPath();
+		createClaudeManagedSettingsJson();
+		expect(existsSync(managedPath)).toBe(true);
+
+		removeClaudeManagedHooks();
+		expect(existsSync(managedPath)).toBe(false);
+
+		mkdirSync(path.dirname(managedPath), { recursive: true });
+		writeFileSync(managedPath, '{"custom":true}\n');
+		removeClaudeManagedHooks();
+		expect(existsSync(managedPath)).toBe(true);
+	});
+});
+
+describe("agent-wrappers claude wrapper", () => {
+	let realBinDir: string;
+	let wrapperPath: string;
+	let managedSettingsPath: string;
+
+	beforeEach(() => {
+		mkdirSync(TEST_BIN_DIR, { recursive: true });
+		mkdirSync(TEST_HOOKS_DIR, { recursive: true });
+		mkdirSync(path.join(TEST_HOME_DIR, ".claude"), { recursive: true });
+		realBinDir = path.join(TEST_ROOT, "real-claude-bin");
+		mkdirSync(realBinDir, { recursive: true });
+
+		const realClaude = path.join(realBinDir, "claude");
+		writeFileSync(
+			realClaude,
+			`#!/bin/bash
+printf 'CLAUDE_CONFIG_DIR=%s\\n' "\${CLAUDE_CONFIG_DIR:-<unset>}"
+for arg in "$@"; do
+  printf 'ARG=%s\\n' "$arg"
+done
+`,
+			{ mode: 0o755 },
+		);
+		chmodSync(realClaude, 0o755);
+
+		createClaudeManagedSettingsJson();
+		createClaudeWrapper();
+		wrapperPath = path.join(TEST_BIN_DIR, "claude");
+		managedSettingsPath = getClaudeManagedSettingsJsonPath();
+	});
+
+	afterEach(() => {
+		rmSync(TEST_ROOT, { recursive: true, force: true });
+	});
+
+	function runClaudeWrapper(
+		args: string[],
+		envOverrides: Record<string, string | undefined> = {},
+	): { configDir: string; argv: string[] } {
+		const env: Record<string, string> = {
+			HOME: TEST_HOME_DIR,
+			PATH: `${TEST_BIN_DIR}:${realBinDir}:/usr/bin:/bin`,
+			SUPERSET_TERMINAL_ID: "terminal-claude-1",
+			SUPERSET_HOME_DIR: TEST_SUPERSET_HOME_DIR,
+		};
+		for (const [key, value] of Object.entries(envOverrides)) {
+			if (value === undefined) {
+				delete env[key];
+			} else {
+				env[key] = value;
+			}
+		}
+		const output = execFileSync(wrapperPath, args, {
+			env,
+			encoding: "utf-8",
+		});
+		const lines = output.split("\n").slice(0, -1);
+		const configDir = lines[0]?.replace(/^CLAUDE_CONFIG_DIR=/, "") ?? "";
+		const argv = lines.slice(1).map((line) => line.replace(/^ARG=/, ""));
+		return { configDir, argv };
+	}
+
+	it("passes --settings with the hooks-only file for a user-exported CLAUDE_CONFIG_DIR without mutating it", () => {
+		const altDir = path.join(TEST_ROOT, "claude-alt");
+		mkdirSync(altDir, { recursive: true });
+		const altSettingsPath = path.join(altDir, "settings.json");
+		const altSettingsRaw = JSON.stringify({ model: "claude-sonnet-4-6" });
+		writeFileSync(altSettingsPath, altSettingsRaw);
+
+		const result = runClaudeWrapper(["Reply with exactly PONG."], {
+			CLAUDE_CONFIG_DIR: altDir,
+		});
+
+		expect(result.configDir).toBe(altDir);
+		expect(result.argv).toEqual([
+			"--settings",
+			managedSettingsPath,
+			"Reply with exactly PONG.",
+		]);
+		expect(readFileSync(altSettingsPath, "utf-8")).toBe(altSettingsRaw);
+	});
+
+	it("passes --settings when user-exported CLAUDE_CONFIG_DIR differs from a Usage-tab default", () => {
+		const usageDir = path.join(TEST_ROOT, "claude-usage");
+		const altDir = path.join(TEST_ROOT, "claude-alt");
+		mkdirSync(usageDir, { recursive: true });
+		mkdirSync(altDir, { recursive: true });
+
+		const result = runClaudeWrapper(["-p", "hi"], {
+			CLAUDE_CONFIG_DIR: altDir,
+			SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: usageDir,
+		});
+
+		expect(result.configDir).toBe(altDir);
+		expect(result.argv).toEqual([
+			"--settings",
+			managedSettingsPath,
+			"-p",
+			"hi",
+		]);
+	});
+
+	it("skips --settings when CLAUDE_CONFIG_DIR is unset or managed by Paradev", () => {
+		expect(runClaudeWrapper(["hi"]).argv).toEqual(["hi"]);
+
+		const usageDir = path.join(TEST_ROOT, "claude-usage");
+		mkdirSync(usageDir, { recursive: true });
+		expect(
+			runClaudeWrapper(["hi"], {
+				CLAUDE_CONFIG_DIR: usageDir,
+				SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR: usageDir,
+			}).argv,
+		).toEqual(["hi"]);
+
+		// Pointer-resolved Usage-tab account
+		const stateDir = path.join(TEST_SUPERSET_HOME_DIR, "state");
+		mkdirSync(stateDir, { recursive: true });
+		writeFileSync(path.join(stateDir, "default-claude-config-dir"), usageDir);
+		const resolved = runClaudeWrapper(["hi"]);
+		expect(resolved.configDir).toBe(usageDir);
+		expect(resolved.argv).toEqual(["hi"]);
+
+		// Explicitly exported ~/.claude (with or without trailing slash, or symlink)
+		const defaultClaudeDir = path.join(TEST_HOME_DIR, ".claude");
+		const defaultClaudeLink = path.join(TEST_ROOT, "claude-default-link");
+		symlinkSync(defaultClaudeDir, defaultClaudeLink);
+		for (const dir of [
+			defaultClaudeDir,
+			`${defaultClaudeDir}/`,
+			defaultClaudeLink,
+		]) {
+			expect(runClaudeWrapper(["hi"], { CLAUDE_CONFIG_DIR: dir }).argv).toEqual(
+				["hi"],
+			);
+		}
+	});
+
+	it("skips --settings outside Paradev, when nested under another agent, or after teardown", () => {
+		const altDir = path.join(TEST_ROOT, "claude-alt");
+		mkdirSync(altDir, { recursive: true });
+
+		expect(
+			runClaudeWrapper(["hi"], {
+				CLAUDE_CONFIG_DIR: altDir,
+				SUPERSET_TERMINAL_ID: undefined,
+			}).argv,
+		).toEqual(["hi"]);
+
+		expect(
+			runClaudeWrapper(["hi"], {
+				CLAUDE_CONFIG_DIR: altDir,
+				SUPERSET_AGENT_ID: "codex",
+			}).argv,
+		).toEqual(["hi"]);
+
+		removeClaudeManagedHooks();
+		expect(
+			runClaudeWrapper(["hi"], { CLAUDE_CONFIG_DIR: altDir }).argv,
+		).toEqual(["hi"]);
+	});
+
+	it("skips --settings for info flags, caller --settings, --bare/--safe-mode, chat-v3 --setting-sources, and subcommands", () => {
+		const altDir = path.join(TEST_ROOT, "claude-alt");
+		mkdirSync(altDir, { recursive: true });
+
+		const skippedArgvs: string[][] = [
+			["--version"],
+			["-v"],
+			["--help"],
+			["-h"],
+			["--settings", "/tmp/user.json", "hi"],
+			["--settings=/tmp/user.json", "hi"],
+			["hi", "--settings", "/tmp/user.json"],
+			["--bare", "-p", "hi"],
+			["--safe-mode"],
+			// Chat V3 (claudeAdapter.ts settingSources: [])
+			[
+				"--output-format",
+				"stream-json",
+				"--verbose",
+				"--input-format",
+				"stream-json",
+				"--setting-sources=",
+			],
+			["--setting-sources", "", "-p", "hi"],
+			["--setting-sources", "project,local", "-p", "hi"],
+			// Subcommands
+			["mcp", "list"],
+			["auth", "login"],
+			["update"],
+			["upgrade"],
+			["doctor"],
+			["plugin", "list"],
+			["--verbose", "mcp", "list"],
+		];
+
+		for (const args of skippedArgvs) {
+			expect(
+				runClaudeWrapper(args, { CLAUDE_CONFIG_DIR: altDir }).argv,
+			).toEqual(args);
+		}
+	});
+
+	it("still injects --settings for prompts after --, print prompts, option values, and user setting-sources", () => {
+		const altDir = path.join(TEST_ROOT, "claude alt with spaces");
+		mkdirSync(altDir, { recursive: true });
+
+		const injectedArgvs: string[][] = [
+			[],
+			["update the README"],
+			["--", "update"],
+			["--", "--settings"],
+			["--", "--version"],
+			["-p", "doctor"],
+			["--name", "update", "Reply with PONG"],
+			["-r", "mcp"],
+			["--setting-sources=user,project", "-p", "hi"],
+			["--setting-sources", "project,user", "-p", "hi"],
+		];
+
+		for (const args of injectedArgvs) {
+			expect(
+				runClaudeWrapper(args, { CLAUDE_CONFIG_DIR: altDir }).argv,
+			).toEqual(["--settings", managedSettingsPath, ...args]);
+		}
 	});
 });
 

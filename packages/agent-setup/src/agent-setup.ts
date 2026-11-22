@@ -8,6 +8,7 @@ import {
 	createAgyWrapper,
 	createAmpPlugin,
 	createAmpWrapper,
+	createClaudeManagedSettingsJson,
 	createClaudeSettingsJson,
 	createClaudeWrapper,
 	createCodexHooksJson,
@@ -95,7 +96,11 @@ const AGENT_SETUP_DEFINITIONS: Record<
 		teardown: [removeAmpPlugin],
 	},
 	claude: {
-		setup: [createClaudeSettingsJson, createClaudeWrapper],
+		setup: [
+			createClaudeManagedSettingsJson,
+			createClaudeSettingsJson,
+			createClaudeWrapper,
+		],
 		teardown: [removeClaudeManagedHooks],
 	},
 	codex: {

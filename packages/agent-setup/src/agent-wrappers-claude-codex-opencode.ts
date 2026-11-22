@@ -4,6 +4,7 @@ import {
 	buildDefaultAccountResolver,
 	buildWrapperScript,
 	createWrapper,
+	DYNAMIC_NOTIFY_PATH_MARKER,
 	getManagedArtifactGuardHookCommand,
 	getManagedNotifyHookCommand,
 	isManagedArtifactGuardCommand,
@@ -23,6 +24,7 @@ import {
 } from "./managed-json-hooks";
 import { getNotifyScriptPath } from "./notify-hook";
 import {
+	getHooksDir,
 	getOpenCodeConfigDir,
 	getOpenCodePluginDir,
 	getOpenCodeTuiPluginDir,
@@ -74,12 +76,18 @@ export function getClaudeManagedHookCommand(): string {
 
 export const CLAUDE_ARTIFACT_GUARD_EVENT = "PreToolUse";
 export const CLAUDE_ARTIFACT_GUARD_MATCHER = "Artifact";
+export const CLAUDE_MANAGED_SETTINGS_FILE = "claude-settings.json";
 
 /**
  * Returns the global Claude settings path used for native hook registration.
  */
 export function getClaudeGlobalSettingsJsonPath(): string {
 	return path.join(resolveUserHomeDir(), ".claude", "settings.json");
+}
+
+/** Hooks-only Claude settings file owned by Paradev under `$SUPERSET_HOME_DIR/hooks/`. */
+export function getClaudeManagedSettingsJsonPath(): string {
+	return path.join(getHooksDir(), CLAUDE_MANAGED_SETTINGS_FILE);
 }
 
 // StopFailure is the API-error hook; it fires while the session stays alive,
@@ -99,10 +107,7 @@ const CLAUDE_MANAGED_EVENTS: Record<string, { matcher?: string }> = {
 	PermissionRequest: { matcher: "*" },
 };
 
-function claudeHooksSpec(
-	notifyScriptPath: string,
-	artifactGuardScriptPath: string = getArtifactGuardScriptPath(),
-): ManagedJsonHooksSpec<ClaudeHookDefinition> {
+function buildClaudeManagedHooks(): Record<string, ClaudeHookDefinition[]> {
 	const desiredEntriesByEvent = buildNestedDesiredEntries<ClaudeHookDefinition>(
 		CLAUDE_MANAGED_EVENTS,
 		getClaudeManagedHookCommand(),
@@ -116,12 +121,19 @@ function claudeHooksSpec(
 			],
 		},
 	];
+	return desiredEntriesByEvent;
+}
+
+function claudeHooksSpec(
+	notifyScriptPath: string,
+	artifactGuardScriptPath: string = getArtifactGuardScriptPath(),
+): ManagedJsonHooksSpec<ClaudeHookDefinition> {
 	return {
 		fileLabel: "Claude settings.json",
 		agentLabel: "Claude",
 		getFilePath: getClaudeGlobalSettingsJsonPath,
 		eventsContainerKey: "hooks",
-		desiredEntriesByEvent,
+		desiredEntriesByEvent: buildClaudeManagedHooks(),
 		cleanEntry: (definition) =>
 			cleanNestedHookDefinition(
 				definition,
@@ -131,6 +143,23 @@ function claudeHooksSpec(
 			),
 		dropEmptyContainerOnRemove: true,
 	};
+}
+
+export function getClaudeManagedSettingsJsonContent(): string {
+	return `${JSON.stringify({ hooks: buildClaudeManagedHooks() }, null, 2)}\n`;
+}
+
+export function createClaudeManagedSettingsJson(): void {
+	const filePath = getClaudeManagedSettingsJsonPath();
+	fs.mkdirSync(path.dirname(filePath), { recursive: true });
+	const changed = writeFileIfChanged(
+		filePath,
+		getClaudeManagedSettingsJsonContent(),
+		0o644,
+	);
+	(changed ? console.log : console.debug)(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} Claude managed settings.json`,
+	);
 }
 
 /**
@@ -157,12 +186,16 @@ export function createClaudeSettingsJson(): void {
 }
 
 /**
- * Removes Superset-managed hook entries from ~/.claude/settings.json,
- * preserving user hooks and all non-hook settings. No-op when the file does
- * not exist — teardown must never create config files.
+ * Removes Paradev-managed hooks from ~/.claude/settings.json and deletes the
+ * hooks-only settings file. No-op when absent.
  */
 export function removeClaudeManagedHooks(): void {
 	removeManagedJsonHooks(claudeHooksSpec(getNotifyScriptPath()));
+	removeOwnedFileIfMarked(
+		getClaudeManagedSettingsJsonPath(),
+		DYNAMIC_NOTIFY_PATH_MARKER,
+		"Claude managed settings.json",
+	);
 }
 
 /**
@@ -308,13 +341,137 @@ export function getOpenCodeTuiPluginContent(notifyPath: string): string {
 		.replace("{{NOTIFY_PATH}}", () => JSON.stringify(notifyPath));
 }
 
+// Claude's --settings is single-valued (last wins) and bypasses --setting-sources,
+// so skip injection when the caller sets either (without user) or runs a subcommand.
+export function buildClaudeWrapperExecLine(): string {
+	return `_superset_claude_terminal_id="\${SUPERSET_TERMINAL_ID:-\${PARADEV_TERMINAL_ID:-}}"
+_superset_claude_home_dir="\${SUPERSET_HOME_DIR:-\${PARADEV_HOME_DIR:-}}"
+_superset_claude_settings=""
+
+if [ -n "$_superset_claude_terminal_id" ] && [ -n "$_superset_claude_home_dir" ] \\
+  && [ "$SUPERSET_AGENT_ID" = "claude" ] && [ -n "\${CLAUDE_CONFIG_DIR:-}" ]; then
+  _superset_claude_config_dir="$CLAUDE_CONFIG_DIR"
+  while [ "\${#_superset_claude_config_dir}" -gt 1 ] && [ "\${_superset_claude_config_dir%/}" != "$_superset_claude_config_dir" ]; do
+    _superset_claude_config_dir="\${_superset_claude_config_dir%/}"
+  done
+
+  _superset_default_dir="\${SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR:-}"
+  while [ "\${#_superset_default_dir}" -gt 1 ] && [ "\${_superset_default_dir%/}" != "$_superset_default_dir" ]; do
+    _superset_default_dir="\${_superset_default_dir%/}"
+  done
+
+  _superset_home_claude=""
+  if [ -n "\${HOME:-}" ]; then
+    _superset_home_dir="$HOME"
+    while [ "\${#_superset_home_dir}" -gt 0 ] && [ "\${_superset_home_dir%/}" != "$_superset_home_dir" ]; do
+      _superset_home_dir="\${_superset_home_dir%/}"
+    done
+    _superset_home_claude="\${_superset_home_dir}/.claude"
+  fi
+
+  _superset_dir_is_managed=""
+  if [ -n "$_superset_default_dir" ] \\
+    && { [ "$_superset_claude_config_dir" = "$_superset_default_dir" ] || [ "$_superset_claude_config_dir" -ef "$_superset_default_dir" ]; }; then
+    _superset_dir_is_managed="1"
+  elif [ -n "$_superset_home_claude" ] \\
+    && { [ "$_superset_claude_config_dir" = "$_superset_home_claude" ] || [ "$_superset_claude_config_dir" -ef "$_superset_home_claude" ]; }; then
+    _superset_dir_is_managed="1"
+  fi
+
+  _superset_candidate_settings="$_superset_claude_home_dir/hooks/${CLAUDE_MANAGED_SETTINGS_FILE}"
+  if [ -z "$_superset_dir_is_managed" ] && [ -f "$_superset_candidate_settings" ]; then
+    _superset_skip_claude_settings=""
+    _superset_expect_arg=""
+    _superset_skip_optional=""
+    _superset_skip_variadic=""
+    _superset_seen_positional=""
+    _superset_print_mode=""
+    for _superset_arg in "$@"; do
+      if [ -n "$_superset_expect_arg" ]; then
+        if [ "$_superset_expect_arg" = "setting-sources" ]; then
+          case ",\${_superset_arg//[[:space:]]/}," in
+            *,user,*) ;;
+            *) _superset_skip_claude_settings="1"; break ;;
+          esac
+        fi
+        _superset_expect_arg=""
+        continue
+      fi
+      [ "$_superset_arg" = "--" ] && break
+      if [ -n "$_superset_skip_optional" ]; then
+        _superset_skip_optional=""
+        case "$_superset_arg" in
+          -*) ;;
+          *) continue ;;
+        esac
+      fi
+      if [ -n "$_superset_skip_variadic" ]; then
+        case "$_superset_arg" in
+          -*) _superset_skip_variadic="" ;;
+          *) continue ;;
+        esac
+      fi
+      case "$_superset_arg" in
+        -h|--help|-v|-V|--version|--bare|--safe-mode|--settings|--settings=*)
+          _superset_skip_claude_settings="1"
+          break
+          ;;
+        --setting-sources)
+          _superset_expect_arg="setting-sources"
+          ;;
+        --setting-sources=*)
+          _superset_sources="\${_superset_arg#--setting-sources=}"
+          case ",\${_superset_sources//[[:space:]]/}," in
+            *,user,*) ;;
+            *) _superset_skip_claude_settings="1"; break ;;
+          esac
+          ;;
+        -p|--print)
+          _superset_print_mode="1"
+          ;;
+        -n|--name|--agent|--agents|--append-system-prompt|--append-system-prompt-file|--autocompact|--channels|--debug-file|--effort|--environment|--fallback-model|--input-format|--json-schema|--max-budget-usd|--max-thinking-tokens|--max-turns|--model|--output-format|--permission-mode|--permission-prompt-tool|--permission-prompts|--plugin-dir|--plugin-dir-no-mcp|--plugin-url|--project-config-root|--remote-control-session-name-prefix|--resume-session-at|--session-id|--system-prompt|--system-prompt-file|--system-prompt-snapshot|--task-budget|--thinking-display)
+          _superset_expect_arg="1"
+          ;;
+        -d|--debug|-r|--resume|-w|--worktree|--cloud|--from-pr|--prompt-suggestions|--remote-control|--teleport)
+          _superset_skip_optional="1"
+          ;;
+        --add-dir|--allowedTools|--allowed-tools|--betas|--disallowedTools|--disallowed-tools|--file|--mcp-config|--tools)
+          _superset_skip_variadic="1"
+          ;;
+        -*)
+          ;;
+        *)
+          if [ -z "$_superset_seen_positional" ] && [ -z "$_superset_print_mode" ]; then
+            case "$_superset_arg" in
+              agents|attach|auth|auto-mode|config|doctor|gateway|import|install|kill|logs|mcp|migrate-installer|plugin|plugins|purge|respawn|rm|setup-token|stop|ultrareview|update|upgrade)
+                _superset_skip_claude_settings="1"
+                break
+                ;;
+            esac
+          fi
+          _superset_seen_positional="1"
+          ;;
+      esac
+    done
+    [ "$_superset_expect_arg" = "setting-sources" ] && _superset_skip_claude_settings="1"
+    if [ -z "$_superset_skip_claude_settings" ]; then
+      _superset_claude_settings="$_superset_candidate_settings"
+    fi
+  fi
+fi
+
+if [ -n "$_superset_claude_settings" ]; then
+  exec "$REAL_BIN" --settings "$_superset_claude_settings" "$@"
+fi
+exec "$REAL_BIN" "$@"`;
+}
+
 /**
- * Wrapper for Claude: forwards SUPERSET_* env vars into the agent process
- * tree and follows the Usage-tab account switch at launch time. Hooks live
- * in ~/.claude/settings.json (createClaudeSettingsJson).
+ * Wrapper for Claude: forwards SUPERSET_* env vars, follows Usage-tab account
+ * switches, and loads managed hooks via --settings for unmanaged CLAUDE_CONFIG_DIR.
  */
 export function createClaudeWrapper(): void {
-	const script = buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
+	const script = buildWrapperScript("claude", buildClaudeWrapperExecLine(), {
 		agentId: "claude",
 		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",

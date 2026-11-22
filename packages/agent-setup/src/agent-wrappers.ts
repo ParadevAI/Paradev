@@ -16,10 +16,13 @@ export {
 	removeAmpPlugin,
 } from "./agent-wrappers-amp";
 export {
+	buildClaudeWrapperExecLine,
 	buildCodexWrapperExecLine,
 	CLAUDE_ARTIFACT_GUARD_EVENT,
 	CLAUDE_ARTIFACT_GUARD_MATCHER,
+	CLAUDE_MANAGED_SETTINGS_FILE,
 	cleanupGlobalOpenCodePlugin,
+	createClaudeManagedSettingsJson,
 	createClaudeSettingsJson,
 	createClaudeWrapper,
 	createCodexHooksJson,
@@ -30,6 +33,8 @@ export {
 	getClaudeGlobalSettingsJsonContent,
 	getClaudeGlobalSettingsJsonPath,
 	getClaudeManagedHookCommand,
+	getClaudeManagedSettingsJsonContent,
+	getClaudeManagedSettingsJsonPath,
 	getCodexGlobalHooksJsonContent,
 	getCodexGlobalHooksJsonPath,
 	getOpenCodeGlobalPluginPath,
