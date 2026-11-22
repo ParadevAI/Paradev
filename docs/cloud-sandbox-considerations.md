@@ -268,6 +268,13 @@ at most 1,000 filtered records an hour; the record that reaches the cap is
 count. Sentry error events (`captureException`, uncaught exceptions) are not
 log records and do not pass this filter.
 
+Two typed events come from the box's own logs, which host-service reads
+and does not send. Each boot stamp leaves as `boot.phase`: the phase token and
+its times, never the line's detail, and only a token of a family
+`superset-boot` or host-service writes (`BOOT_PHASE_FAMILIES`). Each memguard
+kill or unrelieved pressure leaves as `box.reaped` or `box.memory_low`: the
+class of the process from its OOM score and memory sizes, never its name.
+
 A box whose host-service never answers is reported by the control plane:
 `SandboxNotReadyError` names the boot phases `boot.log` reached, not the step
 output between them. The files under `/var/log/superset` stay on the box.
