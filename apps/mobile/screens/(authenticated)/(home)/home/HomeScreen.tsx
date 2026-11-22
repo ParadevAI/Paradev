@@ -905,7 +905,7 @@ export function HomeScreen() {
 					sessions={terminalsByWorkspace.get(workspace.id) ?? []}
 					onCopied={handleCopied}
 					card={card}
-					inGroup={Boolean(item.folderTag)}
+					group={item.group}
 					detail={item.detail}
 					disabled={item.offline}
 					groups={

@@ -25,6 +25,7 @@ import type {
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
+import { GroupBar, groupBarColor } from "../GroupBar";
 import { WorkspaceLead } from "../WorkspaceLead";
 import {
 	WorkspaceRowMenu,
@@ -46,7 +47,7 @@ export function WorkspaceRow({
 	onCopied,
 	card = false,
 	groups,
-	inGroup = false,
+	group,
 	detail,
 	disabled = false,
 }: {
@@ -63,7 +64,8 @@ export function WorkspaceRow({
 	/** A cell of Home's wide grid rather than a row indented under its project. */
 	card?: boolean;
 	groups?: WorkspaceRowMenuProps["groups"];
-	inGroup?: boolean;
+	/** Set for a row inside a group: its colour, and if it ends the group. */
+	group?: { color: string | null; last: boolean };
 	/** Replaces the branch line, e.g. "project · host" outside its project. */
 	detail?: string;
 	/** Rows of a host that can't answer: shown, not opened. */
@@ -94,7 +96,8 @@ export function WorkspaceRow({
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
-	const grouped = !card && inGroup;
+	const grouped = !card && group !== undefined;
+	const barColor = grouped ? groupBarColor(group.color) : null;
 	const showBranch = !detail && workspace.branch !== workspace.name;
 	const showDiff =
 		!detail &&
@@ -155,6 +158,12 @@ export function WorkspaceRow({
 						.join(", ")}
 					ph-label="workspace-row"
 				>
+					{barColor ? (
+						<GroupBar
+							color={barColor}
+							segment={group?.last ? "last" : "middle"}
+						/>
+					) : null}
 					<WorkspaceLead
 						attention={rowAttention}
 						creating={cloudStatus === "provisioning"}

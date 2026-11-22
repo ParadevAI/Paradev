@@ -66,6 +66,8 @@ export type HomeListItem =
 			workspace: HostWorkspaceItem;
 			groups?: ProjectGroups;
 			folderTag?: string | null;
+			/** Set for a row inside a group: its colour, and if it ends the group. */
+			group?: { color: string | null; last: boolean };
 			offline?: boolean;
 			/** Replaces the branch line, e.g. "project · host" under Needs me. */
 			detail?: string;

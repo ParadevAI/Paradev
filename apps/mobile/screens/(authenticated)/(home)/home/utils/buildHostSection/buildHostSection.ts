@@ -173,15 +173,19 @@ export function buildHostSection(
 				offline,
 			});
 			if (folderCollapsed) continue;
-			for (const workspace of folder.workspaces) {
+			folder.workspaces.forEach((workspace, index) => {
 				items.push({
 					kind: "workspace",
 					workspace,
 					groups: canGroup(workspace) ? groups : undefined,
 					folderTag: folder.tag,
+					group: {
+						color: folder.color,
+						last: index === folder.workspaces.length - 1,
+					},
 					offline,
 				});
-			}
+			});
 		}
 	}
 

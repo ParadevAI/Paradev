@@ -287,6 +287,43 @@ describe("buildHostSection", () => {
 		expect(items.map(describeItem)).toEqual(["project:demo", "ws:a"]);
 	});
 
+	test("flags each group's last row with the group's colour, and leaves loose rows ungrouped", () => {
+		const PROJECT = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+		const tagged = (id: string, tags: string[]) => ({
+			...workspace(id, "m1", PROJECT),
+			tags,
+		});
+		const items = buildHostSection(
+			{
+				machineId: "m1",
+				workspaces: [
+					tagged("g1", ["fix"]),
+					tagged("g2", ["fix"]),
+					tagged("loose", []),
+					tagged("solo", ["docs"]),
+				],
+				projects: [{ ...project, id: PROJECT }],
+				tagSettings: [
+					{ projectId: PROJECT, tag: "fix", color: "#ff0000", tabOrder: 1 },
+					{ projectId: PROJECT, tag: "docs", tabOrder: 2 },
+				],
+				offline: false,
+			},
+			options,
+		);
+		const rows = Object.fromEntries(
+			items.flatMap((item) =>
+				item.kind === "workspace" ? [[item.workspace.id, item.group]] : [],
+			),
+		);
+		expect(rows).toEqual({
+			loose: undefined,
+			g1: { color: "#ff0000", last: false },
+			g2: { color: "#ff0000", last: true },
+			solo: { color: null, last: true },
+		});
+	});
+
 	test("hides a collapsed project's rows under its own host's key", () => {
 		const items = buildHostSection(
 			{
