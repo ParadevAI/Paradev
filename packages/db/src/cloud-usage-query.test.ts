@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { eq, gte, inArray } from "drizzle-orm";
 import {
+	ADA,
 	BEN,
 	BILLING_PAGE,
 	BROKEN,
@@ -29,6 +30,7 @@ import {
 	queryCloudUsageByPeriod,
 	queryFleetCloudUsage,
 	queryFleetCloudUsageByWorkspaceDay,
+	queryFleetCloudUsageSeries,
 } from "./cloud-usage-query";
 import {
 	cloudUsageDaily,
@@ -696,6 +698,72 @@ describe("fleet scope", () => {
 			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
 		);
 		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
+	});
+});
+
+describe("queryFleetCloudUsageSeries", () => {
+	const YEAR = {
+		from: new Date("2026-03-01T00:00:00Z"),
+		to: new Date("2027-01-01T00:00:00Z"),
+	};
+	const series = (
+		by: "organization" | "user",
+		keys: string[],
+		window = NOVEMBER,
+	) => queryFleetCloudUsageSeries(db, null, { window, by, keys });
+	const sum = (points: (number | undefined)[]) =>
+		points.reduce<number>((total, point) => total + (point ?? 0), 0);
+
+	test("a user's points are the billing days of the same window", async () => {
+		const { starts, stepDays, series: byUser } = await series("user", [MAYA]);
+		const days = await usage({
+			groupBy: "billingDay",
+			filters: { user: MAYA },
+		});
+		const expected = new Map(
+			days.items.map((item) => [item.key, item.gbHours]),
+		);
+		expect(stepDays).toBe(1);
+		expect(starts[0]).toBe("2026-11-01");
+		expect(byUser[MAYA]).toEqual(starts.map((day) => expected.get(day) ?? 0));
+		expect(sum(byUser[MAYA] ?? [])).toBeGreaterThan(0);
+	});
+
+	test("leaves out the open billing day at the end of the window", async () => {
+		const { starts } = await series("user", [MAYA]);
+		expect(starts.at(-1)).toBe("2026-11-29");
+	});
+
+	test("an organization's points are its users' points", async () => {
+		const orgs = await series("organization", [ORG, OTHER_ORG]);
+		const users = (await series("user", [MAYA, SAM, BEN])).series;
+		const added = (...keys: string[]) =>
+			orgs.starts.map((_, i) => sum(keys.map((key) => users[key]?.[i])));
+		expect(orgs.series[ORG]).toEqual(added(MAYA, SAM));
+		expect(orgs.series[OTHER_ORG]).toEqual(added(BEN));
+	});
+
+	test("a key with no usage has zeros", async () => {
+		const { starts, series: byUser } = await series("user", [ADA]);
+		expect(byUser[ADA]).toEqual(starts.map(() => 0));
+	});
+
+	test("no keys gives no series", async () => {
+		expect((await series("user", [])).series).toEqual({});
+	});
+
+	test("a window over 60 days is summed into whole-day buckets", async () => {
+		const day = await series("user", [MAYA, SAM], YEAR);
+		const total = await usage({
+			groupBy: "billingDay",
+			window: YEAR,
+		});
+		expect(day.stepDays).toBe(Math.ceil(day.stepDays));
+		expect(day.starts.length).toBeLessThanOrEqual(60);
+		expect(day.stepDays).toBeGreaterThan(1);
+		expect(
+			sum(day.series[MAYA] ?? []) + sum(day.series[SAM] ?? []),
+		).toBeCloseTo(total.total.gbHours);
 	});
 });
 
