@@ -89,6 +89,8 @@ export type HomeListItem =
 			kind: "periodHeader";
 			key: string;
 			label: string;
+			/** The list's first item. */
+			first?: boolean;
 	  }
 	| { kind: "cloudRow"; row: CloudWorkspaceRow; detail?: string };
 

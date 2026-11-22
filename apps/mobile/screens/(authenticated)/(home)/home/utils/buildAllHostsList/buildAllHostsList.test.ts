@@ -255,6 +255,27 @@ describe("buildAllHostsList", () => {
 		expect(place(false)).toMatchObject({ count: 4, attention: null });
 	});
 
+	test("lists Cloud's rows newest first under its header, without date labels", () => {
+		const list = buildAllHostsList({
+			hosts: [{ machineId: "m1", name: "Alpha", status: "online", items: [] }],
+			cloud: {
+				name: "Cloud",
+				items: [
+					{ kind: "periodHeader", key: "today", label: "Today" },
+					{ kind: "cloudRow", row: { id: "c1" } as never },
+					{ kind: "periodHeader", key: "yesterday", label: "Yesterday" },
+					{ kind: "cloudRow", row: { id: "c2" } as never },
+				],
+			},
+		});
+		expect(list.map(describeItem)).toEqual([
+			"label:Alpha",
+			"label:Cloud",
+			"cloud:c1",
+			"cloud:c2",
+		]);
+	});
+
 	test("leaves Cloud out where it is not offered", () => {
 		const list = buildAllHostsList({
 			hosts: [

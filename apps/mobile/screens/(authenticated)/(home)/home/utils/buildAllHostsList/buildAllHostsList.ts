@@ -80,7 +80,15 @@ export function buildAllHostsList({
 			.sort(byName)
 			.flatMap(hostItems),
 		...(cloud
-			? placeItems(CLOUD_PLACE_ID, cloud, { cloud: true, status: "online" })
+			? placeItems(
+					CLOUD_PLACE_ID,
+					// Under its own header Cloud lists newest first, without dates.
+					{
+						...cloud,
+						items: cloud.items.filter((item) => item.kind !== "periodHeader"),
+					},
+					{ cloud: true, status: "online" },
+				)
 			: []),
 		...hosts
 			.filter((host) => isPlaceUnreachable(host.status))

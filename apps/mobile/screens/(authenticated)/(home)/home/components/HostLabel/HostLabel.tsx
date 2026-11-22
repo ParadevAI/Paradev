@@ -13,16 +13,7 @@ import type { PlaceStatus } from "@/screens/(authenticated)/(home)/utils/placeSt
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import { AttentionMark } from "../AttentionMark";
-
-/**
- * Desktop's sidebar section header (DashboardSidebarSectionHeader), at the
- * iOS minimum of 11 rather than its 10.
- */
-const HEADER = {
-	label:
-		"text-muted-foreground font-semibold text-[11px] uppercase tracking-[0.075em]",
-	count: "text-muted-foreground text-[11px] tracking-[0.075em] tabular-nums",
-};
+import { SECTION_LABEL } from "../SectionLabel";
 
 interface HostLabelProps {
 	name: string;
@@ -84,14 +75,14 @@ export function HostLabel({
 			)}
 		>
 			<Text
-				className={cn(HEADER.label, "shrink")}
+				className={cn(SECTION_LABEL.label, "shrink")}
 				numberOfLines={enlargedText ? undefined : 1}
 			>
 				{statusText ? `${name} · ${statusText}` : name}
 			</Text>
 			{onToggle ? (
 				<>
-					<Text className={HEADER.count}>{count}</Text>
+					<Text className={SECTION_LABEL.count}>{count}</Text>
 					<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />
 					{attention ? <AttentionMark attention={attention} /> : null}
 				</>
@@ -100,10 +91,7 @@ export function HostLabel({
 	);
 	return (
 		<View
-			className={cn(
-				"flex-row items-center gap-3 px-4 pb-0",
-				first ? "pt-2" : "pt-6",
-			)}
+			className={cn(SECTION_LABEL.frame(first), "flex-row items-center gap-3")}
 		>
 			{onToggle ? (
 				// The toggle and Try again are siblings so VoiceOver reaches both.

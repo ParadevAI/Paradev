@@ -69,10 +69,10 @@ import { NewChatWidget } from "./components/NewChatWidget";
 import { targetKeyFor } from "./components/NewChatWidget/hooks/useNewChatTargets";
 import { useNewSessionPreferencesStore } from "./components/NewChatWidget/stores/newSessionPreferencesStore";
 import { OrganizationHeaderButton } from "./components/OrganizationHeaderButton";
-import { PeriodHeader } from "./components/PeriodHeader";
 import { PlaceEmptyNote } from "./components/PlaceEmptyNote";
 import { ProjectSectionHeader } from "./components/ProjectSectionHeader";
 import { ScopeBar } from "./components/ScopeBar";
+import { SectionLabel } from "./components/SectionLabel";
 import { WorkspaceRow } from "./components/WorkspaceRow";
 import { useAgentLiveActivity } from "./hooks/useAgentLiveActivity";
 import { useAppReviewPrompt } from "./hooks/useAppReviewPrompt";
@@ -492,7 +492,7 @@ export function HomeScreen() {
 		[needsMeCandidates],
 	);
 
-	const listItems = useMemo<HomeListItem[]>(() => {
+	const builtItems = useMemo<HomeListItem[]>(() => {
 		if (needsMeOn) {
 			return buildNeedsMeList(needsMeCandidates, {
 				input: t({ message: "Needs input" }),
@@ -613,6 +613,13 @@ export function HomeScreen() {
 		cloudName,
 		t,
 	]);
+	// A section label at the top sits close to the chips, as a first host header does.
+	const listItems = useMemo<HomeListItem[]>(() => {
+		const [head, ...rest] = builtItems;
+		return head?.kind === "periodHeader"
+			? [{ ...head, first: true }, ...rest]
+			: builtItems;
+	}, [builtItems]);
 
 	const composerWorkspaces = useMemo(
 		() => [...workspaces, ...cloudItems],
@@ -757,7 +764,7 @@ export function HomeScreen() {
 	const renderListItem = useCallback(
 		(item: HomeListItem, card: boolean) => {
 			if (item.kind === "periodHeader") {
-				return <PeriodHeader label={item.label} />;
+				return <SectionLabel label={item.label} first={item.first} />;
 			}
 			if (item.kind === "placeEmpty") {
 				return <PlaceEmptyNote label={item.label} />;
