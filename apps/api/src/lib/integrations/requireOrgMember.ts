@@ -1,4 +1,4 @@
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
 import {
 	unauthenticatedResponse,
@@ -23,7 +23,7 @@ export type OrgMember = {
 export async function requireOrgMember(
 	request: Request,
 ): Promise<OrgMember | Response> {
-	const session = await auth.api.getSession({ headers: request.headers });
+	const session = await getRequestSession(request.headers);
 	if (!session?.user) {
 		return unauthenticatedResponse(
 			request,

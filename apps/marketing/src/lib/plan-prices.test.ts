@@ -9,6 +9,7 @@ function family(
 	monthly: number,
 	yearly: number | null,
 	gbMinutesPerSeat: number | null,
+	advertisedGbHoursPerSeat: number | null,
 ): PlanFamily {
 	return {
 		family: id,
@@ -20,6 +21,7 @@ function family(
 			: null,
 		legacy: [],
 		gbMinutesPerSeat,
+		advertisedGbHoursPerSeat,
 		overagePerGbHour: null,
 		pack: null,
 		environments: null,
@@ -27,9 +29,9 @@ function family(
 }
 
 const catalog = [
-	family("pro", 20, 192, 19200),
-	family("team", 60, 648, 72000),
-	family("ultra", 200, 2400, 240000),
+	family("pro", 20, 192, 19200, null),
+	family("team", 60, 648, 72000, 1200),
+	family("ultra", 200, 2400, 240000, 4000),
 ];
 
 describe("fillPlanPrices", () => {

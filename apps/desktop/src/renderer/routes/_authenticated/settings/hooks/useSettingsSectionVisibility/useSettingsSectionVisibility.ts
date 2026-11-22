@@ -2,10 +2,10 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { env } from "renderer/env.renderer";
+import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
 import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { getAllowedSectionsForVariant } from "../../utils/settings-search";
+import { getOfferedSections } from "../../utils/settings-search";
 import type { SettingsSectionVisibility } from "../../utils/settingsSections";
 
 export function useSettingsSectionVisibility(): SettingsSectionVisibility {
@@ -14,16 +14,21 @@ export function useSettingsSectionVisibility(): SettingsSectionVisibility {
 	const isAdmin = useIsOrganizationAdmin() === true;
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === "darwin";
-	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const cloudUsageEnabled = useCloudUsageEnabled();
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const allowedSections = useMemo(
-		() =>
-			getAllowedSectionsForVariant(isV2CloudEnabled, cloudWorkspacesEnabled),
-		[isV2CloudEnabled, cloudWorkspacesEnabled],
+		() => getOfferedSections(cloudWorkspacesEnabled),
+		[cloudWorkspacesEnabled],
 	);
 	return useMemo(
-		() => ({ isMac, isAdmin, pluginsEnabled, allowedSections }),
-		[isMac, isAdmin, pluginsEnabled, allowedSections],
+		() => ({
+			isMac,
+			isAdmin,
+			pluginsEnabled,
+			cloudUsageEnabled,
+			allowedSections,
+		}),
+		[isMac, isAdmin, pluginsEnabled, cloudUsageEnabled, allowedSections],
 	);
 }

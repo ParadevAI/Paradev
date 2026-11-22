@@ -1,4 +1,4 @@
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import {
 	connectionAccessToken,
 	userConnection,
@@ -9,9 +9,7 @@ const LINEAR_IMAGE_HOST = "uploads.linear.app";
 const CACHE_MAX_AGE = 31536000; // 1 year (Linear URLs are content-addressed)
 
 export async function GET(request: Request): Promise<Response> {
-	const sessionData = await auth.api.getSession({
-		headers: request.headers,
-	});
+	const sessionData = await getRequestSession(request.headers);
 
 	if (!sessionData?.user) {
 		return unauthenticatedResponse(

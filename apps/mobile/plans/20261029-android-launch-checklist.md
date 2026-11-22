@@ -108,9 +108,8 @@ to $0 (3 seats, 216,000 box GB-minutes, overage billing off, past-due ignored). 
 - [ ] **Screens not yet checked on a device:** the Page sheets (preview, comments, share), voice
       sheets, line comment, and `ValueMenu` in share-invite. The PR checks and reviewers sheets
       render on Android (2026-10-30, fixture data: the local dev account has no GitHub).
-- [ ] **CI and EAS workflows.** `.eas/workflows/deploy-android.yml` builds and submits to the Play
-      internal track, run by hand. It moves into `deploy.yml` after the first manual upload and once
-      Android takes OTA updates (`RELEASE.md`).
+- [x] **CI and EAS workflows.** Done: `deploy.yml` publishes OTA updates to Android and, when the
+      fingerprint changes, builds and submits to the Play internal track (`RELEASE.md`).
 - [x] **Home-screen name.** Done: `withAndroidLabel` sets the launcher label to the brand name.
 
 ### Composer, after the MVP

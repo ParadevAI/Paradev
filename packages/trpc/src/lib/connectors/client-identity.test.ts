@@ -10,6 +10,9 @@ import * as crypto from "../../router/plugins/crypto";
 let rows: Array<Record<string, unknown>> = [];
 let inserted: Array<Record<string, unknown>> = [];
 let registrations: Array<Record<string, unknown>> = [];
+let forgotten = 0;
+let authorizeResponse: () => Response = () =>
+	new Response(null, { status: 302 });
 
 const selectChain = {
 	from: () => selectChain,
@@ -25,7 +28,18 @@ const insertChain = {
 	onConflictDoUpdate: () => Promise.resolve(),
 };
 
-stub(db, { select: () => selectChain, insert: () => insertChain });
+const deleteChain = {
+	where: () => {
+		forgotten += 1;
+		return Promise.resolve();
+	},
+};
+
+stub(db, {
+	select: () => selectChain,
+	insert: () => insertChain,
+	delete: () => deleteChain,
+});
 
 stub(crypto, {
 	decryptOptional: (value: string | null) => Promise.resolve(value),
@@ -93,7 +107,10 @@ beforeEach(() => {
 	rows = [];
 	inserted = [];
 	registrations = [];
+	forgotten = 0;
+	authorizeResponse = () => new Response(null, { status: 302 });
 	globalThis.fetch = (async (_input: string | URL, init?: RequestInit) => {
+		if (init?.method === "GET") return authorizeResponse();
 		registrations.push(JSON.parse(String(init?.body)));
 		return new Response(
 			JSON.stringify({
@@ -139,6 +156,24 @@ describe("a new grant", () => {
 		});
 		expect(registrations).toHaveLength(0);
 	});
+
+	test("replaces a stored client the authorization server no longer recognizes", async () => {
+		rows = [client({ clientId: "pruned-client", scopes: SCOPES })];
+		authorizeResponse = () =>
+			Response.json({ message: "Unrecognized client_id" }, { status: 422 });
+
+		expect((await resolve({ newGrant: true })).clientId).toBe("new-client");
+		expect(forgotten).toBe(1);
+	});
+
+	test("keeps a stored client when the authorize request fails for another reason", async () => {
+		rows = [client({ clientId: "scoped-client", scopes: SCOPES })];
+		authorizeResponse = () => new Response("Just a moment...", { status: 403 });
+
+		expect((await resolve({ newGrant: true })).clientId).toBe("scoped-client");
+		expect(forgotten).toBe(0);
+		expect(registrations).toHaveLength(0);
+	});
 });
 
 describe("an issued grant", () => {
@@ -172,6 +207,20 @@ describe("an issued grant", () => {
 			ForgottenClientError,
 		);
 		expect(registrations).toHaveLength(0);
+	});
+
+	test("issued to the metadata document on the other own domain keeps it", async () => {
+		const realBrowser = process.env.BROWSER_API_URL;
+		process.env.BROWSER_API_URL = "https://api.paradev.com";
+		const issuedTo =
+			"https://api.superset.sh/api/connectors/autumn_mcp/client-metadata";
+		try {
+			expect((await resolve({ issuedTo })).clientId).toBe(issuedTo);
+			expect(registrations).toHaveLength(0);
+		} finally {
+			if (realBrowser === undefined) delete process.env.BROWSER_API_URL;
+			else process.env.BROWSER_API_URL = realBrowser;
+		}
 	});
 
 	test("whose client is gone is not handed another one", async () => {

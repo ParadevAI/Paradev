@@ -11,7 +11,6 @@ const access = () =>
 		.desc("unavailable, available, or installed for everyone in the role");
 
 export default command({
-	sandbox: false,
 	description:
 		"Choose, per role, whether a plugin is unavailable, available to install, or installed for everyone",
 	args: [positional("name").required().desc("Plugin name")],

@@ -6,7 +6,7 @@ import type {
 	FolderTierMap,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { tierFor } from "../tiers";
-import type { ModifierEvent } from "../types";
+import type { ModifierEvent, TierMode } from "../types";
 
 export type { FolderLinkAction, FolderTierMap };
 
@@ -15,7 +15,7 @@ export type { FolderLinkAction, FolderTierMap };
  * links): each click tier maps to reveal-in-sidebar, external editor,
  * Finder, or unbound. Defaults:
  *
- *   plain         → null   (caller decides — toggle/hint)
+ *   plain         → null   (reveals in sidebar, see agentOutputLinks)
  *   shift         → open in Finder
  *   meta / ctrl   → reveal in sidebar
  *   meta+shift    → open in external editor
@@ -25,8 +25,9 @@ export type FolderIntent = FolderLinkAction | null;
 export function folderIntentForMap(
 	event: ModifierEvent,
 	map: FolderTierMap,
+	mode: TierMode = "4-tier",
 ): FolderIntent {
-	return map[tierFor(event, "4-tier")];
+	return map[tierFor(event, mode)];
 }
 
 /**

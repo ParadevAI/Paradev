@@ -12,7 +12,7 @@ import {
 	syncSandboxExpiries,
 	watchSandboxExpiry,
 } from "./sandbox-expiry";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
 
 const NOW = Date.now();
 const MINUTE = 60_000;
@@ -76,7 +76,14 @@ stub(db, {
 	}),
 	select: () => ({
 		from: () => ({
-			where: async () => [{ id: "ws_1", providerSandboxId: "ws-box" }],
+			where: async () => [
+				{
+					id: "ws_1",
+					organizationId: "org_1",
+					providerSandboxId: "ws-box",
+					sandboxExpiresAt: storedExpiry,
+				},
+			],
 		}),
 	}),
 });
@@ -122,7 +129,7 @@ beforeEach(() => {
 });
 
 function expectAsleepGuardedBy(sessionId: string) {
-	const [asleep] = writes;
+	const asleep = writes.find((write) => write.set.status === "asleep");
 	expect(asleep?.set.status).toBe("asleep");
 	expect(asleep?.where).toContain('"sandbox_session_id" = $');
 	expect(asleep?.params).toContain(sessionId);
@@ -151,6 +158,19 @@ describe("watchSandboxExpiry", () => {
 		expect(watches).toEqual([]);
 	});
 
+	test("a confirmed stop ends the open boot of the stopped session as idle, unless a stop site already said why", async () => {
+		storedExpiry = new Date(NOW - 5_000);
+		await watchSandboxExpiry({ cloudWorkspaceId: "ws_1" });
+		const ended = writes.findIndex((write) => "endReason" in write.set);
+		expect(writes[ended]?.set).toEqual({ endReason: "idle" });
+		expect(ended).toBeLessThan(
+			writes.findIndex((write) => write.set.status === "asleep"),
+		);
+		expect(writes[ended]?.where).toContain('"stopped_at" is null');
+		expect(writes[ended]?.where).toContain('"end_reason" is null');
+		expect(writes[ended]?.params).toContain("session_1");
+	});
+
 	test("a box still running past its recorded expiry goes through recordSandboxAwake", async () => {
 		storedExpiry = new Date(NOW - 5_000);
 		liveExpiry = new Date(NOW + 20 * MINUTE);
@@ -173,6 +193,19 @@ describe("watchSandboxExpiry", () => {
 			}),
 		).resolves.toBeUndefined();
 		expect(watches).toEqual([]);
+	});
+});
+
+describe("recordBootEnd", () => {
+	test("with no stopped session it ends every open boot of the workspace", async () => {
+		await recordBootEnd(
+			{ cloudWorkspaceId: "ws_1", organizationId: "org_1" },
+			{ sessionId: null, reason: "archived" },
+		);
+		expect(writes).toHaveLength(1);
+		expect(writes[0]?.set).toEqual({ endReason: "archived" });
+		expect(writes[0]?.where).not.toContain("vercel_session_id");
+		expect(writes[0]?.params).toEqual(["ws_1"]);
 	});
 });
 
@@ -199,6 +232,21 @@ describe("a stale record never marks a running box asleep", () => {
 			{ name: "ws-box", expiresAt: null, sessionId: null },
 		]);
 		expect(writes).toEqual([]);
+	});
+
+	test("the reconcile labels a stop past the recorded expiry idle, and one before it not at all", async () => {
+		const endReasons = () =>
+			writes.filter((write) => "endReason" in write.set).map((w) => w.set);
+		storedExpiry = new Date(NOW + 10 * MINUTE);
+		await syncSandboxExpiries([
+			{ name: "ws-box", expiresAt: null, sessionId: "session_1" },
+		]);
+		expect(endReasons()).toEqual([]);
+		storedExpiry = new Date(NOW - MINUTE);
+		await syncSandboxExpiries([
+			{ name: "ws-box", expiresAt: null, sessionId: "session_1" },
+		]);
+		expect(endReasons()).toEqual([{ endReason: "idle" }]);
 	});
 
 	test("the reconcile writes asleep only while the row still records the listed session", async () => {

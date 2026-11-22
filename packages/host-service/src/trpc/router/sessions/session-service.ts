@@ -8,7 +8,7 @@ import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import type { HostServiceContext } from "../../../types";
 import { chatContinuationTarget, chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
-import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
+import { seedWorkspaceAgentTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { createChatSession } from "./create-chat-session";
 import { sessionsClientId } from "./utils/sessionsClientId";
 
@@ -168,11 +168,8 @@ export async function createChatSessionInWorkspace(
 			};
 		}
 	}
-	if (workspace.projectId === null) {
-		const config = resolveHostAgentConfig(ctx.db, input.agent);
-		if (config)
-			await seedAgentFolderTrust(ctx.db, workspace.worktreePath, config);
-	}
+	const config = resolveHostAgentConfig(ctx.db, input.agent);
+	if (config) await seedWorkspaceAgentTrust(ctx.db, workspace, config);
 	return createChatSession(
 		chat,
 		target,

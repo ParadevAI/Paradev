@@ -23,6 +23,8 @@ export const SANDBOX_PATHS = {
 	/** `<hostRoot>/<sha256>/` per runtime, `current` symlink, `current.version`. */
 	hostRoot: "/opt/superset/host",
 	conf: "/etc/superset/sandbox.conf",
+	/** The environment's `config.toml`, rewritten on every create and wake; empty when it has none. */
+	environmentConfig: "/etc/superset/environment.toml",
 	contract: "/etc/superset/contract.sh",
 	state: "/var/lib/superset",
 	hostDb: "/var/lib/superset/host.db",
@@ -35,7 +37,23 @@ export const SANDBOX_PATHS = {
 	media: "/usr/local/share/superset/media",
 	desktopTemplates: "/usr/local/share/superset/desktop",
 	backgrounds: "/usr/share/backgrounds/superset",
+	/** A read-only snapshot of the region's agent-tools drive, when one is mounted. */
+	agents: "/opt/agents",
 } as const;
+
+/**
+ * The agent CLIs of one bundle in one region: written once by the release,
+ * then only ever mounted read-only. A drive only mounts in its own region.
+ */
+export function sandboxAgentToolsDrive(
+	region: string,
+	bundleSha: string,
+): string {
+	return `agent-tools-${region}-${bundleSha.slice(0, 12)}`;
+}
+
+export const SANDBOX_AGENT_TOOLS_DRIVE_PATTERN =
+	/^agent-tools-[a-z]+[0-9]+-[0-9a-f]{12}$/;
 
 /** Every port a workspace publishes, and the loopback ones behind them. */
 export const SANDBOX_PORTS = {
@@ -97,6 +115,8 @@ export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_PROVIDER: z.string().min(1),
 	HOST_SERVICE_SENTRY_DSN: z.string().optional(),
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
+	/** host-service sends its box events to Sentry Logs. Absent is off. */
+	SUPERSET_SANDBOX_BOX_LOGS: z.literal("1").optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */
 	SUPERSET_SANDBOX_AGENT: z.string().optional(),
 	SUPERSET_SANDBOX_AGENT_PROMPT: z.string().optional(),
@@ -220,6 +240,7 @@ export function renderContractShell(): string {
 		SUPERSET_MEDIA_DIR: SANDBOX_PATHS.media,
 		SUPERSET_DESKTOP_TEMPLATES: SANDBOX_PATHS.desktopTemplates,
 		SUPERSET_BACKGROUNDS_DIR: SANDBOX_PATHS.backgrounds,
+		SUPERSET_AGENTS_DIR: SANDBOX_PATHS.agents,
 		SUPERSET_HOST_SERVICE_PORT: SANDBOX_PORTS.hostService,
 		SUPERSET_DESKTOP_PORT: SANDBOX_PORTS.desktop,
 		SUPERSET_VNC_PORT: SANDBOX_PORTS.vnc,

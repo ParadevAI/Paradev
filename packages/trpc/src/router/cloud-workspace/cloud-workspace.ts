@@ -33,6 +33,7 @@ import {
 	type MemberContext,
 	organizationOrFirst,
 } from "../../lib/cloud-guards";
+import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
@@ -78,7 +79,11 @@ import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import {
+	recordBootEnd,
+	recordBoxStopped,
+	recordStopSeen,
+} from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -140,6 +145,7 @@ async function addressSandbox(
 ): Promise<{
 	hostTarget: string;
 	running: boolean;
+	agentsToRestart: string[];
 	agentCredentialsChanged: boolean;
 	vcpus?: number;
 }> {
@@ -150,7 +156,7 @@ async function addressSandbox(
 			if (expiresAt) {
 				await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			} else {
-				await recordSandboxAsleep(row.id, {
+				await recordStopSeen(row, {
 					sessionId: sessionId ?? row.sandboxSessionId,
 				});
 			}
@@ -158,6 +164,7 @@ async function addressSandbox(
 				hostTarget: described.hostTarget,
 				running: described.running,
 				vcpus: described.vcpus,
+				agentsToRestart: [],
 				agentCredentialsChanged: false,
 			};
 		}
@@ -647,6 +654,7 @@ export const cloudWorkspaceRouter = {
 				token: host.token,
 				expiresAt: host.expiresAt,
 				running: address.running,
+				agentsToRestart: address.agentsToRestart,
 				agentCredentialsChanged: address.agentCredentialsChanged,
 				// The display is served by host-service too: same address, same
 				// ticket. The sandbox's own desktop port is not published.
@@ -663,8 +671,8 @@ export const cloudWorkspaceRouter = {
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
-			await wakeCloudWorkspace(row, { adoptSignIns: true });
-			return { applied: true };
+			const woken = await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: woken !== null };
 		}),
 
 	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */
@@ -749,9 +757,13 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				const stopped = await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(row.id, {
-					sessionId: stopped.sessionId ?? row.sandboxSessionId,
-				});
+				await recordBoxStopped(
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{
+						sessionId: stopped.sessionId ?? row.sandboxSessionId,
+						reason: "user",
+					},
+				);
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -870,6 +882,11 @@ export const cloudWorkspaceRouter = {
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
+				logControl(
+					"workspace.archived",
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{ trigger: "user", "workspace.from_status": row.status },
+				);
 				waitUntil(
 					failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
 						(error) =>
@@ -888,6 +905,13 @@ export const cloudWorkspaceRouter = {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
 							error,
+						);
+						await recordBootEnd(
+							{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+							{
+								sessionId: null,
+								reason: "archived",
+							},
 						);
 						await settleWorkspaceNow(row.id).catch((meterError) =>
 							console.error(
@@ -958,7 +982,9 @@ export const cloudWorkspaceRouter = {
 				{ event: "unarchived" },
 			);
 			nudge(row.organizationId, "cloud_workspaces");
-			if (!resumable) await queueProvision({ cloudWorkspaceId: row.id });
+			if (!resumable) {
+				await queueProvision({ cloudWorkspaceId: row.id }, row.organizationId);
+			}
 			return { unarchived: true };
 		}),
 } satisfies TRPCRouterRecord;

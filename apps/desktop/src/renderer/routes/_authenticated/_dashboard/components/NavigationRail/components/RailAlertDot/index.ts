@@ -1,0 +1,1 @@
+export { RailAlertDot } from "./RailAlertDot";

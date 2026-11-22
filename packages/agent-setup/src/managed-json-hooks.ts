@@ -135,7 +135,7 @@ export function ensureManagedJsonHooks<Entry>(
 	const filePath = spec.getFilePath();
 	fs.mkdirSync(path.dirname(filePath), { recursive: true });
 	const changed = writeFileIfChanged(filePath, content, 0o644);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} ${spec.fileLabel}`,
 	);
 }
@@ -185,7 +185,7 @@ export function removeManagedJsonHooks<Entry>(
 		JSON.stringify(root, null, 2),
 		0o644,
 	);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Removed" : "Verified no"} ${spec.agentLabel} managed hooks`,
 	);
 }

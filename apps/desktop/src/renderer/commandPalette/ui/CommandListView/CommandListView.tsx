@@ -3,8 +3,7 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useMemo } from "react";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections, scoreCommand } from "../../core/rankCommands";
 import type { Command } from "../../core/types";
@@ -76,7 +75,6 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 	const sections = useActiveCommands(context);
 	const chatSearchEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.WORKSPACE_MOVES) === true;
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const parsed = parseRootQuery(query);
 	const trimmed = parsed.query.trim();
 	const ranked = useMemo(
@@ -84,10 +82,10 @@ export function CommandListView({ query, onSelect }: CommandListViewProps) {
 		[sections, parsed.query],
 	);
 	const { workspaceRows, text, workspacesOnly } = useRootWorkspaceRows(
-		isV2CloudEnabled && !parsed.commandsOnly,
+		!parsed.commandsOnly,
 		trimmed,
 	);
-	const showsWorkspaces = isV2CloudEnabled && !parsed.commandsOnly;
+	const showsWorkspaces = !parsed.commandsOnly;
 	const showsWorkspaceSection =
 		showsWorkspaces && (workspaceRows.length > 0 || !text);
 	const showsCommands = !(showsWorkspaces && workspacesOnly);

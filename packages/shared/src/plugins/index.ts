@@ -554,6 +554,18 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "planetscale",
+		version: "1.0.0",
+		description: "Inspect databases and branches and run SQL",
+		interface: { displayName: "PlanetScale", category: "Data & APIs" },
+		mcpServers: {
+			planetscale: {
+				type: "http",
+				url: "https://mcp.pscale.dev/mcp/planetscale",
+			},
+		},
+	},
+	{
 		name: "wispr",
 		version: "1.0.0",
 		description: "Search your meeting notes and transcripts",

@@ -55,6 +55,7 @@ export function SignInForm({
 		redirect,
 		webUrl: env.NEXT_PUBLIC_WEB_URL,
 		trustedOrigins: [env.NEXT_PUBLIC_API_URL],
+		adminUrl: env.NEXT_PUBLIC_ADMIN_URL,
 	});
 
 	const callbackError =

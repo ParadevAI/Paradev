@@ -11,6 +11,7 @@ import {
 	getSessionInputSchema,
 	getTurnChangesInputSchema,
 	listSessionsInputSchema,
+	notRunningSessionId,
 	promptInputSchema,
 	queuedPromptInputSchema,
 	respondToApprovalInputSchema,
@@ -39,7 +40,6 @@ export type ChatRouterOptions = {
 };
 
 const UNKNOWN_HARNESS = /^unknown harness /;
-const NOT_RUNNING = /^chat session (.+) is not running$/;
 const NOT_QUEUED = /^prompt .+ is not queued$/;
 
 function mapCommandError(runtime: ChatRuntime, error: unknown): unknown {
@@ -59,7 +59,7 @@ function mapCommandError(runtime: ChatRuntime, error: unknown): unknown {
 			cause: error,
 		});
 	}
-	const sessionId = NOT_RUNNING.exec(error.message)?.[1];
+	const sessionId = notRunningSessionId(error.message);
 	if (sessionId) {
 		return new TRPCError({
 			code: runtime.sessions.get(sessionId) ? "CONFLICT" : "NOT_FOUND",

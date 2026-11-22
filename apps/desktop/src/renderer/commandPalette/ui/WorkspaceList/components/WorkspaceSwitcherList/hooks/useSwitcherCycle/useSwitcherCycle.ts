@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useFrameStackStore } from "../../../../../../core/frames";
 import { holdsAnyModifier } from "../../../../../../core/holdsAnyModifier";
 import type { SwitcherRow } from "../../../../utils/bucketWorkspaces";

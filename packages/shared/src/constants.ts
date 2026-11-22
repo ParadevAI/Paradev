@@ -110,8 +110,8 @@ export const OPEN_ROLES = [
 export const THEME_STORAGE_KEY = "superset-theme";
 
 // Download URLs
-export const DOWNLOAD_URL_MAC_ARM64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Superset-arm64.dmg`;
-export const DOWNLOAD_URL_MAC_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Superset-x64.dmg`;
+export const DOWNLOAD_URL_MAC_ARM64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Paradev-arm64.dmg`;
+export const DOWNLOAD_URL_MAC_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Paradev-x64.dmg`;
 export const DOWNLOAD_URL_LINUX_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Superset-x86_64.AppImage`;
 
 // Auth token configuration
@@ -133,24 +133,11 @@ export const ACCOUNT_DELETION_GRACE_DAYS = 30;
 // PostHog
 export const POSTHOG_COOKIE_NAME = "superset";
 
-// v2-only users have the v1↔v2 surface switch hidden and v2 cloud forced on.
-// Two windows of account-creation time qualify (stored as ISO strings so the
-// values are identical on server, desktop renderer, web, and admin):
-//   [V2_ONLY_USER_CUTOFF, V2_NEW_USER_V1_EXPERIMENT_START) — the original v2-only
-//     cohort.
-//   [V2_NEW_USER_V2_DEFAULT_START, ∞) — new users now default to v2.
-// The gap [V2_NEW_USER_V1_EXPERIMENT_START, V2_NEW_USER_V2_DEFAULT_START) is the
-// new-users-v1 experiment cohort; they started in v1 and stay there — flipping
-// the default must never pull existing v1 users into v2. Pre-cutoff users keep
-// the existing opt-in toggle.
-// 2026-05-15 14:00 UTC = Fri 07:00 PDT / 10:00 EDT.
+// Accounts created in these windows never had v1, so they have nothing to
+// import: [V2_ONLY_USER_CUTOFF, V2_NEW_USER_V1_EXPERIMENT_START) and
+// [V2_NEW_USER_V2_DEFAULT_START, ∞).
 export const V2_ONLY_USER_CUTOFF = "2026-05-15T14:00:00.000Z";
-// 2026-06-08 06:59 UTC = Sun 23:59 PDT (11:59pm Pacific).
 export const V2_NEW_USER_V1_EXPERIMENT_START = "2026-06-08T06:59:00.000Z";
-// Rollout boundary: accounts created at/after this default to v2. Set to the
-// 2026-07-09 release cutover, 10:00 AM Pacific (PDT, UTC-7) = 17:00 UTC. Everyone
-// who signed up before the cutover stays on v1, so no existing v1 user flips.
-// Bump this if the release slips.
 export const V2_NEW_USER_V2_DEFAULT_START = "2026-07-09T17:00:00.000Z";
 
 export const FEATURE_FLAGS = {
@@ -165,12 +152,6 @@ export const FEATURE_FLAGS = {
 	/** In-app channels in the desktop sidebar. */
 	CHANNELS: "channels",
 	/**
-	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
-	 * card, pane cards and the inline home composer. Read once per launch, so
-	 * a change in PostHog applies on the next start.
-	 */
-	PARADEV_SHELL: "paradev-shell",
-	/**
 	 * Kill switch for stacked pull requests on the desktop: the stack read and
 	 * chip, stack merge, merge queue actions, and switching a workspace between
 	 * layers. On for everyone. Unloaded or offline means on, and so does a
@@ -180,13 +161,6 @@ export const FEATURE_FLAGS = {
 	STACKED_PULL_REQUESTS: "stacked-pull-requests",
 	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
 	MOBILE_VOICE_MODE: "mobile-voice-mode",
-	/**
-	 * Paces the v1→v2 auto-migration rollout (percentage ramp + high-profile
-	 * org exclusions). Gates only NEW migrations on the v1 surface — post-flip
-	 * catch-up passes are ungated so flipped machines always finish. Off,
-	 * unloaded, or offline all mean "don't migrate yet" (stays on v1).
-	 */
-	V1_AUTO_MIGRATION: "v1-auto-migration",
 	/**
 	 * Shows the "We're Hiring" card in the dashboard sidebar. Targets a static
 	 * PostHog cohort of users who have created 10+ workspaces all-time, which is
@@ -220,6 +194,16 @@ export const FEATURE_FLAGS = {
 	 * conditions are the allowlist, so access changes without a deploy.
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
+	/** Per organization: shows Settings, Cloud usage, and gates the `cloud.*` procedures server-side. Unloaded or offline is off. */
+	CLOUD_USAGE: "cloud-usage",
+	/**
+	 * Mounts the bundle's agent-tools drive on an organization's boxes, so the
+	 * agent CLIs come from it instead of the image. Evaluated per organization
+	 * on every create and wake. Unloaded or offline means no drive.
+	 */
+	SANDBOX_AGENT_TOOLS_DRIVE: "sandbox-agent-tools-drive",
+	/** Sends an organization's box events to Sentry Logs, from each box's next create or wake. */
+	SANDBOX_BOX_LOGS: "sandbox-box-logs",
 	/**
 	 * Moving a workspace and its chats to the cloud or to another computer:
 	 * shows the Move items, and gates

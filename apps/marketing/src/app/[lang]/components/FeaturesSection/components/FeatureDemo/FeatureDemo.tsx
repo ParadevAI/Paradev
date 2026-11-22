@@ -13,7 +13,7 @@ export function FeatureDemo({
 }: FeatureDemoProps) {
 	return (
 		<div
-			className={`relative w-full overflow-hidden ${fitContent ? "" : "min-h-[300px] lg:aspect-4/3 max-sm:[mask-image:linear-gradient(to_right,black_82%,transparent)]"} ${className}`}
+			className={`relative w-full overflow-hidden ${fitContent ? "" : "min-h-[300px] lg:min-h-0 max-sm:[mask-image:linear-gradient(to_right,black_82%,transparent)]"} ${className}`}
 		>
 			{/* Soft ember glow behind the demo window, same stage lighting as the hero */}
 			<div

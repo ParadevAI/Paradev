@@ -108,11 +108,14 @@ async function chatMovingHere(
  */
 /** As many chats as the preview of a sleeping cloud workspace lists. */
 const MAX_WORKSPACE_CHATS = 20;
+/** How far apart a box pushes a running chat as its tool calls finish; null waits for the turn to end. */
+const CHECKPOINT_GAP_MS: number | null = 3_000;
 
 export const chatHistoryRouter = {
 	/** Whether a cloud box keeps its chats in the cloud as they happen. */
 	syncEnabled: personProcedure.query(async ({ ctx }) => ({
 		enabled: await isMovesEnabled(ctx.session.user),
+		checkpointGapMs: CHECKPOINT_GAP_MS,
 	})),
 
 	push: personProcedure

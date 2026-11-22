@@ -46,7 +46,7 @@ type TerminalServerMessage =
 	// `code: "session-gone"` = the server says the session is permanently
 	// destroyed (not found / disposed / exited), not a transient attach failure.
 	| { type: "error"; message: string; code?: string }
-	| { type: "exit"; exitCode: number; signal: number }
+	| { type: "exit"; exitCode: number; signal: number; shellExited?: boolean }
 	| { type: "title"; title: string | null }
 	// The PTY's size: the smallest box across the clients showing it. Sent
 	// after each of our resizes and whenever it changes.
@@ -96,7 +96,12 @@ export interface TerminalTransport {
 	 */
 	sessionEnded: boolean;
 	/** Set by a live `exit`; null when the session ended without one (`session-gone`). */
-	exitStatus: { exitCode: number; signal: number } | null;
+	exitStatus: {
+		exitCode: number;
+		signal: number;
+		/** The interactive shell ended by itself; absent from older hosts. */
+		shellExited?: boolean;
+	} | null;
 	/**
 	 * True while the PTY is narrower than this pane because a smaller client
 	 * (another device, or a narrower split) is showing the same terminal.
@@ -194,6 +199,12 @@ export interface TerminalTransport {
 	 * request the ring tail (`seq=new`) — it would double-paint.
 	 */
 	_xtermHadContent: boolean;
+	/**
+	 * "needed": the xterm may not match the PTY's screen (it came from a
+	 * snapshot, or its rows changed while detached), so the next resize asks
+	 * the host for a repaint. "sent": waiting for the host's `size` answer.
+	 */
+	_repaintRequest: "none" | "needed" | "sent";
 	/** Internal: wall-clock-gap watchdog for laptop sleep/wake detection. */
 	_livenessTimer: ReturnType<typeof setInterval> | null;
 	/** Internal: Date.now() at the last watchdog tick. */
@@ -464,6 +475,7 @@ export function createTransport(
 		_seqEverSynced: false,
 		_bytesSinceAttach: false,
 		_xtermHadContent: false,
+		_repaintRequest: "none",
 		_livenessTimer: null,
 		_lastLivenessTick: 0,
 		_resumeListener: null,
@@ -828,6 +840,9 @@ function attachSocketListeners(
 		}
 
 		if (message.type === "size") {
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "none";
+			}
 			setNarrowedByOtherClient(transport, message.cols < terminal.cols);
 			return;
 		}
@@ -851,6 +866,10 @@ function attachSocketListeners(
 			setConnectionState(transport, "open");
 			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
+			// The last connection ended before the host answered the request.
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "needed";
+			}
 			sendResize(transport, terminal.cols, terminal.rows);
 			flushPendingInput(transport);
 			return;
@@ -929,6 +948,7 @@ function attachSocketListeners(
 			markSessionEnded(transport, {
 				exitCode: message.exitCode,
 				signal: message.signal,
+				shellExited: message.shellExited,
 			});
 			transport.lastDiagnosis = {
 				category: "unknown",
@@ -1218,7 +1238,11 @@ export function sendResize(
 	const socket = transport._socket;
 	if (!socket || socket.readyState !== WebSocket.OPEN) return;
 	if (transport.connectionState !== "open") return;
-	socket.send(JSON.stringify({ type: "resize", cols, rows }));
+	const repaint = transport._repaintRequest === "needed" || undefined;
+	if (repaint) {
+		transport._repaintRequest = "sent";
+	}
+	socket.send(JSON.stringify({ type: "resize", cols, rows, repaint }));
 }
 
 export function sendDispose(transport: TerminalTransport) {

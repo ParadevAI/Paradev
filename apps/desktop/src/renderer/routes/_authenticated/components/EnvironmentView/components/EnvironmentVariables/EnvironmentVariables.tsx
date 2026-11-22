@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react/macro";
+import { Button } from "@superset/ui/button";
 import { useCallback, useState } from "react";
-import { AddSecretSheet } from "./components/AddSecretSheet";
+import { LuPlus } from "react-icons/lu";
+import { AddVariablesForm } from "./components/AddVariablesForm";
 import { EditSecretDialog } from "./components/EditSecretDialog";
 import { EnvironmentVariablesList } from "./components/EnvironmentVariablesList";
 
@@ -18,20 +20,34 @@ interface EnvironmentVariablesProps {
 export function EnvironmentVariables({
 	environmentId,
 }: EnvironmentVariablesProps) {
-	const [isAddOpen, setIsAddOpen] = useState(false);
+	const [isAdding, setIsAdding] = useState(false);
 	const [editing, setEditing] = useState<EditingSecret | null>(null);
 	const [reloadKey, setReloadKey] = useState(0);
 
 	const reload = useCallback(() => setReloadKey((key) => key + 1), []);
 
 	return (
-		<div>
-			<span className="mb-2 block text-xs font-medium">
-				<Trans>Variables</Trans>
-			</span>
+		<div className="flex flex-col gap-2">
+			<div className="flex items-center justify-between gap-4">
+				<span className="text-xs font-medium">
+					<Trans>Variables</Trans>
+				</span>
+				{!isAdding && (
+					<Button onClick={() => setIsAdding(true)} size="xs" variant="outline">
+						<LuPlus />
+						<Trans>Add variables</Trans>
+					</Button>
+				)}
+			</div>
+			{isAdding && (
+				<AddVariablesForm
+					environmentId={environmentId}
+					onClose={() => setIsAdding(false)}
+					onSaved={reload}
+				/>
+			)}
 			<EnvironmentVariablesList
 				environmentId={environmentId}
-				onAdd={() => setIsAddOpen(true)}
 				refreshToken={reloadKey}
 				onEdit={(secret) =>
 					setEditing({
@@ -41,12 +57,6 @@ export function EnvironmentVariables({
 						sensitive: secret.sensitive,
 					})
 				}
-			/>
-			<AddSecretSheet
-				environmentId={environmentId}
-				onOpenChange={setIsAddOpen}
-				onSaved={reload}
-				open={isAddOpen}
 			/>
 			{editing && (
 				<EditSecretDialog

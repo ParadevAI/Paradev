@@ -191,6 +191,30 @@ describe("agentConfigsRouter", () => {
 			).toEqual([]);
 		});
 
+		it("moves an untouched Antigravity row off its earlier launch args", async () => {
+			const { caller, db } = createCallerWithDb();
+			ensurePresetRow(db as unknown as HostServiceContext["db"], "agy");
+			db.update(schema.hostAgentConfigs)
+				.set({ argsJson: JSON.stringify(["--mode", "accept-edits"]) })
+				.where(eq(schema.hostAgentConfigs.presetId, "agy"))
+				.run();
+
+			const moved = await caller.list();
+			expect(moved.find((row) => row.presetId === "agy")?.args).toEqual([
+				"--dangerously-skip-permissions",
+			]);
+
+			db.update(schema.hostAgentConfigs)
+				.set({ argsJson: JSON.stringify(["--mode", "plan"]) })
+				.where(eq(schema.hostAgentConfigs.presetId, "agy"))
+				.run();
+			const kept = await caller.list();
+			expect(kept.find((row) => row.presetId === "agy")?.args).toEqual([
+				"--mode",
+				"plan",
+			]);
+		});
+
 		it("returns existing rows on subsequent calls without re-seeding", async () => {
 			const caller = createCaller();
 			const first = await caller.list();

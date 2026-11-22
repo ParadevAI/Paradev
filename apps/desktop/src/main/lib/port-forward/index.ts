@@ -7,10 +7,6 @@ import { ForwardTokens } from "./forward-tokens";
 import { PortForwardManager } from "./port-forward-manager";
 import { RelayForwardTransport } from "./relay-forward-transport";
 
-export { PortForwardManager } from "./port-forward-manager";
-export { RelayForwardTransport } from "./relay-forward-transport";
-export type { ForwardTransport } from "./types";
-
 const tokens = new ForwardTokens();
 
 export function setRelayToken(token: string | null): void {

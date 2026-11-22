@@ -5,7 +5,7 @@ import { BRAND } from "@superset/shared/brand";
 import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -26,28 +26,23 @@ import "../globals.css";
 import { initServerI18n } from "../i18n-server";
 import { Providers } from "../providers";
 
-const ibmPlexMono = IBM_Plex_Mono({
-	weight: ["300", "400", "500"],
+const geistMono = Geist_Mono({
 	subsets: ["latin"],
-	variable: "--font-ibm-plex-mono",
+	variable: "--font-geist-mono",
 	display: "swap",
 	// Not used by the LCP hero text; keep it off the critical preload path
 	preload: false,
 });
 
-// Variable font with the opsz axis: large sizes render as Inter Display
-const inter = Inter({
+const geist = Geist({
 	subsets: ["latin"],
-	variable: "--font-inter",
+	variable: "--font-geist-sans",
 	display: "swap",
-	axes: ["opsz"],
-	adjustFontFallback: false,
-	fallback: [],
 });
 
 const siteDescription = msg({
 	message:
-		"The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place.",
+		"The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place.",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -141,10 +136,11 @@ export default async function RootLayout({
 		<html
 			lang={locale}
 			style={{ colorScheme: "dark" }}
-			className={`dark overscroll-none ${ibmPlexMono.variable} ${inter.variable}`}
+			className={`dark overscroll-none ${geistMono.variable} ${geist.variable}`}
 			suppressHydrationWarning
 		>
 			<head>
+				<meta name="darkreader-lock" />
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd
 					dateModified={getChangelogEntries()[0]?.date}

@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { organizationPlugins, pluginInstalls } from "@superset/db/schema";
-import { and, asc, countDistinct, eq } from "drizzle-orm";
+import { and, asc, eq, isNull, or } from "drizzle-orm";
 import { accessibleTo, memberRole } from "../../lib/organization-plugins";
 import { installConnector, type PluginManifest } from "./manifest";
 
@@ -118,11 +118,21 @@ export async function installedPlugin(
 	return resolveInstall(userId, row, pluginName);
 }
 
+/** The caller's account installs and those of the organization it acts in. */
+export const accountOrOrganizationInstalls = (organizationId: string | null) =>
+	or(
+		isNull(pluginInstalls.organizationId),
+		organizationId
+			? eq(pluginInstalls.organizationId, organizationId)
+			: undefined,
+	);
+
 export async function installRecord(
 	userId: string,
+	organizationId: string | null,
 	pluginName: string,
 	marketplace?: string,
-): Promise<{ id: string; marketplace: string; siblings: number } | null> {
+): Promise<{ id: string; marketplace: string } | null> {
 	const rows = await db
 		.select({
 			id: pluginInstalls.id,
@@ -134,6 +144,7 @@ export async function installRecord(
 				eq(pluginInstalls.userId, userId),
 				eq(pluginInstalls.pluginName, pluginName),
 				marketplace ? eq(pluginInstalls.marketplace, marketplace) : undefined,
+				accountOrOrganizationInstalls(organizationId),
 			),
 		)
 		.orderBy(asc(pluginInstalls.marketplace));
@@ -145,20 +156,7 @@ export async function installRecord(
 		);
 	}
 
-	const row = rows[0];
-	if (!row) return null;
-
-	const [{ count } = { count: 0 }] = await db
-		.select({ count: countDistinct(pluginInstalls.id) })
-		.from(pluginInstalls)
-		.where(
-			and(
-				eq(pluginInstalls.userId, userId),
-				eq(pluginInstalls.pluginName, pluginName),
-			),
-		);
-
-	return { id: row.id, marketplace: row.marketplace, siblings: count };
+	return rows[0] ?? null;
 }
 
 export async function installById(

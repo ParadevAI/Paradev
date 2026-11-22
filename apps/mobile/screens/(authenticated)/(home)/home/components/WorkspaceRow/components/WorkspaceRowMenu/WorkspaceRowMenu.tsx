@@ -19,6 +19,7 @@ export function WorkspaceRowMenu({
 	onCopyId,
 	onShare,
 	move,
+	groups,
 	children,
 }: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
@@ -64,6 +65,35 @@ export function WorkspaceRowMenu({
 						{t({ message: "Rename" })}
 					</Link.MenuAction>
 				) : null}
+				{groups ? (
+					<Link.Menu title={t({ message: "Move to group" })} icon="folder">
+						{groups.options.map((group) => (
+							<Link.MenuAction
+								key={group.tag}
+								isOn={group.tag === groups.current}
+								onPress={() => groups.onMove(group.tag)}
+							>
+								{group.name}
+							</Link.MenuAction>
+						))}
+						<Link.Menu inline>
+							<Link.MenuAction
+								icon="folder.badge.plus"
+								onPress={groups.onCreate}
+							>
+								{t({ message: "Create new group" })}
+							</Link.MenuAction>
+						</Link.Menu>
+					</Link.Menu>
+				) : null}
+				{groups?.current ? (
+					<Link.MenuAction
+						icon="folder.badge.minus"
+						onPress={() => groups.onMove(null)}
+					>
+						{t({ message: "Ungroup" })}
+					</Link.MenuAction>
+				) : null}
 				{move && (move.canMoveToCloud || move.computers.length > 0) ? (
 					<Link.Menu
 						title={t({ message: "Move to" })}
@@ -95,16 +125,6 @@ export function WorkspaceRowMenu({
 						) : null}
 					</Link.Menu>
 				) : null}
-				{canDelete && isCloud ? (
-					<Link.MenuAction icon="archivebox" onPress={onDelete}>
-						{t({ message: "Archive" })}
-					</Link.MenuAction>
-				) : null}
-				{canDelete && !isCloud ? (
-					<Link.MenuAction icon="trash" destructive onPress={onDelete}>
-						{t({ message: "Delete" })}
-					</Link.MenuAction>
-				) : null}
 				<Link.Menu inline>
 					<Link.MenuAction icon="doc.on.doc" onPress={onCopyId}>
 						{t({ message: "Copy ID" })}
@@ -116,6 +136,19 @@ export function WorkspaceRowMenu({
 						{t({ message: "Share" })}
 					</Link.MenuAction>
 				</Link.Menu>
+				{canDelete ? (
+					<Link.Menu inline>
+						{isCloud ? (
+							<Link.MenuAction icon="archivebox" onPress={onDelete}>
+								{t({ message: "Archive" })}
+							</Link.MenuAction>
+						) : (
+							<Link.MenuAction icon="trash" destructive onPress={onDelete}>
+								{t({ message: "Delete" })}
+							</Link.MenuAction>
+						)}
+					</Link.Menu>
+				) : null}
 			</Link.Menu>
 		</Link>
 	);

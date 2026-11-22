@@ -32,7 +32,9 @@ Open **Settings → Environments** and click **New environment**. You can also p
 - **Advanced → Region**: where the sandboxes run. The default is the region nearest to you. You can set it only when you create the environment.
 - **Advanced → Visible to**: **Organization** (default) or **Only you**.
 
-Click **Create environment**. From **Settings → Environments** you can instead click **Set up with an agent**: it starts a cloud workspace where Claude installs what the project needs and writes its `.paradev/config.json`.
+An environment can also hold its own config: open it in **Settings → Environments** and edit **Config**. When it has one, its builds and cloud workspaces run it instead of the primary repository's file.
+
+Click **Create environment**. From **Settings → Environments** you can instead click **Set up with an agent**: it starts a cloud workspace where Claude installs what the project needs and writes its config.
 
 ### 2. Add variables
 

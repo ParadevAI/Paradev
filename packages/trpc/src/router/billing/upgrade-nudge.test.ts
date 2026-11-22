@@ -4,12 +4,15 @@ import {
 	type UpgradeNudgeDeps,
 	type UpgradeNudgeMessage,
 	upgradeNudgeFeatureName,
+	upgradeNudgeUrl,
 } from "./upgrade-nudge";
 
 function fakeDeps({
+	owner = true,
 	paid = false,
 	sendFails = false,
 }: {
+	owner?: boolean;
 	paid?: boolean;
 	sendFails?: boolean;
 } = {}) {
@@ -19,6 +22,10 @@ function fakeDeps({
 	const lookups: string[] = [];
 	const deps: UpgradeNudgeDeps = {
 		capture: (event) => captured.push(event.outcome),
+		isOrganizationOwner: async () => {
+			lookups.push("owner");
+			return owner;
+		},
 		isOrganizationPaid: async () => {
 			lookups.push("paid");
 			return paid;
@@ -60,7 +67,11 @@ describe("recordUpgradeIntent", () => {
 		expect(await recordUpgradeIntent(input, deps)).toBe("sent");
 		expect(captured).toEqual(["sent"]);
 		expect(sent).toEqual([
-			{ to: "ada@example.com", featureName: "Paradev Mobile" },
+			{
+				to: "ada@example.com",
+				featureName: "Paradev Mobile",
+				organizationId: "org-1",
+			},
 		]);
 	});
 
@@ -95,16 +106,39 @@ describe("recordUpgradeIntent", () => {
 		expect(captured).toEqual(["paid"]);
 	});
 
+	test("skips the nudge for a member who cannot pay", async () => {
+		const { deps, sent, captured, lookups } = fakeDeps({ owner: false });
+
+		expect(await recordUpgradeIntent(input, deps)).toBe("not_owner");
+		expect(sent).toHaveLength(0);
+		expect(lookups).toEqual(["owner"]);
+		expect(captured).toEqual(["not_owner"]);
+	});
+
+	test("skips the nudge without an active organization", async () => {
+		const { deps, sent, lookups } = fakeDeps();
+
+		expect(
+			await recordUpgradeIntent({ ...input, organizationId: null }, deps),
+		).toBe("no_organization");
+		expect(sent).toHaveLength(0);
+		expect(lookups).toEqual([]);
+	});
+
 	test("names unknown features without passing client text through", () => {
-		expect(upgradeNudgeFeatureName("invite-members")).toBe(
-			"Inviting teammates",
-		);
+		expect(upgradeNudgeFeatureName("invite-members")).toBe("team invites");
 		expect(upgradeNudgeFeatureName("cloud-workspaces")).toBe(
-			"Cloud workspaces",
+			"cloud workspaces",
 		);
-		expect(upgradeNudgeFeatureName("voice_mode")).toBe("Voice mode");
+		expect(upgradeNudgeFeatureName("voice_mode")).toBe("voice mode");
 		expect(upgradeNudgeFeatureName("<a href=x>win</a>")).toBe("a Pro feature");
 		expect(upgradeNudgeFeatureName("__proto__")).toBe("a Pro feature");
-		expect(upgradeNudgeFeatureName("constructor")).toBe("Constructor");
+		expect(upgradeNudgeFeatureName("constructor")).toBe("constructor");
+	});
+
+	test("links to the billing page of the organization that hit the paywall", () => {
+		expect(upgradeNudgeUrl("https://app.paradev.com", "org-1")).toBe(
+			"https://app.paradev.com/settings/billing?organization=org-1",
+		);
 	});
 });

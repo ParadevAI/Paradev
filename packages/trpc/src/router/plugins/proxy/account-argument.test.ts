@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
+import { at } from "../../../../test/at";
 import {
 	accountArgName,
 	accountInstructions,
@@ -9,10 +10,9 @@ import {
 	withoutStaleAccountArgument,
 } from "./account-argument";
 
-const accounts = [
-	{ connectionId: "id-work", userLabel: "work" },
-	{ connectionId: "id-personal", userLabel: "satya@gmail.com" },
-];
+const work = { connectionId: "id-work", userLabel: "work" };
+const personal = { connectionId: "id-personal", userLabel: "satya@gmail.com" };
+const accounts = [work, personal];
 
 function everywhere(
 	tools: readonly Tool[],
@@ -36,7 +36,7 @@ function tool(overrides: Partial<Tool> = {}): Tool {
 
 describe("accountLabel", () => {
 	test("is the provider's label, or the id when there is none", () => {
-		expect(accountLabel(accounts[1])).toBe("satya@gmail.com");
+		expect(accountLabel(personal)).toBe("satya@gmail.com");
 		expect(accountLabel({ connectionId: "id-bare" })).toBe("id-bare");
 	});
 
@@ -111,17 +111,15 @@ describe("accountArgName", () => {
 
 describe("withAccountArgument", () => {
 	test("adds a required enum of the account ids and keeps the rest", () => {
-		const [injected] = withAccountArgument(
-			[tool()],
-			everywhere([tool()]),
-			"superset_account",
+		const injected = at(
+			withAccountArgument([tool()], everywhere([tool()]), "superset_account"),
 		);
 		const properties = injected.inputSchema.properties as Record<
 			string,
 			Record<string, unknown>
 		>;
 
-		expect(properties.superset_account.enum).toEqual([
+		expect(properties.superset_account?.enum).toEqual([
 			"id-work",
 			"id-personal",
 		]);
@@ -130,14 +128,12 @@ describe("withAccountArgument", () => {
 	});
 
 	test("names each account in the description so its label can be matched", () => {
-		const [injected] = withAccountArgument(
-			[tool()],
-			everywhere([tool()]),
-			"superset_account",
+		const injected = at(
+			withAccountArgument([tool()], everywhere([tool()]), "superset_account"),
 		);
 		const description = (
 			injected.inputSchema.properties as Record<string, { description: string }>
-		).superset_account.description;
+		).superset_account?.description;
 
 		expect(description).toContain("id-work (work)");
 		expect(description).toContain("id-personal (satya@gmail.com)");
@@ -145,10 +141,8 @@ describe("withAccountArgument", () => {
 
 	test("gives a tool with no properties block one", () => {
 		const bare = tool({ inputSchema: { type: "object" } });
-		const [injected] = withAccountArgument(
-			[bare],
-			everywhere([bare]),
-			"superset_account",
+		const injected = at(
+			withAccountArgument([bare], everywhere([bare]), "superset_account"),
 		);
 
 		expect(injected.inputSchema.properties).toHaveProperty("superset_account");
@@ -163,10 +157,8 @@ describe("withAccountArgument", () => {
 				additionalProperties: false,
 			},
 		});
-		const [injected] = withAccountArgument(
-			[strict],
-			everywhere([strict]),
-			"superset_account",
+		const injected = at(
+			withAccountArgument([strict], everywhere([strict]), "superset_account"),
 		);
 
 		expect(injected.inputSchema.additionalProperties).toBe(false);
@@ -178,17 +170,19 @@ describe("withAccountArgument", () => {
 		const exclusive = tool({ name: "admin_only" });
 		const byTool = new Map([
 			[shared.name, accounts],
-			[exclusive.name, [accounts[1]]],
+			[exclusive.name, [personal]],
 		]);
 
-		const [first, second] = withAccountArgument(
+		const tools = withAccountArgument(
 			[shared, exclusive],
 			byTool,
 			"superset_account",
 		);
+		const first = at(tools, 0);
+		const second = at(tools, 1);
 		const enumOf = (t: Tool) =>
 			(t.inputSchema.properties as Record<string, { enum: string[] }>)
-				.superset_account.enum;
+				.superset_account?.enum;
 
 		expect(enumOf(first)).toEqual(["id-work", "id-personal"]);
 		expect(enumOf(second)).toEqual(["id-personal"]);
@@ -197,10 +191,8 @@ describe("withAccountArgument", () => {
 	test("leaves a tool alone when no account claims it", () => {
 		const orphan = tool({ name: "orphan" });
 
-		const [injected] = withAccountArgument(
-			[orphan],
-			new Map(),
-			"superset_account",
+		const injected = at(
+			withAccountArgument([orphan], new Map(), "superset_account"),
 		);
 
 		expect(injected.inputSchema.properties).not.toHaveProperty(
@@ -221,7 +213,10 @@ describe("withAccountArgument", () => {
 			"superset_account",
 		);
 
-		expect(twice[0].inputSchema.required).toEqual(["body", "superset_account"]);
+		expect(at(twice).inputSchema.required).toEqual([
+			"body",
+			"superset_account",
+		]);
 	});
 });
 
