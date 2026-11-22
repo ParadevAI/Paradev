@@ -218,7 +218,7 @@ describe("gitRouter.push", () => {
 		expect(upstream).toBe("origin/feature-x");
 	});
 
-	describe("fork tracked by URL, as `gh pr checkout` leaves it", () => {
+	describe("fork branch with no remote-tracking ref", () => {
 		let fork: string;
 		let forkUrl: string;
 
@@ -230,9 +230,12 @@ describe("gitRouter.push", () => {
 			await git.push([forkUrl, "main:refs/heads/feature-x"]);
 		});
 
-		async function checkoutTrackingFork(localBranch: string) {
+		async function checkoutTrackingFork(
+			localBranch: string,
+			trackedRemote = forkUrl,
+		) {
 			await git.checkoutBranch(localBranch, "main");
-			await git.raw(["config", `branch.${localBranch}.remote`, forkUrl]);
+			await git.raw(["config", `branch.${localBranch}.remote`, trackedRemote]);
 			await git.raw([
 				"config",
 				`branch.${localBranch}.merge`,
@@ -243,7 +246,10 @@ describe("gitRouter.push", () => {
 			await git.commit("review fix");
 		}
 
-		async function expectPushedToForkOnly(localBranch: string) {
+		async function expectPushedToForkOnly(
+			localBranch: string,
+			expectedRemote = forkUrl,
+		) {
 			const forkSubject = await simpleGit(fork).raw([
 				"log",
 				"-1",
@@ -261,19 +267,26 @@ describe("gitRouter.push", () => {
 				"config",
 				`branch.${localBranch}.remote`,
 			]);
-			expect(trackedRemote.trim()).toBe(forkUrl);
+			expect(trackedRemote.trim()).toBe(expectedRemote);
 		}
 
-		test("pushes a same-name branch to the fork", async () => {
+		test("pushes a same-name branch to a fork tracked by URL", async () => {
 			await checkoutTrackingFork("feature-x");
 			await createCaller(repo).push({ workspaceId: "ws" });
 			await expectPushedToForkOnly("feature-x");
 		});
 
-		test("pushes a renamed branch to the linked PR head on the fork", async () => {
+		test("pushes a renamed branch to the linked PR head on a fork tracked by URL", async () => {
 			await checkoutTrackingFork("alice/feature-x");
 			await createCaller(repo, "feature-x").push({ workspaceId: "ws" });
 			await expectPushedToForkOnly("alice/feature-x");
+		});
+
+		test("pushes to a named fork remote that has no remote-tracking ref", async () => {
+			await git.addRemote("fork", fork);
+			await checkoutTrackingFork("feature-x", "fork");
+			await createCaller(repo).push({ workspaceId: "ws" });
+			await expectPushedToForkOnly("feature-x", "fork");
 		});
 	});
 
