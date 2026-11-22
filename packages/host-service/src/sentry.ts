@@ -11,22 +11,32 @@ const throttleRepeats = createSentryEventThrottle();
 
 export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
-	const dsn = process.env.HOST_SERVICE_SENTRY_DSN;
-	if (!dsn) return;
+	const sentryOptions = hostSentryOptions(process.env, options.organizationId);
+	if (!sentryOptions) return;
+	Sentry.init(sentryOptions);
+	initialized = true;
+}
+
+export function hostSentryOptions(
+	env: NodeJS.ProcessEnv,
+	organizationId: string | undefined,
+): Sentry.NodeOptions | null {
+	const dsn = env.HOST_SERVICE_SENTRY_DSN;
+	if (!dsn) return null;
 	const tags = {
 		service: "host-service",
-		organization_id: options.organizationId,
-		run_mode: process.env.SUPERSET_HOST_RUN_MODE,
-		cloud_workspace_id: process.env.SUPERSET_SANDBOX_WORKSPACE_ID,
-		image_tag: process.env.SUPERSET_SANDBOX_IMAGE_TAG,
-		provider: process.env.SUPERSET_SANDBOX_PROVIDER,
+		organization_id: organizationId,
+		run_mode: env.SUPERSET_HOST_RUN_MODE,
+		cloud_workspace_id: env.SUPERSET_SANDBOX_WORKSPACE_ID,
+		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
+		provider: env.SUPERSET_SANDBOX_PROVIDER,
 	};
-	Sentry.init({
+	return {
 		dsn,
 		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
-		enableLogs: process.env.SUPERSET_SANDBOX_BOX_LOGS === "1",
-		release: process.env.HOST_SERVICE_SENTRY_RELEASE,
-		environment: process.env.HOST_SERVICE_SENTRY_ENVIRONMENT,
+		enableLogs: env.SUPERSET_SANDBOX_BOX_LOGS === "1",
+		release: env.HOST_SERVICE_SENTRY_RELEASE,
+		environment: env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		// A host that fails once usually fails in a loop: git.getStatus alone
 		// sent 135k copies of one `spawn EBADF` from seven machines last month.
 		beforeSend: throttleRepeats,
@@ -38,8 +48,7 @@ export function initSentry(options: { organizationId?: string }): void {
 			}),
 		],
 		initialScope: { tags, attributes: tags },
-	});
-	initialized = true;
+	};
 }
 
 type BoxAgentId = BuiltinAgentId | "custom";
