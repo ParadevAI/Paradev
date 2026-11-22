@@ -60,9 +60,20 @@ download_tarball() {
 
     info "Downloading $url"
     tmp="$(mktemp -t superset-install.XXXXXX)"
-    if ! curl -fsSL -o "$tmp" "$url"; then
-        rm -f "$tmp"
-        error "Failed to download $url"
+    if ! http_status=$(curl -fsSL -w '%{http_code}' -o "$tmp" "$url"); then
+        if [ "$fallback_latest" = true ] && [ "$http_status" = "404" ] \
+            && [ "$TAG" != "latest" ] && [ "$TAG" != "cli-latest" ]; then
+            warn "Release $TAG has no CLI archive for $target; falling back to cli-latest"
+            url="https://github.com/${REPO}/releases/download/cli-latest/${tarball}"
+            info "Downloading $url"
+            if ! curl -fsSL -o "$tmp" "$url"; then
+                rm -f "$tmp"
+                error "Failed to download $url"
+            fi
+        else
+            rm -f "$tmp"
+            error "Failed to download $url"
+        fi
     fi
     echo "$tmp"
 }
@@ -127,6 +138,15 @@ update_path() {
 }
 
 main() {
+    fallback_latest=false
+    no_next_steps=false
+    for arg in "$@"; do
+        case "$arg" in
+            --fallback-latest) fallback_latest=true ;;
+            --no-next-steps) no_next_steps=true ;;
+        esac
+    done
+
     printf "${BOLD}Installing Paradev CLI${RESET}\n\n"
 
     target="$(detect_target)"
@@ -150,7 +170,7 @@ main() {
 
     printf "\n${GREEN}${BOLD}Installed!${RESET}\n"
     # `superset hosts add` signs the machine in itself, so it skips this advice.
-    if [ "${1:-}" = "--no-next-steps" ]; then
+    if [ "$no_next_steps" = true ]; then
         return
     fi
     printf "Run ${BOLD}exec \$SHELL${RESET} (or open a new terminal) to load the updated PATH.\n"
