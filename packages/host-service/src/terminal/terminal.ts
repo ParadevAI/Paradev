@@ -79,6 +79,7 @@ import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
+import { repaintNudgeIntermediateSize } from "./repaint-nudge.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
 import {
 	getShellReadyMarkerEvidence,
@@ -1678,19 +1679,23 @@ function deliverOutput(session: TerminalSession, bytes: Uint8Array) {
 }
 
 /**
- * Force the running program to repaint by toggling the PTY one row smaller
- * and back — two real SIGWINCHes (a same-dims resize emits none). Used after
- * a reanchor attach, where the renderer may hold a stale frame that only the
- * program itself can faithfully redraw (the v1 terminal-host's proven
- * recipe; never synthesize screen content the tracker may not have — #6290).
+ * Force the running program to repaint by toggling the PTY one column and
+ * one row smaller and back — two real SIGWINCHes (a same-dims resize emits
+ * none). Used after a reanchor attach, where the renderer may hold a stale
+ * frame that only the program itself can faithfully redraw (the v1
+ * terminal-host's proven recipe; never synthesize screen content the tracker
+ * may not have — #6290).
  */
 function nudgeRepaint(session: TerminalSession) {
 	if (!isCurrentLiveSession(session)) return;
 	const { cols, rows } = session;
-	// Shrink by a row, growing instead when already at the minimum.
-	const toggledRows = rows > MIN_TERMINAL_ROWS ? rows - 1 : rows + 1;
+	const intermediate = repaintNudgeIntermediateSize(
+		cols,
+		rows,
+		MIN_TERMINAL_ROWS,
+	);
 	const generation = session.resizeGeneration;
-	session.pty.resize(cols, toggledRows);
+	session.pty.resize(intermediate.cols, intermediate.rows);
 	setTimeout(() => {
 		// A real client resize landed mid-nudge; it owns the dims now.
 		if (!isCurrentLiveSession(session)) return;
