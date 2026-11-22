@@ -20,7 +20,7 @@ export function AppStoreQr({ className, label }: AppStoreQrProps) {
 			aria-label={label}
 			aria-hidden={label ? undefined : true}
 			className={cn("shrink-0 bg-white [&>svg]:size-full", className)}
-			// biome-ignore lint/security/noDangerouslySetInnerHTML: SVG generated at module load from a constant URL
+			// biome-ignore lint/security/noDangerouslySetInnerHtml: SVG generated at module load from a constant URL
 			dangerouslySetInnerHTML={{ __html: QR_SVG }}
 		/>
 	);

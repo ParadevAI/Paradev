@@ -30,7 +30,7 @@ Paradev and RunPane both run CLI coding agents in parallel, one Git worktree per
 | Orchestration | CLI, TypeScript SDK, and MCP server | Sessions orchestrator chat, `runpane` CLI, and MCP server |
 | Scheduling | Pro automations with run history and retry | Agent loops through the CLI; see their docs |
 | Remote hosts | Hosts connected through a relay, with access granted per member (Pro); [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) on your own Linux server; [cloud workspaces](https://docs.paradev.com/cloud-workspaces) | Self-hosted Remote Pane daemon over Tailscale, SSH tunnel, or HTTPS |
-| Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; Android waitlist | Remote Pane browser app (PWA); native companion app in beta |
+| Phone | iPhone and iPad app on the App Store, iOS or iPadOS 26+, Pro; Android app on Google Play, Pro | Remote Pane browser app (PWA); native companion app in beta |
 | Account | Sign-in required | No account required |
 | Pricing | Free; Pro {{price:pro}}/user/month or {{price:pro:yearly}} billed yearly; Team {{price:team}} or {{price:team:yearly}} billed yearly; Ultra {{price:ultra}}; Enterprise custom | Free; no paid plan |
 | License | Open source, MIT | Open source, AGPL-3.0 |
@@ -53,7 +53,7 @@ Both show diffs per task. RunPane puts Git actions on keyboard shortcuts, includ
 
 RunPane's Remote Pane is a self-hosted daemon. The host owns the repos, worktrees, and agent processes, and the UI runs on desktop Pane or a browser app. You connect over Tailscale, SSH tunnels, or HTTPS. A native phone app is in beta, and RunPane also points users to Claude Code's Remote Control.
 
-Paradev connects hosts through a relay, and on Pro an admin can grant access to a host per team member. The [iPhone and iPad app](/mobile) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Pro. From it you can check on agents, send instructions, and review diffs, and a Lock Screen Live Activity shows agent progress. Push notifications are coming. Android is on the waitlist.
+Paradev connects hosts through a relay, and on Pro an admin can grant access to a host per team member. The [iPhone and iPad app](/mobile) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Pro. From it you can check on agents, send instructions, and review diffs, and a Lock Screen Live Activity shows agent progress. Push notifications are coming. The Android app is on [Google Play](https://play.google.com/store/apps/details?id=com.paradev.mobile).
 
 ## Can either one run agents on a schedule?
 

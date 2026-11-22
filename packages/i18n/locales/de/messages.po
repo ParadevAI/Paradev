@@ -4386,13 +4386,13 @@ msgid "Check for Updates..."
 msgstr "Nach Updates suchen..."
 
 msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
-msgstr "Behalte deine Agents mit unserer mobilen App von überall im Blick. Starte Arbeit auf deinem Computer, in der Cloud oder auf einem Remote-Rechner. Mit nativen Ansichten für PRs, Diffs und Pages."
+msgstr "Behalte deine Agenten mit unserer mobilen App von überall im Blick. Starte Arbeit auf deinem Computer, in der Cloud oder auf einem Remote-Rechner. Mit nativen Ansichten für PRs, Diffs und Pages."
 
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "Behalte Agenten im Blick und prüfe ihre Arbeit auf iPhone, iPad oder Android."
 
 msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
-msgstr "Prüfe laufende Agents und lies auf deinem iPhone, iPad oder Android-Smartphone, was sie geändert haben."
+msgstr "Prüfe laufende Agenten und lies auf deinem iPhone, iPad oder Android-Smartphone, was sie geändert haben."
 
 msgid "Check plans and balances"
 msgstr "Pläne und Guthaben prüfen"
@@ -19379,7 +19379,7 @@ msgid "Start building in two."
 msgstr "In zwei Schritten loslegen."
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
-msgstr "Coding-Agents starten, live verfolgen und den Diff auf iPhone, iPad oder Android-Smartphone prüfen. Im App Store und bei Google Play erhältlich."
+msgstr "Coding-Agenten starten, live verfolgen und den Diff auf iPhone, iPad oder Android-Smartphone prüfen. Im App Store und bei Google Play erhältlich."
 
 msgid "Start date"
 msgstr "Startdatum"

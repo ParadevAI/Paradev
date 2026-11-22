@@ -4386,13 +4386,13 @@ msgid "Check for Updates..."
 msgstr "檢查更新..."
 
 msgid "Check in on your agents from anywhere with our mobile app. Start work on your computer, cloud or remote machine. Comes with native PR, diff, and page viewer."
-msgstr "用我們的行動應用程式隨時隨地查看 agent。在你的電腦、雲端或遠端機器上開始工作。內建原生的 PR、diff 和頁面檢視器。"
+msgstr "用我們的行動應用程式隨時隨地查看代理程式。在你的電腦、雲端或遠端機器上開始工作。內建原生的 PR、diff 和頁面檢視器。"
 
 msgid "Check on agents and review their work from iPhone, iPad, or Android."
 msgstr "在 iPhone、iPad 或 Android 上查看代理程式並審查它們的工作。"
 
 msgid "Check on running agents and read what they changed from your iPhone, iPad, or Android phone."
-msgstr "在 iPhone、iPad 或 Android 手機上查看執行中的 agent，並閱讀它們做出的變更。"
+msgstr "在 iPhone、iPad 或 Android 手機上查看執行中的代理程式，並閱讀它們做出的變更。"
 
 msgid "Check plans and balances"
 msgstr "查看方案和餘額"
@@ -19379,7 +19379,7 @@ msgid "Start building in two."
 msgstr "兩步開始建置。"
 
 msgid "Start coding agents, follow them live, and review the diff from your iPhone, iPad, or Android phone. Available on the App Store and Google Play."
-msgstr "在 iPhone、iPad 或 Android 手機上啟動程式設計 agent、即時追蹤並審查差異。已在 App Store 和 Google Play 上架。"
+msgstr "在 iPhone、iPad 或 Android 手機上啟動程式設計代理程式、即時追蹤並審查差異。已在 App Store 和 Google Play 上架。"
 
 msgid "Start date"
 msgstr "開始日期"
