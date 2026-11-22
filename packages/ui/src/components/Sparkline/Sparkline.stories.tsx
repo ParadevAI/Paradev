@@ -33,3 +33,13 @@ export const Narrow: Story = {
 		),
 	],
 };
+
+export const Wide: Story = {
+	decorators: [
+		(Story) => (
+			<div className="w-80">
+				<Story />
+			</div>
+		),
+	],
+};
