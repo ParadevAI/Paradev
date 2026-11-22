@@ -8,18 +8,10 @@ import {
 import { availableParallelism, uptime } from "node:os";
 import { join } from "node:path";
 import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
-
-export type MemguardAction =
-	| {
-			kind: "reap";
-			at: number;
-			processName: string;
-			rssMb: number;
-			adj: number;
-			availableMb: number;
-			floorMb: number;
-	  }
-	| { kind: "pressure"; at: number; availableMb: number; floorMb: number };
+import {
+	type MemguardAction,
+	parseMemguardAction,
+} from "@superset/shared/sandbox/memguard-log";
 
 export interface BoxResources {
 	vcpus: number;
@@ -64,10 +56,6 @@ export function parsePressure(
 	return lines.some ? { some: lines.some, full: lines.full ?? null } : null;
 }
 
-const REAP_LINE =
-	/^(\d+) memguard reap pid=\d+ (.+?) rss=(\d+)MB adj=(-?\d+) available=(\d+)MB drop=\d+MB floor=(\d+)MB$/;
-const PRESSURE_LINE =
-	/^(\d+) memguard pressure available=(\d+)MB floor=(\d+)MB nothing to reap$/;
 const START_LINE = /^\d+ memguard start /;
 const STAMPED_LINE = /^(\d+) memguard /;
 
@@ -78,26 +66,7 @@ function classifyLine(
 	if (START_LINE.test(line)) return "stop";
 	const stamp = STAMPED_LINE.exec(line);
 	if (stamp && Number(stamp[1]) < notBefore) return "stop";
-	const reap = REAP_LINE.exec(line);
-	if (reap) {
-		return {
-			kind: "reap",
-			at: Number(reap[1]),
-			processName: reap[2] ?? "",
-			rssMb: Number(reap[3]),
-			adj: Number(reap[4]),
-			availableMb: Number(reap[5]),
-			floorMb: Number(reap[6]),
-		};
-	}
-	const pressure = PRESSURE_LINE.exec(line);
-	if (!pressure) return null;
-	return {
-		kind: "pressure",
-		at: Number(pressure[1]),
-		availableMb: Number(pressure[2]),
-		floorMb: Number(pressure[3]),
-	};
+	return parseMemguardAction(line);
 }
 
 export function readMemguardActions(

@@ -2,8 +2,9 @@ import {
 	BOX_PRESSURE_HEARTBEAT_MS,
 	type BoxPressure,
 } from "@superset/shared/box-pressure";
+import type { MemguardAction } from "@superset/shared/sandbox/memguard-log";
 import { logBoxEvent } from "../../sentry";
-import type { BoxResources, MemguardAction } from "../box-resources";
+import type { BoxResources } from "../box-resources";
 import { type BoxPressureState, nextBoxPressure } from "./box-pressure-level";
 
 const SAMPLE_MS = 5_000;
@@ -34,7 +35,6 @@ function logMemguardAction(action: MemguardAction, limitMb: number): void {
 		"box.reaped",
 		{
 			"log.source": "memguard",
-			"reap.process": action.processName,
 			"reap.class": reapClass(action.adj),
 			"reap.rss_mb": action.rssMb,
 			...memory,
@@ -102,11 +102,18 @@ export function startSandboxBoxPressureReporter(args: {
 	const tick = () => {
 		const sample = args.read();
 		if (!sample) return;
-		for (const action of sample.memguardActions) {
-			if (action.at <= loggedMemguardAt) continue;
-			loggedMemguardAt = action.at;
-			logMemguardAction(action, sample.memoryLimitMb);
+		const fresh = sample.memguardActions.filter(
+			(action) => action.at > loggedMemguardAt,
+		);
+		const newestPressure = fresh
+			.filter((action) => action.kind === "pressure")
+			.at(-1);
+		for (const action of fresh) {
+			if (action.kind === "reap" || action === newestPressure) {
+				logMemguardAction(action, sample.memoryLimitMb);
+			}
 		}
+		loggedMemguardAt = fresh.at(-1)?.at ?? loggedMemguardAt;
 		if (inFlight || now() < retryAt) return;
 		const at = now();
 		state = nextBoxPressure(state, sample, at);

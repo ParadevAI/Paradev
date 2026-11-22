@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLOUD_AGENT_LAUNCH_ENV_NAMES } from "@superset/shared/cloud-agent-launch";
+import { BOOT_PHASE_FAMILIES } from "@superset/shared/sandbox/boot-stamps";
+import { parseMemguardAction } from "@superset/shared/sandbox/memguard-log";
 
 const boot = readFileSync(
 	join(import.meta.dir, "../bundle/rootfs/usr/local/bin/superset-boot"),
@@ -103,5 +105,50 @@ describe("superset-boot", () => {
 		...CLOUD_AGENT_LAUNCH_ENV_NAMES,
 	])("hands %s to host-service", (name) => {
 		expect(boot).toMatch(new RegExp(`\\b${name}\\b`));
+	});
+});
+
+describe("the log lines host-service reads", () => {
+	test("every phase superset-boot stamps is in a family host-service sends", () => {
+		const families = [...boot.matchAll(/\bstamp "([a-z][a-z0-9-]*)\./g)].map(
+			(match) => match[1],
+		);
+		expect(families.length).toBeGreaterThan(30);
+		expect(boot).not.toMatch(/\bstamp (\$|[^"])/);
+		for (const family of new Set(families)) {
+			expect(BOOT_PHASE_FAMILIES).toContain(family as never);
+		}
+	});
+
+	test("memguard's own reap and pressure lines parse in host-service", () => {
+		const log = /^log\(\) \{.*\}$/m.exec(memguard)?.[0];
+		const reap = /^\s*log "reap [^"]*"/m.exec(memguard)?.[0];
+		const pressure = /log "pressure [^"]*"/.exec(memguard)?.[0];
+		expect([log, reap, pressure]).not.toContain(undefined);
+		const script = [
+			log,
+			"declare -A CLASS=([9]='Web Content') RSS_KB=([9]=3174400) ADJ=([9]=-300)",
+			"victim=9 mem_avail=512000 drop=204800 floor=665600",
+			reap,
+			pressure,
+		].join("\n");
+		const run = Bun.spawnSync(["bash", "-c", script]);
+		const lines = run.stdout.toString().trim().split("\n");
+		expect(lines.map(parseMemguardAction)).toEqual([
+			{
+				kind: "reap",
+				at: expect.any(Number),
+				rssMb: 3100,
+				adj: -300,
+				availableMb: 500,
+				floorMb: 650,
+			},
+			{
+				kind: "pressure",
+				at: expect.any(Number),
+				availableMb: 500,
+				floorMb: 650,
+			},
+		]);
 	});
 });

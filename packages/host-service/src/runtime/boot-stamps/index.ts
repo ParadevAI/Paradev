@@ -1,7 +1,7 @@
 export {
-	bootPhaseLogger,
 	processStartedAt,
 	readBootStamps,
 	recordBootStamp,
 	type SandboxBootReport,
+	startSandboxBootPhaseLog,
 } from "./boot-stamps";

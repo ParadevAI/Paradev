@@ -15,11 +15,11 @@ function reapLine(at: number, name: string): string {
 	return `${at} memguard reap pid=9 ${name} rss=3100MB ${REAP_TAIL}`;
 }
 
-function lastReapName(path: string, notBefore = 0): string | undefined {
+function lastReapRss(path: string, notBefore = 0): number | undefined {
 	const reaps = readMemguardActions(path, notBefore).filter(
 		(action) => action.kind === "reap",
 	);
-	return reaps.at(-1)?.processName;
+	return reaps.at(-1)?.rssMb;
 }
 const roots: string[] = [];
 
@@ -111,7 +111,6 @@ describe("readBoxResources", () => {
 			{
 				kind: "reap",
 				at: NOW - 30_000,
-				processName: "tsc",
 				rssMb: 3100,
 				adj: 500,
 				availableMb: 500,
@@ -152,8 +151,8 @@ test("parsePressure reads the some and full lines", () => {
 	});
 });
 
-test("readMemguardActions reads a process name with spaces", () => {
-	expect(lastReapName(logFile(reapLine(1, "Web Content")))).toBe("Web Content");
+test("readMemguardActions reads a kill of a process whose name has spaces", () => {
+	expect(lastReapRss(logFile(reapLine(1, "Web Content")))).toBe(3100);
 });
 
 test("readMemguardActions ignores a reap from before memguard last started", () => {
@@ -171,7 +170,7 @@ test("readMemguardActions ignores a reap from an earlier session of the box", ()
 test("readMemguardActions finds a kill buried under more than one chunk of rank lines", () => {
 	const rank = `${NOW} memguard rank pid=7 node 0->500\n`.repeat(4000);
 	const path = logFile(`${reapLine(NOW - 1, "tsc")}\n${rank}`);
-	expect(lastReapName(path)).toBe("tsc");
+	expect(lastReapRss(path)).toBe(3100);
 });
 
 test("readMemguardActions reads a kill line split across a chunk boundary", () => {
@@ -183,5 +182,5 @@ test("readMemguardActions reads a kill line split across a chunk boundary", () =
 	const contents = reap + after;
 	const boundary = contents.length - chunk;
 	expect(boundary > 0 && boundary < reap.length).toBe(true);
-	expect(lastReapName(logFile(contents))).toBe("tsc");
+	expect(lastReapRss(logFile(contents))).toBe(3100);
 });

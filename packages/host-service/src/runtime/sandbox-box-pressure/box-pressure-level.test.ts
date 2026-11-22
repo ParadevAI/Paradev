@@ -48,7 +48,6 @@ describe("nextBoxPressure", () => {
 		const reap = {
 			kind: "reap" as const,
 			at: 0,
-			processName: "next-server",
 			rssMb: 4700,
 			adj: 500,
 			availableMb: 500,

@@ -14,9 +14,9 @@ import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
 import {
-	bootPhaseLogger,
 	processStartedAt,
 	recordBootStamp,
+	startSandboxBootPhaseLog,
 } from "./runtime/boot-stamps";
 import { caught } from "./runtime/box-log-filter";
 import { readSandboxBoxResources } from "./runtime/box-resources";
@@ -30,12 +30,10 @@ import { startVitalsLog } from "./runtime/vitals";
 import { detachFromLaunchDirectory } from "./runtime/working-directory";
 import { installProcessSafetyNet, installUpgradeSocketGuard } from "./safety";
 import { configureSelfUpdater } from "./self-update";
-import { captureFatalStartupError, initSentry } from "./sentry";
+import { boxLogsEnabled, captureFatalStartupError, initSentry } from "./sentry";
 import { startTerminalBaseEnvResolution } from "./terminal/env";
 import { startTerminalReaper } from "./terminal/reaper";
 import { connectRelay, type TunnelClient } from "./tunnel";
-
-const BOOT_PHASE_CHECK_MS = 5_000;
 
 async function main(): Promise<void> {
 	installConsoleTimestamps();
@@ -207,10 +205,9 @@ async function main(): Promise<void> {
 				hostSecret: env.HOST_SERVICE_SECRET,
 				read: readSandboxBoxResources,
 			});
-			setInterval(
-				bootPhaseLogger(SANDBOX_PATHS.bootLog),
-				BOOT_PHASE_CHECK_MS,
-			).unref();
+			if (boxLogsEnabled()) {
+				startSandboxBootPhaseLog({ path: SANDBOX_PATHS.bootLog });
+			}
 			startSandboxKeepalive({
 				keepalive: (pingsEveryMs) =>
 					api.sandbox.keepalive.mutate({ pingsEveryMs }),

@@ -1,5 +1,7 @@
 import { appendFileSync, readFileSync, statSync } from "node:fs";
 import {
+	BOOT_PHASE_FAMILIES,
+	type BootPhase,
 	type BootStamp,
 	parseBootStamps,
 } from "@superset/shared/sandbox/boot-stamps";
@@ -24,7 +26,7 @@ function bootLogPath(): string | undefined {
 }
 
 /** Appends a phase to the boot log; a host without one (every non-sandbox host) records nothing. */
-export function recordBootStamp(phase: string, at = Date.now()): void {
+export function recordBootStamp(phase: BootPhase, at = Date.now()): void {
 	const path = bootLogPath();
 	if (!path) return;
 	try {
@@ -56,19 +58,38 @@ export function readBootStamps(): BootStamp[] {
 	return path ? readStamps(path) : [];
 }
 
-/** Each call logs the current boot's stamps not logged yet; the log is parsed again only when it grows. */
-export function bootPhaseLogger(path: string): () => void {
+const BOOT_PHASE_CHECK_MS = 5_000;
+const BOOT_PHASE_MAX_LENGTH = 40;
+
+/** boot.log also holds raw step output, so a line that only looks like a stamp must not leave. */
+function isOwnPhase(phase: string): boolean {
+	const family = phase.slice(0, phase.indexOf("."));
+	return (
+		phase.length <= BOOT_PHASE_MAX_LENGTH &&
+		(BOOT_PHASE_FAMILIES as readonly string[]).includes(family)
+	);
+}
+
+/** Logs each stamp of the current boot once; the log is parsed again only when it grows. */
+export function startSandboxBootPhaseLog(args: {
+	path: string;
+	every?: (tick: () => void, ms: number) => () => void;
+}): () => void {
 	let size = -1;
-	let logged: BootStamp[] = [];
-	return () => {
-		const current = statSync(path, { throwIfNoEntry: false })?.size ?? 0;
+	const logged = new Set<string>();
+	const tick = () => {
+		const current = statSync(args.path, { throwIfNoEntry: false })?.size ?? 0;
 		if (current === size) return;
 		size = current;
-		const stamps = readStamps(path);
+		const stamps = readStamps(args.path).filter((stamp) =>
+			isOwnPhase(stamp.phase),
+		);
 		const start = stamps[0];
 		if (!start) return;
-		const sameBoot = logged[0]?.at === start.at;
-		for (const stamp of sameBoot ? stamps.slice(logged.length) : stamps) {
+		for (const stamp of stamps) {
+			const key = `${stamp.at} ${stamp.phase}`;
+			if (logged.has(key)) continue;
+			logged.add(key);
 			logBoxEvent("boot.phase", {
 				"log.source": "boot",
 				"boot.phase": stamp.phase,
@@ -76,6 +97,13 @@ export function bootPhaseLogger(path: string): () => void {
 				"boot.ms": stamp.at - start.at,
 			});
 		}
-		logged = stamps;
 	};
+	const every =
+		args.every ??
+		((run: () => void, ms: number) => {
+			const timer = setInterval(run, ms);
+			timer.unref?.();
+			return () => clearInterval(timer);
+		});
+	return every(tick, BOOT_PHASE_CHECK_MS);
 }

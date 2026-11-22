@@ -7,6 +7,27 @@ export interface BootStamp {
 	at: number;
 }
 
+/** The first segment of every phase `superset-boot` and host-service stamp; a test holds the script to it. */
+export const BOOT_PHASE_FAMILIES = [
+	"agents",
+	"assets",
+	"boot",
+	"bundle",
+	"checkout",
+	"desktop",
+	"hook",
+	"host",
+	"hostdb",
+	"memguard",
+	"resources",
+	"rootfs",
+	"run",
+	"steps",
+	"workspace",
+] as const;
+
+export type BootPhase = `${(typeof BOOT_PHASE_FAMILIES)[number]}.${string}`;
+
 const BOOT_START = "boot.start";
 /** `<epoch ms> <phase> [detail]`; the runner's own lines (`setup …`) carry no phase and are skipped below. */
 const STAMP_LINE = /^(\d{13}) ([a-z][a-z0-9-]*(?:\.[a-z0-9-]+)+)(?: .*)?$/;

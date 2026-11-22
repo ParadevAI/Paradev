@@ -209,6 +209,10 @@
 			"types": "./src/sandbox/build-errors.ts",
 			"default": "./src/sandbox/build-errors.ts"
 		},
+		"./sandbox/memguard-log": {
+			"types": "./src/sandbox/memguard-log.ts",
+			"default": "./src/sandbox/memguard-log.ts"
+		},
 		"./sandbox/contract": {
 			"types": "./src/sandbox/contract.ts",
 			"default": "./src/sandbox/contract.ts"

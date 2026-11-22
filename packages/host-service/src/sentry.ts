@@ -11,6 +11,14 @@ let initialized = false;
 // instance rather than one per call.
 const throttleRepeats = createSentryEventThrottle();
 
+/** Whether this host sends box logs: a cloud box whose organization has `sandbox-box-logs`. */
+export function boxLogsEnabled(env = process.env): boolean {
+	return (
+		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
+		env.SUPERSET_SANDBOX_BOX_LOGS === "1"
+	);
+}
+
 export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
 	const sentryOptions = hostSentryOptions(process.env, options.organizationId);
@@ -33,9 +41,7 @@ export function hostSentryOptions(
 		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
 		provider: env.SUPERSET_SANDBOX_PROVIDER,
 	};
-	const boxLogs =
-		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
-		env.SUPERSET_SANDBOX_BOX_LOGS === "1";
+	const boxLogs = boxLogsEnabled(env);
 	return {
 		dsn,
 		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
@@ -100,7 +106,6 @@ interface BoxEventAttributes {
 	};
 	"box.reaped": {
 		"log.source": "memguard";
-		"reap.process": string;
 		"reap.class": "box" | "session" | "other";
 		"reap.rss_mb": number;
 		"memory.available_mb": number;
