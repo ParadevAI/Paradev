@@ -49,6 +49,13 @@ describe("listGitIgnoredDirs", () => {
 		expect(await listGitIgnoredDirs(dir)).toEqual([]);
 	});
 
+	test("rejects when git fails on a real repo, so callers can tell failure from nothing ignored", async () => {
+		const dir = await createRepo();
+		await writeFile(path.join(dir, ".git", "index"), "not an index");
+
+		await expect(listGitIgnoredDirs(dir)).rejects.toThrow();
+	});
+
 	test("returns [] for a missing path", async () => {
 		expect(
 			await listGitIgnoredDirs("/nonexistent/definitely-not-here"),

@@ -25,8 +25,9 @@ const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
  *
  * `under` limits the listing to those root-relative dirs, matched literally.
  *
- * Returns [] for non-git roots, timeouts, and every other failure — callers
- * degrade to the static ignore list, never block on this.
+ * Returns [] when the root is not a git worktree or does not exist. Every
+ * other failure (a timeout under attach load, a corrupt index) rejects, so
+ * callers can tell "git ignores nothing here" from "git did not answer".
  */
 export async function listGitIgnoredDirs(
 	rootPath: string,
@@ -47,7 +48,12 @@ export async function listGitIgnoredDirs(
 				"-z",
 				...(under ? ["--", ...under] : []),
 			],
-			{ timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER_BYTES },
+			{
+				timeout: TIMEOUT_MS,
+				maxBuffer: MAX_BUFFER_BYTES,
+				// isNotAWorktree matches git's untranslated messages.
+				env: { ...process.env, LC_ALL: "C" },
+			},
 		);
 		const dirs: string[] = [];
 		for (const entry of stdout.split("\0")) {
@@ -56,7 +62,16 @@ export async function listGitIgnoredDirs(
 			if (dirs.length >= MAX_IGNORED_DIRS) break;
 		}
 		return dirs;
-	} catch {
-		return [];
+	} catch (error) {
+		if (isNotAWorktree(error)) return [];
+		throw error;
 	}
+}
+
+function isNotAWorktree(error: unknown): boolean {
+	const stderr = String((error as { stderr?: unknown } | null)?.stderr ?? "");
+	return (
+		stderr.includes("not a git repository") ||
+		stderr.includes("cannot change to")
+	);
 }
