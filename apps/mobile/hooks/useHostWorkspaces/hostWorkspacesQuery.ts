@@ -14,8 +14,25 @@ export interface WorkspacesHost {
 
 const WORKSPACES_REFETCH_INTERVAL_MS = 30_000;
 
-/** Independent of the host's URL, so an offline host keeps its cached rows. */
-export function getHostWorkspacesQueryKey(machineId: string | null) {
+/**
+ * Independent of the host's URL, so an offline host keeps its cached rows.
+ * A machine can be a host in two organizations, so the key names both.
+ */
+export function getHostWorkspacesQueryKey(
+	machineId: string | null,
+	organizationId: string | null,
+) {
+	return [
+		"host-service",
+		"workspaces",
+		"list",
+		machineId,
+		organizationId,
+	] as const;
+}
+
+/** Every organization's list for one machine, for invalidating without the org. */
+export function getHostWorkspacesQueryPrefix(machineId: string | null) {
 	return ["host-service", "workspaces", "list", machineId] as const;
 }
 
@@ -43,7 +60,7 @@ export function hostWorkspacesQueryOptions(
 	list: (hostUrl: string) => Promise<HostWorkspaceRow[]>,
 ) {
 	return {
-		queryKey: getHostWorkspacesQueryKey(host.machineId),
+		queryKey: getHostWorkspacesQueryKey(host.machineId, host.organizationId),
 		enabled: host.isOnline,
 		refetchInterval: WORKSPACES_REFETCH_INTERVAL_MS,
 		retry: 1,

@@ -87,12 +87,15 @@ function createTagFolderActions({
 	const hostUrl = host.isOnline
 		? hostServiceUrl(host.organizationId, host.machineId)
 		: null;
-	const settingsKey = hostTagFoldersQueryKey(host.machineId);
+	const settingsKey = hostTagFoldersQueryKey(
+		host.machineId,
+		host.organizationId,
+	);
 
 	/** The workspace as the cache holds it now, after any wait for input. */
 	const latest = (workspace: HostWorkspaceItem): HostWorkspaceItem => {
 		const rows = queryClient.getQueryData<HostWorkspaceRow[]>(
-			getHostWorkspacesQueryKey(host.machineId),
+			getHostWorkspacesQueryKey(host.machineId, host.organizationId),
 		);
 		const row = rows?.find((item) => item.id === workspace.id);
 		return row ? { ...workspace, ...row } : workspace;

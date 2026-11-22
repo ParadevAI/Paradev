@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { getHostWorkspacesQueryKey } from "@/hooks/useHostWorkspaces";
+import { getHostWorkspacesQueryPrefix } from "@/hooks/useHostWorkspaces";
 import { asAttachmentError } from "@/lib/attachments/errors";
 import { getChatTransport } from "@/lib/chat";
 import { errorCopy, transportFailureKind } from "@/lib/errors";
@@ -163,7 +163,7 @@ export function useCreateTerminalWorkspace() {
 
 				const refetchCreated = () => {
 					void queryClient.invalidateQueries({
-						queryKey: getHostWorkspacesQueryKey(target.machineId),
+						queryKey: getHostWorkspacesQueryPrefix(target.machineId),
 					});
 					void queryClient.invalidateQueries({
 						queryKey: getHostTerminalsQueryKey(target.machineId),

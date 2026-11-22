@@ -173,7 +173,7 @@ export function createVoiceData({
 		return withTimeout(
 			queryClient.fetchQuery({
 				networkMode: "always",
-				queryKey: getHostWorkspacesQueryKey(host.machineId),
+				queryKey: getHostWorkspacesQueryKey(host.machineId, organizationId),
 				staleTime: FRESH_MS,
 				queryFn: (): Promise<HostWorkspaceRow[]> =>
 					getHostServiceClientByUrl(hostUrl).workspace.list.query(),
@@ -553,7 +553,7 @@ export function createVoiceData({
 				machine.name,
 			);
 			void queryClient.invalidateQueries({
-				queryKey: getHostWorkspacesQueryKey(machine.hostId),
+				queryKey: getHostWorkspacesQueryKey(machine.hostId, organizationId),
 			});
 			const launched = result.agents.find((launch) => launch.ok);
 			return {

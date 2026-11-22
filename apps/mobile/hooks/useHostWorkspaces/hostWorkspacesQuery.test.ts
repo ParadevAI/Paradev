@@ -3,6 +3,8 @@ import { QueriesObserver, QueryClient } from "@tanstack/react-query";
 import type { HostWorkspaceRow } from "@/lib/host-service/client";
 import {
 	combineHostWorkspaces,
+	getHostWorkspacesQueryKey,
+	getHostWorkspacesQueryPrefix,
 	hostWorkspacesQueryOptions,
 } from "./hostWorkspacesQuery";
 
@@ -64,5 +66,20 @@ describe("useHostsWorkspaces queries", () => {
 		);
 		expect(failed.get("m1")?.failed).toBe(true);
 		expect(cached.get("m1")?.failed).toBe(false);
+	});
+});
+
+describe("getHostWorkspacesQueryKey", () => {
+	test("one machine in two organizations gets two cache entries", () => {
+		expect(getHostWorkspacesQueryKey("m1", "org-a")).not.toEqual(
+			getHostWorkspacesQueryKey("m1", "org-b"),
+		);
+	});
+
+	test("the machine prefix covers every organization's key", () => {
+		const prefix = getHostWorkspacesQueryPrefix("m1");
+		expect(
+			getHostWorkspacesQueryKey("m1", "org-a").slice(0, prefix.length),
+		).toEqual([...prefix]);
 	});
 });

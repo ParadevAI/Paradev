@@ -21,6 +21,7 @@ import {
 export type { HostWorkspaceRow } from "@/lib/host-service/client";
 export {
 	getHostWorkspacesQueryKey,
+	getHostWorkspacesQueryPrefix,
 	type HostWorkspaceItem,
 	type HostWorkspacesState,
 	type WorkspacesHost,
@@ -96,9 +97,10 @@ export function useHostsWorkspaces(
 					: null;
 			},
 			upsertWorkspace: (row) => {
-				if (!known.has(row.hostId)) return;
+				const host = known.get(row.hostId);
+				if (!host) return;
 				queryClient.setQueryData<HostWorkspaceRow[] | undefined>(
-					getHostWorkspacesQueryKey(row.hostId),
+					getHostWorkspacesQueryKey(host.machineId, host.organizationId),
 					(rows) => {
 						if (!rows) return [row];
 						const exists = rows.some((existing) => existing.id === row.id);
@@ -111,9 +113,13 @@ export function useHostsWorkspaces(
 				);
 			},
 			invalidateHost: (hostId) => {
-				if (!known.has(hostId)) return;
+				const host = known.get(hostId);
+				if (!host) return;
 				void queryClient.invalidateQueries({
-					queryKey: getHostWorkspacesQueryKey(hostId),
+					queryKey: getHostWorkspacesQueryKey(
+						host.machineId,
+						host.organizationId,
+					),
 				});
 			},
 		};

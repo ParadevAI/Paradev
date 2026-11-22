@@ -7,13 +7,11 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 
+import { hostTagFoldersQueryKey } from "./hostTagFoldersQueryKey";
+
 const TAG_FOLDERS_REFETCH_INTERVAL_MS = 30_000;
 
 const NO_SETTINGS: TagFolderSettingInput[] = [];
-
-export function hostTagFoldersQueryKey(machineId: string) {
-	return ["host-service", "tag-folders", "list", machineId] as const;
-}
 
 type TagFolderRows = Awaited<
 	ReturnType<
@@ -56,7 +54,7 @@ export function useHostTagFolders(
 		queries: stableHosts.map((host) => {
 			const hostUrl = hostServiceUrl(host.organizationId, host.machineId);
 			return {
-				queryKey: hostTagFoldersQueryKey(host.machineId),
+				queryKey: hostTagFoldersQueryKey(host.machineId, host.organizationId),
 				enabled: host.isOnline,
 				refetchInterval: TAG_FOLDERS_REFETCH_INTERVAL_MS,
 				networkMode: "always" as const,
