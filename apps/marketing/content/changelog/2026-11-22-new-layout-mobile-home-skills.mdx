@@ -1,0 +1,90 @@
+---
+title: A New Layout, Mobile Home for Every Host and Skills Mid-Sentence
+date: 2026-11-22
+image: /changelog/2026-11-22-new-layout-hero.png
+version: 2.0.11
+highlights:
+  - icon: layout
+    title: The new layout is on by default
+    description: A navigation rail you arrange, tabs in the title bar and panes drawn as cards
+  - icon: tablet
+    title: Mobile Home for every host
+    description: Several hosts and Cloud in one list, a Needs me filter, and agent questions you can answer
+  - icon: message
+    title: Skills mid-sentence
+    description: Type / or $ anywhere in a chat message to pick one of the agent's skills
+---
+
+## The New Layout Is On by Default <PRBadge url="https://github.com/superset-sh/superset/pull/10039" />
+
+The redesigned app is now what you get: a navigation rail on the left, workspace tabs in the title bar, and each pane area drawn as one card. The new workspace page puts the prompt box in the middle with its pickers above it <PRBadge url="https://github.com/superset-sh/superset/pull/9799" />.
+
+- **Arrange the rail** - Workspaces has its own button. Open the **...** menu to pin, unpin and drag sections into your order, or right-click a rail button <PRBadge url="https://github.com/superset-sh/superset/pull/9835" />
+- **Quota rings** - one ring per provider at the foot of the rail shows how much of your limit is used. Hover for each window and its reset time <PRBadge url="https://github.com/superset-sh/superset/pull/9942" />
+- **Tabs shrink before they scroll** - more tabs stay readable in the same bar <PRBadge url="https://github.com/superset-sh/superset/pull/9946" />
+- **Command palette** - switch workspaces and search files from one palette, with a switcher button in the title bar
+
+![The rail's menu with a pin toggle and a drag grip beside each section](/changelog/2026-11-22-rail-sections.png)
+
+![A quota ring on the rail with its hover card, showing weekly usage and the reset time](/changelog/2026-11-22-quota-rings.png)
+
+Prefer the old one? Turn off **Settings → Experimental → New layout**. The rings have a switch in **Settings → Usage**.
+
+## Mobile Home for Every Host <PRBadge url="https://github.com/superset-sh/superset/pull/10121" />
+
+Home on mobile now shows several hosts and Cloud in one list. Tap the scope chip to pick up to three hosts, and tap **Needs me** to see only the workspaces that wait for you.
+
+![Mobile Home with hosts and Cloud as sections, beside the Scope sheet that picks them](/changelog/2026-11-22-mobile-home-hosts.png)
+
+- **Answer agent questions** - a question from the agent is a card with choices and a text field, the same as on desktop <PRBadge url="https://github.com/superset-sh/superset/pull/9876" />
+- **Desktop groups and sort modes** - Home uses your sidebar groups, colors and order, and you can move workspaces between groups <PRBadge url="https://github.com/superset-sh/superset/pull/9953" />
+- **Page actions** - share, duplicate, rename and delete a page from its menu <PRBadge url="https://github.com/superset-sh/superset/pull/9723" />
+
+Docs: [Mobile](https://docs.paradev.com/mobile).
+
+## Pick a Skill Mid-Sentence <PRBadge url="https://github.com/superset-sh/superset/pull/9874" />
+
+The chat composer now opens the skill menu anywhere in a message, not only at the start. Type `/` after a space with Claude, or `$` with Codex, and pick a skill to insert it where the cursor is.
+
+<Video src="/changelog/2026-11-22-skills-mid-sentence.mp4" title="Typing /cod mid-sentence in chat and picking the code-review skill" />
+
+Paths such as `/tmp` and values such as `$HOME` do not open the menu.
+
+## Model Pickers List What Each Agent Has <PRBadge url="https://github.com/superset-sh/superset/pull/10035" />
+
+The app now asks each agent for its models, so a new model shows in the picker when the agent supports it. Each agent has a tab, and the first row names the model that **Default** resolves to.
+
+![The model picker with a tab for each agent and a Default row that names Opus 5.5](/changelog/2026-11-22-model-picker.png)
+
+- **GPT-6.2 Sol and Astra** in Codex, OpenCode and Paradev chat <PRBadge url="https://github.com/superset-sh/superset/pull/9898" />
+- **Gemini 4 Carbon and Hydrogen** in Antigravity <PRBadge url="https://github.com/superset-sh/superset/pull/10083" />
+- **Claude Fable 5.2** in OpenCode and Copilot
+
+## Improvements
+
+- **Custom themes with CSS** - a theme can carry its own stylesheet for artwork and animations, contributed by [@atharvamhaske](https://github.com/atharvamhaske). Docs: [Custom Themes](https://docs.paradev.com/custom-themes) <PRBadge url="https://github.com/superset-sh/superset/pull/9970" />
+- **Paradev names** - new installs are `Paradev.app`, and the CLI is `paradev`. The `superset` command, `superset:` skills and `SUPERSET_*` variables keep working <PRBadge url="https://github.com/superset-sh/superset/pull/10099" /> <PRBadge url="https://github.com/superset-sh/superset/pull/10137" /> <PRBadge url="https://github.com/superset-sh/superset/pull/10134" />
+- **Idle cloud workspaces stop sooner** - a machine stops 15 minutes after the last activity, down from an hour, so short tasks use less of your cloud hours <PRBadge url="https://github.com/superset-sh/superset/pull/10025" />
+- **PlanetScale plugin** - install it from **Plugins** <PRBadge url="https://github.com/superset-sh/superset/pull/9886" />
+- **Subagent view** - a banner says which subagent you are in, where your messages go, and how to get back <PRBadge url="https://github.com/superset-sh/superset/pull/9964" />
+- **Select cloud workspaces** - ⌘-click and Shift-click cloud rows in the sidebar to archive several at once <PRBadge url="https://github.com/superset-sh/superset/pull/9908" />
+- **Script bar** - hidden until you turn it on <PRBadge url="https://github.com/superset-sh/superset/pull/10011" />
+
+---
+
+**Bug fixes**
+
+- The terminal no longer types stray characters into the shell when it restores a session <PRBadge url="https://github.com/superset-sh/superset/pull/10133" /> <PRBadge url="https://github.com/superset-sh/superset/pull/10140" />
+- A terminal redraws when you come back to it, contributed by [@shubhankiit](https://github.com/shubhankiit), and repeated lines stay in the transcript, contributed by [@agocharbhatia](https://github.com/agocharbhatia) <PRBadge url="https://github.com/superset-sh/superset/pull/9878" /> <PRBadge url="https://github.com/superset-sh/superset/pull/10017" />
+- A browser pane no longer freezes the window when it takes focus <PRBadge url="https://github.com/superset-sh/superset/pull/10072" />
+- IME users can confirm text without submitting a chat answer, contributed by [@PresentJay](https://github.com/PresentJay) <PRBadge url="https://github.com/superset-sh/superset/pull/9625" />
+- Fast mode works from the toggle and `/fast` in Claude chat <PRBadge url="https://github.com/superset-sh/superset/pull/10086" />
+- A chat resumes when its agent was lost, instead of rejecting the message <PRBadge url="https://github.com/superset-sh/superset/pull/10013" />
+- GitHub HTTPS remotes with a username or token are accepted, contributed by [@alexnault](https://github.com/alexnault) <PRBadge url="https://github.com/superset-sh/superset/pull/9138" />
+- Push goes to a fork that is tracked by URL, contributed by [@kr1shna-exe](https://github.com/kr1shna-exe) <PRBadge url="https://github.com/superset-sh/superset/pull/8223" />
+- The new workspace composer no longer reuses another project's base branch, contributed by [@XavierClavel](https://github.com/XavierClavel) <PRBadge url="https://github.com/superset-sh/superset/pull/8032" />
+- The sidebar filter finds hidden projects, contributed by [@Ashad001](https://github.com/Ashad001) <PRBadge url="https://github.com/superset-sh/superset/pull/9487" />
+- Xcode opens when its app name includes a version, contributed by [@mohamad-shoumar](https://github.com/mohamad-shoumar) <PRBadge url="https://github.com/superset-sh/superset/pull/9773" />
+- Published pages can print and download files <PRBadge url="https://github.com/superset-sh/superset/pull/9917" />
+- Zoom in works with the + key on non-US keyboards, and tabs stay reachable at high zoom <PRBadge url="https://github.com/superset-sh/superset/pull/9951" /> <PRBadge url="https://github.com/superset-sh/superset/pull/10028" />
+- Mobile: the pull request screen no longer freezes on iOS, and links in chat replies open <PRBadge url="https://github.com/superset-sh/superset/pull/9890" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9879" />
