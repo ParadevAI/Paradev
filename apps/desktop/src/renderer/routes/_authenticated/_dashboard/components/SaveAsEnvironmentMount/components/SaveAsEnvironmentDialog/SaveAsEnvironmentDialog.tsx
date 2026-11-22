@@ -21,12 +21,12 @@ import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { EnvironmentPropertyRow } from "renderer/routes/_authenticated/components/EnvironmentPropertyRow";
+import {
+	EnvironmentPropertyRow,
+	PROPERTY_ROW_CONTROL,
+} from "renderer/routes/_authenticated/components/EnvironmentPropertyRow";
 
 type EnvironmentScope = "organization" | "personal";
-
-const ROW_CONTROL =
-	"h-10 w-full rounded-none border-0 bg-transparent px-3 shadow-none focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent";
 
 interface SaveAsEnvironmentDialogProps {
 	cloudWorkspaceId: string;
@@ -130,7 +130,7 @@ export function SaveAsEnvironmentDialog({
 								value={scope}
 							>
 								<SelectTrigger
-									className={ROW_CONTROL}
+									className={PROPERTY_ROW_CONTROL}
 									id="save-environment-scope"
 								>
 									<SelectValue />

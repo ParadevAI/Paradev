@@ -18,6 +18,7 @@ import {
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
+	SANDBOX_PATHS,
 	type SandboxIdentity,
 	type SandboxRepository,
 } from "@superset/shared/sandbox/contract";
@@ -33,8 +34,12 @@ import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { agentSignInKinds } from "./agent-sign-in-kinds";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
-import { creatorPlugins } from "./plugins";
-import { readRepoHooks } from "./repo-hooks";
+import {
+	allowedPlugins,
+	creatorPlugins,
+	environmentMcpAllowlist,
+} from "./plugins";
+import { environmentHooks } from "./repo-hooks";
 import {
 	installationTokenFor,
 	toSandboxRepositories,
@@ -61,8 +66,9 @@ export async function buildSandboxClaim(args: {
 	row: CloudWorkspaceRow;
 	launch?: CloudAgentLaunch;
 	/**
-	 * Read the repository's own hooks too. Only a create needs them (ports
-	 * are fixed once the box exists), and it costs a GitHub request.
+	 * Read the environment's hooks too. Only a create needs them (ports are
+	 * fixed once the box exists), and without an environment config it costs
+	 * a GitHub request.
 	 */
 	withRepoHooks?: boolean;
 }): Promise<{
@@ -104,7 +110,10 @@ export async function buildSandboxClaim(args: {
 				}),
 			])
 		: [null, null, undefined];
-	const plugins = await creatorPlugins(creator, args.row.organizationId);
+	const plugins = allowedPlugins(
+		await creatorPlugins(creator, args.row.organizationId),
+		environmentMcpAllowlist(environment.config),
+	);
 	// The creator's own token when they have connected GitHub: pushes and pull
 	// requests are theirs. The App's installation token otherwise.
 	const installation = userToken
@@ -120,7 +129,8 @@ export async function buildSandboxClaim(args: {
 	const primaryCheckout = checkouts[0];
 	const repoHooks =
 		args.withRepoHooks && primaryCheckout
-			? await readRepoHooks({
+			? await environmentHooks({
+					config: environment.config,
 					repo: primaryCheckout.repository,
 					branch: primaryCheckout.baseBranch,
 					token,
@@ -172,7 +182,13 @@ export async function buildSandboxClaim(args: {
 			hostSecret: await sandboxHostSecretFor(args.row.id),
 			managedEnv,
 			networkPolicy,
-			files,
+			files: [
+				...files,
+				{
+					path: SANDBOX_PATHS.environmentConfig,
+					content: environment.config ?? "",
+				},
+			],
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
 			agentTools: await organizationFlagEnabled(

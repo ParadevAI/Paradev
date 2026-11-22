@@ -925,6 +925,8 @@ export const environments = pgTable(
 		scope: environmentScope().notNull().default("organization"),
 		/** The size a workspace boots at when its create names none; null means the organization's default. */
 		machineSize: text("machine_size"),
+		/** The `config.toml` its builds and boxes run; null falls back to the primary repository's own file. */
+		config: text(),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -1045,7 +1047,8 @@ export const environmentSecrets = pgTable(
 /**
  * One build of an environment's golden from `[install]`. The running row is
  * the lock: at most one per environment. A build keeps the newest goldens
- * and deletes older ones, setting `golden_deleted_at`.
+ * and deletes older ones, setting `golden_deleted_at`; a kept one can be
+ * restored.
  */
 export const environmentBuilds = pgTable(
 	"environment_builds",

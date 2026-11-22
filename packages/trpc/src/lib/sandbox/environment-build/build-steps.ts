@@ -1,3 +1,4 @@
+import { BUILD_ERRORS } from "@superset/shared/sandbox/build-errors";
 import {
 	SANDBOX_PATHS,
 	sandboxCheckoutDir,
@@ -15,7 +16,6 @@ import {
 	startBuildCommand,
 	stopBuildBox,
 } from "../vercel";
-import { isProductionDeployment } from "./deployment";
 import {
 	BOX_READY_MS,
 	BuildFailure,
@@ -26,20 +26,19 @@ import {
 	within,
 } from "./environment-build";
 import { BUILD_LIMIT_MS } from "./limits";
-import { checkoutScript, goldensToDelete } from "./policy";
+import { checkoutScript } from "./policy";
+import { pruneGoldens } from "./prune";
 import {
 	failBuild,
 	loadBuild,
 	markBuildFresh,
-	markGoldenDeleted,
 	recordBuildCommit,
 	succeedBuild,
-	undeletedGoldens,
 } from "./store";
 
 export type BuildCommandKey = "checkout" | "install";
 
-const NOT_RUNNING = "The build is no longer running";
+const NOT_RUNNING = BUILD_ERRORS.notRunning;
 
 async function runningBuild(buildId: string) {
 	const loaded = await loadBuild(buildId);
@@ -118,9 +117,7 @@ export async function startCommand(
 	const inputs = await prepareBuild(build);
 	const install = inputs.install;
 	if (key === "install" && !install) {
-		throw new BuildFailure(
-			`No [install] in .paradev/config.toml on ${inputs.installSource}`,
-		);
+		throw new BuildFailure(`No [install] in ${inputs.installSource}`);
 	}
 	const primaryDir = sandboxCheckoutDir(
 		SANDBOX_PATHS.workspace,
@@ -212,29 +209,7 @@ export async function activateBuild(
 export async function pruneOldGoldens(buildId: string): Promise<void> {
 	"use step";
 	const loaded = await loadBuild(buildId);
-	if (!loaded) return;
-	if (!isProductionDeployment()) {
-		console.log(
-			`[environment-build] ${buildId}: not a production deployment, so no old golden is deleted`,
-		);
-		return;
-	}
-	const { environment } = loaded;
-	const stale = goldensToDelete(
-		await undeletedGoldens(environment.id),
-		environment.sourceRef,
-	);
-	for (const golden of stale) {
-		try {
-			await deleteSandbox(golden.goldenRef);
-			await markGoldenDeleted(golden.id);
-		} catch (error) {
-			console.error(
-				`[environment-build] could not delete old golden ${golden.goldenRef} of ${environment.id}`,
-				error,
-			);
-		}
-	}
+	if (loaded) await pruneGoldens(loaded.environment, buildId);
 }
 
 /**
