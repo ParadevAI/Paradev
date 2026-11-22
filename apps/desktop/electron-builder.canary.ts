@@ -16,6 +16,7 @@ import baseConfig, {
 	toInstallerFileName,
 } from "./electron-builder";
 import pkg from "./package.json";
+import { builderProductName } from "./scripts/builder-product-name";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const productName = `${pkg.productName} Canary`;
@@ -28,7 +29,7 @@ const canaryWinIconPath = join(pkg.resources, "build/icons/icon-canary.ico");
 const config: Configuration = {
 	...baseConfig,
 	appId: "com.superset.desktop.canary",
-	productName,
+	productName: builderProductName({ productName, legacyProductName }),
 	afterPack: localizeMacDisplayName(displayName, legacyProductName),
 
 	publish: {

@@ -13,6 +13,7 @@ import {
 	packagedNodeModuleCopies,
 	packagedNodeModuleExclusions,
 } from "./runtime-dependencies";
+import { builderProductName } from "./scripts/builder-product-name";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const currentYear = new Date().getFullYear();
@@ -50,7 +51,10 @@ const macElectronLanguages = SUPPORTED_LOCALES.flatMap((locale) => {
 
 const config: Configuration = {
 	appId: "com.superset.desktop",
-	productName,
+	productName: builderProductName({
+		productName,
+		legacyProductName: legacyAppName,
+	}),
 	afterPack: localizeMacDisplayName(displayName, legacyAppName),
 	copyright: `Copyright © ${currentYear} Superset Inc.`,
 	electronVersion: pkg.devDependencies.electron.replace(/^\^/, ""),
@@ -208,9 +212,9 @@ const config: Configuration = {
 			entry: {
 				Name: displayName,
 				Actions: "new-window;",
-				// Electron sets the window class from the executable name, so the
-				// default (the product name) never matches and the dock shows a
-				// second, iconless entry for the running app.
+				// Electron sets the window class from package.json's desktopName,
+				// so the default (the product name) never matches and the dock
+				// shows a second, iconless entry for the running app.
 				StartupWMClass: "superset",
 			},
 			desktopActions: {
