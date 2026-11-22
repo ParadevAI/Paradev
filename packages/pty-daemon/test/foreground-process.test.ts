@@ -62,6 +62,16 @@ test("idle prompt -> running command -> idle again", async () => {
 	);
 	assert.equal(running, true, "foreground command should report running");
 
+	const order: string[] = [];
+	setImmediate(() => order.push("loop"));
+	const probe = Promise.resolve(hasRunningForegroundProcess(pty.pid));
+	assert.equal(await probe.finally(() => order.push("probe")), true);
+	assert.deepEqual(
+		order,
+		["loop", "probe"],
+		"the probe must not block the event loop",
+	);
+
 	// `sleep 3` finishes; the shell reclaims the foreground group.
 	const backToIdle = await waitFor(
 		async () => !(await hasRunningForegroundProcess(pty.pid)),
