@@ -13,9 +13,10 @@ import { callWithWake } from "@superset/shared/sandbox/reach";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import SuperJSON from "superjson";
 import type { ApiClient } from "../api-client";
-import type {
-	HostServiceClient,
-	ResolvedHostTarget,
+import {
+	HOST_MAX_URL_LENGTH,
+	type HostServiceClient,
+	type ResolvedHostTarget,
 } from "./resolveHostTarget";
 
 type HostWorkspaceRows = Awaited<
@@ -137,6 +138,7 @@ function targetFor(workspaceId: string, ticket: Ticket): ResolvedHostTarget {
 			links: [
 				httpBatchLink({
 					url: `${ticket.url}/trpc`,
+					maxURLLength: HOST_MAX_URL_LENGTH,
 					transformer: SuperJSON,
 					headers: {
 						Authorization: `Bearer ${ticket.token}`,
