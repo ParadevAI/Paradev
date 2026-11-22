@@ -29,6 +29,8 @@ export type HttpExchangeResult =
 
 interface Exchange {
 	request: HttpExchangeRequest;
+	sentTo: string;
+	dialed?: true;
 	resolve: (result: HttpExchangeResult) => void;
 	header?: HttpResponseHeader;
 	chunks: Uint8Array<ArrayBuffer>[];
@@ -49,10 +51,12 @@ export class HttpExchanges {
 	begin(
 		ticket: string,
 		request: HttpExchangeRequest,
+		sentTo: string,
 	): Promise<HttpExchangeResult> {
 		return new Promise((resolve) => {
 			this.exchanges.set(ticket, {
 				request,
+				sentTo,
 				resolve,
 				chunks: [],
 				timer: setTimeout(() => {
@@ -71,6 +75,7 @@ export class HttpExchanges {
 	onDialConnect(ticket: string, dial: DialSocket): void {
 		const exchange = this.exchanges.get(ticket);
 		if (!exchange) return;
+		exchange.dialed = true;
 		dial.send(
 			JSON.stringify({
 				type: "http:request",
@@ -142,6 +147,13 @@ export class HttpExchanges {
 		clearTimeout(exchange.timer);
 		this.exchanges.delete(ticket);
 		exchange.resolve({ ok: false, reason: "dial-failed" });
+	}
+
+	/** The control socket that carried these dials is gone before the host dialed back. */
+	failUndialed(sentTo: string): void {
+		for (const [ticket, exchange] of this.exchanges) {
+			if (exchange.sentTo === sentTo && !exchange.dialed) this.fail(ticket);
+		}
 	}
 
 	abortAll(): void {
