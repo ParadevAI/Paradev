@@ -43,6 +43,23 @@ describe("parseArgv", () => {
 	});
 
 	it.each([
+		"",
+		"  ",
+		"Infinity",
+		"1e999",
+	])("rejects an empty or non-finite numeric value: %p", (value) => {
+		const expected = new CLIError(
+			`--offset: expected a number, got "${value}"`,
+		);
+		expect(() => parse(`--offset=${value}`)).toThrow(expected);
+		expect(() => parse("--offset", value)).toThrow(expected);
+	});
+
+	it("keeps an explicitly supplied zero", () => {
+		expect(parse("--offset=0")).toEqual({ offset: 0 });
+	});
+
+	it.each([
 		["--json"],
 		["--offset=3"],
 		["-x"],

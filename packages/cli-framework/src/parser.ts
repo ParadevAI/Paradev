@@ -245,7 +245,7 @@ function coerce(
 ): string | number | boolean {
 	if (config.type === "number") {
 		const num = Number(value);
-		if (Number.isNaN(num)) {
+		if (value.trim() === "" || !Number.isFinite(num)) {
 			throw new CLIError(`${source}: expected a number, got "${value}"`);
 		}
 		if (config.isInt && !Number.isInteger(num)) {
