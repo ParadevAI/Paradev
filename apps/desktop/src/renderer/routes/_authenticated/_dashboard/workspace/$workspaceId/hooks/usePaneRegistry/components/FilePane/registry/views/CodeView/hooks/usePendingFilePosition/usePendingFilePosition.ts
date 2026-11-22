@@ -1,6 +1,6 @@
 import { type RefObject, useEffect } from "react";
+import type { CodeEditorAdapter } from "renderer/routes/_authenticated/components/CodeEditor/CodeEditorAdapter";
 import type { ViewProps } from "../../../../types";
-import type { CodeEditorAdapter } from "../../components/CodeEditor/CodeEditorAdapter";
 
 interface PendingFilePositionOptions {
 	editorRef: RefObject<Pick<CodeEditorAdapter, "revealPosition"> | null>;

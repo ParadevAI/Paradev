@@ -1,11 +1,12 @@
 /**
- * The hooks a repository declares for its cloud workspaces, read from
+ * The hooks an environment's cloud workspaces run: its own `config.toml`
+ * (`environments.config`) when it has one, else the primary repository's
  * `.paradev/config.toml` (else the v1 `config.json`, else the same files in
- * the pre-rename `.superset/`) on the branch
- * a workspace is created from. Ports are the one key the control plane must
- * know before the box exists (a sandbox publishes its ports at create); the
- * box reads its own setup and terminals. `[install]` runs only in an
- * environment build, which the control plane drives.
+ * the pre-rename `.superset/`) on the branch a workspace is created from.
+ * Ports are the one key the control plane must know before the box exists (a
+ * sandbox publishes its ports at create); the box reads its own setup and
+ * terminals. `[install]` runs only in an environment build, which the control
+ * plane drives.
  */
 import {
 	fromV1Json,
@@ -100,4 +101,13 @@ export async function readRepoHooks(
 		if (json !== null) return repoHooksFromJson(json);
 	}
 	return null;
+}
+
+/** The environment's own config when it has one, else its primary repository's file. */
+export async function environmentHooks(
+	args: RepoFileArgs & { config: string | null },
+): Promise<RepositoryHooks | null> {
+	return args.config?.trim()
+		? repoHooksFromToml(args.config)
+		: readRepoHooks(args);
 }

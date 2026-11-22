@@ -8,19 +8,12 @@ import {
 import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-} from "@superset/ui/sheet";
 import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { Textarea } from "@superset/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
 	HiOutlineArrowDownTray,
 	HiOutlineExclamationTriangle,
@@ -42,11 +35,10 @@ function nextEntryId() {
 	return `entry-${++entryIdCounter}`;
 }
 
-interface AddSecretSheetProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
+interface AddVariablesFormProps {
 	environmentId: string;
 	onSaved: () => void;
+	onClose: () => void;
 }
 
 function createEmptyEntry(): SecretEntry {
@@ -63,12 +55,11 @@ function toSecretEntries(
 	}));
 }
 
-export function AddSecretSheet({
-	open,
-	onOpenChange,
+export function AddVariablesForm({
 	environmentId,
 	onSaved,
-}: AddSecretSheetProps) {
+	onClose,
+}: AddVariablesFormProps) {
 	const { t } = useLingui();
 	const [entries, setEntries] = useState<SecretEntry[]>([createEmptyEntry()]);
 	const [sensitive, setSensitive] = useState(true);
@@ -79,8 +70,8 @@ export function AddSecretSheet({
 
 	const hasContent = entries.some((e) => e.key.trim() || e.value.trim());
 
-	const handleOpenChange = (nextOpen: boolean) => {
-		if (!nextOpen && hasContent) {
+	const handleCancel = () => {
+		if (hasContent) {
 			alert({
 				title: t({ message: "Discard unsaved changes?" }),
 				description: t({
@@ -96,21 +87,14 @@ export function AddSecretSheet({
 					{
 						label: t({ message: "Discard" }),
 						variant: "destructive",
-						onClick: () => onOpenChange(false),
+						onClick: onClose,
 					},
 				],
 			});
 			return;
 		}
-		onOpenChange(nextOpen);
+		onClose();
 	};
-
-	useEffect(() => {
-		if (open) {
-			setEntries([createEmptyEntry()]);
-			setSensitive(true);
-		}
-	}, [open]);
 
 	const updateEntry = (
 		index: number,
@@ -274,7 +258,7 @@ export function AddSecretSheet({
 					: t({ message: `Added ${count} environment variables` }),
 			);
 			onSaved();
-			onOpenChange(false);
+			onClose();
 		} catch (err) {
 			console.error("[secrets/upsert] Failed to save:", err);
 			toast.error(
@@ -291,162 +275,151 @@ export function AddSecretSheet({
 	const hasValidEntries = entries.some((e) => e.key.trim() && e.value.trim());
 
 	return (
-		<Sheet open={open} onOpenChange={handleOpenChange}>
-			<SheetContent
-				className="sm:max-w-xl w-full flex flex-col gap-0 p-0"
-				onDragOver={(e) => {
-					e.preventDefault();
-					setIsDragOver(true);
-				}}
-				onDragLeave={() => setIsDragOver(false)}
-				onDrop={handleDrop}
-			>
-				<SheetHeader className="p-6 pb-4">
-					<SheetTitle>
-						<Trans>Add Environment Variable</Trans>
-					</SheetTitle>
-					<SheetDescription>
-						<Trans>
-							Add one or more environment variables. You can also drag and drop
-							a .env file.
-						</Trans>
-					</SheetDescription>
-				</SheetHeader>
+		<section
+			aria-label={t({ message: "Add environment variables" })}
+			className={cn(
+				"flex flex-col rounded-lg border border-border/70 transition-colors",
+				isDragOver && "border-dashed border-primary/50 bg-primary/5",
+			)}
+			onDragLeave={() => setIsDragOver(false)}
+			onDragOver={(e) => {
+				e.preventDefault();
+				setIsDragOver(true);
+			}}
+			onDrop={handleDrop}
+		>
+			<div>
+				<div className="space-y-2 p-3">
+					<div className="flex items-center gap-2">
+						<span className="flex-1 text-xs font-medium text-muted-foreground">
+							<Trans>Key</Trans>
+						</span>
+						<span className="flex-1 text-xs font-medium text-muted-foreground">
+							<Trans>Value</Trans>
+						</span>
+						<div className="w-8 shrink-0" />
+					</div>
 
-				<div
-					className={cn(
-						"flex-1 overflow-y-auto border-2 border-dashed border-transparent transition-colors",
-						isDragOver && "border-primary/50 bg-primary/5",
-					)}
-				>
-					<div className="px-6 space-y-2">
-						{/* Column headers */}
-						<div className="flex items-center gap-2">
-							<span className="flex-1 text-xs font-medium text-muted-foreground">
-								<Trans>Key</Trans>
-							</span>
-							<span className="flex-1 text-xs font-medium text-muted-foreground">
-								<Trans>Value</Trans>
-							</span>
-							{/* spacer for trash button */}
-							<div className="w-8 shrink-0" />
-						</div>
-
-						{entries.map((entry, index) => (
-							<div key={entry.id} className="flex flex-col gap-1">
-								<div className="flex items-start gap-2">
-									<Input
-										placeholder="CLIENT_KEY..."
-										value={entry.key}
-										onChange={(e) => updateEntry(index, "key", e.target.value)}
-										onPaste={(e) => handleKeyPaste(index, e)}
-										aria-invalid={Boolean(entryErrors[entry.id])}
-										className={`flex-1 font-mono text-sm mt-[1px] ${
-											entryErrors[entry.id]
-												? "border-destructive focus-visible:ring-destructive"
-												: isCloudWorkspaceIgnoredEnvName(entry.key.trim())
-													? "border-warning focus-visible:ring-warning"
-													: ""
-										}`}
-									/>
-									<Textarea
-										placeholder=""
-										value={entry.value}
-										onChange={(e) =>
-											updateEntry(index, "value", e.target.value)
-										}
-										className="flex-1 font-mono text-sm min-h-9 py-1.5"
-										rows={1}
-									/>
-									{entries.length > 1 ? (
-										<Button
-											variant="ghost"
-											size="icon"
-											className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground mt-[1px]"
-											onClick={() => removeEntry(index)}
-										>
-											<HiOutlineTrash className="h-4 w-4" />
-										</Button>
-									) : (
-										<div className="w-8 shrink-0" />
-									)}
-								</div>
-								{entryErrors[entry.id] ? (
-									<p className="text-xs text-destructive pl-1">
-										{entryErrors[entry.id]}
-									</p>
-								) : isCloudWorkspaceIgnoredEnvName(entry.key.trim()) ? (
-									<p className="flex items-start gap-1.5 text-xs text-warning pl-1">
-										<HiOutlineExclamationTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-										<Trans>
-											Cloud workspaces ignore this variable. Agents sign in
-											under Settings › Agents instead.
-										</Trans>
-									</p>
-								) : null}
+					{entries.map((entry, index) => (
+						<div key={entry.id} className="flex flex-col gap-1">
+							<div className="flex items-start gap-2">
+								<Input
+									placeholder="CLIENT_KEY..."
+									value={entry.key}
+									onChange={(e) => updateEntry(index, "key", e.target.value)}
+									onPaste={(e) => handleKeyPaste(index, e)}
+									aria-invalid={Boolean(entryErrors[entry.id])}
+									className={`flex-1 font-mono text-sm mt-[1px] ${
+										entryErrors[entry.id]
+											? "border-destructive focus-visible:ring-destructive"
+											: isCloudWorkspaceIgnoredEnvName(entry.key.trim())
+												? "border-warning focus-visible:ring-warning"
+												: ""
+									}`}
+								/>
+								<Textarea
+									placeholder=""
+									value={entry.value}
+									onChange={(e) => updateEntry(index, "value", e.target.value)}
+									className="flex-1 font-mono text-sm min-h-9 py-1.5"
+									rows={1}
+								/>
+								{entries.length > 1 ? (
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground mt-[1px]"
+										onClick={() => removeEntry(index)}
+									>
+										<HiOutlineTrash className="h-4 w-4" />
+									</Button>
+								) : (
+									<div className="w-8 shrink-0" />
+								)}
 							</div>
-						))}
-
-						<Button
-							variant="ghost"
-							size="sm"
-							className="text-muted-foreground gap-1.5"
-							onClick={addEntry}
-						>
-							<HiPlus className="h-3.5 w-3.5" />
-							<Trans>Add Another</Trans>
-						</Button>
-
-						<div className="flex items-center gap-2 pt-2">
-							<Switch checked={sensitive} onCheckedChange={setSensitive} />
-							<span className="text-sm text-muted-foreground">
-								<Trans>Sensitive</Trans>
-							</span>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<HiOutlineQuestionMarkCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-								</TooltipTrigger>
-								<TooltipContent side="right">
-									<p className="max-w-[200px] text-xs">
-										<Trans>
-											Sensitive values are encrypted and cannot be revealed in
-											the UI after saving.
-										</Trans>
-									</p>
-								</TooltipContent>
-							</Tooltip>
+							{entryErrors[entry.id] ? (
+								<p className="text-xs text-destructive pl-1">
+									{entryErrors[entry.id]}
+								</p>
+							) : isCloudWorkspaceIgnoredEnvName(entry.key.trim()) ? (
+								<p className="flex items-start gap-1.5 text-xs text-warning pl-1">
+									<HiOutlineExclamationTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+									<Trans>
+										Cloud workspaces ignore this variable. Agents sign in under
+										Settings › Agents instead.
+									</Trans>
+								</p>
+							) : null}
 						</div>
+					))}
+
+					<Button
+						variant="ghost"
+						size="sm"
+						className="text-muted-foreground gap-1.5"
+						onClick={addEntry}
+					>
+						<HiPlus className="h-3.5 w-3.5" />
+						<Trans>Add Another</Trans>
+					</Button>
+
+					<div className="flex items-center gap-2 pt-2">
+						<Switch checked={sensitive} onCheckedChange={setSensitive} />
+						<span className="text-sm text-muted-foreground">
+							<Trans>Sensitive</Trans>
+						</span>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<HiOutlineQuestionMarkCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+							</TooltipTrigger>
+							<TooltipContent side="right">
+								<p className="max-w-[200px] text-xs">
+									<Trans>
+										Sensitive values are encrypted and cannot be revealed in the
+										UI after saving.
+									</Trans>
+								</p>
+							</TooltipContent>
+						</Tooltip>
 					</div>
 				</div>
+			</div>
 
-				{/* Footer — pinned bottom, top border */}
-				<div className="flex items-center justify-between border-t px-6 py-4">
-					<div className="flex items-center gap-3">
-						<Button
-							variant="outline"
-							size="sm"
-							className="gap-1.5"
-							onClick={() => fileInputRef.current?.click()}
-						>
-							<HiOutlineArrowDownTray className="h-3.5 w-3.5" />
-							<Trans>Import .env</Trans>
-						</Button>
-						<span className="text-xs text-muted-foreground">
-							<Trans>or paste .env contents in Key input</Trans>
-						</span>
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept="*"
-							className="hidden"
-							onChange={handleFileInputChange}
-						/>
-					</div>
-					<Button onClick={handleSave} disabled={isSaving || !hasValidEntries}>
+			<div className="flex items-center justify-between gap-3 border-t border-border/70 px-3 py-2.5">
+				<div className="flex items-center gap-3">
+					<Button
+						variant="outline"
+						size="sm"
+						className="gap-1.5"
+						onClick={() => fileInputRef.current?.click()}
+					>
+						<HiOutlineArrowDownTray className="h-3.5 w-3.5" />
+						<Trans>Import .env</Trans>
+					</Button>
+					<span className="text-xs text-muted-foreground">
+						<Trans>or paste .env contents in Key input</Trans>
+					</span>
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept="*"
+						className="hidden"
+						onChange={handleFileInputChange}
+					/>
+				</div>
+				<div className="flex items-center gap-2">
+					<Button onClick={handleCancel} size="sm" variant="ghost">
+						<Trans>Cancel</Trans>
+					</Button>
+					<Button
+						disabled={isSaving || !hasValidEntries}
+						onClick={handleSave}
+						size="sm"
+					>
 						{isSaving ? <Trans>Saving...</Trans> : <Trans>Save</Trans>}
 					</Button>
 				</div>
-			</SheetContent>
-		</Sheet>
+			</div>
+		</section>
 	);
 }

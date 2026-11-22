@@ -22,6 +22,7 @@ import {
 	highlightSpecialChars,
 	keymap,
 	lineNumbers,
+	placeholder as placeholderText,
 } from "@codemirror/view";
 import { colorPicker } from "@replit/codemirror-css-color-picker";
 import { cn } from "@superset/ui/utils";
@@ -67,6 +68,10 @@ interface CodeEditorProps {
 	language: string;
 	filePath?: string;
 	readOnly?: boolean;
+	placeholder?: string;
+	ariaLabel?: string;
+	/** Tab indents; off in a form, so Tab moves focus to the next field. */
+	tabIndents?: boolean;
 	fillHeight?: boolean;
 	className?: string;
 	editorRef?: MutableRefObject<CodeEditorAdapter | null>;
@@ -84,6 +89,9 @@ export function CodeEditor({
 	language,
 	filePath,
 	readOnly = false,
+	placeholder,
+	ariaLabel,
+	tabIndents = true,
 	fillHeight = true,
 	className,
 	editorRef,
@@ -175,9 +183,11 @@ export function CodeEditor({
 				]),
 				EditorView.contentAttributes.of({
 					spellcheck: "false",
+					...(ariaLabel ? { "aria-label": ariaLabel } : {}),
 				}),
+				placeholder ? placeholderText(placeholder) : [],
 				keymap.of([
-					indentWithTab,
+					...(tabIndents ? [indentWithTab] : []),
 					...defaultKeymap,
 					...historyKeymap,
 					...searchKeymap,

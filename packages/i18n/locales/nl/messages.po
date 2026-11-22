@@ -2158,8 +2158,8 @@ msgstr "Beschrijving toevoegen"
 msgid "Add description..."
 msgstr "Beschrijving toevoegen..."
 
-msgid "Add Environment Variable"
-msgstr "Omgevingsvariabele toevoegen"
+msgid "Add environment variables"
+msgstr "Omgevingsvariabelen toevoegen"
 
 msgid "Add extension"
 msgstr "Extensie toevoegen"
@@ -2198,9 +2198,6 @@ msgstr "Meer toevoegen…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Voeg er een toe via het menu in de zijbalk om te beginnen."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Voeg een of meer omgevingsvariabelen toe. Je kunt ook een .env-bestand hierheen slepen."
-
 msgid "Add people"
 msgstr "Personen toevoegen"
 
@@ -2212,6 +2209,9 @@ msgstr "Mensen aan kanaal toevoegen"
 
 msgid "Add photos or files"
 msgstr "Foto's of bestanden toevoegen"
+
+msgid "Add port"
+msgstr "Poort toevoegen"
 
 msgid "Add project"
 msgstr "Project toevoegen"
@@ -2248,6 +2248,9 @@ msgstr "Btw-nummer toevoegen"
 
 msgid "Add team member..."
 msgstr "Teamlid toevoegen..."
+
+msgid "Add terminal"
+msgstr "Terminal toevoegen"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Voeg tests toe voor de riskantste ongeteste code…"
@@ -2287,6 +2290,9 @@ msgstr "Aan zijbalk toevoegen"
 
 msgid "Add to workspace"
 msgstr "Toevoegen aan werkruimte"
+
+msgid "Add variables"
+msgstr "Variabelen toevoegen"
 
 msgid "Add what it does"
 msgstr "Toevoegen wat hij doet"
@@ -2628,6 +2634,9 @@ msgstr "Alle pagina's"
 msgid "All plans"
 msgstr "Alle plannen"
 
+msgid "All plugins"
+msgstr "Alle plugins"
+
 msgid "All posts"
 msgstr "Alle berichten"
 
@@ -2717,6 +2726,9 @@ msgstr "Toegestaan"
 
 msgid "Allowed for session"
 msgstr "Toegestaan voor deze sessie"
+
+msgid "Allowed plugins"
+msgstr "Toegestane plugins"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Al overgezet naar een andere organisatie. Schakel daarnaar over om dit project te zien."
@@ -2811,6 +2823,9 @@ msgstr "Een automatisering kan alleen een cloudwerkruimte gebruiken die je zelf 
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Een omgeving bevat je repository's, variabelen en regio. Start er zoveel werkruimtes uit als je nodig hebt."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "De repository's van een omgeving kunnen niet veranderen. Maak een nieuwe omgeving voor andere repository's."
+
 msgid "An error occurred"
 msgstr "Er is een fout opgetreden"
 
@@ -2861,6 +2876,9 @@ msgstr "Een andere AI-assistent"
 
 msgid "another device"
 msgstr "een ander apparaat"
+
+msgid "Another row already uses this name."
+msgstr "Een andere rij gebruikt deze naam al."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantwoord vragen in de terminal hieronder, zoals een wachtwoord."
@@ -3278,6 +3296,9 @@ msgstr "Minstens één team dat we kunnen noemen, het onze inbegrepen, haalt een
 msgid "At most {AUTO_TOPUP_MONTHLY_LIMIT} top-ups a month, so up to {monthlyMax} a month."
 msgstr "Maximaal {AUTO_TOPUP_MONTHLY_LIMIT} keer per maand, dus tot {monthlyMax} per maand."
 
+msgid "At most {MAX_PREVIEW_PORTS} ports can have a preview."
+msgstr "Hoogstens {MAX_PREVIEW_PORTS} poorten kunnen een preview hebben."
+
 msgid "at once"
 msgstr "tegelijk"
 
@@ -3585,9 +3606,6 @@ msgstr "Basismap voor nieuwe worktree-werkruimtes op deze host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Basismap voor nieuwe worktrees op {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Basisimage · nog geen checkpoint"
-
 msgid "Base URL"
 msgstr "Basis-URL"
 
@@ -3865,6 +3883,12 @@ msgstr "Het laatste stuk software bouwen"
 
 msgid "Building the last piece of software."
 msgstr "Het laatste stuk software bouwen."
+
+msgid "Building…"
+msgstr "Bezig met bouwen…"
+
+msgid "Builds fail until there is an install script."
+msgstr "Builds mislukken zolang er geen installatiescript is."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Een plugin gebouwd? Dien hem hier in."
@@ -4407,10 +4431,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · voor de tooltip-refactor"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint opgeslagen {0}"
-
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint opgeslagen in {name}"
 
@@ -4851,6 +4871,9 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Cloudagents krijgen in deze omgeving geen MCP-servers."
+
 msgid "Cloud environment setup"
 msgstr "Cloudomgeving instellen"
 
@@ -5176,6 +5199,9 @@ msgstr "Conductor is een handelsmerk van de eigenaar. {0} is niet verbonden aan 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor-werkruimtes zijn gewone Git-worktrees. {0} gebruikt ze waar ze staan."
+
+msgid "Config"
+msgstr "Configuratie"
 
 msgid "Config file contents"
 msgstr "Inhoud van het configuratiebestand"
@@ -6229,6 +6255,9 @@ msgstr "Kan automatisering niet laden: {0}"
 msgid "Couldn't load automations"
 msgstr "Kan automatiseringen niet laden"
 
+msgid "Couldn't load builds"
+msgstr "Kan builds niet laden"
+
 msgid "Couldn't load contributors. Type a username instead."
 msgstr "Kan contributors niet laden. Typ in plaats daarvan een gebruikersnaam."
 
@@ -6971,8 +7000,14 @@ msgstr "Standaardmodel"
 msgid "Default team for new tasks"
 msgstr "Standaardteam voor nieuwe taken"
 
+msgid "Default terminal"
+msgstr "Standaardterminal"
+
 msgid "Default terminal theme"
 msgstr "Standaard terminalthema"
+
+msgid "Default terminal: {terminalName}"
+msgstr "Standaardterminal: {terminalName}"
 
 msgid "Delegated"
 msgstr "Gedelegeerd"
@@ -7421,6 +7456,9 @@ msgstr "Map"
 msgid "Disable"
 msgstr "Uitschakelen"
 
+msgid "Disable MCP servers"
+msgstr "MCP-servers uitschakelen"
+
 msgid "Disable skill"
 msgstr "Skill uitschakelen"
 
@@ -7835,6 +7873,9 @@ msgstr "Elke gebruiker voegt de uren van zijn abonnement toe aan één pool die 
 msgid "Each session resumes where it left off."
 msgstr "Elke sessie gaat verder waar die gebleven was."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Elke geslaagde build slaat een snapshot op. Nieuwe werkruimtes starten vanaf de huidige, en je kunt een eerdere herstellen."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Elk oppervlak heeft zijn eigen typografie. Wijzigingen zie je meteen in de live previews."
 
@@ -8045,6 +8086,9 @@ msgstr "Gesprek wordt beëindigd"
 msgid "Ensure no regression"
 msgstr "Zorg dat er geen regressie is"
 
+msgid "Enter a command."
+msgstr "Voer een commando in."
+
 msgid "Enter a full email address"
 msgstr "Voer een volledig e-mailadres in"
 
@@ -8056,6 +8100,9 @@ msgstr "Voer een bovenliggende map op {hostName} in"
 
 msgid "Enter a path on {hostName}"
 msgstr "Voer een pad op {hostName} in"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Voer een poort van 1 tot 65535 in."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Voer hierboven een URL in de zoekbalk in."
@@ -8101,6 +8148,9 @@ msgstr "Omgeving"
 
 msgid "Environment archived"
 msgstr "Omgeving gearchiveerd"
+
+msgid "Environment history"
+msgstr "Omgevingsgeschiedenis"
 
 msgid "Environment not found"
 msgstr "Omgeving niet gevonden"
@@ -10529,6 +10579,9 @@ msgstr "Paradev MCP installeren in je client"
 msgid "Install plugin"
 msgstr "Plugin installeren"
 
+msgid "Install script"
+msgstr "Installatiescript"
+
 msgid "Install the desktop app"
 msgstr "Installeer de desktop-app"
 
@@ -11647,6 +11700,9 @@ msgstr "Betrouwbaarheid over lange horizon overschrijdt een drempel. Werk dat om
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip met alleen de sneltoets bij lang hoveren; de chipstijl is nu de standaard voor TooltipContent"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Langlopende commando's, zoals een devserver. Elke werkruimte opent bij het starten de standaardterminal."
+
 msgid "Looking at {what}"
 msgstr "{what} bekijken"
 
@@ -11887,6 +11943,9 @@ msgstr "Maximale grootte is 256 KB."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "MCP-allowlist"
 
 msgid "MCP manager"
 msgstr "MCP-beheer"
@@ -12793,6 +12852,9 @@ msgstr "Geen starts in deze periode."
 msgid "No branches found"
 msgstr "Geen branches gevonden"
 
+msgid "No builds yet"
+msgstr "Nog geen builds"
+
 msgid "No changed files."
 msgstr "Geen gewijzigde bestanden."
 
@@ -13137,6 +13199,9 @@ msgstr "Geen persoon vastgelegd"
 
 msgid "No plugins available yet."
 msgstr "Nog geen plugins beschikbaar."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Geen plugins geïnstalleerd, dus cloudagents krijgen hier geen MCP-servers."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13884,6 +13949,9 @@ msgstr "Alleen de eigenaar of een organisatie-eigenaar kan deze automatisering a
 msgid "Only the people listed above can open it"
 msgstr "Alleen de mensen hierboven kunnen het openen"
 
+msgid "Only the person who created this environment or an organization admin can change its config."
+msgstr "Alleen degene die deze omgeving heeft gemaakt of een beheerder van de organisatie kan de configuratie wijzigen."
+
 msgid "Only the person who created this page can change it"
 msgstr "Alleen degene die deze pagina heeft gemaakt kan hem wijzigen"
 
@@ -13892,6 +13960,9 @@ msgstr "Alleen degene die deze pagina heeft gemaakt kan dit wijzigen."
 
 msgid "Only the person who created this workspace can change these."
 msgstr "Alleen degene die deze workspace heeft gemaakt, kan dit wijzigen."
+
+msgid "Only the plugins below"
+msgstr "Alleen de plugins hieronder"
 
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Alleen de auteur van de thread of de eigenaar van de pagina kan hem verwijderen"
@@ -14464,9 +14535,6 @@ msgstr "Organisatie bestaat al"
 
 msgid "Organization created successfully!"
 msgstr "Organisatie aangemaakt!"
-
-msgid "Organization default ({defaultName})"
-msgstr "Standaard van de organisatie ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organisatie verwijderd"
@@ -15293,6 +15361,18 @@ msgstr "Populair"
 msgid "Popular models"
 msgstr "Populaire modellen"
 
+msgid "Port"
+msgstr "Poort"
+
+msgid "Port label"
+msgstr "Poortlabel"
+
+msgid "Port name"
+msgstr "Poortnaam"
+
+msgid "Port number"
+msgstr "Poortnummer"
+
 msgid "Ports"
 msgstr "Poorten"
 
@@ -15304,6 +15384,9 @@ msgstr "Poorten op externe hosts"
 
 msgid "Ports on this computer"
 msgstr "Poorten op deze computer"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Poorten waarop de app luistert. Previewpoorten krijgen een link die je vanuit de werkruimte kunt openen."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Poorten: {totalPortCount} actief"
@@ -16121,6 +16204,9 @@ msgstr "Rebasen en mergen"
 msgid "Rebase and merge"
 msgstr "Rebasen en mergen"
 
+msgid "Rebuild environment"
+msgstr "Omgeving opnieuw bouwen"
+
 msgid "Recall what was said in meetings"
 msgstr "Terugvinden wat er in vergaderingen is gezegd"
 
@@ -16430,6 +16516,9 @@ msgstr "Vermelding {path} verwijderen"
 msgid "Remove pasted text"
 msgstr "Geplakte tekst verwijderen"
 
+msgid "Remove port"
+msgstr "Poort verwijderen"
+
 msgid "Remove PR Link"
 msgstr "PR-koppeling verwijderen"
 
@@ -16445,8 +16534,14 @@ msgstr "Script verwijderen"
 msgid "Remove team member?"
 msgstr "Teamlid verwijderen?"
 
+msgid "Remove terminal"
+msgstr "Terminal verwijderen"
+
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Terminal {createdAtLabel} verwijderen"
+
+msgid "Remove terminal {terminalName}"
+msgstr "Terminal {terminalName} verwijderen"
 
 msgid "Remove terminal session"
 msgstr "Terminalsessie verwijderen"
@@ -17356,6 +17451,12 @@ msgstr "Voert een lokaal commando uit op je machine"
 msgid "Runs appear here once an automation fires."
 msgstr "Runs verschijnen hier zodra een automatisering wordt geactiveerd."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Wordt als bash-script uitgevoerd in elke nieuwe cloudwerkruimte voordat agents starten."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Wordt als bash-script uitgevoerd wanneer de omgeving wordt gebouwd. Nieuwe werkruimtes starten vanuit het resultaat."
+
 msgid "Runs in"
 msgstr "Draait in"
 
@@ -17468,8 +17569,14 @@ msgstr "{name} opgeslagen"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} opgeslagen, maar de setup-workspace kon niet starten: {reason}"
 
+msgid "Saved from a workspace"
+msgstr "Opgeslagen vanuit een werkruimte"
+
 msgid "Saved to Downloads"
 msgstr "Opgeslagen in Downloads"
+
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Opgeslagen. Nieuwe werkruimtes en de volgende build gebruiken het; actieve werkruimtes nemen het over bij een herstart."
 
 msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
 msgstr "Slaat deze workspace op zoals hij nu is, met alles wat erin is geïnstalleerd. Nieuwe workspaces uit {name} starten vanaf dit checkpoint. De workspace stopt even tijdens het opslaan."
@@ -18863,9 +18970,6 @@ msgstr "Smileys en mensen"
 msgid "Smoother onboarding"
 msgstr "Soepelere onboarding"
 
-msgid "Snapshot"
-msgstr "Snapshot"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Maak voor en na elke chatbeurt een snapshot van de worktree, zodat de kaart elk gewijzigd bestand toont, ook wijzigingen via de shell, en ze ongedaan kan maken. Elke prompt wacht eerst op zijn snapshot."
 
@@ -18932,11 +19036,17 @@ msgstr "Iemand"
 msgid "serverError.page.entryPathHeldByColleague"
 msgstr "Iemand anders heeft {entryPath} vanuit deze workspace al gepubliceerd. Publiceer met een expliciet pagina-id om een versie aan hun pagina toe te voegen, of verplaats het bestand."
 
+msgid "Someone else saved this environment's config while you were editing it"
+msgstr "Iemand anders heeft de configuratie van deze omgeving opgeslagen terwijl je hem bewerkte"
+
 msgid "Someone is moving this workspace…"
 msgstr "Iemand verplaatst deze werkruimte…"
 
 msgid "Someone on the Paradev team will review this page. We only follow up if we need more from you."
 msgstr "Iemand van het Paradev-team beoordeelt deze pagina. We nemen alleen contact op als we meer van je nodig hebben."
+
+msgid "Someone saved this config while you were editing. Saving replaces their version."
+msgstr "Iemand heeft deze configuratie opgeslagen terwijl je hem bewerkte. Opslaan vervangt die versie."
 
 msgid "Something else"
 msgstr "Iets anders"
@@ -19251,6 +19361,9 @@ msgstr "Start er een met + in de tabbladbalk."
 
 msgid "Start or stop the workspace run command"
 msgstr "Het run-commando van de werkruimte starten of stoppen"
+
+msgid "Start script"
+msgstr "Startscript"
 
 msgid "Start voice mode"
 msgstr "Spraakmodus starten"
@@ -19921,6 +20034,9 @@ msgstr "Terminal"
 msgid "Terminal agent launch configuration"
 msgstr "Startconfiguratie van terminalagent"
 
+msgid "Terminal command"
+msgstr "Terminalcommando"
+
 msgid "Terminal connection: {label}"
 msgstr "Terminalverbinding: {label}"
 
@@ -19935,6 +20051,9 @@ msgstr "Tekengrootte van een terminal met focus, paginazoom in een browserpaneel
 
 msgid "Terminal input"
 msgstr "Terminalinvoer"
+
+msgid "Terminal name"
+msgstr "Terminalnaam"
 
 msgid "Terminal removed"
 msgstr "Terminal verwijderd"
@@ -20108,6 +20227,15 @@ msgstr "De beste agent verandert.<0/>Jouw workflow niet."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "De machine kwam terug met {actual} vCPU in plaats van {wanted}. Start hem opnieuw om het nog eens te proberen."
 
+msgid "The build is no longer running"
+msgstr "De build wordt niet meer uitgevoerd"
+
+msgid "The build ran for more than {BUILD_LIMIT_MINUTES} minutes and was stopped"
+msgstr "De build duurde langer dan {BUILD_LIMIT_MINUTES} minuten en is gestopt"
+
+msgid "The build stopped unexpectedly"
+msgstr "De build is onverwacht gestopt"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 
@@ -20173,6 +20301,12 @@ msgstr "De dispatcher verschijnt"
 
 msgid "The endpoint must use https."
 msgstr "Het endpoint moet https gebruiken."
+
+msgid "The environment changed during the build; its current snapshot was kept"
+msgstr "De omgeving is tijdens de build gewijzigd; de huidige snapshot is behouden"
+
+msgid "The environment changed while it was being restored. Try again."
+msgstr "De omgeving is gewijzigd tijdens het herstellen. Probeer het opnieuw."
 
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "De omgeving waaruit deze automatisering cloudwerkruimtes start, is gearchiveerd of heeft geen repository's. Kies een andere omgeving in de instellingen van de automatisering."
@@ -20322,11 +20456,11 @@ msgstr "De naam staat in de zijbalk."
 msgid "The network connection changed"
 msgstr "De netwerkverbinding is gewijzigd"
 
-msgid "The open-source workspace for Claude Code, Codex, and any coding agent."
-msgstr "De open-source werkruimte voor Claude Code, Codex en elke andere coding agent."
+msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally or in the cloud."
+msgstr "De open-source werkruimte voor Claude Code, Codex en elke andere agent. Lokaal of in de cloud."
 
-msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "De open-source workspace voor Claude Code, Codex, OpenCode en elke andere coding agent. Voer taken parallel uit op aparte branches en review alles op één plek."
+msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
+msgstr "De open-source werkruimte voor Claude Code, Codex, OpenCode en elke andere agent, lokaal of in de cloud. Voer taken parallel uit op aparte branches en review alles op één plek."
 
 msgid "The organization reached its usage limit."
 msgstr "De organisatie heeft haar gebruikslimiet bereikt."
@@ -20599,6 +20733,9 @@ msgstr "Deze automatisering staat in een andere organisatie"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Deze browser is niet aangemeld bij Paradev. Meld je aan om door te gaan naar {connectorName}."
 
+msgid "This build has no snapshot to restore"
+msgstr "Deze build heeft geen snapshot om te herstellen"
+
 msgid "This cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."
 
@@ -20644,6 +20781,13 @@ msgstr "Deze cloudwerkruimte kan niet starten"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 seconden duren."
 
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Deze configuratie bevat instellingen die deze versie van Paradev niet kan tonen, dus je kunt hem hier niet bewerken. Werk Paradev bij of wijzig hem met superset environments update."
+
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Deze configuratie is ongeldig: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Dit gesprek is te lang voor het model"
 
@@ -20675,17 +20819,14 @@ msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de pr
 msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
 msgstr "Deze omgeving kan 3 handmatige builds per uur starten. Probeer het over {0} minuten opnieuw."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan .paradev/config.toml op de basisbranch."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan de configuratie in Instellingen, Omgevingen."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Deze omgeving opent {environmentRepository}, niet {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "De repositories van deze omgeving liggen vast; promoveer opnieuw een werkruimte om ze te wijzigen"
 
 msgid "this file"
 msgstr "dit bestand"
@@ -21967,6 +22108,9 @@ msgstr "Gebruiken voor nieuwe agents"
 msgid "Use global default"
 msgstr "Globale standaard gebruiken"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Gebruik kleine letters, cijfers en underscores, beginnend met een letter."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Gebruik kleine letters, cijfers, streepjes en underscores"
 
@@ -22417,6 +22561,9 @@ msgstr "We nemen engineers aan in San Francisco. Kom de tools bouwen waarmee eng
 msgid "We're hiring in San Francisco"
 msgstr "We zoeken mensen in San Francisco"
 
+msgid "Web app"
+msgstr "Webapp"
+
 msgid "Web Fetch"
 msgstr "Webinhoud ophalen"
 
@@ -22559,6 +22706,9 @@ msgstr "Wat teams automatiseren"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Waar deze op sloegen staat niet meer op de pagina, dus ze hebben geen markering."
 
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "Wat de builds en cloudwerkruimtes van deze omgeving uitvoeren. Zonder deze leest de cloud de .paradev/config.toml van de primaire repository."
+
 msgid "What we believe"
 msgstr "Waar we in geloven"
 
@@ -22645,6 +22795,9 @@ msgstr "Welke AI-coding agents worden ondersteund?"
 
 msgid "Which plans include automations?"
 msgstr "Welke abonnementen bevatten automatiseringen?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "Van welke plugins cloudagents in deze omgeving de MCP-servers mogen gebruiken."
 
 msgid "Who can open it"
 msgstr "Wie het kan openen"

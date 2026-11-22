@@ -23,6 +23,8 @@ export interface McpContext {
 	organizationId: string;
 	organizationIds: string[];
 	source: "api-key" | "oauth" | "sandbox";
+	/** The cloud workspace a sandbox credential belongs to; absent for every other source. */
+	sandboxWorkspaceId?: string;
 	clientLabel: string | null;
 	requestId: string;
 	bearerToken: string;
@@ -187,6 +189,7 @@ async function sandboxContext(
 		organizationId: caller.organizationId,
 		organizationIds,
 		source: "sandbox",
+		sandboxWorkspaceId: caller.workspaceId,
 		clientLabel: `cloud-workspace:${caller.workspaceId}`,
 		requestId: crypto.randomUUID(),
 		bearerToken: "",
