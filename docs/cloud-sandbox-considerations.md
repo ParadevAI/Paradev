@@ -245,21 +245,24 @@ decides what a record holds:
 - A `console` line whose `[prefix]` is in `BOX_LOG_PREFIXES` goes out as its
   template, the call site's constant first argument with `{}` for each later
   argument, plus the later arguments that are strings, numbers or booleans.
-  Objects, which include every error, are not sent. Those call sites pass ids,
-  counts, versions, ports, paths, agent, plugin and integration names and
-  URLs, so paths, repository and branch names can leave the box in them. A
-  test keeps their first argument free of `${}`.
+  Objects, which include every error, are not sent; a caught value is passed
+  through `caught()`, so a string rejection is an object too. Those call sites
+  pass ids, counts, versions, ports, paths, a client address, agent, plugin
+  and integration names and URLs, so paths, repository and branch names can
+  leave the box in them. A test keeps their first argument free of `${}`.
 - Any other `console` line goes out as its prefix only. `debug` lines are not
   sent.
 
 The template and each string go through `createBoxLogScrub`
-(`packages/shared/src/sandbox/box-log-scrub.ts`). A record that holds a
+(`packages/host-service/src/runtime/box-log-filter/box-log-scrub.ts`). A record that holds a
 managed value, the host secret or the DSN, raw, JSON-escaped or URL-encoded,
 goes out as `box.logs.withheld` with its level only; URL userinfo, `Bearer`
 and `Basic` credentials, GitHub, Stripe and `sk-` keys are replaced with
 `[redacted]`. Limits: a value shorter than 8 characters is not matched; part
 of a value, or a value in another encoding, is not matched; a token that is
-not a managed value is found only if its shape is in that list. A box sends
+not a managed value is found only if its shape is in that list; a caught
+value passed without `caught()`, or a line whose single argument is
+interpolated, is not held back. A box sends
 at most 1,000 filtered records an hour; the record that reaches the cap is
 `box.logs.capped`, and the next hour starts with `box.logs.dropped` and the
 count. Sentry error events (`captureException`, uncaught exceptions) are not

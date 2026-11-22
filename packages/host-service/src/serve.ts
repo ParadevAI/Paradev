@@ -13,6 +13,7 @@ import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
 import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
+import { caught } from "./runtime/box-log-filter";
 import { readSandboxBoxResources } from "./runtime/box-resources";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
@@ -147,7 +148,7 @@ async function main(): Promise<void> {
 			} catch (err) {
 				console.error(
 					"[host-service] dev shutdown: supervisor.stop failed:",
-					err,
+					caught(err),
 				);
 			} finally {
 				process.exit(0);
@@ -263,7 +264,7 @@ async function main(): Promise<void> {
 }
 
 void main().catch(async (error) => {
-	console.error("[host-service] Failed to start:", error);
+	console.error("[host-service] Failed to start:", caught(error));
 	await captureFatalStartupError(error);
 	process.exit(1);
 });

@@ -1,1 +1,1 @@
-export { createBoxLogFilter } from "./box-log-filter";
+export { caught, createBoxLogFilter } from "./box-log-filter";

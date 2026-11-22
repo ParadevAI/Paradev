@@ -36,6 +36,7 @@ import { createChatSessionInWorkspace } from "../../trpc/router/sessions/session
 import { ensurePresetRow } from "../../trpc/router/settings/agent-configs";
 import type { HostServiceContext } from "../../types";
 import { recordBootStamp } from "../boot-stamps";
+import { caught } from "../box-log-filter";
 import {
 	getManagedEnv,
 	waitForManagedEnv,
@@ -404,7 +405,7 @@ export async function runSandboxStartHook(
 			log: readTail(files.log),
 		};
 		startRun().catch((error) => {
-			console.error("[sandbox] run terminal not started", error);
+			console.error("[sandbox] run terminal not started", caught(error));
 		});
 	});
 
@@ -482,7 +483,7 @@ function approveClaudeApiKey(): void {
 			console.warn(
 				"[sandbox] not readable JSON, key not approved (path):",
 				path,
-				error,
+				caught(error),
 			);
 			return;
 		}
@@ -573,7 +574,10 @@ export async function launchSandboxAgentOnce(
 				const imported = await importCloudAttachments(ctx, attachmentFileIds);
 				attachmentIds = imported.map((item) => item.attachmentId);
 			} catch (error) {
-				console.error("[sandbox] could not import prompt attachments", error);
+				console.error(
+					"[sandbox] could not import prompt attachments",
+					caught(error),
+				);
 			}
 		}
 		const chatTarget =
@@ -635,7 +639,7 @@ export async function launchSandboxAgentOnce(
 			"[sandbox] could not launch (agent, workspace):",
 			agent,
 			identity.workspaceId,
-			error,
+			caught(error),
 		);
 	}
 }
@@ -663,7 +667,7 @@ async function rememberLaunchReport(
 		console.warn(
 			"[sandbox] could not keep the launch report (workspace):",
 			identity.workspaceId,
-			error,
+			caught(error),
 		);
 	}
 }
@@ -699,7 +703,7 @@ async function reportLaunch(
 		console.warn(
 			"[sandbox] could not report the launch (workspace):",
 			workspaceId,
-			error,
+			caught(error),
 		);
 		return false;
 	}

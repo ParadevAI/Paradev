@@ -3,6 +3,7 @@ import { after, before, describe, it } from "node:test";
 import * as Sentry from "@sentry/node";
 import { hostSentryOptions } from "../../sentry";
 import { setManagedEnv } from "../sandbox-managed-env";
+import { caught } from "./box-log-filter";
 
 // Made-up values in the shapes a real box's managed environment holds.
 const VALUES = {
@@ -82,10 +83,22 @@ after(async () => {
 	await Sentry.close(2_000);
 });
 
+const REJECTION =
+	"spawn failed: claude --api-key=opaque-key-9876543210 --prompt 'fix the billing bug for acme'";
 const stderrError = (stderr: string) =>
 	Object.assign(new Error("git failed"), { stderr });
 
 const PROBES: Array<[string, () => void, string[]?]> = [
+	[
+		"a string rejection passed through caught",
+		() =>
+			console.warn(
+				"[sandbox] could not launch (agent):",
+				"claude",
+				caught(REJECTION),
+			),
+		[REJECTION],
+	],
 	[
 		"an Error's stderr, allowlisted prefix",
 		() =>
@@ -183,9 +196,10 @@ describe("box log probes, under Node through the Sentry SDK's own console format
 		});
 	}
 
-	it("sends an allowlisted line as its template and its parameters, and not a debug line", async () => {
+	it("sends an allowlisted line as its template and its parameters with the SDK's attributes, and not a debug line", async () => {
 		const out = await sent(() => {
 			console.log("[sandbox] launched (agent, workspace):", "claude", "ws-1");
+			console.log("[host-service] callback (path):", "/cb?q=%s");
 			console.log("[host-service:vitals]", '{"pid":1117}');
 			console.debug("[host-service] a debug line");
 		});
@@ -200,8 +214,21 @@ describe("box log probes, under Node through the Sentry SDK's own console format
 			}),
 			[
 				["[sandbox] launched (agent, workspace): {} {}", "claude", "ws-1"],
+				["[host-service] callback (path): {}", "/cb?q=%s"],
 				["[host-service:vitals] {}", '{"pid":1117}'],
 			],
 		);
+		for (const record of out) {
+			assert.ok("sentry.sdk.name" in (record.attributes as object));
+		}
+	});
+
+	it("keeps the SDK's attributes on a withheld record", async () => {
+		const [record] = await sent(() =>
+			console.log("[sandbox] could not write git config (key):", HEX),
+		);
+		assert.equal(record?.body, "box.logs.withheld");
+		assert.ok("sentry.sdk.name" in (record?.attributes as object));
+		assert.ok("sentry.origin" in (record?.attributes as object));
 	});
 });

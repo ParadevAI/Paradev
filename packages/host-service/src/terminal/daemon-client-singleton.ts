@@ -10,6 +10,7 @@
 // failure model.
 
 import { getSupervisor, waitForDaemonReady } from "../daemon/index.ts";
+import { caught } from "../runtime/box-log-filter";
 import { DaemonClient } from "./DaemonClient/index.ts";
 
 // Read org id directly from process.env rather than importing the validated
@@ -68,7 +69,7 @@ export async function getDaemonClient(): Promise<DaemonClient> {
 	const sockPath = await ptyDaemonSocketPath();
 	const client = new DaemonClient({ socketPath: sockPath });
 	client.onDisconnect((err) => {
-		console.error("[host-service] pty-daemon disconnected:", err);
+		console.error("[host-service] pty-daemon disconnected:", caught(err));
 		if (cached === client) cached = null;
 		for (const listener of disconnectListeners) {
 			try {
@@ -76,7 +77,7 @@ export async function getDaemonClient(): Promise<DaemonClient> {
 			} catch (cbErr) {
 				console.error(
 					"[host-service] daemon-disconnect listener threw:",
-					cbErr,
+					caught(cbErr),
 				);
 			}
 		}

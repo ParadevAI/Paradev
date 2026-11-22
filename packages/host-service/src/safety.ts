@@ -16,6 +16,7 @@
 import type { IncomingMessage } from "node:http";
 import type { Duplex } from "node:stream";
 import * as Sentry from "@sentry/node";
+import { caught } from "./runtime/box-log-filter";
 
 let safetyNetInstalled = false;
 
@@ -44,7 +45,7 @@ export function installUpgradeSocketGuard(server: {
 				"[host-service] upgrade socket error (path, from):",
 				requestPath,
 				request.socket.remoteAddress ?? "<unknown>",
-				error,
+				caught(error),
 			);
 		});
 	});

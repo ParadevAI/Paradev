@@ -13,6 +13,7 @@ import { desiredPluginMcpServers } from "@superset/shared/plugins";
 import { createApiClient } from "../api/createApiClient";
 import { env } from "../env";
 import { SandboxApiAuthProvider } from "../providers/auth";
+import { caught } from "./box-log-filter";
 import { seedSandboxPlugins } from "./sandbox-plugins";
 
 function organizationBundleFetcher() {
@@ -104,7 +105,7 @@ export async function provisionAgentIntegrations(): Promise<void> {
 	} catch (error) {
 		console.warn(
 			"[host-service] agent integration provisioning failed (continuing):",
-			error,
+			caught(error),
 		);
 	}
 }

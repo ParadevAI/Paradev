@@ -19,6 +19,7 @@ import {
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import { sandboxPluginsSchema } from "@superset/shared/sandbox/contract";
+import { caught } from "../box-log-filter";
 
 function readManifest(file: string): unknown {
 	try {
@@ -54,7 +55,11 @@ async function cacheShippedTree(
 	try {
 		target = pluginCachePath(marketplace, name, version);
 	} catch (error) {
-		console.warn("[sandbox] plugin has no cache path (plugin):", name, error);
+		console.warn(
+			"[sandbox] plugin has no cache path (plugin):",
+			name,
+			caught(error),
+		);
 		return undefined;
 	}
 	if (existsSync(join(target, "plugin.json"))) return target;
@@ -77,7 +82,7 @@ async function cacheShippedTree(
 		console.warn(
 			"[sandbox] could not cache a plugin tree (plugin):",
 			name,
-			error,
+			caught(error),
 		);
 		return undefined;
 	}
@@ -116,7 +121,7 @@ async function cacheOrganizationTree(
 		console.warn(
 			"[sandbox] could not fetch a plugin tree (plugin):",
 			name,
-			error,
+			caught(error),
 		);
 		return undefined;
 	}

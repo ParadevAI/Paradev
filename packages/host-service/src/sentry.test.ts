@@ -58,6 +58,10 @@ describe("hostSentryOptions", () => {
 					"sentry.message.parameter.0": env.HOST_SERVICE_SECRET,
 				},
 			}),
-		).toEqual({ level: "info", message: "box.logs.withheld" });
+		).toEqual({
+			level: "info",
+			message: "box.logs.withheld",
+			attributes: { "sentry.origin": "auto.log.console" },
+		});
 	});
 });

@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { caught } from "../box-log-filter";
 
 const run = promisify(execFile);
 
@@ -58,7 +59,11 @@ async function writeGitIdentity(
 		try {
 			await run("git", ["config", "--global", key, value]);
 		} catch (error) {
-			console.warn("[sandbox] could not write git config (key):", key, error);
+			console.warn(
+				"[sandbox] could not write git config (key):",
+				key,
+				caught(error),
+			);
 		}
 	}
 }

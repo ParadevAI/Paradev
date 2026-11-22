@@ -1,5 +1,5 @@
 import type { Log } from "@sentry/node";
-import { createBoxLogScrub } from "@superset/shared/sandbox/box-log-scrub";
+import { createBoxLogScrub } from "./box-log-scrub";
 
 /** The console prefixes whose call sites keep the first argument constant; their template and parameters leave a box. */
 export const BOX_LOG_PREFIXES: ReadonlySet<string> = new Set([
@@ -15,19 +15,32 @@ const BOX_LOG_RECORDS_PER_HOUR = 1_000;
 const HOUR_MS = 60 * 60_000;
 const PREFIX = /^(?:\S+Z )?\[([\w:-]+)\]/;
 
+/** A caught value as a console argument that never leaves a box: a string rejection becomes an object. */
+export function caught(error: unknown): object {
+	return typeof error === "object" && error !== null ? error : { error };
+}
+
 /** An allowlisted line as its template and its non-object parameters; any other line as its prefix. */
 function boxLogRecord(log: Log, secrets: readonly string[]): Log {
+	const sdkAttributes = Object.fromEntries(
+		Object.entries(log.attributes ?? {}).filter(
+			([key]) =>
+				key.startsWith("sentry.") && !key.startsWith("sentry.message."),
+		),
+	);
 	const message = String(log.message);
+	const template = log.attributes?.["sentry.message.template"];
+	const text = typeof template === "string" ? template : message;
 	const prefix = PREFIX.exec(message)?.[1];
-	if (!prefix || !BOX_LOG_PREFIXES.has(prefix) || /%[sdifocO]/.test(message)) {
+	if (!prefix || !BOX_LOG_PREFIXES.has(prefix) || /%[sdifocO]/.test(text)) {
 		return {
-			level: log.level,
+			...log,
 			message: prefix ? `[${prefix}]` : "(no prefix)",
+			attributes: sdkAttributes,
 		};
 	}
 	const scrub = createBoxLogScrub(secrets);
-	const template = log.attributes?.["sentry.message.template"];
-	const body = scrub(typeof template === "string" ? template : message);
+	const body = scrub(text);
 	const parameters = Object.entries(log.attributes ?? {})
 		.filter(
 			([key, value]) =>
@@ -39,12 +52,13 @@ function boxLogRecord(log: Log, secrets: readonly string[]): Log {
 			typeof value === "string" ? scrub(value) : value,
 		]);
 	if (body === null || parameters.some(([, value]) => value === null)) {
-		return { level: log.level, message: "box.logs.withheld" };
+		return { ...log, message: "box.logs.withheld", attributes: sdkAttributes };
 	}
 	return {
-		level: log.level,
+		...log,
 		message: body,
 		attributes: {
+			...sdkAttributes,
 			"sentry.message.template": body,
 			...Object.fromEntries(parameters),
 		},

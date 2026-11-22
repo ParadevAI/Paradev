@@ -4,6 +4,7 @@ import { getHostId, getHostName } from "@superset/shared/host-info";
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { getHostInstallSource, HOST_SERVICE_VERSION } from "../install-source";
 import type { JwtApiAuthProvider } from "../providers/auth/JwtAuthProvider/JwtAuthProvider";
+import { caught } from "../runtime/box-log-filter";
 import type { ApiClient } from "../types";
 import {
 	recordRegistrationFailure,
@@ -38,7 +39,7 @@ async function resolveRelayUrl(
 	} catch (error) {
 		console.warn(
 			"[host-service] relay endpoint lookup failed, using fallback:",
-			error,
+			caught(error),
 		);
 	}
 	return fallback;
@@ -103,7 +104,7 @@ export async function connectRelay(
 			console.error(
 				"[host-service] failed to register or connect the relay (retry in s):",
 				Math.round(delay / 1000),
-				error,
+				caught(error),
 			);
 			// unref: the HTTP server keeps the process alive between retries;
 			// this timer must not stall shutdown once the server closes.

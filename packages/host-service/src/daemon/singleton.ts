@@ -7,6 +7,7 @@
 import { existsSync } from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { caught } from "../runtime/box-log-filter";
 import { DaemonSupervisor } from "./DaemonSupervisor.ts";
 
 let supervisor: DaemonSupervisor | null = null;
@@ -80,7 +81,7 @@ export function startDaemonBootstrap(organizationId: string): void {
 			console.error(
 				"[supervisor] bootstrap failed (org):",
 				organizationId,
-				err,
+				caught(err),
 			);
 			// Reset so a future request can retry.
 			bootstrapPromise = null;

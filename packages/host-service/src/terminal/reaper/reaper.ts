@@ -2,6 +2,7 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import type { HostDb } from "../../db/index.ts";
 import { terminalAgentBindings, terminalSessions } from "../../db/schema.ts";
 import { chatPortTerminalIds, portManager } from "../../ports/port-manager.ts";
+import { caught } from "../../runtime/box-log-filter";
 import { markTerminalAgentBindingEnded } from "../../terminal-agents/persistence.ts";
 import { getDaemonClient } from "../daemon-client-singleton.ts";
 import {
@@ -267,7 +268,7 @@ function applyPortScanSync(
 			portManager.unregisterSession(terminalId);
 		}
 	} catch (err) {
-		console.warn("[host-service] port-scan sync failed:", err);
+		console.warn("[host-service] port-scan sync failed:", caught(err));
 	}
 }
 
@@ -335,7 +336,7 @@ async function reapOrphanedSessions(
 			missingObservations.reset();
 			console.warn(
 				"[host-service] missing-session reconciliation failed:",
-				err,
+				caught(err),
 			);
 		}
 	}
@@ -411,7 +412,7 @@ export function startTerminalReaper(db: HostDb): () => void {
 			})
 			.catch((err) => {
 				missingObservations.reset();
-				console.warn("[host-service] terminal reaper failed:", err);
+				console.warn("[host-service] terminal reaper failed:", caught(err));
 			})
 			.finally(() => {
 				running = false;
@@ -426,7 +427,10 @@ export function startTerminalReaper(db: HostDb): () => void {
 	const warmupTimers = PORT_SCAN_WARMUP_DELAYS_MS.map((delay) =>
 		setTimeout(() => {
 			void syncPortScans(db).catch((err) => {
-				console.warn("[host-service] port-scan warm-up sync failed:", err);
+				console.warn(
+					"[host-service] port-scan warm-up sync failed:",
+					caught(err),
+				);
 			});
 		}, delay),
 	);

@@ -3,6 +3,7 @@ import {
 	type BootStamp,
 	parseBootStamps,
 } from "@superset/shared/sandbox/boot-stamps";
+import { caught } from "../box-log-filter";
 
 export interface SandboxBootReport {
 	/** The current boot's stamps in order, starting at its `boot.start`. */
@@ -28,7 +29,11 @@ export function recordBootStamp(phase: string, at = Date.now()): void {
 	try {
 		appendFileSync(path, `${at} ${phase}\n`);
 	} catch (error) {
-		console.warn("[boot-stamps] could not write (phase):", phase, error);
+		console.warn(
+			"[boot-stamps] could not write (phase):",
+			phase,
+			caught(error),
+		);
 	}
 }
 
