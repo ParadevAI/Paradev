@@ -234,12 +234,20 @@ reaped while its terminal survived.
 
 When the organization's PostHog flag `sandbox-box-logs` is on, the claim sets
 `SUPERSET_SANDBOX_BOX_LOGS=1` and host-service turns on the Sentry SDK's logs
-(`logBoxEvent` in `packages/host-service/src/sentry.ts`). Only those fixed
-events leave the box, each with ids, counts and durations: no log file, no
-console line, no error message. A box whose host-service never answers is
+(`hostSentryOptions` in `packages/host-service/src/sentry.ts`), on a box only:
+a desktop user's own host-service never sends a line. The box sends its fixed
+events (`logBoxEvent`) and every `console` line host-service writes except
+`debug`. Each record passes `scrubBoxLogLine`
+(`packages/shared/src/sandbox/box-log-scrub.ts`): every managed environment
+value, the host secret and token shapes are removed, and a line it cannot make
+safe goes out as `box.logs.withheld` with nothing of the line. So paths,
+branch and repository names and integration names can leave the box; secrets
+and environment values cannot. A box sends at most `BOX_LOG_RECORDS_PER_HOUR`
+records an hour; the record that reaches it is `box.logs.capped`, and the
+next hour starts with `box.logs.dropped` and the count. A box whose host-service never answers is
 reported by the control plane: `SandboxNotReadyError` names the boot phases
 `boot.log` reached, not the step output between them. `memguard.log`,
-`desktop.log`, `checkout.log` and `host-service.log` stay on the box.
+`desktop.log` and `checkout.log` stay on the box.
 Before the flag is on for a customer organization, the policy wording (L1)
 must be live.
 

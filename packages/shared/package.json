@@ -205,6 +205,10 @@
 			"types": "./src/sandbox/boot-stamps.ts",
 			"default": "./src/sandbox/boot-stamps.ts"
 		},
+		"./sandbox/box-log-scrub": {
+			"types": "./src/sandbox/box-log-scrub.ts",
+			"default": "./src/sandbox/box-log-scrub.ts"
+		},
 		"./sandbox/build-errors": {
 			"types": "./src/sandbox/build-errors.ts",
 			"default": "./src/sandbox/build-errors.ts"

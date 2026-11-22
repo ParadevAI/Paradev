@@ -1,6 +1,8 @@
 import * as Sentry from "@sentry/node";
 import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
+import { createBoxLogFilter } from "./runtime/box-log-filter";
+import { getManagedEnv } from "./runtime/sandbox-managed-env";
 import type { TerminalAgentEndReason } from "./terminal-agents/types";
 
 let initialized = false;
@@ -31,10 +33,32 @@ export function hostSentryOptions(
 		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
 		provider: env.SUPERSET_SANDBOX_PROVIDER,
 	};
+	const boxLogs =
+		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
+		env.SUPERSET_SANDBOX_BOX_LOGS === "1";
 	return {
 		dsn,
 		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
-		enableLogs: env.SUPERSET_SANDBOX_BOX_LOGS === "1",
+		enableLogs: boxLogs,
+		beforeSendLog: boxLogs
+			? createBoxLogFilter({
+					secrets: () =>
+						[
+							...Object.values(getManagedEnv()),
+							env.HOST_SERVICE_SECRET,
+							dsn,
+						].filter((value): value is string => Boolean(value)),
+					reportDropped: (dropped, windowStartedAt) =>
+						logBoxEvent(
+							"box.logs.dropped",
+							{
+								"box.logs.dropped": dropped,
+								"box.logs.window_started_at": windowStartedAt,
+							},
+							"warn",
+						),
+				})
+			: undefined,
 		release: env.HOST_SERVICE_SENTRY_RELEASE,
 		environment: env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		// A host that fails once usually fails in a loop: git.getStatus alone
@@ -46,6 +70,13 @@ export function hostSentryOptions(
 			Sentry.onUncaughtExceptionIntegration({
 				exitEvenIfOtherHandlersAreRegistered: false,
 			}),
+			...(boxLogs
+				? [
+						Sentry.consoleLoggingIntegration({
+							levels: ["log", "info", "warn", "error"],
+						}),
+					]
+				: []),
 		],
 		initialScope: { tags, attributes: tags },
 	};
@@ -61,9 +92,13 @@ interface BoxEventAttributes {
 	};
 	"box.reaped": { "reap.rss_mb": number; "memory.limit_mb": number };
 	"hook.finished": { "hook.exit": number | NodeJS.Signals; ms: number };
+	"box.logs.dropped": {
+		"box.logs.dropped": number;
+		"box.logs.window_started_at": number;
+	};
 }
 
-/** Typed per event so no free text can reach Sentry Logs. */
+/** One of our own events, typed so its attributes stay counts and ids. */
 export function logBoxEvent<E extends keyof BoxEventAttributes>(
 	event: E,
 	attributes: BoxEventAttributes[E],
