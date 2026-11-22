@@ -29,7 +29,7 @@ export default command({
 		if (!themeId && !options.systemLight && !options.systemDark) {
 			throw new CLIError(
 				"Nothing to change",
-				"Pass a theme id, --system-light, or --system-dark. See: superset settings theme list",
+				"Pass a theme id, --system-light, or --system-dark. See: paradev settings theme list",
 			);
 		}
 

@@ -41,7 +41,7 @@ export default command({
 			})),
 			message: skills.length
 				? `${skills.length} skill${skills.length === 1 ? "" : "s"} in ${skillsRoot()}.`
-				: `No skills installed. Install a plugin with: superset plugins install <name>`,
+				: `No skills installed. Install a plugin with: paradev plugins install <name>`,
 		};
 	},
 });

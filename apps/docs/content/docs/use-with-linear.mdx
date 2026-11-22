@@ -17,20 +17,20 @@ passes issue context through `LINEAR_*` environment variables
 (`LINEAR_ISSUE_IDENTIFIER`, `LINEAR_ISSUE_BRANCH_NAME`, `LINEAR_PROMPT`, and
 others). The wrapper script makes two CLI calls:
 
-1. `superset workspaces create`: creates a local workspace on the issue's
+1. `paradev workspaces create`: creates a local workspace on the issue's
    branch and launches an agent with the issue as its prompt.
-2. `superset workspaces open`: opens that workspace in the desktop app via its
+2. `paradev workspaces open`: opens that workspace in the desktop app via its
    deep link.
 
 ## Prerequisites
 
 - The [Paradev CLI](/cli/getting-started) installed and signed in
-  (`superset auth login`).
+  (`paradev auth login`).
 - The Paradev desktop app installed (the script opens workspaces in it).
 - A project that's set up locally. Find its ID with:
 
 ```bash
-superset projects list
+paradev projects list
 ```
 
 Copy the `id` of the project to open issues against.
@@ -49,10 +49,10 @@ NAME="${LINEAR_ISSUE_IDENTIFIER:-linear-task}"
 BRANCH="${LINEAR_ISSUE_BRANCH_NAME:-$NAME}"
 PROMPT="${LINEAR_PROMPT:-Work on Linear issue ${NAME}.}"
 
-superset start --daemon >/dev/null 2>&1 || true
+paradev start --daemon >/dev/null 2>&1 || true
 
 result="$(
-  superset workspaces create \
+  paradev workspaces create \
     --local \
     --project "$PROJECT" \
     --name "$NAME" \
@@ -65,7 +65,7 @@ result="$(
 
 id="$(printf '%s' "$result" | jq -r '.workspace.id')"
 
-superset workspaces open "$id"
+paradev workspaces open "$id"
 ```
 
 Make it executable:
@@ -75,9 +75,9 @@ chmod +x ~/.linear/open-in-superset.sh
 ```
 
 <Callout type="info">
-The script depends on `superset` being on your `PATH` and `jq` being installed.
-If `superset` isn't on your `PATH`, use its full path (the desktop app installs
-a shim at `~/.paradev/bin/superset`).
+The script depends on `paradev` being on your `PATH` and `jq` being installed.
+If `paradev` isn't on your `PATH`, use its full path (the desktop app installs
+a shim at `~/.paradev/bin/paradev`).
 </Callout>
 
 The branch named by the issue won't exist yet. `workspaces create` forks it

@@ -8,7 +8,7 @@ export function environmentLimitHint(error: unknown): never {
 	if (data?.i18nKey === LIMIT_REACHED && error instanceof Error) {
 		throw new CLIError(
 			error.message,
-			"See them with: superset environments list. Archive one with: superset environments archive <id>",
+			"See them with: paradev environments list. Archive one with: paradev environments archive <id>",
 		);
 	}
 	throw error;

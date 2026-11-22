@@ -19,7 +19,7 @@ export default command({
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		if (options.config && options.clearConfig) {
 			throw new CLIError("Pass --config or --clear-config, not both");
@@ -52,7 +52,7 @@ export default command({
 			config,
 		});
 		const name = updated?.name ?? environment.name;
-		const rebuild = `superset environments rebuild ${environment.id}`;
+		const rebuild = `paradev environments rebuild ${environment.id}`;
 		return {
 			data: updated,
 			message:

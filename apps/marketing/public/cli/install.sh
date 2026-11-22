@@ -143,18 +143,18 @@ main() {
             error "Expected executable file not found: $path"
         fi
     done
-    # `paradev` is an alias. Releases before the rename ship without the link.
+    # Releases before the rename ship without the `paradev` link.
     [ -e "$INSTALL_DIR/bin/paradev" ] || ln -s superset "$INSTALL_DIR/bin/paradev"
 
     update_path
 
     printf "\n${GREEN}${BOLD}Installed!${RESET}\n"
-    # `superset hosts add` signs the machine in itself, so it skips this advice.
+    # `paradev hosts add` signs the machine in itself, so it skips this advice.
     if [ "${1:-}" = "--no-next-steps" ]; then
         return
     fi
     printf "Run ${BOLD}exec \$SHELL${RESET} (or open a new terminal) to load the updated PATH.\n"
-    printf "Then run ${BOLD}superset auth login${RESET} to get started. ${BOLD}paradev${RESET} works as an alias for ${BOLD}superset${RESET}.\n"
+    printf "Then run ${BOLD}paradev auth login${RESET} to get started. ${BOLD}superset${RESET} still works as an alias for ${BOLD}paradev${RESET}.\n"
 }
 
 main "$@"

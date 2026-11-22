@@ -19,7 +19,7 @@ describe("environmentLimitHint", () => {
 			expect(error).toBeInstanceOf(CLIError);
 			expect((error as CLIError).message).toContain("environment limit (3)");
 			expect((error as CLIError).suggestion).toContain(
-				"superset environments archive",
+				"paradev environments archive",
 			);
 			return;
 		}

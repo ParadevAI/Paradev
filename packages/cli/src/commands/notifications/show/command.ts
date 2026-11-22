@@ -51,7 +51,7 @@ export default command({
 					/No procedure found on path "?notifications\.show/.test(error.message)
 				) {
 					throw new CLIError(
-						"This host is too old for `superset notifications show`",
+						"This host is too old for `paradev notifications show`",
 						"Update the Paradev desktop app on that host",
 					);
 				}

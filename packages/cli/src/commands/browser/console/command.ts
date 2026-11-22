@@ -7,7 +7,7 @@ export default command({
 	options: {
 		workspace: string().required().desc("Workspace ID"),
 		host: string().desc("Host the workspace lives on (default: this machine)"),
-		pane: string().required().desc("Pane ID (from `superset browser list`)"),
+		pane: string().required().desc("Pane ID (from `paradev browser list`)"),
 		maxLines: number().int().desc("Cap returned entries from the bottom"),
 	},
 	run: async ({ ctx, options }) => {

@@ -6,7 +6,7 @@ import pkg from "./package.json" with { type: "json" };
 const VERSION = pkg.version;
 
 export default defineConfig({
-	name: "superset",
+	name: "paradev",
 	version: VERSION,
 	commandsDir: "./src/commands",
 	outfile: "./dist/superset",
@@ -36,7 +36,7 @@ export default defineConfig({
 	help: {
 		tagline: "Command your fleet of coding agents from any shell.",
 		docsUrl: `${CANONICAL_URLS.DOCS}/cli/getting-started`,
-		tip: "`paradev` is an alias for `superset`. Agents in Paradev terminals already have both on PATH — tell them to use it.",
+		tip: "`superset` still works as an alias for `paradev`. Agents in Paradev terminals already have both on PATH — tell them to use it.",
 		sections: [
 			{
 				title: "Workspaces & agents",
@@ -82,15 +82,15 @@ export default defineConfig({
 		],
 		examples: [
 			{
-				cmd: 'superset ws create --local --project <id> --name fix-tests --branch fix-tests --agent claude --prompt "fix the flaky tests"',
+				cmd: 'paradev ws create --local --project <id> --name fix-tests --branch fix-tests --agent claude --prompt "fix the flaky tests"',
 				desc: "Spin up an isolated workspace and put an agent to work",
 			},
 			{
-				cmd: "superset terminals read --local --workspace <id> --terminal <id>",
+				cmd: "paradev terminals read --local --workspace <id> --terminal <id>",
 				desc: "Peek at what an agent is doing right now",
 			},
 			{
-				cmd: 'superset automations create --name nightly-audit --local --project <id> --rrule "FREQ=DAILY" --prompt "audit deps"',
+				cmd: 'paradev automations create --name nightly-audit --local --project <id> --rrule "FREQ=DAILY" --prompt "audit deps"',
 				desc: "Schedule a recurring agent run",
 			},
 		],

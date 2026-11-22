@@ -15,7 +15,7 @@ export default command({
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const { id } = await resolveEnvironment(
 			ctx.api,

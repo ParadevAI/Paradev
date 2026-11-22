@@ -7,7 +7,7 @@ import {
 
 function describe(result: ConfigCheckResult): string {
 	if (!result.exists) {
-		return `${result.path}: no config file (not logged in; run: superset auth login)`;
+		return `${result.path}: no config file (not logged in; run: paradev auth login)`;
 	}
 	const status = result.valid ? "valid" : "INVALID";
 	const login = result.loggedIn ? "" : " (not logged in)";

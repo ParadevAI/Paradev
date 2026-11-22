@@ -12,7 +12,7 @@ export const trackerOption = string()
 export function requireOrganizationId(ctx: CliContext): string {
 	const organizationId = ctx.config.organizationId;
 	if (!organizationId) {
-		throw new CLIError("No active organization", "Run: superset auth login");
+		throw new CLIError("No active organization", "Run: paradev auth login");
 	}
 	return organizationId;
 }

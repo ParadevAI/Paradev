@@ -19,7 +19,7 @@ export default command({
 		});
 		return {
 			data: source,
-			message: `Added ${source.repo}. It is syncing now; see what it brought: superset plugins organization list`,
+			message: `Added ${source.repo}. It is syncing now; see what it brought: paradev plugins organization list`,
 		};
 	},
 });

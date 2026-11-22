@@ -27,7 +27,7 @@ export async function callPanes<T>(call: () => Promise<T>): Promise<T> {
 			/No procedure found on path "?panes\./.test(error.message)
 		) {
 			throw new CLIError(
-				"This host is too old for `superset panes`",
+				"This host is too old for `paradev panes`",
 				"Update the Paradev desktop app on that host",
 			);
 		}
@@ -72,7 +72,7 @@ export async function withPaneTerminal<T>(
 		if (isTimeout(error)) {
 			throw new CLIError(
 				`The desktop app did not confirm in time; terminal ${terminalId} is kept`,
-				"Check with `superset panes list`; close it with `superset terminals close` if no pane shows it",
+				"Check with `paradev panes list`; close it with `paradev terminals close` if no pane shows it",
 			);
 		}
 		if (!options.terminal) {

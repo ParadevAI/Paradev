@@ -16,7 +16,7 @@ export default command({
 		if (!match) {
 			throw new CLIError(
 				`Organization not found: ${idOrSlug}`,
-				"Run: superset organization list",
+				"Run: paradev organization list",
 			);
 		}
 

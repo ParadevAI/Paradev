@@ -35,7 +35,7 @@ export async function callSessions<T>(call: () => Promise<T>): Promise<T> {
 			/No procedure found on path "?sessions\./.test(error.message)
 		) {
 			throw new CLIError(
-				"This host is too old for `superset sessions` — update host-service",
+				"This host is too old for `paradev sessions` — update host-service",
 				"Update host-service or the Paradev desktop app on that host",
 			);
 		}
@@ -74,7 +74,7 @@ export async function resolveSessionWorkspace(
 }> {
 	const organizationId = ctx.config.organizationId;
 	if (!organizationId)
-		throw new CLIError("No active organization", "Run: superset auth login");
+		throw new CLIError("No active organization", "Run: paradev auth login");
 	const { workspace, target } = await resolveWorkspaceTarget(
 		{
 			organizationId,

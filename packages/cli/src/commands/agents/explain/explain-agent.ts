@@ -70,7 +70,7 @@ export function explainAgent({
 				agentId: null,
 				headline: "No such terminal running.",
 				because:
-					"there is no live terminal with this id and no agent was ever recorded for it. Check the id with `superset terminals list`",
+					"there is no live terminal with this id and no agent was ever recorded for it. Check the id with `paradev terminals list`",
 				details: [],
 			};
 		}
