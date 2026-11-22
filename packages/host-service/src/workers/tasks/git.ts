@@ -857,9 +857,9 @@ export const gitDetectExternalWorktreesTask = defineWorkerTask<
 const SNAPSHOT_COMMIT_MESSAGE = "Work in progress, moved to a cloud workspace";
 /** Used only when git has no identity of the user's own. */
 const SNAPSHOT_IDENTITY = {
-	GIT_AUTHOR_NAME: "Superset",
+	GIT_AUTHOR_NAME: "Paradev",
 	GIT_AUTHOR_EMAIL: "teleport@superset.sh",
-	GIT_COMMITTER_NAME: "Superset",
+	GIT_COMMITTER_NAME: "Paradev",
 	GIT_COMMITTER_EMAIL: "teleport@superset.sh",
 };
 
