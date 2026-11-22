@@ -6,6 +6,7 @@ import { View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { useTheme } from "@/hooks/useTheme";
 import { HeaderToolbar } from "@/lib/navigation";
+import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
 import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
@@ -14,7 +15,6 @@ import { useScopeLabel } from "@/screens/(authenticated)/(home)/hooks/useScopeLa
 import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
-import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 
 export function FilterScreen() {
@@ -30,7 +30,7 @@ export function FilterScreen() {
 	const sortLabel = sortOption ? i18n._(sortOption.label) : "";
 
 	return (
-		<View className="bg-background flex-1 px-6">
+		<View className="bg-background flex-1">
 			<HeaderToolbar placement="left">
 				<HeaderToolbar.Button
 					icon="close"
@@ -38,7 +38,7 @@ export function FilterScreen() {
 					onPress={() => router.back()}
 				/>
 			</HeaderToolbar>
-			<ListRow
+			<SheetRow
 				icon={
 					<Ionicons
 						name="desktop-outline"
@@ -65,7 +65,7 @@ export function FilterScreen() {
 				}
 				onPress={() => router.push("/(authenticated)/(home)/filter/scope")}
 			/>
-			<ListRow
+			<SheetRow
 				icon={
 					<Ionicons
 						name="swap-vertical"

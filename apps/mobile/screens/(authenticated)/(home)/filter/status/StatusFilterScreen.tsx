@@ -7,21 +7,18 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
-import { useTheme } from "@/hooks/useTheme";
 import { posthog } from "@/lib/posthog";
+import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
 import {
 	type CloudStatusFilter,
 	useWorkspacesFilterStore,
 } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
-import { ListRow } from "@/screens/(authenticated)/components/ListRow";
-import { ListRowCheck } from "@/screens/(authenticated)/components/ListRowCheck";
 
 export function StatusFilterScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
-	const theme = useTheme();
 	const { formatNumber } = useFormat();
 	const setCloudStatus = useWorkspacesFilterStore(
 		(store) => store.setCloudStatus,
@@ -52,9 +49,9 @@ export function StatusFilterScreen() {
 	];
 
 	return (
-		<View className="bg-background flex-1 px-6">
+		<View className="bg-background flex-1">
 			{options.map((option, index) => (
-				<ListRow
+				<SheetRow
 					key={option.value}
 					icon={
 						<Icon
@@ -65,13 +62,11 @@ export function StatusFilterScreen() {
 					}
 					label={option.label}
 					trailing={
-						<>
-							<Text style={{ color: theme.mutedForeground }}>
-								{formatNumber(option.count)}
-							</Text>
-							<ListRowCheck visible={option.value === status} />
-						</>
+						<Text className="text-muted-foreground text-[16px] tabular-nums">
+							{formatNumber(option.count)}
+						</Text>
 					}
+					checked={option.value === status}
 					onPress={() => {
 						setCloudStatus(option.value);
 						posthog.capture("filter_applied", {

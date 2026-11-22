@@ -9,6 +9,7 @@ import type { CloudWorkspaceRow as CloudWorkspaceRowData } from "@/hooks/useClou
 import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
 import { cn } from "@/lib/utils";
+import { RowHairline } from "@/screens/(authenticated)/(home)/components/RowHairline";
 import { UserAvatar } from "@/screens/(authenticated)/settings/components/UserAvatar";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import {
@@ -19,7 +20,6 @@ import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { CloudPullRequest } from "../../hooks/useCloudPullRequests";
 import { cloudRowAttention } from "../../utils/needsMe";
 import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
-import { RowHairline } from "../RowHairline";
 import { WorkspaceLead } from "../WorkspaceLead";
 import { ArchivedCloudRowMenu } from "./components/ArchivedCloudRowMenu";
 import { CloudWorkspaceRowMenu } from "./components/CloudWorkspaceRowMenu";

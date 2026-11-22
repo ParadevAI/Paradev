@@ -9,6 +9,7 @@ import { useHostsPresence } from "@/hooks/useHostsPresence";
 import { useHostsWorkspaces } from "@/hooks/useHostWorkspaces";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { posthog } from "@/lib/posthog";
+import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
 import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
 import {
@@ -29,8 +30,6 @@ import {
 } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
-import { ListRow } from "@/screens/(authenticated)/components/ListRow";
-import { ListRowCheck } from "@/screens/(authenticated)/components/ListRowCheck";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 
 /**
@@ -167,12 +166,12 @@ export function ScopeFilterScreen() {
 	return (
 		<ScrollView
 			className="bg-background flex-1"
-			contentContainerClassName="px-6 pb-10"
+			contentContainerClassName="pb-10"
 		>
 			{allOffered ? (
-				<ListRow
+				<SheetRow
 					label={t({ message: "All hosts" })}
-					trailing={<ListRowCheck visible={everything} />}
+					checked={everything}
 					onPress={() =>
 						apply(everythingSelection(sortedHosts, cloudEnabled), "all")
 					}
@@ -180,7 +179,7 @@ export function ScopeFilterScreen() {
 				/>
 			) : null}
 			{cloudEnabled ? (
-				<ListRow
+				<SheetRow
 					icon={
 						<Icon
 							as={CloudIcon}
@@ -190,7 +189,7 @@ export function ScopeFilterScreen() {
 					}
 					label={t({ message: "Cloud" })}
 					subtitle={countsLine("cloud")}
-					trailing={<ListRowCheck visible={selection.cloud} />}
+					checked={selection.cloud}
 					onPress={() => apply(toggleCloud(selection), "cloud")}
 					isLast={sortedHosts.length === 0}
 				/>
@@ -204,7 +203,7 @@ export function ScopeFilterScreen() {
 						key={host.machineId}
 						className={tickable ? undefined : "opacity-50"}
 					>
-						<ListRow
+						<SheetRow
 							icon={<HostStatusDot isOnline={host.isOnline} />}
 							label={host.name}
 							subtitle={
@@ -216,7 +215,7 @@ export function ScopeFilterScreen() {
 											? countsLine(host.machineId)
 											: offlineLine(host.lastSeenAt)
 							}
-							trailing={<ListRowCheck visible={ticked} />}
+							checked={ticked}
 							onPress={
 								tickable
 									? () =>

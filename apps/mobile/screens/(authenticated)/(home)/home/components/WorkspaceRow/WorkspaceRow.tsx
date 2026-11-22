@@ -14,6 +14,7 @@ import type {
 } from "@/hooks/useHostWorkspaces";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
+import { RowHairline } from "@/screens/(authenticated)/(home)/components/RowHairline";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import {
@@ -29,7 +30,6 @@ import type { DiffStats } from "../../hooks/useVisibleDiffStats";
 import type { GroupBarSpan } from "../../types";
 import { GroupBar } from "../GroupBar";
 import { RowDetailLine, rowDetailParts } from "../RowDetailLine";
-import { RowHairline } from "../RowHairline";
 import { WorkspaceLead } from "../WorkspaceLead";
 import {
 	WorkspaceRowMenu,
