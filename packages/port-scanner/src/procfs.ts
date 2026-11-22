@@ -328,47 +328,6 @@ export async function readEnvValuesLinuxProcfs(
 	return values;
 }
 
-/** USER_HZ, the unit of /proc/<pid>/stat times. It is 100 on every Linux ABI. */
-const PROC_STAT_TICKS_PER_SECOND = 100;
-
-/**
- * Linux-only: each pid's start time in epoch seconds, from the boot time in
- * /proc/stat plus field 22 (starttime) of /proc/<pid>/stat. A pid whose stat
- * can't be read maps to null.
- */
-export async function readStartTimesLinuxProcfs(
-	pids: number[],
-	signal?: AbortSignal,
-): Promise<Map<number, number | null>> {
-	const values = new Map<number, number | null>();
-	const kernelStat = await fs.readFile("/proc/stat", {
-		encoding: "utf-8",
-		signal,
-	});
-	const bootTime = Number(kernelStat.match(/^btime (\d+)$/m)?.[1]);
-	await Promise.all(
-		pids.map(async (pid) => {
-			let stat: string;
-			try {
-				stat = await fs.readFile(`/proc/${pid}/stat`, {
-					encoding: "utf-8",
-					signal,
-				});
-			} catch (err) {
-				if (signal?.aborted) throw err;
-				values.set(pid, null);
-				return;
-			}
-			// Field 2 (the command name) can hold spaces and parentheses.
-			const fields = stat.slice(stat.lastIndexOf(")") + 2).split(" ");
-			const startTime =
-				bootTime + Number(fields[19]) / PROC_STAT_TICKS_PER_SECOND;
-			values.set(pid, Number.isFinite(startTime) ? startTime : null);
-		}),
-	);
-	return values;
-}
-
 /**
  * First `KEY=value` entry matching `keys` in priority order, or null.
  * Shared by the procfs and `ps -E` readers.

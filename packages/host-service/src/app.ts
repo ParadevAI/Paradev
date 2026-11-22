@@ -30,7 +30,7 @@ import { createDb, type HostDb } from "./db";
 import { EventBus, GitWatcher, registerEventBusRoute } from "./events";
 import { agentIsBusy, PageWatchManager } from "./page-watch/index.ts";
 import { registerForwardMuxRoute } from "./ports/forward-mux-route";
-import { portManager } from "./ports/port-manager";
+import { agentPidSource, portManager } from "./ports/port-manager";
 import {
 	PROJECT_PURGE_INTERVAL_MS,
 	purgeExpiredProjects,
@@ -264,6 +264,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		);
 	}
 	const terminalAgentStore = new TerminalAgentStore(terminalAgentPersistence);
+	portManager.setAgentPidSource(agentPidSource(terminalAgentStore));
 
 	const pageWatch = new PageWatchManager({
 		api: {

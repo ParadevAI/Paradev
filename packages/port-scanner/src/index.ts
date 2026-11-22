@@ -1,4 +1,5 @@
 export {
+	type AgentPidSource,
 	type KillFn,
 	PortManager,
 	type PortManagerOptions,

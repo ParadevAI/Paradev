@@ -51,6 +51,28 @@ async function readProcessTablePs(): Promise<ProcessTableEntry[]> {
 	return parseProcessTable(stdout);
 }
 
+/**
+ * The first argument of each process's command line. Unlike the environment,
+ * macOS lets `ps` read it for platform binaries such as /bin/bash.
+ */
+export async function readProcessArgv0(
+	pids: number[],
+	signal?: AbortSignal,
+): Promise<Map<number, string>> {
+	const argv0 = new Map<number, string>();
+	if (pids.length === 0 || os.platform() === "win32") return argv0;
+	const output = await runTolerant(
+		psCommand(),
+		["-ww", "-o", "pid=,args=", "-p", pids.join(",")],
+		{ maxBuffer: 1024 * 1024, timeout: EXEC_TIMEOUT_MS, signal },
+	);
+	for (const line of output.split("\n")) {
+		const match = line.match(/^\s*(\d+)\s+(\S+)/);
+		if (match?.[1] && match[2]) argv0.set(Number(match[1]), match[2]);
+	}
+	return argv0;
+}
+
 export function parseProcessTable(output: string): ProcessTableEntry[] {
 	const table: ProcessTableEntry[] = [];
 	for (const line of output.split("\n")) {

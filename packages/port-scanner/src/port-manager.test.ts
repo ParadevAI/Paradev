@@ -80,10 +80,8 @@ let envError: Error | null = null;
 let processTable: { pid: number; ppid: number }[] = [];
 /** pid → terminal id the mocked environment reader reports. */
 let terminalIdEnv = new Map<number, string | null>();
-/** pid → agent launch id the mocked environment reader reports. */
-let agentLaunchIdEnv = new Map<number, string>();
-/** pid → start time in epoch seconds; empty means the time can't be read. */
-let processStartTimes = new Map<number, number>();
+/** pid → first command-line argument the mocked `ps` reports. */
+let argv0 = new Map<number, string>();
 /** When set, trees come from `processTable` instead of root → [root, root+1]. */
 let useProcessTableTrees = false;
 
@@ -102,6 +100,13 @@ mock.module("./scanner", () => ({
 		spy.lastTreeRootPids = rootPids;
 		return new Map(rootPids.map((pid) => [pid, [pid, pid + 1]]));
 	},
+	readProcessArgv0: async (pids: number[]) =>
+		new Map(
+			pids.flatMap((pid) => {
+				const value = argv0.get(pid);
+				return value ? [[pid, value] as const] : [];
+			}),
+		),
 	getListeningPortsForPids: async (pids: number[], signal?: AbortSignal) => {
 		spy.getListeningPortsForPids++;
 		spy.lastListeningPids = pids;
@@ -129,9 +134,6 @@ mock.module("./scanner", () => ({
 }));
 
 mock.module("./terminal-env", () => ({
-	readAgentLaunchIdsFromEnv: async (pids: number[]) =>
-		new Map(pids.map((pid) => [pid, agentLaunchIdEnv.get(pid) ?? null])),
-	readProcessStartTimes: async () => processStartTimes,
 	readTerminalIdsFromEnv: async (pids: number[]) => {
 		spy.envReads++;
 		spy.lastEnvReadPids = pids;
@@ -178,8 +180,7 @@ function resetSpy(): void {
 	spy.getListeningPortsForPids = 0;
 	processTable = [];
 	terminalIdEnv = new Map();
-	agentLaunchIdEnv = new Map();
-	processStartTimes = new Map();
+	argv0 = new Map();
 	useProcessTableTrees = false;
 	spy.inFlight = 0;
 	spy.maxInFlight = 0;
@@ -1046,13 +1047,16 @@ describe("PortManager — detached servers (agent background processes)", () => 
 });
 
 describe("PortManager — agent processes", () => {
-	const AGENT_PORT = 58092;
 	const killed: number[] = [];
+	const closePort = (port: number) =>
+		manager.killPort({ terminalId: "p1", workspaceId: "ws1", port });
+	const listedPorts = () =>
+		manager
+			.getAllPorts()
+			.map(({ port }) => port)
+			.sort((a, b) => a - b);
 
-	/**
-	 * Shell 1000 → launcher 1001 → agent 1002 → dev server 1003. The agent's
-	 * wrapper exported the launch id, so the agent and its children carry it.
-	 */
+	/** Shell 1000 → launch pid 1001 → 1002 → 1003. Each one listens. */
 	beforeEach(() => {
 		useProcessTableTrees = true;
 		processTable = [
@@ -1061,16 +1065,12 @@ describe("PortManager — agent processes", () => {
 			{ pid: 1002, ppid: 1001 },
 			{ pid: 1003, ppid: 1002 },
 		];
-		listeningPorts = [
-			{ port: 58091, pid: 1001, address: "127.0.0.1", processName: "node" },
-			{
-				port: AGENT_PORT,
-				pid: 1002,
-				address: "127.0.0.1",
-				processName: "codex",
-			},
-			{ port: 3000, pid: 1003, address: "127.0.0.1", processName: "node" },
-		];
+		listeningPorts = [1001, 1002, 1003].map((pid) => ({
+			port: pid + 2000,
+			pid,
+			address: "127.0.0.1",
+			processName: "node",
+		}));
 		killed.length = 0;
 		manager = new PortManager({
 			killFn: async ({ pid }) => {
@@ -1078,85 +1078,49 @@ describe("PortManager — agent processes", () => {
 				return { success: true };
 			},
 		});
+		manager.setAgentPidSource((terminalId) =>
+			terminalId === "p1" ? 1001 : null,
+		);
 		manager.upsertSession("p1", "ws1", 1000);
 	});
 
-	const agentLaunched = () => {
-		agentLaunchIdEnv = new Map([
-			[1002, "1002-1700000000"],
-			[1003, "1002-1700000000"],
-		]);
-	};
-
-	it("lists the server an agent started, not ports of the agent or its ancestors", async () => {
-		agentLaunched();
+	it("hides the port of an agent its wrapper exec'd, and closes the servers it started", async () => {
+		argv0.set(1001, "/usr/local/bin/claude");
 		await manager.forceScan();
 
-		expect(manager.getAllPorts().map(({ port }) => port)).toEqual([3000]);
-		const result = await manager.killPort({
-			terminalId: "p1",
-			workspaceId: "ws1",
-			port: 3000,
-		});
-		expect(result.success).toBe(true);
+		expect(listedPorts()).toEqual([3002, 3003]);
+		expect((await closePort(3003)).success).toBe(true);
 		expect(killed).toEqual([1003]);
 	});
 
-	it("refuses a stale close request for an agent's own port", async () => {
+	it("hides the port of an agent that a wrapper shell runs as its child", async () => {
+		argv0.set(1001, "/bin/bash");
 		await manager.forceScan();
-		agentLaunched();
 
-		const result = await manager.killPort({
-			terminalId: "p1",
-			workspaceId: "ws1",
-			port: AGENT_PORT,
-		});
-		expect(result.success).toBe(false);
+		expect(listedPorts()).toEqual([3003]);
+		expect((await closePort(3003)).success).toBe(true);
+		expect(killed).toEqual([1003]);
+	});
+
+	it("refuses a close request that was listed before the agent started", async () => {
+		manager.setAgentPidSource(() => null);
+		await manager.forceScan();
+		manager.setAgentPidSource(() => 1001);
+		argv0.set(1001, "/bin/bash");
+
+		expect((await closePort(3001)).success).toBe(false);
+		expect((await closePort(3002)).success).toBe(false);
 		expect(killed).toEqual([]);
 	});
 
-	it("protects an agent that its wrapper runs as a child, and still closes that agent's server", async () => {
-		// The wrapper 1001 did not exec, so its own environment has no launch id.
-		terminalIdEnv = new Map([[1001, "p1"]]);
-		await manager.forceScan();
-		agentLaunchIdEnv = new Map([
-			[1002, "1001-1700000000"],
-			[1003, "1001-1700000000"],
-		]);
-
-		const refused = await manager.killPort({
-			terminalId: "p1",
-			workspaceId: "ws1",
-			port: AGENT_PORT,
-		});
-		expect(refused.success).toBe(false);
-		await manager.forceScan();
-		expect(manager.getAllPorts().map(({ port }) => port)).toEqual([3000]);
-		const closed = await manager.killPort({
-			terminalId: "p1",
-			workspaceId: "ws1",
-			port: 3000,
-		});
-		expect(closed.success).toBe(true);
-		expect(killed).toEqual([1003]);
-	});
-
-	it("protects an agent that started 20 s before its launch id's time, but not a pid reused long after the launch", async () => {
-		agentLaunched();
-		processStartTimes = new Map([[1002, 1699999980]]);
-		await manager.forceScan();
-		expect(manager.getAllPorts().map(({ port }) => port)).toEqual([3000]);
-
-		processStartTimes = new Map([[1002, 1700009999]]);
+	it("ignores an agent pid that is not in its own terminal's tree", async () => {
+		processTable.push({ pid: 2000, ppid: 500 });
+		manager.upsertSession("p2", "ws1", 2000);
+		manager.setAgentPidSource((terminalId) =>
+			terminalId === "p2" ? 1002 : null,
+		);
 		await manager.forceScan();
 
-		expect(manager.getAllPorts().map(({ port }) => port)).toContain(AGENT_PORT);
-		const result = await manager.killPort({
-			terminalId: "p1",
-			workspaceId: "ws1",
-			port: AGENT_PORT,
-		});
-		expect(result.success).toBe(true);
-		expect(killed).toEqual([1002]);
+		expect(listedPorts()).toEqual([3001, 3002, 3003]);
 	});
 });
