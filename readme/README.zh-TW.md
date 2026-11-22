@@ -256,7 +256,7 @@ iOS 應用程式即將推出,讓你可以在手機上查看你的代理程式。
 下載桌面應用程式:
 
 - **macOS**:[Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage)(實驗性;macOS 是主要目標平台)
+- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(實驗性;macOS 是主要目標平台)
 - **Windows**:暫不提供
 - [所有建置版本](https://github.com/paradevai/paradev/releases/latest)
 

@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# dự án đã ẩn} other {# dự án đã ẩn}}"
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# mục lịch sử} other {# mục lịch sử}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} other {# host}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, other {# nhãn}}"
@@ -187,6 +191,10 @@ msgstr "{0, plural, other {# nhãn}}"
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# đăng nhập} other {# đăng nhập}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# cần nhập thêm} other {# cần nhập thêm}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -222,6 +230,10 @@ msgstr "{0, plural, one {# dự án} other {# dự án}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# pull request}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# sẵn sàng} other {# sẵn sàng}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +243,14 @@ msgstr "{0, plural, other {# câu trả lời}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repository} other {# repository}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# kết quả trên tất cả host} other {# kết quả trên tất cả host}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# kết quả ở các nơi đã chọn} other {# kết quả ở các nơi đã chọn}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +299,10 @@ msgstr "{0, plural, other {# terminal đang chạy}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, other {# dòng không thay đổi}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# đang chạy} other {# đang chạy}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -884,6 +908,9 @@ msgstr "{count, plural, one {# terminal vẫn ở không gian làm việc cũ.} 
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {# terminal đã dừng và không thể khởi động lại.} other {# terminal đã dừng và không thể khởi động lại.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {# workspace} other {# workspace}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree trong repository này chưa có workspace. Nó sẽ được nhập thành workspace.} other {# worktree trong repository này chưa có workspace. Chúng sẽ được nhập thành workspace.}}"
 
@@ -1141,6 +1168,9 @@ msgstr "{machineSize} (không có trong gói của bạn)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, other {Tối đa # host cùng lúc}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Đang sao chép cuộc trò chuyện (# tin nhắn)} other {Đang sao chép cuộc trò chuyện (# tin nhắn)}}"
@@ -2588,6 +2618,9 @@ msgstr "Toàn bộ tính năng, đặt cạnh nhau"
 
 msgid "All files exceed the maximum size."
 msgstr "Mọi tệp đều vượt quá kích thước tối đa."
+
+msgid "All hosts"
+msgstr "Tất cả host"
 
 msgid "All in a new tab (split panes)"
 msgstr "Tất cả trong một tab mới (chia khung)"
@@ -4058,6 +4091,9 @@ msgstr "Có thể xem"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Bạn chuẩn hóa tooltip trên toàn ứng dụng được không?"
+
+msgid "can’t check"
+msgstr "không thể kiểm tra"
 
 msgid "Can’t check {hostName}"
 msgstr "Không thể kiểm tra {hostName}"
@@ -13315,6 +13351,9 @@ msgstr "Không có vị trí nào phù hợp với tôi. Tôi có nên liên h�
 msgid "No runs yet"
 msgstr "Chưa có lần chạy nào"
 
+msgid "No saved workspaces"
+msgstr "Không có workspace đã lưu"
+
 msgid "No screenshots yet"
 msgstr "Chưa có ảnh chụp màn hình nào"
 
@@ -13620,6 +13659,9 @@ msgstr "Không có gì ở {pathname}."
 msgid "Nothing needs a retry"
 msgstr "Không có gì cần chạy lại"
 
+msgid "Nothing needs you right now"
+msgstr "Hiện không có gì cần bạn"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Chưa có gì được công khai trong 30 ngày qua. Thứ hạng của bạn sẽ xuất hiện khi dữ liệu sử dụng từ máy này đồng bộ, công khai dưới tên <0>{handle}</0>."
 
@@ -13733,11 +13775,12 @@ msgstr "Ngoại tuyến"
 msgid "Offline / local-first mode"
 msgstr "Chế độ ngoại tuyến / ưu tiên cục bộ"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "ngoại tuyến, thấy lần cuối {0}"
+
 msgid "OK"
 msgstr "OK"
-
-msgid "Older"
-msgstr "Cũ hơn"
 
 msgid "On"
 msgstr "Bật"
@@ -20909,9 +20952,6 @@ msgstr "Tenant Microsoft này đã được một tổ chức Paradev khác kế
 msgid "This model isn't available"
 msgstr "Mô hình này không khả dụng"
 
-msgid "This month"
-msgstr "Tháng này"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Việc chuyển này đã dừng. Cuộc trò chuyện vẫn ở không gian làm việc cũ."
 
@@ -21082,9 +21122,6 @@ msgstr "Người dùng này đang chạy dịch vụ host cho thiết bị này 
 
 msgid "This view hit an error"
 msgstr "Khung hiển thị này gặp lỗi"
-
-msgid "This week"
-msgstr "Tuần này"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Thao tác này sẽ merge nguyên tử mọi pull request đang mở cho đến #{prNumber} vào {base} bằng commit merge."

@@ -1,1 +1,2 @@
-export { hostTagFoldersQueryKey, useHostTagFolders } from "./useHostTagFolders";
+export { hostTagFoldersQueryKey } from "./hostTagFoldersQueryKey";
+export { useHostTagFolders } from "./useHostTagFolders";

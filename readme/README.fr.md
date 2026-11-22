@@ -256,7 +256,7 @@ Une app iOS arrive bientôt pour que vous puissiez suivre vos agents depuis votr
 Téléchargez l'app de bureau :
 
 - **macOS** : [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux** : [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (expérimental ; macOS est la cible principale)
+- **Linux** : [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (expérimental ; macOS est la cible principale)
 - **Windows** : pas encore disponible
 - [Tous les builds](https://github.com/paradevai/paradev/releases/latest)
 
