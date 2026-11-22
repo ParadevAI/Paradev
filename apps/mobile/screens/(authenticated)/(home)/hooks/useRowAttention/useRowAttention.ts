@@ -1,5 +1,5 @@
 import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import type { TerminalAttention } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals/attention";
 import {
@@ -26,5 +26,5 @@ export function useRowAttention(
 				: cloudRowAttention(row, cloudReadAt[row.id], !!manualUnread[row.id]),
 		[cloudReadAt, manualUnread],
 	);
-	return { host, cloud };
+	return useMemo(() => ({ host, cloud }), [host, cloud]);
 }
