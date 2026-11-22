@@ -44,7 +44,7 @@ export function FolderSectionHeader({
 	const swatch = color?.startsWith("#") ? color : null;
 	return (
 		// The toggle and the menu are siblings so VoiceOver reaches both.
-		<View className="flex-row items-center pr-3 pt-1">
+		<View className="flex-row items-center px-4 pt-1">
 			<Pressable
 				onPress={onToggle}
 				accessibilityRole="button"
@@ -60,7 +60,7 @@ export function FolderSectionHeader({
 					.filter(Boolean)
 					.join(", ")}
 				accessibilityState={{ expanded: !collapsed }}
-				className="web:hover:opacity-80 min-h-11 flex-1 flex-row items-center gap-3 pl-3 pr-2 active:opacity-60"
+				className="web:hover:opacity-80 min-h-11 flex-1 flex-row items-center gap-3 active:opacity-60"
 			>
 				<View className="size-6 items-center justify-center">
 					<View
@@ -78,7 +78,7 @@ export function FolderSectionHeader({
 					>
 						{name}
 					</Text>
-					<Text className="text-muted-foreground font-mono text-[12px]">
+					<Text className="text-muted-foreground font-mono text-[13px]">
 						{count}
 					</Text>
 					<Caret size={12} color={theme.mutedForeground} strokeWidth={2.5} />

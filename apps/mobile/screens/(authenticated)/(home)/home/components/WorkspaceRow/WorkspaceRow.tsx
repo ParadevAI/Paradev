@@ -129,10 +129,9 @@ export function WorkspaceRow({
 			    owns the hold animation, and custom press feedback fights it. */}
 				<Pressable
 					className={cn(
-						"bg-background web:hover:bg-accent/60 flex-row items-center gap-3 rounded-xl pr-3",
-						card ? "py-3 pl-3" : "min-h-12",
-						!card && (hasDetail ? "py-3" : "py-2.5"),
-						!card && (grouped ? "pl-7" : "pl-3"),
+						"bg-background web:hover:bg-accent/60 flex-row items-center gap-3 rounded-xl py-3",
+						card ? "px-3" : "min-h-12 pr-4",
+						!card && (grouped ? "pl-8" : "pl-4"),
 					)}
 					onPress={() => router.navigate(`/(authenticated)${href}`)}
 					accessibilityRole="button"

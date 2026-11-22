@@ -7,7 +7,7 @@ export function PeriodHeader({ label }: { label: string }) {
 	return (
 		<View className="px-4 pb-1 pt-5">
 			<Text
-				className="text-muted-foreground font-medium text-[14px]"
+				className="text-muted-foreground font-medium text-[13px]"
 				numberOfLines={enlargedText ? undefined : 1}
 			>
 				{label}

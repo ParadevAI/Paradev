@@ -49,7 +49,7 @@ export function ProjectSectionHeader({
 		// The collapse target and the "+" are siblings on purpose: a control
 		// nested inside an accessible Pressable is folded into its parent and
 		// VoiceOver never reaches it.
-		<View className="flex-row items-center px-3 pt-4">
+		<View className="flex-row items-center px-4 pt-4">
 			<Pressable
 				onPress={onToggle}
 				accessibilityLabel={[

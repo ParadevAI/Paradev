@@ -34,19 +34,21 @@ export function HostLabel({ name, cloud, online, lastSeenAt }: HostLabelProps) {
 	return (
 		<View
 			className={cn(
-				"flex-row items-center gap-2 px-3 pb-1 pt-5",
+				"flex-row items-center gap-3 px-4 pb-1 pt-5",
 				!online && "opacity-60",
 			)}
 		>
-			{cloud ? (
-				<Icon
-					as={CloudIcon}
-					className="text-muted-foreground size-3"
-					strokeWidth={2}
-				/>
-			) : (
-				<HostStatusDot isOnline={online} />
-			)}
+			<View className="size-6 items-center justify-center">
+				{cloud ? (
+					<Icon
+						as={CloudIcon}
+						className="text-muted-foreground size-3"
+						strokeWidth={2}
+					/>
+				) : (
+					<HostStatusDot isOnline={online} />
+				)}
+			</View>
 			<Text
 				className="text-muted-foreground shrink font-medium text-[13px]"
 				numberOfLines={enlargedText ? undefined : 1}

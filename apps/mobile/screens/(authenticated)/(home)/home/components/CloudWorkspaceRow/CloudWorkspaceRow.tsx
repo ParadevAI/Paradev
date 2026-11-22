@@ -93,7 +93,7 @@ export function CloudWorkspaceRow({
 		>
 			<Text
 				className={cn(
-					"shrink font-medium text-[15px]",
+					"shrink font-medium text-[16px]",
 					archived && "text-muted-foreground",
 				)}
 				numberOfLines={enlargedText ? undefined : 1}
@@ -114,19 +114,21 @@ export function CloudWorkspaceRow({
 	const body = (
 		<Pressable
 			className={cn(
-				"bg-background flex-row items-center gap-3 rounded-xl pr-3",
-				card ? "py-3 pl-3" : "py-2 pl-4",
+				"bg-background flex-row items-center gap-3 rounded-xl py-3",
+				card ? "px-3" : "min-h-12 px-4",
 			)}
 			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
 			ph-label="cloud-workspace-row"
 		>
-			<ProjectAvatar
-				name={repoName ?? row.name}
-				iconUrl={
-					repoOwner ? `https://github.com/${repoOwner}.png?size=64` : null
-				}
-				size={20}
-			/>
+			<View className="size-6 items-center justify-center">
+				<ProjectAvatar
+					name={repoName ?? row.name}
+					iconUrl={
+						repoOwner ? `https://github.com/${repoOwner}.png?size=64` : null
+					}
+					size={20}
+				/>
+			</View>
 			{detail ? (
 				<View className="min-w-0 flex-1">
 					{titleLine}
