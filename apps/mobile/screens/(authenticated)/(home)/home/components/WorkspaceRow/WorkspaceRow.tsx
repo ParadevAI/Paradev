@@ -89,6 +89,10 @@ export function WorkspaceRow({
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
 	const grouped = !card && inGroup;
+	const showBranch = workspace.branch !== workspace.name;
+	const showDiff =
+		diffStats !== null && (diffStats.additions > 0 || diffStats.deletions > 0);
+	const hasDetail = showBranch || showDiff;
 
 	const href = `/workspace/${workspace.id}`;
 
@@ -121,7 +125,8 @@ export function WorkspaceRow({
 				<Pressable
 					className={cn(
 						"bg-background web:hover:bg-accent/60 flex-row items-center gap-3 rounded-xl pr-3",
-						card ? "py-3 pl-3" : "min-h-12 py-2.5",
+						card ? "py-3 pl-3" : "min-h-12",
+						!card && (hasDetail ? "py-3" : "py-2.5"),
 						!card && (grouped ? "pl-7" : "pl-3"),
 					)}
 					onPress={() => router.navigate(`/(authenticated)${href}`)}
@@ -170,25 +175,25 @@ export function WorkspaceRow({
 						<View
 							className={cn(
 								"flex-row items-center gap-1",
+								hasDetail && "mt-1",
 								enlargedText && "flex-wrap",
 							)}
 						>
 							{/* A workspace named after its branch says it twice otherwise —
 						    common now that every project shows its `main`. */}
-							{workspace.branch === workspace.name ? null : (
+							{showBranch ? (
 								<Text
 									className="text-muted-foreground shrink text-[13px]"
 									numberOfLines={enlargedText ? undefined : 1}
 								>
 									{workspace.branch}
 								</Text>
-							)}
-							{diffStats &&
-							(diffStats.additions > 0 || diffStats.deletions > 0) ? (
+							) : null}
+							{showDiff ? (
 								<>
-									{workspace.branch === workspace.name ? null : (
+									{showBranch ? (
 										<Text className="text-muted-foreground text-[13px]">•</Text>
-									)}
+									) : null}
 									<Text className="text-muted-foreground font-mono text-[13px]">
 										+{diffStats.additions} −{diffStats.deletions}
 									</Text>
