@@ -17,12 +17,7 @@ import {
 	Zap,
 } from "lucide-react";
 import type { ChatForkTarget } from "../../../../types";
-import {
-	FORK_TARGET_ARGS,
-	parseForkTarget,
-	parseSwitch,
-	splitInvocation,
-} from "../commandArgs";
+import { FORK_TARGET_ARGS, parseForkTarget, parseSwitch } from "../commandArgs";
 
 /** What the chat can do right now; a missing action hides its commands. */
 export type AppCommandContext = {
@@ -210,24 +205,3 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		},
 	},
 ];
-
-export function matchAppCommand(
-	entries: readonly { command: AppCommand; aliases: readonly string[] }[],
-	text: string,
-	withAttachments: boolean,
-):
-	| { kind: "none" }
-	| { kind: "reject-attachments"; command: AppCommand }
-	| { kind: "match"; command: AppCommand; args: string } {
-	const invocation = splitInvocation(text);
-	if (!invocation) return { kind: "none" };
-	const entry = entries.find(
-		({ command, aliases }) =>
-			command.name === invocation.name || aliases.includes(invocation.name),
-	);
-	if (!entry) return { kind: "none" };
-	if (withAttachments && !entry.command.acceptsAttachments) {
-		return { kind: "reject-attachments", command: entry.command };
-	}
-	return { kind: "match", command: entry.command, args: invocation.args };
-}

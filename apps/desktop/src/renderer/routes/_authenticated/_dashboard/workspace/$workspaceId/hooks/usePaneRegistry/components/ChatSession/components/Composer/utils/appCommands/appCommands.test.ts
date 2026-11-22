@@ -1,10 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 import type { ComposerActionContext } from "@superset/chat-ui/PromptInput";
-import {
-	APP_COMMANDS,
-	type AppCommandContext,
-	matchAppCommand,
-} from "./appCommands";
+import { APP_COMMANDS, type AppCommandContext } from "./appCommands";
 
 const NOOP = () => {};
 
@@ -100,31 +96,12 @@ describe("APP_COMMANDS", () => {
 		expect(explainUnavailable).toHaveBeenCalledTimes(1);
 	});
 
-	test("allows /plan with attachments and optional prompt while rejecting attachments on other commands", () => {
+	test("/plan takes attachments and goes on to send the text after it", () => {
 		const enter = mock(() => {});
 		const context: AppCommandContext = {
-			newChat: NOOP,
 			plan: { active: false, enter, leave: NOOP },
 		};
-		const entries = APP_COMMANDS.filter((entry) =>
-			entry.available(context),
-		).map((entry) => ({ command: entry, aliases: entry.aliases ?? [] }));
-
-		expect(matchAppCommand(entries, "/plan", true)).toEqual({
-			kind: "match",
-			command: command("plan"),
-			args: "",
-		});
-		expect(matchAppCommand(entries, "/plan inspect this image", true)).toEqual({
-			kind: "match",
-			command: command("plan"),
-			args: "inspect this image",
-		});
-		expect(matchAppCommand(entries, "/new", true)).toEqual({
-			kind: "reject-attachments",
-			command: command("new"),
-		});
-
+		expect(command("plan").acceptsAttachments).toBe(true);
 		expect(command("plan").run(context, "", COMPOSER)).toBe("done");
 		expect(command("plan").run(context, "inspect this image", COMPOSER)).toBe(
 			"continue",

@@ -22,8 +22,8 @@ import {
 	type AppCommand,
 	type AppCommandContext,
 	type AppCommandOutcome,
-	matchAppCommand,
 } from "../../utils/appCommands";
+import { splitInvocation } from "../../utils/commandArgs";
 import { resolveCollisions } from "../../utils/commandCollisions";
 import { PLAN_ID, type PlanSwitch, planControl } from "../../utils/planControl";
 import { restoreCommand } from "../../utils/restoreCommand";
@@ -160,9 +160,7 @@ export function useAppCommands({
 				? {
 						plan: {
 							active: plan.active,
-							enter: () => {
-								if (!plan.active) apply(plan.enter);
-							},
+							enter: () => apply(plan.enter),
 							leave: () => apply(plan.leave),
 						},
 					}
@@ -300,12 +298,16 @@ export function useAppCommands({
 
 	const runTyped = useCallback(
 		(text: string, withAttachments: boolean): TypedCommandOutcome => {
+			const invocation = splitInvocation(text);
 			const input = inputRef.current;
-			if (!input) return "not-app";
-			const matched = matchAppCommand(resolved.app, text, withAttachments);
-			if (matched.kind === "none") return "not-app";
-			if (matched.kind === "reject-attachments") {
-				const name = matched.command.name;
+			if (!invocation || !input) return "not-app";
+			const entry = resolved.app.find(
+				({ command, aliases }) =>
+					command.name === invocation.name || aliases.includes(invocation.name),
+			);
+			if (!entry) return "not-app";
+			if (withAttachments && !entry.command.acceptsAttachments) {
+				const name = entry.command.name;
 				toast.error(t({ message: `/${name} doesn't take attachments` }));
 				return "kept";
 			}
@@ -316,12 +318,12 @@ export function useAppCommands({
 				query: "",
 			};
 			pendingPlanSwitch.current = null;
-			const outcome = run(matched.command, matched.args, composer);
+			const outcome = run(entry.command, invocation.args, composer);
 			if (outcome === "bad-args") return "kept";
 			if (outcome === "continue" || withAttachments) {
 				return {
 					kind: "send",
-					text: matched.args,
+					text: invocation.args,
 					ready: pendingPlanSwitch.current,
 				};
 			}

@@ -629,9 +629,13 @@ export const Composer = memo(function Composer({
 			if (typed === "ran") return;
 			if (typed === "kept") return false;
 			if (typed !== "not-app") {
-				return Promise.resolve(typed.ready)
-					.catch(() => undefined)
-					.then(() => send(typed.text, files, mentions, steer, draft));
+				return Promise.resolve(typed.ready).then(
+					() => send(typed.text, files, mentions, steer, draft),
+					() => {
+						promptInputRef.current?.restoreDraft(draft);
+						toast.error(t({ message: "Could not change the mode" }));
+					},
+				);
 			}
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (

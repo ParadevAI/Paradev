@@ -361,7 +361,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 		this.approvals.delete(approvalId);
 
 		let nextMode: ClaudePermissionMode | null = null;
-		let syncMode: ClaudePermissionMode | null = null;
 		if (pending.questions) {
 			pending.settle(
 				questionResult(pending.input, pending.questions, decision),
@@ -377,7 +376,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 				this.modeBeforePlan = null;
 				if (this.modeId !== restored) nextMode = restored;
 				this.modeId = restored;
-				syncMode = restored;
 				pending.settle({
 					behavior: "allow",
 					updatedInput: pending.input,
@@ -386,11 +384,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 					],
 				});
 			} else {
-				if (pending.toolName === "EnterPlanMode" && this.modeId !== "plan") {
-					this.modeBeforePlan = this.modeId;
-					this.modeId = "plan";
-					nextMode = "plan";
-				}
 				pending.settle({ behavior: "allow", updatedInput: pending.input });
 			}
 		} else {
@@ -406,13 +399,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 		if (nextMode) {
 			this.events.push({ kind: "session", session: { modeId: nextMode } });
 		}
-		if (syncMode) {
-			const target = syncMode;
-			queueMicrotask(() => {
-				if (this.disposed || this.modeId !== target) return;
-				void this.session?.setPermissionMode?.(target).catch(() => undefined);
-			});
-		}
 		if (this.approvals.size === 0) {
 			const status = this.translator?.currentTurnId ? "running" : "idle";
 			this.events.push({ kind: "session", session: { status } });
@@ -425,12 +411,8 @@ export class ClaudeAdapter implements HarnessAdapter {
 		const previousBeforePlan = this.modeBeforePlan;
 		const next = claudeMode(modeId);
 		this.modeId = next;
-		this.modeBeforePlan =
-			next === "plan"
-				? previous === "plan"
-					? previousBeforePlan
-					: previous
-				: null;
+		if (next !== "plan") this.modeBeforePlan = null;
+		else if (previous !== "plan") this.modeBeforePlan = previous;
 		this.events.push({ kind: "session", session: { modeId: next } });
 		const applied = this.session?.setPermissionMode?.(next);
 		if (!applied) return Promise.resolve(true);

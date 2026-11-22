@@ -16,7 +16,6 @@ type Harness = {
 	crash: (error: Error) => void;
 	exit: () => void;
 	interrupts: number;
-	modes: string[];
 	aborted: () => boolean;
 	options: () => ClaudeQueryOptions | null;
 };
@@ -39,7 +38,6 @@ function result(): unknown {
 
 function createHarness(modeId?: string): Harness {
 	const pending: unknown[] = [];
-	const modes: string[] = [];
 	let notify: (() => void) | null = null;
 	let aborted = false;
 	let queryOptions: ClaudeQueryOptions | null = null;
@@ -64,9 +62,6 @@ function createHarness(modeId?: string): Harness {
 		},
 		interrupt: async () => {
 			state.interrupts += 1;
-		},
-		setPermissionMode: async (mode) => {
-			modes.push(mode);
 		},
 	};
 
@@ -107,7 +102,6 @@ function createHarness(modeId?: string): Harness {
 		get interrupts() {
 			return state.interrupts;
 		},
-		modes,
 		aborted: () => aborted,
 		options: () => queryOptions,
 	};
@@ -548,63 +542,18 @@ describe("ClaudeAdapter permission modes", () => {
 		expect(reverted.value).toMatchObject({ session: { modeId: "default" } });
 	});
 
-	test("restores the prior mode on ExitPlanMode approval", async () => {
-		for (const priorMode of [
-			"bypassPermissions",
-			"acceptEdits",
-			"auto",
-		] as const) {
-			const harness = createHarness(priorMode);
-			await harness.iterator.next();
-			await Bun.sleep(0);
-
-			await harness.adapter.setMode("plan");
-			await harness.iterator.next();
-
-			const ask = harness.options()?.canUseTool?.(
-				"ExitPlanMode",
-				{ plan: "steps" },
-				{
-					signal: new AbortController().signal,
-					toolUseID: "tool-1",
-					requestId: "req-1",
-				},
-			);
-			const raised = await untilStatus(harness.iterator);
-			const approval = raised.find((event) => event.kind === "item");
-			harness.adapter.respondToApproval(
-				approval?.kind === "item" ? approval.item.id : "",
-				{ type: "accept" },
-			);
-			const settled = await untilStatus(harness.iterator);
-
-			expect(await ask).toEqual({
-				behavior: "allow",
-				updatedInput: { plan: "steps" },
-				updatedPermissions: [
-					{ type: "setMode", mode: priorMode, destination: "session" },
-				],
-			});
-			expect(
-				settled.some(
-					(event) =>
-						event.kind === "session" && event.session.modeId === priorMode,
-				),
-			).toBe(true);
-			await Bun.sleep(0);
-			expect(harness.modes).toEqual(["plan", priorMode]);
-		}
-	});
-
-	test("keeps modeBeforePlan on ExitPlanMode decline and falls back to default when started in plan", async () => {
+	test("restores the mode from before plan when the plan is approved, not when declined", async () => {
 		const harness = createHarness("bypassPermissions");
 		await harness.iterator.next();
 		await Bun.sleep(0);
 		await harness.adapter.setMode("plan");
 		await harness.iterator.next();
 
-		const askExit = (id: string) =>
-			harness.options()?.canUseTool?.(
+		const answerExitPlan = async (
+			id: string,
+			decision: "accept" | "decline",
+		) => {
+			const asked = harness.options()?.canUseTool?.(
 				"ExitPlanMode",
 				{ plan: id },
 				{
@@ -613,59 +562,33 @@ describe("ClaudeAdapter permission modes", () => {
 					requestId: id,
 				},
 			);
+			const approval = (await untilStatus(harness.iterator)).find(
+				(event) => event.kind === "item",
+			);
+			harness.adapter.respondToApproval(
+				approval?.kind === "item" ? approval.item.id : "",
+				{ type: decision },
+			);
+			return {
+				result: await asked,
+				events: await untilStatus(harness.iterator),
+			};
+		};
 
-		const declined = askExit("tool-1");
-		const first = (await untilStatus(harness.iterator)).find(
-			(event) => event.kind === "item",
-		);
-		harness.adapter.respondToApproval(
-			first?.kind === "item" ? first.item.id : "",
-			{ type: "decline" },
-		);
-		await untilStatus(harness.iterator);
-		expect(await declined).toMatchObject({ behavior: "deny" });
+		const declined = await answerExitPlan("tool-1", "decline");
+		expect(declined.result).toMatchObject({ behavior: "deny" });
 
-		const approved = askExit("tool-2");
-		const second = (await untilStatus(harness.iterator)).find(
-			(event) => event.kind === "item",
-		);
-		harness.adapter.respondToApproval(
-			second?.kind === "item" ? second.item.id : "",
-			{ type: "accept" },
-		);
-		await untilStatus(harness.iterator);
-		expect(await approved).toMatchObject({
+		const approved = await answerExitPlan("tool-2", "accept");
+		expect(approved.result).toEqual({
 			behavior: "allow",
+			updatedInput: { plan: "tool-2" },
 			updatedPermissions: [
 				{ type: "setMode", mode: "bypassPermissions", destination: "session" },
 			],
 		});
-
-		const planOnly = createHarness("plan");
-		await planOnly.iterator.next();
-		await Bun.sleep(0);
-		const planAsk = planOnly.options()?.canUseTool?.(
-			"ExitPlanMode",
-			{ plan: "only" },
-			{
-				signal: new AbortController().signal,
-				toolUseID: "tool-3",
-				requestId: "req-3",
-			},
-		);
-		const third = (await untilStatus(planOnly.iterator)).find(
-			(event) => event.kind === "item",
-		);
-		planOnly.adapter.respondToApproval(
-			third?.kind === "item" ? third.item.id : "",
-			{ type: "accept" },
-		);
-		await untilStatus(planOnly.iterator);
-		expect(await planAsk).toMatchObject({
-			behavior: "allow",
-			updatedPermissions: [
-				{ type: "setMode", mode: "default", destination: "session" },
-			],
+		expect(approved.events).toContainEqual({
+			kind: "session",
+			session: { modeId: "bypassPermissions" },
 		});
 	});
 });
