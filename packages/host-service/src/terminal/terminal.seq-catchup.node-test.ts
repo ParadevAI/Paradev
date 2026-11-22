@@ -227,6 +227,7 @@ interface SyncedMessage {
 	type: "synced";
 	epoch: string;
 	seq: number;
+	head: number;
 	mode: "exact" | "tail" | "reanchor";
 }
 
@@ -1555,6 +1556,75 @@ test(
 			phone.dispose();
 			await desktop.disconnect().catch(() => {});
 			desktop.dispose();
+			await disposeSessionAndWait(terminalId, db).catch(() => {});
+		}
+	},
+);
+
+test(
+	"synced.head marks exactly the replayed bytes, in every sync mode",
+	{ timeout: 60_000 },
+	async () => {
+		const terminalId = `seq-head-${randomUUID().slice(0, 8)}`;
+		const session = await createTerminalSessionInternal({
+			terminalId,
+			workspaceId,
+			db,
+			listed: true,
+			cols: COLS,
+			rows: ROWS,
+			initialCommand: `exec bash '${path.join(TEST_HOME, "tui.sh")}'`,
+		});
+		if ("error" in session) assert.fail(session.error);
+
+		const renderer = new SeqRenderer();
+		try {
+			await waitForTrackerText(terminalId, "TUI READY");
+			await renderer.connect(terminalId);
+			const tail = await renderer.waitSynced();
+			// A desktop from before `head` reads the other fields unchanged.
+			assert.deepEqual(Object.keys(tail).sort(), [
+				"epoch",
+				"head",
+				"mode",
+				"seq",
+				"type",
+			]);
+			assert.equal(tail.mode, "tail");
+			await quiesce(renderer);
+			assert.ok(tail.head > tail.seq, "tail: the ring is replayed");
+			assert.equal(renderer.countedThisAttach, tail.head - tail.seq);
+
+			await renderer.disconnect();
+			sendCommand(terminalId, "ticks 10");
+			await waitForTrackerText(terminalId, "INPUT 000010");
+			await renderer.connect(terminalId);
+			const exact = await renderer.waitSynced();
+			assert.equal(exact.mode, "exact");
+			await renderer.waitVisible("INPUT 000010");
+			await quiesce(renderer);
+			assert.ok(exact.head > exact.seq, "exact: the missed bytes are replayed");
+			assert.equal(
+				renderer.streamBytes(exact.seq, exact.head).byteLength,
+				exact.head - exact.seq,
+			);
+			assert.equal(renderer.countedThisAttach, exact.head - exact.seq);
+
+			await renderer.disconnect();
+			await renderer.connect(terminalId, {
+				seqOverride: "none",
+				autoResize: false,
+			});
+			const reanchor = await renderer.waitSynced();
+			assert.equal(reanchor.mode, "reanchor");
+			assert.equal(
+				reanchor.head,
+				reanchor.seq,
+				"reanchor: nothing is replayed",
+			);
+		} finally {
+			await renderer.disconnect().catch(() => {});
+			renderer.dispose();
 			await disposeSessionAndWait(terminalId, db).catch(() => {});
 		}
 	},
