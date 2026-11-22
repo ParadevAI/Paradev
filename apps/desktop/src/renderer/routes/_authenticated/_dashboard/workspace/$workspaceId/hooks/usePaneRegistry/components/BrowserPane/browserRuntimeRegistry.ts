@@ -421,11 +421,12 @@ export class BrowserRuntimeRegistryImpl {
 			}
 		};
 
+		// Also fires when an iframe starts to load, so the favicon resets on
+		// did-navigate, which is main-frame only.
 		const handleDidStartLoading = () => {
 			this.setState(paneId, {
 				isLoading: true,
 				error: null,
-				faviconUrl: null,
 			});
 		};
 
@@ -457,6 +458,7 @@ export class BrowserRuntimeRegistryImpl {
 			this.setState(paneId, {
 				currentUrl: e.url ?? "",
 				pageTitle: "",
+				faviconUrl: null,
 				isLoading: false,
 			});
 			this.refreshNavState(paneId);
@@ -496,6 +498,7 @@ export class BrowserRuntimeRegistryImpl {
 				isLoading: false,
 				currentUrl: e.validatedURL ?? "",
 				pageTitle: "",
+				faviconUrl: null,
 				error: {
 					code: e.errorCode ?? 0,
 					description: e.errorDescription ?? "",

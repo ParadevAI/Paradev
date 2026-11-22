@@ -385,7 +385,9 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 			isLoading: boolean;
 			error: { code: number } | null;
 		};
-		onPersist: ((state: { url: string }) => void) | null;
+		onPersist:
+			| ((state: { url: string; faviconUrl: string | null }) => void)
+			| null;
 		onClose: (() => void) | null;
 	}
 	const registryInternals = browserRuntimeRegistry as unknown as {
@@ -525,6 +527,53 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 			state = browserRuntimeRegistry.getState(paneId);
 			expect(state.currentUrl).toBe("http://localhost:3000/");
 			expect(state.error?.code).toBe(-102);
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("keeps the favicon when an iframe starts loading after the page", () => {
+		const paneId = "late-iframe-favicon-pane";
+		const entry = createEntry(paneId);
+		const persisted: (string | null)[] = [];
+		entry.onPersist = (state) => persisted.push(state.faviconUrl);
+		try {
+			fire(entry.webview, "did-start-loading");
+			fire(entry.webview, "did-navigate", { url: "http://localhost:3000/" });
+			fire(entry.webview, "page-favicon-updated", {
+				favicons: ["http://localhost:3000/icon.svg"],
+			});
+			fire(entry.webview, "did-stop-loading");
+			fire(entry.webview, "did-start-loading");
+			fire(entry.webview, "did-stop-loading");
+
+			expect(browserRuntimeRegistry.getState(paneId).faviconUrl).toBe(
+				"http://localhost:3000/icon.svg",
+			);
+			expect(persisted.at(-1)).toBe("http://localhost:3000/icon.svg");
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("drops the favicon when the main frame commits a new document or fails", () => {
+		const paneId = "main-frame-favicon-pane";
+		const entry = createEntry(paneId);
+		const icon = { favicons: ["http://localhost:3000/icon.svg"] };
+		try {
+			fire(entry.webview, "did-navigate", { url: "http://localhost:3000/" });
+			fire(entry.webview, "page-favicon-updated", icon);
+			fire(entry.webview, "did-navigate", { url: "http://other.example/" });
+			expect(browserRuntimeRegistry.getState(paneId).faviconUrl).toBeNull();
+
+			fire(entry.webview, "page-favicon-updated", icon);
+			fire(entry.webview, "did-fail-load", {
+				errorCode: -102,
+				errorDescription: "ERR_CONNECTION_REFUSED",
+				validatedURL: "http://localhost:3000/",
+				isMainFrame: true,
+			});
+			expect(browserRuntimeRegistry.getState(paneId).faviconUrl).toBeNull();
 		} finally {
 			registryInternals.entries.delete(paneId);
 		}
