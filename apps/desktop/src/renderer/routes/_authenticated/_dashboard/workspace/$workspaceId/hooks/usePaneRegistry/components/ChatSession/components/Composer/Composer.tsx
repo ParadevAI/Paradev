@@ -560,9 +560,9 @@ export const Composer = memo(function Composer({
 			const sink = blockedDraftSink.current;
 			if (sink) sink(draft);
 			else if (input) input.restoreDraft(draft);
-			else prependToDraft(draftKey, [draft]);
+			else prependToDraft(draftKey, [draft], draftPersisted);
 		},
-		[draftKey],
+		[draftKey, draftPersisted],
 	);
 
 	const send = useCallback(
