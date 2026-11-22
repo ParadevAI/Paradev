@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { ChevronDown, ChevronRight, Plus } from "lucide-react-native";
 import type { ReactNode } from "react";
@@ -58,8 +59,14 @@ export function ProjectSectionHeader({
 		>
 			<Pressable
 				onPress={onToggle}
+				accessibilityRole="button"
 				accessibilityLabel={[
-					`${name}, ${count} ${count === 1 ? "workspace" : "workspaces"}`,
+					`${name}, ${t({
+						message: plural(count, {
+							one: "# workspace",
+							other: "# workspaces",
+						}),
+					})}`,
 					attention ? attentionLabel(attention) : null,
 				]
 					.filter(Boolean)

@@ -69,6 +69,25 @@ describe("useHostsWorkspaces queries", () => {
 	});
 });
 
+describe("combineHostWorkspaces", () => {
+	test("keeps only the host's own rows", () => {
+		const byHost = combineHostWorkspaces(
+			[host(true)],
+			[
+				{
+					data: [
+						{ id: "own", hostId: "m1" },
+						{ id: "foreign", hostId: "m2" },
+					] as unknown as HostWorkspaceRow[],
+					isError: false,
+					isSuccess: true,
+				},
+			],
+		);
+		expect(byHost.get("m1")?.workspaces.map((row) => row.id)).toEqual(["own"]);
+	});
+});
+
 describe("getHostWorkspacesQueryKey", () => {
 	test("one machine in two organizations gets two cache entries", () => {
 		expect(getHostWorkspacesQueryKey("m1", "org-a")).not.toEqual(

@@ -69,7 +69,10 @@ export function hostWorkspacesQueryOptions(
 	};
 }
 
-/** Each host's rows by machine id; an offline host keeps its last answer. */
+/**
+ * Each host's own rows by machine id; an offline host keeps its last answer.
+ * A host can report another machine's row, which that machine lists itself.
+ */
 export function combineHostWorkspaces(
 	hosts: readonly WorkspacesHost[],
 	results: readonly Pick<
@@ -83,7 +86,9 @@ export function combineHostWorkspaces(
 		const reachable = host.isOnline && !query?.isError;
 		byHost.set(host.machineId, {
 			workspaces:
-				query?.data?.map((row) => ({ ...row, hostReachable: reachable })) ??
+				query?.data
+					?.filter((row) => row.hostId === host.machineId)
+					.map((row) => ({ ...row, hostReachable: reachable })) ??
 				NO_WORKSPACES,
 			isReady: !host.isOnline || !!query?.isSuccess || !!query?.isError,
 			failed: !!query?.isError && query.data === undefined,

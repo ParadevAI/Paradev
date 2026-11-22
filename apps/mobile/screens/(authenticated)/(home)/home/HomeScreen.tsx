@@ -1135,6 +1135,16 @@ export function HomeScreen() {
 		[renderListItem, cellWidth, sideInset.row],
 	);
 
+	const selectedHostState = selectedHost
+		? workspacesByHost.get(selectedHost.machineId)
+		: undefined;
+	const selectedHostEmptyState = selectedHost
+		? placeEmptyState(statusOf(selectedHost), {
+				isReady: selectedHostState?.isReady ?? false,
+				failed: selectedHostState?.failed ?? false,
+			})
+		: null;
+
 	// The native splash is still up until hideSplash() below; nothing to draw.
 	if (!hasPainted) return null;
 
@@ -1323,9 +1333,13 @@ export function HomeScreen() {
 													? t({
 															message: "No cloud workspaces yet",
 														})
-													: t({
-															message: "No projects on this host yet",
-														})}
+													: selectedHostEmptyState === "failed"
+														? t({
+																message: "Could not reach the workspace host",
+															})
+														: t({
+																message: "No projects on this host yet",
+															})}
 								</Text>
 							</View>
 						) : (
