@@ -287,41 +287,74 @@ describe("buildHostSection", () => {
 		expect(items.map(describeItem)).toEqual(["project:demo", "ws:a"]);
 	});
 
-	test("flags each group's last row with the group's colour, and leaves loose rows ungrouped", () => {
-		const PROJECT = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-		const tagged = (id: string, tags: string[]) => ({
-			...workspace(id, "m1", PROJECT),
+	test("joins the bars of adjacent coloured groups and frees the ends next to anything else", () => {
+		const P1 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+		const P2 = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+		const tagged = (id: string, projectId: string, tags: string[]) => ({
+			...workspace(id, "m1", projectId),
 			tags,
 		});
 		const items = buildHostSection(
 			{
 				machineId: "m1",
 				workspaces: [
-					tagged("g1", ["fix"]),
-					tagged("g2", ["fix"]),
-					tagged("loose", []),
-					tagged("solo", ["docs"]),
+					tagged("loose", P1, []),
+					tagged("fix-1", P1, ["fix"]),
+					tagged("fix-2", P1, ["fix"]),
+					tagged("docs-1", P1, ["docs"]),
+					tagged("plain-1", P1, ["plain"]),
+					tagged("p2-1", P2, ["red"]),
 				],
-				projects: [{ ...project, id: PROJECT }],
+				projects: [
+					{ ...project, id: P1, name: "one", createdAt: 2 },
+					{ ...project, id: P2, name: "two", createdAt: 1 },
+				],
 				tagSettings: [
-					{ projectId: PROJECT, tag: "fix", color: "#ff0000", tabOrder: 1 },
-					{ projectId: PROJECT, tag: "docs", tabOrder: 2 },
+					{ projectId: P1, tag: "fix", color: "#ff0000", tabOrder: 1 },
+					{ projectId: P1, tag: "docs", color: "#0000ff", tabOrder: 2 },
+					{ projectId: P1, tag: "plain", tabOrder: 3 },
+					{ projectId: P2, tag: "red", color: "#ff0000", tabOrder: 1 },
 				],
 				offline: false,
 			},
 			options,
 		);
-		const rows = Object.fromEntries(
-			items.flatMap((item) =>
-				item.kind === "workspace" ? [[item.workspace.id, item.group]] : [],
-			),
-		);
-		expect(rows).toEqual({
-			loose: undefined,
-			g1: { color: "#ff0000", last: false },
-			g2: { color: "#ff0000", last: true },
-			solo: { color: null, last: true },
+		const bars = items.flatMap((item) => {
+			const bar =
+				item.kind === "folderHeader"
+					? item.bar
+					: item.kind === "workspace"
+						? item.group?.bar
+						: undefined;
+			const name =
+				item.kind === "folderHeader"
+					? `group:${item.folder.name}`
+					: item.kind === "workspace"
+						? item.workspace.id
+						: `project:${item.kind === "projectHeader" ? item.name : ""}`;
+			return [
+				[
+					name,
+					bar
+						? `${bar.joinTop ? "joined" : "free"}-${bar.joinBottom ? "joined" : "free"}`
+						: "none",
+				],
+			];
 		});
+		expect(bars).toEqual([
+			["project:one", "none"],
+			["loose", "none"],
+			["group:fix", "free-joined"],
+			["fix-1", "joined-joined"],
+			["fix-2", "joined-joined"],
+			["group:docs", "joined-joined"],
+			["docs-1", "joined-free"],
+			["group:plain", "none"],
+			["plain-1", "none"],
+			["project:two", "none"],
+			["group:red", "free-joined"],
+			["p2-1", "joined-free"],
+		]);
 	});
 
 	test("hides a collapsed project's rows under its own host's key", () => {

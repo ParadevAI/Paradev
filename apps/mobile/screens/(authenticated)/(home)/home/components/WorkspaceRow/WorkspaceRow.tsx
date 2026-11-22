@@ -25,7 +25,8 @@ import type {
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
-import { GroupBar, groupBarColor } from "../GroupBar";
+import type { GroupBarSpan } from "../../types";
+import { GroupBar } from "../GroupBar";
 import { WorkspaceLead } from "../WorkspaceLead";
 import {
 	WorkspaceRowMenu,
@@ -64,8 +65,8 @@ export function WorkspaceRow({
 	/** A cell of Home's wide grid rather than a row indented under its project. */
 	card?: boolean;
 	groups?: WorkspaceRowMenuProps["groups"];
-	/** Set for a row inside a group: its colour, and if it ends the group. */
-	group?: { color: string | null; last: boolean };
+	/** Set for a row inside a group: its colour and piece of the group's bar. */
+	group?: { color: string | null; bar: GroupBarSpan | null };
 	/** Replaces the branch line, e.g. "project · host" outside its project. */
 	detail?: string;
 	/** Rows of a host that can't answer: shown, not opened. */
@@ -97,7 +98,7 @@ export function WorkspaceRow({
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
 	const grouped = !card && group !== undefined;
-	const barColor = grouped ? groupBarColor(group.color) : null;
+	const bar = grouped ? group.bar : null;
 	const showBranch = !detail && workspace.branch !== workspace.name;
 	const showDiff =
 		!detail &&
@@ -158,12 +159,7 @@ export function WorkspaceRow({
 						.join(", ")}
 					ph-label="workspace-row"
 				>
-					{barColor ? (
-						<GroupBar
-							color={barColor}
-							segment={group?.last ? "last" : "middle"}
-						/>
-					) : null}
+					{bar ? <GroupBar span={bar} /> : null}
 					<WorkspaceLead
 						attention={rowAttention}
 						creating={cloudStatus === "provisioning"}

@@ -7,8 +7,9 @@ import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
+import type { GroupBarSpan } from "../../types";
 import { AttentionMark } from "../AttentionMark";
-import { GroupBar, groupBarColor } from "../GroupBar";
+import { GroupBar } from "../GroupBar";
 import {
 	FolderHeaderMenu,
 	type FolderHeaderMenuProps,
@@ -25,6 +26,8 @@ interface FolderSectionHeaderProps {
 	attention?: TerminalAttention | null;
 	/** Group actions; absent where the group cannot be changed from here. */
 	menu?: Omit<FolderHeaderMenuProps, "color">;
+	/** This header's piece of the group's colour bar; none without a colour. */
+	bar?: GroupBarSpan | null;
 }
 
 export function FolderSectionHeader({
@@ -35,19 +38,17 @@ export function FolderSectionHeader({
 	onToggle,
 	attention,
 	menu,
+	bar,
 }: FolderSectionHeaderProps) {
 	const attentionLabel = useAttentionLabel();
 	const { t } = useLingui();
 	const theme = useTheme();
 	const enlargedText = useEnlargedText();
 	const Caret = collapsed ? ChevronRight : ChevronDown;
-	const barColor = groupBarColor(color);
 	return (
 		// The toggle and the menu are siblings so VoiceOver reaches both.
 		<View className="flex-row items-center px-4 pt-1">
-			{barColor ? (
-				<GroupBar color={barColor} segment={collapsed ? "only" : "first"} />
-			) : null}
+			{bar ? <GroupBar span={bar} /> : null}
 			<Pressable
 				onPress={onToggle}
 				accessibilityRole="button"

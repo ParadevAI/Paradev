@@ -4,6 +4,7 @@ import type { HostWorkspaceItem } from "@/hooks/useHostWorkspaces";
 import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
 import type { WorkspaceSort } from "../../stores/workspacesFilterStore/workspacesFilterStore";
 import type { HomeListItem, ProjectGroups } from "../../types";
+import { groupBarColor } from "../groupBarColor";
 import { groupByTagFolder } from "../groupByTagFolder";
 import { orderProjectChildren } from "../orderProjectChildren";
 import { strongestAttention } from "../strongestAttention";
@@ -173,21 +174,50 @@ export function buildHostSection(
 				offline,
 			});
 			if (folderCollapsed) continue;
-			folder.workspaces.forEach((workspace, index) => {
+			for (const workspace of folder.workspaces) {
 				items.push({
 					kind: "workspace",
 					workspace,
 					groups: canGroup(workspace) ? groups : undefined,
 					folderTag: folder.tag,
-					group: {
-						color: folder.color,
-						last: index === folder.workspaces.length - 1,
-					},
+					group: { color: folder.color, bar: null },
 					offline,
 				});
-			});
+			}
 		}
 	}
 
-	return items;
+	return withGroupBars(items);
+}
+
+/** The colour an item's bar would draw: its group's, if the group has one. */
+function barColorOf(item: HomeListItem | undefined): string | null {
+	if (item?.kind === "folderHeader") return groupBarColor(item.folder.color);
+	if (item?.kind === "workspace" && item.group) {
+		return groupBarColor(item.group.color);
+	}
+	return null;
+}
+
+/**
+ * Gives each group header and grouped row its piece of the group's colour
+ * bar. A piece joins the one above or below when that item draws a bar too,
+ * so neighbouring groups' bars meet with no gap.
+ */
+function withGroupBars(items: HomeListItem[]): HomeListItem[] {
+	return items.map((item, index) => {
+		const color = barColorOf(item);
+		const bar = color
+			? {
+					color,
+					joinTop: barColorOf(items[index - 1]) !== null,
+					joinBottom: barColorOf(items[index + 1]) !== null,
+				}
+			: null;
+		if (item.kind === "folderHeader") return { ...item, bar };
+		if (item.kind === "workspace" && item.group) {
+			return { ...item, group: { ...item.group, bar } };
+		}
+		return item;
+	});
 }

@@ -4,6 +4,13 @@ import type { PlaceStatus } from "@/screens/(authenticated)/(home)/utils/placeSt
 import type { TerminalAttention } from "./hooks/useHostTerminals/attention";
 import type { TagFolderGroup } from "./utils/groupByTagFolder";
 
+/** An item's piece of its group's colour bar, and whether its neighbours draw one too. */
+export interface GroupBarSpan {
+	color: string;
+	joinTop: boolean;
+	joinBottom: boolean;
+}
+
 /** A project's groups, for the group menus of its rows and headers. */
 export interface ProjectGroups {
 	machineId: string;
@@ -60,14 +67,15 @@ export type HomeListItem =
 			attention: TerminalAttention | null;
 			groups: ProjectGroups;
 			offline: boolean;
+			bar?: GroupBarSpan | null;
 	  }
 	| {
 			kind: "workspace";
 			workspace: HostWorkspaceItem;
 			groups?: ProjectGroups;
 			folderTag?: string | null;
-			/** Set for a row inside a group: its colour, and if it ends the group. */
-			group?: { color: string | null; last: boolean };
+			/** Set for a row inside a group: its colour and piece of the group's bar. */
+			group?: { color: string | null; bar: GroupBarSpan | null };
 			offline?: boolean;
 			/** Replaces the branch line, e.g. "project · host" under Needs me. */
 			detail?: string;

@@ -815,6 +815,7 @@ export function HomeScreen() {
 						<FolderSectionHeader
 							name={folder.name}
 							color={folder.color}
+							bar={item.bar}
 							count={folder.workspaces.length}
 							collapsed={item.collapsed}
 							attention={item.attention}

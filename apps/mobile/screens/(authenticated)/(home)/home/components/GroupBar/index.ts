@@ -1,1 +1,1 @@
-export { GroupBar, type GroupBarSegment, groupBarColor } from "./GroupBar";
+export { GroupBar } from "./GroupBar";
