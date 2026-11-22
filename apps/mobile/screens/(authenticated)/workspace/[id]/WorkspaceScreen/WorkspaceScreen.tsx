@@ -44,7 +44,7 @@ import type { PromptInputAttachmentItem } from "@/components/ai-elements/prompt-
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
-import { getHostWorkspacesQueryKey } from "@/hooks/useHostWorkspaces";
+import { getHostWorkspacesQueryPrefix } from "@/hooks/useHostWorkspaces";
 import { useWorkspaceHost } from "@/hooks/useWorkspaceHost";
 import { chatAttachmentParts } from "@/lib/attachments/chatParts";
 import {
@@ -302,10 +302,7 @@ export function WorkspaceScreen() {
 		if (!pollingActive || !pendingCreate) return;
 		const interval = setInterval(() => {
 			void queryClient.invalidateQueries({
-				queryKey: getHostWorkspacesQueryKey(
-					pendingCreate.hostId,
-					pendingCreate.hostUrl,
-				),
+				queryKey: getHostWorkspacesQueryPrefix(pendingCreate.hostId),
 			});
 			void queryClient.invalidateQueries({
 				queryKey: getHostTerminalsQueryKey(pendingCreate.hostId),
@@ -402,7 +399,7 @@ export function WorkspaceScreen() {
 				// screen onto the real workspace.
 				clearPendingCreate(workspaceId);
 				void queryClient.invalidateQueries({
-					queryKey: getHostWorkspacesQueryKey(hostId, hostUrl),
+					queryKey: getHostWorkspacesQueryPrefix(hostId),
 				});
 				return;
 			}

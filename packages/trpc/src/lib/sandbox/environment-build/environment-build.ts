@@ -14,7 +14,7 @@ import {
 } from "../repositories";
 import type { BuildCheckout } from "./policy";
 
-const BUILD_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const BUILD_AUTHOR = { name: "Paradev", email: "noreply@superset.sh" };
 export const BOX_READY_MS = 45_000;
 
 export function buildBoxName(buildId: string): string {

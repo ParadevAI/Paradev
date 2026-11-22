@@ -180,6 +180,10 @@ msgstr "{0, plural, one {非表示のプロジェクト #件} other {非表示�
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {#件の履歴} other {#件の履歴}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {#台のホスト} other {#台のホスト}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, other {# 個のラベル}}"
@@ -187,6 +191,10 @@ msgstr "{0, plural, other {# 個のラベル}}"
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#件のログイン情報} other {#件のログイン情報}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {入力待ち#件} other {入力待ち#件}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -222,6 +230,10 @@ msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェ
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# 件のプルリクエスト}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {レビュー可能#件} other {レビュー可能#件}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +243,14 @@ msgstr "{0, plural, other {# 件の返信}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {#件のリポジトリ} other {#件のリポジトリ}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {すべてのホストで#件} other {すべてのホストで#件}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {選択した場所で#件} other {選択した場所で#件}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +299,10 @@ msgstr "{0, plural, other {ターミナル # 個が実行中}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {変更なし #行} other {変更なし #行}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {実行中#件} other {実行中#件}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -884,6 +908,9 @@ msgstr "{count, plural, one {#件のターミナルが元のワークスペー�
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {#件のターミナルが停止し、再起動できませんでした。} other {#件のターミナルが停止し、再起動できませんでした。}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {#件のワークスペース} other {#件のワークスペース}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {このリポジトリの#件のワークツリーにワークスペースがありません。ワークスペースとしてインポートされます。} other {このリポジトリの#件のワークツリーにワークスペースがありません。ワークスペースとしてインポートされます。}}"
 
@@ -1141,6 +1168,9 @@ msgstr "{machineSize}（ご利用のプランにはありません）"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, other {一度に選べるホストは#台まで}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {会話をコピーしています（#件のメッセージ）} other {会話をコピーしています（#件のメッセージ）}}"
@@ -2588,6 +2618,9 @@ msgstr "全機能を並べて比較"
 
 msgid "All files exceed the maximum size."
 msgstr "すべてのファイルが最大サイズを超えています。"
+
+msgid "All hosts"
+msgstr "すべてのホスト"
 
 msgid "All in a new tab (split panes)"
 msgstr "すべて新しいタブで(ペイン分割)"
@@ -4058,6 +4091,9 @@ msgstr "閲覧可"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "アプリ全体のtooltipを統一できますか?"
+
+msgid "can’t check"
+msgstr "確認できません"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}を確認できません"
@@ -13315,6 +13351,9 @@ msgstr "合うポジションがありません。それでも連絡してよい
 msgid "No runs yet"
 msgstr "実行はまだありません"
 
+msgid "No saved workspaces"
+msgstr "保存されたワークスペースはありません"
+
 msgid "No screenshots yet"
 msgstr "スクリーンショットはまだありません"
 
@@ -13620,6 +13659,9 @@ msgstr "{pathname}には何もありません。"
 msgid "Nothing needs a retry"
 msgstr "再実行が必要なものはありません"
 
+msgid "Nothing needs you right now"
+msgstr "今対応が必要なものはありません"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "直近30日に公開された実績はまだありません。このマシンの利用状況が同期されるとランクが表示されます(<0>{handle}</0>として公開)。"
 
@@ -13733,11 +13775,12 @@ msgstr "オフライン"
 msgid "Offline / local-first mode"
 msgstr "オフライン/ローカルファーストモード"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "オフライン、最終確認 {0}"
+
 msgid "OK"
 msgstr "OK"
-
-msgid "Older"
-msgstr "それ以前"
 
 msgid "On"
 msgstr "オン"
@@ -20909,9 +20952,6 @@ msgstr "このMicrosoftテナントは別のParadev組織がすでに接続し�
 msgid "This model isn't available"
 msgstr "このモデルは利用できません"
 
-msgid "This month"
-msgstr "今月"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "この移動は停止しました。チャットは元のワークスペースにあります。"
 
@@ -21082,9 +21122,6 @@ msgstr "このユーザーはこのデバイスのホストサービスを実行
 
 msgid "This view hit an error"
 msgstr "このビューでエラーが発生しました"
-
-msgid "This week"
-msgstr "今週"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "#{prNumber} までのすべてのオープンなプルリクエストを マージコミットで {base} にアトミックにマージします。"

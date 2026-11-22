@@ -439,7 +439,7 @@ const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
 	environmentEnv: probeEnv,
 	userAgentEnv: probeSignInKey ? { ANTHROPIC_API_KEY: probeSignInKey } : {},
 	githubToken: null,
-	gitAuthor: { name: "Superset release", email: "noreply@superset.sh" },
+	gitAuthor: { name: "Paradev release", email: "noreply@superset.sh" },
 });
 const probeClaim = {
 	identity: identityFor(probeWorkspaceId, golden),

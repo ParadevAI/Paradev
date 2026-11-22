@@ -1,6 +1,6 @@
 ---
 name: superset-settings
-description: Read and update the Paradev desktop app's user settings (theme, fonts, terminal, git, notifications, behavior) via the superset CLI, including creating and installing custom themes from JSON. Use when asked to change app settings, switch or create a theme, adjust fonts, or configure desktop preferences without opening the settings UI.
+description: Read and update the Paradev (formerly Superset) desktop app's user settings (theme, fonts, terminal, git, notifications, behavior) via the superset CLI (alias paradev), including creating and installing custom themes from JSON. Use when asked to change app settings, switch or create a theme, adjust fonts, or configure desktop preferences without opening the settings UI.
 ---
 
 # Paradev settings via CLI
@@ -30,7 +30,7 @@ superset settings theme remove <id>                 # delete a custom theme
 Prefer `--json` (auto-on in agent environments; parse it rather than
 matching the human sentences) and `superset settings list` to discover keys
 and allowed values instead of guessing. In Paradev terminals `superset` is
-already on PATH. `SUPERSET_HOME_DIR` overrides the target profile
+already on PATH; `paradev` is the same binary. `SUPERSET_HOME_DIR` overrides the target profile
 (`~/.paradev` by default); useful for testing against a sandbox copy.
 
 ## Creating custom themes

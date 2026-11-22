@@ -174,6 +174,10 @@ msgstr "{0, plural, one {# прихований проєкт} few {# прихо�
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# запис історії} few {# записи історії} many {# записів історії} other {# запису історії}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# хост} few {# хости} many {# хостів} other {# хоста}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# мітка} few {# мітки} many {# міток} other {# мітки}}"
@@ -181,6 +185,10 @@ msgstr "{0, plural, one {# мітка} few {# мітки} many {# міток} ot
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# логін} few {# логіни} many {# логінів} other {# логіна}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# чекає на введення} few {# чекають на введення} many {# чекають на введення} other {# чекають на введення}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -216,6 +224,10 @@ msgstr "{0, plural, one {# проєкт} few {# проєкти} many {# проє
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# пул-реквест} few {# пул-реквести} many {# пул-реквестів} other {# пул-реквесту}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# готово} few {# готово} many {# готово} other {# готово}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -225,6 +237,14 @@ msgstr "{0, plural, one {# відповідь} few {# відповіді} many {
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# репозиторій} few {# репозиторії} many {# репозиторіїв} other {# репозиторію}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# результат на всіх хостах} few {# результати на всіх хостах} many {# результатів на всіх хостах} other {# результату на всіх хостах}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# результат у вибраних місцях} few {# результати у вибраних місцях} many {# результатів у вибраних місцях} other {# результату у вибраних місцях}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -273,6 +293,10 @@ msgstr "{0, plural, one {Запущено # термінал} few {Запуще�
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# рядок без змін} few {# рядки без змін} many {# рядків без змін} other {# рядка без змін}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# працює} few {# працюють} many {# працюють} other {# працюють}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -878,6 +902,9 @@ msgstr "{count, plural, one {# термінал залишився в старо
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {# термінал зупинено, і його не вдалося запустити знову.} few {# термінали зупинено, і їх не вдалося запустити знову.} many {# терміналів зупинено, і їх не вдалося запустити знову.} other {# терміналу зупинено, і його не вдалося запустити знову.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {# робочий простір} few {# робочі простори} many {# робочих просторів} other {# робочого простору}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree у цьому репозиторії не має робочого простору. Його буде імпортовано як робочий простір.} few {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} many {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.} other {# worktree у цьому репозиторії не мають робочих просторів. Їх буде імпортовано як робочі простори.}}"
 
@@ -1135,6 +1162,9 @@ msgstr "{machineSize} (немає у вашому тарифі)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} few {{1}} many {{1}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, one {Не більше # хоста одночасно} other {Не більше # хостів одночасно}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Копіювання розмови (# повідомлення)} few {Копіювання розмови (# повідомлення)} many {Копіювання розмови (# повідомлень)} other {Копіювання розмови (# повідомлення)}}"
@@ -2582,6 +2612,9 @@ msgstr "Усі можливості поруч"
 
 msgid "All files exceed the maximum size."
 msgstr "Усі файли перевищують максимальний розмір."
+
+msgid "All hosts"
+msgstr "Усі хости"
 
 msgid "All in a new tab (split panes)"
 msgstr "Усе в новій вкладці (розділені панелі)"
@@ -4052,6 +4085,9 @@ msgstr "Може переглядати"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "Можеш уніфікувати підказки в усьому застосунку?"
+
+msgid "can’t check"
+msgstr "не вдається перевірити"
 
 msgid "Can’t check {hostName}"
 msgstr "Не вдається перевірити {hostName}"
@@ -13309,6 +13345,9 @@ msgstr "Мені не підходить жодна роль. Чи варто в
 msgid "No runs yet"
 msgstr "Запусків ще немає"
 
+msgid "No saved workspaces"
+msgstr "Немає збережених робочих просторів"
+
 msgid "No screenshots yet"
 msgstr "Знімків екрана ще немає"
 
@@ -13614,6 +13653,9 @@ msgstr "За адресою {pathname} нічого немає."
 msgid "Nothing needs a retry"
 msgstr "Нічого не потребує повторної спроби"
 
+msgid "Nothing needs you right now"
+msgstr "Зараз нічого не чекає на вас"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "За останні 30 днів ще нічого не опубліковано. Ваше місце з'явиться, щойно синхронізується використання з цього комп'ютера; публікація від імені <0>{handle}</0>."
 
@@ -13727,11 +13769,12 @@ msgstr "Офлайн"
 msgid "Offline / local-first mode"
 msgstr "Офлайн / режим local-first"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "не в мережі, був {0}"
+
 msgid "OK"
 msgstr "OK"
-
-msgid "Older"
-msgstr "Старіші"
 
 msgid "On"
 msgstr "Увімкнено"
@@ -20903,9 +20946,6 @@ msgstr "Цей тенант Microsoft уже підключено до іншо�
 msgid "This model isn't available"
 msgstr "Ця модель недоступна"
 
-msgid "This month"
-msgstr "Цього місяця"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Це перенесення зупинено. Чат досі в попередньому робочому просторі."
 
@@ -21076,9 +21116,6 @@ msgstr "Цей користувач запускає службу хоста д�
 
 msgid "This view hit an error"
 msgstr "У цьому вигляді сталася помилка"
-
-msgid "This week"
-msgstr "Цього тижня"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Усі відкриті пул-реквести до #{prNumber} буде атомарно злито в {base} за допомогою коміту злиття."

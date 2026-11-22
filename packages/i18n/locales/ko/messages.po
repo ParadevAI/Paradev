@@ -180,6 +180,10 @@ msgstr "{0, plural, one {숨긴 프로젝트 #개} other {숨긴 프로젝트 #�
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {기록 #개} other {기록 #개}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {호스트 #개} other {호스트 #개}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, other {라벨 #개}}"
@@ -187,6 +191,10 @@ msgstr "{0, plural, other {라벨 #개}}"
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {로그인 #개} other {로그인 #개}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {입력 필요 #개} other {입력 필요 #개}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -222,6 +230,10 @@ msgstr "{0, plural, one {프로젝트 #개} other {프로젝트 #개}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {풀 리퀘스트 #개}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {준비됨 #개} other {준비됨 #개}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +243,14 @@ msgstr "{0, plural, other {답글 #개}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {리포지토리 #개} other {리포지토리 #개}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {모든 호스트에서 결과 #개} other {모든 호스트에서 결과 #개}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {선택한 위치에서 결과 #개} other {선택한 위치에서 결과 #개}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +299,10 @@ msgstr "{0, plural, other {터미널 #개 실행 중}}"
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, other {변경 없는 줄 #개}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {작업 중 #개} other {작업 중 #개}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -884,6 +908,9 @@ msgstr "{count, plural, one {터미널 #개가 이전 워크스페이스에 남�
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {터미널 #개가 중지되었고 다시 시작할 수 없었습니다.} other {터미널 #개가 중지되었고 다시 시작할 수 없었습니다.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {워크스페이스 #개} other {워크스페이스 #개}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.} other {이 리포지토리의 worktree #개에 워크스페이스가 없습니다. 워크스페이스로 가져옵니다.}}"
 
@@ -1141,6 +1168,9 @@ msgstr "{machineSize} (요금제에 포함되지 않음)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, other {한 번에 최대 #개 호스트}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {대화를 복사하는 중 (메시지 #개)} other {대화를 복사하는 중 (메시지 #개)}}"
@@ -2588,6 +2618,9 @@ msgstr "모든 기능 한눈에 비교"
 
 msgid "All files exceed the maximum size."
 msgstr "모든 파일이 최대 크기를 초과합니다."
+
+msgid "All hosts"
+msgstr "모든 호스트"
 
 msgid "All in a new tab (split panes)"
 msgstr "모두 새 탭에서 (분할 패널)"
@@ -4058,6 +4091,9 @@ msgstr "보기 가능"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "앱 전반의 툴팁을 표준화해 줄 수 있나요?"
+
+msgid "can’t check"
+msgstr "확인할 수 없음"
 
 msgid "Can’t check {hostName}"
 msgstr "{hostName}을(를) 확인할 수 없습니다"
@@ -13315,6 +13351,9 @@ msgstr "맞는 포지션이 없어요. 그래도 연락해도 될까요?"
 msgid "No runs yet"
 msgstr "아직 실행 기록이 없습니다"
 
+msgid "No saved workspaces"
+msgstr "저장된 워크스페이스가 없습니다"
+
 msgid "No screenshots yet"
 msgstr "아직 스크린샷이 없습니다"
 
@@ -13620,6 +13659,9 @@ msgstr "{pathname}에는 아무것도 없습니다."
 msgid "Nothing needs a retry"
 msgstr "재시도가 필요한 항목이 없습니다"
 
+msgid "Nothing needs you right now"
+msgstr "지금 확인할 항목이 없습니다"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기기의 사용량이 동기화되면 <0>{handle}</0>(으)로 게시되며 순위가 표시됩니다."
 
@@ -13733,11 +13775,12 @@ msgstr "오프라인"
 msgid "Offline / local-first mode"
 msgstr "오프라인 / 로컬 우선 모드"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "오프라인, 마지막 확인 {0}"
+
 msgid "OK"
 msgstr "확인"
-
-msgid "Older"
-msgstr "이전"
 
 msgid "On"
 msgstr "켬"
@@ -20909,9 +20952,6 @@ msgstr "이 Microsoft 테넌트는 이미 다른 Paradev 조직이 연결했습�
 msgid "This model isn't available"
 msgstr "이 모델은 사용할 수 없습니다"
 
-msgid "This month"
-msgstr "이번 달"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "이 옮기기가 중지되었습니다. 채팅은 이전 워크스페이스에 그대로 있습니다."
 
@@ -21082,9 +21122,6 @@ msgstr "이 사용자는 이 기기의 호스트 서비스를 실행 중이므�
 
 msgid "This view hit an error"
 msgstr "이 화면에서 오류가 발생했습니다"
-
-msgid "This week"
-msgstr "이번 주"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "#{prNumber}까지의 모든 열린 풀 리퀘스트를 머지 커밋으로 {base}에 원자적으로 머지합니다."

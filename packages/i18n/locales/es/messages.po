@@ -180,6 +180,10 @@ msgstr "{0, plural, one {# proyecto oculto} other {# proyectos ocultos}}"
 msgid "{0, plural, one {# history item} other {# history items}}"
 msgstr "{0, plural, one {# elemento del historial} other {# elementos del historial}}"
 
+#. placeholder {0}: label.count
+msgid "{0, plural, one {# host} other {# hosts}}"
+msgstr "{0, plural, one {# host} other {# hosts}}"
+
 #. placeholder {0}: chosenLabels.length
 msgid "{0, plural, one {# label} other {# labels}}"
 msgstr "{0, plural, one {# etiqueta} other {# etiquetas}}"
@@ -187,6 +191,10 @@ msgstr "{0, plural, one {# etiqueta} other {# etiquetas}}"
 #. placeholder {0}: result.imported
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {# inicio de sesión} other {# inicios de sesión}}"
+
+#. placeholder {0}: counts.input
+msgid "{0, plural, one {# needs input} other {# need input}}"
+msgstr "{0, plural, one {# necesita entrada} other {# necesitan entrada}}"
 
 #. placeholder {0}: thread.unreadCount
 msgid "{0, plural, one {# new reply} other {# new replies}}"
@@ -222,6 +230,10 @@ msgstr "{0, plural, one {# proyecto} other {# proyectos}}"
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, one {# pull request} other {# pull requests}}"
 
+#. placeholder {0}: counts.review
+msgid "{0, plural, one {# ready} other {# ready}}"
+msgstr "{0, plural, one {# lista} other {# listas}}"
+
 #. placeholder {0}: data.replies.length
 #. placeholder {0}: message.replyCount
 msgid "{0, plural, one {# reply} other {# replies}}"
@@ -231,6 +243,14 @@ msgstr "{0, plural, one {# respuesta} other {# respuestas}}"
 #. placeholder {0}: selectedProjects.length
 msgid "{0, plural, one {# repository} other {# repositories}}"
 msgstr "{0, plural, one {# repositorio} other {# repositorios}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across all hosts} other {# results across all hosts}}"
+msgstr "{0, plural, one {# resultado en todos los hosts} other {# resultados en todos los hosts}}"
+
+#. placeholder {0}: results.length
+msgid "{0, plural, one {# result across the selected places} other {# results across the selected places}}"
+msgstr "{0, plural, one {# resultado en los lugares seleccionados} other {# resultados en los lugares seleccionados}}"
 
 #. placeholder {0}: results.length
 msgid "{0, plural, one {# result in Cloud} other {# results in Cloud}}"
@@ -279,6 +299,10 @@ msgstr "{0, plural, one {# terminal en ejecución} other {# terminales en ejecuc
 #. placeholder {0}: row.lines
 msgid "{0, plural, one {# unmodified line} other {# unmodified lines}}"
 msgstr "{0, plural, one {# línea sin cambios} other {# líneas sin cambios}}"
+
+#. placeholder {0}: counts.working
+msgid "{0, plural, one {# working} other {# working}}"
+msgstr "{0, plural, one {# trabajando} other {# trabajando}}"
 
 #. placeholder {0}: group.workspaceCount
 #. placeholder {0}: selectedWorkspaces.length
@@ -884,6 +908,9 @@ msgstr "{count, plural, one {# terminal se quedó en el espacio de trabajo anter
 msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
 msgstr "{count, plural, one {# terminal se detuvo y no se pudo iniciar de nuevo.} other {# terminales se detuvieron y no se pudieron iniciar de nuevo.}}"
 
+msgid "{count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{count, plural, one {# espacio de trabajo} other {# espacios de trabajo}}"
+
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree de este repositorio no tiene espacio de trabajo. Se importará como espacio de trabajo.} other {# worktrees de este repositorio no tienen espacio de trabajo. Se importarán como espacios de trabajo.}}"
 
@@ -1141,6 +1168,9 @@ msgstr "{machineSize} (no incluido en tu plan)"
 #. placeholder {1}: <> <span className="tabular-nums font-medium text-foreground"> # </span>{" "} results for &ldquo;{query}&rdquo; </>
 msgid "{matchCount, plural, one {{0}} other {{1}}}"
 msgstr "{matchCount, plural, one {{0}} other {{1}}}"
+
+msgid "{MAX_SELECTED_HOSTS, plural, one {Up to # host at a time} other {Up to # hosts at a time}}"
+msgstr "{MAX_SELECTED_HOSTS, plural, one {Hasta # host a la vez} other {Hasta # hosts a la vez}}"
 
 msgid "{messageCount, plural, one {Copying the conversation (# message)} other {Copying the conversation (# messages)}}"
 msgstr "{messageCount, plural, one {Copiando la conversación (# mensaje)} many {Copiando la conversación (# mensajes)} other {Copiando la conversación (# mensajes)}}"
@@ -2588,6 +2618,9 @@ msgstr "Todas las funciones, una al lado de la otra"
 
 msgid "All files exceed the maximum size."
 msgstr "Todos los archivos superan el tamaño máximo."
+
+msgid "All hosts"
+msgstr "Todos los hosts"
 
 msgid "All in a new tab (split panes)"
 msgstr "Todo en una pestaña nueva (paneles divididos)"
@@ -4058,6 +4091,9 @@ msgstr "Puede ver"
 
 msgid "Can you standardize the tooltips across the app?"
 msgstr "¿Puedes unificar los tooltips de toda la app?"
+
+msgid "can’t check"
+msgstr "no se puede comprobar"
 
 msgid "Can’t check {hostName}"
 msgstr "No se puede comprobar {hostName}"
@@ -13315,6 +13351,9 @@ msgstr "Ningún puesto encaja conmigo. ¿Debería escribirles igualmente?"
 msgid "No runs yet"
 msgstr "Aún no hay ejecuciones"
 
+msgid "No saved workspaces"
+msgstr "No hay espacios de trabajo guardados"
+
 msgid "No screenshots yet"
 msgstr "Aún no hay capturas"
 
@@ -13620,6 +13659,9 @@ msgstr "No hay nada en {pathname}."
 msgid "Nothing needs a retry"
 msgstr "Nada necesita reintento"
 
+msgid "Nothing needs you right now"
+msgstr "Nada te necesita ahora"
+
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Aún no has publicado nada en los últimos 30 días. Tu puesto aparecerá cuando se sincronice el uso de esta máquina, publicando como <0>{handle}</0>."
 
@@ -13733,11 +13775,12 @@ msgstr "Sin conexión"
 msgid "Offline / local-first mode"
 msgstr "Modo sin conexión / local primero"
 
+#. placeholder {0}: formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)
+msgid "offline, seen {0}"
+msgstr "sin conexión, visto {0}"
+
 msgid "OK"
 msgstr "Aceptar"
-
-msgid "Older"
-msgstr "Más antiguo"
 
 msgid "On"
 msgstr "Activado"
@@ -20909,9 +20952,6 @@ msgstr "Este tenant de Microsoft ya está conectado por otra organización de Pa
 msgid "This model isn't available"
 msgstr "Este modelo no está disponible"
 
-msgid "This month"
-msgstr "Este mes"
-
 msgid "This move stopped. The chat is still in its old workspace."
 msgstr "Este traslado se detuvo. El chat sigue en su espacio de trabajo anterior."
 
@@ -21082,9 +21122,6 @@ msgstr "Este usuario ejecuta el servicio de host de este dispositivo y debe segu
 
 msgid "This view hit an error"
 msgstr "Esta vista encontró un error"
-
-msgid "This week"
-msgstr "Esta semana"
 
 msgid "This will atomically merge every open pull request through #{prNumber} into {base} using a merge commit."
 msgstr "Esto fusionará de forma atómica todas las pull requests abiertas hasta #{prNumber} en {base} usando un commit de fusión."

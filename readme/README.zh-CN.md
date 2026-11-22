@@ -256,7 +256,7 @@ iOS 应用即将推出,让你可以在手机上查看你的智能体。
 下载桌面应用:
 
 - **macOS**:[Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage)(实验性;macOS 是主要目标平台)
+- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(实验性;macOS 是主要目标平台)
 - **Windows**:暂不可用
 - [所有构建版本](https://github.com/paradevai/paradev/releases/latest)
 
