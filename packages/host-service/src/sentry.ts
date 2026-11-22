@@ -11,6 +11,14 @@ let initialized = false;
 // instance rather than one per call.
 const throttleRepeats = createSentryEventThrottle();
 
+/** Whether this host sends box logs: a cloud box whose organization has `sandbox-box-logs`. */
+export function boxLogsEnabled(env = process.env): boolean {
+	return (
+		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
+		env.SUPERSET_SANDBOX_BOX_LOGS === "1"
+	);
+}
+
 export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
 	const sentryOptions = hostSentryOptions(process.env, options.organizationId);
@@ -33,9 +41,7 @@ export function hostSentryOptions(
 		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
 		provider: env.SUPERSET_SANDBOX_PROVIDER,
 	};
-	const boxLogs =
-		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
-		env.SUPERSET_SANDBOX_BOX_LOGS === "1";
+	const boxLogs = boxLogsEnabled(env);
 	return {
 		dsn,
 		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
@@ -92,7 +98,26 @@ interface BoxEventAttributes {
 		"agent.end_reason": TerminalAgentEndReason;
 		ms: number;
 	};
-	"box.reaped": { "reap.rss_mb": number; "memory.limit_mb": number };
+	"boot.phase": {
+		"log.source": "boot";
+		"boot.phase": string;
+		"boot.at": number;
+		"boot.ms": number;
+	};
+	"box.reaped": {
+		"log.source": "memguard";
+		"reap.class": "box" | "session" | "other";
+		"reap.rss_mb": number;
+		"memory.available_mb": number;
+		"memory.floor_mb": number;
+		"memory.limit_mb": number;
+	};
+	"box.memory_low": {
+		"log.source": "memguard";
+		"memory.available_mb": number;
+		"memory.floor_mb": number;
+		"memory.limit_mb": number;
+	};
 	"hook.finished": { "hook.exit": number | NodeJS.Signals; ms: number };
 	"box.logs.dropped": {
 		"box.logs.dropped": number;
