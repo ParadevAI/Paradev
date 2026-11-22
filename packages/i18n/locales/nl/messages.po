@@ -20460,7 +20460,7 @@ msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally 
 msgstr "De open-source werkruimte voor Claude Code, Codex en elke andere agent. Lokaal of in de cloud."
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "De open-source workspace voor Claude Code, Codex, OpenCode en elke andere agent, lokaal of in de cloud. Voer taken parallel uit op aparte branches en review alles op één plek."
+msgstr "De open-source werkruimte voor Claude Code, Codex, OpenCode en elke andere agent, lokaal of in de cloud. Voer taken parallel uit op aparte branches en review alles op één plek."
 
 msgid "The organization reached its usage limit."
 msgstr "De organisatie heeft haar gebruikslimiet bereikt."
