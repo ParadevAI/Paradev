@@ -1173,3 +1173,57 @@ describe("replayed output", () => {
 		terminal.dispose();
 	});
 });
+
+describe("replayed output across frames and hosts", () => {
+	function attach(head?: number) {
+		const transport = createTransport();
+		const terminal = new HeadlessTerminal({ allowProposedApi: true });
+		connect(transport, terminal as unknown as XTerm, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		socket.message(
+			JSON.stringify({
+				type: "synced",
+				epoch: "e1",
+				seq: 0,
+				...(head === undefined ? {} : { head }),
+				mode: "tail",
+			}),
+		);
+		const frame = (text: string) =>
+			socket.message(new TextEncoder().encode(text).buffer);
+		const inputs = async () => {
+			transport._writeCoalescer?.flushSync();
+			await new Promise<void>((resolve) => terminal.write("", resolve));
+			return socket.sent
+				.map((raw) => JSON.parse(raw) as { type: string; data?: string })
+				.filter((message) => message.type === "input")
+				.map((message) => message.data);
+		};
+		const close = () => {
+			disconnect(transport);
+			terminal.dispose();
+		};
+		return { transport, frame, inputs, close };
+	}
+
+	test("a replay split across frames is not answered, the live tail is", async () => {
+		const first = "$ \x1b[c\x1b[";
+		const second = "6n";
+		const { frame, inputs, close } = attach(first.length + second.length);
+		frame(first);
+		frame(`${second}\x1b[c`);
+		expect(await inputs()).toEqual(["\x1b[?1;2c"]);
+		close();
+	});
+
+	test("an old host without head: every byte is live and answered", async () => {
+		const { transport, frame, inputs, close } = attach();
+		frame("$ \x1b[c");
+		expect(transport._replayBytesLeft).toBe(0);
+		expect(await inputs()).toEqual(["\x1b[?1;2c"]);
+		close();
+	});
+});
