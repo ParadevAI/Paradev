@@ -15,7 +15,8 @@ export default command({
 			authLine =
 				"Paradev app (the account that runs this terminal's workspace)";
 		} else if (ctx.authSource === "override") {
-			authLine = "API key (from --api-key flag or PARADEV_API_KEY env)";
+			authLine =
+				"API key (from --api-key flag or SUPERSET_API_KEY/PARADEV_API_KEY env)";
 		} else {
 			authLine = "API key (stored via auth login --api-key)";
 		}

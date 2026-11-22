@@ -185,7 +185,10 @@ This page is for deploy and server variables. The variables the app sets in
 terminals, agents and hooks (`SUPERSET_TERMINAL_ID`, `SUPERSET_WORKSPACE_ID`,
 `SUPERSET_HOME_DIR`, …) are listed in `PUBLIC_ENV_NAMES`
 (`packages/shared/src/public-env.ts`). Each is set under both `SUPERSET_` and
-`PARADEV_` with the same value. Read one with `readPublicEnv`, which prefers
-`PARADEV_`. Never remove the `SUPERSET_` name: released CLIs and the hook
-scripts on users' machines read only that one. Both prefixes are reserved for
+`PARADEV_` with the same value. Read one with `readPublicEnv`: the `SUPERSET_`
+value wins when it is set and not empty, and `PARADEV_` is used only when it is
+not. Existing scripts and profiles override the old name, so it must keep
+winning. For the same reason, code that clears one of these variables must
+unset both names. Never remove the `SUPERSET_` name: released CLIs and the
+hook scripts on users' machines read only that one. Both prefixes are reserved for
 cloud environment variables (`packages/shared/src/environment-secrets.ts`).

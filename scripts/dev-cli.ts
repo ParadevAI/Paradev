@@ -86,8 +86,8 @@ console.error(
 );
 
 const apiKey =
-	process.env.PARADEV_API_KEY ||
 	process.env.SUPERSET_API_KEY ||
+	process.env.PARADEV_API_KEY ||
 	"sk_dev_local_placeholder";
 
 const env: NodeJS.ProcessEnv = {

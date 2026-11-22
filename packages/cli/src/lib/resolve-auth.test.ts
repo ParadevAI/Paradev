@@ -120,8 +120,14 @@ describe("resolveAuth", () => {
 		expect(result.authSource).toBe("override");
 	});
 
-	it("prefers PARADEV_API_KEY over SUPERSET_API_KEY", async () => {
+	it("prefers SUPERSET_API_KEY over PARADEV_API_KEY", async () => {
 		process.env.SUPERSET_API_KEY = "sk_live_old";
+		process.env.PARADEV_API_KEY = "sk_live_new";
+		const result = await resolveAuth(undefined);
+		expect(result.bearer).toBe("sk_live_old");
+	});
+
+	it("uses PARADEV_API_KEY when SUPERSET_API_KEY is unset", async () => {
 		process.env.PARADEV_API_KEY = "sk_live_new";
 		const result = await resolveAuth(undefined);
 		expect(result.bearer).toBe("sk_live_new");

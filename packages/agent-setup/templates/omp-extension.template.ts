@@ -63,10 +63,10 @@ interface OmpExtensionApi {
 
 export default function (pi: OmpExtensionApi) {
 	// Only activate inside a v2 Superset terminal.
-	if (!(process.env.PARADEV_TERMINAL_ID || process.env.SUPERSET_TERMINAL_ID)) return;
+	if (!(process.env.SUPERSET_TERMINAL_ID || process.env.PARADEV_TERMINAL_ID)) return;
 
 	const supersetHome =
-		process.env.PARADEV_HOME_DIR || process.env.SUPERSET_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
+		process.env.SUPERSET_HOME_DIR || process.env.PARADEV_HOME_DIR || join(homedir(), "{{APP_HOME_DIR_NAME}}");
 	const notifyScript = join(supersetHome, "hooks", "notify.sh");
 	if (!existsSync(notifyScript)) return;
 

@@ -25,9 +25,9 @@ export default defineConfig({
 		json: boolean().desc("Output as JSON (auto-on under CI/agent envs)"),
 		quiet: boolean().desc("Output IDs only"),
 		apiKey: string()
-			.env("PARADEV_API_KEY")
+			.env("SUPERSET_API_KEY")
 			.desc(
-				"Use a Paradev API key (sk_live_…) instead of OAuth login. $SUPERSET_API_KEY also works",
+				"Use a Paradev API key (sk_live_…) instead of OAuth login. $PARADEV_API_KEY also works",
 			),
 	},
 	audiences: () =>

@@ -2,25 +2,25 @@ import { describe, expect, test } from "bun:test";
 import { addPublicEnvAliases, readPublicEnv } from "./public-env";
 
 describe("readPublicEnv", () => {
-	test("prefers the PARADEV_ name", () => {
+	test("prefers the SUPERSET_ name when both are set", () => {
 		expect(
 			readPublicEnv("WORKSPACE_ID", {
 				PARADEV_WORKSPACE_ID: "new",
 				SUPERSET_WORKSPACE_ID: "old",
 			}),
-		).toBe("new");
+		).toBe("old");
 	});
 
-	test("falls back to the SUPERSET_ name when PARADEV_ is unset or empty", () => {
-		expect(readPublicEnv("HOME_DIR", { SUPERSET_HOME_DIR: "/old" })).toBe(
-			"/old",
+	test("falls back to the PARADEV_ name when SUPERSET_ is unset or empty", () => {
+		expect(readPublicEnv("HOME_DIR", { PARADEV_HOME_DIR: "/new" })).toBe(
+			"/new",
 		);
 		expect(
 			readPublicEnv("HOME_DIR", {
-				PARADEV_HOME_DIR: "",
-				SUPERSET_HOME_DIR: "/old",
+				PARADEV_HOME_DIR: "/new",
+				SUPERSET_HOME_DIR: "",
 			}),
-		).toBe("/old");
+		).toBe("/new");
 	});
 });
 

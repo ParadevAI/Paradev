@@ -27,12 +27,15 @@ export type PublicEnvName = (typeof PUBLIC_ENV_NAMES)[number];
 
 type EnvSource = Record<string, string | undefined>;
 
-/** The `PARADEV_` value when it is non-empty, else the `SUPERSET_` value. */
+/**
+ * The `SUPERSET_` value when it is non-empty, else the `PARADEV_` value. The
+ * old name wins so overrides in existing scripts and profiles keep working.
+ */
 export function readPublicEnv(
 	name: PublicEnvName,
 	env: EnvSource = process.env,
 ): string | undefined {
-	return env[`${ENV_PREFIX}${name}`] || env[`${LEGACY_ENV_PREFIX}${name}`];
+	return env[`${LEGACY_ENV_PREFIX}${name}`] || env[`${ENV_PREFIX}${name}`];
 }
 
 /** Sets `PARADEV_<name>` to the value of every `SUPERSET_<name>` in env. */
