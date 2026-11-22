@@ -96,6 +96,9 @@ export const agentToolingRouter = router({
 						claudeStatePath: claudeDir
 							? join(claudeDir, ".claude.json")
 							: join(home, ".claude.json"),
+						claudeSettingsPath: claudeDir
+							? join(claudeDir, "settings.json")
+							: join(home, ".claude", "settings.json"),
 						codexConfigPath: join(
 							codexHome || join(home, ".codex"),
 							"config.toml",
