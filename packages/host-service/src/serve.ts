@@ -1,5 +1,6 @@
 import { serve } from "@hono/node-server";
 import { moveLegacyAppHome } from "@superset/agent-setup/legacy-home-move";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import { createApp } from "./app";
 import { getSupervisor, startDaemonBootstrap } from "./daemon";
 import { env } from "./env";
@@ -12,7 +13,11 @@ import {
 import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
-import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
+import {
+	bootPhaseLogger,
+	processStartedAt,
+	recordBootStamp,
+} from "./runtime/boot-stamps";
 import { caught } from "./runtime/box-log-filter";
 import { readSandboxBoxResources } from "./runtime/box-resources";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
@@ -29,6 +34,8 @@ import { captureFatalStartupError, initSentry } from "./sentry";
 import { startTerminalBaseEnvResolution } from "./terminal/env";
 import { startTerminalReaper } from "./terminal/reaper";
 import { connectRelay, type TunnelClient } from "./tunnel";
+
+const BOOT_PHASE_CHECK_MS = 5_000;
 
 async function main(): Promise<void> {
 	installConsoleTimestamps();
@@ -200,6 +207,10 @@ async function main(): Promise<void> {
 				hostSecret: env.HOST_SERVICE_SECRET,
 				read: readSandboxBoxResources,
 			});
+			setInterval(
+				bootPhaseLogger(SANDBOX_PATHS.bootLog),
+				BOOT_PHASE_CHECK_MS,
+			).unref();
 			startSandboxKeepalive({
 				keepalive: (pingsEveryMs) =>
 					api.sandbox.keepalive.mutate({ pingsEveryMs }),

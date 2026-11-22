@@ -1,8 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
+import { appendFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readBootStamps, recordBootStamp } from "./boot-stamps";
+import * as Sentry from "@sentry/node";
+import {
+	bootPhaseLogger,
+	readBootStamps,
+	recordBootStamp,
+} from "./boot-stamps";
 
 describe("recordBootStamp", () => {
 	let dir: string;
@@ -37,4 +42,41 @@ describe("recordBootStamp", () => {
 		recordBootStamp("host.listening");
 		expect(readBootStamps()).toEqual([]);
 	});
+});
+
+it("bootPhaseLogger logs each stamp of the current boot once, as phase and times only", () => {
+	const dir = mkdtempSync(join(tmpdir(), "boot-phases-"));
+	const path = join(dir, "boot.log");
+	const info = spyOn(Sentry.logger, "info").mockImplementation(() => {});
+	appendFileSync(
+		path,
+		"1789000000000 boot.start pid=1\nGet:1 http://archive.ubuntu.com noble\n1789000000200 checkout.cloned /home/ubuntu/acme https://github.com/acme/secret.git\n",
+	);
+	const log = bootPhaseLogger(path);
+	log();
+	log();
+	appendFileSync(path, "1789000009000 boot.start pid=2\n");
+	log();
+	expect(info.mock.calls.map(([, attributes]) => attributes)).toEqual([
+		{
+			"log.source": "boot",
+			"boot.phase": "boot.start",
+			"boot.at": 1789000000000,
+			"boot.ms": 0,
+		},
+		{
+			"log.source": "boot",
+			"boot.phase": "checkout.cloned",
+			"boot.at": 1789000000200,
+			"boot.ms": 200,
+		},
+		{
+			"log.source": "boot",
+			"boot.phase": "boot.start",
+			"boot.at": 1789000009000,
+			"boot.ms": 0,
+		},
+	]);
+	info.mockRestore();
+	rmSync(dir, { recursive: true, force: true });
 });

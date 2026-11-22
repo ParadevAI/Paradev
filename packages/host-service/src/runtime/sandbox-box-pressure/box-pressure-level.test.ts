@@ -13,7 +13,7 @@ const calm: BoxResources = {
 	memoryStalledNowPercent: 0,
 	memoryUsedMb: 2000,
 	memoryLimitMb: 8192,
-	recentReap: null,
+	memguardActions: [],
 };
 const start: BoxPressureState = { pressure: null, since: 0 };
 
@@ -45,9 +45,17 @@ describe("nextBoxPressure", () => {
 	});
 
 	test("goes critical on a memory stall and ignores a process kill", () => {
-		const reap = { processName: "next-server", rssMb: 4700, at: 0 };
+		const reap = {
+			kind: "reap" as const,
+			at: 0,
+			processName: "next-server",
+			rssMb: 4700,
+			adj: 500,
+			availableMb: 500,
+			floorMb: 650,
+		};
 		expect(
-			nextBoxPressure(start, { ...calm, recentReap: reap }, 0).pressure,
+			nextBoxPressure(start, { ...calm, memguardActions: [reap] }, 0).pressure,
 		).toBeNull();
 		expect(
 			nextBoxPressure(start, { ...calm, memoryStalledNowPercent: 35 }, 0)

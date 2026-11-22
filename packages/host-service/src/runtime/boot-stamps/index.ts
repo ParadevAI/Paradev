@@ -1,4 +1,5 @@
 export {
+	bootPhaseLogger,
 	processStartedAt,
 	readBootStamps,
 	recordBootStamp,

@@ -2,9 +2,25 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parsePressure, readBoxResources, readLastReap } from "./box-resources";
+import {
+	parsePressure,
+	readBoxResources,
+	readMemguardActions,
+} from "./box-resources";
 
 const NOW = 1_763_000_000_000;
+const REAP_TAIL = "adj=500 available=500MB drop=200MB floor=650MB";
+
+function reapLine(at: number, name: string): string {
+	return `${at} memguard reap pid=9 ${name} rss=3100MB ${REAP_TAIL}`;
+}
+
+function lastReapName(path: string, notBefore = 0): string | undefined {
+	const reaps = readMemguardActions(path, notBefore).filter(
+		(action) => action.kind === "reap",
+	);
+	return reaps.at(-1)?.processName;
+}
 const roots: string[] = [];
 
 afterAll(() => {
@@ -57,7 +73,7 @@ describe("readBoxResources", () => {
 			vcpus: 4,
 			memoryUsedMb: 6144,
 			memoryLimitMb: 8192,
-			recentReap: null,
+			memguardActions: [],
 		});
 	});
 
@@ -82,29 +98,36 @@ describe("readBoxResources", () => {
 		});
 	});
 
-	test("a recent memguard kill names the process", () => {
+	test("reads memguard's kills and unrelieved pressure oldest first, without rank lines", () => {
 		const log = [
 			`${NOW - 60_000} memguard rank pid=7 node 0->500`,
-			`${NOW - 30_000} memguard reap pid=9 tsc rss=3100MB adj=500 available=500MB floor=650MB`,
-			"/usr/local/bin/superset-memguard: line 52: /proc/9/status: No such file or directory",
+			reapLine(NOW - 30_000, "tsc"),
+			`${NOW - 20_000} memguard pressure available=600MB floor=650MB nothing to reap`,
 		].join("\n");
 		const resources = readBoxResources(
 			box({ cpu: pressure(3), memory: pressure(0), memguardLog: log }),
 		);
-		expect(resources?.recentReap).toEqual({
-			at: NOW - 30_000,
-			processName: "tsc",
-			rssMb: 3100,
-		});
+		expect(resources?.memguardActions).toEqual([
+			{
+				kind: "reap",
+				at: NOW - 30_000,
+				processName: "tsc",
+				rssMb: 3100,
+				adj: 500,
+				availableMb: 500,
+				floorMb: 650,
+			},
+			{ kind: "pressure", at: NOW - 20_000, availableMb: 600, floorMb: 650 },
+		]);
 	});
 
-	test("a kill older than ten minutes no longer counts", () => {
-		const log = `${NOW - 11 * 60_000} memguard reap pid=9 tsc rss=3100MB adj=500`;
+	test("an action older than ten minutes no longer counts", () => {
+		const log = reapLine(NOW - 11 * 60_000, "tsc");
 		expect(
 			readBoxResources(
 				box({ cpu: pressure(3), memory: pressure(0), memguardLog: log }),
-			)?.recentReap,
-		).toBeNull();
+			)?.memguardActions,
+		).toEqual([]);
 	});
 
 	test("a host without cgroup files or a memory limit reports nothing", () => {
@@ -129,53 +152,36 @@ test("parsePressure reads the some and full lines", () => {
 	});
 });
 
-test("readLastReap reads a process name with spaces", () => {
-	expect(
-		readLastReap(
-			logFile("1 memguard reap pid=3 Web Content rss=900MB adj=500"),
-			0,
-		)?.processName,
-	).toBe("Web Content");
+test("readMemguardActions reads a process name with spaces", () => {
+	expect(lastReapName(logFile(reapLine(1, "Web Content")))).toBe("Web Content");
 });
 
-test("readLastReap ignores a reap from before memguard last started", () => {
+test("readMemguardActions ignores a reap from before memguard last started", () => {
 	const log = [
-		"1 memguard reap pid=2 tsc rss=3100MB adj=500",
+		reapLine(1, "tsc"),
 		"2 memguard start floor=8% user=ubuntu(1000)",
 	].join("\n");
-	expect(readLastReap(logFile(log), 0)).toBeNull();
+	expect(readMemguardActions(logFile(log), 0)).toEqual([]);
 });
 
-test("readLastReap ignores a reap from an earlier session of the box", () => {
-	expect(
-		readLastReap(logFile("1 memguard reap pid=2 tsc rss=3100MB adj=500"), 2),
-	).toBeNull();
+test("readMemguardActions ignores a reap from an earlier session of the box", () => {
+	expect(readMemguardActions(logFile(reapLine(1, "tsc")), 2)).toEqual([]);
 });
 
-test("readLastReap finds a kill buried under more than one chunk of rank lines", () => {
+test("readMemguardActions finds a kill buried under more than one chunk of rank lines", () => {
 	const rank = `${NOW} memguard rank pid=7 node 0->500\n`.repeat(4000);
-	const path = logFile(
-		`${NOW - 1} memguard reap pid=9 tsc rss=3100MB adj=500\n${rank}`,
-	);
-	expect(readLastReap(path, 0)?.processName).toBe("tsc");
+	const path = logFile(`${reapLine(NOW - 1, "tsc")}\n${rank}`);
+	expect(lastReapName(path)).toBe("tsc");
 });
 
-test("readLastReap reads a kill line split across a chunk boundary", () => {
+test("readMemguardActions reads a kill line split across a chunk boundary", () => {
 	const chunk = 64 * 1024;
-	const reap = `${NOW - 1} memguard reap pid=9 tsc rss=3100MB adj=500\n`;
+	const reap = `${reapLine(NOW - 1, "tsc")}\n`;
 	// One unstamped line of chunk-10 bytes puts the last chunk's start ten
 	// bytes before the end of the reap line.
 	const after = `${"y".repeat(chunk - 11)}\n`;
 	const contents = reap + after;
 	const boundary = contents.length - chunk;
 	expect(boundary > 0 && boundary < reap.length).toBe(true);
-	expect(readLastReap(logFile(contents), 0)?.processName).toBe("tsc");
-});
-
-test("readLastReap takes the newest reap", () => {
-	const log = [
-		"1 memguard reap pid=1 vite rss=900MB adj=500",
-		"2 memguard reap pid=2 tsc rss=3100MB adj=500",
-	].join("\n");
-	expect(readLastReap(logFile(log), 0)?.processName).toBe("tsc");
+	expect(lastReapName(logFile(contents))).toBe("tsc");
 });

@@ -11,7 +11,7 @@ const calm: BoxResources = {
 	memoryStalledNowPercent: 0,
 	memoryUsedMb: 2000,
 	memoryLimitMb: 8192,
-	recentReap: null,
+	memguardActions: [],
 };
 
 function harness(status = 200) {
@@ -67,19 +67,47 @@ test("backs off after a failed report instead of retrying every sample", async (
 	expect(bodies).toHaveLength(2);
 });
 
-test("logs each memory guard reap once, with sizes and no process name", async () => {
+test("logs each memguard action once, with its class and sizes", async () => {
 	const warn = spyOn(Sentry.logger, "warn").mockImplementation(() => {});
 	const { step } = harness();
-	const reaped = {
-		...calm,
-		recentReap: { at: 1_000, processName: "node", rssMb: 5100 },
+	const reap = {
+		kind: "reap" as const,
+		at: 1_000,
+		processName: "node",
+		rssMb: 5100,
+		adj: -300,
+		availableMb: 500,
+		floorMb: 650,
 	};
-	await step(0, reaped);
-	await step(5_000, reaped);
+	const low = {
+		kind: "pressure" as const,
+		at: 2_000,
+		availableMb: 600,
+		floorMb: 650,
+	};
+	await step(0, { ...calm, memguardActions: [reap] });
+	await step(5_000, { ...calm, memguardActions: [reap, low] });
 	expect(warn.mock.calls).toEqual([
 		[
 			"box.reaped",
-			{ "reap.rss_mb": 5100, "memory.limit_mb": 8192, "box.event": true },
+			{
+				"log.source": "memguard",
+				"reap.process": "node",
+				"reap.class": "session",
+				"reap.rss_mb": 5100,
+				"memory.available_mb": 500,
+				"memory.floor_mb": 650,
+				"memory.limit_mb": 8192,
+			},
+		],
+		[
+			"box.memory_low",
+			{
+				"log.source": "memguard",
+				"memory.available_mb": 600,
+				"memory.floor_mb": 650,
+				"memory.limit_mb": 8192,
+			},
 		],
 	]);
 	warn.mockRestore();

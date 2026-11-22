@@ -9,11 +9,17 @@ import { availableParallelism, uptime } from "node:os";
 import { join } from "node:path";
 import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 
-export interface BoxReap {
-	at: number;
-	processName: string;
-	rssMb: number;
-}
+export type MemguardAction =
+	| {
+			kind: "reap";
+			at: number;
+			processName: string;
+			rssMb: number;
+			adj: number;
+			availableMb: number;
+			floorMb: number;
+	  }
+	| { kind: "pressure"; at: number; availableMb: number; floorMb: number };
 
 export interface BoxResources {
 	vcpus: number;
@@ -22,10 +28,11 @@ export interface BoxResources {
 	memoryStalledNowPercent: number;
 	memoryUsedMb: number;
 	memoryLimitMb: number;
-	recentReap: BoxReap | null;
+	/** What memguard did in the last ten minutes of this boot, oldest first. */
+	memguardActions: MemguardAction[];
 }
 
-export const REAP_RECENT_MS = 10 * 60_000;
+const MEMGUARD_RECENT_MS = 10 * 60_000;
 const LOG_CHUNK_BYTES = 64 * 1024;
 const LOG_SCAN_LIMIT_BYTES = 4 * 1024 * 1024;
 const BYTES_PER_MB = 1024 * 1024;
@@ -57,27 +64,47 @@ export function parsePressure(
 	return lines.some ? { some: lines.some, full: lines.full ?? null } : null;
 }
 
-const REAP_LINE = /^(\d+) memguard reap pid=\d+ (.+?) rss=(\d+)MB/;
+const REAP_LINE =
+	/^(\d+) memguard reap pid=\d+ (.+?) rss=(\d+)MB adj=(-?\d+) available=(\d+)MB drop=\d+MB floor=(\d+)MB$/;
+const PRESSURE_LINE =
+	/^(\d+) memguard pressure available=(\d+)MB floor=(\d+)MB nothing to reap$/;
 const START_LINE = /^\d+ memguard start /;
 const STAMPED_LINE = /^(\d+) memguard /;
 
 function classifyLine(
 	line: string,
 	notBefore: number,
-): BoxReap | "stop" | null {
+): MemguardAction | "stop" | null {
 	if (START_LINE.test(line)) return "stop";
 	const stamp = STAMPED_LINE.exec(line);
 	if (stamp && Number(stamp[1]) < notBefore) return "stop";
-	const match = REAP_LINE.exec(line);
-	if (!match) return null;
+	const reap = REAP_LINE.exec(line);
+	if (reap) {
+		return {
+			kind: "reap",
+			at: Number(reap[1]),
+			processName: reap[2] ?? "",
+			rssMb: Number(reap[3]),
+			adj: Number(reap[4]),
+			availableMb: Number(reap[5]),
+			floorMb: Number(reap[6]),
+		};
+	}
+	const pressure = PRESSURE_LINE.exec(line);
+	if (!pressure) return null;
 	return {
-		at: Number(match[1]),
-		processName: match[2] ?? "",
-		rssMb: Number(match[3]),
+		kind: "pressure",
+		at: Number(pressure[1]),
+		availableMb: Number(pressure[2]),
+		floorMb: Number(pressure[3]),
 	};
 }
 
-export function readLastReap(path: string, notBefore: number): BoxReap | null {
+export function readMemguardActions(
+	path: string,
+	notBefore: number,
+): MemguardAction[] {
+	const actions: MemguardAction[] = [];
 	let fd: number | null = null;
 	try {
 		fd = openSync(path, "r");
@@ -93,13 +120,13 @@ export function readLastReap(path: string, notBefore: number): BoxReap | null {
 			carry = position > floor ? (lines.shift() ?? "") : "";
 			for (let index = lines.length - 1; index >= 0; index--) {
 				const result = classifyLine(lines[index] ?? "", notBefore);
-				if (result === "stop") return null;
-				if (result) return result;
+				if (result === "stop") return actions.reverse();
+				if (result) actions.push(result);
 			}
 		}
-		return null;
+		return actions.reverse();
 	} catch {
-		return null;
+		return [];
 	} finally {
 		if (fd !== null) closeSync(fd);
 	}
@@ -162,9 +189,9 @@ export function readBoxResources(options: {
 	}
 
 	const now = options.now ?? Date.now();
-	const recentReap = readLastReap(
+	const memguardActions = readMemguardActions(
 		options.memguardLog,
-		Math.max(options.notBefore ?? 0, now - REAP_RECENT_MS),
+		Math.max(options.notBefore ?? 0, now - MEMGUARD_RECENT_MS),
 	);
 
 	return {
@@ -177,6 +204,6 @@ export function readBoxResources(options: {
 				BYTES_PER_MB,
 		),
 		memoryLimitMb,
-		recentReap,
+		memguardActions,
 	};
 }

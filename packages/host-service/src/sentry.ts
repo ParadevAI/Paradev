@@ -92,7 +92,27 @@ interface BoxEventAttributes {
 		"agent.end_reason": TerminalAgentEndReason;
 		ms: number;
 	};
-	"box.reaped": { "reap.rss_mb": number; "memory.limit_mb": number };
+	"boot.phase": {
+		"log.source": "boot";
+		"boot.phase": string;
+		"boot.at": number;
+		"boot.ms": number;
+	};
+	"box.reaped": {
+		"log.source": "memguard";
+		"reap.process": string;
+		"reap.class": "box" | "session" | "other";
+		"reap.rss_mb": number;
+		"memory.available_mb": number;
+		"memory.floor_mb": number;
+		"memory.limit_mb": number;
+	};
+	"box.memory_low": {
+		"log.source": "memguard";
+		"memory.available_mb": number;
+		"memory.floor_mb": number;
+		"memory.limit_mb": number;
+	};
 	"hook.finished": { "hook.exit": number | NodeJS.Signals; ms: number };
 	"box.logs.dropped": {
 		"box.logs.dropped": number;

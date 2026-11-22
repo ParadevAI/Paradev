@@ -1,5 +1,5 @@
 export {
-	type BoxReap,
 	type BoxResources,
+	type MemguardAction,
 	readSandboxBoxResources,
 } from "./box-resources";

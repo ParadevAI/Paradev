@@ -1,9 +1,10 @@
-import { appendFileSync, readFileSync } from "node:fs";
+import { appendFileSync, readFileSync, statSync } from "node:fs";
 import {
 	type BootStamp,
 	parseBootStamps,
 } from "@superset/shared/sandbox/boot-stamps";
 import { caught } from "../box-log-filter";
+import { logBoxEvent } from "../../sentry";
 
 export interface SandboxBootReport {
 	/** The current boot's stamps in order, starting at its `boot.start`. */
@@ -42,12 +43,39 @@ export function processStartedAt(): number {
 	return Date.now() - Math.round(process.uptime() * 1000);
 }
 
-export function readBootStamps(): BootStamp[] {
-	const path = bootLogPath();
-	if (!path) return [];
+function readStamps(path: string): BootStamp[] {
 	try {
 		return parseBootStamps(readFileSync(path, "utf8"));
 	} catch {
 		return [];
 	}
+}
+
+export function readBootStamps(): BootStamp[] {
+	const path = bootLogPath();
+	return path ? readStamps(path) : [];
+}
+
+/** Each call logs the current boot's stamps not logged yet; the log is parsed again only when it grows. */
+export function bootPhaseLogger(path: string): () => void {
+	let size = -1;
+	let logged: BootStamp[] = [];
+	return () => {
+		const current = statSync(path, { throwIfNoEntry: false })?.size ?? 0;
+		if (current === size) return;
+		size = current;
+		const stamps = readStamps(path);
+		const start = stamps[0];
+		if (!start) return;
+		const sameBoot = logged[0]?.at === start.at;
+		for (const stamp of sameBoot ? stamps.slice(logged.length) : stamps) {
+			logBoxEvent("boot.phase", {
+				"log.source": "boot",
+				"boot.phase": stamp.phase,
+				"boot.at": stamp.at,
+				"boot.ms": stamp.at - start.at,
+			});
+		}
+		logged = stamps;
+	};
 }
