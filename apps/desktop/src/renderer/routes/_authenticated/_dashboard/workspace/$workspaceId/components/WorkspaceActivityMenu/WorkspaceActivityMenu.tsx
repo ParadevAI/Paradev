@@ -99,6 +99,7 @@ import {
 import { useActivityPanelVisibility } from "./hooks/useActivityPanelVisibility";
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
+import { useChatPullRequests } from "./hooks/useChatPullRequests/useChatPullRequests";
 import { useWorkspacePullRequests } from "./hooks/useWorkspacePullRequests";
 import { useActivityPanelStore } from "./stores/activityPanelStore";
 import {
@@ -364,7 +365,8 @@ export function WorkspaceActivityMenu({
 			.filter((layer) => layer.number !== currentPr?.number)
 			.map((layer) => layer.number) ?? [],
 	);
-	const linkedPullRequests = useWorkspacePullRequests(workspaceId, {
+	const chatPullRequests = useChatPullRequests(store, open);
+	const workspacePullRequests = useWorkspacePullRequests(workspaceId, {
 		enabled: open,
 	}).filter(
 		(pullRequest) =>
@@ -375,6 +377,19 @@ export function WorkspaceActivityMenu({
 				stackLayerNumbers.has(pullRequest.number)
 			),
 	);
+	// Include links from the active chat, even when their repositories differ from this worktree.
+	const linkedPullRequests = [
+		...workspacePullRequests,
+		...chatPullRequests.filter(
+			(pr) =>
+				!workspacePullRequests.some(
+					(existing) =>
+						existing.repoOwner.toLowerCase() === pr.repoOwner.toLowerCase() &&
+						existing.repoName.toLowerCase() === pr.repoName.toLowerCase() &&
+						existing.number === pr.number,
+				),
+		),
+	];
 	const pullRequests: PullRequestEntry[] =
 		changes &&
 		currentPr &&
