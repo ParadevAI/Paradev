@@ -323,10 +323,15 @@ export function getOpenCodeTuiPluginContent(notifyPath: string): string {
 
 // Claude reads settings.json only from its active config dir, so a dir the user
 // exported by hand has no managed hooks. Chat sessions pass --setting-sources to load none.
+// Claude runs its background-session commands only when they come first.
 export function buildClaudeWrapperExecLine(): string {
 	return `_superset_claude_hooks="$SUPERSET_HOME_DIR/hooks/${CLAUDE_HOOKS_SETTINGS_FILE}"
 if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -n "$CLAUDE_CONFIG_DIR" ] \\
   && [ "$CLAUDE_CONFIG_DIR" != "$SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR" ] && [ -f "$_superset_claude_hooks" ]; then
+  case "$1" in
+    daemon|attach|logs|kill|rm|stop|respawn) exec "$REAL_BIN" "$@" ;;
+    --dangerously-skip-permissions|--allow-dangerously-skip-permissions) [ "$2" = daemon ] && exec "$REAL_BIN" "$@" ;;
+  esac
   for _superset_arg in "$@"; do
     case "$_superset_arg" in
       --) break ;;

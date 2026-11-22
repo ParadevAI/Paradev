@@ -2257,6 +2257,20 @@ describe("agent-wrappers claude hooks-only settings", () => {
 			`--settings ${hooksFile} -- --settings`,
 		);
 	});
+
+	it("leaves Claude's background-session commands alone", () => {
+		writeFileSync(hooksFile, "{}");
+		const exported = { ...terminal, CLAUDE_CONFIG_DIR: "/tmp/claude-alt" };
+
+		expect(launchArgs(exported, ["daemon", "stop"])).toBe("daemon stop");
+		expect(
+			launchArgs(exported, ["--dangerously-skip-permissions", "daemon"]),
+		).toBe("--dangerously-skip-permissions daemon");
+		expect(launchArgs(exported, ["logs", "abc"])).toBe("logs abc");
+		expect(launchArgs(exported, ["mcp", "list"])).toBe(
+			`--settings ${hooksFile} mcp list`,
+		);
+	});
 });
 
 describe("agent-wrappers codex hooks.json", () => {
