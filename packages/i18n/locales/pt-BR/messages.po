@@ -20326,7 +20326,7 @@ msgid "The open-source workspace for Claude Code, Codex, and any agent. Locally 
 msgstr "A área de trabalho de código aberto para Claude Code, Codex e qualquer agente. Localmente ou na nuvem."
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any agent, locally or in the cloud. Run tasks in parallel on separate branches, and review everything in one place."
-msgstr "O workspace de código aberto para Claude Code, Codex, OpenCode e qualquer agente, localmente ou na nuvem. Execute tarefas em paralelo em branches separadas e revise tudo em um só lugar."
+msgstr "A área de trabalho de código aberto para Claude Code, Codex, OpenCode e qualquer agente, localmente ou na nuvem. Execute tarefas em paralelo em branches separadas e revise tudo em um só lugar."
 
 msgid "The organization reached its usage limit."
 msgstr "A organização atingiu o limite de uso."
