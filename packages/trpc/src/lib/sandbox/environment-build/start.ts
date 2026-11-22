@@ -5,10 +5,11 @@ import {
 	environments,
 	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
+import { BUILD_ERRORS } from "@superset/shared/sandbox/build-errors";
 import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import { start } from "workflow/api";
 import { organizationPlan } from "../../billing/plan";
-import { readRepoHooks } from "../repo-hooks";
+import { environmentHooks } from "../repo-hooks";
 import {
 	environmentRepositoryRows,
 	installationTokenFor,
@@ -58,7 +59,7 @@ export async function expireStaleBuilds(environmentId: string): Promise<void> {
 		.update(environmentBuilds)
 		.set({
 			status: "failed",
-			error: "The build stopped unexpectedly",
+			error: BUILD_ERRORS.stoppedUnexpectedly,
 			finishedAt: new Date(now),
 		})
 		.where(
@@ -164,7 +165,8 @@ export async function startEnvironmentBuild(args: {
 			"This environment has no repositories to build",
 		);
 	}
-	const hooks = await readRepoHooks({
+	const hooks = await environmentHooks({
+		config: environment.config,
 		repo: primary,
 		branch: primary.defaultBranch,
 		token: (await installationTokenFor(repositories))?.token ?? null,
@@ -172,7 +174,9 @@ export async function startEnvironmentBuild(args: {
 	if (!hooks?.install) {
 		throw new BuildRefused(
 			"no-install",
-			`This environment has no [install] to build: add one to .paradev/config.toml on ${primary.fullName}@${primary.defaultBranch}`,
+			environment.config?.trim()
+				? "This environment has no [install] to build: add one to its config"
+				: `This environment has no [install] to build: add one to its config, or to .paradev/config.toml on ${primary.fullName}@${primary.defaultBranch}`,
 		);
 	}
 

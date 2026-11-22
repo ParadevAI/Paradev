@@ -508,11 +508,17 @@ export const serverErrorMessages: Record<
 					"Your GitHub account cannot reach a repository in this environment",
 			}),
 		),
-	"serverError.environment.repositoriesFrozen": () =>
+	"serverError.environment.invalidConfig": (params) =>
+		i18n._(
+			msg({
+				message: `This config is invalid: ${params?.details}`,
+			}),
+		),
+	"serverError.environment.repositoriesFixed": () =>
 		i18n._(
 			msg({
 				message:
-					"This environment's repositories are fixed; promote a workspace again to change them",
+					"An environment's repositories can't change. Create a new environment for other repositories.",
 			}),
 		),
 	"serverError.environment.couldNotRecord": () =>
@@ -525,7 +531,7 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message:
-					"This environment has no [install] to build. Add one to .paradev/config.toml on its base branch.",
+					"This environment has no [install] to build. Add one to its config in Settings, Environments.",
 			}),
 		),
 	"serverError.environment.manualBuildsRateLimited": (params) =>
@@ -538,6 +544,26 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "A build of this environment is already running",
+			}),
+		),
+	"serverError.environment.buildNotRestorable": () =>
+		i18n._(
+			msg({
+				message: "This build has no snapshot to restore",
+			}),
+		),
+	"serverError.environment.changedDuringRestore": () =>
+		i18n._(
+			msg({
+				message:
+					"The environment changed while it was being restored. Try again.",
+			}),
+		),
+	"serverError.environment.configChanged": () =>
+		i18n._(
+			msg({
+				message:
+					"Someone else saved this environment's config while you were editing it",
 			}),
 		),
 	"serverError.task.notFound": () =>

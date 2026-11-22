@@ -32,6 +32,7 @@ import { dirname, join, resolve } from "node:path";
 import { resolveWriteTarget } from "@superset/agent-setup";
 import { parse } from "shell-quote";
 import type { HostDb } from "../../../../db";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import { resolveDefaultAccountEnv } from "../../usage/default-account";
 
 type TrustFamily = "claude" | "codex" | "agy";
@@ -304,6 +305,30 @@ export async function seedAgyFolderTrust(
 	await atomicWrite(settingsFile, JSON.stringify(settings, null, 2));
 }
 
+/**
+ * Antigravity does not carry a main checkout's trust over to its worktrees,
+ * as Claude and Codex do. Trust the worktree when the user already trusted
+ * the main checkout.
+ */
+export async function inheritAgyWorktreeTrust(
+	settingsFile: string,
+	mainRepoPath: string,
+	worktreePath: string,
+): Promise<void> {
+	if (!existsSync(settingsFile)) return;
+	const settings = JSON.parse(await readFile(settingsFile, "utf-8"));
+	const trusted: unknown[] = Array.isArray(settings.trustedWorkspaces)
+		? settings.trustedWorkspaces
+		: [];
+	const mainRepo = normalizeFolderPath(mainRepoPath);
+	const mainRepoTrusted = trusted.some(
+		(entry) =>
+			typeof entry === "string" && normalizeFolderPath(entry) === mainRepo,
+	);
+	if (!mainRepoTrusted) return;
+	await seedAgyFolderTrust(settingsFile, normalizeFolderPath(worktreePath));
+}
+
 function normalizeFolderPath(path: string): string {
 	try {
 		return realpathSync(path);
@@ -339,6 +364,38 @@ export async function seedAgentFolderTrust(
 	} catch (err) {
 		console.warn(
 			`[agents.run] failed to pre-trust session folder '${folderPath}' for agent '${config.presetId}':`,
+			err,
+		);
+	}
+}
+
+/**
+ * Trust a workspace folder for the agent about to launch in it. A session
+ * folder is seeded outright; a worktree only gets the trust its main checkout
+ * already has.
+ */
+export async function seedWorkspaceAgentTrust(
+	db: HostDb,
+	workspace: { projectId: string | null; worktreePath: string },
+	config: AgentLaunchConfig,
+): Promise<void> {
+	if (workspace.projectId === null) {
+		await seedAgentFolderTrust(db, workspace.worktreePath, config);
+		return;
+	}
+	try {
+		const target = resolveTrustTarget(db, config);
+		if (target?.family !== "agy") return;
+		const project = getLocalProject(db, workspace.projectId);
+		if (!project) return;
+		await inheritAgyWorktreeTrust(
+			target.file,
+			project.repoPath,
+			workspace.worktreePath,
+		);
+	} catch (err) {
+		console.warn(
+			`[agents.run] failed to carry folder trust to worktree '${workspace.worktreePath}' for agent '${config.presetId}':`,
 			err,
 		);
 	}

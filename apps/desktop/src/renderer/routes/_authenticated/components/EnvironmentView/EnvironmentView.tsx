@@ -18,16 +18,19 @@ import { FaGithub } from "react-icons/fa";
 import { LuArchive, LuContainer } from "react-icons/lu";
 import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useCanChangeEnvironment } from "renderer/routes/_authenticated/hooks/useCanChangeEnvironment";
 import { ArchiveEnvironmentDialog } from "../ArchiveEnvironmentDialog";
-import { EnvironmentPropertyRow } from "../EnvironmentPropertyRow";
+import {
+	EnvironmentPropertyRow,
+	PROPERTY_ROW_CONTROL,
+} from "../EnvironmentPropertyRow";
+import { EnvironmentConfig } from "./components/EnvironmentConfig";
+import { EnvironmentHistory } from "./components/EnvironmentHistory";
 import { EnvironmentMachineSize } from "./components/EnvironmentMachineSize";
 import { EnvironmentProjectLinks } from "./components/EnvironmentProjectLinks";
 import { EnvironmentVariables } from "./components/EnvironmentVariables";
 
 type EnvironmentScope = "organization" | "personal";
-
-const ROW_CONTROL =
-	"h-10 w-full rounded-none border-0 bg-transparent px-3 shadow-none focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent";
 
 interface EnvironmentViewProps {
 	environmentId: string;
@@ -44,6 +47,7 @@ export function EnvironmentView({
 	const environment = cloudTrpc.environment.get.useQuery({
 		id: environmentId,
 	});
+	const canChange = useCanChangeEnvironment(environment.data);
 	const [confirmingArchive, setConfirmingArchive] = useState(false);
 
 	const update = cloudTrpc.environment.update.useMutation({
@@ -121,13 +125,16 @@ export function EnvironmentView({
 					label={<Trans>Visible to</Trans>}
 				>
 					<Select
-						disabled={update.isPending}
+						disabled={update.isPending || !canChange}
 						onValueChange={(scope) =>
 							update.mutate({ id: row.id, scope: scope as EnvironmentScope })
 						}
 						value={row.scope}
 					>
-						<SelectTrigger className={ROW_CONTROL} id="environment-view-scope">
+						<SelectTrigger
+							className={PROPERTY_ROW_CONTROL}
+							id="environment-view-scope"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -153,8 +160,8 @@ export function EnvironmentView({
 					label={<Trans>Machine size</Trans>}
 				>
 					<EnvironmentMachineSize
-						className={ROW_CONTROL}
-						disabled={update.isPending}
+						className={PROPERTY_ROW_CONTROL}
+						disabled={update.isPending || !canChange}
 						id="environment-view-machine-size"
 						machineSize={row.machineSize}
 						onChange={(machineSize) =>
@@ -197,26 +204,10 @@ export function EnvironmentView({
 						repositories={row.repositories}
 					/>
 				</EnvironmentPropertyRow>
-				<EnvironmentPropertyRow
-					htmlFor="environment-view-snapshot"
-					label={<Trans>Snapshot</Trans>}
-				>
-					<span
-						className="px-3 text-sm text-muted-foreground"
-						id="environment-view-snapshot"
-					>
-						{row.sourceKind === "fork" ? (
-							<Trans>
-								Checkpoint saved{" "}
-								{formatRelativeTime(new Date(row.updatedAt), now)}
-							</Trans>
-						) : (
-							<Trans>Base image · no checkpoint yet</Trans>
-						)}
-					</span>
-				</EnvironmentPropertyRow>
 			</div>
 
+			<EnvironmentConfig canChange={canChange} environment={row} />
+			<EnvironmentHistory canRestore={canChange} environmentId={row.id} />
 			<EnvironmentVariables environmentId={row.id} />
 
 			<div className="mt-auto pt-2">

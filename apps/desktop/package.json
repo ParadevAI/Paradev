@@ -1,6 +1,6 @@
 {
 	"name": "@superset/desktop",
-	"productName": "Superset",
+	"productName": "Paradev",
 	"description": "The last developer tool you'll ever need",
 	"version": "2.0.11",
 	"main": "./dist/main/index.js",

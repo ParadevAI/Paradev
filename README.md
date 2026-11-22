@@ -25,7 +25,7 @@ Claude Code, Codex, and OpenCode are the agents. Paradev is where you run many o
 ## Get started
 
 1. **Download the app.**
-   - macOS: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
+   - macOS: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x64.dmg)
    - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (experimental; macOS is the primary target)
    - Windows: not yet available
 2. **Add a repository** from your computer, or clone one.
@@ -42,7 +42,7 @@ curl -fsSL https://paradev.com/cli/install.sh | sh
 brew install paradevai/tap/superset
 ```
 
-Paradev was previously named Superset, so the command and the download files still use that name. It is unrelated to Apache Superset, the business intelligence tool.
+Paradev was previously named Superset, so the command is still `superset`. It is unrelated to Apache Superset, the business intelligence tool.
 
 ## Features
 

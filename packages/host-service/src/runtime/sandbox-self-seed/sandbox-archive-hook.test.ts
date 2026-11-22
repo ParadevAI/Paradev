@@ -25,14 +25,14 @@ function identity(): SandboxIdentity {
 }
 
 function writeConfig(content: string) {
-	mkdirSync(join(root, ".superset"), { recursive: true });
-	writeFileSync(join(root, ".superset", "config.toml"), content, "utf-8");
+	writeFileSync(join(root, "environment.toml"), content, "utf-8");
 }
 
 beforeEach(() => {
 	root = mkdtempSync(join(tmpdir(), "archive-hook-test-"));
 	previousRunMode = process.env.SUPERSET_HOST_RUN_MODE;
 	process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+	process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(root, "environment.toml");
 	// The hook runs `bash -lc`; an empty HOME and no BASH_ENV keep the
 	// developer's shell startup files out of the run.
 	previousHome = process.env.HOME;
@@ -45,6 +45,7 @@ afterEach(() => {
 	rmSync(root, { recursive: true, force: true });
 	if (previousRunMode === undefined) delete process.env.SUPERSET_HOST_RUN_MODE;
 	else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
+	delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
 	if (previousHome === undefined) delete process.env.HOME;
 	else process.env.HOME = previousHome;
 	if (previousBashEnv !== undefined) process.env.BASH_ENV = previousBashEnv;
@@ -74,9 +75,10 @@ describe("runSandboxArchiveHook", () => {
 			spy.mockRestore();
 		}
 		expect(printed).toEqual([
-			expect.stringMatching(
-				/^\[sandbox\] archive hook exited 0 \(command of \d+ chars\)$/,
-			),
+			"[sandbox] hook outcome (hook, outcome, command chars):",
+			"archive",
+			"exited 0",
+			expect.any(Number),
 		]);
 	});
 

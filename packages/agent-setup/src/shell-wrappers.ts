@@ -219,7 +219,7 @@ export ZDOTDIR="$_superset_home"
 `;
 	const wroteZlogin = writeFileIfChanged(zloginPath, zloginScript, 0o644);
 	const changed = wroteZshenv || wroteZprofile || wroteZshrc || wroteZlogin;
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} zsh wrapper files`,
 	);
 }
@@ -282,7 +282,9 @@ __superset_exit_mark() {
 [[ -z "$(trap -p EXIT)" ]] && trap __superset_exit_mark EXIT
 `;
 	const changed = writeFileIfChanged(rcfilePath, script, 0o644);
-	console.log(`[agent-setup] ${changed ? "Updated" : "Verified"} bash wrapper`);
+	(changed ? console.log : console.debug)(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} bash wrapper`,
+	);
 }
 
 export function getShellEnv(

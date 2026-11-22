@@ -29,7 +29,7 @@ export const env = createEnv({
 		STREAMS_URL: z.url().default("https://superset-stream.fly.dev"),
 		RELAY_URL: z.url().default("https://relay.superset.sh"),
 		REALTIME_URL: z.url().default("https://realtime.superset.sh"),
-		DESKTOP_DISPLAY_NAME: z.string().default("Superset"),
+		DESKTOP_DISPLAY_NAME: z.string().default("Paradev"),
 	},
 
 	runtimeEnv: {
