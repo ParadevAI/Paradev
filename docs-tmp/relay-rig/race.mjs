@@ -30,13 +30,13 @@ const [side, portArg, gapsArg, roundsArg] = process.argv.slice(2);
 if (!side || !portArg || !gapsArg || !roundsArg) { console.error("usage: node race.mjs <side> <port> <gapsMs,...> <rounds>"); process.exit(2); }
 if (!existsSync(join(S, `relay-${side}`, "wrangler.json"))) throw new Error(`missing ${join(S, `relay-${side}`)}; run: node build.mjs ${side} <checkout> --relay-only`);
 const PORT = Number(portArg);
-const OUT = join(S, "results", `race-${side}-${process.env.FIRST ?? "health"}-${process.env.SECOND ?? "health"}`);
+const OUT = join(S, "results", `race-${side}-${process.env.FIRST ?? "health"}-${process.env.SECOND ?? "health"}${process.env.VARIANT ?? ""}`);
 mkdirSync(OUT, { recursive: true });
 const WLOG = join(OUT, "wrangler.log");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let wrangler;
 async function start() {
-	wrangler = spawn(wranglerBin(), ["dev", "-c", join(S, `relay-${side}`, "wrangler.json"), "--no-bundle", "--port", String(PORT), "--ip", "127.0.0.1", "--inspector-port", String(PORT + 3), "--persist-to", join(S, "state", `race-${side}`), "--show-interactive-dev-session=false"], { cwd: join(S, `relay-${side}`), env: { ...process.env, CI: "1", WRANGLER_SEND_METRICS: "false" }, stdio: ["ignore", "pipe", "pipe"], detached: true });
+	wrangler = spawn(wranglerBin(), ["dev", "-c", join(S, `relay-${side}`, "wrangler.json"), "--no-bundle", "--port", String(PORT), "--ip", "127.0.0.1", "--inspector-port", String(PORT + 3), "--persist-to", join(S, "state", `race-${side}${process.env.VARIANT ?? ""}`), "--show-interactive-dev-session=false"], { cwd: join(S, `relay-${side}`), env: { ...process.env, CI: "1", WRANGLER_SEND_METRICS: "false" }, stdio: ["ignore", "pipe", "pipe"], detached: true });
 	const sink = (d) => appendFileSync(WLOG, String(d));
 	wrangler.stdout.on("data", sink); wrangler.stderr.on("data", sink);
 	for (let i = 0; i < 600; i++) { if (await get().then((s) => s === 200, () => false)) return; await sleep(100); }

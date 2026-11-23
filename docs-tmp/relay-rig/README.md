@@ -203,4 +203,14 @@ Other differences on macOS:
   60 s wait in `startWrangler`. If it fails with `relay did not come up`, run it again.
 - The macOS firewall can ask once to allow `workerd` and `node` to accept connections. All
   listeners are on 127.0.0.1, so you can deny.
-- host-service runs with an isolated `HOME` under `$RIG_DIR/runs/<tag>/home`.
+- host-service runs with an isolated `HOME` under `$RIG_DIR/runs/<tag>/home`, and also
+  `CLAUDE_CONFIG_DIR`, `CODEX_HOME` and `XDG_*` there, so it never reads or reaps `~/.agents`,
+  `~/.claude` or `~/.codex`.
+- Do not point host-service `TMPDIR` into `RIG_DIR`. The pty-daemon socket lives in `TMPDIR`, and a
+  `$TMPDIR/…/runs/<tag>/tmp/…sock` path is longer than the macOS limit of 104 bytes. The daemon then
+  fails with `EADDRINUSE`, no shell starts, and terminal echo and the `4410` stream close are lost.
+- Set `WRANGLER_LOG_PATH=$RIG_DIR/wrangler-logs`, or wrangler writes debug logs to
+  `~/Library/Preferences/.wrangler/logs`.
+- `race.mjs` takes `VARIANT` too, so runs with two wrangler versions do not share a results dir.
+- In a worktree, `bun install` can fail in the desktop's native rebuild (postinstall). The relay
+  and CLI builds do not need it; `bun install --frozen-lockfile --ignore-scripts` is enough.
