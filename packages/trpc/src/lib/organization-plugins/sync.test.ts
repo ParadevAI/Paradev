@@ -45,6 +45,10 @@ let source = { ...SOURCE };
 let plugins: PluginRow[] = [];
 let writtenMeanwhile: PluginRow[] = [];
 let objects = new Map<string, Uint8Array>();
+let publicObjects = new Map<
+	string,
+	{ body: Uint8Array; contentType: string }
+>();
 let reads: string[] = [];
 let sourceWrites: Record<string, unknown>[] = [];
 let removalParams: unknown[][] = [];
@@ -59,8 +63,19 @@ stub(realtime, {
 
 stub(credentials, { sourceToken: async () => "token" });
 stub(r2, {
-	putObject: async ({ key, body }: { key: string; body: Uint8Array }) => {
-		objects.set(key, body);
+	putObject: async ({
+		key,
+		body,
+		bucket,
+		contentType,
+	}: {
+		key: string;
+		body: Uint8Array;
+		bucket: r2.Bucket;
+		contentType: string;
+	}) => {
+		if (bucket === "public") publicObjects.set(key, { body, contentType });
+		else objects.set(key, body);
 	},
 	getObject: async (key: string) => {
 		const body = objects.get(key);
@@ -118,7 +133,7 @@ const { syncOrganizationPluginSource } = await import("./sync");
 
 function repo(
 	sha: string,
-	files: Record<string, string>,
+	files: Record<string, string | Buffer>,
 	extra: Partial<RepositorySnapshot> = {},
 ) {
 	return async (): Promise<RepositorySnapshot> => ({
@@ -156,6 +171,7 @@ beforeEach(() => {
 	plugins = [];
 	writtenMeanwhile = [];
 	objects = new Map();
+	publicObjects = new Map();
 	reads = [];
 	sourceWrites = [];
 	removalParams = [];
@@ -457,5 +473,56 @@ describe("syncOrganizationPluginSource", () => {
 		expect(
 			await syncOrganizationPluginSource(SOURCE.id, repo("sha-1", {})),
 		).toBeNull();
+	});
+
+	describe("an icon file", () => {
+		const PNG = Buffer.from("89504e470d0a1a0a0000000049454e44ae426082", "hex");
+		const withIcon = (icon: string, body: string | Buffer) => ({
+			".agent-marketplace.json": marketplace("tools"),
+			"plugins/tools/plugin.json": JSON.stringify({
+				name: "tools",
+				version: "1.0.0",
+				extensions: {
+					superset: {
+						interface: {
+							displayName: "Tools",
+							category: "Developer tools",
+							icon,
+						},
+					},
+				},
+			}),
+			[`plugins/tools/${icon.slice(2)}`]: body,
+		});
+
+		test("is stored in the public bucket under the bundle's hash, typed by its bytes", async () => {
+			const result = await syncOrganizationPluginSource(
+				SOURCE.id,
+				repo("sha-1", withIcon("./assets/icon.png", PNG)),
+			);
+			expect(result?.problems).toEqual([]);
+			const hash = (plugins[0] as PluginRow).contentHash;
+			expect([...publicObjects.keys()]).toEqual([
+				`organization-plugins/${ORG}/${hash}/icon`,
+			]);
+			expect(publicObjects.values().next().value?.contentType).toBe(
+				"image/png",
+			);
+		});
+
+		test("that is svg fails the plugin and stores nothing", async () => {
+			const result = await syncOrganizationPluginSource(
+				SOURCE.id,
+				repo("sha-1", withIcon("./assets/icon.svg", "<svg/>")),
+			);
+			expect(result?.problems).toEqual([
+				{
+					name: "tools",
+					reason: "its icon assets/icon.svg must be a png, jpeg or webp image",
+				},
+			]);
+			expect(plugins).toEqual([]);
+			expect(publicObjects.size).toBe(0);
+		});
 	});
 });

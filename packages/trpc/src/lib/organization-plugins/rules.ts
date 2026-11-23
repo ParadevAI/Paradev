@@ -6,11 +6,17 @@ import {
 } from "@superset/shared/plugins/bundle";
 import { pluginManifestSchema } from "@superset/shared/plugins/manifest-schema";
 import {
+	manifestIcon,
+	PLUGIN_ICON_MAX_BYTES,
+	pluginIconFile,
+} from "@superset/shared/plugins/plugin-icon";
+import {
 	type PluginManifest,
 	pluginConnector,
 	supersetExtension,
 } from "../../router/plugins/manifest";
 import { connectorServer } from "../../router/plugins/proxy/resolve-target";
+import { completeImageType, transformUrlFor } from "../upload";
 import { isInternalHost } from "./internal-host";
 
 export class OrganizationPluginError extends Error {}
@@ -57,6 +63,51 @@ export function organizationBundleKey(
 	contentHash: string,
 ): string {
 	return `organization-plugins/${organizationId}/${contentHash}.json.gz`;
+}
+
+/** Where a plugin's icon is served from, in the public bucket. */
+export function organizationIconKey(
+	organizationId: string,
+	contentHash: string,
+): string {
+	return `organization-plugins/${organizationId}/${contentHash}/icon`;
+}
+
+export function organizationPluginIconUrl(
+	organizationId: string,
+	plugin: { manifest: unknown; contentHash: string },
+): string | null {
+	return pluginIconFile(manifestIcon(plugin.manifest))
+		? transformUrlFor(organizationIconKey(organizationId, plugin.contentHash))
+		: null;
+}
+
+/** The image file a manifest names as its icon, after the rules a publicly served icon must pass. */
+export function organizationPluginIcon(
+	manifest: PluginManifest,
+	files: ReadonlyMap<string, Uint8Array>,
+): { body: Buffer; contentType: string } | null {
+	const file = pluginIconFile(manifestIcon(manifest));
+	if (!file) return null;
+	const bytes = files.get(file.relative);
+	if (!bytes) {
+		throw new OrganizationPluginError(
+			`its icon ${file.relative} is not a file in the plugin`,
+		);
+	}
+	if (bytes.length > PLUGIN_ICON_MAX_BYTES) {
+		throw new OrganizationPluginError(
+			`its icon is ${bytes.length} bytes, over the ${PLUGIN_ICON_MAX_BYTES} byte limit`,
+		);
+	}
+	const body = Buffer.from(bytes);
+	const contentType = completeImageType(body);
+	if (!contentType) {
+		throw new OrganizationPluginError(
+			`its icon ${file.relative} must be a png, jpeg or webp image`,
+		);
+	}
+	return { body, contentType };
 }
 
 /** The manifest a bundle carries, after every rule an organization plugin must pass. */

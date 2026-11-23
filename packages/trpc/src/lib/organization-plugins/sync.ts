@@ -19,6 +19,7 @@ import {
 import { and, eq, isNull, notInArray } from "drizzle-orm";
 import { deleteObjects, getObject, putObject } from "../r2";
 import { nudge } from "../realtime";
+import { IMMUTABLE_CACHE_CONTROL } from "../upload";
 import { sourceToken } from "./credentials";
 import { type RepositorySnapshot, readAll, repositorySnapshot } from "./github";
 import {
@@ -33,7 +34,12 @@ import {
 	UNNAMED_ENTRY,
 	withVersion,
 } from "./marketplace";
-import { organizationBundleKey, readOrganizationBundle } from "./rules";
+import {
+	organizationBundleKey,
+	organizationIconKey,
+	organizationPluginIcon,
+	readOrganizationBundle,
+} from "./rules";
 
 export interface SourceSyncResult {
 	sha: string | null;
@@ -79,6 +85,7 @@ const COMPRESSED_FILE =
 
 interface PluginBuild {
 	bundle: Buffer;
+	files: ReadonlyMap<string, Uint8Array>;
 	treeHash: string;
 	skills: ReturnType<typeof skillsIn>;
 }
@@ -162,6 +169,7 @@ async function bundleFor(
 	);
 	return {
 		bundle: packPluginBundle(files, executable),
+		files,
 		treeHash: pluginTreeHash({ files, executable }),
 		skills: skillsIn(files),
 	};
@@ -248,6 +256,7 @@ async function syncSnapshot(
 			const build = await bundleFor(snapshot, entry, pluginDirs);
 			const { bundle, skills } = build;
 			const manifest = { ...readOrganizationBundle(bundle), skills };
+			const icon = organizationPluginIcon(manifest, build.files);
 			const contentHash = pluginBundleHash(bundle);
 			seen.push(entry.name);
 
@@ -273,6 +282,14 @@ async function syncSnapshot(
 				}
 				result.unchanged.push(entry.name);
 				continue;
+			}
+			if (icon) {
+				await putObject({
+					key: organizationIconKey(source.organizationId, contentHash),
+					...icon,
+					bucket: "public",
+					cacheControl: IMMUTABLE_CACHE_CONTROL,
+				});
 			}
 			await putObject({
 				key: organizationBundleKey(source.organizationId, contentHash),

@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { packPluginBundle } from "@superset/shared/plugins/bundle";
 import type { PluginManifest } from "../../router/plugins/manifest";
-import { organizationPluginProblem, readOrganizationBundle } from "./rules";
+import {
+	organizationPluginIconUrl,
+	organizationPluginProblem,
+	readOrganizationBundle,
+} from "./rules";
 
 function manifest(extension: Record<string, unknown>): PluginManifest {
 	return {
@@ -125,5 +129,25 @@ describe("readOrganizationBundle", () => {
 		expect(() => readOrganizationBundle(Buffer.from("not gzip"))).toThrow(
 			"not a plugin bundle",
 		);
+	});
+});
+
+describe("organizationPluginIconUrl", () => {
+	test("an icon file is served from the bundle's public key, resized at the edge", () => {
+		const url = organizationPluginIconUrl("org-1", {
+			manifest: manifest({ interface: { icon: "./assets/icon.png" } }),
+			contentHash: "abc",
+		});
+		expect(url).toEndWith("/organization-plugins/org-1/abc/icon");
+		expect(url).toContain("/cdn-cgi/image/");
+	});
+
+	test("a built-in icon key has no url", () => {
+		expect(
+			organizationPluginIconUrl("org-1", {
+				manifest: manifest({ interface: { icon: "github" } }),
+				contentHash: "abc",
+			}),
+		).toBeNull();
 	});
 });

@@ -6,9 +6,9 @@ import {
 	getBundledSkillIcons,
 	getBundledSkillPath,
 	getDisabledSkills,
-	installedPluginIcons,
 	installOrganizationPlugin,
 	installPlugin,
+	localMarketplacePluginIcons,
 	organizationPluginVersions,
 	setOrganizationPluginEnabled,
 	setPluginEnabled,
@@ -124,7 +124,9 @@ export const createPluginsRouter = () => {
 				return setPluginEnabled(input.name, input.enabled);
 			}),
 
-		installedIcons: publicProcedure.query(() => installedPluginIcons()),
+		localMarketplaceIcons: publicProcedure.query(() =>
+			localMarketplacePluginIcons(),
+		),
 
 		organizationVersions: publicProcedure.query(() =>
 			organizationPluginVersions(),

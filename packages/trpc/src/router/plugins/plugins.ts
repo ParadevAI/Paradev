@@ -22,6 +22,7 @@ import {
 	accessibleTo,
 	ensureManagedInstalls,
 	memberRole,
+	organizationPluginIconUrl,
 } from "../../lib/organization-plugins";
 import { createTRPCRouter, personProcedure } from "../../trpc";
 import {
@@ -90,6 +91,7 @@ function describe(
 		skills?: { name: string; description: string }[];
 	},
 	marketplace: string,
+	iconUrl: string | null,
 ) {
 	const extension = supersetExtension(manifest);
 	return {
@@ -100,6 +102,7 @@ function describe(
 		displayName: extension?.interface?.displayName ?? manifest.name,
 		category: extension?.interface?.category ?? "Developer tools",
 		icon: extension?.interface?.icon,
+		iconUrl,
 		connector: pluginConnector(manifest) ?? null,
 		mcpUrl: extension?.mcp?.url ?? null,
 		skills: manifest.skills ?? [],
@@ -402,6 +405,7 @@ export const pluginsRouter = createTRPCRouter({
 				): ((typeof everyInstall)[number] & {
 					latest?: string;
 					managed?: boolean;
+					iconUrl?: string | null;
 				})[] => {
 					if (!row.organizationPluginId) return [row];
 					const current = publishedById.get(row.organizationPluginId);
@@ -411,6 +415,10 @@ export const pluginsRouter = createTRPCRouter({
 									...row,
 									manifest: current.manifest,
 									latest: current.version,
+									iconUrl: organizationPluginIconUrl(
+										current.organizationId,
+										current,
+									),
 									managed:
 										organizationPluginAccess(
 											current.installPolicy,
@@ -440,7 +448,11 @@ export const pluginsRouter = createTRPCRouter({
 						? firstPartyManifest(row.pluginName)?.version
 						: row.latest;
 				return {
-					...describe(row.manifest as PluginManifest, row.marketplace),
+					...describe(
+						row.manifest as PluginManifest,
+						row.marketplace,
+						row.iconUrl ?? null,
+					),
 					connector: slug ?? null,
 					installed: true,
 					enabled: row.enabled,
@@ -471,6 +483,7 @@ export const pluginsRouter = createTRPCRouter({
 					const described = describe(
 						manifest as unknown as PluginManifest,
 						FIRST_PARTY,
+						null,
 					);
 					const held_ =
 						described.connector && !claimedByOthers.has(described.connector)
@@ -507,6 +520,7 @@ export const pluginsRouter = createTRPCRouter({
 							const described = describe(
 								row.manifest as PluginManifest,
 								organizationMarketplace(organizationId),
+								organizationPluginIconUrl(organizationId, row),
 							);
 							const held_ =
 								described.connector &&
