@@ -40,6 +40,20 @@ describe("hostSentryOptions", () => {
 		).toBe(false);
 	});
 
+	it("names the workspace and organization as the control plane and the readers do", () => {
+		const options = hostSentryOptions(
+			{ HOST_SERVICE_SENTRY_DSN: DSN, SUPERSET_SANDBOX_WORKSPACE_ID: "ws-1" },
+			"org-1",
+		);
+		const scope = options?.initialScope as {
+			tags: Record<string, unknown>;
+			attributes: Record<string, unknown>;
+		};
+		const ids = { "cloud_workspace.id": "ws-1", "organization.id": "org-1" };
+		expect(scope.tags).toMatchObject(ids);
+		expect(scope.attributes).toMatchObject(ids);
+	});
+
 	it("sends a flagged box's lines through the filter", () => {
 		const env = {
 			HOST_SERVICE_SENTRY_DSN: DSN,

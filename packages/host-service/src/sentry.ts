@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/node";
 import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
+import { SANDBOX_TELEMETRY_KEYS } from "@superset/shared/sandbox/contract";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
 import { createBoxLogFilter } from "./runtime/box-log-filter";
 import { getManagedEnv } from "./runtime/sandbox-managed-env";
@@ -35,9 +36,10 @@ export function hostSentryOptions(
 	if (!dsn) return null;
 	const tags = {
 		service: "host-service",
-		organization_id: organizationId,
+		[SANDBOX_TELEMETRY_KEYS.organizationId]: organizationId,
 		run_mode: env.SUPERSET_HOST_RUN_MODE,
-		cloud_workspace_id: env.SUPERSET_SANDBOX_WORKSPACE_ID,
+		[SANDBOX_TELEMETRY_KEYS.cloudWorkspaceId]:
+			env.SUPERSET_SANDBOX_WORKSPACE_ID,
 		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
 		provider: env.SUPERSET_SANDBOX_PROVIDER,
 	};

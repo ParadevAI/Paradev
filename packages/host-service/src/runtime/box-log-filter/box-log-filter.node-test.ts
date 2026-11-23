@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
 import * as Sentry from "@sentry/node";
-import { hostSentryOptions } from "../../sentry";
+import { hostSentryOptions, logBoxEvent } from "../../sentry";
 import { setManagedEnv } from "../sandbox-managed-env";
 import { caught } from "./box-log-filter";
 
@@ -50,6 +50,7 @@ before(async () => {
 			HOST_SERVICE_SENTRY_DSN: "https://publickey@o0.ingest.sentry.io/0",
 			SUPERSET_HOST_RUN_MODE: "sandbox",
 			SUPERSET_SANDBOX_BOX_LOGS: "1",
+			SUPERSET_SANDBOX_WORKSPACE_ID: "ws-1",
 			HOST_SERVICE_SECRET: HOST_SECRET,
 		},
 		"org",
@@ -220,6 +221,22 @@ describe("box log probes, under Node through the Sentry SDK's own console format
 		);
 		for (const record of out) {
 			assert.ok("sentry.sdk.name" in (record.attributes as object));
+		}
+	});
+
+	it("adds the workspace and organization after the filter, to lines and box events alike", async () => {
+		const out = await sent(() => {
+			console.log("[sandbox] launched (agent, workspace):", "claude", "ws-1");
+			logBoxEvent("hook.finished", { "hook.exit": 0, ms: 1 });
+		});
+		assert.equal(out.length, 2);
+		for (const record of out) {
+			const attributes = record.attributes as Record<
+				string,
+				{ value: unknown }
+			>;
+			assert.equal(attributes["cloud_workspace.id"]?.value, "ws-1");
+			assert.equal(attributes["organization.id"]?.value, "org");
 		}
 	});
 

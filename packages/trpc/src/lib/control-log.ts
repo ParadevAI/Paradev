@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/core";
+import { SANDBOX_TELEMETRY_KEYS } from "@superset/shared/sandbox/contract";
 
 export type ControlEvent =
 	| "workspace.failed"
@@ -23,8 +24,8 @@ export interface ControlScope {
 
 export function controlTags(scope: ControlScope): Record<string, string> {
 	return {
-		"cloud_workspace.id": scope.cloudWorkspaceId,
-		"organization.id": scope.organizationId,
+		[SANDBOX_TELEMETRY_KEYS.cloudWorkspaceId]: scope.cloudWorkspaceId,
+		[SANDBOX_TELEMETRY_KEYS.organizationId]: scope.organizationId,
 		...(scope.bootId ? { "boot.id": scope.bootId } : {}),
 	};
 }
