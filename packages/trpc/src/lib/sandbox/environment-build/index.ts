@@ -1,4 +1,4 @@
-export { queueDailyBuilds } from "./daily";
+export { queueDailyBuilds, runDailyBuild } from "./daily";
 export { isProductionDeployment } from "./deployment";
 export { isStale, keptGoldenRefs } from "./policy";
 export { pruneGoldens } from "./prune";

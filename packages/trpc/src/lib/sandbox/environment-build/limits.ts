@@ -16,3 +16,6 @@ export const KEPT_GOLDENS = 3;
 /** Manual builds an environment may start in any rolling hour; daily builds are not counted. */
 export const MANUAL_BUILDS_PER_HOUR = 3;
 export const MANUAL_BUILD_WINDOW_MS = 60 * 60 * 1000;
+
+/** Daily builds start spread over this window, each environment at its own offset. */
+export const DAILY_BUILD_WINDOW_MS = 2 * 60 * 60 * 1000;
