@@ -5,10 +5,12 @@ import type {
 	AgentSignIn,
 	TurnFailureActions,
 } from "../../../../providers/TurnFailureActionsProvider";
+import type { AccountSwitch } from "../../../UsageAccountMenu";
 
 const CONTINUE: UserContent[] = [{ type: "text", text: CONTINUE_PROMPT }];
 
 export function useFailureRecovery({
+	accountSwitch,
 	blocked,
 	canSwitchAgent = false,
 	configOptions,
@@ -22,6 +24,7 @@ export function useFailureRecovery({
 	sendPrompt,
 	setConfigOption,
 }: {
+	accountSwitch?: AccountSwitch | undefined;
 	blocked: boolean;
 	canSwitchAgent?: boolean;
 	configOptions: SessionConfigOption[] | undefined;
@@ -105,6 +108,7 @@ export function useFailureRecovery({
 			...(onStartNewChat ? { startNewChat: onStartNewChat } : {}),
 			...(manualSignIn ? { manualSignIn, openAgentSettings } : {}),
 			...(agentSignIn ? { agentSignIn } : {}),
+			...(accountSwitch ? { accountSwitch } : {}),
 			dismissed,
 			setDismissed,
 		}),
@@ -119,6 +123,7 @@ export function useFailureRecovery({
 			manualSignIn,
 			openAgentSettings,
 			agentSignIn,
+			accountSwitch,
 			dismissed,
 			setDismissed,
 		],

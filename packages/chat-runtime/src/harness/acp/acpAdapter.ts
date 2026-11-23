@@ -22,7 +22,11 @@ import type {
 	UsageLimit,
 	UserContent,
 } from "@superset/chat/protocol";
-import { AGENT_DEFAULT_MODE, isHiddenText } from "@superset/chat/protocol";
+import {
+	AGENT_DEFAULT_MODE,
+	isHiddenText,
+	isUsageLimitMessage,
+} from "@superset/chat/protocol";
 import { z } from "zod";
 import { BackgroundTasks } from "../backgroundTasks";
 import { EventQueue } from "../eventQueue";
@@ -35,9 +39,10 @@ import type {
 	ResolvedAttachment,
 } from "../types";
 import {
+	isClaudeUsageError,
 	type RefusedWindow,
 	refusedWindow,
-	USAGE_LIMIT_TEXT,
+	refusedWindowOfError,
 } from "../usageLimit";
 import {
 	AIR_ASYNC_TASK_STOP_METHOD,
@@ -1274,7 +1279,11 @@ export class AcpAdapter implements HarnessAdapter {
 			this.endCompactions();
 			if (this.v2Turn?.id === turnId) this.v2Turn = null;
 			if (this.dead) return;
-			this.failRefusedTurn(turnId, this.turnError(error));
+			this.failRefusedTurn(
+				turnId,
+				this.turnError(error),
+				error instanceof AcpRpcError ? error.data : undefined,
+			);
 		}
 	}
 
@@ -1320,6 +1329,7 @@ export class AcpAdapter implements HarnessAdapter {
 				this.turnError(
 					idle.error?.message ?? "The agent stopped with an error.",
 				),
+				idle.error?.data,
 			);
 		else this.finishTurn(turnId, idle.stopReason ?? undefined);
 	}
@@ -1346,8 +1356,12 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	/** A failed turn, reported as a usage limit when the agent refused for usage. */
-	private failRefusedTurn(turnId: string, failure: TurnError): void {
-		const limit = this.usageLimitFrom(failure.message);
+	private failRefusedTurn(
+		turnId: string,
+		failure: TurnError,
+		errorData?: unknown,
+	): void {
+		const limit = this.usageLimitFrom(failure.message, errorData);
 		if (limit) this.emitSession({ usageLimit: limit });
 		this.failTurn(
 			turnId,
@@ -2949,14 +2963,23 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	/**
-	 * The agent forwards Claude's `rate_limit_event` on its usage updates and
-	 * ends a refused turn with the CLI's own words. A refusal paid for by extra
-	 * usage reports nothing, and a turn that survives one is not a limit.
+	 * The agent forwards Claude's `rate_limit_event` on the error that fails the
+	 * turn and on its usage updates. The CLI's own words are the last resort. A
+	 * refusal paid for by extra usage reports nothing, and a turn that survives
+	 * one is not a limit.
 	 */
-	private usageLimitFrom(message: string): UsageLimit | null {
-		const refused = this.refused;
+	private usageLimitFrom(
+		message: string,
+		errorData?: unknown,
+	): UsageLimit | null {
+		const refused = refusedWindowOfError(errorData) ?? this.refused;
 		this.refused = null;
-		if (!refused && !USAGE_LIMIT_TEXT.test(message)) return null;
+		if (
+			!refused &&
+			!isClaudeUsageError(errorData, message) &&
+			!isUsageLimitMessage(message)
+		)
+			return null;
 		return {
 			hitAtMs: this.now(),
 			...(refused?.resetsAtMs ? { resetsAtMs: refused.resetsAtMs } : {}),

@@ -9,12 +9,13 @@ import type {
 	TurnError,
 	Usage,
 } from "@superset/chat/protocol";
+import { isUsageLimitMessage } from "@superset/chat/protocol";
 import { classifyTurnFailure } from "../../turnFailure";
 import type { AdapterEvent } from "../../types";
 import {
+	isClaudeUsageRefusal,
 	type RefusedWindow,
 	refusedWindow,
-	USAGE_LIMIT_TEXT,
 } from "../../usageLimit";
 import type { ToolOutcome, ToolUse } from "../mapToolUse";
 import { contentFor, locationsFor, titleFor, toolKindFor } from "../mapToolUse";
@@ -387,7 +388,8 @@ export class ClaudeTranslator {
 		const text = [asString(envelope.result) ?? "", ...asArray(envelope.errors)]
 			.filter((item): item is string => typeof item === "string")
 			.join("\n");
-		if (!refused && !USAGE_LIMIT_TEXT.test(text)) return null;
+		if (!refused && !isClaudeUsageRefusal(text) && !isUsageLimitMessage(text))
+			return null;
 		return {
 			kind: "session",
 			session: {

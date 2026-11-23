@@ -105,8 +105,7 @@ test("the account menu is only for agents whose logins the host can switch", () 
 	const claude = renderNotice({
 		limit: { hitAtMs: Date.now() },
 		onRespond: () => undefined,
-		agent: "claude",
-		hostUrl: null,
+		accountSwitch: { agent: "claude", hostUrl: null },
 	});
 	expect(claude.getByLabelText("Switch account").textContent).toBe("Account");
 });
@@ -137,16 +136,18 @@ test("the account menu identifies the session's captured login even after the ho
 		{
 			limit: { hitAtMs: 1 },
 			onRespond: () => undefined,
-			agent: "claude",
-			hostUrl: null,
-			sessionAccount: {
+			accountSwitch: {
 				agent: "claude",
-				selection: null,
-				credentialKind: "subscription",
-				identity: "captured",
-				email: "running@example.com",
+				hostUrl: null,
+				sessionAccount: {
+					agent: "claude",
+					selection: null,
+					credentialKind: "subscription",
+					identity: "captured",
+					email: "running@example.com",
+				},
+				onSwitch: async () => undefined,
 			},
-			onSwitchAccount: async () => undefined,
 		},
 		[current, next],
 	);
@@ -168,8 +169,7 @@ test("an unknown session account is not inferred from the host default", () => {
 		{
 			limit: { hitAtMs: 1 },
 			onRespond: () => undefined,
-			agent: "claude",
-			hostUrl: null,
+			accountSwitch: { agent: "claude", hostUrl: null },
 		},
 		[account("/profiles/next", true)],
 	);

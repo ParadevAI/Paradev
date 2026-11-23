@@ -63,7 +63,7 @@ class FakeAcpAgent {
 	 * rate-limited Claude does. */
 	promptFailure: {
 		updates: Record<string, unknown>[];
-		error: { code: number; message: string };
+		error: { code: number; message: string; data?: unknown };
 	} | null = null;
 	/** Answer session/prompt once the message is inserted, as a v2 agent does. */
 	insertOnPrompt = false;
@@ -693,6 +693,72 @@ describe("AcpAdapter", () => {
 		expect(turns.at(-1)?.status).toBe("failed");
 		expect(turns.at(-1)?.error?.kind).toBe("usage_limit");
 		await adapter.dispose();
+	});
+
+	it("a turn refused before any usage reports the limit from the error's own data", async () => {
+		const agent = new FakeAcpAgent();
+		agent.promptFailure = {
+			updates: [],
+			error: {
+				code: -32603,
+				message: "Internal error: Come back later.",
+				data: {
+					errorKind: "rate_limit",
+					rateLimit: {
+						status: "rejected",
+						resetsAt: 1795557600,
+						rateLimitType: "seven_day_overage_included",
+						isUsingOverage: false,
+					},
+				},
+			},
+		};
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "go" }]);
+		await flush(20);
+		const limit = sessionsOf(events)
+			.flatMap((session) => (session.usageLimit ? [session.usageLimit] : []))
+			.at(-1);
+		expect(limit?.resetsAtMs).toBe(1795557600_000);
+		expect(limit?.window).toBe("seven_day_overage_included");
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(turns.at(-1)?.error?.kind).toBe("usage_limit");
+		await adapter.dispose();
+	});
+
+	it("a refusal the Claude agent reports with no window is a limit by the CLI's wording, and a passing rate limit is not", async () => {
+		const failed = async (message: string) => {
+			const agent = new FakeAcpAgent();
+			agent.promptFailure = {
+				updates: [],
+				error: { code: -32603, message, data: { errorKind: "rate_limit" } },
+			};
+			const { adapter, events } = startAdapter(agent);
+			await flush();
+			adapter.prompt([{ type: "text", text: "go" }]);
+			await flush(20);
+			await adapter.dispose();
+			return {
+				limit: sessionsOf(events)
+					.flatMap((session) =>
+						session.usageLimit ? [session.usageLimit] : [],
+					)
+					.at(-1),
+				kind: events.flatMap((e) => (e.kind === "turn" ? [e.turn] : [])).at(-1)
+					?.error?.kind,
+			};
+		};
+		const refused = await failed(
+			"Internal error: You've hit your Fable limit · resets Nov 24 at 2pm (America/Los_Angeles).",
+		);
+		expect(refused.kind).toBe("usage_limit");
+		expect(refused.limit).toEqual({ hitAtMs: 1 });
+		const passing = await failed(
+			"Internal error: API Error: 429 Too many requests, slow down.",
+		);
+		expect(passing.limit).toBeUndefined();
+		expect(passing.kind).not.toBe("usage_limit");
 	});
 
 	it("a usage update with a null _meta still parses", () => {

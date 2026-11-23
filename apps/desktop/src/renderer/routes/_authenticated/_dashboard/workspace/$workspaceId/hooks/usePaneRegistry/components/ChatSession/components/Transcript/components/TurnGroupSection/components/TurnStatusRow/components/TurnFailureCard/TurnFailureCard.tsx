@@ -13,6 +13,7 @@ import {
 	useState,
 } from "react";
 import { useTurnFailureActions } from "../../../../../../../../providers/TurnFailureActionsProvider";
+import { UsageAccountMenu } from "../../../../../../../UsageAccountMenu";
 import { AgentSignInDialog } from "./components/AgentSignInDialog";
 import { CopyErrorButton } from "./components/CopyErrorButton";
 import { SignInCommand } from "./components/SignInCommand";
@@ -193,10 +194,12 @@ export function TurnFailureCard({
 					: null,
 			}
 		: null;
+	const accountSwitch = limit ? recovery?.accountSwitch : undefined;
 	const offered = buttons
 		? (manualSignIn ? MANUAL_SIGN_IN_ACTIONS : FAILURE_ACTIONS[kind]).flatMap(
 				(action) => {
 					const button = buttons[action];
+					if (accountSwitch && action === "usage_settings") return [];
 					return button ? [{ action, ...button }] : [];
 				},
 			)
@@ -297,6 +300,9 @@ export function TurnFailureCard({
 						limit ? "mt-0.5" : "-ml-2",
 					)}
 				>
+					{accountSwitch && (
+						<UsageAccountMenu {...accountSwitch} align="start" />
+					)}
 					{limit && offeredButtons}
 					{(limit ? Boolean(text) : clamped || expanded) && (
 						<Button

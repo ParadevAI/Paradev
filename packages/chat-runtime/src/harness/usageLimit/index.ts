@@ -1,5 +1,7 @@
 export {
+	isClaudeUsageError,
+	isClaudeUsageRefusal,
 	type RefusedWindow,
 	refusedWindow,
-	USAGE_LIMIT_TEXT,
+	refusedWindowOfError,
 } from "./usageLimit";
