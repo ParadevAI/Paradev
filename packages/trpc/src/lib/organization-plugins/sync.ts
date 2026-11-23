@@ -207,6 +207,7 @@ async function syncSnapshot(
 	source: SelectOrganizationPluginSource,
 	snapshot: RepositorySnapshot,
 	result: SourceSyncResult,
+	full: boolean,
 ): Promise<void> {
 	const file = findMarketplaceFile(snapshot.paths, source.path);
 	if (!file) {
@@ -244,6 +245,7 @@ async function syncSnapshot(
 			}
 			const fingerprint = sourceFingerprint(snapshot, entry, pluginDirs);
 			if (
+				!full &&
 				current &&
 				fingerprint &&
 				current.sourceFingerprint === fingerprint &&
@@ -270,6 +272,14 @@ async function syncSnapshot(
 					`its content changed but its version is still ${manifest.version}; bump the version`,
 				);
 			}
+			if (icon) {
+				await putObject({
+					key: organizationIconKey(source.organizationId, contentHash),
+					...icon,
+					bucket: "public",
+					cacheControl: IMMUTABLE_CACHE_CONTROL,
+				});
+			}
 			if (
 				current?.contentHash === contentHash &&
 				!current.removedFromSourceAt
@@ -282,14 +292,6 @@ async function syncSnapshot(
 				}
 				result.unchanged.push(entry.name);
 				continue;
-			}
-			if (icon) {
-				await putObject({
-					key: organizationIconKey(source.organizationId, contentHash),
-					...icon,
-					bucket: "public",
-					cacheControl: IMMUTABLE_CACHE_CONTROL,
-				});
 			}
 			await putObject({
 				key: organizationBundleKey(source.organizationId, contentHash),
@@ -371,9 +373,11 @@ async function syncSnapshot(
  * Brings an organization's plugins in line with one repository source. A
  * plugin that fails keeps its last good version; one that left the
  * repository is marked, not deleted, so members keep what they installed.
+ * A full sync rebuilds every plugin even when the commit has not changed.
  */
 export async function syncOrganizationPluginSource(
 	sourceId: string,
+	{ full = false }: { full?: boolean } = {},
 	readSnapshot: typeof repositorySnapshot = repositorySnapshot,
 ): Promise<SourceSyncResult | null> {
 	const source = await db.query.organizationPluginSources.findFirst({
@@ -395,11 +399,12 @@ export async function syncOrganizationPluginSource(
 		result.sha = snapshot.sha;
 
 		if (
+			full ||
 			source.syncedSha !== snapshot.sha ||
 			source.syncError ||
 			source.syncProblems.length
 		) {
-			await syncSnapshot(source, snapshot, result);
+			await syncSnapshot(source, snapshot, result, full);
 		}
 	} catch (error) {
 		result.error = error instanceof Error ? error.message : String(error);
