@@ -3,6 +3,7 @@ import {
 	createCollection,
 	localStorageCollectionOptions,
 } from "@tanstack/react-db";
+import { resolveActivityPanelHidden } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/WorkspaceActivityMenu/hooks/useActivityPanelVisibility/resolveActivityPanelHidden";
 import {
 	DEFAULT_V2_USER_PREFERENCES,
 	healUserPreferences,
@@ -36,27 +37,32 @@ const noopEvents = {
 	removeEventListener: () => {},
 };
 
+function makeActivityCollection(
+	id: string,
+	storage: ReturnType<typeof makeMapStorage>["api"],
+) {
+	return createCollection(
+		localStorageCollectionOptions(
+			withReadHeal(
+				{
+					id,
+					storageKey: "test-activity-visibility",
+					schema: workspaceLocalStateSchema,
+					getKey: (item: WorkspaceLocalStateRow) => item.workspaceId,
+					storage,
+					storageEventApi: noopEvents,
+				},
+				healWorkspaceLocalState,
+			),
+		),
+	);
+}
+
 it("workspace activity choices survive saving and reopening the workspace collection", async () => {
 	const { api: storage } = makeMapStorage();
-	const makeCollection = (id: string) =>
-		createCollection(
-			localStorageCollectionOptions(
-				withReadHeal(
-					{
-						id,
-						storageKey: "test-activity-visibility",
-						schema: workspaceLocalStateSchema,
-						getKey: (item: WorkspaceLocalStateRow) => item.workspaceId,
-						storage,
-						storageEventApi: noopEvents,
-					},
-					healWorkspaceLocalState,
-				),
-			),
-		);
 	const hiddenId = "11111111-1111-4111-8111-111111111111";
 	const shownId = "22222222-2222-4222-8222-222222222222";
-	const before = makeCollection("activity-before");
+	const before = makeActivityCollection("activity-before", storage);
 	await before.preload();
 	for (const workspaceId of [hiddenId, shownId]) {
 		await before.insert({
@@ -75,16 +81,79 @@ it("workspace activity choices survive saving and reopening the workspace collec
 		}).isPersisted.promise;
 	}
 	await before.cleanup();
-	const after = makeCollection("activity-after");
+	const after = makeActivityCollection("activity-after", storage);
 	await after.preload();
 	expect(after.get(hiddenId)?.activityPanelHidden).toBe(true);
 	expect(after.get(shownId)?.activityPanelHidden).toBe(false);
 	await after.delete(hiddenId).isPersisted.promise;
 	await after.cleanup();
-	const reopened = makeCollection("activity-reopened");
+	const reopened = makeActivityCollection("activity-reopened", storage);
 	await reopened.preload();
 	expect(reopened.has(hiddenId)).toBe(false);
 	expect(reopened.get(shownId)?.activityPanelHidden).toBe(false);
+	await reopened.cleanup();
+});
+
+it("keeps the automatic activity default after deleting the last workspace", async () => {
+	const { api: storage } = makeMapStorage();
+	const makePreferences = (id: string) =>
+		createCollection(
+			localStorageCollectionOptions(
+				withReadHeal(
+					{
+						id,
+						storageKey: "test-activity-preferences",
+						schema: userPreferencesSchema,
+						getKey: (item: UserPreferencesRow) => item.id,
+						storage,
+						storageEventApi: noopEvents,
+					},
+					healUserPreferences,
+				),
+			),
+		);
+	const first = makePreferences("activity-preferences-first");
+	const workspaces = makeActivityCollection(
+		"activity-default-workspaces",
+		storage,
+	);
+	await Promise.all([first.preload(), workspaces.preload()]);
+	await first.insert({
+		id: V2_USER_PREFERENCES_ID,
+		sidebarProjectSortMode: "manual",
+		sidebarProjectHostFilter: "all",
+	}).isPersisted.promise;
+	expect(
+		first.get(V2_USER_PREFERENCES_ID)?.showActivityPanelAutomatically,
+	).toBe(true);
+	await first.update(V2_USER_PREFERENCES_ID, (draft) => {
+		draft.showActivityPanelAutomatically = false;
+	}).isPersisted.promise;
+	const workspaceId = "11111111-1111-4111-8111-111111111111";
+	await workspaces.insert({
+		workspaceId,
+		createdAt: new Date(),
+		sidebarState: { projectId: null },
+		paneLayout: { version: 1, tabs: [], activeTabId: null },
+		activityPanelHidden: false,
+	}).isPersisted.promise;
+	expect(
+		resolveActivityPanelHidden(
+			workspaces.get(workspaceId)?.activityPanelHidden,
+			first.get(V2_USER_PREFERENCES_ID)?.showActivityPanelAutomatically ?? true,
+		),
+	).toBe(false);
+	await workspaces.delete(workspaceId).isPersisted.promise;
+	await Promise.all([first.cleanup(), workspaces.cleanup()]);
+
+	const reopened = makePreferences("activity-preferences-reopened");
+	await reopened.preload();
+	const preference = reopened.get(
+		V2_USER_PREFERENCES_ID,
+	)?.showActivityPanelAutomatically;
+	expect(preference).toBe(false);
+	expect(resolveActivityPanelHidden(undefined, preference ?? true)).toBe(true);
+	expect(resolveActivityPanelHidden(true, true)).toBe(true);
 	await reopened.cleanup();
 });
 

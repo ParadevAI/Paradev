@@ -30,6 +30,7 @@ export interface UserPreferencesApi {
 	setDeleteLocalBranch: (next: boolean) => void;
 	setShowPresetsBar: (next: boolean | ((prev: boolean) => boolean)) => void;
 	toggleShowPresetsBar: () => void;
+	setShowActivityPanelAutomatically: (next: boolean) => void;
 	setChangesViewMode: (next: ChangesViewMode) => void;
 	setSidebarProjectSortMode: (next: SidebarProjectSortMode) => void;
 	setSidebarProjectHostFilter: (next: SidebarProjectHostFilter) => void;
@@ -257,6 +258,22 @@ export function useUserPreferences(): UserPreferencesApi {
 		setShowPresetsBar((prev) => !prev);
 	}, [setShowPresetsBar]);
 
+	const setShowActivityPanelAutomatically = useCallback(
+		(next: boolean) => {
+			if (!collections.userPreferences.has(V2_USER_PREFERENCES_ID)) {
+				collections.userPreferences.insert({
+					...DEFAULT_V2_USER_PREFERENCES,
+					showActivityPanelAutomatically: next,
+				});
+				return;
+			}
+			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
+				draft.showActivityPanelAutomatically = next;
+			});
+		},
+		[collections],
+	);
+
 	const setChangesViewMode = useCallback(
 		(next: ChangesViewMode) => {
 			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
@@ -384,6 +401,7 @@ export function useUserPreferences(): UserPreferencesApi {
 		setDeleteLocalBranch,
 		setShowPresetsBar,
 		toggleShowPresetsBar,
+		setShowActivityPanelAutomatically,
 		setChangesViewMode,
 		setSidebarProjectSortMode,
 		setSidebarProjectHostFilter,

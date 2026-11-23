@@ -13,6 +13,14 @@ function getIds(items: SettingsItem[]): string[] {
 	return items.map((item) => item.id);
 }
 
+it("finds the activity panel default in Appearance settings", () => {
+	expect(
+		searchSettings("activity panel").find(
+			(item) => item.id === SETTING_ITEM_ID.APPEARANCE_ACTIVITY_PANEL,
+		)?.section,
+	).toBe("appearance");
+});
+
 describe("settings search - font settings", () => {
 	it('searching "font" returns both APPEARANCE_EDITOR_FONT and APPEARANCE_TERMINAL_FONT', () => {
 		const results = searchSettings("font");

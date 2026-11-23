@@ -521,6 +521,7 @@ export const userPreferencesSchema = z.object({
 	changesFileListOpen: z.boolean().default(true),
 	deleteLocalBranch: z.boolean().default(false),
 	showPresetsBar: z.boolean().default(false),
+	showActivityPanelAutomatically: z.boolean().default(true),
 	changesViewMode: changesViewModeSchema.default("folders"),
 	// Ordering of the dashboard sidebar's Projects list; manual = drag order.
 	sidebarProjectSortMode: persistedSidebarProjectSortModeSchema,
@@ -565,6 +566,7 @@ export const DEFAULT_V2_USER_PREFERENCES: UserPreferencesRow = {
 	changesFileListOpen: true,
 	deleteLocalBranch: false,
 	showPresetsBar: false,
+	showActivityPanelAutomatically: true,
 	changesViewMode: "folders",
 	sidebarProjectSortMode: "manual",
 	sidebarProjectHostFilter: "all",

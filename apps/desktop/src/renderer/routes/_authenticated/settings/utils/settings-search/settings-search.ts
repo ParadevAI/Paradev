@@ -32,6 +32,7 @@ export const SETTING_ITEM_ID = {
 	APPEARANCE_THEME: "appearance-theme",
 	APPEARANCE_LANGUAGE: "appearance-language",
 	APPEARANCE_MARKDOWN: "appearance-markdown",
+	APPEARANCE_ACTIVITY_PANEL: "appearance-activity-panel",
 	APPEARANCE_CUSTOM_THEMES: "appearance-custom-themes",
 	APPEARANCE_EDITOR_FONT: "appearance-editor-font",
 	APPEARANCE_TERMINAL_FONT: "appearance-terminal-font",
@@ -517,6 +518,13 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"personalize",
 			"customize",
 		],
+	},
+	{
+		id: SETTING_ITEM_ID.APPEARANCE_ACTIVITY_PANEL,
+		section: "appearance",
+		title: "Show activity panel automatically",
+		description: "Choose whether the workspace activity panel opens by default",
+		keywords: ["workspace", "activity", "panel", "dock", "hide", "default"],
 	},
 	{
 		id: SETTING_ITEM_ID.APPEARANCE_EDITOR_FONT,

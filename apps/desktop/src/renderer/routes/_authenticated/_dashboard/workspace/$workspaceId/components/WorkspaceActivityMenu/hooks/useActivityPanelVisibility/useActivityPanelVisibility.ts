@@ -1,13 +1,16 @@
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useCallback } from "react";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { resolveActivityPanelHidden } from "./resolveActivityPanelHidden";
 
 export function useActivityPanelVisibility(workspaceId: string) {
 	const collections = useCollections();
 	const { workspace } = useWorkspace();
+	const { preferences } = useUserPreferences();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
 	const { data: rows = [] } = useLiveQuery(
 		(query) =>
@@ -20,10 +23,11 @@ export function useActivityPanelVisibility(workspaceId: string) {
 				})),
 		[collections, workspaceId],
 	);
-	const hidden =
+	const hidden = resolveActivityPanelHidden(
 		rows.find((row) => row.workspaceId === workspaceId)?.hidden ??
-		collections.workspaceLocalState.get(workspaceId)?.activityPanelHidden ??
-		false;
+			collections.workspaceLocalState.get(workspaceId)?.activityPanelHidden,
+		preferences.showActivityPanelAutomatically,
+	);
 	const setHidden = useCallback(
 		(next: boolean) => {
 			if (!collections.workspaceLocalState.has(workspaceId)) {
