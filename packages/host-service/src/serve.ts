@@ -170,7 +170,11 @@ async function main(): Promise<void> {
 	let tunnelPromise: Promise<TunnelClient | null> = Promise.resolve(null);
 	const hostname =
 		env.SUPERSET_HOST_RUN_MODE === "sandbox" ? undefined : "127.0.0.1";
-	const server = createAdaptorServer({ fetch: app.fetch });
+	const server = createAdaptorServer({
+		fetch: app.fetch,
+		port: env.PORT,
+		hostname,
+	});
 	const stopServing = async () => {
 		// Cancel registration retries before replacing this process.
 		relayAbort.abort();
