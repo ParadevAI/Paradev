@@ -52,8 +52,9 @@ download_tarball() {
     target="$1"
     tarball="superset-${target}.tar.gz"
 
+    latest_url="https://github.com/${REPO}/releases/download/cli-latest/${tarball}"
     if [ "$TAG" = "latest" ]; then
-        url="https://github.com/${REPO}/releases/download/cli-latest/${tarball}"
+        url="$latest_url"
     else
         url="https://github.com/${REPO}/releases/download/${TAG}/${tarball}"
     fi
@@ -61,8 +62,17 @@ download_tarball() {
     info "Downloading $url"
     tmp="$(mktemp -t superset-install.XXXXXX)"
     if ! curl -fsSL -o "$tmp" "$url"; then
-        rm -f "$tmp"
-        error "Failed to download $url"
+        # Some desktop versions have no CLI release, and `hosts add` asks for its own version.
+        if [ "$url" = "$latest_url" ]; then
+            rm -f "$tmp"
+            error "Failed to download $url"
+        fi
+        warn "No CLI release ${TAG} for ${target}. Installing the latest release."
+        info "Downloading $latest_url"
+        if ! curl -fsSL -o "$tmp" "$latest_url"; then
+            rm -f "$tmp"
+            error "Failed to download $latest_url"
+        fi
     fi
     echo "$tmp"
 }
