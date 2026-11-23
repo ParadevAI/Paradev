@@ -25,7 +25,7 @@ export default command({
 				/No procedure found on path "?windows\.list/.test(error.message)
 			) {
 				throw new CLIError(
-					"This host is too old for `superset windows`",
+					"This host is too old for `paradev windows`",
 					"Update the Paradev desktop app on that host",
 				);
 			}
