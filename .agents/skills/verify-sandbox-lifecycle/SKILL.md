@@ -32,9 +32,9 @@ non-zero if any config gives a result other than the expected one.
 
 | Rule | Applied by | Actions |
 | --- | --- | --- |
-| 1 Workspaces: a workspace not in use is deleted (box, snapshot, drive) after its wait: asleep 30 days after last use, archived 7 days (unarchive within keeps everything), failed 30 days, stuck creating 1 day | cleanup job | `Retire`, `TdRun` |
-| 2 Goldens: each environment keeps its 3 newest; an archived environment keeps none; OVERLAY: never one a workspace is pinned to | the build or promote; the cleanup job for archived environments | `Build`, `BuildPrune`, `EnvGoldenDelete` |
-| 3 Leftovers: anything nothing in production refers to, older than 7 days; an agents drive not the current release's that no box mounts | cleanup job | `Leftover`, `AgentsCleanup` |
+| 1 Workspaces: a workspace not in use is deleted (box, snapshot, drive) after its wait: asleep 30 days after last use, archived 7 days (an unarchive before the retire keeps everything), failed 30 days, stuck creating 1 day | cleanup job | `Retire`, `TdRun` |
+| 2 Goldens: each live environment keeps its 3 newest; OVERLAY: never one a workspace is pinned to | the build or promote; with OVERLAY, the cleanup job for live environments | `Build`, `BuildPrune`, `EnvGoldenDelete` |
+| 3 Leftovers: anything nothing in production refers to, older than 7 days, an archived environment's goldens included (only a live environment names its goldens); an agents drive not the current release's that no box mounts | cleanup job | `Leftover`, `AgentsCleanup` |
 
 Mechanics:
 
@@ -100,7 +100,8 @@ so each finishes in about a minute; builds in both databases at once are checked
    them: no production row names them. NoDeleteWhileUsed is about production only.
 4. **A preview's copied rows name production's boxes.** No property depends on it, because
    PREVIEW deletes nothing; a preview can still wake a production box (out of scope on the page).
-5. **Unarchive is refused once the 7 days are over**, even before the cleanup job has run.
+5. **Unarchive is not refused after the 7 days.** The retire is one conditional write that needs the
+   row still archived, so an unarchive that lands before it keeps everything; one after it gets a new box.
 6. **A wake at day 30 against the retire:** the retire is one conditional write (still asleep,
    still past the wait). A wake before it wins.
 7. **A stopped box counts as mounting** the agents drive it last booted with.
