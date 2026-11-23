@@ -26,7 +26,10 @@ import { filterMatchingPresetsForProject } from "shared/preset-project-targeting
 import { getPresetsForTriggerField } from "shared/preset-trigger-selection";
 import { quote } from "shell-quote";
 import type { StoreApi } from "zustand/vanilla";
-import { runPresetOnce } from "../../state/presetLaunches";
+import {
+	runPresetOnce,
+	waitForPresetTerminalCreations,
+} from "../../state/presetLaunches";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { OpenAgentChat } from "../useAgentSessionLauncher";
 import type { TerminalLauncher } from "../useTerminalLauncher";
@@ -274,7 +277,7 @@ export function usePresetExecution({
 					}
 
 					case "new-tab-multi-pane": {
-						const ids = await Promise.all(
+						const ids = await waitForPresetTerminalCreations(
 							launchCommands.length > 0
 								? launchCommands.map((command) => createTerminal(command))
 								: [createTerminal()],
@@ -289,7 +292,7 @@ export function usePresetExecution({
 					}
 
 					case "new-tab-per-command": {
-						const ids = await Promise.all(
+						const ids = await waitForPresetTerminalCreations(
 							launchCommands.map((command) => createTerminal(command)),
 						);
 						for (const terminalId of ids) {
@@ -311,7 +314,7 @@ export function usePresetExecution({
 					}
 
 					case "active-tab-multi-pane": {
-						const ids = await Promise.all(
+						const ids = await waitForPresetTerminalCreations(
 							launchCommands.length > 0
 								? launchCommands.map((command) => createTerminal(command))
 								: [createTerminal()],

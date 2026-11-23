@@ -3,6 +3,7 @@ import {
 	afterPresetTerminalStart,
 	runPresetOnce,
 	startPresetTerminal,
+	waitForPresetTerminalCreations,
 } from "./presetLaunches";
 
 describe("preset launches", () => {
@@ -31,6 +32,39 @@ describe("preset launches", () => {
 		await expect(failed).rejects.toThrow("offline");
 		const retry = mock(async () => {});
 		await runPresetOnce("ws", "codex", retry);
+		expect(retry).toHaveBeenCalledTimes(1);
+	});
+
+	it("keeps a failed multi-pane launch pending until the other creation settles", async () => {
+		const remaining = Promise.withResolvers<string>();
+		const failing = Promise.withResolvers<string>();
+		const firstError = new Error("first terminal failed");
+		const reportError = mock((_error: unknown) => {});
+		const retry = mock(async () => {});
+		const initial = runPresetOnce("workspace", "multi-pane", async () => {
+			try {
+				await waitForPresetTerminalCreations([
+					remaining.promise,
+					failing.promise,
+				]);
+			} catch (error) {
+				reportError(error);
+			}
+		});
+
+		failing.reject(firstError);
+		try {
+			await new Promise<void>((resolve) => setImmediate(resolve));
+			expect(runPresetOnce("workspace", "multi-pane", retry)).toBe(initial);
+			expect(reportError).not.toHaveBeenCalled();
+		} finally {
+			remaining.reject(new Error("second terminal failed"));
+			await initial;
+		}
+
+		expect(reportError).toHaveBeenCalledTimes(1);
+		expect(reportError).toHaveBeenCalledWith(firstError);
+		await runPresetOnce("workspace", "multi-pane", retry);
 		expect(retry).toHaveBeenCalledTimes(1);
 	});
 

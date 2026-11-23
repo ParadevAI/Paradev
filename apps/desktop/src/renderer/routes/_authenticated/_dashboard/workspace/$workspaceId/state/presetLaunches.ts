@@ -32,6 +32,17 @@ export function runPresetOnce(
 	return track(presetKey(workspaceId, presetId), start);
 }
 
+export async function waitForPresetTerminalCreations(
+	creations: readonly Promise<string>[],
+): Promise<string[]> {
+	try {
+		return await Promise.all(creations);
+	} catch (error) {
+		await Promise.allSettled(creations);
+		throw error;
+	}
+}
+
 export function usePresetStarting(workspaceId: string, presetId: string) {
 	return useStore(launches, (pending) =>
 		pending.has(presetKey(workspaceId, presetId)),
