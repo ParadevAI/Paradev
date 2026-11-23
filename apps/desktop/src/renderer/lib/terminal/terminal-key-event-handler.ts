@@ -38,6 +38,30 @@ function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
 	return lower;
 }
 
+// xterm sends committed IME text from a timer that it starts on compositionend.
+// Input sent before that timer gets to the PTY before the last composed
+// character. This listener is added after xterm's, so its timers run later.
+function createSendAfterComposedText(
+	terminal: XTerm,
+	signal: AbortSignal,
+): (data: string) => void {
+	let composedTextPending = false;
+	terminal.textarea?.addEventListener(
+		"compositionend",
+		() => {
+			composedTextPending = true;
+			setTimeout(() => {
+				composedTextPending = false;
+			});
+		},
+		{ signal },
+	);
+	return (data) => {
+		if (composedTextPending) setTimeout(() => sendUserInput(terminal, data));
+		else sendUserInput(terminal, data);
+	};
+}
+
 // xterm's _keyDown calls stopPropagation after processing, so any chord we
 // want the host (react-hotkeys-hook, Electron menu accelerators) or the shell
 // (Ctrl+A/E/U escape sequences for line edit) to see must short-circuit xterm
@@ -50,6 +74,7 @@ function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
 // shouldBubbleClipboardShortcut's Mac branch.
 function createTerminalKeyEventHandler(
 	terminal: XTerm,
+	sendInput: (data: string) => void,
 	options: TerminalKeyEventHandlerOptions = {},
 ) {
 	const platform = resolvePlatform(options);
@@ -63,7 +88,9 @@ function createTerminalKeyEventHandler(
 		if (translation !== null) {
 			if (event.type === "keydown") {
 				event.preventDefault();
-				sendUserInput(terminal, translation);
+				// The IME gets this key before it commits. The browser sends the key
+				// again with isComposing false after the commit, so send on that one.
+				if (!event.isComposing && event.keyCode !== 229) sendInput(translation);
 			}
 			return false;
 		}
@@ -97,11 +124,17 @@ export function installTerminalKeyEventHandler(
 	terminal: XTerm,
 	options: TerminalKeyEventHandlerOptions = {},
 ): () => void {
+	const listeners = new AbortController();
 	terminal.attachCustomKeyEventHandler(
-		createTerminalKeyEventHandler(terminal, options),
+		createTerminalKeyEventHandler(
+			terminal,
+			createSendAfterComposedText(terminal, listeners.signal),
+			options,
+		),
 	);
 
 	return () => {
+		listeners.abort();
 		terminal.attachCustomKeyEventHandler(() => true);
 	};
 }
