@@ -6,7 +6,7 @@ version: 1.40.0
 highlights:
   - icon: plug
     title: Plugins for everyone
-    description: Install a plugin once and your agents get its skills on every machine, and Claude Code and Codex get its tools too
+    description: Install a plugin once and your agents get its skills on every machine. Claude Code and Codex get its tools too
   - icon: list-checks
     title: Sort automations by last run
     description: Put failed and missed runs at the top of the Automations table
@@ -23,7 +23,7 @@ Superset is now Paradev, and we raised an $11.5M seed round to help you run an a
 
 Plugins are now on for every account. Install a plugin once, and Claude Code, Codex, Cursor, and the other agents you run in Paradev get its skills on every machine. Claude Code and Codex also get its tools.
 
-- A plugin that needs an account installs only after you connect it, so agents never get tools that fail until you finish signing in
+- A plugin that needs an account installs only after you connect it, so agents never get tools that fail because you have not signed in
 - Connected accounts live in one place on the plugin page, and the Enable and Disable switches are gone
 
 Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.superset.sh/docs/plugins/overview).
@@ -51,7 +51,7 @@ Open **Plugins** in the sidebar to install one. Docs: [Plugins](https://docs.sup
 **Bug fixes**
 
 - A reused sign-in token no longer logs you out on every machine at once, contributed by [@sahiljagtap08](https://github.com/sahiljagtap08) <PRBadge url="https://github.com/superset-sh/superset/pull/8467" />
-- Automations that continue a session no longer start a new agent session on every run when the agent is a custom one, contributed by [@andyst-dev](https://github.com/andyst-dev) <PRBadge url="https://github.com/superset-sh/superset/pull/7973" />
+- Automations that continue a session with a custom agent no longer start a new session on every run, contributed by [@andyst-dev](https://github.com/andyst-dev) <PRBadge url="https://github.com/superset-sh/superset/pull/7973" />
 - Dialogs stay open when focus moves to another window <PRBadge url="https://github.com/superset-sh/superset/pull/8684" />
 - Importing a repository with a broken `HEAD` now fails with a clear error instead of committing onto it <PRBadge url="https://github.com/superset-sh/superset/pull/8729" />
 - Renaming a tab from its context menu starts editing right away <PRBadge url="https://github.com/superset-sh/superset/pull/8611" />

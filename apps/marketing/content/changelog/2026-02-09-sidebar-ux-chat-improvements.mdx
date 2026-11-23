@@ -1,60 +1,60 @@
 ---
-title: New Diff view, early Chat GUI preview, and powerful preset settings
+title: New Diff view, early Chat GUI preview, and preset settings
 date: 2026-02-09
 image: /changelog/new-diff.png
 ---
 
 ## New Diff View, Powered by diffs.com <PRBadge url="https://github.com/superset-sh/superset/pull/1308" />
 
-The Changes view has been completely rebuilt with [Pierre Computer's diffs.com](https://diffs.com) engine, delivering a drastically improved diff experience in both UI and performance. Large changesets that previously lagged now render instantly, and the new interface makes reviewing diffs feel native and fluid.
+The Changes view now runs on [Pierre Computer's diffs.com](https://diffs.com) engine, with a better interface and faster rendering. Large changesets that lagged before now render instantly.
 
-The new viewer includes an edit mode toggle: switch between read-only review and live editing, and hit Ctrl+S to save changes directly from the diff.
+The new viewer has an edit mode toggle. Switch between read-only review and live editing, and press Ctrl+S to save changes from the diff.
 
-- **Workspace-scoped base branch**: base branch selection is now per-workspace instead of global, so diffs always compare against the right branch <PRBadge url="https://github.com/superset-sh/superset/pull/1329" />
-- **Preserved file explorer state**: expanded folders, scroll position, and selection persist when switching between Changes and Files tabs <PRBadge url="https://github.com/superset-sh/superset/pull/1297" />
-- **Compact tab buttons**: Changes and Files tabs collapse to icon-only mode with tooltips when the sidebar is narrow <PRBadge url="https://github.com/superset-sh/superset/pull/1334" />
+- **Workspace-scoped base branch** - each workspace now has its own base branch, so diffs always compare against the right branch <PRBadge url="https://github.com/superset-sh/superset/pull/1329" />
+- **Preserved file explorer state** - expanded folders, scroll position, and selection stay when you switch between the Changes and Files tabs <PRBadge url="https://github.com/superset-sh/superset/pull/1297" />
+- **Compact tab buttons** - the Changes and Files tabs collapse to icons with tooltips when the sidebar is narrow <PRBadge url="https://github.com/superset-sh/superset/pull/1334" />
 
 ## Early Preview of Chat GUI <PRBadge url="https://github.com/superset-sh/superset/pull/1309" />
 
-A native AI chat interface built right into Paradev, and it works with your existing Claude Code sessions. Pick up where you left off without switching windows.
+Paradev now has a native AI chat interface that works with your existing Claude Code sessions. Pick up where you left off without switching windows.
 
-- **Existing session support**: scan and restore previous Claude Code sessions so you never lose context
-- **Slash commands**: type `/` to browse available commands with fuzzy search and keyboard navigation
-- **File mentions**: tag files with `@` and fuzzy search to pull in exactly the context you need <PRBadge url="https://github.com/superset-sh/superset/pull/1307" />
-- **Rich tool rendering**: tool calls display with specialized UI for bash output, web searches, file diffs, and user questions
-- **Session persistence**: chat sessions survive app restarts with local storage and automatic restore <PRBadge url="https://github.com/superset-sh/superset/pull/1287" />
+- **Existing session support** - scan and restore earlier Claude Code sessions, so you keep your context
+- **Slash commands** - type `/` to browse commands with fuzzy search and keyboard navigation
+- **File mentions** - tag files with `@` and fuzzy search to add them as context <PRBadge url="https://github.com/superset-sh/superset/pull/1307" />
+- **Rich tool rendering** - tool calls show a dedicated UI for bash output, web searches, file diffs, and user questions
+- **Session persistence** - chat sessions save locally and restore automatically after an app restart <PRBadge url="https://github.com/superset-sh/superset/pull/1287" />
 
 This is an early preview. General availability is coming next week. We'd love your feedback in the meantime.
 
 ![Chat GUI with slash commands and tool rendering](/changelog/chat-gui.png)
 
-## Powerful Preset Settings <PRBadge url="https://github.com/superset-sh/superset/pull/1320" />
+## Preset Settings <PRBadge url="https://github.com/superset-sh/superset/pull/1320" />
 
-Terminal presets now have granular auto-apply controls. Configure when presets run independently for workspace creation and new tabs, so you can auto-run setup commands on new workspaces without them firing every time you open a tab.
+Terminal presets now have separate auto-apply controls for workspace creation and new tabs. You can run setup commands on each new workspace without running them every time you open a tab.
 
-- **Apply preset on workspace creation**: controls initialization commands when spinning up workspaces
-- **Apply preset on new tab**: controls whether presets run when opening new tabs, panes, or splits
-- Explicit preset launches via hotkey or menu always work regardless of these settings
+- **Apply preset on workspace creation** - controls the setup commands that run when you create a workspace
+- **Apply preset on new tab** - controls whether presets run when you open a new tab, pane, or split
+- A preset you launch from a hotkey or the menu always runs, whatever these settings are
 
 {/* TODO: Screenshot of terminal settings with both toggles */}
 
 ## Improvements
 
-- **Improved new tab buttons**: grouped outline button bar for New Terminal and New Chat with keyboard shortcuts (Cmd+T, Cmd+Shift+T) <PRBadge url="https://github.com/superset-sh/superset/pull/1321" />
-- **Setup script card**: persistent sidebar card replaces toast for missing setup scripts with direct link to configuration <PRBadge url="https://github.com/superset-sh/superset/pull/1270" />
-- **Push auto-setup**: first `git push` from worktrees automatically creates remote branch and sets upstream tracking <PRBadge url="https://github.com/superset-sh/superset/pull/1267" />
-- **Project image toggle**: hide/show project GitHub avatars in sidebar with colored initial letters as fallback <PRBadge url="https://github.com/superset-sh/superset/pull/1276" />
-- **Teardown logs modal**: failed teardown scripts show logs in a modal instead of dumping output in error toast <PRBadge url="https://github.com/superset-sh/superset/pull/1277" />
+- **Improved new tab buttons** - New Terminal and New Chat sit in one outlined button bar and show their shortcuts (⌘T, ⌘⇧T) <PRBadge url="https://github.com/superset-sh/superset/pull/1321" />
+- **Setup script card** - a sidebar card replaces the toast for a missing setup script and links to the configuration <PRBadge url="https://github.com/superset-sh/superset/pull/1270" />
+- **Push auto-setup** - the first `git push` from a worktree creates the remote branch and sets upstream tracking <PRBadge url="https://github.com/superset-sh/superset/pull/1267" />
+- **Project image toggle** - hide or show project GitHub avatars in the sidebar, with colored initial letters as the fallback <PRBadge url="https://github.com/superset-sh/superset/pull/1276" />
+- **Teardown logs modal** - a failed teardown script shows its logs in a modal, not in the error toast <PRBadge url="https://github.com/superset-sh/superset/pull/1277" />
 
 ---
 
 **Bug fixes:**
 
 - Fixed circular import in Paywall module <PRBadge url="https://github.com/superset-sh/superset/pull/1323" />
-- Processed pending terminal setups for already-initialized workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/1322" />
-- Made teardown resilient to already-deleted Neon branches <PRBadge url="https://github.com/superset-sh/superset/pull/1289" />
+- Pending terminal setups now run for workspaces that are already initialized <PRBadge url="https://github.com/superset-sh/superset/pull/1322" />
+- Teardown no longer fails when a Neon branch is already deleted <PRBadge url="https://github.com/superset-sh/superset/pull/1289" />
 - Improved auto-updater diagnostics <PRBadge url="https://github.com/superset-sh/superset/pull/1291" />
-- Fixed chat infinite re-render <PRBadge url="https://github.com/superset-sh/superset/pull/1283" />
+- Chat no longer re-renders in a loop <PRBadge url="https://github.com/superset-sh/superset/pull/1283" />
 - Routed member creation through Better Auth hooks for billing <PRBadge url="https://github.com/superset-sh/superset/pull/1319" />
 - Used bundle IDs for multi-edition JetBrains IDEs <PRBadge url="https://github.com/superset-sh/superset/pull/1317" />
-- Fixed MCP OAuth with dynamic client registration <PRBadge url="https://github.com/superset-sh/superset/pull/1313" />
+- MCP OAuth now works with dynamic client registration <PRBadge url="https://github.com/superset-sh/superset/pull/1313" />
