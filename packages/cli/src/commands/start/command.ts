@@ -10,6 +10,7 @@ import { getSupersetConfigPath } from "../../lib/config";
 import { waitForUnresponsiveHost } from "../../lib/host/liveness";
 import {
 	isProcessAlive,
+	readHostManifests,
 	readManifest,
 	removeManifestIfOwnedBy,
 } from "../../lib/host/manifest";
@@ -56,12 +57,13 @@ export default command({
 		const enableUserScope =
 			options.userScopedId && !isUserScopedHostIdEnabled();
 		if (enableUserScope) {
-			for (const org of orgs) {
-				const manifest = readManifest(org.id);
-				if (manifest && (await isManifestLive(manifest))) {
+			for (const manifest of readHostManifests()) {
+				if (await isManifestLive(manifest)) {
+					const orgId = manifest.organizationId;
+					const orgName = orgs.find((org) => org.id === orgId)?.name ?? orgId;
 					throw new CLIError(
-						`Stop the host for ${org.name} before changing this user's host ID.`,
-						`Run paradev stop --org ${org.id}, then retry.`,
+						`Stop the host for ${orgName} before changing this user's host ID.`,
+						`Run paradev stop --org ${orgId}, then retry.`,
 					);
 				}
 			}

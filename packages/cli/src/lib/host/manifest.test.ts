@@ -7,9 +7,12 @@ const originalSupersetHomeDir = process.env.SUPERSET_HOME_DIR;
 const tempHome = mkdtempSync(join(tmpdir(), "superset-cli-manifest-"));
 process.env.SUPERSET_HOME_DIR = tempHome;
 
-const { readManifest, removeManifestIfOwnedBy, writeManifest } = await import(
-	"./manifest"
-);
+const {
+	readHostManifests,
+	readManifest,
+	removeManifestIfOwnedBy,
+	writeManifest,
+} = await import("./manifest");
 
 afterAll(() => {
 	if (originalSupersetHomeDir === undefined) {
@@ -46,4 +49,13 @@ describe("removeManifestIfOwnedBy", () => {
 
 		expect(readManifest("org-replaced")?.pid).toBe(4243);
 	});
+});
+
+test("lists manifests from every local organization", () => {
+	writeFor("org-current-account", 4244);
+	writeFor("org-previous-account", 4245);
+
+	const ids = readHostManifests().map((manifest) => manifest.organizationId);
+	expect(ids).toContain("org-current-account");
+	expect(ids).toContain("org-previous-account");
 });

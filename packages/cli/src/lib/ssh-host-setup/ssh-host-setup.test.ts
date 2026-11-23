@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { hostIdFromMachineId } from "@superset/shared/host-info";
-import { hostKeyName } from "./host-key";
+import type { ApiClient } from "../api-client";
+import { findRemoteHostKey, hostKeyName } from "./host-key";
 import { machineIdProblem } from "./machine-id";
 import { checkPlatform } from "./platform";
 import { parseProbe } from "./probe";
@@ -105,6 +106,45 @@ test("the host key name fits better-auth's 32-character limit", () => {
 	);
 	expect(name).toBe("Host a97d7f26 Manageds-Virtual-M");
 	expect(name.length).toBeLessThanOrEqual(32);
+});
+
+test("finds the active legacy SSH key after the remote account changes its host ID", async () => {
+	const hostname = "dev-box";
+	const machineId = "shared-machine";
+	const legacyName = hostKeyName(hostname, hostIdFromMachineId(machineId));
+	const hostId = hostIdFromMachineId(machineId, 1002);
+	const scopedName = hostKeyName(hostname, hostId);
+	const api = {
+		apiKey: {
+			list: {
+				query: async () => [
+					{ id: "other-legacy-key", name: legacyName },
+					{ id: "active-legacy-key", name: legacyName },
+					{ id: "scoped-key", name: scopedName },
+					{ id: "personal-key", name: "My scripts" },
+				],
+			},
+		},
+	} as unknown as ApiClient;
+	const facts = {
+		bin: "/opt/paradev/bin/superset",
+		hostname,
+		hostId,
+		machineId,
+	};
+	const keyFor = (id: string) =>
+		findRemoteHostKey(
+			api,
+			{
+				target: "bob@dev-box",
+				run: async () => ({ exitCode: 0, stdout: id, stderr: "" }),
+			},
+			facts,
+		);
+
+	expect(await keyFor("active-legacy-key")).toBe("active-legacy-key");
+	expect(await keyFor("scoped-key")).toBe("scoped-key");
+	expect(await keyFor("personal-key")).toBeUndefined();
 });
 
 describe("sshFailureHint", () => {

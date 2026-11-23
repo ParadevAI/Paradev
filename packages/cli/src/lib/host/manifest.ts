@@ -2,6 +2,7 @@ import {
 	chmodSync,
 	existsSync,
 	mkdirSync,
+	readdirSync,
 	readFileSync,
 	rmSync,
 	writeFileSync,
@@ -23,7 +24,11 @@ export interface HostServiceManifest {
 }
 
 function manifestDir(organizationId: string): string {
-	return join(resolveAppHomeDir(), "host", organizationId);
+	return join(hostManifestRoot(), organizationId);
+}
+
+function hostManifestRoot(): string {
+	return join(resolveAppHomeDir(), "host");
 }
 
 function manifestPath(organizationId: string): string {
@@ -59,6 +64,17 @@ export function readManifest(
 	} catch {
 		return null;
 	}
+}
+
+export function readHostManifests(): HostServiceManifest[] {
+	let entries: string[];
+	try {
+		entries = readdirSync(hostManifestRoot());
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+		throw error;
+	}
+	return entries.flatMap((entry) => readManifest(entry) ?? []);
 }
 
 export function removeManifest(organizationId: string): void {
