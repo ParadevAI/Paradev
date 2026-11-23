@@ -146,6 +146,11 @@ stub(sandbox, {
 			sessionId: "session_1",
 		};
 	},
+	mintSandboxGateAccess: async () => ({
+		url: "https://gate.example",
+		token: "ticket",
+		expiresAt: new Date(Date.now() + 60_000),
+	}),
 	stopAndSnapshot: async () => ({ sessionId: "session_1" }),
 	deleteSandbox: async () => {},
 	environmentRepositoryRows: async () => [
