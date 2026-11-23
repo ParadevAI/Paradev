@@ -6,8 +6,8 @@ export * from "./model-catalog";
  * Entries are keyed by terminal-agent presetId (see
  * `builtin-terminal-agents.ts`). Agents absent from this list don't support
  * model selection and render no picker. Model ids are the exact values the CLI
- * accepts after `modelFlag` (opencode requires `provider/model`, so the
- * provider is baked into the id).
+ * accepts after `modelFlag` or in `modelEnv` (opencode requires
+ * `provider/model`, so the provider is baked into the id).
  * The virtual `omp` preset is resolved from the configured executable so OMP
  * options never leak onto the legacy `pi` CLI.
  *
@@ -62,6 +62,8 @@ export interface AgentModelSupport {
 	 * `VIBE_ACTIVE_MODEL`). Mutually exclusive with `modelFlag` in practice.
 	 */
 	modelEnv?: string;
+	/** Builds the `modelEnv` value from the model id. Defaults to the bare id. */
+	modelEnvValue?: (model: string) => string;
 	models: AgentModelOption[];
 }
 
@@ -328,7 +330,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 	},
 	{
 		presetId: "opencode",
-		modelFlag: "--model",
+		// OpenCode 2's TUI rejects `--model` ("Unrecognized flag: --model");
+		// 1.x and 2.x both layer OPENCODE_CONFIG_CONTENT over the user's config.
+		modelFlag: null,
+		modelEnv: "OPENCODE_CONFIG_CONTENT",
+		modelEnvValue: (model) => JSON.stringify({ model }),
 		models: [
 			// openai ids verified against `opencode models` (2026-08-05), which
 			// no longer lists the old `openai/gpt-5`. anthropic ids follow the
@@ -907,7 +913,7 @@ export function buildAgentModelArgs(
  * Env vars that select `model` for env-based agents (Vibe has no `--model`
  * flag; the model rides `VIBE_ACTIVE_MODEL`). Same degrade-to-default contract
  * as `buildAgentModelArgs`: unknown presets, presets without `modelEnv`, an
- * unset model, or a model id outside the curated list return `{}`.
+ * unset model, or a model id the preset can't launch return `{}`.
  */
 export function buildAgentModelEnv(
 	presetId: string,
@@ -916,6 +922,6 @@ export function buildAgentModelEnv(
 	if (!model) return {};
 	const support = getAgentModelSupport(presetId);
 	if (!support?.modelEnv) return {};
-	if (!support.models.some((option) => option.id === model)) return {};
-	return { [support.modelEnv]: model };
+	if (!isLaunchableAgentModel(presetId, model)) return {};
+	return { [support.modelEnv]: support.modelEnvValue?.(model) ?? model };
 }
