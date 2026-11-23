@@ -75,7 +75,17 @@ describe("verifyManifestOwner", () => {
 
 test("treats an unidentified process that is still alive as a possible host", async () => {
 	const possibleHost = await mayBeLiveHost(manifestFor(42), {
-		isAlive: () => true,
+		signalProcess: () => {},
+		inspectCommand: async () => null,
+	});
+	expect(possibleHost).toBe(true);
+});
+
+test("treats a host process owned by another OS account as possibly live", async () => {
+	const possibleHost = await mayBeLiveHost(manifestFor(42), {
+		signalProcess: () => {
+			throw Object.assign(new Error("Permission denied"), { code: "EPERM" });
+		},
 		inspectCommand: async () => null,
 	});
 	expect(possibleHost).toBe(true);
