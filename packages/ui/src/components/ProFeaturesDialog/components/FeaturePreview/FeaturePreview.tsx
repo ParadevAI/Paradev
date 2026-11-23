@@ -31,8 +31,8 @@ export function FeaturePreview({ selectedFeature }: FeaturePreviewProps) {
 	const DemoComponent = DEMO_COMPONENTS[selectedFeature.id];
 
 	return (
-		<div className="flex w-[495px] flex-col">
-			<div className="relative h-[346px] overflow-hidden bg-[#0a0a0f]">
+		<div className="flex w-full min-w-0 flex-col md:w-auto md:flex-1">
+			<div className="relative h-[346px] shrink-0 overflow-hidden bg-[#0a0a0f]">
 				{PRO_FEATURES.map((proFeature) => (
 					<div
 						key={`gradient-${proFeature.id}`}

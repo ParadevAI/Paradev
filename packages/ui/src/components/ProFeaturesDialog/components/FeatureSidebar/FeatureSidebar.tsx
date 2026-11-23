@@ -29,8 +29,8 @@ export function FeatureSidebar({
 	}, [highlightedFeatureId]);
 
 	return (
-		<div className="flex w-[249px] shrink-0 flex-col border-r bg-card">
-			<div className="px-5 pt-5 pb-2.5">
+		<div className="flex w-full shrink-0 flex-col border-b bg-card md:w-[249px] md:border-r md:border-b-0">
+			<div className="px-5 pt-5 md:pb-2.5">
 				<DialogTitle asChild>
 					<h1 className="mb-0 text-lg font-bold text-foreground">
 						<Trans>Pro Features</Trans>
@@ -38,7 +38,7 @@ export function FeatureSidebar({
 				</DialogTitle>
 			</div>
 
-			<div className="flex flex-col gap-2 py-2.5">
+			<div className="flex gap-1 overflow-x-auto px-3 py-2.5 md:flex-col md:gap-2 md:overflow-visible md:px-0">
 				{orderedFeatures.map((proFeature) => (
 					<FeatureButton
 						key={proFeature.id}
@@ -65,9 +65,15 @@ function FeatureButton({ feature, isSelected, onSelect }: FeatureButtonProps) {
 	return (
 		<button
 			type="button"
-			onClick={onSelect}
+			onClick={(event) => {
+				event.currentTarget.scrollIntoView({
+					block: "nearest",
+					inline: "nearest",
+				});
+				onSelect();
+			}}
 			className={cn(
-				"group flex h-14 w-full items-center gap-3 px-5 py-2.5 transition-all duration-200 ease-out",
+				"group flex h-10 shrink-0 items-center gap-2 whitespace-nowrap px-3 py-2.5 transition-all duration-200 ease-out md:h-14 md:w-full md:gap-3 md:px-5",
 				"cursor-pointer text-left",
 				isSelected
 					? "bg-muted text-foreground"
