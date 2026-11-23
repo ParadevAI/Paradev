@@ -56,6 +56,62 @@ test("loads every page in order, including an empty final page", async () => {
 	).toEqual(["page=1", "page=2", "page=3"]);
 });
 
+test("pages in an order a push can't reshuffle, then lists the most recently updated first", async () => {
+	const repo = (name: string, updated_at: string) => ({
+		full_name: `owner/${name}`,
+		clone_url: `https://github.com/owner/${name}.git`,
+		updated_at,
+	});
+	const pages = [
+		Array.from({ length: 100 }, (_, index) =>
+			repo(`a-${String(index).padStart(3, "0")}`, "2026-01-01T00:00:00Z"),
+		),
+		[repo("b-pushed", "2026-11-20T00:00:00Z"), repo("c-old", "2025-01-01T00:00:00Z")],
+	];
+	const calls: string[][] = [];
+	const result = await listGitHubRepositories(async (args) => {
+		calls.push(args);
+		return pages[calls.length - 1] ?? [];
+	});
+	for (const args of calls) {
+		expect(args).toContain("sort=full_name");
+		expect(args).not.toContain("sort=updated");
+	}
+	expect(result).toHaveLength(102);
+	expect(result[0]?.fullName).toBe("owner/b-pushed");
+	expect(result.at(-1)?.fullName).toBe("owner/c-old");
+	expect(result.slice(1, 4).map((entry) => entry.fullName)).toEqual([
+		"owner/a-000",
+		"owner/a-001",
+		"owner/a-002",
+	]);
+});
+
+test("lists a repository once even if two pages both return it", async () => {
+	const pages = [
+		Array.from({ length: 100 }, (_, index) => ({
+			full_name: `owner/repo-${index}`,
+			clone_url: `https://github.com/owner/repo-${index}.git`,
+		})),
+		[
+			{
+				full_name: "owner/repo-99",
+				clone_url: "https://github.com/owner/repo-99.git",
+			},
+			{
+				full_name: "owner/repo-100",
+				clone_url: "https://github.com/owner/repo-100.git",
+			},
+		],
+	];
+	let page = 0;
+	const result = await listGitHubRepositories(async () => pages[page++] ?? []);
+	const names = result.map((entry) => entry.fullName);
+	expect(names).toHaveLength(101);
+	expect(new Set(names).size).toBe(101);
+	expect(names.at(-1)).toBe("owner/repo-100");
+});
+
 test("rejects invalid clone URLs on later pages instead of returning partial results", async () => {
 	let page = 0;
 	await expect(
@@ -274,7 +330,8 @@ test.skipIf(!Bun.which("gh"))(
 				expect(request.pathname).toBe("/user/repos");
 				expect(Object.fromEntries(request.searchParams)).toEqual({
 					affiliation: "owner,collaborator,organization_member",
-					sort: "updated",
+					sort: "full_name",
+					direction: "asc",
 					per_page: "100",
 					page: String(index + 1),
 				});
