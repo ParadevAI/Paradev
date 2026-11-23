@@ -142,6 +142,15 @@ describe("organizationPluginIconUrl", () => {
 		expect(url).toContain("/cdn-cgi/image/");
 	});
 
+	test("an svg icon file has no url, since a sync never stores one", () => {
+		expect(
+			organizationPluginIconUrl("org-1", {
+				manifest: manifest({ interface: { icon: "./assets/icon.svg" } }),
+				contentHash: "abc",
+			}),
+		).toBeNull();
+	});
+
 	test("a built-in icon key has no url", () => {
 		expect(
 			organizationPluginIconUrl("org-1", {

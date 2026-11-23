@@ -17,6 +17,7 @@ import {
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import { and, eq, isNull, notInArray } from "drizzle-orm";
+import type { PluginManifest } from "../../router/plugins/manifest";
 import { deleteObjects, getObject, putObject } from "../r2";
 import { nudge } from "../realtime";
 import { IMMUTABLE_CACHE_CONTROL } from "../upload";
@@ -35,6 +36,7 @@ import {
 	withVersion,
 } from "./marketplace";
 import {
+	OrganizationPluginError,
 	organizationBundleKey,
 	organizationIconKey,
 	organizationPluginIcon,
@@ -203,6 +205,25 @@ async function readSource(
 	}
 }
 
+/** A plugin whose icon breaks a rule still syncs, with the default icon and a problem saying why. */
+function iconOf(
+	name: string,
+	manifest: PluginManifest,
+	files: ReadonlyMap<string, Uint8Array>,
+	result: SourceSyncResult,
+) {
+	try {
+		return organizationPluginIcon(manifest, files);
+	} catch (error) {
+		if (!(error instanceof OrganizationPluginError)) throw error;
+		result.problems.push({
+			name,
+			reason: `${error.message}; it shows the default icon`,
+		});
+		return null;
+	}
+}
+
 async function syncSnapshot(
 	source: SelectOrganizationPluginSource,
 	snapshot: RepositorySnapshot,
@@ -258,7 +279,7 @@ async function syncSnapshot(
 			const build = await bundleFor(snapshot, entry, pluginDirs);
 			const { bundle, skills } = build;
 			const manifest = { ...readOrganizationBundle(bundle), skills };
-			const icon = organizationPluginIcon(manifest, build.files);
+			const icon = iconOf(entry.name, manifest, build.files, result);
 			const contentHash = pluginBundleHash(bundle);
 			seen.push(entry.name);
 

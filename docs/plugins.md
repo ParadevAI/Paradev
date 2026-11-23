@@ -68,11 +68,14 @@ that must not change under them.
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
   `packages/shared/src/plugins/index.ts`), and `icon`. `icon` names a built-in icon key or an
   image inside the plugin (`./assets/icon.png`, ≤ 256 KB, no URLs, absolute paths or traversal;
-  `packages/shared/src/plugins/plugin-icon.ts`). An organization sync stores the image in the
-  public bucket next to the bundle's hash and `plugins.list` returns its `iconUrl`, so it shows
-  before install. Because that URL is public, an organization plugin's icon must be png, jpeg or
-  webp; an svg or any other file fails that plugin's sync. Only a local third-party marketplace,
-  which the API never sees, has its icon (svg allowed) read from the installed tree.
+  `packages/shared/src/plugins/plugin-icon.ts`). An organization sync stores a png, jpeg or webp
+  icon in the public bucket under the organization and the bundle's content hash, and
+  `plugins.list` returns its edge-resized `iconUrl`, so it shows before install. The original
+  file is also public at that key, which only the content hash keeps unguessable (anyone who can
+  read the repository can compute it), the same exposure organization logos have. An icon that is
+  missing, too large, not a whole image, or svg does not stop the sync: the plugin syncs with the
+  default icon and the source lists the reason. An installed plugin shows the icon from its
+  installed tree (svg allowed there); the API's URL covers a plugin that is not installed.
   A key that is not a built-in icon is accepted and shows the default icon.
 - `connector` — the one connection this plugin needs, as `{ "slug" }`. A slug names a connector in
   `packages/shared/src/connectors/connectors.json`; the manifest carries no OAuth configuration of

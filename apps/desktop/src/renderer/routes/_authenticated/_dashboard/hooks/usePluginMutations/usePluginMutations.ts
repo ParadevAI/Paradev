@@ -30,7 +30,7 @@ export function usePluginMutations() {
 			utils.plugins.list.invalidate(),
 			utils.plugins.connections.list.invalidate(),
 			machineUtils.plugins.organizationVersions.invalidate(),
-			machineUtils.plugins.localMarketplaceIcons.invalidate(),
+			machineUtils.plugins.installedIcons.invalidate(),
 		]);
 	};
 

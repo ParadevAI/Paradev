@@ -26,7 +26,7 @@ function SyncOnCatalogChange() {
 		onSettled: () =>
 			Promise.all([
 				machineUtils.plugins.organizationVersions.invalidate(),
-				machineUtils.plugins.localMarketplaceIcons.invalidate(),
+				machineUtils.plugins.installedIcons.invalidate(),
 			]),
 		onSuccess: () => setFailures(0),
 		onError: () => {

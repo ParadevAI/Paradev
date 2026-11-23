@@ -73,22 +73,30 @@ export function organizationIconKey(
 	return `organization-plugins/${organizationId}/${contentHash}/icon`;
 }
 
+const STORED_ICON_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+
 export function organizationPluginIconUrl(
 	organizationId: string,
 	plugin: { manifest: unknown; contentHash: string },
 ): string | null {
-	return pluginIconFile(manifestIcon(plugin.manifest))
+	const file = pluginIconFile(manifestIcon(plugin.manifest));
+	return file && STORED_ICON_TYPES.has(file.mime)
 		? transformUrlFor(organizationIconKey(organizationId, plugin.contentHash))
 		: null;
 }
 
-/** The image file a manifest names as its icon, after the rules a publicly served icon must pass. */
+/** The image file a manifest names as its icon, after the rules a publicly served icon must pass; the error is why it has none. */
 export function organizationPluginIcon(
 	manifest: PluginManifest,
 	files: ReadonlyMap<string, Uint8Array>,
 ): { body: Buffer; contentType: string } | null {
 	const file = pluginIconFile(manifestIcon(manifest));
 	if (!file) return null;
+	if (!STORED_ICON_TYPES.has(file.mime)) {
+		throw new OrganizationPluginError(
+			`its icon ${file.relative} must be a png, jpeg or webp image`,
+		);
+	}
 	const bytes = files.get(file.relative);
 	if (!bytes) {
 		throw new OrganizationPluginError(

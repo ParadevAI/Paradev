@@ -549,19 +549,20 @@ describe("syncOrganizationPluginSource", () => {
 			expect(publicObjects.size).toBe(1);
 		});
 
-		test("that is svg fails the plugin and stores nothing", async () => {
+		test("that is svg still syncs the plugin, with a problem and no icon", async () => {
 			const result = await syncOrganizationPluginSource(
 				SOURCE.id,
 				{},
 				repo("sha-1", withIcon("./assets/icon.svg", "<svg/>")),
 			);
+			expect(result?.synced).toEqual(["tools"]);
 			expect(result?.problems).toEqual([
 				{
 					name: "tools",
-					reason: "its icon assets/icon.svg must be a png, jpeg or webp image",
+					reason:
+						"its icon assets/icon.svg must be a png, jpeg or webp image; it shows the default icon",
 				},
 			]);
-			expect(plugins).toEqual([]);
 			expect(publicObjects.size).toBe(0);
 		});
 	});

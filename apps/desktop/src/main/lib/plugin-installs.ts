@@ -165,13 +165,9 @@ export function organizationPluginVersions(): {
 	);
 }
 
-/** Artwork of installed plugins whose marketplace the API never sees; it serves every other plugin's icon. */
-export function localMarketplacePluginIcons() {
-	return readInstalledPluginIcons().filter(
-		(entry) =>
-			entry.marketplace !== DEFAULT_MARKETPLACE &&
-			!isOrganizationMarketplace(entry.marketplace),
-	);
+/** Artwork each installed plugin ships through its manifest `icon`, read from its tree on this machine. */
+export function installedPluginIcons() {
+	return readInstalledPluginIcons();
 }
 
 export function setOrganizationPluginEnabled(
