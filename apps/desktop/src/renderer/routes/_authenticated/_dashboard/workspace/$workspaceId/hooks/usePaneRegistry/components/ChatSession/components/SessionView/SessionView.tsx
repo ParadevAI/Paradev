@@ -160,7 +160,9 @@ export function SessionView({
 	onSessionState?: (session: SessionState | null) => void;
 	/** The mode the user picked, so a resumed session can start in it again. */
 	onModeChange?: (modeId: string) => void;
-	onSwitchAccount?: SwitchAccount;
+	onSwitchAccount?: (
+		...args: [...Parameters<SwitchAccount>, { continueWork: boolean }]
+	) => Promise<void>;
 	sessionAccount?: TerminalAgentBinding["account"];
 	/**
 	 * Absent when the agent cannot branch its own session. The transcript is
@@ -659,6 +661,7 @@ export function SessionView({
 	const limit = sessionState?.usageLimit;
 	const respondToUsageLimit = session.respondToUsageLimit;
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
+	const limited = limit !== undefined;
 	const accountSwitch = useMemo<AccountSwitch | undefined>(() => {
 		const preset = harness ? presetForAnyHarness(harness) : undefined;
 		if (preset !== "claude" && preset !== "codex") return undefined;
@@ -666,9 +669,11 @@ export function SessionView({
 			agent: preset,
 			hostUrl,
 			sessionAccount,
-			onSwitch: onSwitchAccount,
+			onSwitch: onSwitchAccount
+				? (setAccount) => onSwitchAccount(setAccount, { continueWork: limited })
+				: undefined,
 		};
-	}, [harness, hostUrl, sessionAccount, onSwitchAccount]);
+	}, [harness, hostUrl, sessionAccount, onSwitchAccount, limited]);
 	const usageLimit = useMemo(() => {
 		if (!limit) return undefined;
 		return {
