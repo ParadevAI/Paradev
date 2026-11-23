@@ -549,4 +549,18 @@ describe("gbHourRatesOf", () => {
 			),
 		).toMatchObject({ overagePerGbHour: null, boughtPerGbHour: null });
 	});
+
+	test("a bought row with nothing granted does not count", () => {
+		expect(
+			gbHourRatesOf(
+				{
+					breakdown: [
+						row("one_off", "prepaid", undefined, 60),
+						row("one_off", "prepaid", 0.04, 60, 6000),
+					],
+				},
+				undefined,
+			).boughtPerGbHour,
+		).toBeCloseTo(0.04);
+	});
 });

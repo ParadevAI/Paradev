@@ -6,6 +6,8 @@ import {
 	type GbHourRates,
 	gbHourRatesOf,
 	gbMinutesUsd,
+	isBoughtGbMinuteRow,
+	isRecurringGbMinuteRow,
 } from "@superset/shared/billing";
 import type { getAutumnCustomer } from "./customer";
 
@@ -60,20 +62,14 @@ export function cloudUsageFromBalances(
 	const balance = balances[BOX_GB_MINUTES_FEATURE_ID];
 	if (!balance) return null;
 	const breakdown = balance.breakdown ?? [];
-	const prepaid = breakdown.filter(
-		(item) => item.reset?.interval === "one_off",
-	);
+	const recurring = breakdown.filter(isRecurringGbMinuteRow);
+	const prepaid = breakdown.filter((item) => !isRecurringGbMinuteRow(item));
 	const credit = (rows: typeof prepaid): CloudCredit => ({
 		grantedGbMinutes: sum(
 			rows.map((item) => item.includedGrant + item.prepaidGrant),
 		),
 		remainingGbMinutes: sum(rows.map((item) => item.remaining)),
 	});
-	const isBought = (item: (typeof prepaid)[number]) =>
-		item.price?.billingMethod === "prepaid";
-	const recurring = breakdown.filter(
-		(item) => item.reset?.interval !== "one_off",
-	);
 	const topup = billingControls?.autoTopups?.find(
 		(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID,
 	);
@@ -115,8 +111,8 @@ export function cloudUsageFromBalances(
 					)
 				: Math.max(0, balance.usage - balance.granted),
 		prepaidGbMinutes: Math.max(0, sum(prepaid.map((item) => item.remaining))),
-		bought: credit(prepaid.filter(isBought)),
-		freeCredits: credit(prepaid.filter((item) => !isBought(item))),
+		bought: credit(prepaid.filter(isBoughtGbMinuteRow)),
+		freeCredits: credit(prepaid.filter((item) => !isBoughtGbMinuteRow(item))),
 		seats,
 		overageLimit,
 		limitReached:

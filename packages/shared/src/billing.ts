@@ -359,7 +359,10 @@ function perGbHour(
 		| undefined,
 ): number | null {
 	if (price?.amount == null) return null;
-	return (price.amount * 60) / (price.billingUnits ?? 1);
+	return gbHourPackPricePerGbHour({
+		price: price.amount,
+		gbMinutes: price.billingUnits ?? 1,
+	});
 }
 
 function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
@@ -372,7 +375,8 @@ function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
 	);
 }
 
-function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
+/** The plan's one-off GB-minute purchase, when it sells one. */
+export function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
 	const price = plan.items.find(
 		(item) =>
 			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
@@ -404,15 +408,23 @@ export interface GbHourRates {
 	pack: GbHourPack | null;
 }
 
+export function isRecurringGbMinuteRow(row: GbMinuteBalanceRow): boolean {
+	return row.reset?.interval !== "one_off";
+}
+
+export function isBoughtGbMinuteRow(row: GbMinuteBalanceRow): boolean {
+	return !isRecurringGbMinuteRow(row) && row.price?.billingMethod === "prepaid";
+}
+
 function paidPerGbHour(rows: GbMinuteBalanceRow[]): number | null {
 	let gbMinutes = 0;
 	let usd = 0;
 	for (const row of rows) {
-		const rate = perGbHour(row.price);
-		if (rate === null) return null;
 		const granted = row.includedGrant + row.prepaidGrant;
+		if (granted === 0) continue;
+		if (row.price?.amount == null) return null;
 		gbMinutes += granted;
-		usd += (granted / 60) * rate;
+		usd += (granted * row.price.amount) / row.price.billingUnits;
 	}
 	return gbMinutes > 0 ? (usd * 60) / gbMinutes : null;
 }
@@ -425,19 +437,12 @@ export function gbHourRatesOf(
 	const rows = balance?.breakdown ?? [];
 	const usageBased = rows.find(
 		(row) =>
-			row.reset?.interval !== "one_off" &&
-			row.price?.billingMethod === "usage_based",
+			isRecurringGbMinuteRow(row) && row.price?.billingMethod === "usage_based",
 	);
 	return {
 		overagePerGbHour:
 			perGbHour(usageBased?.price) ?? (plan ? overagePerGbHour(plan) : null),
-		boughtPerGbHour: paidPerGbHour(
-			rows.filter(
-				(row) =>
-					row.reset?.interval === "one_off" &&
-					row.price?.billingMethod === "prepaid",
-			),
-		),
+		boughtPerGbHour: paidPerGbHour(rows.filter(isBoughtGbMinuteRow)),
 		pack: plan ? gbHourPack(plan) : null,
 	};
 }
