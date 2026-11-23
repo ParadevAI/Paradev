@@ -88,9 +88,9 @@ function createTerminalKeyEventHandler(
 		if (translation !== null) {
 			if (event.type === "keydown") {
 				event.preventDefault();
-				// The IME gets this key before it commits. The browser sends the key
-				// again with isComposing false after the commit, so send on that one.
-				if (!event.isComposing && event.keyCode !== 229) sendInput(translation);
+				// keyCode 229: the IME took this key to commit the composition. The
+				// browser sends the key again after the commit, so send on that one.
+				if (event.keyCode !== 229) sendInput(translation);
 			}
 			return false;
 		}
