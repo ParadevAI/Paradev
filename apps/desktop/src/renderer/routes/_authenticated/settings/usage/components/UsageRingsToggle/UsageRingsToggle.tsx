@@ -21,26 +21,28 @@ export function UsageRingsToggle() {
 	const toggleProvider = useSettings((s) => s.toggleRailUsageProvider);
 
 	return (
-		<div className="flex shrink-0 items-center gap-3">
-			<Label
-				id="usage-rail-rings-label"
-				htmlFor="usage-rail-rings"
-				className="text-xs text-muted-foreground"
-			>
-				<Trans>Show quota rings on sidebar</Trans>
-			</Label>
-			<span id="usage-rail-rings-description" className="sr-only">
-				<Trans>
-					Show how much quota each model provider has used, at the bottom of the
-					sidebar
-				</Trans>
-			</span>
-			<Switch
-				id="usage-rail-rings"
-				aria-describedby="usage-rail-rings-description"
-				checked={isShown}
-				onCheckedChange={(shown) => updateSetting("showRailUsage", shown)}
-			/>
+		<div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
+			<div className="flex min-w-0 items-center gap-3">
+				<Label
+					id="usage-rail-rings-label"
+					htmlFor="usage-rail-rings"
+					className="text-xs leading-snug text-muted-foreground"
+				>
+					<Trans>Show quota rings on sidebar</Trans>
+				</Label>
+				<span id="usage-rail-rings-description" className="sr-only">
+					<Trans>
+						Show how much quota each model provider has used, at the bottom of
+						the sidebar
+					</Trans>
+				</span>
+				<Switch
+					id="usage-rail-rings"
+					aria-describedby="usage-rail-rings-description"
+					checked={isShown}
+					onCheckedChange={(shown) => updateSetting("showRailUsage", shown)}
+				/>
+			</div>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button
