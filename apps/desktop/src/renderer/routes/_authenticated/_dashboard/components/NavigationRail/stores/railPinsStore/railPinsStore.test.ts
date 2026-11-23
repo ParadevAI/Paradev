@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
 	isRailDestinationPinned,
+	RAIL_PINS_STORAGE_KEY,
 	resolveRailOrder,
 	sanitizeRailPins,
+	syncRailPinsAcrossWindows,
 	useRailPinsStore,
 	withRailOrder,
 	withRailPin,
@@ -99,5 +101,31 @@ test("hiding a sidebar section keeps its pin and position when shown again", () 
 		expect(visible.pinOverrides.pages).toBe(false);
 	} finally {
 		useRailPinsStore.setState(initialState, true);
+	}
+});
+
+test("reads sidebar changes saved before cross-window synchronization starts", () => {
+	const initialState = useRailPinsStore.getState();
+	const initialStorage = localStorage.getItem(RAIL_PINS_STORAGE_KEY);
+	let stopSync: (() => void) | undefined;
+	try {
+		useRailPinsStore.setState({ hiddenDestinationIds: [] });
+		localStorage.setItem(
+			RAIL_PINS_STORAGE_KEY,
+			JSON.stringify({
+				state: { hiddenDestinationIds: ["pages"] },
+				version: 1,
+			}),
+		);
+		expect(useRailPinsStore.getState().hiddenDestinationIds).toEqual([]);
+
+		stopSync = syncRailPinsAcrossWindows();
+
+		expect(useRailPinsStore.getState().hiddenDestinationIds).toEqual(["pages"]);
+	} finally {
+		stopSync?.();
+		useRailPinsStore.setState(initialState, true);
+		if (initialStorage === null) localStorage.removeItem(RAIL_PINS_STORAGE_KEY);
+		else localStorage.setItem(RAIL_PINS_STORAGE_KEY, initialStorage);
 	}
 });

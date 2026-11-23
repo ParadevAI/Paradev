@@ -1,3 +1,4 @@
+import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedStoreAcrossWindows";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -151,3 +152,9 @@ export const useRailPinsStore = create<RailPinsState>()(
 		},
 	),
 );
+
+export function syncRailPinsAcrossWindows() {
+	const stopSync = syncPersistedStoreAcrossWindows(useRailPinsStore);
+	void useRailPinsStore.persist?.rehydrate();
+	return stopSync;
+}

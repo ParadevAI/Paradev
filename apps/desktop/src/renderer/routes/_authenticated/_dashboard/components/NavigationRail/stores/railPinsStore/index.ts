@@ -3,5 +3,6 @@ export {
 	isRailDestinationPinned,
 	type RailDestinationId,
 	resolveRailOrder,
+	syncRailPinsAcrossWindows,
 	useRailPinsStore,
 } from "./railPinsStore";
