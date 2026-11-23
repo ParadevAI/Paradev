@@ -15,8 +15,7 @@ Add `--env Production` / `--env Preview` only when the two need different
 values. Without it, both environments get the same one. Scoping works because
 every deploy job declares `environment: production` / `preview`; a job that
 does not will read an environment secret as empty. It is also why a one-off
-script that needs a production secret has to run as a workflow; see
-`docs/deploy-workflows.md`.
+script that needs a production secret has to run as a workflow.
 
 Give both environments the **same name** and different values. A separate
 `MY_VAR_DEV` variable is easy to reference in a workflow and forget to create,
@@ -149,8 +148,7 @@ surface has its own PostHog flag, so they roll out separately: desktop sign-in
 reads `web-domain-move` and old-app pages read `web-pages-domain-move`. A
 missing `web-pages-domain-move` flag retains the old pages. No secret is set
 by merging the wiring. Stage and final artifact preparation explicitly pass
-`false`. Read the cutover handoff (`paradev-repo/docs/paradev-staging.md` in the private
-`ParadevAI/plans` repo) before any future activation, including its merge/deployment warning.
+`false`.
 
 ## Marketing destination override
 

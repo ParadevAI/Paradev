@@ -153,5 +153,5 @@ online instead (rule 2).
 the branch has applied a migration, later pushes that change that migration make the PR's database
 check a no-op. Delete the Neon branch to force a real run.
 
-Workflow pitfalls from the same incident (pipefail, production secrets) are in
-`docs/deploy-workflows.md`.
+Workflow pitfalls from the same incident: a `run:` step has no `pipefail` by default, and
+production secrets exist only in GitHub Actions.

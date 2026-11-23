@@ -205,12 +205,17 @@ Three traps worth knowing before you touch catalogs:
   Mock that module with a Proxy, never a spread — `i18n` is a class instance and a spread
   drops `load`/`activate`.
 
+## Deploy workflows
+
+In `.github/workflows/`, a `run:` step has no `pipefail` by default, so set it on any piped step.
+Production secrets exist only in GitHub: a script that needs one runs as a workflow.
+
 ## Plans and design notes
 
-This repository is public. Plans, design notes, research, findings, specs and TODO lists go in
-the private `ParadevAI/plans` repo under `paradev-repo/`, at the path they would have had here
-(`paradev-repo/plans/`, `paradev-repo/apps/<app>/plans/`). Do not add them here, and do not
-point code, comments or PR descriptions at them.
+This repository is public. Plans, design notes, research, findings, specs and TODO lists are not
+committed to any repo: publish them as an org page with `superset pages publish` (`/create-plan`
+for a plan). Keep the source in `plans/local/`, which is gitignored. Do not point code, comments,
+docs or PR descriptions at them.
 
 ## Comments
 
@@ -250,15 +255,10 @@ earns its place by catching a regression quickly.
   contract, the credential proxy, and which files are generated.
 - `docs/environment-variables.md`: read before adding an environment variable. Five places,
   and missing one fails silently.
-- `docs/deploy-workflows.md`: read before writing or testing a deploy workflow step. `run:` has
-  no `pipefail` by default, and production secrets exist only in GitHub.
 - `packages/trpc/AGENTS.md`: read before changing any tRPC procedure, in `packages/trpc` or
   `packages/host-service`. Released desktop, mobile, and CLI builds still call it.
 - `apps/desktop/AGENTS.md`: desktop specifics (notices, persisted renderer state).
 - `apps/mobile/AGENTS.md`: mobile structure and iOS-only scope.
-- `ParadevAI/plans` (private), `paradev-repo/docs/cloud-sandbox-mismatches.md` and
-  `cloud-sandbox-considerations.md`: where cloud sandboxes don't fit assumptions about a machine
-  someone owns, and what they still owe. Read them before touching sandboxes if you have access.
 
 ## Contributor responsibility
 

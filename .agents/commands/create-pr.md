@@ -22,7 +22,7 @@ A good PR description answers:
 
 IMPORTANT:
 - When on `main`, ALWAYS create a branch first before committing. Never push directly to `main`.
-- If there is an ExecPlan, do not link it: it lives in the private `ParadevAI/plans` repo. Say what shipped and what is deferred in plain terms.
+- If there is an ExecPlan, do not link it: it is an org page and this repo is public. Say what shipped and what is deferred in plain terms.
 
 # Workflow (creating the PR)
 
@@ -79,9 +79,9 @@ Do NOT proceed with the PR. Instead, present findings to the user:
 - If starting from `main`: `git switch -c <feature-branch-name>`
 
 ## 4. Move ExecPlan to done (if applicable)
-- ExecPlans live in the private `ParadevAI/plans` repo, not in this public one.
-- If this PR completes an ExecPlan, fill in `Outcomes & Retrospective` and move it to its
-  `done/` folder there, in a separate commit or PR on that repo.
+- ExecPlans are org pages, never files in a repo.
+- If this PR completes an ExecPlan, fill in `Outcomes & Retrospective`, mark it done and republish
+  it with `superset pages publish <source>.html --label "done"`.
 - Never link, quote or name the plan in this public PR.
 - Skip if there is no ExecPlan or it spans multiple PRs.
 

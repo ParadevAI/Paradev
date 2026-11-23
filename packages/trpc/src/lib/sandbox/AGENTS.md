@@ -9,11 +9,6 @@ checks the secret the gate presents with the same `PskHostAuthProvider` a
 local host uses; and the image and bundle are `packages/sandbox` — a change here
 usually needs one of those too.
 
-Where a sandbox does not behave like a machine someone owns is recorded in the
-private `ParadevAI/plans` repo (`paradev-repo/docs/cloud-sandbox-mismatches.md`).
-Read it before changing anything here if you have access, and add each new one
-you find, including the ones you fixed quickly.
-
 Habits that pay for themselves here:
 
 - **Verify from the renderer, not from Node.** The renderer's CSP and the
