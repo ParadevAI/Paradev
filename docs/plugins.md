@@ -73,6 +73,7 @@ that must not change under them.
   before install. Because that URL is public, an organization plugin's icon must be png, jpeg or
   webp; an svg or any other file fails that plugin's sync. Only a local third-party marketplace,
   which the API never sees, has its icon (svg allowed) read from the installed tree.
+  A key that is not a built-in icon is accepted and shows the default icon.
 - `connector` — the one connection this plugin needs, as `{ "slug" }`. A slug names a connector in
   `packages/shared/src/connectors/connectors.json`; the manifest carries no OAuth configuration of
   its own — no scopes, no client mode, no `requires_env`. A connection is account state, and the
@@ -190,8 +191,9 @@ Sync runs when an admin adds a source and when they click "Sync now" (or run
 `superset plugins organization sources sync`); there is no schedule. Like Codex, it reads the
 repository only with the GitHub account of the admin who added the source, while that admin is still
 an admin with GitHub connected; Settings shows it as "Syncs as @login". To take a source over,
-another admin adds the same repository again. A plugin whose files did not change, by the blob
-hashes in the tree listing, is not downloaded again. A plugin that fails to sync keeps its last good
+another admin adds the same repository again. When an admin adds a source, a commit that did not
+change is skipped, and so is a plugin whose files did not change, by the blob hashes in the tree
+listing. "Sync now" rebuilds every plugin. A plugin that fails to sync keeps its last good
 version, and its problem is listed on the source. A plugin that leaves the repository is marked "No
 longer in source": members who have it keep it, but it is not offered or installed anew. Changed
 content that reuses a declared version is refused. Removing a source removes its plugins from the
