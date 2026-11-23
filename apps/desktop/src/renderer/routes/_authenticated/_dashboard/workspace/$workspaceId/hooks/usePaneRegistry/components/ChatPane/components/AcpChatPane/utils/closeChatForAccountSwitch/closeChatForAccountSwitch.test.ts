@@ -1,5 +1,6 @@
 import { expect, mock, test } from "bun:test";
 import { setImmediate as flush } from "node:timers/promises";
+import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type { UserContent } from "@superset/chat/protocol";
 import { createChatRouter } from "@superset/chat-runtime";
 import {
@@ -90,6 +91,48 @@ test("an account switch preserves the full queue before disposing the old sessio
 	}
 });
 
+test.each<{ limited: boolean; carried: UserContent[][] }>([
+	{ limited: true, carried: [[{ type: "text", text: CONTINUE_PROMPT }]] },
+	{ limited: false, carried: [] },
+])("an empty queue carries a continue only out of a usage limit: $limited", async ({
+	limited,
+	carried,
+}) => {
+	const { harnesses } = fakeHarnessRegistry({
+		start: [
+			{
+				kind: "session",
+				session: {
+					status: "idle",
+					...(limited ? { usageLimit: { hitAtMs: 1 } } : {}),
+				},
+			},
+		],
+		turns: [],
+	});
+	const runtime = createTestRuntime({ harnesses });
+	const transport = createChatRouter(runtime, {
+		resolveCwd: () => "/tmp",
+	}).createCaller({});
+	try {
+		const { sessionId } = await transport.createSession({
+			commandId: crypto.randomUUID(),
+			workspaceId: "workspace-1",
+			harness: "fake",
+		});
+		await flush();
+		expect(
+			await closeChatForAccountSwitch({
+				transport,
+				sessionId,
+				setAccount: async () => undefined,
+			}),
+		).toEqual(carried);
+	} finally {
+		await runtime.dispose();
+	}
+});
+
 test.each([
 	"queue",
 	"account",
@@ -105,7 +148,7 @@ test.each([
 	>(async () => undefined);
 	const getQueue = mock(async () => {
 		if (failure === "queue") throw new Error("queue failed");
-		return { live: true, paused: true, prompts: [] };
+		return { live: true, paused: true, limited: true, prompts: [] };
 	});
 	await expect(
 		closeChatForAccountSwitch({

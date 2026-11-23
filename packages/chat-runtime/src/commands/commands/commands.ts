@@ -1121,7 +1121,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		getQueue(input) {
 			const parsed: GetSessionInput = getSessionInputSchema.parse(input);
 			const session = options.live.get(parsed.sessionId);
-			if (!session) return { live: false, paused: false, prompts: [] };
+			if (!session) {
+				return { live: false, paused: false, limited: false, prompts: [] };
+			}
 			return { live: true, ...session.queueState };
 		},
 
