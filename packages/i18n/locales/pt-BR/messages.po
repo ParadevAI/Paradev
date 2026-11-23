@@ -20291,6 +20291,9 @@ msgstr "O chat continua como está. Arquivos editados desde este turno, por qual
 msgid "the cloud"
 msgstr "a nuvem"
 
+msgid "The cloud workspace could not start"
+msgstr "Não foi possível iniciar a área de trabalho na nuvem"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "A área de trabalho na nuvem não está em execução. Inicie-a e tente novamente."
 

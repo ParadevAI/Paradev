@@ -14,6 +14,7 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
+import { CLOUD_WORKSPACE_NOT_STARTED_KEY } from "@superset/shared/sandbox/access";
 import {
 	normalizeWorkspaceTags,
 	workspaceTagsInputSchema,
@@ -37,6 +38,7 @@ import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
+	CloudWorkspaceNotStartedError,
 	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
@@ -183,6 +185,13 @@ async function addressSandbox(
 				: await wakeCloudWorkspace(row);
 		return { ...woken, running: true };
 	} catch (error) {
+		if (error instanceof CloudWorkspaceNotStartedError) {
+			throw userError({
+				code: "TIMEOUT",
+				message: error.message,
+				i18nKey: CLOUD_WORKSPACE_NOT_STARTED_KEY,
+			});
+		}
 		if (error instanceof SandboxNotReadyError) {
 			throw new TRPCError({
 				code: "TIMEOUT",

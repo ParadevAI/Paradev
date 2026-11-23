@@ -6,6 +6,7 @@ import { AgentCredentialsChangedBanner } from "./components/AgentCredentialsChan
 import { BoxOutOfMemoryBanner } from "./components/BoxOutOfMemoryBanner";
 import { CloudUsageRefusedBanner } from "./components/CloudUsageRefusedBanner";
 import { CloudUsageStoppingBanner } from "./components/CloudUsageStoppingBanner";
+import { CloudWorkspaceNotStartedBanner } from "./components/CloudWorkspaceNotStartedBanner";
 
 /** Keeps loaded panes accessible while reporting cloud workspace limits. */
 export function WorkspaceHostGate({
@@ -15,7 +16,7 @@ export function WorkspaceHostGate({
 	workspace: HostShapedWorkspace;
 	children: ReactNode;
 }) {
-	const { agentsToRestart, usageRefusal } = useSandboxAccess();
+	const { agentsToRestart, usageRefusal, notStarted } = useSandboxAccess();
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
 	const cloudRow = cloudWorkspaces?.find((row) => row.id === workspace.hostId);
 	const isCloudWorkspace = Boolean(cloudRow);
@@ -43,6 +44,9 @@ export function WorkspaceHostGate({
 					workspaceId={workspace.hostId}
 					error={usageRefusal.error}
 				/>
+			) : null}
+			{notStarted?.workspaceId === workspace.hostId ? (
+				<CloudWorkspaceNotStartedBanner error={notStarted.error} />
 			) : null}
 		</div>
 	);

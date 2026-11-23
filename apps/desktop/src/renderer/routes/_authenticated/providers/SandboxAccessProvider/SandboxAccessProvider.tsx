@@ -1,5 +1,6 @@
 import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
+import { CLOUD_WORKSPACE_NOT_STARTED_KEY } from "@superset/shared/sandbox/access";
 import {
 	type QueryClient,
 	type UseQueryResult,
@@ -52,6 +53,8 @@ interface SandboxAccessValue {
 	/** The open workspace's agents whose sign-in kind changed since its box booted. */
 	agentsToRestart: { workspaceId: string; agents: string[] } | null;
 	usageRefusal: { workspaceId: string; error: unknown } | null;
+	/** The open workspace's wake missed its deadline: the box will not start. */
+	notStarted?: { workspaceId: string; error: unknown } | null;
 	wakeOpenWorkspace: () => Promise<void>;
 }
 
@@ -223,6 +226,12 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 					: null,
 			usageRefusal:
 				openWorkspace && isCloudUsageRefusal(wake.error)
+					? { workspaceId: openWorkspace.id, error: wake.error }
+					: null,
+			notStarted:
+				openWorkspace &&
+				(wake.error as { data?: { i18nKey?: unknown } } | null)?.data
+					?.i18nKey === CLOUD_WORKSPACE_NOT_STARTED_KEY
 					? { workspaceId: openWorkspace.id, error: wake.error }
 					: null,
 			wakeOpenWorkspace,

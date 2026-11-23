@@ -20291,6 +20291,9 @@ msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保
 msgid "the cloud"
 msgstr "雲端"
 
+msgid "The cloud workspace could not start"
+msgstr "雲端工作區無法啟動"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "雲端工作區未執行。請先啟動它，然後再試一次。"
 

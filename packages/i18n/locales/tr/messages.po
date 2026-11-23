@@ -20291,6 +20291,9 @@ msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından d�
 msgid "the cloud"
 msgstr "bulut"
 
+msgid "The cloud workspace could not start"
+msgstr "Bulut çalışma alanı başlatılamadı"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Bulut çalışma alanı çalışmıyor. Başlatın, ardından tekrar deneyin."
 

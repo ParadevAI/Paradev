@@ -20291,6 +20291,9 @@ msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, z
 msgid "the cloud"
 msgstr "cloud"
 
+msgid "The cloud workspace could not start"
+msgstr "Cloudový pracovní prostor se nepodařilo spustit"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Cloudový pracovní prostor neběží. Spusťte ho a zkuste to znovu."
 

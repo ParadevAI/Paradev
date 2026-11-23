@@ -584,6 +584,12 @@ export const serverErrorMessages: Record<
 				message: "Only the author can change a comment",
 			}),
 		),
+	"serverError.cloudWorkspace.cloudWorkspaceCouldNotStart": () =>
+		i18n._(
+			msg({
+				message: "The cloud workspace could not start",
+			}),
+		),
 	"serverError.cloudWorkspace.couldNotRecordCloudWorkspace": () =>
 		i18n._(
 			msg({

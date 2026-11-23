@@ -20291,6 +20291,9 @@ msgstr "Der Chat bleibt, wie er ist. Dateien, die seit diesem Durchlauf jemand b
 msgid "the cloud"
 msgstr "die Cloud"
 
+msgid "The cloud workspace could not start"
+msgstr "Der Cloud-Arbeitsbereich konnte nicht gestartet werden"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Der Cloud-Arbeitsbereich läuft nicht. Starte ihn und versuche es dann erneut."
 
