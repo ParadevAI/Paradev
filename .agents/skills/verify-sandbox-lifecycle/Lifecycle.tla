@@ -26,8 +26,9 @@ Agents(a) == <<"agents", a>>
 Aging(r) == r[1] \in {"box", "drive", "golden"}
 Min(a, b) == IF a < b THEN a ELSE b
 Range(s) == {s[i] : i \in DOMAIN s}
-\* The previous release's agents drive is kept this long after a release (48 h, 2 days).
-PrevKeep == 2 * ProvStuck
+\* 48 h (2 days): an agents drive younger than this is kept, and so is the
+\* previous release's until the current release is this old.
+AgentsKeep == 2 * ProvStuck
 
 NoRow == [st |-> "none", n |-> None, pin |-> None, t |-> 0, half |-> FALSE]
 GoneRow == [NoRow EXCEPT !.st = "gone"]
@@ -38,7 +39,7 @@ VARIABLES
   env,       \* env[d]: st, gs (goldens, newest last), act (active golden), prune (a build's prune is due)
   gcnt,      \* goldens built in database d
   rel,       \* production's current release; its agents drive is Agents(rel)
-  relAge,    \* days since rel was recorded, capped at PrevKeep
+  relAge,    \* days since rel was recorded, capped at AgentsKeep
   ex,        \* ex[r]: the resource exists in Vercel
   age,       \* age[r]: days since created, capped at LeftoverAge
   mnt,       \* mnt[box]: the agents drive the box mounts
@@ -113,8 +114,10 @@ Init ==
 Tick ==
   LET rows2 == [d \in DBs |-> [w \in WS |->
                   [rows[d][w] EXCEPT !.t = Min(@ + 1, Cap(rows[d][w]))]]]
-      age2 == [r \in Res |-> IF ex[r] /\ Aging(r) THEN Min(age[r] + 1, LeftoverAge) ELSE age[r]]
-      relAge2 == Min(relAge + 1, PrevKeep)
+      age2 == [r \in Res |-> IF ex[r] /\ Aging(r) THEN Min(age[r] + 1, LeftoverAge)
+                             ELSE IF ex[r] /\ r[1] = "agents" THEN Min(age[r] + 1, AgentsKeep)
+                             ELSE age[r]]
+      relAge2 == Min(relAge + 1, AgentsKeep)
   IN /\ <<rows2, age2, relAge2>> # <<rows, age, relAge>>
      /\ rows' = rows2 /\ age' = age2 /\ relAge' = relAge2
      /\ UNCHANGED <<env, gcnt, rel, ex, mnt, tdQ, branched, iso>>
@@ -276,12 +279,13 @@ HeldByRunning(a) ==
     rows[d][w].st = "awake" /\ n # None /\ ex[Box(n)] /\ mnt[Box(n)] = a
 
 \* Rule 3: an agents drive that is not the current release's, nor the previous
-\* one's within PrevKeep of the release.  A stopped box's mount does not keep it:
+\* one's within AgentsKeep of the release, nor younger than AgentsKeep.  A stopped box's mount does not keep it:
 \* a wake mounts the current release's drive.
 AgentsCleanup(d, a) ==
   /\ Rule3On /\ JobRuns(d)
   /\ ex[Agents(a)] /\ a # rel
-  /\ ~(a = rel - 1 /\ relAge < PrevKeep)
+  /\ ~(a = rel - 1 /\ relAge < AgentsKeep)
+  /\ age[Agents(a)] >= AgentsKeep
   /\ ~HeldByRunning(a)
   /\ DelBy({Agents(a)}, d)
   /\ UNCHANGED <<rows, env, gcnt, rel, relAge, tdQ, branched>>
@@ -365,5 +369,5 @@ NoLeak == \A r \in Res : (ex[r] /\ ~Kept(r)) ~> (~ex[r] \/ Kept(r))
 TypeOK ==
   /\ \A d \in DBs, w \in WS : rows[d][w].st \in {"none", "provisioning", "awake", "asleep", "archived", "failed", "gone"}
   /\ tdQ \subseteq DBs \X WsNames
-  /\ \A r \in Res : age[r] \in 0..LeftoverAge
+  /\ \A r \in Res : age[r] \in 0..(IF LeftoverAge > AgentsKeep THEN LeftoverAge ELSE AgentsKeep)
 =============================================================================
