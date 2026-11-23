@@ -61,8 +61,8 @@ export function getSupervisor(scriptPath?: string): DaemonSupervisor {
  * migration plan, decision D3 — fire-and-track). Stash the promise so
  * callers that need the daemon up can await it via `waitForDaemonReady`.
  */
-export function startDaemonBootstrap(organizationId: string): void {
-	if (bootstrapPromise) return;
+export function startDaemonBootstrap(organizationId: string): Promise<unknown> {
+	if (bootstrapPromise) return bootstrapPromise;
 	const sup = getSupervisor();
 	console.log("[supervisor] kicking off bootstrap (org):", organizationId);
 	bootstrapPromise = sup
@@ -87,6 +87,7 @@ export function startDaemonBootstrap(organizationId: string): void {
 			bootstrapPromise = null;
 			throw err;
 		});
+	return bootstrapPromise;
 }
 
 /**

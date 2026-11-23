@@ -43,6 +43,20 @@ test("stops serving and disposes before exiting, cancelling the deadline", async
 	]);
 });
 
+test("disposes a partly started host and reports the failure before exiting", async () => {
+	const { shutdown, calls } = setup();
+	await shutdown("startup failure", async () => {
+		calls.push("report startup error");
+	});
+	expect(calls).toEqual([
+		"stop serving",
+		"dispose",
+		"report startup error",
+		"cancel deadline",
+		"exit 1",
+	]);
+});
+
 test("stops the development daemon before disposing the app", async () => {
 	const events: string[] = [];
 	const { shutdown } = setup({

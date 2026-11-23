@@ -24,7 +24,10 @@ export function createStandaloneShutdown({
 		return () => clearTimeout(timer);
 	},
 	log = (message, ...details) => console.log(message, ...details),
-}: StandaloneShutdownOptions): (signal: NodeJS.Signals) => Promise<void> {
+}: StandaloneShutdownOptions): (
+	reason: NodeJS.Signals | "startup failure",
+	reportStartupError?: () => Promise<void>,
+) => Promise<void> {
 	let shuttingDown = false;
 	let finished = false;
 	let cancelDeadline = () => {};
@@ -35,18 +38,18 @@ export function createStandaloneShutdown({
 		hardExit();
 	};
 
-	return async (signal) => {
+	return async (reason, reportStartupError) => {
 		if (finished) return;
 		if (shuttingDown) {
 			log(
 				"[host-service] forcing exit after repeated shutdown signal:",
-				signal,
+				reason,
 			);
 			forceExit();
 			return;
 		}
 		shuttingDown = true;
-		log("[host-service] shutdown signal:", signal);
+		log("[host-service] shutdown requested:", reason);
 		cancelDeadline = scheduleDeadline(() => {
 			if (finished) return;
 			log(
@@ -60,6 +63,7 @@ export function createStandaloneShutdown({
 			["stop serving", stopServing],
 			["stop dev daemon", stopDaemon],
 			["dispose", dispose],
+			["report startup error", reportStartupError],
 		] as const;
 		for (const [name, cleanup] of steps) {
 			if (finished) return;
@@ -73,6 +77,6 @@ export function createStandaloneShutdown({
 		finished = true;
 		cancelDeadline();
 		log("[host-service] shutdown complete");
-		exit(0);
+		exit(reason === "startup failure" ? 1 : 0);
 	};
 }
