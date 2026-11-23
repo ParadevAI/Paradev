@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { hostIdFromMachineId } from "@superset/shared/host-info";
 import { hostKeyName } from "./host-key";
 import { machineIdProblem } from "./machine-id";
 import { checkPlatform } from "./platform";
@@ -78,6 +79,14 @@ describe("parseProbe", () => {
 			'system=Darwin\nmachineid=\nioreg=      "IOPlatformUUID" = "1234-ABCD"\n',
 		);
 		expect(mac.machineId).toBe("1234-ABCD");
+	});
+
+	test("derives the remote account's effective host ID from the probe", () => {
+		const linux = "system=Linux\nmachineid=abc\n";
+		expect(parseProbe(linux).hostId).toBe(hostIdFromMachineId("abc"));
+		expect(parseProbe(`${linux}hostuid=1001\n`).hostId).toBe(
+			hostIdFromMachineId("abc", 1001),
+		);
 	});
 });
 

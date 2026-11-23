@@ -1,6 +1,6 @@
 import * as p from "@clack/prompts";
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
-import { getHostId, hostIdFromMachineId } from "@superset/shared/host-info";
+import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import { resolveOrganizationFromContext } from "../../../lib/resolve-org";
 import { shellQuote } from "../../../lib/shell-quote";
@@ -49,7 +49,7 @@ export default command({
 			if (!facts.machineId) {
 				throw new CLIError(`Could not read the machine id of ${target}`);
 			}
-			const hostId = hostIdFromMachineId(facts.machineId);
+			const { hostId } = facts;
 			if (hostId === getHostId()) {
 				throw new CLIError(
 					`${target} is this machine`,

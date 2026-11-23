@@ -1,10 +1,16 @@
+import {
+	hostIdFromMachineId,
+	USER_SCOPED_HOST_ID_FILE,
+} from "@superset/shared/host-info";
+
 /**
  * Prints one `key=value` line per fact about the remote machine. Written for
  * POSIX sh with no backslashes: ssh hands the quoted script to the user's
  * login shell first, and fish reads backslashes in single quotes.
  */
 export const PROBE_SCRIPT = `
-echo "system=$(uname -s)"
+system=$(uname -s)
+echo "system=$system"
 echo "machine=$(uname -m)"
 echo "ldd=$(ldd --version 2>&1 | head -n 1)"
 echo "machineid=$(cat /etc/machine-id 2>/dev/null || cat /var/lib/dbus/machine-id 2>/dev/null)"
@@ -12,6 +18,9 @@ echo "ioreg=$(ioreg -rd1 -c IOPlatformExpertDevice 2>/dev/null | grep IOPlatform
 echo "home=$HOME"
 echo "user=$(id -un)"
 echo "hostname=$(hostname)"
+if [ "$system" = Linux ] && [ -f "$HOME/${USER_SCOPED_HOST_ID_FILE}" ]; then
+	echo "hostuid=$(id -u)"
+fi
 bin=""
 for candidate in "$HOME/superset/bin/superset" "$(command -v superset 2>/dev/null)" /opt/homebrew/bin/superset /usr/local/bin/superset; do
 	if [ -n "$candidate" ] && [ -x "$candidate" ]; then bin="$candidate"; break; fi
@@ -35,6 +44,7 @@ export interface RemoteFacts {
 	ldd: string;
 	/** The raw id the host derives its host id from, as getMachineId reads it. */
 	machineId: string;
+	hostId: string;
 	home: string;
 	user: string;
 	hostname: string;
@@ -62,11 +72,16 @@ export function parseProbe(output: string): RemoteFacts {
 			: get("machineid");
 	const linger = get("linger");
 	const gh = get("gh");
+	const hostUid = get("hostuid");
 	return {
 		system,
 		machine: get("machine"),
 		ldd: get("ldd"),
 		machineId,
+		hostId: hostIdFromMachineId(
+			machineId,
+			system === "Linux" && /^\d+$/.test(hostUid) ? Number(hostUid) : undefined,
+		),
 		home: get("home"),
 		user: get("user"),
 		hostname: get("hostname"),

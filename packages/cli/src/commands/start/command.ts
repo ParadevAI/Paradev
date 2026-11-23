@@ -1,5 +1,9 @@
 import * as p from "@clack/prompts";
 import { boolean, CLIError, number, string } from "@superset/cli-framework";
+import {
+	enableUserScopedHostId,
+	isUserScopedHostIdEnabled,
+} from "@superset/shared/host-info";
 import { readPublicEnv } from "@superset/shared/public-env";
 import { command } from "../../lib/command";
 import { getSupersetConfigPath } from "../../lib/config";
@@ -28,6 +32,9 @@ export default command({
 		),
 		port: number().desc("Port to listen on"),
 		org: string().desc("Organization to register under (id, slug, or name)"),
+		userScopedId: boolean().desc(
+			"Use a persistent host ID for this Linux user on a shared machine",
+		),
 	},
 	run: async ({ ctx, options, signal }) => {
 		if (options.autoUpdate && !options.daemon) {
@@ -36,12 +43,29 @@ export default command({
 				"Run paradev start --daemon --auto-update.",
 			);
 		}
+		if (options.userScopedId && process.platform !== "linux") {
+			throw new CLIError("--user-scoped-id is supported only on Linux.");
+		}
 
 		const orgs = await ctx.api.user.myOrganizations.query();
 		const organization = await resolveOrganization(
 			orgs,
 			options.org ?? readPublicEnv("ORGANIZATION_ID"),
 		);
+
+		const enableUserScope =
+			options.userScopedId && !isUserScopedHostIdEnabled();
+		if (enableUserScope) {
+			for (const org of orgs) {
+				const manifest = readManifest(org.id);
+				if (manifest && (await isManifestLive(manifest))) {
+					throw new CLIError(
+						`Stop the host for ${org.name} before changing this user's host ID.`,
+						`Run paradev stop --org ${org.id}, then retry.`,
+					);
+				}
+			}
+		}
 
 		const existing = readManifest(organization.id);
 		if (existing) {
@@ -62,6 +86,7 @@ export default command({
 
 		let running: SpawnHostResult;
 		try {
+			if (enableUserScope) enableUserScopedHostId();
 			const result = await spawnHostService({
 				organizationId: organization.id,
 				sessionToken: ctx.bearer,

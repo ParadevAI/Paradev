@@ -17,6 +17,7 @@ describe("start auto-update options", () => {
 						daemon,
 						port: undefined,
 						org: undefined,
+						userScopedId: undefined,
 					},
 					signal: new AbortController().signal,
 				}),
@@ -41,7 +42,12 @@ describe("start auto-update options", () => {
 						api: { user: { myOrganizations: { query } } },
 					} as unknown as CliContext,
 					args: {},
-					options: { ...options, port: undefined, org: undefined },
+					options: {
+						...options,
+						port: undefined,
+						org: undefined,
+						userScopedId: undefined,
+					},
 					signal: new AbortController().signal,
 				}),
 			).rejects.toBe(lookupError);
