@@ -84,6 +84,12 @@ export const SANDBOX_DISPLAY = {
 	panelHeight: 28,
 } as const;
 
+/** Tag and log attribute names that readers use to find a workspace's records in Sentry. */
+export const SANDBOX_TELEMETRY_KEYS = {
+	cloudWorkspaceId: "cloud_workspace.id",
+	organizationId: "organization.id",
+} as const;
+
 /** Where `sync-assets` fetches by hash: `<base>/<sha256><suffix>`. */
 export const SANDBOX_ASSET_BASE_URL = "https://cdn.superset.sh/sandbox";
 
