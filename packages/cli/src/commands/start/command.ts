@@ -14,7 +14,10 @@ import {
 	readManifest,
 	removeManifestIfOwnedBy,
 } from "../../lib/host/manifest";
-import { isManifestLive } from "../../lib/host/manifest-liveness";
+import {
+	isManifestLive,
+	mayBeLiveHost,
+} from "../../lib/host/manifest-liveness";
 import {
 	describeHostExit,
 	type SpawnHostResult,
@@ -58,12 +61,12 @@ export default command({
 			options.userScopedId && !isUserScopedHostIdEnabled();
 		if (enableUserScope) {
 			for (const manifest of readHostManifests()) {
-				if (await isManifestLive(manifest)) {
+				if (await mayBeLiveHost(manifest)) {
 					const orgId = manifest.organizationId;
 					const orgName = orgs.find((org) => org.id === orgId)?.name ?? orgId;
 					throw new CLIError(
-						`Stop the host for ${orgName} before changing this user's host ID.`,
-						`Run paradev stop --org ${orgId}, then retry.`,
+						`A host may still be running for ${orgName}.`,
+						`Check PID ${manifest.pid} and stop the host before changing this user's host ID.`,
 					);
 				}
 			}

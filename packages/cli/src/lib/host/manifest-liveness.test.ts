@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import type { HostServiceManifest } from "./manifest";
-import { isManifestLive, verifyManifestOwner } from "./manifest-liveness";
+import {
+	isManifestLive,
+	mayBeLiveHost,
+	verifyManifestOwner,
+} from "./manifest-liveness";
 
 function manifestFor(pid: number): HostServiceManifest {
 	return {
@@ -67,4 +71,12 @@ describe("verifyManifestOwner", () => {
 		});
 		expect(alive).toBe(false);
 	});
+});
+
+test("treats an unidentified process that is still alive as a possible host", async () => {
+	const possibleHost = await mayBeLiveHost(manifestFor(42), {
+		isAlive: () => true,
+		inspectCommand: async () => null,
+	});
+	expect(possibleHost).toBe(true);
 });

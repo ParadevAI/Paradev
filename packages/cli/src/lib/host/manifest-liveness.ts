@@ -46,3 +46,16 @@ export async function isManifestLive(
 	if (!isAlive(manifest.pid)) return false;
 	return verifyManifestOwner(manifest, deps);
 }
+
+export async function mayBeLiveHost(
+	manifest: HostServiceManifest,
+	deps: Pick<ManifestLivenessDeps, "isAlive" | "inspectCommand"> = {},
+): Promise<boolean> {
+	const isAlive = deps.isAlive ?? isProcessAlive;
+	if (!isAlive(manifest.pid)) return false;
+	const inspectCommand = deps.inspectCommand ?? inspectProcessCommand;
+	const command = await inspectCommand(manifest.pid);
+	return command === null
+		? isAlive(manifest.pid)
+		: looksLikeHostProcess(command);
+}
