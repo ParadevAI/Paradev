@@ -172,6 +172,18 @@ try {
 		return elapsed;
 	};
 
+	// The agent-tools drive, stubbed as a directory at its mount path.
+	const stubSha = "f".repeat(64);
+	const writeDrive = () =>
+		exec(
+			`for name in claude pi; do mkdir -p ${SANDBOX_PATHS.agents}/$name/${stubSha} && printf '#!/bin/sh\\necho drive-%s\\n' $name > ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name && chmod 755 ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name; done && printf '%s' '${JSON.stringify(
+				[
+					{ name: "claude", sha: stubSha, bin: "claude" },
+					{ name: "pi", sha: stubSha, bin: "pi" },
+				],
+			)}' > ${SANDBOX_PATHS.agents}/manifest.json`,
+		);
+	writeDrive();
 	const first = boot(1);
 	const log1 = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	// The image may have been built from an older bundle than the one the
@@ -341,12 +353,12 @@ try {
 	);
 	expect("second boot: nothing fetched", !/fetched \//.test(log2));
 	expect("second boot: every step skipped", !/step \S+ running/.test(log2));
-	const binaries = exec(
-		"claude --version && superset --version && echo binaries-ok",
-		{ user: "ubuntu", check: false },
-	);
+	const binaries = exec("superset --version && echo binaries-ok", {
+		user: "ubuntu",
+		check: false,
+	});
 	expect(
-		"second boot: claude and superset still run from the media dir",
+		"second boot: superset still runs from the media dir",
 		/binaries-ok/.test(binaries),
 		binaries.trim().replace(/\n/g, " | "),
 	);
@@ -368,62 +380,28 @@ try {
 	);
 	console.log(`\nboot log (second boot):\n${log2}`);
 
-	// The agent-tools drive, stubbed as a directory at its mount path: the
-	// listed agent is linked from it, and a session without it falls back to
-	// the image's agents rather than to links that point nowhere.
-	const stop = () =>
-		exec(
-			`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,
-			{ check: false },
-		);
-	const stubSha = "f".repeat(64);
-	stop();
-	exec(
-		`: > ${SANDBOX_PATHS.bootLog}; for name in claude pi; do mkdir -p ${SANDBOX_PATHS.agents}/$name/${stubSha} && printf '#!/bin/sh\\necho drive-%s\\n' $name > ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name && chmod 755 ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name; done && printf '%s' '${JSON.stringify(
-			[
-				{ name: "claude", sha: stubSha, bin: "claude" },
-				{ name: "pi", sha: stubSha, bin: "pi" },
-			],
-		)}' > ${SANDBOX_PATHS.agents}/manifest.json`,
-	);
-	boot(3);
-	const logDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect(
 		"drive: listed agents linked",
-		/agents\.linked 2/.test(logDrive) &&
+		/agents\.linked 2/.test(log2) &&
 			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })) &&
 			/drive-pi/.test(exec("pi", { check: false, user: "ubuntu" })),
-		logDrive.match(/agents\..*/)?.[0],
+		log2.match(/agents\..*/)?.[0],
 	);
-	stop();
-	exec(`: > ${SANDBOX_PATHS.bootLog}; rm -rf ${SANDBOX_PATHS.agents}`);
-	const noDriveExit = bootAsUser();
+
+	// Without the drive the box has no agents: the boot is refused before
+	// host-service starts, so the open fails.
 	exec(
-		`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
+		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}; : > ${SANDBOX_PATHS.bootLog}; rm -rf ${SANDBOX_PATHS.agents}`,
 		{ check: false },
 	);
+	bootAsUser();
 	const logNoDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect(
-		"no drive: boot exits 0 and host-service ready",
-		/exit=0/.test(noDriveExit) && /host\.ready/.test(logNoDrive),
+		"no drive: boot refused before host-service starts",
+		/boot\.refused/.test(logNoDrive) && !/host\.exec/.test(logNoDrive),
+		logNoDrive.match(/boot\.refused.*/)?.[0],
 	);
-	expect(
-		"no drive: stamped unavailable",
-		/agents\.unavailable/.test(logNoDrive),
-	);
-	expect(
-		"no drive: image claude back on PATH",
-		exec("readlink -f /usr/local/bin/claude", { check: false }).startsWith(
-			SANDBOX_PATHS.media,
-		),
-		exec("readlink -f /usr/local/bin/claude", { check: false }).trim(),
-	);
-	expect(
-		"no drive: a drive-only agent's link is gone",
-		exec("test -L /usr/local/bin/pi && echo dangling", {
-			check: false,
-		}).trim() === "",
-	);
+	writeDrive();
 
 	// Third boot, with host-service deliberately broken: the box must stay
 	// alive, the desktop must still come up, and the log must say so.

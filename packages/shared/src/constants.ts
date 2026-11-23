@@ -204,12 +204,6 @@ export const FEATURE_FLAGS = {
 	CLOUD_WORKSPACES: "cloud-workspaces",
 	/** Per organization: shows Settings, Cloud usage, and gates the `cloud.*` procedures server-side. Unloaded or offline is off. */
 	CLOUD_USAGE: "cloud-usage",
-	/**
-	 * Mounts the bundle's agent-tools drive on an organization's boxes, so the
-	 * agent CLIs come from it instead of the image. Evaluated per organization
-	 * on every create and wake. Unloaded or offline means no drive.
-	 */
-	SANDBOX_AGENT_TOOLS_DRIVE: "sandbox-agent-tools-drive",
 	/** Sends an organization's box events to Sentry Logs, from each box's next create or wake. */
 	SANDBOX_BOX_LOGS: "sandbox-box-logs",
 	/**
