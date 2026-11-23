@@ -75,6 +75,7 @@ async function readShared(key: string): Promise<OrganizationBilling | null> {
 			cloudUsage: value.cloudUsage && {
 				...value.cloudUsage,
 				overagePerGbHour: value.cloudUsage.overagePerGbHour ?? null,
+				boughtPerGbHour: value.cloudUsage.boughtPerGbHour ?? null,
 				bought: value.cloudUsage.bought ?? null,
 				freeCredits: value.cloudUsage.freeCredits ?? null,
 				seats: value.cloudUsage.seats ?? null,

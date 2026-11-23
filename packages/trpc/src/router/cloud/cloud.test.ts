@@ -34,6 +34,7 @@ const CLOUD_USAGE: CloudUsage = {
 	autoTopup: null,
 	pack: null,
 	overagePerGbHour: 0.06,
+	boughtPerGbHour: null,
 	resetsAt: "2026-12-01T00:00:00.000Z",
 };
 
@@ -508,6 +509,7 @@ test("with billing off there are no periods and no prices", async () => {
 		items: [],
 		nextCursor: null,
 		ratePerGbHour: null,
+		boughtPerGbHour: null,
 	});
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
@@ -608,6 +610,30 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 			] as const
 		).map((field) => ({ field, reason: "not_read" })),
 	);
+});
+
+test("a custom-priced organization's dollars use its own prices", async () => {
+	const owner = caller(MAYA, {
+		readCloudUsage: async () => ({
+			...CLOUD_USAGE,
+			overagePerGbHour: 0.03,
+			boughtPerGbHour: 0.04,
+			pack: { gbMinutes: 60, price: 0.04 },
+		}),
+	});
+	const { items, ratePerGbHour, boughtPerGbHour } = await owner.periods.list(
+		{},
+	);
+	expect({ ratePerGbHour, boughtPerGbHour }).toEqual({
+		ratePerGbHour: 0.03,
+		boughtPerGbHour: 0.04,
+	});
+	expect(items[0]?.allowance).toMatchObject({
+		includedUsd: 0.6,
+		overageUsd: 0.42,
+	});
+	const usage = await owner.usage.query({ range: NOVEMBER });
+	expect(usage.total.usageUsd).toBeCloseTo(1.02);
 });
 
 describe("the list rate", () => {

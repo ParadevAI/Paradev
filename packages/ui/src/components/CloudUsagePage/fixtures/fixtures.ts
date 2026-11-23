@@ -686,7 +686,12 @@ function periodList(state: BillingState, member = false): CloudPeriods {
 			metrics: total(member ? rows.filter(isMember) : rows),
 		};
 	});
-	return { items, nextCursor: null, ratePerGbHour: RATE };
+	return {
+		items,
+		nextCursor: null,
+		ratePerGbHour: RATE,
+		boughtPerGbHour: RATE,
+	};
 }
 
 const noop = () => undefined;
@@ -752,6 +757,7 @@ export function noPeriodsArgs() {
 			items: [],
 			nextCursor: null,
 			ratePerGbHour: RATE,
+			boughtPerGbHour: null,
 		}),
 		period: undefined,
 		...overviewQueries(

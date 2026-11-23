@@ -5,6 +5,22 @@ type Balances = Parameters<typeof cloudUsageFromBalances>[0];
 
 const RESET = Date.UTC(2026, 10, 1);
 
+/** A Team version priced for one customer; the pack row below was bought on catalog Team. */
+const CUSTOM_TEAM_PLAN = {
+	id: "team",
+	name: "Team",
+	items: [
+		{
+			featureId: "box_gb_minutes",
+			price: { amount: 0.5, interval: "month", billingUnits: 1000 },
+		},
+		{
+			featureId: "box_gb_minutes",
+			price: { amount: 0.04, interval: "one_off", billingUnits: 60 },
+		},
+	],
+};
+
 function boxBalance(overrides: Partial<Balances[string]>): Balances {
 	return {
 		box_gb_minutes: {
@@ -36,8 +52,9 @@ describe("cloudUsageFromBalances", () => {
 			overageLimit: { type: "none" },
 			limitReached: false,
 			autoTopup: null,
-			pack: null,
 			overagePerGbHour: null,
+			boughtPerGbHour: null,
+			pack: null,
 			resetsAt: new Date(RESET).toISOString(),
 		});
 	});
@@ -64,8 +81,9 @@ describe("cloudUsageFromBalances", () => {
 			overageLimit: { type: "none" },
 			limitReached: false,
 			autoTopup: null,
-			pack: null,
 			overagePerGbHour: null,
+			boughtPerGbHour: null,
+			pack: null,
 			resetsAt: null,
 		});
 	});
@@ -74,7 +92,7 @@ describe("cloudUsageFromBalances", () => {
 		expect(cloudUsageFromBalances({})).toBeNull();
 	});
 
-	test("bought packs, with credit carried from an earlier pack, are apart from the monthly pool and from a granted credit", () => {
+	test("bought packs, with credit carried from an earlier pack, are apart from the monthly pool and from a granted credit, and priced as bought", () => {
 		const usage = cloudUsageFromBalances(
 			boxBalance({
 				granted: 446000,
@@ -134,8 +152,12 @@ describe("cloudUsageFromBalances", () => {
 					},
 				],
 			},
+			CUSTOM_TEAM_PLAN,
 		);
 		expect(usage).toMatchObject({
+			overagePerGbHour: 0.03,
+			boughtPerGbHour: expect.closeTo(0.06),
+			pack: { gbMinutes: 60, price: 0.04 },
 			includedGbMinutes: 360000,
 			usedGbMinutes: 360000,
 			overageGbMinutes: 0,

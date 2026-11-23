@@ -352,15 +352,27 @@ function environmentLimit(plan: AutumnCatalogPlan): number | null {
 	);
 }
 
-/** The plan's monthly price for a GB-hour beyond the allowance, when it sells overage. */
-export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
-	const price = plan.items.find(
-		(item) =>
-			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
-			item.price?.interval === "month",
-	)?.price;
+function perGbHour(
+	price:
+		| { amount?: number | null; billingUnits?: number | null }
+		| null
+		| undefined,
+): number | null {
 	if (price?.amount == null) return null;
-	return (price.amount * 60) / (price.billingUnits ?? 1);
+	return gbHourPackPricePerGbHour({
+		price: price.amount,
+		gbMinutes: price.billingUnits ?? 1,
+	});
+}
+
+function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
+	return perGbHour(
+		plan.items.find(
+			(item) =>
+				item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+				item.price?.interval === "month",
+		)?.price,
+	);
 }
 
 /** The plan's one-off GB-minute purchase, when it sells one. */
@@ -373,6 +385,66 @@ export function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
 	const gbMinutes = positiveNumber(price?.billingUnits);
 	const amount = positiveNumber(price?.amount);
 	return gbMinutes && amount ? { gbMinutes, price: amount } : null;
+}
+
+/** The fields of an Autumn GB-minute balance row that price it. */
+export interface GbMinuteBalanceRow {
+	includedGrant: number;
+	prepaidGrant: number;
+	reset: { interval: string } | null;
+	price: {
+		amount?: number | null;
+		billingUnits: number;
+		billingMethod: string;
+	} | null;
+}
+
+export interface GbHourRates {
+	/** The price of a GB-hour past the allowance. */
+	overagePerGbHour: number | null;
+	/** What the credit bought so far cost per GB-hour; null with none bought or a tiered price. */
+	boughtPerGbHour: number | null;
+	/** What the next purchase costs: Autumn charges the one-off item of the plan the customer holds. */
+	pack: GbHourPack | null;
+}
+
+export function isRecurringGbMinuteRow(row: GbMinuteBalanceRow): boolean {
+	return row.reset?.interval !== "one_off";
+}
+
+export function isBoughtGbMinuteRow(row: GbMinuteBalanceRow): boolean {
+	return !isRecurringGbMinuteRow(row) && row.price?.billingMethod === "prepaid";
+}
+
+function paidPerGbHour(rows: GbMinuteBalanceRow[]): number | null {
+	let gbMinutes = 0;
+	let usd = 0;
+	for (const row of rows) {
+		const granted = row.includedGrant + row.prepaidGrant;
+		if (granted === 0) continue;
+		if (row.price?.amount == null) return null;
+		gbMinutes += granted;
+		usd += (granted * row.price.amount) / row.price.billingUnits;
+	}
+	return gbMinutes > 0 ? (usd * 60) / gbMinutes : null;
+}
+
+/** The customer's own GB-hour prices: its balance rows first, then the plan version it holds, never the catalog. */
+export function gbHourRatesOf(
+	balance: { breakdown?: GbMinuteBalanceRow[] } | null | undefined,
+	plan: AutumnCatalogPlan | null | undefined,
+): GbHourRates {
+	const rows = balance?.breakdown ?? [];
+	const usageBased = rows.find(
+		(row) =>
+			isRecurringGbMinuteRow(row) && row.price?.billingMethod === "usage_based",
+	);
+	return {
+		overagePerGbHour:
+			perGbHour(usageBased?.price) ?? (plan ? overagePerGbHour(plan) : null),
+		boughtPerGbHour: paidPerGbHour(rows.filter(isBoughtGbMinuteRow)),
+		pack: plan ? gbHourPack(plan) : null,
+	};
 }
 
 export const GB_HOUR_PURCHASE = { min: 100, max: 30_000 };

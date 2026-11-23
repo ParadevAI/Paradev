@@ -1,7 +1,5 @@
 import {
-	gbHourPack,
 	type MachineSize,
-	overagePerGbHour,
 	PLAN_METADATA,
 	type PlanTier,
 } from "@superset/shared/billing";
@@ -132,7 +130,6 @@ export function billingFromCustomer(
 						currency: unpaidInvoice?.currency ?? null,
 					}
 				: { kind: "ok" };
-	const pack = paid?.plan ? gbHourPack(paid.plan) : null;
 	return {
 		tier,
 		autumnPlanId: paidPlanId,
@@ -161,9 +158,7 @@ export function billingFromCustomer(
 		cloudUsage: cloudUsageFromBalances(
 			customer.balances,
 			customer.billingControls,
-			pack,
-			(paid?.plan && overagePerGbHour(paid.plan)) ??
-				(pack && (pack.price * 60) / pack.gbMinutes),
+			paid?.plan,
 			seatCount(customer, paidPlanId),
 		),
 		planTier: planTierOf(paid?.plan?.metadata, tier),
