@@ -26,6 +26,8 @@ Agents(a) == <<"agents", a>>
 Aging(r) == r[1] \in {"box", "drive", "golden"}
 Min(a, b) == IF a < b THEN a ELSE b
 Range(s) == {s[i] : i \in DOMAIN s}
+\* The previous release's agents drive is kept this long after a release (48 h, 2 days).
+PrevKeep == 2 * ProvStuck
 
 NoRow == [st |-> "none", n |-> None, pin |-> None, t |-> 0, half |-> FALSE]
 GoneRow == [NoRow EXCEPT !.st = "gone"]
@@ -36,6 +38,7 @@ VARIABLES
   env,       \* env[d]: st, gs (goldens, newest last), act (active golden), prune (a build's prune is due)
   gcnt,      \* goldens built in database d
   rel,       \* production's current release; its agents drive is Agents(rel)
+  relAge,    \* days since rel was recorded, capped at PrevKeep
   ex,        \* ex[r]: the resource exists in Vercel
   age,       \* age[r]: days since created, capped at LeftoverAge
   mnt,       \* mnt[box]: the agents drive the box mounts
@@ -43,7 +46,7 @@ VARIABLES
   branched,  \* PREVIEW has been copied from PROD
   iso        \* ghost: PREVIEW has deleted nothing
 
-vars == <<rows, env, gcnt, rel, ex, age, mnt, tdQ, branched, iso>>
+vars == <<rows, env, gcnt, rel, relAge, ex, age, mnt, tdQ, branched, iso>>
 resVars == <<ex, age, mnt, iso>>
 
 Active(d) == d = "PROD" \/ branched
@@ -98,6 +101,7 @@ Init ==
                           ELSE NoEnv]
   /\ gcnt = [d \in DBs |-> IF d = "PROD" THEN 1 ELSE 0]
   /\ rel = 1
+  /\ relAge = 0
   /\ ex = [r \in Res |-> r \in {Golden(<<"PROD", 1>>), Agents(1)}]
   /\ age = [r \in Res |-> 0]
   /\ mnt = [r \in Res |-> None]
@@ -110,8 +114,9 @@ Tick ==
   LET rows2 == [d \in DBs |-> [w \in WS |->
                   [rows[d][w] EXCEPT !.t = Min(@ + 1, Cap(rows[d][w]))]]]
       age2 == [r \in Res |-> IF ex[r] /\ Aging(r) THEN Min(age[r] + 1, LeftoverAge) ELSE age[r]]
-  IN /\ <<rows2, age2>> # <<rows, age>>
-     /\ rows' = rows2 /\ age' = age2
+      relAge2 == Min(relAge + 1, PrevKeep)
+  IN /\ <<rows2, age2, relAge2>> # <<rows, age, relAge>>
+     /\ rows' = rows2 /\ age' = age2 /\ relAge' = relAge2
      /\ UNCHANGED <<env, gcnt, rel, ex, mnt, tdQ, branched, iso>>
 
 \* PREVIEW is a copy of PROD, taken at any time.  Queued jobs are not copied.
@@ -120,7 +125,7 @@ Branch ==
   /\ branched' = TRUE
   /\ rows' = [rows EXCEPT !["PREVIEW"] = rows["PROD"]]
   /\ env' = [env EXCEPT !["PREVIEW"] = [env["PROD"] EXCEPT !.prune = FALSE]]
-  /\ UNCHANGED <<gcnt, rel, ex, age, mnt, tdQ, iso>>
+  /\ UNCHANGED <<gcnt, rel, relAge, ex, age, mnt, tdQ, iso>>
 
 -----------------------------------------------------------------------------
 (* User actions: they create, or set a status.  They delete nothing.       *)
@@ -135,7 +140,7 @@ Create(d, w) ==
      /\ ex' = [ex EXCEPT ![Box(n)] = TRUE, ![Drive(n)] = TRUE]
      /\ age' = [age EXCEPT ![Box(n)] = 0, ![Drive(n)] = 0]
      /\ mnt' = [mnt EXCEPT ![Box(n)] = rel]
-  /\ UNCHANGED <<env, gcnt, rel, tdQ, branched, iso>>
+  /\ UNCHANGED <<env, gcnt, rel, relAge, tdQ, branched, iso>>
 
 \* A boot or a wake mounts the current release's agents drive.
 BootOrWake(d, w, from) ==
@@ -143,7 +148,7 @@ BootOrWake(d, w, from) ==
   /\ ex[Box(rows[d][w].n)]
   /\ SetRow(d, w, "awake")
   /\ mnt' = [mnt EXCEPT ![Box(rows[d][w].n)] = rel]
-  /\ UNCHANGED <<env, gcnt, rel, ex, age, tdQ, branched, iso>>
+  /\ UNCHANGED <<env, gcnt, rel, relAge, ex, age, tdQ, branched, iso>>
 
 Boot(d, w) == BootOrWake(d, w, "provisioning")
 Wake(d, w) == BootOrWake(d, w, "asleep")
@@ -151,7 +156,7 @@ Wake(d, w) == BootOrWake(d, w, "asleep")
 Move(d, w, from, to) ==
   /\ rows[d][w].st \in from /\ rows[d][w].n # None /\ ~rows[d][w].half
   /\ SetRow(d, w, to)
-  /\ UNCHANGED <<env, gcnt, rel, ex, age, mnt, tdQ, branched, iso>>
+  /\ UNCHANGED <<env, gcnt, rel, relAge, ex, age, mnt, tdQ, branched, iso>>
 
 \* A stop replaces the box's previous snapshot; that is not a deletion.
 Sleep(d, w) == Move(d, w, {"awake"}, "asleep")
@@ -171,19 +176,19 @@ Fail(d, w) ==
           /\ tdQ' = tdQ \cup {<<d, rows[d][w].n>>}
      ELSE /\ SetRow(d, w, "failed")
           /\ UNCHANGED tdQ
-  /\ UNCHANGED <<env, gcnt, rel, ex, age, mnt, branched, iso>>
+  /\ UNCHANGED <<env, gcnt, rel, relAge, ex, age, mnt, branched, iso>>
 
 \* The daily purge deletes an organization's rows; its resources stay.
 OrgDelete(d) ==
   /\ "org" \in Ops /\ Active(d) /\ env[d].st # "gone"
   /\ rows' = [rows EXCEPT ![d] = [w \in WS |-> GoneRow]]
   /\ env' = [env EXCEPT ![d] = [NoEnv EXCEPT !.st = "gone"]]
-  /\ UNCHANGED <<gcnt, rel, ex, age, mnt, tdQ, branched, iso>>
+  /\ UNCHANGED <<gcnt, rel, relAge, ex, age, mnt, tdQ, branched, iso>>
 
 EnvArchive(d) ==
   /\ "envarchive" \in Ops /\ Active(d) /\ env[d].st = "live"
   /\ env' = [env EXCEPT ![d].st = "archived", ![d].prune = FALSE]
-  /\ UNCHANGED <<rows, gcnt, rel, ex, age, mnt, tdQ, branched, iso>>
+  /\ UNCHANGED <<rows, gcnt, rel, relAge, ex, age, mnt, tdQ, branched, iso>>
 
 \* Rule 2: a build or a promote makes a golden, swaps it in, then prunes.
 Build(d) ==
@@ -193,7 +198,7 @@ Build(d) ==
      /\ ex' = [ex EXCEPT ![Golden(g)] = TRUE]
      /\ age' = [age EXCEPT ![Golden(g)] = 0]
   /\ gcnt' = [gcnt EXCEPT ![d] = @ + 1]
-  /\ UNCHANGED <<rows, rel, mnt, tdQ, branched, iso>>
+  /\ UNCHANGED <<rows, rel, relAge, mnt, tdQ, branched, iso>>
 
 DropGoldens(d, S) ==
   env' = [env EXCEPT ![d].gs = SelectSeq(@, LAMBDA x : x \notin S), ![d].prune = FALSE]
@@ -203,12 +208,12 @@ BuildPrune(d) ==
   /\ LET S == IF Rule2On THEN {g \in BeyondK(d) : PinGuard(d, g)} ELSE {} IN
      /\ DelBy({Golden(g) : g \in S}, d)
      /\ IF CanDelete(d) THEN DropGoldens(d, S) ELSE env' = [env EXCEPT ![d].prune = FALSE]
-  /\ UNCHANGED <<rows, gcnt, rel, tdQ, branched>>
+  /\ UNCHANGED <<rows, gcnt, rel, relAge, tdQ, branched>>
 
 \* Releases come from main only.
 Release ==
   /\ "release" \in Ops /\ rel < MaxReleases
-  /\ rel' = rel + 1
+  /\ rel' = rel + 1 /\ relAge' = 0
   /\ ex' = [ex EXCEPT ![Agents(rel + 1)] = TRUE]
   /\ UNCHANGED <<rows, env, gcnt, age, mnt, tdQ, branched, iso>>
 
@@ -219,7 +224,7 @@ VercelExpire(b) ==
   /\ ex' = [ex EXCEPT ![b] = FALSE]
   /\ age' = [age EXCEPT ![b] = 0]
   /\ mnt' = [mnt EXCEPT ![b] = None]
-  /\ UNCHANGED <<rows, env, gcnt, rel, tdQ, branched, iso>>
+  /\ UNCHANGED <<rows, env, gcnt, rel, relAge, tdQ, branched, iso>>
 
 -----------------------------------------------------------------------------
 (* The cleanup job, against database d.                                     *)
@@ -236,24 +241,24 @@ Retire(d, w) ==
      ELSE /\ DelBy({Drive(rows[d][w].n)}, d)
           /\ rows' = [rows EXCEPT ![d][w].half = TRUE]
           /\ UNCHANGED tdQ
-  /\ UNCHANGED <<env, gcnt, rel, branched>>
+  /\ UNCHANGED <<env, gcnt, rel, relAge, branched>>
 
 RetireHalf(d, w) ==
   /\ Live(d, w) /\ rows[d][w].half
   /\ rows' = [rows EXCEPT ![d][w] = RetiredRow(@)]
   /\ tdQ' = tdQ \cup {<<d, rows[d][w].n>>}
-  /\ UNCHANGED <<env, gcnt, rel, ex, age, mnt, branched, iso>>
+  /\ UNCHANGED <<env, gcnt, rel, relAge, ex, age, mnt, branched, iso>>
 
 TdRun(j) ==
   /\ j \in tdQ
   /\ DelBy({Box(j[2]), Drive(j[2])}, j[1])
   /\ tdQ' = tdQ \ {j}
-  /\ UNCHANGED <<rows, env, gcnt, rel, branched>>
+  /\ UNCHANGED <<rows, env, gcnt, rel, relAge, branched>>
 
 TdGiveUp(j) ==
   /\ ~TeardownRetries /\ j \in tdQ
   /\ tdQ' = tdQ \ {j}
-  /\ UNCHANGED <<rows, env, gcnt, rel, ex, age, mnt, branched, iso>>
+  /\ UNCHANGED <<rows, env, gcnt, rel, relAge, ex, age, mnt, branched, iso>>
 
 \* Rule 2 for archived environments.  CleanupPrunesPinned: the job also
 \* prunes a live environment's goldens beyond the newest K.
@@ -262,15 +267,24 @@ EnvGoldenDelete(d, g) ==
   /\ CleanupPrunesPinned /\ env[d].st = "live" /\ g \in BeyondK(d)
   /\ DelBy({Golden(g)}, d)
   /\ DropGoldens(d, {g})
-  /\ UNCHANGED <<rows, gcnt, rel, tdQ, branched>>
+  /\ UNCHANGED <<rows, gcnt, rel, relAge, tdQ, branched>>
 
-\* Rule 3: an agents drive not the current release's that no box mounts.
+\* A running box holds the agents drive it booted with; Vercel refuses to delete it.
+HeldByRunning(a) ==
+  \E d \in DBs, w \in WS :
+    LET n == rows[d][w].n IN
+    rows[d][w].st = "awake" /\ n # None /\ ex[Box(n)] /\ mnt[Box(n)] = a
+
+\* Rule 3: an agents drive that is not the current release's, nor the previous
+\* one's within PrevKeep of the release.  A stopped box's mount does not keep it:
+\* a wake mounts the current release's drive.
 AgentsCleanup(d, a) ==
   /\ Rule3On /\ JobRuns(d)
   /\ ex[Agents(a)] /\ a # rel
-  /\ ~\E b \in Res : b[1] = "box" /\ ex[b] /\ mnt[b] = a
+  /\ ~(a = rel - 1 /\ relAge < PrevKeep)
+  /\ ~HeldByRunning(a)
   /\ DelBy({Agents(a)}, d)
-  /\ UNCHANGED <<rows, env, gcnt, rel, tdQ, branched>>
+  /\ UNCHANGED <<rows, env, gcnt, rel, relAge, tdQ, branched>>
 
 NamedIn(d, r) ==
   IF r[1] = "golden"
@@ -285,7 +299,7 @@ Leftover(d, r) ==
   /\ LeftoverBoxesOnly => r[1] = "box"
   /\ ~NamedIn(d, r)
   /\ DelBy({r}, d)
-  /\ UNCHANGED <<rows, env, gcnt, rel, tdQ, branched>>
+  /\ UNCHANGED <<rows, env, gcnt, rel, relAge, tdQ, branched>>
 
 -----------------------------------------------------------------------------
 User == \E d \in DBs, w \in WS :
@@ -324,7 +338,7 @@ Used(r) ==
          \/ Overlay /\ PinnedIn("PROD", r[2])
     [] r[1] = "agents" ->
          \/ rel = r[2]
-         \/ \E b \in Res : b[1] = "box" /\ ex[b] /\ mnt[b] = r[2]
+         \/ HeldByRunning(r[2])
 
 NoDeleteWhileUsed == [][\A r \in Res : ex[r] /\ ~ex'[r] => ~Used(r)]_vars
 

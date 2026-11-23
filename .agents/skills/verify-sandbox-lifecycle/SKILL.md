@@ -34,7 +34,7 @@ non-zero if any config gives a result other than the expected one.
 | --- | --- | --- |
 | 1 Workspaces: a workspace not in use is deleted (box, snapshot, drive) after its wait: asleep 30 days after last use, archived 7 days (an unarchive before the retire keeps everything), failed 30 days, stuck creating 1 day | cleanup job | `Retire`, `TdRun` |
 | 2 Goldens: each live environment keeps its 3 newest; OVERLAY: never one a workspace is pinned to | the build or promote; with OVERLAY, the cleanup job for live environments | `Build`, `BuildPrune`, `EnvGoldenDelete` |
-| 3 Leftovers: anything nothing in production refers to, older than 7 days, an archived environment's goldens included (only a live environment names its goldens); an agents drive not the current release's that no box mounts | cleanup job | `Leftover`, `AgentsCleanup` |
+| 3 Leftovers: anything nothing in production refers to, older than 7 days, an archived environment's goldens included (only a live environment names its goldens); an agents drive that is not the current release's, nor the previous release's within 48 hours of the current one (a running box's is refused by Vercel) | cleanup job | `Leftover`, `AgentsCleanup` |
 
 Mechanics:
 
@@ -104,7 +104,9 @@ so each finishes in about a minute; builds in both databases at once are checked
    row still archived, so an unarchive that lands before it keeps everything; one after it gets a new box.
 6. **A wake at day 30 against the retire:** the retire is one conditional write (still asleep,
    still past the wait). A wake before it wins.
-7. **A stopped box counts as mounting** the agents drive it last booted with.
+7. **A stopped box's mount keeps nothing.** A wake mounts the current release's agents drive, so
+   only a running box holds an old one, and Vercel refuses to delete a drive a running box holds.
+   The previous release's drive is kept for `PrevKeep` (48 hours) after a release, for a rollback.
 8. **"Retried until done" is backed up by rule 3:** a teardown that gives up leaves a box and drive
    no row names, and rule 3 deletes them after 7 days.
 
