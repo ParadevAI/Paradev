@@ -20285,6 +20285,9 @@ msgstr "Чат залишиться без змін. Файли, які будь
 msgid "the cloud"
 msgstr "хмара"
 
+msgid "The cloud workspace could not start"
+msgstr "Не вдалося запустити хмарний робочий простір"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Хмарний робочий простір не запущено. Запустіть його й спробуйте ще раз."
 

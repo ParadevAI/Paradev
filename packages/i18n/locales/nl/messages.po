@@ -20291,6 +20291,9 @@ msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan
 msgid "the cloud"
 msgstr "de cloud"
 
+msgid "The cloud workspace could not start"
+msgstr "De cloudwerkruimte kon niet starten"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "De cloudwerkruimte draait niet. Start hem en probeer het opnieuw."
 

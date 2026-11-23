@@ -6,11 +6,13 @@ import {
 	setSystemTime,
 	test,
 } from "bun:test";
+import * as Sentry from "@sentry/core";
 import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
 	applyClaimInPlace,
+	CloudWorkspaceNotStartedError,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
@@ -25,6 +27,7 @@ import {
 	sandboxExists,
 	stopSandbox,
 	topUpSandboxSession,
+	WAKE_READY_DEADLINE_MS,
 	wakeSandbox,
 } from "./vercel";
 
@@ -683,4 +686,77 @@ test("a box that did not get ready names the boot phases it reached, with offset
 	expect(new SandboxNotReadyError("ws-box", null).message).toEndWith(
 		"the boot reached an unreadable boot log",
 	);
+});
+
+describe("a wake past its deadline", () => {
+	const reports: unknown[] = [];
+	stub(Sentry, {
+		captureMessage: (message: string, context: unknown) => {
+			reports.push([message, context]);
+			return "";
+		},
+	});
+	stub(Sandbox, {
+		get: async () => ({
+			status: "running",
+			region: "iad1",
+			vcpus: 8,
+			timeout: SESSION_TIMEOUT_MS,
+			expiresAt: new Date(Date.now() + SESSION_TIMEOUT_MS),
+			domain: () => "https://slow.example",
+			extendTimeout: async () => {},
+			update: async () => {},
+			writeFiles: async () => {},
+			runCommand: async () => ({ exitCode: 0 }),
+		}),
+	});
+	stub(globalThis, { fetch: async () => new Response("", { status: 503 }) });
+
+	test("gives up when host-service has not answered, and reports the box once", async () => {
+		let now = 0;
+		const clock = {
+			now: () => now,
+			sleep: async (ms: number) => {
+				now += ms;
+			},
+		};
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "ws-slow",
+				claim: {
+					vcpus: 8,
+					hostSecret: "s",
+					managedEnv: {},
+					networkPolicy: "allow-all",
+					identity: {
+						SUPERSET_SANDBOX_CONTRACT: "1",
+						SUPERSET_API_URL: "https://api.test",
+						SUPERSET_SANDBOX_WORKSPACE_ID:
+							"2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+						SUPERSET_SANDBOX_ORGANIZATION_ID:
+							"1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+						SUPERSET_SANDBOX_REPOSITORIES: "[]",
+						SUPERSET_SANDBOX_IMAGE_TAG: "image",
+						SUPERSET_SANDBOX_PROVIDER: "vercel",
+						SUPERSET_BUNDLE_SHA: "a".repeat(64),
+					},
+				} as never,
+				clock,
+			}),
+		).rejects.toBeInstanceOf(CloudWorkspaceNotStartedError);
+		expect(reports).toEqual([
+			[
+				"cloud workspace wake missed its deadline",
+				{
+					level: "error",
+					tags: {
+						"sandbox.box": "ws-slow",
+						"sandbox.region": "iad1",
+						"sandbox.vcpus": "8",
+					},
+					extra: { elapsedMs: WAKE_READY_DEADLINE_MS },
+				},
+			],
+		]);
+	});
 });

@@ -20291,6 +20291,9 @@ msgstr "Chat vẫn giữ nguyên. Các tệp đã được bất kỳ ai sửa k
 msgid "the cloud"
 msgstr "cloud"
 
+msgid "The cloud workspace could not start"
+msgstr "Không thể khởi động không gian làm việc trên cloud"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Không gian làm việc trên cloud chưa chạy. Hãy khởi động nó rồi thử lại."
 

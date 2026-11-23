@@ -20291,6 +20291,9 @@ msgstr "Czat zostaje bez zmian. Pliki edytowane od tej tury przez kogokolwiek po
 msgid "the cloud"
 msgstr "chmura"
 
+msgid "The cloud workspace could not start"
+msgstr "Nie udało się uruchomić obszaru roboczego w chmurze"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Obszar roboczy w chmurze nie działa. Uruchom go i spróbuj ponownie."
 

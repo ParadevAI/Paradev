@@ -20291,6 +20291,9 @@ msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siap
 msgid "the cloud"
 msgstr "cloud"
 
+msgid "The cloud workspace could not start"
+msgstr "Workspace cloud tidak dapat dijalankan"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Workspace cloud tidak berjalan. Jalankan, lalu coba lagi."
 

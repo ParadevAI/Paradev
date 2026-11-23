@@ -59,6 +59,7 @@ export {
 export {
 	type ActiveWorkspaceSandbox,
 	type BoxSession,
+	CloudWorkspaceNotStartedError,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,

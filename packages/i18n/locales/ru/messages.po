@@ -20291,6 +20291,9 @@ msgstr "Чат остаётся как есть. Файлы, которые кт
 msgid "the cloud"
 msgstr "облако"
 
+msgid "The cloud workspace could not start"
+msgstr "Не удалось запустить облачную рабочую область"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "Облачная рабочая область не запущена. Запустите её и повторите попытку."
 

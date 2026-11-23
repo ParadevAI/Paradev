@@ -20291,6 +20291,9 @@ msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui q
 msgid "the cloud"
 msgstr "le cloud"
 
+msgid "The cloud workspace could not start"
+msgstr "L'espace de travail cloud n'a pas pu démarrer"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "L'espace de travail cloud n'est pas en cours d'exécution. Démarrez-le, puis réessayez."
 

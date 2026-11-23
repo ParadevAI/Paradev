@@ -20291,6 +20291,9 @@ msgstr "チャットはそのまま残ります。このターンの後に誰か
 msgid "the cloud"
 msgstr "クラウド"
 
+msgid "The cloud workspace could not start"
+msgstr "クラウドワークスペースを起動できませんでした"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "クラウドワークスペースが起動していません。起動してから、もう一度お試しください。"
 

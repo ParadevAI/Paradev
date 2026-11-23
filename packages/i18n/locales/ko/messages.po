@@ -20291,6 +20291,9 @@ msgstr "채팅은 그대로 유지됩니다. 이 턴 이후 누군가 편집한 
 msgid "the cloud"
 msgstr "클라우드"
 
+msgid "The cloud workspace could not start"
+msgstr "클라우드 워크스페이스를 시작할 수 없습니다"
+
 msgid "The cloud workspace is not running. Start it, then try again."
 msgstr "클라우드 워크스페이스가 실행 중이 아닙니다. 시작한 다음 다시 시도하세요."
 

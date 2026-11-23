@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
+import { CLOUD_WORKSPACE_NOT_STARTED_KEY } from "@superset/shared/sandbox/access";
 import { stub } from "../../../test/stub";
 import * as attachments from "../../lib/attachments";
 import * as plan from "../../lib/billing/plan";
@@ -160,8 +161,14 @@ stub(sandbox, {
 	recordWorkspaceRepositories: async () => {},
 	workspaceBranchName: () => "paradev/ws-1",
 });
+let wakeFailure: Error | null = null;
+const markedUnavailable: string[] = [];
 stub(wake, {
+	markSandboxUnavailable: async (row: { id: string }) => {
+		markedUnavailable.push(row.id);
+	},
 	wakeCloudWorkspace: async () => {
+		if (wakeFailure) throw wakeFailure;
 		if (!running) return null;
 		return {
 			hostTarget: "https://box-1.example",
@@ -414,5 +421,19 @@ describe("cloudWorkspace.access in one large batch", () => {
 		const granted = await Promise.all(addresses);
 		expect(granted).toHaveLength(64);
 		expect(peakDescribing).toBeLessThanOrEqual(8);
+	});
+});
+
+describe("cloudWorkspace.access with wake, past the wake deadline", () => {
+	test("answers the could-not-start key, and leaves the workspace as it was", async () => {
+		wakeFailure = new sandbox.CloudWorkspaceNotStartedError();
+		const error = await caller.cloudWorkspace
+			.access({ id: WORKSPACE_ID, wake: true })
+			.catch((e) => e);
+		wakeFailure = null;
+		expect(error.code).toBe("TIMEOUT");
+		expect(error.message).toBe("The cloud workspace could not start");
+		expect(error.cause.i18nKey).toBe(CLOUD_WORKSPACE_NOT_STARTED_KEY);
+		expect(markedUnavailable).toEqual([]);
 	});
 });
