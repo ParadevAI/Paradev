@@ -4,7 +4,6 @@ import { eq } from "drizzle-orm";
 import { logControl } from "../../lib/control-log";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
-	deleteSandbox,
 	describeSandbox,
 	rerunBoxStartHook,
 	runBoxArchiveHook,
@@ -12,8 +11,8 @@ import {
 	stopSandbox,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
-import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
-import { recordBootEnd, recordBoxStopped } from "./sandbox-sleep";
+import { queueSettleWorkspace } from "./meter";
+import { recordBoxStopped } from "./sandbox-sleep";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -24,6 +23,7 @@ export interface ReapArchivedCloudWorkspaceInput {
 	cloudWorkspaceId: string;
 	/** The archive this reap belongs to; a later archive queues its own. */
 	archivedAt: string;
+	/** `delete` only arrives from archives queued before the cleanup job; drop it 7 days after deploy. */
 	stage: "stop" | "delete";
 }
 
@@ -83,26 +83,16 @@ async function runArchiveHook(
 
 export async function reapArchivedCloudWorkspace(
 	input: ReapArchivedCloudWorkspaceInput,
-): Promise<"stopped" | "reaped" | "skipped"> {
+): Promise<"stopped" | "skipped"> {
 	const row = await findRow(input.cloudWorkspaceId);
 	if (!isStillArchived(row, input)) {
 		return "skipped";
 	}
 	if (input.stage === "delete") {
-		await recordBootEnd(
-			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
-			{ sessionId: null, reason: "archived" },
+		console.log(
+			`[cloud-workspace] ${row.id} reap delete left to the cleanup job (rule 1)`,
 		);
-		await settleWorkspaceNow(row.id).catch((error) =>
-			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
-		);
-		await deleteSandbox(row.providerSandboxId);
-		await reapWorkspaceFiles(row.id);
-		logControl("archive.deleted", {
-			cloudWorkspaceId: row.id,
-			organizationId: row.organizationId,
-		});
-		return "reaped";
+		return "skipped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	const stopped = await stopSandbox(row.providerSandboxId);
@@ -149,9 +139,8 @@ function queueReapStage(
 }
 
 /**
- * Stops the box after a short delay, and deletes it once the grace period is over.
- * Throws only when the delete could not be queued; a stop that could not be
- * queued happens now instead.
+ * Stops the box after a short delay; a stop that could not be queued happens
+ * now instead. The cleanup job deletes the box once the grace period is over.
  */
 export async function queueReap(
 	input: Omit<ReapArchivedCloudWorkspaceInput, "stage">,
@@ -161,7 +150,6 @@ export async function queueReap(
 		sandboxSessionId: string | null;
 	},
 ): Promise<void> {
-	await queueReapStage({ ...input, stage: "delete" }, ARCHIVE_GRACE_SECONDS);
 	await queueReapStage(
 		{ ...input, stage: "stop" },
 		ARCHIVE_STOP_DELAY_SECONDS,

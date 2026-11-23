@@ -140,6 +140,10 @@
 			"types": "./src/lib/sandbox/environment-build/index.ts",
 			"default": "./src/lib/sandbox/environment-build/index.ts"
 		},
+		"./cloud-workspace-retention": {
+			"types": "./src/router/cloud-workspace/retention.ts",
+			"default": "./src/router/cloud-workspace/retention.ts"
+		},
 		"./automation-dispatch": {
 			"types": "./src/router/automation/dispatch.ts",
 			"default": "./src/router/automation/dispatch.ts"

@@ -12,7 +12,6 @@ import { nudge } from "../../lib/realtime";
 import {
 	bootPhases,
 	buildSandboxClaim,
-	deleteSandbox,
 	provisionSandbox,
 	SandboxNotReadyError,
 	scheduleRulesRefresh,
@@ -162,10 +161,10 @@ async function provision(
 			},
 		});
 		if (!ready) {
-			// Deleted while the box was being made: the delete won the row, so
-			// the box it never knew about goes with it. A duplicate delivery of
-			// this job loses the row to the first one and must leave the box be:
-			// the name is per workspace, so it is the same box.
+			// Archived while the box was being made: the archive won the row, so
+			// the box is stopped and left to the cleanup job's teardown. A
+			// duplicate delivery of this job loses the row to the first one and
+			// must leave the box be: the name is per workspace, so it is the same box.
 			const current = await db.query.cloudWorkspaces.findFirst({
 				where: eq(cloudWorkspaces.id, row.id),
 				columns: { status: true },
@@ -178,7 +177,7 @@ async function provision(
 							error,
 						),
 				);
-				await deleteSandbox(providerSandboxId);
+				await stopSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId, "provision_abandoned");
 			}
 			await naming.catch(() => {});
@@ -240,18 +239,13 @@ async function provision(
 				),
 			);
 		}
-		// A box that booted but whose host-service never answered is kept for
-		// diagnosis, stopped: its boot log, desktop and shell are a resume
-		// away, it costs storage rather than compute meanwhile, and a delete
-		// from the sidebar still removes it. Any other failure must not leak
-		// a box, since billing started at provision.
-		const keepForDiagnosis = error instanceof SandboxNotReadyError;
-		await (keepForDiagnosis ? stopSandbox : deleteSandbox)(
-			providerSandboxId,
-		).catch((teardownError) => {
+		// A failed create only stops the box: it costs storage, not compute,
+		// its boot log is a resume away, and the cleanup job deletes it 30
+		// days after the failure (rule 1).
+		await stopSandbox(providerSandboxId).catch((stopError) => {
 			console.error(
-				`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}`,
-				teardownError,
+				`[cloud-workspace] could not stop sandbox ${providerSandboxId}`,
+				stopError,
 			);
 		});
 		await failCloudWorkspace({
@@ -261,7 +255,7 @@ async function provision(
 				bootId,
 			},
 			from: ["provisioning", "awake", "asleep"],
-			set: keepForDiagnosis ? { providerSandboxId } : {},
+			set: { providerSandboxId },
 			reason: provisionFailureReason(error),
 			error,
 		});

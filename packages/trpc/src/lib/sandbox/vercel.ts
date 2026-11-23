@@ -48,6 +48,7 @@ import {
 	CODEX_SYSTEM_CONFIG_PATH,
 	type SandboxFile,
 } from "./credentials";
+import { sandboxDeletesAllowed } from "./deletes";
 
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
@@ -61,7 +62,6 @@ const MIN_TOP_UP_MS = 60 * 1000;
 /** What host-service bundles that do not report their keepalive interval ping at. */
 const LEGACY_KEEPALIVE_INTERVAL_MS = 15 * 60 * 1000;
 const KEEPALIVE_MARGIN_MS = 5 * 60 * 1000;
-const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
@@ -329,7 +329,6 @@ export async function provisionSandbox(args: {
 	name: string;
 	environment: SandboxEnvironment;
 	claim: SandboxClaim;
-	/** A golden under construction keeps its snapshots until its row goes. */
 	kind?: "workspace" | "environment";
 }): Promise<{
 	providerSandboxId: string;
@@ -347,8 +346,8 @@ export async function provisionSandbox(args: {
 		env: {},
 		networkPolicy: args.claim.networkPolicy,
 		persistent: true,
-		snapshotExpiration:
-			kind === "environment" ? 0 : WORKSPACE_SNAPSHOT_EXPIRATION_MS,
+		// Vercel never expires a snapshot: the retention reaper decides when a box goes.
+		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
@@ -1248,6 +1247,45 @@ export async function listActiveWorkspaceSandboxes(
 		}
 	}
 	return found;
+}
+
+export interface ListedSandbox {
+	name: string;
+	createdAt: number;
+}
+
+/** Every box in the project, whatever its status or database; throws if a page fails. */
+export async function listProjectSandboxes(): Promise<ListedSandbox[]> {
+	const sandboxes = await (
+		await Sandbox.list({ ...credentials(), limit: 50 })
+	).toArray();
+	return sandboxes.map((sandbox) => ({
+		name: sandbox.name,
+		createdAt: sandbox.createdAt,
+	}));
+}
+
+/** Every drive in the project; throws if a page fails. */
+export async function listProjectDrives(): Promise<
+	Array<{ name: string; createdAt: number }>
+> {
+	const drives = await (
+		await Drive.list({ ...credentials(), limit: 50 })
+	).toArray();
+	return drives.map((drive) => ({
+		name: drive.name,
+		createdAt: drive.createdAt.getTime(),
+	}));
+}
+
+/** Throws while a box holds it; a drive already gone is the state we wanted. */
+export async function deleteDrive(name: string): Promise<void> {
+	if (!sandboxDeletesAllowed(`drive ${name}`)) return;
+	const drive = await Drive.get({ ...credentials(), name }).catch((error) => {
+		if (isNotFound(error)) return null;
+		throw error;
+	});
+	await drive?.delete();
 }
 
 /** Best-effort: a sandbox already gone is the state we wanted. */

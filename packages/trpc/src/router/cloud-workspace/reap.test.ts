@@ -13,6 +13,7 @@ type Row = {
 	deletedAt: Date | null;
 	provider: string;
 	providerSandboxId: string;
+	updatedAt?: Date;
 };
 type Stage = "stop" | "delete";
 
@@ -107,7 +108,6 @@ const input = {
 	cloudWorkspaceId: "00000000-0000-0000-0000-000000000001",
 	archivedAt: archivedAt.toISOString(),
 };
-const SEVEN_DAYS = 7 * 24 * 60 * 60;
 
 const BOX = {
 	organizationId: "org_1",
@@ -123,14 +123,9 @@ describe("queueReap", () => {
 		recordedAsleep = [];
 	});
 
-	test("queues the delete after seven days and the stop after a minute", async () => {
+	test("queues only the stop, after a minute: the cleanup job deletes the box", async () => {
 		await queueReap(input, BOX);
 		expect(queued).toEqual([
-			{
-				path: "/api/cloud-workspaces/reap",
-				body: { ...input, stage: "delete" },
-				delaySeconds: SEVEN_DAYS,
-			},
 			{
 				path: "/api/cloud-workspaces/reap",
 				body: { ...input, stage: "stop" },
@@ -147,9 +142,7 @@ describe("queueReap", () => {
 		expect(recordedAsleep).toEqual([
 			[input.cloudWorkspaceId, { sessionId: "session_1" }],
 		]);
-		expect(queued.map((job) => (job.body as { stage: Stage }).stage)).toEqual([
-			"delete",
-		]);
+		expect(queued).toEqual([]);
 	});
 
 	test("a stop that could not be queued ends the stopped session's boot as archived", async () => {
@@ -159,12 +152,6 @@ describe("queueReap", () => {
 		expect(endedBoots).toEqual([
 			[input.cloudWorkspaceId, { sessionId: "session_1", reason: "archived" }],
 		]);
-	});
-
-	test("a delete that could not be queued throws so the caller deletes the box", async () => {
-		failingStage = "delete";
-		await expect(queueReap(input, BOX)).rejects.toThrow("qstash down");
-		expect(queued).toEqual([]);
 	});
 });
 
@@ -193,13 +180,6 @@ describe("reapArchivedCloudWorkspace", () => {
 		await reapArchivedCloudWorkspace({ ...input, stage: "stop" });
 		expect(endedBoots).toEqual([
 			[input.cloudWorkspaceId, { sessionId: "session_1", reason: "archived" }],
-		]);
-	});
-
-	test("the delete stage ends every boot still open as archived", async () => {
-		await reapArchivedCloudWorkspace({ ...input, stage: "delete" });
-		expect(endedBoots).toEqual([
-			[input.cloudWorkspaceId, { sessionId: null, reason: "archived" }],
 		]);
 	});
 
@@ -252,25 +232,14 @@ describe("reapArchivedCloudWorkspace", () => {
 		expect(meterCalls).toEqual([]);
 	});
 
-	test("the delete stage settles the box's usage before deleting it", async () => {
+	test("the delete stage of an archive queued before the cleanup job deletes nothing", async () => {
 		expect(
 			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
-		).toBe("reaped");
-		expect(meterCalls).toEqual(["settle"]);
-		expect(sandboxCalls).toEqual(["delete:ws-box"]);
-	});
-
-	test("the delete stage removes the files sent to the workspace", async () => {
-		await reapArchivedCloudWorkspace({ ...input, stage: "delete" });
-		expect(reapedFiles).toEqual([`file-of-${input.cloudWorkspaceId}`]);
-	});
-
-	test("a delete still deletes when the final settle fails: at most one lock window goes unbilled", async () => {
-		meterFailure = new Error("autumn down");
-		expect(
-			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
-		).toBe("reaped");
-		expect(sandboxCalls).toEqual(["delete:ws-box"]);
+		).toBe("skipped");
+		expect(sandboxCalls).toEqual([]);
+		expect(meterCalls).toEqual([]);
+		expect(endedBoots).toEqual([]);
+		expect(reapedFiles).toEqual([]);
 	});
 
 	for (const stage of ["stop", "delete"] as const) {

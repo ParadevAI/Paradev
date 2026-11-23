@@ -69,11 +69,15 @@ stub(access, {
 		branch: "main",
 	}),
 });
+let deletedBoxes: string[] = [];
 stub(sandbox, {
 	workspaceRepositories: async () => [],
 	environmentRepositoryRows: async () => [{ id: REPOSITORY_ID }] as never,
 	queueRulesReapply: async (scope: unknown) => {
 		reapplied.push(scope);
+	},
+	deleteSandbox: async (name: string) => {
+		deletedBoxes.push(name);
 	},
 });
 stub(plan, {
@@ -117,6 +121,22 @@ beforeEach(() => {
 	runningBuilds = [];
 	configMatches = true;
 	reapplied = [];
+	deletedBoxes = [];
+});
+
+describe("environment.archive", () => {
+	test("only sets a status: the cleanup job deletes its golden (rule 3)", async () => {
+		environment = {
+			...environment,
+			sourceKind: "fork",
+			sourceRef: "env-golden",
+		};
+		expect(await caller.environment.archive({ id: ENVIRONMENT_ID })).toEqual({
+			archived: true,
+		});
+		expect(written).toEqual([{ archivedAt: expect.any(Date) }]);
+		expect(deletedBoxes).toEqual([]);
+	});
 });
 
 describe("environment.update machineSize", () => {

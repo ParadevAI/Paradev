@@ -28,6 +28,7 @@ export {
 } from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
+export { sandboxDeletesAllowed } from "./deletes";
 export {
 	listRemoteBranches,
 	type RemoteBranch,
@@ -60,12 +61,16 @@ export {
 	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	CloudWorkspaceNotStartedError,
+	deleteDrive,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
 	keepaliveWindowMs,
+	type ListedSandbox,
 	listActiveWorkspaceSandboxes,
+	listProjectDrives,
+	listProjectSandboxes,
 	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
