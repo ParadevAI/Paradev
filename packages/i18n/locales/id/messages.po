@@ -20416,7 +20416,7 @@ msgid "The host hasn't answered."
 msgstr "Host tidak merespons."
 
 msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
-msgstr "Host sedang offline. Coba lagi saat host kembali online, atau hapus host jika sudah tidak dipakai lagi."
+msgstr "Host sedang offline. Coba lagi saat host kembali online, atau hapus host jika sudah tidak akan kembali lagi."
 
 msgid "The host is offline. Try again when it's back online."
 msgstr "Host sedang offline. Coba lagi saat host kembali online."

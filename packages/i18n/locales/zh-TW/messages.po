@@ -20416,7 +20416,7 @@ msgid "The host hasn't answered."
 msgstr "主機未回應。"
 
 msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
-msgstr "主機已離線。請在它恢復連線後再試一次；如果該主機已不再使用，請將其刪除。"
+msgstr "主機已離線。請在它恢復連線後再試一次；如果該主機已永久停用，請將其刪除。"
 
 msgid "The host is offline. Try again when it's back online."
 msgstr "主機已離線。請在它恢復連線後再試一次。"

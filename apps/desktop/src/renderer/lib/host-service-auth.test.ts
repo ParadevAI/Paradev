@@ -17,9 +17,13 @@ afterEach(() => {
 test("a relay call sends the token the refresh produced", async () => {
 	setJwt("stale");
 
-	const headers = await resolveHostServiceHeaders(RELAY_HOST_URL, async () => {
-		setJwt("fresh");
-	});
+	const headers = await resolveHostServiceHeaders(
+		RELAY_HOST_URL,
+		async () => {
+			setJwt("fresh");
+		},
+		() => true,
+	);
 
 	expect(headers.Authorization).toBe("Bearer fresh");
 });
@@ -34,4 +38,20 @@ test("a host reached with its own secret does not wait on a refresh", async () =
 
 	expect(refreshed).toBe(false);
 	expect(headers.Authorization).toBe("Bearer secret");
+});
+
+test("a relay call with a usable token does not wait on a refresh", async () => {
+	setJwt("usable");
+	let refreshed = false;
+
+	const headers = await resolveHostServiceHeaders(
+		RELAY_HOST_URL,
+		async () => {
+			refreshed = true;
+		},
+		() => false,
+	);
+
+	expect(refreshed).toBe(false);
+	expect(headers.Authorization).toBe("Bearer usable");
 });

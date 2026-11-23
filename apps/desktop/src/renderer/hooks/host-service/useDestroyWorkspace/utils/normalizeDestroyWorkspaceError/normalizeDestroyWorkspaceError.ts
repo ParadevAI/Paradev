@@ -9,7 +9,10 @@ import type { DestroyWorkspaceError } from "../../useDestroyWorkspace";
 
 export function normalizeDestroyWorkspaceError(
 	err: unknown,
-	{ relayTokenExpired }: { relayTokenExpired: boolean },
+	{
+		viaRelay,
+		relayTokenExpired,
+	}: { viaRelay: boolean; relayTokenExpired: boolean },
 ): DestroyWorkspaceError {
 	if (isDestroyWorkspaceError(err)) return err;
 	if (err instanceof TRPCClientError) {
@@ -30,7 +33,8 @@ export function normalizeDestroyWorkspaceError(
 		if (data?.code === "CONFLICT") {
 			return { kind: "conflict", message: err.message };
 		}
-		if (data?.code === "SERVICE_UNAVAILABLE") {
+		// A host reached directly also uses this code, for its own failures.
+		if (data?.code === "SERVICE_UNAVAILABLE" && viaRelay) {
 			return {
 				kind: "host-offline",
 				message: i18n._(
@@ -42,7 +46,7 @@ export function normalizeDestroyWorkspaceError(
 		}
 		// The relay refuses an expired token, and the token is only still
 		// expired here when refreshing it failed.
-		if (data?.code === "UNAUTHORIZED" && relayTokenExpired) {
+		if (data?.code === "UNAUTHORIZED" && viaRelay && relayTokenExpired) {
 			return {
 				kind: "sign-in-expired",
 				message: i18n._(

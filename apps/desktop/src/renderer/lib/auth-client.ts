@@ -50,7 +50,10 @@ let jwtRefreshInFlight: Promise<string | null> | null = null;
 // Refresh ahead of expiry so a token handed to a WS URL is still valid by the
 // time the relay verifies it.
 const JWT_REFRESH_LEEWAY_MS = 60_000;
-const JWT_REFRESH_TIMEOUT_MS = 10_000;
+// After a refresh fails, callers get the cached token at once for this long.
+const JWT_REFRESH_COOLDOWN_MS = 10_000;
+let jwtRefreshBlockedUntilMs = 0;
+let jwtRefreshStartedAtMs = 0;
 
 export function setJwt(token: string | null) {
 	jwt = token;
@@ -65,10 +68,17 @@ export function setJwt(token: string | null) {
 		});
 }
 
-export function jwtIsFresh(): boolean {
+function jwtIsFresh(): boolean {
 	if (!jwt) return false;
 	if (jwtExpiresAtMs === null) return true;
 	return Date.now() < jwtExpiresAtMs - JWT_REFRESH_LEEWAY_MS;
+}
+
+/** A token is cached and its expiry has passed, so the relay will refuse it. */
+export function hasExpiredJwt(): boolean {
+	return (
+		jwt !== null && jwtExpiresAtMs !== null && Date.now() >= jwtExpiresAtMs
+	);
 }
 
 export function getJwt(): string | null {
@@ -87,12 +97,12 @@ export function getJwt(): string | null {
  */
 export async function ensureFreshJwt(): Promise<string | null> {
 	if (jwtIsFresh()) return jwt;
+	if (!jwtRefreshInFlight && Date.now() < jwtRefreshBlockedUntilMs) return jwt;
 	if (!jwtRefreshInFlight) {
 		const generationAtStart = jwtGeneration;
+		jwtRefreshStartedAtMs = Date.now();
 		jwtRefreshInFlight = authClient
-			.$fetch<{ token?: string }>("/token", {
-				timeout: JWT_REFRESH_TIMEOUT_MS,
-			})
+			.$fetch<{ token?: string }>("/token")
 			.then((res) => {
 				const token = res.data?.token;
 				// Apply only if nothing (logout, a set-auth-jwt response header)
@@ -111,10 +121,27 @@ export async function ensureFreshJwt(): Promise<string | null> {
 				return jwt;
 			})
 			.finally(() => {
+				if (!jwtIsFresh() && jwtGeneration === generationAtStart) {
+					jwtRefreshBlockedUntilMs = Date.now() + JWT_REFRESH_COOLDOWN_MS;
+				}
 				jwtRefreshInFlight = null;
 			});
 	}
 	return jwtRefreshInFlight;
+}
+
+/**
+ * Waits for a refresh, but only until `maxWaitMs` after that refresh began:
+ * a slow refresh keeps running, and callers arriving later do not wait again.
+ */
+export async function waitForFreshJwt(maxWaitMs: number): Promise<void> {
+	const refresh = ensureFreshJwt();
+	const remainingMs = jwtRefreshStartedAtMs + maxWaitMs - Date.now();
+	if (remainingMs <= 0) return;
+	await Promise.race([
+		refresh,
+		new Promise((resolve) => setTimeout(resolve, remainingMs)),
+	]);
 }
 
 /**

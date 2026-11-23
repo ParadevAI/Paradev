@@ -20416,7 +20416,7 @@ msgid "The host hasn't answered."
 msgstr "호스트가 응답하지 않았습니다."
 
 msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
-msgstr "호스트가 오프라인입니다. 다시 온라인이 되면 다시 시도하세요. 호스트를 더 이상 쓰지 않는다면 호스트를 삭제하세요."
+msgstr "호스트가 오프라인입니다. 다시 온라인이 되면 다시 시도하세요. 호스트가 완전히 없어졌다면 호스트를 삭제하세요."
 
 msgid "The host is offline. Try again when it's back online."
 msgstr "호스트가 오프라인입니다. 다시 온라인이 되면 다시 시도하세요."

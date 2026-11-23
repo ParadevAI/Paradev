@@ -2,8 +2,9 @@ import type { TeardownFailureCause } from "@superset/host-service";
 import { useCallback } from "react";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import { jwtIsFresh } from "renderer/lib/auth-client";
+import { hasExpiredJwt } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { usesRelayJwt } from "renderer/lib/host-service-auth";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import {
@@ -86,9 +87,7 @@ export async function destroyWorkspaceAtHost(
 			skipTeardown: input.skipTeardown ?? false,
 		});
 	} catch (error) {
-		throw normalizeDestroyWorkspaceError(error, {
-			relayTokenExpired: !jwtIsFresh(),
-		});
+		throw normalizeDestroyWorkspaceError(error, relayContext(hostUrl));
 	}
 }
 
@@ -101,9 +100,7 @@ export async function inspectWorkspaceAtHost({
 	try {
 		return await client.workspaceCleanup.inspect.query({ workspaceId });
 	} catch (error) {
-		throw normalizeDestroyWorkspaceError(error, {
-			relayTokenExpired: !jwtIsFresh(),
-		});
+		throw normalizeDestroyWorkspaceError(error, relayContext(hostUrl));
 	}
 }
 
@@ -193,6 +190,13 @@ export function useDestroyWorkspace(workspaceId: string): UseDestroyWorkspace {
 	}, [hostUrl, hostStatus, isSandbox, workspaceId]);
 
 	return { hostTarget, destroy, inspect };
+}
+
+function relayContext(hostUrl: string | null) {
+	return {
+		viaRelay: hostUrl !== null && usesRelayJwt(hostUrl),
+		relayTokenExpired: hasExpiredJwt(),
+	};
 }
 
 function getReadyClient(

@@ -23,6 +23,8 @@ interface UseDestroyDialogStateOptions {
 	onDeleted?: () => void;
 }
 
+const OFFLINE_RECHECK_MS = 5_000;
+
 type InspectState =
 	| { status: "idle" }
 	| { status: "loading" }
@@ -95,6 +97,22 @@ export function useDestroyDialogState({
 	const isHostOffline =
 		inspectState.status === "error" && inspectState.hostOffline;
 	const hostId = "hostId" in hostTarget ? hostTarget.hostId : null;
+
+	useEffect(() => {
+		if (!open || !isHostOffline) return;
+		let cancelled = false;
+		const timer = setInterval(() => {
+			inspect()
+				.then((next) => {
+					if (!cancelled) setInspectState({ status: "ready", preview: next });
+				})
+				.catch(() => {});
+		}, OFFLINE_RECHECK_MS);
+		return () => {
+			cancelled = true;
+			clearInterval(timer);
+		};
+	}, [open, isHostOffline, inspect]);
 
 	const openHostSettings = useCallback(() => {
 		if (!hostId) return;

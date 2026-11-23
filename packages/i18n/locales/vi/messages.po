@@ -20416,7 +20416,7 @@ msgid "The host hasn't answered."
 msgstr "Host không phản hồi."
 
 msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
-msgstr "Host đang ngoại tuyến. Hãy thử lại khi host trực tuyến trở lại, hoặc xóa host nếu nó không còn dùng nữa."
+msgstr "Host đang ngoại tuyến. Hãy thử lại khi host trực tuyến trở lại, hoặc xóa host nếu nó đã mất hẳn."
 
 msgid "The host is offline. Try again when it's back online."
 msgstr "Host đang ngoại tuyến. Hãy thử lại khi host trực tuyến trở lại."
