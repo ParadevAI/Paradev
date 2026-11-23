@@ -1,3 +1,4 @@
+import type { UsageAccount } from "renderer/hooks/host-service/useHostUsageQuota";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -13,10 +14,12 @@ interface Settings {
 	dictationEnabled: boolean;
 	showParadevAnywhereButton: boolean;
 	showRailUsage: boolean;
+	hiddenRailUsageProviders: UsageAccount["agent"][];
 }
 
 interface SettingsStore extends Settings {
 	update: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+	toggleRailUsageProvider: (provider: UsageAccount["agent"]) => void;
 }
 
 export const useSettings = create<SettingsStore>()(
@@ -29,7 +32,14 @@ export const useSettings = create<SettingsStore>()(
 			dictationEnabled: true,
 			showParadevAnywhereButton: true,
 			showRailUsage: true,
+			hiddenRailUsageProviders: [],
 			update: (key, value) => set({ [key]: value }),
+			toggleRailUsageProvider: (provider) =>
+				set(({ hiddenRailUsageProviders }) => ({
+					hiddenRailUsageProviders: hiddenRailUsageProviders.includes(provider)
+						? hiddenRailUsageProviders.filter((agent) => agent !== provider)
+						: [...hiddenRailUsageProviders, provider],
+				})),
 		}),
 		{ name: "settings" },
 	),

@@ -9,13 +9,14 @@ export function RailUsage() {
 	const navigate = useNavigate();
 	const { activeHostUrl } = useLocalHostService();
 	const isShown = useSettings((s) => s.showRailUsage);
+	const hiddenProviders = useSettings((s) => s.hiddenRailUsageProviders);
 	const quota = useHostUsageQuota(isShown ? activeHostUrl : null);
 	if (!isShown) return null;
-	const entries = selectRailUsage(quota.data ?? []);
+	const entries = selectRailUsage(quota.data ?? [], hiddenProviders);
 
 	return entries.map((entry) => (
 		<RailUsageRing
-			key={entry.account.accountKey}
+			key={entry.account.agent}
 			entry={entry}
 			onOpen={() =>
 				navigate({

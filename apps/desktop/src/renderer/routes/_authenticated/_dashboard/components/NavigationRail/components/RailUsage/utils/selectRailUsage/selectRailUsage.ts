@@ -2,17 +2,9 @@ import type {
 	UsageAccount,
 	UsageQuotaWindow,
 } from "renderer/hooks/host-service/useHostUsageQuota";
+import { QUOTA_AGENT_ORDER } from "renderer/utils/usage/quotaAgentLabels";
 import { isModelScopedWindow } from "../isModelScopedWindow";
 
-const RAIL_AGENT_ORDER: UsageAccount["agent"][] = [
-	"claude",
-	"codex",
-	"grok",
-	"agy",
-	"opencode",
-];
-
-export const MAX_RAIL_USAGE_ACCOUNTS = 2;
 const MAX_RINGS_PER_ACCOUNT = 2;
 
 export interface RailUsageEntry {
@@ -36,8 +28,10 @@ function ringWindows(windows: UsageQuotaWindow[]): UsageQuotaWindow[] {
 
 export function selectRailUsage(
 	accounts: ReadonlyArray<UsageAccount>,
+	hiddenProviders: readonly UsageAccount["agent"][] = [],
 ): RailUsageEntry[] {
-	return RAIL_AGENT_ORDER.flatMap((agent) => {
+	return QUOTA_AGENT_ORDER.flatMap((agent) => {
+		if (hiddenProviders.includes(agent)) return [];
 		const readable = accounts.filter(
 			(account) =>
 				account.agent === agent &&
@@ -49,5 +43,5 @@ export function selectRailUsage(
 		if (!account) return [];
 		const rings = ringWindows(account.windows);
 		return rings.length > 0 ? [{ account, rings }] : [];
-	}).slice(0, MAX_RAIL_USAGE_ACCOUNTS);
+	});
 }
