@@ -12,7 +12,20 @@ import SANDBOX from "./cloud-usage.sandbox.json";
  */
 
 const PER_SEAT = 72_000;
-const RATE = 0.06;
+
+interface Prices {
+	usageBased: { amount: number; billingUnits: number };
+	prepaid: { amount: number; billingUnits: number };
+}
+const CATALOG: Prices = {
+	usageBased: { amount: 1, billingUnits: 1000 },
+	prepaid: { amount: 0.06, billingUnits: 60 },
+};
+/** A Team version priced for one customer: $0.03 a GB-hour past the allowance, $0.04 bought. */
+const CUSTOM: Prices = {
+	usageBased: { amount: 0.5, billingUnits: 1000 },
+	prepaid: { amount: 0.04, billingUnits: 60 },
+};
 
 type Plan = "team" | "pro" | "enterprise";
 type Kind = "seats" | "priced" | "free" | "bought";
@@ -43,6 +56,7 @@ class Ledger {
 	constructor(
 		public plan: Plan,
 		seats = 1,
+		public prices = CATALOG,
 	) {
 		this.overage = plan !== "team";
 		this.rows =
@@ -146,15 +160,13 @@ class Ledger {
 				price:
 					row.kind === "priced"
 						? {
-								amount: 1,
-								billingUnits: 1000,
+								...this.prices.usageBased,
 								billingMethod: "usage_based",
 								maxPurchase: null,
 							}
 						: row.kind === "bought"
 							? {
-									amount: RATE,
-									billingUnits: 60,
+									...this.prices.prepaid,
 									billingMethod: "prepaid",
 									maxPurchase: null,
 								}
@@ -198,15 +210,15 @@ class Ledger {
 		const usage = cloudUsageFromBalances(
 			{ box_gb_minutes: this.balance() },
 			this.controls(),
-			null,
-			RATE,
 		);
 		if (!usage) throw new Error("no balance");
-		const { allowance } = allowanceOf(usage, new Date(), RATE);
+		const rate = usage.overagePerGbHour;
+		if (rate === null) throw new Error("no usage-based price");
+		const { allowance } = allowanceOf(usage, new Date(), rate);
 		const shown = cloudUsageDisplay(
 			allowance,
-			{ gbHours: this.metered / 60, usd: (this.metered / 60) * RATE },
-			RATE,
+			{ gbHours: this.metered / 60, usd: (this.metered / 60) * rate },
+			rate,
 		);
 		const $ = (usd: number) => Math.round(usd * 100) / 100;
 		return {
@@ -246,8 +258,25 @@ const SCENARIOS: {
 	name: string;
 	plan: Plan;
 	seats?: number;
+	prices?: Prices;
 	steps: [Step, Expect][];
 }[] = [
+	{
+		name: "A custom-priced Team customer: the card uses its own usage-based price",
+		plan: "team",
+		prices: CUSTOM,
+		steps: [
+			[t(36_000), { used: 18, held: 36, lines: ["included 18 of 36"] }],
+			[
+				{ buy: 6_000 },
+				{
+					used: 18,
+					held: 39,
+					lines: ["included 18 of 36", "bought 0 of 3"],
+				},
+			],
+		],
+	},
 	{
 		name: "Under the allowance, then a reset",
 		plan: "team",
@@ -656,8 +685,8 @@ const SCENARIOS: {
 ];
 
 describe("cloud usage card across billing periods", () => {
-	test.each(SCENARIOS)("$name", ({ plan, seats, steps }) => {
-		const ledger = new Ledger(plan, seats);
+	test.each(SCENARIOS)("$name", ({ plan, seats, prices, steps }) => {
+		const ledger = new Ledger(plan, seats, prices);
 		for (const [step, expected] of steps) {
 			if ("track" in step) ledger.track(step.track);
 			if ("buy" in step) ledger.credit("bought", step.buy);

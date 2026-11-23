@@ -320,7 +320,12 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.query(async ({ ctx, input }) => {
 					const { cloudUsage, anchor } = ctx;
 					if (!cloudUsage || !anchor) {
-						return { items: [], nextCursor: null, ratePerGbHour: ctx.rate };
+						return {
+							items: [],
+							nextCursor: null,
+							ratePerGbHour: ctx.rate,
+							boughtPerGbHour: cloudUsage?.boughtPerGbHour ?? null,
+						};
 					}
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
@@ -358,6 +363,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						nextCursor:
 							periods.length > input.limit && last ? periodId(last.from) : null,
 						ratePerGbHour: ctx.rate,
+						boughtPerGbHour: cloudUsage.boughtPerGbHour,
 					};
 				}),
 		},

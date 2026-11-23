@@ -5,8 +5,8 @@ import {
 	AUTO_TOPUP_MONTHLY_LIMIT,
 	BOX_GB_MINUTES_FEATURE_ID,
 	GB_HOUR_PURCHASE,
-	gbHourPack,
 	gbHourPurchase,
+	gbHourRatesOf,
 } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import type { BetterAuthPlugin } from "better-auth";
@@ -137,7 +137,10 @@ async function currentPack(organizationId: string) {
 		(subscription) =>
 			subscription.planId === planId && subscription.status !== "scheduled",
 	)?.plan;
-	const pack = subscribed ? gbHourPack(subscribed) : null;
+	const { pack } = gbHourRatesOf(
+		customer.balances[BOX_GB_MINUTES_FEATURE_ID],
+		subscribed,
+	);
 	if (!planId || !pack) {
 		throw new APIError("BAD_REQUEST", {
 			message: "This plan does not sell extra cloud GB-hours.",

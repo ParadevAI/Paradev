@@ -130,13 +130,19 @@ describe("cloudUsageDisplay prices GB-hours at the organization's rate", () => {
 		limitReached: false,
 	};
 
-	it("the headline is the By day total, the same number, with or without a breakdown", () => {
-		const metered = { gbHours: 37.5, usd: 37.5 * RATE };
+	it.each([
+		["the catalog", RATE],
+		["a custom-priced customer's own", 0.03],
+	])("at %s rate, the headline is the By day total, with or without a breakdown", (_, rate) => {
+		const metered = { gbHours: 37.5, usd: 37.5 * rate };
 		for (const breakdown of [allowance, null]) {
-			expect(cloudUsageDisplay(breakdown, metered, RATE).used.usd).toBe(
+			expect(cloudUsageDisplay(breakdown, metered, rate).used.usd).toBe(
 				metered.usd,
 			);
 		}
+		expect(cloudUsageDisplay(allowance, metered, rate).held?.usd).toBe(
+			100 * rate,
+		);
 	});
 
 	it("keeps the dollars of usage under a cent", () => {

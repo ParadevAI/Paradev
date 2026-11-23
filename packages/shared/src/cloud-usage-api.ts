@@ -174,4 +174,6 @@ export const cloudPeriodsOutputSchema = z.object({
 	nextCursor: z.iso.date().nullable(),
 	/** The organization's price of one GB-hour; null when it is not known, and then no amount has a price. */
 	ratePerGbHour: z.number().nullable(),
+	/** What the organization paid for one GB-hour of the credit it bought; null with none bought. */
+	boughtPerGbHour: z.number().nullable(),
 });

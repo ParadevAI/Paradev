@@ -1,8 +1,10 @@
 import {
 	ALLOWANCE_UNAVAILABLE_FIELDS,
 	type ALLOWANCE_UNAVAILABLE_REASONS,
+	type AutumnCatalogPlan,
 	BOX_GB_MINUTES_FEATURE_ID,
-	type GbHourPack,
+	type GbHourRates,
+	gbHourRatesOf,
 	gbMinutesUsd,
 } from "@superset/shared/billing";
 import type { getAutumnCustomer } from "./customer";
@@ -26,7 +28,7 @@ interface CloudCredit {
 }
 
 /** `null` in `bought` means a cached value from before it and the fields after it. */
-export interface CloudUsage {
+export interface CloudUsage extends GbHourRates {
 	includedGbMinutes: number | null;
 	usedGbMinutes: number;
 	overageGbMinutes: number;
@@ -40,8 +42,6 @@ export interface CloudUsage {
 	/** Null when Autumn decides it on a rule this does not read: a percentage cap, a usage limit. */
 	limitReached: boolean | null;
 	autoTopup: CloudAutoTopup | null;
-	pack: GbHourPack | null;
-	overagePerGbHour: number | null;
 	resetsAt: string | null;
 }
 
@@ -54,8 +54,7 @@ function sum(values: number[]): number {
 export function cloudUsageFromBalances(
 	balances: Customer["balances"],
 	billingControls?: Customer["billingControls"],
-	pack: GbHourPack | null = null,
-	overagePerGbHour: number | null = null,
+	plan: AutumnCatalogPlan | null = null,
 	seats: number | null = null,
 ): CloudUsage | null {
 	const balance = balances[BOX_GB_MINUTES_FEATURE_ID];
@@ -132,8 +131,7 @@ export function cloudUsageFromBalances(
 					quantityGbMinutes: topup.quantity,
 				}
 			: null,
-		pack,
-		overagePerGbHour,
+		...gbHourRatesOf(balance, plan),
 		resetsAt: balance.nextResetAt
 			? new Date(balance.nextResetAt).toISOString()
 			: null,
