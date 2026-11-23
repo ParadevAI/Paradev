@@ -20415,6 +20415,12 @@ msgstr "主機未在十五分鐘內恢復。"
 msgid "The host hasn't answered."
 msgstr "主機未回應。"
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "主機已離線。請在它恢復連線後再試一次；如果該主機已永久停用，請將其刪除。"
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "主機已離線。請在它恢復連線後再試一次。"
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "主機已上線。建立工作區時選擇它。"
 
@@ -23463,6 +23469,9 @@ msgstr "你的階級是為你測得的 {0} 項目標的加權分數，強項可�
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "你正在執行的應用程式，放進代理程式可操作的瀏覽器裡。"
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "無法重新整理您的登入狀態。請檢查網路連線，然後再試一次。"
 
 msgid "Your signed-in session"
 msgstr "你已登入的會話"

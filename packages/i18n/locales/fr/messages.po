@@ -20415,6 +20415,12 @@ msgstr "L’hôte n’est pas redevenu disponible dans les quinze minutes."
 msgid "The host hasn't answered."
 msgstr "L'hôte n'a pas répondu."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "L'hôte est hors ligne. Réessayez quand il sera de nouveau en ligne, ou supprimez l'hôte s'il a disparu pour de bon."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "L'hôte est hors ligne. Réessayez quand il sera de nouveau en ligne."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "L'hôte est en ligne. Choisissez-le lorsque vous créez un espace de travail."
 
@@ -23463,6 +23469,9 @@ msgstr "Votre palier est un score pondéré sur les {0} objectifs mesurés pour 
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Votre application en cours d'exécution, dans un navigateur que vos agents peuvent piloter."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Impossible d'actualiser votre connexion. Vérifiez votre connexion réseau, puis réessayez."
 
 msgid "Your signed-in session"
 msgstr "Votre session connectée"

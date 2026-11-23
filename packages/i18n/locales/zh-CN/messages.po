@@ -20415,6 +20415,12 @@ msgstr "主机未在十五分钟内恢复。"
 msgid "The host hasn't answered."
 msgstr "主机未响应。"
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "主机已离线。请在它恢复在线后重试；如果该主机已永久停用，请将其删除。"
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "主机已离线。请在它恢复在线后重试。"
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "主机已在线。创建工作区时选择它。"
 
@@ -23463,6 +23469,9 @@ msgstr "你的档位是为你测得的 {0} 项目标的加权得分，强项可�
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "你正在运行的应用，放进智能体可操作的浏览器里。"
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "无法刷新您的登录状态。请检查网络连接，然后重试。"
 
 msgid "Your signed-in session"
 msgstr "你已登录的会话"

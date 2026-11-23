@@ -20415,6 +20415,12 @@ msgstr "Host tidak kembali dalam lima belas menit."
 msgid "The host hasn't answered."
 msgstr "Host tidak merespons."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Host sedang offline. Coba lagi saat host kembali online, atau hapus host jika sudah tidak akan kembali lagi."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Host sedang offline. Coba lagi saat host kembali online."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host sudah online. Pilih host ini saat membuat workspace."
 
@@ -23463,6 +23469,9 @@ msgstr "Tingkat Anda adalah skor berbobot dari {0} sasaran yang terukur untuk An
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Aplikasi Anda yang sedang berjalan, di browser yang bisa dikendalikan agen Anda."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Sesi masuk Anda tidak dapat diperbarui. Periksa koneksi Anda, lalu coba lagi."
 
 msgid "Your signed-in session"
 msgstr "Sesi login Anda"

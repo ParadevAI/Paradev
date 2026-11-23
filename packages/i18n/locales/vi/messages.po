@@ -20415,6 +20415,12 @@ msgstr "Máy chủ không hoạt động trở lại trong vòng mười lăm ph
 msgid "The host hasn't answered."
 msgstr "Host không phản hồi."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Host đang ngoại tuyến. Hãy thử lại khi host trực tuyến trở lại, hoặc xóa host nếu nó đã mất hẳn."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Host đang ngoại tuyến. Hãy thử lại khi host trực tuyến trở lại."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host đã trực tuyến. Hãy chọn nó khi tạo workspace."
 
@@ -23463,6 +23469,9 @@ msgstr "Bậc của bạn là điểm số có trọng số trên {0} mục tiê
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Ứng dụng đang chạy của bạn, trong một trình duyệt mà các agent có thể điều khiển."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Không thể làm mới phiên đăng nhập của bạn. Hãy kiểm tra kết nối rồi thử lại."
 
 msgid "Your signed-in session"
 msgstr "Phiên đã đăng nhập của bạn"

@@ -20415,6 +20415,12 @@ msgstr "The host did not come back within fifteen minutes."
 msgid "The host hasn't answered."
 msgstr "The host hasn't answered."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "The host is offline. Try again when it's back online."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "The host is online. Pick it when you create a workspace."
 
@@ -23463,6 +23469,9 @@ msgstr "Your rung is a weighted score across the {0} objectives measured for you
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Your running app, in a browser your agents can drive."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Your sign-in couldn't be refreshed. Check your connection, then try again."
 
 msgid "Your signed-in session"
 msgstr "Your signed-in session"

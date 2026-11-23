@@ -156,3 +156,35 @@ test("opening from an agent input focuses the native action without intercepting
 		input.remove();
 	}
 });
+
+test("an offline host offers its settings and cannot be confirmed", async () => {
+	const onOpenHostSettings = mock(() => {});
+	render(
+		<DestroyConfirmPane
+			open
+			onOpenChange={() => {}}
+			workspaceName="ws"
+			deleteBranch={false}
+			onDeleteBranchChange={() => {}}
+			hasChanges={false}
+			hasUnpushedCommits={false}
+			canConfirm={false}
+			blockingReason={null}
+			isHostOffline
+			onOpenHostSettings={onOpenHostSettings}
+			onConfirm={() => {}}
+			confirmLabel="Delete"
+		/>,
+	);
+	const dialog = within(document.body).getByRole("alertdialog");
+
+	fireEvent.click(
+		within(dialog).getByRole("button", { name: "Host settings" }),
+	);
+
+	expect(onOpenHostSettings).toHaveBeenCalledTimes(1);
+	expect(within(dialog).getByRole("button", { name: "Delete" })).toHaveProperty(
+		"disabled",
+		true,
+	);
+});

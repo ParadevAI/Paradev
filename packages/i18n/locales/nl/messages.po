@@ -20415,6 +20415,12 @@ msgstr "De host was na vijftien minuten nog niet terug."
 msgid "The host hasn't answered."
 msgstr "De host heeft niet geantwoord."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "De host is offline. Probeer het opnieuw wanneer hij weer online is, of verwijder de host als hij voorgoed weg is."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "De host is offline. Probeer het opnieuw wanneer hij weer online is."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "De host is online. Kies hem wanneer je een werkruimte aanmaakt."
 
@@ -23463,6 +23469,9 @@ msgstr "Je trede is een gewogen score over de {0} doelen die voor jou gemeten zi
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Je draaiende app, in een browser die je agents kunnen besturen."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Je aanmelding kon niet worden vernieuwd. Controleer je verbinding en probeer het opnieuw."
 
 msgid "Your signed-in session"
 msgstr "Je ingelogde sessie"

@@ -20415,6 +20415,12 @@ msgstr "L’host non è tornato disponibile entro quindici minuti."
 msgid "The host hasn't answered."
 msgstr "L'host non ha risposto."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "L'host è offline. Riprova quando sarà di nuovo online, oppure elimina l'host se non tornerà più."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "L'host è offline. Riprova quando sarà di nuovo online."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "L'host è online. Sceglilo quando crei un workspace."
 
@@ -23463,6 +23469,9 @@ msgstr "Il tuo gradino è un punteggio ponderato sugli {0} obiettivi misurati pe
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "La tua app in esecuzione, in un browser che i tuoi agenti possono controllare."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Impossibile aggiornare l'accesso. Controlla la connessione e riprova."
 
 msgid "Your signed-in session"
 msgstr "La tua sessione autenticata"
