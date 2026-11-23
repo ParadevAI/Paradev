@@ -22,6 +22,6 @@
 		"@cloudflare/workers-types": "5.20260801.1",
 		"@superset/typescript": "workspace:*",
 		"typescript": "7.0.2",
-		"wrangler": "4.118.0"
+		"wrangler": "4.129.1"
 	}
 }
