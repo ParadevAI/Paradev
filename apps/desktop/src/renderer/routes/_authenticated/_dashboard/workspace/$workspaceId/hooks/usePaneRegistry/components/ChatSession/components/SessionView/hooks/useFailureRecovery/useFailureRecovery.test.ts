@@ -16,7 +16,7 @@ const MODEL: SessionConfigOption = {
 };
 const CONTINUE: UserContent[] = [{ type: "text", text: CONTINUE_PROMPT }];
 
-function setup() {
+function setup(options: { resumeAfterLimit?: () => void } = {}) {
 	const sendPrompt = mock((_content: UserContent[]) => {});
 	const openModelPicker = mock(() => {});
 	let finishSet = () => {};
@@ -35,6 +35,7 @@ function setup() {
 			openModelPicker,
 			sendPrompt,
 			setConfigOption,
+			...options,
 		}),
 	);
 	return {
@@ -68,6 +69,27 @@ test("a model picked after Change model continues once the agent has it", async 
 	await act(async () => finish());
 	expect(openModelPicker).toHaveBeenCalledTimes(2);
 	expect(sendPrompt.mock.calls).toEqual([[CONTINUE]]);
+});
+
+test("another model picked under a usage limit resumes the session", async () => {
+	const resumeAfterLimit = mock(() => {});
+	const { hook, sendPrompt, setConfigOption, finish } = setup({
+		resumeAfterLimit,
+	});
+
+	hook.result.current.onSetConfigOption("model", "sonnet");
+	await act(async () => finish());
+	expect(resumeAfterLimit).not.toHaveBeenCalled();
+
+	hook.result.current.onSetConfigOption("model", "opus");
+	await act(async () => finish());
+	expect(setConfigOption.mock.calls[1]).toEqual([
+		"model",
+		"opus",
+		{ confirm: true },
+	]);
+	expect(resumeAfterLimit).toHaveBeenCalledTimes(1);
+	expect(sendPrompt).not.toHaveBeenCalled();
 });
 
 test("a model the agent refuses does not continue the task", async () => {

@@ -698,6 +698,10 @@ export function SessionView({
 		[sentOutbox.transcript, heldOutbox],
 	);
 	const booting = sessionState?.status === "starting";
+	const resumeAfterLimit = useMemo(
+		() => (limit ? () => respondToUsageLimit("resume") : undefined),
+		[limit, respondToUsageLimit],
+	);
 	const openModelPicker = useCallback(
 		() => composerRef.current?.openModelPicker(),
 		[],
@@ -723,6 +727,7 @@ export function SessionView({
 			onRestartAndContinue,
 			onStartNewChat,
 			openModelPicker,
+			resumeAfterLimit,
 			sendPrompt,
 			setConfigOption,
 		});
