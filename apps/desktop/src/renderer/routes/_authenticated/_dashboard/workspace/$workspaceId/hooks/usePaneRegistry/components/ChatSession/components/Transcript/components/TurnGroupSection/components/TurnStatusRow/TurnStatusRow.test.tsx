@@ -191,7 +191,7 @@ test("an unclassified limit on an agent with switchable logins offers the accoun
 			>
 				<TurnStatusRow
 					error={{
-						message: "Internal error: You've hit your Fable limit",
+						message: "Claude AI usage limit reached|1794450000",
 						kind: "unknown",
 					}}
 					latest

@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset, CONTINUE_PROMPT } from "@superset/chat/core";
+import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
 import { errorMessage } from "@superset/i18n/errors";
 import { getAgentModelSupport } from "@superset/shared/agent-models";
@@ -541,10 +541,7 @@ export function AcpChatPane({
 			.then(() => start(harness, agentSessionId, true));
 	}, [harness, agentSessionId, sessionId, start, wiring.transport]);
 	const switchAccount = useCallback(
-		async (
-			setAccount: () => Promise<unknown>,
-			{ continueWork }: { continueWork: boolean },
-		) => {
+		async (setAccount: () => Promise<unknown>) => {
 			if (!harness || !sessionId || recoveryInFlight.current) return;
 			recoveryInFlight.current = true;
 			setSwitchingAccount(true);
@@ -557,11 +554,7 @@ export function AcpChatPane({
 				if (!mounted.current) return;
 				setTransferredFrom(sessionId);
 				onRestoreQueuedPrompts(queued);
-				if (continueWork && queued.length === 0) {
-					continueAfterRestart.current = CONTINUE_PROMPT;
-				}
 				const restarted = await start(harness, agentSessionId, true);
-				if (!restarted) continueAfterRestart.current = null;
 				if (!restarted && mounted.current) setTransferredFrom(null);
 			} catch (error) {
 				recoveryInFlight.current = false;

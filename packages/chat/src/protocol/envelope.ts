@@ -134,7 +134,7 @@ export const turnErrorSchema = z.looseObject({
 export type TurnError = z.infer<typeof turnErrorSchema>;
 
 const USAGE_LIMIT_MESSAGE =
-	/(?:usage|spend|spending|monthly|weekly|daily) limits? (?:reached|exceeded)|(?:reached|hit) your (?:[\w'-]+ ){0,4}(?:usage|spend|spending) limits?|hit your (?:(?!context|token|output|size)[\w.'-]+ ){0,2}limit|(?:quota|credits?) (?:exceeded|exhausted|depleted)|exceeded your current quota|insufficient[_ ](?:quota|credits)|credit balance is too low/i;
+	/(?:usage|spend|spending|monthly|weekly|daily) limits? (?:reached|exceeded)|(?:reached|hit) your (?:[\w'-]+ ){0,4}(?:usage|spend|spending) limits?|hit your (?:usage )?limit|(?:quota|credits?) (?:exceeded|exhausted|depleted)|exceeded your current quota|insufficient[_ ](?:quota|credits)|credit balance is too low/i;
 
 /** Gemini words a per-minute 429 as "exceeded your current quota" and links its rate-limit docs. */
 const RATE_LIMIT_MESSAGE = /rate[-_ ]?limit/i;

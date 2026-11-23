@@ -21,7 +21,6 @@ export function useFailureRecovery({
 	onRestartAndContinue,
 	onStartNewChat,
 	openModelPicker,
-	resumeAfterLimit,
 	sendPrompt,
 	setConfigOption,
 }: {
@@ -37,8 +36,6 @@ export function useFailureRecovery({
 	onRestartAndContinue?: ((prompt: string) => Promise<boolean>) | undefined;
 	onStartNewChat?: (() => Promise<boolean>) | undefined;
 	openModelPicker: () => void;
-	/** Set while a usage limit holds the session: another model can lift it. */
-	resumeAfterLimit?: (() => void) | undefined;
 	sendPrompt: (content: UserContent[]) => unknown;
 	setConfigOption: (
 		configId: string,
@@ -56,21 +53,20 @@ export function useFailureRecovery({
 
 	const onSetConfigOption = useCallback(
 		(configId: string, value: string) => {
-			const option = configOptions?.find((option) => option.id === configId);
-			const isModel = option?.category === "model";
-			const afterLimit =
-				option?.currentValue !== value ? resumeAfterLimit : undefined;
-			if (!isModel || (!continueAfterModelPick.current && !afterLimit)) {
+			const isModel =
+				configOptions?.find((option) => option.id === configId)?.category ===
+				"model";
+			if (!isModel || !continueAfterModelPick.current) {
 				void setConfigOption(configId, value);
 				return;
 			}
 			continueAfterModelPick.current = false;
 			void setConfigOption(configId, value, { confirm: true }).then(
-				afterLimit ?? continueTask,
+				continueTask,
 				() => undefined,
 			);
 		},
-		[setConfigOption, configOptions, continueTask, resumeAfterLimit],
+		[setConfigOption, configOptions, continueTask],
 	);
 	const onModelPickerOpenChange = useCallback((open: boolean) => {
 		if (!open) continueAfterModelPick.current = false;

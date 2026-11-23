@@ -160,9 +160,7 @@ export function SessionView({
 	onSessionState?: (session: SessionState | null) => void;
 	/** The mode the user picked, so a resumed session can start in it again. */
 	onModeChange?: (modeId: string) => void;
-	onSwitchAccount?: (
-		...args: [...Parameters<SwitchAccount>, { continueWork: boolean }]
-	) => Promise<void>;
+	onSwitchAccount?: SwitchAccount;
 	sessionAccount?: TerminalAgentBinding["account"];
 	/**
 	 * Absent when the agent cannot branch its own session. The transcript is
@@ -661,7 +659,6 @@ export function SessionView({
 	const limit = sessionState?.usageLimit;
 	const respondToUsageLimit = session.respondToUsageLimit;
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
-	const limited = limit !== undefined;
 	const accountSwitch = useMemo<AccountSwitch | undefined>(() => {
 		const preset = harness ? presetForAnyHarness(harness) : undefined;
 		if (preset !== "claude" && preset !== "codex") return undefined;
@@ -669,11 +666,9 @@ export function SessionView({
 			agent: preset,
 			hostUrl,
 			sessionAccount,
-			onSwitch: onSwitchAccount
-				? (setAccount) => onSwitchAccount(setAccount, { continueWork: limited })
-				: undefined,
+			onSwitch: onSwitchAccount,
 		};
-	}, [harness, hostUrl, sessionAccount, onSwitchAccount, limited]);
+	}, [harness, hostUrl, sessionAccount, onSwitchAccount]);
 	const usageLimit = useMemo(() => {
 		if (!limit) return undefined;
 		return {
@@ -703,10 +698,6 @@ export function SessionView({
 		[sentOutbox.transcript, heldOutbox],
 	);
 	const booting = sessionState?.status === "starting";
-	const resumeAfterLimit = useMemo(
-		() => (limit ? () => respondToUsageLimit("resume") : undefined),
-		[limit, respondToUsageLimit],
-	);
 	const openModelPicker = useCallback(
 		() => composerRef.current?.openModelPicker(),
 		[],
@@ -732,7 +723,6 @@ export function SessionView({
 			onRestartAndContinue,
 			onStartNewChat,
 			openModelPicker,
-			resumeAfterLimit,
 			sendPrompt,
 			setConfigOption,
 		});
