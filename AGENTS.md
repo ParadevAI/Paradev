@@ -175,8 +175,7 @@ locale. After adding or changing strings, run `bun run check:i18n` (CI enforces 
 regenerates the catalogs and lists every untranslated message per locale. Write those
 translations yourself into each `locales/<locale>/messages.po` and commit the catalogs with
 the change — nothing on CI fills translations for you. Conventions: `packages/i18n/README.md`;
-terms that never translate: `packages/i18n/glossary.md`; strategy and phasing:
-`plans/20260826-i18n-strategy.md`.
+terms that never translate: `packages/i18n/glossary.md`.
 Directories listed in `packages/i18n/test/enforced-dirs.ts` must not contain hardcoded
 JSX text — add a directory there once it is fully converted. `errorMessage()` output is potentially
 translated and is display-only: logs, Sentry/PostHog, and error classification use
@@ -205,6 +204,13 @@ Three traps worth knowing before you touch catalogs:
   Tests see neither, which is why `apps/desktop/test-setup.ts` shims the macros and `i18n._`.
   Mock that module with a Proxy, never a spread — `i18n` is a class instance and a spread
   drops `load`/`activate`.
+
+## Plans and design notes
+
+This repository is public. Plans, design notes, research, findings, specs and TODO lists are not
+committed to any repo: publish them as an org page with `superset pages publish` (`/create-plan`
+for a plan). Keep the source in `plans/local/`, which is gitignored. Do not point code, comments,
+docs or PR descriptions at them.
 
 ## Comments
 
@@ -250,11 +256,6 @@ earns its place by catching a regression quickly.
   `packages/host-service`. Released desktop, mobile, and CLI builds still call it.
 - `apps/desktop/AGENTS.md`: desktop specifics (notices, persisted renderer state).
 - `apps/mobile/AGENTS.md`: mobile structure and iOS-only scope.
-- `docs/cloud-sandbox-mismatches.md`: where cloud workspace sandboxes don't fit assumptions the
-  app makes about a machine someone owns. Read it before touching sandboxes, and add to it when
-  you find a new one.
-- `docs/cloud-sandbox-considerations.md`: what cloud sandboxes still owe before they leave the
-  team — billing, credential blast radius, untested behaviour.
 
 ## Contributor responsibility
 

@@ -89,7 +89,7 @@ export const searchBranches = protectedProcedure
 
 				// Derive isLocal/isRemote and the user-facing name from
 				// the FULL refname's structural prefix — never from the
-				// short form. See GIT_REFS.md.
+				// short form.
 				let name: string;
 				let isLocal = false;
 				let isRemote = false;

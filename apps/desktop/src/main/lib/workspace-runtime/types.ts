@@ -11,8 +11,6 @@
  *    not "health right now"; mid-session failures should propagate as errors
  * 3. Operations use sync signatures where latency-critical (write, resize, signal, detach);
  *    async signatures for lifecycle ops (createOrAttach, kill, cleanup)
- *
- * Reference: apps/desktop/plans/20260109-2313-terminal-runtime-abstraction-rewrite.md
  */
 
 import type { EventEmitter } from "node:events";

@@ -345,7 +345,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 	};
 
-	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
+	// Chat v3 runtime. Registered unconditionally:
 	// the routes sit behind the same auth as every other host route, and the
 	// runtime is built on first request, so chat.db is never created on a host
 	// nobody chats with. Exposure is a client concern — the renderer gates the
