@@ -156,7 +156,7 @@ Move(d, w, from, to) ==
 \* A stop replaces the box's previous snapshot; that is not a deletion.
 Sleep(d, w) == Move(d, w, {"awake"}, "asleep")
 Archive(d, w) == Move(d, w, {"awake", "asleep"}, "archived")
-Unarchive(d, w) == rows[d][w].t < Grace /\ Move(d, w, {"archived"}, "asleep")
+Unarchive(d, w) == Move(d, w, {"archived"}, "asleep")
 
 RetiredRow(r) ==
   [r EXCEPT !.st = IF @ = "archived" THEN "archived" ELSE "failed",
@@ -259,8 +259,7 @@ TdGiveUp(j) ==
 \* prunes a live environment's goldens beyond the newest K.
 EnvGoldenDelete(d, g) ==
   /\ Rule2On /\ JobRuns(d) /\ g \in Range(env[d].gs) /\ PinGuard(d, g)
-  /\ \/ env[d].st = "archived"
-     \/ CleanupPrunesPinned /\ env[d].st = "live" /\ g \in BeyondK(d)
+  /\ CleanupPrunesPinned /\ env[d].st = "live" /\ g \in BeyondK(d)
   /\ DelBy({Golden(g)}, d)
   /\ DropGoldens(d, {g})
   /\ UNCHANGED <<rows, gcnt, rel, tdQ, branched>>
@@ -275,7 +274,7 @@ AgentsCleanup(d, a) ==
 
 NamedIn(d, r) ==
   IF r[1] = "golden"
-  THEN r[2] \in Range(env[d].gs) \/ env[d].act = r[2] \/ PinnedIn(d, r[2])
+  THEN (env[d].st = "live" /\ (r[2] \in Range(env[d].gs) \/ env[d].act = r[2])) \/ PinnedIn(d, r[2])
   ELSE \E w \in WS : NamesWs(d, w, r[2])
 
 \* Rule 3: anything nothing in d refers to, older than LeftoverAge.
