@@ -1,6 +1,6 @@
 ---
 name: panes
-description: Arrange the tabs and split panes of a Paradev (formerly Superset) workspace in the desktop app from an agent, in the main area and the right sidebar. Use when the user asks to split a pane, open a tab, run a command in a new pane, resize, swap, move, focus, close, or even out panes, lay out a dashboard of terminals, show them something side by side, or open, show, hide, or expand the right sidebar with Changes, a file in the editor, Files, Pages, or a browser in it, including "split this and run the tests on the right", "open the logs in a new tab", "make this pane bigger", "put the server and the tests side by side", "close those extra panes", "show me the diff in the sidebar", "open cart.ts at line 40", "open localhost:3000 in the sidebar", "move that terminal to the sidebar", "hide the sidebar". Not for coordinating worker agents (use superset:orchestrate) or driving web pages (use superset:browser).
+description: Arrange the tabs and split panes of a Paradev (formerly Superset) workspace in the desktop app from an agent, in the main area and the right sidebar. Use when the user asks to split a pane, open a tab, run a command in a new pane, resize, swap, move, focus, close, or even out panes, lay out a dashboard of terminals, show them something side by side, or open, show, hide, or expand the right sidebar with Changes, a file in the editor, Files, Pages, or a browser in it, including "split this and run the tests on the right", "open the logs in a new tab", "make this pane bigger", "put the server and the tests side by side", "close those extra panes", "show me the diff in the sidebar", "open cart.ts at line 40", "open localhost:3000 in the sidebar", "move that terminal to the sidebar", "hide the sidebar", "which workspace is open in my window". Not for coordinating worker agents (use superset:orchestrate) or driving web pages (use superset:browser).
 argument-hint: the layout to build, or the pane change to make
 allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(jq:*)
 ---
@@ -28,8 +28,11 @@ main area unless the user asks for the sidebar.
    `superset update` and recheck. The app-bundled CLI (`~/.paradev/bin/superset`)
    updates only with the desktop app, so if it still lacks `panes`, updating
    the app is the fix.
-2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`;
-   otherwise `superset workspaces list --local --json` and pick the target.
+2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`.
+   For the workspace the user is looking at, ask the desktop app:
+   `superset windows list --json | jq -r '.[0].workspaceId'` (the focused
+   window comes first; `null` means it shows no workspace). Otherwise
+   `superset workspaces list --local --json` and pick the target.
 3. Panes live in the desktop app. A host with no desktop attached (a standalone
    `superset start`) has no panes, and an older desktop app answers "This host
    is too old for `superset panes`". Surface either rather than retrying.
