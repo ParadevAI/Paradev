@@ -205,11 +205,6 @@ Three traps worth knowing before you touch catalogs:
   Mock that module with a Proxy, never a spread — `i18n` is a class instance and a spread
   drops `load`/`activate`.
 
-## Deploy workflows
-
-In `.github/workflows/`, a `run:` step has no `pipefail` by default, so set it on any piped step.
-Production secrets exist only in GitHub: a script that needs one runs as a workflow.
-
 ## Plans and design notes
 
 This repository is public. Plans, design notes, research, findings, specs and TODO lists are not
@@ -255,6 +250,8 @@ earns its place by catching a regression quickly.
   contract, the credential proxy, and which files are generated.
 - `docs/environment-variables.md`: read before adding an environment variable. Five places,
   and missing one fails silently.
+- `docs/deploy-workflows.md`: read before writing or testing a deploy workflow step. `run:` has
+  no `pipefail` by default, and production secrets exist only in GitHub.
 - `packages/trpc/AGENTS.md`: read before changing any tRPC procedure, in `packages/trpc` or
   `packages/host-service`. Released desktop, mobile, and CLI builds still call it.
 - `apps/desktop/AGENTS.md`: desktop specifics (notices, persisted renderer state).
