@@ -22,6 +22,7 @@ import log from "electron-log";
 import express, { type Request, type Response } from "express";
 import { type WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
+import { listDesktopWindows } from "../desktop-windows/list-desktop-windows";
 import { showCliNotification } from "../notifications/show-cli-notification";
 import {
 	PaneLayoutRequestError,
@@ -472,6 +473,10 @@ export async function startBrowserBridge({
 					.status(err instanceof PaneLayoutRequestError ? err.status : 500)
 					.json({ error: errorMessage(err) }),
 			);
+	});
+
+	app.get("/windows", (_req, res) => {
+		res.json({ windows: listDesktopWindows() });
 	});
 
 	app.post("/notify", (req, res) => {
