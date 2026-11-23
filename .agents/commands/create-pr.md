@@ -22,7 +22,7 @@ A good PR description answers:
 
 IMPORTANT:
 - When on `main`, ALWAYS create a branch first before committing. Never push directly to `main`.
-- If there is an ExecPlan, link it in the PR body and call out deltas (what shipped, what deferred).
+- If there is an ExecPlan, do not link it: it lives in the private `ParadevAI/plans` repo. Say what shipped and what is deferred in plain terms.
 
 # Workflow (creating the PR)
 
@@ -79,10 +79,10 @@ Do NOT proceed with the PR. Instead, present findings to the user:
 - If starting from `main`: `git switch -c <feature-branch-name>`
 
 ## 4. Move ExecPlan to done (if applicable)
-- If this PR completes an ExecPlan:
-  `git mv apps/<app>/plans/<plan-name>.md apps/<app>/plans/done/<plan-name>.md`
-- Fill in `Outcomes & Retrospective` first.
-- Update the PR body link to point at the `done/` path.
+- ExecPlans live in the private `ParadevAI/plans` repo, not in this public one.
+- If this PR completes an ExecPlan, fill in `Outcomes & Retrospective` and move it to its
+  `done/` folder there, in a separate commit or PR on that repo.
+- Never link, quote or name the plan in this public PR.
 - Skip if there is no ExecPlan or it spans multiple PRs.
 
 ## 5. Stage and commit changes
@@ -164,7 +164,6 @@ Use **High-risk/Complex** when any of these are true:
 ## Standard PR template
 
     **Links (optional)**
-    - ExecPlan: `apps/<app>/plans/<plan-name>.md`
     - Issue: <link>
 
     ## Summary
@@ -212,7 +211,6 @@ Use **High-risk/Complex** when any of these are true:
 For PRs bundling multiple features, use Part headers to organize (like PR #559):
 
     **Links**
-    - ExecPlan: `apps/<app>/plans/<plan-name>.md`
     - Issue: <link>
 
     ## Summary
@@ -477,13 +475,9 @@ Use these as templates for the Manual QA Checklist section. Pick categories appr
 - **Keyboard shortcuts table** for changes that add shortcuts.
 - **Decision tables** for changes with multiple trade-offs.
 - **Files changed summary** for large PRs (helps reviewers navigate).
-- **Plan deltas** when an ExecPlan exists (what deviated and why).
 - **"How to review" hints** for large diffs (suggested review order, key files to focus on).
 
 # Example (Standard - Desktop Feature)
-
-    **Links**
-    - ExecPlan: `apps/desktop/plans/done/workspace-sidebar-exec-plan.md`
 
     ## Summary
     - Add configurable workspace navigation sidebar as alternative to top bar tabs.

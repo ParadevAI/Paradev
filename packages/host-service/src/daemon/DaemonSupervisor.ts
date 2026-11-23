@@ -5,8 +5,7 @@
 //
 // History: this used to live in the desktop main process
 // (`apps/desktop/src/main/lib/pty-daemon-coordinator.ts`). It moved here
-// so host-service can be deployed independently of Electron — see
-// `apps/desktop/plans/20260430-pty-daemon-host-service-migration.md`.
+// so host-service can be deployed independently of Electron.
 
 import * as childProcess from "node:child_process";
 import { createHash } from "node:crypto";

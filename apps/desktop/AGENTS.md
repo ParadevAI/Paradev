@@ -1,7 +1,7 @@
 
 ## Server-driven announcements (desktop notices)
 
-To show an announcement/warning popup in the app without shipping a release, insert a row in the `desktop_notices` table (served by `GET /api/desktop/version`). Authoring guide — markdown-only body, severities, triggers, targeting, QA previews: `docs/DESKTOP_NOTICES.md`.
+To show an announcement/warning popup in the app without shipping a release, insert a row in the `desktop_notices` table (served by `GET /api/desktop/version`). The authoring guide (markdown-only body, severities, triggers, targeting, QA previews) is `paradev-repo/apps/desktop/docs/DESKTOP_NOTICES.md` in the private `ParadevAI/plans` repo.
 
 ## Persisted renderer state (localStorage) policy
 

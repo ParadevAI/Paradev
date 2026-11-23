@@ -22,8 +22,7 @@ The flow will:
 5. Create a **draft release** for review
 
 > Desktop, `host-service`, and `cli` share one version, enforced by CI
-> (`bun run check:versions`). `pty-daemon` stays on its own `0.x` track. See
-> [`plans/20260709-unified-version-bumping.md`](../../plans/20260709-unified-version-bumping.md).
+> (`bun run check:versions`). `pty-daemon` stays on its own `0.x` track.
 
 ### Options
 

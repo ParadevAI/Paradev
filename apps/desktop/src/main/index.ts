@@ -525,8 +525,8 @@ if (!gotTheLock) {
 
 	(async () => {
 		await app.whenReady();
-		// Persisted language setting wins; otherwise infer from OS preferences
-		// (plans/20260826-i18n-strategy.md). Menus are built later in
+		// Persisted language setting wins; otherwise infer from OS preferences.
+		// Menus are built later in
 		// initAppServices/initTray, so a plain activate is enough here.
 		await initI18nAsync(resolveAppLocale(getLanguageSetting()));
 		if (getAppDisplayName() !== app.name) {

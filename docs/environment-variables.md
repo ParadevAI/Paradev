@@ -149,9 +149,8 @@ surface has its own PostHog flag, so they roll out separately: desktop sign-in
 reads `web-domain-move` and old-app pages read `web-pages-domain-move`. A
 missing `web-pages-domain-move` flag retains the old pages. No secret is set
 by merging the wiring. Stage and final artifact preparation explicitly pass
-`false`. See
-[the cutover handoff](paradev-staging.md#inert-domain-cutover-preparation) before
-any future activation, including its merge/deployment warning.
+`false`. Read the cutover handoff (`paradev-repo/docs/paradev-staging.md` in the private
+`ParadevAI/plans` repo) before any future activation, including its merge/deployment warning.
 
 ## Marketing destination override
 

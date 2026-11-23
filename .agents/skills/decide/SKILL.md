@@ -7,7 +7,7 @@ description: Walk the user through design or implementation decisions one at a t
 
 ## Prepare
 
-Before a design walkthrough, inspect the relevant code and record concrete bugs, inconsistencies, and decision points in `plans/<YYYYMMDD>-<topic>.md` or the appropriate app-scoped `plans/` directory. Preserve existing edits; never discard speculative or user-authored work without explicit approval.
+Before a design walkthrough, inspect the relevant code and record concrete bugs, inconsistencies, and decision points in the private `ParadevAI/plans` repo, at `paradev-repo/plans/<YYYYMMDD>-<topic>.md` or the matching `paradev-repo/apps/<app>/plans/` directory. Never write them into this public repo. Preserve existing edits; never discard speculative or user-authored work without explicit approval.
 
 Order decisions by dependency and leverage, not document order.
 
