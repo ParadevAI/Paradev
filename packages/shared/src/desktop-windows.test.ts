@@ -29,5 +29,12 @@ describe("parseDesktopWindowRoute", () => {
 			workspaceId: null,
 		});
 		expect(parseDesktopWindowRoute("not a url").workspaceId).toBeNull();
+		expect(
+			parseDesktopWindowRoute("file:///index.html#/workspace/%E0%A4%A"),
+		).toEqual({
+			route: "/workspace/%E0%A4%A",
+			view: "other",
+			workspaceId: null,
+		});
 	});
 });

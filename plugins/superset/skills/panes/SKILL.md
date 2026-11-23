@@ -30,9 +30,14 @@ main area unless the user asks for the sidebar.
    the app is the fix.
 2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`.
    For the workspace the user is looking at, ask the desktop app:
-   `superset windows list --json | jq -r '.[0].workspaceId'` (the focused
-   window comes first; `null` means it shows no workspace). Otherwise
-   `superset workspaces list --local --json` and pick the target.
+   `superset windows list --json | jq -c '.[0] | {view, workspaceId}'`. The
+   focused window comes first. Use its `workspaceId` only when `view` is
+   `workspace`. A `cloud-workspace` runs on another machine, so tell the user
+   which one it is and that local pane control does not reach it; `other`
+   shows no workspace. `windows` is newer than `panes`: if
+   `superset windows --help` fails, update the CLI (or the app, for the
+   bundled CLI) as above. Otherwise `superset workspaces list --local --json`
+   and pick the target.
 3. Panes live in the desktop app. A host with no desktop attached (a standalone
    `superset start`) has no panes, and an older desktop app answers "This host
    is too old for `superset panes`". Surface either rather than retrying.

@@ -33,9 +33,12 @@ export function parseDesktopWindowRoute(url: string): {
 		route = new URL(url).hash.replace(/^#/, "") || "/";
 	} catch {}
 	for (const [pattern, view] of WORKSPACE_ROUTES) {
-		const workspaceId = pattern.exec(route)?.[1];
-		if (workspaceId) {
-			return { route, view, workspaceId: decodeURIComponent(workspaceId) };
+		const encoded = pattern.exec(route)?.[1];
+		if (!encoded) continue;
+		try {
+			return { route, view, workspaceId: decodeURIComponent(encoded) };
+		} catch {
+			break;
 		}
 	}
 	return { route, view: "other", workspaceId: null };
