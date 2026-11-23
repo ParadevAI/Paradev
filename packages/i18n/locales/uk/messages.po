@@ -20409,6 +20409,12 @@ msgstr "Хост не повернувся протягом п'ятнадцят�
 msgid "The host hasn't answered."
 msgstr "Хост не відповів."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Хост не в мережі. Спробуйте ще раз, коли він знову буде в мережі, або видаліть хост, якщо він уже не повернеться."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Хост не в мережі. Спробуйте ще раз, коли він знову буде в мережі."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Хост онлайн. Виберіть його, коли створюватимете робочий простір."
 
@@ -23457,6 +23463,9 @@ msgstr "Ваша сходинка — це зважена оцінка за ви
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Ваш запущений застосунок у браузері, яким можуть керувати ваші агенти."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Не вдалося оновити вхід. Перевірте з'єднання та спробуйте ще раз."
 
 msgid "Your signed-in session"
 msgstr "Ваш сеанс входу"

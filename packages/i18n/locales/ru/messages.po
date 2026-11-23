@@ -20415,6 +20415,12 @@ msgstr "Хост не восстановил работу в течение пя
 msgid "The host hasn't answered."
 msgstr "Хост не ответил."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Хост не в сети. Повторите попытку, когда он снова будет в сети, или удалите хост, если он больше не вернётся."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Хост не в сети. Повторите попытку, когда он снова будет в сети."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Хост в сети. Выберите его при создании рабочей области."
 
@@ -23463,6 +23469,9 @@ msgstr "Ваша ступень — взвешенная оценка по це�
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Ваше работающее приложение в браузере, которым могут управлять агенты."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Не удалось обновить вход. Проверьте подключение и повторите попытку."
 
 msgid "Your signed-in session"
 msgstr "Ваша авторизованная сессия"

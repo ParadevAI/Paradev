@@ -20415,6 +20415,12 @@ msgstr "Hostitel se neobnovil do patnácti minut."
 msgid "The host hasn't answered."
 msgstr "Host neodpověděl."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Hostitel je offline. Zkuste to znovu, až bude zase online, nebo hostitele smažte, pokud už se nevrátí."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Hostitel je offline. Zkuste to znovu, až bude zase online."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host je online. Vyberte ho při vytváření pracovního prostoru."
 
@@ -23463,6 +23469,9 @@ msgstr "Tvůj stupeň je vážené skóre z cílů, kterých bylo změřeno {0},
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Vaše běžící aplikace v prohlížeči, který mohou ovládat vaši agenti."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Přihlášení se nepodařilo obnovit. Zkontrolujte připojení a zkuste to znovu."
 
 msgid "Your signed-in session"
 msgstr "Vaše přihlášená relace"

@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { toast } from "@superset/ui/sonner";
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
 	DestroyWorkspacePreview,
@@ -26,7 +27,7 @@ type InspectState =
 	| { status: "idle" }
 	| { status: "loading" }
 	| { status: "ready"; preview: DestroyWorkspacePreview }
-	| { status: "error" };
+	| { status: "error"; hostOffline: boolean };
 
 export function useDestroyDialogState({
 	workspaceId,
@@ -40,6 +41,7 @@ export function useDestroyDialogState({
 	const { workspaces: hostWorkspaces, cache: hostWorkspacesCache } =
 		useHostWorkspaces();
 	const { navigateAwayFromWorkspace } = useNavigateAwayFromWorkspace();
+	const navigate = useNavigate();
 
 	const { preferences, setDeleteLocalBranch: setDeleteBranch } =
 		useUserPreferences();
@@ -74,11 +76,14 @@ export function useDestroyDialogState({
 				if (cancelled) return;
 				setInspectState({ status: "ready", preview });
 			})
-			.catch(() => {
+			.catch((err: DestroyWorkspaceError) => {
 				if (cancelled) return;
-				// Inspect-failure is non-fatal — let the user attempt destroy and
-				// surface real errors there. Treat as "no warnings, no block".
-				setInspectState({ status: "error" });
+				// Other inspect failures are non-fatal: let the user attempt
+				// destroy and surface real errors there.
+				setInspectState({
+					status: "error",
+					hostOffline: err.kind === "host-offline",
+				});
 			});
 
 		return () => {
@@ -87,6 +92,15 @@ export function useDestroyDialogState({
 	}, [open, hostTarget.status, inspect]);
 
 	const preview = inspectState.status === "ready" ? inspectState.preview : null;
+	const isHostOffline =
+		inspectState.status === "error" && inspectState.hostOffline;
+	const hostId = "hostId" in hostTarget ? hostTarget.hostId : null;
+
+	const openHostSettings = useCallback(() => {
+		if (!hostId) return;
+		onOpenChange(false);
+		void navigate({ to: "/settings/hosts/$hostId", params: { hostId } });
+	}, [hostId, navigate, onOpenChange]);
 
 	const handleOpenChange = useCallback(
 		(next: boolean) => {
@@ -122,7 +136,7 @@ export function useDestroyDialogState({
 			navigateAwayFromWorkspace(workspaceId);
 			toast(`Deleting "${workspaceName}"...`);
 
-			const hostId = hostWorkspaces.find(
+			const workspaceHostId = hostWorkspaces.find(
 				(item) => item.id === workspaceId,
 			)?.hostId;
 
@@ -148,8 +162,8 @@ export function useDestroyDialogState({
 				// The host's local delete is the commit point; its
 				// workspace:changed broadcast normally beats this, but drop the
 				// row explicitly so the UI never depends on the socket.
-				if (hostId) {
-					hostWorkspacesCache.removeWorkspace(hostId, workspaceId);
+				if (workspaceHostId) {
+					hostWorkspacesCache.removeWorkspace(workspaceHostId, workspaceId);
 				}
 				for (const warning of result.warnings) toast.warning(warning);
 				onDeleted?.();
@@ -169,6 +183,14 @@ export function useDestroyDialogState({
 						t({
 							message: `Failed to delete ${workspaceName}: ${"message" in e ? e.message : String(e.kind)}`,
 						}),
+						e.kind === "host-offline" && hostId
+							? {
+									action: {
+										label: t({ message: "Host settings" }),
+										onClick: openHostSettings,
+									},
+								}
+							: undefined,
 					);
 				}
 			} finally {
@@ -186,6 +208,8 @@ export function useDestroyDialogState({
 			navigateAwayFromWorkspace,
 			hostWorkspaces,
 			hostWorkspacesCache,
+			hostId,
+			openHostSettings,
 			t,
 		],
 	);
@@ -197,8 +221,10 @@ export function useDestroyDialogState({
 		hasUnpushedCommits: preview?.hasUnpushedCommits ?? false,
 		sharesProjectCheckout:
 			preview?.canDelete === true && preview.sharesProjectCheckout === true,
-		canConfirm: preview ? preview.canDelete : true,
+		canConfirm: preview ? preview.canDelete : !isHostOffline,
 		blockingReason: preview && !preview.canDelete ? preview.reason : null,
+		isHostOffline,
+		openHostSettings,
 		isCheckingStatus: open && inspectState.status === "loading",
 		error,
 		handleOpenChange,

@@ -20415,6 +20415,12 @@ msgstr "Ana makine on beş dakika içinde geri gelmedi."
 msgid "The host hasn't answered."
 msgstr "Host yanıt vermedi."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Host çevrimdışı. Yeniden çevrimiçi olduğunda tekrar deneyin veya artık geri gelmeyecekse host'u silin."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Host çevrimdışı. Yeniden çevrimiçi olduğunda tekrar deneyin."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host çevrimiçi. Bir çalışma alanı oluştururken onu seç."
 
@@ -23463,6 +23469,9 @@ msgstr "Basamağın, senin için ölçülen {0} hedefin ağırlıklı puanıdır
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Çalışan uygulamanız, ajanlarınızın yönetebildiği bir tarayıcıda."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Oturumunuz yenilenemedi. Bağlantınızı kontrol edip tekrar deneyin."
 
 msgid "Your signed-in session"
 msgstr "Oturum açık durumdaki oturumunuz"

@@ -20415,6 +20415,12 @@ msgstr "Host nie wrócił do działania w ciągu piętnastu minut."
 msgid "The host hasn't answered."
 msgstr "Host nie odpowiedział."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "Host jest offline. Spróbuj ponownie, gdy wróci do trybu online, albo usuń hosta, jeśli już nie wróci."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "Host jest offline. Spróbuj ponownie, gdy wróci do trybu online."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "Host jest online. Wybierz go podczas tworzenia obszaru roboczego."
 
@@ -23463,6 +23469,9 @@ msgstr "Twój szczebel to ważona ocena z celów, których zmierzono {0}, więc 
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "Twoja działająca aplikacja w przeglądarce, którą mogą sterować Twoi agenci."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "Nie udało się odświeżyć logowania. Sprawdź połączenie i spróbuj ponownie."
 
 msgid "Your signed-in session"
 msgstr "Twoja zalogowana sesja"

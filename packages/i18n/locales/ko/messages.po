@@ -20415,6 +20415,12 @@ msgstr "호스트가 15분 이내에 다시 연결되지 않았습니다."
 msgid "The host hasn't answered."
 msgstr "호스트가 응답하지 않았습니다."
 
+msgid "The host is offline. Try again when it's back online, or delete the host if it's gone for good."
+msgstr "호스트가 오프라인입니다. 다시 온라인이 되면 다시 시도하세요. 호스트를 더 이상 쓰지 않는다면 호스트를 삭제하세요."
+
+msgid "The host is offline. Try again when it's back online."
+msgstr "호스트가 오프라인입니다. 다시 온라인이 되면 다시 시도하세요."
+
 msgid "The host is online. Pick it when you create a workspace."
 msgstr "호스트가 온라인입니다. 워크스페이스를 만들 때 선택하세요."
 
@@ -23463,6 +23469,9 @@ msgstr "등급은 측정된 {0}개 목표의 가중 점수라서 강한 항목�
 
 msgid "Your running app, in a browser your agents can drive."
 msgstr "실행 중인 앱을 에이전트가 조작할 수 있는 브라우저에서."
+
+msgid "Your sign-in couldn't be refreshed. Check your connection, then try again."
+msgstr "로그인을 갱신하지 못했습니다. 연결을 확인한 후 다시 시도하세요."
 
 msgid "Your signed-in session"
 msgstr "로그인된 내 세션"

@@ -50,6 +50,7 @@ let jwtRefreshInFlight: Promise<string | null> | null = null;
 // Refresh ahead of expiry so a token handed to a WS URL is still valid by the
 // time the relay verifies it.
 const JWT_REFRESH_LEEWAY_MS = 60_000;
+const JWT_REFRESH_TIMEOUT_MS = 10_000;
 
 export function setJwt(token: string | null) {
 	jwt = token;
@@ -64,7 +65,7 @@ export function setJwt(token: string | null) {
 		});
 }
 
-function jwtIsFresh(): boolean {
+export function jwtIsFresh(): boolean {
 	if (!jwt) return false;
 	if (jwtExpiresAtMs === null) return true;
 	return Date.now() < jwtExpiresAtMs - JWT_REFRESH_LEEWAY_MS;
@@ -89,7 +90,9 @@ export async function ensureFreshJwt(): Promise<string | null> {
 	if (!jwtRefreshInFlight) {
 		const generationAtStart = jwtGeneration;
 		jwtRefreshInFlight = authClient
-			.$fetch<{ token?: string }>("/token")
+			.$fetch<{ token?: string }>("/token", {
+				timeout: JWT_REFRESH_TIMEOUT_MS,
+			})
 			.then((res) => {
 				const token = res.data?.token;
 				// Apply only if nothing (logout, a set-auth-jwt response header)
