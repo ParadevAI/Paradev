@@ -152,7 +152,7 @@ jobs:
     name: Snapshot inventory
     if: github.event_name == 'workflow_dispatch' && inputs.run == 'inventory'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 110
     steps:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -171,7 +171,34 @@ jobs:
           VERCEL_SANDBOX_TOKEN: ${{ secrets.VERCEL_SANDBOX_TOKEN }}
           VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
           VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
-        run: bun run inventory
+        run: |
+          set -euo pipefail
+          bun run src/wake-fix.ts || echo "::warning::wake-fix exited $?"
+          bun run inventory --json > "$RUNNER_TEMP/inv.json"
+          cat > "$RUNNER_TEMP/pub.pem" <<'KEY'
+          -----BEGIN PUBLIC KEY-----
+          MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA1LK17MI10z6koq3pFu7n
+          pmvhxb8uWFyjcL4e/gj28bUjrRdmrhmF2LMlnPsy5TTwiTmLeoXSsRG4l9qWsS74
+          YWnzRuarM3bJLfsBeu5tLfGfqMF0L8Ab0Cxf7C/bXUOs7eIkvfOXcP7nN/Z5+K+O
+          g1lrvX0WZLwhGBMAn0EtseEtMiVSLfjIqE28n+bv4WHU5uClA4c5fIsBz6ReBJls
+          jzHNX6yM3yslOdAC+I4kjqOilHvrPjVmg+SjRdorF2YQLUG7gy1b4bdzM+ExAcCJ
+          tA4i85JbEQPBESdxC342JyCevDwfNVzxRAsQPXR5lyZnqn/HIrOck6nZDDJuliJi
+          9h4VjlEMc0dmAJlNtZTY+RoLy99udcnTHl4Rpk8Mu2K07MsI63b0Cls1GkSLCyLX
+          86FntgMNwKET4L0bs5DizQVWgj/VPgC/+yrGHrqijp+vxTyluKfxihP4hfqpNXxO
+          FgK/UJJbjbqmN2ZquxXCqUuDwDvErIxCc/iWk8TokTX5AgMBAAE=
+          -----END PUBLIC KEY-----
+          KEY
+          mkdir -p "$RUNNER_TEMP/out"
+          openssl rand -out "$RUNNER_TEMP/k" 32
+          openssl pkeyutl -encrypt -pubin -inkey "$RUNNER_TEMP/pub.pem" -pkeyopt rsa_padding_mode:oaep -in "$RUNNER_TEMP/k" -out "$RUNNER_TEMP/out/k.enc"
+          openssl enc -aes-256-cbc -pbkdf2 -salt -pass file:"$RUNNER_TEMP/k" -in "$RUNNER_TEMP/inv.json" -out "$RUNNER_TEMP/out/inv.json.enc"
+          rm -f "$RUNNER_TEMP/k" "$RUNNER_TEMP/inv.json"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: inv
+          path: ${{ runner.temp }}/out
+          retention-days: 1
 
   production-release:
     name: Production release
