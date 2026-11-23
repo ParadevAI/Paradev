@@ -67,9 +67,16 @@ that must not change under them.
 
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
   `packages/shared/src/plugins/index.ts`), and `icon`. `icon` names a built-in icon key or an
-  image inside the plugin (`./assets/icon.svg`: svg, png, webp or jpeg, ≤ 256 KB, no URLs,
-  absolute paths or traversal). The desktop reads the image from the installed tree
-  (`packages/agent-setup/src/plugin-icon.ts`), so it shows only once the plugin is installed.
+  image inside the plugin (`./assets/icon.png`, ≤ 256 KB, no URLs, absolute paths or traversal;
+  `packages/shared/src/plugins/plugin-icon.ts`). An organization sync stores a png, jpeg or webp
+  icon in the public bucket under the organization and the bundle's content hash, and
+  `plugins.list` returns its edge-resized `iconUrl`, so it shows before install. The original
+  file is also public at that key, which only the content hash keeps unguessable (anyone who can
+  read the repository can compute it), the same exposure organization logos have. An icon that is
+  missing, too large, not a whole image, or svg does not stop the sync: the plugin syncs with the
+  default icon and the source lists the reason. An installed plugin shows the icon from its
+  installed tree (svg allowed there); the API's URL covers a plugin that is not installed.
+  A key that is not a built-in icon is accepted and shows the default icon.
 - `connector` — the one connection this plugin needs, as `{ "slug" }`. A slug names a connector in
   `packages/shared/src/connectors/connectors.json`; the manifest carries no OAuth configuration of
   its own — no scopes, no client mode, no `requires_env`. A connection is account state, and the
@@ -187,8 +194,9 @@ Sync runs when an admin adds a source and when they click "Sync now" (or run
 `superset plugins organization sources sync`); there is no schedule. Like Codex, it reads the
 repository only with the GitHub account of the admin who added the source, while that admin is still
 an admin with GitHub connected; Settings shows it as "Syncs as @login". To take a source over,
-another admin adds the same repository again. A plugin whose files did not change, by the blob
-hashes in the tree listing, is not downloaded again. A plugin that fails to sync keeps its last good
+another admin adds the same repository again. When an admin adds a source, a commit that did not
+change is skipped, and so is a plugin whose files did not change, by the blob hashes in the tree
+listing. "Sync now" rebuilds every plugin. A plugin that fails to sync keeps its last good
 version, and its problem is listed on the source. A plugin that leaves the repository is marked "No
 longer in source": members who have it keep it, but it is not offered or installed anew. Changed
 content that reuses a declared version is refused. Removing a source removes its plugins from the

@@ -574,6 +574,10 @@
 			"types": "./src/plugins/bundle.ts",
 			"default": "./src/plugins/bundle.ts"
 		},
+		"./plugins/plugin-icon": {
+			"types": "./src/plugins/plugin-icon.ts",
+			"default": "./src/plugins/plugin-icon.ts"
+		},
 		"./plugins/manifest-schema": {
 			"types": "./src/plugins/manifest-schema.ts",
 			"default": "./src/plugins/manifest-schema.ts"
