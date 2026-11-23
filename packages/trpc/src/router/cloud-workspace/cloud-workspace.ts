@@ -68,6 +68,7 @@ import {
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { withClientStatus } from "./client-status";
+import { createConcurrencyLimit } from "./concurrency-limit";
 import { isLiveStatus } from "./live";
 import {
 	assertMayBoot,
@@ -104,6 +105,14 @@ const DESCRIPTION_PROMPT = [
 	"Keep it to 2-4 sentences of markdown, and save it by piping it on stdin:",
 	"`superset workspaces description set <<'EOF'` followed by the description and `EOF`.",
 ].join(" ");
+
+/**
+ * A client addresses every live workspace it lists in one batched request,
+ * and each address opens several sockets. Run unbounded, a large organization
+ * runs the instance out of file descriptors; a wake is one per client and is
+ * not held behind them.
+ */
+const limitAddress = createConcurrencyLimit(8);
 
 /** The caller's cloud workspace, refused unless it exists, they may use it, and it is ready. */
 async function loadReadyWorkspace(
@@ -637,29 +646,32 @@ export const cloudWorkspaceRouter = {
 		.input(
 			z.object({ id: z.string().uuid(), wake: z.boolean().default(false) }),
 		)
-		.mutation(async ({ ctx, input }) => {
-			const row = await loadReadyWorkspace(ctx, input.id);
-			const address = await addressSandbox(
-				row,
-				input.wake ? "wake" : "address",
-			);
-			const host = await mintSandboxGateAccess({
-				workspaceId: row.id,
-				userId: ctx.principal.userId,
-				port: HOST_SERVICE_PORT,
-				target: address.hostTarget,
-			});
-			return {
-				url: host.url,
-				token: host.token,
-				expiresAt: host.expiresAt,
-				running: address.running,
-				agentsToRestart: address.agentsToRestart,
-				agentCredentialsChanged: address.agentCredentialsChanged,
-				// The display is served by host-service too: same address, same
-				// ticket. The sandbox's own desktop port is not published.
-				desktop: { url: host.url, token: host.token },
+		.mutation(({ ctx, input }) => {
+			const grant = async () => {
+				const row = await loadReadyWorkspace(ctx, input.id);
+				const address = await addressSandbox(
+					row,
+					input.wake ? "wake" : "address",
+				);
+				const host = await mintSandboxGateAccess({
+					workspaceId: row.id,
+					userId: ctx.principal.userId,
+					port: HOST_SERVICE_PORT,
+					target: address.hostTarget,
+				});
+				return {
+					url: host.url,
+					token: host.token,
+					expiresAt: host.expiresAt,
+					running: address.running,
+					agentsToRestart: address.agentsToRestart,
+					agentCredentialsChanged: address.agentCredentialsChanged,
+					// The display is served by host-service too: same address, same
+					// ticket. The sandbox's own desktop port is not published.
+					desktop: { url: host.url, token: host.token },
+				};
 			};
+			return input.wake ? grant() : limitAddress(grant);
 		}),
 
 	/**
