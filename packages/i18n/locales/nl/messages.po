@@ -2306,6 +2306,9 @@ msgstr "Toevoegen aan mergewachtrij"
 msgid "Add to project"
 msgstr "Aan project toevoegen"
 
+msgid "Add to prompt"
+msgstr "Toevoegen aan prompt"
+
 msgid "Add to queue"
 msgstr "In wachtrij zetten"
 

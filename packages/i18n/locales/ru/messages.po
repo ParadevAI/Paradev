@@ -2306,6 +2306,9 @@ msgstr "Добавить в очередь объединения"
 msgid "Add to project"
 msgstr "Добавить в проект"
 
+msgid "Add to prompt"
+msgstr "Добавить в промпт"
+
 msgid "Add to queue"
 msgstr "В очередь"
 

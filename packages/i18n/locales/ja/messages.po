@@ -2306,6 +2306,9 @@ msgstr "マージキューに追加"
 msgid "Add to project"
 msgstr "プロジェクトに追加"
 
+msgid "Add to prompt"
+msgstr "プロンプトに追加"
+
 msgid "Add to queue"
 msgstr "キューに追加"
 

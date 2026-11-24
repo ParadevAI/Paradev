@@ -2306,6 +2306,9 @@ msgstr "Přidat do fronty slučování"
 msgid "Add to project"
 msgstr "Přidat do projektu"
 
+msgid "Add to prompt"
+msgstr "Přidat do promptu"
+
 msgid "Add to queue"
 msgstr "Přidat do fronty"
 

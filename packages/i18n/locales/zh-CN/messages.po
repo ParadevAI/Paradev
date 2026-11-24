@@ -2306,6 +2306,9 @@ msgstr "加入合并队列"
 msgid "Add to project"
 msgstr "添加到项目"
 
+msgid "Add to prompt"
+msgstr "添加到提示词"
+
 msgid "Add to queue"
 msgstr "加入队列"
 

@@ -351,6 +351,11 @@
 		background-color: var(--highlight-active);
 	}
 
+	/* CSS Custom Highlight API for the text a chat comment quotes */
+	::highlight(chat-comment) {
+		background-color: var(--highlight-match);
+	}
+
 	/* UpdatesPill: marquee progress bar while installing */
 	@keyframes ascii-bar {
 		0% {

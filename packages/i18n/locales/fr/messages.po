@@ -2306,6 +2306,9 @@ msgstr "Ajouter à la file de fusion"
 msgid "Add to project"
 msgstr "Ajouter à un projet"
 
+msgid "Add to prompt"
+msgstr "Ajouter au prompt"
+
 msgid "Add to queue"
 msgstr "Mettre en file"
 

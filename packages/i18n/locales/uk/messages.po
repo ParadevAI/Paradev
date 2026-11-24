@@ -2300,6 +2300,9 @@ msgstr "Додати до черги злиття"
 msgid "Add to project"
 msgstr "Додати до проєкту"
 
+msgid "Add to prompt"
+msgstr "Додати до промпту"
+
 msgid "Add to queue"
 msgstr "У чергу"
 
