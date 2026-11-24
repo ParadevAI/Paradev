@@ -7241,6 +7241,9 @@ msgstr "\"{projectName}\" excluído de {0} de {1} dispositivos. Os outros mantê
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" excluído. Você pode restaurá-lo em Configurações → Projetos por 30 dias."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Excluídos {completed} de {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Excluído {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7285,6 @@ msgstr "Exclui este host, o acesso a ele e as áreas de trabalho dele. Os arquiv
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Excluindo"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Excluindo {0} de {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Excluindo {name}..."

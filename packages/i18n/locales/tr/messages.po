@@ -7241,6 +7241,9 @@ msgstr "\"{projectName}\", {1} cihazın {0} tanesinden silindi. Diğerleri kopya
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" silindi. 30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{total} öğeden {completed} tanesi silindi…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen} silindi · {deviceNames}"
 
@@ -7282,11 +7285,6 @@ msgstr "Bu host'u, erişimini ve çalışma alanlarını siler. Makinedeki dosya
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Siliniyor"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{1} öğeden {0} tanesi siliniyor…"
 
 msgid "Deleting {name}..."
 msgstr "{name} siliniyor..."

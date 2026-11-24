@@ -22,12 +22,14 @@ export async function executeBulkWorkspaceDeleteTargets<
 	Failure,
 >({
 	targets,
+	concurrency,
 	shouldForce,
 	shouldRetryWithForce,
 	destroy,
 	onSettled,
 }: {
 	targets: readonly Workspace[];
+	concurrency: number;
 	shouldForce: (workspace: Workspace) => boolean;
 	/** Retry a failed unforced destroy once with force. Used for conflicts on
 	 * workspaces whose preview never completed — "Delete without checking" is
@@ -39,30 +41,54 @@ export async function executeBulkWorkspaceDeleteTargets<
 	successes: Array<{ workspace: Workspace; result: Result }>;
 	failures: Array<{ workspace: Workspace; error: Failure }>;
 }> {
-	const successes: Array<{ workspace: Workspace; result: Result }> = [];
-	const failures: Array<{ workspace: Workspace; error: Failure }> = [];
+	type Outcome =
+		| { ok: true; workspace: Workspace; result: Result }
+		| { ok: false; workspace: Workspace; error: Failure };
+	const outcomes: Outcome[] = new Array(targets.length);
 
-	for (const workspace of targets) {
+	const destroyOne = async (workspace: Workspace): Promise<Outcome> => {
 		try {
 			const force = shouldForce(workspace);
-			let result: Result;
 			try {
-				result = await destroy(workspace, force);
+				return { ok: true, workspace, result: await destroy(workspace, force) };
 			} catch (error) {
 				if (!force && shouldRetryWithForce?.(workspace, error as Failure)) {
-					result = await destroy(workspace, true);
-				} else {
-					throw error;
+					return {
+						ok: true,
+						workspace,
+						result: await destroy(workspace, true),
+					};
 				}
+				throw error;
 			}
-			successes.push({ workspace, result });
 		} catch (error) {
-			failures.push({ workspace, error: error as Failure });
+			return { ok: false, workspace, error: error as Failure };
 		} finally {
 			onSettled?.();
 		}
-	}
+	};
 
+	let nextIndex = 0;
+	const worker = async () => {
+		while (nextIndex < targets.length) {
+			const index = nextIndex++;
+			outcomes[index] = await destroyOne(targets[index] as Workspace);
+		}
+	};
+	const workerCount = Number.isFinite(concurrency)
+		? Math.min(Math.max(1, Math.floor(concurrency)), targets.length)
+		: 1;
+	await Promise.all(Array.from({ length: workerCount }, worker));
+
+	const successes: Array<{ workspace: Workspace; result: Result }> = [];
+	const failures: Array<{ workspace: Workspace; error: Failure }> = [];
+	for (const outcome of outcomes) {
+		if (outcome.ok) {
+			successes.push({ workspace: outcome.workspace, result: outcome.result });
+		} else {
+			failures.push({ workspace: outcome.workspace, error: outcome.error });
+		}
+	}
 	return { successes, failures };
 }
 

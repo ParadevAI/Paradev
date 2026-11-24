@@ -33,6 +33,8 @@ interface UseBulkWorkspaceDeleteOptions {
 
 export type { BulkWorkspaceDeleteFailure };
 
+const BULK_DELETE_CONCURRENCY = 10;
+
 export function bulkWorkspaceDestroyErrorMessage(
 	workspace: DashboardSidebarWorkspace,
 	error: DestroyWorkspaceError,
@@ -62,8 +64,8 @@ export function bulkWorkspaceDestroyErrorMessage(
  *
  * Confirming hides the dialog at once and runs the destroys in the
  * background behind a progress toast, the same shape as the single delete:
- * a bulk delete runs every teardown script serially and can take minutes,
- * and a modal open that long blocks the whole app. The request's phase and
+ * every destroy runs a teardown script and can take a minute, and a modal
+ * open that long blocks the whole app. The request's phase and
  * failures live in the intent store, not here: the sidebar (and with it this
  * hook) unmounts when toggled closed, and the run must still surface its
  * failures pane once it is back instead of asking for confirmation again.
@@ -171,12 +173,8 @@ export function useBulkWorkspaceDelete({
 			intent.markRunning(requestId);
 
 			const total = targets.length;
-			// Both placeholders stay positional expressions so the catalog keeps
-			// the dialog-era "{0} of {1}" shape and its translations.
 			const progressMessage = (completed: number) =>
-				t({
-					message: `Deleting ${Math.min(completed + 1, total)} of ${targets.length}…`,
-				});
+				t({ message: `Deleted ${completed} of ${total}…` });
 			const progressToastId = toast.loading(progressMessage(0));
 
 			const targetIds = new Set(targets.map((workspace) => workspace.id));
@@ -199,6 +197,7 @@ export function useBulkWorkspaceDelete({
 					DestroyWorkspaceError
 				>({
 					targets,
+					concurrency: BULK_DELETE_CONCURRENCY,
 					shouldForce: (workspace) => {
 						const inspection = inspections.get(workspace.id);
 						return (

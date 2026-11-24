@@ -7241,6 +7241,9 @@ msgstr "Usunięto „{projectName}” z {0} z {1} urządzeń. Pozostałe zachowu
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Usunięto „{projectName}”. Możesz go przywrócić w Ustawienia → Projekty przez 30 dni."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Usunięto {completed} z {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Usunięto {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7285,6 @@ msgstr "Usuwa tego hosta, dostęp do niego i jego obszary robocze. Pliki na masz
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Usuwanie"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Usuwanie {0} z {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Usuwanie {name}..."

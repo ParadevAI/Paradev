@@ -7241,6 +7241,9 @@ msgstr "Deleted \"{projectName}\" from {0} of {1} devices. The others keep their
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Deleted {completed} of {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Deleted {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7285,6 @@ msgstr "Deletes this host, its access, and its workspaces. Files on the machine 
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Deleting"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Deleting {0} of {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Deleting {name}..."

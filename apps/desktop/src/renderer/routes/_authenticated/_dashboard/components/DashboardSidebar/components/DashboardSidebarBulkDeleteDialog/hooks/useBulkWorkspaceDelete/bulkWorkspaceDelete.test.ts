@@ -160,41 +160,96 @@ describe("buildBulkWorkspaceInspectionSummary", () => {
 });
 
 describe("executeBulkWorkspaceDeleteTargets", () => {
-	it("runs targets sequentially with each target's confirmed force choice", async () => {
-		const calls: Array<{ workspace: string; force: boolean }> = [];
-		let activeCalls = 0;
-		let maxActiveCalls = 0;
+	function controlledDestroy() {
+		const releases = new Map<string, (failure?: Error) => void>();
+		let active = 0;
+		let maxActive = 0;
+		const destroy = async (workspace: string) => {
+			active += 1;
+			maxActive = Math.max(maxActive, active);
+			const failure = await new Promise<Error | undefined>((resolve) =>
+				releases.set(workspace, resolve),
+			);
+			active -= 1;
+			if (failure) throw failure;
+			return `${workspace}-deleted`;
+		};
+		const flush = async () => {
+			for (let i = 0; i < 10; i += 1) await Promise.resolve();
+		};
+		return { releases, destroy, flush, maxActive: () => maxActive };
+	}
+
+	it("runs at most `concurrency` destroys at once", async () => {
+		const control = controlledDestroy();
 		let settledCount = 0;
 
-		const result = await executeBulkWorkspaceDeleteTargets<
-			string,
-			string,
-			Error
-		>({
-			targets: ["clean", "dirty"],
-			shouldForce: (workspace) => workspace === "dirty",
-			destroy: async (workspace, force) => {
-				activeCalls += 1;
-				maxActiveCalls = Math.max(maxActiveCalls, activeCalls);
-				calls.push({ workspace, force });
-				await Promise.resolve();
-				activeCalls -= 1;
-				return `${workspace}-deleted`;
-			},
+		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["a", "b", "c", "d", "e"],
+			concurrency: 2,
+			shouldForce: () => false,
+			destroy: control.destroy,
 			onSettled: () => {
 				settledCount += 1;
+			},
+		});
+
+		await control.flush();
+		expect([...control.releases.keys()]).toEqual(["a", "b"]);
+		for (const workspace of ["b", "a", "c", "d", "e"]) {
+			control.releases.get(workspace)?.();
+			await control.flush();
+		}
+		await run;
+
+		expect(control.maxActive()).toBe(2);
+		expect(settledCount).toBe(5);
+	});
+
+	it("reports outcomes in target order when destroys finish out of order", async () => {
+		const control = controlledDestroy();
+		const failure = new Error("teardown failed");
+
+		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["a", "b", "c", "d"],
+			concurrency: 4,
+			shouldForce: () => false,
+			destroy: control.destroy,
+		});
+
+		await control.flush();
+		control.releases.get("d")?.();
+		control.releases.get("c")?.(failure);
+		control.releases.get("b")?.();
+		control.releases.get("a")?.(failure);
+		const result = await run;
+
+		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
+			"b",
+			"d",
+		]);
+		expect(result.failures).toEqual([
+			{ workspace: "a", error: failure },
+			{ workspace: "c", error: failure },
+		]);
+	});
+
+	it("passes each target's own force choice", async () => {
+		const calls: Array<{ workspace: string; force: boolean }> = [];
+
+		await executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["clean", "dirty"],
+			concurrency: 2,
+			shouldForce: (workspace) => workspace === "dirty",
+			destroy: async (workspace, force) => {
+				calls.push({ workspace, force });
+				return workspace;
 			},
 		});
 
 		expect(calls).toEqual([
 			{ workspace: "clean", force: false },
 			{ workspace: "dirty", force: true },
-		]);
-		expect(maxActiveCalls).toBe(1);
-		expect(settledCount).toBe(2);
-		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
-			"clean",
-			"dirty",
 		]);
 	});
 
@@ -208,6 +263,7 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			Error
 		>({
 			targets: ["clean", "raced", "later"],
+			concurrency: 1,
 			shouldForce: () => false,
 			destroy: async (workspace) => {
 				callCount.set(workspace, (callCount.get(workspace) ?? 0) + 1);
@@ -234,6 +290,7 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			Error
 		>({
 			targets: ["unchecked", "clean"],
+			concurrency: 1,
 			shouldForce: () => false,
 			shouldRetryWithForce: (workspace, error) =>
 				workspace === "unchecked" && error === conflict,
@@ -266,6 +323,7 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			Error
 		>({
 			targets: ["ws"],
+			concurrency: 1,
 			shouldForce: () => true,
 			shouldRetryWithForce: () => true,
 			destroy: async (workspace, force) => {

@@ -7241,6 +7241,9 @@ msgstr "«{projectName}» удалён с {0} из {1} устройств. На 
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "«{projectName}» удалён. Его можно восстановить в разделе «Настройки → Проекты» в течение 30 дней."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Удалено {completed} из {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Удалён {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7285,6 @@ msgstr "Удаляет этот хост, доступ к нему и его р�
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Удаление"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Удаление {0} из {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Удаление {name}..."

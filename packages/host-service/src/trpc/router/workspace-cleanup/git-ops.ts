@@ -20,6 +20,10 @@ import {
 	WorkerTaskAbortedError,
 	WorkerTaskError,
 } from "../../../workers/WorkerTaskRunner";
+import { createConcurrencyLimit } from "./concurrency-limit";
+
+// The host worker pool keeps two spare workers; removals never take the ones status refreshes need.
+const runWorktreeRemoval = createConcurrencyLimit(2);
 
 /**
  * Pool-infrastructure failure (timeout, queue rejection, abort) — the git
@@ -66,9 +70,11 @@ export const cleanupGitOps = {
 		// Generous timeout: removal recursively deletes the worktree
 		// directory, which can take a while for large trees (node_modules
 		// etc.).
-		return getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
-			timeoutMs: 120_000,
-		});
+		return runWorktreeRemoval(() =>
+			getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
+				timeoutMs: 120_000,
+			}),
+		);
 	},
 
 	deleteLocalBranch(input: {

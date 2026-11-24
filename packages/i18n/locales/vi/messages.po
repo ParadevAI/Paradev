@@ -7241,6 +7241,9 @@ msgstr "Đã xóa \"{projectName}\" khỏi {0}/{1} thiết bị. Các thiết b�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Đã xóa \"{projectName}\". Bạn có thể khôi phục trong Cài đặt → Dự án trong 30 ngày."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Đã xóa {completed} trong {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Đã xóa {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7285,6 @@ msgstr "Xóa host này, quyền truy cập và các workspace của nó. Tệp t
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Đang xóa"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Đang xóa {0} trong {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Đang xóa {name}..."
