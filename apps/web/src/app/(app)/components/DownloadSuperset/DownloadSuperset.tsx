@@ -1,13 +1,20 @@
 import { msg } from "@lingui/core/macro";
-import { COMPANY, DOWNLOAD_URL_MAC_ARM64 } from "@superset/shared/constants";
+import {
+	COMPANY,
+	DOWNLOAD_URL_LINUX_X64,
+	DOWNLOAD_URL_MAC_ARM64,
+} from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import { Download, Globe } from "lucide-react";
+import { headers } from "next/headers";
 import { FaGithub } from "react-icons/fa";
 import { initServerI18n } from "@/lib/i18n-server";
 import { ProductDemo } from "./components/ProductDemo";
+import { isLinuxDesktop } from "./utils/isLinuxDesktop";
 
 export async function DownloadSuperset() {
 	const i18n = await initServerI18n();
+	const isLinux = isLinuxDesktop((await headers()).get("user-agent"));
 
 	return (
 		<div className="flex flex-col gap-8">
@@ -32,12 +39,10 @@ export async function DownloadSuperset() {
 
 				<div className="flex flex-wrap justify-center gap-3">
 					<Button size="lg" className="gap-2" asChild>
-						<a href={DOWNLOAD_URL_MAC_ARM64}>
-							{i18n._(
-								msg({
-									message: "Download for Mac",
-								}),
-							)}
+						<a href={isLinux ? DOWNLOAD_URL_LINUX_X64 : DOWNLOAD_URL_MAC_ARM64}>
+							{isLinux
+								? i18n._(msg({ message: "Download for Linux" }))
+								: i18n._(msg({ message: "Download for Mac" }))}
 							<Download className="size-5" />
 						</a>
 					</Button>
@@ -61,7 +66,7 @@ export async function DownloadSuperset() {
 						>
 							{i18n._(
 								msg({
-									message: "View on GitHub",
+									message: "Star on GitHub",
 								}),
 							)}
 							<FaGithub className="size-5" />
