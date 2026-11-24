@@ -2,7 +2,7 @@
 title: "Scheduled Coding Agents in 2026: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs You Review"
 description: "How to run coding agents on a schedule and review their work in the morning: nightly maintenance, a weekly flaky-test agent that leaves a reviewable fix, and dispatching runs from a CLI. GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations compared."
 date: 2026-10-07
-lastUpdated: 2026-11-15
+lastUpdated: 2026-11-24
 type: "roundup"
 competitors:
   - github-actions
@@ -23,6 +23,8 @@ keywords:
   - coding agent shared machine
   - agent automations
   - claude code schedule superset
+  - opencode automations
+  - schedule opencode
 ---
 
 To run a coding agent on a schedule, you need three things: a trigger, an isolated branch or worktree for each run, and a place where a human reviews the result before it merges. [Paradev Automations](https://docs.paradev.com/automations) have all three built in. You set a schedule, a prompt, and an agent (Claude Code, Codex, Amp, or another CLI agent), and each run gets a fresh worktree workspace on a machine you pick, which the team reviews like any other workspace.
@@ -78,9 +80,17 @@ For a full walkthrough with a read-only first prompt and a review checklist, see
 Yes. We checked on October 14, 2026, with Claude Code 2.1.300 started by Paradev: `/schedule` and `/loop` both appear in the session's command list, and `/schedule` reached the Routines service. Paradev uses your own Claude login and does not route Claude Code's traffic, so nothing in a Paradev workspace changes how these commands behave. Two of them run in different places, though:
 
 - **`/schedule` creates a Routine.** Per [Anthropic's routines docs](https://code.claude.com/docs/en/routines) (accessed October 14, 2026), routines are a research preview for Pro, Max, Team, and Enterprise plans. They run on Anthropic-managed cloud infrastructure, clone the repository at the start of each run, and push to `claude/` branches. The minimum interval is one hour, and `/schedule` needs a claude.ai login, not an API key or a third-party provider. A routine created from a Paradev session does not run in Paradev. When someone opens a pull request from its branch in a repository connected to a Paradev project, the PR shows up in Paradev's Pull requests view.
-- **`/loop` stays in the session.** Per [Anthropic's scheduled tasks docs](https://code.claude.com/docs/en/scheduled-tasks), `/loop` tasks are session-scoped, the shortest interval is one minute, and recurring tasks expire after seven days. In Paradev, the session lives in a background terminal service, so a `/loop` keeps firing after you quit the desktop app. Closing the terminal's last open pane or deleting the workspace ends the session and the loop.
+- **`/loop` stays in the session.** Per [Anthropic's scheduled tasks docs](https://code.claude.com/docs/en/scheduled-tasks), `/loop` tasks are session-scoped, and the shortest interval is one minute. Since [Claude Code 2.1.330](https://github.com/anthropics/claude-code/releases/tag/v2.1.330) (November 20, 2026), recurring tasks run for up to 30 days instead of 7 while their session keeps running. In Paradev, the session lives in a background terminal service, so a `/loop` keeps firing after you quit the desktop app. Closing the terminal's last open pane or deleting the workspace ends the session and the loop.
 
 **Using them together.** Paradev Automations fit runs that need your machine, your local services, or an agent other than Claude Code, and they leave a workspace a teammate can open. Routines fit runs that need only a fresh clone and should keep going while every machine is off. `/loop` fits short polling inside a session you are already watching, such as checking a deploy every five minutes. Codex has its own scheduled tasks in the ChatGPT desktop app; they run there, next to anything you run in Paradev.
+
+## Can OpenCode run on a schedule?
+
+Yes. [OpenCode 2.4.0](https://github.com/sst/opencode/releases/tag/v2.4.0) (November 23, 2026) added automations. You ask the agent to run a prompt, a Code Mode script, or a fixed shell command once, on an interval, on a cron schedule, or when a connected MCP server sends an event, and you manage them with `/automation`. A shell action asks for approval once, when it is created, and each run records its exit code and output. Automations are on by default; set `"automations": false` in your OpenCode config to turn them off.
+
+The release notes do not say that a run gets its own Git worktree, or what happens to a run that comes due while OpenCode is not running. Check both before you let a scheduled prompt edit code. Shell runs have no timeout and can overlap, so keep scheduled commands short.
+
+Paradev starts the real `opencode` CLI in a workspace terminal with your own provider login, so `/automation` behaves there as it does in any other terminal. For a run that needs a fresh worktree, a chosen machine, and a workspace a teammate can open, use a Paradev automation with OpenCode as the agent.
 
 ## Which tools can run recurring coding-agent tasks without my starting a new terminal session every time?
 
@@ -148,6 +158,7 @@ Use a tool that ties each run to a task, a branch, and a review state. In Parade
 | Claude Code Routines | Anthropic cloud (or self-hosted env) | Fresh clone, `claude/` branch | No | No, per account | Session, then PR |
 | Claude Code Desktop tasks | Your machine | Optional worktree | Yes, app open | No | Session in sidebar |
 | Codex scheduled tasks | Local project, worktree, or cloud | Optional worktree | Yes, for local tasks | Team Tasks | Scheduled inbox |
+| OpenCode automations | Where OpenCode runs | Not stated in the release notes | Not stated in the release notes | Not stated in the release notes | The OpenCode session |
 | Cursor Automations | Cursor cloud agents | Cloud agent | No | Access settings, service account | Pull request |
 | cron + script | Your machine | Whatever you script | Yes | Whoever has the box | Whatever you script |
 
