@@ -337,6 +337,38 @@ describe("agentSession workflow", () => {
 		assert.equal(calls.at(-1)?.input.outcome, "interrupted");
 	});
 
+	it("keeps finished and interrupted turns from the run it continues", async () => {
+		const calls: Call[] = [];
+		await withWorker(fakeActivities({}, calls), "s7", async () => {
+			await env.client.workflow.start("agentSession", {
+				workflowId: sessionWorkflowId("s7"),
+				taskQueue: "agent",
+				args: [
+					{
+						sessionId: "s7",
+						carried: {
+							pending: [{ turnId: "t2", promptId: "p2", text: "stop me" }],
+							seenPromptIds: ["p1", "p2"],
+							finishedTurnIds: ["t1"],
+							interruptedTurnIds: ["t2"],
+						},
+					},
+				],
+			});
+			await waitFor(() => names(calls).includes("settleTurn"));
+			assert.equal(
+				await steerTurn(env.client, "s7", {
+					turnId: "t1",
+					promptId: "p3",
+					text: "late",
+				}),
+				"duplicate",
+			);
+		});
+		assert.ok(!names(calls).includes("runTurn"));
+		assert.equal(calls.at(-1)?.input.outcome, "interrupted");
+	});
+
 	it("ends the workflow after ten idle minutes", async () => {
 		const calls: Call[] = [];
 		await withWorker(fakeActivities({}, calls), "s5", async () => {
