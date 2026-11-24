@@ -140,7 +140,11 @@ function AuthenticatedLayout() {
 	const [isSigningOut, setIsSigningOut] = useState(false);
 
 	useSettingsExternalChangeListener();
-	useEffect(() => syncPersistedStoreAcrossWindows(useSettings), []);
+	useEffect(() => {
+		const unsubscribe = syncPersistedStoreAcrossWindows(useSettings);
+		void useSettings.persist.rehydrate();
+		return unsubscribe;
+	}, []);
 
 	// Seed the parked-terminal eviction cap from settings (SUPER-1545).
 	const { data: parkedRuntimeCap } =
