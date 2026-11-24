@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import type { AccountSwitch } from "../../components/UsageAccountMenu";
 
 export type DeviceCode = {
 	userCode: string;
@@ -36,6 +37,8 @@ export type TurnFailureActions = {
 	changeModel?: () => void;
 	/** Restarts the agent so a new sign-in takes effect, then continues; false when it could not. */
 	restartAndContinue?: () => Promise<boolean>;
+	/** Set for an agent whose logins the host can switch between. */
+	accountSwitch?: AccountSwitch;
 	/** Resolves false when the new chat could not be started. */
 	startNewChat?: () => Promise<boolean>;
 	/** The person's own script signs this agent in, so a sign-in prompt has nothing to offer. */

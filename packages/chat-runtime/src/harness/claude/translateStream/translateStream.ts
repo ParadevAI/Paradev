@@ -9,12 +9,13 @@ import type {
 	TurnError,
 	Usage,
 } from "@superset/chat/protocol";
+import { isUsageLimitMessage } from "@superset/chat/protocol";
 import { classifyTurnFailure } from "../../turnFailure";
 import type { AdapterEvent } from "../../types";
 import {
+	isClaudeUsageError,
 	type RefusedWindow,
 	refusedWindow,
-	USAGE_LIMIT_TEXT,
 } from "../../usageLimit";
 import type { ToolOutcome, ToolUse } from "../mapToolUse";
 import { contentFor, locationsFor, titleFor, toolKindFor } from "../mapToolUse";
@@ -83,6 +84,7 @@ export class ClaudeTranslator {
 	private interruptReason: string | null = null;
 	private refused: RefusedWindow = null;
 	private lastModel: string | null = null;
+	private lastErrorKind: string | null = null;
 
 	constructor(private readonly options: ClaudeTranslatorOptions) {}
 
@@ -207,6 +209,7 @@ export class ClaudeTranslator {
 		const messageId = asString(message.id) ?? this.mintId();
 		const model = asString(message.model);
 		if (model && model !== "<synthetic>") this.lastModel = model;
+		this.lastErrorKind = asString(envelope.error) ?? null;
 		const parentItemId = this.parentItemFor(envelope);
 		const events = this.ensureTurn();
 
@@ -382,12 +385,18 @@ export class ClaudeTranslator {
 
 	private usageLimit(envelope: Json, isError: boolean): AdapterEvent | null {
 		const refused = this.refused;
+		const errorKind = this.lastErrorKind;
 		this.refused = null;
+		this.lastErrorKind = null;
 		if (!isError) return null;
-		const text = [asString(envelope.result) ?? "", ...asArray(envelope.errors)]
-			.filter((item): item is string => typeof item === "string")
-			.join("\n");
-		if (!refused && !USAGE_LIMIT_TEXT.test(text)) return null;
+		const texts = [envelope.result, ...asArray(envelope.errors)].filter(
+			(item): item is string => typeof item === "string" && item !== "",
+		);
+		const named = texts.some(
+			(text) =>
+				isClaudeUsageError({ errorKind }, text) || isUsageLimitMessage(text),
+		);
+		if (!refused && !named) return null;
 		return {
 			kind: "session",
 			session: {

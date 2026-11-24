@@ -7,7 +7,7 @@ import {
 	reduceMany,
 } from "@superset/chat/core";
 import type { UsageLimitAction, UserMessage } from "@superset/chat/protocol";
-import type { HarnessAdapter } from "../../harness";
+import type { AdapterEvent, HarnessAdapter } from "../../harness";
 import { EventQueue } from "../../harness/eventQueue";
 import type { FakeHarnessScript } from "../../harness/fake";
 import type { ChatRuntime } from "../../index";
@@ -40,6 +40,24 @@ const COMPLETED: FakeHarnessScript["turns"][number] = [
 	{ kind: "turn", turn: turn("t2", { status: "completed", completedAtMs: 4 }) },
 	{ kind: "session", session: { status: "idle" } },
 ];
+
+const MODELS: AdapterEvent = {
+	kind: "session",
+	session: {
+		configOptions: [
+			{
+				id: "model",
+				label: "Model",
+				category: "model",
+				currentValue: "fable",
+				options: [
+					{ id: "fable", label: "Fable" },
+					{ id: "sonnet", label: "Sonnet" },
+				],
+			},
+		],
+	},
+};
 
 function startSession(
 	script: FakeHarnessScript,
@@ -170,6 +188,56 @@ describe("LiveSession usage limit", () => {
 		expect(session?.queuePausedByLimit).toBe(true);
 		expect(deliveredTexts(runtime, sessionId)).toEqual(["first"]);
 		await runtime.dispose();
+	});
+
+	test("another model the agent takes lifts the limit and continues the work", async () => {
+		const taken = { current: false };
+		const { runtime, session, events, prompt } = timerSession({
+			setConfigOption: () => Promise.resolve(taken.current),
+		});
+		try {
+			events.push(MODELS);
+			await flush();
+			await session.setConfigOption("model", "fable");
+			await session.setConfigOption("model", "sonnet");
+			expect(prompt).not.toHaveBeenCalled();
+			expect(session.state.usageLimit).toBeDefined();
+
+			taken.current = true;
+			await session.setConfigOption("model", "sonnet");
+			expect(prompt.mock.calls).toEqual([
+				[[{ type: "text", text: CONTINUE_PROMPT }]],
+			]);
+			expect(session.state.usageLimit).toBeUndefined();
+		} finally {
+			events.close();
+			await runtime.dispose();
+		}
+	});
+
+	test("another model sends the queue first, and only while the limit holds the session", async () => {
+		const { runtime, session, events, prompt } = timerSession({
+			setConfigOption: () => Promise.resolve(true),
+		});
+		try {
+			events.push(MODELS);
+			await flush();
+			sendPrompt(runtime, session.sessionId, "queued");
+			session.respondToUsageLimit("dismiss");
+			await session.setConfigOption("model", "sonnet");
+			expect(prompt).not.toHaveBeenCalled();
+			expect(session.state.queuePaused).toBe(true);
+
+			events.push({ kind: "session", session: { usageLimit: { hitAtMs: 1 } } });
+			await flush();
+			await session.setConfigOption("model", "sonnet");
+			expect(prompt.mock.calls).toEqual([[[{ type: "text", text: "queued" }]]]);
+			expect(session.state.usageLimit).toBeUndefined();
+			expect(session.state.queuePaused).toBe(false);
+		} finally {
+			events.close();
+			await runtime.dispose();
+		}
 	});
 
 	test("resume at reset can be cancelled and rearmed without waiting for the real clock", async () => {
@@ -315,7 +383,7 @@ describe("LiveSession usage limit", () => {
 	});
 });
 
-function timerSession() {
+function timerSession(overrides: Partial<HarnessAdapter> = {}) {
 	let now = 0;
 	const events = new EventQueue();
 	const prompt = mock<HarnessAdapter["prompt"]>();
@@ -326,6 +394,7 @@ function timerSession() {
 		respondToApproval: () => undefined,
 		setMode: () => Promise.resolve(true),
 		dispose: async () => events.close(),
+		...overrides,
 	};
 	const runtime = createTestRuntime({
 		harnesses: new Map([[FAKE_HARNESS, () => adapter]]),

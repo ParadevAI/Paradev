@@ -260,7 +260,10 @@ export const acpStateUpdateSchema = z.looseObject({
 	state: z.string(),
 	stopReason: z.string().nullable().optional(),
 	error: z
-		.looseObject({ message: z.string().optional() })
+		.looseObject({
+			message: z.string().optional(),
+			data: z.unknown().optional(),
+		})
 		.nullable()
 		.optional(),
 });

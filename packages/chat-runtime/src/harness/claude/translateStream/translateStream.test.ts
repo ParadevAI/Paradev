@@ -348,6 +348,7 @@ describe("ClaudeTranslator usage limit", () => {
 	function translateWith(
 		rateLimitInfo: Record<string, unknown> | null,
 		result: Record<string, unknown>,
+		assistantError?: string,
 	): AdapterEvent[] {
 		const translator = new ClaudeTranslator({
 			cwd: CWD,
@@ -362,6 +363,7 @@ describe("ClaudeTranslator usage limit", () => {
 					model: "claude-sonnet-5-5",
 					content: [{ type: "text", text: "hi" }],
 				},
+				...(assistantError ? { error: assistantError } : {}),
 			},
 			...(rateLimitInfo
 				? [{ type: "rate_limit_event", rate_limit_info: rateLimitInfo }]
@@ -449,5 +451,18 @@ describe("ClaudeTranslator usage limit", () => {
 				}),
 			),
 		).toEqual([{ hitAtMs: 7, model: "claude-sonnet-5-5" }]);
+	});
+
+	test("Claude's refusal words count only when the message failed for usage", () => {
+		const result = {
+			is_error: true,
+			subtype: "error",
+			errors: ["You've hit your Fable limit · resets 2pm"],
+		};
+		expect(limitOf(translateWith(null, result, "rate_limit"))).toEqual([
+			{ hitAtMs: 7, model: "claude-sonnet-5-5" },
+		]);
+		expect(limitOf(translateWith(null, result, "invalid_request"))).toEqual([]);
+		expect(limitOf(translateWith(null, result))).toEqual([]);
 	});
 });

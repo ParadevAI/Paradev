@@ -1,6 +1,7 @@
 import { afterEach, expect, mock, test } from "bun:test";
 import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 import { pageLinkFinder } from "../../../../../../../../utils/pageLinks";
@@ -173,6 +174,36 @@ test("a spend limit the host did not classify is a limit notice, not a red failu
 	expect(card?.textContent).not.toContain("workspace API usage limits");
 	fireEvent.click(view.getByText("Show details"));
 	expect(card?.textContent).toContain("workspace API usage limits");
+});
+
+test("an unclassified limit on an agent with switchable logins offers the account menu in place of Usage settings", () => {
+	const view = render(
+		<QueryClientProvider client={new QueryClient()}>
+			<TurnFailureActionsProvider
+				value={{
+					blocked: false,
+					continueTask: () => {},
+					dismissed: new Set(),
+					setDismissed: () => {},
+					changeModel: () => {},
+					accountSwitch: { agent: "claude", hostUrl: null },
+				}}
+			>
+				<TurnStatusRow
+					error={{
+						message: "Claude AI usage limit reached|1794450000",
+						kind: "unknown",
+					}}
+					latest
+					status="failed"
+					turnId="t1"
+				/>
+			</TurnFailureActionsProvider>
+		</QueryClientProvider>,
+	);
+	expect(view.getByLabelText("Switch account")).toBeTruthy();
+	expect(view.queryByText("Usage settings")).toBeNull();
+	expect(view.getByText("Change model")).toBeTruthy();
 });
 
 function authCard(actions: Partial<TurnFailureActions>) {

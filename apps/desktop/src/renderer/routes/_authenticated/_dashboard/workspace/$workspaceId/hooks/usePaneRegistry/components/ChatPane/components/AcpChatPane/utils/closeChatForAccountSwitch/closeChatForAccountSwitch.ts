@@ -1,4 +1,5 @@
 import type { ChatTransport } from "@superset/chat/client";
+import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type { UserContent } from "@superset/chat/protocol";
 
 type Transport = Pick<ChatTransport, "getQueue"> & {
@@ -10,6 +11,10 @@ type Transport = Pick<ChatTransport, "getQueue"> & {
 	): Promise<unknown>;
 };
 
+/**
+ * Resolves to the work the next session must run: the queue, or a plain
+ * "Continue" when a usage limit held the session with nothing queued.
+ */
 export async function closeChatForAccountSwitch({
 	transport,
 	sessionId,
@@ -24,9 +29,13 @@ export async function closeChatForAccountSwitch({
 		commandId: crypto.randomUUID(),
 		action: "cancel_resume_at_reset",
 	});
-	const { prompts } = await transport.getQueue({ sessionId });
+	// Older hosts do not say that a limit holds the session.
+	const { prompts, limited } = await transport.getQueue({ sessionId });
 	await setAccount();
 	await transport.closeSession({ sessionId });
+	if (prompts.length === 0 && limited) {
+		return [[{ type: "text", text: CONTINUE_PROMPT }]];
+	}
 	// Older hosts send no fullContent, only the visible parts.
 	return prompts.map((prompt) => prompt.fullContent ?? prompt.content);
 }

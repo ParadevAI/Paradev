@@ -71,6 +71,7 @@ import { useChildrenByParent } from "../Transcript/hooks/useChildrenByParent";
 import { NestedItemsProvider } from "../Transcript/providers/NestedItemsProvider";
 import { SessionModeProvider } from "../Transcript/providers/SessionModeProvider";
 import { TranscriptPluginsProvider } from "../Transcript/providers/TranscriptPluginsProvider";
+import type { AccountSwitch, SwitchAccount } from "../UsageAccountMenu";
 import {
 	type DrawerExit,
 	WorkDrawer,
@@ -78,11 +79,7 @@ import {
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
 import { SubagentNotice } from "./components/SubagentNotice";
-import {
-	type SwitchAccount,
-	type SwitchableAgent,
-	UsageLimitNotice,
-} from "./components/UsageLimitNotice";
+import { UsageLimitNotice } from "./components/UsageLimitNotice";
 import { useAgentSignIn } from "./hooks/useAgentSignIn";
 import { useFailureRecovery } from "./hooks/useFailureRecovery";
 import { useLaunchPromptDelivered } from "./hooks/useLaunchPromptDelivered";
@@ -662,31 +659,26 @@ export function SessionView({
 	const limit = sessionState?.usageLimit;
 	const respondToUsageLimit = session.respondToUsageLimit;
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
+	const accountSwitch = useMemo<AccountSwitch | undefined>(() => {
+		const preset = harness ? presetForAnyHarness(harness) : undefined;
+		if (preset !== "claude" && preset !== "codex") return undefined;
+		return {
+			agent: preset,
+			hostUrl,
+			sessionAccount,
+			onSwitch: onSwitchAccount,
+		};
+	}, [harness, hostUrl, sessionAccount, onSwitchAccount]);
 	const usageLimit = useMemo(() => {
 		if (!limit) return undefined;
-		const preset = harness ? presetForAnyHarness(harness) : undefined;
-		const agent: SwitchableAgent | undefined =
-			preset === "claude" ? "claude" : preset === "codex" ? "codex" : undefined;
 		return {
 			limit,
 			respond: respondToUsageLimit,
 			modelLabel: limit.model
 				? modelDisplayName(limit.model, configOptions ?? [])
 				: undefined,
-			agent,
-			hostUrl,
-			sessionAccount,
-			onSwitchAccount,
 		};
-	}, [
-		limit,
-		respondToUsageLimit,
-		harness,
-		configOptions,
-		hostUrl,
-		onSwitchAccount,
-		sessionAccount,
-	]);
+	}, [limit, respondToUsageLimit, configOptions]);
 
 	const heldQueued = held?.queued;
 	const heldLaunched = held?.launched;
@@ -714,6 +706,7 @@ export function SessionView({
 		useAgentSignIn(presetId);
 	const { failureActions, onSetConfigOption, onModelPickerOpenChange } =
 		useFailureRecovery({
+			accountSwitch,
 			blocked:
 				!loaded ||
 				booting ||
@@ -747,13 +740,10 @@ export function SessionView({
 	);
 	const usageLimitNotice = usageLimit && !held && (
 		<UsageLimitNotice
-			agent={usageLimit.agent}
-			hostUrl={usageLimit.hostUrl}
+			accountSwitch={accountSwitch}
 			limit={usageLimit.limit}
 			modelLabel={usageLimit.modelLabel}
 			onRespond={usageLimit.respond}
-			onSwitchAccount={usageLimit.onSwitchAccount}
-			sessionAccount={usageLimit.sessionAccount}
 		/>
 	);
 

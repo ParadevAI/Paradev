@@ -63,6 +63,8 @@ export type PromptResult = {
 
 export type QueueState = {
 	paused: boolean;
+	/** A usage limit holds the session. */
+	limited: boolean;
 	prompts: {
 		itemId: string;
 		clientId: string | undefined;
@@ -476,6 +478,7 @@ export class LiveSession {
 	get queueState(): QueueState {
 		return {
 			paused: this.queuePaused,
+			limited: this.sessionState.usageLimit !== undefined,
 			prompts: this.queue.map(({ item, typed }) => ({
 				itemId: item.id,
 				clientId: item.clientId,
@@ -497,10 +500,6 @@ export class LiveSession {
 		}
 	}
 
-	/**
-	 * Resuming after a limit continues the work the refusal cut short: the
-	 * next queued prompt if there is one, else a plain "Continue".
-	 */
 	respondToUsageLimit(action: UsageLimitAction): void {
 		const limit = this.sessionState.usageLimit;
 		if (this.stopped || !limit) return;
@@ -532,6 +531,11 @@ export class LiveSession {
 		}
 	}
 
+	/**
+	 * Continues the work the refusal cut short: the next queued prompt if
+	 * there is one, else a plain "Continue". Every way out of a limit that
+	 * keeps the session uses it.
+	 */
 	private resumeAfterLimit(): void {
 		const idle = this.currentTurn?.status !== "running" && !this.inFlight();
 		this.resumeQueue();
@@ -652,7 +656,21 @@ export class LiveSession {
 		if (!this.options.adapter.setConfigOption) {
 			throw new Error("this agent has no settings to change");
 		}
-		return this.options.adapter.setConfigOption(configId, value);
+		const limited = this.sessionState.usageLimit !== undefined;
+		const picksOtherModel = this.sessionState.configOptions?.some(
+			(option) =>
+				option.id === configId &&
+				option.category === "model" &&
+				option.currentValue !== value,
+		);
+		const taken = this.options.adapter.setConfigOption(configId, value);
+		if (!limited || !picksOtherModel) return taken;
+		return taken.then((accepted) => {
+			if (accepted && !this.stopped && this.sessionState.usageLimit) {
+				this.resumeAfterLimit();
+			}
+			return accepted;
+		});
 	}
 
 	stopBackgroundTask(taskId: string): Promise<boolean> {
