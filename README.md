@@ -6,7 +6,9 @@
 
 The open-source workspace for Claude Code, Codex, and any coding agent.
 
-[**Download for macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [Documentation](https://docs.paradev.com) &nbsp;&bull;&nbsp; [Changelog](https://paradev.com/changelog) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
+**Download:** [**macOS**](https://github.com/paradevai/paradev/releases/latest) &nbsp;&bull;&nbsp; [**Linux**](https://paradev.com/download) &nbsp;&bull;&nbsp; [**iOS**](https://apps.apple.com/us/app/id6788926383) &nbsp;&bull;&nbsp; [**Android**](https://play.google.com/store/apps/details?id=com.paradev.mobile)
+
+[Documentation](https://docs.paradev.com) &nbsp;&bull;&nbsp; [Changelog](https://paradev.com/changelog) &nbsp;&bull;&nbsp; [Discord](https://discord.gg/cZeD9WYcV7)
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE.md)
@@ -28,7 +30,7 @@ Paradev is the workspace for running parallel coding agents. You can run any cod
 
 1. **Download the app.**
    - macOS: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x64.dmg)
-   - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimental; macOS is the primary target)
+   - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimental)
    - Windows: not yet available
 2. **Add a repository** from your computer, or clone one.
 3. **Create a workspace**, choose your CLI agent, and describe a small change.
@@ -124,7 +126,7 @@ Run agents on a schedule or when something happens: a review request, a Slack me
 
 ### Cloud workspaces
 
-Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad. Cloud workspaces are included with Team and Ultra.
+Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iOS, or Android. Cloud workspaces are included with Team and Ultra.
 
 [Docs →](https://docs.paradev.com/cloud-workspaces) · [Learn more →](https://paradev.com/cloud)
 
@@ -136,11 +138,11 @@ Each workspace gets its own cloud machine and keeps working when your laptop is 
 <tr>
 <td width="50%" valign="middle">
 
-### iPhone and iPad
+### iOS and Android
 
-Start agents, follow them live, and review the diff from your iPhone or iPad. You can also merge the pull request there. The app requires iOS 26 or iPadOS 26 or later and is included with Paradev Pro.
+Start agents, follow them live, and review the diff on iOS or Android. You can also merge the pull request there. The app is included with Paradev Pro. The iOS app requires iOS 26 or iPadOS 26 or later.
 
-[App Store →](https://apps.apple.com/us/app/id6788926383) · [Learn more →](https://paradev.com/mobile)
+[App Store →](https://apps.apple.com/us/app/id6788926383) · [Google Play →](https://play.google.com/store/apps/details?id=com.paradev.mobile) · [Learn more →](https://paradev.com/mobile)
 
 </td>
 <td width="50%">
@@ -280,10 +282,10 @@ Yes, the Paradev desktop app notifies you when an agent finishes or stops to wai
 </details>
 
 <details>
-<summary>Can I check on my coding agents and answer them from my iPhone?</summary>
+<summary>Can I check on my coding agents and answer them from my phone?</summary>
 <br />
 
-Yes, Paradev for iPhone and iPad lets you start agents, follow their sessions live, answer them, and review their changes. It needs iOS 26 or iPadOS 26 or later and Paradev Pro, and there is also an Android app on Google Play. For workspaces on your computer, turn on Remote Access and keep the computer awake and online. [Mobile app docs](https://docs.paradev.com/mobile)
+Yes, Paradev for iOS and Android lets you start agents, follow their sessions live, answer them, and review their changes. It needs Paradev Pro. Get it on the [App Store](https://apps.apple.com/us/app/id6788926383) (iOS 26 or iPadOS 26 or later) or [Google Play](https://play.google.com/store/apps/details?id=com.paradev.mobile). For workspaces on your computer, turn on Remote Access and keep the computer awake and online. [Mobile app docs](https://docs.paradev.com/mobile)
 
 </details>
 
@@ -390,6 +392,6 @@ The script starts local Postgres and Redis with Docker and seeds a dev account. 
 
 ## License and pricing
 
-The Free plan covers local workspaces, the desktop app, and the CLI, with no credit card required. Paid plans are optional: the [Pro plan](https://paradev.com/pricing) adds remote access, automations, the iPhone and iPad app, and the Linear and Slack integrations, and the Team and Ultra plans add cloud workspaces.
+The Free plan covers local workspaces, the desktop app, and the CLI, with no credit card required. Paid plans are optional: the [Pro plan](https://paradev.com/pricing) adds remote access, automations, the iOS and Android apps, and the Linear and Slack integrations, and the Team and Ultra plans add cloud workspaces.
 
 Paradev is open source under the [MIT License](LICENSE.md). You can inspect, modify, and self-host it, and anyone can file issues, open pull requests, or fork it.
