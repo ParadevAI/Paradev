@@ -1,38 +1,44 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { useTheme } from "@/hooks/useTheme";
+import { HeaderToolbar } from "@/lib/navigation";
+import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
 import {
 	SORT_OPTIONS,
 	useWorkspacesFilterStore,
 } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
-import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
-import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { useScopeLabel } from "@/screens/(authenticated)/(home)/hooks/useScopeLabel";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
-import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 
 export function FilterScreen() {
 	const { t } = useLingui();
 	const router = useRouter();
 	const theme = useTheme();
-	const selectedHost = useSelectedHost();
-	const cloud = useWorkspaceScope() === "cloud";
+	const { scope, selectedHost } = useScopeSelection();
+	const scopeLabel = useScopeLabel();
+	const cloud = scope === "cloud";
 	const sort = useWorkspacesFilterStore((store) => store.sort);
 
 	const sortOption = SORT_OPTIONS.find((option) => option.value === sort);
 	const sortLabel = sortOption ? i18n._(sortOption.label) : "";
 
 	return (
-		<View className="bg-background flex-1 px-6">
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} />
-			</Stack.Toolbar>
-			<ListRow
+		<View className="bg-background flex-1">
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
+					accessibilityLabel={t({ message: "Close" })}
+					onPress={() => router.back()}
+				/>
+			</HeaderToolbar>
+			<SheetRow
 				icon={
 					<Ionicons
 						name="desktop-outline"
@@ -43,7 +49,7 @@ export function FilterScreen() {
 				label={t({ message: "Scope" })}
 				trailing={
 					<ListRowValue
-						value={cloud ? t({ message: "Cloud" }) : (selectedHost?.name ?? "")}
+						value={scopeLabel}
 						accessory={
 							cloud ? (
 								<Icon
@@ -59,7 +65,7 @@ export function FilterScreen() {
 				}
 				onPress={() => router.push("/(authenticated)/(home)/filter/scope")}
 			/>
-			<ListRow
+			<SheetRow
 				icon={
 					<Ionicons
 						name="swap-vertical"

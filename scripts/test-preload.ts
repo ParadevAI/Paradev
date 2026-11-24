@@ -32,6 +32,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const testSupersetHome = mkdtempSync(join(tmpdir(), "superset-test-home-"));
+// Readers prefer PARADEV_* over SUPERSET_*, and a Paradev terminal exports both,
+// so an inherited PARADEV_* would win over every value a test sets.
+for (const key of Object.keys(process.env)) {
+	if (key.startsWith("PARADEV_")) delete process.env[key];
+}
 process.env.SUPERSET_HOME_DIR = testSupersetHome;
 Reflect.set(
 	globalThis,

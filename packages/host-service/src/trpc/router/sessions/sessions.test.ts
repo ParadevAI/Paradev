@@ -216,19 +216,16 @@ describe("sessions router", () => {
 		).toHaveLength(1);
 	});
 
-	test("starts the chat on the model and effort the launch picked", async () => {
-		await createChatSessionInWorkspace(ctx, {
+	test("starts the agent at the reasoning effort the caller asked for", async () => {
+		const created = await createChatSessionInWorkspace(ctx, {
 			workspaceId: WORKSPACE,
 			agent: "claude",
 			prompt: "go",
-			model: "claude-opus-5-5",
 			effort: "high",
 		});
-		await waitFor(() => starts.length === 1);
-		expect(starts[0]).toMatchObject({
-			modelId: "claude-opus-5-5",
-			effortId: "high",
-		});
+		expect(created.kind).toBe("chat");
+		await waitFor(() => starts.length > 0);
+		expect(starts[0]?.effortId).toBe("high");
 	});
 
 	test("launches under the terminal id a cloud launch was promised", async () => {

@@ -3,7 +3,7 @@
 // Consumed by release.ts (entry point), desktop.ts, cli.ts, and check-versions.ts.
 //
 // Add a package to UNIFIED_PACKAGES here and every flow + the CI check follows,
-// so the bundle can't drift. See plans/20260709-unified-version-bumping.md.
+// so the bundle can't drift.
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -61,7 +61,7 @@ export function maxVersion(versions: string[]): string {
  * the next desktop release catches up. PLAIN — no prerelease suffix — because a
  * suffix would (a) sort BELOW the release so `superset update` won't deliver it
  * and (b) fail the host-service min-version floor (semver.satisfies excludes
- * prereleases). See plans/20260709-unified-version-bumping.md. */
+ * prereleases). */
 export function nextCliHotfix(current: string): string {
 	return incrementPatch(current);
 }

@@ -1,4 +1,5 @@
 import { isCloudUsageRefusal } from "@superset/shared/billing";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { AppState } from "react-native";
@@ -54,10 +55,11 @@ export function useSandboxAccess(
 ): SandboxAccessValue {
 	const queryClient = useQueryClient();
 
-	// Only a `ready` row has a sandbox to address: `access` refuses anything
+	// Only an `awake` or `asleep` row has a sandbox to address: `access` refuses anything
 	// else, and a provisioning workspace asking for a ticket every few seconds
 	// would be a retry loop against a guaranteed rejection.
-	const ready = cloud?.status === "ready" ? cloud : null;
+	const ready =
+		cloud && isLiveCloudWorkspaceStatus(cloud.status) ? cloud : null;
 	const addressKey = [...SANDBOX_ADDRESS_QUERY_KEY, ready?.id ?? null] as const;
 
 	const address = useQuery({

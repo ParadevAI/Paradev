@@ -30,7 +30,7 @@ export default command({
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const selectors = [options.path, options.branch, options.all].filter(
 			Boolean,
@@ -38,7 +38,7 @@ export default command({
 		if (selectors.length !== 1) {
 			throw new CLIError(
 				"Specify exactly one of --path, --branch or --all",
-				"See the project's worktrees: superset worktrees list --project <id>",
+				"See the project's worktrees: paradev worktrees list --project <id>",
 			);
 		}
 		const explicitHost = resolveHostFilter({
@@ -49,7 +49,7 @@ export default command({
 		if (options.path && !onThisMachine && !options.path.startsWith("/")) {
 			throw new CLIError(
 				"--path must be absolute on another host",
-				"Pass the path as `superset worktrees list --host <id>` shows it",
+				"Pass the path as `paradev worktrees list --host <id>` shows it",
 			);
 		}
 		const target = await resolveHostTarget({
@@ -145,13 +145,13 @@ export default command({
 				options.path
 					? `No worktree of this project at ${options.path}`
 					: `No worktree of this project has ${options.branch} checked out`,
-				"See the project's worktrees: superset worktrees list --project <id>",
+				"See the project's worktrees: paradev worktrees list --project <id>",
 			);
 		}
 		if (worktree.isMain) {
 			throw new CLIError(
 				`${worktree.path} is the project's main checkout, not a linked worktree`,
-				"Use: superset workspaces create --project <id> --checkout local",
+				"Use: paradev workspaces create --project <id> --checkout local",
 			);
 		}
 

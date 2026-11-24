@@ -18,7 +18,7 @@ export function resolveCloudEnvironment<T extends SelectableEnvironment>(
 	if (startable.length === 0) {
 		throw new CLIError(
 			"No environment with repositories in this organization",
-			"Create one with: superset environments create",
+			"Create one with: paradev environments create",
 		);
 	}
 

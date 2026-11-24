@@ -7,7 +7,7 @@ export const PROJECT_UUID_PATTERN =
 export function requireOrganizationId(): string {
 	const organizationId = resolveOrganizationId(readConfig());
 	if (!organizationId) {
-		throw new CLIError("No active organization", "Run: superset auth login");
+		throw new CLIError("No active organization", "Run: paradev auth login");
 	}
 	return organizationId;
 }
@@ -19,7 +19,7 @@ export function assertProjectIds(projectIds: string[] | undefined): void {
 	if (invalidProjectId) {
 		throw new CLIError(
 			`Invalid project UUID: ${invalidProjectId}`,
-			"Pass the project UUID shown by `superset projects list`.",
+			"Pass the project UUID shown by `paradev projects list`.",
 		);
 	}
 }

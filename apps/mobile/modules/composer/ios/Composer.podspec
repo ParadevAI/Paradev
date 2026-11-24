@@ -5,10 +5,10 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'Composer'
   s.version        = package['version']
-  s.summary        = 'Native composer for Superset'
+  s.summary        = 'Native composer for Paradev'
   s.description    = 'Full-screen SwiftUI composer overlay that tracks the keyboard'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

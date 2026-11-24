@@ -2,13 +2,16 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import {
+	CONTINUE_AFTER_UPDATE_PROMPT,
+	CONTINUE_PROMPT,
+} from "@superset/chat/core";
 import type {
 	ChatRuntime,
 	ResumeSessionInput,
 	UnfinishedSession,
 } from "@superset/chat-runtime";
 import {
-	CONTINUE_AFTER_UPDATE_PROMPT,
 	closedChatsOf,
 	RESUME_MARKER_MAX_AGE_MS,
 	recordUnfinishedChats,
@@ -191,6 +194,23 @@ describe("chats a quit cut off", () => {
 		writeClosedChats(path, []);
 		expect(existsSync(path)).toBe(false);
 		expect(restoreClosedChats(path)).toEqual([]);
+	});
+
+	test("a record that piled up continues reads as one interruption", () => {
+		const proceed = [{ type: "text", text: CONTINUE_PROMPT }];
+		const queued = [{ type: "text", text: "queued" }];
+		const path = markerIn({
+			sessions: [
+				{
+					...UNFINISHED,
+					interrupted: false,
+					prompts: [queued, proceed, proceed, proceed],
+				},
+			],
+		});
+		expect(restoreClosedChats(path)).toEqual([
+			expect.objectContaining({ interrupted: true, prompts: [queued] }),
+		]);
 	});
 
 	test("a record from before queued prompts were kept still reads", () => {

@@ -60,7 +60,7 @@ export const FEATURES: PagesItem[] = [
 		title: msg({ message: "Read it on your phone" }),
 		description: msg({
 			message:
-				"Open pages and reply to comments from the Paradev app on iPhone and iPad.",
+				"Open pages and reply to comments from the Paradev app on iPhone, iPad, and Android.",
 		}),
 	},
 	{

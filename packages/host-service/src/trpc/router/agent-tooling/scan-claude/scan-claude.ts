@@ -1,6 +1,9 @@
 import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
-import type { SlashCommand } from "@superset/shared/slash-commands";
+import {
+	foldLegacyPluginCommands,
+	type SlashCommand,
+} from "@superset/shared/slash-commands";
 import { CLAUDE_BUILTIN_SLASH_COMMANDS } from "../builtins";
 import type { SlashCommandScanContext } from "../registry";
 import {
@@ -126,11 +129,13 @@ export async function scanClaudeSlashCommands(
 		Promise.all(commandScans).then((lists) => dedupeFirstWins(lists.flat())),
 		Promise.all(skillScans).then((lists) => dedupeFirstWins(lists.flat())),
 	]);
+	const custom = foldLegacyPluginCommands([...commands, ...skills]).map(
+		({ command, legacyAliases }) =>
+			legacyAliases.length > 0
+				? { ...command, aliases: [...command.aliases, ...legacyAliases] }
+				: command,
+	);
 	// Builtins last, and shadowed by a same-named custom command — composers
 	// sort builtins to the bottom, so the order here matches what renders.
-	return dedupeFirstWins([
-		...commands,
-		...skills,
-		...CLAUDE_BUILTIN_SLASH_COMMANDS,
-	]);
+	return dedupeFirstWins([...custom, ...CLAUDE_BUILTIN_SLASH_COMMANDS]);
 }

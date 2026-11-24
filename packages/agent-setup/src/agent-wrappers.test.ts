@@ -504,8 +504,8 @@ describe("agent-wrappers opencode tui plugin", () => {
 		const read = (): Notification[] =>
 			existsSync(log)
 				? readFileSync(log, "utf-8")
-						.trim()
 						.split("\n")
+						.slice(0, -1)
 						.map((line) => {
 							const separator = line.indexOf(" ");
 							return {
@@ -1499,9 +1499,9 @@ exit 0
 	});
 
 	it("bumps hook script markers when hook semantics change", () => {
-		expect(COPILOT_HOOK_MARKER).toBe("# Superset copilot hook v6");
-		expect(CURSOR_HOOK_MARKER).toBe("# Superset cursor hook v8");
-		expect(GEMINI_HOOK_MARKER).toBe("# Superset gemini hook v7");
+		expect(COPILOT_HOOK_MARKER).toBe("# Superset copilot hook v7");
+		expect(CURSOR_HOOK_MARKER).toBe("# Superset cursor hook v9");
+		expect(GEMINI_HOOK_MARKER).toBe("# Superset gemini hook v8");
 	});
 
 	it("replaces stale Mastra hook commands from old superset paths", () => {

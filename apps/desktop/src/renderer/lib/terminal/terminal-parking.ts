@@ -6,9 +6,8 @@
 // `inert` removes the whole subtree from the tab order and the accessibility
 // tree, and also moves focus out of it — so a parked terminal's internal
 // <textarea> can't receive keystrokes meant for the active pane.
-//
-// Shared by v1 (v1-terminal-cache.ts) and v2 (terminal-runtime.ts) so the
-// two surfaces converge on a single DOM node and lifecycle.
+// `content-visibility: hidden` keeps parked terminals out of every style,
+// layout and paint pass; a measurement inside still lays them out on demand.
 const PARKING_CONTAINER_ID = "terminal-parking";
 
 export function getTerminalParkingContainer(): HTMLDivElement {
@@ -26,6 +25,7 @@ export function getTerminalParkingContainer(): HTMLDivElement {
 	el.style.height = "100vh";
 	el.style.overflow = "hidden";
 	el.style.pointerEvents = "none";
+	el.style.contentVisibility = "hidden";
 	document.body.appendChild(el);
 	return el;
 }

@@ -89,11 +89,6 @@ export async function makeAppSetup(
 	return window;
 }
 
-// macOS Sequoia+: occluded window throttling can corrupt GPU compositor layers
-if (PLATFORM.IS_MAC) {
-	app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
-}
-
 PLATFORM.IS_WINDOWS &&
 	app.setAppUserModelId(
 		env.NODE_ENV === "development" ? process.execPath : makeAppId(),
@@ -113,7 +108,7 @@ if (env.NODE_ENV === "development" && process.env.RENDERER_REMOTE_DEBUG_PORT) {
 	app.commandLine.removeSwitch("remote-debugging-pipe");
 }
 
-// Each xterm pane holds one WebGL context. v2 parking keeps panes alive
+// Each xterm pane holds one WebGL context. parking keeps panes alive
 // across workspace switches, so cumulative contexts can reach the low
 // hundreds — past Chromium's default cap of 16, Blink force-evicts the
 // oldest context and the terminal blanks out. 256 covers the parking load

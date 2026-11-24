@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { ProductHeroActions } from "@/app/[lang]/components/ProductHeroActions";
 import { localizedAlternates } from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
+import { env } from "@/env";
 import { AgentStrip } from "./components/AgentStrip";
 import { BuildOnce } from "./components/BuildOnce";
 import { HowItWorks } from "./components/HowItWorks";
@@ -73,7 +74,11 @@ export default async function PluginsPage() {
 								cloud.
 							</Trans>
 						</p>
-						<ProductHeroActions source="plugins" docsPath="/mcp-server" />
+						<ProductHeroActions
+							source="plugins"
+							docsPath="/mcp-server"
+							signInUrl={`${env.NEXT_PUBLIC_WEB_URL}/sign-in`}
+						/>
 						<AgentStrip />
 					</div>
 					<PluginCatalog />

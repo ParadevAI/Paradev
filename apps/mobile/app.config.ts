@@ -1,9 +1,11 @@
 import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
-import { IOS_APP } from "@superset/shared/app-identity";
+import { ANDROID_APP, IOS_APP } from "@superset/shared/app-identity";
 import { BRAND } from "@superset/shared/brand";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
+import { withAndroidLabel } from "./config-plugins/withAndroidLabel";
 import { withIosAccentColor } from "./config-plugins/withIosAccentColor";
 import { withSceneLifecycle } from "./config-plugins/withSceneLifecycle";
 
@@ -19,10 +21,30 @@ if (process.env.MOBILE_EAS_BUILD !== "1") {
 }
 
 const webUrl = new URL(
-	process.env.EXPO_PUBLIC_WEB_URL || "https://app.superset.sh",
+	process.env.EXPO_PUBLIC_WEB_URL || "https://app.paradev.com",
 );
+// Links already shared on the other own root domain must keep opening the app.
+const appLinksHosts =
+	webUrl.protocol === "https:" ? withOwnDomainTwins([webUrl.hostname]) : [];
 const associatedDomains =
-	webUrl.protocol === "https:" ? [`applinks:${webUrl.hostname}`] : undefined;
+	appLinksHosts.length > 0 && appLinksHosts.map((host) => `applinks:${host}`);
+// Same paths as apple-app-site-association in apps/web.
+const appLinkIntentFilters = appLinksHosts.length > 0 && [
+	{
+		action: "VIEW",
+		autoVerify: true,
+		data: appLinksHosts.flatMap((host) =>
+			["/page/", "/workspaces/"].map((pathPrefix) => ({
+				scheme: "https",
+				host,
+				pathPrefix,
+			})),
+		),
+		category: ["BROWSABLE", "DEFAULT"],
+	},
+];
+
+const webBaseUrl = process.env.MOBILE_WEB_BASE_URL;
 
 const SIGNED_BUILD_PROFILES = ["preview", "production"];
 const signedUpdates = process.env.MOBILE_SIGNED_UPDATES === "1";
@@ -46,7 +68,8 @@ export default ({ config }: ConfigContext) => ({
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	userInterfaceStyle: "dark",
-	scheme: "superset",
+	// The first scheme is the one Linking.createURL emits.
+	scheme: ["superset", "paradev"],
 	runtimeVersion: { policy: "fingerprint" as const },
 	updates: {
 		url: "https://u.expo.dev/fa9332a8-896a-4d2a-be5b-d82469b46e5d",
@@ -84,21 +107,23 @@ export default ({ config }: ConfigContext) => ({
 			// went with `GlassComposer`. Without it `SFSpeechRecognizer`'s
 			// authorization request terminates the app.
 			NSSpeechRecognitionUsageDescription:
-				"Superset uses speech recognition to turn your voice into text.",
+				"Paradev uses speech recognition to turn your voice into text.",
 		},
 	},
 	android: {
 		adaptiveIcon: {
 			foregroundImage: "./assets/adaptive-icon.png",
-			backgroundColor: "#ffffff",
+			backgroundColor: "#151110",
 		},
-		package: "sh.superset.mobile",
+		package: ANDROID_APP.PACKAGE,
 		predictiveBackGestureEnabled: false,
+		...(appLinkIntentFilters && { intentFilters: appLinkIntentFilters }),
 	},
 	web: {
 		favicon: "./assets/favicon.png",
 		bundler: "metro",
 	},
+	...(webBaseUrl && { experiments: { baseUrl: webBaseUrl } }),
 	plugins: [
 		// Dark, not white: iOS 26 fills a prominent system control with the
 		// accent, so the photo picker's confirm button became a lit white disc
@@ -107,6 +132,7 @@ export default ({ config }: ConfigContext) => ({
 		[withIosAccentColor, { color: "#262626" }],
 		// iOS 27 SDK: an app without the UIScene life cycle traps on launch.
 		withSceneLifecycle,
+		[withAndroidLabel, { label: BRAND.NAME }],
 		"@bacons/apple-targets",
 		"expo-router",
 		[
@@ -138,18 +164,23 @@ export default ({ config }: ConfigContext) => ({
 		],
 		[
 			"expo-localization",
-			{ supportedLocales: { ios: [...SUPPORTED_LOCALES] } },
+			{
+				supportedLocales: {
+					ios: [...SUPPORTED_LOCALES],
+					android: [...SUPPORTED_LOCALES],
+				},
+			},
 		],
 		"expo-apple-authentication",
 		[
 			"expo-image-picker",
 			{
 				photosPermission:
-					"Superset needs access to your photo library so you can attach images to chat messages.",
+					"Paradev needs access to your photo library so you can attach images to chat messages.",
 				cameraPermission:
-					"Superset uses the camera so you can attach photos to chat messages.",
+					"Paradev uses the camera so you can attach photos to chat messages.",
 				microphonePermission:
-					"Superset uses the microphone so you can dictate chat messages.",
+					"Paradev uses the microphone so you can dictate chat messages.",
 			},
 		],
 		"expo-document-picker",
@@ -159,19 +190,25 @@ export default ({ config }: ConfigContext) => ({
 			"@config-plugins/react-native-webrtc",
 			{
 				cameraPermission:
-					"Superset uses the camera so you can attach photos to chat messages.",
+					"Paradev uses the camera so you can attach photos to chat messages.",
 				microphonePermission:
-					"Superset uses the microphone for voice mode and to dictate chat messages.",
+					"Paradev uses the microphone for voice mode and to dictate chat messages.",
 			},
 		],
 		["expo-notifications", { enableBackgroundRemoteNotifications: false }],
 		// The composer is built on Liquid Glass, which silently no-ops before
 		// iOS 26 — an iOS 26 floor means one visual language instead of a glass
-		// path plus a solid fallback. See plans/20260821-native-composer.md.
+		// path plus a solid fallback.
 		[
 			"expo-build-properties",
 			{
 				ios: { deploymentTarget: "26.0", buildReactNativeFromSource: true },
+				// WorkManager keeps its input mergers without members, so R8 full
+				// mode strips the constructor it reflects on and every job fails.
+				android: {
+					extraProguardRules:
+						"-keep class * extends androidx.work.InputMerger { public <init>(); }",
+				},
 			},
 		],
 		// SDK 57 no longer autolinks config plugins; every installed plugin has

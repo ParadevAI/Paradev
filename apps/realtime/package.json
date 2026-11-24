@@ -23,6 +23,6 @@
 		"@superset/typescript": "workspace:*",
 		"jose": "6.2.13",
 		"typescript": "7.0.2",
-		"wrangler": "4.118.0"
+		"wrangler": "4.129.1"
 	}
 }

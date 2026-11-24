@@ -28,7 +28,7 @@ async function mint(apiKey: string, fetchImpl: typeof fetch): Promise<string> {
 	if (!response.ok) {
 		throw new CLIError(
 			`Could not get a token for this API key (${response.status})`,
-			"Check the key with: superset auth whoami",
+			"Check the key with: paradev auth whoami",
 		);
 	}
 	return ((await response.json()) as { token: string }).token;

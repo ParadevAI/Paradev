@@ -5,10 +5,10 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'AlertPrompt'
   s.version        = package['version']
-  s.summary        = 'Native text prompt alert for Superset'
+  s.summary        = 'Native text prompt alert for Paradev'
   s.description    = 'UIAlertController prompt with text selection support'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

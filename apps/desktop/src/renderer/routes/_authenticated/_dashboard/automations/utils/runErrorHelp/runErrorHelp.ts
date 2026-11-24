@@ -30,7 +30,7 @@ const HELP: Record<AutomationRunErrorCode, MessageDescriptor> = {
 	}),
 	cloud_usage_limit_reached: msg({
 		message:
-			"Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device.",
+			"Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device.",
 	}),
 	no_instructions: msg({
 		message:

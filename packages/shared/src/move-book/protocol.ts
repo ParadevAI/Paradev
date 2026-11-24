@@ -25,6 +25,14 @@ export const WORKSPACE_MOVE_IN_FLIGHT = ["pending", "moving"] as const;
 /** Longer than a move job may run, so a move this quiet has stopped. */
 export const STALE_MOVE_MS = 6 * 60 * 1000;
 
+/**
+ * Longer than the quietest step of a copy (an import, up to 150 s), so a
+ * copy this quiet lost its runner and another attempt may take it over,
+ * and shorter than STALE_MOVE_MS, so a desktop that came back can take it
+ * over before the sweep fails it.
+ */
+export const CLAIM_LEASE_MS = 4 * 60 * 1000;
+
 export const MOVE_STOPPED_ANSWERING = "The move stopped answering";
 
 /**
@@ -110,7 +118,13 @@ export type MoveBookRequest =
 			branch: string;
 			chats: NewChatMove[];
 	  }
-	| { op: "abandon"; workspaceMoveId: string; error: string }
+	| {
+			op: "abandon";
+			workspaceMoveId: string;
+			error: string;
+			/** Also ends a move that already has its destination, as when the desktop could not finish it. */
+			withDestination?: boolean;
+	  }
 	| { op: "retry"; workspaceMoveId: string; chat: NewChatMove }
 	| { op: "workspaceMove"; id: string }
 	| { op: "chatMove"; id: string }
@@ -133,16 +147,46 @@ export type MoveBookRequest =
 			/** Only a move into this workspace that changed state recently. */
 			freshInto?: string;
 	  }
-	| { op: "claim"; id: string }
+	| {
+			op: "claim";
+			id: string;
+			/** Names this run's attempt; the same attempt may claim again, another only once the copy went quiet. */
+			attempt?: string;
+	  }
 	| { op: "touchWorkspaceMove"; id: string }
 	| { op: "touchChatMove"; id: string }
-	| { op: "finish"; id: string }
+	| {
+			op: "finish";
+			id: string;
+			/** Finishes only the copy this attempt holds. */
+			attempt?: string;
+	  }
 	| {
 			op: "fail";
 			id: string;
 			error: string;
 			/** Also fails a `ready` move, whose chat could not be switched after all. */
 			evenIfReady?: boolean;
+	  }
+	| {
+			/** Fails only the copy this attempt holds; a claim that never landed is left to be claimed. */
+			op: "failAttempt";
+			id: string;
+			attempt: string;
+			error: string;
+			/** Also fails a copy claimed without an attempt, by a caller that holds it. */
+			orUnowned?: boolean;
+	  }
+	| {
+			/** Marks the copy this attempt holds as switching its chat, just before the switch. */
+			op: "switching";
+			id: string;
+			attempt?: string;
+	  }
+	| {
+			/** Records as ready a failed move whose chat did switch, when it is the chat's newest move. */
+			op: "reconcile";
+			id: string;
 	  }
 	| { op: "pendingInto"; toWorkspaceId: string }
 	| { op: "finishInto"; toWorkspaceId: string }
@@ -151,7 +195,8 @@ export type MoveBookRequest =
 type Replies = {
 	begin: { move: WorkspaceMove };
 	attach: { moves: ChatMove[] };
-	abandon: Record<never, never>;
+	/** The chats the move took, or is switching, which stay where they went. */
+	abandon: { movedSessionIds: string[] };
 	retry: { move: ChatMove };
 	workspaceMove: { move: WorkspaceMove | null };
 	chatMove: { move: ChatMove | null };
@@ -166,6 +211,9 @@ type Replies = {
 	touchChatMove: { alive: boolean };
 	finish: { finished: boolean };
 	fail: Record<never, never>;
+	failAttempt: { failed: boolean };
+	switching: { switching: boolean };
+	reconcile: { ready: boolean };
 	pendingInto: { ids: string[] };
 	waitingOnHost: { ids: string[] };
 	finishInto: Record<never, never>;

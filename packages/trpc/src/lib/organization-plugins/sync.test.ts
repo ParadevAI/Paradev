@@ -45,6 +45,10 @@ let source = { ...SOURCE };
 let plugins: PluginRow[] = [];
 let writtenMeanwhile: PluginRow[] = [];
 let objects = new Map<string, Uint8Array>();
+let publicObjects = new Map<
+	string,
+	{ body: Uint8Array; contentType: string }
+>();
 let reads: string[] = [];
 let sourceWrites: Record<string, unknown>[] = [];
 let removalParams: unknown[][] = [];
@@ -59,8 +63,19 @@ stub(realtime, {
 
 stub(credentials, { sourceToken: async () => "token" });
 stub(r2, {
-	putObject: async ({ key, body }: { key: string; body: Uint8Array }) => {
-		objects.set(key, body);
+	putObject: async ({
+		key,
+		body,
+		bucket,
+		contentType,
+	}: {
+		key: string;
+		body: Uint8Array;
+		bucket: r2.Bucket;
+		contentType: string;
+	}) => {
+		if (bucket === "public") publicObjects.set(key, { body, contentType });
+		else objects.set(key, body);
 	},
 	getObject: async (key: string) => {
 		const body = objects.get(key);
@@ -118,7 +133,7 @@ const { syncOrganizationPluginSource } = await import("./sync");
 
 function repo(
 	sha: string,
-	files: Record<string, string>,
+	files: Record<string, string | Buffer>,
 	extra: Partial<RepositorySnapshot> = {},
 ) {
 	return async (): Promise<RepositorySnapshot> => ({
@@ -133,7 +148,7 @@ function repo(
 }
 
 /** The tree listing's blob hashes, which change exactly when a file does. */
-const blobsOf = (files: Record<string, string>) =>
+const blobsOf = (files: Record<string, string | Buffer>) =>
 	new Map(
 		Object.entries(files).map(([path, body]) => [
 			path,
@@ -156,6 +171,7 @@ beforeEach(() => {
 	plugins = [];
 	writtenMeanwhile = [];
 	objects = new Map();
+	publicObjects = new Map();
 	reads = [];
 	sourceWrites = [];
 	removalParams = [];
@@ -168,6 +184,7 @@ describe("syncOrganizationPluginSource", () => {
 		source.syncedSha = "sha-1";
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", { ".agent-marketplace.json": marketplace() }),
 		);
 		expect(result?.error).toBeNull();
@@ -184,7 +201,7 @@ describe("syncOrganizationPluginSource", () => {
 			".agent-marketplace.json": marketplace("tools"),
 			...plugin("tools", "1.0.0"),
 		};
-		await syncOrganizationPluginSource(SOURCE.id, repo("sha-1", files));
+		await syncOrganizationPluginSource(SOURCE.id, {}, repo("sha-1", files));
 		const stored = plugins[0] as PluginRow;
 		stored.contentHash = "packed-differently";
 		const bytes = [...objects.values()][0] as Uint8Array;
@@ -195,6 +212,7 @@ describe("syncOrganizationPluginSource", () => {
 
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-2", files),
 		);
 		expect(result?.problems).toEqual([]);
@@ -204,6 +222,7 @@ describe("syncOrganizationPluginSource", () => {
 	test("new files under the same version are refused", async () => {
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "1.0.0"),
@@ -211,6 +230,7 @@ describe("syncOrganizationPluginSource", () => {
 		);
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-2", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "1.0.0", "second"),
@@ -228,6 +248,7 @@ describe("syncOrganizationPluginSource", () => {
 		);
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": marketplace("big"),
 				"plugins/big/plugin.json": JSON.stringify({
@@ -244,6 +265,7 @@ describe("syncOrganizationPluginSource", () => {
 	test("a plugin over the size limit is refused before any file is read", async () => {
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo(
 				"sha-1",
 				{
@@ -262,6 +284,7 @@ describe("syncOrganizationPluginSource", () => {
 	test("a same-version change is refused when the stored bundle is missing", async () => {
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "1.0.0"),
@@ -270,6 +293,7 @@ describe("syncOrganizationPluginSource", () => {
 		objects.clear();
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-2", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "1.0.0", "second"),
@@ -281,6 +305,7 @@ describe("syncOrganizationPluginSource", () => {
 	test("images over the packed limit are refused before any file is read", async () => {
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo(
 				"sha-1",
 				{
@@ -311,6 +336,7 @@ describe("syncOrganizationPluginSource", () => {
 		});
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "2.0.0"),
@@ -333,6 +359,7 @@ describe("syncOrganizationPluginSource", () => {
 		});
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": JSON.stringify({
 					plugins: [{ name: "tools", source: "plugins/tools" }],
@@ -347,10 +374,10 @@ describe("syncOrganizationPluginSource", () => {
 			".agent-marketplace.json": marketplace("tools"),
 			...plugin("tools", "1.0.0"),
 		};
-		await syncOrganizationPluginSource(SOURCE.id, repo("sha-1", files));
+		await syncOrganizationPluginSource(SOURCE.id, {}, repo("sha-1", files));
 		expect(nudges).toEqual([`${ORG}:plugins`]);
 
-		await syncOrganizationPluginSource(SOURCE.id, repo("sha-2", files));
+		await syncOrganizationPluginSource(SOURCE.id, {}, repo("sha-2", files));
 		expect(nudges).toEqual([`${ORG}:plugins`]);
 	});
 
@@ -358,6 +385,7 @@ describe("syncOrganizationPluginSource", () => {
 		removedNames = ["gone"];
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", { ".agent-marketplace.json": marketplace() }),
 		);
 		expect(result?.removed).toEqual(["gone"]);
@@ -372,6 +400,7 @@ describe("syncOrganizationPluginSource", () => {
 		};
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", files, { blobs: blobsOf(files) }),
 		);
 		reads = [];
@@ -379,6 +408,7 @@ describe("syncOrganizationPluginSource", () => {
 
 		const result = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-2", changed, { blobs: blobsOf(changed) }),
 		);
 
@@ -395,6 +425,7 @@ describe("syncOrganizationPluginSource", () => {
 		};
 		const first = await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", files, { blobs: blobsOf(files) }),
 		);
 		expect(sourceWrites.at(-1)?.syncError).toBeNull();
@@ -405,6 +436,7 @@ describe("syncOrganizationPluginSource", () => {
 
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", files, { blobs: blobsOf(files) }),
 		);
 
@@ -414,6 +446,7 @@ describe("syncOrganizationPluginSource", () => {
 	test("a replaced version's bundle is deleted from storage", async () => {
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "1.0.0"),
@@ -422,6 +455,7 @@ describe("syncOrganizationPluginSource", () => {
 		const firstKey = [...objects.keys()][0];
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-2", {
 				".agent-marketplace.json": marketplace("tools"),
 				...plugin("tools", "1.1.0", "second"),
@@ -443,6 +477,7 @@ describe("syncOrganizationPluginSource", () => {
 		});
 		await syncOrganizationPluginSource(
 			SOURCE.id,
+			{},
 			repo("sha-1", {
 				".agent-marketplace.json": JSON.stringify({
 					plugins: [{ source: "./plugins/tools" }],
@@ -455,7 +490,80 @@ describe("syncOrganizationPluginSource", () => {
 	test("a removed source is nothing to do", async () => {
 		source = undefined as never;
 		expect(
-			await syncOrganizationPluginSource(SOURCE.id, repo("sha-1", {})),
+			await syncOrganizationPluginSource(SOURCE.id, {}, repo("sha-1", {})),
 		).toBeNull();
+	});
+
+	describe("an icon file", () => {
+		const PNG = Buffer.from("89504e470d0a1a0a0000000049454e44ae426082", "hex");
+		const withIcon = (icon: string, body: string | Buffer) => ({
+			".agent-marketplace.json": marketplace("tools"),
+			"plugins/tools/plugin.json": JSON.stringify({
+				name: "tools",
+				version: "1.0.0",
+				extensions: {
+					superset: {
+						interface: {
+							displayName: "Tools",
+							category: "Developer tools",
+							icon,
+						},
+					},
+				},
+			}),
+			[`plugins/tools/${icon.slice(2)}`]: body,
+		});
+
+		test("is stored in the public bucket under the bundle's hash, typed by its bytes", async () => {
+			const result = await syncOrganizationPluginSource(
+				SOURCE.id,
+				{},
+				repo("sha-1", withIcon("./assets/icon.png", PNG)),
+			);
+			expect(result?.problems).toEqual([]);
+			const hash = (plugins[0] as PluginRow).contentHash;
+			expect([...publicObjects.keys()]).toEqual([
+				`organization-plugins/${ORG}/${hash}/icon`,
+			]);
+			expect(publicObjects.values().next().value?.contentType).toBe(
+				"image/png",
+			);
+		});
+
+		test("a full sync of an unchanged commit stores an icon an automatic one skips", async () => {
+			const files = withIcon("./assets/icon.png", PNG);
+			const read = repo("sha-1", files, { blobs: blobsOf(files) });
+			await syncOrganizationPluginSource(SOURCE.id, {}, read);
+			source.syncedSha = "sha-1";
+			publicObjects.clear();
+
+			await syncOrganizationPluginSource(SOURCE.id, {}, read);
+			expect(publicObjects.size).toBe(0);
+
+			const result = await syncOrganizationPluginSource(
+				SOURCE.id,
+				{ full: true },
+				read,
+			);
+			expect(result?.unchanged).toEqual(["tools"]);
+			expect(publicObjects.size).toBe(1);
+		});
+
+		test("that is svg still syncs the plugin, with a problem and no icon", async () => {
+			const result = await syncOrganizationPluginSource(
+				SOURCE.id,
+				{},
+				repo("sha-1", withIcon("./assets/icon.svg", "<svg/>")),
+			);
+			expect(result?.synced).toEqual(["tools"]);
+			expect(result?.problems).toEqual([
+				{
+					name: "tools",
+					reason:
+						"its icon assets/icon.svg must be a png, jpeg or webp image; it shows the default icon",
+				},
+			]);
+			expect(publicObjects.size).toBe(0);
+		});
 	});
 });

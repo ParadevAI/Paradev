@@ -36,7 +36,7 @@ Habiskan waktu Anda untuk shipping, bukan menunggu.
 
 ## Coding 10x Lebih Cepat Tanpa Biaya Berpindah Konteks
 
-Paradev menjalankan agen coding berbasis CLI secara paralel di git worktree yang terisolasi, dengan alur kerja terminal, review, dan buka-di-editor bawaan.
+Paradev menjalankan agen coding berbasis CLI secara paralel di git worktree yang terisolasi, di terminal atau sebagai chat, dengan alur kerja terminal, review, dan buka-di-editor bawaan.
 
 - **Jalankan banyak agen sekaligus** tanpa beban berpindah konteks
 - **Isolasi tiap tugas** di git worktree-nya sendiri sehingga agen tidak saling mengganggu
@@ -230,6 +230,188 @@ Agen mendapat lebih dari sekadar terminal:
 - **Status dan notifikasi**: indikator bekerja, bunyi penanda selesai, dan badge dock saat agen membutuhkan Anda
 - **Chat bawaan**: bicaralah dengan model di panel chat, dengan persetujuan tool inline dan review rencana
 
+<details>
+<summary><strong>Pertanyaan Umum</strong></summary>
+<br />
+
+<details>
+<summary>Apakah Paradev aplikasi terminal atau aplikasi desktop?</summary>
+<br />
+
+Paradev adalah aplikasi desktop, bukan aplikasi terminal. Agen berjalan di dalamnya sebagai chat atau di terminal. Di sampingnya ada diff viewer, pull request, browser dalam aplikasi, dan editor file. [Dokumentasi FAQ](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Apakah saya harus memakai terminal, atau bisa chat dengan agen coding?</summary>
+<br />
+
+Tidak harus. Paradev bisa menampilkan sesi agen sebagai chat alih-alih terminal, dan Anda menyetujui atau menolak tindakan agen dengan sekali klik. Chat bisa dipakai dengan Claude Code, Codex, OpenCode, dan Pi; Paradev menjalankan CLI yang sudah Anda instal, jadi login dan pengaturan Anda tetap terpakai. Toggle **CLI** / **Chat** mengganti mode sesi yang sedang berjalan tanpa kehilangan konteks, dan agen lain berjalan di terminal Paradev. [Dokumentasi Chat](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>Apa lisensi Paradev, berapa biayanya, dan di platform apa saja ia berjalan?</summary>
+<br />
+
+Paradev adalah open source dengan Lisensi MIT. Paket Free mencakup workspace lokal dengan aplikasi desktop dan CLI. Paket berbayar menambahkan fitur seperti otomatisasi dan workspace cloud. Aplikasi desktop berjalan di macOS, dengan AppImage Linux yang masih eksperimental; Windows belum tersedia. [Harga](https://paradev.com/pricing) · [Dokumentasi FAQ](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Apakah Paradev sama dengan Superset? Apakah ada hubungannya dengan Apache Superset?</summary>
+<br />
+
+Paradev sebelumnya bernama Superset, itulah sebabnya perintah CLI-nya masih `superset`. Paradev tidak berhubungan dengan Apache Superset, tool business intelligence. [Dokumentasi instalasi](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Agen coding apa saja yang didukung Paradev, dan apakah saya tetap memakai langganan saya sendiri?</summary>
+<br />
+
+Paradev punya dukungan bawaan untuk Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, Amp, dan lainnya, dan Anda bisa menambahkan agen CLI lain apa pun. Claude Code, Codex, OpenCode, dan Pi juga bisa berjalan sebagai chat. Agen memakai langganan dan API key Anda sendiri, dan Paradev tidak mem-proxy panggilan model. [Dokumentasi agen yang didukung](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>Bagaimana mencegah beberapa agen coding saling menimpa pekerjaan di satu repositori?</summary>
+<br />
+
+Paradev memberi setiap agen workspace-nya sendiri: sebuah git worktree di branch-nya sendiri, dengan terminalnya sendiri. Agen mengedit salinan file kerja yang terpisah, jadi satu agen tidak menimpa perubahan agen lain. Worktree tidak mengisolasi proses dalam sandbox, dan branch tetap bisa konflik saat Anda menggabungkannya. [Dokumentasi workspace](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>Sesi terminal Claude Code saya terlalu banyak. Bagaimana cara melacaknya?</summary>
+<br />
+
+Paradev menampilkan setiap sesi agen di satu sidebar, dikelompokkan per proyek, dengan status untuk masing-masing, baik sesi itu berjalan sebagai chat maupun di terminal. Claude Code melaporkan saat ia selesai dan saat menunggu input Anda, dan sidebar menandai workspace yang membutuhkan Anda. [Dokumentasi status agen](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Bisakah saya menjalankan dua agen coding pada tugas yang sama lalu membandingkan hasilnya?</summary>
+<br />
+
+Bisa. Di Paradev Anda memberikan prompt yang sama ke dua workspace atau lebih, masing-masing di branch-nya sendiri, dengan agen yang sama atau agen yang berbeda. Lalu Anda membandingkan diff-nya dan menyimpan hasil terbaik. [Resep balapan agen](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>Bisakah saya memakai Claude Code dan Codex bersamaan, satu menulis kode dan yang lain me-review-nya?</summary>
+<br />
+
+Bisa. Paradev menjalankan Claude Code dan Codex berdampingan, masing-masing sebagai chat atau di terminal. Untuk mendapat review, pilih baris di tab **Code** sebuah pull request lalu kirim ke agen lain, atau gunakan **Continue with another agent** untuk memulai sesi agen lain dengan konteks terbaru. [Dokumentasi sesi agen](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>Bagaimana cara me-review diff agen coding dan mengirim tindak lanjut sebelum merge?</summary>
+<br />
+
+Paradev menampilkan perubahan setiap workspace di diff viewer, tempat Anda melakukan commit, push, dan membuka pull request. Di tab **Code** pull request, pilih baris lalu kirim komentar ke agen yang sedang berjalan atau ke sesi baru; memposting komentar itu ke GitHub bersifat opsional. Anda bisa memantau check dan melakukan merge dari tampilan yang sama. [Dokumentasi pull request](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>Bagaimana cara memisahkan server dev, port, dan pratinjau tiap branch?</summary>
+<br />
+
+Paradev menyimpan setiap branch di worktree-nya sendiri dan menampilkan port yang didengarkan oleh proses tiap workspace, dikelompokkan per workspace. Pilih sebuah port untuk membuka server dev branch tersebut di browser dalam aplikasi. Paradev tidak menetapkan rentang port, jadi atur konfigurasi per workspace di skrip setup, yang berjalan di setiap workspace baru dengan variabel seperti `SUPERSET_WORKSPACE_PATH`. [Dokumentasi port](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>Bisakah saya mengklik elemen di aplikasi web yang sedang berjalan lalu meminta agen coding mengubahnya?</summary>
+<br />
+
+Bisa. Paradev punya mode Design di browser dalam aplikasinya: buka server dev Anda, nyalakan **Design**, lalu klik elemennya. Kemudian Anda menjelaskan perubahannya, dan agen menerima detail elemen serta screenshot beserta catatan Anda. [Dokumentasi browser](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>Bisakah saya mendapat notifikasi saat agen coding membutuhkan input saya?</summary>
+<br />
+
+Bisa. Aplikasi desktop Paradev memberi tahu Anda saat agen selesai atau berhenti menunggu input Anda, dan ikon Dock macOS menampilkan badge. Dukungannya bergantung pada agen: Claude Code melaporkan kedua kondisi, sementara beberapa agen hanya melaporkan saat selesai. Di aplikasi mobile, sebuah titik pada workspace menandakan agen membutuhkan izin Anda; push notification belum tersedia. [Dokumentasi status agen](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>Bisakah saya memantau agen coding dan membalasnya dari iPhone?</summary>
+<br />
+
+Bisa. Paradev untuk iPhone dan iPad memungkinkan Anda memulai agen, mengikuti sesinya secara langsung, membalasnya, dan me-review perubahannya. Dibutuhkan iOS 26 atau iPadOS 26 ke atas dan Paradev Pro, dan ada juga aplikasi Android di Google Play. Untuk workspace di komputer Anda, aktifkan akses jarak jauh dan biarkan komputer tetap menyala dan online. [Dokumentasi aplikasi mobile](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>Bisakah agen coding berjalan sesuai jadwal, misalnya maintenance malam hari atau pengecekan flaky test mingguan?</summary>
+<br />
+
+Bisa. Otomatisasi Paradev menjalankan agen dengan jadwal per jam, harian, mingguan, atau kustom. Setiap run membuat workspace tempat Anda me-review perubahan dan melanjutkan pekerjaan. Otomatisasi membutuhkan paket Pro. [Dokumentasi otomatisasi](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Bisakah saya memulai agen coding dari Slack, Linear, Sentry, atau pull request GitHub?</summary>
+<br />
+
+Bisa. Otomatisasi Paradev memulai agen saat ada event pull request GitHub, pesan Slack, issue Linear, issue Sentry, atau webhook yang masuk, dan agen menerima detail event tersebut bersama prompt Anda. Anda juga bisa me-mention bot Paradev di Slack untuk memulai workspace cloud dan agen. Otomatisasi dan integrasi Slack membutuhkan paket Pro. [Dokumentasi otomatisasi](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>Bisakah saya memulai agen coding dari command line atau dari agen lain?</summary>
+<br />
+
+Bisa. Paradev CLI membuat workspace dan memulai agen di dalamnya dari skrip shell atau dari agen lain. Agen juga bisa memakai server MCP Paradev untuk bekerja dengan workspace dan terminal. Aplikasi desktop menyertakan skill orchestrate yang memungkinkan satu agen mengoordinasikan worker di workspace terpisah. [Dokumentasi CLI](https://docs.paradev.com/cli/getting-started)
+
+</details>
+
+<details>
+<summary>Bisakah saya menjalankan agen coding di mesin jarak jauh atau di cloud dan me-review perubahannya dari laptop?</summary>
+<br />
+
+Bisa. Dengan akses jarak jauh Paradev (paket Pro), Anda membuka workspace yang di-host di mesin lain, seperti Mac mini atau server, dari laptop Anda. Workspace cloud (paket Team dan Ultra) menjalankan setiap workspace di mesin cloud-nya sendiri, jadi agen tetap bekerja saat laptop Anda tertutup. [Dokumentasi akses jarak jauh](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Bisakah saya kembali ke sebuah tugas nanti dengan sesi agen dan branch-nya masih ada?</summary>
+<br />
+
+Bisa. Workspace Paradev tetap ada di disk sebagai git worktree di branch-nya sampai Anda menghapusnya. Terminal dimiliki oleh proses latar belakang, jadi terminal tetap berjalan dan menyimpan scrollback-nya saat Anda menutup atau memperbarui aplikasi. Jika terminal berhenti setelah crash atau restart, Paradev bisa melanjutkan sesi agen untuk agen yang mendukung resume, seperti Claude Code dan Codex. [Dokumentasi menjaga agen tetap berjalan](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>Bisakah tim kecil berbagi satu mesin untuk agen coding?</summary>
+<br />
+
+Bisa. Host Paradev bisa berupa mesin bersama, seperti Mac mini, yang diakses rekan tim lewat akses jarak jauh (paket Pro). Saat host pertama kali online, hanya orang yang menjalankannya yang punya akses. Orang tersebut menambahkan rekan tim di **Settings → Hosts**. [Dokumentasi akses jarak jauh](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Apa bedanya Paradev dengan Conductor, Orca, dan Cursor?</summary>
+<br />
+
+Paradev, Conductor, dan Orca sama-sama menjalankan agen coding di git worktree paralel, sedangkan Cursor adalah editor AI yang dibangun di sekitar agennya sendiri. Paradev menjalankan agen CLI apa pun dengan langganan Anda sendiri, dan membuka workspace di Cursor saat Anda ingin mengedit di sana. Orca juga open source dan berjalan di Windows, yang belum didukung Paradev. Conductor sedang bergabung dengan Meta dan tertutup untuk pengguna baru, dan Paradev punya panduan untuk memindahkan workspace Conductor. [Migrasi dari Conductor](https://docs.paradev.com/migrate-from-conductor)
+
+</details>
+
+<details>
+<summary>Apakah Paradev bisa menggantikan tmux?</summary>
+<br />
+
+Bisa, untuk menjalankan agen coding Paradev dapat menggantikan tmux: sesi terminalnya tetap berjalan saat Anda menutup, keluar dari, atau memperbarui aplikasi. Setiap workspace juga mendapat worktree dan status sendiri di sidebar. Anda tetap bisa menjalankan tmux di dalam terminal Paradev. [Dokumentasi menjaga agen tetap berjalan](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+</details>
+
 ## Lebih dari Sekadar Aplikasi Desktop
 
 Setiap permukaan berbicara dengan workspace yang sama, jadi Anda bisa memulai tugas di aplikasi dan memeriksanya dari mana saja.
@@ -256,7 +438,7 @@ Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
 Unduh aplikasi desktop:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage) (eksperimental; macOS adalah target utama)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (eksperimental; macOS adalah target utama)
 - **Windows**: belum tersedia
 - [Semua build](https://github.com/paradevai/paradev/releases/latest)
 

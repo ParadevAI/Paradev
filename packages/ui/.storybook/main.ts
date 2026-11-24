@@ -32,6 +32,7 @@ const config: StorybookConfig = {
 			reactPlugin(),
 			babel({ plugins: ["@lingui/babel-plugin-lingui-macro"] }),
 		];
+		viteConfig.define = { ...viteConfig.define, "process.env": {} };
 		return viteConfig;
 	},
 };

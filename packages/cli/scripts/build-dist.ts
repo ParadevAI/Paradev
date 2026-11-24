@@ -2,8 +2,8 @@
  * Builds a standalone Superset CLI distribution tarball.
  *
  * Bundle layout (extracts into ~/superset/):
- *   bin/superset                 — Bun-compiled CLI binary
- *   bin/paradev                  — Symlink to bin/superset (alias)
+ *   bin/superset                 — Bun-compiled CLI binary; released installers and `update` check this path
+ *   bin/paradev                  — Symlink to bin/superset; the name help and docs show
  *   bin/superset-host            — Shell wrapper to run the host-service
  *   lib/node                     — Standalone Node.js runtime
  *   lib/host-service.js          — Bundled host-service entry
@@ -58,6 +58,7 @@ const RUNTIME_PACKAGES = [
 	"node-pty",
 	"@parcel/watcher",
 	"@xterm/headless",
+	"@agentclientprotocol/claude-agent-acp",
 ] as const;
 
 /**

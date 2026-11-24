@@ -36,7 +36,7 @@ Claude Code、Codex 或任何 CLI 智能体,各自运行在独立的 worktree �
 
 ## 零切换成本,编码快 10 倍
 
-Paradev 在相互隔离的 git worktree 中并行运行基于 CLI 的编码智能体,并内置终端、审查和在编辑器中打开的工作流。
+Paradev 在相互隔离的 git worktree 中并行运行基于 CLI 的编码智能体,在终端中或以聊天形式运行,并内置终端、审查和在编辑器中打开的工作流。
 
 - **同时运行多个智能体**,没有上下文切换的开销
 - **将每个任务隔离**在独立的 git worktree 中,智能体之间互不干扰
@@ -230,6 +230,188 @@ Paradev 适用于任何基于 CLI 的编码智能体,包括:
 - **状态与通知**:工作指示器、完成提示音,以及智能体需要你时的 Dock 徽标
 - **内置聊天**:在聊天窗格中与模型对话,支持内联工具批准和计划审查
 
+<details>
+<summary><strong>常见问题</strong></summary>
+<br />
+
+<details>
+<summary>Paradev 是终端应用还是桌面应用?</summary>
+<br />
+
+Paradev 是桌面应用,不是终端应用。智能体在其中以聊天形式或在终端中运行。旁边还有差异查看器、拉取请求、应用内浏览器和文件编辑器。[FAQ 文档](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>我必须使用终端吗,还是可以直接和编码智能体聊天?</summary>
+<br />
+
+不必使用终端。Paradev 可以将智能体会话显示为聊天而非终端,你只需点击即可批准或拒绝智能体的操作。聊天支持 Claude Code、Codex、OpenCode 和 Pi。Paradev 运行的是你已经安装的 CLI,因此会保留你的登录状态和设置。通过 **CLI** / **Chat** 切换,可以在不丢失上下文的情况下切换正在运行的会话,其他智能体则在 Paradev 终端中运行。[聊天文档](https://docs.paradev.com/chat)
+
+</details>
+
+<details>
+<summary>Paradev 采用什么许可证、费用如何、支持哪些平台?</summary>
+<br />
+
+Paradev 基于 MIT 许可证开源。Free 套餐支持通过桌面应用和 CLI 使用本地工作区。付费套餐增加了自动化和云工作区等功能。桌面应用可在 macOS 上运行,另有实验性的 Linux AppImage。Windows 版暂未推出。[定价](https://paradev.com/pricing) · [FAQ 文档](https://docs.paradev.com/faq)
+
+</details>
+
+<details>
+<summary>Paradev 和 Superset 是一回事吗?它和 Apache Superset 有关系吗?</summary>
+<br />
+
+Paradev 以前名为 Superset,所以 CLI 命令仍然是 `superset`。它与商业智能工具 Apache Superset 没有关系。[安装文档](https://docs.paradev.com/install)
+
+</details>
+
+<details>
+<summary>Paradev 支持哪些编码智能体?我能继续使用自己的订阅吗?</summary>
+<br />
+
+Paradev 内置支持 Claude Code、Codex、OpenCode、Cursor Agent、Gemini CLI、Amp 等,你还可以添加任何其他 CLI 智能体。Claude Code、Codex、OpenCode 和 Pi 还可以以聊天形式运行。智能体使用你自己的订阅和 API 密钥,Paradev 不会代理模型调用。[支持的智能体文档](https://docs.paradev.com/supported-agents)
+
+</details>
+
+<details>
+<summary>如何防止多个编码智能体在同一个仓库中互相覆盖?</summary>
+<br />
+
+Paradev 为每个智能体提供独立的工作区:一个位于独立分支上的 Git worktree,并配有独立的终端。智能体编辑的是工作文件的不同副本,因此一个智能体不会覆盖另一个智能体的更改。worktree 不会对进程进行沙盒隔离,合并分支时仍可能出现冲突。[工作区文档](https://docs.paradev.com/workspaces)
+
+</details>
+
+<details>
+<summary>我的 Claude Code 终端会话太多了,怎么跟踪它们?</summary>
+<br />
+
+Paradev 在同一个侧边栏中按项目分组显示所有智能体会话,无论会话以聊天形式还是在终端中运行,都会显示各自的状态。Claude Code 会在完成任务和等待你输入时报告,侧边栏会标记需要你处理的工作区。[智能体状态文档](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>我能让两个编码智能体处理同一个任务并比较结果吗?</summary>
+<br />
+
+可以。在 Paradev 中,你可以把同一个提示词交给两个或更多工作区,每个工作区都在自己的分支上,使用相同或不同的智能体。然后比较各自的差异,保留最好的结果。[智能体竞速示例](https://docs.paradev.com/recipes/race-agents)
+
+</details>
+
+<details>
+<summary>我能同时使用 Claude Code 和 Codex,一个写代码,另一个审查吗?</summary>
+<br />
+
+可以。Paradev 可以并排运行 Claude Code 和 Codex,每个都可以以聊天形式或在终端中运行。要进行审查,可以在拉取请求的 **Code** 标签页中选中代码行并发送给另一个智能体,或者使用 **Continue with another agent**,带着最近的上下文启动另一个智能体的会话。[智能体会话文档](https://docs.paradev.com/agent-sessions)
+
+</details>
+
+<details>
+<summary>合并前如何审查编码智能体的差异并发送后续指令?</summary>
+<br />
+
+Paradev 在差异查看器中显示每个工作区的更改,你可以在其中提交、推送并创建拉取请求。在拉取请求的 **Code** 标签页中选中代码行,即可将评论发送给正在运行的智能体或新会话。是否同时发布到 GitHub 由你决定。你还可以在同一视图中查看检查结果并合并。[拉取请求文档](https://docs.paradev.com/pull-requests)
+
+</details>
+
+<details>
+<summary>如何让每个分支的开发服务器、端口和预览互不干扰?</summary>
+<br />
+
+Paradev 将每个分支放在各自的 worktree 中,并按工作区分组显示各工作区进程监听的端口。选择一个端口,即可在应用内浏览器中打开该分支的开发服务器。Paradev 不会分配端口范围,因此请在设置脚本中进行每个工作区的配置。设置脚本会在每个新工作区中运行,并提供 `SUPERSET_WORKSPACE_PATH` 等变量。[端口文档](https://docs.paradev.com/ports)
+
+</details>
+
+<details>
+<summary>我能点击正在运行的 Web 应用中的元素,让编码智能体修改它吗?</summary>
+<br />
+
+可以。Paradev 的应用内浏览器提供 Design 模式:打开你的开发服务器,开启 **Design**,然后点击元素。接着描述你想要的修改,智能体会收到该元素的详细信息和一张截图,以及你的说明。[浏览器文档](https://docs.paradev.com/browser)
+
+</details>
+
+<details>
+<summary>编码智能体需要我输入时,我能收到通知吗?</summary>
+<br />
+
+可以。智能体完成任务或停下来等待你输入时,Paradev 桌面应用会通知你,macOS Dock 图标也会显示徽标。支持情况因智能体而异:Claude Code 会报告这两种状态,有些智能体只在完成时报告。在移动应用中,工作区上的圆点表示有智能体需要你授权。推送通知暂不可用。[智能体状态文档](https://docs.paradev.com/agent-status)
+
+</details>
+
+<details>
+<summary>我能在 iPhone 上查看编码智能体的进展并回复它们吗?</summary>
+<br />
+
+可以。通过 iPhone 和 iPad 版 Paradev,你可以启动智能体、实时跟进会话、回复智能体并审查更改。需要 iOS 26 或 iPadOS 26 及以上版本以及 Paradev Pro,Google Play 上也提供 Android 应用。如需访问你电脑上的工作区,请开启远程访问,并让电脑保持唤醒和联网。[移动应用文档](https://docs.paradev.com/mobile)
+
+</details>
+
+<details>
+<summary>编码智能体能按计划运行吗,比如每晚维护或每周检查不稳定的测试?</summary>
+<br />
+
+可以。Paradev 自动化可以按每小时、每天、每周或自定义计划运行智能体。每次运行都会创建一个工作区,你可以在其中审查更改并继续工作。自动化需要 Pro 套餐。[自动化文档](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>我能从 Slack、Linear、Sentry 或 GitHub 拉取请求启动编码智能体吗?</summary>
+<br />
+
+可以。当收到 GitHub 拉取请求事件、Slack 消息、Linear issue、Sentry issue 或 webhook 时,Paradev 自动化会启动智能体,智能体会连同你的提示词一起收到事件详情。你还可以在 Slack 中提及 Paradev 机器人,来启动云工作区和智能体。自动化和 Slack 集成需要 Pro 套餐。[自动化文档](https://docs.paradev.com/automations)
+
+</details>
+
+<details>
+<summary>我能从命令行或另一个智能体启动编码智能体吗?</summary>
+<br />
+
+可以。Paradev CLI 可以从 shell 脚本或另一个智能体创建工作区,并在其中启动智能体。智能体也可以通过 Paradev MCP 服务器操作工作区和终端。桌面应用包含一个 orchestrate 技能,可让一个智能体协调位于不同工作区中的多个工作智能体。[CLI 文档](https://docs.paradev.com/cli/getting-started)
+
+</details>
+
+<details>
+<summary>我能在远程机器或云端运行编码智能体,并在笔记本电脑上审查更改吗?</summary>
+<br />
+
+可以。借助 Paradev 远程访问(Pro 套餐),你可以在笔记本电脑上打开托管在另一台机器(例如 Mac mini 或服务器)上的工作区。云工作区(Team 和 Ultra 套餐)让每个工作区运行在各自的云端机器上,因此合上笔记本电脑后,智能体仍会继续工作。[远程访问文档](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>我能稍后再回到某个任务,并且它的智能体会话和分支都还在吗?</summary>
+<br />
+
+可以。Paradev 工作区会作为其分支上的 Git worktree 保留在磁盘上,直到你删除它。终端归属于一个后台进程,因此关闭或更新应用时,终端会继续运行并保留滚动历史。如果终端因崩溃或重启而停止,对于支持恢复的智能体(例如 Claude Code 和 Codex),Paradev 可以恢复其智能体会话。[保持智能体运行文档](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+<details>
+<summary>小团队能共用一台机器来运行编码智能体吗?</summary>
+<br />
+
+可以。Paradev 主机可以是一台共享机器(例如 Mac mini),团队成员通过远程访问(Pro 套餐)连接。主机首次上线时,只有启动它的人拥有访问权限。之后由此人在 **Settings → Hosts** 中添加团队成员。[远程访问文档](https://docs.paradev.com/remote-access)
+
+</details>
+
+<details>
+<summary>Paradev 与 Conductor、Orca 和 Cursor 有什么不同?</summary>
+<br />
+
+Paradev、Conductor 和 Orca 都在并行的 Git worktree 中运行编码智能体,而 Cursor 是围绕自家智能体构建的 AI 编辑器。Paradev 使用你自己的订阅运行任何 CLI 智能体,想在 Cursor 中编辑时,也可以直接在 Cursor 中打开工作区。Orca 同样开源,并且支持 Windows,而 Paradev 暂不支持 Windows。Conductor 即将加入 Meta,已不再接受新用户,Paradev 提供了将 Conductor 工作区迁移过来的指南。[从 Conductor 迁移](https://docs.paradev.com/migrate-from-conductor)
+
+</details>
+
+<details>
+<summary>Paradev 能替代 tmux 吗?</summary>
+<br />
+
+可以。就运行编码智能体而言,Paradev 可以替代 tmux:关闭、退出或更新应用时,它的终端会话会继续运行。每个工作区还有自己的 worktree,并在侧边栏中显示状态。你仍然可以在 Paradev 终端中运行 tmux。[保持智能体运行文档](https://docs.paradev.com/keep-agents-running)
+
+</details>
+
+</details>
+
 ## 不只是一个桌面应用
 
 每个界面都连接到同样的工作区,你可以在应用里开始一个任务,然后在任何地方查看进展。
@@ -256,7 +438,7 @@ iOS 应用即将推出,让你可以在手机上查看你的智能体。
 下载桌面应用:
 
 - **macOS**:[Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Superset-x86_64.AppImage)(实验性;macOS 是主要目标平台)
+- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(实验性;macOS 是主要目标平台)
 - **Windows**:暂不可用
 - [所有构建版本](https://github.com/paradevai/paradev/releases/latest)
 

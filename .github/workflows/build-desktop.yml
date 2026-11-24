@@ -27,13 +27,18 @@ on:
         required: false
         type: number
         default: 30
+      environment:
+        description: "GitHub environment the build reads its secrets from"
+        required: false
+        type: string
+        default: production
 
 jobs:
   build-macos:
     name: Build - macOS (${{ matrix.arch }})
     runs-on: macos-latest
     timeout-minutes: 90
-    environment: production
+    environment: ${{ inputs.environment }}
 
     strategy:
       fail-fast: false
@@ -98,8 +103,8 @@ jobs:
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
-          NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_WEB_URL: ${{ secrets.DESKTOP_WEB_URL || secrets.NEXT_PUBLIC_WEB_URL }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.DESKTOP_API_URL || secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_DOCS_URL: ${{ secrets.NEXT_PUBLIC_DOCS_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}
@@ -258,7 +263,7 @@ jobs:
     name: Build - Linux (x64)
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    environment: production
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Checkout code
@@ -319,8 +324,8 @@ jobs:
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
-          NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL }}
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_WEB_URL: ${{ secrets.DESKTOP_WEB_URL || secrets.NEXT_PUBLIC_WEB_URL }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.DESKTOP_API_URL || secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_DOCS_URL: ${{ secrets.NEXT_PUBLIC_DOCS_URL }}
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}

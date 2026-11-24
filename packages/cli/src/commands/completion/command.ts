@@ -4,12 +4,12 @@ import {
 	introspectCli,
 	positional,
 } from "@superset/cli-framework";
-import { CLI_BIN_ALIASES } from "../../lib/bin-aliases";
+import { CLI_COMMAND_NAMES } from "../../lib/bin-aliases";
 import { command } from "../../lib/command";
 
 export default command({
 	description:
-		"Print a shell completion script; load it with: source <(superset completion zsh)",
+		"Print a shell completion script; load it with: source <(paradev completion zsh)",
 	skipMiddleware: true,
 	args: [
 		positional("shell")
@@ -20,8 +20,12 @@ export default command({
 	run: async ({ args }) => {
 		const generate =
 			args.shell === "zsh" ? generateZshCompletion : generateBashCompletion;
+		const cli = introspectCli();
 		return {
-			raw: generate({ ...introspectCli(), binAliases: [...CLI_BIN_ALIASES] }),
+			raw: generate({
+				...cli,
+				binAliases: CLI_COMMAND_NAMES.filter((name) => name !== cli.name),
+			}),
 		};
 	},
 });

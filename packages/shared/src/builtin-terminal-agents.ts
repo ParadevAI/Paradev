@@ -241,9 +241,9 @@ export const BUILTIN_TERMINAL_AGENTS = [
 		label: "Antigravity",
 		description:
 			"Google's Antigravity CLI for reasoning, editing, and running code from the terminal.",
-		command: "agy --mode accept-edits",
-		promptCommand: "agy --mode accept-edits -i",
-		resumeCommand: "agy --mode accept-edits --conversation",
+		command: "agy --dangerously-skip-permissions",
+		promptCommand: "agy --dangerously-skip-permissions -i",
+		resumeCommand: "agy --dangerously-skip-permissions --conversation",
 		nonInteractiveCommand: "agy -p",
 	}),
 	createBuiltinTerminalAgent({

@@ -16,15 +16,15 @@ export type { ActiveDemo } from "./types";
 
 // The mockup is laid out at a fixed app-window size and scaled to fit its
 // container, so type and chrome stay proportional like a real screenshot
-const DESIGN_WIDTH = 1280;
-const DESIGN_HEIGHT = 800;
+const DESIGN_WIDTH = 1440;
+const DESIGN_HEIGHT = 900;
 
 export function AppMockup({
 	activeDemo = "Cloud Workspaces",
 	edgeGlare = false,
 }: AppMockupProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const [scale, setScale] = useState(0.72);
+	const [scale, setScale] = useState(0.64);
 	const isPages = activeDemo === "Publish Pages";
 	const prefersReducedMotion = useReducedMotion() ?? false;
 	const [reducedMotion, setReducedMotion] = useState(false);
@@ -50,7 +50,7 @@ export function AppMockup({
 		<MotionConfig reducedMotion="user">
 			<div
 				ref={containerRef}
-				className="relative w-full min-w-[700px] overflow-hidden rounded-xl border border-border bg-background shadow-[0_1px_1px_rgba(0,0,0,0.4),0_16px_40px_-12px_rgba(0,0,0,0.6),0_32px_90px_-24px_rgba(0,0,0,0.75)]"
+				className="relative w-full min-w-[700px] overflow-hidden rounded-xl border border-border bg-[#0d0d0d] shadow-[0_1px_1px_rgba(0,0,0,0.4),0_16px_40px_-12px_rgba(0,0,0,0.6),0_32px_90px_-24px_rgba(0,0,0,0.75)]"
 				style={{ aspectRatio: "16/10" }}
 			>
 				{/* Edge lighting: brighter hairline along the top edge, dimmer sides */}
@@ -65,7 +65,7 @@ export function AppMockup({
 				)}
 				{/* Bottom dissolve: the window fades into the page instead of ending
 			    on a hard border */}
-				<div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[10%] bg-gradient-to-b from-transparent to-background" />
+				<div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[4%] bg-gradient-to-b from-transparent to-background/80" />
 
 				<div
 					className="absolute left-0 top-0 origin-top-left"
@@ -75,13 +75,15 @@ export function AppMockup({
 						transform: `scale(${scale})`,
 					}}
 				>
-					<div className="flex h-full">
+					<div className="flex h-full pr-1 font-[450] text-[13px] leading-5 [&_svg[fill=none]]:stroke-[1.5]">
 						<LeftSidebar activeDemo={activeDemo} />
-						<div className="flex min-w-0 flex-1 flex-col">
+						<div className="flex min-w-0 flex-1 flex-col gap-1 py-1">
 							<TabBar activeDemo={activeDemo} />
 							<MainPanel activeDemo={activeDemo} pagePhase={pagePhase} />
 						</div>
-						<RightSidebar activeDemo={activeDemo} />
+						<div className="flex py-1">
+							<RightSidebar activeDemo={activeDemo} />
+						</div>
 					</div>
 
 					<PagePopup visible={isPages} phase={pagePhase} />

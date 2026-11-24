@@ -1,0 +1,122 @@
+import type { EnvironmentBuildStatus } from "@superset/db/schema";
+import { sandboxCheckoutDir } from "@superset/shared/sandbox/contract";
+import {
+	KEPT_GOLDENS,
+	MANUAL_BUILD_WINDOW_MS,
+	MANUAL_BUILDS_PER_HOUR,
+	STALE_BUILD_MS,
+} from "./limits";
+
+export const DAILY_PAUSE_AFTER_FAILURES = 3;
+
+/** A running build whose workflow died never finishes on its own. */
+export function isStale(build: {
+	status: EnvironmentBuildStatus;
+	startedAt: Date;
+}): boolean {
+	return (
+		build.status === "running" &&
+		Date.now() - build.startedAt.getTime() > STALE_BUILD_MS
+	);
+}
+
+/**
+ * Goldens past the active one and the `KEPT_GOLDENS - 1` newest others.
+ * Takes undeleted goldens, newest first; never returns the active one.
+ */
+export function goldensToDelete<T extends { goldenRef: string }>(
+	goldens: readonly T[],
+	activeRef: string,
+): T[] {
+	return goldens
+		.filter((golden) => golden.goldenRef !== activeRef)
+		.slice(KEPT_GOLDENS - 1);
+}
+
+/** The goldens retention keeps, the active one included; the complement of `goldensToDelete`. */
+export function keptGoldenRefs(
+	goldens: readonly { goldenRef: string }[],
+	activeRef: string,
+): Set<string> {
+	const deleted = new Set(
+		goldensToDelete(goldens, activeRef).map((golden) => golden.goldenRef),
+	);
+	return new Set([
+		activeRef,
+		...goldens
+			.map((golden) => golden.goldenRef)
+			.filter((ref) => !deleted.has(ref)),
+	]);
+}
+
+/**
+ * When the next manual build may start, or null for now. Takes the start
+ * times of the environment's manual builds in the last hour.
+ */
+export function nextManualBuildAt(recentStarts: readonly Date[]): Date | null {
+	if (recentStarts.length < MANUAL_BUILDS_PER_HOUR) return null;
+	const oldestCounted = [...recentStarts]
+		.map((start) => start.getTime())
+		.sort((a, b) => b - a)[MANUAL_BUILDS_PER_HOUR - 1];
+	return oldestCounted === undefined
+		? null
+		: new Date(oldestCounted + MANUAL_BUILD_WINDOW_MS);
+}
+
+/** Finished builds, newest first. */
+export function dailyBuildsPaused(
+	finished: ReadonlyArray<{ status: EnvironmentBuildStatus }>,
+): boolean {
+	const recent = finished.slice(0, DAILY_PAUSE_AFTER_FAILURES);
+	return (
+		recent.length === DAILY_PAUSE_AFTER_FAILURES &&
+		recent.every((build) => build.status === "failed")
+	);
+}
+
+function quote(value: string): string {
+	return `'${value.replaceAll("'", `'\\''`)}'`;
+}
+
+export interface BuildCheckout {
+	url: string;
+	branch: string;
+	path: string;
+}
+
+/**
+ * Brings every checkout to the tip of its branch: a fetch into a checkout
+ * the box already has, else a clone moved into place the way the boot runner
+ * does it. Prints the primary's commit last.
+ */
+export function checkoutScript(args: {
+	root: string;
+	checkouts: readonly BuildCheckout[];
+}): string {
+	const lines = ["set -euo pipefail"];
+	for (const checkout of args.checkouts) {
+		const dir = quote(sandboxCheckoutDir(args.root, checkout.path));
+		const url = quote(checkout.url);
+		const branch = quote(checkout.branch);
+		lines.push(
+			`mkdir -p ${dir}`,
+			`if [ -d ${dir}/.git ] && [ "$(git -C ${dir} remote get-url origin 2>/dev/null)" = ${url} ]; then`,
+			`  git -C ${dir} fetch -q --depth 1 origin ${branch}`,
+			`  git -C ${dir} checkout -q -f -B ${branch} FETCH_HEAD`,
+			"else",
+			`  tmp="$(mktemp -d ${quote(args.root)}/.clone.XXXXXX)"`,
+			`  git clone -q --depth 1 --single-branch --branch ${branch} ${url} "$tmp"`,
+			`  find ${dir} -mindepth 1 -maxdepth 1 ! -name '.clone.*' -exec rm -rf {} +`,
+			`  (shopt -s dotglob nullglob; for entry in "$tmp"/*; do mv "$entry" ${dir}/; done)`,
+			`  rmdir "$tmp"`,
+			"fi",
+		);
+	}
+	const primary = args.checkouts[0];
+	if (primary) {
+		lines.push(
+			`git -C ${quote(sandboxCheckoutDir(args.root, primary.path))} rev-parse HEAD`,
+		);
+	}
+	return lines.join("\n");
+}

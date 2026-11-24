@@ -1,5 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { getListeningPortsForPids, getProcessTreesForPids } from "./scanner.ts";
+import {
+	getListeningPortsForPids,
+	getProcessTreesForPids,
+	parseProcessTable,
+} from "./scanner.ts";
 
 /**
  * Tests for lsof output parsing logic.
@@ -372,5 +376,16 @@ node      12345 kietho   23u  IPv4 0x1234567890ab          0t0                 T
 			expect(ports[0]?.port).toBe(3000);
 			expect(ports[0]?.pid).toBe(12345);
 		});
+	});
+});
+
+describe("parseProcessTable", () => {
+	it("reads pid and ppid columns and skips other lines", () => {
+		const output = "    1     0\n  430     1\n\n garbage line\n 7166   430\n";
+		expect(parseProcessTable(output)).toEqual([
+			{ pid: 1, ppid: 0 },
+			{ pid: 430, ppid: 1 },
+			{ pid: 7166, ppid: 430 },
+		]);
 	});
 });

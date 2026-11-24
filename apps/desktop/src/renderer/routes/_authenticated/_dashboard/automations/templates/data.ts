@@ -27,7 +27,6 @@ const WEEKLY_FRIDAY_4PM = "FREQ=WEEKLY;BYDAY=FR;BYHOUR=16;BYMINUTE=0";
  * First-run suggestions: the description is a complete sentence a user could
  * have typed themselves (Zapier's "automation ideas" pattern) — clicking a
  * card creates the automation with the matching prompt + schedule.
- * See plans/automations-onboarding.md.
  */
 export const ONBOARDING_SUGGESTIONS: AutomationTemplate[] = [
 	{

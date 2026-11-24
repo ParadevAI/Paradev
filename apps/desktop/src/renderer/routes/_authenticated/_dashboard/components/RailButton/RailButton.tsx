@@ -1,7 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 
 export const RAIL_ICON_CLASS = "size-[18px]";
 export const RAIL_ICON_STROKE_WIDTH = 1.75;
@@ -17,7 +16,8 @@ export function railButtonClass(isActive: boolean) {
 
 interface RailButtonProps {
 	label: string;
-	icon: LucideIcon;
+	icon: ComponentType<{ className?: string; strokeWidth?: number }>;
+	isIconFilled?: boolean;
 	isActive?: boolean;
 	onClick: () => void;
 	badge?: ReactNode;
@@ -26,6 +26,7 @@ interface RailButtonProps {
 export function RailButton({
 	label,
 	icon: Icon,
+	isIconFilled = false,
 	isActive = false,
 	onClick,
 	badge,
@@ -42,7 +43,9 @@ export function RailButton({
 				>
 					<Icon
 						className={RAIL_ICON_CLASS}
-						strokeWidth={RAIL_ICON_STROKE_WIDTH}
+						// Omitted, not undefined: react-icons would then drop the glyph's
+						// own stroke-width="0" and SVG would draw a 1-unit outline.
+						{...(isIconFilled ? {} : { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
 					/>
 					{badge}
 				</button>

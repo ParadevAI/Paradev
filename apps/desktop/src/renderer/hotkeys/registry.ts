@@ -213,6 +213,20 @@ export const HOTKEYS_REGISTRY = {
 			message: "Navigate to the next workspace in the sidebar",
 		}),
 	},
+	OPEN_WORKSPACE_LIST: {
+		key: {
+			mac: L("meta+period"),
+			windows: L("ctrl+period"),
+			linux: L("ctrl+period"),
+		},
+		label: msg({
+			message: "Switch Workspace",
+		}),
+		category: "Workspace",
+		description: msg({
+			message: "Search your workspaces and open one, or start a new workspace",
+		}),
+	},
 	OPEN_ACTIVE_WORKSPACE_SWITCHER: {
 		key: {
 			mac: L("meta+semicolon"),
@@ -224,8 +238,7 @@ export const HOTKEYS_REGISTRY = {
 		}),
 		category: "Workspace",
 		description: msg({
-			message:
-				"Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running",
+			message: "Same as Switch Workspace",
 		}),
 	},
 	CLOSE_WORKSPACE: {

@@ -117,7 +117,7 @@ export function describeResize(
 	const target = `${resize.machineSize} (${resize.vcpus} vCPU)`;
 	const current = resize.boxVcpus ?? "an unknown number of";
 	if (resize.restarted && resize.boxVcpus !== resize.vcpus) {
-		return `Restarted cloud workspace ${id}, but the box came up at ${current} vCPU instead of ${target}. Run: superset workspaces restart ${id}`;
+		return `Restarted cloud workspace ${id}, but the box came up at ${current} vCPU instead of ${target}. Run: paradev workspaces restart ${id}`;
 	}
 	if (resize.restarted) return `Restarted cloud workspace ${id} at ${target}`;
 	if (resize.boxVcpus === resize.vcpus) {

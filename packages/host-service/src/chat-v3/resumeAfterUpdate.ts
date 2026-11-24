@@ -5,14 +5,15 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { CONTINUE_PROMPT } from "@superset/chat/core";
+import {
+	CONTINUE_AFTER_UPDATE_PROMPT,
+	withoutWaitingContinues,
+} from "@superset/chat/core";
 import { userContentSchema } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import { z } from "zod";
 
 export const RESUME_MARKER_MAX_AGE_MS = 30 * 60_000;
-
-export const CONTINUE_AFTER_UPDATE_PROMPT = `Paradev restarted to install an update, which stopped your work before it finished, including any commands running in the background. ${CONTINUE_PROMPT}`;
 
 const sessionSchema = z.object({
 	scopeId: z.string().min(1),
@@ -126,7 +127,8 @@ const closedChatSchema = sessionSchema
 		sessionId: z.string().min(1),
 		interrupted: z.boolean().default(true),
 		prompts: z.array(z.array(userContentSchema).min(1)).default([]),
-	});
+	})
+	.transform(withoutWaitingContinues);
 
 export type ClosedChat = z.infer<typeof closedChatSchema>;
 

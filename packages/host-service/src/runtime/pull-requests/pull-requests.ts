@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	projects,
@@ -28,6 +28,8 @@ import {
 	fetchOpenPullRequestsFromGh,
 	fetchPullRequestByHead,
 	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumber,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecks,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueState,
@@ -80,6 +82,8 @@ const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
 // Re-probe cadence for worktrees observed missing on disk. existsSync-only —
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
+const PAST_PULL_REQUEST_LOOKUP_BATCH = 8;
+const PAST_PULL_REQUEST_REFRESH_STATES: string[] = ["open", "draft", "queued"];
 // Dedup + link-assignment key. Branch stays case-sensitive: `feature` and
 // `Feature` are distinct branches with distinct PRs, so collapsing them here
 // would mislink. Case drift is tolerated only in the fallback in
@@ -266,6 +270,14 @@ export class PullRequestRuntimeManager {
 		string,
 		{
 			promise: Promise<GitHubPullRequestNode[]>;
+			fetchedAt: number;
+			consecutiveFailures: number;
+		}
+	>();
+	private readonly pullRequestNumberCache = new Map<
+		string,
+		{
+			promise: Promise<GitHubPullRequestNode | null>;
 			fetchedAt: number;
 			consecutiveFailures: number;
 		}
@@ -653,10 +665,11 @@ export class PullRequestRuntimeManager {
 	}
 
 	/**
-	 * Append-only memory of every PR a workspace has been linked to. The
-	 * current-link pointer moves on when the branch does; this row stays, so
-	 * the workspace's whole PR history remains listable. Unlinking hides a PR
-	 * from the sidebar surfaces, never from here.
+	 * Memory of every PR a workspace has been linked to. The current-link
+	 * pointer moves on when the branch does; this row stays, so the
+	 * workspace's whole PR history remains listable. Unlinking hides a PR
+	 * from the sidebar surfaces, never from here. Only
+	 * `forgetPastPromotionLinks` deletes rows.
 	 */
 	private recordWorkspacePullRequestLink(
 		workspaceId: string,
@@ -669,6 +682,57 @@ export class PullRequestRuntimeManager {
 			.onConflictDoNothing()
 			.run();
 		if (changes === 0) return;
+		for (const listener of this.linkListeners) listener();
+	}
+
+	// Drops head=<default> PRs this workspace only picked up after they had
+	// closed (past promotions such as main -> staging). A PR linked while
+	// open, e.g. a git-flow release PR, keeps its history row.
+	private forgetPastPromotionLinks(
+		workspaceId: string,
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+	): void {
+		if (!repo.defaultBranch) return;
+		const staleIds = this.db
+			.select({
+				pullRequestId: workspacePullRequests.pullRequestId,
+				linkedAt: workspacePullRequests.linkedAt,
+				mergedAt: pullRequests.mergedAt,
+			})
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.innerJoin(
+				workspaces,
+				eq(workspacePullRequests.workspaceId, workspaces.id),
+			)
+			.where(
+				and(
+					eq(workspacePullRequests.workspaceId, workspaceId),
+					isNull(workspaces.archivedAt),
+					eq(pullRequests.projectId, projectId),
+					eq(pullRequests.repoOwner, repo.owner),
+					eq(pullRequests.repoName, repo.name),
+					eq(pullRequests.headBranch, repo.defaultBranch),
+					notInArray(pullRequests.state, ["open", "draft"]),
+				),
+			)
+			.all()
+			.filter((row) => row.mergedAt == null || row.mergedAt <= row.linkedAt)
+			.map((row) => row.pullRequestId);
+		if (staleIds.length === 0) return;
+		this.db
+			.delete(workspacePullRequests)
+			.where(
+				and(
+					eq(workspacePullRequests.workspaceId, workspaceId),
+					inArray(workspacePullRequests.pullRequestId, staleIds),
+				),
+			)
+			.run();
 		for (const listener of this.linkListeners) listener();
 	}
 
@@ -987,6 +1051,13 @@ export class PullRequestRuntimeManager {
 
 		const { failedKeys, matched: keyToPullRequest } =
 			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
+		await this.refreshPastPullRequests(
+			projectId,
+			repo,
+			projectWorkspaces.map((workspace) => workspace.id),
+			new Set([...keyToPullRequest.values()].map((match) => match.id)),
+			options,
+		);
 
 		for (const workspace of projectWorkspaces) {
 			const key = this.effectiveUpstreamKey(workspace, repo);
@@ -1017,9 +1088,18 @@ export class PullRequestRuntimeManager {
 				continue;
 			}
 			const rawMatch = keyToPullRequest.get(key);
+			// A head=<default> PR that is merged or closed is a past promotion
+			// (e.g. main -> staging), never the default-branch workspace's work.
+			const isPastPromotion =
+				!!rawMatch &&
+				!rawMatch.isOpen &&
+				this.tracksBaseDefaultBranch(workspace, repo);
+			if (this.tracksBaseDefaultBranch(workspace, repo)) {
+				this.forgetPastPromotionLinks(workspace.id, projectId, repo);
+			}
 			// A PR the user unlinked stays unlinked; a different PR still links.
 			const match =
-				rawMatch?.id === workspace.suppressedPullRequestId
+				rawMatch?.id === workspace.suppressedPullRequestId || isPastPromotion
 					? undefined
 					: rawMatch;
 			if (match) {
@@ -1120,28 +1200,37 @@ export class PullRequestRuntimeManager {
 		}
 	}
 
+	// Base repo only, so fork / `gh pr checkout` renames whose head is
+	// `<default>` are not treated as tracking the default branch.
+	private tracksBaseDefaultBranch(
+		workspace: typeof workspaces.$inferSelect,
+		repo: NormalizedRepoIdentity,
+	): boolean {
+		return (
+			repo.defaultBranch !== null &&
+			(workspace.upstreamBranch ?? workspace.branch) === repo.defaultBranch &&
+			workspace.upstreamOwner?.toLowerCase() === repo.owner.toLowerCase() &&
+			workspace.upstreamRepo?.toLowerCase() === repo.name.toLowerCase()
+		);
+	}
+
 	// Guard: a workspace that merely tracks `origin/<default>` (branched off it,
 	// never pushed) must not key on `<default>` and grab a head=<default> PR —
-	// only its own default-branch workspace may. Base repo only, so fork /
-	// `gh pr checkout` renames whose head is `<default>` still link.
+	// only its own default-branch workspace may.
 	private effectiveUpstreamKey(
 		workspace: typeof workspaces.$inferSelect,
 		repo: NormalizedRepoIdentity,
 	): string | null {
-		const upstreamBranch = workspace.upstreamBranch ?? workspace.branch;
 		if (
-			repo.defaultBranch &&
-			upstreamBranch === repo.defaultBranch &&
-			workspace.branch !== repo.defaultBranch &&
-			workspace.upstreamOwner?.toLowerCase() === repo.owner.toLowerCase() &&
-			workspace.upstreamRepo?.toLowerCase() === repo.name.toLowerCase()
+			this.tracksBaseDefaultBranch(workspace, repo) &&
+			workspace.branch !== repo.defaultBranch
 		) {
 			return null;
 		}
 		return upstreamKey(
 			workspace.upstreamOwner,
 			workspace.upstreamRepo,
-			upstreamBranch,
+			workspace.upstreamBranch ?? workspace.branch,
 		);
 	}
 
@@ -1547,16 +1636,134 @@ export class PullRequestRuntimeManager {
 		);
 	}
 
+	// A head lookup only reaches the PR on a workspace's current branch. PRs it
+	// linked before (another stack layer, an earlier branch) are fetched by
+	// number until GitHub reports them closed or merged.
+	private async refreshPastPullRequests(
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+		workspaceIds: string[],
+		refreshedRowIds: ReadonlySet<string>,
+		options: { bypassCache?: boolean } = {},
+	): Promise<void> {
+		const rowIds = this.db
+			.selectDistinct({ id: pullRequests.id })
+			.from(workspacePullRequests)
+			.innerJoin(
+				pullRequests,
+				eq(workspacePullRequests.pullRequestId, pullRequests.id),
+			)
+			.where(
+				and(
+					inArray(workspacePullRequests.workspaceId, workspaceIds),
+					eq(pullRequests.repoProvider, repo.provider),
+					eq(pullRequests.repoOwner, repo.owner),
+					eq(pullRequests.repoName, repo.name),
+					inArray(pullRequests.state, PAST_PULL_REQUEST_REFRESH_STATES),
+				),
+			)
+			.all()
+			.map((row) => row.id)
+			.filter((id) => !refreshedRowIds.has(id));
+
+		for (
+			let start = 0;
+			start < rowIds.length;
+			start += PAST_PULL_REQUEST_LOOKUP_BATCH
+		) {
+			await Promise.all(
+				rowIds
+					.slice(start, start + PAST_PULL_REQUEST_LOOKUP_BATCH)
+					.map((id) =>
+						this.refreshPastPullRequest(projectId, repo, id, options),
+					),
+			);
+		}
+	}
+
+	private async refreshPastPullRequest(
+		projectId: string,
+		repo: NormalizedRepoIdentity,
+		rowId: string,
+		options: { bypassCache?: boolean },
+	): Promise<void> {
+		const existing = this.findPullRequestRowById(rowId);
+		if (!existing) return;
+		const { prNumber } = existing;
+		const context = {
+			projectId,
+			owner: repo.owner,
+			name: repo.name,
+			prNumber,
+		};
+		const startedAt = Date.now();
+		try {
+			const node = await this.cachedGitHubFetch(
+				this.pullRequestNumberCache,
+				`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${prNumber}`,
+				options,
+				() =>
+					this.fetchFromGitHub(
+						"PR number lookup",
+						context,
+						() => fetchPullRequestByNumberFromGh(this.execGh, repo, prNumber),
+						async () =>
+							fetchPullRequestByNumber(await this.github(), repo, prNumber),
+						{ probe: options.bypassCache === true },
+					),
+			);
+			if (!node || node.number !== prNumber) return;
+			// A lookup that started earlier can resolve later; never let it
+			// overwrite what a newer one already stored.
+			const latest = this.findPullRequestRowById(rowId);
+			if (
+				!latest ||
+				!PAST_PULL_REQUEST_REFRESH_STATES.includes(latest.state) ||
+				(latest.lastFetchedAt ?? 0) > startedAt
+			) {
+				return;
+			}
+			const headChanged = latest.headSha !== node.headRefOid;
+			const now = Date.now();
+			this.upsertPullRequestRow({
+				existing: latest,
+				projectId: latest.projectId,
+				prNumber,
+				repo,
+				url: node.url,
+				title: node.title,
+				state: mapPullRequestState(node.state, node.isDraft),
+				isDraft: node.isDraft,
+				headBranch: node.headRefName,
+				headSha: node.headRefOid,
+				mergedAt: node.mergedAt,
+				reviewDecision: coerceReviewDecision(latest.reviewDecision),
+				checksStatus: headChanged
+					? "none"
+					: coerceChecksStatus(latest.checksStatus),
+				checksJson: headChanged ? "[]" : latest.checksJson,
+				lastFetchedAt: now,
+				error: null,
+				now,
+			});
+		} catch (error) {
+			console.warn(
+				"[host-service:pull-request-runtime] Failed to fetch past PR by number",
+				{ ...context, error },
+			);
+		}
+	}
+
 	private async fetchRepoPullRequests(
 		projectId: string,
 		repo: NormalizedRepoIdentity,
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<{
-		matched: Map<string, { id: string }>;
+		matched: Map<string, { id: string; isOpen: boolean }>;
 		failedKeys: Set<string>;
 	}> {
-		const matched = new Map<string, { id: string }>();
+		const matched = new Map<string, { id: string; isOpen: boolean }>();
 		const failedKeys = new Set<string>();
 		if (wantedRefs.size === 0) return { matched, failedKeys };
 
@@ -1691,7 +1898,7 @@ export class PullRequestRuntimeManager {
 				now,
 			});
 
-			matched.set(key, { id: rowId });
+			matched.set(key, { id: rowId, isOpen: node.state === "OPEN" });
 		}
 
 		return { matched, failedKeys };

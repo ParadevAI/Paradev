@@ -1,8 +1,9 @@
 {
 	"name": "@superset/desktop",
-	"productName": "Superset",
+	"productName": "Paradev",
+	"desktopName": "superset.desktop",
 	"description": "The last developer tool you'll ever need",
-	"version": "2.0.8",
+	"version": "2.0.11",
 	"main": "./dist/main/index.js",
 	"resources": "src/resources",
 	"repository": {
@@ -46,7 +47,7 @@
 		"test": "bun test"
 	},
 	"dependencies": {
-		"@agentclientprotocol/claude-agent-acp": "0.85.0",
+		"@agentclientprotocol/claude-agent-acp": "0.107.0",
 		"@agentclientprotocol/codex-acp": "2.1.0",
 		"@parcel/watcher": "2.5.6",
 		"@superset/macos-process-metrics": "workspace:*",
@@ -144,7 +145,7 @@
 		"@tanstack/react-query": "5.101.4",
 		"@tanstack/react-query-persist-client": "5.101.4",
 		"@tanstack/react-router": "1.170.16",
-		"@tanstack/react-table": "8.21.3",
+		"@tanstack/react-table": "9.3.1",
 		"@tanstack/react-virtual": "3.14.3",
 		"@tanstack/router-cli": "1.167.17",
 		"@tanstack/router-plugin": "1.168.18",
@@ -193,6 +194,7 @@
 		"@types/babel__core": "7.20.5",
 		"@types/better-sqlite3": "7.6.13",
 		"@types/bun": "1.4.3",
+		"@types/css-tree": "3.2.0",
 		"@types/culori": "4.0.1",
 		"@types/express": "5.0.6",
 		"@types/lodash": "4.17.24",
@@ -222,6 +224,7 @@
 		"better-auth": "1.6.22",
 		"clsx": "2.1.1",
 		"cross-env": "10.1.0",
+		"css-tree": "3.2.1",
 		"culori": "4.0.2",
 		"date-fns": "4.1.0",
 		"default-shell": "2.2.0",

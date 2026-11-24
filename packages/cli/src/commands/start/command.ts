@@ -1,5 +1,6 @@
 import * as p from "@clack/prompts";
 import { boolean, CLIError, number, string } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { command } from "../../lib/command";
 import { getSupersetConfigPath } from "../../lib/config";
 import { waitForUnresponsiveHost } from "../../lib/host/liveness";
@@ -32,14 +33,14 @@ export default command({
 		if (options.autoUpdate && !options.daemon) {
 			throw new CLIError(
 				"--auto-update requires --daemon because updates replace the host process.",
-				"Run superset start --daemon --auto-update.",
+				"Run paradev start --daemon --auto-update.",
 			);
 		}
 
 		const orgs = await ctx.api.user.myOrganizations.query();
 		const organization = await resolveOrganization(
 			orgs,
-			options.org ?? process.env.SUPERSET_ORGANIZATION_ID,
+			options.org ?? readPublicEnv("ORGANIZATION_ID"),
 		);
 
 		const existing = readManifest(organization.id);
@@ -55,7 +56,7 @@ export default command({
 			removeManifestIfOwnedBy(organization.id, existing.pid);
 		}
 
-		p.intro(`superset start (${organization.name})`);
+		p.intro(`paradev start (${organization.name})`);
 		const spinner = p.spinner();
 		spinner.start("Starting host service...");
 

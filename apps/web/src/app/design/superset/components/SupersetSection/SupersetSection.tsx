@@ -118,9 +118,13 @@ export function SupersetSection() {
 							message: "Monitor agents from your phone.",
 						}),
 					)}
-					actionLabel={i18n._(msg({ message: "Open App Store" }))}
+					actionLabel={i18n._(msg({ message: "Get the mobile app" }))}
 					onAction={() =>
-						window.open(COMPANY.APP_STORE_URL, "_blank", "noopener,noreferrer")
+						window.open(
+							COMPANY.MOBILE_INSTALL_URL,
+							"_blank",
+							"noopener,noreferrer",
+						)
 					}
 					onDismiss={() =>
 						toast(

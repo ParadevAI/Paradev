@@ -34,7 +34,7 @@ export function missingInputsError(
 			...missing.map(describe),
 			"",
 			"Then run:",
-			`  superset plugins ${command} ${pluginName} --inputs '${JSON.stringify(example)}'`,
+			`  paradev plugins ${command} ${pluginName} --inputs '${JSON.stringify(example)}'`,
 			"",
 			"Values marked secret appear in shell history and process listings; prefer",
 			"--inputs - to read the JSON from stdin.",

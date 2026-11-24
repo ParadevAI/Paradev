@@ -6,27 +6,27 @@ image: /changelog/ph-chat.png
 
 ## Improved Chat View: Now Generally Available <PRBadge url="https://github.com/superset-sh/superset/pull/1876" /> <PRBadge url="https://github.com/superset-sh/superset/pull/1973" /> <PRBadge url="https://github.com/superset-sh/superset/pull/1983" />
 
-The redesigned chat interface is now generally available to all users. Previously behind early access, the new chat view features refreshed tool call visuals with collapsible panels, improved diff rendering, and cleaner file views. Paradev's own MCP tools (tasks, workspaces, and agent sessions) now render as rich, interactive cards directly in the chat. Paradev Chat is also available as a first-class agent option with its own launch config and icon.
+The redesigned chat interface is out of early access and now generally available to all users. It has refreshed tool call visuals with collapsible panels, improved diff rendering, and cleaner file views. Paradev's own MCP tools (tasks, workspaces, and agent sessions) now render as interactive cards in the chat. Paradev Chat is also an agent option with its own launch config and icon.
 
 - Refreshed tool call visuals with collapsible output panels and inline status icons
 - Rich UI cards for Paradev MCP tool calls (tasks, workspaces, agent sessions)
 - Paradev Chat available as a built-in agent alongside Claude, Codex, and others
-- Markdown rendering for agent question prompts with optimistic answer UX
+- Agent questions render as markdown, and your answer shows right away
 
 ## Open Worktree with Prompt <PRBadge url="https://github.com/superset-sh/superset/pull/1882" /> <PRBadge url="https://github.com/superset-sh/superset/pull/1912" />
 
-The new workspace modal has been redesigned with a send-to-agent flow. When creating a worktree you can now write a prompt that gets sent directly to an agent in the new workspace: describe what you want built and the agent starts working as soon as the workspace is ready. The modal also includes a project selector, an import flow for cloning repos, and auto-generated branch names derived from your prompt.
+The new workspace modal can now send a prompt to an agent in the new workspace. When you create a worktree, describe what you want built, and the agent starts as soon as the workspace is ready. The modal also has a project selector, an import flow to clone repos, and branch names generated from your prompt.
 
 ![Open worktree with prompt](/changelog/ws-prompt.png)
 
 - Write a task prompt when creating a new workspace
 - Agent starts working immediately in the new worktree
 - Auto-generated branch names from prompt content
-- Keyboard shortcut hint (Cmd/Ctrl+Enter) on the create button
+- Keyboard shortcut hint (⌘/Ctrl+Enter) on the create button
 
 ## Start Project from Template <PRBadge url="https://github.com/superset-sh/superset/pull/1913" />
 
-New users now see a multi-step setup wizard when opening a project for the first time. The onboarding auto-detects environment files and package managers already present in the repo, guides you through running setup scripts, and links to relevant documentation. The new project flow also includes a Next.js Chatbot template option for quick-starting a project from a pre-built starter.
+New users now see a multi-step setup wizard when they open a project for the first time. It detects the environment files and package managers in the repo, guides you through setup scripts, and links to the docs. The new project flow also has a Next.js Chatbot template, so you can start a project from a pre-built starter.
 
 ![Start project from template](/changelog/template.png)
 
@@ -37,33 +37,33 @@ New users now see a multi-step setup wizard when opening a project for the first
 
 ## Improvements
 
-- **Mastra agent prompt UI** - Agent questions, approval requests, and plans now appear as interactive inline prompts in chat with markdown rendering and optimistic answer UX <PRBadge url="https://github.com/superset-sh/superset/pull/1933" /> <PRBadge url="https://github.com/superset-sh/superset/pull/1970" />
-- **Persist chat model selection** - Your chosen model is now remembered across sessions and app restarts <PRBadge url="https://github.com/superset-sh/superset/pull/1956" />
-- **Paradev MCP tools built-in** - Paradev's own MCP tools are wired in as built-in extras in chat, no manual configuration needed <PRBadge url="https://github.com/superset-sh/superset/pull/1858" />
-- **Anthropic API key support** - You can now supply your own Anthropic API key for Mastra chat sessions <PRBadge url="https://github.com/superset-sh/superset/pull/1905" />
-- **Pane right-click menu** - Right-clicking a chat or browser pane now opens a context menu with common actions <PRBadge url="https://github.com/superset-sh/superset/pull/1886" />
-- **Open changes pane from file edits** - When an agent edits a file in chat, you can jump directly to the changes pane to review the diff <PRBadge url="https://github.com/superset-sh/superset/pull/1868" />
-- **Cmd+Shift+W closes the active tab** - New keyboard shortcut to close whichever pane tab is focused <PRBadge url="https://github.com/superset-sh/superset/pull/1860" />
-- **Resource monitor on by default** - The system tray resource monitor is now enabled for all users out of the box <PRBadge url="https://github.com/superset-sh/superset/pull/1949" />
-- **File diffs via diffs.com** - Edit tool diffs now open in diffs.com by default for a cleaner review experience <PRBadge url="https://github.com/superset-sh/superset/pull/1859" />
+- **Mastra agent prompt UI** - Agent questions, approval requests, and plans now appear as interactive inline prompts in chat, with markdown rendering and answers that show right away <PRBadge url="https://github.com/superset-sh/superset/pull/1933" /> <PRBadge url="https://github.com/superset-sh/superset/pull/1970" />
+- **Persist chat model selection** - Chat now remembers your chosen model across sessions and app restarts <PRBadge url="https://github.com/superset-sh/superset/pull/1956" />
+- **Paradev MCP tools built-in** - Chat now includes Paradev's own MCP tools, with no manual configuration <PRBadge url="https://github.com/superset-sh/superset/pull/1858" />
+- **Anthropic API key support** - You can now use your own Anthropic API key for Mastra chat sessions <PRBadge url="https://github.com/superset-sh/superset/pull/1905" />
+- **Pane right-click menu** - Right-click a chat or browser pane for a context menu with common actions <PRBadge url="https://github.com/superset-sh/superset/pull/1886" />
+- **Open changes pane from file edits** - When an agent edits a file in chat, you can jump to the changes pane to review the diff <PRBadge url="https://github.com/superset-sh/superset/pull/1868" />
+- **⌘⇧W closes the active tab** - A new keyboard shortcut closes the pane tab in focus <PRBadge url="https://github.com/superset-sh/superset/pull/1860" />
+- **Resource monitor on by default** - The system tray resource monitor is now on for all users <PRBadge url="https://github.com/superset-sh/superset/pull/1949" />
+- **File diffs via diffs.com** - Edit tool diffs now open in diffs.com by default for a cleaner review <PRBadge url="https://github.com/superset-sh/superset/pull/1859" />
 - **Read-file tool collapsed by default** - File read results start collapsed to reduce chat noise <PRBadge url="https://github.com/superset-sh/superset/pull/1895" />
-- **Windsurf IDE in Open In menu** - Windsurf is now available in the "Open in" external editor dropdown <PRBadge url="https://github.com/superset-sh/superset/pull/1966" />
+- **Windsurf IDE in Open In menu** - Windsurf is now in the "Open in" external editor dropdown <PRBadge url="https://github.com/superset-sh/superset/pull/1966" />
 - **Native shell integration** - Interactive terminals now default to native shell integration for better PATH and environment handling <PRBadge url="https://github.com/superset-sh/superset/pull/1987" />
-- **Monthly/yearly billing toggle** - Pro users can switch between monthly and yearly billing directly from the plans page <PRBadge url="https://github.com/superset-sh/superset/pull/1977" />
-- **Chat performance improvements** - Replaced aggressive polling with a smarter update strategy, reducing scrollback churn and improving rendering speed <PRBadge url="https://github.com/superset-sh/superset/pull/1872" />
+- **Monthly/yearly billing toggle** - Pro users can switch between monthly and yearly billing on the plans page <PRBadge url="https://github.com/superset-sh/superset/pull/1977" />
+- **Chat performance improvements** - Chat no longer polls aggressively, which cuts scrollback churn and speeds up rendering <PRBadge url="https://github.com/superset-sh/superset/pull/1872" />
 
 ---
 
 **Bug fixes:**
 
-- Fixed race condition dropping agent prompt on new workspace init <PRBadge url="https://github.com/superset-sh/superset/pull/1941" />
-- Fixed first chat message send race on pane creation <PRBadge url="https://github.com/superset-sh/superset/pull/1932" />
-- Fixed PATH resolution by using interactive login shell <PRBadge url="https://github.com/superset-sh/superset/pull/1940" />
+- A new workspace no longer drops the agent prompt during init <PRBadge url="https://github.com/superset-sh/superset/pull/1941" />
+- The first chat message now sends on a new pane <PRBadge url="https://github.com/superset-sh/superset/pull/1932" />
+- PATH now resolves through an interactive login shell <PRBadge url="https://github.com/superset-sh/superset/pull/1940" />
 - Fixed existing PR state handling in changes actions <PRBadge url="https://github.com/superset-sh/superset/pull/1952" />
-- Fixed new workspace modal text overflow <PRBadge url="https://github.com/superset-sh/superset/pull/1902" />
-- Fixed Codex prompt payload being parsed as flags <PRBadge url="https://github.com/superset-sh/superset/pull/1910" />
-- Fixed first chat send failing on session create <PRBadge url="https://github.com/superset-sh/superset/pull/1903" />
-- Fixed duplicate tool entries in assistant message rendering <PRBadge url="https://github.com/superset-sh/superset/pull/1879" />
+- Text no longer overflows in the new workspace modal <PRBadge url="https://github.com/superset-sh/superset/pull/1902" />
+- A Codex prompt no longer parses as flags <PRBadge url="https://github.com/superset-sh/superset/pull/1910" />
+- The first chat send no longer fails at session creation <PRBadge url="https://github.com/superset-sh/superset/pull/1903" />
+- Assistant messages no longer show duplicate tool entries <PRBadge url="https://github.com/superset-sh/superset/pull/1879" />
 - Fixed interrupted response preview in mastra chat <PRBadge url="https://github.com/superset-sh/superset/pull/1988" />
-- Fixed first chat message not rendering immediately during session init <PRBadge url="https://github.com/superset-sh/superset/pull/1989" />
+- The first chat message now renders at once during session init <PRBadge url="https://github.com/superset-sh/superset/pull/1989" />
 - Fixed chat auto-scroll on resize <PRBadge url="https://github.com/superset-sh/superset/pull/2004" />

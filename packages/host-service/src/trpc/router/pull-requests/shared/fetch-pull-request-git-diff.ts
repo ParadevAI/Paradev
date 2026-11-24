@@ -3,6 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import { z } from "zod";
 import { getToolEnvironment } from "../../../../terminal/clean-shell-env";
 import { execGh } from "../../workspace-creation/utils/exec-gh";
@@ -51,7 +52,7 @@ export async function diffRemoteCommits(
 	const directory = await mkdtemp(join(tmpdir(), "superset-pr-diff-"));
 	const git = async (args: string[]) => {
 		const { stdout } = await execFileAsync(
-			"git",
+			resolveCommand("git", { env }),
 			[
 				`--git-dir=${directory}`,
 				"-c",

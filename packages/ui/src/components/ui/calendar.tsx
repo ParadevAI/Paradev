@@ -1,4 +1,5 @@
 "use client";
+import { useLingui } from "@lingui/react";
 import { useFormat } from "@superset/i18n/use-format";
 
 import {
@@ -13,6 +14,7 @@ import {
 	getDefaultClassNames,
 } from "react-day-picker";
 
+import { dayPickerLocale } from "../../lib/day-picker-locale";
 import { cn } from "../../lib/utils";
 import { Button, buttonVariants } from "./button";
 
@@ -29,11 +31,13 @@ function Calendar({
 	buttonVariant?: React.ComponentProps<typeof Button>["variant"];
 }) {
 	const { formatDateTime } = useFormat();
+	const { i18n } = useLingui();
 
 	const defaultClassNames = getDefaultClassNames();
 
 	return (
 		<DayPicker
+			locale={dayPickerLocale(i18n.locale)}
 			showOutsideDays={showOutsideDays}
 			className={cn(
 				"bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",

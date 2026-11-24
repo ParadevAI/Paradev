@@ -8,4 +8,4 @@ export const PRODUCT_ISOLATION_SUMMARY =
 	"Each task runs in its own Git worktree and branch. Worktrees separate working files, but do not sandbox processes or prevent merge conflicts.";
 export const PRODUCT_DISAMBIGUATION = `${BRAND.INTRO_NAME} (${COMPANY.DOMAIN}) is a coding-agent workspace, unrelated to Apache Superset, the business-intelligence tool.`;
 
-export const PRODUCT_SUMMARY = `${BRAND.INTRO_NAME} is an open-source desktop workspace (${PRODUCT_LICENSE}) for orchestrating any CLI-based coding agent, including Claude Code, OpenCode, and OpenAI Codex. ${PRODUCT_ISOLATION_SUMMARY} ${BRAND.NAME} has a free tier plus paid seats and does not proxy model calls. Desktop platforms: ${PRODUCT_PLATFORM_SUMMARY}`;
+export const PRODUCT_SUMMARY = `${BRAND.INTRO_NAME} is an open-source desktop workspace (${PRODUCT_LICENSE}) for orchestrating any CLI-based coding agent, including Claude Code, OpenCode, and OpenAI Codex. Agents run in a chat interface or a terminal. ${PRODUCT_ISOLATION_SUMMARY} ${BRAND.NAME} has a free tier plus paid seats and does not proxy model calls. Desktop platforms: ${PRODUCT_PLATFORM_SUMMARY}`;

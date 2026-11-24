@@ -7,18 +7,39 @@ import {
 	Trash2Icon,
 	ZapIcon,
 } from "lucide-react";
-import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useQuickCreateWorkspaceIntent } from "renderer/stores/quick-create-workspace-intent";
 import { useRemoveFromSidebarIntent } from "renderer/stores/remove-workspace-from-sidebar-intent";
+import { useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { LinkTaskFrame } from "../../ui/LinkTask/LinkTaskFrame";
+import { QuickOpenFrame } from "../../ui/QuickOpen";
+
+const quickOpenCommand: Command = {
+	id: "files.quickOpen",
+	title: msg({
+		message: "Search files",
+	}),
+	section: "workspace",
+	icon: FileIcon,
+	keywords: ["file picker", "quick open"],
+	hotkeyId: "QUICK_OPEN",
+	renderFrame: () => <QuickOpenFrame />,
+	framePlaceholder: msg({ message: "Search files..." }),
+};
+
+export function openQuickOpen(): void {
+	const { setOpen, reset, pushFrame } = useFrameStackStore.getState();
+	setOpen(true);
+	reset();
+	pushFrame(quickOpenCommand);
+}
 
 export const workspaceProvider: CommandProvider = {
 	id: "workspace",
 	provide: (context) => {
 		// Not gated on context.workspace — quick-create should work from any
-		// v2 dashboard view (e.g. the workspaces list), not just an open one.
+		// dashboard view (e.g. the workspaces list), not just an open one.
 		const quickCreate: Command = {
 			id: "workspace.quickCreate",
 			title: msg({
@@ -28,7 +49,6 @@ export const workspaceProvider: CommandProvider = {
 			icon: ZapIcon,
 			hotkeyId: "QUICK_CREATE_WORKSPACE",
 			keywords: ["new", "fast"],
-			when: (ctx) => ctx.isV2CloudEnabled,
 			run: (ctx) =>
 				useQuickCreateWorkspaceIntent
 					.getState()
@@ -49,20 +69,7 @@ export const workspaceProvider: CommandProvider = {
 				run: (ctx) => ctx.openNewWorkspace(workspace.projectId),
 			},
 			quickCreate,
-			{
-				id: "files.quickOpen",
-				title: msg({
-					message: "Search files",
-				}),
-				section: "workspace",
-				icon: FileIcon,
-				keywords: ["file picker", "quick open"],
-				hotkeyId: "QUICK_OPEN",
-				run: () =>
-					useQuickOpenStore.getState().openFor({
-						workspaceId: workspace.id,
-					}),
-			},
+			quickOpenCommand,
 			{
 				id: "workspace.linkTask",
 				title: msg({
