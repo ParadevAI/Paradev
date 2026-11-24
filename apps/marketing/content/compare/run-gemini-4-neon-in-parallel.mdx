@@ -18,7 +18,7 @@ keywords:
   - antigravity swarm
 ---
 
-To run Gemini 4 Neon in parallel, start one Antigravity CLI (`agy`) session per task, each in its own Git worktree and branch. On Google AI Pro and Ultra, Neon is the model `agy` uses when you have not chosen one. Inside one session, Orchestrator (Neon) plans with Neon and hands the edits to Gemini 4 Hydrogen, and `/swarm` splits one large task across parallel workers. In Paradev, create one workspace per task, start `agy` in each, and review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+To run Gemini 4 Neon in parallel, start one Antigravity CLI (`agy`) session per task, each in its own Git worktree and branch. On paid Google AI Pro and Ultra plans, Neon is the model `agy` uses when you have not chosen one. Inside one session, Orchestrator (Neon) plans with Neon and hands the edits to Gemini 4 Hydrogen, and `/swarm` splits one large task across parallel workers. In Paradev, create one workspace per task, start `agy` in each, and review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
 
 ## What shipped
 
@@ -30,15 +30,15 @@ Google released [Gemini 4 Neon on November 18, 2026](https://blog.google/innovat
 | **API model id** | `gemini-4-neon` |
 | **API price** | $3 per million input tokens, $15 per million output tokens, paid tier only |
 | **Context window** | 1 million tokens |
-| **Thinking levels** | `low`, `medium`, `high` (default), `xhigh` |
-| **In Antigravity** | Google AI Pro, Google AI Ultra, and Gemini Enterprise |
+| **Thinking levels** | `low`, `medium`, `high`, `xhigh`. The API defaults to `high`; Antigravity defaults to `medium` |
+| **In Antigravity** | Paid Google AI Pro, Google AI Ultra, and Gemini Enterprise. A Pro trial includes it only with an eligible premium device |
 | **In the Gemini app** | Google AI Pro and Ultra |
 
-The API id, price, and thinking levels come from the [Gemini API release notes](https://aistudio.google.com/docs/changelog). Google says Neon scores 65.2% on Terminal-Bench 4.1 and costs 32% less per task than Carbon at its default thinking level. These figures come from Google and are not independently checked.
+The API id, price, and thinking levels come from the [Gemini API release notes](https://aistudio.google.com/docs/changelog). Google says Neon scores 65.2% on Terminal-Bench 4.1 and costs 32% less per task than Carbon at the `high` thinking level. These figures come from Google and are not independently checked.
 
 Three things changed in Antigravity, per its [changelog](https://antigravity.google/docs/changelog):
 
-- **Neon is the default model.** Since November 18, Antigravity uses Neon when you have not chosen a model. Free and Google AI Plus accounts do not have Neon and stay on Hydrogen.
+- **Neon is the default model.** Since November 18, Antigravity uses Neon when you have not chosen a model. If you chose a model before, Antigravity keeps your choice. Free, Google AI Plus, and standard Pro trial accounts stay on Hydrogen.
 - **Orchestrator (Neon)** is a new model choice. Neon plans the task and Hydrogen implements it. It is one task with two models, not parallel agents.
 - **Antigravity CLI 1.5.12 and 1.5.13** (November 19) added Neon to `/model` and `--model` for accounts that connect with a Gemini API key or Application Default Credentials.
 
@@ -53,7 +53,7 @@ agy update
 agy models
 ```
 
-On a plan that includes Neon, a plain `agy` starts on Neon at its default `high` thinking level. To set the model yourself, pass an identifier from `agy models`. Google's [models page](https://antigravity.google/docs/models/) gives these examples:
+On a plan that includes Neon, a plain `agy` starts on Neon at Antigravity's default `medium` thinking level, unless you chose another model before. To be sure a session runs on Neon, pass an identifier from `agy models`. Google's [models page](https://antigravity.google/docs/models/) gives these examples:
 
 ```bash
 agy --model gemini-4-neon-xhigh
@@ -66,7 +66,7 @@ Inside a session, `/model` switches the model. `--effort` and `/effort` do not a
 
 There are two ways to get parallel work, and they solve different problems.
 
-**`/swarm` splits one big task.** Type `/swarm` in an `agy` session and describe the job. A coordinator starts parallel workers, each in its own Git worktree, plus verifier agents. `/swarm board` shows their progress, and since CLI 1.5.14 (November 21) it has a live **Overview** section. Swarms use quota much faster than a normal chat.
+**`/swarm` splits one big task.** Type `/swarm` in an `agy` session and describe the job. A coordinator starts parallel workers plus verifier agents. Per Google's [swarm docs](https://antigravity.google/docs/swarm/), workers share your workspace by default, and the coordinator can give each one its own working copy when several edit at once. If you need separate files for certain, use separate sessions. `/swarm board` shows their progress, and since CLI 1.5.14 (November 21) it has a live **Overview** section. Swarms use quota much faster than a normal chat.
 
 **Separate sessions run separate tasks.** For unrelated tasks, give each one its own worktree, branch, and `agy` session:
 
@@ -78,7 +78,7 @@ cd ../repo-neon-billing && agy --model gemini-4-neon-xhigh
 cd ../repo-neon-parser-tests && agy
 ```
 
-Run each in its own terminal. Raise the thinking level for the task that needs it and leave the rest on the default. Give each task a clear stop condition:
+Run each in its own terminal. The first session sets Neon at `xhigh` for the harder task. The second uses your saved model, or Neon at `medium` if you never chose one, so check it with `/model` before you give it the task. Give each task a clear stop condition:
 
 ```text
 Task A: Move the billing module from callbacks to async/await. Keep the
@@ -102,7 +102,7 @@ Paradev is a desktop app that runs the Antigravity CLI, Claude Code, Codex, and 
 From the app:
 
 1. Create a new workspace for each task.
-2. Start `agy` in the workspace terminal. It uses Neon by default on a plan that includes it. To set the model, run `agy --model gemini-4-neon-xhigh`, or type `/model` in the session.
+2. Start `agy` in the workspace terminal. It uses Neon by default on a plan that includes it, unless you chose another model before. To be sure, run `agy --model gemini-4-neon-xhigh`, or type `/model` in the session before you give it the task.
 3. Repeat for the next task. Each workspace keeps its own branch and terminal.
 4. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
 
@@ -120,7 +120,7 @@ superset ws create --local --project PROJECT_ID --name neon-parser-tests \
 superset ws list --local --tag gemini-4-neon
 ```
 
-`-i` starts `agy` with an initial prompt and keeps the session open. `superset projects list` gives the `PROJECT_ID`. Tagged workspaces collect in a sidebar folder with the tag's name.
+`-i` starts `agy` with an initial prompt and keeps the session open. The second command sets no model, so it runs on your saved model, or on Neon if you never chose one. Add `--model` with an identifier from `agy models` to fix it. `superset projects list` gives the `PROJECT_ID`. Tagged workspaces collect in a sidebar folder with the tag's name.
 
 To see whether Neon is enough for your code, create two workspaces with the same prompt, one on Neon and one on Carbon, and compare the diffs. You can also run the same prompt with Claude Code or Codex in a third workspace. Long runs do not need your laptop open: run them on a host you added through Remote Access, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud), and check on them from the [iPhone, iPad, and Android app](/mobile).
 
@@ -128,7 +128,7 @@ To see whether Neon is enough for your code, create two workspaces with the same
 
 ### Which plan do I need for Gemini 4 Neon?
 
-In Antigravity, Google AI Pro, Google AI Ultra, or Gemini Enterprise. Free and Google AI Plus accounts stay on Gemini 4 Hydrogen. On the Gemini API, Neon is on the paid tier only.
+In Antigravity, a paid Google AI Pro plan, Google AI Ultra, or Gemini Enterprise. A Pro trial includes Neon only when it comes with an eligible premium device. Free, Google AI Plus, and standard Pro trial accounts stay on Gemini 4 Hydrogen. On the Gemini API, Neon is on the paid tier only.
 
 ### Is Gemini 4 Neon the default model in Antigravity?
 
