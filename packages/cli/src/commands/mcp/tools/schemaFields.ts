@@ -2,6 +2,8 @@ interface PropertySchema {
 	type?: string | string[];
 	enum?: unknown[];
 	items?: PropertySchema;
+	anyOf?: PropertySchema[];
+	oneOf?: PropertySchema[];
 	default?: unknown;
 	description?: string;
 }
@@ -16,6 +18,8 @@ export interface SchemaField {
 
 function typeLabel(property: PropertySchema): string {
 	if (property.enum) return property.enum.map(String).join(" | ");
+	const union = property.anyOf ?? property.oneOf;
+	if (union) return union.map(typeLabel).join(" | ");
 	if (Array.isArray(property.type)) return property.type.join(" | ");
 	if (property.type === "array" && property.items) {
 		return `${typeLabel(property.items)}[]`;

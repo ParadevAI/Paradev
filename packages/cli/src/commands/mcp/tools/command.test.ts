@@ -15,6 +15,7 @@ const createIssue = {
 			title: { type: "string", description: "Issue title" },
 			labels: { type: "array", items: { type: "string" } },
 			priority: { enum: [1, 2, 3], default: 2 },
+			due: { anyOf: [{ type: "string" }, { type: "null" }] },
 		},
 		required: ["title"],
 	},
@@ -93,6 +94,7 @@ test("one tool shows its arguments and output as fields", async () => {
 	expect(text).toMatch(/title\s+string\s+yes\s+Issue title/);
 	expect(text).toMatch(/labels\s+string\[\]/);
 	expect(text).toMatch(/priority\s+1 \| 2 \| 3\s+2/);
+	expect(text).toMatch(/due\s+string \| null/);
 	expect(text).toMatch(/Output:\nNAME.*\nid\s+string\s+New issue id/);
 });
 

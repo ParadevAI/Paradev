@@ -27,7 +27,7 @@ function fieldTable(schema: Tool["inputSchema"]): string {
 		fields as unknown as Record<string, unknown>[],
 		["name", "type", "required", "default", "description"],
 		["NAME", "TYPE", "REQUIRED", "DEFAULT", "DESCRIPTION"],
-		[30, 24, 8, 16, 80],
+		[30, 48, 8, 16, 400],
 	);
 }
 
