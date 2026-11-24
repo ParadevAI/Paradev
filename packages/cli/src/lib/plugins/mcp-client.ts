@@ -9,6 +9,7 @@ import {
 import { getApiUrl } from "../config";
 import {
 	type InstalledPlugin,
+	ORGANIZATION,
 	parsePluginRef,
 	readInstalledPlugins,
 } from "./host";
@@ -24,7 +25,7 @@ export function resolveMcpPluginRef(
 	installed: InstalledPlugin[],
 ): PluginRef {
 	const { name, marketplace } = parsePluginRef(ref);
-	if (marketplace === "organization") {
+	if (marketplace === ORGANIZATION) {
 		if (!organizationId) {
 			throw new CLIError(
 				`"${ref}" names your organization's marketplace, but no organization is active.`,

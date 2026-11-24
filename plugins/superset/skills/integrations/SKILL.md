@@ -43,9 +43,8 @@ repo, and they change between plugin versions. Never call a tool you have not li
 
 Before you call a tool, read it by name. That view lists each argument with its type, whether it
 is required, its default and its description, then the fields of the output when the server
-declares them. Under `--json` every tool carries `inputSchema` and `outputSchema` as the server
-sent them, so `superset mcp tools --plugin linear | jq '.[] | select(.tool=="create_issue")'`
-gives the full JSON Schema.
+declares them. Under `--json` it, and every row of the listing, carries `inputSchema` and
+`outputSchema` as the server sent them: the full JSON Schema, nested fields included.
 
 `--plugin` takes the name from the `PLUGIN` column. A name installed from only one marketplace
 needs nothing more, whichever marketplace that is. Use `name@organization` for your
