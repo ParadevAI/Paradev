@@ -141,8 +141,10 @@ function AuthenticatedLayout() {
 
 	useSettingsExternalChangeListener();
 	useEffect(() => {
+		const persist = useSettings.persist;
+		if (!persist) return;
 		const unsubscribe = syncPersistedStoreAcrossWindows(useSettings);
-		void useSettings.persist.rehydrate();
+		void persist.rehydrate();
 		return unsubscribe;
 	}, []);
 
