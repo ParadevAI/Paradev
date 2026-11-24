@@ -1,7 +1,8 @@
-/** Antigravity CLI quota from the same read-only Google login used by `agy`. */
 import { execFile } from "node:child_process";
-import { platform } from "node:os";
+import { devNull, platform, tmpdir } from "node:os";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
+import semver from "semver";
 import type { UsageAccount, UsageQuotaWindow } from "./types";
 
 const execFileAsync = promisify(execFile);
@@ -10,6 +11,7 @@ const BASE_URLS = [
 	"https://cloudcode-pa.googleapis.com",
 ];
 const FETCH_TIMEOUT_MS = 10_000;
+const MIN_HEADLESS_USAGE_VERSION = "1.1.11";
 
 const BUCKETS: Record<string, string> = {
 	"gemini-5h": "Session — Gemini Models",
@@ -37,13 +39,12 @@ function expiryMs(value: string | number | undefined): number {
 	return Number.POSITIVE_INFINITY;
 }
 
-async function readAgyAuth(): Promise<AgyAuth | null> {
-	if (platform() !== "darwin") return null;
+async function readAgyAuth(signal: AbortSignal): Promise<AgyAuth | null> {
 	try {
 		const { stdout } = await execFileAsync(
 			"security",
 			["find-generic-password", "-s", "gemini", "-a", "antigravity", "-w"],
-			{ timeout: 5_000 },
+			{ signal, timeout: 5_000 },
 		);
 		const raw = stdout.trim().replace(/^go-keyring-base64:/, "");
 		const text = stdout.trim().startsWith("go-keyring-base64:")
@@ -72,20 +73,26 @@ export function mapAgyQuotaWindows(value: unknown): UsageQuotaWindow[] {
 				bucketId?: unknown;
 				remainingFraction?: unknown;
 				resetTime?: unknown;
+				id?: unknown;
+				remaining_fraction?: unknown;
+				reset_time?: unknown;
 			};
+			const id = item.bucketId ?? item.id;
+			const remaining = item.remainingFraction ?? item.remaining_fraction;
+			const resetTime = item.resetTime ?? item.reset_time;
 			if (
-				typeof item.bucketId !== "string" ||
-				!BUCKETS[item.bucketId] ||
-				typeof item.remainingFraction !== "number"
+				typeof id !== "string" ||
+				!Object.hasOwn(BUCKETS, id) ||
+				typeof remaining !== "number" ||
+				!Number.isFinite(remaining)
 			)
 				continue;
-			const reset =
-				typeof item.resetTime === "string" ? new Date(item.resetTime) : null;
-			found.set(item.bucketId, {
-				id: item.bucketId,
-				label: BUCKETS[item.bucketId] as string,
+			const reset = typeof resetTime === "string" ? new Date(resetTime) : null;
+			found.set(id, {
+				id,
+				label: BUCKETS[id] as string,
 				usedPercent: Math.round(
-					(1 - Math.max(0, Math.min(1, item.remainingFraction))) * 100,
+					(1 - Math.max(0, Math.min(1, remaining))) * 100,
 				),
 				resetsAt: reset && !Number.isNaN(reset.getTime()) ? reset : null,
 			});
@@ -97,22 +104,87 @@ export function mapAgyQuotaWindows(value: unknown): UsageQuotaWindow[] {
 	});
 }
 
+export function mapAgyCliQuotaWindows(value: unknown): UsageQuotaWindow[] {
+	if (
+		!value ||
+		typeof value !== "object" ||
+		!("status" in value) ||
+		value.status !== "SUCCESS" ||
+		!("command" in value)
+	)
+		return [];
+	const command = value.command;
+	if (
+		!command ||
+		typeof command !== "object" ||
+		!("name" in command) ||
+		command.name !== "usage" ||
+		!("data" in command)
+	)
+		return [];
+	return mapAgyQuotaWindows(command.data);
+}
+
+async function readAgyCliQuota(
+	signal: AbortSignal,
+): Promise<UsageQuotaWindow[]> {
+	const executable = resolveCommand("agy");
+	const cwd = tmpdir();
+	try {
+		const { stdout: versionText } = await execFileAsync(
+			executable,
+			["--version"],
+			{ cwd, signal, timeout: 1_000 },
+		);
+		// Older releases pass /usage to the model in print mode.
+		const version = semver.valid(versionText.trim());
+		if (!version || semver.lt(version, MIN_HEADLESS_USAGE_VERSION)) return [];
+		const { stdout } = await execFileAsync(
+			executable,
+			["--print", "/usage", "--output-format", "json", "--log-file", devNull],
+			{ cwd, signal, timeout: 8_000, maxBuffer: 256 * 1024 },
+		);
+		return mapAgyCliQuotaWindows(JSON.parse(stdout));
+	} catch {
+		return [];
+	}
+}
+
 export async function fetchAgyAccounts(): Promise<UsageAccount[]> {
-	const auth = await readAgyAuth();
-	const accessToken = auth?.token?.access_token;
-	if (!accessToken) return [];
-	const base = {
+	if (platform() !== "darwin") return [];
+	const signal = AbortSignal.timeout(14_000);
+	const account = {
 		agent: "agy" as const,
 		credentialKind: "subscription" as const,
 		accountKey: "keychain:gemini:antigravity",
-		sourceLabel: "Keychain",
-		email: auth?.email ?? null,
 		plan: null,
 		creditsBalance: null,
 		extraUsage: null,
 		selection: null,
 		isDefault: false,
 		fetchedAt: new Date(),
+	};
+	const cliWindows = await readAgyCliQuota(signal);
+	if (cliWindows.length > 0) {
+		return [
+			{
+				...account,
+				sourceLabel: "Antigravity CLI",
+				email: null,
+				status: "ok",
+				statusDetail: null,
+				windows: cliWindows,
+			},
+		];
+	}
+
+	const auth = await readAgyAuth(signal);
+	const accessToken = auth?.token?.access_token;
+	if (!accessToken) return [];
+	const base = {
+		...account,
+		sourceLabel: "Keychain",
+		email: auth?.email ?? null,
 	};
 	const expiry = expiryMs(auth?.token?.expiry);
 	if (Number.isFinite(expiry) && expiry <= Date.now()) {
@@ -138,7 +210,10 @@ export async function fetchAgyAccounts(): Promise<UsageAccount[]> {
 						"User-Agent": "antigravity",
 					},
 					body: "{}",
-					signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+					signal: AbortSignal.any([
+						signal,
+						AbortSignal.timeout(FETCH_TIMEOUT_MS),
+					]),
 				},
 			);
 			lastStatus = response.status;
