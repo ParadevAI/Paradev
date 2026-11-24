@@ -4107,6 +4107,9 @@ msgstr "Impossible d'ouvrir les chemins d'un espace de travail distant dans le F
 msgid "Can't reach the host"
 msgstr "Impossible de joindre l'hôte"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Impossible de joindre l'hôte de cet espace de travail. Nouvelle tentative…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Impossible d'annuler pendant qu'un chat de cet espace de travail travaille."
 
@@ -6311,6 +6314,12 @@ msgstr "Impossible de charger les commentaires de revue"
 
 msgid "Couldn't load runs"
 msgstr "Impossible de charger les exécutions"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Impossible de charger les messages de ce chat."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Impossible de charger les messages de ce chat. Nouvelle tentative…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Impossible de charger la charge utile de cette exécution."

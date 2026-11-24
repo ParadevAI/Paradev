@@ -4107,6 +4107,9 @@ msgstr "원격 워크스페이스 경로는 Finder에서 열 수 없습니다"
 msgid "Can't reach the host"
 msgstr "호스트에 연결할 수 없습니다"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "이 워크스페이스의 호스트에 연결할 수 없습니다. 다시 시도하는 중…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "이 워크스페이스에서 채팅이 작업 중이어서 실행 취소할 수 없습니다."
 
@@ -6311,6 +6314,12 @@ msgstr "리뷰 코멘트를 불러오지 못했습니다"
 
 msgid "Couldn't load runs"
 msgstr "실행 기록을 불러오지 못했습니다"
+
+msgid "Couldn't load this chat's messages."
+msgstr "이 채팅의 메시지를 불러오지 못했습니다."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "이 채팅의 메시지를 불러오지 못했습니다. 다시 시도하는 중…"
 
 msgid "Couldn't load this run's payload."
 msgstr "이 실행의 페이로드를 불러오지 못했습니다."

@@ -4107,6 +4107,9 @@ msgstr "无法在Finder中打开远程工作区路径"
 msgid "Can't reach the host"
 msgstr "无法连接主机"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "无法连接到此工作区的主机。正在重试…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "此工作区中有聊天正在工作，无法撤销。"
 
@@ -6311,6 +6314,12 @@ msgstr "无法加载审查评论"
 
 msgid "Couldn't load runs"
 msgstr "无法加载运行记录"
+
+msgid "Couldn't load this chat's messages."
+msgstr "无法加载此聊天的消息。"
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "无法加载此聊天的消息。正在重试…"
 
 msgid "Couldn't load this run's payload."
 msgstr "无法加载此次运行的负载。"

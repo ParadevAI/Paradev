@@ -77,7 +77,9 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { HistoryNotice } from "./components/HistoryNotice";
 import { SubagentNotice } from "./components/SubagentNotice";
+import { TranscriptLoadState } from "./components/TranscriptLoadState";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -101,6 +103,7 @@ import { subagentsInTurn } from "./utils/subagentsInTurn";
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
+const NO_APPROVALS: ReturnType<typeof useApprovals> = [];
 
 function contentText(content: UserContent[]): string {
 	return userMessageText({ content });
@@ -503,7 +506,7 @@ export function SessionView({
 		[sendPrompt],
 	);
 	const onSend = useMainSend({
-		approvals,
+		approvals: session.history === "loaded" ? approvals : NO_APPROVALS,
 		holdPrompt,
 		loaded,
 		onAnswerFailed,
@@ -790,6 +793,12 @@ export function SessionView({
 				{setupEnvironment && (
 					<SetupSessionHeader environmentId={setupEnvironment} />
 				)}
+				{session.history !== "loaded" && (
+					<HistoryNotice
+						failed={session.history === "failed"}
+						onRetry={session.retryHistory}
+					/>
+				)}
 				<MessageScroller.Provider
 					autoScroll
 					defaultScrollPosition="end"
@@ -832,6 +841,13 @@ export function SessionView({
 								</NestedItemsProvider>
 							</TranscriptPluginsProvider>
 						</SessionModeProvider>
+						{!focusedSubagentId && (
+							<TranscriptLoadState
+								empty={timeline.length === 0 && transcriptOutbox.length === 0}
+								loading={!loaded}
+								unreachable={session.unreachable}
+							/>
+						)}
 						{!focusedSubagentId && rail.length > 1 && (
 							<ChatHistorySidebarScroller
 								className="absolute inset-y-0 left-0 my-auto hidden h-fit max-h-full flex-col pl-3 @[56rem]:flex"

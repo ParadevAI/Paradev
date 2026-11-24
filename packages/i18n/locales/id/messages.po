@@ -4107,6 +4107,9 @@ msgstr "Tidak bisa membuka path workspace jarak jauh di Finder"
 msgid "Can't reach the host"
 msgstr "Tidak dapat menjangkau host"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Tidak dapat menjangkau host workspace ini. Mencoba lagi…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Tidak bisa dibatalkan selagi chat di workspace ini bekerja."
 
@@ -6311,6 +6314,12 @@ msgstr "Tidak bisa memuat komentar review"
 
 msgid "Couldn't load runs"
 msgstr "Tidak dapat memuat run"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Tidak dapat memuat pesan chat ini."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Tidak dapat memuat pesan chat ini. Mencoba lagi…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Tidak dapat memuat payload run ini."

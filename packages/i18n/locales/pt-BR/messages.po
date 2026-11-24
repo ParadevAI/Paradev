@@ -4107,6 +4107,9 @@ msgstr "Não dá para abrir caminhos de áreas de trabalho remotas no Finder"
 msgid "Can't reach the host"
 msgstr "Não foi possível acessar o host"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Não foi possível acessar o host desta área de trabalho. Tentando novamente…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Não é possível desfazer enquanto um chat nesta área de trabalho está trabalhando."
 
@@ -6311,6 +6314,12 @@ msgstr "Não foi possível carregar os comentários de revisão"
 
 msgid "Couldn't load runs"
 msgstr "Não foi possível carregar as execuções"
+
+msgid "Couldn't load this chat's messages."
+msgstr "Não foi possível carregar as mensagens deste chat."
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Não foi possível carregar as mensagens deste chat. Tentando novamente…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Não foi possível carregar a carga útil desta execução."
