@@ -4,19 +4,16 @@ import { CLIError } from "@superset/cli-framework";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
 import { DEFAULT_MARKETPLACE } from "@superset/shared/plugins";
 import { getApiUrl } from "../config";
+import { parsePluginRef as parseRef } from "./host";
 
 export interface PluginRef {
 	plugin: string;
 	marketplace: string;
 }
 
-export function parsePluginRef(name: string): PluginRef {
-	const at = name.lastIndexOf("@");
-	if (at <= 0) return { plugin: name, marketplace: DEFAULT_MARKETPLACE };
-	return {
-		plugin: name.slice(0, at),
-		marketplace: name.slice(at + 1),
-	};
+export function parsePluginRef(ref: string): PluginRef {
+	const { name, marketplace } = parseRef(ref);
+	return { plugin: name, marketplace: marketplace ?? DEFAULT_MARKETPLACE };
 }
 
 export function pluginMcpUrl(ref: PluginRef, connection?: string): URL {
