@@ -78,8 +78,8 @@ import {
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
 import { HistoryNotice } from "./components/HistoryNotice";
-import { TranscriptLoadState } from "./components/TranscriptLoadState";
 import { SubagentNotice } from "./components/SubagentNotice";
+import { TranscriptLoadState } from "./components/TranscriptLoadState";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
