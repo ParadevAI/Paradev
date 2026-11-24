@@ -43,17 +43,42 @@ test("stops serving and disposes before exiting, cancelling the deadline", async
 	]);
 });
 
-test("disposes a partly started host and reports the failure before exiting", async () => {
+test("reports a startup failure and disposes the partly started host before exiting", async () => {
 	const { shutdown, calls } = setup();
 	await shutdown("startup failure", async () => {
 		calls.push("report startup error");
 	});
 	expect(calls).toEqual([
+		"report startup error",
 		"stop serving",
 		"dispose",
-		"report startup error",
 		"cancel deadline",
 		"exit 1",
+	]);
+});
+
+test("reports a startup failure before the cleanup deadline", async () => {
+	const entered = Promise.withResolvers<void>();
+	const pending = Promise.withResolvers<void>();
+	const { shutdown, calls, deadline } = setup({
+		dispose: () => {
+			entered.resolve();
+			return pending.promise;
+		},
+	});
+	const completion = shutdown("startup failure", async () => {
+		calls.push("report startup error");
+	});
+	await entered.promise;
+	deadline();
+	pending.resolve();
+	await completion;
+
+	expect(calls).toEqual([
+		"report startup error",
+		"stop serving",
+		"cancel deadline",
+		"hard exit",
 	]);
 });
 

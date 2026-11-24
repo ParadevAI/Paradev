@@ -60,10 +60,10 @@ export function createStandaloneShutdown({
 		}, SHUTDOWN_TIMEOUT_MS);
 
 		const steps = [
+			["report startup error", reportStartupError],
 			["stop serving", stopServing],
 			["stop dev daemon", stopDaemon],
 			["dispose", dispose],
-			["report startup error", reportStartupError],
 		] as const;
 		for (const [name, cleanup] of steps) {
 			if (finished) return;
