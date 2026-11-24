@@ -764,7 +764,10 @@ export class FsWatcherManager {
 	 * Split from createWatcher so root-deletion recovery can re-attach to the
 	 * same WatcherState without dropping its listeners.
 	 */
-	private async attachNativeSubscription(state: WatcherState): Promise<void> {
+	private async attachNativeSubscription(
+		state: WatcherState,
+		listedGitIgnoredRelDirs?: string[],
+	): Promise<void> {
 		const { realPath, realPathNormalized, realPathDiffers } =
 			await this.normalizePath(state.absolutePath);
 		state.realPath = realPath;
@@ -782,7 +785,8 @@ export class FsWatcherManager {
 		// about is pruned via whatever git itself considers fully ignored.
 		const [nestedRepoRelDirs, gitIgnoredRelDirs] = await Promise.all([
 			this.computeNestedRepoRelDirs(realPath, state.controller.signal),
-			this.computeGitIgnoredRelDirs(realPath, state.controller.signal),
+			listedGitIgnoredRelDirs ??
+				this.computeGitIgnoredRelDirs(realPath, state.controller.signal),
 		]);
 		state.controller.signal.throwIfAborted();
 		state.ignoreListingEpoch += 1;
@@ -1140,7 +1144,7 @@ export class FsWatcherManager {
 			return false;
 		}
 		try {
-			await this.attachNativeSubscription(state);
+			await this.attachNativeSubscription(state, gitIgnoredRelDirs);
 		} catch (error) {
 			// The root is now unwatched; a transient failure must not leave it
 			// that way silently. Reuse the root-recovery poll, which re-attaches,

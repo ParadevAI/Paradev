@@ -92,4 +92,19 @@ describe("a failed gitignored-dir listing", () => {
 		expect(run.attaches).toHaveLength(1);
 		expect(run.isPruned("node_modules/a.js")).toBe(true);
 	});
+
+	it("re-attaches a refresh with the listing it already has", async () => {
+		const run = await setup([
+			async () => ["node_modules"],
+			async () => ["vendor"],
+			failing,
+		]);
+
+		expect(await run.manager.refreshIgnores(run.rootPath)).toBe(true);
+
+		expect(run.attaches).toHaveLength(2);
+		expect(run.attaches[1]).toContain("vendor/**");
+		expect(run.attaches[1]).not.toContain("**/node_modules/**");
+		expect(run.isPruned("node_modules/a.js")).toBe(false);
+	});
 });
