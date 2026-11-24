@@ -2,20 +2,55 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { CLIError } from "@superset/cli-framework";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
-import { DEFAULT_MARKETPLACE } from "@superset/shared/plugins";
+import {
+	DEFAULT_MARKETPLACE,
+	organizationMarketplace,
+} from "@superset/shared/plugins";
 import { getApiUrl } from "../config";
+import {
+	type InstalledPlugin,
+	ORGANIZATION,
+	parsePluginRef,
+	readInstalledPlugins,
+} from "./host";
 
 export interface PluginRef {
 	plugin: string;
 	marketplace: string;
 }
 
-export function parsePluginRef(name: string): PluginRef {
-	const at = name.lastIndexOf("@");
-	if (at <= 0) return { plugin: name, marketplace: DEFAULT_MARKETPLACE };
+export function resolveMcpPluginRef(
+	ref: string,
+	organizationId: string | undefined,
+	installed: InstalledPlugin[],
+): PluginRef {
+	const { name, marketplace } = parsePluginRef(ref);
+	if (marketplace === ORGANIZATION) {
+		if (!organizationId) {
+			throw new CLIError(
+				`"${ref}" names your organization's marketplace, but no organization is active.`,
+				"Run: paradev organization switch <id>",
+			);
+		}
+		return {
+			plugin: name,
+			marketplace: organizationMarketplace(organizationId),
+		};
+	}
+	if (marketplace !== undefined) return { plugin: name, marketplace };
+
+	const matches = installed.filter(
+		(entry) => entry.name === name && entry.enabled,
+	);
+	if (matches.length > 1) {
+		throw new CLIError(
+			`"${name}" is installed from more than one marketplace.`,
+			`Name one: ${matches.map((entry) => `--plugin ${name}@${entry.marketplace}`).join(" or ")}`,
+		);
+	}
 	return {
-		plugin: name.slice(0, at),
-		marketplace: name.slice(at + 1),
+		plugin: name,
+		marketplace: matches[0]?.marketplace ?? DEFAULT_MARKETPLACE,
 	};
 }
 
@@ -47,7 +82,11 @@ export async function connectPluginMcp(
 	transport: StreamableHTTPClientTransport;
 	ref: PluginRef;
 }> {
-	const ref = parsePluginRef(name);
+	const ref = resolveMcpPluginRef(
+		name,
+		auth.organizationId,
+		readInstalledPlugins(),
+	);
 	const client = new Client({ name: "superset-cli", version: "1.0.0" });
 	const transport = new StreamableHTTPClientTransport(
 		pluginMcpUrl(ref, connection),

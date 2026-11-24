@@ -18,7 +18,7 @@ import { command } from "../../../lib/command";
 import { canReachDesktop, openUrl } from "../../../lib/open-url";
 import { authorizeUrl, chooseAuthMethod } from "../../../lib/plugins/connect";
 import { withPluginHints } from "../../../lib/plugins/errors";
-import { resolvePluginRef } from "../../../lib/plugins/host";
+import { ORGANIZATION, resolvePluginRef } from "../../../lib/plugins/host";
 import {
 	type AuthInputSpec,
 	missingInputsError,
@@ -31,8 +31,6 @@ const POLL_TIMEOUT_MS = 5 * 60_000;
 type ConnectFirst =
 	| { status: "ready"; connection: string }
 	| { status: "authorize"; url: string };
-
-const ORGANIZATION = "organization";
 
 async function organizationPlugin(
 	api: ApiClient,
