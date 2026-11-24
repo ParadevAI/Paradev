@@ -56,6 +56,19 @@ describe("listGitIgnoredDirs", () => {
 		await expect(listGitIgnoredDirs(dir)).rejects.toThrow();
 	});
 
+	test("rejects when git cannot enter an existing root", async () => {
+		const runGit = () =>
+			Promise.reject(
+				Object.assign(new Error("Command failed"), {
+					stderr: "fatal: cannot change to '/repo': Permission denied\n",
+				}),
+			);
+
+		await expect(
+			listGitIgnoredDirs("/repo", undefined, runGit),
+		).rejects.toThrow("Command failed");
+	});
+
 	test("never caps generated dirs, only the other ignored dirs", async () => {
 		const dir = await createRepo();
 		await writeFile(

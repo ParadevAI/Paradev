@@ -5,6 +5,12 @@ import { DEFAULT_IGNORE_DIR_NAMES } from "@superset/workspace-fs/ignore-defaults
 
 const execFileAsync = promisify(execFile);
 
+type RunGit = (
+	file: string,
+	args: string[],
+	options: { timeout: number; maxBuffer: number; env: NodeJS.ProcessEnv },
+) => Promise<{ stdout: string }>;
+
 // Bounds the non-generated remainder for a pathological repo (thousands of
 // ignored entries). Dirs named like generated output (node_modules, build,
 // dist, …) are never capped: they are the subtrees that must not be watched,
@@ -34,9 +40,10 @@ const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
 export async function listGitIgnoredDirs(
 	rootPath: string,
 	under?: readonly string[],
+	runGit: RunGit = (file, args, options) => execFileAsync(file, args, options),
 ): Promise<string[]> {
 	try {
-		const { stdout } = await execFileAsync(
+		const { stdout } = await runGit(
 			resolveCommand("git"),
 			[
 				"--literal-pathspecs",
@@ -78,8 +85,9 @@ export async function listGitIgnoredDirs(
 
 function isNotAWorktree(error: unknown): boolean {
 	const stderr = String((error as { stderr?: unknown } | null)?.stderr ?? "");
+	if (stderr.includes("not a git repository")) return true;
 	return (
-		stderr.includes("not a git repository") ||
-		stderr.includes("cannot change to")
+		stderr.includes("cannot change to") &&
+		stderr.includes("No such file or directory")
 	);
 }
