@@ -33,6 +33,39 @@ const NAMED_KEYS: Record<string, string> = {
 	f12: "\x1b[24~",
 };
 
+const ARROW_KEYS: Record<string, string> = {
+	up: "A",
+	down: "B",
+	right: "C",
+	left: "D",
+};
+
+/** xterm's modifier parameter is 1 + the bit mask (shift 1, alt 2, ctrl 4). */
+const MODIFIER_BITS: Record<string, number> = {
+	shift: 1,
+	alt: 2,
+	ctrl: 4,
+};
+
+/**
+ * A modified cursor key is one CSI sequence, `CSI 1;<modifier> <letter>`, not
+ * an Escape prefixed to the plain arrow: `ESC ESC [ A` is what a TUI reads as
+ * "Escape, then Up", so a chord built that way never reaches the binding it
+ * asks for.
+ */
+function modifiedArrow(parts: string[]): string | undefined {
+	const arrow = ARROW_KEYS[parts[parts.length - 1] ?? ""];
+	if (!arrow) return undefined;
+	let bits = 0;
+	for (const part of parts.slice(0, -1)) {
+		const bit = MODIFIER_BITS[part];
+		// An unknown or repeated modifier is not a chord we can encode.
+		if (!bit || (bits & bit) !== 0) return undefined;
+		bits |= bit;
+	}
+	return bits === 0 ? undefined : `\x1b[1;${bits + 1}${arrow}`;
+}
+
 export const INTERRUPT_KEYS = new Set(["\x1b", "\x03"]);
 
 export function parseTerminalKeys(spec: string): string[] {
@@ -51,12 +84,14 @@ function keyBytes(key: string): string {
 	const name = key.toLowerCase().replace(/^c-/, "ctrl+").replace(/^m-/, "alt+");
 	const named = Object.hasOwn(NAMED_KEYS, name) ? NAMED_KEYS[name] : undefined;
 	if (named) return named;
+	const arrow = modifiedArrow(name.split("+"));
+	if (arrow) return arrow;
 	const ctrl = /^ctrl\+([a-z])$/.exec(name);
 	if (ctrl?.[1]) return String.fromCharCode(ctrl[1].charCodeAt(0) - 96);
 	const alt = /^alt\+(.+)$/.exec(name);
 	if (alt?.[1]) return `\x1b${keyBytes(alt[1])}`;
 	throw new CLIError(
 		`Unknown key: ${key}`,
-		`Use a single character, ctrl+<letter>, alt+<key>, or one of: ${Object.keys(NAMED_KEYS).join(", ")}`,
+		`Use a single character, ctrl+<letter>, alt+<key>, shift|alt|ctrl+<arrow>, or one of: ${Object.keys(NAMED_KEYS).join(", ")}`,
 	);
 }
