@@ -226,6 +226,6 @@ superset plugins connect|connections            # credentials
 superset plugins marketplace list|add|remove    # marketplace sources
 superset plugins organization list|access       # an organization's own plugins
 superset plugins organization sources add|list|remove|sync  # their GitHub sources
-superset mcp tools|call-tool                    # call a plugin's tools through the proxy
+superset mcp tools [tool]|call-tool <tool>      # list a plugin's tools, read one's schema, call it
 superset skills list
 ```

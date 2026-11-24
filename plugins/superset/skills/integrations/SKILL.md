@@ -30,20 +30,27 @@ is gone: the credential is still live, and the `PLUGIN` column holds the connect
 to. `CONNECTION` holds the connection id, empty on a row with no connection yet. A plugin with
 two connected accounts has two rows.
 
-## 2. List the tools before calling one
+## 2. List the tools, then read the one you will call
 
 ```bash
 superset mcp tools --plugin linear
 superset mcp tools --plugin linear | jq -r '.[].tool'   # names only; descriptions run long
+superset mcp tools create_issue --plugin linear         # its arguments and output
 ```
 
-Names and descriptions come from the plugin's own server, not from anything in this repo, and
-they change between plugin versions. Never call a tool you have not listed.
+Names, descriptions and schemas come from the plugin's own server, not from anything in this
+repo, and they change between plugin versions. Never call a tool you have not listed.
 
-The listing gives a name and a description, but **no input schema**. The description is where
-the plugin documents its arguments, so read the full description of the tool you are about to
-call rather than the filtered name list. If the shape is still ambiguous, a wrong call comes
-back as a tool error naming the offending field; correct it from there.
+Before you call a tool, read it by name. That view lists each argument with its type, whether it
+is required, its default and its description, then the fields of the output when the server
+declares them. Under `--json` every tool carries `inputSchema` and `outputSchema` as the server
+sent them, so `superset mcp tools --plugin linear | jq '.[] | select(.tool=="create_issue")'`
+gives the full JSON Schema.
+
+`--plugin` takes the name from the `PLUGIN` column. A name installed from only one marketplace
+needs nothing more, whichever marketplace that is. Use `name@organization` for your
+organization's own plugin, and `name@<marketplace>` when the CLI says the name is installed
+from more than one.
 
 ## 3. Call it
 
@@ -91,6 +98,8 @@ a good triage still applies. Only the transport changes.
 | `"x" is not connected. Connect an account first.` | Nothing is authorized under that name. Also what an uninstalled plugin looks like. Run `superset plugins connect x`, or install it first. |
 | `--connection takes a plugin name now, not a connection id.` | You passed a UUID. The handle is the plugin name: `--plugin <name>`. |
 | `Pass --plugin <name>.` | `superset mcp tools` with no target. |
+| `"x" is installed from more than one marketplace.` | Pass one of the `--plugin x@<marketplace>` refs the hint lists. |
+| `<plugin> has no tool "x".` | The name is not in the listing. Take the hint, or list the tools again. |
 | `Missing required argument: <tool>` | `call-tool` takes the tool name first; the plugin goes in `--plugin`. |
 | `Arguments must be JSON: ...` | The second positional is a JSON object, quoted as one shell word. Passing the plugin as a positional lands here. |
 | 401 or 403 from the tool itself | Read the error before acting. Reconnect only when it names an invalid, revoked, or expired credential. A 403 that names a scope, a permission, or a resource means the connected account lacks that access, and reconnecting the same account changes nothing. |
