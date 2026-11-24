@@ -6,8 +6,6 @@ import type { TerminalModesSnapshot } from "../TerminalModes/index.ts";
 // Wire format (v2): see ./framing.ts. Each frame carries a JSON header
 // and an optional binary payload tail. PTY input/output bytes ride in
 // the payload tail — they are NOT base64-encoded inside the JSON.
-//
-// See ../README.md and ../../../../apps/desktop/plans/20260429-pty-daemon-implementation.md
 
 export interface SessionMeta {
 	colors?: TerminalColors;

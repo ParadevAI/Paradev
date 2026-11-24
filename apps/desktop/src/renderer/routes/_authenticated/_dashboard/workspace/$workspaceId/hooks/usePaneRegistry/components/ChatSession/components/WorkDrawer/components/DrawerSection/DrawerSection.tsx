@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { type ReactNode, useId } from "react";
 
 export function DrawerSection({
+	maxHeight,
 	stopKey,
 	tabbable,
 	title,
@@ -13,6 +14,7 @@ export function DrawerSection({
 	showHeader = true,
 	children,
 }: {
+	maxHeight: string;
 	stopKey: string;
 	tabbable: boolean;
 	title: string;
@@ -25,12 +27,12 @@ export function DrawerSection({
 }) {
 	const listId = useId();
 	return (
-		<section>
+		<section className="flex min-h-0 flex-col" style={{ maxHeight }}>
 			{showHeader && (
 				<button
 					aria-controls={listId}
 					aria-expanded={expanded}
-					className="sticky top-0 z-10 flex min-h-7 w-full items-center gap-2 rounded-md bg-[color-mix(in_oklab,var(--muted)_40%,var(--background))] px-2.5 py-0.5 text-left font-sans text-muted-foreground text-sm outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:ring-1 focus-visible:ring-ring"
+					className="m-1 flex min-h-7 shrink-0 items-center gap-2 rounded-md bg-[color-mix(in_oklab,var(--muted)_40%,var(--background))] px-2.5 py-0.5 text-left font-sans text-muted-foreground text-sm outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:ring-1 focus-visible:ring-ring"
 					data-drawer-stop={stopKey}
 					onClick={onToggle}
 					tabIndex={tabbable ? 0 : -1}
@@ -49,12 +51,12 @@ export function DrawerSection({
 				</button>
 			)}
 			{(expanded || !showHeader) && (
-				<>
+				<div className="overflow-y-auto p-1" data-work-drawer-scroller>
 					{banner}
 					<div aria-label={title} id={listId} role="listbox">
 						{children}
 					</div>
-				</>
+				</div>
 			)}
 		</section>
 	);

@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { unlink } from "node:fs/promises";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import type {
 	CredentialProblem,
 	GitCredentialProvider,
@@ -127,7 +128,7 @@ export class LocalGitCredentialProvider implements GitCredentialProvider {
 		const env = { ...(await this.envResolver()), GIT_TERMINAL_PROMPT: "0" };
 		return new Promise((resolve) => {
 			const child = execFile(
-				"git",
+				resolveCommand("git", { env }),
 				["credential", "fill"],
 				{ timeout: 10_000, env },
 				(error, stdout) => {
@@ -150,10 +151,14 @@ export class LocalGitCredentialProvider implements GitCredentialProvider {
 	private async fetchTokenViaGhCli(): Promise<string | null> {
 		const env = await this.envResolver();
 		try {
-			const { stdout } = await execFileAsync("gh", ["auth", "token"], {
-				timeout: 10_000,
-				env,
-			});
+			const { stdout } = await execFileAsync(
+				resolveCommand("gh", { env }),
+				["auth", "token"],
+				{
+					timeout: 10_000,
+					env,
+				},
+			);
 			return stdout.trim() || null;
 		} catch {
 			return null;

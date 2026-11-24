@@ -26,6 +26,8 @@ export function useStoredChatSnapshot(
 			queryFn: () => loadStoredChatSnapshot(sessionId as string),
 			enabled: isCloud && sessionId !== null,
 			staleTime: 60_000,
+			// A box that syncs pushes a running chat as it goes, so its copy can be behind within the minute.
+			refetchOnMount: (query) => (query.state.data ? "always" : true),
 			retry: false,
 		},
 		electronQueryClient,

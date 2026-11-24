@@ -7,6 +7,9 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"packages/i18n/src",
 	"apps/web/src/app/account-pending-deletion",
 	"apps/web/src/app/auth/switch-account",
+	"apps/web/src/app/(app)/(page)/settings/cloud-usage",
+	"packages/ui/src/components/CloudUsagePage",
+	"packages/ui/src/components/DateRangePicker",
 	// automations is temporarily un-enforced: the trigger-fidelity work
 	// rewrote most of its copy, and converting the new strings is deferred to
 	// a dedicated i18n pass. Re-add once that lands.

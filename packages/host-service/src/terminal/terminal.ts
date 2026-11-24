@@ -19,6 +19,10 @@ import {
 	TERMINAL_HANDOFF_MAX_CHARS,
 } from "@superset/shared/session-handoff";
 import {
+	containsShellExitMarker,
+	SHELL_EXIT_MARKER_TAIL_BYTES,
+} from "@superset/shared/shell-exit-marker";
+import {
 	createScanState,
 	type ShellReadyScanState,
 	scanForShellReady,
@@ -75,6 +79,7 @@ import {
 	TerminalLifecycleOperations,
 	terminalLifecycleState,
 } from "./lifecycle/lifecycle.ts";
+import { repaintNudgeIntermediateSize } from "./repaint-nudge.ts";
 import { listTerminalResourceSessions } from "./resource-sessions.ts";
 import {
 	getShellReadyMarkerEvidence,
@@ -210,7 +215,9 @@ function getHostAgentHookUrl(): string {
 type TerminalClientMessage =
 	| { type: "input"; data: string }
 	| { type: "colors"; colors: TerminalColors; resetOverrides?: boolean }
-	| { type: "resize"; cols: number; rows: number }
+	// `repaint`: the client's screen may not match the PTY's, so the program
+	// must redraw even when the size does not change.
+	| { type: "resize"; cols: number; rows: number; repaint?: boolean }
 	// The client's current keyboard-focus state, sent on every attach. A
 	// reattaching client may hold focus the program last heard it lost (or
 	// vice versa) — a fresh xterm can't self-report because focus-reporting
@@ -252,7 +259,7 @@ type TerminalServerMessage =
 			message: string;
 			code?: "session-gone" | "attach-retryable";
 	  }
-	| { type: "exit"; exitCode: number; signal: number }
+	| { type: "exit"; exitCode: number; signal: number; shellExited?: boolean }
 	| { type: "title"; title: string | null }
 	// The PTY's size, the smallest box across visible clients. Sent to every
 	// client when it changes, and to a client after each of its resizes, so a
@@ -272,7 +279,15 @@ type TerminalServerMessage =
 	//               content bytes are sent — the client's screen is presumed
 	//               better than anything we could synthesize (see #6290) — and
 	//               a repaint nudge asks the running program to redraw itself.
-	| { type: "synced"; epoch: string; seq: number; mode: SyncedMode }
+	// Bytes from `seq` up to `head` are replayed: the client must not answer
+	// the queries in them.
+	| {
+			type: "synced";
+			epoch: string;
+			seq: number;
+			head: number;
+			mode: SyncedMode;
+	  }
 	// Liveness probe; the client answers with `pong`. Sent once on attach and
 	// then every CLIENT_PING_INTERVAL_MS while the socket is attached.
 	| { type: "ping" };
@@ -566,6 +581,7 @@ interface TerminalSession {
 	exited: boolean;
 	exitCode: number;
 	exitSignal: number;
+	shellExited: boolean;
 	listed: boolean;
 	/** Last title the shell reported over OSC. Lives and dies with the process. */
 	title: string | null;
@@ -606,11 +622,13 @@ interface TerminalSession {
 	 */
 	echoProbe: ((bytes: Uint8Array) => void) | null;
 	/**
-	 * Trailing bytes of the previous output chunk (up to 3), so a DSR cursor
-	 * query (`ESC[6n`) straddling a chunk boundary is still recognized.
+	 * Trailing bytes of the previous output chunk, so a CPR or DA1 query
+	 * split across chunks is still found.
 	 */
-	dsrCarry: Uint8Array;
+	queryCarry: Uint8Array;
 	initialCommandQueued: boolean;
+	trackCommandCompletion: boolean;
+	commandCompletionArmed: boolean;
 	/**
 	 * Basename of the launch shell. Picks the source keyword when a long
 	 * initialCommand is staged as a script (fish 4 removed `.`; sh/ksh
@@ -820,10 +838,10 @@ export function isLiveTerminalSession(terminalId: string): boolean {
  * idle shell prompt). Drives the "close anyway?" confirm on pane close. Unknown
  * sessions, idle prompts, and sessions owned by another workspace return false.
  */
-export function sessionHasRunningProcess(
+export async function sessionHasRunningProcess(
 	terminalId: string,
 	workspaceId: string,
-): boolean {
+): Promise<boolean> {
 	const session = sessions.get(terminalId);
 	if (!session || session.exited) return false;
 	// Ownership gate: don't let one workspace probe another's terminals.
@@ -1558,6 +1576,17 @@ function retainOutput(session: TerminalSession, data: Uint8Array) {
 	}
 }
 
+function readRetainedTail(
+	session: TerminalSession,
+	maxBytes: number,
+): Uint8Array {
+	const end = session.retainedStartSeq + session.retainedBytes;
+	return readRetainedFrom(
+		session,
+		Math.max(session.retainedStartSeq, end - maxBytes),
+	);
+}
+
 /** Concatenate the retained stream from absolute seq `from` to the present. */
 function readRetainedFrom(session: TerminalSession, from: number): Uint8Array {
 	let skip = from - session.retainedStartSeq;
@@ -1582,70 +1611,80 @@ function readRetainedFrom(session: TerminalSession, from: number): Uint8Array {
 	return out;
 }
 
+type UnattachedQuery = "cursor" | "deviceAttributes";
+
+const UNATTACHED_QUERIES: ReadonlyArray<{
+	bytes: Uint8Array;
+	query: UnattachedQuery;
+}> = [
+	{ bytes: new Uint8Array([0x1b, 0x5b, 0x36, 0x6e]), query: "cursor" }, // ESC [ 6 n
+	{ bytes: new Uint8Array([0x1b, 0x5b, 0x63]), query: "deviceAttributes" }, // ESC [ c
+	{
+		bytes: new Uint8Array([0x1b, 0x5b, 0x30, 0x63]), // ESC [ 0 c
+		query: "deviceAttributes",
+	},
+];
+
+const UNATTACHED_QUERY_CARRY_BYTES =
+	Math.max(...UNATTACHED_QUERIES.map(({ bytes }) => bytes.length)) - 1;
+
+// What the desktop xterm with its image addon answers (sixel).
+const DEVICE_ATTRIBUTES_REPLY = "\x1b[?62;4;9;22c";
+
+/**
+ * Find the CPR and DA1 queries in this chunk, joined with the previous
+ * chunk's tail so a query split across chunks is still found.
+ */
+function scanForUnattachedQueries(
+	session: TerminalSession,
+	chunk: Uint8Array,
+): UnattachedQuery[] {
+	const carry = session.queryCarry;
+	const joined = new Uint8Array(carry.length + chunk.length);
+	joined.set(carry, 0);
+	joined.set(chunk, carry.length);
+	const found: UnattachedQuery[] = [];
+	for (let i = 0; i < joined.length; i++) {
+		if (joined[i] !== 0x1b) continue;
+		for (const { bytes, query } of UNATTACHED_QUERIES) {
+			// A match that ends inside the carry was found with the last chunk.
+			if (i + bytes.length <= carry.length) continue;
+			if (i + bytes.length > joined.length) continue;
+			if (bytes.every((byte, j) => joined[i + j] === byte)) found.push(query);
+		}
+	}
+	session.queryCarry = joined.slice(
+		Math.max(0, joined.length - UNATTACHED_QUERY_CARRY_BYTES),
+	);
+	return found;
+}
+
+/**
+ * Answer CPR and DA1 when no client is attached to answer them. reedline
+ * (nushell) waits for CPR before it paints its prompt (#6024); fish waits for
+ * DA1. A client does not answer the queries in bytes it replays, so a program
+ * that asks while no client is attached gets its answer only from here.
+ */
+function answerUnattachedQueries(
+	session: TerminalSession,
+	queries: UnattachedQuery[],
+) {
+	if (queries.length === 0 || session.exited) return;
+	if (pruneAndCountOpenSockets(session) > 0) return;
+	const { x, y } = session.modeTracker.cursorPosition();
+	for (const query of queries) {
+		session.pty.write(
+			query === "cursor" ? `\x1b[${y + 1};${x + 1}R` : DEVICE_ATTRIBUTES_REPLY,
+		);
+	}
+}
+
 /**
  * Single choke point for PTY output: mode tracker, catch-up ring, then
  * broadcast (falling back to the legacy zero-socket FIFO). Every byte that
  * counts toward `outputSeq` MUST flow through here and nowhere else, or
  * seq-aware clients drift out of sync.
  */
-/** ESC [ 6 n — DSR cursor position report request. */
-const DSR_CURSOR_QUERY = new Uint8Array([0x1b, 0x5b, 0x36, 0x6e]);
-
-/**
- * Count DSR cursor queries in this chunk (joined with the previous chunk's
- * tail so boundary-straddling sequences still match) and update the carry.
- */
-function scanForDsrCursorQueries(
-	session: TerminalSession,
-	chunk: Uint8Array,
-): number {
-	const joined = new Uint8Array(session.dsrCarry.length + chunk.length);
-	joined.set(session.dsrCarry, 0);
-	joined.set(chunk, session.dsrCarry.length);
-	let count = 0;
-	// Start where a match could involve carried bytes; matches wholly inside
-	// the carry were already counted last chunk.
-	for (
-		let i = Math.max(
-			0,
-			session.dsrCarry.length - (DSR_CURSOR_QUERY.length - 1),
-		);
-		i + DSR_CURSOR_QUERY.length <= joined.length;
-		i++
-	) {
-		let matched = true;
-		for (let j = 0; j < DSR_CURSOR_QUERY.length; j++) {
-			if (joined[i + j] !== DSR_CURSOR_QUERY[j]) {
-				matched = false;
-				break;
-			}
-		}
-		if (matched) count++;
-	}
-	session.dsrCarry = joined.slice(
-		Math.max(0, joined.length - (DSR_CURSOR_QUERY.length - 1)),
-	);
-	return count;
-}
-
-/**
- * Answer a program's DSR cursor query when no renderer is attached to do it.
- * reedline (nushell) asks `ESC[6n` after init and will not paint its prompt —
- * or accept input — until the terminal answers; a preset launch into an
- * unattached session therefore wedged forever (#6024). An attached renderer's
- * xterm answers by itself (so we stay silent then, like tmux does for
- * attached clients); for unattached sessions the mirrored headless screen is
- * the truth and answers with the real cursor position.
- */
-function answerDsrCursorQueries(session: TerminalSession, count: number) {
-	if (count === 0 || session.exited) return;
-	if (pruneAndCountOpenSockets(session) > 0) return;
-	const { x, y } = session.modeTracker.cursorPosition();
-	for (let i = 0; i < count; i++) {
-		session.pty.write(`\x1b[${y + 1};${x + 1}R`);
-	}
-}
-
 function deliverOutput(session: TerminalSession, bytes: Uint8Array) {
 	session.modeTracker.feed(bytes);
 	retainOutput(session, bytes);
@@ -1658,19 +1697,23 @@ function deliverOutput(session: TerminalSession, bytes: Uint8Array) {
 }
 
 /**
- * Force the running program to repaint by toggling the PTY one row smaller
- * and back — two real SIGWINCHes (a same-dims resize emits none). Used after
- * a reanchor attach, where the renderer may hold a stale frame that only the
- * program itself can faithfully redraw (the v1 terminal-host's proven
- * recipe; never synthesize screen content the tracker may not have — #6290).
+ * Force the running program to repaint by toggling the PTY one column and
+ * one row smaller and back — two real SIGWINCHes (a same-dims resize emits
+ * none). Used after a reanchor attach, where the renderer may hold a stale
+ * frame that only the program itself can faithfully redraw (the v1
+ * terminal-host's proven recipe; never synthesize screen content the tracker
+ * may not have — #6290).
  */
 function nudgeRepaint(session: TerminalSession) {
 	if (!isCurrentLiveSession(session)) return;
 	const { cols, rows } = session;
-	// Shrink by a row, growing instead when already at the minimum.
-	const toggledRows = rows > MIN_TERMINAL_ROWS ? rows - 1 : rows + 1;
+	const intermediate = repaintNudgeIntermediateSize(
+		cols,
+		rows,
+		MIN_TERMINAL_ROWS,
+	);
 	const generation = session.resizeGeneration;
-	session.pty.resize(cols, toggledRows);
+	session.pty.resize(intermediate.cols, intermediate.rows);
 	setTimeout(() => {
 		// A real client resize landed mid-nudge; it owns the dims now.
 		if (!isCurrentLiveSession(session)) return;
@@ -1782,6 +1825,7 @@ function resumeHiddenSocket(session: TerminalSession, ws: TerminalSocket) {
 		sendMessage(ws, {
 			type: "synced",
 			epoch: session.epoch,
+			head: session.outputSeq,
 			seq: session.outputSeq,
 			mode: "reanchor",
 		});
@@ -2028,6 +2072,7 @@ function sendSeqAttach(
 		sendMessage(socket, {
 			type: "synced",
 			epoch: session.epoch,
+			head: session.outputSeq,
 			seq: request.seq,
 			mode: "exact",
 		});
@@ -2042,6 +2087,7 @@ function sendSeqAttach(
 		sendMessage(socket, {
 			type: "synced",
 			epoch: session.epoch,
+			head: session.outputSeq,
 			seq: session.retainedStartSeq,
 			mode: "tail",
 		});
@@ -2059,6 +2105,7 @@ function sendSeqAttach(
 	sendMessage(socket, {
 		type: "synced",
 		epoch: session.epoch,
+		head: session.outputSeq,
 		seq: session.outputSeq,
 		mode: "reanchor",
 	});
@@ -2366,6 +2413,15 @@ function tryTypeToPty(session: TerminalSession, data: string): boolean {
 	}
 }
 
+function submitInitialCommand(session: TerminalSession): boolean {
+	if (!tryTypeToPty(session, "\r")) return false;
+	const startupPromptCannotArriveLate =
+		session.shellReadyState !== "timed_out" || session.lateMarkerRecorded;
+	session.commandCompletionArmed =
+		session.trackCommandCompletion && startupPromptCannotArriveLate;
+	return true;
+}
+
 /**
  * Grace-window typing (learned `missing` evidence, no observed prompt): a
  * startup stdin reader can still be consuming the TTY when the grace fires —
@@ -2397,7 +2453,7 @@ async function typeInitialCommandVerifyingEcho(
 	}
 	await new Promise((r) => setTimeout(r, INITIAL_COMMAND_ENTER_DELAY_MS));
 	if (isDefunct()) return dropStagedFiles();
-	if (!tryTypeToPty(session, "\r")) dropStagedFiles();
+	if (!submitInitialCommand(session)) dropStagedFiles();
 }
 
 /**
@@ -2462,13 +2518,13 @@ async function typeInitialCommandUngated(
 		);
 		if (verified) {
 			if (isDefunct()) return dropStagedFiles();
-			if (!tryTypeToPty(session, "\r")) dropStagedFiles();
+			if (!submitInitialCommand(session)) dropStagedFiles();
 			return;
 		}
 	}
 	await new Promise((r) => setTimeout(r, INITIAL_COMMAND_ENTER_DELAY_MS));
 	if (isDefunct()) return dropStagedFiles();
-	if (!tryTypeToPty(session, "\r")) dropStagedFiles();
+	if (!submitInitialCommand(session)) dropStagedFiles();
 }
 
 /**
@@ -2631,7 +2687,7 @@ function queueInitialCommand(
 			return;
 		}
 		setTimeout(() => {
-			if (isDefunct() || !tryTypeToPty(session, "\r")) {
+			if (isDefunct() || !submitInitialCommand(session)) {
 				dropStagedFiles();
 			}
 		}, INITIAL_COMMAND_ENTER_DELAY_MS);
@@ -2917,6 +2973,7 @@ interface CreateTerminalSessionOptions {
 	db: HostDb;
 	eventBus?: EventBus;
 	initialCommand?: string;
+	trackCommandCompletion?: boolean;
 	cwd?: string;
 	/** Hidden sessions are process-internal and should not appear in user pickers. */
 	listed?: boolean;
@@ -3014,6 +3071,7 @@ async function createTerminalSessionUnlocked({
 	db,
 	eventBus,
 	initialCommand,
+	trackCommandCompletion = false,
 	cwd: cwdOverride,
 	listed = true,
 	cols: requestedCols,
@@ -3283,19 +3341,28 @@ async function createTerminalSessionUnlocked({
 	// bytes, but the session literal below needs the tracker — close over a
 	// ref assigned right after construction.
 	let reclaimSession: TerminalSession | null = null;
-	const modeTracker = createModeTracker(
-		cols,
-		rows,
-		daemon.supportsModeSnapshots
+	const modeTracker = createModeTracker(cols, rows, {
+		onShellReady() {
+			const s = reclaimSession;
+			if (!s || !isCurrentLiveSession(s) || !s.commandCompletionArmed) return;
+			s.commandCompletionArmed = false;
+			s.eventBus?.broadcastTerminalLifecycle({
+				workspaceId: s.workspaceId,
+				terminalId: s.terminalId,
+				eventType: "command-finished",
+				occurredAt: Date.now(),
+			});
+		},
+		...(daemon.supportsModeSnapshots
 			? {}
 			: {
-					onLeakedInputModeDisarm(bytes) {
+					onLeakedInputModeDisarm(bytes: Uint8Array) {
 						const s = reclaimSession;
 						if (!s || !isCurrentLiveSession(s)) return;
 						deliverOutput(s, bytes);
 					},
-				},
-	);
+				}),
+	});
 
 	const session: TerminalSession = {
 		terminalId,
@@ -3317,6 +3384,7 @@ async function createTerminalSessionUnlocked({
 		exited: false,
 		exitCode: 0,
 		exitSignal: 0,
+		shellExited: false,
 		listed,
 		title: null,
 		customTitle,
@@ -3334,10 +3402,12 @@ async function createTerminalSessionUnlocked({
 		usedMissingMarkerGrace: false,
 		lateMarkerRecorded: false,
 		echoProbe: null,
-		dsrCarry: new Uint8Array(0),
+		queryCarry: new Uint8Array(0),
 		// Adopted sessions have already run their initialCommand in the prior
 		// host-service lifetime — flag it as queued so we don't double-fire it.
 		initialCommandQueued: isAdopted,
+		trackCommandCompletion,
+		commandCompletionArmed: false,
 		launchShellName: basename(shell),
 		portHintDecoder: new StringDecoder("utf8"),
 		modeTracker,
@@ -3437,11 +3507,11 @@ async function createTerminalSessionUnlocked({
 				// — the chunk is still output and must refresh the idle clock.
 				portManager.checkOutputForHint(terminalId, hintText);
 
-				const dsrQueries = scanForDsrCursorQueries(session, bytes);
+				const queries = scanForUnattachedQueries(session, bytes);
 				deliverOutput(session, bytes);
 				// After deliverOutput so the mirror has consumed this chunk and
 				// the reported cursor position is current.
-				answerDsrCursorQueries(session, dsrQueries);
+				answerUnattachedQueries(session, queries);
 			},
 			onExit({ code, signal }) {
 				if (sessions.get(terminalId) !== session) return;
@@ -3449,6 +3519,9 @@ async function createTerminalSessionUnlocked({
 				cancelShellReady(session);
 				session.exitCode = code ?? 0;
 				session.exitSignal = signal ?? 0;
+				session.shellExited = containsShellExitMarker(
+					readRetainedTail(session, SHELL_EXIT_MARKER_TAIL_BYTES),
+				);
 				const occurredAt = Date.now();
 
 				if (!chatPortTerminalIds.has(terminalId))
@@ -3485,6 +3558,7 @@ async function createTerminalSessionUnlocked({
 					type: "exit",
 					exitCode: session.exitCode,
 					signal: session.exitSignal,
+					shellExited: session.shellExited,
 				});
 
 				eventBus?.broadcastTerminalLifecycle({
@@ -3657,6 +3731,7 @@ export function registerWorkspaceTerminalRoute({
 						type: "exit",
 						exitCode: session.exitCode,
 						signal: session.exitSignal,
+						shellExited: session.shellExited,
 					});
 				}
 				return true;
@@ -3911,7 +3986,9 @@ export function registerWorkspaceTerminalRoute({
 							next === null ||
 							(next.cols === session.cols && next.rows === session.rows);
 						const needsForcedNudge =
-							session.pendingRepaintNudge !== null && dimsUnchanged;
+							(session.pendingRepaintNudge !== null ||
+								message.repaint === true) &&
+							dimsUnchanged;
 						clearPendingRepaintNudge(session);
 						const changed = applyEffectiveDims(session, { force: true });
 						if (!changed) sendMessage(ws, ptySizeMessage(session));

@@ -110,7 +110,7 @@ function renderGitStatus(hostUrl: string) {
 							value={{
 								targets: [],
 								isReady: true,
-								agentCredentialsChangedWorkspaceId: null,
+								agentsToRestart: null,
 								usageRefusal: null,
 								wakeOpenWorkspace: async () => {},
 							}}

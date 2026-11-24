@@ -13,7 +13,7 @@ export default command({
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const environment = await resolveEnvironment(
 			ctx.api,
@@ -24,7 +24,7 @@ export default command({
 			name: environment.name,
 			consequence: `Archiving ${environment.name} deletes its snapshot and cannot be undone`,
 			yes: options.yes,
-			rerun: `superset environments archive ${environment.id}`,
+			rerun: `paradev environments archive ${environment.id}`,
 		});
 		await ctx.api.environment.archive.mutate({ id: environment.id });
 		return {

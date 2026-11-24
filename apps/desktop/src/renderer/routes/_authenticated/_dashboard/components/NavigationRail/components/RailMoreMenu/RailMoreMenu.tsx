@@ -14,7 +14,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuPortal,
 	DropdownMenuSeparator,
 	DropdownMenuSub,
@@ -23,9 +22,8 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { Ellipsis, FolderPlus, Gauge } from "lucide-react";
+import { Ellipsis, FolderPlus } from "lucide-react";
 import { useId, useState } from "react";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
 import {
 	RAIL_ICON_CLASS,
@@ -43,22 +41,15 @@ import { SortableDestinationRow } from "./components/SortableDestinationRow";
 interface RailMoreMenuProps {
 	destinations: RailDestination[];
 	isActive: boolean;
-	onOpenUsage: () => void;
 }
 
-export function RailMoreMenu({
-	destinations,
-	isActive,
-	onOpenUsage,
-}: RailMoreMenuProps) {
+export function RailMoreMenu({ destinations, isActive }: RailMoreMenuProps) {
 	const { t } = useLingui();
 	const setPinned = useRailPinsStore((state) => state.setPinned);
 	const setVisibleOrder = useRailPinsStore((state) => state.setVisibleOrder);
 	const sensors = useSensors(
 		useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
 	);
-	const { data: isUsageInSidebarEnabled } =
-		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 	const [isSorting, setIsSorting] = useState(false);
 	const alertDescriptionId = useId();
 	const offRailAlertLabel = destinations.find(
@@ -140,12 +131,6 @@ export function RailMoreMenu({
 						))}
 					</SortableContext>
 				</DndContext>
-				{isUsageInSidebarEnabled && (
-					<DropdownMenuItem onSelect={onOpenUsage}>
-						<Gauge className="size-4" />
-						<Trans>Usage</Trans>
-					</DropdownMenuItem>
-				)}
 				<DropdownMenuSeparator />
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>

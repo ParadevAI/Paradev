@@ -9,8 +9,7 @@ import { createGitFixture, type GitFixture } from "../helpers/git-fixture";
 import { seedProject, seedWorkspace } from "../helpers/seed";
 
 /**
- * INTEGRATION coverage for the event-driven path of finding #1 in
- * `plans/v2-paths-worktree-perf-findings.md`.
+ * INTEGRATION coverage for the event-driven pull request refresh path.
  *
  * Wires a real `GitWatcher` into the runtime, explicitly registers interest
  * in all 3 workspaces (simulating a renderer with all 3 open — GitWatcher no

@@ -2,19 +2,41 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import type { WorkspaceRef } from "./types";
 
-export const STATUS_LABELS: Record<WorkspaceRef["status"], MessageDescriptor> =
-	{
-		provisioning: msg({
-			message: "Starting",
-			context: "cloud workspace status",
-		}),
-		ready: msg({ message: "Ready", context: "cloud workspace status" }),
-		failed: msg({ message: "Failed", context: "cloud workspace status" }),
-		deleted: msg({ message: "Deleted", context: "cloud workspace status" }),
-		awake: msg({ message: "Running", context: "cloud workspace status" }),
-		asleep: msg({ message: "Asleep", context: "cloud workspace status" }),
-		archived: msg({ message: "Archived", context: "cloud workspace status" }),
-	};
+export type Tone = "ok" | "warn" | "bad" | "idle";
+
+export const STATUS_BADGES: Record<
+	WorkspaceRef["status"],
+	{ label: MessageDescriptor; tone: Tone }
+> = {
+	provisioning: {
+		label: msg({ message: "Provisioning", context: "cloud workspace status" }),
+		tone: "warn",
+	},
+	ready: {
+		label: msg({ message: "Ready", context: "cloud workspace status" }),
+		tone: "ok",
+	},
+	failed: {
+		label: msg({ message: "Failed", context: "cloud workspace status" }),
+		tone: "bad",
+	},
+	deleted: {
+		label: msg({ message: "Deleted", context: "cloud workspace status" }),
+		tone: "idle",
+	},
+	awake: {
+		label: msg({ message: "Awake", context: "cloud workspace status" }),
+		tone: "ok",
+	},
+	asleep: {
+		label: msg({ message: "Asleep", context: "cloud workspace status" }),
+		tone: "idle",
+	},
+	archived: {
+		label: msg({ message: "Archived", context: "cloud workspace status" }),
+		tone: "idle",
+	},
+};
 
 export const FAILURE_REASONS: Record<
 	NonNullable<WorkspaceRef["failure"]>["reason"],
@@ -28,3 +50,16 @@ export const FAILURE_REASONS: Record<
 	sandbox_gone: msg({ message: "Its machine no longer exists." }),
 	snapshot_expired: msg({ message: "Its saved state expired." }),
 };
+
+/**
+ * The design's bar grey, the text colour at 60%, for a chart: the kit's chart colours take no nested
+ * `var()`, so the chart gets the variable and its container the class that sets it.
+ */
+export const CHART_BAR = {
+	color: "var(--usage-bar)",
+	className:
+		"[--usage-bar:color-mix(in_oklab,var(--foreground)_60%,transparent)]",
+};
+
+/** The design's one boxed surface: the allowance, the member summary and the workspace figures. */
+export const BOX = "border-0 bg-muted shadow-none";

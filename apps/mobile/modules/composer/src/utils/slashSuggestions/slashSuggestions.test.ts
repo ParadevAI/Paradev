@@ -52,4 +52,16 @@ describe("slashSuggestions", () => {
 	test("commits the token with a trailing space", () => {
 		expect(committedSlashDraft(command("deploy"))).toBe("/deploy ");
 	});
+
+	test("finds a plugin skill by its skill name, new namespace, or old one", () => {
+		const plugin = [
+			command("paradev:orchestrate", { aliases: ["superset:orchestrate"] }),
+			command("review", { isBuiltin: true }),
+		];
+		for (const draft of ["/orc", "/paradev", "/superset:orc"]) {
+			expect(names(slashSuggestions(draft, plugin))).toEqual([
+				"paradev:orchestrate",
+			]);
+		}
+	});
 });

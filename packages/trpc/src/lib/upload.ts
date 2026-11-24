@@ -15,8 +15,8 @@ const MAX_SIZE_MB = 4.5;
  */
 export const CANONICAL_WIDTH = 256;
 
-/** Every upload gets a fresh random key, so a URL's bytes never change. */
-const CACHE_CONTROL = "public, max-age=31536000, immutable";
+/** A key never gets new bytes: an upload uses a random key or a content hash. */
+export const IMMUTABLE_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 /**
  * Base URL of the host serving the public bucket, without a trailing slash —
@@ -129,6 +129,12 @@ function looksComplete(buffer: Buffer, contentType: string): boolean {
 	return true;
 }
 
+/** The sniffed type of a whole png, jpeg or webp image, or null for anything else. */
+export function completeImageType(buffer: Buffer): string | null {
+	const contentType = sniffImageType(buffer);
+	return contentType && looksComplete(buffer, contentType) ? contentType : null;
+}
+
 export async function uploadImage({
 	fileData,
 	pathname,
@@ -155,8 +161,8 @@ export async function uploadImage({
 	// The bytes decide, not the Content-Type the client sent: the sniff is
 	// strictly the stronger check, and consulting the header as well only adds
 	// a way to reject a valid image that a browser happened to mislabel.
-	const contentType = sniffImageType(buffer);
-	if (!contentType || !looksComplete(buffer, contentType)) {
+	const contentType = completeImageType(buffer);
+	if (!contentType) {
 		throw userError({
 			code: "BAD_REQUEST",
 			message: "Invalid image type. Only PNG, JPEG, and WebP are allowed",
@@ -171,7 +177,7 @@ export async function uploadImage({
 		body: buffer,
 		contentType,
 		bucket: "public",
-		cacheControl: CACHE_CONTROL,
+		cacheControl: IMMUTABLE_CACHE_CONTROL,
 	});
 
 	void reclaim({ existingUrl, pathname }).catch((error) => {

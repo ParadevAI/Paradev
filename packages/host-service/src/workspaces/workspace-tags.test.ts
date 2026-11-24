@@ -9,6 +9,7 @@ import { workspaces, workspaceTags } from "../db/schema";
 import type { EventBus } from "../events";
 import type { WorkspaceChangedMessage } from "../events/types";
 import {
+	archiveLocalWorkspace,
 	getWorkspaceTagAssignments,
 	getWorkspaceTags,
 	getWorkspaceTagsByWorkspaceId,
@@ -67,6 +68,18 @@ function seedWorkspace(
 }
 
 describe("workspace tags store", () => {
+	it("updating an archived workspace writes the tags but does not broadcast", () => {
+		const db = createTestDb();
+		const { eventBus, messages } = createTestEventBus();
+		const id = "33333333-3333-4333-8333-333333333333";
+		seedWorkspace(db, eventBus, { id, tags: ["alpha"] });
+		archiveLocalWorkspace({ db, eventBus }, id, "deleted");
+		messages.length = 0;
+		updateLocalWorkspace({ db, eventBus }, id, { tags: ["beta"] });
+		expect(getWorkspaceTags(db, id, null)).toEqual(["beta"]);
+		expect(messages).toEqual([]);
+	});
+
 	it("insert writes normalized tags and broadcasts them", () => {
 		const db = createTestDb();
 		const { eventBus, messages } = createTestEventBus();

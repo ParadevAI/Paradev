@@ -8,54 +8,54 @@ image: /changelog/review-tab.png
 
 The changes sidebar now has a dedicated Review tab. You can read, filter, and respond to PR review comments without leaving the desktop app.
 
-- Resolved comments are separated from open ones so you can focus on what still needs attention
-- Stays in sync with GitHub, refreshing automatically after PR mutations
+- Resolved comments sit apart from open ones, so you can focus on what still needs attention
+- Stays in sync with GitHub and refreshes automatically after PR changes
 
 ## Task Create & Detail Actions <PRBadge url="https://github.com/superset-sh/superset/pull/2656" /> <PRBadge url="https://github.com/superset-sh/superset/pull/2660" />
 
 ![Task create modal](/changelog/create-task.png)
 
-You can now create tasks and take actions on them directly from the desktop without switching to Linear or the web app.
+You can now create tasks and act on them from the desktop, without a switch to Linear or the web app.
 
-- New task create modal for quickly filing tasks from wherever you are
-- Task detail action menu for quick actions on individual tasks
+- New task create modal to file a task from wherever you are
+- Task detail action menu for quick actions on a single task
 
 ## Project-Level Presets Configurable <PRBadge url="https://github.com/superset-sh/superset/pull/2719" />
 
 ![Project-level presets](/changelog/project-presets.png)
 
-Terminal presets can now be scoped to a specific project. Project-level presets only appear when you're working in that project, keeping the preset list clean and context-relevant.
+You can now scope terminal presets to one project. Project-level presets appear only when you work in that project, so the preset list stays short and relevant.
 
 ## Run Button & Stop Command <PRBadge url="https://github.com/superset-sh/superset/pull/2680" /> <PRBadge url="https://github.com/superset-sh/superset/pull/2740" />
 
 ![Run button](/changelog/run-button.png)
 
-The run button has moved to the presets bar (`Cmd+G`) and now includes a stop command so you can cancel a running preset mid-execution.
+The run button is now in the presets bar (⌘G) and has a stop command, so you can cancel a running preset.
 
-- `Cmd+G` triggers the run preset from anywhere in the workspace
+- ⌘G triggers the run preset from anywhere in the workspace
 - Stop button cancels in-progress runs immediately
 
 ## Improvements
 
-- **AI-generated branch names** - Paradev now suggests a branch name when creating a workspace, with automatic conflict resolution if the name is taken <PRBadge url="https://github.com/superset-sh/superset/pull/2627" />
+- **AI-generated branch names** - Paradev now suggests a branch name when you create a workspace, and resolves the conflict automatically if a branch already has that name <PRBadge url="https://github.com/superset-sh/superset/pull/2627" />
 - **Chat draft preserved** - Unsent chat text is now saved when you switch tabs or workspaces and restored when you come back <PRBadge url="https://github.com/superset-sh/superset/pull/2631" />
 - **Warn before closing dirty editors** - Desktop now prompts before closing a file tab with unsaved changes <PRBadge url="https://github.com/superset-sh/superset/pull/2717" />
-- **GitHub issue attachment in workspace modal** - You can attach a GitHub issue directly in the new workspace modal, giving the agent immediate context <PRBadge url="https://github.com/superset-sh/superset/pull/2678" />
+- **GitHub issue attachment in workspace modal** - Attach a GitHub issue in the new workspace modal to give the agent context from the start <PRBadge url="https://github.com/superset-sh/superset/pull/2678" />
 - **Autosave for setup/teardown scripts** - Setup and teardown scripts now save automatically as you edit them <PRBadge url="https://github.com/superset-sh/superset/pull/2644" />
-- **CMD+R reload now configurable** - The `Cmd+R` reload shortcut can be remapped or disabled from keyboard settings <PRBadge url="https://github.com/superset-sh/superset/pull/2716" />
-- **Virtualized git history** - The commit list in the git history panel is now virtualized and capped at 500, preventing slowdowns in repos with long histories <PRBadge url="https://github.com/superset-sh/superset/pull/2763" />
-- **PR merge loading feedback** - The merge button now shows a loading state while a PR merge is in progress <PRBadge url="https://github.com/superset-sh/superset/pull/2703" />
+- **⌘R reload now configurable** - Remap or turn off the ⌘R reload shortcut in keyboard settings <PRBadge url="https://github.com/superset-sh/superset/pull/2716" />
+- **Virtualized git history** - The git history panel now caps the commit list at 500 and renders only the visible rows, which prevents slowdowns in repos with long histories <PRBadge url="https://github.com/superset-sh/superset/pull/2763" />
+- **PR merge loading feedback** - The merge button now shows a loading state while a PR merges <PRBadge url="https://github.com/superset-sh/superset/pull/2703" />
 
 ---
 
 **Bug fixes:**
 
-- Fixed TERMINAL_ATTACH_CANCELED errors when opening worktrees <PRBadge url="https://github.com/superset-sh/superset/pull/2749" />
-- Fixed MCP OAuth 500 without an active organization <PRBadge url="https://github.com/superset-sh/superset/pull/2683" />
-- Prevented external worktree data loss <PRBadge url="https://github.com/superset-sh/superset/pull/2573" />
-- Fixed workspace sidebar drag start instability <PRBadge url="https://github.com/superset-sh/superset/pull/2723" />
-- Synced plan gating with live subscriptions <PRBadge url="https://github.com/superset-sh/superset/pull/2713" />
-- Fixed file viewer tabs being duplicated across workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/2712" />
+- Opening a worktree no longer gives TERMINAL_ATTACH_CANCELED errors <PRBadge url="https://github.com/superset-sh/superset/pull/2749" />
+- MCP OAuth no longer returns a 500 without an active organization <PRBadge url="https://github.com/superset-sh/superset/pull/2683" />
+- External worktrees no longer lose data <PRBadge url="https://github.com/superset-sh/superset/pull/2573" />
+- A drag in the workspace sidebar now starts reliably <PRBadge url="https://github.com/superset-sh/superset/pull/2723" />
+- Plan gating now follows live subscriptions <PRBadge url="https://github.com/superset-sh/superset/pull/2713" />
+- File viewer tabs no longer duplicate across workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/2712" />
 - Fixed PR branch reuse on publish <PRBadge url="https://github.com/superset-sh/superset/pull/2673" />
-- Preserved cursor position when saving a file <PRBadge url="https://github.com/superset-sh/superset/pull/2645" />
-- Fixed chat focus after `@mention` file selection <PRBadge url="https://github.com/superset-sh/superset/pull/2653" />
+- Saving a file now keeps the cursor position <PRBadge url="https://github.com/superset-sh/superset/pull/2645" />
+- Chat keeps focus after you select a file with `@mention` <PRBadge url="https://github.com/superset-sh/superset/pull/2653" />

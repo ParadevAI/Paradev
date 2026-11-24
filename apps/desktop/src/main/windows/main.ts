@@ -323,11 +323,6 @@ export async function createPlatformWindow({
 		startSharedServices();
 	}
 
-	// macOS Sequoia+: background throttling can corrupt GPU compositor layers
-	if (PLATFORM.IS_MAC) {
-		window.webContents.setBackgroundThrottling(false);
-	}
-
 	if (isDev) {
 		window.webContents.on(
 			"console-message",

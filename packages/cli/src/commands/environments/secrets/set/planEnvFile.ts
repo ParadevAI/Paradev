@@ -27,7 +27,7 @@ export function planEnvFile(
 		} else if (isCloudWorkspaceIgnoredEnvName(key)) {
 			plan.skipped.push({
 				key,
-				reason: "agents sign in with: superset connections agents set <agent>",
+				reason: "agents sign in with: paradev connections agents set <agent>",
 			});
 		} else {
 			plan.set.push({ key, value });

@@ -1,14 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type AutumnCatalogPlan,
-	advertisedGbMinutesPerSeat,
 	catalogPlansFrom,
 	defaultMachineSize,
 	familyForPlan,
 	fromAutumnRest,
 	gbHourPackPricePerGbHour,
 	gbHourPurchase,
+	gbHourRatesOf,
 	isCloudUsageRefusal,
+	lineupRatePerGbHour,
 	machineSpec,
 	maxYearlyDiscount,
 	offeredMachineSizes,
@@ -263,8 +264,8 @@ describe("planCatalogFromAutumn", () => {
 		const [pro, ultra] = lineup;
 		if (!pro || !ultra) throw new Error("lineup");
 		expect(pro.gbMinutesPerSeat).toBe(19200);
-		expect(advertisedGbMinutesPerSeat(pro)).toBeNull();
-		expect(advertisedGbMinutesPerSeat(ultra)).toBe(ultra.gbMinutesPerSeat);
+		expect(pro.advertisedGbHoursPerSeat).toBeNull();
+		expect(ultra.advertisedGbHoursPerSeat).toBe(4000);
 	});
 
 	test("a GB-hour purchase rounds up to whole pack units, never past the maximum", () => {
@@ -409,5 +410,157 @@ describe("seatPriceOf", () => {
 		const plans = [license, current, retired];
 		expect(seatPriceOf(current, plans)?.interval).toBe("year");
 		expect(seatPriceOf(retired, plans)?.interval).toBe("year");
+	});
+});
+
+describe("lineupRatePerGbHour", () => {
+	test("is the GB-hour price every self-serve family charges", () => {
+		expect(lineup.every((family) => family.overagePerGbHour === 0.06)).toBe(
+			true,
+		);
+		expect(lineupRatePerGbHour(lineup)).toBe(0.06);
+	});
+
+	test("is null when the families disagree, so no family's price is shown as the list price", () => {
+		const [pro, ultra] = lineup;
+		if (!pro || !ultra) throw new Error("lineup has pro and ultra");
+		expect(
+			lineupRatePerGbHour([pro, { ...ultra, overagePerGbHour: 0.08 }]),
+		).toBeNull();
+	});
+
+	test("ignores a family that does not sell GB-minutes, and is null with none that does", () => {
+		const [pro, ultra] = lineup;
+		if (!pro || !ultra) throw new Error("lineup has pro and ultra");
+		expect(
+			lineupRatePerGbHour([pro, { ...ultra, overagePerGbHour: null }]),
+		).toBe(0.06);
+		expect(
+			lineupRatePerGbHour([{ ...pro, overagePerGbHour: null }]),
+		).toBeNull();
+		expect(lineupRatePerGbHour([])).toBeNull();
+	});
+});
+
+describe("gbHourRatesOf", () => {
+	const box = (interval: string, amount: number, billingUnits: number) => ({
+		featureId: "box_gb_minutes",
+		price: { amount, interval, billingUnits },
+	});
+	const plan = (...items: ReturnType<typeof box>[]): AutumnCatalogPlan => ({
+		id: "team",
+		name: "Team",
+		items,
+	});
+	const row = (
+		interval: string,
+		billingMethod: string,
+		amount: number | undefined,
+		billingUnits: number,
+		prepaidGrant = 0,
+	) => ({
+		includedGrant: 0,
+		prepaidGrant,
+		reset: { interval },
+		price: { amount, billingUnits, billingMethod },
+	});
+	const catalogTeam = plan(box("month", 1, 1000), box("one_off", 0.06, 60));
+	const customTeam = plan(box("month", 0.5, 1000), box("one_off", 0.04, 60));
+
+	test("a catalog customer gets the catalog prices", () => {
+		expect(
+			gbHourRatesOf(
+				{ breakdown: [row("month", "usage_based", 1, 1000)] },
+				catalogTeam,
+			),
+		).toEqual({
+			overagePerGbHour: 0.06,
+			boughtPerGbHour: null,
+			pack: { gbMinutes: 60, price: 0.06 },
+		});
+	});
+
+	test("a custom-priced customer gets its own prices from its balance rows and plan version", () => {
+		expect(
+			gbHourRatesOf(
+				{
+					breakdown: [
+						row("month", "usage_based", 0.5, 1000),
+						row("one_off", "prepaid", 0.04, 60, 6000),
+					],
+				},
+				customTeam,
+			),
+		).toEqual({
+			overagePerGbHour: 0.03,
+			boughtPerGbHour: 0.04,
+			pack: { gbMinutes: 60, price: 0.04 },
+		});
+	});
+
+	test("the balance row's price wins over the plan's", () => {
+		expect(
+			gbHourRatesOf(
+				{ breakdown: [row("month", "usage_based", 0.5, 1000)] },
+				catalogTeam,
+			).overagePerGbHour,
+		).toBe(0.03);
+	});
+
+	test("the next pack is the plan's price, not the price of credit bought earlier", () => {
+		const rates = gbHourRatesOf(
+			{
+				breakdown: [
+					row("one_off", "prepaid", 0.06, 60, 60_000),
+					row("one_off", "prepaid", 0.04, 60, 6000),
+				],
+			},
+			customTeam,
+		);
+		expect(rates.pack).toEqual({ gbMinutes: 60, price: 0.04 });
+		expect(rates.boughtPerGbHour).toBeCloseTo((60 + 4) / 1100);
+	});
+
+	test("with no balance rows the plan prices it; with neither there is no price", () => {
+		expect(gbHourRatesOf(undefined, customTeam).overagePerGbHour).toBe(0.03);
+		expect(gbHourRatesOf(undefined, undefined)).toEqual({
+			overagePerGbHour: null,
+			boughtPerGbHour: null,
+			pack: null,
+		});
+	});
+
+	test("a pack is never the overage price", () => {
+		expect(
+			gbHourRatesOf(undefined, plan(box("one_off", 0.04, 60))).overagePerGbHour,
+		).toBeNull();
+	});
+
+	test("a tiered price has no single rate", () => {
+		expect(
+			gbHourRatesOf(
+				{
+					breakdown: [
+						row("month", "usage_based", undefined, 1000),
+						row("one_off", "prepaid", undefined, 60, 6000),
+					],
+				},
+				undefined,
+			),
+		).toMatchObject({ overagePerGbHour: null, boughtPerGbHour: null });
+	});
+
+	test("a bought row with nothing granted does not count", () => {
+		expect(
+			gbHourRatesOf(
+				{
+					breakdown: [
+						row("one_off", "prepaid", undefined, 60),
+						row("one_off", "prepaid", 0.04, 60, 6000),
+					],
+				},
+				undefined,
+			).boughtPerGbHour,
+		).toBeCloseTo(0.04);
 	});
 });

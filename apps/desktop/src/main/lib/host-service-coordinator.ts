@@ -12,6 +12,7 @@ import {
 	HOST_CHAT_RESUME_MARKER_FILE,
 	HOST_INSTALL_SOURCE_ENV,
 } from "@superset/shared/host-version";
+import { publicEnvPair } from "@superset/shared/public-env";
 import { eq } from "drizzle-orm";
 import { app, dialog } from "electron";
 import log from "electron-log/main";
@@ -871,7 +872,7 @@ export class HostServiceCoordinator extends EventEmitter {
 	): Promise<Connection | null> {
 		if (!isStartAllowed()) throw new Error("Host service start cancelled");
 		const manifest = this.deps.readManifest(organizationId);
-		if (!manifest) return null;
+		if (!manifest || !this.deps.isProcessAlive(manifest.pid)) return null;
 
 		let port: number;
 		try {
@@ -885,6 +886,8 @@ export class HostServiceCoordinator extends EventEmitter {
 			manifest.endpoint,
 			manifest.authToken,
 			ADOPT_HEALTH_TIMEOUT_MS,
+			() => !isStartAllowed() || !this.deps.isProcessAlive(manifest.pid),
+			manifest.pid,
 		);
 		if (!healthy) return null;
 		if (!isStartAllowed()) throw new Error("Host service start cancelled");
@@ -1118,7 +1121,7 @@ export class HostServiceCoordinator extends EventEmitter {
 				? { SUPERSET_CHAT_V3_CLAUDE_BIN: chatV3ClaudeBin() as string }
 				: {}),
 			DESKTOP_VITE_PORT: String(sharedEnv.DESKTOP_VITE_PORT),
-			SUPERSET_HOME_DIR: SUPERSET_HOME_DIR,
+			...publicEnvPair("HOME_DIR", SUPERSET_HOME_DIR),
 			SUPERSET_LEGACY_WORKTREE_BASE_DIR: row?.worktreeBaseDir ?? "",
 			// BROWSER_BRIDGE_URL/SECRET are set (or stripped) after the shell-env
 			// merge below, alongside RELAY_URL, so an inherited value can't leak

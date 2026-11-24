@@ -1,8 +1,9 @@
 import { getHostId } from "@superset/shared/host-info";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { resolveHostTarget } from "../../../../../lib/host-target";
 
 export function watchTerminalId(): string | undefined {
-	return process.env.SUPERSET_TERMINAL_ID;
+	return readPublicEnv("TERMINAL_ID");
 }
 
 export async function registerWatch({

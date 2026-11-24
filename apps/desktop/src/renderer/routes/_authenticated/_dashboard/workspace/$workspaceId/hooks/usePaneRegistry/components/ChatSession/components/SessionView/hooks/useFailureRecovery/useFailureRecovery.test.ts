@@ -99,3 +99,23 @@ test("a restart after a sign-in resends the prompt the agent never ran", async (
 	await hook.result.current.failureActions.restartAndContinue?.();
 	expect(onRestartAndContinue.mock.calls).toEqual([["Say hello in one word."]]);
 });
+
+test("Change model is offered for a one-model agent when another agent can take over", () => {
+	const oneModel: SessionConfigOption = {
+		...MODEL,
+		options: [{ id: "sonnet", label: "Sonnet" }],
+	};
+	const render = (canSwitchAgent: boolean) =>
+		renderHook(() =>
+			useFailureRecovery({
+				blocked: false,
+				canSwitchAgent,
+				configOptions: [oneModel],
+				openModelPicker: () => {},
+				sendPrompt: () => {},
+				setConfigOption: async () => {},
+			}),
+		).result.current.failureActions.changeModel;
+	expect(render(false)).toBeUndefined();
+	expect(render(true)).toBeDefined();
+});

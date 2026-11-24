@@ -1,156 +1,174 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import type { ReactNode } from "react";
+import { PageLink } from "../PageLink";
+import { Alert, AlertTitle } from "../ui/alert";
 import { AllowanceCard } from "./components/AllowanceCard";
-import { PeriodPicker } from "./components/PeriodPicker";
+import { MemberSummary } from "./components/MemberSummary";
+import { PageHeader } from "./components/PageHeader";
+import { PeriodStepper } from "./components/PeriodStepper";
 import { QueryStatus } from "./components/QueryStatus";
+import { Section } from "./components/Section";
 import { UsageByDay } from "./components/UsageByDay";
 import { UsageByPerson } from "./components/UsageByPerson";
-import { UsageTotals } from "./components/UsageTotals";
-import { WorkspaceBootsSheet } from "./components/WorkspaceBootsSheet";
 import { WorkspacesTable } from "./components/WorkspacesTable";
 import type {
-	CloudBoots,
-	CloudPages,
 	CloudPeriod,
 	CloudPeriods,
 	CloudQuery,
 	CloudUsage,
-	WorkspaceRef,
+	CloudUsageLink,
 } from "./types";
+import { billingDate } from "./utils/billingDay";
 import { hasUsage } from "./utils/hasUsage";
+import { periodParam } from "./utils/periodParam";
+import { priced, pricedQuery } from "./utils/priced";
 
 interface CloudUsagePageProps {
+	Link: CloudUsageLink;
 	isAdmin: boolean;
-	/** Beside the period picker, such as a link to billing. */
-	actions?: ReactNode;
 	periods: CloudQuery<CloudPeriods>;
 	period: CloudPeriod | undefined;
-	onPeriodChange: (periodId: string) => void;
 	byDay: CloudQuery<CloudUsage>;
 	byPerson: CloudQuery<CloudUsage>;
-	workspaces: CloudPages<CloudUsage>;
-	workspace: WorkspaceRef | null;
-	onWorkspaceChange: (workspace: WorkspaceRef | null) => void;
-	boots: CloudPages<CloudBoots>;
+	/** The top workspaces; the Workspaces page has the rest. */
+	workspaces: CloudQuery<CloudUsage>;
+	/** The billing day (Pacific) the page counts as today; the current one by default. */
+	today?: string;
 }
 
 export function CloudUsagePage({
+	Link,
 	isAdmin,
-	actions,
 	periods,
 	period,
-	onPeriodChange,
-	byDay,
-	byPerson,
-	workspaces,
-	workspace,
-	onWorkspaceChange,
-	boots,
+	byDay: unpricedByDay,
+	byPerson: unpricedByPerson,
+	workspaces: unpricedWorkspaces,
+	today = billingDate(new Date()),
 }: CloudUsagePageProps) {
-	const allowance = isAdmin ? period?.allowance : null;
+	const param = periodParam(periods.data?.items, period);
+	const byDay = pricedQuery(unpricedByDay);
+	const byPerson = pricedQuery(unpricedByPerson);
+	const workspaces = pricedQuery(unpricedWorkspaces);
+	const allowance = period?.allowance ? priced(period.allowance) : null;
+	const unpriced = Boolean(period?.allowance) && allowance === null;
+	const workspaceCount = workspaces.data?.total.workspaces ?? null;
 
 	return (
-		<div className="space-y-8">
-			<div className="flex flex-wrap items-end justify-between gap-4">
-				<div className="min-w-0">
-					<h2 className="text-xl font-medium">
-						{isAdmin ? (
-							<Trans>Cloud usage</Trans>
-						) : (
-							<Trans>Your cloud usage</Trans>
-						)}
-					</h2>
-					<p className="mt-1 text-sm text-muted-foreground">
-						{isAdmin ? (
-							<Trans>Cloud workspace usage for the whole organization.</Trans>
-						) : (
-							<Trans>
-								Only your own workspaces. Organization totals are for owners and
-								admins.
-							</Trans>
-						)}
-					</p>
-				</div>
-				{(period || actions) && (
-					<div className="flex w-full items-center gap-2 sm:w-auto">
-						{period && periods.data && (
-							<PeriodPicker
-								periods={periods.data.items}
-								value={period.id}
-								onChange={onPeriodChange}
-							/>
-						)}
-						{actions}
-					</div>
-				)}
-			</div>
-
-			{periods.data && !period && (
-				<p className="text-sm text-muted-foreground">
-					<Trans>
-						This organization has no billing periods, so this page shows the
-						last 30 days.
-					</Trans>
-				</p>
-			)}
-
-			{allowance && <AllowanceCard allowance={allowance} />}
-
-			{!periods.data || !byDay.data ? (
+		<div className="@container space-y-6">
+			<PageHeader
+				Link={Link}
+				title={
+					isAdmin ? <Trans>Cloud usage</Trans> : <Trans>Your cloud usage</Trans>
+				}
+				period={
+					periods.data && (
+						<PeriodStepper
+							Link={Link}
+							periods={periods.data.items}
+							period={period}
+							to={(id) => ({ view: "overview", period: id })}
+						/>
+					)
+				}
+			/>
+			{!periods.data || !byDay.data || unpriced ? (
 				<QueryStatus
-					isError={periods.isError || byDay.isError}
-					onRetry={() =>
-						periods.isError ? periods.refetch() : byDay.refetch()
-					}
+					isError={periods.isError || byDay.isError || unpriced}
+					onRetry={() => {
+						periods.refetch();
+						byDay.refetch();
+					}}
 				/>
-			) : !hasUsage(byDay.data.total) ? (
-				<p className="rounded-md border border-dashed py-12 text-center text-sm text-muted-foreground">
-					{isAdmin ? (
-						<Trans>No cloud usage in this period.</Trans>
-					) : (
-						<Trans>You have no cloud usage in this period.</Trans>
-					)}
-				</p>
 			) : (
 				<>
-					<UsageTotals total={byDay.data.total} showGbHours={!allowance} />
-					{isAdmin && period?.closed && (
-						<p className="text-sm text-muted-foreground">
-							<Trans>
-								The included and overage GB-hours are kept for the current
-								period only.
-							</Trans>
-						</p>
+					{period?.allowance?.limitReached && !period.closed && (
+						<Alert variant="warning">
+							<AlertTitle className="line-clamp-none">
+								<Trans>
+									Cloud usage is used up for this period. Workspaces cannot
+									start.
+								</Trans>
+							</AlertTitle>
+						</Alert>
 					)}
-					<div className="grid gap-8 lg:grid-cols-3">
-						<UsageByDay
-							className={isAdmin ? "lg:col-span-2" : "lg:col-span-3"}
-							items={byDay.data.items}
-							window={byDay.data.range}
-							title={
-								isAdmin ? (
-									<Trans>Usage by day</Trans>
-								) : (
-									<Trans>Your usage by day</Trans>
-								)
+					{isAdmin ? (
+						<AllowanceCard
+							metered={{
+								gbHours: byDay.data.total.gbHours,
+								usd: byDay.data.total.usageUsd,
+							}}
+							ratePerGbHour={periods.data.ratePerGbHour}
+							allowance={allowance}
+							unavailable={period?.unavailable ?? []}
+							isPeriod={period !== undefined}
+							seats={allowance?.seats ?? null}
+							billing={
+								<PageLink>
+									<Link to={{ view: "billing" }}>
+										<Trans>Billing</Trans>
+									</Link>
+								</PageLink>
 							}
 						/>
-						{isAdmin && <UsageByPerson byPerson={byPerson} />}
-					</div>
-					<WorkspacesTable
-						pages={workspaces}
-						isAdmin={isAdmin}
-						onSelect={onWorkspaceChange}
-					/>
+					) : (
+						<MemberSummary
+							total={byDay.data.total}
+							workspaces={workspaceCount}
+							isPeriod={period !== undefined}
+						/>
+					)}
+					{hasUsage({ ...byDay.data.total, workspaces: workspaceCount }) && (
+						<>
+							<UsageByDay
+								today={today}
+								usage={byDay.data}
+								title={
+									isAdmin ? (
+										<Trans>By day</Trans>
+									) : (
+										<Trans>Your usage by day</Trans>
+									)
+								}
+							/>
+							{isAdmin && (
+								<UsageByPerson Link={Link} byPerson={byPerson} period={param} />
+							)}
+							<Section
+								title={
+									isAdmin ? (
+										<Trans>Workspaces</Trans>
+									) : (
+										<Trans>Your workspaces</Trans>
+									)
+								}
+								action={
+									<PageLink>
+										<Link to={{ view: "workspaces", period: param }}>
+											<Trans>All workspaces</Trans>
+										</Link>
+									</PageLink>
+								}
+							>
+								{!workspaces.data ? (
+									<QueryStatus
+										isError={workspaces.isError}
+										onRetry={() => workspaces.refetch()}
+									/>
+								) : (
+									<WorkspacesTable
+										Link={Link}
+										rows={workspaces.data.items}
+										isAdmin={isAdmin}
+										period={param}
+									/>
+								)}
+							</Section>
+						</>
+					)}
 				</>
 			)}
-			<WorkspaceBootsSheet
-				workspace={workspace}
-				pages={boots}
-				onClose={() => onWorkspaceChange(null)}
-			/>
 		</div>
 	);
 }

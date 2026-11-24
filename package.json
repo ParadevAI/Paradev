@@ -52,6 +52,7 @@
 		"check:plugins": "bun scripts/check-plugins.ts",
 		"check:i18n": "bun run --cwd packages/i18n check",
 		"typecheck:release": "tsc -p scripts/release/tsconfig.json",
+		"typecheck:test-preload": "tsc -p scripts/tsconfig.test-preload.json",
 		"test:release": "bun test scripts/release",
 		"db:push": "bun run --cwd packages/db push",
 		"db:migrate": "bun run --cwd packages/db migrate",

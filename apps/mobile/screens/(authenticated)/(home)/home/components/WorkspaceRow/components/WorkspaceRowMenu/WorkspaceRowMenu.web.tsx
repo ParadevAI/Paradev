@@ -53,16 +53,6 @@ export function WorkspaceRowMenu({
 						<Text>{t({ message: "Rename" })}</Text>
 					</ContextMenuItem>
 				) : null}
-				{canDelete && isCloud ? (
-					<ContextMenuItem onPress={onDelete}>
-						<Text>{t({ message: "Archive" })}</Text>
-					</ContextMenuItem>
-				) : null}
-				{canDelete && !isCloud ? (
-					<ContextMenuItem variant="destructive" onPress={onDelete}>
-						<Text>{t({ message: "Delete" })}</Text>
-					</ContextMenuItem>
-				) : null}
 				<ContextMenuSeparator />
 				{url && link ? (
 					<>
@@ -86,6 +76,17 @@ export function WorkspaceRowMenu({
 				<ContextMenuItem onPress={() => onShare()}>
 					<Text>{t({ message: "Share" })}</Text>
 				</ContextMenuItem>
+				{canDelete ? <ContextMenuSeparator /> : null}
+				{canDelete && isCloud ? (
+					<ContextMenuItem onPress={onDelete}>
+						<Text>{t({ message: "Archive" })}</Text>
+					</ContextMenuItem>
+				) : null}
+				{canDelete && !isCloud ? (
+					<ContextMenuItem variant="destructive" onPress={onDelete}>
+						<Text>{t({ message: "Delete" })}</Text>
+					</ContextMenuItem>
+				) : null}
 			</ContextMenuContent>
 		</ContextMenu>
 	);

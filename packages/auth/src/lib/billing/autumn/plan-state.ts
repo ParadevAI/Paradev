@@ -21,6 +21,7 @@ const FREE: OrganizationBilling = {
 	scheduledAt: null,
 	periodStart: null,
 	periodEnd: null,
+	startedAt: null,
 	billingInterval: null,
 	lapsed: false,
 	paymentState: { kind: "ok" },
@@ -39,6 +40,7 @@ const FAIL_OPEN: OrganizationBilling = {
 	scheduledAt: null,
 	periodStart: null,
 	periodEnd: null,
+	startedAt: null,
 	billingInterval: null,
 	lapsed: false,
 	paymentState: { kind: "ok" },
@@ -73,6 +75,12 @@ async function readShared(key: string): Promise<OrganizationBilling | null> {
 			cloudUsage: value.cloudUsage && {
 				...value.cloudUsage,
 				overagePerGbHour: value.cloudUsage.overagePerGbHour ?? null,
+				boughtPerGbHour: value.cloudUsage.boughtPerGbHour ?? null,
+				bought: value.cloudUsage.bought ?? null,
+				freeCredits: value.cloudUsage.freeCredits ?? null,
+				seats: value.cloudUsage.seats ?? null,
+				overageLimit: value.cloudUsage.overageLimit ?? null,
+				limitReached: value.cloudUsage.limitReached ?? null,
 			},
 			environmentLimit:
 				value.environmentLimit !== undefined

@@ -1,1 +1,0 @@
-export { SizeLabel } from "./SizeLabel";

@@ -1,39 +1,21 @@
 "use client";
 
-import { Trans } from "@lingui/react/macro";
-import { Button } from "@superset/ui/button";
 import {
 	CloudUsagePage,
 	cloudUsageQueries,
-	PERIODS_INPUT,
-	selectedPeriod,
-	usageRange,
-	type WorkspaceRef,
 } from "@superset/ui/cloud-usage-page";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
+import { useCloudUsagePeriod } from "../../hooks/useCloudUsagePeriod";
+import { CloudUsageLink } from "../CloudUsageLink";
 
-interface CloudUsageSettingsProps {
-	isAdmin: boolean;
-	isOwner: boolean;
-}
-
-export function CloudUsageSettings({
-	isAdmin,
-	isOwner,
-}: CloudUsageSettingsProps) {
+export function CloudUsageSettings({ isAdmin }: { isAdmin: boolean }) {
 	const trpc = useTRPC();
-	const periods = useQuery(trpc.cloud.periods.list.queryOptions(PERIODS_INPUT));
-	const [periodId, setPeriodId] = useState<string>();
-	const [workspace, setWorkspace] = useState<WorkspaceRef | null>(null);
-	const period = selectedPeriod(periods.data?.items, periodId);
+	const { periods, period, range } = useCloudUsagePeriod();
 	const queries = cloudUsageQueries({
-		range: usageRange(period),
+		range,
 		periodsLoaded: periods.isSuccess,
 		isAdmin,
-		workspaceId: workspace?.id,
 	});
 	const byDay = useQuery({
 		...trpc.cloud.usage.query.queryOptions(queries.byDay.input),
@@ -43,41 +25,21 @@ export function CloudUsageSettings({
 		...trpc.cloud.usage.query.queryOptions(queries.byPerson.input),
 		enabled: queries.byPerson.enabled,
 	});
-	const workspaces = useInfiniteQuery({
-		...trpc.cloud.usage.query.infiniteQueryOptions(queries.workspaces.input, {
-			getNextPageParam: (page) => page.nextCursor,
-		}),
-		enabled: queries.workspaces.enabled,
-	});
-	const boots = useInfiniteQuery({
-		...trpc.cloud.boots.list.infiniteQueryOptions(queries.boots.input, {
-			getNextPageParam: (page) => page.nextCursor,
-		}),
-		enabled: queries.boots.enabled,
+	const workspaces = useQuery({
+		...trpc.cloud.usage.query.queryOptions(queries.topWorkspaces.input),
+		enabled: queries.topWorkspaces.enabled,
 	});
 
 	return (
 		<div className="mx-auto max-w-5xl">
 			<CloudUsagePage
+				Link={CloudUsageLink}
 				isAdmin={isAdmin}
-				actions={
-					isOwner && (
-						<Button variant="outline" asChild>
-							<Link href="/settings/billing">
-								<Trans>Billing</Trans>
-							</Link>
-						</Button>
-					)
-				}
 				periods={periods}
 				period={period}
-				onPeriodChange={setPeriodId}
 				byDay={byDay}
 				byPerson={byPerson}
 				workspaces={workspaces}
-				workspace={workspace}
-				onWorkspaceChange={setWorkspace}
-				boots={boots}
 			/>
 		</div>
 	);

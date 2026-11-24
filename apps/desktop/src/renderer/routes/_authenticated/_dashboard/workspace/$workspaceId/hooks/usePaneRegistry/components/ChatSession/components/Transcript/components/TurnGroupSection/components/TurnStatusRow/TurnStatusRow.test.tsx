@@ -276,7 +276,7 @@ test("a cloud workspace shows no paused row", () => {
 					},
 				],
 				isReady: true,
-				agentCredentialsChangedWorkspaceId: null,
+				agentsToRestart: null,
 				usageRefusal: null,
 				wakeOpenWorkspace: async () => {},
 			}}

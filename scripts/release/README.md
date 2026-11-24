@@ -1,8 +1,7 @@
 # Releasing
 
 The release toolchain is `scripts/release/*.ts` (TypeScript, run by Bun — no build
-step). One entry point: **`bun run release`**. Design/rationale lives in
-[`plans/20260709-unified-version-bumping.md`](../../plans/20260709-unified-version-bumping.md).
+step). One entry point: **`bun run release`**.
 
 ## Model
 
@@ -92,7 +91,7 @@ gcloud compute ssh superset-review-host --zone=us-west1-b --command \
 Nothing did this for three weeks, which is how the box sat on 1.22.0 from
 2026-08-14 to 2026-09-05 while the app shipped 1.26.0, 404ing on seven procedures
 the mobile app calls — with no upgrade prompt, because it still cleared
-`MIN_HOST_SERVICE_VERSION`. Background: `apps/review-host/README.md`.
+`MIN_HOST_SERVICE_VERSION`.
 
 ## When the daemon guard blocks
 

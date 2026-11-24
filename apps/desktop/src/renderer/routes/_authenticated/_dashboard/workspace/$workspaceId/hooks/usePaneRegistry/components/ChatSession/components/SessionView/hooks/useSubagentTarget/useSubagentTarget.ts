@@ -10,7 +10,7 @@ import type { Item, UserContent, UserMessage } from "@superset/chat/protocol";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { toast } from "@superset/ui/sonner";
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { ComposerTarget } from "../../../Composer";
+import type { ComposerTarget, SubagentBlock } from "../../../Composer";
 
 type Send = (
 	content: UserContent[],
@@ -63,6 +63,7 @@ export function useSubagentTarget({
 } {
 	const { t } = useLingui();
 	const [hostCannotSteer, setHostCannotSteer] = useState(false);
+	const hostCannotSteerRef = useRef(false);
 	const [steers, setSteers] = useState<QueuedSteer[]>([]);
 	const steerCount = useRef(0);
 	const itemsRef = useRef(items);
@@ -77,17 +78,29 @@ export function useSubagentTarget({
 	});
 	const canStop = item?.canStop === true;
 
-	const disabledReason = !item
+	const blockedBy: SubagentBlock | undefined = !item
 		? undefined
 		: hostCannotSteer
-			? hostTooOldReason
+			? "host"
 			: outcome === "stopped"
-				? t({ message: `${name} stopped` })
+				? "stopped"
 				: item.canSteer
 					? undefined
 					: outcome === "failed"
-						? t({ message: `${name} failed` })
-						: unreachableReason;
+						? "failed"
+						: outcome === "running"
+							? "agent"
+							: "ended";
+	const disabledReason =
+		blockedBy === "host"
+			? hostTooOldReason
+			: blockedBy === "stopped"
+				? t({ message: `${name} stopped` })
+				: blockedBy === "failed"
+					? t({ message: `${name} failed` })
+					: blockedBy === "agent" || blockedBy === "ended"
+						? unreachableReason
+						: undefined;
 
 	const stop = useCallback(() => {
 		if (itemId) onStop(itemId);
@@ -98,11 +111,13 @@ export function useSubagentTarget({
 			itemId
 				? {
 						name,
-						...(disabledReason ? { disabledReason } : {}),
+						...(blockedBy && disabledReason
+							? { disabledReason, blockedBy }
+							: {}),
 						...(canStop ? { onStop: stop } : {}),
 					}
 				: undefined,
-		[itemId, name, disabledReason, canStop, stop],
+		[itemId, name, disabledReason, blockedBy, canStop, stop],
 	);
 
 	const steer = useCallback(
@@ -123,6 +138,25 @@ export function useSubagentTarget({
 			setSteers((current) => [...current, entry]);
 			const drop = () =>
 				setSteers((current) => current.filter(({ id }) => id !== entry.id));
+			const stillSteerable = () => {
+				const current = subagentItem(itemsRef.current, itemId);
+				return (
+					!hostCannotSteerRef.current &&
+					current?.canSteer === true &&
+					subagentOutcome(current) !== "stopped"
+				);
+			};
+			const giveBack = (toMainChat: boolean, message: string) => {
+				drop();
+				onUnsent(content, toMainChat ? draftKey : origin);
+				toast.error(message);
+			};
+			const backInMainChat = t({
+				message: `${name} can't take messages. Your text is back in the main chat.`,
+			});
+			const backInComposer = t({
+				message: "Couldn't send your message. It's back in the composer.",
+			});
 			try {
 				const result = await client.steerSubagent(itemId, content);
 				if (result === "steered") {
@@ -133,34 +167,27 @@ export function useSubagentTarget({
 					);
 					return;
 				}
-				drop();
-				onUnsent(content, origin);
 				if (result === "unsupported") {
+					hostCannotSteerRef.current = true;
 					setHostCannotSteer(true);
-					toast.error(hostTooOldReason);
-				} else {
-					toast.error(unreachableReason);
+					giveBack(
+						true,
+						t({
+							message:
+								"Update this host to message subagents. Your text is back in the main chat.",
+						}),
+					);
+					return;
 				}
+				const steerable = stillSteerable();
+				giveBack(!steerable, steerable ? backInComposer : backInMainChat);
 			} catch (error) {
 				console.warn("[useSubagentTarget] could not message subagent", error);
-				drop();
-				onUnsent(content, origin);
-				toast.error(
-					t({
-						message: "Couldn't send your message. It's back in the composer.",
-					}),
-				);
+				const steerable = stillSteerable();
+				giveBack(!steerable, steerable ? backInComposer : backInMainChat);
 			}
 		},
-		[
-			client,
-			itemId,
-			draftKey,
-			onUnsent,
-			hostTooOldReason,
-			unreachableReason,
-			t,
-		],
+		[client, itemId, draftKey, onUnsent, name, t],
 	);
 
 	const queued = useMemo(() => {

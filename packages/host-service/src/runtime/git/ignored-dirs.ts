@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { resolveCommand } from "@superset/shared/resolve-command";
 
 const execFileAsync = promisify(execFile);
 
@@ -33,7 +34,7 @@ export async function listGitIgnoredDirs(
 ): Promise<string[]> {
 	try {
 		const { stdout } = await execFileAsync(
-			"git",
+			resolveCommand("git"),
 			[
 				"--literal-pathspecs",
 				"-C",

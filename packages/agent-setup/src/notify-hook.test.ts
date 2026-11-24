@@ -25,7 +25,9 @@ function renderNotifyHookScript(): string {
 }
 
 const ambientEnvWithoutSuperset = Object.fromEntries(
-	Object.entries(process.env).filter(([key]) => !key.startsWith("SUPERSET_")),
+	Object.entries(process.env).filter(
+		([key]) => !key.startsWith("SUPERSET_") && !key.startsWith("PARADEV_"),
+	),
 );
 
 function hookEnv(envOverrides: Record<string, string>) {
@@ -319,6 +321,29 @@ describe("getNotifyScriptContent", () => {
 
 		expect(result.exitCode).toBe(0);
 		expect(result.stderr.toString()).toContain("[notify-hook] event=Stop");
+	});
+
+	it("prefers SUPERSET_ terminal variables over PARADEV_ ones", () => {
+		const result = runNotifyHook(
+			{ hook_event_name: "Stop", session_id: "main-session" },
+			{
+				SUPERSET_TERMINAL_ID: "old-terminal",
+				PARADEV_TERMINAL_ID: "new-terminal",
+			},
+		);
+
+		expect(result.exitCode).toBe(0);
+		expect(result.stderr.toString()).toContain("terminalId=old-terminal");
+	});
+
+	it("uses PARADEV_ terminal variables when SUPERSET_ ones are unset", () => {
+		const result = runNotifyHook(
+			{ hook_event_name: "Stop", session_id: "main-session" },
+			{ SUPERSET_TERMINAL_ID: "", PARADEV_TERMINAL_ID: "new-terminal" },
+		);
+
+		expect(result.exitCode).toBe(0);
+		expect(result.stderr.toString()).toContain("terminalId=new-terminal");
 	});
 
 	it("exits silently outside Paradev terminals even with a payload session id", () => {

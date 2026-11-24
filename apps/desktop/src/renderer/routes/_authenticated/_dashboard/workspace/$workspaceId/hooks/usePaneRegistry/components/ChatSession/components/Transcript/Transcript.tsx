@@ -400,7 +400,10 @@ export function Transcript({
 		});
 
 	return (
-		<MessageScroller.Root className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+		<MessageScroller.Root
+			data-theme-surface="chat"
+			className="relative flex min-h-0 min-w-0 flex-1 flex-col"
+		>
 			<ChatImageGalleryProvider images={gallery}>
 				<TranscriptFindBar
 					currentIndex={find.currentIndex}

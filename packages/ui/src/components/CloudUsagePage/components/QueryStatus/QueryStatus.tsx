@@ -1,7 +1,10 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { LuCircleAlert } from "react-icons/lu";
+import { Alert, AlertTitle } from "../../../ui/alert";
 import { Button } from "../../../ui/button";
+import { Skeleton } from "../../../ui/skeleton";
 
 interface QueryStatusProps {
 	isError: boolean;
@@ -11,17 +14,23 @@ interface QueryStatusProps {
 export function QueryStatus({ isError, onRetry }: QueryStatusProps) {
 	if (!isError) {
 		return (
-			<p className="py-12 text-center text-sm text-muted-foreground">
-				<Trans>Loading...</Trans>
-			</p>
+			<div>
+				<output className="sr-only">
+					<Trans>Loading...</Trans>
+				</output>
+				<Skeleton aria-hidden className="h-32 w-full rounded-xl" />
+			</div>
 		);
 	}
 	return (
-		<div className="flex flex-wrap items-center justify-center gap-3 py-12 text-sm text-muted-foreground">
-			<Trans>Could not load cloud usage.</Trans>
-			<Button size="sm" variant="outline" onClick={onRetry}>
-				<Trans>Retry</Trans>
-			</Button>
-		</div>
+		<Alert variant="destructive" className="items-center">
+			<LuCircleAlert />
+			<AlertTitle className="flex items-center justify-between gap-4">
+				<Trans>Failed to load usage</Trans>
+				<Button size="sm" variant="outline" onClick={onRetry}>
+					<Trans>Retry</Trans>
+				</Button>
+			</AlertTitle>
+		</Alert>
 	);
 }

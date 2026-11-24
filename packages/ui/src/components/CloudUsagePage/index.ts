@@ -1,6 +1,16 @@
 export { CloudUsagePage } from "./CloudUsagePage";
+export { BillingUsageCard } from "./components/BillingUsageCard";
+export { CloudWorkspacePage } from "./components/CloudWorkspacePage";
+export { CloudWorkspacesPage } from "./components/CloudWorkspacesPage";
+export { GbHourPurchase } from "./components/GbHourPurchase";
 export { QueryStatus } from "./components/QueryStatus";
-export type { WorkspaceRef } from "./types";
+export type {
+	CloudUsageLink,
+	CloudUsageTarget,
+	WorkspacesFilters,
+	WorkspacesTarget,
+} from "./types";
 export { cloudUsageQueries, PERIODS_INPUT } from "./utils/cloudUsageQueries";
 export { selectedPeriod } from "./utils/selectedPeriod";
 export { usageRange } from "./utils/usageRange";
+export { workspacesFilters } from "./utils/workspacesFilters";

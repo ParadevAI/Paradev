@@ -209,6 +209,11 @@
 		@apply bg-background text-foreground;
 	}
 
+	code {
+		user-select: text;
+		cursor: text;
+	}
+
 	html,
 	body {
 		width: 100vw;

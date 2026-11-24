@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { boxLogsEnabled, organizationFlagEnabled } from "./feature-flags";
+import { organizationFlagEnabled } from "./feature-flags";
 
 const ORG = "6f1c2b8e-1d2a-4c55-9a3e-0b7f5d2c9e11";
 
@@ -43,29 +43,5 @@ describe("organizationFlagEnabled", () => {
 				),
 			).toBe(false);
 		}
-	});
-});
-
-describe("boxLogsEnabled", () => {
-	test("is on when the fleet switch and the organization's flag are both on", async () => {
-		const posthog = flags({
-			"sandbox-box-logs-fleet": on,
-			"sandbox-box-logs": on,
-		});
-		expect(await boxLogsEnabled(posthog, ORG)).toBe(true);
-		expect(posthog.asked.map((args) => args.slice(0, 2))).toEqual([
-			["sandbox-box-logs-fleet", "sandbox-fleet"],
-			["sandbox-box-logs", ORG],
-		]);
-		expect(posthog.asked[0]?.[2]).toEqual({ sendFeatureFlagEvents: false });
-	});
-
-	test("with the fleet switch off, asks nothing else and is off", async () => {
-		const posthog = flags({
-			"sandbox-box-logs-fleet": off,
-			"sandbox-box-logs": on,
-		});
-		expect(await boxLogsEnabled(posthog, ORG)).toBe(false);
-		expect(posthog.asked).toHaveLength(1);
 	});
 });

@@ -99,7 +99,7 @@ export function createGrokHooksJson(): void {
 		getGrokHooksJsonContent(),
 		0o644,
 	);
-	console.log(
+	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} Grok hooks json`,
 	);
 }

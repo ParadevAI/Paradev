@@ -1,6 +1,7 @@
 import { normalizeWorkspaceTags } from "@superset/shared/workspace-tags";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
 import { useDashboardSidebarActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarActionsProvider";
 import {
@@ -8,6 +9,7 @@ import {
 	useSidebarWorkspaceStatus,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarWorkspaceStatusProvider";
 import { useWorkspaceMenuActions } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMenuActions";
+import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { applyFolderTagChange } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 
@@ -33,7 +35,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 	branch,
 	isPinned = false,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const { requestSectionRename } = useDashboardSidebarSectionRename();
 	const markWorkspaceTerminalsSeen =
@@ -97,11 +99,11 @@ export function useDashboardSidebarWorkspaceItemActions({
 
 	const handleClick = () => {
 		if (isRenaming) return;
-		clearWorkspaceAttention();
-		navigate({
-			to: "/workspace/$workspaceId",
-			params: { workspaceId },
-		});
+		void navigateToWorkspaceAndThen(
+			workspaceId,
+			router,
+			clearWorkspaceAttention,
+		).catch(reportRendererError);
 	};
 
 	const startRename = () => {

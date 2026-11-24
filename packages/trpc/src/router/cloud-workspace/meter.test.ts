@@ -31,6 +31,8 @@ const MINUTE = 60_000;
 const NOW = Date.now();
 
 let boot: Record<string, unknown> | null;
+/** Open boots a select returns; the one `boot` when null. */
+let openBoots: Record<string, unknown>[] | null;
 let session: BoxSession | null;
 let renewalAllowed: boolean;
 let finalizeError: Error | null;
@@ -103,7 +105,9 @@ stub(db, {
 		let source: unknown;
 		return chain(
 			() => {
-				if (source === cloudWorkspaceBoots) return boot ? [boot] : [];
+				if (source === cloudWorkspaceBoots) {
+					return openBoots ?? (boot ? [boot] : []);
+				}
 				if (source === users) {
 					return [{ name: "Ada Lovelace", email: "ada@example.com" }];
 				}
@@ -222,6 +226,14 @@ stub(autumnClient.balances, {
 
 const dialect = new PgDialect();
 
+/** The usage rows a write appends to the boot's pending list. */
+function pendingOf(write: Record<string, unknown> | undefined) {
+	const value = write?.pendingUsageEvents;
+	if (value === undefined) return undefined;
+	const { params } = dialect.sqlToQuery(value as SQL);
+	return JSON.parse(String(params.at(-1)));
+}
+
 /** The end reason a write sets: a value, or the SQL that keeps one already written. */
 function endReasonOf(write: Record<string, unknown> | undefined) {
 	const value = write?.endReason;
@@ -276,6 +288,7 @@ beforeEach(() => {
 	usageStopAt = null;
 	creatorId = "user_1";
 	delayedSettles = [];
+	openBoots = null;
 	updateMatches = true;
 	insertConflicts = false;
 	insertError = null;
@@ -320,6 +333,30 @@ describe("releaseBoot", () => {
 			'coalesce("cloud_workspace_boots"."end_reason", $1) ["failed"]',
 			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
 		]);
+	});
+
+	test("a release of a lock Autumn no longer has closes it, with no Sentry event", async () => {
+		finalizeError = autumnError(404, "Lock not found");
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
+	});
+
+	test("a release Autumn refuses is reported and leaves the lock open, and the next settle releases it", async () => {
+		finalizeError = autumnError(503);
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([finalizeError]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: true });
+
+		finalizeError = null;
+		const stoppedAt = new Date(NOW - MINUTE);
+		boot = { ...boot, stoppedAt, finalizedThrough: stoppedAt, lockOpen: true };
+		autumnCalls = [];
+		expect(await settleBoot("boot_1")).toBe("closed");
+		expect(
+			autumnCalls.filter((call) => call.method === "finalize"),
+		).toMatchObject([{ params: { action: "release" } }]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
 	});
 
 	test("a reason a stop site writes during the Autumn release stays, and the log says it", async () => {
@@ -626,7 +663,7 @@ describe("settleBoot", () => {
 		expect(usageRows()).toEqual([]);
 	});
 
-	test("a usage row that fails to write is reported and the settle goes on unchanged", async () => {
+	test("a usage row that fails to write is reported and kept on the boot, and the settle goes on", async () => {
 		usageRowError = new Error("db down");
 		expect(await settleBoot("boot_1")).toBe("renewed");
 		expect(reported).toEqual([usageRowError]);
@@ -634,15 +671,71 @@ describe("settleBoot", () => {
 			"finalize",
 			"check",
 		]);
-		expect(writes).toContainEqual(
-			expect.objectContaining({ finalizedThrough: expect.any(Date) }),
-		);
+		const settled = writes.find((write) => "finalizedThrough" in write);
+		const kept = pendingOf(settled);
+		expect(kept).toEqual([
+			expect.objectContaining({
+				bootId: "boot_1",
+				feature: "box_gb_minutes",
+				amount: String(usageRows()[0]?.amount),
+				windowFrom: (usageRows()[0]?.windowFrom as Date).toISOString(),
+			}),
+		]);
 	});
 
 	test("a boot another run is settling is left alone", async () => {
 		boot = null;
 		expect(await settleBoot("boot_1")).toBe("skipped");
 		expect(autumnCalls).toEqual([]);
+	});
+});
+
+describe("the reconcile queues a settle for every open boot", () => {
+	test("each settle is queued now, with no delay, whatever its place in the batch", async () => {
+		openBoots = ["boot_1", "boot_2", "boot_3"].map((id) => ({ ...boot, id }));
+		expect(
+			await reconcileCloudWorkspaceUsage({ billingEnabled: true }),
+		).toEqual({ adopted: 0, queued: 3, failed: 0 });
+		expect(queuedSettles).toEqual(["boot_1", "boot_2", "boot_3"]);
+		expect(delayedSettles).toEqual([0, 0, 0]);
+	});
+});
+
+describe("the reconcile writes the usage rows a settle could not", () => {
+	const pending = {
+		bootId: "boot_1",
+		lockSeq: 3,
+		feature: "box_gb_minutes",
+		organizationId: "org_1",
+		cloudWorkspaceId: "ws_1",
+		userId: "user_1",
+		windowFrom: new Date(NOW - 30 * MINUTE).toISOString(),
+		windowTo: new Date(NOW).toISOString(),
+		amount: "480",
+		sentAt: new Date(NOW).toISOString(),
+	};
+
+	test("a kept row is written with its own amount and window, and the list is cleared", async () => {
+		boot = { ...boot, pendingUsageEvents: [pending] };
+		await reconcileCloudWorkspaceUsage({ billingEnabled: true });
+		expect(usageRows()).toEqual([
+			{
+				...pending,
+				windowFrom: new Date(pending.windowFrom),
+				windowTo: new Date(pending.windowTo),
+				sentAt: new Date(pending.sentAt),
+			},
+		]);
+		expect(writes).toContainEqual({ pendingUsageEvents: null });
+		expect(autumnCalls.filter((call) => call.method !== "check")).toEqual([]);
+	});
+
+	test("a kept row that still fails to write stays on the boot", async () => {
+		boot = { ...boot, pendingUsageEvents: [pending] };
+		usageRowError = new Error("db down");
+		await reconcileCloudWorkspaceUsage({ billingEnabled: true });
+		expect(reported).toEqual([usageRowError]);
+		expect(writes).not.toContainEqual({ pendingUsageEvents: null });
 	});
 });
 
@@ -737,7 +830,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		listed = [resumed(NOW - 2 * MINUTE), timedOut];
 		await reconcile();
 		const adoptedId = adoptedBoot()?.id;
-		expect(adoptedId).toEqual(expect.any(String));
+		if (typeof adoptedId !== "string") throw new Error("no adopted boot");
 		expect(queuedSettles).toEqual(["boot_1", adoptedId]);
 	});
 
@@ -918,6 +1011,48 @@ describe("meter", () => {
 			sessionEndedAt({ status: "stopping", requestedStopAt: 4, updatedAt: 9 }),
 		).toBe(4);
 		expect(sessionEndedAt({ status: "aborted", updatedAt: 9 })).toBe(9);
+	});
+});
+
+describe("the usage limit refusal", () => {
+	let pack: { gbMinutes: number; price: number } | null = null;
+	stub(billing, {
+		ensureAutumnCustomer: async () => ({ id: "org_1" }),
+		organizationBilling: async () => ({ cloudUsage: { pack } }),
+	});
+	const start = () =>
+		authorizeBoot(
+			{
+				organizationId: "org_1",
+				cloudWorkspaceId: "ws_1",
+				createdByUserId: null,
+				memoryMb: 16_384,
+				vcpus: 8,
+				origin: "create",
+				traceId: "trace_1",
+			},
+			{ billingEnabled: true },
+		);
+
+	test.each([
+		[
+			"a plan that sells GB-hours, none bought yet",
+			{ gbMinutes: 60, price: 0.06 },
+			"buy",
+		],
+		["a plan with no pack", null, "upgrade"],
+	])("%s: the next step is to %s", async (_, plan, next) => {
+		pack = plan;
+		renewalAllowed = false;
+		const error = (await start().catch((caught: unknown) => caught)) as {
+			code: string;
+			cause: { i18nKey: string; i18nParams: unknown };
+		};
+		expect(error.code).toBe("FORBIDDEN");
+		expect(error.cause.i18nKey).toBe(
+			"serverError.cloudWorkspace.usageLimitReached",
+		);
+		expect(error.cause.i18nParams).toEqual({ next });
 	});
 });
 

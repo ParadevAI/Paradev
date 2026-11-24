@@ -6,11 +6,17 @@ import {
 } from "@superset/shared/plugins/bundle";
 import { pluginManifestSchema } from "@superset/shared/plugins/manifest-schema";
 import {
+	manifestIcon,
+	PLUGIN_ICON_MAX_BYTES,
+	pluginIconFile,
+} from "@superset/shared/plugins/plugin-icon";
+import {
 	type PluginManifest,
 	pluginConnector,
 	supersetExtension,
 } from "../../router/plugins/manifest";
 import { connectorServer } from "../../router/plugins/proxy/resolve-target";
+import { completeImageType, transformUrlFor } from "../upload";
 import { isInternalHost } from "./internal-host";
 
 export class OrganizationPluginError extends Error {}
@@ -20,13 +26,13 @@ export function organizationPluginProblem(
 	manifest: PluginManifest,
 ): string | null {
 	if (PLUGIN_CATALOG.some((plugin) => plugin.name === manifest.name)) {
-		return `"${manifest.name}" is the name of a Superset plugin`;
+		return `"${manifest.name}" is the name of a Paradev plugin`;
 	}
 
 	const slug = pluginConnector(manifest);
 	if (slug) {
 		const connector = getConnector(slug);
-		if (!connector) return `"${slug}" is not a connector Superset knows`;
+		if (!connector) return `"${slug}" is not a connector Paradev knows`;
 		if (!connector.methods.some((method) => connectorServer(method))) {
 			return `the ${slug} connector has no tool server of its own, so an organization plugin cannot use it`;
 		}
@@ -57,6 +63,59 @@ export function organizationBundleKey(
 	contentHash: string,
 ): string {
 	return `organization-plugins/${organizationId}/${contentHash}.json.gz`;
+}
+
+/** Where a plugin's icon is served from, in the public bucket. */
+export function organizationIconKey(
+	organizationId: string,
+	contentHash: string,
+): string {
+	return `organization-plugins/${organizationId}/${contentHash}/icon`;
+}
+
+const STORED_ICON_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+
+export function organizationPluginIconUrl(
+	organizationId: string,
+	plugin: { manifest: unknown; contentHash: string },
+): string | null {
+	const file = pluginIconFile(manifestIcon(plugin.manifest));
+	return file && STORED_ICON_TYPES.has(file.mime)
+		? transformUrlFor(organizationIconKey(organizationId, plugin.contentHash))
+		: null;
+}
+
+/** The image file a manifest names as its icon, after the rules a publicly served icon must pass; the error is why it has none. */
+export function organizationPluginIcon(
+	manifest: PluginManifest,
+	files: ReadonlyMap<string, Uint8Array>,
+): { body: Buffer; contentType: string } | null {
+	const file = pluginIconFile(manifestIcon(manifest));
+	if (!file) return null;
+	if (!STORED_ICON_TYPES.has(file.mime)) {
+		throw new OrganizationPluginError(
+			`its icon ${file.relative} must be a png, jpeg or webp image`,
+		);
+	}
+	const bytes = files.get(file.relative);
+	if (!bytes) {
+		throw new OrganizationPluginError(
+			`its icon ${file.relative} is not a file in the plugin`,
+		);
+	}
+	if (bytes.length > PLUGIN_ICON_MAX_BYTES) {
+		throw new OrganizationPluginError(
+			`its icon is ${bytes.length} bytes, over the ${PLUGIN_ICON_MAX_BYTES} byte limit`,
+		);
+	}
+	const body = Buffer.from(bytes);
+	const contentType = completeImageType(body);
+	if (!contentType) {
+		throw new OrganizationPluginError(
+			`its icon ${file.relative} must be a png, jpeg or webp image`,
+		);
+	}
+	return { body, contentType };
 }
 
 /** The manifest a bundle carries, after every rule an organization plugin must pass. */

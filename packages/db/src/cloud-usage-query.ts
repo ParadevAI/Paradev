@@ -1,5 +1,7 @@
 // Runs whole queries, unlike task-list-query's condition builders: the admin repo shares them and vendors packages/db but not packages/trpc.
 import {
+	BOX_GB_MINUTES_FEATURE_ID,
+	gbMinutesUsd,
 	isMachineSize,
 	LEGACY_MACHINE_SIZE,
 	MACHINE_SIZE_VCPUS,
@@ -12,6 +14,7 @@ import {
 	desc,
 	eq,
 	gte,
+	ilike,
 	inArray,
 	isNotNull,
 	isNull,
@@ -33,14 +36,24 @@ import type {
 } from "./schema/enums";
 import {
 	cloudWorkspaceBoots as boots,
+	cloudUsageDaily as daily,
 	cloudUsageEvents as events,
 	taskProjects,
 	cloudWorkspaces as workspaces,
 } from "./schema/schema";
+import { escapeLikePattern } from "./utils/like";
+
+export { gbMinutesUsd };
 
 export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
-export const cloudUsageGroupByValues = ["user", "day", "workspace"] as const;
+/** `day` is the UTC day of sent_at; `billingDay` is the Pacific billing day, from the daily rollup. */
+export const cloudUsageGroupByValues = [
+	"user",
+	"day",
+	"workspace",
+	"billingDay",
+] as const;
 export type CloudUsageGroupBy = (typeof cloudUsageGroupByValues)[number];
 
 export const cloudFleetGroupByValues = [
@@ -68,15 +81,19 @@ const inOrganization = (scope: Scope, column: AnyPgColumn) =>
 			? inArray(column, scope.organizationId)
 			: eq(column, scope.organizationId);
 
+const workspaceOf = (scope: Scope, column: AnyPgColumn) =>
+	and(
+		eq(workspaces.id, column),
+		inOrganization(scope, workspaces.organizationId),
+	);
+
 export interface CloudUsageFilters {
 	user?: string;
 	workspace?: string | string[];
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
-}
-
-export interface CloudFleetFilters extends CloudUsageFilters {
-	project?: string;
+	/** Part of the workspace name, in any case. */
+	search?: string;
 }
 
 export interface CloudUsageWindow {
@@ -84,12 +101,27 @@ export interface CloudUsageWindow {
 	to: Date;
 }
 
+export const cloudUsageSortValues = [
+	"gbHours",
+	"hours",
+	"boots",
+	"name",
+	"status",
+] as const;
+
+/** `name` and `status` are the workspace's, so they need grouping by workspace. */
+export interface CloudUsageSort {
+	by: (typeof cloudUsageSortValues)[number];
+	order: "asc" | "desc";
+}
+
 /**
- * `gbMinutes` is the exact sum as decimal digits with an optional fraction (`1080`, `16.5`); it is
- * cast to numeric in SQL, so the router must check that format. Grouped by day, only `key` is used.
+ * `value` is the last row's sort value: the workspace name for `name`, else decimal digits with an
+ * optional fraction (`1080`, `16.5`) that is cast to numeric in SQL, so the router must check that
+ * format. Grouped by day with no sort, only `key` is used.
  */
 export interface CloudUsageCursor {
-	gbMinutes: string;
+	value: string;
 	key: string;
 }
 
@@ -98,40 +130,47 @@ export interface CloudBootCursor {
 	id: string;
 }
 
-/**
- * Autumn resets the GB-minute balance monthly on a fixed day of the month, on the last day of a
- * shorter month, at the time of day of `resetsAt`. `previousResetAt` is the reset that opened the
- * period, when the caller knows it: it settles the day when `resetsAt` is a short month's last day.
- */
+/** Autumn resets the GB-minute balance monthly on `day`, or a shorter month's last day, at the time of day of `resetsAt`. */
 export interface CloudBillingAnchor {
 	resetsAt: Date;
-	previousResetAt: Date | null;
+	day: number;
 }
 
 function lastDayOfMonth(year: number, month: number): number {
 	return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
 
-function anchorDay({ resetsAt, previousResetAt }: CloudBillingAnchor): number {
-	const day = resetsAt.getUTCDate();
-	const isMonthEnd =
-		day === lastDayOfMonth(resetsAt.getUTCFullYear(), resetsAt.getUTCMonth());
-	return isMonthEnd && previousResetAt
-		? Math.max(day, previousResetAt.getUTCDate())
-		: day;
+function monthsAfter(date: Date, months: number, day: number): Date {
+	const moved = new Date(date);
+	moved.setUTCDate(1);
+	moved.setUTCMonth(moved.getUTCMonth() + months);
+	moved.setUTCDate(
+		Math.min(day, lastDayOfMonth(moved.getUTCFullYear(), moved.getUTCMonth())),
+	);
+	return moved;
 }
 
-function resetMonthsBefore(anchor: CloudBillingAnchor, months: number): Date {
-	const reset = new Date(anchor.resetsAt);
-	reset.setUTCDate(1);
-	reset.setUTCMonth(reset.getUTCMonth() - months);
-	reset.setUTCDate(
-		Math.min(
-			anchorDay(anchor),
-			lastDayOfMonth(reset.getUTCFullYear(), reset.getUTCMonth()),
-		),
-	);
-	return reset;
+/**
+ * Autumn anchors the monthly reset on the subscription's start, to the millisecond. A start that
+ * does not land on `resetsAt` (a plan change, a trial) says nothing, so `resetsAt`'s day is used.
+ */
+export function cloudBillingAnchor(
+	resetsAt: Date,
+	startedAt: Date | null,
+): CloudBillingAnchor {
+	const months = startedAt
+		? (resetsAt.getUTCFullYear() - startedAt.getUTCFullYear()) * 12 +
+			resetsAt.getUTCMonth() -
+			startedAt.getUTCMonth()
+		: 0;
+	const proven =
+		startedAt !== null &&
+		monthsAfter(startedAt, months, startedAt.getUTCDate()).getTime() ===
+			resetsAt.getTime();
+	return {
+		resetsAt,
+		day: proven ? startedAt.getUTCDate() : resetsAt.getUTCDate(),
+	};
 }
 
 /** Period 0 is the open one, ending at `resetsAt`; period n ends n resets earlier. */
@@ -140,8 +179,8 @@ export function cloudBillingPeriod(
 	index: number,
 ): CloudUsageWindow {
 	return {
-		from: resetMonthsBefore(anchor, index + 1),
-		to: resetMonthsBefore(anchor, index),
+		from: monthsAfter(anchor.resetsAt, -(index + 1), anchor.day),
+		to: monthsAfter(anchor.resetsAt, -index, anchor.day),
 	};
 }
 
@@ -163,21 +202,13 @@ export function cloudBillingPeriodIndex(
 		: null;
 }
 
-const BILLED_FEATURE = "box_gb_minutes";
-
 const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
 );
 
-function usd(gbMinutes: number, overagePerGbHour: number | null) {
-	return overagePerGbHour === null
-		? null
-		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
-}
-
 function scopeConditions(
 	scope: Scope,
-	filters: CloudFleetFilters,
+	filters: CloudUsageFilters,
 	columns: {
 		user: AnyPgColumn;
 		workspace: AnyPgColumn;
@@ -194,12 +225,14 @@ function scopeConditions(
 				: eq(columns.workspace, filters.workspace),
 		);
 	}
-	if (filters.project) {
-		conditions.push(eq(workspaces.projectId, filters.project));
-	}
 	if (filters.size) conditions.push(columns.size(filters.size));
 	if (filters.status?.length) {
 		conditions.push(inArray(workspaces.status, filters.status));
+	}
+	if (filters.search) {
+		conditions.push(
+			ilike(workspaces.name, `%${escapeLikePattern(filters.search)}%`),
+		);
 	}
 	return conditions;
 }
@@ -213,8 +246,27 @@ const sizeOfBoot = sql`case ${boots.vcpus} ${sql.join(
 
 const sizeOfWorkspace = sql`coalesce(${workspaces.machineSize}, ${LEGACY_MACHINE_SIZE})`;
 
+const STATUS_ORDER: CloudWorkspaceStatus[] = [
+	"failed",
+	"provisioning",
+	"awake",
+	"asleep",
+	"archived",
+];
+
+const statusRank = sql`case ${workspaces.status} ${sql.join(
+	STATUS_ORDER.map(
+		(status, rank) => sql`when ${status} then ${sql.raw(String(rank))}`,
+	),
+	sql` `,
+)} end`;
+
 const bootSize = (size: MachineSize) =>
 	eq(boots.vcpus, MACHINE_SIZE_VCPUS[size]);
+
+export function billingDay(column: AnyPgColumn | SQL) {
+	return sql<string>`to_char(public.cloud_billing_day(${column}), 'YYYY-MM-DD')`;
+}
 
 const utcDay = (column: AnyPgColumn) =>
 	sql`to_char(${column} at time zone 'UTC', 'YYYY-MM-DD')`;
@@ -257,6 +309,11 @@ const groupKeys = {
 		boot: sql`${boots.endReason}`,
 		failed: sql`'failed'`,
 	},
+	billingDay: {
+		event: billingDay(events.sentAt),
+		boot: billingDay(boots.startedAt),
+		failed: billingDay(workspaces.failedAt),
+	},
 } satisfies Record<CloudFleetGroupBy, FactKeys>;
 
 const NO_KEY: FactKeys = {
@@ -274,13 +331,21 @@ const NO_KEY: FactKeys = {
 function usageFacts(
 	db: Db,
 	scope: Scope,
-	filters: CloudFleetFilters,
+	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
 	keys: FactKeys,
+	secondKeys: FactKeys = NO_KEY,
+	options: {
+		/** Narrows the sent events, for the days the rollup does not cover. */
+		sentWhere?: SQL;
+		/** Usage rows from the daily rollup, in the facts' shape. */
+		days?: NonNullable<ReturnType<typeof billingDayRollup>>["days"];
+	} = {},
 ) {
 	const sent = db
 		.select({
 			key: sql<string | null>`${keys.event}::text`.as("key"),
+			secondKey: sql<string | null>`${secondKeys.event}::text`.as("second_key"),
 			workspaceId: sql<string | null>`${events.cloudWorkspaceId}`.as(
 				"workspace_id",
 			),
@@ -291,16 +356,18 @@ function usageFacts(
 				),
 			bootId: sql<string | null>`null::text`.as("boot_id"),
 			failed: sql<boolean>`false`.as("failed"),
+			day: sql<string>`${utcDay(events.sentAt)}`.as("day"),
 		})
 		.from(events)
 		.leftJoin(boots, eq(boots.id, events.bootId))
-		.leftJoin(workspaces, eq(workspaces.id, events.cloudWorkspaceId))
+		.leftJoin(workspaces, workspaceOf(scope, events.cloudWorkspaceId))
 		.where(
 			and(
 				inOrganization(scope, events.organizationId),
-				eq(events.feature, BILLED_FEATURE),
+				eq(events.feature, BOX_GB_MINUTES_FEATURE_ID),
 				gte(events.sentAt, window.from),
 				lt(events.sentAt, window.to),
+				options.sentWhere,
 				...scopeConditions(scope, filters, {
 					user: events.userId,
 					workspace: events.cloudWorkspaceId,
@@ -311,14 +378,16 @@ function usageFacts(
 	const started = db
 		.select({
 			key: sql<string | null>`${keys.boot}::text`,
+			secondKey: sql<string | null>`${secondKeys.boot}::text`,
 			workspaceId: sql<string | null>`${boots.cloudWorkspaceId}`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`${boots.id}`,
 			failed: sql<boolean>`${boots.endReason} is not distinct from 'failed'`,
+			day: sql<string>`${utcDay(boots.startedAt)}`,
 		})
 		.from(boots)
-		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
+		.leftJoin(workspaces, workspaceOf(scope, boots.cloudWorkspaceId))
 		.where(
 			and(
 				inOrganization(scope, boots.organizationId),
@@ -334,11 +403,13 @@ function usageFacts(
 	const failed = db
 		.select({
 			key: sql<string | null>`${keys.failed}::text`,
+			secondKey: sql<string | null>`${secondKeys.failed}::text`,
 			workspaceId: sql<string | null>`${workspaces.id}`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`null::text`,
 			failed: sql<boolean>`false`,
+			day: sql<string>`${utcDay(workspaces.failedAt)}`,
 		})
 		.from(workspaces)
 		.where(
@@ -355,7 +426,72 @@ function usageFacts(
 				}),
 			),
 		);
-	return db.$with("facts").as(sent.unionAll(started).unionAll(failed));
+	const facts = sent.unionAll(started).unionAll(failed);
+	return db
+		.$with("facts")
+		.as(options.days ? facts.unionAll(options.days) : facts);
+}
+
+/** The billing days wholly inside the window: from `firstWhole` up to, not including, `endWhole`. */
+function wholeBillingDays(window: CloudUsageWindow) {
+	const from = sql`${window.from.toISOString()}::timestamptz`;
+	const to = sql`${window.to.toISOString()}::timestamptz`;
+	const fromDay = sql`public.cloud_billing_day(${from})`;
+	return {
+		firstWhole: sql`(case when public.cloud_billing_day_start(${fromDay}) = ${from} then ${fromDay} else ${fromDay} + 1 end)`,
+		endWhole: sql`public.cloud_billing_day(${to})`,
+	};
+}
+
+/**
+ * Usage by billing day from the daily rollup: its rows for the billing days wholly inside the
+ * window, and `sentWhere` for the events of the partial days at the window's edges. Each event
+ * lands in exactly one part. Null when a filter the rollup cannot apply (workspace, status, search)
+ * is set: then every day reads events.
+ */
+function billingDayRollup(
+	db: Db,
+	scope: Scope,
+	filters: CloudUsageFilters,
+	window: CloudUsageWindow,
+) {
+	if (filters.workspace || filters.status?.length || filters.search) {
+		return null;
+	}
+	const { firstWhole, endWhole } = wholeBillingDays(window);
+	return {
+		sentWhere: sql`(${events.sentAt} < public.cloud_billing_day_start(${firstWhole}) or ${events.sentAt} >= public.cloud_billing_day_start(${endWhole}))`,
+		days: db
+			.select({
+				key: sql<string | null>`to_char(${daily.day}::date, 'YYYY-MM-DD')`,
+				secondKey: sql<string | null>`null::text`,
+				workspaceId: sql<string | null>`null::uuid`,
+				gbMinutes: sql<string>`${daily.gbMinutes}`,
+				seconds: sql<string>`${daily.seconds}`,
+				bootId: sql<string | null>`null::text`,
+				failed: sql<boolean>`false`,
+				day: sql<string>`null::text`,
+			})
+			.from(daily)
+			.where(
+				and(
+					inOrganization(scope, daily.organizationId),
+					sql`${daily.day} >= ${firstWhole}`,
+					sql`${daily.day} < ${endWhole}`,
+					sql`${daily.events} <> 0`,
+					scope.userId ? eq(daily.userId, scope.userId) : undefined,
+					filters.user ? eq(daily.userId, filters.user) : undefined,
+					filters.size
+						? eq(daily.vcpus, MACHINE_SIZE_VCPUS[filters.size])
+						: undefined,
+				),
+			),
+	};
+}
+
+interface DayRow {
+	day: string;
+	gbMinutes: number;
 }
 
 function metricColumns(facts: ReturnType<typeof usageFacts>) {
@@ -383,29 +519,51 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 		failedBoots: row.failedBoots,
 		hours: Number(row.seconds) / 3600,
 		gbHours: gbMinutes / 60,
-		usageUsd: usd(gbMinutes, overagePerGbHour),
+		usageUsd: gbMinutesUsd(gbMinutes, overagePerGbHour),
 	};
 }
 
 export type CloudUsageMetrics = ReturnType<typeof toMetrics>;
 
+/** Grouped by billing day there is no workspaces count: the rollup has no workspace. */
+function usageMetrics(
+	metrics: CloudUsageMetrics,
+	byBillingDay: boolean,
+): Omit<CloudUsageMetrics, "workspaces"> & { workspaces: number | null } {
+	return byBillingDay ? { ...metrics, workspaces: null } : metrics;
+}
+
 /** These groupings have no entity behind the key: the key is the label. */
 const isPlainKey = (groupBy: CloudFleetGroupBy) =>
-	groupBy === "day" || groupBy === "size" || groupBy === "endReason";
+	groupBy === "day" ||
+	groupBy === "billingDay" ||
+	groupBy === "size" ||
+	groupBy === "endReason";
 
 interface UserRef {
 	id: string;
 	name: string;
 	email: string;
+	image: string | null;
 }
 
 interface WorkspaceRef {
 	id: string;
 	name: string;
 	status: CloudWorkspaceStatus;
+	/** Deleted workspaces keep the status they had; this says they are gone. */
+	deleted: boolean;
 	size: MachineSize;
 	owner: UserRef | null;
 	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
+	/**
+	 * The newest boot the scope may see, in any window. `stoppedAt` is null while it runs; a stopped
+	 * boot with no end reason is from before end reasons were kept.
+	 */
+	lastBoot: {
+		endReason: CloudWorkspaceBootEndReason | null;
+		stoppedAt: Date | null;
+	} | null;
 }
 
 interface OrganizationRef {
@@ -446,29 +604,60 @@ async function refsFor(
 	}
 	if (groupBy === "user") {
 		const rows = await db
-			.select({ id: users.id, name: users.name, email: users.email })
+			.select({
+				id: users.id,
+				name: users.name,
+				email: users.email,
+				image: users.image,
+			})
 			.from(users)
 			.where(inArray(users.id, keys));
 		return new Map(rows.map((row) => [row.id, row]));
 	}
-	const rows = await db
-		.select({
-			id: workspaces.id,
-			name: workspaces.name,
-			status: workspaces.status,
-			machineSize: workspaces.machineSize,
-			failureReason: workspaces.failureReason,
-			failedAt: workspaces.failedAt,
-			owner: { id: users.id, name: users.name, email: users.email },
-		})
-		.from(workspaces)
-		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
-		.where(
-			and(
-				inOrganization(scope, workspaces.organizationId),
-				inArray(workspaces.id, keys),
+	const [rows, lastBoots] = await Promise.all([
+		db
+			.select({
+				id: workspaces.id,
+				name: workspaces.name,
+				status: workspaces.status,
+				deleted: sql<boolean>`${workspaces.deletedAt} is not null`,
+				machineSize: workspaces.machineSize,
+				failureReason: workspaces.failureReason,
+				failedAt: workspaces.failedAt,
+				owner: {
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image,
+				},
+			})
+			.from(workspaces)
+			.leftJoin(users, eq(users.id, workspaces.createdByUserId))
+			.where(
+				and(
+					inOrganization(scope, workspaces.organizationId),
+					inArray(workspaces.id, keys),
+				),
 			),
-		);
+		db
+			.selectDistinctOn([boots.cloudWorkspaceId], {
+				workspaceId: boots.cloudWorkspaceId,
+				endReason: boots.endReason,
+				stoppedAt: boots.stoppedAt,
+			})
+			.from(boots)
+			.where(
+				and(
+					inOrganization(scope, boots.organizationId),
+					inArray(boots.cloudWorkspaceId, keys),
+					scope.userId ? eq(boots.createdByUserId, scope.userId) : undefined,
+				),
+			)
+			.orderBy(boots.cloudWorkspaceId, desc(boots.startedAt), desc(boots.id)),
+	]);
+	const lastBootOf = new Map(
+		lastBoots.map(({ workspaceId, ...lastBoot }) => [workspaceId, lastBoot]),
+	);
 	return new Map(
 		rows.map(({ machineSize, failureReason, failedAt, ...row }) => [
 			row.id,
@@ -479,24 +668,114 @@ async function refsFor(
 					row.status === "failed" && failureReason && failedAt
 						? { reason: failureReason, at: failedAt }
 						: null,
+				lastBoot: lastBootOf.get(row.id) ?? null,
 			},
 		]),
 	);
 }
 
-interface CloudUsageOptions<GroupBy, Filters = CloudUsageFilters> {
+interface CloudUsageOptions<GroupBy> {
 	window: CloudUsageWindow;
-	filters?: Filters;
+	filters?: CloudUsageFilters;
 	groupBy?: GroupBy;
+	/** Default: by day newest first, else by GB-hours, most first. */
+	sort?: CloudUsageSort;
 	limit: number;
 	cursor?: CloudUsageCursor;
 	overagePerGbHour: number | null;
+	/** By billing day, read every day from events, not the rollup. */
+	fromEvents?: boolean;
 }
 
-type CloudFleetUsageOptions = CloudUsageOptions<
-	CloudFleetGroupBy,
-	CloudFleetFilters
-> & { refs?: boolean };
+type CloudFleetUsageOptions = CloudUsageOptions<CloudFleetGroupBy> & {
+	refs?: boolean;
+};
+
+/**
+ * One page of rows grouped by person, each with the person's days. The page is ranked first, so
+ * the days are summed for its people only, once each, in the same statement.
+ */
+function pageWithDays(
+	db: Db,
+	facts: ReturnType<typeof usageFacts>,
+	{
+		sortKey,
+		sortValue,
+		having,
+		order,
+		limit,
+	}: {
+		sortKey: SQL<string>;
+		sortValue: SQL;
+		having: SQL | undefined;
+		order: SQL[];
+		limit: number;
+	},
+) {
+	const metrics = metricColumns(facts);
+	const page = db.$with("page").as(
+		db
+			.select({
+				key: facts.key,
+				sortKey: sortKey.as("sort_key"),
+				sortValue: sql<string>`(${sortValue})::text`.as("sort_value"),
+				gbMinutes: metrics.gbMinutes.as("total_gb_minutes"),
+				seconds: metrics.seconds.as("total_seconds"),
+				boots: metrics.boots.as("total_boots"),
+				failedBoots: metrics.failedBoots.as("total_failed_boots"),
+				workspaces: metrics.workspaces.as("total_workspaces"),
+				rank: sql<number>`row_number() over (order by ${sql.join(order, sql`, `)})`.as(
+					"rank",
+				),
+			})
+			.from(facts)
+			.groupBy(facts.key)
+			.having(having)
+			.orderBy(...order)
+			.limit(limit),
+	);
+	const perDay = db
+		.select({
+			key: sql<string>`coalesce(${facts.key}, '')`.as("days_key"),
+			day: facts.day,
+			gbMinutes: sql<string>`sum(${facts.gbMinutes})`.as("day_gb_minutes"),
+		})
+		.from(facts)
+		.where(
+			sql`coalesce(${facts.key}, '') in (select ${page.sortKey} from ${page})`,
+		)
+		.groupBy(facts.key, facts.day)
+		.as("per_day");
+	const userDays = db.$with("user_days").as(
+		db
+			.select({
+				key: perDay.key,
+				days: sql<
+					DayRow[]
+				>`json_agg(json_build_object('day', ${perDay.day}, 'gbMinutes', ${perDay.gbMinutes}) order by ${perDay.day})`.as(
+					"days",
+				),
+			})
+			.from(perDay)
+			.groupBy(perDay.key),
+	);
+	return db
+		.with(facts, page, userDays)
+		.select({
+			key: page.key,
+			sortKey: page.sortKey,
+			sortValue: page.sortValue,
+			gbMinutes: page.gbMinutes,
+			seconds: page.seconds,
+			boots: page.boots,
+			failedBoots: page.failedBoots,
+			workspaces: page.workspaces,
+			days: userDays.days,
+		})
+		.from(page)
+		.leftJoin(userDays, eq(userDays.key, page.sortKey))
+		.orderBy(page.rank);
+}
 
 /**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
@@ -517,7 +796,20 @@ async function usageRows(
 		limit,
 		overagePerGbHour,
 	} = options;
-	const totalFacts = usageFacts(db, scope, filters, window, NO_KEY);
+	const byBillingDay = groupBy === "billingDay";
+	const rollup =
+		byBillingDay && !options.fromEvents
+			? billingDayRollup(db, scope, filters, window)
+			: null;
+	const totalFacts = usageFacts(
+		db,
+		scope,
+		filters,
+		window,
+		NO_KEY,
+		NO_KEY,
+		rollup ?? {},
+	);
 	const totalRow = db
 		.with(totalFacts)
 		.select(metricColumns(totalFacts))
@@ -530,37 +822,98 @@ async function usageRows(
 	if (!groupBy) {
 		return {
 			items: [],
-			total: toMetrics(await totalRow, overagePerGbHour),
+			total: usageMetrics(
+				toMetrics(await totalRow, overagePerGbHour),
+				byBillingDay,
+			),
+			rowCount: 0,
 			nextCursor: null,
 		};
 	}
 
-	const facts = usageFacts(db, scope, filters, window, groupKeys[groupBy]);
+	const sort =
+		options.sort ??
+		(groupBy === "day" || byBillingDay
+			? null
+			: { by: "gbHours", order: "desc" });
+	if (
+		(sort?.by === "name" || sort?.by === "status") &&
+		groupBy !== "workspace"
+	) {
+		throw new Error(`Sorting by ${sort.by} needs grouping by workspace`);
+	}
+	const facts = usageFacts(
+		db,
+		scope,
+		filters,
+		window,
+		groupKeys[groupBy],
+		NO_KEY,
+		rollup ?? {},
+	);
 	const metrics = metricColumns(facts);
+	const withDays = groupBy === "user";
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
-	const [rows, total] = await Promise.all([
+	const ofWorkspace = (column: AnyPgColumn | SQL) =>
+		sql`(select ${column} from ${workspaces} where ${workspaces.id} = ${facts.key}::uuid)`;
+	const sortValue = !sort
+		? sortKey
+		: {
+				gbHours: metrics.gbMinutes,
+				hours: metrics.seconds,
+				boots: metrics.boots,
+				name: sql`coalesce(${ofWorkspace(workspaces.name)}, '')`,
+				status: sql`coalesce(${ofWorkspace(statusRank)}, ${sql.raw(String(STATUS_ORDER.length))})`,
+			}[sort.by];
+	const cursorValue =
+		cursor &&
+		(sort?.by === "name"
+			? sql`${cursor.value}`
+			: sql`${cursor.value}::numeric`);
+	const having = !cursor
+		? undefined
+		: !sort
+			? sql`${facts.key} < ${cursor.key}`
+			: or(
+					sort.order === "desc"
+						? sql`${sortValue} < ${cursorValue}`
+						: sql`${sortValue} > ${cursorValue}`,
+					sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
+				);
+	const order = !sort
+		? [desc(facts.key)]
+		: [sort.order === "desc" ? desc(sortValue) : asc(sortValue), asc(sortKey)];
+	const [rows, total, rowCount] = await Promise.all([
+		withDays
+			? pageWithDays(db, facts, {
+					sortKey,
+					sortValue,
+					having,
+					order,
+					limit: limit + 1,
+				})
+			: db
+					.with(facts)
+					.select({
+						key: facts.key,
+						sortKey,
+						sortValue: sql<string>`(${sortValue})::text`,
+						days: sql<null>`null`,
+						...metrics,
+					})
+					.from(facts)
+					.groupBy(facts.key)
+					.having(having)
+					.orderBy(...order)
+					.limit(limit + 1),
+		totalRow,
 		db
 			.with(facts)
-			.select({ key: facts.key, sortKey, ...metrics })
+			.select({
+				rowCount: sql<number>`count(distinct ${sortKey})`.mapWith(Number),
+			})
 			.from(facts)
-			.groupBy(facts.key)
-			.having(
-				!cursor
-					? undefined
-					: groupBy === "day"
-						? sql`${facts.key} < ${cursor.key}`
-						: or(
-								sql`${metrics.gbMinutes} < ${cursor.gbMinutes}::numeric`,
-								sql`${metrics.gbMinutes} = ${cursor.gbMinutes}::numeric and ${sortKey} > ${cursor.key}`,
-							),
-			)
-			.orderBy(
-				...(groupBy === "day"
-					? [desc(facts.key)]
-					: [desc(metrics.gbMinutes), asc(sortKey)]),
-			)
-			.limit(limit + 1),
-		totalRow,
+			.then(([row]) => row?.rowCount ?? 0),
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
@@ -574,19 +927,28 @@ async function usageRows(
 					page.flatMap((row) => (row.key ? [row.key] : [])),
 				);
 	return {
-		items: page.map(({ key, sortKey: _, ...row }) => {
+		items: page.map((row) => {
+			const { key, sortKey: _, sortValue: __, days, ...metricRow } = row;
 			const ref = (key && refs.get(key)) || null;
 			return {
 				key,
 				label: ref ? ref.name : isPlainKey(groupBy) ? key : null,
 				ref,
-				...toMetrics(row, overagePerGbHour),
+				...usageMetrics(toMetrics(metricRow, overagePerGbHour), byBillingDay),
+				...(withDays && {
+					days: (days ?? []).map((day) => ({
+						day: day.day,
+						gbHours: day.gbMinutes / 60,
+						usageUsd: gbMinutesUsd(day.gbMinutes, overagePerGbHour),
+					})),
+				}),
 			};
 		}),
-		total: toMetrics(total, overagePerGbHour),
+		total: usageMetrics(toMetrics(total, overagePerGbHour), byBillingDay),
+		rowCount,
 		nextCursor:
 			rows.length > limit && last
-				? { gbMinutes: last.gbMinutes, key: last.sortKey }
+				? { value: last.sortValue, key: last.sortKey }
 				: null,
 	};
 }
@@ -621,6 +983,136 @@ export function queryFleetCloudUsage(
 	options: CloudFleetUsageOptions,
 ): Promise<CloudFleetUsageResult> {
 	return usageRows(db, { organizationId }, options);
+}
+
+/**
+ * `queryFleetCloudUsage` grouped by workspace and Pacific billing day in one query: a row for each
+ * pair with a fact, no limit, so the caller windows it. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function queryFleetCloudUsageByWorkspaceDay(
+	db: Db,
+	organizationId: string | string[] | null,
+	options: { window: CloudUsageWindow; filters?: CloudUsageFilters },
+) {
+	const facts = usageFacts(
+		db,
+		{ organizationId },
+		options.filters ?? {},
+		options.window,
+		groupKeys.workspace,
+		{
+			event: billingDay(events.sentAt),
+			boot: billingDay(boots.startedAt),
+			failed: billingDay(workspaces.failedAt),
+		},
+	);
+	const rows = await db
+		.with(facts)
+		.select({
+			workspaceId: facts.key,
+			day: facts.secondKey,
+			...metricColumns(facts),
+		})
+		.from(facts)
+		.groupBy(facts.key, facts.secondKey)
+		.orderBy(asc(facts.key), asc(facts.secondKey));
+	return rows.map(({ workspaceId, day, ...row }) => {
+		if (day === null) throw new Error("A usage fact has no billing day.");
+		const { boots, failedBoots, hours, gbHours } = toMetrics(row, null);
+		return {
+			workspaceId,
+			day,
+			boots,
+			failedBoots,
+			hours,
+			gbHours,
+		};
+	});
+}
+
+const SERIES_MAX_POINTS = 60;
+
+/**
+ * GB-hours per billing day of each organization or user in `keys`, from the daily rollup in one
+ * query. Only whole billing days count: partial days at both edges of the window are left out, so
+ * the open day is never drawn. A window longer than 60 days is summed into buckets of `stepDays`
+ * whole days that end on the window's last whole day; the leading days that do not fill a bucket
+ * are dropped. `starts` holds each bucket's first billing day. Every key has one point per bucket,
+ * zero where it has no usage. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function queryFleetCloudUsageSeries(
+	db: Db,
+	options: { window: CloudUsageWindow; keys: string[] } & (
+		| { by: "organization" }
+		| { by: "user"; organizationId: string }
+	),
+) {
+	const { window, keys } = options;
+	const { firstWhole, endWhole } = wholeBillingDays(window);
+	const step = sql`greatest(1, ceil((raw."end" - raw.first) / ${SERIES_MAX_POINTS}::numeric))::int`;
+	const days = sql`(raw."end" - raw.first) / ${step} * ${step}`;
+	const span = db.$with("span").as(
+		db
+			.select({
+				first: sql<string>`raw."end" - ${days}`.as("first"),
+				end: sql<string>`raw."end"`.as("end"),
+				days: sql<number>`${days}`.as("days"),
+				step: sql<number>`${step}`.as("step"),
+			})
+			.from(sql`(select ${firstWhole} as first, ${endWhole} as "end") as raw`),
+	);
+	const keyColumn =
+		options.by === "organization" ? daily.organizationId : daily.userId;
+	const bucket = sql<number>`(${daily.day} - ${span.first}) / ${span.step}`;
+	const sums = db.$with("sums").as(
+		db
+			.select({
+				key: sql<string>`${keyColumn}`.as("key"),
+				bucket: bucket.as("bucket"),
+				gbMinutes: sql<string>`sum(${daily.gbMinutes})`.as("gb_minutes"),
+			})
+			.from(daily)
+			.innerJoin(span, sql`true`)
+			.where(
+				and(
+					options.by === "user"
+						? eq(daily.organizationId, options.organizationId)
+						: undefined,
+					inArray(keyColumn, keys),
+					sql`${daily.day} >= ${span.first}`,
+					sql`${daily.day} < ${span.end}`,
+				),
+			)
+			.groupBy(keyColumn, bucket),
+	);
+	const rows = await db
+		.with(span, sums)
+		.select({
+			first: sql<string>`to_char(${span.first}, 'YYYY-MM-DD')`,
+			days: span.days,
+			stepDays: span.step,
+			key: sums.key,
+			bucket: sums.bucket,
+			gbMinutes: sums.gbMinutes,
+		})
+		.from(span)
+		.leftJoin(sums, sql`true`);
+	const head = rows[0];
+	if (!head) throw new Error("A usage series has no span.");
+	const { first, stepDays } = head;
+	const count = Math.ceil(head.days / stepDays);
+	const day = Date.parse(`${first}T00:00:00Z`);
+	const starts = Array.from({ length: count }, (_, i) =>
+		new Date(day + i * stepDays * 86_400_000).toISOString().slice(0, 10),
+	);
+	const series: Record<string, number[]> = Object.fromEntries(
+		keys.map((key) => [key, starts.map(() => 0)]),
+	);
+	for (const { key, bucket, gbMinutes } of rows) {
+		const points = key === null ? undefined : series[key];
+		if (points && bucket !== null) points[bucket] = Number(gbMinutes) / 60;
+	}
+	return { starts, stepDays, series };
 }
 
 const NO_USAGE: MetricRow = {
@@ -671,9 +1163,9 @@ export async function queryCloudUsageByPeriod(
 	}));
 }
 
-interface CloudBootsOptions<Filters = CloudUsageFilters> {
+interface CloudBootsOptions {
 	window: CloudUsageWindow;
-	filters?: Filters;
+	filters?: CloudUsageFilters;
 	endReason?: CloudWorkspaceBootEndReason[];
 	open?: boolean;
 	limit: number;
@@ -682,8 +1174,7 @@ interface CloudBootsOptions<Filters = CloudUsageFilters> {
 	overagePerGbHour: number | null;
 }
 
-interface BootReadOptions
-	extends Omit<CloudBootsOptions<CloudFleetFilters>, "window"> {
+interface BootReadOptions extends Omit<CloudBootsOptions, "window"> {
 	window?: CloudUsageWindow;
 	/** A boot id or a Vercel session id. */
 	boot?: string;
@@ -693,13 +1184,18 @@ const bootColumns = {
 	id: boots.id,
 	sessionId: boots.vercelSessionId,
 	workspace: { id: workspaces.id, name: workspaces.name },
-	user: { id: users.id, name: users.name, email: users.email },
+	user: {
+		id: users.id,
+		name: users.name,
+		email: users.email,
+		image: users.image,
+	},
 	startedAt: boots.startedAt,
 	stoppedAt: boots.stoppedAt,
 	memoryMb: boots.memoryMb,
 	vcpus: boots.vcpus,
 	endReason: boots.endReason,
-	gbMinutes: sql<string>`(select coalesce(sum(${events.amount}), 0) from ${events} where ${events.bootId} = ${boots.id} and ${events.feature} = ${BILLED_FEATURE} and ${events.sentAt} is not null)`,
+	gbMinutes: sql<string>`(select coalesce(sum(${events.amount}), 0) from ${events} where ${events.bootId} = ${boots.id} and ${events.feature} = ${BOX_GB_MINUTES_FEATURE_ID} and ${events.sentAt} is not null)`,
 };
 
 function bootConditions(scope: Scope, options: BootReadOptions) {
@@ -732,7 +1228,6 @@ function bootConditions(scope: Scope, options: BootReadOptions) {
 	);
 }
 
-/** Rows come fetched one past the limit. */
 const selectBootRows = (db: Db) =>
 	db
 		.select(bootColumns)
@@ -742,6 +1237,7 @@ const selectBootRows = (db: Db) =>
 
 type BootRow = Awaited<ReturnType<typeof selectBootRows>>[number];
 
+/** `rows` were fetched one past the limit. */
 function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
 	const { limit, now, overagePerGbHour } = options;
 	const page = rows.slice(0, limit);
@@ -754,7 +1250,7 @@ function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
 			size: sizeOfVcpus.get(row.vcpus) ?? null,
 			memoryGb: memoryMb / 1024,
 			gbHours: Number(gbMinutes) / 60,
-			usageUsd: usd(Number(gbMinutes), overagePerGbHour),
+			usageUsd: gbMinutesUsd(Number(gbMinutes), overagePerGbHour),
 		})),
 		nextCursor:
 			rows.length > limit && last
@@ -823,7 +1319,7 @@ export type CloudFleetBootsResult = Awaited<ReturnType<typeof fleetBoots>>;
 export function listFleetCloudBoots(
 	db: Db,
 	organizationId: string | string[] | null,
-	options: CloudBootsOptions<CloudFleetFilters>,
+	options: CloudBootsOptions,
 ) {
 	return fleetBoots(db, { organizationId }, options);
 }

@@ -30,7 +30,7 @@ DEPLOY.md and stop.
 5. Call the URL from your service:
 
 ```bash
-curl -X POST "https://api.superset.sh/api/automations/webhook/<automationId>" \
+curl -X POST "https://api.paradev.com/api/automations/webhook/<automationId>" \
   -H "Authorization: Bearer $SUPERSET_WEBHOOK_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"service": "checkout", "commit": "4f2a9c1", "logs": "https://ci.example.com/runs/812"}'

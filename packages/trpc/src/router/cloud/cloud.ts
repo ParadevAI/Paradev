@@ -1,9 +1,15 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
-import { type CloudUsage, organizationBilling } from "@superset/auth/billing";
+import {
+	listRatePerGbHour,
+	type OrganizationBilling,
+	organizationBilling,
+} from "@superset/auth/billing";
+import { allowanceOf } from "@superset/auth/billing/cloud-usage";
 import { db } from "@superset/db/client";
 import {
 	type CloudBillingAnchor,
 	type CloudUsageScope,
+	cloudBillingAnchor,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
 	listCloudBoots,
@@ -11,6 +17,11 @@ import {
 	queryCloudUsageByPeriod,
 } from "@superset/db/cloud-usage-query";
 import { organizations } from "@superset/db/schema";
+import {
+	cloudBootsOutputSchema,
+	cloudPeriodsOutputSchema,
+	cloudUsageOutputSchema,
+} from "@superset/shared/cloud-usage-api";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -26,11 +37,8 @@ import {
 	type CloudListFilters,
 	type CloudRange,
 	cloudBootsInputSchema,
-	cloudBootsOutputSchema,
 	cloudPeriodsInputSchema,
-	cloudPeriodsOutputSchema,
 	cloudUsageInputSchema,
-	cloudUsageOutputSchema,
 	type RangePreset,
 	type UsageKeyset,
 	usageKeysetSchemas,
@@ -39,7 +47,15 @@ import {
 export interface CloudDeps {
 	db: Parameters<typeof queryCloudUsage>[0] &
 		NonNullable<Parameters<typeof requireActiveOrgRole>[1]>;
-	cloudUsage: (organizationId: string) => Promise<CloudUsage | null>;
+	/** Null when billing is not Autumn. */
+	billing: (
+		organizationId: string,
+	) => Promise<Pick<
+		OrganizationBilling,
+		"tier" | "cloudUsage" | "startedAt"
+	> | null>;
+	/** For an organization with no paid plan; null when the price cannot be known. */
+	listRatePerGbHour: () => Promise<number | null>;
 	flags: Parameters<typeof organizationFlagEnabled>[0];
 }
 
@@ -51,10 +67,11 @@ const PRESET_MS: Record<RangePreset, number> = {
 	"90d": 90 * 24 * HOUR_MS,
 };
 
-function anchorOf(cloudUsage: CloudUsage | null): CloudBillingAnchor | null {
-	return cloudUsage?.resetsAt
-		? { resetsAt: new Date(cloudUsage.resetsAt), previousResetAt: null }
-		: null;
+function noAllowance(reason: "closed_period" | "owners_and_admins_only") {
+	return {
+		allowance: null,
+		unavailable: [{ field: "allowance", reason } as const],
+	};
 }
 
 function periodId(start: Date): string {
@@ -74,7 +91,13 @@ const CURSOR_FILTER_KEYS = Object.keys({
 	endReason: true,
 	groupBy: true,
 	open: true,
+	order: true,
 	range: true,
+	search: true,
+	size: true,
+	sort: true,
+	status: true,
+	user: true,
 	workspace: true,
 } satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
 
@@ -137,33 +160,54 @@ function windowFor(range: CloudRange, anchor: CloudBillingAnchor | null) {
 }
 
 export function cloudRouterWith(deps: CloudDeps) {
-	const scopedProcedure = personProcedure.use(async ({ ctx, next }) => {
-		const { organizationId, isAdmin } = await requireActiveOrgRole(
-			ctx,
-			deps.db,
-		);
-		const enabled = await organizationFlagEnabled(
-			deps.flags,
-			FEATURE_FLAGS.CLOUD_USAGE,
-			organizationId,
-		);
-		if (!enabled) {
-			throw userError({
-				code: "FORBIDDEN",
-				message: "Cloud usage is not enabled for this organization.",
-				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
-			});
-		}
-		const cloudUsage = await deps.cloudUsage(organizationId);
-		const scope: CloudUsageScope = isAdmin
-			? { organizationId }
-			: { organizationId, userId: ctx.session.user.id };
-		return next({ ctx: { scope, isAdmin, cloudUsage } });
-	});
+	/** `gated`: the usage pages, behind the cloud usage flag; Billing reads the open period for every organization. */
+	const scopedProcedure = (gated: boolean) =>
+		personProcedure.use(async ({ ctx, next }) => {
+			const { organizationId, isAdmin } = await requireActiveOrgRole(
+				ctx,
+				deps.db,
+			);
+			if (
+				gated &&
+				!(await organizationFlagEnabled(
+					deps.flags,
+					FEATURE_FLAGS.CLOUD_USAGE,
+					organizationId,
+				))
+			) {
+				throw userError({
+					code: "FORBIDDEN",
+					message: "Cloud usage is not enabled for this organization.",
+					i18nKey: "serverError.cloud.cloudUsageNotEnabled",
+				});
+			}
+			const billing = await deps.billing(organizationId);
+			const cloudUsage = billing?.cloudUsage ?? null;
+			// A paid plan whose own rate was not read gets no price: the list rate could be the wrong one.
+			const rate =
+				cloudUsage?.overagePerGbHour ??
+				(billing?.tier === "free" ? await deps.listRatePerGbHour() : null);
+			if (rate === null && cloudUsage && billing?.tier !== "free") {
+				console.warn(
+					`[cloud] ${organizationId} has a paid plan but no GB-hour rate; usage has no price`,
+				);
+			}
+			const scope: CloudUsageScope = isAdmin
+				? { organizationId }
+				: { organizationId, userId: ctx.session.user.id };
+			const anchor = cloudUsage?.resetsAt
+				? cloudBillingAnchor(
+						new Date(cloudUsage.resetsAt),
+						billing?.startedAt ? new Date(billing.startedAt) : null,
+					)
+				: null;
+			return next({ ctx: { scope, isAdmin, cloudUsage, rate, anchor } });
+		});
+	const pageProcedure = scopedProcedure(true);
 
 	return {
 		usage: {
-			query: scopedProcedure
+			query: pageProcedure
 				.input(cloudUsageInputSchema)
 				.output(cloudUsageOutputSchema)
 				.query(async ({ ctx, input }) => {
@@ -174,25 +218,41 @@ export function cloudRouterWith(deps: CloudDeps) {
 							i18nKey: "serverError.cloud.onlyAdminsSeeUsageByPerson",
 						});
 					}
-					const sort = input.groupBy === "day" ? "key" : "gbMinutes";
+					const sort =
+						input.sort ??
+						(input.groupBy === "day" || input.groupBy === "billingDay"
+							? null
+							: "gbHours");
+					const keysetSort =
+						sort === null ? "key" : sort === "gbHours" ? "gbMinutes" : sort;
 					const keyset = readCursor<UsageKeyset>(
 						input,
-						usageKeysetSchemas[sort],
+						usageKeysetSchemas[keysetSort],
 					);
-					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
+					const window = windowFor(input.range, ctx.anchor);
 					const { nextCursor, ...result } = await queryCloudUsage(
 						deps.db,
 						ctx.scope,
 						{
 							window,
-							filters: { workspace: input.workspace },
+							filters: {
+								workspace: input.workspace,
+								user: ctx.isAdmin ? input.user : undefined,
+								size: input.size,
+								status: input.status,
+								search: input.search,
+							},
 							groupBy: input.groupBy,
+							sort:
+								sort === null
+									? undefined
+									: { by: sort, order: input.order ?? "desc" },
 							limit: input.limit,
 							cursor: keyset && {
-								gbMinutes: keyset.sort === "gbMinutes" ? keyset.value : "0",
+								value: keyset.sort === "key" ? "0" : keyset.value,
 								key: keyset.key,
 							},
-							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+							overagePerGbHour: ctx.rate,
 						},
 					);
 					return {
@@ -202,21 +262,25 @@ export function cloudRouterWith(deps: CloudDeps) {
 							nextCursor &&
 							writeCursor(
 								input,
-								sort === "key"
-									? { sort, key: nextCursor.key }
-									: { sort, value: nextCursor.gbMinutes, key: nextCursor.key },
+								keysetSort === "key"
+									? { sort: keysetSort, key: nextCursor.key }
+									: {
+											sort: keysetSort,
+											value: nextCursor.value,
+											key: nextCursor.key,
+										},
 							),
 					};
 				}),
 		},
 
 		boots: {
-			list: scopedProcedure
+			list: pageProcedure
 				.input(cloudBootsInputSchema)
 				.output(cloudBootsOutputSchema)
 				.query(async ({ ctx, input }) => {
 					const keyset = readCursor(input, bootKeysetSchema);
-					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
+					const window = windowFor(input.range, ctx.anchor);
 					const { nextCursor, ...result } = await listCloudBoots(
 						deps.db,
 						ctx.scope,
@@ -231,7 +295,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 								id: keyset.key,
 							},
 							now: new Date(),
-							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+							overagePerGbHour: ctx.rate,
 						},
 					);
 					return {
@@ -250,12 +314,19 @@ export function cloudRouterWith(deps: CloudDeps) {
 
 		periods: {
 			/** Newest first, back to the period the organization was created in. */
-			list: scopedProcedure
+			list: scopedProcedure(false)
 				.input(cloudPeriodsInputSchema)
 				.output(cloudPeriodsOutputSchema)
 				.query(async ({ ctx, input }) => {
-					const anchor = anchorOf(ctx.cloudUsage);
-					if (!anchor) return { items: [], nextCursor: null };
+					const { cloudUsage, anchor } = ctx;
+					if (!cloudUsage || !anchor) {
+						return {
+							items: [],
+							nextCursor: null,
+							ratePerGbHour: ctx.rate,
+							boughtPerGbHour: cloudUsage?.boughtPerGbHour ?? null,
+						};
+					}
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
 						: -1;
@@ -270,9 +341,8 @@ export function cloudRouterWith(deps: CloudDeps) {
 					).filter((period) => period.to > createdAt);
 					const page = await queryCloudUsageByPeriod(deps.db, ctx.scope, {
 						periods: periods.slice(0, input.limit),
-						overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+						overagePerGbHour: ctx.rate,
 					});
-					const allowance = ctx.isAdmin ? ctx.cloudUsage : null;
 					const last = page.at(-1);
 					return {
 						items: page.map(({ from, to, metrics }, i) => {
@@ -282,25 +352,18 @@ export function cloudRouterWith(deps: CloudDeps) {
 								start: from,
 								end: to,
 								closed: !open,
-								allowance:
-									open && allowance
-										? {
-												includedGbHours:
-													allowance.includedGbMinutes === null
-														? null
-														: allowance.includedGbMinutes / 60,
-												usedGbHours: allowance.usedGbMinutes / 60,
-												overageGbHours: allowance.overageGbMinutes / 60,
-												prepaidRemainingGbHours:
-													allowance.prepaidGbMinutes / 60,
-												resetsAt: to,
-											}
-										: null,
+								...(!open
+									? noAllowance("closed_period")
+									: !ctx.isAdmin
+										? noAllowance("owners_and_admins_only")
+										: allowanceOf(cloudUsage, to, ctx.rate)),
 								metrics,
 							};
 						}),
 						nextCursor:
 							periods.length > input.limit && last ? periodId(last.from) : null,
+						ratePerGbHour: ctx.rate,
+						boughtPerGbHour: cloudUsage.boughtPerGbHour,
 					};
 				}),
 		},
@@ -309,9 +372,17 @@ export function cloudRouterWith(deps: CloudDeps) {
 
 export const cloudRouter = cloudRouterWith({
 	db,
-	cloudUsage: async (organizationId) =>
+	billing: async (organizationId) =>
+		billingUsesAutumn ? organizationBilling(organizationId) : null,
+	listRatePerGbHour: async () =>
 		billingUsesAutumn
-			? (await organizationBilling(organizationId)).cloudUsage
+			? listRatePerGbHour().catch((error) => {
+					console.error(
+						"[cloud] catalog unavailable; usage has no price",
+						error,
+					);
+					return null;
+				})
 			: null,
 	flags: posthog,
 });

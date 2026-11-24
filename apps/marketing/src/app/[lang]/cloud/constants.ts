@@ -11,7 +11,7 @@ export const CLOUD_FEATURES: CloudFeature[] = [
 		title: msg({ message: "Close your laptop" }),
 		description: msg({
 			message:
-				"Agents keep working in the cloud. Open the workspace again from desktop, iPhone, or iPad.",
+				"Agents keep working in the cloud. Open the workspace again from your desktop or phone.",
 		}),
 	},
 	{

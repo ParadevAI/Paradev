@@ -69,14 +69,14 @@ export function ProjectIconPicker({
 			<PopoverTrigger asChild>{children}</PopoverTrigger>
 			<PopoverContent
 				align="start"
-				className="w-[412px] p-0"
+				className="flex max-h-[var(--radix-popover-content-available-height)] w-[412px] max-w-[calc(100vw-1rem)] flex-col overflow-hidden p-0"
 				onClick={(event) => event.stopPropagation()}
 				onOpenAutoFocus={(event) => {
 					event.preventDefault();
 					filterRef.current?.focus();
 				}}
 			>
-				<div className="flex items-center justify-between px-3 pt-2.5">
+				<div className="flex shrink-0 items-center justify-between px-3 pt-2.5">
 					<span className="text-xs font-medium text-muted-foreground">
 						<Trans>Icons</Trans>
 					</span>
@@ -90,7 +90,7 @@ export function ProjectIconPicker({
 						</button>
 					)}
 				</div>
-				<div className="flex items-center gap-1.5 px-3 pt-2">
+				<div className="flex shrink-0 items-center gap-1.5 px-3 pt-2">
 					<div className="relative flex-1">
 						<LuSearch className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
 						<input

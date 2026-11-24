@@ -6,26 +6,26 @@ image: /changelog/terminal.png
 
 ## VS Code-Style Resizable Sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/457" />
 
-- Replace percentage-based panels with a custom `ResizableSidebar` component
-- Use pixel-based widths (250px default, 200-500px range) for consistent sizing
-- Implement drag-to-resize with mouse events like VS Code
-- Add wider invisible drag handle (12px) for easier resize targeting while keeping thin visible indicator
+- The sidebar is a new resizable panel, and its width is no longer a percentage of the window
+- The width is in pixels (250px by default, from 200px to 500px), so the size stays consistent
+- Drag the sidebar edge to resize it, as in VS Code
+- The drag handle is 12px wide and invisible, which makes it easy to grab, and the visible line stays thin
 
 ## Multiple Terminal Tabs <PRBadge url="https://github.com/superset-sh/superset/pull/452" />
 
-Fixed a regression that prevented creating new terminal tabs. The "New Terminal" button now creates new tabs again instead of just activating existing ones. Multiple tabs can be created per workspace for parallel workflows.
+The **New Terminal** button creates a new tab again. A regression made it only switch to an existing tab. Each workspace can have more than one terminal tab, so you can run work in parallel.
 
 ## Port Visibility <PRBadge url="https://github.com/superset-sh/superset/pull/462" />
 
 ![Ports panel](/changelog/ports.png)
 
-- Auto-detects listening ports from terminal output and verifies activity before showing
-- New Ports panel in the sidebar showing ports grouped by workspace with quick actions (open in browser, jump to pane)
-- Real-time updates via subscriptions so the list stays current as ports appear/disappear
-- Cleans up port entries when terminal panes close to avoid stale items
+- Superset detects listening ports from terminal output and checks that each port is active before it shows it
+- A new Ports panel in the sidebar groups ports by workspace, with quick actions (open in browser, jump to pane)
+- The list updates in real time as ports appear and disappear
+- When a terminal pane closes, its ports leave the list
 
 ## Multi-line URL Links <PRBadge url="https://github.com/superset-sh/superset/pull/467" />
 
-- Extract multi-line spanning logic into a shared `MultiLineLinkProvider` base class
-- Create `UrlLinkProvider` that supports URLs spanning wrapped terminal lines
-- Replace `WebLinksAddon` with the new custom provider for consistent multi-line handling
+- A URL that wraps across terminal lines now works as one link
+- Other link types can use the same logic for wrapped links
+- A custom link provider replaces the old web links add-on, so wrapped links behave the same way everywhere

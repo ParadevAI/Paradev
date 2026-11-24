@@ -7,7 +7,6 @@ import { command } from "../../../../lib/command";
 import { withPluginHints } from "../../../../lib/plugins/errors";
 
 export default command({
-	sandbox: false,
 	description: "Add a marketplace from a GitHub repo or local path",
 	args: [
 		positional("source")
@@ -56,7 +55,7 @@ export default command({
 					location: local.location,
 				},
 			],
-			message: `${local.updated ? "Updated" : "Added"} marketplace "${local.name}" with ${local.plugins} plugin${local.plugins === 1 ? "" : "s"}. Install one with: superset plugins install <name> --marketplace ${local.name}`,
+			message: `${local.updated ? "Updated" : "Added"} marketplace "${local.name}" with ${local.plugins} plugin${local.plugins === 1 ? "" : "s"}. Install one with: paradev plugins install <name> --marketplace ${local.name}`,
 		};
 	},
 });

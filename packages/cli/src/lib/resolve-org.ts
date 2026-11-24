@@ -38,7 +38,7 @@ export async function resolveOrganization<T extends OrgChoice>(
 	activeOrgId?: string,
 ): Promise<T> {
 	if (orgs.length === 0) {
-		throw new CLIError("No organizations", "Run: superset auth login");
+		throw new CLIError("No organizations", "Run: paradev auth login");
 	}
 
 	if (orgOption) {

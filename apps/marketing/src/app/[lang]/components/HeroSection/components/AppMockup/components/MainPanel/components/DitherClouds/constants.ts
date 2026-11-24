@@ -3,6 +3,7 @@ export const DOT = 3;
 export const MAX_DPR = 2;
 export const FRAME_MS = 1000 / 15;
 export const DRIFT_PER_FRAME = 0.0044;
+export const LATTICE_SIZE = 256;
 
 export const BAYER = [
 	[0, 32, 8, 40, 2, 34, 10, 42],

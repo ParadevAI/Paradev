@@ -1,1 +1,4 @@
-export { useTagFolderActions } from "./useTagFolderActions";
+export {
+	type TagFolderActions,
+	useTagFolderActions,
+} from "./useTagFolderActions";

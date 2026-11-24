@@ -1,3 +1,5 @@
+import { readPublicEnv } from "@superset/shared/public-env";
+
 export function agentSessionId(): string | undefined {
-	return process.env.SUPERSET_PANE_ID || process.env.SUPERSET_TERMINAL_ID;
+	return readPublicEnv("PANE_ID") || readPublicEnv("TERMINAL_ID");
 }

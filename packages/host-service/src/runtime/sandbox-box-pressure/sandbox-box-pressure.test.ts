@@ -1,4 +1,5 @@
-import { expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import * as Sentry from "@sentry/node";
 import { BOX_PRESSURE_HEARTBEAT_MS } from "@superset/shared/box-pressure";
 import type { BoxResources } from "../box-resources";
 import { startSandboxBoxPressureReporter } from "./sandbox-box-pressure";
@@ -10,7 +11,7 @@ const calm: BoxResources = {
 	memoryStalledNowPercent: 0,
 	memoryUsedMb: 2000,
 	memoryLimitMb: 8192,
-	recentReap: null,
+	memguardActions: [],
 };
 
 function harness(status = 200) {
@@ -64,4 +65,71 @@ test("backs off after a failed report instead of retrying every sample", async (
 	expect(bodies).toHaveLength(1);
 	await step(31_000);
 	expect(bodies).toHaveLength(2);
+});
+
+describe("memguard actions", () => {
+	let warn: ReturnType<typeof spyOn<typeof Sentry.logger, "warn">>;
+	beforeEach(() => {
+		warn = spyOn(Sentry.logger, "warn").mockImplementation(() => {});
+	});
+	afterEach(() => warn.mockRestore());
+
+	const reap = {
+		kind: "reap" as const,
+		at: 1_000,
+		rssMb: 5100,
+		adj: -300,
+		availableMb: 500,
+		floorMb: 650,
+	};
+	const low = (at: number, availableMb: number) => ({
+		kind: "pressure" as const,
+		at,
+		availableMb,
+		floorMb: 650,
+	});
+
+	test("logs each action once, with its class and sizes and no process name", async () => {
+		const { step } = harness();
+		await step(0, { ...calm, memguardActions: [reap] });
+		await step(5_000, { ...calm, memguardActions: [reap, low(2_000, 600)] });
+		expect(warn.mock.calls).toEqual([
+			[
+				"box.reaped",
+				{
+					"log.source": "memguard",
+					"box.event": true,
+					"reap.class": "session",
+					"reap.rss_mb": 5100,
+					"memory.available_mb": 500,
+					"memory.floor_mb": 650,
+					"memory.limit_mb": 8192,
+				},
+			],
+			[
+				"box.memory_low",
+				{
+					"log.source": "memguard",
+					"box.event": true,
+					"memory.available_mb": 600,
+					"memory.floor_mb": 650,
+					"memory.limit_mb": 8192,
+				},
+			],
+		]);
+	});
+
+	test("logs at most one low-memory record a sample, the newest", async () => {
+		const { step } = harness();
+		await step(0, {
+			...calm,
+			memguardActions: [low(1_000, 640), low(2_000, 620), low(3_000, 600)],
+		});
+		expect(
+			warn.mock.calls.map(
+				([, attributes]) =>
+					(attributes as Record<string, unknown>)["memory.available_mb"],
+			),
+		).toEqual([600]);
+	});
 });

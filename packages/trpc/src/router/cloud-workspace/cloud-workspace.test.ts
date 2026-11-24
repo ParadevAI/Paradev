@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
+import { CLOUD_WORKSPACE_NOT_STARTED_KEY } from "@superset/shared/sandbox/access";
 import { stub } from "../../../test/stub";
 import * as attachments from "../../lib/attachments";
 import * as plan from "../../lib/billing/plan";
@@ -129,13 +130,27 @@ stub(realtime, {
 	nudge: () => {},
 	readWorkspaceForwards: async () => [FORWARD],
 });
+let describing = 0;
+let peakDescribing = 0;
+let describeHeld: Promise<void> | null = null;
 stub(sandbox, {
-	describeSandbox: async () => ({
-		hostTarget: "https://box-1.example",
-		running,
-		vcpus: boxVcpus,
-		expiresAt: running ? new Date(Date.now() + 60_000) : null,
-		sessionId: "session_1",
+	describeSandbox: async () => {
+		describing += 1;
+		peakDescribing = Math.max(peakDescribing, describing);
+		await describeHeld;
+		describing -= 1;
+		return {
+			hostTarget: "https://box-1.example",
+			running,
+			vcpus: boxVcpus,
+			expiresAt: running ? new Date(Date.now() + 60_000) : null,
+			sessionId: "session_1",
+		};
+	},
+	mintSandboxGateAccess: async () => ({
+		url: "https://gate.example",
+		token: "ticket",
+		expiresAt: new Date(Date.now() + 60_000),
 	}),
 	stopAndSnapshot: async () => ({ sessionId: "session_1" }),
 	deleteSandbox: async () => {},
@@ -146,11 +161,18 @@ stub(sandbox, {
 	recordWorkspaceRepositories: async () => {},
 	workspaceBranchName: () => "paradev/ws-1",
 });
+let wakeFailure: Error | null = null;
+const markedUnavailable: string[] = [];
 stub(wake, {
+	markSandboxUnavailable: async (row: { id: string }) => {
+		markedUnavailable.push(row.id);
+	},
 	wakeCloudWorkspace: async () => {
+		if (wakeFailure) throw wakeFailure;
 		if (!running) return null;
 		return {
 			hostTarget: "https://box-1.example",
+			agentsToRestart: [],
 			agentCredentialsChanged: false,
 		};
 	},
@@ -159,6 +181,7 @@ stub(wake, {
 		boxVcpus = 16;
 		return {
 			hostTarget: "https://box-1.example",
+			agentsToRestart: [],
 			agentCredentialsChanged: false,
 		};
 	},
@@ -183,6 +206,8 @@ const caller = createCallerFactory(
 );
 
 beforeEach(() => {
+	peakDescribing = 0;
+	describeHeld = null;
 	running = false;
 	boxVcpus = 8;
 	restartedWith = [];
@@ -373,5 +398,42 @@ describe("cloudWorkspace.forwards", () => {
 				id: "9c1d2e3f-4a5b-4c6d-8e7f-0a1b2c3d4e5f",
 			}),
 		).rejects.toMatchObject({ code: "NOT_FOUND" });
+	});
+});
+
+describe("cloudWorkspace.access in one large batch", () => {
+	test("addresses a few workspaces at a time, and a wake is not held behind them", async () => {
+		let release = () => {};
+		describeHeld = new Promise((resolve) => {
+			release = resolve;
+		});
+		const addresses = Array.from({ length: 64 }, () =>
+			caller.cloudWorkspace.access({ id: WORKSPACE_ID }),
+		);
+		await Bun.sleep(0);
+		running = true;
+		const woken = await caller.cloudWorkspace.access({
+			id: WORKSPACE_ID,
+			wake: true,
+		});
+		expect(woken.running).toBe(true);
+		release();
+		const granted = await Promise.all(addresses);
+		expect(granted).toHaveLength(64);
+		expect(peakDescribing).toBeLessThanOrEqual(8);
+	});
+});
+
+describe("cloudWorkspace.access with wake, past the wake deadline", () => {
+	test("answers the could-not-start key, and leaves the workspace as it was", async () => {
+		wakeFailure = new sandbox.CloudWorkspaceNotStartedError();
+		const error = await caller.cloudWorkspace
+			.access({ id: WORKSPACE_ID, wake: true })
+			.catch((e) => e);
+		wakeFailure = null;
+		expect(error.code).toBe("TIMEOUT");
+		expect(error.message).toBe("The cloud workspace could not start");
+		expect(error.cause.i18nKey).toBe(CLOUD_WORKSPACE_NOT_STARTED_KEY);
+		expect(markedUnavailable).toEqual([]);
 	});
 });

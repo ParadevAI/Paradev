@@ -77,6 +77,7 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			scheduledPlanId: null,
 			scheduledAt: null,
 			periodStart: new Date(NOW - 10 * DAY).toISOString(),
+			startedAt: new Date(NOW - 40 * DAY).toISOString(),
 			periodEnd: new Date(NOW + 20 * DAY).toISOString(),
 			billingInterval: "month",
 			lapsed: false,
@@ -247,24 +248,92 @@ describe("environment limit", () => {
 	});
 });
 
-test("cloud usage carries the plan's overage price per GB-hour", () => {
+const CATALOG_TEAM = [
+	{ amount: 1, interval: "month", billingUnits: 1000 },
+	{ amount: 0.06, interval: "one_off", billingUnits: 60 },
+];
+const CUSTOM_TEAM = [
+	{ amount: 0.5, interval: "month", billingUnits: 1000 },
+	{ amount: 0.04, interval: "one_off", billingUnits: 60 },
+];
+
+function pricedCustomer(
+	prices: { amount: number; interval: string; billingUnits: number }[],
+) {
 	const source = customer({
 		flags: pro,
 		subscription: {
 			plan: {
-				items: [
-					{
-						featureId: "box_gb_minutes",
-						price: { amount: 0.25, interval: "month", billingUnits: 250 },
-					},
-				],
+				items: prices.map((price) => ({ featureId: "box_gb_minutes", price })),
 			},
 		} as never,
 	});
 	source.balances = {
+		box_gb_minutes: {
+			granted: 0,
+			remaining: 0,
+			usage: 0,
+			unlimited: false,
+			breakdown: prices.map((price) => ({
+				includedGrant: price.interval === "month" ? 60000 : 0,
+				prepaidGrant: price.interval === "month" ? 0 : 6000,
+				remaining: 0,
+				usage: 0,
+				reset: { interval: price.interval },
+				price: {
+					amount: price.amount,
+					billingUnits: price.billingUnits,
+					billingMethod: price.interval === "month" ? "usage_based" : "prepaid",
+				},
+			})),
+		},
+	} as never;
+	return source;
+}
+
+test.each([
+	["the catalog", CATALOG_TEAM, 0.06, 0.06],
+	["its own custom version", CUSTOM_TEAM, 0.03, 0.04],
+] as const)("a customer on %s gets its own GB-hour prices", (_, prices, overage, pack) => {
+	const usage = billingFromCustomer(
+		pricedCustomer([...prices]),
+		NOW,
+	).cloudUsage;
+	expect(usage?.overagePerGbHour).toBeCloseTo(overage);
+	expect(usage?.boughtPerGbHour).toBeCloseTo(pack);
+	expect(usage?.pack).toEqual({ gbMinutes: 60, price: pack });
+});
+
+test("a plan with a pack but no monthly price has no overage rate", () => {
+	const source = pricedCustomer([
+		CUSTOM_TEAM[1] as (typeof CUSTOM_TEAM)[number],
+	]);
+	expect(billingFromCustomer(source, NOW).cloudUsage).toMatchObject({
+		overagePerGbHour: null,
+		pack: { gbMinutes: 60, price: 0.04 },
+	});
+});
+
+test.each([
+	[
+		"the paid plan's seat licenses",
+		{
+			licenses: [
+				{ parentPlanId: "pro", granted: 3 },
+				{ parentPlanId: "team", granted: 9 },
+			],
+			balances: {},
+		},
+		3,
+	],
+	["the seats feature", { balances: { seats: { granted: 4 } } }, 4],
+	["no seat count", { balances: {} }, null],
+] as const)("cloud usage counts seats from %s", (_, seats, expected) => {
+	const source = customer({ flags: pro, subscription: {} });
+	Object.assign(source, seats);
+	source.balances = {
+		...source.balances,
 		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
 	} as never;
-	expect(billingFromCustomer(source, NOW).cloudUsage?.overagePerGbHour).toBe(
-		0.06,
-	);
+	expect(billingFromCustomer(source, NOW).cloudUsage?.seats).toBe(expected);
 });

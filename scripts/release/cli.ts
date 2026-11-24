@@ -8,8 +8,7 @@
 //
 // Plain versions (no prerelease suffix) on purpose: a suffix would sort BELOW the
 // release (so `superset update` wouldn't deliver it) AND fail the host-service
-// min-version floor (semver.satisfies excludes prereleases). See
-// plans/20260709-unified-version-bumping.md.
+// min-version floor (semver.satisfies excludes prereleases).
 //
 // pty-daemon stays on its OWN 0.x track and is only bumped with --daemon.
 //

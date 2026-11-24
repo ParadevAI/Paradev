@@ -2,8 +2,11 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
+import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
+import type { ReactNode } from "react";
+import { LuArrowDown } from "react-icons/lu";
 import { cn } from "../../../../lib/utils";
-import { Button } from "../../../ui/button";
+import { Badge } from "../../../ui/badge";
 import {
 	Table,
 	TableBody,
@@ -12,137 +15,161 @@ import {
 	TableHeader,
 	TableRow,
 } from "../../../ui/table";
-import { FAILURE_REASONS, STATUS_LABELS } from "../../constants";
-import type { CloudPages, CloudUsage, WorkspaceRef } from "../../types";
-import { QueryStatus } from "../QueryStatus";
-import { SizeLabel } from "../SizeLabel";
+import { useUsageFormat } from "../../hooks/useUsageFormat";
+import type {
+	CloudUsageLink,
+	CloudUsageTarget,
+	WorkspacesSort,
+} from "../../types";
+import type { PricedRow } from "../../utils/priced";
+import { workspaceOf } from "../../utils/workspaceOf";
+import { Person } from "../Person";
+import { StatusBadge } from "../StatusBadge";
 
 interface WorkspacesTableProps {
-	pages: CloudPages<CloudUsage>;
+	Link: CloudUsageLink;
+	rows: PricedRow[];
 	isAdmin: boolean;
-	onSelect: (workspace: WorkspaceRef) => void;
+	period: string | undefined;
+	/** Makes the headers sort links, on the Workspaces page. */
+	sort?: { by: WorkspacesSort; to: (sort: WorkspacesSort) => CloudUsageTarget };
 }
 
+/** Folding, by the table's own width: owner and hours go first, then size, then GB-hours. */
+const WIDE = "hidden @3xl:table-cell";
+const MEDIUM = "hidden @xl:table-cell";
+const NARROW = "hidden @md:table-cell";
+
 export function WorkspacesTable({
-	pages,
+	Link,
+	rows,
 	isAdmin,
-	onSelect,
+	period,
+	sort,
 }: WorkspacesTableProps) {
 	const { i18n } = useLingui();
-	const { formatNumber, formatGbHours } = useFormat();
-	const rows = pages.data?.pages.flatMap((page) => page.items) ?? [];
+	const { formatNumber } = useFormat();
+	const { dollars, formatGbHours } = useUsageFormat();
+	const head = (by: WorkspacesSort, label: ReactNode, marked = true) =>
+		sort ? (
+			<Link to={sort.to(by)} className="hover:text-foreground">
+				{label}
+				{marked && sort.by === by && (
+					<LuArrowDown aria-hidden className="ml-1 inline size-3.5" />
+				)}
+			</Link>
+		) : (
+			label
+		);
 
 	return (
-		<section className="space-y-3">
-			<h3 className="text-sm font-medium">
-				{isAdmin ? <Trans>Workspaces</Trans> : <Trans>Your workspaces</Trans>}
-			</h3>
-			{!pages.data ? (
-				<QueryStatus isError={pages.isError} onRetry={() => pages.refetch()} />
-			) : (
-				<div className="rounded-md border">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>
-									<Trans>Workspace</Trans>
-								</TableHead>
-								{isAdmin && (
-									<TableHead className="hidden lg:table-cell">
-										<Trans>Owner</Trans>
-									</TableHead>
-								)}
-								<TableHead>
-									<Trans>Status</Trans>
-								</TableHead>
-								<TableHead className="hidden lg:table-cell">
-									<Trans>Size</Trans>
-								</TableHead>
-								<TableHead className="hidden text-right sm:table-cell">
-									<Trans>Hours</Trans>
-								</TableHead>
-								<TableHead className="text-right">
-									<Trans>GB-hours</Trans>
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{rows.map((row) => {
-								const workspace =
-									row.ref && "status" in row.ref ? row.ref : null;
-								return (
-									<TableRow key={row.key ?? ""}>
-										<TableCell
-											className={cn("whitespace-normal", isAdmin && "max-w-48")}
+		<div className="@container">
+			<Table>
+				<TableHeader>
+					<TableRow className="hover:bg-transparent">
+						<TableHead>{head("name", <Trans>Workspace</Trans>)}</TableHead>
+						{isAdmin && (
+							<TableHead className={WIDE}>
+								<Trans>Owner</Trans>
+							</TableHead>
+						)}
+						<TableHead>{head("status", <Trans>Status</Trans>)}</TableHead>
+						<TableHead className={MEDIUM}>
+							<Trans>Size</Trans>
+						</TableHead>
+						<TableHead className={cn(WIDE, "text-right")}>
+							{head("hours", <Trans>Billed hours</Trans>)}
+						</TableHead>
+						<TableHead className={cn("text-right", NARROW)}>
+							{head("gbHours", <Trans>GB-hours</Trans>, false)}
+						</TableHead>
+						<TableHead className={"text-right"}>
+							{head("gbHours", <Trans>Usage</Trans>)}
+						</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{rows.length === 0 && (
+						<TableRow className="hover:bg-transparent">
+							<TableCell
+								colSpan={7}
+								className="py-6 text-center text-sm text-muted-foreground"
+							>
+								<Trans>No workspaces.</Trans>
+							</TableCell>
+						</TableRow>
+					)}
+					{rows.map((row) => {
+						const workspace = workspaceOf(row);
+						const owner = workspace?.owner?.name;
+						const ownerImage = workspace?.owner?.image ?? null;
+						const size =
+							workspace && i18n._(MACHINE_SIZE_NAMES[workspace.size]);
+						return (
+							<TableRow key={row.key ?? ""} className="relative">
+								<TableCell className="w-full min-w-28 max-w-0 py-2.5 whitespace-normal @xl:min-w-40">
+									{workspace ? (
+										<Link
+											to={{
+												view: "workspace",
+												workspaceId: workspace.id,
+												period,
+											}}
+											className="font-semibold break-words after:absolute after:inset-0"
 										>
-											{workspace ? (
-												<button
-													type="button"
-													className="text-left font-medium break-words hover:underline"
-													onClick={() => onSelect(workspace)}
-												>
-													{workspace.name}
-												</button>
-											) : (
-												<span className="text-muted-foreground">
-													<Trans>Deleted workspace</Trans>
-												</span>
-											)}
-											{isAdmin && workspace?.owner && (
-												<div className="text-xs text-muted-foreground lg:hidden">
-													{workspace.owner.name}
-												</div>
-											)}
-										</TableCell>
-										{isAdmin && (
-											<TableCell className="hidden whitespace-normal lg:table-cell">
-												{workspace?.owner?.name}
-											</TableCell>
+											{workspace.name}
+										</Link>
+									) : (
+										<span className="text-muted-foreground">
+											<Trans>Deleted workspace</Trans>
+										</span>
+									)}
+									<div className="flex min-w-0 flex-wrap gap-x-3 text-xs text-muted-foreground @3xl:hidden">
+										{isAdmin && owner && (
+											<span className="break-words">{owner}</span>
 										)}
-										<TableCell className="whitespace-normal">
-											{workspace && (
-												<div
-													className={
-														workspace.status === "failed"
-															? "text-destructive"
-															: undefined
-													}
-												>
-													{i18n._(STATUS_LABELS[workspace.status])}
-												</div>
-											)}
-											{workspace?.failure && (
-												<div className="text-xs text-muted-foreground">
-													{i18n._(FAILURE_REASONS[workspace.failure.reason])}
-												</div>
-											)}
-										</TableCell>
-										<TableCell className="hidden lg:table-cell">
-											{workspace && <SizeLabel size={workspace.size} />}
-										</TableCell>
-										<TableCell className="hidden text-right tabular-nums sm:table-cell">
-											{formatNumber(row.hours, { maximumFractionDigits: 1 })}
-										</TableCell>
-										<TableCell className="text-right tabular-nums">
-											{formatGbHours(row.gbHours)}
-										</TableCell>
-									</TableRow>
-								);
-							})}
-						</TableBody>
-					</Table>
-				</div>
-			)}
-			{pages.hasNextPage && (
-				<Button
-					variant="outline"
-					size="sm"
-					disabled={pages.isFetchingNextPage}
-					onClick={() => pages.fetchNextPage()}
-				>
-					<Trans>Show more</Trans>
-				</Button>
-			)}
-		</section>
+										{size && (
+											<span className="whitespace-nowrap @xl:hidden">
+												{size}
+											</span>
+										)}
+									</div>
+								</TableCell>
+								{isAdmin && (
+									<TableCell
+										className={cn(WIDE, "min-w-40 max-w-56 whitespace-normal")}
+									>
+										{owner && <Person name={owner} image={ownerImage} />}
+									</TableCell>
+								)}
+								<TableCell>
+									{workspace && (
+										<span className="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5">
+											<StatusBadge workspace={workspace} />
+											{workspace.status === "asleep" &&
+												workspace.lastBoot?.endReason === "usage_limit" && (
+													<Badge variant="warning">
+														<Trans>Usage limit</Trans>
+													</Badge>
+												)}
+										</span>
+									)}
+								</TableCell>
+								<TableCell className={MEDIUM}>{size}</TableCell>
+								<TableCell className={cn(WIDE, "text-right tabular-nums")}>
+									{formatNumber(row.hours, { maximumFractionDigits: 0 })}
+								</TableCell>
+								<TableCell className={cn("text-right tabular-nums", NARROW)}>
+									{formatGbHours(row.gbHours)}
+								</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{dollars(row.usageUsd)}
+								</TableCell>
+							</TableRow>
+						);
+					})}
+				</TableBody>
+			</Table>
+		</div>
 	);
 }

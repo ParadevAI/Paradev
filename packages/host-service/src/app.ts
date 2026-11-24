@@ -39,6 +39,7 @@ import type { ApiAuthProvider } from "./providers/auth";
 import type { HostAuthProvider } from "./providers/host-auth";
 import { AgentJobRunner } from "./runtime/agent-jobs";
 import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
+import { caught } from "./runtime/box-log-filter";
 import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
@@ -344,7 +345,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 	};
 
-	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
+	// Chat v3 runtime. Registered unconditionally:
 	// the routes sit behind the same auth as every other host route, and the
 	// runtime is built on first request, so chat.db is never created on a host
 	// nobody chats with. Exposure is a client concern — the renderer gates the
@@ -384,7 +385,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	try {
 		chatV3.resumeAfterUpdate();
 	} catch (error) {
-		console.warn("[host-service] chat resume after update failed:", error);
+		console.warn(
+			"[host-service] chat resume after update failed:",
+			caught(error),
+		);
 	}
 
 	// Startup sweeps run in the background so they don't block server
@@ -404,7 +408,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	};
 	const runProjectPurge = () =>
 		purgeExpiredProjects(purgeContext).catch((err) => {
-			console.warn("[host-service] project purge failed:", err);
+			console.warn("[host-service] project purge failed:", caught(err));
 			return 0;
 		});
 	const projectPurgeTimer =
@@ -414,7 +418,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	projectPurgeTimer?.unref?.();
 	const runAttachmentSweep = () =>
 		sweepAttachmentStore().catch((err) => {
-			console.warn("[host-service] attachment sweep failed:", err);
+			console.warn("[host-service] attachment sweep failed:", caught(err));
 		});
 	const attachmentSweepTimer =
 		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
@@ -434,7 +438,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			db,
 			eventBus,
 		}).catch((err) => {
-			console.warn("[host-service] project backfill failed:", err);
+			console.warn("[host-service] project backfill failed:", caught(err));
 		});
 		// Finish any delete the previous process crashed out of (archived row
 		// whose worktree still exists).
@@ -451,7 +455,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			organizationId: config.organizationId,
 			isAuthenticated: true,
 		}).catch((err) => {
-			console.warn("[host-service] archived-workspace reconcile failed:", err);
+			console.warn(
+				"[host-service] archived-workspace reconcile failed:",
+				caught(err),
+			);
 		});
 		await runProjectPurge();
 		await runAttachmentSweep();
@@ -459,7 +466,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		// provider profiles. Last: it touches no host state the sweeps above
 		// repair, and a slow filesystem must not delay them.
 		await provisionSelectedAccounts(db).catch((err) => {
-			console.warn("[host-service] account provisioning failed:", err);
+			console.warn("[host-service] account provisioning failed:", caught(err));
 		});
 	})();
 
@@ -609,22 +616,28 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		try {
 			pullRequestRuntime.stop();
 		} catch (err) {
-			console.warn("[host-service] pullRequestRuntime.stop failed:", err);
+			console.warn(
+				"[host-service] pullRequestRuntime.stop failed:",
+				caught(err),
+			);
 		}
 		try {
 			pageWatch.stop();
 		} catch (err) {
-			console.warn("[host-service] pageWatch.stop failed:", err);
+			console.warn("[host-service] pageWatch.stop failed:", caught(err));
 		}
 		try {
 			await disposeLocalMobileDevices();
 		} catch (err) {
-			console.warn("[host-service] disposeLocalMobileDevices failed:", err);
+			console.warn(
+				"[host-service] disposeLocalMobileDevices failed:",
+				caught(err),
+			);
 		}
 		try {
 			await chatV3.dispose();
 		} catch (err) {
-			console.warn("[host-service] chatV3.dispose failed:", err);
+			console.warn("[host-service] chatV3.dispose failed:", caught(err));
 		}
 		// Retire the host-worker threads (and reap their in-flight git
 		// children) here rather than leaving them to process.exit(): exit joins
@@ -634,22 +647,28 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		try {
 			await getHostWorkerPool().dispose();
 		} catch (err) {
-			console.warn("[host-service] hostWorkerPool.dispose failed:", err);
+			console.warn(
+				"[host-service] hostWorkerPool.dispose failed:",
+				caught(err),
+			);
 		}
 		try {
 			await disposeUsageWorkerPool();
 		} catch (err) {
-			console.warn("[host-service] usageWorkerPool.dispose failed:", err);
+			console.warn(
+				"[host-service] usageWorkerPool.dispose failed:",
+				caught(err),
+			);
 		}
 		try {
 			eventBus.close();
 		} catch (err) {
-			console.warn("[host-service] eventBus.close failed:", err);
+			console.warn("[host-service] eventBus.close failed:", caught(err));
 		}
 		try {
 			gitWatcher.close();
 		} catch (err) {
-			console.warn("[host-service] gitWatcher.close failed:", err);
+			console.warn("[host-service] gitWatcher.close failed:", caught(err));
 		}
 		if (ownsDb) {
 			try {
@@ -720,7 +739,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			} catch (error) {
 				console.warn(
 					"[host-service] could not record unfinished chats:",
-					error,
+					caught(error),
 				);
 			}
 		},

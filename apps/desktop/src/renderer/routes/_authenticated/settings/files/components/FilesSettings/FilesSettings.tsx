@@ -11,7 +11,11 @@ import {
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences";
-import type { FolderTierMap, LinkTierMap } from "renderer/lib/clickPolicy";
+import {
+	FILE_LINK_PLAIN_DEFAULT,
+	type FolderTierMap,
+	type LinkTierMap,
+} from "renderer/lib/clickPolicy";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import { HighlightText } from "../../../components/HighlightText";
@@ -189,6 +193,7 @@ export function FilesSettings({ visibleItems }: FilesSettingsProps) {
 								onChange={handleFileChange}
 								idPrefix="links-file"
 								surface="file"
+								plainDefault={FILE_LINK_PLAIN_DEFAULT}
 							/>
 						)}
 					</section>

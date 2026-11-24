@@ -8,9 +8,12 @@ import { verifyQstashRequest } from "@/lib/verifyQstash";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-const bodySchema = z.object({ sourceId: z.string().uuid() });
+const bodySchema = z.object({
+	sourceId: z.string().uuid(),
+	full: z.boolean().optional(),
+});
 
-/** Syncs one source, queued when an admin adds it or asks for a sync. */
+/** Syncs one source, queued when an admin adds it or asks for a sync; an asked-for sync is full. */
 export async function POST(request: Request): Promise<Response> {
 	const body = await request.text();
 	const rejected = await verifyQstashRequest(
@@ -29,7 +32,9 @@ export async function POST(request: Request): Promise<Response> {
 		return Response.json({ error: "Invalid body" }, { status: 400 });
 	}
 
-	const outcome = await syncOrganizationPluginSource(parsed.data.sourceId);
+	const outcome = await syncOrganizationPluginSource(parsed.data.sourceId, {
+		full: parsed.data.full,
+	});
 	if (!outcome) return Response.json({ ok: true, removed: true });
 	return Response.json({ ok: !outcome.error, ...outcome });
 }

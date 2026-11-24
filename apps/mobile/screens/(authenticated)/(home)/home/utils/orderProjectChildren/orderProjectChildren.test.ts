@@ -28,15 +28,8 @@ const grouped = {
 	ungrouped: [row("new", 30), row("old", 10)],
 	folders: [folder("bugs", [row("fix", 5)]), folder("feat", [row("busy", 40)])],
 };
-const order = (sort: "manual" | "active" | "created", pinned: string[] = []) =>
-	names(
-		orderProjectChildren(
-			grouped,
-			sort,
-			(workspace) => workspace.t,
-			(workspace) => pinned.includes(workspace.name),
-		),
-	);
+const order = (sort: "manual" | "active" | "created") =>
+	names(orderProjectChildren(grouped, sort, (workspace) => workspace.t));
 
 describe("orderProjectChildren", () => {
 	it("manual keeps ungrouped rows, then folders in their order", () => {
@@ -51,21 +44,11 @@ describe("orderProjectChildren", () => {
 		expect(order("created")).toEqual(["new", "old", "[bugs]", "[feat]"]);
 	});
 
-	it("keeps pinned rows first outside manual order", () => {
-		expect(order("active", ["old"])).toEqual([
-			"old",
-			"[feat]",
-			"new",
-			"[bugs]",
-		]);
-	});
-
 	it("ranks a row with no time last", () => {
 		const children = orderProjectChildren(
 			{ ungrouped: [row("unknown", Number.NaN), row("dated", 1)], folders: [] },
 			"active",
 			(workspace) => workspace.t,
-			() => false,
 		);
 		expect(names(children)).toEqual(["dated", "unknown"]);
 	});

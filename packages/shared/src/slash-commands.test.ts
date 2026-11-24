@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
 	findSlashCommandByNameOrAlias,
+	foldLegacyPluginCommands,
 	getCommandMatchRank,
 	type SlashCommand,
 	shouldSuppressSlashMenuForCommittedCommand,
@@ -86,5 +87,22 @@ describe("findSlashCommandByNameOrAlias", () => {
 		expect(findSlashCommandByNameOrAlias(commands, "NEW")?.name).toBe("new");
 		expect(findSlashCommandByNameOrAlias(commands, "clear")?.name).toBe("new");
 		expect(findSlashCommandByNameOrAlias(commands, "")).toBeNull();
+	});
+});
+
+describe("foldLegacyPluginCommands", () => {
+	it("folds superset:x into paradev:x and keeps a superset:x with no twin", () => {
+		const folded = foldLegacyPluginCommands([
+			{ name: "paradev:orchestrate" },
+			{ name: "superset:orchestrate" },
+			{ name: "superset:browser" },
+		]);
+		expect(folded).toEqual([
+			{
+				command: { name: "paradev:orchestrate" },
+				legacyAliases: ["superset:orchestrate"],
+			},
+			{ command: { name: "superset:browser" }, legacyAliases: [] },
+		]);
 	});
 });

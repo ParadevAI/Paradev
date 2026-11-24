@@ -99,7 +99,7 @@ describe("a failed provision records why", () => {
 				message: "needs a paid plan",
 				i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan",
 			}),
-			new sandbox.SandboxNotReadyError("ws-box"),
+			new sandbox.SandboxNotReadyError("ws-box", null),
 			new Error("create failed"),
 		]) {
 			await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" });

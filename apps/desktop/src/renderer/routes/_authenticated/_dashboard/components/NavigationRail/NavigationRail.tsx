@@ -7,6 +7,7 @@ import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { PinnableRailButton } from "./components/PinnableRailButton";
 import { RailMoreMenu } from "./components/RailMoreMenu";
+import { RailUsage } from "./components/RailUsage";
 import { useRailDestinations } from "./hooks/useRailDestinations";
 
 export const NAVIGATION_RAIL_WIDTH = 52;
@@ -20,7 +21,7 @@ export function NavigationRail() {
 	return (
 		<nav
 			aria-label={t({ message: "Sections" })}
-			className="flex shrink-0 flex-col items-center gap-1.5 pt-1 pb-2"
+			className="hide-scrollbar flex min-h-0 shrink-0 flex-col items-center gap-1.5 overflow-y-auto pt-1 pb-2 [&>*]:shrink-0"
 			style={{ width: NAVIGATION_RAIL_WIDTH }}
 		>
 			<RailButton
@@ -40,9 +41,9 @@ export function NavigationRail() {
 					navigation.isChannelsOpen &&
 					!destinations.some((destination) => destination.id === "chat")
 				}
-				onOpenUsage={navigation.openUsage}
 			/>
 			<div className="mt-auto flex flex-col items-center gap-1.5">
+				<RailUsage />
 				<ParadevAnywhereButton variant="rail" />
 				<UpdatesPill isCollapsed />
 				<OrganizationDropdown variant="rail" />

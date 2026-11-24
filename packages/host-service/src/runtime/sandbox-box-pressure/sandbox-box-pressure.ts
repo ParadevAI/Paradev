@@ -2,6 +2,8 @@ import {
 	BOX_PRESSURE_HEARTBEAT_MS,
 	type BoxPressure,
 } from "@superset/shared/box-pressure";
+import type { MemguardAction } from "@superset/shared/sandbox/memguard-log";
+import { logBoxEvent } from "../../sentry";
 import type { BoxResources } from "../box-resources";
 import { type BoxPressureState, nextBoxPressure } from "./box-pressure-level";
 
@@ -9,13 +11,41 @@ const SAMPLE_MS = 5_000;
 const RETRY_MIN_MS = 30_000;
 const RETRY_MAX_MS = 10 * 60_000;
 
+function reapClass(adj: number): "box" | "session" | "other" {
+	if (adj <= -900) return "box";
+	if (adj <= -300) return "session";
+	return "other";
+}
+
+function logMemguardAction(action: MemguardAction, limitMb: number): void {
+	const memory = {
+		"memory.available_mb": action.availableMb,
+		"memory.floor_mb": action.floorMb,
+		"memory.limit_mb": limitMb,
+	};
+	if (action.kind === "pressure") {
+		logBoxEvent(
+			"box.memory_low",
+			{ "log.source": "memguard", ...memory },
+			"warn",
+		);
+		return;
+	}
+	logBoxEvent(
+		"box.reaped",
+		{
+			"log.source": "memguard",
+			"reap.class": reapClass(action.adj),
+			"reap.rss_mb": action.rssMb,
+			...memory,
+		},
+		"warn",
+	);
+}
+
 function sameReport(a: BoxPressure | null, b: BoxPressure | null): boolean {
 	if (!a || !b) return !a && !b;
-	return (
-		a.level === b.level &&
-		a.limitedBy.join() === b.limitedBy.join() &&
-		a.reap?.at === b.reap?.at
-	);
+	return a.level === b.level && a.limitedBy.join() === b.limitedBy.join();
 }
 
 export function startSandboxBoxPressureReporter(args: {
@@ -35,6 +65,7 @@ export function startSandboxBoxPressureReporter(args: {
 	let inFlight = false;
 	let retryAt = 0;
 	let retryDelay = RETRY_MIN_MS;
+	let loggedMemguardAt = 0;
 
 	const report = async (pressure: BoxPressure | null) => {
 		inFlight = true;
@@ -69,9 +100,21 @@ export function startSandboxBoxPressureReporter(args: {
 	};
 
 	const tick = () => {
-		if (inFlight || now() < retryAt) return;
 		const sample = args.read();
 		if (!sample) return;
+		const fresh = sample.memguardActions.filter(
+			(action) => action.at > loggedMemguardAt,
+		);
+		const newestPressure = fresh
+			.filter((action) => action.kind === "pressure")
+			.at(-1);
+		for (const action of fresh) {
+			if (action.kind === "reap" || action === newestPressure) {
+				logMemguardAction(action, sample.memoryLimitMb);
+			}
+		}
+		loggedMemguardAt = fresh.at(-1)?.at ?? loggedMemguardAt;
+		if (inFlight || now() < retryAt) return;
 		const at = now();
 		state = nextBoxPressure(state, sample, at);
 		const due =

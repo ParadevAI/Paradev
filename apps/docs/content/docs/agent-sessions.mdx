@@ -14,7 +14,7 @@ If the resume fails, the pill turns into "Failed to resume" with a **Retry** but
 Works for agents with an id-based resume command (the **Resume Args** field under **Settings → Agents**). From the CLI:
 
 ```bash
-superset agents create --workspace ws_… --agent claude --resume-session <sessionId>
+paradev agents create --workspace ws_… --agent claude --resume-session <sessionId>
 ```
 
 ## Fork and Hand Off Sessions
@@ -58,23 +58,23 @@ A handoff sends terminal output to the target agent's provider. Paradev removes 
 Click the copy icon in an agent terminal's header (**Copy IDs**):
 
 - **Copy agent session ID** - The agent's own session id, used by `--resume-session` and `--fork-session`
-- **Copy terminal ID** - The Paradev terminal id, used by `--from-terminal` and `superset agents read`
+- **Copy terminal ID** - The Paradev terminal id, used by `--from-terminal` and `paradev agents read`
 
 ## From the CLI
 
 ```bash
 # Fork a session
-superset agents create --workspace <workspace-id> --agent claude --fork-session <agent-session-id>
+paradev agents create --workspace <workspace-id> --agent claude --fork-session <agent-session-id>
 # Continue in another agent
-superset agents create --workspace <workspace-id> --agent codex --from-terminal <terminal-id>
+paradev agents create --workspace <workspace-id> --agent codex --from-terminal <terminal-id>
 ```
 
 `--from-terminal` builds its own prompt, so it does not accept `--prompt`. Use `--context-chars` to send less than 36,000 characters. See [`agents create`](/cli/cli-reference#agents).
 
 ## Read an Agent's Transcript
 
-`superset agents read` returns the agent's saved conversation, including what scrolled off a full-screen interface. Paradev can read saved transcripts for Claude Code and Codex. The command fails for other agents, and when the saved transcript is missing. It does not fall back to terminal output.
+`paradev agents read` returns the agent's saved conversation, including what scrolled off a full-screen interface. Paradev can read saved transcripts for Claude Code and Codex. The command fails for other agents, and when the saved transcript is missing. It does not fall back to terminal output.
 
 ```bash
-superset agents read --local --workspace <workspace-id> --terminal <terminal-id>
+paradev agents read --local --workspace <workspace-id> --terminal <terminal-id>
 ```

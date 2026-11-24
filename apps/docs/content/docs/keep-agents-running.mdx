@@ -31,15 +31,15 @@ The desktop app starts its own host service and stops it when you quit. To keep 
    curl -fsSL https://paradev.com/cli/install.sh | sh
    ```
 
-2. Quit the Paradev desktop app. While the app is running, the host belongs to it, and `superset start` only reports that a host is already running.
+2. Quit the Paradev desktop app. While the app is running, the host belongs to it, and `paradev start` only reports that a host is already running.
 3. Sign in and start the host service:
 
    ```bash
-   superset auth login
-   superset start --daemon
+   paradev auth login
+   paradev start --daemon
    ```
 
-4. Run `superset status` and check that the host is running before you leave.
+4. Run `paradev status` and check that the host is running before you leave.
 
 The CLI host picks up terminals that are already running and stays registered with the relay. On a dedicated machine, such as a Mac mini or a Linux server, this is the recommended setup. See [Getting Started](/cli/getting-started), [Host Server](/cli/host-server), and [Remote Access](/remote-access).
 
@@ -48,7 +48,7 @@ Keep the machine awake and online. A machine that sleeps or loses its network co
 ## Stop Everything
 
 - **Quit Paradev Completely** in the menu bar stops the host service and ends every terminal session.
-- On a CLI host, `superset stop` stops the host server but leaves terminals running; `superset stop --terminals` ends them too.
+- On a CLI host, `paradev stop` stops the host server but leaves terminals running; `paradev stop --terminals` ends them too.
 
 ## FAQ
 

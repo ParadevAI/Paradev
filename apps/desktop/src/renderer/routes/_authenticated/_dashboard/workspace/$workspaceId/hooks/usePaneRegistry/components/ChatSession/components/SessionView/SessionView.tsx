@@ -17,6 +17,7 @@ import type {
 	UserContent,
 	UserMessage,
 } from "@superset/chat/protocol";
+import { notRunningSessionId } from "@superset/chat/protocol";
 import {
 	useApprovals,
 	useChatSession,
@@ -27,6 +28,7 @@ import { MessageScroller } from "@superset/chat-ui/MessageScroller";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -77,6 +79,7 @@ import {
 import { ComposerChips } from "./components/ComposerChips";
 import { HistoryNotice } from "./components/HistoryNotice";
 import { TranscriptLoadState } from "./components/TranscriptLoadState";
+import { SubagentNotice } from "./components/SubagentNotice";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -127,6 +130,7 @@ export function SessionView({
 	sessionAccount,
 	onEditMessage,
 	onRestartAndContinue,
+	onSessionGone,
 	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
@@ -174,6 +178,8 @@ export function SessionView({
 	onEditMessage?: (request: ChatEditRequest) => void;
 	/** Restarts the agent and sends `prompt` once it is back. */
 	onRestartAndContinue?: (prompt: string) => Promise<boolean>;
+	/** Takes prompts the host refused because the chat's agent is gone; false leaves them to the composer. */
+	onSessionGone?: (prompts: UserContent[][]) => boolean;
 	/** Resolves false when the new chat could not be started. */
 	onStartNewChat?: () => Promise<boolean>;
 	/** Called when the user sends a message, as opposed to anything sent for them. */
@@ -225,9 +231,11 @@ export function SessionView({
 		[draftKey],
 	);
 	const sentDrafts = useRef(new Map<string, ComposerDraft>());
+	const handedOverDrafts = useRef(new Map<string, ComposerDraft>());
 	const draftOf = useCallback(
 		(entry: OutboxEntry): ComposerDraft =>
-			sentDrafts.current.get(entry.clientId) ?? {
+			sentDrafts.current.get(entry.clientId) ??
+			handedOverDrafts.current.get(JSON.stringify(entry.content)) ?? {
 				segments: [{ type: "text", text: contentText(entry.content) }],
 				attachments: [],
 			},
@@ -236,15 +244,39 @@ export function SessionView({
 	useEffect(() => {
 		const failed = outbox.filter((entry) => entry.state === "failed");
 		if (failed.length === 0) return;
+		const gone = failed.filter(
+			(entry) => notRunningSessionId(entry.lastError) !== null,
+		);
+		const handedOver =
+			gone.length > 0 &&
+			onSessionGone?.(gone.map((entry) => entry.content)) === true;
+		const restored = handedOver
+			? failed.filter((entry) => !gone.includes(entry))
+			: failed;
 		for (const entry of failed) {
 			discardPrompt(entry.clientId);
-			restoreDraft(draftOf(entry), draftKey);
+			const contentKey = JSON.stringify(entry.content);
+			if (restored.includes(entry)) {
+				restoreDraft(draftOf(entry), draftKey);
+				handedOverDrafts.current.delete(contentKey);
+			} else {
+				handedOverDrafts.current.set(contentKey, draftOf(entry));
+			}
 			sentDrafts.current.delete(entry.clientId);
 		}
+		if (restored.length === 0) return;
 		toast.error(
 			t({ message: "Couldn't send your message. It's back in the composer." }),
 		);
-	}, [outbox, discardPrompt, restoreDraft, draftOf, draftKey, t]);
+	}, [
+		outbox,
+		discardPrompt,
+		restoreDraft,
+		draftOf,
+		draftKey,
+		onSessionGone,
+		t,
+	]);
 	useEffect(() => {
 		const live = new Set(outbox.map((entry) => entry.clientId));
 		for (const clientId of sentDrafts.current.keys()) {
@@ -485,18 +517,13 @@ export function SessionView({
 	});
 	const {
 		focusedId: focusedSubagentId,
+		parentTitle: subagentParentTitle,
 		openSubagent,
 		goBack,
 	} = useSubagentNavigation({
 		chatKey,
 		items: session.snapshot.items,
 	});
-	const shownSubagentId = useRef(focusedSubagentId);
-	useEffect(() => {
-		if (shownSubagentId.current === focusedSubagentId) return;
-		shownSubagentId.current = focusedSubagentId;
-		focusComposer();
-	}, [focusedSubagentId, focusComposer]);
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
 			restoreDraft(
@@ -530,6 +557,39 @@ export function SessionView({
 		onUnsent: restoreUnsent,
 	});
 	openDraftKey.current = subagent.draftKey;
+	const subagentBackRef = useRef<HTMLButtonElement>(null);
+	const subagentBlocked = subagent.target?.blockedBy !== undefined;
+	const shownSubagent = useRef<{ id: string | null; blocked: boolean } | null>(
+		null,
+	);
+	useEffect(() => {
+		const shown = shownSubagent.current;
+		shownSubagent.current = { id: focusedSubagentId, blocked: subagentBlocked };
+		const active = document.activeElement;
+		const focusLost = active === document.body || !!active?.closest("[inert]");
+		if (shown?.id !== focusedSubagentId) {
+			if (!isActive && !focusLost && !paneRef.current?.contains(active)) return;
+			if (subagentBlocked) subagentBackRef.current?.focus();
+			else if (shown) focusComposer();
+			return;
+		}
+		if (subagentBlocked && !shown.blocked && focusLost)
+			subagentBackRef.current?.focus();
+	}, [focusedSubagentId, focusComposer, subagentBlocked, isActive]);
+
+	const subagentName = subagent.target?.name ?? "";
+	const onSubagentDraftBlocked = useCallback(
+		(draft: ComposerDraft) => {
+			const name = subagentName;
+			restoreDraft(draft, draftKey);
+			toast.info(
+				t({
+					message: `${name} can't take messages. Your text is back in the main chat.`,
+				}),
+			);
+		},
+		[restoreDraft, draftKey, subagentName, t],
+	);
 
 	const onBackgroundSubagent = useMoveToBackground(client);
 	const plugins = usePluginMentionOptions();
@@ -664,6 +724,7 @@ export function SessionView({
 				runningTurnId !== null ||
 				approvals.length > 0 ||
 				outbox.length > 0,
+			canSwitchAgent: (agentSwitcher?.agents.length ?? 0) > 1,
 			configOptions,
 			manualSignIn,
 			openAgentSettings,
@@ -677,6 +738,27 @@ export function SessionView({
 		});
 	const composerQueue = held ? undefined : promptQueue;
 	const drawerQueue = subagent.target === undefined ? composerQueue : undefined;
+
+	const subagentNotice = subagent.target && (
+		<SubagentNotice
+			agentLabel={agentLabel}
+			backRef={subagentBackRef}
+			onBack={goBack}
+			parentTitle={subagentParentTitle}
+			target={subagent.target}
+		/>
+	);
+	const usageLimitNotice = usageLimit && !held && (
+		<UsageLimitNotice
+			agent={usageLimit.agent}
+			hostUrl={usageLimit.hostUrl}
+			limit={usageLimit.limit}
+			modelLabel={usageLimit.modelLabel}
+			onRespond={usageLimit.respond}
+			onSwitchAccount={usageLimit.onSwitchAccount}
+			sessionAccount={usageLimit.sessionAccount}
+		/>
+	);
 
 	// w-full because the pane lays its children out in a row: without it this
 	// sizes to its content and leaves the right of the pane empty.
@@ -792,18 +874,20 @@ export function SessionView({
 				)}
 				<WorkDrawer
 					notice={
-						usageLimit &&
-						!held && (
-							<UsageLimitNotice
-								agent={usageLimit.agent}
-								hostUrl={usageLimit.hostUrl}
-								limit={usageLimit.limit}
-								modelLabel={usageLimit.modelLabel}
-								onRespond={usageLimit.respond}
-								onSwitchAccount={usageLimit.onSwitchAccount}
-								sessionAccount={usageLimit.sessionAccount}
-							/>
-						)
+						subagentNotice || usageLimitNotice ? (
+							<>
+								{subagentNotice}
+								{usageLimitNotice && (
+									<div
+										className={cn(
+											subagentNotice && "border-border/60 border-t",
+										)}
+									>
+										{usageLimitNotice}
+									</div>
+								)}
+							</>
+						) : undefined
 					}
 					onExit={returnToComposer}
 					paneRef={paneRef}
@@ -831,6 +915,7 @@ export function SessionView({
 					onEnterDrawer={enterDrawer}
 					onSend={subagent.onSend}
 					target={subagent.target}
+					onDraftBlocked={subagent.target ? onSubagentDraftBlocked : undefined}
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}

@@ -124,3 +124,7 @@ export function createSandboxAccess<G extends SandboxGrant>(
 		},
 	};
 }
+
+/** The `i18nKey` of a wake that missed its deadline: the box will not start. */
+export const CLOUD_WORKSPACE_NOT_STARTED_KEY =
+	"serverError.cloudWorkspace.cloudWorkspaceCouldNotStart";

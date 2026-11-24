@@ -475,6 +475,10 @@ export function createWorkspaceStore<TData>(
 			set((s) => {
 				const tab = s.tabs.find((t) => t.id === args.tabId);
 				if (!tab || !tab.panes[args.paneId]) return s;
+				// Focus sources call this per event; a new `tabs` array re-renders every pane.
+				if (s.activeTabId === args.tabId && tab.activePaneId === args.paneId) {
+					return s;
+				}
 
 				return {
 					activeTabId: args.tabId,
