@@ -3677,6 +3677,42 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("reports a prompt cancelled while a quiet resume is still loading", async () => {
+		const agent = new FakeAcpAgent();
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => {
+				const transport = agent.transport(handlers);
+				return {
+					...transport,
+					send: (line) => {
+						if (!line.includes('"session/resume"')) transport.send(line);
+					},
+				};
+			},
+		});
+		const events: AdapterEvent[] = [];
+		void collect(
+			adapter.start({
+				cwd: "/work",
+				resume: { harnessSessionId: "sess-1", quiet: true },
+			}),
+			events,
+		);
+		await flush(16);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		await flush(16);
+
+		expect(
+			events.flatMap((event) =>
+				event.kind === "turn" ? [event.turn.status] : [],
+			),
+		).toEqual(["running", "interrupted"]);
+
+		await adapter.dispose();
+	});
+
 	it("still reads as starting after a prompt queued during startup is cancelled", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(
