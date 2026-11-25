@@ -48,7 +48,7 @@ export function historyEntries(
 			presetId,
 			harnessSessionId: session.harnessSessionId ?? undefined,
 			sessionId: session.sessionId,
-			terminalId: session.terminalId ?? undefined,
+			terminalId: session.live ? (session.terminalId ?? undefined) : undefined,
 			title: session.title ?? discovered?.title,
 			updatedAt: Math.max(session.updatedAt, discovered?.updatedAt ?? 0),
 		});

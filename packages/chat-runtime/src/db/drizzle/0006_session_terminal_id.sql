@@ -1,0 +1,1 @@
+ALTER TABLE `chat_sessions_local` ADD `terminal_id` text;

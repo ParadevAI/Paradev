@@ -49,6 +49,15 @@ describe("historyEntries", () => {
 		});
 	});
 
+	it("reopens a stopped chat on a fresh terminal, not the one it ran under", () => {
+		const [entry] = historyEntries(
+			[saved({ live: false, terminalId: "terminal" })],
+			[],
+			"claude-acp",
+		);
+		expect(entry?.terminalId).toBeUndefined();
+	});
+
 	it("keeps provider histories separate and orders native-only chats by recency", () => {
 		const entries = historyEntries(
 			[saved(), saved({ harness: "codex-acp", harnessSessionId: "other" })],

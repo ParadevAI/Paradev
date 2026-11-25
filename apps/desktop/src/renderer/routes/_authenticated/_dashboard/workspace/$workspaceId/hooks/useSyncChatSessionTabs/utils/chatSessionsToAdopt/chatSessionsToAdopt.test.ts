@@ -130,6 +130,10 @@ describe("chatSessionsToAdopt", () => {
 					listed("shown"),
 					listed("creating"),
 					listed("pending"),
+					listed("pending-finished", {
+						live: false,
+						terminalId: "terminal-pending",
+					}),
 				],
 				store.getState().tabs,
 			),

@@ -582,7 +582,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				return {
 					...row,
 					live: live !== null,
-					terminalId: live?.terminalId ?? null,
+					terminalId: live?.terminalId ?? row.terminalId,
 				};
 			});
 	};
@@ -671,6 +671,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
 					agentConfigId,
+					terminalId: parsed.terminalId,
 				});
 				try {
 					options.live.create({

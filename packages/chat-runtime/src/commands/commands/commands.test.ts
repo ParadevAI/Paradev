@@ -290,6 +290,25 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("a session keeps its terminal after its harness stops", async () => {
+		const { runtime } = newRuntime();
+		const launched = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			terminalId: "terminal-1",
+		});
+		await runtime.live.disposeAll();
+
+		expect(
+			runtime.commands
+				.listSessions({})
+				.find((session) => session.sessionId === launched.sessionId),
+		).toMatchObject({ live: false, terminalId: "terminal-1" });
+		await runtime.dispose();
+	});
+
 	test("a closed session stays closed, and one stopped by shutdown does not", async () => {
 		const { runtime } = newRuntime();
 		const closed = createSession(runtime);

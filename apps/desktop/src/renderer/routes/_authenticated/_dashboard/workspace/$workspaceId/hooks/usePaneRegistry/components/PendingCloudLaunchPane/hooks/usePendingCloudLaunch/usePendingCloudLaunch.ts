@@ -82,6 +82,15 @@ export function usePendingCloudLaunch({
 	const terminalListed = !!terminalSessions.data?.sessions.some(
 		(session) => session.terminalId === terminalId,
 	);
+	const answered =
+		surface === "chat" ? sessionsQuery.isFetched : terminalSessions.isFetched;
+	const [answeredAtMs, setAnsweredAtMs] = useState<number | null>(null);
+	useEffect(() => {
+		if (!answered || answeredAtMs !== null) return;
+		const now = Date.now();
+		setAnsweredAtMs(now);
+		setNowMs(now);
+	}, [answered, answeredAtMs]);
 
 	const outcome = pendingLaunchOutcome({
 		surface,
@@ -93,6 +102,7 @@ export function usePendingCloudLaunch({
 			!!data.queuedPrompts?.length ||
 			hasComposerDraft(chatDraftKey(data.draftId)),
 		sinceMs,
+		answeredAtMs,
 		nowMs,
 		timeoutMs,
 	});
@@ -115,12 +125,14 @@ export function usePendingCloudLaunch({
 			}
 			case "chat":
 				if (!session) return;
-				store
-					.getState()
-					.replaceState((state) =>
-						attachCloudChatSession(state, paneId, session),
-					);
-				markChatSessionLive(queryClient, hostUrl, session.sessionId);
+				store.getState().replaceState((state) =>
+					attachCloudChatSession(state, paneId, {
+						...session,
+						terminalId: session.terminalId ?? terminalId ?? null,
+					}),
+				);
+				if (session.live)
+					markChatSessionLive(queryClient, hostUrl, session.sessionId);
 				return;
 			case "terminal":
 				if (!terminalId) return;
