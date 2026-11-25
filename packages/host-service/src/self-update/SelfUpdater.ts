@@ -335,7 +335,10 @@ export class SelfUpdater {
 		}
 		if (existsSync(backup)) {
 			let failed = `${root}.failed`;
-			await rm(failed, { recursive: true, force: true }).catch(() => {
+			await rm(failed, { recursive: true, force: true }).catch((error) => {
+				this.deps.log(
+					`[self-update] could not remove stale failed build: ${String(error)}`,
+				);
 				failed = `${failed}.${Date.now()}`;
 			});
 			renameSync(root, failed);
