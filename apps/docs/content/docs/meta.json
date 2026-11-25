@@ -8,6 +8,7 @@
 		"superset-model",
 		"migrate-from-conductor",
 		"migrate-from-conductor-cloud",
+		"migrate-from-t3-code",
 		"---Recipes---",
 		"recipes/race-agents",
 		"recipes/parallel-workstreams",
