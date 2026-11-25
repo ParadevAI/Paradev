@@ -62,7 +62,7 @@ export interface PageHeaderActions {
 	onDelete: () => Promise<void>;
 	onDuplicate: (title: string) => Promise<void>;
 	onRename: (title: string) => Promise<void>;
-	onRefresh: () => void;
+	onRefresh: () => void | Promise<void>;
 	onPreviewVersion: (version: number | null) => void;
 	previewVersion?: number | null;
 	sharing: PageHeaderSharing;

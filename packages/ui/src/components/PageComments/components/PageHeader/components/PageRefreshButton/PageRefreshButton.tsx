@@ -2,7 +2,7 @@
 
 import { useLingui } from "@lingui/react/macro";
 import { RotateCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "../../../../../../lib/utils";
 import { Button } from "../../../../../ui/button";
 import {
@@ -11,10 +11,8 @@ import {
 	TooltipTrigger,
 } from "../../../../../ui/tooltip";
 
-const SPIN_MS = 600;
-
 interface PageRefreshButtonProps {
-	onRefresh: () => void;
+	onRefresh: () => void | Promise<void>;
 	compact?: boolean;
 }
 
@@ -23,14 +21,17 @@ export function PageRefreshButton({
 	compact = false,
 }: PageRefreshButtonProps) {
 	const { t } = useLingui();
-	const [spinning, setSpinning] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
 	const label = t({ message: "Refresh" });
 
-	useEffect(() => {
-		if (!spinning) return;
-		const timer = setTimeout(() => setSpinning(false), SPIN_MS);
-		return () => clearTimeout(timer);
-	}, [spinning]);
+	const refresh = async () => {
+		setRefreshing(true);
+		try {
+			await onRefresh();
+		} finally {
+			setRefreshing(false);
+		}
+	};
 
 	return (
 		<Tooltip>
@@ -39,17 +40,15 @@ export function PageRefreshButton({
 					variant="ghost"
 					size="icon-xs"
 					aria-label={label}
-					onClick={() => {
-						setSpinning(true);
-						onRefresh();
-					}}
+					aria-busy={refreshing}
+					onClick={() => void refresh()}
 					className={
 						compact
 							? "size-6 text-muted-foreground/60 hover:text-muted-foreground"
 							: undefined
 					}
 				>
-					<RotateCw className={cn("size-3.5", spinning && "animate-spin")} />
+					<RotateCw className={cn("size-3.5", refreshing && "animate-spin")} />
 				</Button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">{label}</TooltipContent>
