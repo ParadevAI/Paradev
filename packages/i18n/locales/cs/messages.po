@@ -8987,9 +8987,6 @@ msgstr "Obr. 1 · Lidský podíl na úsilí za sloučenou změnou"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Obr. 2 · Sloučené změny napsané agenty, bez lidských úprav"
 
-msgid "file"
-msgstr "soubor"
-
 msgid "File"
 msgstr "Soubor"
 

@@ -8987,9 +8987,6 @@ msgstr "Fig. 1 · Human share of the effort behind a merged change"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Merged changes written by agents, zero human edits"
 
-msgid "file"
-msgstr "file"
-
 msgid "File"
 msgstr "File"
 

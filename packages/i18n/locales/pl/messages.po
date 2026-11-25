@@ -8987,9 +8987,6 @@ msgstr "Rys. 1 · Udział człowieka w wysiłku stojącym za scaloną zmianą"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Rys. 2 · Scalone zmiany napisane przez agentów, zero poprawek człowieka"
 
-msgid "file"
-msgstr "plik"
-
 msgid "File"
 msgstr "Plik"
 

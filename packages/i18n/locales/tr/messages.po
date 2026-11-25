@@ -8987,9 +8987,6 @@ msgstr "Şekil 1 · Birleştirilen bir değişiklikteki insan emeği payı"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Şekil 2 · Ajanların yazdığı, hiç insan düzenlemesi olmayan birleştirilmiş değişiklikler"
 
-msgid "file"
-msgstr "dosya"
-
 msgid "File"
 msgstr "Dosya"
 
