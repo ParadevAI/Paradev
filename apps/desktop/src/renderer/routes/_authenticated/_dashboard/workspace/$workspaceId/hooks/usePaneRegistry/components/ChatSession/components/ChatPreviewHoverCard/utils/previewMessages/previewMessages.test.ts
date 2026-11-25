@@ -68,14 +68,19 @@ test("an empty chat has nothing to preview", () => {
 	expect(previewMessages([])).toEqual([]);
 });
 
-test("shows a quoted prompt without its tags", () => {
+test("shows a quoted or pasted prompt without its tags", () => {
 	const quoted =
 		'<quoted_reply lines="1">\nthe cache policy\n</quoted_reply>\n\n';
 	const messages = previewMessages(
-		[user("u1", `${quoted}why?`), user("u2", quoted)].map(itemEnvelope),
+		[
+			user("u1", `${quoted}why?`),
+			user("u2", quoted),
+			user("u3", '<pasted_text lines="1">\nan old paste\n</pasted_text>'),
+		].map(itemEnvelope),
 	);
 	expect(messages.map((message) => message.text)).toEqual([
 		"why?",
 		"the cache policy",
+		"an old paste",
 	]);
 });
