@@ -26,7 +26,7 @@ export interface TranscriptRow {
 /** The session's Durable Object store in apps/realtime, as the worker writes it. */
 export interface SessionStore {
 	append(input: AppendInput): Promise<{ duplicate: boolean }>;
-	transcript(): Promise<TranscriptRow[]>;
+	transcript(afterSeq?: number): Promise<TranscriptRow[]>;
 	transcriptStep(stepKey: string): Promise<TranscriptRow[]>;
 }
 
@@ -63,10 +63,10 @@ export function httpSessionStore(options: {
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify(input),
 			}),
-		async transcript() {
+		async transcript(afterSeq = 0) {
 			const rows: TranscriptRow[] = [];
 			for (;;) {
-				const after = rows.at(-1)?.seq ?? 0;
+				const after = rows.at(-1)?.seq ?? afterSeq;
 				const page = await request<{ entries: TranscriptRow[] }>(
 					`transcript?after=${after}`,
 				);
