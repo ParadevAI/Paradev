@@ -365,7 +365,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 	}
 
 	cancelTurn(): void {
-		if (this.unansweredPrompts === 0) {
+		if (this.unansweredPrompts === 0 && !this.translator?.currentTurnId) {
 			if (this.resolvingPrompt) this.cancelRequested = true;
 			return;
 		}
