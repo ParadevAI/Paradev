@@ -643,7 +643,10 @@ export class AcpAdapter implements HarnessAdapter {
 
 	cancelTurn(): void {
 		if (!this.client || !this.sessionId) {
-			if (this.queuedPrompts.shift()) this.emitDroppedTurn();
+			if (this.queuedPrompts.shift()) {
+				this.emitDroppedTurn();
+				this.emitSession({ status: "starting" });
+			}
 			return;
 		}
 		if (this.currentTurn?.status !== "running") return;
@@ -1264,7 +1267,15 @@ export class AcpAdapter implements HarnessAdapter {
 			this.heldTurnId = null;
 			return;
 		}
-		const prompt = await this.toAcpPrompt(content);
+		let prompt: unknown[];
+		try {
+			prompt = await this.toAcpPrompt(content);
+		} catch (error) {
+			if (this.heldTurnId !== turnId) return;
+			this.heldTurnId = null;
+			this.failRefusedTurn(turnId, this.turnError(error));
+			return;
+		}
 		if (this.heldTurnId !== turnId) return;
 		this.heldTurnId = null;
 		const client = this.client;
