@@ -82,11 +82,13 @@ export function useAgentSessionLauncher({
 			const label = config?.label;
 			const pane = {
 				kind: "chat-v3" as const,
-				...(label ? { titleOverride: label } : {}),
 				data: {
 					terminalId,
 					sessionId: null,
 					agent: { id: presetId },
+					// The agent's label is only the starting name; the session's
+					// generated title replaces it. titleOverride is for user renames.
+					...(label ? { chatTitle: label } : {}),
 					...(input.prompt ? { pendingPrompt: input.prompt } : {}),
 					...(input.attachments?.length
 						? { pendingAttachments: input.attachments }
