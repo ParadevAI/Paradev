@@ -99,25 +99,34 @@ interface RailPinsState {
 }
 
 /** A fixed-size singleton per profile. */
-export const useRailPinsStore = create<RailPinsState>()(
-	persist(
-		(set) => {
+export const useRailPinsStore = create<
+	RailPinsState,
+	[["zustand/persist", RailPinsState]]
+>((setLocalState, get, store) =>
+	persist<RailPinsState>(
+		(setPersistedState) => {
+			const reportSaveError = (error: unknown) => {
+				console.error("[rail-pins] Could not save sidebar settings:", error);
+			};
 			const update = (
 				change: (state: RailPinsState) => Partial<RailPinsState>,
 			) => {
 				const commit = () => {
 					// localStorage hydration is synchronous, and the event can still be queued.
 					void useRailPinsStore.persist?.rehydrate();
-					set(change);
+					const previous = get();
+					try {
+						setPersistedState(change);
+					} catch (error) {
+						setLocalState(previous, true);
+						reportSaveError(error);
+					}
 				};
 				const locks = globalThis.navigator?.locks;
 				if (locks) {
-					void locks.request(RAIL_PINS_STORAGE_KEY, commit).catch((error) => {
-						console.error(
-							"[rail-pins] Could not save sidebar settings:",
-							error,
-						);
-					});
+					void locks
+						.request(RAIL_PINS_STORAGE_KEY, commit)
+						.catch(reportSaveError);
 				} else {
 					commit();
 				}
@@ -150,7 +159,7 @@ export const useRailPinsStore = create<RailPinsState>()(
 				...sanitizeRailPins(persisted),
 			}),
 		},
-	),
+	)(setLocalState, get, store),
 );
 
 export function syncRailPinsAcrossWindows() {

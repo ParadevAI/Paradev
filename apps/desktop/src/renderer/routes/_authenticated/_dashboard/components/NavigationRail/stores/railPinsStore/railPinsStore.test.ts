@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, spyOn, test } from "bun:test";
 import {
 	isRailDestinationPinned,
 	RAIL_PINS_STORAGE_KEY,
@@ -124,6 +124,40 @@ test("reads sidebar changes saved before cross-window synchronization starts", (
 		expect(useRailPinsStore.getState().hiddenDestinationIds).toEqual(["pages"]);
 	} finally {
 		stopSync?.();
+		useRailPinsStore.setState(initialState, true);
+		if (initialStorage === null) localStorage.removeItem(RAIL_PINS_STORAGE_KEY);
+		else localStorage.setItem(RAIL_PINS_STORAGE_KEY, initialStorage);
+	}
+});
+
+test("reverts a sidebar edit when storage rejects it", () => {
+	const initialState = useRailPinsStore.getState();
+	const initialStorage = localStorage.getItem(RAIL_PINS_STORAGE_KEY);
+	useRailPinsStore.setState({ hiddenDestinationIds: ["chat"] });
+	const saved = localStorage.getItem(RAIL_PINS_STORAGE_KEY);
+	const quotaError = new DOMException("Storage is full", "QuotaExceededError");
+	const write = spyOn(localStorage, "setItem").mockImplementationOnce(() => {
+		throw quotaError;
+	});
+	const report = spyOn(console, "error").mockImplementation(() => {});
+	try {
+		useRailPinsStore.getState().setDestinationVisible("pages", false);
+		expect(useRailPinsStore.getState().hiddenDestinationIds).toEqual(["chat"]);
+		expect(localStorage.getItem(RAIL_PINS_STORAGE_KEY)).toBe(saved);
+		expect(report).toHaveBeenCalledWith(
+			"[rail-pins] Could not save sidebar settings:",
+			quotaError,
+		);
+
+		useRailPinsStore.getState().setDestinationVisible("plugins", false);
+		expect(useRailPinsStore.getState().hiddenDestinationIds).toEqual([
+			"chat",
+			"plugins",
+		]);
+		expect(write).toHaveBeenCalledTimes(2);
+	} finally {
+		write.mockRestore();
+		report.mockRestore();
 		useRailPinsStore.setState(initialState, true);
 		if (initialStorage === null) localStorage.removeItem(RAIL_PINS_STORAGE_KEY);
 		else localStorage.setItem(RAIL_PINS_STORAGE_KEY, initialStorage);
