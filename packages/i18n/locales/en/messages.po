@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# line} other {# lines}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Quote} other {Quote · # lines}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (this device)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} doesn't take arguments"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} doesn't take attachments"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} doesn't take quotes"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "A prompt, some triggers, and a workspace for each run"
 
 msgid "A pull request always gets its own worktree"
 msgstr "A pull request always gets its own worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "A quote can be up to {limit} characters"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
@@ -2293,6 +2302,9 @@ msgstr "Add this label"
 
 msgid "Add to channel"
 msgstr "Add to channel"
+
+msgid "Add to chat"
+msgstr "Add to chat"
 
 msgid "Add to Dictionary"
 msgstr "Add to Dictionary"
@@ -16583,6 +16595,9 @@ msgstr "Remove PR Link"
 msgid "Remove queued message"
 msgstr "Remove queued message"
 
+msgid "Remove quote"
+msgstr "Remove quote"
+
 msgid "Remove repository"
 msgstr "Remove repository"
 
@@ -18179,6 +18194,9 @@ msgstr "Selected workspace actions"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
+
+msgid "Selection actions"
+msgstr "Selection actions"
 
 msgid "Self-hosted"
 msgstr "Self-hosted"

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { withQuotedReplies } from "../quotedReplies/quotedReplies";
 import {
 	attachmentDisplayName,
 	formatAttachmentTag,
@@ -37,6 +38,7 @@ describe("attachmentTags", () => {
 				{ path: ".superset/attachments/notes.txt", type: "" },
 			],
 			pastedTexts: [],
+			quotes: [],
 		});
 	});
 
@@ -62,6 +64,7 @@ describe("attachmentTags", () => {
 			text: message,
 			attachments: [],
 			pastedTexts: [],
+			quotes: [],
 		});
 	});
 
@@ -79,6 +82,7 @@ describe("attachmentTags", () => {
 				{ path: ".superset/attachments/shot.png", type: "image/png" },
 			],
 			pastedTexts: [paste],
+			quotes: [],
 		});
 	});
 
@@ -105,5 +109,23 @@ describe("attachmentTags", () => {
 			'Superset-arm64 (21) "final" <v2>.dmg',
 			"notes.txt",
 		]);
+	});
+
+	it("takes the leading quotes off, so a tag inside a quote stays in it", () => {
+		const tag = formatAttachmentTag({
+			path: ".superset/attachments/shot.png",
+			type: "image/png",
+		});
+		const quote = `see ${tag}`;
+		const message = [withQuotedReplies([quote], "why?"), tag].join("\n");
+
+		expect(parseAttachmentTags(message)).toEqual({
+			text: "why?",
+			attachments: [
+				{ path: ".superset/attachments/shot.png", type: "image/png" },
+			],
+			pastedTexts: [],
+			quotes: [quote],
+		});
 	});
 });

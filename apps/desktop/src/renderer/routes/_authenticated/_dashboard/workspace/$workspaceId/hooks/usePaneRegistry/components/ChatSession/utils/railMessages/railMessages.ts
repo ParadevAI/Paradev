@@ -25,10 +25,10 @@ export function railMessages(groups: TurnGroup[]): ChatHistorySidebarMessage[] {
 			if (entry.kind !== "item") continue;
 			const { item } = entry;
 			if (item.kind === "user_message") {
-				const { text, pastedTexts } = parseAttachmentTags(
+				const { text, pastedTexts, quotes } = parseAttachmentTags(
 					userMessageText(item as UserMessage),
 				);
-				const line = preview(text || (pastedTexts[0] ?? ""));
+				const line = preview(text || (pastedTexts[0] ?? quotes[0] ?? ""));
 				if (line) messages.push({ id: item.id, role: "user", preview: line });
 				continue;
 			}

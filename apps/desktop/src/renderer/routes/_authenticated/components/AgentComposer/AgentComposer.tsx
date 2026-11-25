@@ -66,6 +66,7 @@ export function AgentComposer({
 					used_dictation: payload.draft.usedDictation === true,
 					attachments: payload.files.length,
 					mentions: payload.mentions.length,
+					quotes: payload.quotes.length,
 				});
 			return result;
 		},

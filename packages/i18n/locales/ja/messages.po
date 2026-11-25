@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# 行}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {引用} other {引用 · # 行}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（このデバイス）"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} は引数を受け付けません"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} は添付ファイルを受け付けません"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} は引用を受け付けません"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "プロンプトとトリガー、そして実行ごとのワークスペ
 
 msgid "A pull request always gets its own worktree"
 msgstr "プルリクエストには常に専用のワークツリーが作られます"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "引用は {limit} 文字までです"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "エージェントを操作するためのチャット画面を作り直します。ツール出力はより豊かに、誘導はよりスムーズに、すべてが速くなります。"
@@ -2293,6 +2302,9 @@ msgstr "このラベルを追加"
 
 msgid "Add to channel"
 msgstr "チャンネルに追加"
+
+msgid "Add to chat"
+msgstr "チャットに追加"
 
 msgid "Add to Dictionary"
 msgstr "辞書に追加"
@@ -16583,6 +16595,9 @@ msgstr "PRリンクを解除"
 msgid "Remove queued message"
 msgstr "キューのメッセージを削除"
 
+msgid "Remove quote"
+msgstr "引用を削除"
+
 msgid "Remove repository"
 msgstr "リポジトリを削除"
 
@@ -18179,6 +18194,9 @@ msgstr "選択したワークスペースの操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "ターミナルでテキストを選択すると、行末の空白を取り除いてすぐにクリップボードへコピーします"
+
+msgid "Selection actions"
+msgstr "選択範囲の操作"
 
 msgid "Self-hosted"
 msgstr "セルフホスト"

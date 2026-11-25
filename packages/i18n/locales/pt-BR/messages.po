@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# linha} other {# linhas}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Citação} other {Citação · # linhas}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (este dispositivo)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} não aceita argumentos"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} não aceita anexos"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} não aceita citações"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Um prompt, alguns gatilhos e uma área de trabalho para cada execução"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Um pull request sempre tem seu próprio worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Uma citação pode ter até {limit} caracteres"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Uma superfície de chat reconstruída para conduzir agentes: saída de ferramentas mais rica, condução mais fluida e tudo mais rápido."
@@ -2293,6 +2302,9 @@ msgstr "Adicionar este rótulo"
 
 msgid "Add to channel"
 msgstr "Adicionar a um canal"
+
+msgid "Add to chat"
+msgstr "Adicionar ao chat"
 
 msgid "Add to Dictionary"
 msgstr "Adicionar ao dicionário"
@@ -16583,6 +16595,9 @@ msgstr "Remover vínculo do PR"
 msgid "Remove queued message"
 msgstr "Remover mensagem da fila"
 
+msgid "Remove quote"
+msgstr "Remover citação"
+
 msgid "Remove repository"
 msgstr "Remover repositório"
 
@@ -18179,6 +18194,9 @@ msgstr "Ações das áreas de trabalho selecionadas"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Selecionar texto em um terminal copia na hora para a área de transferência, sem os espaços do final"
+
+msgid "Selection actions"
+msgstr "Ações da seleção"
 
 msgid "Self-hosted"
 msgstr "Auto-hospedado"

@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# Zeile} other {# Zeilen}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Zitat} other {Zitat · # Zeilen}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (dieses Gerät)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} akzeptiert keine Argumente"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} akzeptiert keine Anhänge"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} akzeptiert keine Zitate"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Ein Prompt, ein paar Auslöser und ein Arbeitsbereich pro Ausführung"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Ein Pull Request bekommt immer einen eigenen Worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Ein Zitat darf höchstens {limit} Zeichen lang sein"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Eine neu gebaute Chat-Oberfläche zum Steuern von Agenten: reichere Tool-Ausgaben, geschmeidigeres Nachjustieren, alles schneller."
@@ -2293,6 +2302,9 @@ msgstr "Dieses Label hinzufügen"
 
 msgid "Add to channel"
 msgstr "Zu Kanal hinzufügen"
+
+msgid "Add to chat"
+msgstr "Zum Chat hinzufügen"
 
 msgid "Add to Dictionary"
 msgstr "Zum Wörterbuch hinzufügen"
@@ -16583,6 +16595,9 @@ msgstr "PR-Link entfernen"
 msgid "Remove queued message"
 msgstr "Nachricht aus der Warteschlange entfernen"
 
+msgid "Remove quote"
+msgstr "Zitat entfernen"
+
 msgid "Remove repository"
 msgstr "Repository entfernen"
 
@@ -18179,6 +18194,9 @@ msgstr "Aktionen für ausgewählte Arbeitsbereiche"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Markierter Text im Terminal wird sofort in die Zwischenablage kopiert, ohne Leerzeichen am Ende"
+
+msgid "Selection actions"
+msgstr "Aktionen für die Auswahl"
 
 msgid "Self-hosted"
 msgstr "Selbst gehostet"

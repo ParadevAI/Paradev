@@ -3,6 +3,7 @@ import {
 	countLines,
 	firstLine,
 	parsePastedText,
+	splitQuotedReplies,
 	userMessageText,
 } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
@@ -56,8 +57,11 @@ export function QueuedPrompts({
 				</View>
 			) : null}
 			{prompts.map((prompt) => {
-				const { text, pastes } = parsePastedText(userMessageText(prompt));
-				const label = (text || firstLine(pastes[0] ?? "")).replace(/\n/g, " ");
+				const quoted = splitQuotedReplies(userMessageText(prompt));
+				const { text, pastes } = parsePastedText(quoted.text);
+				const label = (
+					text || firstLine(pastes[0] ?? quoted.quotes[0] ?? "")
+				).replace(/\n/g, " ");
 				const lines = pastes.reduce((sum, paste) => sum + countLines(paste), 0);
 				return (
 					<View className="flex-row items-center gap-3 py-2.5" key={prompt.id}>
