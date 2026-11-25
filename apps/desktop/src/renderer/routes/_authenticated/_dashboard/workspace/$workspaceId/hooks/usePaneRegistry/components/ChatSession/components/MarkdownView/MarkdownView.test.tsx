@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, mock, test } from "bun:test";
 
 (
 	globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -11,7 +11,9 @@ const {
 	createRouter,
 	RouterContextProvider,
 } = await import("@tanstack/react-router");
-const { cleanup, render } = await import("@testing-library/react");
+const { act, cleanup, fireEvent, render } = await import(
+	"@testing-library/react"
+);
 const { getQueryKey } = await import("@trpc/react-query");
 const { env } = await import("renderer/env.renderer");
 const { cloudTrpc } = await import("renderer/lib/cloud-trpc");
@@ -80,4 +82,26 @@ test("find skips page cards while matching settled and streaming Markdown blocks
 	expect(streaming.current?.startContainer.textContent).toContain(
 		"streamed report",
 	);
+});
+
+test("a workspace deep link opens the workspace in the app, with or without a modifier key", async () => {
+	const router = createRouter({
+		routeTree: createRootRoute(),
+		history: createMemoryHistory(),
+	});
+	const openLink = mock(() => true);
+	const view = render(
+		<RouterContextProvider router={router}>
+			<ChatPaneActionsProvider openLink={openLink}>
+				<MarkdownView text="[open it](superset://v2-workspace/workspace-2)" />
+			</ChatPaneActionsProvider>
+		</RouterContextProvider>,
+	);
+
+	await act(async () => {
+		fireEvent.click(view.getByRole("link"), { metaKey: true });
+	});
+
+	expect(router.history.location.pathname).toBe("/workspace/workspace-2");
+	expect(openLink).not.toHaveBeenCalled();
 });

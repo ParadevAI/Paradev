@@ -1,8 +1,11 @@
 import { ChatTable } from "@superset/chat-ui/ChatMarkdown";
+import { env } from "renderer/env.renderer";
+import type { StreamdownProps } from "streamdown";
 import { ChatCodeBlock } from "./components/ChatCodeBlock";
 import { ChatInlineCode } from "./components/ChatInlineCode";
 import { ChatLink } from "./components/ChatLink";
 import { remarkLocalPathLinks } from "./utils/remarkLocalPathLinks";
+import { remarkWorkspaceDeepLinks } from "./utils/remarkWorkspaceDeepLinks";
 
 /** The transcript and the composer share one column so their edges line up. */
 export const CHAT_GUTTER_CLASSNAME = "px-6";
@@ -18,4 +21,9 @@ export const CHAT_MARKDOWN_COMPONENTS = {
 	table: ChatTable,
 };
 
-export const CHAT_REMARK_PLUGINS = [remarkLocalPathLinks];
+export const CHAT_REMARK_PLUGINS: NonNullable<
+	StreamdownProps["remarkPlugins"]
+> = [
+	[remarkWorkspaceDeepLinks, { webUrl: env.NEXT_PUBLIC_WEB_URL }],
+	remarkLocalPathLinks,
+];
