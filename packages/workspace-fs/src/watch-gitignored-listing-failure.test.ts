@@ -107,4 +107,51 @@ describe("a failed gitignored-dir listing", () => {
 		expect(run.attaches[1]).not.toContain("**/node_modules/**");
 		expect(run.isPruned("node_modules/a.js")).toBe(false);
 	});
+
+	it("lists again when the root resolves elsewhere during a refresh", async () => {
+		const tempDir = await fs.realpath(
+			await fs.mkdtemp(path.join(os.tmpdir(), "watch-listing-retarget-")),
+		);
+		tempRoots.push(tempDir);
+		const repoA = path.join(tempDir, "a");
+		const repoB = path.join(tempDir, "b");
+		const link = path.join(tempDir, "root");
+		await fs.mkdir(repoA);
+		await fs.mkdir(repoB);
+		await fs.symlink(repoA, link);
+		const listingsA = [["node_modules"], ["shared"]];
+		const attaches: string[][] = [];
+		let retarget = true;
+		const backend: NativeWatchBackend = {
+			name: "fake",
+			watchesEachEntry: true,
+			subscribe: async (request) => {
+				attaches.push(request.ignore);
+				return {
+					unsubscribe: async () => {
+						if (!retarget) return;
+						retarget = false;
+						await fs.rm(link);
+						await fs.symlink(repoB, link);
+					},
+				};
+			},
+		};
+		const manager = new FsWatcherManager({
+			backend,
+			useDefaultIgnores: false,
+			listGitIgnoredDirs: async (rootPath) => {
+				if (rootPath !== repoA) return [];
+				return listingsA.shift() ?? [];
+			},
+			findNestedRepoRoots: async () => ({ roots: [], truncated: false }),
+		});
+		managers.push(manager);
+		await manager.subscribe({ absolutePath: link }, () => {});
+
+		expect(await manager.refreshIgnores(link)).toBe(true);
+
+		expect(attaches).toHaveLength(2);
+		expect(attaches[1]).not.toContain("shared/**");
+	});
 });

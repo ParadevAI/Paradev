@@ -766,7 +766,7 @@ export class FsWatcherManager {
 	 */
 	private async attachNativeSubscription(
 		state: WatcherState,
-		listedGitIgnoredRelDirs?: string[],
+		gitIgnoredListing?: { realPath: string; dirs: string[] },
 	): Promise<void> {
 		const { realPath, realPathNormalized, realPathDiffers } =
 			await this.normalizePath(state.absolutePath);
@@ -783,9 +783,13 @@ export class FsWatcherManager {
 		// Gitignored dirs get the same treatment: repo-specific build output
 		// (`__pycache__`, `packages/*/lib`, …) that the static list can't know
 		// about is pruned via whatever git itself considers fully ignored.
+		const listedDirs =
+			gitIgnoredListing?.realPath === realPath
+				? gitIgnoredListing.dirs
+				: undefined;
 		const [nestedRepoRelDirs, gitIgnoredRelDirs] = await Promise.all([
 			this.computeNestedRepoRelDirs(realPath, state.controller.signal),
-			listedGitIgnoredRelDirs ??
+			listedDirs ??
 				this.computeGitIgnoredRelDirs(realPath, state.controller.signal),
 		]);
 		state.controller.signal.throwIfAborted();
@@ -1073,6 +1077,7 @@ export class FsWatcherManager {
 		if (!state.subscription || state.recoveryTimer) {
 			return false;
 		}
+		const listedRealPath = state.realPath;
 		const [nestedRepoRelDirs, gitIgnoredRelDirs] = await Promise.all([
 			this.computeNestedRepoRelDirs(state.realPath, state.controller.signal),
 			this.computeGitIgnoredRelDirs(state.realPath, state.controller.signal),
@@ -1144,7 +1149,10 @@ export class FsWatcherManager {
 			return false;
 		}
 		try {
-			await this.attachNativeSubscription(state, gitIgnoredRelDirs);
+			await this.attachNativeSubscription(state, {
+				realPath: listedRealPath,
+				dirs: gitIgnoredRelDirs,
+			});
 		} catch (error) {
 			// The root is now unwatched; a transient failure must not leave it
 			// that way silently. Reuse the root-recovery poll, which re-attaches,
