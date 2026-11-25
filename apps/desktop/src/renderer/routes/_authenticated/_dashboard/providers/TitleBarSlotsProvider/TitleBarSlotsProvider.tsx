@@ -18,20 +18,37 @@ interface TitleBarSlots {
 	setSide: (element: HTMLElement | null) => void;
 	setContentCard: (element: HTMLElement | null) => void;
 	claimMain: () => () => void;
-	setSideWidth: (width: number | null) => void;
+	setSideWidth: (width: number | null, layoutWidth?: number | null) => void;
 }
 
 const TitleBarSlotsContext = createContext<TitleBarSlots | null>(null);
+interface TitleBarSide {
+	/** From the right pane's left edge to the window's right edge, or null while the pane is closed. */
+	width: number | null;
+	/** The same span for the pane at rest, while the pane slides; null when it is still. */
+	layoutWidth: number | null;
+}
+
+const CLOSED_SIDE: TitleBarSide = { width: null, layoutWidth: null };
 /** Changes every frame while the right pane slides, so only the title bar reads it. */
-const TitleBarSideWidthContext = createContext<number | null>(null);
+const TitleBarSideContext = createContext<TitleBarSide>(CLOSED_SIDE);
 
 /** Lets a screen put its tab bars in the window's title bar instead of above its content. */
 export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 	const [main, setMain] = useState<HTMLElement | null>(null);
-	const [side, setSide] = useState<HTMLElement | null>(null);
+	const [sideSlot, setSide] = useState<HTMLElement | null>(null);
 	const [contentCard, setContentCard] = useState<HTMLElement | null>(null);
 	const [mainClaims, setMainClaims] = useState(0);
-	const [sideWidth, setSideWidth] = useState<number | null>(null);
+	const [side, setSideState] = useState(CLOSED_SIDE);
+	const setSideWidth = useCallback(
+		(width: number | null, layoutWidth: number | null = null) =>
+			setSideState((current) =>
+				current.width === width && current.layoutWidth === layoutWidth
+					? current
+					: { width, layoutWidth },
+			),
+		[],
+	);
 	const claimMain = useCallback(() => {
 		setMainClaims((count) => count + 1);
 		return () => setMainClaims((count) => count - 1);
@@ -39,7 +56,7 @@ export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 	const slots = useMemo(
 		() => ({
 			main,
-			side,
+			side: sideSlot,
 			contentCard,
 			mainClaims,
 			setMain,
@@ -48,13 +65,13 @@ export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 			claimMain,
 			setSideWidth,
 		}),
-		[main, side, contentCard, mainClaims, claimMain],
+		[main, sideSlot, contentCard, mainClaims, claimMain, setSideWidth],
 	);
 	return (
 		<TitleBarSlotsContext.Provider value={slots}>
-			<TitleBarSideWidthContext.Provider value={sideWidth}>
+			<TitleBarSideContext.Provider value={side}>
 				{children}
-			</TitleBarSideWidthContext.Provider>
+			</TitleBarSideContext.Provider>
 		</TitleBarSlotsContext.Provider>
 	);
 }
@@ -74,9 +91,8 @@ export function useIsInTitleBarShell(): boolean {
 	return useContext(TitleBarSlotsContext) !== null;
 }
 
-/** From the right pane's left edge to the window's right edge, or null while the pane is closed. */
-export function useTitleBarSideWidth(): number | null {
-	return useContext(TitleBarSideWidthContext);
+export function useTitleBarSide(): TitleBarSide {
+	return useContext(TitleBarSideContext);
 }
 
 /**
@@ -101,14 +117,34 @@ export function useTitleBarSideSlot(
 		const measure = () => {
 			const rect = pane.getBoundingClientRect();
 			const isShown = rect.width > 0 && rect.left < window.innerWidth;
-			setSideWidth(isShown ? window.innerWidth - rect.left : null);
+			if (!isShown) {
+				setSideWidth(null);
+				return;
+			}
+			const content = pane.hasAttribute("data-moving")
+				? pane.firstElementChild?.firstElementChild
+				: null;
+			setSideWidth(
+				window.innerWidth - rect.left,
+				content
+					? content.getBoundingClientRect().width +
+							window.innerWidth -
+							rect.right
+					: null,
+			);
 		};
 		measure();
 		const observer = new ResizeObserver(measure);
 		observer.observe(pane);
+		const moveObserver = new MutationObserver(measure);
+		moveObserver.observe(pane, {
+			attributes: true,
+			attributeFilter: ["data-moving"],
+		});
 		window.addEventListener("resize", measure);
 		return () => {
 			observer.disconnect();
+			moveObserver.disconnect();
 			window.removeEventListener("resize", measure);
 			setSideWidth(null);
 		};

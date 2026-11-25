@@ -2,6 +2,7 @@ export const TAB_MAX_WIDTH = 160;
 export const TAB_MIN_WIDTH = 72;
 // OverflowFadeContainer's default fade-edge size (1.5rem).
 export const TAB_BAR_FADE_WIDTH = 24;
+export const ADD_TAB_SLOT_WIDTH = 40;
 
 export function computeInsertIndex(
 	clientX: number,
