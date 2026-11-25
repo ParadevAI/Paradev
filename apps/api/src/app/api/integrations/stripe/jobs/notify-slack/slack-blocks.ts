@@ -105,6 +105,7 @@ function stripeDashboardButtons(
 export interface EnrichedSubscription {
 	organizationName: string;
 	planName: string;
+	planTier: string | null;
 	stripeCustomerId: string;
 	stripeSubscriptionId: string;
 	seatCount: number;
@@ -270,6 +271,38 @@ export function formatSubscriptionStarted(
 				text: "New Subscription Started",
 				emoji: true,
 			},
+		},
+		standardFields(enriched),
+		stripeDashboardButtons(
+			enriched.stripeCustomerId,
+			enriched.stripeSubscriptionId,
+		),
+	];
+}
+
+export function isTeamPlan(enriched: EnrichedSubscription): boolean {
+	return enriched.planTier === "team";
+}
+
+export function formatTeamSubscriptionStarted(
+	enriched: EnrichedSubscription,
+	channel: { name: string; automated: boolean },
+): unknown[] {
+	const next = channel.automated
+		? `Opening #${channel.name} and inviting the customer over Slack Connect.`
+		: `Open #${channel.name} by hand and invite the customer over Slack Connect.`;
+	return [
+		{
+			type: "header",
+			text: {
+				type: "plain_text",
+				text: ":rotating_light: New Team Plan Customer",
+				emoji: true,
+			},
+		},
+		{
+			type: "section",
+			text: { type: "mrkdwn", text: `<!channel> ${next}` },
 		},
 		standardFields(enriched),
 		stripeDashboardButtons(
