@@ -7691,6 +7691,9 @@ msgstr "indirildi"
 msgid "Downloading"
 msgstr "İndiriliyor"
 
+msgid "Downloading update"
+msgstr "Güncelleme indiriliyor"
+
 msgid "Downloading..."
 msgstr "İndiriliyor..."
 
@@ -10510,6 +10513,9 @@ msgstr "Masaüstü uygulamasını kurun"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "Depolarını bağlamak istediğiniz her GitHub organizasyonuna veya hesabına Paradev GitHub App'i yükleyin."
+
+msgid "Install the update. Sessions keep running"
+msgstr "Güncellemeyi yükleyin. Oturumlar çalışmaya devam eder"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "MCP sunucularını tek bir yerden, merkezi OAuth ile tüm çalışma alanlarınıza kurun, yetkilendirin ve kapsamlandırın."
@@ -21712,6 +21718,9 @@ msgstr "Daemon'u güncelle"
 
 msgid "Update Error"
 msgstr "Güncelleme hatası"
+
+msgid "Update failed"
+msgstr "Güncelleme başarısız oldu"
 
 msgid "Update host service"
 msgstr "Ana makine hizmetini güncelle"

@@ -7691,6 +7691,9 @@ msgstr "已下載"
 msgid "Downloading"
 msgstr "下載中"
 
+msgid "Downloading update"
+msgstr "正在下載更新"
+
 msgid "Downloading..."
 msgstr "正在下載..."
 
@@ -10510,6 +10513,9 @@ msgstr "安裝桌面應用程式"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "在每個你想連接其儲存庫的 GitHub 組織或帳號上安裝 Paradev GitHub App。"
+
+msgid "Install the update. Sessions keep running"
+msgstr "安裝更新。會話會繼續執行"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "在一處為所有工作區安裝、授權並劃定MCP伺服器的權限範圍，OAuth集中管理。"
@@ -21712,6 +21718,9 @@ msgstr "更新守護程式"
 
 msgid "Update Error"
 msgstr "更新出錯"
+
+msgid "Update failed"
+msgstr "更新失敗"
 
 msgid "Update host service"
 msgstr "更新主機服務"

@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
 import { TbSmartHome } from "react-icons/tb";
-import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
@@ -45,7 +44,6 @@ export function NavigationRail() {
 			<div className="mt-auto flex flex-col items-center gap-1.5">
 				<RailUsage />
 				<ParadevAnywhereButton variant="rail" />
-				<UpdatesPill isCollapsed />
 				<OrganizationDropdown variant="rail" />
 			</div>
 		</nav>

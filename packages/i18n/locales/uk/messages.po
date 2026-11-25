@@ -7685,6 +7685,9 @@ msgstr "завантажено"
 msgid "Downloading"
 msgstr "Завантаження"
 
+msgid "Downloading update"
+msgstr "Завантаження оновлення"
+
 msgid "Downloading..."
 msgstr "Завантаження..."
 
@@ -10504,6 +10507,9 @@ msgstr "Встановити десктопний застосунок"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "Установіть GitHub App Paradev у кожну організацію або обліковий запис GitHub, репозиторії яких хочете під’єднати."
+
+msgid "Install the update. Sessions keep running"
+msgstr "Установіть оновлення. Сеанси працюватимуть далі"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Встановлюйте й авторизуйте MCP-сервери та обмежуйте їхній доступ у всіх робочих просторах з одного місця, із централізованим OAuth."
@@ -21706,6 +21712,9 @@ msgstr "Оновити демон"
 
 msgid "Update Error"
 msgstr "Помилка оновлення"
+
+msgid "Update failed"
+msgstr "Не вдалося оновити"
 
 msgid "Update host service"
 msgstr "Оновити службу хоста"

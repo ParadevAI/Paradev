@@ -26,6 +26,7 @@ import {
 	WindowControlsInset,
 } from "../WindowControlsInset";
 import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
+import { UpdateButton } from "./components/UpdateButton";
 import { WorkspaceSwitcherButton } from "./components/WorkspaceSwitcherButton";
 import { shellFrameColor } from "./utils/shellFrameColor";
 
@@ -130,6 +131,7 @@ export function TitleBar() {
 						{isListPanelCollapsed && <NewWorkspaceButton />}
 						<PortsDropdown align="start" />
 						<OfflineBadge />
+						<UpdateButton />
 					</ZoomStable>
 				</div>
 				<div className="drag h-full min-w-1 flex-1" />

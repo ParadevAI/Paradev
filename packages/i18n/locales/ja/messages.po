@@ -7691,6 +7691,9 @@ msgstr "ダウンロード済み"
 msgid "Downloading"
 msgstr "ダウンロード中"
 
+msgid "Downloading update"
+msgstr "アップデートをダウンロード中"
+
 msgid "Downloading..."
 msgstr "ダウンロード中..."
 
@@ -10510,6 +10513,9 @@ msgstr "デスクトップアプリをインストール"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "接続したいリポジトリがある GitHub の組織またはアカウントごとに、Paradev GitHub App をインストールしてください。"
+
+msgid "Install the update. Sessions keep running"
+msgstr "アップデートをインストールします。セッションは実行を続けます"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "すべてのワークスペースにまたがるMCPサーバーのインストール、認可、スコープ設定を1か所で。OAuthも一元管理します。"
@@ -21712,6 +21718,9 @@ msgstr "デーモンを更新"
 
 msgid "Update Error"
 msgstr "アップデートエラー"
+
+msgid "Update failed"
+msgstr "アップデートに失敗しました"
 
 msgid "Update host service"
 msgstr "ホストサービスを更新"
