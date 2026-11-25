@@ -148,6 +148,7 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 				state: {
 					data?: SandboxAccess;
 					error: unknown;
+					status: string;
 					errorUpdateCount: number;
 				};
 			}): number =>

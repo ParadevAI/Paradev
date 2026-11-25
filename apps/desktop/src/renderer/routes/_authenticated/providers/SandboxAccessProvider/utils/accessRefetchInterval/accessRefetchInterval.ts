@@ -35,14 +35,18 @@ export function wakeRefetchInterval(
 /**
  * react-query's errorUpdateCount never resets on success, so remember it at
  * each success and count only the failures since. One entry per access query.
+ * A query with no data clears its error when a fetch starts, so a missing
+ * error is not a success.
  */
 export function createFailureStreak(): (
 	queryHash: string,
-	state: { error?: unknown; errorUpdateCount: number },
+	state: { status: string; errorUpdateCount: number },
 ) => number {
 	const countAtSuccess = new Map<string, number>();
 	return (queryHash, state) => {
-		if (!state.error) countAtSuccess.set(queryHash, state.errorUpdateCount);
+		if (state.status === "success") {
+			countAtSuccess.set(queryHash, state.errorUpdateCount);
+		}
 		return state.errorUpdateCount - (countAtSuccess.get(queryHash) ?? 0);
 	};
 }
