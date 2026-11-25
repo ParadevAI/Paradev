@@ -232,8 +232,6 @@ assert_resident_session() {
   fi
 }
 
-# Presence lags a cold boot by ~20s, so start late and require a sustained
-# failure before acting.
 sleep 120
 fails=0
 # A restore that is still starting must not be spawned twice, so back off a few

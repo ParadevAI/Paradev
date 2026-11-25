@@ -166,7 +166,6 @@ async function runHandoffReceiver(): Promise<void> {
 			reason: `adopt failed: ${(err as Error).message}`,
 		};
 		process.send?.(nak);
-		// Give Node a moment to flush the IPC frame, then exit non-zero.
 		setTimeout(() => process.exit(1), 50).unref();
 		return;
 	}
@@ -189,9 +188,6 @@ async function runHandoffReceiver(): Promise<void> {
 	await new Promise<void>((resolve) => {
 		if (process.connected !== true) return resolve();
 		process.once("disconnect", () => resolve());
-		// Defense in depth: if disconnect doesn't arrive (unexpected), bind
-		// anyway after a short bound. The retry-on-EADDRINUSE handles any
-		// remaining race.
 		setTimeout(() => resolve(), 1_000).unref();
 	});
 	log(`predecessor disconnected, binding socket`);

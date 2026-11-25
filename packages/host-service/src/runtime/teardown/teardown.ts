@@ -140,8 +140,6 @@ export async function runTeardown({
 			} catch {
 				// PTY may already be dead
 			}
-			// Hard-stop: if onExit doesn't fire shortly after kill (zombie PTY),
-			// settle the promise directly so workspaceCleanup.destroy never hangs.
 			setTimeout(() => {
 				settle({
 					status: "failed",

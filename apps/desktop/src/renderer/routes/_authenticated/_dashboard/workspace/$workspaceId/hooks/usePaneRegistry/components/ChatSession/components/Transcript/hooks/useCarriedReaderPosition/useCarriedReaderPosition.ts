@@ -85,8 +85,6 @@ export function useCarriedReaderPosition({
 			return;
 		}
 		let current = true;
-		// The scroller jumps to the end for its first rows from a MutationObserver
-		// callback; a microtask queued here runs after it and before the paint.
 		queueMicrotask(() => {
 			if (!current) return;
 			const content = rowElement(viewport, anchorId)?.parentElement;

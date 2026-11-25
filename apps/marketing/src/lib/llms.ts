@@ -192,8 +192,6 @@ export const MARKDOWN_HEADERS = {
 	Vary: "Accept",
 } as const;
 
-// Module-evaluation time: the build for statically generated routes, the cold
-// start for dynamic ones. Good enough as "when this document was generated".
 const GENERATED_AT = new Date().toISOString().slice(0, 10);
 
 export interface MarkdownFrontmatter {

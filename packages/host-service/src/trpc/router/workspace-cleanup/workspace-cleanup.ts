@@ -723,8 +723,6 @@ function sharesProfileWithLiveWorkspace(
 	ctx: HostServiceContext,
 	local: { id: string; name: string },
 ): boolean {
-	// Defensive: rows written before the name column was backfilled carry ""
-	// and test fixtures carry nothing at all. Neither names a profile.
 	if (typeof local.name !== "string" || !local.name.trim()) return false;
 	const profileKey = local.name.trim();
 	try {

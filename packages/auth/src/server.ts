@@ -843,7 +843,6 @@ export const auth = betterAuth({
 					const seatsOwnedByAutumn =
 						billingUsesAutumn &&
 						(await setAutumnSeats(organization.id, quantity));
-					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
 					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,
@@ -972,7 +971,6 @@ export const auth = betterAuth({
 					const seatsOwnedByAutumn =
 						billingUsesAutumn &&
 						(await setAutumnSeats(organization.id, quantity));
-					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
 					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
 							subscription.stripeSubscriptionId,

@@ -107,9 +107,6 @@ final class ComposerModel {
   /// The terminal wants `never`; prose surfaces want sentences.
   var autocapitalization: TextInputAutocapitalization = .sentences
 
-  /// Frame 4's header row — project+branch and target. Same shape as the model
-  /// options; their menus arrive with the data at cutover, so for now a press
-  /// is reported and the caller decides what to present.
   var headerChips: [ComposerMenuOption] = []
 
   /// Bumped to ask the composer to take or resign focus. A counter rather than

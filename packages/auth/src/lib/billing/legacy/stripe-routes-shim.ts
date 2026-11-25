@@ -267,11 +267,6 @@ interface ReferencedContext {
 	};
 }
 
-/**
- * @deprecated Serves the Stripe plugin's /subscription/* routes from Autumn
- * for released clients.
- */
-// TODO(2027-01-31): drop once MINIMUM_DESKTOP_VERSION is at or past the first build on /api/auth/autumn/*.
 export function withAutumnBilling<Plugin extends StripePluginShape>(
 	plugin: Plugin,
 	options: { enabled: boolean; deps: () => AutumnBillingDeps },

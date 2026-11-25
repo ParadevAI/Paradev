@@ -409,8 +409,6 @@ export async function runSandboxStartHook(
 		});
 	});
 
-	// A command that daemonizes (tmux new-session -d) also exits at once, so
-	// only a non-zero exit inside this window counts as a failure to start.
 	const failure = await new Promise<number | null>((resolve) => {
 		const timer = setTimeout(() => resolve(null), START_HOOK_SETTLE_MS);
 		child.once("exit", (code) => {

@@ -1088,9 +1088,6 @@ export function useDashboardSidebarState() {
 			orderedPins: Array<{ workspaceId: string; projectId: string | null }>,
 			options: { allowNewWorkspaceId?: string } = {},
 		) => {
-			// Safety net: a single drop may pin at most ONE new workspace (the
-			// dragged one). Anything else not already pinned is dropped here so a
-			// corrupted caller list can never mass-pin rows.
 			const eligiblePins = orderedPins.filter(
 				({ workspaceId }) =>
 					workspaceId === options.allowNewWorkspaceId ||

@@ -38,9 +38,6 @@ export class PtyWriteQueue {
 	 */
 	private readonly CHUNK_SIZE = 256;
 
-	/**
-	 * Delay between chunks in ms. Gives event loop time to process other work.
-	 */
 	private readonly CHUNK_DELAY_MS = 1;
 
 	/**
@@ -123,7 +120,6 @@ export class PtyWriteQueue {
 			return;
 		}
 
-		// Yield to event loop with a small delay, allowing other work to run
 		setTimeout(() => this.flush(), this.CHUNK_DELAY_MS);
 	}
 

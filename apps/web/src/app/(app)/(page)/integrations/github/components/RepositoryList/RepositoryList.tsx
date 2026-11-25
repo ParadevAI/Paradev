@@ -36,7 +36,6 @@ export function RepositoryList({ organizationId }: RepositoryListProps) {
 						message: "Repositories will be updated shortly.",
 					}),
 				});
-				// Refetch after a short delay to allow sync to complete
 				setTimeout(() => refetch(), 3000);
 			},
 			onError: (error) => {

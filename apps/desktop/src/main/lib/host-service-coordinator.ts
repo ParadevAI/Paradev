@@ -1494,9 +1494,6 @@ export class HostServiceCoordinator extends EventEmitter {
 				error,
 			);
 		}
-		// SIGKILL is asynchronous: give the kernel a moment to tear the process
-		// down so spawn()'s findFreePort sees its preferred port free instead
-		// of falling back to a random one.
 		const exited = await this.waitForExit(manifest.pid, REAP_EXIT_WAIT_MS);
 		if (!exited) {
 			log.warn(

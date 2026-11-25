@@ -2277,7 +2277,6 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 	}
 
-	/** An agent may list its options after `session/new`; the first prompt waits a moment for them. */
 	private awaitStartOptions(wanted: ChatSelections): Promise<ChatSelections> {
 		const taken = new Promise<ChatSelections>((resolve) => {
 			const timer = setTimeout(

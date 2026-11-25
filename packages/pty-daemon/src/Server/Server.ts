@@ -338,12 +338,6 @@ export class Server {
 			return result;
 		}
 
-		// Successor adopted. Schedule close+exit AFTER the dispatcher has
-		// flushed the upgrade-prepared reply. Closing here would destroy
-		// the supervisor's connection before the reply lands. The
-		// successor is blocked on our IPC `disconnect` (process.exit closes
-		// the channel), so we want to exit promptly — but not so promptly
-		// that we beat the reply.
 		setImmediate(() => {
 			void this.finalizeHandoff();
 		});
@@ -352,13 +346,8 @@ export class Server {
 
 	/** Phase 2: tear down predecessor state once the upgrade-prepared reply has flushed. */
 	private async finalizeHandoff(): Promise<void> {
-		// Yield a few microtasks so the conn.send() of upgrade-prepared has
-		// a chance to drain into the kernel socket buffer.
 		await new Promise((r) => setImmediate(r));
 		await new Promise((r) => setImmediate(r));
-		// killSessions=false: the master fds are now refcounted in the
-		// successor's process; killing them here would close shells the
-		// user just successfully preserved.
 		await this.close({ killSessions: false });
 		setTimeout(() => process.exit(0), 50).unref();
 	}

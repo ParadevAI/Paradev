@@ -625,8 +625,6 @@ async function main() {
 							break;
 						}
 						if (panesAfterClose.length === 0) {
-							// A closed webview can briefly disappear and be recreated under a
-							// new target id while the renderer commits its pane state.
 							await sleep(1500);
 							panesAfterClose = await listLiveCreatedPanes();
 							if (panesAfterClose === null) break;

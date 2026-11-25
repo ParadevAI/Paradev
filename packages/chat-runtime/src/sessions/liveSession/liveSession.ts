@@ -48,7 +48,6 @@ export type LiveSessionOptions = {
 	usageLimitGraceMs?: number;
 };
 
-/** Providers can still refuse right at the reset; give them a moment. */
 export const USAGE_LIMIT_GRACE_MS = 30_000;
 
 /** The most a timer can wait; a reset further out is re-armed when it fires. */

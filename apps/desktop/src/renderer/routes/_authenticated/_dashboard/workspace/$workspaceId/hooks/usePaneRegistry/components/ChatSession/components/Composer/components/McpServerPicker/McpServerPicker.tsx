@@ -63,8 +63,6 @@ export function McpServerPicker({
 	const isDark = useIsDarkTheme();
 	const [query, setQuery] = useState("");
 	const searchRef = useRef<HTMLInputElement>(null);
-	// The command menu's own editor update runs after this mounts and keeps
-	// focus in the editor, so focus the search a frame later.
 	useEffect(() => {
 		const frame = requestAnimationFrame(() => searchRef.current?.focus());
 		return () => cancelAnimationFrame(frame);

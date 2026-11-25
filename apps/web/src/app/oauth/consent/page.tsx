@@ -21,7 +21,6 @@ export default async function ConsentPage({ searchParams }: ConsentPageProps) {
 	});
 
 	if (!session) {
-		// Defensive — middleware should have caught this.
 		return null;
 	}
 

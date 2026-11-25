@@ -598,12 +598,6 @@ export const createSettingsRouter = () => {
 				return { success: true };
 			}),
 
-		/**
-		 * Re-runs wrapper/settings/hook setup for one agent. Safety net for
-		 * the settings-UI Add flow; returns `{ ran: false }` for unknown ids.
-		 * Adding an agent expresses intent to integrate it, so a previously
-		 * disabled hooks toggle is cleared first.
-		 */
 		setupAgent: publicProcedure
 			.input(z.object({ agentId: z.string().min(1) }))
 			.mutation(({ input }) => {
@@ -660,7 +654,6 @@ export const createSettingsRouter = () => {
 				return { ran };
 			}),
 
-		// TODO: remove telemetry procedures once telemetry_enabled column is dropped
 		getTelemetryEnabled: publicProcedure.query(() => {
 			return true;
 		}),

@@ -403,8 +403,6 @@ export function attachToContainer(
 	const stillAttached = () =>
 		runtime.container === container &&
 		runtime.wrapper.parentElement === container;
-	// The rest of a pane switch is still writing the DOM; measuring now would
-	// lay the whole page out once per terminal.
 	requestAnimationFrame(() => {
 		if (!stillAttached()) return;
 		measureAndResize(runtime, onResize);

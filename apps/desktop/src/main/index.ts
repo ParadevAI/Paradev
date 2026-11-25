@@ -243,7 +243,6 @@ function registerWithMacOSNotificationCenter() {
 		console.log("[notifications] Registered with Notification Center");
 	});
 
-	// Fallback timeout in case macOS doesn't fire events
 	setTimeout(cleanup, 1000);
 
 	registrationNotification.show();

@@ -847,7 +847,6 @@ export function usePaneRegistry({
 					renderToolbar: (ctx: RendererContext<PaneViewerData>) => (
 						<BrowserPaneToolbar ctx={ctx} />
 					),
-					// Destruction handled by useGlobalBrowserLifecycle for now.
 					contextMenuActions: (_ctx, defaults) =>
 						defaults.map((d) =>
 							d.key === "close-pane"

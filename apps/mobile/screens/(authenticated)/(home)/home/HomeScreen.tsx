@@ -197,10 +197,6 @@ export function HomeScreen() {
 	const tagSettingsByHost = useHostTagFolders(scopeHosts);
 	const folderActionsFor = useTagFolderActions(scopeHosts, cache);
 
-	// Mirrors the rows above onto the Lock Screen and Dynamic Island while the
-	// app is open. Foreground-only for now: nothing server-side knows an agent
-	// needs attention yet, so the card goes stale (and says so) once the app
-	// closes. ActivityKit push updates are the follow-up that fixes that.
 	const liveActivityEnabled = Boolean(
 		useFeatureFlag(FEATURE_FLAGS.MOBILE_LIVE_ACTIVITY),
 	);

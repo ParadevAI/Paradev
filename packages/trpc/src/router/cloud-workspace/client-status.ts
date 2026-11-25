@@ -2,13 +2,6 @@ import type { CloudWorkspaceStatus } from "@superset/db/schema";
 import semver from "semver";
 import type { ApiClientInfo } from "../../trpc";
 
-/**
- * The first build of each client that reads `awake`, `asleep` and `archived`.
- * Older ones (desktop 1.31.0-2.0.9, CLI 2.0.9, mobile 1.2.2, SDK 0.0.1-alpha.12,
- * and the plugin skills they run) open a box only on `ready` and hide it on `deleted`.
- * TODO(SUPER-3018): remove once MINIMUM_DESKTOP_VERSION and MINIMUM_MOBILE_VERSION
- * reach these floors and `api_procedure_called` shows no CLI or SDK call below them.
- */
 export const SLEEP_STATUS_CLIENT_FLOORS: Record<
 	ApiClientInfo["product"],
 	string

@@ -169,8 +169,6 @@ async function runHandoffReceiver(): Promise<void> {
 	await new Promise<void>((resolve) => {
 		if (process.connected !== true) return resolve();
 		process.once("disconnect", () => resolve());
-		// Defense in depth: bind anyway after a short bound; the
-		// retry-on-EADDRINUSE inside listenWithRetry covers any race.
 		setTimeout(() => resolve(), 1_000).unref();
 	});
 	log(`predecessor disconnected, binding socket`);

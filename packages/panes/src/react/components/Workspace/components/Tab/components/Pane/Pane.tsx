@@ -276,7 +276,6 @@ export function Pane<TData>({
 	);
 	useEffect(() => {
 		if (focusRequestSeq === null) return;
-		// After paint, so a pane that only just mounted can take focus.
 		const frame = requestAnimationFrame(() => {
 			store.getState().clearFocusRequest(focusRequestSeq);
 			const root = dropRef.current;

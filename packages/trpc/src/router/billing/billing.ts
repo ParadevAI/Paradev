@@ -75,7 +75,6 @@ const EMPTY_ACTIVE_PLAN = {
 	plan: "free" as const,
 	autumnPlanId: null,
 	planTier: "free",
-	/** @deprecated TODO(2027-01-31): Stripe vocabulary; read `paymentState`. */
 	status: null,
 	cancelAt: null,
 	scheduledPlanId: null,

@@ -77,8 +77,6 @@ export function selectActionButton(state: PRFlowState): ActionButtonVariant {
 		case "no-pr":
 			return { kind: "create-pr-dropdown" };
 		case "pr-exists":
-			// Post-PR actions land in a later phase; for now the button hides
-			// once a PR exists. The PR link button remains visible on the left.
 			return { kind: "hidden" };
 		case "busy":
 			return { kind: "cancel-busy" };

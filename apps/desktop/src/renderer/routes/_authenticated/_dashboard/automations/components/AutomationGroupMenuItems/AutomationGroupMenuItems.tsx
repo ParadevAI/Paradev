@@ -38,7 +38,6 @@ export function AutomationGroupMenuItems({
 	return (
 		<Sub
 			onOpenChange={(open) => {
-				// After the submenu mounts and Radix places its own focus.
 				if (open) {
 					requestAnimationFrame(() =>
 						requestAnimationFrame(() => inputRef.current?.focus()),

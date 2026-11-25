@@ -37,9 +37,6 @@ interface CommentThreadProps {
 	isOutdated?: boolean;
 	url?: string;
 	comments: Comment[];
-	/** REST databaseId of a comment already in the thread — replies thread
-	 *  onto it regardless of which comment they target. Undefined only if
-	 *  GitHub ever returns a thread with zero comments (shouldn't happen). */
 	replyToCommentId?: number;
 	/** Force-expand the bubble whenever this changes — lets jump-to-line
 	 *  reveal a collapsed (resolved/outdated) thread. */

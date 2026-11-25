@@ -176,9 +176,6 @@ export function IntegrationErrorHandler<P extends Provider>({
 				);
 			}
 		};
-		// The root layout's Toaster subscribes in its own effect, which runs after
-		// this one and drops anything published before it. Never cancelled: the
-		// replaceState below re-runs this effect, and its cleanup would drop the toast.
 		setTimeout(show, 0);
 		window.history.replaceState({}, "", `/integrations/${provider}`);
 	}, [searchParams, provider, messages, warnings, successes]);

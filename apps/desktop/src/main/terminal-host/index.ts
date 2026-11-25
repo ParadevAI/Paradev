@@ -564,7 +564,6 @@ const handlers: Record<string, RequestHandler> = {
 			terminalHost.killAll({ deleteHistory: false });
 		}
 
-		// Schedule shutdown after a brief delay to allow response to be sent
 		setTimeout(() => {
 			stopServer().then(() => process.exit(0));
 		}, 100);
