@@ -1,5 +1,12 @@
 import { describe, expect, it } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import {
+	accessSync,
+	constants,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { getTemplatePath } from "./config";
@@ -62,9 +69,10 @@ function runNotifyHook(
 async function runNotifyHookAsync(
 	input: Record<string, unknown>,
 	envOverrides: Record<string, string> = {},
+	script = renderNotifyHookScript(),
 ) {
 	const proc = Bun.spawn({
-		cmd: ["bash", "-c", renderNotifyHookScript()],
+		cmd: ["bash", "-c", script],
 		env: hookEnv(envOverrides),
 		stdin: Buffer.from(JSON.stringify(input)),
 		stdout: "pipe",
@@ -380,7 +388,7 @@ describe("getNotifyScriptContent", () => {
 		const script = readNotifyHookTemplate();
 
 		expect(script).toContain(
-			'curl -sX POST "$HOOK_URL" \\\n      --connect-timeout 2 --max-time 5',
+			'"$CURL_BIN" -sX POST "$HOOK_URL" \\\n      --connect-timeout 2 --max-time 5',
 		);
 	});
 
@@ -499,7 +507,7 @@ describe("per-agent hook scripts dispatch to host-service", () => {
 				'[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0',
 			);
 			expect(script).toContain(buildExpectedV2Payload(agentIdVar));
-			expect(script).toContain('curl -sX POST "$HOOK_URL"');
+			expect(script).toContain('"$CURL_BIN" -sX POST "$HOOK_URL"');
 			expect(script).toContain(HOME_DIR_FALLBACK);
 			expect(script).toContain("/host/*/manifest.json; do");
 			expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
@@ -575,6 +583,81 @@ describe("call-time endpoint resolution (frozen-port healing)", () => {
 			manifestHost.stop();
 		}
 	});
+});
+
+describe("curl resolution", () => {
+	const stopEvent = { hook_event_name: "Stop", session_id: "s1" };
+	const hasSystemCurl = (() => {
+		try {
+			accessSync("/usr/bin/curl", constants.X_OK);
+			return true;
+		} catch {
+			return false;
+		}
+	})();
+
+	function pathWithCurlStub(mode: number) {
+		const dir = mkdtempSync(path.join(tmpdir(), "notify-hook-curl-"));
+		writeFileSync(path.join(dir, "curl"), "#!/bin/sh\nexit 1\n", { mode });
+		return `${dir}:${process.env.PATH}`;
+	}
+
+	it("keeps all four hook templates on the same resolver", () => {
+		const resolver = readNotifyHookTemplate().match(
+			/\n(# Apple ships[^\n]*\nCURL_BIN=[^\n]*\n[^\n]*\n)/,
+		)?.[1];
+		expect(resolver).toBeDefined();
+		for (const template of [
+			"cursor-hook.template.sh",
+			"copilot-hook.template.sh",
+			"gemini-hook.template.sh",
+		]) {
+			expect(readFileSync(getTemplatePath(template), "utf-8")).toContain(
+				resolver as string,
+			);
+		}
+	});
+
+	it.skipIf(!hasSystemCurl)(
+		"delivers through /usr/bin/curl when a broken curl is first on PATH",
+		async () => {
+			const host = fakeHostService(false);
+			try {
+				const result = await runNotifyHookAsync(stopEvent, {
+					PATH: pathWithCurlStub(0o755),
+					SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook`,
+				});
+				expect(result.exitCode).toBe(0);
+				expect(host.requests).toHaveLength(1);
+			} finally {
+				host.stop();
+			}
+		},
+	);
+
+	it.skipIf(!Bun.which("curl"))(
+		"falls back to the PATH curl when /usr/bin/curl is missing",
+		async () => {
+			const host = fakeHostService(false);
+			try {
+				const result = await runNotifyHookAsync(
+					stopEvent,
+					{
+						PATH: pathWithCurlStub(0o644),
+						SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook`,
+					},
+					renderNotifyHookScript().replace(
+						"CURL_BIN=/usr/bin/curl",
+						"CURL_BIN=/nonexistent/curl",
+					),
+				);
+				expect(result.exitCode).toBe(0);
+				expect(host.requests).toHaveLength(1);
+			} finally {
+				host.stop();
+			}
+		},
+	);
 });
 
 describe("agent identity precedence", () => {

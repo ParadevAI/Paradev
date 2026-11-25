@@ -11,6 +11,10 @@ SUPERSET_ENV="${SUPERSET_ENV:-${PARADEV_ENV:-}}"
 # CLI agent lifecycle hook — POSTs an AgentIdentity payload to the
 # host-service endpoint.
 
+# Apple ships a universal /usr/bin/curl; a PATH curl can be the wrong arch (x86_64 Anaconda on Apple Silicon).
+CURL_BIN=/usr/bin/curl
+[ -x "$CURL_BIN" ] || CURL_BIN=$(command -v curl)
+
 # Codex passes JSON as argv; Claude/Mastra/Droid/Kimi/Grok pipe via stdin.
 if [ -n "$1" ]; then
   INPUT="$1"
@@ -175,7 +179,7 @@ dispatch_to_host() {
     case " $SEEN_HOOK_URLS " in *" $HOOK_URL "*) continue ;; esac
     SEEN_HOOK_URLS="$SEEN_HOOK_URLS $HOOK_URL"
 
-    RESPONSE=$(curl -sX POST "$HOOK_URL" \
+    RESPONSE=$("$CURL_BIN" -sX POST "$HOOK_URL" \
       --connect-timeout 2 --max-time 5 \
       -H "Content-Type: application/json" \
       -d "$DISPATCH_PAYLOAD" \
