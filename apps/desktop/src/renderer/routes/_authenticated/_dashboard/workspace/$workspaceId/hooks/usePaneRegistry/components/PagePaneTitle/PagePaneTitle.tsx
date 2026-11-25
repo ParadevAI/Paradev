@@ -25,15 +25,8 @@ export function PagePaneTitle({
 }: PagePaneTitleProps) {
 	const { setShareOpen, previewVersion, setPreviewVersion } =
 		usePagePaneUi(paneId);
-	const {
-		page,
-		versions,
-		currentUserId,
-		onRename,
-		onRefresh,
-		onDelete,
-		onDuplicate,
-	} = usePageHeaderData({ ...data, version: previewVersion });
+	const { page, versions, currentUserId, onRename, onDelete, onDuplicate } =
+		usePageHeaderData({ ...data, version: previewVersion });
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [renameOpen, setRenameOpen] = useState(false);
@@ -81,7 +74,6 @@ export function PagePaneTitle({
 					setMenuOpen(false);
 					setRenameOpen(true);
 				}}
-				onRefresh={onRefresh}
 				onPreviewVersion={setPreviewVersion}
 			/>
 			<DeletePageDialog
