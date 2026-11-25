@@ -400,30 +400,31 @@ describe("SelfUpdater", () => {
 	test.skipIf(process.getuid?.() === 0).each([
 		{ leftover: "a stale failed build", inFailed: true },
 		{ leftover: "the failed build", inFailed: false },
-	])("$leftover that cannot be removed does not stop the rollback", async ({
-		inFailed,
-	}) => {
-		let polls = 0;
-		const h = harness({
-			pollHealth: async () =>
-				++polls === 1 ? null : { version: "1.22.0", pid: 222 },
-		});
-		const failed = `${h.root}.failed`;
-		const locked = join(inFailed ? failed : h.root, "locked");
-		mkdirSync(locked, { recursive: true });
-		writeFileSync(join(locked, "f"), "");
-		chmodSync(locked, 0o500);
-		try {
-			h.updater.start({ version: "1.27.0" });
-			await settle(h);
-		} finally {
-			for (const dir of [locked, join(failed, "locked")])
-				if (existsSync(dir)) chmodSync(dir, 0o700);
-		}
-		expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("old");
-		expect(h.exitCode).toBe(0);
-		expect(h.updater.status().lastResult?.outcome).toBe("rolled-back");
-	});
+	])(
+		"$leftover that cannot be removed does not stop the rollback",
+		async ({ inFailed }) => {
+			let polls = 0;
+			const h = harness({
+				pollHealth: async () =>
+					++polls === 1 ? null : { version: "1.22.0", pid: 222 },
+			});
+			const failed = `${h.root}.failed`;
+			const locked = join(inFailed ? failed : h.root, "locked");
+			mkdirSync(locked, { recursive: true });
+			writeFileSync(join(locked, "f"), "");
+			chmodSync(locked, 0o500);
+			try {
+				h.updater.start({ version: "1.27.0" });
+				await settle(h);
+			} finally {
+				for (const dir of [locked, join(failed, "locked")])
+					if (existsSync(dir)) chmodSync(dir, 0o700);
+			}
+			expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("old");
+			expect(h.exitCode).toBe(0);
+			expect(h.updater.status().lastResult?.outcome).toBe("rolled-back");
+		},
+	);
 
 	test("releases the install lock after a failed download", async () => {
 		const h = harness({

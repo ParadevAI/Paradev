@@ -327,11 +327,17 @@ export class SelfUpdater {
 			return;
 		}
 		if (existsSync(backup)) {
-			const failed = `${root}.failed`;
-			await rm(failed, { recursive: true, force: true });
+			let failed = `${root}.failed`;
+			await rm(failed, { recursive: true, force: true }).catch(() => {
+				failed = `${failed}.${Date.now()}`;
+			});
 			renameSync(root, failed);
 			renameSync(backup, root);
-			await rm(failed, { recursive: true, force: true });
+			await rm(failed, { recursive: true, force: true }).catch((error) =>
+				this.deps.log(
+					`[self-update] could not remove failed build: ${String(error)}`,
+				),
+			);
 		}
 		let restored: SpawnedHost | null = null;
 		let restoredHealth: { version: string; pid?: number } | null = null;
