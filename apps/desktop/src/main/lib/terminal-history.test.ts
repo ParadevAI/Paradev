@@ -26,7 +26,11 @@ test("close() writes the backlog queued behind backpressure, then returns", () =
 		timeout: 3000,
 	});
 
-	expect(result.exitCode).toBe(0);
+	expect({
+		exitCode: result.exitCode,
+		timedOut: result.exitedDueToTimeout,
+		stderr: result.stderr.toString(),
+	}).toEqual({ exitCode: 0, timedOut: false, stderr: "" });
 	const dir = join(home, "terminal-history", "ws", "pane");
 	expect(readFileSync(join(dir, "scrollback.bin"), "utf8")).toBe(
 		`${"a".repeat(100_000)}tail`,
