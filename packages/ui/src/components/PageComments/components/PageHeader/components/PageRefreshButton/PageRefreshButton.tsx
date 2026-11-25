@@ -25,9 +25,11 @@ export function PageRefreshButton({
 	const { t } = useLingui();
 	const [awaitingRefresh, setAwaitingRefresh] = useState(false);
 	const refreshing = refreshingFromParent || awaitingRefresh;
+	const [finishingTurn, setFinishingTurn] = useState(false);
 	const label = t({ message: "Refresh" });
 
 	const refresh = async () => {
+		setFinishingTurn(true);
 		setAwaitingRefresh(true);
 		try {
 			await onRefresh();
@@ -54,8 +56,12 @@ export function PageRefreshButton({
 					<RotateCw
 						className={cn(
 							"size-3.5",
-							refreshing && "animate-spin motion-reduce:animate-none",
+							(refreshing || finishingTurn) &&
+								"animate-spin motion-reduce:animate-none",
 						)}
+						onAnimationIteration={() => {
+							if (!refreshing) setFinishingTurn(false);
+						}}
 					/>
 				</Button>
 			</TooltipTrigger>
