@@ -6,15 +6,20 @@ import { remarkWorkspaceDeepLinks } from "./remarkWorkspaceDeepLinks";
 const WEB_URL = "https://app.superset.sh";
 const ID = "7caaacb5-3d77-4d1f-aaa6-8e194158e8a7";
 
-function hrefs(markdown: string): string[] {
-	const html = renderToStaticMarkup(
+function render(markdown: string): string {
+	return renderToStaticMarkup(
 		<ChatMarkdown
 			remarkPlugins={[[remarkWorkspaceDeepLinks, { webUrl: WEB_URL }]]}
 		>
 			{markdown}
 		</ChatMarkdown>,
 	);
-	return [...html.matchAll(/href="([^"]*)"/g)].map((match) => match[1] ?? "");
+}
+
+function hrefs(markdown: string): string[] {
+	return [...render(markdown).matchAll(/href="([^"]*)"/g)].map(
+		(match) => match[1] ?? "",
+	);
 }
 
 test("a workspace deep link becomes the workspace's web link", () => {
@@ -43,4 +48,10 @@ test("a deep link in code and other deep links stay as they are", () => {
 			`\`superset://v2-workspace/${ID}\` [auth](superset://auth/callback) superset://tasks/x`,
 		),
 	).toEqual([]);
+});
+
+test("an autolink shows the web link, so the chat can name the workspace", () => {
+	const html = render(`<superset://v2-workspace/${ID}>`);
+	expect(html).toContain(`>${WEB_URL}/workspaces/${ID}</a>`);
+	expect(html).not.toContain("superset://");
 });

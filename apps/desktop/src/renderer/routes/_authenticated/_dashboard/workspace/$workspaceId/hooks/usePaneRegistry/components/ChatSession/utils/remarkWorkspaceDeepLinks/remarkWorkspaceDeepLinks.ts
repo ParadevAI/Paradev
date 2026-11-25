@@ -53,8 +53,14 @@ function linkedText(text: string, webUrl: string): MarkdownNode[] | null {
 
 function rewriteDeepLinks(node: MarkdownNode, webUrl: string) {
 	if (node.type === "link") {
-		const match = node.url?.match(WHOLE_DEEP_LINK);
-		if (match?.[1]) node.url = workspaceWebUrl(match[1], match[2], webUrl);
+		const deepLink = node.url;
+		const match = deepLink?.match(WHOLE_DEEP_LINK);
+		if (!match?.[1]) return;
+		node.url = workspaceWebUrl(match[1], match[2], webUrl);
+		const [label] = node.children ?? [];
+		if (node.children?.length === 1 && label?.value === deepLink) {
+			label.value = node.url;
+		}
 		return;
 	}
 	if (!node.children) return;

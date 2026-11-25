@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
-import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { useWorkspaceName } from "../../../../../../../../hooks/useWorkspaceName";
 import { MessageChip } from "../MessageChip";
 
 export function WorkspaceMessageChip({
@@ -13,8 +13,7 @@ export function WorkspaceMessageChip({
 	workspaceId: string;
 }) {
 	const { t } = useLingui();
-	const { workspaces } = useHostWorkspaces();
-	const name = workspaces.find(({ id }) => id === workspaceId)?.name;
+	const name = useWorkspaceName(workspaceId);
 	return (
 		<MessageChip
 			chip={{ ...chip, label: name ?? t({ message: "Workspace" }) }}
