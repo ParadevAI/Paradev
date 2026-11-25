@@ -13,23 +13,26 @@ import {
 
 interface PageRefreshButtonProps {
 	onRefresh: () => void | Promise<void>;
+	refreshing?: boolean;
 	compact?: boolean;
 }
 
 export function PageRefreshButton({
 	onRefresh,
+	refreshing: refreshingFromParent = false,
 	compact = false,
 }: PageRefreshButtonProps) {
 	const { t } = useLingui();
-	const [refreshing, setRefreshing] = useState(false);
+	const [awaitingRefresh, setAwaitingRefresh] = useState(false);
+	const refreshing = refreshingFromParent || awaitingRefresh;
 	const label = t({ message: "Refresh" });
 
 	const refresh = async () => {
-		setRefreshing(true);
+		setAwaitingRefresh(true);
 		try {
 			await onRefresh();
 		} finally {
-			setRefreshing(false);
+			setAwaitingRefresh(false);
 		}
 	};
 
@@ -48,7 +51,12 @@ export function PageRefreshButton({
 							: undefined
 					}
 				>
-					<RotateCw className={cn("size-3.5", refreshing && "animate-spin")} />
+					<RotateCw
+						className={cn(
+							"size-3.5",
+							refreshing && "animate-spin motion-reduce:animate-none",
+						)}
+					/>
 				</Button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">{label}</TooltipContent>

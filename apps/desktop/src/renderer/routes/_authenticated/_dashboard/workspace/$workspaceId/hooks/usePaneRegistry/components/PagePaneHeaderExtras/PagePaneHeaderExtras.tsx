@@ -50,7 +50,6 @@ export function PagePaneHeaderExtras({
 				canManage={editable}
 				onCreateNewAgentSession={onCreateNewAgentSession}
 			/>
-			{page ? <PageRefreshButton compact onRefresh={onRefresh} /> : null}
 			{canComment ? (
 				<CommentModeButton
 					compact
@@ -59,6 +58,7 @@ export function PagePaneHeaderExtras({
 					onToggle={() => setCommentsEnabled(!commentsEnabled)}
 				/>
 			) : null}
+			{page ? <PageRefreshButton compact onRefresh={onRefresh} /> : null}
 			{page ? (
 				<PageShareButton
 					compact
