@@ -175,6 +175,15 @@ export class ClaudeTranslator {
 		return events;
 	}
 
+	/** A prompt stopped before Claude answered it still reads as a turn. */
+	stoppedTurn(reason: string): AdapterEvent[] {
+		return [
+			...this.ensureTurn(),
+			...this.interrupt(reason),
+			this.sessionIdle(),
+		];
+	}
+
 	private system(envelope: Json): AdapterEvent[] {
 		const subtype = asString(envelope.subtype) ?? "";
 		if (IGNORED_SYSTEM_SUBTYPES.has(subtype)) return [];
@@ -407,11 +416,7 @@ export class ClaudeTranslator {
 			this.interruptReason = null;
 			this.settledBlocks.clear();
 			this.streamingBlocks.clear();
-			return [
-				...this.ensureTurn(),
-				...this.interrupt(interruptReason),
-				this.sessionIdle(),
-			];
+			return this.stoppedTurn(interruptReason);
 		}
 		if (!this.turnId) return [];
 

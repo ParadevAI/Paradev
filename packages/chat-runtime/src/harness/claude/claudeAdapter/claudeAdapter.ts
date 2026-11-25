@@ -152,6 +152,10 @@ class PromptQueue {
 		this.buffered.push(message);
 	}
 
+	dropUnread(): boolean {
+		return this.buffered.shift() !== undefined;
+	}
+
 	close(): void {
 		this.closed = true;
 		const waiting = this.waiting;
@@ -196,6 +200,8 @@ function promptText(content: UserContent[]): string {
 		.map((part) => (part.type === "text" ? part.text : ""))
 		.join("\n");
 }
+
+const STOP_REASON = "Turn canceled by user";
 
 function isResult(message: unknown): boolean {
 	return (
@@ -295,7 +301,6 @@ export class ClaudeAdapter implements HarnessAdapter {
 
 		this.session = stream;
 		this.pump = this.run(stream, translator);
-		this.honourHeldCancel();
 	}
 
 	prompt(content: UserContent[]): void {
@@ -353,15 +358,18 @@ export class ClaudeAdapter implements HarnessAdapter {
 	}
 
 	private send(message: SDKUserMessage): void {
+		if (this.cancelRequested) {
+			this.cancelRequested = false;
+			if (this.translator?.currentTurnId) this.cancelTurn();
+			else this.emitStoppedTurn();
+			return;
+		}
 		this.unansweredPrompts += 1;
 		this.prompts.push(message);
-		this.honourHeldCancel();
 	}
 
-	private honourHeldCancel(): void {
-		if (!this.cancelRequested) return;
-		this.cancelRequested = false;
-		this.cancelTurn();
+	private emitStoppedTurn(): void {
+		this.pushAll(this.translator?.stoppedTurn(STOP_REASON) ?? []);
 	}
 
 	cancelTurn(): void {
@@ -370,7 +378,9 @@ export class ClaudeAdapter implements HarnessAdapter {
 			return;
 		}
 		if (!this.session) {
-			this.cancelRequested = true;
+			if (!this.prompts.dropUnread()) return;
+			this.unansweredPrompts -= 1;
+			this.emitStoppedTurn();
 			return;
 		}
 		const interrupt = this.session.interrupt;
@@ -378,7 +388,7 @@ export class ClaudeAdapter implements HarnessAdapter {
 			this.abortController.abort();
 			return;
 		}
-		this.translator?.markInterrupted("Turn canceled by user");
+		this.translator?.markInterrupted(STOP_REASON);
 		void interrupt.call(this.session).catch(() => {
 			this.abortController.abort();
 		});
