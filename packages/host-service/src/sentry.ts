@@ -1,5 +1,10 @@
 import * as Sentry from "@sentry/node";
+import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
+import { SANDBOX_TELEMETRY_KEYS } from "@superset/shared/sandbox/contract";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
+import { createBoxLogFilter } from "./runtime/box-log-filter";
+import { getManagedEnv } from "./runtime/sandbox-managed-env";
+import type { TerminalAgentEndReason } from "./terminal-agents/types";
 
 let initialized = false;
 
@@ -7,14 +12,62 @@ let initialized = false;
 // instance rather than one per call.
 const throttleRepeats = createSentryEventThrottle();
 
+/** Whether this host sends box logs: a cloud box whose organization has `sandbox-box-logs`. */
+export function boxLogsEnabled(env = process.env): boolean {
+	return (
+		env.SUPERSET_HOST_RUN_MODE === "sandbox" &&
+		env.SUPERSET_SANDBOX_BOX_LOGS === "1"
+	);
+}
+
 export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
-	const dsn = process.env.HOST_SERVICE_SENTRY_DSN;
-	if (!dsn) return;
-	Sentry.init({
+	const sentryOptions = hostSentryOptions(process.env, options.organizationId);
+	if (!sentryOptions) return;
+	Sentry.init(sentryOptions);
+	initialized = true;
+}
+
+export function hostSentryOptions(
+	env: NodeJS.ProcessEnv,
+	organizationId: string | undefined,
+): Sentry.NodeOptions | null {
+	const dsn = env.HOST_SERVICE_SENTRY_DSN;
+	if (!dsn) return null;
+	const tags = {
+		service: "host-service",
+		[SANDBOX_TELEMETRY_KEYS.organizationId]: organizationId,
+		run_mode: env.SUPERSET_HOST_RUN_MODE,
+		[SANDBOX_TELEMETRY_KEYS.cloudWorkspaceId]:
+			env.SUPERSET_SANDBOX_WORKSPACE_ID,
+		image_tag: env.SUPERSET_SANDBOX_IMAGE_TAG,
+		provider: env.SUPERSET_SANDBOX_PROVIDER,
+	};
+	const boxLogs = boxLogsEnabled(env);
+	return {
 		dsn,
-		release: process.env.HOST_SERVICE_SENTRY_RELEASE,
-		environment: process.env.HOST_SERVICE_SENTRY_ENVIRONMENT,
+		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
+		enableLogs: boxLogs,
+		beforeSendLog: boxLogs
+			? createBoxLogFilter({
+					secrets: () => [
+						...Object.values(getManagedEnv()),
+						env.HOST_SERVICE_SECRET ?? "",
+						dsn,
+					],
+					reportDropped: (dropped, windowStartedAt) =>
+						logBoxEvent(
+							"box.logs.dropped",
+							{
+								"box.logs.dropped": dropped,
+								"box.logs.window_started_at": windowStartedAt,
+							},
+							"warn",
+						),
+				})
+			: undefined,
+		release: env.HOST_SERVICE_SENTRY_RELEASE,
+		environment: env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		// A host that fails once usually fails in a loop: git.getStatus alone
 		// sent 135k copies of one `spawn EBADF` from seven machines last month.
 		beforeSend: throttleRepeats,
@@ -24,25 +77,75 @@ export function initSentry(options: { organizationId?: string }): void {
 			Sentry.onUncaughtExceptionIntegration({
 				exitEvenIfOtherHandlersAreRegistered: false,
 			}),
+			...(boxLogs
+				? [
+						Sentry.consoleLoggingIntegration({
+							levels: ["log", "info", "warn", "error"],
+						}),
+					]
+				: []),
 		],
 		initialScope: {
-			tags: {
-				service: "host-service",
-				organization_id: options.organizationId,
-				run_mode: process.env.SUPERSET_HOST_RUN_MODE,
-				cloud_workspace_id: process.env.SUPERSET_SANDBOX_WORKSPACE_ID,
-				image_tag: process.env.SUPERSET_SANDBOX_IMAGE_TAG,
-				provider: process.env.SUPERSET_SANDBOX_PROVIDER,
-			},
+			tags,
+			attributes: { ...tags, "log.source": "host-service" },
 		},
-	});
-	initialized = true;
+	};
+}
+
+type BoxAgentId = BuiltinAgentId | "custom";
+
+interface BoxEventAttributes {
+	"agent.ended": {
+		"agent.id": BoxAgentId;
+		"agent.end_reason": TerminalAgentEndReason;
+		ms: number;
+	};
+	"boot.phase": {
+		"log.source": "boot";
+		"boot.phase": string;
+		"boot.at": number;
+		"boot.ms": number;
+	};
+	"box.reaped": {
+		"log.source": "memguard";
+		"reap.class": "box" | "session" | "other";
+		"reap.rss_mb": number;
+		"memory.available_mb": number;
+		"memory.floor_mb": number;
+		"memory.limit_mb": number;
+	};
+	"box.memory_low": {
+		"log.source": "memguard";
+		"memory.available_mb": number;
+		"memory.floor_mb": number;
+		"memory.limit_mb": number;
+	};
+	"hook.finished": { "hook.exit": number | NodeJS.Signals; ms: number };
+	"box.logs.dropped": {
+		"box.logs.dropped": number;
+		"box.logs.window_started_at": number;
+	};
+}
+
+/** One of our own events, typed so its attributes stay counts and ids. */
+export function logBoxEvent<E extends keyof BoxEventAttributes>(
+	event: E,
+	attributes: BoxEventAttributes[E],
+	level: "info" | "warn" = "info",
+): void {
+	Sentry.logger[level](event, { ...attributes, "box.event": true });
 }
 
 /** A file a user attached that the agent did not get. */
 export function reportAttachmentResolveFailure(error: unknown): void {
 	if (!initialized) return;
 	Sentry.captureException(error, { tags: { attachment_resolve: "failed" } });
+}
+
+/** A usage scan that crashed its worker, idle or not; the pool pauses after. */
+export function reportUsageWorkerCrash(error: unknown): void {
+	if (!initialized) return;
+	Sentry.captureException(error, { tags: { usage_worker: "crashed" } });
 }
 
 export async function captureFatalStartupError(error: unknown): Promise<void> {

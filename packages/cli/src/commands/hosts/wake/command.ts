@@ -54,7 +54,7 @@ export default command({
 		if (!host.wakeCommand) {
 			throw new CLIError(
 				`No wake command set for ${host.name}`,
-				`Set one: superset hosts set-wake ${host.name} "<command>"`,
+				`Set one: paradev hosts set-wake ${host.name} "<command>"`,
 			);
 		}
 

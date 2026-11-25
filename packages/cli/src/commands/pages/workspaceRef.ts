@@ -18,7 +18,7 @@ export async function resolveWorkspaceId({
 	if (UUID.test(value)) return value;
 
 	if (!organizationId) {
-		throw new CLIError("No active organization", "Run: superset auth login");
+		throw new CLIError("No active organization", "Run: paradev auth login");
 	}
 
 	const { workspaces } = await listWorkspacesOnHost({
@@ -34,7 +34,7 @@ export async function resolveWorkspaceId({
 	if (!match) {
 		throw new CLIError(
 			`No workspace named "${value}" on this machine`,
-			"Run `superset ws list` to see them, or pass the workspace id",
+			"Run `paradev ws list` to see them, or pass the workspace id",
 		);
 	}
 	if (matches.length > 1) {

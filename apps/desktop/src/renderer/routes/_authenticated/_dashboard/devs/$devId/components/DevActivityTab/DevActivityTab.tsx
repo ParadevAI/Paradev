@@ -3,6 +3,7 @@ import { formatCompactRelativeTime } from "@superset/i18n/format";
 import type { RouterOutputs } from "@superset/trpc";
 import { useNavigate } from "@tanstack/react-router";
 import { LuLoader } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
 import { TurnStatus } from "./components/TurnStatus";
@@ -15,6 +16,7 @@ interface DevActivityTabProps {
 }
 
 export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const { people, currentUserId } = useOrganizationPeople();
@@ -98,7 +100,7 @@ export function DevActivityTab({ devId, onOpenChat }: DevActivityTabProps) {
 							</span>
 						)}
 						<span className="w-16 shrink-0 text-right text-muted-foreground">
-							{formatCompactRelativeTime(new Date(turn.startedAt))}
+							{formatCompactRelativeTime(new Date(turn.startedAt), now)}
 						</span>
 					</button>
 				))}

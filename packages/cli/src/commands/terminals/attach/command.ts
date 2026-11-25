@@ -33,7 +33,7 @@ export default command({
 		if (inCi || !process.stdin.isTTY || !process.stdout.isTTY) {
 			throw new CLIError(
 				"attach needs an interactive terminal",
-				"Scripts can use `superset terminals read` and `terminals send` instead",
+				"Scripts can use `paradev terminals read` and `terminals send` instead",
 			);
 		}
 
@@ -66,7 +66,7 @@ export default command({
 			if (exitCode === COMMAND_NOT_FOUND) {
 				throw new CLIError(
 					`\`superset\` is not installed on ${options.ssh}`,
-					"Install the CLI there and run `superset auth login`",
+					"Install the CLI there and run `paradev auth login`",
 				);
 			}
 			if (exitCode !== 0) {
@@ -83,7 +83,7 @@ export default command({
 
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const { target } = await resolveWorkspaceTarget(
 			{
@@ -119,7 +119,7 @@ export default command({
 			case "error":
 				throw new CLIError(
 					`Terminal ${options.terminal}: ${end.message}`,
-					"List live terminals with `superset terminals list`",
+					"List live terminals with `paradev terminals list`",
 				);
 			case "exited":
 				return {

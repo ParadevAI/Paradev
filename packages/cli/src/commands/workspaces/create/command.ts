@@ -14,12 +14,12 @@ export default command({
 		host: string().desc("Create on this host (machineId), or `cloud`"),
 		local: boolean().desc("Create on this machine"),
 		environment: string().desc(
-			"Environment ID a cloud workspace starts from (see: superset environments list); required when several have repositories",
+			"Environment ID a cloud workspace starts from (see: paradev environments list); required when several have repositories",
 		),
 		machineSize: string()
 			.enum(...MACHINE_SIZES)
 			.desc(
-				"Machine size of a cloud workspace: `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB; the default) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where your plan includes them",
+				"Machine size of a cloud workspace: `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where your plan includes them. Omitted: the environment's size, else your organization's default",
 			),
 		project: string().desc(
 			"Project ID, for a workspace on a host. Required with --local or --host unless --session",
@@ -73,7 +73,7 @@ export default command({
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 
 		const defaultHostId = await resolveWorkspaceHost(

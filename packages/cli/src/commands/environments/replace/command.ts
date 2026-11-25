@@ -21,7 +21,7 @@ export default command({
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const { id } = await resolveEnvironment(
 			ctx.api,
@@ -33,7 +33,7 @@ export default command({
 			name: environment.name,
 			consequence: `Replacing ${environment.name} deletes the snapshot its new workspaces fork from and cannot be undone`,
 			yes: options.yes,
-			rerun: `superset environments replace ${environment.id} --workspace ${options.workspace}`,
+			rerun: `paradev environments replace ${environment.id} --workspace ${options.workspace}`,
 		});
 		const saved = await promoteWorkspace({
 			api: ctx.api,

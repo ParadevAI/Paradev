@@ -1,6 +1,6 @@
 import type { BranchPrefixMode } from "@superset/shared/workspace-launch";
 
-// Audit result (see plans/20260716-v1-to-v2-auto-migration.md): v1 and v2
+// Audit result: v1 and v2
 // share the electron-main settings row for user preferences (fonts,
 // notifications, editor, behavior toggles, ...), and the host-wide worktree
 // base dir is seeded from SUPERSET_LEGACY_WORKTREE_BASE_DIR on first host

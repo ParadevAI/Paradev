@@ -1,0 +1,538 @@
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
+import { i18n } from "@superset/i18n";
+import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
+import type { CreatePaneInput, WorkspaceStore } from "@superset/panes";
+import { toast } from "@superset/ui/sonner";
+import { workspaceTrpc } from "@superset/workspace-client";
+import { eq } from "@tanstack/db";
+import { useLiveQuery } from "@tanstack/react-db";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
+import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import type {
+	TerminalPresetRow,
+	WorkspaceRunTerminalState,
+} from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import { selectWorkspaceRunDefinition } from "shared/workspace-run-definition";
+import type { StoreApi } from "zustand/vanilla";
+import type { PaneViewerData, TerminalPaneData } from "../../types";
+import type { TerminalLauncher } from "../useTerminalLauncher";
+import { waitForWorkspaceRunStop } from "./waitForWorkspaceRunStop";
+import {
+	applyWorkspaceRunLifecycleEvent,
+	markStopped,
+} from "./workspaceRunLifecycle";
+
+const CTRL_C_INPUT = "\u0003";
+const TERMINAL_GONE_ERROR_MESSAGES = [
+	"Terminal session not found",
+	"Terminal session has exited",
+	"Terminal session does not belong to this workspace",
+] as const;
+
+function isTerminalGoneError(error: unknown): boolean {
+	// Matches server wording, so it must see the raw English message — the
+	// translated display string would break this under any other locale.
+	const message = rawErrorMessage(error);
+	return TERMINAL_GONE_ERROR_MESSAGES.some((terminalMessage) =>
+		message.includes(terminalMessage),
+	);
+}
+
+function makeTerminalPane(
+	terminalId: string,
+	paneId: string,
+): CreatePaneInput<PaneViewerData> {
+	return {
+		id: paneId,
+		kind: "terminal",
+		titleOverride: i18n._(
+			msg({
+				message: "Workspace Run",
+			}),
+		),
+		data: { terminalId } as TerminalPaneData,
+	};
+}
+
+function getDefinitionId(
+	definition: ReturnType<typeof selectWorkspaceRunDefinition>,
+): string | undefined {
+	if (!definition) return undefined;
+	return definition.source === "terminal-preset"
+		? definition.presetId
+		: definition.projectId;
+}
+
+interface UseV2WorkspaceRunArgs {
+	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	launcher: TerminalLauncher;
+	matchedPresets: TerminalPresetRow[];
+	resolvePresetCommands: (preset: TerminalPresetRow) => string[];
+}
+
+export function useWorkspaceRun({
+	store,
+	launcher,
+	matchedPresets,
+	resolvePresetCommands,
+}: UseV2WorkspaceRunArgs) {
+	const { t } = useLingui();
+	const { workspace } = useWorkspace();
+	const workspaceId = workspace.id;
+	const projectId = workspace.projectId;
+	const collections = useCollections();
+	const [isPending, setIsPending] = useState(false);
+	const isStartingRef = useRef(false);
+	const utils = workspaceTrpc.useUtils();
+	const writeInputMutation = workspaceTrpc.terminal.writeInput.useMutation();
+	const killSessionMutation = workspaceTrpc.terminal.killSession.useMutation();
+	const { data: localWorkspaceRows = [] } = useLiveQuery(
+		(query) =>
+			query
+				.from({ workspaceLocalState: collections.workspaceLocalState })
+				.where(({ workspaceLocalState }) =>
+					eq(workspaceLocalState.workspaceId, workspaceId),
+				),
+		[collections, workspaceId],
+	);
+	const localWorkspaceState = localWorkspaceRows[0] ?? null;
+	const workspaceRunTerminals = useMemo(
+		() => localWorkspaceState?.workspaceRunTerminals ?? {},
+		[localWorkspaceState?.workspaceRunTerminals],
+	);
+
+	// Session workspaces (null projectId) have no project config; only global
+	// terminal presets can define their run.
+	const { data: configRunDefinition } =
+		workspaceTrpc.config.getWorkspaceRunDefinition.useQuery(
+			{ projectId: projectId ?? "" },
+			{ enabled: projectId !== null },
+		);
+
+	const hostTarget = useWorkspaceHostTarget(workspaceId);
+	const isSandbox =
+		hostTarget.status === "ready" && hostTarget.kind === "sandbox";
+	const isBootRunHost = isSandbox && Boolean(configRunDefinition);
+	const { data: sandboxStatus } = workspaceTrpc.sandbox.status.useQuery(
+		undefined,
+		{ enabled: isBootRunHost },
+	);
+	const bootRunTerminalId = sandboxStatus?.runTerminalId ?? null;
+	const { data: bootRunProcess } =
+		workspaceTrpc.terminal.hasRunningProcess.useQuery(
+			{ terminalId: bootRunTerminalId ?? "", workspaceId },
+			{ enabled: bootRunTerminalId !== null },
+		);
+
+	const resolvedMatchedPresets = useMemo(
+		() =>
+			matchedPresets.map((preset) => ({
+				...preset,
+				commands: resolvePresetCommands(preset),
+			})),
+		[matchedPresets, resolvePresetCommands],
+	);
+
+	const definition = useMemo(
+		() =>
+			selectWorkspaceRunDefinition({
+				presets: resolvedMatchedPresets,
+				configRunCommands: configRunDefinition?.commands,
+				configCwd: configRunDefinition?.cwd,
+				projectId,
+			}),
+		[
+			configRunDefinition?.commands,
+			configRunDefinition?.cwd,
+			projectId,
+			resolvedMatchedPresets,
+		],
+	);
+
+	const runningState = useMemo(
+		() =>
+			Object.values(workspaceRunTerminals)
+				.filter((state) => state.state === "running")
+				.sort((a, b) => b.startedAt - a.startedAt)[0] ?? null,
+		[workspaceRunTerminals],
+	);
+
+	const updateWorkspaceRunTerminals = useCallback(
+		(updater: (states: Record<string, WorkspaceRunTerminalState>) => void) => {
+			if (!collections.workspaceLocalState.get(workspaceId)) return;
+			collections.workspaceLocalState.update(workspaceId, (draft) => {
+				draft.workspaceRunTerminals ??= {};
+				updater(draft.workspaceRunTerminals);
+			});
+		},
+		[collections.workspaceLocalState, workspaceId],
+	);
+
+	const bootRunCommand = buildTerminalCommand(configRunDefinition?.commands);
+	const adoptBootRun = useCallback(
+		(terminalId: string) => {
+			if (!projectId) return;
+			updateWorkspaceRunTerminals((states) => {
+				states[terminalId] ??= {
+					terminalId,
+					workspaceId,
+					state: "running",
+					command: bootRunCommand ?? "",
+					definitionSource: "project-config",
+					definitionId: projectId,
+					startedAt: Date.now(),
+				};
+			});
+		},
+		[bootRunCommand, projectId, updateWorkspaceRunTerminals, workspaceId],
+	);
+
+	const isBootRunLive = bootRunProcess?.running === true;
+	useEffect(() => {
+		if (!isBootRunLive || !bootRunTerminalId) return;
+		if (workspaceRunTerminals[bootRunTerminalId]) return;
+		adoptBootRun(bootRunTerminalId);
+	}, [adoptBootRun, bootRunTerminalId, isBootRunLive, workspaceRunTerminals]);
+
+	const findLiveBootRun = useCallback(async (): Promise<string | null> => {
+		if (!isBootRunHost) return null;
+		try {
+			const status = await utils.sandbox.status.fetch(undefined, {
+				staleTime: 0,
+			});
+			const terminalId = status.runTerminalId;
+			if (!terminalId || workspaceRunTerminals[terminalId]) return null;
+			const { running } = await utils.terminal.hasRunningProcess.fetch(
+				{ terminalId, workspaceId },
+				{ staleTime: 0 },
+			);
+			return running ? terminalId : null;
+		} catch (error) {
+			console.warn("[workspace-run] could not read the boot run", error);
+			return null;
+		}
+	}, [isBootRunHost, utils, workspaceId, workspaceRunTerminals]);
+
+	const focusTerminalPane = useCallback(
+		(terminalId: string) => {
+			const state = store.getState();
+			for (const tab of state.tabs) {
+				for (const [paneId, pane] of Object.entries(tab.panes)) {
+					if (pane.kind !== "terminal") continue;
+					if ((pane.data as TerminalPaneData).terminalId !== terminalId)
+						continue;
+					state.setActivePane({ tabId: tab.id, paneId });
+					state.setActiveTab(tab.id);
+					return;
+				}
+			}
+			state.addTab({
+				id: crypto.randomUUID(),
+				panes: [makeTerminalPane(terminalId, crypto.randomUUID())],
+			});
+		},
+		[store],
+	);
+
+	const startWorkspaceRun = useCallback(async () => {
+		if (isStartingRef.current) return;
+		const command = buildTerminalCommand(definition?.commands);
+		if (!definition || !command) {
+			toast.error(
+				t({
+					message: "No workspace run command configured",
+				}),
+				{
+					description: t({
+						message:
+							"Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run.",
+					}),
+				},
+			);
+			return;
+		}
+
+		isStartingRef.current = true;
+		setIsPending(true);
+		try {
+			if (definition.source === "project-config") {
+				const bootRunId = await findLiveBootRun();
+				if (bootRunId) {
+					adoptBootRun(bootRunId);
+					focusTerminalPane(bootRunId);
+					return;
+				}
+			}
+
+			// A terminal pane is a "workspace run" pane iff its terminalId is in
+			// workspaceRunTerminals. Snapshot before launch so the new terminal
+			// we're about to create doesn't itself match.
+			const priorRunTerminalIds = new Set(Object.keys(workspaceRunTerminals));
+			try {
+				const { sessions } = await utils.terminal.list.fetch(
+					{ workspaceId },
+					{ staleTime: 0 },
+				);
+				await Promise.allSettled(
+					sessions
+						.filter((session) => priorRunTerminalIds.has(session.terminalId))
+						.map((session) =>
+							killSessionMutation.mutateAsync({
+								terminalId: session.terminalId,
+								workspaceId,
+							}),
+						),
+				);
+			} catch (error) {
+				console.warn(
+					"[workspace-run] could not end earlier run terminals",
+					error,
+				);
+			}
+
+			const terminalId = launcher.mint();
+			const startedAt = Date.now();
+			updateWorkspaceRunTerminals((states) => {
+				states[terminalId] = {
+					terminalId,
+					workspaceId,
+					state: "running",
+					command,
+					definitionSource: definition.source,
+					definitionId: getDefinitionId(definition),
+					startedAt,
+				};
+			});
+			try {
+				await launcher.create({
+					terminalId,
+					command,
+					cwd: definition.cwd,
+					trackCommandCompletion: true,
+				});
+			} catch (error) {
+				updateWorkspaceRunTerminals((states) => {
+					delete states[terminalId];
+				});
+				throw error;
+			}
+
+			const state = store.getState();
+			let reused: { tabId: string; paneId: string } | null = null;
+			for (let i = state.tabs.length - 1; i >= 0; i--) {
+				const tab = state.tabs[i];
+				if (!tab) continue;
+				for (const [paneId, pane] of Object.entries(tab.panes)) {
+					if (pane.kind !== "terminal") continue;
+					const paneTerminalId = (pane.data as TerminalPaneData).terminalId;
+					if (paneTerminalId && priorRunTerminalIds.has(paneTerminalId)) {
+						reused = { tabId: tab.id, paneId };
+						break;
+					}
+				}
+				if (reused) break;
+			}
+
+			if (reused) {
+				const nextData: TerminalPaneData = { terminalId };
+				state.setPaneData({ paneId: reused.paneId, data: nextData });
+				state.setActivePane({
+					tabId: reused.tabId,
+					paneId: reused.paneId,
+				});
+				state.setActiveTab(reused.tabId);
+			} else {
+				const tabId = crypto.randomUUID();
+				const paneId = crypto.randomUUID();
+				const pane = makeTerminalPane(terminalId, paneId);
+				state.addTab({ id: tabId, panes: [pane] });
+			}
+		} catch (error) {
+			toast.error(
+				t({
+					message: "Failed to run workspace command",
+				}),
+				{
+					description: errorMessage(
+						error,
+						t({
+							message: "Unknown error",
+						}),
+					),
+				},
+			);
+		} finally {
+			isStartingRef.current = false;
+			setIsPending(false);
+		}
+	}, [
+		adoptBootRun,
+		definition,
+		findLiveBootRun,
+		focusTerminalPane,
+		killSessionMutation,
+		launcher,
+		store,
+		t,
+		updateWorkspaceRunTerminals,
+		utils,
+		workspaceId,
+		workspaceRunTerminals,
+	]);
+
+	const stopWorkspaceRun = useCallback(async () => {
+		if (!runningState) return;
+		setIsPending(true);
+		try {
+			const stopRequestedAt = Date.now();
+			updateWorkspaceRunTerminals((states) => {
+				const state = states[runningState.terminalId];
+				if (!state || state.state !== "running") return;
+				state.stopRequestedAt = stopRequestedAt;
+			});
+			await writeInputMutation.mutateAsync({
+				terminalId: runningState.terminalId,
+				workspaceId,
+				data: CTRL_C_INPUT,
+			});
+			const stopped = await waitForWorkspaceRunStop(async () => {
+				const result = await utils.terminal.hasRunningProcess.fetch(
+					{
+						terminalId: runningState.terminalId,
+						workspaceId,
+					},
+					{ staleTime: 0 },
+				);
+				return result.running;
+			});
+			if (stopped) {
+				const stoppedAt = Date.now();
+				updateWorkspaceRunTerminals((states) => {
+					const state = states[runningState.terminalId];
+					if (!state || state.state !== "running") return;
+					markStopped(state, stoppedAt);
+				});
+			}
+		} catch (error) {
+			if (isTerminalGoneError(error)) {
+				const stoppedAt = Date.now();
+				updateWorkspaceRunTerminals((states) => {
+					const state = states[runningState.terminalId];
+					if (!state || state.state !== "running") return;
+					markStopped(state, stoppedAt);
+				});
+				return;
+			}
+
+			updateWorkspaceRunTerminals((states) => {
+				const state = states[runningState.terminalId];
+				if (!state || state.state !== "running") return;
+				delete state.stopRequestedAt;
+			});
+			toast.error(
+				t({
+					message: "Failed to stop workspace run command",
+				}),
+				{
+					description: errorMessage(
+						error,
+						t({
+							message: "Unknown error",
+						}),
+					),
+				},
+			);
+		} finally {
+			setIsPending(false);
+		}
+	}, [
+		runningState,
+		t,
+		updateWorkspaceRunTerminals,
+		utils,
+		workspaceId,
+		writeInputMutation,
+	]);
+
+	const forceStopWorkspaceRun = useCallback(async () => {
+		if (!runningState) return;
+		setIsPending(true);
+		try {
+			await killSessionMutation.mutateAsync({
+				terminalId: runningState.terminalId,
+				workspaceId,
+			});
+			const stoppedAt = Date.now();
+			updateWorkspaceRunTerminals((states) => {
+				const state = states[runningState.terminalId];
+				if (!state) return;
+				state.stopRequestedAt ??= stoppedAt;
+				markStopped(state, stoppedAt, { state: "stopped-by-user" });
+			});
+			await utils.terminal.list.invalidate({ workspaceId });
+		} catch (error) {
+			if (isTerminalGoneError(error)) {
+				const stoppedAt = Date.now();
+				updateWorkspaceRunTerminals((states) => {
+					const state = states[runningState.terminalId];
+					if (!state || state.state !== "running") return;
+					markStopped(state, stoppedAt);
+				});
+				await utils.terminal.list.invalidate({ workspaceId });
+				return;
+			}
+
+			toast.error(
+				t({
+					message: "Failed to force stop workspace run command",
+				}),
+				{
+					description: errorMessage(
+						error,
+						t({
+							message: "Unknown error",
+						}),
+					),
+				},
+			);
+		} finally {
+			setIsPending(false);
+		}
+	}, [
+		killSessionMutation,
+		runningState,
+		t,
+		updateWorkspaceRunTerminals,
+		utils,
+		workspaceId,
+	]);
+
+	const toggleWorkspaceRun = useCallback(async () => {
+		if (runningState) {
+			await stopWorkspaceRun();
+			return;
+		}
+		await startWorkspaceRun();
+	}, [runningState, startWorkspaceRun, stopWorkspaceRun]);
+
+	useWorkspaceEvent("terminal:lifecycle", workspaceId, (payload) => {
+		updateWorkspaceRunTerminals((states) => {
+			applyWorkspaceRunLifecycleEvent(states, payload);
+		});
+	});
+
+	return {
+		canForceStop: Boolean(runningState),
+		definition,
+		forceStopWorkspaceRun,
+		isPending,
+		isRunning: Boolean(runningState),
+		runningState,
+		toggleWorkspaceRun,
+	};
+}

@@ -1,6 +1,7 @@
 import { CLOUD_AGENT_IDS } from "@superset/shared/cloud-agent-launch";
 import type { HostDb } from "../../../../db";
 import { ensurePresetRow } from "../../../../trpc/router/settings/agent-configs";
+import { caught } from "../../../box-log-filter";
 import { pdevAgentDir, trustPdevWorkspace } from "../trustPdevWorkspace";
 
 export function seedSandboxAgents(
@@ -12,6 +13,9 @@ export function seedSandboxAgents(
 	try {
 		trustPdevWorkspace(workspaceRoot, agentDir);
 	} catch (error) {
-		console.warn("[sandbox] could not prepare pdev folder trust", error);
+		console.warn(
+			"[sandbox] could not prepare pdev folder trust",
+			caught(error),
+		);
 	}
 }

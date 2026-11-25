@@ -343,6 +343,19 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 		href: "/changelog/2026-09-28-file-editing-instant-workspaces",
 	},
 	{
+		id: "android-app",
+		title: msg({
+			message: "Android app",
+		}),
+		description: msg({
+			message:
+				"Monitor, steer, and unblock your agents from your Android phone.",
+		}),
+		category: "Mobile",
+		status: "shipped",
+		shippedDate: "Nov 2026",
+	},
+	{
 		id: "in-app-pr-merge",
 		title: msg({
 			message: "In-app PR merge",

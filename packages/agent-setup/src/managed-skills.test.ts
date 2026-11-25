@@ -13,6 +13,7 @@ import {
 	MANAGED_SENTINEL_NAME,
 	MANAGED_SKILL_MARKER,
 	type PluginSkillSource,
+	setFrontmatterDescription,
 	setFrontmatterName,
 	withManagedMarker,
 } from "./managed-skills";
@@ -29,6 +30,7 @@ const SUPERSET_HOME = path.join(TEST_ROOT, "superset");
 
 const claudeSkills = path.join(HOME_DIR, ".claude", "skills");
 const claudePlugin = path.join(claudeSkills, "superset");
+const paradevPlugin = path.join(claudeSkills, "paradev");
 const agentsSkills = path.join(HOME_DIR, ".agents", "skills");
 const commandsDir = path.join(HOME_DIR, ".agents", "commands", "superset");
 
@@ -150,6 +152,16 @@ describe("setFrontmatterName", () => {
 		);
 		expect(renamed).toContain("name: superset-feedback");
 		expect(renamed).toContain("# feedback body");
+	});
+});
+
+describe("setFrontmatterDescription", () => {
+	it("replaces a multi-line description whole", () => {
+		const content =
+			"---\nname: x\ndescription: >\n  first\n  second\nlicense: MIT\n---\nbody\n";
+		expect(setFrontmatterDescription(content, "new")).toBe(
+			'---\nname: x\nlicense: MIT\ndescription: "new"\n---\nbody\n',
+		);
 	});
 });
 
@@ -506,5 +518,79 @@ describe("createManagedSkills without an explicit source list", () => {
 		});
 
 		expect(existsSync(path.join(agentsSkills, "superset-feedback"))).toBe(true);
+	});
+});
+
+describe("createManagedSkills paradev rename", () => {
+	it("keeps every skill under superset: on a machine provisioned before the rename", async () => {
+		const github = seedMarketplacePlugin("github", ["issue-triage"]);
+		writeInstalledPlugins([
+			{ name: github.name, installPath: github.dir, enabled: true },
+		]);
+		const bodies = {
+			orchestrate: "# orchestrate body",
+			"github-issue-triage": "# issue-triage body",
+		};
+		for (const skill of Object.keys(bodies)) {
+			const dir = path.join(claudePlugin, "skills", skill);
+			mkdirSync(dir, { recursive: true });
+			writeFileSync(path.join(dir, "SKILL.md"), skillMd(skill));
+		}
+		writeFileSync(
+			path.join(claudePlugin, MANAGED_SENTINEL_NAME),
+			MANAGED_SKILL_MARKER,
+		);
+
+		await createManagedSkills({
+			homeDir: HOME_DIR,
+			templatesDir: TEMPLATES_DIR,
+			installedPluginsFile: INSTALLED_PLUGINS_FILE,
+		});
+
+		for (const [skill, body] of Object.entries(bodies)) {
+			const legacy = readFileSync(
+				path.join(claudePlugin, "skills", skill, "SKILL.md"),
+				"utf-8",
+			);
+			expect(legacy).toContain(body);
+			expect(legacy).toContain(
+				`description: "Old name of paradev:${skill}. Use paradev:${skill}."`,
+			);
+			const current = readFileSync(
+				path.join(paradevPlugin, "skills", skill, "SKILL.md"),
+				"utf-8",
+			);
+			expect(current).toContain(body);
+			expect(current).not.toContain("Old name of");
+		}
+		const manifestName = (dir: string) =>
+			JSON.parse(
+				readFileSync(path.join(dir, ".claude-plugin", "plugin.json"), "utf-8"),
+			).name;
+		expect(manifestName(claudePlugin)).toBe("superset");
+		expect(manifestName(paradevPlugin)).toBe("paradev");
+		expect(existsSync(path.join(agentsSkills, "superset-orchestrate"))).toBe(
+			true,
+		);
+	});
+
+	it("keeps superset as the full plugin when the user owns a paradev dir", async () => {
+		mkdirSync(path.join(paradevPlugin, "skills", "mine"), { recursive: true });
+		writeFileSync(
+			path.join(paradevPlugin, "skills", "mine", "SKILL.md"),
+			"# mine",
+		);
+
+		await run();
+
+		expect(existsSync(path.join(paradevPlugin, MANAGED_SENTINEL_NAME))).toBe(
+			false,
+		);
+		expect(
+			readFileSync(
+				path.join(claudePlugin, "skills", "orchestrate", "SKILL.md"),
+				"utf-8",
+			),
+		).toContain("description: test orchestrate skill");
 	});
 });

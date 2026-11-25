@@ -4,10 +4,11 @@ import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
-import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PORTS } from "@superset/shared/sandbox/contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
 const MAX_DISPLAY_BUFFER_BYTES = 32 * 1024 * 1024;
@@ -17,11 +18,12 @@ import { TRPCError } from "@trpc/server";
 import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { parseLaunchSource, withLaunchSource } from "./agent-launch-analytics";
 import { createApiClient } from "./api";
+import { createChatSync, syncWhenEnabled } from "./chat-sync";
 import {
 	createChatAgentBridge,
 	createChatV3Mount,
-	promptChatSession,
 	registerChatV3Routes,
 } from "./chat-v3";
 import { createDb, type HostDb } from "./db";
@@ -37,6 +39,7 @@ import type { ApiAuthProvider } from "./providers/auth";
 import type { HostAuthProvider } from "./providers/host-auth";
 import { AgentJobRunner } from "./runtime/agent-jobs";
 import { runArchivedWorkspaceReconcile } from "./runtime/archived-workspace-reconcile";
+import { caught } from "./runtime/box-log-filter";
 import { registerBrowserCdpRoute } from "./runtime/browser-bridge/browser-cdp-route";
 import { WorkspaceFilesystemManager } from "./runtime/filesystem";
 import type { GitCredentialProvider } from "./runtime/git";
@@ -48,18 +51,18 @@ import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 } from "./runtime/sandbox-self-seed";
 import {
 	isAgentTerminalAlive,
 	registerWorkspaceTerminalRoute,
-	sendAgentMessage,
 } from "./terminal/terminal";
 import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
-import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
+import { sendToAgent } from "./terminal-agents/send-to-agent";
 import { appRouter } from "./trpc/router";
 import {
 	ATTACHMENT_SWEEP_INTERVAL_MS,
@@ -86,6 +89,7 @@ import type {
 } from "./types";
 import { getHostWorkerPool } from "./workers/host-worker-pool";
 import { gitWorkspaceRefsTask } from "./workers/tasks/git";
+import { disposeUsageWorkerPool } from "./workers/usage-worker-pool";
 import { disposeWorkspaceTitleJobs } from "./workspaces/workspace-title-jobs";
 
 export interface CreateAppOptions {
@@ -232,6 +236,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			],
 		}),
 	);
+	app.use("*", (c, next) =>
+		withLaunchSource(
+			parseLaunchSource(c.req.header(SUPERSET_LAUNCH_SOURCE_HEADER)),
+			next,
+		),
+	);
 
 	const eventBus = new EventBus({ db, filesystem, gitWatcher });
 	eventBus.start();
@@ -274,22 +284,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
-			const chat = terminalAgentStore.getChat(terminalId);
-			const chatSessionId = chat?.chatSessionId;
-			if (chatSessionId) {
-				if (!matchesAgentBinding(chat, expectedAgent)) {
-					throw new Error("The chat's agent changed before delivery");
-				}
-				await promptChatSession({
-					runtime: chatV3.runtime(),
-					chatSessionId,
-					text,
-					acquireDelivery,
-					signal,
-				});
-				return;
-			}
-			const result = await sendAgentMessage({
+			const result = await sendToAgent({
 				terminalId,
 				workspaceId,
 				text,
@@ -298,6 +293,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				acquireDelivery,
 				signal,
 				terminalAgentStore,
+				chatRuntime: () => chatV3.runtime(),
 				db,
 				eventBus,
 			});
@@ -308,20 +304,18 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isTerminalAlive: (terminalId, workspaceId) => {
 			const chat = terminalAgentStore.getChat(terminalId);
-			if (chat) return chat.lastEventType !== "Failed";
+			if (chat?.chatSessionId) {
+				const live = chatV3.runtime().live.get(chat.chatSessionId);
+				return live !== null && live.state.status !== "dead";
+			}
 			return isAgentTerminalAlive({ terminalId, workspaceId, db, eventBus });
 		},
 		isAgentBusy: (terminalId) =>
 			agentIsBusy(
-				(
-					terminalAgentStore.getChat(terminalId) ??
-					terminalAgentStore.get(terminalId)
-				)?.lastEventType,
+				terminalAgentStore.getChatOrTerminalAgent(terminalId)?.lastEventType,
 			),
 		getAgent: (terminalId) => {
-			const binding =
-				terminalAgentStore.getChat(terminalId) ??
-				terminalAgentStore.get(terminalId);
+			const binding = terminalAgentStore.getChatOrTerminalAgent(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});
@@ -332,16 +326,26 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
 	});
 
+	const chatSync = createChatSync({
+		runtime: () => chatV3.existingRuntime(),
+		api,
+	});
 	const runtime = {
 		agentJobs,
 		filesystem,
 		pullRequests: pullRequestRuntime,
 		pageWatch,
 		chat: () => chatV3.runtime(),
+		chatSync,
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
+		closedMidTurn: {
+			list: () => chatV3.closedMidTurn(),
+			resume: () => chatV3.resumeClosedMidTurn(),
+			keepPaused: () => chatV3.keepClosedMidTurnPaused(),
+		},
 	};
 
-	// Chat v3 runtime (plans/chat-v3-pane-mount.md). Registered unconditionally:
+	// Chat v3 runtime. Registered unconditionally:
 	// the routes sit behind the same auth as every other host route, and the
 	// runtime is built on first request, so chat.db is never created on a host
 	// nobody chats with. Exposure is a client concern — the renderer gates the
@@ -370,11 +374,21 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				workspaceId: scopeId,
 				occurredAt,
 			}),
+		onAppend: (envelope) => chatSync.noteAppend(envelope),
 	});
+	// A box whose owner has it keeps its chats in the cloud as they happen; a
+	// machine someone owns pushes a chat only when it moves.
+	const stopChatSync =
+		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
+			? syncWhenEnabled({ chatSync, api })
+			: null;
 	try {
 		chatV3.resumeAfterUpdate();
 	} catch (error) {
-		console.warn("[host-service] chat resume after update failed:", error);
+		console.warn(
+			"[host-service] chat resume after update failed:",
+			caught(error),
+		);
 	}
 
 	// Startup sweeps run in the background so they don't block server
@@ -394,7 +408,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	};
 	const runProjectPurge = () =>
 		purgeExpiredProjects(purgeContext).catch((err) => {
-			console.warn("[host-service] project purge failed:", err);
+			console.warn("[host-service] project purge failed:", caught(err));
 			return 0;
 		});
 	const projectPurgeTimer =
@@ -404,7 +418,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	projectPurgeTimer?.unref?.();
 	const runAttachmentSweep = () =>
 		sweepAttachmentStore().catch((err) => {
-			console.warn("[host-service] attachment sweep failed:", err);
+			console.warn("[host-service] attachment sweep failed:", caught(err));
 		});
 	const attachmentSweepTimer =
 		process.env.SUPERSET_HOST_RUN_MODE === "sandbox"
@@ -424,7 +438,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			db,
 			eventBus,
 		}).catch((err) => {
-			console.warn("[host-service] project backfill failed:", err);
+			console.warn("[host-service] project backfill failed:", caught(err));
 		});
 		// Finish any delete the previous process crashed out of (archived row
 		// whose worktree still exists).
@@ -441,7 +455,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			organizationId: config.organizationId,
 			isAuthenticated: true,
 		}).catch((err) => {
-			console.warn("[host-service] archived-workspace reconcile failed:", err);
+			console.warn(
+				"[host-service] archived-workspace reconcile failed:",
+				caught(err),
+			);
 		});
 		await runProjectPurge();
 		await runAttachmentSweep();
@@ -449,7 +466,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		// provider profiles. Last: it touches no host state the sweeps above
 		// repair, and a slow filesystem must not delay them.
 		await provisionSelectedAccounts(db).catch((err) => {
-			console.warn("[host-service] account provisioning failed:", err);
+			console.warn("[host-service] account provisioning failed:", caught(err));
 		});
 	})();
 
@@ -588,6 +605,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 
 	const ownsDb = options.db === undefined;
 	const dispose = async (): Promise<void> => {
+		stopChatSync?.();
 		agentJobs.stopAll();
 		if (projectPurgeTimer) clearInterval(projectPurgeTimer);
 		if (attachmentSweepTimer) clearInterval(attachmentSweepTimer);
@@ -598,22 +616,28 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		try {
 			pullRequestRuntime.stop();
 		} catch (err) {
-			console.warn("[host-service] pullRequestRuntime.stop failed:", err);
+			console.warn(
+				"[host-service] pullRequestRuntime.stop failed:",
+				caught(err),
+			);
 		}
 		try {
 			pageWatch.stop();
 		} catch (err) {
-			console.warn("[host-service] pageWatch.stop failed:", err);
+			console.warn("[host-service] pageWatch.stop failed:", caught(err));
 		}
 		try {
 			await disposeLocalMobileDevices();
 		} catch (err) {
-			console.warn("[host-service] disposeLocalMobileDevices failed:", err);
+			console.warn(
+				"[host-service] disposeLocalMobileDevices failed:",
+				caught(err),
+			);
 		}
 		try {
 			await chatV3.dispose();
 		} catch (err) {
-			console.warn("[host-service] chatV3.dispose failed:", err);
+			console.warn("[host-service] chatV3.dispose failed:", caught(err));
 		}
 		// Retire the host-worker threads (and reap their in-flight git
 		// children) here rather than leaving them to process.exit(): exit joins
@@ -623,17 +647,28 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		try {
 			await getHostWorkerPool().dispose();
 		} catch (err) {
-			console.warn("[host-service] hostWorkerPool.dispose failed:", err);
+			console.warn(
+				"[host-service] hostWorkerPool.dispose failed:",
+				caught(err),
+			);
+		}
+		try {
+			await disposeUsageWorkerPool();
+		} catch (err) {
+			console.warn(
+				"[host-service] usageWorkerPool.dispose failed:",
+				caught(err),
+			);
 		}
 		try {
 			eventBus.close();
 		} catch (err) {
-			console.warn("[host-service] eventBus.close failed:", err);
+			console.warn("[host-service] eventBus.close failed:", caught(err));
 		}
 		try {
 			gitWatcher.close();
 		} catch (err) {
-			console.warn("[host-service] gitWatcher.close failed:", err);
+			console.warn("[host-service] gitWatcher.close failed:", caught(err));
 		}
 		if (ownsDb) {
 			try {
@@ -682,7 +717,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			isAuthenticated: true,
 			browserBridge: config.browserBridge,
 		} as HostServiceContext;
-		await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		try {
+			await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		} finally {
+			if (sandboxIdentity)
+				await resumeSandboxStartHookRun(ctx, sandboxIdentity);
+		}
 	};
 
 	return {
@@ -699,7 +739,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			} catch (error) {
 				console.warn(
 					"[host-service] could not record unfinished chats:",
-					error,
+					caught(error),
 				);
 			}
 		},

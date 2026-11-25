@@ -276,7 +276,7 @@ export interface ComparisonRow {
 		paid: ComparisonValue | null,
 		enterprise: ComparisonValue | null,
 	];
-	cloud?: "gbHours" | "environments" | "overageRate" | "pack";
+	cloud?: "gbHours" | "environments" | "pack";
 }
 
 export interface ComparisonSection {
@@ -338,12 +338,6 @@ export const COMPARISON_SECTIONS: ComparisonSection[] = [
 				label: msg({ message: "Cloud environments" }),
 				values: [null, null, CUSTOM],
 				cloud: "environments",
-			},
-			{
-				id: "overage",
-				label: msg({ message: "GB-hours past the pool" }),
-				values: [null, null, CUSTOM],
-				cloud: "overageRate",
 			},
 			{
 				id: "gbHourPacks",
@@ -538,10 +532,7 @@ export const PRICING_FAQ_ITEMS: PricingFAQItem[] = [
 				message:
 					"Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast.",
 			}),
-			msg({
-				message:
-					"The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan.",
-			}),
+			msg({ message: "The pool resets every month." }),
 		],
 		needs: "gbHours",
 	},

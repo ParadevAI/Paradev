@@ -9,7 +9,7 @@ import {
 } from "./search";
 
 /**
- * Verifies finding #2's fix from `plans/v2-paths-worktree-perf-fix-plan.md`:
+ * Verifies the search index cache bound:
  *
  * `searchIndexCache` now has a hard LRU cap (`SEARCH_INDEX_CACHE_MAX = 12`)
  * plus a 30-min idle TTL. These tests confirm:

@@ -467,4 +467,22 @@ describe("parseAuthDeepLink", () => {
 			params: { token: "t", expiresAt: "2099-01-01", state: "s" },
 		});
 	});
+
+	test("accepts the callback on both superset:// and paradev://", () => {
+		for (const scheme of ["superset", "paradev"]) {
+			expect(
+				parseAuthDeepLink(
+					`${scheme}://auth/callback?token=t&expiresAt=2099-01-01&state=s`,
+				),
+			).toEqual({
+				type: "valid",
+				params: { token: "t", expiresAt: "2099-01-01", state: "s" },
+			});
+		}
+		expect(
+			parseAuthDeepLink(
+				"https://auth/callback?token=t&expiresAt=2099-01-01&state=s",
+			),
+		).toEqual({ type: "not-auth" });
+	});
 });

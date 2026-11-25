@@ -1,3 +1,4 @@
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
@@ -22,9 +23,9 @@ const SANDBOX_REFETCH_INTERVAL_MS = 30_000;
  * workspace's id: the sandbox reports the machine id of the container it
  * happens to run in, which addresses nothing from here.
  */
-function sandboxWorkspacesQuery(target: SandboxTarget) {
+function sandboxWorkspacesQuery(target: SandboxTarget, organizationId: string) {
 	return {
-		queryKey: getHostWorkspacesQueryKey(target.workspaceId, target.url),
+		queryKey: getHostWorkspacesQueryKey(target.workspaceId, organizationId),
 		refetchInterval: SANDBOX_REFETCH_INTERVAL_MS,
 		retry: 1,
 		networkMode: "always" as const,
@@ -97,9 +98,14 @@ export function useWorkspaceHost(
 
 	const queries = useQueries({
 		queries: [
-			...(sandbox ? [sandboxWorkspacesQuery(sandbox)] : []),
+			...(sandbox && cloud
+				? [sandboxWorkspacesQuery(sandbox, cloud.organizationId)]
+				: []),
 			...targets.map(({ host, hostUrl }) => ({
-				queryKey: getHostWorkspacesQueryKey(host.machineId, hostUrl),
+				queryKey: getHostWorkspacesQueryKey(
+					host.machineId,
+					host.organizationId,
+				),
 				enabled: workspaceId !== null,
 				staleTime: 30_000,
 				retry: 1,
@@ -144,7 +150,7 @@ export function useWorkspaceHost(
 					retrySandbox();
 					void served?.refetch();
 				},
-				isResolving: !host && cloud.status === "ready",
+				isResolving: !host && isLiveCloudWorkspaceStatus(cloud.status),
 			};
 		}
 		let workspace: HostWorkspaceRow | null = null;

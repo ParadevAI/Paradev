@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const PLAN_TIERS = ["free", "pro", "enterprise"] as const;
 export type PlanTier = (typeof PLAN_TIERS)[number];
 
@@ -148,12 +150,21 @@ export const CLOUD_USAGE_REFUSAL_KEYS = [
 	"serverError.cloudWorkspace.usageLimitReached",
 ] as const;
 
+/** Clients read the key from `data`; the server's own `TRPCError` still holds it in `cause`. */
+export function cloudUsageRefusalKey(
+	error: unknown,
+): (typeof CLOUD_USAGE_REFUSAL_KEYS)[number] | null {
+	const { data, cause } =
+		(error as {
+			data?: { i18nKey?: unknown } | null;
+			cause?: { i18nKey?: unknown } | null;
+		} | null) ?? {};
+	const i18nKey = data?.i18nKey ?? cause?.i18nKey;
+	return CLOUD_USAGE_REFUSAL_KEYS.find((key) => key === i18nKey) ?? null;
+}
+
 export function isCloudUsageRefusal(error: unknown): boolean {
-	const data = (error as { data?: { i18nKey?: unknown } | null } | null)?.data;
-	return (
-		typeof data?.i18nKey === "string" &&
-		(CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(data.i18nKey)
-	);
+	return cloudUsageRefusalKey(error) !== null;
 }
 
 export const PLAN_PRICE_CURRENCY = "USD";
@@ -243,6 +254,8 @@ export interface PlanFamily {
 	yearly: CatalogPlan | null;
 	legacy: CatalogPlan[];
 	gbMinutesPerSeat: number | null;
+	/** The GB-hours per seat the family is sold with; null where it is not sold with cloud. */
+	advertisedGbHoursPerSeat: number | null;
 	overagePerGbHour: number | null;
 	pack: GbHourPack | null;
 	environments: number | null;
@@ -318,13 +331,17 @@ function catalogPlan(
 	return { id: plan.id, name: plan.name, interval, seatPrice: price.amount };
 }
 
+/** The Autumn features a cloud workspace boot is billed on; also the usage events' features. */
+export const BOX_GB_MINUTES_FEATURE_ID = "box_gb_minutes";
+export const ACTIVE_CPU_MINUTES_FEATURE_ID = "active_cpu_minutes";
+
 function gbMinutesPerSeat(
 	plan: AutumnCatalogPlan,
 	plans: AutumnCatalogPlan[],
 ): number | null {
 	return positiveNumber(
 		seatLicensePlan(plan, plans)?.items.find(
-			(item) => item.featureId === "box_gb_minutes",
+			(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID,
 		)?.included,
 	);
 }
@@ -335,28 +352,110 @@ function environmentLimit(plan: AutumnCatalogPlan): number | null {
 	);
 }
 
-function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
-	const price = plan.items.find(
-		(item) =>
-			item.featureId === "box_gb_minutes" && item.price?.interval === "month",
-	)?.price;
+function perGbHour(
+	price:
+		| { amount?: number | null; billingUnits?: number | null }
+		| null
+		| undefined,
+): number | null {
 	if (price?.amount == null) return null;
-	return (price.amount * 60) / (price.billingUnits ?? 1);
+	return gbHourPackPricePerGbHour({
+		price: price.amount,
+		gbMinutes: price.billingUnits ?? 1,
+	});
+}
+
+function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
+	return perGbHour(
+		plan.items.find(
+			(item) =>
+				item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+				item.price?.interval === "month",
+		)?.price,
+	);
 }
 
 /** The plan's one-off GB-minute purchase, when it sells one. */
 export function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
 	const price = plan.items.find(
 		(item) =>
-			item.featureId === "box_gb_minutes" && item.price?.interval === "one_off",
+			item.featureId === BOX_GB_MINUTES_FEATURE_ID &&
+			item.price?.interval === "one_off",
 	)?.price;
 	const gbMinutes = positiveNumber(price?.billingUnits);
 	const amount = positiveNumber(price?.amount);
 	return gbMinutes && amount ? { gbMinutes, price: amount } : null;
 }
 
+/** The fields of an Autumn GB-minute balance row that price it. */
+export interface GbMinuteBalanceRow {
+	includedGrant: number;
+	prepaidGrant: number;
+	reset: { interval: string } | null;
+	price: {
+		amount?: number | null;
+		billingUnits: number;
+		billingMethod: string;
+	} | null;
+}
+
+export interface GbHourRates {
+	/** The price of a GB-hour past the allowance. */
+	overagePerGbHour: number | null;
+	/** What the credit bought so far cost per GB-hour; null with none bought or a tiered price. */
+	boughtPerGbHour: number | null;
+	/** What the next purchase costs: Autumn charges the one-off item of the plan the customer holds. */
+	pack: GbHourPack | null;
+}
+
+export function isRecurringGbMinuteRow(row: GbMinuteBalanceRow): boolean {
+	return row.reset?.interval !== "one_off";
+}
+
+export function isBoughtGbMinuteRow(row: GbMinuteBalanceRow): boolean {
+	return !isRecurringGbMinuteRow(row) && row.price?.billingMethod === "prepaid";
+}
+
+function paidPerGbHour(rows: GbMinuteBalanceRow[]): number | null {
+	let gbMinutes = 0;
+	let usd = 0;
+	for (const row of rows) {
+		const granted = row.includedGrant + row.prepaidGrant;
+		if (granted === 0) continue;
+		if (row.price?.amount == null) return null;
+		gbMinutes += granted;
+		usd += (granted * row.price.amount) / row.price.billingUnits;
+	}
+	return gbMinutes > 0 ? (usd * 60) / gbMinutes : null;
+}
+
+/** The customer's own GB-hour prices: its balance rows first, then the plan version it holds, never the catalog. */
+export function gbHourRatesOf(
+	balance: { breakdown?: GbMinuteBalanceRow[] } | null | undefined,
+	plan: AutumnCatalogPlan | null | undefined,
+): GbHourRates {
+	const rows = balance?.breakdown ?? [];
+	const usageBased = rows.find(
+		(row) =>
+			isRecurringGbMinuteRow(row) && row.price?.billingMethod === "usage_based",
+	);
+	return {
+		overagePerGbHour:
+			perGbHour(usageBased?.price) ?? (plan ? overagePerGbHour(plan) : null),
+		boughtPerGbHour: paidPerGbHour(rows.filter(isBoughtGbMinuteRow)),
+		pack: plan ? gbHourPack(plan) : null,
+	};
+}
+
 export const GB_HOUR_PURCHASE = { min: 100, max: 30_000 };
 export const AUTO_TOPUP_MONTHLY_LIMIT = 10;
+
+/** The limit's next step: buy more GB-hours when the organization's plan sells a pack, else upgrade. */
+export function offersGbHourPack(
+	plan: { pack: GbHourPack | null } | null | undefined,
+): boolean {
+	return Boolean(plan?.pack);
+}
 
 /** What buying about `gbHours` costs: whole pack units, never past the maximum. */
 export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
@@ -367,13 +466,40 @@ export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
 	);
 	return {
 		gbMinutes: units * pack.gbMinutes,
-		price: Math.round(units * pack.price * 100) / 100,
+		price: units * pack.price,
 	};
+}
+
+/** The allowance fields a billing value can fail to give; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_FIELDS = [
+	"seats",
+	"bought",
+	"freeCredits",
+	"extraUsageLimit",
+	"limitReached",
+] as const;
+
+/** Why a billing value cannot give a field; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_REASONS = [
+	"not_read",
+	"percent_of_allowance",
+	"not_tracked",
+] as const;
+
+/** Exact: rounding is the formatter's, at display. */
+export function gbMinutesUsd(
+	gbMinutes: number,
+	overagePerGbHour: number | null,
+) {
+	return overagePerGbHour === null ? null : (gbMinutes / 60) * overagePerGbHour;
 }
 
 export function gbHourPackPricePerGbHour(pack: GbHourPack): number {
 	return (pack.price * 60) / pack.gbMinutes;
 }
+
+/** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
+const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
 
 /** The purchasable lineup, one entry per family, ordered for display. */
 export function planCatalogFromAutumn(
@@ -392,6 +518,7 @@ export function planCatalogFromAutumn(
 			yearly: null,
 			legacy: [],
 			gbMinutesPerSeat: null,
+			advertisedGbHoursPerSeat: null,
 			overagePerGbHour: null,
 			pack: null,
 			environments: null,
@@ -408,6 +535,11 @@ export function planCatalogFromAutumn(
 				Number.POSITIVE_INFINITY,
 		);
 		family.gbMinutesPerSeat ??= gbMinutesPerSeat(plan, plans);
+		family.advertisedGbHoursPerSeat =
+			family.gbMinutesPerSeat === null ||
+			FAMILIES_WITHOUT_ADVERTISED_CLOUD.includes(key)
+				? null
+				: family.gbMinutesPerSeat / 60;
 		family.overagePerGbHour ??= overagePerGbHour(plan);
 		family.pack ??= gbHourPack(plan);
 		family.environments ??= environmentLimit(plan);
@@ -425,6 +557,16 @@ export function planCatalogFromAutumn(
 		(a, b) =>
 			a.displayOrder - b.displayOrder || a.family.localeCompare(b.family),
 	);
+}
+
+/** The GB-hour price every self-serve family charges; null when none sells GB-minutes or they disagree. */
+export function lineupRatePerGbHour(lineup: PlanFamily[]): number | null {
+	const rates = new Set(
+		lineup.flatMap((family) =>
+			family.overagePerGbHour === null ? [] : [family.overagePerGbHour],
+		),
+	);
+	return rates.size === 1 ? ([...rates][0] ?? null) : null;
 }
 
 /** Yearly only counts as an option when it costs less than twelve months. */
@@ -449,14 +591,6 @@ export function seatPricePerMonth(family: PlanFamily, yearly: boolean): number {
 	const plan = planForInterval(family, yearly);
 	if (!plan) return 0;
 	return plan.interval === "year" ? plan.seatPrice / 12 : plan.seatPrice;
-}
-
-const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
-
-/** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
-export function advertisedGbMinutesPerSeat(family: PlanFamily): number | null {
-	if (FAMILIES_WITHOUT_ADVERTISED_CLOUD.includes(family.family)) return null;
-	return family.gbMinutesPerSeat;
 }
 
 export function familyForPlan(
@@ -503,6 +637,7 @@ export const MACHINE_SIZES = Object.keys(MACHINE_SIZE_VCPUS) as [
 	MachineSize,
 	...MachineSize[],
 ];
+export const machineSizeSchema = z.enum(MACHINE_SIZES);
 /** Every organization can run these; the rest need an Autumn feature each. */
 export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"small",
@@ -510,6 +645,8 @@ export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"large",
 ];
 export const DEFAULT_MACHINE_SIZE: MachineSize = "medium";
+/** The size of a workspace with no stored size: it was made before sizes existed. */
+export const LEGACY_MACHINE_SIZE: MachineSize = "large";
 
 export function isMachineSize(value: unknown): value is MachineSize {
 	return typeof value === "string" && Object.hasOwn(MACHINE_SIZE_VCPUS, value);

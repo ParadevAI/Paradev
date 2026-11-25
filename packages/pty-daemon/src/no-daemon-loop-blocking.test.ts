@@ -40,8 +40,8 @@ const RULES: Rule[] = [
 			// Shell probe + shutdown diagnostics; cold paths.
 			"Pty/Pty.ts": 2,
 			// Kill-chain ps reads — bounded by PS_TIMEOUT_MS; the hot polling
-			// path uses readProcessTableAsync instead.
-			"process-tree.ts": 3,
+			// and foreground-probe paths use async execFile instead.
+			"process-tree.ts": 2,
 		},
 		advice:
 			"A sync subprocess freezes the daemon's only event loop until the child exits — every terminal session in the org stops flowing (keystrokes and output stall). Prefer async spawn/execFile (see readProcessTableAsync): the caller awaits the same result, but session IO keeps flowing while the child runs.",

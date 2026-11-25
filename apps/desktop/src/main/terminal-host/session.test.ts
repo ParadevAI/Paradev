@@ -114,6 +114,7 @@ describe("Terminal Host Session shell args", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: (command: string, args: readonly string[], _options) => {
 				spawnCalls.push({ command, args: [...args] });
 				return fakeChildProcess as unknown as ChildProcess;
@@ -148,6 +149,7 @@ describe("Terminal Host Session shell args", () => {
 			cwd: "/tmp",
 			shell: "/bin/bash",
 			command: "echo hello && exit 1",
+			killProcessTree: async () => {},
 			spawnProcess: (command: string, args: readonly string[], _options) => {
 				spawnCalls.push({ command, args: [...args] });
 				return fakeChildProcess as unknown as ChildProcess;
@@ -182,6 +184,7 @@ describe("Terminal Host Session shell args", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: (command: string, args: readonly string[], _options) => {
 				spawnCalls.push({ command, args: [...args] });
 				return fakeChildProcess as unknown as ChildProcess;
@@ -280,6 +283,7 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/zsh",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChildProcess as unknown as ChildProcess,
 		});
 
@@ -305,6 +309,7 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/zsh",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChildProcess as unknown as ChildProcess,
 		});
 
@@ -335,6 +340,7 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/zsh",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChildProcess as unknown as ChildProcess,
 		});
 
@@ -364,6 +370,7 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/zsh",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChildProcess as unknown as ChildProcess,
 		});
 
@@ -404,6 +411,7 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 				rows: 24,
 				cwd: "/tmp",
 				shell: "/bin/zsh",
+				killProcessTree: async () => {},
 				spawnProcess: () => fakeChildProcess as unknown as ChildProcess,
 			});
 
@@ -448,6 +456,7 @@ describe("Terminal Host Session emulator backlog backpressure", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/zsh",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChildProcess as unknown as ChildProcess,
 		});
 
@@ -585,6 +594,7 @@ describe("Terminal Host Session stdin backpressure", () => {
 			cols: 80,
 			rows: 24,
 			cwd: "/tmp",
+			killProcessTree: async () => {},
 			spawnProcess: () => child as unknown as ChildProcess,
 		});
 

@@ -1,0 +1,29 @@
+import { ChatTable } from "@superset/chat-ui/ChatMarkdown";
+import { env } from "renderer/env.renderer";
+import type { StreamdownProps } from "streamdown";
+import { ChatCodeBlock } from "./components/ChatCodeBlock";
+import { ChatInlineCode } from "./components/ChatInlineCode";
+import { ChatLink } from "./components/ChatLink";
+import { remarkLocalPathLinks } from "./utils/remarkLocalPathLinks";
+import { remarkWorkspaceDeepLinks } from "./utils/remarkWorkspaceDeepLinks";
+
+/** The transcript and the composer share one column so their edges line up. */
+export const CHAT_GUTTER_CLASSNAME = "px-6";
+/** The same gutter for a scroller, less the space it reserves for scrollbars. */
+export const CHAT_SCROLLER_GUTTER_CLASSNAME =
+	"px-[max(0px,calc(1.5rem-var(--scrollbar-gutter,0px)))]";
+export const CHAT_COLUMN_CLASSNAME = "mx-auto w-full max-w-3xl";
+
+export const CHAT_MARKDOWN_COMPONENTS = {
+	code: ChatCodeBlock,
+	inlineCode: ChatInlineCode,
+	a: ChatLink,
+	table: ChatTable,
+};
+
+export const CHAT_REMARK_PLUGINS: NonNullable<
+	StreamdownProps["remarkPlugins"]
+> = [
+	[remarkWorkspaceDeepLinks, { webUrl: env.NEXT_PUBLIC_WEB_URL }],
+	remarkLocalPathLinks,
+];

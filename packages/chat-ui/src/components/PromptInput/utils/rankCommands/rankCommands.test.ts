@@ -71,4 +71,40 @@ describe("rankCommands", () => {
 	it("offers nothing once arguments are being typed", () => {
 		expect(rankCommands([command("fork")], "fork ")).toEqual([]);
 	});
+
+	it("matches only a name or alias that starts with the query when prefixOnly", () => {
+		const commands = [
+			command("trpc-compat", { description: "Check tmp files" }),
+			command("code-review"),
+			command("slack:test-slack-app", { searchAliases: ["tester"] }),
+			command("$autumn"),
+		];
+		expect(ids(rankCommands(commands, "tmp", { prefixOnly: true }))).toEqual(
+			[],
+		);
+		expect(ids(rankCommands(commands, "cod", { prefixOnly: true }))).toEqual([
+			"code-review",
+		]);
+		expect(ids(rankCommands(commands, "test", { prefixOnly: true }))).toEqual([
+			"slack:test-slack-app",
+		]);
+		expect(ids(rankCommands(commands, "aut", { prefixOnly: true }))).toEqual([
+			"$autumn",
+		]);
+		expect(
+			ids(rankCommands(commands, "test-sl", { prefixOnly: true })),
+		).toEqual(["slack:test-slack-app"]);
+		expect(ids(rankCommands(commands, "tmp"))).toEqual(["trpc-compat"]);
+	});
+
+	it("ranks a $ skill whose name starts with the query first", () => {
+		const commands = [
+			command("$mobile-demo-film", { title: "$mobile-demo-film" }),
+			command("$find-skills", { title: "$find-skills" }),
+		];
+		expect(ids(rankCommands(commands, "fi", { prefixOnly: true }))).toEqual([
+			"$find-skills",
+			"$mobile-demo-film",
+		]);
+	});
 });

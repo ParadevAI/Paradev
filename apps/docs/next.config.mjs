@@ -20,7 +20,7 @@ const withMDX = createMDX();
 const config = {
 	reactStrictMode: true,
 	// Compiles @lingui/react/macro at build time. Version must stay in
-	// lockstep with Next's swc_core ABI — see plans/20260826-i18n-strategy.md.
+	// lockstep with Next's swc_core ABI.
 	experimental: {
 		swcPlugins: [["@lingui/swc-plugin", {}]],
 	},
@@ -72,6 +72,31 @@ const config = {
 			{
 				source: "/remote-workspaces",
 				destination: "/remote-access",
+				permanent: true,
+			},
+			{
+				source: "/port-management",
+				destination: "/ports",
+				permanent: true,
+			},
+			{
+				source: "/agent-status-notifications",
+				destination: "/agent-status",
+				permanent: true,
+			},
+			{
+				source: "/claude-code",
+				destination: "/agents/claude-code",
+				permanent: true,
+			},
+			{
+				source: "/changelog",
+				destination: "https://paradev.com/changelog",
+				permanent: true,
+			},
+			{
+				source: "/agent-orchestration",
+				destination: "https://paradev.com/agent-orchestration",
 				permanent: true,
 			},
 		];

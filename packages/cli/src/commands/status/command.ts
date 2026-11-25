@@ -96,7 +96,7 @@ export default command({
 			health.healthy && cloudRegistered === false
 				? `\nWarning: not registered with the cloud for ${organization.name}${
 						health.registrationError ? ` (${health.registrationError})` : ""
-					} — hosts list and automations won't see this machine\nHint: check host-service.log; registration retries automatically, or run: superset stop && superset start`
+					} — hosts list and automations won't see this machine\nHint: check host-service.log; registration retries automatically, or run: paradev stop && paradev start`
 				: "";
 
 		return {

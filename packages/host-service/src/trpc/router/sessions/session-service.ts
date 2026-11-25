@@ -8,8 +8,9 @@ import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import type { HostServiceContext } from "../../../types";
 import { chatContinuationTarget, chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
-import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
+import { seedWorkspaceAgentTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { createChatSession } from "./create-chat-session";
+import { sessionsClientId } from "./utils/sessionsClientId";
 
 export const createChatSessionSchema = z
 	.object({
@@ -17,6 +18,7 @@ export const createChatSessionSchema = z
 		agent: z.string().min(1),
 		prompt: z.string().default(""),
 		model: z.string().min(1).optional(),
+		effort: z.string().min(1).optional(),
 		mode: z.string().min(1).optional(),
 		resumeSessionId: z.string().min(1).optional(),
 		continueSessionId: z.string().min(1).optional(),
@@ -94,12 +96,12 @@ export function requireChatSession(
 export async function createChatSessionInWorkspace(
 	ctx: SessionContext,
 	rawInput: CreateChatSessionInput,
-	launch: { terminalId?: string } = {},
+	launch: { terminalId?: string; withoutAgentConfig?: boolean } = {},
 ): Promise<ChatSessionResult> {
 	const input = createChatSessionSchema.parse(rawInput);
 	const workspace = requireSessionWorkspace(ctx, input.workspaceId);
 	seedDefaultsIfEmpty(ctx.db);
-	const target = chatLaunchTarget(ctx.db, {
+	const resolved = chatLaunchTarget(ctx.db, {
 		workspaceId: input.workspaceId,
 		agent: input.agent,
 		prompt: input.prompt,
@@ -107,6 +109,10 @@ export async function createChatSessionInWorkspace(
 		model: input.model,
 		attachmentIds: input.attachmentIds,
 	});
+	const target =
+		resolved && launch.withoutAgentConfig
+			? { ...resolved, agentConfigId: null }
+			: resolved;
 	if (!target)
 		throw new TRPCError({
 			code: "BAD_REQUEST",
@@ -122,6 +128,7 @@ export async function createChatSessionInWorkspace(
 	if (
 		input.continueSessionId &&
 		!input.model &&
+		!input.effort &&
 		!input.mode &&
 		!input.attachmentIds?.length
 	) {
@@ -148,7 +155,7 @@ export async function createChatSessionInWorkspace(
 				chat.commands.prompt({
 					commandId,
 					sessionId: input.continueSessionId,
-					clientId: "superset-sessions",
+					clientId: sessionsClientId(commandId),
 					content: [{ type: "text", text: input.prompt }],
 				});
 			return {
@@ -161,11 +168,8 @@ export async function createChatSessionInWorkspace(
 			};
 		}
 	}
-	if (workspace.projectId === null) {
-		const config = resolveHostAgentConfig(ctx.db, input.agent);
-		if (config)
-			await seedAgentFolderTrust(ctx.db, workspace.worktreePath, config);
-	}
+	const config = resolveHostAgentConfig(ctx.db, input.agent);
+	if (config) await seedWorkspaceAgentTrust(ctx.db, workspace, config);
 	return createChatSession(
 		chat,
 		target,

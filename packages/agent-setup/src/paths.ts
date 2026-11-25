@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { readPublicEnv } from "@superset/shared/public-env";
 
 export const APP_HOME_DIR_NAME = ".paradev";
 
@@ -11,7 +12,7 @@ export const APP_HOME_DIR_NAME = ".paradev";
  * into process.env during boot, and headless hosts may not have it set at all.
  */
 export function resolveAppHomeDir(): string {
-	return process.env.SUPERSET_HOME_DIR?.trim() || defaultAppHomeDir();
+	return readPublicEnv("HOME_DIR")?.trim() || defaultAppHomeDir();
 }
 
 export function defaultAppHomeDir(): string {

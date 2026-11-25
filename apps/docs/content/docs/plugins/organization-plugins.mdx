@@ -38,7 +38,7 @@ You must be an owner or admin, have GitHub connected in **Integrations**, and th
 From the CLI:
 
 ```bash
-superset plugins organization sources add acme/paradev-plugins \
+paradev plugins organization sources add acme/paradev-plugins \
   --ref main \
   --path tools/plugins
 ```
@@ -50,7 +50,7 @@ The plugins appear when the first sync finishes.
 Paradev syncs a repository when it is added, and again when an admin clicks **Sync now** in **Settings → Plugins** or runs:
 
 ```bash
-superset plugins organization sources sync acme/paradev-plugins
+paradev plugins organization sources sync acme/paradev-plugins
 ```
 
 There is no automatic schedule. Sync after you push a change.
@@ -74,7 +74,7 @@ Each plugin has a setting for each role: owner, admin, and member.
 A new plugin is available to owners and admins only. Change the settings in **Settings → Plugins**, or from the CLI:
 
 ```bash
-superset plugins organization access deploy-runbook --member installed
+paradev plugins organization access deploy-runbook --member installed
 ```
 
 A change applies only to the roles you name. Moving a role from **Installed** back to **Available** keeps the installs it already made.
@@ -82,7 +82,7 @@ A change applies only to the roles you name. Moving a role from **Installed** ba
 To see your organization's plugins and their settings:
 
 ```bash
-superset plugins organization list
+paradev plugins organization list
 ```
 
 ## Remove a Repository
@@ -90,7 +90,7 @@ superset plugins organization list
 Removing a repository removes its plugins from the organization and from every member. Remove it in **Settings → Plugins**, or run:
 
 ```bash
-superset plugins organization sources remove acme/paradev-plugins
+paradev plugins organization sources remove acme/paradev-plugins
 ```
 
 ## Multiple Organizations

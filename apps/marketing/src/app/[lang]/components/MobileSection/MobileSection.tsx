@@ -16,12 +16,12 @@ export function MobileSection() {
 				/>
 				<h2
 					id="mobile-heading"
-					className="text-2xl font-normal tracking-tight text-foreground sm:text-3xl"
+					className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.1] text-foreground"
 				>
 					<Trans>Start work from anywhere</Trans>
 				</h2>
-				<p className="mt-3 text-base text-muted-foreground sm:text-lg">
-					<Trans>Mobile, Cloud, or bring your own Cloud</Trans>
+				<p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+					<Trans>Mobile, Cloud, or bring your own fleet</Trans>
 				</p>
 				<div className="mt-12 sm:mt-20">
 					<PhoneShowcase layout="spread" />

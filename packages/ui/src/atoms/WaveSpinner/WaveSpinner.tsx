@@ -1,39 +1,18 @@
-import { useEffect, useState } from "react";
 import { cn } from "../../lib/utils";
 
-const FRAME_MS = 50;
-const FRAMES_PER_LOOP = 24;
-const FADE_FRAMES = 3;
-const DIAGONAL_DELAY_FRAMES = 2;
-const EMPTY_START_FRAME = 11;
+const DIAGONAL_DELAY_MS = 100;
 const CELLS = Array.from({ length: 9 }, (_, index) => ({
 	id: index,
 	diagonal: Math.floor(index / 3) + (index % 3),
 }));
 
-function ramp(frames: number): number {
-	return Math.min(1, Math.max(0, frames / FADE_FRAMES));
-}
-
-function cellOpacity(frame: number, diagonal: number): number {
-	const delay = diagonal * DIAGONAL_DELAY_FRAMES;
-	return ramp(frame - delay) - ramp(frame - EMPTY_START_FRAME - delay);
-}
-
 interface WaveSpinnerProps {
 	className?: string;
 }
 
+// CSS-driven: a JS frame timer re-rendered React 20x/s per spinner and froze
+// with the main thread.
 export function WaveSpinner({ className }: WaveSpinnerProps) {
-	const [frame, setFrame] = useState(0);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setFrame((current) => (current + 1) % FRAMES_PER_LOOP);
-		}, FRAME_MS);
-		return () => clearInterval(interval);
-	}, []);
-
 	return (
 		<span
 			aria-hidden="true"
@@ -45,8 +24,8 @@ export function WaveSpinner({ className }: WaveSpinnerProps) {
 			{CELLS.map((cell) => (
 				<span
 					key={cell.id}
-					className="rounded-[0.5px] bg-current"
-					style={{ opacity: cellOpacity(frame, cell.diagonal) }}
+					className="animate-wave-cell rounded-[0.5px] bg-current"
+					style={{ animationDelay: `${cell.diagonal * DIAGONAL_DELAY_MS}ms` }}
 				/>
 			))}
 		</span>

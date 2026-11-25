@@ -1,6 +1,12 @@
 import { db } from "@superset/db/client";
 import { organizationPlugins, pluginInstalls } from "@superset/db/schema";
-import type { SandboxPlugin } from "@superset/shared/sandbox-contract";
+import {
+	type McpPlugin,
+	mcpAllowlist,
+	mcpAllows,
+	parseProjectConfig,
+} from "@superset/shared/project-config";
+import type { SandboxPlugin } from "@superset/shared/sandbox/contract";
 import { and, asc, eq, isNull, or } from "drizzle-orm";
 import {
 	accessibleTo,
@@ -40,4 +46,20 @@ export async function creatorPlugins(
 			),
 		)
 		.orderBy(asc(pluginInstalls.pluginName));
+}
+
+/** An environment's `[mcp] allow`; null allows every plugin. A config that does not parse allows none. */
+export function environmentMcpAllowlist(
+	config: string | null,
+): string[] | null {
+	if (!config?.trim()) return null;
+	const parsed = parseProjectConfig(config);
+	return parsed.ok ? mcpAllowlist(parsed.config) : [];
+}
+
+export function allowedPlugins<T extends McpPlugin>(
+	plugins: readonly T[],
+	allowlist: readonly string[] | null,
+): T[] {
+	return plugins.filter((plugin) => mcpAllows(allowlist, plugin));
 }

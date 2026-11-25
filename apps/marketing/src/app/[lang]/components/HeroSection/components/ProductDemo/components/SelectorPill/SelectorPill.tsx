@@ -17,18 +17,12 @@ export function SelectorPill({
 			aria-pressed={active}
 			onMouseEnter={onSelect}
 			onClick={onSelect}
-			className={`group relative flex items-center shrink-0 lg:w-full px-4 py-2 lg:py-2.5 text-left text-xs sm:text-sm whitespace-nowrap cursor-pointer transition-colors duration-200 ${
+			className={`relative flex h-10 shrink-0 cursor-pointer items-center whitespace-nowrap px-4 text-left text-sm transition-[color,transform] duration-300 ease-out lg:w-full lg:pl-5 ${
 				active
-					? "text-foreground"
-					: "text-muted-foreground hover:text-foreground/80"
+					? "text-foreground lg:translate-x-1"
+					: "text-muted-foreground/60 hover:text-foreground/80"
 			}`}
 		>
-			{/* Active marker: ember bar on the left edge, same as the app's sidebar */}
-			<span
-				className={`absolute left-0 top-1/2 -translate-y-1/2 w-[2px] bg-brand/80 transition-all duration-200 ease-out ${
-					active ? "h-2/5 opacity-100" : "h-0 opacity-0"
-				}`}
-			/>
 			{label}
 		</button>
 	);

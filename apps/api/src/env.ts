@@ -1,3 +1,4 @@
+import { parseOriginList } from "@superset/shared/origin-list";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
@@ -8,6 +9,8 @@ export const env = createEnv({
 			.default("development"),
 	},
 	server: {
+		DOMAIN_MOVE_ENABLED: z.string().optional(),
+		BROWSER_API_URL: z.string().url().optional(),
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),
 		GOOGLE_CLIENT_ID: z.string().min(1),
@@ -79,6 +82,21 @@ export const env = createEnv({
 		SENTRY_APP_SLUG: z.string().optional(),
 		RELAY_URL: z.string().url().default("https://relay.superset.sh"),
 		REALTIME_URL: z.string().url().default("https://realtime.superset.sh"),
+		// Where the mobile app is served on the web. Unset allows none.
+		MOBILE_WEB_ORIGINS: z
+			.string()
+			.optional()
+			.refine(
+				(value) => {
+					try {
+						parseOriginList(value);
+						return true;
+					} catch {
+						return false;
+					}
+				},
+				{ message: "Comma-separated origins, without wildcards" },
+			),
 	},
 	client: {
 		NEXT_PUBLIC_API_URL: z.string().url(),

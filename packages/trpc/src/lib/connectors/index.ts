@@ -685,8 +685,10 @@ export {
 	connectionBotToken,
 	connectionById,
 	connectorConnections,
+	grantSharedWithAnotherConnection,
 	orgConnection,
 	userConnection,
+	userConnections,
 } from "./lookup";
 export {
 	ConnectorUnavailableError,

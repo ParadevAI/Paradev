@@ -7,7 +7,11 @@ import {
 	spyOn,
 	test,
 } from "bun:test";
-
+import {
+	createParserIdleGate,
+	runWhenParserIdle,
+	wrapWrite,
+} from "./parser-idle-gate";
 import {
 	terminalMeasurementsChanged,
 	tryPersistRuntimeState,
@@ -274,7 +278,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			transport: {},
 			linkManager: null,
 			pendingLinkHandlers: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 1,
 		}));
 		const registryInternals = terminalRuntimeRegistry as unknown as {
@@ -320,6 +323,165 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
+	test("persistEndedSession saves the scrollback and anchor once the parser is idle", async () => {
+		const terminalId = "ended-on-screen";
+		const gate = createParserIdleGate();
+		let parsed: (() => void) | undefined;
+		const runtime = {
+			terminalId,
+			serializeAddon: { serialize: () => "output\r\n[terminal] exited" },
+			lastCols: 120,
+			lastRows: 32,
+			gate,
+			terminal: {
+				write: wrapWrite(gate, (_data, callback) => {
+					parsed = callback;
+				}),
+			},
+		};
+		const entry = {
+			terminalId,
+			instanceId: terminalId,
+			runtime,
+			transport: {
+				sessionEnded: true,
+				seqAnchor: { epoch: "e1", seq: 42 },
+				_seqCounting: true,
+				_bytesSinceAttach: false,
+			},
+		};
+		const registryInternals = terminalRuntimeRegistry as unknown as {
+			entries: Map<string, typeof entry>;
+			entryKeysByTerminalId: Map<string, Set<string>>;
+		};
+		const entryKey = `${terminalId}\u0000${terminalId}`;
+		registryInternals.entries.set(entryKey, entry);
+		registryInternals.entryKeysByTerminalId.set(
+			terminalId,
+			new Set([entryKey]),
+		);
+
+		try {
+			terminalRuntimeRegistry.persistEndedSession(terminalId);
+			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
+				false,
+			);
+			parsed?.();
+			await Promise.resolve();
+			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
+				"output\r\n[terminal] exited",
+			);
+			expect(
+				JSON.parse(
+					fakeStorage.values.get(`terminal-seq:${terminalId}`) ?? "null",
+				),
+			).toEqual({ epoch: "e1", seq: 42 });
+		} finally {
+			registryInternals.entries.delete(entryKey);
+			registryInternals.entryKeysByTerminalId.delete(terminalId);
+			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
+			fakeStorage.values.delete(`terminal-seq:${terminalId}`);
+		}
+	});
+
+	test("persistEndedSession leaves other queued idle work in place", async () => {
+		const terminalId = "ended-with-queued-resize";
+		const gate = createParserIdleGate();
+		const callbacks: (() => void)[] = [];
+		const write = wrapWrite(gate, (_data, callback) => {
+			if (callback) callbacks.push(callback);
+		});
+		const entry = {
+			terminalId,
+			instanceId: terminalId,
+			runtime: {
+				terminalId,
+				serializeAddon: { serialize: () => "kept output" },
+				lastCols: 120,
+				lastRows: 32,
+				gate,
+				terminal: { write },
+			},
+			transport: { sessionEnded: true },
+		};
+		const registryInternals = terminalRuntimeRegistry as unknown as {
+			entries: Map<string, typeof entry>;
+			entryKeysByTerminalId: Map<string, Set<string>>;
+		};
+		const entryKey = `${terminalId}\u0000${terminalId}`;
+		registryInternals.entries.set(entryKey, entry);
+		registryInternals.entryKeysByTerminalId.set(
+			terminalId,
+			new Set([entryKey]),
+		);
+		const resize = mock(() => {});
+
+		try {
+			write("still parsing");
+			runWhenParserIdle(gate, resize);
+			terminalRuntimeRegistry.persistEndedSession(terminalId);
+			callbacks[1]?.();
+			await Promise.resolve();
+			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
+				"kept output",
+			);
+			callbacks[0]?.();
+			await Promise.resolve();
+			expect(resize).toHaveBeenCalledTimes(1);
+		} finally {
+			registryInternals.entries.delete(entryKey);
+			registryInternals.entryKeysByTerminalId.delete(terminalId);
+			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
+		}
+	});
+
+	test("persistEndedSession skips the save when the pane is disposed first", async () => {
+		const terminalId = "ended-then-closed";
+		const gate = createParserIdleGate();
+		let parsed: (() => void) | undefined;
+		const entry = {
+			terminalId,
+			instanceId: terminalId,
+			runtime: {
+				terminalId,
+				serializeAddon: { serialize: () => "late output" },
+				lastCols: 120,
+				lastRows: 32,
+				gate,
+				terminal: {
+					write: wrapWrite(gate, (_data, callback) => {
+						parsed = callback;
+					}),
+				},
+			},
+			transport: { sessionEnded: true },
+		};
+		const registryInternals = terminalRuntimeRegistry as unknown as {
+			entries: Map<string, typeof entry>;
+			entryKeysByTerminalId: Map<string, Set<string>>;
+		};
+		const entryKey = `${terminalId}\u0000${terminalId}`;
+		registryInternals.entries.set(entryKey, entry);
+		registryInternals.entryKeysByTerminalId.set(
+			terminalId,
+			new Set([entryKey]),
+		);
+
+		try {
+			terminalRuntimeRegistry.persistEndedSession(terminalId);
+			registryInternals.entries.delete(entryKey);
+			parsed?.();
+			await Promise.resolve();
+			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
+				false,
+			);
+		} finally {
+			registryInternals.entries.delete(entryKey);
+			registryInternals.entryKeysByTerminalId.delete(terminalId);
+			fakeStorage.values.delete(`terminal-buffer:${terminalId}`);
+		}
+	});
+
 	test("release persists once before disposing a runtime", () => {
 		const terminalId = "release-success";
 		const entry = {
@@ -335,7 +497,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			transport: {},
 			linkManager: null,
 			pendingLinkHandlers: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 1,
 		};
 		const registryInternals = terminalRuntimeRegistry as unknown as {
@@ -381,7 +542,7 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		}
 	});
 
-	test("release disposes with clear and never persists an ended session", () => {
+	test("release keeps an ended session's scrollback for the pane to show", () => {
 		const terminalId = "release-session-ended";
 		const serialize = mock(() => "dead session scrollback");
 		const entry = {
@@ -392,11 +553,11 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 				serializeAddon: { serialize },
 				lastCols: 120,
 				lastRows: 32,
+				gate: { pending: 0 },
 			},
 			transport: { sessionEnded: true },
 			linkManager: null,
 			pendingLinkHandlers: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 1,
 		};
 		const registryInternals = terminalRuntimeRegistry as unknown as {
@@ -421,11 +582,10 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		try {
 			terminalRuntimeRegistry.release(terminalId);
 
-			expect(serialize).not.toHaveBeenCalled();
-			expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(
-				false,
+			expect(fakeStorage.values.get(`terminal-buffer:${terminalId}`)).toBe(
+				"dead session scrollback",
 			);
-			expect(disposeCalls).toEqual([{ persistedState: "clear" }]);
+			expect(disposeCalls).toEqual([{ persistedState: "preserve" }]);
 		} finally {
 			delete (terminalRuntimeRegistry as unknown as { disposeEntry?: unknown })
 				.disposeEntry;
@@ -447,51 +607,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 
 		expect(fakeStorage.values.has(`terminal-buffer:${terminalId}`)).toBe(false);
 		expect(fakeStorage.values.has(`terminal-dims:${terminalId}`)).toBe(false);
-	});
-
-	test("reschedules eviction when a parked terminal changes buffers", () => {
-		let emitBufferChange: () => void = () => {
-			throw new Error("buffer listener was not installed");
-		};
-		let listenerDisposed = false;
-		const runtime = {
-			container: {} as HTMLDivElement | null,
-			terminal: {
-				buffer: {
-					onBufferChange: (listener: () => void) => {
-						emitBufferChange = listener;
-						return { dispose: () => (listenerDisposed = true) };
-					},
-				},
-			},
-		};
-		const entry = {
-			runtime,
-			disposeBufferChangeListener: null as (() => void) | null,
-		};
-		const registryInternals = terminalRuntimeRegistry as unknown as {
-			observeBufferChanges: (observedEntry: typeof entry) => void;
-			pendingEviction: ReturnType<typeof setTimeout> | null;
-		};
-
-		if (registryInternals.pendingEviction !== null) {
-			clearTimeout(registryInternals.pendingEviction);
-			registryInternals.pendingEviction = null;
-		}
-		registryInternals.observeBufferChanges(entry);
-		emitBufferChange();
-		expect(registryInternals.pendingEviction).toBeNull();
-
-		runtime.container = null;
-		emitBufferChange();
-		expect(registryInternals.pendingEviction).not.toBeNull();
-
-		if (registryInternals.pendingEviction !== null) {
-			clearTimeout(registryInternals.pendingEviction);
-			registryInternals.pendingEviction = null;
-		}
-		entry.disposeBufferChangeListener?.();
-		expect(listenerDisposed).toBe(true);
 	});
 
 	test("defers eviction while flushed output is still being parsed", () => {
@@ -532,6 +647,35 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			expect(registryInternals.entries.has(entryKey)).toBe(true);
 		} finally {
 			registryInternals.entries.delete(entryKey);
+		}
+	});
+});
+
+describe("endedCleanly", () => {
+	test("a failing exit is clean only when the shell ended by itself", () => {
+		const entry: { transport: { exitStatus: unknown } } = {
+			transport: { exitStatus: null },
+		};
+		const internals = terminalRuntimeRegistry as unknown as {
+			getEntry: () => typeof entry;
+		};
+		const getEntry = spyOn(internals, "getEntry").mockReturnValue(entry);
+		try {
+			const endedCleanly = (exitStatus: unknown) => {
+				entry.transport.exitStatus = exitStatus;
+				return terminalRuntimeRegistry.endedCleanly("t1", "pane");
+			};
+			expect(endedCleanly(null)).toBe(false);
+			expect(endedCleanly({ exitCode: 0, signal: 0 })).toBe(true);
+			expect(endedCleanly({ exitCode: 1, signal: 0 })).toBe(false);
+			expect(endedCleanly({ exitCode: 1, signal: 0, shellExited: true })).toBe(
+				true,
+			);
+			expect(endedCleanly({ exitCode: 0, signal: 9, shellExited: true })).toBe(
+				false,
+			);
+		} finally {
+			getEntry.mockRestore();
 		}
 	});
 });
@@ -577,7 +721,7 @@ describe("terminal replacement history", () => {
 			});
 			expect(getOrCreate).toHaveBeenCalledWith("new", "pane");
 			expect(replacement.initialBuffer).toBe(
-				"previous output\r\n\x1b[0mNew shell\r\n",
+				"previous output\r\n\x1b[0mNew shell\r\n\x1b7",
 			);
 		} finally {
 			getEntry.mockRestore();

@@ -33,6 +33,6 @@
 		"bun-types": "1.4.3",
 		"tsx": "4.21.0",
 		"typescript": "7.0.2",
-		"wrangler": "4.118.0"
+		"wrangler": "4.129.1"
 	}
 }

@@ -50,12 +50,12 @@ export function buildCompanyFactsSection(): string[] {
 		`## Facts about ${BRAND.NAME}`,
 		"",
 		`- **What it is**: a local-first desktop workspace for orchestrating any CLI-based coding agent. Each task runs in its own Git worktree, and ${BRAND.NAME} provides the stable workflow around the agents.`,
-		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Next to the agent terminals it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
+		"- **Interface**: a desktop app with a full GUI, not a terminal wrapper. Claude Code, Codex, OpenCode, and Pi run in a chat interface or a terminal; other agents run in a terminal. Next to the agents it has a Changes pane, a pull request pane, a file editor, and an in-app browser.",
 		`- **Company**: built by ${BRAND.NAME} in San Francisco, founded by three former YC CTOs (see ${baseUrl}/team).`,
 		`- **License**: open source under the ${PRODUCT_LICENSE}. The code is public on GitHub (${COMPANY.GITHUB_URL}).`,
 		`- **Not Apache Superset**: ${PRODUCT_DISAMBIGUATION}`,
 		`- **Desktop platforms**: ${PRODUCT_PLATFORM_SUMMARY} There is also a CLI, a TypeScript SDK, and an MCP server for programmatic control.`,
-		`- **Mobile**: an iPhone and iPad app on the App Store (iOS 26 or iPadOS 26 or later, Pro plan) to check on agents, reply to them, review diffs, and read Pages while the agents keep running in a cloud workspace or on a desktop or remote host that stays online. While the app is open, a Lock Screen and Dynamic Island Live Activity shows which agents need you, are working, or are ready for review; it does not update in the background yet. Push notifications are coming. Android is on a waitlist (${baseUrl}/mobile).`,
+		`- **Mobile**: an iPhone and iPad app on the App Store (iOS 26 or iPadOS 26 or later) and an Android app on Google Play (${COMPANY.PLAY_STORE_URL}), both on the Pro plan, to check on agents, reply to them, review diffs, and read Pages while the agents keep running in a cloud workspace or on a desktop or remote host that stays online. On iPhone, while the app is open, a Lock Screen and Dynamic Island Live Activity shows which agents need you, are working, or are ready for review; it does not update in the background yet. Push notifications are coming.`,
 		`- **Remote access**: add another machine as a host through the ${BRAND.NAME} relay and run workspaces and agents on it from the desktop app or the mobile app (Pro).`,
 		"- **Automations**: agent sessions on a chosen host that start on a schedule or from an event, such as a GitHub pull request, a Slack message, a Linear issue, a Sentry issue, a Notion or Microsoft Teams event, or a webhook (Pro). Each has a run history for you and your team and retry for failed runs.",
 		"- **Review**: a Changes pane that commits, pushes, and opens pull requests, and a pull request pane with checks, review threads, and merge.",
@@ -64,7 +64,7 @@ export function buildCompanyFactsSection(): string[] {
 		"- **Pages**: agents publish self-contained HTML reports as Pages with version history and pinned comments; a page can be shared with anyone who has the link.",
 		`- **Isolation**: ${PRODUCT_ISOLATION_SUMMARY}`,
 		`- **Pricing**: free tier plus paid seats (see ${baseUrl}/pricing). ${BRAND.NAME} never proxies model API calls; you bring your own agent subscriptions and API keys. Free covers one user with local workspaces, the desktop app, and the CLI. Pro adds remote access, automations, the mobile app, and Linear and Slack integrations. Team and Ultra add cloud workspaces, with one shared pool of GB-hours per seat. Enterprise adds SSO, SCIM, audit logs, an uptime SLA, and priority support.`,
-		"- **Cloud workspaces**: workspaces that run in the cloud and work from desktop, iPhone, and iPad without keeping your own computer connected, on the Team and Ultra plans. Remote access to your own machines is a separate option on Pro.",
+		"- **Cloud workspaces**: workspaces that run in the cloud and work from desktop, iPhone, iPad, and Android without keeping your own computer connected, on the Team and Ultra plans. Remote access to your own machines is a separate option on Pro.",
 		`- **Agents**: works with any CLI coding agent, including Claude Code, OpenAI Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Grok Build, Kimi Code, Mistral Vibe, Devin, and Muse Code, plus custom agents you add.`,
 	];
 }
@@ -96,7 +96,7 @@ export function buildWhenToUseSection(): string[] {
 		`- Orchestrate agent work programmatically: create workspaces, launch agents with a prompt, open terminals, and track tasks from another agent or script via the ${BRAND.NAME} MCP server.`,
 		"- Run a prompt automatically (automations) on a cron-like schedule or when an event happens, such as a pull request, a Slack message, a Linear issue, a Sentry issue, or a webhook, in a fresh or existing workspace.",
 		"- Review diffs, manage ports, and monitor many concurrent agent sessions from one dashboard.",
-		"- Check on agents, reply to them, and review their diffs from an iPhone or iPad while they run on your own machine.",
+		"- Check on agents, reply to them, and review their diffs from an iPhone, iPad, or Android phone while they run on your own machine.",
 		"",
 		`${BRAND.NAME} is not a coding agent itself; it is the workspace and orchestration layer the agents run in. If you are an AI agent, the fastest way to act on a user's ${BRAND.NAME} account is the MCP server below (OAuth or API key auth); the fastest way to learn the product is the docs index at ${CANONICAL_URLS.DOCS}.`,
 	];

@@ -3,6 +3,7 @@ import {
 	countLines,
 	firstLine,
 	parsePastedText,
+	splitQuotedReplies,
 	userMessageText,
 } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
@@ -14,6 +15,7 @@ import { Text } from "@/components/ui/text";
 interface QueuedPromptsProps {
 	prompts: UserMessage[];
 	paused: boolean;
+	pausedByShutdown?: boolean;
 	actionable: boolean;
 	onSteer: (itemId: string) => void;
 	onRemove: (itemId: string) => void;
@@ -23,6 +25,7 @@ interface QueuedPromptsProps {
 export function QueuedPrompts({
 	prompts,
 	paused,
+	pausedByShutdown = false,
 	actionable,
 	onSteer,
 	onRemove,
@@ -34,7 +37,11 @@ export function QueuedPrompts({
 			{paused ? (
 				<View className="mb-2 flex-row items-center gap-3 rounded-2xl bg-white/5 px-3.5 py-3">
 					<Text className="text-muted-foreground min-w-0 flex-1 text-[13px]">
-						<Trans>Queue paused because you interrupted</Trans>
+						{pausedByShutdown ? (
+							<Trans>Queue paused when Paradev closed</Trans>
+						) : (
+							<Trans>Queue paused because you interrupted</Trans>
+						)}
 					</Text>
 					{actionable ? (
 						<Pressable
@@ -50,8 +57,11 @@ export function QueuedPrompts({
 				</View>
 			) : null}
 			{prompts.map((prompt) => {
-				const { text, pastes } = parsePastedText(userMessageText(prompt));
-				const label = (text || firstLine(pastes[0] ?? "")).replace(/\n/g, " ");
+				const quoted = splitQuotedReplies(userMessageText(prompt));
+				const { text, pastes } = parsePastedText(quoted.text);
+				const label = (
+					text || firstLine(pastes[0] ?? quoted.quotes[0] ?? "")
+				).replace(/\n/g, " ");
 				const lines = pastes.reduce((sum, paste) => sum + countLines(paste), 0);
 				return (
 					<View className="flex-row items-center gap-3 py-2.5" key={prompt.id}>

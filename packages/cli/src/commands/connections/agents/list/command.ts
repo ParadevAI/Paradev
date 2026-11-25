@@ -25,7 +25,7 @@ export default command({
 							.join("  "),
 					)
 					.join("\n") ||
-				"No agents signed in. Run: superset connections agents set claude --kind subscription",
+				"No agents signed in. Run: paradev connections agents set claude --kind subscription",
 		};
 	},
 });

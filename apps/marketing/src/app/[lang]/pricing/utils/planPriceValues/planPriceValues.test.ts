@@ -62,8 +62,6 @@ describe("planPriceValues", () => {
 			yearlyTotal: "$648",
 			gbHours: "1,200",
 			hours: "150",
-			overage: "$0.06",
-			overageRate: "$0.06 per GB-hour",
 			environments: "5",
 			previousName: "Pro",
 		});
@@ -76,7 +74,6 @@ describe("planPriceValues", () => {
 		expect(values.byFamily.pro).toMatchObject({
 			gbHours: null,
 			hours: null,
-			overageRate: null,
 			environments: null,
 		});
 		expect(values.allowanceItems).toHaveLength(2);
@@ -115,7 +112,6 @@ describe("planPriceValues", () => {
 		const values = planPriceValues(catalog, setupI18n({ locale: "en" }));
 		expect(values.byFamily.pro).toMatchObject({
 			gbHours: null,
-			overageRate: null,
 			pack: null,
 		});
 		expect(values.byFamily.team).toMatchObject({

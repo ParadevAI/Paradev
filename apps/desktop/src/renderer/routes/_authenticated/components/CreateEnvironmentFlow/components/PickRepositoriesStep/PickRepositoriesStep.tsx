@@ -22,6 +22,7 @@ import { HiCheck } from "react-icons/hi2";
 import { LuRefreshCw } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { githubAppSettingsUrl } from "renderer/lib/github/githubAppSettingsUrl";
+import { SetupAgentNote } from "../SetupAgentNote";
 import type { GitHubInstallationOption } from "./types";
 
 interface PickRepositoriesStepProps {
@@ -37,6 +38,9 @@ interface PickRepositoriesStepProps {
 	onContinue: (
 		repositories: ReadonlyArray<{ id: string; name: string; fullName: string }>,
 	) => void;
+	onSkip: (
+		repositories: ReadonlyArray<{ id: string; name: string; fullName: string }>,
+	) => void;
 	onCancel: () => void;
 }
 
@@ -50,6 +54,7 @@ export function PickRepositoriesStep({
 	onUpgrade,
 	initialSelectedIds = [],
 	onContinue,
+	onSkip,
 	onCancel,
 }: PickRepositoriesStepProps) {
 	const { t } = useLingui();
@@ -83,6 +88,7 @@ export function PickRepositoriesStep({
 	const selected = selectedIds
 		.map((id) => repositories.data?.find((repository) => repository.id === id))
 		.filter((repository) => repository !== undefined);
+	const isLastStep = selected.length <= 1;
 	const toggle = (id: string) =>
 		setSelectedIds((ids) =>
 			ids.includes(id) ? ids.filter((other) => other !== id) : [...ids, id],
@@ -96,8 +102,8 @@ export function PickRepositoriesStep({
 				</DialogTitle>
 				<DialogDescription className="text-sm leading-snug">
 					<Trans>
-						Pick the repositories it checks out. An agent on this machine works
-						out what to install and gets it running in the cloud.
+						Pick the repositories it checks out. An agent in a cloud workspace
+						works out what to install and gets it running.
 					</Trans>
 				</DialogDescription>
 				{accountLogin && (
@@ -201,6 +207,7 @@ export function PickRepositoriesStep({
 					)}
 				</div>
 			)}
+			{isLastStep && <SetupAgentNote />}
 			<DialogFooter className="items-center border-t border-border/70 bg-muted/20 px-5 py-3">
 				<span className="flex-1 text-xs text-muted-foreground">
 					{selected.length === 0 ? (
@@ -212,6 +219,18 @@ export function PickRepositoriesStep({
 				<Button onClick={onCancel} size="sm" variant="ghost">
 					<Trans>Cancel</Trans>
 				</Button>
+				{isLastStep && (
+					<Button
+						disabled={
+							selected.length === 0 || isStarting || reachedLimit !== null
+						}
+						onClick={() => onSkip(selected)}
+						size="sm"
+						variant="outline"
+					>
+						<Trans>Skip & save</Trans>
+					</Button>
+				)}
 				<Button
 					disabled={
 						selected.length === 0 || isStarting || reachedLimit !== null
@@ -224,7 +243,7 @@ export function PickRepositoriesStep({
 					) : selected.length > 1 ? (
 						<Trans>Next</Trans>
 					) : (
-						<Trans>Get started</Trans>
+						<Trans>Start agent</Trans>
 					)}
 				</Button>
 			</DialogFooter>

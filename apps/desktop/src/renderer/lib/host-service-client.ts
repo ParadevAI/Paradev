@@ -1,7 +1,7 @@
 import type { AppRouter } from "@superset/host-service";
 import { createHostServiceLinks } from "@superset/workspace-client";
 import { createTRPCClient } from "@trpc/client";
-import { getHostServiceHeaders } from "./host-service-auth";
+import { resolveHostServiceHeaders } from "./host-service-auth";
 import { isHostServiceConnectionError } from "./utils/isHostServiceConnectionError";
 
 export { isHostServiceConnectionError } from "./utils/isHostServiceConnectionError";
@@ -24,7 +24,7 @@ export function getHostServiceClientByUrl(hostUrl: string): HostServiceClient {
 	const client = createTRPCClient<AppRouter>({
 		links: createHostServiceLinks({
 			url: `${hostUrl}/trpc`,
-			headers: () => getHostServiceHeaders(hostUrl),
+			headers: () => resolveHostServiceHeaders(hostUrl),
 		}),
 	});
 

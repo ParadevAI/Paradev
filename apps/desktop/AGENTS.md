@@ -1,7 +1,13 @@
 
 ## Server-driven announcements (desktop notices)
 
-To show an announcement/warning popup in the app without shipping a release, insert a row in the `desktop_notices` table (served by `GET /api/desktop/version`). Authoring guide — markdown-only body, severities, triggers, targeting, QA previews: `docs/DESKTOP_NOTICES.md`.
+To show an announcement/warning popup in the app without shipping a release, insert a row in the `desktop_notices` table (served by `GET /api/desktop/version`).
+
+- The body is one markdown string with the title inside it (`### Heads up: …`); there is no title field. Raw HTML is stripped. A leading image renders as a cover. `blocking` notices show the body as plain text, so keep it to a sentence or two.
+- `severity`: `info` | `warning` | `blocking` (replaces the app with the forced-update page). `trigger`: `immediate` | `pre-update` | `post-update` (shown only to installs that updated into `min_version`).
+- Targeting: `min_version`/`max_version`, `platforms` (`process.platform` values), `channels` (`stable`/`canary`), `starts_at`/`ends_at`; `NULL` means unbounded. Optional CTA: `cta_label` + `cta_action` (`install-update` | `open-url` with `cta_url`). Dismissals persist per row id.
+- Insert with `active = false`, verify, then set `active = true`; set it back to `false` to pull. Production writes follow the database rules in the root AGENTS.md.
+- QA: dev command palette → `Preview notice: …`, or `NODE_ENV=development bun run packages/db/src/seed-desktop-notices.ts` against the local stack.
 
 ## Persisted renderer state (localStorage) policy
 

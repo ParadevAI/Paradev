@@ -4,25 +4,25 @@ date: 2026-04-27
 image: /changelog/v2-public-beta.png
 ---
 
-**Paradev 2.0 is in open beta.** Enable it under **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/3748" />. It's a 2-way door, and your v1 workspaces and sessions stay put when you flip back.
+**Paradev 2.0 is in open beta.** Enable it under **Settings → Experimental** <PRBadge url="https://github.com/superset-sh/superset/pull/3748" />. You can switch back at any time, and your v1 workspaces and sessions stay where they are.
 
 ![Settings → Experimental: Try Paradev v2 toggle and v1 → v2 migration](/changelog/v2-enable-flag.png)
 
 ## Remote workspaces
 
-In 2.0, a workspace runs on a host: your own machine or another Paradev device. Point your local app at any Paradev device on the same network (a beefier box across the room, a cloud VM, a teammate's host) and run workspaces on it as if they were local. Terminal, file editor, and chat all behave the same way <PRBadge url="https://github.com/superset-sh/superset/pull/3566" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3606" />, and ports listening on the remote host show up in your sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/3676" />.
+In 2.0, a workspace runs on a host: your own machine or another Paradev device. Point your local app at any Paradev device on the same network (a bigger machine across the room, a cloud VM, a teammate's host) and run workspaces on it as if they were local. The terminal, file editor, and chat all work the same way <PRBadge url="https://github.com/superset-sh/superset/pull/3566" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3606" />, and ports that listen on the remote host show in your sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/3676" />.
 
 ![Sidebar with a Cloud workspace group and a remote workspace hover card](/changelog/v2-remote-workspaces.png)
 
 ## Reimagined diff view
 
-The diff viewer is rebuilt to feel like reviewing a PR on your machine: one infinite-scroll diff with a compact sidebar of changed files, per-file viewed state <PRBadge url="https://github.com/superset-sh/superset/pull/3715" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3776" />, and shift/cmd-click selection across the file list <PRBadge url="https://github.com/superset-sh/superset/pull/3683" />.
+The new diff viewer feels like a PR review on your machine. You get one infinite-scroll diff with a compact sidebar of changed files, a viewed state for each file <PRBadge url="https://github.com/superset-sh/superset/pull/3715" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3776" />, and ⇧-click and ⌘-click selection across the file list <PRBadge url="https://github.com/superset-sh/superset/pull/3683" />.
 
 ![v2 Changes pane: infinite-scroll diff with compact file sidebar and review tab](/changelog/v2-changes-pane.png)
 
 ## Paradev CLI
 
-The `superset` CLI is a single static binary that drives the same backend as the desktop app. Sign in with `superset auth login`, then create workspaces, tail terminals, and trigger automations from your shell or CI <PRBadge url="https://github.com/superset-sh/superset/pull/3638" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3640" />.
+The `superset` CLI is a single static binary that uses the same backend as the desktop app. Sign in with `superset auth login`, then create workspaces, tail terminals, and trigger automations from your shell or CI <PRBadge url="https://github.com/superset-sh/superset/pull/3638" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3640" />.
 
 ```bash
 curl -fsSL https://superset.sh/cli/install.sh | sh
@@ -33,11 +33,11 @@ superset auth login
 
 ## A real IDE shell
 
-**Tab → Split → Pane** with drag-and-drop everywhere: drop panes onto the tab strip to spawn tabs <PRBadge url="https://github.com/superset-sh/superset/pull/3809" />. File tree with git decorations, file editor, a browser pane that keeps state across switches, a fresh terminal (XTerm.js + WebGL, kitty keyboard, OSC links, search), and live-synced data with optimistic updates <PRBadge url="https://github.com/superset-sh/superset/pull/3722" />, all in one window.
+**Tab → Split → Pane** with drag and drop everywhere: drop a pane on the tab strip to make a tab <PRBadge url="https://github.com/superset-sh/superset/pull/3809" />. One window holds a file tree with git decorations, a file editor, a browser pane that keeps its state across switches, a new terminal (XTerm.js + WebGL, kitty keyboard, OSC links, search), and live-synced data with optimistic updates <PRBadge url="https://github.com/superset-sh/superset/pull/3722" />.
 
 ## Migration in place
 
-1.x projects and workspaces port directly into 2.0 <PRBadge url="https://github.com/superset-sh/superset/pull/3670" />. The migration is org-idempotent <PRBadge url="https://github.com/superset-sh/superset/pull/3775" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3781" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3783" />, and the migration modal only shows on first onboard <PRBadge url="https://github.com/superset-sh/superset/pull/3816" />.
+1.x projects and workspaces move into 2.0 <PRBadge url="https://github.com/superset-sh/superset/pull/3670" />. The migration is safe to run again for an org <PRBadge url="https://github.com/superset-sh/superset/pull/3775" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3781" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3783" />, and the migration modal shows only the first time you onboard <PRBadge url="https://github.com/superset-sh/superset/pull/3816" />.
 
 ---
 
@@ -45,52 +45,52 @@ superset auth login
 
 ### v2 project setup
 
-- Create or import a project from v2 <PRBadge url="https://github.com/superset-sh/superset/pull/3566" />, with name inferred from folder <PRBadge url="https://github.com/superset-sh/superset/pull/3605" />
-- v2 project settings + setup/relocate path <PRBadge url="https://github.com/superset-sh/superset/pull/3606" />, wired into sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/3592" />
-- Non-setup projects route to settings from the new-workspace modal <PRBadge url="https://github.com/superset-sh/superset/pull/3626" />
-- Auto-create a v2 main workspace on host project setup <PRBadge url="https://github.com/superset-sh/superset/pull/3632" />
-- Keypad loading screen ported to v2 <PRBadge url="https://github.com/superset-sh/superset/pull/3788" />
+- Create or import a project from v2 <PRBadge url="https://github.com/superset-sh/superset/pull/3566" />, with the name taken from the folder <PRBadge url="https://github.com/superset-sh/superset/pull/3605" />
+- v2 project settings and setup/relocate path <PRBadge url="https://github.com/superset-sh/superset/pull/3606" />, linked from the sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/3592" />
+- The new-workspace modal sends you to settings for a project that is not set up <PRBadge url="https://github.com/superset-sh/superset/pull/3626" />
+- Project setup on a host creates a v2 main workspace <PRBadge url="https://github.com/superset-sh/superset/pull/3632" />
+- The keypad loading screen is now in v2 <PRBadge url="https://github.com/superset-sh/superset/pull/3788" />
 
 ### Scheduled agent runs <PRBadge url="https://github.com/superset-sh/superset/pull/3576" />
 
-Automations now run on a cadence: same execution path as a manual run.
+Automations now run on a schedule, the same way as a manual run.
 
 ### Sidebar
 
-- Persistent hover card showing branch/PR/status <PRBadge url="https://github.com/superset-sh/superset/pull/3813" />, rename branches inline from it <PRBadge url="https://github.com/superset-sh/superset/pull/3793" />
-- PR state shown as the workspace icon <PRBadge url="https://github.com/superset-sh/superset/pull/3694" />, local/remote/offline state on icons <PRBadge url="https://github.com/superset-sh/superset/pull/3649" />, pending workspaces pinned to top <PRBadge url="https://github.com/superset-sh/superset/pull/3655" />
-- AI generates title + branch together on workspace create <PRBadge url="https://github.com/superset-sh/superset/pull/3692" />
+- A persistent hover card shows branch, PR and status <PRBadge url="https://github.com/superset-sh/superset/pull/3813" />, and you can rename the branch inline from it <PRBadge url="https://github.com/superset-sh/superset/pull/3793" />
+- The workspace icon shows PR state <PRBadge url="https://github.com/superset-sh/superset/pull/3694" />, icons show local/remote/offline state <PRBadge url="https://github.com/superset-sh/superset/pull/3649" />, and pending workspaces pin to the top <PRBadge url="https://github.com/superset-sh/superset/pull/3655" />
+- AI generates the title and branch together when you create a workspace <PRBadge url="https://github.com/superset-sh/superset/pull/3692" />
 - Sortable v2 workspaces table <PRBadge url="https://github.com/superset-sh/superset/pull/3660" />
-- Refreshed icons <PRBadge url="https://github.com/superset-sh/superset/pull/3755" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3800" />, branch row dropped (lives in hover card) <PRBadge url="https://github.com/superset-sh/superset/pull/3733" />, open state persists across workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/3656" />
+- Refreshed icons <PRBadge url="https://github.com/superset-sh/superset/pull/3755" /> <PRBadge url="https://github.com/superset-sh/superset/pull/3800" />, no branch row (the branch is in the hover card) <PRBadge url="https://github.com/superset-sh/superset/pull/3733" />, and open state persists across workspaces <PRBadge url="https://github.com/superset-sh/superset/pull/3656" />
 - Group management: inline rename on create, cleaner ungroup/delete, hover-only actions <PRBadge url="https://github.com/superset-sh/superset/pull/3745" />
 - Mark-as-unread <PRBadge url="https://github.com/superset-sh/superset/pull/3773" /> clears on click <PRBadge url="https://github.com/superset-sh/superset/pull/3765" />, notification hooks play client-side <PRBadge url="https://github.com/superset-sh/superset/pull/3675" />
 
 ### Cross-workspace terminals
 
 - Terminal session dropdown lists shells from every workspace <PRBadge url="https://github.com/superset-sh/superset/pull/3751" /> with live shell/process titles <PRBadge url="https://github.com/superset-sh/superset/pull/3740" />
-- Hide other-workspace sessions if you'd rather scope to current <PRBadge url="https://github.com/superset-sh/superset/pull/3774" />
+- Hide sessions from other workspaces to see only the current one <PRBadge url="https://github.com/superset-sh/superset/pull/3774" />
 
 ### Chat & markdown
 
 - GPT-5.5 <PRBadge url="https://github.com/superset-sh/superset/pull/3808" /> and Opus 4.7 <PRBadge url="https://github.com/superset-sh/superset/pull/3579" /> in v2 chat
-- Mermaid diagrams in markdown pane <PRBadge url="https://github.com/superset-sh/superset/pull/3642" />, Tiptap tables <PRBadge url="https://github.com/superset-sh/superset/pull/3719" />
+- Mermaid diagrams in the markdown pane <PRBadge url="https://github.com/superset-sh/superset/pull/3642" />, Tiptap tables <PRBadge url="https://github.com/superset-sh/superset/pull/3719" />
 - v1 review comments open in a pane <PRBadge url="https://github.com/superset-sh/superset/pull/3596" />
-- Chat double header collapsed <PRBadge url="https://github.com/superset-sh/superset/pull/3805" />, comment headers consolidated <PRBadge url="https://github.com/superset-sh/superset/pull/3803" />
+- Chat has one header, not two <PRBadge url="https://github.com/superset-sh/superset/pull/3805" />, and comment headers are merged <PRBadge url="https://github.com/superset-sh/superset/pull/3803" />
 
 ### Improvements
 
-- Diff pane file viewer (Shift-click for new tab) <PRBadge url="https://github.com/superset-sh/superset/pull/3715" />, tighter file headers <PRBadge url="https://github.com/superset-sh/superset/pull/3776" />, shift/cmd-click selection <PRBadge url="https://github.com/superset-sh/superset/pull/3683" />
+- Diff pane file viewer (⇧-click for a new tab) <PRBadge url="https://github.com/superset-sh/superset/pull/3715" />, tighter file headers <PRBadge url="https://github.com/superset-sh/superset/pull/3776" />, ⇧-click and ⌘-click selection <PRBadge url="https://github.com/superset-sh/superset/pull/3683" />
 - Configurable v2 link-click behavior <PRBadge url="https://github.com/superset-sh/superset/pull/3600" />, Copy Branch Name in context menus <PRBadge url="https://github.com/superset-sh/superset/pull/3635" />
-- v2 terminal hotkeys backported to v1 <PRBadge url="https://github.com/superset-sh/superset/pull/3724" />, narrow pane header responsiveness <PRBadge url="https://github.com/superset-sh/superset/pull/3737" />, terminal drop hover animation <PRBadge url="https://github.com/superset-sh/superset/pull/3769" />, Ghostty keyboard model <PRBadge url="https://github.com/superset-sh/superset/pull/3700" />
-- v2 file-open honors CMD+O editor choice <PRBadge url="https://github.com/superset-sh/superset/pull/3674" />, agent selection honored in new-workspace modal <PRBadge url="https://github.com/superset-sh/superset/pull/3699" />, task title used as workspace name <PRBadge url="https://github.com/superset-sh/superset/pull/3678" />
+- v2 terminal hotkeys in v1 <PRBadge url="https://github.com/superset-sh/superset/pull/3724" />, pane headers that fit narrow panes <PRBadge url="https://github.com/superset-sh/superset/pull/3737" />, a hover animation for terminal drops <PRBadge url="https://github.com/superset-sh/superset/pull/3769" />, Ghostty keyboard model <PRBadge url="https://github.com/superset-sh/superset/pull/3700" />
+- v2 opens files in the editor you chose with ⌘O <PRBadge url="https://github.com/superset-sh/superset/pull/3674" />, the new-workspace modal keeps your agent selection <PRBadge url="https://github.com/superset-sh/superset/pull/3699" />, the task title becomes the workspace name <PRBadge url="https://github.com/superset-sh/superset/pull/3678" />
 - "Also delete local branch" persists <PRBadge url="https://github.com/superset-sh/superset/pull/3681" />, worktrees under `~/.superset/worktrees/<projectId>` <PRBadge url="https://github.com/superset-sh/superset/pull/3669" />, AI workspace naming on v2 create <PRBadge url="https://github.com/superset-sh/superset/pull/3654" />
-- Workspace setup loader keypad + scrolling steps <PRBadge url="https://github.com/superset-sh/superset/pull/3647" />, safer terminal agent preset defaults <PRBadge url="https://github.com/superset-sh/superset/pull/3546" />, scaffolded PR action header (gated) <PRBadge url="https://github.com/superset-sh/superset/pull/3777" />
+- Workspace setup loader with keypad and scrolling steps <PRBadge url="https://github.com/superset-sh/superset/pull/3647" />, safer defaults for terminal agent presets <PRBadge url="https://github.com/superset-sh/superset/pull/3546" />, scaffolded PR action header (gated) <PRBadge url="https://github.com/superset-sh/superset/pull/3777" />
 
 ### Beyond v2
 
-- Hosts settings page for managing host access <PRBadge url="https://github.com/superset-sh/superset/pull/3768" />
-- /pricing page + redesigned header/footer IA <PRBadge url="https://github.com/superset-sh/superset/pull/3639" />
-- Marketing product menu simplified, yearly discount surfaced <PRBadge url="https://github.com/superset-sh/superset/pull/3691" />
+- Hosts settings page to manage host access <PRBadge url="https://github.com/superset-sh/superset/pull/3768" />
+- /pricing page and a redesigned header and footer <PRBadge url="https://github.com/superset-sh/superset/pull/3639" />
+- Simpler product menu on the marketing site, with the yearly discount shown <PRBadge url="https://github.com/superset-sh/superset/pull/3691" />
 
 ---
 

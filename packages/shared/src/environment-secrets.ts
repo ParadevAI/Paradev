@@ -1,3 +1,5 @@
+import { RESERVED_PARADEV_ENV_KEYS } from "./public-env";
+
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const MAX_KEY_LENGTH = 256;
 const MAX_VALUE_SIZE = 16 * 1024;
@@ -27,6 +29,7 @@ const RESERVED_KEYS = new Set([
 	"PWD",
 	"LANG",
 	"IS_SANDBOX",
+	...RESERVED_PARADEV_ENV_KEYS,
 ]);
 
 export function reservedKeyReason(key: string): string | null {

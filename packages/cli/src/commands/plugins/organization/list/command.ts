@@ -25,7 +25,7 @@ export default command({
 			})),
 			message: plugins.length
 				? `${plugins.length} plugin${plugins.length === 1 ? "" : "s"}.`
-				: "Your organization has no plugins. Sync them from a repository: superset plugins organization sources add <owner/repo>",
+				: "Your organization has no plugins. Sync them from a repository: paradev plugins organization sources add <owner/repo>",
 		};
 	},
 });

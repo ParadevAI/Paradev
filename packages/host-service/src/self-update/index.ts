@@ -29,7 +29,7 @@ function productionDeps(): Omit<SelfUpdaterDeps, "stopServing"> {
 		spawnHost: spawnDetachedHost,
 		pollHealth: pollHostHealth,
 		exit: (code) => process.exit(code),
-		log: (message) => console.log(`[host-service] ${message}`),
+		log: (message) => console.log(message),
 	};
 }
 

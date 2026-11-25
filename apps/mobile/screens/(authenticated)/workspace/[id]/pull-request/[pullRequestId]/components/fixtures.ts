@@ -98,6 +98,7 @@ const MERGEABILITY: PullRequestMergeability = {
 	requiresThreadResolution: false,
 	queue: null,
 	allowedMergeMethods: ["squash"],
+	defaultMergeMethod: "squash",
 };
 
 const CAN: PullRequestCapabilities = {
@@ -199,7 +200,7 @@ export const SCENARIOS = {
 		{
 			pullRequest: {
 				number: 6649,
-				title: "Fix Superset terminal CLI auth",
+				title: "Fix Paradev terminal CLI auth",
 				additions: 290,
 				deletions: 20,
 				changedFiles: 11,

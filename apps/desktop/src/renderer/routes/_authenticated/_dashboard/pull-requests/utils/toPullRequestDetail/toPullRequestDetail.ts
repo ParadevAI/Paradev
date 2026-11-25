@@ -11,6 +11,7 @@ import type {
 	PullRequestDetailCheck,
 	PullRequestDetailRead,
 } from "@superset/shared/pull-request-detail";
+import { mergeMethodChoices } from "@superset/shared/pull-request-merge-methods";
 import type { PullRequestDetail } from "../../hooks/usePullRequestDetail";
 
 /** One row per check name; a re-run replaces the run it supersedes. */
@@ -72,6 +73,7 @@ export function toPullRequestDetail(
 		reviewDecision: reviewDecision(read.mergeability.reviewDecision),
 		checksStatus: computeChecksStatus(checks),
 		checks,
+		checksUnavailable: read.checksUnavailable === true,
 		createdAt: activity?.createdAt ?? "",
 		updatedAt: activity?.updatedAt ?? "",
 		additions: pr.additions,
@@ -88,5 +90,12 @@ export function toPullRequestDetail(
 		commits: activity?.commits ?? [],
 		labels: activity?.labels ?? [],
 		capabilities: read.capabilities,
+		mergeMethods: mergeMethodChoices(read.mergeability),
+		mergeQueue: {
+			enabled:
+				read.mergeability.queueEnabled === true ||
+				read.mergeability.queue !== null,
+			entry: read.mergeability.queue,
+		},
 	};
 }

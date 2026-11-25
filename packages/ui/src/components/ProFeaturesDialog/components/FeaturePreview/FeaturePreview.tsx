@@ -31,8 +31,8 @@ export function FeaturePreview({ selectedFeature }: FeaturePreviewProps) {
 	const DemoComponent = DEMO_COMPONENTS[selectedFeature.id];
 
 	return (
-		<div className="flex w-[495px] flex-col">
-			<div className="relative h-[346px] overflow-hidden bg-[#0a0a0f]">
+		<div className="flex w-full min-w-0 flex-col md:w-auto md:flex-1">
+			<div className="relative h-[346px] shrink-0 overflow-hidden bg-[#0a0a0f]">
 				{PRO_FEATURES.map((proFeature) => (
 					<div
 						key={`gradient-${proFeature.id}`}
@@ -74,12 +74,12 @@ export function FeaturePreview({ selectedFeature }: FeaturePreviewProps) {
 				</span>
 				{selectedFeature.id === "mobile-app" && (
 					<a
-						href={COMPANY.APP_STORE_URL}
+						href={COMPANY.MOBILE_INSTALL_URL}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="mt-3 text-sm text-foreground underline underline-offset-4 hover:text-foreground/80"
 					>
-						<Trans>Open App Store</Trans>
+						<Trans>Get the mobile app</Trans>
 					</a>
 				)}
 			</div>

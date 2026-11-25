@@ -4,19 +4,21 @@ import {
 	describe,
 	expect,
 	jest,
-	mock,
 	setSystemTime,
 	test,
 } from "bun:test";
 import type { createRelaySocket } from "@superset/workspace-client/relay-socket";
+import { Terminal as HeadlessTerminal } from "@xterm/headless";
 import type { Terminal as XTerm } from "@xterm/xterm";
 import {
+	background,
 	connect,
 	createTransport as createRealTransport,
 	disconnect,
 	park,
 	reconnect,
 	sendColors,
+	sendResize,
 } from "./terminal-ws-transport";
 
 // The transport builds on createRelaySocket (partysocket) — reconnection,
@@ -116,8 +118,8 @@ class FakeRelaySocket {
 const createSocket = ((options: Record<string, unknown>) =>
 	new FakeRelaySocket(options)) as unknown as typeof createRelaySocket;
 
-function createTransport(options: { onSessionEnded?: () => void } = {}) {
-	return createRealTransport({ ...options, createSocket });
+function createTransport() {
+	return createRealTransport({ createSocket });
 }
 
 // `window` is aliased to `globalThis` by the xterm-env-polyfill preload, and
@@ -452,6 +454,57 @@ describe("terminal-ws-transport", () => {
 		]);
 	});
 
+	test("asks for a repaint on the first resize after the screen went stale", () => {
+		const transport = createTransport();
+		const terminal = createMockTerminal();
+		transport._repaintRequest = "needed";
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances[0];
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		sendResize(transport, 101, 27);
+
+		expect(
+			socket.sent.map((payload) => JSON.parse(payload) as unknown),
+		).toEqual([
+			{ type: "visible", visible: true },
+			{ type: "resize", cols: 101, rows: 27, repaint: true },
+			{ type: "resize", cols: 101, rows: 27 },
+		]);
+	});
+
+	test("asks for the repaint again when the connection ended before the host answered", () => {
+		const transport = createTransport();
+		const terminal = createMockTerminal();
+		transport._repaintRequest = "needed";
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances[0];
+		if (!socket) throw new Error("expected relay socket instance");
+		const attach = () => {
+			socket.open();
+			socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		};
+
+		attach();
+		socket.drop();
+		attach();
+		socket.message(JSON.stringify({ type: "size", cols: 101, rows: 27 }));
+		socket.drop();
+		attach();
+
+		expect(
+			socket.sent
+				.map(
+					(payload) => JSON.parse(payload) as { type: string; repaint?: true },
+				)
+				.filter((message) => message.type === "resize")
+				.map((message) => message.repaint === true),
+		).toEqual([true, true, false]);
+	});
+
 	test("never gives up: keeps one socket and never self-closes on repeated failures", () => {
 		const { socket } = connectAttached();
 
@@ -581,9 +634,8 @@ describe("terminal-ws-transport", () => {
 		expect(transport.connectionState).toBe("disconnected");
 	});
 
-	test("PTY exit marks the session ended and fires the callback once", () => {
-		const onSessionEnded = mock(() => {});
-		const transport = createTransport({ onSessionEnded });
+	test("PTY exit marks the session ended and records the exit status", () => {
+		const transport = createTransport();
 		const terminal = createMockTerminal();
 		connect(transport, terminal, "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances.at(-1);
@@ -592,9 +644,9 @@ describe("terminal-ws-transport", () => {
 		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
 		expect(transport.sessionEnded).toBe(false);
 
-		socket.message(JSON.stringify({ type: "exit", exitCode: 0, signal: 0 }));
+		socket.message(JSON.stringify({ type: "exit", exitCode: 1, signal: 0 }));
 		expect(transport.sessionEnded).toBe(true);
-		expect(onSessionEnded).toHaveBeenCalledTimes(1);
+		expect(transport.exitStatus).toEqual({ exitCode: 1, signal: 0 });
 		// Permanent: no auto-retry after a PTY exit.
 		expect(socket.closed).toBe(true);
 		expect(
@@ -603,8 +655,7 @@ describe("terminal-ws-transport", () => {
 	});
 
 	test("a session-gone attach error marks the session ended", () => {
-		const onSessionEnded = mock(() => {});
-		const transport = createTransport({ onSessionEnded });
+		const transport = createTransport();
 		connect(transport, createMockTerminal(), "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances.at(-1);
 		if (!socket) throw new Error("expected relay socket instance");
@@ -619,7 +670,7 @@ describe("terminal-ws-transport", () => {
 		);
 
 		expect(transport.sessionEnded).toBe(true);
-		expect(onSessionEnded).toHaveBeenCalledTimes(1);
+		expect(transport.exitStatus).toBeNull();
 		// Permanent: the transport closes the socket so partysocket never
 		// re-dials, and the terminated close is not logged as retryable.
 		expect(socket.closed).toBe(true);
@@ -630,8 +681,7 @@ describe("terminal-ws-transport", () => {
 	});
 
 	test("a plain server error does not mark the session ended", () => {
-		const onSessionEnded = mock(() => {});
-		const transport = createTransport({ onSessionEnded });
+		const transport = createTransport();
 		connect(transport, createMockTerminal(), "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances.at(-1);
 		if (!socket) throw new Error("expected relay socket instance");
@@ -645,7 +695,6 @@ describe("terminal-ws-transport", () => {
 		);
 
 		expect(transport.sessionEnded).toBe(false);
-		expect(onSessionEnded).not.toHaveBeenCalled();
 	});
 
 	test("a successful re-attach resets the session-ended flag", () => {
@@ -659,6 +708,51 @@ describe("terminal-ws-transport", () => {
 		socket.open();
 		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
 		expect(transport.sessionEnded).toBe(false);
+		expect(transport.exitStatus).toBeNull();
+	});
+
+	test("re-attaching to an exited session does not repeat the exit line, even when it wraps", () => {
+		const cols = 12;
+		const rows: { text: string; isWrapped: boolean }[] = [];
+		const terminal = Object.assign(createMockTerminal(cols), {
+			writeln: (text: string) => {
+				for (const line of text.split("\r\n")) {
+					if (!line) rows.push({ text: "", isWrapped: false });
+					for (let i = 0; i < line.length; i += cols) {
+						rows.push({ text: line.slice(i, i + cols), isWrapped: i > 0 });
+					}
+				}
+			},
+			buffer: {
+				active: {
+					get length() {
+						return rows.length;
+					},
+					getLine: (row: number) =>
+						rows[row] && {
+							isWrapped: rows[row].isWrapped,
+							translateToString: () => rows[row].text,
+						},
+				},
+			},
+		}) as unknown as XTerm;
+		const transport = createTransport();
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		const attachAndExit = () => {
+			socket.open();
+			socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+			socket.message(JSON.stringify({ type: "exit", exitCode: 3, signal: 0 }));
+		};
+
+		attachAndExit();
+		reconnect(transport);
+		attachAndExit();
+
+		expect(
+			rows.filter((row) => row.text.startsWith("[terminal] e")),
+		).toHaveLength(1);
 	});
 
 	test("park closes the socket silently, keeping title and stream position", () => {
@@ -973,5 +1067,163 @@ describe("input typed while attaching", () => {
 		expect(inputs(socket)).toEqual([]);
 		expect(inputs(resumed)).toEqual([]);
 		disconnect(transport);
+	});
+});
+
+describe("background", () => {
+	const RELAY_URL = "wss://relay.test/hosts/org-1:machine-1/terminal/t1";
+
+	test("keeps a live relay socket open, and the remount reuses it", () => {
+		const { transport, terminal, socket } = connectAttached(RELAY_URL);
+
+		background(transport);
+
+		expect(socket.closed).toBe(false);
+		expect(transport.connectionState).toBe("open");
+
+		connect(transport, terminal, RELAY_URL);
+
+		expect(FakeRelaySocket.instances).toHaveLength(1);
+		expect(socket.reconnectCount).toBe(0);
+		expect(transport._backgrounded).toBe(false);
+	});
+
+	test("parks a local terminal", () => {
+		const { transport, socket } = connectAttached("ws://host/terminal/t1");
+
+		background(transport);
+
+		expect(socket.closed).toBe(true);
+		expect(transport.connectionState).toBe("disconnected");
+	});
+
+	test("parks a relay socket that is not open yet", () => {
+		const transport = createTransport();
+		connect(transport, createMockTerminal(), RELAY_URL);
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+
+		background(transport);
+
+		expect(socket.closed).toBe(true);
+		expect(transport.connectionState).toBe("disconnected");
+	});
+
+	test("parks a backgrounded socket that drops instead of redialing it", () => {
+		const { transport, terminal, socket } = connectAttached(RELAY_URL);
+		background(transport);
+
+		socket.drop(1006, "host restarted");
+
+		expect(socket.closed).toBe(true);
+		expect(socket.reconnectCount).toBe(0);
+		expect(transport.connectionState).toBe("disconnected");
+		expect(transport.logs).toHaveLength(0);
+		expect(transport.lastDiagnosis).toBeNull();
+
+		connect(transport, terminal, RELAY_URL);
+		expect(FakeRelaySocket.instances).toHaveLength(2);
+	});
+
+	test("parks a backgrounded socket after a suspend instead of redialing it", () => {
+		jest.useFakeTimers();
+		setSystemTime(new Date("2026-01-01T00:00:00Z"));
+		const { transport, socket } = connectAttached(RELAY_URL);
+		background(transport);
+
+		setSystemTime(new Date("2026-01-01T00:02:00Z"));
+		jest.advanceTimersByTime(120_000);
+
+		expect(socket.closed).toBe(true);
+		expect(socket.reconnectCount).toBe(0);
+		expect(transport.connectionState).toBe("disconnected");
+	});
+});
+
+describe("replayed output", () => {
+	test("queries in bytes before the synced head are not answered; live ones are", async () => {
+		const transport = createTransport();
+		const terminal = new HeadlessTerminal({ allowProposedApi: true });
+		connect(transport, terminal as unknown as XTerm, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		const replayed = "$ \x1b[c\x1b[6n";
+		socket.message(
+			JSON.stringify({
+				type: "synced",
+				epoch: "e1",
+				seq: 0,
+				head: replayed.length,
+				mode: "tail",
+			}),
+		);
+		const frame = new TextEncoder().encode(`${replayed}\x1b[c`);
+		socket.message(frame.buffer);
+		transport._writeCoalescer?.flushSync();
+		await new Promise<void>((resolve) => terminal.write("", resolve));
+
+		const inputs = socket.sent
+			.map((raw) => JSON.parse(raw) as { type: string; data?: string })
+			.filter((message) => message.type === "input");
+		expect(inputs).toEqual([{ type: "input", data: "\x1b[?1;2c" }]);
+		expect(transport.seqAnchor).toEqual({ epoch: "e1", seq: frame.length });
+		disconnect(transport);
+		terminal.dispose();
+	});
+});
+
+describe("replayed output across frames and hosts", () => {
+	function attach(head?: number) {
+		const transport = createTransport();
+		const terminal = new HeadlessTerminal({ allowProposedApi: true });
+		connect(transport, terminal as unknown as XTerm, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances.at(-1);
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		socket.message(
+			JSON.stringify({
+				type: "synced",
+				epoch: "e1",
+				seq: 0,
+				...(head === undefined ? {} : { head }),
+				mode: "tail",
+			}),
+		);
+		const frame = (text: string) =>
+			socket.message(new TextEncoder().encode(text).buffer);
+		const inputs = async () => {
+			transport._writeCoalescer?.flushSync();
+			await new Promise<void>((resolve) => terminal.write("", resolve));
+			return socket.sent
+				.map((raw) => JSON.parse(raw) as { type: string; data?: string })
+				.filter((message) => message.type === "input")
+				.map((message) => message.data);
+		};
+		const close = () => {
+			disconnect(transport);
+			terminal.dispose();
+		};
+		return { transport, frame, inputs, close };
+	}
+
+	test("a replay split across frames is not answered, the live tail is", async () => {
+		const first = "$ \x1b[c\x1b[";
+		const second = "6n";
+		const { frame, inputs, close } = attach(first.length + second.length);
+		frame(first);
+		frame(`${second}\x1b[c`);
+		expect(await inputs()).toEqual(["\x1b[?1;2c"]);
+		close();
+	});
+
+	test("an old host without head: every byte is live and answered", async () => {
+		const { transport, frame, inputs, close } = attach();
+		frame("$ \x1b[c");
+		expect(transport._replayBytesLeft).toBe(0);
+		expect(await inputs()).toEqual(["\x1b[?1;2c"]);
+		close();
 	});
 });

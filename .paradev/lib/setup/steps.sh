@@ -1,5 +1,8 @@
 # Setup steps.
 
+# shellcheck source=../admin.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../admin.sh"
+
 step_load_env() {
   echo "📂 Loading environment variables..."
 
@@ -78,17 +81,70 @@ neon_branch_lease_expiry() {
 # Push a branch's expiry NEON_BRANCH_LEASE_DAYS out. Never call
 # set-expiration without --expires-at: that removes the expiry.
 renew_neon_branch_lease() {
-  local branch_id="$1"
+  local branch_id="$1" project_id="$2"
   local lease_expiry
   lease_expiry="$(neon_branch_lease_expiry)"
   [ -n "$lease_expiry" ] || return 0
   if neonctl branches set-expiration "$branch_id" \
-      --project-id "$NEON_PROJECT_ID" \
+      --project-id "$project_id" \
       --expires-at "$lease_expiry" --output json > /dev/null; then
     echo "  Lease renewed until $lease_expiry"
   else
     warn "Could not renew the Neon branch lease (continuing)"
   fi
+}
+
+# Prints the id of the project's branch called $2: renews its lease when it
+# exists, else creates it (from branch $3 when given).
+find_or_create_neon_branch() {
+  local project_id="$1" name="$2" parent="${3:-}"
+  local branches_output existing_id lease_expiry
+
+  # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
+  if ! branches_output=$(neonctl branches list --project-id "$project_id" --output json); then
+    error "Failed to list Neon branches (check output above)"
+    return 1
+  fi
+
+  if ! validate_json "$branches_output" "Neon branches list"; then
+    return 1
+  fi
+
+  existing_id=$(echo "$branches_output" | jq -r --arg n "$name" '.[] | select(.name == $n) | .id // empty' 2>/dev/null)
+
+  if [ -n "$existing_id" ]; then
+    echo "  Using existing Neon branch..." >&2
+    renew_neon_branch_lease "$existing_id" "$project_id" >&2
+    printf '%s\n' "$existing_id"
+    return 0
+  fi
+
+  echo "  Creating new Neon branch..." >&2
+  lease_expiry="$(neon_branch_lease_expiry)"
+  local neon_output create_args=()
+  [ -n "$lease_expiry" ] && create_args+=(--expires-at "$lease_expiry")
+  [ -n "$parent" ] && create_args+=(--parent "$parent")
+  if ! neon_output=$(neonctl branches create \
+      --project-id "$project_id" \
+      --name "$name" \
+      ${create_args[@]+"${create_args[@]}"} \
+      --output json); then
+    error "Failed to create Neon branch (check output above)"
+    return 1
+  fi
+
+  if ! validate_json "$neon_output" "Neon branch creation"; then
+    return 1
+  fi
+
+  local new_id
+  new_id=$(echo "$neon_output" | jq -r '.branch.id // .id // empty' 2>/dev/null)
+  if [ -z "$new_id" ]; then
+    error "Branch ID not found in neonctl response"
+    echo "Response keys: $(echo "$neon_output" | jq -c 'keys' 2>/dev/null)" >&2
+    return 1
+  fi
+  printf '%s\n' "$new_id"
 }
 
 step_setup_neon_branch() {
@@ -112,60 +168,7 @@ step_setup_neon_branch() {
 
   WORKSPACE_NAME="${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
 
-  # Check if branch already exists
-  local branches_output
-  # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
-  if ! branches_output=$(neonctl branches list --project-id "$NEON_PROJECT_ID" --output json); then
-    error "Failed to list Neon branches (check output above)"
-    return 1
-  fi
-
-  # Validate JSON before parsing
-  if ! validate_json "$branches_output" "Neon branches list"; then
-    return 1
-  fi
-
-  # Now safe to parse with jq - use // empty for fallback
-  EXISTING_BRANCH=$(echo "$branches_output" | jq -r ".[] | select(.name == \"$WORKSPACE_NAME\") | .id // empty" 2>/dev/null)
-
-  local lease_expiry
-  lease_expiry="$(neon_branch_lease_expiry)"
-
-  if [ -n "$EXISTING_BRANCH" ]; then
-    echo "  Using existing Neon branch..."
-    BRANCH_ID="$EXISTING_BRANCH"
-    renew_neon_branch_lease "$BRANCH_ID"
-  else
-    echo "  Creating new Neon branch..."
-    local neon_output
-    local lease_args=()
-    [ -n "$lease_expiry" ] && lease_args=(--expires-at "$lease_expiry")
-    # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
-    if ! neon_output=$(neonctl branches create \
-        --project-id "$NEON_PROJECT_ID" \
-        --name "$WORKSPACE_NAME" \
-        ${lease_args[@]+"${lease_args[@]}"} \
-        --output json); then
-      error "Failed to create Neon branch (check output above)"
-      return 1
-    fi
-
-    # Validate JSON before parsing
-    if ! validate_json "$neon_output" "Neon branch creation"; then
-      return 1
-    fi
-
-    # Parse with fallback - if .branch.id doesn't exist, try .id
-    BRANCH_ID=$(echo "$neon_output" | jq -r '.branch.id // .id // empty' 2>/dev/null)
-
-    # Verify we got a branch ID
-    if [ -z "$BRANCH_ID" ]; then
-      error "Branch ID not found in neonctl response"
-      echo "Response structure:" >&2
-      echo "$neon_output" | jq '.' >&2 2>/dev/null || echo "$neon_output" >&2
-      return 1
-    fi
-  fi
+  BRANCH_ID="$(find_or_create_neon_branch "$NEON_PROJECT_ID" "$WORKSPACE_NAME")" || return 1
 
   # Get connection strings
   if ! DIRECT_URL=$(neonctl connection-string "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" --role-name neondb_owner); then
@@ -185,6 +188,122 @@ step_setup_neon_branch() {
   export DATABASE_URL="$POOLED_URL" DATABASE_URL_UNPOOLED="$DIRECT_URL"
 
   success "Neon branch ready: $WORKSPACE_NAME"
+  return 0
+}
+
+# The admin checkout's Neon project, parent branch, database and role come from the
+# environment's variables.
+ADMIN_NEON_VARS="ADMIN_NEON_PROJECT_ID ADMIN_NEON_PARENT_BRANCH ADMIN_NEON_DATABASE ADMIN_NEON_ROLE"
+
+admin_neon_missing() {
+  local var absent=""
+  for var in $ADMIN_NEON_VARS NEON_API_KEY; do
+    [ -n "${!var:-}" ] || absent+=" $var"
+  done
+  command -v neonctl &> /dev/null || absent+=" neonctl"
+  command -v jq &> /dev/null || absent+=" jq"
+  printf '%s' "${absent# }"
+}
+
+admin_connection_string() {
+  neonctl connection-string "$1" --project-id "$ADMIN_NEON_PROJECT_ID" \
+    --database-name "$ADMIN_NEON_DATABASE" --role-name "$ADMIN_NEON_ROLE" "${@:2}"
+}
+
+# Safe on every boot: installs only into a fresh checkout. A later boot that
+# cannot reach the admin branch leaves .env.workspace alone and fails.
+step_setup_admin_checkout() {
+  local dir="$1"
+  echo "🧰 Setting up the admin checkout at $dir..."
+
+  if [ -d "$dir/vendor/superset/.git" ] && [ -d "$dir/node_modules" ]; then
+    echo "  vendor/ and node_modules already present"
+  elif ! (cd "$dir" && bun run setup); then
+    error "bun run setup failed in $dir"
+    return 1
+  fi
+
+  if [ ! -e "$dir/.env" ] && [ ! -L "$dir/.env" ]; then
+    ln -s "$PARADEV_ADMIN_LIB_ROOT/.env" "$dir/.env"
+  fi
+
+  # Later lines of .env win, and the workspace's own come after the environment's.
+  local product_pooled product_direct
+  product_pooled="$(set -a; . "$PARADEV_ADMIN_LIB_ROOT/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL:-}")"
+  product_direct="$(set -a; . "$PARADEV_ADMIN_LIB_ROOT/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL_UNPOOLED:-}")"
+  if ! grep -q "^NEON_BRANCH_ID=" "$PARADEV_ADMIN_LIB_ROOT/.env" 2>/dev/null || [ -z "$product_pooled" ]; then
+    error "This workspace has no product database branch yet; not pointing the admin app at one"
+    return 1
+  fi
+
+  local kept_branch_id admin_pooled="" admin_direct="" admin_source="" branch_id="" problem=""
+  kept_branch_id="$(admin_workspace_branch_id "$dir")"
+  local missing
+  missing="$(admin_neon_missing)"
+  if [ -n "$missing" ]; then
+    problem="Not set or not installed: $missing"
+  elif branch_id="$(find_or_create_neon_branch "$ADMIN_NEON_PROJECT_ID" "$(admin_branch_name)" "$ADMIN_NEON_PARENT_BRANCH")" &&
+      admin_pooled="$(admin_connection_string "$branch_id" --pooled)" &&
+      admin_direct="$(admin_connection_string "$branch_id")"; then
+    admin_source="admin branch $(admin_branch_name)"
+  else
+    branch_id=""
+    problem="Could not get the admin branch $(admin_branch_name)"
+  fi
+
+  if [ -n "$problem" ]; then
+    if [ -n "$kept_branch_id" ]; then
+      error "$problem. Keeping $dir/.env.workspace on its branch $kept_branch_id; it was not changed"
+      return 1
+    fi
+    admin_pooled="${ADMIN_DATABASE_URL:-}"
+    admin_direct="${ADMIN_DATABASE_URL_UNPOOLED:-}"
+    if [ -n "$admin_pooled" ]; then
+      admin_source="the environment's ADMIN_DATABASE_URL (shared)"
+    else
+      admin_source="an in-memory admin database"
+    fi
+    warn "$problem. The admin app uses $admin_source"
+    step_skipped "Admin branch: not made, admin app uses $admin_source"
+  fi
+
+  local tmp
+  tmp="$(mktemp)"
+  {
+    echo "# Written by Paradev's .paradev/setup.cloud.sh on every boot: this workspace's"
+    echo "# product branch and $admin_source."
+    echo "# The environment's DATABASE_URL and ADMIN_DATABASE_URL* are also in every"
+    echo "# terminal's environment, and dotenv-cli (bun run db:migrate) does not override"
+    echo "# them: load this file first (set -a; . ./.env.workspace; set +a)."
+    write_env_var "DATABASE_URL" "$product_pooled"
+    write_env_var "DATABASE_URL_UNPOOLED" "${product_direct:-$product_pooled}"
+    if [ -n "$admin_pooled" ]; then
+      write_env_var "ADMIN_DATABASE_URL" "$admin_pooled"
+      write_env_var "ADMIN_DATABASE_URL_UNPOOLED" "${admin_direct:-$admin_pooled}"
+    fi
+    if [ -n "$branch_id" ]; then
+      write_env_var "ADMIN_NEON_BRANCH_ID" "$branch_id"
+    fi
+    if [ -n "${DEV_USER_EMAIL:-}" ]; then
+      write_env_var "DEV_USER_EMAIL" "$DEV_USER_EMAIL"
+    fi
+  } > "$tmp"
+  install -m 600 "$tmp" "$dir/.env.workspace"
+  rm -f "$tmp"
+  echo "  Wrote $dir/.env.workspace (product: this workspace's branch; admin: $admin_source)"
+
+  # Only on this workspace's own branch: never migrate the shared one.
+  if [ -n "$branch_id" ]; then
+    if (cd "$dir/app" && ADMIN_DATABASE_URL="$admin_pooled" \
+        ADMIN_DATABASE_URL_UNPOOLED="$admin_direct" bunx drizzle-kit migrate > /dev/null); then
+      echo "  Admin migrations applied"
+    else
+      error "Admin migrations failed on $(admin_branch_name)"
+      return 1
+    fi
+  fi
+
+  success "Admin checkout ready: $dir"
   return 0
 }
 
@@ -335,6 +454,7 @@ step_write_env() {
     # so a later workspace rename never needs this file rewritten.
     write_env_var "SUPERSET_WORKSPACE_NAME" "${WORKSPACE_NAME:-$(basename "$PWD")}"
     write_env_var "SUPERSET_HOME_DIR" "$PWD/$DEV_DATA_DIR"
+    write_env_var "PARADEV_HOME_DIR" "$PWD/$DEV_DATA_DIR"
     echo ""
     echo "# Workspace Database (Neon Branch)"
     if [ -n "${BRANCH_ID:-}" ]; then
@@ -352,7 +472,7 @@ step_write_env() {
     # Offsets: +0 web, +1 api, +2 marketing, +3 admin, +4 docs,
     #          +5 desktop vite, +6 notifications, +7 streams, +8 streams internal,
     #          +11 code inspector, +13 relay, +14 usercontent worker,
-    #          +18 realtime worker
+    #          +18 realtime worker, +19 agents web export
     # (+9, +10, +12 were Electric/Caddy/wrangler; retired, kept unassigned so
     # the surviving offsets stay stable across existing allocations)
     local BASE=$SUPERSET_PORT_BASE
@@ -371,6 +491,7 @@ step_write_env() {
     local RELAY_PORT=$((BASE + 13))
     local USERCONTENT_DEV_PORT=$((BASE + 14))
     local SANDBOX_GATE_DEV_PORT=$((BASE + 15))
+    local AGENTS_PORT=$((BASE + 19))
     local REALTIME_PORT=$((BASE + 18))
 
     echo ""
@@ -389,6 +510,7 @@ step_write_env() {
     write_env_var "RELAY_PORT" "$RELAY_PORT"
     write_env_var "USERCONTENT_DEV_PORT" "$USERCONTENT_DEV_PORT"
     write_env_var "SANDBOX_GATE_DEV_PORT" "$SANDBOX_GATE_DEV_PORT"
+    write_env_var "AGENTS_PORT" "$AGENTS_PORT"
     write_env_var "REALTIME_PORT" "$REALTIME_PORT"
     echo ""
     echo "# Cross-app URLs (overrides from root .env)"
@@ -411,6 +533,7 @@ step_write_env() {
     write_env_var "USERCONTENT_URL" "http://frame.usercontent.localhost:$USERCONTENT_DEV_PORT"
     write_env_var "MEDIA_URL" "http://media.usercontent.localhost:$USERCONTENT_DEV_PORT"
     write_env_var "SANDBOX_GATE_ORIGIN" "http://127.0.0.1:$SANDBOX_GATE_DEV_PORT"
+    write_env_var "AGENTS_URL" "http://localhost:$AGENTS_PORT"
     echo ""
     echo "# Streams URLs (overrides from root .env)"
     write_env_var "PORT" "$STREAMS_PORT"
@@ -429,7 +552,7 @@ step_write_env() {
   assert_unique_ports "$WEB_PORT" "$API_PORT" "$MARKETING_PORT" "$ADMIN_PORT" \
     "$DOCS_PORT" "$DESKTOP_VITE_PORT" "$DESKTOP_NOTIFICATIONS_PORT" "$STREAMS_PORT" \
     "$STREAMS_INTERNAL_PORT" "$CODE_INSPECTOR_PORT" "$RELAY_PORT" "$USERCONTENT_DEV_PORT" \
-    "$SANDBOX_GATE_DEV_PORT" "$REALTIME_PORT" || return 1
+    "$SANDBOX_GATE_DEV_PORT" "$AGENTS_PORT" "$REALTIME_PORT" || return 1
 
   cat > "$paradev_dir/ports.json" <<PORTSJSON
 {
@@ -445,6 +568,7 @@ step_write_env() {
     { "port": $STREAMS_INTERNAL_PORT, "label": "Streams Internal" },
     { "port": $USERCONTENT_DEV_PORT, "label": "Usercontent Worker" },
     { "port": $SANDBOX_GATE_DEV_PORT, "label": "Gate Worker" },
+    { "port": $AGENTS_PORT, "label": "Agents Web" },
     { "port": $CODE_INSPECTOR_PORT, "label": "Code Inspector" }
   ]
 }

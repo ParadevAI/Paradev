@@ -1,40 +1,49 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { useRouter } from "expo-router";
+import { formatRelativeTime } from "@superset/i18n/format";
 import { useMemo } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
+import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
 import { useHostsPresence } from "@/hooks/useHostsPresence";
+import { useHostsWorkspaces } from "@/hooks/useHostWorkspaces";
 import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { posthog } from "@/lib/posthog";
+import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
+import { useHostsTerminals } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
-import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
+import { CLOUD_PLACE_ID } from "@/screens/(authenticated)/(home)/home/utils/buildPlacesList";
 import {
-	useCloudScopeEnabled,
-	useWorkspaceScope,
-} from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+	type AttentionCounts,
+	countAttention,
+} from "@/screens/(authenticated)/(home)/home/utils/needsMe";
+import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
+import { useRowAttention } from "@/screens/(authenticated)/(home)/hooks/useRowAttention";
+import { useScopeSelection } from "@/screens/(authenticated)/(home)/hooks/useScopeSelection";
+import { getLastSeenTime } from "@/screens/(authenticated)/(home)/utils/getLastSeenTime";
+import {
+	canTickHost,
+	everythingSelection,
+	MAX_SELECTED_HOSTS,
+	type ScopeSelection,
+	toggleCloud,
+	toggleHost,
+} from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
-import { ListRow } from "@/screens/(authenticated)/components/ListRow";
-import { ListRowCheck } from "@/screens/(authenticated)/components/ListRowCheck";
 
 /**
- * Where the list looks: one of your machines, or Cloud where that is enabled.
- * Cloud leads, and carries the cloud glyph rather than a status dot — it is a
- * place, not a computer that sleeps.
+ * Which places the list shows: Cloud and up to three machines, each ticked
+ * on its own; at least one stays ticked. The sheet stays open while you
+ * tick. Counts show for every row only in an org of three machines or
+ * fewer; past that, only for ticked machines, since Home never asks more.
  */
 export function ScopeFilterScreen() {
 	const { t } = useLingui();
-	const router = useRouter();
 	const { hosts } = useOrgHosts();
-	const selectedHost = useSelectedHost();
-	const scope = useWorkspaceScope();
-	const cloudEnabled = useCloudScopeEnabled();
-	const setHostFilter = useWorkspacesFilterStore(
-		(store) => store.setHostFilter,
-	);
-	const setScopeCloud = useWorkspacesFilterStore(
-		(store) => store.setScopeCloud,
-	);
+	const { selection, cloudEnabled, allOffered, everything } =
+		useScopeSelection();
+	const setSelection = useWorkspacesFilterStore((store) => store.setSelection);
 
 	const { presence } = useHostsPresence(hosts);
 
@@ -49,25 +58,119 @@ export function ScopeFilterScreen() {
 		[hosts, presence],
 	);
 
-	const selectHost = (machineId: string) => {
-		setHostFilter(machineId);
-		posthog.capture("filter_applied", { filter: "host", value: "machine" });
-		router.back();
+	const smallOrg = sortedHosts.length <= MAX_SELECTED_HOSTS;
+	const countedHosts = useMemo(
+		() =>
+			smallOrg
+				? sortedHosts
+				: sortedHosts.filter((host) =>
+						selection.hosts.includes(host.machineId),
+					),
+		[smallOrg, sortedHosts, selection.hosts],
+	);
+	const onlineCountedHosts = useMemo(
+		() => countedHosts.filter((host) => host.isOnline),
+		[countedHosts],
+	);
+	const { byHost } = useHostsWorkspaces(countedHosts);
+	const { attentionByWorkspace } = useHostsTerminals(onlineCountedHosts);
+	const rowAttention = useRowAttention(attentionByWorkspace);
+	const { workspaces: activeCloud } = useCloudWorkspaces();
+	const cloudFilters = useCloudFilters();
+
+	const countsByPlace = useMemo(() => {
+		const counts = new Map<string, AttentionCounts>();
+		for (const host of onlineCountedHosts) {
+			counts.set(
+				host.machineId,
+				countAttention(
+					(byHost.get(host.machineId)?.workspaces ?? [])
+						.filter((workspace) => workspace.worktreeExists !== false)
+						.map(rowAttention.host),
+				),
+			);
+		}
+		counts.set(
+			CLOUD_PLACE_ID,
+			countAttention(
+				activeCloud
+					.filter((row) => cloudFilters.matchesCreator(row.createdByUserId))
+					.map(rowAttention.cloud),
+			),
+		);
+		return counts;
+	}, [
+		onlineCountedHosts,
+		byHost,
+		rowAttention,
+		activeCloud,
+		cloudFilters.matchesCreator,
+	]);
+
+	const countsLine = (placeId: string) => {
+		const counts = countsByPlace.get(placeId);
+		if (!counts) return undefined;
+		const parts = [
+			counts.input > 0
+				? t({
+						message: plural(counts.input, {
+							one: "# needs input",
+							other: "# need input",
+						}),
+					})
+				: null,
+			counts.review > 0
+				? t({
+						message: plural(counts.review, {
+							one: "# ready",
+							other: "# ready",
+						}),
+					})
+				: null,
+			counts.working > 0
+				? t({
+						message: plural(counts.working, {
+							one: "# working",
+							other: "# working",
+						}),
+					})
+				: null,
+		].filter(Boolean);
+		return parts.length > 0 ? parts.join(" · ") : undefined;
 	};
 
-	const selectCloud = () => {
-		setScopeCloud();
-		posthog.capture("filter_applied", { filter: "host", value: "cloud" });
-		router.back();
+	const offlineLine = (lastSeenAt: number | null | undefined) => {
+		if (lastSeenAt === undefined) return undefined;
+		if (lastSeenAt === null) return t({ message: "offline" });
+		const now = Date.now();
+		return t({
+			message: `offline, seen ${formatRelativeTime(getLastSeenTime(lastSeenAt, now), now)}`,
+		});
+	};
+
+	const apply = (next: ScopeSelection, filter: "all" | "cloud" | "machine") => {
+		if (next === selection) return;
+		setSelection(next);
+		posthog.capture("filter_applied", { filter: "host", value: filter });
 	};
 
 	return (
 		<ScrollView
 			className="bg-background flex-1"
-			contentContainerClassName="px-6 pb-10"
+			contentContainerClassName="pb-10"
 		>
+			{allOffered ? (
+				<SheetRow
+					label={t({ message: "All hosts" })}
+					checked={everything}
+					onPress={() =>
+						apply(everythingSelection(sortedHosts, cloudEnabled), "all")
+					}
+					isLast={!cloudEnabled && sortedHosts.length === 0}
+				/>
+			) : null}
 			{cloudEnabled ? (
-				<ListRow
+				<SheetRow
 					icon={
 						<Icon
 							as={CloudIcon}
@@ -76,27 +179,50 @@ export function ScopeFilterScreen() {
 						/>
 					}
 					label={t({ message: "Cloud" })}
-					trailing={<ListRowCheck visible={scope === "cloud"} />}
-					onPress={selectCloud}
+					subtitle={countsLine(CLOUD_PLACE_ID)}
+					checked={selection.cloud}
+					onPress={() => apply(toggleCloud(selection), "cloud")}
 					isLast={sortedHosts.length === 0}
 				/>
 			) : null}
-			{sortedHosts.map((host, index) => (
-				<ListRow
-					key={host.machineId}
-					icon={<HostStatusDot isOnline={host.isOnline} />}
-					label={host.name}
-					trailing={
-						<ListRowCheck
-							visible={
-								scope === "host" && host.machineId === selectedHost?.machineId
+			{sortedHosts.map((host, index) => {
+				const ticked = selection.hosts.includes(host.machineId);
+				const tickable = canTickHost(selection, host.machineId);
+				const showStatus = smallOrg || ticked;
+				return (
+					<View
+						key={host.machineId}
+						className={tickable ? undefined : "opacity-50"}
+					>
+						<SheetRow
+							icon={<HostStatusDot isOnline={host.isOnline} />}
+							label={host.name}
+							subtitle={
+								!tickable
+									? t({
+											message: plural(MAX_SELECTED_HOSTS, {
+												one: "Up to # host at a time",
+												other: "Up to # hosts at a time",
+											}),
+										})
+									: !showStatus
+										? undefined
+										: host.isOnline
+											? countsLine(host.machineId)
+											: offlineLine(host.lastSeenAt)
 							}
+							checked={ticked}
+							onPress={
+								tickable
+									? () =>
+											apply(toggleHost(selection, host.machineId), "machine")
+									: undefined
+							}
+							isLast={index === sortedHosts.length - 1}
 						/>
-					}
-					onPress={() => selectHost(host.machineId)}
-					isLast={index === sortedHosts.length - 1}
-				/>
-			))}
+					</View>
+				);
+			})}
 		</ScrollView>
 	);
 }
