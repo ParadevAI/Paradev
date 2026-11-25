@@ -14206,6 +14206,9 @@ msgstr "開啟檔案"
 msgid "Open File in New Tab"
 msgstr "在新分頁中開啟檔案"
 
+msgid "Open folder in editor"
+msgstr "在編輯器中開啟資料夾"
+
 msgid "Open from folder"
 msgstr "從資料夾開啟"
 

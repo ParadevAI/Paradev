@@ -14200,6 +14200,9 @@ msgstr "Відкрити файл"
 msgid "Open File in New Tab"
 msgstr "Відкрити файл у новій вкладці"
 
+msgid "Open folder in editor"
+msgstr "Відкрити папку в редакторі"
+
 msgid "Open from folder"
 msgstr "Відкрити з папки"
 

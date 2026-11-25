@@ -14206,6 +14206,9 @@ msgstr "ファイルを開く"
 msgid "Open File in New Tab"
 msgstr "新しいタブでファイルを開く"
 
+msgid "Open folder in editor"
+msgstr "フォルダをエディタで開く"
+
 msgid "Open from folder"
 msgstr "フォルダから開く"
 

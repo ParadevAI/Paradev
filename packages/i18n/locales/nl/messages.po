@@ -14206,6 +14206,9 @@ msgstr "Bestand openen"
 msgid "Open File in New Tab"
 msgstr "Bestand openen in nieuw tabblad"
 
+msgid "Open folder in editor"
+msgstr "Map openen in editor"
+
 msgid "Open from folder"
 msgstr "Openen vanuit map"
 

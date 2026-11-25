@@ -14206,6 +14206,9 @@ msgstr "Apri il file"
 msgid "Open File in New Tab"
 msgstr "Apri il file in una nuova scheda"
 
+msgid "Open folder in editor"
+msgstr "Apri cartella nell'editor"
+
 msgid "Open from folder"
 msgstr "Apri da cartella"
 

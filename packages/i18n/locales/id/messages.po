@@ -14206,6 +14206,9 @@ msgstr "Buka File"
 msgid "Open File in New Tab"
 msgstr "Buka File di Tab Baru"
 
+msgid "Open folder in editor"
+msgstr "Buka folder di editor"
+
 msgid "Open from folder"
 msgstr "Buka dari folder"
 

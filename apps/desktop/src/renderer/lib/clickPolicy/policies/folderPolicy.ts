@@ -50,7 +50,7 @@ const FOLDER_INTENT_LABELS: Record<FolderLinkAction, MessageDescriptor> = {
 		message: "Reveal in sidebar",
 	}),
 	external: msg({
-		message: "Open in editor",
+		message: "Open folder in editor",
 	}),
 	finder: msg({ message: "Open in Finder" }),
 };

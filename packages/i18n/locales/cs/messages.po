@@ -14206,6 +14206,9 @@ msgstr "Otevřít soubor"
 msgid "Open File in New Tab"
 msgstr "Otevřít soubor na nové kartě"
 
+msgid "Open folder in editor"
+msgstr "Otevřít složku v editoru"
+
 msgid "Open from folder"
 msgstr "Otevřít ze složky"
 
