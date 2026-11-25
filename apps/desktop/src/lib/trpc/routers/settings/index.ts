@@ -3,6 +3,11 @@ import {
 	teardownSingleAgent,
 	writeSharedDisabledAgentIds,
 } from "@superset/agent-setup";
+import {
+	isDoNotTrackSet,
+	readTelemetrySetting,
+	writeTelemetrySetting,
+} from "@superset/agent-setup/telemetry";
 import type { SupportedLocale } from "@superset/i18n/locales";
 import { isSupportedLocale } from "@superset/i18n/locales";
 import {
@@ -660,14 +665,15 @@ export const createSettingsRouter = () => {
 				return { ran };
 			}),
 
-		// TODO: remove telemetry procedures once telemetry_enabled column is dropped
-		getTelemetryEnabled: publicProcedure.query(() => {
-			return true;
-		}),
+		getTelemetryState: publicProcedure.query(() => ({
+			enabled: readTelemetrySetting(),
+			doNotTrack: isDoNotTrackSet(),
+		})),
 
 		setTelemetryEnabled: publicProcedure
 			.input(z.object({ enabled: z.boolean() }))
-			.mutation(() => {
+			.mutation(({ input }) => {
+				writeTelemetrySetting(input.enabled);
 				return { success: true };
 			}),
 	});

@@ -6540,6 +6540,9 @@ msgstr "チャットの設定を更新できませんでした"
 msgid "Couldn't update the queue"
 msgstr "キューを更新できませんでした"
 
+msgid "Couldn't update the usage data setting"
+msgstr "使用状況データの設定を更新できませんでした"
+
 msgid "Couldn't update thread"
 msgstr "スレッドを更新できませんでした"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "オフ"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "環境で DO_NOT_TRACK が設定されているためオフになっています。"
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100以上のコーディングエージェントを並列実行できるアプリ、{0}の公式ドキュメント。"
@@ -18249,6 +18255,9 @@ msgstr "チャットに送る"
 msgid "Send to chat ({draftCount})"
 msgstr "チャットに送る({draftCount})"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "Paradev の改善のため、このコンピューターから使用状況の分析、セッションの記録、エラーレポートを送信します。変更を完全に反映するにはアプリを再起動してください。"
+
 msgid "Sending"
 msgstr "送信中"
 
@@ -18486,6 +18495,9 @@ msgstr "ページを共有（公開）"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHubリポジトリからプラグインを共有。gitタグでリリースを固定できます。"
+
+msgid "Share usage data"
+msgstr "使用状況データを共有"
 
 msgid "Share via…"
 msgstr "共有方法を選択…"

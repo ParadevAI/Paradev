@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { homedir } from "node:os";
 import { delimiter } from "node:path";
 import { getBinDir } from "@superset/agent-setup";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import hostServicePackageJson from "@superset/host-service/package.json" with {
 	type: "json",
 };
@@ -180,7 +181,7 @@ export function trackAgentLaunched(
 		env: Record<string, string>;
 	},
 ): void {
-	if (!api) return;
+	if (!api || !isTelemetryEnabled()) return;
 	try {
 		const properties = agentLaunchProperties(launch, {
 			source: launchSourceStorage.getStore(),

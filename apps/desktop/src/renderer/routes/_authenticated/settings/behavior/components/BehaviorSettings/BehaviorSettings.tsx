@@ -20,6 +20,7 @@ import {
 import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
+import { TelemetrySetting } from "./components/TelemetrySetting";
 
 interface BehaviorSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -272,6 +273,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 							}
 						/>
 					</div>
+				)}
+
+				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_TELEMETRY, visibleItems) && (
+					<TelemetrySetting />
 				)}
 
 				{showStarGithub && <GithubStarRow searchQuery={searchQuery} />}

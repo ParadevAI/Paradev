@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/electron/main";
 import { IPCMode } from "@sentry/electron/main";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
 import { session } from "electron";
 import { APP_PARTITION } from "shared/constants";
@@ -17,6 +18,7 @@ export function initSentry(): void {
 	if (!env.SENTRY_DSN_DESKTOP || env.NODE_ENV !== "production") {
 		return;
 	}
+	if (!isTelemetryEnabled()) return;
 
 	try {
 		Sentry.init({
@@ -25,7 +27,8 @@ export function initSentry(): void {
 			sendDefaultPii: false,
 			// One machine repeating one failure should not crowd out everyone
 			// else's rare ones, nor spend the org's quota getting there.
-			beforeSend: throttleRepeats,
+			beforeSend: (event) =>
+				isTelemetryEnabled() ? throttleRepeats(event) : null,
 			ipcMode: IPCMode.Classic,
 			getSessions: () => [
 				session.defaultSession,

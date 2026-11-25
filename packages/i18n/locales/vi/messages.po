@@ -6540,6 +6540,9 @@ msgstr "Không thể cập nhật cài đặt Trò chuyện"
 msgid "Couldn't update the queue"
 msgstr "Không thể cập nhật hàng đợi"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Không thể cập nhật cài đặt dữ liệu sử dụng"
+
 msgid "Couldn't update thread"
 msgstr "Không thể cập nhật luồng"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Tắt"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Đã tắt vì DO_NOT_TRACK được đặt trong môi trường của bạn."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Tài liệu chính thức của {0}, ứng dụng chạy song song hơn 100 tác tử lập trình."
@@ -18249,6 +18255,9 @@ msgstr "Gửi vào chat"
 msgid "Send to chat ({draftCount})"
 msgstr "Gửi vào chat ({draftCount})"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "Gửi phân tích sử dụng, bản ghi phiên và báo cáo lỗi từ máy tính này để giúp cải thiện Paradev. Khởi động lại ứng dụng để áp dụng hoàn toàn thay đổi."
+
 msgid "Sending"
 msgstr "Đang gửi"
 
@@ -18486,6 +18495,9 @@ msgstr "Chia sẻ trang (công khai)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Chia sẻ plugin từ một repo GitHub. Ghim bản phát hành bằng git tag."
+
+msgid "Share usage data"
+msgstr "Chia sẻ dữ liệu sử dụng"
 
 msgid "Share via…"
 msgstr "Chia sẻ qua…"

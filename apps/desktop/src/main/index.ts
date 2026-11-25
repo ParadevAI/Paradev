@@ -44,6 +44,7 @@ import {
 	REGISTERED_PROTOCOL_SCHEMES,
 } from "shared/constants";
 import { sweepDevAppProfiles } from "./dev-app-profile-sweep";
+import { registerTelemetryIpc } from "./lib/analytics";
 import { getAppDisplayName } from "./lib/app-display-name";
 import { initAppState } from "./lib/app-state";
 import { requestAppleEventsAccess } from "./lib/apple-events-permission";
@@ -80,7 +81,6 @@ import { localDb } from "./lib/local-db";
 import { requestLocalNetworkAccess } from "./lib/local-network-permission";
 import { menuEmitter } from "./lib/menu-events";
 import { allowRendererToReachDeviceHub } from "./lib/mobile-hub-origin";
-
 import {
 	adoptDesktopInstalls,
 	finishPendingOrganizationForget,
@@ -588,6 +588,7 @@ if (!gotTheLock) {
 
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();
+		registerTelemetryIpc();
 		initSentry();
 		await initAppState(() =>
 			localDb

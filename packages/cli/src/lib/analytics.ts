@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import type { ApiClient } from "./api-client";
 import { env } from "./env";
 
@@ -31,6 +32,7 @@ export function trackCommandInvoked(input: {
 	commandPath: string[];
 	flags: string[];
 }): void {
+	if (!isTelemetryEnabled()) return;
 	const command = input.commandPath.join(" ");
 	if (!isFirstReportToday(command)) return;
 	void input.api.analytics.captureEvent

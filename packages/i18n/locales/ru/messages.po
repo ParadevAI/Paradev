@@ -6540,6 +6540,9 @@ msgstr "Не удалось обновить настройку чата"
 msgid "Couldn't update the queue"
 msgstr "Не удалось обновить очередь"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Не удалось изменить настройку данных об использовании"
+
 msgid "Couldn't update thread"
 msgstr "Не удалось обновить ветку обсуждения"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Выкл."
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Выключено, потому что в вашем окружении задана DO_NOT_TRACK."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Официальная документация {0} — приложения для параллельного запуска более 100 агентов программирования."
@@ -18249,6 +18255,9 @@ msgstr "Отправить в чат"
 msgid "Send to chat ({draftCount})"
 msgstr "Отправить в чат ({draftCount})"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "Отправлять аналитику использования, записи сеансов и отчёты об ошибках с этого компьютера, чтобы помочь улучшить Paradev. Перезапустите приложение, чтобы изменение применилось полностью."
+
 msgid "Sending"
 msgstr "Отправка"
 
@@ -18486,6 +18495,9 @@ msgstr "Поделиться страницей (публичная)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Делитесь плагинами из репозитория GitHub. Закрепляйте релизы git-тегами."
+
+msgid "Share usage data"
+msgstr "Передавать данные об использовании"
 
 msgid "Share via…"
 msgstr "Поделиться через…"

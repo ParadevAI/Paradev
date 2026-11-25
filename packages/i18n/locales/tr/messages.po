@@ -6540,6 +6540,9 @@ msgstr "Sohbet ayarı güncellenemedi"
 msgid "Couldn't update the queue"
 msgstr "Kuyruk güncellenemedi"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Kullanım verisi ayarı güncellenemedi"
+
 msgid "Couldn't update thread"
 msgstr "Konu güncellenemedi"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Kapalı"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Ortamınızda DO_NOT_TRACK ayarlı olduğu için kapalı."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100'den fazla kodlama ajanını paralel çalıştıran {0} uygulamasının resmi belgeleri."
@@ -18249,6 +18255,9 @@ msgstr "Sohbete gönder"
 msgid "Send to chat ({draftCount})"
 msgstr "Sohbete gönder ({draftCount})"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "Paradev'i geliştirmeye yardımcı olmak için bu bilgisayardan kullanım analizleri, oturum kayıtları ve hata raporları gönderin. Bir değişikliği tam olarak uygulamak için uygulamayı yeniden başlatın."
+
 msgid "Sending"
 msgstr "Gönderiliyor"
 
@@ -18486,6 +18495,9 @@ msgstr "Sayfayı paylaş (herkese açık)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Eklentileri bir GitHub deposundan paylaşın. Sürümleri git etiketleriyle sabitleyin."
+
+msgid "Share usage data"
+msgstr "Kullanım verilerini paylaş"
 
 msgid "Share via…"
 msgstr "Şununla paylaş…"

@@ -1,24 +1,26 @@
 import { useEffect } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { posthog } from "renderer/lib/posthog";
+import {
+	isTelemetryEnabled,
+	setTelemetryEnabled,
+} from "renderer/lib/telemetry";
 
 export function TelemetrySync() {
-	const { data: telemetryEnabled } =
-		electronTrpc.settings.getTelemetryEnabled.useQuery();
+	const { data } = electronTrpc.settings.getTelemetryState.useQuery();
+	const enabled = data ? data.enabled && !data.doNotTrack : undefined;
 
 	useEffect(() => {
-		if (telemetryEnabled === undefined) return;
-
-		if (telemetryEnabled) {
-			if (typeof posthog?.opt_in_capturing === "function") {
-				posthog.opt_in_capturing();
-			}
+		if (enabled === undefined || enabled === isTelemetryEnabled()) return;
+		setTelemetryEnabled(enabled);
+		if (!posthog.__loaded) return;
+		if (enabled) {
+			posthog.opt_in_capturing();
 		} else {
-			if (typeof posthog?.opt_out_capturing === "function") {
-				posthog.opt_out_capturing();
-			}
+			posthog.opt_out_capturing();
+			posthog.stopSessionRecording();
 		}
-	}, [telemetryEnabled]);
+	}, [enabled]);
 
 	return null;
 }

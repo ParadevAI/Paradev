@@ -14,6 +14,18 @@ function sendsLines(env: NodeJS.ProcessEnv): boolean {
 }
 
 describe("hostSentryOptions", () => {
+	it("does not set up Sentry when DO_NOT_TRACK is set", () => {
+		expect(hostSentryOptions({ HOST_SERVICE_SENTRY_DSN: DSN }, "org")).not.toBe(
+			null,
+		);
+		expect(
+			hostSentryOptions(
+				{ HOST_SERVICE_SENTRY_DSN: DSN, DO_NOT_TRACK: "1" },
+				"org",
+			),
+		).toBe(null);
+	});
+
 	it("never sends log lines from a desktop user's own host-service, flag or not", () => {
 		expect(sendsLines({ HOST_SERVICE_SENTRY_DSN: DSN })).toBe(false);
 		expect(

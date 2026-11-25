@@ -6540,6 +6540,9 @@ msgstr "Tidak dapat memperbarui pengaturan Chat"
 msgid "Couldn't update the queue"
 msgstr "Tidak dapat memperbarui antrean"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Tidak dapat memperbarui pengaturan data penggunaan"
+
 msgid "Couldn't update thread"
 msgstr "Tidak bisa memperbarui thread"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Mati"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Nonaktif karena DO_NOT_TRACK disetel di lingkungan Anda."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Dokumentasi resmi {0}, aplikasi untuk menjalankan lebih dari 100 agen pemrograman secara paralel."
@@ -18249,6 +18255,9 @@ msgstr "Kirim ke chat"
 msgid "Send to chat ({draftCount})"
 msgstr "Kirim ke chat ({draftCount})"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "Kirim analitik penggunaan, rekaman sesi, dan laporan kesalahan dari komputer ini untuk membantu meningkatkan Paradev. Mulai ulang aplikasi agar perubahan berlaku sepenuhnya."
+
 msgid "Sending"
 msgstr "Mengirim"
 
@@ -18486,6 +18495,9 @@ msgstr "Bagikan halaman (publik)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Bagikan plugin dari repo GitHub. Sematkan rilis dengan tag git."
+
+msgid "Share usage data"
+msgstr "Bagikan data penggunaan"
 
 msgid "Share via…"
 msgstr "Bagikan lewat…"

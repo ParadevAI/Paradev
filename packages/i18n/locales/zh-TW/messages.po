@@ -6540,6 +6540,9 @@ msgstr "無法更新聊天設定"
 msgid "Couldn't update the queue"
 msgstr "無法更新佇列"
 
+msgid "Couldn't update the usage data setting"
+msgstr "無法更新使用資料設定"
+
 msgid "Couldn't update thread"
 msgstr "無法更新討論"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "關閉"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "已關閉，因為你的環境中設定了 DO_NOT_TRACK。"
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "{0} 官方文件。這款應用程式可並行運行 100 多個編程代理。"
@@ -18249,6 +18255,9 @@ msgstr "傳送到聊天"
 msgid "Send to chat ({draftCount})"
 msgstr "傳送到聊天（{draftCount}）"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "從這台電腦傳送使用分析、工作階段錄製和錯誤報告，協助改善 Paradev。重新啟動 App 後變更才會完全生效。"
+
 msgid "Sending"
 msgstr "正在傳送"
 
@@ -18486,6 +18495,9 @@ msgstr "分享頁面（公開）"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "從 GitHub 儲存庫分享外掛，用 git 標籤固定版本。"
+
+msgid "Share usage data"
+msgstr "分享使用資料"
 
 msgid "Share via…"
 msgstr "分享方式…"

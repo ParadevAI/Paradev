@@ -6540,6 +6540,9 @@ msgstr "Kan de Chat-instelling niet bijwerken"
 msgid "Couldn't update the queue"
 msgstr "Kan de wachtrij niet bijwerken"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Kan de instelling voor gebruiksgegevens niet bijwerken"
+
 msgid "Couldn't update thread"
 msgstr "Kan thread niet bijwerken"
 
@@ -13776,6 +13779,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Uit"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Uit omdat DO_NOT_TRACK in je omgeving is ingesteld."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Officiële documentatie van {0}, de app voor meer dan 100 parallelle programmeeragenten."
@@ -18249,6 +18255,9 @@ msgstr "Naar chat sturen"
 msgid "Send to chat ({draftCount})"
 msgstr "Naar chat sturen ({draftCount})"
 
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
+msgstr "Stuur gebruiksanalyses, sessie-opnames en foutrapporten vanaf deze computer om Paradev te helpen verbeteren. Start de app opnieuw om een wijziging volledig toe te passen."
+
 msgid "Sending"
 msgstr "Versturen"
 
@@ -18486,6 +18495,9 @@ msgstr "Pagina delen (openbaar)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Deel plugins vanuit een GitHub-repo. Zet releases vast met git-tags."
+
+msgid "Share usage data"
+msgstr "Gebruiksgegevens delen"
 
 msgid "Share via…"
 msgstr "Delen via…"

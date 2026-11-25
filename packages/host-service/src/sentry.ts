@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
 import { SANDBOX_TELEMETRY_KEYS } from "@superset/shared/sandbox/contract";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
@@ -33,7 +34,7 @@ export function hostSentryOptions(
 	organizationId: string | undefined,
 ): Sentry.NodeOptions | null {
 	const dsn = env.HOST_SERVICE_SENTRY_DSN;
-	if (!dsn) return null;
+	if (!dsn || !isTelemetryEnabled({ env })) return null;
 	const tags = {
 		service: "host-service",
 		[SANDBOX_TELEMETRY_KEYS.organizationId]: organizationId,
