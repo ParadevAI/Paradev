@@ -14,7 +14,7 @@ const request = {
 
 test("a slow dial still leaves time for the HTTP response", async () => {
 	const exchanges = new HttpExchanges();
-	const result = exchanges.begin("ticket", request);
+	const result = exchanges.begin("ticket", request, "host");
 	const dial = { send: mock(() => {}), close: mock(() => {}) };
 	jest.advanceTimersByTime(32_000);
 	expect(exchanges.has("ticket")).toBe(true);
@@ -34,7 +34,7 @@ test("a slow dial still leaves time for the HTTP response", async () => {
 
 test("an unanswered HTTP exchange still expires", async () => {
 	const exchanges = new HttpExchanges();
-	const result = exchanges.begin("ticket", request);
+	const result = exchanges.begin("ticket", request, "host");
 	jest.advanceTimersByTime(65_000);
 	expect(await result).toEqual({ ok: false, reason: "timeout" });
 	expect(exchanges.has("ticket")).toBe(false);
@@ -42,7 +42,7 @@ test("an unanswered HTTP exchange still expires", async () => {
 
 test("a host-reported dial failure fails immediately", async () => {
 	const exchanges = new HttpExchanges();
-	const result = exchanges.begin("ticket", request);
+	const result = exchanges.begin("ticket", request, "host");
 	exchanges.fail("ticket");
 	expect(await result).toEqual({ ok: false, reason: "dial-failed" });
 	expect(exchanges.has("ticket")).toBe(false);
@@ -50,7 +50,7 @@ test("a host-reported dial failure fails immediately", async () => {
 
 test("completion removes the timeout and ignores late frames", async () => {
 	const exchanges = new HttpExchanges();
-	const result = exchanges.begin("ticket", request);
+	const result = exchanges.begin("ticket", request, "host");
 	const dial = { send: mock(() => {}), close: mock(() => {}) };
 	exchanges.onDialConnect("ticket", dial);
 	exchanges.onDialMessage(
@@ -76,8 +76,8 @@ test("completion removes the timeout and ignores late frames", async () => {
 
 test("shutdown settles all pending exchanges", async () => {
 	const exchanges = new HttpExchanges();
-	const first = exchanges.begin("first", request);
-	const second = exchanges.begin("second", request);
+	const first = exchanges.begin("first", request, "host");
+	const second = exchanges.begin("second", request, "host");
 	exchanges.abortAll();
 	expect(await first).toEqual({ ok: false, reason: "timeout" });
 	expect(await second).toEqual({ ok: false, reason: "timeout" });

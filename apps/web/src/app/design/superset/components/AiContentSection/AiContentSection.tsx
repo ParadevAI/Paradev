@@ -52,7 +52,6 @@ const NOT_DEMOED = [
 	"clickable-file-path",
 	"confirmation",
 	"exploring-group",
-	"file-diff-tool",
 	"image",
 	"prompt-input",
 	"queue",

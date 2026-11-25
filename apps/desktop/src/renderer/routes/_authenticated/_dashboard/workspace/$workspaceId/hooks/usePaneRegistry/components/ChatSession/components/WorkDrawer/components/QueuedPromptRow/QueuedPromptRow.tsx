@@ -48,7 +48,7 @@ export function QueuedPromptRow({
 	onSteer: (id: string) => void;
 }) {
 	const { t } = useLingui();
-	const { text, attachments, pastedTexts } = parseAttachmentTags(
+	const { text, attachments, pastedTexts, quotes } = parseAttachmentTags(
 		userMessageText(prompt),
 	);
 	const attachmentNames = [
@@ -59,7 +59,8 @@ export function QueuedPromptRow({
 	];
 	const label =
 		text ||
-		(pastedTexts[0] ? firstLine(pastedTexts[0]) : attachmentNames.join(", "));
+		firstLine(pastedTexts[0] ?? quotes[0] ?? "") ||
+		attachmentNames.join(", ");
 	const finishEdit = (next: string | null) => {
 		if (!editing) return;
 		const trimmed = next?.trim() ?? "";

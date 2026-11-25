@@ -17,6 +17,7 @@ import type {
 	PaneViewerData,
 	PendingCloudLaunchPaneData,
 } from "../../../../../../types";
+import { chatDraftKey } from "../../../../utils/chatDraftKey";
 import { markChatSessionLive } from "../../../ChatPane/components/AcpChatPane/hooks/useChatSessionLiveness";
 import { hasComposerDraft } from "../../../ChatSession/components/Composer/hooks/useComposerDraft";
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
@@ -90,7 +91,7 @@ export function usePendingCloudLaunch({
 		terminalBinding,
 		typed:
 			!!data.queuedPrompts?.length ||
-			hasComposerDraft(`chat-v3-draft:${data.draftId}`),
+			hasComposerDraft(chatDraftKey(data.draftId)),
 		sinceMs,
 		nowMs,
 		timeoutMs,

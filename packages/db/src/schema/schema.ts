@@ -1,5 +1,5 @@
 import type { ActiveAgentStatus } from "@superset/shared/agent-status";
-import { desc, sql } from "drizzle-orm";
+import { desc, type SQL, sql } from "drizzle-orm";
 import {
 	type AnyPgColumn,
 	bigint,
@@ -654,6 +654,67 @@ export const dealRedemptions = pgTable(
 export type InsertDealRedemption = typeof dealRedemptions.$inferInsert;
 export type SelectDealRedemption = typeof dealRedemptions.$inferSelect;
 
+export const awsMarketplaceCustomerStatusValues = [
+	"pending",
+	"active",
+	"inactive",
+] as const;
+export type AwsMarketplaceCustomerStatus =
+	(typeof awsMarketplaceCustomerStatusValues)[number];
+
+export const awsMarketplaceCustomers = pgTable(
+	"aws_marketplace_customers",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		licenseArn: text("license_arn").notNull(),
+		awsAccountId: text("aws_account_id").notNull(),
+		customerIdentifier: text("customer_identifier"),
+		productCode: text("product_code").notNull(),
+		agreementId: text("agreement_id"),
+		organizationId: uuid("organization_id").references(() => organizations.id, {
+			onDelete: "set null",
+		}),
+		linkedByUserId: uuid("linked_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		linkedAt: timestamp("linked_at"),
+		claimTokenHash: text("claim_token_hash"),
+		claimExpiresAt: timestamp("claim_expires_at"),
+		status: text()
+			.$type<AwsMarketplaceCustomerStatus>()
+			.notNull()
+			.default("pending"),
+		planId: text("plan_id"),
+		seats: integer(),
+		entitlementExpiresAt: timestamp("entitlement_expires_at"),
+		entitlementsSyncedAt: timestamp("entitlements_synced_at"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		uniqueIndex("aws_marketplace_customers_license_arn_unique").on(
+			table.licenseArn,
+		),
+		uniqueIndex("aws_marketplace_customers_organization_id_unique")
+			.on(table.organizationId)
+			.where(sql`${table.organizationId} is not null`),
+		uniqueIndex("aws_marketplace_customers_claim_token_hash_unique").on(
+			table.claimTokenHash,
+		),
+		index("aws_marketplace_customers_aws_account_id_idx").on(
+			table.awsAccountId,
+		),
+	],
+);
+
+export type InsertAwsMarketplaceCustomer =
+	typeof awsMarketplaceCustomers.$inferInsert;
+export type SelectAwsMarketplaceCustomer =
+	typeof awsMarketplaceCustomers.$inferSelect;
+
 // Device presence — v1 concept. Tracks per-(user, machine) presence for
 // MCP ownership verification. Untouched by the v2 host consolidation; will
 // be retired when v1 is removed.
@@ -864,6 +925,8 @@ export const environments = pgTable(
 		scope: environmentScope().notNull().default("organization"),
 		/** The size a workspace boots at when its create names none; null means the organization's default. */
 		machineSize: text("machine_size"),
+		/** The `config.toml` its builds and boxes run; null falls back to the primary repository's own file. */
+		config: text(),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -984,7 +1047,8 @@ export const environmentSecrets = pgTable(
 /**
  * One build of an environment's golden from `[install]`. The running row is
  * the lock: at most one per environment. A build keeps the newest goldens
- * and deletes older ones, setting `golden_deleted_at`.
+ * and deletes older ones, setting `golden_deleted_at`; a kept one can be
+ * restored.
  */
 export const environmentBuilds = pgTable(
 	"environment_builds",
@@ -1203,6 +1267,15 @@ export const cloudWorkspaceTags = pgTable(
 	],
 );
 
+/** A boot with usage left to finalize or a lock left to give back: the reconcile's open set. */
+export function openBoot(boot: {
+	stoppedAt: AnyPgColumn;
+	finalizedThrough: AnyPgColumn;
+	lockOpen: AnyPgColumn;
+}): SQL {
+	return sql`(${boot.stoppedAt} is null or ${boot.finalizedThrough} is null or ${boot.finalizedThrough} < ${boot.stoppedAt} or ${boot.lockOpen})`;
+}
+
 export const cloudWorkspaceBoots = pgTable(
 	"cloud_workspace_boots",
 	{
@@ -1249,11 +1322,9 @@ export const cloudWorkspaceBoots = pgTable(
 		index("cloud_workspace_boots_pending_usage_idx")
 			.on(table.id)
 			.where(sql`${table.pendingUsageEvents} is not null`),
-		index("cloud_workspace_boots_open_idx")
+		index("cloud_workspace_boots_open_or_locked_idx")
 			.on(table.startedAt)
-			.where(
-				sql`${table.stoppedAt} is null or ${table.finalizedThrough} is null or ${table.finalizedThrough} < ${table.stoppedAt}`,
-			),
+			.where(openBoot(table)),
 	],
 );
 

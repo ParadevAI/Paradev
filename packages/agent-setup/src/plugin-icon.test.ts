@@ -2,11 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import {
-	PLUGIN_ICON_MAX_BYTES,
-	pluginIconFile,
-	readPluginIcon,
-} from "./plugin-icon";
+import { PLUGIN_ICON_MAX_BYTES } from "@superset/shared/plugins/plugin-icon";
+import { readPluginIcon } from "./plugin-icon";
 
 let root: string;
 let plugin: string;
@@ -30,33 +27,6 @@ function writeManifest(icon: unknown) {
 		}),
 	);
 }
-
-describe("pluginIconFile", () => {
-	test("accepts an image path inside the plugin", () => {
-		expect(pluginIconFile("./assets/icon.png")).toEqual({
-			relative: "assets/icon.png",
-			mime: "image/png",
-		});
-		expect(pluginIconFile("icon.SVG")?.mime).toBe("image/svg+xml");
-	});
-
-	test("rejects slugs, URLs, absolute paths, traversal and other formats", () => {
-		for (const icon of [
-			"github",
-			"https://example.com/icon.png",
-			"data:image/png;base64,AAAA",
-			"/etc/icon.png",
-			"../icon.png",
-			"assets/../../icon.png",
-			"assets\\icon.png",
-			"assets/icon.gif",
-			"",
-			42,
-		]) {
-			expect(pluginIconFile(icon)).toBeNull();
-		}
-	});
-});
 
 describe("readPluginIcon", () => {
 	test("returns the icon file as a data URI", () => {

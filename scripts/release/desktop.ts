@@ -3,8 +3,7 @@
 // Desktop app release: bumps desktop + host-service + cli to one unified version
 // (and, with --daemon, patch-bumps pty-daemon), tags desktop-v<version> to
 // trigger release-desktop.yml, monitors the build, and leaves a draft (or
-// publishes with --publish). See plans/20260709-unified-version-bumping.md and
-// apps/desktop/RELEASE.md.
+// publishes with --publish). See apps/desktop/RELEASE.md.
 //
 // Usage: [version] [commit] [--publish] [--merge] [--daemon]
 

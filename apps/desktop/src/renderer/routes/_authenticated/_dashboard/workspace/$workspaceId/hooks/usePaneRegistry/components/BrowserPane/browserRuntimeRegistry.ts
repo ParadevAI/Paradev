@@ -354,7 +354,11 @@ export class BrowserRuntimeRegistryImpl {
 		workspaceId: string,
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
-		const detachViewportZoom = attachBrowserViewportZoom(webview);
+		const detachViewportZoom = attachBrowserViewportZoom(
+			webview,
+			paneId,
+			this.ipc.browser.onViewportZoom,
+		);
 		webview.setAttribute("partition", BROWSER_PARTITION);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
@@ -417,11 +421,12 @@ export class BrowserRuntimeRegistryImpl {
 			}
 		};
 
+		// Also fires when an iframe starts to load, so the favicon resets on
+		// did-navigate, which is main-frame only.
 		const handleDidStartLoading = () => {
 			this.setState(paneId, {
 				isLoading: true,
 				error: null,
-				faviconUrl: null,
 			});
 		};
 
@@ -453,6 +458,7 @@ export class BrowserRuntimeRegistryImpl {
 			this.setState(paneId, {
 				currentUrl: e.url ?? "",
 				pageTitle: "",
+				faviconUrl: null,
 				isLoading: false,
 			});
 			this.refreshNavState(paneId);
@@ -460,6 +466,7 @@ export class BrowserRuntimeRegistryImpl {
 		};
 
 		const handleDidNavigateInPage = (e: Electron.DidNavigateInPageEvent) => {
+			if (!e.isMainFrame) return;
 			this.setState(paneId, { currentUrl: e.url ?? "" });
 			this.refreshNavState(paneId);
 		};
@@ -484,14 +491,14 @@ export class BrowserRuntimeRegistryImpl {
 		};
 
 		const handleDidFailLoad = (e: Electron.DidFailLoadEvent) => {
-			if (e.errorCode === -3) return; // ERR_ABORTED
+			if (!e.isMainFrame || e.errorCode === -3) return; // ERR_ABORTED
 			// A failed main-frame load commits Chromium's error page without a
 			// did-navigate, so the address comes from the failure itself.
 			this.setState(paneId, {
 				isLoading: false,
-				...(e.isMainFrame
-					? { currentUrl: e.validatedURL ?? "", pageTitle: "" }
-					: {}),
+				currentUrl: e.validatedURL ?? "",
+				pageTitle: "",
+				faviconUrl: null,
 				error: {
 					code: e.errorCode ?? 0,
 					description: e.errorDescription ?? "",

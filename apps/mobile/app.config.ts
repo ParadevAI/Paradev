@@ -2,6 +2,7 @@ import path from "node:path";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import { ANDROID_APP, IOS_APP } from "@superset/shared/app-identity";
 import { BRAND } from "@superset/shared/brand";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config } from "dotenv";
 import type { ConfigContext } from "expo/config";
 import { withAndroidLabel } from "./config-plugins/withAndroidLabel";
@@ -20,20 +21,25 @@ if (process.env.MOBILE_EAS_BUILD !== "1") {
 }
 
 const webUrl = new URL(
-	process.env.EXPO_PUBLIC_WEB_URL || "https://app.superset.sh",
+	process.env.EXPO_PUBLIC_WEB_URL || "https://app.paradev.com",
 );
-const appLinksHost = webUrl.protocol === "https:" ? webUrl.hostname : undefined;
-const associatedDomains = appLinksHost && [`applinks:${appLinksHost}`];
+// Links already shared on the other own root domain must keep opening the app.
+const appLinksHosts =
+	webUrl.protocol === "https:" ? withOwnDomainTwins([webUrl.hostname]) : [];
+const associatedDomains =
+	appLinksHosts.length > 0 && appLinksHosts.map((host) => `applinks:${host}`);
 // Same paths as apple-app-site-association in apps/web.
-const appLinkIntentFilters = appLinksHost && [
+const appLinkIntentFilters = appLinksHosts.length > 0 && [
 	{
 		action: "VIEW",
 		autoVerify: true,
-		data: ["/page/", "/workspaces/"].map((pathPrefix) => ({
-			scheme: "https",
-			host: appLinksHost,
-			pathPrefix,
-		})),
+		data: appLinksHosts.flatMap((host) =>
+			["/page/", "/workspaces/"].map((pathPrefix) => ({
+				scheme: "https",
+				host,
+				pathPrefix,
+			})),
+		),
 		category: ["BROWSABLE", "DEFAULT"],
 	},
 ];
@@ -62,7 +68,8 @@ export default ({ config }: ConfigContext) => ({
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	userInterfaceStyle: "dark",
-	scheme: "superset",
+	// The first scheme is the one Linking.createURL emits.
+	scheme: ["superset", "paradev"],
 	runtimeVersion: { policy: "fingerprint" as const },
 	updates: {
 		url: "https://u.expo.dev/fa9332a8-896a-4d2a-be5b-d82469b46e5d",
@@ -191,7 +198,7 @@ export default ({ config }: ConfigContext) => ({
 		["expo-notifications", { enableBackgroundRemoteNotifications: false }],
 		// The composer is built on Liquid Glass, which silently no-ops before
 		// iOS 26 — an iOS 26 floor means one visual language instead of a glass
-		// path plus a solid fallback. See plans/20260821-native-composer.md.
+		// path plus a solid fallback.
 		[
 			"expo-build-properties",
 			{

@@ -1,51 +1,58 @@
 import { useLingui } from "@lingui/react/macro";
+import { i18n } from "@superset/i18n";
 import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
 import { RowLink } from "@/components/RowLink";
-import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/ui/icon";
-import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceRow as CloudWorkspaceRowData } from "@/hooks/useCloudWorkspaces";
-import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
-import { cn } from "@/lib/utils";
-import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
 import { UserAvatar } from "@/screens/(authenticated)/settings/components/UserAvatar";
 import { useUnreadWorkspacesStore } from "@/screens/(authenticated)/stores/unreadWorkspacesStore";
 import {
 	PULL_REQUEST_STATUS,
 	pullRequestStatus,
 } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
+import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type { CloudPullRequest } from "../../hooks/useCloudPullRequests";
+import { cloudRowAttention, isCloudRowUnread } from "../../utils/needsMe";
+import { rowDetailParts } from "../RowDetailLine";
+import { WorkspaceLead } from "../WorkspaceLead";
+import { WorkspaceRowFrame } from "../WorkspaceRowFrame";
 import { ArchivedCloudRowMenu } from "./components/ArchivedCloudRowMenu";
 import { CloudWorkspaceRowMenu } from "./components/CloudWorkspaceRowMenu";
-import { CloudWorkspaceStatus } from "./components/CloudWorkspaceStatus";
+import { UnarchiveButton } from "./components/UnarchiveButton";
 
-/** Desktop's DashboardSidebarCloudRow: repo, name, owner if not you, PR, status. */
+/**
+ * A cloud workspace laid out like a host row: its state (or PR) in the lead
+ * slot, the name on the name column, and its creator, if not you, trailing.
+ */
 export function CloudWorkspaceRow({
 	row,
-	repoFullName,
 	pullRequest,
 	viewerId,
-	now,
 	cache,
 	onCopied,
 	card = false,
+	detail,
+	grouped = false,
+	separator = false,
+	stateInLabel = false,
 }: {
 	row: CloudWorkspaceRowData;
-	repoFullName?: string;
 	pullRequest?: CloudPullRequest;
 	viewerId: string | null;
-	now: Date;
 	cache: HostWorkspacesCacheOps;
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row of the Cloud list. */
 	card?: boolean;
+	/** Replaces the branch in the detail line, e.g. "repo · Cloud" outside the Cloud list. */
+	detail?: string;
+	grouped?: boolean;
+	separator?: boolean;
+	stateInLabel?: boolean;
 }) {
 	const { t } = useLingui();
+	const attentionLabel = useAttentionLabel();
 	const router = useRouter();
-	const enlargedText = useEnlargedText();
 	const archived = isArchivedCloudWorkspaceStatus(row.status);
 	const readAt = useUnreadWorkspacesStore((state) => state.cloudReadAt[row.id]);
 	const manuallyUnread = useUnreadWorkspacesStore(
@@ -60,11 +67,7 @@ export function CloudWorkspaceRow({
 	const markCloudRead = useUnreadWorkspacesStore(
 		(state) => state.markCloudRead,
 	);
-	const isRead =
-		!manuallyUnread &&
-		(row.agentStatusAt === null ||
-			(readAt ?? 0) >= row.agentStatusAt.getTime());
-	const isUnread = manuallyUnread || (row.agentStatus === "review" && !isRead);
+	const isUnread = isCloudRowUnread(row, readAt, manuallyUnread);
 	const toggleUnread = () => {
 		if (!isUnread) {
 			setManualUnread(row.id);
@@ -75,74 +78,80 @@ export function CloudWorkspaceRow({
 	};
 	const owner = row.createdBy;
 	const isMine = owner !== null && owner.userId === viewerId;
-	const [repoOwner, repoName] = repoFullName?.split("/") ?? [];
 	const prStatus = pullRequest
 		? PULL_REQUEST_STATUS[pullRequestStatus(pullRequest)]
 		: null;
 	const [prOwner, prRepo] = pullRequest?.repoFullName.split("/") ?? [];
+	const provisioning = row.status === "provisioning";
+	const attention = archived
+		? null
+		: cloudRowAttention(row, readAt, manuallyUnread);
+	const detailParts = rowDetailParts({
+		state: attention ? attentionLabel(attention) : null,
+		pullRequest:
+			prStatus && !archived
+				? { label: i18n._(prStatus.label), ink: prStatus.ink }
+				: null,
+		diff: null,
+		name: row.name,
+		branch: row.branch,
+		context: detail,
+		omitState: stateInLabel,
+		noChanges: t({ message: "No changes" }),
+	});
 
 	const body = (
-		<Pressable
-			className={cn(
-				"bg-background flex-row items-center gap-3 rounded-xl pr-3",
-				card ? "py-3 pl-3" : "py-2 pl-4",
-			)}
-			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
-			ph-label="cloud-workspace-row"
-		>
-			<ProjectAvatar
-				name={repoName ?? row.name}
-				iconUrl={
-					repoOwner ? `https://github.com/${repoOwner}.png?size=64` : null
-				}
-				size={20}
-			/>
-			<View className="min-w-0 flex-1 flex-row items-center gap-1.5">
-				<Text
-					className={cn(
-						"shrink font-medium text-[15px]",
-						archived && "text-muted-foreground",
-					)}
-					numberOfLines={enlargedText ? undefined : 1}
-				>
-					{row.name || t({ message: "Untitled workspace" })}
-				</Text>
-				{owner && !isMine ? (
+		<WorkspaceRowFrame
+			lead={
+				<WorkspaceLead
+					attention={attention}
+					creating={provisioning}
+					failed={false}
+					pullRequest={
+						prStatus && pullRequest && !archived
+							? {
+									icon: prStatus.icon,
+									ink: prStatus.ink,
+									label: t({
+										message: `Pull request #${pullRequest.number}`,
+									}),
+									onPress: () =>
+										router.push(
+											`/(authenticated)/workspace/${row.id}/pull-request/${pullRequest.number}?owner=${encodeURIComponent(prOwner ?? "")}&repo=${encodeURIComponent(prRepo ?? "")}`,
+										),
+								}
+							: null
+					}
+				/>
+			}
+			name={row.name || t({ message: "Untitled workspace" })}
+			nameMuted={archived}
+			detailParts={detailParts}
+			trailing={
+				archived ? (
+					<UnarchiveButton workspaceId={row.id} />
+				) : owner && !isMine ? (
 					<UserAvatar
 						name={owner.name}
 						image={owner.image}
 						className="size-[18px]"
 						textClassName="text-[7px]"
 					/>
-				) : null}
-			</View>
-			{pullRequest && prStatus && !archived ? (
-				<Button
-					accessibilityLabel={t({
-						message: `Pull request #${pullRequest.number}`,
-					})}
-					ph-label="cloud-workspace-row-pull-request"
-					variant="ghost"
-					size="icon"
-					className="-my-1 size-7 rounded-md"
-					hitSlop={8}
-					onPress={() =>
-						router.push(
-							`/(authenticated)/workspace/${row.id}/pull-request/${pullRequest.number}?owner=${encodeURIComponent(prOwner ?? "")}&repo=${encodeURIComponent(prRepo ?? "")}`,
-						)
-					}
-				>
-					<Icon
-						as={prStatus.icon}
-						className={cn("size-4", prStatus.ink)}
-						strokeWidth={1.75}
-					/>
-				</Button>
-			) : null}
-			<View className="min-w-6 items-end">
-				<CloudWorkspaceStatus row={row} isUnread={isUnread} now={now} />
-			</View>
-		</Pressable>
+				) : null
+			}
+			card={card}
+			grouped={grouped}
+			separator={separator}
+			onPress={() => router.navigate(`/(authenticated)/workspace/${row.id}`)}
+			accessibilityLabel={[
+				row.name || t({ message: "Untitled workspace" }),
+				...detailParts.map((part) => part.text),
+				provisioning ? t({ message: "Creating the sandbox" }) : null,
+			]
+				.filter(Boolean)
+				.join(", ")}
+			phLabel="cloud-workspace-row"
+		/>
 	);
 
 	return (

@@ -23,7 +23,7 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 }) => {
 	const { t } = useLingui();
 	const colors = [
-		{ value: null, label: t({ message: "Default" }) },
+		{ value: null, label: t({ message: "None" }) },
 		...GROUP_COLORS.map((option) => ({
 			value: option.value,
 			label: i18n._(option.label),
@@ -33,7 +33,8 @@ export const FolderHeaderMenu: FolderHeaderMenuComponent = ({
 		<DropdownMenu>
 			<DropdownMenuTrigger
 				accessibilityLabel={t({ message: "Group actions" })}
-				className="size-9 items-center justify-center"
+				className="size-6 items-center justify-center"
+				hitSlop={8}
 			>
 				<Icon as={Ellipsis} className="text-muted-foreground size-4" />
 			</DropdownMenuTrigger>

@@ -2,6 +2,7 @@ import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 
 const ROUTES = [
 	"agent-orchestration",
+	"android",
 	"automations",
 	"blog",
 	"browser",
@@ -15,6 +16,8 @@ const ROUTES = [
 	"enterprise",
 	"factory-2026",
 	"fight",
+	"get-app",
+	"ios",
 	"join-us",
 	"leaderboard",
 	"marketplace",

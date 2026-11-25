@@ -20,13 +20,21 @@ export function writeLocalizedDisplayName(
 	}
 }
 
-export function localizeMacDisplayName(displayName: string) {
+/**
+ * Writes the strings whenever the shown name differs from the Info.plist
+ * name, so an install that keeps the file name `<plistDisplayName>.app`
+ * also shows `displayName`.
+ */
+export function localizeMacDisplayName(
+	displayName: string,
+	plistDisplayName: string,
+) {
 	return async (context: AfterPackContext) => {
 		if (context.electronPlatformName !== "darwin") return;
-		const appName = context.packager.appInfo.productFilename;
-		if (displayName === appName) return;
+		if (displayName === plistDisplayName) return;
+		const bundleName = context.packager.appInfo.productFilename;
 		writeLocalizedDisplayName(
-			join(context.appOutDir, `${appName}.app`, "Contents", "Resources"),
+			join(context.appOutDir, `${bundleName}.app`, "Contents", "Resources"),
 			displayName,
 		);
 	};

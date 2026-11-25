@@ -386,8 +386,7 @@ interface ComposerBaseProps {
  *
  * Every surface-specific difference arrives as data, never as children: the
  * moment a `ReactNode` crosses this boundary the seam artifacts that made
- * `GlassComposer` unmaintainable come back with it. See
- * `plans/20260821-native-composer.md`.
+ * `GlassComposer` unmaintainable come back with it.
  */
 export type ComposerComponent = ForwardRefExoticComponent<
 	ComposerProps & RefAttributes<ComposerHandle>

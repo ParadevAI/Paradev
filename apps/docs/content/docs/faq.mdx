@@ -11,13 +11,13 @@ import { COMPANY, SOCIAL } from "@superset/shared/constants";
 macOS (Apple Silicon and Intel) is the supported target. A Linux x64 AppImage ships with each release but is experimental and untested. Windows is planned with no date. The CLI also supports Linux x64 and arm64.
 
 **Is Paradev a terminal app?**
-No. Agents run in terminals, and next to them you get the [Changes pane](/diff-viewer), [pull requests](/pull-requests) with checks and review threads, an [in-app browser](/browser) with Design Mode, and a [file editor](/editor).
+No. Agents run in a [chat interface](/chat) or a terminal, and next to them you get the [Changes pane](/diff-viewer), [pull requests](/pull-requests) with checks and review threads, an [in-app browser](/browser) with Design Mode, and a [file editor](/editor).
 
 **Is there a mobile app or web dashboard?**
-Yes, [Paradev for iPhone and iPad](/install#iphone-and-ipad) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Paradev Pro. Push notifications are coming. Android is not available yet; join the [Android waitlist](https://paradev.com/mobile#android). There's no supported web dashboard today.
+Yes, [Paradev for iPhone and iPad](/install#iphone-and-ipad) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Paradev Pro. Push notifications are coming. The Android app is on [Google Play](https://play.google.com/store/apps/details?id=com.paradev.mobile) and also needs Paradev Pro. There's no supported web dashboard today.
 
 **Do I need to keep my computer on to use the mobile app?**
-Only for workspaces hosted on that computer. Enable Remote Access and keep the host awake and online. [Cloud workspaces](/cloud-workspaces) work on iPhone and iPad without keeping your own computer connected.
+Only for workspaces hosted on that computer. Enable Remote Access and keep the host awake and online. [Cloud workspaces](/cloud-workspaces) work on iPhone, iPad, and Android without keeping your own computer connected.
 
 **Does it work with GitLab or self-hosted remotes?**
 GitHub is fully supported via the `gh` CLI. Repos with other remotes work locally, but cross-machine project identity is currently tied to GitHub, so the same project can show up twice across devices.
@@ -91,7 +91,7 @@ Yes. Terminals are backed by a background daemon, so running processes and scrol
 ## Remote and Automations
 
 **Why does my host show offline when the machine is up?**
-"Online" means connected to the Paradev relay, not "the process is running." Remote access via relay is **off by default**; enable it under **Settings → Remote Access** (or run `superset start --daemon` on CLI hosts). See [Remote Access](/remote-access). The local CLI works regardless of relay state.
+"Online" means connected to the Paradev relay, not "the process is running." Remote access via relay is **off by default**; enable it under **Settings → Remote Access** (or run `paradev start --daemon` on CLI hosts). See [Remote Access](/remote-access). The local CLI works regardless of relay state.
 
 **Can I open a remote host's ports on my Mac?**
 Yes. The desktop app forwards detected ports for the selected remote workspace to your machine. If a local port is busy, choose **Use another port**. See [Remote Access](/remote-access#ports-on-a-remote-host) for requirements.
@@ -109,7 +109,7 @@ No. Paradev uses standard git commands.
 
 ## CLI
 
-**`superset projects list` / `workspaces list` shows nothing, but I have projects.**
+**`paradev projects list` / `workspaces list` shows nothing, but I have projects.**
 The CLI works against the v2 local-first model only. If you're on the legacy v1 interface, the CLI won't see those projects; enable v2 under **Settings → Experimental**.
 
 ## Getting Help

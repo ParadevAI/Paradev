@@ -151,6 +151,7 @@ const changesFilterSchema = z.discriminatedUnion("kind", [
 		kind: z.literal("range"),
 		fromHash: z.string(),
 		toHash: z.string(),
+		includeFrom: z.boolean().optional(),
 	}),
 ]);
 
@@ -210,6 +211,7 @@ export const workspaceLocalStateSchema = z.object({
 	paneLayout: paneWorkspaceStateSchema,
 	rightPaneLayout: paneWorkspaceStateSchema.optional(),
 	rightSidebarOpen: z.boolean().optional(),
+	activityPanelHidden: z.boolean().optional(),
 	// TODO(2027-01-31): delete with useRestoreExpandedPaneArea / restoreExpandedPaneArea once builds that wrote it are gone.
 	rightPaneAreaExpansion: z
 		.object({
@@ -231,8 +233,8 @@ export const workspaceLocalStateSchema = z.object({
 	workspaceRunTerminals: z
 		.record(z.string(), workspaceRunTerminalStateSchema)
 		.default({}),
-	// v1->v2 migration: terminals to recreate lazily on first workspace open
-	// (D2 in plans/20260716-v1-to-v2-auto-migration.md). Cleared after the
+	// v1->v2 migration: terminals to recreate lazily on first workspace open.
+	// Cleared after the
 	// sessions are created; panes come from useAutoAdoptBackgroundSessions.
 	pendingMigratedTerminals: z
 		.array(

@@ -2,8 +2,6 @@ import { randomUUID } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { autumnClient, billingUsesAutumn } from "@superset/auth/autumn";
 import {
-	ACTIVE_CPU_MINUTES_FEATURE_ID,
-	BOX_GB_MINUTES_FEATURE_ID,
 	ensureAutumnCustomer,
 	organizationBilling,
 } from "@superset/auth/billing";
@@ -22,10 +20,15 @@ import {
 	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
+	openBoot,
 	type PendingUsageEvent,
 	users,
 } from "@superset/db/schema";
-import { offersGbHourPack } from "@superset/shared/billing";
+import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
+	BOX_GB_MINUTES_FEATURE_ID,
+	offersGbHourPack,
+} from "@superset/shared/billing";
 import { AutumnError } from "autumn-js";
 import {
 	and,
@@ -164,11 +167,7 @@ async function usageUser(userId: string | null): Promise<UsageUser | null> {
 	return { id: userId, name: user?.name ?? null, email: user?.email ?? null };
 }
 
-const OPEN_BOOT = or(
-	isNull(cloudWorkspaceBoots.stoppedAt),
-	isNull(cloudWorkspaceBoots.finalizedThrough),
-	lt(cloudWorkspaceBoots.finalizedThrough, cloudWorkspaceBoots.stoppedAt),
-);
+const OPEN_BOOT = openBoot(cloudWorkspaceBoots);
 
 async function checkOrFailOpen<T>(
 	organizationId: string,
@@ -284,26 +283,14 @@ export async function releaseBoot(
 		.from(cloudWorkspaceBoots)
 		.where(eq(cloudWorkspaceBoots.id, bootId));
 	if (!boot || boot.stoppedAt) return;
-	if (boot.lockOpen) {
-		await autumnClient.balances
-			.finalize({
-				lockId: lockIdFor(boot.id, boot.lockSeq),
-				action: "release",
-			})
-			.catch((error) =>
-				console.error(
-					`[cloud-workspace/meter] release of ${bootId} failed`,
-					error,
-				),
-			);
-	}
+	const lockReleased = await releaseLock(boot);
 	const now = new Date();
 	const [released] = await db
 		.update(cloudWorkspaceBoots)
 		.set({
 			stoppedAt: now,
 			finalizedThrough: now,
-			lockOpen: false,
+			lockOpen: !lockReleased,
 			settleLeaseUntil: null,
 			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${cause === "provision_failed" ? "failed" : "released"})`,
 		})
@@ -321,6 +308,32 @@ export async function releaseBoot(
 			},
 			{ "end.reason": released.endReason, "release.cause": cause },
 		);
+	}
+}
+
+/** False when Autumn still holds the lock. */
+async function releaseLock(
+	boot: Pick<
+		Boot,
+		"id" | "lockSeq" | "lockOpen" | "organizationId" | "cloudWorkspaceId"
+	>,
+): Promise<boolean> {
+	if (!boot.lockOpen) return true;
+	try {
+		await autumnClient.balances.finalize({
+			lockId: lockIdFor(boot.id, boot.lockSeq),
+			action: "release",
+		});
+		return true;
+	} catch (error) {
+		if (
+			(error instanceof AutumnError && error.statusCode === 409) ||
+			lockNotFound(error)
+		) {
+			return true;
+		}
+		Sentry.captureException(error, { tags: bootTags(boot) });
+		return false;
 	}
 }
 
@@ -361,7 +374,9 @@ export async function attachBootSession(args: {
 	await releaseBoot(args.bootId, "session_taken");
 }
 
-function bootTags(boot: Boot): Record<string, string> {
+function bootTags(
+	boot: Pick<Boot, "id" | "organizationId" | "cloudWorkspaceId">,
+): Record<string, string> {
 	return {
 		"organization.id": boot.organizationId,
 		"boot.id": boot.id,
@@ -469,9 +484,13 @@ async function writePendingUsage(): Promise<void> {
 function confirmedEarlier(boot: Boot, error: AutumnError): boolean {
 	const takenAt = boot.finalizedThrough ?? boot.createdAt;
 	return (
-		error.body.includes("Lock not found") &&
+		lockNotFound(error) &&
 		Date.now() < takenAt.getTime() + LOCK_TTL_MS - LOCK_WINDOW_MS
 	);
+}
+
+function lockNotFound(error: unknown): boolean {
+	return error instanceof AutumnError && error.body.includes("Lock not found");
 }
 
 async function recordUsage(
@@ -575,6 +594,18 @@ export async function settleBoot(
 ): Promise<"renewed" | "warned" | "stopped" | "closed" | "skipped"> {
 	const boot = await claimSettle(bootId);
 	if (!boot) return "skipped";
+	if (
+		boot.stoppedAt &&
+		boot.finalizedThrough &&
+		boot.finalizedThrough >= boot.stoppedAt
+	) {
+		const lockReleased = await releaseLock(boot);
+		await db
+			.update(cloudWorkspaceBoots)
+			.set({ lockOpen: !lockReleased, settleLeaseUntil: null })
+			.where(eq(cloudWorkspaceBoots.id, bootId));
+		return "closed";
+	}
 	try {
 		const [workspace] = boot.cloudWorkspaceId
 			? await db
@@ -945,10 +976,13 @@ async function adoptRunningBoxes(
 					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
 					.returning({ id: cloudWorkspaceBoots.id });
 			} finally {
-				if (inserted.length === 0 && lockOpen) {
-					await autumnClient.balances.finalize({
-						lockId: lockIdFor(bootId, 0),
-						action: "release",
+				if (inserted.length === 0) {
+					await releaseLock({
+						id: bootId,
+						lockSeq: 0,
+						lockOpen,
+						organizationId: workspace.organizationId,
+						cloudWorkspaceId: workspace.id,
 					});
 				}
 			}
@@ -1021,7 +1055,7 @@ export async function reconcileCloudWorkspaceUsage({
 	let failed = 0;
 	for (let i = 0; i < ids.length; i += RECONCILE_CONCURRENCY) {
 		const results = await Promise.allSettled(
-			ids.slice(i, i + RECONCILE_CONCURRENCY).map(queueSettle),
+			ids.slice(i, i + RECONCILE_CONCURRENCY).map((id) => queueSettle(id)),
 		);
 		for (const result of results) {
 			if (result.status === "rejected") {

@@ -35,8 +35,8 @@ export async function resolveAutomationTarget(args: {
 				? `Host ${targetHostId} is not registered in this organization`
 				: `This machine (host ${targetHostId}) isn't registered with the cloud`,
 			args.hostId
-				? "Run: superset hosts list"
-				: "Restart the host service (superset stop && superset start), then check: superset hosts list",
+				? "Run: paradev hosts list"
+				: "Restart the host service (paradev stop && paradev start), then check: paradev hosts list",
 		);
 	}
 
@@ -82,7 +82,7 @@ export async function resolveAutomationTarget(args: {
 	if (!projects.some((project) => project.id === args.projectId)) {
 		throw new CLIError(
 			`Project ${args.projectId} is not set up on host ${targetHostId}`,
-			"Run: superset projects list",
+			"Run: paradev projects list",
 		);
 	}
 	return { targetHostId, v2ProjectId: args.projectId };

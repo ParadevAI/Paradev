@@ -110,6 +110,15 @@ export function EmailLayout({
 									style={{ display: "inline-block" }}
 								/>
 							</Link>
+							<Link href={COMPANY.PLAY_STORE_URL} style={{ marginLeft: "8px" }}>
+								<Img
+									src={`${assets}/badge-googleplay.png`}
+									alt="Get Paradev on Google Play"
+									width="108"
+									height="32"
+									style={{ display: "inline-block" }}
+								/>
+							</Link>
 						</Section>
 						<Text style={footerText}>
 							<Link

@@ -52,8 +52,9 @@ download_tarball() {
     target="$1"
     tarball="superset-${target}.tar.gz"
 
+    latest_url="https://github.com/${REPO}/releases/download/cli-latest/${tarball}"
     if [ "$TAG" = "latest" ]; then
-        url="https://github.com/${REPO}/releases/download/cli-latest/${tarball}"
+        url="$latest_url"
     else
         url="https://github.com/${REPO}/releases/download/${TAG}/${tarball}"
     fi
@@ -61,8 +62,17 @@ download_tarball() {
     info "Downloading $url"
     tmp="$(mktemp -t superset-install.XXXXXX)"
     if ! curl -fsSL -o "$tmp" "$url"; then
-        rm -f "$tmp"
-        error "Failed to download $url"
+        # Some desktop versions have no CLI release, and `hosts add` asks for its own version.
+        if [ "$url" = "$latest_url" ]; then
+            rm -f "$tmp"
+            error "Failed to download $url"
+        fi
+        warn "No CLI release ${TAG} for ${target}. Installing the latest release."
+        info "Downloading $latest_url"
+        if ! curl -fsSL -o "$tmp" "$latest_url"; then
+            rm -f "$tmp"
+            error "Failed to download $latest_url"
+        fi
     fi
     echo "$tmp"
 }
@@ -143,18 +153,18 @@ main() {
             error "Expected executable file not found: $path"
         fi
     done
-    # `paradev` is an alias. Releases before the rename ship without the link.
+    # Releases before the rename ship without the `paradev` link.
     [ -e "$INSTALL_DIR/bin/paradev" ] || ln -s superset "$INSTALL_DIR/bin/paradev"
 
     update_path
 
     printf "\n${GREEN}${BOLD}Installed!${RESET}\n"
-    # `superset hosts add` signs the machine in itself, so it skips this advice.
+    # `paradev hosts add` signs the machine in itself, so it skips this advice.
     if [ "${1:-}" = "--no-next-steps" ]; then
         return
     fi
     printf "Run ${BOLD}exec \$SHELL${RESET} (or open a new terminal) to load the updated PATH.\n"
-    printf "Then run ${BOLD}superset auth login${RESET} to get started. ${BOLD}paradev${RESET} works as an alias for ${BOLD}superset${RESET}.\n"
+    printf "Then run ${BOLD}paradev auth login${RESET} to get started. ${BOLD}superset${RESET} still works as an alias for ${BOLD}paradev${RESET}.\n"
 }
 
 main "$@"

@@ -40,6 +40,7 @@ function makeBuild(
 		error: null,
 		startedAt: new Date(0),
 		finishedAt: null,
+		goldenDeletedAt: null,
 		...overrides,
 	};
 }
@@ -195,7 +196,7 @@ stub(repositories, {
 	installationTokenFor: async () => null,
 });
 stub(repoHooks, {
-	readRepoHooks: async () => ({ install: { commands: ["bun install"] } }),
+	environmentHooks: async () => ({ install: { commands: ["bun install"] } }),
 });
 stub(resolveEnvironmentModule, { resolveEnvironment: async () => null });
 stub(credentials, {

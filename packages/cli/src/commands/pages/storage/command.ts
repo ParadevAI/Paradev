@@ -26,7 +26,7 @@ export async function userJwt(
 	if (!bearer.startsWith("sk_live_")) {
 		throw new CLIError(
 			"Reading page storage needs a signed-in user",
-			"Run: superset auth login, or pass --api-key",
+			"Run: paradev auth login, or pass --api-key",
 		);
 	}
 	return jwtForApiKey(bearer, fetchImpl);
@@ -63,7 +63,7 @@ export async function readStorage({
 		case 401:
 			throw new CLIError(
 				"Page storage did not accept your credentials",
-				"Run: superset auth login",
+				"Run: paradev auth login",
 			);
 		case 403:
 			throw new CLIError(
@@ -73,7 +73,7 @@ export async function readStorage({
 		case 404:
 			throw new CLIError(
 				"This page has no published version",
-				"Publish it first: superset pages publish",
+				"Publish it first: paradev pages publish",
 			);
 		default:
 			throw new CLIError(

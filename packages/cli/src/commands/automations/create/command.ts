@@ -29,7 +29,7 @@ export default command({
 			"Trigger set as a JSON array, for event triggers (Slack, GitHub, Linear, ...). See --triggers-file",
 		),
 		triggersFile: string().desc(
-			"Path to a JSON file holding the trigger set. Run `superset automations trigger-options --group slack` to resolve the ids a scope filters on",
+			"Path to a JSON file holding the trigger set. Run `paradev automations trigger-options --group slack` to resolve the ids a scope filters on",
 		),
 		timezone: string().desc(`IANA timezone (default: host TZ, else UTC)`),
 		dtstart: string().desc("ISO 8601 start anchor (default: now)"),
@@ -89,7 +89,7 @@ export default command({
 
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const hostFlag = splitCloudHost(options.host);
 		const cloud = Boolean(

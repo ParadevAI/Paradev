@@ -6415,6 +6415,63 @@ describe("AcpAdapter config options", () => {
 		await adapter.dispose();
 	});
 
+	it("shows the agent's boolean fast option as a toggle and sets it with a boolean", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [
+			MODEL_OPTION,
+			{ id: "fast", name: "Fast mode", type: "boolean", currentValue: false },
+			{
+				id: "ultracode",
+				name: "Ultracode",
+				type: "boolean",
+				currentValue: false,
+			},
+		];
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		const options = sessionsOf(events).pop()?.configOptions ?? [];
+		expect(options.map((option) => option.id)).toEqual(["model", "fast"]);
+		expect(options[1]).toMatchObject({
+			currentValue: "off",
+			options: [
+				{ id: "on", label: "On" },
+				{ id: "off", label: "Off" },
+			],
+		});
+
+		expect(await adapter.setConfigOption("fast", "on")).toBe(true);
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params),
+		).toEqual([
+			{ sessionId: "sess-1", configId: "fast", type: "boolean", value: true },
+		]);
+
+		await adapter.dispose();
+	});
+
+	it("sets a boolean fast option with a boolean on ACP v2", async () => {
+		const agent = new FakeAcpAgent();
+		agent.newSessionConfigOptions = [
+			{ id: "fast", name: "Fast mode", type: "boolean", currentValue: false },
+		];
+		const { adapter } = startAdapter(agent);
+		await flush();
+
+		expect(await adapter.setConfigOption("fast", "off")).toBe(true);
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params),
+		).toEqual([
+			{ sessionId: "sess-1", configId: "fast", type: "boolean", value: false },
+		]);
+
+		await adapter.dispose();
+	});
+
 	it("turns fast mode on once the agent has taken the start model", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
@@ -7189,4 +7246,133 @@ describe("AcpAdapter when the agent fails", () => {
 
 		await adapter.dispose();
 	});
+});
+
+it("model discovery reads ACP options without prompting or changing modes", async () => {
+	const agent = new FakeAcpAgent();
+	agent.newSessionConfigOptions = [
+		{
+			id: "model",
+			name: "Model",
+			category: "model",
+			currentValue: "private/new",
+			options: [{ value: "private/new", name: "Private model" }],
+		},
+	];
+	const adapter = new AcpAdapter({
+		command: "fake",
+		cwd: "/repo",
+		createTransport: (_launch, handlers) => agent.transport(handlers),
+	});
+	try {
+		const options = await adapter.discoverModels("/repo");
+		expect(
+			options.find((option) => option.category === "model")?.options,
+		).toEqual([{ id: "private/new", label: "Private model" }]);
+		expect(
+			agent.sent.filter((frame) => frame.method).map((frame) => frame.method),
+		).toEqual(["initialize", "session/new"]);
+	} finally {
+		await adapter.dispose();
+	}
+});
+
+it("does not prompt a default model when the requested model is unavailable", async () => {
+	const agent = new FakeAcpAgent();
+	agent.newSessionConfigOptions = [
+		{
+			id: "model",
+			name: "Model",
+			category: "model",
+			currentValue: "available",
+			options: [{ value: "available", name: "Available" }],
+		},
+	];
+	const { adapter, events } = startAdapter(agent, undefined, {
+		modelId: "removed",
+	});
+	await flush();
+	adapter.prompt([{ type: "text", text: "hello" }]);
+	await flush();
+	expect(agent.sent.some((frame) => frame.method === "session/prompt")).toBe(
+		false,
+	);
+	expect(
+		events.some(
+			(event) =>
+				event.kind === "turn" && event.turn.error?.kind === "model_unavailable",
+		),
+	).toBe(true);
+	expect(await adapter.setConfigOption("model", "available")).toBe(true);
+	adapter.prompt([{ type: "text", text: "hello" }]);
+	await flush();
+	expect(agent.sent.some((frame) => frame.method === "session/prompt")).toBe(
+		true,
+	);
+	await adapter.dispose();
+});
+
+it("keeps a model chosen while the start selections were still pending", async () => {
+	const agent = new FakeAcpAgent();
+	agent.newSessionConfigOptions = [
+		{
+			id: "model",
+			name: "Model",
+			category: "model",
+			currentValue: "available",
+			options: [{ value: "available", name: "Available" }],
+		},
+		{
+			id: "mode",
+			name: "Mode",
+			category: "mode",
+			currentValue: "default",
+			options: [
+				{ value: "default", name: "Default" },
+				{ value: "plan", name: "Plan" },
+			],
+		},
+	];
+	agent.holdSelections = true;
+	const { adapter } = startAdapter(agent, undefined, {
+		modelId: "removed",
+		modeId: "plan",
+	});
+	await flush();
+	agent.holdSelections = false;
+	expect(await adapter.setConfigOption("model", "available")).toBe(true);
+	agent.releaseSelections();
+	await flush();
+	adapter.prompt([{ type: "text", text: "hello" }]);
+	await flush();
+	expect(agent.sent.some((frame) => frame.method === "session/prompt")).toBe(
+		true,
+	);
+	await adapter.dispose();
+});
+
+it("discovers model options announced after the native session opens", async () => {
+	const agent = new FakeAcpAgent();
+	const adapter = new AcpAdapter({
+		command: "fake",
+		createTransport: (_launch, handlers) => agent.transport(handlers),
+		startOptionsGraceMs: 50,
+	});
+	const discovery = adapter.discoverModels("/repo");
+	await flush();
+	agent.notify("sess-1", {
+		sessionUpdate: "config_option_update",
+		configOptions: [
+			{
+				id: "model",
+				name: "Model",
+				category: "model",
+				options: [{ value: "new", name: "New" }],
+			},
+		],
+	});
+	expect(
+		(await discovery).find((option) => option.category === "model")?.options,
+	).toEqual([{ id: "new", label: "New" }]);
+	await adapter.dispose();
 });

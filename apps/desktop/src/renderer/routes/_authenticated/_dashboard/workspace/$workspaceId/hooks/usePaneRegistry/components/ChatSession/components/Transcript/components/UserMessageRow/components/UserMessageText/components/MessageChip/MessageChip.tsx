@@ -1,5 +1,6 @@
 import { Chip } from "@superset/chat-ui/Chip";
 import type { ComposerChip } from "@superset/chat-ui/PromptInput";
+import { useOpenAppLink } from "../../../../../../../../hooks/useOpenAppLink";
 import { useChatPaneActions } from "../../../../../../../../providers/ChatPaneActionsProvider";
 import { chipLink } from "../../../../../../../../utils/linkChip";
 import { LinkHoverCard } from "../../../../../../../LinkHoverCard";
@@ -13,6 +14,7 @@ export function MessageChip({
 	link?: string | undefined;
 }) {
 	const { openLink } = useChatPaneActions();
+	const openAppLink = useOpenAppLink();
 	const href = link ?? chipLink(chip);
 	if (!href) return <Chip chip={chip} />;
 	return (
@@ -22,7 +24,9 @@ export function MessageChip({
 					className="no-underline outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
 					href={href}
 					onClick={(event) => {
-						if (openLink?.(href, event)) event.preventDefault();
+						if (openAppLink(href) || openLink?.(href, event)) {
+							event.preventDefault();
+						}
 					}}
 					rel="noreferrer"
 					target="_blank"

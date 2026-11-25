@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import type { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { stub } from "../test/stub";
 import { posthog } from "./lib/analytics";
 
@@ -23,6 +24,7 @@ const {
 const { isMember } = await import("./lib/cloud-guards");
 
 const reached = personProcedure.mutation(() => "reached");
+const organizationInput = z.object({ organizationId: z.string() });
 
 const router = createTRPCRouter({
 	cloudWorkspace: createTRPCRouter({
@@ -40,6 +42,18 @@ const router = createTRPCRouter({
 		unarchive: reached,
 		setVisibility: reached,
 		restart: reached,
+	}),
+	connectors: createTRPCRouter({
+		connectApiKey: personProcedure
+			.input(organizationInput)
+			.mutation(() => "reached"),
+		disconnect: reached,
+		status: personProcedure.input(organizationInput).query(() => "reached"),
+	}),
+	plugins: createTRPCRouter({
+		organization: createTRPCRouter({
+			sources: createTRPCRouter({ add: reached }),
+		}),
 	}),
 	user: createTRPCRouter({
 		myOrganization: personProcedure.query(
@@ -109,10 +123,24 @@ describe("what a cloud workspace may call", () => {
 	});
 
 	test.each([
-		["unarchive", () => box.cloudWorkspace.unarchive()],
-		["setVisibility", () => box.cloudWorkspace.setVisibility()],
-		["restart", () => box.cloudWorkspace.restart()],
-	])("a box is refused cloudWorkspace.%s", async (_name, call) => {
+		[
+			"plugins.organization.sources.add",
+			() => box.plugins.organization.sources.add(),
+		],
+		[
+			"connectors.connectApiKey",
+			() => box.connectors.connectApiKey({ organizationId: "box-org" }),
+		],
+	])("a box reaches %s", async (_name, call) => {
+		expect(await outcome(call)).toBe("reached");
+	});
+
+	test.each([
+		["cloudWorkspace.unarchive", () => box.cloudWorkspace.unarchive()],
+		["cloudWorkspace.setVisibility", () => box.cloudWorkspace.setVisibility()],
+		["cloudWorkspace.restart", () => box.cloudWorkspace.restart()],
+		["connectors.disconnect", () => box.connectors.disconnect()],
+	])("a box is refused %s", async (_name, call) => {
 		expect(await outcome(call)).toBe("FORBIDDEN");
 	});
 
@@ -135,6 +163,20 @@ describe("the organization a cloud workspace acts in", () => {
 				callerFor({ organization: "other-org" }).user.myOrganization(),
 			),
 		).toBe("FORBIDDEN");
+	});
+
+	test.each([
+		[
+			"connectors.connectApiKey",
+			() =>
+				callerFor().connectors.connectApiKey({ organizationId: "other-org" }),
+		],
+		[
+			"connectors.status",
+			() => callerFor().connectors.status({ organizationId: "other-org" }),
+		],
+	])("a box may not name another organization in the input of %s", async (_name, call) => {
+		expect(await outcome(call)).toBe("FORBIDDEN");
 	});
 
 	test("a box may name its own organization", async () => {

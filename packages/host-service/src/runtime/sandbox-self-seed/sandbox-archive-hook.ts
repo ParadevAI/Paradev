@@ -97,7 +97,7 @@ export async function runSandboxArchiveHook(
 			});
 		});
 		child.on("close", (code) => {
-			console.log(hookOutcomeLine("archive", `exited ${code}`, command));
+			console.log(...hookOutcomeLine("archive", `exited ${code}`, command));
 			finish(
 				code === 0 && !timedOut
 					? { status: "ok", outputTail: output }

@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { withQuotedReplies } from "@superset/chat/core";
 import type {
 	AvailableCommand,
 	SessionConfigOption,
@@ -17,6 +18,7 @@ import type {
 } from "@superset/chat-ui/PromptInput";
 import { formatRelativeTime } from "@superset/i18n/format";
 import { usePaneFocus } from "@superset/panes";
+import { foldLegacyPluginCommands } from "@superset/shared/slash-commands";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
@@ -80,18 +82,20 @@ import { useMcpServerPicker } from "./hooks/useMcpServerPicker";
 import { useStatusDialog } from "./hooks/useStatusDialog";
 import { useUploadAttachments } from "./hooks/useUploadAttachments";
 
+export type SubagentBlock = "agent" | "ended" | "stopped" | "failed" | "host";
+
 export type ComposerTarget = {
 	name: string;
 	disabledReason?: string;
+	blockedBy?: SubagentBlock;
 	onStop?: () => void;
 };
 
 export type ComposerHandle = Pick<
 	PromptInputHandle,
-	"restoreDraft" | "addFiles" | "focus"
+	"restoreDraft" | "addFiles" | "addQuote" | "focus"
 > & {
 	returnFocus: (recallHistory?: boolean) => void;
-	/** Opens the model picker on this agent's models only. */
 	openModelPicker: () => void;
 };
 
@@ -127,6 +131,8 @@ export type ComposerProps = {
 	disabled?: boolean;
 	onCancelTurn?: (() => void) | null;
 	target?: ComposerTarget;
+	/** Takes text left in the composer when it becomes read-only. */
+	onDraftBlocked?: (draft: ComposerDraft) => void;
 	escapeGoesBack?: boolean;
 	onEnterDrawer?: (options: { actionableOnly: boolean }) => boolean;
 	sessionUsage?: SessionUsage | null;
@@ -153,17 +159,20 @@ function toMenuCommands(
 	groups: { commands: string; mcp: string },
 ): PromptInputCommand[] {
 	const sigilSkills = commands.some((command) => isSigilSkill(command.name));
-	return commands.map((command) => ({
-		id: command.name,
-		title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
-		...(command.hint ? { hint: command.hint } : {}),
-		description: command.description ?? "",
-		group: command.category === "mcp" ? groups.mcp : groups.commands,
-		inline: !sigilSkills || isSigilSkill(command.name),
-		onSelect: (ctx) => {
-			ctx.insertChip(commandChip(command.name, command.description));
-		},
-	}));
+	return foldLegacyPluginCommands(commands).map(
+		({ command, legacyAliases }) => ({
+			id: command.name,
+			title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
+			...(legacyAliases.length > 0 ? { searchAliases: legacyAliases } : {}),
+			...(command.hint ? { hint: command.hint } : {}),
+			description: command.description ?? "",
+			group: command.category === "mcp" ? groups.mcp : groups.commands,
+			inline: !sigilSkills || isSigilSkill(command.name),
+			onSelect: (ctx) => {
+				ctx.insertChip(commandChip(command.name, command.description));
+			},
+		}),
+	);
 }
 
 const FOCUS_HANDOFF_MS = 1000;
@@ -203,6 +212,7 @@ export const Composer = memo(function Composer({
 	placeholder,
 	sessionUsage,
 	target,
+	onDraftBlocked,
 	turnRunning = false,
 	promptPending = false,
 	awaitingBackground = false,
@@ -213,7 +223,12 @@ export const Composer = memo(function Composer({
 }: ComposerProps) {
 	const { t } = useLingui();
 	const blocked = disabled || target?.disabledReason !== undefined;
-	const stop = target ? target.onStop : (onCancelTurn ?? undefined);
+	const readOnly = target?.blockedBy !== undefined;
+	const stop = readOnly
+		? undefined
+		: target
+			? target.onStop
+			: (onCancelTurn ?? undefined);
 	const name = target?.name ?? "";
 	const trpcUtils = workspaceTrpc.useUtils();
 	const { hostUrl } = useWorkspaceClient();
@@ -230,12 +245,24 @@ export const Composer = memo(function Composer({
 		),
 	);
 	const uploadAttachments = useUploadAttachments(workspaceId);
-	const { storedDraft, onDraftChange, clearDraft } = useComposerDraft(
-		draftKey,
-		draftPersisted,
-	);
+	const { storedDraft, onDraftChange, clearDraft, takeDraft } =
+		useComposerDraft(draftKey, draftPersisted);
+	const [editorResets, setEditorResets] = useState(0);
+	const blockedDraftSink = useRef(onDraftBlocked);
+	useLayoutEffect(() => {
+		blockedDraftSink.current = readOnly ? onDraftBlocked : undefined;
+	}, [readOnly, onDraftBlocked]);
+	useLayoutEffect(() => {
+		if (!readOnly || !onDraftBlocked) return;
+		const draft = takeDraft();
+		if (!draft) return;
+		onDraftBlocked(draft);
+		setEditorResets((count) => count + 1);
+	}, [readOnly, takeDraft, onDraftBlocked]);
 	const promptInputRef = useRef<PromptInputHandle>(null);
-	const focusInput = useCallback(() => promptInputRef.current?.focus(), []);
+	const focusInput = useCallback(() => {
+		if (!readOnly) promptInputRef.current?.focus();
+	}, [readOnly]);
 	const recallHistory = useCallback(
 		() => promptInputRef.current?.recallPreviousPrompt(),
 		[],
@@ -248,11 +275,9 @@ export const Composer = memo(function Composer({
 	const { returnFocus } = drawerEntry;
 	const mcpPicker = useMcpServerPicker({ workspaceId, presetId });
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
-	const [agentModelsOnly, setAgentModelsOnly] = useState(false);
 	const changeModelPickerOpen = useCallback(
 		(open: boolean) => {
 			setModelPickerOpen(open);
-			if (!open) setAgentModelsOnly(false);
 			onModelPickerOpenChange?.(open);
 		},
 		[onModelPickerOpenChange],
@@ -263,12 +288,10 @@ export const Composer = memo(function Composer({
 			restoreDraft: (draft: ComposerDraft) =>
 				promptInputRef.current?.restoreDraft(draft),
 			addFiles: (files: File[]) => promptInputRef.current?.addFiles(files),
+			addQuote: (text: string) => promptInputRef.current?.addQuote(text),
 			focus: focusInput,
 			returnFocus,
-			openModelPicker: () => {
-				setAgentModelsOnly(true);
-				changeModelPickerOpen(true);
-			},
+			openModelPicker: () => changeModelPickerOpen(true),
 		}),
 		[focusInput, returnFocus, changeModelPickerOpen],
 	);
@@ -305,15 +328,15 @@ export const Composer = memo(function Composer({
 	}, [draftKey]);
 	usePaneFocus(focusInput);
 	useHotkey("FOCUS_CHAT_INPUT", () => promptInputRef.current?.focus(), {
-		enabled: Boolean(isActive),
+		enabled: Boolean(isActive) && !readOnly,
 	});
 	useHotkey(
 		"CHAT_ADD_ATTACHMENT",
 		() => promptInputRef.current?.openFileDialog(),
-		{ enabled: Boolean(isActive) },
+		{ enabled: Boolean(isActive) && !readOnly },
 	);
 	useEffect(() => {
-		if (!isActive) return;
+		if (!isActive || readOnly) return;
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "/" || event.defaultPrevented) return;
 			if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -330,7 +353,7 @@ export const Composer = memo(function Composer({
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [isActive]);
+	}, [isActive, readOnly]);
 	const collections = useCollections();
 	const { getOpenFilePaths } = useChatPaneActions();
 	const searchFiles = useCallback(
@@ -538,6 +561,7 @@ export const Composer = memo(function Composer({
 			text: string,
 			files: File[],
 			mentions: ComposerChip[],
+			quotes: string[],
 			steer: boolean,
 			draft: ComposerDraft,
 		) => {
@@ -551,13 +575,20 @@ export const Composer = memo(function Composer({
 					),
 				};
 				const input = promptInputRef.current;
-				if (input) input.restoreDraft(restored);
+				const sink = blockedDraftSink.current;
+				if (sink) sink(restored);
+				else if (input) input.restoreDraft(restored);
 				else prependToDraft(draftKey, [restored]);
 				return;
 			}
 			const { tags, parts } = upload;
 			const message = text.trim();
-			const elements = elementsForChips(message, mentions);
+			const quoted = withQuotedReplies(quotes, message);
+			const elements = elementsForChips(
+				message,
+				mentions,
+				quoted.slice(0, quoted.length - message.length),
+			);
 			const mcpContext = mcpContextLine(
 				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
 			);
@@ -566,7 +597,7 @@ export const Composer = memo(function Composer({
 				env.NEXT_PUBLIC_WEB_URL,
 				otherHostOf,
 			);
-			const body = [message, ...tags].filter(Boolean).join("\n");
+			const body = [quoted, ...tags].filter(Boolean).join("\n");
 			onSend(
 				[
 					...(body || parts.length === 0
@@ -600,9 +631,20 @@ export const Composer = memo(function Composer({
 	);
 
 	const handleSubmit = useCallback(
-		({ text, files, mentions, steer, draft }: PromptInputSubmitPayload) => {
-			if (blocked || (text.trim() === "" && files.length === 0)) return false;
-			const typed = runTyped(text, files.length > 0);
+		({
+			text,
+			files,
+			mentions,
+			quotes,
+			steer,
+			draft,
+		}: PromptInputSubmitPayload) => {
+			if (
+				blocked ||
+				(text.trim() === "" && files.length === 0 && quotes.length === 0)
+			)
+				return false;
+			const typed = runTyped(text, files.length > 0 || quotes.length > 0);
 			if (typed === "ran") return;
 			if (typed === "kept") return false;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
@@ -615,7 +657,16 @@ export const Composer = memo(function Composer({
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			return send(text, files, mentions, steer, draft);
+			// The agent runs a command only when the prompt starts with it.
+			if (
+				name &&
+				quotes.length > 0 &&
+				availableCommands.some((command) => command.name === name)
+			) {
+				toast.error(t({ message: `/${name} doesn't take quotes` }));
+				return false;
+			}
+			return send(text, files, mentions, quotes, steer, draft);
 		},
 		[availableCommands, blocked, runTyped, send, t, target],
 	);
@@ -654,78 +705,82 @@ export const Composer = memo(function Composer({
 					onSetUp={insertSetupPrompt}
 				/>
 			)}
-			<AgentComposer
-				className={CHAT_COLUMN_CLASSNAME}
-				commands={commands}
-				draft={storedDraft}
-				chipForPaste={linkChips.chipForPaste}
-				renderChip={linkChips.renderChip}
-				history={history}
-				key={draftKey}
-				mentionProviders={mentionProviders}
-				onDraftChange={onDraftChange}
-				onStop={stop}
-				onSubmit={handleSubmit}
-				ref={promptInputRef}
-				placeholder={
-					target
-						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
-						: awaitingBackground
-							? t({ message: `Queue a message · ${SEND_NOW_KEYS} to send now` })
-							: (placeholder ??
-								t({
-									message: "Ask the agent, @mention files, run /commands",
-								}))
-				}
-				status={
-					stop || promptPending
-						? "streaming"
-						: awaitingBackground && !target
-							? "background"
-							: "ready"
-				}
-				stopOnEscape={!escapeGoesBack}
-				toolbar={
-					target ? (
-						<span className="flex h-6 min-w-0 max-w-48 items-center rounded-md border border-border/60 px-2 font-sans text-foreground/70 text-xs">
-							<span className="min-w-0 truncate">
-								<Trans>to {name}</Trans>
+			<div className={cn(readOnly && "opacity-50")} inert={readOnly}>
+				<AgentComposer
+					className={CHAT_COLUMN_CLASSNAME}
+					commands={commands}
+					draft={storedDraft}
+					chipForPaste={linkChips.chipForPaste}
+					renderChip={linkChips.renderChip}
+					history={history}
+					key={`${draftKey}#${editorResets}`}
+					mentionProviders={mentionProviders}
+					onDraftChange={onDraftChange}
+					onStop={stop}
+					onSubmit={handleSubmit}
+					ref={promptInputRef}
+					placeholder={
+						target
+							? (target.disabledReason ?? t({ message: `Message ${name}…` }))
+							: awaitingBackground
+								? t({
+										message: `Queue a message · ${SEND_NOW_KEYS} to send now`,
+									})
+								: (placeholder ??
+									t({
+										message: "Ask the agent, @mention files, run /commands",
+									}))
+					}
+					status={
+						stop || promptPending
+							? "streaming"
+							: awaitingBackground && !target
+								? "background"
+								: "ready"
+					}
+					stopOnEscape={!escapeGoesBack}
+					toolbar={
+						target ? (
+							<span className="flex h-6 min-w-0 max-w-48 items-center rounded-md border border-border/60 px-2 font-sans text-foreground/70 text-xs">
+								<span className="min-w-0 truncate">
+									<Trans>to {name}</Trans>
+								</span>
 							</span>
-						</span>
-					) : modes && onSetMode ? (
-						<ModePicker
-							currentModeId={currentModeId}
-							iconOnly={footerTier >= 2}
-							modes={modes}
-							onSelect={onSetMode}
-						/>
-					) : undefined
-				}
-				toolbarEnd={
-					target ? undefined : (
-						<>
-							{sessionUsage && (
-								<ContextWindowRing
-									usage={sessionUsage}
-									onCompact={canCompact ? compact : undefined}
-									compactDisabled={blocked || turnRunning}
-								/>
-							)}
-							{configOptions && onSetConfigOption && (
-								<ModelPicker
-									agentSwitcher={agentModelsOnly ? undefined : agentSwitcher}
-									configOptions={configOptions}
-									hideEffortLabel={footerTier >= 1}
-									hideModelLabel={footerTier >= 3}
-									onOpenChange={changeModelPickerOpen}
-									onSelect={onSetConfigOption}
-									open={modelPickerOpen}
-								/>
-							)}
-						</>
-					)
-				}
-			/>
+						) : modes && onSetMode ? (
+							<ModePicker
+								currentModeId={currentModeId}
+								iconOnly={footerTier >= 2}
+								modes={modes}
+								onSelect={onSetMode}
+							/>
+						) : undefined
+					}
+					toolbarEnd={
+						target ? undefined : (
+							<>
+								{sessionUsage && (
+									<ContextWindowRing
+										usage={sessionUsage}
+										onCompact={canCompact ? compact : undefined}
+										compactDisabled={blocked || turnRunning}
+									/>
+								)}
+								{configOptions && onSetConfigOption && (
+									<ModelPicker
+										agentSwitcher={agentSwitcher}
+										configOptions={configOptions}
+										hideEffortLabel={footerTier >= 1}
+										hideModelLabel={footerTier >= 3}
+										onOpenChange={changeModelPickerOpen}
+										onSelect={onSetConfigOption}
+										open={modelPickerOpen}
+									/>
+								)}
+							</>
+						)
+					}
+				/>
+			</div>
 			{mcpPicker.dialog}
 			{status.dialog}
 		</div>

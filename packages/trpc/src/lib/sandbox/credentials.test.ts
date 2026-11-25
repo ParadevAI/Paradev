@@ -13,7 +13,10 @@ setTestEnv({ NEXT_PUBLIC_API_URL: undefined });
 type Policy = {
 	allow: Record<
 		string,
-		Array<{ transform: Array<{ headers: Record<string, string> }> }>
+		Array<{
+			match?: unknown;
+			transform: Array<{ headers: Record<string, string> }>;
+		}>
 	>;
 };
 const rules = (

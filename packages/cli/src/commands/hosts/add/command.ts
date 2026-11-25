@@ -285,7 +285,7 @@ export default command({
 			organizationId: organization.id,
 		});
 
-		p.intro(`superset hosts add ${target}`);
+		p.intro(`paradev hosts add ${target}`);
 		const ssh = await SshSession.open(target);
 		try {
 			const probe = await ssh.run(PROBE_SCRIPT);
@@ -313,7 +313,7 @@ export default command({
 			if (hostId === getHostId()) {
 				throw new CLIError(
 					`${target} is this machine`,
-					"This machine is already a host when the app or `superset start` runs here.",
+					"This machine is already a host when the app or `paradev start` runs here.",
 				);
 			}
 			log.info(`${facts.hostname} (${platform.target}), host id ${hostId}`);

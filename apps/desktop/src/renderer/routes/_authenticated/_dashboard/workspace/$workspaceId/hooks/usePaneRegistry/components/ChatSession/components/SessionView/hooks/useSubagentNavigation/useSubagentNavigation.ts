@@ -18,6 +18,7 @@ export function useSubagentNavigation({
 	items: SessionSnapshot["items"];
 }): {
 	focusedId: string | null;
+	parentTitle: string | null;
 	openSubagent: (itemId: string) => void;
 	goBack: () => void;
 } {
@@ -50,5 +51,6 @@ export function useSubagentNavigation({
 		() => open(chatKey, path.at(-2)?.id ?? null),
 		[chatKey, open, path],
 	);
-	return { focusedId, openSubagent, goBack };
+	const parentTitle = path.at(-2)?.title ?? null;
+	return { focusedId, parentTitle, openSubagent, goBack };
 }

@@ -11,31 +11,25 @@ import { LuTriangleAlert, LuX } from "react-icons/lu";
 import { MachineSizeMenuItems } from "renderer/routes/_authenticated/_dashboard/components/MachineSizeMenuItems";
 import { useChangeMachineSize } from "renderer/routes/_authenticated/hooks/useChangeMachineSize";
 import {
-	boxPressureEpisode,
 	useBoxPressure,
 	useBoxPressureStore,
 } from "renderer/stores/box-pressure";
 import { nextMachineSize } from "./utils/nextMachineSize";
-
-const MB_PER_GB = 1024;
 
 export function BoxOutOfMemoryBanner({ workspaceId }: { workspaceId: string }) {
 	const { t } = useLingui();
 	const { runAfterClose, onCloseAutoFocus } = useRunAfterMenuClose();
 	const { formatNumber } = useFormat();
 	const pressure = useBoxPressure(workspaceId);
-	const dismissedEpisode = useBoxPressureStore(
-		(state) => state.dismissed[workspaceId],
+	const dismissed = useBoxPressureStore(
+		(state) => state.dismissed[workspaceId] === true,
 	);
 	const dismiss = useBoxPressureStore((state) => state.dismiss);
 	const { options, currentSize, currentOption, isResizing } =
 		useChangeMachineSize(workspaceId);
 
-	if (pressure?.level !== "critical") return null;
-	const episode = boxPressureEpisode(pressure);
-	if (dismissedEpisode === episode) return null;
+	if (pressure?.level !== "critical" || dismissed) return null;
 
-	const reap = pressure.reap;
 	const suggested = nextMachineSize(
 		options.map((option) => option.size),
 		currentSize,
@@ -56,13 +50,9 @@ export function BoxOutOfMemoryBanner({ workspaceId }: { workspaceId: string }) {
 				aria-hidden="true"
 			/>
 			<span className="min-w-0 flex-1 select-text">
-				{reap
-					? t({
-							message: `Out of memory: the box stopped ${reap.processName} (${formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })} GB) to keep running. ${sizeName} has ${memoryGb} GB.`,
-						})
-					: t({
-							message: `Out of memory: the box is close to not responding. ${sizeName} has ${memoryGb} GB.`,
-						})}
+				{t({
+					message: `Out of memory: the box is close to not responding. ${sizeName} has ${memoryGb} GB.`,
+				})}
 			</span>
 			{suggested !== currentSize && suggestedName ? (
 				<DropdownMenu>
@@ -89,7 +79,7 @@ export function BoxOutOfMemoryBanner({ workspaceId }: { workspaceId: string }) {
 			) : null}
 			<button
 				type="button"
-				onClick={() => dismiss(workspaceId, episode)}
+				onClick={() => dismiss(workspaceId)}
 				aria-label={t({ message: "Dismiss" })}
 				className="shrink-0 rounded p-0.5 text-foreground/70 hover:bg-destructive/20 hover:text-foreground"
 			>

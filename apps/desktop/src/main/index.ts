@@ -1,3 +1,5 @@
+// Must stay the first import: later imports read userData at load time.
+import "./lib/legacy-app-name/pin";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -9,7 +11,7 @@ import {
 	writeSharedDisabledSkillIds,
 } from "@superset/agent-setup";
 import { i18n, initI18nAsync } from "@superset/i18n";
-import { browserHistory, settings } from "@superset/local-db";
+import { browserHistory, settings, workspaces } from "@superset/local-db";
 import {
 	devAppProfileDirName,
 	isDevAppProfileDirName,
@@ -39,7 +41,7 @@ import {
 	BROWSER_PARTITION,
 	DEFAULT_CONFIRM_ON_QUIT,
 	PLATFORM,
-	PROTOCOL_SCHEME,
+	REGISTERED_PROTOCOL_SCHEMES,
 } from "shared/constants";
 import { sweepDevAppProfiles } from "./dev-app-profile-sweep";
 import { getAppDisplayName } from "./lib/app-display-name";
@@ -66,6 +68,7 @@ import {
 	installBundledCliShim,
 	installBundledPdevShim,
 } from "./lib/bundled-cli";
+import { deepLinkToRoute, findDeepLinkInArgv } from "./lib/deep-link";
 import { installDevRunnerExit } from "./lib/dev-runner-exit";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -141,14 +144,16 @@ if (IS_DEV) {
 }
 
 // Dev mode: register with execPath + app script so macOS launches Electron with our entry point
-if (process.defaultApp) {
-	if (process.argv.length >= 2) {
-		app.setAsDefaultProtocolClient(PROTOCOL_SCHEME, process.execPath, [
-			path.resolve(process.argv[1]),
-		]);
+for (const scheme of REGISTERED_PROTOCOL_SCHEMES) {
+	if (process.defaultApp) {
+		if (process.argv.length >= 2) {
+			app.setAsDefaultProtocolClient(scheme, process.execPath, [
+				path.resolve(process.argv[1]),
+			]);
+		}
+	} else {
+		app.setAsDefaultProtocolClient(scheme);
 	}
-} else {
-	app.setAsDefaultProtocolClient(PROTOCOL_SCHEME);
 }
 
 async function processDeepLink(url: string): Promise<void> {
@@ -192,13 +197,7 @@ async function processDeepLink(url: string): Promise<void> {
 
 	console.log("[main] Processing deep link:", url);
 
-	// Non-auth deep links: extract path and navigate in renderer
-	// e.g. superset://tasks/my-slug -> /tasks/my-slug
-	// Links minted before the route rename (older CLIs, published pages).
-	const path = `/${url.slice(url.indexOf("://") + 3)}`.replace(
-		/^\/v2-workspace(s)?\b/,
-		"/workspace$1",
-	);
+	const path = deepLinkToRoute(url);
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();
@@ -208,10 +207,6 @@ async function processDeepLink(url: string): Promise<void> {
 browserManager.on("deep-link", (url: string) => {
 	void processDeepLink(url);
 });
-
-function findDeepLinkInArgv(argv: string[]): string | undefined {
-	return argv.find((arg) => arg.startsWith(`${PROTOCOL_SCHEME}://`));
-}
 
 export function focusMainWindow(): void {
 	const target = getFocusedOrLastWindow();
@@ -530,8 +525,8 @@ if (!gotTheLock) {
 
 	(async () => {
 		await app.whenReady();
-		// Persisted language setting wins; otherwise infer from OS preferences
-		// (plans/20260826-i18n-strategy.md). Menus are built later in
+		// Persisted language setting wins; otherwise infer from OS preferences.
+		// Menus are built later in
 		// initAppServices/initTray, so a plain activate is enough here.
 		await initI18nAsync(resolveAppLocale(getLanguageSetting()));
 		if (getAppDisplayName() !== app.name) {
@@ -594,7 +589,13 @@ if (!gotTheLock) {
 		ensureProjectIconsDir();
 		setWorkspaceDockIcon();
 		initSentry();
-		await initAppState();
+		await initAppState(() =>
+			localDb
+				.select({ id: workspaces.id })
+				.from(workspaces)
+				.all()
+				.map((row) => row.id),
+		);
 
 		sweepNetworkLogs();
 		sweepDevAppProfiles();

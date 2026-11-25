@@ -16,6 +16,10 @@ test("reads paths and line positions the way agents write them", () => {
 		path: "src/app.ts",
 		row: 12,
 	});
+	expect(parseFileHref("src/app.ts:17-33")).toEqual({
+		path: "src/app.ts",
+		row: 17,
+	});
 	expect(parseFileHref("src/app.ts#L12-L20")).toEqual({
 		path: "src/app.ts",
 		row: 12,

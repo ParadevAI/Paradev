@@ -6,7 +6,6 @@ import { ZodError } from "zod";
 // fallback and for logs; `cause` is not serialized by tRPC, so the
 // errorFormatter in trpc.ts copies these fields into `shape.data`. Catalog
 // entries for every key live in packages/i18n/src/server-errors.ts.
-// Strategy: plans/20260826-i18n-strategy.md.
 
 /** The paid tiers a gate can name. Mirrors PlanTier minus "free". */
 export type RequiredPlan = "pro" | "enterprise";

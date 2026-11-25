@@ -280,6 +280,19 @@ export function ComposerBody({
 	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
 	const attachmentsRef = useRef(attachments);
 	attachmentsRef.current = attachments;
+	const [quotes, setQuotes] = useState<string[]>([]);
+	const quotesRef = useRef(quotes);
+	quotesRef.current = quotes;
+	const addQuotes = useCallback((incoming: readonly string[] | undefined) => {
+		if (!incoming?.length) return;
+		setQuotes((previous) => [
+			...previous,
+			...incoming.filter(
+				(quote, index) =>
+					!previous.includes(quote) && incoming.indexOf(quote) === index,
+			),
+		]);
+	}, []);
 	const usedDictationRef = useRef(false);
 	const addAttachments = useCallback(
 		(incoming: readonly Omit<PromptInputAttachment, "previewUrl">[]) => {
@@ -304,6 +317,7 @@ export function ComposerBody({
 			restoreDraft(restored: ComposerDraft) {
 				editor.update(() => $appendDraftSegments(restored.segments));
 				addAttachments(restored.attachments);
+				addQuotes(restored.quotes);
 				if (restored.usedDictation) usedDictationRef.current = true;
 				editor.focus();
 			},
@@ -312,7 +326,8 @@ export function ComposerBody({
 					editor
 						.getEditorState()
 						.read(() => $getRoot().getTextContent().trim() === "") &&
-					attachmentsRef.current.length === 0
+					attachmentsRef.current.length === 0 &&
+					quotesRef.current.length === 0
 				);
 			},
 			addFiles(files: File[]) {
@@ -321,6 +336,10 @@ export function ComposerBody({
 			},
 			insertChip(chip: ComposerChip) {
 				insertChip(editor, chip);
+			},
+			addQuote(text: string) {
+				addQuotes([text]);
+				focusAtEnd();
 			},
 			openFileDialog() {
 				fileInputRef.current?.click();
@@ -340,7 +359,7 @@ export function ComposerBody({
 				editor.blur();
 			},
 		}),
-		[addAttachments, editor, focusAtEnd],
+		[addAttachments, addQuotes, editor, focusAtEnd],
 	);
 	const [isEmpty, setIsEmpty] = useState(true);
 	const [dragging, setDragging] = useState(false);
@@ -402,8 +421,9 @@ export function ComposerBody({
 			});
 		}
 		addAttachments(draft.attachments);
+		addQuotes(draft.quotes);
 		if (draft.usedDictation) usedDictationRef.current = true;
-	}, [addAttachments, draft, editor]);
+	}, [addAttachments, addQuotes, draft, editor]);
 
 	useEffect(
 		() =>
@@ -411,6 +431,9 @@ export function ComposerBody({
 				onDraftChangeRef.current?.({
 					segments: draftOf(editorState),
 					attachments: attachmentsRef.current,
+					...(quotesRef.current.length > 0
+						? { quotes: quotesRef.current }
+						: {}),
 					...(usedDictationRef.current ? { usedDictation: true } : {}),
 				});
 			}),
@@ -420,9 +443,10 @@ export function ComposerBody({
 		onDraftChangeRef.current?.({
 			segments: draftOf(editor.getEditorState()),
 			attachments,
+			...(quotes.length > 0 ? { quotes } : {}),
 			...(usedDictationRef.current ? { usedDictation: true } : {}),
 		});
-	}, [attachments, editor]);
+	}, [attachments, quotes, editor]);
 
 	const addFiles = (files: FileList | File[]) => {
 		const incoming = Array.from(files);
@@ -648,7 +672,13 @@ export function ComposerBody({
 		const segments = draftOf(editorState);
 		const sent = stateRef.current.attachments;
 		const files = sent.map((attachment) => attachment.file);
-		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {
+		const quoted = quotesRef.current;
+		if (
+			!text &&
+			files.length === 0 &&
+			quoted.length === 0 &&
+			!stateRef.current.allowEmptySubmit
+		) {
 			return;
 		}
 		if (
@@ -656,10 +686,12 @@ export function ComposerBody({
 				text,
 				files,
 				mentions,
+				quotes: quoted,
 				steer,
 				draft: {
 					segments,
 					attachments: sent,
+					...(quoted.length > 0 ? { quotes: quoted } : {}),
 					...(usedDictationRef.current ? { usedDictation: true } : {}),
 				},
 			}) === false
@@ -672,6 +704,7 @@ export function ComposerBody({
 			for (const attachment of previous) releaseAttachment(attachment);
 			return [];
 		});
+		setQuotes([]);
 		setPanel(null);
 	};
 	const submitRef = useRef(submit);
@@ -1061,7 +1094,8 @@ export function ComposerBody({
 		return () => document.removeEventListener("pointerdown", onPointerDown);
 	}, []);
 
-	const canSend = allowEmptySubmit || !isEmpty || attachments.length > 0;
+	const hasCards = attachments.length > 0 || quotes.length > 0;
+	const canSend = allowEmptySubmit || !isEmpty || hasCards;
 
 	useEffect(() => {
 		if (autoFocus) focusAtEnd();
@@ -1373,7 +1407,7 @@ export function ComposerBody({
 					className={
 						!canSend || disabled || pending
 							? buttons.inactiveSend
-							: inline && isEmpty && attachments.length === 0
+							: inline && isEmpty && !hasCards
 								? buttons.filled
 								: cn(
 										buttons.base,
@@ -1528,6 +1562,10 @@ export function ComposerBody({
 				</div>
 				<AttachmentPills
 					attachments={attachments}
+					quotes={quotes}
+					onRemoveQuote={(quote) =>
+						setQuotes((previous) => previous.filter((entry) => entry !== quote))
+					}
 					onAttachmentClick={onAttachmentClick}
 					onReveal={
 						localFiles

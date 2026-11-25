@@ -62,7 +62,7 @@ export default command({
 			}),
 			message: visible.length
 				? `${visible.length} plugin${visible.length === 1 ? "" : "s"}.`
-				: "No plugins installed. See what's available: superset plugins list --available",
+				: "No plugins installed. See what's available: paradev plugins list --available",
 		};
 	},
 });

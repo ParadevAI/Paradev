@@ -1,4 +1,6 @@
 // Pure, so the admin repo's daily check can share it: it vendors packages/db but not the Autumn client.
+
+import { ACTIVE_CPU_MINUTES_FEATURE_ID } from "@superset/shared/billing";
 import {
 	type CloudUsageFeature,
 	cloudUsageFeatureValues,
@@ -117,7 +119,7 @@ export function autumnUsageByLock(
 		const feature = event.featureId;
 		const lockSeq =
 			lockSeqOf(event) ??
-			(feature === "active_cpu_minutes" ? finalSeq : LEGACY_LOCK_SEQ);
+			(feature === ACTIVE_CPU_MINUTES_FEATURE_ID ? finalSeq : LEGACY_LOCK_SEQ);
 		const key = `${bootId}:${lockSeq}:${feature}`;
 		const { workspaceId, userId } = event.properties;
 		const lock = locks.get(key) ?? {

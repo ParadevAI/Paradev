@@ -69,7 +69,11 @@ export interface CloudWorkspaceItemsValue {
  */
 export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 	const queryClient = useQueryClient();
-	const { workspaces: cloudRows, isReady } = useCloudWorkspaces();
+	const {
+		workspaces: cloudRows,
+		isReady,
+		organizationId,
+	} = useCloudWorkspaces();
 
 	const items = useMemo<CloudWorkspaceItem[]>(
 		() => cloudRows.map((cloud) => itemFromCloudRow(cloud)),
@@ -79,7 +83,7 @@ export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 	const cache = useMemo<HostWorkspacesCacheOps>(() => {
 		const keyFor = (hostId: string) => {
 			const access = getSandboxAccess(hostId);
-			return access ? getHostWorkspacesQueryKey(hostId, access.url) : null;
+			return access ? getHostWorkspacesQueryKey(hostId, organizationId) : null;
 		};
 		return {
 			resolveHostUrl: (hostId) => getSandboxAccess(hostId)?.url ?? null,
@@ -104,7 +108,7 @@ export function useCloudWorkspaceItems(): CloudWorkspaceItemsValue {
 				if (key) void queryClient.invalidateQueries({ queryKey: key });
 			},
 		};
-	}, [queryClient]);
+	}, [queryClient, organizationId]);
 
 	return { items, cache, isReady };
 }

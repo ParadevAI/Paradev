@@ -2,7 +2,7 @@ import { COMPANY } from "@superset/shared/constants";
 import { renderSVG } from "uqr";
 import { cn } from "../../lib/utils";
 
-const QR_SVG = renderSVG(COMPANY.APP_STORE_URL, {
+const QR_SVG = renderSVG(COMPANY.MOBILE_INSTALL_URL, {
 	border: 4,
 	whiteColor: "#ffffff",
 	blackColor: "#0b0b0b",

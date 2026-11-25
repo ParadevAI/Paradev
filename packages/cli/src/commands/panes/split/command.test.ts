@@ -74,7 +74,7 @@ describe("panes split", () => {
 	test("names an old host instead of a missing procedure", async () => {
 		splitError = new Error('No procedure found on path "panes.split"');
 		await expect(invoke({ terminal: "term-old" })).rejects.toThrow(
-			"This host is too old for `superset panes`",
+			"This host is too old for `paradev panes`",
 		);
 		expect(killSession).not.toHaveBeenCalled();
 	});

@@ -107,7 +107,7 @@ describe("buildAgentModelArgs", () => {
 
 	it("returns [] for model ids outside the preset's curated list", () => {
 		expect(buildAgentModelArgs("claude", "bad-model")).toEqual([]);
-		expect(buildAgentModelArgs("codex", "sonnet")).toEqual([]);
+		expect(buildAgentModelArgs("gemini", "sonnet")).toEqual([]);
 	});
 
 	it("returns [] for superset (model travels via chat metadata)", () => {
@@ -149,9 +149,13 @@ describe("buildAgentModelArgs", () => {
 		expect(models.find((model) => model.id === "opus")?.label).toBe("Opus");
 	});
 
-	it("drops codex models that left the live catalog", () => {
-		for (const model of ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex"]) {
-			expect(buildAgentModelArgs("codex", model)).toEqual([]);
+	it("passes an unlisted id to an agent that lists its own models", () => {
+		for (const presetId of ["codex", "opencode", "cursor-agent"]) {
+			expect(buildAgentModelArgs(presetId, "vendor/new-model")).toEqual([
+				"--model",
+				"vendor/new-model",
+			]);
+			expect(buildAgentModelArgs(presetId, "bad id")).toEqual([]);
 		}
 	});
 
@@ -478,6 +482,29 @@ describe("getAgentEfforts", () => {
 		);
 	});
 
+	it("offers Gemini 4 Carbon and Hydrogen in agy, with xhigh only on Hydrogen", () => {
+		const agyModels = getAgentModelSupport("agy")?.models.map((m) => m.id);
+		expect(agyModels).toContain("gemini-4-carbon");
+		expect(agyModels).toContain("gemini-4-hydrogen");
+		expect(getAgentEfforts("agy", "gemini-4-carbon").map((e) => e.id)).toEqual([
+			"low",
+			"medium",
+			"high",
+		]);
+		expect(
+			getAgentEfforts("agy", "gemini-4-hydrogen").map((e) => e.id),
+		).toEqual(["low", "medium", "high", "xhigh"]);
+		expect(buildAgentModelArgs("agy", "gemini-4-hydrogen")).toEqual([
+			"--model",
+			"gemini-4-hydrogen",
+		]);
+		expect(buildAgentEffortArgs("agy", "xhigh", "gemini-4-hydrogen")).toEqual([
+			"--effort",
+			"xhigh",
+		]);
+		expect(buildAgentEffortArgs("agy", "xhigh", "gemini-4-carbon")).toEqual([]);
+	});
+
 	it("offers codex's top efforts only alongside the models that take them", () => {
 		expect(getAgentEfforts("codex", "gpt-5.6-sol").map((e) => e.id)).toEqual([
 			"low",
@@ -627,9 +654,6 @@ describe("buildAgentModelArgs with effort", () => {
 			"--model",
 			"claude-opus-4-8-low",
 		]);
-		expect(
-			buildAgentModelArgs("cursor-agent", "claude-opus-4-8-bogus"),
-		).toEqual([]);
 		expect(isCuratedAgentModel("cursor-agent", "gpt-5.5-extra-high")).toBe(
 			true,
 		);

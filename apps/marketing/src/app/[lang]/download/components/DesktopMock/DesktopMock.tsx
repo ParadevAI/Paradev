@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AppMockup } from "@/app/[lang]/components/HeroSection/components/AppMockup";
 
-// AppMockup floors its own width at 700px so its internal 1280px design never
+// AppMockup floors its own width at 700px so its internal 1440px design never
 // scales below legibility on the hero. A card band is far narrower, so render it
 // at that floor and scale the whole box down to fit.
 const MOCKUP_WIDTH = 700;

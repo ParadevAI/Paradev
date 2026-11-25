@@ -41,6 +41,7 @@ const PERSISTED_QUERY_PREFIXES = [
 	["cloud", "user", "myOrganizations"],
 	["cloud", "host", "roster"],
 	["cloud", "cloudWorkspace", "list"],
+	["cloud", "cloudWorkspace", "repositories"],
 	["host-service", "workspaces", "list"],
 	["host-service", "projects", "list"],
 ] as const;
@@ -71,7 +72,7 @@ const persister = createAsyncStoragePersister({
 });
 
 // Device-language inference on first load; a persisted user setting takes
-// precedence once it exists (plans/20260826-i18n-strategy.md). The provider
+// precedence once it exists. The provider
 // waits for the catalog before mounting native navigation.
 const deviceLocale = resolveLocale(
 	getLocales().map((locale) => locale.languageTag),

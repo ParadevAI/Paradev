@@ -6,6 +6,7 @@
 	"exports": {
 		"./legacy-integration-connect": "./src/legacy-integration-connect/index.ts",
 		"./domain-move": "./src/domain-move/index.ts",
+		"./oauth-resource": "./src/oauth-resource/index.ts",
 		"./browser-api-url": "./src/browser-api-url.ts",
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
@@ -125,6 +126,10 @@
 			"types": "./src/env-file.ts",
 			"default": "./src/env-file.ts"
 		},
+		"./public-env": {
+			"types": "./src/public-env.ts",
+			"default": "./src/public-env.ts"
+		},
 		"./environment-secrets": {
 			"types": "./src/environment-secrets.ts",
 			"default": "./src/environment-secrets.ts"
@@ -204,6 +209,14 @@
 		"./sandbox/boot-stamps": {
 			"types": "./src/sandbox/boot-stamps.ts",
 			"default": "./src/sandbox/boot-stamps.ts"
+		},
+		"./sandbox/build-errors": {
+			"types": "./src/sandbox/build-errors.ts",
+			"default": "./src/sandbox/build-errors.ts"
+		},
+		"./sandbox/memguard-log": {
+			"types": "./src/sandbox/memguard-log.ts",
+			"default": "./src/sandbox/memguard-log.ts"
 		},
 		"./sandbox/contract": {
 			"types": "./src/sandbox/contract.ts",
@@ -521,6 +534,10 @@
 			"types": "./src/github-remote.ts",
 			"default": "./src/github-remote.ts"
 		},
+		"./resolve-command": {
+			"types": "./src/resolve-command.ts",
+			"default": "./src/resolve-command.ts"
+		},
 		"./simple-git-options": {
 			"types": "./src/simple-git-options.ts",
 			"default": "./src/simple-git-options.ts"
@@ -528,6 +545,10 @@
 		"./shell-ready-scanner": {
 			"types": "./src/shell-ready-scanner.ts",
 			"default": "./src/shell-ready-scanner.ts"
+		},
+		"./shell-exit-marker": {
+			"types": "./src/shell-exit-marker.ts",
+			"default": "./src/shell-exit-marker.ts"
 		},
 		"./leaked-input-mode-reclaim": {
 			"types": "./src/leaked-input-mode-reclaim.ts",
@@ -552,6 +573,10 @@
 		"./plugins/bundle": {
 			"types": "./src/plugins/bundle.ts",
 			"default": "./src/plugins/bundle.ts"
+		},
+		"./plugins/plugin-icon": {
+			"types": "./src/plugins/plugin-icon.ts",
+			"default": "./src/plugins/plugin-icon.ts"
 		},
 		"./plugins/manifest-schema": {
 			"types": "./src/plugins/manifest-schema.ts",

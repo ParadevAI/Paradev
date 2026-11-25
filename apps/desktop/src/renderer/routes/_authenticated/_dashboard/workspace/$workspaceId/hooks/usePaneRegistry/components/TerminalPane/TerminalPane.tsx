@@ -49,6 +49,7 @@ import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 import { isWithinWorkspacePath } from "shared/absolute-paths";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { useSendAttachments } from "../../hooks/useSendAttachments";
+import { useWorkspacePathHost } from "../../hooks/useWorkspacePathHost";
 import {
 	runFileLinkAction,
 	runFolderLinkAction,
@@ -327,33 +328,15 @@ export function TerminalPane({
 		);
 	}, [terminalId, terminalInstanceId, appearance]);
 
-	// --- Link handlers ---
-	// All filesystem operations go through the host service.
-	// statPath is a mutation (POST) to avoid tRPC GET URL encoding issues
-	// with paths containing special characters like ().
-	const statPathMutation = workspaceTrpc.filesystem.statPath.useMutation();
-	const statPathRef = useRef(statPathMutation.mutateAsync);
-	statPathRef.current = statPathMutation.mutateAsync;
+	const pathHost = useWorkspacePathHost(workspaceId);
 
 	useEffect(() => {
 		terminalRuntimeRegistry.setLinkHandlers(
 			terminalId,
 			{
-				stat: async (path) => {
-					try {
-						const result = await statPathRef.current({
-							workspaceId,
-							path,
-						});
-						if (!result) return null;
-						return {
-							isDirectory: result.isDirectory,
-							resolvedPath: result.resolvedPath,
-						};
-					} catch {
-						return null;
-					}
-				},
+				stat: (path) => pathHost.stat(path).catch(() => null),
+				resolveFile: (reference) =>
+					pathHost.resolveFile(reference).catch(() => null),
 				onFileLinkClick: (event, link) => {
 					if (link.isDirectory) {
 						const intent = folderPolicy.getIntent(event);
@@ -404,7 +387,7 @@ export function TerminalPane({
 	}, [
 		terminalId,
 		terminalInstanceId,
-		workspaceId,
+		pathHost,
 		onLinkHover,
 		onLinkLeave,
 		showHint,

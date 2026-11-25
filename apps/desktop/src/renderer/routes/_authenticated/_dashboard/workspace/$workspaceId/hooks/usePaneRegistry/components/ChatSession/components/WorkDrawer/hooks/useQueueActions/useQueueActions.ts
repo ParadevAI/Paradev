@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { userMessageText } from "@superset/chat/core";
+import { userMessageText, withQuotedReplies } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import { errorMessage, rawErrorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
@@ -33,9 +33,11 @@ export function useQueueActions(promptQueue: DrawerQueue | undefined) {
 	const updateQueued = useCallback(
 		async (prompt: UserMessage, text: string) => {
 			if (!promptQueue) return;
-			const { attachments } = parseAttachmentTags(userMessageText(prompt));
+			const { attachments, quotes } = parseAttachmentTags(
+				userMessageText(prompt),
+			);
 			const content = [
-				text.trim(),
+				withQuotedReplies(quotes, text.trim()),
 				...attachments.map((attachment) => formatAttachmentTag(attachment)),
 			]
 				.filter(Boolean)

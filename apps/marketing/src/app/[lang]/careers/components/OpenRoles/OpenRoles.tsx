@@ -38,7 +38,7 @@ export function OpenRoles({ applyLabel, className = "" }: OpenRolesProps) {
 						--waas-border-focus: var(--brand);
 						--waas-bg: #101012;
 						--waas-bg-subtle: rgba(255, 255, 255, 0.06);
-						--waas-font: var(--font-inter), ui-sans-serif, sans-serif;
+						--waas-font: var(--font-geist-sans), ui-sans-serif, sans-serif;
 						--waas-text: var(--foreground);
 						--waas-text-secondary: var(--muted-foreground);
 						--waas-font-size-base: 15px;
@@ -78,7 +78,7 @@ export function OpenRoles({ applyLabel, className = "" }: OpenRolesProps) {
 							root.append(style);
 						};
 						// site CTA recipe (see DownloadButton): mono uppercase, foreground/background flip, brand on hover
-						const mono = "font-family:var(--font-ibm-plex-mono),ui-monospace,monospace !important;text-transform:uppercase !important;letter-spacing:0.05em !important";
+						const mono = "font-family:var(--font-geist-mono),ui-monospace,monospace !important;text-transform:uppercase !important;letter-spacing:0.05em !important";
 						const detailCss = [
 							".two-col{gap:40px !important}",
 							".tabs{margin-bottom:48px !important;gap:40px !important}",

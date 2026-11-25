@@ -19,7 +19,7 @@ export async function resolveHostClient(
 ): Promise<HostServiceClient> {
 	const organizationId = ctx.config.organizationId;
 	if (!organizationId) {
-		throw new CLIError("No active organization", "Run: superset auth login");
+		throw new CLIError("No active organization", "Run: paradev auth login");
 	}
 	if (options.host?.toLowerCase() === CLOUD_HOST_ID && options.workspace) {
 		const { target } = await resolveCloudWorkspaceTarget({

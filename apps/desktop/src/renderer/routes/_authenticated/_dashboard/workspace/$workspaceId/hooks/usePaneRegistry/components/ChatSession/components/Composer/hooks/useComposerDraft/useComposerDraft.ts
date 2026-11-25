@@ -11,8 +11,12 @@ const EMPTY_DRAFT: ComposerDraft = { segments: [], attachments: [] };
 const unsavedDrafts = new Map<string, ComposerDraft>();
 const recoveredAfterRead = new Map<string, ComposerDraft[]>();
 
-function isEmpty(draft: ComposerDraft): boolean {
-	return draft.segments.length === 0 && draft.attachments.length === 0;
+export function isEmptyDraft(draft: ComposerDraft): boolean {
+	return (
+		draft.segments.length === 0 &&
+		draft.attachments.length === 0 &&
+		!draft.quotes?.length
+	);
 }
 
 function persistDraft(draftKey: string, draft: ComposerDraft): boolean {
@@ -48,13 +52,15 @@ function readDraft(draftKey: string): ComposerDraft | undefined {
 
 export function hasDraft(draftKey: string): boolean {
 	const draft = readDraft(draftKey);
-	return draft !== undefined && !isEmpty(draft);
+	return draft !== undefined && !isEmptyDraft(draft);
 }
 
 export function joinDrafts(drafts: readonly ComposerDraft[]): ComposerDraft {
+	const quotes = [...new Set(drafts.flatMap((draft) => draft.quotes ?? []))];
 	return {
 		segments: drafts.flatMap((draft) => draft.segments),
 		attachments: drafts.flatMap((draft) => draft.attachments),
+		...(quotes.length > 0 ? { quotes } : {}),
 		...(drafts.some((draft) => draft.usedDictation)
 			? { usedDictation: true }
 			: {}),
@@ -80,7 +86,7 @@ export function takeRecoveredDraft(draftKey: string): ComposerDraft | null {
 	recoveredAfterRead.delete(draftKey);
 	if (!recovered?.length) return null;
 	const joined = joinDrafts(recovered);
-	return isEmpty(joined) ? null : joined;
+	return isEmptyDraft(joined) ? null : joined;
 }
 
 export function useComposerDraft(draftKey: string, persisted = true) {
@@ -96,7 +102,8 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 		if (
 			draft !== undefined &&
 			persistDraft(key, draft) &&
-			draft.attachments.length === 0
+			draft.attachments.length === 0 &&
+			!draft.quotes?.length
 		) {
 			unsavedDrafts.delete(key);
 		}
@@ -104,7 +111,7 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 	const onDraftChange = useCallback(
 		(draft: ComposerDraft) => {
 			if (!persisted) {
-				if (isEmpty(draft)) unsavedDrafts.delete(draftKey);
+				if (isEmptyDraft(draft)) unsavedDrafts.delete(draftKey);
 				else unsavedDrafts.set(draftKey, draft);
 				return;
 			}
@@ -133,6 +140,13 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 		setSeed({ draftKey, draft: undefined });
 	}, [draftKey, persisted]);
 
+	const takeDraft = useCallback((): ComposerDraft | null => {
+		const draft = readDraft(draftKey);
+		if (draft === undefined || isEmptyDraft(draft)) return null;
+		clearDraft();
+		return draft;
+	}, [draftKey, clearDraft]);
+
 	if (seed.draftKey !== draftKey) {
 		recoveredAfterRead.delete(draftKey);
 		setSeed({ draftKey, draft: readDraft(draftKey) });
@@ -142,5 +156,6 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 		storedDraft: seed.draftKey === draftKey ? seed.draft : readDraft(draftKey),
 		onDraftChange,
 		clearDraft,
+		takeDraft,
 	};
 }

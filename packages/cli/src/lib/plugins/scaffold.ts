@@ -113,7 +113,6 @@ export function scaffoldPlugin(
 		interface: {
 			displayName: display,
 			category,
-			icon: name,
 		},
 	};
 

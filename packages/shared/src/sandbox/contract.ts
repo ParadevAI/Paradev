@@ -23,6 +23,8 @@ export const SANDBOX_PATHS = {
 	/** `<hostRoot>/<sha256>/` per runtime, `current` symlink, `current.version`. */
 	hostRoot: "/opt/superset/host",
 	conf: "/etc/superset/sandbox.conf",
+	/** The environment's `config.toml`, rewritten on every create and wake; empty when it has none. */
+	environmentConfig: "/etc/superset/environment.toml",
 	contract: "/etc/superset/contract.sh",
 	state: "/var/lib/superset",
 	hostDb: "/var/lib/superset/host.db",
@@ -80,6 +82,12 @@ export const SANDBOX_DISPLAY = {
 	dockIconSize: 48,
 	cursorSize: 24,
 	panelHeight: 28,
+} as const;
+
+/** Tag and log attribute names that readers use to find a workspace's records in Sentry. */
+export const SANDBOX_TELEMETRY_KEYS = {
+	cloudWorkspaceId: "cloud_workspace.id",
+	organizationId: "organization.id",
 } as const;
 
 /** Where `sync-assets` fetches by hash: `<base>/<sha256><suffix>`. */

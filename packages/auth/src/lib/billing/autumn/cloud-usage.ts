@@ -1,11 +1,15 @@
 import {
 	ALLOWANCE_UNAVAILABLE_FIELDS,
 	type ALLOWANCE_UNAVAILABLE_REASONS,
-	type GbHourPack,
+	type AutumnCatalogPlan,
+	BOX_GB_MINUTES_FEATURE_ID,
+	type GbHourRates,
+	gbHourRatesOf,
 	gbMinutesUsd,
+	isBoughtGbMinuteRow,
+	isRecurringGbMinuteRow,
 } from "@superset/shared/billing";
 import type { getAutumnCustomer } from "./customer";
-import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
 
 export interface CloudAutoTopup {
 	enabled: boolean;
@@ -26,7 +30,7 @@ interface CloudCredit {
 }
 
 /** `null` in `bought` means a cached value from before it and the fields after it. */
-export interface CloudUsage {
+export interface CloudUsage extends GbHourRates {
 	includedGbMinutes: number | null;
 	usedGbMinutes: number;
 	overageGbMinutes: number;
@@ -40,8 +44,6 @@ export interface CloudUsage {
 	/** Null when Autumn decides it on a rule this does not read: a percentage cap, a usage limit. */
 	limitReached: boolean | null;
 	autoTopup: CloudAutoTopup | null;
-	pack: GbHourPack | null;
-	overagePerGbHour: number | null;
 	resetsAt: string | null;
 }
 
@@ -54,27 +56,20 @@ function sum(values: number[]): number {
 export function cloudUsageFromBalances(
 	balances: Customer["balances"],
 	billingControls?: Customer["billingControls"],
-	pack: GbHourPack | null = null,
-	overagePerGbHour: number | null = null,
+	plan: AutumnCatalogPlan | null = null,
 	seats: number | null = null,
 ): CloudUsage | null {
 	const balance = balances[BOX_GB_MINUTES_FEATURE_ID];
 	if (!balance) return null;
 	const breakdown = balance.breakdown ?? [];
-	const prepaid = breakdown.filter(
-		(item) => item.reset?.interval === "one_off",
-	);
+	const recurring = breakdown.filter(isRecurringGbMinuteRow);
+	const prepaid = breakdown.filter((item) => !isRecurringGbMinuteRow(item));
 	const credit = (rows: typeof prepaid): CloudCredit => ({
 		grantedGbMinutes: sum(
 			rows.map((item) => item.includedGrant + item.prepaidGrant),
 		),
 		remainingGbMinutes: sum(rows.map((item) => item.remaining)),
 	});
-	const isBought = (item: (typeof prepaid)[number]) =>
-		item.price?.billingMethod === "prepaid";
-	const recurring = breakdown.filter(
-		(item) => item.reset?.interval !== "one_off",
-	);
 	const topup = billingControls?.autoTopups?.find(
 		(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID,
 	);
@@ -116,8 +111,8 @@ export function cloudUsageFromBalances(
 					)
 				: Math.max(0, balance.usage - balance.granted),
 		prepaidGbMinutes: Math.max(0, sum(prepaid.map((item) => item.remaining))),
-		bought: credit(prepaid.filter(isBought)),
-		freeCredits: credit(prepaid.filter((item) => !isBought(item))),
+		bought: credit(prepaid.filter(isBoughtGbMinuteRow)),
+		freeCredits: credit(prepaid.filter((item) => !isBoughtGbMinuteRow(item))),
 		seats,
 		overageLimit,
 		limitReached:
@@ -132,8 +127,7 @@ export function cloudUsageFromBalances(
 					quantityGbMinutes: topup.quantity,
 				}
 			: null,
-		pack,
-		overagePerGbHour,
+		...gbHourRatesOf(balance, plan),
 		resetsAt: balance.nextResetAt
 			? new Date(balance.nextResetAt).toISOString()
 			: null,

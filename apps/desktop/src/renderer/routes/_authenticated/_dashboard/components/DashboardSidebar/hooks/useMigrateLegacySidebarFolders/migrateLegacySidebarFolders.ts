@@ -9,8 +9,7 @@ import {
 
 /**
  * In-place conversion of legacy folders (uuid-keyed rows whose membership
- * lives in local `sectionId` pointers) into tag-backed folders. §6 of
- * plans/20260828-workspace-tags-design.md:
+ * lives in local `sectionId` pointers) into tag-backed folders:
  *
  * - `tag === null` IS the "not converted" marker — no migration flag, so the
  *   pass is idempotent, resumable, and self-clearing.

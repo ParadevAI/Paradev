@@ -12,7 +12,20 @@ import SANDBOX from "./cloud-usage.sandbox.json";
  */
 
 const PER_SEAT = 72_000;
-const RATE = 0.06;
+
+interface Prices {
+	usageBased: { amount: number; billingUnits: number };
+	prepaid: { amount: number; billingUnits: number };
+}
+const CATALOG: Prices = {
+	usageBased: { amount: 1, billingUnits: 1000 },
+	prepaid: { amount: 0.06, billingUnits: 60 },
+};
+/** A Team version priced for one customer: $0.03 a GB-hour past the allowance, $0.04 bought. */
+const CUSTOM: Prices = {
+	usageBased: { amount: 0.5, billingUnits: 1000 },
+	prepaid: { amount: 0.04, billingUnits: 60 },
+};
 
 type Plan = "team" | "pro" | "enterprise";
 type Kind = "seats" | "priced" | "free" | "bought";
@@ -26,7 +39,7 @@ type Balance = Parameters<typeof cloudUsageFromBalances>[0][string];
 type Controls = NonNullable<Parameters<typeof cloudUsageFromBalances>[1]>;
 type Snapshot = Exclude<keyof typeof SANDBOX, "_source">;
 
-const kindOf = (row: Balance["breakdown"][number]): Kind =>
+const kindOf = (row: NonNullable<Balance["breakdown"]>[number]): Kind =>
 	row.price?.billingMethod === "usage_based"
 		? "priced"
 		: row.reset?.interval === "one_off"
@@ -43,6 +56,7 @@ class Ledger {
 	constructor(
 		public plan: Plan,
 		seats = 1,
+		public prices = CATALOG,
 	) {
 		this.overage = plan !== "team";
 		this.rows =
@@ -58,7 +72,9 @@ class Ledger {
 		this.plan = plan as Plan;
 		this.overage = overage;
 		this.metered = metered;
-		this.rows = (balance as unknown as Balance).breakdown.map((row) => ({
+		const { breakdown } = balance as unknown as Balance;
+		if (!breakdown) throw new Error(`${name} has no breakdown`);
+		this.rows = breakdown.map((row) => ({
 			kind: kindOf(row),
 			included: row.includedGrant,
 			prepaid: row.prepaidGrant,
@@ -84,9 +100,6 @@ class Ledger {
 			left -= drawn;
 		}
 	}
-	mayStart() {
-		return this.rows.reduce((total, row) => total + this.room(row), 0) >= 240;
-	}
 	credit(kind: "free" | "bought", gbMinutes: number) {
 		const row = this.rows.find((item) => item.kind === kind);
 		const field = kind === "free" ? "included" : "prepaid";
@@ -111,15 +124,10 @@ class Ledger {
 		for (const item of this.rows)
 			if (item.kind === "seats" || item.kind === "priced") item.usage = 0;
 	}
-	/** Closes the period; returns the dollars billing charges for usage. */
-	reset(): number {
-		const charged = this.rows
-			.filter((row) => row.kind === "priced")
-			.reduce((total, row) => total + Math.max(0, row.usage - row.included), 0);
+	reset() {
 		for (const row of this.rows)
 			if (row.kind === "seats" || row.kind === "priced") row.usage = 0;
 		this.metered = 0;
-		return (charged / 60) * RATE;
 	}
 	balance(): Balance {
 		const granted = this.rows.reduce(
@@ -152,15 +160,13 @@ class Ledger {
 				price:
 					row.kind === "priced"
 						? {
-								amount: 1,
-								billingUnits: 1000,
+								...this.prices.usageBased,
 								billingMethod: "usage_based",
 								maxPurchase: null,
 							}
 						: row.kind === "bought"
 							? {
-									amount: RATE,
-									billingUnits: 60,
+									...this.prices.prepaid,
 									billingMethod: "prepaid",
 									maxPurchase: null,
 								}
@@ -204,15 +210,16 @@ class Ledger {
 		const usage = cloudUsageFromBalances(
 			{ box_gb_minutes: this.balance() },
 			this.controls(),
-			null,
-			RATE,
 		);
 		if (!usage) throw new Error("no balance");
-		const { allowance } = allowanceOf(usage, new Date(), RATE);
-		const shown = cloudUsageDisplay(allowance, {
-			gbHours: this.metered / 60,
-			usd: (this.metered / 60) * RATE,
-		});
+		const rate = usage.overagePerGbHour;
+		if (rate === null) throw new Error("no usage-based price");
+		const { allowance } = allowanceOf(usage, new Date(), rate);
+		const shown = cloudUsageDisplay(
+			allowance,
+			{ gbHours: this.metered / 60, usd: (this.metered / 60) * rate },
+			rate,
+		);
 		const $ = (usd: number) => Math.round(usd * 100) / 100;
 		return {
 			used: $(shown.used.usd),
@@ -241,9 +248,6 @@ interface Expect {
 	held: number;
 	over?: number;
 	lines: string[];
-	mayStart: boolean;
-	/** Dollars for usage on the invoice at the reset just before. */
-	charged?: number;
 }
 
 const t = (track: number): Step => ({ track });
@@ -254,24 +258,36 @@ const SCENARIOS: {
 	name: string;
 	plan: Plan;
 	seats?: number;
+	prices?: Prices;
 	steps: [Step, Expect][];
 }[] = [
+	{
+		name: "A custom-priced Team customer: the card uses its own usage-based price",
+		plan: "team",
+		prices: CUSTOM,
+		steps: [
+			[t(36_000), { used: 18, held: 36, lines: ["included 18 of 36"] }],
+			[
+				{ buy: 6_000 },
+				{
+					used: 18,
+					held: 39,
+					lines: ["included 18 of 36", "bought 0 of 3"],
+				},
+			],
+		],
+	},
 	{
 		name: "Under the allowance, then a reset",
 		plan: "team",
 		steps: [
-			[
-				t(50_000),
-				{ used: 50, held: 72, lines: ["included 50 of 72"], mayStart: true },
-			],
+			[t(50_000), { used: 50, held: 72, lines: ["included 50 of 72"] }],
 			[
 				RESET,
 				{
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -280,18 +296,13 @@ const SCENARIOS: {
 		name: "Exactly at the allowance",
 		plan: "team",
 		steps: [
-			[
-				t(72_000),
-				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
-			],
+			[t(72_000), { used: 72, held: 72, lines: ["included 72 of 72"] }],
 			[
 				RESET,
 				{
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -302,7 +313,7 @@ const SCENARIOS: {
 		steps: [
 			[
 				{ sandbox: "team-at-limit-past-it-dropped", metered: 73_440 },
-				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
+				{ used: 72, held: 72, lines: ["included 72 of 72"] },
 			],
 			[
 				RESET,
@@ -310,8 +321,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -326,7 +335,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 144,
 					lines: ["included 0 of 72", "bought 0 of 72"],
-					mayStart: true,
 				},
 			],
 			[
@@ -335,7 +343,6 @@ const SCENARIOS: {
 					used: 73.44,
 					held: 144,
 					lines: ["included 72 of 72", "bought 1.44 of 72"],
-					mayStart: true,
 				},
 			],
 			[
@@ -344,8 +351,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 142.56,
 					lines: ["included 0 of 72", "bought 0 of 70.56"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -361,7 +366,6 @@ const SCENARIOS: {
 					held: 50,
 					over: 1,
 					lines: ["included 50 of 50"],
-					mayStart: true,
 				},
 			],
 			[
@@ -370,8 +374,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 50,
 					lines: ["included 0 of 50"],
-					mayStart: true,
-					charged: 1,
 				},
 			],
 		],
@@ -386,7 +388,6 @@ const SCENARIOS: {
 					used: 75,
 					held: 78,
 					lines: ["included 72 of 72", "bought 3 of 6"],
-					mayStart: true,
 				},
 			],
 			[
@@ -395,7 +396,6 @@ const SCENARIOS: {
 					used: 1,
 					held: 75,
 					lines: ["included 1 of 72", "bought 0 of 3"],
-					mayStart: true,
 				},
 			],
 		],
@@ -410,7 +410,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 144,
 					lines: ["included 0 of 72", "bought 0 of 72"],
-					mayStart: true,
 				},
 			],
 			[
@@ -419,7 +418,6 @@ const SCENARIOS: {
 					used: 100,
 					held: 144,
 					lines: ["included 72 of 72", "bought 28 of 72"],
-					mayStart: true,
 				},
 			],
 			[
@@ -428,8 +426,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 116,
 					lines: ["included 0 of 72", "bought 0 of 44"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 			[
@@ -438,7 +434,6 @@ const SCENARIOS: {
 					used: 80,
 					held: 116,
 					lines: ["included 72 of 72", "bought 8 of 44"],
-					mayStart: true,
 				},
 			],
 			[
@@ -447,8 +442,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 108,
 					lines: ["included 0 of 72", "bought 0 of 36"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -463,7 +456,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 82,
 					lines: ["included 0 of 72", "freeCredits 0 of 10"],
-					mayStart: true,
 				},
 			],
 			[
@@ -472,7 +464,6 @@ const SCENARIOS: {
 					used: 75,
 					held: 82,
 					lines: ["included 72 of 72", "freeCredits 3 of 10"],
-					mayStart: true,
 				},
 			],
 			[
@@ -481,8 +472,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 79,
 					lines: ["included 0 of 72", "freeCredits 0 of 7"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -491,17 +480,13 @@ const SCENARIOS: {
 		name: "Limit reached, then a pack bought: the card never reads lower than the page, so the dropped usage counts against the pack",
 		plan: "team",
 		steps: [
-			[
-				t(72_600),
-				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
-			],
+			[t(72_600), { used: 72, held: 72, lines: ["included 72 of 72"] }],
 			[
 				{ buy: 6_000 },
 				{
 					used: 72.6,
 					held: 78.6,
 					lines: ["included 72 of 72", "bought 0.6 of 6.6"],
-					mayStart: true,
 				},
 			],
 		],
@@ -516,7 +501,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 78,
 					lines: ["included 0 of 72", "bought 0 of 6"],
-					mayStart: true,
 				},
 			],
 			[
@@ -525,7 +509,6 @@ const SCENARIOS: {
 					used: 72,
 					held: 78,
 					lines: ["included 72 of 72", "bought 0 of 6"],
-					mayStart: true,
 				},
 			],
 			[
@@ -534,7 +517,6 @@ const SCENARIOS: {
 					used: 73.2,
 					held: 79.2,
 					lines: ["included 72 of 72", "bought 1.2 of 7.2"],
-					mayStart: true,
 				},
 			],
 		],
@@ -549,7 +531,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 78,
 					lines: ["included 0 of 72", "bought 0 of 6"],
-					mayStart: true,
 				},
 			],
 			[
@@ -558,7 +539,6 @@ const SCENARIOS: {
 					used: 78,
 					held: 78,
 					lines: ["included 72 of 72", "bought 6 of 6"],
-					mayStart: false,
 				},
 			],
 			[
@@ -567,8 +547,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -579,7 +557,7 @@ const SCENARIOS: {
 		steps: [
 			[
 				{ sandbox: "team-at-limit-past-it-dropped", metered: 72_300 },
-				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
+				{ used: 72, held: 72, lines: ["included 72 of 72"] },
 			],
 			[
 				RESET,
@@ -587,14 +565,9 @@ const SCENARIOS: {
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
-			[
-				t(300),
-				{ used: 0.3, held: 72, lines: ["included 0.3 of 72"], mayStart: true },
-			],
+			[t(300), { used: 0.3, held: 72, lines: ["included 0.3 of 72"] }],
 		],
 	},
 	{
@@ -607,7 +580,6 @@ const SCENARIOS: {
 					used: 72,
 					held: 72,
 					lines: ["included 72 of 72"],
-					mayStart: false,
 				},
 			],
 			[
@@ -616,8 +588,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 8,
 				},
 			],
 		],
@@ -626,14 +596,8 @@ const SCENARIOS: {
 		name: "A seat added after the limit",
 		plan: "team",
 		steps: [
-			[
-				t(72_000),
-				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
-			],
-			[
-				{ seats: 2 },
-				{ used: 72, held: 144, lines: ["included 72 of 144"], mayStart: true },
-			],
+			[t(72_000), { used: 72, held: 72, lines: ["included 72 of 72"] }],
+			[{ seats: 2 }, { used: 72, held: 144, lines: ["included 72 of 144"] }],
 		],
 	},
 	{
@@ -641,22 +605,14 @@ const SCENARIOS: {
 		plan: "team",
 		seats: 2,
 		steps: [
-			[
-				t(92_000),
-				{ used: 92, held: 144, lines: ["included 92 of 144"], mayStart: true },
-			],
-			[
-				{ seats: 1 },
-				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
-			],
+			[t(92_000), { used: 92, held: 144, lines: ["included 92 of 144"] }],
+			[{ seats: 1 }, { used: 72, held: 72, lines: ["included 72 of 72"] }],
 			[
 				RESET,
 				{
 					used: 0,
 					held: 72,
 					lines: ["included 0 of 72"],
-					mayStart: true,
-					charged: 0,
 				},
 			],
 		],
@@ -665,13 +621,10 @@ const SCENARIOS: {
 		name: "An upgrade to Ultra mid-period: billing starts its usage at 0, the card keeps the period's",
 		plan: "team",
 		steps: [
-			[
-				t(50_000),
-				{ used: 50, held: 72, lines: ["included 50 of 72"], mayStart: true },
-			],
+			[t(50_000), { used: 50, held: 72, lines: ["included 50 of 72"] }],
 			[
 				{ upgradeToUltra: true },
-				{ used: 50, held: 240, lines: ["included 50 of 240"], mayStart: true },
+				{ used: 50, held: 240, lines: ["included 50 of 240"] },
 			],
 		],
 	},
@@ -686,7 +639,6 @@ const SCENARIOS: {
 					held: 50,
 					over: 150,
 					lines: ["included 50 of 50"],
-					mayStart: false,
 				},
 			],
 			[
@@ -695,8 +647,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 50,
 					lines: ["included 0 of 50"],
-					mayStart: true,
-					charged: 150,
 				},
 			],
 		],
@@ -705,14 +655,8 @@ const SCENARIOS: {
 		name: "Pro with overage off: as Team",
 		plan: "pro",
 		steps: [
-			[
-				{ overage: false },
-				{ used: 0, held: 50, lines: ["included 0 of 50"], mayStart: true },
-			],
-			[
-				t(52_000),
-				{ used: 50, held: 50, lines: ["included 50 of 50"], mayStart: false },
-			],
+			[{ overage: false }, { used: 0, held: 50, lines: ["included 0 of 50"] }],
+			[t(52_000), { used: 50, held: 50, lines: ["included 50 of 50"] }],
 		],
 	},
 	{
@@ -726,7 +670,6 @@ const SCENARIOS: {
 					held: 50,
 					over: 450,
 					lines: ["included 50 of 50"],
-					mayStart: true,
 				},
 			],
 			[
@@ -735,8 +678,6 @@ const SCENARIOS: {
 					used: 0,
 					held: 50,
 					lines: ["included 0 of 50"],
-					mayStart: true,
-					charged: 450,
 				},
 			],
 		],
@@ -744,10 +685,9 @@ const SCENARIOS: {
 ];
 
 describe("cloud usage card across billing periods", () => {
-	test.each(SCENARIOS)("$name", ({ plan, seats, steps }) => {
-		const ledger = new Ledger(plan, seats);
+	test.each(SCENARIOS)("$name", ({ plan, seats, prices, steps }) => {
+		const ledger = new Ledger(plan, seats, prices);
 		for (const [step, expected] of steps) {
-			let charged: number | undefined;
 			if ("track" in step) ledger.track(step.track);
 			if ("buy" in step) ledger.credit("bought", step.buy);
 			if ("free" in step) ledger.credit("free", step.free);
@@ -756,12 +696,8 @@ describe("cloud usage card across billing periods", () => {
 			if ("overage" in step) ledger.overage = step.overage;
 			if ("sandbox" in step) ledger.load(step.sandbox, step.metered);
 			if ("notCounted" in step) ledger.metered += step.notCounted;
-			if ("reset" in step) charged = Math.round(ledger.reset() * 100) / 100;
-			expect({
-				...ledger.card(),
-				mayStart: ledger.mayStart(),
-				...(charged === undefined ? {} : { charged }),
-			}).toEqual({ over: null, ...expected });
+			if ("reset" in step) ledger.reset();
+			expect(ledger.card()).toEqual({ over: null, ...expected });
 		}
 	});
 });

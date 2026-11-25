@@ -26,7 +26,7 @@ export default command({
 		if (!found.session) {
 			throw new CLIError(
 				`Session not found in workspace ${options.workspace}: ${options.session}`,
-				"Run `superset sessions list` to see chat sessions in this workspace",
+				"Run `paradev sessions list` to see chat sessions in this workspace",
 			);
 		}
 

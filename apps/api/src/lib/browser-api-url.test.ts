@@ -13,8 +13,6 @@ for (const browserUrl of [
 			...process.env,
 			NEXT_PUBLIC_API_URL: identityUrl,
 			BROWSER_API_URL: browserUrl,
-			PLUGIN_CLIENT_METADATA_BASE_URL:
-				browserUrl === "" ? "https://metadata.test" : undefined,
 			SKIP_ENV_VALIDATION: "1",
 		};
 		if (browserUrl === undefined) delete env.BROWSER_API_URL;
@@ -74,8 +72,6 @@ for (const browserUrl of [
 		expect(result.exitCode, result.stderr.toString()).toBe(0);
 		const config = JSON.parse(result.stdout.toString().trim());
 		const expectedUrl = browserUrl || identityUrl;
-		const metadataUrl =
-			browserUrl === "" ? "https://metadata.test" : identityUrl;
 		expect(config.baseURL).toBe(expectedUrl);
 		expect(config.authorizationRedirect).toBe(
 			`${expectedUrl}/api/integrations/google/callback`,
@@ -86,19 +82,11 @@ for (const browserUrl of [
 			identityUrl,
 		]);
 		expect(config.clientDocument.client_id).toBe(
-			`${metadataUrl}/api/connectors/google/client-metadata`,
+			`${expectedUrl}/api/connectors/google/client-metadata`,
 		);
-		expect(config.clientDocument.redirect_uris).toContain(
+		expect(config.clientDocument.redirect_uris).toEqual([
 			`${expectedUrl}/api/connectors/callback/google`,
-		);
-		if (expectedUrl.startsWith("https")) {
-			expect(config.clientDocument.redirect_uris).toContain(
-				"https://api.superset.sh/api/connectors/callback/google",
-			);
-			expect(config.clientDocument.redirect_uris).toContain(
-				"https://api.paradev.com/api/connectors/callback/google",
-			);
-		}
+		]);
 		expect(config.issuer).toBe(identityUrl);
 		for (const metadata of [config.metadata, config.openid]) {
 			expect(metadata.issuer).toBe(identityUrl);
@@ -136,7 +124,7 @@ for (const browserUrl of [
 			`${expectedUrl}/api/github/user/callback`,
 		);
 		expect(config.clientMetadata).toBe(
-			`${metadataUrl}/api/connectors/test/client-metadata`,
+			`${expectedUrl}/api/connectors/test/client-metadata`,
 		);
 		expect(config.cookie.includes(" Secure;")).toBe(
 			expectedUrl.startsWith("https"),

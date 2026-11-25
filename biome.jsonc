@@ -12,7 +12,8 @@
 			"!**/*.template.js",
 			"!**/*.template.sh",
 			"!**/*.template.ts",
-			"!**/plans",
+			"!plans",
+			"!apps/*/plans",
 			"!**/*.generated.ts",
 			// Lingui catalogs: .po plus compiled messages.ts (lingui compile output).
 			"!packages/i18n/locales",
@@ -58,6 +59,7 @@
 								"importNames": [
 									"queryFleetCloudUsage",
 									"queryFleetCloudUsageByWorkspaceDay",
+									"queryFleetCloudUsageSeries",
 									"listFleetCloudBoots",
 									"getFleetCloudBoot"
 								],

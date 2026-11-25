@@ -35,6 +35,7 @@ export const RATE = 0.06;
 const CLOUD_USAGE_DAILY_MIGRATIONS = [
 	"0201_cloud_usage_daily_trigger.sql",
 	"0202_cloud_usage_daily_backfill.sql",
+	"0204_cloud_billing_day_start.sql",
 ].map((name) => new URL(`../drizzle/${name}`, import.meta.url));
 
 /** An in-process Postgres with the cloud usage tables, seeded with two organizations. */

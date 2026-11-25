@@ -4,10 +4,10 @@ import {
 	getPaneScrollState,
 	savePaneScrollState,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/state/paneScrollStateCache";
+import { CodeEditor } from "renderer/routes/_authenticated/components/CodeEditor";
+import type { CodeEditorAdapter } from "renderer/routes/_authenticated/components/CodeEditor/CodeEditorAdapter";
 import { detectLanguage } from "shared/detect-language";
 import type { ViewProps } from "../../types";
-import { CodeEditor } from "./components/CodeEditor";
-import type { CodeEditorAdapter } from "./components/CodeEditor/CodeEditorAdapter";
 
 import { usePendingFilePosition } from "./hooks/usePendingFilePosition";
 

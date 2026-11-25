@@ -151,6 +151,6 @@ describe("gitPushSnapshotTask", () => {
 		expect(await remote.show([`${commit}:tracked.txt`])).toBe("edited\n");
 		expect(
 			(await remote.raw(["log", "-1", "--format=%an <%ae>", commit])).trim(),
-		).toBe("Superset <teleport@superset.sh>");
+		).toBe("Paradev <teleport@superset.sh>");
 	});
 });

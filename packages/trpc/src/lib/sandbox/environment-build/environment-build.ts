@@ -5,7 +5,7 @@ import type { NetworkPolicy } from "@vercel/sandbox";
 import { FatalError } from "workflow";
 import { resolveEnvironment } from "../../../router/environment/resolve-environment";
 import { deriveSandboxCredentials } from "../credentials";
-import { readRepoHooks } from "../repo-hooks";
+import { environmentHooks } from "../repo-hooks";
 import {
 	cloneUrl,
 	installationTokenFor,
@@ -14,7 +14,7 @@ import {
 } from "../repositories";
 import type { BuildCheckout } from "./policy";
 
-const BUILD_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
+const BUILD_AUTHOR = { name: "Paradev", email: "noreply@superset.sh" };
 export const BOX_READY_MS = 45_000;
 
 export function buildBoxName(buildId: string): string {
@@ -90,11 +90,18 @@ async function readBuildInputs(
 		...repositories.filter((row) => row.id !== primary.id),
 	];
 	const baseBranch = primary.defaultBranch;
-	const token = await installationTokenFor(ordered);
-	const [hooks, environment] = await Promise.all([
-		readRepoHooks({ repo: primary, branch: baseBranch, token }),
-		resolveEnvironment(build.environmentId, build.organizationId),
-	]);
+	const token = (await installationTokenFor(ordered))?.token ?? null;
+	const environment = await resolveEnvironment(
+		build.environmentId,
+		build.organizationId,
+	);
+	const config = environment?.config ?? null;
+	const hooks = await environmentHooks({
+		config,
+		repo: primary,
+		branch: baseBranch,
+		token,
+	});
 	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
 		workspaceId: build.id,
 		environmentEnv: environment?.envs ?? {},
@@ -104,7 +111,9 @@ async function readBuildInputs(
 	});
 	return {
 		install: hooks?.install ?? null,
-		installSource: `${primary.fullName}@${baseBranch}`,
+		installSource: config?.trim()
+			? "the environment's config"
+			: `.paradev/config.toml on ${primary.fullName}@${baseBranch}`,
 		checkouts: ordered.map((repository) => ({
 			url: cloneUrl(repository),
 			branch: repository.defaultBranch,

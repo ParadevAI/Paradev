@@ -86,4 +86,13 @@ describe("APP_COMMANDS", () => {
 		expect(command("automation").run(context, "", COMPOSER)).toBe("bad-args");
 		expect(command("fast").run(context, "faster", COMPOSER)).toBe("bad-args");
 	});
+
+	test("explains an unavailable fast mode instead of passing /fast to the agent", () => {
+		const explainUnavailable = mock(() => {});
+		const context: AppCommandContext = { fast: { explainUnavailable } };
+		expect(availableNames(context)).toContain("fast");
+		expect(listedNames(context)).not.toContain("fast");
+		expect(command("fast").run(context, "on", COMPOSER)).toBe("done");
+		expect(explainUnavailable).toHaveBeenCalledTimes(1);
+	});
 });

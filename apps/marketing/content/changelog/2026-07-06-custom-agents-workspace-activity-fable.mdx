@@ -5,37 +5,37 @@ date: 2026-07-06
 
 ## Bring Your Own Terminal Agents <PRBadge url="https://github.com/superset-sh/superset/pull/5420" />
 
-You can now add your own custom terminal agents alongside the built-ins, each with its own icon and launch command.
+You can now add your own terminal agents next to the built-in ones, each with its own icon and launch command.
 
 <Video src="/changelog/2026-07-06-custom-agents.mp4" title="Add a custom terminal agent from Settings → Agents" />
 
 - Register any CLI agent and give it a name and icon
-- Runs everywhere the built-in agents do
-- Polygraph ships as a new built-in terminal agent <PRBadge url="https://github.com/superset-sh/superset/pull/5422" />
+- It runs everywhere the built-in agents run
+- Polygraph is a new built-in terminal agent <PRBadge url="https://github.com/superset-sh/superset/pull/5422" />
 
 ## Redesigned Workspace Activity Strip <PRBadge url="https://github.com/superset-sh/superset/pull/5439" />
 
-The v2 sidebar now surfaces what each workspace is actually doing in a single compact activity strip.
+The v2 sidebar now shows what each workspace is doing in one compact activity strip.
 
 <Video src="/changelog/2026-07-06-activity-strip.mp4" title="Running agents and open ports shown inline on the workspace item" />
 
-- Running agents and open ports live inline on the workspace item <PRBadge url="https://github.com/superset-sh/superset/pull/5414" />
+- Running agents and open ports show inline on the workspace item <PRBadge url="https://github.com/superset-sh/superset/pull/5414" />
 - Running and PR state persist across restarts, with a Clear Status action <PRBadge url="https://github.com/superset-sh/superset/pull/5349" />
-- Live-work sections are emphasized so in-progress workspaces stand out <PRBadge url="https://github.com/superset-sh/superset/pull/5416" />
-- Agent chips stay hidden unless multiple agents are running <PRBadge url="https://github.com/superset-sh/superset/pull/5445" />
+- Sections with live work have more emphasis, so in-progress workspaces stand out <PRBadge url="https://github.com/superset-sh/superset/pull/5416" />
+- Agent chips stay hidden unless more than one agent is running <PRBadge url="https://github.com/superset-sh/superset/pull/5445" />
 
 ## Fable 5 and Reasoning Effort <PRBadge url="https://github.com/superset-sh/superset/pull/5418" />
 
-Launch agents with the Fable model family and pick a reasoning-effort level right from the workspace.
+Launch agents with the Fable model family and pick a reasoning-effort level from the workspace.
 
 ![New workspace dialog: pick the model (Fable, Opus, Sonnet, Haiku) and reasoning effort inline](/changelog/2026-07-06-model-picker.png)
 
-- Fable 5 available in the copilot, cursor-agent, and opencode model pickers <PRBadge url="https://github.com/superset-sh/superset/pull/5435" />
-- Model picker added to the workspace create dialog <PRBadge url="https://github.com/superset-sh/superset/pull/5248" />
+- Fable 5 is available in the copilot, cursor-agent, and opencode model pickers <PRBadge url="https://github.com/superset-sh/superset/pull/5435" />
+- The workspace create dialog has a model picker <PRBadge url="https://github.com/superset-sh/superset/pull/5248" />
 
 ## Workspace Dock Badge <PRBadge url="https://github.com/superset-sh/superset/pull/5351" />
 
-The macOS dock icon now shows a badge for workspaces with unread activity or that need your attention, so you can step away and still know when an agent wants you.
+The macOS dock icon now shows a badge when a workspace has unread activity or needs your attention. You can step away and still know when an agent needs you.
 
 ![Paradev dock icon showing an attention badge for workspaces that need you](/changelog/2026-07-06-dock-badge.png)
 
@@ -47,27 +47,27 @@ The macOS dock icon now shows a badge for workspaces with unread activity or tha
 
 ![Workspaces table grouped by project with sortable Host, Branch, and Created columns](/changelog/2026-07-06-workspaces-table.png)
 
-- **Loud automation failures** - Automation runs now surface failures instead of failing silently <PRBadge url="https://github.com/superset-sh/superset/pull/4817" />
-- **View files outside the workspace root** - Open and inspect files beyond the workspace directory <PRBadge url="https://github.com/superset-sh/superset/pull/5427" />
+- **Loud automation failures** - Automation runs now show failures and no longer fail silently <PRBadge url="https://github.com/superset-sh/superset/pull/4817" />
+- **View files outside the workspace root** - Open and inspect files outside the workspace directory <PRBadge url="https://github.com/superset-sh/superset/pull/5427" />
 - **"Last used" sign-in badge** - See which method you last signed in with <PRBadge url="https://github.com/superset-sh/superset/pull/5432" />
-- **Restored-session separator** - A clear marker shows where a v2 terminal cold-restored a previous session <PRBadge url="https://github.com/superset-sh/superset/pull/5448" />
-- **Quit Paradev Completely** - New macOS app menu item to fully quit <PRBadge url="https://github.com/superset-sh/superset/pull/5419" />
-- **Configurable port badges** - Choose where v2 port badges open from Settings → Links <PRBadge url="https://github.com/superset-sh/superset/pull/5350" />
+- **Restored-session separator** - A marker shows where a v2 terminal restored an earlier session <PRBadge url="https://github.com/superset-sh/superset/pull/5448" />
+- **Quit Paradev Completely** - A new macOS app menu item to fully quit <PRBadge url="https://github.com/superset-sh/superset/pull/5419" />
+- **Configurable port badges** - Choose where v2 port badges open in **Settings → Links** <PRBadge url="https://github.com/superset-sh/superset/pull/5350" />
 
 ---
 
 **Bug fixes**
 
-- Fixed file navigator lag and empty-folder-on-expand <PRBadge url="https://github.com/superset-sh/superset/pull/4961" />
-- Fixed Cmd+Backspace sending a bare Ctrl-U in the terminal <PRBadge url="https://github.com/superset-sh/superset/pull/5388" />
-- Shift+Enter now inserts a newline in terminal chat TUIs <PRBadge url="https://github.com/superset-sh/superset/pull/5434" />
-- Restored the native right-click edit menu for text inputs <PRBadge url="https://github.com/superset-sh/superset/pull/5441" />
-- Batched folder-level Discard All to avoid git index.lock races <PRBadge url="https://github.com/superset-sh/superset/pull/5442" />
-- Fixed terminal resize bricking the parser mid inline-image decode <PRBadge url="https://github.com/superset-sh/superset/pull/5352" />
-- Kept workspace PR and diff state from drifting out of sync with GitHub <PRBadge url="https://github.com/superset-sh/superset/pull/5455" />
-- Recovered v2 open ports promptly after a host-service restart <PRBadge url="https://github.com/superset-sh/superset/pull/5430" />
-- Detect ports for terminals without an attached renderer <PRBadge url="https://github.com/superset-sh/superset/pull/5325" />
-- Kept device and workspace host in sync for automations <PRBadge url="https://github.com/superset-sh/superset/pull/5394" />
-- Fixed billing to read invoices from the org's canonical Stripe customer <PRBadge url="https://github.com/superset-sh/superset/pull/5406" />
-- Stopped force reload from hijacking reopen tab <PRBadge url="https://github.com/superset-sh/superset/pull/5121" />
-- Kept traffic-light chrome and sidebar icons a constant size under page zoom <PRBadge url="https://github.com/superset-sh/superset/pull/5390" />
+- The file navigator no longer lags or shows an empty folder on expand <PRBadge url="https://github.com/superset-sh/superset/pull/4961" />
+- ⌘⌫ no longer sends a bare Ctrl-U in the terminal <PRBadge url="https://github.com/superset-sh/superset/pull/5388" />
+- ⇧Enter now inserts a newline in terminal chat TUIs <PRBadge url="https://github.com/superset-sh/superset/pull/5434" />
+- Text inputs have the native right-click edit menu again <PRBadge url="https://github.com/superset-sh/superset/pull/5441" />
+- Folder-level Discard All no longer hits git index.lock races <PRBadge url="https://github.com/superset-sh/superset/pull/5442" />
+- A terminal resize during an inline-image decode no longer breaks the parser <PRBadge url="https://github.com/superset-sh/superset/pull/5352" />
+- Workspace PR and diff state stay in sync with GitHub <PRBadge url="https://github.com/superset-sh/superset/pull/5455" />
+- v2 open ports come back promptly after a host-service restart <PRBadge url="https://github.com/superset-sh/superset/pull/5430" />
+- Port detection works for terminals without an attached renderer <PRBadge url="https://github.com/superset-sh/superset/pull/5325" />
+- Device and workspace host stay in sync for automations <PRBadge url="https://github.com/superset-sh/superset/pull/5394" />
+- Billing reads invoices from the org's canonical Stripe customer <PRBadge url="https://github.com/superset-sh/superset/pull/5406" />
+- Force reload no longer takes over reopen tab <PRBadge url="https://github.com/superset-sh/superset/pull/5121" />
+- Traffic-light chrome and sidebar icons keep a constant size under page zoom <PRBadge url="https://github.com/superset-sh/superset/pull/5390" />

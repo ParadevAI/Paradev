@@ -2,8 +2,7 @@
 
 // The single entry point for releases (`bun run release`). Routes to the desktop
 // or CLI flow so the whole bundle (desktop + host-service + cli) can't drift —
-// both flows and the CI guard share ./lib.ts. See
-// plans/20260709-unified-version-bumping.md.
+// both flows and the CI guard share ./lib.ts.
 //
 // Agent-friendly: every action is reachable non-interactively via subcommands +
 // flags. The interactive menu only runs on a TTY; otherwise usage is printed.

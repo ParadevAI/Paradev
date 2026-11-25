@@ -32,10 +32,18 @@ export const metricsSchema = z.object({
 	usageUsd: z.number().nullable(),
 });
 
+/** The zone of a billing day, `groupBy: "billingDay"`: Vercel bills by the Pacific day. */
+export const BILLING_TIME_ZONE = "America/Los_Angeles";
+
+/** Usage metrics as `usage.query` returns them: `workspaces` is null when grouped by `billingDay`, whose daily rollup has no workspace. */
+const usageMetricsSchema = metricsSchema.extend({
+	workspaces: z.number().nullable(),
+});
+
 export const cloudUsageOutputSchema = z.object({
 	range: windowSchema,
 	items: z.array(
-		metricsSchema.extend({
+		usageMetricsSchema.extend({
 			key: z.string().nullable(),
 			label: z.string().nullable(),
 			/** Grouped by user only: the person's usage on each UTC day that has any. */
@@ -72,7 +80,7 @@ export const cloudUsageOutputSchema = z.object({
 				.nullable(),
 		}),
 	),
-	total: metricsSchema,
+	total: usageMetricsSchema,
 	/**
 	 * Rows across every page; 0 with no groupBy. Grouped by workspace it counts the one row of usage
 	 * with no workspace (key null), which `total.workspaces` does not.
@@ -132,6 +140,12 @@ export const cloudPeriodsOutputSchema = z.object({
 			start: z.date(),
 			end: z.date(),
 			closed: z.boolean(),
+			/**
+			 * Deprecated: the dollar fields `usedUsd`, `includedUsd`, `overageUsd`, `bought.usedUsd`,
+			 * `bought.totalUsd`, `freeCredits.usedUsd`, `freeCredits.totalUsd` and `extraUsageLimit.usd`.
+			 * Desktop 2.0.10 reads all eight; remove them together once the desktop floor is past it.
+			 * Price with `ratePerGbHour`.
+			 */
 			allowance: z
 				.object({
 					includedGbHours: z.number().nullable(),
@@ -158,4 +172,8 @@ export const cloudPeriodsOutputSchema = z.object({
 		}),
 	),
 	nextCursor: z.iso.date().nullable(),
+	/** The organization's price of one GB-hour; null when it is not known, and then no amount has a price. */
+	ratePerGbHour: z.number().nullable(),
+	/** What the organization paid for one GB-hour of the credit it bought; null with none bought. */
+	boughtPerGbHour: z.number().nullable(),
 });

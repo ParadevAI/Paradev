@@ -42,12 +42,12 @@ const sum = (amounts: Amount[]): Amount => ({
 export function cloudUsageDisplay(
 	allowance: CloudAllowance | null,
 	metered: Amount,
+	/** The organization's price of one GB-hour, from `cloud.periods.list`; null shows `metered` only. */
+	ratePerGbHour: number | null,
 ): CloudUsageDisplay {
 	if (
 		allowance?.includedGbHours == null ||
-		allowance.includedUsd === null ||
-		allowance.usedUsd === null ||
-		allowance.overageUsd === null ||
+		ratePerGbHour === null ||
 		allowance.usedGbHours < 0
 	) {
 		return {
@@ -60,15 +60,9 @@ export function cloudUsageDisplay(
 			lines: [],
 		};
 	}
-	const perGbHour =
-		metered.gbHours > 0
-			? metered.usd / metered.gbHours
-			: allowance.includedGbHours > 0
-				? allowance.includedUsd / allowance.includedGbHours
-				: 0;
 	const amount = (gbHours: number): Amount => ({
 		gbHours,
-		usd: gbHours * perGbHour,
+		usd: gbHours * ratePerGbHour,
 	});
 	const billedOver = allowance.overageGbHours;
 	const includedUsed = Math.min(

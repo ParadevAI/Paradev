@@ -10,7 +10,9 @@ import type {
 	PersonRef,
 	WorkspaceRef,
 } from "../types";
+import { billingDate, billingDays } from "../utils/billingDay";
 import { type Priced, priced } from "../utils/priced";
+import { usageRange } from "../utils/usageRange";
 
 /**
  * Story data in the router's output shapes, for states the router can return. Each allowance
@@ -20,10 +22,9 @@ import { type Priced, priced } from "../utils/priced";
 
 const RATE = 0.06;
 const MINUTES = 60;
-const DAY_MS = 24 * 60 * 60 * 1000;
 /** The stories' clock, so captures do not change from day to day. */
-export const STORY_NOW = new Date("2026-11-18T14:00:00Z");
-export const STORY_TODAY = "2026-11-18";
+export const STORY_NOW = new Date("2026-11-18T22:00:00Z");
+export const STORY_TODAY = billingDate(STORY_NOW);
 /** The share of the open period's usage each earlier period had, newest first. */
 const PERIOD_SHARE = [1, 0.86, 0.71, 0.58, 0.44, 0];
 
@@ -298,20 +299,22 @@ export const withoutRate = (page: Usage): CloudUsage => ({
 	total: { ...page.total, usageUsd: null },
 });
 
-/** One row per day of the range up to today, as the router groups by day. */
+/** One row per billing day of the range up to today, as the router groups by `billingDay`: no workspaces count. */
 function byDay({ rows, boots }: Fleet, range: Range): Usage {
 	const days = new Map<string, Boot[]>();
-	for (let t = range.from.getTime(); t < range.to.getTime(); t += DAY_MS) {
-		if (t <= STORY_NOW.getTime()) days.set(day(new Date(t)), []);
+	for (const key of billingDays(range)) {
+		if (key <= STORY_TODAY) days.set(key, []);
 	}
-	for (const boot of boots) days.get(day(boot.startedAt))?.push(boot);
+	for (const boot of boots) days.get(billingDate(boot.startedAt))?.push(boot);
 	const items = [...days].map(([key, list]) => ({
 		key,
 		label: key,
 		ref: null,
 		...metricsOf(list),
+		workspaces: null,
 	}));
-	return usage(items, rows, range);
+	const page = usage(items, rows, range);
+	return { ...page, total: { ...page.total, workspaces: null } };
 }
 
 /** `groupBy: "user"`, with each person's days. */
@@ -367,11 +370,11 @@ const periodRange = (back: number): Range => ({
 	to: new Date(Date.UTC(2026, 10 - back, 27)),
 });
 const CURRENT = periodRange(0);
-const TODAY_START = Date.parse(`${day(STORY_NOW)}T00:00:00Z`);
-/** The range with no billing periods: the last 30 UTC days, today included. */
+const lastDays = usageRange(undefined, STORY_NOW);
+/** The range with no billing periods, as the page asks for it. */
 const LAST_30_DAYS: Range = {
-	from: new Date(TODAY_START - 29 * DAY_MS),
-	to: new Date(TODAY_START + DAY_MS),
+	from: new Date(lastDays.from as string),
+	to: new Date(lastDays.to as string),
 };
 
 const PERIOD_END = new Date("2026-11-27T00:00:00Z");
@@ -683,7 +686,12 @@ function periodList(state: BillingState, member = false): CloudPeriods {
 			metrics: total(member ? rows.filter(isMember) : rows),
 		};
 	});
-	return { items, nextCursor: null };
+	return {
+		items,
+		nextCursor: null,
+		ratePerGbHour: RATE,
+		boughtPerGbHour: RATE,
+	};
 }
 
 const noop = () => undefined;
@@ -745,7 +753,12 @@ export function overviewArgs(
 /** An organization with no billing periods: the last 30 days, priced at the list rate. */
 export function noPeriodsArgs() {
 	return {
-		periods: query<CloudPeriods>({ items: [], nextCursor: null }),
+		periods: query<CloudPeriods>({
+			items: [],
+			nextCursor: null,
+			ratePerGbHour: RATE,
+			boughtPerGbHour: null,
+		}),
 		period: undefined,
 		...overviewQueries(
 			fleet(NORTHWIND_SEEDS, 3100, LAST_30_DAYS),
@@ -761,6 +774,7 @@ export function cardArgs(state: BillingState, back = 0) {
 	const allowance = priced(args.period?.allowance ?? null);
 	return {
 		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		ratePerGbHour: RATE,
 		allowance,
 		unavailable: args.period?.unavailable ?? [],
 		isPeriod: true,
@@ -768,10 +782,29 @@ export function cardArgs(state: BillingState, back = 0) {
 	};
 }
 
+/** Under a cent of usage in the open period: a few minutes on a small box. */
+export function tinyUsageCardArgs() {
+	const args = cardArgs("trial");
+	if (!args.allowance) throw new Error("the trial state has an allowance");
+	const gbHours = 0.07;
+	return {
+		...args,
+		metered: { gbHours, usd: gbHours * RATE },
+		allowance: {
+			...args.allowance,
+			usedGbHours: gbHours,
+			usedUsd: gbHours * RATE,
+			overageGbHours: 0,
+			overageUsd: 0,
+		},
+	};
+}
+
 export function lastThirtyDaysCardArgs() {
 	const { total } = noPeriodsArgs().byDay.data as Usage;
 	return {
 		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		ratePerGbHour: RATE,
 		allowance: null,
 		unavailable: [],
 		isPeriod: false,

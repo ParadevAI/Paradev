@@ -23,19 +23,35 @@ export function AgentOptionsScreen({
 	groupHref,
 }: {
 	/** Where a "Pinned releases ›" row goes — this stack's group screen. */
-	groupHref: (params: { presetId: string; group: string }) => Href;
+	groupHref: (params: {
+		presetId: string;
+		group: string;
+		hostUrl?: string;
+		projectId?: string;
+		agent?: string;
+	}) => Href;
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
-	const { presetId, agentLabel } = useLocalSearchParams<{
-		presetId?: string;
-		agentLabel?: string;
-	}>();
+	const { presetId, agentLabel, hostUrl, agent, projectId } =
+		useLocalSearchParams<{
+			presetId?: string;
+			hostUrl?: string;
+			projectId?: string;
+			agent?: string;
+			agentLabel?: string;
+		}>();
 	const launchPresetId = presetId || null;
-	const { models, model, efforts, effort } =
-		useAgentLaunchPreferences(launchPresetId);
+	const {
+		models,
+		model,
+		efforts,
+		effort,
+		defaultModelLabel,
+		defaultEffortLabel,
+	} = useAgentLaunchPreferences(launchPresetId, { hostUrl, agent, projectId });
 	const setModel = useNewSessionPreferencesStore((state) => state.setModel);
 	const setEffort = useNewSessionPreferencesStore((state) => state.setEffort);
 	const { inline, groups } = splitModelCatalog(models ?? []);
@@ -80,6 +96,7 @@ export function AgentOptionsScreen({
 					<SectionLabel label={t({ message: "Model" })} />
 					<OptionRow
 						label={t({ message: "Default" })}
+						detail={defaultModelLabel}
 						isSelected={model === null}
 						onPress={() => pickModel(null)}
 						phLabel="new-session-model-row"
@@ -98,7 +115,13 @@ export function AgentOptionsScreen({
 							key={group}
 							onPress={() =>
 								router.push(
-									groupHref({ presetId: launchPresetId ?? "", group }),
+									groupHref({
+										presetId: launchPresetId ?? "",
+										group,
+										hostUrl,
+										projectId,
+										agent,
+									}),
 								)
 							}
 							className="flex-row items-center gap-2.5 py-2.5"
@@ -139,6 +162,7 @@ export function AgentOptionsScreen({
 					<SectionLabel label={t({ message: "Effort" })} />
 					<OptionRow
 						label={t({ message: "Default" })}
+						detail={model === null ? defaultEffortLabel : undefined}
 						isSelected={effort === null}
 						onPress={() => pickEffort(null)}
 						phLabel="new-session-effort-row"

@@ -7,6 +7,7 @@
 import { existsSync } from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { caught } from "../runtime/box-log-filter";
 import { DaemonSupervisor } from "./DaemonSupervisor.ts";
 
 let supervisor: DaemonSupervisor | null = null;
@@ -63,19 +64,24 @@ export function getSupervisor(scriptPath?: string): DaemonSupervisor {
 export function startDaemonBootstrap(organizationId: string): void {
 	if (bootstrapPromise) return;
 	const sup = getSupervisor();
-	console.log(`[supervisor] kicking off bootstrap for org=${organizationId}`);
+	console.log("[supervisor] kicking off bootstrap (org):", organizationId);
 	bootstrapPromise = sup
 		.ensure(organizationId)
 		.then((inst) => {
 			console.log(
-				`[supervisor] bootstrap OK for org=${organizationId} pid=${inst.pid} version=${inst.runningVersion}${inst.updatePending ? " (update pending)" : ""}`,
+				"[supervisor] bootstrap OK (org, pid, version, update pending):",
+				organizationId,
+				inst.pid,
+				inst.runningVersion,
+				inst.updatePending,
 			);
 			return inst;
 		})
 		.catch((err) => {
 			console.error(
-				`[supervisor] bootstrap failed for org=${organizationId}:`,
-				err,
+				"[supervisor] bootstrap failed (org):",
+				organizationId,
+				caught(err),
 			);
 			// Reset so a future request can retry.
 			bootstrapPromise = null;

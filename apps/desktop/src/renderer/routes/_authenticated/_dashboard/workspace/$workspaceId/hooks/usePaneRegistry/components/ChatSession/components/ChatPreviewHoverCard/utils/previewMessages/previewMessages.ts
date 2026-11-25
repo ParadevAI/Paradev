@@ -1,6 +1,7 @@
 import {
 	displayText,
 	emptySnapshot,
+	parseAttachmentTags,
 	reduceMany,
 	userMessageText,
 } from "@superset/chat/core";
@@ -32,7 +33,10 @@ export function previewMessages(
 		const user = userMessageSchema.safeParse(item);
 		if (user.success) {
 			if (user.data.discarded || user.data.queued) continue;
-			const text = excerpt(userMessageText(user.data, " "));
+			const typed = parseAttachmentTags(userMessageText(user.data, "\n"));
+			const text = excerpt(
+				typed.text || (typed.pastedTexts[0] ?? typed.quotes[0] ?? ""),
+			);
 			if (text) messages.push({ id, from: "user", text });
 		} else if (item.kind === "agent_message") {
 			const text = excerpt(displayText(snapshot, id));

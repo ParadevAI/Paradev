@@ -255,7 +255,7 @@ describe("probeIdentity", () => {
 			"tools/call",
 			"[DELETE]",
 		]);
-		expect(calls[2]?.params?.name).toBe("execute_sentry_tool");
+		expect(calls[2]?.params?.name).toBe("whoami");
 		expect(calls[1]?.protocolHeader).toBe("2025-06-18");
 		expect(calls[2]?.protocolHeader).toBe("2025-06-18");
 		expect(identity.account).toEqual({ id: "42", label: "h@tegon.ai" });
@@ -874,10 +874,10 @@ describe("authorization response issuer (RFC 9207)", () => {
 
 describe("authorizeUrl for a dynamic client", () => {
 	const realFetch = globalThis.fetch;
-	const realBase = process.env.PLUGIN_CLIENT_METADATA_BASE_URL;
+	const realBrowser = process.env.BROWSER_API_URL;
 
 	beforeEach(() => {
-		process.env.PLUGIN_CLIENT_METADATA_BASE_URL = "https://api.test";
+		process.env.BROWSER_API_URL = "https://api.test";
 		const routes: Record<string, unknown> = {
 			"https://mcp.granola.ai/.well-known/oauth-protected-resource/mcp": {
 				resource: "https://mcp.granola.ai/mcp",
@@ -928,9 +928,8 @@ describe("authorizeUrl for a dynamic client", () => {
 
 	afterEach(() => {
 		globalThis.fetch = realFetch;
-		if (realBase === undefined)
-			delete process.env.PLUGIN_CLIENT_METADATA_BASE_URL;
-		else process.env.PLUGIN_CLIENT_METADATA_BASE_URL = realBase;
+		if (realBrowser === undefined) delete process.env.BROWSER_API_URL;
+		else process.env.BROWSER_API_URL = realBrowser;
 	});
 
 	test("granola_mcp names the resource and asks for its scopes", async () => {

@@ -49,7 +49,7 @@ Two agents editing the same file on different branches means merge conflicts, an
 
 ```bash
 for slice in api cli web; do
-  superset workspaces create --project <projectId> \
+  paradev workspaces create --project <projectId> \
     --name "migrate-$slice" --branch "migrate/$slice" --local \
     --agent claude \
     --prompt "Migrate the $slice slice from moment to date-fns, per plan.md. Only touch files in your slice. Run the affected tests before finishing."
