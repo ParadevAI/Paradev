@@ -186,6 +186,18 @@ describe("ClaudeAdapter", () => {
 		});
 	});
 
+	test("a Stop interrupts a turn Claude started without a prompt", async () => {
+		const harness = createHarness();
+
+		harness.emit(messageStart("msg_1"));
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "running" },
+		});
+
+		harness.adapter.cancelTurn();
+		expect(harness.interrupts).toBe(1);
+	});
+
 	test("a Stop before the first token still ends the turn", async () => {
 		const harness = createHarness();
 
