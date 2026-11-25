@@ -14206,6 +14206,9 @@ msgstr "Mở tệp"
 msgid "Open File in New Tab"
 msgstr "Mở tệp ở tab mới"
 
+msgid "Open folder in editor"
+msgstr "Mở thư mục trong editor"
+
 msgid "Open from folder"
 msgstr "Mở từ thư mục"
 

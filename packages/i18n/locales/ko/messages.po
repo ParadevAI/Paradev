@@ -14206,6 +14206,9 @@ msgstr "파일 열기"
 msgid "Open File in New Tab"
 msgstr "새 탭에서 파일 열기"
 
+msgid "Open folder in editor"
+msgstr "에디터에서 폴더 열기"
+
 msgid "Open from folder"
 msgstr "폴더에서 열기"
 

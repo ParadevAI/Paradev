@@ -14206,6 +14206,9 @@ msgstr "Dosyayı aç"
 msgid "Open File in New Tab"
 msgstr "Dosyayı yeni sekmede aç"
 
+msgid "Open folder in editor"
+msgstr "Klasörü düzenleyicide aç"
+
 msgid "Open from folder"
 msgstr "Klasörden aç"
 
