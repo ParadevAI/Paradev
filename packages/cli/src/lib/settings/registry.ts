@@ -6,6 +6,7 @@ import {
 	EXTERNAL_APPS,
 	FILE_AUTO_SAVE_MODES,
 	FILE_OPEN_MODES,
+	NEW_TAB_DEFAULT_KINDS,
 	NON_EDITOR_APPS,
 	TERMINAL_LINK_BEHAVIORS,
 } from "@superset/local-db/schema/zod";
@@ -66,6 +67,14 @@ const FONT_WEIGHT = { ...FONT_WEIGHT_LIMITS, integer: true };
 
 export const SETTINGS: SettingDefinition[] = [
 	// Behavior
+	{
+		key: "newTabDefaultKind",
+		type: "enum",
+		section: "behavior",
+		enumValues: NEW_TAB_DEFAULT_KINDS,
+		description: "Tab type opened by the new-tab button",
+		defaultValue: "ask",
+	},
 	{
 		key: "confirmOnQuit",
 		type: "boolean",

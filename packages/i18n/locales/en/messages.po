@@ -3256,6 +3256,9 @@ msgstr "As last reported. The host must be online to update."
 msgid "ascending"
 msgstr "ascending"
 
+msgid "Ask"
+msgstr "Ask"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Ask a member to add you to this channel"
 
@@ -4551,6 +4554,9 @@ msgstr "Choose MCP servers for this message"
 msgid "Choose one"
 msgstr "Choose one"
 
+msgid "Choose tab type"
+msgstr "Choose tab type"
+
 msgid "Choose the model"
 msgstr "Choose the model"
 
@@ -4559,6 +4565,9 @@ msgstr "Choose the organization that AWS Marketplace will bill. Each subscriptio
 
 msgid "Choose the primary repository"
 msgstr "Choose the primary repository"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Choose what opens when you click + in the tab bar."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Choose what to clear from the in-app browser."
@@ -7050,6 +7059,9 @@ msgstr "Default location for new worktree workspaces on this host."
 
 msgid "Default model"
 msgstr "Default model"
+
+msgid "Default new tab"
+msgstr "Default new tab"
 
 msgid "Default team for new tasks"
 msgstr "Default team for new tasks"

@@ -3256,6 +3256,9 @@ msgstr "上次回報的版本。主機必須在線上才能更新。"
 msgid "ascending"
 msgstr "升序"
 
+msgid "Ask"
+msgstr "詢問"
+
 msgid "Ask a member to add you to this channel"
 msgstr "請讓成員將你加入此頻道"
 
@@ -4551,6 +4554,9 @@ msgstr "為這則訊息選擇MCP伺服器"
 msgid "Choose one"
 msgstr "請選擇"
 
+msgid "Choose tab type"
+msgstr "選擇分頁類型"
+
 msgid "Choose the model"
 msgstr "選擇模型"
 
@@ -4559,6 +4565,9 @@ msgstr "選擇由 AWS Marketplace 計費的組織。每個訂閱只能連結一�
 
 msgid "Choose the primary repository"
 msgstr "選擇主要儲存庫"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "選擇點擊分頁列中的 + 時開啟的內容。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "選擇要從應用程式內瀏覽器清除的內容。"
@@ -7050,6 +7059,9 @@ msgstr "此主機上新建worktree工作區的預設位置。"
 
 msgid "Default model"
 msgstr "預設模型"
+
+msgid "Default new tab"
+msgstr "預設新分頁"
 
 msgid "Default team for new tasks"
 msgstr "新任務的預設團隊"

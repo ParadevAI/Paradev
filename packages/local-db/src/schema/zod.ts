@@ -220,6 +220,15 @@ export const FILE_OPEN_MODES = ["split-pane", "new-tab"] as const;
 
 export type FileOpenMode = (typeof FILE_OPEN_MODES)[number];
 
+export const NEW_TAB_DEFAULT_KINDS = [
+	"ask",
+	"terminal",
+	"chat",
+	"browser",
+] as const;
+
+export type NewTabDefaultKind = (typeof NEW_TAB_DEFAULT_KINDS)[number];
+
 export const FILE_AUTO_SAVE_MODES = [
 	"off",
 	"afterDelay",

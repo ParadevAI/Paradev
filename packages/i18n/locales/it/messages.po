@@ -3256,6 +3256,9 @@ msgstr "Ultimo valore riportato. L'host deve essere online per aggiornarsi."
 msgid "ascending"
 msgstr "crescente"
 
+msgid "Ask"
+msgstr "Chiedi"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Chiedi a un membro di aggiungerti a questo canale"
 
@@ -4551,6 +4554,9 @@ msgstr "Scegli i server MCP per questo messaggio"
 msgid "Choose one"
 msgstr "Scegli"
 
+msgid "Choose tab type"
+msgstr "Scegli il tipo di scheda"
+
 msgid "Choose the model"
 msgstr "Scegli il modello"
 
@@ -4559,6 +4565,9 @@ msgstr "Scegli l’organizzazione che AWS Marketplace addebiterà. Ogni abboname
 
 msgid "Choose the primary repository"
 msgstr "Scegli il repository principale"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Scegli cosa aprire quando fai clic su + nella barra delle schede."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Scegli cosa cancellare dal browser interno."
@@ -7050,6 +7059,9 @@ msgstr "Posizione predefinita per i nuovi workspace worktree su questo host."
 
 msgid "Default model"
 msgstr "Modello predefinito"
+
+msgid "Default new tab"
+msgstr "Nuova scheda predefinita"
 
 msgid "Default team for new tasks"
 msgstr "Team predefinito per i nuovi task"

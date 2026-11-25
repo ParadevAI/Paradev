@@ -1,0 +1,1 @@
+ALTER TABLE `settings` ADD `new_tab_default_kind` text;

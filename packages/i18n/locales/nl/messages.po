@@ -3256,6 +3256,9 @@ msgstr "Zoals laatst gemeld. De host moet online zijn om bij te werken."
 msgid "ascending"
 msgstr "oplopend"
 
+msgid "Ask"
+msgstr "Vragen"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Vraag een lid om je aan dit kanaal toe te voegen"
 
@@ -4551,6 +4554,9 @@ msgstr "Kies MCP-servers voor dit bericht"
 msgid "Choose one"
 msgstr "Kies er een"
 
+msgid "Choose tab type"
+msgstr "Tabbladtype kiezen"
+
 msgid "Choose the model"
 msgstr "Model kiezen"
 
@@ -4559,6 +4565,9 @@ msgstr "Kies de organisatie die AWS Marketplace factureert. Elk abonnement is ge
 
 msgid "Choose the primary repository"
 msgstr "Kies de primaire repository"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Kies wat er wordt geopend wanneer je op + in de tabbladbalk klikt."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Kies wat je uit de ingebouwde browser wilt wissen."
@@ -7050,6 +7059,9 @@ msgstr "Standaardlocatie voor nieuwe worktree-werkruimtes op deze host."
 
 msgid "Default model"
 msgstr "Standaardmodel"
+
+msgid "Default new tab"
+msgstr "Standaard nieuw tabblad"
 
 msgid "Default team for new tasks"
 msgstr "Standaardteam voor nieuwe taken"

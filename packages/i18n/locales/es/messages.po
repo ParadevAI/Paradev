@@ -3256,6 +3256,9 @@ msgstr "Según el último informe. El host debe estar en línea para actualizars
 msgid "ascending"
 msgstr "ascendente"
 
+msgid "Ask"
+msgstr "Preguntar"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Pide a un miembro que te añada a este canal"
 
@@ -4551,6 +4554,9 @@ msgstr "Elige servidores MCP para este mensaje"
 msgid "Choose one"
 msgstr "Elige una"
 
+msgid "Choose tab type"
+msgstr "Elegir tipo de pestaña"
+
 msgid "Choose the model"
 msgstr "Elegir el modelo"
 
@@ -4559,6 +4565,9 @@ msgstr "Elige la organización que facturará AWS Marketplace. Cada suscripción
 
 msgid "Choose the primary repository"
 msgstr "Elige el repositorio principal"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Elige qué se abre al hacer clic en + en la barra de pestañas."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Elige qué borrar del navegador integrado."
@@ -7050,6 +7059,9 @@ msgstr "Ubicación predeterminada de los espacios de trabajo con worktree nuevos
 
 msgid "Default model"
 msgstr "Modelo predeterminado"
+
+msgid "Default new tab"
+msgstr "Nueva pestaña predeterminada"
 
 msgid "Default team for new tasks"
 msgstr "Equipo predeterminado para las tareas nuevas"

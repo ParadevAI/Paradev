@@ -1,16 +1,5 @@
-import { Button } from "@superset/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "@superset/ui/dropdown-menu";
-import {
-	HEADER_ICON_BUTTON_CLASS,
-	HEADER_ICON_STROKE_WIDTH,
-} from "@superset/ui/lib/header-controls";
 import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { cn } from "@superset/ui/utils";
-import { PlusIcon } from "lucide-react";
 import {
 	type ComponentProps,
 	type ReactNode,
@@ -30,6 +19,7 @@ import type { Tab } from "../../../../../types";
 import { usePaneAppearance } from "../../../../hooks/usePaneAppearance";
 import type { AddTabMenuActions, PaneRegistry } from "../../../../types";
 import { PANE_DRAG_TYPE } from "../Tab/components/Pane/components/PaneHeader";
+import { AddTabButton } from "./components/AddTabButton";
 import { TAB_DRAG_TYPE, TabItem } from "./components/TabItem";
 import {
 	computeInsertIndex,
@@ -77,63 +67,6 @@ interface TabBarProps<TData> {
 
 type TabDragItem = { tabId: string; store?: unknown };
 type PaneDragItem = { paneId: string; store?: unknown };
-
-function AddTabButton<_TData>({
-	renderAddTabMenu,
-	onAddTab,
-}: {
-	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
-	onAddTab?: () => void;
-}) {
-	const pendingActionRef = useRef<(() => void) | null>(null);
-	const isCards = usePaneAppearance() === "cards";
-	const button = isCards ? (
-		<button
-			className={HEADER_ICON_BUTTON_CLASS}
-			type="button"
-			onClick={onAddTab}
-		>
-			<PlusIcon className="size-4" strokeWidth={HEADER_ICON_STROKE_WIDTH} />
-		</button>
-	) : (
-		<Button
-			className="ml-1.5 size-7 rounded-md border border-border/60 bg-muted/30 px-1 text-muted-foreground shadow-none hover:bg-accent/60 hover:text-foreground"
-			size="icon"
-			type="button"
-			variant="ghost"
-			onClick={onAddTab}
-		>
-			<PlusIcon className="size-3.5" />
-		</Button>
-	);
-
-	if (renderAddTabMenu) {
-		return (
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>{button}</DropdownMenuTrigger>
-				<DropdownMenuContent
-					align="end"
-					className="w-56"
-					onCloseAutoFocus={(event) => {
-						const action = pendingActionRef.current;
-						if (!action) return;
-						pendingActionRef.current = null;
-						event.preventDefault();
-						action();
-					}}
-				>
-					{renderAddTabMenu({
-						runAfterClose: (action) => {
-							pendingActionRef.current = action;
-						},
-					})}
-				</DropdownMenuContent>
-			</DropdownMenu>
-		);
-	}
-
-	return button;
-}
 
 export function TabBar<TData>({
 	className,
@@ -408,7 +341,7 @@ export function TabBar<TData>({
 					{!hasHorizontalOverflow && (
 						<div
 							className={cn(
-								"flex h-full w-10 shrink-0 items-center justify-center",
+								"flex h-full min-w-10 shrink-0 items-center justify-center px-1",
 								!isCards && "pt-1",
 							)}
 						>
@@ -431,7 +364,7 @@ export function TabBar<TData>({
 			{hasHorizontalOverflow && (
 				<div
 					className={cn(
-						"no-drag flex h-full w-10 shrink-0 items-center justify-center",
+						"no-drag flex h-full min-w-10 shrink-0 items-center justify-center px-1",
 						!isCards && "pt-1",
 					)}
 				>
