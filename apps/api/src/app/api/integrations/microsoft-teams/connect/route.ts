@@ -1,4 +1,5 @@
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
+import { withLegacyIntegrationConnect } from "@superset/shared/legacy-integration-connect";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
@@ -11,40 +12,42 @@ import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
  * supported for tenant-wide message notifications.
  */
 export async function GET(request: Request) {
-	if (!env.MICROSOFT_CLIENT_ID) {
-		return Response.json(
-			{ error: "Microsoft Teams integration is not configured" },
-			{ status: 503 },
-		);
-	}
+	return withLegacyIntegrationConnect(request, async () => {
+		if (!env.MICROSOFT_CLIENT_ID) {
+			return Response.json(
+				{ error: "Microsoft Teams integration is not configured" },
+				{ status: 503 },
+			);
+		}
 
-	const member = await requireOrgMember(request);
-	if (member instanceof Response) return member;
+		const member = await requireOrgMember(request);
+		if (member instanceof Response) return member;
 
-	const clientId = env.MICROSOFT_CLIENT_ID;
-	return beginOAuthFlow({
-		cookie: STATE_COOKIES.microsoftTeams,
-		payload: { organizationId: member.organizationId, userId: member.userId },
-		authorizeUrl: (state) => {
-			// `organizations`, not `common`: personal accounts cannot grant admin
-			// consent, and Microsoft's own guidance says not to use common here.
-			const consentUrl = new URL(
-				"https://login.microsoftonline.com/organizations/v2.0/adminconsent",
-			);
-			consentUrl.searchParams.set("client_id", clientId);
-			// `.default` requests every application permission the app
-			// registration declares — the only way to request app permissions on
-			// this endpoint.
-			consentUrl.searchParams.set(
-				"scope",
-				"https://graph.microsoft.com/.default",
-			);
-			consentUrl.searchParams.set(
-				"redirect_uri",
-				`${getBrowserApiUrl(env)}/api/integrations/microsoft-teams/callback`,
-			);
-			consentUrl.searchParams.set("state", state);
-			return consentUrl.toString();
-		},
+		const clientId = env.MICROSOFT_CLIENT_ID;
+		return beginOAuthFlow({
+			cookie: STATE_COOKIES.microsoftTeams,
+			payload: { organizationId: member.organizationId, userId: member.userId },
+			authorizeUrl: (state) => {
+				// `organizations`, not `common`: personal accounts cannot grant admin
+				// consent, and Microsoft's own guidance says not to use common here.
+				const consentUrl = new URL(
+					"https://login.microsoftonline.com/organizations/v2.0/adminconsent",
+				);
+				consentUrl.searchParams.set("client_id", clientId);
+				// `.default` requests every application permission the app
+				// registration declares — the only way to request app permissions on
+				// this endpoint.
+				consentUrl.searchParams.set(
+					"scope",
+					"https://graph.microsoft.com/.default",
+				);
+				consentUrl.searchParams.set(
+					"redirect_uri",
+					`${getBrowserApiUrl(env)}/api/integrations/microsoft-teams/callback`,
+				);
+				consentUrl.searchParams.set("state", state);
+				return consentUrl.toString();
+			},
+		});
 	});
 }

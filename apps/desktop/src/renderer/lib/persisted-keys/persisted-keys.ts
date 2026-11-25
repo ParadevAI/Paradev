@@ -26,7 +26,7 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "right-pane-area", match: "exact" },
 	// Workspace details moved into the workspace item (#5392)
 	{ key: "workspace-details-store", match: "exact" },
-	// Replaced by the v2 onboarding setup flow (#4080)
+	// Replaced by the onboarding setup flow (#4080)
 	{ key: "superset-onboarding-v1", match: "exact" },
 	// Analytics funnel marker removed in #502-era simplification
 	{ key: "superset_auth_completed", match: "exact" },
@@ -50,6 +50,14 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "leaderboard-auto-publish-v1", match: "exact" },
 	// Launch-time "join the leaderboard" prompt removed; joining lives in settings
 	{ key: "leaderboard-asked-v1", match: "exact" },
+	// v1 workspace surface removed; its stores no longer exist
+	{ key: "tabs-storage", match: "exact" },
+	{ key: "changes-store", match: "exact" },
+	{ key: "file-explorer-store", match: "exact" },
+	{ key: "search-dialog-store", match: "exact" },
+	{ key: "sidebar-store", match: "exact" },
+	// v1/v2 surface switch removed; v2 is the only surface
+	{ key: "v2-local-override-v2", match: "exact" },
 	// Opening a page no longer routes to the last-visited workspace
 	{ key: "last-active-v2-workspace", match: "exact" },
 	// v1/v2 surface toggle; v2 is always on

@@ -20,7 +20,7 @@ highlights:
 
 ## Redesigned Pull Request Page <PRBadge url="https://github.com/superset-sh/superset/pull/8247" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8322" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8323" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8301" />
 
-A pull request now opens as its own page: a header with state, labels, and author, an info rail for merge status, reviews, and checks, and a comment composer that posts as you.
+A pull request now opens as its own page. The header shows state, labels, and author. An info rail shows merge status, reviews, and checks, and the comment composer posts as you.
 
 - Switch between **Summary** and **Changes** tabs; checks and reviewers fold into the header when the pane is narrow
 - Reviews and comments collapse into rows, and bot findings show a title and severity line
@@ -32,7 +32,7 @@ A pull request now opens as its own page: a header with state, labels, and autho
 
 The Tasks tab now mirrors whichever tracker your org uses. Pick it once in **Settings → Organization → Track tasks in**, and the separate Linear tab is gone.
 
-- Paradev tasks can be filed under a team with `--team`, and admins can rename a team's task key (for example `DESIG` → `ART`) from **Settings → Teams**
+- File a Paradev task under a team with `--team`. Admins can rename a team's task key (for example `DESIG` → `ART`) from **Settings → Teams**
 
 ![Track tasks in setting under Settings → Organization, with Paradev and Linear options](/changelog/2026-10-11-track-tasks-in.png)
 
@@ -53,10 +53,10 @@ Connect Google Calendar, Vercel, Neon, and PostHog from **Plugins**, so an agent
 - **⌘; workspace switcher** - cycles workspaces that need input, just finished, or are running, the same way ⌘-Tab cycles apps <PRBadge url="https://github.com/superset-sh/superset/pull/8283" />
 - **Automations get a PR closed trigger** - react to a pull request closed without merging, separate from Merged <PRBadge url="https://github.com/superset-sh/superset/pull/8302" />
 - **Comment previews on pages** - hover a page's comment count to see the newest reply without opening it <PRBadge url="https://github.com/superset-sh/superset/pull/8393" />
-- **CLI terminal control** - `superset agents wait`, raw keys in `superset terminals send`, `superset terminals attach` over SSH, and `superset panes` let you script terminals and agents directly <PRBadge url="https://github.com/superset-sh/superset/pull/8371" />
-- **`superset hosts add`** turns any machine you can reach over SSH into a host in one command; `superset snapshot` and `superset agents explain` show every workspace, terminal, and agent, or why one is in its current state <PRBadge url="https://github.com/superset-sh/superset/pull/8388" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8381" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8380" />
+- **CLI terminal control** - `superset agents wait`, raw keys in `superset terminals send`, `superset terminals attach` over SSH, and `superset panes` let you script terminals and agents <PRBadge url="https://github.com/superset-sh/superset/pull/8371" />
+- **`superset hosts add`** turns any machine you can reach over SSH into a host in one command. `superset snapshot` and `superset agents explain` show every workspace, terminal, and agent, or why one is in its current state <PRBadge url="https://github.com/superset-sh/superset/pull/8388" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8381" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8380" />
 - **`superset workspaces archive`** replaces `workspaces delete` (clearer name, same command), and `superset workspaces sleep` puts a cloud workspace to sleep <PRBadge url="https://github.com/superset-sh/superset/pull/8267" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8191" />
-- **Import browser logins** - pull saved logins from more Chromium-based browsers on macOS, not just Chrome <PRBadge url="https://github.com/superset-sh/superset/pull/8190" />
+- **Import browser logins** - pull saved logins from more Chromium-based browsers on macOS, not only Chrome <PRBadge url="https://github.com/superset-sh/superset/pull/8190" />
 - **Hermes token usage** - Hermes Agent's usage now shows in **Settings → Usage** with its own cost estimate <PRBadge url="https://github.com/superset-sh/superset/pull/8341" />
 - Experimental: a redesigned chat surface (streaming replies, subagents, background work across every chat) keeps advancing behind the early-access `acp-chat` flag. Its composer gets denser model and mode pickers with ⌘1-9 to jump to a model, and a background chat tab now resumes instead of opening blank <PRBadge url="https://github.com/superset-sh/superset/pull/8339" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8329" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8243" /> <PRBadge url="https://github.com/superset-sh/superset/pull/8342" />
 
@@ -74,5 +74,5 @@ Connect Google Calendar, Vercel, Neon, and PostHog from **Plugins**, so an agent
 - Dragging a Files tab row onto a terminal pastes the path instead of failing <PRBadge url="https://github.com/superset-sh/superset/pull/8350" />
 - Renaming or moving a file in the Files tab onto a name that is already taken shows a conflict, not a server error <PRBadge url="https://github.com/superset-sh/superset/pull/8326" />
 - Pull request diffs load even without a matching workspace repository <PRBadge url="https://github.com/superset-sh/superset/pull/8125" />
-- Hardened what app windows are allowed to load and open, contributed by [@PascalOrdano18](https://github.com/PascalOrdano18) <PRBadge url="https://github.com/superset-sh/superset/pull/7436" />
-- Linux: GPU acceleration is no longer disabled, and clipboard image paste works in terminals, contributed by [@pgilmore](https://github.com/pgilmore) and [@dennisklappe](https://github.com/dennisklappe) <PRBadge url="https://github.com/superset-sh/superset/pull/7880" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6013" />
+- App windows have stricter limits on what they can load and open, contributed by [@PascalOrdano18](https://github.com/PascalOrdano18) <PRBadge url="https://github.com/superset-sh/superset/pull/7436" />
+- Linux: GPU acceleration stays on, and clipboard image paste works in terminals, contributed by [@pgilmore](https://github.com/pgilmore) and [@dennisklappe](https://github.com/dennisklappe) <PRBadge url="https://github.com/superset-sh/superset/pull/7880" /> <PRBadge url="https://github.com/superset-sh/superset/pull/6013" />

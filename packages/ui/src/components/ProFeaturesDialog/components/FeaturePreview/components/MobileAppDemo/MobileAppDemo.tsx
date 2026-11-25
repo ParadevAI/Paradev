@@ -48,7 +48,7 @@ export function MobileAppDemo() {
 	return (
 		<div className="relative w-full h-full overflow-hidden">
 			{/* Phone frame - large and cropped at bottom */}
-			<div className="absolute right-12 top-10 w-[340px] h-[700px] bg-black rounded-[50px] border-[8px] border-neutral-700 shadow-2xl overflow-hidden">
+			<div className="absolute top-10 left-1/2 -translate-x-1/2 w-[340px] md:right-12 md:left-auto md:translate-x-0 h-[700px] bg-black rounded-[50px] border-[8px] border-neutral-700 shadow-2xl overflow-hidden">
 				{/* Dynamic Island */}
 				<div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-8 bg-black rounded-full z-10" />
 

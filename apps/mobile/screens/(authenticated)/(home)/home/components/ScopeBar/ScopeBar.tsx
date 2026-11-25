@@ -1,18 +1,20 @@
 import { ScrollView } from "react-native";
 import { Icon } from "@/components/ui/icon";
-import type { WorkspaceScope } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
+import type { WorkspaceScope } from "@/screens/(authenticated)/(home)/utils/scopeSelection";
 import { CloudIcon } from "@/screens/(authenticated)/components/CloudIcon";
 import { HostStatusDot } from "@/screens/(authenticated)/components/HostStatusDot";
 import { Chip } from "./components/Chip";
 import { CloudFilterChips } from "./components/CloudFilterChips";
+import { NeedsMeChip } from "./components/NeedsMeChip";
 
 interface ScopeBarProps {
 	scope: WorkspaceScope;
-	hostName: string | null;
+	label: string;
 	hostOnline: boolean;
 	sortLabel: string | null;
 	onPressScope: () => void;
 	onPressSort: () => void;
+	needsMe: { count: number; active: boolean; onPress: () => void } | null;
 }
 
 /**
@@ -28,11 +30,12 @@ interface ScopeBarProps {
  */
 export function ScopeBar({
 	scope,
-	hostName,
+	label,
 	hostOnline,
 	sortLabel,
 	onPressScope,
 	onPressSort,
+	needsMe,
 }: ScopeBarProps) {
 	const cloud = scope === "cloud";
 	return (
@@ -42,9 +45,9 @@ export function ScopeBar({
 			showsHorizontalScrollIndicator={false}
 			contentContainerClassName="flex-row items-center gap-2 px-4 pb-2 pt-1"
 		>
-			{cloud || hostName ? (
+			{label ? (
 				<Chip
-					label={cloud ? "Cloud" : (hostName ?? "")}
+					label={label}
 					leading={
 						cloud ? (
 							<Icon
@@ -59,8 +62,17 @@ export function ScopeBar({
 					onPress={onPressScope}
 				/>
 			) : null}
-			{cloud ? <CloudFilterChips /> : null}
-			{sortLabel ? <Chip label={sortLabel} onPress={onPressSort} /> : null}
+			{needsMe ? (
+				<NeedsMeChip
+					count={needsMe.count}
+					active={needsMe.active}
+					onPress={needsMe.onPress}
+				/>
+			) : null}
+			{cloud && !needsMe?.active ? <CloudFilterChips /> : null}
+			{sortLabel && !needsMe?.active ? (
+				<Chip label={sortLabel} onPress={onPressSort} />
+			) : null}
 		</ScrollView>
 	);
 }

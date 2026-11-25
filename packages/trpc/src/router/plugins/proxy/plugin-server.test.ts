@@ -1,9 +1,22 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, spyOn, test } from "bun:test";
+import { randomUUID } from "node:crypto";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import type { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { buildPluginServer } from "./plugin-server";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import {
+	CallToolRequestSchema,
+	type Tool,
+} from "@modelcontextprotocol/sdk/types.js";
+import { at } from "../../../../test/at";
+import { memoryRedis, unreachableRedis } from "../../../../test/session-redis";
+import { buildPluginServer, endUpstreamSessions } from "./plugin-server";
 import { type PluginTarget, PluginTargetError } from "./resolve-target";
+import {
+	type ResumableSession,
+	type UpstreamSessions,
+	upstreamSessions,
+} from "./upstream-sessions";
 
 const TOOL: Tool = {
 	name: "send_email",
@@ -59,9 +72,16 @@ function expiredTarget(): PluginTarget {
 	};
 }
 
-async function connect(target: PluginTarget, rejected: string[] = []) {
-	const server = await buildPluginServer(target, async (connectionId) => {
-		rejected.push(connectionId);
+async function connect(
+	target: PluginTarget,
+	rejected: string[] = [],
+	sessions?: UpstreamSessions,
+) {
+	const server = await buildPluginServer(target, {
+		sessions,
+		recordRejection: async (connectionId) => {
+			rejected.push(connectionId);
+		},
 	});
 	const [clientTransport, serverTransport] =
 		InMemoryTransport.createLinkedPair();
@@ -109,17 +129,17 @@ describe("a plugin server with two accounts", () => {
 		try {
 			const { tools } = await client.listTools();
 			expect(tools).toHaveLength(1);
-			expect(tools[0].name).toBe("send_email");
+			expect(at(tools).name).toBe("send_email");
 
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				Record<string, unknown>
 			>;
-			expect(properties.superset_account.enum).toEqual([
+			expect(properties.superset_account?.enum).toEqual([
 				"id-personal",
 				"id-work",
 			]);
-			expect(tools[0].inputSchema.required).toContain("superset_account");
+			expect(at(tools).inputSchema.required).toContain("superset_account");
 			expect(client.getInstructions()).toContain("2 accounts");
 		} finally {
 			await close();
@@ -139,8 +159,8 @@ describe("a plugin server with two accounts", () => {
 			});
 
 			expect(calls).toHaveLength(1);
-			expect(calls[0].args).toEqual({ body: "hi" });
-			expect(calls[0].credential).toBe("token-id-personal");
+			expect(at(calls).args).toEqual({ body: "hi" });
+			expect(at(calls).credential).toBe("token-id-personal");
 			expect(result.isError).toBeFalsy();
 			expect(JSON.stringify(result.content)).toContain("token-id-personal");
 			expect(JSON.stringify(result.content)).toContain(
@@ -163,7 +183,7 @@ describe("a plugin server with two accounts", () => {
 				name: "send_email",
 				arguments: { superset_account: "work", body: "hi" },
 			});
-			expect(calls[0].credential).toBe("token-id-work");
+			expect(at(calls).credential).toBe("token-id-work");
 		} finally {
 			await close();
 		}
@@ -255,7 +275,7 @@ describe("a plugin server with two accounts", () => {
 		try {
 			const { tools } = await client.listTools();
 			expect(tools).toHaveLength(1);
-			expect(tools[0].inputSchema.required).toContain("superset_account");
+			expect(at(tools).inputSchema.required).toContain("superset_account");
 		} finally {
 			await close();
 		}
@@ -269,18 +289,18 @@ describe("a plugin server with one account", () => {
 
 		try {
 			const { tools } = await client.listTools();
-			expect(tools[0].inputSchema.properties).not.toHaveProperty(
+			expect(at(tools).inputSchema.properties).not.toHaveProperty(
 				"superset_account",
 			);
-			expect(tools[0].inputSchema.required).toEqual(["body"]);
+			expect(at(tools).inputSchema.required).toEqual(["body"]);
 
 			const result = await client.callTool({
 				name: "send_email",
 				arguments: { body: "hi" },
 			});
 			expect(result.isError).toBeFalsy();
-			expect(calls[0].args).toEqual({ body: "hi" });
-			expect(calls[0].credential).toBe("token-id-work");
+			expect(at(calls).args).toEqual({ body: "hi" });
+			expect(at(calls).credential).toBe("token-id-work");
 		} finally {
 			await close();
 		}
@@ -306,11 +326,11 @@ describe("which account the tool list comes from", () => {
 		try {
 			const { tools } = await client.listTools();
 			expect(tools).toHaveLength(1);
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				{ enum: string[] }
 			>;
-			expect(properties.superset_account.enum).toEqual([
+			expect(properties.superset_account?.enum).toEqual([
 				"id-personal",
 				"id-work",
 			]);
@@ -330,12 +350,12 @@ describe("which account the tool list comes from", () => {
 
 		try {
 			const { tools } = await client.listTools();
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				{ enum: string[] }
 			>;
 
-			expect(properties.superset_account.enum).toEqual(["id-work"]);
+			expect(properties.superset_account?.enum).toEqual(["id-work"]);
 		} finally {
 			await close();
 		}
@@ -352,12 +372,12 @@ describe("which account the tool list comes from", () => {
 
 		try {
 			const { tools } = await client.listTools();
-			const properties = tools[0].inputSchema.properties as Record<
+			const properties = at(tools).inputSchema.properties as Record<
 				string,
 				{ enum: string[] }
 			>;
 
-			expect(properties.superset_account.enum).toEqual([
+			expect(properties.superset_account?.enum).toEqual([
 				"id-personal",
 				"id-work",
 			]);
@@ -368,7 +388,9 @@ describe("which account the tool list comes from", () => {
 });
 
 describe("a vendor rejecting the credential mid-session", () => {
-	function rejectingTarget(connectionId: string): PluginTarget {
+	function rejectingTarget(
+		connectionId: string,
+	): Extract<PluginTarget, { kind: "first-party" }> {
 		return {
 			kind: "first-party",
 			plugin: "gmail",
@@ -595,5 +617,269 @@ describe("superset-home review", () => {
 		} finally {
 			await close();
 		}
+	});
+});
+
+describe("a vendor that keeps state per MCP session", () => {
+	const VENDOR_URL = "https://vendor.test/mcp";
+
+	function stubVendor() {
+		const live = new Map<string, WebStandardStreamableHTTPServerTransport>();
+		const projects = new Map<string, string>();
+		const vendor = {
+			live,
+			initialized: 0,
+			deleted: [] as string[],
+			resumedWith: [] as (string | null)[],
+			refuseNextResumed: undefined as Response | undefined,
+			refuseAll: undefined as number | undefined,
+		};
+
+		const open = async () => {
+			vendor.initialized++;
+			const transport = new WebStandardStreamableHTTPServerTransport({
+				sessionIdGenerator: randomUUID,
+				enableJsonResponse: true,
+				onsessioninitialized: (id) => {
+					live.set(id, transport);
+				},
+				onsessionclosed: (id) => {
+					live.delete(id);
+					vendor.deleted.push(id);
+				},
+			});
+			const server = new Server(
+				{ name: "vendor", version: "1.0.0" },
+				{ capabilities: { tools: {} } },
+			);
+			server.setRequestHandler(
+				CallToolRequestSchema,
+				async (request, extra) => {
+					const session = extra.sessionId ?? "";
+					if (request.params.name === "switch_project")
+						projects.set(session, String(request.params.arguments?.project));
+					const text = projects.get(session) ?? "Default";
+					return { content: [{ type: "text" as const, text }] };
+				},
+			);
+			await server.connect(transport);
+			return transport;
+		};
+
+		spyOn(globalThis, "fetch").mockImplementation((async (
+			url: string,
+			init?: RequestInit,
+		) => {
+			const request = new Request(url, init);
+			if (vendor.refuseAll)
+				return new Response(null, { status: vendor.refuseAll });
+			const id = request.headers.get("mcp-session-id");
+			if (!id) return (await open()).handleRequest(request);
+			const transport = live.get(id);
+			if (!transport) return new Response(null, { status: 404 });
+			const refusal = vendor.refuseNextResumed;
+			if (refusal && request.method === "POST") {
+				vendor.refuseNextResumed = undefined;
+				return refusal;
+			}
+			vendor.resumedWith.push(request.headers.get("mcp-protocol-version"));
+			return transport.handleRequest(request);
+		}) as typeof fetch);
+		return vendor;
+	}
+
+	function callerSession(userId = "user-a") {
+		const store = memoryRedis();
+		const sessions = upstreamSessions(store.redis, userId, randomUUID());
+		const stored = () =>
+			[...store.hashes.values()].flatMap((fields) =>
+				[...fields.values()].map(
+					(session) => (session as ResumableSession).sessionId,
+				),
+			);
+		return { ...store, sessions, stored };
+	}
+
+	const remote: PluginTarget = {
+		kind: "remote",
+		plugin: "posthog",
+		version: "1.0.0",
+		url: VENDOR_URL,
+		headers: {},
+		connectionId: "id-posthog",
+	};
+
+	async function callOnce(
+		sessions: UpstreamSessions | undefined,
+		name: string,
+		args: Record<string, unknown> = {},
+		rejected: string[] = [],
+	): Promise<string> {
+		const { client, close } = await connect(remote, rejected, sessions);
+		try {
+			const result = await client.callTool({ name, arguments: args });
+			return JSON.stringify(result.content);
+		} finally {
+			await close();
+		}
+	}
+
+	afterEach(() => {
+		(globalThis.fetch as unknown as { mockRestore(): void }).mockRestore();
+	});
+
+	test("a value set in one request is still there in the next", async () => {
+		const vendor = stubVendor();
+		const { sessions } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		expect(await callOnce(sessions, "project_get")).toContain("Production");
+		expect(vendor.initialized).toBe(1);
+		expect(vendor.resumedWith.every(Boolean)).toBe(true);
+	});
+
+	test("two caller sessions on one connection get separate vendor sessions", async () => {
+		stubVendor();
+
+		await callOnce(callerSession().sessions, "switch_project", {
+			project: "Production",
+		});
+		expect(await callOnce(callerSession().sessions, "project_get")).toContain(
+			"Default",
+		);
+	});
+
+	test("a session the vendor expired is opened again and the call runs", async () => {
+		const vendor = stubVendor();
+		const { sessions, stored } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		const expired = at(stored());
+		vendor.live.delete(expired);
+
+		expect(await callOnce(sessions, "project_get")).toContain("Default");
+		expect(stored()).not.toContain(expired);
+		expect(stored()).toHaveLength(1);
+	});
+
+	const jsonRpcError = (status: number, code: number, message: string) =>
+		Response.json(
+			{ jsonrpc: "2.0", error: { code, message }, id: null },
+			{ status },
+		);
+	const dropped: Record<string, () => Response> = {
+		"400 Session not found": () =>
+			jsonRpcError(400, -32001, "Session not found"),
+		"400 Server not initialized": () =>
+			jsonRpcError(400, -32000, "Bad Request: Server not initialized"),
+		"401": () => new Response(null, { status: 401 }),
+	};
+	for (const [answer, refusal] of Object.entries(dropped)) {
+		test(`a resumed session answered ${answer} is replaced once, with no rejection recorded`, async () => {
+			const vendor = stubVendor();
+			const { sessions, stored } = callerSession();
+			const rejected: string[] = [];
+
+			await callOnce(sessions, "switch_project", { project: "Production" });
+			const old = at(stored());
+			vendor.refuseNextResumed = refusal();
+
+			expect(await callOnce(sessions, "project_get", {}, rejected)).toContain(
+				"Default",
+			);
+			expect(stored()).not.toContain(old);
+			expect(rejected).toEqual([]);
+		});
+	}
+
+	test("a 400 that is the tool's own failure is not retried", async () => {
+		const vendor = stubVendor();
+		const { sessions, stored } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		const kept = stored();
+		vendor.refuseNextResumed = jsonRpcError(400, -32602, "Invalid params");
+
+		await expect(callOnce(sessions, "project_get")).rejects.toThrow();
+		expect(vendor.initialized).toBe(1);
+		expect(stored()).toEqual(kept);
+	});
+
+	test("a fresh session that is rejected too records the rejection", async () => {
+		const vendor = stubVendor();
+		const { sessions } = callerSession();
+		const rejected: string[] = [];
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		vendor.refuseAll = 401;
+		await callOnce(sessions, "project_get", {}, rejected);
+
+		expect(rejected).toEqual(["id-posthog"]);
+	});
+
+	test("a failed resumed call does not extend the session", async () => {
+		const vendor = stubVendor();
+		const { sessions, expired } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		const before = expired.length;
+		vendor.refuseNextResumed = new Response(null, { status: 500 });
+		await expect(callOnce(sessions, "project_get")).rejects.toThrow();
+
+		expect(expired).toHaveLength(before);
+	});
+
+	test("two first calls at once keep one vendor session and end the other", async () => {
+		const vendor = stubVendor();
+		const { sessions, stored } = callerSession();
+
+		await Promise.all([
+			callOnce(sessions, "project_get"),
+			callOnce(sessions, "project_get"),
+		]);
+
+		expect(vendor.initialized).toBe(2);
+		expect(stored()).toHaveLength(1);
+		expect(vendor.deleted).toHaveLength(1);
+		expect([...vendor.live.keys()]).toEqual(stored());
+	});
+
+	test("an unreachable session store falls back to one vendor session per call", async () => {
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		const vendor = stubVendor();
+		const sessions = upstreamSessions(
+			unreachableRedis(),
+			"user-a",
+			randomUUID(),
+		);
+		try {
+			await callOnce(sessions, "switch_project", { project: "Production" });
+			expect(await callOnce(sessions, "project_get")).toContain("Default");
+			expect(vendor.live.size).toBe(0);
+			expect(vendor.deleted).toHaveLength(2);
+		} finally {
+			warn.mockRestore();
+		}
+	});
+
+	test("ending the caller's session ends the vendor session", async () => {
+		const vendor = stubVendor();
+		const { sessions, stored, hashes } = callerSession();
+
+		await callOnce(sessions, "switch_project", { project: "Production" });
+		const sessionId = at(stored());
+		await endUpstreamSessions(remote, sessions);
+
+		expect(vendor.deleted).toEqual([sessionId]);
+		expect(hashes.size).toBe(0);
+	});
+
+	test("a caller with no session ends the vendor session after each call", async () => {
+		const vendor = stubVendor();
+
+		await callOnce(undefined, "switch_project", { project: "Production" });
+
+		expect(vendor.live.size).toBe(0);
+		expect(vendor.deleted).toHaveLength(1);
 	});
 });

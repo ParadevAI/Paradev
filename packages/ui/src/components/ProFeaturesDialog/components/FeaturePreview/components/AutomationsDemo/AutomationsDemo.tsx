@@ -27,7 +27,7 @@ const AUTOMATIONS = [
 export function AutomationsDemo() {
 	return (
 		<div className="w-full h-full flex items-center justify-center">
-			<div className="w-[300px] bg-card/90 backdrop-blur-sm rounded-lg border border-border shadow-2xl overflow-hidden">
+			<div className="w-[300px] max-w-[calc(100%-2rem)] bg-card/90 backdrop-blur-sm rounded-lg border border-border shadow-2xl overflow-hidden">
 				<div className="flex items-center justify-between px-4 py-3 bg-muted/80 border-b border-border/50">
 					<div className="flex items-center gap-2">
 						<div className="flex gap-1.5">

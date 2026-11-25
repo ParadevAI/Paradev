@@ -1,5 +1,7 @@
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
-import { getJwt } from "./auth-client";
+import { getJwt, hasExpiredJwt, waitForFreshJwt } from "./auth-client";
+
+const RELAY_TOKEN_WAIT_MS = 5_000;
 
 /**
  * The bearer a host accepts, by URL. A local host-service takes its
@@ -50,6 +52,25 @@ export function getHostServiceHeaders(hostUrl: string): Record<string, string> {
 	const jwt = getJwt();
 	if (jwt) headers.Authorization = `Bearer ${jwt}`;
 	return headers;
+}
+
+/** True when the host is reached through the relay, with the user's JWT. */
+export function usesRelayJwt(hostUrl: string): boolean {
+	return !secrets.has(hostUrl);
+}
+
+/**
+ * For request paths that can wait: a relay call made with no JWT or an expired
+ * one is refused, so refresh the token before building the headers.
+ */
+export async function resolveHostServiceHeaders(
+	hostUrl: string,
+	refreshJwt: () => Promise<unknown> = () =>
+		waitForFreshJwt(RELAY_TOKEN_WAIT_MS),
+	jwtIsUnusable: () => boolean = () => getJwt() === null || hasExpiredJwt(),
+): Promise<Record<string, string>> {
+	if (usesRelayJwt(hostUrl) && jwtIsUnusable()) await refreshJwt();
+	return getHostServiceHeaders(hostUrl);
 }
 
 /**

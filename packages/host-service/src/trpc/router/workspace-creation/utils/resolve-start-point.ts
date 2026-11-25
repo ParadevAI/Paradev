@@ -34,7 +34,7 @@ async function refExists(git: SimpleGit, fullRef: string): Promise<boolean> {
  *
  * Probes use full refnames so a local branch literally named `origin/foo`
  * cannot be misclassified as remote-tracking. Callers switch on
- * `result.kind` — see `GIT_REFS.md`.
+ * `result.kind`.
  */
 export async function resolveStartPoint(
 	git: SimpleGit,

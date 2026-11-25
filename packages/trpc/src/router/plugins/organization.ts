@@ -69,14 +69,14 @@ async function isAdmin(userId: string, organizationId: string) {
 	);
 }
 
-async function requestSync(sourceId: string) {
+async function requestSync(sourceId: string, { full = false } = {}) {
 	if (env.NODE_ENV === "development") {
-		await syncOrganizationPluginSource(sourceId);
+		await syncOrganizationPluginSource(sourceId, { full });
 		return;
 	}
 	await qstash.publishJSON({
 		url: `${env.NEXT_PUBLIC_API_URL}${ORGANIZATION_PLUGIN_SYNC_PATH}`,
-		body: { sourceId },
+		body: { sourceId, full },
 		retries: 3,
 	});
 }
@@ -200,7 +200,7 @@ const sourcesRouter = {
 				),
 			});
 			if (!source) throw unknownSource();
-			await requestSync(source.id);
+			await requestSync(source.id, { full: true });
 			return { requested: source.id };
 		}),
 

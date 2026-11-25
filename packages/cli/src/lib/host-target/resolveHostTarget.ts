@@ -4,6 +4,7 @@ import { getHostId } from "@superset/shared/host-info";
 import {
 	buildHostRoutingKey,
 	CLOUD_HOST_ID,
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
@@ -13,6 +14,10 @@ import { jwtForApiKey } from "../api-key-jwt";
 import { isProcessAlive, readManifest } from "../host/manifest";
 import { getRelayUrl } from "../host/relay-url";
 import { readJwtSubject } from "./readJwtSubject";
+
+// Node answers 431 when the request line and headers are more than 16 KiB.
+// The other half is for the headers.
+export const HOST_MAX_URL_LENGTH = 8_192;
 
 export type HostServiceClient = ReturnType<
 	typeof createTRPCClient<HostServiceRouter>
@@ -61,13 +66,13 @@ export async function resolveHostTarget(
 		if (!manifest) {
 			throw new CLIError(
 				"Host service for this machine isn't running",
-				"Run: superset start",
+				"Run: paradev start",
 			);
 		}
 		if (!isProcessAlive(manifest.pid)) {
 			throw new CLIError(
 				"Host service manifest is stale (recorded PID is dead)",
-				"Run: superset start",
+				"Run: paradev start",
 			);
 		}
 		return {
@@ -77,10 +82,12 @@ export async function resolveHostTarget(
 				links: [
 					httpBatchLink({
 						url: `${manifest.endpoint}/trpc`,
+						maxURLLength: HOST_MAX_URL_LENGTH,
 						transformer: SuperJSON,
 						headers: {
 							Authorization: `Bearer ${manifest.authToken}`,
 							"x-superset-client-machine-id": localHostId,
+							[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 							// Names the user to the local host so it can stamp
 							// createdByUserId; the relay does this for remote hosts.
 							...(userId ? { [SUPERSET_USER_ID_HEADER]: userId } : {}),
@@ -98,7 +105,7 @@ export async function resolveHostTarget(
 	if (targetHostId.toLowerCase() === CLOUD_HOST_ID) {
 		throw new CLIError(
 			"`--host cloud` is not one host: each cloud workspace runs its own",
-			"Name the workspace: `superset snapshot --host cloud --workspace <id>`, or a workspace command such as `superset sessions list --workspace <id>`",
+			"Name the workspace: `paradev snapshot --host cloud --workspace <id>`, or a workspace command such as `paradev sessions list --workspace <id>`",
 		);
 	}
 
@@ -112,11 +119,13 @@ export async function resolveHostTarget(
 			links: [
 				httpBatchLink({
 					url: `${relayUrl}/hosts/${routingKey}/trpc`,
+					maxURLLength: HOST_MAX_URL_LENGTH,
 					transformer: SuperJSON,
 					// A cloud workspace has no bearer; its firewall adds its credential.
 					headers: {
 						...(userJwt ? { Authorization: `Bearer ${userJwt}` } : {}),
 						"x-superset-client-machine-id": localHostId,
+						[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 					},
 				}),
 			],

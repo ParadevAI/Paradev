@@ -254,7 +254,6 @@
 					"client": "dynamic",
 					"authorization_url": "https://mcp.notion.com/mcp",
 					"scopes": [],
-					"token_request_auth_method": "client_secret_basic",
 					"authorization_params": {
 						"owner": "user"
 					},
@@ -445,11 +444,8 @@
 					"scopes": [],
 					"identity": {
 						"mcp": "https://mcp.sentry.dev/mcp",
-						"tool": "execute_sentry_tool",
-						"arguments": {
-							"name": "whoami",
-							"arguments": {}
-						},
+						"tool": "whoami",
+						"arguments": {},
 						"account": {
 							"id": "$.user.id",
 							"label": "$.user.email"
@@ -1192,12 +1188,47 @@
 					"client": "dynamic",
 					"authorization_url": "https://api.ahrefs.com/mcp/mcp",
 					"scopes": ["apiv3-mcp"],
+					"token_request_auth_method": "client_secret_post",
 					"identity": {
 						"account": {
 							"id": "$.token_type"
 						},
 						"user": {
 							"id": "$.token_type"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"planetscale_mcp": {
+			"displayName": "PlanetScale",
+			"icon": "planetscale",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.pscale.dev/mcp/planetscale",
+					"identity": {
+						"url": "https://auth.planetscale.com/oauth/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.email",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.email",
+							"label": "$.email"
 						}
 					},
 					"bind": {
@@ -1222,6 +1253,41 @@
 					"scopes": ["openid", "email", "profile", "offline_access"],
 					"identity": {
 						"url": "https://mcp-auth.wisprflow.com/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"paradev_admin_mcp": {
+			"displayName": "Paradev admin",
+			"icon": "superset",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "Paradev account",
+					"client": "dynamic",
+					"authorization_url": "https://admin.paradev.com/api/mcp/cloud",
+					"scopes": ["openid", "email", "profile", "offline_access"],
+					"identity": {
+						"url": "https://api.superset.sh/api/auth/oauth2/userinfo",
 						"method": "GET",
 						"headers": {
 							"Authorization": "Bearer ${config.access_token}"

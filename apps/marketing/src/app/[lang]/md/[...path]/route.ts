@@ -1,5 +1,5 @@
 import type { I18n, MessageDescriptor } from "@lingui/core";
-import { isSupportedLocale } from "@superset/i18n";
+import { isSupportedLocale, type SupportedLocale } from "@superset/i18n";
 import { getI18nInstance, preloadServerLocale } from "@superset/i18n/server";
 import type { PlanFamily } from "@superset/shared/billing";
 import { BRAND } from "@superset/shared/brand";
@@ -37,6 +37,7 @@ import {
 	MCP_SERVER_URL,
 	stripMdxSyntax,
 } from "@/lib/llms";
+import { localizeMarkdownLinks } from "@/lib/localized-mdx";
 import { markdownNotFound } from "@/lib/markdown-not-found";
 import { getAllPeople } from "@/lib/people";
 import { renderProfileMarkdown } from "@/lib/profile-markdown";
@@ -262,6 +263,7 @@ async function loadPage(
 	i18n: I18n,
 	section: string,
 	slug: string,
+	locale: SupportedLocale,
 ): Promise<MarkdownPage | undefined> {
 	const baseUrl = COMPANY.MARKETING_URL;
 	if (section === "page") {
@@ -281,14 +283,20 @@ async function loadPage(
 		};
 	}
 	if (section === "compare") {
-		const page = await getPricedComparisonPage(slug);
+		const page = await getPricedComparisonPage(
+			slug,
+			slug === "superset-vs-conductor" ? locale : "en",
+		);
 		if (!page) return undefined;
 		return {
 			title: page.title,
 			url: `${baseUrl}/compare/${page.slug}`,
 			date: page.lastUpdated ?? page.date,
 			description: page.description,
-			content: stripMdxSyntax(page.content),
+			content:
+				slug === "superset-vs-conductor"
+					? localizeMarkdownLinks(stripMdxSyntax(page.content), locale)
+					: stripMdxSyntax(page.content),
 		};
 	}
 	if (section === "category") {
@@ -345,7 +353,7 @@ export async function GET(
 	try {
 		page =
 			path.length === 2 && section && slug
-				? await loadPage(i18n, section, slug)
+				? await loadPage(i18n, section, slug, locale)
 				: undefined;
 	} catch (error) {
 		console.error("[marketing/md] page load failed:", error);

@@ -18,7 +18,7 @@ import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { electronQueryClient } from "renderer/providers/ElectronTRPCProvider/ElectronTRPCProvider";
 import { DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
-import { V2_WORKSPACES_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces/useAccessibleV2Workspaces";
+import { V2_WORKSPACES_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces/useAccessibleWorkspaces";
 import {
 	type PullRequestTarget,
 	pullRequestThreadsQueryKey,
@@ -44,6 +44,8 @@ export type PullRequestDetail = PullRequestDetailBase &
 		mergeMethods: MergeMethodChoices;
 		/** Absent from details cached by builds older than this field. */
 		mergeQueue?: PullRequestMergeQueue;
+		/** GitHub refused the login some status checks. */
+		checksUnavailable?: boolean;
 	};
 
 export interface PullRequestMergeQueue {

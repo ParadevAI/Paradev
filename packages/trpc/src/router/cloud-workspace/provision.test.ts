@@ -1,171 +1,200 @@
-import { beforeEach, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import type { SQL } from "drizzle-orm";
-import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
-import * as moves from "../../lib/moves";
+import { userError } from "../../i18n-error";
 import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
+import * as chatMoves from "../chat-move/utils/queueChatMove";
 import * as meter from "./meter";
 import { provisionCloudWorkspace } from "./provision";
 
-type Row = {
-	id: string;
-	organizationId: string;
-	createdByUserId: string;
-	name: string;
-	status: string;
-	providerSandboxId: string;
-	sandboxUrl: string | null;
-};
-
-const WORKSPACE_ID = "0b8f4c1e-2a3d-4e5f-8a9b-1c2d3e4f5a6b";
-const dialect = new PgDialect();
-
-let row: Row;
-let whileTheBoxIsMade: () => void;
-let boxFails: boolean;
-let whileTheBoxSettles: () => void;
-let teardowns: string[];
-let moveOps: string[];
-
-function holdsFor(target: Row, condition: SQL): boolean {
-	const { sql, params } = dialect.sqlToQuery(condition);
-	return [...sql.matchAll(/"(\w+)" (?:=|in) \(?([$\d, ]+)/g)].every(
-		([, column = "", refs = ""]) => {
-			const field = column.replace(/_(\w)/g, (_, c: string) =>
-				c.toUpperCase(),
-			) as keyof Row;
-			return (refs.match(/\d+/g) ?? []).some(
-				(ref) => params[Number(ref) - 1] === target[field],
-			);
-		},
-	);
-}
-
-stub(db.query.cloudWorkspaces, { findFirst: async () => ({ ...row }) });
-stub(db, {
-	update: () => ({
-		set: (values: Partial<Row>) => ({
-			where: (condition: SQL) => ({
-				returning: async () => {
-					if (!holdsFor(row, condition)) return [];
-					row = { ...row, ...values };
-					return [{ id: row.id }];
-				},
-			}),
-		}),
+const logged: unknown[] = [];
+const captured: unknown[] = [];
+let claimError: unknown;
+stub(db.query.cloudWorkspaces, {
+	findFirst: async () => ({
+		id: "ws_1",
+		organizationId: "org_1",
+		status: "provisioning",
+		providerSandboxId: "ws-box",
 	}),
 });
 stub(sandbox, {
-	buildSandboxClaim: async () => ({
-		claim: { vcpus: 2 },
-		environment: {},
-		agentCredentialDigest: "digest",
-	}),
-	provisionSandbox: async ({ name }: { name: string }) => {
-		whileTheBoxIsMade();
-		if (boxFails) throw new Error("provider refused the box");
-		return {
-			providerSandboxId: name,
-			sandboxUrl: `https://${name}.example`,
-			hostTarget: `https://${name}.example`,
-		};
+	buildSandboxClaim: async () => {
+		throw claimError;
 	},
-	settleSandbox: async () => {
-		whileTheBoxSettles();
-		return {};
-	},
-	recordBootSpans: () => {},
-	deleteSandbox: async (id: string) => {
-		teardowns.push(`delete:${id}`);
-	},
-	stopSandbox: async (id: string) => {
-		teardowns.push(`stop:${id}`);
-	},
-});
-stub(meter, {
-	authorizeBoot: async () => ({ bootId: "boot-1" }),
-	attachBootSession: async () => {},
-	releaseBoot: async () => {},
+	deleteSandbox: async () => {},
+	stopSandbox: async () => ({ sessionId: null }),
 });
 stub(realtime, { nudge: () => {} });
-stub(moves, {
-	callMoves: async (_organizationId: string, request: { op: string }) => {
-		moveOps.push(request.op);
-		return { ids: [] };
-	},
+stub(chatMoves, { failChatMovesTo: async () => {} });
+stub(Sentry.logger, {
+	warn: (...args: unknown[]) => logged.push(["warn", ...args]),
+	error: (...args: unknown[]) => logged.push(["error", ...args]),
+});
+stub(Sentry, {
+	captureException: (...args: unknown[]) => captured.push(args),
 });
 
-const restoredWithANewBox = () => {
-	row = { ...row, status: "provisioning", providerSandboxId: "box-2" };
-};
-
-beforeEach(() => {
-	row = {
-		id: WORKSPACE_ID,
-		organizationId: "org-1",
-		createdByUserId: "user-1",
-		name: "Cloud workspace",
-		status: "provisioning",
-		providerSandboxId: "box-1",
-		sandboxUrl: null,
+/** The row update a failure makes; `moved` says whether the row was still in a `from` status. */
+function rowUpdate(moved: boolean, sets: unknown[] = []) {
+	return {
+		update: () => ({
+			set: (values: unknown) => {
+				sets.push(values);
+				return {
+					where: () => ({
+						returning: async () => (moved ? [{ id: "ws_1" }] : []),
+					}),
+				};
+			},
+		}),
 	};
-	whileTheBoxIsMade = () => {};
-	boxFails = false;
-	whileTheBoxSettles = () => {};
-	teardowns = [];
-	moveOps = [];
+}
+
+describe("a provision that Autumn refuses", () => {
+	stub(db, rowUpdate(true));
+
+	test("fails the workspace with a warning and opens no Sentry issue", async () => {
+		logged.length = 0;
+		captured.length = 0;
+		claimError = userError({
+			code: "FORBIDDEN",
+			message: "limit reached",
+			i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+		});
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
+			"failed",
+		);
+		expect(logged).toEqual([
+			[
+				"warn",
+				"workspace.failed",
+				{
+					"log.source": "control",
+					"cloud_workspace.id": "ws_1",
+					"organization.id": "org_1",
+					"failure.reason": "usage_limit",
+				},
+			],
+		]);
+		expect(captured).toEqual([]);
+	});
 });
 
-test("an older job that finishes its box after a restore leaves the new box on the row and deletes its own", async () => {
-	whileTheBoxIsMade = restoredWithANewBox;
+describe("a failed provision records why", () => {
+	const sets: { failureReason?: string; failedAt?: Date }[] = [];
+	stub(db, rowUpdate(true, sets));
 
-	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
-
-	expect(row.status).toBe("provisioning");
-	expect(row.providerSandboxId).toBe("box-2");
-	expect(teardowns).toEqual(["delete:box-1"]);
+	test("from the error: a refusal of either kind, a host that never answered, anything else", async () => {
+		for (claimError of [
+			userError({
+				code: "FORBIDDEN",
+				message: "limit reached",
+				i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+			}),
+			userError({
+				code: "FORBIDDEN",
+				message: "needs a paid plan",
+				i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan",
+			}),
+			new sandbox.SandboxNotReadyError("ws-box", null),
+			new Error("create failed"),
+		]) {
+			await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" });
+		}
+		expect(
+			sets.map((set) => [set.failureReason, set.failedAt instanceof Date]),
+		).toEqual([
+			["usage_limit", true],
+			["needs_paid_plan", true],
+			["host_not_ready", true],
+			["create_failed", true],
+		]);
+	});
 });
 
-test("an older job whose box fails after a restore does not fail the restored workspace", async () => {
-	whileTheBoxIsMade = restoredWithANewBox;
-	boxFails = true;
+describe("a provision whose row another write already moved", () => {
+	stub(db, rowUpdate(false));
 
-	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
-
-	expect(row.status).toBe("provisioning");
-	expect(row.providerSandboxId).toBe("box-2");
-	expect(moveOps).toEqual([]);
+	test("writes no workspace.failed and opens no Sentry issue", async () => {
+		logged.length = 0;
+		captured.length = 0;
+		claimError = new Error("create failed");
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
+			"failed",
+		);
+		expect(logged).toEqual([]);
+		expect(captured).toEqual([]);
+	});
 });
 
-test("a job whose box fails fails the chat moves into its workspace", async () => {
-	boxFails = true;
+describe("a provision whose host answered", () => {
+	const authorized: { traceId: string; transactionTraceId?: string }[] = [];
+	const sets: Record<string, unknown>[] = [];
+	const at = 1_789_000_000_000;
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({
+			claim: { vcpus: 4 },
+			environment: {},
+			agentCredentialDigest: "digest",
+		}),
+		provisionSandbox: async () => ({
+			providerSandboxId: "ws-box",
+			sandboxUrl: "https://box.test",
+			hostTarget: "https://box.test",
+			expiresAt: null,
+			sessionId: "sess_1",
+		}),
+		settleSandbox: async () => ({
+			stamps: [
+				{ phase: "boot.start", at },
+				{ phase: "host.ready", at: at + 700 },
+			],
+			answeredAt: at + 750,
+		}),
+	});
+	stub(meter, {
+		authorizeBoot: async (args: { traceId: string }) => {
+			const active = Sentry.getActiveSpan();
+			const transaction = active && Sentry.getRootSpan(active);
+			authorized.push({
+				traceId: args.traceId,
+				transactionTraceId: transaction?.spanContext().traceId,
+			});
+			return { bootId: "boot_1" };
+		},
+		attachBootSession: async () => {},
+	});
+	stub(chatMoves, { queueChatMovesTo: async () => {} });
+	stub(db, {
+		update: () => ({
+			set: (values: Record<string, unknown>) => {
+				sets.push(values);
+				return {
+					where: () =>
+						Object.assign(Promise.resolve([]), {
+							returning: async () => [{ id: "ws_1" }],
+						}),
+				};
+			},
+		}),
+	});
 
-	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
-
-	expect(row.status).toBe("failed");
-	expect(moveOps).toEqual(["failInto"]);
-});
-
-test("a job whose box fails after another actor failed the workspace still fails the chat moves into it", async () => {
-	whileTheBoxSettles = () => {
-		row = { ...row, status: "failed" };
-		throw new Error("host-service never answered");
-	};
-
-	await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID });
-
-	expect(row.status).toBe("failed");
-	expect(moveOps).toEqual(["failInto"]);
-});
-
-test("a job left alone makes its box the ready workspace", async () => {
-	expect(
-		await provisionCloudWorkspace({ cloudWorkspaceId: WORKSPACE_ID }),
-	).toBe("provisioned");
-
-	expect(row.status).toBe("ready");
-	expect(row.providerSandboxId).toBe("box-1");
-	expect(teardowns).toEqual([]);
+	test("authorizes the boot with the provision's trace id and stores the box's phases", async () => {
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
+			"provisioned",
+		);
+		expect(authorized[0]?.transactionTraceId).toMatch(/^[0-9a-f]{32}$/);
+		expect(authorized[0]?.traceId).toBe(authorized[0]?.transactionTraceId);
+		expect(sets.filter((set) => "phases" in set)).toEqual([
+			{
+				phases: [
+					{ name: "boot.start", source: "box", at, ms: 700 },
+					{ name: "host.ready", source: "box", at: at + 700, ms: 50 },
+				],
+			},
+		]);
+	});
 });

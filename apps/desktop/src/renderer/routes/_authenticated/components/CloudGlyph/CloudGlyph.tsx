@@ -4,7 +4,7 @@ import "./cloud-glyph.css";
 const CLOUD_OUTLINE =
 	"M4.5 12.5h7a3 3 0 0 0 .4-5.97A4 4 0 0 0 4.2 7.6A2.5 2.5 0 0 0 4.5 12.5Z";
 
-export type CloudGlyphState = "on" | "connecting";
+export type CloudGlyphState = "on" | "asleep" | "connecting";
 
 /** The cloud mark for cloud workspaces, drawn on a 16px grid to sit with Lucide icons. */
 export function CloudGlyph({
@@ -29,7 +29,11 @@ export function CloudGlyph({
 		>
 			<path
 				d={CLOUD_OUTLINE}
-				className={cn("cloud-glyph-outline", isConnecting && "opacity-35")}
+				className={cn(
+					"cloud-glyph-outline",
+					isConnecting && "opacity-35",
+					state === "asleep" && "cloud-glyph-asleep",
+				)}
 			/>
 			{isConnecting && (
 				<path d={CLOUD_OUTLINE} pathLength={100} className="cloud-glyph-arc" />

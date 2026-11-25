@@ -30,13 +30,13 @@ export default command({
 			"Store it readable in settings instead of as a secret",
 		),
 		environment: string().desc(
-			"Environment ID (see: superset environments list); required when the organization has several",
+			"Environment ID (see: paradev environments list); required when the organization has several",
 		),
 	},
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const name = args.name as string | undefined;
 		if (options.envFile && (name || options.body)) {
@@ -72,7 +72,7 @@ export default command({
 			if (value === undefined) {
 				throw new CLIError(
 					"No value given",
-					`Pass --body, or pipe it: printf '%s' "$VALUE" | superset environments secrets set ${name}`,
+					`Pass --body, or pipe it: printf '%s' "$VALUE" | paradev environments secrets set ${name}`,
 				);
 			}
 			entries = [{ key: name as string, value }];
@@ -97,7 +97,7 @@ export default command({
 			...(agentKeys.length === 0
 				? []
 				: [
-						`Cloud workspaces ignore ${agentKeys.join(", ")}. Sign agents in with: superset connections agents set <agent>`,
+						`Cloud workspaces ignore ${agentKeys.join(", ")}. Sign agents in with: paradev connections agents set <agent>`,
 					]),
 			...skipped.map((entry) => `Skipped ${entry.key}: ${entry.reason}`),
 		];

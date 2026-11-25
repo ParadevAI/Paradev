@@ -6,6 +6,11 @@ import "./storybook.css";
 
 initI18n("en");
 
+// Stories have no Electron preload; calls to the main process never answer.
+Object.assign(globalThis, {
+	electronTRPC: { sendMessage: () => {}, onMessage: () => {} },
+});
+
 const preview: Preview = {
 	globalTypes: {
 		theme: {

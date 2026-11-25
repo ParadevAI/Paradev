@@ -217,7 +217,7 @@ export const SETTINGS: SettingDefinition[] = [
 		type: "boolean",
 		section: "terminal",
 		description: "Show the terminal scripts bar",
-		defaultValue: true,
+		defaultValue: false,
 	},
 	{
 		key: "useCompactTerminalAddButton",
@@ -369,10 +369,10 @@ export const SETTINGS: SettingDefinition[] = [
 export const EXCLUDED_SETTINGS_COLUMNS: Record<string, string> = {
 	lastActiveWorkspaceId: "internal navigation state, not a preference",
 	activeOrganizationId: "internal session state, managed by sign-in",
-	terminalPresets: "structured JSON; use the app UI or superset agents",
+	terminalPresets: "structured JSON; use the app UI or paradev agents",
 	terminalPresetsInitialized: "internal seeding flag",
-	agentPresetOverrides: "structured JSON; use superset agents",
-	agentCustomDefinitions: "structured JSON; use superset agents",
+	agentPresetOverrides: "structured JSON; use paradev agents",
+	agentCustomDefinitions: "structured JSON; use paradev agents",
 	agentPresetPermissionsMigratedAt: "internal migration marker",
 	disabledAgentHooks: "agent-id list; use the app UI",
 	disabledSkills: "skill-name list; use the app's Plugins page",
@@ -389,10 +389,7 @@ export const EXCLUDED_SETTINGS_COLUMNS: Record<string, string> = {
 export function getSettingDefinition(key: string): SettingDefinition {
 	const def = SETTINGS.find((setting) => setting.key === key);
 	if (!def) {
-		throw new CLIError(
-			`Unknown setting: ${key}`,
-			"Run: superset settings list",
-		);
+		throw new CLIError(`Unknown setting: ${key}`, "Run: paradev settings list");
 	}
 	return def;
 }

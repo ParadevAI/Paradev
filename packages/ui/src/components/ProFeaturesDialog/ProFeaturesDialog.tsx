@@ -29,11 +29,11 @@ export function ProFeaturesDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent
-				className="!w-[744px] !max-w-[744px] p-0 gap-0 overflow-hidden !rounded-none"
+				className="flex max-h-[calc(100dvh-2rem)] !w-[744px] !max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden !rounded-none p-0"
 				showCloseButton={false}
 				aria-describedby={undefined}
 			>
-				<div className="flex">
+				<div className="flex min-h-0 flex-col overflow-y-auto md:flex-row">
 					<FeatureSidebar
 						selectedFeatureId={selectedFeature.id}
 						highlightedFeatureId={highlightedFeatureId}
@@ -42,7 +42,7 @@ export function ProFeaturesDialog({
 					<FeaturePreview selectedFeature={selectedFeature} />
 				</div>
 
-				<div className="box-border flex items-center justify-between border-t bg-background px-5 py-4">
+				<div className="box-border flex shrink-0 items-center justify-between border-t bg-background px-5 py-4">
 					<Button variant="outline" onClick={() => onOpenChange(false)}>
 						<Trans>Cancel</Trans>
 					</Button>

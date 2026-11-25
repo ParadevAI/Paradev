@@ -63,7 +63,9 @@ export function createPiExtension(): void {
 	const content = getPiExtensionContent();
 	fs.mkdirSync(path.dirname(extensionPath), { recursive: true });
 	const changed = writeFileIfChanged(extensionPath, content, 0o644);
-	console.log(`[agent-setup] ${changed ? "Updated" : "Verified"} pi extension`);
+	(changed ? console.log : console.debug)(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} pi extension`,
+	);
 }
 
 /** Removes the wholly Superset-owned pi extension file (signature-gated). */

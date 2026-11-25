@@ -5,6 +5,20 @@ import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
 
 export async function GET(request: Request) {
+	const url = new URL(request.url);
+	const callbackOrigin = new URL(getBrowserApiUrl(env)).origin;
+	if (url.origin !== callbackOrigin) {
+		const destination = new URL("/api/github/install", callbackOrigin);
+		destination.search = url.search;
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: destination.toString(),
+				"Cache-Control": "no-store",
+			},
+		});
+	}
+
 	const member = await requireOrgMember(request);
 	if (member instanceof Response) return member;
 
@@ -29,7 +43,11 @@ export async function GET(request: Request) {
 
 	return beginOAuthFlow({
 		cookie: STATE_COOKIES.github,
-		payload: { organizationId: member.organizationId, userId: member.userId },
+		payload: {
+			organizationId: member.organizationId,
+			userId: member.userId,
+			callbackOrigin,
+		},
 		authorizeUrl: (state) => {
 			// The slug must match GH_APP_ID: installing a different App produces
 			// an installation this deployment cannot mint tokens for, which

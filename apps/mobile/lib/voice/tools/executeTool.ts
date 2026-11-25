@@ -1,3 +1,4 @@
+import { isAwakeCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	isVoiceToolName,
 	type VoiceToolInput,
@@ -70,7 +71,9 @@ function describeWorkspace(workspace: VoiceWorkspace, now: number) {
 			workspace.kind === "cloud"
 				? "cloud"
 				: (workspace.hostName ?? "a machine"),
-		...(workspace.status !== "ready" ? { status: workspace.status } : {}),
+		...(!isAwakeCloudWorkspaceStatus(workspace.status)
+			? { status: workspace.status }
+			: {}),
 		agent: workspace.attention ? ATTENTION_WORDS[workspace.attention] : "idle",
 		since: ago(workspace.attentionAt ?? workspace.lastActivityAt, now),
 	};

@@ -18,7 +18,7 @@ export async function listBranchNames(
 			// Use the full refname's structural prefix to classify (safe — a
 			// branch name can't contain `refs/heads/`). Stripping `origin/`
 			// from the SHORT name would misclassify a local branch named
-			// `origin/foo`. See GIT_REFS.md.
+			// `origin/foo`.
 			let name: string;
 			if (refname.startsWith("refs/heads/")) {
 				name = refname.slice("refs/heads/".length);

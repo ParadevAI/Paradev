@@ -86,7 +86,7 @@ const urgent = await client.tasks.list({
 
 // Inspect what else you have: projects and workspaces are host-owned
 const [host] = await client.hosts.list();
-if (!host) throw new Error('No hosts registered; run `superset start` on a machine');
+if (!host) throw new Error('No hosts registered; run `paradev start` on a machine');
 const projects = await client.projects.list({ hostId: host.id });
 const automations = await client.automations.list();
 

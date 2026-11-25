@@ -1,6 +1,7 @@
 export * from "./attachmentTags/attachmentTags";
 export * from "./bookkeeping/readBookkeeping";
 export * from "./coalesce";
+export * from "./composerAnswer/composerAnswer";
 export * from "./config/launchConfigSelections";
 export * from "./config/sessionSelections";
 export * from "./continuePrompt/continuePrompt";
@@ -10,6 +11,8 @@ export * from "./markdown/splitBlocks";
 export * from "./outbox/outbox";
 export * from "./outline";
 export * from "./pastedText/pastedText";
+export * from "./questionPages/questionPages";
+export * from "./quotedReplies/quotedReplies";
 export * from "./reducer/reducer";
 export * from "./sessionUsage/sessionUsage";
 export * from "./subagents/subagents";

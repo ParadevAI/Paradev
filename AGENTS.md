@@ -101,7 +101,7 @@ serves them from `packages/trpc/src/router/plugins/servers/`. A release is the g
 `<name>@<version>` on this repo — that tree is what a host
 downloads — and `packages/shared/src/plugins/manifests.generated.ts` is the bundle the API resolves
 against, which is generated and must never be hand-edited. Change the source, then
-`superset plugins publish <name> --bump patch`, which rewrites the marketplace entry in
+`paradev plugins publish <name> --bump patch`, which rewrites the marketplace entry in
 `.agent-marketplace.json` and the generated manifests; merging to main tags it. `bun run check:plugins` is what CI
 runs to catch a change that skipped that step; run it before pushing.
 
@@ -115,33 +115,34 @@ Details: `docs/plugins.md`.
 ## Orchestrating agents and workspaces
 
 When work wants a fresh isolated environment, a parallel agent, or a long-running job, reach for the
-`superset` CLI instead of hand-rolling git worktrees or doing it all serially in this one. It's
-already on `PATH` in Paradev terminals, and we dogfood it. `paradev` is an alias for the same
-binary; write `superset` in code and docs here.
+`paradev` CLI instead of hand-rolling git worktrees or doing it all serially in this one. It's
+already on `PATH` in Paradev terminals, and we dogfood it. `superset` is an alias for the same
+binary and must keep working; write `paradev` in help text and docs here. Code that runs the CLI
+on another machine or from a released build's files still calls `superset`.
 
 Replace the capitalized placeholders before running these:
 
 ```bash
-superset ws create --local --project PROJECT_ID --name NAME --branch BRANCH --agent claude --prompt "..."
-superset agents create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
-superset ws list --local
-superset terminals read --local --workspace WORKSPACE_ID --terminal TERMINAL_ID
-superset ws archive --local WORKSPACE_ID
+paradev ws create --local --project PROJECT_ID --name NAME --branch BRANCH --agent claude --prompt "..."
+paradev agents create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
+paradev ws list --local
+paradev terminals read --local --workspace WORKSPACE_ID --terminal TERMINAL_ID
+paradev ws archive --local WORKSPACE_ID
 ```
 
 In order: an isolated workspace with an agent already working in it, another agent in an existing
 workspace, what's running, what an agent is doing right now, and cleanup when you're done.
 
 Those agents run in terminals. A user who asks for a new *session* or a *chat* means a chat agent
-session, which is a different namespace: use `superset sessions`, not `agents create` or
-`terminals`. `terminals read` and `send` cannot control a chat session.
+session, which is a different namespace: use `paradev sessions`, not `agents create` or
+`terminals`. `terminals read` cannot read a chat session; prompt one with `sessions send`.
 
 ```bash
-superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
-superset sessions list --local --workspace WORKSPACE_ID
-superset sessions read --local --workspace WORKSPACE_ID --session SESSION_ID
-superset sessions send --local --workspace WORKSPACE_ID --session SESSION_ID --prompt "..."
-superset sessions close --local --workspace WORKSPACE_ID --session SESSION_ID
+paradev sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
+paradev sessions list --local --workspace WORKSPACE_ID
+paradev sessions read --local --workspace WORKSPACE_ID --session SESSION_ID
+paradev sessions send --local --workspace WORKSPACE_ID --session SESSION_ID --prompt "..."
+paradev sessions close --local --workspace WORKSPACE_ID --session SESSION_ID
 ```
 
 `resume`, `open`, and `import`, and which agents chat supports: `docs/agent-tooling.md`.
@@ -152,13 +153,13 @@ of scattering across the project. `ws list --local --tag SOME_TAG` filters to th
 `ws update WORKSPACE_ID --tag ...` retags (`--clear-tags` ungroups). Automation-created workspaces
 are tagged `automation` by default and collect in an "automation" folder.
 
-`superset schema` prints every command, option and argument as JSON; read it with `jq` to learn the
+`paradev schema` prints every command, option and argument as JSON; read it with `jq` to learn the
 rest (tasks, automations, hosts, settings) instead of parsing `--help` text. To check only that a
-command exists, the exit code of `superset <command> --help` is enough. Details and the version
+command exists, the exit code of `paradev <command> --help` is enough. Details and the version
 caveat: `docs/agent-tooling.md`.
 
 ```bash
-superset schema | jq '.commands[] | select(.path==["terminals"]) | .commands[] | {path, options: [.options[].name]}'
+paradev schema | jq '.commands[] | select(.path==["terminals"]) | .commands[] | {path, options: [.options[].name]}'
 ```
 
 Pass `--json` for parsable output; it's on by default under agent environments.
@@ -174,8 +175,7 @@ locale. After adding or changing strings, run `bun run check:i18n` (CI enforces 
 regenerates the catalogs and lists every untranslated message per locale. Write those
 translations yourself into each `locales/<locale>/messages.po` and commit the catalogs with
 the change — nothing on CI fills translations for you. Conventions: `packages/i18n/README.md`;
-terms that never translate: `packages/i18n/glossary.md`; strategy and phasing:
-`plans/20260826-i18n-strategy.md`.
+terms that never translate: `packages/i18n/glossary.md`.
 Directories listed in `packages/i18n/test/enforced-dirs.ts` must not contain hardcoded
 JSX text — add a directory there once it is fully converted. `errorMessage()` output is potentially
 translated and is display-only: logs, Sentry/PostHog, and error classification use
@@ -204,6 +204,13 @@ Three traps worth knowing before you touch catalogs:
   Tests see neither, which is why `apps/desktop/test-setup.ts` shims the macros and `i18n._`.
   Mock that module with a Proxy, never a spread — `i18n` is a class instance and a spread
   drops `load`/`activate`.
+
+## Plans and design notes
+
+This repository is public. Plans, design notes, research, findings, specs and TODO lists are not
+committed to any repo: publish them as an org page with `superset pages publish` (`/create-plan`
+for a plan). Keep the source in `plans/local/`, which is gitignored. Do not point code, comments,
+docs or PR descriptions at them.
 
 ## Comments
 
@@ -249,11 +256,6 @@ earns its place by catching a regression quickly.
   `packages/host-service`. Released desktop, mobile, and CLI builds still call it.
 - `apps/desktop/AGENTS.md`: desktop specifics (notices, persisted renderer state).
 - `apps/mobile/AGENTS.md`: mobile structure and iOS-only scope.
-- `docs/cloud-sandbox-mismatches.md`: where cloud workspace sandboxes don't fit assumptions the
-  app makes about a machine someone owns. Read it before touching sandboxes, and add to it when
-  you find a new one.
-- `docs/cloud-sandbox-considerations.md`: what cloud sandboxes still owe before they leave the
-  team — billing, credential blast radius, untested behaviour.
 
 ## Contributor responsibility
 

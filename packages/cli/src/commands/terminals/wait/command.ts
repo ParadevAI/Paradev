@@ -23,7 +23,7 @@ export default command({
 	run: async ({ ctx, options, signal }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		let pattern: RegExp;
 		try {
@@ -92,12 +92,12 @@ export default command({
 		if (!value.alive) {
 			throw new CLIError(
 				`Terminal ${options.terminal} exited without a match for ${options.match}`,
-				"Read its last screen with `superset terminals read`",
+				"Read its last screen with `paradev terminals read`",
 			);
 		}
 		throw new CLIError(
 			`Timed out after ${options.timeout}s without a match for ${options.match}`,
-			"Check the screen with `superset terminals read`",
+			"Check the screen with `paradev terminals read`",
 		);
 	},
 });

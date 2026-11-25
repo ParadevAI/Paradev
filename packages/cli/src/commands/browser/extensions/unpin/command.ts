@@ -8,7 +8,7 @@ export default command({
 	args: [
 		positional("extension")
 			.required()
-			.desc("Extension ID (from `superset browser extensions list`)"),
+			.desc("Extension ID (from `paradev browser extensions list`)"),
 	],
 	options: {
 		host: string().desc("Host the extension is on (default: this machine)"),

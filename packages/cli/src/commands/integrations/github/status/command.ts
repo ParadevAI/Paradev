@@ -8,7 +8,7 @@ export default command({
 	run: async ({ ctx }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const installations =
 			await ctx.api.integration.github.listInstallations.query({
@@ -18,7 +18,7 @@ export default command({
 			return {
 				data: { installation: null, installations, repositories: 0 },
 				message:
-					"The GitHub App is not installed. Run: superset integrations github connect",
+					"The GitHub App is not installed. Run: paradev integrations github connect",
 			};
 		}
 		const repositories =
@@ -37,7 +37,7 @@ export default command({
 				installations,
 				repositories: repositories.length,
 			},
-			message: `Installed on ${accounts}; ${repositories.length} ${repositories.length === 1 ? "repository" : "repositories"}. List them with: superset environments repos`,
+			message: `Installed on ${accounts}; ${repositories.length} ${repositories.length === 1 ? "repository" : "repositories"}. List them with: paradev environments repos`,
 		};
 	},
 });

@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import * as Sentry from "@sentry/core";
 import { autumnClient } from "@superset/auth/autumn";
 import * as billing from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { cloudWorkspaceBoots, users } from "@superset/db/schema";
 import { AutumnError } from "autumn-js";
+import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
 import * as realtime from "../../lib/realtime";
 import type { BoxSession } from "../../lib/sandbox";
@@ -12,6 +15,7 @@ import { sessionEndedAt } from "../../lib/sandbox/vercel";
 import * as jobs from "./jobs";
 import {
 	assertMayBoot,
+	attachBootSession,
 	authorizeBoot,
 	gbMinutes,
 	lockIdFor,
@@ -19,22 +23,35 @@ import {
 	refusalFor,
 	releaseBoot,
 	settleBoot,
+	settleOrganizationNow,
 } from "./meter";
+import * as sandboxSleep from "./sandbox-sleep";
 
 const MINUTE = 60_000;
 const NOW = Date.now();
 
 let boot: Record<string, unknown> | null;
+/** Open boots a select returns; the one `boot` when null. */
+let openBoots: Record<string, unknown>[] | null;
 let session: BoxSession | null;
 let renewalAllowed: boolean;
 let finalizeError: Error | null;
+let duringFinalize: () => void;
 let trackError: Error | null;
 let renewalError: Error | null;
 let writes: Record<string, unknown>[];
 let autumnCalls: { method: string; params: unknown; headers?: unknown }[];
 let stopped: string[];
 let usageStopAt: Date | null;
+let creatorId: string | null;
 let delayedSettles: number[];
+let updateMatches: boolean;
+let insertConflicts: boolean;
+let insertError: Error | null;
+let usageRowError: Error | null;
+let reported: unknown[];
+let queuedSettles: string[];
+let listed: BoxSession[];
 type UsageEvent = {
 	featureId: string;
 	value: number;
@@ -64,24 +81,42 @@ function chain(rows: () => unknown[], onFrom?: (table: unknown) => void) {
 }
 
 stub(db, {
-	update: () => chain(() => (boot ? [boot] : [])),
+	update: () => chain(() => (boot && updateMatches ? [boot] : [])),
 	insert: () => ({
-		values: async (values: Record<string, unknown>) => {
+		values: (values: Record<string, unknown>) => {
 			writes.push(values);
+			return Object.assign(Promise.resolve(), {
+				onConflictDoNothing: () =>
+					Object.assign(
+						"feature" in values && usageRowError
+							? Promise.reject(usageRowError)
+							: Promise.resolve(),
+						{
+							returning: async () => {
+								if (insertError) throw insertError;
+								return insertConflicts ? [] : [{ id: values.id }];
+							},
+						},
+					),
+			});
 		},
 	}),
 	select: () => {
 		let source: unknown;
 		return chain(
 			() => {
-				if (source === cloudWorkspaceBoots) return boot ? [boot] : [];
+				if (source === cloudWorkspaceBoots) {
+					return openBoots ?? (boot ? [boot] : []);
+				}
 				if (source === users) {
 					return [{ name: "Ada Lovelace", email: "ada@example.com" }];
 				}
 				return [
 					{
+						id: "ws_1",
+						organizationId: "org_1",
 						providerSandboxId: "ws-box",
-						createdByUserId: "user_1",
+						createdByUserId: creatorId,
 						usageStopAt,
 						userName: "Ada Lovelace",
 						userEmail: "ada@example.com",
@@ -96,14 +131,42 @@ stub(db, {
 });
 stub(sandbox, {
 	findSandboxSession: async () => ({ session }),
+	listSandboxSessions: async () => listed,
 	stopSandbox: async (id: string) => {
 		stopped.push(id);
+		return { sessionId: "session_1" };
 	},
 });
 stub(realtime, { nudge: () => {} });
+stub(Sentry, {
+	captureException: (error: unknown) => {
+		reported.push(error);
+		return "";
+	},
+});
+let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+let endedBoots: unknown[] = [];
+stub(sandboxSleep, {
+	recordSandboxAsleep: async (
+		id: string,
+		stopped: { sessionId: string | null },
+	) => {
+		recordedAsleep.push([id, stopped]);
+	},
+	recordBootEnd: async (
+		scope: { cloudWorkspaceId: string },
+		ended: unknown,
+	) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
+	},
+});
 stub(jobs, {
-	publishCloudWorkspaceJob: async (job: { delaySeconds?: number }) => {
+	publishCloudWorkspaceJob: async (job: {
+		delaySeconds?: number;
+		body: { bootId: string };
+	}) => {
 		delayedSettles.push(job.delaySeconds ?? 0);
+		queuedSettles.push(job.body.bootId);
 	},
 });
 stub(autumnClient, {
@@ -139,6 +202,7 @@ stub(autumnClient, {
 stub(autumnClient.balances, {
 	finalize: async (params: unknown, options?: { headers?: unknown }) => {
 		autumnCalls.push({ method: "finalize", params, headers: options?.headers });
+		duringFinalize();
 		if (finalizeError) throw finalizeError;
 		const finalize = params as Parameters<
 			typeof autumnClient.balances.finalize
@@ -160,11 +224,33 @@ stub(autumnClient.balances, {
 	},
 });
 
-function autumnError(status: number) {
+const dialect = new PgDialect();
+
+/** The usage rows a write appends to the boot's pending list. */
+function pendingOf(write: Record<string, unknown> | undefined) {
+	const value = write?.pendingUsageEvents;
+	if (value === undefined) return undefined;
+	const { params } = dialect.sqlToQuery(value as SQL);
+	return JSON.parse(String(params.at(-1)));
+}
+
+/** The end reason a write sets: a value, or the SQL that keeps one already written. */
+function endReasonOf(write: Record<string, unknown> | undefined) {
+	const value = write?.endReason;
+	if (typeof value === "string" || value === undefined) return value;
+	const { sql, params } = dialect.sqlToQuery(value as SQL);
+	return `${sql} ${JSON.stringify(params)}`;
+}
+
+function usageRows() {
+	return writes.filter((write) => "feature" in write);
+}
+
+function autumnError(status: number, body = "") {
 	return new AutumnError(`status ${status}`, {
-		response: new Response("", { status }),
+		response: new Response(body, { status }),
 		request: new Request("https://api.useautumn.com/v1"),
-		body: "",
+		body,
 	});
 }
 
@@ -186,18 +272,109 @@ beforeEach(() => {
 		startedAt: NOW - 20 * MINUTE,
 		endedAt: null,
 		activeCpuMs: null,
+		egressBytes: null,
+		crashed: false,
 	};
 	renewalAllowed = true;
 	finalizeError = null;
+	duringFinalize = () => {};
 	trackError = null;
 	renewalError = null;
 	writes = [];
 	autumnCalls = [];
 	stopped = [];
+	recordedAsleep = [];
+	endedBoots = [];
 	usageStopAt = null;
+	creatorId = "user_1";
 	delayedSettles = [];
+	openBoots = null;
+	updateMatches = true;
+	insertConflicts = false;
+	insertError = null;
+	usageRowError = null;
+	reported = [];
+	queuedSettles = [];
+	listed = [];
 	usageEvents = null;
 	reservations = new Map();
+});
+
+describe("attachBootSession", () => {
+	test("a boot another caller already attached to this session stays open", async () => {
+		updateMatches = false;
+		await attachBootSession({ bootId: "boot_1", providerSandboxId: "ws-box" });
+		expect(autumnCalls).toEqual([]);
+		expect(writes.some((write) => "stoppedAt" in write)).toBe(false);
+	});
+
+	test("a boot that lost its session to another boot is released", async () => {
+		updateMatches = false;
+		boot = { ...boot, vercelSessionId: null };
+		await attachBootSession({ bootId: "boot_1", providerSandboxId: "ws-box" });
+		expect(autumnCalls.map((call) => call.params)).toMatchObject([
+			{ lockId: "boot_1:0", action: "release" },
+		]);
+		expect(writes.some((write) => "stoppedAt" in write)).toBe(true);
+	});
+});
+
+describe("releaseBoot", () => {
+	const logged: [string, unknown][] = [];
+	stub(Sentry.logger, {
+		info: (event: string, attributes: unknown) =>
+			logged.push([event, attributes]),
+	});
+
+	test("a failed start falls back to failed, any other release to released", async () => {
+		await releaseBoot("boot_1", "provision_failed");
+		await releaseBoot("boot_1", "never_attached");
+		expect(writes.map(endReasonOf)).toEqual([
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["failed"]',
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
+		]);
+	});
+
+	test("a release of a lock Autumn no longer has closes it, with no Sentry event", async () => {
+		finalizeError = autumnError(404, "Lock not found");
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
+	});
+
+	test("a release Autumn refuses is reported and leaves the lock open, and the next settle releases it", async () => {
+		finalizeError = autumnError(503);
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([finalizeError]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: true });
+
+		finalizeError = null;
+		const stoppedAt = new Date(NOW - MINUTE);
+		boot = { ...boot, stoppedAt, finalizedThrough: stoppedAt, lockOpen: true };
+		autumnCalls = [];
+		expect(await settleBoot("boot_1")).toBe("closed");
+		expect(
+			autumnCalls.filter((call) => call.method === "finalize"),
+		).toMatchObject([{ params: { action: "release" } }]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
+	});
+
+	test("a reason a stop site writes during the Autumn release stays, and the log says it", async () => {
+		duringFinalize = () => {
+			boot = { ...boot, endReason: "archived" };
+		};
+		await releaseBoot("boot_1", "sandbox_lost");
+		expect(endReasonOf(writes.at(-1))).toBe(
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
+		);
+		expect(logged.at(-1)).toEqual([
+			"boot.released",
+			expect.objectContaining({
+				"end.reason": "archived",
+				"release.cause": "sandbox_lost",
+			}),
+		]);
+	});
 });
 
 describe("settleBoot", () => {
@@ -291,11 +468,39 @@ describe("settleBoot", () => {
 		);
 	});
 
-	test("a box still refused once its grace ends is stopped and the warning cleared", async () => {
+	test("a closed boot keeps the reason its stop site wrote, or is unknown", async () => {
+		session = { ...(session as BoxSession), endedAt: NOW - MINUTE };
+		await settleBoot("boot_1");
+		expect(endReasonOf(writes.at(-1))).toBe(
+			'coalesce("cloud_workspace_boots"."end_reason", \'unknown\') []',
+		);
+	});
+
+	test("a session Vercel failed or aborted closes as crashed", async () => {
+		session = {
+			...(session as BoxSession),
+			endedAt: NOW - MINUTE,
+			crashed: true,
+		};
+		await settleBoot("boot_1");
+		expect(writes.at(-1)).toMatchObject({ endReason: "crashed" });
+	});
+
+	test("a box stopped at the spend cap ends its boot as usage_limit", async () => {
+		renewalAllowed = false;
+		usageStopAt = new Date(NOW - MINUTE);
+		await settleBoot("boot_1");
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "session_1", reason: "usage_limit" }],
+		]);
+	});
+
+	test("a box still refused once its grace ends is stopped, recorded asleep for the session it stopped, and the warning cleared", async () => {
 		renewalAllowed = false;
 		usageStopAt = new Date(NOW - MINUTE);
 		expect(await settleBoot("boot_1")).toBe("stopped");
 		expect(stopped).toEqual(["ws-box"]);
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "session_1" }]]);
 		expect(writes.at(-1)).toEqual({ usageStopAt: null });
 	});
 
@@ -359,6 +564,29 @@ describe("settleBoot", () => {
 		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
 	});
 
+	test("a retried confirm whose lock Autumn already consumed is not tracked again", async () => {
+		finalizeError = autumnError(
+			400,
+			'{"code":"invalid_request","message":"Lock not found for ID: boot_1:0"}',
+		);
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
+		expect(usageRows()).toHaveLength(1);
+		expect(reported).toEqual([]);
+	});
+
+	test("a lock Autumn no longer finds after it could have expired is tracked", async () => {
+		boot = { ...boot, finalizedThrough: new Date(NOW - 45 * MINUTE) };
+		finalizeError = autumnError(
+			400,
+			'{"code":"invalid_request","message":"Lock not found for ID: boot_1:0"}',
+		);
+		await settleBoot("boot_1");
+		expect(
+			autumnCalls.find((call) => call.method === "track")?.params,
+		).toMatchObject({ featureId: "box_gb_minutes" });
+	});
+
 	test("a confirm that fails on Autumn's side is retried, not tracked", async () => {
 		finalizeError = autumnError(503);
 		await expect(settleBoot("boot_1")).rejects.toThrow("status 503");
@@ -376,10 +604,269 @@ describe("settleBoot", () => {
 		);
 	});
 
+	test("each amount Autumn accepts is written as a usage row for its lock and window", async () => {
+		await settleBoot("boot_1");
+		const [row] = usageRows();
+		expect(usageRows()).toHaveLength(1);
+		expect(row).toMatchObject({
+			bootId: "boot_1",
+			lockSeq: 0,
+			feature: "box_gb_minutes",
+			organizationId: "org_1",
+			cloudWorkspaceId: "ws_1",
+			userId: "user_1",
+			windowFrom: new Date(NOW - 10 * MINUTE),
+			sentAt: expect.any(Date),
+		});
+		const sent = autumnCalls.find((call) => call.method === "finalize")
+			?.params as { overrideValue: number };
+		expect(row?.amount).toBe(String(sent.overrideValue));
+		expect(
+			(row?.windowTo as Date).getTime() - (row?.windowFrom as Date).getTime(),
+		).toBe((sent.overrideValue / 16) * MINUTE);
+	});
+
+	test("a closed boot writes its CPU row and its CPU time and egress on the boot", async () => {
+		session = {
+			...(session as BoxSession),
+			endedAt: NOW - 4 * MINUTE,
+			activeCpuMs: 3 * MINUTE,
+			egressBytes: 5_000,
+		};
+		await settleBoot("boot_1");
+		expect(
+			usageRows().find((row) => row.feature === "active_cpu_minutes"),
+		).toMatchObject({
+			lockSeq: 0,
+			amount: "3",
+			windowFrom: new Date(NOW - 20 * MINUTE),
+			windowTo: new Date(NOW - 4 * MINUTE),
+		});
+		expect(writes.at(-1)).toMatchObject({
+			activeCpuMs: 3 * MINUTE,
+			egressBytes: 5_000,
+		});
+	});
+
+	test("a usage row for a workspace with no creator has no user, where Autumn has unattributed", async () => {
+		creatorId = null;
+		await settleBoot("boot_1");
+		expect(usageRows()[0]).toMatchObject({ userId: null });
+		expect(
+			autumnCalls.find((call) => call.method === "check")?.params,
+		).toMatchObject({ properties: { userId: "unattributed" } });
+	});
+
+	test("an amount Autumn has not accepted writes no usage row", async () => {
+		finalizeError = autumnError(503);
+		await expect(settleBoot("boot_1")).rejects.toThrow("status 503");
+		expect(usageRows()).toEqual([]);
+	});
+
+	test("a usage row that fails to write is reported and kept on the boot, and the settle goes on", async () => {
+		usageRowError = new Error("db down");
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(reported).toEqual([usageRowError]);
+		expect(autumnCalls.map((call) => call.method)).toEqual([
+			"finalize",
+			"check",
+		]);
+		const settled = writes.find((write) => "finalizedThrough" in write);
+		const kept = pendingOf(settled);
+		expect(kept).toEqual([
+			expect.objectContaining({
+				bootId: "boot_1",
+				feature: "box_gb_minutes",
+				amount: String(usageRows()[0]?.amount),
+				windowFrom: (usageRows()[0]?.windowFrom as Date).toISOString(),
+			}),
+		]);
+	});
+
 	test("a boot another run is settling is left alone", async () => {
 		boot = null;
 		expect(await settleBoot("boot_1")).toBe("skipped");
 		expect(autumnCalls).toEqual([]);
+	});
+});
+
+describe("the reconcile queues a settle for every open boot", () => {
+	test("each settle is queued now, with no delay, whatever its place in the batch", async () => {
+		openBoots = ["boot_1", "boot_2", "boot_3"].map((id) => ({ ...boot, id }));
+		expect(
+			await reconcileCloudWorkspaceUsage({ billingEnabled: true }),
+		).toEqual({ adopted: 0, queued: 3, failed: 0 });
+		expect(queuedSettles).toEqual(["boot_1", "boot_2", "boot_3"]);
+		expect(delayedSettles).toEqual([0, 0, 0]);
+	});
+});
+
+describe("the reconcile writes the usage rows a settle could not", () => {
+	const pending = {
+		bootId: "boot_1",
+		lockSeq: 3,
+		feature: "box_gb_minutes",
+		organizationId: "org_1",
+		cloudWorkspaceId: "ws_1",
+		userId: "user_1",
+		windowFrom: new Date(NOW - 30 * MINUTE).toISOString(),
+		windowTo: new Date(NOW).toISOString(),
+		amount: "480",
+		sentAt: new Date(NOW).toISOString(),
+	};
+
+	test("a kept row is written with its own amount and window, and the list is cleared", async () => {
+		boot = { ...boot, pendingUsageEvents: [pending] };
+		await reconcileCloudWorkspaceUsage({ billingEnabled: true });
+		expect(usageRows()).toEqual([
+			{
+				...pending,
+				windowFrom: new Date(pending.windowFrom),
+				windowTo: new Date(pending.windowTo),
+				sentAt: new Date(pending.sentAt),
+			},
+		]);
+		expect(writes).toContainEqual({ pendingUsageEvents: null });
+		expect(autumnCalls.filter((call) => call.method !== "check")).toEqual([]);
+	});
+
+	test("a kept row that still fails to write stays on the boot", async () => {
+		boot = { ...boot, pendingUsageEvents: [pending] };
+		usageRowError = new Error("db down");
+		await reconcileCloudWorkspaceUsage({ billingEnabled: true });
+		expect(reported).toEqual([usageRowError]);
+		expect(writes).not.toContainEqual({ pendingUsageEvents: null });
+	});
+});
+
+describe("the reconcile adopts sessions no boot meters", () => {
+	stub(billing, { ensureAutumnCustomer: async () => ({ id: "org_1" }) });
+	const box = { name: "ws-box", expiresAt: null, sessionId: "sess_C" };
+	const resumed = (endedAt: number | null): BoxSession => ({
+		id: "sess_C",
+		memoryMb: 16_384,
+		vcpus: 8,
+		startedAt: NOW - 12 * MINUTE,
+		endedAt,
+		activeCpuMs: null,
+		egressBytes: null,
+		crashed: false,
+	});
+	const timedOut: BoxSession = {
+		id: "sess_1",
+		memoryMb: 16_384,
+		vcpus: 8,
+		startedAt: NOW - 72 * MINUTE,
+		endedAt: NOW - 12 * MINUTE - 1_000,
+		activeCpuMs: null,
+		egressBytes: null,
+		crashed: false,
+	};
+	const reconcile = () =>
+		reconcileCloudWorkspaceUsage({ active: [box], billingEnabled: true });
+	const adoptedBoot = () =>
+		writes.find((write) => write.vercelSessionId === "sess_C");
+
+	test("a session resumed after a timeout stop is adopted in the same run, though the stopped session's boot is still open", async () => {
+		listed = [resumed(NOW - 2 * MINUTE), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toMatchObject({
+			cloudWorkspaceId: "ws_1",
+			startedAt: new Date(NOW - 12 * MINUTE),
+			memoryMb: 16_384,
+			lockOpen: false,
+		});
+		expect(adoptedBoot()).not.toHaveProperty("finalizedThrough");
+		expect(autumnCalls.some((call) => call.method === "check")).toBe(false);
+		expect(stopped).toEqual([]);
+	});
+
+	test("a running unmetered session takes a lock and is billed from its start, not from the adopt", async () => {
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toMatchObject({
+			startedAt: new Date(NOW - 12 * MINUTE),
+		});
+		expect(adoptedBoot()).not.toHaveProperty("finalizedThrough");
+		expect(
+			autumnCalls.find((call) => call.method === "check")?.params,
+		).toMatchObject({
+			lock: { lockId: `${adoptedBoot()?.id}:0` },
+		});
+		expect(adoptedBoot()).toMatchObject({ lockOpen: true });
+	});
+
+	test("a session that already has a boot is not adopted again", async () => {
+		boot = { ...boot, vercelSessionId: "sess_C" };
+		listed = [resumed(null)];
+		expect((await reconcile()).adopted).toBe(0);
+		expect(adoptedBoot()).toBeUndefined();
+	});
+
+	test("a session another caller attached meanwhile is left to that boot, and the lock taken for it is released", async () => {
+		insertConflicts = true;
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(0);
+		const lockId = (
+			autumnCalls.find((call) => call.method === "check")?.params as {
+				lock: { lockId: string };
+			}
+		).lock.lockId;
+		expect(
+			autumnCalls.find((call) => call.method === "finalize")?.params,
+		).toEqual({ lockId, action: "release" });
+	});
+
+	test("a lock taken for an adopt whose insert fails is released", async () => {
+		insertError = new Error("db down");
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(0);
+		expect(
+			autumnCalls.find((call) => call.method === "finalize")?.params,
+		).toMatchObject({ action: "release" });
+	});
+
+	test("the run's settles are queued before the adopt, and an adopted boot queues its own", async () => {
+		listed = [resumed(NOW - 2 * MINUTE), timedOut];
+		await reconcile();
+		const adoptedId = adoptedBoot()?.id;
+		if (typeof adoptedId !== "string") throw new Error("no adopted boot");
+		expect(queuedSettles).toEqual(["boot_1", adoptedId]);
+	});
+
+	test("a refused running session is stopped and recorded asleep, and its minutes stay on the boot", async () => {
+		renewalAllowed = false;
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toBeDefined();
+		expect(stopped).toEqual(["ws-box"]);
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "session_1" }]]);
+		expect(adoptedBoot()).toMatchObject({ lockOpen: false });
+	});
+
+	test("an adopted boot records that the reconcile opened it", async () => {
+		listed = [resumed(null)];
+		await reconcile();
+		expect(adoptedBoot()).toMatchObject({ origin: "adopt" });
+	});
+
+	test("a refused running session ends its adopted boot as usage_limit", async () => {
+		renewalAllowed = false;
+		listed = [resumed(null)];
+		await reconcile();
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "session_1", reason: "usage_limit" }],
+		]);
+	});
+
+	test("the newest session is left to an open boot that has not attached yet", async () => {
+		boot = { ...boot, vercelSessionId: null };
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toBeUndefined();
+		expect(writes).toContainEqual(
+			expect.objectContaining({ vercelSessionId: "sess_1" }),
+		);
 	});
 });
 
@@ -395,6 +882,8 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 				createdByUserId: userId,
 				memoryMb: 16_384,
 				vcpus: 8,
+				origin: "wake",
+				traceId: "trace_1",
 			},
 			{ billingEnabled: true },
 		);
@@ -450,7 +939,7 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 
 	test("a release refunds the same user instead of leaving a negative user-only total", async () => {
 		const bootId = await reserve();
-		await releaseBoot(bootId);
+		await releaseBoot(bootId, "provision_failed");
 		expect(userTotal("box_gb_minutes")).toBe(0);
 		expect(reservations.size).toBe(0);
 	});
@@ -468,6 +957,26 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 		await reserve(null);
 		expect(userTotal("box_gb_minutes", "unattributed")).toBe(480);
 		expect(usageEvents?.[0]?.properties).not.toHaveProperty("userEmail");
+	});
+
+	test("a boot records who created it", async () => {
+		await reserve();
+		expect(writes[0]).toMatchObject({ createdByUserId: "user_1" });
+	});
+
+	test("a boot records the call that authorized it", async () => {
+		await reserve();
+		expect(writes[0]).toMatchObject({ origin: "wake" });
+	});
+});
+
+describe("settleOrganizationNow", () => {
+	test("the boxes of a purged account end their boots as archived", async () => {
+		boot = { ...boot, providerSandboxId: "ws-box" };
+		await settleOrganizationNow("org_1");
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "session_1", reason: "archived" }],
+		]);
 	});
 });
 
@@ -505,6 +1014,48 @@ describe("meter", () => {
 	});
 });
 
+describe("the usage limit refusal", () => {
+	let pack: { gbMinutes: number; price: number } | null = null;
+	stub(billing, {
+		ensureAutumnCustomer: async () => ({ id: "org_1" }),
+		organizationBilling: async () => ({ cloudUsage: { pack } }),
+	});
+	const start = () =>
+		authorizeBoot(
+			{
+				organizationId: "org_1",
+				cloudWorkspaceId: "ws_1",
+				createdByUserId: null,
+				memoryMb: 16_384,
+				vcpus: 8,
+				origin: "create",
+				traceId: "trace_1",
+			},
+			{ billingEnabled: true },
+		);
+
+	test.each([
+		[
+			"a plan that sells GB-hours, none bought yet",
+			{ gbMinutes: 60, price: 0.06 },
+			"buy",
+		],
+		["a plan with no pack", null, "upgrade"],
+	])("%s: the next step is to %s", async (_, plan, next) => {
+		pack = plan;
+		renewalAllowed = false;
+		const error = (await start().catch((caught: unknown) => caught)) as {
+			code: string;
+			cause: { i18nKey: string; i18nParams: unknown };
+		};
+		expect(error.code).toBe("FORBIDDEN");
+		expect(error.cause.i18nKey).toBe(
+			"serverError.cloudWorkspace.usageLimitReached",
+		);
+		expect(error.cause.i18nParams).toEqual({ next });
+	});
+});
+
 describe("with BILLING_PROVIDER=stripe", () => {
 	test("boxes start, wake and reconcile without asking Autumn", async () => {
 		await assertMayBoot("org_1", 4);
@@ -515,6 +1066,8 @@ describe("with BILLING_PROVIDER=stripe", () => {
 				createdByUserId: "user_1",
 				memoryMb: 16_384,
 				vcpus: 8,
+				origin: "create",
+				traceId: "trace_1",
 			}),
 		).toEqual({ bootId: null });
 		expect(await reconcileCloudWorkspaceUsage()).toEqual({

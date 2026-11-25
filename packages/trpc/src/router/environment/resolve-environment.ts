@@ -12,6 +12,7 @@ export interface ResolvedEnvironment {
 	region: string;
 	bundleSha: string;
 	primaryRepositoryId: string | null;
+	config: string | null;
 	envs: Record<string, string>;
 }
 
@@ -42,15 +43,13 @@ export async function resolveEnvironment(
 			),
 		);
 
-	const envs: Record<string, string> = {};
-	for (const secret of rows) {
-		if (isReservedKey(secret.key)) continue;
-		envs[secret.key] = decryptSecret(secret.encryptedValue, {
+	const envs = environmentEnvs(rows, (secret) =>
+		decryptSecret(secret.encryptedValue, {
 			environmentId,
 			organizationId,
 			key: secret.key,
-		});
-	}
+		}),
+	);
 
 	return {
 		id: row.id,
@@ -60,6 +59,19 @@ export async function resolveEnvironment(
 		region: row.region,
 		bundleSha: row.bundleSha,
 		primaryRepositoryId: row.primaryRepositoryId,
+		config: row.config,
 		envs,
 	};
+}
+
+export function environmentEnvs<T extends { key: string }>(
+	rows: T[],
+	decrypt: (row: T) => string,
+): Record<string, string> {
+	const envs: Record<string, string> = {};
+	for (const row of rows) {
+		if (isReservedKey(row.key)) continue;
+		envs[row.key] = decrypt(row);
+	}
+	return envs;
 }

@@ -1,3 +1,4 @@
+import { resolveCommand } from "@superset/shared/resolve-command";
 import { userGitSimpleGitOptions } from "@superset/shared/simple-git-options";
 import { type SimpleGit, type SimpleGitOptions, simpleGit } from "simple-git";
 
@@ -17,6 +18,7 @@ export function createUserSimpleGit(
 		...(userGitSimpleGitOptions(
 			env ?? process.env,
 		) satisfies Partial<SimpleGitOptions>),
+		binary: resolveCommand("git", { env: env ?? process.env }),
 		...rest,
 	};
 	const git = baseDir ? simpleGit(baseDir, gitOptions) : simpleGit(gitOptions);

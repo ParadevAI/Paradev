@@ -54,6 +54,28 @@ function build(overrides: Partial<BuildCloudSidebarWorkspacesParams> = {}) {
 }
 
 describe("buildCloudSidebarWorkspaces", () => {
+	it("carries the server's sandbox status, so only an asleep row reads asleep", () => {
+		const layout = build({
+			cloudWorkspaces: [
+				makeCloudWorkspace({ id: "asleep", status: "asleep" }),
+				makeCloudWorkspace({ id: "awake", status: "awake" }),
+				makeCloudWorkspace({ id: "older-api" }),
+				makeCloudWorkspace({ id: "provisioning", status: "provisioning" }),
+			],
+		});
+		const statusById = Object.fromEntries(
+			layout.repoProjects
+				.flatMap((project) => project.cloudWorkspaces)
+				.map((row) => [row.id, row.sandboxStatus]),
+		);
+		expect(statusById).toEqual({
+			asleep: "asleep",
+			awake: null,
+			"older-api": null,
+			provisioning: "provisioning",
+		});
+	});
+
 	it("files a workspace under the project with the same GitHub repo", () => {
 		const layout = build({
 			cloudWorkspaces: [makeCloudWorkspace({ id: "ws-1" })],

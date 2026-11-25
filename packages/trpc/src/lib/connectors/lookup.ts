@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { connections, type SelectConnection } from "@superset/db/schema";
-import { and, asc, desc, eq, isNull, ne, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, notInArray, type SQL } from "drizzle-orm";
 import { decryptSecret } from "../../router/plugins/crypto";
 import { ensureFreshConnection } from "./refresh";
 
@@ -165,6 +165,7 @@ export async function connectorConnections(
  */
 export async function grantSharedWithAnotherConnection(
 	connection: Pick<SelectConnection, "id" | "connector" | "externalUserId">,
+	alsoLeaving: readonly string[] = [],
 ): Promise<boolean> {
 	if (!connection.externalUserId) return false;
 	const [row] = await db
@@ -174,7 +175,7 @@ export async function grantSharedWithAnotherConnection(
 			live({}, [
 				eq(connections.connector, connection.connector),
 				eq(connections.externalUserId, connection.externalUserId),
-				ne(connections.id, connection.id),
+				notInArray(connections.id, [connection.id, ...alsoLeaving]),
 			]),
 		)
 		.limit(1);

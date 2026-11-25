@@ -8,7 +8,7 @@ import { BrandRenameDialog } from "./components/BrandRenameDialog";
 import { NoticeDialog } from "./components/NoticeDialog";
 
 /**
- * Server-driven version notices (plans/done/20260720-remote-version-notices.md).
+ * Server-driven version notices.
  * Blocking notices replace the app with the forced-update page; soft ones
  * render as a modal over it.
  */

@@ -1,1 +1,0 @@
-export { withStoredHistory } from "./withStoredHistory";

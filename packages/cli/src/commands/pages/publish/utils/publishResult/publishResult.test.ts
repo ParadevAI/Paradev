@@ -80,7 +80,7 @@ describe("publishResult", () => {
 			'Published "Q3 Report" v3',
 			PAGE.url,
 			"No workspace, so the next publish of this file would create a second page",
-			"To add a version instead: superset pages publish reports/q3.html --page p1",
+			"To add a version instead: paradev pages publish reports/q3.html --page p1",
 		]);
 		expect(data.unanchored).toBe(true);
 		expect(data.id).toBe("p1");
@@ -97,7 +97,7 @@ describe("publishResult", () => {
 			watchNote: null,
 		});
 		expect(data.republish).toBe(
-			"superset pages publish reports/q3.html --page p1",
+			"paradev pages publish reports/q3.html --page p1",
 		);
 	});
 
@@ -112,7 +112,7 @@ describe("publishResult", () => {
 			watchNote: null,
 		});
 		expect(data.republish).toBe(
-			'superset pages publish "my reports/q3.html" --page p1',
+			'paradev pages publish "my reports/q3.html" --page p1',
 		);
 	});
 

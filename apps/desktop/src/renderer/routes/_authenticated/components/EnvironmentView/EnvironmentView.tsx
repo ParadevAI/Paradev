@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { formatRelativeTime } from "@superset/i18n/format";
-import { SANDBOX_REGIONS } from "@superset/shared/sandbox-regions";
+import { SANDBOX_REGIONS } from "@superset/shared/sandbox/regions";
 import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import {
@@ -16,16 +16,21 @@ import { toast } from "@superset/ui/sonner";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { LuArchive, LuContainer } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useCanChangeEnvironment } from "renderer/routes/_authenticated/hooks/useCanChangeEnvironment";
 import { ArchiveEnvironmentDialog } from "../ArchiveEnvironmentDialog";
-import { EnvironmentPropertyRow } from "../EnvironmentPropertyRow";
+import {
+	EnvironmentPropertyRow,
+	PROPERTY_ROW_CONTROL,
+} from "../EnvironmentPropertyRow";
+import { EnvironmentConfig } from "./components/EnvironmentConfig";
+import { EnvironmentHistory } from "./components/EnvironmentHistory";
+import { EnvironmentMachineSize } from "./components/EnvironmentMachineSize";
 import { EnvironmentProjectLinks } from "./components/EnvironmentProjectLinks";
 import { EnvironmentVariables } from "./components/EnvironmentVariables";
 
 type EnvironmentScope = "organization" | "personal";
-
-const ROW_CONTROL =
-	"h-10 w-full rounded-none border-0 bg-transparent px-3 shadow-none focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent";
 
 interface EnvironmentViewProps {
 	environmentId: string;
@@ -36,14 +41,13 @@ export function EnvironmentView({
 	environmentId,
 	onArchived,
 }: EnvironmentViewProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
 	const environment = cloudTrpc.environment.get.useQuery({
 		id: environmentId,
 	});
-	const secrets = cloudTrpc.environment.secrets.list.useQuery({
-		environmentId,
-	});
+	const canChange = useCanChangeEnvironment(environment.data);
 	const [confirmingArchive, setConfirmingArchive] = useState(false);
 
 	const update = cloudTrpc.environment.update.useMutation({
@@ -54,7 +58,10 @@ export function EnvironmentView({
 	});
 	const archive = cloudTrpc.environment.archive.useMutation({
 		onSuccess: async () => {
-			await utils.environment.list.invalidate();
+			await Promise.all([
+				utils.environment.list.invalidate(),
+				utils.billing.environmentUsage.invalidate(),
+			]);
 			toast.success(t({ message: "Environment archived" }));
 			onArchived?.();
 		},
@@ -105,7 +112,9 @@ export function EnvironmentView({
 						)}
 					</div>
 					<div className="mt-0.5 text-xs text-muted-foreground">
-						<Trans>Created {formatRelativeTime(new Date(row.createdAt))}</Trans>
+						<Trans>
+							Created {formatRelativeTime(new Date(row.createdAt), now)}
+						</Trans>
 					</div>
 				</div>
 			</div>
@@ -116,13 +125,16 @@ export function EnvironmentView({
 					label={<Trans>Visible to</Trans>}
 				>
 					<Select
-						disabled={update.isPending}
+						disabled={update.isPending || !canChange}
 						onValueChange={(scope) =>
 							update.mutate({ id: row.id, scope: scope as EnvironmentScope })
 						}
 						value={row.scope}
 					>
-						<SelectTrigger className={ROW_CONTROL} id="environment-view-scope">
+						<SelectTrigger
+							className={PROPERTY_ROW_CONTROL}
+							id="environment-view-scope"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -142,6 +154,20 @@ export function EnvironmentView({
 					<span className="px-3 text-sm" id="environment-view-region">
 						{region}
 					</span>
+				</EnvironmentPropertyRow>
+				<EnvironmentPropertyRow
+					htmlFor="environment-view-machine-size"
+					label={<Trans>Machine size</Trans>}
+				>
+					<EnvironmentMachineSize
+						className={PROPERTY_ROW_CONTROL}
+						disabled={update.isPending || !canChange}
+						id="environment-view-machine-size"
+						machineSize={row.machineSize}
+						onChange={(machineSize) =>
+							update.mutate({ id: row.id, machineSize })
+						}
+					/>
 				</EnvironmentPropertyRow>
 				<EnvironmentPropertyRow
 					htmlFor="environment-view-repositories"
@@ -178,29 +204,11 @@ export function EnvironmentView({
 						repositories={row.repositories}
 					/>
 				</EnvironmentPropertyRow>
-				<EnvironmentPropertyRow
-					htmlFor="environment-view-snapshot"
-					label={<Trans>Snapshot</Trans>}
-				>
-					<span
-						className="px-3 text-sm text-muted-foreground"
-						id="environment-view-snapshot"
-					>
-						{row.sourceKind === "fork" ? (
-							<Trans>
-								Checkpoint saved {formatRelativeTime(new Date(row.updatedAt))}
-							</Trans>
-						) : (
-							<Trans>Base image · no checkpoint yet</Trans>
-						)}
-					</span>
-				</EnvironmentPropertyRow>
 			</div>
 
-			<EnvironmentVariables
-				isLoading={secrets.isLoading}
-				variables={secrets.data ?? []}
-			/>
+			<EnvironmentConfig canChange={canChange} environment={row} />
+			<EnvironmentHistory canRestore={canChange} environmentId={row.id} />
+			<EnvironmentVariables environmentId={row.id} />
 
 			<div className="mt-auto pt-2">
 				<Button

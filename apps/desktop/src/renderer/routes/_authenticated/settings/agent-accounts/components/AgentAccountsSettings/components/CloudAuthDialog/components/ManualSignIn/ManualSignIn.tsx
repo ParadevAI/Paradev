@@ -38,12 +38,7 @@ export function ManualSignIn({
 		setSaving(true);
 		try {
 			await enable();
-			toast.success(t({ message: `${label} is set to manual` }), {
-				description: t({
-					message:
-						"Restart running workspaces so their agents pick up the change.",
-				}),
-			});
+			toast.success(t({ message: `${label} is set to manual` }));
 		} catch (error) {
 			toast.error(
 				error instanceof Error

@@ -36,6 +36,7 @@ import {
 	CUT_COMMAND,
 	DROP_COMMAND,
 	FORMAT_TEXT_COMMAND,
+	HISTORY_PUSH_TAG,
 	INDENT_CONTENT_COMMAND,
 	INSERT_PARAGRAPH_COMMAND,
 	KEY_ARROW_RIGHT_COMMAND,
@@ -45,6 +46,7 @@ import {
 	KEY_ENTER_COMMAND,
 	KEY_ESCAPE_COMMAND,
 	KEY_TAB_COMMAND,
+	type LexicalEditor,
 	type LexicalNode,
 	OUTDENT_CONTENT_COMMAND,
 	PASTE_COMMAND,
@@ -93,6 +95,7 @@ import type {
 	ComposerMentionProvider,
 	ComposerPanelContent,
 	PromptInputAttachment,
+	PromptInputCommand,
 	PromptInputLayout,
 	PromptInputProps,
 } from "../../types";
@@ -108,6 +111,12 @@ import { registerHistoryNavigation } from "../../utils/historyNavigation";
 import { registerInlineCodeExit } from "../../utils/inlineCodeExit";
 import { $insertTranscript } from "../../utils/insertTranscript";
 import { $isInCode } from "../../utils/isInCode";
+import {
+	$commandTokenStart,
+	$textAfterCaret,
+	type CommandTokenMatch,
+	matchCommandToken,
+} from "../../utils/matchCommandToken";
 import { rankCommands } from "../../utils/rankCommands";
 import { tablesToMarkdown } from "../../utils/tablesToMarkdown";
 import { registerTrailingParagraph } from "../../utils/trailingParagraph";
@@ -157,15 +166,19 @@ const FOOTER_BUTTONS: Record<
 const INLINE_CONTEXT_BUTTON_CLASS =
 	"size-7 rounded-full bg-secondary hover:bg-secondary/80 disabled:hover:bg-secondary";
 
-// Slash commands only trigger while the "/token" is the entire message.
-function matchCommandToken(text: string) {
-	const match = /^\/([^/\r\n]*)$/.exec(text);
-	if (!match) return null;
-	return {
-		leadOffset: 0,
-		matchingString: match[1] ?? "",
-		replaceableString: match[0],
-	};
+function rankForToken(
+	commands: PromptInputCommand[],
+	token: Pick<CommandTokenMatch, "leading" | "sigil">,
+	query: string,
+): PromptInputCommand[] {
+	const eligible = token.leading
+		? commands
+		: commands.filter(
+				(command) =>
+					command.inline &&
+					(token.sigil === "/" || command.title.startsWith(token.sigil)),
+			);
+	return rankCommands(eligible, query, { prefixOnly: !token.leading });
 }
 
 export type ComposerBodyProps = Required<
@@ -207,6 +220,11 @@ function $insertChipAtSelection(chip: ComposerChip) {
 	if (!$isRangeSelection(selection)) return;
 	const chipNode = MentionChipNode.fromChip(chip);
 	selection.insertNodes([chipNode, $createTextNode(" ")]);
+}
+
+/** A chip is its own undo step, even when it lands right after typing. */
+function insertChip(editor: LexicalEditor, chip: ComposerChip) {
+	editor.update(() => $insertChipAtSelection(chip), { tag: HISTORY_PUSH_TAG });
 }
 
 function $collectChips(): ComposerChip[] {
@@ -262,6 +280,19 @@ export function ComposerBody({
 	const [attachments, setAttachments] = useState<PromptInputAttachment[]>([]);
 	const attachmentsRef = useRef(attachments);
 	attachmentsRef.current = attachments;
+	const [quotes, setQuotes] = useState<string[]>([]);
+	const quotesRef = useRef(quotes);
+	quotesRef.current = quotes;
+	const addQuotes = useCallback((incoming: readonly string[] | undefined) => {
+		if (!incoming?.length) return;
+		setQuotes((previous) => [
+			...previous,
+			...incoming.filter(
+				(quote, index) =>
+					!previous.includes(quote) && incoming.indexOf(quote) === index,
+			),
+		]);
+	}, []);
 	const usedDictationRef = useRef(false);
 	const addAttachments = useCallback(
 		(incoming: readonly Omit<PromptInputAttachment, "previewUrl">[]) => {
@@ -286,6 +317,7 @@ export function ComposerBody({
 			restoreDraft(restored: ComposerDraft) {
 				editor.update(() => $appendDraftSegments(restored.segments));
 				addAttachments(restored.attachments);
+				addQuotes(restored.quotes);
 				if (restored.usedDictation) usedDictationRef.current = true;
 				editor.focus();
 			},
@@ -294,7 +326,8 @@ export function ComposerBody({
 					editor
 						.getEditorState()
 						.read(() => $getRoot().getTextContent().trim() === "") &&
-					attachmentsRef.current.length === 0
+					attachmentsRef.current.length === 0 &&
+					quotesRef.current.length === 0
 				);
 			},
 			addFiles(files: File[]) {
@@ -302,7 +335,11 @@ export function ComposerBody({
 				focusAtEnd();
 			},
 			insertChip(chip: ComposerChip) {
-				editor.update(() => $insertChipAtSelection(chip));
+				insertChip(editor, chip);
+			},
+			addQuote(text: string) {
+				addQuotes([text]);
+				focusAtEnd();
 			},
 			openFileDialog() {
 				fileInputRef.current?.click();
@@ -322,13 +359,17 @@ export function ComposerBody({
 				editor.blur();
 			},
 		}),
-		[addAttachments, editor, focusAtEnd],
+		[addAttachments, addQuotes, editor, focusAtEnd],
 	);
 	const [isEmpty, setIsEmpty] = useState(true);
 	const [dragging, setDragging] = useState(false);
 	const [mentionQuery, setMentionQuery] = useState<string | null>(null);
 	const [commandQuery, setCommandQuery] = useState<string | null>(null);
 	const [commandDismissed, setCommandDismissed] = useState(false);
+	const [commandToken, setCommandToken] = useState<{
+		leading: boolean;
+		sigil: "/" | "$";
+	}>({ leading: true, sigil: "/" });
 	const [panel, setPanel] = useState<ComposerPanelContent | null>(null);
 	const [menuSlot, setMenuSlot] = useState<HTMLDivElement | null>(null);
 	const [browseOpen, setBrowseOpen] = useState(false);
@@ -380,8 +421,9 @@ export function ComposerBody({
 			});
 		}
 		addAttachments(draft.attachments);
+		addQuotes(draft.quotes);
 		if (draft.usedDictation) usedDictationRef.current = true;
-	}, [addAttachments, draft, editor]);
+	}, [addAttachments, addQuotes, draft, editor]);
 
 	useEffect(
 		() =>
@@ -389,6 +431,9 @@ export function ComposerBody({
 				onDraftChangeRef.current?.({
 					segments: draftOf(editorState),
 					attachments: attachmentsRef.current,
+					...(quotesRef.current.length > 0
+						? { quotes: quotesRef.current }
+						: {}),
 					...(usedDictationRef.current ? { usedDictation: true } : {}),
 				});
 			}),
@@ -398,9 +443,10 @@ export function ComposerBody({
 		onDraftChangeRef.current?.({
 			segments: draftOf(editor.getEditorState()),
 			attachments,
+			...(quotes.length > 0 ? { quotes } : {}),
 			...(usedDictationRef.current ? { usedDictation: true } : {}),
 		});
-	}, [attachments, editor]);
+	}, [attachments, quotes, editor]);
 
 	const addFiles = (files: FileList | File[]) => {
 		const incoming = Array.from(files);
@@ -449,9 +495,7 @@ export function ComposerBody({
 	}, [editor]);
 
 	const actionContext: ComposerActionContext = {
-		insertChip: (chip) => {
-			editor.update(() => $insertChipAtSelection(chip));
-		},
+		insertChip: (chip) => insertChip(editor, chip),
 		attachFiles: () => fileInputRef.current?.click(),
 		openPanel: setPanel,
 		query: mentionQuery ?? "",
@@ -538,8 +582,8 @@ export function ComposerBody({
 	);
 
 	const rankedCommands = useMemo(
-		() => rankCommands(commands ?? [], commandQuery ?? ""),
-		[commands, commandQuery],
+		() => rankForToken(commands ?? [], commandToken, commandQuery ?? ""),
+		[commands, commandQuery, commandToken],
 	);
 	const commandOptions = useMemo(
 		() => rankedCommands.map((command) => new CommandTypeaheadOption(command)),
@@ -628,7 +672,13 @@ export function ComposerBody({
 		const segments = draftOf(editorState);
 		const sent = stateRef.current.attachments;
 		const files = sent.map((attachment) => attachment.file);
-		if (!text && files.length === 0 && !stateRef.current.allowEmptySubmit) {
+		const quoted = quotesRef.current;
+		if (
+			!text &&
+			files.length === 0 &&
+			quoted.length === 0 &&
+			!stateRef.current.allowEmptySubmit
+		) {
 			return;
 		}
 		if (
@@ -636,10 +686,12 @@ export function ComposerBody({
 				text,
 				files,
 				mentions,
+				quotes: quoted,
 				steer,
 				draft: {
 					segments,
 					attachments: sent,
+					...(quoted.length > 0 ? { quotes: quoted } : {}),
 					...(usedDictationRef.current ? { usedDictation: true } : {}),
 				},
 			}) === false
@@ -652,6 +704,7 @@ export function ComposerBody({
 			for (const attachment of previous) releaseAttachment(attachment);
 			return [];
 		});
+		setQuotes([]);
 		setPanel(null);
 	};
 	const submitRef = useRef(submit);
@@ -804,7 +857,7 @@ export function ComposerBody({
 					trimmed && !asText ? chipForPasteRef.current?.(trimmed) : null;
 				if (chip) {
 					event.preventDefault();
-					editor.update(() => $insertChipAtSelection(chip));
+					insertChip(editor, chip);
 					return true;
 				}
 				const text = normalizePastedText(raw);
@@ -1041,7 +1094,8 @@ export function ComposerBody({
 		return () => document.removeEventListener("pointerdown", onPointerDown);
 	}, []);
 
-	const canSend = allowEmptySubmit || !isEmpty || attachments.length > 0;
+	const hasCards = attachments.length > 0 || quotes.length > 0;
+	const canSend = allowEmptySubmit || !isEmpty || hasCards;
 
 	useEffect(() => {
 		if (autoFocus) focusAtEnd();
@@ -1062,7 +1116,7 @@ export function ComposerBody({
 			className={cn(
 				inline
 					? "relative min-w-24 flex-1 py-[3px]"
-					: "relative px-4 pt-3.5 pb-1",
+					: "relative px-4 pt-3.5 pb-1 @max-[240px]/composer:[--prompt-input-max-height:20vh]",
 				inline && dictating && "hidden",
 			)}
 		>
@@ -1082,7 +1136,7 @@ export function ComposerBody({
 							"pointer-events-none absolute text-sm leading-[1.625]",
 							inline
 								? "top-[3px] left-0 text-muted-foreground"
-								: "top-3.5 left-4 text-muted-foreground/70",
+								: "top-3.5 right-4 left-4 text-muted-foreground/70 @max-[240px]/composer:line-clamp-2",
 						)}
 					>
 						{placeholder}
@@ -1158,7 +1212,27 @@ export function ComposerBody({
 					else void option.command.onSelect(actionContextRef.current);
 				}}
 				options={commandOptions}
-				triggerFn={(text) => ($isInCode() ? null : matchCommandToken(text))}
+				triggerFn={(text) => {
+					const match = $isInCode()
+						? null
+						: matchCommandToken(text, $commandTokenStart(), $textAfterCaret());
+					if (
+						match &&
+						rankForToken(commands ?? [], match, match.matchingString).length ===
+							0
+					)
+						// Lexical keeps a matched menu's arrow keys even when it shows nothing.
+						return null;
+					if (match) {
+						const { leading, sigil } = match;
+						setCommandToken((current) =>
+							current.leading === leading && current.sigil === sigil
+								? current
+								: { leading, sigil },
+						);
+					}
+					return match;
+				}}
 				commandPriority={COMMAND_PRIORITY_HIGH}
 				menuRenderFn={(
 					anchorElementRef,
@@ -1333,7 +1407,7 @@ export function ComposerBody({
 					className={
 						!canSend || disabled || pending
 							? buttons.inactiveSend
-							: inline && isEmpty && attachments.length === 0
+							: inline && isEmpty && !hasCards
 								? buttons.filled
 								: cn(
 										buttons.base,
@@ -1370,7 +1444,7 @@ export function ComposerBody({
 		<>
 			{editorBlock}
 			<div
-				className="flex min-h-12 items-center gap-2 px-3 pb-2.5"
+				className="flex min-h-12 flex-wrap items-center gap-2 px-3 pb-2.5 @[240px]/composer:flex-nowrap [&>*]:max-w-full"
 				data-composer-footer
 			>
 				<ContextButton onClick={toggleBrowseMenu} disabled={dictating} />
@@ -1392,7 +1466,7 @@ export function ComposerBody({
 			<div
 				ref={rootRef}
 				className={cn(
-					"relative flex flex-col bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
+					"@container/composer relative flex min-w-0 flex-col bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
 					inline ? "rounded-[22px]" : "rounded-2xl",
 				)}
 				onDragOver={(event) => {
@@ -1488,6 +1562,10 @@ export function ComposerBody({
 				</div>
 				<AttachmentPills
 					attachments={attachments}
+					quotes={quotes}
+					onRemoveQuote={(quote) =>
+						setQuotes((previous) => previous.filter((entry) => entry !== quote))
+					}
 					onAttachmentClick={onAttachmentClick}
 					onReveal={
 						localFiles

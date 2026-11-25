@@ -12,6 +12,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { posthog } from "@/lib/posthog";
 import { useStartWorkspaceTerminal } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/hooks/useStartWorkspaceTerminal";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
@@ -58,7 +59,7 @@ export function FinishReviewSheet() {
 	const workspaceId = id ?? "";
 
 	const { workspace, host } = useWorkspaceHost(workspaceId || null);
-	const { terminalsByWorkspace } = useHostTerminals(host);
+	const { terminalsByWorkspace } = useHostTerminals(host, workspaceId);
 	const comments = useDraftCommentsStore(
 		(state) => state.commentsByWorkspace[workspaceId] ?? NO_COMMENTS,
 	);
@@ -158,15 +159,15 @@ export function FinishReviewSheet() {
 					}),
 				}}
 			/>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			<ScrollView
 				className="bg-background flex-1"
 				contentInsetAdjustmentBehavior="automatic"
@@ -184,6 +185,7 @@ export function FinishReviewSheet() {
 				<TextInput
 					className="border-border text-foreground mx-3 min-h-20 rounded-xl border px-3.5 py-3 text-[15px]"
 					multiline
+					textAlignVertical="top"
 					onChangeText={setMessage}
 					placeholder={t({
 						message: "Leave a summary…",

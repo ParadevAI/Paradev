@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { resolveSharedVersion, servedVersion } from "./shared-version";
+import {
+	isPubliclyServed,
+	resolveSharedVersion,
+	servedVersion,
+} from "./shared-version";
 
 describe("servedVersion", () => {
 	test("falls back to the latest version when nothing is pinned", () => {
@@ -34,5 +38,22 @@ describe("resolveSharedVersion", () => {
 
 	test("pins a pick when the page has no versions to compare against", () => {
 		expect(resolveSharedVersion(2, null)).toBe(2);
+	});
+});
+
+describe("isPubliclyServed", () => {
+	const page = { visibility: "everyone" as const, takenDownAt: null };
+
+	test("is true for a page anyone with the link can see", () => {
+		expect(isPubliclyServed(page)).toBe(true);
+	});
+
+	test("is false for a page only its organization or its owner can see", () => {
+		expect(isPubliclyServed({ ...page, visibility: "org" })).toBe(false);
+		expect(isPubliclyServed({ ...page, visibility: "just_me" })).toBe(false);
+	});
+
+	test("is false for a page that was taken down", () => {
+		expect(isPubliclyServed({ ...page, takenDownAt: new Date() })).toBe(false);
 	});
 });

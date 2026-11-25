@@ -1,5 +1,21 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
+import {
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
+	BOX_GB_MINUTES_FEATURE_ID,
+} from "@superset/shared/billing";
 import { z } from "zod";
+
+export {
+	type CloudWorkspaceBootEndReason,
+	type CloudWorkspaceFailureReason,
+	type CloudWorkspaceStatus,
+	cloudWorkspaceBootEndReasonEnum,
+	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceFailureReasonEnum,
+	cloudWorkspaceFailureReasonValues,
+	cloudWorkspaceStatusEnum,
+	cloudWorkspaceStatusValues,
+} from "@superset/shared/cloud-workspace-status";
 
 export const taskStatusEnumValues = [
 	"backlog",
@@ -60,18 +76,12 @@ export const commandStatusEnum = z.enum(commandStatusValues);
 export type CommandStatus = z.infer<typeof commandStatusEnum>;
 
 /**
- * No sleep/wake states: the provider wakes a sandbox on the first inbound
- * connection, so "asleep" is invisible to callers and could only ever be
- * reported stale. `ready` means addressable, awake or not.
+ * `asleep`: the box session ended, and the box answers nothing until `access`
+ * with `wake` resumes it. Only `sandbox-sleep.ts` and `sandbox-expiry.ts` move
+ * a row between `awake` and `asleep`. `ready` and `deleted` are the old names
+ * of `awake` and `archived`: no row holds them, and Postgres cannot drop an
+ * enum value without rebuilding the type.
  */
-export const cloudWorkspaceStatusValues = [
-	"provisioning",
-	"ready",
-	"failed",
-	"deleted",
-] as const;
-export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
-export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
 
 /** Who else can open a cloud workspace besides its creator and the people it is shared with. `just_me` predates sharing: it means no one else. */
 export const cloudWorkspaceVisibilityValues = ["just_me", "org"] as const;
@@ -80,6 +90,27 @@ export const cloudWorkspaceVisibilityEnum = z.enum(
 );
 export type CloudWorkspaceVisibility = z.infer<
 	typeof cloudWorkspaceVisibilityEnum
+>;
+
+/** The Autumn features a cloud workspace boot is billed on; the values are Autumn feature ids. */
+export const cloudUsageFeatureValues = [
+	BOX_GB_MINUTES_FEATURE_ID,
+	ACTIVE_CPU_MINUTES_FEATURE_ID,
+] as const;
+export const cloudUsageFeatureEnum = z.enum(cloudUsageFeatureValues);
+export type CloudUsageFeature = z.infer<typeof cloudUsageFeatureEnum>;
+
+/** Who inserted a boot row: a create or a wake that authorized it, or the reconcile that found its session unmetered. */
+export const cloudWorkspaceBootOriginValues = [
+	"create",
+	"wake",
+	"adopt",
+] as const;
+export const cloudWorkspaceBootOriginEnum = z.enum(
+	cloudWorkspaceBootOriginValues,
+);
+export type CloudWorkspaceBootOrigin = z.infer<
+	typeof cloudWorkspaceBootOriginEnum
 >;
 
 /** Who made a change: a person (bot accounts included) or Superset itself. */
@@ -141,6 +172,27 @@ export type SuggestionEntity = (typeof suggestionEntityValues)[number];
 /** Who can see and use an environment: everyone in its organization, or its creator alone. */
 export const environmentScopeValues = ["organization", "personal"] as const;
 export type EnvironmentScope = (typeof environmentScopeValues)[number];
+
+export const environmentBuildStatusValues = [
+	"running",
+	"succeeded",
+	"failed",
+] as const;
+export type EnvironmentBuildStatus =
+	(typeof environmentBuildStatusValues)[number];
+
+/** `promote` records a golden saved from a workspace that a build replaced, so retention can delete it. */
+export const environmentBuildTriggerValues = [
+	"manual",
+	"daily",
+	"promote",
+] as const;
+export type EnvironmentBuildTrigger =
+	(typeof environmentBuildTriggerValues)[number];
+
+/** `incremental` forks the current golden; `fresh` starts from the base image. */
+export const environmentBuildKindValues = ["incremental", "fresh"] as const;
+export type EnvironmentBuildKind = (typeof environmentBuildKindValues)[number];
 
 export const environmentSourceKindValues = ["image", "fork"] as const;
 export const environmentSourceKindEnum = z.enum(environmentSourceKindValues);

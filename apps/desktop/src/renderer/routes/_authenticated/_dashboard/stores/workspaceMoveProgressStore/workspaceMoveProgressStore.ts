@@ -19,6 +19,12 @@ export interface WorkspaceMoveProgress {
 	/** A new cloud workspace boots before any chat can copy into it. */
 	toCloud: boolean;
 	stayed: string[];
+	/** Terminals that did not move and run again at the source. */
+	stayedTerminals: string[];
+	/** Terminals that did not move and could not be started again. */
+	notRestartedTerminals: string[];
+	/** Moving the terminals goes on after the chats have moved. */
+	terminalsPending: boolean;
 	open: (() => void) | null;
 	stage: WorkspaceMoveProgressStage;
 	chats: { total: number; ready: number; failed: number } | null;

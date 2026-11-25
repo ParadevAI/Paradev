@@ -3,7 +3,7 @@ title: Host Server
 description: Set up the daemon the CLI and desktop app talk to when targeting the local machine.
 ---
 
-`superset start` runs a headless HTTP server that the Paradev desktop app and CLI talk to. It manages workspaces, ports, and agent runs on its machine. The desktop app starts it automatically. On a CLI-only or headless machine, start it yourself.
+`paradev start` runs a headless HTTP server that the Paradev desktop app and CLI talk to. It manages workspaces, ports, and agent runs on its machine. The desktop app starts it automatically. On a CLI-only or headless machine, start it yourself.
 
 The desktop app includes the CLI. It installs a `~/.paradev/bin/superset` shim on launch, and Paradev terminals add that directory to `PATH`. In other shells, add `~/.paradev/bin` to `PATH`. On a headless machine, use the standalone
 installer from [Getting Started](/cli/getting-started).
@@ -38,7 +38,7 @@ None are required to start the host server or create workspaces.
 The host server starts under your Paradev session:
 
 ```bash
-superset auth login
+paradev auth login
 ```
 
 See [Getting Started](/cli/getting-started) for the full sign-in flow,
@@ -47,7 +47,7 @@ including API-key auth for CI.
 ## Start the host server
 
 ```bash
-superset start --daemon
+paradev start --daemon
 ```
 
 Starts the daemon in the background and writes a manifest at
@@ -57,7 +57,7 @@ it. Binds to `127.0.0.1` only.
 Check its health:
 
 ```bash
-superset status
+paradev status
 ```
 
 ### Keep it updated
@@ -66,7 +66,7 @@ Automatic updates are off by default. To turn them on, start the host with
 `--auto-update`:
 
 ```bash
-superset start --daemon --auto-update
+paradev start --daemon --auto-update
 ```
 
 - `--auto-update` requires `--daemon`.
@@ -74,7 +74,7 @@ superset start --daemon --auto-update
   installs, and the host restarts with its health check and rollback.
   Terminals reconnect after the restart.
 - Updates never downgrade the host. A release that fails its health check is
-  skipped on later automatic checks; `superset update` can still install it.
+  skipped on later automatic checks; `paradev update` can still install it.
 - The flag applies to a new start only. To change it, stop the host and start
   it again.
 
@@ -86,7 +86,7 @@ install and its parent directory, or reinstall as that user.
 ### Run it under systemd
 
 On a server, let systemd start the host server at boot and restart it on
-failure. Run `superset start` without `--daemon` so systemd tracks the
+failure. Run `paradev start` without `--daemon` so systemd tracks the
 process:
 
 ```ini
@@ -121,12 +121,12 @@ sudo systemctl enable --now superset-host
 ```
 
 To end every terminal and agent too, stop the unit first, then stop the
-terminal daemon. If you run `superset stop` while the unit is active,
+terminal daemon. If you run `paradev stop` while the unit is active,
 systemd starts the host again.
 
 ```bash
 sudo systemctl stop superset-host
-superset stop --terminals
+paradev stop --terminals
 ```
 
 ## Getting started
@@ -141,7 +141,7 @@ machine runs `projects setup` to attach to the existing project.
 Check what this machine has (add `--host <id>` to check another host):
 
 ```bash
-superset projects list
+paradev projects list
 ```
 
 #### First machine: `projects create`
@@ -151,14 +151,14 @@ existing local one:
 
 ```bash
 # Clone from a Git URL
-superset projects create \
+paradev projects create \
   --name "My Project" \
   --local \
   --clone https://github.com/org/repo.git \
   --parent-dir ~/code
 
 # Or import a repo that's already on disk
-superset projects create \
+paradev projects create \
   --name "My Project" \
   --local \
   --import ~/code/existing-repo
@@ -176,10 +176,10 @@ Projects are host-owned, so pick the ID from a machine that has it
 
 ```bash
 # Clone the project's repo onto this machine
-superset projects setup 47c31b04-… --local --parent-dir ~/code
+paradev projects setup 47c31b04-… --local --parent-dir ~/code
 
 # Or attach to an existing local checkout
-superset projects setup 47c31b04-… --local --import ~/code/repo
+paradev projects setup 47c31b04-… --local --import ~/code/repo
 ```
 
 The URL for clone mode comes from the cloud project record, so `setup`
@@ -189,8 +189,8 @@ project that's already set up here is a no-op.
 ### Create your first workspace
 
 ```bash
-superset projects list
-superset workspaces create \
+paradev projects list
+paradev workspaces create \
   --project prj_… \
   --name "fix-login-bug" \
   --branch fix/login-bug
@@ -202,7 +202,7 @@ a git worktree at the chosen branch, and registers the workspace.
 You can also create a workspace from a pull request number:
 
 ```bash
-superset workspaces create \
+paradev workspaces create \
   --project prj_… \
   --name "review-pr-123" \
   --pr 123 \
@@ -212,14 +212,14 @@ superset workspaces create \
 ## Stop the host server
 
 ```bash
-superset stop
+paradev stop
 ```
 
 Your terminals and agents keep running in the terminal daemon, and the next
-`superset start` picks them up. To end them as well:
+`paradev start` picks them up. To end them as well:
 
 ```bash
-superset stop --terminals
+paradev stop --terminals
 ```
 
 ## Shared state
@@ -237,6 +237,6 @@ The CLI sees a host server started by the desktop app, and the reverse. `SUPERSE
 
 For full flags, exit codes, and output shapes:
 
-- [`superset start`](/cli/cli-reference#superset-start)
-- [`superset status`](/cli/cli-reference#superset-status)
-- [`superset stop`](/cli/cli-reference#superset-stop)
+- [`paradev start`](/cli/cli-reference#superset-start)
+- [`paradev status`](/cli/cli-reference#superset-status)
+- [`paradev stop`](/cli/cli-reference#superset-stop)

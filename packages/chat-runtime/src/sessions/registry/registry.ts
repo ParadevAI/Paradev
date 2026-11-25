@@ -5,6 +5,7 @@ import type {
 	Envelope,
 	TurnError,
 } from "@superset/chat/protocol";
+import { sessionNotRunningMessage } from "@superset/chat/protocol";
 import type { ChatCheckpoints, SessionCheckpoints } from "../../checkpoints";
 import type {
 	DiscoverNativeSessionsInput,
@@ -223,7 +224,7 @@ export class LiveSessionRegistry {
 
 	require(sessionId: string): LiveSession {
 		const session = this.live.get(sessionId);
-		if (!session) throw new Error(`chat session ${sessionId} is not running`);
+		if (!session) throw new Error(sessionNotRunningMessage(sessionId));
 		return session;
 	}
 

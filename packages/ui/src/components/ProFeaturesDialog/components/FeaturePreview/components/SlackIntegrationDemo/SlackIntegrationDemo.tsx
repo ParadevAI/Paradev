@@ -18,7 +18,7 @@ const MESSAGES = [
 export function SlackIntegrationDemo() {
 	return (
 		<div className="flex h-full w-full items-center justify-center">
-			<div className="w-[300px] overflow-hidden rounded-lg border border-border bg-card/90 shadow-2xl backdrop-blur-sm">
+			<div className="w-[300px] max-w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-card/90 shadow-2xl backdrop-blur-sm">
 				<div className="flex items-center justify-between border-border/50 border-b bg-muted/80 px-4 py-3">
 					<div className="flex items-center gap-2">
 						<FaSlack className="size-4 text-violet-400" />

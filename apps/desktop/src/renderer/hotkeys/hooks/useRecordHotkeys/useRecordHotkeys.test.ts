@@ -5,8 +5,7 @@ import {
 } from "./useRecordHotkeys";
 
 /**
- * Covers the regressions fixed in
- * apps/desktop/plans/20260412-keyboard-recorder-ctrl-binding-fix.md plus
+ * Covers the keyboard recorder Ctrl-binding regressions plus
  * Phase 2 additions (logical/named classification, dual-form capture).
  *
  * Note: `captureHotkeyFromEvent` reads `PLATFORM` via registry.ts, which in a

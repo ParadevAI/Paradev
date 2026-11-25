@@ -1,0 +1,1 @@
+export { workspaceOf } from "./workspaceOf";
