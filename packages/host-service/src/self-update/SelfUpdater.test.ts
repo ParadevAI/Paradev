@@ -426,6 +426,20 @@ describe("SelfUpdater", () => {
 		},
 	);
 
+	test("exits after a post-stop failure when the install lock cannot be released", async () => {
+		const h: Harness = harness({
+			stopServing: async () => {
+				const lock = `${h.root}.update-lock`;
+				rmSync(lock);
+				mkdirSync(lock);
+				throw new Error("relay did not close");
+			},
+		});
+		h.updater.start({ version: "1.27.0" });
+		await settle(h);
+		expect(h.exitCode).toBe(1);
+	});
+
 	test("releases the install lock after a failed download", async () => {
 		const h = harness({
 			runCliUpdate: async () => ({ ok: false, stdout: "", stderr: "offline" }),
