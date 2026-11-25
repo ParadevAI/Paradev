@@ -50,6 +50,10 @@
 			"types": "./src/html-preview.ts",
 			"default": "./src/html-preview.ts"
 		},
+		"./posthog-privacy": {
+			"types": "./src/posthog-privacy.ts",
+			"default": "./src/posthog-privacy.ts"
+		},
 		"./page-zoom": {
 			"types": "./src/page-zoom.ts",
 			"default": "./src/page-zoom.ts"

@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
+import { POSTHOG_PRIVACY_CONFIG } from "@superset/shared/posthog-privacy";
 import {
 	SENTRY_DENY_URLS,
 	SENTRY_IGNORE_ERRORS,
@@ -24,6 +25,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
 	before_send: sanitizePosthogEvent,
+	...POSTHOG_PRIVACY_CONFIG,
 });
 
 registerBaseProperties();

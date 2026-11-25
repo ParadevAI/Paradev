@@ -51,7 +51,11 @@ export function PullRequestFileTree({
 
 	return (
 		<div className="h-full" onClickCapture={onClickCapture}>
-			<PierreFileTree model={model} style={{ ...TREE_STYLE, height: "100%" }} />
+			<PierreFileTree
+				model={model}
+				className="ph-no-capture"
+				style={{ ...TREE_STYLE, height: "100%" }}
+			/>
 		</div>
 	);
 }

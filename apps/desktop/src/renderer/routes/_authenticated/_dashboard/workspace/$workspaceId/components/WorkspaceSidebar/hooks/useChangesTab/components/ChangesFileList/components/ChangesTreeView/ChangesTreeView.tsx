@@ -350,6 +350,7 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 				>
 					<PierreFileTree
 						model={model}
+						className="ph-no-capture"
 						style={{ ...TREE_STYLE, height: treeHeight }}
 						renderContextMenu={renderContextMenu}
 					/>

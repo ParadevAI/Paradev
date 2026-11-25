@@ -508,7 +508,10 @@ export function MessageComposerBody({
 			<div className="relative px-4 pt-3.5 pb-1">
 				<RichTextPlugin
 					contentEditable={
-						<ContentEditable className="prompt-input-editor" spellCheck />
+						<ContentEditable
+							className="prompt-input-editor ph-no-capture"
+							spellCheck
+						/>
 					}
 					placeholder={
 						<span className="pointer-events-none absolute top-3.5 left-4 text-sm leading-[1.625] text-muted-foreground/70">
