@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { computeInsertIndex, scrollLeftToRevealTab } from "./utils";
+import {
+	ADD_TAB_SLOT_WIDTH,
+	computeInsertIndex,
+	scrollLeftToRevealTab,
+	tabScrollerMinWidth,
+} from "./utils";
 
 const TAB = 100;
 
@@ -47,5 +52,14 @@ describe("computeInsertIndex", () => {
 		expect(computeInsertIndex(50 + 130, track, 4, 100)).toBe(1);
 		expect(computeInsertIndex(50 + 170, track, 4, 100)).toBe(2);
 		expect(computeInsertIndex(50 + 900, track, 4, 100)).toBe(4);
+	});
+});
+
+describe("tabScrollerMinWidth", () => {
+	test("the bar's minimum is the same with the add button inside or outside the scroller", () => {
+		const outsideScroller = ADD_TAB_SLOT_WIDTH;
+		expect(tabScrollerMinWidth(false)).toBe(
+			tabScrollerMinWidth(true) + outsideScroller,
+		);
 	});
 });

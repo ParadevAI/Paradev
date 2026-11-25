@@ -5,4 +5,5 @@ export {
 	TAB_BAR_FADE_WIDTH,
 	TAB_MAX_WIDTH,
 	TAB_MIN_WIDTH,
+	tabScrollerMinWidth,
 } from "./utils";

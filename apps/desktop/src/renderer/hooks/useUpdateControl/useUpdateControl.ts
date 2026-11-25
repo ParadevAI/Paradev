@@ -4,17 +4,11 @@ import { useDesktopNotices } from "renderer/hooks/useDesktopNotices";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AUTO_UPDATE_STATUS } from "shared/auto-update";
 import { create } from "zustand";
+import { resolvePhase, type UpdatePhase } from "./resolvePhase";
 import { useAutoUpdateStatus } from "./useAutoUpdateStatus";
 
 export const UPDATE_CONFIRM_MS = 5000;
 export const UPDATE_EXIT_MS = 450;
-
-export type UpdatePhase =
-	| "downloading"
-	| "ready"
-	| "installing"
-	| "error"
-	| "updated";
 
 const useInstallingStore = create<{
 	isInstalling: boolean;
@@ -120,23 +114,4 @@ export function useUpdateControl(): UpdateControl {
 			onCancel: () => setIsConfirming(false),
 		},
 	};
-}
-
-function resolvePhase(
-	status: string | undefined,
-	isInstalling: boolean,
-	confirmationDone: boolean,
-): UpdatePhase | null {
-	switch (status) {
-		case AUTO_UPDATE_STATUS.DOWNLOADING:
-			return "downloading";
-		case AUTO_UPDATE_STATUS.READY:
-			return isInstalling ? "installing" : "ready";
-		case AUTO_UPDATE_STATUS.ERROR:
-			return "error";
-		case AUTO_UPDATE_STATUS.UPDATED:
-			return confirmationDone ? null : "updated";
-		default:
-			return null;
-	}
 }

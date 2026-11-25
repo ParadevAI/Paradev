@@ -131,6 +131,7 @@ export function SidebarSlide({
 								),
 						hidden && "invisible",
 					)}
+					data-sidebar-slide-content={fill ? "fill" : "fixed"}
 					style={{
 						width: inFlow ? undefined : contentWidth,
 						contain: move ? "strict" : undefined,

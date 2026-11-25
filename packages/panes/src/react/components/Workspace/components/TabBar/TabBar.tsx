@@ -38,6 +38,7 @@ import {
 	TAB_BAR_FADE_WIDTH,
 	TAB_MAX_WIDTH,
 	TAB_MIN_WIDTH,
+	tabScrollerMinWidth,
 } from "./utils";
 
 function drawnTabWidth(track: HTMLElement): number {
@@ -344,17 +345,9 @@ export function TabBar<TData>({
 			<OverflowFadeContainer
 				observeChildren
 				onOverflowChange={handleOverflowChange}
-				// The add button moves out of this scroller on overflow. Its width stays
-				// in the bar's minimum either way, or a bar held at its minimum flips
-				// between the two layouts.
 				style={
 					isCards
-						? {
-								minWidth:
-									TAB_MIN_WIDTH +
-									TAB_BAR_FADE_WIDTH +
-									(hasHorizontalOverflow ? 0 : ADD_TAB_SLOT_WIDTH),
-							}
+						? { minWidth: tabScrollerMinWidth(hasHorizontalOverflow) }
 						: undefined
 				}
 				className={cn(

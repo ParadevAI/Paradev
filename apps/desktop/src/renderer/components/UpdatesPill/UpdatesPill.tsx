@@ -2,7 +2,6 @@ import { Trans } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { LuCircleArrowUp, LuCircleCheck } from "react-icons/lu";
-import { DownloadRing } from "renderer/components/DownloadRing";
 import { PreUpdateConfirmPopover } from "renderer/components/PreUpdateConfirmPopover";
 import {
 	UPDATE_CONFIRM_MS as CONFIRM_MS,
@@ -11,6 +10,7 @@ import {
 	useUpdateControl,
 } from "renderer/hooks/useUpdateControl";
 import { CountdownBorder } from "./CountdownBorder";
+import { DownloadRing } from "./DownloadRing";
 
 const STROKE_WIDTH = 1.5;
 

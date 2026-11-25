@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { LuArrowUp, LuCheck, LuRotateCw } from "react-icons/lu";
@@ -15,6 +16,7 @@ const ICON_STROKE_WIDTH = 2;
 /** One fixed width in every state, so the title bar moves only when it appears and leaves. */
 export function UpdateButton() {
 	const { t } = useLingui();
+	const { formatPercent } = useFormat();
 	const {
 		phase,
 		isLeaving,
@@ -33,7 +35,7 @@ export function UpdateButton() {
 	const label = {
 		downloading:
 			percent !== null
-				? `${Math.floor(percent)}%`
+				? formatPercent(Math.floor(percent) / 100, { maximumFractionDigits: 0 })
 				: t({ message: "Updating…" }),
 		ready: t({ message: "Update" }),
 		installing: t({ message: "Updating…" }),
@@ -45,11 +47,14 @@ export function UpdateButton() {
 		downloading: t({ message: "Downloading update" }),
 		ready: t({ message: "Install the update. Sessions keep running" }),
 		installing: t({ message: "Updating…" }),
-		error: error ?? t({ message: "Update failed" }),
+		error: `${error ?? t({ message: "Update failed" })} · ${t({ message: "Retry" })}`,
 		updated: t({ message: "Updated" }),
 	}[phase];
 	const tooltip =
 		versionLabel && phase !== "error" ? `${hint} · ${versionLabel}` : hint;
+	const accessibleName = tooltip.includes(label)
+		? tooltip
+		: `${label} · ${tooltip}`;
 
 	return (
 		<div className="no-drag flex px-1.5 animate-in fade-in zoom-in-95 duration-300">
@@ -60,7 +65,7 @@ export function UpdateButton() {
 							type="button"
 							onClick={activate}
 							aria-disabled={!isActionable}
-							aria-label={tooltip}
+							aria-label={accessibleName}
 							className={cn(
 								"relative flex h-6 w-[76px] shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md text-xs font-medium tabular-nums outline-none transition-[background-color,color,opacity] focus-visible:ring-1 focus-visible:ring-ring",
 								!isActionable && "cursor-default",

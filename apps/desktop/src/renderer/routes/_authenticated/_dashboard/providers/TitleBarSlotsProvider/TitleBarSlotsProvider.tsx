@@ -122,7 +122,7 @@ export function useTitleBarSideSlot(
 				return;
 			}
 			const content = pane.hasAttribute("data-moving")
-				? pane.firstElementChild?.firstElementChild
+				? pane.querySelector('[data-sidebar-slide-content="fixed"]')
 				: null;
 			setSideWidth(
 				window.innerWidth - rect.left,
