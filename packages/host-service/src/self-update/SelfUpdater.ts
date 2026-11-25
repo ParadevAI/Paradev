@@ -214,8 +214,15 @@ export class SelfUpdater {
 	}
 
 	private unlock(): void {
-		this.releaseLock?.();
+		const release = this.releaseLock;
 		this.releaseLock = null;
+		try {
+			release?.();
+		} catch (error) {
+			this.deps.log(
+				`[self-update] could not release install lock: ${String(error)}`,
+			);
+		}
 	}
 
 	private installRoot(): string | null {
