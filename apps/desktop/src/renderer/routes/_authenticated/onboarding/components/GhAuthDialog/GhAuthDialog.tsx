@@ -212,7 +212,7 @@ export function GhAuthDialog({
 									{oneTimeCode}
 								</span>
 								<span className="text-xs text-muted-foreground">
-									Paste this code on GitHub — your browser is opening
+									Paste this code on GitHub. Your browser is opening
 								</span>
 								{copied ? (
 									<span className="ml-auto flex shrink-0 items-center gap-1.5 text-xs font-medium text-emerald-500">

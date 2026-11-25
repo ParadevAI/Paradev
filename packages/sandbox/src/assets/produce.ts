@@ -6,8 +6,10 @@
  *   bun run assets themes            prebuilt GTK, icon and cursor theme tarballs
  *   bun run assets wallpapers        eight photos, cropped to the display
  *   bun run assets host-service      the runtime tarball from this checkout
- *   bun run assets claude [version]  Claude Code's native binary (default: stable)
+ *   bun run assets claude [version]  Claude Code's native binary (default: latest)
  *   bun run assets codex [version]   Codex's standalone package (default: latest)
+ *   bun run assets opencode [version]  OpenCode's linux-x64 release, drive only (default: newest stable)
+ *   bun run assets pi [version]      Pi's linux-x64 release, drive only (default: newest stable)
  *   bun run assets all
  *
  * Each producer writes its files to .cache/assets/<sha256><suffix>, then
@@ -25,7 +27,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import { ASSET_CACHE, BUNDLE_SRC, PACKAGE_ROOT } from "../build";
 import {
 	type Asset,
@@ -60,7 +62,9 @@ function rewriteRows(rows: Record<string, Asset>): void {
 	);
 	writeFileSync(ASSETS_JSON, `${JSON.stringify(sorted, null, "\t")}\n`);
 	for (const [name, row] of Object.entries(rows))
-		console.log(`${name}: ${assetObjectKey(row)} -> ${row.dest}`);
+		console.log(
+			`${name}: ${assetObjectKey(row)} -> ${row.dest ?? "agent-tools drive only"}`,
+		);
 }
 
 async function fetchBytes(url: string): Promise<Uint8Array> {
@@ -343,11 +347,16 @@ function hostService(): void {
 			"mkdir -p /rt && cd /rt && cp -R /out/stage/dist/. /rt/ && cp -R /out/stage/drizzle /rt/drizzle && cp -R /out/stage/agent-templates /rt/agent-templates && cp /out/stage/RUNTIME /rt/RUNTIME",
 			// host-service resolves the daemon side by side with itself, the way the desktop ships it.
 			"cp /out/stage/pty-daemon/pty-daemon.js /rt/pty-daemon.js",
+			// The natives below build against this node, so the runtime carries it: an environment's setup may replace the box's node.
+			"cp /usr/local/bin/node /rt/node",
 			"cd /rt && npm init -y >/dev/null && npm pkg set type=module >/dev/null",
 			`npm install ${[...natives, ...acpAdapters.map(pinned)].join(" ")} @parcel/watcher @xterm/headless --no-audit --no-fund >/dev/null`,
 			// The adapters bring their own claude and codex binaries (~650 MB); host-service points them at the box's pinned CLIs instead.
 			"rm -rf node_modules/@anthropic-ai/claude-agent-sdk-linux-* node_modules/@openai/codex-linux-*",
+			"cd /rt/node_modules/node-pty/prebuilds && find . -mindepth 1 -maxdepth 1 ! -name linux-x64 -exec rm -rf {} + && cd /rt",
+			"rm -rf node_modules/node-pty/third_party node_modules/node-pty/src node_modules/better-sqlite3/deps node_modules/better-sqlite3/src node_modules/zod/src",
 			"test -d node_modules/node-pty/prebuilds/linux-x64 || (echo 'node-pty prebuild missing' && exit 1)",
+			'./node -e \'require("better-sqlite3");require("node-pty");new (require("better-sqlite3"))(":memory:").close()\' || (echo "natives do not load after pruning" && exit 1)',
 			...acpAdapters.map(
 				(adapter) =>
 					`test -f node_modules/${adapter}/dist/index.js || (echo '${adapter} missing' && exit 1)`,
@@ -356,7 +365,7 @@ function hostService(): void {
 			'cd /rt && node -e \'const fs=require("node:fs");const D=require("better-sqlite3");const d=new D(":memory:");for(const e of JSON.parse(fs.readFileSync("/rt/chat-migrations/meta/_journal.json","utf8")).entries)d.exec(fs.readFileSync("/rt/chat-migrations/"+e.tag+".sql","utf8").replaceAll("--> statement-breakpoint",""));d.close()\'',
 			// The schema, baked: run host-service once against a throwaway path so the template carries every migration.
 			"cd /rt && ORGANIZATION_ID=00000000-0000-0000-0000-000000000000 HOST_DB_PATH=/rt/host.db.template HOST_MIGRATIONS_FOLDER=/rt/drizzle AUTH_TOKEN=build SUPERSET_API_URL=https://example.invalid SUPERSET_HOST_RUN_MODE=sandbox SUPERSET_SANDBOX_WORKSPACE_ID=00000000-0000-0000-0000-000000000000 SUPERSET_SANDBOX_WORKSPACE_PATH=/workspace PORT=4879 node -e '" +
-				'const {spawn}=require("node:child_process");const p=spawn("node",["host-service.js"],{stdio:["ignore","pipe","pipe"]});let out="";const done=c=>{try{p.kill("SIGTERM")}catch{}process.exit(c)};const w=ch=>{out+=ch;if(out.includes("Initialized at"))setTimeout(()=>done(0),2000)};p.stdout.on("data",w);p.stderr.on("data",w);setTimeout(()=>{console.error(out.slice(-800));done(1)},60000)\'',
+				'const {spawn}=require("node:child_process");const p=spawn("node",["host-service.js"],{stdio:["ignore","pipe","pipe"]});let out="";const done=c=>{try{p.kill("SIGTERM")}catch{}process.exit(c)};const w=ch=>{out+=ch;if(out.includes("[host-service:db] Initialized"))setTimeout(()=>done(0),2000)};p.stdout.on("data",w);p.stderr.on("data",w);setTimeout(()=>{console.error(out.slice(-800));done(1)},60000)\'',
 			'cd /rt && node -e \'const D=require("better-sqlite3");const d=new D("/rt/host.db.template");d.pragma("journal_mode = DELETE");d.close()\' && test "$(stat -c %s /rt/host.db.template)" -gt 100000 && rm -f /rt/host.db.template-wal /rt/host.db.template-shm',
 			"cd /rt && tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -czf /out/host-service.tar.gz . && echo built host-service",
 		].join(" && "),
@@ -441,9 +450,9 @@ async function fetchText(url: string): Promise<string> {
 	return new TextDecoder().decode(await fetchBytes(url)).trim();
 }
 
-/** Claude Code's native linux-x64 binary; defaults to the `stable` channel. */
+/** Claude Code's native linux-x64 binary; defaults to the `latest` channel, the one a local install follows. */
 async function claude(version?: string): Promise<void> {
-	const pinned = version ?? (await fetchText(`${CLAUDE_RELEASES}/stable`));
+	const pinned = version ?? (await fetchText(`${CLAUDE_RELEASES}/latest`));
 	const manifest = JSON.parse(
 		await fetchText(`${CLAUDE_RELEASES}/${pinned}/manifest.json`),
 	) as { platforms: Record<string, { checksum: string }> };
@@ -533,6 +542,105 @@ async function pdev(version?: string): Promise<void> {
 	});
 }
 
+export interface GithubRelease {
+	tag_name: string;
+	draft: boolean;
+	prerelease: boolean;
+	assets: {
+		name: string;
+		digest?: string | null;
+		browser_download_url: string;
+	}[];
+}
+
+/**
+ * The highest stable `vX.Y.Z` release that carries the asset. Not GitHub's
+ * `latest`: OpenCode's still names an older major line.
+ */
+export function pickRelease(
+	releases: readonly GithubRelease[],
+	assetName: string,
+): { version: string; asset: GithubRelease["assets"][number] } | undefined {
+	return releases
+		.flatMap((release) => {
+			const asset = release.assets.find((a) => a.name === assetName);
+			return !release.draft &&
+				!release.prerelease &&
+				asset &&
+				/^v\d+\.\d+\.\d+$/.test(release.tag_name)
+				? [{ version: release.tag_name.slice(1), asset }]
+				: [];
+		})
+		.sort((a, b) => Bun.semver.order(b.version, a.version))[0];
+}
+
+/**
+ * An agent that boxes get only from the agent-tools drive: the row has no
+ * `dest`, so neither the image nor a boot fetches it. Without a version it
+ * takes the newest stable release. The bytes must match GitHub's digest for
+ * the asset.
+ */
+async function driveOnlyAgent(args: {
+	name: string;
+	repo: string;
+	asset: string;
+	version?: string;
+}): Promise<void> {
+	const api = `https://api.github.com/repos/${args.repo}/releases`;
+	const picked = args.version
+		? {
+				version: args.version,
+				asset: (
+					JSON.parse(
+						await fetchText(`${api}/tags/v${args.version}`),
+					) as GithubRelease
+				).assets.find((a) => a.name === args.asset),
+			}
+		: pickRelease(
+				JSON.parse(await fetchText(`${api}?per_page=100`)) as GithubRelease[],
+				args.asset,
+			);
+	if (!picked?.asset)
+		throw new Error(
+			`${args.name}: no ${args.asset} ${args.version ? `in v${args.version}` : "in a stable release"}`,
+		);
+	const { version, asset } = picked;
+	if (!asset.digest?.startsWith("sha256:"))
+		throw new Error(`${args.name} ${version}: GitHub publishes no digest`);
+	const bytes = await fetchBytes(asset.browser_download_url);
+	const hash = sha256(bytes);
+	if (`sha256:${hash}` !== asset.digest)
+		throw new Error(
+			`${args.name} ${version}: sha256 ${hash}, release ${asset.digest}`,
+		);
+	cache(bytes, ".tar.gz");
+	rewriteRows({
+		[args.name]: {
+			sha256: hash,
+			suffix: ".tar.gz",
+			mode: "0644",
+			source: asset.browser_download_url,
+			version,
+		},
+	});
+}
+
+const opencode = (version?: string) =>
+	driveOnlyAgent({
+		name: "opencode",
+		repo: "anomalyco/opencode",
+		asset: "opencode-linux-x64.tar.gz",
+		version,
+	});
+
+const pi = (version?: string) =>
+	driveOnlyAgent({
+		name: "pi",
+		repo: "earendil-works/pi",
+		asset: "pi-linux-x64.tar.gz",
+		version,
+	});
+
 export const producers: Record<
 	string,
 	(version?: string) => Promise<void> | void
@@ -547,6 +655,8 @@ export const producers: Record<
 	claude,
 	codex,
 	pdev,
+	opencode,
+	pi,
 };
 
 if (import.meta.main) {

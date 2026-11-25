@@ -43,7 +43,7 @@ export default async function CloudPage() {
 						<p className="mt-5 max-w-xl text-lg text-muted-foreground leading-relaxed">
 							<Trans>
 								Each workspace gets its own cloud machine and keeps working when
-								your laptop is closed. Check in from desktop, iPhone, or iPad.
+								your laptop is closed. Check in from your desktop or phone.
 							</Trans>
 						</p>
 						<UpgradeActions placement="hero" />

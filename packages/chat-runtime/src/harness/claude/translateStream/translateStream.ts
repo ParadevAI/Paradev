@@ -6,8 +6,10 @@ import type {
 	ToolCall,
 	ToolCallStatus,
 	Turn,
+	TurnError,
 	Usage,
 } from "@superset/chat/protocol";
+import { classifyTurnFailure } from "../../turnFailure";
 import type { AdapterEvent } from "../../types";
 import {
 	type RefusedWindow,
@@ -121,7 +123,20 @@ export class ClaudeTranslator {
 		}
 	}
 
-	interrupt(reason: string): AdapterEvent[] {
+	get interruptRequested(): boolean {
+		return this.interruptReason !== null;
+	}
+
+	/** The stream died while a turn ran and nobody asked it to stop. */
+	fail(message: string): AdapterEvent[] {
+		const kind = classifyTurnFailure({ message });
+		return this.interrupt(message, {
+			message,
+			kind: kind === "unknown" ? "crashed" : kind,
+		});
+	}
+
+	interrupt(reason: string, failure?: TurnError): AdapterEvent[] {
 		const events: AdapterEvent[] = [];
 		const completedAtMs = this.now();
 
@@ -149,8 +164,8 @@ export class ClaudeTranslator {
 				kind: "turn",
 				turn: {
 					id: this.turnId,
-					status: "interrupted",
-					error: { message: reason },
+					status: failure ? "failed" : "interrupted",
+					error: failure ?? { message: reason },
 					startedAtMs: this.turnStartedAtMs,
 					completedAtMs,
 				},

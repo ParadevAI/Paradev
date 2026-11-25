@@ -317,8 +317,8 @@ export function generatedManifestDrift(ctx: MarketplaceContext): CheckIssue[] {
 			name: path.basename(rendered.target),
 			problem:
 				current === null
-					? "bundled manifests are missing; run `superset plugins publish`"
-					: "bundled manifests are stale; run `superset plugins publish` to regenerate",
+					? "bundled manifests are missing; run `paradev plugins publish`"
+					: "bundled manifests are stale; run `paradev plugins publish` to regenerate",
 		},
 	];
 }

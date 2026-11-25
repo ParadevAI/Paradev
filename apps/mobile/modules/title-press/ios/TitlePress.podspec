@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.summary        = 'Tap handling for the native navigation bar title'
   s.description    = 'Reports taps on the enclosing screen\'s UINavigationBar title without replacing it with a custom title view'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

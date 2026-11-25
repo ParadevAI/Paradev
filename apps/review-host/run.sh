@@ -23,7 +23,7 @@ fi
 
 mkdir -p "/root/.superset/host/$ORG"
 
-exec env -u SUPERSET_API_KEY \
+exec env -u SUPERSET_API_KEY -u PARADEV_API_KEY \
   ORGANIZATION_ID="$ORG" \
   AUTH_TOKEN="$ACCESS_TOKEN" \
   SUPERSET_AUTH_CONFIG_PATH="$CONFIG" \

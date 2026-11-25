@@ -1,12 +1,13 @@
 import { boolean, defineConfig, string } from "@superset/cli-framework";
 import { linguiMacroPlugin } from "@superset/i18n/bun-plugin";
 import { CANONICAL_URLS } from "@superset/shared/constants";
+import { readPublicEnv } from "@superset/shared/public-env";
 import pkg from "./package.json" with { type: "json" };
 
 const VERSION = pkg.version;
 
 export default defineConfig({
-	name: "superset",
+	name: "paradev",
 	version: VERSION,
 	commandsDir: "./src/commands",
 	outfile: "./dist/superset",
@@ -17,7 +18,7 @@ export default defineConfig({
 			process.env.SUPERSET_CLI_CHANNEL ?? "standalone",
 		),
 		"process.env.NEXT_PUBLIC_ROOT_DOMAIN": JSON.stringify(
-			process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh",
+			process.env.NEXT_PUBLIC_ROOT_DOMAIN || "paradev.com",
 		),
 	},
 	globals: {
@@ -25,28 +26,32 @@ export default defineConfig({
 		quiet: boolean().desc("Output IDs only"),
 		apiKey: string()
 			.env("SUPERSET_API_KEY")
-			.desc("Use a Paradev API key (sk_live_…) instead of OAuth login"),
+			.desc(
+				"Use a Paradev API key (sk_live_…) instead of OAuth login. $PARADEV_API_KEY also works",
+			),
 	},
 	audiences: () =>
 		process.env.SUPERSET_CLI_AUDIENCE === "internal" ||
-		process.env.SUPERSET_SANDBOX_WORKSPACE_ID
+		readPublicEnv("SANDBOX_WORKSPACE_ID")
 			? ["internal", "public"]
 			: ["public"],
-	sandbox: () => Boolean(process.env.SUPERSET_SANDBOX_WORKSPACE_ID),
+	sandbox: () => Boolean(readPublicEnv("SANDBOX_WORKSPACE_ID")),
 	help: {
 		tagline: "Command your fleet of coding agents from any shell.",
 		docsUrl: `${CANONICAL_URLS.DOCS}/cli/getting-started`,
-		tip: "`paradev` is an alias for `superset`. Agents in Paradev terminals already have both on PATH — tell them to use it.",
+		tip: "`superset` still works as an alias for `paradev`. Agents in Paradev terminals already have both on PATH — tell them to use it.",
 		sections: [
 			{
 				title: "Workspaces & agents",
 				commands: [
 					"workspaces",
+					"worktrees",
 					"environments",
 					"sessions",
 					"agents",
 					"terminals",
 					"panes",
+					"ports",
 					"snapshot",
 					"scripts",
 				],
@@ -80,15 +85,15 @@ export default defineConfig({
 		],
 		examples: [
 			{
-				cmd: 'superset ws create --local --project <id> --name fix-tests --branch fix-tests --agent claude --prompt "fix the flaky tests"',
+				cmd: 'paradev ws create --local --project <id> --name fix-tests --branch fix-tests --agent claude --prompt "fix the flaky tests"',
 				desc: "Spin up an isolated workspace and put an agent to work",
 			},
 			{
-				cmd: "superset terminals read --local --workspace <id> --terminal <id>",
+				cmd: "paradev terminals read --local --workspace <id> --terminal <id>",
 				desc: "Peek at what an agent is doing right now",
 			},
 			{
-				cmd: 'superset automations create --name nightly-audit --local --project <id> --rrule "FREQ=DAILY" --prompt "audit deps"',
+				cmd: 'paradev automations create --name nightly-audit --local --project <id> --rrule "FREQ=DAILY" --prompt "audit deps"',
 				desc: "Schedule a recurring agent run",
 			},
 		],

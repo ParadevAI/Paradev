@@ -186,7 +186,7 @@ export const FIRST_PARTY_MANIFESTS = {
 	"sentry": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "sentry",
-		"version": "1.0.3",
+		"version": "1.0.4",
 		"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
 		"author": {
 			"name": "Paradev",
@@ -1020,6 +1020,48 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"ahrefs": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "ahrefs",
+		"version": "1.0.0",
+		"description": "Research SEO with Ahrefs: backlinks, organic keywords, rankings, site audits, and brand visibility in AI search.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"ahrefs",
+			"seo",
+			"backlinks",
+			"keywords",
+			"rank-tracking"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Ahrefs",
+					"category": "Data & APIs",
+					"icon": "ahrefs"
+				},
+				"connector": {
+					"slug": "ahrefs_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://api.ahrefs.com/mcp/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
 	"wispr": {
 		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 		"name": "wispr",
@@ -1058,6 +1100,49 @@ export const FIRST_PARTY_MANIFESTS = {
 				"mcp": {
 					"type": "streamable-http",
 					"url": "https://api.wisprflow.ai/connect/mcp"
+				}
+			}
+		},
+		"skills": []
+	} as const,
+	"planetscale": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "planetscale",
+		"version": "1.0.0",
+		"description": "Work with your PlanetScale databases: inspect organizations, databases, and branches, read schemas, run SQL, and review query insights.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"planetscale",
+			"mysql",
+			"postgres",
+			"vitess",
+			"database",
+			"sql"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "PlanetScale",
+					"category": "Data & APIs",
+					"icon": "planetscale"
+				},
+				"connector": {
+					"slug": "planetscale_mcp"
+				},
+				"bind": {
+					"headers": {
+						"Authorization": "Bearer ${config.access_token}"
+					}
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.pscale.dev/mcp/planetscale"
 				}
 			}
 		},

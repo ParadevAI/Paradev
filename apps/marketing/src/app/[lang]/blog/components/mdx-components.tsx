@@ -1,3 +1,4 @@
+import type { SupportedLocale } from "@superset/i18n";
 import { isValidElement, type ReactNode } from "react";
 import { HiMiniArrowDownTray } from "react-icons/hi2";
 import type { BundledLanguage } from "shiki";
@@ -8,6 +9,7 @@ import { StoreBadges } from "@/app/[lang]/components/StoreBadges";
 import { StoryPhoto } from "@/app/[lang]/components/StoryPhoto";
 import { getAbout } from "@/lib/about";
 import { slugify } from "@/lib/blog-utils";
+import { localizeMdxHref } from "@/lib/localized-mdx";
 import { getPublicImageSize } from "@/lib/public-image-size";
 import { BlogCodeBlock } from "./BlogCodeBlock";
 import { Testimonial } from "./Testimonial";
@@ -176,3 +178,33 @@ export const mdxComponents = {
 		</div>
 	),
 };
+
+export function getMdxComponents(locale: SupportedLocale = "en") {
+	if (locale === "en") return mdxComponents;
+	const BaseCta = mdxComponents.CTAButton;
+	return {
+		...mdxComponents,
+		a: ({
+			children,
+			href,
+			...props
+		}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+			<a {...props} href={localizeMdxHref(locale, href)}>
+				{children}
+			</a>
+		),
+		h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+			<h2 id={slugify(textContent(children), locale) || undefined} {...props}>
+				{children}
+			</h2>
+		),
+		h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+			<h3 id={slugify(textContent(children), locale) || undefined} {...props}>
+				{children}
+			</h3>
+		),
+		CTAButton: ({ href, children }: { href: string; children: ReactNode }) => (
+			<BaseCta href={localizeMdxHref(locale, href) ?? href}>{children}</BaseCta>
+		),
+	};
+}

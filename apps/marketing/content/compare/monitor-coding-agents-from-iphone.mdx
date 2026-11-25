@@ -22,7 +22,7 @@ keywords:
   - start claude code task from iphone
 ---
 
-To check on coding agents from your iPhone, use [Paradev for iPhone and iPad](/mobile). It shows every agent you run in Paradev (Claude Code, Codex, and other terminal agents) on all your machines in one list. You can answer prompts, send follow-ups, and review diffs, and while the app is open, a Lock Screen Live Activity shows which agents need you. It does not update in the background yet.
+To check on coding agents from your iPhone, use [Paradev for iPhone, iPad, and Android](/mobile). It shows every agent you run in Paradev (Claude Code, Codex, and other terminal agents) on all your machines in one list. You can answer prompts, send follow-ups, and review diffs, and while the app is open, a Lock Screen Live Activity shows which agents need you. It does not update in the background yet.
 
 Claude Code's own Remote Control also works inside Paradev. Paradev starts the real `claude` CLI in a real terminal, so `/remote-control` in a Paradev workspace connects that session to the Claude app as usual. Use Paradev when you run several agents or several machines and want one app for all of them. Use Remote Control when you want the Claude app's push notifications for one Claude Code session. You can use both on the same session.
 
@@ -123,7 +123,7 @@ Remote Control changes the screen you use, not where the work runs. A separate w
 
 **Claude Code Remote Control.** Claude Code runs on your machine with your databases, VPN, local credentials, and MCP servers. Setup is one command, and traffic goes through Anthropic's API over TLS with no inbound ports. The costs: it is Claude-only, your computer must stay awake, and without `--spawn worktree` sessions in server mode share one directory and can edit the same files.
 
-**A separate workspace with a mobile companion.** The task gets its own environment. In Paradev that environment is a git worktree on its own branch, on a host you pick, so parallel agents don't overwrite each other's files. One phone app covers every agent and host. The costs: you install a desktop app or CLI on the host, the iPhone app needs Paradev Pro and iOS 26 or later, and Android is not available yet. Paradev's docs also warn that enabling remote access on your main workstation makes its files and terminals reachable by clients you grant access to. They recommend a separate machine with only the repos and credentials you mean to share.
+**A separate workspace with a mobile companion.** The task gets its own environment. In Paradev that environment is a git worktree on its own branch, on a host you pick, so parallel agents don't overwrite each other's files. One phone app covers every agent and host. The costs: you install a desktop app or CLI on the host, and the mobile app needs Paradev Pro (iOS 26 or later on iPhone). Paradev's docs also warn that enabling remote access on your main workstation makes its files and terminals reachable by clients you grant access to. They recommend a separate machine with only the repos and credentials you mean to share.
 
 **Fully hosted cloud agents** (Claude Code on the web, Codex Cloud, Copilot coding agent) remove the "keep your computer on" rule. In exchange, they lose your local services and you must set up secrets and dependencies in the cloud.
 
@@ -178,7 +178,7 @@ The app is free to download. Mobile access requires Paradev Pro, and Claude Code
 
 ### Is there an Android or iPad version?
 
-Yes, on iPad. Paradev runs natively on iPad with iPadOS 26 or later. Android is not available yet; it has a [waitlist](/mobile#android).
+Yes, both. Paradev runs natively on iPad with iPadOS 26 or later, and the Android app is on [Google Play](https://play.google.com/store/apps/details?id=com.paradev.mobile).
 
 ### Is tmux enough to monitor agents from my phone?
 

@@ -1,10 +1,10 @@
 {
 	"name": "@superset/cli",
-	"version": "2.0.5",
+	"version": "2.0.12",
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "dotenv -e ../../.env -o -- sh -c 'exec env SUPERSET_API_URL=$NEXT_PUBLIC_API_URL SUPERSET_WEB_URL=${SUPERSET_WEB_URL:-$NEXT_PUBLIC_WEB_URL} cli-framework dev \"$@\"' --",
+		"dev": "dotenv -e ../../.env -o -- sh -c 'exec env SUPERSET_API_URL=$NEXT_PUBLIC_API_URL PARADEV_API_URL=$NEXT_PUBLIC_API_URL SUPERSET_WEB_URL=${SUPERSET_WEB_URL:-$NEXT_PUBLIC_WEB_URL} cli-framework dev \"$@\"' --",
 		"build": "cli-framework build",
 		"build:darwin-arm64": "cli-framework build --target=bun-darwin-arm64 --outfile=./dist/superset-darwin-arm64",
 		"build:linux-x64": "cli-framework build --target=bun-linux-x64 --outfile=./dist/superset-linux-x64",
@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@clack/prompts": "0.10.1",
-		"@modelcontextprotocol/sdk": "1.31.0",
+		"@modelcontextprotocol/sdk": "1.32.0",
 		"@superset/agent-setup": "workspace:*",
 		"@superset/cli-framework": "workspace:*",
 		"@superset/host-service": "workspace:*",
@@ -31,7 +31,7 @@
 		"mime-types": "3.0.2",
 		"react": "19.3.0",
 		"superjson": "2.2.6",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",

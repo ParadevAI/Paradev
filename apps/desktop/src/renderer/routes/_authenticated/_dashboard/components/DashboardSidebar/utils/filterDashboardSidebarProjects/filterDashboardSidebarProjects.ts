@@ -1,4 +1,5 @@
 import type {
+	DashboardSidebarHiddenProject,
 	DashboardSidebarProject,
 	DashboardSidebarProjectChild,
 } from "../../types";
@@ -57,7 +58,7 @@ function filterChildren(
  * (pruned to the matches; a matching folder keeps all its members). Surviving
  * projects and matched folders come back expanded so the matches are actually
  * visible; the persisted collapse state is never written. Branch names are
- * deliberately not searched: v2 names are branch-derived, and matching hidden
+ * deliberately not searched: names are branch-derived, and matching hidden
  * text would surface rows whose visible label doesn't contain the query.
  */
 export function filterDashboardSidebarProjects(
@@ -79,4 +80,14 @@ export function filterDashboardSidebarProjects(
 		if (childrenUnchanged) return [expandProject(project)];
 		return [{ ...project, isCollapsed: false, children }];
 	});
+}
+
+/** Names only: the workspaces of a hidden project are never built. */
+export function filterDashboardSidebarHiddenProjects(
+	projects: DashboardSidebarHiddenProject[],
+	query: string,
+): DashboardSidebarHiddenProject[] {
+	const normalizedQuery = query.trim().toLowerCase();
+	if (normalizedQuery === "") return projects;
+	return projects.filter((project) => matches(project.name, normalizedQuery));
 }

@@ -4,7 +4,6 @@ import { z } from "zod";
 /**
  * Wire format for server-driven desktop notices, returned by
  * `GET /api/desktop/version` alongside the legacy `minimumVersion` gate.
- * See plans/done/20260720-remote-version-notices.md.
  */
 
 const desktopNoticeSchema = z.object({

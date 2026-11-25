@@ -9,6 +9,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, ne, sql, sum } from "drizzle-orm";
 import { z } from "zod";
 import { assertCloudAccess } from "../../../lib/cloud-guards";
+import { queueRulesReapply } from "../../../lib/sandbox/reapply-rules";
 import { personProcedure, userError } from "../../../trpc";
 import { loadEnvironment } from "../environment";
 import { decryptSecret, encryptSecret } from "./utils/crypto";
@@ -170,6 +171,7 @@ export const secretsRouter = {
 						sensitive: input.sensitive,
 					},
 				});
+			await queueRulesReapply({ environmentId: input.environmentId });
 			return { key: input.key };
 		}),
 
@@ -190,6 +192,7 @@ export const secretsRouter = {
 						eq(environmentSecrets.key, input.key),
 					),
 				);
+			await queueRulesReapply({ environmentId: input.environmentId });
 			return { removed: true };
 		}),
 } satisfies TRPCRouterRecord;

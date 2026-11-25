@@ -20,12 +20,21 @@ export const MANAGED_COMMAND_NAMESPACE = "superset";
 /**
  * Claude Code loads any ~/.claude/skills/<name> directory containing a
  * .claude-plugin/plugin.json as a "skills-directory plugin" named
- * `<name>@skills-dir`, namespacing its skills as `<name>:<skill>`. There is
- * exactly one such directory: marketplace plugin skills are grafted into it
- * rather than each claiming a directory of its own, so Claude sees a single
- * Superset plugin however many plugins are installed.
+ * `<name>@skills-dir`, namespacing its skills as `<name>:<skill>`. Marketplace
+ * plugin skills are grafted into it rather than each claiming a directory of
+ * their own, so Claude sees one Paradev plugin however many are installed.
  */
 const BUNDLED_SOURCE_NAME = "superset";
+
+export const CLAUDE_PLUGIN_NAME = "paradev";
+
+/**
+ * Prompts, automations and released builds name skills `superset:<skill>`.
+ * This directory keeps every skill there too, with a description that points
+ * the model at the `paradev:` name. Older builds provision only this one and
+ * reap the other, so `superset:` must always hold the full skill.
+ */
+export const LEGACY_CLAUDE_PLUGIN_NAME = "superset";
 
 /**
  * Skills exposed as slash commands to the in-app chat. Deliberately a curated
@@ -159,6 +168,7 @@ async function syncDir(
 	isExcluded?: (relativePath: string) => boolean,
 	extraTrees: readonly ExtraTree[] = [],
 	isPreserved?: (relativePath: string) => boolean,
+	transform?: (relativePath: string, contents: string) => string,
 ): Promise<void> {
 	const copies: { source: string; relative: string; contents?: string }[] =
 		listFilesRecursive(src)
@@ -181,9 +191,10 @@ async function syncDir(
 		fs.mkdirSync(path.dirname(target), { recursive: true });
 		// Skills may bundle scripts/; keep them runnable after provisioning.
 		const executable = (fs.statSync(source).mode & 0o111) !== 0;
+		const raw = contents ?? fs.readFileSync(source, "utf-8");
 		writeFileIfChanged(
 			target,
-			contents ?? fs.readFileSync(source, "utf-8"),
+			transform ? transform(relative, raw) : raw,
 			executable ? 0o755 : 0o644,
 		);
 	}
@@ -208,9 +219,9 @@ async function syncDir(
 }
 
 /**
- * Marketplace plugin skills as directories to graft under the Superset plugin
+ * Marketplace plugin skills as directories to graft under the Paradev plugin
  * dir's own `skills/`. Claude namespaces by plugin directory, so these answer
- * to `superset:<plugin>-<skill>`; the prefix is what keeps two plugins
+ * to `paradev:<plugin>-<skill>`; the prefix is what keeps two plugins
  * shipping the same skill name apart, and it matches the directory names used
  * under ~/.agents/skills so a skill is called the same thing everywhere.
  */
@@ -237,23 +248,98 @@ function claudeSkillTrees(
 }
 
 /**
- * Provisions the bundled plugin, plus every installed plugin's skills, as one
- * Claude Code skills-directory plugin inside one Claude config dir —
- * `~/.claude` for the default account, or a profile dir whose own `skills/`
- * the user owns (a shared profile links `skills/` at the default account
- * instead, and gets it that way).
+ * Rewrites the frontmatter `description:`, including any indented lines that
+ * continue it, so a multi-line YAML value is replaced whole.
  */
-async function provisionClaudePlugin(
+export function setFrontmatterDescription(
+	content: string,
+	description: string,
+): string {
+	if (!content.startsWith("---\n")) return content;
+	const frontmatterEnd = content.indexOf("\n---\n", 4);
+	if (frontmatterEnd === -1) return content;
+	const lines = content.slice(4, frontmatterEnd).split("\n");
+	const kept: string[] = [];
+	let skipping = false;
+	for (const line of lines) {
+		if (/^description:/.test(line)) {
+			skipping = true;
+			continue;
+		}
+		if (skipping && /^\s/.test(line)) continue;
+		skipping = false;
+		kept.push(line);
+	}
+	kept.push(`description: ${JSON.stringify(description)}`);
+	return `---\n${kept.join("\n")}${content.slice(frontmatterEnd)}`;
+}
+
+function setManifestName(contents: string, name: string): string {
+	try {
+		const manifest = JSON.parse(contents) as Record<string, unknown>;
+		return `${JSON.stringify({ ...manifest, name }, null, "\t")}\n`;
+	} catch {
+		return contents;
+	}
+}
+
+function isManifest(relativePath: string): boolean {
+	return (
+		relativePath === "plugin.json" ||
+		relativePath === path.join(".claude-plugin", "plugin.json")
+	);
+}
+
+/** The name after `<plugin>:` that Claude gives this file, if it is a skill or command. */
+function entryNameOfPath(relativePath: string): string | null {
+	const [dir, ...rest] = relativePath.split(path.sep);
+	if (dir === "skills") {
+		return rest.length === 2 && rest[1] === "SKILL.md"
+			? (rest[0] ?? null)
+			: null;
+	}
+	if (dir === "commands" && relativePath.endsWith(".md")) {
+		return rest.join(":").replace(/\.md$/, "");
+	}
+	return null;
+}
+
+function legacyAliasTransform(relativePath: string, contents: string): string {
+	if (isManifest(relativePath)) {
+		return setManifestName(contents, LEGACY_CLAUDE_PLUGIN_NAME);
+	}
+	const entry = entryNameOfPath(relativePath);
+	if (!entry) return contents;
+	const current = `${CLAUDE_PLUGIN_NAME}:${entry}`;
+	return setFrontmatterDescription(
+		contents,
+		`Old name of ${current}. Use ${current}.`,
+	);
+}
+
+function primaryTransform(relativePath: string, contents: string): string {
+	return isManifest(relativePath)
+		? setManifestName(contents, CLAUDE_PLUGIN_NAME)
+		: contents;
+}
+
+/**
+ * Writes one Claude skills-directory plugin. Returns false and writes nothing
+ * when the directory exists without our sentinel: the user owns it.
+ */
+async function provisionClaudePluginDir(
+	name: string,
 	bundledPluginDir: string,
 	claudeDir: string,
 	disabledSkills: ReadonlySet<string>,
 	pluginSources: readonly ResolvedSource[],
-): Promise<void> {
-	const target = path.join(claudeDir, "skills", BUNDLED_SOURCE_NAME);
+	transform: (relativePath: string, contents: string) => string,
+): Promise<boolean> {
+	const target = path.join(claudeDir, "skills", name);
 	const sentinel = path.join(target, MANAGED_SENTINEL_NAME);
 	if (fs.existsSync(target) && !fs.existsSync(sentinel)) {
 		console.log(`[agent-setup] Skipping user-owned plugin dir at ${target}`);
-		return;
+		return false;
 	}
 	const unreadable = pluginSources
 		.filter((entry) => entry.skills === null)
@@ -282,8 +368,42 @@ async function provisionClaudePlugin(
 						relativePath.slice(entry.prefix.length).split(path.sep)[0] ?? "",
 					),
 			),
+		transform,
 	);
 	writeFileIfChanged(sentinel, `${MANAGED_SKILL_MARKER}\n`, 0o644);
+	return true;
+}
+
+/**
+ * Provisions the bundled plugin, plus every installed plugin's skills, as the
+ * `paradev` Claude Code skills-directory plugin and its `superset` alias inside
+ * one Claude config dir — `~/.claude` for the default account, or a profile dir
+ * whose own `skills/` the user owns (a shared profile links `skills/` at the
+ * default account instead, and gets it that way). If the user owns a
+ * `paradev` dir, `superset` stays the full plugin, as before the rename.
+ */
+async function provisionClaudePlugin(
+	bundledPluginDir: string,
+	claudeDir: string,
+	disabledSkills: ReadonlySet<string>,
+	pluginSources: readonly ResolvedSource[],
+): Promise<void> {
+	const hasPrimary = await provisionClaudePluginDir(
+		CLAUDE_PLUGIN_NAME,
+		bundledPluginDir,
+		claudeDir,
+		disabledSkills,
+		pluginSources,
+		primaryTransform,
+	);
+	await provisionClaudePluginDir(
+		LEGACY_CLAUDE_PLUGIN_NAME,
+		bundledPluginDir,
+		claudeDir,
+		disabledSkills,
+		pluginSources,
+		hasPrimary ? legacyAliasTransform : (_relative, contents) => contents,
+	);
 }
 
 function readPluginSkill(
@@ -535,11 +655,11 @@ async function provisionManagedSkills(
 	}
 
 	try {
-		// ~/.claude/skills holds only the plugin dir; anything else marker-bearing
+		// ~/.claude/skills holds only the plugin dirs; anything else marker-bearing
 		// there (including dirs from earlier versions of this mechanism) is stale.
 		await reapStaleSkillDirs(
 			path.join(homeDir, ".claude", "skills"),
-			new Set([BUNDLED_SOURCE_NAME]),
+			new Set([CLAUDE_PLUGIN_NAME, LEGACY_CLAUDE_PLUGIN_NAME]),
 		);
 		await reapStaleSkillDirs(agentsSkillsRoot, desiredAgentsDirs);
 		await reapStaleCommands(commandNamespaceDir, desiredCommandFiles);

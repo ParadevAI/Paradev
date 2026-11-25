@@ -8,11 +8,13 @@ description: Configure how Paradev sets up, runs, and archives a project's works
 Run commands automatically when a workspace is created or archived, and define the dev server the **Run** button starts.
 
 These are **project lifecycle scripts**: project-owned behavior stored in the
-repository, in `.superset/config.toml`. They are different from
+repository, in `.paradev/config.toml`. They are different from
 [terminal scripts](/terminal-scripts), which are reusable launches saved in
 your Paradev settings and shown in the Scripts bar.
 
-Create `.superset/config.toml` in your project:
+Create `.paradev/config.toml` in your project:
+
+Repositories set up before Paradev's rename keep this config in `.superset/`. Paradev still reads it there and keeps editing it there; see the [FAQ](/faq) to move it.
 
 ```toml
 [setup]
@@ -28,7 +30,7 @@ run = ["docker compose down"]
 
 You can also edit it in the app: **Settings → your project → Workspace config**. The editor shows the whole file, keeps your comments, and checks it as you type; **Save** stays disabled until the file is valid.
 
-![Settings → Workspace config editing .superset/config.toml](/images/workspace-config.png)
+![Settings → Workspace config editing .paradev/config.toml](/images/workspace-config.png)
 
 ## How It Works
 
@@ -121,7 +123,7 @@ run = ["docker compose down -v"]
 **Scripts and a subdirectory:**
 ```toml
 [setup]
-run = "./.superset/setup.sh"
+run = "./.paradev/setup.sh"
 
 [terminals.dev]
 run = "bun dev"
@@ -129,12 +131,12 @@ cwd = "apps/web"
 default = true
 
 [archive]
-run = "./.superset/archive.sh"
+run = "./.paradev/archive.sh"
 ```
 
 ## Personal Config
 
-Add your own tweaks without changing the team's file: create `.superset/config.local.toml` in your main checkout. It applies to every worktree of the repository. When you save it from **Settings → Workspace config**, Paradev keeps it out of your commits; otherwise add it to `.gitignore`.
+Add your own tweaks without changing the team's file: create `.paradev/config.local.toml` in your main checkout. It applies to every worktree of the repository. When you save it from **Settings → Workspace config**, Paradev keeps it out of your commits; otherwise add it to `.gitignore`.
 
 It has the same shape as `config.toml`, and any key you set replaces the shared one:
 
@@ -150,7 +152,7 @@ Here `setup` replaces the shared list, so copy the shared commands you want to k
 
 ## Coming from config.json
 
-Projects with `.superset/config.json` keep working. When both files exist, `config.toml` is used. To convert, open **Settings → Workspace config** and click **Convert to config.toml**, or write it by hand:
+Projects with `config.json` keep working. When both files exist, `config.toml` is used. To convert, open **Settings → Workspace config** and click **Convert to config.toml**, or write it by hand:
 
 | config.json | config.toml |
 |-------------|-------------|
@@ -158,9 +160,9 @@ Projects with `.superset/config.json` keep working. When both files exist, `conf
 | `teardown` | `[archive]` `run` |
 | `run` | `[terminals.dev]` `run`, with `default = true` |
 | `cwd` | `cwd` on each section |
-| `.superset/<key>.sh` used automatically | list the script in `run` |
+| `.paradev/<key>.sh` used automatically | list the script in `run` |
 | `config.local.json` with `before` / `after` | `config.local.toml`, with the full list |
-| `~/.superset/projects/<repo-path>/config.json` | `config.local.toml` in your main checkout |
+| `~/.paradev/projects/<repo-path>/config.json` | `config.local.toml` in your main checkout |
 
 Coming from Cursor: `install` stays `install`, `start` becomes `[setup]`, and `terminals` stays `terminals`.
 
@@ -178,6 +180,6 @@ Deleting a workspace through the CLI, SDK, or MCP also runs `[archive]`. Since t
 ## Tips
 
 - Keep setup fast: it runs on every workspace creation
-- Commit `.superset/config.toml` to share it with your team
-- Use shell scripts for complex logic: `run = "./.superset/setup.sh"`
+- Commit `.paradev/config.toml` to share it with your team
+- Use shell scripts for complex logic: `run = "./.paradev/setup.sh"`
 - Put dev servers in `[terminals]`, not `[setup]`: they're restartable and don't block workspace creation

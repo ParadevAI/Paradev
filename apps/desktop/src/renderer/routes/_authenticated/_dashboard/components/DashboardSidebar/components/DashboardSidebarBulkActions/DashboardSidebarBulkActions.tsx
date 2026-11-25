@@ -10,6 +10,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { type ReactNode, useMemo } from "react";
 import {
+	LuArchive,
 	LuFolderInput,
 	LuFolderPlus,
 	LuTrash2,
@@ -17,8 +18,8 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { useBulkWorkspaceMoveActions } from "../../hooks/useBulkWorkspaceMoveActions";
+import { useBulkWorkspaceRemoveActions } from "../../hooks/useBulkWorkspaceRemoveActions";
 import { useDashboardSidebarSelection } from "../../providers/DashboardSidebarSelectionProvider";
-import { useBulkDeleteWorkspacesIntent } from "../../stores/bulkDeleteWorkspacesIntent";
 import type {
 	DashboardSidebarProject,
 	DashboardSidebarWorkspace,
@@ -74,8 +75,8 @@ export function DashboardSidebarBulkActions({
 		sectionIdByWorkspaceId,
 	});
 
-	const openDeleteDialog = () =>
-		useBulkDeleteWorkspacesIntent.getState().request(selectedWorkspaces);
+	const { archivableCount, archiveSelection, deletableCount, requestDelete } =
+		useBulkWorkspaceRemoveActions(selectedWorkspaces);
 
 	return (
 		<>
@@ -196,23 +197,45 @@ export function DashboardSidebarBulkActions({
 						</TooltipContent>
 					</Tooltip>
 
-					<Tooltip delayDuration={300}>
-						<TooltipTrigger asChild>
-							<button
-								type="button"
-								onClick={openDeleteDialog}
-								className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-								aria-label={t({
-									message: "Delete selected workspaces",
-								})}
-							>
-								<LuTrash2 className="size-3.5" />
-							</button>
-						</TooltipTrigger>
-						<TooltipContent side="bottom">
-							<Trans>Delete</Trans>
-						</TooltipContent>
-					</Tooltip>
+					{deletableCount > 0 && (
+						<Tooltip delayDuration={300}>
+							<TooltipTrigger asChild>
+								<button
+									type="button"
+									onClick={requestDelete}
+									className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+									aria-label={t({
+										message: "Delete selected workspaces",
+									})}
+								>
+									<LuTrash2 className="size-3.5" />
+								</button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<Trans>Delete</Trans>
+							</TooltipContent>
+						</Tooltip>
+					)}
+
+					{archivableCount > 0 && (
+						<Tooltip delayDuration={300}>
+							<TooltipTrigger asChild>
+								<button
+									type="button"
+									onClick={archiveSelection}
+									className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
+									aria-label={t({
+										message: "Archive selected cloud workspaces",
+									})}
+								>
+									<LuArchive className="size-3.5" />
+								</button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<Trans>Archive</Trans>
+							</TooltipContent>
+						</Tooltip>
+					)}
 				</div>
 			)}
 		</>

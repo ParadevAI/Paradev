@@ -6,7 +6,7 @@ import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useRefreshHostsPresence } from "../../hooks/useRefreshHostsPresence";
+import { useRefreshHostsPresence } from "@/screens/(authenticated)/(home)/home/hooks/useRefreshHostsPresence";
 
 export function HostPresenceUnknownView({ hostName }: { hostName: string }) {
 	const { t } = useLingui();

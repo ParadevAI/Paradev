@@ -103,7 +103,7 @@ function requireScript(
 	if (!script) {
 		throw new CLIError(
 			`Terminal script ${id} not found`,
-			"Run `superset scripts list` to see script ids.",
+			"Run `paradev scripts list` to see script ids.",
 		);
 	}
 	return { index, script };
@@ -165,7 +165,7 @@ export function updateTerminalScript({
 		if (script.cliDeletePending) {
 			throw new CLIError(
 				`Terminal script ${id} is scheduled for deletion`,
-				"Add it again with `superset scripts add`.",
+				"Add it again with `paradev scripts add`.",
 			);
 		}
 		const updated: TerminalPreset = {
@@ -245,7 +245,7 @@ export function findTerminalScriptByName(
 			`${matches.length} scripts are named ${target}: ${matches
 				.map((script) => script.id)
 				.join(", ")}`,
-			"Delete the extras with `superset scripts delete <id>`, then retry.",
+			"Delete the extras with `paradev scripts delete <id>`, then retry.",
 		);
 	}
 	return matches[0];

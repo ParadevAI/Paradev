@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { LaptopMinimal, Smartphone, Tablet } from "lucide-react";
+import { LaptopMinimal, Smartphone } from "lucide-react";
 import { CloudSky } from "../CloudSky";
 import { DeviceChip } from "./components/DeviceChip";
 import { SANDBOX_ROWS } from "./constants";
@@ -57,7 +57,9 @@ export function CloudGraphic() {
 					<Trans>Laptop closed</Trans>
 				</DeviceChip>
 				<DeviceChip icon={<Smartphone className="size-4" />}>iPhone</DeviceChip>
-				<DeviceChip icon={<Tablet className="size-4" />}>iPad</DeviceChip>
+				<DeviceChip icon={<Smartphone className="size-4" />}>
+					Android
+				</DeviceChip>
 			</div>
 		</div>
 	);

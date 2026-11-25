@@ -1,0 +1,85 @@
+---
+title: "Paradev ve Conductor: yerel ajanlar, bulut çalışma alanları ve inceleme"
+description: "Paralel kodlama ajanları, yerel ve bulut çalışma alanları, inceleme, ekip iş birliği ve mobil erişim açısından Paradev ile Conductor'ı karşılaştırın."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset ve conductor karşılaştırması
+  - conductor alternatifi
+  - yapay zekâ ajanı orkestrasyonu
+  - kodlama ajanı yönetimi
+  - conductor ve superset karşılaştırması
+  - conductor kapanıyor
+  - conductor'dan geçiş
+---
+
+Taşınmaya karar verirseniz geçiş seçenekleri için [Conductor'dan Paradev'e geçiş](/conductor) yazısına veya yerel uygulama için [Conductor'dan geçiş](https://docs.paradev.com/migrate-from-conductor), bulut çalışma alanları için [Conductor Cloud'dan geçiş](https://docs.paradev.com/migrate-from-conductor-cloud) rehberlerine bakın.
+
+Paradev ve Conductor, paralel kodlama görevlerini ayrı çalışma alanlarında düzenler. Conductor; bulut çalışma alanları, paylaşılan ekip sohbetleri, API ve MCP sunucusu, zamanlanmış Routines ve bulut erişimiyle yerel Mac çalışma alanlarını deneysel olarak uzaktan kontrol etmeyi sağlayan bir iOS uygulaması sunar. Paradev'in iPhone ve iPad uygulaması bulut çalışma alanlarına ve sahip olduğunuz ana makinelere bağlanır; böylece ajanlar nerede çalışırsa çalışsın çalışma alanı terminallerine ve fark incelemesine devam edebilirsiniz.
+
+## Genel Bakış
+
+| Gereksinim | Paradev | Conductor |
+|---|---|---|
+| Ajanlar | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp ve eklediğiniz özel CLI ajanları | Claude Code, Codex, Cursor, OpenCode |
+| Çalışma konumu | Yerel çalışma alanları, bağlı ana makineler, kendi Linux sunucunuz ([Kendi Bulutunuzu Getirin](https://docs.paradev.com/bring-your-own-cloud)) ve [bulut çalışma alanları](https://docs.paradev.com/cloud-workspaces) | Yerel Mac çalışma alanları ve bulut korumalı alanları |
+| İnceleme | Değişiklikler bölmesi değişiklikleri kaydeder, gönderir ve PR açar; PR bölmesi kontrolleri, inceleme dizilerini ve birleştirmeyi gösterir | Farklar, kontroller, çekme istekleri, birleştirme ve arşivleme |
+| Ekip erişimi | Eklediğiniz, üye başına erişim izni verdiğiniz ana makineler ve kuruluş erişimi | Paylaşılan bulut çalışma alanları ve sohbetler |
+| Tarayıcı | Tasarım Modu'na sahip uygulama içi tarayıcı bölmesi: bir öğe seçip ajana gönderin | Tarayıcı önizlemesi |
+| Otomasyonlar | Pro'da seçili ana makinede zamanlanmış ajan çalıştırmaları; çalıştırma geçmişi ve başarısız çalıştırmalar için yeniden deneme | Zamanlanmış veya GitHub eylemiyle başlatılan, bulutta çalışan Routines |
+| Programatik kontrol | CLI, TypeScript SDK ve MCP sunucusu | API ve Conductor MCP |
+| Telefon | App Store'daki iPhone ve iPad uygulaması, iOS veya iPadOS 26+ sürümünde, Pro; bulut çalışma alanları ve kendi ana makinelerinizle çalışır | iOS uygulaması; bulut çalışma alanları ve [yerel Mac çalışma alanları için deneysel uzaktan kontrol](https://www.conductor.build/docs/reference/remote-control). Uzaktan kontrol için Mac açık, uyanık ve çevrimiçi kalmalıdır. |
+| Fiyatlandırma | Ücretsiz; Pro {{price:pro}}/kullanıcı/ay veya yıllık faturalandırmayla {{price:pro:yearly}}; Team {{price:team}} veya yıllık faturalandırmayla {{price:team:yearly}}; Ultra {{price:ultra}}; Enterprise özel fiyatlandırma. Ücretli planlar bulut erişimi sağlar; dahilî kullanım ve ölçümlü ek kullanım için [fiyatlandırmaya](/pricing) bakın. | [Güncel planlar ve hesap erişimi](https://www.conductor.build/docs/cloud/faq) için Conductor'a bakın |
+
+Conductor'ın [tanıtımı](https://www.conductor.build/docs) dört ajan altyapısını ve inceleme akışını listeliyor. [Bulut belgeleri](https://www.conductor.build/docs/cloud), paylaşılan ortamları ve yalıtılmış korumalı alanları açıklıyor. Güncel belgeleri ayrıca iPhone'dan [yerel Mac çalışma alanlarını deneysel olarak uzaktan kontrol etmeyi](https://www.conductor.build/docs/reference/remote-control) anlatıyor.
+
+## Paradev gereksinimleri
+
+Paradev, CLI kodlama ajanlarını ayrı çalışma alanlarında, terminaller ve fark incelemesiyle tek bir uygulamada çalıştırır. Masaüstü sürümü macOS'u ve deneysel Linux AppImage'ı destekler. Windows henüz kullanılamıyor. Paradev, MIT Lisansı altında açık kaynaklıdır. Sohbetini beğenen Conductor kullanıcıları, Claude Code, Codex, OpenCode ve Pi için [sohbet arayüzünü](https://docs.paradev.com/chat) kullanabilir.
+
+Aynı anda çok sayıda oturum çalıştırdığınızda Çalışma Alanları sayfası, tüm ana makinelerinizdeki çalışma alanlarını durumlarına göre gruplar (İlgilenmeniz gerekiyor, Çalışıyor, İnceleme gerekiyor, Boşta, Birleştirildi). Kesintiye uğrayan ajan oturumları aynı bölmede devam eder; Claude Code veya Codex'in başlattığı alt ajanlar da üst ajanlarının altında görünür.
+
+[iPhone ve iPad'de Paradev](/mobile) kullanmak için iOS 26 veya iPadOS 26 ya da üzeri ve Pro gerekir. Bulut çalışma alanları, kendi bilgisayarınızı bağlı tutmadan çalışır; kendi makinenizdeki çalışma alanları için ana makinenin çevrimiçi kalması gerekir. Uzak erişim ve otomasyonlar da ücretli plan gerektirir. [Fiyatlandırmaya](/pricing) ve [uzak erişim kurulumuna](https://docs.paradev.com/remote-access) bakın.
+
+## Deponuzda deneyin
+
+Bu karşılaştırma Paradev tarafından yayımlanmıştır. Bağlantı verilen Conductor belgeleri özellik açıklamalarını destekler; aşağıdaki deneme bir değerlendirme yöntemidir, ölçülmüş bir performans sıralaması değildir.
+
+Uygulamaları karşılaştırmak için her birinde aynı depo commit'ini, ajanı, modeli ve birbirinden bağımsız iki görev istemini kullanın. Uygulama ve ajan sürümlerini, tarihi ve kurulum farklarını kaydedin. Kapsamı belirli istemler için [paralel görevler rehberine](/blog/parallel-coding-agents-guide) bakın.
+
+| Deneme adımı | Kaydedilecek kanıt |
+|---|---|
+| Birbirinden bağımsız iki görev oluşturun | Çalışma alanı yolları ve dal adları; testleri çalıştırmadan önce gereken kurulum adımları |
+| Her ajanın küçük bir değişikliği tamamlamasını bekleyin | İstem, model, değiştirilen dosyalar ve kontrol çıktısı |
+| Bir düzeltme isteyin | Doğru oturumu bulup sürdürebiliyor musunuz? |
+| Her iki değişikliği inceleyip birleştirin | İnceleme adımları, çakışmalar ve birleşik test sonucu |
+| Gerekiyorsa uzak erişimi deneyin | Ana makinenin kullanılabilirliği, gereken plan ve bağlantı kesilince ne olduğu |
+
+Kurulum ve inceleme süresini ajan çalıştırma süresinden ayrı ölçün. Hız hakkında bir sonuca varmadan önce denemeyi tekrarlayın: ajan çıktıları değişkenlik gösterir ve daha hızlı çalışan bir ajan daha kötü bir fark da üretebilir. Git worktree'leri çalışma dosyalarını birbirinden ayırır; çakışmasız birleştirmeyi veya ajan izinlerinin korumalı alanla sınırlandırılmasını garanti etmez.
+
+![Paradev'de bir değişikliği inceleme.](/images/readme/diff-viewer.png)
+
+## Conductor kullanıcıları şimdi ne yapabilir?
+
+Taşınmaya karar verirseniz dallarınızı kaydedin ve saklamak istediğiniz kayıtları dışa aktarın.
+
+Görev kendi bilgisayarınızda, bir ana makinede veya bulut çalışma alanında sürerken iPhone'unuzdan ajana yanıt vermek ve değişikliklerini incelemek, üstelik her türlü CLI ajanını kullanmak istiyorsanız Paradev'i seçin. Kurulumu [telefon rehberiyle](/blog/claude-code-codex-iphone) doğrulayın. Çalışmanızı taşımak için [yerel uygulama rehberini](https://docs.paradev.com/migrate-from-conductor) veya [Conductor Cloud rehberini](https://docs.paradev.com/migrate-from-conductor-cloud) izleyin.
+
+İşlem ve ajan sağlayıcı maliyetleri dahil güncel [Paradev planlarını](/pricing) karşılaştırın. Ajan sağlayıcılarının kullanımı ayrıca faturalandırılır.
+
+## Sık Sorulan Sorular
+
+### Conductor yalnızca yerel çalışmaya mı yönelik?
+
+Hayır. Conductor, yerel Mac çalışma alanlarını ve paylaşılan bulut çalışma alanlarını da içeren [bulut korumalı alanlarını](https://www.conductor.build/docs/cloud) belgeliyor. iOS uygulaması ayrıca [yerel Mac çalışma alanları için deneysel uzaktan kontrol](https://www.conductor.build/docs/reference/remote-control) sunuyor.
+
+### Conductor OpenCode çalıştırabilir mi?
+
+Evet. Tanıtımında OpenCode, Claude Code, Codex ve Cursor ile birlikte listeleniyor.
+
+### Paradev için düzenleyicimi değiştirmem gerekir mi?
+
+Hayır. Paradev terminallerinizi ve çalışma alanlarınızı yönetirken çalışma alanı dizinini düzenleyicinizde açabilirsiniz. Çakışan düzenlemeler için tek bir sahip belirleyin.

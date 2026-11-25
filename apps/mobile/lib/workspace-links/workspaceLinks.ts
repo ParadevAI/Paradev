@@ -1,6 +1,6 @@
 import { isOwnOriginTwin } from "@superset/shared/own-domains";
 
-const APP_SCHEME = "superset:";
+const APP_SCHEMES = new Set(["superset:", "paradev:"]);
 
 function singleSegment(pathname: string, prefix: string): string | null {
 	const segments = pathname.split("/").filter(Boolean);
@@ -15,8 +15,8 @@ function singleSegment(pathname: string, prefix: string): string | null {
 
 /**
  * Reads the workspace id from a shared web link (`<web>/workspaces/<id>`), or
- * from the desktop deep link (`superset://v2-workspace/<id>`) that the web page
- * redirects to when iOS opens the link in Safari.
+ * from the desktop deep link (`superset://v2-workspace/<id>`, or `paradev://`)
+ * that the web page redirects to when iOS opens the link in Safari.
  */
 export function workspaceIdFromUrl(url: string, webUrl: string): string | null {
 	let target: URL;
@@ -27,7 +27,7 @@ export function workspaceIdFromUrl(url: string, webUrl: string): string | null {
 	} catch {
 		return null;
 	}
-	if (target.protocol === APP_SCHEME) {
+	if (APP_SCHEMES.has(target.protocol)) {
 		return singleSegment(`/${target.host}${target.pathname}`, "v2-workspace");
 	}
 	if (!isOwnOriginTwin(target.origin, web.origin)) return null;

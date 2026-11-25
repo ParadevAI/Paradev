@@ -1,11 +1,32 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
 
 export async function GET(request: Request) {
+	const url = new URL(request.url);
+	const callbackOrigin = new URL(getBrowserApiUrl(env)).origin;
+	if (url.origin !== callbackOrigin) {
+		const destination = new URL("/api/github/install", callbackOrigin);
+		destination.search = url.search;
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: destination.toString(),
+				"Cache-Control": "no-store",
+			},
+		});
+	}
+
 	const member = await requireOrgMember(request);
 	if (member instanceof Response) return member;
+
+	if (member.role !== "owner" && member.role !== "admin") {
+		return Response.redirect(
+			`${env.NEXT_PUBLIC_WEB_URL}/integrations/github?error=admin_required`,
+		);
+	}
 
 	if (!(await organizationSyncsNow(member.organizationId))) {
 		return Response.redirect(
@@ -22,7 +43,11 @@ export async function GET(request: Request) {
 
 	return beginOAuthFlow({
 		cookie: STATE_COOKIES.github,
-		payload: { organizationId: member.organizationId, userId: member.userId },
+		payload: {
+			organizationId: member.organizationId,
+			userId: member.userId,
+			callbackOrigin,
+		},
 		authorizeUrl: (state) => {
 			// The slug must match GH_APP_ID: installing a different App produces
 			// an installation this deployment cannot mint tokens for, which
@@ -34,7 +59,7 @@ export async function GET(request: Request) {
 			installUrl.searchParams.set("state", state);
 			installUrl.searchParams.set(
 				"redirect_url",
-				`${env.NEXT_PUBLIC_API_URL}/api/github/callback`,
+				`${getBrowserApiUrl(env)}/api/github/callback`,
 			);
 			return installUrl.toString();
 		},

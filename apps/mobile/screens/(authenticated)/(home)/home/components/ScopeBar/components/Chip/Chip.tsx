@@ -18,10 +18,13 @@ export function Chip({ label, leading, onPress }: ChipProps) {
 			onPress={onPress}
 			accessibilityLabel={label}
 			ph-label="scope-chip"
-			className="bg-secondary/60 flex-row items-center gap-1.5 rounded-full py-1.5 pl-3 pr-2.5 active:opacity-60"
+			className="bg-secondary/60 web:hover:bg-secondary flex-row items-center gap-1.5 rounded-full py-1.5 pl-3 pr-2.5 active:opacity-60"
 		>
 			{leading}
-			<Text className="text-foreground max-w-40 text-xs" numberOfLines={1}>
+			<Text
+				className="text-foreground max-w-40 text-[14px] leading-4"
+				numberOfLines={1}
+			>
 				{label}
 			</Text>
 			<ChevronDown size={12} color={theme.mutedForeground} strokeWidth={2.5} />

@@ -208,7 +208,9 @@ export function mergeAndLinkSessionDir(
 	}
 	if (!onSameFilesystem(src, dst)) {
 		console.warn(
-			`[host-service] leaving ${src} unshared because ${dst} is on another filesystem`,
+			"[host-service] leaving a file unshared, its target is on another filesystem (src, dst):",
+			src,
+			dst,
 		);
 		return;
 	}

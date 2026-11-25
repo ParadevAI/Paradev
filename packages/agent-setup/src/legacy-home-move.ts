@@ -2,6 +2,7 @@
 import { execFile, execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { publicEnvPair, readPublicEnv } from "@superset/shared/public-env";
 import { linkClaudeProjectsAfterHomeMove } from "./claude-project-links";
 import { defaultAppHomeDir, resolveUserHomeDir } from "./paths";
 
@@ -33,7 +34,7 @@ export function moveLegacyAppHome(env: NodeJS.ProcessEnv = process.env): {
 } {
 	if (env.NODE_ENV === "test" || env.NODE_TEST_CONTEXT !== undefined) {
 		return {
-			homeDir: env.SUPERSET_HOME_DIR?.trim() || defaultAppHomeDir(),
+			homeDir: readPublicEnv("HOME_DIR", env)?.trim() || defaultAppHomeDir(),
 			move: "test-runner",
 		};
 	}
@@ -42,13 +43,13 @@ export function moveLegacyAppHome(env: NodeJS.ProcessEnv = process.env): {
 		resolveUserHomeDir(),
 		LEGACY_APP_HOME_DIR_NAME,
 	);
-	const explicit = env.SUPERSET_HOME_DIR?.trim();
+	const explicit = readPublicEnv("HOME_DIR", env)?.trim();
 	if (explicit && ![homeDir, legacyHomeDir].includes(path.resolve(explicit))) {
 		return { homeDir: explicit, move: "custom-home" };
 	}
 	const move = moveHome(legacyHomeDir, homeDir);
 	const inUse = move === "failed" ? legacyHomeDir : homeDir;
-	env.SUPERSET_HOME_DIR = inUse;
+	Object.assign(env, publicEnvPair("HOME_DIR", inUse));
 	return { homeDir: inUse, move };
 }
 

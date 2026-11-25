@@ -20,6 +20,7 @@ import {
 import { CommentMarkdown } from "renderer/components/CommentMarkdown";
 import { ReviewThreadReplyComposer } from "renderer/routes/_authenticated/_dashboard/components/ReviewThreadReplyComposer";
 import "./comment-thread.css";
+import { useNow } from "renderer/hooks/useNow";
 
 interface Comment {
 	id: string;
@@ -240,6 +241,7 @@ export function PullRequestCommentThread({
 }
 
 function CommentRow({ comment }: { comment: Comment }) {
+	const now = useNow(60_000);
 	const { formatCompactRelativeTime } = useFormat();
 	return (
 		<li className="flex gap-2 px-3 py-2.5">
@@ -261,7 +263,7 @@ function CommentRow({ comment }: { comment: Comment }) {
 							className="text-muted-foreground"
 							dateTime={new Date(comment.createdAt).toISOString()}
 						>
-							{formatCompactRelativeTime(comment.createdAt)}
+							{formatCompactRelativeTime(comment.createdAt, now)}
 						</time>
 					)}
 				</div>

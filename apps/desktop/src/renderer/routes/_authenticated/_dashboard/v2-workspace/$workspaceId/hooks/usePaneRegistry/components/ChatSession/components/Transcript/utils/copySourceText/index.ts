@@ -1,1 +1,0 @@
-export { copySourceText } from "./copySourceText";

@@ -33,9 +33,14 @@ beforeEach(() => {
 	}
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
+	// Never the box's own /etc/superset/environment.toml, which a cloud workspace running these tests has.
+	process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(root, "environment.toml");
 });
 
 afterEach(() => {
+	delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
+	delete process.env.SUPERSET_SANDBOX_WORKSPACE_PATH;
+	delete process.env.SUPERSET_SANDBOX_REPOSITORIES;
 	rmSync(root, { recursive: true, force: true });
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
@@ -112,17 +117,52 @@ describe("loadProjectConfig with config.toml", () => {
 		});
 	});
 
-	it("the cloud reads the cloud tables, without the personal file", () => {
+	it("the cloud reads the environment's config with its cloud tables, not the repository's files", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
-		write(
-			repoPath,
-			"config.toml",
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(
+			join(root, "environment.toml"),
 			'[setup]\nrun = "local-setup"\n[setup.cloud]\nrun = "cloud-setup"\n',
 		);
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
 		write(repoPath, "config.local.toml", '[setup]\nrun = "personal"\n');
 		expect(resolved({ repoPath, projectId }).setup.commands).toEqual([
 			"cloud-setup",
 		]);
+	});
+
+	it("in a box with several repositories, only the primary takes the environment's config", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		process.env.SUPERSET_SANDBOX_WORKSPACE_PATH = root;
+		process.env.SUPERSET_SANDBOX_REPOSITORIES = JSON.stringify([
+			{ url: "https://github.com/acme/web", branch: "main", path: "repo" },
+			{ url: "https://github.com/acme/docs", branch: "main", path: "docs" },
+		]);
+		writeFileSync(join(root, "environment.toml"), '[setup]\nrun = "env"\n');
+		const docsPath = join(root, "docs");
+		write(docsPath, "config.toml", '[setup]\nrun = "docs"\n');
+		expect(resolved({ repoPath, projectId }).setup.commands).toEqual(["env"]);
+		expect(resolved({ repoPath: docsPath, projectId }).setup.commands).toEqual([
+			"docs",
+		]);
+	});
+
+	it("an environment config that does not parse runs nothing and says why", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(join(root, "environment.toml"), "[setup\n");
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
+		expect(loadProjectConfig({ repoPath, projectId })?.kind).toBe("invalid");
 	});
 
 	it("a local app launched from a sandbox terminal still resolves as local", () => {
@@ -148,7 +188,21 @@ describe("loadProjectConfig with config.toml", () => {
 	});
 });
 
-describe("loadProjectConfig with v1 in the cloud", () => {
+describe("loadProjectConfig in the cloud without an environment config", () => {
+	it("reads the repository's config, as before environments had their own", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(join(root, "environment.toml"), "\n");
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
+		const loaded = loadProjectConfig({ repoPath, projectId, appHomeDir });
+		expect(loaded?.kind === "ok" && loaded.resolved.setup.commands).toEqual([
+			"repository",
+		]);
+	});
+
 	it("keeps v1's cloud behavior: only start runs, and no teardown", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
 		write(

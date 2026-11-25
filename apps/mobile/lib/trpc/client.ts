@@ -2,7 +2,8 @@ import type { AppRouter } from "@superset/trpc";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import * as Application from "expo-application";
 import superjson from "superjson";
-import { authClient, getJwt } from "../auth/client";
+import { getJwt } from "../auth/client";
+import { sessionFetch, sessionHeaders } from "../auth/sessionTransport";
 import { env } from "../env";
 import { transportRetryLink } from "../errors";
 
@@ -13,12 +14,12 @@ export const apiClient = createTRPCProxyClient<AppRouter>({
 		transportRetryLink(),
 		httpBatchLink({
 			url: `${env.EXPO_PUBLIC_API_URL}/api/trpc`,
+			fetch: sessionFetch,
 			headers() {
-				const cookies = authClient.getCookie();
 				const jwt = getJwt();
 				return {
 					"x-superset-client": clientVersionHeader,
-					...(cookies ? { Cookie: cookies } : {}),
+					...sessionHeaders(),
 					...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
 				};
 			},

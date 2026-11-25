@@ -104,3 +104,95 @@ or the value arrives empty.
 `SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID` is an internal first-boot variable. Cloud automation dispatch sets it when it starts a workspace, and host-service sends it back with the launch report so the run is correlated without guessing which row created the box. A manual cloud launch must not set it. It is not a deployment secret: do not add it to `.env` templates, the API env schema, or deploy workflows.
 
 `SUPERSET_SANDBOX_AGENT_TERMINAL_ID` is an internal first-boot variable. The desktop's create flow chooses the id, the API passes it with the launch, and host-service starts the agent's chat or terminal under it so the desktop can open that pane by the exact id. It is not a deployment secret: do not add it to `.env` templates, the API env schema, or deploy workflows.
+
+## Browser OAuth origin
+
+`BROWSER_API_URL` is an optional server setting in API, auth, and tRPC. It falls
+back to `NEXT_PUBLIC_API_URL`, including when a deploy passes an empty secret.
+Leave it unset in the existing stack and local development. It selects auth's
+base URL, integration OAuth redirect URIs, state-cookie transport, and browser
+account-link URLs. OAuth token exchanges must send that same redirect URI.
+`NEXT_PUBLIC_API_URL` remains the JWT issuer/audience, MCP resource identity, and
+server job/callback origin. It is also the origin of connector client
+metadata, so a connector's client ID and its callback are on one host.
+
+The API and web preview workflows pass the optional setting through. Production
+workflow wiring is deferred to the separate-deployment change, so this preparation
+does not trigger infrastructure redeploys through workflow path filters. No secret
+or local `.env` change is needed for the existing stack. The web client's public API URL remains its own
+`NEXT_PUBLIC_API_URL`; `BROWSER_API_URL` is not bundled into browser code.
+
+OAuth/OIDC discovery keeps the explicit canonical issuer but advertises protocol
+endpoints (authorize, token, JWKS, registration, introspection, revocation,
+userinfo, logout) on the deployment's browser base URL. With no override these
+are unchanged. The MCP resource is always `${NEXT_PUBLIC_API_URL}/mcp`, including
+root and plugin discovery, while discovery URLs can use the request host.
+Connector client metadata lists only the callback on its own origin: Firecrawl
+and Resend reject a document whose redirect URIs are on another host than its
+client ID. Grants issued to the client ID on the other own domain keep
+refreshing as it. Existing dynamic-client grants look up their original client
+across those callback twins, scoped to the same issuer and connector; new grants
+still select registrations for the current callback only.
+
+## Domain move opt-in
+
+`DOMAIN_MOVE_ENABLED` is optional in API and web, and only literal `true` enables
+the routing flag lookup. Every other value defaults to the existing behavior,
+without a rollout cookie or added remote lookup. It is server-only and included
+in Turbo's env inputs and API/web preview/manual build/runtime passthrough.
+The web proxy reads this optional string directly from `process.env` so its
+auth gate does not load the full app environment schema. The API reads its
+declared server environment value.
+Production API builds and runtime now pass the optional production
+`DOMAIN_MOVE_ENABLED` secret, and production web passes the same secret. Each
+surface has its own PostHog flag, so they roll out separately: desktop sign-in
+reads `web-domain-move` and old-app pages read `web-pages-domain-move`. A
+missing `web-pages-domain-move` flag retains the old pages. No secret is set
+by merging the wiring. Stage and final artifact preparation explicitly pass
+`false`.
+
+## Marketing destination override
+
+The production-only GitHub environment secret `MARKETING_WEB_URL` overrides
+`NEXT_PUBLIC_WEB_URL` only in the marketing deploy job. An absent or empty
+override retains the shared `NEXT_PUBLIC_WEB_URL` secret. Set the override to
+`https://app.paradev.com` when marketing traffic is ready to move; remove it or
+set it to `https://app.superset.sh` to roll back, then redeploy marketing.
+
+This is a workflow input, not an application environment variable. The app
+still receives its existing schema-validated `NEXT_PUBLIC_WEB_URL` at build
+and runtime, so no additional app schema or local environment value is needed.
+Do not change the shared `NEXT_PUBLIC_WEB_URL` secret to move marketing: the
+legacy API, web, admin, billing and auth returns still depend on it.
+
+## Desktop destination override
+
+The production-only GitHub environment secrets `DESKTOP_API_URL` and
+`DESKTOP_WEB_URL` override `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WEB_URL` only
+in the desktop build jobs (`build-desktop.yml`, stable and canary). An absent
+or empty override retains the shared secret. They take effect in the next
+desktop build; released builds do not change. To roll back, remove them and
+build again.
+
+Do not change the shared secrets to move desktop: the legacy API uses
+`NEXT_PUBLIC_API_URL` as its token issuer and audience.
+
+## Not this: variables a terminal sees
+
+This page is for deploy and server variables. The variables the app sets in
+terminals, agents and hooks (`SUPERSET_TERMINAL_ID`, `SUPERSET_WORKSPACE_ID`,
+`SUPERSET_HOME_DIR`, …) are listed in `PUBLIC_ENV_NAMES`
+(`packages/shared/src/public-env.ts`). Each is set under both `SUPERSET_` and
+`PARADEV_` with the same value. Read one with `readPublicEnv`: the `SUPERSET_`
+value wins when it is set and not empty, and `PARADEV_` is used only when it is
+not. Existing scripts and profiles override the old name, so it must keep
+winning. For the same reason, code that clears one of these variables must
+unset both names. Never remove the `SUPERSET_` name: released CLIs and the
+hook scripts on users' machines read only that one.
+
+For cloud environment variables (`packages/shared/src/environment-secrets.ts`),
+the whole `SUPERSET_` prefix is reserved, but only the exact `PARADEV_` names
+in `IDENTITY_ENV_NAMES` are. Customers saved other `PARADEV_*` variables (for
+example `PARADEV_API_KEY`) before the rename, and those still reach their
+boxes. In a cloud workspace the CLI reads only `SUPERSET_API_KEY` and
+`SUPERSET_API_URL`, so such a saved variable does not change how it signs in.

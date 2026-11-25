@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset, presetForAnyHarness } from "@superset/chat/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SquareTerminal } from "lucide-react-native";
 import { useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
@@ -16,6 +16,7 @@ import {
 	getHostServiceClientByUrl,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
+import { HeaderToolbar } from "@/lib/navigation";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
@@ -30,6 +31,7 @@ import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgen
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import { hostStartsChats } from "@/screens/(authenticated)/utils/hostStartsChats";
 import { useHostCompatibility } from "../hooks/useHostCompatibility";
+import { resumeChat } from "../utils/resumeChat";
 import { openDesktopChatTab } from "./utils/openDesktopChatTab";
 
 /**
@@ -203,23 +205,16 @@ export function NewSessionSheet() {
 		if (launchingKey !== null) return;
 		setLaunchingKey(chat.sessionId);
 		try {
-			const transport = getChatTransport(hostUrl);
-			await transport
-				.closeSession({ sessionId: chat.sessionId })
-				.catch(() => {});
-			const created = await transport.createSession({
-				commandId: randomUUID(),
+			const sessionId = await resumeChat({
+				transport: getChatTransport(hostUrl),
 				workspaceId: workspace.id,
-				harness: chat.harness,
-				resume: {
-					harnessSessionId: chat.harnessSessionId,
-					replacesSessionId: chat.sessionId,
-				},
+				chat: { ...chat, harnessSessionId: chat.harnessSessionId },
+				commandId: randomUUID(),
 			});
 			openDesktopChatTab(
 				getHostServiceClientByUrl(hostUrl),
 				workspace.id,
-				created.sessionId,
+				sessionId,
 			);
 			if (host) {
 				void queryClient.invalidateQueries({
@@ -227,7 +222,7 @@ export function NewSessionSheet() {
 				});
 			}
 			router.dismissTo(
-				`/(authenticated)/workspace/${workspace.id}?tab=${created.sessionId}`,
+				`/(authenticated)/workspace/${workspace.id}?tab=${sessionId}`,
 			);
 		} catch (error) {
 			setLaunchingKey(null);
@@ -246,15 +241,15 @@ export function NewSessionSheet() {
 			contentContainerClassName="px-5 pb-8"
 			contentInsetAdjustmentBehavior="automatic"
 		>
-			<Stack.Toolbar placement="left">
-				<Stack.Toolbar.Button
-					icon="xmark"
+			<HeaderToolbar placement="left">
+				<HeaderToolbar.Button
+					icon="close"
 					accessibilityLabel={t({
 						message: "Close",
 					})}
 					onPress={() => router.back()}
 				/>
-			</Stack.Toolbar>
+			</HeaderToolbar>
 			{isLoading ? <View className="items-center py-8">{spinner}</View> : null}
 			{notice ? (
 				<View className="items-center gap-3 py-8">

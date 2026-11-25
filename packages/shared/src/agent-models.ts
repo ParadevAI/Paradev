@@ -1,5 +1,6 @@
+export * from "./model-catalog";
 /**
- * Curated per-agent model, effort, and launch-mode catalogs for the
+ * Bundled per-agent model, effort, and launch-mode fallbacks for the
  * workspace-create pickers.
  *
  * Entries are keyed by terminal-agent presetId (see
@@ -10,8 +11,8 @@
  * The virtual `omp` preset is resolved from the configured executable so OMP
  * options never leak onto the legacy `pi` CLI.
  *
- * The lists are hand-maintained and expected to drift with CLI releases —
- * update them here when a tool adds or retires models.
+ * Live model discovery takes precedence where the harness supports it.
+ * These lists keep older hosts and offline pickers usable.
  */
 
 export interface AgentModelOption {
@@ -77,6 +78,11 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 	{ id: "anthropic/claude-opus-4-8", label: "Opus 4.8", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-7", label: "Opus 4.7", provider: "Anthropic" },
 	{
+		id: "anthropic/claude-fable-5-2",
+		label: "Fable 5.2",
+		provider: "Anthropic",
+	},
+	{
 		id: "anthropic/claude-fable-5-1",
 		label: "Fable 5.1",
 		provider: "Anthropic",
@@ -98,6 +104,8 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 		label: "Haiku 4.5",
 		provider: "Anthropic",
 	},
+	{ id: "openai/gpt-6.2-astra", label: "GPT-6.2 Astra", provider: "OpenAI" },
+	{ id: "openai/gpt-6.2-sol", label: "GPT-6.2 Sol", provider: "OpenAI" },
 	{ id: "openai/gpt-6.1-sol", label: "GPT-6.1 Sol", provider: "OpenAI" },
 	{ id: "openai/gpt-6-astra", label: "GPT-6 Astra", provider: "OpenAI" },
 	{ id: "openai/gpt-6-sol", label: "GPT-6 Sol", provider: "OpenAI" },
@@ -131,6 +139,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "opus", label: "Opus", group: LATEST_GROUP },
 			{ id: "sonnet", label: "Sonnet", group: LATEST_GROUP },
 			{ id: "haiku", label: "Haiku", group: LATEST_GROUP },
+			{ id: "claude-fable-5-2", label: "Fable 5.2", group: PINNED_GROUP },
 			{ id: "claude-fable-5-1", label: "Fable 5.1", group: PINNED_GROUP },
 			{ id: "claude-fable-5", label: "Fable 5", group: PINNED_GROUP },
 			{ id: "claude-opus-5-5", label: "Opus 5.5", group: PINNED_GROUP },
@@ -150,10 +159,12 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		modelFlag: "--model",
 		models: [
 			// Availability is account-dependent; ids and order follow Codex's
-			// live catalog (`codex app-server` → `model/list`, codex 0.162.1).
+			// live catalog (`codex app-server` → `model/list`, codex 0.169.0).
+			{ id: "gpt-6.2-sol", label: "GPT-6.2 Sol" },
+			{ id: "gpt-6.2-astra", label: "GPT-6.2 Astra" },
+			{ id: "gpt-6.1-terra", label: "GPT-6.1 Terra" },
 			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol" },
 			{ id: "gpt-6-astra", label: "GPT-6 Astra" },
-			{ id: "gpt-6.1-terra", label: "GPT-6.1 Terra" },
 			{ id: "gpt-6-sol", label: "GPT-6 Sol" },
 			{ id: "gpt-6-luna", label: "GPT-6 Luna" },
 			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol" },
@@ -177,9 +188,11 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		models: [
 			// Family ids; `--effort` picks the level. The catalog is
 			// account-dependent and agy rejects ids the account lacks. Verified
-			// against `agy models` (agy 1.4.10, 2026-10-29) except Gemini 4 Argon,
-			// whose family and level ids ship in the binary but need a plan that
-			// includes it.
+			// against `agy models` (agy 1.4.10, 2026-10-29) except the Gemini 4
+			// models, whose family and level ids ship in the binary (Carbon and
+			// Hydrogen since agy 1.4.11) but need a plan that includes them.
+			{ id: "gemini-4-carbon", label: "Gemini 4 Carbon" },
+			{ id: "gemini-4-hydrogen", label: "Gemini 4 Hydrogen" },
 			{ id: "gemini-4-argon", label: "Gemini 4 Argon" },
 			{ id: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
 			{ id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
@@ -194,6 +207,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "auto", label: "Auto" },
 			{ id: "claude-opus-5.5", label: "Claude Opus 5.5" },
 			{ id: "claude-opus-5", label: "Claude Opus 5" },
+			{ id: "claude-fable-5.2", label: "Claude Fable 5.2" },
 			{ id: "claude-fable-5.1", label: "Claude Fable 5.1" },
 			{ id: "claude-sonnet-5.5", label: "Claude Sonnet 5.5" },
 			{ id: "claude-sonnet-5", label: "Claude Sonnet 5" },
@@ -321,16 +335,20 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// same models.dev catalog but need an authed anthropic provider to
 			// appear in that listing; `claude-fable-5-1` was checked against
 			// models.dev directly (2026-09-01), the gpt-6 family likewise
-			// (2026-09-23).
+			// (2026-09-23), `claude-fable-5-2` and the gpt-6.2 family likewise
+			// (2026-11-17).
 			{ id: "anthropic/claude-opus-5-5", label: "Claude Opus 5.5" },
 			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-2", label: "Claude Fable 5.2" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{ id: "anthropic/claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
 			{ id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5" },
 			{ id: "google/gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+			{ id: "openai/gpt-6.2-astra", label: "GPT-6.2 Astra" },
+			{ id: "openai/gpt-6.2-sol", label: "GPT-6.2 Sol" },
 			{ id: "openai/gpt-6-astra", label: "GPT-6 Astra" },
 			{ id: "openai/gpt-6-sol", label: "GPT-6 Sol" },
 			{ id: "openai/gpt-6-luna", label: "GPT-6 Luna" },
@@ -347,7 +365,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// provider/model selectors. Exact ids verified against
 			// `omp models --json` in OMP 18.0.1; `claude-fable-5-1` against the
 			// catalog bundled in OMP 18.1.2; the gpt-6 family against
-			// pi-catalog 18.2.11.
+			// pi-catalog 18.2.11; `claude-fable-5-2` against pi-catalog 18.18.5.
 			{ id: "@smol", label: "Configured fast model" },
 			{ id: "@slow", label: "Configured slow model" },
 			{ id: "@plan", label: "Configured plan model" },
@@ -355,6 +373,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-2", label: "Claude Fable 5.2" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{
@@ -575,7 +594,12 @@ const CURSOR_EFFORT_VARIANTS: Readonly<
 	"glm-5.2-high": cursorEffortVariants("glm-5.2", ["high", "max"]),
 };
 
-const AGY_EFFORT_MODELS = ["gemini-4-argon", "gemini-3.8-flash"] as const;
+const AGY_EFFORT_MODELS = [
+	"gemini-4-carbon",
+	"gemini-4-hydrogen",
+	"gemini-4-argon",
+	"gemini-3.8-flash",
+] as const;
 
 const PI_THINKING_LEVELS: AgentModelOption[] = [
 	{ id: "off", label: "Off" },
@@ -633,9 +657,11 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 				id: "ultra",
 				label: "Ultra",
 				models: [
+					"gpt-6.2-sol",
+					"gpt-6.2-astra",
+					"gpt-6.1-terra",
 					"gpt-6.1-sol",
 					"gpt-6-astra",
-					"gpt-6.1-terra",
 					"gpt-6-sol",
 					"gpt-5.6-sol",
 					"gpt-5.6-terra",
@@ -678,6 +704,7 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 			{ id: "low", label: "Low", models: AGY_EFFORT_MODELS },
 			{ id: "medium", label: "Medium", models: AGY_EFFORT_MODELS },
 			{ id: "high", label: "High", models: AGY_EFFORT_MODELS },
+			{ id: "xhigh", label: "xHigh", models: ["gemini-4-hydrogen"] },
 		],
 	},
 	{
@@ -835,6 +862,22 @@ export function isCuratedAgentModel(presetId: string, model: string): boolean {
 	);
 }
 
+const LISTS_OWN_MODELS = new Set(["codex", "opencode", "cursor-agent"]);
+
+/**
+ * True for a bundled model, and for any well-formed id on an agent that lists
+ * its own models: the CLI decides whether that id exists.
+ */
+export function isLaunchableAgentModel(
+	presetId: string,
+	model: string,
+): boolean {
+	return (
+		isCuratedAgentModel(presetId, model) ||
+		(LISTS_OWN_MODELS.has(presetId) && /^[^\s\p{Cc}]{1,200}$/u.test(model))
+	);
+}
+
 /**
  * Argv tokens that select `model` for the given preset, e.g.
  * `["--model", "sonnet"]`. Returns `[]` for unknown presets, presets without
@@ -853,7 +896,7 @@ export function buildAgentModelArgs(
 	if (!model) return [];
 	const support = getAgentModelSupport(presetId);
 	if (!support?.modelFlag) return [];
-	if (!isCuratedAgentModel(presetId, model)) return [];
+	if (!isLaunchableAgentModel(presetId, model)) return [];
 	const variant = effort
 		? getAgentEffortSupport(presetId)?.modelVariants?.[model]?.[effort]
 		: undefined;

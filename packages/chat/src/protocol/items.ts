@@ -247,6 +247,7 @@ export const approvalRequestSchema = z.looseObject({
 	targetItemId: z.string().min(1).nullable(),
 	title: z.string(),
 	detail: z.array(toolContentSchema).optional(),
+	reason: z.string().optional(),
 	options: z
 		.array(
 			z.looseObject({

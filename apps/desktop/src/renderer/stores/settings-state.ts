@@ -20,6 +20,7 @@ export type SettingsSection =
 	| "integrations"
 	| "plugins"
 	| "billing"
+	| "cloudUsage"
 	| "apikeys"
 	| "permissions"
 	| "security"
@@ -51,7 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
 			activeProjectId: null,
 			searchQuery: "",
 			isOpen: false,
-			originRoute: "/workspace",
+			originRoute: "/new-workspace",
 
 			setActiveSection: (section) => set({ activeSection: section }),
 
@@ -81,17 +82,9 @@ export const useSettingsStore = create<SettingsState>()(
 	),
 );
 
-export const useSettingsSection = () =>
-	useSettingsStore((state) => state.activeSection);
-export const useSetSettingsSection = () =>
-	useSettingsStore((state) => state.setActiveSection);
 export const useSettingsSearchQuery = () =>
 	useSettingsStore((state) => state.searchQuery);
 export const useSetSettingsSearchQuery = () =>
 	useSettingsStore((state) => state.setSearchQuery);
-export const useActiveProjectId = () =>
-	useSettingsStore((state) => state.activeProjectId);
-export const useCloseSettings = () =>
-	useSettingsStore((state) => state.closeSettings);
 export const useSettingsOriginRoute = () =>
 	useSettingsStore((state) => state.originRoute);

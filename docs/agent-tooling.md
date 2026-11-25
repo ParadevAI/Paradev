@@ -16,6 +16,30 @@ Everything else links to those:
 | `.cursor/commands` | `../.agents/commands` |
 | `.codex/commands`, `.codex/prompts` | `../.agents/commands` |
 
+## Skill names after the Paradev rename
+
+Paradev was called Superset. Skill text says Paradev, and a description says
+"Paradev (formerly Superset)" so that agents and search connect the two names. Names that agents
+and released builds look up keep `superset`:
+
+- The CLI command `superset` (`paradev` is the same binary) and the `SUPERSET_*` variables.
+- Repo skill `superset-settings` (`/superset-settings`, `$superset-settings`).
+- Managed skills: the `superset-<skill>` directories in `~/.agents/skills/`, the
+  `~/.agents/commands/superset/` commands, `<!-- superset-managed-skill v1 -->` and
+  `.superset-managed`.
+- Disabled-skill keys (`superset/<skill>`) in saved settings.
+
+Do not rename these. Agents have no skill alias: if a skill has two names, it shows two times
+in the list. If it has only the new name, saved prompts and old habits that use the old name stop
+working.
+
+Claude is the one exception. It gets the managed skills from two plugins with the same skill
+bodies: `~/.claude/skills/paradev/` (`paradev:<skill>`), and `~/.claude/skills/superset/`
+(`superset:<skill>`), whose descriptions only say "Old name of `paradev:<skill>`". Both names
+run the full skill. Keep the `superset` plugin complete: builds from before the rename provision
+only it and delete `paradev`. Paradev's menus show `superset:<skill>` as an alias of
+`paradev:<skill>`. Details: `docs/plugins.md`.
+
 ## Per-tool notes
 
 - **Codex** layers trusted repo settings from `.codex/config.toml`; launch it normally from the repo
@@ -96,8 +120,9 @@ exists only in this worktree, read the from-source CLI with
 `bun run --cwd packages/cli dev schema 2>/dev/null | jq ...`; it can list commands the installed
 CLI does not have yet.
 
-`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`) is the chat-only
-namespace targeting `sessions.*` on the host. The host accepts only supported chat providers, with
+`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`, `import`) is the
+chat-only namespace targeting `sessions.*` on the host; `search`, in the same namespace, asks the
+cloud API instead. The host accepts only supported chat providers, with
 no fallback to `agents.run` or `terminal.*`; `superset agents` and
 `superset terminals` remain unchanged for terminal-backed agent runs.
 
@@ -132,7 +157,13 @@ superset sessions open --local --workspace WORKSPACE_ID --session CHAT_SESSION_I
 superset sessions close --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions resume --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions import --local --workspace WORKSPACE_ID --agent claude --native-session PROVIDER_SESSION_ID
+superset sessions search "acpAdapter upload" --limit 10
 ```
+
+`sessions search` asks the cloud API, not a host: it finds your chats that are stored in the cloud,
+which are every chat on a cloud workspace, every chat moved there, and every chat whose move started
+but did not finish, one row per conversation.
+It takes no `--workspace`.
 
 The host resolves the selected agent to an installed ACP harness. It does not check the `acp-chat`
 rollout flag: the desktop gates the chat UI and the API gates automation dispatch. Unsupported

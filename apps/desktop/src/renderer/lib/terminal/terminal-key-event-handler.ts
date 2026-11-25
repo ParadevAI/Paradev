@@ -5,8 +5,9 @@ import {
 	shouldSelectAllShortcut,
 } from "./clipboard-shortcuts";
 import { translateLineEditChord } from "./line-edit-translations";
+import { sendUserInput } from "./terminal-replay-write";
 
-export interface TerminalKeyEventHandlerOptions {
+interface TerminalKeyEventHandlerOptions {
 	platform?: string;
 }
 
@@ -47,7 +48,7 @@ function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
 // sidesteps this by suppressing all super/Cmd chords on macOS before the
 // encoder runs (ghostty/src/input/key_encode.zig:534-545). We do the same via
 // shouldBubbleClipboardShortcut's Mac branch.
-export function createTerminalKeyEventHandler(
+function createTerminalKeyEventHandler(
 	terminal: XTerm,
 	options: TerminalKeyEventHandlerOptions = {},
 ) {
@@ -62,7 +63,7 @@ export function createTerminalKeyEventHandler(
 		if (translation !== null) {
 			if (event.type === "keydown") {
 				event.preventDefault();
-				terminal.input(translation, true);
+				sendUserInput(terminal, translation);
 			}
 			return false;
 		}

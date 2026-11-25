@@ -9,8 +9,6 @@ let isReady = true;
 let dismissed = false;
 let hasCompleted = false;
 let allowed = true;
-let flagsLoaded = true;
-let mobileEnabled: boolean | undefined = true;
 let remoteEnabled: boolean | undefined = false;
 let automations: unknown[] | undefined = [];
 let tried = 0;
@@ -21,10 +19,6 @@ const gateFeature = mock((_feature: string, start: () => Promise<void>) => {
 mock.module("@tanstack/react-router", () => ({
 	...router,
 	useNavigate: () => navigate,
-}));
-mock.module("posthog-js/react", () => ({
-	useFeatureFlagEnabled: () => mobileEnabled,
-	useActiveFeatureFlags: () => (flagsLoaded ? [] : undefined),
 }));
 mock.module("renderer/components/Paywall", () => ({
 	GATED_FEATURES,
@@ -75,8 +69,6 @@ beforeEach(() => {
 	dismissed = false;
 	hasCompleted = false;
 	allowed = true;
-	mobileEnabled = true;
-	flagsLoaded = true;
 	remoteEnabled = false;
 	automations = [];
 	tried = 0;
@@ -134,26 +126,14 @@ describe("Pro getting-started card", () => {
 		renderToStaticMarkup(<Probe />);
 		expect(props().completed).toBe(1);
 	});
-	test("hides on first completion of all available steps", () => {
+	test("hides on first completion of every step", () => {
 		remoteEnabled = true;
 		automations = [{ id: "automation" }];
-		mobileEnabled = false;
-		renderToStaticMarkup(<Probe />);
-		expect(card).toBeNull();
-		mobileEnabled = true;
 		renderToStaticMarkup(<Probe />);
 		expect(card).not.toBeNull();
 		tried = 1;
 		renderToStaticMarkup(<Probe />);
 		expect(card).toBeNull();
-	});
-	test("does not auto-complete before mobile availability resolves", () => {
-		flagsLoaded = false;
-		mobileEnabled = undefined;
-		remoteEnabled = true;
-		automations = [{ id: "automation" }];
-		renderToStaticMarkup(<Probe />);
-		expect(card).not.toBeNull();
 	});
 	test("keeps completed onboarding dismissed and allows explicitly reopening it", () => {
 		hasCompleted = true;
@@ -172,18 +152,6 @@ describe("Pro getting-started card", () => {
 		automations = undefined;
 		renderToStaticMarkup(<Probe />);
 		expect(props().completed).toBe(0);
-	});
-	test("hides mobile until the flag is enabled and keeps automation navigation correct", () => {
-		for (const value of [false, undefined]) {
-			mobileEnabled = value;
-			renderToStaticMarkup(<Probe />);
-			expect(props().steps.map((step) => step.to)).toEqual([
-				"/settings/security",
-				"/automations",
-			]);
-			props().onStart(1);
-			expect(navigate).toHaveBeenLastCalledWith({ to: "/automations" });
-		}
 	});
 	test("does not navigate when entitlement is revoked before clicking", () => {
 		renderToStaticMarkup(<Probe />);

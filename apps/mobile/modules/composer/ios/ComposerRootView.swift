@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// Metrics read off the reference frames in
-/// `apps/mobile/plans/20260821-native-composer.md`, converted from the 921-wide
+/// Metrics read off the design reference frames, converted from the 921-wide
 /// render to points on a 440pt-wide screen. Tuned on device from here.
 enum ComposerMetrics {
   /// Measured off frame 1: the pill's left edge sits ~12pt in, not 16.

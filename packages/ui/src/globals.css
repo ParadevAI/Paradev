@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./motion.css";
+@import "./components/overflow-fade/fade-edge.css";
 
 @custom-variant dark (&:is(.dark *));
 

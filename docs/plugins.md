@@ -66,7 +66,17 @@ that must not change under them.
 `license` — with everything Paradev-specific under `extensions.superset`:
 
 - `interface` — `displayName`, `category` (one of `PLUGIN_CATEGORIES` in
-  `packages/shared/src/plugins/index.ts`), and `icon`.
+  `packages/shared/src/plugins/index.ts`), and `icon`. `icon` names a built-in icon key or an
+  image inside the plugin (`./assets/icon.png`, ≤ 256 KB, no URLs, absolute paths or traversal;
+  `packages/shared/src/plugins/plugin-icon.ts`). An organization sync stores a png, jpeg or webp
+  icon in the public bucket under the organization and the bundle's content hash, and
+  `plugins.list` returns its edge-resized `iconUrl`, so it shows before install. The original
+  file is also public at that key, which only the content hash keeps unguessable (anyone who can
+  read the repository can compute it), the same exposure organization logos have. An icon that is
+  missing, too large, not a whole image, or svg does not stop the sync: the plugin syncs with the
+  default icon and the source lists the reason. An installed plugin shows the icon from its
+  installed tree (svg allowed there); the API's URL covers a plugin that is not installed.
+  A key that is not a built-in icon is accepted and shows the default icon.
 - `connector` — the one connection this plugin needs, as `{ "slug" }`. A slug names a connector in
   `packages/shared/src/connectors/connectors.json`; the manifest carries no OAuth configuration of
   its own — no scopes, no client mode, no `requires_env`. A connection is account state, and the
@@ -96,7 +106,11 @@ authorization server's metadata, and then gets a client identity one of two ways
   stored; or
 - the server offers a `registration_endpoint`, so we register once per authorization server
   (RFC 7591) and keep the result in `plugin_oauth_clients`, keyed by issuer and redirect URI so
-  every user shares one registration.
+  every user shares one registration. The registration picks a client authentication method from
+  the server's `token_endpoint_auth_methods_supported` (`client_secret_basic` when it lists none).
+  A server that wants another one than it advertises gets `token_request_auth_method` on the
+  method: we register with it, send token requests with it, and register again rather than reuse a
+  stored client registered with another one.
 
 Either way the flow is PKCE with a `resource` indicator, the authorization response's `iss` is
 checked against the discovered issuer before the code is redeemed (RFC 9207), and refresh happens
@@ -107,6 +121,14 @@ Credentials never reach the manifest, the renderer, or the agent's machine. They
 by `packages/trpc/src/lib/secret-box.ts` under `SECRETS_ENCRYPTION_KEY` and attached by the proxy in
 `packages/trpc/src/router/plugins/proxy/`, so a tool call goes out from the API, not from the
 agent.
+
+The proxy gives each caller an `Mcp-Session-Id` and keeps one vendor MCP session per caller session
+and connection, so state that a vendor keeps per session (an active project or organization) lasts
+from one call to the next. The vendor session id is in Redis for one hour after its last successful use. A
+caller that does not send the id back, or any caller while Redis cannot be reached, gets a new vendor
+session for each call. `superset mcp call-tool` keeps its session between runs of one agent
+launch (`SUPERSET_AGENT_LAUNCH_ID`, which the agent wrapper sets once per launch) in
+`plugin-mcp-sessions.json` under the Superset home, and ends it at the end of a run anywhere else.
 
 ## Install state on a machine
 
@@ -136,6 +158,16 @@ Skills land in `~/.agents/skills` (what Codex, Cursor, OpenCode, Gemini CLI, Vib
 natively) and are mirrored into `~/.claude/skills` as a plugin directory, because Claude does not
 read the shared convention.
 
+Claude gets two plugin directories with the same skills: `~/.claude/skills/paradev` (skills answer
+to `paradev:<skill>`) and `~/.claude/skills/superset`, the old name, which saved prompts, automations
+and released builds still use. The `superset` copy keeps each skill's body, but its description only
+tells the model to use the `paradev:` name. Composers fold `superset:<x>` into
+`paradev:<x>` as an alias (`foldLegacyPluginCommands` in `@superset/shared/slash-commands`). Do not
+remove the `superset` directory: builds from before the rename provision only it and reap
+`paradev`, so `superset:` is the one name that resolves on every build. If the user owns a
+`paradev` directory, `superset` stays the full plugin. The `~/.agents/skills/superset-<skill>` names
+and the source directory `plugins/superset/` did not change.
+
 Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
 `~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors
 `PDEV_CODING_AGENT_DIR` when set. Claude and pdev entries share the ownership ledger at
@@ -162,8 +194,9 @@ Sync runs when an admin adds a source and when they click "Sync now" (or run
 `superset plugins organization sources sync`); there is no schedule. Like Codex, it reads the
 repository only with the GitHub account of the admin who added the source, while that admin is still
 an admin with GitHub connected; Settings shows it as "Syncs as @login". To take a source over,
-another admin adds the same repository again. A plugin whose files did not change, by the blob
-hashes in the tree listing, is not downloaded again. A plugin that fails to sync keeps its last good
+another admin adds the same repository again. When an admin adds a source, a commit that did not
+change is skipped, and so is a plugin whose files did not change, by the blob hashes in the tree
+listing. "Sync now" rebuilds every plugin. A plugin that fails to sync keeps its last good
 version, and its problem is listed on the source. A plugin that leaves the repository is marked "No
 longer in source": members who have it keep it, but it is not offered or installed anew. Changed
 content that reuses a declared version is refused. Removing a source removes its plugins from the
@@ -193,6 +226,6 @@ superset plugins connect|connections            # credentials
 superset plugins marketplace list|add|remove    # marketplace sources
 superset plugins organization list|access       # an organization's own plugins
 superset plugins organization sources add|list|remove|sync  # their GitHub sources
-superset mcp tools|call-tool                    # call a plugin's tools through the proxy
+superset mcp tools [tool]|call-tool <tool>      # list a plugin's tools, read one's schema, call it
 superset skills list
 ```

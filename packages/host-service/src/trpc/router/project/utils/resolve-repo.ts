@@ -15,6 +15,10 @@ import {
 	isUnreadable,
 } from "../../../../runtime/path-state";
 import {
+	rethrowEnvironmentalGitError,
+	rethrowGitToolsMissing,
+} from "../../git/utils/classify-git-error";
+import {
 	findMatchingRemote,
 	getGitHubRemotes,
 	type ParsedGitHubRemote,
@@ -187,7 +191,9 @@ async function gitInitMainBranch(targetPath: string): Promise<void> {
 	const git = createUserSimpleGit(targetPath);
 	try {
 		await git.init(["--initial-branch=main"]);
-	} catch {
+	} catch (err) {
+		// Retrying cannot help when git itself cannot run.
+		rethrowGitToolsMissing(err);
 		await git.init();
 	}
 }
@@ -212,7 +218,7 @@ async function commitInitialEmpty(repoPath: string): Promise<void> {
  * Makes sure `repoPath` has a resolvable `HEAD` before Superset treats it as
  * a usable project. A bare `git init` with nothing committed leaves HEAD
  * unborn, and `git worktree add` — which every workspace creation runs
- * through (see `resolveStartPoint` / `GIT_REFS.md`) — has no start point to
+ * through (see `resolveStartPoint`) — has no start point to
  * fork from and fails outright. `initEmptyRepo`/`initLocalRepoInPlace`
  * already avoid this for repos Superset creates from scratch; this covers a
  * repo a caller points us at that already exists but was never committed to.
@@ -269,6 +275,9 @@ export async function tryRevParseGitRoot(path: string): Promise<string | null> {
 	} catch (err) {
 		error = err;
 	}
+	// Without git every folder would look like a non-repo, and the caller would
+	// offer `git init` on a real repository.
+	rethrowGitToolsMissing(error);
 	const blockedPath = isPermissionDenied(error)
 		? path
 		: findUnreadableRepoAbove(path);
@@ -548,6 +557,8 @@ export async function cloneRepoInto(
 		signal?.throwIfAborted();
 	} catch (err) {
 		await rollbackTargetDir(targetPath);
+		rethrowGitToolsMissing(err);
+		rethrowEnvironmentalGitError(err);
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `Failed to clone repository: ${

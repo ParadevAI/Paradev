@@ -166,7 +166,7 @@ describe("createCodexTranscriber", () => {
 		expect(uploadSignal?.aborted).toBe(true);
 	});
 
-	test("posts the clip with the session token and Superset's own name", async () => {
+	test("posts the clip with the session token and Paradev's own name", async () => {
 		const sent: RequestInit[] = [];
 		const transcriber = createCodexTranscriber({
 			readToken: async () => "tok",
@@ -181,7 +181,7 @@ describe("createCodexTranscriber", () => {
 		});
 		const headers = sent[0]?.headers as Record<string, string>;
 		expect(headers.Authorization).toBe("Bearer tok");
-		expect(headers["User-Agent"]).toBe("Superset");
+		expect(headers["User-Agent"]).toBe("Paradev");
 		expect((sent[0]?.body as FormData).get("file")).toBeInstanceOf(Blob);
 	});
 

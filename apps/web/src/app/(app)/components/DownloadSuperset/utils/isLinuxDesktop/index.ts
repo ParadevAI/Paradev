@@ -1,0 +1,1 @@
+export { isLinuxDesktop } from "./isLinuxDesktop";

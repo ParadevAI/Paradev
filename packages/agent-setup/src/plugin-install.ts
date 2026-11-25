@@ -7,6 +7,10 @@ import {
 	DEFAULT_MARKETPLACE_REF,
 	DEFAULT_MARKETPLACE_REPO,
 } from "@superset/shared/plugins";
+import {
+	manifestIcon,
+	pluginIconFile,
+} from "@superset/shared/plugins/plugin-icon";
 import { resolveDisabledSkillIds } from "./disabled-skills";
 import {
 	type InstalledPluginEntry,
@@ -15,6 +19,7 @@ import {
 import { createManagedSkills } from "./managed-skills";
 import { pluginCachePath } from "./plugin-cache";
 import { PluginError } from "./plugin-error";
+import { resolvePluginIcon } from "./plugin-icon";
 import {
 	assertSafeSegment,
 	MARKETPLACE_FILE,
@@ -589,6 +594,13 @@ export async function installPlugin(
 		for (const item of ["skills"]) {
 			const src = path.join(dir, item);
 			if (fs.existsSync(src)) copyTree(src, path.join(target, item));
+		}
+		const icon = pluginIconFile(manifestIcon(manifest));
+		const iconSource = icon && resolvePluginIcon(dir, icon.relative);
+		if (icon && iconSource) {
+			const destination = path.join(target, icon.relative);
+			fs.mkdirSync(path.dirname(destination), { recursive: true });
+			fs.copyFileSync(iconSource, destination);
 		}
 	}
 

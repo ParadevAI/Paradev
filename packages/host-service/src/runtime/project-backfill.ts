@@ -5,7 +5,7 @@ import { projects } from "../db/schema";
 import type { EventBus } from "../events";
 import {
 	emitProjectChanged,
-	getLocalProject,
+	getProjectIncludingDeleted,
 } from "../projects/local-project-store";
 
 export interface ProjectBackfillContext {
@@ -39,7 +39,7 @@ export async function runProjectBackfill(
 			.where(and(eq(projects.id, row.id), eq(projects.name, "")))
 			.run();
 		if (result.changes === 0) continue;
-		const updated = getLocalProject(ctx.db, row.id);
+		const updated = getProjectIncludingDeleted(ctx.db, row.id);
 		if (updated) emitProjectChanged(ctx.eventBus, "updated", updated);
 		filled++;
 	}

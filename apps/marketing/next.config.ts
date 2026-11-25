@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import { readRootDomain } from "@superset/shared/app-identity";
-import { CANONICAL_URLS } from "@superset/shared/constants";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
@@ -30,6 +30,7 @@ const apiOrigin = process.env.NEXT_PUBLIC_API_URL
 
 // Third parties this site actually loads (probed against production):
 // - Google Ads gtag + Reddit pixel, injected in [lang]/layout.tsx
+// - Paradev external tracking script + LeadConnector event endpoint
 // - Cloudflare Web Analytics, injected at the edge by the Cloudflare proxy
 // - Work at a Startup job board (+ its hCaptcha) on /careers
 // - PostHog goes through the same-origin /ingest rewrite; ui_host is listed
@@ -58,6 +59,7 @@ const contentSecurityPolicy = [
 		"https://googleads.g.doubleclick.net",
 		"https://ad.doubleclick.net",
 		"https://alb.reddit.com",
+		"https://backend.leadconnectorhq.com",
 		"https://www.workatastartup.com",
 		...hcaptcha,
 		!isProduction && "ws:",
@@ -79,6 +81,7 @@ const contentSecurityPolicy = [
 	"object-src 'none'",
 	[
 		"script-src 'self' 'unsafe-inline'",
+		"https://x.paradev.com",
 		...googleAdsScripts,
 		"https://www.redditstatic.com",
 		"https://static.cloudflareinsights.com",
@@ -121,7 +124,7 @@ const config: NextConfig = {
 	},
 
 	// Compiles @lingui/react/macro at build time. Version must stay in
-	// lockstep with Next's swc_core ABI — see plans/20260826-i18n-strategy.md.
+	// lockstep with Next's swc_core ABI.
 	experimental: {
 		swcPlugins: [["@lingui/swc-plugin", {}]],
 	},
@@ -188,6 +191,41 @@ const config: NextConfig = {
 				permanent: false,
 			},
 			{
+				source: "/android",
+				destination: COMPANY.PLAY_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/ios",
+				destination: COMPANY.APP_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/get-app",
+				has: [
+					{ type: "header" as const, key: "user-agent", value: ".*Android.*" },
+				],
+				destination: COMPANY.PLAY_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/get-app",
+				has: [
+					{
+						type: "header" as const,
+						key: "user-agent",
+						value: ".*(iPhone|iPad|iPod).*",
+					},
+				],
+				destination: COMPANY.APP_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/get-app",
+				destination: "/mobile",
+				permanent: false,
+			},
+			{
 				source: "/changelog/2026-03-09-codemirror-workspace-modal-icons",
 				destination: "/changelog/2026-03-09-codemirror-workspace",
 				permanent: true,
@@ -195,7 +233,7 @@ const config: NextConfig = {
 			{
 				source: "/docs/:path*",
 				destination: `${docsUrl}/:path*`,
-				permanent: false,
+				permanent: true,
 			},
 			...buildLegacyRedirects({ locales: SUPPORTED_LOCALES, docsUrl }),
 		];

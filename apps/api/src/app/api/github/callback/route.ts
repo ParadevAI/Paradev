@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import { githubInstallations } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { organizationSyncsNow } from "@superset/trpc/sync-policy";
 import { Client } from "@upstash/qstash";
 import { and, eq, ne } from "drizzle-orm";
@@ -7,6 +8,7 @@ import { env } from "@/env";
 import { exitOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { resolveCallback } from "@/lib/integrations/resolveCallback";
 import { githubApp } from "../octokit";
+import { redirectCallback } from "../utils/redirectCallback";
 import { saveInstallation } from "./utils/saveInstallation";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
@@ -18,6 +20,9 @@ const settingsUrl = `${env.NEXT_PUBLIC_WEB_URL}/integrations/github`;
  * GitHub redirects here after the user installs/configures the app.
  */
 export async function GET(request: Request) {
+	const redirect = redirectCallback(request, getBrowserApiUrl(env));
+	if (redirect) return redirect;
+
 	if (new URL(request.url).searchParams.get("setup_action") === "cancel") {
 		return exitOAuthFlow(
 			STATE_COOKIES.github,
@@ -31,7 +36,10 @@ export async function GET(request: Request) {
 		cookie: STATE_COOKIES.github,
 	});
 	if (callback instanceof Response) return callback;
-	const { organizationId, userId, params, exit } = callback;
+	const { organizationId, userId, role, params, exit } = callback;
+	if (role !== "owner" && role !== "admin") {
+		return exit(`${settingsUrl}?error=admin_required`);
+	}
 	const installationId = params.installation_id;
 
 	try {

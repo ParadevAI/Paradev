@@ -35,6 +35,7 @@ Click **Automations → New automation** and fill in:
 - **Title**: how the automation appears in the list
 - **Prompt**: the instructions the agent receives. Supports markdown, `@file/path` mentions (scoped to the selected project), `:emoji:` shortcodes, and `/` slash commands.
 - **Device**: which host runs the session. Defaults to this device. Pick **Cloud** to run each session in a new [cloud workspace](/cloud-workspaces) at the [machine size](/cloud-workspaces#machine-sizes) you choose, or in an existing cloud workspace.
+- **Workspace**: **New workspace** (each run makes its own), **Same workspace** (the first run makes one and later runs reuse it), or a workspace you pick. With a shared workspace, **Session mode** chooses **Start fresh** (a new agent conversation each run) or **Continue** (the agent picks up where the last run left off).
 - **Project**: the v2 project the session runs against, or **No project** for a session per run.
 - **Trigger**: an event from a connected integration, a webhook, or a schedule. See [Triggers](#triggers).
 - **Agent**: Claude, Codex, Amp, or anything else you've set up under **Settings → Agents**.
@@ -76,7 +77,7 @@ A webhook trigger runs the automation when something sends a POST to its URL.
 3. Send a JSON body to the URL, with the token as a bearer header or as a `?token=` query parameter:
 
 ```bash
-curl -X POST "https://api.superset.sh/api/automations/webhook/<automationId>" \
+curl -X POST "https://api.paradev.com/api/automations/webhook/<automationId>" \
   -H "Authorization: Bearer sset_wh_..." \
   -H "Content-Type: application/json" \
   -d '{"service": "checkout", "status": "failed"}'
@@ -163,38 +164,42 @@ On the **Mine** tab, **Retry all** appears in the header when any of your automa
 ## CLI
 
 ```bash
-superset automations list
-superset automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" --project <projectId> --prompt-file prompt.md --agent claude
+paradev automations list
+paradev automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" --project <projectId> --prompt-file prompt.md --agent claude
 
 # Omit --project and --workspace for session mode (a session workspace per run)
-superset automations create --name "Scratch triage" --rrule "FREQ=DAILY;BYHOUR=8;BYMINUTE=0" --prompt "…"
+paradev automations create --name "Scratch triage" --rrule "FREQ=DAILY;BYHOUR=8;BYMINUTE=0" --prompt "…"
 
 # Each run's workspace carries the automation's tags and groups into the matching
 # sidebar folders. Default tag: "automation". Runs collect in an "automation"
 # folder per project. --tag (repeatable) files them elsewhere; clearing the tags
 # in the editor opts out of grouping.
-superset automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" --project <projectId> --prompt "…" --tag audits
+paradev automations create --name "Nightly audit" --rrule "FREQ=DAILY;BYHOUR=3;BYMINUTE=0" --project <projectId> --prompt "…" --tag audits
 
 # Groups organize the automations list; they don't affect where runs go.
-superset automations update <automationId> --group "Nightly jobs"
-superset automations list --group "nightly jobs"
-superset automations update <automationId> --clear-group
+paradev automations update <automationId> --group "Nightly jobs"
+paradev automations list --group "nightly jobs"
+paradev automations update <automationId> --clear-group
 
 # Event triggers: pass the trigger set as a JSON array with --triggers or --triggers-file.
 # trigger-options lists the ids a provider's filters accept (channels, repos, teams, ...).
-superset automations trigger-options --group slack
-superset automations create --name "Triage #bugs" --project <projectId> --prompt-file triage.md \
+paradev automations trigger-options --group slack
+paradev automations create --name "Triage #bugs" --project <projectId> --prompt-file triage.md \
   --triggers '[{"config":{"kind":"slack","event":"reaction_added","channels":{"mode":"list","ids":["C123"]},"emoji":{"mode":"list","ids":["bug"]},"actor":{"mode":"any"}}}]'
 
 # update --triggers replaces the whole set: include each existing trigger's id to keep it.
 
-superset automations update <id> --session   # switch an existing automation to session mode
-superset automations get <id>
-superset automations run <id>
-superset automations pause <id>
-superset automations resume <id>
-superset automations archive <id>     # stops it and hides it; runs stay
-superset automations list --archived
-superset automations unarchive <id>   # restores it, paused
-superset automations delete <id>      # permanently deletes an archived automation
+paradev automations update <id> --session   # switch an existing automation to session mode
+paradev automations get <id>
+paradev automations run <id>
+paradev automations pause <id>
+paradev automations resume <id>
+paradev automations archive <id>     # stops it and hides it; runs stay
+paradev automations list --archived
+paradev automations unarchive <id>   # restores it, paused
+paradev automations delete <id>      # permanently deletes an archived automation
 ```
+
+## Related Guide
+
+- [Scheduled Coding Agents: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs](https://paradev.com/compare/scheduled-coding-agents)

@@ -101,9 +101,9 @@ describe("API HTTP errors through the CLI formatter", () => {
 		["non-JSON", () => new Response("Unauthorized", { status: 401 })],
 	] as const)("formats a %s 401 as an expired session", async (_, response) => {
 		respond = response;
-		expect(formatError(await queryError(), "superset")).toEqual({
+		expect(formatError(await queryError(), "paradev")).toEqual({
 			message: "Session expired",
-			hint: "Run: superset auth login",
+			hint: "Run: paradev auth login",
 		});
 	});
 
@@ -116,9 +116,9 @@ describe("API HTTP errors through the CLI formatter", () => {
 			httpStatus: 401,
 			path: "user.me",
 		});
-		expect(formatError(error, "superset")).toEqual({
+		expect(formatError(error, "paradev")).toEqual({
 			message: "Session expired",
-			hint: "Run: superset auth login",
+			hint: "Run: paradev auth login",
 		});
 	});
 
@@ -126,19 +126,19 @@ describe("API HTTP errors through the CLI formatter", () => {
 		respond = () => nativeError("FORBIDDEN", 403, "Not a member");
 		const error = await queryError();
 		expect(error.data?.code).toBe("FORBIDDEN");
-		expect(formatError(error, "superset")).toEqual({ message: "Not a member" });
+		expect(formatError(error, "paradev")).toEqual({ message: "Not a member" });
 	});
 
 	test("prefers native tRPC codes over the HTTP status", async () => {
 		respond = () => nativeError("FORBIDDEN", 401, "Not a member");
-		expect(formatError(await queryError(), "superset")).toEqual({
+		expect(formatError(await queryError(), "paradev")).toEqual({
 			message: "Not a member",
 		});
 	});
 
 	test("preserves non-401 JSON transformation errors", async () => {
 		respond = () => Response.json({ error: "Bad gateway" }, { status: 502 });
-		expect(formatError(await queryError(), "superset")).toEqual({
+		expect(formatError(await queryError(), "paradev")).toEqual({
 			message: "Unable to transform response from server",
 		});
 	});
@@ -151,7 +151,7 @@ describe("API HTTP errors through the CLI formatter", () => {
 			});
 		const error = await queryError();
 		expect(error.cause).toBeInstanceOf(ApiHttpError);
-		expect(formatError(error, "superset")).toEqual({
+		expect(formatError(error, "paradev")).toEqual({
 			message: "HTTP 502 Bad Gateway: Gateway unavailable",
 		});
 	});

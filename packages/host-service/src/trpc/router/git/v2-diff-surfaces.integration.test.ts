@@ -12,9 +12,8 @@ import {
 } from "./utils/git-helpers";
 
 /**
- * End-to-end tests organized to mirror docs/V2_WORKSPACE_DIFF_VIEWS.md.
- * Each describe block maps to one UI surface in that doc, so a reviewer
- * can trace "this surface works as described" to a specific test.
+ * End-to-end tests, one describe block per UI surface that shows what
+ * changed in a workspace.
  */
 
 async function initRepo(path: string): Promise<SimpleGit> {
