@@ -8,7 +8,6 @@ import {
 	FileText,
 	History,
 	Pencil,
-	RotateCw,
 	Share2,
 	Trash2,
 } from "lucide-react";
@@ -44,7 +43,6 @@ interface PageTitleMenuProps {
 	onDelete: () => void;
 	onDuplicate: (title: string) => Promise<void>;
 	onRename: () => void;
-	onRefresh: () => void;
 	onPreviewVersion: (version: number) => void;
 	compact?: boolean;
 }
@@ -60,7 +58,6 @@ export function PageTitleMenu({
 	onDelete,
 	onDuplicate,
 	onRename,
-	onRefresh,
 	onPreviewVersion,
 	compact = false,
 }: PageTitleMenuProps) {
@@ -200,11 +197,6 @@ export function PageTitleMenu({
 						)}
 					</DropdownMenuSubContent>
 				</DropdownMenuSub>
-
-				<DropdownMenuItem className={itemClass} onSelect={run(onRefresh)}>
-					<RotateCw className={iconClass} />
-					<Trans>Refresh</Trans>
-				</DropdownMenuItem>
 
 				{editable ? (
 					<>

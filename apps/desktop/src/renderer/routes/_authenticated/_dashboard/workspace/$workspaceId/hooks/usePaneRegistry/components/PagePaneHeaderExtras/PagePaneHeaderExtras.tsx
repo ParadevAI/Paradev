@@ -1,4 +1,8 @@
-import { CommentModeButton, PageShareButton } from "@superset/ui/page-comments";
+import {
+	CommentModeButton,
+	PageRefreshButton,
+	PageShareButton,
+} from "@superset/ui/page-comments";
 import { PagePresenceStack } from "@superset/ui/presence";
 import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
 import type { PagePaneData } from "../../../../types";
@@ -28,6 +32,7 @@ export function PagePaneHeaderExtras({
 		onSetSharedVersion,
 		sharing,
 		canComment,
+		onRefresh,
 	} = usePageHeaderData(data);
 	const { commentsEnabled, setCommentsEnabled, shareOpen, setShareOpen } =
 		usePagePaneUi(paneId);
@@ -53,6 +58,7 @@ export function PagePaneHeaderExtras({
 					onToggle={() => setCommentsEnabled(!commentsEnabled)}
 				/>
 			) : null}
+			{page ? <PageRefreshButton compact onRefresh={onRefresh} /> : null}
 			{page ? (
 				<PageShareButton
 					compact
