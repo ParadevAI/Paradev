@@ -404,9 +404,11 @@ describe("SelfUpdater", () => {
 		"$leftover that cannot be removed does not stop the rollback",
 		async ({ inFailed }) => {
 			let polls = 0;
+			const logs: string[] = [];
 			const h = harness({
 				pollHealth: async () =>
 					++polls === 1 ? null : { version: "1.22.0", pid: 222 },
+				log: (message) => logs.push(message),
 			});
 			const failed = `${h.root}.failed`;
 			const locked = join(inFailed ? failed : h.root, "locked");
@@ -423,6 +425,11 @@ describe("SelfUpdater", () => {
 			expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("old");
 			expect(h.exitCode).toBe(0);
 			expect(h.updater.status().lastResult?.outcome).toBe("rolled-back");
+			expect(logs.join("\n")).toContain(
+				inFailed
+					? "could not remove stale failed build"
+					: "could not remove failed build",
+			);
 		},
 	);
 
