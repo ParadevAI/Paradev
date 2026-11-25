@@ -21,8 +21,10 @@ import { commandChip } from "../../../../../../utils/commandChip";
 import { fileMentionChip } from "../../../../../../utils/fileMentions";
 import { linkChip } from "../../../../../../utils/linkChip";
 import type { MessageSegment } from "../../../../../../utils/messageElements";
+import { parseSupersetAppLink } from "../../../../../../utils/supersetAppLink";
 import { ChatLink } from "../../../../../ChatLink";
 import { MessageChip } from "./components/MessageChip";
+import { WorkspaceMessageChip } from "./components/WorkspaceMessageChip";
 import { remarkLineBreaks } from "./utils/remarkLineBreaks";
 import { remarkTypedMarkers } from "./utils/remarkTypedMarkers";
 
@@ -111,6 +113,18 @@ export function UserMessageText({
 						isDark,
 						chatLabel,
 					});
+					const appLink = parseSupersetAppLink(href, env.NEXT_PUBLIC_WEB_URL);
+					if (chip && appLink?.kind === "workspace") {
+						return (
+							<span data-source-text={href}>
+								<WorkspaceMessageChip
+									chip={chip}
+									link={href}
+									workspaceId={appLink.workspaceId}
+								/>
+							</span>
+						);
+					}
 					if (chip) {
 						return (
 							<span data-source-text={chip.label === href ? undefined : href}>
