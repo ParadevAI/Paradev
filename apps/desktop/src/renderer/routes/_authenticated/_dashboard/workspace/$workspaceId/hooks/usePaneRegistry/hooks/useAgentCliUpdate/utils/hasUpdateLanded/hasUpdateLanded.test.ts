@@ -24,6 +24,7 @@ function status(
 		minVersion: "0.160.0",
 		belowFloor: false,
 		latest: "0.165.0",
+		latestPending: false,
 		behind: false,
 		source,
 		updateCommand,

@@ -104,14 +104,33 @@ describe("resolveAgentCliUpdate", () => {
 		).toMatchObject({ source: "bun", command: null });
 	});
 
-	it("updates a pnpm global install in that pnpm's root", () => {
+	it("updates a pnpm global install in that pnpm's home", () => {
+		const launcher = (home: string, store: string) =>
+			`#!/bin/sh\nexec node "$basedir/../${store}/node_modules/@openai/codex/bin/codex.js" "$@"\n# cmd-shim-target=${home}/${store}/node_modules/@openai/codex/bin/codex.js\n`;
+		const pnpm = (path: string, script: string) =>
+			resolveAgentCliUpdate({
+				binary: "codex",
+				found: { path, realPath: path },
+				readLauncher: () => script,
+			});
+		const command =
+			"PNPM_HOME=/Users/a/Library/pnpm pnpm add -g @openai/codex@latest";
+
 		expect(
-			update(
-				"codex",
+			pnpm(
+				"/Users/a/Library/pnpm/bin/codex",
+				launcher("/Users/a/Library/pnpm", "global/v11/3eece6"),
+			),
+		).toMatchObject({ source: "pnpm", command });
+		expect(
+			pnpm(
 				"/Users/a/Library/pnpm/codex",
-				"/Users/a/Library/pnpm/global/5/node_modules/@openai/codex/bin/codex.js",
+				launcher("/Users/a/Library/pnpm", "global/5"),
 			)?.command,
-		).toBe("PNPM_HOME=/Users/a/Library/pnpm pnpm add -g @openai/codex@latest");
+		).toBe(command);
+		expect(
+			pnpm("/Users/a/bin/codex", launcher("/Users/a/Library/pnpm", "global/5")),
+		).toMatchObject({ source: "unknown", command: null });
 	});
 
 	it("updates a bun global install with that bun", () => {

@@ -20845,6 +20845,9 @@ msgstr "Questa chat è lunga, quindi viene mostrata solo la parte più recente. 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Questa chat potrebbe essere stata rimossa o potresti non avervi accesso."
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Questa chat si è interrotta perché la CLI del suo agente richiedeva un aggiornamento."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Questa chat si è interrotta perché la conversazione è proseguita in un terminale."
 

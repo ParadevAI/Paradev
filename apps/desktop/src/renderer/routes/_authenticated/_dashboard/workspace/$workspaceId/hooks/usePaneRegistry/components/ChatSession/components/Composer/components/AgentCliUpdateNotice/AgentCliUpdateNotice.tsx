@@ -86,7 +86,7 @@ export function AgentCliUpdateNotice({
 		phase === "idle" &&
 		runningVersion !== undefined &&
 		isNewer(installed, runningVersion) &&
-		!isAgentCliUpdateDismissed(dismissedAt, binary, installed);
+		!isAgentCliUpdateDismissed(dismissedAt, binary, installed, "restart");
 	if (phase === "updated" || runningOlder) {
 		return (
 			<AgentCliUpdateCard
@@ -111,7 +111,9 @@ export function AgentCliUpdateNotice({
 				compact
 				description={<Trans>Restart the chat to use {installed}.</Trans>}
 				onDismiss={
-					runningOlder ? () => dismissAgentCliUpdate(binary, installed) : finish
+					runningOlder
+						? () => dismissAgentCliUpdate(binary, installed, "restart")
+						: finish
 				}
 				state="updated"
 				testId="agent-cli-update-notice"

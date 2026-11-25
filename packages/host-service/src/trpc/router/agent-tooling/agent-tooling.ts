@@ -6,7 +6,10 @@ import type { SlashCommand } from "@superset/shared/slash-commands";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { agentCliStatus } from "../../../chat-v3/agentCliStatus";
+import {
+	agentCliStatus,
+	hasAgentCliStatus,
+} from "../../../chat-v3/agentCliStatus";
 import { buildChatAgentEnv } from "../../../chat-v3/agentEnv";
 import { workspaces } from "../../../db/schema";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
@@ -47,6 +50,7 @@ export const agentToolingRouter = router({
 		.input(z.object({ workspaceId: z.string(), harness: z.string() }))
 		.query(async ({ ctx, input }): Promise<AgentCliStatus | null> => {
 			const workspace = findWorkspace(ctx, input.workspaceId);
+			if (!hasAgentCliStatus(input.harness)) return null;
 			const env = await buildChatAgentEnv({
 				db: ctx.db,
 				cwd: workspace.worktreePath,

@@ -20845,6 +20845,9 @@ msgstr "Tento chat je dlouhý, proto se zobrazuje jen jeho nejnovější část.
 msgid "This chat may have been removed or you may not have access."
 msgstr "Tento chat mohl být odstraněn, nebo k němu nemáte přístup."
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Tento chat se zastavil, protože CLI jeho agenta potřebovalo aktualizaci."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Tento chat se zastavil, protože konverzace pokračovala v terminálu."
 

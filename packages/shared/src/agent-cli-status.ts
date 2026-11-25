@@ -23,6 +23,8 @@ export interface AgentCliStatus {
 	belowFloor: boolean;
 	/** Null when the newest release is unknown, or not worth comparing against. */
 	latest: string | null;
+	/** True while the newest release is still being looked up: ask again. */
+	latestPending: boolean;
 	behind: boolean;
 	source: AgentCliInstallSource;
 	/** Null when no command is known to update this install safely. */

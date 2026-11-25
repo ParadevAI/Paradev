@@ -11,14 +11,43 @@ function isOlder(installed: string, latest: string): boolean {
 	return current !== null && newest !== null && lt(current, newest);
 }
 
+const LATEST_WAIT_MS = 250;
+const PENDING = Symbol("pending");
+
+function settledWithin<T>(
+	promise: Promise<T>,
+	ms: number,
+): Promise<T | typeof PENDING> {
+	return new Promise((resolve, reject) => {
+		const timer = setTimeout(() => resolve(PENDING), ms);
+		promise.then(
+			(value) => {
+				clearTimeout(timer);
+				resolve(value);
+			},
+			(error: unknown) => {
+				clearTimeout(timer);
+				reject(error);
+			},
+		);
+	});
+}
+
+export function hasAgentCliStatus(harness: string): boolean {
+	const entry = ACP_HARNESSES[harness];
+	return entry !== undefined && hasAgentCliUpdates(entry.binary);
+}
+
 /**
  * Null for a harness whose CLI has no update table: those keep the version
- * floor alone.
+ * floor alone. The floor answer gates chat recovery, so it does not wait for
+ * the newest-release lookup: a slow one reads `latestPending`.
  */
 export async function agentCliStatus(options: {
 	harness: string;
 	env: NodeJS.ProcessEnv;
 	latest?: LatestCliVersion;
+	latestWaitMs?: number;
 }): Promise<AgentCliStatus | null> {
 	const entry = ACP_HARNESSES[options.harness];
 	if (!entry || !hasAgentCliUpdates(entry.binary)) return null;
@@ -31,8 +60,14 @@ export async function agentCliStatus(options: {
 	if (!update) return null;
 	const installed = probed.version;
 	const lookup = options.latest ?? latestCliVersion;
-	const latest =
-		installed && update.latest ? await lookup(update.latest) : null;
+	const looked =
+		installed && update.latest
+			? await settledWithin(
+					lookup(update.latest),
+					options.latestWaitMs ?? LATEST_WAIT_MS,
+				)
+			: null;
+	const latest = looked === PENDING ? null : looked;
 	const minVersion =
 		entry.minVersion === UNGATED_VERSION ? null : entry.minVersion;
 	return {
@@ -44,6 +79,7 @@ export async function agentCliStatus(options: {
 			minVersion !== null &&
 			!meetsFloor(installed, minVersion),
 		latest,
+		latestPending: looked === PENDING,
 		behind: installed !== null && latest !== null && isOlder(installed, latest),
 		source: update.source,
 		updateCommand: update.command,

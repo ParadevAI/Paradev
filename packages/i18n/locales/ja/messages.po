@@ -20845,6 +20845,9 @@ msgstr "このチャットは長いため、最新の部分だけを表示して
 msgid "This chat may have been removed or you may not have access."
 msgstr "このチャットは削除されたか、アクセス権がない可能性があります。"
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "エージェントの CLI に更新が必要だったため、このチャットは停止しました。"
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "会話がターミナルで続行されたため、このチャットは停止しました。"
 

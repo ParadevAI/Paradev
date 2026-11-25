@@ -10,8 +10,6 @@ export type UpdateWatch = {
 	/** The terminal running the update command, once it opened. */
 	terminalId?: string;
 	openedAt?: number;
-	/** Whether the update command was seen running in that terminal. */
-	ran?: boolean;
 };
 
 /**

@@ -1,18 +1,17 @@
 /**
- * Whether the update command in its terminal has finished. A command can start
- * and exit between two polls, so one never seen running counts as finished once
- * the terminal has been open longer than a shell takes to start it.
+ * Whether the update command in its terminal has finished. The shell's own
+ * start-up runs processes too, and the command is typed only once the shell is
+ * ready, so nothing counts until the terminal has been open longer than that
+ * takes.
  */
 export function hasCommandExited(options: {
 	running: boolean;
-	ran: boolean;
 	openedAt: number | undefined;
 	now: number;
 	startGraceMs: number;
 }): boolean {
-	if (options.running) return false;
-	if (options.ran) return true;
 	return (
+		!options.running &&
 		options.openedAt !== undefined &&
 		options.now - options.openedAt >= options.startGraceMs
 	);

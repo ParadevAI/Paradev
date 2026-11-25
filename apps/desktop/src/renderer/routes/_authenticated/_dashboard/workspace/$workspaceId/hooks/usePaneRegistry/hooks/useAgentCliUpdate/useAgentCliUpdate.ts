@@ -15,8 +15,10 @@ import { hasUpdateLanded } from "./utils/hasUpdateLanded";
 
 const STATUS_STALE_MS = 60_000;
 const UPDATE_POLL_MS = 3_000;
+const LATEST_POLL_MS = 2_000;
 const COMMAND_POLL_MS = 1_000;
-const COMMAND_START_GRACE_MS = 15_000;
+// The host types the command once the shell is ready, and waits up to 15 s for that.
+const COMMAND_START_GRACE_MS = 20_000;
 const UPDATE_WATCH_MS = 5 * 60_000;
 
 export const AGENT_CLI_UPDATE_DOCS_URL = `${COMPANY.DOCS_URL}/chat#update-the-agent-cli`;
@@ -60,12 +62,12 @@ export function useAgentCliUpdate({
 		{
 			enabled: harness !== undefined,
 			staleTime: STATUS_STALE_MS,
-			refetchOnMount: "always",
 			retry: false,
-			refetchInterval: (query) =>
-				watch && !hasUpdateLanded(watch, query.state.data ?? null)
-					? UPDATE_POLL_MS
-					: false,
+			refetchInterval: (query) => {
+				const current = query.state.data ?? null;
+				if (watch && !hasUpdateLanded(watch, current)) return UPDATE_POLL_MS;
+				return current?.latestPending ? LATEST_POLL_MS : false;
+			},
 		},
 	);
 	const status = data ?? null;
@@ -88,8 +90,8 @@ export function useAgentCliUpdate({
 	}, [watch, updated, clearWatch, key]);
 	const finish = useCallback(() => clearWatch(key), [clearWatch, key]);
 
-	// A command that ran and exited without changing the install failed or did
-	// nothing: give the Update action back instead of waiting out the watch.
+	// A command that exited without changing the install failed or did nothing:
+	// give the Update action back instead of waiting out the watch.
 	const terminalId = watch?.terminalId;
 	const { data: commandState, dataUpdatedAt: commandCheckedAt } =
 		workspaceTrpc.terminal.hasRunningProcess.useQuery(
@@ -103,13 +105,8 @@ export function useAgentCliUpdate({
 	const checkingExit = useRef(false);
 	useEffect(() => {
 		if (!watch || updated || commandState === undefined) return;
-		if (commandState.running && !watch.ran) {
-			patchWatch(key, watch.id, { ran: true });
-			return;
-		}
 		const exited = hasCommandExited({
 			running: commandState.running,
-			ran: watch.ran === true,
 			openedAt: watch.openedAt,
 			now: commandCheckedAt,
 			startGraceMs: COMMAND_START_GRACE_MS,
@@ -128,7 +125,6 @@ export function useAgentCliUpdate({
 		updated,
 		commandState,
 		commandCheckedAt,
-		patchWatch,
 		refetch,
 		clearWatch,
 		key,
@@ -204,12 +200,16 @@ export function useAgentCliTooOld(
 	useEffect(() => {
 		if (stopped && harness !== undefined) void refetch();
 	}, [stopped, harness, refetch]);
-	if (data?.belowFloor === true) return true;
-	if (harness === undefined || stoppedAt === null) return false;
-	return Math.max(dataUpdatedAt, errorUpdatedAt) >= stoppedAt ? false : null;
+	if (harness === undefined) return false;
+	if (stoppedAt === null) return data?.belowFloor === true;
+	if (Math.max(dataUpdatedAt, errorUpdatedAt) < stoppedAt) return null;
+	return errorUpdatedAt > dataUpdatedAt ? false : data?.belowFloor === true;
 }
 
-/** True while an update this chat session started has not landed yet. */
+/**
+ * True while this chat session has an update it started and has not handed
+ * back: the recovery screen resumes the chat once that update lands.
+ */
 export function useAgentCliUpdatePending(
 	workspaceId: string,
 	harness: string | undefined,

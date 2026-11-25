@@ -211,7 +211,9 @@ export async function resolveAgentCli(options: {
 			!probed.found && update?.source === "unknown"
 				? agentCliInstallHint(options.binary)
 				: undefined;
-		const upgrade = update ? (update.command ?? undefined) : options.upgrade;
+		const upgrade = update
+			? (update.command ?? agentCliInstallHint(options.binary))
+			: options.upgrade;
 		const message = agentCliUnsupported({
 			...options,
 			found,

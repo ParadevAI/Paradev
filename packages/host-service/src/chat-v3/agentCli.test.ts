@@ -74,7 +74,7 @@ describe.skipIf(POSIX_ONLY)("probeAgentCli", () => {
 });
 
 describe.skipIf(POSIX_ONLY)("resolveAgentCli", () => {
-	it("marks a too-old CLI only when chat can offer its update", async () => {
+	it("marks a too-old CLI only when chat can offer its update, and always says how to upgrade", async () => {
 		const home = tempHome();
 		fakeCli(join(home, "bin"), "1.0.0", "codex");
 		fakeCli(join(home, "bin"), "1.0.0");
@@ -84,7 +84,12 @@ describe.skipIf(POSIX_ONLY)("resolveAgentCli", () => {
 				.then(() => null)
 				.catch((caught: unknown) => caught);
 
-		expect(await tooOld("codex")).toMatchObject({ code: AGENT_CLI_OUTDATED });
+		expect(await tooOld("codex")).toMatchObject({
+			code: AGENT_CLI_OUTDATED,
+			message: expect.stringContaining(
+				"Upgrade with: npm i -g @openai/codex@latest",
+			),
+		});
 		expect(await tooOld(BINARY)).not.toHaveProperty("code");
 	});
 

@@ -20845,6 +20845,9 @@ msgstr "Deze chat is lang, dus alleen het nieuwste deel wordt getoond. Alles ope
 msgid "This chat may have been removed or you may not have access."
 msgstr "Deze chat is mogelijk verwijderd of je hebt geen toegang."
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Deze chat is gestopt omdat de CLI van de agent een update nodig had."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Deze chat is gestopt omdat het gesprek in een terminal verderging."
 

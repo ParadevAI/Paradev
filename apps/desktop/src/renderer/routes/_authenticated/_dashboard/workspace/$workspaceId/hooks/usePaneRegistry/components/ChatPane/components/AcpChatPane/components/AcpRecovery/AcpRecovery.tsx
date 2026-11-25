@@ -63,7 +63,7 @@ export function AcpRecovery({
 
 	const installed = status?.installed;
 	const minVersion = status?.minVersion;
-	const updating = phase === "updating";
+	const updating = phase === "updating" && (startedHere || tooOld);
 	if (tooOld || updating) {
 		const actions: AgentCliUpdateCardAction[] = [];
 		if (!updating && canUpdate) {

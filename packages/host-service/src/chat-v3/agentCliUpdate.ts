@@ -1,4 +1,11 @@
-import { accessSync, constants, statSync } from "node:fs";
+import {
+	accessSync,
+	constants,
+	readFileSync,
+	realpathSync,
+	statSync,
+} from "node:fs";
+import { dirname } from "node:path";
 import type { AgentCliInstallSource } from "@superset/shared/agent-cli-status";
 
 export type LatestVersionSource =
@@ -85,6 +92,51 @@ function isWritable(path: string): boolean {
 	}
 }
 
+const LAUNCHER_MAX_BYTES = 64 * 1024;
+
+function readLauncher(path: string): string | null {
+	try {
+		if (statSync(path).size > LAUNCHER_MAX_BYTES) return null;
+		return readFileSync(path, "utf8");
+	} catch {
+		return null;
+	}
+}
+
+function resolved(path: string): string {
+	try {
+		return realpathSync(path);
+	} catch {
+		return path;
+	}
+}
+
+/**
+ * pnpm's global bin is a launcher script, not a link, and its last line names
+ * the file it runs. The launcher sits in the pnpm home or in its `bin`.
+ */
+function pnpmHomeOf(
+	found: AgentCliBinary,
+	npmName: string,
+	read: (path: string) => string | null,
+): string | null {
+	const target = /^# cmd-shim-target=(.+)$/m.exec(
+		read(found.realPath) ?? "",
+	)?.[1];
+	const home = target
+		? new RegExp(`^(.*)/global/.*/node_modules/${escapeRegExp(npmName)}/`).exec(
+				target,
+			)?.[1]
+		: undefined;
+	if (!home) return null;
+	const binDirs = [home, resolved(home)].flatMap((dir) => [dir, `${dir}/bin`]);
+	return [dirname(found.path), dirname(found.realPath)].some((dir) =>
+		binDirs.includes(dir),
+	)
+		? home
+		: null;
+}
+
 /**
  * Picks the update for one install from where its binary lives, and never
  * runs one package manager over another's install: a source it cannot read
@@ -96,6 +148,7 @@ export function resolveAgentCliUpdate(options: {
 	runMode?: string | undefined;
 	executable?: (path: string) => boolean;
 	writable?: (path: string) => boolean;
+	readLauncher?: (path: string) => string | null;
 }): AgentCliUpdate | null {
 	const pkg = hasAgentCliUpdates(options.binary)
 		? AGENT_CLI_PACKAGES[options.binary]
@@ -159,8 +212,12 @@ export function resolveAgentCliUpdate(options: {
 			latest: npmLatest,
 		};
 	}
-	const pnpmHome = /^(.*\/pnpm)\/global\//.exec(realPath)?.[1];
-	if (pnpmHome && new RegExp(inPackage).test(realPath)) {
+	const pnpmHome = pnpmHomeOf(
+		found,
+		pkg.npm,
+		options.readLauncher ?? readLauncher,
+	);
+	if (pnpmHome) {
 		return {
 			source: "pnpm",
 			command: `PNPM_HOME=${shellQuote(pnpmHome)} pnpm add -g ${pkg.npm}@latest`,

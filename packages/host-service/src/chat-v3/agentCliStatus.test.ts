@@ -50,7 +50,26 @@ describe.skipIf(process.platform === "win32")("agentCliStatus", () => {
 			minVersion: "0.160.0",
 			belowFloor: true,
 			latest: "0.166.0",
+			latestPending: false,
 			behind: true,
+		});
+	});
+
+	it("answers the floor without waiting for a slow newest-release lookup", async () => {
+		const { env } = fakeCli("codex", "0.159.2");
+
+		expect(
+			await agentCliStatus({
+				harness: "codex-acp",
+				env,
+				latest: () => new Promise(() => {}),
+				latestWaitMs: 0,
+			}),
+		).toMatchObject({
+			belowFloor: true,
+			latest: null,
+			latestPending: true,
+			behind: false,
 		});
 	});
 

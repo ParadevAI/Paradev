@@ -20845,6 +20845,9 @@ msgstr "此聊天較長，因此只顯示最新部分。工作區啟動後會完
 msgid "This chat may have been removed or you may not have access."
 msgstr "此聊天可能已被移除，或你沒有存取權限。"
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "此聊天已停止，因為其代理程式 CLI 需要更新。"
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "由於對話已在終端機中繼續，此聊天已停止。"
 

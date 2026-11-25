@@ -20845,6 +20845,9 @@ msgstr "이 채팅은 길어서 최신 부분만 표시합니다. 워크스페�
 msgid "This chat may have been removed or you may not have access."
 msgstr "이 채팅은 삭제되었거나 접근 권한이 없을 수 있습니다."
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "에이전트 CLI에 업데이트가 필요해서 이 채팅이 중지되었습니다."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "대화가 터미널에서 계속되어 이 채팅이 중지되었습니다."
 

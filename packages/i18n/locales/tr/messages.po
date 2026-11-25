@@ -20845,6 +20845,9 @@ msgstr "Bu sohbet uzun, bu yüzden yalnızca en son kısmı gösteriliyor. Çal�
 msgid "This chat may have been removed or you may not have access."
 msgstr "Bu sohbet kaldırılmış olabilir veya erişiminiz olmayabilir."
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Bu sohbet, ajanının CLI'sinin güncellenmesi gerektiği için durdu."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Konuşma bir terminalde devam ettiği için bu sohbet durdu."
 

@@ -20845,6 +20845,9 @@ msgstr "Этот чат длинный, поэтому показана толь
 msgid "This chat may have been removed or you may not have access."
 msgstr "Возможно, этот чат удалён или у вас нет к нему доступа."
 
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Этот чат остановился, потому что CLI его агента требовалось обновить."
+
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Этот чат остановлен, потому что разговор продолжился в терминале."
 
