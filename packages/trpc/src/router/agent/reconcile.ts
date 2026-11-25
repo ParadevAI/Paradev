@@ -2,13 +2,15 @@ import { sessionWorkflowId, stateQuery } from "@superset/agent-harness/session";
 import { db } from "@superset/db/client";
 import { agents, agentTurns } from "@superset/db/schema";
 import type { Client } from "@temporalio/client";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { posthog } from "../../lib/analytics";
 import { afterTaskTurn } from "./tasks";
 import {
+	type Prompt,
 	redeliverMessage,
 	startNextQueued,
 	startTurnsForMessage,
+	submitPrompt,
 } from "./turns";
 
 /** A message younger than this may still be on its way; one older is given up on. */
@@ -35,7 +37,7 @@ export interface ReconcileReport {
  * a DM or mention that never became a turn is sent again; a session
  * workflow whose workflow task keeps failing is terminated; and a turn the
  * database says is running but its workflow is not is settled as lost, its
- * messages are sent again if it is recent, and a task's parent hears about it.
+ * prompts are sent again if it is recent, and a task's parent hears about it.
  */
 export async function reconcileDevs(
 	temporal: Client,
@@ -153,7 +155,11 @@ function staleRunningTurns(organizationId: string | undefined) {
 			sessionId: agentTurns.sessionId,
 			agentId: agentTurns.agentId,
 			reason: agentTurns.reason,
+			actingUserId: agentTurns.actingUserId,
+			triggerMessageId: agentTurns.triggerMessageId,
+			routineId: agentTurns.routineId,
 			promptId: agentTurns.promptId,
+			prompt: agentTurns.prompt,
 			steerPromptIds: agentTurns.steerPromptIds,
 			recent: sql<boolean>`${agentTurns.startedAt} > now() - ${DELIVERY_WINDOW}::interval`,
 		})
@@ -197,18 +203,27 @@ async function settleLost(turnId: string): Promise<boolean> {
 	return Boolean(settled);
 }
 
-/** Each channel message the lost turn was answering goes to the main session again. */
+/**
+ * A lost main-session turn is asked again from the prompt it stored, and each
+ * channel message that joined it is sent again. A turn that was itself sent
+ * again is not sent a third time.
+ */
 async function sendAgain(turn: StaleTurn) {
 	const [agent] = await db
 		.select()
 		.from(agents)
-		.where(eq(agents.id, turn.agentId))
+		.where(
+			and(
+				eq(agents.id, turn.agentId),
+				isNull(agents.archivedAt),
+				isNull(agents.pausedAt),
+			),
+		)
 		.limit(1);
 	if (!agent) return;
-	const promptIds = [turn.promptId, ...turn.steerPromptIds].filter(
-		(id): id is string => Boolean(id && UUID.test(id)),
-	);
-	for (const messageId of promptIds) {
+	const prompt = promptAgain(turn, agent);
+	if (prompt && (await stillAsked(turn))) await submitPrompt(prompt);
+	for (const messageId of turn.steerPromptIds.filter((id) => UUID.test(id))) {
 		await redeliverMessage({
 			agent,
 			messageId,
@@ -216,6 +231,38 @@ async function sendAgain(turn: StaleTurn) {
 			reason: turn.reason,
 		});
 	}
+}
+
+export function promptAgain(
+	turn: StaleTurn,
+	agent: { id: string; organizationId: string; mainSessionId: string | null },
+): Prompt | null {
+	if (turn.sessionId !== agent.mainSessionId) return null;
+	if (!turn.promptId || turn.promptId.startsWith("again:")) return null;
+	if (!turn.prompt || !turn.actingUserId) return null;
+	if (turn.reason === "routine" && !turn.routineId) return null;
+	return {
+		agent,
+		sessionId: turn.sessionId,
+		actingUserId: turn.actingUserId,
+		promptId: `again:${turn.promptId}`,
+		text: turn.prompt,
+		reason: turn.reason,
+		triggerMessageId: turn.triggerMessageId ?? undefined,
+		routineId: turn.routineId ?? undefined,
+	};
+}
+
+/** The person is still here, and the message that asked was not deleted. */
+async function stillAsked(turn: StaleTurn) {
+	const { rows } = await db.execute<{ asked: boolean }>(sql`
+		select exists (
+				select 1 from auth.users where id = ${turn.actingUserId} and deleted_at is null
+			)
+			and not exists (
+				select 1 from channel_messages where id = ${turn.triggerMessageId} and deleted_at is not null
+			) as asked`);
+	return rows[0]?.asked === true;
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
