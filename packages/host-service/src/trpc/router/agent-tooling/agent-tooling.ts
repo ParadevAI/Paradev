@@ -1,10 +1,15 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
+import type { AgentCliStatus } from "@superset/shared/agent-cli-status";
 import type { McpServerEntry } from "@superset/shared/mcp-servers";
 import type { SlashCommand } from "@superset/shared/slash-commands";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import {
+	agentCliStatus,
+	hasAgentCliStatus,
+} from "../../../chat-v3/agentCliStatus";
 import { buildChatAgentEnv } from "../../../chat-v3/agentEnv";
 import { workspaces } from "../../../db/schema";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
@@ -17,6 +22,7 @@ import { isMcpServerAgent, listMcpServers } from "./mcp-servers";
 // Declaration emit: the procedure's return
 // type must be nameable from dist-types, and shared is runtime-neutral so
 // mobile can resolve it.
+export type { AgentCliStatus } from "@superset/shared/agent-cli-status";
 export type { McpServerEntry } from "@superset/shared/mcp-servers";
 export type { SlashCommand } from "@superset/shared/slash-commands";
 
@@ -34,6 +40,25 @@ function findWorkspace(ctx: HostServiceContext, workspaceId: string) {
 }
 
 export const agentToolingRouter = router({
+	/**
+	 * The chat harness's CLI as the chat would launch it: its version, the
+	 * newest release, and the command that updates it in place. Null for a
+	 * harness with no update support.
+	 */
+	agentCliStatus: queryProcedure
+		.meta({ timeoutMs: 20_000 })
+		.input(z.object({ workspaceId: z.string(), harness: z.string() }))
+		.query(async ({ ctx, input }): Promise<AgentCliStatus | null> => {
+			const workspace = findWorkspace(ctx, input.workspaceId);
+			if (!hasAgentCliStatus(input.harness)) return null;
+			const env = await buildChatAgentEnv({
+				db: ctx.db,
+				cwd: workspace.worktreePath,
+				workspaceId: input.workspaceId,
+			});
+			return agentCliStatus({ harness: input.harness, env });
+		}),
+
 	/**
 	 * The slash commands and skills the given agent can use in this
 	 * workspace. `agent` is a presetId ("claude") or a hostAgentConfigs

@@ -1146,8 +1146,17 @@ msgstr "O {label} volta a ficar sem configuração. Nada muda nas suas áreas de
 msgid "{label} is set to manual"
 msgstr "{label} agora usa login manual"
 
+msgid "{label} needs an update"
+msgstr "{label} precisa ser atualizado"
+
 msgid "{label} quota used: {summary}. Open usage settings"
 msgstr "Cota usada de {label}: {summary}. Abrir configurações de uso"
+
+msgid "{label} update available"
+msgstr "Atualização do {label} disponível"
+
+msgid "{label} updated"
+msgstr "{label} atualizado"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -4364,6 +4373,9 @@ msgstr "Interface de chat"
 msgid "Chat name"
 msgstr "Nome do chat"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "O chat precisa da versão {minVersion} ou mais recente. A versão instalada é {installed}."
+
 msgid "Chat session not found"
 msgstr "Sessão de chat não encontrada"
 
@@ -6347,6 +6359,9 @@ msgstr "Não foi possível mover a área de trabalho"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Não foi possível nomear \"{name}\" automaticamente"
+
+msgid "Couldn't open a terminal"
+msgstr "Não foi possível abrir um terminal"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Não foi possível abrir na interface de chat"
@@ -9281,6 +9296,9 @@ msgstr "Visualização por pastas"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Pastas a incluir nas novas worktrees, uma por linha, relativas à raiz do repositório. Os arquivos da raiz sempre entram. Vazio inclui tudo."
 
+msgid "Follow along in the terminal below."
+msgstr "Acompanhe no terminal abaixo."
+
 msgid "FOLLOW ON X"
 msgstr "SIGA NO X"
 
@@ -10179,6 +10197,9 @@ msgstr "Como instalar {name} no Paradev"
 
 msgid "How to install Paradev"
 msgstr "Como instalar o Paradev"
+
+msgid "How to update"
+msgstr "Como atualizar"
 
 msgid "How we build it, in long form."
 msgstr "Como construímos, em detalhes."
@@ -16998,6 +17019,9 @@ msgstr "Reiniciar o daemon de terminal?"
 msgid "Restart terminals"
 msgstr "Reiniciar os terminais"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Reinicie o chat para usar a versão {installed}."
+
 msgid "Restart workspace"
 msgstr "Reiniciar área de trabalho"
 
@@ -20294,6 +20318,9 @@ msgstr "O botão agora se destaca. Conferi no seu painel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "A mudança começa agora. Você paga só a diferença pelo resto do período."
 
+msgid "The chat resumes after the update."
+msgstr "O chat será retomado após a atualização."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "O chat continua como está. Arquivos editados desde este turno, por qualquer pessoa, não são tocados e aparecem na lista."
 
@@ -20817,6 +20844,9 @@ msgstr "Este chat é longo, então só a parte mais recente é exibida. Ele abre
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Este chat pode ter sido removido ou você pode não ter acesso."
+
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Este chat parou porque a CLI do agente precisava de uma atualização."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Este chat parou porque a conversa continuou em um terminal."
@@ -21945,6 +21975,9 @@ msgstr "Atualizar"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Atualize o {appName} nesta máquina para anexar arquivos"
 
+msgid "Update {label}"
+msgstr "Atualizar {label}"
+
 msgid "Update available"
 msgstr "Atualização disponível"
 
@@ -22043,6 +22076,9 @@ msgstr "Atualizado agora mesmo a partir da {0}."
 
 msgid "Updates"
 msgstr "Atualizações"
+
+msgid "Updating {label}…"
+msgstr "Atualizando {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

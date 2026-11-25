@@ -1,4 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
+import { toast } from "@superset/ui/sonner";
 import { useCallback, useMemo, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useReviewCommentNavigation";
@@ -7,8 +9,11 @@ import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
+	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openFilePathsIn";
+import type { TerminalLauncher } from "../../../useTerminalLauncher";
+import type { RunInTerminal } from "../../hooks/useAgentCliUpdate";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { openChatHistory } from "../../utils/chatHistoryOpen";
 import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
@@ -26,17 +31,20 @@ import { sessionInfoPaneData } from "./utils/sessionInfoPaneData";
 
 export function ChatPane({
 	ctx,
+	launcher,
 	onOpenDiff,
 	onOpenFile,
 	onRevealPath,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
+	launcher: TerminalLauncher;
 	workspaceId: string;
 	onOpenDiff: OpenReviewDiff;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }) {
+	const { t } = useLingui();
 	const data = ctx.pane.data as ChatPaneData;
 	const openPage = useOpenChatPage(ctx.store);
 	const { hint, showHint } = useLinkClickHint();
@@ -57,6 +65,25 @@ export function ChatPane({
 	latest.current = data;
 	const paneId = ctx.pane.id;
 	const onOpenHistory = useCallback(() => openChatHistory(paneId), [paneId]);
+	const split = ctx.actions.split;
+	const runInTerminal = useCallback<RunInTerminal>(
+		async (command, title) => {
+			try {
+				const terminalId = await launcher.create({ command });
+				split("down", {
+					kind: "terminal",
+					titleOverride: title,
+					data: { terminalId } satisfies TerminalPaneData,
+				});
+				return terminalId;
+			} catch (error) {
+				console.error("[chat] could not open a terminal", error);
+				toast.error(t({ message: "Couldn't open a terminal" }));
+				return null;
+			}
+		},
+		[launcher, split, t],
+	);
 	const openDiff = useCallback<OpenDiff>(
 		(filter, path) =>
 			onOpenDiff(path ?? "", false, undefined, undefined, undefined, filter),
@@ -211,6 +238,7 @@ export function ChatPane({
 						],
 					});
 				}}
+				onRunInTerminal={runInTerminal}
 				onRewound={(prompt) => {
 					const { agent, chatModelId, chatEffortId, chatModeId } =
 						latest.current;

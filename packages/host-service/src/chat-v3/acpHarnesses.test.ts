@@ -5,6 +5,7 @@ import {
 	acpHarnessForPreset,
 	UNGATED_VERSION,
 } from "./acpCatalogue";
+import { hasAgentCliUpdates } from "./agentCliUpdate";
 
 const entries = Object.entries(ACP_HARNESSES);
 
@@ -33,6 +34,7 @@ describe("ACP_HARNESSES", () => {
 
 	it.each(entries)("%s tells a gated reader how to upgrade", (_id, entry) => {
 		if (entry.minVersion === UNGATED_VERSION) return;
+		if (hasAgentCliUpdates(entry.binary)) return;
 		expect(entry.upgrade).toBeTypeOf("string");
 		expect(entry.upgrade).not.toBe("");
 	});

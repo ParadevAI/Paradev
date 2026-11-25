@@ -40,10 +40,18 @@ export async function resolveAcpLaunch(
 	});
 	const loginCommand = agentLoginCommand(entry.binary, cli.env);
 	const identity = { command: cli.command, version: cli.version };
-	if (!entry.adapter)
-		return { ...cli, args: entry.args, loginCommand, identity };
+	if (!entry.adapter) {
+		return {
+			...cli,
+			args: entry.args,
+			loginCommand,
+			identity,
+			cliVersion: cli.version,
+		};
+	}
 	return {
 		identity,
+		cliVersion: cli.version,
 		command: process.execPath,
 		args: [resolveAdapterEntry(entry.adapter), ...entry.args],
 		env: {

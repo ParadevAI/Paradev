@@ -94,6 +94,8 @@ export const sessionStateSchema = z.looseObject({
 	 * session, and the caller has to know which one it ended up on.
 	 */
 	harnessSessionId: z.string().optional(),
+	/** The version of the agent CLI this session's process was started from. */
+	cliVersion: z.string().optional(),
 	queuePaused: z.boolean().optional(),
 	queueControls: z.boolean().optional(),
 	usageLimit: usageLimitSchema.optional(),

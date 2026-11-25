@@ -12,7 +12,8 @@ import {
 	type LaunchSource,
 } from "@superset/shared/host-routing";
 import { harnessBinary } from "../chat-v3/acpCatalogue";
-import { findOnPath, isExecutableFile } from "../chat-v3/agentCli";
+import { findOnPath } from "../chat-v3/agentCli";
+import { isExecutableFile } from "../chat-v3/agentCliUpdate";
 import type { HostDb } from "../db";
 import { getTerminalBaseEnv } from "../terminal/env";
 import {

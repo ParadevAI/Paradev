@@ -39,6 +39,7 @@ import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions"
 import { useStableList } from "renderer/hooks/useStableList";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
+import type { RunInTerminal } from "../../../../hooks/useAgentCliUpdate";
 import {
 	ChatPaneActionsProvider,
 	type OpenDiff,
@@ -130,6 +131,7 @@ export function SessionView({
 	sessionAccount,
 	onEditMessage,
 	onRestartAndContinue,
+	onRunInTerminal,
 	onSessionGone,
 	onStartNewChat,
 	onUserPrompt,
@@ -176,8 +178,9 @@ export function SessionView({
 	onFork?: ((target: ChatForkTarget, transcript: string) => void) | undefined;
 	canForkToWorktree?: boolean;
 	onEditMessage?: (request: ChatEditRequest) => void;
-	/** Restarts the agent and sends `prompt` once it is back. */
-	onRestartAndContinue?: (prompt: string) => Promise<boolean>;
+	/** Restarts the agent, then sends `prompt`, if given, once it is back. */
+	onRestartAndContinue?: (prompt?: string) => Promise<boolean>;
+	onRunInTerminal?: RunInTerminal;
 	/** Takes prompts the host refused because the chat's agent is gone; false leaves them to the composer. */
 	onSessionGone?: (prompts: UserContent[][]) => boolean;
 	/** Resolves false when the new chat could not be started. */
@@ -927,6 +930,11 @@ export function SessionView({
 					onFork={onFork ? forkWithTranscript : undefined}
 					canForkToWorktree={canForkToWorktree}
 					onOpenFind={focusedSubagentId ? undefined : openFind}
+					onRestartAgent={onRestartAndContinue}
+					onRunInTerminal={onRunInTerminal}
+					{...(sessionState?.cliVersion
+						? { cliVersion: sessionState.cliVersion }
+						: {})}
 					usageLimited={!held && usageLimit !== undefined}
 					workspaceId={workspaceId}
 				/>

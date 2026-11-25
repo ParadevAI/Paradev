@@ -1146,8 +1146,17 @@ msgstr "{label} vuelve a quedar sin configurar. Nada cambia dentro de tus espaci
 msgid "{label} is set to manual"
 msgstr "{label} usa inicio de sesión manual"
 
+msgid "{label} needs an update"
+msgstr "{label} necesita una actualización"
+
 msgid "{label} quota used: {summary}. Open usage settings"
 msgstr "Cuota usada de {label}: {summary}. Abrir ajustes de uso"
+
+msgid "{label} update available"
+msgstr "Actualización de {label} disponible"
+
+msgid "{label} updated"
+msgstr "{label} actualizado"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -4364,6 +4373,9 @@ msgstr "Interfaz de chat"
 msgid "Chat name"
 msgstr "Nombre del chat"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "El chat necesita la versión {minVersion} o posterior. Está instalada la {installed}."
+
 msgid "Chat session not found"
 msgstr "Sesión de chat no encontrada"
 
@@ -6347,6 +6359,9 @@ msgstr "No se pudo mover el espacio de trabajo"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "No se pudo nombrar «{name}» automáticamente"
+
+msgid "Couldn't open a terminal"
+msgstr "No se pudo abrir una terminal"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "No se pudo abrir en la interfaz de chat"
@@ -9281,6 +9296,9 @@ msgstr "Vista de carpetas"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Carpetas que se extraen en los worktrees nuevos, una por línea, relativas a la raíz del repo. Los archivos de la raíz se incluyen siempre. Si se deja vacío, se extrae todo."
 
+msgid "Follow along in the terminal below."
+msgstr "Sigue el progreso en la terminal de abajo."
+
 msgid "FOLLOW ON X"
 msgstr "SEGUIR EN X"
 
@@ -10179,6 +10197,9 @@ msgstr "Cómo instalar {name} en Paradev"
 
 msgid "How to install Paradev"
 msgstr "Cómo instalar Paradev"
+
+msgid "How to update"
+msgstr "Cómo actualizar"
 
 msgid "How we build it, in long form."
 msgstr "Cómo lo construimos, en detalle."
@@ -16998,6 +17019,9 @@ msgstr "¿Reiniciar el daemon de terminal?"
 msgid "Restart terminals"
 msgstr "Reiniciar las terminales"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Reinicia el chat para usar la versión {installed}."
+
 msgid "Restart workspace"
 msgstr "Reiniciar espacio de trabajo"
 
@@ -20294,6 +20318,9 @@ msgstr "El botón ahora destaca. Lo he comprobado en tu panel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "El cambio empieza ahora. Solo pagas la diferencia por el resto de este período."
 
+msgid "The chat resumes after the update."
+msgstr "El chat se reanudará después de la actualización."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "El chat queda como está. Los archivos editados desde este turno, por quien sea, no se tocan y se listan."
 
@@ -20817,6 +20844,9 @@ msgstr "Este chat es largo, así que solo se muestra la parte más reciente. Se 
 
 msgid "This chat may have been removed or you may not have access."
 msgstr "Es posible que este chat se haya eliminado o que no tengas acceso."
+
+msgid "This chat stopped because its agent CLI needed an update."
+msgstr "Este chat se detuvo porque la CLI de su agente necesitaba una actualización."
 
 msgid "This chat stopped because the conversation continued in a terminal."
 msgstr "Este chat se detuvo porque la conversación continuó en una terminal."
@@ -21945,6 +21975,9 @@ msgstr "Actualizar"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Actualiza {appName} en esta máquina para adjuntar archivos"
 
+msgid "Update {label}"
+msgstr "Actualizar {label}"
+
 msgid "Update available"
 msgstr "Actualización disponible"
 
@@ -22043,6 +22076,9 @@ msgstr "Actualizado ahora mismo desde {0}."
 
 msgid "Updates"
 msgstr "Actualizaciones"
+
+msgid "Updating {label}…"
+msgstr "Actualizando {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
