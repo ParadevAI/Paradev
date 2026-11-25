@@ -6,6 +6,7 @@ import {
 	deriveQueuedPrompts,
 	deriveTimeline,
 	emptySnapshot,
+	isContinuePrompt,
 	isStartingMode,
 	outlineSnapshot,
 	reduceMany,
@@ -63,6 +64,7 @@ import {
 	respondToUsageLimitInputSchema,
 	resumeQueueInputSchema,
 	rewindSessionInputSchema,
+	sessionNotRunningMessage,
 	setConfigOptionInputSchema,
 	setModeInputSchema,
 	steerSubagentInputSchema,
@@ -205,7 +207,8 @@ function carriedFrom(
 	}
 	const queued = deriveQueuedPrompts(snapshot)
 		.sort((a, b) => a.startedAtMs - b.startedAtMs)
-		.map((message) => message.content);
+		.map((message) => message.content)
+		.filter((content) => !isContinuePrompt(content));
 	return {
 		turn: failedLastTurn(snapshot),
 		canceledToolIds,
@@ -970,7 +973,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					const source = options.sessions.get(parsed.sessionId);
 					const replay = replaySession(parsed.sessionId);
 					if (!source || !replay.ok) {
-						throw new Error(`chat session ${parsed.sessionId} is not running`);
+						throw new Error(sessionNotRunningMessage(parsed.sessionId));
 					}
 					const before = transcriptBefore(
 						replay.snapshot,

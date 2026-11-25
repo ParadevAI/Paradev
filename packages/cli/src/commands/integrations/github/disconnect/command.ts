@@ -17,7 +17,7 @@ export default command({
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const installations =
 			await ctx.api.integration.github.listInstallations.query({
@@ -44,14 +44,14 @@ export default command({
 				options.account
 					? `${options.account} is not connected. Connected: ${accounts}`
 					: `Several GitHub accounts are connected: ${accounts}`,
-				"Run: superset integrations github disconnect --account <login>",
+				"Run: paradev integrations github disconnect --account <login>",
 			);
 		}
 		await confirmByName({
 			name: installation.accountLogin,
 			consequence: `Disconnecting ${installation.accountLogin} removes its repositories from this organization's cloud environments`,
 			yes: options.yes,
-			rerun: `superset integrations github disconnect --account ${installation.accountLogin}`,
+			rerun: `paradev integrations github disconnect --account ${installation.accountLogin}`,
 		});
 		await ctx.api.integration.github.disconnect.mutate({
 			organizationId,

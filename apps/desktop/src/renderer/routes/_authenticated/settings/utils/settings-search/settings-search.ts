@@ -3,6 +3,11 @@ import {
 	type IntegrationProvider,
 } from "@superset/shared/integrations";
 import type { SettingsSection } from "renderer/stores/settings-state";
+import {
+	isSettingsSectionVisible,
+	SETTINGS_SECTION_GROUPS,
+	type SettingsSectionVisibility,
+} from "../settingsSections";
 
 export const SETTING_ITEM_ID = {
 	MOBILE_APP: "mobile-app",
@@ -45,7 +50,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
 	BEHAVIOR_PARADEV_ANYWHERE: "behavior-paradev-anywhere",
-	USAGE_IN_SIDEBAR: "usage-in-sidebar",
+	USAGE_RAIL_RINGS: "usage-rail-rings",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
 
 	BROWSER_HOMEPAGE: "browser-homepage",
@@ -85,6 +90,8 @@ export const SETTING_ITEM_ID = {
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
 	BILLING_USAGE: "billing-usage",
+
+	CLOUD_USAGE: "cloud-usage",
 
 	PROJECT_NAME: "project-name",
 	PROJECT_PATH: "project-path",
@@ -206,8 +213,18 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.MOBILE_APP,
 		section: "mobile",
 		title: "Mobile",
-		description: "Use Paradev on your iPhone",
-		keywords: ["phone", "mobile", "qr", "scan", "ios", "app store"],
+		description: "Use Paradev on your phone",
+		keywords: [
+			"phone",
+			"mobile",
+			"qr",
+			"scan",
+			"ios",
+			"iphone",
+			"app store",
+			"android",
+			"google play",
+		],
 	},
 	{
 		id: SETTING_ITEM_ID.ACCOUNT_PROFILE,
@@ -799,20 +816,22 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
-		id: SETTING_ITEM_ID.USAGE_IN_SIDEBAR,
+		id: SETTING_ITEM_ID.USAGE_RAIL_RINGS,
 		section: "usage",
-		title: "Show usage tab on sidebar",
-		description: "Show a Usage button in the home sidebar, under Pull requests",
+		title: "Show quota rings on sidebar",
+		description:
+			"Show how much quota each model provider has used, at the bottom of the sidebar",
 		keywords: [
 			"sidebar",
 			"rail",
-			"button",
-			"shortcut",
-			"nav",
-			"home",
-			"gauge",
-			"pull requests",
+			"quota",
+			"rate limit",
 			"usage",
+			"ring",
+			"claude",
+			"codex",
+			"hide",
+			"show",
 		],
 	},
 	{
@@ -1456,6 +1475,13 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.CLOUD_USAGE,
+		section: "cloudUsage",
+		title: "Cloud usage",
+		description: "Cloud usage by day, person and workspace",
+		keywords: ["cloud", "usage", "gb-hours", "workspaces", "boots", "billing"],
+	},
+	{
 		id: SETTING_ITEM_ID.PROJECT_NAME,
 		section: "project",
 		title: "Project Name",
@@ -1779,6 +1805,9 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"fork",
 			"base",
 			"template",
+			"config",
+			"config.toml",
+			"build",
 		],
 	},
 	{
@@ -1964,17 +1993,24 @@ function isItemOffered(
 	return cloudWorkspaces || !CLOUD_WORKSPACE_SECTIONS.has(item.section);
 }
 
-/** Like `getMatchCountBySection`, but excludes items that are not offered. */
+const NAV_ITEMS = new Map(
+	SETTINGS_SECTION_GROUPS.flatMap((group) => group.items).map((item) => [
+		item.section,
+		item,
+	]),
+);
+
+/** Like `getMatchCountBySection`, but only for sections the settings nav shows. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	cloudWorkspaces: boolean,
-	pluginsVisible = false,
+	visibility: SettingsSectionVisibility,
 ): Partial<Record<SettingsSection, number>> {
-	const matches = searchSettings(query).filter(
-		(item) =>
-			isItemOffered(item, cloudWorkspaces) &&
-			(item.section !== "plugins" || pluginsVisible),
-	);
+	const matches = searchSettings(query).filter((item) => {
+		const navItem = NAV_ITEMS.get(item.section);
+		return navItem
+			? isSettingsSectionVisible(navItem, visibility)
+			: visibility.allowedSections.has(item.section);
+	});
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {
 		counts[item.section] = (counts[item.section] || 0) + 1;

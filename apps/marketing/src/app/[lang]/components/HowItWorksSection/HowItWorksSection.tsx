@@ -20,7 +20,7 @@ export function HowItWorksSection() {
 					<span className="text-sm font-mono uppercase tracking-widest text-brand">
 						<Trans>How it works</Trans>
 					</span>
-					<h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.1] text-foreground">
+					<h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-[1.1] text-foreground">
 						<Trans>
 							The best agent will change.
 							<br />
@@ -42,7 +42,7 @@ export function HowItWorksSection() {
 							<span className="text-sm font-mono text-brand">
 								{step.number}
 							</span>
-							<h3 className="text-xl sm:text-2xl font-medium tracking-tight text-foreground">
+							<h3 className="text-xl sm:text-2xl font-light tracking-tight text-foreground">
 								{t(step.title)}
 							</h3>
 							<p className="text-base text-muted-foreground leading-relaxed">

@@ -742,6 +742,7 @@ describe("workspace moves", () => {
 			branch: BRANCH,
 			toWorkspaceId: DESKTOP_WORKSPACE,
 			toHostId: DESKTOP,
+			chatSessionIds: [],
 		});
 		expect(started.moves).toEqual([]);
 		expect(

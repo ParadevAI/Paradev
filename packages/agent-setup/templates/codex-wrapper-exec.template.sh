@@ -1,3 +1,9 @@
+# SUPERSET_* wins so existing overrides keep working; PARADEV_* fills in when it is unset.
+SUPERSET_TERMINAL_ID="${SUPERSET_TERMINAL_ID:-${PARADEV_TERMINAL_ID:-}}"
+SUPERSET_TAB_ID="${SUPERSET_TAB_ID:-${PARADEV_TAB_ID:-}}"
+SUPERSET_PANE_ID="${SUPERSET_PANE_ID:-${PARADEV_PANE_ID:-}}"
+SUPERSET_WORKSPACE_PATH="${SUPERSET_WORKSPACE_PATH:-${PARADEV_WORKSPACE_PATH:-}}"
+SUPERSET_ENV="${SUPERSET_ENV:-${PARADEV_ENV:-}}"
 # The wrapper uses Codex's process-scoped TUI session log for Start/permission
 # events. Avoid tailing global rollout files: concurrent Codex sessions share
 # that directory.

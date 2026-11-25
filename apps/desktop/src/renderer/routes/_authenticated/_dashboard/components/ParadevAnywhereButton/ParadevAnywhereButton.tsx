@@ -97,7 +97,7 @@ export function ParadevAnywhereButton({
 				sideOffset={8}
 				collisionPadding={8}
 				onCloseAutoFocus={(event) => event.preventDefault()}
-				className="w-[332px] rounded-xl p-3.5 shadow-lg"
+				className="@container max-h-[var(--radix-popover-content-available-height)] w-[332px] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-xl p-3.5 shadow-lg"
 			>
 				<ParadevAnywherePanel onClose={() => setIsOpen(false)} onHide={hide} />
 			</PopoverContent>

@@ -6,7 +6,7 @@ const MINIMUM_DESKTOP_VERSION = "1.37.0";
 /**
  * Version gate + server-driven notices for the desktop app.
  * `minimumVersion` force-updates old clients; `notices` drives targeted
- * popups without a desktop release (plans/done/20260720-remote-version-notices.md).
+ * popups without a desktop release.
  */
 export async function GET() {
 	let notices: DesktopNotice[] = [];

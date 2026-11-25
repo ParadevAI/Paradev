@@ -21,8 +21,8 @@ const CACHE_TTL_MS = 60_000;
 
 export type AgentCli = {
 	command: string;
-	env: NodeJS.ProcessEnv;
 	version: string;
+	env: NodeJS.ProcessEnv;
 };
 
 const WIN32_DIRECT_EXEC_EXTENSIONS = [".exe", ".com"];
@@ -107,6 +107,7 @@ async function probeVersion(
 	command: string,
 	env: NodeJS.ProcessEnv,
 	binaryFingerprint: string,
+	signal?: AbortSignal,
 ): Promise<string | null> {
 	const hit = cache.get(command);
 	if (
@@ -121,16 +122,19 @@ async function probeVersion(
 		const { stdout, stderr } = await execFileAsync(command, ["--version"], {
 			env,
 			timeout: VERSION_TIMEOUT_MS,
+			signal,
 		});
 		version = parseVersion(stdout) ?? parseVersion(stderr);
 	} catch {
 		version = null;
 	}
-	cache.set(command, {
-		at: Date.now(),
-		fingerprint: binaryFingerprint,
-		version,
-	});
+	if (!signal?.aborted) {
+		cache.set(command, {
+			at: Date.now(),
+			fingerprint: binaryFingerprint,
+			version,
+		});
+	}
 	return version;
 }
 
@@ -138,6 +142,7 @@ async function probeVersion(
 export async function probeAgentCli(
 	binary: string,
 	env: NodeJS.ProcessEnv,
+	signal?: AbortSignal,
 ): Promise<{
 	command: string;
 	version: string | null;
@@ -145,7 +150,7 @@ export async function probeAgentCli(
 }> {
 	const command = agentCliCommand(binary, env);
 	const found = realAgentCli(binary, env);
-	const version = await probeVersion(command, env, fingerprint(found));
+	const version = await probeVersion(command, env, fingerprint(found), signal);
 	return { command, version, found };
 }
 
@@ -190,9 +195,11 @@ export async function resolveAgentCli(options: {
 	minVersion: string;
 	upgrade?: string;
 	env: () => Promise<NodeJS.ProcessEnv>;
+	signal?: AbortSignal;
 }): Promise<AgentCli> {
 	const env = await options.env();
-	const probed = await probeAgentCli(options.binary, env);
+	options.signal?.throwIfAborted();
+	const probed = await probeAgentCli(options.binary, env, options.signal);
 	const found = probed.version;
 	if (!found || !meetsFloor(found, options.minVersion)) {
 		const update = resolveAgentCliUpdate({

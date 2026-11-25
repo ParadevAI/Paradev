@@ -3,8 +3,7 @@ import type { SimpleGit } from "simple-git";
 /**
  * A git ref resolved against the local repo, classified by type at the
  * boundary so downstream code never has to infer kind from a string.
- *
- * See `packages/host-service/GIT_REFS.md` for the rationale.
+ * Classify from the full refname: a local branch can be named `origin/foo`.
  */
 export type ResolvedRef =
 	| {

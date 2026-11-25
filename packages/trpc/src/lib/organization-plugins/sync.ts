@@ -17,8 +17,10 @@ import {
 	unpackPluginBundle,
 } from "@superset/shared/plugins/bundle";
 import { and, eq, isNull, notInArray } from "drizzle-orm";
+import type { PluginManifest } from "../../router/plugins/manifest";
 import { deleteObjects, getObject, putObject } from "../r2";
 import { nudge } from "../realtime";
+import { IMMUTABLE_CACHE_CONTROL } from "../upload";
 import { sourceToken } from "./credentials";
 import { type RepositorySnapshot, readAll, repositorySnapshot } from "./github";
 import {
@@ -33,7 +35,13 @@ import {
 	UNNAMED_ENTRY,
 	withVersion,
 } from "./marketplace";
-import { organizationBundleKey, readOrganizationBundle } from "./rules";
+import {
+	OrganizationPluginError,
+	organizationBundleKey,
+	organizationIconKey,
+	organizationPluginIcon,
+	readOrganizationBundle,
+} from "./rules";
 
 export interface SourceSyncResult {
 	sha: string | null;
@@ -79,6 +87,7 @@ const COMPRESSED_FILE =
 
 interface PluginBuild {
 	bundle: Buffer;
+	files: ReadonlyMap<string, Uint8Array>;
 	treeHash: string;
 	skills: ReturnType<typeof skillsIn>;
 }
@@ -162,6 +171,7 @@ async function bundleFor(
 	);
 	return {
 		bundle: packPluginBundle(files, executable),
+		files,
 		treeHash: pluginTreeHash({ files, executable }),
 		skills: skillsIn(files),
 	};
@@ -195,10 +205,30 @@ async function readSource(
 	}
 }
 
+/** A plugin whose icon breaks a rule still syncs, with the default icon and a problem saying why. */
+function iconOf(
+	name: string,
+	manifest: PluginManifest,
+	files: ReadonlyMap<string, Uint8Array>,
+	result: SourceSyncResult,
+) {
+	try {
+		return organizationPluginIcon(manifest, files);
+	} catch (error) {
+		if (!(error instanceof OrganizationPluginError)) throw error;
+		result.problems.push({
+			name,
+			reason: `${error.message}; it shows the default icon`,
+		});
+		return null;
+	}
+}
+
 async function syncSnapshot(
 	source: SelectOrganizationPluginSource,
 	snapshot: RepositorySnapshot,
 	result: SourceSyncResult,
+	full: boolean,
 ): Promise<void> {
 	const file = findMarketplaceFile(snapshot.paths, source.path);
 	if (!file) {
@@ -236,6 +266,7 @@ async function syncSnapshot(
 			}
 			const fingerprint = sourceFingerprint(snapshot, entry, pluginDirs);
 			if (
+				!full &&
 				current &&
 				fingerprint &&
 				current.sourceFingerprint === fingerprint &&
@@ -248,6 +279,7 @@ async function syncSnapshot(
 			const build = await bundleFor(snapshot, entry, pluginDirs);
 			const { bundle, skills } = build;
 			const manifest = { ...readOrganizationBundle(bundle), skills };
+			const icon = iconOf(entry.name, manifest, build.files, result);
 			const contentHash = pluginBundleHash(bundle);
 			seen.push(entry.name);
 
@@ -260,6 +292,14 @@ async function syncSnapshot(
 				throw new Error(
 					`its content changed but its version is still ${manifest.version}; bump the version`,
 				);
+			}
+			if (icon) {
+				await putObject({
+					key: organizationIconKey(source.organizationId, contentHash),
+					...icon,
+					bucket: "public",
+					cacheControl: IMMUTABLE_CACHE_CONTROL,
+				});
 			}
 			if (
 				current?.contentHash === contentHash &&
@@ -354,9 +394,11 @@ async function syncSnapshot(
  * Brings an organization's plugins in line with one repository source. A
  * plugin that fails keeps its last good version; one that left the
  * repository is marked, not deleted, so members keep what they installed.
+ * A full sync rebuilds every plugin even when the commit has not changed.
  */
 export async function syncOrganizationPluginSource(
 	sourceId: string,
+	{ full = false }: { full?: boolean } = {},
 	readSnapshot: typeof repositorySnapshot = repositorySnapshot,
 ): Promise<SourceSyncResult | null> {
 	const source = await db.query.organizationPluginSources.findFirst({
@@ -378,11 +420,12 @@ export async function syncOrganizationPluginSource(
 		result.sha = snapshot.sha;
 
 		if (
+			full ||
 			source.syncedSha !== snapshot.sha ||
 			source.syncError ||
 			source.syncProblems.length
 		) {
-			await syncSnapshot(source, snapshot, result);
+			await syncSnapshot(source, snapshot, result, full);
 		}
 	} catch (error) {
 		result.error = error instanceof Error ? error.message : String(error);

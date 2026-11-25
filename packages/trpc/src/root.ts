@@ -12,6 +12,7 @@ import { analyticsRouter } from "./router/analytics";
 import { apiKeyRouter } from "./router/api-key";
 import { attachmentRouter } from "./router/attachment";
 import { automationRouter } from "./router/automation";
+import { awsMarketplaceRouter } from "./router/aws-marketplace";
 import { billingRouter } from "./router/billing";
 import {
 	channelMessageRouter,
@@ -23,6 +24,7 @@ import {
 import { chatRouter } from "./router/chat";
 import { chatHistoryRouter } from "./router/chat-history";
 import { chatMoveRouter } from "./router/chat-move";
+import { cloudRouter } from "./router/cloud";
 import { cloudWorkspaceRouter } from "./router/cloud-workspace";
 import { connectorsRouter } from "./router/connectors";
 import { environmentRouter } from "./router/environment";
@@ -62,10 +64,12 @@ export const appRouter = createTRPCRouter({
 	analytics: analyticsRouter,
 	attachment: attachmentRouter,
 	automation: automationRouter,
+	awsMarketplace: awsMarketplaceRouter,
 	billing: billingRouter,
 	chat: chatRouter,
 	chatHistory: chatHistoryRouter,
 	chatMove: chatMoveRouter,
+	cloud: cloudRouter,
 	cloudWorkspace: cloudWorkspaceRouter,
 	environment: environmentRouter,
 	host: { ...hostRouter, ...hostManagementRouter },

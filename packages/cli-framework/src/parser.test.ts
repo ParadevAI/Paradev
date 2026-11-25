@@ -24,6 +24,16 @@ describe("parseArgv", () => {
 		expect(parse("--prompt", value)).toEqual({ prompt: value });
 	});
 
+	it("takes a bare - as a value", () => {
+		expect(parse("--prompt", "-")).toEqual({ prompt: "-" });
+	});
+
+	it("takes a bare - as a positional", () => {
+		expect(
+			parseArgv(["bun", "demo", "cmd", "a", "-"], configs).positionals,
+		).toEqual(["cmd", "a", "-"]);
+	});
+
 	it("takes an option-shaped value after =", () => {
 		expect(parse("--prompt=--3d")).toEqual({ prompt: "--3d" });
 	});

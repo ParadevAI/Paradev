@@ -29,9 +29,14 @@ let reapedFiles: string[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: () => Promise.resolve(row) });
 let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+let endedBoots: unknown[] = [];
 stub(sandboxSleep, {
 	recordSandboxAsleep: (id: string, stopped: { sessionId: string | null }) => {
 		recordedAsleep.push([id, stopped]);
+		return Promise.resolve();
+	},
+	recordBootEnd: (scope: { cloudWorkspaceId: string }, ended: unknown) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
 		return Promise.resolve();
 	},
 });
@@ -147,6 +152,15 @@ describe("queueReap", () => {
 		]);
 	});
 
+	test("a stop that could not be queued ends the stopped session's boot as archived", async () => {
+		failingStage = "stop";
+		endedBoots = [];
+		await queueReap(input, BOX);
+		expect(endedBoots).toEqual([
+			[input.cloudWorkspaceId, { sessionId: "session_1", reason: "archived" }],
+		]);
+	});
+
 	test("a delete that could not be queued throws so the caller deletes the box", async () => {
 		failingStage = "delete";
 		await expect(queueReap(input, BOX)).rejects.toThrow("qstash down");
@@ -172,6 +186,21 @@ describe("reapArchivedCloudWorkspace", () => {
 		onArchiveHook = () => {};
 		reapedFiles = [];
 		recordedAsleep = [];
+		endedBoots = [];
+	});
+
+	test("the stop stage ends the stopped session's boot as archived", async () => {
+		await reapArchivedCloudWorkspace({ ...input, stage: "stop" });
+		expect(endedBoots).toEqual([
+			[input.cloudWorkspaceId, { sessionId: "session_1", reason: "archived" }],
+		]);
+	});
+
+	test("the delete stage ends every boot still open as archived", async () => {
+		await reapArchivedCloudWorkspace({ ...input, stage: "delete" });
+		expect(endedBoots).toEqual([
+			[input.cloudWorkspaceId, { sessionId: null, reason: "archived" }],
+		]);
 	});
 
 	test("the stop stage runs the archive hook, stops the box and queues its final settle", async () => {

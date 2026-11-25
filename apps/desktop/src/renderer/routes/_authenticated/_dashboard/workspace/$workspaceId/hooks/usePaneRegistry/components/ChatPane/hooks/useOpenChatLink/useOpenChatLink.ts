@@ -10,7 +10,7 @@ import {
 	useUrlLinkAction,
 } from "renderer/lib/clickPolicy";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useOpenInExternalEditor";
-import { useRecentlyViewedFiles } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useRecentlyViewedFiles";
+import { useWorkspacePathHost } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/hooks/useWorkspacePathHost";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useRevealInFinder";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
@@ -25,7 +25,7 @@ import {
 	type TerminalLinkActionDeps,
 } from "../../../../utils/runTerminalLinkAction";
 import type { OpenLink } from "../../../ChatSession/providers/ChatPaneActionsProvider";
-import { type LocatedPath, locatePath } from "./utils/locatePath";
+import { locateChatLink } from "./utils/locateChatLink";
 import { parseFileHref } from "./utils/parseFileHref";
 
 const WEB_URL = /^https?:\/\//i;
@@ -45,7 +45,7 @@ export function useOpenChatLink({
 }): OpenLink {
 	const { t } = useLingui();
 	const filePolicy = useInlineFilePolicy();
-	const folderPolicy = useTerminalFolderPolicy();
+	const folderPolicy = useTerminalFolderPolicy("2-tier");
 	const getUrlAction = useUrlLinkAction("2-tier");
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const revealInFinder = useRevealInFinder(workspaceId);
@@ -53,22 +53,7 @@ export function useOpenChatLink({
 	const { data: workspace } = workspaceTrpc.workspace.get.useQuery({
 		id: workspaceId,
 	});
-	const statPath = workspaceTrpc.filesystem.statPath.useMutation();
-	const hostClient = workspaceTrpc.useUtils().client;
-	const { recentFiles } = useRecentlyViewedFiles(workspaceId);
-	const locateRef = useRef<(path: string) => Promise<LocatedPath | null>>(
-		async () => null,
-	);
-	locateRef.current = (path) =>
-		locatePath(path, {
-			stat: (target) => statPath.mutateAsync({ workspaceId, path: target }),
-			resolveFile: (reference) =>
-				hostClient.filesystem.resolveFileReference.query({
-					workspaceId,
-					reference,
-					preferredRelativePaths: recentFiles.map((file) => file.relativePath),
-				}),
-		});
+	const pathHost = useWorkspacePathHost(workspaceId);
 
 	const depsRef = useRef<TerminalLinkActionDeps>({
 		store,
@@ -92,23 +77,29 @@ export function useOpenChatLink({
 	return useCallback(
 		(href, event, chosen) => {
 			const isPlain = tierFor(event, "2-tier") === "plain";
-			if (WEB_URL.test(href)) {
-				if (runChatPullRequestLink(depsRef.current, href, event, chosen))
-					return true;
+			const openWebUrl = (url: string) => {
+				if (runChatPullRequestLink(depsRef.current, url, event, chosen)) return;
 				const action =
-					chosen ?? getUrlAction(event, href) ?? (isPlain ? "pane" : null);
+					chosen ?? getUrlAction(event, url) ?? (isPlain ? "pane" : null);
 				if (action === null) showHint(event.clientX, event.clientY);
-				else runUrlLinkAction(depsRef.current, href, action);
+				else runUrlLinkAction(depsRef.current, url, action);
+			};
+			if (WEB_URL.test(href)) {
+				openWebUrl(href);
 				return true;
 			}
 
 			const file = parseFileHref(href);
 			if (!file) return false;
-			void locateRef.current(file.path).then(
+			void locateChatLink(href, file.path, pathHost).then(
 				(stat) => {
 					if (!stat) {
 						const { path } = file;
 						toast.error(t({ message: `Path not found: ${path}` }));
+						return;
+					}
+					if (stat.kind === "web") {
+						openWebUrl(stat.url);
 						return;
 					}
 					if (stat.isDirectory) {
@@ -116,15 +107,13 @@ export function useOpenChatLink({
 							? chosen === "external"
 								? "external"
 								: "reveal"
-							: (folderPolicy.map[tierFor(event, "2-tier")] ??
-								(isPlain ? "reveal" : null));
+							: folderPolicy.getIntent(event);
 						if (intent === null) showHint(event.clientX, event.clientY);
 						else
 							runFolderLinkAction(depsRef.current, stat.resolvedPath, intent);
 						return;
 					}
-					const action =
-						chosen ?? filePolicy.getAction(event) ?? (isPlain ? "pane" : null);
+					const action = chosen ?? filePolicy.getAction(event);
 					if (action === null) {
 						showHint(event.clientX, event.clientY);
 						return;
@@ -142,6 +131,6 @@ export function useOpenChatLink({
 			);
 			return true;
 		},
-		[getUrlAction, filePolicy, folderPolicy, showHint, t],
+		[getUrlAction, filePolicy, folderPolicy, pathHost, showHint, t],
 	);
 }

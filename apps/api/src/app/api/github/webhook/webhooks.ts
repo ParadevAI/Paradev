@@ -9,6 +9,7 @@ import {
 	githubPullRequests,
 	githubRepositories,
 } from "@superset/db/schema";
+import { queueRulesReapply } from "@superset/trpc/lib/sandbox";
 import { nudge } from "@superset/trpc/realtime";
 import { and, eq } from "drizzle-orm";
 
@@ -54,12 +55,16 @@ webhooks.on(
 			"[github/webhook] Installation unsuspended:",
 			payload.installation.id,
 		);
-		await db
+		const installations = await db
 			.update(githubInstallations)
 			.set({ suspended: false, suspendedAt: null })
 			.where(
 				eq(githubInstallations.installationId, String(payload.installation.id)),
-			);
+			)
+			.returning({ organizationId: githubInstallations.organizationId });
+		for (const { organizationId } of installations) {
+			await queueRulesReapply({ organizationId });
+		}
 	},
 );
 

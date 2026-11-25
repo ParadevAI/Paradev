@@ -1,4 +1,4 @@
-import { ROOT_DOMAIN } from "./app-identity";
+import { ANDROID_APP, ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
 import { BRAND } from "./brand";
 import { OWN_ROOT_DOMAINS } from "./own-domains";
@@ -24,6 +24,12 @@ export const PROTOCOL_SCHEMES = {
 	DEV: "superset-dev",
 	PROD: "superset",
 } as const;
+
+/** Released builds without `paradev` ignore those links, so links still use `PROTOCOL_SCHEMES.PROD`. */
+export const ACCEPTED_PROTOCOL_SCHEMES = [
+	PROTOCOL_SCHEMES.PROD,
+	"paradev",
+] as const;
 
 // Company
 // Root domain flips the whole brand at cutover. Default keeps superset.sh so
@@ -79,6 +85,8 @@ export const COMPANY = {
 	DISCORD_URL: SOCIAL.DISCORD.url,
 	APP_STORE_ID,
 	APP_STORE_URL: `https://apps.apple.com/app/id${APP_STORE_ID}`,
+	PLAY_STORE_URL: `https://play.google.com/store/apps/details?id=${ANDROID_APP.PACKAGE}`,
+	MOBILE_INSTALL_URL: `${MARKETING_URL}/get-app`,
 	STATUS_URL: `https://status.${ROOT_DOMAIN}`,
 	TRUST_URL: `https://trust.${ROOT_DOMAIN}`,
 	JOIN_US_URL: `${MARKETING_URL}/careers`,
@@ -110,9 +118,9 @@ export const OPEN_ROLES = [
 export const THEME_STORAGE_KEY = "superset-theme";
 
 // Download URLs
-export const DOWNLOAD_URL_MAC_ARM64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Superset-arm64.dmg`;
-export const DOWNLOAD_URL_MAC_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Superset-x64.dmg`;
-export const DOWNLOAD_URL_LINUX_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Superset-x86_64.AppImage`;
+export const DOWNLOAD_URL_MAC_ARM64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Paradev-arm64.dmg`;
+export const DOWNLOAD_URL_MAC_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Paradev-x64.dmg`;
+export const DOWNLOAD_URL_LINUX_X64 = `${COMPANY.GITHUB_URL}/releases/latest/download/Paradev-x86_64.AppImage`;
 
 // Auth token configuration
 export const TOKEN_CONFIG = {
@@ -194,12 +202,16 @@ export const FEATURE_FLAGS = {
 	 * conditions are the allowlist, so access changes without a deploy.
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
+	/** Per organization: shows Settings, Cloud usage, and gates the `cloud.*` procedures server-side. Unloaded or offline is off. */
+	CLOUD_USAGE: "cloud-usage",
 	/**
 	 * Mounts the bundle's agent-tools drive on an organization's boxes, so the
 	 * agent CLIs come from it instead of the image. Evaluated per organization
 	 * on every create and wake. Unloaded or offline means no drive.
 	 */
 	SANDBOX_AGENT_TOOLS_DRIVE: "sandbox-agent-tools-drive",
+	/** Sends an organization's box events to Sentry Logs, from each box's next create or wake. */
+	SANDBOX_BOX_LOGS: "sandbox-box-logs",
 	/**
 	 * Moving a workspace and its chats to the cloud or to another computer:
 	 * shows the Move items, and gates
@@ -308,7 +320,7 @@ export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 // Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
 // under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
 // amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
-// the terminal from its XTVERSION reply ("Superset (xterm.js)", see the
+// the terminal from its XTVERSION reply ("Paradev (xterm.js)", see the
 // desktop terminal-version-reply) and the CSI-u probe.
 export const TERMINAL_IDENTITY_ENV_KEYS = [
 	"TERM_PROGRAM",

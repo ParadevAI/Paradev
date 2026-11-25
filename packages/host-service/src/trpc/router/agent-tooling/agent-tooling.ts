@@ -16,7 +16,7 @@ import { resolveDefaultAccountEnv } from "../usage/default-account";
 import { listAgentSlashCommands } from "./discovery";
 import { isMcpServerAgent, listMcpServers } from "./mcp-servers";
 
-// Declaration emit (docs/interim-router-types.md): the procedure's return
+// Declaration emit: the procedure's return
 // type must be nameable from dist-types, and shared is runtime-neutral so
 // mobile can resolve it.
 export type { AgentCliStatus } from "@superset/shared/agent-cli-status";

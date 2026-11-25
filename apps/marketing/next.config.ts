@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
 import { SUPPORTED_LOCALES } from "@superset/i18n/locales";
 import { readRootDomain } from "@superset/shared/app-identity";
-import { CANONICAL_URLS } from "@superset/shared/constants";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import { withLegacyHostRedirects } from "@superset/shared/legacy-host-redirects";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
@@ -124,7 +124,7 @@ const config: NextConfig = {
 	},
 
 	// Compiles @lingui/react/macro at build time. Version must stay in
-	// lockstep with Next's swc_core ABI — see plans/20260826-i18n-strategy.md.
+	// lockstep with Next's swc_core ABI.
 	experimental: {
 		swcPlugins: [["@lingui/swc-plugin", {}]],
 	},
@@ -188,6 +188,41 @@ const config: NextConfig = {
 			{
 				source: "/mcp",
 				destination: `${CANONICAL_URLS.API}/mcp`,
+				permanent: false,
+			},
+			{
+				source: "/android",
+				destination: COMPANY.PLAY_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/ios",
+				destination: COMPANY.APP_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/get-app",
+				has: [
+					{ type: "header" as const, key: "user-agent", value: ".*Android.*" },
+				],
+				destination: COMPANY.PLAY_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/get-app",
+				has: [
+					{
+						type: "header" as const,
+						key: "user-agent",
+						value: ".*(iPhone|iPad|iPod).*",
+					},
+				],
+				destination: COMPANY.APP_STORE_URL,
+				permanent: false,
+			},
+			{
+				source: "/get-app",
+				destination: "/mobile",
 				permanent: false,
 			},
 			{

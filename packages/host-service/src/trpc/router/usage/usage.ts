@@ -6,6 +6,7 @@ import { MAX_BACKFILL_DAYS } from "@superset/trpc/leaderboard-periods";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { caught } from "../../../runtime/box-log-filter";
 import { WorkerPoolUnavailableError } from "../../../workers/host-worker-pool";
 import {
 	leaderboardPayloadTask,
@@ -269,8 +270,10 @@ export const usageRouter = router({
 						: provisionCodexAccount(input.selection));
 				} catch (error) {
 					console.warn(
-						`[host-service] provisioning ${input.agent} account ${input.selection} failed (continuing):`,
-						error,
+						"[host-service] provisioning an account failed, continuing (agent, selection):",
+						input.agent,
+						input.selection,
+						caught(error),
 					);
 				}
 			}

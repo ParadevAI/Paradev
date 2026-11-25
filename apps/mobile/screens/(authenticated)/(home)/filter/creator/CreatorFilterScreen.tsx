@@ -8,12 +8,11 @@ import { useArchivedCloudWorkspaces } from "@/hooks/useArchivedCloudWorkspaces";
 import { useCloudWorkspaces } from "@/hooks/useCloudWorkspaces";
 import { useSession } from "@/lib/auth/client";
 import { posthog } from "@/lib/posthog";
+import { SheetRow } from "@/screens/(authenticated)/(home)/filter/components/SheetRow";
 import {
 	type CloudCreatorFilter,
 	useWorkspacesFilterStore,
 } from "@/screens/(authenticated)/(home)/home/stores/workspacesFilterStore";
-import { ListRow } from "@/screens/(authenticated)/components/ListRow";
-import { ListRowCheck } from "@/screens/(authenticated)/components/ListRowCheck";
 import { UserAvatar } from "@/screens/(authenticated)/settings/components/UserAvatar";
 
 export function CreatorFilterScreen() {
@@ -61,10 +60,9 @@ export function CreatorFilterScreen() {
 	return (
 		<ScrollView
 			className="bg-background flex-1"
-			contentContainerClassName="px-6"
 			contentInsetAdjustmentBehavior="automatic"
 		>
-			<ListRow
+			<SheetRow
 				icon={
 					<UserAvatar
 						name={session?.user?.name ?? ""}
@@ -74,10 +72,10 @@ export function CreatorFilterScreen() {
 					/>
 				}
 				label={t({ message: "Created by me" })}
-				trailing={<ListRowCheck visible={creator === "me"} />}
+				checked={creator === "me"}
 				onPress={() => pick("me")}
 			/>
-			<ListRow
+			<SheetRow
 				icon={
 					<Icon
 						as={Users}
@@ -86,12 +84,12 @@ export function CreatorFilterScreen() {
 					/>
 				}
 				label={t({ message: "Anyone" })}
-				trailing={<ListRowCheck visible={creator === "anyone"} />}
+				checked={creator === "anyone"}
 				onPress={() => pick("anyone")}
 				isLast={people.length === 0}
 			/>
 			{people.map((person, index) => (
-				<ListRow
+				<SheetRow
 					key={person.userId}
 					icon={
 						<UserAvatar
@@ -102,12 +100,8 @@ export function CreatorFilterScreen() {
 						/>
 					}
 					label={person.name}
-					trailing={
-						<ListRowCheck
-							visible={
-								typeof creator === "object" && creator.userId === person.userId
-							}
-						/>
+					checked={
+						typeof creator === "object" && creator.userId === person.userId
 					}
 					onPress={() =>
 						pick({

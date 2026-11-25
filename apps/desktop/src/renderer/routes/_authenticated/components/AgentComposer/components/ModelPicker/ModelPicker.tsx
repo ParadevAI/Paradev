@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import type { SessionConfigOption } from "@superset/chat/protocol";
 import {
 	DropdownMenu,
@@ -12,7 +13,7 @@ import {
 import { cn } from "@superset/ui/utils";
 import { Settings2 } from "lucide-react";
 import { type KeyboardEvent, useMemo, useRef } from "react";
-import { LuCheck, LuChevronDown } from "react-icons/lu";
+import { LuCheck, LuChevronDown, LuZap } from "react-icons/lu";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -24,7 +25,10 @@ import {
 	PILL_TRIGGER_CLASS,
 } from "../../constants";
 import { useOptimisticSelections } from "../../hooks/useOptimisticSelections";
-import { currentLabel } from "../../utils/configOptionLabels";
+import {
+	currentLabel,
+	currentModelLabel,
+} from "../../utils/configOptionLabels";
 import { fastOption } from "../../utils/toggleOption";
 import { EffortSliderCard } from "./components/EffortSliderCard";
 import { ModelPanel } from "./components/ModelPanel";
@@ -54,6 +58,7 @@ export function ModelPicker({
 	onSelect,
 	open,
 }: ModelPickerProps) {
+	const { t } = useLingui();
 	const searchRef = useRef<HTMLInputElement>(null);
 	const settingsRef = useRef<HTMLDivElement>(null);
 	const isDark = useIsDarkTheme();
@@ -97,8 +102,8 @@ export function ModelPicker({
 			option.options.length > 0,
 	);
 	const fast = fastOption(settings);
+	const fastOn = fast?.currentValue === "on";
 	const effort = settings.find((option) => option.category === "thought_level");
-	const effortLabel = currentLabel(effort);
 	// The slider card owns effort and the fast toggle; the rest stay as rows.
 	const rows = settings.filter(
 		(option) => option !== effort && (effort ? option !== fast : true),
@@ -107,10 +112,19 @@ export function ModelPicker({
 	const showsModels = Boolean(model) || canSwitchAgent;
 	const currentAgentLabel = currentAgent?.label;
 	const pillLabel =
-		currentLabel(model) ??
+		currentModelLabel(model) ??
 		model?.label ??
 		currentAgentLabel ??
 		settings[0]?.label;
+	const currentEffort = effort?.options.find(
+		(entry) => entry.id === effort.currentValue,
+	);
+	const currentEffortLabel =
+		currentEffort?.id === agentSwitcher?.defaultOptionId
+			? (currentEffort?.description ?? currentEffort?.label)
+			: currentEffort?.label;
+	const effortLabel =
+		currentEffortLabel === pillLabel ? undefined : currentEffortLabel;
 	const modelLabelHidden = Boolean(hideModelLabel && agentIcon);
 	const hiddenLabels = [
 		modelLabelHidden ? pillLabel : null,
@@ -186,6 +200,15 @@ export function ModelPicker({
 					) : effortLabel ? (
 						<span className="shrink-0 text-muted-foreground">
 							{effortLabel}
+						</span>
+					) : null}
+					{fastOn ? (
+						<span
+							className="flex shrink-0 items-center text-highlight"
+							data-slot="fast-indicator"
+						>
+							<LuZap aria-hidden="true" className="size-3.5 fill-current" />
+							<span className="sr-only">{t({ message: "Fast" })}</span>
 						</span>
 					) : null}
 					<LuChevronDown className={PILL_CHEVRON_CLASS} />

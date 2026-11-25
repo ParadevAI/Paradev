@@ -27,9 +27,9 @@ The desktop app includes this skill. For standalone agents, see [Skills installa
 
 The coordinator uses the [Paradev CLI](/cli/getting-started):
 
-- `superset workspaces create` for a separate branch per worker
-- `superset agents create` to launch a worker with a bounded prompt
-- `superset terminals read` / `send` to monitor progress and deliver follow-ups or dependency results
+- `paradev workspaces create` for a separate branch per worker
+- `paradev agents create` to launch a worker with a bounded prompt
+- `paradev terminals read` / `send` to monitor progress and deliver follow-ups or dependency results
 
 Workers finish by reporting a structured completion or blocked message, which the coordinator verifies before integrating. You review the results the same way as always: one branch and PR per worker.
 

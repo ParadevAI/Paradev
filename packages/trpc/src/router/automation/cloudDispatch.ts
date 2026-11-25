@@ -24,7 +24,7 @@ import {
 } from "../../lib/sandbox";
 import { acpChatEnabled } from "../../lib/user-settings";
 import { startCloudWorkspace } from "../cloud-workspace/start";
-import { transitionCloudWorkspace } from "../cloud-workspace/transition";
+import { failCloudWorkspace } from "../cloud-workspace/transition";
 import {
 	markSandboxUnavailable,
 	wakeCloudWorkspace,
@@ -257,7 +257,7 @@ async function assertOwnerMayUseCloud(
 }
 
 /** The pinned cloud workspace, awake, or null when it is gone. */
-async function reachablePin(
+export async function reachablePin(
 	cloudWorkspaceId: string,
 ): Promise<{ row: CloudWorkspaceRow; hostTarget: string } | null> {
 	const row = await db.query.cloudWorkspaces.findFirst({
@@ -268,10 +268,11 @@ async function reachablePin(
 	}
 	if (row.status === "provisioning") {
 		if (Date.now() - row.createdAt.getTime() > STRANDED_PROVISIONING_MS) {
-			await transitionCloudWorkspace({
-				id: row.id,
+			await failCloudWorkspace({
+				scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 				from: ["provisioning"],
-				to: "failed",
+				reason: "create_failed",
+				error: new Error("A pinned workspace stayed in provisioning"),
 			});
 			return null;
 		}

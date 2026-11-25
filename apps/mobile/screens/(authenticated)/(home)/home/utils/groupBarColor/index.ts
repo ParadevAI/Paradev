@@ -1,0 +1,1 @@
+export { groupBarColor } from "./groupBarColor";

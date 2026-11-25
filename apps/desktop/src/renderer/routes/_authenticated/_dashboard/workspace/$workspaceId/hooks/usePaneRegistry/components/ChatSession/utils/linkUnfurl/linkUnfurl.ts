@@ -1,5 +1,5 @@
+import { stripLocation } from "renderer/lib/pathText";
 import { parseGithubWorkItemUrl } from "../githubWorkItem";
-import { stripLocation } from "../pathText";
 import { parseSupersetAppLink } from "../supersetAppLink";
 
 export type LinkUnfurl = {
@@ -39,6 +39,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)firecrawl\.dev$/, "firecrawl"],
 	[/(^|\.)wisprflow\.ai$/, "wispr"],
 	[/(^|\.)ahrefs\.com$/, "ahrefs"],
+	[/(^|\.)planetscale\.com$/, "planetscale"],
 ];
 
 const FILE_EXTENSION = /[^.]\.((?=\d*[a-z])[a-z0-9]{1,8})$/i;

@@ -91,6 +91,8 @@ export interface PullRequestDetailRead {
 		mergedBy: { login: string; avatarUrl: string | null } | null;
 	};
 	checks: PullRequestDetailCheck[];
+	/** GitHub refused the token some status checks, so `checks` may be incomplete. Absent from API builds older than this field. */
+	checksUnavailable?: boolean;
 	reviewers: PullRequestDetailReviewer[];
 	mergeability: {
 		mergeable: string;
@@ -603,6 +605,11 @@ export async function readPullRequestDetail(
 ): Promise<PullRequestDetailRead> {
 	const activity = options.activity ?? false;
 	const onRefused = options.onRefused ?? (() => {});
+	let checksUnavailable = false;
+	const onChecksRefused = (error: unknown) => {
+		checksUnavailable = true;
+		onRefused(error);
+	};
 	const requestedReviewers = client.requestedReviewers(input);
 	// Awaited below; this only stops an unhandled rejection when the read
 	// above fails first.
@@ -614,7 +621,7 @@ export async function readPullRequestDetail(
 		PULL_REQUEST_DETAIL_QUERY,
 		{ ...variables(input), activity },
 		CHECKS_PATH,
-		onRefused,
+		onChecksRefused,
 	);
 	const core = data.repository?.pullRequest;
 	if (!core) {
@@ -663,7 +670,7 @@ export async function readPullRequestDetail(
 						CHECK_CONTEXTS_PAGE_QUERY,
 						variables(input, cursor),
 						CHECKS_PATH,
-						onRefused,
+						onChecksRefused,
 					)
 				).repository?.pullRequest?.statusCheckRollup?.contexts,
 		),
@@ -760,6 +767,7 @@ export async function readPullRequestDetail(
 				: null,
 		},
 		checks,
+		checksUnavailable,
 		reviewers: [...reviewers.values()],
 		mergeability: {
 			mergeable: pr.mergeable,

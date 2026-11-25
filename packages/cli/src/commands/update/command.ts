@@ -135,7 +135,7 @@ export default command({
 		const currentVersion = getCurrentVersion();
 		if (currentVersion === "0.0.0-dev") {
 			throw new CLIError(
-				"`superset update` is only available in built binaries",
+				"`paradev update` is only available in built binaries",
 				"You're running a dev build (`bun run dev`). Re-run with the released binary.",
 			);
 		}

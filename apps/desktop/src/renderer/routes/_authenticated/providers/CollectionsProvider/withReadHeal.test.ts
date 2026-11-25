@@ -36,6 +36,58 @@ const noopEvents = {
 	removeEventListener: () => {},
 };
 
+it("workspace activity choices survive saving and reopening the workspace collection", async () => {
+	const { api: storage } = makeMapStorage();
+	const makeCollection = (id: string) =>
+		createCollection(
+			localStorageCollectionOptions(
+				withReadHeal(
+					{
+						id,
+						storageKey: "test-activity-visibility",
+						schema: workspaceLocalStateSchema,
+						getKey: (item: WorkspaceLocalStateRow) => item.workspaceId,
+						storage,
+						storageEventApi: noopEvents,
+					},
+					healWorkspaceLocalState,
+				),
+			),
+		);
+	const hiddenId = "11111111-1111-4111-8111-111111111111";
+	const shownId = "22222222-2222-4222-8222-222222222222";
+	const before = makeCollection("activity-before");
+	await before.preload();
+	for (const workspaceId of [hiddenId, shownId]) {
+		await before.insert({
+			workspaceId,
+			createdAt: new Date(),
+			sidebarState: { projectId: null },
+			paneLayout: { version: 1, tabs: [], activeTabId: null },
+		}).isPersisted.promise;
+	}
+	for (const [workspaceId, hidden] of [
+		[hiddenId, true],
+		[shownId, false],
+	] as const) {
+		await before.update(workspaceId, (draft) => {
+			draft.activityPanelHidden = hidden;
+		}).isPersisted.promise;
+	}
+	await before.cleanup();
+	const after = makeCollection("activity-after");
+	await after.preload();
+	expect(after.get(hiddenId)?.activityPanelHidden).toBe(true);
+	expect(after.get(shownId)?.activityPanelHidden).toBe(false);
+	await after.delete(hiddenId).isPersisted.promise;
+	await after.cleanup();
+	const reopened = makeCollection("activity-reopened");
+	await reopened.preload();
+	expect(reopened.has(hiddenId)).toBe(false);
+	expect(reopened.get(shownId)?.activityPanelHidden).toBe(false);
+	await reopened.cleanup();
+});
+
 describe("withReadHeal parser", () => {
 	it("heals each entry's data through the heal fn while preserving the envelope", () => {
 		const heal = (raw: unknown) => ({ ...(raw as object), healed: true });

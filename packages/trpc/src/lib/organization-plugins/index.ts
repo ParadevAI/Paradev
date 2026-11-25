@@ -12,6 +12,7 @@ export { sweepOrganizationPluginBundles } from "./bundles";
 export {
 	OrganizationPluginError,
 	organizationBundleKey,
+	organizationPluginIconUrl,
 	organizationPluginProblem,
 	readOrganizationBundle,
 } from "./rules";

@@ -8,7 +8,7 @@ export function GET() {
 	const lines = [
 		`# ${BRAND.INTRO_NAME} Documentation`,
 		"",
-		`> Official documentation for ${BRAND.INTRO_NAME} — run parallel AI coding agents in isolated Git worktrees on your machine.`,
+		`> Official documentation for ${BRAND.INTRO_NAME}: run parallel AI coding agents in a chat or a terminal, in Git worktrees on your machine or in cloud workspaces.`,
 		"",
 		"Fetch the relevant Markdown pages linked below. Each page includes its source URL and description, followed by the full documentation content.",
 		"",

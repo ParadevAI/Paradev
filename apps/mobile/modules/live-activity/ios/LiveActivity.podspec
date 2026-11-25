@@ -5,10 +5,10 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'LiveActivity'
   s.version        = package['version']
-  s.summary        = 'ActivityKit bridge for Superset'
+  s.summary        = 'ActivityKit bridge for Paradev'
   s.description    = 'Starts, updates and ends the agent-status Live Activity'
   s.license        = 'MIT'
-  s.author         = 'Superset'
+  s.author         = 'Paradev'
   s.homepage       = 'https://superset.sh'
   s.platforms      = { :ios => '26.0' }
   s.swift_version  = '5.9'

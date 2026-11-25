@@ -1,6 +1,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { basename, extname, resolve } from "node:path";
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { OFFERED_VISIBILITIES } from "@superset/trpc/page-schema";
 import { command } from "../../../lib/command";
 import { resolveWorkspaceId } from "../workspaceRef";
@@ -92,13 +93,13 @@ export default command({
 		const entryPath =
 			resolveEntryPath({
 				filePath: entryFilePath,
-				workspacePath: process.env.SUPERSET_WORKSPACE_PATH,
+				workspacePath: readPublicEnv("WORKSPACE_PATH"),
 			}) ??
 			(isDirectory
 				? `${EXTERNAL_ENTRY_PREFIX}${basename(inputPath)}/index.html`
 				: externalEntryPath(entryFilePath));
 
-		const workspaceRef = options.workspace ?? process.env.SUPERSET_WORKSPACE_ID;
+		const workspaceRef = options.workspace ?? readPublicEnv("WORKSPACE_ID");
 		const workspaceId = workspaceRef
 			? await resolveWorkspaceId({
 					value: workspaceRef,

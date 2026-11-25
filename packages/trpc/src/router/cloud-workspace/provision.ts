@@ -1,24 +1,21 @@
 import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
+import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { cloudUsageRefusalKey } from "@superset/shared/billing";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
-import {
-	type ControlScope,
-	captureControlException,
-	errorClass,
-	logControl,
-	logStepFailed,
-} from "../../lib/control-log";
+import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
+	bootPhases,
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
-	recordBootSpans,
 	SandboxNotReadyError,
+	scheduleRulesRefresh,
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
@@ -27,15 +24,10 @@ import {
 	queueChatMovesTo,
 } from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
-import {
-	attachBootSession,
-	authorizeBoot,
-	boxFor,
-	isUsageRefusal,
-	releaseBoot,
-} from "./meter";
+import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { transitionCloudWorkspace } from "./transition";
+import { recordBootTrace } from "./sandbox-sleep";
+import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
 
@@ -62,6 +54,18 @@ export interface ProvisionCloudWorkspaceInput {
 	namingPrompt?: string;
 	/** A built-in agent to run once the sandbox is up; see cloud-agent-launch. */
 	launch?: CloudAgentLaunch;
+}
+
+function provisionFailureReason(error: unknown): CloudWorkspaceFailureReason {
+	switch (cloudUsageRefusalKey(error)) {
+		case "serverError.cloudWorkspace.usageLimitReached":
+			return "usage_limit";
+		case "serverError.cloudWorkspace.cloudNeedsPaidPlan":
+			return "needs_paid_plan";
+	}
+	return error instanceof SandboxNotReadyError
+		? "host_not_ready"
+		: "create_failed";
 }
 
 export type ProvisionCloudWorkspaceOutcome =
@@ -108,16 +112,7 @@ async function provision(
 		where: eq(cloudWorkspaces.id, input.cloudWorkspaceId),
 	});
 	if (!row) return "skipped";
-	const scope: ControlScope = {
-		cloudWorkspaceId: row.id,
-		organizationId: row.organizationId,
-	};
-	if (row.status !== "provisioning") {
-		logControl("provision.skipped", scope, { "workspace.status": row.status });
-		return "skipped";
-	}
-	const startedAt = Date.now();
-	logControl("provision.started", scope, {});
+	if (row.status !== "provisioning") return "skipped";
 
 	const providerSandboxId = row.providerSandboxId;
 	const naming =
@@ -135,20 +130,23 @@ async function provision(
 				);
 	let bootId: string | null = null;
 	try {
-		const { claim, environment, agentCredentialDigest } =
+		const { claim, environment, agentCredentialDigest, rulesExpireAt } =
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
 				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
 			);
-		({ bootId } = await authorizeBoot({
-			organizationId: row.organizationId,
-			cloudWorkspaceId: row.id,
-			createdByUserId: row.createdByUserId,
-			...boxFor(claim.vcpus),
-		}));
-		if (bootId) {
-			scope.bootId = bootId;
-			span.setAttribute("boot.id", bootId);
-		}
+		({ bootId } = await Sentry.startSpan(
+			{ name: "authorize boot", op: "billing" },
+			() =>
+				authorizeBoot({
+					organizationId: row.organizationId,
+					cloudWorkspaceId: row.id,
+					createdByUserId: row.createdByUserId,
+					...boxFor(claim.vcpus),
+					origin: "create",
+					traceId: span.spanContext().traceId,
+				}),
+		));
+		if (bootId) span.setAttribute("boot.id", bootId);
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
 			() => provisionSandbox({ name: providerSandboxId, environment, claim }),
@@ -174,32 +172,35 @@ async function provision(
 			});
 			if (current?.status === "archived") {
 				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
-					(error) => logStepFailed("chat_moves.fail", scope, error),
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
 				);
 				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId, "provision_abandoned");
 			}
-			logControl("provision.abandoned", scope, {
-				"box.deleted": current?.status === "archived",
-			});
 			await naming.catch(() => {});
 			return "skipped";
 		}
 		nudge(row.organizationId, "cloud_workspaces");
-		logControl("provision.awake", scope, { ms: Date.now() - startedAt });
+		await scheduleRulesRefresh(row.id, rulesExpireAt);
 		if (sandbox.expiresAt) {
-			await recordSandboxAwake(
-				row.id,
-				{
-					expiresAt: sandbox.expiresAt,
-					sessionId: sandbox.sessionId,
-				},
-				row.organizationId,
-			);
+			await recordSandboxAwake(row.id, {
+				expiresAt: sandbox.expiresAt,
+				sessionId: sandbox.sessionId,
+			});
 		}
 		if (bootId) {
 			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
-				captureControlException(error, scope),
+				Sentry.captureException(error, {
+					tags: controlTags({
+						cloudWorkspaceId: row.id,
+						organizationId: row.organizationId,
+						bootId,
+					}),
+				}),
 			);
 		}
 		// The box is booting; the environment it needs arrives once host-service
@@ -215,21 +216,28 @@ async function provision(
 				}),
 		);
 		await queueChatMovesTo(row.id).catch((error) =>
-			logStepFailed("chat_moves.queue", scope, error),
+			console.error(
+				`[cloud-workspace] could not start the chat moving into ${row.id}`,
+				error,
+			),
 		);
-		try {
-			recordBootSpans(answer);
-		} catch (error) {
-			logStepFailed("boot.trace", scope, error);
-		}
-		await naming.catch((error) => logStepFailed("naming", scope, error));
-		logControl("provision.completed", scope, { ms: Date.now() - startedAt });
+		await recordBootTrace(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
+			span,
+			bootPhases(answer),
+		);
+		await naming.catch((error) =>
+			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
+		);
 		return "provisioned";
 	} catch (error) {
 		await naming.catch(() => {});
 		if (bootId) {
 			await releaseBoot(bootId, "provision_failed").catch((releaseError) =>
-				logStepFailed("boot.release", scope, releaseError),
+				console.error(
+					`[cloud-workspace] could not release boot ${bootId}`,
+					releaseError,
+				),
 			);
 		}
 		// A box that booted but whose host-service never answered is kept for
@@ -238,37 +246,33 @@ async function provision(
 		// from the sidebar still removes it. Any other failure must not leak
 		// a box, since billing started at provision.
 		const keepForDiagnosis = error instanceof SandboxNotReadyError;
-		const refused = isUsageRefusal(error);
 		await (keepForDiagnosis ? stopSandbox : deleteSandbox)(
 			providerSandboxId,
-		).catch((teardownError) =>
-			logStepFailed("sandbox.teardown", scope, teardownError),
-		);
-		const changed = await transitionCloudWorkspace({
-			id: row.id,
-			from: ["provisioning", "awake", "asleep"],
-			to: "failed",
-			set: keepForDiagnosis ? { providerSandboxId } : {},
+		).catch((teardownError) => {
+			console.error(
+				`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}`,
+				teardownError,
+			);
 		});
-		nudge(row.organizationId, "cloud_workspaces");
-		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
-			(moveError) => logStepFailed("chat_moves.fail", scope, moveError),
-		);
-		logControl(
-			"workspace.failed",
-			scope,
-			{
-				"failure.site": "provision",
-				"error.class": errorClass(error),
-				"status.changed": changed,
-				"failure.refused": refused,
-				"sandbox.kept": keepForDiagnosis,
+		await failCloudWorkspace({
+			scope: {
+				cloudWorkspaceId: row.id,
+				organizationId: row.organizationId,
+				bootId,
 			},
+			from: ["provisioning", "awake", "asleep"],
+			set: keepForDiagnosis ? { providerSandboxId } : {},
+			reason: provisionFailureReason(error),
 			error,
+		});
+		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
+			(moveError) =>
+				console.error(
+					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+					moveError,
+				),
 		);
-		if (!refused) {
-			captureControlException(error, scope, { failureSite: "provision" });
-		}
+		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
 	}
 }

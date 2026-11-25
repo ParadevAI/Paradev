@@ -29,10 +29,8 @@ import {
 	useChatSubagentStore,
 } from "../../stores/chatSubagentStore";
 import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
-import { AccountUsageMenuSection } from "../AccountUsageMenuSection";
 import { ForkMenuItems } from "../ForkMenuItems";
 import { StopHeaderEvents } from "../StopHeaderEvents";
-import { UsageWarningDot } from "../UsageWarningDot";
 import { ChatHistoryPicker } from "./components/ChatHistoryPicker";
 import { RecentChatsMenuItems } from "./components/RecentChatsMenuItems";
 import { SubagentBreadcrumb } from "./components/SubagentBreadcrumb";
@@ -128,7 +126,6 @@ export function ChatPaneTitle({
 				<span className="shrink-0 text-muted-foreground">{icon}</span>
 				<span className="truncate">{title}</span>
 				<ChevronDown className="size-3 shrink-0 opacity-60" />
-				<UsageWarningDot workspaceId={workspaceId} terminalId={chatKey} />
 			</button>
 		</DropdownMenuTrigger>
 	);
@@ -207,10 +204,6 @@ export function ChatPaneTitle({
 								<Search />
 								<Trans>Search all chats…</Trans>
 							</DropdownMenuItem>
-							<AccountUsageMenuSection
-								workspaceId={workspaceId}
-								terminalId={chatKey}
-							/>
 							{(forkSource || forkIntoChat) && (
 								<>
 									<DropdownMenuSeparator />

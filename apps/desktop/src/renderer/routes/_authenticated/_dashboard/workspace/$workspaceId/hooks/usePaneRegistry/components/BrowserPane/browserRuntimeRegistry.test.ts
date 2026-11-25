@@ -32,6 +32,7 @@ const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
 		unregister: { mutate: unregister },
 		onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
 		onAgentUse: { subscribe: () => ({ unsubscribe: () => {} }) },
+		onViewportZoom: { subscribe: () => ({ unsubscribe: () => {} }) },
 		getUnloadInfo: {
 			query: (input: { paneIds: string[] }) => unloadInfo(input),
 		},
@@ -384,7 +385,9 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 			isLoading: boolean;
 			error: { code: number } | null;
 		};
-		onPersist: ((state: { url: string }) => void) | null;
+		onPersist:
+			| ((state: { url: string; faviconUrl: string | null }) => void)
+			| null;
 		onClose: (() => void) | null;
 	}
 	const registryInternals = browserRuntimeRegistry as unknown as {
@@ -447,6 +450,7 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 
 			fire(entry.webview, "did-navigate-in-page", {
 				url: "http://localhost:3000/app#tab",
+				isMainFrame: true,
 			});
 			expect(browserRuntimeRegistry.getState(paneId).currentUrl).toBe(
 				"http://localhost:3000/app#tab",
@@ -456,7 +460,51 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 		}
 	});
 
-	test("records the attempted URL of a failed main-frame load only", () => {
+	test("preserves the page URL when an iframe navigates in-page", () => {
+		const paneId = "subframe-navigation-pane";
+		const entry = createEntry(paneId);
+		const persisted: string[] = [];
+		entry.onPersist = (state) => persisted.push(state.url);
+		try {
+			fire(entry.webview, "did-navigate", { url: "http://localhost:3000/app" });
+			fire(entry.webview, "page-title-updated", { title: "App" });
+			fire(entry.webview, "did-navigate-in-page", {
+				url: "http://frame.example/embed#tab",
+				isMainFrame: false,
+			});
+			fire(entry.webview, "did-stop-loading");
+
+			expect(browserRuntimeRegistry.getState(paneId).currentUrl).toBe(
+				"http://localhost:3000/app",
+			);
+			expect(browserRuntimeRegistry.getState(paneId).pageTitle).toBe("App");
+			expect(persisted).toEqual(["http://localhost:3000/app"]);
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("does not replace the page with an iframe load error", () => {
+		const paneId = "subframe-failed-load-pane";
+		const entry = createEntry(paneId);
+		try {
+			fire(entry.webview, "did-start-loading");
+			const state = browserRuntimeRegistry.getState(paneId);
+			fire(entry.webview, "did-fail-load", {
+				errorCode: -102,
+				errorDescription: "ERR_CONNECTION_REFUSED",
+				validatedURL: "http://frame.example/embed",
+				isMainFrame: false,
+			});
+			expect(browserRuntimeRegistry.getState(paneId)).toBe(state);
+			expect(state.error).toBeNull();
+			expect(state.isLoading).toBe(true);
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("records a main-frame load error without replacing it with an iframe error", () => {
 		const paneId = "lifecycle-failed-load-pane";
 		const entry = createEntry(paneId);
 		try {
@@ -478,6 +526,54 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 			});
 			state = browserRuntimeRegistry.getState(paneId);
 			expect(state.currentUrl).toBe("http://localhost:3000/");
+			expect(state.error?.code).toBe(-102);
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("keeps the favicon when an iframe starts loading after the page", () => {
+		const paneId = "late-iframe-favicon-pane";
+		const entry = createEntry(paneId);
+		const persisted: (string | null)[] = [];
+		entry.onPersist = (state) => persisted.push(state.faviconUrl);
+		try {
+			fire(entry.webview, "did-start-loading");
+			fire(entry.webview, "did-navigate", { url: "http://localhost:3000/" });
+			fire(entry.webview, "page-favicon-updated", {
+				favicons: ["http://localhost:3000/icon.svg"],
+			});
+			fire(entry.webview, "did-stop-loading");
+			fire(entry.webview, "did-start-loading");
+			fire(entry.webview, "did-stop-loading");
+
+			expect(browserRuntimeRegistry.getState(paneId).faviconUrl).toBe(
+				"http://localhost:3000/icon.svg",
+			);
+			expect(persisted.at(-1)).toBe("http://localhost:3000/icon.svg");
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("drops the favicon when the main frame commits a new document or fails", () => {
+		const paneId = "main-frame-favicon-pane";
+		const entry = createEntry(paneId);
+		const icon = { favicons: ["http://localhost:3000/icon.svg"] };
+		try {
+			fire(entry.webview, "did-navigate", { url: "http://localhost:3000/" });
+			fire(entry.webview, "page-favicon-updated", icon);
+			fire(entry.webview, "did-navigate", { url: "http://other.example/" });
+			expect(browserRuntimeRegistry.getState(paneId).faviconUrl).toBeNull();
+
+			fire(entry.webview, "page-favicon-updated", icon);
+			fire(entry.webview, "did-fail-load", {
+				errorCode: -102,
+				errorDescription: "ERR_CONNECTION_REFUSED",
+				validatedURL: "http://localhost:3000/",
+				isMainFrame: true,
+			});
+			expect(browserRuntimeRegistry.getState(paneId).faviconUrl).toBeNull();
 		} finally {
 			registryInternals.entries.delete(paneId);
 		}

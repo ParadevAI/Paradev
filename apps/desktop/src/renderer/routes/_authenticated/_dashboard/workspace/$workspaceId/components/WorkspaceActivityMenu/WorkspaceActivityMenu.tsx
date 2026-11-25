@@ -21,6 +21,7 @@ import {
 import { createPortal } from "react-dom";
 import { env } from "renderer/env.renderer";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -63,7 +64,7 @@ import {
 	getAttachedTerminalIdsKey,
 	getBackgroundTerminalRefetchInterval,
 	getBackgroundTerminalSessions,
-	parseAttachedTerminalIdsKey,
+	getTabbedTerminalIds,
 } from "../../utils/backgroundTerminals";
 import { changesPillStats } from "../../utils/changesPillStats";
 import type { AgentWork } from "../../utils/collectAgentWork";
@@ -95,6 +96,7 @@ import {
 	PANEL_MAX_HEIGHT_PX,
 	VIEW_ENTER_CLASSNAME,
 } from "./constants";
+import { useActivityPanelVisibility } from "./hooks/useActivityPanelVisibility";
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
 import { useWorkspacePullRequests } from "./hooks/useWorkspacePullRequests";
@@ -171,10 +173,7 @@ export function WorkspaceActivityMenu({
 	const fits = useActivityPanelStore(
 		(state) => state.fits[workspaceId] === true,
 	);
-	const hidden = useActivityPanelStore(
-		(state) => state.hidden[workspaceId] === true,
-	);
-	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const { hidden, setHidden } = useActivityPanelVisibility(workspaceId);
 	const subagentsCollapsed = useActivityPanelStore(
 		(state) => state.subagentsCollapsed[workspaceId] === true,
 	);
@@ -328,14 +327,11 @@ export function WorkspaceActivityMenu({
 		getAttachedSnapshot,
 		getAttachedSnapshot,
 	);
-	const terminalSessionsQuery = workspaceTrpc.terminal.list.useQuery(
-		{ workspaceId },
-		{
-			refetchInterval: getBackgroundTerminalRefetchInterval(open),
-			refetchOnWindowFocus: open,
-			staleTime: open ? 1_000 : 5_000,
-		},
-	);
+	const terminalSessionsQuery = useWorkspaceTerminalSessions(workspaceId, {
+		refetchInterval: getBackgroundTerminalRefetchInterval(open),
+		refetchOnWindowFocus: open,
+		staleTime: open ? 1_000 : 5_000,
+	});
 	const settledAttachedTerminalIdsKey = useDebouncedValue(
 		attachedTerminalIdsKey,
 		BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS,
@@ -345,13 +341,17 @@ export function WorkspaceActivityMenu({
 			isLayoutReady
 				? getBackgroundTerminalSessions(
 						terminalSessionsQuery.data?.sessions ?? [],
-						parseAttachedTerminalIdsKey(settledAttachedTerminalIdsKey),
+						getTabbedTerminalIds(
+							attachedTerminalIdsKey,
+							settledAttachedTerminalIdsKey,
+						),
 					)
 				: [],
 		[
 			isLayoutReady,
 			terminalSessionsQuery.data?.sessions,
 			settledAttachedTerminalIdsKey,
+			attachedTerminalIdsKey,
 		],
 	);
 	const processes = useMemo(
@@ -564,7 +564,7 @@ export function WorkspaceActivityMenu({
 				: null;
 	const onTriggerClick = () => {
 		if (fits) {
-			setHidden(workspaceId, !hidden);
+			setHidden(!hidden);
 			return;
 		}
 		setFloating(!popoverOpen);

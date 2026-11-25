@@ -1,4 +1,8 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { simpleGit } from "simple-git";
 import {
 	collectWorktreeBatchPaths,
 	DEBOUNCE_MS,
@@ -23,8 +27,11 @@ interface GitWatcherInternals {
 	scheduleFlush(workspaceId: string): void;
 	getOrCreateIgnoredDirsState(workspaceId: string): {
 		dirs: ReadonlySet<string>;
+		lastRefreshAt: number;
 		rulesChanged: boolean;
 	};
+	refreshIgnoredDirs(workspaceId: string, worktreePath: string): void;
+	watched: Map<string, unknown>;
 }
 
 function createWatcher(): GitWatcher {
@@ -223,6 +230,44 @@ describe("GitWatcher ignore-rule staleness flag", () => {
 			state.dirs,
 		);
 		expect(filtered.sawGitignoreChange).toBe(true);
+	});
+
+	test("a rule change right after a refresh re-checks the native prune", async () => {
+		const repo = await mkdtemp(join(tmpdir(), "git-watcher-rules-"));
+		await simpleGit(repo).init();
+		let rechecked: () => void = () => {};
+		const recheck = new Promise<void>((resolve) => {
+			rechecked = resolve;
+		});
+		const watcher = new GitWatcher(
+			{} as unknown as ConstructorParameters<typeof GitWatcher>[0],
+			{
+				refreshWatcherIgnores: async () => {
+					rechecked();
+					return false;
+				},
+			} as unknown as ConstructorParameters<typeof GitWatcher>[1],
+		);
+		try {
+			internals(watcher).watched.set("w", {
+				controller: new AbortController(),
+				workspaceId: "w",
+				worktreePath: repo,
+				watcher: { close() {} },
+				disposeWorktreeWatch() {},
+			});
+			const state = internals(watcher).getOrCreateIgnoredDirsState("w");
+			state.lastRefreshAt = Date.now();
+			state.rulesChanged = true;
+
+			internals(watcher).refreshIgnoredDirs("w", repo);
+
+			expect(state.rulesChanged).toBe(false);
+			await recheck;
+		} finally {
+			watcher.close();
+			await rm(repo, { recursive: true, force: true });
+		}
 	});
 });
 

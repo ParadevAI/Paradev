@@ -1,36 +1,66 @@
-import { CLIError, positional, string } from "@superset/cli-framework";
+import { readFileSync } from "node:fs";
+import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
 import { resolveEnvironment } from "../../../lib/environments";
 
 export default command({
 	sandbox: false,
-	description: "Rename an environment or change who can use it",
+	description:
+		"Rename an environment, change who can use it, or set the config.toml its builds and cloud workspaces run",
 	args: [positional("environment").required().desc("Environment ID")],
 	options: {
 		name: string().desc("New name"),
 		scope: string().enum("organization", "personal").desc("Who can use it"),
+		config: string().desc(
+			"Path to a config.toml to store as the environment's config; without one, the cloud reads the primary repository's own .paradev/config.toml",
+		),
+		clearConfig: boolean().desc("Remove the environment's config"),
 	},
 	run: async ({ ctx, args, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
-		if (!options.name && !options.scope) {
-			throw new CLIError("Nothing to change", "Pass --name or --scope");
+		if (options.config && options.clearConfig) {
+			throw new CLIError("Pass --config or --clear-config, not both");
+		}
+		if (
+			!options.name &&
+			!options.scope &&
+			!options.config &&
+			!options.clearConfig
+		) {
+			throw new CLIError(
+				"Nothing to change",
+				"Pass --name, --scope, --config or --clear-config",
+			);
 		}
 		const environment = await resolveEnvironment(
 			ctx.api,
 			organizationId,
 			args.environment as string,
 		);
+		const config = options.clearConfig
+			? null
+			: options.config
+				? readFileSync(options.config, "utf-8")
+				: undefined;
 		const updated = await ctx.api.environment.update.mutate({
 			id: environment.id,
 			name: options.name,
 			scope: options.scope,
+			config,
 		});
+		const name = updated?.name ?? environment.name;
+		const rebuild = `paradev environments rebuild ${environment.id}`;
 		return {
 			data: updated,
-			message: `Updated ${updated?.name ?? environment.name}`,
+			message:
+				config === undefined
+					? `Updated ${name}`
+					: updated?.config
+						? `Updated ${name}; run ${rebuild} to build it with this config`
+						: `Cleared ${name}'s config; the cloud reads the primary repository's .paradev/config.toml again. Run ${rebuild} to build from it`,
 		};
 	},
 });

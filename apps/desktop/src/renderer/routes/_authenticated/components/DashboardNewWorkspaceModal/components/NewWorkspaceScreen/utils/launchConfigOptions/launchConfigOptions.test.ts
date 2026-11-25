@@ -7,7 +7,7 @@ import {
 
 const labels = {
 	model: "Model",
-	defaultModel: "Default model",
+	defaultModel: "Default",
 	effort: "Effort",
 	defaultEffort: "Default effort",
 };
@@ -49,6 +49,22 @@ describe("launchConfigOptions", () => {
 			labels,
 		});
 		expect(effort?.currentValue).toBe(AGENT_DEFAULT_OPTION_ID);
+	});
+
+	test("the default effort says what the runtime resolves it to", () => {
+		const [effort] = launchConfigOptions({
+			modelSupport: undefined,
+			selectedModel: null,
+			efforts: [{ id: "low", label: "Low" }],
+			selectedEffort: null,
+			defaultEffortLabel: "High",
+			labels,
+		});
+		expect(effort?.options[0]).toEqual({
+			id: AGENT_DEFAULT_OPTION_ID,
+			label: "Default effort",
+			description: "High",
+		});
 	});
 
 	test("omits what the agent has no catalog for", () => {

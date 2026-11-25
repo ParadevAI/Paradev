@@ -19,6 +19,7 @@ export type AcpHarness = {
 	clientApprovalModes?: boolean;
 	/** Forks a session up to a given message (JetBrains AIR fork point), so a rewind keeps the agent's own history. */
 	forkAtMessage?: boolean;
+	protocolVersion?: number;
 	note: string;
 } & AcpTranslator;
 
@@ -35,6 +36,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		// The adapter serves ACP v2 since 0.95, where steering is not yet
 		// supported and turns end differently. Chat is built and tested on v1.
 		adapterEnv: { CLAUDE_AGENT_ACP_PROTOCOL: "v1" },
+		protocolVersion: 1,
 		fullAccessModeId: "bypassPermissions",
 		forkAtMessage: true,
 		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 verified with 2.1.226 and 2.1.311: a background subagent ends the turn at its reply, the follow-up arrives as a `turn` async task, and steering is advertised.",

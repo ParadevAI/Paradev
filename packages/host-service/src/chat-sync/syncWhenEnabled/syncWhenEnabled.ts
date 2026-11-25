@@ -13,11 +13,12 @@ const defaultSchedule: Schedule = (run, ms) => {
 };
 
 /**
- * Starts a box's chat sync once the API says its owner has it, asking again
- * every hour while they do not and soon after a failed ask.
+ * Starts a box's chat sync once the API says its owner has it. Asks again
+ * every hour, soon after a failed ask, so a new checkpoint gap from the API
+ * reaches a box without a release.
  */
 export function syncWhenEnabled(args: {
-	chatSync: Pick<ChatSync, "start">;
+	chatSync: Pick<ChatSync, "start" | "setCheckpointGap">;
 	api: Pick<ApiClient, "chatHistory">;
 	schedule?: Schedule;
 }): () => void {
@@ -30,12 +31,11 @@ export function syncWhenEnabled(args: {
 		cancel = null;
 		let next = RECHECK_MS;
 		try {
-			const { enabled } = await args.api.chatHistory.syncEnabled.query();
+			const { enabled, checkpointGapMs } =
+				await args.api.chatHistory.syncEnabled.query();
 			if (stopped) return;
-			if (enabled) {
-				stopSync = args.chatSync.start();
-				return;
-			}
+			args.chatSync.setCheckpointGap(checkpointGapMs ?? null);
+			if (enabled && !stopSync) stopSync = args.chatSync.start();
 		} catch (error) {
 			if (stopped) return;
 			next = RETRY_MS;

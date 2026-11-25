@@ -12,6 +12,7 @@ interface Settings {
 	changesOpenTarget: ChangesOpenTarget;
 	dictationEnabled: boolean;
 	showParadevAnywhereButton: boolean;
+	showRailUsage: boolean;
 }
 
 interface SettingsStore extends Settings {
@@ -27,6 +28,7 @@ export const useSettings = create<SettingsStore>()(
 			changesOpenTarget: "pane",
 			dictationEnabled: true,
 			showParadevAnywhereButton: true,
+			showRailUsage: true,
 			update: (key, value) => set({ [key]: value }),
 		}),
 		{ name: "settings" },

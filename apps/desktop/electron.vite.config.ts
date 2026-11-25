@@ -51,7 +51,7 @@ const hostServiceSentryPlugin = process.env.SENTRY_AUTH_TOKEN
 		})
 	: null;
 
-const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "paradev.com";
 
 export default defineConfig({
 	main: {
@@ -69,7 +69,7 @@ export default defineConfig({
 			),
 			"process.env.NEXT_PUBLIC_STREAMS_URL": defineEnv(
 				process.env.NEXT_PUBLIC_STREAMS_URL,
-				`https://streams.${rootDomain}`,
+				"https://streams.superset.sh",
 			),
 			"process.env.NEXT_PUBLIC_WEB_URL": defineEnv(
 				process.env.NEXT_PUBLIC_WEB_URL,

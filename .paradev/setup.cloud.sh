@@ -12,6 +12,8 @@ ROOT_DIR="$(cd "$PARADEV_SCRIPT_DIR/.." && pwd)"
 source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
 source "$PARADEV_SCRIPT_DIR/lib/setup/steps.sh"
+# shellcheck source=/dev/null
+source "$PARADEV_SCRIPT_DIR/lib/admin.sh"
 cd "$ROOT_DIR" || exit 1
 
 # The environment's variables, as a file, because step_write_env copies one.
@@ -27,7 +29,7 @@ cloud_write_environment_env() {
     local key="${entry%%=*}"
     local value="${entry#*=}"
     case "$key" in
-      SUPERSET_*|HOST_SERVICE_*|VERCEL_*|IS_SANDBOX|PATH|HOME|PWD|OLDPWD|SHLVL|_|DISPLAY|TERM|SHELL|HOSTNAME|LANG|LC_*|NODE_ENV|PORT|TMUX*|USER|LOGNAME|MAIL|DEBIAN_FRONTEND) continue ;;
+      SUPERSET_*|PARADEV_TERMINAL_ID|PARADEV_PANE_ID|PARADEV_TAB_ID|PARADEV_ORGANIZATION_ID|PARADEV_WORKSPACE_ID|PARADEV_WORKSPACE_NAME|PARADEV_WORKSPACE_PATH|PARADEV_ROOT_PATH|PARADEV_SANDBOX_WORKSPACE_ID|PARADEV_ENV|PARADEV_HOST_AGENT_HOOK_URL|PARADEV_HOME_DIR|HOST_SERVICE_*|VERCEL_*|IS_SANDBOX|PATH|HOME|PWD|OLDPWD|SHLVL|_|DISPLAY|TERM|SHELL|HOSTNAME|LANG|LC_*|NODE_ENV|PORT|TMUX*|USER|LOGNAME|MAIL|DEBIAN_FRONTEND) continue ;;
     esac
     [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
     if [[ "$value" == *$'\n'* ]]; then
@@ -67,7 +69,7 @@ renew_cloud_branch_lease() {
     warn "No Neon branch named $SUPERSET_WORKSPACE_NAME; setting up again"
     return 1
   fi
-  renew_neon_branch_lease "$branch_id"
+  renew_neon_branch_lease "$branch_id" "${NEON_PROJECT_ID:-}"
 }
 
 cloud_setup_main() {
@@ -79,13 +81,20 @@ cloud_setup_main() {
   # is archived or abandoned releases its branch without running any hook.
   export NEON_BRANCH_LEASE_DAYS=7
 
-  if already_set_up && renew_cloud_branch_lease; then
-    echo "This workspace already has its database and .env"
-    return 0
-  fi
-
   FAILED_STEPS=()
   SKIPPED_STEPS=()
+
+  # The ParadevAI/admin checkout, when the environment has that repository too.
+  local admin_dir=""
+  admin_dir="$(admin_checkout_dir)" || admin_dir=""
+
+  if already_set_up && renew_cloud_branch_lease; then
+    echo "This workspace already has its database and .env"
+    [ -n "$admin_dir" ] || return 0
+    step_setup_admin_checkout "$admin_dir" || step_failed "Set up admin checkout"
+    print_summary "Cloud setup (admin checkout)"
+    return
+  fi
 
   # The environment's variables land in .env beside the checkout either way —
   # step_write_env copies this file there. What this keeps out of the checkout
@@ -112,6 +121,9 @@ cloud_setup_main() {
     step_failed "Seed personal auth token"
   ( set -a; . "$ROOT_DIR/.env"; set +a; bun run db:seed-cloud-mobile-token ) ||
     step_failed "Seed mobile dev token"
+  if [ -n "$admin_dir" ]; then
+    step_setup_admin_checkout "$admin_dir" || step_failed "Set up admin checkout"
+  fi
 
   print_summary "Cloud setup"
 }

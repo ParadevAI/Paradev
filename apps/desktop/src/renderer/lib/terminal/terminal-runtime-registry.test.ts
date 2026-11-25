@@ -278,7 +278,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			transport: {},
 			linkManager: null,
 			pendingLinkHandlers: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 1,
 		}));
 		const registryInternals = terminalRuntimeRegistry as unknown as {
@@ -498,7 +497,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			transport: {},
 			linkManager: null,
 			pendingLinkHandlers: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 1,
 		};
 		const registryInternals = terminalRuntimeRegistry as unknown as {
@@ -560,7 +558,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			transport: { sessionEnded: true },
 			linkManager: null,
 			pendingLinkHandlers: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 1,
 		};
 		const registryInternals = terminalRuntimeRegistry as unknown as {
@@ -612,51 +609,6 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 		expect(fakeStorage.values.has(`terminal-dims:${terminalId}`)).toBe(false);
 	});
 
-	test("reschedules eviction when a parked terminal changes buffers", () => {
-		let emitBufferChange: () => void = () => {
-			throw new Error("buffer listener was not installed");
-		};
-		let listenerDisposed = false;
-		const runtime = {
-			container: {} as HTMLDivElement | null,
-			terminal: {
-				buffer: {
-					onBufferChange: (listener: () => void) => {
-						emitBufferChange = listener;
-						return { dispose: () => (listenerDisposed = true) };
-					},
-				},
-			},
-		};
-		const entry = {
-			runtime,
-			disposeBufferChangeListener: null as (() => void) | null,
-		};
-		const registryInternals = terminalRuntimeRegistry as unknown as {
-			observeBufferChanges: (observedEntry: typeof entry) => void;
-			pendingEviction: ReturnType<typeof setTimeout> | null;
-		};
-
-		if (registryInternals.pendingEviction !== null) {
-			clearTimeout(registryInternals.pendingEviction);
-			registryInternals.pendingEviction = null;
-		}
-		registryInternals.observeBufferChanges(entry);
-		emitBufferChange();
-		expect(registryInternals.pendingEviction).toBeNull();
-
-		runtime.container = null;
-		emitBufferChange();
-		expect(registryInternals.pendingEviction).not.toBeNull();
-
-		if (registryInternals.pendingEviction !== null) {
-			clearTimeout(registryInternals.pendingEviction);
-			registryInternals.pendingEviction = null;
-		}
-		entry.disposeBufferChangeListener?.();
-		expect(listenerDisposed).toBe(true);
-	});
-
 	test("defers eviction while flushed output is still being parsed", () => {
 		const terminalId = "parser-busy-terminal";
 		let flushed = false;
@@ -695,6 +647,35 @@ describe("terminalRuntimeRegistry eviction cleanup", () => {
 			expect(registryInternals.entries.has(entryKey)).toBe(true);
 		} finally {
 			registryInternals.entries.delete(entryKey);
+		}
+	});
+});
+
+describe("endedCleanly", () => {
+	test("a failing exit is clean only when the shell ended by itself", () => {
+		const entry: { transport: { exitStatus: unknown } } = {
+			transport: { exitStatus: null },
+		};
+		const internals = terminalRuntimeRegistry as unknown as {
+			getEntry: () => typeof entry;
+		};
+		const getEntry = spyOn(internals, "getEntry").mockReturnValue(entry);
+		try {
+			const endedCleanly = (exitStatus: unknown) => {
+				entry.transport.exitStatus = exitStatus;
+				return terminalRuntimeRegistry.endedCleanly("t1", "pane");
+			};
+			expect(endedCleanly(null)).toBe(false);
+			expect(endedCleanly({ exitCode: 0, signal: 0 })).toBe(true);
+			expect(endedCleanly({ exitCode: 1, signal: 0 })).toBe(false);
+			expect(endedCleanly({ exitCode: 1, signal: 0, shellExited: true })).toBe(
+				true,
+			);
+			expect(endedCleanly({ exitCode: 0, signal: 9, shellExited: true })).toBe(
+				false,
+			);
+		} finally {
+			getEntry.mockRestore();
 		}
 	});
 });

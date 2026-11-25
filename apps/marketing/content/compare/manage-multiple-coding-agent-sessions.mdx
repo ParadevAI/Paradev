@@ -136,7 +136,7 @@ The main alternatives add the two things tmux lacks: per-task worktrees and a re
 | Conductor | Mac app, closed to new users | Isolated workspaces | Yes | Claude Code, Codex, Cursor |
 | Orca | Desktop app | Yes | Yes | Any CLI |
 | Nimbalyst | Desktop app | Optional per session | Kanban by phase | Claude Code, Codex, more in alpha |
-| Paradev | Desktop app + CLI + iPhone | Yes, per workspace | Board by state, hooks | Any CLI, 20+ built in |
+| Paradev | Desktop app + CLI + mobile | Yes, per workspace | Board by state, hooks | Any CLI, 20+ built in |
 
 If you want to stay in the terminal, **Claude Squad** wraps tmux and worktrees in a TUI; see [Paradev vs Claude Squad](/compare/superset-vs-claude-squad). If you want a board of tasks with diffs, **Vibe Kanban** puts agent tasks in columns; see [Paradev vs Vibe Kanban](/compare/superset-vs-vibe-kanban). For the full list, see [tmux Alternatives for AI Coding Agents](/compare/tmux-alternatives-for-ai-agents).
 
@@ -159,7 +159,7 @@ Name each session after its task, keep transcripts readable, and make sessions c
 - **Names:** rename a terminal session in Paradev from the session dropdown; the name sticks across restarts. In tmux, name sessions per task.
 - **Transcripts:** `superset agents read` returns the saved Claude Code or Codex conversation, including what scrolled off screen. Claude Code's `claude logs <id>` shows recent output for background sessions.
 - **Recovery:** if an agent's terminal dies from a crash or reboot, Paradev relaunches it with the agent's resume command, for example `claude --resume <session-id>`.
-- **Away from the desk:** the Paradev iPhone and iPad app shows agent sessions and diffs away from your desk (Pro plan). See [Remote Access](https://docs.paradev.com/remote-access).
+- **Away from the desk:** the Paradev iPhone, iPad, and Android app shows agent sessions and diffs away from your desk (Pro plan). See [Remote Access](https://docs.paradev.com/remote-access).
 
 ---
 

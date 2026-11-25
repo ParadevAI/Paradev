@@ -22,7 +22,7 @@ export default command({
 			"Replace the whole trigger set with this JSON array. See --triggers-file",
 		),
 		triggersFile: string().desc(
-			"Path to a JSON file holding the replacement trigger set. Fetch the current set with `superset automations get <id>` and resend the entries you want to keep, with their `id`, or they are deleted",
+			"Path to a JSON file holding the replacement trigger set. Fetch the current set with `paradev automations get <id>` and resend the entries you want to keep, with their `id`, or they are deleted",
 		),
 		timezone: string().desc("New IANA timezone"),
 		dtstart: string().desc("New ISO 8601 start anchor"),
@@ -157,10 +157,7 @@ export default command({
 		if (cloud) {
 			const organizationId = ctx.config.organizationId;
 			if (!organizationId) {
-				throw new CLIError(
-					"No active organization",
-					"Run: superset auth login",
-				);
+				throw new CLIError("No active organization", "Run: paradev auth login");
 			}
 			cloudTarget = (
 				await resolveCloudAutomationTarget({
@@ -174,10 +171,7 @@ export default command({
 		} else if (options.workspace || options.project) {
 			const organizationId = ctx.config.organizationId;
 			if (!organizationId) {
-				throw new CLIError(
-					"No active organization",
-					"Run: superset auth login",
-				);
+				throw new CLIError("No active organization", "Run: paradev auth login");
 			}
 			target = await resolveAutomationTarget({
 				organizationId,

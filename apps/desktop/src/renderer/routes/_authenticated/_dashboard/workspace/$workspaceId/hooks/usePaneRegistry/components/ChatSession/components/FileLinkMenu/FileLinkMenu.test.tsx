@@ -14,15 +14,15 @@ import { FileLinkMenu } from "./FileLinkMenu";
 
 afterEach(cleanup);
 
-function renderMenu(openLink?: OpenLink) {
+function renderMenu(openLink?: OpenLink, reference = "src/auth.ts:42") {
 	render(
 		<ChatPaneActionsProvider openLink={openLink}>
-			<FileLinkMenu reference="src/auth.ts:42">
-				<span>auth.ts:42</span>
+			<FileLinkMenu reference={reference}>
+				<span>{reference}</span>
 			</FileLinkMenu>
 		</ChatPaneActionsProvider>,
 	);
-	return screen.getByText("auth.ts:42");
+	return screen.getByText(reference);
 }
 
 test("each destination opens the reference with that action", async () => {
@@ -34,6 +34,21 @@ test("each destination opens the reference with that action", async () => {
 	expect(openLink.mock.calls.map(([href, , action]) => [href, action])).toEqual(
 		[["src/auth.ts:42", "external"]],
 	);
+});
+
+test("a bare web host can open in the browser", async () => {
+	const openLink = mock<OpenLink>(() => true);
+	fireEvent.contextMenu(renderMenu(openLink, "changelog.example.ai"));
+	fireEvent.click(await screen.findByText("Open in Browser"));
+	expect(openLink.mock.calls.map(([href, , action]) => [href, action])).toEqual(
+		[["https://changelog.example.ai/", "external"]],
+	);
+});
+
+test("a file name has no browser entry", async () => {
+	fireEvent.contextMenu(renderMenu(() => true, "App.vue"));
+	await screen.findByText("Open in");
+	expect(screen.queryByText("Open in Browser")).toBeNull();
 });
 
 test("copy puts the reference with its line on the clipboard", async () => {

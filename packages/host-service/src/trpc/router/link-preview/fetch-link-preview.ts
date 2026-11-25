@@ -56,7 +56,7 @@ const MAX_CACHED_PREVIEWS = 200;
 const MAX_CACHED_IMAGE_PREVIEWS = 20;
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 const HTML_MEDIA_TYPES = new Set(["text/html", "application/xhtml+xml"]);
-const USER_AGENT = "Mozilla/5.0 (compatible; Superset-LinkPreview/1.0)";
+const USER_AGENT = "Mozilla/5.0 (compatible; Paradev-LinkPreview/1.0)";
 
 type Resource = { url: URL; contentType: string | null; bytes: Uint8Array };
 

@@ -242,18 +242,14 @@ export function WorkDrawer({
 					{notice}
 					<div
 						className={cn(
-							"overflow-y-auto p-1",
 							notice && "border-border/60 border-t",
 							prompts.length === 0 && "hidden",
 						)}
-						data-work-drawer-scroller
-						style={{
-							maxHeight: paneThird
-								? `min(${MAX_HEIGHT}, ${paneThird}px)`
-								: MAX_HEIGHT,
-						}}
 					>
 						<DrawerSection
+							maxHeight={
+								paneThird ? `min(${MAX_HEIGHT}, ${paneThird}px)` : MAX_HEIGHT
+							}
 							stopKey="header:queued"
 							tabbable={tabbableKey === "header:queued"}
 							banner={

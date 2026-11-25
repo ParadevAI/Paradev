@@ -1,4 +1,5 @@
 import { CLIError, positional, string } from "@superset/cli-framework";
+import { readPublicEnv } from "@superset/shared/public-env";
 import { command } from "../../../../lib/command";
 import { readStdin } from "../../../../lib/plugins/inputs";
 
@@ -16,7 +17,7 @@ export default command({
 		),
 	},
 	run: async ({ ctx, args, options }) => {
-		const id = options.workspace ?? process.env.SUPERSET_SANDBOX_WORKSPACE_ID;
+		const id = options.workspace ?? readPublicEnv("SANDBOX_WORKSPACE_ID");
 		if (!id) {
 			throw new CLIError(
 				"No cloud workspace",

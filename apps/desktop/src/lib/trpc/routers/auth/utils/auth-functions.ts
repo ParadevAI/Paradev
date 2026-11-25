@@ -7,8 +7,8 @@ import {
 	SUPERSET_HOME_DIR_MODE,
 	SUPERSET_SENSITIVE_FILE_MODE,
 } from "main/lib/app-environment";
+import { isDeepLinkUrl } from "main/lib/deep-link";
 import { lock } from "proper-lockfile";
-import { PROTOCOL_SCHEME } from "shared/constants";
 import { decrypt, encrypt } from "./crypto-storage";
 
 interface StoredAuth {
@@ -384,7 +384,7 @@ type ParsedAuthDeepLink =
 export function parseAuthDeepLink(url: string): ParsedAuthDeepLink {
 	try {
 		const parsed = new URL(url);
-		if (parsed.protocol !== `${PROTOCOL_SCHEME}:`) return { type: "not-auth" };
+		if (!isDeepLinkUrl(url)) return { type: "not-auth" };
 		if (parsed.host !== "auth" || parsed.pathname !== "/callback") {
 			return { type: "not-auth" };
 		}

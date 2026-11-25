@@ -1,4 +1,5 @@
 import type { UIColors } from "shared/themes/types";
+import { sanitizeThemeCss } from "./sanitizeThemeCss";
 
 /**
  * Maps UI color keys to CSS variable names
@@ -79,6 +80,19 @@ export function updateThemeClass(type: "dark" | "light"): void {
 		html.classList.add("light");
 		html.classList.remove("dark");
 	}
+}
+
+const THEME_CSS_ID = "theme-css";
+
+export function applyThemeCss(css: string | undefined): void {
+	document.getElementById(THEME_CSS_ID)?.remove();
+	const sanitizedCss = sanitizeThemeCss(css);
+	if (!sanitizedCss) return;
+
+	const style = document.createElement("style");
+	style.id = THEME_CSS_ID;
+	style.textContent = sanitizedCss;
+	document.head.append(style);
 }
 
 /**

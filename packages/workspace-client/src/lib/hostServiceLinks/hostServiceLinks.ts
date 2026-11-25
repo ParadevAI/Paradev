@@ -30,7 +30,7 @@ function isConnectionError(error: unknown): boolean {
 export interface HostServiceLinkOptions {
 	/** The host's tRPC endpoint, e.g. `http://127.0.0.1:PORT/trpc`. */
 	url: string;
-	headers?: () => Record<string, string>;
+	headers?: () => Record<string, string> | Promise<Record<string, string>>;
 }
 
 /**

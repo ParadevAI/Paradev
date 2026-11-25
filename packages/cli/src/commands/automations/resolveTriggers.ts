@@ -6,7 +6,7 @@ import {
 } from "@superset/shared/automation-triggers";
 
 const HINT =
-	'Expected a JSON array of {config: {...}}, e.g. [{"config":{"kind":"slack","event":"reaction_added","channels":{"mode":"list","ids":["C123"]},"emoji":{"mode":"list","ids":["bug"]},"actor":{"mode":"any"}}}]. Run `superset automations trigger-options --group slack` to resolve ids.';
+	'Expected a JSON array of {config: {...}}, e.g. [{"config":{"kind":"slack","event":"reaction_added","channels":{"mode":"list","ids":["C123"]},"emoji":{"mode":"list","ids":["bug"]},"actor":{"mode":"any"}}}]. Run `paradev automations trigger-options --group slack` to resolve ids.';
 
 export function resolveTriggers(options: {
 	triggers?: string | null;

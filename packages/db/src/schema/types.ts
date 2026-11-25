@@ -3,6 +3,7 @@ import type {
 	TriggerConfigInput,
 	TriggerScope as TriggerConfigScope,
 } from "@superset/shared/automation-triggers";
+import type { CloudUsageFeature } from "./enums";
 
 /**
  * Everything `dispatchMatchingTriggers` needs for one automation_events row:
@@ -124,9 +125,24 @@ export type UserIdentityMetadata =
 	// name people by; the stable subject id rides here.
 	| { provider: "google"; sub?: string };
 
-/** One phase of a boot: API spans first, then the box's stamps. `at` is epoch ms. */
+/** A cloud_usage_events row kept on its boot until it is written; timestamps are ISO strings. */
+export type PendingUsageEvent = {
+	bootId: string;
+	lockSeq: number;
+	feature: CloudUsageFeature;
+	organizationId: string;
+	cloudWorkspaceId?: string | null;
+	userId?: string | null;
+	windowFrom: string;
+	windowTo: string;
+	amount: string;
+	sentAt: string;
+};
+
+/** One phase of a boot: API spans first, then the box's stamps. `at` is epoch ms on the source's own clock. */
 export type CloudWorkspaceBootPhase = {
 	name: string;
+	source: "api" | "box";
 	at: number;
 	ms: number;
 };

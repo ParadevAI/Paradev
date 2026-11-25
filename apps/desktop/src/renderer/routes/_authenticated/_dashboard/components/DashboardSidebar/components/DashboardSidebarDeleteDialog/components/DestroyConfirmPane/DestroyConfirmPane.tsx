@@ -29,6 +29,9 @@ interface DestroyConfirmPaneProps {
 	hasUnpushedCommits: boolean;
 	canConfirm: boolean;
 	blockingReason: string | null;
+	/** The host can't run the delete now; host settings can remove a host that is gone. */
+	isHostOffline?: boolean;
+	onOpenHostSettings?: () => void;
 	onConfirm: () => void;
 	confirmLabel: string;
 }
@@ -45,6 +48,8 @@ export function DestroyConfirmPane({
 	hasUnpushedCommits,
 	canConfirm,
 	blockingReason,
+	isHostOffline = false,
+	onOpenHostSettings,
 	onConfirm,
 	confirmLabel,
 }: DestroyConfirmPaneProps) {
@@ -106,6 +111,23 @@ export function DestroyConfirmPane({
 					<div className="px-4 pb-2">
 						<div className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-2.5 py-1.5">
 							{blockingReason}
+						</div>
+					</div>
+				)}
+				{isHostOffline && (
+					<div className="px-4 pb-2">
+						<div className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-2.5 py-1.5">
+							<Trans>
+								The host is offline. Try again when it's back online, or delete
+								the host if it's gone for good.
+							</Trans>{" "}
+							<button
+								type="button"
+								className="underline underline-offset-2 hover:no-underline"
+								onClick={onOpenHostSettings}
+							>
+								<Trans>Host settings</Trans>
+							</button>
 						</div>
 					</div>
 				)}

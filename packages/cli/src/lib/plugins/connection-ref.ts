@@ -17,7 +17,7 @@ export function resolvePluginName(opts: {
 	if (!opts.plugin && legacy && UUID.test(legacy)) {
 		throw new CLIError(
 			"--connection takes a plugin name now, not a connection id.",
-			"To pick an account, pass the id to --account: superset mcp tools --plugin <name> --account <id>",
+			"To pick an account, pass the id to --account: paradev mcp tools --plugin <name> --account <id>",
 		);
 	}
 
@@ -25,7 +25,7 @@ export function resolvePluginName(opts: {
 	if (!name) {
 		throw new CLIError(
 			"Pass --plugin <name>.",
-			"Run: superset plugins list  (the PLUGIN column holds the name)",
+			"Run: paradev plugins list  (the PLUGIN column holds the name)",
 		);
 	}
 	return name;

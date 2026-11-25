@@ -52,6 +52,7 @@
 		"check:plugins": "bun scripts/check-plugins.ts",
 		"check:i18n": "bun run --cwd packages/i18n check",
 		"typecheck:release": "tsc -p scripts/release/tsconfig.json",
+		"typecheck:test-preload": "tsc -p scripts/tsconfig.test-preload.json",
 		"test:release": "bun test scripts/release",
 		"db:push": "bun run --cwd packages/db push",
 		"db:migrate": "bun run --cwd packages/db migrate",
@@ -119,6 +120,7 @@
 		"@pierre/diffs@1.6.2": "patches/@pierre%2Fdiffs@1.6.2.patch",
 		"electron-chrome-web-store@0.13.0": "patches/electron-chrome-web-store@0.13.0.patch",
 		"electron-chrome-extensions@4.10.0": "patches/electron-chrome-extensions@4.10.0.patch",
-		"@vercel/sandbox@4.0.0": "patches/@vercel%2Fsandbox@4.0.0.patch"
+		"@vercel/sandbox@4.0.0": "patches/@vercel%2Fsandbox@4.0.0.patch",
+		"sonner@2.0.7": "patches/sonner@2.0.7.patch"
 	}
 }

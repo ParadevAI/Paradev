@@ -238,6 +238,7 @@ async function redeem(
 		body.set("client_id", clientId);
 		if (clientSecret) body.set("client_secret", clientSecret);
 	}
+	if (endpoints.resource) body.set("resource", endpoints.resource);
 
 	let response: Response;
 	try {

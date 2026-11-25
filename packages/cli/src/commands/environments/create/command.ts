@@ -8,7 +8,6 @@ import { command } from "../../../lib/command";
 import { environmentLimitHint } from "../../../lib/environments";
 
 export default command({
-	sandbox: false,
 	description: "Create an environment for cloud workspaces to start from",
 	options: {
 		name: string().required().desc("Environment name"),
@@ -29,7 +28,7 @@ export default command({
 	run: async ({ ctx, options }) => {
 		const organizationId = ctx.config.organizationId;
 		if (!organizationId) {
-			throw new CLIError("No active organization", "Run: superset auth login");
+			throw new CLIError("No active organization", "Run: paradev auth login");
 		}
 		const region = options.region as SandboxRegionId | undefined;
 		if (region && !SANDBOX_REGION_IDS.includes(region)) {
@@ -48,7 +47,7 @@ export default command({
 			if (!match) {
 				throw new CLIError(
 					`${fullName} is not connected to this organization`,
-					"See what is connected with: superset environments repos",
+					"See what is connected with: paradev environments repos",
 				);
 			}
 			return match.id;
