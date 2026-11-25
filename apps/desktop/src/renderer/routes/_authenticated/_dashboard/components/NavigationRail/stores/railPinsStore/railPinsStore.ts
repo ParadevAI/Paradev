@@ -111,9 +111,15 @@ export const useRailPinsStore = create<
 			const update = (
 				change: (state: RailPinsState) => Partial<RailPinsState>,
 			) => {
+				const persistence = useRailPinsStore.persist;
+				if (!persistence) {
+					setLocalState(change);
+					return;
+				}
+
 				const commit = () => {
 					// localStorage hydration is synchronous, and the event can still be queued.
-					void useRailPinsStore.persist?.rehydrate();
+					void persistence.rehydrate();
 					const previous = get();
 					try {
 						setPersistedState(change);
@@ -163,7 +169,10 @@ export const useRailPinsStore = create<
 );
 
 export function syncRailPinsAcrossWindows() {
+	const persistence = useRailPinsStore.persist;
+	if (!persistence) return () => {};
+
 	const stopSync = syncPersistedStoreAcrossWindows(useRailPinsStore);
-	void useRailPinsStore.persist?.rehydrate();
+	void persistence.rehydrate();
 	return stopSync;
 }

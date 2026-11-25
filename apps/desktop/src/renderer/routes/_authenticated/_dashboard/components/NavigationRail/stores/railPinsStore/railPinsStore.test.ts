@@ -163,3 +163,28 @@ test("reverts a sidebar edit when storage rejects it", () => {
 		else localStorage.setItem(RAIL_PINS_STORAGE_KEY, initialStorage);
 	}
 });
+
+test("keeps sidebar edits in memory when persistence is unavailable", () => {
+	const initialState = useRailPinsStore.getState();
+	const initialStorage = localStorage.getItem(RAIL_PINS_STORAGE_KEY);
+	const persistence = useRailPinsStore.persist;
+	const addListener = spyOn(window, "addEventListener");
+	let stopSync: (() => void) | undefined;
+	try {
+		Reflect.deleteProperty(useRailPinsStore, "persist");
+
+		stopSync = syncRailPinsAcrossWindows();
+		expect(addListener).not.toHaveBeenCalled();
+
+		initialState.setDestinationVisible("pages", false);
+		expect(useRailPinsStore.getState().hiddenDestinationIds).toContain("pages");
+		expect(localStorage.getItem(RAIL_PINS_STORAGE_KEY)).toBe(initialStorage);
+	} finally {
+		stopSync?.();
+		addListener.mockRestore();
+		useRailPinsStore.persist = persistence;
+		useRailPinsStore.setState(initialState, true);
+		if (initialStorage === null) localStorage.removeItem(RAIL_PINS_STORAGE_KEY);
+		else localStorage.setItem(RAIL_PINS_STORAGE_KEY, initialStorage);
+	}
+});
