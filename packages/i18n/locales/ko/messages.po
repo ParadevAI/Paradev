@@ -8987,9 +8987,6 @@ msgstr "그림 1 · 머지된 변경 하나에 드는 노력 중 사람의 비�
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "그림 2 · 사람의 수정 없이 에이전트가 작성한 머지된 변경"
 
-msgid "file"
-msgstr "파일"
-
 msgid "File"
 msgstr "파일"
 

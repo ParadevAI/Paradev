@@ -8987,9 +8987,6 @@ msgstr "Hình 1 · Phần công sức của con người sau mỗi thay đổi �
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Hình 2 · Thay đổi được merge do agent viết, không có chỉnh sửa của con người"
 
-msgid "file"
-msgstr "tệp"
-
 msgid "File"
 msgstr "Tệp"
 

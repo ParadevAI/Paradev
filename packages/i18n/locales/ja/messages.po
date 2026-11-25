@@ -8987,9 +8987,6 @@ msgstr "図1 · マージされた変更を支える作業のうち人間の割�
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "図2 · 人間の編集なしにエージェントが書いたマージ済み変更"
 
-msgid "file"
-msgstr "ファイル"
-
 msgid "File"
 msgstr "ファイル"
 

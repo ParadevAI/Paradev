@@ -8987,9 +8987,6 @@ msgstr "Рис. 1 · Доля человека в усилиях за объед
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Рис. 2 · Объединённые изменения, написанные агентами, без правок человека"
 
-msgid "file"
-msgstr "файл"
-
 msgid "File"
 msgstr "Файл"
 

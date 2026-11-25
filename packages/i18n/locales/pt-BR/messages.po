@@ -8987,9 +8987,6 @@ msgstr "Fig. 1 · Parcela humana do esforço por trás de uma mudança mesclada"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Mudanças mescladas escritas por agentes, sem edição humana"
 
-msgid "file"
-msgstr "arquivo"
-
 msgid "File"
 msgstr "Arquivo"
 

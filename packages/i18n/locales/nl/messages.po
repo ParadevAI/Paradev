@@ -8987,9 +8987,6 @@ msgstr "Fig. 1 · Menselijk aandeel in de inspanning achter een gemergede wijzig
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Gemergede wijzigingen geschreven door agents, zonder menselijke bewerkingen"
 
-msgid "file"
-msgstr "bestand"
-
 msgid "File"
 msgstr "Bestand"
 

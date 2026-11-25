@@ -8987,9 +8987,6 @@ msgstr "Fig. 1 · Proporción humana del esfuerzo detrás de un cambio fusionado
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Cambios fusionados escritos por agentes, sin ediciones humanas"
 
-msgid "file"
-msgstr "archivo"
-
 msgid "File"
 msgstr "Archivo"
 

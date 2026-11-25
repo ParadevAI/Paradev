@@ -8987,9 +8987,6 @@ msgstr "图1 · 一次合并变更背后人类投入的占比"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "图2 · 由智能体撰写、无人工修改的合并变更"
 
-msgid "file"
-msgstr "文件"
-
 msgid "File"
 msgstr "文件"
 

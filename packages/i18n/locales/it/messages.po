@@ -8987,9 +8987,6 @@ msgstr "Fig. 1 · Quota umana dello sforzo dietro una modifica unita"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Modifiche unite scritte dagli agenti, senza modifiche umane"
 
-msgid "file"
-msgstr "file"
-
 msgid "File"
 msgstr "File"
 

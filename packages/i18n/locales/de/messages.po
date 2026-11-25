@@ -8987,9 +8987,6 @@ msgstr "Abb. 1 · Menschlicher Anteil am Aufwand hinter einer zusammengeführten
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Abb. 2 · Zusammengeführte Änderungen von Agenten, ohne menschliche Bearbeitung"
 
-msgid "file"
-msgstr "Datei"
-
 msgid "File"
 msgstr "Datei"
 

@@ -8987,9 +8987,6 @@ msgstr "圖1 · 一次合併變更背後人類投入的佔比"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "圖2 · 由代理程式撰寫、無人工修改的合併變更"
 
-msgid "file"
-msgstr "檔案"
-
 msgid "File"
 msgstr "檔案"
 

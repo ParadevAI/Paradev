@@ -8987,9 +8987,6 @@ msgstr "Gbr. 1 · Porsi manusia dalam upaya di balik sebuah perubahan yang di-me
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Gbr. 2 · Perubahan yang di-merge dan ditulis agen, tanpa suntingan manusia"
 
-msgid "file"
-msgstr "file"
-
 msgid "File"
 msgstr "File"
 
