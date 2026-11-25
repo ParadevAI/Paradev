@@ -142,7 +142,7 @@ export function useComposerDraft(draftKey: string, persisted = true) {
 
 	const takeDraft = useCallback((): ComposerDraft | null => {
 		const draft = readDraft(draftKey);
-		if (draft === undefined || isEmpty(draft)) return null;
+		if (draft === undefined || isEmptyDraft(draft)) return null;
 		clearDraft();
 		return draft;
 	}, [draftKey, clearDraft]);

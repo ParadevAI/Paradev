@@ -6,7 +6,7 @@ const CLOSE_TAG = "</quoted_reply>";
 export function normalizeQuote(text: string): string {
 	return text
 		.replace(/\r\n?/g, "\n")
-		.replace(/ /g, " ")
+		.replace(/\u00a0/g, " ")
 		.split("\n")
 		.map((line) => line.trimEnd())
 		.join("\n")

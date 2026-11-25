@@ -54,6 +54,7 @@ export function useReplySelection({
 		key: string;
 		selection: ShownReplySelection;
 	} | null>(null);
+	if (shown && shown.key !== resetKey) setShown(null);
 	const selection = enabled && shown?.key === resetKey ? shown.selection : null;
 	const selectionRef = useRef(selection);
 	selectionRef.current = selection;

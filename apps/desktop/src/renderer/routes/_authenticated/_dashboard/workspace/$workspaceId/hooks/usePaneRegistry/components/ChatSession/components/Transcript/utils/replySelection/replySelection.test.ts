@@ -124,4 +124,24 @@ describe("readReplySelection", () => {
 		expect(read?.replyId).toBe("r2");
 		expect(read?.text).toBe("const a = 1;");
 	});
+
+	test("leaves a selection that reaches a code block to the browser's text", () => {
+		const reply = container.querySelector("[data-reply-id=r1]");
+		if (!reply) throw new Error("no reply");
+		const host = document.createElement("div");
+		reply.append(host);
+		host.attachShadow({ mode: "open" }).innerHTML = "<pre>const a = 1;</pre>";
+		const selection = select(textOf("li"), 0, reply, reply.childNodes.length);
+		const read = readReplySelection(
+			{
+				rangeCount: 1,
+				anchorNode: selection?.anchorNode,
+				focusNode: selection?.focusNode,
+				getRangeAt: () => selection?.getRangeAt(0),
+				toString: () => "open a.ts\nthen commit\nconst a = 1;",
+			} as unknown as Selection,
+			container,
+		);
+		expect(read?.text).toBe("open a.ts\nthen commit\nconst a = 1;");
+	});
 });

@@ -127,8 +127,8 @@ export function UserMessageRow({
 				pending && !pending.failed && "opacity-60",
 			)}
 		>
-			{quotes.map((quote) => (
-				<QuotedReplyBlock key={quote} text={quote} />
+			{quotes.map((quote, index) => (
+				<QuotedReplyBlock key={`${index}:${quote}`} text={quote} />
 			))}
 		</div>
 	);

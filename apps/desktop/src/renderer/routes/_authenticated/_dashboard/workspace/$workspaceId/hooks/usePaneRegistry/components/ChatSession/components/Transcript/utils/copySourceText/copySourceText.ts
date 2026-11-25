@@ -42,7 +42,19 @@ function fragmentText(node: Node): string {
 	return text;
 }
 
-/** The range's text with each `data-source-text` run as typed; null when it has none. */
+function crossesShadowRoot(range: Range): boolean {
+	const ancestor = range.commonAncestorContainer;
+	if (!(ancestor instanceof Element)) return false;
+	for (const element of ancestor.querySelectorAll("*")) {
+		if (element.shadowRoot && range.intersectsNode(element)) return true;
+	}
+	return false;
+}
+
+/**
+ * The range's text with each `data-source-text` run as typed. Null when it has
+ * none, or when it reaches a shadow root, which a cloned range leaves out.
+ */
 export function sourceTextOfRange(range: Range): string | null {
 	const ancestor = range.commonAncestorContainer;
 	const element =
@@ -52,7 +64,7 @@ export function sourceTextOfRange(range: Range): string | null {
 	if (text != null) return text;
 	const copied = range.cloneContents();
 	const sources = copied.querySelectorAll(`[${SOURCE_TEXT}]`);
-	if (sources.length === 0) return null;
+	if (sources.length === 0 || crossesShadowRoot(range)) return null;
 	for (const part of sources) {
 		part.textContent = part.getAttribute(SOURCE_TEXT);
 	}
