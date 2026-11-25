@@ -34,6 +34,7 @@ const ROUTES = [
 	"roadmap",
 	"starchart",
 	"stats",
+	"t3-code",
 	"team",
 	"the-production-run",
 	"user",

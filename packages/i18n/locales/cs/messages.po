@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {# commit} few {# commity} many {# commitu} ot
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} najde vaše worktree z Conductor a naimportuje je na místě, včetně necommitnutých změn."
 
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} najde vaše worktree z T3 Code a naimportuje je na místě, včetně necommitnutých změn."
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} vyvíjí společnost {companyName}"
 
@@ -2499,6 +2502,9 @@ msgstr "Agenti podle plánu nebo spouštěče"
 msgid "Agents on your phone"
 msgstr "Agenti ve vašem telefonu"
 
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "Agenti se otevírají jako chat, podobně jako vlákno v T3 Code. Stejnou relaci můžete kdykoli přepnout na její CLI v terminálu."
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "Agenti si pamatují, co se naučí o vašem kódu, takže každá nová relace začíná s kontextem."
 
@@ -2933,6 +2939,9 @@ msgstr "Jakýkoli agent, kterého máte v Paradevu nastaveného, například Cla
 
 msgid "Any channel"
 msgstr "Jakýkoli kanál"
+
+msgid "Any CLI agent"
+msgstr "Jakýkoli agent s CLI"
 
 msgid "Any conclusion"
 msgstr "Jakýkoli výsledek"
@@ -4062,6 +4071,9 @@ msgstr "Mohu si koupit další cloudové GB-hodiny?"
 msgid "Can I create automations from a script?"
 msgstr "Můžu vytvářet automatizace ze skriptu?"
 
+msgid "Can I keep using T3 Code?"
+msgstr "Můžu dál používat T3 Code?"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "Můžu kdykoli změnit tarif nebo ho zrušit?"
 
@@ -4370,6 +4382,16 @@ msgstr "Relace chatu nenalezena"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Plochy chatu: zprávy, uvažování, návrhy"
 
+msgid "Chat threads, with a built-in terminal"
+msgstr "Chatová vlákna s vestavěným terminálem"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "Chatujte se svými agenty v {0} tak, jak jste zvyklí, ve worktree, které už máte. Review, cloud i mobil jsou součástí."
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "Chat, nebo vlastní CLI agenta v terminálu"
+
 msgid "Chats"
 msgstr "Chaty"
 
@@ -4586,6 +4608,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode a další. Žádné nastavení pro 
 
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code, Codex, Cursor, OpenCode a další."
+
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx a agenti ACP"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude teď běží v pracovním prostoru component-showcase."
@@ -5629,6 +5654,9 @@ msgstr "Převést na config.toml"
 
 msgid "Convert to draft"
 msgstr "Převést na koncept"
+
+msgid "Convert your actions"
+msgstr "Převeďte své akce"
 
 msgid "Converting to draft…"
 msgstr "Převádí se na koncept…"
@@ -9350,6 +9378,9 @@ msgstr "S dotazy médií a žádostmi o rozhovor nám napište e-mail."
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "S dotazy k fakturaci se <0>ozvěte nám</0>."
 
+msgid "For T3 Code users"
+msgstr "Pro uživatele T3 Code"
+
 msgid "For teams that need more power"
 msgstr "Pro týmy, které potřebují víc"
 
@@ -10198,6 +10229,9 @@ msgstr "Jak pracujeme"
 msgid "How you run agents"
 msgstr "Jak spouštíte agenty"
 
+msgid "How you work"
+msgstr "Jak pracujete"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Jak se vaši agenti přihlašují v cloudových pracovních prostorech. Ostatní připojují vlastní předplatné nebo API klíče; na tomto počítači každý agent dál používá přihlášení, které už na něm je."
 
@@ -10773,6 +10807,9 @@ msgstr "Pozval"
 msgid "Invoices and payment method"
 msgstr "Faktury a způsob platby"
 
+msgid "iOS and Android"
+msgstr "iOS a Android"
+
 msgid "iOS app"
 msgstr "Aplikace pro iOS"
 
@@ -10880,6 +10917,9 @@ msgstr "Mohla být smazána nebo patří jiné organizaci."
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Aby se sloučil, musí se znovu zařadit a projít kontrolami."
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "Zabere to pár minut a T3 Code si můžete nechat nainstalovaný, dokud to zkoušíte."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Zabere to pár minut. Používáte Conductor Cloud? Začněte <0>průvodcem pro cloud</0>."
@@ -11791,6 +11831,9 @@ msgstr "macOS"
 msgid "macOS, Linux (experimental)"
 msgstr "macOS, Linux (experimentálně)"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS, Windows, Linux"
+
 msgid "Magenta"
 msgstr "Purpurová"
 
@@ -12395,6 +12438,9 @@ msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a 
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "Přesuň Nastavení do modálního okna, aby lidé nemuseli opouštět svůj pracovní prostor. Zachovej filtrování vyhledávání a zařiď, aby ho ⌘, otevřelo odkudkoli."
 
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Přesuňte akce z t3.json do .paradev/config.json, nebo o to požádejte agenta."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Přesunout tento pracovní prostor na {computerName}?"
 
@@ -12427,6 +12473,9 @@ msgstr "Přesunout na kartu"
 
 msgid "Move your agents."
 msgstr "Přesuňte své agenty."
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Přesuňte své worktree a agenty z T3 Code do {companyName} během pár minut. Zdarma a open source."
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Přesuňte své worktree a agenty do {companyName} během pár minut. Zdarma a open source."
@@ -13510,6 +13559,9 @@ msgstr "Žádné pracovní prostory."
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Ne. {companyName} nikdy nezprostředkovává volání modelů přes proxy. Agenti používají vaše vlastní předplatná a klíče."
 
+msgid "No. Runs on machines you own"
+msgstr "Ne. Běží na vašich vlastních strojích"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Ne. Vaši agenti zůstávají nezávislí; Paradev je orchestrační vrstva kolem nich. Každý úkol dostane vlastní Git worktree a větev, trvalé relace, kontrolu diffů a automatizace, které běží při událostech nebo podle plánu, aniž by byl pracovní postup vázán na jednoho poskytovatele."
 
@@ -14419,6 +14471,9 @@ msgstr "Otevřít možnosti odeslání"
 
 msgid "Open Source"
 msgstr "Open source"
+
+msgid "Open source (MIT)"
+msgstr "Open source (MIT)"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source pod licencí MIT. Používejte libovolného agenta s vlastními předplatnými a klíči."
@@ -15767,6 +15822,9 @@ msgstr "Projekt nastaven v {0}"
 
 msgid "Project Settings"
 msgstr "Nastavení projektu"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "Nastavení projektu v T3 Code, například pravidla úklidu worktree"
 
 msgid "Project worktree location reset"
 msgstr "Umístění worktree projektu obnoveno"
@@ -17388,6 +17446,9 @@ msgstr "Řiďte armádu kódovacích agentů"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Spusťte simulátor iOS v panelu pracovního prostoru, abyste vy i vaši agenti mohli testovat mobilní aplikace."
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "Spusťte jakéhokoli agenta, který má CLI, na vlastních předplatných a klíčích."
+
 msgid "Run automations on data source and comment activity."
 msgstr "Spouštějte automatizace při aktivitě ve zdrojích dat a komentářích."
 
@@ -17674,6 +17735,12 @@ msgstr "Plánování schůzek"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Agenti spouštění podle plánu i událostmi (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooky) s hotovými šablonami."
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "Naplánované úlohy a workflow. Vytvořte je znovu jako automatizace"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "Naplánované úlohy, webhookové úlohy a workflow"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "Plány se opakují — odeberte COUNT nebo UNTIL."
@@ -17968,6 +18035,9 @@ msgstr "Zobrazit všechny statistiky →"
 
 msgid "See Changes"
 msgstr "Prohlédněte změny"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "Mějte kontroly CI a vlákna review hned vedle diffu a posílejte komentáře zpět agentovi."
 
 msgid "See Conductor for current plans and account access"
 msgstr "Aktuální tarify a přístup k účtům najdete u Conductor"
@@ -18432,6 +18502,9 @@ msgstr "Setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Instalační skripty, jakmile převedete conductor.json"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "Instalační skripty, jakmile převedete t3.json"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Nastavení se zastavilo. Důvod je ve výstupu níže."
@@ -19744,6 +19817,9 @@ msgstr "Pravidelnost · aktivní dny z 30"
 msgid "Switch account"
 msgstr "Přepnout účet"
 
+msgid "Switch from T3 Code to {companyName}"
+msgstr "Přejděte z T3 Code na {companyName}"
+
 msgid "Switch host"
 msgstr "Přepnout hosta"
 
@@ -19901,6 +19977,20 @@ msgstr "Podíl systémové RAM"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "Systémová RAM: Paradev {0}, ostatní aplikace {1}, volné {2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Údaje o T3 Code pocházejí z jeho veřejné dokumentace a repozitáře. Viz <0>úplné srovnání</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code je ochranná známka společnosti T3 Tools, Inc. {0} není s T3 Tools spojen ani jí podporován."
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "Vlákna T3 Code. Zůstávají v T3 Code, který si můžete nechat nainstalovaný"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Worktree z T3 Code jsou obyčejné Git worktree. {0} je používá tam, kde jsou."
 
 msgid "Tab"
 msgstr "Karta"
@@ -23136,6 +23226,9 @@ msgstr "Ano, degradovat mě"
 msgid "Yes, on paid plans."
 msgstr "Ano, v placených tarifech."
 
+msgid "Yes, or the current checkout"
+msgstr "Ano, nebo aktuální checkout"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "Ano, obnovuje relace Claude Code"
 
@@ -23147,6 +23240,9 @@ msgstr "Ano. Přihlaste se na pozici, která vám nejlépe sedí, a napište ná
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Ano. Free pokrývá jednotlivce s 1 uživatelem, lokální pracovní prostory, desktopovou aplikaci a CLI. Bez platební karty."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "Ano. Importované worktree zůstávají tam, kde jsou, takže je mohou otevřít obě aplikace. Nechte v T3 Code vypnutý úklid worktree, aby je neodstranil."
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Ano. U plánů s cloudovými pracovními prostory mohou vlastníci v Nastavení, Fakturace koupit libovolné množství dalších GB-hodin za {packPrice} za GB-hodinu. Koupené GB-hodiny se čerpají po měsíčním fondu a nikdy nevyprší, a automatické dobití může koupit další, když docházejí."

@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {# Commit} other {# Commits}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} findet deine Conductor-Worktrees und importiert sie an Ort und Stelle, samt nicht committeter Änderungen."
 
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} findet deine T3-Code-Worktrees und importiert sie an Ort und Stelle, samt nicht committeter Änderungen."
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} wird von {companyName} entwickelt."
 
@@ -2499,6 +2502,9 @@ msgstr "Agenten nach Zeitplan oder Auslöser"
 msgid "Agents on your phone"
 msgstr "Agenten auf deinem Handy"
 
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "Agenten öffnen sich als Chat, wie ein Thread in T3 Code. Wechsle mit derselben Sitzung jederzeit zu ihrer CLI im Terminal."
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "Agenten merken sich, was sie über deine Codebasis lernen, sodass jede neue Sitzung mit Kontext startet."
 
@@ -2933,6 +2939,9 @@ msgstr "Jeder Agent, den du in Paradev eingerichtet hast, etwa Claude Code oder 
 
 msgid "Any channel"
 msgstr "Beliebiger Channel"
+
+msgid "Any CLI agent"
+msgstr "Jeder CLI-Agent"
 
 msgid "Any conclusion"
 msgstr "Beliebiges Ergebnis"
@@ -4062,6 +4071,9 @@ msgstr "Kann ich weitere Cloud-GB-Stunden kaufen?"
 msgid "Can I create automations from a script?"
 msgstr "Kann ich Automatisierungen per Skript erstellen?"
 
+msgid "Can I keep using T3 Code?"
+msgstr "Kann ich T3 Code weiter nutzen?"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "Kann ich jederzeit den Tarif wechseln oder kündigen?"
 
@@ -4370,6 +4382,16 @@ msgstr "Chat-Sitzung nicht gefunden"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Chat-Oberflächen: Nachrichten, Reasoning, Vorschläge"
 
+msgid "Chat threads, with a built-in terminal"
+msgstr "Chat-Threads mit integriertem Terminal"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "Chatte mit deinen Agenten in {0} so, wie du es gewohnt bist, in den Worktrees, die du schon hast. Review, Cloud und Mobile sind eingebaut."
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "Chat oder die eigene CLI des Agenten im Terminal"
+
 msgid "Chats"
 msgstr "Chats"
 
@@ -4586,6 +4608,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode und mehr. Keine Einrichtung pro Age
 
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code, Codex, Cursor, OpenCode und mehr."
+
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx und ACP-Agenten"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude läuft jetzt im Arbeitsbereich component-showcase."
@@ -5629,6 +5654,9 @@ msgstr "In config.toml umwandeln"
 
 msgid "Convert to draft"
 msgstr "In Entwurf umwandeln"
+
+msgid "Convert your actions"
+msgstr "Aktionen konvertieren"
 
 msgid "Converting to draft…"
 msgstr "Wird in Entwurf umgewandelt…"
@@ -9350,6 +9378,9 @@ msgstr "Für Presseanfragen und Interviewwünsche schreib uns eine E-Mail."
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "Bei Fragen zur Abrechnung <0>melde dich bei uns</0>."
 
+msgid "For T3 Code users"
+msgstr "Für T3-Code-Nutzer"
+
 msgid "For teams that need more power"
 msgstr "Für Teams, die mehr Power brauchen"
 
@@ -10198,6 +10229,9 @@ msgstr "Wie wir arbeiten"
 msgid "How you run agents"
 msgstr "Wie du Agenten ausführst"
 
+msgid "How you work"
+msgstr "So arbeitest du"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Wie sich deine Agenten in Cloud-Arbeitsbereichen anmelden. Andere verbinden ihre eigenen Abos oder API-Schlüssel; auf diesem Rechner nutzt jeder Agent weiter die Anmeldung, die schon darauf liegt."
 
@@ -10773,6 +10807,9 @@ msgstr "Eingeladen von"
 msgid "Invoices and payment method"
 msgstr "Rechnungen und Zahlungsmethode"
 
+msgid "iOS and Android"
+msgstr "iOS und Android"
+
 msgid "iOS app"
 msgstr "iOS-App"
 
@@ -10880,6 +10917,9 @@ msgstr "Sie wurde möglicherweise gelöscht oder gehört zu einer anderen Organi
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Zum Mergen muss er erneut beitreten und seine Checks bestehen."
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "Es dauert ein paar Minuten, und du kannst T3 Code installiert lassen, während du es ausprobierst."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Es dauert nur wenige Minuten. Du nutzt Conductor Cloud? Beginne mit der <0>Cloud-Anleitung</0>."
@@ -11791,6 +11831,9 @@ msgstr "macOS"
 msgid "macOS, Linux (experimental)"
 msgstr "macOS, Linux (experimentell)"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS, Windows, Linux"
+
 msgid "Magenta"
 msgstr "Magenta"
 
@@ -12395,6 +12438,9 @@ msgstr "Fokus zwischen den Haupt-Tabs und der rechten Seitenleiste wechseln und 
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "Verschiebe die Einstellungen in ein Modal, damit niemand seinen Arbeitsbereich verlassen muss. Behalte die Suchfilterung bei und sorge dafür, dass ⌘, sie von überall öffnet."
 
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Verschiebe die Aktionen aus t3.json nach .paradev/config.json oder lass das einen Agenten für dich erledigen."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Diesen Arbeitsbereich auf {computerName} verschieben?"
 
@@ -12427,6 +12473,9 @@ msgstr "In Tab verschieben"
 
 msgid "Move your agents."
 msgstr "Zieh deine Agenten um."
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Zieh deine T3-Code-Worktrees und Agenten in wenigen Minuten zu {companyName} um. Kostenlos und Open Source."
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Zieh deine Worktrees und Agenten in wenigen Minuten zu {companyName} um. Kostenlos und Open Source."
@@ -13510,6 +13559,9 @@ msgstr "Keine Arbeitsbereiche."
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Nein. {companyName} leitet Modellaufrufe niemals über einen Proxy. Die Agenten nutzen deine eigenen Abonnements und Schlüssel."
 
+msgid "No. Runs on machines you own"
+msgstr "Nein. Läuft auf deinen eigenen Rechnern"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Nein. Deine Agenten bleiben unabhängig; Paradev ist die Orchestrierungsebene um sie herum. Jede Aufgabe bekommt ihren eigenen Git-Worktree und Branch, dauerhafte Sitzungen, Diff-Review und Automationen, die bei Ereignissen oder nach Zeitplan laufen, ohne den Workflow an einen Anbieter zu binden."
 
@@ -14419,6 +14471,9 @@ msgstr "Versandoptionen öffnen"
 
 msgid "Open Source"
 msgstr "Open Source"
+
+msgid "Open source (MIT)"
+msgstr "Open Source (MIT)"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open Source unter MIT. Nutze jeden Agenten mit deinen eigenen Abos und Schlüsseln."
@@ -15767,6 +15822,9 @@ msgstr "Projekt unter {0} eingerichtet"
 
 msgid "Project Settings"
 msgstr "Projekteinstellungen"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "Projekteinstellungen in T3 Code, etwa Regeln zum Aufräumen von Worktrees"
 
 msgid "Project worktree location reset"
 msgstr "Worktree-Speicherort des Projekts zurückgesetzt"
@@ -17388,6 +17446,9 @@ msgstr "Starte eine Armee aus Coding-Agents"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Führe einen iOS-Simulator in einem Bereich des Arbeitsbereichs aus, damit du und deine Agenten mobile Apps testen könnt."
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "Nutze jeden Agenten, der eine CLI hat, mit deinen eigenen Abos und Schlüsseln."
+
 msgid "Run automations on data source and comment activity."
 msgstr "Automatisierungen bei Aktivität an Datenquellen und Kommentaren ausführen."
 
@@ -17674,6 +17735,12 @@ msgstr "Meetings planen"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Geplante und ereignisgesteuerte Agenten (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, Webhooks) mit fertigen Vorlagen."
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "Geplante Aufgaben und Workflows. Lege sie als Automatisierungen neu an"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "Geplante Aufgaben, Webhook-Aufgaben und Workflows"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "Zeitpläne wiederholen sich — entferne COUNT oder UNTIL."
@@ -17968,6 +18035,9 @@ msgstr "Alle Statistiken ansehen →"
 
 msgid "See Changes"
 msgstr "Änderungen sehen"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "Sieh CI-Checks und Review-Threads direkt neben dem Diff und schick Kommentare zurück an den Agenten."
 
 msgid "See Conductor for current plans and account access"
 msgstr "Aktuelle Tarife und Kontozugang bei Conductor prüfen"
@@ -18432,6 +18502,9 @@ msgstr "Setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Setup-Skripte, sobald du conductor.json konvertierst"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "Setup-Skripte, sobald du t3.json konvertierst"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Die Einrichtung wurde angehalten. Den Grund siehst du in der Ausgabe unten."
@@ -19744,6 +19817,9 @@ msgstr "Beständigkeit · aktive Tage von 30"
 msgid "Switch account"
 msgstr "Konto wechseln"
 
+msgid "Switch from T3 Code to {companyName}"
+msgstr "Von T3 Code zu {companyName} wechseln"
+
 msgid "Switch host"
 msgstr "Host wechseln"
 
@@ -19901,6 +19977,20 @@ msgstr "Anteil am System-RAM"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "System-RAM: Paradev {0}, andere Apps {1}, frei {2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Angaben zu T3 Code stammen aus der öffentlichen Dokumentation und dem Repository. Siehe den <0>vollständigen Vergleich</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code ist eine Marke von T3 Tools, Inc. {0} ist weder mit T3 Tools verbunden noch von T3 Tools unterstützt."
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "T3-Code-Threads. Sie bleiben in T3 Code, das du installiert lassen kannst"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "T3-Code-Worktrees sind einfache Git-Worktrees. {0} nutzt sie dort, wo sie liegen."
 
 msgid "Tab"
 msgstr "Tab"
@@ -23136,6 +23226,9 @@ msgstr "Ja, mich herabstufen"
 msgid "Yes, on paid plans."
 msgstr "Ja, in kostenpflichtigen Tarifen."
 
+msgid "Yes, or the current checkout"
+msgstr "Ja, oder der aktuelle Checkout"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "Ja, setzt Claude-Code-Sitzungen fort"
 
@@ -23147,6 +23240,9 @@ msgstr "Ja. Bewirb dich auf die Stelle, die am besten passt, und erzähl uns, wa
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Ja. Free deckt Einzelpersonen mit 1 Nutzer ab, dazu lokale Arbeitsbereiche, die Desktop-App und die CLI. Ohne Kreditkarte."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "Ja. Importierte Worktrees bleiben, wo sie sind, sodass beide Apps sie öffnen können. Lass das Aufräumen von Worktrees in T3 Code ausgeschaltet, damit es sie nicht entfernt."
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Ja. Bei Plänen mit Cloud-Workspaces können Owner in Einstellungen, Abrechnung beliebig viele zusätzliche GB-Stunden zu {packPrice} pro GB-Stunde kaufen. Gekaufte GB-Stunden werden nach dem monatlichen Pool genutzt und verfallen nie, und automatisches Nachkaufen kann mehr kaufen, wenn sie knapp werden."

@@ -18,7 +18,8 @@ export type DownloadSource =
 	| "careers"
 	| "factory_2026"
 	| "production_run"
-	| "conductor";
+	| "conductor"
+	| "t3_code";
 
 /** PostHog event name → Google Ads conversion action (send_to). */
 const GOOGLE_ADS_EVENT_MAP: Record<string, string> = {

@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {#件のコミット} other {#件のコミッ�
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} が Conductor のワークツリーを見つけ、未コミットの変更ごとその場でインポートします。"
 
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} が T3 Code のワークツリーを見つけ、未コミットの変更ごとその場でインポートします。"
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} は {companyName} が開発しています。"
 
@@ -2499,6 +2502,9 @@ msgstr "スケジュールやトリガーで動くエージェント"
 msgid "Agents on your phone"
 msgstr "スマホで使うエージェント"
 
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "エージェントは T3 Code のスレッドと同じようにチャットとして開きます。同じセッションをいつでもターミナルの CLI に切り替えられます。"
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "エージェントがコードベースについて学んだことを記憶するため、新しいセッションは最初から文脈を持って始まります。"
 
@@ -2933,6 +2939,9 @@ msgstr "Paradevで設定済みのエージェントなら何でも使えます�
 
 msgid "Any channel"
 msgstr "すべてのチャンネル"
+
+msgid "Any CLI agent"
+msgstr "あらゆる CLI エージェント"
 
 msgid "Any conclusion"
 msgstr "すべての結果"
@@ -4062,6 +4071,9 @@ msgstr "クラウド GB 時間を追加購入できますか?"
 msgid "Can I create automations from a script?"
 msgstr "スクリプトからオートメーションを作成できますか？"
 
+msgid "Can I keep using T3 Code?"
+msgstr "T3 Code を使い続けられますか？"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "プランの変更や解約はいつでもできますか?"
 
@@ -4370,6 +4382,16 @@ msgstr "チャットセッションが見つかりません"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "チャットの構成要素: メッセージ、推論、提案"
 
+msgid "Chat threads, with a built-in terminal"
+msgstr "チャットスレッド（ターミナル内蔵）"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "今あるワークツリーのまま、{0} でいつもどおりエージェントとチャットできます。レビュー、クラウド、モバイルも組み込み済みです。"
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "チャット、またはターミナルでエージェント自身の CLI"
+
 msgid "Chats"
 msgstr "チャット"
 
@@ -4586,6 +4608,9 @@ msgstr "Claude Code、Codex、Cursor、OpenCodeなど。エージェントごと
 
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code、Codex、Cursor、OpenCodeなど。"
+
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code、Codex、Cursor、OpenCode、Grok Build、Antigravity、Kiro、Pi、Muse Code、fx、ACP エージェント"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "ワークスペースcomponent-showcaseでClaudeが実行中です。"
@@ -5629,6 +5654,9 @@ msgstr "config.toml に変換"
 
 msgid "Convert to draft"
 msgstr "ドラフトに変換"
+
+msgid "Convert your actions"
+msgstr "アクションを変換する"
 
 msgid "Converting to draft…"
 msgstr "ドラフトに変換しています…"
@@ -9350,6 +9378,9 @@ msgstr "取材やインタビューのご依頼は、メールでお問い合わ
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "請求に関するご質問は<0>お問い合わせ</0>ください。"
 
+msgid "For T3 Code users"
+msgstr "T3 Code ユーザーの方へ"
+
 msgid "For teams that need more power"
 msgstr "もっと力が必要なチーム向け"
 
@@ -10198,6 +10229,9 @@ msgstr "私たちの働き方"
 msgid "How you run agents"
 msgstr "エージェントの実行方法"
 
+msgid "How you work"
+msgstr "作業のしかた"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "クラウドワークスペース内でエージェントがどうサインインするかの設定です。ほかの人は自分のサブスクリプションやAPIキーを接続します。このマシンでは、各エージェントはすでにあるログインをそのまま使い続けます。"
 
@@ -10773,6 +10807,9 @@ msgstr "招待者"
 msgid "Invoices and payment method"
 msgstr "請求書と支払い方法"
 
+msgid "iOS and Android"
+msgstr "iOS と Android"
+
 msgid "iOS app"
 msgstr "iOSアプリ"
 
@@ -10880,6 +10917,9 @@ msgstr "削除されたか、別の組織に属している可能性がありま
 
 msgid "It must join again and pass its checks to merge."
 msgstr "マージするには、もう一度キューに入れてチェックに合格する必要があります。"
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "数分で完了します。試している間、T3 Code はインストールしたままで構いません。"
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "数分で完了します。Conductor Cloud をお使いの場合は、まず<0>クラウドガイド</0>をご覧ください。"
@@ -11791,6 +11831,9 @@ msgstr "macOS"
 msgid "macOS, Linux (experimental)"
 msgstr "macOS、Linux（実験的）"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS、Windows、Linux"
+
 msgid "Magenta"
 msgstr "マゼンタ"
 
@@ -12395,6 +12438,9 @@ msgstr "メインのタブと右サイドバーの間でフォーカスを移動
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "ワークスペースを離れずに済むよう、設定をモーダルに移してください。検索の絞り込みは残し、⌘, でどこからでも開けるようにしてください。"
 
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "t3.json のアクションを .paradev/config.json に移すか、エージェントに任せましょう。"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "このワークスペースを {computerName} に移動しますか？"
 
@@ -12427,6 +12473,9 @@ msgstr "タブに移動"
 
 msgid "Move your agents."
 msgstr "エージェントを移行しましょう。"
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "T3 Code のワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "ワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
@@ -13510,6 +13559,9 @@ msgstr "ワークスペースはありません。"
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "いいえ。{companyName}がモデル呼び出しをプロキシすることはありません。エージェントはご自身のサブスクリプションとキーを使います。"
 
+msgid "No. Runs on machines you own"
+msgstr "いいえ。お持ちのマシンで動作します"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "いいえ。エージェントは独立したままで、Paradevはその周りのオーケストレーション層です。タスクごとに専用のGitワークツリーとブランチ、永続的なセッション、差分レビュー、イベントやスケジュールで動くオートメーションが手に入り、ワークフローが特定のプロバイダーに縛られることもありません。"
 
@@ -14419,6 +14471,9 @@ msgstr "送信オプションを開く"
 
 msgid "Open Source"
 msgstr "オープンソース"
+
+msgid "Open source (MIT)"
+msgstr "オープンソース (MIT)"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "MIT ライセンスのオープンソース。お持ちのサブスクリプションとキーで、どのエージェントでも使えます。"
@@ -15767,6 +15822,9 @@ msgstr "{0}にプロジェクトをセットアップしました"
 
 msgid "Project Settings"
 msgstr "プロジェクト設定"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "T3 Code のプロジェクト設定（ワークツリーのクリーンアップルールなど）"
 
 msgid "Project worktree location reset"
 msgstr "プロジェクトのワークツリーの場所をリセットしました"
@@ -17388,6 +17446,9 @@ msgstr "コーディングエージェント軍団を動かす"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "ワークスペースのペインでiOSシミュレーターを動かし、あなたとエージェントがモバイルアプリをテストできます。"
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "CLI のあるエージェントなら何でも、ご自身のサブスクリプションとキーで実行できます。"
+
 msgid "Run automations on data source and comment activity."
 msgstr "データソースやコメントの動きに応じてオートメーションを実行します。"
 
@@ -17674,6 +17735,12 @@ msgstr "会議のスケジュール調整"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "スケジュール実行とイベント起動のエージェント(cron、GitHub、Slack、Linear、Sentry、Notion、Microsoft Teams、webhook)。すぐ使えるテンプレート付き。"
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "スケジュールタスクとワークフロー。オートメーションとして作り直してください"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "スケジュールタスク、Webhook タスク、ワークフロー"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "スケジュールは繰り返されます — COUNTまたはUNTILを削除してください。"
@@ -17968,6 +18035,9 @@ msgstr "すべての統計を見る →"
 
 msgid "See Changes"
 msgstr "変更を確認"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "CI チェックとレビュースレッドを diff の横で確認し、コメントをエージェントに送り返せます。"
 
 msgid "See Conductor for current plans and account access"
 msgstr "現在のプランとアカウント利用条件はConductorをご確認ください"
@@ -18432,6 +18502,9 @@ msgstr "セットアップ"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "セットアップスクリプト（conductor.json を変換した後）"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "セットアップスクリプト（t3.json を変換した後）"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "設定が停止しました。理由は下の出力に表示されています。"
@@ -19744,6 +19817,9 @@ msgstr "継続 · 30日間のアクティブ日数"
 msgid "Switch account"
 msgstr "アカウントを切り替え"
 
+msgid "Switch from T3 Code to {companyName}"
+msgstr "T3 Code から {companyName} に乗り換える"
+
 msgid "Switch host"
 msgstr "ホストを切り替え"
 
@@ -19901,6 +19977,20 @@ msgstr "システムRAMシェア"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "システムRAM: Paradev{0}、他のアプリ{1}、空き{2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "T3 Code の情報は公開ドキュメントとリポジトリに基づいています。<0>詳しい比較</0>をご覧ください。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code は T3 Tools, Inc. の商標です。{0} は T3 Tools と提携しておらず、承認も受けていません。"
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "T3 Code のスレッド。T3 Code に残るので、インストールしたままにできます"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "T3 Code のワークツリーはただの Git ワークツリーです。{0} はそのままの場所で使います。"
 
 msgid "Tab"
 msgstr "タブ"
@@ -23136,6 +23226,9 @@ msgstr "はい、降格します"
 msgid "Yes, on paid plans."
 msgstr "はい、有料プランで可能です。"
 
+msgid "Yes, or the current checkout"
+msgstr "はい、または現在のチェックアウト"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "対応（Claude Code のセッションを再開可能）"
 
@@ -23147,6 +23240,9 @@ msgstr "はい。最も合うポジションに応募し、何を作りたいか
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "はい。Freeプランは個人向けで、1ユーザー、ローカルワークスペース、デスクトップアプリ、CLIが使えます。クレジットカードは不要です。"
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "はい。インポートしたワークツリーはそのままの場所に残るので、どちらのアプリでも開けます。T3 Code に削除されないよう、ワークツリーのクリーンアップはオフのままにしてください。"
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "はい。クラウドワークスペースのあるプランでは、オーナーが設定の請求から、GB 時間あたり {packPrice} で追加の GB 時間を好きなだけ購入できます。購入した GB 時間は月間プールの後に使われ、期限はありません。残りが少なくなると自動チャージで追加購入することもできます。"

@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {# commit} other {# commit}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} menemukan worktree Conductor Anda dan mengimpornya di tempat, beserta perubahan yang belum di-commit."
 
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} menemukan worktree T3 Code Anda dan mengimpornya di tempat, beserta perubahan yang belum di-commit."
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} dikembangkan oleh {companyName}"
 
@@ -2499,6 +2502,9 @@ msgstr "Agen terjadwal atau dengan pemicu"
 msgid "Agents on your phone"
 msgstr "Agen di ponsel Anda"
 
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "Agen terbuka sebagai chat, seperti thread T3 Code. Pindahkan sesi yang sama ke CLI-nya di terminal kapan saja."
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "Agen mengingat apa yang mereka pelajari tentang codebase Anda, sehingga setiap sesi baru dimulai dengan konteks."
 
@@ -2933,6 +2939,9 @@ msgstr "Agen apa pun yang sudah Anda siapkan di Paradev, seperti Claude Code ata
 
 msgid "Any channel"
 msgstr "Channel mana pun"
+
+msgid "Any CLI agent"
+msgstr "Agen CLI apa pun"
 
 msgid "Any conclusion"
 msgstr "Kesimpulan apa pun"
@@ -4062,6 +4071,9 @@ msgstr "Bisakah saya membeli GB-jam cloud tambahan?"
 msgid "Can I create automations from a script?"
 msgstr "Bisakah saya membuat otomatisasi dari skrip?"
 
+msgid "Can I keep using T3 Code?"
+msgstr "Bisakah saya tetap memakai T3 Code?"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "Bisakah saya ganti paket atau batal kapan saja?"
 
@@ -4370,6 +4382,16 @@ msgstr "Sesi chat tidak ditemukan"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Permukaan chat: pesan, penalaran, saran"
 
+msgid "Chat threads, with a built-in terminal"
+msgstr "Thread chat, dengan terminal bawaan"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "Chat dengan agen Anda di {0} seperti yang biasa Anda lakukan, di worktree yang sudah Anda miliki. Review, cloud, dan seluler sudah tersedia."
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "Chat, atau CLI milik agen di terminal"
+
 msgid "Chats"
 msgstr "Obrolan"
 
@@ -4586,6 +4608,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode, dan lainnya. Tanpa penyiapan per a
 
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code, Codex, Cursor, OpenCode, dan lainnya."
+
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, dan agen ACP"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude kini berjalan di workspace component-showcase."
@@ -5629,6 +5654,9 @@ msgstr "Konversi ke config.toml"
 
 msgid "Convert to draft"
 msgstr "Ubah menjadi draf"
+
+msgid "Convert your actions"
+msgstr "Konversi aksi Anda"
 
 msgid "Converting to draft…"
 msgstr "Mengubah menjadi draf…"
@@ -9350,6 +9378,9 @@ msgstr "Untuk pertanyaan pers dan permintaan wawancara, kirimi kami email."
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "Untuk pertanyaan soal penagihan, <0>hubungi kami</0>."
 
+msgid "For T3 Code users"
+msgstr "Untuk pengguna T3 Code"
+
 msgid "For teams that need more power"
 msgstr "Untuk tim yang butuh lebih banyak tenaga"
 
@@ -10198,6 +10229,9 @@ msgstr "Cara kami bekerja"
 msgid "How you run agents"
 msgstr "Cara Anda menjalankan agen"
 
+msgid "How you work"
+msgstr "Cara Anda bekerja"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cara agen Anda masuk di dalam workspace cloud. Orang lain menghubungkan langganan atau kunci API mereka sendiri; di mesin ini setiap agen tetap memakai login yang sudah ada."
 
@@ -10773,6 +10807,9 @@ msgstr "Diundang Oleh"
 msgid "Invoices and payment method"
 msgstr "Faktur dan metode pembayaran"
 
+msgid "iOS and Android"
+msgstr "iOS dan Android"
+
 msgid "iOS app"
 msgstr "Aplikasi iOS"
 
@@ -10880,6 +10917,9 @@ msgstr "Mungkin sudah dihapus, atau milik organisasi lain."
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Agar bisa di-merge, ia harus masuk lagi dan lolos pemeriksaannya."
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "Hanya butuh beberapa menit, dan Anda bisa tetap memasang T3 Code selama mencobanya."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Hanya butuh beberapa menit. Memakai Conductor Cloud? Mulai dengan <0>panduan cloud</0>."
@@ -11791,6 +11831,9 @@ msgstr "macOS"
 msgid "macOS, Linux (experimental)"
 msgstr "macOS, Linux (eksperimental)"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS, Windows, Linux"
+
 msgid "Magenta"
 msgstr "Magenta"
 
@@ -12395,6 +12438,9 @@ msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar ji
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "Pindahkan Pengaturan ke modal agar orang tidak perlu meninggalkan ruang kerja mereka. Pertahankan pemfilteran pencarian, dan buat ⌘, membukanya dari mana saja."
 
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Pindahkan aksi di t3.json ke .paradev/config.json, atau minta agen melakukannya untuk Anda."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Pindahkan workspace ini ke {computerName}?"
 
@@ -12427,6 +12473,9 @@ msgstr "Pindahkan ke Tab"
 
 msgid "Move your agents."
 msgstr "Pindahkan agen Anda."
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Pindahkan worktree dan agen T3 Code Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Pindahkan worktree dan agen Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
@@ -13510,6 +13559,9 @@ msgstr "Tidak ada workspace."
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Tidak. {companyName} tidak pernah menjadi proxy untuk panggilan model. Agen menggunakan langganan dan kunci Anda sendiri."
 
+msgid "No. Runs on machines you own"
+msgstr "Tidak. Berjalan di mesin milik Anda"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Tidak. Agen Anda tetap independen; Paradev adalah lapisan orkestrasi di sekitarnya. Setiap tugas mendapat Git worktree dan branch sendiri, sesi yang persisten, peninjauan diff, dan otomatisasi yang berjalan berdasarkan peristiwa atau jadwal, tanpa mengikat alur kerja ke satu penyedia."
 
@@ -14419,6 +14471,9 @@ msgstr "Buka opsi pengiriman"
 
 msgid "Open Source"
 msgstr "Open Source"
+
+msgid "Open source (MIT)"
+msgstr "Open source (MIT)"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source dengan lisensi MIT. Gunakan agen apa pun dengan langganan dan kunci Anda sendiri."
@@ -15767,6 +15822,9 @@ msgstr "Proyek disiapkan di {0}"
 
 msgid "Project Settings"
 msgstr "Pengaturan Proyek"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "Pengaturan proyek di T3 Code, seperti aturan pembersihan worktree"
 
 msgid "Project worktree location reset"
 msgstr "Lokasi worktree proyek direset"
@@ -17388,6 +17446,9 @@ msgstr "Jalankan pasukan agen coding"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Jalankan simulator iOS di panel workspace agar Anda dan agen Anda bisa menguji aplikasi mobile."
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "Jalankan agen apa pun yang punya CLI, dengan langganan dan kunci Anda sendiri."
+
 msgid "Run automations on data source and comment activity."
 msgstr "Jalankan otomatisasi pada aktivitas sumber data dan komentar."
 
@@ -17674,6 +17735,12 @@ msgstr "Jadwalkan rapat"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Agen terjadwal dan terpicu event (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhook) dengan templat siap pakai."
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "Tugas terjadwal dan workflow. Buat lagi sebagai otomatisasi"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "Tugas terjadwal, tugas webhook, dan workflow"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "Jadwal harus berulang — hapus COUNT atau UNTIL."
@@ -17968,6 +18035,9 @@ msgstr "Lihat semua statistik →"
 
 msgid "See Changes"
 msgstr "Lihat Perubahan"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "Lihat pemeriksaan CI dan thread review di samping diff, lalu kirim komentar kembali ke agen."
 
 msgid "See Conductor for current plans and account access"
 msgstr "Lihat Conductor untuk paket dan akses akun saat ini"
@@ -18432,6 +18502,9 @@ msgstr "Setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Skrip setup, setelah Anda mengonversi conductor.json"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "Skrip setup, setelah Anda mengonversi t3.json"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Penyiapan berhenti. Alasannya ada di output di bawah."
@@ -19744,6 +19817,9 @@ msgstr "Konsistensi · hari aktif dari 30"
 msgid "Switch account"
 msgstr "Ganti akun"
 
+msgid "Switch from T3 Code to {companyName}"
+msgstr "Beralih dari T3 Code ke {companyName}"
+
 msgid "Switch host"
 msgstr "Ganti host"
 
@@ -19901,6 +19977,20 @@ msgstr "Porsi RAM sistem"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "RAM sistem: Paradev {0}, aplikasi lain {1}, bebas {2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Detail T3 Code diambil dari dokumentasi publik dan repositorinya. Lihat <0>perbandingan lengkap</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code adalah merek dagang T3 Tools, Inc. {0} tidak berafiliasi dengan atau didukung oleh T3 Tools."
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "Thread T3 Code. Thread tetap berada di T3 Code, yang bisa tetap Anda pasang"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Worktree T3 Code adalah Git worktree biasa. {0} menggunakannya di lokasi aslinya."
 
 msgid "Tab"
 msgstr "Tab"
@@ -23136,6 +23226,9 @@ msgstr "Ya, turunkan peran saya"
 msgid "Yes, on paid plans."
 msgstr "Ya, di paket berbayar."
 
+msgid "Yes, or the current checkout"
+msgstr "Ya, atau checkout saat ini"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "Ya, melanjutkan sesi Claude Code"
 
@@ -23147,6 +23240,9 @@ msgstr "Ya. Lamar posisi yang paling sesuai dan ceritakan apa yang ingin Anda ba
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Ya. Paket gratis mencakup perorangan dengan 1 pengguna, workspace lokal, aplikasi desktop, dan CLI. Tanpa kartu kredit."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "Ya. Worktree yang diimpor tetap di tempatnya, jadi kedua aplikasi bisa membukanya. Biarkan pembersihan worktree di T3 Code tetap nonaktif agar tidak menghapusnya."
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Ya. Pada paket dengan workspace cloud, pemilik dapat membeli GB-jam tambahan berapa pun seharga {packPrice} per GB-jam di Pengaturan, Penagihan. GB-jam yang dibeli dipakai setelah kumpulan bulanan dan tidak pernah kedaluwarsa, dan isi ulang otomatis dapat membeli lagi saat hampir habis."

@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {#个提交} other {#个提交}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} 会找到你的 Conductor worktree，并在原位置导入，包括未提交的更改。"
 
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} 会找到你的 T3 Code worktree，并在原位置导入，包括未提交的更改。"
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} 由 {companyName} 开发。"
 
@@ -2499,6 +2502,9 @@ msgstr "按计划或触发器运行的智能体"
 msgid "Agents on your phone"
 msgstr "手机上的智能体"
 
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "智能体以聊天形式打开，就像 T3 Code 的会话一样。可随时把同一个会话切换到终端里的 CLI。"
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "智能体会记住它们对你代码库的了解，让每个新会话一开始就有上下文。"
 
@@ -2933,6 +2939,9 @@ msgstr "你在 Paradev 中设置的任何智能体，例如 Claude Code 或 Code
 
 msgid "Any channel"
 msgstr "任意频道"
+
+msgid "Any CLI agent"
+msgstr "任意 CLI 智能体"
 
 msgid "Any conclusion"
 msgstr "任意结论"
@@ -4062,6 +4071,9 @@ msgstr "可以购买更多云端 GB 小时吗？"
 msgid "Can I create automations from a script?"
 msgstr "我可以用脚本创建自动化吗？"
 
+msgid "Can I keep using T3 Code?"
+msgstr "我还能继续使用 T3 Code 吗？"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "可以随时切换方案或取消吗？"
 
@@ -4370,6 +4382,16 @@ msgstr "未找到聊天会话"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "聊天界面：消息、推理、建议"
 
+msgid "Chat threads, with a built-in terminal"
+msgstr "聊天会话，带内置终端"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "在你已有的 worktree 里，用你习惯的方式在 {0} 中与智能体聊天。评审、云端和移动端都已内置。"
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "聊天，或在终端中使用智能体自己的 CLI"
+
 msgid "Chats"
 msgstr "聊天"
 
@@ -4586,6 +4608,9 @@ msgstr "Claude Code、Codex、Cursor、OpenCode 等。无需为每个智能体�
 
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code、Codex、Cursor、OpenCode等。"
+
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code、Codex、Cursor、OpenCode、Grok Build、Antigravity、Kiro、Pi、Muse Code、fx 以及 ACP 智能体"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude已在工作区component-showcase中运行。"
@@ -5629,6 +5654,9 @@ msgstr "转换为 config.toml"
 
 msgid "Convert to draft"
 msgstr "转为草稿"
+
+msgid "Convert your actions"
+msgstr "转换你的操作"
 
 msgid "Converting to draft…"
 msgstr "正在转为草稿…"
@@ -9350,6 +9378,9 @@ msgstr "媒体咨询和采访请求，请发邮件给我们。"
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "如有账单相关问题，请<0>联系我们</0>。"
 
+msgid "For T3 Code users"
+msgstr "面向 T3 Code 用户"
+
 msgid "For teams that need more power"
 msgstr "面向需要更多能力的团队"
 
@@ -10198,6 +10229,9 @@ msgstr "我们的工作方式"
 msgid "How you run agents"
 msgstr "运行智能体的方式"
 
+msgid "How you work"
+msgstr "工作方式"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "你的智能体在云端工作区中如何登录。其他人连接各自的订阅或API密钥；在这台机器上，每个智能体继续使用它上面已有的登录。"
 
@@ -10773,6 +10807,9 @@ msgstr "邀请人"
 msgid "Invoices and payment method"
 msgstr "发票和支付方式"
 
+msgid "iOS and Android"
+msgstr "iOS 和 Android"
+
 msgid "iOS app"
 msgstr "iOS应用"
 
@@ -10880,6 +10917,9 @@ msgstr "它可能已被删除，或属于另一个组织。"
 
 msgid "It must join again and pass its checks to merge."
 msgstr "要合并，它必须重新加入队列并通过检查。"
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "只需几分钟，试用期间可以保留已安装的 T3 Code。"
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "只需几分钟。在用 Conductor Cloud？请先看<0>云端指南</0>。"
@@ -11791,6 +11831,9 @@ msgstr "macOS"
 msgid "macOS, Linux (experimental)"
 msgstr "macOS、Linux（实验性）"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS、Windows、Linux"
+
 msgid "Magenta"
 msgstr "品红"
 
@@ -12395,6 +12438,9 @@ msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "把设置改成模态框，这样大家不用离开工作区。保留搜索筛选，并让 ⌘, 在任何地方都能打开它。"
 
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "把 t3.json 中的操作移到 .paradev/config.json，或者让智能体替你完成。"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "将此工作区移至 {computerName}？"
 
@@ -12427,6 +12473,9 @@ msgstr "移动到标签页"
 
 msgid "Move your agents."
 msgstr "迁移你的智能体。"
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "几分钟即可把你的 T3 Code worktree 和智能体迁移到 {companyName}。免费且开源。"
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "几分钟即可把你的 worktree 和智能体迁移到 {companyName}。免费且开源。"
@@ -13510,6 +13559,9 @@ msgstr "没有工作区。"
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "不会。{companyName} 从不代理模型调用。智能体使用你自己的订阅和密钥。"
 
+msgid "No. Runs on machines you own"
+msgstr "否。在你自己的机器上运行"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "不是。你的智能体保持独立；Paradev 是围绕它们的编排层。每个任务都有自己的 Git worktree 和分支、持久会话、差异审查，以及按事件或计划运行的自动化，而不会把工作流绑定到某一家提供商。"
 
@@ -14419,6 +14471,9 @@ msgstr "打开发布选项"
 
 msgid "Open Source"
 msgstr "开源"
+
+msgid "Open source (MIT)"
+msgstr "开源 (MIT)"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "基于 MIT 许可证开源。用你自己的订阅和密钥使用任何智能体。"
@@ -15767,6 +15822,9 @@ msgstr "项目已设置在{0}"
 
 msgid "Project Settings"
 msgstr "项目设置"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "T3 Code 中的项目设置，例如 worktree 清理规则"
 
 msgid "Project worktree location reset"
 msgstr "已重置项目worktree位置"
@@ -17388,6 +17446,9 @@ msgstr "调动一支编程智能体大军"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "在工作区窗格中运行 iOS 模拟器，让你和你的智能体测试移动应用。"
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "用你自己的订阅和密钥，运行任何带 CLI 的智能体。"
+
 msgid "Run automations on data source and comment activity."
 msgstr "在数据源和评论活动上运行自动化。"
 
@@ -17674,6 +17735,12 @@ msgstr "安排会议"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "定时和事件触发的智能体（cron、GitHub、Slack、Linear、Sentry、Notion、Microsoft Teams、webhook），并提供现成模板。"
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "定时任务和工作流。请以自动化的形式重新创建"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "定时任务、Webhook 任务和工作流"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "计划会重复 — 请移除COUNT或UNTIL。"
@@ -17968,6 +18035,9 @@ msgstr "查看全部数据 →"
 
 msgid "See Changes"
 msgstr "查看改动"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "在 diff 旁查看 CI 检查和评审讨论，并把评论发回给智能体。"
 
 msgid "See Conductor for current plans and account access"
 msgstr "请查看 Conductor 了解当前套餐和账户访问情况"
@@ -18432,6 +18502,9 @@ msgstr "初始化"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "设置脚本（转换 conductor.json 之后）"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "设置脚本（转换 t3.json 之后）"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "设置已停止。原因见下方输出。"
@@ -19744,6 +19817,9 @@ msgstr "持续性 · 30 天内的活跃天数"
 msgid "Switch account"
 msgstr "切换账号"
 
+msgid "Switch from T3 Code to {companyName}"
+msgstr "从 T3 Code 切换到 {companyName}"
+
 msgid "Switch host"
 msgstr "切换主机"
 
@@ -19901,6 +19977,20 @@ msgstr "系统RAM占比"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "系统RAM：Paradev {0}，其他应用{1}，空闲{2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "T3 Code 的信息来自其公开文档和代码仓库。查看<0>完整对比</0>。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code 是 T3 Tools, Inc. 的商标。{0} 与 T3 Tools 无关联，也未获得其认可。"
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "T3 Code 会话。它们保留在 T3 Code 中，你可以继续保留该应用"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "T3 Code 的 worktree 就是普通的 Git worktree。{0} 会在原位置直接使用它们。"
 
 msgid "Tab"
 msgstr "标签页"
@@ -23136,6 +23226,9 @@ msgstr "是，降低我的角色"
 msgid "Yes, on paid plans."
 msgstr "可以，付费方案支持。"
 
+msgid "Yes, or the current checkout"
+msgstr "是，或当前检出"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "支持，可恢复 Claude Code 会话"
 
@@ -23147,6 +23240,9 @@ msgstr "可以。申请最合适的职位，并告诉我们你想做什么。附
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "有。免费版面向个人，包含1个用户、本地工作区、桌面应用和CLI。无需信用卡。"
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "可以。导入的 worktree 留在原位置，所以两个应用都能打开它们。请保持 T3 Code 的 worktree 清理功能关闭，以免它将其删除。"
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "可以。在包含云工作区的方案中，所有者可以在设置的账单中按每 GB 小时 {packPrice} 的价格购买任意数量的额外 GB 小时。购买的 GB 小时在每月额度池之后使用，永不过期，余量不足时自动充值可以继续购买。"

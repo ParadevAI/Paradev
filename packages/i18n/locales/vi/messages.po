@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {# commit} other {# commit}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} tìm các worktree Conductor của bạn và nhập chúng tại chỗ, kèm cả thay đổi chưa commit."
 
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} tìm các worktree T3 Code của bạn và nhập chúng tại chỗ, kèm cả thay đổi chưa commit."
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} do {companyName} phát triển."
 
@@ -2499,6 +2502,9 @@ msgstr "Agent chạy theo lịch hoặc trigger"
 msgid "Agents on your phone"
 msgstr "Agent trên điện thoại của bạn"
 
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "Agent mở dưới dạng chat, giống một thread của T3 Code. Chuyển chính phiên đó sang CLI của nó trong terminal bất cứ lúc nào."
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "Agent ghi nhớ những gì chúng học được về codebase của bạn, nên mỗi phiên mới đều bắt đầu với sẵn ngữ cảnh."
 
@@ -2933,6 +2939,9 @@ msgstr "Bất kỳ agent nào bạn đã thiết lập trong Paradev, như Claud
 
 msgid "Any channel"
 msgstr "Kênh bất kỳ"
+
+msgid "Any CLI agent"
+msgstr "Bất kỳ agent CLI nào"
 
 msgid "Any conclusion"
 msgstr "Kết quả bất kỳ"
@@ -4062,6 +4071,9 @@ msgstr "Tôi có thể mua thêm GB-giờ đám mây không?"
 msgid "Can I create automations from a script?"
 msgstr "Tôi có thể tạo automation từ script không?"
 
+msgid "Can I keep using T3 Code?"
+msgstr "Tôi có thể tiếp tục dùng T3 Code không?"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "Tôi có thể đổi gói hoặc hủy bất cứ lúc nào không?"
 
@@ -4370,6 +4382,16 @@ msgstr "Không tìm thấy phiên chat"
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Các bề mặt chat: tin nhắn, suy luận, gợi ý"
 
+msgid "Chat threads, with a built-in terminal"
+msgstr "Thread chat, có terminal tích hợp"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "Chat với các agent của bạn trong {0} theo cách bạn đã quen, ngay trong những worktree bạn đang có. Review, cloud và di động đều có sẵn."
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "Chat, hoặc CLI riêng của agent trong terminal"
+
 msgid "Chats"
 msgstr "Cuộc trò chuyện"
 
@@ -4586,6 +4608,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode và nhiều hơn nữa. Không cầ
 
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code, Codex, Cursor, OpenCode và nhiều nữa."
+
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx và các agent ACP"
 
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude hiện đang chạy trong workspace component-showcase."
@@ -5629,6 +5654,9 @@ msgstr "Chuyển sang config.toml"
 
 msgid "Convert to draft"
 msgstr "Chuyển thành bản nháp"
+
+msgid "Convert your actions"
+msgstr "Chuyển đổi các action của bạn"
 
 msgid "Converting to draft…"
 msgstr "Đang chuyển thành bản nháp…"
@@ -9350,6 +9378,9 @@ msgstr "Với các yêu cầu báo chí và phỏng vấn, hãy gửi email cho 
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "Nếu có thắc mắc về thanh toán, hãy <0>liên hệ với chúng tôi</0>."
 
+msgid "For T3 Code users"
+msgstr "Dành cho người dùng T3 Code"
+
 msgid "For teams that need more power"
 msgstr "Dành cho đội cần nhiều sức mạnh hơn"
 
@@ -10198,6 +10229,9 @@ msgstr "Cách chúng tôi làm việc"
 msgid "How you run agents"
 msgstr "Cách bạn chạy agent"
 
+msgid "How you work"
+msgstr "Cách bạn làm việc"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Cách các agent của bạn đăng nhập bên trong workspace cloud. Người khác kết nối gói đăng ký hoặc khóa API của riêng họ; trên máy này mỗi agent vẫn dùng phiên đăng nhập sẵn có."
 
@@ -10773,6 +10807,9 @@ msgstr "Người mời"
 msgid "Invoices and payment method"
 msgstr "Hóa đơn và phương thức thanh toán"
 
+msgid "iOS and Android"
+msgstr "iOS và Android"
+
 msgid "iOS app"
 msgstr "Ứng dụng iOS"
 
@@ -10880,6 +10917,9 @@ msgstr "Có thể nó đã bị xóa, hoặc thuộc về một tổ chức khá
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Để merge, nó phải vào lại hàng đợi và vượt qua các kiểm tra."
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "Chỉ mất vài phút, và bạn có thể giữ T3 Code đã cài trong lúc dùng thử."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Chỉ mất vài phút. Đang dùng Conductor Cloud? Hãy bắt đầu với <0>hướng dẫn cho cloud</0>."
@@ -11791,6 +11831,9 @@ msgstr "macOS"
 msgid "macOS, Linux (experimental)"
 msgstr "macOS, Linux (thử nghiệm)"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS, Windows, Linux"
+
 msgid "Magenta"
 msgstr "Đỏ tía"
 
@@ -12395,6 +12438,9 @@ msgstr "Di chuyển tiêu điểm giữa các tab chính và thanh bên phải, 
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "Chuyển Cài đặt vào một modal để mọi người không phải rời không gian làm việc. Giữ nguyên tính năng lọc tìm kiếm và để ⌘, mở nó từ bất cứ đâu."
 
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Chuyển các action trong t3.json sang .paradev/config.json, hoặc nhờ một agent làm giúp bạn."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Chuyển không gian làm việc này sang {computerName}?"
 
@@ -12427,6 +12473,9 @@ msgstr "Chuyển sang tab"
 
 msgid "Move your agents."
 msgstr "Hãy chuyển agent của bạn."
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Chuyển worktree và agent T3 Code của bạn sang {companyName} trong vài phút. Miễn phí và mã nguồn mở."
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Chuyển worktree và agent của bạn sang {companyName} trong vài phút. Miễn phí và mã nguồn mở."
@@ -13510,6 +13559,9 @@ msgstr "Không có workspace."
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Không. {companyName} không bao giờ làm proxy cho các lệnh gọi mô hình. Agent dùng gói đăng ký và khóa của chính bạn."
 
+msgid "No. Runs on machines you own"
+msgstr "Không. Chạy trên máy của chính bạn"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Không. Các agent của bạn vẫn độc lập; Paradev là lớp điều phối bao quanh chúng. Mỗi tác vụ có Git worktree và nhánh riêng, phiên làm việc lâu dài, xem xét diff và các tự động hóa chạy theo sự kiện hoặc theo lịch, mà không ràng buộc quy trình vào một nhà cung cấp."
 
@@ -14419,6 +14471,9 @@ msgstr "Mở tùy chọn gửi"
 
 msgid "Open Source"
 msgstr "Mã nguồn mở"
+
+msgid "Open source (MIT)"
+msgstr "Mã nguồn mở (MIT)"
 
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Mã nguồn mở theo giấy phép MIT. Dùng bất kỳ agent nào với gói đăng ký và khóa của riêng bạn."
@@ -15767,6 +15822,9 @@ msgstr "Đã thiết lập dự án tại {0}"
 
 msgid "Project Settings"
 msgstr "Cài đặt dự án"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "Cài đặt dự án trong T3 Code, như quy tắc dọn dẹp worktree"
 
 msgid "Project worktree location reset"
 msgstr "Đã đặt lại vị trí worktree của dự án"
@@ -17388,6 +17446,9 @@ msgstr "Vận hành cả một đội quân agent lập trình"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Chạy trình mô phỏng iOS trong một ngăn của workspace để bạn và các agent có thể kiểm thử ứng dụng di động."
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "Chạy bất kỳ agent nào có CLI, bằng gói đăng ký và khóa của riêng bạn."
+
 msgid "Run automations on data source and comment activity."
 msgstr "Chạy tự động hóa theo hoạt động của nguồn dữ liệu và bình luận."
 
@@ -17674,6 +17735,12 @@ msgstr "Lên lịch cuộc họp"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Agent chạy theo lịch và theo sự kiện (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhook) kèm mẫu dựng sẵn."
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "Tác vụ theo lịch và workflow. Tạo lại chúng dưới dạng tự động hóa"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "Tác vụ theo lịch, tác vụ webhook và workflow"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "Lịch phải lặp lại — hãy bỏ COUNT hoặc UNTIL."
@@ -17968,6 +18035,9 @@ msgstr "Xem tất cả số liệu →"
 
 msgid "See Changes"
 msgstr "Xem thay đổi"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "Xem các kiểm tra CI và thread review ngay cạnh diff, rồi gửi nhận xét lại cho agent."
 
 msgid "See Conductor for current plans and account access"
 msgstr "Xem Conductor để biết các gói và quyền truy cập tài khoản hiện tại"
@@ -18432,6 +18502,9 @@ msgstr "Thiết lập"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Script thiết lập, sau khi bạn chuyển đổi conductor.json"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "Script thiết lập, sau khi bạn chuyển đổi t3.json"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Quá trình thiết lập đã dừng. Lý do có trong output bên dưới."
@@ -19744,6 +19817,9 @@ msgstr "Duy trì · số ngày hoạt động trong 30 ngày"
 msgid "Switch account"
 msgstr "Chuyển tài khoản"
 
+msgid "Switch from T3 Code to {companyName}"
+msgstr "Chuyển từ T3 Code sang {companyName}"
+
 msgid "Switch host"
 msgstr "Đổi host"
 
@@ -19901,6 +19977,20 @@ msgstr "Tỷ lệ RAM hệ thống"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "RAM hệ thống: Paradev {0}, ứng dụng khác {1}, trống {2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Thông tin về T3 Code lấy từ tài liệu công khai và kho mã của họ. Xem <0>so sánh đầy đủ</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code là nhãn hiệu của T3 Tools, Inc. {0} không liên kết với và không được T3 Tools xác nhận."
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "Thread của T3 Code. Chúng vẫn nằm trong T3 Code, và bạn có thể giữ ứng dụng này"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Worktree của T3 Code chỉ là Git worktree thông thường. {0} dùng chúng ngay tại chỗ."
 
 msgid "Tab"
 msgstr "Tab"
@@ -23136,6 +23226,9 @@ msgstr "Có, hạ quyền tôi"
 msgid "Yes, on paid plans."
 msgstr "Có, trên các gói trả phí."
 
+msgid "Yes, or the current checkout"
+msgstr "Có, hoặc checkout hiện tại"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "Có, tiếp tục được các phiên Claude Code"
 
@@ -23147,6 +23240,9 @@ msgstr "Có. Hãy ứng tuyển vào vị trí phù hợp nhất và cho chúng 
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Có. Gói Free dành cho cá nhân với 1 người dùng, workspace cục bộ, ứng dụng máy tính và CLI. Không cần thẻ tín dụng."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "Có. Các worktree đã nhập vẫn ở nguyên chỗ cũ, nên cả hai ứng dụng đều mở được. Hãy để tính năng dọn dẹp worktree trong T3 Code ở trạng thái tắt để nó không xóa chúng."
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Có. Với các gói có không gian làm việc trên đám mây, chủ sở hữu có thể mua thêm GB-giờ với số lượng bất kỳ, giá {packPrice} cho mỗi GB-giờ, trong Cài đặt, Thanh toán. GB-giờ đã mua được dùng sau quỹ hằng tháng và không bao giờ hết hạn, và tự động nạp thêm có thể mua thêm khi sắp hết."
