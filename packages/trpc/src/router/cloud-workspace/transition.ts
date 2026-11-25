@@ -68,7 +68,7 @@ export async function failCloudWorkspace(args: {
 	set?: Partial<typeof cloudWorkspaces.$inferInsert>;
 	reason: CloudWorkspaceFailureReason;
 	error: unknown;
-}): Promise<void> {
+}): Promise<boolean> {
 	const { scope } = args;
 	const changed = await moveCloudWorkspace({
 		id: scope.cloudWorkspaceId,
@@ -78,7 +78,7 @@ export async function failCloudWorkspace(args: {
 		set: { ...args.set, failureReason: args.reason, failedAt: new Date() },
 	});
 	nudge(scope.organizationId, "cloud_workspaces");
-	if (!changed) return;
+	if (!changed) return false;
 	const refused = isCloudUsageRefusal(args.error);
 	logControl(
 		"workspace.failed",
@@ -89,4 +89,5 @@ export async function failCloudWorkspace(args: {
 	if (!refused) {
 		Sentry.captureException(args.error, { tags: controlTags(scope) });
 	}
+	return true;
 }
