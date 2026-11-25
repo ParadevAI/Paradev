@@ -1,8 +1,7 @@
 # Releasing
 
 The release toolchain is `scripts/release/*.ts` (TypeScript, run by Bun — no build
-step). One entry point: **`bun run release`**. Design/rationale lives in
-[`plans/20260709-unified-version-bumping.md`](../../plans/20260709-unified-version-bumping.md).
+step). One entry point: **`bun run release`**.
 
 ## Model
 
@@ -17,6 +16,11 @@ step). One entry point: **`bun run release`**. Design/rationale lives in
   update` won't deliver it) and fails the host-service min-version floor
   (`semver.satisfies` excludes prereleases). Everything stays plain.
 - **pty-daemon** is on its own `0.x` track, bumped only with `--daemon`.
+- **API status floors.** The API sends old cloud workspace status names to clients
+  below `SLEEP_STATUS_CLIENT_FLOORS` in
+  `packages/trpc/src/router/cloud-workspace/client-status.ts` (desktop/CLI 2.0.10,
+  mobile 1.2.3, SDK 0.0.1-alpha.13), so a build at or above a floor must contain
+  #9800, and an older-code hotfix must never be numbered into that range.
 
 ## Commands
 
@@ -87,7 +91,7 @@ gcloud compute ssh superset-review-host --zone=us-west1-b --command \
 Nothing did this for three weeks, which is how the box sat on 1.22.0 from
 2026-08-14 to 2026-09-05 while the app shipped 1.26.0, 404ing on seven procedures
 the mobile app calls — with no upgrade prompt, because it still cleared
-`MIN_HOST_SERVICE_VERSION`. Background: `apps/review-host/README.md`.
+`MIN_HOST_SERVICE_VERSION`.
 
 ## When the daemon guard blocks
 

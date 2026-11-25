@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
+import { CLOUD_WORKSPACE_NOT_STARTED_KEY } from "@superset/shared/sandbox/access";
 import { stub } from "../../../test/stub";
 import * as attachments from "../../lib/attachments";
 import * as plan from "../../lib/billing/plan";
@@ -9,17 +10,22 @@ import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
 import * as userSettings from "../../lib/user-settings";
 import * as workspaceAccess from "../../lib/workspace-access";
+import * as chatMoves from "../chat-move/utils/queueChatMove";
 import * as access from "./access";
 import * as activity from "./activity";
 import * as jobs from "./jobs";
 import * as meter from "./meter";
+import * as reap from "./reap";
+import * as sandboxExpiry from "./sandbox-expiry";
+import * as sandboxSleep from "./sandbox-sleep";
 import * as wake from "./wake";
 
 const WORKSPACE_ID = "0b8f4c1e-2a3d-4e5f-8a9b-1c2d3e4f5a6b";
 const ROW = {
 	id: WORKSPACE_ID,
 	organizationId: "org-1",
-	status: "ready",
+	status: "awake",
+	provider: "vercel",
 	providerSandboxId: "box-1",
 	machineSize: "large",
 };
@@ -31,10 +37,16 @@ let restartedWith: string[] = [];
 const ENVIRONMENT_ID = "5e6f7a8b-9c0d-4e1f-8a2b-3c4d5e6f7a8b";
 let inserted: unknown[] = [];
 let queuedJobs: { launch?: { surface?: string; effort?: string } }[] = [];
+let environmentSize: string | null = null;
+let sizeLookups: (string | null | undefined)[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: async () => ROW });
 stub(db.query.environments, {
-	findFirst: async () => ({ id: ENVIRONMENT_ID, scope: "organization" }),
+	findFirst: async () => ({
+		id: ENVIRONMENT_ID,
+		scope: "organization",
+		machineSize: environmentSize,
+	}),
 });
 stub(db.query.users, {
 	findFirst: async () => ({ id: "user-1", name: "Ana", image: null }),
@@ -70,10 +82,44 @@ stub(guards, {
 });
 stub(access, { canOpenWorkspace: async () => true });
 stub(plan, {
-	resolveMachineSize: async (_: string, name: string) =>
-		name === "xlarge" ? { name, vcpus: 16 } : null,
+	resolveMachineSize: async (_: string, name: string | null | undefined) => {
+		sizeLookups.push(name);
+		return name === "xlarge"
+			? { name, vcpus: 16 }
+			: name == null
+				? { name: "medium", vcpus: 4 }
+				: null;
+	},
 });
-stub(meter, { assertMayBoot: async () => {} });
+stub(meter, {
+	assertMayBoot: async () => {},
+	queueSettleWorkspace: async () => {},
+	settleWorkspaceNow: async () => {},
+});
+let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+let endedBoots: unknown[] = [];
+stub(sandboxSleep, {
+	recordSandboxAsleep: async (
+		id: string,
+		stopped: { sessionId: string | null },
+	) => {
+		recordedAsleep.push([id, stopped]);
+	},
+	recordBootEnd: async (
+		scope: { cloudWorkspaceId: string },
+		ended: unknown,
+	) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
+	},
+});
+stub(reap, {
+	queueReap: async () => {
+		throw new Error("queue down");
+	},
+	reapWorkspaceFiles: async () => {},
+});
+stub(chatMoves, { failChatMovesTo: async () => {} });
+stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
 const FORWARD = {
 	port: 5173,
 	localPort: 5174,
@@ -84,12 +130,30 @@ stub(realtime, {
 	nudge: () => {},
 	readWorkspaceForwards: async () => [FORWARD],
 });
+let describing = 0;
+let peakDescribing = 0;
+let describeHeld: Promise<void> | null = null;
 stub(sandbox, {
-	describeSandbox: async () => ({
-		hostTarget: "https://box-1.example",
-		running,
-		vcpus: boxVcpus,
+	describeSandbox: async () => {
+		describing += 1;
+		peakDescribing = Math.max(peakDescribing, describing);
+		await describeHeld;
+		describing -= 1;
+		return {
+			hostTarget: "https://box-1.example",
+			running,
+			vcpus: boxVcpus,
+			expiresAt: running ? new Date(Date.now() + 60_000) : null,
+			sessionId: "session_1",
+		};
+	},
+	mintSandboxGateAccess: async () => ({
+		url: "https://gate.example",
+		token: "ticket",
+		expiresAt: new Date(Date.now() + 60_000),
 	}),
+	stopAndSnapshot: async () => ({ sessionId: "session_1" }),
+	deleteSandbox: async () => {},
 	environmentRepositoryRows: async () => [
 		{ id: "repo-1", defaultBranch: "main" },
 	],
@@ -97,12 +161,27 @@ stub(sandbox, {
 	recordWorkspaceRepositories: async () => {},
 	workspaceBranchName: () => "paradev/ws-1",
 });
+let wakeFailure: Error | null = null;
+const markedUnavailable: string[] = [];
 stub(wake, {
+	markSandboxUnavailable: async (row: { id: string }) => {
+		markedUnavailable.push(row.id);
+	},
+	wakeCloudWorkspace: async () => {
+		if (wakeFailure) throw wakeFailure;
+		if (!running) return null;
+		return {
+			hostTarget: "https://box-1.example",
+			agentsToRestart: [],
+			agentCredentialsChanged: false,
+		};
+	},
 	restartCloudWorkspace: async (row: { machineSize: string }) => {
 		restartedWith.push(row.machineSize);
 		boxVcpus = 16;
 		return {
 			hostTarget: "https://box-1.example",
+			agentsToRestart: [],
 			agentCredentialsChanged: false,
 		};
 	},
@@ -127,11 +206,17 @@ const caller = createCallerFactory(
 );
 
 beforeEach(() => {
+	peakDescribing = 0;
+	describeHeld = null;
 	running = false;
 	boxVcpus = 8;
 	restartedWith = [];
+	recordedAsleep = [];
+	endedBoots = [];
 	inserted = [];
 	queuedJobs = [];
+	environmentSize = null;
+	sizeLookups = [];
 });
 
 describe("cloudWorkspace.create", () => {
@@ -165,6 +250,26 @@ describe("cloudWorkspace.create", () => {
 			mode: "plan",
 		});
 		expect(row.initialLaunch).toMatchObject({ surface: "chat" });
+	});
+
+	test("boots at the environment's size when the create names none", async () => {
+		environmentSize = "xlarge";
+		const row = await create({ machineSize: undefined });
+		expect(row.machineSize).toBe("xlarge");
+	});
+
+	test("falls back to the organization's default when the environment's size is no longer offered", async () => {
+		environmentSize = "2xlarge";
+		const row = await create({ machineSize: undefined });
+		expect(sizeLookups).toEqual(["2xlarge", undefined]);
+		expect(row.machineSize).toBe("medium");
+	});
+
+	test("refuses a size the caller names that the plan does not offer, whatever the environment's", async () => {
+		environmentSize = "xlarge";
+		await expect(create({ machineSize: "2xlarge" })).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+		});
 	});
 });
 
@@ -200,6 +305,68 @@ describe("cloudWorkspace.setMachineSize", () => {
 	});
 });
 
+describe("cloudWorkspace.applySignIns", () => {
+	test("hands sign-ins to a running box, and leaves a stopped one for its next wake", async () => {
+		expect(
+			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
+		).toEqual({ applied: false });
+
+		running = true;
+		expect(
+			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
+		).toEqual({ applied: true });
+	});
+});
+
+describe("cloudWorkspace.sleep", () => {
+	test("records asleep only for the session it stopped", async () => {
+		running = true;
+		expect(await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID })).toEqual({
+			stopped: true,
+		});
+		expect(recordedAsleep).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1" }],
+		]);
+	});
+});
+
+describe("cloudWorkspace.sleep ends the boot", () => {
+	test("as the user's stop, for the session it stopped", async () => {
+		running = true;
+		await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID });
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1", reason: "user" }],
+		]);
+	});
+});
+
+describe("an address read that finds the box stopped", () => {
+	test("labels the boot idle when the recorded expiry has passed", async () => {
+		Object.assign(ROW, { sandboxExpiresAt: new Date(Date.now() - 60_000) });
+		try {
+			expect(await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID })).toEqual({
+				stopped: false,
+			});
+		} finally {
+			Object.assign(ROW, { sandboxExpiresAt: undefined });
+		}
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1", reason: "idle" }],
+		]);
+	});
+});
+
+describe("cloudWorkspace.delete when the reap cannot be queued", () => {
+	test("ends every open boot as archived before the final settle", async () => {
+		expect(await caller.cloudWorkspace.delete({ id: WORKSPACE_ID })).toEqual({
+			deleted: true,
+		});
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: null, reason: "archived" }],
+		]);
+	});
+});
+
 describe("cloudWorkspace.forwards", () => {
 	const boxCaller = createCallerFactory(
 		createTRPCRouter({ cloudWorkspace: cloudWorkspaceRouter }),
@@ -231,5 +398,42 @@ describe("cloudWorkspace.forwards", () => {
 				id: "9c1d2e3f-4a5b-4c6d-8e7f-0a1b2c3d4e5f",
 			}),
 		).rejects.toMatchObject({ code: "NOT_FOUND" });
+	});
+});
+
+describe("cloudWorkspace.access in one large batch", () => {
+	test("addresses a few workspaces at a time, and a wake is not held behind them", async () => {
+		let release = () => {};
+		describeHeld = new Promise((resolve) => {
+			release = resolve;
+		});
+		const addresses = Array.from({ length: 64 }, () =>
+			caller.cloudWorkspace.access({ id: WORKSPACE_ID }),
+		);
+		await Bun.sleep(0);
+		running = true;
+		const woken = await caller.cloudWorkspace.access({
+			id: WORKSPACE_ID,
+			wake: true,
+		});
+		expect(woken.running).toBe(true);
+		release();
+		const granted = await Promise.all(addresses);
+		expect(granted).toHaveLength(64);
+		expect(peakDescribing).toBeLessThanOrEqual(8);
+	});
+});
+
+describe("cloudWorkspace.access with wake, past the wake deadline", () => {
+	test("answers the could-not-start key, and leaves the workspace as it was", async () => {
+		wakeFailure = new sandbox.CloudWorkspaceNotStartedError();
+		const error = await caller.cloudWorkspace
+			.access({ id: WORKSPACE_ID, wake: true })
+			.catch((e) => e);
+		wakeFailure = null;
+		expect(error.code).toBe("TIMEOUT");
+		expect(error.message).toBe("The cloud workspace could not start");
+		expect(error.cause.i18nKey).toBe(CLOUD_WORKSPACE_NOT_STARTED_KEY);
+		expect(markedUnavailable).toEqual([]);
 	});
 });

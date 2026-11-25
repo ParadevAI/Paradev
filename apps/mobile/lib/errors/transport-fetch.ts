@@ -28,3 +28,34 @@ export const transportFetch: typeof fetch = async (input, init) => {
 		throw new TransportError(cause);
 	}
 };
+
+/**
+ * `fetch` that gives up when no response arrives within `ms`. React Native's
+ * Android client is built with no timeouts (OkHttpClientProvider sets them to
+ * 0), so a request the far side accepts and never answers stays pending for
+ * good there; iOS's URLSession gives up after 60 s.
+ */
+export function deadlineFetch(ms: number): typeof fetch {
+	return (input, init) => {
+		const callerSignal = init?.signal ?? undefined;
+		const controller = new AbortController();
+		let timedOut = false;
+		const onCallerAbort = () => controller.abort(callerSignal?.reason);
+		const timer = setTimeout(() => {
+			timedOut = true;
+			controller.abort();
+		}, ms);
+		if (callerSignal?.aborted) onCallerAbort();
+		else callerSignal?.addEventListener("abort", onCallerAbort, { once: true });
+		return fetch(input, { ...init, signal: controller.signal })
+			.catch((cause: unknown) => {
+				throw timedOut
+					? new TransportError(new Error(`no response in ${ms} ms`))
+					: cause;
+			})
+			.finally(() => {
+				clearTimeout(timer);
+				callerSignal?.removeEventListener("abort", onCallerAbort);
+			});
+	};
+}

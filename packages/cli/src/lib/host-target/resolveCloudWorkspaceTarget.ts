@@ -4,27 +4,38 @@ import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { CLIError } from "@superset/cli-framework";
 import type { AppRouter as HostServiceRouter } from "@superset/host-service/trpc";
 import { getHostId } from "@superset/shared/host-info";
+import { SUPERSET_LAUNCH_SOURCE_HEADER } from "@superset/shared/host-routing";
+import {
+	createSandboxAccess,
+	type SandboxGrant,
+} from "@superset/shared/sandbox/access";
+import { callWithWake } from "@superset/shared/sandbox/reach";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import SuperJSON from "superjson";
 import type { ApiClient } from "../api-client";
-import type {
-	HostServiceClient,
-	ResolvedHostTarget,
+import {
+	HOST_MAX_URL_LENGTH,
+	type HostServiceClient,
+	type ResolvedHostTarget,
 } from "./resolveHostTarget";
 
 type HostWorkspaceRows = Awaited<
 	ReturnType<HostServiceClient["workspace"]["list"]["query"]>
 >;
 
-interface Ticket {
-	url: string;
-	token: string;
-	expiresAt: number;
-}
+type Ticket = SandboxGrant;
 
-const TICKET_MARGIN_MS = 60_000;
 /** A stopped sandbox behind a cached ticket should fail over to a wake, not hang. */
 const REACH_TIMEOUT_MS = 8_000;
+
+class NoAnswerError extends Error {
+	constructor(workspaceId: string, cause: unknown) {
+		super(
+			`Cloud workspace ${workspaceId} did not answer: ${cause instanceof Error ? cause.message : String(cause)}`,
+			{ cause },
+		);
+	}
+}
 
 function ticketsPath(): string {
 	return join(resolveAppHomeDir(), "cloud-workspace-tickets.json");
@@ -43,32 +54,24 @@ export async function resolveCloudWorkspaceTarget(options: {
 	workspaceId: string;
 }): Promise<{ target: ResolvedHostTarget; workspaces: HostWorkspaceRows }> {
 	const key = `${options.organizationId}:${options.workspaceId}`;
-
-	const cached = readTickets()[key];
-	if (cached && cached.expiresAt - TICKET_MARGIN_MS > Date.now()) {
-		const reached = await reach(options.workspaceId, cached);
-		if (reached) return reached;
-	}
-
-	const ticket = await askApi(options, () =>
-		options.api.cloudWorkspace.hostTicket.mutate({ id: options.workspaceId }),
+	const access = createSandboxAccess<Ticket>((id, wake) =>
+		askApi(options, () =>
+			wake
+				? options.api.cloudWorkspace.access.mutate({ id, wake: true })
+				: options.api.cloudWorkspace.hostTicket.mutate({ id }),
+		),
 	);
-	const reached = await reach(options.workspaceId, ticket);
-	if (reached) {
-		saveTicket(key, ticket);
-		return reached;
-	}
-
-	const woken = await askApi(options, () =>
-		options.api.cloudWorkspace.access.mutate({
-			id: options.workspaceId,
-			wake: true,
-		}),
-	);
-	const target = targetFor(options.workspaceId, woken);
-	const workspaces = await target.client.workspace.list.query();
-	saveTicket(key, woken);
-	return { target, workspaces };
+	return callWithWake({
+		access,
+		workspaceId: options.workspaceId,
+		cached: readTickets()[key] ?? null,
+		call: async (ticket) => {
+			const reached = await reach(options.workspaceId, ticket);
+			saveTicket(key, ticket);
+			return reached;
+		},
+		isUnanswered: (error) => error instanceof NoAnswerError,
+	});
 }
 
 async function reach(
@@ -77,7 +80,7 @@ async function reach(
 ): Promise<{
 	target: ResolvedHostTarget;
 	workspaces: HostWorkspaceRows;
-} | null> {
+}> {
 	const target = targetFor(workspaceId, ticket);
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	try {
@@ -91,8 +94,8 @@ async function reach(
 			}),
 		]);
 		return { target, workspaces };
-	} catch {
-		return null;
+	} catch (error) {
+		throw new NoAnswerError(workspaceId, error);
 	} finally {
 		clearTimeout(timer);
 	}
@@ -122,7 +125,7 @@ async function askApi(
 			`Cloud workspace ${options.workspaceId}: ${error.message}`,
 			code === "TIMEOUT"
 				? "The sandbox is still starting; try again in a few seconds"
-				: "Check it with: superset workspaces list",
+				: "Check it with: paradev workspaces list",
 		);
 	}
 }
@@ -135,10 +138,12 @@ function targetFor(workspaceId: string, ticket: Ticket): ResolvedHostTarget {
 			links: [
 				httpBatchLink({
 					url: `${ticket.url}/trpc`,
+					maxURLLength: HOST_MAX_URL_LENGTH,
 					transformer: SuperJSON,
 					headers: {
 						Authorization: `Bearer ${ticket.token}`,
 						"x-superset-client-machine-id": getHostId(),
+						[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 					},
 				}),
 			],

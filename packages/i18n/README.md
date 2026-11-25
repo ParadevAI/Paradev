@@ -1,8 +1,7 @@
 # @superset/i18n
 
 Shared internationalization for every surface: one Lingui catalog set, one
-client `i18n` instance, fixed server instances per locale, one locale list. Strategy and phasing:
-`plans/20260826-i18n-strategy.md`.
+client `i18n` instance, fixed server instances per locale, one locale list.
 
 ## Usage
 

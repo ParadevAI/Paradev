@@ -1,12 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
+import { i18n } from "@superset/i18n";
+import { useFormat } from "@superset/i18n/react";
 import { useRouter } from "expo-router";
-import { FolderGit2 } from "lucide-react-native";
-import { Pressable, View } from "react-native";
-import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/ui/icon";
+import { View } from "react-native";
+import { RowLink } from "@/components/RowLink";
 import { Text } from "@/components/ui/text";
-import type { CloudWorkspaceStatus } from "@/hooks/useCloudWorkspaceItems";
 import type {
 	HostWorkspaceItem,
 	HostWorkspacesCacheOps,
@@ -14,23 +13,28 @@ import type {
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { AgentMark } from "@/screens/(authenticated)/(home)/new-session/agent";
-import { AsciiSpinner } from "@/screens/(authenticated)/components/AsciiSpinner";
-import { PingDot } from "@/screens/(authenticated)/components/PingDot";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import {
 	PULL_REQUEST_STATUS,
 	pullRequestStatus,
 } from "@/screens/(authenticated)/workspace/[id]/utils/pullRequest";
+import { useAttentionLabel } from "../../hooks/useAttentionLabel";
 import type {
 	TerminalAttention,
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
-import { WorkspaceRowMenu } from "./components/WorkspaceRowMenu";
+import type { GroupBarSpan } from "../../types";
+import { rowDetailParts } from "../RowDetailLine";
+import { WorkspaceLead } from "../WorkspaceLead";
+import { WorkspaceRowFrame } from "../WorkspaceRowFrame";
+import {
+	WorkspaceRowMenu,
+	type WorkspaceRowMenuProps,
+} from "./components/WorkspaceRowMenu";
+import { useWorkspaceMove } from "./hooks/useWorkspaceMove";
 import { useWorkspaceRowActions } from "./hooks/useWorkspaceRowActions";
 
-// PR state replaces the host icon in the icon slot — same treatment as
-// desktop's DashboardSidebarWorkspaceIcon.
 const MAX_SESSION_MARKS = 3;
 
 export function WorkspaceRow({
@@ -40,9 +44,14 @@ export function WorkspaceRow({
 	cache,
 	attention,
 	sessions,
-	cloudStatus,
 	onCopied,
 	card = false,
+	groups,
+	group,
+	detail,
+	disabled = false,
+	separator = false,
+	stateInLabel = false,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -50,16 +59,24 @@ export function WorkspaceRow({
 	cache: HostWorkspacesCacheOps;
 	attention?: TerminalAttention | null;
 	sessions: TerminalRowData[];
-	/** Set for a cloud workspace; drives the row's pending/failed treatment. */
-	cloudStatus?: CloudWorkspaceStatus;
 	/** Copy ID landed on the pasteboard; the screen shows its "Copied" notice. */
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row indented under its project. */
 	card?: boolean;
+	groups?: WorkspaceRowMenuProps["groups"];
+	/** Set for a row inside a group: its colour and piece of the group's bar. */
+	group?: { color: string | null; bar: GroupBarSpan | null };
+	/** Replaces the branch in the detail line, e.g. "project · host" outside its project. */
+	detail?: string;
+	disabled?: boolean;
+	separator?: boolean;
+	stateInLabel?: boolean;
 }) {
 	const { t } = useLingui();
+	const attentionLabel = useAttentionLabel();
 	const router = useRouter();
 	const theme = useTheme();
+	const { formatNumber } = useFormat();
 	const prIcon = pullRequest
 		? PULL_REQUEST_STATUS[pullRequestStatus(pullRequest)]
 		: null;
@@ -70,7 +87,8 @@ export function WorkspaceRow({
 		shareWorkspace,
 		isUnread,
 		toggleUnread,
-	} = useWorkspaceRowActions(workspace, cache, sessions, cloudStatus, onCopied);
+	} = useWorkspaceRowActions(workspace, cache, sessions, undefined, onCopied);
+	const move = useWorkspaceMove(workspace, cache, false);
 	// A manual mark reads as `review` — desktop's rollup ranks it lowest, so
 	// any live status the sessions are reporting keeps the slot.
 	const rowAttention = attention ?? (isUnread ? "review" : null);
@@ -79,142 +97,107 @@ export function WorkspaceRow({
 	);
 	const togglePin = usePinnedWorkspacesStore((state) => state.togglePin);
 
+	const state = rowAttention ?? null;
+	const detailParts = rowDetailParts({
+		state: state ? attentionLabel(state) : null,
+		pullRequest:
+			prIcon && pullRequest
+				? { label: i18n._(prIcon.label), ink: prIcon.ink }
+				: null,
+		diff: diffStats,
+		name: workspace.name,
+		branch: workspace.branch,
+		context: detail,
+		omitState: stateInLabel,
+		noChanges: t({ message: "No changes" }),
+	});
+
+	const href = `/workspace/${workspace.id}`;
+
 	return (
-		<WorkspaceRowMenu
-			// A sandbox that doesn't exist yet has nothing to rename or delete; a
-			// failed one only needs disposing of. Deleting a local workspace
-			// retires the record and leaves the checkout alone, so every row on
-			// a host is deletable.
-			canRename={cloudStatus === undefined || cloudStatus === "ready"}
-			canDelete={cloudStatus === undefined || cloudStatus !== "provisioning"}
-			isCloud={cloudStatus !== undefined}
-			isUnread={isUnread}
-			onToggleUnread={toggleUnread}
-			pinned={pinned}
-			onTogglePin={() => togglePin(workspace.id)}
-			onRename={() => void renameWorkspace()}
-			onDelete={deleteWorkspace}
-			onCopyId={copyId}
-			onShare={shareWorkspace}
-		>
-			{/* Default press behavior on purpose: the system context-menu lift
-			    owns the hold animation, and custom press feedback fights it. */}
-			<Pressable
-				className={cn(
-					"bg-background flex-row items-center gap-3 rounded-xl pr-3",
-					card ? "py-3 pl-3" : "py-2 pl-10",
-				)}
-				onPress={() =>
-					router.push(`/(authenticated)/workspace/${workspace.id}`)
-				}
-				ph-label="workspace-row"
+		<RowLink href={href}>
+			<WorkspaceRowMenu
+				// Deleting a local workspace retires the record and leaves the
+				// checkout alone, so every row on a host is deletable.
+				canRename
+				canDelete
+				isCloud={false}
+				isUnread={isUnread}
+				onToggleUnread={toggleUnread}
+				pinned={pinned}
+				onTogglePin={() => togglePin(workspace.id)}
+				onRename={() => void renameWorkspace()}
+				onDelete={deleteWorkspace}
+				onCopyId={copyId}
+				onShare={shareWorkspace}
+				link={{ href, onCopied }}
+				move={move}
+				groups={groups}
 			>
-				{/* Desktop WorkspaceIcon semantics: working replaces the icon with
-				    the braille spinner; other statuses overlay a corner ping on the
-				    base icon (PR state when one exists, else the workspace mark). */}
-				{rowAttention === "working" || cloudStatus === "provisioning" ? (
-					<View className="size-6 items-center justify-center">
-						<AsciiSpinner />
-					</View>
-				) : (
-					<View className="size-6 items-center justify-center">
-						{prIcon && pullRequest ? (
-							<Button
-								accessibilityLabel={t({
-									message: `Pull request #${pullRequest.prNumber}`,
-								})}
-								ph-label="workspace-row-pull-request"
-								variant="ghost"
-								size="icon"
-								className="size-6"
-								hitSlop={8}
-								onPress={() =>
-									router.push(
-										`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
-									)
-								}
-							>
-								<Icon
-									as={prIcon.icon}
-									className={`size-5 ${prIcon.ink}`}
-									strokeWidth={1.75}
-								/>
-							</Button>
-						) : (
-							<Icon
-								as={FolderGit2}
-								className="text-muted-foreground/80 size-4.5"
-								strokeWidth={1.75}
-							/>
-						)}
-						{rowAttention === "permission" ? (
-							<View className="absolute -right-0.5 -top-0.5">
-								<PingDot color="#eab308" size={7} />
+				<WorkspaceRowFrame
+					lead={
+						<WorkspaceLead
+							attention={rowAttention}
+							creating={false}
+							failed={false}
+							pullRequest={
+								prIcon && pullRequest
+									? {
+											icon: prIcon.icon,
+											ink: prIcon.ink,
+											label: t({
+												message: `Pull request #${pullRequest.prNumber}`,
+											}),
+											onPress: () =>
+												router.push(
+													`/(authenticated)/workspace/${workspace.id}/pull-request/${pullRequest.prNumber}`,
+												),
+										}
+									: null
+							}
+						/>
+					}
+					name={workspace.name}
+					detailParts={detailParts}
+					trailing={
+						sessions.length > 0 ? (
+							<View className="flex-row items-center">
+								{sessions.slice(0, MAX_SESSION_MARKS).map((session, index) => (
+									<View
+										key={session.terminalId}
+										className={cn(
+											"bg-secondary size-6 items-center justify-center rounded-full",
+											index > 0 && "-ml-2",
+										)}
+									>
+										<AgentMark
+											agentId={session.agentId ?? ""}
+											size={12}
+											color={theme.mutedForeground}
+										/>
+									</View>
+								))}
+								{sessions.length > MAX_SESSION_MARKS ? (
+									<Text className="text-muted-foreground pl-1 text-[14px] tabular-nums">
+										+{formatNumber(sessions.length - MAX_SESSION_MARKS)}
+									</Text>
+								) : null}
 							</View>
-						) : rowAttention === "failed" || cloudStatus === "failed" ? (
-							<View className="absolute -right-0.5 -top-0.5">
-								<PingDot color="#ef4444" size={7} />
-							</View>
-						) : rowAttention === "review" ? (
-							<View className="bg-green-500 absolute -right-0.5 -top-0.5 size-2 rounded-full" />
-						) : null}
-					</View>
-				)}
-				<View className="flex-1">
-					<Text className="font-medium text-[15px]" numberOfLines={1}>
-						{workspace.name}
-					</Text>
-					<View className="flex-row items-center gap-1">
-						{/* A workspace named after its branch says it twice otherwise —
-						    common now that every project shows its `main`. */}
-						{workspace.branch === workspace.name ? null : (
-							<Text
-								className="text-muted-foreground shrink text-xs"
-								numberOfLines={1}
-							>
-								{workspace.branch}
-							</Text>
-						)}
-						{diffStats &&
-						(diffStats.additions > 0 || diffStats.deletions > 0) ? (
-							<>
-								{workspace.branch === workspace.name ? null : (
-									<Text className="text-muted-foreground text-xs">•</Text>
-								)}
-								<Text className="text-muted-foreground font-mono text-xs">
-									+{diffStats.additions} −{diffStats.deletions}
-								</Text>
-							</>
-						) : null}
-					</View>
-				</View>
-				{sessions.length > 0 ? (
-					// Overlapping avatar-style stack — stays ~fixed-width as sessions
-					// grow instead of eating the row.
-					<View className="flex-row items-center">
-						{sessions.slice(0, MAX_SESSION_MARKS).map((session, index) => (
-							<View
-								key={session.terminalId}
-								className={cn(
-									"bg-secondary size-6 items-center justify-center rounded-full",
-									index > 0 && "-ml-2",
-								)}
-							>
-								<AgentMark
-									agentId={session.agentId ?? ""}
-									size={12}
-									color={theme.mutedForeground}
-								/>
-							</View>
-						))}
-						{sessions.length > MAX_SESSION_MARKS ? (
-							<Text className="text-muted-foreground pl-1 text-[11px]">
-								+{sessions.length - MAX_SESSION_MARKS}
-							</Text>
-						) : null}
-					</View>
-				) : null}
-			</Pressable>
-		</WorkspaceRowMenu>
+						) : null
+					}
+					card={card}
+					grouped={group !== undefined}
+					bar={group?.bar ?? null}
+					separator={separator}
+					onPress={() => router.navigate(`/(authenticated)${href}`)}
+					disabled={disabled}
+					accessibilityLabel={[
+						workspace.name,
+						...detailParts.map((part) => part.text),
+					].join(", ")}
+					phLabel="workspace-row"
+				/>
+			</WorkspaceRowMenu>
+		</RowLink>
 	);
 }

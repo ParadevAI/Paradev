@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { promisify } from "node:util";
 import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../..";
-import { execWithShellEnv } from "../workspaces/utils/shell-env";
+import { execWithShellEnv } from "../utils/shell-env";
 import { COMMAND_LINE_TOOLS_INSTALLER_PATH, detectGit } from "./detect-git";
 
 const execFileAsync = promisify(execFile);

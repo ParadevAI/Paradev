@@ -49,7 +49,7 @@ export async function stopTerminalDaemon(
 		}
 		if (!hello.daemonPid) {
 			throw new Error(
-				`The terminal daemon (version ${hello.daemonVersion}) does not report its pid, so it cannot be stopped safely. Run \`superset start\` once so the host updates the daemon, then try again.`,
+				`The terminal daemon (version ${hello.daemonVersion}) does not report its pid, so it cannot be stopped safely. Run \`paradev start\` once so the host updates the daemon, then try again.`,
 			);
 		}
 		if (stopped.includes(hello.daemonPid)) break;

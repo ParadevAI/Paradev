@@ -9,7 +9,7 @@ const notifyPath = {{NOTIFY_PATH}};
 export default {
   id: "superset-notify",
   setup(ctx) {
-    if (!process.env.SUPERSET_TERMINAL_ID) return;
+    if (!(process.env.SUPERSET_TERMINAL_ID || process.env.PARADEV_TERMINAL_ID)) return;
 
     const running = new Set();
     const finished = new Set();

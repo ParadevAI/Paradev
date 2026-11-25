@@ -32,7 +32,8 @@ stub(db, {
 	}),
 });
 
-const { creatorPlugins } = await import("./plugins");
+const { allowedPlugins, creatorPlugins, environmentMcpAllowlist } =
+	await import("./plugins");
 
 describe("creatorPlugins", () => {
 	test("a cloud workspace gets only the organization plugins the creator's role may use", async () => {
@@ -45,5 +46,47 @@ describe("creatorPlugins", () => {
 
 	test("a workspace with no creator gets no plugins", async () => {
 		expect(await creatorPlugins(null, "org-1")).toEqual([]);
+	});
+});
+
+describe("allowedPlugins", () => {
+	const linear = { marketplace: "superset", name: "linear", version: "1.0.0" };
+	const github = { marketplace: "superset", name: "github", version: "1.0.0" };
+	const forkedLinear = {
+		marketplace: "acme",
+		name: "linear",
+		version: "1.0.0",
+	};
+
+	test("a box gets only the plugins the config's [mcp] allow lists, matched on name and marketplace", () => {
+		const allowlist = environmentMcpAllowlist(
+			'[mcp]\nallow = ["linear@superset"]\n',
+		);
+		expect(allowedPlugins([linear, github, forkedLinear], allowlist)).toEqual([
+			linear,
+		]);
+	});
+
+	test("no [mcp] allow lets every plugin through; a config that does not parse lets none through", () => {
+		const plugins = [linear, github];
+		expect(allowedPlugins(plugins, environmentMcpAllowlist(null))).toEqual(
+			plugins,
+		);
+		expect(
+			allowedPlugins(
+				plugins,
+				environmentMcpAllowlist('[install]\nrun = "x"\n'),
+			),
+		).toEqual(plugins);
+		expect(allowedPlugins(plugins, environmentMcpAllowlist("[mcp\n"))).toEqual(
+			[],
+		);
+	});
+
+	test("[mcp] enabled = false lets no plugin through, whatever allow lists", () => {
+		const allowlist = environmentMcpAllowlist(
+			'[mcp]\nenabled = false\nallow = ["linear@superset"]\n',
+		);
+		expect(allowedPlugins([linear, github], allowlist)).toEqual([]);
 	});
 });

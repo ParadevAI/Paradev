@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import {
+	environmentHooks,
 	readRepoHooks,
 	repoHooksFromJson,
 	repoHooksFromToml,
@@ -15,7 +16,28 @@ describe("repoHooksFromToml", () => {
 	});
 
 	test("a file without previews publishes nothing extra", () => {
-		expect(repoHooksFromToml('[setup]\nrun = "x"\n')).toEqual({});
+		expect(repoHooksFromToml('[archive]\nrun = "x"\n')).toEqual({});
+	});
+
+	test("reads [install] with its cloud override", () => {
+		expect(
+			repoHooksFromToml(
+				'[install]\nrun = "bun install"\ncwd = "apps/web"\n[install.cloud]\nrun = ["bun install", "bunx playwright install chromium"]\n',
+			),
+		).toEqual({
+			install: {
+				commands: ["bun install", "bunx playwright install chromium"],
+				cwd: "apps/web",
+			},
+		});
+	});
+
+	test("an [install] the cloud turns off is no install", () => {
+		expect(
+			repoHooksFromToml(
+				'[install]\nrun = "bun install"\n[install.cloud]\nrun = []\n',
+			),
+		).toEqual({});
 	});
 
 	test("an invalid file is treated as missing", () => {
@@ -69,5 +91,21 @@ describe("readRepoHooks", () => {
 		});
 
 		expect(await readRepoHooks(args)).toEqual({ ports: [4000] });
+	});
+
+	test("an environment's own config wins; without one the repository's file is read", async () => {
+		serve({
+			".paradev/config.toml": "[ports.web]\ndefault = 4000\npreview = true\n",
+		});
+
+		expect(
+			await environmentHooks({
+				...args,
+				config: "[ports.app]\ndefault = 5000\npreview = true\n",
+			}),
+		).toEqual({ ports: [5000] });
+		expect(await environmentHooks({ ...args, config: null })).toEqual({
+			ports: [4000],
+		});
 	});
 });

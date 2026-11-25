@@ -15,6 +15,7 @@ import {
 	TerminalAgentStore,
 } from "../../../terminal-agents";
 import type { HostAgentConfigId } from "../../../terminal-agents/types";
+import type { HostServiceContext } from "../../../types";
 import { importCloudAttachments } from "../attachments/attachments";
 import {
 	type AttachmentMetadata,
@@ -31,6 +32,7 @@ import {
 	chatContinuationTarget,
 	chatLaunchTarget,
 	continuationTarget,
+	continueAgent,
 	validateAgentEffortSelection,
 	validateAgentForkSelection,
 	validateAgentLaunchOptions,
@@ -120,6 +122,14 @@ describe("buildAgentCommandString", () => {
 		).toBe(
 			"claude --dangerously-skip-permissions --model 'x'\\''; rm -rf /' 'p'\\''; rm -rf /'",
 		);
+	});
+
+	it("ends option parsing before a positional prompt that starts with a dash", () => {
+		expect(
+			buildAgentCommandString(argvConfig, "- fix flags\n- add geo", [], {
+				randomId: RANDOM_ID,
+			}),
+		).toBe("claude --dangerously-skip-permissions -- '- fix flags\n- add geo'");
 	});
 
 	it("includes promptArgs before the prompt when a prompt is present", () => {
@@ -312,6 +322,38 @@ describe("buildTerminalAgentLaunch", () => {
 			})
 			.run();
 	}
+
+	it("passes an unlisted model to an agent that lists its own models", () => {
+		const db = createTestDb();
+		seedConfig(db);
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000b",
+				presetId: "opencode",
+				label: "OpenCode",
+				command: "opencode",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				resumeArgsJson: "[]",
+				forkArgsJson: "[]",
+				envJson: "{}",
+				displayOrder: 1,
+			})
+			.run();
+		const launch = (agent: string, model: string) =>
+			buildTerminalAgentLaunch(db, {
+				workspaceId: "workspace",
+				agent,
+				prompt: "p",
+				model,
+			});
+		expect(launch("opencode", "private/new").fullCommand).toContain(
+			"--model private/new",
+		);
+		expect(() => launch("opencode", "bad id")).toThrow(/Unsupported model/);
+		expect(() => launch("claude", "private/new")).toThrow(/Unsupported model/);
+	});
 
 	it("resolves the agent config to a runnable command without a terminal", () => {
 		const db = createTestDb();
@@ -1245,6 +1287,30 @@ describe("continuationTarget", () => {
 		expect(continuationTarget(db, boundStore(), run)).toEqual({
 			terminalId,
 			label: "Claude",
+		});
+	});
+
+	it("continues a terminal agent without opening the chat runtime", async () => {
+		const db = createTestDb();
+		seedClaude(db);
+		let chatOpened = false;
+		const continued = await continueAgent(
+			{
+				db,
+				eventBus: {} as HostServiceContext["eventBus"],
+				terminalAgentStore: boundStore(),
+				runtime: {
+					chat: () => {
+						chatOpened = true;
+						throw new Error("chat runtime opened");
+					},
+				} as unknown as HostServiceContext["runtime"],
+			},
+			run,
+		);
+		expect({ continued, chatOpened }).toEqual({
+			continued: null,
+			chatOpened: false,
 		});
 	});
 

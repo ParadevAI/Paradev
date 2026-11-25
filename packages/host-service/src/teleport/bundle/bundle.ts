@@ -17,6 +17,7 @@ import { type BundleManifest, parseBundleManifest } from "../providers";
 const execFileAsync = promisify(execFile);
 const MANIFEST = "manifest.json";
 const MAX_EXPANDED_BYTES = 1024 * 1024 * 1024;
+export const UPLOAD_TIMEOUT_MS = 10 * 60_000;
 
 /** A scratch directory removed once `run` settles. */
 export async function withStage<T>(
@@ -30,6 +31,59 @@ export async function withStage<T>(
 	}
 }
 
+type PackedBundle = {
+	bytes: Buffer<ArrayBuffer>;
+	size: number;
+	sha256: string;
+};
+
+/** Packs a staged session with its manifest into one gzipped tar. */
+async function packStage(
+	manifest: BundleManifest,
+	stageDir: string,
+): Promise<PackedBundle> {
+	await writeFile(join(stageDir, MANIFEST), JSON.stringify(manifest));
+	const archive = `${stageDir}.tar.gz`;
+	try {
+		await writeFile(archive, "", { mode: 0o600 });
+		await execFileAsync("tar", ["-czf", archive, "-C", stageDir, "."]);
+		const { size } = await stat(archive);
+		if (size > MAX_ATTACHMENT_BYTES) {
+			throw new TRPCError({
+				code: "PAYLOAD_TOO_LARGE",
+				message: "This conversation is too large to move",
+			});
+		}
+		const bytes = await readFile(archive);
+		return {
+			bytes,
+			size,
+			sha256: createHash("sha256").update(bytes).digest("hex"),
+		};
+	} finally {
+		await rm(archive, { force: true });
+	}
+}
+
+export async function putBundle(
+	upload: { url: string; headers: Record<string, string> },
+	bytes: Buffer<ArrayBuffer>,
+	timeoutMs = UPLOAD_TIMEOUT_MS,
+): Promise<void> {
+	const response = await fetch(upload.url, {
+		method: "PUT",
+		headers: upload.headers,
+		body: bytes,
+		signal: AbortSignal.timeout(timeoutMs),
+	});
+	if (!response.ok) {
+		throw new TRPCError({
+			code: "BAD_GATEWAY",
+			message: `Could not upload the conversation (${response.status})`,
+		});
+	}
+}
+
 /** Packs a staged session and uploads it as the chat's newest bundle. */
 export async function uploadBundle(args: {
 	api: ApiClient;
@@ -38,46 +92,41 @@ export async function uploadBundle(args: {
 	manifest: BundleManifest;
 	stageDir: string;
 }): Promise<string> {
-	await writeFile(join(args.stageDir, MANIFEST), JSON.stringify(args.manifest));
-	const archive = `${args.stageDir}.tar.gz`;
-	try {
-		await writeFile(archive, "", { mode: 0o600 });
-		await execFileAsync("tar", ["-czf", archive, "-C", args.stageDir, "."]);
-		const { size } = await stat(archive);
-		if (size > MAX_ATTACHMENT_BYTES) {
-			throw new TRPCError({
-				code: "PAYLOAD_TOO_LARGE",
-				message: "This conversation is too large to move to the cloud",
-			});
-		}
-		const bytes = await readFile(archive);
-		const { transcriptId, upload } =
-			await args.api.chatHistory.createTranscriptUpload.mutate({
-				sessionId: args.chatSessionId,
-				harness: args.harness,
-				harnessSessionId: args.manifest.harnessSessionId,
-				sourceCwd: args.manifest.sourceCwd,
-				sizeBytes: size,
-				sha256: createHash("sha256").update(bytes).digest("hex"),
-			});
-		const response = await fetch(upload.url, {
-			method: "PUT",
-			headers: upload.headers,
-			body: bytes,
+	const packed = await packStage(args.manifest, args.stageDir);
+	const { transcriptId, upload } =
+		await args.api.chatHistory.createTranscriptUpload.mutate({
+			sessionId: args.chatSessionId,
+			harness: args.harness,
+			harnessSessionId: args.manifest.harnessSessionId,
+			sourceCwd: args.manifest.sourceCwd,
+			sizeBytes: packed.size,
+			sha256: packed.sha256,
 		});
-		if (!response.ok) {
-			throw new TRPCError({
-				code: "BAD_GATEWAY",
-				message: `Could not upload the conversation (${response.status})`,
-			});
-		}
-		await args.api.chatHistory.completeTranscriptUpload.mutate({
-			transcriptId,
-		});
-		return transcriptId;
-	} finally {
-		await rm(archive, { force: true });
-	}
+	await putBundle(upload, packed.bytes);
+	await args.api.chatHistory.completeTranscriptUpload.mutate({
+		transcriptId,
+	});
+	return transcriptId;
+}
+
+/**
+ * Packs a staged session and uploads it as a transfer attachment, for a
+ * session that has no chat to keep it under. The file sweep reclaims it a
+ * day later.
+ */
+export async function uploadTransferBundle(args: {
+	api: ApiClient;
+	manifest: BundleManifest;
+	stageDir: string;
+}): Promise<{ fileId: string; sha256: string; byteLength: number }> {
+	const packed = await packStage(args.manifest, args.stageDir);
+	const { fileId, upload } = await args.api.attachment.createUpload.mutate({
+		name: `${args.manifest.harnessSessionId}.tar.gz`,
+		contentType: "application/gzip",
+		sizeBytes: packed.size,
+	});
+	await putBundle(upload, packed.bytes);
+	return { fileId, sha256: packed.sha256, byteLength: packed.size };
 }
 
 export type BundleSource = {

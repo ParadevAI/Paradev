@@ -27,7 +27,7 @@ export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
 	homepage: string | null;
 	author: string | null;
 	license: string | null;
-	/** Artwork the installed plugin ships in its own tree, as a data URI. */
+	/** Artwork the plugin ships in its own tree: read from the installed copy, else served by the API. */
 	iconUrl: string | null;
 }
 
@@ -62,7 +62,8 @@ function toCatalogPlugin(
 		author: plugin.author,
 		license: plugin.license,
 		iconUrl:
-			iconUrls?.get(localVersionKey(plugin.marketplace, plugin.name)) ?? null,
+			iconUrls?.get(localVersionKey(plugin.marketplace, plugin.name)) ??
+			plugin.iconUrl,
 	};
 }
 

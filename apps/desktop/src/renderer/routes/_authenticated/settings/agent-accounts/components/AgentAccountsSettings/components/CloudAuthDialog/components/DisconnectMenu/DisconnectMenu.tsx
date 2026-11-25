@@ -25,7 +25,6 @@ export interface DisconnectCopy {
 	title: string;
 	description: string;
 	done: string;
-	doneDetail?: string;
 }
 
 export function DisconnectMenu({
@@ -49,15 +48,12 @@ export function DisconnectMenu({
 			message: `Cloud workspaces will stop running ${agentLabel} with it.`,
 		}),
 		done: t({ message: `Removed ${credential} for ${agentLabel}.` }),
-		doneDetail: t({
-			message: "Restart workspaces to pick up new agent credentials.",
-		}),
 	};
 	const [confirming, setConfirming] = useState(false);
 	const handleDisconnect = async () => {
 		try {
 			await disconnect();
-			toast.success(copy.done, { description: copy.doneDetail });
+			toast.success(copy.done);
 		} catch (error) {
 			toast.error(
 				error instanceof Error

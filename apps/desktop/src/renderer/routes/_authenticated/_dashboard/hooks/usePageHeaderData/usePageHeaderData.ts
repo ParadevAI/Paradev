@@ -13,7 +13,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { usePageFavorites } from "../usePageFavorites";
 import { useShareDirectory } from "../useShareDirectory";
 
-export interface PageHeaderTarget {
+interface PageHeaderTarget {
 	slug: string;
 	pageId?: string;
 	title?: string;
@@ -28,8 +28,9 @@ interface PageHeaderData {
 	onSetVisibility: (visibility: PageVisibility) => Promise<void>;
 	onSetSharedVersion: (version: number | null) => Promise<void>;
 	onRename: (title: string) => Promise<void>;
-	onRefresh: () => void;
+	onRefresh: () => Promise<void>;
 	onDelete: () => Promise<void>;
+	onDuplicate: (title: string) => Promise<{ id: string; slug: string } | null>;
 	sharing: PageHeaderSharing;
 	/** False for readers who may only view. The server enforces it either way. */
 	canComment: boolean;
@@ -57,6 +58,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 	const setSharedVersion = cloudTrpc.page.setSharedVersion.useMutation();
 	const updatePage = cloudTrpc.page.update.useMutation();
 	const deletePage = cloudTrpc.page.delete.useMutation();
+	const duplicatePage = cloudTrpc.page.duplicate.useMutation();
 	const { setFavorite } = usePageFavorites();
 
 	const share = useShareDirectory();
@@ -175,13 +177,18 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 				utils.page.listPaginated.invalidate(),
 			]);
 		},
-		onRefresh: () => {
-			void refresh();
-		},
+		onRefresh: refresh,
 		onDelete: async () => {
 			if (!pageId) return;
 			await deletePage.mutateAsync({ id: pageId });
 			setFavorite(pageId, false);
+		},
+		onDuplicate: async (title) => {
+			if (!pageId) return null;
+			const copy = await duplicatePage.mutateAsync({ id: pageId, title });
+			void utils.page.listPaginated.invalidate();
+			void utils.page.counts.invalidate();
+			return copy;
 		},
 		sharing,
 		canComment: access.data?.canComment ?? true,

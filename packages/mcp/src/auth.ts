@@ -2,12 +2,15 @@ import { auth, mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
+import {
+	productAudiences,
+	verifyUserBearer,
+} from "@superset/shared/verify-jwt";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
 } from "@superset/trpc/lib/sandbox";
-import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
 import {
 	TokenOrganizationError,
@@ -20,6 +23,8 @@ export interface McpContext {
 	organizationId: string;
 	organizationIds: string[];
 	source: "api-key" | "oauth" | "sandbox";
+	/** The cloud workspace a sandbox credential belongs to; absent for every other source. */
+	sandboxWorkspaceId?: string;
 	clientLabel: string | null;
 	requestId: string;
 	bearerToken: string;
@@ -139,26 +144,12 @@ async function resolveOAuth(
 	organizationId: string;
 	clientLabel: string | null;
 }> {
-	let payload: Record<string, unknown>;
-	try {
-		payload = (await verifyAccessToken(token, {
-			jwksUrl: `${apiUrl}/api/auth/jwks`,
-			verifyOptions: {
-				issuer: apiUrl,
-				audience: [
-					apiUrl,
-					`${apiUrl}/`,
-					`${apiUrl}/api/v2/agent/mcp`,
-					`${apiUrl}/mcp`,
-				],
-			},
-		})) as Record<string, unknown>;
-	} catch {
-		throw new McpUnauthorizedError("Invalid OAuth token");
-	}
-	if (typeof payload.sub !== "string" || !payload.sub) {
-		throw new McpUnauthorizedError("OAuth token missing sub claim");
-	}
+	const payload = await verifyUserBearer(
+		token,
+		apiUrl,
+		productAudiences(apiUrl),
+	);
+	if (!payload) throw new McpUnauthorizedError("Invalid OAuth token");
 	let organizationId: string;
 	try {
 		organizationId = tokenOrganizationId(payload, requestedOrganizationId);
@@ -198,6 +189,7 @@ async function sandboxContext(
 		organizationId: caller.organizationId,
 		organizationIds,
 		source: "sandbox",
+		sandboxWorkspaceId: caller.workspaceId,
 		clientLabel: `cloud-workspace:${caller.workspaceId}`,
 		requestId: crypto.randomUUID(),
 		bearerToken: "",

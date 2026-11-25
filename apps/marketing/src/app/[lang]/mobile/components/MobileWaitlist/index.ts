@@ -1,1 +1,0 @@
-export { MobileWaitlist } from "./MobileWaitlist";

@@ -3,8 +3,7 @@
  * source ccusage and T3 Code read, so usage is complete even for turns not
  * driven through Superset.
  *
- * Correctness rules learned from prior art (see
- * plans/20260815-token-spend-twitter-feedback.md):
+ * Correctness rules learned from prior art:
  * - Claude: count only `type === "assistant"` lines with usage, dedupe on
  *   `message.id + requestId` — the same message is rewritten into multiple
  *   files on resume/fork/compaction, and naive parsers over-count.

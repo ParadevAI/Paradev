@@ -76,7 +76,7 @@ export function chooseAuthMethod({
 				"",
 				...methods.map(
 					(entry) =>
-						`  superset plugins ${command} ${pluginName} --method ${entry.type}${entry.label ? `   (${entry.label})` : ""}`,
+						`  paradev plugins ${command} ${pluginName} --method ${entry.type}${entry.label ? `   (${entry.label})` : ""}`,
 				),
 			].join("\n"),
 		);

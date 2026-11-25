@@ -215,7 +215,7 @@ export function exportTheme(id: string): Theme {
 	if (!theme) {
 		throw new CLIError(
 			`Unknown theme: ${id}`,
-			"Run: superset settings theme list",
+			"Run: paradev settings theme list",
 		);
 	}
 	// exports are starters for custom themes — don't let them claim isBuiltIn

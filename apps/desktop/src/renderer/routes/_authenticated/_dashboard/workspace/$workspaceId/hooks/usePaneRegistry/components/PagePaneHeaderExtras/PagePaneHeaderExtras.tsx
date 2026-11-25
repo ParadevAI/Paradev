@@ -1,0 +1,79 @@
+import {
+	CommentModeButton,
+	PageRefreshButton,
+	PageShareButton,
+} from "@superset/ui/page-comments";
+import { PagePresenceStack } from "@superset/ui/presence";
+import { usePageHeaderData } from "renderer/routes/_authenticated/_dashboard/hooks/usePageHeaderData";
+import type { PagePaneData } from "../../../../types";
+import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
+import { usePagePaneUi } from "../../hooks/usePagePaneUi";
+import { PageWatcherMenu } from "./components/PageWatcherMenu";
+
+interface PagePaneHeaderExtrasProps {
+	data: PagePaneData;
+	paneId: string;
+	workspaceId: string;
+	onCreateNewAgentSession: CreateNewAgentSession;
+}
+
+export function PagePaneHeaderExtras({
+	data,
+	paneId,
+	workspaceId,
+	onCreateNewAgentSession,
+}: PagePaneHeaderExtrasProps) {
+	const {
+		page,
+		versions,
+		threads,
+		currentUserId,
+		onSetVisibility,
+		onSetSharedVersion,
+		sharing,
+		canComment,
+		onRefresh,
+	} = usePageHeaderData(data);
+	const { commentsEnabled, setCommentsEnabled, shareOpen, setShareOpen } =
+		usePagePaneUi(paneId);
+
+	const editable =
+		page?.canEdit ??
+		(currentUserId !== undefined && currentUserId === page?.createdByUserId);
+
+	return (
+		<>
+			<PagePresenceStack pageId={page?.id} viewerId={currentUserId} />
+			<PageWatcherMenu
+				workspaceId={workspaceId}
+				pageId={page?.id}
+				canManage={editable}
+				onCreateNewAgentSession={onCreateNewAgentSession}
+			/>
+			{canComment ? (
+				<CommentModeButton
+					compact
+					enabled={commentsEnabled}
+					openCount={threads.filter((thread) => !thread.resolved).length}
+					onToggle={() => setCommentsEnabled(!commentsEnabled)}
+				/>
+			) : null}
+			{page ? <PageRefreshButton compact onRefresh={onRefresh} /> : null}
+			{page ? (
+				<PageShareButton
+					compact
+					labelClassName="hidden @min-[360px]/pane-header:inline"
+					page={page}
+					versions={versions}
+					editable={editable}
+					open={shareOpen}
+					onOpenChange={setShareOpen}
+					onSetVisibility={onSetVisibility}
+					onSetSharedVersion={onSetSharedVersion}
+					currentUserId={currentUserId}
+					sharing={sharing}
+				/>
+			) : null}
+		</>
+	);
+}

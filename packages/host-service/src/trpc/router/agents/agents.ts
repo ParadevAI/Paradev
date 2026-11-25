@@ -11,7 +11,7 @@ import {
 	getAgentEfforts,
 	getAgentModelSupport,
 	getAgentModeSupport,
-	isCuratedAgentModel,
+	isLaunchableAgentModel,
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
@@ -28,13 +28,14 @@ import {
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { trackAgentLaunched } from "../../../agent-launch-analytics";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
-import {
-	createTerminalSessionInternal,
-	sendAgentMessage,
-} from "../../../terminal/terminal";
+import { discoverAgentModels } from "../../../model-catalog/catalog";
+import { refreshModelMetadata } from "../../../model-catalog/metadata";
+import { sessionModelCatalog } from "../../../model-catalog/session";
+import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type {
 	TerminalAgentBinding,
 	TerminalAgentId,
@@ -42,10 +43,12 @@ import type {
 } from "../../../terminal-agents";
 import {
 	agentLaunchEnv,
+	chatLaunchPresetId,
 	type ResolvedHostAgentConfig,
 	resolveHostAgentConfig,
 } from "../../../terminal-agents/agent-config";
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
+import { sendToAgent } from "../../../terminal-agents/send-to-agent";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import {
@@ -54,7 +57,7 @@ import {
 } from "../attachments/storage";
 import { createChatSession } from "../sessions/create-chat-session";
 import { toTerminalSessionError } from "../terminal/errors";
-import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
+import { seedWorkspaceAgentTrust } from "../workspace-creation/shared/seed-agent-trust";
 
 /**
  * Build a shell command string that runs the resolved agent config with the
@@ -102,7 +105,14 @@ export function buildAgentCommandString(
 	if (config.promptTransport === "argv") {
 		// Plain quoted positional, not the shared "$(cat <<…)" form: the command
 		// is typed into the user's configured shell, and fish has no heredocs.
-		return withCommand([...baseArgv, ...config.promptArgs, prompt]);
+		const endOfOptions =
+			config.promptArgs.length === 0 && prompt.startsWith("-") ? ["--"] : [];
+		return withCommand([
+			...baseArgv,
+			...config.promptArgs,
+			...endOfOptions,
+			prompt,
+		]);
 	}
 
 	return buildPromptCommandString({
@@ -194,7 +204,7 @@ export function validateAgentModelSelection(
 		});
 	}
 
-	if (!isCuratedAgentModel(presetId, model)) {
+	if (!isLaunchableAgentModel(presetId, model)) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `Unsupported model "${model}" for ${label}. Choose one of: ${support.models.map((option) => option.id).join(", ")}.`,
@@ -379,13 +389,18 @@ export function validateAgentLaunchOptions(
 		config.presetId,
 		config.command,
 	);
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
-	validateAgentEffortSelection(
-		launchPresetId,
-		config.label,
-		input.effort,
-		input.model,
-	);
+	const chat =
+		input.surface === "chat" &&
+		!!acpHarnessForPreset(chatLaunchPresetId(config));
+	if (!chat)
+		validateAgentModelSelection(launchPresetId, config.label, input.model);
+	if (!chat)
+		validateAgentEffortSelection(
+			launchPresetId,
+			config.label,
+			input.effort,
+			input.model,
+		);
 	validateAgentModeSelection(
 		launchPresetId,
 		config.label,
@@ -403,7 +418,7 @@ export function validateAgentLaunchOptions(
 export function buildTerminalAgentLaunch(
 	db: HostDb,
 	input: AgentRunInput,
-): { fullCommand: string; label: string } {
+): { fullCommand: string; label: string; config: ResolvedHostAgentConfig } {
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) {
 		// Worded for end users (automation run errors show this verbatim), but
@@ -482,6 +497,7 @@ export function buildTerminalAgentLaunch(
 			SUPERSET_AGENT_DEFINITION_ID: config.id,
 		})}${command}`,
 		label: config.label,
+		config,
 	};
 }
 
@@ -519,12 +535,38 @@ export function bindResumedSession(
 	});
 }
 
+export function trackTerminalAgentLaunched(
+	ctx: Pick<HostServiceContext, "api" | "db">,
+	config: ResolvedHostAgentConfig,
+	input: Pick<AgentRunInput, "workspaceId" | "resumeSessionId">,
+): void {
+	try {
+		trackAgentLaunched(ctx.api, {
+			presetId: config.presetId,
+			command: config.command,
+			executable: config.command,
+			env: agentLaunchEnv(ctx.db, config),
+			kind: "terminal",
+			resumed: Boolean(input.resumeSessionId),
+			workspaceId: input.workspaceId,
+		});
+	} catch (error) {
+		console.warn("[agent-launch] could not report the terminal launch", error);
+	}
+}
+
 async function runTerminalAgent(
-	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
+	ctx: Pick<
+		HostServiceContext,
+		"api" | "db" | "eventBus" | "terminalAgentStore"
+	>,
 	input: AgentRunInput,
 	terminalId: string = crypto.randomUUID(),
 ): Promise<AgentRunResult> {
-	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
+	const { fullCommand, label, config } = buildTerminalAgentLaunch(
+		ctx.db,
+		input,
+	);
 
 	const result = await createTerminalSessionInternal({
 		terminalId,
@@ -540,6 +582,7 @@ async function runTerminalAgent(
 	}
 
 	bindResumedSession(ctx, input, result.terminalId);
+	trackTerminalAgentLaunched(ctx, config, input);
 
 	return {
 		kind: "terminal",
@@ -707,7 +750,6 @@ export function chatLaunchTarget(
 	const launchPresetId = chatLaunchPresetId(config);
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
 	return {
 		harness,
@@ -723,22 +765,7 @@ export function chatLaunchTarget(
  * A chat takes only the config's env: its args and executable path apply to
  * terminal launches, and the chat runs the CLI the ACP harness resolves.
  */
-export function chatLaunchPresetId(
-	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
-): string {
-	const launchPresetId = resolveAgentLaunchPresetId(
-		config.presetId,
-		config.command,
-	);
-	if (!config.presetId.startsWith("custom")) return launchPresetId;
-	const [commandToken = ""] = config.command.trim().split(/\s+/);
-	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
-		.toLowerCase()
-		.replace(/\.exe$/, "");
-	return executable === "claude" || executable === "codex"
-		? executable
-		: launchPresetId;
-}
+export { chatLaunchPresetId } from "../../../terminal-agents/agent-config";
 
 /**
  * The agent config a stored chat ran under, and whether it still runs that
@@ -756,41 +783,6 @@ export function storedChatConfig(
 		stored !== null &&
 		acpHarnessForPreset(chatLaunchPresetId(stored)) === session.harness;
 	return { stored, keeps };
-}
-
-function continueChatAgent(
-	ctx: Pick<HostServiceContext, "db" | "runtime" | "terminalAgentStore">,
-	input: AgentRunInput,
-): AgentRunResult | null {
-	const terminalId = input.continueTerminalId;
-	if (!terminalId || !ctx.terminalAgentStore.getChat(terminalId)) return null;
-	const chat = ctx.runtime.chat?.();
-	if (!chat) return null;
-	const target = chatContinuationTarget(
-		ctx.db,
-		ctx.terminalAgentStore,
-		chat.live,
-		input,
-	);
-	if (!target) return null;
-
-	try {
-		chat.commands.prompt({
-			commandId: crypto.randomUUID(),
-			sessionId: target.chatSessionId,
-			clientId: crypto.randomUUID(),
-			content: [{ type: "text", text: input.prompt }],
-		});
-	} catch {
-		return null;
-	}
-
-	return {
-		kind: "terminal",
-		sessionId: target.terminalId,
-		label: target.label,
-		chatSessionId: target.chatSessionId,
-	};
 }
 
 function launchChatAgent(
@@ -827,18 +819,32 @@ function launchChatAgent(
  * Every rejection falls through to a launch rather than failing: the caller's
  * candidate is a hint, and a stale one must cost nothing.
  */
-async function continueTerminalAgent(
-	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
+export async function continueAgent(
+	ctx: Pick<
+		HostServiceContext,
+		"db" | "eventBus" | "runtime" | "terminalAgentStore"
+	>,
 	input: AgentRunInput,
 ): Promise<AgentRunResult | null> {
-	const target = continuationTarget(ctx.db, ctx.terminalAgentStore, input);
+	const terminalId = input.continueTerminalId;
+	if (!terminalId) return null;
+	// `runtime.chat()` opens chat.db on first use, so only a chat asks for it.
+	const chat = ctx.terminalAgentStore.hasChat(terminalId)
+		? ctx.runtime.chat?.()
+		: undefined;
+	const chatTarget = chat
+		? chatContinuationTarget(ctx.db, ctx.terminalAgentStore, chat.live, input)
+		: null;
+	const target =
+		chatTarget ?? continuationTarget(ctx.db, ctx.terminalAgentStore, input);
 	if (!target) return null;
 
-	const sent = await sendAgentMessage({
+	const sent = await sendToAgent({
 		terminalId: target.terminalId,
 		workspaceId: input.workspaceId,
 		text: input.prompt,
 		terminalAgentStore: ctx.terminalAgentStore,
+		chatRuntime: () => chat,
 		submit: true,
 		db: ctx.db,
 		eventBus: ctx.eventBus,
@@ -852,6 +858,7 @@ async function continueTerminalAgent(
 		kind: "terminal",
 		sessionId: target.terminalId,
 		label: target.label,
+		...(chatTarget ? { chatSessionId: chatTarget.chatSessionId } : {}),
 	};
 }
 
@@ -882,21 +889,11 @@ export async function runAgentInWorkspace(
 		});
 	}
 	// Ahead of the launch path: continuing costs no pty and no trust seeding.
-	const continued =
-		continueChatAgent(ctx, input) ?? (await continueTerminalAgent(ctx, input));
+	const continued = await continueAgent(ctx, input);
 	if (continued) return continued;
 
-	// Session workspaces are standalone repos the host itself scaffolded, so
-	// agent CLIs can't inherit folder trust from anywhere — pre-trust the
-	// folder in the launching agent's own trust store so its first
-	// interactive boot skips the trust dialog. Worktree workspaces inherit
-	// trust from the main checkout and need nothing.
-	if (workspace.projectId === null) {
-		const config = resolveHostAgentConfig(ctx.db, input.agent);
-		if (config) {
-			await seedAgentFolderTrust(ctx.db, workspace.worktreePath, config);
-		}
-	}
+	const config = resolveHostAgentConfig(ctx.db, input.agent);
+	if (config) await seedWorkspaceAgentTrust(ctx.db, workspace, config);
 	return (
 		launchChatAgent(ctx, input, workspace.worktreePath, launch.terminalId) ??
 		runTerminalAgent(ctx, input, launch.terminalId)
@@ -904,6 +901,32 @@ export async function runAgentInWorkspace(
 }
 
 export const agentsRouter = router({
+	models: protectedProcedure
+		.input(
+			z.object({
+				agent: z.string().min(1),
+				surface: z.enum(["chat", "terminal"]).default("chat"),
+				workspaceId: z.string().optional(),
+				projectId: z.string().optional(),
+				sessionId: z.string().optional(),
+			}),
+		)
+		.query(({ ctx, input }) => {
+			if (input.sessionId) {
+				const catalog = sessionModelCatalog(
+					ctx.runtime.chat?.().live.get(input.sessionId) ?? null,
+					input.workspaceId,
+				);
+				if (!catalog)
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Chat session is not active in this workspace",
+					});
+				refreshModelMetadata();
+				return catalog;
+			}
+			return discoverAgentModels(ctx.db, input);
+		}),
 	run: protectedProcedure
 		.input(
 			z.object({

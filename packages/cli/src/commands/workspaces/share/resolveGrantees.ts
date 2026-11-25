@@ -16,7 +16,7 @@ export async function resolveGrantees(
 	if (users.length === 0 && teams.length === 0) {
 		throw new CLIError(
 			"Nobody to share with",
-			"Pass --user <email|id> or --team <id>; list members with: superset organization members list",
+			"Pass --user <email|id> or --team <id>; list members with: paradev organization members list",
 		);
 	}
 	const grantees: Grantee[] = [];
@@ -35,7 +35,7 @@ export async function resolveGrantees(
 		if (!member) {
 			throw new CLIError(
 				`No member with email ${user} in this organization`,
-				"Run: superset organization members list",
+				"Run: paradev organization members list",
 			);
 		}
 		grantees.push({ kind: "user", userId: member.id });

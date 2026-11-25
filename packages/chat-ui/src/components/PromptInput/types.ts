@@ -89,6 +89,8 @@ export type PromptInputCommand = {
 	searchAliases?: string[];
 	// Tab inserts this chip in place of the typed command instead of selecting.
 	completion?: ComposerChip;
+	// Offered mid-sentence too, not only when the command starts the message.
+	inline?: boolean;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -118,6 +120,7 @@ export type ComposerDraftSegment =
 export type ComposerDraft = {
 	segments: ComposerDraftSegment[];
 	attachments: PromptInputAttachment[];
+	quotes?: string[];
 	usedDictation?: boolean;
 };
 
@@ -125,6 +128,7 @@ export type PromptInputSubmitPayload = {
 	text: string;
 	files: File[];
 	mentions: ComposerChip[];
+	quotes: string[];
 	steer: boolean;
 	draft: ComposerDraft;
 };
@@ -155,6 +159,8 @@ export type PromptInputHandle = {
 	addFiles(files: File[]): void;
 	restoreDraft(draft: ComposerDraft): void;
 	insertChip(chip: ComposerChip): void;
+	/** Adds a quote card and focuses the prompt; a quote already there is kept once. */
+	addQuote(text: string): void;
 	openFileDialog(): void;
 	openPanel(panel: ComposerPanelContent): void;
 	focus(): void;

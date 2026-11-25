@@ -35,7 +35,7 @@ export default command({
 				if (removed === 0) throw error;
 				throw new CLIError(
 					`Stopped sharing with ${removed}, then failed: ${rawErrorMessage(error)}`,
-					"Run superset workspaces share list to see who still has access",
+					"Run paradev workspaces share list to see who still has access",
 				);
 			}
 		}

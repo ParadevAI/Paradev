@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
  * client died mid-PUT, or verification failed after the object landed — and
  * after a day it is never completing. A `ready` row nothing references
  * belonged to a deleted parent whose inline cleanup did not finish. An
- * organization plugin bundle nothing points at belonged to a removed source
+ * organization plugin bundle or icon nothing points at belonged to a removed source
  * or a deleted organization.
  */
 export async function POST(request: Request) {

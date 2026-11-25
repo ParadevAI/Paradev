@@ -40,6 +40,7 @@ export async function GET() {
 		"- **Parallel agents**: run many coding agents side by side, each in its own Git worktree and branch.",
 		"- **Any CLI agent**: Claude Code, OpenAI Codex, OpenCode, and anything else that runs in a terminal.",
 		"- **Diff review**: review every change from one dashboard before merging.",
+		"- **Chat or terminal**: run an agent as a chat with tool calls and file edits in a transcript, or in a terminal.",
 		"- **Persistent terminals**: sessions survive app restarts.",
 		"- **Automations** (Pro): run an agent with a prompt on a schedule or when an event happens.",
 		`- **MCP server**: drive ${BRAND.NAME} from other AI agents over the Model Context Protocol.`,

@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/cloudflare";
+import { parseBoxPressure } from "@superset/shared/box-pressure";
 import {
 	parseChannelRealtimeEvent,
 	USER_EVENTS_PATH,
@@ -532,6 +533,36 @@ app.post(USERS_PUBLISH_PATH, async (c) => {
 });
 
 // ── Emit: the API, after a write ────────────────────────────────────
+
+app.post("/v2/box-pressure", async (c) => {
+	const token = extractToken(c);
+	if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const body = (await c.req.json().catch(() => null)) as {
+		organizationId?: unknown;
+		workspaceId?: unknown;
+		pressure?: unknown;
+	} | null;
+	const organizationId = body?.organizationId;
+	const workspaceId = body?.workspaceId;
+	if (
+		typeof organizationId !== "string" ||
+		organizationId.length === 0 ||
+		typeof workspaceId !== "string" ||
+		!UUID.test(workspaceId)
+	) {
+		return c.json({ error: "organizationId and workspaceId required" }, 400);
+	}
+	const pressure =
+		body?.pressure === null ? null : parseBoxPressure(body?.pressure);
+	if (body?.pressure !== null && !pressure) {
+		return c.json({ error: "invalid pressure" }, 400);
+	}
+	const stub = await getServerByName(c.env.OrgHub, organizationId);
+	await stub.reportBoxPressure(workspaceId, pressure);
+	return c.json({ ok: true });
+});
 
 app.post("/v2/nudge", async (c) => {
 	const token = extractToken(c);

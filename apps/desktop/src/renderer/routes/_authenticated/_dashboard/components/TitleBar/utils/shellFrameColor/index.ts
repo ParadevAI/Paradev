@@ -1,0 +1,1 @@
+export { shellFrameColor } from "./shellFrameColor";

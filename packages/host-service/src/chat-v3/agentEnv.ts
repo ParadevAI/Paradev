@@ -8,20 +8,22 @@ import { waitForSandboxManagedEnv } from "../runtime/sandbox-managed-env";
 import { buildHostLaunchEnv, waitForTerminalBaseEnv } from "../terminal/env";
 import {
 	agentLaunchEnv,
+	chatLaunchPresetId,
 	resolveHostAgentConfig,
 } from "../terminal-agents/agent-config";
-import { chatLaunchPresetId } from "../trpc/router/agents/agents";
 import { resolveDefaultAccountTerminalEnv } from "../trpc/router/usage/default-account";
 
 function workspacePaths(
 	db: HostDb,
 	workspaceId: string,
+	projectId?: string,
 ): { workspacePath: string; rootPath: string } {
 	const workspace = db.query.workspaces
 		.findFirst({ where: eq(workspaces.id, workspaceId) })
 		.sync();
-	const project = workspace?.projectId
-		? getProjectIncludingDeleted(db, workspace.projectId)
+	const resolvedProjectId = workspace?.projectId ?? projectId;
+	const project = resolvedProjectId
+		? getProjectIncludingDeleted(db, resolvedProjectId)
 		: undefined;
 	return {
 		workspacePath: workspace?.worktreePath ?? "",
@@ -91,13 +93,18 @@ export async function buildChatAgentEnv(options: {
 	db: HostDb;
 	cwd: string;
 	workspaceId: string;
+	projectId?: string;
 	terminalId?: string;
 	agentConfigId?: string;
 	/** The CLI the chat runs (`claude`, `codex`, …); a config applies only to its own. */
 	presetId?: string;
 }): Promise<Record<string, string>> {
 	await Promise.all([waitForTerminalBaseEnv(), waitForSandboxManagedEnv()]);
-	const paths = workspacePaths(options.db, options.workspaceId);
+	const paths = workspacePaths(
+		options.db,
+		options.workspaceId,
+		options.projectId,
+	);
 	const overlay = configEnv(
 		options.db,
 		options.agentConfigId,

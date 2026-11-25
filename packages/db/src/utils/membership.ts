@@ -5,14 +5,17 @@ import { db } from "../client";
 import { members, type SelectMember } from "../schema/auth";
 import { type SelectSubscription, subscriptions } from "../schema/schema";
 
-export async function findOrgMembership({
-	userId,
-	organizationId,
-}: {
-	userId: string;
-	organizationId: string;
-}): Promise<SelectMember | undefined> {
-	return db.query.members.findFirst({
+export async function findOrgMembership(
+	{
+		userId,
+		organizationId,
+	}: {
+		userId: string;
+		organizationId: string;
+	},
+	database: Pick<typeof db, "query"> = db,
+): Promise<SelectMember | undefined> {
+	return database.query.members.findFirst({
 		where: and(
 			eq(members.organizationId, organizationId),
 			eq(members.userId, userId),

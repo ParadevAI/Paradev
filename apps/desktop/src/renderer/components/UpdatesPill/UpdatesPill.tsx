@@ -160,7 +160,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 					{isDownloading ? (
 						<DownloadRing percent={percent} className="size-3.5" />
 					) : isInstalling ? (
-						<span className="font-mono text-xs leading-none text-orange-600 dark:text-orange-300 before:animate-braille-spin" />
+						<span className="font-mono text-xs leading-none text-orange-600 dark:text-orange-300 braille-spin" />
 					) : isUpdated ? (
 						<LuCircleCheck
 							strokeWidth={STROKE_WIDTH}
@@ -220,7 +220,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 						<>
 							<span
 								aria-hidden="true"
-								className="w-3 text-center text-xs leading-none before:animate-braille-spin"
+								className="w-3 text-center text-xs leading-none braille-spin"
 							/>
 							<span
 								aria-hidden="true"

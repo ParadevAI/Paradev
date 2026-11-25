@@ -16,10 +16,10 @@ import { Redirect } from "renderer/components/Redirect";
 import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
+import { useSessionRecovery } from "renderer/hooks/useSessionRecovery";
 import { track } from "renderer/lib/analytics";
 import { setAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useSessionRecovery } from "./hooks/useSessionRecovery";
 
 export const Route = createFileRoute("/sign-in/")({
 	component: SignInPage,
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/sign-in/")({
 
 const LAST_USED_METHOD_KEY = "superset-last-auth-method";
 
-const workspaceRedirect = <Redirect to="/workspace" replace />;
+const workspaceRedirect = <Redirect to="/new-workspace" replace />;
 
 const SESSION_PENDING_TIMEOUT_MS = 15_000;
 
@@ -50,11 +50,13 @@ function SignInPage() {
 	const [browserProvider, setBrowserProvider] = useState<AuthProvider | null>(
 		null,
 	);
-	const { hasLocalToken, isPending, session } = useSessionRecovery();
+	const { hasLocalToken, isPending, isRecovering, session } =
+		useSessionRecovery();
 	// A session fetch that never settles must not trap the user on a spinner —
 	// fall through to the sign-in buttons after a while (#5729).
+	const isRestoring = isPending || isRecovering;
 	const pendingTimedOut = useDelayElapsed(
-		isPending,
+		isRestoring,
 		SESSION_PENDING_TIMEOUT_MS,
 	);
 
@@ -64,7 +66,7 @@ function SignInPage() {
 	}
 
 	// Show loading while session is being fetched
-	if (isPending && !pendingTimedOut) {
+	if (isRestoring && !pendingTimedOut) {
 		return (
 			<div className="flex h-screen w-screen items-center justify-center bg-background">
 				<Spinner className="size-8" />
@@ -142,7 +144,7 @@ function SignInPage() {
 			).toISOString();
 			await persistToken.mutateAsync({ token, expiresAt });
 			setAuthToken(token);
-			await navigate({ to: "/workspace", replace: true });
+			await navigate({ to: "/new-workspace", replace: true });
 		} catch (error) {
 			setDevError(
 				error instanceof Error ? error.message : "Dev sign-in failed",

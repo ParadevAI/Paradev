@@ -155,13 +155,17 @@ step_delete_neon_branch() {
 
   WORKSPACE_NAME="${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
 
-  # Check if branch exists before attempting deletion
-  if ! neonctl branches get "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" &> /dev/null; then
-    warn "Neon branch not found or already deleted: $WORKSPACE_NAME ($BRANCH_ID)"
-    return 0
+  local output
+  if ! output=$(neonctl branches get "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" 2>&1); then
+    if [[ "$output" == *"not found"* ]]; then
+      warn "Neon branch not found or already deleted: $WORKSPACE_NAME ($BRANCH_ID)"
+      return 0
+    fi
+    error "Could not read Neon branch: $WORKSPACE_NAME ($BRANCH_ID)"
+    error "Output: $output"
+    return 1
   fi
 
-  local output
   if output=$(neonctl branches delete "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" --force 2>&1); then
     success "Neon branch deleted: $WORKSPACE_NAME ($BRANCH_ID)"
   else
@@ -171,6 +175,43 @@ step_delete_neon_branch() {
   fi
 
   return 0
+}
+
+# Cloud archive: delete the admin branch whose id setup wrote to the admin checkout.
+step_delete_admin_neon_branch() {
+  local dir branch_id project_id="${ADMIN_NEON_PROJECT_ID:-}"
+  dir="$(admin_checkout_dir)" || return 0
+  echo "🗄️  Deleting the admin Neon branch..."
+
+  branch_id="$(admin_workspace_branch_id "$dir")"
+  if [ -z "$branch_id" ]; then
+    warn "No ADMIN_NEON_BRANCH_ID in $dir/.env.workspace, skipping admin branch deletion"
+    step_skipped "admin neon (no branch id)"
+    return 0
+  fi
+  if [ -z "$project_id" ] || [ -z "${NEON_API_KEY:-}" ] || ! command -v neonctl &> /dev/null; then
+    warn "ADMIN_NEON_PROJECT_ID, NEON_API_KEY or neonctl missing; leaving admin branch $branch_id to expire"
+    step_skipped "admin neon (cannot reach Neon)"
+    return 0
+  fi
+
+  local output
+  if ! output=$(neonctl branches get "$branch_id" --project-id "$project_id" 2>&1); then
+    if [[ "$output" == *"not found"* ]]; then
+      warn "Admin Neon branch not found or already deleted: $branch_id"
+      return 0
+    fi
+    error "Could not read admin Neon branch $branch_id: $output"
+    return 1
+  fi
+
+  if output=$(neonctl branches delete "$branch_id" --project-id "$project_id" --force 2>&1); then
+    success "Admin Neon branch deleted: $branch_id"
+  else
+    error "Failed to delete admin Neon branch: $branch_id"
+    error "Output: $output"
+    return 1
+  fi
 }
 
 step_deallocate_port() {

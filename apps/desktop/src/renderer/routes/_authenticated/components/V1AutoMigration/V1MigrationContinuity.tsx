@@ -44,7 +44,7 @@ export function V1MigrationContinuity() {
 					const row = ledger.get(ledgerKey("workspace", lastActive));
 					if (row && isTerminalStatus(row.status) && row.v2Id) {
 						await navigate({
-							to: "/v2-workspace/$workspaceId",
+							to: "/workspace/$workspaceId",
 							params: { workspaceId: row.v2Id },
 						});
 					}

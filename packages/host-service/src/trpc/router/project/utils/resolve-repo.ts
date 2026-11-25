@@ -218,7 +218,7 @@ async function commitInitialEmpty(repoPath: string): Promise<void> {
  * Makes sure `repoPath` has a resolvable `HEAD` before Superset treats it as
  * a usable project. A bare `git init` with nothing committed leaves HEAD
  * unborn, and `git worktree add` — which every workspace creation runs
- * through (see `resolveStartPoint` / `GIT_REFS.md`) — has no start point to
+ * through (see `resolveStartPoint`) — has no start point to
  * fork from and fails outright. `initEmptyRepo`/`initLocalRepoInPlace`
  * already avoid this for repos Superset creates from scratch; this covers a
  * repo a caller points us at that already exists but was never committed to.

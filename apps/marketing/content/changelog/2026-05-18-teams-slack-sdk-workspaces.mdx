@@ -4,28 +4,28 @@ date: 2026-05-18
 image: /changelog/automations.png
 ---
 
-Paradev is now usable from a lot more places than the desktop app: a fleshed-out CLI and TypeScript SDK, a Slack agent that spins up workspaces on its own, and a mobile app heading into internal review.
+You can now use Paradev from more places than the desktop app: a fuller CLI and a TypeScript SDK, a Slack agent that creates workspaces on its own, and a mobile app in internal review.
 
 ## Automations
 
-**Automations are cron jobs for agent sessions.** Pick a project, write a prompt, set a schedule, and Paradev dispatches an agent run against a fresh workspace every time it fires. The output is a live workspace you can open, review, and continue interactively.
+**Automations are cron jobs for agent sessions.** Pick a project, write a prompt, set a schedule, and Paradev starts an agent run in a fresh workspace each time it fires. The output is a live workspace that you can open, review, and continue.
 
 Typical uses:
 
 - **Nightly standups**: summarize PRs, issues, and activity from the last 24 hours
 - **Release notes**: draft from merged commits each week
 - **Security & dependency sweeps**: scan for vulnerable packages or deprecated APIs every morning
-- **Long-running refactors**: "bump TypeScript to 5.7 in the next un-migrated package" on a daily cadence
+- **Long-running refactors**: "bump TypeScript to 5.7 in the next un-migrated package" every day
 
-This batch brings automations into their own as a first-class workflow:
+New in this batch:
 
-- **Prompt version history** <PRBadge url="https://github.com/superset-sh/superset/pull/3996" />: every edit to an automation's prompt is snapshotted. Browse previous versions and restore any of them, so an accidental change is no longer a one-way door.
-- **Redesigned automations tab** <PRBadge url="https://github.com/superset-sh/superset/pull/4225" />: new layout that makes a queue of runs easier to scan at a glance.
-- **Mine vs. Team filter** <PRBadge url="https://github.com/superset-sh/superset/pull/4403" />: automations now belong to a team. Filter the runs view between **Mine** and **Team** to see only what you ran vs. everything your team kicked off.
+- **Prompt version history** <PRBadge url="https://github.com/superset-sh/superset/pull/3996" />: Paradev saves every edit to an automation's prompt. Browse earlier versions and restore any of them to undo an accidental change.
+- **Redesigned automations tab** <PRBadge url="https://github.com/superset-sh/superset/pull/4225" />: a new layout that makes a queue of runs easier to scan.
+- **Mine vs. Team filter** <PRBadge url="https://github.com/superset-sh/superset/pull/4403" />: automations now belong to a team. Switch the runs view between **Mine** and **Team** to see only your runs or all your team's runs.
 
 ### Drive them from the CLI
 
-Everything you can do in the UI is now scriptable. New in this batch: `prompt get` / `prompt set` <PRBadge url="https://github.com/superset-sh/superset/pull/3966" /> and the `--name` filter on list <PRBadge url="https://github.com/superset-sh/superset/pull/3959" />.
+You can now script everything the UI does. New in this batch: `prompt get` / `prompt set` <PRBadge url="https://github.com/superset-sh/superset/pull/3966" /> and the `--name` filter on list <PRBadge url="https://github.com/superset-sh/superset/pull/3959" />.
 
 ```bash
 # create a recurring run from a prompt file
@@ -50,17 +50,17 @@ superset automations prompt set <id> --file prompt.md
 superset automations run <id>
 ```
 
-`superset automations run` is also exposed via the **TypeScript SDK** and **MCP**, so you can dispatch runs from a CI job, an internal admin panel, or a Slack slash command. See the [Automations docs](https://docs.superset.sh/docs/automations) for the full surface.
+`superset automations run` is also available in the **TypeScript SDK** and **MCP**, so you can start runs from a CI job, an internal admin panel, or a Slack slash command. See the [Automations docs](https://docs.superset.sh/docs/automations) for the full list.
 
 ## Paradev CLI
 
-The `superset` CLI grew real project and workspace commands and a cross-device login flow.
+The `superset` CLI now has project and workspace commands and a login that works across devices.
 
 **New commands:**
 
-- `superset projects create` <PRBadge url="https://github.com/superset-sh/superset/pull/4355" />: scaffold a new Paradev project from your shell.
+- `superset projects create` <PRBadge url="https://github.com/superset-sh/superset/pull/4355" />: create a new Paradev project from your shell.
 - `superset projects setup` <PRBadge url="https://github.com/superset-sh/superset/pull/4356" />: link an existing local repo to a Paradev project.
-- `superset workspaces open` <PRBadge url="https://github.com/superset-sh/superset/pull/4258" />: open a workspace directly from the terminal.
+- `superset workspaces open` <PRBadge url="https://github.com/superset-sh/superset/pull/4258" />: open a workspace from the terminal.
 - `superset auth login` <PRBadge url="https://github.com/superset-sh/superset/pull/3965" />: now uses OAuth device code + PKCE, so it works on headless servers and across devices.
 
 **Setting it up:**
@@ -79,7 +79,7 @@ superset projects create
 superset workspaces open
 ```
 
-The accompanying **TypeScript SDK** <PRBadge url="https://github.com/superset-sh/superset/pull/3937" /> (`@superset_sh/sdk`) mirrors the CLI 1:1 (same procedures, same shapes), so anything you can do from your shell, you can do from a script, a CI job, or an internal tool.
+The **TypeScript SDK** <PRBadge url="https://github.com/superset-sh/superset/pull/3937" /> (`@superset_sh/sdk`) mirrors the CLI 1:1. Anything you can do from your shell, you can do from a script, a CI job, or an internal tool.
 
 ```bash
 npm install @superset_sh/sdk
@@ -91,19 +91,19 @@ const client = new Superset(); // reads SUPERSET_API_KEY / SUPERSET_ORGANIZATION
 await client.automations.run('<automation-id>');
 ```
 
-Linux `superset start` and `superset update` are now fixed <PRBadge url="https://github.com/superset-sh/superset/pull/4635" />.
+`superset start` and `superset update` now work on Linux <PRBadge url="https://github.com/superset-sh/superset/pull/4635" />.
 
 ## Slack bot
 
 ![Paradev Slack bot spinning up a workspace and reporting back in-thread](/changelog/slack.png)
 
-`@superset` in Slack is now an actual agent, not a task-filer. Mention it in a channel or DM it from anywhere, and it can:
+`@superset` in Slack is now an agent that does more than file tasks. Mention it in a channel or DM it, and it can:
 
-- **Create, update, search, and triage tasks** from the conversation it's standing in, pulling assignees, statuses, and priorities from your team's Linear/Paradev setup.
-- **Spin up a cloud workspace and launch a coding agent** to actually do the work. For code-change requests (e.g. "@superset bump our Sentry SDK to v9 across all apps"), it now defaults to spawning a workspace and agent rather than just filing a ticket <PRBadge url="https://github.com/superset-sh/superset/pull/4660" />.
-- **Read the thread or channel history** on its own to gather context: no need to copy-paste the prior messages.
-- **Search the web with citations** when a request needs up-to-date info.
-- **Unfurl Paradev task and workspace links** with rich previews when they're shared in a channel.
+- **Create, update, search, and triage tasks** from the conversation it is in. It reads assignees, statuses, and priorities from your team's Linear/Paradev setup.
+- **Spin up a cloud workspace and launch a coding agent** to do the work. For a code-change request (e.g. "@superset bump our Sentry SDK to v9 across all apps"), it now creates a workspace and an agent by default and does not only file a ticket <PRBadge url="https://github.com/superset-sh/superset/pull/4660" />.
+- **Read the thread or channel history** on its own for context, so you do not need to paste earlier messages.
+- **Search the web with citations** when a request needs current information.
+- **Unfurl Paradev task and workspace links** with rich previews when someone shares them in a channel.
 
 **Setting it up:**
 
@@ -111,18 +111,18 @@ Linux `superset start` and `superset update` are now fixed <PRBadge url="https:/
 2. Click **Connect** to install the Paradev Slack app into your workspace (OAuth).
 3. Mention `@superset` in any channel, or open a DM with the bot, and describe what you want done.
 
-If Slack was already connected before this release, no action needed: proactive workspace creation is on by default.
+If you connected Slack before this release, you do not need to do anything: proactive workspace creation is on by default.
 
 ## Mobile: internal review
 
-The mobile app is in **internal review**. Core flows (workspaces list, task triage, agent chat, and the live terminal viewer) are wired up against the same APIs as web and desktop. We're dogfooding on-device now ahead of a wider beta.
+The mobile app is in **internal review**. The core flows (workspaces list, task triage, agent chat, and the live terminal viewer) use the same APIs as web and desktop. We now test it on our own devices before a wider beta.
 
 ## Also in this batch
 
-- **Teams as a first-class primitive** <PRBadge url="https://github.com/superset-sh/superset/pull/4403" />: assign members, workspaces, and automations to a team. Powers the Mine/Team automations split above.
-- **Terminal sessions survive app updates** <PRBadge url="https://github.com/superset-sh/superset/pull/3971" />: the PTY daemon hands off file descriptors on upgrade, so running shells stay alive when Paradev auto-updates.
-- **Web terminal presets** <PRBadge url="https://github.com/superset-sh/superset/pull/4653" />: run your common commands with a single click in the web terminal, same as desktop.
+- **Teams as a first-class primitive** <PRBadge url="https://github.com/superset-sh/superset/pull/4403" />: assign members, workspaces, and automations to a team. The Mine/Team automations filter above uses teams.
+- **Terminal sessions survive app updates** <PRBadge url="https://github.com/superset-sh/superset/pull/3971" />: running shells stay alive when Paradev auto-updates.
+- **Web terminal presets** <PRBadge url="https://github.com/superset-sh/superset/pull/4653" />: run your common commands with one click in the web terminal, as on desktop.
 
 ## Minor updates
 
-V2 changes tab gained inline stage/unstage/discard controls <PRBadge url="https://github.com/superset-sh/superset/pull/4022" /> and diff comments gained a copy action <PRBadge url="https://github.com/superset-sh/superset/pull/4389" />. Workspaces can be started with a preset for repeatable agent runs <PRBadge url="https://github.com/superset-sh/superset/pull/4335" />. The relay server now drains tunnel connections cleanly on shutdown ahead of the multi-region rollout <PRBadge url="https://github.com/superset-sh/superset/pull/4594" />. Theme search in the command palette <PRBadge url="https://github.com/superset-sh/superset/pull/4573" />. macOS notifications now include workspace and project context <PRBadge url="https://github.com/superset-sh/superset/pull/4614" />. MCP OAuth access token TTL bumped to 7 days <PRBadge url="https://github.com/superset-sh/superset/pull/4365" />.
+The V2 changes tab has inline stage, unstage and discard controls <PRBadge url="https://github.com/superset-sh/superset/pull/4022" />, and diff comments have a copy action <PRBadge url="https://github.com/superset-sh/superset/pull/4389" />. You can start a workspace with a preset for repeatable agent runs <PRBadge url="https://github.com/superset-sh/superset/pull/4335" />. The relay server now closes tunnel connections cleanly on shutdown, ahead of the multi-region rollout <PRBadge url="https://github.com/superset-sh/superset/pull/4594" />. The command palette has theme search <PRBadge url="https://github.com/superset-sh/superset/pull/4573" />. macOS notifications now include the workspace and project <PRBadge url="https://github.com/superset-sh/superset/pull/4614" />. MCP OAuth access tokens now last 7 days <PRBadge url="https://github.com/superset-sh/superset/pull/4365" />.

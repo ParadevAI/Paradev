@@ -218,9 +218,6 @@ const timeoutMiddleware = t.middleware(async ({ next, type, path, meta }) => {
  *
  * Use this for `.query` procedures only — mutations have variable
  * latency and shouldn't share a blanket budget.
- *
- * See `packages/host-service/QUERY_TIMEOUTS.md` for the policy and
- * current per-procedure budgets.
  */
 export const queryProcedure = protectedProcedure.use(timeoutMiddleware);
 
@@ -228,5 +225,5 @@ export type {
 	ProjectNotSetupCause,
 	TeardownFailureCause,
 } from "./error-types";
-// INTERIM cross-runtime types via dist-types — see docs/interim-router-types.md
+// INTERIM cross-runtime types via dist-types
 export type { AppRouter } from "./router";

@@ -1,12 +1,12 @@
 // INTERIM: AppRouter comes from generated dist-types until the wire contract
-// moves to a neutral package — see packages/host-service/docs/interim-router-types.md
+// moves to a neutral package.
 import type { AppRouter } from "@superset/host-service/router";
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { createTRPCClient, httpLink, type TRPCClient } from "@trpc/client";
 import type { inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
 import { getJwt } from "../auth/client";
-import { transportRetryLink } from "../errors";
+import { deadlineFetch, transportRetryLink } from "../errors";
 import { getRelayUrl } from "../host/client";
 import { getSandboxAccess, sandboxToken } from "../sandbox-access";
 
@@ -25,6 +25,10 @@ export type BranchSearchResult =
 	RouterOutputs["workspaceCreation"]["searchBranches"];
 export type BranchSearchRow = BranchSearchResult["items"][number];
 export type HostProjectRow = RouterOutputs["project"]["list"][number];
+
+// iOS's URLSession default. The relay sends a response in one piece, so on iOS
+// this is already the cap on every host request.
+const HOST_REQUEST_DEADLINE_MS = 60_000;
 
 const clientCache = new Map<string, HostServiceClient>();
 
@@ -52,6 +56,7 @@ export function getHostServiceClientByUrl(hostUrl: string): HostServiceClient {
 			transportRetryLink(),
 			httpLink({
 				url: `${hostUrl}/trpc`,
+				fetch: deadlineFetch(HOST_REQUEST_DEADLINE_MS),
 				transformer: superjson,
 				headers: () => {
 					const headers: Record<string, string> = {};

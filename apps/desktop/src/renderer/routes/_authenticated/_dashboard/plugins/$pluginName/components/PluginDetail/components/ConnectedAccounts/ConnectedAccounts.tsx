@@ -10,7 +10,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import { useState } from "react";
-import { LuEllipsis, LuPencil, LuPlug, LuPlus, LuUnplug } from "react-icons/lu";
+import { LuEllipsis, LuPencil, LuPlus, LuUnplug } from "react-icons/lu";
 import { RenameAccountDialog } from "renderer/components/ConnectorSection/components/RenameAccountDialog";
 import { useConnector } from "renderer/components/ConnectorSection/hooks/useConnector";
 
@@ -93,6 +93,16 @@ export function ConnectedAccounts({
 									)}
 								</p>
 							</div>
+							{connection.needsReauth && (
+								<Button
+									variant="outline"
+									size="sm"
+									className="shrink-0"
+									onClick={() => (oauth ? openOAuth(oauth.type) : onConnect())}
+								>
+									<Trans>Reconnect</Trans>
+								</Button>
+							)}
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button
@@ -109,16 +119,6 @@ export function ConnectedAccounts({
 										<LuPencil className="size-3.5 shrink-0 text-current" />
 										<Trans>Rename account</Trans>
 									</DropdownMenuItem>
-									{connection.needsReauth && (
-										<DropdownMenuItem
-											onSelect={() =>
-												oauth ? openOAuth(oauth.type) : onConnect()
-											}
-										>
-											<LuPlug className="size-3.5 shrink-0 text-current" />
-											<Trans>Reconnect</Trans>
-										</DropdownMenuItem>
-									)}
 									<DropdownMenuItem
 										disabled={disconnect.isPending}
 										onSelect={() =>

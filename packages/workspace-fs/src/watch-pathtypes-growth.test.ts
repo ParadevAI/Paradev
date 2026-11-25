@@ -6,8 +6,7 @@ import { FsWatcherManager, type FsWatcherManagerOptions } from "./watch";
 import type { NativeWatchBackend, NativeWatchEvent } from "./watch-backend";
 
 /**
- * INTEGRATION reproduction of finding #3 in
- * `plans/v2-paths-worktree-perf-findings.md`.
+ * INTEGRATION reproduction of unbounded `pathTypes` growth.
  *
  * `WatcherState.pathTypes` (private to `FsWatcherManager`) accumulates one
  * entry per path that has been seen via `create` / `update` / `rename` events.

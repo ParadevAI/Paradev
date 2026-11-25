@@ -83,7 +83,7 @@ export function readCodexChatGptToken({
 			id: 1,
 			method: "initialize",
 			params: {
-				clientInfo: { name: "superset", title: "Superset", version: "1" },
+				clientInfo: { name: "superset", title: "Paradev", version: "1" },
 			},
 		});
 		write({ method: "initialized" });
@@ -159,7 +159,7 @@ export function createCodexTranscriber({
 			headers: {
 				Authorization: `Bearer ${bearer}`,
 				originator: "superset",
-				"User-Agent": "Superset",
+				"User-Agent": "Paradev",
 			},
 			body: form,
 			signal: AbortSignal.any([

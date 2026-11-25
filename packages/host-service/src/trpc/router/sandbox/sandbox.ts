@@ -3,9 +3,10 @@ import { join } from "node:path";
 import {
 	SANDBOX_PATHS,
 	sandboxManagedEnvSchema,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { readSandboxBoxResources } from "../../../runtime/box-resources";
 import {
 	hasManagedEnv,
 	setManagedEnv,
@@ -13,6 +14,7 @@ import {
 import {
 	getStartHookRunTerminalId,
 	getStartHookState,
+	readPendingSandboxLaunch,
 	readSandboxIdentity,
 	runSandboxArchiveHook,
 	runSandboxStartHook,
@@ -96,6 +98,20 @@ export const sandboxRouter = router({
 			runTerminalId: getStartHookRunTerminalId(),
 		};
 	}),
+
+	resources: protectedProcedure.query(() => {
+		if (process.env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
+		return readSandboxBoxResources();
+	}),
+
+	/**
+	 * The agent this box will launch at boot, while it has not started yet.
+	 * Lets a client that did not create the workspace open the same waiting
+	 * pane the creator did.
+	 */
+	pendingLaunch: protectedProcedure
+		.input(z.object({ workspaceId: z.string() }))
+		.query(({ input }) => readPendingSandboxLaunch(input.workspaceId)),
 
 	/**
 	 * Runs the repository's `start` hook with the managed environment. The

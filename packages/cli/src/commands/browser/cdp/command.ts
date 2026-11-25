@@ -8,7 +8,7 @@ export default command({
 	options: {
 		workspace: string().required().desc("Workspace ID"),
 		host: string().desc("Host the workspace lives on (default: this machine)"),
-		pane: string().required().desc("Pane ID (from `superset browser list`)"),
+		pane: string().required().desc("Pane ID (from `paradev browser list`)"),
 	},
 	run: async ({ ctx, options }) => {
 		const { client, ws } = await resolveBrowserTarget(ctx, options);
@@ -20,7 +20,7 @@ export default command({
 		if (!panes.some((p) => p.paneId === options.pane)) {
 			throw new CLIError(
 				`No browser pane ${options.pane} in workspace ${options.workspace}`,
-				"Run: superset browser list --workspace <id>",
+				"Run: paradev browser list --workspace <id>",
 			);
 		}
 		const url = `${ws.baseWsUrl}/browser/${encodeURIComponent(

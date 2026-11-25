@@ -35,7 +35,6 @@ app state driven over CDP; no mockups. Landscape 1280px wide, 30fps, silent.
    `apps/marketing/public/changelog/YYYY-MM-DD-week.mp4`; target under 2MB.
 6. **Embed** at the top of the entry, right under the frontmatter:
    `<Video src="/changelog/YYYY-MM-DD-week.mp4" title="Everything in this week's release" />`
-7. The launch thread's post 2 attaches this film.
 
 ## Status
 

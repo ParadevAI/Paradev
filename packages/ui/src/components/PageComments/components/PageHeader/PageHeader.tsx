@@ -3,6 +3,7 @@
 import { type ReactNode, useState } from "react";
 import { cn } from "../../../../lib/utils";
 import { DeletePageDialog } from "./components/DeletePageDialog";
+import { PageRefreshButton } from "./components/PageRefreshButton";
 import { PageShareButton } from "./components/PageShareButton";
 import { PageTitleMenu } from "./components/PageTitleMenu";
 import { PageVersionBanner } from "./components/PageVersionBanner";
@@ -22,6 +23,7 @@ interface PageHeaderProps extends PageHeaderActions {
 	className?: string;
 	/** The empty space between the title and the actions, e.g. a window-drag region. */
 	fillerClassName?: string;
+	refreshing?: boolean;
 }
 
 export function PageHeader({
@@ -32,9 +34,11 @@ export function PageHeader({
 	trailing,
 	className,
 	fillerClassName,
+	refreshing,
 	onSetVisibility,
 	onSetSharedVersion,
 	onDelete,
+	onDuplicate,
 	onRename,
 	onRefresh,
 	onPreviewVersion,
@@ -75,8 +79,8 @@ export function PageHeader({
 							setMenuOpen(false);
 							setDeleteOpen(true);
 						}}
+						onDuplicate={onDuplicate}
 						onRename={() => setRenameOpen(true)}
-						onRefresh={onRefresh}
 						onPreviewVersion={onPreviewVersion}
 					/>
 					{!isOwner && page.owner ? (
@@ -89,6 +93,7 @@ export function PageHeader({
 				<div className={cn("h-full min-w-0 flex-1", fillerClassName)} />
 				<div className="flex shrink-0 items-center gap-1">
 					{trailing}
+					<PageRefreshButton onRefresh={onRefresh} refreshing={refreshing} />
 					<PageShareButton
 						page={page}
 						versions={versions}

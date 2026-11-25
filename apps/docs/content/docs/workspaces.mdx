@@ -31,7 +31,7 @@ New local worktrees use `<worktrees path>/<project name>/<branch>` directories. 
 
 ### Cloud Workspaces
 
-Cloud workspaces run in the cloud and are available from desktop, iPhone, and iPad without keeping your computer connected. Paradev creates a new working branch from the selected base, with the same branch name in each repository for multi-repo workspaces. You can attach images to the initial prompt.
+Cloud workspaces run in the cloud and are available from desktop, iPhone, iPad, and Android without keeping your computer connected. Paradev creates a new working branch from the selected base, with the same branch name in each repository for multi-repo workspaces. You can attach images to the initial prompt.
 
 To set up environments and pick a machine size, see [Cloud Workspaces](/cloud-workspaces).
 
@@ -41,7 +41,7 @@ If you have existing git worktrees on disk, use the **Import** tab in the New Wo
 
 You can also right-click a project in the sidebar and choose **Import untracked worktrees**. A confirmation dialog lists the branches and paths that will be imported; the **Run setup script** checkbox is off by default, since existing worktrees are usually already set up.
 
-From a shell, use [`superset worktrees list` and `superset worktrees open`](/cli/cli-reference#worktrees) to list and open a project's worktrees on any host.
+From a shell, use [`paradev worktrees list` and `paradev worktrees open`](/cli/cli-reference#worktrees) to list and open a project's worktrees on any host.
 
 ## Sessions
 
@@ -53,10 +53,10 @@ From the CLI, pass `--session` explicitly. Creating a host workspace requires
 either `--project <id>` or `--session`; omitting both is an error:
 
 ```bash
-superset workspaces create --session --local --agent claude --prompt "…"
+paradev workspaces create --session --local --agent claude --prompt "…"
 ```
 
-On iPhone or iPad, choose **No project** in the composer's project picker, or tap **+** beside **No project** on Home. Sending your prompt creates a session on the selected online host.
+In the mobile app, choose **No project** in the composer's project picker, or tap **+** beside **No project** on Home. Sending your prompt creates a session on the selected online host.
 
 Automations can run in session mode too; see [Automations](/automations).
 
@@ -127,3 +127,8 @@ Right-click a project in the sidebar and choose **Delete Project…**, or use **
 - Use descriptive branch names: `feature/auth`, `fix/login-bug`.
 - Don't work directly on `main`.
 - Delete workspaces after merging.
+
+## Related Guides
+
+- [How to Isolate Parallel Coding Agents in One Repository](https://paradev.com/compare/isolate-parallel-coding-agents)
+- [Git Worktrees for AI Agents](https://paradev.com/compare/git-worktrees-for-ai-agents)

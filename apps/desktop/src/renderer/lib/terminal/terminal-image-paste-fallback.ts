@@ -1,4 +1,5 @@
 import type { Terminal as XTerm } from "@xterm/xterm";
+import { sendUserInput } from "./terminal-replay-write";
 
 // For file/image clipboard payloads (screenshot, copied file, web image),
 // xterm.js's built-in paste handler reads an empty string from
@@ -50,7 +51,7 @@ export function handleImagePasteFallback(
 		override(Array.from(event.clipboardData?.files ?? []));
 		return;
 	}
-	terminal.input("\x16", true);
+	sendUserInput(terminal, "\x16");
 }
 
 export function installImagePasteFallback(

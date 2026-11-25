@@ -14,6 +14,7 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
+import { CLOUD_WORKSPACE_NOT_STARTED_KEY } from "@superset/shared/sandbox/access";
 import {
 	normalizeWorkspaceTags,
 	workspaceTagsInputSchema,
@@ -33,9 +34,11 @@ import {
 	type MemberContext,
 	organizationOrFirst,
 } from "../../lib/cloud-guards";
+import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
+	CloudWorkspaceNotStartedError,
 	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
@@ -66,6 +69,9 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import { withClientStatus } from "./client-status";
+import { createConcurrencyLimit } from "./concurrency-limit";
+import { isLiveStatus } from "./live";
 import {
 	assertMayBoot,
 	queueSettleWorkspace,
@@ -75,6 +81,12 @@ import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
+import { recordSandboxAwake } from "./sandbox-expiry";
+import {
+	recordBootEnd,
+	recordBoxStopped,
+	recordStopSeen,
+} from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -96,6 +108,14 @@ const DESCRIPTION_PROMPT = [
 	"`superset workspaces description set <<'EOF'` followed by the description and `EOF`.",
 ].join(" ");
 
+/**
+ * A client addresses every live workspace it lists in one batched request,
+ * and each address opens several sockets. Run unbounded, a large organization
+ * runs the instance out of file descriptors; a wake is one per client and is
+ * not held behind them.
+ */
+const limitAddress = createConcurrencyLimit(8);
+
 /** The caller's cloud workspace, refused unless it exists, they may use it, and it is ready. */
 async function loadReadyWorkspace(
 	ctx: Parameters<typeof assertCloudAccess>[0] & MemberContext,
@@ -114,7 +134,7 @@ async function loadReadyWorkspace(
 	await assertMember(ctx, row.organizationId);
 	await assertCloudAccess(ctx, row.organizationId);
 	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
-	if (row.status !== "ready") {
+	if (!isLiveStatus(row.status)) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: `Cloud workspace is ${row.status}`,
@@ -136,13 +156,26 @@ async function addressSandbox(
 ): Promise<{
 	hostTarget: string;
 	running: boolean;
+	agentsToRestart: string[];
 	agentCredentialsChanged: boolean;
 	vcpus?: number;
 }> {
 	try {
 		if (mode === "address") {
+			const described = await describeSandbox(row.providerSandboxId);
+			const { expiresAt, sessionId } = described;
+			if (expiresAt) {
+				await recordSandboxAwake(row.id, { expiresAt, sessionId });
+			} else {
+				await recordStopSeen(row, {
+					sessionId: sessionId ?? row.sandboxSessionId,
+				});
+			}
 			return {
-				...(await describeSandbox(row.providerSandboxId)),
+				hostTarget: described.hostTarget,
+				running: described.running,
+				vcpus: described.vcpus,
+				agentsToRestart: [],
 				agentCredentialsChanged: false,
 			};
 		}
@@ -152,6 +185,13 @@ async function addressSandbox(
 				: await wakeCloudWorkspace(row);
 		return { ...woken, running: true };
 	} catch (error) {
+		if (error instanceof CloudWorkspaceNotStartedError) {
+			throw userError({
+				code: "TIMEOUT",
+				message: error.message,
+				i18nKey: CLOUD_WORKSPACE_NOT_STARTED_KEY,
+			});
+		}
 		if (error instanceof SandboxNotReadyError) {
 			throw new TRPCError({
 				code: "TIMEOUT",
@@ -258,7 +298,7 @@ export const cloudWorkspaceRouter = {
 				ctx.principal.userId,
 			);
 			return rows.map(({ workspace, createdBy }) => ({
-				...workspace,
+				...withClientStatus(ctx.client, workspace),
 				createdBy,
 				presence: NO_PRESENCE,
 				tags: tagsByWorkspaceId.get(workspace.id) ?? [],
@@ -402,7 +442,7 @@ export const cloudWorkspaceRouter = {
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
-				/** A size the organization offers (see `machineSizes`); omitted = its default. */
+				/** A size the organization offers (see `machineSizes`); omitted = the environment's size, else the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
 				/** The caller's own tags, as `setTags` files them. */
 				tags: workspaceTagsInputSchema.optional(),
@@ -517,7 +557,7 @@ export const cloudWorkspaceRouter = {
 				columns: { id: true, name: true, image: true },
 			});
 			return {
-				...row,
+				...withClientStatus(ctx.client, row),
 				createdBy: creator
 					? { userId: creator.id, name: creator.name, image: creator.image }
 					: null,
@@ -553,7 +593,7 @@ export const cloudWorkspaceRouter = {
 				);
 			}
 			nudge(row.organizationId, "cloud_workspaces");
-			return renamed ?? row;
+			return withClientStatus(ctx.client, renamed ?? row);
 		}),
 
 	/**
@@ -594,7 +634,7 @@ export const cloudWorkspaceRouter = {
 			// Tags are personal, but the caller's other windows learn of the
 			// change only through the organization channel.
 			nudge(row.organizationId, "cloud_workspaces");
-			return { ...row, tags: input.tags };
+			return { ...withClientStatus(ctx.client, row), tags: input.tags };
 		}),
 
 	/**
@@ -615,28 +655,45 @@ export const cloudWorkspaceRouter = {
 		.input(
 			z.object({ id: z.string().uuid(), wake: z.boolean().default(false) }),
 		)
+		.mutation(({ ctx, input }) => {
+			const grant = async () => {
+				const row = await loadReadyWorkspace(ctx, input.id);
+				const address = await addressSandbox(
+					row,
+					input.wake ? "wake" : "address",
+				);
+				const host = await mintSandboxGateAccess({
+					workspaceId: row.id,
+					userId: ctx.principal.userId,
+					port: HOST_SERVICE_PORT,
+					target: address.hostTarget,
+				});
+				return {
+					url: host.url,
+					token: host.token,
+					expiresAt: host.expiresAt,
+					running: address.running,
+					agentsToRestart: address.agentsToRestart,
+					agentCredentialsChanged: address.agentCredentialsChanged,
+					// The display is served by host-service too: same address, same
+					// ticket. The sandbox's own desktop port is not published.
+					desktop: { url: host.url, token: host.token },
+				};
+			};
+			return input.wake ? grant() : limitAddress(grant);
+		}),
+
+	/**
+	 * Hands the creator's current sign-ins to a running box in place: the
+	 * firewall rules, login files and managed environment, without a restart.
+	 * Agents started before it keep the sign-in they started with.
+	 */
+	applySignIns: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
-			const address = await addressSandbox(
-				row,
-				input.wake ? "wake" : "address",
-			);
-			const host = await mintSandboxGateAccess({
-				workspaceId: row.id,
-				userId: ctx.principal.userId,
-				port: HOST_SERVICE_PORT,
-				target: address.hostTarget,
-			});
-			return {
-				url: host.url,
-				token: host.token,
-				expiresAt: host.expiresAt,
-				running: address.running,
-				agentCredentialsChanged: address.agentCredentialsChanged,
-				// The display is served by host-service too: same address, same
-				// ticket. The sandbox's own desktop port is not published.
-				desktop: { url: host.url, token: host.token },
-			};
+			const woken = await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: woken !== null };
 		}),
 
 	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */
@@ -720,7 +777,14 @@ export const cloudWorkspaceRouter = {
 			const row = await loadReadyWorkspace(ctx, input.id);
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
-				await stopAndSnapshot(row.providerSandboxId);
+				const stopped = await stopAndSnapshot(row.providerSandboxId);
+				await recordBoxStopped(
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{
+						sessionId: stopped.sessionId ?? row.sandboxSessionId,
+						reason: "user",
+					},
+				);
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -834,11 +898,16 @@ export const cloudWorkspaceRouter = {
 			// The box keeps running until the reap stops it, so an undo is instant.
 			const archived = await transitionCloudWorkspace({
 				id: row.id,
-				from: ["provisioning", "ready", "failed"],
-				to: "deleted",
+				from: ["provisioning", "awake", "asleep", "failed"],
+				to: "archived",
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
+				logControl(
+					"workspace.archived",
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{ trigger: "user", "workspace.from_status": row.status },
+				);
 				waitUntil(
 					failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
 						(error) =>
@@ -852,11 +921,18 @@ export const cloudWorkspaceRouter = {
 				if (row.provider === "vercel") {
 					await queueReap(
 						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
-						row.providerSandboxId,
+						row,
 					).catch(async (error) => {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
 							error,
+						);
+						await recordBootEnd(
+							{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+							{
+								sessionId: null,
+								reason: "archived",
+							},
 						);
 						await settleWorkspaceNow(row.id).catch((meterError) =>
 							console.error(
@@ -889,7 +965,7 @@ export const cloudWorkspaceRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.id);
 			const resumable =
-				row.status === "deleted" &&
+				row.status === "archived" &&
 				row.provider === "vercel" &&
 				(await sandboxExists(row.providerSandboxId));
 			// Inside the grace period the box is still there, running for the
@@ -899,13 +975,17 @@ export const cloudWorkspaceRouter = {
 				resumable
 					? {
 							id: row.id,
-							from: ["deleted"],
-							to: "ready",
+							from: ["archived"],
+							to:
+								row.sandboxExpiresAt &&
+								row.sandboxExpiresAt.getTime() <= Date.now()
+									? "asleep"
+									: "awake",
 							set: { deletedAt: null },
 						}
 					: {
 							id: row.id,
-							from: ["deleted"],
+							from: ["archived"],
 							to: "provisioning",
 							set: {
 								provider: "vercel",
@@ -923,7 +1003,9 @@ export const cloudWorkspaceRouter = {
 				{ event: "unarchived" },
 			);
 			nudge(row.organizationId, "cloud_workspaces");
-			if (!resumable) await queueProvision({ cloudWorkspaceId: row.id });
+			if (!resumable) {
+				await queueProvision({ cloudWorkspaceId: row.id }, row.organizationId);
+			}
 			return { unarchived: true };
 		}),
 } satisfies TRPCRouterRecord;

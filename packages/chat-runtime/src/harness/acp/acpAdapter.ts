@@ -41,6 +41,7 @@ import {
 } from "../usageLimit";
 import {
 	AIR_ASYNC_TASK_STOP_METHOD,
+	AIR_AUTONOMOUS_TURN_TASK_TYPE,
 	AIR_CLIENT_META,
 	airAsyncTaskProgressSchema,
 	airAsyncTaskSpawnedSchema,
@@ -111,8 +112,28 @@ import {
  */
 const LATEST_PROTOCOL_VERSION = 2;
 
+const FAST_CONFIG_ID = "fast";
+const TOGGLE_ON = "on";
+const TOGGLE_OFF = "off";
+
 /** Who `initialize` says we are; v2 requires a name and a version. */
 const CLIENT_INFO = { name: "superset", version: "1.0.0" };
+
+function clientCapabilitiesFor(protocolVersion: number) {
+	const heldAtV1 = protocolVersion < LATEST_PROTOCOL_VERSION;
+	return {
+		fs: { readTextFile: false, writeTextFile: false },
+		terminal: false,
+		elicitation: { form: {} },
+		...(heldAtV1 ? { plan: {} } : {}),
+		session: {
+			compaction: {},
+			notices: {},
+			...(heldAtV1 ? { configOptions: { boolean: {} } } : {}),
+		},
+		_meta: AIR_CLIENT_META,
+	};
+}
 
 function unconfirmedSelectionMessage(error: AcpTimeoutError): string {
 	return `${error.message}. The agent can still apply the change, so the selection stays as you set it.`;
@@ -236,6 +257,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	defaultModeId?: string;
 	clientApprovalModes?: boolean;
 	forkAtMessage?: boolean;
+	protocolVersion?: number;
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
@@ -321,6 +343,9 @@ const MAIN_AGENT_ACTIVITY = new Set([
 	"tool_call_content_chunk",
 	"plan",
 	"plan_update",
+	"notice",
+	"compaction_update",
+	"compaction_summary_chunk",
 ]);
 
 function isApprovalOptionKind(
@@ -454,6 +479,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private sessionUsage: SessionUsage | undefined;
 	private reportedCostUsd: number | undefined;
 	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
+	/** Async task id of each turn the agent started on its own, to the turn shown for it. */
+	private readonly autonomousTurns = new Map<string, string>();
+	private lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
 	private awaitingBackground = false;
 	/** The v2 config option that stands in for v1's session mode, once seen. */
 	private modeConfigId: string | null = null;
@@ -467,11 +495,16 @@ export class AcpAdapter implements HarnessAdapter {
 		},
 	);
 	private configOptions: SessionConfigOption[] = [];
+	private booleanConfigIds = new Set<string>();
+	private unavailableStartModel: string | undefined;
+	private modelSetSinceStart = false;
 	private replaying = false;
 	private agentName: string | null = null;
 	private quietReplay = false;
 	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
+	/** The session could not open signed out; each prompt fails with this until a restart. */
+	private signedOut: TurnError | null = null;
 	private disposed = false;
 	private dead = false;
 	private stderrTail = "";
@@ -511,7 +544,9 @@ export class AcpAdapter implements HarnessAdapter {
 			(tasks) => {
 				const live = new Set(tasks.map((task) => task.id));
 				for (const id of this.backgroundTaskTurns.keys()) {
-					if (!live.has(id)) this.backgroundTaskTurns.delete(id);
+					if (live.has(id)) continue;
+					this.backgroundTaskTurns.delete(id);
+					this.lastBackgroundEndMs = this.now();
 				}
 				for (const id of live) {
 					if (!this.backgroundTaskTurns.has(id)) {
@@ -530,6 +565,22 @@ export class AcpAdapter implements HarnessAdapter {
 		);
 	}
 
+	async discoverModels(cwd: string): Promise<SessionConfigOption[]> {
+		await this.ensureConnected(cwd);
+		if (!this.client) throw new Error("Agent did not connect");
+		// ACP exposes models on session/new; no prompt or mode change is sent.
+		const response = await this.client.request(
+			"session/new",
+			{ cwd, mcpServers: [] },
+			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
+		);
+		const session = acpNewSessionResponseSchema.parse(response);
+		this.sessionId = session.sessionId;
+		this.handleConfigOptions(response);
+		if (this.configOptions.length === 0) await this.awaitStartOptions({});
+		return this.configOptions;
+	}
+
 	start(startOptions: HarnessStartOptions): AsyncIterable<AdapterEvent> {
 		this.cwd = startOptions.cwd;
 		void this.bootstrap(startOptions);
@@ -537,6 +588,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
+		if (this.signedOut) {
+			this.failSignedOutTurn(this.signedOut);
+			return;
+		}
 		if (!this.client || !this.sessionId) {
 			this.queuedPrompts.push(content);
 			return;
@@ -599,10 +654,39 @@ export class AcpAdapter implements HarnessAdapter {
 			this.emitSession({ status: "idle" });
 			return;
 		}
-		this.client.notify("session/cancel", { sessionId: this.sessionId });
-		if (this.cancelPendingApprovals(this.currentTurn.id)) {
+		const turnId = this.currentTurn.id;
+		const autonomousTask = [...this.autonomousTurns].find(
+			([, id]) => id === turnId,
+		)?.[0];
+		if (autonomousTask) void this.stopAutonomousTurn(autonomousTask, turnId);
+		else this.client.notify("session/cancel", { sessionId: this.sessionId });
+		if (this.cancelPendingApprovals(turnId)) {
 			this.emitSession({ status: this.statusAfterApprovals() });
 		}
+	}
+
+	/** `session/cancel` would also stop the session's background workflows. */
+	private async stopAutonomousTurn(
+		asyncTaskId: string,
+		turnId: string,
+	): Promise<void> {
+		const client = this.client;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId) return;
+		const response = await client
+			.request(
+				AIR_ASYNC_TASK_STOP_METHOD,
+				{ sessionId, asyncTaskId },
+				this.requestTimeoutMs(),
+			)
+			.catch(() => null);
+		if ((response as { stopped?: unknown } | null)?.stopped === true) return;
+		if (
+			this.autonomousTurns.get(asyncTaskId) === turnId &&
+			this.currentTurn?.id === turnId &&
+			this.currentTurn.status === "running"
+		)
+			client.notify("session/cancel", { sessionId });
 	}
 
 	respondToApproval(approvalId: string, decision: Decision): void {
@@ -708,6 +792,9 @@ export class AcpAdapter implements HarnessAdapter {
 		const sessionId = this.sessionId;
 		if (!client || !sessionId) return Promise.resolve(false);
 		const previous = this.configOptions;
+		const changesModel = previous.some(
+			(option) => option.id === configId && option.category === "model",
+		);
 		const previousModeId =
 			configId === this.modeConfigId ? this.modeId : undefined;
 		this.configOptions = previous.map((option) =>
@@ -717,13 +804,18 @@ export class AcpAdapter implements HarnessAdapter {
 			configOptions: this.configOptions,
 			...(configId === this.modeConfigId ? { modeId: value } : {}),
 		});
+		const isBoolean = this.booleanConfigIds.has(configId);
 		const request = client.request(
 			"session/set_config_option",
 			{
 				sessionId,
 				configId,
-				value,
-				...(this.negotiatedVersion >= 2 ? { type: "id" } : {}),
+				...(isBoolean
+					? { type: "boolean", value: value === TOGGLE_ON }
+					: {
+							value,
+							...(this.negotiatedVersion >= 2 ? { type: "id" } : {}),
+						}),
 			},
 			this.requestTimeoutMs(),
 		);
@@ -743,7 +835,13 @@ export class AcpAdapter implements HarnessAdapter {
 				this.emitNotice("error", error.message);
 			});
 		return request.then(
-			() => true,
+			() => {
+				if (changesModel) {
+					this.unavailableStartModel = undefined;
+					this.modelSetSinceStart = true;
+				}
+				return true;
+			},
 			() => false,
 		);
 	}
@@ -961,10 +1059,12 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		}
 
+		const protocolVersion =
+			this.options.protocolVersion ?? LATEST_PROTOCOL_VERSION;
 		const initialized = await client.request(
 			"initialize",
 			{
-				protocolVersion: LATEST_PROTOCOL_VERSION,
+				protocolVersion,
 				// v2 requires `info` and renamed `clientCapabilities` to
 				// `capabilities`, so both names go out and one request serves either
 				// side of the bump.
@@ -974,12 +1074,7 @@ export class AcpAdapter implements HarnessAdapter {
 				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
 				// Do not advertise fs/terminal: the agent falls back to its own
 				// Read/Edit/Bash tools, which run headless in the workspace.
-				clientCapabilities: {
-					fs: { readTextFile: false, writeTextFile: false },
-					terminal: false,
-					elicitation: { form: {} },
-					_meta: AIR_CLIENT_META,
-				},
+				clientCapabilities: clientCapabilitiesFor(protocolVersion),
 			},
 			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
 		);
@@ -1115,6 +1210,15 @@ export class AcpAdapter implements HarnessAdapter {
 			const queued = this.queuedPrompts.splice(0, this.queuedPrompts.length);
 			for (const content of queued) await this.runTurn(content);
 		} catch (error) {
+			const failure = this.turnError(error);
+			if (failure.kind === "auth") {
+				this.signedOut = failure;
+				this.emitSession({ status: this.statusAfterApprovals() });
+				if (this.queuedPrompts.splice(0).length > 0) {
+					this.failSignedOutTurn(failure);
+				}
+				return;
+			}
 			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
 			this.dead = true;
 			this.emitSession({ status: "dead" });
@@ -1135,6 +1239,14 @@ export class AcpAdapter implements HarnessAdapter {
 		this.emitSession({ status: this.statusAfterApprovals() });
 		this.heldTurnId = turnId;
 		await this.selectionsApplied();
+		if (this.unavailableStartModel) {
+			this.failTurn(turnId, {
+				kind: "model_unavailable",
+				message: this.unavailableStartModel,
+			});
+			this.heldTurnId = null;
+			return;
+		}
 		if (this.heldTurnId !== turnId) return;
 		this.heldTurnId = null;
 		const client = this.client;
@@ -1241,6 +1353,16 @@ export class AcpAdapter implements HarnessAdapter {
 			turnId,
 			limit ? { ...failure, kind: "usage_limit" } : failure,
 		);
+	}
+
+	private failSignedOutTurn(failure: TurnError): void {
+		const turnId = this.mintId();
+		this.emitTurn({
+			id: turnId,
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		});
+		this.failTurn(turnId, failure);
 	}
 
 	private failTurn(turnId: string, error: TurnError): void {
@@ -1382,11 +1504,16 @@ export class AcpAdapter implements HarnessAdapter {
 			case "tool_call_content_chunk":
 			case "plan":
 			case "plan_update":
+			case "notice":
 				this.main.handleUpdate(variant, outer.data.update, turnId);
 				return;
 			case "tool_call":
 			case "tool_call_update":
 				this.handleToolCall(outer.data.update, turnId);
+				return;
+			case "compaction_update":
+			case "compaction_summary_chunk":
+				this.handleCompaction(variant, outer.data.update, turnId);
 				return;
 			case "available_commands_update":
 				this.handleAvailableCommands(outer.data.update);
@@ -1458,13 +1585,23 @@ export class AcpAdapter implements HarnessAdapter {
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
 		if (!item || this.replaying) return;
 		this.trackBackgroundShell(item);
-		this.trackCompaction(raw, item);
+		if (this.compactions.has(item.id) || isCompactionCall(raw))
+			this.trackCompaction(item.id, item.status === "running");
 	}
 
-	private trackCompaction(raw: unknown, item: ToolCall): void {
-		if (!this.compactions.has(item.id) && !isCompactionCall(raw)) return;
-		if (item.status !== "running") {
-			this.compactions.delete(item.id);
+	private handleCompaction(
+		variant: "compaction_update" | "compaction_summary_chunk",
+		raw: unknown,
+		turnId: string,
+	): void {
+		const notice = this.main.handleCompaction(variant, raw, turnId);
+		if (!notice || this.replaying) return;
+		this.trackCompaction(notice.id, notice.completedAtMs === undefined);
+	}
+
+	private trackCompaction(itemId: string, running: boolean): void {
+		if (!running) {
+			this.compactions.delete(itemId);
 			if (this.compactions.size === 0) this.endCompactions();
 			return;
 		}
@@ -1473,11 +1610,13 @@ export class AcpAdapter implements HarnessAdapter {
 				this.settleCompactions = resolve;
 			});
 		}
-		this.compactions.add(item.id);
+		this.compactions.add(itemId);
 	}
 
 	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
 	private endCompactions(): void {
+		if (!this.disposed)
+			for (const itemId of this.compactions) this.main.cancelCompaction(itemId);
 		this.compactions.clear();
 		this.settleCompactions?.();
 		this.settleCompactions = null;
@@ -1858,6 +1997,7 @@ export class AcpAdapter implements HarnessAdapter {
 		open = false,
 	): void {
 		run.stream.flush();
+		run.stream.cancelCompactions();
 		this.cancelSubagentApprovals(sessionId, run);
 		this.endSubagentTasks(sessionId);
 		this.backgroundTasks.end(run.item.id);
@@ -1920,7 +2060,11 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskSpawned(sessionId: string, raw: unknown): void {
 		const parsed = airAsyncTaskSpawnedSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const { asyncTaskId, name, description, canStop } = parsed.data;
+		const { asyncTaskId, name, description, canStop, taskType } = parsed.data;
+		if (taskType === AIR_AUTONOMOUS_TURN_TASK_TYPE) {
+			if (sessionId === this.sessionId) this.startAutonomousTurn(asyncTaskId);
+			return;
+		}
 		if (this.finishedSubagents.has(sessionId)) return;
 		const owner = this.subagents.get(sessionId);
 		if (owner) {
@@ -1947,15 +2091,91 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskState(raw: unknown): void {
 		const parsed = airAsyncTaskStateSchema.safeParse(raw);
 		if (!parsed.success || !isTerminalAirState(parsed.data.state)) return;
-		this.backgroundTasks.end(parsed.data.asyncTaskId);
+		const { asyncTaskId, state } = parsed.data;
+		if (this.autonomousTurns.has(asyncTaskId)) {
+			this.endAutonomousTurn(asyncTaskId, state);
+			return;
+		}
+		this.backgroundTasks.end(asyncTaskId);
+	}
+
+	/**
+	 * A turn the agent starts after its answer, such as the reply to a
+	 * finished background subagent, reopens the latest turn, so the reply
+	 * reads as part of it and the turn's clock stays its last line.
+	 */
+	private startAutonomousTurn(asyncTaskId: string): void {
+		const latest = this.currentTurn;
+		if (latest?.status === "running") return;
+		if (!latest || !this.continuesBackgroundWork(latest)) {
+			const turnId = this.mintId();
+			this.autonomousTurns.set(asyncTaskId, turnId);
+			this.emitTurn({
+				id: turnId,
+				status: "running",
+				startedAtMs: this.nextStartMs(),
+			});
+		} else {
+			const { completedAtMs: _completedAtMs, ...reopened } = latest;
+			this.lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
+			this.autonomousTurns.set(asyncTaskId, latest.id);
+			this.emitTurn({ ...reopened, status: "running" });
+		}
+		this.emitSession({ status: this.statusAfterApprovals() });
+	}
+
+	/**
+	 * Only a reply to background work continues the turn. A stopped or failed
+	 * turn keeps its ending, and a scheduled wakeup gets a turn of its own.
+	 */
+	private continuesBackgroundWork(turn: Turn): boolean {
+		return (
+			turn.status === "completed" &&
+			(this.backgroundTaskTurns.size > 0 ||
+				this.lastBackgroundEndMs >= turn.startedAtMs)
+		);
+	}
+
+	private endAutonomousTurn(asyncTaskId: string, state: string): void {
+		const turnId = this.autonomousTurns.get(asyncTaskId);
+		this.autonomousTurns.delete(asyncTaskId);
+		const turn = this.currentTurn;
+		if (!turnId || turn?.id !== turnId || turn.status !== "running") return;
+		this.endCompactions();
+		this.main.flush();
+		this.emitTurn({
+			...turn,
+			status: state === "cancelled" ? "interrupted" : "completed",
+			completedAtMs: this.now(),
+		});
+		this.emitSession({ status: this.statusAfterApprovals() });
+		this.sendCustomAnswer();
 	}
 
 	private handleConfigOptions(raw: unknown): void {
 		const parsed = acpConfigOptionUpdateSchema.safeParse(raw);
 		if (!parsed.success) return;
+		this.booleanConfigIds = new Set();
 		this.configOptions = parsed.data.configOptions.flatMap((option) => {
 			const id = option.configId ?? option.id;
-			if (!id || (option.type && option.type !== "select")) return [];
+			if (!id) return [];
+			if (option.type === "boolean") {
+				if (id !== FAST_CONFIG_ID) return [];
+				this.booleanConfigIds.add(id);
+				return [
+					{
+						id,
+						label: this.optionLabel(option.name),
+						...(option.category ? { category: option.category } : {}),
+						currentValue: option.currentValue === true ? TOGGLE_ON : TOGGLE_OFF,
+						options: [
+							{ id: TOGGLE_ON, label: "On" },
+							{ id: TOGGLE_OFF, label: "Off" },
+						],
+					},
+				];
+			}
+			if (option.type && option.type !== "select") return [];
 			return [
 				{
 					id,
@@ -2094,6 +2314,14 @@ export class AcpAdapter implements HarnessAdapter {
 				: Object.keys(wanted).length > 0
 					? this.awaitStartOptions(wanted)
 					: Promise.resolve({});
+		this.modelSetSinceStart = false;
+		const confirmed = configured.then((taken) => {
+			if (!this.modelSetSinceStart)
+				this.unavailableStartModel =
+					wanted.modelId && !taken.modelId ? wanted.modelId : undefined;
+			return taken;
+		});
+		this.trackSelection(confirmed);
 		let sessionMode: Promise<string | undefined> = Promise.resolve(
 			this.options.clientApprovalModes && modeId && isClientApprovalMode(modeId)
 				? modeId
@@ -2114,7 +2342,7 @@ export class AcpAdapter implements HarnessAdapter {
 				taken ? modeId : undefined,
 			);
 		}
-		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+		void Promise.all([confirmed, sessionMode]).then(([taken, takenMode]) => {
 			if (wanted.effortId && !taken.effortId)
 				console.warn(
 					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
@@ -2431,6 +2659,7 @@ export class AcpAdapter implements HarnessAdapter {
 			this.finishSubagent(sessionId, "failed");
 		}
 		this.backgroundTasks.clear();
+		this.endCompactions();
 		const message = `acp agent exited (code ${code ?? "null"})`;
 		if (this.stderrTail) console.warn(`[acp] ${message}\n${this.stderrTail}`);
 		if (this.currentTurn?.status === "running") {
@@ -2577,7 +2806,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private authAwareMessage(error: unknown): string {
 		const message = error instanceof Error ? error.message : String(error);
 		if (/auth/i.test(message)) {
-			return `${message}. Run the agent's login in a terminal (e.g. \`claude /login\`), then reopen this chat.`;
+			return this.loginCommand
+				? `${message}. Run \`${this.loginCommand}\` in a terminal, then reopen this chat.`
+				: `${message}. Sign in to the agent in a terminal, then reopen this chat.`;
 		}
 		return message;
 	}

@@ -23,6 +23,9 @@ export {
 	DEFAULT_MARKETPLACE_REPO,
 } from "@superset/shared/plugins";
 
+/** What a user types after `@` to name their organization's marketplace. */
+export const ORGANIZATION = "organization";
+
 export function parsePluginRef(ref: string): {
 	name: string;
 	marketplace?: string;

@@ -1,9 +1,9 @@
 ---
 title: Slack Integration
-description: Mention @superset in Slack to file tasks or dispatch coding agents
+description: Mention @Paradev in Slack to file tasks or dispatch coding agents
 ---
 
-Mention `@superset` in a Slack channel or DM it, describe what you want, and the agent acts on it.
+Mention `@Paradev` in a Slack channel or DM it, describe what you want, and the agent acts on it.
 
 ![The Paradev Slack bot spinning up a workspace and reporting back in-thread](/images/slack-bot.png)
 
@@ -21,7 +21,7 @@ To give a coding agent tools to read and post in Slack, install the [Slack plugi
 
 1. In the dashboard, go to **Integrations → Slack**
 2. Click **Connect** to install the Paradev Slack app (OAuth)
-3. Mention `@superset` in any channel, or DM the bot, and describe what you want done
+3. Mention `@Paradev` in any channel, or DM the bot, and describe what you want done
 
 ## Page Links
 
@@ -43,17 +43,21 @@ These controls are available when thread follow-ups are enabled for your Slack t
 - Send `!mute` to require mentions in that thread again, or `!unmute` to resume automatic follow-ups. Direct mentions still work in a muted thread.
 - Send `!stop` or `!cancel` in the thread or DM to end the running Slack turn. Work already completed remains in the reply's Changes footer. This does not undo actions or stop coding agents already launched in workspaces.
 
-Without thread follow-ups, mention `@superset` for each channel request.
+Without thread follow-ups, mention `@Paradev` for each channel request.
 
 ## Good First Prompts
 
 ```text
-@superset file a bug: the export button 500s on reports over 10k rows.
+@Paradev file a bug: the export button 500s on reports over 10k rows.
 Assign to whoever owns reporting.
 ```
 
 ```text
-@superset bump our Sentry SDK to v9 across all apps and open a PR.
+@Paradev bump our Sentry SDK to v9 across all apps and open a PR.
 ```
 
 The second one creates a workspace, runs an agent, and reports back in-thread.
+
+## Related Guide
+
+- [How to Start Coding Agents From Slack](https://paradev.com/compare/start-coding-agents-from-slack)

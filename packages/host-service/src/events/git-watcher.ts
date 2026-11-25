@@ -419,7 +419,8 @@ export class GitWatcher {
 	/**
 	 * Re-ask git which dirs are fully ignored. Rides on emitted `git:changed`
 	 * events (plus one call at watch start), so filtered-out churn never spawns
-	 * git; `force` bypasses the min-interval for the initial load.
+	 * git. An ignore-rule change and `force` (the initial load) bypass the
+	 * min-interval.
 	 */
 	private refreshIgnoredDirs(
 		workspaceId: string,
@@ -438,6 +439,7 @@ export class GitWatcher {
 		if (state.refreshing) return;
 		if (
 			!force &&
+			!state.rulesChanged &&
 			Date.now() - state.lastRefreshAt < IGNORED_DIRS_REFRESH_MIN_MS
 		)
 			return;
@@ -447,14 +449,15 @@ export class GitWatcher {
 		void listGitIgnoredDirs(worktreePath, entry.controller.signal)
 			.then(async (dirs) => {
 				if (!stillCurrent()) return;
+				const grew = dirs.some((dir) => !state.dirs.has(dir));
 				state.dirs = new Set(dirs);
 				state.lastRefreshAt = Date.now();
-				if (rulesChanged) {
+				if (rulesChanged || grew) {
 					// Ignore rules changed: a dir may have been UN-ignored, leaving
 					// the native watcher's attach-time prune stale (events for that
-					// dir silently suppressed until restart). refreshIgnores
-					// re-derives the set and swaps the subscription only when it
-					// actually shrank; after a swap, force one broad status refresh
+					// dir silently suppressed until restart). A new ignored dir
+					// must be pruned from a per-entry watch. refreshIgnores decides
+					// whether to swap; after a swap, force one broad status refresh
 					// to cover anything written during the swap gap.
 					const swapped = await this.filesystem
 						.refreshWatcherIgnores(workspaceId)
@@ -483,7 +486,7 @@ export class GitWatcher {
 				// is stale and the emit that flagged it was swallowed by the
 				// `refreshing` guard — run once more.
 				if (state.rulesChanged && stillCurrent()) {
-					this.refreshIgnoredDirs(workspaceId, worktreePath, true);
+					this.refreshIgnoredDirs(workspaceId, worktreePath);
 				}
 			});
 	}

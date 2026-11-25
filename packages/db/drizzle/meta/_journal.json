@@ -1352,6 +1352,111 @@
       "when": 1794194624056,
       "tag": "0192_chat_storage",
       "breakpoints": true
+    },
+    {
+      "idx": 193,
+      "version": "7",
+      "when": 1794541805805,
+      "tag": "0193_environment_machine_size",
+      "breakpoints": true
+    },
+    {
+      "idx": 194,
+      "version": "7",
+      "when": 1794799483177,
+      "tag": "0194_cloud_workspace_sleep_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 195,
+      "version": "7",
+      "when": 1794806184119,
+      "tag": "0195_cloud_workspace_status_archived",
+      "breakpoints": true
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1794970769952,
+      "tag": "0196_cloud_usage_events_and_boot_facts",
+      "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1794980472136,
+      "tag": "0197_cloud_usage_events_amount_and_key",
+      "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1794982413384,
+      "tag": "0198_cloud_workspace_boot_origin",
+      "breakpoints": true
+    },
+    {
+      "idx": 199,
+      "version": "7",
+      "when": 1795061707634,
+      "tag": "0199_environment_builds",
+      "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1795116912668,
+      "tag": "0200_cloud_usage_daily",
+      "breakpoints": true
+    },
+    {
+      "idx": 201,
+      "version": "7",
+      "when": 1795116914925,
+      "tag": "0201_cloud_usage_daily_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1795117964138,
+      "tag": "0202_cloud_usage_daily_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1795120757281,
+      "tag": "0203_cloud_workspace_boot_pending_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1795149908647,
+      "tag": "0204_cloud_billing_day_start",
+      "breakpoints": true
+    },
+    {
+      "idx": 205,
+      "version": "7",
+      "when": 1795176188571,
+      "tag": "0205_cloud_workspace_boots_open_or_locked_idx",
+      "breakpoints": true
+    },
+    {
+      "idx": 206,
+      "version": "7",
+      "when": 1795212874823,
+      "tag": "0206_aws_marketplace_customers",
+      "breakpoints": true
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1795297907753,
+      "tag": "0207_environment_config",
+      "breakpoints": true
     }
   ]
 }

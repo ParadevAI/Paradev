@@ -5,8 +5,7 @@
  * browser has resolved so far. If a custom `@font-face` (or a user-selected
  * system font that the browser hasn't surfaced yet) finishes loading after
  * that measurement, the cached glyph metrics diverge from the actual rendered
- * font, producing "mangled" text that only repairs on the next resize. See issue #4617 and
- * `plans/20260425-v2-terminal-rendering-divergences.md` (#1).
+ * font, producing "mangled" text that only repairs on the next resize. See issue #4617.
  *
  * Callers `await` this before re-fitting / refreshing the terminal.
  */
@@ -15,7 +14,7 @@ import type { Terminal as XTerm } from "@xterm/xterm";
 
 const DEFAULT_FONT_LOAD_TIMEOUT_MS = 2000;
 
-export interface FontReadyTarget {
+interface FontReadyTarget {
 	fontFamily: string;
 	fontSize: number;
 	timeoutMs?: number;

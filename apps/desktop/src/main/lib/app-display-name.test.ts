@@ -22,6 +22,11 @@ describe("toAppDisplayName", () => {
 		);
 	});
 
+	it("swaps the new product name too", () => {
+		expect(toAppDisplayName("Paradev", "Paradev")).toBe("Paradev");
+		expect(toAppDisplayName("Paradev Canary", "Acme")).toBe("Acme Canary");
+	});
+
 	it("leaves a name without the product name alone", () => {
 		expect(toAppDisplayName("Electron", "Paradev")).toBe("Electron");
 	});

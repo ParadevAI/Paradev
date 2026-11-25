@@ -30,7 +30,7 @@ function isProcessAlive(pid: number): boolean {
 
 const NOT_RUNNING = new CLIError(
 	"The host service isn't running on this machine",
-	"Launch the Paradev desktop app or run: superset start",
+	"Launch the Paradev desktop app or run: paradev start",
 );
 
 /** Find a live host-service manifest, preferring the configured org. */
@@ -101,12 +101,12 @@ async function callHost<T>(run: () => Promise<T>): Promise<T> {
 		if (/UNAUTHORIZED|401/i.test(message)) {
 			throw new CLIError(
 				"The host service rejected the CLI's credentials",
-				"The service may have restarted with new credentials. Run: superset start",
+				"The service may have restarted with new credentials. Run: paradev start",
 			);
 		}
 		throw new CLIError(
 			`Could not reach the host service (${message.slice(0, 80)})`,
-			"Launch the Paradev desktop app or run: superset start",
+			"Launch the Paradev desktop app or run: paradev start",
 		);
 	}
 }

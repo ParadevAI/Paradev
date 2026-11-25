@@ -2,37 +2,28 @@ import { useQuery } from "@tanstack/react-query";
 import { Directory, File, Paths } from "expo-file-system";
 import { getHostServiceClientByUrl } from "@/lib/host-service/client";
 import { apiClient } from "@/lib/trpc/client";
+import type { UseAttachmentFile } from "./useAttachmentFile.types";
 
-function extensionOf(name: string, mediaType: string): string {
-	const fromName = name.includes(".") ? name.split(".").pop() : undefined;
-	return fromName || mediaType.split("/")[1]?.split("+")[0] || "bin";
-}
-
-/** Which copy of a sent attachment to fetch; a path tag has neither. */
-export interface AttachmentSource {
-	fileId?: string;
-	attachmentId?: string;
+function fileNameOf(name: string, mediaType: string): string {
+	const cleaned = name.replace(/[/\\:]/g, "_").trim();
+	const base = /^\.*$/.test(cleaned) ? "attachment" : cleaned;
+	if (base.includes(".")) return base;
+	return `${base}.${mediaType.split("/")[1]?.split("+")[0] || "bin"}`;
 }
 
 /**
  * A sent attachment as a local file, fetched once. A cloud part comes from
  * storage, so it shows without the box; a host part from the host, the only
- * place its bytes exist. QuickLook picks a renderer by extension, so the file
- * keeps the original one.
+ * place its bytes exist. It keeps the original name: viewers pick a renderer
+ * by extension and show the name.
  */
-export function useAttachmentFile({
+export const useAttachmentFile: UseAttachmentFile = ({
 	hostUrl,
-	source,
+	source: { fileId, attachmentId },
 	name,
 	mediaType,
-}: {
-	hostUrl: string | undefined;
-	source: AttachmentSource;
-	name: string;
-	mediaType: string;
-}) {
-	const { fileId, attachmentId } = source;
-	return useQuery({
+}) =>
+	useQuery({
 		queryKey: fileId
 			? ["attachment-file", "cloud", fileId]
 			: ["attachment-file", hostUrl, attachmentId],
@@ -41,12 +32,11 @@ export function useAttachmentFile({
 		retry: 1,
 		networkMode: "always" as const,
 		queryFn: async () => {
-			const directory = new Directory(Paths.cache, "sent-attachments");
-			directory.create({ idempotent: true });
-			const file = new File(
-				directory,
-				`${fileId ?? attachmentId}.${extensionOf(name, mediaType)}`,
-			);
+			const id = fileId ?? attachmentId;
+			if (!id) throw new Error("no source");
+			const directory = new Directory(Paths.cache, "sent-attachments", id);
+			directory.create({ idempotent: true, intermediates: true });
+			const file = new File(directory, fileNameOf(name, mediaType));
 			if (file.exists) return file.uri;
 			if (fileId) {
 				const [resolved] = await apiClient.attachment.resolveEach.mutate({
@@ -65,4 +55,3 @@ export function useAttachmentFile({
 			return file.uri;
 		},
 	});
-}

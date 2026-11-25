@@ -14,6 +14,7 @@ import {
 	resolveAmbientCodexHome,
 } from "@superset/agent-setup";
 import type { HostDb } from "../../../db/index.ts";
+import { caught } from "../../../runtime/box-log-filter";
 import {
 	getDefaultAccountSelections,
 	syncDefaultAccountPointers,
@@ -73,8 +74,9 @@ export async function provisionSelectedAccounts(db: HostDb): Promise<void> {
 			await provision();
 		} catch (error) {
 			console.warn(
-				`[host-service] provisioning the selected account ${dir} failed (continuing):`,
-				error,
+				"[host-service] provisioning the selected account failed, continuing (dir):",
+				dir,
+				caught(error),
 			);
 		}
 	}

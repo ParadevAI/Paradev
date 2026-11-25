@@ -1,3 +1,4 @@
+import { resolveAgentLaunchPresetId } from "@superset/shared/agent-models";
 import { asc, eq } from "drizzle-orm";
 import type { HostDb } from "../db";
 import { hostAgentConfigs } from "../db/schema";
@@ -104,4 +105,21 @@ export function agentLaunchEnv(
 	config: Pick<ResolvedHostAgentConfig, "presetId" | "env">,
 ): Record<string, string> {
 	return { ...resolveDefaultAccountEnv(db, config.presetId), ...config.env };
+}
+
+export function chatLaunchPresetId(
+	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
+): string {
+	const launchPresetId = resolveAgentLaunchPresetId(
+		config.presetId,
+		config.command,
+	);
+	if (!config.presetId.startsWith("custom")) return launchPresetId;
+	const [commandToken = ""] = config.command.trim().split(/\s+/);
+	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
+		.toLowerCase()
+		.replace(/\.exe$/, "");
+	return executable === "claude" || executable === "codex"
+		? executable
+		: launchPresetId;
 }

@@ -3,17 +3,15 @@ import type {
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 } from "@superset/chat-ui/PromptInput";
-import type { MachineSize } from "@superset/shared/billing";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { HiOutlineComputerDesktop, HiOutlineServer } from "react-icons/hi2";
-import { LuBox, LuContainer, LuCpu } from "react-icons/lu";
+import { LuBox, LuContainer } from "react-icons/lu";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import type { EnvironmentOption } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
-import type { MachineSizeOption } from "renderer/routes/_authenticated/hooks/useMachineSizeOptions";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceHostOptions } from "../../../DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import type { ProjectOption } from "../../../DashboardNewWorkspaceForm/PromptGroup/types";
@@ -27,8 +25,6 @@ interface UseWorkspaceSettingMentionProvidersOptions {
 	cloud: {
 		environments: EnvironmentOption[];
 		onSelectEnvironment: (environmentId: string) => void;
-		machineSizes: MachineSizeOption[];
-		onSelectMachineSize: (machineSize: MachineSize) => void;
 	} | null;
 }
 
@@ -120,7 +116,6 @@ export function useWorkspaceSettingMentionProviders({
 		if (!cloud) return providers;
 
 		const environmentKeywords = [t({ message: "environment" }), "environment"];
-		const sizeKeywords = [t({ message: "size" }), "size"];
 		return [
 			...providers,
 			staticProvider(
@@ -135,21 +130,6 @@ export function useWorkspaceSettingMentionProviders({
 					keywords: environmentKeywords,
 					icon: <LuContainer className="size-4" />,
 					select: () => cloud.onSelectEnvironment(environment.id),
-				})),
-			),
-			staticProvider(
-				{
-					id: "workspace-machine-sizes",
-					title: t({ message: "Machine size" }),
-					priority: 4,
-				},
-				cloud.machineSizes.map((option) => ({
-					id: `machine-size:${option.size}`,
-					label: option.name,
-					description: option.spec,
-					keywords: [...sizeKeywords, option.size],
-					icon: <LuCpu className="size-4" />,
-					select: () => cloud.onSelectMachineSize(option.size),
 				})),
 			),
 		];
