@@ -1,4 +1,7 @@
-import { POSTHOG_PRIVACY_CONFIG } from "@superset/shared/posthog-privacy";
+import {
+	maskRecordingAttributes,
+	POSTHOG_PRIVACY_CONFIG,
+} from "@superset/shared/posthog-privacy";
 import posthogFull from "posthog-js/dist/module.full.no-external";
 import type { PostHog } from "posthog-js/react";
 import { env } from "../env.renderer";
@@ -22,6 +25,7 @@ export function initPostHog() {
 		persistence: "localStorage",
 		debug: false,
 		...POSTHOG_PRIVACY_CONFIG,
+		before_send: maskRecordingAttributes,
 	});
 
 	posthogFull.register({
