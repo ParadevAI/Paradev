@@ -1,11 +1,45 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { promises as fs } from "node:fs";
 import {
+	createLimiter,
 	parseIPv4Hex,
 	parseIPv6Hex,
 	parseProcNetLine,
 	readEnvValuesLinuxProcfs,
 } from "./procfs";
+
+describe("createLimiter", () => {
+	test("does not exceed the limit when a caller concurrently arrives as a slot is handed over", async () => {
+		const limiter = createLimiter(1);
+		let count: number = 0;
+		let max: number = 0;
+
+		const task = async () => {
+			count++;
+			max = Math.max(max, count);
+			await Promise.resolve();
+			count--;
+		};
+
+		// A holds the only slot until the gate opens so B queues behind
+		const gate = Promise.withResolvers<void>();
+		const a = limiter(async () => {
+			count++;
+			max = Math.max(max, count);
+			await gate.promise;
+			count--;
+		});
+		const b = limiter(task);
+
+		// Let A finish releasing its slot, B not resuming yet. C enters in this window.
+		gate.resolve();
+		await gate.promise;
+		await Promise.resolve();
+		const c = limiter(task);
+		await Promise.all([a, b, c]);
+		expect(max).toBe(1); // Max should not cross concurrency limit
+	});
+});
 
 describe("readEnvValuesLinuxProcfs", () => {
 	test("forwards cancellation to active reads and does not swallow it", async () => {
