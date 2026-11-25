@@ -10,7 +10,11 @@ import {
 import { Switch } from "@superset/ui/switch";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
-import { type ChangesOpenTarget, useSettings } from "renderer/stores/settings";
+import {
+	type ChangesOpenTarget,
+	type ComposerEnterBehavior,
+	useSettings,
+} from "renderer/stores/settings";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
 	isItemVisible,
@@ -44,6 +48,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_DICTATION,
 		visibleItems,
 	);
+	const showComposerEnter = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_COMPOSER_ENTER,
+		visibleItems,
+	);
 	const showParadevAnywhere = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE,
 		visibleItems,
@@ -56,6 +64,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 	const utils = electronTrpc.useUtils();
 	const changesOpenTarget = useSettings((s) => s.changesOpenTarget);
 	const dictationEnabled = useSettings((s) => s.dictationEnabled);
+	const composerEnterBehavior = useSettings((s) => s.composerEnterBehavior);
 	const paradevAnywhereShown = useSettings((s) => s.showParadevAnywhereButton);
 	const updateSetting = useSettings((s) => s.update);
 
@@ -245,6 +254,46 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 								updateSetting("dictationEnabled", enabled)
 							}
 						/>
+					</div>
+				)}
+
+				{showComposerEnter && (
+					<div className="flex items-center justify-between gap-6">
+						<div className="space-y-0.5">
+							<Label htmlFor="composer-enter" className="text-sm font-medium">
+								<HighlightText
+									text={t({ message: "Enter in the chat composer" })}
+									query={searchQuery}
+								/>
+							</Label>
+							<p className="text-xs text-muted-foreground">
+								<Trans>
+									Choose whether Enter sends your message or adds a new line.
+									When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn.
+								</Trans>
+							</p>
+						</div>
+						<Select
+							value={composerEnterBehavior}
+							onValueChange={(value) =>
+								updateSetting(
+									"composerEnterBehavior",
+									value as ComposerEnterBehavior,
+								)
+							}
+						>
+							<SelectTrigger id="composer-enter" className="w-[180px] shrink-0">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="send">
+									<Trans>Enter sends</Trans>
+								</SelectItem>
+								<SelectItem value="newline">
+									<Trans>Enter adds a line</Trans>
+								</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 				)}
 

@@ -54,6 +54,7 @@ export function PromptInput({
 	onSubmit,
 	onStop,
 	stopOnEscape = true,
+	enterBehavior = "send",
 	allowEmptySubmit = false,
 	disabled = false,
 	pending = false,
@@ -93,6 +94,7 @@ export function PromptInput({
 						onSubmit={onSubmit}
 						onStop={onStop}
 						stopOnEscape={stopOnEscape}
+						enterBehavior={enterBehavior}
 						allowEmptySubmit={allowEmptySubmit}
 						disabled={disabled}
 						pending={pending}

@@ -4557,6 +4557,9 @@ msgstr "Wybierz, kiedy Paradev ma Cię powiadamiać."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Wybierz, gdzie otwierać agentów uruchamianych z komentarzy, trybu projektowania i Pages."
 
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
+msgstr "Wybierz, czy Enter wysyła wiadomość, czy dodaje nowy wiersz. Gdy dodaje wiersz, ⌘↩ wysyła, a ⌘⇧↩ kieruje trwającą turą."
+
 msgid "Choose your default skin tone"
 msgstr "Wybierz domyślny odcień skóry"
 
@@ -8164,8 +8167,17 @@ msgstr "Wpisz liczbę całkowitą"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Wpisz liczbę całkowitą od {minHours} do {maxHours} GB-godzin."
 
+msgid "Enter adds a line"
+msgstr "Enter dodaje wiersz"
+
+msgid "Enter in the chat composer"
+msgstr "Enter w polu czatu"
+
 msgid "Enter new value"
 msgstr "Wpisz nową wartość"
+
+msgid "Enter sends"
+msgstr "Enter wysyła"
 
 msgid "Enter this code on the page we opened:"
 msgstr "Wpisz ten kod na stronie, którą otworzyliśmy:"
@@ -15987,6 +15999,9 @@ msgstr "Kolejkuj pracę dla agentów"
 
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "Do kolejki; ⌘↩, aby pokierować trwającą turą"
+
+msgid "Queue; ⌘⇧↩ to steer the running turn"
+msgstr "Do kolejki; ⌘⇧↩, aby pokierować trwającą turą"
 
 msgid "Queued"
 msgstr "W kolejce"

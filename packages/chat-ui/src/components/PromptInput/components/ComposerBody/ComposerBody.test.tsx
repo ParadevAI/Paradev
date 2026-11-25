@@ -196,3 +196,74 @@ test.each([
 	});
 	expect(handled).toBe(taken);
 });
+
+async function pressEnter(
+	enterBehavior: "send" | "newline",
+	modifiers: { mod?: boolean; shift?: boolean },
+) {
+	const submitted: { steer: boolean }[] = [];
+	const view = render(
+		<PromptInput
+			commands={[]}
+			draft={{ segments: [{ type: "text", text: "hello" }], attachments: [] }}
+			mentionProviders={[]}
+			enterBehavior={enterBehavior}
+			onSubmit={({ steer }) => {
+				submitted.push({ steer });
+				return false;
+			}}
+		/>,
+	);
+	const editable = view.container.querySelector(
+		"[contenteditable]",
+	) as HTMLElement;
+	const editor = getNearestEditorFromDOMNode(editable);
+	if (!editor) throw new Error("composer has no Lexical editor");
+	const text = editable.querySelector("[data-lexical-text]")?.firstChild;
+	if (!text) throw new Error("draft text did not load");
+	await act(async () => {
+		editable.focus();
+		document.getSelection()?.setBaseAndExtent(text, 5, text, 5);
+	});
+	await act(async () => {
+		editable.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				key: "Enter",
+				code: "Enter",
+				shiftKey: modifiers.shift ?? false,
+				...(modifiers.mod
+					? IS_APPLE
+						? { metaKey: true }
+						: { ctrlKey: true }
+					: {}),
+				bubbles: true,
+				cancelable: true,
+			}),
+		);
+	});
+	const paragraphs = editor
+		.getEditorState()
+		.read(() => $getRoot().getChildrenSize());
+	return { submitted, paragraphs };
+}
+
+test.each([
+	["send", {}, { steer: false }],
+	["send", { mod: true }, { steer: true }],
+	["newline", { mod: true }, { steer: false }],
+	["newline", { mod: true, shift: true }, { steer: true }],
+] as const)("with Enter set to %s, Enter %o submits %o", async (enterBehavior, modifiers, expected) => {
+	const result = await pressEnter(enterBehavior, modifiers);
+	expect(result.submitted).toEqual([expected]);
+	expect(result.paragraphs).toBe(1);
+});
+
+test.each([
+	["send", { shift: true }],
+	["newline", {}],
+	["newline", { shift: true }],
+] as const)("with Enter set to %s, Enter %o adds a line instead of submitting", async (enterBehavior, modifiers) => {
+	const result = await pressEnter(enterBehavior, modifiers);
+	expect(result.submitted).toEqual([]);
+	expect(result.paragraphs).toBe(2);
+});

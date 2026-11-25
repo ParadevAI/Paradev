@@ -4557,6 +4557,9 @@ msgstr "Kies wanneer Paradev je een seintje geeft."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Kies waar agents worden geopend die vanuit opmerkingen, de ontwerpmodus en Pages worden gestart."
 
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
+msgstr "Kies of Enter je bericht verstuurt of een nieuwe regel toevoegt. Voegt Enter een regel toe, dan verstuurt ⌘↩ en stuurt ⌘⇧↩ de lopende beurt bij."
+
 msgid "Choose your default skin tone"
 msgstr "Kies je standaard huidskleur"
 
@@ -8164,8 +8167,17 @@ msgstr "Voer een geheel getal in"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Voer een heel getal in van {minHours} tot {maxHours} GB-uren."
 
+msgid "Enter adds a line"
+msgstr "Enter voegt een regel toe"
+
+msgid "Enter in the chat composer"
+msgstr "Enter in het chatinvoerveld"
+
 msgid "Enter new value"
 msgstr "Nieuwe waarde invoeren"
+
+msgid "Enter sends"
+msgstr "Enter verstuurt"
 
 msgid "Enter this code on the page we opened:"
 msgstr "Voer deze code in op de pagina die we hebben geopend:"
@@ -15987,6 +15999,9 @@ msgstr "Werk in de wachtrij zetten voor agents"
 
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "In wachtrij; ⌘↩ om de lopende beurt bij te sturen"
+
+msgid "Queue; ⌘⇧↩ to steer the running turn"
+msgstr "In wachtrij; ⌘⇧↩ om de lopende beurt bij te sturen"
 
 msgid "Queued"
 msgstr "In wachtrij"

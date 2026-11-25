@@ -4557,6 +4557,9 @@ msgstr "选择Paradev在什么时候通知你。"
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "选择从评论、设计模式和 Pages 启动的智能体的打开位置。"
 
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
+msgstr "选择按 Enter 是发送消息还是换行。换行时，按 ⌘↩ 发送，按 ⌘⇧↩ 引导当前轮次。"
+
 msgid "Choose your default skin tone"
 msgstr "选择默认肤色"
 
@@ -8164,8 +8167,17 @@ msgstr "输入整数"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "请输入 {minHours} 到 {maxHours} 之间的整数 GB 小时。"
 
+msgid "Enter adds a line"
+msgstr "Enter 换行"
+
+msgid "Enter in the chat composer"
+msgstr "聊天输入框中的 Enter"
+
 msgid "Enter new value"
 msgstr "输入新值"
+
+msgid "Enter sends"
+msgstr "Enter 发送"
 
 msgid "Enter this code on the page we opened:"
 msgstr "在我们打开的页面上输入此代码："
@@ -15987,6 +15999,9 @@ msgstr "为智能体排队安排工作"
 
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "加入队列；按⌘↩引导当前轮次"
+
+msgid "Queue; ⌘⇧↩ to steer the running turn"
+msgstr "加入队列；按⌘⇧↩引导当前轮次"
 
 msgid "Queued"
 msgstr "排队中"

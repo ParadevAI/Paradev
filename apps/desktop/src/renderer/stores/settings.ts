@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type ChangesOpenTarget = "pane" | "tab";
+export type ComposerEnterBehavior = "send" | "newline";
 
 interface Settings {
 	diffStyle: "split" | "unified";
@@ -11,6 +12,8 @@ interface Settings {
 	 * split the current tab, or focus/create a dedicated tab. */
 	changesOpenTarget: ChangesOpenTarget;
 	dictationEnabled: boolean;
+	/** "newline": Enter adds a line in the chat composer and ⌘↩ sends. */
+	composerEnterBehavior: ComposerEnterBehavior;
 	showParadevAnywhereButton: boolean;
 	showRailUsage: boolean;
 }
@@ -27,6 +30,7 @@ export const useSettings = create<SettingsStore>()(
 			expandUnchanged: false,
 			changesOpenTarget: "pane",
 			dictationEnabled: true,
+			composerEnterBehavior: "send",
 			showParadevAnywhereButton: true,
 			showRailUsage: true,
 			update: (key, value) => set({ [key]: value }),
