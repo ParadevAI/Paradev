@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { ACTIVE_ORG_ID_KEY } from "renderer/hooks/useSignOut";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { posthog } from "../../lib/posthog";
+import { postHogIdentity } from "renderer/lib/posthog-identity";
 
 export function PostHogUserIdentifier() {
 	const { data: session } = authClient.useSession();
@@ -15,20 +15,19 @@ export function PostHogUserIdentifier() {
 		const createdAt = user.createdAt
 			? new Date(user.createdAt).toISOString()
 			: undefined;
-		posthog.identify(user.id, {
-			email: user.email,
-			name: user.name,
-			desktop_version: window.App.appVersion,
-			surface: "v2",
-			...(createdAt ? { created_at: createdAt } : {}),
-		});
-		if (createdAt) {
+		postHogIdentity.identifyUser(
+			user.id,
+			{
+				email: user.email,
+				name: user.name,
+				desktop_version: window.App.appVersion,
+				surface: "v2",
+				...(createdAt ? { created_at: createdAt } : {}),
+			},
 			// Included in flag evaluation requests so release conditions can
 			// target account age immediately, without waiting for ingestion.
-			// `false` skips the built-in reload; reloadFeatureFlags below covers it.
-			posthog.setPersonPropertiesForFlags({ created_at: createdAt }, false);
-		}
-		posthog.reloadFeatureFlags();
+			createdAt ? { created_at: createdAt } : {},
+		);
 		setUserId({ userId: user.id });
 	}, [user, setUserId]);
 

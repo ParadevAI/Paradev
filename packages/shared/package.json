@@ -282,6 +282,10 @@
 			"types": "./src/sentry.ts",
 			"default": "./src/sentry.ts"
 		},
+		"./sentry-gate": {
+			"types": "./src/sentry-gate.ts",
+			"default": "./src/sentry-gate.ts"
+		},
 		"./sentry-throttle": {
 			"types": "./src/sentry-throttle.ts",
 			"default": "./src/sentry-throttle.ts"

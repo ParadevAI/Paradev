@@ -18255,8 +18255,8 @@ msgstr "Sohbete gönder"
 msgid "Send to chat ({draftCount})"
 msgstr "Sohbete gönder ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Paradev'i geliştirmeye yardımcı olmak için bu bilgisayardan kullanım analizleri, oturum kayıtları ve hata raporları gönderin. Bir değişikliği tam olarak uygulamak için uygulamayı yeniden başlatın."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Paradev'i geliştirmeye yardımcı olmak için bu bilgisayardan kullanım analizleri, oturum kayıtları ve hata raporları gönderin. Bu kapalıyken Paradev, hangi özellikleri kullanabileceğinizi kontrol etmek için hesap kimliğinizi ve planınızı kullanmaya devam eder. Oturum kaydı ve hata raporlama değişiklikleri uygulamayı yeniden başlattıktan sonra geçerli olur."
 
 msgid "Sending"
 msgstr "Gönderiliyor"

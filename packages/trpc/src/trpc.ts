@@ -10,6 +10,7 @@ import {
 import {
 	ORGANIZATION_HEADER,
 	STAFF_EMAIL_DOMAINS,
+	TELEMETRY_HEADER,
 } from "@superset/shared/constants";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
@@ -41,6 +42,7 @@ export { isI18nErrorCause, planRequiredError, userError } from "./i18n-error";
 export interface ApiClientInfo {
 	product: "desktop" | "mobile" | "cli" | "sdk";
 	version: string;
+	telemetryOff?: boolean;
 }
 
 export const CLIENT_VERSION_HEADER = "x-superset-client";
@@ -57,7 +59,11 @@ export function parseClientHeader(headers: Headers): ApiClientInfo | null {
 	const product = match?.[1];
 	const version = match?.[2];
 	if (!product || !version) return null;
-	return { product: product as ApiClientInfo["product"], version };
+	return {
+		product: product as ApiClientInfo["product"],
+		version,
+		telemetryOff: headers.get(TELEMETRY_HEADER) === "off",
+	};
 }
 
 /**
@@ -158,7 +164,9 @@ function captureApiCall(
 	distinctId: string,
 	path: string,
 ) {
-	if (!client || Math.random() >= API_CALL_SAMPLE_RATE) return;
+	if (!client || client.telemetryOff || Math.random() >= API_CALL_SAMPLE_RATE) {
+		return;
+	}
 	posthog.capture({
 		distinctId,
 		event: "api_procedure_called",

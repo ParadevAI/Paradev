@@ -1,4 +1,8 @@
-import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
+import {
+	ORGANIZATION_HEADER,
+	TELEMETRY_HEADER,
+} from "@superset/shared/constants";
 import type { AppRouter } from "@superset/trpc";
 import type { TRPCClient } from "@trpc/client";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
@@ -76,6 +80,7 @@ export function createApiClient(opts: {
 						headers[ORGANIZATION_HEADER] = opts.organizationId;
 					}
 					headers["x-superset-client"] = `cli/${env.VERSION}`;
+					if (!isTelemetryEnabled()) headers[TELEMETRY_HEADER] = "off";
 					return headers;
 				},
 			}),

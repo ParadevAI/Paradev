@@ -18255,8 +18255,8 @@ msgstr "Enviar para o chat"
 msgid "Send to chat ({draftCount})"
 msgstr "Enviar para o chat ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Envie análises de uso, gravações de sessão e relatórios de erros deste computador para ajudar a melhorar o Paradev. Reinicie o app para aplicar uma alteração por completo."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Envie análises de uso, gravações de sessão e relatórios de erros deste computador para ajudar a melhorar o Paradev. Quando desativado, o Paradev ainda usa o ID da sua conta e seu plano para verificar quais recursos você pode usar. Alterações na gravação de sessões e nos relatórios de erros são aplicadas depois que você reiniciar o app."
 
 msgid "Sending"
 msgstr "Enviando"

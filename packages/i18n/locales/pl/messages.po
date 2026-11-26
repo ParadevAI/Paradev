@@ -18255,8 +18255,8 @@ msgstr "Wyślij na czat"
 msgid "Send to chat ({draftCount})"
 msgstr "Wyślij na czat ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Wysyłaj analizy użycia, nagrania sesji i raporty błędów z tego komputera, aby pomóc ulepszać Paradev. Uruchom aplikację ponownie, aby w pełni zastosować zmianę."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Wysyłaj analizy użycia, nagrania sesji i raporty błędów z tego komputera, aby pomóc ulepszać Paradev. Gdy to ustawienie jest wyłączone, Paradev nadal używa identyfikatora konta i planu, aby sprawdzić, z których funkcji możesz korzystać. Zmiany dotyczące nagrywania sesji i raportów błędów zaczną działać po ponownym uruchomieniu aplikacji."
 
 msgid "Sending"
 msgstr "Wysyłanie"

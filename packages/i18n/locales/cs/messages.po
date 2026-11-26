@@ -18255,8 +18255,8 @@ msgstr "Odeslat do chatu"
 msgid "Send to chat ({draftCount})"
 msgstr "Odeslat do chatu ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Odesílat analytiku používání, záznamy relací a hlášení chyb z tohoto počítače a pomoci tak vylepšit Paradev. Pro úplné použití změny restartujte aplikaci."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Odesílat analytiku používání, záznamy relací a hlášení chyb z tohoto počítače a pomoci tak vylepšit Paradev. Když je tato možnost vypnutá, Paradev dál používá ID vašeho účtu a tarif ke kontrole, které funkce můžete používat. Změny záznamu relací a hlášení chyb se projeví po restartu aplikace."
 
 msgid "Sending"
 msgstr "Odesílám"

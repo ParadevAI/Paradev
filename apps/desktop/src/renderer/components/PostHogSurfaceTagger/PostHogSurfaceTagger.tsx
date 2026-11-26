@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { authClient } from "renderer/lib/auth-client";
 import { posthog } from "renderer/lib/posthog";
+import { postHogIdentity } from "renderer/lib/posthog-identity";
 
 export function PostHogSurfaceTagger() {
 	const { data: session } = authClient.useSession();
@@ -11,9 +12,9 @@ export function PostHogSurfaceTagger() {
 
 		if (!userId) return;
 
-		posthog.people.set({ surface: "v2" });
-		posthog.people.set_once({ onboarded_surface: "v2" });
-		posthog.people.set_once({
+		postHogIdentity.setPeople({ surface: "v2" });
+		postHogIdentity.setPeopleOnce({ onboarded_surface: "v2" });
+		postHogIdentity.setPeopleOnce({
 			surface_first_v2_at: new Date().toISOString(),
 			surface_ever_v2: true,
 		});

@@ -36,10 +36,42 @@ describe("telemetry setting", () => {
 		expect(isTelemetryEnabled({ env: {}, filePath })).toBe(true);
 	});
 
-	test("a corrupt file reads as on", () => {
+	test.each([
+		["{not json"],
+		[""],
+		['{"enabled":false'],
+		['{"enabled":"false"}'],
+		['{"enabled":0}'],
+		["null"],
+		["{}"],
+	])("a file that cannot be read as a choice reads as off: %p", (text) => {
 		fs.mkdirSync(path.dirname(filePath), { recursive: true });
-		fs.writeFileSync(filePath, "{not json");
-		expect(readTelemetrySetting(filePath)).toBe(true);
+		fs.writeFileSync(filePath, text);
+		expect(readTelemetrySetting(filePath)).toBe(false);
+	});
+
+	test("a path that exists but is not a file reads as off", () => {
+		fs.mkdirSync(filePath, { recursive: true });
+		expect(readTelemetrySetting(filePath)).toBe(false);
+	});
+
+	test("a write replaces the file in one step and leaves no temp file", () => {
+		writeTelemetrySetting(true, filePath);
+		const renames: string[] = [];
+		const realRename = fs.renameSync;
+		fs.renameSync = ((from: string, to: string) => {
+			renames.push(to);
+			expect(readTelemetrySetting(filePath)).toBe(true);
+			realRename(from, to);
+		}) as typeof fs.renameSync;
+		try {
+			writeTelemetrySetting(false, filePath);
+		} finally {
+			fs.renameSync = realRename;
+		}
+		expect(renames).toEqual([filePath]);
+		expect(readTelemetrySetting(filePath)).toBe(false);
+		expect(fs.readdirSync(path.dirname(filePath))).toEqual(["telemetry.json"]);
 	});
 
 	test("DO_NOT_TRACK turns it off whatever is stored", () => {

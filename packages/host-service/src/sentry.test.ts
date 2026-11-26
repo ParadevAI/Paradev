@@ -14,6 +14,46 @@ function sendsLines(env: NodeJS.ProcessEnv): boolean {
 }
 
 describe("hostSentryOptions", () => {
+	it("drops events and envelopes once telemetry is turned off while running", async () => {
+		let received = 0;
+		const server = Bun.serve({
+			port: 0,
+			fetch: () => {
+				received += 1;
+				return new Response("{}");
+			},
+		});
+		try {
+			const env: NodeJS.ProcessEnv = {
+				HOST_SERVICE_SENTRY_DSN: `http://public@127.0.0.1:${server.port}/1`,
+			};
+			const options = hostSentryOptions(env, "org");
+			if (!options?.beforeSend || typeof options.transport !== "function") {
+				throw new Error("expected beforeSend and a transport");
+			}
+			const transport = options.transport({
+				url: `http://127.0.0.1:${server.port}/api/1/envelope/`,
+				recordDroppedEvent: () => {},
+			});
+			const session = [
+				{},
+				[[{ type: "session" }, { status: "exited" }]],
+			] as never;
+			const event = { type: undefined, message: "probe" } as const;
+
+			expect(options.beforeSend(event, {})).toBe(event);
+			await transport.send(session);
+			expect(received).toBe(1);
+
+			env.DO_NOT_TRACK = "1";
+			expect(options.beforeSend(event, {})).toBe(null);
+			await transport.send(session);
+			expect(received).toBe(1);
+		} finally {
+			server.stop(true);
+		}
+	});
+
 	it("does not set up Sentry when DO_NOT_TRACK is set", () => {
 		expect(hostSentryOptions({ HOST_SERVICE_SENTRY_DSN: DSN }, "org")).not.toBe(
 			null,

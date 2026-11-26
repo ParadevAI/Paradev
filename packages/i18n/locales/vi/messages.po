@@ -18255,8 +18255,8 @@ msgstr "Gửi vào chat"
 msgid "Send to chat ({draftCount})"
 msgstr "Gửi vào chat ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Gửi phân tích sử dụng, bản ghi phiên và báo cáo lỗi từ máy tính này để giúp cải thiện Paradev. Khởi động lại ứng dụng để áp dụng hoàn toàn thay đổi."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Gửi phân tích sử dụng, bản ghi phiên và báo cáo lỗi từ máy tính này để giúp cải thiện Paradev. Khi tắt, Paradev vẫn dùng ID tài khoản và gói của bạn để kiểm tra những tính năng bạn có thể dùng. Thay đổi về ghi phiên và báo cáo lỗi sẽ áp dụng sau khi bạn khởi động lại ứng dụng."
 
 msgid "Sending"
 msgstr "Đang gửi"

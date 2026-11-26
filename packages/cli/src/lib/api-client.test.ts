@@ -164,3 +164,38 @@ describe("API HTTP errors through the CLI formatter", () => {
 		expect((await api.user.me.query()).id).toBe("test-user");
 	});
 });
+
+describe("the telemetry header", () => {
+	const telemetryHeaderSent = async (doNotTrack: string | undefined) => {
+		let header: string | null = null;
+		const original = process.env.DO_NOT_TRACK;
+		if (doNotTrack === undefined) delete process.env.DO_NOT_TRACK;
+		else process.env.DO_NOT_TRACK = doNotTrack;
+		respond = () => Response.json([{ result: { data: { json: null } } }]);
+		server.reload({
+			fetch: (request) => {
+				header = request.headers.get("x-superset-telemetry");
+				return respond();
+			},
+		});
+		try {
+			env.SUPERSET_API_URL = `http://localhost:${server.port}`;
+			await createApiClient({ bearer: "token" })
+				.user.me.query()
+				.catch(() => {});
+		} finally {
+			server.reload({ fetch: () => respond() });
+			if (original === undefined) delete process.env.DO_NOT_TRACK;
+			else process.env.DO_NOT_TRACK = original;
+		}
+		return header;
+	};
+
+	test("says off when telemetry is off on this machine", async () => {
+		expect(await telemetryHeaderSent("1")).toBe("off");
+	});
+
+	test("is absent when telemetry is on", async () => {
+		expect(await telemetryHeaderSent(undefined)).toBe(null);
+	});
+});

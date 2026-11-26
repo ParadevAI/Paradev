@@ -16,11 +16,17 @@ export function isDoNotTrackSet(env: NodeJS.ProcessEnv = process.env): boolean {
 export function readTelemetrySetting(
 	filePath = getTelemetryStateFilePath(),
 ): boolean {
+	let text: string;
 	try {
-		const raw: unknown = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-		return (raw as { enabled?: unknown })?.enabled !== false;
+		text = fs.readFileSync(filePath, "utf-8");
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "ENOENT";
+	}
+	try {
+		const raw: unknown = JSON.parse(text);
+		return (raw as { enabled?: unknown } | null)?.enabled === true;
 	} catch {
-		return true;
+		return false;
 	}
 }
 
@@ -29,9 +35,16 @@ export function writeTelemetrySetting(
 	filePath = getTelemetryStateFilePath(),
 ): void {
 	fs.mkdirSync(path.dirname(filePath), { recursive: true });
-	fs.writeFileSync(filePath, `${JSON.stringify({ enabled }, null, "\t")}\n`, {
-		mode: 0o644,
-	});
+	const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+	try {
+		fs.writeFileSync(tempPath, `${JSON.stringify({ enabled }, null, "\t")}\n`, {
+			mode: 0o644,
+		});
+		fs.renameSync(tempPath, filePath);
+	} catch (error) {
+		fs.rmSync(tempPath, { force: true });
+		throw error;
+	}
 }
 
 export function isTelemetryEnabled({

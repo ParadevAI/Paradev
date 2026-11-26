@@ -1,5 +1,9 @@
-import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import {
+	ORGANIZATION_HEADER,
+	TELEMETRY_HEADER,
+} from "@superset/shared/constants";
 import { getAuthToken } from "../auth-client";
+import { isTelemetryEnabled } from "../telemetry";
 
 /**
  * The organization this window's cloud reads are scoped to.
@@ -28,5 +32,6 @@ export function getCloudRequestHeaders(): Record<string, string> {
 			? { [ORGANIZATION_HEADER]: cloudOrganizationId }
 			: {}),
 		...(version ? { "x-superset-client": `desktop/${version}` } : {}),
+		...(isTelemetryEnabled() ? {} : { [TELEMETRY_HEADER]: "off" }),
 	};
 }

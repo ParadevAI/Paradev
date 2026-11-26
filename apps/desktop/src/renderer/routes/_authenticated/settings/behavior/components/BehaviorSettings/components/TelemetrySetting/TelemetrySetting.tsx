@@ -3,6 +3,7 @@ import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
 import { Switch } from "@superset/ui/switch";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { applyTelemetrySetting } from "renderer/lib/posthog-identity";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 
@@ -36,7 +37,7 @@ export function TelemetrySetting() {
 	const doNotTrack = data?.doNotTrack ?? false;
 
 	return (
-		<div className="flex items-center justify-between gap-6">
+		<div className="ph-no-capture flex items-center justify-between gap-6">
 			<div className="min-w-0 flex-1 space-y-0.5">
 				<Label htmlFor="telemetry" className="text-sm font-medium">
 					<HighlightText
@@ -47,8 +48,10 @@ export function TelemetrySetting() {
 				<p className="text-xs text-muted-foreground">
 					<Trans>
 						Send usage analytics, session recordings and error reports from this
-						computer to help improve Paradev. Restart the app to fully apply a
-						change.
+						computer to help improve Paradev. When this is off, Paradev still
+						uses your account ID and plan to check which features you can use.
+						Changes to session recording and error reporting apply after you
+						restart the app.
 					</Trans>
 				</p>
 				{doNotTrack && (
@@ -60,7 +63,10 @@ export function TelemetrySetting() {
 			<Switch
 				id="telemetry"
 				checked={!doNotTrack && (data?.enabled ?? true)}
-				onCheckedChange={(enabled) => setTelemetryEnabled.mutate({ enabled })}
+				onCheckedChange={(enabled) => {
+					applyTelemetrySetting(enabled);
+					setTelemetryEnabled.mutate({ enabled });
+				}}
 				disabled={isLoading || doNotTrack || setTelemetryEnabled.isPending}
 			/>
 		</div>

@@ -28,8 +28,8 @@ export function initPostHog() {
 		capture_dead_clicks: telemetryEnabled,
 		capture_performance: telemetryEnabled,
 		before_send: (event) => (isTelemetryEnabled() ? event : null),
+		...(telemetryEnabled ? {} : { advanced_disable_flags: true }),
 	});
-	if (!telemetryEnabled) posthogFull.opt_out_capturing();
 
 	posthogFull.register({
 		app_name: "desktop",

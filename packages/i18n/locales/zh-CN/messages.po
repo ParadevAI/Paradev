@@ -18255,8 +18255,8 @@ msgstr "发送到聊天"
 msgid "Send to chat ({draftCount})"
 msgstr "发送到聊天（{draftCount}）"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "从这台电脑发送使用分析、会话录制和错误报告，帮助改进 Paradev。重启应用后更改才会完全生效。"
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "从这台电脑发送使用分析、会话录制和错误报告，帮助改进 Paradev。关闭后，Paradev 仍会使用你的账户 ID 和套餐来确认你可以使用哪些功能。会话录制和错误报告的更改在重启应用后生效。"
 
 msgid "Sending"
 msgstr "正在发送"

@@ -18255,8 +18255,8 @@ msgstr "Отправить в чат"
 msgid "Send to chat ({draftCount})"
 msgstr "Отправить в чат ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Отправлять аналитику использования, записи сеансов и отчёты об ошибках с этого компьютера, чтобы помочь улучшить Paradev. Перезапустите приложение, чтобы изменение применилось полностью."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Отправлять аналитику использования, записи сеансов и отчёты об ошибках с этого компьютера, чтобы помочь улучшить Paradev. Когда эта настройка выключена, Paradev всё равно использует ID вашей учётной записи и тариф, чтобы проверить, какие функции вам доступны. Изменения записи сеансов и отчётов об ошибках вступают в силу после перезапуска приложения."
 
 msgid "Sending"
 msgstr "Отправка"

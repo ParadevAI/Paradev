@@ -18255,8 +18255,8 @@ msgstr "Envoyer au chat"
 msgid "Send to chat ({draftCount})"
 msgstr "Envoyer au chat ({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Envoyer des statistiques d'utilisation, des enregistrements de session et des rapports d'erreur depuis cet ordinateur pour aider à améliorer Paradev. Redémarrez l'application pour appliquer entièrement un changement."
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Envoyer des statistiques d'utilisation, des enregistrements de session et des rapports d'erreur depuis cet ordinateur pour aider à améliorer Paradev. Lorsque cette option est désactivée, Paradev utilise toujours l'identifiant de votre compte et votre forfait pour vérifier les fonctionnalités auxquelles vous avez accès. Les changements concernant l'enregistrement des sessions et les rapports d'erreur s'appliquent après le redémarrage de l'application."
 
 msgid "Sending"
 msgstr "Envoi"

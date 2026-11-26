@@ -18255,8 +18255,8 @@ msgstr "チャットに送る"
 msgid "Send to chat ({draftCount})"
 msgstr "チャットに送る({draftCount})"
 
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. Restart the app to fully apply a change."
-msgstr "Paradev の改善のため、このコンピューターから使用状況の分析、セッションの記録、エラーレポートを送信します。変更を完全に反映するにはアプリを再起動してください。"
+msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
+msgstr "Paradev の改善のため、このコンピューターから使用状況の分析、セッションの記録、エラーレポートを送信します。オフの場合も、利用できる機能を確認するために、アカウント ID とプランは引き続き使用されます。セッションの記録とエラーレポートの変更は、アプリの再起動後に反映されます。"
 
 msgid "Sending"
 msgstr "送信中"
