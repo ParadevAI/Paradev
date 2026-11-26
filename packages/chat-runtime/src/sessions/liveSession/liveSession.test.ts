@@ -733,7 +733,7 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
-	test("a plain prompt sent while the turn only waits on background work is queued, not steered", async () => {
+	test("a plain prompt sent while the turn only waits on background work joins it", async () => {
 		const { runtime, sessionId, adapters } = startSessionWithAdapters({
 			...HELD_THEN_QUICK,
 			steer: true,
@@ -742,20 +742,12 @@ describe("LiveSession", () => {
 		await waitForApproval(runtime, sessionId);
 		const second = sendPrompt(runtime, sessionId, "second");
 
-		expect(second.queued).toBe(true);
-		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(1);
-		expect(adapters[0]?.steered).toEqual([]);
-
-		answerApproval(runtime, sessionId);
-
-		await waitFor(
-			() =>
-				snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId ===
-				"t2",
-		);
+		expect(second.queued).toBe(false);
 		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
-		expect(adapters[0]?.steered).toEqual([]);
-		expect(adapters[0]?.prompted).toHaveLength(2);
+		expect(
+			snapshotOf(runtime, sessionId).items.get(second.itemId)?.turnId,
+		).toBe("t1");
+		await waitFor(() => adapters[0]?.steered.length === 1);
 		await runtime.dispose();
 	});
 
@@ -789,7 +781,7 @@ describe("LiveSession", () => {
 		await runtime.dispose();
 	});
 
-	test("prompts queued while the agent worked stay queued once it only waits on background work", async () => {
+	test("prompts queued while the agent worked join the turn, in order, once it only waits on background work", async () => {
 		const { runtime, sessionId } = startSession({
 			turns: [
 				[
@@ -814,12 +806,11 @@ describe("LiveSession", () => {
 				snapshotOf(runtime, sessionId).items.get("ap2")?.item.kind ===
 				"approval_request",
 		);
-		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(2);
-		expect(
-			deriveQueuedPrompts(snapshotOf(runtime, sessionId)).map(
-				(item) => item.id,
-			),
-		).toEqual([second.itemId, third.itemId]);
+		expect(runtime.sessions.get(sessionId)?.queuedCount).toBe(0);
+		expect(deriveQueuedPrompts(snapshotOf(runtime, sessionId))).toEqual([]);
+		const items = snapshotOf(runtime, sessionId).items;
+		expect(items.get(second.itemId)?.turnId).toBe("t1");
+		expect(items.get(third.itemId)?.turnId).toBe("t1");
 		await runtime.dispose();
 	});
 
