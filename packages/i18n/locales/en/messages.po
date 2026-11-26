@@ -4557,8 +4557,8 @@ msgstr "Choose when Paradev pings you."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Choose where agents started from comments, design mode, and Pages open."
 
-msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
-msgstr "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
 
 msgid "Choose your default skin tone"
 msgstr "Choose your default skin tone"
@@ -16000,8 +16000,8 @@ msgstr "Queue work for agents"
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "Queue; ⌘↩ to steer the running turn"
 
-msgid "Queue; ⌘⇧↩ to steer the running turn"
-msgstr "Queue; ⌘⇧↩ to steer the running turn"
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "Queue; ⌘⇧↩︎ to steer the running turn"
 
 msgid "Queued"
 msgstr "Queued"

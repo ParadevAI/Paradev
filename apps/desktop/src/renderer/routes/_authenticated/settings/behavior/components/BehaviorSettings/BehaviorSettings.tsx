@@ -269,7 +269,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 							<p className="text-xs text-muted-foreground">
 								<Trans>
 									Choose whether Enter sends your message or adds a new line.
-									When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn.
+									When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn.
 								</Trans>
 							</p>
 						</div>

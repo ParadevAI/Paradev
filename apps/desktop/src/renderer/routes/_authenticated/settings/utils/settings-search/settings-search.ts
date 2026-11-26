@@ -802,7 +802,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		section: "behavior",
 		title: "Enter in the chat composer",
 		description:
-			"Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn.",
+			"Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn.",
 		keywords: [
 			"enter",
 			"return",

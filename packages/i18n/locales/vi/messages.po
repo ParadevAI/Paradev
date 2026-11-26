@@ -4557,8 +4557,8 @@ msgstr "Chọn khi nào Paradev báo cho bạn."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Chọn nơi mở tác nhân được khởi chạy từ bình luận, chế độ thiết kế và Pages."
 
-msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
-msgstr "Chọn Enter để gửi tin nhắn hay thêm dòng mới. Khi Enter thêm dòng, ⌘↩ sẽ gửi và ⌘⇧↩ sẽ dừng và gửi trong lượt đang chạy."
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Chọn Enter để gửi tin nhắn hay thêm dòng mới. Khi Enter thêm dòng, ⌘↩︎ sẽ gửi và ⌘⇧↩︎ sẽ dừng và gửi trong lượt đang chạy."
 
 msgid "Choose your default skin tone"
 msgstr "Chọn màu da mặc định"
@@ -16000,8 +16000,8 @@ msgstr "Xếp việc cho agent"
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "Vào hàng đợi; ⌘↩ để dừng và gửi trong lượt đang chạy"
 
-msgid "Queue; ⌘⇧↩ to steer the running turn"
-msgstr "Vào hàng đợi; ⌘⇧↩ để dừng và gửi trong lượt đang chạy"
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "Vào hàng đợi; ⌘⇧↩︎ để dừng và gửi trong lượt đang chạy"
 
 msgid "Queued"
 msgstr "Đang xếp hàng"

@@ -4551,8 +4551,8 @@ msgstr "Виберіть, коли Paradev надсилатиме вам спо�
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Виберіть, де відкриваються агенти, запущені з коментарів, режиму дизайну та Pages."
 
-msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
-msgstr "Виберіть, чи Enter надсилає повідомлення, чи додає новий рядок. Якщо Enter додає рядок, ⌘↩ надсилає, а ⌘⇧↩ скеровує поточний хід."
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Виберіть, чи Enter надсилає повідомлення, чи додає новий рядок. Якщо Enter додає рядок, ⌘↩︎ надсилає, а ⌘⇧↩︎ скеровує поточний хід."
 
 msgid "Choose your default skin tone"
 msgstr "Виберіть тон шкіри за замовчуванням"
@@ -15994,8 +15994,8 @@ msgstr "Ставте роботу для агентів у чергу"
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "У чергу; ⌘↩, щоб скерувати поточний хід"
 
-msgid "Queue; ⌘⇧↩ to steer the running turn"
-msgstr "У чергу; ⌘⇧↩, щоб скерувати поточний хід"
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "У чергу; ⌘⇧↩︎, щоб скерувати поточний хід"
 
 msgid "Queued"
 msgstr "У черзі"

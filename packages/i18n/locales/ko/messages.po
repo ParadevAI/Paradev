@@ -4557,8 +4557,8 @@ msgstr "Paradev가 언제 알릴지 선택하세요."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "댓글, 디자인 모드 및 Pages에서 시작한 에이전트를 열 위치를 선택하세요."
 
-msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
-msgstr "Enter로 메시지를 보낼지 새 줄을 추가할지 선택하세요. 새 줄을 추가하면 ⌘↩로 보내고 ⌘⇧↩로 진행 중인 턴의 방향을 전환합니다."
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Enter로 메시지를 보낼지 새 줄을 추가할지 선택하세요. 새 줄을 추가하면 ⌘↩︎로 보내고 ⌘⇧↩︎로 진행 중인 턴의 방향을 전환합니다."
 
 msgid "Choose your default skin tone"
 msgstr "기본 피부색 선택"
@@ -16000,8 +16000,8 @@ msgstr "에이전트 작업 대기열에 추가"
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "대기열에 추가; ⌘↩로 진행 중인 턴 방향 전환"
 
-msgid "Queue; ⌘⇧↩ to steer the running turn"
-msgstr "대기열에 추가; ⌘⇧↩로 진행 중인 턴 방향 전환"
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "대기열에 추가; ⌘⇧↩︎로 진행 중인 턴 방향 전환"
 
 msgid "Queued"
 msgstr "대기열"

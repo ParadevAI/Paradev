@@ -1368,7 +1368,7 @@ export function ComposerBody({
 					title={
 						(status === "streaming" && onStop) || status === "background"
 							? enterBehavior === "newline"
-								? t({ message: "Queue; ⌘⇧↩ to steer the running turn" })
+								? t({ message: "Queue; ⌘⇧↩︎ to steer the running turn" })
 								: t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}

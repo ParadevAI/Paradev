@@ -4557,8 +4557,8 @@ msgstr "Zvolte, kdy vás Paradev upozorní."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Vyberte, kde se otevřou agenti spuštění z komentářů, režimu návrhu a stránek Pages."
 
-msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
-msgstr "Zvolte, zda Enter odešle zprávu, nebo přidá nový řádek. Když přidává řádek, ⌘↩ odešle a ⌘⇧↩ usměrní běžící tah."
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Zvolte, zda Enter odešle zprávu, nebo přidá nový řádek. Když přidává řádek, ⌘↩︎ odešle a ⌘⇧↩︎ usměrní běžící tah."
 
 msgid "Choose your default skin tone"
 msgstr "Vyberte výchozí odstín pleti"
@@ -16000,8 +16000,8 @@ msgstr "Fronta práce pro agenty"
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "Zařadit do fronty; ⌘↩ usměrní běžící tah"
 
-msgid "Queue; ⌘⇧↩ to steer the running turn"
-msgstr "Zařadit do fronty; ⌘⇧↩ usměrní běžící tah"
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "Zařadit do fronty; ⌘⇧↩︎ usměrní běžící tah"
 
 msgid "Queued"
 msgstr "Ve frontě"

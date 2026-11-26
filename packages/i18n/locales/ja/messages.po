@@ -4557,8 +4557,8 @@ msgstr "Paradevから通知するタイミングを選びます。"
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "コメント、デザインモード、Pages から起動したエージェントを開く場所を選択します。"
 
-msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩ sends and ⌘⇧↩ steers the running turn."
-msgstr "Enter でメッセージを送信するか、改行するかを選択します。改行する場合は ⌘↩ で送信し、⌘⇧↩ で実行中のターンを軌道修正します。"
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Enter でメッセージを送信するか、改行するかを選択します。改行する場合は ⌘↩︎ で送信し、⌘⇧↩︎ で実行中のターンを軌道修正します。"
 
 msgid "Choose your default skin tone"
 msgstr "デフォルトの肌の色を選択"
@@ -16000,8 +16000,8 @@ msgstr "エージェントの作業をキューに入れる"
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "キューに追加。⌘↩で実行中のターンを軌道修正"
 
-msgid "Queue; ⌘⇧↩ to steer the running turn"
-msgstr "キューに追加。⌘⇧↩で実行中のターンを軌道修正"
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "キューに追加。⌘⇧↩︎で実行中のターンを軌道修正"
 
 msgid "Queued"
 msgstr "待機中"
