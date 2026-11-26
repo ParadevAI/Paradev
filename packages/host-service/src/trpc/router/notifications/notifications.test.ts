@@ -312,6 +312,26 @@ describe("notificationsRouter.hook", () => {
 		expect(broadcastAgentLifecycle.mock.calls).toHaveLength(broadcasts);
 	});
 
+	it("binds Claude's next session after /clear or a relaunch", async () => {
+		const { ctx, terminalAgentStore } = createContext("workspace-1");
+		const caller = notificationsRouter.createCaller(ctx);
+		const hook = (eventType: string, sessionId: string, launchId: string) =>
+			caller.hook({
+				terminalId: "terminal-1",
+				eventType,
+				launchId,
+				agent: { agentId: "claude", sessionId },
+			});
+		await hook("SessionStart", "s1", "launch-1");
+
+		await hook("SessionEnd", "s1", "launch-1");
+		await hook("SessionStart", "s2", "launch-1");
+		expect(terminalAgentStore.get("terminal-1")?.agentSessionId).toBe("s2");
+
+		await hook("Start", "s3", "launch-2");
+		expect(terminalAgentStore.get("terminal-1")?.agentSessionId).toBe("s3");
+	});
+
 	it("keeps only transcript paths that look like harness files under home", async () => {
 		const { ctx, terminalAgentStore } = createContext("workspace-1");
 		const caller = notificationsRouter.createCaller(ctx);
