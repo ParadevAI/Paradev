@@ -1,3 +1,5 @@
+import { COMPANY } from "@superset/shared/constants";
+
 export interface FeatureOverlay {
 	id: "parallel-execution" | "cli-sdk";
 	title: string;
@@ -6,7 +8,11 @@ export interface FeatureOverlay {
 export interface LandingCopy {
 	lead: string;
 	emphasis: string;
-	feature: FeatureOverlay;
+	description?: string;
+	indexable?: boolean;
+	subheadline?: string;
+	badge?: { label: string; href: string };
+	feature?: FeatureOverlay;
 }
 export const landingCopy = {
 	"claude-code-parallel-sessions": {
@@ -37,6 +43,19 @@ export const landingCopy = {
 			title: "Switch tasks without stashing",
 			description:
 				"Paradev creates a Git worktree for each task. Review one Codex diff while another task keeps running on its own branch.",
+		},
+	},
+	"black-friday": {
+		indexable: true,
+		lead: "Black Friday:",
+		emphasis: "90 Days of Pro, Free",
+		description:
+			"Paradev is open source. For Black Friday, enter BFCM2026 at checkout to get 90 days of Pro free.",
+		subheadline:
+			"The open-source workspace for Claude Code, Codex, and any agent. Enter BFCM2026 at checkout.",
+		badge: {
+			label: "Paradev is open source (MIT)",
+			href: COMPANY.GITHUB_URL,
 		},
 	},
 } satisfies Record<string, LandingCopy>;

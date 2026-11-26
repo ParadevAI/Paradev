@@ -47,7 +47,12 @@ export function LandingPage({ copy }: { copy: LandingCopy }) {
 			/>
 			<ServiceJsonLd />
 			<WebMcpTools />
-			<LandingHero lead={copy.lead} emphasis={copy.emphasis} />
+			<LandingHero
+				lead={copy.lead}
+				emphasis={copy.emphasis}
+				subheadline={copy.subheadline}
+				badge={copy.badge}
+			/>
 			<MobileSection />
 			<TrustedBySection />
 			<LandingFeatures overlay={copy.feature} />

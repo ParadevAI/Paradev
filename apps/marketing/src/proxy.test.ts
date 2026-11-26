@@ -30,11 +30,12 @@ describe("proxy", () => {
 		);
 	});
 
-	test("routes only the three English landing URLs without taking the land handle", async () => {
+	test("routes only the English landing URLs without taking the land handle", async () => {
 		for (const slug of [
 			"claude-code-parallel-sessions",
 			"claude-code-worktrees",
 			"codex-cli-worktrees",
+			"black-friday",
 		]) {
 			const path = `/land/${slug}`;
 			const query = "?utm_source=test&utm_campaign=landing&gclid=a%2Bb";

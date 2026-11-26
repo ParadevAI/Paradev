@@ -1,18 +1,18 @@
 import { BRAND } from "@superset/shared/brand";
 import type { Metadata } from "next";
 import { localeUrl } from "@/app/[lang]/metadata";
-import { landingCopy } from "./copy";
+import { type LandingCopy, landingCopy } from "./copy";
 
 export function landingMetadata(slug: keyof typeof landingCopy): Metadata {
-	const copy = landingCopy[slug];
+	const copy: LandingCopy = landingCopy[slug];
 	const title = `${copy.lead} ${copy.emphasis}`;
-	const description = copy.feature.description;
+	const description = copy.description ?? copy.feature?.description;
 	const url = localeUrl("en", `/land/${slug}`);
 	return {
 		title,
 		description,
 		alternates: { canonical: url },
-		robots: { index: false, follow: true },
+		robots: { index: copy.indexable ?? false, follow: true },
 		openGraph: {
 			type: "website",
 			locale: "en_US",

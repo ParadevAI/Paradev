@@ -16,9 +16,13 @@ import { track } from "@/lib/analytics";
 export function LandingHero({
 	lead,
 	emphasis,
+	subheadline,
+	badge,
 }: {
 	lead: string;
 	emphasis: string;
+	subheadline?: string;
+	badge?: { label: string; href: string };
 }) {
 	const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 	const [deviceStore, setDeviceStore] = useState<
@@ -42,17 +46,17 @@ export function LandingHero({
 				<div className="relative w-full max-w-7xl mx-auto px-6 sm:px-8">
 					<div className="flex flex-col items-center text-center">
 						<Link
-							href={
-								i18n.locale === "en"
-									? "/blog/superset-is-now-paradev"
-									: `/${i18n.locale}/blog/superset-is-now-paradev`
-							}
+							href={badge?.href ?? "/blog/superset-is-now-paradev"}
+							target={badge ? "_blank" : undefined}
+							rel={badge ? "noopener noreferrer" : undefined}
 							className="group relative mb-6 sm:mb-8 inline-flex max-w-full items-center gap-2 rounded-[2px] border border-border bg-background/80 px-3 py-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground hover:border-foreground/[0.2]"
 						>
 							<span>
-								<Trans>
-									Superset is now Paradev. Also, we raised an $11.5M seed
-								</Trans>
+								{badge?.label ?? (
+									<Trans>
+										Superset is now Paradev. Also, we raised an $11.5M seed
+									</Trans>
+								)}
 							</span>
 							<span
 								aria-hidden="true"
@@ -70,10 +74,12 @@ export function LandingHero({
 								id="hero-subheadline"
 								className="text-base sm:text-xl font-light text-muted-foreground max-w-4xl mx-auto"
 							>
-								<Trans>
-									The open-source workspace for Claude Code, Codex, and any
-									agent. Locally or in the cloud.
-								</Trans>
+								{subheadline ?? (
+									<Trans>
+										The open-source workspace for Claude Code, Codex, and any
+										agent. Locally or in the cloud.
+									</Trans>
+								)}
 							</p>
 						</div>
 

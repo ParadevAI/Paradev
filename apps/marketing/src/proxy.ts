@@ -82,7 +82,8 @@ function route(request: NextRequest) {
 	const landingPage =
 		barePath === "/land/claude-code-parallel-sessions" ||
 		barePath === "/land/claude-code-worktrees" ||
-		barePath === "/land/codex-cli-worktrees";
+		barePath === "/land/codex-cli-worktrees" ||
+		barePath === "/land/black-friday";
 	if (landingPage && barePath !== pathname) {
 		// NextURL retains the inbound trailing-slash flag when serialized.
 		const target = new URL(request.url);

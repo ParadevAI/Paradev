@@ -30,6 +30,9 @@ import { FooterBackdrop } from "./components/FooterBackdrop";
 const CTASection = dynamic(() =>
 	import("./components/CTASection").then((mod) => mod.CTASection),
 );
+const BlackFridayCTA = dynamic(() =>
+	import("./components/BlackFridayCTA").then((mod) => mod.BlackFridayCTA),
+);
 
 function SupersetLogo() {
 	return (
@@ -206,7 +209,11 @@ export function Footer({
 		<footer className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden border-t border-border bg-background">
 			<FooterBackdrop />
 			<div className="flex flex-1 items-center">
-				<CTASection />
+				{pathname === "/land/black-friday" ? (
+					<BlackFridayCTA />
+				) : (
+					<CTASection />
+				)}
 			</div>
 			<m.div
 				initial={{ opacity: 0 }}
