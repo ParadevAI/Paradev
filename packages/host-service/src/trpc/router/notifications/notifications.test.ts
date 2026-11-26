@@ -332,6 +332,36 @@ describe("notificationsRouter.hook", () => {
 		expect(terminalAgentStore.get("terminal-1")?.agentSessionId).toBe("s3");
 	});
 
+	it("keeps a nested Claude process out between two sessions of the terminal's Claude", async () => {
+		const { ctx, db } = createDbContext({
+			terminalId: "terminal-1",
+			workspaceId: "workspace-1",
+		});
+		ctx.terminalAgentStore = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		const caller = notificationsRouter.createCaller(ctx);
+		const hook = (eventType: string, sessionId: string) =>
+			caller.hook({
+				terminalId: "terminal-1",
+				eventType,
+				launchId: "launch-1",
+				agent: { agentId: "claude", sessionId },
+			});
+		await hook("SessionStart", "s1");
+		await hook("SessionEnd", "s1");
+
+		await hook("PostToolUse", "nested");
+		expect(ctx.terminalAgentStore.get("terminal-1")).toBeUndefined();
+
+		await hook("SessionStart", "s2");
+		await hook("Stop", "s2");
+		expect(ctx.terminalAgentStore.get("terminal-1")).toMatchObject({
+			agentSessionId: "s2",
+			lastEventType: "Stop",
+		});
+	});
+
 	it("keeps only transcript paths that look like harness files under home", async () => {
 		const { ctx, terminalAgentStore } = createContext("workspace-1");
 		const caller = notificationsRouter.createCaller(ctx);
