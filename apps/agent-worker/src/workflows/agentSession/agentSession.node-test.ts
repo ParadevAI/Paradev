@@ -98,9 +98,10 @@ async function withWorker<T>(
 	activities: AgentActivities,
 	sessionId: string,
 	fn: () => Promise<T>,
+	testEnv = env,
 ): Promise<T> {
 	const worker = await Worker.create({
-		connection: env.nativeConnection,
+		connection: testEnv.nativeConnection,
 		taskQueue: "agent",
 		defaultHeartbeatThrottleInterval: 50,
 		maxHeartbeatThrottleInterval: 50,
@@ -111,7 +112,7 @@ async function withWorker<T>(
 		try {
 			return await fn();
 		} finally {
-			await env.client.workflow
+			await testEnv.client.workflow
 				.getHandle(sessionWorkflowId(sessionId))
 				.terminate()
 				.catch(() => {});
@@ -338,19 +339,32 @@ describe("agentSession workflow", () => {
 	});
 
 	it("ends the workflow after ten idle minutes", async () => {
+		// A query from an earlier test's activity can leave the shared server unable to skip time.
+		const idleEnv = await TestWorkflowEnvironment.createTimeSkipping();
 		const calls: Call[] = [];
-		await withWorker(fakeActivities({}, calls), "s5", async () => {
-			await startTurn(env.client, "s5", {
-				turnId: "t1",
-				promptId: "p1",
-				text: "hi",
-			});
-			await waitFor(() => names(calls).includes("settleTurn"));
-			await env.sleep("11 minutes");
-			const handle = env.client.workflow.getHandle(sessionWorkflowId("s5"));
-			const description = await handle.describe();
-			assert.equal(description.status.name, "COMPLETED");
-		});
+		try {
+			await withWorker(
+				fakeActivities({}, calls),
+				"s5",
+				async () => {
+					await startTurn(idleEnv.client, "s5", {
+						turnId: "t1",
+						promptId: "p1",
+						text: "hi",
+					});
+					await waitFor(() => names(calls).includes("settleTurn"));
+					await idleEnv.sleep("11 minutes");
+					const handle = idleEnv.client.workflow.getHandle(
+						sessionWorkflowId("s5"),
+					);
+					const description = await handle.describe();
+					assert.equal(description.status.name, "COMPLETED");
+				},
+				idleEnv,
+			);
+		} finally {
+			await idleEnv.teardown();
+		}
 		assert.deepEqual(names(calls), ["beginTurn", "runTurn", "settleTurn"]);
 	});
 });
