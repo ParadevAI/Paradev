@@ -4,11 +4,136 @@ export const recordingUnmaskProps = {
 	[RECORDING_UNMASK_ATTRIBUTE]: "",
 } as const;
 
-const MASKED_ATTRIBUTES = ["title", "aria-label", "alt", "placeholder"];
+const MASKED_VALUE = "***";
+
+const KEPT_VALUES = new Set(["", "true", "false"]);
+
+const KEPT_ATTRIBUTES = new Set([
+	"class",
+	"style",
+	"role",
+	"type",
+	"tabindex",
+	"dir",
+	"lang",
+	"rel",
+	"media",
+	"as",
+	"crossorigin",
+	"charset",
+	"width",
+	"height",
+	"cols",
+	"rows",
+	"colspan",
+	"rowspan",
+	"span",
+	"hidden",
+	"disabled",
+	"checked",
+	"selected",
+	"readonly",
+	"required",
+	"multiple",
+	"open",
+	"draggable",
+	"contenteditable",
+	"spellcheck",
+	"autocomplete",
+	"autocapitalize",
+	"autocorrect",
+	"inputmode",
+	"translate",
+	"xmlns",
+	"xmlns:xlink",
+	"version",
+	"viewBox",
+	"preserveAspectRatio",
+	"focusable",
+	"d",
+	"x",
+	"y",
+	"x1",
+	"x2",
+	"y1",
+	"y2",
+	"cx",
+	"cy",
+	"r",
+	"rx",
+	"ry",
+	"points",
+	"pathLength",
+	"transform",
+	"offset",
+	"opacity",
+	"fill",
+	"fill-rule",
+	"fill-opacity",
+	"clip-rule",
+	"stroke",
+	"stroke-width",
+	"stroke-linecap",
+	"stroke-linejoin",
+	"stroke-dasharray",
+	"stroke-dashoffset",
+	"stroke-miterlimit",
+	"stroke-opacity",
+	"stop-color",
+	"stop-opacity",
+	"vector-effect",
+	"shape-rendering",
+	"aria-hidden",
+	"aria-expanded",
+	"aria-selected",
+	"aria-checked",
+	"aria-disabled",
+	"aria-pressed",
+	"aria-current",
+	"aria-orientation",
+	"aria-haspopup",
+	"aria-modal",
+	"aria-busy",
+	"aria-live",
+	"aria-atomic",
+	"aria-level",
+	"aria-posinset",
+	"aria-setsize",
+	"aria-sort",
+	"aria-readonly",
+	"aria-required",
+	"aria-invalid",
+	"aria-multiline",
+	"aria-multiselectable",
+	"aria-autocomplete",
+	"data-state",
+	"data-side",
+	"data-align",
+	"data-orientation",
+	"data-slot",
+	"_cssText",
+	"rr_width",
+	"rr_height",
+	"rr_left",
+	"rr_top",
+	"rr_position",
+	"rr_scrollLeft",
+	"rr_scrollTop",
+	"rr_open",
+	"rr_mediaState",
+	"rr_mediaCurrentTime",
+	"rr_mediaLoop",
+	"rr_mediaMuted",
+	"rr_mediaPlaybackRate",
+	"rr_mediaVolume",
+]);
 
 const RRWEB_FULL_SNAPSHOT = 2;
 const RRWEB_INCREMENTAL_SNAPSHOT = 3;
+const RRWEB_PLUGIN = 6;
 const RRWEB_MUTATION_SOURCE = 0;
+const RRWEB_INPUT_SOURCE = 5;
+const RRWEB_CONSOLE_PLUGIN = "rrweb/console@1";
 
 function maskText(text: string): string {
 	return text.replace(/\S/g, "*");
@@ -17,6 +142,10 @@ function maskText(text: string): string {
 export function maskRecordedText(text: string, element?: HTMLElement): string {
 	if (element?.closest(`[${RECORDING_UNMASK_ATTRIBUTE}]`)) return text;
 	return maskText(text);
+}
+
+export function maskRecordedInput(): string {
+	return MASKED_VALUE;
 }
 
 type Attributes = Record<string, unknown>;
@@ -31,76 +160,93 @@ interface RecordingEvent {
 	type?: number;
 	data?: {
 		source?: number;
+		plugin?: string;
+		text?: unknown;
 		node?: SerializedNode;
 		adds?: { node?: SerializedNode }[];
 		attributes?: { attributes?: Attributes }[];
 	};
 }
 
-function maskAttribute(attributes: Attributes, name: string): void {
-	const value = attributes[name];
-	if (typeof value === "string") attributes[name] = maskText(value);
-}
-
-function maskAttributes(attributes: Attributes | undefined): void {
+function maskAttributes(
+	attributes: Attributes | undefined,
+	tagName: string | undefined,
+): void {
 	if (!attributes) return;
-	for (const name of MASKED_ATTRIBUTES) maskAttribute(attributes, name);
+	for (const [name, value] of Object.entries(attributes)) {
+		if (typeof value !== "string" || KEPT_VALUES.has(value)) continue;
+		if (name === "style") {
+			attributes[name] = value.replace(/url\([^)]*\)/gi, "none");
+		} else if (
+			!KEPT_ATTRIBUTES.has(name) &&
+			!(tagName === "link" && name === "href")
+		) {
+			attributes[name] = MASKED_VALUE;
+		}
+	}
 }
 
 function maskNodeTree(root: SerializedNode | undefined): void {
 	const stack = root ? [root] : [];
 	for (let node = stack.pop(); node; node = stack.pop()) {
-		if (node.attributes && RECORDING_UNMASK_ATTRIBUTE in node.attributes) {
-			continue;
-		}
-		maskAttributes(node.attributes);
-		if (node.tagName === "a" && node.attributes) {
-			maskAttribute(node.attributes, "href");
-		}
+		maskAttributes(node.attributes, node.tagName);
 		if (node.childNodes) stack.push(...node.childNodes);
 	}
 }
 
-function maskEventAttributes(event: RecordingEvent): void {
+function isConsoleEvent(event: RecordingEvent): boolean {
+	return (
+		event.type === RRWEB_PLUGIN && event.data?.plugin === RRWEB_CONSOLE_PLUGIN
+	);
+}
+
+function maskEvent(event: RecordingEvent): void {
 	if (event.type === RRWEB_FULL_SNAPSHOT) {
 		maskNodeTree(event.data?.node);
 		return;
 	}
-	if (
-		event.type !== RRWEB_INCREMENTAL_SNAPSHOT ||
-		event.data?.source !== RRWEB_MUTATION_SOURCE
-	) {
+	if (event.type !== RRWEB_INCREMENTAL_SNAPSHOT || !event.data) return;
+	if (event.data.source === RRWEB_INPUT_SOURCE) {
+		if (typeof event.data.text === "string") event.data.text = MASKED_VALUE;
 		return;
 	}
+	if (event.data.source !== RRWEB_MUTATION_SOURCE) return;
 	for (const add of event.data.adds ?? []) maskNodeTree(add.node);
-	for (const { attributes } of event.data.attributes ?? []) {
-		if (!attributes) continue;
-		maskAttributes(attributes);
-		const href = attributes.href;
-		if (typeof href === "string" && !href.startsWith("#")) {
-			maskAttribute(attributes, "href");
-		}
+	for (const change of event.data.attributes ?? []) {
+		maskAttributes(change.attributes, undefined);
 	}
 }
 
-export function maskRecordingAttributes<
+export function maskRecordingEvents<
 	T extends { event: string; properties: Record<string, unknown> } | null,
 >(capture: T): T {
 	if (capture?.event !== "$snapshot") return capture;
 	const events = capture.properties.$snapshot_data;
-	if (Array.isArray(events)) {
-		for (const event of events) maskEventAttributes(event as RecordingEvent);
-	}
+	if (!Array.isArray(events)) return capture;
+	const kept = (events as RecordingEvent[]).filter(
+		(event) => !isConsoleEvent(event),
+	);
+	for (const event of kept) maskEvent(event);
+	capture.properties.$snapshot_data = kept;
 	return capture;
+}
+
+export function dropExceptionEvents<T extends { event: string } | null>(
+	capture: T,
+): T | null {
+	return capture?.event === "$exception" ? null : capture;
 }
 
 export const POSTHOG_PRIVACY_CONFIG = {
 	mask_all_text: true,
 	mask_all_element_attributes: true,
+	enable_recording_console_log: false,
 	session_recording: {
 		maskAllInputs: true,
+		maskInputFn: maskRecordedInput,
 		maskTextSelector: "*",
 		maskTextFn: maskRecordedText,
+		blockSelector: "img",
 		compress_events: false,
 	},
 };

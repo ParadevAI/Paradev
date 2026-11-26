@@ -1,5 +1,6 @@
 import {
-	maskRecordingAttributes,
+	dropExceptionEvents,
+	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
 } from "@superset/shared/posthog-privacy";
 import posthogFull from "posthog-js/dist/module.full.no-external";
@@ -20,12 +21,12 @@ export function initPostHog() {
 		defaults: "2025-11-30",
 		capture_pageview: false,
 		capture_pageleave: false,
-		capture_exceptions: true,
+		capture_exceptions: false,
 		person_profiles: "always",
 		persistence: "localStorage",
 		debug: false,
 		...POSTHOG_PRIVACY_CONFIG,
-		before_send: maskRecordingAttributes,
+		before_send: [maskRecordingEvents, dropExceptionEvents],
 	});
 
 	posthogFull.register({

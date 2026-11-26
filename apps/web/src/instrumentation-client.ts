@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 import {
-	maskRecordingAttributes,
+	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
 } from "@superset/shared/posthog-privacy";
 import {
@@ -28,7 +28,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
 	...POSTHOG_PRIVACY_CONFIG,
-	before_send: [sanitizePosthogEvent, maskRecordingAttributes],
+	before_send: [sanitizePosthogEvent, maskRecordingEvents],
 });
 
 registerBaseProperties();
