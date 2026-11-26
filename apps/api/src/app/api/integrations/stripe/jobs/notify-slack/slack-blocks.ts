@@ -282,6 +282,7 @@ function acquisitionSourceLabel(source: string): string {
 }
 
 const sourceLabels: Array<[RegExp, string]> = [
+	[/(^|\.)gemini\.google\.com$/, "Gemini"],
 	[/(^|\.)google\.[a-z.]+$/, "Google search"],
 	[/(^|\.)bing\.com$/, "Bing search"],
 	[/(^|\.)duckduckgo\.com$/, "DuckDuckGo search"],
@@ -290,7 +291,6 @@ const sourceLabels: Array<[RegExp, string]> = [
 	[/(^|\.)(chatgpt\.com|openai\.com)$/, "ChatGPT"],
 	[/(^|\.)claude\.ai$/, "Claude"],
 	[/(^|\.)perplexity\.ai$/, "Perplexity"],
-	[/(^|\.)gemini\.google\.com$/, "Gemini"],
 	[/(^|\.)github\.com$/, "GitHub"],
 	[/^bookface\.ycombinator\.com$/, "YC Bookface"],
 	[/^news\.ycombinator\.com$/, "Hacker News"],

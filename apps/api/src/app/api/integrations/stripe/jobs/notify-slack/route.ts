@@ -175,10 +175,18 @@ async function subscriberProfile({
 		if (!userId) return unknown;
 
 		const [user, firstSource] = await Promise.all([
-			db.query.users.findFirst({
-				where: eq(authSchema.users.id, userId),
-				columns: { createdAt: true },
-			}),
+			db.query.users
+				.findFirst({
+					where: eq(authSchema.users.id, userId),
+					columns: { createdAt: true },
+				})
+				.catch((error) => {
+					console.error(
+						`[stripe/notify-slack] Failed to read user ${userId}:`,
+						error,
+					);
+					return null;
+				}),
 			getPostHogPersonProperties(userId).then(
 				firstSourceFromPersonProperties,
 				(error) => {

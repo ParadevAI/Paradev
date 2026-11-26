@@ -237,6 +237,14 @@ describe("firstSourceFromPersonProperties", () => {
 			"reddit (cpc, launch)",
 		],
 		[
+			"Gemini ahead of the general Google rule",
+			{
+				$initial_referring_domain: "gemini.google.com",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"Gemini",
+		],
+		[
 			"a Google ad click",
 			{
 				$initial_gclid: "abc",
