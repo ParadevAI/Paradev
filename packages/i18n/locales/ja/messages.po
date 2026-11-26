@@ -1871,6 +1871,9 @@ msgstr "夜中にアイデアが浮かんで目が覚めると、ついアプリ
 msgid "A host must have at least one owner."
 msgstr "ホストには少なくとも1人のオーナーが必要です。"
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "このアドレスはリンクから入力されました。信頼できるホストの場合のみ設定してください。Paradev はそのホストをあなたのアカウントにサインインさせます。"
+
 msgid "A living reference of every component exported from"
 msgstr "エクスポートされる全コンポーネントの最新リファレンス。対象は"
 
@@ -20480,6 +20483,9 @@ msgstr "Paradevの最新のアップデート、改善、新機能。毎週更�
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Sentryトリガーと毎日のスケジュールを持つLaunch watchオートメーション、その2つの実行、エージェントが作成したドラフトのプルリクエスト。"
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "リンクに有効な SSH アドレスがありませんでした。ssh://user@host:2222 のようなアドレスを入力してください。"
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "リンクが間違っているか、ここにあったものが移動した可能性があります。"

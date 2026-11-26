@@ -1871,6 +1871,9 @@ msgstr "Tôi có thói quen khó bỏ là tỉnh giấc giữa đêm với một
 msgid "A host must have at least one owner."
 msgstr "Mỗi host phải có ít nhất một chủ sở hữu."
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "Một liên kết đã điền địa chỉ này. Chỉ thiết lập host nếu bạn tin tưởng nó: Paradev sẽ đăng nhập nó vào tài khoản của bạn."
+
 msgid "A living reference of every component exported from"
 msgstr "Tài liệu tham chiếu sống của mọi component được export từ"
 
@@ -20480,6 +20483,9 @@ msgstr "Các cập nhật, cải tiến và tính năng mới nhất trong Parad
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Automation Launch watch với trigger Sentry và lịch hằng ngày, hai lượt chạy của nó và pull request nháp mà agent đã mở."
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "Liên kết không có địa chỉ SSH hợp lệ. Hãy nhập một địa chỉ, ví dụ ssh://user@host:2222."
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "Liên kết có thể sai, hoặc thứ từng ở đây đã chuyển đi."

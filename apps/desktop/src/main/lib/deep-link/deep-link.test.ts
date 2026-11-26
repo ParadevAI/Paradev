@@ -3,6 +3,7 @@ import {
 	deepLinkToRoute,
 	findDeepLinkInArgv,
 	isDeepLinkUrl,
+	redactDeepLink,
 } from "./deep-link";
 
 describe("isDeepLinkUrl", () => {
@@ -48,6 +49,22 @@ describe("deepLinkToRoute", () => {
 		expect(deepLinkToRoute("paradev://v2-workspaces")).toBe("/workspaces");
 		expect(deepLinkToRoute("paradev://v2-workspacex/abc")).toBe(
 			"/v2-workspacex/abc",
+		);
+	});
+});
+
+describe("redactDeepLink", () => {
+	test("hides the ssh address and keeps the rest", () => {
+		expect(
+			redactDeepLink(
+				"superset://settings/hosts?ssh=ssh%3A%2F%2Ftoken%40box%3A2222&x=1",
+			),
+		).toBe("superset://settings/hosts?ssh=<redacted>&x=1");
+		expect(redactDeepLink("paradev://settings/hosts?x=1&SSH=ssh://t@box")).toBe(
+			"paradev://settings/hosts?x=1&SSH=<redacted>",
+		);
+		expect(redactDeepLink("superset://new-workspace?host=abc")).toBe(
+			"superset://new-workspace?host=abc",
 		);
 	});
 });

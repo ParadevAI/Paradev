@@ -67,6 +67,14 @@ paradev status --org <id|slug|name>
 
 In the desktop app, open **Settings → Hosts** and choose **Set up a host over SSH**. Enter the SSH destination (`user@box` or a Host alias). The dialog runs [`superset hosts add`](/cli/cli-reference) in an embedded terminal, so password, host-key, and install prompts work as in any terminal. When it finishes, the new host appears in the list. If it fails, edit the destination and retry.
 
+Another app can open this dialog with the destination filled in:
+
+```bash
+open "superset://settings/hosts?ssh=$(printf %s 'ssh://user@host:2222' | jq -sRr @uri)"
+```
+
+The `ssh` parameter must be `ssh://user@host` or `ssh://user@host:port`, URL-encoded. Paradev refuses anything else, such as ssh options or a password. Nothing starts until you click **Set up**, and the dialog says that a link filled in the address.
+
 ## Connect from your phone [#connect-from-an-iphone-or-ipad]
 
 Install [Paradev for iPhone, iPad, or Android](/install#iphone-and-ipad) and check its requirements before connecting. You can use [cloud workspaces](/cloud-workspaces) without connecting your own computer.
