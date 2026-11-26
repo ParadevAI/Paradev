@@ -37,12 +37,13 @@ const item: ApprovalRequest = {
 test.each([
 	{ isComposing: true, keyCode: 13 },
 	{ isComposing: false, keyCode: 229 },
-])("keeps IME confirmation in Other without submitting (%j)", (ime) => {
+])("keeps IME confirmation in a written answer without submitting (%j)", (ime) => {
 	const onRespond = mock(() => {});
 	const view = render(
 		<QuestionForm form={form} item={item} onRespond={onRespond} />,
 	);
-	const input = view.getByRole("textbox", { name: "Other" });
+	fireEvent.click(view.getByRole("button", { name: "Write my own answer" }));
+	const input = view.getByRole("textbox", { name: "Write my own answer" });
 	fireEvent.compositionStart(input);
 	fireEvent.change(input, { target: { value: "각" } });
 	fireEvent.keyDown(input, { key: "Enter", ...ime });
@@ -55,4 +56,78 @@ test.each([
 		type: "form",
 		values: { choice_custom: "각" },
 	});
+});
+
+test("changing the suggested choice keeps its note in the submitted answer", () => {
+	const respond = mock();
+	const view = render(
+		<QuestionForm
+			item={{
+				id: "question",
+				kind: "approval_request",
+				status: "pending",
+				targetItemId: null,
+				startedAtMs: 0,
+				title: "Delivery",
+			}}
+			form={{
+				message: "Delivery",
+				fields: [
+					{
+						id: "delivery",
+						input: "single",
+						required: true,
+						options: [
+							{ label: "Mail", value: "mail" },
+							{ label: "Courier", value: "courier" },
+						],
+					},
+					{ id: "delivery_note", input: "text", answerFor: "delivery" },
+				],
+			}}
+			onRespond={respond}
+		/>,
+	);
+	fireEvent.click(view.getByRole("button", { name: /^Mail/ }));
+	fireEvent.change(view.getByRole("textbox", { name: "Add a note" }), {
+		target: { value: "Use the side entrance" },
+	});
+	fireEvent.click(view.getByRole("button", { name: /^Courier/ }));
+	fireEvent.click(view.getByRole("button", { name: "Submit" }));
+	expect(respond).toHaveBeenCalledWith("question", {
+		type: "form",
+		values: { delivery: "courier", delivery_note: "Use the side entrance" },
+	});
+});
+
+test("describes the linked text input in both answer modes", () => {
+	const description = "Include the desk number.";
+	const view = render(
+		<QuestionForm
+			form={{
+				...form,
+				fields: [
+					...form.fields.filter((field) => field.id === "choice"),
+					{
+						id: "provider_note",
+						input: "text",
+						answerFor: "choice",
+						description,
+					},
+				],
+			}}
+			item={item}
+			onRespond={mock()}
+		/>,
+	);
+	for (const [action, name] of [
+		["Write my own answer", "Write my own answer"],
+		["Sample", "Add a note"],
+	] as const) {
+		fireEvent.click(view.getByRole("button", { name: new RegExp(action) }));
+		const input = view.getByRole("textbox", { name });
+		expect(input.getAttribute("aria-describedby")).toBe(
+			view.getByText(description).id,
+		);
+	}
 });
