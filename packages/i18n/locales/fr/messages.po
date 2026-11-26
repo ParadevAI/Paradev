@@ -11590,6 +11590,9 @@ msgstr "Chargement"
 msgid "Loading and in-flight activity indicators"
 msgstr "Indicateurs de chargement et d'activité en cours"
 
+msgid "Loading branches..."
+msgstr "Chargement des branches..."
+
 msgid "Loading changes..."
 msgstr "Chargement des modifications..."
 
@@ -14512,6 +14515,9 @@ msgstr "Ouvrir l'espace de travail de cette exécution"
 
 msgid "Open workspace"
 msgstr "Ouvrir l'espace de travail"
+
+msgid "Open workspace on <0>{typedBranch}</0>"
+msgstr "Ouvrir l'espace de travail sur <0>{typedBranch}</0>"
 
 msgid "Open your app."
 msgstr "Ouvrez votre application."
