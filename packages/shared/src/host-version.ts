@@ -121,6 +121,19 @@ export function hostReadsAttachmentParts(
 	);
 }
 
+/** The first host that starts a chat on the effort a launch asks for. Older hosts open a terminal instead. */
+export const CHAT_LAUNCH_EFFORT_MIN_HOST_VERSION = "2.0.9";
+
+/** Whether a chat launch can carry an effort without the host falling back to a terminal. */
+export function hostLaunchesChatWithEffort(
+	hostVersion: string | null | undefined,
+): boolean {
+	const version = semver.coerce(hostVersion ?? "");
+	return (
+		version !== null && semver.gte(version, CHAT_LAUNCH_EFFORT_MIN_HOST_VERSION)
+	);
+}
+
 /** The first host that remembers the model, effort and mode a user picks in a chat. */
 export const CHAT_SELECTIONS_MIN_HOST_VERSION = "2.0.6";
 

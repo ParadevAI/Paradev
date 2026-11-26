@@ -47,6 +47,7 @@ export function pendingLaunchSurface(
 export interface PendingCloudLaunchContext {
 	prompt?: string;
 	modelId?: string | null;
+	effortId?: string | null;
 	modeId?: string | null;
 }
 
@@ -79,7 +80,7 @@ function isTerminalClaimed(
 export function withPendingCloudLaunch(
 	layout: WorkspaceState<PaneViewerData>,
 	launch: CloudAgentLaunchDescriptor | null | undefined,
-	{ prompt, modelId, modeId }: PendingCloudLaunchContext = {},
+	{ prompt, modelId, effortId, modeId }: PendingCloudLaunchContext = {},
 	otherLayouts: readonly WorkspaceState<PaneViewerData>[] = [],
 ): WorkspaceState<PaneViewerData> | null {
 	const terminalId = launch?.terminalId;
@@ -99,6 +100,7 @@ export function withPendingCloudLaunch(
 					terminalId,
 					...(prompt ? { launchPrompt: prompt } : {}),
 					...(modelId ? { chatModelId: modelId } : {}),
+					...(effortId ? { chatEffortId: effortId } : {}),
 					...(modeId ? { chatModeId: modeId } : {}),
 				} satisfies PendingCloudLaunchPaneData,
 			},
@@ -174,6 +176,7 @@ function carriedOver(data: PendingCloudLaunchPaneData) {
 		draftId: data.draftId,
 		...(data.queuedPrompts ? { queuedPrompts: data.queuedPrompts } : {}),
 		...(data.chatModelId ? { chatModelId: data.chatModelId } : {}),
+		...(data.chatEffortId ? { chatEffortId: data.chatEffortId } : {}),
 		...(data.chatModeId ? { chatModeId: data.chatModeId } : {}),
 	};
 }

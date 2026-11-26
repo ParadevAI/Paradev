@@ -20,6 +20,7 @@ import { useDashboardNewWorkspaceDraft } from "../../../../../DashboardNewWorksp
 import type { WorkspaceCreateAgent } from "../../types";
 import type { UseUploadAttachmentsApi } from "../useUploadAttachments";
 import { resolveNames } from "./resolveNames";
+import { launchEffort } from "./utils/launchEffort";
 
 interface Overrides {
 	cloudEnvironmentId?: string;
@@ -46,6 +47,7 @@ export function useSubmitWorkspace(
 	cloudEnvironmentId: string | null = null,
 	hostId: string | null = null,
 	isSession = false,
+	hostLaunchesChatWithEffort = false,
 ) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
@@ -221,6 +223,7 @@ export function useSubmitWorkspace(
 						{
 							prompt: userPrompt.trim(),
 							modelId: isSelectedAgent ? selectedModel : null,
+							effortId: isSelectedAgent ? selectedEffort : null,
 							modeId: isSelectedAgent ? selectedMode : null,
 						},
 					);
@@ -293,7 +296,10 @@ export function useSubmitWorkspace(
 							attachmentIds:
 								attachmentIds.length > 0 ? attachmentIds : undefined,
 							model: selectedModel ?? undefined,
-							effort: openAsChat ? undefined : (selectedEffort ?? undefined),
+							effort: launchEffort(selectedEffort, {
+								openAsChat,
+								hostLaunchesChatWithEffort,
+							}),
 							mode: selectedMode ?? undefined,
 							...(openAsChat ? { surface: "chat" as const } : {}),
 						},
@@ -423,6 +429,7 @@ export function useSubmitWorkspace(
 			t,
 			uploadAttachments,
 			cloudEnvironmentId,
+			hostLaunchesChatWithEffort,
 		],
 	);
 

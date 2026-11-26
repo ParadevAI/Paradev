@@ -190,13 +190,14 @@ test("seeding twice from either source opens one waiting pane", () => {
 	expect(withPendingCloudLaunch(layoutWith([]), null)).toBeNull();
 });
 
-test("attaching preserves the pane, tab, draft, queued messages and model without replaying the initial prompt", () => {
+test("attaching preserves the pane, tab, draft, queued messages, model and effort without replaying the initial prompt", () => {
 	const state = collections();
 	seedPendingCloudLaunch({
 		collections: state.collections,
 		workspaceId: "handoff",
 		launch,
 		modelId: "chosen-model",
+		effortId: "high",
 		modeId: "plan",
 	});
 	const layout = state.rows.get("handoff")?.paneLayout;
@@ -226,6 +227,7 @@ test("attaching preserves the pane, tab, draft, queued messages and model withou
 		draftId: pending.data.draftId,
 		queuedPrompts: pending.data.queuedPrompts,
 		chatModelId: "chosen-model",
+		chatEffortId: "high",
 		chatModeId: "plan",
 	});
 	expect(data).not.toHaveProperty("pendingPrompt");
