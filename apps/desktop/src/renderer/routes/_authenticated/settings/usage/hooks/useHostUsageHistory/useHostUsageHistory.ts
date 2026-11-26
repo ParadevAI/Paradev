@@ -13,9 +13,9 @@ export type UsageHistory = RouterOutputs["usage"]["history"];
 
 const HISTORY_STALE_MS = 5 * 60 * 1000;
 const HISTORY_CACHE_MS = 24 * 60 * 60 * 1000;
-/** The host answers TIMEOUT while a crashed scan is paused (10 min), which
- * clears on its own. SERVICE_UNAVAILABLE means the host is unreachable and
- * keeps the connection retry policy. */
+/** The host answers TIMEOUT while its first scan runs or a crashed scan is
+ * paused (10 min); both clear on their own. SERVICE_UNAVAILABLE means the
+ * host is unreachable and keeps the connection retry policy. */
 const SCAN_PENDING_CODES = new Set(["TIMEOUT"]);
 const SCAN_RETRY_DELAY_MS = 30_000;
 const SCAN_MAX_RETRIES = 30;

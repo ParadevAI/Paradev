@@ -1,8 +1,8 @@
 import type { UsageAgent } from "../types";
-import { collectUsageEntries } from "./entries";
 import { type FactoryDay, groupFactoryDays } from "./factory-days";
 import type { UsageLogEntry } from "./parse";
 import { costUsd, matchModelRate, PRICING_TABLE_UPDATED } from "./pricing";
+import type { CollectUsage } from "./usage-index";
 
 export interface LeaderboardDay {
 	day: string;
@@ -105,13 +105,11 @@ export function groupEntriesByDay(entries: UsageLogEntry[]): LeaderboardDay[] {
 
 export async function computeLeaderboardPayload(
 	days: number,
-	agentPrsByDay: Record<string, number> = {},
-	now: Date = new Date(),
+	agentPrsByDay: Record<string, number>,
+	now: Date,
+	collect: CollectUsage,
 ): Promise<LeaderboardPayload> {
-	const { entries } = await collectUsageEntries(
-		days,
-		utcMidnightCutoff(days, now),
-	);
+	const { entries } = await collect(utcMidnightCutoff(days, now), {});
 
 	return {
 		payloadVersion: 2,
