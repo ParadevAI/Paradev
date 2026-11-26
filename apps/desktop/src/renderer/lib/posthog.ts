@@ -1,7 +1,7 @@
 import {
-	dropExceptionEvents,
 	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
+	scrubExceptionPaths,
 	stripLinkTargets,
 } from "@superset/shared/posthog-privacy";
 import posthogFull from "posthog-js/dist/module.full.no-external";
@@ -22,12 +22,12 @@ export function initPostHog() {
 		defaults: "2025-11-30",
 		capture_pageview: false,
 		capture_pageleave: false,
-		capture_exceptions: false,
+		capture_exceptions: true,
 		person_profiles: "always",
 		persistence: "localStorage",
 		debug: false,
 		...POSTHOG_PRIVACY_CONFIG,
-		before_send: [maskRecordingEvents, stripLinkTargets, dropExceptionEvents],
+		before_send: [maskRecordingEvents, stripLinkTargets, scrubExceptionPaths],
 	});
 
 	posthogFull.register({

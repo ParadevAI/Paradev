@@ -3,6 +3,7 @@ import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 import {
 	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
+	scrubExceptionPaths,
 	stripLinkTargets,
 } from "@superset/shared/posthog-privacy";
 import {
@@ -29,7 +30,12 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
 	...POSTHOG_PRIVACY_CONFIG,
-	before_send: [sanitizePosthogEvent, maskRecordingEvents, stripLinkTargets],
+	before_send: [
+		sanitizePosthogEvent,
+		maskRecordingEvents,
+		stripLinkTargets,
+		scrubExceptionPaths,
+	],
 });
 
 registerBaseProperties();

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
-	dropExceptionEvents,
 	maskRecordedInput,
 	maskRecordedText,
 	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
+	scrubExceptionPaths,
 	stripLinkTargets,
 } from "./posthog-privacy";
 
@@ -334,11 +334,61 @@ describe("stripLinkTargets", () => {
 	});
 });
 
-describe("dropExceptionEvents", () => {
-	test("drops exception events and keeps others", () => {
-		expect(dropExceptionEvents({ event: "$exception" })).toBeNull();
-		expect(dropExceptionEvents({ event: "$pageview" })).toEqual({
-			event: "$pageview",
+describe("scrubExceptionPaths", () => {
+	test("replaces home directories in exception messages and frames", () => {
+		const capture = {
+			event: "$exception",
+			properties: {
+				$exception_level: "error",
+				$exception_list: [
+					{
+						type: "Error",
+						value: "ENOENT: /Users/jane/notes.md and C:\\Users\\jane\\a.txt",
+						stacktrace: {
+							type: "raw",
+							frames: [
+								{
+									filename:
+										"http://localhost:9045/@fs/Users/jane/repo/src/app.ts",
+									lineno: 3,
+								},
+								{ filename: "file:///home/jane/app/index.js" },
+								{
+									filename: "file:///C:/Users/jane/app/main.js",
+									abs_path: "/Users/jane/app/main.js",
+								},
+							],
+						},
+					},
+				],
+			},
+		};
+
+		expect(scrubExceptionPaths(capture)).toEqual({
+			event: "$exception",
+			properties: {
+				$exception_level: "error",
+				$exception_list: [
+					{
+						type: "Error",
+						value: "ENOENT: ~/notes.md and ~\\a.txt",
+						stacktrace: {
+							type: "raw",
+							frames: [
+								{
+									filename: "http://localhost:9045/@fs~/repo/src/app.ts",
+									lineno: 3,
+								},
+								{ filename: "file://~/app/index.js" },
+								{
+									filename: "file:///~/app/main.js",
+									abs_path: "~/app/main.js",
+								},
+							],
+						},
+					},
+				],
+			},
 		});
 	});
 });

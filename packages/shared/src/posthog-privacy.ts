@@ -269,10 +269,33 @@ export function stripLinkTargets<
 	return capture;
 }
 
-export function dropExceptionEvents<T extends { event: string } | null>(
-	capture: T,
-): T | null {
-	return capture?.event === "$exception" ? null : capture;
+const HOME_DIRECTORY =
+	/(?:[A-Za-z]:[\\/]+Users|\/Users|\/home)[\\/]+[^\\/\s"'`?#:]+/g;
+
+function scrubHomeDirectory(value: unknown): unknown {
+	return typeof value === "string" ? value.replace(HOME_DIRECTORY, "~") : value;
+}
+
+interface ExceptionEntry {
+	value?: unknown;
+	stacktrace?: { frames?: { filename?: unknown; abs_path?: unknown }[] };
+}
+
+export function scrubExceptionPaths<
+	T extends { event: string; properties: Record<string, unknown> } | null,
+>(capture: T): T {
+	if (capture?.event !== "$exception") return capture;
+	const exceptions = capture.properties.$exception_list;
+	if (!Array.isArray(exceptions)) return capture;
+	for (const exception of exceptions as ExceptionEntry[]) {
+		exception.value = scrubHomeDirectory(exception.value);
+		for (const frame of exception.stacktrace?.frames ?? []) {
+			frame.filename = scrubHomeDirectory(frame.filename);
+			if ("abs_path" in frame)
+				frame.abs_path = scrubHomeDirectory(frame.abs_path);
+		}
+	}
+	return capture;
 }
 
 export const POSTHOG_PRIVACY_CONFIG = {
