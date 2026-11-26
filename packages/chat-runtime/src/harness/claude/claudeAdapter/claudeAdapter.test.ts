@@ -4,6 +4,7 @@ import { attachedFilesBlock } from "../../attachedFiles";
 import type { AdapterEvent, ResolveAttachment } from "../../types";
 import {
 	ClaudeAdapter,
+	type ClaudeAdapterOptions,
 	type ClaudeQuery,
 	type ClaudeQueryOptions,
 	type ClaudeSession,
@@ -18,6 +19,7 @@ type Harness = {
 	interrupts: number;
 	aborted: () => boolean;
 	options: () => ClaudeQueryOptions | null;
+	sent: SDKUserMessage[];
 };
 
 function messageStart(id: string): unknown {
@@ -36,7 +38,9 @@ function result(): unknown {
 	};
 }
 
-function createHarness(): Harness {
+function createHarness(
+	options: Pick<ClaudeAdapterOptions, "launch" | "resolveAttachment"> = {},
+): Harness {
 	const pending: unknown[] = [];
 	let notify: (() => void) | null = null;
 	let aborted = false;
@@ -44,6 +48,7 @@ function createHarness(): Harness {
 	let crashed: Error | null = null;
 	let exited = false;
 	const state = { interrupts: 0 };
+	const sent: SDKUserMessage[] = [];
 
 	const stream: ClaudeSession = {
 		async *[Symbol.asyncIterator]() {
@@ -65,15 +70,19 @@ function createHarness(): Harness {
 		},
 	};
 
-	const query: ClaudeQuery = ({ options }) => {
+	const query: ClaudeQuery = ({ prompt, options }) => {
 		queryOptions = options;
 		options.abortController?.signal.addEventListener("abort", () => {
 			aborted = true;
 		});
+		void (async () => {
+			for await (const message of prompt as AsyncIterable<SDKUserMessage>)
+				sent.push(message);
+		})();
 		return stream;
 	};
 
-	const adapter = new ClaudeAdapter({ query });
+	const adapter = new ClaudeAdapter({ ...options, query });
 	const iterator = adapter.start({ cwd: "/workspace" })[Symbol.asyncIterator]();
 
 	return {
@@ -102,7 +111,48 @@ function createHarness(): Harness {
 		},
 		aborted: () => aborted,
 		options: () => queryOptions,
+		sent,
 	};
+}
+
+async function tick(): Promise<void> {
+	await new Promise((resolve) => setImmediate(resolve));
+}
+
+const screenshot = {
+	type: "attachment",
+	attachmentId: "a",
+	name: "a.png",
+	mimeType: "image/png",
+} as const;
+
+async function expectDropped(harness: Harness): Promise<void> {
+	expect(await nextTurn(harness.iterator)).toMatchObject({
+		turn: { status: "running" },
+	});
+	expect(await untilStatus(harness.iterator)).toMatchObject([
+		{ turn: { status: "interrupted" } },
+		{ session: { status: "idle" } },
+	]);
+	await tick();
+	expect(harness.sent).toEqual([]);
+	expect(harness.interrupts).toBe(0);
+	expect(harness.aborted()).toBe(false);
+}
+
+async function expectNextPromptRuns(harness: Harness): Promise<void> {
+	harness.adapter.cancelTurn();
+	harness.adapter.prompt([{ type: "text", text: "next" }]);
+	harness.emit(messageStart("msg_next"));
+	harness.emit(result());
+	await nextTurn(harness.iterator);
+	expect(await nextTurn(harness.iterator)).toMatchObject({
+		turn: { status: "completed" },
+	});
+	expect(harness.sent.map((message) => message.message.content)).toEqual([
+		"next",
+	]);
+	expect(harness.interrupts).toBe(0);
 }
 
 async function untilStatus(
@@ -160,6 +210,128 @@ describe("ClaudeAdapter", () => {
 				? secondTurn.turn.id !== firstTurn.turn.id
 				: false,
 		).toBe(true);
+	});
+
+	test("a Stop after the turn ended does not interrupt the next turn", async () => {
+		const harness = createHarness();
+
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "completed" },
+		});
+
+		harness.adapter.cancelTurn();
+		harness.adapter.prompt([{ type: "text", text: "second" }]);
+		harness.emit(messageStart("msg_2"));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "completed" },
+		});
+	});
+
+	test("a Stop interrupts a turn Claude started without a prompt", async () => {
+		const harness = createHarness();
+
+		harness.emit(messageStart("msg_1"));
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "running" },
+		});
+
+		harness.adapter.cancelTurn();
+		expect(harness.interrupts).toBe(1);
+	});
+
+	test("a Stop before the first token still ends the turn", async () => {
+		const harness = createHarness();
+
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.adapter.cancelTurn();
+		harness.emit(result());
+
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "running" },
+		});
+		expect(await nextTurn(harness.iterator)).toMatchObject({
+			turn: { status: "interrupted" },
+		});
+	});
+
+	test("a Stop while Claude launches drops the prompt before it is sent", async () => {
+		let launched: (() => void) | undefined;
+		const harness = createHarness({
+			launch: () =>
+				new Promise((resolve) => {
+					launched = () => resolve({});
+				}),
+		});
+
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.adapter.cancelTurn();
+		launched?.();
+
+		await expectDropped(harness);
+		await expectNextPromptRuns(harness);
+	});
+
+	test("a Stop while an attachment resolves drops the prompt before it is sent", async () => {
+		let finishRead: (() => void) | undefined;
+		const harness = createHarness({
+			resolveAttachment: () =>
+				new Promise((resolve) => {
+					finishRead = () => resolve(null);
+				}),
+		});
+
+		harness.adapter.prompt([screenshot]);
+		harness.adapter.cancelTurn();
+		finishRead?.();
+
+		await expectDropped(harness);
+		await expectNextPromptRuns(harness);
+	});
+
+	test("a Stop while an attachment resolves on a later turn drops only that prompt", async () => {
+		let finishRead: (() => void) | undefined;
+		const harness = createHarness({
+			resolveAttachment: () =>
+				new Promise((resolve) => {
+					finishRead = () => resolve(null);
+				}),
+		});
+		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		harness.emit(messageStart("msg_1"));
+		harness.emit(result());
+		await nextTurn(harness.iterator);
+		await untilStatus(harness.iterator);
+		harness.sent.length = 0;
+
+		harness.adapter.prompt([screenshot]);
+		harness.adapter.cancelTurn();
+		finishRead?.();
+
+		await expectDropped(harness);
+		await expectNextPromptRuns(harness);
+	});
+
+	test("a Stop held through a failed attachment read drops the prompt", async () => {
+		let failRead: (() => void) | undefined;
+		const harness = createHarness({
+			resolveAttachment: () =>
+				new Promise((_, reject) => {
+					failRead = () => reject(new Error("unreadable"));
+				}),
+		});
+
+		harness.adapter.prompt([screenshot]);
+		harness.adapter.cancelTurn();
+		failRead?.();
+
+		await expectDropped(harness);
+		await expectNextPromptRuns(harness);
 	});
 
 	test("reports the session id the stream carries, once", async () => {
