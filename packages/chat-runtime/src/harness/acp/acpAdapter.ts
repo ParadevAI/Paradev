@@ -677,11 +677,11 @@ export class AcpAdapter implements HarnessAdapter {
 			status: "running",
 			startedAtMs: this.nextStartMs(),
 		};
-		this.emitTurn(turn, { duringQuietReplay: true });
-		this.emitTurn(
-			{ ...turn, status: "interrupted", completedAtMs: this.now() },
-			{ duringQuietReplay: true },
-		);
+		this.queue.push({ kind: "turn", turn });
+		this.queue.push({
+			kind: "turn",
+			turn: { ...turn, status: "interrupted", completedAtMs: this.now() },
+		});
 	}
 
 	/** `session/cancel` would also stop the session's background workflows. */
@@ -2876,7 +2876,7 @@ export class AcpAdapter implements HarnessAdapter {
 		return this.historyTurnId;
 	}
 
-	private emitTurn(turn: Turn, { duringQuietReplay = false } = {}): void {
+	private emitTurn(turn: Turn): void {
 		if (turn.status !== "running" || turn.id !== this.currentTurn?.id) {
 			this.cycleEnded = false;
 			this.steeredCyclePending = false;
@@ -2885,8 +2885,7 @@ export class AcpAdapter implements HarnessAdapter {
 			? { ...turn, sessionUsage: this.sessionUsage }
 			: turn;
 		this.currentTurn = next;
-		if (duringQuietReplay) this.queue.push({ kind: "turn", turn: next });
-		else this.emit({ kind: "turn", turn: next });
+		this.emit({ kind: "turn", turn: next });
 		this.syncAwaitingBackground();
 	}
 
