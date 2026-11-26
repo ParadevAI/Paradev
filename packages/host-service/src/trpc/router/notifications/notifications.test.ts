@@ -275,6 +275,43 @@ describe("notificationsRouter.hook", () => {
 		expect(terminalAgentStore.get("terminal-1")?.subagents).toBeUndefined();
 	});
 
+	it("ignores a nested Claude process that inherits the terminal's identity", async () => {
+		const { ctx, broadcastAgentLifecycle, terminalAgentStore } =
+			createContext("workspace-1");
+		const caller = notificationsRouter.createCaller(ctx);
+		const main = {
+			terminalId: "terminal-1",
+			launchId: "launch-1",
+			agent: { agentId: "claude", sessionId: "main" },
+		};
+		const nested = {
+			...main,
+			agent: { agentId: "claude", sessionId: "nested" },
+		};
+		await caller.hook({ ...main, eventType: "SessionStart" });
+		await caller.hook({ ...main, eventType: "Start" });
+		await caller.hook({ ...main, eventType: "Stop" });
+		const broadcasts = broadcastAgentLifecycle.mock.calls.length;
+
+		for (const eventType of [
+			"SessionStart",
+			"Start",
+			"PostToolUse",
+			"Stop",
+			"SessionEnd",
+		]) {
+			expect(await caller.hook({ ...nested, eventType })).toEqual({
+				success: true,
+				ignored: true,
+			});
+			expect(terminalAgentStore.get("terminal-1")).toMatchObject({
+				agentSessionId: "main",
+				lastEventType: "Stop",
+			});
+		}
+		expect(broadcastAgentLifecycle.mock.calls).toHaveLength(broadcasts);
+	});
+
 	it("keeps only transcript paths that look like harness files under home", async () => {
 		const { ctx, terminalAgentStore } = createContext("workspace-1");
 		const caller = notificationsRouter.createCaller(ctx);
