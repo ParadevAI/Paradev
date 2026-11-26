@@ -70,6 +70,11 @@ const NEW_DIR_IGNORE_CHECK_MAX_DIRS = 64;
 const PROBE_PREFIX = ".superset-watcher-probe-";
 const PROBE_TIMEOUT_MS = 4_000;
 
+// Re-attaching a large worktree is a full crawl, and switching workspaces
+// releases one; the cap keeps idle cost flat as worktree count grows.
+const IDLE_KEEP_ALIVE_MS = 60_000;
+const MAX_IDLE_WATCHERS = 3;
+
 // Backslash-escape every character picomatch (parcel's glob engine) treats as
 // magic, so an absolute path is matched literally when embedded in a glob.
 // Mirrors the metacharacter set `is-glob`/picomatch@2 recognize.
@@ -187,6 +192,12 @@ interface WatcherState {
 	realPath: string;
 	realPathNormalized: string;
 	realPathDiffers: boolean;
+	/**
+	 * The attached root directory's identity. A root deleted and recreated
+	 * while nobody listens can go unreported, leaving a live-looking
+	 * subscription on a dead tree; reuse compares against this first.
+	 */
+	rootIdentity: string;
 	/** Null while suspended (root deleted, polling for recreation). */
 	subscription: NativeWatchSubscription | null;
 	recoveryTimer: ReturnType<typeof setInterval> | null;
@@ -215,6 +226,15 @@ interface WatcherState {
 	overflowsCoalesced: number;
 	lastOverflowAt: number;
 	listeners: Set<WatchListener>;
+	/** Disposes the watcher once it has sat without listeners for the keep-alive. */
+	idleTimer: ReturnType<typeof setTimeout> | null;
+	/**
+	 * Something changed while no listener was attached that a reused watcher
+	 * would get wrong: a directory removal or a .gitignore edit.
+	 */
+	staleWhileIdle: boolean;
+	/** Whether to reuse the idle watcher, decided once for every subscriber. */
+	reuseCheck: Promise<boolean> | null;
 	/**
 	 * Root-relative directories pruned from the native subscription beyond the
 	 * static defaults (nested repos + gitignored dirs), kept queryable so
@@ -277,6 +297,11 @@ async function unsubscribeQuietly(
 	await settleWithin(subscription.unsubscribe(), timeoutMs);
 }
 
+async function readRootIdentity(rootPath: string): Promise<string> {
+	const stats = await stat(rootPath);
+	return `${stats.dev}:${stats.ino}:${stats.birthtimeMs}`;
+}
+
 function internalToFsWatchEvent(event: InternalWatchEvent): FsWatchEvent {
 	return {
 		kind: event.kind,
@@ -336,6 +361,19 @@ export interface FsWatcherManagerOptions {
 	/** Limit on native subscribe and unsubscribe during teardown. Test-only override. */
 	teardownTimeoutMs?: number;
 	now?: () => number;
+	/** How long a watcher with no listeners stays attached; 0 disposes at once. */
+	idleKeepAliveMs?: number;
+	/** Most listener-less watchers kept attached; the longest-idle goes first. */
+	maxIdleWatchers?: number;
+}
+
+// A reused watcher keeps its attach-time prune set, and chokidar under bun
+// doesn't re-watch a directory recreated at the same path.
+function isStaleWhileIdle(event: NativeWatchEvent): boolean {
+	return (
+		(event.type === "delete" && event.isDirectory === true) ||
+		path.basename(event.path) === ".gitignore"
+	);
 }
 
 export class FsWatcherManager {
@@ -363,7 +401,11 @@ export class FsWatcherManager {
 	private readonly growthReattachMinMs: number;
 	private readonly teardownTimeoutMs: number;
 	private readonly now: () => number;
+	private readonly idleKeepAliveMs: number;
+	private readonly maxIdleWatchers: number;
 	private readonly watchers = new Map<string, WatcherState>();
+	/** Listener-less watchers still attached, oldest-idle first. */
+	private readonly idleWatchers = new Set<WatcherState>();
 	/**
 	 * One-shot dedup so a single ENOSPC report doesn't spam logs across every
 	 * watcher creation that follows it. Mirrors VS Code's `enospcErrorLogged`
@@ -409,6 +451,8 @@ export class FsWatcherManager {
 			options.growthReattachMinMs ?? IGNORE_GROWTH_REATTACH_MIN_MS;
 		this.teardownTimeoutMs = options.teardownTimeoutMs ?? TEARDOWN_TIMEOUT_MS;
 		this.now = options.now ?? Date.now;
+		this.idleKeepAliveMs = options.idleKeepAliveMs ?? IDLE_KEEP_ALIVE_MS;
+		this.maxIdleWatchers = options.maxIdleWatchers ?? MAX_IDLE_WATCHERS;
 	}
 
 	async subscribe(
@@ -416,6 +460,11 @@ export class FsWatcherManager {
 		listener: WatchListener,
 	): Promise<() => Promise<void>> {
 		const absolutePath = normalizeAbsolutePath(options.absolutePath);
+		options.signal?.throwIfAborted();
+		const idle = this.watchers.get(absolutePath);
+		if (idle?.listeners.size === 0 && !(await this.canReuse(idle))) {
+			await this.releaseWatcher(idle);
+		}
 		options.signal?.throwIfAborted();
 		let state = this.watchers.get(absolutePath);
 		let pending = this.pending.get(absolutePath);
@@ -443,6 +492,7 @@ export class FsWatcherManager {
 			pending = { controller, listeners, promise };
 			this.pending.set(absolutePath, pending);
 		}
+		if (state) this.markActive(state);
 		const listeners = state?.listeners ?? pending?.listeners;
 		if (!listeners) throw new Error("Missing watcher subscription state");
 		listeners.add(listener);
@@ -461,10 +511,16 @@ export class FsWatcherManager {
 				);
 			}
 			const current = this.watchers.get(absolutePath);
-			if (current?.listeners === listeners) {
-				this.watchers.delete(absolutePath);
-				await this.trackRelease(this.disposeWatcherState(current));
+			if (current?.listeners !== listeners) return;
+			if (
+				this.idleKeepAliveMs <= 0 ||
+				this.maxIdleWatchers <= 0 ||
+				current.subscription === null
+			) {
+				await this.releaseWatcher(current);
+				return;
 			}
+			await this.markIdle(current);
 		};
 		const onAbort = () => {
 			void release();
@@ -489,6 +545,24 @@ export class FsWatcherManager {
 		}
 	}
 
+	private canReuse(state: WatcherState): Promise<boolean> {
+		state.reuseCheck ??= this.isStillAttached(state).then(
+			(attached) => attached && !state.staleWhileIdle,
+		);
+		return state.reuseCheck;
+	}
+
+	private async isStillAttached(state: WatcherState): Promise<boolean> {
+		if (state.subscription === null) {
+			return false;
+		}
+		try {
+			return (await readRootIdentity(state.realPath)) === state.rootIdentity;
+		} catch {
+			return false;
+		}
+	}
+
 	async close(): Promise<void> {
 		const pending = [...this.pending.values()];
 		this.pending.clear();
@@ -496,14 +570,52 @@ export class FsWatcherManager {
 		await Promise.allSettled(pending.map((entry) => entry.promise));
 		const states = Array.from(this.watchers.values());
 		this.watchers.clear();
+		this.idleWatchers.clear();
 		await Promise.all([
 			...this.releasing,
 			...states.map((state) => this.disposeWatcherState(state)),
 		]);
 	}
 
+	private markActive(state: WatcherState): void {
+		if (state.idleTimer) {
+			clearTimeout(state.idleTimer);
+			state.idleTimer = null;
+		}
+		this.idleWatchers.delete(state);
+	}
+
+	private async markIdle(state: WatcherState): Promise<void> {
+		state.reuseCheck = null;
+		state.idleTimer = setTimeout(() => {
+			state.idleTimer = null;
+			void this.releaseWatcher(state);
+		}, this.idleKeepAliveMs);
+		state.idleTimer.unref?.();
+		this.idleWatchers.add(state);
+
+		const excess = this.idleWatchers.size - this.maxIdleWatchers;
+		const evicted = Array.from(this.idleWatchers).slice(0, Math.max(0, excess));
+		await Promise.all(evicted.map((idle) => this.releaseWatcher(idle)));
+	}
+
+	private async releaseWatcher(state: WatcherState): Promise<void> {
+		if (this.watchers.get(state.absolutePath) !== state) {
+			return;
+		}
+		// Remove from the map before touching the native layer so a fresh
+		// subscribe can never reuse a state whose teardown is in flight.
+		this.watchers.delete(state.absolutePath);
+		this.markActive(state);
+		await this.trackRelease(this.disposeWatcherState(state));
+	}
+
 	private async disposeWatcherState(state: WatcherState): Promise<void> {
 		state.controller.abort();
+		if (state.idleTimer) {
+			clearTimeout(state.idleTimer);
+			state.idleTimer = null;
+		}
 		if (state.flushTimer) {
 			clearTimeout(state.flushTimer);
 			state.flushTimer = null;
@@ -681,6 +793,7 @@ export class FsWatcherManager {
 			realPath: normalizedPath,
 			realPathNormalized: normalizedPath,
 			realPathDiffers: false,
+			rootIdentity: "",
 			subscription: null,
 			recoveryTimer: null,
 			recovering: false,
@@ -696,6 +809,9 @@ export class FsWatcherManager {
 			overflowsCoalesced: 0,
 			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
+			idleTimer: null,
+			staleWhileIdle: false,
+			reuseCheck: null,
 			prunedRelPrefixes: [],
 			nativePrunedRelPrefixes: [],
 			filteredRelPrefixes: [],
@@ -744,6 +860,7 @@ export class FsWatcherManager {
 		state.realPath = realPath;
 		state.realPathNormalized = realPathNormalized;
 		state.realPathDiffers = realPathDiffers;
+		state.rootIdentity = await readRootIdentity(realPath);
 		const generation = ++state.generation;
 
 		// Nested git repos/worktrees (agent tools pile these up — a full repo copy
@@ -837,6 +954,9 @@ export class FsWatcherManager {
 					);
 		if (keptEvents.length === 0) {
 			return;
+		}
+		if (state.listeners.size === 0 && keptEvents.some(isStaleWhileIdle)) {
+			state.staleWhileIdle = true;
 		}
 		this.queueNewDirIgnoreChecks(state, keptEvents);
 		for (const event of keptEvents) state.pendingEvents.push(event);
