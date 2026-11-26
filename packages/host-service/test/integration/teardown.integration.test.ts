@@ -7,8 +7,9 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { Server } from "@superset/pty-daemon";
+import { inheritedConfigNotice } from "../../src/runtime/setup/config";
 import { runTeardown } from "../../src/runtime/teardown";
 import { disposeDaemonClient } from "../../src/terminal/daemon-client-singleton";
 import {
@@ -18,7 +19,11 @@ import {
 import { __resetSessionsForTesting } from "../../src/terminal/terminal";
 import { __setAccountShellForTesting } from "../../src/terminal/user-shell";
 import { createFishLikePtySpawner, shellQuote } from "../helpers/fake-pty";
-import { type BasicScenario, createBasicScenario } from "../helpers/scenarios";
+import {
+	type BasicScenario,
+	createBasicScenario,
+	createFeatureWorktreeScenario,
+} from "../helpers/scenarios";
 
 describe("runTeardown integration", () => {
 	let scenario: BasicScenario | null = null;
@@ -46,9 +51,13 @@ describe("runTeardown integration", () => {
 		}
 	});
 
-	test("hidden teardown terminal exits under fish instead of timing out", async () => {
-		tmp = mkdtempSync(join(tmpdir(), "host-service-teardown-it-"));
-		const socketPath = join(tmp, "pty-daemon.sock");
+	async function startFishLikeDaemon(): Promise<{
+		writes: string[];
+		tmp: string;
+	}> {
+		const dir = mkdtempSync(join(tmpdir(), "host-service-teardown-it-"));
+		tmp = dir;
+		const socketPath = join(dir, "pty-daemon.sock");
 		const writes: string[] = [];
 		server = new Server({
 			socketPath,
@@ -58,14 +67,19 @@ describe("runTeardown integration", () => {
 		await server.listen();
 
 		process.env.SUPERSET_PTY_DAEMON_SOCKET = socketPath;
-		process.env.SUPERSET_HOME_DIR = tmp;
+		process.env.SUPERSET_HOME_DIR = dir;
 		__setAccountShellForTesting("/bin/fish");
 		initTerminalBaseEnv({
-			HOME: process.env.HOME ?? tmp,
+			HOME: process.env.HOME ?? dir,
 			LANG: "en_US.UTF-8",
 			PATH: process.env.PATH ?? "/usr/bin:/bin",
 			SHELL: "/bin/bash",
 		});
+		return { writes, tmp: dir };
+	}
+
+	test("hidden teardown terminal exits under fish instead of timing out", async () => {
+		const { writes } = await startFishLikeDaemon();
 
 		scenario = await createBasicScenario();
 		const scriptDir = join(scenario.repo.repoPath, ".superset");
@@ -93,5 +107,40 @@ describe("runTeardown integration", () => {
 		expect(writes[0]).toStartWith("exec bash ");
 		expect(writes[0]).not.toContain("$?");
 		expect(existsSync(markerPath)).toBe(true);
+	});
+
+	test("a failed teardown names the main checkout config past the output tail", async () => {
+		const { tmp: appHomeDir } = await startFishLikeDaemon();
+		const worktreeScenario = await createFeatureWorktreeScenario();
+		scenario = worktreeScenario;
+		const configPath = join(
+			worktreeScenario.repo.repoPath,
+			".superset",
+			"config.json",
+		);
+		mkdirSync(dirname(configPath), { recursive: true });
+		writeFileSync(
+			configPath,
+			JSON.stringify({
+				teardown: ["printf '%05000d' 0", "./.superset/teardown.sh"],
+			}),
+		);
+
+		const result = await runTeardown({
+			db: worktreeScenario.host.db,
+			workspaceId: worktreeScenario.featureWorkspaceId,
+			worktreePath: worktreeScenario.worktreePath,
+			repoPath: worktreeScenario.repo.repoPath,
+			projectId: worktreeScenario.projectId,
+			timeoutMs: 3_000,
+			appHomeDir,
+		});
+
+		expect(result).toMatchObject({ status: "failed", exitCode: 127 });
+		if (result.status !== "failed") return;
+		expect(result.outputTail).toStartWith(
+			`${inheritedConfigNotice("teardown", configPath)}\n`,
+		);
+		expect(result.outputTail).toContain("./.superset/teardown.sh");
 	});
 });

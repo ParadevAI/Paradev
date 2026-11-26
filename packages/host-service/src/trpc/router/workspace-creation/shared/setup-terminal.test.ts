@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { inheritedConfigNotice } from "../../../../runtime/setup/config";
 import { resolveInitialCommand } from "./setup-terminal";
 
 const PROJECT_ID = "11111111-1111-1111-1111-111111111111";
@@ -152,6 +153,55 @@ describe("resolveInitialCommand", () => {
 				appHomeDir: sandbox.appHomeDir,
 			}),
 		).toEqual({ initialCommand: "from-worktree" });
+	});
+
+	it("names the main checkout's config.json when the worktree has none", () => {
+		writeConfig(sandbox.repoPath, { setup: ["./.superset/setup.sh"] });
+		const worktreePath = join(sandbox.repoPath, "..", "feature-worktree");
+		mkdirSync(worktreePath);
+		const notice = inheritedConfigNotice(
+			"setup",
+			join(sandbox.repoPath, ".superset", "config.json"),
+		);
+
+		expect(
+			resolveInitialCommand({
+				repoPath: sandbox.repoPath,
+				projectId: PROJECT_ID,
+				worktreePath,
+				appHomeDir: sandbox.appHomeDir,
+			}),
+		).toEqual({
+			initialCommand: `printf '%s\\n' '${notice}' && ./.superset/setup.sh`,
+		});
+	});
+
+	it("names the main checkout's config.toml unless the personal file replaces setup", () => {
+		const dir = join(sandbox.repoPath, ".superset");
+		mkdirSync(dir, { recursive: true });
+		writeFileSync(
+			join(dir, "config.toml"),
+			'[setup]\nrun = ["./.superset/setup.sh"]\n',
+		);
+		const worktreePath = join(sandbox.repoPath, "..", "feature-worktree");
+		mkdirSync(worktreePath);
+		const resolveInWorktree = () =>
+			resolveInitialCommand({
+				repoPath: sandbox.repoPath,
+				projectId: PROJECT_ID,
+				worktreePath,
+				appHomeDir: sandbox.appHomeDir,
+			});
+
+		expect(resolveInWorktree()?.initialCommand).toStartWith(
+			`printf '%s\\n' '${inheritedConfigNotice("setup", join(dir, "config.toml"))}' && `,
+		);
+
+		writeFileSync(
+			join(dir, "config.local.toml"),
+			'[setup]\nrun = ["bun install"]\n',
+		);
+		expect(resolveInWorktree()).toEqual({ initialCommand: "bun install" });
 	});
 
 	it("falls back to the worktree setup.sh before the main repo's", () => {

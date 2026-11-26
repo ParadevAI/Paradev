@@ -6,7 +6,11 @@ import { Server } from "@superset/pty-daemon";
 import type { SessionMeta } from "@superset/pty-daemon/protocol";
 import { eq } from "drizzle-orm";
 import { projects, workspaces } from "../../src/db/schema";
-import { getProjectConfigPath } from "../../src/runtime/setup/config";
+import {
+	getProjectConfigPath,
+	inheritedConfigNotice,
+	shellSingleQuote,
+} from "../../src/runtime/setup/config";
 import { disposeDaemonClient } from "../../src/terminal/daemon-client-singleton";
 import {
 	initTerminalBaseEnv,
@@ -132,12 +136,14 @@ describe("setup scripts integration", () => {
 		expect(created.terminals).toHaveLength(1);
 		expect(created.terminals[0]?.label).toBe("Workspace Setup");
 
+		// The config is not committed, so the worktree runs the main checkout's.
+		const setupCommand = `printf '%s\\n' ${shellSingleQuote(inheritedConfigNotice("setup", configPath))} && echo setup-a && echo setup-b`;
 		// The command text and its Enter arrive as separate writes (the Enter is
 		// delayed so shell startup can't eat it) — assert both, in order.
 		await waitFor(
 			() =>
-				writes.includes("echo setup-a && echo setup-b") &&
-				writes.indexOf("\r") > writes.indexOf("echo setup-a && echo setup-b"),
+				writes.includes(setupCommand) &&
+				writes.indexOf("\r") > writes.indexOf(setupCommand),
 			5000,
 			() =>
 				`expected setup command write + Enter, got ${JSON.stringify(writes)}`,

@@ -2,8 +2,10 @@ import { eq } from "drizzle-orm";
 import { projects, workspaces } from "../../../../db/schema";
 import {
 	chainPhases,
+	inheritedConfigNotice,
 	invalidConfigCommand,
 	loadProjectConfig,
+	shellSingleQuote,
 } from "../../../../runtime/setup/config";
 import { trackConfigResolved } from "../../../../runtime/setup/track-config-resolved";
 import { createTerminalSessionInternal } from "../../../../terminal/terminal";
@@ -125,8 +127,11 @@ export function resolveInitialCommand(args: {
 		args.worktreePath ?? args.repoPath,
 	);
 	if (!setup) return null;
+	const inherited = config.inheritedFrom.install ?? config.inheritedFrom.setup;
 	return {
-		initialCommand: setup.command,
+		initialCommand: inherited
+			? `printf '%s\\n' ${shellSingleQuote(inheritedConfigNotice("setup", inherited))} && ${setup.command}`
+			: setup.command,
 		...(setup.cwd && { cwd: setup.cwd }),
 	};
 }
