@@ -31,7 +31,10 @@ run_json() {
   out=$(mktemp) || { echo null; return; }
   err=$(mktemp) || { rm -f "$out"; echo null; return; }
   if superset "$@" --json >"$out" 2>"$err"; then
-    if ! jq -c '.' "$out" 2>/dev/null; then
+    if [ ! -s "$out" ] || jq -e -s 'length == 0' "$out" >/dev/null 2>&1; then
+      echo "no output from: superset $*" >&2
+      echo null
+    elif ! jq -c '.' "$out" 2>/dev/null; then
       echo "invalid JSON from: superset $*" >&2
       echo null
     fi
@@ -54,6 +57,7 @@ for ws in $(printf '%s' "$WORKSPACES" | jq -r '.[]?.id // empty'); do
     READ=$(run_json terminals read --workspace "$ws" --terminal "$term" --max-lines "$MAX_LINES" "${HOST_ARGS[@]}")
     ENTRY=$(printf '%s' "$LIST" | jq -c --arg ws "$ws" --arg id "$term" --argjson read "$READ" \
       '.sessions[] | select(.terminalId == $id) | {workspaceId: $ws, terminalId: .terminalId, title: .title, attached: .attached, text: ($read.text // null)}')
+    [ -n "$ENTRY" ] || continue
     TERMINALS=$(printf '%s' "$TERMINALS" | jq -c --argjson e "$ENTRY" '. + [$e]')
   done
 done
