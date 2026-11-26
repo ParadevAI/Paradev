@@ -126,6 +126,35 @@ _superset_ensure_path() {
 } 2>/dev/null || true`;
 }
 
+/**
+ * Build a zsh hook that re-enters `$PWD` when the working directory went
+ * stale: a worktree on an external or network volume that was unmounted and
+ * mounted again is a new directory at the same path, and every command run
+ * from the old one fails with getcwd errors until the user runs `cd`. It
+ * runs on preexec as well as precmd because the prompt on screen was usually
+ * drawn before the volume came back. `-ef` compares what `.` and `$PWD`
+ * resolve to, so a healthy directory costs two stats and no `cd`.
+ */
+function buildZshStaleCwdHook(): string {
+	return `typeset -ga preexec_functions 2>/dev/null || true
+_superset_fix_stale_cwd() {
+  [[ . -ef "$PWD" ]] && return 0
+  [[ -d "$PWD" ]] && builtin cd -q -- "$PWD" 2>/dev/null
+  return 0
+}
+{
+  precmd_functions=(\${precmd_functions:#_superset_fix_stale_cwd} _superset_fix_stale_cwd)
+  preexec_functions=(\${preexec_functions:#_superset_fix_stale_cwd} _superset_fix_stale_cwd)
+} 2>/dev/null || true`;
+}
+
+/** Bash counterpart of {@link buildZshStaleCwdHook}; bash has no preexec, so it runs per prompt. */
+const BASH_STALE_CWD_FUNCTION = `__superset_fix_stale_cwd() {
+  [[ . -ef "$PWD" ]] && return 0
+  [[ -d "$PWD" ]] && builtin cd -- "$PWD" 2>/dev/null
+  return 0
+}`;
+
 function escapeFishDoubleQuoted(value: string): string {
 	return value
 		.replaceAll("\\", "\\\\")
@@ -176,6 +205,7 @@ export ZDOTDIR="$_superset_home"
 ${SUPERSET_ENV_RESTORE}
 ${buildPathPrependFunction(paths.BIN_DIR)}
 ${buildZshPrecmdHook(paths.BIN_DIR)}
+${buildZshStaleCwdHook()}
 rehash 2>/dev/null || true
 # Restore ZDOTDIR so our .zlogin runs after user's .zlogin
 export ZDOTDIR=${quotedZshDir}
@@ -263,15 +293,17 @@ export PS1=$'\\[\\e[1;38;2;52;211;153m\\]❯\\[\\e[0m\\] '
 __superset_prompt_mark() {
   printf "\\033]777;superset-shell-ready\\007\\033]133;A\\007"
 }
+# Re-enter a working directory that was unmounted and mounted again.
+${BASH_STALE_CWD_FUNCTION}
 # Hook via PROMPT_COMMAND. Supports both scalar and array forms (Bash 5.1+).
 if [[ "$(declare -p PROMPT_COMMAND 2>/dev/null)" == "declare -a"* ]]; then
-  PROMPT_COMMAND=("\${PROMPT_COMMAND[@]}" "__superset_prompt_mark")
+  PROMPT_COMMAND=("\${PROMPT_COMMAND[@]}" "__superset_fix_stale_cwd" "__superset_prompt_mark")
 else
   _superset_orig_prompt_cmd="\${PROMPT_COMMAND}"
   if [[ -n "\${_superset_orig_prompt_cmd}" ]]; then
-    PROMPT_COMMAND="\${_superset_orig_prompt_cmd};__superset_prompt_mark"
+    PROMPT_COMMAND="\${_superset_orig_prompt_cmd};__superset_fix_stale_cwd;__superset_prompt_mark"
   else
-    PROMPT_COMMAND="__superset_prompt_mark"
+    PROMPT_COMMAND="__superset_fix_stale_cwd;__superset_prompt_mark"
   fi
 fi
 # Tells the host that the shell ended by itself (exit, logout, Ctrl+D).
