@@ -481,6 +481,9 @@ test(
 						const { message: second, socket } = await wait(
 							secondRequest.promise,
 						);
+						assert.equal(typeof first.requestId, "number");
+						assert.equal(typeof second.requestId, "number");
+						assert.notEqual(first.requestId, second.requestId);
 						const repliesRead = Promise.withResolvers<void>();
 						client.subscribe(
 							"list-test-marker",
