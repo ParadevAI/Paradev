@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type EnrichedSubscription,
+	firstSourceFromPersonProperties,
 	formatPlanChanged,
 	formatSubscriptionCancelled,
+	formatSubscriptionStarted,
 	type PreviousPlan,
 	planChangeDirection,
 	planLabel,
@@ -171,5 +173,79 @@ describe("formatPlanChanged", () => {
 
 		expect(serialized).toContain("Plan Changed");
 		expect(serialized).toContain("yearly -> monthly");
+	});
+});
+
+describe("formatSubscriptionStarted", () => {
+	test("shows the signup date and first source", () => {
+		const blocks = formatSubscriptionStarted(createEnrichedSubscription(), {
+			signedUpAt: new Date("2026-11-20T23:30:00.000Z"),
+			firstSource: "chatgpt.com",
+		});
+
+		const serializedBlocks = JSON.stringify(blocks);
+
+		expect(serializedBlocks).toContain(
+			"*Signed up:*\\n<!date^1795217400^{date_short}|2026-11-20>",
+		);
+		expect(serializedBlocks).toContain("*First source:*\\nchatgpt.com");
+	});
+
+	test("shows Unknown when the subscriber profile is missing", () => {
+		const blocks = formatSubscriptionStarted(createEnrichedSubscription(), {
+			signedUpAt: null,
+			firstSource: null,
+		});
+
+		const serializedBlocks = JSON.stringify(blocks);
+
+		expect(serializedBlocks).toContain("*Signed up:*\\nUnknown");
+		expect(serializedBlocks).toContain("*First source:*\\nUnknown");
+	});
+});
+
+describe("firstSourceFromPersonProperties", () => {
+	test("prefers the first UTM source over the referring domain", () => {
+		expect(
+			firstSourceFromPersonProperties({
+				$initial_utm_source: "chatgpt.com",
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "https://paradev.com/",
+			}),
+		).toBe("chatgpt.com");
+	});
+
+	test("labels a direct first visit and adds the self-reported source", () => {
+		expect(
+			firstSourceFromPersonProperties({
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "https://paradev.com/",
+				acquisition_source: "friend_or_colleague",
+			}),
+		).toBe("Direct (self-reported: Friend or colleague)");
+	});
+
+	test("ignores sign-in redirects, our own sites and app-only first visits", () => {
+		for (const properties of [
+			{
+				$initial_referring_domain: "accounts.google.com",
+				$initial_current_url: "https://app.paradev.com/auth/desktop/success",
+			},
+			{
+				$initial_referring_domain: "paradev.com",
+				$initial_current_url: "https://app.paradev.com/sign-in",
+			},
+			{
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "file:///Applications/Paradev.app/index.html",
+			},
+		]) {
+			expect(firstSourceFromPersonProperties(properties)).toBeNull();
+		}
+	});
+
+	test("returns null when the person has no source properties", () => {
+		expect(firstSourceFromPersonProperties({})).toBeNull();
+		expect(firstSourceFromPersonProperties(null)).toBeNull();
 	});
 });

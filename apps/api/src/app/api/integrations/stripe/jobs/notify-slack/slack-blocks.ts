@@ -117,6 +117,11 @@ export interface EnrichedSubscription {
 	customerEmail: string | null;
 }
 
+export interface SubscriberProfile {
+	signedUpAt: Date | null;
+	firstSource: string | null;
+}
+
 // --- Shared field builders ---
 
 const intervalLabel = (interval: "monthly" | "yearly") =>
@@ -257,10 +262,88 @@ function standardFields(enriched: EnrichedSubscription): unknown {
 	};
 }
 
+const acquisitionSourceLabels: Record<string, string> = {
+	chatgpt: "ChatGPT",
+	other_ai_assistant: "Other AI assistant",
+	x_twitter: "X / Twitter",
+	youtube: "YouTube",
+	product_hunt: "Product Hunt",
+	hacker_news: "Hacker News",
+	github: "GitHub",
+};
+
+function acquisitionSourceLabel(source: string): string {
+	const fallback = source.split("_").filter(Boolean).join(" ");
+	return (
+		acquisitionSourceLabels[source] ??
+		`${fallback.charAt(0).toUpperCase()}${fallback.slice(1)}`
+	);
+}
+
+function nonEmptyString(value: unknown): string | null {
+	return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+const nonSourceReferrers = [
+	/^accounts\.google\.[a-z.]+$/,
+	/^accounts\.youtube\.com$/,
+	/^(www\.)?github\.com$/,
+	/^appleid\.apple\.com$/,
+	/(^|\.)paradev\.com$/,
+	/(^|\.)superset\.sh$/,
+];
+
+function firstTouchSource(properties: Record<string, unknown>): string | null {
+	const utmSource = nonEmptyString(properties.$initial_utm_source);
+	if (utmSource) return utmSource;
+
+	const referrer = nonEmptyString(properties.$initial_referring_domain);
+	const firstSeenOnWeb = nonEmptyString(
+		properties.$initial_current_url,
+	)?.startsWith("http");
+	if (!referrer || !firstSeenOnWeb) return null;
+	if (referrer === "$direct") return "Direct";
+	return nonSourceReferrers.some((pattern) => pattern.test(referrer))
+		? null
+		: referrer;
+}
+
+export function firstSourceFromPersonProperties(
+	properties: Record<string, unknown> | null,
+): string | null {
+	if (!properties) return null;
+
+	const firstTouch = firstTouchSource(properties);
+	const selfReported = nonEmptyString(properties.acquisition_source);
+	if (!selfReported) return firstTouch;
+
+	const selfReportedLabel = `self-reported: ${acquisitionSourceLabel(selfReported)}`;
+	return firstTouch
+		? `${firstTouch} (${selfReportedLabel})`
+		: selfReportedLabel;
+}
+
+function subscriberProfileBlock(profile: SubscriberProfile): unknown {
+	const signedUp = profile.signedUpAt
+		? `<!date^${Math.floor(profile.signedUpAt.getTime() / 1000)}^{date_short}|${profile.signedUpAt.toISOString().slice(0, 10)}>`
+		: "Unknown";
+	const firstSource = profile.firstSource
+		? escapeSlackMrkdwn(profile.firstSource)
+		: "Unknown";
+	return {
+		type: "section",
+		fields: [
+			{ type: "mrkdwn", text: `*Signed up:*\n${signedUp}` },
+			{ type: "mrkdwn", text: `*First source:*\n${firstSource}` },
+		],
+	};
+}
+
 // --- Formatters ---
 
 export function formatSubscriptionStarted(
 	enriched: EnrichedSubscription,
+	profile: SubscriberProfile,
 ): unknown[] {
 	return [
 		{
@@ -272,6 +355,7 @@ export function formatSubscriptionStarted(
 			},
 		},
 		standardFields(enriched),
+		subscriberProfileBlock(profile),
 		stripeDashboardButtons(
 			enriched.stripeCustomerId,
 			enriched.stripeSubscriptionId,
