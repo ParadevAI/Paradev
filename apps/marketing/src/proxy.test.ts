@@ -30,7 +30,7 @@ describe("proxy", () => {
 		);
 	});
 
-	test("routes only the English landing URLs without taking the land handle", async () => {
+	test("routes only the landing URLs, in every locale, without taking the land handle", async () => {
 		for (const slug of [
 			"claude-code-parallel-sessions",
 			"claude-code-worktrees",
@@ -48,12 +48,21 @@ describe("proxy", () => {
 			});
 			expect((await run(`/en${path}`)).location).toBe(path);
 			expect((await run(`/en/en${path}`)).location).toBe(`/en${path}`);
-			expect((await run(`/fr${path}`)).rewrite).toBeUndefined();
+			expect((await run(`/fr${path}${query}`)).rewrite).toBe(
+				`/fr/en${path}${query}`,
+			);
+			expect((await run(`/zh-CN${path}`)).rewrite).toBe(`/zh-CN/en${path}`);
+			expect(await run(`/fr${path}/`)).toMatchObject({
+				status: 308,
+				location: `/fr${path}`,
+			});
 		}
 		expect((await run("/land")).rewrite).toBe("/en/user/land");
 		expect((await run("/land/")).rewrite).toBe("/en/user/land/");
 		expect((await run("/land/other")).rewrite).toBe("/en/land/other");
 		expect((await run("/land/other/")).rewrite).toBe("/en/land/other/");
+		expect((await run("/fr/land")).rewrite).toBe("/fr/user/land");
+		expect((await run("/fr/land/other")).rewrite).toBeUndefined();
 	});
 
 	test("serves canonical paths without a redirect", async () => {

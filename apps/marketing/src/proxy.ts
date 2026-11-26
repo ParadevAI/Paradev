@@ -4,6 +4,13 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { canonicalPathname } from "@/lib/canonical-pathname";
 
+const LANDING_PAGES = new Set([
+	"claude-code-parallel-sessions",
+	"claude-code-worktrees",
+	"codex-cli-worktrees",
+	"black-friday",
+]);
+
 export function proxy(request: NextRequest) {
 	return route(request);
 }
@@ -60,7 +67,25 @@ function route(request: NextRequest) {
 	}
 	if (canonical !== pathname) return redirectTo(canonical);
 
+	const redirectWithoutSlash = () => {
+		// NextURL retains the inbound trailing-slash flag when serialized.
+		const target = new URL(request.url);
+		target.pathname = pathname.slice(0, -1);
+		return NextResponse.redirect(target, 308);
+	};
+
 	if (isSupportedLocale(first)) {
+		const [landingSlug = ""] = tail;
+		if (
+			second === "land" &&
+			tail.length === 1 &&
+			LANDING_PAGES.has(landingSlug)
+		) {
+			if (pathname.endsWith("/")) return redirectWithoutSlash();
+			const url = request.nextUrl.clone();
+			url.pathname = `/${first}/en/land/${landingSlug}`;
+			return NextResponse.rewrite(url);
+		}
 		if (tail.length === 0 && isProfileHandle(second)) {
 			const url = request.nextUrl.clone();
 			url.pathname = `/${first}/user/${second}`;
@@ -76,20 +101,11 @@ function route(request: NextRequest) {
 	}
 
 	const url = request.nextUrl.clone();
-	// Keep /land available as a profile handle. Only these English child URLs
-	// use the internal /en/en tree; direct /en URLs still canonicalize above.
-	const barePath = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+	// Keep /land available as a profile handle. Only these child URLs use the
+	// internal /<lang>/en tree; direct /en URLs still canonicalize above.
 	const landingPage =
-		barePath === "/land/claude-code-parallel-sessions" ||
-		barePath === "/land/claude-code-worktrees" ||
-		barePath === "/land/codex-cli-worktrees" ||
-		barePath === "/land/black-friday";
-	if (landingPage && barePath !== pathname) {
-		// NextURL retains the inbound trailing-slash flag when serialized.
-		const target = new URL(request.url);
-		target.pathname = barePath;
-		return NextResponse.redirect(target, 308);
-	}
+		first === "land" && rest.length === 1 && LANDING_PAGES.has(second);
+	if (landingPage && pathname.endsWith("/")) return redirectWithoutSlash();
 	url.pathname = landingPage ? `/en/en${pathname}` : `/en${pathname}`;
 	return NextResponse.rewrite(url);
 }
