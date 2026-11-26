@@ -5,6 +5,7 @@ import {
 	maskRecordedText,
 	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
+	stripLinkTargets,
 } from "./posthog-privacy";
 
 function elementInside(unmasked: boolean): HTMLElement {
@@ -232,6 +233,104 @@ describe("maskRecordingEvents", () => {
 				},
 			]),
 		);
+	});
+});
+
+describe("maskRecordingEvents styles and links", () => {
+	test("drops font families from inline styles", () => {
+		const capture = fullSnapshot([
+			{
+				tagName: "div",
+				attributes: { style: 'font-family: "My Font"; color: red;' },
+			},
+		]);
+
+		expect(maskRecordingEvents(capture)).toEqual(
+			fullSnapshot([{ tagName: "div", attributes: { style: " color: red;" } }]),
+		);
+	});
+
+	test("sanitizes style changes sent as objects", () => {
+		const capture = snapshot([
+			{
+				type: 3,
+				data: {
+					source: 0,
+					attributes: [
+						{
+							attributes: {
+								style: {
+									"background-image": "url(https://x.dev/me.png)",
+									"font-family": "My Font",
+									color: ["red", "important"],
+									opacity: false,
+								},
+							},
+						},
+					],
+				},
+			},
+		]);
+
+		expect(maskRecordingEvents(capture)).toEqual(
+			snapshot([
+				{
+					type: 3,
+					data: {
+						source: 0,
+						attributes: [
+							{
+								attributes: {
+									style: {
+										"background-image": "none",
+										color: ["red", "important"],
+										opacity: false,
+									},
+								},
+							},
+						],
+					},
+				},
+			]),
+		);
+	});
+
+	test("keeps link targets only for stylesheets", () => {
+		const capture = fullSnapshot([
+			{
+				tagName: "link",
+				attributes: { rel: "icon", href: "https://x.dev/me" },
+			},
+		]);
+
+		expect(maskRecordingEvents(capture)).toEqual(
+			fullSnapshot([
+				{ tagName: "link", attributes: { rel: "icon", href: "***" } },
+			]),
+		);
+	});
+});
+
+describe("stripLinkTargets", () => {
+	test("removes clicked link addresses from events", () => {
+		const capture: { event: string; properties: Record<string, unknown> } = {
+			event: "$autocapture",
+			properties: {
+				$event_type: "click",
+				$external_click_url: "https://x.dev/pull/1?scope=token",
+				$elements_chain:
+					'a.link:attr__href="https://x.dev/pull/1?scope=token"href="https://x.dev/pull/1?scope=token"nth-child="1"nth-of-type="1";div:attr__data-href="#/a"nth-child="2"',
+			},
+		};
+
+		expect(stripLinkTargets(capture)).toEqual({
+			event: "$autocapture",
+			properties: {
+				$event_type: "click",
+				$elements_chain:
+					'a.link:nth-child="1"nth-of-type="1";div:attr__data-href="#/a"nth-child="2"',
+			},
+		});
 	});
 });
 

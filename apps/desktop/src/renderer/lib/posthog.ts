@@ -2,6 +2,7 @@ import {
 	dropExceptionEvents,
 	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
+	stripLinkTargets,
 } from "@superset/shared/posthog-privacy";
 import posthogFull from "posthog-js/dist/module.full.no-external";
 import type { PostHog } from "posthog-js/react";
@@ -26,7 +27,7 @@ export function initPostHog() {
 		persistence: "localStorage",
 		debug: false,
 		...POSTHOG_PRIVACY_CONFIG,
-		before_send: [maskRecordingEvents, dropExceptionEvents],
+		before_send: [maskRecordingEvents, stripLinkTargets, dropExceptionEvents],
 	});
 
 	posthogFull.register({

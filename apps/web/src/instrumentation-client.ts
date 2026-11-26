@@ -3,6 +3,7 @@ import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 import {
 	maskRecordingEvents,
 	POSTHOG_PRIVACY_CONFIG,
+	stripLinkTargets,
 } from "@superset/shared/posthog-privacy";
 import {
 	SENTRY_DENY_URLS,
@@ -28,7 +29,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
 	...POSTHOG_PRIVACY_CONFIG,
-	before_send: [sanitizePosthogEvent, maskRecordingEvents],
+	before_send: [sanitizePosthogEvent, maskRecordingEvents, stripLinkTargets],
 });
 
 registerBaseProperties();

@@ -168,19 +168,42 @@ interface RecordingEvent {
 	};
 }
 
+function sanitizeStyleValue(value: string): string {
+	return value.replace(/url\([^)]*\)/gi, "none");
+}
+
+function sanitizeStyle(style: unknown): unknown {
+	if (typeof style === "string") {
+		return sanitizeStyleValue(
+			style.replace(/(^|;)\s*font-family\s*:[^;]*;?/gi, "$1"),
+		);
+	}
+	if (!style || typeof style !== "object") return style;
+	const diff = style as Record<string, unknown>;
+	delete diff["font-family"];
+	for (const [property, value] of Object.entries(diff)) {
+		if (typeof value === "string") diff[property] = sanitizeStyleValue(value);
+		if (Array.isArray(value) && typeof value[0] === "string") {
+			diff[property] = [sanitizeStyleValue(value[0]), ...value.slice(1)];
+		}
+	}
+	return diff;
+}
+
 function maskAttributes(
 	attributes: Attributes | undefined,
 	tagName: string | undefined,
 ): void {
 	if (!attributes) return;
 	for (const [name, value] of Object.entries(attributes)) {
-		if (typeof value !== "string" || KEPT_VALUES.has(value)) continue;
 		if (name === "style") {
-			attributes[name] = value.replace(/url\([^)]*\)/gi, "none");
-		} else if (
-			!KEPT_ATTRIBUTES.has(name) &&
-			!(tagName === "link" && name === "href")
-		) {
+			attributes[name] = sanitizeStyle(value);
+			continue;
+		}
+		if (typeof value !== "string" || KEPT_VALUES.has(value)) continue;
+		const isStylesheetHref =
+			tagName === "link" && name === "href" && attributes.rel === "stylesheet";
+		if (!KEPT_ATTRIBUTES.has(name) && !isStylesheetHref) {
 			attributes[name] = MASKED_VALUE;
 		}
 	}
@@ -228,6 +251,21 @@ export function maskRecordingEvents<
 	);
 	for (const event of kept) maskEvent(event);
 	capture.properties.$snapshot_data = kept;
+	return capture;
+}
+
+export function stripLinkTargets<
+	T extends { event: string; properties: Record<string, unknown> } | null,
+>(capture: T): T {
+	if (!capture || capture.event === "$snapshot") return capture;
+	delete capture.properties.$external_click_url;
+	const chain = capture.properties.$elements_chain;
+	if (typeof chain === "string") {
+		capture.properties.$elements_chain = chain.replace(
+			/(?<=^|[:"])(?:attr__)?href="(?:[^"\\]|\\.)*"/g,
+			"",
+		);
+	}
 	return capture;
 }
 
