@@ -21,6 +21,7 @@ function trimUrl(text: string): string {
 }
 
 // A TUI that lays out its own rows breaks a long URL without isWrapped.
+// Agent CLIs hang the next rows under the text of a "⏺ text" or "• text" row.
 // Returns the indent to drop from `next` when it continues `line`, else -1.
 function hardWrapIndent(
 	line: IBufferLine | undefined,
@@ -32,8 +33,11 @@ function hardWrapIndent(
 		?.getChars()
 		.trim();
 	if (!line || !next || next.isWrapped || !lastCell) return -1;
-	const indent = line.translateToString().search(/\S/);
-	return next.translateToString().search(/\S/) === indent ? indent : -1;
+	const text = line.translateToString();
+	const indent = text.search(/\S/);
+	const hasMarker = /^[^\p{L}\p{N}\s] \S/u.test(text.slice(indent));
+	const expected = hasMarker ? indent + 2 : indent;
+	return next.translateToString().search(/\S/) === expected ? expected : -1;
 }
 
 export class UrlLinkProvider implements ILinkProvider {
