@@ -51,6 +51,7 @@ export function LandingPage({ copy }: { copy: LandingCopy }) {
 				lead={copy.lead}
 				emphasis={copy.emphasis}
 				subheadline={copy.subheadline}
+				promoCode={copy.promoCode}
 				badge={copy.badge}
 			/>
 			<MobileSection />
