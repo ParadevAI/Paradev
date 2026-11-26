@@ -21,10 +21,10 @@ function firstHeaderValue(value: string | null): string | null {
 }
 
 function getClientIdentifier(requestHeaders: HeaderReader): string {
+	// Only headers Vercel overwrites: cf-connecting-ip is client-controlled here, since this app is not behind Cloudflare.
 	return (
-		firstHeaderValue(requestHeaders.get("cf-connecting-ip")) ??
-		firstHeaderValue(requestHeaders.get("x-real-ip")) ??
 		firstHeaderValue(requestHeaders.get("x-vercel-forwarded-for")) ??
+		firstHeaderValue(requestHeaders.get("x-real-ip")) ??
 		firstHeaderValue(requestHeaders.get("x-forwarded-for")) ??
 		"unknown"
 	);
