@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {#件のコミット} other {#件のコミッ�
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} が Conductor のワークツリーを見つけ、未コミットの変更ごとその場でインポートします。"
 
+msgid "{companyName} finds your Orca worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} が Orca のワークツリーを見つけ、未コミットの変更ごとその場でインポートします。"
+
 msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} が T3 Code のワークツリーを見つけ、未コミットの変更ごとその場でインポートします。"
 
@@ -2502,6 +2505,9 @@ msgstr "スケジュールやトリガーで動くエージェント"
 msgid "Agents on your phone"
 msgstr "スマホで使うエージェント"
 
+msgid "Agents open as a chat or as their CLI in a terminal. Switch the same session between the two at any time."
+msgstr "エージェントはチャットとして、またはターミナル上の CLI として開きます。同じセッションをいつでも両者の間で切り替えられます。"
+
 msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
 msgstr "エージェントは T3 Code のスレッドと同じようにチャットとして開きます。同じセッションをいつでもターミナルの CLI に切り替えられます。"
 
@@ -3509,6 +3515,9 @@ msgstr "オートメーションにはProプランが必要です。"
 msgid "Automations, {myFailedCount} failing"
 msgstr "オートメーション、{myFailedCount}件が失敗中"
 
+msgid "Automations. Create them again in {companyName}"
+msgstr "オートメーション。{companyName} で作り直してください"
+
 msgid "Autonomous"
 msgstr "自律"
 
@@ -4071,6 +4080,9 @@ msgstr "クラウド GB 時間を追加購入できますか?"
 msgid "Can I create automations from a script?"
 msgstr "スクリプトからオートメーションを作成できますか？"
 
+msgid "Can I keep using Orca?"
+msgstr "Orca を使い続けられますか？"
+
 msgid "Can I keep using T3 Code?"
 msgstr "T3 Code を使い続けられますか？"
 
@@ -4376,6 +4388,9 @@ msgstr "チャット画面"
 msgid "Chat name"
 msgstr "チャット名"
 
+msgid "Chat or terminal"
+msgstr "チャットまたはターミナル"
+
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
 
@@ -4384,6 +4399,9 @@ msgstr "チャットの構成要素: メッセージ、推論、提案"
 
 msgid "Chat threads, with a built-in terminal"
 msgstr "チャットスレッド（ターミナル内蔵）"
+
+msgid "Chat UI or terminal for each agent"
+msgstr "エージェントごとにチャット UI またはターミナル"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
@@ -4702,6 +4720,12 @@ msgstr "CLIドキュメント"
 
 msgid "CLI reference"
 msgstr "CLIリファレンス"
+
+msgid "CLI, SDK and MCP"
+msgstr "CLI、SDK、MCP"
+
+msgid "CLI, TypeScript SDK, and MCP server"
+msgstr "CLI、TypeScript SDK、MCP サーバー"
 
 msgid "click"
 msgstr "クリック"
@@ -5640,6 +5664,9 @@ msgstr "コントリビューション"
 msgid "Control how your local machine is reachable from elsewhere"
 msgstr "このマシンに外部からどのように接続できるかを設定"
 
+msgid "Control workspaces and agents from scripts with the CLI, the TypeScript SDK, or the MCP server."
+msgstr "CLI、TypeScript SDK、MCP サーバーを使って、スクリプトからワークスペースとエージェントを操作できます。"
+
 msgid "Controls when manually edited files are saved"
 msgstr "手動で編集したファイルを保存するタイミングを制御します"
 
@@ -5657,6 +5684,9 @@ msgstr "ドラフトに変換"
 
 msgid "Convert your actions"
 msgstr "アクションを変換する"
+
+msgid "Convert your scripts"
+msgstr "スクリプトを変換"
 
 msgid "Converting to draft…"
 msgstr "ドラフトに変換しています…"
@@ -8437,6 +8467,9 @@ msgstr "ワークスペースを展開"
 msgid "Experimental"
 msgstr "実験的機能"
 
+msgid "Experimental cloud VMs on your own provider"
+msgstr "自分のプロバイダー上の実験的なクラウド VM"
+
 msgid "Expired"
 msgstr "期限切れ"
 
@@ -9365,6 +9398,9 @@ msgstr "これから始める個人向け"
 
 msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
 msgstr "Apple Silicon と Intel の macOS に対応。Linux AppImage は試験版です。"
+
+msgid "For Orca users"
+msgstr "Orca ユーザーの方へ"
 
 msgid "For organizations with advanced needs"
 msgstr "高度な要件がある組織向け"
@@ -10813,6 +10849,9 @@ msgstr "iOS と Android"
 msgid "iOS app"
 msgstr "iOSアプリ"
 
+msgid "iOS app and an Android APK, both in beta"
+msgstr "iOS アプリと Android APK（どちらもベータ版）"
+
 msgid "iOS app; cloud and experimental local Mac remote control"
 msgstr "iOSアプリ。クラウドと、実験的なローカルMacのリモート操作に対応"
 
@@ -10917,6 +10956,9 @@ msgstr "削除されたか、別の組織に属している可能性がありま
 
 msgid "It must join again and pass its checks to merge."
 msgstr "マージするには、もう一度キューに入れてチェックに合格する必要があります。"
+
+msgid "It takes a few minutes, and you can keep Orca installed while you try it."
+msgstr "数分で完了します。試している間、Orca はインストールしたままで構いません。"
 
 msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
 msgstr "数分で完了します。試している間、T3 Code はインストールしたままで構いません。"
@@ -11098,6 +11140,9 @@ msgstr "編集を続ける"
 
 msgid "Keep paused"
 msgstr "一時停止のままにする"
+
+msgid "Keep the worktrees you already have, and run your agents as a chat or in a terminal. Review, cloud and mobile are built in."
+msgstr "今あるワークツリーをそのまま使い、エージェントをチャットまたはターミナルで実行できます。レビュー、クラウド、モバイルも組み込み済みです。"
 
 msgid "Keep typing an email to invite"
 msgstr "招待するにはメールアドレスを入力し続けてください"
@@ -11933,6 +11978,9 @@ msgstr "組織のブランディングとメンバーを管理します。"
 msgid "Managed"
 msgstr "管理対象"
 
+msgid "Managed agent accounts in Orca. Sign in to each agent again"
+msgstr "Orca の管理対象エージェントアカウント。各エージェントに再度サインインしてください"
+
 msgid "Managed by"
 msgstr "管理者"
 
@@ -12407,6 +12455,9 @@ msgstr "{name} のその他のオプション"
 msgid "More pages"
 msgstr "その他のページ"
 
+msgid "More than 25 named agents"
+msgstr "名前が挙げられたエージェントは 25 以上"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "マージされた変更の半数超が、人間の編集なしにエージェントによって書かれる。"
 
@@ -12441,6 +12492,9 @@ msgstr "ワークスペースを離れずに済むよう、設定をモーダル
 msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
 msgstr "t3.json のアクションを .paradev/config.json に移すか、エージェントに任せましょう。"
 
+msgid "Move the scripts in orca.yaml to .paradev/config.json, or ask an agent to do it for you."
+msgstr "orca.yaml のスクリプトを .paradev/config.json に移すか、エージェントに任せましょう。"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "このワークスペースを {computerName} に移動しますか？"
 
@@ -12473,6 +12527,9 @@ msgstr "タブに移動"
 
 msgid "Move your agents."
 msgstr "エージェントを移行しましょう。"
+
+msgid "Move your Orca worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Orca のワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
 
 msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "T3 Code のワークツリーとエージェントを数分で {companyName} に移行できます。無料のオープンソースです。"
@@ -14616,6 +14673,17 @@ msgstr "または .env の内容をキー欄に貼り付け"
 msgid "Orange"
 msgstr "オレンジ"
 
+msgid "Orca details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Orca の情報は公開ドキュメントとリポジトリに基づいています。<0>詳しい比較</0>をご覧ください。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca is a trademark of its owner. {0} is not affiliated with or endorsed by it."
+msgstr "Orca はその所有者の商標です。{0} は所有者と提携しておらず、承認も受けていません。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Orca のワークツリーはただの Git ワークツリーです。{0} はそのままの場所で使います。"
+
 msgid "Orchestrate Parallel Agents"
 msgstr "並列エージェントを指揮"
 
@@ -15752,6 +15820,9 @@ msgstr "プロダクト"
 
 msgid "Profile name"
 msgstr "プロファイル名"
+
+msgid "Programmatic control"
+msgstr "プログラムからの操作"
 
 msgid "Progress"
 msgstr "進捗"
@@ -17736,6 +17807,9 @@ msgstr "会議のスケジュール調整"
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "スケジュール実行とイベント起動のエージェント(cron、GitHub、Slack、Linear、Sentry、Notion、Microsoft Teams、webhook)。すぐ使えるテンプレート付き。"
 
+msgid "Scheduled automations"
+msgstr "スケジュールされたオートメーション"
+
 msgid "Scheduled tasks and workflows. Create them again as automations"
 msgstr "スケジュールタスクとワークフロー。オートメーションとして作り直してください"
 
@@ -18502,6 +18576,9 @@ msgstr "セットアップ"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "セットアップスクリプト（conductor.json を変換した後）"
+
+msgid "Setup scripts, once you convert orca.yaml"
+msgstr "セットアップスクリプト（orca.yaml を変換した後）"
 
 msgid "Setup scripts, once you convert t3.json"
 msgstr "セットアップスクリプト（t3.json を変換した後）"
@@ -19816,6 +19893,9 @@ msgstr "継続 · 30日間のアクティブ日数"
 
 msgid "Switch account"
 msgstr "アカウントを切り替え"
+
+msgid "Switch from Orca to {companyName}"
+msgstr "Orca から {companyName} に乗り換える"
 
 msgid "Switch from T3 Code to {companyName}"
 msgstr "T3 Code から {companyName} に乗り換える"
@@ -23073,6 +23153,9 @@ msgstr "ワークスペースを作成しました"
 msgid "Workspace details"
 msgstr "ワークスペースの詳細"
 
+msgid "Workspace details in Orca, like pins, comments and linked issues"
+msgstr "Orca 内のワークスペース情報（ピン留め、コメント、リンクされた課題など）"
+
 msgid "Workspace ID copied"
 msgstr "ワークスペースIDをコピーしました"
 
@@ -23240,6 +23323,9 @@ msgstr "はい。最も合うポジションに応募し、何を作りたいか
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "はい。Freeプランは個人向けで、1ユーザー、ローカルワークスペース、デスクトップアプリ、CLIが使えます。クレジットカードは不要です。"
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Do not delete an imported workspace in Orca, because that removes its folder."
+msgstr "はい。インポートしたワークツリーはそのままの場所に残るので、どちらのアプリでも開けます。インポートしたワークスペースを Orca で削除しないでください。フォルダーごと削除されます。"
 
 msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
 msgstr "はい。インポートしたワークツリーはそのままの場所に残るので、どちらのアプリでも開けます。T3 Code に削除されないよう、ワークツリーのクリーンアップはオフのままにしてください。"

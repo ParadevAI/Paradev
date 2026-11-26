@@ -19,7 +19,8 @@ export type DownloadSource =
 	| "factory_2026"
 	| "production_run"
 	| "conductor"
-	| "t3_code";
+	| "t3_code"
+	| "orca";
 
 /** PostHog event name → Google Ads conversion action (send_to). */
 const GOOGLE_ADS_EVENT_MAP: Record<string, string> = {

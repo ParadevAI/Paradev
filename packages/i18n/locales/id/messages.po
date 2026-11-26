@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {# commit} other {# commit}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} menemukan worktree Conductor Anda dan mengimpornya di tempat, beserta perubahan yang belum di-commit."
 
+msgid "{companyName} finds your Orca worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} menemukan worktree Orca Anda dan mengimpornya di tempat, beserta perubahan yang belum di-commit."
+
 msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} menemukan worktree T3 Code Anda dan mengimpornya di tempat, beserta perubahan yang belum di-commit."
 
@@ -2502,6 +2505,9 @@ msgstr "Agen terjadwal atau dengan pemicu"
 msgid "Agents on your phone"
 msgstr "Agen di ponsel Anda"
 
+msgid "Agents open as a chat or as their CLI in a terminal. Switch the same session between the two at any time."
+msgstr "Agen terbuka sebagai chat atau sebagai CLI-nya di terminal. Pindahkan sesi yang sama di antara keduanya kapan saja."
+
 msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
 msgstr "Agen terbuka sebagai chat, seperti thread T3 Code. Pindahkan sesi yang sama ke CLI-nya di terminal kapan saja."
 
@@ -3509,6 +3515,9 @@ msgstr "Otomatisasi memerlukan paket Pro."
 msgid "Automations, {myFailedCount} failing"
 msgstr "Otomatisasi, {myFailedCount} gagal"
 
+msgid "Automations. Create them again in {companyName}"
+msgstr "Otomatisasi. Buat lagi di {companyName}"
+
 msgid "Autonomous"
 msgstr "Otonom"
 
@@ -4071,6 +4080,9 @@ msgstr "Bisakah saya membeli GB-jam cloud tambahan?"
 msgid "Can I create automations from a script?"
 msgstr "Bisakah saya membuat otomatisasi dari skrip?"
 
+msgid "Can I keep using Orca?"
+msgstr "Bisakah saya tetap memakai Orca?"
+
 msgid "Can I keep using T3 Code?"
 msgstr "Bisakah saya tetap memakai T3 Code?"
 
@@ -4376,6 +4388,9 @@ msgstr "Antarmuka chat"
 msgid "Chat name"
 msgstr "Nama obrolan"
 
+msgid "Chat or terminal"
+msgstr "Chat atau terminal"
+
 msgid "Chat session not found"
 msgstr "Sesi chat tidak ditemukan"
 
@@ -4384,6 +4399,9 @@ msgstr "Permukaan chat: pesan, penalaran, saran"
 
 msgid "Chat threads, with a built-in terminal"
 msgstr "Thread chat, dengan terminal bawaan"
+
+msgid "Chat UI or terminal for each agent"
+msgstr "UI chat atau terminal untuk setiap agen"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
@@ -4702,6 +4720,12 @@ msgstr "Dokumentasi CLI"
 
 msgid "CLI reference"
 msgstr "Referensi CLI"
+
+msgid "CLI, SDK and MCP"
+msgstr "CLI, SDK, dan MCP"
+
+msgid "CLI, TypeScript SDK, and MCP server"
+msgstr "CLI, SDK TypeScript, dan server MCP"
 
 msgid "click"
 msgstr "klik"
@@ -5640,6 +5664,9 @@ msgstr "Kontribusi"
 msgid "Control how your local machine is reachable from elsewhere"
 msgstr "Kontrol bagaimana mesin lokal Anda dapat diakses dari luar"
 
+msgid "Control workspaces and agents from scripts with the CLI, the TypeScript SDK, or the MCP server."
+msgstr "Kendalikan workspace dan agen dari skrip dengan CLI, SDK TypeScript, atau server MCP."
+
 msgid "Controls when manually edited files are saved"
 msgstr "Mengatur kapan file yang diedit secara manual disimpan"
 
@@ -5657,6 +5684,9 @@ msgstr "Ubah menjadi draf"
 
 msgid "Convert your actions"
 msgstr "Konversi aksi Anda"
+
+msgid "Convert your scripts"
+msgstr "Konversi skrip Anda"
 
 msgid "Converting to draft…"
 msgstr "Mengubah menjadi draf…"
@@ -8437,6 +8467,9 @@ msgstr "Bentangkan workspace"
 msgid "Experimental"
 msgstr "Eksperimental"
 
+msgid "Experimental cloud VMs on your own provider"
+msgstr "VM cloud eksperimental di penyedia Anda sendiri"
+
 msgid "Expired"
 msgstr "Kedaluwarsa"
 
@@ -9365,6 +9398,9 @@ msgstr "Untuk perorangan yang baru memulai"
 
 msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
 msgstr "Untuk macOS di Apple Silicon dan Intel. Linux AppImage masih eksperimental."
+
+msgid "For Orca users"
+msgstr "Untuk pengguna Orca"
 
 msgid "For organizations with advanced needs"
 msgstr "Untuk organisasi dengan kebutuhan tingkat lanjut"
@@ -10813,6 +10849,9 @@ msgstr "iOS dan Android"
 msgid "iOS app"
 msgstr "Aplikasi iOS"
 
+msgid "iOS app and an Android APK, both in beta"
+msgstr "Aplikasi iOS dan APK Android, keduanya masih beta"
+
 msgid "iOS app; cloud and experimental local Mac remote control"
 msgstr "Aplikasi iOS; cloud dan kendali jarak jauh Mac lokal eksperimental"
 
@@ -10917,6 +10956,9 @@ msgstr "Mungkin sudah dihapus, atau milik organisasi lain."
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Agar bisa di-merge, ia harus masuk lagi dan lolos pemeriksaannya."
+
+msgid "It takes a few minutes, and you can keep Orca installed while you try it."
+msgstr "Hanya butuh beberapa menit, dan Anda bisa tetap memasang Orca selama mencobanya."
 
 msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
 msgstr "Hanya butuh beberapa menit, dan Anda bisa tetap memasang T3 Code selama mencobanya."
@@ -11098,6 +11140,9 @@ msgstr "Lanjutkan mengedit"
 
 msgid "Keep paused"
 msgstr "Biarkan dijeda"
+
+msgid "Keep the worktrees you already have, and run your agents as a chat or in a terminal. Review, cloud and mobile are built in."
+msgstr "Pertahankan worktree yang sudah Anda miliki, dan jalankan agen Anda sebagai chat atau di terminal. Review, cloud, dan seluler sudah tersedia."
 
 msgid "Keep typing an email to invite"
 msgstr "Terus ketik email untuk mengundang"
@@ -11933,6 +11978,9 @@ msgstr "Kelola identitas dan anggota organisasi Anda."
 msgid "Managed"
 msgstr "Terkelola"
 
+msgid "Managed agent accounts in Orca. Sign in to each agent again"
+msgstr "Akun agen terkelola di Orca. Masuk lagi ke setiap agen"
+
 msgid "Managed by"
 msgstr "Dikelola oleh"
 
@@ -12407,6 +12455,9 @@ msgstr "Opsi lainnya untuk {name}"
 msgid "More pages"
 msgstr "Halaman lainnya"
 
+msgid "More than 25 named agents"
+msgstr "Lebih dari 25 agen yang disebutkan namanya"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "Lebih dari separuh perubahan yang di-merge ditulis agen tanpa suntingan manusia."
 
@@ -12441,6 +12492,9 @@ msgstr "Pindahkan Pengaturan ke modal agar orang tidak perlu meninggalkan ruang 
 msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
 msgstr "Pindahkan aksi di t3.json ke .paradev/config.json, atau minta agen melakukannya untuk Anda."
 
+msgid "Move the scripts in orca.yaml to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Pindahkan skrip di orca.yaml ke .paradev/config.json, atau minta agen melakukannya untuk Anda."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Pindahkan workspace ini ke {computerName}?"
 
@@ -12473,6 +12527,9 @@ msgstr "Pindahkan ke Tab"
 
 msgid "Move your agents."
 msgstr "Pindahkan agen Anda."
+
+msgid "Move your Orca worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Pindahkan worktree dan agen Orca Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
 
 msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Pindahkan worktree dan agen T3 Code Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
@@ -14616,6 +14673,17 @@ msgstr "atau tempel isi .env di kolom Kunci"
 msgid "Orange"
 msgstr "Oranye"
 
+msgid "Orca details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Detail Orca diambil dari dokumentasi publik dan repositorinya. Lihat <0>perbandingan lengkap</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca is a trademark of its owner. {0} is not affiliated with or endorsed by it."
+msgstr "Orca adalah merek dagang pemiliknya. {0} tidak berafiliasi dengan atau didukung oleh pemilik tersebut."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Worktree Orca adalah Git worktree biasa. {0} menggunakannya di lokasi aslinya."
+
 msgid "Orchestrate Parallel Agents"
 msgstr "Orkestrasi Agen Paralel"
 
@@ -15752,6 +15820,9 @@ msgstr "Produk"
 
 msgid "Profile name"
 msgstr "Nama profil"
+
+msgid "Programmatic control"
+msgstr "Kontrol terprogram"
 
 msgid "Progress"
 msgstr "Progres"
@@ -17736,6 +17807,9 @@ msgstr "Jadwalkan rapat"
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Agen terjadwal dan terpicu event (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhook) dengan templat siap pakai."
 
+msgid "Scheduled automations"
+msgstr "Otomatisasi terjadwal"
+
 msgid "Scheduled tasks and workflows. Create them again as automations"
 msgstr "Tugas terjadwal dan workflow. Buat lagi sebagai otomatisasi"
 
@@ -18502,6 +18576,9 @@ msgstr "Setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Skrip setup, setelah Anda mengonversi conductor.json"
+
+msgid "Setup scripts, once you convert orca.yaml"
+msgstr "Skrip setup, setelah Anda mengonversi orca.yaml"
 
 msgid "Setup scripts, once you convert t3.json"
 msgstr "Skrip setup, setelah Anda mengonversi t3.json"
@@ -19816,6 +19893,9 @@ msgstr "Konsistensi · hari aktif dari 30"
 
 msgid "Switch account"
 msgstr "Ganti akun"
+
+msgid "Switch from Orca to {companyName}"
+msgstr "Beralih dari Orca ke {companyName}"
 
 msgid "Switch from T3 Code to {companyName}"
 msgstr "Beralih dari T3 Code ke {companyName}"
@@ -23073,6 +23153,9 @@ msgstr "Workspace dibuat"
 msgid "Workspace details"
 msgstr "Detail workspace"
 
+msgid "Workspace details in Orca, like pins, comments and linked issues"
+msgstr "Detail workspace di Orca, seperti pin, komentar, dan issue yang ditautkan"
+
 msgid "Workspace ID copied"
 msgstr "ID workspace disalin"
 
@@ -23240,6 +23323,9 @@ msgstr "Ya. Lamar posisi yang paling sesuai dan ceritakan apa yang ingin Anda ba
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Ya. Paket gratis mencakup perorangan dengan 1 pengguna, workspace lokal, aplikasi desktop, dan CLI. Tanpa kartu kredit."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Do not delete an imported workspace in Orca, because that removes its folder."
+msgstr "Ya. Worktree yang diimpor tetap di tempatnya, jadi kedua aplikasi bisa membukanya. Jangan hapus workspace yang diimpor di Orca, karena itu menghapus foldernya."
 
 msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
 msgstr "Ya. Worktree yang diimpor tetap di tempatnya, jadi kedua aplikasi bisa membukanya. Biarkan pembersihan worktree di T3 Code tetap nonaktif agar tidak menghapusnya."

@@ -26,6 +26,7 @@ const ROUTES = [
 	"media",
 	"mobile",
 	"multiplayer-coding-agents",
+	"orca",
 	"pages",
 	"parallel-coding-agents",
 	"people",

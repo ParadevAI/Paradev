@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {# Commit} other {# Commits}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} findet deine Conductor-Worktrees und importiert sie an Ort und Stelle, samt nicht committeter Änderungen."
 
+msgid "{companyName} finds your Orca worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} findet deine Orca-Worktrees und importiert sie an Ort und Stelle, samt nicht committeter Änderungen."
+
 msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} findet deine T3-Code-Worktrees und importiert sie an Ort und Stelle, samt nicht committeter Änderungen."
 
@@ -2502,6 +2505,9 @@ msgstr "Agenten nach Zeitplan oder Auslöser"
 msgid "Agents on your phone"
 msgstr "Agenten auf deinem Handy"
 
+msgid "Agents open as a chat or as their CLI in a terminal. Switch the same session between the two at any time."
+msgstr "Agenten öffnen sich als Chat oder als ihre CLI im Terminal. Du kannst dieselbe Sitzung jederzeit zwischen beiden umschalten."
+
 msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
 msgstr "Agenten öffnen sich als Chat, wie ein Thread in T3 Code. Wechsle mit derselben Sitzung jederzeit zu ihrer CLI im Terminal."
 
@@ -3509,6 +3515,9 @@ msgstr "Automatisierungen erfordern den Pro-Plan."
 msgid "Automations, {myFailedCount} failing"
 msgstr "Automatisierungen, {myFailedCount} fehlgeschlagen"
 
+msgid "Automations. Create them again in {companyName}"
+msgstr "Automatisierungen. Erstelle sie in {companyName} neu"
+
 msgid "Autonomous"
 msgstr "Autonom"
 
@@ -4071,6 +4080,9 @@ msgstr "Kann ich weitere Cloud-GB-Stunden kaufen?"
 msgid "Can I create automations from a script?"
 msgstr "Kann ich Automatisierungen per Skript erstellen?"
 
+msgid "Can I keep using Orca?"
+msgstr "Kann ich Orca weiter nutzen?"
+
 msgid "Can I keep using T3 Code?"
 msgstr "Kann ich T3 Code weiter nutzen?"
 
@@ -4376,6 +4388,9 @@ msgstr "Chat-Oberfläche"
 msgid "Chat name"
 msgstr "Chatname"
 
+msgid "Chat or terminal"
+msgstr "Chat oder Terminal"
+
 msgid "Chat session not found"
 msgstr "Chat-Sitzung nicht gefunden"
 
@@ -4384,6 +4399,9 @@ msgstr "Chat-Oberflächen: Nachrichten, Reasoning, Vorschläge"
 
 msgid "Chat threads, with a built-in terminal"
 msgstr "Chat-Threads mit integriertem Terminal"
+
+msgid "Chat UI or terminal for each agent"
+msgstr "Chat-Oberfläche oder Terminal für jeden Agenten"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
@@ -4702,6 +4720,12 @@ msgstr "CLI-Doku"
 
 msgid "CLI reference"
 msgstr "CLI-Referenz"
+
+msgid "CLI, SDK and MCP"
+msgstr "CLI, SDK und MCP"
+
+msgid "CLI, TypeScript SDK, and MCP server"
+msgstr "CLI, TypeScript-SDK und MCP-Server"
 
 msgid "click"
 msgstr "Klick"
@@ -5640,6 +5664,9 @@ msgstr "Beiträge"
 msgid "Control how your local machine is reachable from elsewhere"
 msgstr "Lege fest, wie deine lokale Maschine von außen erreichbar ist"
 
+msgid "Control workspaces and agents from scripts with the CLI, the TypeScript SDK, or the MCP server."
+msgstr "Steuere Arbeitsbereiche und Agenten aus Skripten mit der CLI, dem TypeScript-SDK oder dem MCP-Server."
+
 msgid "Controls when manually edited files are saved"
 msgstr "Legt fest, wann manuell bearbeitete Dateien gespeichert werden"
 
@@ -5657,6 +5684,9 @@ msgstr "In Entwurf umwandeln"
 
 msgid "Convert your actions"
 msgstr "Aktionen konvertieren"
+
+msgid "Convert your scripts"
+msgstr "Skripte konvertieren"
 
 msgid "Converting to draft…"
 msgstr "Wird in Entwurf umgewandelt…"
@@ -8437,6 +8467,9 @@ msgstr "Arbeitsbereich ausklappen"
 msgid "Experimental"
 msgstr "Experimentell"
 
+msgid "Experimental cloud VMs on your own provider"
+msgstr "Experimentelle Cloud-VMs bei deinem eigenen Anbieter"
+
 msgid "Expired"
 msgstr "Abgelaufen"
 
@@ -9365,6 +9398,9 @@ msgstr "Für Einzelpersonen zum Einstieg"
 
 msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
 msgstr "Für macOS auf Apple Silicon und Intel. Linux-AppImage ist experimentell."
+
+msgid "For Orca users"
+msgstr "Für Orca-Nutzer"
 
 msgid "For organizations with advanced needs"
 msgstr "Für Organisationen mit erhöhten Anforderungen"
@@ -10813,6 +10849,9 @@ msgstr "iOS und Android"
 msgid "iOS app"
 msgstr "iOS-App"
 
+msgid "iOS app and an Android APK, both in beta"
+msgstr "iOS-App und eine Android-APK, beide in der Beta"
+
 msgid "iOS app; cloud and experimental local Mac remote control"
 msgstr "iOS-App; Cloud und experimentelle Fernsteuerung des lokalen Mac"
 
@@ -10917,6 +10956,9 @@ msgstr "Sie wurde möglicherweise gelöscht oder gehört zu einer anderen Organi
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Zum Mergen muss er erneut beitreten und seine Checks bestehen."
+
+msgid "It takes a few minutes, and you can keep Orca installed while you try it."
+msgstr "Es dauert ein paar Minuten, und du kannst Orca installiert lassen, während du es ausprobierst."
 
 msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
 msgstr "Es dauert ein paar Minuten, und du kannst T3 Code installiert lassen, während du es ausprobierst."
@@ -11098,6 +11140,9 @@ msgstr "Weiter bearbeiten"
 
 msgid "Keep paused"
 msgstr "Pausiert lassen"
+
+msgid "Keep the worktrees you already have, and run your agents as a chat or in a terminal. Review, cloud and mobile are built in."
+msgstr "Behalte die Worktrees, die du schon hast, und führe deine Agenten als Chat oder im Terminal aus. Review, Cloud und Mobile sind integriert."
 
 msgid "Keep typing an email to invite"
 msgstr "Gib weiter eine E-Mail-Adresse ein, um einzuladen"
@@ -11933,6 +11978,9 @@ msgstr "Verwalte Branding und Mitglieder deiner Organisation."
 msgid "Managed"
 msgstr "Verwaltet"
 
+msgid "Managed agent accounts in Orca. Sign in to each agent again"
+msgstr "Verwaltete Agentenkonten in Orca. Melde dich bei jedem Agenten neu an"
+
 msgid "Managed by"
 msgstr "Verwaltet von"
 
@@ -12407,6 +12455,9 @@ msgstr "Weitere Optionen für {name}"
 msgid "More pages"
 msgstr "Weitere Seiten"
 
+msgid "More than 25 named agents"
+msgstr "Mehr als 25 namentlich genannte Agenten"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "Mehr als die Hälfte der gemergten Änderungen stammt von Agenten, ohne menschliche Bearbeitung."
 
@@ -12441,6 +12492,9 @@ msgstr "Verschiebe die Einstellungen in ein Modal, damit niemand seinen Arbeitsb
 msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
 msgstr "Verschiebe die Aktionen aus t3.json nach .paradev/config.json oder lass das einen Agenten für dich erledigen."
 
+msgid "Move the scripts in orca.yaml to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Verschiebe die Skripte aus orca.yaml nach .paradev/config.json oder lass das einen Agenten für dich erledigen."
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Diesen Arbeitsbereich auf {computerName} verschieben?"
 
@@ -12473,6 +12527,9 @@ msgstr "In Tab verschieben"
 
 msgid "Move your agents."
 msgstr "Zieh deine Agenten um."
+
+msgid "Move your Orca worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Zieh deine Orca-Worktrees und Agenten in wenigen Minuten zu {companyName} um. Kostenlos und Open Source."
 
 msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Zieh deine T3-Code-Worktrees und Agenten in wenigen Minuten zu {companyName} um. Kostenlos und Open Source."
@@ -14616,6 +14673,17 @@ msgstr "oder .env-Inhalt in das Schlüsselfeld einfügen"
 msgid "Orange"
 msgstr "Orange"
 
+msgid "Orca details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Angaben zu Orca stammen aus der öffentlichen Dokumentation und dem Repository. Siehe den <0>vollständigen Vergleich</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca is a trademark of its owner. {0} is not affiliated with or endorsed by it."
+msgstr "Orca ist eine Marke des jeweiligen Inhabers. {0} ist nicht mit ihm verbunden und wird nicht von ihm unterstützt."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Orca-Worktrees sind einfache Git-Worktrees. {0} nutzt sie dort, wo sie liegen."
+
 msgid "Orchestrate Parallel Agents"
 msgstr "Parallele Agenten orchestrieren"
 
@@ -15752,6 +15820,9 @@ msgstr "Produkte"
 
 msgid "Profile name"
 msgstr "Profilname"
+
+msgid "Programmatic control"
+msgstr "Programmatische Steuerung"
 
 msgid "Progress"
 msgstr "Fortschritt"
@@ -17736,6 +17807,9 @@ msgstr "Meetings planen"
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Geplante und ereignisgesteuerte Agenten (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, Webhooks) mit fertigen Vorlagen."
 
+msgid "Scheduled automations"
+msgstr "Geplante Automatisierungen"
+
 msgid "Scheduled tasks and workflows. Create them again as automations"
 msgstr "Geplante Aufgaben und Workflows. Lege sie als Automatisierungen neu an"
 
@@ -18502,6 +18576,9 @@ msgstr "Setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Setup-Skripte, sobald du conductor.json konvertierst"
+
+msgid "Setup scripts, once you convert orca.yaml"
+msgstr "Setup-Skripte, sobald du orca.yaml konvertierst"
 
 msgid "Setup scripts, once you convert t3.json"
 msgstr "Setup-Skripte, sobald du t3.json konvertierst"
@@ -19816,6 +19893,9 @@ msgstr "Beständigkeit · aktive Tage von 30"
 
 msgid "Switch account"
 msgstr "Konto wechseln"
+
+msgid "Switch from Orca to {companyName}"
+msgstr "Von Orca zu {companyName} wechseln"
 
 msgid "Switch from T3 Code to {companyName}"
 msgstr "Von T3 Code zu {companyName} wechseln"
@@ -23073,6 +23153,9 @@ msgstr "Arbeitsbereich erstellt"
 msgid "Workspace details"
 msgstr "Arbeitsbereichsdetails"
 
+msgid "Workspace details in Orca, like pins, comments and linked issues"
+msgstr "Arbeitsbereichsdetails in Orca, etwa Pins, Kommentare und verknüpfte Issues"
+
 msgid "Workspace ID copied"
 msgstr "Arbeitsbereich-ID kopiert"
 
@@ -23240,6 +23323,9 @@ msgstr "Ja. Bewirb dich auf die Stelle, die am besten passt, und erzähl uns, wa
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Ja. Free deckt Einzelpersonen mit 1 Nutzer ab, dazu lokale Arbeitsbereiche, die Desktop-App und die CLI. Ohne Kreditkarte."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Do not delete an imported workspace in Orca, because that removes its folder."
+msgstr "Ja. Importierte Worktrees bleiben, wo sie sind, sodass beide Apps sie öffnen können. Lösche einen importierten Arbeitsbereich nicht in Orca, denn das entfernt seinen Ordner."
 
 msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
 msgstr "Ja. Importierte Worktrees bleiben, wo sie sind, sodass beide Apps sie öffnen können. Lass das Aufräumen von Worktrees in T3 Code ausgeschaltet, damit es sie nicht entfernt."

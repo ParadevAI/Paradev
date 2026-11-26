@@ -853,6 +853,9 @@ msgstr "{commitCount, plural, one {#個提交} other {#個提交}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} 會找到你的 Conductor worktree，並在原位置匯入，包括未提交的變更。"
 
+msgid "{companyName} finds your Orca worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName} 會找到你的 Orca worktree，並在原位置匯入，包括未提交的變更。"
+
 msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName} 會找到你的 T3 Code worktree，並在原位置匯入，包括未提交的變更。"
 
@@ -2502,6 +2505,9 @@ msgstr "依排程或觸發器執行的代理程式"
 msgid "Agents on your phone"
 msgstr "手機上的代理程式"
 
+msgid "Agents open as a chat or as their CLI in a terminal. Switch the same session between the two at any time."
+msgstr "代理程式以聊天方式開啟，或以其 CLI 在終端機中開啟。可隨時在兩者之間切換同一個工作階段。"
+
 msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
 msgstr "代理程式以聊天形式開啟，就像 T3 Code 的對話串一樣。可隨時把同一個工作階段切換到終端機裡的 CLI。"
 
@@ -3509,6 +3515,9 @@ msgstr "自動化需要Pro方案。"
 msgid "Automations, {myFailedCount} failing"
 msgstr "自動化，{myFailedCount}個失敗"
 
+msgid "Automations. Create them again in {companyName}"
+msgstr "自動化。請在 {companyName} 中重新建立"
+
 msgid "Autonomous"
 msgstr "自主"
 
@@ -4071,6 +4080,9 @@ msgstr "可以購買更多雲端 GB 小時嗎？"
 msgid "Can I create automations from a script?"
 msgstr "我可以用指令碼建立自動化嗎？"
 
+msgid "Can I keep using Orca?"
+msgstr "我還能繼續使用 Orca 嗎？"
+
 msgid "Can I keep using T3 Code?"
 msgstr "我還能繼續使用 T3 Code 嗎？"
 
@@ -4376,6 +4388,9 @@ msgstr "聊天介面"
 msgid "Chat name"
 msgstr "聊天名稱"
 
+msgid "Chat or terminal"
+msgstr "聊天或終端機"
+
 msgid "Chat session not found"
 msgstr "未找到聊天會話"
 
@@ -4384,6 +4399,9 @@ msgstr "聊天介面：訊息、推理、建議"
 
 msgid "Chat threads, with a built-in terminal"
 msgstr "聊天對話串，內建終端機"
+
+msgid "Chat UI or terminal for each agent"
+msgstr "每個代理程式可選聊天介面或終端機"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
@@ -4702,6 +4720,12 @@ msgstr "CLI文件"
 
 msgid "CLI reference"
 msgstr "CLI 參考文件"
+
+msgid "CLI, SDK and MCP"
+msgstr "CLI、SDK 和 MCP"
+
+msgid "CLI, TypeScript SDK, and MCP server"
+msgstr "CLI、TypeScript SDK 和 MCP 伺服器"
 
 msgid "click"
 msgstr "點選"
@@ -5640,6 +5664,9 @@ msgstr "貢獻"
 msgid "Control how your local machine is reachable from elsewhere"
 msgstr "控制這台機器如何從外部存取"
 
+msgid "Control workspaces and agents from scripts with the CLI, the TypeScript SDK, or the MCP server."
+msgstr "透過 CLI、TypeScript SDK 或 MCP 伺服器，用指令碼控制工作區和代理程式。"
+
 msgid "Controls when manually edited files are saved"
 msgstr "控制手動編輯的檔案何時儲存"
 
@@ -5657,6 +5684,9 @@ msgstr "轉為草稿"
 
 msgid "Convert your actions"
 msgstr "轉換你的動作"
+
+msgid "Convert your scripts"
+msgstr "轉換你的指令碼"
 
 msgid "Converting to draft…"
 msgstr "正在轉為草稿…"
@@ -8437,6 +8467,9 @@ msgstr "展開工作區"
 msgid "Experimental"
 msgstr "實驗功能"
 
+msgid "Experimental cloud VMs on your own provider"
+msgstr "在你自己的雲端供應商上執行的實驗性雲端虛擬機"
+
 msgid "Expired"
 msgstr "已過期"
 
@@ -9365,6 +9398,9 @@ msgstr "面向剛上手的個人使用者"
 
 msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
 msgstr "適用於 Apple Silicon 與 Intel 的 macOS。Linux AppImage 為實驗版本。"
+
+msgid "For Orca users"
+msgstr "適用於 Orca 使用者"
 
 msgid "For organizations with advanced needs"
 msgstr "面向有進階需求的組織"
@@ -10813,6 +10849,9 @@ msgstr "iOS 和 Android"
 msgid "iOS app"
 msgstr "iOS應用"
 
+msgid "iOS app and an Android APK, both in beta"
+msgstr "iOS 應用程式和 Android APK，皆為測試版"
+
 msgid "iOS app; cloud and experimental local Mac remote control"
 msgstr "iOS App；支援雲端與實驗性的本機 Mac 遠端控制"
 
@@ -10917,6 +10956,9 @@ msgstr "它可能已被刪除，或屬於另一個組織。"
 
 msgid "It must join again and pass its checks to merge."
 msgstr "要合併，它必須重新加入佇列並通過檢查。"
+
+msgid "It takes a few minutes, and you can keep Orca installed while you try it."
+msgstr "只需幾分鐘，試用期間可以保留已安裝的 Orca。"
 
 msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
 msgstr "只需幾分鐘，試用期間可以保留已安裝的 T3 Code。"
@@ -11098,6 +11140,9 @@ msgstr "繼續編輯"
 
 msgid "Keep paused"
 msgstr "保持暫停"
+
+msgid "Keep the worktrees you already have, and run your agents as a chat or in a terminal. Review, cloud and mobile are built in."
+msgstr "保留你已有的 worktree，以聊天方式或在終端機中執行代理程式。審查、雲端和行動裝置都已內建。"
 
 msgid "Keep typing an email to invite"
 msgstr "繼續輸入電子郵件以邀請"
@@ -11933,6 +11978,9 @@ msgstr "管理組織的品牌形象和成員。"
 msgid "Managed"
 msgstr "託管"
 
+msgid "Managed agent accounts in Orca. Sign in to each agent again"
+msgstr "Orca 中的受管理代理程式帳號。請重新登入每個代理程式"
+
 msgid "Managed by"
 msgstr "管理者"
 
@@ -12407,6 +12455,9 @@ msgstr "{name} 的更多選項"
 msgid "More pages"
 msgstr "更多頁面"
 
+msgid "More than 25 named agents"
+msgstr "超過 25 個具名代理程式"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "超過一半的合併變更由代理程式撰寫，且無任何人工修改。"
 
@@ -12441,6 +12492,9 @@ msgstr "把設定改成強制回應視窗，這樣大家不必離開工作區。
 msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
 msgstr "把 t3.json 中的動作移到 .paradev/config.json，或者請代理程式替你完成。"
 
+msgid "Move the scripts in orca.yaml to .paradev/config.json, or ask an agent to do it for you."
+msgstr "把 orca.yaml 中的指令碼移到 .paradev/config.json，或者請代理程式替你完成。"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "要將此工作區移至 {computerName} 嗎？"
 
@@ -12473,6 +12527,9 @@ msgstr "移動到分頁"
 
 msgid "Move your agents."
 msgstr "遷移你的代理程式。"
+
+msgid "Move your Orca worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "幾分鐘即可把你的 Orca worktree 和代理程式遷移到 {companyName}。免費且開源。"
 
 msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "幾分鐘即可把你的 T3 Code worktree 和代理程式遷移到 {companyName}。免費且開源。"
@@ -14616,6 +14673,17 @@ msgstr "或將 .env 內容貼到鍵輸入欄"
 msgid "Orange"
 msgstr "橙色"
 
+msgid "Orca details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Orca 的資訊來自其公開文件和程式碼儲存庫。查看<0>完整比較</0>。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca is a trademark of its owner. {0} is not affiliated with or endorsed by it."
+msgstr "Orca 是其擁有者的商標。{0} 與其無關聯，也未獲得其認可。"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Orca 的 worktree 就是普通的 Git worktree。{0} 會在原位置直接使用它們。"
+
 msgid "Orchestrate Parallel Agents"
 msgstr "編排並行代理程式"
 
@@ -15752,6 +15820,9 @@ msgstr "產品"
 
 msgid "Profile name"
 msgstr "配置檔名稱"
+
+msgid "Programmatic control"
+msgstr "程式化控制"
 
 msgid "Progress"
 msgstr "進度"
@@ -17736,6 +17807,9 @@ msgstr "安排會議"
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "定時和事件觸發的代理程式（cron、GitHub、Slack、Linear、Sentry、Notion、Microsoft Teams、webhook），並提供現成模板。"
 
+msgid "Scheduled automations"
+msgstr "排程自動化"
+
 msgid "Scheduled tasks and workflows. Create them again as automations"
 msgstr "排程工作和工作流程。請以自動化的形式重新建立"
 
@@ -18502,6 +18576,9 @@ msgstr "初始化"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "設定指令碼（轉換 conductor.json 之後）"
+
+msgid "Setup scripts, once you convert orca.yaml"
+msgstr "設定指令碼（轉換 orca.yaml 之後）"
 
 msgid "Setup scripts, once you convert t3.json"
 msgstr "設定指令碼（轉換 t3.json 之後）"
@@ -19816,6 +19893,9 @@ msgstr "持續性 · 30 天內的活躍天數"
 
 msgid "Switch account"
 msgstr "切換帳號"
+
+msgid "Switch from Orca to {companyName}"
+msgstr "從 Orca 切換到 {companyName}"
 
 msgid "Switch from T3 Code to {companyName}"
 msgstr "從 T3 Code 切換到 {companyName}"
@@ -23073,6 +23153,9 @@ msgstr "工作區已建立"
 msgid "Workspace details"
 msgstr "工作區詳細資料"
 
+msgid "Workspace details in Orca, like pins, comments and linked issues"
+msgstr "Orca 中的工作區資訊，例如釘選、留言和連結的 issue"
+
 msgid "Workspace ID copied"
 msgstr "已複製工作區ID"
 
@@ -23240,6 +23323,9 @@ msgstr "可以。應徵最適合的職位，並告訴我們你想做什麼。附
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "有。免費版面向個人，包含1個使用者、本地工作區、桌面應用程式和CLI。無需信用卡。"
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Do not delete an imported workspace in Orca, because that removes its folder."
+msgstr "可以。匯入的 worktree 留在原位置，所以兩個應用程式都能開啟它們。請不要在 Orca 中刪除已匯入的工作區，因為這會刪除它的資料夾。"
 
 msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
 msgstr "可以。匯入的 worktree 留在原位置，所以兩個應用程式都能開啟它們。請保持 T3 Code 的 worktree 清理功能關閉，以免它將其刪除。"
