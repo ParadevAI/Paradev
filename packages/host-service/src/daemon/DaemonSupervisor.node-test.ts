@@ -1005,6 +1005,52 @@ describe("trustd-degraded daemon heal", () => {
 		},
 	);
 
+	test(
+		"heals a daemon whose login session ended after it started",
+		darwinOnly,
+		async () => {
+			const orgId = "org-trustd-session-ended";
+			const socketPath = socketPathFor(orgId);
+			const shimDir = fs.mkdtempSync(path.join(os.tmpdir(), "trustd-shim-"));
+			const sessionEnded = path.join(shimDir, "session-ended");
+			fs.writeFileSync(
+				path.join(shimDir, "security"),
+				`#!/bin/sh\n[ -e "${sessionEnded}" ] && exit 1\nexit 0\n`,
+				{ mode: 0o755 },
+			);
+			const child = childProcess.spawn(
+				process.execPath,
+				[DAEMON_BUNDLE, `--socket=${socketPath}`],
+				{
+					detached: true,
+					stdio: "ignore",
+					env: { ...process.env, PATH: `${shimDir}:${process.env.PATH}` },
+				},
+			);
+			child.unref();
+			const daemonPid = child.pid as number;
+			strayPids.push(daemonPid);
+			assert.equal(await waitForSocket(socketPath, 5000), true);
+			await waitForTrustdReport(socketPath);
+			seedManifest(orgId, daemonPid, socketPath);
+			fs.writeFileSync(sessionEnded, "");
+
+			const sup = new DaemonSupervisor({
+				scriptPath: DAEMON_BUNDLE,
+				autoUpdate: false,
+			});
+			supervisorsToCleanup.push({ sup, orgId });
+			const instance = await sup.ensure(orgId);
+
+			assert.notEqual(
+				instance.pid,
+				daemonPid,
+				"daemon from the ended session must be replaced, not adopted",
+			);
+			assert.equal(isAlive(instance.pid), true, "fresh daemon not running");
+		},
+	);
+
 	test("adopts (never kills) a pre-probe daemon whose hello-ack lacks trustdHealthy", async () => {
 		// Pre-0.3.0 daemons don't probe — their hello-ack has no trustdHealthy.
 		// Unknown must not be treated as degraded: those daemons hold real

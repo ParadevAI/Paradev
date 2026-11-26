@@ -31,6 +31,11 @@ export interface HelloMessage {
 	type: "hello";
 	protocols: number[];
 	clientVersion?: string;
+	/**
+	 * Re-run the trustd probe before the hello-ack. A logout ends the daemon's
+	 * login session without restarting it, so the startup value can be stale.
+	 */
+	refreshTrustd?: boolean;
 }
 
 export interface HelloAckMessage {
@@ -47,7 +52,8 @@ export interface HelloAckMessage {
 	 * macOS only: whether the daemon's Mach bootstrap can reach `com.apple.trustd`
 	 * (Security-framework TLS trust evaluation). False means terminals it spawns
 	 * hit `gh: x509: OSStatus -26276`; the supervisor respawns such a daemon from
-	 * its own healthy context. Absent from pre-probe daemon versions.
+	 * its own healthy context. Absent from pre-probe daemon versions, and while
+	 * the probe has not finished.
 	 */
 	trustdHealthy?: boolean;
 	supportsModeSnapshots?: boolean;

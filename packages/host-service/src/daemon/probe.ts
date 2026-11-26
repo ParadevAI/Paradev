@@ -28,6 +28,7 @@ export function probeDaemonHello(
 	socketPath: string,
 	timeoutMs: number,
 	outcome?: ProbeAttemptOutcome,
+	refreshTrustd = false,
 ): Promise<DaemonProbeResult | null> {
 	return new Promise<DaemonProbeResult | null>((resolve) => {
 		const sock = net.createConnection({ path: socketPath });
@@ -74,6 +75,7 @@ export function probeDaemonHello(
 						type: "hello",
 						protocols: [CURRENT_PROTOCOL_VERSION],
 						clientVersion: "supervisor-probe",
+						refreshTrustd,
 					}),
 				);
 			} catch {

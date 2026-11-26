@@ -38,7 +38,6 @@ import {
 	Server,
 } from "@superset/pty-daemon";
 import type { HandoffMessage } from "@superset/pty-daemon/protocol";
-import { probeTrustdHealthy } from "@superset/pty-daemon/trustd-probe";
 
 interface CliArgs {
 	socket: string;
@@ -92,7 +91,7 @@ async function runFresh(): Promise<void> {
 	// Probe AFTER binding so a slow `security` can't delay the socket coming up
 	// (the supervisor has a socket-ready timeout). The value lands before the
 	// supervisor's adoption hello, which happens well after bind.
-	server.setTrustdHealthy(await probeTrustdHealthy());
+	await server.refreshTrustdHealthy();
 	process.stderr.write(
 		`[pty-daemon] listening on ${args.socket} (v${daemonVersion})\n`,
 	);
@@ -181,7 +180,7 @@ async function runHandoffReceiver(): Promise<void> {
 	wireShutdown(server);
 	// Probe only now: running it earlier would delay the upgrade-ack the
 	// predecessor is waiting on (and the socket bind).
-	server.setTrustdHealthy(await probeTrustdHealthy());
+	await server.refreshTrustdHealthy();
 	log(`bound and listening`);
 
 	clearSnapshot(snapshotPath);

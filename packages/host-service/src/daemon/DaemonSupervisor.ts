@@ -699,11 +699,11 @@ export class DaemonSupervisor {
 				this.kickoffAutoUpdate(organizationId, current);
 			}
 		}
-		// The daemon probes trustd AFTER binding, so a daemon adopted right
-		// after it started may not have self-reported yet. Fill in the value
-		// only while unknown — the reported value never changes after startup,
-		// so this can complete adoption-time triage late but can never turn
-		// into a mid-life kill of a long-adopted daemon.
+		// The adoption hello can come back without a trustd value: the daemon
+		// probes AFTER binding, and a slow fresh probe acks without one. Fill
+		// in the value only while unknown, so this can complete adoption-time
+		// triage late but can never turn into a mid-life kill of a
+		// long-adopted daemon.
 		if (
 			current.trustdHealthy === undefined &&
 			probe.trustdHealthy !== undefined
@@ -1011,6 +1011,7 @@ export class DaemonSupervisor {
 		const probe = await probeDaemonHelloWithRetry(
 			manifest.socketPath,
 			ADOPTION_PROBE_TOTAL_TIMEOUT_MS,
+			{ refreshTrustd: true },
 		);
 		if (!probe && !(await isSocketConnectable(manifest.socketPath, 1000))) {
 			// Nothing is even accepting on the socket. A live daemon keeps its
@@ -1086,6 +1087,7 @@ export class DaemonSupervisor {
 		let probe = await probeDaemonHelloWithRetry(
 			socketPath,
 			ADOPTION_PROBE_TOTAL_TIMEOUT_MS,
+			{ refreshTrustd: true },
 		);
 		if (!probe) {
 			// The listener was accepting a moment ago, so a silent probe most
@@ -1114,6 +1116,7 @@ export class DaemonSupervisor {
 				{
 					perAttemptTimeoutMs: ADOPTION_PROBE_LIVE_SOCKET_ATTEMPT_TIMEOUT_MS,
 					stopWhenNoListener: true,
+					refreshTrustd: true,
 				},
 			);
 		}
@@ -1579,6 +1582,8 @@ export async function probeDaemonHelloWithRetry(
 		 * is exactly the live daemon the escalation exists to protect.
 		 */
 		stopWhenNoListener?: boolean;
+		/** Ask the daemon to re-probe trustd; see `HelloMessage.refreshTrustd`. */
+		refreshTrustd?: boolean;
 	} = {},
 ): Promise<DaemonProbeResult | null> {
 	const perAttemptCap = options.perAttemptTimeoutMs ?? VERSION_PROBE_TIMEOUT_MS;
@@ -1587,7 +1592,12 @@ export async function probeDaemonHelloWithRetry(
 		const remaining = deadline - Date.now();
 		const perAttempt = Math.min(remaining, perAttemptCap);
 		const outcome: ProbeAttemptOutcome = {};
-		const probe = await probeDaemonHello(socketPath, perAttempt, outcome);
+		const probe = await probeDaemonHello(
+			socketPath,
+			perAttempt,
+			outcome,
+			options.refreshTrustd,
+		);
 		if (probe !== null) return probe;
 		if (options.stopWhenNoListener && outcome.noListener) return null;
 		await new Promise((r) => setTimeout(r, 50));
