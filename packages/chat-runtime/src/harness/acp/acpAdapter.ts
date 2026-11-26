@@ -642,7 +642,13 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	cancelTurn(): void {
-		if (!this.client || !this.sessionId) return;
+		if (!this.client || !this.sessionId) {
+			if (this.queuedPrompts.shift()) {
+				this.emitDroppedTurn();
+				this.emitSession({ status: "starting" });
+			}
+			return;
+		}
 		if (this.currentTurn?.status !== "running") return;
 		if (this.heldTurnId === this.currentTurn.id) {
 			this.heldTurnId = null;
@@ -663,6 +669,19 @@ export class AcpAdapter implements HarnessAdapter {
 		if (this.cancelPendingApprovals(turnId)) {
 			this.emitSession({ status: this.statusAfterApprovals() });
 		}
+	}
+
+	private emitDroppedTurn(): void {
+		const turn: Turn = {
+			id: this.mintId(),
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		};
+		this.emitTurn(turn, { duringQuietReplay: true });
+		this.emitTurn(
+			{ ...turn, status: "interrupted", completedAtMs: this.now() },
+			{ duringQuietReplay: true },
+		);
 	}
 
 	/** `session/cancel` would also stop the session's background workflows. */
@@ -1247,6 +1266,15 @@ export class AcpAdapter implements HarnessAdapter {
 			this.heldTurnId = null;
 			return;
 		}
+		let prompt: unknown[];
+		try {
+			prompt = await this.toAcpPrompt(content);
+		} catch (error) {
+			if (this.heldTurnId !== turnId) return;
+			this.heldTurnId = null;
+			this.failRefusedTurn(turnId, this.turnError(error));
+			return;
+		}
 		if (this.heldTurnId !== turnId) return;
 		this.heldTurnId = null;
 		const client = this.client;
@@ -1257,7 +1285,7 @@ export class AcpAdapter implements HarnessAdapter {
 		try {
 			const response = await client.request("session/prompt", {
 				sessionId: this.sessionId,
-				prompt: await this.toAcpPrompt(content),
+				prompt,
 			});
 			const parsed = acpPromptResponseSchema.safeParse(response).data;
 			if (
@@ -2848,7 +2876,7 @@ export class AcpAdapter implements HarnessAdapter {
 		return this.historyTurnId;
 	}
 
-	private emitTurn(turn: Turn): void {
+	private emitTurn(turn: Turn, { duringQuietReplay = false } = {}): void {
 		if (turn.status !== "running" || turn.id !== this.currentTurn?.id) {
 			this.cycleEnded = false;
 			this.steeredCyclePending = false;
@@ -2857,7 +2885,8 @@ export class AcpAdapter implements HarnessAdapter {
 			? { ...turn, sessionUsage: this.sessionUsage }
 			: turn;
 		this.currentTurn = next;
-		this.emit({ kind: "turn", turn: next });
+		if (duringQuietReplay) this.queue.push({ kind: "turn", turn: next });
+		else this.emit({ kind: "turn", turn: next });
 		this.syncAwaitingBackground();
 	}
 
