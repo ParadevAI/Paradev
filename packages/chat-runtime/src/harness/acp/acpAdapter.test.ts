@@ -3713,6 +3713,52 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("keeps a replayed reply in its own turn when a queued prompt is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => {
+				const transport = agent.transport(handlers);
+				return {
+					...transport,
+					send: (line) => {
+						if (!line.includes('"session/resume"')) transport.send(line);
+					},
+				};
+			},
+		});
+		const events: AdapterEvent[] = [];
+		void collect(
+			adapter.start({ cwd: "/work", resume: { harnessSessionId: "sess-1" } }),
+			events,
+		);
+		await flush(16);
+		agent.notify("sess-1", {
+			sessionUpdate: "user_message_chunk",
+			content: { type: "text", text: "old question" },
+		});
+		await flush(16);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			content: { type: "text", text: "old answer" },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "user_message_chunk",
+			content: { type: "text", text: "later question" },
+		});
+		await flush(16);
+
+		const [question, answer] = events.flatMap((event) =>
+			event.kind === "item" ? [event] : [],
+		);
+		expect(answer?.item.kind).toBe("agent_message");
+		expect(answer?.turnId).toBe(question?.turnId);
+
+		await adapter.dispose();
+	});
+
 	it("still reads as starting after a prompt queued during startup is cancelled", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(
