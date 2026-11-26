@@ -14,6 +14,7 @@ import { useUserPreferences } from "renderer/hooks/useUserPreferences/useUserPre
 import { useNavigateAwayFromWorkspace } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace";
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import { canSilentlyForceRetry } from "../../utils/canSilentlyForceRetry";
 
 interface UseDestroyDialogStateOptions {
 	workspaceId: string;
@@ -142,6 +143,7 @@ export function useDestroyDialogState({
 		}) => {
 			if (inFlight.current) return;
 			inFlight.current = true;
+			const inspectFinished = inspectState.status === "ready";
 
 			setError(null);
 			onOpenChange(false);
@@ -171,7 +173,7 @@ export function useDestroyDialogState({
 					// retry. Do NOT extend this to `in-progress` (that's a
 					// different CONFLICT cause; retrying just races the same
 					// guard).
-					if (e.kind === "conflict" && !force) {
+					if (canSilentlyForceRetry(e, { force, inspectFinished })) {
 						result = await destroy({ deleteBranch, force: true, skipTeardown });
 					} else {
 						throw firstErr;
@@ -187,7 +189,7 @@ export function useDestroyDialogState({
 				onDeleted?.();
 			} catch (err) {
 				const e = err as DestroyWorkspaceError;
-				if (e.kind === "teardown-failed") {
+				if (e.kind === "teardown-failed" || e.kind === "conflict") {
 					setError(e);
 					onOpenChange(true);
 				} else if (e.kind === "in-progress") {
@@ -219,6 +221,7 @@ export function useDestroyDialogState({
 		[
 			destroy,
 			deleteBranch,
+			inspectState.status,
 			workspaceName,
 			workspaceId,
 			onOpenChange,
@@ -235,7 +238,7 @@ export function useDestroyDialogState({
 	return {
 		deleteBranch,
 		setDeleteBranch,
-		hasChanges: preview?.hasChanges ?? false,
+		hasChanges: preview?.hasChanges === true || error?.kind === "conflict",
 		hasUnpushedCommits: preview?.hasUnpushedCommits ?? false,
 		sharesProjectCheckout:
 			preview?.canDelete === true && preview.sharesProjectCheckout === true,
