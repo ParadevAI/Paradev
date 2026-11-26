@@ -14,7 +14,7 @@
 		"@superset/shared": "workspace:*",
 		"@superset/trpc": "workspace:*",
 		"@trpc/client": "11.16.0",
-		"hono": "4.13.11",
+		"hono": "4.13.16",
 		"partyserver": "0.5.9",
 		"superjson": "2.2.6"
 	},
