@@ -247,9 +247,13 @@ describe("ClaudeAdapter", () => {
 
 	test("a Stop before the first token still ends the turn", async () => {
 		const harness = createHarness();
+		await tick();
 
 		harness.adapter.prompt([{ type: "text", text: "first" }]);
+		await tick();
 		harness.adapter.cancelTurn();
+		expect(harness.sent).toHaveLength(1);
+		expect(harness.interrupts).toBe(1);
 		harness.emit(result());
 
 		expect(await nextTurn(harness.iterator)).toMatchObject({
