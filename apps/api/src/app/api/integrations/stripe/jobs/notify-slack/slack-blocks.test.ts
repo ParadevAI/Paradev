@@ -177,75 +177,122 @@ describe("formatPlanChanged", () => {
 });
 
 describe("formatSubscriptionStarted", () => {
-	test("shows the signup date and first source", () => {
+	test("leads with who, plan and total, then source and signup", () => {
 		const blocks = formatSubscriptionStarted(createEnrichedSubscription(), {
 			signedUpAt: new Date("2026-11-20T23:30:00.000Z"),
-			firstSource: "chatgpt.com",
-		});
+			subscribedAt: new Date("2026-11-23T08:00:00.000Z"),
+			firstSource: "Google search",
+		}) as Array<{ fields?: Array<{ text: string }> }>;
 
-		const serializedBlocks = JSON.stringify(blocks);
-
-		expect(serializedBlocks).toContain(
-			"*Signed up:*\\n<!date^1795217400^{date_short}|2026-11-20>",
-		);
-		expect(serializedBlocks).toContain("*First source:*\\nchatgpt.com");
+		expect(blocks[1]?.fields?.map((field) => field.text)).toEqual([
+			"*Organization:*\nAcme",
+			"*Email:*\nfounder@acme.com",
+			"*Plan:*\nPro · monthly · 3 seats",
+			"*Total:*\n$60.00/mo",
+			"*First source:*\nGoogle search",
+			"*Signed up:*\n<!date^1795217400^{date_short}|2026-11-20> · subscribed 2 days later",
+			"*Price:*\n$20.00/seat/mo",
+			"*Discount:*\nNone",
+		]);
 	});
 
-	test("shows Unknown when the subscriber profile is missing", () => {
+	test("shows Unknown when the signup date is missing", () => {
 		const blocks = formatSubscriptionStarted(createEnrichedSubscription(), {
 			signedUpAt: null,
-			firstSource: null,
+			subscribedAt: new Date("2026-11-23T08:00:00.000Z"),
+			firstSource: "Unknown",
 		});
 
-		const serializedBlocks = JSON.stringify(blocks);
-
-		expect(serializedBlocks).toContain("*Signed up:*\\nUnknown");
-		expect(serializedBlocks).toContain("*First source:*\\nUnknown");
+		expect(JSON.stringify(blocks)).toContain("*Signed up:*\\nUnknown");
 	});
 });
 
 describe("firstSourceFromPersonProperties", () => {
-	test("prefers the first UTM source over the referring domain", () => {
-		expect(
-			firstSourceFromPersonProperties({
+	test.each([
+		[
+			"a search referrer with its landing page",
+			{
+				$initial_referring_domain: "www.google.com",
+				$initial_current_url: "https://paradev.com/compare/herdr-alternative",
+			},
+			"Google search → paradev.com/compare/herdr-alternative",
+		],
+		[
+			"the UTM source ahead of the referrer",
+			{
 				$initial_utm_source: "chatgpt.com",
 				$initial_referring_domain: "$direct",
 				$initial_current_url: "https://paradev.com/",
-			}),
-		).toBe("chatgpt.com");
-	});
-
-	test("labels a direct first visit and adds the self-reported source", () => {
-		expect(
-			firstSourceFromPersonProperties({
+			},
+			"ChatGPT",
+		],
+		[
+			"UTM medium and campaign",
+			{
+				$initial_utm_source: "reddit",
+				$initial_utm_medium: "cpc",
+				$initial_utm_campaign: "launch",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"reddit (cpc, launch)",
+		],
+		[
+			"a Google ad click",
+			{
+				$initial_gclid: "abc",
+				$initial_referring_domain: "www.google.com",
+				$initial_current_url: "https://paradev.com/?gclid=abc",
+			},
+			"Google ad",
+		],
+		[
+			"GitHub as a real source on a marketing page",
+			{
+				$initial_referring_domain: "github.com",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"GitHub",
+		],
+		[
+			"a direct visit with the self-reported answer",
+			{
 				$initial_referring_domain: "$direct",
 				$initial_current_url: "https://paradev.com/",
 				acquisition_source: "friend_or_colleague",
-			}),
-		).toBe("Direct (self-reported: Friend or colleague)");
-	});
-
-	test("ignores sign-in redirects, our own sites and app-only first visits", () => {
-		for (const properties of [
+			},
+			"Direct · said: Friend or colleague",
+		],
+		[
+			"a sign-in redirect as unknown",
 			{
-				$initial_referring_domain: "accounts.google.com",
+				$initial_referring_domain: "github.com",
 				$initial_current_url: "https://app.paradev.com/auth/desktop/success",
 			},
+			"Unknown (first seen in the app)",
+		],
+		[
+			"a direct first visit to the app as unknown",
 			{
-				$initial_referring_domain: "paradev.com",
-				$initial_current_url: "https://app.paradev.com/sign-in",
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "https://app.superset.sh/sign-in",
 			},
+			"Unknown (first seen in the app)",
+		],
+		[
+			"a desktop-only first visit as unknown",
 			{
 				$initial_referring_domain: "$direct",
 				$initial_current_url: "file:///Applications/Paradev.app/index.html",
 			},
-		]) {
-			expect(firstSourceFromPersonProperties(properties)).toBeNull();
-		}
+			"Unknown (first seen in the app)",
+		],
+	])("reads %s", (_name, properties, expected) => {
+		expect(firstSourceFromPersonProperties(properties)).toBe(expected);
 	});
 
-	test("returns null when the person has no source properties", () => {
-		expect(firstSourceFromPersonProperties({})).toBeNull();
-		expect(firstSourceFromPersonProperties(null)).toBeNull();
+	test("says when the person has no analytics profile", () => {
+		expect(firstSourceFromPersonProperties(null)).toBe(
+			"Unknown (no analytics profile)",
+		);
 	});
 });

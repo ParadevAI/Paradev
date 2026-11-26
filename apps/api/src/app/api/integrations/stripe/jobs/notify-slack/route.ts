@@ -95,6 +95,7 @@ const payloadSchema = z.discriminatedUnion("eventType", [
 interface EnrichedSubscriptionWithSubscriber extends EnrichedSubscription {
 	organizationId: string;
 	initiatedByUserId: string | null;
+	subscribedAt: Date;
 }
 
 async function enrichFromSubscription(
@@ -133,6 +134,7 @@ async function enrichFromSubscription(
 	return {
 		organizationId: org.id,
 		initiatedByUserId: stripeSub.metadata?.userId ?? null,
+		subscribedAt: new Date(stripeSub.created * 1000),
 		organizationName: org.name,
 		planName: planLabel(
 			planTier && planTier !== "free" ? planTier : dbSub?.plan,
@@ -162,33 +164,34 @@ async function firstOwnerId(organizationId: string): Promise<string | null> {
 	return owner?.userId ?? null;
 }
 
-async function subscriberProfile(
-	organizationId: string,
-	initiatedByUserId: string | null,
-): Promise<SubscriberProfile> {
-	const unknown = { signedUpAt: null, firstSource: null };
+async function subscriberProfile({
+	organizationId,
+	initiatedByUserId,
+	subscribedAt,
+}: EnrichedSubscriptionWithSubscriber): Promise<SubscriberProfile> {
+	const unknown = { signedUpAt: null, subscribedAt, firstSource: "Unknown" };
 	try {
 		const userId = initiatedByUserId ?? (await firstOwnerId(organizationId));
 		if (!userId) return unknown;
 
-		const [user, personProperties] = await Promise.all([
+		const [user, firstSource] = await Promise.all([
 			db.query.users.findFirst({
 				where: eq(authSchema.users.id, userId),
 				columns: { createdAt: true },
 			}),
-			getPostHogPersonProperties(userId).catch((error) => {
-				console.error(
-					`[stripe/notify-slack] Failed to read PostHog person ${userId}:`,
-					error,
-				);
-				return null;
-			}),
+			getPostHogPersonProperties(userId).then(
+				firstSourceFromPersonProperties,
+				(error) => {
+					console.error(
+						`[stripe/notify-slack] Failed to read PostHog person ${userId}:`,
+						error,
+					);
+					return "Unknown (lookup failed)";
+				},
+			),
 		]);
 
-		return {
-			signedUpAt: user?.createdAt ?? null,
-			firstSource: firstSourceFromPersonProperties(personProperties),
-		};
+		return { signedUpAt: user?.createdAt ?? null, subscribedAt, firstSource };
 	} catch (error) {
 		console.error(
 			"[stripe/notify-slack] Failed to read subscriber profile:",
@@ -267,10 +270,7 @@ export async function POST(request: Request) {
 		case "subscription_started":
 			blocks = formatSubscriptionStarted(
 				enriched,
-				await subscriberProfile(
-					enriched.organizationId,
-					enriched.initiatedByUserId,
-				),
+				await subscriberProfile(enriched),
 			);
 			break;
 		case "subscription_cancelled": {
