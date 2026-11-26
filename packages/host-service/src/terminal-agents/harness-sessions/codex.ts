@@ -42,7 +42,10 @@ function codexHome(env: HarnessEnv): string {
 function findRollout(
 	home: string,
 	sessionId: string,
-	{ compressed }: { compressed: boolean },
+	{
+		compressed,
+		maxDirs = MAX_DIRS_VISITED,
+	}: { compressed: boolean; maxDirs?: number },
 ): { path: string | null; complete: boolean } {
 	const root = join(home, "sessions");
 	if (!existsSync(root)) return { path: null, complete: false };
@@ -52,7 +55,7 @@ function findRollout(
 	const stack = [root];
 	let visited = 0;
 	while (stack.length > 0) {
-		if (visited++ >= MAX_DIRS_VISITED) return { path: null, complete: false };
+		if (visited++ >= maxDirs) return { path: null, complete: false };
 		const dir = stack.pop() as string;
 		const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
 			b.name.localeCompare(a.name),
@@ -132,13 +135,13 @@ export const codexSessionFiles: HarnessSessionFiles = {
 	parseTurns,
 };
 
-export const codexSessionStore: HarnessSessionStore = {
+export const codexSessionStore = {
 	/** Only the launch env's home: that is where a relaunch will look. */
-	hasSession({ sessionId, env }) {
+	hasSession({ sessionId, env }, maxDirs = MAX_DIRS_VISITED) {
 		const home = codexHome(env);
 		if (!existsSync(join(home, "sessions"))) return null;
-		const search = findRollout(home, sessionId, { compressed: true });
+		const search = findRollout(home, sessionId, { compressed: true, maxDirs });
 		if (search.path) return true;
 		return search.complete ? false : null;
 	},
-};
+} satisfies HarnessSessionStore;
