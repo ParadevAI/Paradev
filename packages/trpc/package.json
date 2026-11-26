@@ -160,6 +160,10 @@
 			"types": "./src/router/agent/routines.ts",
 			"default": "./src/router/agent/routines.ts"
 		},
+		"./posthog-persons": {
+			"types": "./src/lib/posthog-persons.ts",
+			"default": "./src/lib/posthog-persons.ts"
+		},
 		"./plugins-proxy": {
 			"types": "./src/router/plugins/proxy/index.ts",
 			"default": "./src/router/plugins/proxy/index.ts"

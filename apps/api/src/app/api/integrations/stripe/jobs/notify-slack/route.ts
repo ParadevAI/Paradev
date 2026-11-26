@@ -2,7 +2,8 @@ import { organizationBilling, seatItem } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import * as authSchema from "@superset/db/schema/auth";
-import { eq } from "drizzle-orm";
+import { getPostHogPersonProperties } from "@superset/trpc/posthog-persons";
+import { and, asc, eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { z } from "zod";
 
@@ -11,6 +12,7 @@ import { verifyQstashRequest } from "@/lib/verifyQstash";
 
 import {
 	type EnrichedSubscription,
+	firstSourceFromPersonProperties,
 	formatPaymentFailed,
 	formatPaymentSucceeded,
 	formatPlanChanged,
@@ -21,6 +23,7 @@ import {
 	getDiscountInfo,
 	type PreviousPlan,
 	planLabel,
+	type SubscriberProfile,
 } from "./slack-blocks";
 
 // --- QStash verification ---
@@ -89,9 +92,15 @@ const payloadSchema = z.discriminatedUnion("eventType", [
 
 // --- Enrichment ---
 
+interface EnrichedSubscriptionWithSubscriber extends EnrichedSubscription {
+	organizationId: string;
+	initiatedByUserId: string | null;
+	subscribedAt: Date;
+}
+
 async function enrichFromSubscription(
 	stripeSubscriptionId: string,
-): Promise<EnrichedSubscription | null> {
+): Promise<EnrichedSubscriptionWithSubscriber | null> {
 	const stripeSub = await stripeClient.subscriptions.retrieve(
 		stripeSubscriptionId,
 		{ expand: ["discounts.source.coupon", "customer"] },
@@ -123,6 +132,9 @@ async function enrichFromSubscription(
 	const interval = price?.recurring?.interval === "year" ? "yearly" : "monthly";
 
 	return {
+		organizationId: org.id,
+		initiatedByUserId: stripeSub.metadata?.userId ?? null,
+		subscribedAt: new Date(stripeSub.created * 1000),
 		organizationName: org.name,
 		planName: planLabel(
 			planTier && planTier !== "free" ? planTier : dbSub?.plan,
@@ -138,6 +150,63 @@ async function enrichFromSubscription(
 		cancellationDetails: stripeSub.cancellation_details,
 		customerEmail: customer && !customer.deleted ? customer.email : null,
 	};
+}
+
+async function firstOwnerId(organizationId: string): Promise<string | null> {
+	const owner = await db.query.members.findFirst({
+		where: and(
+			eq(authSchema.members.organizationId, organizationId),
+			eq(authSchema.members.role, "owner"),
+		),
+		orderBy: asc(authSchema.members.createdAt),
+		columns: { userId: true },
+	});
+	return owner?.userId ?? null;
+}
+
+async function subscriberProfile({
+	organizationId,
+	initiatedByUserId,
+	subscribedAt,
+}: EnrichedSubscriptionWithSubscriber): Promise<SubscriberProfile> {
+	const unknown = { signedUpAt: null, subscribedAt, firstSource: "Unknown" };
+	try {
+		const userId = initiatedByUserId ?? (await firstOwnerId(organizationId));
+		if (!userId) return unknown;
+
+		const [user, firstSource] = await Promise.all([
+			db.query.users
+				.findFirst({
+					where: eq(authSchema.users.id, userId),
+					columns: { createdAt: true },
+				})
+				.catch((error) => {
+					console.error(
+						`[stripe/notify-slack] Failed to read user ${userId}:`,
+						error,
+					);
+					return null;
+				}),
+			getPostHogPersonProperties(userId).then(
+				firstSourceFromPersonProperties,
+				(error) => {
+					console.error(
+						`[stripe/notify-slack] Failed to read PostHog person ${userId}:`,
+						error,
+					);
+					return "Unknown (lookup failed)";
+				},
+			),
+		]);
+
+		return { signedUpAt: user?.createdAt ?? null, subscribedAt, firstSource };
+	} catch (error) {
+		console.error(
+			"[stripe/notify-slack] Failed to read subscriber profile:",
+			error,
+		);
+		return unknown;
+	}
 }
 
 async function previousPlanFromPrice(
@@ -207,7 +276,10 @@ export async function POST(request: Request) {
 
 	switch (payload.eventType) {
 		case "subscription_started":
-			blocks = formatSubscriptionStarted(enriched);
+			blocks = formatSubscriptionStarted(
+				enriched,
+				await subscriberProfile(enriched),
+			);
 			break;
 		case "subscription_cancelled": {
 			// Prefer fresh fields: the portal attaches feedback after the queued webhook snapshot

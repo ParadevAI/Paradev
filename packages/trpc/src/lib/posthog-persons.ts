@@ -38,3 +38,23 @@ export async function deletePostHogPerson(distinctId: string): Promise<void> {
 		);
 	}
 }
+
+export async function getPostHogPersonProperties(
+	distinctId: string,
+): Promise<Record<string, unknown> | null> {
+	const response = await fetchWithTimeout(
+		`${env.POSTHOG_API_HOST}/api/projects/${env.POSTHOG_PROJECT_ID}/persons/?distinct_id=${encodeURIComponent(distinctId)}`,
+		{ headers: { Authorization: `Bearer ${env.POSTHOG_API_KEY}` } },
+	);
+
+	if (!response.ok) {
+		throw new Error(
+			`PostHog person lookup error: ${response.status} - ${await response.text()}`,
+		);
+	}
+
+	const data = (await response.json()) as {
+		results?: Array<{ properties?: Record<string, unknown> }>;
+	};
+	return data.results?.[0]?.properties ?? null;
+}
