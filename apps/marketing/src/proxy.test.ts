@@ -58,8 +58,25 @@ describe("proxy", () => {
 	test("serves canonical paths without a redirect", async () => {
 		expect((await run("/careers")).rewrite).toBe("/en/careers");
 		expect(await run("/zh-CN/careers")).toMatchObject({
-			status: undefined,
 			location: undefined,
+			rewrite: undefined,
 		});
+	});
+
+	test("records the consent region from the visitor's country", () => {
+		const region = (country: string | null, cookie?: string) => {
+			const headers = new Headers();
+			if (country) headers.set("x-vercel-ip-country", country);
+			if (cookie) headers.set("cookie", `paradev-consent-region=${cookie}`);
+			return proxy(
+				new NextRequest(`${ORIGIN}/pricing`, { headers }),
+			).cookies.get("paradev-consent-region")?.value;
+		};
+		expect(region("DE")).toBe("opt-in");
+		expect(region("gb")).toBe("opt-in");
+		expect(region("CH")).toBe("opt-out");
+		expect(region("US")).toBe("opt-out");
+		expect(region("US", "opt-in")).toBe("opt-out");
+		expect(region("US", "opt-out")).toBeUndefined();
 	});
 });

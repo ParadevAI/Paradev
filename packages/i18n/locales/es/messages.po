@@ -5645,6 +5645,9 @@ msgstr "Convertir en borrador"
 msgid "Converting to draft…"
 msgstr "Convirtiendo en borrador…"
 
+msgid "Cookie settings"
+msgstr "Configuración de cookies"
+
 msgid "cookies and site data"
 msgstr "cookies y datos de sitios"
 
@@ -7023,6 +7026,9 @@ msgstr "Depurar ejecuciones fallidas y volver a ejecutar funciones"
 
 msgid "Debug with production stack traces"
 msgstr "Depura con stack traces de producción"
+
+msgid "Decline"
+msgstr "Rechazar"
 
 msgid "default"
 msgstr "predeterminada"
@@ -22595,14 +22601,14 @@ msgstr "No pronosticamos autonomía total en 2026 ni en 2027. Las incógnitas ho
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Encontramos {hostName}. Activa allí el acceso remoto para terminar."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Solo recopilamos cookies de analítica para mejorar tu experiencia."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Cerramos una ronda semilla de {amount} para ayudarte a ejecutar un ejército de agentes de programación."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Enviamos el enlace de descarga a {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Usamos cookies para analítica y para medir nuestros anuncios."
 
 msgid "We'll be in touch shortly."
 msgstr "Nos pondremos en contacto en breve."

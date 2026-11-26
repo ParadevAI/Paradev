@@ -5645,6 +5645,9 @@ msgstr "Перевести в черновик"
 msgid "Converting to draft…"
 msgstr "Перевод в черновик…"
 
+msgid "Cookie settings"
+msgstr "Настройки cookies"
+
 msgid "cookies and site data"
 msgstr "cookies и данные сайтов"
 
@@ -7023,6 +7026,9 @@ msgstr "Отладка сбойных запусков и повторный з�
 
 msgid "Debug with production stack traces"
 msgstr "Отладка по стек-трейсам из продакшена"
+
+msgid "Decline"
+msgstr "Отклонить"
 
 msgid "default"
 msgstr "по умолчанию"
@@ -22595,14 +22601,14 @@ msgstr "Мы не прогнозируем полную автономность
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Мы нашли {hostName}. Включите на нём удалённый доступ, чтобы завершить."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Мы собираем только аналитические cookies, чтобы улучшать ваш опыт."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Мы привлекли {amount} в посевном раунде, чтобы помочь вам запускать целую армию агентов для программирования."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Мы отправили ссылку на скачивание на {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Мы используем cookies для аналитики и измерения эффективности рекламы."
 
 msgid "We'll be in touch shortly."
 msgstr "Скоро свяжемся."

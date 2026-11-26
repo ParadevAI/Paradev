@@ -1,0 +1,1 @@
+export { CookieSettingsButton } from "./CookieSettingsButton";

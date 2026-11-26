@@ -1,9 +1,8 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 
 import { env } from "@/env";
-import { declineAnalytics } from "@/lib/analytics/decline";
+import { canTrack, onConsentChange } from "@/lib/analytics/consent";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
-import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
 
 // posthog-js and @sentry/nextjs together add ~200KiB to the initial bundle,
 // which tanks the Lighthouse LCP on throttled mobile. Both are dynamically
@@ -15,8 +14,11 @@ type SentryClient = typeof import("@sentry/nextjs");
 
 let sentryClient: SentryClient | null = null;
 let started = false;
+let posthogStarted = false;
 
 async function initPosthog() {
+	if (posthogStarted || !canTrack()) return;
+	posthogStarted = true;
 	const { default: posthog } = await import("posthog-js");
 
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
@@ -33,12 +35,6 @@ async function initPosthog() {
 		persistence: "cookie",
 		persistence_name: POSTHOG_COOKIE_NAME,
 		disable_session_recording: true,
-		loaded: (posthog) => {
-			const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
-			if (consent === "declined") {
-				declineAnalytics(posthog);
-			}
-		},
 	});
 
 	posthog.register({
@@ -87,6 +83,7 @@ function start() {
 	started = true;
 	void initPosthog();
 	void initSentry();
+	onConsentChange(() => void initPosthog());
 }
 
 function scheduleIdle() {

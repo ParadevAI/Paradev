@@ -1,4 +1,4 @@
-import { hasDeclinedAnalytics } from "./consent";
+import { canTrack } from "./consent";
 import {
 	EXTERNAL_TRACKING_ID,
 	type ExternalTrackingContext,
@@ -11,7 +11,7 @@ type Fetch = (
 
 export function createConsentAwareTrackingFetch(
 	fetch: Fetch,
-	hasDeclined = hasDeclinedAnalytics,
+	hasDeclined = () => !canTrack(),
 	onInitialize: (context: ExternalTrackingContext) => void = () => {},
 ): Fetch {
 	return async (input, init) => {

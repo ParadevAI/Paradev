@@ -5645,6 +5645,9 @@ msgstr "Zamień na wersję roboczą"
 msgid "Converting to draft…"
 msgstr "Zamienianie na wersję roboczą…"
 
+msgid "Cookie settings"
+msgstr "Ustawienia plików cookie"
+
 msgid "cookies and site data"
 msgstr "cookies i dane witryn"
 
@@ -7023,6 +7026,9 @@ msgstr "Debuguj nieudane uruchomienia i uruchamiaj funkcje ponownie"
 
 msgid "Debug with production stack traces"
 msgstr "Debuguj ze śladami stosu z produkcji"
+
+msgid "Decline"
+msgstr "Odrzuć"
 
 msgid "default"
 msgstr "domyślna"
@@ -22595,14 +22601,14 @@ msgstr "Nie prognozujemy pełnej autonomii w 2026 ani 2027 roku. Uczciwe niewiad
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Znaleźliśmy {hostName}. Włącz tam dostęp zdalny, aby dokończyć."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Zbieramy wyłącznie analityczne pliki cookie, aby ulepszać Twoje doświadczenie."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Pozyskaliśmy {amount} w rundzie seed, aby pomóc Ci uruchomić armię agentów kodujących."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Wysłaliśmy link do pobrania na {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Używamy plików cookie do analityki i pomiaru reklam."
 
 msgid "We'll be in touch shortly."
 msgstr "Wkrótce się odezwiemy."

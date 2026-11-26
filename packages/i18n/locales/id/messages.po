@@ -5645,6 +5645,9 @@ msgstr "Ubah menjadi draf"
 msgid "Converting to draft…"
 msgstr "Mengubah menjadi draf…"
 
+msgid "Cookie settings"
+msgstr "Pengaturan cookie"
+
 msgid "cookies and site data"
 msgstr "cookie dan data situs"
 
@@ -7023,6 +7026,9 @@ msgstr "Debug run yang gagal dan jalankan ulang fungsi"
 
 msgid "Debug with production stack traces"
 msgstr "Debug dengan stack trace produksi"
+
+msgid "Decline"
+msgstr "Tolak"
 
 msgid "default"
 msgstr "bawaan"
@@ -22595,14 +22601,14 @@ msgstr "Kami tidak memperkirakan full self-driving pada 2026 atau 2027. Yang juj
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Kami menemukan {hostName}. Aktifkan Akses Jarak Jauh di sana untuk menyelesaikan."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Kami hanya mengumpulkan cookie analitik agar bisa meningkatkan pengalaman Anda."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Kami meraih pendanaan seed sebesar {amount} untuk membantu Anda menjalankan pasukan agen coding."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Kami mengirim tautan unduhan ke {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Kami menggunakan cookie untuk analitik dan pengukuran iklan."
 
 msgid "We'll be in touch shortly."
 msgstr "Kami akan segera menghubungi Anda."

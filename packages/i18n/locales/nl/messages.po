@@ -5645,6 +5645,9 @@ msgstr "Omzetten naar concept"
 msgid "Converting to draft…"
 msgstr "Omzetten naar concept…"
 
+msgid "Cookie settings"
+msgstr "Cookie-instellingen"
+
 msgid "cookies and site data"
 msgstr "cookies en sitegegevens"
 
@@ -7023,6 +7026,9 @@ msgstr "Mislukte runs debuggen en functies opnieuw uitvoeren"
 
 msgid "Debug with production stack traces"
 msgstr "Debug met stack traces uit productie"
+
+msgid "Decline"
+msgstr "Weigeren"
 
 msgid "default"
 msgstr "standaard"
@@ -22595,14 +22601,14 @@ msgstr "We voorspellen geen volledige zelfsturing in 2026 of 2027. De eerlijke o
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "We hebben {hostName} gevonden. Zet daar externe toegang aan om af te ronden."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "We verzamelen alleen analytische cookies zodat we je ervaring kunnen verbeteren."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "We hebben een seedronde van {amount} opgehaald om je te helpen een leger aan codeeragents in te zetten."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "We hebben de downloadlink naar {submittedEmail} gestuurd."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "We gebruiken cookies voor analyse en om onze advertenties te meten."
 
 msgid "We'll be in touch shortly."
 msgstr "We nemen snel contact op."

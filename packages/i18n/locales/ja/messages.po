@@ -5645,6 +5645,9 @@ msgstr "ドラフトに変換"
 msgid "Converting to draft…"
 msgstr "ドラフトに変換しています…"
 
+msgid "Cookie settings"
+msgstr "Cookie 設定"
+
 msgid "cookies and site data"
 msgstr "Cookieとサイトデータ"
 
@@ -7023,6 +7026,9 @@ msgstr "失敗した実行のデバッグと関数の再実行"
 
 msgid "Debug with production stack traces"
 msgstr "本番のスタックトレースでデバッグ"
+
+msgid "Decline"
+msgstr "拒否"
 
 msgid "default"
 msgstr "デフォルト"
@@ -22595,14 +22601,14 @@ msgstr "2026年や2027年に完全自動運転が実現するとは予測して�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "{hostName}が見つかりました。そちらでリモートアクセスをオンにすると完了です。"
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "体験を改善するため、分析用のCookieのみを収集しています。"
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "コーディングエージェント軍団を動かせるよう、シードラウンドで {amount} を調達しました。"
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "{submittedEmail}にダウンロードリンクを送信しました。"
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "分析と広告効果の測定にCookieを使用しています。"
 
 msgid "We'll be in touch shortly."
 msgstr "折り返しご連絡します。"

@@ -5645,6 +5645,9 @@ msgstr "초안으로 전환"
 msgid "Converting to draft…"
 msgstr "초안으로 전환하는 중…"
 
+msgid "Cookie settings"
+msgstr "쿠키 설정"
+
 msgid "cookies and site data"
 msgstr "쿠키 및 사이트 데이터"
 
@@ -7023,6 +7026,9 @@ msgstr "실패한 실행 디버그 및 함수 재실행"
 
 msgid "Debug with production stack traces"
 msgstr "프로덕션 스택 트레이스로 디버깅"
+
+msgid "Decline"
+msgstr "거부"
 
 msgid "default"
 msgstr "기본"
@@ -22595,14 +22601,14 @@ msgstr "2026년이나 2027년에 완전 자율 주행이 실현되리라고 예�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "{hostName}을(를) 찾았습니다. 거기에서 원격 액세스를 켜면 완료됩니다."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "사용 경험 개선을 위한 분석 쿠키만 수집합니다."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "코딩 에이전트 군단을 운영할 수 있도록 {amount} 규모의 시드 라운드 투자를 유치했습니다."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "{submittedEmail}으로 다운로드 링크를 보냈습니다."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "분석과 광고 성과 측정을 위해 쿠키를 사용합니다."
 
 msgid "We'll be in touch shortly."
 msgstr "곧 연락드리겠습니다."

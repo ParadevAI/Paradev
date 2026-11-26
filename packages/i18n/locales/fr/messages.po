@@ -5645,6 +5645,9 @@ msgstr "Convertir en brouillon"
 msgid "Converting to draft…"
 msgstr "Conversion en brouillon…"
 
+msgid "Cookie settings"
+msgstr "Paramètres des cookies"
+
 msgid "cookies and site data"
 msgstr "cookies et données de site"
 
@@ -7023,6 +7026,9 @@ msgstr "Déboguer les exécutions en échec et relancer les fonctions"
 
 msgid "Debug with production stack traces"
 msgstr "Déboguer avec les stack traces de production"
+
+msgid "Decline"
+msgstr "Refuser"
 
 msgid "default"
 msgstr "par défaut"
@@ -22595,14 +22601,14 @@ msgstr "Nous ne prévoyons pas d'autonomie complète en 2026 ni en 2027. Les vra
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Nous avons trouvé {hostName}. Activez-y l'accès distant pour terminer."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Nous ne collectons que des cookies analytiques, afin d'améliorer votre expérience."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Nous avons levé {amount} en seed pour vous aider à lancer une armée d’agents de code."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Nous avons envoyé le lien de téléchargement à {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Nous utilisons des cookies pour l'analyse d'audience et la mesure de nos publicités."
 
 msgid "We'll be in touch shortly."
 msgstr "Nous vous recontacterons rapidement."

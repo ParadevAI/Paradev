@@ -5645,6 +5645,9 @@ msgstr "轉為草稿"
 msgid "Converting to draft…"
 msgstr "正在轉為草稿…"
 
+msgid "Cookie settings"
+msgstr "Cookie 設定"
+
 msgid "cookies and site data"
 msgstr "Cookie和站點資料"
 
@@ -7023,6 +7026,9 @@ msgstr "除錯失敗的執行並重新執行函式"
 
 msgid "Debug with production stack traces"
 msgstr "用正式環境堆疊追蹤除錯"
+
+msgid "Decline"
+msgstr "拒絕"
 
 msgid "default"
 msgstr "預設"
@@ -22595,14 +22601,14 @@ msgstr "我們不預測2026或2027年實現完全自動駕駛。誠實地講，�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "已找到{hostName}。在那台電腦上開啟遠端存取即可完成。"
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "我們只收集分析類cookie，用於改進你的使用體驗。"
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "我們完成了 {amount} 種子輪募資，幫你調動一支程式代理程式大軍。"
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下載連結已傳送至{submittedEmail}。"
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "我們使用cookie進行分析和廣告成效衡量。"
 
 msgid "We'll be in touch shortly."
 msgstr "我們會盡快與你聯絡。"

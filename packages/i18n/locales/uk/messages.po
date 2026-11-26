@@ -5639,6 +5639,9 @@ msgstr "Перетворити на чернетку"
 msgid "Converting to draft…"
 msgstr "Перетворення на чернетку…"
 
+msgid "Cookie settings"
+msgstr "Налаштування файлів cookie"
+
 msgid "cookies and site data"
 msgstr "файли cookie та дані сайтів"
 
@@ -7017,6 +7020,9 @@ msgstr "Налагодження невдалих запусків і повто
 
 msgid "Debug with production stack traces"
 msgstr "Налагодження за стек-трейсами з продакшену"
+
+msgid "Decline"
+msgstr "Відхилити"
 
 msgid "default"
 msgstr "за замовчуванням"
@@ -22589,14 +22595,14 @@ msgstr "Ми не прогнозуємо повної автономності �
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Ми знайшли {hostName}. Увімкніть там віддалений доступ, щоб завершити."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Ми збираємо лише аналітичні файли cookie, щоб покращувати ваш досвід."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Ми залучили {amount} у seed-раунді, щоб допомогти вам керувати цілою армією кодинг-агентів."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Ми надіслали посилання для завантаження на {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Ми використовуємо файли cookie для аналітики та вимірювання ефективності реклами."
 
 msgid "We'll be in touch shortly."
 msgstr "Ми скоро з вами зв'яжемося."

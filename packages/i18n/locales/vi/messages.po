@@ -5645,6 +5645,9 @@ msgstr "Chuyển thành bản nháp"
 msgid "Converting to draft…"
 msgstr "Đang chuyển thành bản nháp…"
 
+msgid "Cookie settings"
+msgstr "Cài đặt cookie"
+
 msgid "cookies and site data"
 msgstr "cookie và dữ liệu trang"
 
@@ -7023,6 +7026,9 @@ msgstr "Gỡ lỗi các lần chạy thất bại và chạy lại hàm"
 
 msgid "Debug with production stack traces"
 msgstr "Gỡ lỗi bằng stack trace từ production"
+
+msgid "Decline"
+msgstr "Từ chối"
 
 msgid "default"
 msgstr "mặc định"
@@ -22595,14 +22601,14 @@ msgstr "Chúng tôi không dự báo tự vận hành hoàn toàn vào năm 2026
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Đã tìm thấy {hostName}. Bật Truy cập từ xa trên máy đó để hoàn tất."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Chúng tôi chỉ thu thập cookie phân tích để cải thiện trải nghiệm của bạn."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Chúng tôi đã gọi vốn hạt giống {amount} để giúp bạn vận hành cả một đội quân agent lập trình."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Chúng tôi đã gửi liên kết tải tới {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Chúng tôi dùng cookie để phân tích và đo lường quảng cáo."
 
 msgid "We'll be in touch shortly."
 msgstr "Chúng tôi sẽ liên hệ sớm."

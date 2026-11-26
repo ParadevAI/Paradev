@@ -5645,6 +5645,9 @@ msgstr "In Entwurf umwandeln"
 msgid "Converting to draft…"
 msgstr "Wird in Entwurf umgewandelt…"
 
+msgid "Cookie settings"
+msgstr "Cookie-Einstellungen"
+
 msgid "cookies and site data"
 msgstr "Cookies und Websitedaten"
 
@@ -7023,6 +7026,9 @@ msgstr "Fehlgeschlagene Läufe debuggen und Funktionen erneut ausführen"
 
 msgid "Debug with production stack traces"
 msgstr "Mit Produktions-Stacktraces debuggen"
+
+msgid "Decline"
+msgstr "Ablehnen"
 
 msgid "default"
 msgstr "Standard"
@@ -22595,14 +22601,14 @@ msgstr "Wir prognostizieren für 2026 oder 2027 kein vollständig autonomes Fahr
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Wir haben {hostName} gefunden. Aktiviere dort den Fernzugriff, um abzuschließen."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Wir erfassen nur Analyse-Cookies, um dein Erlebnis zu verbessern."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Wir haben eine Seed-Runde über {amount} abgeschlossen, damit du eine Armee aus Coding-Agents starten kannst."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Wir haben den Download-Link an {submittedEmail} geschickt."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Wir nutzen Cookies für Analysen und zur Messung unserer Werbung."
 
 msgid "We'll be in touch shortly."
 msgstr "Wir melden uns in Kürze."

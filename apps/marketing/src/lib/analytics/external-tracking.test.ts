@@ -22,6 +22,7 @@ function fixture(choice: string | null = null) {
 	const storage = { choice };
 	globals.window = {
 		location: { href: "https://paradev.com/roadmap" },
+		document: { cookie: "paradev-consent-region=opt-out" },
 		localStorage: { getItem: () => storage.choice },
 	};
 	const transport = mock(async () => new Response("{}"));
@@ -106,6 +107,7 @@ test("blocks initialization when stored consent cannot be read", async () => {
 	const { fetch, transport, initialize } = fixture();
 	globals.window = {
 		location: { href: "https://paradev.com/" },
+		document: { cookie: "paradev-consent-region=opt-out" },
 		localStorage: {
 			getItem: () => {
 				throw new Error("storage unavailable");

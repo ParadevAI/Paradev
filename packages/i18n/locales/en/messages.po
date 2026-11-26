@@ -5645,6 +5645,9 @@ msgstr "Convert to draft"
 msgid "Converting to draft…"
 msgstr "Converting to draft…"
 
+msgid "Cookie settings"
+msgstr "Cookie settings"
+
 msgid "cookies and site data"
 msgstr "cookies and site data"
 
@@ -7023,6 +7026,9 @@ msgstr "Debug failed runs and rerun functions"
 
 msgid "Debug with production stack traces"
 msgstr "Debug with production stack traces"
+
+msgid "Decline"
+msgstr "Decline"
 
 msgid "default"
 msgstr "default"
@@ -22595,14 +22601,14 @@ msgstr "We do not forecast full self-driving in 2026 or 2027. The honest unknown
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "We found {hostName}. Turn on Remote Access there to finish."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "We only collect analytics cookies so we can improve your experience."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "We raised an {amount} seed round to help you run an army of coding agents."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "We sent the download link to {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "We use cookies for analytics and ad measurement."
 
 msgid "We'll be in touch shortly."
 msgstr "We'll be in touch shortly."

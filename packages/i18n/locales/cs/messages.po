@@ -5645,6 +5645,9 @@ msgstr "Převést na koncept"
 msgid "Converting to draft…"
 msgstr "Převádí se na koncept…"
 
+msgid "Cookie settings"
+msgstr "Nastavení cookies"
+
 msgid "cookies and site data"
 msgstr "cookies a data webů"
 
@@ -7023,6 +7026,9 @@ msgstr "Ladění neúspěšných běhů a opětovné spuštění funkcí"
 
 msgid "Debug with production stack traces"
 msgstr "Ladění s produkčními stack trace"
+
+msgid "Decline"
+msgstr "Odmítnout"
 
 msgid "default"
 msgstr "výchozí"
@@ -22595,14 +22601,14 @@ msgstr "Neslibujeme plnou autonomii v roce 2026 ani 2027. Poctivé neznámé: zd
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Našli jsme {hostName}. Dokončete to zapnutím Vzdáleného přístupu na něm."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Sbíráme jen analytické cookies, abychom mohli zlepšovat vaši zkušenost."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Získali jsme {amount} v seed kole, abychom vám pomohli řídit armádu kódovacích agentů."
 
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Odkaz ke stažení jsme poslali na {submittedEmail}."
+
+msgid "We use cookies for analytics and ad measurement."
+msgstr "Cookies používáme pro analytiku a měření reklam."
 
 msgid "We'll be in touch shortly."
 msgstr "Brzy se vám ozveme."
