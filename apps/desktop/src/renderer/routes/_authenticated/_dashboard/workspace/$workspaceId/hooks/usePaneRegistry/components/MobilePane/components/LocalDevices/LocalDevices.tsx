@@ -11,9 +11,15 @@ import { deviceKey } from "./utils/deviceKey";
 
 interface LocalDevicesProps {
 	workspaceId: string;
+	/** False when the host asked is not the workspace's own: it has no
+	 * workspace row to keep the pick on. */
+	remembersPick?: boolean;
 }
 
-export function LocalDevices({ workspaceId }: LocalDevicesProps) {
+export function LocalDevices({
+	workspaceId,
+	remembersPick = true,
+}: LocalDevicesProps) {
 	// A cached list can show a device as running after it shut down, and
 	// mounting its stream would boot it again.
 	const devicesQuery = workspaceTrpc.mobile.localDevices.useQuery(
@@ -70,7 +76,7 @@ export function LocalDevices({ workspaceId }: LocalDevicesProps) {
 
 	const select = (device: LocalDevice) => {
 		setSelectedKey(deviceKey(device));
-		remember.mutate({ ...device, workspaceId });
+		if (remembersPick) remember.mutate({ ...device, workspaceId });
 		if (!device.booted) boot.mutate(device);
 	};
 	const booting =
