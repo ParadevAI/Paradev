@@ -1,0 +1,1 @@
+export { dictationKeyAction } from "./dictationKeyAction";

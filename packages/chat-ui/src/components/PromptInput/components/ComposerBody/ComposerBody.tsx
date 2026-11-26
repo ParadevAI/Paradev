@@ -132,6 +132,7 @@ import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
 import { MentionSubmenu } from "../MentionSubmenu";
+import { dictationKeyAction } from "./utils/dictationKeyAction";
 import { getFormatShortcutTarget } from "./utils/getFormatShortcutTarget";
 
 function footerButtonClasses(base: string, ghost: string) {
@@ -992,17 +993,12 @@ export function ComposerBody({
 	useEffect(() => {
 		if (dictationSession.status === "idle") return;
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.isComposing || !isFocusUnclaimed()) return;
-			if (event.key === "Escape") {
-				event.preventDefault();
-				event.stopPropagation();
-				dictationSession.cancel();
-				return;
-			}
-			if (event.key !== "Enter" || event.shiftKey) return;
+			const action = dictationKeyAction(event);
+			if (!action || !isFocusUnclaimed()) return;
 			event.preventDefault();
 			event.stopPropagation();
-			if (dictationSession.status === "recording")
+			if (action === "cancel") dictationSession.cancel();
+			else if (dictationSession.status === "recording")
 				void dictationSession.finish();
 			else if (dictationSession.status === "error")
 				void dictationSession.retry();
