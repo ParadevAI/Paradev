@@ -59,6 +59,7 @@ const handleDeepLink = (path: string) => {
 const ipcRenderer = window.ipcRenderer as typeof window.ipcRenderer | undefined;
 if (ipcRenderer) {
 	ipcRenderer.on("deep-link-navigate", handleDeepLink);
+	ipcRenderer.send("deep-link-ready");
 } else {
 	reportBootError(
 		"Renderer preload not available (window.ipcRenderer missing)",

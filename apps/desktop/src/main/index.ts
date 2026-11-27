@@ -22,6 +22,7 @@ import {
 	app,
 	BrowserWindow,
 	dialog,
+	ipcMain,
 	Notification,
 	net,
 	protocol,
@@ -68,7 +69,12 @@ import {
 	installBundledCliShim,
 	installBundledPdevShim,
 } from "./lib/bundled-cli";
-import { deepLinkToRoute, findDeepLinkInArgv } from "./lib/deep-link";
+import {
+	createDeepLinkDelivery,
+	DEEP_LINK_READY_CHANNEL,
+	deepLinkToRoute,
+	findDeepLinkInArgv,
+} from "./lib/deep-link";
 import { installDevRunnerExit } from "./lib/dev-runner-exit";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -201,8 +207,24 @@ async function processDeepLink(url: string): Promise<void> {
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();
-	target?.webContents.send("deep-link-navigate", path);
+	if (target) deepLinkDelivery.deliver(target.webContents, path);
 }
+
+const deepLinkDelivery = createDeepLinkDelivery();
+const deepLinkWatched = new WeakSet<Electron.WebContents>();
+ipcMain.on(DEEP_LINK_READY_CHANNEL, ({ sender }) => {
+	if (!deepLinkWatched.has(sender)) {
+		deepLinkWatched.add(sender);
+		const { id } = sender;
+		sender.on("did-start-navigation", (details) => {
+			if (details.isMainFrame && !details.isSameDocument) {
+				deepLinkDelivery.markLoading(id);
+			}
+		});
+		sender.once("destroyed", () => deepLinkDelivery.forget(id));
+	}
+	deepLinkDelivery.markListening(sender);
+});
 
 browserManager.on("deep-link", (url: string) => {
 	void processDeepLink(url);
