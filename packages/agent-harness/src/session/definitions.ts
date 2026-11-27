@@ -36,6 +36,8 @@ export interface AgentSessionArgs {
 	carried?: {
 		pending: StartTurnInput[];
 		seenPromptIds: string[];
+		finishedTurnIds?: string[];
+		interruptedTurnIds?: string[];
 	};
 }
 

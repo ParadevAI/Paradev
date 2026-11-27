@@ -77,8 +77,10 @@ function validatePrompt(input: {
 export async function agentSession(args: AgentSessionArgs): Promise<void> {
 	const { sessionId } = args;
 	const pending: QueuedTurn[] = [...(args.carried?.pending ?? [])];
-	const finished = new Set<string>();
-	const interruptedEarly = new Set<string>();
+	const finished = new Set<string>(args.carried?.finishedTurnIds ?? []);
+	const interruptedEarly = new Set<string>(
+		args.carried?.interruptedTurnIds ?? [],
+	);
 	const seen = new Set<string>(args.carried?.seenPromptIds ?? []);
 	let steers: SteerInput[] = [];
 	let delivered = 0;
@@ -270,7 +272,12 @@ export async function agentSession(args: AgentSessionArgs): Promise<void> {
 			await condition(allHandlersFinished);
 			await continueAsNew<typeof agentSession>({
 				sessionId,
-				carried: { pending, seenPromptIds: [...seen] },
+				carried: {
+					pending,
+					seenPromptIds: [...seen],
+					finishedTurnIds: [...finished],
+					interruptedTurnIds: [...interruptedEarly],
+				},
 			});
 		}
 	}
