@@ -27,15 +27,15 @@ import {
 	cpSync,
 	existsSync,
 	mkdirSync,
-	readdirSync,
 	readFileSync,
-	realpathSync,
 	renameSync,
 	rmSync,
 	writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { ACP_HARNESSES } from "@superset/host-service/acp-catalogue";
+import { copyPackagesWithDeps } from "./copy-runtime-packages";
 import { linkBinAliases } from "./link-bin-aliases";
 
 type Target = "darwin-arm64" | "darwin-x64" | "linux-x64" | "linux-arm64";
@@ -58,8 +58,8 @@ const RUNTIME_PACKAGES = [
 	"node-pty",
 	"@parcel/watcher",
 	"@xterm/headless",
-	"@agentclientprotocol/claude-agent-acp",
-] as const;
+	...Object.values(ACP_HARNESSES).flatMap((harness) => harness.adapter ?? []),
+];
 
 /**
  * Platform-specific native bindings that live in optional dependencies
@@ -183,107 +183,18 @@ async function downloadAndExtractNode(
 	return destBinary;
 }
 
-function findPackagePath(
-	packageName: string,
-	startDir: string,
-	repoRoot: string,
-): string | null {
-	let current = startDir;
-	while (current.startsWith(repoRoot)) {
-		const candidate = join(current, "node_modules", packageName);
-		if (existsSync(candidate)) return realpathSync(candidate);
-		const parent = dirname(current);
-		if (parent === current) break;
-		current = parent;
-	}
-	const fallbacks = [
-		join(repoRoot, "packages", "host-service", "node_modules", packageName),
-		join(repoRoot, "packages", "workspace-fs", "node_modules", packageName),
-		join(repoRoot, "node_modules", packageName),
-	];
-	for (const fallback of fallbacks) {
-		if (existsSync(fallback)) return realpathSync(fallback);
-	}
-	// Bun isolated store fallback: node_modules/.bun/<encoded>@<ver>/node_modules/<name>
-	// where scoped names have `/` encoded as `+` in the store directory.
-	// If multiple versions exist, error rather than silently picking one —
-	// the walker is meant to be deterministic for reproducible tarballs.
-	const bunStore = join(repoRoot, "node_modules", ".bun");
-	if (existsSync(bunStore)) {
-		const encoded = packageName.replace("/", "+");
-		const prefix = `${encoded}@`;
-		const matches = readdirSync(bunStore)
-			.filter((entry) => entry.startsWith(prefix))
-			.map((entry) => join(bunStore, entry, "node_modules", packageName))
-			.filter((candidate) => existsSync(candidate));
-		if (matches.length === 1) return realpathSync(matches[0] as string);
-		if (matches.length > 1) {
-			throw new Error(
-				`Ambiguous Bun store matches for ${packageName}: ${matches.join(", ")}`,
-			);
-		}
-	}
-	return null;
-}
-
-function copyPackageWithDeps(
-	packageName: string,
-	startDir: string,
-	repoRoot: string,
-	destModules: string,
-	copied: Set<string>,
-	optional = false,
-): void {
-	if (copied.has(packageName)) return;
-
-	const sourcePath = findPackagePath(packageName, startDir, repoRoot);
-	if (!sourcePath) {
-		if (optional) {
-			console.warn(
-				`[build-dist]   skipping peer dep not installed: ${packageName}`,
-			);
-			return;
-		}
-		throw new Error(
-			`Package not found: ${packageName}. Run 'bun install' first.`,
-		);
-	}
-	copied.add(packageName);
-
-	const destPath = join(destModules, packageName);
-	mkdirSync(dirname(destPath), { recursive: true });
-	cpSync(sourcePath, destPath, { recursive: true, dereference: true });
-
-	const packageJsonPath = join(sourcePath, "package.json");
-	if (existsSync(packageJsonPath)) {
-		const pkg = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-		for (const dep of Object.keys(pkg.dependencies ?? {})) {
-			copyPackageWithDeps(dep, sourcePath, repoRoot, destModules, copied);
-		}
-		// Packages we ship unbundled load their peer
-		// deps from disk at module init — a bundled consumer's inlined copy
-		// is invisible to them. Walk non-optional peers best-effort: one the
-		// installer didn't materialize is skipped rather than failing the build.
-		const peerMeta = pkg.peerDependenciesMeta ?? {};
-		for (const dep of Object.keys(pkg.peerDependencies ?? {})) {
-			if (peerMeta[dep]?.optional) continue;
-			copyPackageWithDeps(dep, sourcePath, repoRoot, destModules, copied, true);
-		}
-	}
-}
-
 function copyRuntimePackages(libDir: string, target: Target): void {
 	const repoRoot = resolve(import.meta.dir, "../../..");
 	const destModules = join(libDir, "node_modules");
 	mkdirSync(destModules, { recursive: true });
-	const copied = new Set<string>();
-
-	const hostServiceDir = join(repoRoot, "packages", "host-service");
 	const packages = [...RUNTIME_PACKAGES, ...TARGET_NATIVE_PACKAGES[target]];
-	for (const pkg of packages) {
-		console.log(`[build-dist]   copying ${pkg} (+ deps)`);
-		copyPackageWithDeps(pkg, hostServiceDir, repoRoot, destModules, copied);
-	}
+	console.log(`[build-dist]   copying ${packages.join(", ")} (+ deps)`);
+	copyPackagesWithDeps(
+		packages,
+		join(repoRoot, "packages", "host-service"),
+		repoRoot,
+		destModules,
+	);
 }
 
 /**
