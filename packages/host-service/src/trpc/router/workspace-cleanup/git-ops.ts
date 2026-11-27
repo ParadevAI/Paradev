@@ -57,25 +57,32 @@ export const cleanupGitOps = {
 		});
 	},
 
-	removeWorktree(input: {
-		repoPath: string;
-		worktreePath: string;
-		gitEnv: GitTaskEnv;
-		force?: boolean;
-	}): Promise<{ stillRegistered: boolean; removeError?: string }> {
+	removeWorktree(
+		input: {
+			repoPath: string;
+			worktreePath: string;
+			gitEnv: GitTaskEnv;
+			force?: boolean;
+		},
+		signal?: AbortSignal,
+	): Promise<{ stillRegistered: boolean; removeError?: string }> {
 		// Generous timeout: removal recursively deletes the worktree
 		// directory, which can take a while for large trees (node_modules
 		// etc.).
 		return getHostWorkerPool().run(gitWorktreeRemoveTask, input, {
 			timeoutMs: 120_000,
+			signal,
 		});
 	},
 
-	deleteLocalBranch(input: {
-		repoPath: string;
-		branch: string;
-		gitEnv: GitTaskEnv;
-	}): Promise<{ deleted: boolean }> {
-		return getHostWorkerPool().run(gitDeleteBranchTask, input);
+	deleteLocalBranch(
+		input: {
+			repoPath: string;
+			branch: string;
+			gitEnv: GitTaskEnv;
+		},
+		signal?: AbortSignal,
+	): Promise<{ deleted: boolean }> {
+		return getHostWorkerPool().run(gitDeleteBranchTask, input, { signal });
 	},
 };

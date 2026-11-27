@@ -18,6 +18,7 @@ import { cleanupGitOps } from "../src/trpc/router/workspace-cleanup/git-ops";
 import { isLocalCheckoutWorkspace } from "../src/trpc/router/workspace-cleanup/is-local-checkout-workspace";
 import {
 	__testDestroysInFlight,
+	cleanupQueueLimits,
 	cleanupTeardownOps,
 	workspaceCleanupRouter,
 } from "../src/trpc/router/workspace-cleanup/workspace-cleanup";
@@ -953,6 +954,97 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			expect(deleteBranch).not.toHaveBeenCalled();
 			expect(existsSync(tmp)).toBe(true);
 		} finally {
+			Object.assign(cleanupTeardownOps, realTeardownOps);
+			rmSync(tmp, { recursive: true, force: true });
+			rmSync(repo, { recursive: true, force: true });
+		}
+	});
+
+	test("a delete that runs out of time before files go is cancelled and the workspace comes back", async () => {
+		const tmp = mkdtempSync(join(tmpdir(), "workspace-delete-"));
+		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-repo-"));
+		let teardownSignal: AbortSignal | undefined;
+		cleanupTeardownOps.runTeardown = mock(
+			async ({ abortSignal }: { abortSignal?: AbortSignal }) => {
+				teardownSignal = abortSignal;
+				return new Promise<never>(() => {});
+			},
+		) as never;
+		const removeWorktree = mock(async () => ({ stillRegistered: false }));
+		const realLimit = cleanupQueueLimits.slotTimeoutMs;
+		cleanupQueueLimits.slotTimeoutMs = 20;
+		try {
+			const ctx = makeCtx({
+				workspace: {
+					id: "ws-1",
+					projectId: "p-1",
+					worktreePath: tmp,
+					branch: "feature",
+				},
+				project: { id: "p-1", repoPath: repo },
+				removeWorktree,
+			});
+			const caller = workspaceCleanupRouter.createCaller(ctx);
+
+			await expect(
+				caller.destroy({
+					workspaceId: "ws-1",
+					deleteBranch: false,
+					force: true,
+				}),
+			).rejects.toThrow("took too long");
+
+			expect(teardownSignal?.aborted).toBe(true);
+			expect(removeWorktree).not.toHaveBeenCalled();
+			expect(existsSync(tmp)).toBe(true);
+			const eventTypes = ctx.__mocks.broadcastWorkspaceChanged.mock.calls.map(
+				(call) => (call as unknown as [{ eventType: string }])[0].eventType,
+			);
+			expect(eventTypes.at(-1)).toBe("created");
+		} finally {
+			cleanupQueueLimits.slotTimeoutMs = realLimit;
+			Object.assign(cleanupTeardownOps, realTeardownOps);
+			rmSync(tmp, { recursive: true, force: true });
+			rmSync(repo, { recursive: true, force: true });
+		}
+	});
+
+	test("a delete that runs out of time while removing files stays deleted", async () => {
+		const tmp = mkdtempSync(join(tmpdir(), "workspace-delete-"));
+		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-repo-"));
+		cleanupTeardownOps.runTeardown = mock(async () => ({
+			status: "ok" as const,
+		}));
+		const deleteBranch = mock(async () => ({ deleted: true }));
+		const realLimit = cleanupQueueLimits.slotTimeoutMs;
+		cleanupQueueLimits.slotTimeoutMs = 20;
+		try {
+			const ctx = makeCtx({
+				workspace: {
+					id: "ws-1",
+					projectId: "p-1",
+					worktreePath: tmp,
+					branch: "feature",
+				},
+				project: { id: "p-1", repoPath: repo },
+				removeWorktree: () => new Promise(() => {}),
+				deleteBranch,
+			});
+			const caller = workspaceCleanupRouter.createCaller(ctx);
+
+			const result = await caller.destroy({
+				workspaceId: "ws-1",
+				deleteBranch: true,
+				force: true,
+			});
+
+			expect(result.success).toBe(true);
+			expect(result.worktreeRemoved).toBe(false);
+			expect(result.warnings.join(" ")).toContain("took too long");
+			expect(deleteBranch).not.toHaveBeenCalled();
+			expect(ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(1);
+		} finally {
+			cleanupQueueLimits.slotTimeoutMs = realLimit;
 			Object.assign(cleanupTeardownOps, realTeardownOps);
 			rmSync(tmp, { recursive: true, force: true });
 			rmSync(repo, { recursive: true, force: true });

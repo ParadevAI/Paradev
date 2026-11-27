@@ -17,7 +17,7 @@ const flush = async () => {
 
 describe("createCleanupQueue", () => {
 	it("runs one job at a time in order, and a failure does not stop the queue", async () => {
-		const enqueue = createCleanupQueue({ slotTimeoutMs: 60_000 });
+		const enqueue = createCleanupQueue({ slotTimeoutMs: () => 60_000 });
 		const started: string[] = [];
 		const gates = { a: deferred(), b: deferred(), c: deferred() };
 		const results = (["a", "b", "c"] as const).map((name) =>
@@ -46,24 +46,32 @@ describe("createCleanupQueue", () => {
 		]);
 	});
 
-	it("starts the next job when one runs past the slot timeout", async () => {
+	it("aborts a job past its slot and starts the next once it has stopped", async () => {
 		let timedOut = 0;
 		const enqueue = createCleanupQueue({
-			slotTimeoutMs: 1,
+			slotTimeoutMs: () => 1,
 			onSlotTimeout: () => {
 				timedOut += 1;
 			},
 		});
-		const stuck = deferred();
-		const first = enqueue(async () => {
-			await stuck.promise;
-			return "first";
+		const events: string[] = [];
+		const first = enqueue(
+			(signal) =>
+				new Promise<string>((_, reject) => {
+					signal.addEventListener("abort", () => {
+						events.push("first stopped");
+						reject(new Error("cancelled"));
+					});
+				}),
+		);
+		const second = enqueue(async () => {
+			events.push("second started");
+			return "second";
 		});
-		const second = enqueue(async () => "second");
 
+		await expect(first).rejects.toThrow("cancelled");
 		expect(await second).toBe("second");
 		expect(timedOut).toBe(1);
-		stuck.resolve();
-		expect(await first).toBe("first");
+		expect(events).toEqual(["first stopped", "second started"]);
 	});
 });
