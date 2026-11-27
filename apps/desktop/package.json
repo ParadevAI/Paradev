@@ -221,7 +221,7 @@
 		"@xterm/xterm": "6.1.0-beta.315",
 		"ai": "6.0.235",
 		"babel-plugin-react-compiler": "1.0.0",
-		"better-auth": "1.6.22",
+		"better-auth": "1.7.7",
 		"clsx": "2.1.1",
 		"cross-env": "10.1.0",
 		"css-tree": "3.2.1",
