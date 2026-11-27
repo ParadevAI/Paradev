@@ -681,3 +681,33 @@ describe("createManagedSkills paradev names for other agents", () => {
 		}
 	});
 });
+
+describe("createManagedSkills renamed command", () => {
+	it("names superset-automation paradev-automation under paradev: and keeps the old name under superset:", async () => {
+		const commands = path.join(BUNDLED_PLUGIN, "commands");
+		mkdirSync(commands, { recursive: true });
+		writeFileSync(
+			path.join(commands, "superset-automation.md"),
+			"---\ndescription: manage an automation\n---\n\nbody\n",
+		);
+
+		await run();
+
+		expect(
+			existsSync(path.join(paradevPlugin, "commands", "paradev-automation.md")),
+		).toBe(true);
+		expect(
+			existsSync(
+				path.join(paradevPlugin, "commands", "superset-automation.md"),
+			),
+		).toBe(false);
+		expect(
+			readFileSync(
+				path.join(claudePlugin, "commands", "superset-automation.md"),
+				"utf-8",
+			),
+		).toContain(
+			'description: "Old name of paradev:paradev-automation. Use paradev:paradev-automation."',
+		);
+	});
+});

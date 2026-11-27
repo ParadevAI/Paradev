@@ -176,6 +176,12 @@ know, so it leaves them alone. It still rewrites `superset-<skill>` in full, whi
 keeps the whole skill. A disable applies to both copies, whether the key is the bare skill name,
 `superset/<skill>` or `paradev/<skill>`.
 
+One entry is renamed rather than only prefixed: the `superset-automation` command is
+`paradev:paradev-automation` in the `paradev` dir and stays `superset:superset-automation` in the
+`superset` one (`RENAMED_PLUGIN_ENTRIES` in `@superset/shared/slash-commands`, which the composers'
+fold also reads). The source file keeps its old name while the GitHub marketplace still installs
+the plugin as `superset`.
+
 Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
 `~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors
 `PDEV_CODING_AGENT_DIR` when set. Claude and pdev entries share the ownership ledger at

@@ -124,6 +124,11 @@ export function sortSlashCommandMatches<
 const LEGACY_PLUGIN_PREFIX = "superset:";
 const CURRENT_PLUGIN_PREFIX = "paradev:";
 
+/** Bundled plugin entries whose `paradev:` name differs from the old one. */
+export const RENAMED_PLUGIN_ENTRIES: Readonly<Record<string, string>> = {
+	"superset-automation": "paradev-automation",
+};
+
 /**
  * Claude sees the bundled plugin twice, as `paradev:<x>` and the old
  * `superset:<x>`. Menus show one entry: the old name becomes an alias of the
@@ -137,7 +142,8 @@ export function foldLegacyPluginCommands<T extends { name: string }>(
 	const legacyOf = new Map<string, string>();
 	for (const { name } of commands) {
 		if (!name.startsWith(LEGACY_PLUGIN_PREFIX)) continue;
-		const current = `${CURRENT_PLUGIN_PREFIX}${name.slice(LEGACY_PLUGIN_PREFIX.length)}`;
+		const entry = name.slice(LEGACY_PLUGIN_PREFIX.length);
+		const current = `${CURRENT_PLUGIN_PREFIX}${RENAMED_PLUGIN_ENTRIES[entry] ?? entry}`;
 		if (names.has(current)) legacyOf.set(current, name);
 	}
 	const folded = new Set(legacyOf.values());

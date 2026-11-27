@@ -105,4 +105,17 @@ describe("foldLegacyPluginCommands", () => {
 			{ command: { name: "superset:browser" }, legacyAliases: [] },
 		]);
 	});
+
+	it("folds a renamed entry into its new name", () => {
+		const folded = foldLegacyPluginCommands([
+			{ name: "paradev:paradev-automation" },
+			{ name: "superset:superset-automation" },
+		]);
+		expect(folded).toEqual([
+			{
+				command: { name: "paradev:paradev-automation" },
+				legacyAliases: ["superset:superset-automation"],
+			},
+		]);
+	});
 });

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { copyFile, mkdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { RENAMED_PLUGIN_ENTRIES } from "@superset/shared/slash-commands";
 import { writeFileIfChanged } from "./agent-wrappers-common";
 import { getBundledPluginDir } from "./config";
 import { readInstalledPluginSources } from "./installed-plugins";
@@ -189,6 +190,7 @@ function listFilesRecursive(root: string, relative = ""): string[] {
  * they count as part of src, so the reaper keeps rather than orphans them.
  * `isPreserved` marks paths that are neither written nor reaped — for content
  * whose source is temporarily unreadable and must survive the run.
+ * `relocate` maps a path in src to its path in dest.
  */
 async function syncDir(
 	src: string,
@@ -197,25 +199,36 @@ async function syncDir(
 	extraTrees: readonly ExtraTree[] = [],
 	isPreserved?: (relativePath: string) => boolean,
 	transform?: (relativePath: string, contents: string) => string,
+	relocate: (relativePath: string) => string = (relativePath) => relativePath,
 ): Promise<void> {
-	const copies: { source: string; relative: string; contents?: string }[] =
-		listFilesRecursive(src)
-			.filter((file) => !isExcluded?.(file))
-			.map((file) => ({ source: path.join(src, file), relative: file }));
+	const copies: {
+		source: string;
+		relative: string;
+		destRelative: string;
+		contents?: string;
+	}[] = listFilesRecursive(src)
+		.filter((file) => !isExcluded?.(file))
+		.map((file) => ({
+			source: path.join(src, file),
+			relative: file,
+			destRelative: relocate(file),
+		}));
 
 	for (const tree of extraTrees) {
 		for (const file of listFilesRecursive(tree.src)) {
 			const source = path.join(tree.src, file);
+			const relative = path.join(tree.destRelative, file);
 			copies.push({
 				source,
-				relative: path.join(tree.destRelative, file),
+				relative,
+				destRelative: relative,
 				contents: tree.transform?.(file, fs.readFileSync(source, "utf-8")),
 			});
 		}
 	}
 
-	for (const { source, relative, contents } of copies) {
-		const target = path.join(dest, relative);
+	for (const { source, relative, destRelative, contents } of copies) {
+		const target = path.join(dest, destRelative);
 		fs.mkdirSync(path.dirname(target), { recursive: true });
 		// Skills may bundle scripts/; keep them runnable after provisioning.
 		const executable = (fs.statSync(source).mode & 0o111) !== 0;
@@ -226,7 +239,7 @@ async function syncDir(
 			executable ? 0o755 : 0o644,
 		);
 	}
-	const wanted = new Set(copies.map((c) => path.join(dest, c.relative)));
+	const wanted = new Set(copies.map((c) => path.join(dest, c.destRelative)));
 	if (fs.existsSync(dest)) {
 		for (const file of listFilesRecursive(dest)) {
 			const absolute = path.join(dest, file);
@@ -338,11 +351,19 @@ function legacyAliasTransform(relativePath: string, contents: string): string {
 	}
 	const entry = entryNameOfPath(relativePath);
 	if (!entry) return contents;
-	const current = `${CLAUDE_PLUGIN_NAME}:${entry}`;
+	const current = `${CLAUDE_PLUGIN_NAME}:${RENAMED_PLUGIN_ENTRIES[entry] ?? entry}`;
 	return setFrontmatterDescription(
 		contents,
 		`Old name of ${current}. Use ${current}.`,
 	);
+}
+
+/** Gives a renamed command its new file name in the `paradev` dir. */
+function primaryRelocate(relativePath: string): string {
+	const [dir, ...rest] = relativePath.split(path.sep);
+	if (dir !== "commands" || rest.length !== 1) return relativePath;
+	const renamed = RENAMED_PLUGIN_ENTRIES[rest[0]?.replace(/\.md$/, "") ?? ""];
+	return renamed ? path.join("commands", `${renamed}.md`) : relativePath;
 }
 
 function primaryTransform(relativePath: string, contents: string): string {
@@ -362,6 +383,7 @@ async function provisionClaudePluginDir(
 	disabledSkills: ReadonlySet<string>,
 	pluginSources: readonly ResolvedSource[],
 	transform: (relativePath: string, contents: string) => string,
+	relocate?: (relativePath: string) => string,
 ): Promise<boolean> {
 	const target = path.join(claudeDir, "skills", name);
 	const sentinel = path.join(target, MANAGED_SENTINEL_NAME);
@@ -397,6 +419,7 @@ async function provisionClaudePluginDir(
 					),
 			),
 		transform,
+		relocate,
 	);
 	writeFileIfChanged(sentinel, `${MANAGED_SKILL_MARKER}\n`, 0o644);
 	return true;
@@ -423,6 +446,7 @@ async function provisionClaudePlugin(
 		disabledSkills,
 		pluginSources,
 		primaryTransform,
+		primaryRelocate,
 	);
 	await provisionClaudePluginDir(
 		LEGACY_CLAUDE_PLUGIN_NAME,
