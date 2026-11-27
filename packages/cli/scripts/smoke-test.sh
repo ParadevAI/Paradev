@@ -39,13 +39,32 @@ fi
 	}
 	const { dirname, join } = require("node:path");
 	const { existsSync } = require("node:fs");
-	const adapter = require.resolve("@agentclientprotocol/claude-agent-acp/package.json");
-	if (!adapter.startsWith(process.env.DIST + "/")) {
-		throw new Error("Claude ACP adapter resolved outside the distribution: " + adapter);
+	const { spawnSync } = require("node:child_process");
+	const entries = {};
+	for (const adapter of ["@agentclientprotocol/claude-agent-acp", "@agentclientprotocol/codex-acp", "pi-acp"]) {
+		const pkg = require.resolve(adapter + "/package.json");
+		if (!pkg.startsWith(process.env.DIST + "/")) {
+			throw new Error(adapter + " resolved outside the distribution: " + pkg);
+		}
+		entries[adapter] = join(dirname(pkg), "dist/index.js");
+		if (!existsSync(entries[adapter])) throw new Error("Missing " + adapter + " entry: " + entries[adapter]);
+		console.log("[smoke]", adapter, "OK");
 	}
-	const entry = join(dirname(adapter), "dist/index.js");
-	if (!existsSync(entry)) throw new Error("Missing Claude ACP adapter entry: " + entry);
-	console.log("[smoke] Claude ACP adapter OK");
+	// Loads each adapter with the dependencies it was shipped with. codex-acp
+	// needs a real codex before it answers, so it is only resolved above.
+	const initialize = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: 1, clientCapabilities: {} } });
+	for (const adapter of ["@agentclientprotocol/claude-agent-acp", "pi-acp"]) {
+		const run = spawnSync(process.execPath, [entries[adapter]], {
+			input: initialize + "\n",
+			encoding: "utf8",
+			timeout: 20000,
+			env: { ...process.env, CLAUDE_CODE_EXECUTABLE: "/usr/bin/false", PI_ACP_PI_COMMAND: "/usr/bin/false" },
+		});
+		if (!run.stdout.includes("\"result\"")) {
+			throw new Error(adapter + " did not answer initialize:\n" + run.stdout + run.stderr);
+		}
+		console.log("[smoke]", adapter, "initialize OK");
+	}
 ' )
 
 # node-pty must resolve from the bundled tree (not a leaked host copy), and a
