@@ -28,31 +28,21 @@ export interface ListedTerminalSession {
 	createdAt?: number;
 }
 
-/** What this desktop hid, and must not bring back as a tab. */
 export interface AgentTabHiding {
-	/** A chat tab closed here: in its undo window, or its stop still queued. */
-	chatSession: (sessionId: string) => boolean;
-	/** A terminal a closed chat tab or a fork loader ran under. */
-	chatTerminal: (terminalId: string) => boolean;
-	/** A terminal sent to the background, or a replacement that was cancelled. */
-	terminal: (terminalId: string) => boolean;
-	/** A chat opened on purpose here after it was closed elsewhere. */
-	reopened: (sessionId: string) => boolean;
+	isChatClosedHere: (sessionId: string) => boolean;
+	isChatTerminalHidden: (terminalId: string) => boolean;
+	isTerminalHidden: (terminalId: string) => boolean;
+	isChatReopenedHere: (sessionId: string) => boolean;
 }
 
 export interface ReconcileAgentTabsInput {
 	main: Layout;
-	/** The workspace's other pane areas; their panes count, new tabs never go there. */
 	linked: readonly Layout[];
-	/** Absent until the host has answered. */
 	chats?: readonly ListedChatSession[];
-	/** Absent until the host has answered. */
 	terminals?: readonly ListedTerminalSession[];
 	presetFor: (harness: string) => string | null | undefined;
 	hiding: AgentTabHiding;
-	/** Tabs opened from a cloud box's stored chats before the box answered. */
-	storedSessionIds?: ReadonlySet<string>;
-	/** The workspace opened with no tabs of the user's. */
+	shownFromStoredChats?: ReadonlySet<string>;
 	openedEmpty: boolean;
 }
 
@@ -75,11 +65,9 @@ interface NewTab {
 }
 
 /**
- * The one writer of agent tabs the host owns. Every open agent conversation
- * gets exactly one pane across the workspace's pane areas, unless this
- * desktop hid it; a chat the user closed elsewhere loses its pane; two panes
- * on one chat, one chat terminal or one terminal collapse to the oldest. Idempotent: run it again on its
- * own output and nothing changes.
+ * The one writer of agent tabs. Every open agent conversation gets one pane
+ * across the pane areas unless this desktop hid it; a chat closed by a person
+ * elsewhere loses its pane; duplicates collapse to the oldest tab. Idempotent.
  */
 export function reconcileAgentTabs(
 	input: ReconcileAgentTabsInput,
@@ -132,20 +120,7 @@ function panesToRemove(
 	const shownChatTerminals = new Set<string>();
 	const shownSessions = new Set<string>();
 	const removals: PaneRef[] = [];
-	// Oldest tab first, so a pane the user placed outlives one a racing
-	// writer opened since.
-	const panes = areas
-		.flatMap((layout, area) =>
-			layout.tabs.flatMap((tab) =>
-				Object.values(tab.panes).map((pane) => ({ area, tab, pane })),
-			),
-		)
-		.map((entry, order) => ({ ...entry, order }))
-		.sort(
-			(a, b) =>
-				(a.tab.createdAt ?? 0) - (b.tab.createdAt ?? 0) || a.order - b.order,
-		);
-	for (const { area, tab, pane } of panes) {
+	for (const { area, tab, pane } of panesOldestTabFirst(areas)) {
 		if (!isAgentPane(pane)) continue;
 		const ref = { area, tabId: tab.id, paneId: pane.id };
 		const { terminalId, sessionId } = paneClaimKeys(pane);
@@ -160,7 +135,8 @@ function panesToRemove(
 			(terminalId && shownChatTerminals.has(terminalId)) ||
 			(input.chats &&
 				!(terminalId && openOnTerminal.has(terminalId)) &&
-				closedForThisPane(input, chatById, conversationOf, sessionId))
+				(closedByUserElsewhere(input, chatById, conversationOf, sessionId) ||
+					storedChatTheBoxClosed(input, chatById, sessionId)))
 		) {
 			removals.push(ref);
 			continue;
@@ -171,27 +147,44 @@ function panesToRemove(
 	return removals;
 }
 
-/**
- * A pane goes when its conversation was closed by a person elsewhere; a row
- * the conversation has since moved past does not take the pane with it.
- */
-function closedForThisPane(
+function panesOldestTabFirst(areas: readonly Layout[]) {
+	return areas
+		.flatMap((layout, area) =>
+			layout.tabs.flatMap((tab) =>
+				Object.values(tab.panes).map((pane) => ({ area, tab, pane })),
+			),
+		)
+		.map((entry, order) => ({ ...entry, order }))
+		.sort(
+			(a, b) =>
+				(a.tab.createdAt ?? 0) - (b.tab.createdAt ?? 0) || a.order - b.order,
+		);
+}
+
+function closedByUserElsewhere(
 	input: ReconcileAgentTabsInput,
 	chatById: ReadonlyMap<string, ListedChatSession>,
 	conversationOf: ReadonlyMap<string, ChatConversation>,
 	sessionId: string,
 ): boolean {
 	const chat = chatById.get(sessionId);
-	const conversation = conversationOf.get(sessionId);
-	if (
+	return (
 		chat?.closedByUser === true &&
 		!chat.live &&
-		!conversation?.open &&
-		!input.hiding.reopened(sessionId)
-	) {
-		return true;
-	}
-	return !!input.storedSessionIds?.has(sessionId) && !(chat && !chat.closedAt);
+		!conversationOf.get(sessionId)?.open &&
+		!input.hiding.isChatReopenedHere(sessionId)
+	);
+}
+
+function storedChatTheBoxClosed(
+	input: ReconcileAgentTabsInput,
+	chatById: ReadonlyMap<string, ListedChatSession>,
+	sessionId: string,
+): boolean {
+	const chat = chatById.get(sessionId);
+	return (
+		!!input.shownFromStoredChats?.has(sessionId) && !(chat && !chat.closedAt)
+	);
 }
 
 function tabsToAdd(
@@ -208,8 +201,8 @@ function tabsToAdd(
 		if (!conversation.open) continue;
 		const presetId = input.presetFor(current.harness);
 		if (!presetId) continue;
-		if (input.hiding.chatTerminal(conversation.key)) continue;
-		if (conversation.sessionIds.some(input.hiding.chatSession)) continue;
+		if (input.hiding.isChatTerminalHidden(conversation.key)) continue;
+		if (conversation.sessionIds.some(input.hiding.isChatClosedHere)) continue;
 		const keys = {
 			terminalIds: [
 				conversation.key,
@@ -243,7 +236,7 @@ function tabsToAdd(
 	for (const terminal of input.terminals ?? []) {
 		const { terminalId } = terminal;
 		if (claims.terminalIds.has(terminalId)) continue;
-		if (input.hiding.terminal(terminalId)) continue;
+		if (input.hiding.isTerminalHidden(terminalId)) continue;
 		claims.terminalIds.add(terminalId);
 		newTabs.push({
 			at: terminal.createdAt ?? 0,
@@ -266,11 +259,6 @@ function withoutPanes(layout: Layout, refs: readonly PaneRef[]): Layout {
 	return snapshot(store.getState());
 }
 
-/**
- * New tabs go last, oldest first, and keep the user's selection. A workspace
- * that opened empty, or on setup terminals alone, selects its newest chat;
- * one left with no tabs at all selects the oldest new tab.
- */
 function withNewTabs(
 	layout: Layout,
 	newTabs: readonly NewTab[],
@@ -292,16 +280,28 @@ function withNewTabs(
 		addedTabIds.push(tabId);
 		if (newTab.chat) newestChatTabId = tabId;
 	}
-	const selected =
-		(selectChat ? newestChatTabId : null) ??
-		(layout.activeTabId &&
-		layout.tabs.some((tab) => tab.id === layout.activeTabId)
-			? layout.activeTabId
-			: null) ??
-		addedTabIds[0] ??
-		null;
+	const selected = tabToSelect({
+		layout,
+		newestChatTabId: selectChat ? newestChatTabId : null,
+		oldestAddedTabId: addedTabIds[0] ?? null,
+	});
 	if (selected) store.getState().setActiveTab(selected);
 	return snapshot(store.getState());
+}
+
+function tabToSelect({
+	layout,
+	newestChatTabId,
+	oldestAddedTabId,
+}: {
+	layout: Layout;
+	newestChatTabId: string | null;
+	oldestAddedTabId: string | null;
+}): string | null {
+	const usersTab = layout.tabs.some((tab) => tab.id === layout.activeTabId)
+		? layout.activeTabId
+		: null;
+	return newestChatTabId ?? usersTab ?? oldestAddedTabId;
 }
 
 function snapshot(state: Layout): Layout {

@@ -5,7 +5,6 @@ import {
 	PENDING_CLOUD_LAUNCH_PANE_KIND,
 } from "../../types";
 
-/** The terminal ids and chat sessions that panes already show. */
 export interface AgentPaneClaims {
 	terminalIds: Set<string>;
 	sessionIds: Set<string>;
@@ -17,7 +16,6 @@ interface LayoutLike {
 	tabs: readonly { panes: Record<string, PaneLike> }[];
 }
 
-/** What an agent conversation can be claimed by. */
 export interface AgentClaimKeys {
 	terminalIds?: readonly (string | null | undefined)[];
 	sessionIds?: readonly (string | null | undefined)[];
@@ -33,7 +31,6 @@ export function isAgentPane(pane: PaneLike): boolean {
 	return AGENT_PANE_KINDS.has(pane.kind);
 }
 
-/** The keys one agent pane holds: its terminal, and its chat session once it has one. */
 export function paneClaimKeys(pane: PaneLike): {
 	terminalId: string | null;
 	sessionId: string | null;
@@ -67,7 +64,6 @@ export function claimKeys(claims: AgentPaneClaims, keys: AgentClaimKeys): void {
 	for (const id of keys.sessionIds ?? []) if (id) claims.sessionIds.add(id);
 }
 
-/** Every agent pane in every pane area of a workspace. */
 export function agentPaneClaims(
 	layouts: readonly (LayoutLike | null | undefined)[],
 ): AgentPaneClaims {

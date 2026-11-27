@@ -85,16 +85,12 @@ export function usePendingCloudLaunch({
 	const terminalListed = !!terminalSessions.data?.sessions.some(
 		(session) => session.terminalId === terminalId,
 	);
-	const answered =
-		(surface === "chat" ? sessionsQuery.data : terminalSessions.data) !==
-		undefined;
+	const answer = surface === "chat" ? sessionsQuery : terminalSessions;
 	const [answeredAtMs, setAnsweredAtMs] = useState<number | null>(null);
-	useEffect(() => {
-		if (!answered || answeredAtMs !== null) return;
-		const now = Date.now();
-		setAnsweredAtMs(now);
-		setNowMs(now);
-	}, [answered, answeredAtMs]);
+	if (answer.data !== undefined && answeredAtMs === null) {
+		setAnsweredAtMs(answer.dataUpdatedAt);
+		setNowMs(Math.max(nowMs, answer.dataUpdatedAt));
+	}
 
 	const outcome = pendingLaunchOutcome({
 		surface,

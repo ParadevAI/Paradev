@@ -5,19 +5,12 @@ export interface ListedChatSession {
 	title: string | null;
 	updatedAt: number;
 	live: boolean;
-	/** The terminal its harness runs under; null once it stops. */
 	terminalId: string | null;
-	/** The terminal it launched under, kept after the harness stops. Older hosts omit it. */
 	launchTerminalId?: string | null;
 	closedAt?: number | null;
 	closedByUser?: boolean;
 }
 
-/**
- * Every chat session one terminal has run: a resume, rewind or restart adds a
- * row, not a tab. The live row, else the newest, speaks for the conversation;
- * an older row left open is history, not a second chat.
- */
 export interface ChatConversation {
 	key: string;
 	sessionIds: string[];

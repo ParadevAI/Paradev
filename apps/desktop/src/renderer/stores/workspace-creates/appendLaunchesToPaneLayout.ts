@@ -33,7 +33,6 @@ type AgentLaunchResult =
 
 interface AppendArgs {
 	existing: WorkspaceState<PaneViewerData> | undefined;
-	/** The workspace's other pane areas; a launch shown there gets no tab here. */
 	linked?: readonly (WorkspaceState<PaneViewerData> | undefined)[];
 	terminals: Array<{ terminalId: string; label?: string }>;
 	agents: AgentLaunchResult[];

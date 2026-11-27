@@ -19,7 +19,6 @@ import {
 
 type Layout = WorkspaceState<PaneViewerData>;
 
-/** Seeded so a failure names the run that found it and replays exactly. */
 function random(seed: number) {
 	let state = seed >>> 0;
 	const next = () => {
@@ -49,14 +48,12 @@ interface World {
 	reopened: Set<string>;
 	oldHost: boolean;
 	openedEmpty: boolean;
-	/** The model's own truth: which conversation each chat row belongs to. */
 	conversationOf: Map<string, string>;
 	terminalOf: Map<string, string | null>;
 	latestOf: Map<string, string>;
 }
 
-/** A host runs one harness per terminal: a new session there stops the one before. */
-function addRow(
+function startSessionInConversation(
 	world: World,
 	row: ListedChatSession,
 	conversation: string,
@@ -72,8 +69,7 @@ function addRow(
 	world.latestOf.set(conversation, row.sessionId);
 }
 
-/** The model's own reading of what a pane shows, independent of the code under test. */
-function paneClaimKeys(pane: Pane<PaneViewerData>): {
+function modelPaneClaimKeys(pane: Pane<PaneViewerData>): {
 	terminalId: string | null;
 	sessionId: string | null;
 } {
@@ -115,7 +111,6 @@ function stopHarness(world: World, chat: ListedChatSession): void {
 	if (!world.oldHost) chat.launchTerminalId = launch;
 }
 
-/** One thing that happens to a workspace: on the host, or by the user. */
 function step(world: World, rng: ReturnType<typeof random>): void {
 	world.clock += 1;
 	const id = () => {
@@ -158,7 +153,7 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 	) {
 		case "launchChat": {
 			const terminal = `t${id()}`;
-			addRow(
+			startSessionInConversation(
 				world,
 				chatRow(`s${id()}`, terminal, world.clock),
 				terminal,
@@ -168,7 +163,12 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 		}
 		case "mobileChat": {
 			const session = `s${id()}`;
-			addRow(world, chatRow(session, null, world.clock), session, null);
+			startSessionInConversation(
+				world,
+				chatRow(session, null, world.clock),
+				session,
+				null,
+			);
 			return;
 		}
 		case "stop":
@@ -183,7 +183,7 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 			const terminal = world.terminalOf.get(conversation);
 			if (!terminal) return;
 			stopHarness(world, anyChat);
-			addRow(
+			startSessionInConversation(
 				world,
 				chatRow(`s${id()}`, terminal, world.clock),
 				conversation,
@@ -216,7 +216,7 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 		}
 		case "userClosesTab": {
 			if (!anyPane) return;
-			const { terminalId, sessionId } = paneClaimKeys(anyPane.pane);
+			const { terminalId, sessionId } = modelPaneClaimKeys(anyPane.pane);
 			if (anyPane.pane.kind === "terminal" && terminalId) {
 				if (rng.chance(0.5)) world.hiddenTerminals.add(terminalId);
 				else
@@ -269,7 +269,7 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 			const chat = rng.pick(world.chats);
 			if (!chat) return;
 			const shown = agentPanes.some(
-				({ pane }) => paneClaimKeys(pane).sessionId === chat.sessionId,
+				({ pane }) => modelPaneClaimKeys(pane).sessionId === chat.sessionId,
 			);
 			world.hiddenSessions.delete(chat.sessionId);
 			world.reopened.add(chat.sessionId);
@@ -297,7 +297,9 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 			const latest = world.latestOf.get(conversation) as string;
 			const terminal = world.terminalOf.get(conversation) ?? latest;
 			if (
-				agentPanes.some(({ pane }) => paneClaimKeys(pane).sessionId === latest)
+				agentPanes.some(
+					({ pane }) => modelPaneClaimKeys(pane).sessionId === latest,
+				)
 			)
 				return;
 			world.main = edit(world.main, (store) =>
@@ -318,7 +320,7 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 				}),
 			);
 			if (rng.chance(0.7))
-				addRow(
+				startSessionInConversation(
 					world,
 					chatRow(`s${id()}`, terminal, world.clock),
 					terminal,
@@ -370,10 +372,11 @@ function inputOf(
 		terminals: rng.chance(0.85) ? [...world.terminals] : undefined,
 		presetFor: () => "claude",
 		hiding: {
-			chatSession: (sessionId) => world.hiddenSessions.has(sessionId),
-			chatTerminal: (terminalId) => world.hiddenChatTerminals.has(terminalId),
-			terminal: (terminalId) => world.hiddenTerminals.has(terminalId),
-			reopened: (sessionId) => world.reopened.has(sessionId),
+			isChatClosedHere: (sessionId) => world.hiddenSessions.has(sessionId),
+			isChatTerminalHidden: (terminalId) =>
+				world.hiddenChatTerminals.has(terminalId),
+			isTerminalHidden: (terminalId) => world.hiddenTerminals.has(terminalId),
+			isChatReopenedHere: (sessionId) => world.reopened.has(sessionId),
 		},
 		openedEmpty: world.openedEmpty,
 	};
@@ -395,15 +398,17 @@ function checkInvariants(
 
 	const terminalPanes = panes
 		.filter((pane) => pane.kind === "terminal")
-		.map((pane) => paneClaimKeys(pane).terminalId);
+		.map((pane) => modelPaneClaimKeys(pane).terminalId);
 	if (new Set(terminalPanes).size !== terminalPanes.length)
 		throw new Error(`two panes on one terminal: ${terminalPanes}`);
 	const chatSessions = panes
-		.map((pane) => paneClaimKeys(pane).sessionId)
+		.map((pane) => modelPaneClaimKeys(pane).sessionId)
 		.filter(Boolean);
 	const chatTerminals = panes
-		.filter((pane) => pane.kind === "chat-v3" && paneClaimKeys(pane).sessionId)
-		.map((pane) => paneClaimKeys(pane).terminalId);
+		.filter(
+			(pane) => pane.kind === "chat-v3" && modelPaneClaimKeys(pane).sessionId,
+		)
+		.map((pane) => modelPaneClaimKeys(pane).terminalId);
 	if (new Set(chatTerminals).size !== chatTerminals.length) {
 		throw new Error(`two chat panes on one terminal: ${chatTerminals}`);
 	}
@@ -411,7 +416,7 @@ function checkInvariants(
 		throw new Error(`two panes on one chat: ${chatSessions}`);
 
 	const claimedTerminals = new Set(
-		panes.map((pane) => paneClaimKeys(pane).terminalId).filter(Boolean),
+		panes.map((pane) => modelPaneClaimKeys(pane).terminalId).filter(Boolean),
 	);
 	if (input.chats) {
 		const conversations = [...new Set(world.conversationOf.values())];
@@ -428,7 +433,7 @@ function checkInvariants(
 			);
 		};
 		const claims = (conversation: string, pane: Pane<PaneViewerData>) => {
-			const keys = paneClaimKeys(pane);
+			const keys = modelPaneClaimKeys(pane);
 			const terminal = world.terminalOf.get(conversation);
 			return (
 				(!!keys.sessionId &&
@@ -440,14 +445,15 @@ function checkInvariants(
 		for (const conversation of conversations) {
 			const terminal = world.terminalOf.get(conversation);
 			const hidden =
-				sessionsOf(conversation).some(input.hiding.chatSession) ||
-				(!!terminal && input.hiding.chatTerminal(terminal));
+				sessionsOf(conversation).some(input.hiding.isChatClosedHere) ||
+				(!!terminal && input.hiding.isChatTerminalHidden(terminal));
 			const addedForIt = added.filter((pane) => claims(conversation, pane));
 			const addedHiddenPane = addedForIt.some((pane) => {
-				const keys = paneClaimKeys(pane);
+				const keys = modelPaneClaimKeys(pane);
 				return (
-					(!!keys.sessionId && input.hiding.chatSession(keys.sessionId)) ||
-					(!!keys.terminalId && input.hiding.chatTerminal(keys.terminalId))
+					(!!keys.sessionId && input.hiding.isChatClosedHere(keys.sessionId)) ||
+					(!!keys.terminalId &&
+						input.hiding.isChatTerminalHidden(keys.terminalId))
 				);
 			});
 			if (
@@ -478,7 +484,7 @@ function checkInvariants(
 			}
 		}
 		for (const pane of panes) {
-			const sessionId = paneClaimKeys(pane).sessionId;
+			const sessionId = modelPaneClaimKeys(pane).sessionId;
 			if (!sessionId) continue;
 			const row = rowOf(sessionId);
 			const conversation = world.conversationOf.get(sessionId);
@@ -487,10 +493,10 @@ function checkInvariants(
 				!row.live &&
 				conversation &&
 				!isOpen(conversation) &&
-				!input.hiding.reopened(sessionId)
+				!input.hiding.isChatReopenedHere(sessionId)
 			) {
 				throw new Error(
-					`pane kept a chat closed elsewhere: ${sessionId} pane=${JSON.stringify(paneClaimKeys(pane))} rows=${JSON.stringify(input.chats?.filter((c) => world.conversationOf.get(c.sessionId) === conversation))} latest=${world.latestOf.get(conversation)}`,
+					`pane kept a chat closed elsewhere: ${sessionId} pane=${JSON.stringify(modelPaneClaimKeys(pane))} rows=${JSON.stringify(input.chats?.filter((c) => world.conversationOf.get(c.sessionId) === conversation))} latest=${world.latestOf.get(conversation)}`,
 				);
 			}
 		}
@@ -498,7 +504,7 @@ function checkInvariants(
 	if (input.terminals) {
 		for (const terminal of input.terminals) {
 			if (
-				!input.hiding.terminal(terminal.terminalId) &&
+				!input.hiding.isTerminalHidden(terminal.terminalId) &&
 				!claimedTerminals.has(terminal.terminalId)
 			) {
 				throw new Error(`terminal ${terminal.terminalId} has no pane`);
@@ -506,11 +512,11 @@ function checkInvariants(
 		}
 	}
 	for (const pane of added) {
-		const { terminalId } = paneClaimKeys(pane);
+		const { terminalId } = modelPaneClaimKeys(pane);
 		if (
 			pane.kind === "terminal" &&
 			terminalId &&
-			input.hiding.terminal(terminalId)
+			input.hiding.isTerminalHidden(terminalId)
 		) {
 			throw new Error(`added hidden terminal ${terminalId}`);
 		}
@@ -559,7 +565,8 @@ function checkInvariants(
 	if (again.changed) {
 		const describe = (state: Layout) =>
 			panesOf(state).map(
-				({ pane }) => `${pane.kind}:${JSON.stringify(paneClaimKeys(pane))}`,
+				({ pane }) =>
+					`${pane.kind}:${JSON.stringify(modelPaneClaimKeys(pane))}`,
 			);
 		throw new Error(
 			`not idempotent: ${JSON.stringify(describe(main))} -> ${JSON.stringify(describe(again.main))}`,

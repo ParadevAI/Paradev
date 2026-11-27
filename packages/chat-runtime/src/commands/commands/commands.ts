@@ -956,8 +956,6 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					? { agentConfigId: source.agentConfigId }
 					: {}),
 				resume: { harnessSessionId: forked },
-				// A branch is a conversation of its own; on the source's terminal
-				// it would read as that chat and close or hide with it.
 				...(parsed.terminalId ? { terminalId: parsed.terminalId } : {}),
 			});
 		},

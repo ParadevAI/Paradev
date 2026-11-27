@@ -3,7 +3,6 @@ import type { CloudAgentLaunchSurface } from "@superset/shared/cloud-agent-launc
 export interface LaunchedChatSession {
 	sessionId: string;
 	terminalId: string | null;
-	/** The terminal it launched under, kept after the harness stops. Older hosts omit it. */
 	launchTerminalId?: string | null;
 	harnessSessionId: string | null;
 	title: string | null;
@@ -45,11 +44,9 @@ export function pendingLaunchOutcome({
 	terminalBinding: { chatSessionId?: string | null } | undefined;
 	typed: boolean;
 	sinceMs: number;
-	/** When the host first answered the session lists; null until it has. */
 	answeredAtMs: number | null;
 	nowMs: number;
 	timeoutMs: number;
-	/** How long to wait for the host's first answer, from provisioning. */
 	noAnswerTimeoutMs: number;
 }): PendingLaunchOutcome {
 	const giveUp = givingUpOutcome(surface);
@@ -65,10 +62,6 @@ export function pendingLaunchOutcome({
 	return nowMs >= untilMs ? giveUp : { kind: "wait", untilMs };
 }
 
-/**
- * The chat the launch started, live or not: a harness that finished or a box
- * that slept leaves the session behind, and the user came for its transcript.
- */
 function launchedChat(
 	sessions: readonly LaunchedChatSession[],
 	terminalId: string,

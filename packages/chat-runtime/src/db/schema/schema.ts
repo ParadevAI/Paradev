@@ -32,7 +32,6 @@ export const chatSessionsLocal = sqliteTable(
 		harnessSessionId: text("harness_session_id"),
 		/** The host agent config the chat launched with; its env picks the account. */
 		agentConfigId: text("agent_config_id"),
-		/** The terminal id the chat launched under; outlives its harness process. */
 		launchTerminalId: text("terminal_id"),
 		epoch: text().notNull(),
 		status: text().$type<SessionStatus>().notNull(),

@@ -66,10 +66,10 @@ function layout(
 }
 
 const noHiding = {
-	chatSession: () => false,
-	chatTerminal: () => false,
-	terminal: () => false,
-	reopened: () => false,
+	isChatClosedHere: () => false,
+	isChatTerminalHidden: () => false,
+	isTerminalHidden: () => false,
+	isChatReopenedHere: () => false,
 };
 
 function reconcile(overrides: Partial<ReconcileAgentTabsInput> = {}) {
@@ -165,9 +165,9 @@ describe("reconcileAgentTabs", () => {
 			terminals: [{ terminalId: "backgrounded" }],
 			hiding: {
 				...noHiding,
-				chatSession: (id) => id === "closed-here",
-				chatTerminal: (id) => id === "terminal-ignored",
-				terminal: (id) => id === "backgrounded",
+				isChatClosedHere: (id) => id === "closed-here",
+				isChatTerminalHidden: (id) => id === "terminal-ignored",
+				isTerminalHidden: (id) => id === "backgrounded",
 			},
 		});
 		expect(result.changed).toBe(false);
@@ -220,7 +220,7 @@ describe("reconcileAgentTabs", () => {
 				chat("reopened", { live: false, closedByUser: true }),
 				chat("stopped", { live: false, closedAt: 5 }),
 			],
-			hiding: { ...noHiding, reopened: (id) => id === "reopened" },
+			hiding: { ...noHiding, isChatReopenedHere: (id) => id === "reopened" },
 		});
 		expect(shown(result.main)).toEqual([
 			"chat:reopened@b",
@@ -233,7 +233,7 @@ describe("reconcileAgentTabs", () => {
 		const result = reconcile({
 			main: layout([chatPane("x", "kept")], [chatPane("y", "gone")]),
 			chats: [chat("kept"), chat("gone", { live: false, closedAt: 5 })],
-			storedSessionIds: new Set(["kept", "gone"]),
+			shownFromStoredChats: new Set(["kept", "gone"]),
 		});
 		expect(shown(result.main)).toEqual(["chat:kept@x"]);
 	});

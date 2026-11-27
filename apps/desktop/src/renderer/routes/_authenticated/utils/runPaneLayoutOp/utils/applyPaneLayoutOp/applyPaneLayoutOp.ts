@@ -204,7 +204,6 @@ function newTabPane(op: NewTabOp): Omit<CreatePaneInput<PaneViewerData>, "id"> {
 	);
 }
 
-/** The pane already showing what a new tab would show: its chat, or its terminal. */
 function findShownPane(areas: PaneAreas, op: NewTabOp): Located | null {
 	const keys = op.chat
 		? { sessionIds: [op.chat.sessionId], terminalIds: [op.chat.terminalId] }
