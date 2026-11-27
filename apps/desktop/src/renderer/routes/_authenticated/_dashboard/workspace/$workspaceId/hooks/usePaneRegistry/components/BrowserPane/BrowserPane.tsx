@@ -352,24 +352,26 @@ export function BrowserPane({
 						{state.error && !state.isLoading && (
 							<BrowserErrorOverlay error={state.error} onRetry={reload} />
 						)}
-						{isBlankPage && !state.isLoading && !state.error && (
+						{!state.hasCommittedPage && !state.error && (
 							<div
 								data-pointer-passthrough-target
 								className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center bg-background"
 							>
-								<div className="flex w-full max-w-sm flex-col items-center gap-5 px-6">
-									<div className="flex size-14 items-center justify-center rounded-2xl bg-muted/50">
-										<GlobeIcon className="size-7 text-muted-foreground" />
+								{isBlankPage && !state.isLoading && (
+									<div className="flex w-full max-w-sm flex-col items-center gap-5 px-6">
+										<div className="flex size-14 items-center justify-center rounded-2xl bg-muted/50">
+											<GlobeIcon className="size-7 text-muted-foreground" />
+										</div>
+										<div className="text-center">
+											<p className="text-base font-medium text-foreground">
+												<Trans>Start browsing</Trans>
+											</p>
+											<p className="mt-1.5 text-sm text-muted-foreground">
+												<Trans>Enter a URL into the search bar above.</Trans>
+											</p>
+										</div>
 									</div>
-									<div className="text-center">
-										<p className="text-base font-medium text-foreground">
-											<Trans>Start browsing</Trans>
-										</p>
-										<p className="mt-1.5 text-sm text-muted-foreground">
-											<Trans>Enter a URL into the search bar above.</Trans>
-										</p>
-									</div>
-								</div>
+								)}
 							</div>
 						)}
 					</>,
