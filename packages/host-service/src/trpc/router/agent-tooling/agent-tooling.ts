@@ -33,6 +33,20 @@ function findWorkspace(ctx: HostServiceContext, workspaceId: string) {
 	return workspace;
 }
 
+function chatAgentConfigId(
+	ctx: HostServiceContext,
+	input: { workspaceId: string; agent: string; sessionId?: string },
+	resolvedConfigId: string | undefined,
+): string | undefined {
+	const chat = input.sessionId
+		? ctx.runtime?.chat?.()?.sessions.get(input.sessionId)
+		: null;
+	if (chat && chat.scopeId === input.workspaceId) {
+		return chat.agentConfigId ?? undefined;
+	}
+	return resolvedConfigId === input.agent ? resolvedConfigId : undefined;
+}
+
 export const agentToolingRouter = router({
 	/**
 	 * The slash commands and skills the given agent can use in this
@@ -66,6 +80,7 @@ export const agentToolingRouter = router({
 			z.object({
 				workspaceId: z.string(),
 				agent: z.string(),
+				sessionId: z.string().optional(),
 				refresh: z.boolean().optional(),
 			}),
 		)
@@ -84,6 +99,8 @@ export const agentToolingRouter = router({
 					db: ctx.db,
 					cwd: workspace.worktreePath,
 					workspaceId: input.workspaceId,
+					agentConfigId: chatAgentConfigId(ctx, input, config?.id),
+					presetId,
 				});
 				const claudeDir = env.CLAUDE_CONFIG_DIR?.trim();
 				const codexHome = env.CODEX_HOME?.trim();
@@ -96,6 +113,9 @@ export const agentToolingRouter = router({
 						claudeStatePath: claudeDir
 							? join(claudeDir, ".claude.json")
 							: join(home, ".claude.json"),
+						claudeSettingsPath: claudeDir
+							? join(claudeDir, "settings.json")
+							: join(home, ".claude", "settings.json"),
 						codexConfigPath: join(
 							codexHome || join(home, ".codex"),
 							"config.toml",

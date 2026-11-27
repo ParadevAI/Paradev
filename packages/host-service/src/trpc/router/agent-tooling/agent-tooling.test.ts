@@ -6,9 +6,14 @@ import { join, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import * as schema from "../../../db/schema";
+import {
+	initTerminalBaseEnv,
+	resetTerminalBaseEnvForTests,
+} from "../../../terminal/env";
 import type { HostServiceContext } from "../../../types";
 import { agentToolingRouter } from "./agent-tooling";
 import { clearSlashCommandDiscoveryCache } from "./discovery";
+import { clearMcpServerCache } from "./mcp-servers";
 
 const MIGRATIONS_FOLDER = resolve(import.meta.dir, "../../../../drizzle");
 const WORKSPACE_ID = "2b1e8c7e-1234-4abc-8def-0123456789ab";
@@ -19,8 +24,17 @@ let worktree: string;
 let db: ReturnType<typeof drizzle<typeof schema>>;
 let previousSupersetHomeDir: string | undefined;
 
-function createCaller() {
-	const ctx = { db, isAuthenticated: true } as unknown as HostServiceContext;
+type ChatRow = { scopeId: string; agentConfigId: string | null };
+
+function createCaller(chats: Record<string, ChatRow> = {}) {
+	const runtime = {
+		chat: () => ({ sessions: { get: (id: string) => chats[id] ?? null } }),
+	};
+	const ctx = {
+		db,
+		isAuthenticated: true,
+		runtime,
+	} as unknown as HostServiceContext;
 	return agentToolingRouter.createCaller(ctx);
 }
 
@@ -156,5 +170,59 @@ describe("agentTooling.listSlashCommands", () => {
 		expect(
 			fromConfig.filter((c) => c.kind === "custom").map((c) => c.name),
 		).toEqual(["from-config-env"]);
+	});
+});
+
+describe("agentTooling.listMcpServers", () => {
+	let configDir: string;
+
+	beforeEach(() => {
+		initTerminalBaseEnv({ PATH: "/usr/bin" });
+		clearMcpServerCache();
+		seedWorkspace();
+		configDir = join(root, "work-account");
+		mkdirSync(configDir, { recursive: true });
+		writeFileSync(
+			join(configDir, ".claude.json"),
+			JSON.stringify({ mcpServers: { "work-only": { command: "node" } } }),
+		);
+		seedAgentConfig({ CLAUDE_CONFIG_DIR: configDir });
+	});
+
+	afterEach(() => {
+		resetTerminalBaseEnvForTests();
+		clearMcpServerCache();
+	});
+
+	async function serverNames(
+		input: { agent: string; sessionId?: string },
+		chats?: Record<string, ChatRow>,
+	) {
+		const { servers } = await createCaller(chats).listMcpServers({
+			workspaceId: WORKSPACE_ID,
+			...input,
+		});
+		return servers.map((server) => server.name);
+	}
+
+	it("reads the config dir of the agent config the chat launched with", async () => {
+		const names = await serverNames(
+			{ agent: "claude", sessionId: "chat-1" },
+			{ "chat-1": { scopeId: WORKSPACE_ID, agentConfigId: CONFIG_ID } },
+		);
+		expect(names).toContain("work-only");
+	});
+
+	it("keeps the default account for a bare preset, and reads a config named by id", async () => {
+		expect(await serverNames({ agent: "claude" })).not.toContain("work-only");
+		expect(await serverNames({ agent: CONFIG_ID })).toContain("work-only");
+	});
+
+	it("ignores a chat from another workspace", async () => {
+		const names = await serverNames(
+			{ agent: "claude", sessionId: "chat-1" },
+			{ "chat-1": { scopeId: "other-workspace", agentConfigId: CONFIG_ID } },
+		);
+		expect(names).not.toContain("work-only");
 	});
 });
