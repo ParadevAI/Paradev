@@ -4,6 +4,7 @@ import type {
 	PaneViewerData,
 	PendingCloudLaunchPaneData,
 } from "../../../../../../types";
+import { chatDraftKey } from "../../../../utils/chatDraftKey";
 import { DraftChat } from "../../../ChatPane/components/AcpChatPane/components/DraftChat";
 
 export function PendingCloudChat({
@@ -24,7 +25,7 @@ export function PendingCloudChat({
 	const queued = useMemo(() => data.queuedPrompts ?? [], [data.queuedPrompts]);
 	return (
 		<DraftChat
-			draftKey={`chat-v3-draft:${data.draftId}`}
+			draftKey={chatDraftKey(data.draftId)}
 			isActive={ctx.isActive}
 			launched={launched}
 			onQueue={(content) => {

@@ -30,16 +30,18 @@ type McpServerPickerControls = {
 export function useMcpServerPicker({
 	workspaceId,
 	presetId,
+	sessionId,
 }: {
 	workspaceId: string;
 	presetId: string | undefined;
+	sessionId: string | undefined;
 }): McpServerPickerControls {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const utils = workspaceTrpc.useUtils();
 	const { install } = usePluginMutations();
 	const installAfterConnect = useInstallAfterConnect();
-	const input = { workspaceId, agent: presetId ?? "" };
+	const input = { workspaceId, agent: presetId ?? "", sessionId };
 	const listed = workspaceTrpc.agentTooling.listMcpServers.useQuery(input, {
 		enabled: presetId !== undefined,
 	}).data;
@@ -96,6 +98,7 @@ export function useMcpServerPicker({
 			render: ({ close }) => (
 				<McpServerPicker
 					presetId={pickerAgent}
+					sessionId={sessionId}
 					installedHere={installedHereRef.current}
 					workspaceId={workspaceId}
 					onPick={(chip) => {

@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# wiersz} few {# wiersze} many {# wierszy} other {# wiersza}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Cytat} few {Cytat · # wiersze} many {Cytat · # wierszy} other {Cytat · # wiersza}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (to urządzenie)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} nie przyjmuje argumentów"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} nie przyjmuje załączników"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} nie przyjmuje cytatów"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Prompt, kilka wyzwalaczy i obszar roboczy dla każdego uruchomienia"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request zawsze dostaje własny worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Cytat może mieć najwyżej {limit} znaków"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Przebudowana powierzchnia czatu do prowadzenia agentów: bogatsze wyjście narzędzi, płynniejsze sterowanie, szybsze wszystko."
@@ -2293,6 +2302,9 @@ msgstr "Dodaj tę etykietę"
 
 msgid "Add to channel"
 msgstr "Dodaj do kanału"
+
+msgid "Add to chat"
+msgstr "Dodaj do czatu"
 
 msgid "Add to Dictionary"
 msgstr "Dodaj do słownika"
@@ -7241,6 +7253,9 @@ msgstr "Usunięto „{projectName}” z {0} z {1} urządzeń. Pozostałe zachowu
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Usunięto „{projectName}”. Możesz go przywrócić w Ustawienia → Projekty przez 30 dni."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Usunięto {completed} z {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Usunięto {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7297,6 @@ msgstr "Usuwa tego hosta, dostęp do niego i jego obszary robocze. Pliki na masz
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Usuwanie"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Usuwanie {0} z {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Usuwanie {name}..."
@@ -8987,9 +8997,6 @@ msgstr "Rys. 1 · Udział człowieka w wysiłku stojącym za scaloną zmianą"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Rys. 2 · Scalone zmiany napisane przez agentów, zero poprawek człowieka"
 
-msgid "file"
-msgstr "plik"
-
 msgid "File"
 msgstr "Plik"
 
@@ -9335,8 +9342,8 @@ msgstr "W przypadku zgłoszeń błędów i propozycji funkcji najszybszą drogą
 msgid "For individuals getting started"
 msgstr "Dla osób, które zaczynają"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Dla macOS na Apple Silicon i Intel. Linux AppImage jest eksperymentalny."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Dla macOS na Apple Silicon i Intel oraz systemu Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "Dla organizacji o zaawansowanych potrzebach"
@@ -9453,8 +9460,8 @@ msgstr "Darmowe kredyty"
 msgid "Free for everyone"
 msgstr "Za darmo dla wszystkich"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Za darmo dla jednego użytkownika. macOS oraz eksperymentalna wersja dla systemu Linux."
+msgid "Free for one user. macOS and Linux."
+msgstr "Za darmo dla jednego użytkownika. macOS i Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Za darmo dla jednego użytkownika. Open source na licencji MIT."
@@ -11788,8 +11795,8 @@ msgstr "Niezwiązane z maszyną obszary robocze w chmurze, które startują w ki
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (eksperymentalnie)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13644,8 +13651,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Brak aktualizacji"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Jeszcze nie. Działa na macOS, z eksperymentalną wersją dla systemu Linux. Użytkownicy Windows mogą zapisać się na listę oczekujących przez przycisk pobierania."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Jeszcze nie. Działa na macOS i Linuksie. Użytkownicy Windows mogą zapisać się na listę oczekujących przez przycisk pobierania."
 
 msgid "Note"
 msgstr "Uwaga"
@@ -14205,6 +14212,9 @@ msgstr "Otwórz plik"
 
 msgid "Open File in New Tab"
 msgstr "Otwórz plik w nowej karcie"
+
+msgid "Open folder in editor"
+msgstr "Otwórz folder w edytorze"
 
 msgid "Open from folder"
 msgstr "Otwórz z folderu"
@@ -16583,6 +16593,9 @@ msgstr "Usuń powiązanie z PR"
 msgid "Remove queued message"
 msgstr "Usuń wiadomość z kolejki"
 
+msgid "Remove quote"
+msgstr "Usuń cytat"
+
 msgid "Remove repository"
 msgstr "Usuń repozytorium"
 
@@ -18179,6 +18192,9 @@ msgstr "Akcje zaznaczonych obszarów roboczych"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Zaznaczenie tekstu w terminalu od razu kopiuje go do schowka, bez końcowych spacji"
+
+msgid "Selection actions"
+msgstr "Akcje zaznaczenia"
 
 msgid "Self-hosted"
 msgstr "Własny hosting"

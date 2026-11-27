@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# regel} other {# regels}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Citaat} other {Citaat · # regels}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (dit apparaat)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} accepteert geen argumenten"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} accepteert geen bijlagen"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} accepteert geen citaten"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Een prompt, een paar triggers en een werkruimte per run"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Een pull request krijgt altijd een eigen worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Een citaat mag maximaal {limit} tekens bevatten"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Een herbouwd chatoppervlak om agents aan te sturen: rijkere tooluitvoer, soepeler bijsturen, alles sneller."
@@ -2293,6 +2302,9 @@ msgstr "Dit label toevoegen"
 
 msgid "Add to channel"
 msgstr "Aan kanaal toevoegen"
+
+msgid "Add to chat"
+msgstr "Toevoegen aan chat"
 
 msgid "Add to Dictionary"
 msgstr "Toevoegen aan woordenboek"
@@ -7241,6 +7253,9 @@ msgstr "\"{projectName}\" verwijderd van {0} van {1} apparaten. De andere houden
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" verwijderd. Je kunt het 30 dagen lang herstellen via Instellingen → Projecten."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{completed} van {total} verwijderd…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Verwijderd {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7297,6 @@ msgstr "Verwijdert deze host, de toegang en de werkruimtes. Bestanden op de mach
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Verwijderen"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{0} van {1} verwijderen…"
 
 msgid "Deleting {name}..."
 msgstr "{name} verwijderen..."
@@ -8987,9 +8997,6 @@ msgstr "Fig. 1 · Menselijk aandeel in de inspanning achter een gemergede wijzig
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Gemergede wijzigingen geschreven door agents, zonder menselijke bewerkingen"
 
-msgid "file"
-msgstr "bestand"
-
 msgid "File"
 msgstr "Bestand"
 
@@ -9335,8 +9342,8 @@ msgstr "Voor bugmeldingen en featureverzoeken is een GitHub-issue op <0>{githubH
 msgid "For individuals getting started"
 msgstr "Voor individuen die beginnen"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Voor macOS op Apple Silicon en Intel. Linux-AppImage is experimenteel."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Voor macOS op Apple Silicon en Intel, en Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "Voor organisaties met geavanceerde eisen"
@@ -9453,8 +9460,8 @@ msgstr "Gratis tegoed"
 msgid "Free for everyone"
 msgstr "Gratis voor iedereen"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Gratis voor één gebruiker. macOS, met een experimentele Linux-build."
+msgid "Free for one user. macOS and Linux."
+msgstr "Gratis voor één gebruiker. macOS en Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Gratis voor één gebruiker. Open source onder MIT."
@@ -11788,8 +11795,8 @@ msgstr "Machine-onafhankelijke cloudwerkruimtes die in seconden opstarten en met
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimenteel)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13644,8 +13651,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Geen updates"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Nog niet. Het draait op macOS, met een experimentele Linux-build. Windows-gebruikers kunnen zich via de downloadknop op de wachtlijst zetten."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Nog niet. Het draait op macOS en Linux. Windows-gebruikers kunnen zich via de downloadknop op de wachtlijst zetten."
 
 msgid "Note"
 msgstr "Opmerking"
@@ -14205,6 +14212,9 @@ msgstr "Bestand openen"
 
 msgid "Open File in New Tab"
 msgstr "Bestand openen in nieuw tabblad"
+
+msgid "Open folder in editor"
+msgstr "Map openen in editor"
 
 msgid "Open from folder"
 msgstr "Openen vanuit map"
@@ -16583,6 +16593,9 @@ msgstr "PR-koppeling verwijderen"
 msgid "Remove queued message"
 msgstr "Bericht uit wachtrij verwijderen"
 
+msgid "Remove quote"
+msgstr "Citaat verwijderen"
+
 msgid "Remove repository"
 msgstr "Repository verwijderen"
 
@@ -18179,6 +18192,9 @@ msgstr "Acties voor geselecteerde werkruimtes"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Tekst selecteren in een terminal kopieert die meteen naar het klembord, zonder witruimte aan het einde"
+
+msgid "Selection actions"
+msgstr "Acties voor selectie"
 
 msgid "Self-hosted"
 msgstr "Zelf gehost"

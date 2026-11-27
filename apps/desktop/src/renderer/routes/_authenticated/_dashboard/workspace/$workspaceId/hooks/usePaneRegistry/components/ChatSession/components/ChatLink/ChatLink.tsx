@@ -1,19 +1,15 @@
 import { useLingui } from "@lingui/react/macro";
 import { chatMarkdownComponents } from "@superset/chat-ui/ChatMarkdown";
 import { cn } from "@superset/ui/utils";
-import { type UseNavigateResult, useNavigate } from "@tanstack/react-router";
-import type { ComponentProps, MouseEvent, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { env } from "renderer/env.renderer";
-import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { useOpenAppLink } from "../../hooks/useOpenAppLink";
 import { ChatLinkProvider } from "../../providers/ChatLinkProvider";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import { parseGithubWorkItemUrl } from "../../utils/githubWorkItem";
 import { unfurlLink } from "../../utils/linkUnfurl";
 import { LOCAL_PATH_PREFIX } from "../../utils/remarkLocalPathLinks";
-import {
-	parseSupersetAppLink,
-	type SupersetAppLink,
-} from "../../utils/supersetAppLink";
+import { parseSupersetAppLink } from "../../utils/supersetAppLink";
 import { ChatPreviewHoverCard } from "../ChatPreviewHoverCard";
 import { FileLinkMenu } from "../FileLinkMenu";
 import { GithubWorkItemHoverCard } from "../GithubWorkItemHoverCard";
@@ -21,52 +17,11 @@ import { LinkMenu } from "../LinkMenu";
 import { WebsiteHoverCard } from "../WebsiteHoverCard";
 import { EnvironmentLinkLabel } from "./components/EnvironmentLinkLabel";
 import { LinkUnfurlIcon } from "./components/LinkUnfurlIcon";
+import { WorkspaceLinkLabel } from "./components/WorkspaceLinkLabel";
 
 const MarkdownLink = chatMarkdownComponents.a;
 const UNFURLED_LINK_CLASSNAME =
 	"rounded-md bg-foreground/[0.06] px-1.5 py-0.5 text-foreground no-underline box-decoration-clone transition-colors hover:bg-foreground/[0.12] hover:text-foreground hover:no-underline";
-
-function openInApp(
-	link: Exclude<SupersetAppLink, { kind: "page" }>,
-	navigate: UseNavigateResult<string>,
-): void {
-	switch (link.kind) {
-		case "task":
-			void navigate({ to: "/tasks/$taskId", params: { taskId: link.taskId } });
-			return;
-		case "automation":
-			void navigate({
-				to: "/automations/$automationId",
-				params: { automationId: link.automationId },
-			});
-			return;
-		case "plugin":
-			void navigate({
-				to: "/plugins/$pluginName",
-				params: { pluginName: link.pluginName },
-			});
-			return;
-		case "environment":
-			void navigate({
-				to: "/settings/environments/$environmentId",
-				params: { environmentId: link.environmentId },
-			});
-			return;
-		case "workspace":
-			void navigate({
-				to: "/workspace/$workspaceId",
-				params: { workspaceId: link.workspaceId },
-			});
-			return;
-		case "chat":
-			void navigateToWorkspace(link.workspaceId, navigate, {
-				search: {
-					sessionId: link.sessionId,
-					focusRequestId: crypto.randomUUID(),
-				},
-			});
-	}
-}
 
 function isWebLink(href: string): boolean {
 	try {
@@ -77,14 +32,10 @@ function isWebLink(href: string): boolean {
 	}
 }
 
-function withModifier(event: MouseEvent): boolean {
-	return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
-}
-
 export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 	const { t } = useLingui();
 	const { openPage, openLink, workspaceId } = useChatPaneActions();
-	const navigate = useNavigate();
+	const openAppLink = useOpenAppLink();
 	const isLocalPath = props.href?.startsWith(LOCAL_PATH_PREFIX) ?? false;
 	const href = isLocalPath
 		? decodeURIComponent(props.href?.slice(LOCAL_PATH_PREFIX.length) ?? "")
@@ -105,6 +56,8 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 			t({ message: "Chat" })
 		) : appLink?.kind === "environment" ? (
 			<EnvironmentLinkLabel environmentId={appLink.environmentId} />
+		) : appLink?.kind === "workspace" ? (
+			<WorkspaceLinkLabel workspaceId={appLink.workspaceId} />
 		) : (
 			unfurl?.label
 		);
@@ -136,9 +89,8 @@ export function ChatLink(props: ComponentProps<typeof MarkdownLink>) {
 					openPage(href, event);
 					return;
 				}
-				if (appLink && appLink.kind !== "page" && !withModifier(event)) {
+				if (openAppLink(href)) {
 					event.preventDefault();
-					openInApp(appLink, navigate);
 					return;
 				}
 				if (openLink?.(href, event) || isLocalPath) event.preventDefault();

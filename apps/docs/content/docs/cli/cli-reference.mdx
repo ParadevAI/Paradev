@@ -2351,17 +2351,21 @@ API, which attaches the stored credential, so no token is written to this
 machine.
 
 <Command
-	name="paradev mcp tools"
+	name="paradev mcp tools [tool]"
+	args={[
+		{ name: "tool", description: "Tool name. Shows that tool's arguments and output fields instead of the list." },
+	]}
 	options={[
 		{ flag: "--plugin <name>", required: true, description: "Plugin name, e.g. `slack` or `google-calendar`." },
 		{ flag: "--account <id>", description: "Connection id. Needed only when the plugin has more than one connected account." },
 	]}
-	output="Array<{ plugin, tool, description }>"
+	output="Array<{ plugin, tool, description, inputSchema, outputSchema? }>"
 >
-List the tools a connected plugin exposes (PLUGIN, TOOL, DESCRIPTION).
+List the tools a connected plugin exposes (PLUGIN, TOOL, DESCRIPTION). With a tool name, print its description, an arguments table (name, type, required, default, description), and its output fields. An unknown name suggests the closest tool. `--json` rows carry `inputSchema` and `outputSchema` as the plugin's server sent them.
 
 ```bash
 paradev mcp tools --plugin slack
+paradev mcp tools search_messages --plugin slack
 ```
 </Command>
 

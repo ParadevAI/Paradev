@@ -1,12 +1,19 @@
 export interface FeatureOverlay {
-	id: "parallel-execution" | "cli-sdk";
+	id: "agent-independence" | "parallel-execution" | "cli-sdk";
 	title: string;
 	description: string;
 }
 export interface LandingCopy {
 	lead: string;
 	emphasis: string;
-	feature: FeatureOverlay;
+	title?: string;
+	description?: string;
+	image?: { url: string; width: number; height: number };
+	indexable?: boolean;
+	subheadline?: string;
+	promoCode?: string;
+	badge?: { label: string; href: string };
+	feature?: FeatureOverlay;
 }
 export const landingCopy = {
 	"claude-code-parallel-sessions": {
@@ -37,6 +44,28 @@ export const landingCopy = {
 			title: "Switch tasks without stashing",
 			description:
 				"Paradev creates a Git worktree for each task. Review one Codex diff while another task keeps running on its own branch.",
+		},
+	},
+	"black-friday": {
+		indexable: true,
+		image: { url: "/land/black-friday.png", width: 1600, height: 900 },
+		lead: "Paradev Pro,",
+		emphasis: "Free for 90 Days",
+		title: "Black Friday & Cyber Monday: Paradev Pro Free for 90 Days",
+		description:
+			"Paradev is open source. For Black Friday, enter BFCM2026 at checkout to get 90 days of Pro free.",
+		subheadline:
+			"The open-source workspace for Claude Code, Codex, and any agent.",
+		promoCode: "BFCM2026",
+		feature: {
+			id: "agent-independence",
+			title: "Use the best agents with your own subscriptions",
+			description:
+				"Use the best agents as soon as they come out. Your artifacts, branches, and plugins work across all of them.",
+		},
+		badge: {
+			label: "Black Friday & Cyber Monday offer",
+			href: "#black-friday",
 		},
 	},
 } satisfies Record<string, LandingCopy>;

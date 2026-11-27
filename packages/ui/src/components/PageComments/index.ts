@@ -26,6 +26,7 @@ export {
 	type PageHeaderPage,
 	type PageHeaderSharing,
 	type PageHeaderVersion,
+	PageRefreshButton,
 	PageShareButton,
 	type PageShareRole,
 	PageTitleMenu,

@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# строка} few {# строки} many {# строк} other {# строки}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Цитата} one {Цитата · # строка} few {Цитата · # строки} many {Цитата · # строк} other {Цитата · # строки}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (это устройство)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} не принимает аргументы"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} не принимает вложения"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} не принимает цитаты"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Промпт, несколько триггеров и рабочая о
 
 msgid "A pull request always gets its own worktree"
 msgstr "У pull request всегда есть собственный worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Цитата может содержать не более {limit} символов"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Переделанная поверхность чата для управления агентами: богаче вывод инструментов, плавнее управление, всё быстрее."
@@ -2293,6 +2302,9 @@ msgstr "Добавить эту метку"
 
 msgid "Add to channel"
 msgstr "Добавить в канал"
+
+msgid "Add to chat"
+msgstr "Добавить в чат"
 
 msgid "Add to Dictionary"
 msgstr "Добавить в словарь"
@@ -7241,6 +7253,9 @@ msgstr "«{projectName}» удалён с {0} из {1} устройств. На 
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "«{projectName}» удалён. Его можно восстановить в разделе «Настройки → Проекты» в течение 30 дней."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Удалено {completed} из {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Удалён {deletedWhen} · {deviceNames}"
 
@@ -7282,11 +7297,6 @@ msgstr "Удаляет этот хост, доступ к нему и его р�
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Удаление"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Удаление {0} из {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Удаление {name}..."
@@ -8987,9 +8997,6 @@ msgstr "Рис. 1 · Доля человека в усилиях за объед
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Рис. 2 · Объединённые изменения, написанные агентами, без правок человека"
 
-msgid "file"
-msgstr "файл"
-
 msgid "File"
 msgstr "Файл"
 
@@ -9335,8 +9342,8 @@ msgstr "Для сообщений об ошибках и запросов фун
 msgid "For individuals getting started"
 msgstr "Для тех, кто начинает в одиночку"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Для macOS на Apple Silicon и Intel. Linux AppImage — экспериментальная версия."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Для macOS на Apple Silicon и Intel, а также Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "Для организаций с повышенными требованиями"
@@ -9453,8 +9460,8 @@ msgstr "Бесплатные кредиты"
 msgid "Free for everyone"
 msgstr "Бесплатно для всех"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Бесплатно для одного пользователя. macOS и экспериментальная сборка для Linux."
+msgid "Free for one user. macOS and Linux."
+msgstr "Бесплатно для одного пользователя. macOS и Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Бесплатно для одного пользователя. Open source под лицензией MIT."
@@ -11788,8 +11795,8 @@ msgstr "Облачные рабочие области, не привязанн�
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (экспериментально)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Пурпурный"
@@ -13644,8 +13651,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Нет обновлений"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Пока нет. Он работает на macOS, есть экспериментальная сборка для Linux. Пользователи Windows могут записаться в список ожидания через кнопку загрузки."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Пока нет. Он работает на macOS и Linux. Пользователи Windows могут записаться в список ожидания через кнопку загрузки."
 
 msgid "Note"
 msgstr "Примечание"
@@ -14205,6 +14212,9 @@ msgstr "Открыть файл"
 
 msgid "Open File in New Tab"
 msgstr "Открыть файл в новой вкладке"
+
+msgid "Open folder in editor"
+msgstr "Открыть папку в редакторе"
 
 msgid "Open from folder"
 msgstr "Открыть из папки"
@@ -16583,6 +16593,9 @@ msgstr "Отвязать PR"
 msgid "Remove queued message"
 msgstr "Удалить сообщение из очереди"
 
+msgid "Remove quote"
+msgstr "Удалить цитату"
+
 msgid "Remove repository"
 msgstr "Удалить репозиторий"
 
@@ -18179,6 +18192,9 @@ msgstr "Действия с выбранными рабочими областя
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Выделенный в терминале текст сразу копируется в буфер обмена, без конечных пробелов"
+
+msgid "Selection actions"
+msgstr "Действия с выделением"
 
 msgid "Self-hosted"
 msgstr "Собственный хостинг"

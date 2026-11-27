@@ -28,7 +28,7 @@ interface PageHeaderData {
 	onSetVisibility: (visibility: PageVisibility) => Promise<void>;
 	onSetSharedVersion: (version: number | null) => Promise<void>;
 	onRename: (title: string) => Promise<void>;
-	onRefresh: () => void;
+	onRefresh: () => Promise<void>;
 	onDelete: () => Promise<void>;
 	onDuplicate: (title: string) => Promise<{ id: string; slug: string } | null>;
 	sharing: PageHeaderSharing;
@@ -177,9 +177,7 @@ export function usePageHeaderData(data: PageHeaderTarget): PageHeaderData {
 				utils.page.listPaginated.invalidate(),
 			]);
 		},
-		onRefresh: () => {
-			void refresh();
-		},
+		onRefresh: refresh,
 		onDelete: async () => {
 			if (!pageId) return;
 			await deletePage.mutateAsync({ id: pageId });

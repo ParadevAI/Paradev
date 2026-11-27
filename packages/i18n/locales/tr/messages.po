@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# satır} other {# satır}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Alıntı} other {Alıntı · # satır}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (bu cihaz)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} argüman almaz"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} ek almaz"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} alıntı almaz"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Bir istem, birkaç tetikleyici ve her çalıştırma için bir çalışm
 
 msgid "A pull request always gets its own worktree"
 msgstr "Bir pull request her zaman kendi worktree'sini alır"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Bir alıntı en fazla {limit} karakter olabilir"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Ajanları yönetmek için yeniden yapılmış bir sohbet yüzeyi: daha zengin araç çıktısı, daha akıcı yönlendirme, her şey daha hızlı."
@@ -2293,6 +2302,9 @@ msgstr "Bu etiketi ekle"
 
 msgid "Add to channel"
 msgstr "Kanala ekle"
+
+msgid "Add to chat"
+msgstr "Sohbete ekle"
 
 msgid "Add to Dictionary"
 msgstr "Sözlüğe ekle"
@@ -7241,6 +7253,9 @@ msgstr "\"{projectName}\", {1} cihazın {0} tanesinden silindi. Diğerleri kopya
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" silindi. 30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{total} öğeden {completed} tanesi silindi…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen} silindi · {deviceNames}"
 
@@ -7282,11 +7297,6 @@ msgstr "Bu host'u, erişimini ve çalışma alanlarını siler. Makinedeki dosya
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Siliniyor"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{1} öğeden {0} tanesi siliniyor…"
 
 msgid "Deleting {name}..."
 msgstr "{name} siliniyor..."
@@ -8987,9 +8997,6 @@ msgstr "Şekil 1 · Birleştirilen bir değişiklikteki insan emeği payı"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Şekil 2 · Ajanların yazdığı, hiç insan düzenlemesi olmayan birleştirilmiş değişiklikler"
 
-msgid "file"
-msgstr "dosya"
-
 msgid "File"
 msgstr "Dosya"
 
@@ -9335,8 +9342,8 @@ msgstr "Hata bildirimleri ve özellik istekleri için en hızlı yol <0>{githubH
 msgid "For individuals getting started"
 msgstr "Yeni başlayan bireyler için"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Apple Silicon ve Intel üzerinde macOS için. Linux AppImage deneyseldir."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Apple Silicon ve Intel üzerinde macOS ile Linux (AppImage) için."
 
 msgid "For organizations with advanced needs"
 msgstr "Gelişmiş ihtiyaçları olan kuruluşlar için"
@@ -9453,8 +9460,8 @@ msgstr "Ücretsiz krediler"
 msgid "Free for everyone"
 msgstr "Herkes için ücretsiz"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Tek kullanıcı için ücretsiz. macOS ve deneysel bir Linux sürümü."
+msgid "Free for one user. macOS and Linux."
+msgstr "Tek kullanıcı için ücretsiz. macOS ve Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Tek kullanıcı için ücretsiz. MIT lisansıyla açık kaynak."
@@ -11788,8 +11795,8 @@ msgstr "Saniyeler içinde açılan ve takım arkadaşlarınızla paylaşılabile
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (deneysel)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Macenta"
@@ -13644,8 +13651,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Güncellenmiyor"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Henüz değil. macOS'ta çalışır, deneysel bir Linux sürümü de vardır. Windows kullanıcıları indirme düğmesinden bekleme listesine katılabilir."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Henüz değil. macOS ve Linux'ta çalışır. Windows kullanıcıları indirme düğmesinden bekleme listesine katılabilir."
 
 msgid "Note"
 msgstr "Not"
@@ -14205,6 +14212,9 @@ msgstr "Dosyayı aç"
 
 msgid "Open File in New Tab"
 msgstr "Dosyayı yeni sekmede aç"
+
+msgid "Open folder in editor"
+msgstr "Klasörü düzenleyicide aç"
 
 msgid "Open from folder"
 msgstr "Klasörden aç"
@@ -16583,6 +16593,9 @@ msgstr "PR bağlantısını kaldır"
 msgid "Remove queued message"
 msgstr "Kuyruktaki mesajı kaldır"
 
+msgid "Remove quote"
+msgstr "Alıntıyı kaldır"
+
 msgid "Remove repository"
 msgstr "Depoyu kaldır"
 
@@ -18179,6 +18192,9 @@ msgstr "Seçili çalışma alanı eylemleri"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Terminalde metin seçmek, sondaki boşluklar kırpılmış olarak panoya hemen kopyalar"
+
+msgid "Selection actions"
+msgstr "Seçim işlemleri"
 
 msgid "Self-hosted"
 msgstr "Kendi sunucunuzda"
