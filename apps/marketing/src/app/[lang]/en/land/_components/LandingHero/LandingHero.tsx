@@ -87,11 +87,11 @@ export function LandingHero({
 							</p>
 							{promoCode && (
 								<div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2.5 text-xs sm:text-sm text-muted-foreground">
-									<span className="justify-self-end">Use code</span>
 									<PromoCode
 										code={promoCode}
 										source="black_friday_hero"
 										size="xs"
+										className="col-start-2"
 									/>
 									<span className="justify-self-start">at checkout</span>
 								</div>
