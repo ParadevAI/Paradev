@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { builtInThemes, darkTheme, lightTheme } from "./built-in";
 import { getEditorTheme } from "./editor-theme";
+import { fromT3Skin } from "./t3-skin";
 import { getDefaultTerminalColors, type Theme } from "./types";
 
 export const MAX_THEME_CSS_LENGTH = 64 * 1024;
@@ -283,11 +284,13 @@ export function parseThemeConfigFile(content: string): ThemeConfigParseResult {
 		return { ok: false, error: "Invalid JSON file" };
 	}
 
-	const entries = Array.isArray(parsedJson)
-		? parsedJson
-		: isThemePack(parsedJson)
-			? parsedJson.themes
-			: [parsedJson];
+	const entries = (
+		Array.isArray(parsedJson)
+			? parsedJson
+			: isThemePack(parsedJson)
+				? parsedJson.themes
+				: [parsedJson]
+	).flatMap((entry) => fromT3Skin(entry) ?? [entry]);
 
 	if (entries.length === 0) {
 		return { ok: false, error: "No themes found in file" };
