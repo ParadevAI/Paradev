@@ -19,5 +19,5 @@ export interface GitCredentialProvider {
 
 export type GitFactory = (
 	path: string,
-	options?: Pick<SimpleGitOptions, "timeout">,
+	options?: Pick<SimpleGitOptions, "timeout"> & { interactive?: boolean },
 ) => Promise<SimpleGit>;

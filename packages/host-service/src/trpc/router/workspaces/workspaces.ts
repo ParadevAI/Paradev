@@ -351,7 +351,7 @@ function createWorkerBaseRefFetcher(
 		const gitEnv = await createGitEnvResolver(ctx.credentials)(repoPath);
 		return getHostWorkerPool().run(
 			gitFetchBaseRefTask,
-			{ worktreePath: repoPath, target, gitEnv },
+			{ worktreePath: repoPath, target, gitEnv, interactive: true },
 			{
 				timeoutMs: 30_000,
 				strategy: "coalesce",

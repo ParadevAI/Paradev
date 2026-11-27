@@ -68,6 +68,7 @@ export function useOpenStackLayer(
 				workspaceId: workspace.id,
 				branches: openLayers.map((layer) => layer.headRefName),
 				missingOnly: true,
+				interactive: false,
 			})
 			.catch(() => {});
 	}, [warmKey, canSwitch, hostUrl, workspace.id, layerWorkspace]);
