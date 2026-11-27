@@ -7,6 +7,7 @@ import {
 } from "../../terminal/terminal";
 import {
 	chainPhases,
+	inheritedConfigNotice,
 	loadProjectConfig,
 	shellSingleQuote,
 } from "../setup/config";
@@ -102,6 +103,8 @@ export async function runTeardown({
 		}
 	};
 	const dataDisposer = session.pty.onData(appendTail);
+	const failureOutput = () =>
+		resolved.notice ? `${resolved.notice}\n${tail}` : tail;
 
 	return new Promise<TeardownResult>((resolve) => {
 		let settled = false;
@@ -130,7 +133,7 @@ export async function runTeardown({
 				exitCode: exitCode ?? null,
 				signal: signal ?? null,
 				timedOut,
-				outputTail: tail,
+				outputTail: failureOutput(),
 			});
 		});
 
@@ -153,7 +156,7 @@ export async function runTeardown({
 					exitCode: null,
 					signal: null,
 					timedOut: true,
-					outputTail: tail,
+					outputTail: failureOutput(),
 				});
 			}, KILL_GRACE_MS).unref();
 		};
@@ -181,14 +184,18 @@ export function resolveTeardownCommand(args: {
 	projectId: string;
 	worktreePath: string;
 	appHomeDir?: string;
-}): { initialCommand: string; cwd?: string } | null {
+}): { initialCommand: string; cwd?: string; notice?: string } | null {
 	const config = loadProjectConfig(args);
 	if (config?.kind !== "ok") return null;
 	const archive = chainPhases([config.resolved.archive], args.worktreePath);
 	if (!archive) return null;
+	const inherited = config.inheritedFrom.archive;
 	return {
 		initialCommand: buildTeardownCommandFromShell(archive.command),
 		...(archive.cwd && { cwd: archive.cwd }),
+		...(inherited && {
+			notice: inheritedConfigNotice("teardown", inherited),
+		}),
 	};
 }
 

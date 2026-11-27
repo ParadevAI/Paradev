@@ -12,7 +12,7 @@ import {
 import { hostname, tmpdir } from "node:os";
 import { join } from "node:path";
 import { workspaceDevAppProfileDirName } from "@superset/shared/dev-app-profile";
-import { shellSingleQuote } from "../setup/config";
+import { inheritedConfigNotice, shellSingleQuote } from "../setup/config";
 import { removeDevAppProfile } from "./dev-app-profile";
 import {
 	buildTeardownCommandFromShell,
@@ -85,9 +85,17 @@ describe("resolveTeardownCommand", () => {
 	}
 
 	function writeConfig(repoPath: string, config: unknown): void {
+		mkdirSync(join(repoPath, ".superset"), { recursive: true });
 		writeFileSync(
 			join(repoPath, ".superset", "config.json"),
 			JSON.stringify(config),
+		);
+	}
+
+	function mainCheckoutNotice(repoPath: string): string {
+		return inheritedConfigNotice(
+			"teardown",
+			join(repoPath, ".superset", "config.json"),
 		);
 	}
 
@@ -112,6 +120,7 @@ describe("resolveTeardownCommand", () => {
 			expect(resolved).toEqual({
 				initialCommand:
 					"exec bash -c 'docker compose down && bash teardown.sh'",
+				notice: mainCheckoutNotice(sb.repoPath),
 			});
 		} finally {
 			sb.cleanup();
@@ -136,6 +145,7 @@ describe("resolveTeardownCommand", () => {
 
 			expect(resolved).toEqual({
 				initialCommand: "exec bash -c 'echo configured'",
+				notice: mainCheckoutNotice(sb.repoPath),
 			});
 		} finally {
 			sb.cleanup();
@@ -216,7 +226,65 @@ describe("resolveTeardownCommand", () => {
 			expect(resolved).toEqual({
 				initialCommand: "exec bash -c 'docker compose down'",
 				cwd: "apps/web",
+				notice: mainCheckoutNotice(sb.repoPath),
 			});
+		} finally {
+			sb.cleanup();
+		}
+	});
+
+	test("names the main checkout's config only for the keys the worktree config leaves out", () => {
+		const sb = makeSandbox();
+		try {
+			writeConfig(sb.repoPath, { teardown: ["./.superset/teardown.sh"] });
+			const worktreePath = join(sb.repoPath, ".worktrees", "feature");
+			const resolve = () =>
+				resolveTeardownCommand({
+					repoPath: sb.repoPath,
+					projectId: "proj-1",
+					worktreePath,
+					appHomeDir: sb.appHomeDir,
+				});
+
+			writeConfig(worktreePath, { setup: ["bun install"] });
+			expect(resolve()?.notice).toBe(mainCheckoutNotice(sb.repoPath));
+
+			writeConfig(worktreePath, { teardown: ["docker compose down"] });
+			expect(resolve()).toEqual({
+				initialCommand: "exec bash -c 'docker compose down'",
+			});
+		} finally {
+			sb.cleanup();
+		}
+	});
+
+	test("names no source for the main checkout itself or a personal override", () => {
+		const sb = makeSandbox();
+		try {
+			writeConfig(sb.repoPath, { teardown: ["docker compose down"] });
+			expect(
+				resolveTeardownCommand({
+					repoPath: sb.repoPath,
+					projectId: "proj-1",
+					worktreePath: sb.repoPath,
+					appHomeDir: sb.appHomeDir,
+				}),
+			).toEqual({ initialCommand: "exec bash -c 'docker compose down'" });
+
+			const overridePath = join(sb.appHomeDir, "projects", sb.repoPath);
+			mkdirSync(overridePath, { recursive: true });
+			writeFileSync(
+				join(overridePath, "config.json"),
+				JSON.stringify({ teardown: ["echo personal"] }),
+			);
+			expect(
+				resolveTeardownCommand({
+					repoPath: sb.repoPath,
+					projectId: "proj-1",
+					worktreePath: join(sb.repoPath, ".worktrees", "feature"),
+					appHomeDir: sb.appHomeDir,
+				}),
+			).toEqual({ initialCommand: "exec bash -c 'echo personal'" });
 		} finally {
 			sb.cleanup();
 		}

@@ -4,6 +4,7 @@ import { BRAND } from "@superset/shared/brand";
 import {
 	type ConfigEnvironment,
 	type ConfigError,
+	type PhaseName,
 	PROJECT_CONFIG_FILE,
 	PROJECT_LOCAL_CONFIG_FILE,
 	type ProjectConfig,
@@ -18,8 +19,21 @@ import {
 	sandboxRepositoriesSchema,
 } from "@superset/shared/sandbox/contract";
 
+/**
+ * For each phase a worktree runs from the main checkout's shared config,
+ * because the worktree has no config of its own for it: that file's path.
+ */
+export type InheritedPhases = Partial<Record<PhaseName, string>>;
+
+const PHASES: PhaseName[] = ["install", "setup", "archive"];
+
 export type TomlConfigLoad =
-	| { kind: "ok"; path: string; resolved: ResolvedProjectConfig }
+	| {
+			kind: "ok";
+			path: string;
+			resolved: ResolvedProjectConfig;
+			inheritedFrom: InheritedPhases;
+	  }
 	| { kind: "invalid"; path: string; errors: ConfigError[] };
 
 /**
@@ -138,15 +152,32 @@ export function loadTomlConfig(args: {
 		}
 		local = personal.config;
 	}
-	return {
-		kind: "ok",
-		path,
-		resolved: resolveProjectConfig({
-			base: shared.config,
-			local,
-			environment,
-		}),
-	};
+	const resolved = resolveProjectConfig({
+		base: shared.config,
+		local,
+		environment,
+	});
+	const inheritedFrom: InheritedPhases = {};
+	if (hasSeparateWorktree(args) && path === getTomlConfigPath(args.repoPath)) {
+		for (const phase of PHASES) {
+			const personalRun = local?.[phase]?.run ?? local?.[phase]?.local?.run;
+			if (personalRun === undefined && resolved[phase].commands.length > 0) {
+				inheritedFrom[phase] = path;
+			}
+		}
+	}
+	return { kind: "ok", path, resolved, inheritedFrom };
+}
+
+/** A worktree in scope that is not the main checkout itself. */
+export function hasSeparateWorktree(args: {
+	repoPath: string;
+	worktreePath?: string;
+}): boolean {
+	return (
+		args.worktreePath !== undefined &&
+		resolve(args.worktreePath) !== resolve(args.repoPath)
+	);
 }
 
 export function formatConfigErrors({

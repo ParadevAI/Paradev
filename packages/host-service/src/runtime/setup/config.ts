@@ -1,9 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { BRAND } from "@superset/shared/brand";
 import {
+	type ConfigEnvironment,
 	type ConfigError,
 	fromV1Json,
+	type PhaseName,
 	type ResolvedPhase,
 	type ResolvedProjectConfig,
 	resolveProjectConfig,
@@ -13,6 +16,8 @@ import {
 	configEnvironment,
 	findTomlConfigPath,
 	formatConfigErrors,
+	hasSeparateWorktree,
+	type InheritedPhases,
 	loadTomlConfig,
 } from "./project-config-toml";
 
@@ -227,6 +232,22 @@ export function loadSetupConfig(args: {
 	worktreePath?: string;
 	appHomeDir?: string;
 }): SetupConfig | null {
+	return mergeSetupLayers(readSetupLayers(args));
+}
+
+interface SetupLayers {
+	projectConfig: SetupConfig | null;
+	worktreeConfig: SetupConfig | null;
+	userConfig: SetupConfig | null;
+	local: LocalSetupConfig | null;
+}
+
+function readSetupLayers(args: {
+	repoPath: string;
+	projectId: string;
+	worktreePath?: string;
+	appHomeDir?: string;
+}): SetupLayers {
 	const projectConfig = readSetupConfigAt(getProjectConfigPath(args.repoPath));
 	const worktreeConfig = args.worktreePath
 		? readSetupConfigAt(getProjectConfigPath(args.worktreePath))
@@ -242,18 +263,21 @@ export function loadSetupConfig(args: {
 		if (userConfig) break;
 	}
 
-	const base = mergeBaseConfigs(
-		mergeBaseConfigs(projectConfig, worktreeConfig),
-		userConfig,
-	);
-	if (!base) return null;
-
 	const worktreeLocal = args.worktreePath
 		? readLocalConfigAt(getLocalOverlayPath(args.worktreePath))
 		: null;
 	const local =
 		worktreeLocal ?? readLocalConfigAt(getLocalOverlayPath(args.repoPath));
-	return local ? applyLocalOverlay(base, local) : base;
+	return { projectConfig, worktreeConfig, userConfig, local };
+}
+
+function mergeSetupLayers(layers: SetupLayers): SetupConfig | null {
+	const base = mergeBaseConfigs(
+		mergeBaseConfigs(layers.projectConfig, layers.worktreeConfig),
+		layers.userConfig,
+	);
+	if (!base) return null;
+	return layers.local ? applyLocalOverlay(base, layers.local) : base;
 }
 
 function nonEmptyStrings(value: string[] | undefined): string[] {
@@ -269,7 +293,12 @@ export function hasConfiguredScripts(config: SetupConfig | null): boolean {
 }
 
 export type ProjectConfigLoad =
-	| { kind: "ok"; format: "toml" | "json"; resolved: ResolvedProjectConfig }
+	| {
+			kind: "ok";
+			format: "toml" | "json";
+			resolved: ResolvedProjectConfig;
+			inheritedFrom: InheritedPhases;
+	  }
 	| { kind: "invalid"; path: string; errors: ConfigError[] };
 
 /**
@@ -286,19 +315,58 @@ export function loadProjectConfig(args: {
 }): ProjectConfigLoad | null {
 	const toml = loadTomlConfig(args);
 	if (toml?.kind === "invalid") return toml;
-	if (toml) return { kind: "ok", format: "toml", resolved: toml.resolved };
+	if (toml) {
+		return {
+			kind: "ok",
+			format: "toml",
+			resolved: toml.resolved,
+			inheritedFrom: toml.inheritedFrom,
+		};
+	}
 
-	const v1 = withScriptFallbacks(loadSetupConfig(args) ?? {}, args);
+	const layers = readSetupLayers(args);
+	const v1 = withScriptFallbacks(mergeSetupLayers(layers) ?? {}, args);
 	if (!hasConfiguredScripts(v1)) return null;
+	const environment = configEnvironment();
 	return {
 		kind: "ok",
 		format: "json",
 		resolved: resolveProjectConfig({
 			base: fromV1Json(v1),
 			local: null,
-			environment: configEnvironment(),
+			environment,
 		}),
+		inheritedFrom: hasSeparateWorktree(args)
+			? jsonInheritedFrom(layers, args.repoPath, environment)
+			: {},
 	};
+}
+
+function jsonInheritedFrom(
+	layers: SetupLayers,
+	repoPath: string,
+	environment: ConfigEnvironment,
+): InheritedPhases {
+	const phaseKeys: Array<[PhaseName, ScriptKey]> =
+		environment === "cloud"
+			? [["setup", "start"]]
+			: [
+					["setup", "setup"],
+					["archive", "teardown"],
+				];
+	const result: InheritedPhases = {};
+	for (const [phase, key] of phaseKeys) {
+		if (nonEmptyStrings(layers.projectConfig?.[key]).length === 0) continue;
+		if (
+			layers.worktreeConfig?.[key] !== undefined ||
+			layers.userConfig?.[key] !== undefined ||
+			Array.isArray(layers.local?.[key])
+		) {
+			continue;
+		}
+		result[phase] = getProjectConfigPath(repoPath);
+	}
+	return result;
 }
 
 /** v1 runs `<config dir>/<key>.sh` for a key with no commands, worktree first. */
@@ -351,6 +419,10 @@ export function chainPhases(
 			})
 			.join(" && "),
 	};
+}
+
+export function inheritedConfigNotice(label: string, path: string): string {
+	return `${BRAND.NAME}: ${label} commands come from the main checkout: ${path}`;
 }
 
 /** A command that prints why the config is invalid, then fails. */
