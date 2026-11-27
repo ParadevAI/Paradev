@@ -176,7 +176,8 @@ oldest page.
 
 A chat session ID identifies the host's journal. A provider session ID identifies the conversation
 inside Claude, Codex, or another ACP agent. `sessions resume --session` accepts the former and
-returns the live chat session ID, which is a new one when the chat had stopped. `sessions import
+returns the live chat session ID. A stopped chat starts again under the same ID; it gets a new one
+only when its agent config is gone or another chat already runs the conversation. `sessions import
 --native-session` accepts the latter, with `--agent`, and adopts that conversation into a new chat.
 `sessions create` always starts a new chat. `sessions send` resumes a stopped chat first and returns
 the session ID the prompt went to. `sessions list` lists Paradev-saved sessions for the workspace;

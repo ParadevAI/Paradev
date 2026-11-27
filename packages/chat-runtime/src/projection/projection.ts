@@ -96,6 +96,13 @@ export function markSessionClosed(
 		.run();
 }
 
+export function markSessionOpen(db: ChatDb, sessionId: string): void {
+	db.update(chatSessionsLocal)
+		.set({ closedAt: null, closedByUser: false })
+		.where(eq(chatSessionsLocal.sessionId, sessionId))
+		.run();
+}
+
 export function writeSessionProjection(
 	db: ChatDb,
 	sessionId: string,
@@ -119,6 +126,10 @@ export class ChatSessionStore {
 		{ byUser = false, closedAt = Date.now() } = {},
 	): void {
 		markSessionClosed(this.db, sessionId, closedAt, byUser);
+	}
+
+	markOpen(sessionId: string): void {
+		markSessionOpen(this.db, sessionId);
 	}
 
 	list(): ChatSessionRow[] {

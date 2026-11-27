@@ -6,11 +6,13 @@ import { protectedProcedure, queryProcedure, router } from "../../index";
 import { chatLaunchTarget, storedChatConfig } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import {
+	conversationChat,
 	createChatSessionInWorkspace,
 	createChatSessionSchema,
 	requireChatRuntime,
 	requireChatSession,
 	requireSessionWorkspace,
+	restartStoppedChat,
 } from "./session-service";
 import { sessionsClientId } from "./utils/sessionsClientId";
 
@@ -132,23 +134,24 @@ export const sessionsRouter = router({
 	resume: protectedProcedure
 		.input(sessionInput.extend({ commandId: z.string().uuid().optional() }))
 		.mutation(async ({ ctx, input }) => {
-			const { chat, session, live } = requireChatSession(
+			const { chat, session: named } = requireChatSession(
 				ctx,
 				input.workspaceId,
 				input.sessionId,
 			);
-			const presetId = presetForAcpHarness(session.harness);
+			const presetId = presetForAcpHarness(named.harness);
 			if (!presetId)
 				throw new TRPCError({
 					code: "BAD_REQUEST",
 					message: "This provider does not support ACP chat.",
 				});
-			if (live && chat.live.get(session.sessionId)?.state.status !== "dead")
+			const session = conversationChat(chat, named);
+			const running = chat.live.get(session.sessionId);
+			if (running && running.state.status !== "dead")
 				return {
 					kind: "chat" as const,
 					sessionId: session.sessionId,
-					terminalId:
-						chat.live.get(session.sessionId)?.terminalId ?? session.sessionId,
+					terminalId: running.terminalId ?? session.sessionId,
 					label: presetId,
 				};
 			if (!session.harnessSessionId)
@@ -160,6 +163,12 @@ export const sessionsRouter = router({
 			// A config deleted or moved to another CLI since then falls back to
 			// the default account, and the reply says so.
 			const { stored, keeps: keepsConfig } = storedChatConfig(ctx.db, session);
+			const restarted =
+				!session.agentConfigId || keepsConfig
+					? await restartStoppedChat(ctx, session)
+					: null;
+			if (restarted)
+				return { kind: "chat" as const, ...restarted, label: presetId };
 			const created = await createChatSessionInWorkspace(
 				ctx,
 				{
