@@ -20658,6 +20658,9 @@ msgstr "Bağlantı yanlış olabilir, sayfa silinmiş olabilir ya da erişiminiz
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "Bağlı ajan eksik veya devre dışı. Anlık görüntü gösteriliyor."
 
+msgid "The linked workspace changed"
+msgstr "Bağlı çalışma alanı değişti"
+
 msgid "The local change was rolled back."
 msgstr "Yerel değişiklik geri alındı."
 

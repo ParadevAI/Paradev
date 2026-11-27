@@ -20658,6 +20658,9 @@ msgstr "De link klopt mogelijk niet, de pagina is verwijderd, of je hebt er geen
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "De gekoppelde agent ontbreekt of staat uit. De snapshot wordt getoond."
 
+msgid "The linked workspace changed"
+msgstr "De gekoppelde werkruimte is gewijzigd"
+
 msgid "The local change was rolled back."
 msgstr "De lokale wijziging is teruggedraaid."
 

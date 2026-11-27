@@ -20658,6 +20658,9 @@ msgstr "Tautannya mungkin salah, halamannya mungkin sudah dihapus, atau Anda mun
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "Agen yang ditautkan hilang atau nonaktif. Menampilkan snapshot."
 
+msgid "The linked workspace changed"
+msgstr "Ruang kerja yang ditautkan telah berubah"
+
 msgid "The local change was rolled back."
 msgstr "Perubahan lokal dibatalkan."
 

@@ -20658,6 +20658,9 @@ msgstr "Odkaz může být špatný, stránka mohla být smazána, nebo k ní nem
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "Propojený agent chybí nebo je vypnutý. Zobrazuje se snímek."
 
+msgid "The linked workspace changed"
+msgstr "Propojený pracovní prostor se změnil"
+
 msgid "The local change was rolled back."
 msgstr "Místní změna byla vrácena."
 
