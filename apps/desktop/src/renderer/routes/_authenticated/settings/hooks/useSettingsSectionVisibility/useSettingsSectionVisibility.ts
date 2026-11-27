@@ -14,7 +14,7 @@ export function useSettingsSectionVisibility(): SettingsSectionVisibility {
 	const isAdmin = useIsOrganizationAdmin() === true;
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === "darwin";
-	const cloudUsageEnabled = useCloudUsageEnabled();
+	const cloudUsageEnabled = useCloudUsageEnabled() === true;
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const allowedSections = useMemo(

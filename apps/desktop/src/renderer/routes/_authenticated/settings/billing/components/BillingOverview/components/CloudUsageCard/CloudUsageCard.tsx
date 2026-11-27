@@ -20,7 +20,7 @@ export function CloudUsageCard({
 }: CloudUsageCardProps) {
 	const utils = cloudTrpc.useUtils();
 	const { data: usage } = cloudTrpc.billing.cloudUsage.useQuery(undefined);
-	const showUsageLink = useCloudUsageEnabled();
+	const showUsageLink = useCloudUsageEnabled() === true;
 	const { data: periods } = cloudTrpc.cloud.periods.list.useQuery({
 		limit: 1,
 	});
