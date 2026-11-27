@@ -254,7 +254,7 @@ Zorunda değilsiniz; Paradev bir ajan oturumunu terminal yerine sohbet olarak g�
 <summary>Paradev'in lisansı nedir, ne kadar tutar ve hangi platformlarda çalışır?</summary>
 <br />
 
-Paradev, MIT Lisansı ile açık kaynaktır. Free planı, masaüstü uygulaması ve CLI ile yerel çalışma alanlarını kapsar. Ücretli planlar otomasyonlar ve bulut çalışma alanları gibi özellikler ekler. Masaüstü uygulaması macOS'ta çalışır, ayrıca deneysel bir Linux AppImage sürümü vardır; Windows henüz desteklenmiyor. [Fiyatlandırma](https://paradev.com/pricing) · [SSS belgeleri](https://docs.paradev.com/faq)
+Paradev, MIT Lisansı ile açık kaynaktır. Free planı, masaüstü uygulaması ve CLI ile yerel çalışma alanlarını kapsar. Ücretli planlar otomasyonlar ve bulut çalışma alanları gibi özellikler ekler. Masaüstü uygulaması macOS ve Linux'ta çalışır; Windows henüz desteklenmiyor. [Fiyatlandırma](https://paradev.com/pricing) · [SSS belgeleri](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ Ajanlarınızı telefonunuzdan kontrol edebilmeniz için bir iOS uygulaması da 
 Masaüstü uygulamasını indirin:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (deneysel; birincil hedef macOS)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: henüz mevcut değil
 - [Tüm derlemeler](https://github.com/paradevai/paradev/releases/latest)
 

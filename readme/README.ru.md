@@ -254,7 +254,7 @@ Paradev — десктопное приложение, а не терминал�
 <summary>Какая у Paradev лицензия, сколько он стоит и на каких платформах работает?</summary>
 <br />
 
-Paradev — open source под лицензией MIT. План Free включает локальные рабочие области в десктопном приложении и CLI. Платные планы добавляют такие функции, как автоматизации и облачные рабочие области. Десктопное приложение работает на macOS, есть экспериментальный AppImage для Linux; Windows пока не поддерживается. [Цены](https://paradev.com/pricing) · [Документация: частые вопросы](https://docs.paradev.com/faq)
+Paradev — open source под лицензией MIT. План Free включает локальные рабочие области в десктопном приложении и CLI. Платные планы добавляют такие функции, как автоматизации и облачные рабочие области. Десктопное приложение работает на macOS и Linux; Windows пока не поддерживается. [Цены](https://paradev.com/pricing) · [Документация: частые вопросы](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ brew install paradevai/tap/superset
 Скачайте десктопное приложение:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (экспериментально; основная платформа — macOS)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: пока недоступно
 - [Все сборки](https://github.com/paradevai/paradev/releases/latest)
 

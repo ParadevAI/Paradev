@@ -42,7 +42,7 @@ This article is published by Paradev. Competitor details come from each vendor's
 | **Cursor Design Mode** | Click, multi-select, draw, or voice in Cursor's browser | Xpath, component, attributes, computed styles, props, screenshot | Cursor's agent | Ties the flow to Cursor's Agents Window |
 | **Orca Design Mode** | Click in a per-worktree Chromium window | HTML, computed CSS, cropped screenshot, source file and line with a source map | The active agent terminal | Open source (MIT); a separate app from your current setup |
 | **stagewise** | Click in the stagewise browser | Outer HTML, key computed CSS, bounding box, selector path | stagewise's own agent | The original toolbar that fed editor agents is deprecated |
-| **Paradev Design Mode** | Click in the browser pane, type a note on the prompt card | DOM, computed styles, React component metadata, cropped screenshot | Any CLI agent, existing terminal or new session | macOS (Linux AppImage is experimental), no Windows |
+| **Paradev Design Mode** | Click in the browser pane, type a note on the prompt card | DOM, computed styles, React component metadata, cropped screenshot | Any CLI agent, existing terminal or new session | macOS and Linux, no Windows |
 
 ## Can I just paste a screenshot into Claude Code or Codex?
 
@@ -85,7 +85,7 @@ Paradev is a desktop app for running CLI coding agents, each task in its own Git
 
 The agent receives the element's DOM, computed styles, React component metadata, and usually a cropped screenshot, with your note. Press **esc** to pick a different element, and **esc** again to leave Design Mode. It works on any page the pane can load, including localhost. The [walkthrough post](/blog/change-ui-with-your-coding-agent) shows a full example.
 
-Paradev's difference is where the element goes. It works with the agent you already use (Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, and others), and the change lands in that task's worktree, so two UI experiments don't edit the same files. The same pane can be driven by the agent through `superset browser` commands or a CDP endpoint to check its own work. The tradeoffs: Paradev runs on macOS with an experimental Linux AppImage, and has no Windows build. It is open source under the MIT License.
+Paradev's difference is where the element goes. It works with the agent you already use (Claude Code, Codex, OpenCode, Cursor Agent, Gemini CLI, and others), and the change lands in that task's worktree, so two UI experiments don't edit the same files. The same pane can be driven by the agent through `superset browser` commands or a CDP endpoint to check its own work. The tradeoffs: Paradev runs on macOS and Linux, and has no Windows build. It is open source under the MIT License.
 
 ## How does a frontend team use Design Mode with Claude Code?
 
@@ -98,7 +98,7 @@ A day with it looks like this:
 3. **Click, describe, send.** Open the port in the browser pane, click **Design**, click the element, and send one change to Claude Code. With hot reload, the result shows in the same pane, so you can click the next element straight away.
 4. **Review the diff before it goes up.** The **Changes** pane shows what Claude Code edited for that task alone. Commit, push, and open the pull request from there, and watch its checks in the PR pane.
 
-Two honest limits. Worktrees keep each task's files apart, but two tasks that both edit a shared component, such as `Button.tsx`, still conflict when the second pull request merges, so split UI work by component when you can. And Design Mode is a feature of the Paradev desktop app on macOS (the Linux AppImage is experimental); teammates on Windows can review the pull request and Pages, but cannot use Design Mode yet.
+Two honest limits. Worktrees keep each task's files apart, but two tasks that both edit a shared component, such as `Button.tsx`, still conflict when the second pull request merges, so split UI work by component when you can. And Design Mode is a feature of the Paradev desktop app on macOS and Linux; teammates on Windows can review the pull request and Pages, but cannot use Design Mode yet.
 
 If the dev servers run on a shared or remote host, the desktop app forwards each port of the selected remote workspace to your machine, so the browser pane and Design Mode work on it as if it were local. The host needs host-service 1.26 or newer, and if the same port is already busy on your machine, choose **Use another port**. See [ports on a remote host](https://docs.paradev.com/remote-access#ports-on-a-remote-host).
 

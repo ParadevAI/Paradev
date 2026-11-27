@@ -9344,8 +9344,8 @@ msgstr "报告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 msgid "For individuals getting started"
 msgstr "面向刚上手的个人用户"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "适用于 Apple Silicon 和 Intel 的 macOS。Linux AppImage 为实验版本。"
+msgid "For macOS on Apple Silicon and Intel, and Linux x64."
+msgstr "适用于 Apple Silicon 和 Intel 的 macOS，以及 Linux x64。"
 
 msgid "For organizations with advanced needs"
 msgstr "面向有进阶需求的组织"
@@ -9462,8 +9462,8 @@ msgstr "免费额度"
 msgid "Free for everyone"
 msgstr "对所有人免费"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "单个用户免费。支持 macOS，另有实验性 Linux 版本。"
+msgid "Free for one user. macOS and Linux."
+msgstr "单个用户免费。支持 macOS 和 Linux。"
 
 msgid "Free for one user. Open source under MIT."
 msgstr "单个用户免费。基于 MIT 许可证开源。"
@@ -11797,8 +11797,8 @@ msgstr "不绑定机器的云端工作区，几秒即可启动，还能分享给
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS、Linux（实验性）"
+msgid "macOS, Linux"
+msgstr "macOS、Linux"
 
 msgid "Magenta"
 msgstr "品红"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "未更新"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "暂不支持。目前支持 macOS，另有实验性 Linux 版本。Windows 用户可以通过下载按钮加入候补名单。"
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "暂不支持。目前支持 macOS 和 Linux。Windows 用户可以通过下载按钮加入候补名单。"
 
 msgid "Note"
 msgstr "注意"

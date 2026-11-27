@@ -9344,8 +9344,8 @@ msgstr "Pour les rapports de bugs et les demandes de fonctionnalités, le plus r
 msgid "For individuals getting started"
 msgstr "Pour les particuliers qui débutent"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Pour macOS sur Apple Silicon et Intel. L'AppImage Linux est expérimentale."
+msgid "For macOS on Apple Silicon and Intel, and Linux x64."
+msgstr "Pour macOS sur Apple Silicon et Intel, et Linux x64."
 
 msgid "For organizations with advanced needs"
 msgstr "Pour les organisations aux besoins avancés"
@@ -9462,8 +9462,8 @@ msgstr "Crédits gratuits"
 msgid "Free for everyone"
 msgstr "Gratuit pour tout le monde"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Gratuit pour un utilisateur. macOS, avec une version Linux expérimentale."
+msgid "Free for one user. macOS and Linux."
+msgstr "Gratuit pour un utilisateur. macOS et Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Gratuit pour un utilisateur. Open source sous licence MIT."
@@ -11797,8 +11797,8 @@ msgstr "Des espaces de travail cloud, détachés de toute machine, qui démarren
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (expérimental)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Pas de mise à jour"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Pas encore. Il fonctionne sous macOS, avec une version Linux expérimentale. Les utilisateurs Windows peuvent rejoindre la liste d'attente depuis le bouton de téléchargement."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Pas encore. Il fonctionne sous macOS et Linux. Les utilisateurs Windows peuvent rejoindre la liste d'attente depuis le bouton de téléchargement."
 
 msgid "Note"
 msgstr "Remarque"

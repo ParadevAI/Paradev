@@ -254,7 +254,7 @@ Không bắt buộc. Paradev có thể hiển thị phiên agent dưới dạng 
 <summary>Paradev dùng giấy phép gì, giá bao nhiêu và chạy trên những nền tảng nào?</summary>
 <br />
 
-Paradev là mã nguồn mở theo Giấy phép MIT. Gói Free bao gồm workspace cục bộ với ứng dụng desktop và CLI. Các gói trả phí bổ sung những tính năng như tự động hóa và workspace trên đám mây. Ứng dụng desktop chạy trên macOS, kèm bản AppImage cho Linux đang ở giai đoạn thử nghiệm; Windows hiện chưa được hỗ trợ. [Bảng giá](https://paradev.com/pricing) · [Tài liệu câu hỏi thường gặp](https://docs.paradev.com/faq)
+Paradev là mã nguồn mở theo Giấy phép MIT. Gói Free bao gồm workspace cục bộ với ứng dụng desktop và CLI. Các gói trả phí bổ sung những tính năng như tự động hóa và workspace trên đám mây. Ứng dụng desktop chạy trên macOS và Linux; Windows hiện chưa được hỗ trợ. [Bảng giá](https://paradev.com/pricing) · [Tài liệu câu hỏi thường gặp](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ brew install paradevai/tap/superset
 Tải ứng dụng desktop:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (thử nghiệm; macOS là nền tảng chính)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: chưa có
 - [Tất cả các bản build](https://github.com/paradevai/paradev/releases/latest)
 

@@ -254,7 +254,7 @@ Não, o Paradev pode mostrar uma sessão de agente como um chat em vez de um ter
 <summary>Qual é a licença do Paradev, quanto custa e em quais plataformas ele roda?</summary>
 <br />
 
-O Paradev é open source sob a Licença MIT. O plano Free cobre áreas de trabalho locais com o app desktop e a CLI. Os planos pagos adicionam recursos como automações e áreas de trabalho na nuvem. O app desktop roda no macOS, com um AppImage experimental para Linux; o Windows ainda não está disponível. [Preços](https://paradev.com/pricing) · [Documentação de FAQ](https://docs.paradev.com/faq)
+O Paradev é open source sob a Licença MIT. O plano Free cobre áreas de trabalho locais com o app desktop e a CLI. Os planos pagos adicionam recursos como automações e áreas de trabalho na nuvem. O app desktop roda no macOS e no Linux; o Windows ainda não está disponível. [Preços](https://paradev.com/pricing) · [Documentação de FAQ](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ Um app para iOS chega em breve para você acompanhar seus agentes pelo celular.
 Baixe o app desktop:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimental; o macOS é o alvo principal)
+- **Linux**: [AppImage x64](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: ainda não disponível
 - [Todas as builds](https://github.com/paradevai/paradev/releases/latest)
 

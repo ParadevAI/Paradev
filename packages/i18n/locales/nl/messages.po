@@ -9344,8 +9344,8 @@ msgstr "Voor bugmeldingen en featureverzoeken is een GitHub-issue op <0>{githubH
 msgid "For individuals getting started"
 msgstr "Voor individuen die beginnen"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Voor macOS op Apple Silicon en Intel. Linux-AppImage is experimenteel."
+msgid "For macOS on Apple Silicon and Intel, and Linux x64."
+msgstr "Voor macOS op Apple Silicon en Intel, en Linux x64."
 
 msgid "For organizations with advanced needs"
 msgstr "Voor organisaties met geavanceerde eisen"
@@ -9462,8 +9462,8 @@ msgstr "Gratis tegoed"
 msgid "Free for everyone"
 msgstr "Gratis voor iedereen"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Gratis voor één gebruiker. macOS, met een experimentele Linux-build."
+msgid "Free for one user. macOS and Linux."
+msgstr "Gratis voor één gebruiker. macOS en Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Gratis voor één gebruiker. Open source onder MIT."
@@ -11797,8 +11797,8 @@ msgstr "Machine-onafhankelijke cloudwerkruimtes die in seconden opstarten en met
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimenteel)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Geen updates"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Nog niet. Het draait op macOS, met een experimentele Linux-build. Windows-gebruikers kunnen zich via de downloadknop op de wachtlijst zetten."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Nog niet. Het draait op macOS en Linux. Windows-gebruikers kunnen zich via de downloadknop op de wachtlijst zetten."
 
 msgid "Note"
 msgstr "Opmerking"

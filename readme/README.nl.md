@@ -254,7 +254,7 @@ Nee, Paradev kan een agentsessie als chat tonen in plaats van als terminal, en j
 <summary>Wat is de licentie van Paradev, wat kost het en op welke platforms draait het?</summary>
 <br />
 
-Paradev is open source onder de MIT-licentie. Het Free-abonnement dekt lokale werkruimtes met de desktop-app en de CLI. Betaalde abonnementen voegen functies toe zoals automatiseringen en cloudwerkruimtes. De desktop-app draait op macOS, met een experimentele Linux-AppImage; Windows is nog niet beschikbaar. [Prijzen](https://paradev.com/pricing) · [FAQ-docs](https://docs.paradev.com/faq)
+Paradev is open source onder de MIT-licentie. Het Free-abonnement dekt lokale werkruimtes met de desktop-app en de CLI. Betaalde abonnementen voegen functies toe zoals automatiseringen en cloudwerkruimtes. De desktop-app draait op macOS en Linux; Windows is nog niet beschikbaar. [Prijzen](https://paradev.com/pricing) · [FAQ-docs](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ Er komt binnenkort een iOS-app zodat je je agents vanaf je telefoon kunt checken
 Download de desktop-app:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimenteel; macOS is het primaire doelplatform)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: nog niet beschikbaar
 - [Alle builds](https://github.com/paradevai/paradev/releases/latest)
 

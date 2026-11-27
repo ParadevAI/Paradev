@@ -254,7 +254,7 @@ Paradevはターミナルアプリではなく、デスクトップアプリで�
 <summary>Paradevのライセンス、料金、対応プラットフォームを教えてください。</summary>
 <br />
 
-ParadevはMITライセンスのオープンソースです。Freeプランでは、デスクトップアプリとCLIでローカルワークスペースを利用できます。有料プランでは、オートメーションやクラウドワークスペースなどの機能が加わります。デスクトップアプリはmacOSで動作し、実験的なLinux版AppImageもあります。Windowsにはまだ対応していません。[料金](https://paradev.com/pricing) · [FAQドキュメント](https://docs.paradev.com/faq)
+ParadevはMITライセンスのオープンソースです。Freeプランでは、デスクトップアプリとCLIでローカルワークスペースを利用できます。有料プランでは、オートメーションやクラウドワークスペースなどの機能が加わります。デスクトップアプリはmacOSとLinuxで動作します。Windowsにはまだ対応していません。[料金](https://paradev.com/pricing) · [FAQドキュメント](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ iOSアプリも近日公開予定です。スマートフォンからエージ�
 デスクトップアプリをダウンロード:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(実験的。macOSが主要ターゲットです)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: 現時点では未対応
 - [すべてのビルド](https://github.com/paradevai/paradev/releases/latest)
 
