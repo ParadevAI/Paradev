@@ -12,14 +12,10 @@ import { isTelemetryEnabled } from "./telemetry";
 // Cast to standard PostHog type for compatibility with posthog-js/react
 export const posthog = posthogFull as unknown as PostHog;
 
-export function initPostHog() {
-	if (!env.NEXT_PUBLIC_POSTHOG_KEY) {
-		console.log("[posthog] No key configured, skipping");
-		return;
-	}
-
-	const telemetryEnabled = isTelemetryEnabled();
-	posthogFull.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
+export function createPostHogConfig(
+	telemetryEnabled: boolean,
+): NonNullable<Parameters<typeof posthogFull.init>[1]> {
+	return {
 		api_host: env.NEXT_PUBLIC_POSTHOG_HOST,
 		defaults: "2025-11-30",
 		capture_pageview: false,
@@ -41,7 +37,19 @@ export function initPostHog() {
 			scrubExceptionPaths,
 		],
 		...(telemetryEnabled ? {} : { advanced_disable_flags: true }),
-	});
+	};
+}
+
+export function initPostHog() {
+	if (!env.NEXT_PUBLIC_POSTHOG_KEY) {
+		console.log("[posthog] No key configured, skipping");
+		return;
+	}
+
+	posthogFull.init(
+		env.NEXT_PUBLIC_POSTHOG_KEY,
+		createPostHogConfig(isTelemetryEnabled()),
+	);
 
 	posthogFull.register({
 		app_name: "desktop",
