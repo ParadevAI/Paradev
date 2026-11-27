@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { findNestedRepoRoots } from "./find-nested-repos";
-import { DEFAULT_IGNORE_DIR_NAMES } from "./search";
+import { DEFAULT_IGNORE_DIR_NAMES } from "./ignore-defaults";
 
 const tempRoots: string[] = [];
 

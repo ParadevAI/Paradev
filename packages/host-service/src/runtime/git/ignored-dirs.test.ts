@@ -49,6 +49,54 @@ describe("listGitIgnoredDirs", () => {
 		expect(await listGitIgnoredDirs(dir)).toEqual([]);
 	});
 
+	test("rejects when git fails on a real repo, so callers can tell failure from nothing ignored", async () => {
+		const dir = await createRepo();
+		await writeFile(path.join(dir, ".git", "index"), "not an index");
+
+		await expect(listGitIgnoredDirs(dir)).rejects.toThrow();
+	});
+
+	test("rejects when git cannot enter an existing root", async () => {
+		const runGit = () =>
+			Promise.reject(
+				Object.assign(new Error("Command failed"), {
+					stderr: "fatal: cannot change to '/repo': Permission denied\n",
+				}),
+			);
+
+		await expect(
+			listGitIgnoredDirs("/repo", undefined, runGit),
+		).rejects.toThrow("Command failed");
+	});
+
+	test("never caps generated dirs, only the other ignored dirs", async () => {
+		const dir = await createRepo();
+		await writeFile(
+			path.join(dir, ".gitignore"),
+			"cache-*/\nbuild/\nnode_modules/\n",
+		);
+		const makeDir = async (relativeDir: string) => {
+			await mkdir(path.join(dir, relativeDir), { recursive: true });
+			await writeFile(path.join(dir, relativeDir, "entry"), "x");
+		};
+		const indexes = Array.from({ length: 205 }, (_, index) =>
+			String(index).padStart(3, "0"),
+		);
+		for (const index of indexes) {
+			await makeDir(`cache-${index}`);
+			await makeDir(`pkgs/p${index}/build`);
+		}
+		await makeDir("zz/node_modules");
+
+		const ignored = await listGitIgnoredDirs(dir);
+
+		const builds = ignored.filter((entry) => entry.endsWith("/build"));
+		const caches = ignored.filter((entry) => entry.startsWith("cache-"));
+		expect(builds).toHaveLength(205);
+		expect(ignored).toContain("zz/node_modules");
+		expect(caches).toHaveLength(200);
+	});
+
 	test("returns [] for a missing path", async () => {
 		expect(
 			await listGitIgnoredDirs("/nonexistent/definitely-not-here"),

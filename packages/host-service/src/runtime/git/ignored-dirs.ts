@@ -1,13 +1,21 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { resolveCommand } from "@superset/shared/resolve-command";
+import { DEFAULT_IGNORE_DIR_NAMES } from "@superset/workspace-fs/ignore-defaults";
 
 const execFileAsync = promisify(execFile);
 
-// Bounds for a pathological repo (thousands of ignored entries): the caller
-// turns each dir into a per-event glob/prefix check, so an unbounded list
-// would trade watcher churn for matcher churn.
-const MAX_IGNORED_DIRS = 200;
+type RunGit = (
+	file: string,
+	args: string[],
+	options: { timeout: number; maxBuffer: number; env: NodeJS.ProcessEnv },
+) => Promise<{ stdout: string }>;
+
+// Bounds the non-generated remainder for a pathological repo (thousands of
+// ignored entries). Dirs named like generated output (node_modules, build,
+// dist, …) are never capped: they are the subtrees that must not be watched,
+// and a monorepo can have more of them than any fixed cap.
+const MAX_OTHER_IGNORED_DIRS = 200;
 const TIMEOUT_MS = 3_000;
 const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
 
@@ -25,15 +33,17 @@ const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
  *
  * `under` limits the listing to those root-relative dirs, matched literally.
  *
- * Returns [] for non-git roots, timeouts, and every other failure — callers
- * degrade to the static ignore list, never block on this.
+ * Returns [] when the root is not a git worktree or does not exist. Every
+ * other failure (a timeout under attach load, a corrupt index) rejects, so
+ * callers can tell "git ignores nothing here" from "git did not answer".
  */
 export async function listGitIgnoredDirs(
 	rootPath: string,
 	under?: readonly string[],
+	runGit: RunGit = (file, args, options) => execFileAsync(file, args, options),
 ): Promise<string[]> {
 	try {
-		const { stdout } = await execFileAsync(
+		const { stdout } = await runGit(
 			resolveCommand("git"),
 			[
 				"--literal-pathspecs",
@@ -47,16 +57,37 @@ export async function listGitIgnoredDirs(
 				"-z",
 				...(under ? ["--", ...under] : []),
 			],
-			{ timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER_BYTES },
+			{
+				timeout: TIMEOUT_MS,
+				maxBuffer: MAX_BUFFER_BYTES,
+				// isNotAWorktree matches git's untranslated messages.
+				env: { ...process.env, LC_ALL: "C" },
+			},
 		);
 		const dirs: string[] = [];
+		let others = 0;
 		for (const entry of stdout.split("\0")) {
 			if (!entry.endsWith("/")) continue;
-			dirs.push(entry.slice(0, -1));
-			if (dirs.length >= MAX_IGNORED_DIRS) break;
+			const dir = entry.slice(0, -1);
+			const name = dir.slice(dir.lastIndexOf("/") + 1);
+			if (!DEFAULT_IGNORE_DIR_NAMES.has(name)) {
+				if (others >= MAX_OTHER_IGNORED_DIRS) continue;
+				others += 1;
+			}
+			dirs.push(dir);
 		}
 		return dirs;
-	} catch {
-		return [];
+	} catch (error) {
+		if (isNotAWorktree(error)) return [];
+		throw error;
 	}
+}
+
+function isNotAWorktree(error: unknown): boolean {
+	const stderr = String((error as { stderr?: unknown } | null)?.stderr ?? "");
+	if (stderr.includes("not a git repository")) return true;
+	return (
+		stderr.includes("cannot change to") &&
+		stderr.includes("No such file or directory")
+	);
 }
