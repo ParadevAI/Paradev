@@ -83,7 +83,7 @@ const opencodeV2Assistant = (now: number, input: number) =>
 		tokens: { input, output: 2, reasoning: 1, cache: { read: 4, write: 0 } },
 	});
 
-test("OpenCode 2.x usage is read from session_message and session_v2", () => {
+test("OpenCode 2.x reply and compaction usage is read from session_message and session_v2", () => {
 	const path = join(root, "opencode-v2.db");
 	const db = new Database(path);
 	db.exec(OPENCODE_V2_TABLES);
@@ -95,22 +95,56 @@ test("OpenCode 2.x usage is read from session_message and session_v2", () => {
 	insert.run("u", "user", 1, now, now, JSON.stringify({ text: "hi" }));
 	insert.run("a", "assistant", 2, now, now, opencodeV2Assistant(now, 10));
 	insert.run("i", "idle", 3, now, now, "{}");
+	insert.run(
+		"c",
+		"compaction",
+		4,
+		now,
+		now,
+		JSON.stringify({
+			time: { created: now, completed: now },
+			status: "completed",
+			model: { id: "big-pickle", providerID: "opencode" },
+			cost: 0.25,
+			tokens: {
+				input: 20,
+				output: 3,
+				reasoning: 0,
+				cache: { read: 0, write: 0 },
+			},
+		}),
+	);
+	insert.run(
+		"r",
+		"compaction",
+		5,
+		now,
+		now,
+		JSON.stringify({ time: { created: now }, status: "running" }),
+	);
 	db.close();
 
 	const out: UsageLogEntry[] = [];
 	const labels = new Map<string, string>();
-	assert.equal(collectOpencodeDbEntries(path, 0, out, labels), 1);
-	assert.equal(out.length, 1);
+	assert.equal(collectOpencodeDbEntries(path, 0, out, labels), 3);
+	assert.equal(out.length, 2);
+	// A compaction request is billed like a reply; a running one has no usage yet.
+	const compaction = out.find((entry) => entry.uncachedInput === 20);
+	assert.deepEqual(
+		{ model: compaction?.model, costUsd: compaction?.costUsd },
+		{ model: "big-pickle", costUsd: 0.25 },
+	);
+	const reply = out.find((entry) => entry.uncachedInput === 10);
 	assert.deepEqual(
 		{
-			model: out[0]?.model,
-			cwd: out[0]?.cwd,
-			sessionId: out[0]?.sessionId,
-			uncachedInput: out[0]?.uncachedInput,
-			cachedInput: out[0]?.cachedInput,
-			output: out[0]?.output,
-			reasoningOutput: out[0]?.reasoningOutput,
-			costUsd: out[0]?.costUsd,
+			model: reply?.model,
+			cwd: reply?.cwd,
+			sessionId: reply?.sessionId,
+			uncachedInput: reply?.uncachedInput,
+			cachedInput: reply?.cachedInput,
+			output: reply?.output,
+			reasoningOutput: reply?.reasoningOutput,
+			costUsd: reply?.costUsd,
 		},
 		{
 			model: "big-pickle",

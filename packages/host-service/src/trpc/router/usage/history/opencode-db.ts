@@ -1,9 +1,10 @@
 /**
  * OpenCode's SQLite store (`<data>/opencode/opencode.db`). In 1.x assistant
  * messages are JSON in `message.data`, joined to `session` for the cwd and
- * title. 2.x writes `session_message` rows (`type = 'assistant'`, the model
- * under `model.id`) joined to `session_v2`, and copies 1.x messages over under
- * the same id, so a 1.x row is read only when 2.x has no copy of it.
+ * title. 2.x writes `session_message` rows joined to `session_v2`: assistant
+ * replies, and compactions, which carry the compaction request's own cost and
+ * tokens (the model under `model.id` in both). 2.x copies 1.x messages over
+ * under the same id, so a 1.x row is read only when 2.x has no copy of it.
  * Opened read-only — OpenCode may hold the database concurrently.
  * Kept apart from opencode.ts because better-sqlite3 is a Node-only native
  * binding the Bun unit suite cannot load.
@@ -67,7 +68,7 @@ export function collectOpencodeDbEntries(
 				        s.directory, s.title
 				 FROM session_message m
 				 LEFT JOIN session_v2 s ON s.id = m.session_id
-				 WHERE m.type = 'assistant'
+				 WHERE m.type IN ('assistant', 'compaction')
 				   AND m.time_created >= ?
 				   AND json_valid(m.data)`);
 			params.push(cutoffMs);
