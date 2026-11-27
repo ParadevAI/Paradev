@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createMcpCaller } from "../../caller";
 import { defineTool } from "../../define-tool";
 import { hostServiceCall } from "../../host-service-client";
+import { WORKSPACE_BOARD_URI } from "../../resources/workspace-board";
 import { requireCloudUnlessHost } from "../../workspace-service-target";
 
 export function register(server: McpServer): void {
@@ -14,6 +15,7 @@ export function register(server: McpServer): void {
 			destructiveHint: false,
 			openWorldHint: false,
 		},
+		_meta: { ui: { resourceUri: WORKSPACE_BOARD_URI } },
 		description:
 			"List workspaces. Without hostId, the organization's cloud workspaces with their status ('provisioning', 'awake', 'asleep', 'failed'; an asleep one wakes when used) — use it to watch one created by workspaces_create reach 'awake'. With hostId, the workspaces on that host (see hosts_list), including the host-served projectName; use this to find a workspace ID for automations_create's v2WorkspaceId.",
 		inputSchema: {
