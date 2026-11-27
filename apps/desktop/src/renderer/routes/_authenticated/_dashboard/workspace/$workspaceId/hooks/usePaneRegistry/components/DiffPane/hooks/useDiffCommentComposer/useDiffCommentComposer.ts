@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import type {
-	CodeViewOptions,
-	DiffLineAnnotation,
-	SelectedLineRange,
+import {
+	areSelectionsEqual,
+	type CodeViewOptions,
+	type DiffLineAnnotation,
+	type SelectedLineRange,
 } from "@pierre/diffs";
 import type { CodeViewHandle } from "@pierre/diffs/react";
 import { toast } from "@superset/ui/sonner";
@@ -68,6 +69,9 @@ interface UseDiffCommentComposerResult {
 		string,
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	> | null;
+	comment: string;
+	submitting: boolean;
+	setComment: (comment: string) => void;
 	onLineSelectionEnd: OnLineSelectionEnd;
 	onGutterUtilityClick: () => void;
 	clear: () => void;
@@ -92,14 +96,24 @@ export function useDiffCommentComposer({
 }: UseDiffCommentComposerArgs): UseDiffCommentComposerResult {
 	const { t } = useLingui();
 	const [composer, setComposer] = useState<ComposerState | null>(null);
-	const composerRef = useRef(composer);
-	composerRef.current = composer;
+	const [comment, setComment] = useState("");
+	const pendingComposers = useRef(new Set<ComposerState>());
+	const [pending, setPending] = useState<ReadonlySet<ComposerState>>(
+		() => new Set(),
+	);
+	const composerRef = useRef<ComposerState | null>(null);
 	const { send: sendToTerminalAgent } = useSendToTerminalAgent();
 
+	const replaceComposer = useCallback((next: ComposerState | null) => {
+		composerRef.current = next;
+		setComposer(next);
+		setComment("");
+	}, []);
+
 	const clear = useCallback(() => {
-		setComposer(null);
+		replaceComposer(null);
 		codeViewRef.current?.clearSelectedLines();
-	}, [codeViewRef]);
+	}, [codeViewRef, replaceComposer]);
 
 	// Only clear when the in-flight submit's composer is still the one on
 	// screen — protects against a slow send wiping a newer composer the user
@@ -114,13 +128,18 @@ export function useDiffCommentComposer({
 	const onLineSelectionEnd = useCallback<OnLineSelectionEnd>(
 		(range, context) => {
 			if (context.type !== "diff") return;
-			if (!range) {
-				setComposer(null);
+			const itemId = context.item.id;
+			const current = composerRef.current;
+			if (
+				range &&
+				current?.itemId === itemId &&
+				areSelectionsEqual(current.range, range)
+			) {
 				return;
 			}
-			setComposer({ itemId: context.item.id, range });
+			replaceComposer(range ? { itemId, range } : null);
 		},
-		[],
+		[replaceComposer],
 	);
 
 	// Pierre gates the gutter "+" button's pointer flow behind a non-null
@@ -156,7 +175,7 @@ export function useDiffCommentComposer({
 	const submit = useCallback(
 		async (input: DiffCommentSubmitInput) => {
 			const submitted = composer;
-			if (!submitted) return;
+			if (!submitted || pendingComposers.current.has(submitted)) return;
 			const file = getFile(submitted.itemId);
 			if (!file) return;
 
@@ -170,37 +189,44 @@ export function useDiffCommentComposer({
 				},
 			});
 
-			if (input.target.kind === "new") {
-				if (!onCreateNewAgentSession) {
-					toast.error(
-						t({
-							message: "Couldn't start a new agent session",
-						}),
-					);
+			pendingComposers.current.add(submitted);
+			setPending(new Set(pendingComposers.current));
+			try {
+				if (input.target.kind === "new") {
+					if (!onCreateNewAgentSession) {
+						toast.error(
+							t({
+								message: "Couldn't start a new agent session",
+							}),
+						);
+						return;
+					}
+					// Host bakes the prompt into the launch command (argv/stdin per
+					// the agent config), so no follow-up send here.
+					const result = await onCreateNewAgentSession({
+						configId: input.target.configId,
+						placement: input.target.placement,
+						prompt: text,
+					});
+					if (result) clearIfStillCurrent(submitted);
 					return;
 				}
-				// Host bakes the prompt into the launch command (argv/stdin per
-				// the agent config), so no follow-up send here.
-				const result = await onCreateNewAgentSession({
-					configId: input.target.configId,
-					placement: input.target.placement,
-					prompt: text,
-				});
-				if (result) clearIfStillCurrent(submitted);
-				return;
-			}
 
-			try {
-				await sendToTerminalAgent({
-					workspaceId,
-					terminalId: input.target.terminalId,
-					text,
-					submit: true,
-				});
-				clearIfStillCurrent(submitted);
-			} catch {
-				// Toast surfaced by the hook; keep composer open so the user
-				// can retry or edit.
+				try {
+					await sendToTerminalAgent({
+						workspaceId,
+						terminalId: input.target.terminalId,
+						text,
+						submit: true,
+					});
+					clearIfStillCurrent(submitted);
+				} catch {
+					// Toast surfaced by the hook; keep composer open so the user
+					// can retry or edit.
+				}
+			} finally {
+				pendingComposers.current.delete(submitted);
+				setPending(new Set(pendingComposers.current));
 			}
 		},
 		[
@@ -216,6 +242,9 @@ export function useDiffCommentComposer({
 
 	return {
 		composerAnnotationsByItemId,
+		comment,
+		submitting: composer !== null && pending.has(composer),
+		setComment,
 		onLineSelectionEnd,
 		onGutterUtilityClick,
 		clear,

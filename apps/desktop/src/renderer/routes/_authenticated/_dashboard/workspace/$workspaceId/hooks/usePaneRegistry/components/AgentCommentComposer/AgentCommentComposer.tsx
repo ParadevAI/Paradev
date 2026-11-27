@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { LuCornerDownLeft, LuLoaderCircle } from "react-icons/lu";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
@@ -25,6 +25,9 @@ interface AgentCommentComposerProps {
 	contextLabel: string;
 	placeholder?: string;
 	submitLabel?: string;
+	comment: string;
+	submitting: boolean;
+	onCommentChange: (comment: string) => void;
 	onCancel: () => void;
 	onSubmit: (input: {
 		comment: string;
@@ -38,6 +41,9 @@ export function AgentCommentComposer({
 	contextLabel,
 	placeholder,
 	submitLabel,
+	comment,
+	submitting,
+	onCommentChange,
 	onCancel,
 	onSubmit,
 }: AgentCommentComposerProps) {
@@ -70,14 +76,12 @@ export function AgentCommentComposer({
 		preferredTerminalId,
 	});
 
-	const [comment, setComment] = useState("");
-	const [submitting, setSubmitting] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	useEffect(() => {
 		const el = textareaRef.current;
 		if (!el) return;
-		el.focus();
+		el.focus({ preventScroll: true });
 		const len = el.value.length;
 		el.setSelectionRange(len, len);
 	}, []);
@@ -87,7 +91,6 @@ export function AgentCommentComposer({
 
 	const handleSubmit = async () => {
 		if (!canSubmit || !resolved) return;
-		setSubmitting(true);
 		try {
 			await onSubmit({ comment: comment.trim(), target: resolved });
 		} catch (error) {
@@ -95,8 +98,6 @@ export function AgentCommentComposer({
 			// DiffPane's submit path). Catch here so a rejection doesn't leak
 			// as an unhandled promise out of the form's synchronous handlers.
 			console.error("[AgentCommentComposer] submit failed", error);
-		} finally {
-			setSubmitting(false);
 		}
 	};
 
@@ -134,7 +135,7 @@ export function AgentCommentComposer({
 				<textarea
 					ref={textareaRef}
 					value={comment}
-					onChange={(e) => setComment(e.target.value)}
+					onChange={(e) => onCommentChange(e.target.value)}
 					placeholder={resolvedPlaceholder}
 					rows={3}
 					className={cn(
