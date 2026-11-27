@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev uses speech recognition to turn your voice into text.",
 		"NSPhotoLibraryUsageDescription": "Paradev needs access to your photo library so you can attach images to chat messages.",
 		"NSCameraUsageDescription": "Paradev uses the camera so you can attach photos to chat messages.",
-		"NSMicrophoneUsageDescription": "Paradev uses the microphone so you can dictate chat messages."
+		"NSMicrophoneUsageDescription": "Paradev uses the microphone for voice mode and to dictate chat messages."
 	}
 }

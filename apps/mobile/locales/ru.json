@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev использует распознавание речи для преобразования голоса в текст.",
 		"NSPhotoLibraryUsageDescription": "Paradev нужен доступ к вашей медиатеке, чтобы прикреплять изображения к сообщениям.",
 		"NSCameraUsageDescription": "Paradev использует камеру, чтобы прикреплять фотографии к сообщениям.",
-		"NSMicrophoneUsageDescription": "Paradev использует микрофон, чтобы вы могли диктовать сообщения."
+		"NSMicrophoneUsageDescription": "Paradev использует микрофон для голосового режима и диктовки сообщений."
 	}
 }
