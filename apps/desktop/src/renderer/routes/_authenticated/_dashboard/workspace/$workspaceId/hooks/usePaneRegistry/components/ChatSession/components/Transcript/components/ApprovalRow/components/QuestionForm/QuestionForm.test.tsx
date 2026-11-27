@@ -6,8 +6,17 @@ const previousActEnvironment = reactActGlobal.IS_REACT_ACT_ENVIRONMENT;
 reactActGlobal.IS_REACT_ACT_ENVIRONMENT = true;
 const { cleanup, fireEvent, render } = await import("@testing-library/react");
 const { QuestionForm } = await import("./QuestionForm");
+const { ChatKeyProvider } = await import(
+	"../../../../providers/ChatKeyProvider"
+);
+const { useQuestionDraftStore } = await import(
+	"../../../../../../../../stores/questionDraftStore"
+);
 
-afterEach(cleanup);
+afterEach(() => {
+	cleanup();
+	useQuestionDraftStore.setState({ drafts: {} });
+});
 afterAll(() => {
 	reactActGlobal.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment;
 });
@@ -55,4 +64,46 @@ test.each([
 		type: "form",
 		values: { choice_custom: "각" },
 	});
+});
+
+function renderInChat(chatKey: string, question: ApprovalRequest = item) {
+	return render(
+		<ChatKeyProvider value={chatKey}>
+			<QuestionForm form={form} item={question} onRespond={() => {}} />
+		</ChatKeyProvider>,
+	);
+}
+
+const otherValue = (view: ReturnType<typeof render>) =>
+	(view.getByRole("textbox", { name: "Other" }) as HTMLInputElement).value;
+
+test("keeps a draft answer per chat when the chat unmounts and mounts again", () => {
+	const first = renderInChat("chat-a");
+	fireEvent.change(first.getByRole("textbox", { name: "Other" }), {
+		target: { value: "draft" },
+	});
+	first.unmount();
+
+	const otherChat = renderInChat("chat-b");
+	expect(otherValue(otherChat)).toBe("");
+	otherChat.unmount();
+
+	expect(otherValue(renderInChat("chat-a"))).toBe("draft");
+});
+
+test("drops the draft once the question is no longer pending", () => {
+	const view = renderInChat("chat-a");
+	fireEvent.change(view.getByRole("textbox", { name: "Other" }), {
+		target: { value: "draft" },
+	});
+	view.rerender(
+		<ChatKeyProvider value="chat-a">
+			<QuestionForm
+				form={form}
+				item={{ ...item, status: "answered" }}
+				onRespond={() => {}}
+			/>
+		</ChatKeyProvider>,
+	);
+	expect(useQuestionDraftStore.getState().drafts["chat-a"]).toBeUndefined();
 });

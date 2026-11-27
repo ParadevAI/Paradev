@@ -20,14 +20,9 @@ import {
 	CornerDownLeft,
 	MessageCircleQuestion,
 } from "lucide-react";
-import {
-	type KeyboardEvent,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { type KeyboardEvent, useEffect, useMemo, useRef } from "react";
 import { QuestionPage } from "./components/QuestionPage";
+import { useQuestionDraft } from "./hooks/useQuestionDraft";
 
 function focusIfLost(element: HTMLElement | null) {
 	const focused = document.activeElement;
@@ -47,10 +42,12 @@ export function QuestionForm({
 }) {
 	const { t } = useLingui();
 	const pages = useMemo(() => questionPages(form.fields), [form.fields]);
-	const [values, setValues] = useState<FormValues>({});
-	const [pageIndex, setPageIndex] = useState(0);
-	const cardRef = useRef<HTMLFieldSetElement>(null);
 	const pending = item.status === "pending";
+	const { values, setValues, pageIndex, setPageIndex } = useQuestionDraft(
+		item.id,
+		pending,
+	);
+	const cardRef = useRef<HTMLFieldSetElement>(null);
 	const index = Math.min(pageIndex, Math.max(pages.length - 1, 0));
 	const page = pages[index];
 	const last = index >= pages.length - 1;

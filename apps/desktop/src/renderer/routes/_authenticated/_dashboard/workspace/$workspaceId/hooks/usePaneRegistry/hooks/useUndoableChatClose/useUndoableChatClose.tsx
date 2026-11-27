@@ -17,6 +17,7 @@ import {
 } from "../../../../utils/pendingChatStops";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
 import { useChatSubagentStore } from "../../stores/chatSubagentStore";
+import { useQuestionDraftStore } from "../../stores/questionDraftStore";
 import { ChatClosedToast } from "./components/ChatClosedToast";
 import { createClosedChatBatches } from "./utils/closedChatBatches";
 import { findStrayChatSessions } from "./utils/findStrayChatSessions";
@@ -157,6 +158,7 @@ export function useUndoableChatClose({
 				const { terminalId } = chat.pane.data as ChatPaneData;
 				stopSession(chat.sessionId, chat.showAgain);
 				useChatSubagentStore.getState().forget(terminalId);
+				useQuestionDraftStore.getState().forget(terminalId);
 			},
 		});
 		return { closed, stopSession };
