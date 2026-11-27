@@ -49,3 +49,26 @@ test("a terminal block that prints the command is not repeated", () => {
 		view.container.textContent?.match(/\$ cat package\.json/g),
 	).toHaveLength(1);
 });
+
+test("a created Paradev task shows its label and a chip for the task", () => {
+	const view = render(
+		<ToolCallRow
+			item={{
+				id: "call-2",
+				kind: "tool_call",
+				title: "mcp__paradev__tasks_create",
+				toolKind: "other",
+				toolName: "mcp__paradev__tasks_create",
+				status: "completed",
+				startedAtMs: 1,
+				content: [],
+				rawOutput: { structuredContent: { task: { title: "Fix login" } } },
+				mcpServer: { name: "paradev", tool: "tasks_create" },
+			}}
+		/>,
+	);
+	expect(view.container.textContent).toContain("Created task");
+	expect(
+		view.container.querySelector('[data-chip-kind="task"]')?.textContent,
+	).toBe("Fix login");
+});

@@ -3238,8 +3238,16 @@ msgstr "\"{0}\" diarsipkan"
 msgid "Archived {0}"
 msgstr "Diarsipkan {0}"
 
+msgctxt "Paradev tool"
+msgid "Archived automation"
+msgstr "Otomatisasi diarsipkan"
+
 msgid "Archived shown"
 msgstr "Arsip ditampilkan"
+
+msgctxt "Paradev tool"
+msgid "Archiving automation"
+msgstr "Sedang mengarsipkan otomatisasi"
 
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Yakin ingin menghapus file ini? Tindakan ini tidak bisa dibatalkan."
@@ -4951,6 +4959,14 @@ msgstr "Ditutup"
 msgctxt "pull request or issue state"
 msgid "Closed"
 msgstr "Ditutup"
+
+msgctxt "Paradev tool"
+msgid "Closed terminal"
+msgstr "Terminal ditutup"
+
+msgctxt "Paradev tool"
+msgid "Closing terminal"
+msgstr "Sedang menutup terminal"
 
 msgid "Closing these ports will end the processes using them."
 msgstr "Menutup port ini akan menghentikan proses yang memakainya."
@@ -6833,6 +6849,10 @@ msgstr "Membuat {createdDirs} folder di {where}"
 msgid "Created 1 folder in {where}"
 msgstr "Membuat 1 folder di {where}"
 
+msgctxt "Paradev tool"
+msgid "Created automation"
+msgstr "Otomatisasi dibuat"
+
 msgid "Created by"
 msgstr "Dibuat oleh"
 
@@ -6845,8 +6865,16 @@ msgstr "Dibuat oleh saya"
 msgid "Created ENG-142 Login fails on Safari"
 msgstr "ENG-142 dibuat: Login gagal di Safari"
 
+msgctxt "Paradev tool"
+msgid "Created task"
+msgstr "Tugas dibuat"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "Membuat tim \"{trimmedName}\""
+
+msgctxt "Paradev tool"
+msgid "Created workspace"
+msgstr "Workspace dibuat"
 
 msgid "creating"
 msgstr "membuat"
@@ -6864,6 +6892,10 @@ msgstr "Membuat tugas"
 msgid "Creating a workspace"
 msgstr "Membuat workspace"
 
+msgctxt "Paradev tool"
+msgid "Creating automation"
+msgstr "Sedang membuat otomatisasi"
+
 msgid "Creating PR..."
 msgstr "Membuat PR…"
 
@@ -6876,11 +6908,19 @@ msgstr "Membuat sesi"
 msgid "Creating session: {name}"
 msgstr "Membuat sesi: {name}"
 
+msgctxt "Paradev tool"
+msgid "Creating task"
+msgstr "Sedang membuat tugas"
+
 msgid "Creating the sandbox"
 msgstr "Membuat sandbox"
 
 msgid "Creating workspace"
 msgstr "Membuat workspace"
+
+msgctxt "Paradev tool"
+msgid "Creating workspace"
+msgstr "Sedang membuat workspace"
 
 msgid "Creating workspace: {name}"
 msgstr "Membuat workspace: {name}"
@@ -7329,6 +7369,10 @@ msgstr "Dihapus {deletedWhen} · {deviceNames}"
 msgid "Deleted {name}"
 msgstr "Menghapus {name}"
 
+msgctxt "Paradev tool"
+msgid "Deleted automation"
+msgstr "Otomatisasi dihapus"
+
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Dihapus oleh {deletedBy} {deletedWhen} · {deviceNames}"
 
@@ -7341,11 +7385,19 @@ msgstr "dihapus atau tidak tersedia, pilih yang lain"
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "Proyek yang dihapus dapat dipulihkan selama 30 hari, bersama workspace yang ikut terhapus. Setelah itu proyek dihapus permanen; folder repositori dan worktree dengan perubahan yang belum di-commit tetap ada di disk."
 
+msgctxt "Paradev tool"
+msgid "Deleted task"
+msgstr "Tugas dihapus"
+
 msgid "Deleted user"
 msgstr "Pengguna dihapus"
 
 msgid "Deleted workspace"
 msgstr "Workspace yang dihapus"
+
+msgctxt "Paradev tool"
+msgid "Deleted workspace"
+msgstr "Workspace dihapus"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "Workspace terhapus, tapi tidak bisa menyelesaikan pembaruan sidebar"
@@ -7368,8 +7420,20 @@ msgstr "Menghapus"
 msgid "Deleting {name}..."
 msgstr "Menghapus {name}..."
 
+msgctxt "Paradev tool"
+msgid "Deleting automation"
+msgstr "Sedang menghapus otomatisasi"
+
 msgid "Deleting organization..."
 msgstr "Menghapus organisasi..."
+
+msgctxt "Paradev tool"
+msgid "Deleting task"
+msgstr "Sedang menghapus tugas"
+
+msgctxt "Paradev tool"
+msgid "Deleting workspace"
+msgstr "Sedang menghapus workspace"
 
 msgid "Deleting..."
 msgstr "Menghapus..."
@@ -7866,8 +7930,16 @@ msgstr "Unduh file tema"
 msgid "downloaded"
 msgstr "terunduh"
 
+msgctxt "Paradev tool"
+msgid "Downloaded page"
+msgstr "Halaman diunduh"
+
 msgid "Downloading"
 msgstr "Mengunduh"
+
+msgctxt "Paradev tool"
+msgid "Downloading page"
+msgstr "Sedang mengunduh halaman"
 
 msgid "Downloading..."
 msgstr "Mengunduh..."
@@ -11347,6 +11419,14 @@ msgstr "Jalankan skrip terminal ini setiap kali tab terminal baru dibuka."
 msgid "Launch watch"
 msgstr "Pantau peluncuran"
 
+msgctxt "Paradev tool"
+msgid "Launched agent"
+msgstr "Agen dimulai"
+
+msgctxt "Paradev tool"
+msgid "Launching agent"
+msgstr "Sedang memulai agen"
+
 msgid "Layout"
 msgstr "Tata letak"
 
@@ -11621,6 +11701,62 @@ msgctxt "shell intent"
 msgid "Listed"
 msgstr "Ditampilkan"
 
+msgctxt "Paradev tool"
+msgid "Listed agents"
+msgstr "Daftar agen dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed automation runs"
+msgstr "Daftar run otomatisasi dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed automations"
+msgstr "Daftar otomatisasi dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed hosts"
+msgstr "Daftar host dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed members"
+msgstr "Daftar anggota dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed page comments"
+msgstr "Daftar komentar halaman dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed page versions"
+msgstr "Daftar versi halaman dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed pages"
+msgstr "Daftar halaman dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed projects"
+msgstr "Daftar proyek dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed task statuses"
+msgstr "Daftar status tugas dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed tasks"
+msgstr "Daftar tugas dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed terminals"
+msgstr "Daftar terminal dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed trigger options"
+msgstr "Daftar opsi pemicu dimuat"
+
+msgctxt "Paradev tool"
+msgid "Listed workspaces"
+msgstr "Daftar workspace dimuat"
+
 msgid "Listening"
 msgstr "Mendengarkan"
 
@@ -11637,8 +11773,64 @@ msgctxt "shell intent"
 msgid "Listing"
 msgstr "Menampilkan"
 
+msgctxt "Paradev tool"
+msgid "Listing agents"
+msgstr "Sedang memuat daftar agen"
+
+msgctxt "Paradev tool"
+msgid "Listing automation runs"
+msgstr "Sedang memuat daftar run otomatisasi"
+
+msgctxt "Paradev tool"
+msgid "Listing automations"
+msgstr "Sedang memuat daftar otomatisasi"
+
+msgctxt "Paradev tool"
+msgid "Listing hosts"
+msgstr "Sedang memuat daftar host"
+
+msgctxt "Paradev tool"
+msgid "Listing members"
+msgstr "Sedang memuat daftar anggota"
+
+msgctxt "Paradev tool"
+msgid "Listing page comments"
+msgstr "Sedang memuat daftar komentar halaman"
+
+msgctxt "Paradev tool"
+msgid "Listing page versions"
+msgstr "Sedang memuat daftar versi halaman"
+
+msgctxt "Paradev tool"
+msgid "Listing pages"
+msgstr "Sedang memuat daftar halaman"
+
+msgctxt "Paradev tool"
+msgid "Listing projects"
+msgstr "Sedang memuat daftar proyek"
+
 msgid "Listing sessions in {what}"
 msgstr "Mendaftar sesi di {what}"
+
+msgctxt "Paradev tool"
+msgid "Listing task statuses"
+msgstr "Sedang memuat daftar status tugas"
+
+msgctxt "Paradev tool"
+msgid "Listing tasks"
+msgstr "Sedang memuat daftar tugas"
+
+msgctxt "Paradev tool"
+msgid "Listing terminals"
+msgstr "Sedang memuat daftar terminal"
+
+msgctxt "Paradev tool"
+msgid "Listing trigger options"
+msgstr "Sedang memuat daftar opsi pemicu"
+
+msgctxt "Paradev tool"
+msgid "Listing workspaces"
+msgstr "Sedang memuat daftar workspace"
 
 msgid "live"
 msgstr "live"
@@ -14650,6 +14842,10 @@ msgstr "OpenAI menolak kunci API ini."
 msgid "Opened"
 msgstr "Dibuka"
 
+msgctxt "Paradev tool"
+msgid "Opened terminal"
+msgstr "Terminal dibuka"
+
 msgid "Opening {appName}…"
 msgstr "Membuka {appName}…"
 
@@ -14667,6 +14863,10 @@ msgstr "Membuka di antarmuka chat…"
 
 msgid "Opening pages"
 msgstr "Membuka halaman"
+
+msgctxt "Paradev tool"
+msgid "Opening terminal"
+msgstr "Sedang membuka terminal"
 
 msgid "Operator"
 msgstr "Operator"
@@ -15256,12 +15456,20 @@ msgctxt "project state"
 msgid "Paused"
 msgstr "Dijeda"
 
+msgctxt "Paradev tool"
+msgid "Paused automation"
+msgstr "Otomatisasi dijeda"
+
 #. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
 msgid "Paused until {0}"
 msgstr "Dijeda hingga {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Dijeda saat Paradev ditutup"
+
+msgctxt "Paradev tool"
+msgid "Pausing automation"
+msgstr "Sedang menjeda otomatisasi"
 
 msgid "Pay {total}"
 msgstr "Bayar {total}"
@@ -16021,6 +16229,10 @@ msgctxt "github release action"
 msgid "Published"
 msgstr "Dipublikasikan"
 
+msgctxt "Paradev tool"
+msgid "Published page"
+msgstr "Halaman diterbitkan"
+
 msgid "Published version 1."
 msgstr "Versi 1 diterbitkan."
 
@@ -16029,6 +16241,10 @@ msgstr "Mempublikasikan jumlah token dan nama model Anda, tidak pernah nama repo
 
 msgid "Publishing as <0>{handle}</0>. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Dipublikasikan sebagai <0>{handle}</0>. Hanya jumlah token dan nama model, tanpa nama repo, path file, atau prompt."
+
+msgctxt "Paradev tool"
+msgid "Publishing page"
+msgstr "Sedang menerbitkan halaman"
 
 msgid "Pull request"
 msgstr "Pull request"
@@ -16213,6 +16429,10 @@ msgstr "Dokumentasi Radix Tooltip"
 msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
 msgstr "Menjalankan <0>bun test settings</0> · 14 lulus · 1 gagal"
 
+msgctxt "Paradev tool"
+msgid "Ran automation"
+msgstr "Otomatisasi dijalankan"
+
 msgid "Random icon"
 msgstr "Ikon acak"
 
@@ -16298,6 +16518,14 @@ msgstr "Baca dan kirim email"
 msgid "Read announcement"
 msgstr "Baca pengumuman"
 
+msgctxt "Paradev tool"
+msgid "Read automation"
+msgstr "Otomatisasi dibaca"
+
+msgctxt "Paradev tool"
+msgid "Read automation prompt"
+msgstr "Prompt otomatisasi dibaca"
+
 msgid "Read data you copy and paste"
 msgstr "Membaca data yang Anda salin dan tempel"
 
@@ -16309,6 +16537,22 @@ msgstr "Baca di ponsel Anda"
 
 msgid "Read MCP servers again"
 msgstr "Baca ulang server MCP"
+
+msgctxt "Paradev tool"
+msgid "Read page"
+msgstr "Halaman dibaca"
+
+msgctxt "Paradev tool"
+msgid "Read page storage"
+msgstr "Penyimpanan halaman dibaca"
+
+msgctxt "Paradev tool"
+msgid "Read task"
+msgstr "Tugas dibaca"
+
+msgctxt "Paradev tool"
+msgid "Read terminal"
+msgstr "Terminal dibaca"
 
 msgid "Read the changelog"
 msgstr "Baca changelog"
@@ -16355,6 +16599,30 @@ msgstr "Membaca"
 
 msgid "Reading {what}"
 msgstr "Membaca {what}"
+
+msgctxt "Paradev tool"
+msgid "Reading automation"
+msgstr "Sedang membaca otomatisasi"
+
+msgctxt "Paradev tool"
+msgid "Reading automation prompt"
+msgstr "Sedang membaca prompt otomatisasi"
+
+msgctxt "Paradev tool"
+msgid "Reading page"
+msgstr "Sedang membaca halaman"
+
+msgctxt "Paradev tool"
+msgid "Reading page storage"
+msgstr "Sedang membaca penyimpanan halaman"
+
+msgctxt "Paradev tool"
+msgid "Reading task"
+msgstr "Sedang membaca tugas"
+
+msgctxt "Paradev tool"
+msgid "Reading terminal"
+msgstr "Sedang membaca terminal"
 
 msgid "Reading the page"
 msgstr "Membaca halaman"
@@ -16791,11 +17059,19 @@ msgstr "Menghapus {removedLabel}."
 msgid "Removed from the merge queue"
 msgstr "Dikeluarkan dari antrean merge"
 
+msgctxt "Paradev tool"
+msgid "Removed page storage"
+msgstr "Penyimpanan halaman dihapus"
+
 msgid "Removes this agent from this device only."
 msgstr "Menghapus agen ini hanya dari perangkat ini."
 
 msgid "Removing member..."
 msgstr "Menghapus anggota..."
+
+msgctxt "Paradev tool"
+msgid "Removing page storage"
+msgstr "Sedang menghapus penyimpanan halaman"
 
 msgid "Removing terminal..."
 msgstr "Menghapus terminal..."
@@ -16911,6 +17187,10 @@ msgstr "Mengganti {replaced} file di {where}"
 msgid "Replaced 1 file in {where}"
 msgstr "Mengganti 1 file di {where}"
 
+msgctxt "Paradev tool"
+msgid "Replied to comment"
+msgstr "Komentar dibalas"
+
 msgid "Replied to your DM"
 msgstr "Membalas pesan langsung Anda"
 
@@ -16937,6 +17217,10 @@ msgstr "Membalas {replyingTo}"
 
 msgid "Replying to a DM"
 msgstr "Membalas pesan langsung"
+
+msgctxt "Paradev tool"
+msgid "Replying to comment"
+msgstr "Sedang membalas komentar"
 
 msgid "repo"
 msgstr "repo"
@@ -17110,6 +17394,14 @@ msgstr "Selesaikan thread"
 msgid "Resolved"
 msgstr "Terselesaikan"
 
+msgctxt "Paradev tool"
+msgid "Resolved comment"
+msgstr "Komentar diselesaikan"
+
+msgctxt "Paradev tool"
+msgid "Resolving comment"
+msgstr "Sedang menyelesaikan komentar"
+
 msgid "Resource monitor"
 msgstr "Monitor sumber daya"
 
@@ -17248,8 +17540,16 @@ msgstr "\"{projectName}\" dipulihkan"
 msgid "Restored \"{workspaceName}\""
 msgstr "\"{workspaceName}\" dipulihkan"
 
+msgctxt "Paradev tool"
+msgid "Restored automation"
+msgstr "Otomatisasi dipulihkan"
+
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Memulihkan \"{workspaceName}\"…"
+
+msgctxt "Paradev tool"
+msgid "Restoring automation"
+msgstr "Sedang memulihkan otomatisasi"
 
 msgid "Restoring Claude's session"
 msgstr "Memulihkan sesi Claude"
@@ -17287,12 +17587,20 @@ msgstr "Lanjutkan otomatisasi"
 msgid "Resume notifications"
 msgstr "Lanjutkan notifikasi"
 
+msgctxt "Paradev tool"
+msgid "Resumed automation"
+msgstr "Otomatisasi dilanjutkan"
+
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "Melanjutkan {0}…"
 
 msgid "Resuming at reset"
 msgstr "Akan dilanjutkan saat direset"
+
+msgctxt "Paradev tool"
+msgid "Resuming automation"
+msgstr "Sedang melanjutkan otomatisasi"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Dilanjutkan dalam {resumeSeconds} dtk"
@@ -17657,6 +17965,10 @@ msgstr "Menjalankan \"{name}\" sekarang"
 msgid "Running agents on this profile lose access."
 msgstr "Agen yang berjalan di profil ini kehilangan akses."
 
+msgctxt "Paradev tool"
+msgid "Running automation"
+msgstr "Sedang menjalankan otomatisasi"
+
 msgid "Running bun test…"
 msgstr "Menjalankan bun test…"
 
@@ -17790,6 +18102,10 @@ msgstr "{name} disimpan, tetapi workspace penyiapannya tidak dapat dimulai: {rea
 msgid "Saved from a workspace"
 msgstr "Disimpan dari workspace"
 
+msgctxt "Paradev tool"
+msgid "Saved page storage"
+msgstr "Disimpan ke penyimpanan halaman"
+
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
 
@@ -17807,6 +18123,10 @@ msgstr "Menyimpan sebagai lingkungan..."
 
 msgid "Saving its work and its chats…"
 msgstr "Menyimpan pekerjaan dan chat-nya…"
+
+msgctxt "Paradev tool"
+msgid "Saving page storage"
+msgstr "Sedang menyimpan ke penyimpanan halaman"
 
 msgid "Saving..."
 msgstr "Menyimpan..."
@@ -18415,6 +18735,10 @@ msgstr "Mengirim"
 msgid "Sending a message to {what}"
 msgstr "Mengirim pesan ke {what}"
 
+msgctxt "Paradev tool"
+msgid "Sending to terminal"
+msgstr "Sedang mengirim ke terminal"
+
 msgid "Sending..."
 msgstr "Mengirim..."
 
@@ -18449,6 +18773,10 @@ msgstr "Undangan dikirim ulang ke {0}"
 
 msgid "Sent to agent"
 msgstr "Dikirim ke agen"
+
+msgctxt "Paradev tool"
+msgid "Sent to terminal"
+msgstr "Dikirim ke terminal"
 
 msgid "Sent to the pull request's workspace"
 msgstr "Dikirim ke workspace pull request"
@@ -18518,6 +18846,10 @@ msgstr "Sesi · {0} teratas menurut biaya"
 msgid "Set a notification schedule"
 msgstr "Atur jadwal notifikasi"
 
+msgctxt "Paradev tool"
+msgid "Set automation prompt"
+msgstr "Prompt otomatisasi diatur"
+
 msgid "Set channel…"
 msgstr "Atur saluran…"
 
@@ -18577,6 +18909,10 @@ msgstr "Siapkan organisasi Anda untuk memulai"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Mengembalikan plugin terpasang ke Tersedia membuat semua orang tetap memiliki salinannya; mereka lalu bisa menghapusnya. Tidak tersedia akan menghapusnya."
+
+msgctxt "Paradev tool"
+msgid "Setting automation prompt"
+msgstr "Sedang mengatur prompt otomatisasi"
 
 msgid "Setting saved"
 msgstr "Pengaturan disimpan"
@@ -22244,16 +22580,40 @@ msgstr "{key} diperbarui"
 msgid "Updated {updatedRelative}"
 msgstr "Diperbarui {updatedRelative}"
 
+msgctxt "Paradev tool"
+msgid "Updated automation"
+msgstr "Otomatisasi diperbarui"
+
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Baru saja diperbarui dari {0}."
 
+msgctxt "Paradev tool"
+msgid "Updated task"
+msgstr "Tugas diperbarui"
+
+msgctxt "Paradev tool"
+msgid "Updated workspace"
+msgstr "Workspace diperbarui"
+
 msgid "Updates"
 msgstr "Pembaruan"
+
+msgctxt "Paradev tool"
+msgid "Updating automation"
+msgstr "Sedang memperbarui otomatisasi"
+
+msgctxt "Paradev tool"
+msgid "Updating task"
+msgstr "Sedang memperbarui tugas"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
 msgstr "Memperbarui ke {0}"
+
+msgctxt "Paradev tool"
+msgid "Updating workspace"
+msgstr "Sedang memperbarui workspace"
 
 msgid "Updating…"
 msgstr "Memperbarui…"

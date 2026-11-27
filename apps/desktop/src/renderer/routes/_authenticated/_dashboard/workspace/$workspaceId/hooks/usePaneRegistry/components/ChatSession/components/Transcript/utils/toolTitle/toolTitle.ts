@@ -3,6 +3,7 @@ import { msg } from "@lingui/core/macro";
 import type { ToolCall } from "@superset/chat/protocol";
 import { i18n } from "@superset/i18n";
 import { fileChangeOf } from "../fileChange";
+import { paradevToolLabel } from "../paradevToolDisplay";
 import {
 	type ShellIntent,
 	type ShellVerb,
@@ -70,6 +71,15 @@ export function toolTitle(
 	if (intent) {
 		const verb = SHELL_VERBS[intent.verb][running ? "running" : "settled"];
 		return { label: t(verb), change: null, intent, command: false };
+	}
+	const paradevLabel = paradevToolLabel(item);
+	if (paradevLabel) {
+		return {
+			label: t(paradevLabel),
+			change: null,
+			intent: null,
+			command: false,
+		};
 	}
 	const mcpServer = item.mcpServer;
 	const rawMcpTitle =
