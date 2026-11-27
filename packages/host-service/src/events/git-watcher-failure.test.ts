@@ -29,7 +29,7 @@ class Stream implements AsyncIterable<Batch>, AsyncIterator<Batch> {
 	}
 }
 interface Internals {
-	watched: Map<string, { watcher: GitDirectoryHandle }>;
+	watched: Map<string, { watcher: GitDirectoryHandle; worktreePath: string }>;
 	pendingBatches: Map<string, unknown>;
 	interest: Map<string, number>;
 	rescan(): Promise<void>;
@@ -164,3 +164,39 @@ for (const failure of ["reject", "end", "subscribe", "git"] as const) {
 		expect(computations).toBe(reattached + 1);
 	}, 15_000);
 }
+
+test("rescan moves the watcher to a workspace's new worktree path", async () => {
+	const oldPath = await mkdtemp(join(tmpdir(), "git-watch-old-"));
+	const newPath = await mkdtemp(join(tmpdir(), "git-watch-new-"));
+	await simpleGit(oldPath).init();
+	await simpleGit(newPath).init();
+	const workspaceId = "watch-moved";
+	const row = { id: workspaceId, worktreePath: oldPath };
+	const db = {
+		select: () => ({
+			from: () => ({ where: () => ({ get: () => row, all: () => [row] }) }),
+		}),
+	};
+	const filesystem = {
+		getServiceForWorkspace: () => ({ watchPath: () => new Stream() }),
+		refreshWatcherIgnores: async () => false,
+		isWatchAttachBackingOff: () => false,
+	};
+	const watcher = new GitWatcher(
+		db as unknown as ConstructorParameters<typeof GitWatcher>[0],
+		filesystem as unknown as ConstructorParameters<typeof GitWatcher>[1],
+	);
+	cleanups.push(async () => {
+		watcher.close();
+		await rm(oldPath, { recursive: true, force: true });
+		await rm(newPath, { recursive: true, force: true });
+	});
+	const internals = watcher as unknown as Internals;
+	watcher.watchWorkspace(workspaceId);
+	await waitFor(() => internals.watched.has(workspaceId));
+
+	row.worktreePath = newPath;
+	await internals.rescan();
+
+	expect(internals.watched.get(workspaceId)?.worktreePath).toBe(newPath);
+});

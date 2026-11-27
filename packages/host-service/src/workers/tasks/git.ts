@@ -50,6 +50,7 @@ import { enablePushAutoSetupRemote } from "../../trpc/router/workspace-creation/
 import {
 	normalizeWorktreePath,
 	parseWorktreeList,
+	type WorktreeRecord,
 } from "../../trpc/router/workspace-creation/shared/worktree-list.ts";
 import { defineWorkerTask } from "../define-worker-task.ts";
 
@@ -432,6 +433,21 @@ export const gitWorktreeRemoveTask = defineWorkerTask<
 			removeError,
 		};
 	},
+});
+
+export const gitListWorktreesTask = defineWorkerTask<
+	{ repoPath: string; gitEnv: GitTaskEnv },
+	WorktreeRecord[]
+>({
+	type: "git/listWorktrees",
+	handler: async ({ repoPath, gitEnv }) =>
+		parseWorktreeList(
+			await createUserSimpleGit(repoPath, { env: gitEnv }).raw([
+				"worktree",
+				"list",
+				"--porcelain",
+			]),
+		),
 });
 
 export const gitDeleteBranchTask = defineWorkerTask<
@@ -935,6 +951,7 @@ export const gitTasks = [
 	gitAuthorNameTask,
 	gitWorktreeStateTask,
 	gitWorktreeRemoveTask,
+	gitListWorktreesTask,
 	gitDeleteBranchTask,
 	gitAutomaticBranchRenamableTask,
 	gitRenameBranchTask,

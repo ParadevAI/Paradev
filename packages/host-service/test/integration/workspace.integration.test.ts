@@ -1,14 +1,16 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import {
 	archiveLocalWorkspace,
+	getLocalWorkspace,
 	unarchiveLocalWorkspace,
 } from "../../src/workspaces/local-workspace-store";
 import {
 	type BasicScenario,
 	createBasicScenario,
 	createFeatureWorktreeScenario,
+	type FeatureWorktreeScenario,
 } from "../helpers/scenarios";
 import { seedWorkspace } from "../helpers/seed";
 
@@ -153,5 +155,143 @@ describe("workspace list archive semantics", () => {
 		unarchiveLocalWorkspace(storeCtx(), id);
 		const restored = await scenario.host.trpc.workspace.list.query();
 		expect(restored.map((w) => w.id)).toContain(id);
+	});
+});
+
+describe("moved worktree", () => {
+	let scenario: FeatureWorktreeScenario;
+	let movedPath: string;
+
+	beforeEach(async () => {
+		scenario = await createFeatureWorktreeScenario();
+		movedPath = join(scenario.repo.repoPath, "moved", "feature");
+		mkdirSync(dirname(movedPath), { recursive: true });
+		await scenario.repo.git.raw([
+			"worktree",
+			"move",
+			scenario.worktreePath,
+			movedPath,
+		]);
+	});
+
+	afterEach(async () => {
+		await scenario?.dispose();
+	});
+
+	function storedPath(id: string) {
+		return getLocalWorkspace(scenario.host.db, id)?.worktreePath;
+	}
+
+	test("get re-points the workspace at the moved worktree", async () => {
+		const ws = await scenario.host.trpc.workspace.get.query({
+			id: scenario.featureWorkspaceId,
+		});
+		expect(ws.worktreePath).toBe(movedPath);
+		expect(ws.worktreeExists).toBe(true);
+		expect(storedPath(scenario.featureWorkspaceId)).toBe(movedPath);
+	});
+
+	test("get leaves an archived workspace on its old path", async () => {
+		archiveLocalWorkspace(
+			{ db: scenario.host.db, eventBus: scenario.host.eventBus },
+			scenario.featureWorkspaceId,
+			"deleted",
+		);
+		const ws = await scenario.host.trpc.workspace.get.query({
+			id: scenario.featureWorkspaceId,
+		});
+		expect(ws.worktreePath).toBe(scenario.worktreePath);
+	});
+
+	test("get does not take a worktree another workspace uses", async () => {
+		seedWorkspace(scenario.host, {
+			projectId: scenario.projectId,
+			worktreePath: movedPath,
+			branch: "feature/other",
+		});
+		const ws = await scenario.host.trpc.workspace.get.query({
+			id: scenario.featureWorkspaceId,
+		});
+		expect(ws.worktreePath).toBe(scenario.worktreePath);
+		expect(ws.worktreeExists).toBe(false);
+	});
+
+	test("update re-points the workspace at the given worktree", async () => {
+		const link = join(scenario.repo.repoPath, "link");
+		symlinkSync(dirname(movedPath), link);
+		const updated = await scenario.host.trpc.workspace.update.mutate({
+			id: scenario.featureWorkspaceId,
+			worktreePath: join(link, "feature"),
+		});
+		expect(updated.worktreePath).toBe(movedPath);
+		expect(storedPath(scenario.featureWorkspaceId)).toBe(movedPath);
+	});
+
+	test("update rejects a path that is not this workspace's worktree", async () => {
+		const otherPath = join(scenario.repo.repoPath, "moved", "other");
+		await scenario.repo.git.raw(["worktree", "add", "-b", "other", otherPath]);
+		const plainDir = join(scenario.repo.repoPath, "moved", "plain");
+		mkdirSync(plainDir);
+		for (const worktreePath of [otherPath, plainDir, "moved/feature"]) {
+			await expect(
+				scenario.host.trpc.workspace.update.mutate({
+					id: scenario.featureWorkspaceId,
+					worktreePath,
+				}),
+			).rejects.toMatchObject({ data: { code: "BAD_REQUEST" } });
+		}
+		expect(storedPath(scenario.featureWorkspaceId)).toBe(scenario.worktreePath);
+
+		const { id: onMainBranch } = seedWorkspace(scenario.host, {
+			projectId: scenario.projectId,
+			worktreePath: join(scenario.repo.repoPath, "gone"),
+			branch: "main",
+		});
+		await expect(
+			scenario.host.trpc.workspace.update.mutate({
+				id: onMainBranch,
+				worktreePath: scenario.repo.repoPath,
+			}),
+		).rejects.toMatchObject({ data: { code: "BAD_REQUEST" } });
+	});
+
+	test("update checks the path against the branch it saves", async () => {
+		await scenario.repo.git.raw(["branch", "-m", scenario.branch, "renamed"]);
+		const updated = await scenario.host.trpc.workspace.update.mutate({
+			id: scenario.featureWorkspaceId,
+			branch: "renamed",
+			worktreePath: movedPath,
+		});
+		expect(updated.branch).toBe("renamed");
+		expect(updated.worktreePath).toBe(movedPath);
+	});
+
+	test("update refuses a worktree another workspace uses", async () => {
+		seedWorkspace(scenario.host, {
+			projectId: scenario.projectId,
+			worktreePath: movedPath,
+			branch: scenario.branch,
+		});
+		await expect(
+			scenario.host.trpc.workspace.update.mutate({
+				id: scenario.featureWorkspaceId,
+				worktreePath: movedPath,
+			}),
+		).rejects.toMatchObject({ data: { code: "CONFLICT" } });
+	});
+
+	test("update refuses to move a local workspace", async () => {
+		const { id } = seedWorkspace(scenario.host, {
+			projectId: scenario.projectId,
+			worktreePath: scenario.repo.repoPath,
+			branch: scenario.branch,
+			type: "local",
+		});
+		await expect(
+			scenario.host.trpc.workspace.update.mutate({
+				id,
+				worktreePath: movedPath,
+			}),
+		).rejects.toMatchObject({ data: { code: "BAD_REQUEST" } });
 	});
 });
