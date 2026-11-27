@@ -8,6 +8,7 @@ const session: NonNullable<SessionResult["session"]> = {
 	scopeId: "workspace-1",
 	harness: "claude-acp",
 	agentConfigId: null,
+	launchTerminalId: null,
 	harnessSessionId: "native-1",
 	epoch: "epoch-1",
 	status: "idle",

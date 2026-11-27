@@ -66,7 +66,6 @@ import {
 } from "./components/WorkspaceSplitLayout";
 import { WorkspaceToolbar } from "./components/WorkspaceToolbar";
 import { useAgentSessionLauncher } from "./hooks/useAgentSessionLauncher";
-import { useAutoAdoptBackgroundSessions } from "./hooks/useAutoAdoptBackgroundSessions";
 import { useCloseRightPaneAreaWhenEmpty } from "./hooks/useCloseRightPaneAreaWhenEmpty";
 import { useConsumeAutomationRunLink } from "./hooks/useConsumeAutomationRunLink";
 import { useConsumeOpenUrlRequest } from "./hooks/useConsumeOpenUrlRequest";
@@ -84,12 +83,12 @@ import { renderBrowserTabIcon } from "./hooks/usePaneRegistry/components/Browser
 import { browserRuntimeRegistry } from "./hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { usePresetExecution } from "./hooks/usePresetExecution";
 import { usePullRequestPaneIntentOpener } from "./hooks/usePullRequestPaneIntentOpener";
+import { useReconcileAgentTabs } from "./hooks/useReconcileAgentTabs";
 import { useRestoreExpandedPaneArea } from "./hooks/useRestoreExpandedPaneArea";
 import { useRightSidebarHotkeys } from "./hooks/useRightSidebarHotkeys";
 import { useRunPendingChatHandoff } from "./hooks/useRunPendingChatHandoff";
 import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationPresets";
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
-import { useSyncChatSessionTabs } from "./hooks/useSyncChatSessionTabs";
 import { useTabCloseGuard } from "./hooks/useTabCloseGuard";
 import { useTerminalLauncher } from "./hooks/useTerminalLauncher";
 import { useWorkspaceFileNavigation } from "./hooks/useWorkspaceFileNavigation";
@@ -365,13 +364,7 @@ function WorkspaceContent() {
 		executePreset,
 		resolvePresetCommands,
 	});
-	useAutoAdoptBackgroundSessions({
-		store,
-		linkedStores: linkedPaneStores,
-		workspaceId,
-		isLayoutReady: isLayoutReady && isRightLayoutReady,
-	});
-	useSyncChatSessionTabs({
+	useReconcileAgentTabs({
 		store,
 		linkedStores: linkedPaneStores,
 		workspaceId,

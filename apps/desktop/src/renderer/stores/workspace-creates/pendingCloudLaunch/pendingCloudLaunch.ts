@@ -15,6 +15,10 @@ import {
 	type PendingCloudLaunchPaneData,
 	type TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
+import {
+	agentPaneClaims,
+	isClaimed,
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/agentPaneClaims";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
@@ -56,20 +60,6 @@ const EMPTY_LAYOUT: WorkspaceState<PaneViewerData> = {
 	activeTabId: null,
 };
 
-/** Whether any pane in these tabs, from any of the workspace's pane areas, holds the terminal. */
-function isTerminalClaimed(
-	tabs: readonly WorkspaceState<PaneViewerData>["tabs"][number][],
-	terminalId: string,
-): boolean {
-	return tabs.some((tab) =>
-		Object.values(tab.panes).some(
-			(pane) =>
-				(pane.data as { terminalId?: unknown } | undefined)?.terminalId ===
-				terminalId,
-		),
-	);
-}
-
 /**
  * The one rule for opening a launch's waiting pane, whoever learned of the
  * launch: a new tab, unless a pane in any of the workspace's pane areas
@@ -84,8 +74,13 @@ export function withPendingCloudLaunch(
 ): WorkspaceState<PaneViewerData> | null {
 	const terminalId = launch?.terminalId;
 	if (!launch || !terminalId) return null;
-	const workspaceTabs = [layout, ...otherLayouts].flatMap((each) => each.tabs);
-	if (isTerminalClaimed(workspaceTabs, terminalId)) return null;
+	if (
+		isClaimed(agentPaneClaims([layout, ...otherLayouts]), {
+			terminalIds: [terminalId],
+		})
+	) {
+		return null;
+	}
 	const store = createWorkspaceStore<PaneViewerData>({ initialState: layout });
 	store.getState().addTab({
 		panes: [

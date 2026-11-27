@@ -1,11 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import { chatSessionsToAdopt } from "../chatSessionsToAdopt";
 import { storedChatsAsListed } from "./storedChatsAsListed";
 
 describe("storedChatsAsListed", () => {
-	it("turns a cloud workspace's stored chats into tabs, newest last, skipping ones with no agent", () => {
-		const targets = chatSessionsToAdopt({
-			sessions: storedChatsAsListed([
+	it("lists a cloud workspace's stored chats as open, skipping ones with no agent", () => {
+		expect(
+			storedChatsAsListed([
 				{
 					id: "newer",
 					title: "Repeated error messages",
@@ -24,15 +23,10 @@ describe("storedChatsAsListed", () => {
 					harness: null,
 					lastActiveAt: new Date(3_000),
 				},
-			]),
-			tabs: [],
-			workspaceId: "cloud-1",
-		});
-		expect(
-			targets.map((target) => [target.sessionId, target.terminalId]),
+			]).map((chat) => [chat.sessionId, chat.updatedAt, chat.live]),
 		).toEqual([
-			["older", "older"],
-			["newer", "newer"],
+			["newer", 2_000, true],
+			["older", 1_000, true],
 		]);
 	});
 });

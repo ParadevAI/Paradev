@@ -290,6 +290,29 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("a session keeps its terminal after its harness stops", async () => {
+		const { runtime } = newRuntime();
+		const launched = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			terminalId: "terminal-1",
+		});
+		await runtime.live.disposeAll();
+
+		expect(
+			runtime.commands
+				.listSessions({})
+				.find((session) => session.sessionId === launched.sessionId),
+		).toMatchObject({
+			live: false,
+			terminalId: null,
+			launchTerminalId: "terminal-1",
+		});
+		await runtime.dispose();
+	});
+
 	test("a closed session stays closed, and one stopped by shutdown does not", async () => {
 		const { runtime } = newRuntime();
 		const closed = createSession(runtime);
@@ -693,6 +716,45 @@ describe("chat commands", () => {
 		expect(runtime.live.require(source.sessionId).terminalId).toBe(
 			"terminal-source",
 		);
+		await runtime.dispose();
+	});
+
+	test("forkSession without a terminal leaves the source's terminal to the source", async () => {
+		class ForkingHarness extends FakeHarness {
+			async fork() {
+				return "agent-forked";
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new ForkingHarness({
+							...SCRIPT,
+							start: [{ kind: "session", session: { status: "idle" } }],
+						}),
+				],
+			]),
+		});
+		const source = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			terminalId: "terminal-source",
+		});
+
+		const forked = await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: source.sessionId,
+			cwd: "/tmp/workspace",
+		});
+
+		const branch = runtime.commands
+			.listSessions({})
+			.find((session) => session.sessionId === forked?.sessionId);
+		expect(branch).toMatchObject({ terminalId: null, launchTerminalId: null });
 		await runtime.dispose();
 	});
 

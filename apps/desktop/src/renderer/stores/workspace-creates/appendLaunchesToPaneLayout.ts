@@ -8,6 +8,11 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
+import {
+	agentPaneClaims,
+	claimKeys,
+	isClaimed,
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/agentPaneClaims";
 
 const EMPTY_STATE: WorkspaceState<PaneViewerData> = {
 	version: 1,
@@ -28,12 +33,14 @@ type AgentLaunchResult =
 
 interface AppendArgs {
 	existing: WorkspaceState<PaneViewerData> | undefined;
+	linked?: readonly (WorkspaceState<PaneViewerData> | undefined)[];
 	terminals: Array<{ terminalId: string; label?: string }>;
 	agents: AgentLaunchResult[];
 }
 
 interface PaneLaunch {
 	sessionId: string;
+	chatSessionId?: string;
 	label?: string;
 	pane: CreatePaneInput<PaneViewerData>;
 }
@@ -51,6 +58,7 @@ function terminalLaunch(terminalId: string, label?: string): PaneLaunch {
 
 export function appendLaunchesToPaneLayout({
 	existing,
+	linked = [],
 	terminals,
 	agents,
 }: AppendArgs): WorkspaceState<PaneViewerData> {
@@ -75,6 +83,7 @@ export function appendLaunchesToPaneLayout({
 		return [
 			{
 				sessionId: entry.sessionId,
+				chatSessionId: entry.chatSessionId,
 				pane: {
 					kind: "chat-v3",
 					data: {
@@ -86,23 +95,18 @@ export function appendLaunchesToPaneLayout({
 			},
 		];
 	});
-	const seen = new Set(
-		(existing?.tabs ?? []).flatMap((tab) =>
-			Object.values(tab.panes).flatMap((pane) => {
-				const data = pane.data as Partial<ChatPaneData>;
-				return [data.terminalId, data.sessionId].filter(
-					(id): id is string => typeof id === "string",
-				);
-			}),
-		),
-	);
+	const claims = agentPaneClaims([existing, ...linked]);
 	const launches = [
 		...agentLaunches,
 		...terminals.map((entry) => terminalLaunch(entry.terminalId, entry.label)),
 	].filter((launch) => {
-		if (seen.has(launch.sessionId)) return false;
-		seen.add(launch.sessionId);
-		return true;
+		const keys = {
+			terminalIds: [launch.sessionId],
+			sessionIds: [launch.chatSessionId],
+		};
+		const shown = isClaimed(claims, keys);
+		claimKeys(claims, keys);
+		return !shown;
 	});
 
 	if (launches.length === 0) {

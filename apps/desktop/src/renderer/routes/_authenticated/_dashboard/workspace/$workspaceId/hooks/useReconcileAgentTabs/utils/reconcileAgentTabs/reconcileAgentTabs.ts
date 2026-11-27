@@ -1,0 +1,313 @@
+import {
+	type CreatePaneInput,
+	createWorkspaceStore,
+	type WorkspaceState,
+} from "@superset/panes";
+import type {
+	ChatPaneData,
+	PaneViewerData,
+	TerminalPaneData,
+} from "../../../../types";
+import {
+	agentPaneClaims,
+	claimKeys,
+	isAgentPane,
+	isClaimed,
+	paneClaimKeys,
+} from "../../../../utils/agentPaneClaims";
+import {
+	type ChatConversation,
+	chatConversations,
+	type ListedChatSession,
+} from "../chatConversations";
+
+type Layout = WorkspaceState<PaneViewerData>;
+
+export interface ListedTerminalSession {
+	terminalId: string;
+	createdAt?: number;
+}
+
+export interface AgentTabHiding {
+	isChatClosedHere: (sessionId: string) => boolean;
+	isChatTerminalHidden: (terminalId: string) => boolean;
+	isTerminalHidden: (terminalId: string) => boolean;
+	isChatReopenedHere: (sessionId: string) => boolean;
+}
+
+export interface ReconcileAgentTabsInput {
+	main: Layout;
+	linked: readonly Layout[];
+	chats?: readonly ListedChatSession[];
+	terminals?: readonly ListedTerminalSession[];
+	presetFor: (harness: string) => string | null | undefined;
+	hiding: AgentTabHiding;
+	shownFromStoredChats?: ReadonlySet<string>;
+	openedEmpty: boolean;
+}
+
+export interface ReconcileAgentTabsResult {
+	main: Layout;
+	linked: Layout[];
+	changed: boolean;
+}
+
+interface PaneRef {
+	area: number;
+	tabId: string;
+	paneId: string;
+}
+
+interface NewTab {
+	at: number;
+	chat: boolean;
+	pane: CreatePaneInput<PaneViewerData>;
+}
+
+/**
+ * The one writer of agent tabs. Every open agent conversation gets one pane
+ * across the pane areas unless this desktop hid it; a chat closed by a person
+ * elsewhere loses its pane; duplicates collapse to the oldest tab. Idempotent.
+ */
+export function reconcileAgentTabs(
+	input: ReconcileAgentTabsInput,
+): ReconcileAgentTabsResult {
+	const areas = [input.main, ...input.linked];
+	const removals = panesToRemove(input, areas);
+	const kept = areas.map((layout, area) =>
+		withoutPanes(
+			layout,
+			removals.filter((ref) => ref.area === area),
+		),
+	);
+	const [keptMain, ...keptLinked] = kept as [Layout, ...Layout[]];
+	const newTabs = tabsToAdd(input, kept);
+	if (removals.length === 0 && newTabs.length === 0) {
+		return { main: input.main, linked: [...input.linked], changed: false };
+	}
+	return {
+		main: withNewTabs(keptMain, newTabs, input.openedEmpty),
+		linked: keptLinked,
+		changed: true,
+	};
+}
+
+function panesToRemove(
+	input: ReconcileAgentTabsInput,
+	areas: readonly Layout[],
+): PaneRef[] {
+	const chatById = new Map(
+		(input.chats ?? []).map((chat) => [chat.sessionId, chat]),
+	);
+	const conversations = chatConversations(input.chats ?? []);
+	const conversationOf = new Map(
+		conversations.flatMap((conversation) =>
+			conversation.sessionIds.map((sessionId) => [sessionId, conversation]),
+		),
+	);
+	const openOnTerminal = new Set(
+		conversations.flatMap((conversation) =>
+			conversation.open
+				? [
+						conversation.key,
+						conversation.current.terminalId,
+						conversation.current.launchTerminalId,
+					].filter((id): id is string => !!id)
+				: [],
+		),
+	);
+	const shownTerminals = new Set<string>();
+	const shownChatTerminals = new Set<string>();
+	const shownSessions = new Set<string>();
+	const removals: PaneRef[] = [];
+	for (const { area, tab, pane } of panesOldestTabFirst(areas)) {
+		if (!isAgentPane(pane)) continue;
+		const ref = { area, tabId: tab.id, paneId: pane.id };
+		const { terminalId, sessionId } = paneClaimKeys(pane);
+		if (pane.kind === "terminal" && terminalId) {
+			if (shownTerminals.has(terminalId)) removals.push(ref);
+			else shownTerminals.add(terminalId);
+			continue;
+		}
+		if (pane.kind !== "chat-v3" || !sessionId) continue;
+		if (
+			shownSessions.has(sessionId) ||
+			(terminalId && shownChatTerminals.has(terminalId)) ||
+			(input.chats &&
+				!(terminalId && openOnTerminal.has(terminalId)) &&
+				(closedByUserElsewhere(input, chatById, conversationOf, sessionId) ||
+					storedChatTheBoxClosed(input, chatById, sessionId)))
+		) {
+			removals.push(ref);
+			continue;
+		}
+		shownSessions.add(sessionId);
+		if (terminalId) shownChatTerminals.add(terminalId);
+	}
+	return removals;
+}
+
+function panesOldestTabFirst(areas: readonly Layout[]) {
+	return areas
+		.flatMap((layout, area) =>
+			layout.tabs.flatMap((tab) =>
+				Object.values(tab.panes).map((pane) => ({ area, tab, pane })),
+			),
+		)
+		.map((entry, order) => ({ ...entry, order }))
+		.sort(
+			(a, b) =>
+				(a.tab.createdAt ?? 0) - (b.tab.createdAt ?? 0) || a.order - b.order,
+		);
+}
+
+function closedByUserElsewhere(
+	input: ReconcileAgentTabsInput,
+	chatById: ReadonlyMap<string, ListedChatSession>,
+	conversationOf: ReadonlyMap<string, ChatConversation>,
+	sessionId: string,
+): boolean {
+	const chat = chatById.get(sessionId);
+	return (
+		chat?.closedByUser === true &&
+		!chat.live &&
+		!conversationOf.get(sessionId)?.open &&
+		!input.hiding.isChatReopenedHere(sessionId)
+	);
+}
+
+function storedChatTheBoxClosed(
+	input: ReconcileAgentTabsInput,
+	chatById: ReadonlyMap<string, ListedChatSession>,
+	sessionId: string,
+): boolean {
+	const chat = chatById.get(sessionId);
+	return (
+		!!input.shownFromStoredChats?.has(sessionId) && !(chat && !chat.closedAt)
+	);
+}
+
+function tabsToAdd(
+	input: ReconcileAgentTabsInput,
+	areas: readonly Layout[],
+): NewTab[] {
+	const claims = agentPaneClaims(areas);
+	const newTabs: NewTab[] = [];
+	const conversations = chatConversations(input.chats ?? []).sort(
+		(a, b) => a.updatedAt - b.updatedAt,
+	);
+	for (const conversation of conversations) {
+		const { current } = conversation;
+		if (!conversation.open) continue;
+		const presetId = input.presetFor(current.harness);
+		if (!presetId) continue;
+		if (input.hiding.isChatTerminalHidden(conversation.key)) continue;
+		if (conversation.sessionIds.some(input.hiding.isChatClosedHere)) continue;
+		const keys = {
+			terminalIds: [
+				conversation.key,
+				current.terminalId,
+				current.launchTerminalId,
+			],
+			sessionIds: conversation.sessionIds,
+		};
+		const shown = isClaimed(claims, keys);
+		claimKeys(claims, keys);
+		if (shown) continue;
+		newTabs.push({
+			at: conversation.updatedAt,
+			chat: true,
+			pane: {
+				kind: "chat-v3",
+				data: {
+					terminalId: conversation.key,
+					sessionId: current.sessionId,
+					agent: {
+						id: presetId,
+						...(current.harnessSessionId
+							? { sessionId: current.harnessSessionId }
+							: {}),
+					},
+					...(current.title ? { chatTitle: current.title } : {}),
+				} satisfies ChatPaneData,
+			},
+		});
+	}
+	for (const terminal of input.terminals ?? []) {
+		const { terminalId } = terminal;
+		if (claims.terminalIds.has(terminalId)) continue;
+		if (input.hiding.isTerminalHidden(terminalId)) continue;
+		claims.terminalIds.add(terminalId);
+		newTabs.push({
+			at: terminal.createdAt ?? 0,
+			chat: false,
+			pane: {
+				kind: "terminal",
+				data: { terminalId } satisfies TerminalPaneData,
+			},
+		});
+	}
+	return newTabs.sort((a, b) => a.at - b.at);
+}
+
+function withoutPanes(layout: Layout, refs: readonly PaneRef[]): Layout {
+	if (refs.length === 0) return layout;
+	const store = createWorkspaceStore<PaneViewerData>({ initialState: layout });
+	for (const { tabId, paneId } of refs) {
+		store.getState().closePane({ tabId, paneId, intent: "remove" });
+	}
+	return snapshot(store.getState());
+}
+
+function withNewTabs(
+	layout: Layout,
+	newTabs: readonly NewTab[],
+	openedEmpty: boolean,
+): Layout {
+	if (newTabs.length === 0) return layout;
+	const selectChat =
+		openedEmpty &&
+		layout.tabs.every((tab) =>
+			Object.values(tab.panes).every((pane) => pane.kind === "terminal"),
+		);
+	const store = createWorkspaceStore<PaneViewerData>({ initialState: layout });
+	const addedTabIds: string[] = [];
+	let newestChatTabId: string | null = null;
+	for (const newTab of newTabs) {
+		store.getState().addTab({ panes: [newTab.pane], focus: false });
+		const tabId = store.getState().activeTabId;
+		if (!tabId) continue;
+		addedTabIds.push(tabId);
+		if (newTab.chat) newestChatTabId = tabId;
+	}
+	const selected = tabToSelect({
+		layout,
+		newestChatTabId: selectChat ? newestChatTabId : null,
+		oldestAddedTabId: addedTabIds[0] ?? null,
+	});
+	if (selected) store.getState().setActiveTab(selected);
+	return snapshot(store.getState());
+}
+
+function tabToSelect({
+	layout,
+	newestChatTabId,
+	oldestAddedTabId,
+}: {
+	layout: Layout;
+	newestChatTabId: string | null;
+	oldestAddedTabId: string | null;
+}): string | null {
+	const usersTab = layout.tabs.some((tab) => tab.id === layout.activeTabId)
+		? layout.activeTabId
+		: null;
+	return newestChatTabId ?? usersTab ?? oldestAddedTabId;
+}
+
+function snapshot(state: Layout): Layout {
+	return {
+		version: state.version,
+		tabs: state.tabs,
+		activeTabId: state.activeTabId,
+	};
+}

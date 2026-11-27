@@ -19,7 +19,10 @@ import type {
 	PaneViewerData,
 	TerminalPaneData,
 } from "../../types";
-import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
+import {
+	focusOrAddTerminalPane,
+	focusTerminalPane,
+} from "../../utils/focusTerminalPane";
 import { readLastChatAgent } from "../../utils/lastChatAgent";
 
 export interface CreateNewAgentSessionInput {
@@ -166,6 +169,7 @@ export function useAgentSessionLauncher({
 					return null;
 				}
 				const terminalId = result.sessionId;
+				if (focusTerminalPane(store, terminalId)) return { terminalId };
 				const state = store.getState();
 				const pane = {
 					kind: "terminal" as const,

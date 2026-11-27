@@ -101,4 +101,38 @@ describe("appendLaunchesToPaneLayout", () => {
 
 		expect(again.tabs).toHaveLength(1);
 	});
+
+	it("does not add a tab for a chat another pane area already shows", () => {
+		const right = appendLaunchesToPaneLayout({
+			existing: undefined,
+			terminals: [],
+			agents: [
+				{
+					ok: true,
+					kind: "terminal",
+					sessionId: "terminal-1",
+					label: "Claude",
+					chatSessionId: "chat-1",
+					chatAgentId: "claude",
+				},
+			],
+		});
+		const state = appendLaunchesToPaneLayout({
+			existing: undefined,
+			linked: [right],
+			terminals: [],
+			agents: [
+				{
+					ok: true,
+					kind: "terminal",
+					sessionId: "terminal-2",
+					label: "Claude",
+					chatSessionId: "chat-1",
+					chatAgentId: "claude",
+				},
+			],
+		});
+
+		expect(state.tabs).toHaveLength(0);
+	});
 });

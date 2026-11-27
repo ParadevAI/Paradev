@@ -671,6 +671,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
 					agentConfigId,
+					launchTerminalId: parsed.terminalId,
 				});
 				try {
 					options.live.create({
@@ -955,7 +956,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					? { agentConfigId: source.agentConfigId }
 					: {}),
 				resume: { harnessSessionId: forked },
-				terminalId: parsed.terminalId ?? live.terminalId,
+				...(parsed.terminalId ? { terminalId: parsed.terminalId } : {}),
 			});
 		},
 

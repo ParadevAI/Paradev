@@ -234,8 +234,7 @@ export const workspaceLocalStateSchema = z.object({
 		.record(z.string(), workspaceRunTerminalStateSchema)
 		.default({}),
 	// v1->v2 migration: terminals to recreate lazily on first workspace open.
-	// Cleared after the
-	// sessions are created; panes come from useAutoAdoptBackgroundSessions.
+	// Cleared after the sessions are created.
 	pendingMigratedTerminals: z
 		.array(
 			z.object({

@@ -3,9 +3,11 @@ import type { CloudAgentLaunchSurface } from "@superset/shared/cloud-agent-launc
 export interface LaunchedChatSession {
 	sessionId: string;
 	terminalId: string | null;
+	launchTerminalId?: string | null;
 	harnessSessionId: string | null;
 	title: string | null;
 	live: boolean;
+	closedAt?: number | null;
 }
 
 export type PendingLaunchOutcome =
@@ -28,8 +30,10 @@ export function pendingLaunchOutcome({
 	terminalBinding,
 	typed,
 	sinceMs,
+	answeredAtMs,
 	nowMs,
 	timeoutMs,
+	noAnswerTimeoutMs,
 }: {
 	surface: CloudAgentLaunchSurface;
 	terminalId: string | undefined;
@@ -40,19 +44,40 @@ export function pendingLaunchOutcome({
 	terminalBinding: { chatSessionId?: string | null } | undefined;
 	typed: boolean;
 	sinceMs: number;
+	answeredAtMs: number | null;
 	nowMs: number;
 	timeoutMs: number;
+	noAnswerTimeoutMs: number;
 }): PendingLaunchOutcome {
 	const giveUp = givingUpOutcome(surface);
 	if (!terminalId) return giveUp;
-	const session = sessions.find(
-		(candidate) => candidate.live && candidate.terminalId === terminalId,
-	);
+	const session = launchedChat(sessions, terminalId, terminalBinding);
 	if (session) return { kind: "chat", session };
 	if (launchedInTerminal(surface, terminalListed, terminalBinding))
 		return typed ? { kind: "release" } : { kind: "terminal" };
-	const untilMs = sinceMs + timeoutMs;
+	const untilMs =
+		answeredAtMs === null
+			? sinceMs + noAnswerTimeoutMs
+			: Math.max(sinceMs, answeredAtMs) + timeoutMs;
 	return nowMs >= untilMs ? giveUp : { kind: "wait", untilMs };
+}
+
+function launchedChat(
+	sessions: readonly LaunchedChatSession[],
+	terminalId: string,
+	terminalBinding: { chatSessionId?: string | null } | undefined,
+): LaunchedChatSession | undefined {
+	const bound = terminalBinding?.chatSessionId;
+	const launched = sessions.filter(
+		(candidate) =>
+			(candidate.terminalId ?? candidate.launchTerminalId) === terminalId ||
+			candidate.sessionId === bound,
+	);
+	return (
+		launched.find((candidate) => candidate.live) ??
+		launched.find((candidate) => !candidate.closedAt) ??
+		launched[0]
+	);
 }
 
 function launchedInTerminal(

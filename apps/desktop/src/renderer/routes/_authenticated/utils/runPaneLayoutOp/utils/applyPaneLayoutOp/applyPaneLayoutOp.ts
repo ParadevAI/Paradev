@@ -25,6 +25,11 @@ import type {
 	PagesListPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
+import {
+	claimAgentPane,
+	emptyAgentPaneClaims,
+	isClaimed,
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/agentPaneClaims";
 import { NEW_DIFF_PANE } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openChangesPaneInStore";
 
 type LayoutState = WorkspaceState<PaneViewerData>;
@@ -199,14 +204,17 @@ function newTabPane(op: NewTabOp): Omit<CreatePaneInput<PaneViewerData>, "id"> {
 	);
 }
 
-function findChatPane(areas: PaneAreas, sessionId: string): Located | null {
+function findShownPane(areas: PaneAreas, op: NewTabOp): Located | null {
+	const keys = op.chat
+		? { sessionIds: [op.chat.sessionId], terminalIds: [op.chat.terminalId] }
+		: { terminalIds: [op.terminalId] };
 	for (const area of ["main", "sidebar"] as const) {
 		for (const tab of areas[area].tabs) {
-			const pane = Object.values(tab.panes).find(
-				(candidate) =>
-					candidate.kind === "chat-v3" &&
-					(candidate.data as ChatPaneData).sessionId === sessionId,
-			);
+			const pane = Object.values(tab.panes).find((candidate) => {
+				const claims = emptyAgentPaneClaims();
+				claimAgentPane(claims, candidate);
+				return isClaimed(claims, keys);
+			});
 			if (pane) return { area, tab, pane };
 		}
 	}
@@ -486,7 +494,7 @@ export function applyPaneLayoutOp(
 
 		case "newTab": {
 			const pane = newTabPane(op);
-			const open = op.chat ? findChatPane(areas, op.chat.sessionId) : null;
+			const open = findShownPane(areas, op);
 			if (open) {
 				const next = op.focus
 					? inArea(open.area, (store) =>

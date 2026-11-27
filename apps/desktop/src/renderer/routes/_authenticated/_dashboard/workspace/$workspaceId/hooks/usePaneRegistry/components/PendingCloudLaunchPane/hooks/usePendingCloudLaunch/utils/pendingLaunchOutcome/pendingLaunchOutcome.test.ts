@@ -17,12 +17,14 @@ const base = {
 	terminalBinding: undefined,
 	typed: false,
 	sinceMs: 0,
+	answeredAtMs: 0,
 	nowMs: 10,
 	timeoutMs: 100,
+	noAnswerTimeoutMs: 1000,
 };
 
 describe("pendingLaunchOutcome", () => {
-	it("binds only to the live chat under the promised terminal id", () => {
+	it("binds to the chat under the promised terminal id, the live one first", () => {
 		const own = chat(T);
 		expect(
 			pendingLaunchOutcome({
@@ -30,6 +32,27 @@ describe("pendingLaunchOutcome", () => {
 				sessions: [chat("someone-else"), chat(T, false), own],
 			}),
 		).toEqual({ kind: "chat", session: own });
+	});
+
+	it("binds to the launch's chat after its harness stopped", () => {
+		const finished = { ...chat(null, false), launchTerminalId: T };
+		expect(
+			pendingLaunchOutcome({
+				...base,
+				sessions: [chat("someone-else"), finished],
+			}),
+		).toEqual({ kind: "chat", session: finished });
+	});
+
+	it("binds through the agent binding when the host lists no terminal", () => {
+		const finished = { ...chat(null, false), sessionId: "launched" };
+		expect(
+			pendingLaunchOutcome({
+				...base,
+				sessions: [chat(null, false), finished],
+				terminalBinding: { chatSessionId: "launched" },
+			}),
+		).toEqual({ kind: "chat", session: finished });
 	});
 
 	it("becomes the terminal the launch fell back to, unless the user typed", () => {
@@ -46,6 +69,31 @@ describe("pendingLaunchOutcome", () => {
 		expect(pendingLaunchOutcome({ ...base, nowMs: 100 })).toEqual({
 			kind: "release",
 		});
+	});
+
+	it("prefers an open chat to a closed one when none is live", () => {
+		const open = { ...chat(T, false), sessionId: "open" };
+		expect(
+			pendingLaunchOutcome({
+				...base,
+				sessions: [{ ...chat(T, false), closedAt: 5 }, open],
+			}),
+		).toEqual({ kind: "chat", session: open });
+	});
+
+	it("waits for the host's first answer, up to a longer limit", () => {
+		expect(
+			pendingLaunchOutcome({ ...base, answeredAtMs: null, nowMs: 500 }),
+		).toEqual({ kind: "wait", untilMs: 1000 });
+		expect(
+			pendingLaunchOutcome({ ...base, answeredAtMs: null, nowMs: 1000 }),
+		).toEqual({ kind: "release" });
+	});
+
+	it("times the wait from the host's first answer when that comes after provisioning", () => {
+		expect(
+			pendingLaunchOutcome({ ...base, answeredAtMs: 500, nowMs: 550 }),
+		).toEqual({ kind: "wait", untilMs: 600 });
 	});
 
 	it("releases a pane with no promised terminal id, which nothing can match", () => {

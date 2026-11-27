@@ -3,6 +3,10 @@ import type {
 	ChatPaneData,
 	PaneViewerData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
+import {
+	agentPaneClaims,
+	isClaimed,
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/agentPaneClaims";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
@@ -37,15 +41,20 @@ export function seedMovedChat({
 			[],
 		);
 	}
-	const existing = collections.workspaceLocalState.get(workspaceId)
-		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
-	const alreadyOpen = existing?.tabs.some((tab) =>
-		Object.values(tab.panes).some(
-			(pane) =>
-				(pane.data as Partial<ChatPaneData>).sessionId === chatSessionId,
-		),
-	);
-	if (alreadyOpen) return;
+	const row = collections.workspaceLocalState.get(workspaceId);
+	const existing = row?.paneLayout as
+		| WorkspaceState<PaneViewerData>
+		| undefined;
+	const right = row?.rightPaneLayout as
+		| WorkspaceState<PaneViewerData>
+		| undefined;
+	if (
+		isClaimed(agentPaneClaims([existing, right]), {
+			sessionIds: [chatSessionId],
+		})
+	) {
+		return;
+	}
 	const store = createWorkspaceStore<PaneViewerData>({
 		initialState: existing,
 	});

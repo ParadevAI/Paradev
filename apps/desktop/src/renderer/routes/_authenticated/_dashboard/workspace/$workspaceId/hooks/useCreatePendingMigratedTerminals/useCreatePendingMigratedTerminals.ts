@@ -14,8 +14,7 @@ import { useTerminalLauncher } from "../useTerminalLauncher";
  * lazy recreation — fresh shell at the v1 cwd, spawned on first workspace
  * open instead of during migration, so a big v1 install can't PTY-storm the
  * boot). Created entries are removed from the queue; failures stay queued
- * for the next open. Panes come from useAutoAdoptBackgroundSessions once
- * the sessions are running.
+ * for the next open.
  *
  * When the source v1 pane had a resumable agent session (captured by the
  * electron hook server), the fresh terminal is seeded with an ended binding
