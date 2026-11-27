@@ -76,11 +76,11 @@ paradev browser console --workspace <id> --pane <paneId>
 
 For clicking, typing, scrolling, and form flows, `paradev browser cdp` prints a raw [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) WebSocket endpoint for a browser-use or Playwright-class client. The endpoint drives only that pane's page (never the Paradev app itself), and pane operations are scoped to their workspace.
 
-Agents use this through the [`superset:browser` skill](/skills). A pane you open runs in your logged-in browser session. Panes that agents open use a separate session with none of your logins unless you import them. Agents are instructed to confirm before consequential actions.
+Agents use this through the [`paradev:browser` skill](/skills). A pane you open runs in your logged-in browser session. Panes that agents open use a separate session with none of your logins unless you import them. Agents are instructed to confirm before consequential actions.
 
 ## Pane or standalone browser?
 
-The `superset:browser` skill defaults to the in-app pane. When a page is or can be open in a workspace pane (previewing a dev server, verifying UI, clicking through a flow), agents use the `paradev browser` commands above.
+The `paradev:browser` skill defaults to the in-app pane. When a page is or can be open in a workspace pane (previewing a dev server, verifying UI, clicking through a flow), agents use the `paradev browser` commands above.
 
 For targets a pane cannot reach (a real Chrome window outside Paradev, a host without the desktop app attached, or an isolated or cloud browser), the skill uses [Browser Use 3.0](https://docs.browser-use.com/open-source/browser-use-cli) as a second engine.
 
