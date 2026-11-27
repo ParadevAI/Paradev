@@ -9,13 +9,23 @@ import { readInstalledPluginSources } from "./installed-plugins";
 export const MANAGED_SKILL_MARKER = "<!-- superset-managed-skill v1 -->";
 
 /**
+ * Marks the `paradev-<skill>` dirs under ~/.agents/skills. Builds from before
+ * that name know only MANAGED_SKILL_MARKER, so they leave these dirs alone
+ * instead of reaping them as stale.
+ */
+export const PARADEV_MANAGED_SKILL_MARKER = "<!-- paradev-managed-skill v1 -->";
+
+/**
  * Sentinel file marking a directory as Superset-managed (used for the Claude
  * plugin dir, whose manifest is JSON and can't carry the markdown marker).
  */
 export const MANAGED_SENTINEL_NAME = ".superset-managed";
 
-/** Namespace subdirectory for managed commands under ~/.agents/commands. */
-export const MANAGED_COMMAND_NAMESPACE = "superset";
+/** Namespace subdirectories for managed commands under ~/.agents/commands. */
+export const MANAGED_COMMAND_NAMESPACE = "paradev";
+
+/** Older builds write and reap only this namespace. */
+export const LEGACY_MANAGED_COMMAND_NAMESPACE = "superset";
 
 /**
  * Claude Code loads any ~/.claude/skills/<name> directory containing a
@@ -24,7 +34,14 @@ export const MANAGED_COMMAND_NAMESPACE = "superset";
  * plugin skills are grafted into it rather than each claiming a directory of
  * their own, so Claude sees one Paradev plugin however many are installed.
  */
-const BUNDLED_SOURCE_NAME = "superset";
+const BUNDLED_SOURCE_NAME = "paradev";
+
+/**
+ * ~/.agents/skills keeps every bundled skill as `superset-<skill>` too:
+ * prompts, automations and older builds use that name. Older builds write it
+ * in full and reap the rest, so it must always hold the full skill.
+ */
+const LEGACY_BUNDLED_SOURCE_NAME = "superset";
 
 export const CLAUDE_PLUGIN_NAME = "paradev";
 
@@ -72,14 +89,17 @@ export interface ManagedSkillsOptions {
  * Inserts the managed marker right after the frontmatter block so both the
  * writer and the reaper can tell managed files apart from user-authored ones.
  */
-export function withManagedMarker(content: string): string {
-	if (content.includes(MANAGED_SKILL_MARKER)) return content;
+export function withManagedMarker(
+	content: string,
+	marker: string = MANAGED_SKILL_MARKER,
+): string {
+	if (content.includes(marker)) return content;
 	const frontmatterEnd = content.startsWith("---\n")
 		? content.indexOf("\n---\n", 4)
 		: -1;
-	if (frontmatterEnd === -1) return `${MANAGED_SKILL_MARKER}\n${content}`;
+	if (frontmatterEnd === -1) return `${marker}\n${content}`;
 	const insertAt = frontmatterEnd + "\n---\n".length;
-	return `${content.slice(0, insertAt)}${MANAGED_SKILL_MARKER}\n${content.slice(insertAt)}`;
+	return `${content.slice(0, insertAt)}${marker}\n${content.slice(insertAt)}`;
 }
 
 /** Rewrites the frontmatter `name:` so it matches the destination directory. */
@@ -98,13 +118,17 @@ function isSkillDisabled(
 	skillName: string,
 ): boolean {
 	if (disabled.has(`${sourceName}/${skillName}`)) return true;
-	return sourceName === BUNDLED_SOURCE_NAME && disabled.has(skillName);
+	if (sourceName !== BUNDLED_SOURCE_NAME) return false;
+	return (
+		disabled.has(skillName) ||
+		disabled.has(`${LEGACY_BUNDLED_SOURCE_NAME}/${skillName}`)
+	);
 }
 
 function resolvePluginSources(
 	pluginSources: readonly PluginSkillSource[] = [],
 ): ResolvedSource[] {
-	const seen = new Set([BUNDLED_SOURCE_NAME]);
+	const seen = new Set([BUNDLED_SOURCE_NAME, LEGACY_BUNDLED_SOURCE_NAME]);
 	const resolved: ResolvedSource[] = [];
 	for (const source of pluginSources) {
 		if (seen.has(source.name)) {
@@ -127,7 +151,11 @@ function resolvePluginSources(
 
 function isUserOwnedFile(filePath: string): boolean {
 	if (!fs.existsSync(filePath)) return false;
-	return !fs.readFileSync(filePath, "utf-8").includes(MANAGED_SKILL_MARKER);
+	const contents = fs.readFileSync(filePath, "utf-8");
+	return (
+		!contents.includes(MANAGED_SKILL_MARKER) &&
+		!contents.includes(PARADEV_MANAGED_SKILL_MARKER)
+	);
 }
 
 function isManagedDir(dirPath: string): boolean {
@@ -406,6 +434,39 @@ async function provisionClaudePlugin(
 	);
 }
 
+const COMMAND_NAMESPACES = [
+	MANAGED_COMMAND_NAMESPACE,
+	LEGACY_MANAGED_COMMAND_NAMESPACE,
+];
+
+interface AgentsSkillCopy {
+	dirName: string;
+	marker: string;
+	transform: (contents: string) => string;
+}
+
+function agentsSkillCopies(
+	sourceName: string,
+	skillName: string,
+): AgentsSkillCopy[] {
+	const dirName = `${sourceName}-${skillName}`;
+	if (sourceName !== BUNDLED_SOURCE_NAME) {
+		return [{ dirName, marker: MANAGED_SKILL_MARKER, transform: (c) => c }];
+	}
+	return [
+		{ dirName, marker: PARADEV_MANAGED_SKILL_MARKER, transform: (c) => c },
+		{
+			dirName: `${LEGACY_BUNDLED_SOURCE_NAME}-${skillName}`,
+			marker: MANAGED_SKILL_MARKER,
+			transform: (contents) =>
+				setFrontmatterDescription(
+					contents,
+					`Old name of ${dirName}. Use ${dirName}.`,
+				),
+		},
+	];
+}
+
 function readPluginSkill(
 	sourceDir: string,
 	pluginSkill: string,
@@ -534,12 +595,7 @@ async function provisionManagedSkills(
 	}
 
 	const agentsSkillsRoot = path.join(homeDir, ".agents", "skills");
-	const commandNamespaceDir = path.join(
-		homeDir,
-		".agents",
-		"commands",
-		MANAGED_COMMAND_NAMESPACE,
-	);
+	const commandsRoot = path.join(homeDir, ".agents", "commands");
 
 	const installed =
 		options.pluginSources ??
@@ -595,35 +651,39 @@ async function provisionManagedSkills(
 
 		for (const pluginSkill of skills) {
 			if (isSkillDisabled(disabledSkills, source.name, pluginSkill)) continue;
-			const dirName = `${source.name}-${pluginSkill}`;
-			try {
-				const raw = readPluginSkill(source.dir, pluginSkill);
-				if (raw === null) continue;
-				desiredAgentsDirs.add(dirName);
-				const targetDir = path.join(agentsSkillsRoot, dirName);
-				const skillMdPath = path.join(targetDir, "SKILL.md");
-				if (isUserOwnedFile(skillMdPath)) {
-					console.log(
-						`[agent-setup] Skipping user-owned skill at ${skillMdPath}`,
+			for (const copy of agentsSkillCopies(source.name, pluginSkill)) {
+				try {
+					const raw = readPluginSkill(source.dir, pluginSkill);
+					if (raw === null) continue;
+					desiredAgentsDirs.add(copy.dirName);
+					const targetDir = path.join(agentsSkillsRoot, copy.dirName);
+					const skillMdPath = path.join(targetDir, "SKILL.md");
+					if (isUserOwnedFile(skillMdPath)) {
+						console.log(
+							`[agent-setup] Skipping user-owned skill at ${skillMdPath}`,
+						);
+						continue;
+					}
+					fs.mkdirSync(targetDir, { recursive: true });
+					writeFileIfChanged(
+						skillMdPath,
+						withManagedMarker(
+							copy.transform(setFrontmatterName(raw, copy.dirName)),
+							copy.marker,
+						),
+						0o644,
 					);
-					continue;
+					await copyBundledExtras(
+						path.join(source.dir, "skills", pluginSkill),
+						targetDir,
+					);
+				} catch (error) {
+					desiredAgentsDirs.add(copy.dirName);
+					console.warn(
+						`[agent-setup] Failed to provision skill ${copy.dirName}:`,
+						error,
+					);
 				}
-				fs.mkdirSync(targetDir, { recursive: true });
-				writeFileIfChanged(
-					skillMdPath,
-					withManagedMarker(setFrontmatterName(raw, dirName)),
-					0o644,
-				);
-				await copyBundledExtras(
-					path.join(source.dir, "skills", pluginSkill),
-					targetDir,
-				);
-			} catch (error) {
-				desiredAgentsDirs.add(dirName);
-				console.warn(
-					`[agent-setup] Failed to provision skill ${dirName}:`,
-					error,
-				);
 			}
 		}
 	}
@@ -634,23 +694,28 @@ async function provisionManagedSkills(
 			continue;
 		}
 		const fileName = `${pluginSkill}.md`;
-		try {
-			const raw = readPluginSkill(bundledPluginDir, pluginSkill);
-			if (raw === null) continue;
-			desiredCommandFiles.add(fileName);
-			const filePath = path.join(commandNamespaceDir, fileName);
-			if (isUserOwnedFile(filePath)) {
-				console.log(`[agent-setup] Skipping user-owned command at ${filePath}`);
-				continue;
+		for (const namespace of COMMAND_NAMESPACES) {
+			const namespaceDir = path.join(commandsRoot, namespace);
+			try {
+				const raw = readPluginSkill(bundledPluginDir, pluginSkill);
+				if (raw === null) continue;
+				desiredCommandFiles.add(fileName);
+				const filePath = path.join(namespaceDir, fileName);
+				if (isUserOwnedFile(filePath)) {
+					console.log(
+						`[agent-setup] Skipping user-owned command at ${filePath}`,
+					);
+					continue;
+				}
+				fs.mkdirSync(namespaceDir, { recursive: true });
+				writeFileIfChanged(filePath, withManagedMarker(raw), 0o644);
+			} catch (error) {
+				desiredCommandFiles.add(fileName);
+				console.warn(
+					`[agent-setup] Failed to provision command ${namespace}/${fileName}:`,
+					error,
+				);
 			}
-			fs.mkdirSync(commandNamespaceDir, { recursive: true });
-			writeFileIfChanged(filePath, withManagedMarker(raw), 0o644);
-		} catch (error) {
-			desiredCommandFiles.add(fileName);
-			console.warn(
-				`[agent-setup] Failed to provision command ${fileName}:`,
-				error,
-			);
 		}
 	}
 
@@ -662,7 +727,12 @@ async function provisionManagedSkills(
 			new Set([CLAUDE_PLUGIN_NAME, LEGACY_CLAUDE_PLUGIN_NAME]),
 		);
 		await reapStaleSkillDirs(agentsSkillsRoot, desiredAgentsDirs);
-		await reapStaleCommands(commandNamespaceDir, desiredCommandFiles);
+		for (const namespace of COMMAND_NAMESPACES) {
+			await reapStaleCommands(
+				path.join(commandsRoot, namespace),
+				desiredCommandFiles,
+			);
+		}
 	} catch (error) {
 		console.warn("[agent-setup] Failed to reap stale managed skills:", error);
 	}

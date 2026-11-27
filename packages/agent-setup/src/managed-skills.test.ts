@@ -12,6 +12,7 @@ import {
 	createManagedSkills,
 	MANAGED_SENTINEL_NAME,
 	MANAGED_SKILL_MARKER,
+	PARADEV_MANAGED_SKILL_MARKER,
 	type PluginSkillSource,
 	setFrontmatterDescription,
 	setFrontmatterName,
@@ -33,6 +34,12 @@ const claudePlugin = path.join(claudeSkills, "superset");
 const paradevPlugin = path.join(claudeSkills, "paradev");
 const agentsSkills = path.join(HOME_DIR, ".agents", "skills");
 const commandsDir = path.join(HOME_DIR, ".agents", "commands", "superset");
+const paradevCommandsDir = path.join(
+	HOME_DIR,
+	".agents",
+	"commands",
+	"paradev",
+);
 
 function skillMd(name: string): string {
 	return `---\nname: ${name}\ndescription: test ${name} skill\n---\n\n# ${name} body\n`;
@@ -592,5 +599,85 @@ describe("createManagedSkills paradev rename", () => {
 				"utf-8",
 			),
 		).toContain("description: test orchestrate skill");
+	});
+});
+
+describe("createManagedSkills paradev names for other agents", () => {
+	it("provisions paradev-<skill> and keeps superset-<skill> as its old name", async () => {
+		await run();
+
+		const primary = readFileSync(
+			path.join(agentsSkills, "paradev-feedback", "SKILL.md"),
+			"utf-8",
+		);
+		expect(primary).toContain("name: paradev-feedback");
+		expect(primary).toContain("description: test feedback skill");
+		const legacy = readFileSync(
+			path.join(agentsSkills, "superset-feedback", "SKILL.md"),
+			"utf-8",
+		);
+		expect(legacy).toContain("name: superset-feedback");
+		expect(legacy).toContain(
+			'description: "Old name of paradev-feedback. Use paradev-feedback."',
+		);
+		expect(legacy).toContain("# feedback body");
+		expect(
+			existsSync(
+				path.join(agentsSkills, "paradev-orchestrate", "agents", "openai.yaml"),
+			),
+		).toBe(true);
+	});
+
+	it("marks paradev-<skill> so a build that knows only the old marker leaves it alone", async () => {
+		await run();
+
+		const primaryDir = path.join(agentsSkills, "paradev-feedback");
+		const primary = readFileSync(path.join(primaryDir, "SKILL.md"), "utf-8");
+		expect(primary).toContain(PARADEV_MANAGED_SKILL_MARKER);
+		expect(primary).not.toContain(MANAGED_SKILL_MARKER);
+		expect(existsSync(path.join(primaryDir, MANAGED_SENTINEL_NAME))).toBe(
+			false,
+		);
+		expect(
+			readFileSync(
+				path.join(agentsSkills, "superset-feedback", "SKILL.md"),
+				"utf-8",
+			),
+		).toContain(MANAGED_SKILL_MARKER);
+	});
+
+	it("honours a disable under either name for both copies", async () => {
+		for (const key of ["superset/feedback", "paradev/feedback"]) {
+			await run();
+			await run([key]);
+
+			expect(existsSync(path.join(agentsSkills, "paradev-feedback"))).toBe(
+				false,
+			);
+			expect(existsSync(path.join(agentsSkills, "superset-feedback"))).toBe(
+				false,
+			);
+			expect(existsSync(path.join(paradevCommandsDir, "feedback.md"))).toBe(
+				false,
+			);
+			expect(existsSync(path.join(agentsSkills, "paradev-10x"))).toBe(true);
+		}
+	});
+
+	it("refuses a plugin named paradev", async () => {
+		const impostor = seedMarketplacePlugin("paradev", ["evil"]);
+		await run(undefined, [impostor]);
+
+		expect(existsSync(path.join(agentsSkills, "paradev-evil"))).toBe(false);
+	});
+
+	it("writes in-app commands under both namespaces", async () => {
+		await run();
+
+		for (const dir of [paradevCommandsDir, commandsDir]) {
+			expect(readFileSync(path.join(dir, "feedback.md"), "utf-8")).toContain(
+				MANAGED_SKILL_MARKER,
+			);
+		}
 	});
 });

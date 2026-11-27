@@ -1,4 +1,4 @@
 interface:
   display_name: "Paradev Doctor"
   short_description: "Diagnose and fix Paradev connection, host, terminal, auth, or update problems"
-  default_prompt: "Use $superset-doctor to diagnose and fix this Paradev problem."
+  default_prompt: "Use $paradev-doctor to diagnose and fix this Paradev problem."
