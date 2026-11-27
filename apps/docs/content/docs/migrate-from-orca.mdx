@@ -1,0 +1,175 @@
+---
+title: Migrate from Orca
+description: Move your Orca worktrees, scripts, and agents to Paradev
+---
+
+If you choose to switch from Orca, this guide moves your worktrees to Paradev. Your branches, uncommitted changes, and agent subscriptions all come with you.
+
+<Callout type="info" title="Platforms">
+Paradev runs on macOS, with an experimental Linux build. It does not run on Windows yet.
+</Callout>
+
+Both apps use the same model: one Git worktree and one branch per task, with an agent working inside it. Both call the task a workspace, and both run the agent as a chat or as its CLI in a terminal. Most of the move is pointing Paradev at the same repositories and translating one config file.
+
+## What Maps to What
+
+| Orca | Paradev |
+|---|---|
+| Workspace (a Git worktree) | [Workspace](/workspaces) (a Git worktree on its own branch) |
+| `~/orca/workspaces/<repo>/<workspace>` | Imported workspaces keep their path. New ones go in `~/.paradev/worktrees/<project>/<branch>` |
+| `orca.yaml`, or local scripts in Settings | `.paradev/config.json` ([lifecycle scripts](/setup-teardown-scripts)) |
+| `scripts.setup` | `setup` |
+| `scripts.archive` | `teardown`, which runs when you delete the workspace |
+| `defaultTabs` commands | `run` (Run button), plus [terminal scripts](/terminal-scripts) for other commands |
+| `worktree.sharedDirectories` and `.worktreeinclude` | A link or copy command in `setup` |
+| `ORCA_ROOT_PATH` | `SUPERSET_ROOT_PATH` |
+| `ORCA_WORKTREE_PATH` | `SUPERSET_WORKSPACE_PATH` |
+| `ORCA_WORKSPACE_NAME` | No equivalent. Use the folder name: `$(basename "$SUPERSET_WORKSPACE_PATH")` |
+| Chat UI and terminal agents | [Chat](/chat). The same session can switch to the agent's CLI in a terminal |
+| Agent Session History | [Agent sessions](/agent-sessions) |
+| Diff review, commit, push, and PR | [Changes pane](/diff-viewer) and [pull requests](/pull-requests) |
+| Per-worktree browser | [In-app browser](/browser), with [detected ports](/ports) |
+| Linked Linear and GitHub issues | [Tasks](/tasks) |
+| Automations | [Automations](/automations) |
+| SSH hosts and Remote Orca Server | [Remote Access](/remote-access) and [Bring Your Own Cloud](/bring-your-own-cloud) |
+| Cloud VMs from `environmentRecipes` | [Cloud workspaces](/cloud-workspaces) |
+| Mobile app | [iPhone, iPad, and Android apps](/mobile) |
+| `orca` CLI | [CLI](/cli/getting-started), [TypeScript SDK](/sdk/getting-started), and [MCP server](/mcp-server) |
+
+## 1. Install Paradev and Add Your Repositories
+
+[Install Paradev](/install), then add each repository you used in Orca from its local folder. Add the same folder that the Orca project points to, not a new clone: Orca's worktrees are attached to that checkout, and Paradev finds them through it.
+
+## 2. Import Your Orca Worktrees
+
+Each Orca workspace is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
+
+1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --project <projectId> --all`](/cli/cli-reference#worktrees) does the same. Get the ID from `paradev projects list`.
+2. Check the list of branches and paths. Orca's worktrees are under `~/orca/workspaces/`, unless you changed the workspace directory in Orca's **Settings → General**.
+3. Leave **Run setup script** off. These worktrees are already set up.
+
+Imported workspaces keep their paths, branches, and uncommitted changes. Files that Orca copied or linked into the worktree, such as `.env` or `node_modules`, stay as they are. New workspaces you create in Paradev go under `~/.paradev/worktrees/`.
+
+A folder workspace is not a Git worktree, so there is nothing to import. Add each Git repository inside the folder as its own project.
+
+If a worktree is missing from the list, run `git worktree list` in the repository. Paradev only imports worktrees that have a branch checked out. A worktree on a detached HEAD needs a branch first (`git switch -c <name>` inside it).
+
+<Callout type="warn">
+Orca can still remove a worktree after you import it. **Delete** on a workspace in Orca deletes the directory and can delete its branch. Do not delete an imported workspace in Orca, and do not select it in **Clean up workspaces**. The directory is now your Paradev workspace too. To take a repository out of Orca, use **Remove Project**: it only removes the project from Orca, and the worktrees stay on disk.
+</Callout>
+
+## 3. Convert Your Scripts
+
+Orca keeps shared scripts in `orca.yaml` at the repository root, and local scripts in **Settings → Repository**. Move them into `.paradev/config.json` at the repository root.
+
+An `orca.yaml` like this:
+
+```yaml
+scripts:
+  setup: |
+    bun install
+  archive: |
+    rm -rf dist
+defaultTabs:
+  - title: Agent
+  - title: Dev
+    command: bun dev
+worktree:
+  sharedDirectories:
+    - .cache
+```
+
+with a `.worktreeinclude` that lists `.env`, becomes:
+
+```json
+{
+  "setup": [
+    "bun install",
+    "cp \"$SUPERSET_ROOT_PATH/.env\" .env",
+    "ln -s \"$SUPERSET_ROOT_PATH/.cache\" .cache"
+  ],
+  "run": ["bun dev"],
+  "teardown": ["rm -rf dist"]
+}
+```
+
+Differences to know:
+
+- **Commands are arrays.** The entries run in order in the workspace directory, joined with `&&`. Put each simple command in its own entry. Keep a multi-line block, such as an `if` statement, in one entry, or move it to a script file.
+- **`archive` becomes `teardown`.** It runs before Paradev removes the worktree. If it fails, you can still **Delete anyway**.
+- **`run` is one command set.** It starts from the Run button in its own restartable pane. Save other `defaultTabs` commands as [terminal scripts](/terminal-scripts) and launch them from the Scripts bar.
+- **Ignored files are not copied for you.** Paradev does not read `.worktreeinclude` or `worktree.sharedDirectories`. A new worktree has only tracked files, so copy or link what you need in `setup`, from `$SUPERSET_ROOT_PATH`.
+- **Local scripts** from Orca's Settings go in `.paradev/config.local.json`, not in the committed file. Add it to `.gitignore` before you commit `.paradev/`. See [Local Config](/setup-teardown-scripts#local-config).
+
+Other `orca.yaml` keys, such as `issueCommand`, `setupAgentStartupPolicy`, and `environmentRecipes`, have no key in `.paradev/config.json`. To start an agent from an issue, see [Tasks](/tasks). To run a workspace on a machine that is not yours, see [Cloud workspaces](/cloud-workspaces).
+
+You can keep `orca.yaml` and `.worktreeinclude` in the repository. Paradev ignores them, so teammates who stay on Orca are not affected.
+
+### Keep Scripts That Read `ORCA_*`
+
+If your setup is a shell script that reads `ORCA_*` variables, you can keep it unchanged at first. Pass the Paradev values under the old names:
+
+```json
+{
+  "setup": [
+    "ORCA_ROOT_PATH=\"$SUPERSET_ROOT_PATH\" ORCA_WORKTREE_PATH=\"$SUPERSET_WORKSPACE_PATH\" ORCA_WORKSPACE_NAME=\"$(basename \"$SUPERSET_WORKSPACE_PATH\")\" ./scripts/setup-worktree.sh"
+  ]
+}
+```
+
+### Let an Agent Do It
+
+Create a workspace with this prompt:
+
+```text
+Convert this repo's Orca config (orca.yaml and .worktreeinclude) into
+.paradev/config.json. Read docs.paradev.com/setup-teardown-scripts and
+docs.paradev.com/migrate-from-orca first. Map ORCA_* variables to
+SUPERSET_* variables, and list any tab command that needs a terminal script.
+```
+
+Commit `.paradev/` so your team gets the same scripts.
+
+## 4. Pick Up Your Agents
+
+Claude Code, Codex, Cursor Agent, OpenCode, Grok, Antigravity, Pi, and Muse Code all run in Paradev on your existing subscriptions and keys. See [Supported Agents](/supported-agents) for the full list, or add any other CLI as a custom agent.
+
+Orca runs each agent with its own CLI, and the agent saves its session in its usual folder, such as `~/.claude` or `~/.codex`, under the worktree's path. Import keeps that path, so open a terminal in the imported workspace and run the agent's resume command, such as `claude --resume` or `codex resume`. Stop the agent in Orca first, so that only one app writes to the session. Claude Code deletes sessions older than 30 days by default, so very old sessions may be gone. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
+
+If you added managed agent accounts in Orca, sign in to each agent again in a Paradev terminal.
+
+Sessions of supported agents open as a [chat](/chat). Orca sets **Chat** or **CLI** for each agent in its Settings. In Paradev, use the **CLI** / **Chat** toggle in the agent pane to move the same session to a terminal and back.
+
+## 5. Move Automations and Remote Machines
+
+- **Automations.** Recreate each one as a Paradev [automation](/automations). Automations run on a schedule, on a webhook, or when something happens in GitHub, Slack, Linear, Sentry, and other tools.
+- **Remote machines.** If you used an SSH host or a Remote Orca Server, add that machine as a host with [Remote Access](/remote-access), or run the host on your own Linux server with [Bring Your Own Cloud](/bring-your-own-cloud). Then import its worktrees the same way.
+- **Phone.** Install the [iPhone, iPad, or Android app](/mobile) to answer agents and review diffs.
+- **No machine of your own.** [Cloud workspaces](/cloud-workspaces) keep agents working when every machine you own is off. They come with the Team and Ultra plans.
+
+## 6. Learn the Daily Loop
+
+| Task | In Paradev |
+|---|---|
+| New workspace | **⌘N**, type a prompt, pick an agent |
+| Review a diff | **Changes** tab ([Diff Viewer](/diff-viewer)) |
+| Commit, push, open a PR | From the Changes pane |
+| Check CI and review threads | [Pull Requests](/pull-requests) |
+| Preview your app | [In-app browser](/browser) |
+| Finish a task | Delete the workspace |
+
+The [first parallel session](/first-workspace) walks through this end to end. All [keyboard shortcuts](/keyboard-shortcuts) can be changed.
+
+## 7. Remove Orca
+
+You can keep both apps installed. If you decide to remove Orca after moving your worktrees, follow these steps:
+
+1. In Orca, use **Remove Project** on each repository you moved. This keeps the worktrees on disk.
+2. Quit Orca and remove the app.
+3. Keep `~/orca/workspaces/` while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.
+4. Delete a workspace from Paradev when you finish it. Paradev runs `teardown` and removes the worktree, wherever it lives.
+5. After the last old workspace is gone, run `git worktree prune` in each repository, then delete `~/orca/`.
+
+## Get Help
+
+Stuck on a step? Ask in the [community](/community) or see [Troubleshooting](/troubleshooting).
