@@ -40,7 +40,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 
 Each T3 Code worktree is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
 
-1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --all`](/cli/cli-reference#worktrees) does the same.
+1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --project <projectId> --all`](/cli/cli-reference#worktrees) does the same. Get the ID from `paradev projects list`.
 2. Check the list of branches and paths. T3 Code's worktrees are under `~/.t3/worktrees/`, unless you changed **Settings → Worktrees → Worktree location** in T3 Code.
 3. Leave **Run setup script** off. These worktrees are already set up.
 
@@ -51,7 +51,7 @@ A thread in **Current checkout** mode has no worktree of its own. Its branch liv
 If a worktree is missing from the list, run `git worktree list` in the repository. Paradev only imports worktrees that have a branch checked out. A worktree on a detached HEAD needs a branch first (`git switch -c <name>` inside it).
 
 <Callout type="warn">
-T3 Code can still remove a worktree after you import it. Keep every option under **Settings → Worktrees → Cleanup** off in T3 Code (they are off by default). With them off, deleting a thread or removing the project in T3 Code leaves the worktree in place. The directory is now your Paradev workspace too.
+T3 Code can still remove a worktree after you import it. Keep every option under **Settings → Worktrees → Cleanup** off in T3 Code (they are off by default). T3 Code settings open at **All projects**. If a project has its own override, choose that project and turn cleanup off there too. With them off, deleting a thread or removing the project in T3 Code leaves the worktree in place. The directory is now your Paradev workspace too.
 </Callout>
 
 ## 3. Convert Your Actions
@@ -137,7 +137,7 @@ Sessions of supported agents open as a [chat](/chat), like a T3 Code thread. Use
 - **Scheduled and webhook tasks.** Recreate each one as a Paradev [automation](/automations). Automations run on a schedule, on a webhook, or when something happens in GitHub, Slack, Linear, Sentry, and other tools.
 - **Remote machines.** If you ran `t3 up` on another Mac or Linux machine, add that machine as a host with [Remote Access](/remote-access), or run the host on your own Linux server with [Bring Your Own Cloud](/bring-your-own-cloud). Then import its worktrees the same way.
 - **Phone.** Install the [iPhone, iPad, or Android app](/mobile) to answer agents and review diffs.
-- **No machine of your own.** [Cloud workspaces](/cloud-workspaces) keep agents working when every machine you own is off. They are available on paid plans.
+- **No machine of your own.** [Cloud workspaces](/cloud-workspaces) keep agents working when every machine you own is off. They come with the Team and Ultra plans.
 
 ## 6. Learn the Daily Loop
 
@@ -159,7 +159,7 @@ You can keep both apps installed. If you decide to remove T3 Code after moving y
 1. Quit T3 Code. If you installed the `t3` command, run `t3 uninstall` to remove the background service and the launcher. It keeps your threads and settings in `~/.t3/userdata`.
 2. Keep `~/.t3/worktrees/` while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.
 3. Delete a workspace from Paradev when you finish it. Paradev runs `teardown` and removes the worktree, wherever it lives.
-4. After the last old workspace is gone, run `git worktree prune` in each repository, then delete `~/.t3/`.
+4. After the last old workspace is gone, run `git worktree prune` in each repository, then check `~/.t3/scratch`. T3 Code keeps the files of threads without a project there. Copy what you need, then delete `~/.t3/`.
 
 ## Get Help
 

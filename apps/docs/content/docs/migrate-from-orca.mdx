@@ -44,7 +44,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 
 Each Orca workspace is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
 
-1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --all`](/cli/cli-reference#worktrees) does the same.
+1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --project <projectId> --all`](/cli/cli-reference#worktrees) does the same. Get the ID from `paradev projects list`.
 2. Check the list of branches and paths. Orca's worktrees are under `~/orca/workspaces/`, unless you changed the workspace directory in Orca's **Settings → General**.
 3. Leave **Run setup script** off. These worktrees are already set up.
 
@@ -95,7 +95,7 @@ with a `.worktreeinclude` that lists `.env`, becomes:
 
 Differences to know:
 
-- **Commands are arrays.** Each entry runs in order in the workspace directory. An Orca script is one block of shell, so put each line in its own entry.
+- **Commands are arrays.** The entries run in order in the workspace directory, joined with `&&`. Put each simple command in its own entry. Keep a multi-line block, such as an `if` statement, in one entry, or move it to a script file.
 - **`archive` becomes `teardown`.** It runs before Paradev removes the worktree. If it fails, you can still **Delete anyway**.
 - **`run` is one command set.** It starts from the Run button in its own restartable pane. Save other `defaultTabs` commands as [terminal scripts](/terminal-scripts) and launch them from the Scripts bar.
 - **Ignored files are not copied for you.** Paradev does not read `.worktreeinclude` or `worktree.sharedDirectories`. A new worktree has only tracked files, so copy or link what you need in `setup`, from `$SUPERSET_ROOT_PATH`.
@@ -145,7 +145,7 @@ Sessions of supported agents open as a [chat](/chat). Orca sets **Chat** or **CL
 - **Automations.** Recreate each one as a Paradev [automation](/automations). Automations run on a schedule, on a webhook, or when something happens in GitHub, Slack, Linear, Sentry, and other tools.
 - **Remote machines.** If you used an SSH host or a Remote Orca Server, add that machine as a host with [Remote Access](/remote-access), or run the host on your own Linux server with [Bring Your Own Cloud](/bring-your-own-cloud). Then import its worktrees the same way.
 - **Phone.** Install the [iPhone, iPad, or Android app](/mobile) to answer agents and review diffs.
-- **No machine of your own.** [Cloud workspaces](/cloud-workspaces) keep agents working when every machine you own is off. They are available on paid plans.
+- **No machine of your own.** [Cloud workspaces](/cloud-workspaces) keep agents working when every machine you own is off. They come with the Team and Ultra plans.
 
 ## 6. Learn the Daily Loop
 

@@ -39,7 +39,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 
 Each Conductor workspace is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
 
-1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --all`](/cli/cli-reference#worktrees) does the same.
+1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --project <projectId> --all`](/cli/cli-reference#worktrees) does the same. Get the ID from `paradev projects list`.
 2. Check the list of branches and paths. Conductor's worktrees are usually under `~/conductor/workspaces/`. Older versions put them in a `.conductor/` folder inside the repository.
 3. Leave **Run setup script** off. These worktrees are already set up.
 
