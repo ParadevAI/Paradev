@@ -13,7 +13,7 @@ export function register(server: McpServer): void {
 		annotations: {
 			readOnlyHint: false,
 			destructiveHint: true,
-			openWorldHint: false,
+			openWorldHint: true,
 			idempotentHint: true,
 		},
 		description:
