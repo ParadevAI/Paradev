@@ -1082,7 +1082,7 @@ paradev workspaces update ws_… --machine-size xlarge
 >
 Open a workspace in the Paradev desktop app.
 
-`url` is the `superset://` deep link. `webUrl` is an HTTPS link that opens the
+`url` is the `paradev://` deep link. `webUrl` is an HTTPS link that opens the
 same workspace in the desktop app. Use it where only HTTP(S) links are
 accepted, such as Linear or Slack. `workspaces list`, `get`, and `create`
 return both fields too. `--print` prints `url`; to print the HTTPS link, run
@@ -1117,10 +1117,10 @@ sessionId=$(echo "$session" | jq -r '.sessionId')
 
 # Open the session using the query param that matches its kind:
 # chat session (kind: "chat")
-open "superset://v2-workspace/<workspaceId>?chatSessionId=$sessionId"
+open "paradev://v2-workspace/<workspaceId>?chatSessionId=$sessionId"
 
 # terminal session (kind: "terminal")
-open "superset://v2-workspace/<workspaceId>?terminalId=$sessionId"
+open "paradev://v2-workspace/<workspaceId>?terminalId=$sessionId"
 ```
 
 Append `&focusRequestId=<unique>` to force a re-focus when opening the same link

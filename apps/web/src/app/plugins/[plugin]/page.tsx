@@ -1,6 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { LINK_PROTOCOL_SCHEME } from "@superset/shared/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -9,10 +10,12 @@ import { useEffect, useState } from "react";
 export default function PluginDeepLinkPage() {
 	const params = useParams<{ plugin: string }>();
 	const plugin = encodeURIComponent(params.plugin);
-	const [deepLink, setDeepLink] = useState(`superset://plugins/${plugin}`);
+	const [deepLink, setDeepLink] = useState(
+		`${LINK_PROTOCOL_SCHEME}://plugins/${plugin}`,
+	);
 
 	useEffect(() => {
-		const target = `superset://plugins/${plugin}${window.location.search}`;
+		const target = `${LINK_PROTOCOL_SCHEME}://plugins/${plugin}${window.location.search}`;
 		setDeepLink(target);
 		window.location.href = target;
 	}, [plugin]);

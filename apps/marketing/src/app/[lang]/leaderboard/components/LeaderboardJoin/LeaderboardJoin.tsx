@@ -1,6 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { LINK_PROTOCOL_SCHEME } from "@superset/shared/constants";
 import { ArrowUpRight } from "lucide-react";
 import { type MouseEvent, useEffect, useRef } from "react";
 
@@ -32,7 +33,7 @@ export function LeaderboardJoin() {
 		cancelOpen.current = cleanup;
 		document.addEventListener("visibilitychange", onVisibility);
 		window.addEventListener("blur", cleanup, { once: true });
-		window.location.assign("superset://settings/account");
+		window.location.assign(`${LINK_PROTOCOL_SCHEME}://settings/account`);
 	};
 
 	return (

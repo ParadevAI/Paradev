@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
+import { LINK_PROTOCOL_SCHEME } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,10 +19,10 @@ interface DeepLinkRedirectProps {
 /**
  * Passthrough screen for web routes that only exist to hand a destination to
  * the desktop app. Shareable links point here so a recipient gets a real URL
- * instead of a `superset://` one their chat client won't render.
+ * instead of a `paradev://` one their chat client won't render.
  */
 export function DeepLinkRedirect({ path, browserHref }: DeepLinkRedirectProps) {
-	const deepLink = `${PROTOCOL_SCHEMES.PROD}://${path}`;
+	const deepLink = `${LINK_PROTOCOL_SCHEME}://${path}`;
 	const [showBrowserFallback, setShowBrowserFallback] = useState(false);
 
 	useEffect(() => {

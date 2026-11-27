@@ -6,7 +6,7 @@ import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 
 /**
  * Copies a web URL whose page (apps/web/src/app) bounces into the desktop
- * app, so the link renders in chat clients that won't show a `superset://` one.
+ * app, so the link renders in chat clients that won't show a `paradev://` one.
  */
 export function useCopyShareLink() {
 	const { t } = useLingui();

@@ -5,6 +5,7 @@ import { isDesktopProtocol } from "./desktopProtocol";
 describe("isDesktopProtocol", () => {
 	test("accepts the schemes the desktop registers", () => {
 		expect(isDesktopProtocol("superset")).toBe(true);
+		expect(isDesktopProtocol("paradev")).toBe(true);
 		expect(isDesktopProtocol("superset-dev")).toBe(true);
 		expect(isDesktopProtocol("superset-my-worktree2")).toBe(true);
 		expect(isDesktopProtocol("Superset")).toBe(true);
@@ -14,6 +15,7 @@ describe("isDesktopProtocol", () => {
 		expect(isDesktopProtocol("https")).toBe(false);
 		expect(isDesktopProtocol("https://attacker.example/?x=")).toBe(false);
 		expect(isDesktopProtocol("superset://evil")).toBe(false);
+		expect(isDesktopProtocol("paradev-dev")).toBe(false);
 		expect(isDesktopProtocol("superset-")).toBe(false);
 		expect(isDesktopProtocol("supersets")).toBe(false);
 		expect(isDesktopProtocol("javascript")).toBe(false);

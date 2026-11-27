@@ -1,14 +1,17 @@
-import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
+import {
+	LINK_PROTOCOL_SCHEME,
+	PROTOCOL_SCHEMES,
+} from "@superset/shared/constants";
 
 /**
- * The desktop registers `superset` (release), `superset-dev`, or
+ * The desktop registers `paradev` and `superset` (release), `superset-dev`, or
  * `superset-<workspace>` for a dev instance. The success page pastes the
  * scheme straight into `${protocol}://auth/callback?token=...`, so anything
  * else would send the freshly minted session token to an attacker's URL.
  * Mirrors the allowlist in apps/api `auth/desktop/connect`.
  */
 const DESKTOP_PROTOCOL = new RegExp(
-	`^${PROTOCOL_SCHEMES.PROD}(?:-[a-z0-9][a-z0-9-]*)?$`,
+	`^(?:${LINK_PROTOCOL_SCHEME}|${PROTOCOL_SCHEMES.PROD}(?:-[a-z0-9][a-z0-9-]*)?)$`,
 	"i",
 );
 
