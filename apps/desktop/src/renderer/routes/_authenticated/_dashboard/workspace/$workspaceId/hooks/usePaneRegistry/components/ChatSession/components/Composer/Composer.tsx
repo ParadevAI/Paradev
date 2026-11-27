@@ -272,7 +272,11 @@ export const Composer = memo(function Composer({
 		recallHistory,
 	});
 	const { returnFocus } = drawerEntry;
-	const mcpPicker = useMcpServerPicker({ workspaceId, presetId });
+	const mcpPicker = useMcpServerPicker({
+		workspaceId,
+		presetId,
+		sessionId,
+	});
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
 	const changeModelPickerOpen = useCallback(
 		(open: boolean) => {
