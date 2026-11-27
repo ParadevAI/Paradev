@@ -2483,6 +2483,9 @@ msgstr "Previews aangestuurd door agents"
 msgid "Agents"
 msgstr "Agents"
 
+msgid "Agents and workspaces"
+msgstr "Agents en werkruimtes"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agents kunnen de tools van {0} niet bereiken"
@@ -3069,6 +3072,9 @@ msgstr "API-equivalent"
 
 msgid "API-equivalent cost"
 msgstr "API-equivalente kosten"
+
+msgid "App"
+msgstr "App"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "Help"
 
 msgid "Help & Docs"
 msgstr "Help en docs"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Help Paradev te verbeteren door gebruiksgegevens en crashrapporten te versturen. <0>Meer informatie<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "Herstart ze nu om ze naar {accountLabel} te verplaatsen; elke sessie pak
 msgid "Restart onboarding"
 msgstr "Onboarding opnieuw starten"
 
+msgid "Restart Paradev to apply"
+msgstr "Start Paradev opnieuw om toe te passen"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Draaiende {providerLabel}-agents herstarten?"
 
@@ -18254,9 +18266,6 @@ msgstr "Naar chat sturen"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Naar chat sturen ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Stuur gebruiksanalyses, sessie-opnames en foutrapporten vanaf deze computer om Paradev te helpen verbeteren. Als dit uit staat, gebruikt Paradev nog steeds je account-ID en abonnement om te bepalen welke functies je kunt gebruiken. Wijzigingen voor sessie-opnames en foutrapporten gelden nadat je de app opnieuw start."
 
 msgid "Sending"
 msgstr "Versturen"

@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 describe("TelemetrySetting", () => {
-	test("the click that turns it off is not autocaptured and stops capture before the save finishes", async () => {
+	test("the click that turns it off is not autocaptured and stops capture before the save finishes, then asks for a restart", async () => {
 		const link: TRPCLink<AppRouter> = () => (call) =>
 			observable((observer) => {
 				if (call.op.path === "settings.getTelemetryState") {
@@ -47,10 +47,12 @@ describe("TelemetrySetting", () => {
 		await waitFor(() => expect(toggle.disabled).toBe(false));
 
 		expect(toggle.closest(".ph-no-capture")).not.toBeNull();
+		expect(view.queryByText("Restart Paradev to apply")).toBeNull();
 
 		await act(async () => {
 			fireEvent.click(toggle);
 		});
 		expect(isTelemetryEnabled()).toBe(false);
+		expect(await view.findByText("Restart Paradev to apply")).not.toBeNull();
 	});
 });

@@ -2483,6 +2483,9 @@ msgstr "由代理程式驅動的預覽"
 msgid "Agents"
 msgstr "代理程式"
 
+msgid "Agents and workspaces"
+msgstr "代理程式與工作區"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "代理程式無法存取 {0} 的工具"
@@ -3069,6 +3072,9 @@ msgstr "按API價折算"
 
 msgid "API-equivalent cost"
 msgstr "API 等價費用"
+
+msgid "App"
+msgstr "應用程式"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "幫助"
 
 msgid "Help & Docs"
 msgstr "幫助與文件"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "傳送使用資料與當機報告，協助改善 Paradev。<0>瞭解更多<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "立即重新啟動即可移至{accountLabel}；每個會話都會從中�
 msgid "Restart onboarding"
 msgstr "重新開始導覽"
 
+msgid "Restart Paradev to apply"
+msgstr "重新啟動 Paradev 以套用"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新啟動執行中的{providerLabel}代理程式嗎？"
 
@@ -18254,9 +18266,6 @@ msgstr "傳送到聊天"
 
 msgid "Send to chat ({draftCount})"
 msgstr "傳送到聊天（{draftCount}）"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "從這台電腦傳送使用分析、工作階段錄製和錯誤報告，協助改善 Paradev。關閉後，Paradev 仍會使用你的帳戶 ID 和方案來確認你可以使用哪些功能。工作階段錄製和錯誤報告的變更會在重新啟動 App 後生效。"
 
 msgid "Sending"
 msgstr "正在傳送"

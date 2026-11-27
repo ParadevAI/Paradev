@@ -2483,6 +2483,9 @@ msgstr "Náhledy řízené agenty"
 msgid "Agents"
 msgstr "Agenti"
 
+msgid "Agents and workspaces"
+msgstr "Agenti a pracovní prostory"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agenti nemají přístup k nástrojům {0}"
@@ -3069,6 +3072,9 @@ msgstr "ekvivalent API"
 
 msgid "API-equivalent cost"
 msgstr "Náklady v přepočtu na API"
+
+msgid "App"
+msgstr "Aplikace"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "Nápověda"
 
 msgid "Help & Docs"
 msgstr "Nápověda a dokumentace"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Pomozte vylepšit Paradev odesíláním údajů o používání a hlášení o pádech. <0>Další informace<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "Restartujte je teď a přejdou na {accountLabel}; každá relace naváž
 msgid "Restart onboarding"
 msgstr "Spustit úvodní průvodce znovu"
 
+msgid "Restart Paradev to apply"
+msgstr "Pro použití restartujte Paradev"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restartovat běžící agenty {providerLabel}?"
 
@@ -18254,9 +18266,6 @@ msgstr "Odeslat do chatu"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Odeslat do chatu ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Odesílat analytiku používání, záznamy relací a hlášení chyb z tohoto počítače a pomoci tak vylepšit Paradev. Když je tato možnost vypnutá, Paradev dál používá ID vašeho účtu a tarif ke kontrole, které funkce můžete používat. Změny záznamu relací a hlášení chyb se projeví po restartu aplikace."
 
 msgid "Sending"
 msgstr "Odesílám"

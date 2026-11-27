@@ -2483,6 +2483,9 @@ msgstr "Vistas previas controladas por el agente"
 msgid "Agents"
 msgstr "Agentes"
 
+msgid "Agents and workspaces"
+msgstr "Agentes y espacios de trabajo"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Los agentes no pueden acceder a las herramientas de {0}"
@@ -3069,6 +3072,9 @@ msgstr "equivalente en API"
 
 msgid "API-equivalent cost"
 msgstr "Coste equivalente de API"
+
+msgid "App"
+msgstr "Aplicación"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "Ayuda"
 
 msgid "Help & Docs"
 msgstr "Ayuda y documentación"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Ayuda a mejorar Paradev enviando datos de uso e informes de fallos. <0>Más información<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "Reinícialos ahora para pasarlos a {accountLabel}; cada sesión retoma s
 msgid "Restart onboarding"
 msgstr "Reiniciar la introducción"
 
+msgid "Restart Paradev to apply"
+msgstr "Reinicia Paradev para aplicar el cambio"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "¿Reiniciar los agentes de {providerLabel} en marcha?"
 
@@ -18254,9 +18266,6 @@ msgstr "Enviar al chat"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Enviar al chat ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Envía analíticas de uso, grabaciones de sesión e informes de errores desde este equipo para ayudar a mejorar Paradev. Cuando está desactivado, Paradev sigue usando el ID de tu cuenta y tu plan para comprobar qué funciones puedes usar. Los cambios en la grabación de sesiones y los informes de errores se aplican al reiniciar la app."
 
 msgid "Sending"
 msgstr "Enviando"

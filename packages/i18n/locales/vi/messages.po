@@ -2483,6 +2483,9 @@ msgstr "Bản xem trước do agent điều khiển"
 msgid "Agents"
 msgstr "Agent"
 
+msgid "Agents and workspaces"
+msgstr "Agent và workspace"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agent không thể truy cập các công cụ của {0}"
@@ -3069,6 +3072,9 @@ msgstr "quy đổi theo API"
 
 msgid "API-equivalent cost"
 msgstr "Chi phí quy đổi theo API"
+
+msgid "App"
+msgstr "Ứng dụng"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "Trợ giúp"
 
 msgid "Help & Docs"
 msgstr "Trợ giúp & Tài liệu"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Giúp cải thiện Paradev bằng cách gửi dữ liệu sử dụng và báo cáo sự cố. <0>Tìm hiểu thêm<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "Khởi động lại ngay để chuyển sang {accountLabel}; mỗi phi�
 msgid "Restart onboarding"
 msgstr "Bắt đầu lại phần hướng dẫn"
 
+msgid "Restart Paradev to apply"
+msgstr "Khởi động lại Paradev để áp dụng"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"
 
@@ -18254,9 +18266,6 @@ msgstr "Gửi vào chat"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Gửi vào chat ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Gửi phân tích sử dụng, bản ghi phiên và báo cáo lỗi từ máy tính này để giúp cải thiện Paradev. Khi tắt, Paradev vẫn dùng ID tài khoản và gói của bạn để kiểm tra những tính năng bạn có thể dùng. Thay đổi về ghi phiên và báo cáo lỗi sẽ áp dụng sau khi bạn khởi động lại ứng dụng."
 
 msgid "Sending"
 msgstr "Đang gửi"

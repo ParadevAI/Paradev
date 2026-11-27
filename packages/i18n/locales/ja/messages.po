@@ -2483,6 +2483,9 @@ msgstr "エージェントが操作するプレビュー"
 msgid "Agents"
 msgstr "エージェント"
 
+msgid "Agents and workspaces"
+msgstr "エージェントとワークスペース"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "エージェントは {0} のツールにアクセスできません"
@@ -3069,6 +3072,9 @@ msgstr "API換算"
 
 msgid "API-equivalent cost"
 msgstr "API換算のコスト"
+
+msgid "App"
+msgstr "アプリ"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "ヘルプ"
 
 msgid "Help & Docs"
 msgstr "ヘルプとドキュメント"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "使用状況データとクラッシュレポートを送信して、Paradev の改善にご協力ください。<0>詳細<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "今すぐ再起動すると{accountLabel}に移行し、各セッショ�
 msgid "Restart onboarding"
 msgstr "オンボーディングをやり直す"
 
+msgid "Restart Paradev to apply"
+msgstr "適用するには Paradev を再起動してください"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
@@ -18254,9 +18266,6 @@ msgstr "チャットに送る"
 
 msgid "Send to chat ({draftCount})"
 msgstr "チャットに送る({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Paradev の改善のため、このコンピューターから使用状況の分析、セッションの記録、エラーレポートを送信します。オフの場合も、利用できる機能を確認するために、アカウント ID とプランは引き続き使用されます。セッションの記録とエラーレポートの変更は、アプリの再起動後に反映されます。"
 
 msgid "Sending"
 msgstr "送信中"

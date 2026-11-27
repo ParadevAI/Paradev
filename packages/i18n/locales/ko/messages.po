@@ -2483,6 +2483,9 @@ msgstr "에이전트가 조작하는 미리보기"
 msgid "Agents"
 msgstr "에이전트"
 
+msgid "Agents and workspaces"
+msgstr "에이전트 및 워크스페이스"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
@@ -3069,6 +3072,9 @@ msgstr "API 환산"
 
 msgid "API-equivalent cost"
 msgstr "API 환산 비용"
+
+msgid "App"
+msgstr "앱"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "도움말"
 
 msgid "Help & Docs"
 msgstr "도움말 및 문서"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "사용 데이터와 충돌 보고서를 보내 Paradev 개선에 도움을 주세요. <0>자세히 알아보기<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "지금 다시 시작하면 {accountLabel}(으)로 이동하며, 각 세�
 msgid "Restart onboarding"
 msgstr "온보딩 다시 시작"
 
+msgid "Restart Paradev to apply"
+msgstr "적용하려면 Paradev를 다시 시작하세요"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
@@ -18254,9 +18266,6 @@ msgstr "채팅으로 보내기"
 
 msgid "Send to chat ({draftCount})"
 msgstr "채팅으로 보내기 ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Paradev 개선을 위해 이 컴퓨터에서 사용 분석, 세션 녹화 및 오류 보고서를 보냅니다. 꺼져 있어도 Paradev는 사용할 수 있는 기능을 확인하기 위해 계정 ID와 요금제를 계속 사용합니다. 세션 녹화 및 오류 보고 변경 사항은 앱을 다시 시작한 후 적용됩니다."
 
 msgid "Sending"
 msgstr "보내는 중"

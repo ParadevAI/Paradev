@@ -2483,6 +2483,9 @@ msgstr "由智能体驱动的预览"
 msgid "Agents"
 msgstr "智能体"
 
+msgid "Agents and workspaces"
+msgstr "智能体和工作区"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "智能体无法访问 {0} 的工具"
@@ -3069,6 +3072,9 @@ msgstr "按API价折算"
 
 msgid "API-equivalent cost"
 msgstr "API 等价费用"
+
+msgid "App"
+msgstr "应用"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "帮助"
 
 msgid "Help & Docs"
 msgstr "帮助与文档"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "发送使用数据和崩溃报告，帮助改进 Paradev。<0>了解更多<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "立即重新启动即可迁移到{accountLabel}；每个会话都会从�
 msgid "Restart onboarding"
 msgstr "重新开始引导"
 
+msgid "Restart Paradev to apply"
+msgstr "重启 Paradev 以应用"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
@@ -18254,9 +18266,6 @@ msgstr "发送到聊天"
 
 msgid "Send to chat ({draftCount})"
 msgstr "发送到聊天（{draftCount}）"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "从这台电脑发送使用分析、会话录制和错误报告，帮助改进 Paradev。关闭后，Paradev 仍会使用你的账户 ID 和套餐来确认你可以使用哪些功能。会话录制和错误报告的更改在重启应用后生效。"
 
 msgid "Sending"
 msgstr "正在发送"

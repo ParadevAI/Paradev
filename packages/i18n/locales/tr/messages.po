@@ -2483,6 +2483,9 @@ msgstr "Ajanın yönettiği önizlemeler"
 msgid "Agents"
 msgstr "Ajanlar"
 
+msgid "Agents and workspaces"
+msgstr "Ajanlar ve çalışma alanları"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Ajanlar {0} araçlarına erişemiyor"
@@ -3069,6 +3072,9 @@ msgstr "API eşdeğeri"
 
 msgid "API-equivalent cost"
 msgstr "API eşdeğeri maliyet"
+
+msgid "App"
+msgstr "Uygulama"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "Yardım"
 
 msgid "Help & Docs"
 msgstr "Yardım ve belgeler"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Kullanım verileri ve çökme raporları göndererek Paradev'i geliştirmemize yardım edin. <0>Daha fazla bilgi<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "Şimdi yeniden başlatarak {accountLabel} hesabına taşıyın; her otur
 msgid "Restart onboarding"
 msgstr "Başlangıç adımlarını yeniden başlat"
 
+msgid "Restart Paradev to apply"
+msgstr "Uygulamak için Paradev'i yeniden başlatın"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Çalışan {providerLabel} ajanları yeniden başlatılsın mı?"
 
@@ -18254,9 +18266,6 @@ msgstr "Sohbete gönder"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Sohbete gönder ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Paradev'i geliştirmeye yardımcı olmak için bu bilgisayardan kullanım analizleri, oturum kayıtları ve hata raporları gönderin. Bu kapalıyken Paradev, hangi özellikleri kullanabileceğinizi kontrol etmek için hesap kimliğinizi ve planınızı kullanmaya devam eder. Oturum kaydı ve hata raporlama değişiklikleri uygulamayı yeniden başlattıktan sonra geçerli olur."
 
 msgid "Sending"
 msgstr "Gönderiliyor"

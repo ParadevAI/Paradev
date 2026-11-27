@@ -2477,6 +2477,9 @@ msgstr "Попередній перегляд під керуванням аге
 msgid "Agents"
 msgstr "Агенти"
 
+msgid "Agents and workspaces"
+msgstr "Агенти й робочі простори"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Агенти не мають доступу до інструментів {0}"
@@ -3063,6 +3066,9 @@ msgstr "в еквіваленті API"
 
 msgid "API-equivalent cost"
 msgstr "Вартість в еквіваленті API"
+
+msgid "App"
+msgstr "Застосунок"
 
 msgctxt "log scope"
 msgid "App"
@@ -9920,6 +9926,9 @@ msgstr "Довідка"
 
 msgid "Help & Docs"
 msgstr "Довідка та документація"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Допоможіть покращити Paradev, надсилаючи дані про використання та звіти про збої. <0>Докладніше<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Генрі Форд"
@@ -17004,6 +17013,9 @@ msgstr "Перезапустіть їх зараз, щоб перенести н
 msgid "Restart onboarding"
 msgstr "Пройти онбординг заново"
 
+msgid "Restart Paradev to apply"
+msgstr "Перезапустіть Paradev, щоб застосувати"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
@@ -18248,9 +18260,6 @@ msgstr "Надіслати в чат"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Надіслати в чат ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Надсилати аналітику використання, записи сеансів і звіти про помилки з цього комп’ютера, щоб допомогти покращити Paradev. Коли це вимкнено, Paradev і далі використовує ID вашого облікового запису та тариф, щоб перевірити, які функції вам доступні. Зміни запису сеансів і звітів про помилки набувають чинності після перезапуску застосунку."
 
 msgid "Sending"
 msgstr "Надсилання"

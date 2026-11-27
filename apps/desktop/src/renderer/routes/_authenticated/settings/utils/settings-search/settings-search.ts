@@ -856,8 +856,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.BEHAVIOR_TELEMETRY,
 		section: "behavior",
 		title: "Share usage data",
-		description:
-			"Send usage analytics, session recordings and error reports to help improve Paradev",
+		description: "Help improve Paradev by sending usage data and crash reports",
 		keywords: [
 			"telemetry",
 			"analytics",

@@ -2483,6 +2483,9 @@ msgstr "Pratinjau yang digerakkan agen"
 msgid "Agents"
 msgstr "Agen"
 
+msgid "Agents and workspaces"
+msgstr "Agen dan workspace"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agen tidak dapat menjangkau alat {0}"
@@ -3069,6 +3072,9 @@ msgstr "Setara API"
 
 msgid "API-equivalent cost"
 msgstr "Biaya setara API"
+
+msgid "App"
+msgstr "Aplikasi"
 
 msgctxt "log scope"
 msgid "App"
@@ -9926,6 +9932,9 @@ msgstr "Bantuan"
 
 msgid "Help & Docs"
 msgstr "Bantuan & Dokumentasi"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Bantu tingkatkan Paradev dengan mengirim data penggunaan dan laporan crash. <0>Pelajari lebih lanjut<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -17010,6 +17019,9 @@ msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap s
 msgid "Restart onboarding"
 msgstr "Mulai ulang orientasi"
 
+msgid "Restart Paradev to apply"
+msgstr "Mulai ulang Paradev untuk menerapkan"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"
 
@@ -18254,9 +18266,6 @@ msgstr "Kirim ke chat"
 
 msgid "Send to chat ({draftCount})"
 msgstr "Kirim ke chat ({draftCount})"
-
-msgid "Send usage analytics, session recordings and error reports from this computer to help improve Paradev. When this is off, Paradev still uses your account ID and plan to check which features you can use. Changes to session recording and error reporting apply after you restart the app."
-msgstr "Kirim analitik penggunaan, rekaman sesi, dan laporan kesalahan dari komputer ini untuk membantu meningkatkan Paradev. Saat nonaktif, Paradev tetap menggunakan ID akun dan paket Anda untuk memeriksa fitur yang dapat Anda gunakan. Perubahan pada rekaman sesi dan laporan kesalahan berlaku setelah Anda memulai ulang aplikasi."
 
 msgid "Sending"
 msgstr "Mengirim"
