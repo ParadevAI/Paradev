@@ -9,7 +9,7 @@ import { readPublicEnv } from "@superset/shared/public-env";
  * stays baked: it is this build's identity, not an address.
  */
 
-const DEFAULT_API_URL = "https://api.paradev.com";
+export const DEFAULT_API_URL = "https://api.paradev.com";
 const DEFAULT_WEB_URL = "https://app.paradev.com";
 
 /**

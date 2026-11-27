@@ -46,3 +46,27 @@ export async function isManifestLive(
 	if (!isAlive(manifest.pid)) return false;
 	return verifyManifestOwner(manifest, deps);
 }
+
+export async function mayBeLiveHost(
+	manifest: HostServiceManifest,
+	{
+		inspectCommand = inspectProcessCommand,
+		signalProcess = process.kill,
+	}: Pick<ManifestOwnerDeps, "inspectCommand"> & {
+		signalProcess?: (pid: number, signal: 0) => void;
+	} = {},
+): Promise<boolean> {
+	const { pid } = manifest;
+	if (!Number.isInteger(pid) || pid <= 0) return false;
+	const processMayBeAlive = () => {
+		try {
+			signalProcess(pid, 0);
+			return true;
+		} catch (error) {
+			return (error as NodeJS.ErrnoException).code !== "ESRCH";
+		}
+	};
+	if (!processMayBeAlive()) return false;
+	const command = await inspectCommand(pid);
+	return command === null ? processMayBeAlive() : looksLikeHostProcess(command);
+}

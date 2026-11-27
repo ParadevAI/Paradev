@@ -7,7 +7,7 @@ import {
 	wrapText,
 } from "@superset/cli-framework";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { getHostId, hostIdFromMachineId } from "@superset/shared/host-info";
+import { getHostId } from "@superset/shared/host-info";
 import { type ApiClient, createApiClient } from "../../../lib/api-client";
 import { command } from "../../../lib/command";
 import { env } from "../../../lib/env";
@@ -309,7 +309,7 @@ export default command({
 			} else if (!facts.machineId) {
 				throw new CLIError(`Could not read the hardware UUID of ${target}`);
 			}
-			const hostId = hostIdFromMachineId(facts.machineId);
+			const { hostId } = facts;
 			if (hostId === getHostId()) {
 				throw new CLIError(
 					`${target} is this machine`,

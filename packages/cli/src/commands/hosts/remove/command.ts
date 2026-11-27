@@ -1,13 +1,10 @@
 import * as p from "@clack/prompts";
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
-import { getHostId, hostIdFromMachineId } from "@superset/shared/host-info";
+import { getHostId } from "@superset/shared/host-info";
 import { command } from "../../../lib/command";
 import { resolveOrganizationFromContext } from "../../../lib/resolve-org";
 import { shellQuote } from "../../../lib/shell-quote";
-import {
-	hostKeyName,
-	revokeKeysNamed,
-} from "../../../lib/ssh-host-setup/host-key";
+import { findRemoteHostKey } from "../../../lib/ssh-host-setup/host-key";
 import { log } from "../../../lib/ssh-host-setup/log";
 import { PROBE_SCRIPT, parseProbe } from "../../../lib/ssh-host-setup/probe";
 import { uninstallServiceScript } from "../../../lib/ssh-host-setup/service";
@@ -49,7 +46,7 @@ export default command({
 			if (!facts.machineId) {
 				throw new CLIError(`Could not read the machine id of ${target}`);
 			}
-			const hostId = hostIdFromMachineId(facts.machineId);
+			const { hostId } = facts;
 			if (hostId === getHostId()) {
 				throw new CLIError(
 					`${target} is this machine`,
@@ -71,6 +68,7 @@ export default command({
 				}
 			}
 
+			const keyId = await findRemoteHostKey(ctx.api, ssh, facts);
 			const uninstall = await ssh.run(uninstallServiceScript());
 			const removed = [...uninstall.stdout.matchAll(/removed=(\w+)/g)].map(
 				(match) => match[1],
@@ -87,12 +85,14 @@ export default command({
 				}
 			}
 
-			const revoked = await revokeKeysNamed(
-				ctx.api,
-				hostKeyName(facts.hostname, hostId),
-			);
-			if (revoked > 0 && facts.bin) {
-				await ssh.run(`${shellQuote(facts.bin)} auth logout`);
+			if (keyId && facts.bin) {
+				await ctx.api.apiKey.revoke.mutate({ id: keyId });
+				const logout = await ssh.run(`${shellQuote(facts.bin)} auth logout`);
+				if (logout.exitCode !== 0) {
+					throw new CLIError(
+						`Revoked its API key but could not sign out ${target}`,
+					);
+				}
 			}
 
 			log.success(
@@ -101,7 +101,7 @@ export default command({
 						? `Removed the ${removed.join(" and ")} service`
 						: "No service was installed",
 					"stopped the host and its terminals",
-					revoked > 0
+					keyId
 						? "revoked its API key and signed it out"
 						: "found no API key from hosts add, so left its sign-in alone",
 				].join("; "),
@@ -110,7 +110,7 @@ export default command({
 				"The CLI stays installed in ~/superset. The host stays listed, offline, until you delete it in Settings → Hosts.",
 			);
 			return {
-				data: { hostId, removedServices: removed, revokedKeys: revoked },
+				data: { hostId, removedServices: removed, revokedKeys: keyId ? 1 : 0 },
 				message: `Removed the host on ${target}`,
 			};
 		} finally {

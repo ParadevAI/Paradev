@@ -45,6 +45,12 @@ Check that it is online:
 paradev status
 ```
 
+### Shared Linux machines
+
+When another Linux user on the same machine already registered a host in your organization, run `paradev start --daemon --user-scoped-id` as your own Linux user. If your host is already running, stop it with `paradev stop` first.
+
+Use this option on additional Linux accounts. It saves the setting for future starts and gives that account its own host ID across organizations. The account that already has a working host should keep using its existing start command.
+
 ### Headless (sandbox, CI, or server)
 
 On a machine with no browser to complete an interactive login, authenticate with an API key instead. Create one in **Settings → API Keys**, then export it. The CLI reads `SUPERSET_API_KEY` automatically (no `paradev auth login` needed):

@@ -1,7 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { createHmac } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir, hostname, platform } from "node:os";
+import { dirname, join } from "node:path";
+
+export const USER_SCOPED_HOST_ID_FILE = ".paradev/user-scoped-host-id";
 
 // Salt value preserved verbatim across the rename to keep existing host ids
 // stable for users already registered against the cloud.
@@ -70,12 +73,41 @@ export function getMachineId(): string {
 
 let cachedHashedId: string | null = null;
 
-/** The host id a machine with this raw machine id registers under. */
-export function hostIdFromMachineId(machineId: string): string {
+/** The host id derived from a raw machine id and an optional Linux user ID. */
+export function hostIdFromMachineId(
+	machineId: string,
+	linuxUid?: number,
+): string {
 	return createHmac("sha256", APP_HOST_SALT)
-		.update(machineId)
+		.update(
+			linuxUid === undefined
+				? machineId
+				: `linux-user:${linuxUid}:${machineId}`,
+		)
 		.digest("hex")
 		.slice(0, 32);
+}
+
+function userScopedHostIdPath(): string {
+	return join(homedir(), USER_SCOPED_HOST_ID_FILE);
+}
+
+export function isUserScopedHostIdEnabled(): boolean {
+	return (
+		platform() === "linux" &&
+		(statSync(userScopedHostIdPath(), { throwIfNoEntry: false })?.isFile() ??
+			false)
+	);
+}
+
+export function enableUserScopedHostId(): void {
+	if (platform() !== "linux") {
+		throw new Error("User-scoped host IDs are supported only on Linux");
+	}
+	const path = userScopedHostIdPath();
+	mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+	writeFileSync(path, "", { mode: 0o600, flag: "a" });
+	cachedHashedId = null;
 }
 
 /**
@@ -91,13 +123,15 @@ export function resolveHostId(
 
 /**
  * Stable host id safe for cloud transmission.
- * HMAC of the raw machine id; non-reversible and app-specific.
  * This is the canonical identifier for a machine acting as a host or client.
  */
 export function getHostId(): string {
 	if (!cachedHashedId) {
 		cachedHashedId = resolveHostId(process.env, () =>
-			hostIdFromMachineId(getMachineId()),
+			hostIdFromMachineId(
+				getMachineId(),
+				isUserScopedHostIdEnabled() ? process.geteuid?.() : undefined,
+			),
 		);
 	}
 	return cachedHashedId;
