@@ -239,10 +239,6 @@ async function loadCallerTags(
 	return byWorkspaceId;
 }
 
-/**
- * Released desktop and mobile builds still read `presence`; it now lives in the realtime WorkspaceHub.
- * TODO(2026-10-26): drop `presence` from list and create once MINIMUM_DESKTOP_VERSION is past the release that stopped reading it.
- */
 const NO_PRESENCE: {
 	userId: string;
 	name: string;

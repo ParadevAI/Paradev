@@ -135,9 +135,6 @@ export function useTerminalBridge(
 		return () => subscription.remove();
 	}, [postToPage]);
 
-	// Seeded from the values above rather than a bare `true`, so the `ready`
-	// handshake reports the truth even if it somehow beats the effect below.
-	// Held in a ref so the handshake doesn't re-run on every change.
 	const visibleRef = useRef(screenFocused && appActive);
 
 	const fontScale = Math.min(useWindowDimensions().fontScale, MAX_FONT_SCALE);

@@ -1228,11 +1228,6 @@ const runtimeJs = /* js */ `
 	// so a remounted page starting at the live edge would otherwise leave RN
 	// holding whatever the previous terminal reported.
 	post({ type: "scroll", atBottom: atBottom });
-	// RN answers "ready" with the cached buffer for this session, if it has
-	// one. Dialling before that lands would attach with an empty buffer and
-	// pull the whole ring tail back down over content we already had. The
-	// timer is a backstop only: a lost answer must never leave the terminal
-	// sitting unattached.
 	startTimer = setTimeout(function () {
 		startTimer = null;
 		beginSession(null, null);

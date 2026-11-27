@@ -67,10 +67,6 @@ import {
 // branch syncs are event-driven via `GitWatcher.onChanged`; this is a
 // belt-and-braces backup, not the primary path.
 const SAFETY_NET_INTERVAL_MS = 5 * 60_000;
-// Long-cadence safety net for project-level PR refresh. Steady-state
-// refreshes are triggered by `syncOneWorkspace` whenever a workspace's
-// branch/HEAD/upstream changes. The 60s repo-PR cache deduplicates across
-// concurrent triggers.
 const PROJECT_REFRESH_INTERVAL_MS = 5 * 60_000;
 // Sweeps outlive this cache on purpose: they revalidate through ConditionalGh,
 // and a 304 costs no rate limit. Raising it past the sweep only makes PRs staler.
@@ -343,9 +339,6 @@ export class PullRequestRuntimeManager {
 			void this.enqueueWorkspaceSync(event.workspaceId);
 		});
 
-		// Long-cadence safety net for `GitWatcher` overflow / error paths, and —
-		// per the comment above — the primary (not just backup) sync path for
-		// any workspace nobody currently holds a live git-watch on.
 		this.safetyNetTimer = setInterval(() => {
 			void this.syncWorkspaceBranches();
 		}, SAFETY_NET_INTERVAL_MS);
@@ -354,13 +347,6 @@ export class PullRequestRuntimeManager {
 		}, PROJECT_REFRESH_INTERVAL_MS);
 	}
 
-	// A brand-new worktree is git-idle, so `GitWatcher` never fires for it and
-	// its row (NULL upstream/head) is invisible to PR matching until the 5-min
-	// safety net. Reacting to `created` closes that gap via the same coalesced
-	// sync path. Wired post-construction because app.ts builds the EventBus
-	// after this manager. Only `created`: renames/branch edits already arrive
-	// through GitWatcher, and this manager's own row writes bypass the store
-	// emitters, so syncing can't re-trigger itself.
 	subscribeToWorkspaceEvents(
 		eventBus: Pick<EventBus, "onWorkspaceChanged">,
 	): void {

@@ -245,7 +245,6 @@ export function RingtonesSettings({ visibleItems }: RingtonesSettingsProps) {
 				setPlayingId(null);
 			}
 
-			// Auto-reset after the ringtone's actual duration (with 500ms buffer)
 			const durationMs = ((ringtone.duration ?? 5) + 0.5) * 1000;
 			previewTimerRef.current = setTimeout(() => {
 				setPlayingId((current) => (current === ringtone.id ? null : current));

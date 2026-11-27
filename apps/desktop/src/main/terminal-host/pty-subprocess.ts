@@ -154,7 +154,6 @@ function maybeResumeStdin(): void {
 
 function queueWriteBuffer(buf: Buffer): void {
 	if (queuedBytes + buf.length > INPUT_QUEUE_HARD_LIMIT_BYTES) {
-		// This should never happen for normal pastes; avoid OOM if it does.
 		sendError("Input backlog exceeded hard limit");
 		return;
 	}
@@ -404,8 +403,6 @@ function handleKill(payload: Buffer): void {
 		}
 	});
 
-	// Step 2: Escalate to SIGKILL if still alive after 2 seconds
-	// node-pty's onExit callback may not fire reliably after pty.kill()
 	const escalationTimer = setTimeout(() => {
 		if (!ptyProcess) return; // Already exited via onExit
 
@@ -416,8 +413,6 @@ function handleKill(payload: Buffer): void {
 			}
 		});
 
-		// Step 3: Force completion if onExit still hasn't fired after another 1 second
-		// This ensures the subprocess exits even if node-pty never emits onExit
 		const forceExitTimer = setTimeout(() => {
 			if (!ptyProcess) return; // Finally exited via onExit
 

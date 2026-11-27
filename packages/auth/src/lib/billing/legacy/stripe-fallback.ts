@@ -12,11 +12,6 @@ export type StripeFallbackClient = {
 	>;
 };
 
-/**
- * @deprecated Stripe calls for subscribers Autumn does not manage yet, and the
- * cancel deep link Autumn's portal call cannot open.
- */
-// TODO(2027-01-31): drop with the shim, once released desktops are past the first build on /api/auth/autumn/*.
 export function stripeFallback(
 	stripe: StripeFallbackClient,
 	prices: { monthly: string; yearly: string },

@@ -162,7 +162,6 @@ class TreeKiller {
 			if (nextDelay === undefined) break;
 			await delay(nextDelay);
 		}
-		// Let the final volley's SIGKILLs land before declaring survivors.
 		await delay(300);
 		const finalTable = await readProcessTableAsync();
 		if (finalTable === null) {
@@ -263,10 +262,6 @@ class NodePtyAdapter implements Pty {
 				}
 			},
 		);
-		// The immediate capture races the child's setsid/login_tty (it may
-		// still show the daemon's own pgid — collect's current-pgid guard
-		// covers that — and no tty), so re-capture once the child has
-		// certainly run.
 		void this.killer.captureIdentity();
 		setTimeout(() => {
 			if (!this.exited) void this.killer.captureIdentity();
@@ -574,12 +569,6 @@ class AdoptedPty implements Pty {
 	resize(cols: number, rows: number): void {
 		validateDims(cols, rows);
 		this.meta = { ...this.meta, cols, rows };
-		// TIOCSWINSZ on the master fd is what node-pty does internally
-		// for non-adopted sessions; we don't have that native binding
-		// here. Workaround: spawn `stty` with the master fd as its
-		// stdin. stty(1) issues TIOCSWINSZ on its own stdin by default.
-		// One process spawn per resize — resize is rare (window-drag
-		// throttled by xterm.js), so this is fine.
 		try {
 			childProcess.spawnSync(
 				"stty",

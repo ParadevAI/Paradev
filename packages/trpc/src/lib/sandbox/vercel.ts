@@ -1036,7 +1036,6 @@ export async function readBuildCommand(args: {
 	return parseCommandState(await read.stdout());
 }
 
-// TODO: import ROOT_DISK_AGENTS_COMMAND from @superset/shared/sandbox/contract once #9911 merges.
 export const ROOT_DISK_AGENTS_COMMAND = `ls -d /opt/codex /opt/pdev ${SANDBOX_PATHS.media}/claude-* ${SANDBOX_PATHS.steps}/install-agent-clis.version 2>/dev/null || true`;
 
 /** The agent CLI paths on the box's own disk; empty when the disk is clean. */

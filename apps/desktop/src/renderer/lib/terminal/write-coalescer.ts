@@ -159,10 +159,6 @@ export function createWriteCoalescer(
 			write(batch, () => {
 				if (drained) return;
 				drained = true;
-				// Deferred, not immediate: the emulator invokes this from inside
-				// its parse loop and before it drops the batch from its own
-				// pending count, so writing here would both re-enter that loop
-				// and be measured against a count that still includes this batch.
 				queueMicrotask(onDrained);
 			});
 		} catch (error) {

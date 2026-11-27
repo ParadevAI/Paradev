@@ -57,7 +57,6 @@ export function FontNotFoundBanner({ fontFamily }: { fontFamily: string }) {
 		// Reset immediately so we don't show a stale banner while re-checking
 		setAvailable(null);
 
-		// Use rAF to ensure @font-face fonts have a chance to load
 		const raf = requestAnimationFrame(() => {
 			setAvailable(isFontInstalled(primaryFont));
 		});

@@ -513,10 +513,6 @@ function ProjectRow({
 				return {
 					kind: "error",
 					message: plan.message,
-					// Belt-and-suspenders: import-retry errors render as "Queued"
-					// during a batch, so this fires only for query retries there —
-					// but guard anyway so no future mapping can start a concurrent
-					// import mid-batch.
 					onRetry: () => {
 						if (disabled) return;
 						if (plan.retry === "import") {

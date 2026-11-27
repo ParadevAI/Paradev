@@ -94,12 +94,6 @@ export function sortRepositories<T extends { fullName: string }>(
 	);
 }
 
-/**
- * The repository a workspace opens on and whose Paradev config runs:
- * the environment's primary, or the first by name once that was removed from
- * GitHub. Multi-repository workspaces opening at the root, with a repository picker
- * in the sidebar, is a TODO recorded in the plan.
- */
 export function primaryRepository<T extends { id: string; fullName: string }>(
 	rows: readonly T[],
 	primaryRepositoryId: string | null | undefined,

@@ -225,5 +225,4 @@ export type {
 	ProjectNotSetupCause,
 	TeardownFailureCause,
 } from "./error-types";
-// INTERIM cross-runtime types via dist-types
 export type { AppRouter } from "./router";

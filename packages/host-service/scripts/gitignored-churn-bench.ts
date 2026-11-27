@@ -306,7 +306,6 @@ async function main(): Promise<void> {
 	gitStatusRefreshLimiter.clear();
 	eventBus.start();
 	await (gitWatcher as unknown as { rescan: () => Promise<void> }).rescan();
-	// Warm the worker and let attach-time git activity settle.
 	await runRefresh();
 	await new Promise((r) => setTimeout(r, 2_000));
 

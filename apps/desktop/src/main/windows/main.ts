@@ -109,9 +109,6 @@ export function initAppServices(): void {
 	});
 	createApplicationMenu();
 
-	// File → New Window (Cmd+N): open another window on the same org as the
-	// currently focused window. Per-window org independence arrives in a later
-	// milestone; for now a new window mirrors the current org.
 	menuEmitter.on("new-window", (payload?: { orgId?: string | null }) => {
 		// Prefer the org the caller passed (e.g. window.openNew, which captures the
 		// calling window deterministically). Fall back to the focused window's org

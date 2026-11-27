@@ -100,7 +100,6 @@ export const appRouter = createTRPCRouter({
 	userSettings: userSettingsRouter,
 	voice: voiceRouter,
 	workspaceMove: workspaceMoveRouter,
-	// TODO(2026-10-11): drop; desktops and phones before 1.29 call these names.
 	v2Host: {
 		list: hostManagementRouter.roster,
 		listMembers: hostManagementRouter.listMembers,

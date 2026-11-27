@@ -71,9 +71,6 @@ interface PrCommentThreadComment {
 interface PrCommentThreadMetadata {
 	kind: "thread";
 	threadId: string;
-	/** REST databaseId of a comment already in the thread — replies thread
-	 *  onto it regardless of which comment they target. Undefined only if
-	 *  GitHub ever returns a thread with zero comments (shouldn't happen). */
 	replyToCommentId?: number;
 	comments: PrCommentThreadComment[];
 	isResolved: boolean;

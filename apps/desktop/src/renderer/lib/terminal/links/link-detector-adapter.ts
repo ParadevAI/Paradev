@@ -175,7 +175,6 @@ export class LinkDetectorAdapter implements ILinkProvider {
 
 			if (!text.trim()) continue;
 
-			// Adjust to 1-based for xterm link API (matches VSCode's HACK comment)
 			const range = {
 				start: {
 					x: rangeCandidate.start.x + 1,

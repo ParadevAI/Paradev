@@ -99,8 +99,6 @@ export function loadAddons(
 			webglAddon.onAddTextureAtlasCanvas(() => {
 				if (++atlasPageAdds >= ATLAS_PAGE_ADDS_BEFORE_RESET) {
 					atlasPageAdds = 0;
-					// Defer: the event fires mid-glyph-draw; clearing synchronously
-					// would wipe the atlas under the in-flight rasterization.
 					queueMicrotask(() => webglAddon?.clearTextureAtlas());
 				}
 			});

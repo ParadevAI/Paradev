@@ -141,7 +141,6 @@ export function OpenRoles({ applyLabel, className = "" }: OpenRolesProps) {
 								}
 							};
 							patch();
-							// nested shadow roots aren't visible to the observer, so poll as a safety net
 							new MutationObserver(patch).observe(board.shadowRoot, { childList: true, subtree: true });
 							setInterval(patch, 500);
 						}

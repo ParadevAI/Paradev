@@ -146,7 +146,6 @@ export async function navigateToWorkspaceAndThen(
 		unsubscribe();
 		return;
 	}
-	// Animation-frame callbacks run before paint; a task gives paint a turn first.
 	requestAnimationFrame(() => {
 		setTimeout(async () => {
 			unsubscribe();

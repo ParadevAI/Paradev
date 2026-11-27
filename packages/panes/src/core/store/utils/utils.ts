@@ -59,7 +59,6 @@ export function removePaneFromLayout(
 	const newFirst = removePaneFromLayout(node.first, paneId);
 	const newSecond = removePaneFromLayout(node.second, paneId);
 
-	// Both removed (shouldn't happen in practice)
 	if (!newFirst && !newSecond) return null;
 	// Sibling promotion — one child removed, promote the other
 	if (!newFirst) return newSecond;

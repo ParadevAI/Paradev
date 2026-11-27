@@ -1,5 +1,3 @@
-// INTERIM: AppRouter comes from generated dist-types until the wire contract
-// moves to a neutral package.
 import type { AppRouter } from "@superset/host-service/router";
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { createTRPCClient, httpLink, type TRPCClient } from "@trpc/client";

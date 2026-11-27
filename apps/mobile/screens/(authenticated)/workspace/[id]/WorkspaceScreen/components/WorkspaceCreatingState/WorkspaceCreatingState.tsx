@@ -8,9 +8,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { AsciiSpinner } from "@/screens/(authenticated)/components/AsciiSpinner";
 
-// Synthetic timings, desktop's WorkspaceCreatingState trick: the create
-// streams no progress, so the first steps advance on a clock and the
-// worktree step holds until the row actually lands.
 const WORKTREE_TIMING = { stepDoneAtS: [2, 12], typicalSeconds: 25 };
 const SESSION_TIMING = { stepDoneAtS: [], typicalSeconds: 10 };
 const SLOW_HINT_AT_S = 60;

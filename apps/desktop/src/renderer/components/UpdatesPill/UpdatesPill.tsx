@@ -56,10 +56,6 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 
 	const status = event?.status;
 
-	// Drop the local installing state when the status moves off READY (e.g.
-	// dev-mode install emits IDLE, or an install error surfaces) — and as a
-	// safety net, when the install mutation itself fails at the IPC layer,
-	// which produces no status event.
 	useEffect(() => {
 		if (status !== AUTO_UPDATE_STATUS.READY || installMutation.isError) {
 			setIsInstalling(false);

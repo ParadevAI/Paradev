@@ -570,8 +570,6 @@ async function runEventBusScenario(
 
 	// Warm the worker and Git implementation before measuring watcher churn.
 	await Promise.all(workspaceIds.map((id) => runRefresh(id)));
-	// Let any watcher events caused by warm-up Git processes flush before the
-	// mock renderer attaches, so they cannot race the measurement counters.
 	await sleep(GIT_DIR_WARMUP_SETTLE_MS);
 	actualRefreshes = 0;
 	activeRefreshes = 0;
@@ -594,10 +592,6 @@ async function runEventBusScenario(
 			`event bus rejected ${busErrors.length} git:watch command(s): ${busErrors[0]}`,
 		);
 	}
-	// Let every watcher's async attach chain (DB lookup + `git rev-parse`
-	// subprocess) settle before measuring — otherwise that overhead bleeds
-	// into the steady-state window this profile exists to isolate. Mirrors
-	// gitignored-churn-bench.ts's settle after its own git:watch send.
 	await sleep(GIT_DIR_WARMUP_SETTLE_MS);
 	const stopEventLoopMonitor = startEventLoopMonitor();
 	const startedAt = performance.now();

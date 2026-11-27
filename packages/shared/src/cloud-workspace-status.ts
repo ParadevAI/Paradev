@@ -46,13 +46,6 @@ export type CloudWorkspaceFailureReason = z.infer<
 	typeof cloudWorkspaceFailureReasonEnum
 >;
 
-/**
- * Clients still accept `ready` and `deleted`, the old names of `awake` and
- * `archived`: the API sends them to builds below the legacy floors
- * (`client-status.ts` in packages/trpc), and new code can run under an old
- * version number (a mobile OTA update, a dev build). Nothing stores them.
- * TODO(SUPER-3018): drop the old names with the legacy status mapper.
- */
 export function isAwakeCloudWorkspaceStatus(
 	status: string | null | undefined,
 ): boolean {

@@ -112,7 +112,6 @@ export function AutomationBulkBar({
 				<>
 					<DropdownMenu
 						onOpenChange={(open) => {
-							// After the menu mounts and Radix places its own focus.
 							if (open) {
 								requestAnimationFrame(() =>
 									requestAnimationFrame(() => inputRef.current?.focus()),

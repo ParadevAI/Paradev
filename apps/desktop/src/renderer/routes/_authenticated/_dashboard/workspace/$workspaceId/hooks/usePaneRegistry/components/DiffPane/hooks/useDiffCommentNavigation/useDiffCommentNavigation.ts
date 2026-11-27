@@ -75,8 +75,6 @@ export function useDiffCommentNavigation({
 					behavior: "smooth-auto",
 				});
 			};
-			// A collapsed file has no body to land a line scroll in — expand it
-			// and give Pierre a frame to process the version bump first.
 			const file = fileByItemId.get(target.itemId);
 			const changeKey = file ? getChangesetFileKey(file) : null;
 			if (changeKey != null && collapsedSet.has(changeKey)) {

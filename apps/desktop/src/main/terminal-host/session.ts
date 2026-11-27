@@ -1064,7 +1064,6 @@ export class Session {
 		).then(() => {});
 	}
 
-	/** Includes PTY PID as safety net in case the shell was reparented after subprocess exit. */
 	private collectProcessPids(): number[] {
 		const pids: number[] = [];
 		if (this.subprocess?.pid) pids.push(this.subprocess.pid);

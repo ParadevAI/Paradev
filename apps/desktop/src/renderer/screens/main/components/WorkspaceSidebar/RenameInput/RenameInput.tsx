@@ -20,7 +20,6 @@ export function RenameInput({
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		// Delay to allow context menu to fully close
 		const timer = setTimeout(() => {
 			if (inputRef.current) {
 				inputRef.current.focus();

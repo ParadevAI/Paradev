@@ -34,8 +34,6 @@ const SYNCED_STRIPE_EVENTS = new Set([
 	"invoice.payment_failed",
 ]);
 
-/** @deprecated See withAutumnBilling. */
-// TODO(2027-01-31): drop with the shim.
 export function autumnBillingDeps(): AutumnBillingDeps {
 	const autumn = autumnClient;
 	return {

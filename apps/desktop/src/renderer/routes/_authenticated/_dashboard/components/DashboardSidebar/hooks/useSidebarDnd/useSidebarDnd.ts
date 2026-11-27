@@ -862,8 +862,6 @@ export function useSidebarDnd({
 							},
 						];
 					}),
-					// One drag pins at most one new workspace; the mutation drops
-					// any other not-yet-pinned id as a corrupted-state safety net.
 					{ allowNewWorkspaceId: workspaceId },
 				);
 				return;
@@ -1130,7 +1128,6 @@ export function useSidebarDnd({
 			disarm();
 		};
 		const onMouseUp = () => {
-			// The trailing click (if any) fires before this timeout runs.
 			setTimeout(disarm, 50);
 		};
 		const disarm = () => {

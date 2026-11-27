@@ -142,8 +142,6 @@ export function AgentsSettings({ initialAgentId }: AgentsSettingsProps = {}) {
 				await getHostServiceClientByUrl(
 					activeHostUrl,
 				).settings.agentConfigs.add.mutate(body);
-			// Safety net: re-run wrapper/hook setup so Add guarantees the hooks
-			// are wired even if boot setup failed or the wrapper was wiped.
 			setupAgentMutation.mutate(
 				{ agentId: preset.presetId },
 				{
