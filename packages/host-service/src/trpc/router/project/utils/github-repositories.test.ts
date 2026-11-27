@@ -56,6 +56,95 @@ test("loads every page in order, including an empty final page", async () => {
 	).toEqual(["page=1", "page=2", "page=3"]);
 });
 
+test.skipIf(!Bun.which("gh"))(
+	"real gh: a push between pages neither repeats nor drops a repository (#9139)",
+	async () => {
+		// A local stand-in for GitHub's user/repos that sorts like GitHub does.
+		const repositories = Array.from({ length: 250 }, (_, index) => ({
+			full_name: `owner/repo-${String(index).padStart(3, "0")}`,
+			clone_url: `https://github.com/owner/repo-${index}.git`,
+			updated_at: new Date(Date.UTC(2026, 0, 1) + (250 - index) * 60_000)
+				.toISOString()
+				.replace(".000", ""),
+		}));
+		const pushed = "owner/repo-150";
+		let pages = 0;
+		const server = Bun.serve({
+			hostname: "127.0.0.1",
+			port: 0,
+			fetch(request) {
+				const url = new URL(request.url);
+				const page = Number(url.searchParams.get("page") ?? 1);
+				const sorted = [...repositories].sort((a, b) =>
+					url.searchParams.get("sort") === "full_name"
+						? a.full_name.localeCompare(b.full_name)
+						: b.updated_at.localeCompare(a.updated_at),
+				);
+				const body = Response.json(sorted.slice((page - 1) * 100, page * 100));
+				// Someone pushes to a repository on page 2 right after page 1 is served.
+				if (++pages === 1) {
+					const target = repositories.find((row) => row.full_name === pushed);
+					if (target) target.updated_at = "2026-11-23T00:00:00Z";
+				}
+				return body;
+			},
+		});
+		const runGh: ExecGh = async (args, options) => {
+			const { stdout } = await execFileAsync(
+				Bun.which("gh") as string,
+				args.map((arg) =>
+					arg === "user/repos" ? `${server.url}user/repos` : arg,
+				),
+				{
+					encoding: "utf8",
+					timeout: 10_000,
+					...options,
+					env: { ...process.env, GH_TOKEN: "local-fixture-only" },
+				},
+			);
+			return JSON.parse(stdout);
+		};
+		try {
+			const names = (await listGitHubRepositories(runGh)).map(
+				(entry) => entry.fullName,
+			);
+			expect(names).toHaveLength(250);
+			expect(new Set(names).size).toBe(250);
+			// The pushed repository is listed, and first, as the newest update.
+			expect(names[0]).toBe(pushed);
+			expect(names.slice(1, 3)).toEqual(["owner/repo-000", "owner/repo-001"]);
+		} finally {
+			await server.stop(true);
+		}
+	},
+	30_000,
+);
+
+test("lists a repository once even if two pages both return it", async () => {
+	const pages = [
+		Array.from({ length: 100 }, (_, index) => ({
+			full_name: `owner/repo-${index}`,
+			clone_url: `https://github.com/owner/repo-${index}.git`,
+		})),
+		[
+			{
+				full_name: "owner/repo-99",
+				clone_url: "https://github.com/owner/repo-99.git",
+			},
+			{
+				full_name: "owner/repo-100",
+				clone_url: "https://github.com/owner/repo-100.git",
+			},
+		],
+	];
+	let page = 0;
+	const result = await listGitHubRepositories(async () => pages[page++] ?? []);
+	const names = result.map((entry) => entry.fullName);
+	expect(names).toHaveLength(101);
+	expect(new Set(names).size).toBe(101);
+	expect(names.at(-1)).toBe("owner/repo-100");
+});
+
 test("rejects invalid clone URLs on later pages instead of returning partial results", async () => {
 	let page = 0;
 	await expect(
@@ -274,7 +363,8 @@ test.skipIf(!Bun.which("gh"))(
 				expect(request.pathname).toBe("/user/repos");
 				expect(Object.fromEntries(request.searchParams)).toEqual({
 					affiliation: "owner,collaborator,organization_member",
-					sort: "updated",
+					sort: "full_name",
+					direction: "asc",
 					per_page: "100",
 					page: String(index + 1),
 				});

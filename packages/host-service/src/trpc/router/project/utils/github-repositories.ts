@@ -5,14 +5,41 @@ import { type ExecGh, execGh } from "../../workspace-creation/utils/exec-gh";
 const githubRepositorySchema = z.object({
 	full_name: z.string(),
 	clone_url: z.string().url(),
+	updated_at: z.string().nullish(),
 });
 
+type GitHubRepositoryRow = z.infer<typeof githubRepositorySchema>;
+
+function parseGitHubRepositoryRows(raw: unknown): GitHubRepositoryRow[] {
+	return z.array(z.array(githubRepositorySchema)).parse(raw).flat();
+}
+
 export function parseGitHubRepositories(raw: unknown) {
-	const pages = z.array(z.array(githubRepositorySchema)).parse(raw);
-	return pages.flat().map((repository) => ({
+	return parseGitHubRepositoryRows(raw).map((repository) => ({
 		fullName: repository.full_name,
 		cloneUrl: repository.clone_url,
 	}));
+}
+
+/**
+ * Most recently updated first, like GitHub's `sort=updated`, with one row per
+ * repository. Rows without a time keep their relative order at the end.
+ */
+function orderByRecentUpdate(rows: GitHubRepositoryRow[]) {
+	const seen = new Set<string>();
+	const unique = rows.filter((row) => {
+		if (seen.has(row.full_name)) return false;
+		seen.add(row.full_name);
+		return true;
+	});
+	const time = (row: GitHubRepositoryRow) => {
+		const ms = row.updated_at ? Date.parse(row.updated_at) : Number.NaN;
+		return Number.isNaN(ms) ? Number.NEGATIVE_INFINITY : ms;
+	};
+	return unique
+		.map((row, index) => ({ row, index, at: time(row) }))
+		.sort((a, b) => b.at - a.at || a.index - b.index)
+		.map(({ row }) => ({ fullName: row.full_name, cloneUrl: row.clone_url }));
 }
 
 const TIMEOUT_MESSAGE =
@@ -27,7 +54,7 @@ export async function listGitHubRepositories(
 		rejectOnAbort = () => reject(signal.reason);
 	});
 	signal.addEventListener("abort", rejectOnAbort, { once: true });
-	const repositories: ReturnType<typeof parseGitHubRepositories> = [];
+	const rows: GitHubRepositoryRow[] = [];
 	try {
 		for (let page = 1; ; page++) {
 			signal.throwIfAborted();
@@ -40,22 +67,27 @@ export async function listGitHubRepositories(
 						"user/repos",
 						"-f",
 						"affiliation=owner,collaborator,organization_member",
+						// Page in an order a push can't change. With `sort=updated`, a push
+						// mid-walk moves a repository to page 1, so later pages repeat one
+						// row and skip the moved repository. Recency is restored below.
 						"-f",
-						"sort=updated",
+						"sort=full_name",
+						"-f",
+						"direction=asc",
 						"-f",
 						"per_page=100",
 						"-f",
 						`page=${page}`,
 						"--jq",
-						"map({full_name, clone_url})",
+						"map({full_name, clone_url, updated_at})",
 					],
 					{ signal },
 				),
 				aborted,
 			]);
-			const entries = parseGitHubRepositories([raw]);
-			repositories.push(...entries);
-			if (entries.length < 100) return repositories;
+			const entries = parseGitHubRepositoryRows([raw]);
+			rows.push(...entries);
+			if (entries.length < 100) return orderByRecentUpdate(rows);
 		}
 	} catch (error) {
 		const failure = error instanceof Error ? error : new Error(String(error));
