@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { builtInThemes, darkTheme, lightTheme } from "./built-in";
 import { getEditorTheme } from "./editor-theme";
+import { fromT3Skin } from "./t3-skin";
 import { getDefaultTerminalColors, type Theme } from "./types";
 
 export const MAX_THEME_CSS_LENGTH = 64 * 1024;
@@ -182,7 +183,7 @@ function parseThemeEntry(
 	entry: unknown,
 	index: number,
 ): { ok: true; theme: Theme } | { ok: false; issue: string } {
-	const parsedEntry = themeConfigSchema.safeParse(entry);
+	const parsedEntry = themeConfigSchema.safeParse(fromT3Skin(entry) ?? entry);
 	if (!parsedEntry.success) {
 		const issue = parsedEntry.error.issues[0]?.message ?? "Invalid theme shape";
 		return { ok: false, issue: `Theme ${index + 1}: ${issue}` };
