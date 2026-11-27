@@ -36,6 +36,7 @@ import supersetIcon from "./superset.svg";
 import ufoIcon from "./ufo.svg";
 import ufoWhiteIcon from "./ufo-white.svg";
 import vibeIcon from "./vibe.svg";
+import wallyIcon from "./wally.svg";
 
 export interface PresetIconSet {
 	light: string;
@@ -69,6 +70,7 @@ export const PRESET_ICONS: Record<string, PresetIconSet> = {
 	muse: { light: museIcon, dark: museWhiteIcon },
 	opencode: { light: opencodeIcon, dark: opencodeWhiteIcon },
 	vibe: { light: vibeIcon, dark: vibeIcon },
+	wally: { light: wallyIcon, dark: wallyIcon },
 };
 
 /** True when a value is an inline `data:` image URI rather than a preset key. */
@@ -127,4 +129,5 @@ export {
 	ufoIcon,
 	ufoWhiteIcon,
 	vibeIcon,
+	wallyIcon,
 };
