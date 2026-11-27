@@ -4,6 +4,18 @@ import { CONSENT_REGION_COOKIE, type ConsentRegion } from "./consent-region";
 export type ConsentChoice = "accepted" | "declined";
 
 const CONSENT_CHANGE_EVENT = "paradev:consent-change";
+const TRACKER_LOADED_KEY = Symbol.for("paradev.trackerLoaded");
+
+type TrackerWindow = Window & { [TRACKER_LOADED_KEY]?: true };
+
+/** Records that a tracker has loaded in this document, which only a reload undoes. */
+export function markTrackerLoaded(): void {
+	(window as TrackerWindow)[TRACKER_LOADED_KEY] = true;
+}
+
+export function hasLoadedTracker(): boolean {
+	return (window as TrackerWindow)[TRACKER_LOADED_KEY] === true;
+}
 
 export function mayTrack(
 	region: ConsentRegion,

@@ -5,6 +5,7 @@ import Script from "next/script";
 import { useEffect } from "react";
 
 import { useCanTrack } from "@/hooks/useCanTrack";
+import { markTrackerLoaded } from "@/lib/analytics/consent";
 import {
 	installExternalTrackingConsentGuard,
 	trackExternalPageView,
@@ -30,6 +31,10 @@ export function ExternalTracking() {
 		window.addEventListener("storage", onStorage);
 		return () => window.removeEventListener("storage", onStorage);
 	}, []);
+
+	useEffect(() => {
+		if (enabled) markTrackerLoaded();
+	}, [enabled]);
 
 	useEffect(() => {
 		if (

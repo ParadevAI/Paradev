@@ -1,8 +1,10 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
+import type { PostHog } from "posthog-js";
 
 import { env } from "@/env";
-import { canTrack, onConsentChange } from "@/lib/analytics/consent";
+import { onConsentChange } from "@/lib/analytics/consent";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
+import { createPosthogStarter } from "@/lib/analytics/posthog-start";
 
 // posthog-js and @sentry/nextjs together add ~200KiB to the initial bundle,
 // which tanks the Lighthouse LCP on throttled mobile. Both are dynamically
@@ -14,13 +16,8 @@ type SentryClient = typeof import("@sentry/nextjs");
 
 let sentryClient: SentryClient | null = null;
 let started = false;
-let posthogStarted = false;
 
-async function initPosthog() {
-	if (posthogStarted || !canTrack()) return;
-	posthogStarted = true;
-	const { default: posthog } = await import("posthog-js");
-
+function startPosthog(posthog: PostHog) {
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 		api_host: "/ingest",
 		ui_host: "https://us.posthog.com",
@@ -49,6 +46,11 @@ async function initPosthog() {
 
 	setPosthogInstance(posthog);
 }
+
+const initPosthog = createPosthogStarter(
+	async () => (await import("posthog-js")).default,
+	startPosthog,
+);
 
 async function initSentry() {
 	const [Sentry, { SENTRY_DENY_URLS, SENTRY_IGNORE_ERRORS }] =

@@ -1,5 +1,8 @@
 import type { PostHog } from "posthog-js";
 
+import { hasLoadedTracker, saveConsentChoice } from "./consent";
+import { withPosthog } from "./lazy";
+
 /**
  * The PostHog cookie is shared with app.superset.sh, which identifies the
  * visitor at sign-in. A visitor who declined gets a fresh anonymous id, so
@@ -14,4 +17,13 @@ export function declineAnalytics(
 		posthog.reset(true);
 	}
 	posthog.opt_out_capturing();
+}
+
+/** Loaded trackers have no teardown API; a reload discards them. */
+export function declineTracking(
+	reload: () => void = () => window.location.reload(),
+): void {
+	withPosthog(declineAnalytics);
+	saveConsentChoice("declined");
+	if (hasLoadedTracker()) reload();
 }

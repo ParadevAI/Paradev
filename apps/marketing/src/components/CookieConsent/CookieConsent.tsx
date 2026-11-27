@@ -8,13 +8,12 @@ import { useEffect, useState } from "react";
 
 import {
 	type ConsentChoice,
-	canTrack,
 	readConsentChoice,
 	readConsentRegion,
 	saveConsentChoice,
 } from "@/lib/analytics/consent";
 import type { ConsentRegion } from "@/lib/analytics/consent-region";
-import { declineAnalytics } from "@/lib/analytics/decline";
+import { declineTracking } from "@/lib/analytics/decline";
 import { withPosthog } from "@/lib/analytics/lazy";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "./constants";
 
@@ -45,12 +44,8 @@ export function CookieConsent() {
 	};
 
 	const handleDecline = () => {
-		const wasTracking = canTrack();
-		withPosthog(declineAnalytics);
-		saveConsentChoice("declined");
+		declineTracking();
 		setShowBanner(false);
-		// Loaded trackers have no teardown API; a reload discards them.
-		if (wasTracking) window.location.reload();
 	};
 
 	return (
