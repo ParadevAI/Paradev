@@ -22,6 +22,10 @@ import {
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import {
+	normalizeAuthorFilter,
+	normalizeAuthorFilters,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeAuthorFilter/normalizeAuthorFilter";
+import {
 	normalizeGithubLogin,
 	normalizeGithubLogins,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/normalizeGithubLogins";
@@ -141,7 +145,11 @@ export function PullRequestUserFilter({
 		return list.filter((c) => c.login.toLowerCase().includes(q));
 	}, [contributors, search, selected]);
 
-	const normalizedSearch = normalizeGithubLogin(search)?.toLowerCase() ?? null;
+	const normalizedSearch =
+		(kind === "author"
+			? normalizeAuthorFilter(search)
+			: normalizeGithubLogin(search)
+		)?.toLowerCase() ?? null;
 	const showCustomOption =
 		!!normalizedSearch &&
 		!filtered.some((c) => c.login.toLowerCase() === normalizedSearch);
@@ -160,7 +168,11 @@ export function PullRequestUserFilter({
 							(entry) => entry.toLowerCase() !== login.toLowerCase(),
 						)
 					: [...selected, login];
-		onChange(normalizeGithubLogins(next.join(",")));
+		onChange(
+			kind === "author"
+				? normalizeAuthorFilters(next.join(","))
+				: normalizeGithubLogins(next.join(",")),
+		);
 		setSearch("");
 	};
 
