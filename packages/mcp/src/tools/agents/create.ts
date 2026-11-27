@@ -12,7 +12,7 @@ export function register(server: McpServer): void {
 		title: "Launch agent",
 		annotations: {
 			readOnlyHint: false,
-			destructiveHint: true,
+			destructiveHint: false,
 			openWorldHint: true,
 		},
 		description:

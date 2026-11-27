@@ -48,7 +48,7 @@ export function register(server: McpServer): void {
 		title: "Create workspace",
 		annotations: {
 			readOnlyHint: false,
-			destructiveHint: true,
+			destructiveHint: false,
 			openWorldHint: true,
 		},
 		description:

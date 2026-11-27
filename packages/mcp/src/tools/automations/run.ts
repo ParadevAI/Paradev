@@ -9,7 +9,7 @@ export function register(server: McpServer): void {
 		title: "Run automation",
 		annotations: {
 			readOnlyHint: false,
-			destructiveHint: true,
+			destructiveHint: false,
 			openWorldHint: true,
 		},
 		description:
