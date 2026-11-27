@@ -17,6 +17,10 @@ import {
 } from "./agent-models";
 import { BUILTIN_TERMINAL_AGENT_TYPES } from "./builtin-terminal-agents";
 
+const opencodeModelEnv = (model: string) => ({
+	OPENCODE_CONFIG_CONTENT: JSON.stringify({ model }),
+});
+
 describe("AGENT_MODEL_SUPPORT", () => {
 	it("only references builtin presets (or the superset chat agent)", () => {
 		const validIds = new Set<string>([
@@ -150,13 +154,17 @@ describe("buildAgentModelArgs", () => {
 	});
 
 	it("passes an unlisted id to an agent that lists its own models", () => {
-		for (const presetId of ["codex", "opencode", "cursor-agent"]) {
+		for (const presetId of ["codex", "cursor-agent"]) {
 			expect(buildAgentModelArgs(presetId, "vendor/new-model")).toEqual([
 				"--model",
 				"vendor/new-model",
 			]);
 			expect(buildAgentModelArgs(presetId, "bad id")).toEqual([]);
 		}
+		expect(buildAgentModelEnv("opencode", "vendor/new-model")).toEqual(
+			opencodeModelEnv("vendor/new-model"),
+		);
+		expect(buildAgentModelEnv("opencode", "bad id")).toEqual({});
 	});
 
 	it("passes a pinned legacy claude model through to the CLI flag", () => {
@@ -195,8 +203,8 @@ describe("buildAgentModelArgs", () => {
 		expect(
 			buildAgentModelArgs("cursor-agent", "claude-fable-5-1-thinking-high"),
 		).toEqual(["--model", "claude-fable-5-1-thinking-high"]);
-		expect(buildAgentModelArgs("opencode", "anthropic/claude-fable-5")).toEqual(
-			["--model", "anthropic/claude-fable-5"],
+		expect(buildAgentModelEnv("opencode", "anthropic/claude-fable-5")).toEqual(
+			opencodeModelEnv("anthropic/claude-fable-5"),
 		);
 	});
 
@@ -205,11 +213,13 @@ describe("buildAgentModelArgs", () => {
 			"--model",
 			"claude-fable-5-1",
 		]);
-		for (const preset of ["opencode", "omp"]) {
-			expect(buildAgentModelArgs(preset, "anthropic/claude-fable-5-1")).toEqual(
-				["--model", "anthropic/claude-fable-5-1"],
-			);
-		}
+		expect(buildAgentModelArgs("omp", "anthropic/claude-fable-5-1")).toEqual([
+			"--model",
+			"anthropic/claude-fable-5-1",
+		]);
+		expect(
+			buildAgentModelEnv("opencode", "anthropic/claude-fable-5-1"),
+		).toEqual(opencodeModelEnv("anthropic/claude-fable-5-1"));
 	});
 
 	it("offers fable 5.2 in omp, whose catalog already lists it", () => {
@@ -259,10 +269,9 @@ describe("buildAgentModelArgs", () => {
 			"openai/gpt-5.6-terra",
 			"openai/gpt-5.6-luna",
 		]) {
-			expect(buildAgentModelArgs("opencode", model)).toEqual([
-				"--model",
-				model,
-			]);
+			expect(buildAgentModelEnv("opencode", model)).toEqual(
+				opencodeModelEnv(model),
+			);
 		}
 	});
 
@@ -434,10 +443,9 @@ describe("buildAgentEffortArgs", () => {
 			"openai/gpt-6.2-astra",
 			"openai/gpt-6.2-sol",
 		]) {
-			expect(buildAgentModelArgs("opencode", model)).toEqual([
-				"--model",
-				model,
-			]);
+			expect(buildAgentModelEnv("opencode", model)).toEqual(
+				opencodeModelEnv(model),
+			);
 		}
 		expect(buildAgentModelArgs("copilot", "claude-fable-5.2")).toEqual([
 			"--model",
@@ -708,6 +716,17 @@ describe("buildAgentModelEnv (vibe)", () => {
 	});
 });
 
+describe("buildAgentModelEnv (opencode)", () => {
+	it("selects the model through a config overlay, not --model", () => {
+		expect(
+			buildAgentModelArgs("opencode", "anthropic/claude-opus-5-5"),
+		).toEqual([]);
+		expect(buildAgentModelEnv("opencode", "anthropic/claude-opus-5-5")).toEqual(
+			{ OPENCODE_CONFIG_CONTENT: '{"model":"anthropic/claude-opus-5-5"}' },
+		);
+	});
+});
+
 describe("September 2026 model launches", () => {
 	it.each([
 		["claude", "claude-opus-5-5"],
@@ -723,16 +742,24 @@ describe("September 2026 model launches", () => {
 		["copilot", "gpt-6-luna"],
 		["gemini", "gemini-3.8-flash"],
 		["gemini", "gemini-3.1-pro-preview"],
-		["opencode", "anthropic/claude-opus-5-5"],
-		["opencode", "anthropic/claude-sonnet-5-5"],
-		["opencode", "anthropic/claude-sonnet-5"],
-		["opencode", "google/gemini-3.8-flash"],
 		["omp", "anthropic/claude-opus-5-5"],
 		["omp", "anthropic/claude-sonnet-5-5"],
 		["omp", "anthropic/claude-sonnet-5"],
 	])("launches %s with its exact model id %s", (preset, model) => {
 		expect(isCuratedAgentModel(preset, model)).toBe(true);
 		expect(buildAgentModelArgs(preset, model)).toEqual(["--model", model]);
+	});
+
+	it.each([
+		"anthropic/claude-opus-5-5",
+		"anthropic/claude-sonnet-5-5",
+		"anthropic/claude-sonnet-5",
+		"google/gemini-3.8-flash",
+	])("launches opencode with its exact model id %s", (model) => {
+		expect(isCuratedAgentModel("opencode", model)).toBe(true);
+		expect(buildAgentModelEnv("opencode", model)).toEqual(
+			opencodeModelEnv(model),
+		);
 	});
 
 	it("keeps Copilot's dotted ids separate from Anthropic's ids", () => {
