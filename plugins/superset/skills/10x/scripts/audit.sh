@@ -3,8 +3,12 @@
 # Emits one JSON object on stdout; progress and errors go to stderr.
 set -u
 
-if ! command -v superset >/dev/null 2>&1; then
-  echo "superset CLI not found on PATH; install with: curl -fsSL https://paradev.com/cli/install.sh | sh" >&2
+if command -v paradev >/dev/null 2>&1; then
+  CLI=paradev
+elif command -v superset >/dev/null 2>&1; then
+  CLI=superset
+else
+  echo "paradev CLI not found on PATH; install with: curl -fsSL https://paradev.com/cli/install.sh | sh" >&2
   exit 1
 fi
 if ! command -v jq >/dev/null 2>&1; then
@@ -12,7 +16,7 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-# Writes a superset command's JSON to $DIR/<key>.json, or null with the error on stderr.
+# Writes a CLI command's JSON to $DIR/<key>.json, or null with the error on stderr.
 # stdout goes to a file, not a pipe: the CLI can drop output past ~64KB when it
 # exits before a slow pipe reader drains it. Files, not --argjson: a large
 # account's lists overflow the argument limit.
@@ -22,13 +26,13 @@ run_json() {
   local key=$1 err
   shift
   err=$(mktemp) || { echo null >"$DIR/$key.json"; return; }
-  if superset "$@" --json >"$DIR/$key.json" 2>"$err"; then
+  if "$CLI" "$@" --json >"$DIR/$key.json" 2>"$err"; then
     if ! jq -e '.' "$DIR/$key.json" >/dev/null 2>&1; then
-      echo "invalid JSON from: superset $*" >&2
+      echo "invalid JSON from: $CLI $*" >&2
       echo null >"$DIR/$key.json"
     fi
   else
-    echo "failed: superset $* ($(tr '\n' ' ' <"$err"))" >&2
+    echo "failed: $CLI $* ($(tr '\n' ' ' <"$err"))" >&2
     echo null >"$DIR/$key.json"
   fi
   rm -f "$err"

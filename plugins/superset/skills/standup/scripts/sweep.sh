@@ -14,8 +14,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if ! command -v superset >/dev/null 2>&1; then
-  echo "superset CLI not found on PATH; install with: curl -fsSL https://paradev.com/cli/install.sh | sh" >&2
+if command -v paradev >/dev/null 2>&1; then
+  CLI=paradev
+elif command -v superset >/dev/null 2>&1; then
+  CLI=superset
+else
+  echo "paradev CLI not found on PATH; install with: curl -fsSL https://paradev.com/cli/install.sh | sh" >&2
   exit 1
 fi
 if ! command -v jq >/dev/null 2>&1; then
@@ -23,20 +27,20 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-# Runs a superset command and prints its JSON, or null with the error on stderr.
+# Runs a CLI command and prints its JSON, or null with the error on stderr.
 # stdout goes to a file, not a pipe: the CLI can drop output past ~64KB when it
 # exits before a slow pipe reader drains it.
 run_json() {
   local out err
   out=$(mktemp) || { echo null; return; }
   err=$(mktemp) || { rm -f "$out"; echo null; return; }
-  if superset "$@" --json >"$out" 2>"$err"; then
+  if "$CLI" "$@" --json >"$out" 2>"$err"; then
     if ! jq -c '.' "$out" 2>/dev/null; then
-      echo "invalid JSON from: superset $*" >&2
+      echo "invalid JSON from: $CLI $*" >&2
       echo null
     fi
   else
-    echo "failed: superset $* ($(tr '\n' ' ' <"$err"))" >&2
+    echo "failed: $CLI $* ($(tr '\n' ' ' <"$err"))" >&2
     echo null
   fi
   rm -f "$out" "$err"

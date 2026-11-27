@@ -1,7 +1,7 @@
 ---
 description: "Manage a single Paradev automation: edit its prompt in $EDITOR, view recent runs, or trigger a one-off run."
 argument-hint: "<id-or-slug> [edit | logs | run] (default: edit)"
-allowed-tools: Bash(superset:*), Bash(mktemp:*), Bash(${EDITOR}:*), Bash(${VISUAL}:*), Bash(vi:*), Bash(vim:*), Bash(nano:*), Bash(jq:*), AskUserQuestion
+allowed-tools: Bash(superset:*), Bash(paradev:*), Bash(mktemp:*), Bash(${EDITOR}:*), Bash(${VISUAL}:*), Bash(vi:*), Bash(vim:*), Bash(nano:*), Bash(jq:*), AskUserQuestion
 ---
 
 You are operating on a single Paradev automation.
@@ -10,10 +10,10 @@ You are operating on a single Paradev automation.
 
 Take `$ARGUMENTS` as `<id-or-slug> [action]`.
 
-- If `<id-or-slug>` is missing, ask the user via `AskUserQuestion`. Optionally call `superset automations list --json | jq -r '.[] | "\(.slug)\t\(.name)"'` and present recent automations as choices.
+- If `<id-or-slug>` is missing, ask the user via `AskUserQuestion`. Optionally call `paradev automations list --json | jq -r '.[] | "\(.slug)\t\(.name)"'` and present recent automations as choices.
 - If `[action]` is missing, default to `edit`.
 
-The CLI is required for all actions below; there's no MCP equivalent for the editor round-trip, and the run/logs flows benefit from CLI's argument parsing. If `superset` isn't on PATH, tell the user to install it: `curl -fsSL https://paradev.com/cli/install.sh | sh`.
+The CLI is required for all actions below; there's no MCP equivalent for the editor round-trip, and the run/logs flows benefit from CLI's argument parsing. If `paradev` is not found, run the same command as `superset`, or update the CLI. If neither is on PATH, tell the user to install it: `curl -fsSL https://paradev.com/cli/install.sh | sh`.
 
 ## Dispatch
 
@@ -22,7 +22,7 @@ The CLI is required for all actions below; there's no MCP equivalent for the edi
 ```bash
 ID="<id-or-slug>"
 TMP=$(mktemp -t superset-prompt.XXXXXX.md)
-superset automations prompt get "$ID" --json | jq -j .prompt > "$TMP"
+paradev automations prompt get "$ID" --json | jq -j .prompt > "$TMP"
 ${EDITOR:-${VISUAL:-vi}} "$TMP"
 
 if [ ! -s "$TMP" ]; then
@@ -31,7 +31,7 @@ if [ ! -s "$TMP" ]; then
   exit 1
 fi
 
-superset automations prompt set "$ID" --from-file "$TMP"
+paradev automations prompt set "$ID" --from-file "$TMP"
 rm -f "$TMP"
 ```
 
@@ -40,7 +40,7 @@ rm -f "$TMP"
 ### `logs`: show recent runs
 
 ```bash
-superset automations logs "<id-or-slug>" --limit 20 --json
+paradev automations logs "<id-or-slug>" --limit 20 --json
 ```
 
 Render as a table: RUN ID, STATUS, SCHEDULED, DISPATCHED, HOST. Statuses to know:
@@ -51,7 +51,7 @@ Render as a table: RUN ID, STATUS, SCHEDULED, DISPATCHED, HOST. Statuses to know
 ### `run`: one-off run now
 
 ```bash
-superset automations run "<id-or-slug>" --json
+paradev automations run "<id-or-slug>" --json
 ```
 
 Print the new run id and tell the user to use `/superset-automation <id> logs` (or just ask) to inspect the result.

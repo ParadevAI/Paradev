@@ -6,8 +6,8 @@ tasks, schedule automations, publish pages, and lay out panes in the desktop app
 
 ## Sign in
 
-The skills need the `paradev` CLI on your `PATH`. `superset` is an alias for the same binary,
-and the skills call it by either name.
+The skills need the `paradev` CLI on your `PATH`. `superset` is an alias for the same binary.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
 ```bash
 curl -fsSL https://paradev.com/cli/install.sh | sh
