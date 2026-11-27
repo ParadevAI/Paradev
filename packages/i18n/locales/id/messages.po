@@ -17811,10 +17811,10 @@ msgid "Scheduled automations"
 msgstr "Otomatisasi terjadwal"
 
 msgid "Scheduled tasks and workflows. Create them again as automations"
-msgstr "Tugas terjadwal dan workflow. Buat lagi sebagai otomatisasi"
+msgstr "Tugas terjadwal dan alur kerja. Buat lagi sebagai otomatisasi"
 
 msgid "Scheduled tasks, webhook tasks, and workflows"
-msgstr "Tugas terjadwal, tugas webhook, dan workflow"
+msgstr "Tugas terjadwal, tugas webhook, dan alur kerja"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "Jadwal harus berulang — hapus COUNT atau UNTIL."
