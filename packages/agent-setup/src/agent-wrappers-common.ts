@@ -219,6 +219,23 @@ fi
 `;
 }
 
+/**
+ * Shell block that re-enters `$PWD` when the working directory went stale.
+ * A worktree on an external or network volume that was unmounted and mounted
+ * again is a new directory at the same path: the terminal's shell still holds
+ * the old one, so the agent's first getcwd fails ("The current directory no
+ * longer exists") although the path is back. bash keeps the inherited
+ * `$PWD` when its own getcwd fails, so that is the path to return to. A
+ * directory that is really gone is left alone for the agent to report.
+ */
+export function buildStaleCwdRecovery(): string {
+	return `if ! pwd -P >/dev/null 2>&1 && [ -n "$PWD" ] && [ -d "$PWD" ]; then
+  cd -- "$PWD" 2>/dev/null || true
+fi
+
+`;
+}
+
 function getMissingBinaryMessage(name: string): string {
 	return `Paradev: ${name} not found in PATH. Install it and ensure it is on PATH, then retry.`;
 }
@@ -301,7 +318,7 @@ ${buildLaunchReportBlock()}fi
 ${WRAPPER_MARKER}
 # Superset wrapper for ${binaryName}
 
-${buildLoopGuard(binaryName)}${buildRealBinaryResolver()}
+${buildStaleCwdRecovery()}${buildLoopGuard(binaryName)}${buildRealBinaryResolver()}
 REAL_BIN="$(find_real_binary "${binaryName}")"
 if [ -z "$REAL_BIN" ]; then
   echo "${getMissingBinaryMessage(binaryName)}" >&2
