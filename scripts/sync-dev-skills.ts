@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Sync this worktree's `plugins/superset` into a dev-only Claude Code plugin at
+ * Sync this worktree's `plugins/paradev` into a dev-only Claude Code plugin at
  * ~/.claude/skills/superset-dev so you can test in-development skills without
  * colliding with the installed prod `superset@superset` plugin (which owns the
  * name "superset" and takes precedence). Skills load as `/superset-dev:<skill>`.
@@ -33,7 +33,7 @@ function repoRoot(): string {
 }
 
 const root = repoRoot();
-const src = join(root, "plugins", "superset");
+const src = join(root, "plugins", "paradev");
 if (!existsSync(src)) {
 	console.error(`[sync-dev-skills] no plugin at ${src}`);
 	process.exit(1);

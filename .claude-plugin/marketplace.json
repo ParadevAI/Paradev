@@ -7,7 +7,7 @@
 	"plugins": [
 		{
 			"name": "superset",
-			"source": "./plugins/superset",
+			"source": "./plugins/paradev",
 			"description": "Use Paradev (formerly Superset) to spawn agents, create workspaces, manage tasks, and schedule automations from Claude Code."
 		}
 	]

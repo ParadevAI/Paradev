@@ -475,7 +475,7 @@ async function main(): Promise<void> {
 		{ recursive: true },
 	);
 	cpSync(
-		resolve(import.meta.dir, "../../../plugins/superset"),
+		resolve(import.meta.dir, "../../../plugins/paradev"),
 		join(agentTemplatesDest, "plugin"),
 		{ recursive: true },
 	);

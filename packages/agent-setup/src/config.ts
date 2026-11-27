@@ -45,8 +45,8 @@ export function getBundledPluginDir(): string {
 	const bundled = path.join(getAgentSetupTemplatesDir(), "plugin");
 	if (fs.existsSync(path.join(bundled, "skills"))) return bundled;
 	for (const candidate of [
-		path.join(getBundledMarketplaceDir(), "superset"),
-		path.join(repoPluginsDir(), "superset"),
+		path.join(getBundledMarketplaceDir(), "paradev"),
+		path.join(repoPluginsDir(), "paradev"),
 	]) {
 		if (fs.existsSync(path.join(candidate, "skills"))) return candidate;
 	}
@@ -55,7 +55,7 @@ export function getBundledPluginDir(): string {
 
 /**
  * Every installable first-party tree. Only the sandbox tarball overlays it at
- * templates/plugins — the desktop and the CLI ship `superset` alone — so
+ * templates/plugins — the desktop and the CLI ship `paradev` alone — so
  * outside host-service this falls back to the repo and exists only from source.
  */
 export function getBundledMarketplaceDir(): string {
