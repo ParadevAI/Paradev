@@ -121,7 +121,7 @@ describe("sessions commands", () => {
 			print: true,
 		})) as { message: string };
 		expect(result.message).toBe(
-			`superset://v2-workspace/${WORKSPACE_ID}?sessionId=${SESSION_ID}`,
+			`paradev://v2-workspace/${WORKSPACE_ID}?sessionId=${SESSION_ID}`,
 		);
 
 		await expect(

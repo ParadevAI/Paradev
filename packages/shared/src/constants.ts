@@ -25,10 +25,12 @@ export const PROTOCOL_SCHEMES = {
 	PROD: "superset",
 } as const;
 
-/** Released builds without `paradev` ignore those links, so links still use `PROTOCOL_SCHEMES.PROD`. */
+/** Desktop builds before 2.0.12 ignore links on this scheme. */
+export const LINK_PROTOCOL_SCHEME = "paradev";
+
 export const ACCEPTED_PROTOCOL_SCHEMES = [
 	PROTOCOL_SCHEMES.PROD,
-	"paradev",
+	LINK_PROTOCOL_SCHEME,
 ] as const;
 
 // Company
