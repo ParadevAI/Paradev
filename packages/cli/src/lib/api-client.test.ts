@@ -166,7 +166,9 @@ describe("API HTTP errors through the CLI formatter", () => {
 });
 
 describe("the telemetry header", () => {
-	const telemetryHeaderSent = async (doNotTrack: string | undefined) => {
+	const telemetryHeaderSent = async (
+		doNotTrack: string | undefined,
+	): Promise<string | null> => {
 		let header: string | null = null;
 		const original = process.env.DO_NOT_TRACK;
 		if (doNotTrack === undefined) delete process.env.DO_NOT_TRACK;
