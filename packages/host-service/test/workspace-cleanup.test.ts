@@ -59,6 +59,8 @@ interface ContextSpec {
 	deleteBranch?: () => Promise<{ deleted: boolean }>;
 	// Simulates sqlite failure at the archive UPDATE — the commit point.
 	dbUpdateThrows?: boolean | "once";
+	// A live workspace that adopted the worktree while the delete was queued.
+	liveWorktreeOwner?: { id: string };
 }
 
 // Mutable per-test behavior read by the patched ops; makeCtx resets it.
@@ -151,7 +153,10 @@ function makeCtx(spec: ContextSpec): HostServiceContext & {
 					// `.all` serves the terminal-session sweep; `.get` serves
 					// getHostWorktreeBaseDir when a spec sets no per-project
 					// worktreeBaseDir ("no host settings row" shape).
-					where: () => ({ all: terminalSelectAll, get: () => undefined }),
+					where: () => ({
+						all: terminalSelectAll,
+						get: () => spec.liveWorktreeOwner,
+					}),
 				}),
 			}),
 			update: () => ({
@@ -908,6 +913,47 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			expect(result.success).toBe(true);
 			expect(ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(1);
 		} finally {
+			rmSync(tmp, { recursive: true, force: true });
+			rmSync(repo, { recursive: true, force: true });
+		}
+	});
+
+	test("a worktree adopted by a live workspace while queued is left alone", async () => {
+		const tmp = mkdtempSync(join(tmpdir(), "workspace-delete-"));
+		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-repo-"));
+		const teardown = mock(async () => ({ status: "ok" as const }));
+		const removeWorktree = mock(async () => ({ stillRegistered: false }));
+		const deleteBranch = mock(async () => ({ deleted: true }));
+		cleanupTeardownOps.runTeardown = teardown;
+		try {
+			const ctx = makeCtx({
+				workspace: {
+					id: "ws-1",
+					projectId: "p-1",
+					worktreePath: tmp,
+					branch: "feature",
+				},
+				project: { id: "p-1", repoPath: repo },
+				removeWorktree,
+				deleteBranch,
+				liveWorktreeOwner: { id: "ws-2" },
+			});
+			const caller = workspaceCleanupRouter.createCaller(ctx);
+
+			const result = await caller.destroy({
+				workspaceId: "ws-1",
+				deleteBranch: true,
+				force: true,
+			});
+
+			expect(result.success).toBe(true);
+			expect(result.worktreeRemoved).toBe(false);
+			expect(teardown).not.toHaveBeenCalled();
+			expect(removeWorktree).not.toHaveBeenCalled();
+			expect(deleteBranch).not.toHaveBeenCalled();
+			expect(existsSync(tmp)).toBe(true);
+		} finally {
+			Object.assign(cleanupTeardownOps, realTeardownOps);
 			rmSync(tmp, { recursive: true, force: true });
 			rmSync(repo, { recursive: true, force: true });
 		}

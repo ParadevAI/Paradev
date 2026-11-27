@@ -10,6 +10,7 @@ import {
 	inspectWorkspaceAtHost,
 } from "renderer/hooks/host-service/useDestroyWorkspace";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences/useUserPreferences";
+import { usesRelayJwt } from "renderer/lib/host-service-auth";
 import { useNavigateAwayFromWorkspace } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace";
 import {
 	type BulkWorkspaceDeleteFailure,
@@ -196,6 +197,10 @@ export function useBulkWorkspaceDelete({
 					DestroyWorkspaceError
 				>({
 					targets,
+					oneAtATime: (workspace) => {
+						const { hostUrl } = targetFor(workspace);
+						return hostUrl !== null && usesRelayJwt(hostUrl);
+					},
 					shouldForce: (workspace) => {
 						const inspection = inspections.get(workspace.id);
 						return (

@@ -1,8 +1,4 @@
-/**
- * Runs jobs one at a time, in order. A job that runs past `slotTimeoutMs`
- * gives up its turn so the next job starts; it keeps running and still
- * settles its own promise.
- */
+/** One job at a time. A job past `slotTimeoutMs` gives up its turn but keeps running. */
 export function createCleanupQueue({
 	slotTimeoutMs,
 	onSlotTimeout,
@@ -25,6 +21,7 @@ export function createCleanupQueue({
 				onSlotTimeout?.();
 				release();
 			}, slotTimeoutMs);
+			timer.unref?.();
 			const run = Promise.resolve().then(job);
 			void run
 				.finally(() => {

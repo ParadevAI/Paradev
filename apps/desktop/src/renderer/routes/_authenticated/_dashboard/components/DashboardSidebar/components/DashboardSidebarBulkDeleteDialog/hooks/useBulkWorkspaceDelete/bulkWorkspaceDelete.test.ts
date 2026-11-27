@@ -196,6 +196,31 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 		expect(control.maxActive()).toBe(3);
 	});
 
+	it("runs oneAtATime targets in line while the others start at once", async () => {
+		const control = controlledDestroy();
+
+		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["relay-1", "local", "relay-2"],
+			oneAtATime: (workspace) => workspace.startsWith("relay"),
+			shouldForce: () => false,
+			destroy: control.destroy,
+		});
+
+		await control.flush();
+		expect([...control.releases.keys()].sort()).toEqual(["local", "relay-1"]);
+		control.releases.get("relay-1")?.();
+		await control.flush();
+		expect(control.releases.has("relay-2")).toBeTrue();
+		control.releases.get("local")?.();
+		control.releases.get("relay-2")?.();
+		const result = await run;
+		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
+			"relay-1",
+			"local",
+			"relay-2",
+		]);
+	});
+
 	it("reports whether each settled target was deleted", async () => {
 		const settled: boolean[] = [];
 

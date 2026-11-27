@@ -16,23 +16,22 @@ interface BulkWorkspaceInspectionItem {
 	sharesProjectCheckout: boolean | null;
 }
 
-/**
- * Starts every destroy at once. The host archives each workspace as its
- * request arrives and runs the heavy cleanup one workspace at a time, so the
- * whole selection leaves the sidebar together.
- */
 export async function executeBulkWorkspaceDeleteTargets<
 	Workspace,
 	Result,
 	Failure,
 >({
 	targets,
+	oneAtATime,
 	shouldForce,
 	shouldRetryWithForce,
 	destroy,
 	onSettled,
 }: {
 	targets: readonly Workspace[];
+	/** Targets that must not wait in a request together, e.g. behind a
+	 * relay whose request deadline is shorter than the host's queue. */
+	oneAtATime?: (workspace: Workspace) => boolean;
 	shouldForce: (workspace: Workspace) => boolean;
 	/** Retry a failed unforced destroy once with force. Used for conflicts on
 	 * workspaces whose preview never completed — "Delete without checking" is
@@ -76,7 +75,18 @@ export async function executeBulkWorkspaceDeleteTargets<
 		return outcome;
 	};
 
-	const outcomes = await Promise.all(targets.map(destroyOne));
+	const outcomes: Outcome[] = new Array(targets.length);
+	let previousInLine: Promise<void> = Promise.resolve();
+	await Promise.all(
+		targets.map((workspace, index) => {
+			const settle = async () => {
+				outcomes[index] = await destroyOne(workspace);
+			};
+			if (!oneAtATime?.(workspace)) return settle();
+			previousInLine = previousInLine.then(settle);
+			return previousInLine;
+		}),
+	);
 
 	const successes: Array<{ workspace: Workspace; result: Result }> = [];
 	const failures: Array<{ workspace: Workspace; error: Failure }> = [];

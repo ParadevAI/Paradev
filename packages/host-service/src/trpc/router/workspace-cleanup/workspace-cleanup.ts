@@ -1,7 +1,7 @@
 import { rm } from "node:fs/promises";
 import { sanitizePromptForPty } from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
-import { eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, ne } from "drizzle-orm";
 import { z } from "zod";
 import { pullRequests, workspaces } from "../../../db/schema";
 import { invalidateLabelCache } from "../../../ports/static-ports";
@@ -59,11 +59,6 @@ const restoresInFlight = new Set<string>();
 // worktree removal 120s, preflight 15s), so only a hung delete reaches it.
 const CLEANUP_SLOT_TIMEOUT_MS = 5 * 60_000;
 
-/**
- * Every delete on this host archives at once, then waits here for its
- * cleanup turn: teardown scripts and recursive folder removal are heavy, and
- * running a bulk selection of them together can overload the machine.
- */
 const enqueueCleanup = createCleanupQueue({
 	slotTimeoutMs: CLEANUP_SLOT_TIMEOUT_MS,
 	onSlotTimeout: () =>
@@ -320,6 +315,19 @@ async function runDestroy(
 
 	try {
 		return await enqueueCleanup(async () => {
+			// Re-created on the same branch while this delete waited: the new
+			// workspace adopted the folder, so it is no longer ours to tear down.
+			const adoptedByLiveWorkspace =
+				local != null &&
+				!sharesProjectCheckout &&
+				liveWorkspaceOwnsPath(ctx, input.workspaceId, local.worktreePath);
+			if (adoptedByLiveWorkspace) {
+				warnings.push(
+					`Left ${local.worktreePath} on disk: another workspace now uses it`,
+				);
+			}
+			const filesBelongElsewhere =
+				sharesProjectCheckout || adoptedByLiveWorkspace;
 			// ─── Step 1: Preflight ─────────────────────────────────────
 			// Block only on dirty worktree (the common "I forgot to commit"
 			// case). Missing/broken local state is handled by the cleanup phase.
@@ -327,7 +335,7 @@ async function runDestroy(
 			// though they have no project row.
 			if (
 				!input.force &&
-				!sharesProjectCheckout &&
+				!filesBelongElsewhere &&
 				local &&
 				(project || local.type === "session")
 			) {
@@ -375,7 +383,7 @@ async function runDestroy(
 			// other local workspace on it is using.
 			if (
 				input.teardownMode !== "skip" &&
-				!sharesProjectCheckout &&
+				!filesBelongElsewhere &&
 				local &&
 				project
 			) {
@@ -422,7 +430,7 @@ async function runDestroy(
 			const result = await runDestroyPhases(ctx, input, {
 				local,
 				project,
-				sharesProjectCheckout,
+				sharesProjectCheckout: filesBelongElsewhere,
 				warnings,
 			});
 			// Telemetry at the true commit: a failed destroy un-archives below and
@@ -434,6 +442,25 @@ async function runDestroy(
 		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
 		throw err;
 	}
+}
+
+function liveWorkspaceOwnsPath(
+	ctx: HostServiceContext,
+	workspaceId: string,
+	worktreePath: string,
+): boolean {
+	const owner = ctx.db
+		.select({ id: workspaces.id })
+		.from(workspaces)
+		.where(
+			and(
+				isNull(workspaces.archivedAt),
+				eq(workspaces.worktreePath, worktreePath),
+				ne(workspaces.id, workspaceId),
+			),
+		)
+		.get();
+	return owner !== undefined;
 }
 
 /** "merged" when the linked PR was observed merged; every other delete —
