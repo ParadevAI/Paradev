@@ -9,7 +9,6 @@ export interface McpConfigPaths {
 	homeDir: string;
 	/** `~/.claude.json`, or `.claude.json` inside a custom CLAUDE_CONFIG_DIR. */
 	claudeStatePath: string;
-	/** `~/.claude/settings.json`, or `settings.json` inside a custom CLAUDE_CONFIG_DIR. */
 	claudeSettingsPath: string;
 	codexConfigPath: string;
 }
@@ -144,7 +143,6 @@ function ancestors(dir: string): string[] {
 	return dirs;
 }
 
-/** A linked worktree belongs to its main checkout, or to its bare repository. */
 async function repositoryOf(checkout: string): Promise<string> {
 	const gitFile = await readText(join(checkout, ".git"));
 	const gitDir = gitFile?.match(/^gitdir:\s*(.+)$/m)?.[1]?.trim();
@@ -156,10 +154,6 @@ async function repositoryOf(checkout: string): Promise<string> {
 	return basename(commonDir) === ".git" ? dirname(commonDir) : commonDir;
 }
 
-/**
- * Claude Code keys local scope by repository, not by the directory it runs in,
- * and reads `.mcp.json` from every directory up to the filesystem root.
- */
 async function claudeProject(
 	worktreePath: string,
 ): Promise<{ cwd: string; repository: string; dirs: string[] }> {

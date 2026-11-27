@@ -33,10 +33,6 @@ function findWorkspace(ctx: HostServiceContext, workspaceId: string) {
 	return workspace;
 }
 
-/**
- * The agent config a chat launched with, else `agent` when it names a config.
- * A bare preset resolves to no config, as a chat started without one does.
- */
 function chatAgentConfigId(
 	ctx: HostServiceContext,
 	input: { workspaceId: string; agent: string; sessionId?: string },
