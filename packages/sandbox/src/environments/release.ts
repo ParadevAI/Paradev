@@ -262,7 +262,6 @@ for (;;) {
 				managedEnv: {},
 				networkPolicy: "allow-all",
 				vcpus: GOLDEN_BOX_VCPUS,
-				agentTools: true,
 			},
 		});
 		break;
@@ -286,7 +285,6 @@ await wakeSandbox({
 		managedEnv: {},
 		networkPolicy: "allow-all",
 		vcpus: GOLDEN_BOX_VCPUS,
-		agentTools: true,
 	},
 });
 log("golden: host-service up; waiting for the checkout");
@@ -449,7 +447,6 @@ const probeClaim = {
 	managedEnv,
 	networkPolicy,
 	vcpus: GOLDEN_BOX_VCPUS,
-	agentTools: true,
 };
 log(`probe: provisioning ${probe} as a fork of ${golden}`);
 await provisionSandbox({

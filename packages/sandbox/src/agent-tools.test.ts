@@ -9,6 +9,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+	AGENT_TOOLS,
 	type AgentToolsManifest,
 	agentToolsDrivesToPrune,
 	agentToolsGaps,
@@ -55,7 +56,7 @@ describe("agent-tools manifest", () => {
 		expect(parseAgentToolsManifest(JSON.stringify(manifest))).toEqual(manifest);
 	});
 
-	test("the committed bundle has a row for every agent, and opencode and pi only on the drive", () => {
+	test("the committed bundle has a row for every agent, each only on the drive", () => {
 		const assets = loadAssets(
 			join(import.meta.dir, "..", "bundle", "assets.json"),
 		);
@@ -66,9 +67,9 @@ describe("agent-tools manifest", () => {
 			"opencode",
 			"pi",
 		]);
-		for (const name of ["opencode", "pi"]) {
+		for (const { name } of AGENT_TOOLS) {
 			expect(assets[name]?.dest).toBeUndefined();
-			expect(assets[name]?.source).toStartWith("https://github.com/");
+			expect(assets[name]?.source).toStartWith("https://");
 		}
 	});
 

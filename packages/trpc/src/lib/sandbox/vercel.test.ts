@@ -10,7 +10,7 @@ import * as Sentry from "@sentry/core";
 import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
-	agentToolsMounts,
+	agentToolsDrive,
 	applyClaimInPlace,
 	CloudWorkspaceNotStartedError,
 	deleteSandbox,
@@ -439,6 +439,7 @@ describe("wakeSandbox", () => {
 		},
 	});
 	stub(globalThis, { fetch: async () => new Response("{}") });
+	stub(Drive, { get: async () => ({ currentSandboxName: undefined }) });
 	const identity = {
 		SUPERSET_SANDBOX_CONTRACT: "1",
 		SUPERSET_API_URL: "https://api.test",
@@ -555,58 +556,52 @@ describe("keepaliveWindowMs", () => {
 	});
 });
 
-describe("agentToolsMounts", () => {
-	const detached = () => Promise.resolve({ currentSandboxName: undefined });
-
-	test("mounts nothing without a drive name", async () => {
-		let asked = 0;
-		const getDrive = () => {
-			asked++;
-			return detached();
-		};
-		expect(await agentToolsMounts(null, getDrive)).toBeUndefined();
-		expect(asked).toBe(0);
+describe("agentToolsDrive", () => {
+	const claim = (bundle: string) =>
+		({
+			identity: { SUPERSET_BUNDLE_SHA: bundle.repeat(64 / bundle.length) },
+		}) as unknown as SandboxClaim;
+	const reported: unknown[] = [];
+	stub(Sentry, {
+		captureException: (_: unknown, context: unknown) => {
+			reported.push(context);
+			return "";
+		},
 	});
 
-	test("mounts a detached drive read-only, and asks only once", async () => {
+	test("names the drive by region and bundle, and asks once while it stays usable", async () => {
 		let asked = 0;
-		const getDrive = () => {
+		const getDrive = async () => {
 			asked++;
-			return detached();
+			return { currentSandboxName: undefined };
 		};
-		const want = {
-			"/opt/agents": {
-				drive: "agent-tools-iad1-0123456789ab",
-				mode: "snapshot" as const,
-			},
-		};
-		expect(
-			await agentToolsMounts("agent-tools-iad1-0123456789ab", getDrive),
-		).toEqual(want);
-		expect(
-			await agentToolsMounts("agent-tools-iad1-0123456789ab", getDrive),
-		).toEqual(want);
+		expect(await agentToolsDrive(claim("ab"), "iad1", getDrive)).toBe(
+			"agent-tools-iad1-abababababab",
+		);
+		await agentToolsDrive(claim("ab"), "iad1", getDrive);
 		expect(asked).toBe(1);
 	});
 
-	test("skips a missing drive, or one a writer still holds", async () => {
-		expect(
-			await agentToolsMounts("agent-tools-sfo1-aaaaaaaaaaaa", () =>
+	test("a missing or attached drive is the generic could-not-start, reported with the drive", async () => {
+		reported.length = 0;
+		await expect(
+			agentToolsDrive(claim("cd"), "sfo1", () =>
 				Promise.reject(new Error("404")),
 			),
-		).toBeUndefined();
-		let asked = 0;
-		const attached = () => {
-			asked++;
-			return Promise.resolve({ currentSandboxName: "builder" });
-		};
-		expect(
-			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
-		).toBeUndefined();
-		expect(
-			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
-		).toBeUndefined();
-		expect(asked).toBe(2);
+		).rejects.toBeInstanceOf(CloudWorkspaceNotStartedError);
+		await expect(
+			agentToolsDrive(claim("ef"), "sfo1", async () => ({
+				currentSandboxName: "builder",
+			})),
+		).rejects.toBeInstanceOf(CloudWorkspaceNotStartedError);
+		expect(reported).toEqual([
+			{
+				tags: { "sandbox.agent_tools_drive": "agent-tools-sfo1-cdcdcdcdcdcd" },
+			},
+			{
+				tags: { "sandbox.agent_tools_drive": "agent-tools-sfo1-efefefefefef" },
+			},
+		]);
 	});
 });
 
@@ -614,6 +609,7 @@ describe("wakeSandbox", () => {
 	const asked: string[] = [];
 	const updates: unknown[] = [];
 	let savedTimeout = SESSION_TIMEOUT_MS;
+	let mountRefused = false;
 	stub(Sandbox, {
 		get: async () => ({
 			status: "stopped",
@@ -622,8 +618,9 @@ describe("wakeSandbox", () => {
 			timeout: savedTimeout,
 			mounts: {},
 			domain: () => "https://host.example",
-			update: async (patch: unknown) => {
+			update: async (patch: { mounts?: unknown }) => {
 				updates.push(patch);
+				if (patch.mounts && mountRefused) throw new Error("502");
 			},
 		}),
 	});
@@ -633,20 +630,22 @@ describe("wakeSandbox", () => {
 			return { currentSandboxName: undefined };
 		},
 	});
+	const stop = new Error("stop before resume");
+	/** Rejects with `stop` once the box would resume. */
+	const wakeUntilResume = () => {
+		updates.length = 0;
+		return wakeSandbox({
+			providerSandboxId: "sbx",
+			claim: {
+				vcpus: 2,
+				identity: { SUPERSET_BUNDLE_SHA: "abcdef012345".repeat(5) },
+			} as unknown as SandboxClaim,
+			beforeResume: () => Promise.reject(stop),
+		});
+	};
 
 	test("mounts the drive of the box's own region, not its environment's", async () => {
-		const stop = new Error("stop before resume");
-		await expect(
-			wakeSandbox({
-				providerSandboxId: "sbx",
-				claim: {
-					vcpus: 2,
-					agentTools: true,
-					identity: { SUPERSET_BUNDLE_SHA: "abcdef012345".repeat(5) },
-				} as unknown as SandboxClaim,
-				beforeResume: () => Promise.reject(stop),
-			}),
-		).rejects.toBe(stop);
+		await expect(wakeUntilResume()).rejects.toBe(stop);
 		expect(asked).toEqual(["agent-tools-iad1-abcdef012345"]);
 		expect(updates).toEqual([
 			{
@@ -662,16 +661,17 @@ describe("wakeSandbox", () => {
 
 	test("gives a box created with an older timeout the current one before it resumes", async () => {
 		savedTimeout = HOUR;
-		updates.length = 0;
-		const stop = new Error("stop before resume");
-		await expect(
-			wakeSandbox({
-				providerSandboxId: "sbx",
-				claim: { vcpus: 2, identity: {} } as unknown as SandboxClaim,
-				beforeResume: () => Promise.reject(stop),
-			}),
-		).rejects.toBe(stop);
-		expect(updates).toEqual([{ timeout: SESSION_TIMEOUT_MS }]);
+		await expect(wakeUntilResume()).rejects.toBe(stop);
+		expect(updates[0]).toEqual({ timeout: SESSION_TIMEOUT_MS });
+		savedTimeout = SESSION_TIMEOUT_MS;
+	});
+
+	test("a refused mounts update fails the wake as could-not-start before the box resumes", async () => {
+		mountRefused = true;
+		await expect(wakeUntilResume()).rejects.toBeInstanceOf(
+			CloudWorkspaceNotStartedError,
+		);
+		mountRefused = false;
 	});
 });
 

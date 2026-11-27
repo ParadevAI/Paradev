@@ -191,11 +191,6 @@ export async function buildSandboxClaim(args: {
 			],
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
-			agentTools: await organizationFlagEnabled(
-				posthog,
-				FEATURE_FLAGS.SANDBOX_AGENT_TOOLS_DRIVE,
-				args.row.organizationId,
-			),
 		},
 		environment: {
 			sourceKind: environment.sourceKind,

@@ -11,7 +11,6 @@ export DISPLAY="${DISPLAY:-${SUPERSET_DISPLAY:-:1}}"
 # The box's memory ceiling and CPUs, written by superset-boot from the cgroup.
 [ -r "${SUPERSET_RUN_DIR:-/run/superset}/resources.env" ] && . "${SUPERSET_RUN_DIR:-/run/superset}/resources.env"
 case ":$PATH:" in *":/usr/local/go/bin:"*) ;; *) export PATH="$PATH:/usr/local/go/bin" ;; esac
-# The agent CLIs are pinned by the bundle (install-agent-clis) or run from the
-# read-only agents drive; a self-update would drift from the pin and only
-# prints a warning every session.
+# The agent CLIs run from the read-only agents drive, pinned by the bundle; a
+# self-update would drift from the pin and only prints a warning every session.
 export DISABLE_AUTOUPDATER=1 OPENCODE_DISABLE_AUTOUPDATE=1 PI_SKIP_VERSION_CHECK=1
