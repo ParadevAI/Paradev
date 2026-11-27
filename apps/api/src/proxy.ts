@@ -1,4 +1,7 @@
-import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import {
+	ORGANIZATION_HEADER,
+	TELEMETRY_HEADER,
+} from "@superset/shared/constants";
 import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
@@ -37,7 +40,7 @@ function getCorsHeaders(origin: string | null, deploymentOrigin: string) {
 		"Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 		// The desktop sends ORGANIZATION_HEADER per window; without it in the
 		// preflight allow list every scoped request dies before reaching tRPC.
-		"Access-Control-Allow-Headers": `Content-Type, Authorization, x-trpc-source, trpc-accept, x-superset-client, ${ORGANIZATION_HEADER}`,
+		"Access-Control-Allow-Headers": `Content-Type, Authorization, x-trpc-source, trpc-accept, x-superset-client, ${ORGANIZATION_HEADER}, ${TELEMETRY_HEADER}`,
 		"Access-Control-Expose-Headers": "ETag",
 		"Access-Control-Allow-Credentials": "true",
 	};

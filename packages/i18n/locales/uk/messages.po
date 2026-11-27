@@ -2483,6 +2483,9 @@ msgstr "Попередній перегляд під керуванням аге
 msgid "Agents"
 msgstr "Агенти"
 
+msgid "Agents and workspaces"
+msgstr "Агенти й робочі простори"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Агенти не мають доступу до інструментів {0}"
@@ -3078,6 +3081,9 @@ msgstr "в еквіваленті API"
 
 msgid "API-equivalent cost"
 msgstr "Вартість в еквіваленті API"
+
+msgid "App"
+msgstr "Застосунок"
 
 msgctxt "log scope"
 msgid "App"
@@ -6592,6 +6598,9 @@ msgstr "Не вдалося оновити налаштування «Чат»"
 msgid "Couldn't update the queue"
 msgstr "Не вдалося оновити чергу"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Не вдалося змінити налаштування даних про використання"
+
 msgid "Couldn't update thread"
 msgstr "Не вдалося оновити тред"
 
@@ -9982,6 +9991,9 @@ msgstr "Довідка"
 
 msgid "Help & Docs"
 msgstr "Довідка та документація"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Допоможіть покращити Paradev, надсилаючи дані про використання та звіти про збої. <0>Докладніше<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Генрі Форд"
@@ -13877,6 +13889,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Вимкнено"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Вимкнено, бо у вашому середовищі задано DO_NOT_TRACK."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Офіційна документація {0}, застосунку для паралельного запуску 100+ кодинг-агентів."
@@ -17125,6 +17140,9 @@ msgstr "Перезапустіть їх зараз, щоб перенести н
 msgid "Restart onboarding"
 msgstr "Пройти онбординг заново"
 
+msgid "Restart Paradev to apply"
+msgstr "Перезапустіть Paradev, щоб застосувати"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
@@ -18628,6 +18646,9 @@ msgstr "Поділитися сторінкою (публічно)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Діліться плагінами з репозиторію GitHub. Закріплюйте релізи git-тегами."
+
+msgid "Share usage data"
+msgstr "Надсилати дані про використання"
 
 msgid "Share via…"
 msgstr "Поділитися через…"

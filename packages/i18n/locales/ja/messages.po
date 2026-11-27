@@ -2489,6 +2489,9 @@ msgstr "エージェントが操作するプレビュー"
 msgid "Agents"
 msgstr "エージェント"
 
+msgid "Agents and workspaces"
+msgstr "エージェントとワークスペース"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "エージェントは {0} のツールにアクセスできません"
@@ -3084,6 +3087,9 @@ msgstr "API換算"
 
 msgid "API-equivalent cost"
 msgstr "API換算のコスト"
+
+msgid "App"
+msgstr "アプリ"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "チャットの設定を更新できませんでした"
 msgid "Couldn't update the queue"
 msgstr "キューを更新できませんでした"
 
+msgid "Couldn't update the usage data setting"
+msgstr "使用状況データの設定を更新できませんでした"
+
 msgid "Couldn't update thread"
 msgstr "スレッドを更新できませんでした"
 
@@ -9988,6 +9997,9 @@ msgstr "ヘルプ"
 
 msgid "Help & Docs"
 msgstr "ヘルプとドキュメント"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "使用状況データとクラッシュレポートを送信して、Paradev の改善にご協力ください。<0>詳細<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "オフ"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "環境で DO_NOT_TRACK が設定されているためオフになっています。"
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100以上のコーディングエージェントを並列実行できるアプリ、{0}の公式ドキュメント。"
@@ -17131,6 +17146,9 @@ msgstr "今すぐ再起動すると{accountLabel}に移行し、各セッショ�
 msgid "Restart onboarding"
 msgstr "オンボーディングをやり直す"
 
+msgid "Restart Paradev to apply"
+msgstr "適用するには Paradev を再起動してください"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
@@ -18634,6 +18652,9 @@ msgstr "ページを共有（公開）"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHubリポジトリからプラグインを共有。gitタグでリリースを固定できます。"
+
+msgid "Share usage data"
+msgstr "使用状況データを共有"
 
 msgid "Share via…"
 msgstr "共有方法を選択…"

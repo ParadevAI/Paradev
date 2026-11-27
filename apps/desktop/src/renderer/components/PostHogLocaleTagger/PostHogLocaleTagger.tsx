@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { authClient } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { posthog } from "renderer/lib/posthog";
+import { postHogIdentity } from "renderer/lib/posthog-identity";
 import { resolveLocaleTag } from "./localeTag";
 
 /**
@@ -30,7 +31,7 @@ export function PostHogLocaleTagger() {
 		posthog.register(tag);
 
 		if (!userId) return;
-		posthog.people.set(tag);
+		postHogIdentity.setPeople(tag);
 	}, [activeLocale, language, userId]);
 
 	return null;

@@ -1,6 +1,7 @@
 import { SENTRY_IGNORE_ERRORS } from "@superset/shared/sentry";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
 import { env } from "../env.renderer";
+import { isTelemetryEnabled } from "./telemetry";
 
 let sentryInitialized = false;
 
@@ -14,6 +15,7 @@ export async function initSentry(): Promise<void> {
 	if (!env.SENTRY_DSN_DESKTOP || env.NODE_ENV !== "production") {
 		return;
 	}
+	if (!isTelemetryEnabled()) return;
 
 	try {
 		// Dynamic import to avoid bundler issues
@@ -27,6 +29,7 @@ export async function initSentry(): Promise<void> {
 			// server context; renderer copies (unhandled query/mutation promises)
 			// duplicate them with worse stacks.
 			beforeSend(event, hint) {
+				if (!isTelemetryEnabled()) return null;
 				const original = hint.originalException;
 				if (original instanceof Error && original.name === "TRPCClientError") {
 					return null;

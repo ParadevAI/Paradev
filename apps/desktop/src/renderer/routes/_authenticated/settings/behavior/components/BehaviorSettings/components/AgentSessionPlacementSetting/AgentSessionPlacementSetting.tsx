@@ -21,7 +21,7 @@ export function AgentSessionPlacementSetting({
 	const { t } = useLingui();
 	const placement = useAgentSessionPlacement();
 	return (
-		<div className="flex items-center justify-between gap-6">
+		<div className="flex items-center justify-between gap-6 p-4">
 			<div className="space-y-0.5">
 				<Label
 					htmlFor="agent-session-placement"

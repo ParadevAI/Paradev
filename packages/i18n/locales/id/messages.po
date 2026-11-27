@@ -2489,6 +2489,9 @@ msgstr "Pratinjau yang digerakkan agen"
 msgid "Agents"
 msgstr "Agen"
 
+msgid "Agents and workspaces"
+msgstr "Agen dan workspace"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agen tidak dapat menjangkau alat {0}"
@@ -3084,6 +3087,9 @@ msgstr "Setara API"
 
 msgid "API-equivalent cost"
 msgstr "Biaya setara API"
+
+msgid "App"
+msgstr "Aplikasi"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "Tidak dapat memperbarui pengaturan Chat"
 msgid "Couldn't update the queue"
 msgstr "Tidak dapat memperbarui antrean"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Tidak dapat memperbarui pengaturan data penggunaan"
+
 msgid "Couldn't update thread"
 msgstr "Tidak bisa memperbarui thread"
 
@@ -9988,6 +9997,9 @@ msgstr "Bantuan"
 
 msgid "Help & Docs"
 msgstr "Bantuan & Dokumentasi"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Bantu tingkatkan Paradev dengan mengirim data penggunaan dan laporan crash. <0>Pelajari lebih lanjut<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Mati"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Nonaktif karena DO_NOT_TRACK disetel di lingkungan Anda."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Dokumentasi resmi {0}, aplikasi untuk menjalankan lebih dari 100 agen pemrograman secara paralel."
@@ -17131,6 +17146,9 @@ msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap s
 msgid "Restart onboarding"
 msgstr "Mulai ulang orientasi"
 
+msgid "Restart Paradev to apply"
+msgstr "Mulai ulang Paradev untuk menerapkan"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"
 
@@ -18634,6 +18652,9 @@ msgstr "Bagikan halaman (publik)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Bagikan plugin dari repo GitHub. Sematkan rilis dengan tag git."
+
+msgid "Share usage data"
+msgstr "Bagikan data penggunaan"
 
 msgid "Share via…"
 msgstr "Bagikan lewat…"

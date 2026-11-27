@@ -2489,6 +2489,9 @@ msgstr "Vom Agenten gesteuerte Vorschauen"
 msgid "Agents"
 msgstr "Agenten"
 
+msgid "Agents and workspaces"
+msgstr "Agenten und Arbeitsbereiche"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agenten können die Tools von {0} nicht erreichen"
@@ -3084,6 +3087,9 @@ msgstr "API-Äquivalent"
 
 msgid "API-equivalent cost"
 msgstr "API-äquivalente Kosten"
+
+msgid "App"
+msgstr "App"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "Die Chat-Einstellung konnte nicht aktualisiert werden"
 msgid "Couldn't update the queue"
 msgstr "Warteschlange konnte nicht aktualisiert werden"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Die Einstellung für Nutzungsdaten konnte nicht geändert werden"
+
 msgid "Couldn't update thread"
 msgstr "Thread konnte nicht aktualisiert werden"
 
@@ -9988,6 +9997,9 @@ msgstr "Hilfe"
 
 msgid "Help & Docs"
 msgstr "Hilfe & Doku"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Hilf mit, Paradev zu verbessern, indem du Nutzungsdaten und Absturzberichte sendest. <0>Mehr erfahren<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Aus"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Aus, weil DO_NOT_TRACK in deiner Umgebung gesetzt ist."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Offizielle Dokumentation zu {0}, der App für mehr als 100 parallele Coding-Agenten."
@@ -17131,6 +17146,9 @@ msgstr "Starte sie jetzt neu, um sie auf {accountLabel} umzustellen; jede Sitzun
 msgid "Restart onboarding"
 msgstr "Onboarding neu starten"
 
+msgid "Restart Paradev to apply"
+msgstr "Starte Paradev neu, um die Änderung anzuwenden"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Laufende {providerLabel}-Agenten neu starten?"
 
@@ -18634,6 +18652,9 @@ msgstr "Seite teilen (öffentlich)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Teile Plugins aus einem GitHub-Repo. Pinne Releases mit Git-Tags."
+
+msgid "Share usage data"
+msgstr "Nutzungsdaten teilen"
 
 msgid "Share via…"
 msgstr "Teilen über…"

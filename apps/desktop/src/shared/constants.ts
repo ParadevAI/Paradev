@@ -59,6 +59,5 @@ export const DEFAULT_CONFIRM_ON_QUIT = true;
 export const DEFAULT_TERMINAL_COPY_ON_SELECT = false;
 export const DEFAULT_FILE_AUTO_SAVE = "off" as const;
 export const DEFAULT_WAIT_FOR_SETUP_BEFORE_AGENT = false;
-export const DEFAULT_TELEMETRY_ENABLED = true;
 export const DEFAULT_SHOW_RESOURCE_MONITOR = true;
 export const DEFAULT_EXPOSE_HOST_SERVICE_VIA_RELAY = false;

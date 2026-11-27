@@ -2489,6 +2489,9 @@ msgstr "Agent-driven previews"
 msgid "Agents"
 msgstr "Agents"
 
+msgid "Agents and workspaces"
+msgstr "Agents and workspaces"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agents cannot reach {0}'s tools"
@@ -3084,6 +3087,9 @@ msgstr "API-equivalent"
 
 msgid "API-equivalent cost"
 msgstr "API-equivalent cost"
+
+msgid "App"
+msgstr "App"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "Couldn't update the Chat setting"
 msgid "Couldn't update the queue"
 msgstr "Couldn't update the queue"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Couldn't update the usage data setting"
+
 msgid "Couldn't update thread"
 msgstr "Couldn't update thread"
 
@@ -9988,6 +9997,9 @@ msgstr "Help"
 
 msgid "Help & Docs"
 msgstr "Help & Docs"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Off"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Off because DO_NOT_TRACK is set in your environment."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -17131,6 +17146,9 @@ msgstr "Restart now to move them to {accountLabel}; each session picks its conve
 msgid "Restart onboarding"
 msgstr "Restart onboarding"
 
+msgid "Restart Paradev to apply"
+msgstr "Restart Paradev to apply"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restart running {providerLabel} agents?"
 
@@ -18634,6 +18652,9 @@ msgstr "Share page (public)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Share plugins from a GitHub repo. Pin releases with git tags."
+
+msgid "Share usage data"
+msgstr "Share usage data"
 
 msgid "Share via…"
 msgstr "Share via…"

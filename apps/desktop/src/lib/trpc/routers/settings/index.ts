@@ -3,6 +3,11 @@ import {
 	teardownSingleAgent,
 	writeSharedDisabledAgentIds,
 } from "@superset/agent-setup";
+import {
+	isDoNotTrackSet,
+	readTelemetrySetting,
+	writeTelemetrySetting,
+} from "@superset/agent-setup/telemetry";
 import type { SupportedLocale } from "@superset/i18n/locales";
 import { isSupportedLocale } from "@superset/i18n/locales";
 import {
@@ -60,6 +65,7 @@ import {
 	type PresetWithUnknownMode,
 	shouldPersistNormalizedTerminalPresets,
 } from "./preset-execution-mode";
+import { createTelemetryStateChannel } from "./telemetry-state";
 
 function isValidRingtoneId(ringtoneId: string): boolean {
 	if (isBuiltInRingtoneId(ringtoneId)) {
@@ -139,6 +145,11 @@ function initializeDefaultPresets() {
 
 	return mergedPresets;
 }
+
+const telemetryState = createTelemetryStateChannel(() => ({
+	enabled: readTelemetrySetting(),
+	doNotTrack: isDoNotTrackSet(),
+}));
 
 export const createSettingsRouter = () => {
 	return router({
@@ -660,14 +671,17 @@ export const createSettingsRouter = () => {
 				return { ran };
 			}),
 
-		// TODO: remove telemetry procedures once telemetry_enabled column is dropped
-		getTelemetryEnabled: publicProcedure.query(() => {
-			return true;
-		}),
+		getTelemetryState: publicProcedure.query(telemetryState.read),
+
+		onTelemetryChange: publicProcedure.subscription(() =>
+			telemetryState.observe(),
+		),
 
 		setTelemetryEnabled: publicProcedure
 			.input(z.object({ enabled: z.boolean() }))
-			.mutation(() => {
+			.mutation(({ input }) => {
+				writeTelemetrySetting(input.enabled);
+				telemetryState.publish();
 				return { success: true };
 			}),
 	});

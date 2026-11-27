@@ -23,7 +23,7 @@ export function AcpChatSetting() {
 		: savedEnabled;
 
 	return (
-		<div className="flex items-center justify-between gap-6">
+		<div className="flex items-center justify-between gap-6 p-4">
 			<div className="min-w-0 flex-1 space-y-0.5">
 				<Label htmlFor="acp-chat" className="text-sm font-medium">
 					<HighlightText

@@ -2489,6 +2489,9 @@ msgstr "由智能体驱动的预览"
 msgid "Agents"
 msgstr "智能体"
 
+msgid "Agents and workspaces"
+msgstr "智能体和工作区"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "智能体无法访问 {0} 的工具"
@@ -3084,6 +3087,9 @@ msgstr "按API价折算"
 
 msgid "API-equivalent cost"
 msgstr "API 等价费用"
+
+msgid "App"
+msgstr "应用"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "无法更新聊天设置"
 msgid "Couldn't update the queue"
 msgstr "无法更新队列"
 
+msgid "Couldn't update the usage data setting"
+msgstr "无法更新使用数据设置"
+
 msgid "Couldn't update thread"
 msgstr "无法更新讨论"
 
@@ -9988,6 +9997,9 @@ msgstr "帮助"
 
 msgid "Help & Docs"
 msgstr "帮助与文档"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "发送使用数据和崩溃报告，帮助改进 Paradev。<0>了解更多<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "关闭"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "已关闭，因为你的环境中设置了 DO_NOT_TRACK。"
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "{0} 官方文档。这款应用可并行运行 100 多个编程代理。"
@@ -17131,6 +17146,9 @@ msgstr "立即重新启动即可迁移到{accountLabel}；每个会话都会从�
 msgid "Restart onboarding"
 msgstr "重新开始引导"
 
+msgid "Restart Paradev to apply"
+msgstr "重启 Paradev 以应用"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
@@ -18634,6 +18652,9 @@ msgstr "分享页面（公开）"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "从 GitHub 仓库分享插件，用 git 标签固定版本。"
+
+msgid "Share usage data"
+msgstr "共享使用数据"
 
 msgid "Share via…"
 msgstr "分享方式…"

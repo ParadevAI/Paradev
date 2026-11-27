@@ -45,6 +45,7 @@ export interface HostServiceContext {
 	organizationId: string;
 	isAuthenticated: boolean;
 	clientMachineId?: string;
+	telemetryOff?: boolean;
 	/**
 	 * The user behind this request (`x-superset-user-id`): set by the relay
 	 * from the verified JWT, or by a local caller holding the pre-shared

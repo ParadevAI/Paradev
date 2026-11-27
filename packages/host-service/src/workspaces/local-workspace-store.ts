@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import hostServicePackageJson from "@superset/host-service/package.json" with {
 	type: "json",
 };
@@ -36,6 +37,7 @@ export interface WorkspaceStoreContext {
 	api?: ApiClient;
 	organizationId?: string;
 	clientMachineId?: string;
+	telemetryOff?: boolean;
 	/** The acting user; tags they write are theirs (see `workspaceTags`). */
 	userId?: string;
 }
@@ -64,7 +66,7 @@ function trackWorkspaceEvent(
 	event: "workspace_created" | "workspace_deleted",
 	row: HostWorkspaceRow,
 ): void {
-	if (!ctx.api) return;
+	if (!ctx.api || ctx.telemetryOff || !isTelemetryEnabled()) return;
 	const clientMachineId = ctx.clientMachineId ?? getHostId();
 	try {
 		void ctx.api.analytics.captureEvent

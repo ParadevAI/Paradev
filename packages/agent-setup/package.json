@@ -28,6 +28,10 @@
 			"types": "./src/config.ts",
 			"default": "./src/config.ts"
 		},
+		"./telemetry": {
+			"types": "./src/telemetry.ts",
+			"default": "./src/telemetry.ts"
+		},
 		"./write-file-if-changed": {
 			"types": "./src/write-file-if-changed.ts",
 			"default": "./src/write-file-if-changed.ts"

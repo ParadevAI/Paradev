@@ -1,6 +1,8 @@
 import * as Sentry from "@sentry/node";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
 import { SANDBOX_TELEMETRY_KEYS } from "@superset/shared/sandbox/contract";
+import { gateSentryTransport } from "@superset/shared/sentry-gate";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
 import { createBoxLogFilter } from "./runtime/box-log-filter";
 import { getManagedEnv } from "./runtime/sandbox-managed-env";
@@ -33,7 +35,7 @@ export function hostSentryOptions(
 	organizationId: string | undefined,
 ): Sentry.NodeOptions | null {
 	const dsn = env.HOST_SERVICE_SENTRY_DSN;
-	if (!dsn) return null;
+	if (!dsn || !isTelemetryEnabled({ env })) return null;
 	const tags = {
 		service: "host-service",
 		[SANDBOX_TELEMETRY_KEYS.organizationId]: organizationId,
@@ -70,7 +72,11 @@ export function hostSentryOptions(
 		environment: env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		// A host that fails once usually fails in a loop: git.getStatus alone
 		// sent 135k copies of one `spawn EBADF` from seven machines last month.
-		beforeSend: throttleRepeats,
+		beforeSend: (event) =>
+			isTelemetryEnabled({ env }) ? throttleRepeats(event) : null,
+		transport: gateSentryTransport(Sentry.makeNodeTransport, () =>
+			isTelemetryEnabled({ env }),
+		),
 		// safety.ts keeps the process alive through uncaught exceptions; Sentry
 		// must capture them without re-introducing the exit.
 		integrations: [

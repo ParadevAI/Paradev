@@ -2489,6 +2489,9 @@ msgstr "Náhledy řízené agenty"
 msgid "Agents"
 msgstr "Agenti"
 
+msgid "Agents and workspaces"
+msgstr "Agenti a pracovní prostory"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agenti nemají přístup k nástrojům {0}"
@@ -3084,6 +3087,9 @@ msgstr "ekvivalent API"
 
 msgid "API-equivalent cost"
 msgstr "Náklady v přepočtu na API"
+
+msgid "App"
+msgstr "Aplikace"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "Nastavení Chat se nepodařilo aktualizovat"
 msgid "Couldn't update the queue"
 msgstr "Frontu se nepodařilo aktualizovat"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Nastavení sdílení dat o používání se nepodařilo změnit"
+
 msgid "Couldn't update thread"
 msgstr "Nepodařilo se aktualizovat vlákno"
 
@@ -9988,6 +9997,9 @@ msgstr "Nápověda"
 
 msgid "Help & Docs"
 msgstr "Nápověda a dokumentace"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Pomozte vylepšit Paradev odesíláním údajů o používání a hlášení o pádech. <0>Další informace<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Vypnuto"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Vypnuto, protože je ve vašem prostředí nastaveno DO_NOT_TRACK."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Oficiální dokumentace {0}, aplikace pro paralelní spouštění více než 100 programovacích agentů."
@@ -17131,6 +17146,9 @@ msgstr "Restartujte je teď a přejdou na {accountLabel}; každá relace naváž
 msgid "Restart onboarding"
 msgstr "Spustit úvodní průvodce znovu"
 
+msgid "Restart Paradev to apply"
+msgstr "Pro použití restartujte Paradev"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restartovat běžící agenty {providerLabel}?"
 
@@ -18634,6 +18652,9 @@ msgstr "Sdílet stránku (veřejná)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Sdílejte pluginy z repozitáře GitHub. Zafixujte vydání pomocí git tagů."
+
+msgid "Share usage data"
+msgstr "Sdílet data o používání"
 
 msgid "Share via…"
 msgstr "Sdílet přes…"

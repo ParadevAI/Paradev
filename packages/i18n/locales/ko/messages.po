@@ -2489,6 +2489,9 @@ msgstr "에이전트가 조작하는 미리보기"
 msgid "Agents"
 msgstr "에이전트"
 
+msgid "Agents and workspaces"
+msgstr "에이전트 및 워크스페이스"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
@@ -3084,6 +3087,9 @@ msgstr "API 환산"
 
 msgid "API-equivalent cost"
 msgstr "API 환산 비용"
+
+msgid "App"
+msgstr "앱"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "채팅 설정을 업데이트할 수 없습니다"
 msgid "Couldn't update the queue"
 msgstr "대기열을 업데이트할 수 없습니다"
 
+msgid "Couldn't update the usage data setting"
+msgstr "사용 데이터 설정을 업데이트하지 못했습니다"
+
 msgid "Couldn't update thread"
 msgstr "스레드를 업데이트하지 못했습니다"
 
@@ -9988,6 +9997,9 @@ msgstr "도움말"
 
 msgid "Help & Docs"
 msgstr "도움말 및 문서"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "사용 데이터와 충돌 보고서를 보내 Paradev 개선에 도움을 주세요. <0>자세히 알아보기<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "끔"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "환경에 DO_NOT_TRACK이 설정되어 있어 꺼져 있습니다."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100개 이상의 코딩 에이전트를 병렬로 실행하는 앱, {0}의 공식 문서입니다."
@@ -17131,6 +17146,9 @@ msgstr "지금 다시 시작하면 {accountLabel}(으)로 이동하며, 각 세�
 msgid "Restart onboarding"
 msgstr "온보딩 다시 시작"
 
+msgid "Restart Paradev to apply"
+msgstr "적용하려면 Paradev를 다시 시작하세요"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
@@ -18634,6 +18652,9 @@ msgstr "페이지 공유(공개)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHub 저장소에서 플러그인을 공유하세요. git 태그로 릴리스를 고정합니다."
+
+msgid "Share usage data"
+msgstr "사용 데이터 공유"
 
 msgid "Share via…"
 msgstr "공유 방법…"

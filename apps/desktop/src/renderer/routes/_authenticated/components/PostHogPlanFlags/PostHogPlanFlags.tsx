@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
-import { posthog } from "renderer/lib/posthog";
+import { postHogIdentity } from "renderer/lib/posthog-identity";
 
 export function PostHogPlanFlags() {
 	const { activePlan } = useCurrentPlan();
@@ -8,8 +8,7 @@ export function PostHogPlanFlags() {
 
 	useEffect(() => {
 		if (!planTier) return;
-		posthog.setPersonProperties({ plan_tier: planTier });
-		posthog.setPersonPropertiesForFlags({ plan_tier: planTier });
+		postHogIdentity.setPlanTier(planTier);
 	}, [planTier]);
 
 	return null;

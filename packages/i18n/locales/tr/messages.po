@@ -2489,6 +2489,9 @@ msgstr "Ajanın yönettiği önizlemeler"
 msgid "Agents"
 msgstr "Ajanlar"
 
+msgid "Agents and workspaces"
+msgstr "Ajanlar ve çalışma alanları"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Ajanlar {0} araçlarına erişemiyor"
@@ -3084,6 +3087,9 @@ msgstr "API eşdeğeri"
 
 msgid "API-equivalent cost"
 msgstr "API eşdeğeri maliyet"
+
+msgid "App"
+msgstr "Uygulama"
 
 msgctxt "log scope"
 msgid "App"
@@ -6598,6 +6604,9 @@ msgstr "Sohbet ayarı güncellenemedi"
 msgid "Couldn't update the queue"
 msgstr "Kuyruk güncellenemedi"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Kullanım verisi ayarı güncellenemedi"
+
 msgid "Couldn't update thread"
 msgstr "Konu güncellenemedi"
 
@@ -9988,6 +9997,9 @@ msgstr "Yardım"
 
 msgid "Help & Docs"
 msgstr "Yardım ve belgeler"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Kullanım verileri ve çökme raporları göndererek Paradev'i geliştirmemize yardım edin. <0>Daha fazla bilgi<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13883,6 +13895,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Kapalı"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Ortamınızda DO_NOT_TRACK ayarlı olduğu için kapalı."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100'den fazla kodlama ajanını paralel çalıştıran {0} uygulamasının resmi belgeleri."
@@ -17131,6 +17146,9 @@ msgstr "Şimdi yeniden başlatarak {accountLabel} hesabına taşıyın; her otur
 msgid "Restart onboarding"
 msgstr "Başlangıç adımlarını yeniden başlat"
 
+msgid "Restart Paradev to apply"
+msgstr "Uygulamak için Paradev'i yeniden başlatın"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Çalışan {providerLabel} ajanları yeniden başlatılsın mı?"
 
@@ -18634,6 +18652,9 @@ msgstr "Sayfayı paylaş (herkese açık)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Eklentileri bir GitHub deposundan paylaşın. Sürümleri git etiketleriyle sabitleyin."
+
+msgid "Share usage data"
+msgstr "Kullanım verilerini paylaş"
 
 msgid "Share via…"
 msgstr "Şununla paylaş…"
