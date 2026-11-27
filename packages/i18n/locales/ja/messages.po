@@ -22607,8 +22607,8 @@ msgstr "コーディングエージェント軍団を動かせるよう、シー
 msgid "We sent the download link to {submittedEmail}."
 msgstr "{submittedEmail}にダウンロードリンクを送信しました。"
 
-msgid "We use cookies for analytics and ad measurement."
-msgstr "分析と広告効果の測定にCookieを使用しています。"
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgstr "分析と広告効果の測定に Cookie を使用しています。拒否した場合は、Cookie を使わずにページビューのみを集計します。"
 
 msgid "We'll be in touch shortly."
 msgstr "折り返しご連絡します。"

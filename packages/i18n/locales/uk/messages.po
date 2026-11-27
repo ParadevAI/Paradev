@@ -22601,8 +22601,8 @@ msgstr "Ми залучили {amount} у seed-раунді, щоб допомо
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Ми надіслали посилання для завантаження на {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement."
-msgstr "Ми використовуємо файли cookie для аналітики та вимірювання ефективності реклами."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgstr "Ми використовуємо файли cookie для аналітики та вимірювання реклами. Якщо ви відмовитеся, ми рахуватимемо лише перегляди сторінок, без cookie."
 
 msgid "We'll be in touch shortly."
 msgstr "Ми скоро з вами зв'яжемося."

@@ -4,7 +4,10 @@ import type { PostHog } from "posthog-js";
 import { env } from "@/env";
 import { onConsentChange } from "@/lib/analytics/consent";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
-import { createPosthogStarter } from "@/lib/analytics/posthog-start";
+import {
+	createPosthogStarter,
+	type PosthogMode,
+} from "@/lib/analytics/posthog-start";
 
 // posthog-js and @sentry/nextjs together add ~200KiB to the initial bundle,
 // which tanks the Lighthouse LCP on throttled mobile. Both are dynamically
@@ -17,7 +20,12 @@ type SentryClient = typeof import("@sentry/nextjs");
 let sentryClient: SentryClient | null = null;
 let started = false;
 
-function startPosthog(posthog: PostHog) {
+function startPosthog(posthog: PostHog, mode: PosthogMode) {
+	if (mode === "cookieless") {
+		startCookielessPosthog(posthog);
+		return;
+	}
+
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 		api_host: "/ingest",
 		ui_host: "https://us.posthog.com",
@@ -33,7 +41,42 @@ function startPosthog(posthog: PostHog) {
 		persistence_name: POSTHOG_COOKIE_NAME,
 		disable_session_recording: true,
 	});
+	if (posthog.has_opted_out_capturing()) {
+		posthog.opt_in_capturing({ captureEventName: false });
+	}
 
+	registerPageProperties(posthog);
+	setPosthogInstance(posthog);
+}
+
+/** Page views only, kept apart from withPosthog() so no custom event or identify reaches it. */
+function startCookielessPosthog(posthog: PostHog) {
+	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
+		api_host: "/ingest",
+		ui_host: "https://us.posthog.com",
+		defaults: "2025-11-30",
+		cookieless_mode: "always",
+		persistence: "memory",
+		disable_persistence: true,
+		capture_pageview: "history_change",
+		capture_pageleave: true,
+		autocapture: false,
+		capture_exceptions: false,
+		capture_dead_clicks: false,
+		capture_heatmaps: false,
+		capture_performance: false,
+		disable_session_recording: true,
+		disable_surveys: true,
+		disable_conversations: true,
+		advanced_disable_flags: true,
+		person_profiles: "identified_only",
+		debug: false,
+	});
+	posthog.clear_opt_in_out_capturing();
+	registerPageProperties(posthog);
+}
+
+function registerPageProperties(posthog: PostHog) {
 	posthog.register({
 		app_name: "marketing",
 		domain: window.location.hostname,
@@ -43,8 +86,6 @@ function startPosthog(posthog: PostHog) {
 		app_locale: document.documentElement.lang,
 		app_locale_source: "url",
 	});
-
-	setPosthogInstance(posthog);
 }
 
 const initPosthog = createPosthogStarter(

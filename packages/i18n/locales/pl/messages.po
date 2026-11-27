@@ -22607,8 +22607,8 @@ msgstr "Pozyskaliśmy {amount} w rundzie seed, aby pomóc Ci uruchomić armię a
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Wysłaliśmy link do pobrania na {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement."
-msgstr "Używamy plików cookie do analityki i pomiaru reklam."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgstr "Używamy plików cookie do analityki i pomiaru reklam. Jeśli odmówisz, liczymy tylko wyświetlenia stron, bez plików cookie."
 
 msgid "We'll be in touch shortly."
 msgstr "Wkrótce się odezwiemy."

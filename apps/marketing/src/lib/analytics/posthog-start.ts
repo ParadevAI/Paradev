@@ -1,19 +1,27 @@
-import { canTrack, markTrackerLoaded } from "./consent";
+import {
+	canTrack,
+	markCookielessAnalytics,
+	markTrackerLoaded,
+} from "./consent";
 
+export type PosthogMode = "full" | "cookieless";
+
+/** Starts PostHog once: full with consent, cookieless without it. */
 export function createPosthogStarter<T>(
 	load: () => Promise<T>,
-	init: (posthog: T) => void,
+	init: (posthog: T, mode: PosthogMode) => void,
 ): () => Promise<void> {
-	let started = false;
+	let loading = false;
+	let mode: PosthogMode | null = null;
 	return async () => {
-		if (started || !canTrack()) return;
-		started = true;
+		if (loading || mode) return;
+		loading = true;
 		const posthog = await load();
-		if (!canTrack()) {
-			started = false;
-			return;
-		}
-		init(posthog);
-		markTrackerLoaded();
+		loading = false;
+		if (mode) return;
+		mode = canTrack() ? "full" : "cookieless";
+		init(posthog, mode);
+		if (mode === "full") markTrackerLoaded();
+		else markCookielessAnalytics();
 	};
 }

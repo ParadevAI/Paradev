@@ -5,16 +5,13 @@ import { Button } from "@superset/ui/button";
 import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
+import { acceptTracking, declineTracking } from "@/lib/analytics/choice";
 import {
 	type ConsentChoice,
 	readConsentChoice,
 	readConsentRegion,
-	saveConsentChoice,
 } from "@/lib/analytics/consent";
 import type { ConsentRegion } from "@/lib/analytics/consent-region";
-import { declineTracking } from "@/lib/analytics/decline";
-import { withPosthog } from "@/lib/analytics/lazy";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "./constants";
 
 function storedChoice(): ConsentChoice | null {
@@ -38,9 +35,8 @@ export function CookieConsent() {
 	}, []);
 
 	const handleAccept = () => {
-		saveConsentChoice("accepted");
 		setShowBanner(false);
-		withPosthog((posthog) => posthog.opt_in_capturing());
+		acceptTracking();
 	};
 
 	const handleDecline = () => {
@@ -59,7 +55,10 @@ export function CookieConsent() {
 					className="fixed inset-x-2 bottom-2 z-50 flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2 shadow-lg sm:inset-x-auto sm:bottom-4 sm:left-4 sm:max-w-md"
 				>
 					<p className="min-w-0 flex-1 text-xs leading-snug text-muted-foreground">
-						<Trans>We use cookies for analytics and ad measurement.</Trans>{" "}
+						<Trans>
+							We use cookies for analytics and ad measurement. If you decline,
+							we only count page views, without cookies.
+						</Trans>{" "}
 						<Link
 							href="/privacy"
 							className="whitespace-nowrap text-foreground underline underline-offset-2"

@@ -22607,8 +22607,8 @@ msgstr "我們完成了 {amount} 種子輪募資，幫你調動一支程式代�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下載連結已傳送至{submittedEmail}。"
 
-msgid "We use cookies for analytics and ad measurement."
-msgstr "我們使用cookie進行分析和廣告成效衡量。"
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgstr "我們使用 Cookie 進行分析與廣告成效衡量。如果您拒絕，我們只統計頁面瀏覽次數，不使用 Cookie。"
 
 msgid "We'll be in touch shortly."
 msgstr "我們會盡快與你聯絡。"

@@ -22607,8 +22607,8 @@ msgstr "Bir kodlama ajanı ordusu yönetmenize yardımcı olmak için {amount} t
 msgid "We sent the download link to {submittedEmail}."
 msgstr "İndirme bağlantısını {submittedEmail} adresine gönderdik."
 
-msgid "We use cookies for analytics and ad measurement."
-msgstr "Çerezleri analiz ve reklam ölçümü için kullanıyoruz."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgstr "Çerezleri analiz ve reklam ölçümü için kullanıyoruz. Reddederseniz, çerez olmadan yalnızca sayfa görüntülemelerini sayarız."
 
 msgid "We'll be in touch shortly."
 msgstr "Kısa süre içinde sizinle iletişime geçeceğiz."

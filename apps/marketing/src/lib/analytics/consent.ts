@@ -5,8 +5,12 @@ export type ConsentChoice = "accepted" | "declined";
 
 const CONSENT_CHANGE_EVENT = "paradev:consent-change";
 const TRACKER_LOADED_KEY = Symbol.for("paradev.trackerLoaded");
+const COOKIELESS_KEY = Symbol.for("paradev.cookielessAnalytics");
 
-type TrackerWindow = Window & { [TRACKER_LOADED_KEY]?: true };
+type TrackerWindow = Window & {
+	[TRACKER_LOADED_KEY]?: true;
+	[COOKIELESS_KEY]?: true;
+};
 
 /** Records that a tracker has loaded in this document, which only a reload undoes. */
 export function markTrackerLoaded(): void {
@@ -15,6 +19,15 @@ export function markTrackerLoaded(): void {
 
 export function hasLoadedTracker(): boolean {
 	return (window as TrackerWindow)[TRACKER_LOADED_KEY] === true;
+}
+
+/** Records that PostHog runs without cookies in this document. */
+export function markCookielessAnalytics(): void {
+	(window as TrackerWindow)[COOKIELESS_KEY] = true;
+}
+
+export function hasCookielessAnalytics(): boolean {
+	return (window as TrackerWindow)[COOKIELESS_KEY] === true;
 }
 
 export function mayTrack(

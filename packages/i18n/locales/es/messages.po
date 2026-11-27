@@ -22607,8 +22607,8 @@ msgstr "Cerramos una ronda semilla de {amount} para ayudarte a ejecutar un ejér
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Enviamos el enlace de descarga a {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement."
-msgstr "Usamos cookies para analítica y para medir nuestros anuncios."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgstr "Usamos cookies para analítica y medición de anuncios. Si las rechazas, solo contamos visitas a páginas, sin cookies."
 
 msgid "We'll be in touch shortly."
 msgstr "Nos pondremos en contacto en breve."
