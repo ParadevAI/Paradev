@@ -54,11 +54,17 @@ const MODIFIER_BITS: Record<string, number> = {
  * asks for.
  */
 function modifiedArrow(parts: string[]): string | undefined {
-	const arrow = ARROW_KEYS[parts[parts.length - 1] ?? ""];
-	if (!arrow) return undefined;
+	const last = parts[parts.length - 1] ?? "";
+	// Own properties only: both tables inherit from Object.prototype, so
+	// `shift+__proto__` would otherwise read an object and encode
+	// "\x1b[1;2[object Object]".
+	if (!Object.hasOwn(ARROW_KEYS, last)) return undefined;
+	const arrow = ARROW_KEYS[last];
 	let bits = 0;
 	for (const part of parts.slice(0, -1)) {
-		const bit = MODIFIER_BITS[part];
+		const bit = Object.hasOwn(MODIFIER_BITS, part)
+			? MODIFIER_BITS[part]
+			: undefined;
 		// An unknown or repeated modifier is not a chord we can encode.
 		if (!bit || (bits & bit) !== 0) return undefined;
 		bits |= bit;
@@ -84,8 +90,19 @@ function keyBytes(key: string): string {
 	const name = key.toLowerCase().replace(/^c-/, "ctrl+").replace(/^m-/, "alt+");
 	const named = Object.hasOwn(NAMED_KEYS, name) ? NAMED_KEYS[name] : undefined;
 	if (named) return named;
-	const arrow = modifiedArrow(name.split("+"));
+	const parts = name.split("+");
+	const arrow = modifiedArrow(parts);
 	if (arrow) return arrow;
+	// A key that ends in an arrow but whose modifiers did not form a chord is
+	// malformed. The alt fallback would recurse and send a different chord:
+	// `alt+alt+shift+up` used to become ESC ESC [1;4A instead of failing.
+	const last = parts[parts.length - 1] ?? "";
+	if (parts.length > 1 && Object.hasOwn(ARROW_KEYS, last)) {
+		throw new CLIError(
+			`Unknown key: ${key}`,
+			`Use shift, alt or ctrl once before an arrow: shift|alt|ctrl+<arrow>`,
+		);
+	}
 	const ctrl = /^ctrl\+([a-z])$/.exec(name);
 	if (ctrl?.[1]) return String.fromCharCode(ctrl[1].charCodeAt(0) - 96);
 	const alt = /^alt\+(.+)$/.exec(name);

@@ -65,5 +65,21 @@ describe("parseTerminalKeys", () => {
 		expect(() => parseTerminalKeys("shift+shift+up")).toThrow(
 			"Unknown key: shift+shift+up",
 		);
+		// The alt fallback used to recurse here and send ESC ESC [1;4A.
+		expect(() => parseTerminalKeys("alt+alt+shift+up")).toThrow(
+			"Unknown key: alt+alt+shift+up",
+		);
+	});
+
+	test("reads only own properties, not Object.prototype", () => {
+		expect(() => parseTerminalKeys("shift+__proto__")).toThrow(
+			"Unknown key: shift+__proto__",
+		);
+		expect(() => parseTerminalKeys("shift+__proto__+up")).toThrow(
+			"Unknown key: shift+__proto__+up",
+		);
+		expect(() => parseTerminalKeys("constructor+up")).toThrow(
+			"Unknown key: constructor+up",
+		);
 	});
 });
