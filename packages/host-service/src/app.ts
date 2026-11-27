@@ -3,6 +3,7 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
+import { TELEMETRY_HEADER } from "@superset/shared/constants";
 import {
 	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_RELAYED_HEADER,
@@ -233,6 +234,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				"trpc-accept",
 				"x-superset-client-machine-id",
 				SUPERSET_USER_ID_HEADER,
+				TELEMETRY_HEADER,
 			],
 		}),
 	);
@@ -595,6 +597,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 					clientMachineId:
 						c.req.header("x-superset-client-machine-id") ?? undefined,
 					userId: c.req.header(SUPERSET_USER_ID_HEADER)?.trim() || undefined,
+					telemetryOff: c.req.header(TELEMETRY_HEADER) === "off",
 					browserBridge: config.browserBridge,
 					apiAuth: providers.auth,
 					isLocalCaller: c.req.header(SUPERSET_RELAYED_HEADER) === undefined,

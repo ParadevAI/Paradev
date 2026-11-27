@@ -1,1 +1,4 @@
-export { telemetryGatedTransport } from "./sentry-transport";
+export {
+	telemetryGatedOfflineTransport,
+	telemetryGatedTransport,
+} from "./sentry-transport";

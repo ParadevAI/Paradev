@@ -37,9 +37,17 @@ export function createPostHogIdentity({
 		const request = ++flagsRequest;
 		const response = await fetchFlags({
 			distinct_id: user.id,
-			person_properties: planTier ? { plan_tier: planTier } : {},
+			person_properties: {
+				...(enabled ? user.flags : {}),
+				...(planTier ? { plan_tier: planTier } : {}),
+			},
 		});
-		if (response && request === flagsRequest && ready()) {
+		if (
+			response &&
+			request === flagsRequest &&
+			ready() &&
+			posthog._shouldDisableFlags()
+		) {
 			posthog.featureFlags.receivedFeatureFlags(response as never);
 		}
 	}
@@ -97,6 +105,7 @@ export function createPostHogIdentity({
 				posthog.setPersonPropertiesForFlags(flags, false);
 			}
 			posthog.reloadFeatureFlags();
+			void refreshMinimalFlags();
 		},
 
 		setPlanTier(tier: string) {
@@ -108,6 +117,7 @@ export function createPostHogIdentity({
 			}
 			posthog.setPersonProperties({ plan_tier: tier });
 			posthog.setPersonPropertiesForFlags({ plan_tier: tier });
+			void refreshMinimalFlags();
 		},
 
 		setPeople(properties: Properties) {

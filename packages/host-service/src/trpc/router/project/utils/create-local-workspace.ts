@@ -15,7 +15,7 @@ export type LocalWorkspaceContext = Pick<
 	Partial<
 		Pick<
 			HostServiceContext,
-			"api" | "organizationId" | "clientMachineId" | "userId"
+			"api" | "organizationId" | "clientMachineId" | "userId" | "telemetryOff"
 		>
 	>;
 
@@ -106,6 +106,7 @@ export async function createLocalWorkspace(
 			api: ctx.api,
 			organizationId: ctx.organizationId,
 			clientMachineId: ctx.clientMachineId,
+			telemetryOff: ctx.telemetryOff,
 			userId: ctx.userId,
 		},
 		{

@@ -1,4 +1,3 @@
-import { EventEmitter } from "node:events";
 import {
 	setupSingleAgent,
 	teardownSingleAgent,
@@ -66,6 +65,7 @@ import {
 	type PresetWithUnknownMode,
 	shouldPersistNormalizedTerminalPresets,
 } from "./preset-execution-mode";
+import { createTelemetryStateChannel } from "./telemetry-state";
 
 function isValidRingtoneId(ringtoneId: string): boolean {
 	if (isBuiltInRingtoneId(ringtoneId)) {
@@ -146,16 +146,10 @@ function initializeDefaultPresets() {
 	return mergedPresets;
 }
 
-interface TelemetryState {
-	enabled: boolean;
-	doNotTrack: boolean;
-}
-
-const telemetryEvents = new EventEmitter();
-
-function getTelemetryState(): TelemetryState {
-	return { enabled: readTelemetrySetting(), doNotTrack: isDoNotTrackSet() };
-}
+const telemetryState = createTelemetryStateChannel(() => ({
+	enabled: readTelemetrySetting(),
+	doNotTrack: isDoNotTrackSet(),
+}));
 
 export const createSettingsRouter = () => {
 	return router({
@@ -677,23 +671,17 @@ export const createSettingsRouter = () => {
 				return { ran };
 			}),
 
-		getTelemetryState: publicProcedure.query(getTelemetryState),
+		getTelemetryState: publicProcedure.query(telemetryState.read),
 
 		onTelemetryChange: publicProcedure.subscription(() =>
-			observable<TelemetryState>((emit) => {
-				const notify = (state: TelemetryState) => emit.next(state);
-				telemetryEvents.on("change", notify);
-				return () => {
-					telemetryEvents.off("change", notify);
-				};
-			}),
+			telemetryState.observe(),
 		),
 
 		setTelemetryEnabled: publicProcedure
 			.input(z.object({ enabled: z.boolean() }))
 			.mutation(({ input }) => {
 				writeTelemetrySetting(input.enabled);
-				telemetryEvents.emit("change", getTelemetryState());
+				telemetryState.publish();
 				return { success: true };
 			}),
 	});

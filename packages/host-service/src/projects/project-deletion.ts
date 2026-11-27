@@ -39,7 +39,9 @@ type ProjectDeletionContext = Pick<
 	HostServiceContext,
 	"db" | "eventBus" | "api" | "credentials" | "organizationId"
 > &
-	Partial<Pick<HostServiceContext, "clientMachineId" | "userId">>;
+	Partial<
+		Pick<HostServiceContext, "clientMachineId" | "userId" | "telemetryOff">
+	>;
 
 /**
  * Hide the project and every live workspace in it for everyone on this

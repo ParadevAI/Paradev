@@ -99,6 +99,7 @@ export async function adoptExistingWorktree(
 		api: ctx.api,
 		organizationId: ctx.organizationId,
 		clientMachineId: ctx.clientMachineId,
+		telemetryOff: ctx.telemetryOff,
 		userId: ctx.userId,
 	};
 

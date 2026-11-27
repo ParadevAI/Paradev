@@ -55,4 +55,40 @@ describe("TelemetrySetting", () => {
 		expect(isTelemetryEnabled()).toBe(false);
 		expect(await view.findByText("Restart Paradev to apply")).not.toBeNull();
 	});
+
+	test("a failed save puts telemetry back to the restored setting", async () => {
+		const link: TRPCLink<AppRouter> = () => (call) =>
+			observable((observer) => {
+				if (call.op.path === "settings.getTelemetryState") {
+					observer.next({
+						result: { data: { enabled: true, doNotTrack: false } },
+					});
+					observer.complete();
+				}
+				if (call.op.path === "settings.setTelemetryEnabled") {
+					observer.error(new Error("disk full") as never);
+				}
+			});
+		const view = render(
+			<electronTrpc.Provider
+				client={electronTrpc.createClient({ links: [link] })}
+				queryClient={new QueryClient()}
+			>
+				<TelemetrySetting />
+			</electronTrpc.Provider>,
+		);
+		const toggle = view.container.querySelector(
+			"#telemetry",
+		) as HTMLButtonElement;
+		await waitFor(() => expect(toggle.disabled).toBe(false));
+
+		await act(async () => {
+			fireEvent.click(toggle);
+		});
+
+		await waitFor(() =>
+			expect(toggle.getAttribute("aria-checked")).toBe("true"),
+		);
+		expect(isTelemetryEnabled()).toBe(true);
+	});
 });

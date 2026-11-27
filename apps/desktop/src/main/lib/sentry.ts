@@ -5,7 +5,7 @@ import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
 import { session } from "electron";
 import { APP_PARTITION } from "shared/constants";
 import { env } from "../env.main";
-import { telemetryGatedTransport } from "./sentry-transport";
+import { telemetryGatedOfflineTransport } from "./sentry-transport";
 
 let sentryInitialized = false;
 
@@ -30,7 +30,10 @@ export function initSentry(): void {
 			// else's rare ones, nor spend the org's quota getting there.
 			beforeSend: (event) =>
 				isTelemetryEnabled() ? throttleRepeats(event) : null,
-			transport: telemetryGatedTransport(Sentry.makeElectronOfflineTransport()),
+			transport: telemetryGatedOfflineTransport(
+				Sentry.makeElectronOfflineTransport,
+				Sentry.makeElectronTransport,
+			),
 			ipcMode: IPCMode.Classic,
 			getSessions: () => [
 				session.defaultSession,

@@ -8,6 +8,7 @@ function fakePostHog({ optedOut = false, optOutByDefault = false } = {}) {
 		optedOut,
 		storedConsent: null as "in" | "out" | null,
 		disableFlags: false,
+		disabledAtInit: false,
 		flagProperties: { email: "someone@example.com" } as Record<string, unknown>,
 		received: [] as unknown[],
 	};
@@ -42,7 +43,7 @@ function fakePostHog({ optedOut = false, optOutByDefault = false } = {}) {
 		set_config: (config: { advanced_disable_flags?: boolean }) => {
 			state.disableFlags = config.advanced_disable_flags ?? state.disableFlags;
 		},
-		_shouldDisableFlags: () => state.disableFlags,
+		_shouldDisableFlags: () => state.disabledAtInit || state.disableFlags,
 		featureFlags: {
 			receivedFeatureFlags: (response: unknown) => {
 				state.received.push(response);
@@ -62,15 +63,19 @@ function setup(
 		optedOut?: boolean;
 		optOutByDefault?: boolean;
 		flagsDisabled?: boolean;
+		flagsDisabledAtInit?: boolean;
+		fetchFlags?: () => Promise<unknown>;
 	} = {},
 ) {
 	const fake = fakePostHog(options);
 	fake.state.disableFlags = options.flagsDisabled ?? false;
+	fake.state.disabledAtInit = options.flagsDisabledAtInit ?? false;
 	const requests: unknown[] = [];
 	const identity = createPostHogIdentity({
 		posthog: fake.posthog,
 		fetchFlags: async (request) => {
 			requests.push(request);
+			if (options.fetchFlags) return options.fetchFlags();
 			return { flags: { "cloud-workspaces": { enabled: true } } };
 		},
 	});
@@ -156,5 +161,41 @@ describe("PostHog consent follows the setting", () => {
 		identity.start(false);
 		identity.reset();
 		expect(state.storedConsent).toBe("out");
+	});
+});
+
+describe("flags after the setting is turned on", () => {
+	test("a launch with it off keeps flags fresh after it is turned on and the plan changes", async () => {
+		const { identity, requests } = setup({ flagsDisabledAtInit: true });
+		identity.start(false);
+		identity.identifyUser("user-1", { email: "someone@example.com" });
+		identity.apply(true);
+		await flush();
+		const before = requests.length;
+
+		identity.setPlanTier("team");
+		await flush();
+
+		expect(requests.length).toBe(before + 1);
+		expect(requests.at(-1)).toMatchObject({
+			distinct_id: "user-1",
+			person_properties: { plan_tier: "team" },
+		});
+	});
+
+	test("a minimal response that lands after SDK flags are back does not replace them", async () => {
+		let respond: (value: unknown) => void = () => {};
+		const { identity, state } = setup({
+			fetchFlags: () => new Promise((resolve) => (respond = resolve)),
+		});
+		identity.start(true);
+		identity.identifyUser("user-1", { email: "someone@example.com" });
+		identity.apply(false);
+		identity.apply(true);
+
+		respond({ flags: { stale: { enabled: true } } });
+		await flush();
+
+		expect(state.received).toEqual([]);
 	});
 });

@@ -33,6 +33,9 @@ export function TelemetrySetting() {
 			onError: (_error, _input, context) => {
 				if (context?.previous) {
 					utils.settings.getTelemetryState.setData(undefined, context.previous);
+					applyTelemetrySetting(
+						context.previous.enabled && !context.previous.doNotTrack,
+					);
 				}
 				toast.error(t({ message: "Couldn't update the usage data setting" }));
 			},
