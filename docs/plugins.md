@@ -165,8 +165,22 @@ tells the model to use the `paradev:` name. Composers fold `superset:<x>` into
 `paradev:<x>` as an alias (`foldLegacyPluginCommands` in `@superset/shared/slash-commands`). Do not
 remove the `superset` directory: builds from before the rename provision only it and reap
 `paradev`, so `superset:` is the one name that resolves on every build. If the user owns a
-`paradev` directory, `superset` stays the full plugin. The `~/.agents/skills/superset-<skill>` names
-did not change; the source directory is now `plugins/paradev/`.
+`paradev` directory, `superset` stays the full plugin. The source directory is `plugins/paradev/`.
+
+Other agents get the same two names. Each bundled skill is `~/.agents/skills/paradev-<skill>` and
+also `superset-<skill>`, whose description points at the new name, and the in-app commands are
+written under both `~/.agents/commands/paradev/` and `~/.agents/commands/superset/`. The
+`paradev-<skill>` dirs carry `<!-- paradev-managed-skill v1 -->` instead of the old marker: a build
+from before these names reaps every marked dir it did not write, and this marker is one it does not
+know, so it leaves them alone. It still rewrites `superset-<skill>` in full, which is why that copy
+keeps the whole skill. A disable applies to both copies, whether the key is the bare skill name,
+`superset/<skill>` or `paradev/<skill>`.
+
+One entry is renamed rather than only prefixed: the `superset-automation` command is
+`paradev:paradev-automation` in the `paradev` dir and stays `superset:superset-automation` in the
+`superset` one (`RENAMED_PLUGIN_ENTRIES` in `@superset/shared/slash-commands`, which the composers'
+fold also reads). The source file keeps its old name while the GitHub marketplace still installs
+the plugin as `superset`.
 
 Plugin MCP servers are also synced to Claude's `~/.claude.json`, Codex's
 `~/.codex/config.toml`, and pdev's `~/.paradev/agent/mcp.json`. pdev honors

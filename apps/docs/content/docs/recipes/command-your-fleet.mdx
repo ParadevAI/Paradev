@@ -58,5 +58,5 @@ Archives every listed workspace (the project's `main` workspace cannot be archiv
 ## Variations
 
 - **Scope by name**: prefix fleet workspaces (`worker-1`, `race-claude`) at creation, then drive only them with `workspaces list --search worker- --quiet`
-- **Let an agent do this**: the [`superset:orchestrate` skill](/orchestration) runs these same loops for you; monitoring workers and delivering follow-ups is exactly how it coordinates
+- **Let an agent do this**: the [`paradev:orchestrate` skill](/orchestration) runs these same loops for you; monitoring workers and delivering follow-ups is exactly how it coordinates
 - **Watch continuously**: wrap the read loop in `watch -n 30` for a poor-man's fleet dashboard
