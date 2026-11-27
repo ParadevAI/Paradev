@@ -114,7 +114,7 @@ export type ComposerProps = {
 	agentSwitcher?: AgentSwitcher;
 	modes?: SessionMode[];
 	currentModeId?: string;
-	onSetMode?: (modeId: string) => void;
+	onSetMode?: (modeId: string) => unknown;
 	onSend: (
 		content: UserContent[],
 		options: { steer: boolean; draft: ComposerDraft },
@@ -560,6 +560,17 @@ export const Composer = memo(function Composer({
 		[appCommands.commands, availableCommands, hiddenAgentNames, t],
 	);
 
+	const keepDraft = useCallback(
+		(draft: ComposerDraft) => {
+			const input = promptInputRef.current;
+			const sink = blockedDraftSink.current;
+			if (sink) sink(draft);
+			else if (input) input.restoreDraft(draft);
+			else prependToDraft(draftKey, [draft], draftPersisted);
+		},
+		[draftKey, draftPersisted],
+	);
+
 	const send = useCallback(
 		async (
 			text: string,
@@ -572,17 +583,12 @@ export const Composer = memo(function Composer({
 			const upload = await uploadAttachments(files);
 			if (!upload.ok) {
 				const keep = new Set(upload.keep);
-				const restored: ComposerDraft = {
+				keepDraft({
 					...draft,
 					attachments: draft.attachments.filter((attachment) =>
 						keep.has(attachment.file),
 					),
-				};
-				const input = promptInputRef.current;
-				const sink = blockedDraftSink.current;
-				if (sink) sink(restored);
-				else if (input) input.restoreDraft(restored);
-				else prependToDraft(draftKey, [restored]);
+				});
 				return;
 			}
 			const { tags, parts } = upload;
@@ -628,7 +634,7 @@ export const Composer = memo(function Composer({
 			onSend,
 			uploadAttachments,
 			clearDraft,
-			draftKey,
+			keepDraft,
 			mcpPicker.serverNameOf,
 			otherHostOf,
 		],
@@ -651,6 +657,15 @@ export const Composer = memo(function Composer({
 			const typed = runTyped(text, files.length > 0 || quotes.length > 0);
 			if (typed === "ran") return;
 			if (typed === "kept") return false;
+			if (typed !== "not-app") {
+				return Promise.resolve(typed.ready).then(
+					() => send(typed.text, files, mentions, steer, draft),
+					() => {
+						keepDraft(draft);
+						toast.error(t({ message: "Could not change the mode" }));
+					},
+				);
+			}
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
 			if (
 				name &&
@@ -672,7 +687,7 @@ export const Composer = memo(function Composer({
 			}
 			return send(text, files, mentions, quotes, steer, draft);
 		},
-		[availableCommands, blocked, runTyped, send, t, target],
+		[availableCommands, blocked, keepDraft, runTyped, send, t, target],
 	);
 
 	const insertSetupPrompt = useCallback((prompt: string) => {

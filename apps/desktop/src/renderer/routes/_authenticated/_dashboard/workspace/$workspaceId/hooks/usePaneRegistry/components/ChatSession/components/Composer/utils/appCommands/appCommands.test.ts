@@ -95,4 +95,17 @@ describe("APP_COMMANDS", () => {
 		expect(command("fast").run(context, "on", COMPOSER)).toBe("done");
 		expect(explainUnavailable).toHaveBeenCalledTimes(1);
 	});
+
+	test("/plan takes attachments and goes on to send the text after it", () => {
+		const enter = mock(() => {});
+		const context: AppCommandContext = {
+			plan: { active: false, enter, leave: NOOP },
+		};
+		expect(command("plan").acceptsAttachments).toBe(true);
+		expect(command("plan").run(context, "", COMPOSER)).toBe("done");
+		expect(command("plan").run(context, "inspect this image", COMPOSER)).toBe(
+			"continue",
+		);
+		expect(enter).toHaveBeenCalledTimes(2);
+	});
 });

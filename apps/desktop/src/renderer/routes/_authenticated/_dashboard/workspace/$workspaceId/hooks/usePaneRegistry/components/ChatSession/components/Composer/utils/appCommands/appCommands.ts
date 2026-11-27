@@ -38,7 +38,7 @@ export type AppCommandContext = {
 	createAutomation?: (prompt: string) => void;
 };
 
-export type AppCommandOutcome = "done" | "bad-args";
+export type AppCommandOutcome = "done" | "continue" | "bad-args";
 
 export type AppCommandChoice = { arg: string; description: MessageDescriptor };
 
@@ -50,6 +50,7 @@ export type AppCommand = {
 	hint?: string | MessageDescriptor;
 	/** Picking it from the menu leaves it in the composer for the text it takes. */
 	takesText?: boolean;
+	acceptsAttachments?: boolean;
 	/** One menu row per choice, each running the command with its argument. */
 	choices?: (context: AppCommandContext) => AppCommandChoice[];
 	available: (context: AppCommandContext) => boolean;
@@ -116,9 +117,13 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		name: "plan",
 		icon: NotebookPen,
 		description: msg({ message: "Read and plan without changing anything" }),
+		acceptsAttachments: true,
 		available: (context) => context.plan !== undefined,
 		listed: (context) => context.plan?.active === false,
-		run: (context, args) => withoutArgs(args, context.plan?.enter),
+		run: (context, args) => {
+			context.plan?.enter();
+			return args ? "continue" : "done";
+		},
 	},
 	{
 		name: "default",

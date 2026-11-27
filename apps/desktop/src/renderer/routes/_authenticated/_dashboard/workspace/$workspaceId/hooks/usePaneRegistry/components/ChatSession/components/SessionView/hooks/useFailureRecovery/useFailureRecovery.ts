@@ -54,8 +54,7 @@ export function useFailureRecovery({
 				configOptions?.find((option) => option.id === configId)?.category ===
 				"model";
 			if (!isModel || !continueAfterModelPick.current) {
-				void setConfigOption(configId, value);
-				return;
+				return setConfigOption(configId, value);
 			}
 			continueAfterModelPick.current = false;
 			void setConfigOption(configId, value, { confirm: true }).then(
