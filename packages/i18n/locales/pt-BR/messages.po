@@ -853,6 +853,12 @@ msgstr "{commitCount, plural, one {# commit} other {# commits}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "O {companyName} encontra suas worktrees do Conductor e as importa no lugar, com as alterações sem commit."
 
+msgid "{companyName} finds your Orca worktrees and imports them in place, with uncommitted changes."
+msgstr "O {companyName} encontra suas worktrees do Orca e as importa no lugar, com as alterações sem commit."
+
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "O {companyName} encontra suas worktrees do T3 Code e as importa no lugar, com as alterações sem commit."
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName} é desenvolvido pela {companyName}"
 
@@ -2511,6 +2517,12 @@ msgstr "Agentes por agenda ou gatilho"
 msgid "Agents on your phone"
 msgstr "Agentes no seu celular"
 
+msgid "Agents open as a chat or as their CLI in a terminal. Switch the same session between the two at any time."
+msgstr "Os agentes abrem como um chat ou como a própria CLI em um terminal. Alterne a mesma sessão entre os dois a qualquer momento."
+
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "Os agentes abrem como um chat, igual a uma thread do T3 Code. Troque a mesma sessão para a CLI dela em um terminal quando quiser."
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "Os agentes lembram o que aprendem sobre sua base de código, então cada nova sessão já começa com contexto."
 
@@ -2945,6 +2957,9 @@ msgstr "Qualquer agente que você configurou no Paradev, como Claude Code ou Cod
 
 msgid "Any channel"
 msgstr "Qualquer canal"
+
+msgid "Any CLI agent"
+msgstr "Qualquer agente de CLI"
 
 msgid "Any conclusion"
 msgstr "Qualquer conclusão"
@@ -3512,6 +3527,9 @@ msgstr "As automações exigem o plano Pro."
 msgid "Automations, {myFailedCount} failing"
 msgstr "Automações, {myFailedCount} falhando"
 
+msgid "Automations. Create them again in {companyName}"
+msgstr "Automações. Crie-as de novo no {companyName}"
+
 msgid "Autonomous"
 msgstr "Autônomo"
 
@@ -4074,6 +4092,12 @@ msgstr "Posso comprar mais GB-horas na nuvem?"
 msgid "Can I create automations from a script?"
 msgstr "Posso criar automações a partir de um script?"
 
+msgid "Can I keep using Orca?"
+msgstr "Posso continuar usando o Orca?"
+
+msgid "Can I keep using T3 Code?"
+msgstr "Posso continuar usando o T3 Code?"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "Posso trocar de plano ou cancelar quando quiser?"
 
@@ -4376,11 +4400,27 @@ msgstr "Interface de chat"
 msgid "Chat name"
 msgstr "Nome do chat"
 
+msgid "Chat or terminal"
+msgstr "Chat ou terminal"
+
 msgid "Chat session not found"
 msgstr "Sessão de chat não encontrada"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Superfícies de chat: mensagens, raciocínio, sugestões"
+
+msgid "Chat threads, with a built-in terminal"
+msgstr "Threads de chat, com terminal integrado"
+
+msgid "Chat UI or terminal for each agent"
+msgstr "Interface de chat ou terminal para cada agente"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "Converse com seus agentes no {0} do jeito que você já está acostumado, nas worktrees que você já tem. Revisão, nuvem e celular já vêm incluídos."
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "Chat, ou a CLI do próprio agente em um terminal"
 
 msgid "Chats"
 msgstr "Chats"
@@ -4599,6 +4639,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode e outros. Sem configuração por ag
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code, Codex, Cursor, OpenCode e outros."
 
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx e agentes ACP"
+
 msgid "Claude is now running in workspace component-showcase."
 msgstr "O Claude está rodando agora na área de trabalho component-showcase."
 
@@ -4689,6 +4732,12 @@ msgstr "Documentação da CLI"
 
 msgid "CLI reference"
 msgstr "Referência da CLI"
+
+msgid "CLI, SDK and MCP"
+msgstr "CLI, SDK e MCP"
+
+msgid "CLI, TypeScript SDK, and MCP server"
+msgstr "CLI, SDK de TypeScript e servidor MCP"
 
 msgid "click"
 msgstr "clique"
@@ -5627,6 +5676,9 @@ msgstr "Contribuições"
 msgid "Control how your local machine is reachable from elsewhere"
 msgstr "Controle como sua máquina local pode ser acessada de fora"
 
+msgid "Control workspaces and agents from scripts with the CLI, the TypeScript SDK, or the MCP server."
+msgstr "Controle áreas de trabalho e agentes a partir de scripts com a CLI, o SDK de TypeScript ou o servidor MCP."
+
 msgid "Controls when manually edited files are saved"
 msgstr "Controla quando arquivos editados manualmente são salvos"
 
@@ -5641,6 +5693,12 @@ msgstr "Converter para config.toml"
 
 msgid "Convert to draft"
 msgstr "Converter em rascunho"
+
+msgid "Convert your actions"
+msgstr "Converta suas ações"
+
+msgid "Convert your scripts"
+msgstr "Converta seus scripts"
 
 msgid "Converting to draft…"
 msgstr "Convertendo em rascunho…"
@@ -8419,6 +8477,9 @@ msgstr "Expandir área de trabalho"
 msgid "Experimental"
 msgstr "Experimental"
 
+msgid "Experimental cloud VMs on your own provider"
+msgstr "VMs de nuvem experimentais no seu próprio provedor"
+
 msgid "Expired"
 msgstr "Expirado"
 
@@ -9345,6 +9406,9 @@ msgstr "Para quem está começando sozinho"
 msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
 msgstr "Para macOS em Apple Silicon e Intel, e Linux (AppImage)."
 
+msgid "For Orca users"
+msgstr "Para quem usa o Orca"
+
 msgid "For organizations with advanced needs"
 msgstr "Para organizações com necessidades avançadas"
 
@@ -9356,6 +9420,9 @@ msgstr "Para pedidos de imprensa e entrevistas, envie um e-mail para nós."
 
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "Para dúvidas sobre faturamento, <0>fale com a gente</0>."
+
+msgid "For T3 Code users"
+msgstr "Para quem usa o T3 Code"
 
 msgid "For teams that need more power"
 msgstr "Para times que precisam de mais"
@@ -10205,6 +10272,9 @@ msgstr "Como trabalhamos"
 msgid "How you run agents"
 msgstr "Como você executa agentes"
 
+msgid "How you work"
+msgstr "Como você trabalha"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Como seus agentes entram dentro das áreas de trabalho na nuvem. Outras pessoas conectam as próprias assinaturas ou chaves de API; nesta máquina cada agente continua usando o login que já está nela."
 
@@ -10780,8 +10850,14 @@ msgstr "Convidado por"
 msgid "Invoices and payment method"
 msgstr "Faturas e forma de pagamento"
 
+msgid "iOS and Android"
+msgstr "iOS e Android"
+
 msgid "iOS app"
 msgstr "App para iOS"
+
+msgid "iOS app and an Android APK, both in beta"
+msgstr "App para iOS e um APK para Android, ambos em beta"
 
 msgid "iOS app; cloud and experimental local Mac remote control"
 msgstr "App iOS; nuvem e controle remoto experimental do Mac local"
@@ -10887,6 +10963,12 @@ msgstr "Ela pode ter sido excluída ou pertence a outra organização."
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Para fazer o merge, ele precisa entrar de novo e passar nas verificações."
+
+msgid "It takes a few minutes, and you can keep Orca installed while you try it."
+msgstr "Leva alguns minutos, e você pode manter o Orca instalado enquanto testa."
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "Leva alguns minutos, e você pode manter o T3 Code instalado enquanto testa."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Leva poucos minutos. Usa o Conductor Cloud? Comece pelo <0>guia da nuvem</0>."
@@ -11065,6 +11147,9 @@ msgstr "Continuar editando"
 
 msgid "Keep paused"
 msgstr "Manter pausado"
+
+msgid "Keep the worktrees you already have, and run your agents as a chat or in a terminal. Review, cloud and mobile are built in."
+msgstr "Mantenha as worktrees que você já tem e execute seus agentes como um chat ou em um terminal. Revisão, nuvem e celular já vêm incluídos."
 
 msgid "Keep typing an email to invite"
 msgstr "Continue digitando um e-mail para convidar"
@@ -11798,6 +11883,9 @@ msgstr "macOS"
 msgid "macOS, Linux"
 msgstr "macOS, Linux"
 
+msgid "macOS, Windows, Linux"
+msgstr "macOS, Windows, Linux"
+
 msgid "Magenta"
 msgstr "Magenta"
 
@@ -11896,6 +11984,9 @@ msgstr "Gerencie a identidade visual e os membros da sua organização."
 
 msgid "Managed"
 msgstr "Gerenciada"
+
+msgid "Managed agent accounts in Orca. Sign in to each agent again"
+msgstr "Contas de agentes gerenciadas no Orca. Entre de novo em cada agente"
 
 msgid "Managed by"
 msgstr "Gerenciado por"
@@ -12371,6 +12462,9 @@ msgstr "Mais opções para {name}"
 msgid "More pages"
 msgstr "Mais páginas"
 
+msgid "More than 25 named agents"
+msgstr "Mais de 25 agentes citados por nome"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "Mais da metade das mudanças mescladas é escrita por agentes, sem nenhuma edição humana."
 
@@ -12401,6 +12495,12 @@ msgstr "Mover o foco entre as abas principais e a barra lateral direita, e abrir
 
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "Mova as Configurações para um modal para que as pessoas não saiam da área de trabalho. Mantenha a filtragem da busca e faça ⌘, abri-lo de qualquer lugar."
+
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Mova as ações do t3.json para o .paradev/config.json, ou peça a um agente para fazer isso por você."
+
+msgid "Move the scripts in orca.yaml to .paradev/config.json, or ask an agent to do it for you."
+msgstr "Mova os scripts do orca.yaml para o .paradev/config.json, ou peça a um agente para fazer isso por você."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Mover esta área de trabalho para {computerName}?"
@@ -12434,6 +12534,12 @@ msgstr "Mover para a aba"
 
 msgid "Move your agents."
 msgstr "Mova seus agentes."
+
+msgid "Move your Orca worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Leve suas worktrees e agentes do Orca para o {companyName} em poucos minutos. Gratuito e open source."
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Leve suas worktrees e agentes do T3 Code para o {companyName} em poucos minutos. Gratuito e open source."
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Leve suas worktrees e agentes para o {companyName} em poucos minutos. Gratuito e open source."
@@ -13517,6 +13623,9 @@ msgstr "Nenhuma área de trabalho."
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Não. O {companyName} nunca atua como proxy nas chamadas aos modelos. Os agentes usam suas próprias assinaturas e chaves."
 
+msgid "No. Runs on machines you own"
+msgstr "Não. Roda em máquinas suas"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Não. Seus agentes continuam independentes; o Paradev é a camada de orquestração em volta deles. Cada tarefa tem seu próprio worktree Git e sua própria branch, sessões persistentes, revisão de diffs e automações que rodam por eventos ou em um agendamento, sem prender o fluxo de trabalho a um único provedor."
 
@@ -14430,6 +14539,9 @@ msgstr "Abrir opções de envio"
 msgid "Open Source"
 msgstr "Código aberto"
 
+msgid "Open source (MIT)"
+msgstr "Open source (MIT)"
+
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "Open source sob a licença MIT. Use qualquer agente com suas próprias assinaturas e chaves."
 
@@ -14570,6 +14682,17 @@ msgstr "ou cole o conteúdo de um .env no campo Chave"
 
 msgid "Orange"
 msgstr "Laranja"
+
+msgid "Orca details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "As informações sobre o Orca vêm da documentação pública e do repositório dele. Veja a <0>comparação completa</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca is a trademark of its owner. {0} is not affiliated with or endorsed by it."
+msgstr "Orca é uma marca registrada do seu proprietário. O {0} não é afiliado nem endossado por ele."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "As worktrees do Orca são worktrees Git comuns. O {0} as usa onde estão."
 
 msgid "Orchestrate Parallel Agents"
 msgstr "Orquestrar agentes em paralelo"
@@ -15708,6 +15831,9 @@ msgstr "Produtos"
 msgid "Profile name"
 msgstr "Nome do perfil"
 
+msgid "Programmatic control"
+msgstr "Controle programático"
+
 msgid "Progress"
 msgstr "Progresso"
 
@@ -15777,6 +15903,9 @@ msgstr "Projeto configurado em {0}"
 
 msgid "Project Settings"
 msgstr "Configurações do projeto"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "Configurações de projeto no T3 Code, como as regras de limpeza de worktrees"
 
 msgid "Project worktree location reset"
 msgstr "Local das worktrees do projeto redefinido"
@@ -17401,6 +17530,9 @@ msgstr "Comande um exército de agentes de código"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Rode um simulador de iOS em um painel da área de trabalho para que você e seus agentes possam testar apps móveis."
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "Rode qualquer agente que tenha uma CLI, com suas próprias assinaturas e chaves."
+
 msgid "Run automations on data source and comment activity."
 msgstr "Rode automações a partir de atividade em fontes de dados e comentários."
 
@@ -17687,6 +17819,15 @@ msgstr "Agendar reuniões"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Agentes agendados e disparados por eventos (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) com modelos prontos."
+
+msgid "Scheduled automations"
+msgstr "Automações agendadas"
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "Tarefas agendadas e workflows. Crie-os de novo como automações"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "Tarefas agendadas, tarefas de webhook e workflows"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "As agendas se repetem — remova COUNT ou UNTIL."
@@ -17981,6 +18122,9 @@ msgstr "Ver todas as estatísticas →"
 
 msgid "See Changes"
 msgstr "Ver as alterações"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "Veja as verificações de CI e as threads de revisão ao lado do diff e envie comentários de volta ao agente."
 
 msgid "See Conductor for current plans and account access"
 msgstr "Consulte o Conductor para ver os planos e o acesso às contas atuais"
@@ -18448,6 +18592,12 @@ msgstr "Setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Scripts de setup, depois de converter o conductor.json"
+
+msgid "Setup scripts, once you convert orca.yaml"
+msgstr "Scripts de setup, depois de converter o orca.yaml"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "Scripts de setup, depois de converter o t3.json"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "A configuração parou. O motivo está na saída abaixo."
@@ -19760,6 +19910,12 @@ msgstr "Constância · dias ativos em 30"
 msgid "Switch account"
 msgstr "Trocar de conta"
 
+msgid "Switch from Orca to {companyName}"
+msgstr "Troque o Orca pelo {companyName}"
+
+msgid "Switch from T3 Code to {companyName}"
+msgstr "Troque o T3 Code pelo {companyName}"
+
 msgid "Switch host"
 msgstr "Trocar de host"
 
@@ -19917,6 +20073,20 @@ msgstr "Parcela da RAM do sistema"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "RAM do sistema: Paradev {0}, outros apps {1}, livre {2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "As informações sobre o T3 Code vêm da documentação pública e do repositório dele. Veja a <0>comparação completa</0>."
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code é uma marca registrada da T3 Tools, Inc. O {0} não é afiliado nem endossado pela T3 Tools."
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "Threads do T3 Code. Elas ficam no T3 Code, que você pode manter instalado"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "As worktrees do T3 Code são worktrees Git comuns. O {0} as usa onde estão."
 
 msgid "Tab"
 msgstr "Aba"
@@ -22999,6 +23169,9 @@ msgstr "Área de trabalho criada"
 msgid "Workspace details"
 msgstr "Detalhes da área de trabalho"
 
+msgid "Workspace details in Orca, like pins, comments and linked issues"
+msgstr "Detalhes das áreas de trabalho no Orca, como itens fixados, comentários e issues vinculadas"
+
 msgid "Workspace ID copied"
 msgstr "ID da área de trabalho copiado"
 
@@ -23152,6 +23325,9 @@ msgstr "Sim, rebaixar"
 msgid "Yes, on paid plans."
 msgstr "Sim, nos planos pagos."
 
+msgid "Yes, or the current checkout"
+msgstr "Sim, ou o checkout atual"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "Sim, retoma sessões do Claude Code"
 
@@ -23163,6 +23339,12 @@ msgstr "Sim. Candidate-se à vaga que melhor combina com você e conte o que voc
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Sim. O plano gratuito atende pessoas individuais, com 1 usuário, áreas de trabalho locais, app de desktop e CLI. Sem cartão de crédito."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Do not delete an imported workspace in Orca, because that removes its folder."
+msgstr "Sim. As worktrees importadas ficam onde estão, então os dois apps podem abri-las. Não exclua no Orca uma área de trabalho importada, porque isso remove a pasta dela."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "Sim. As worktrees importadas ficam onde estão, então os dois apps podem abri-las. Mantenha a limpeza de worktrees desativada no T3 Code para que ele não as remova."
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Sim. Nos planos com workspaces na nuvem, os proprietários podem comprar qualquer quantidade de GB-horas extras a {packPrice} por GB-hora em Configurações, Cobrança. As GB-horas compradas são usadas depois do conjunto mensal e nunca expiram, e a recarga automática pode comprar mais quando estiverem acabando."

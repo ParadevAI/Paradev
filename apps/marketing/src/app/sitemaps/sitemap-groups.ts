@@ -50,6 +50,16 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.8,
 		},
 		{
+			url: `${baseUrl}/t3-code`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
+			url: `${baseUrl}/orca`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
 			url: `${baseUrl}/mobile`,
 			changeFrequency: "monthly",
 			priority: 0.8,

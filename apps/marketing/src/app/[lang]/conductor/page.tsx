@@ -9,12 +9,12 @@ import Link from "next/link";
 import { HiCheck, HiXMark } from "react-icons/hi2";
 import { DownloadLink } from "@/app/[lang]/components/DownloadLink";
 import { FAQDisclosure } from "@/app/[lang]/components/FAQDisclosure";
+import { SwitchActions } from "@/app/[lang]/components/SwitchActions";
 import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
 import { fetchPlanCatalog } from "@/app/[lang]/pricing/utils/fetchPlanCatalog";
 import { planPriceValues } from "@/app/[lang]/pricing/utils/planPriceValues";
 import { initServerI18n } from "@/app/i18n-server";
 import { FAQPageJsonLd } from "@/components/JsonLd";
-import { SwitchActions } from "./components/SwitchActions";
 import {
 	COMPARE_PATH,
 	COMPARISON_ROWS,
@@ -22,6 +22,7 @@ import {
 	FAQ_ITEMS,
 	HIGHLIGHTS,
 	MIGRATE_CLOUD_URL,
+	MIGRATE_LOCAL_URL,
 	MIGRATION_STEPS,
 	TRANSFERS,
 } from "./constants";
@@ -101,7 +102,11 @@ export default async function ConductorPage() {
 							mobile built in.
 						</Trans>
 					</p>
-					<SwitchActions placement="hero" />
+					<SwitchActions
+						placement="hero"
+						source="conductor"
+						guideUrl={MIGRATE_LOCAL_URL}
+					/>
 					<p className="mt-4 text-muted-foreground text-xs">
 						<Trans>Free for one user. Open source under MIT.</Trans>
 					</p>
@@ -344,7 +349,11 @@ export default async function ConductorPage() {
 							.
 						</Trans>
 					</p>
-					<SwitchActions placement="footer" />
+					<SwitchActions
+						placement="footer"
+						source="conductor"
+						guideUrl={MIGRATE_LOCAL_URL}
+					/>
 					<p className="mt-6 text-muted-foreground text-xs">
 						<Trans>
 							Conductor is a trademark of its owner. {BRAND.NAME} is not
