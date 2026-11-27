@@ -647,11 +647,11 @@ export class GitWatcher {
 			return;
 		}
 
-		const existingIds = new Set(rows.map((r) => r.id));
 		const worktreePathById = new Map(rows.map((r) => [r.id, r.worktreePath]));
 
 		// Remove watchers for workspaces that no longer exist (archived or
-		// deleted). Routed through stopWatching() (not inlined) so a pending
+		// deleted) or whose worktree moved; the retry below reattaches the
+		// moved ones. Routed through stopWatching() (not inlined) so a pending
 		// debounce timer/batch for the removed workspace can't fire a stale
 		// git:changed later — it also clears those, this loop used to leave
 		// them dangling.
@@ -672,8 +672,9 @@ export class GitWatcher {
 		// per-client `git:watch` cap in event-bus.ts) until the holding
 		// client unwatches or its socket closes — self-healing, unlike a
 		// leaked live watcher.
-		for (const id of [...this.watched.keys()]) {
-			if (!existingIds.has(id)) this.stopWatching(id);
+		for (const [id, entry] of [...this.watched]) {
+			if (worktreePathById.get(id) !== entry.worktreePath)
+				this.stopWatching(id);
 		}
 
 		// Retry attaching for still-interested workspaces that never attached.

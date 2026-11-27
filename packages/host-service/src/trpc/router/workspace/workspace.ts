@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { eq, isNotNull, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { projects, workspaces } from "../../../db/schema";
+import { invalidateLabelCache } from "../../../ports/static-ports";
 import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
 import { isMissingPath } from "../../../runtime/path-state";
 import {
@@ -16,22 +17,27 @@ import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace
 import { protectedProcedure, router } from "../../index";
 import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { destroyWorkspace } from "../workspace-cleanup";
+import {
+	repairMovedWorktree,
+	resolveWorktreePathUpdate,
+} from "./utils/moved-worktree";
 
 export const workspaceRouter = router({
 	get: protectedProcedure
 		.input(z.object({ id: z.string() }))
-		.query(({ ctx, input }) => {
-			const localWorkspace = ctx.db.query.workspaces
+		.query(async ({ ctx, input }) => {
+			const stored = ctx.db.query.workspaces
 				.findFirst({ where: eq(workspaces.id, input.id) })
 				.sync();
 
-			if (!localWorkspace) {
+			if (!stored) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Workspace not found",
 				});
 			}
 
+			const localWorkspace = await repairMovedWorktree(ctx, stored);
 			return {
 				...localWorkspace,
 				worktreeExists: !isMissingPath(localWorkspace.worktreePath),
@@ -152,6 +158,7 @@ export const workspaceRouter = router({
 				branch: z.string().min(1).optional(),
 				taskId: z.string().uuid().nullable().optional(),
 				tags: workspaceTagsInputSchema.optional(),
+				worktreePath: z.string().min(1).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -169,15 +176,24 @@ export const workspaceRouter = router({
 				branch?: string;
 				taskId?: string | null;
 				tags?: string[];
+				worktreePath?: string;
 			} = {};
 			if (input.name !== undefined) patch.name = input.name;
 			if (input.branch !== undefined) patch.branch = input.branch;
 			if (input.taskId !== undefined) patch.taskId = input.taskId;
 			if (input.tags !== undefined) patch.tags = input.tags;
+			if (input.worktreePath !== undefined)
+				patch.worktreePath = await resolveWorktreePathUpdate(
+					ctx,
+					current,
+					input.worktreePath,
+					input.branch ?? current.branch,
+				);
 			if (Object.keys(patch).length === 0) {
 				return {
 					...toCloudShape(current, ctx.organizationId),
 					tags: getWorkspaceTags(ctx.db, current.id, ctx.userId),
+					worktreePath: current.worktreePath,
 				};
 			}
 			if (patch.name !== undefined || patch.branch !== undefined)
@@ -193,6 +209,7 @@ export const workspaceRouter = router({
 					message: "Workspace not found",
 				});
 			}
+			if (patch.worktreePath !== undefined) invalidateLabelCache(input.id);
 			// Linking a task to a workspace starts work on it — move it to
 			// In Progress. Best-effort cloud call; the update never blocks.
 			if (typeof input.taskId === "string") {
@@ -207,6 +224,7 @@ export const workspaceRouter = router({
 			return {
 				...toCloudShape(updated, ctx.organizationId),
 				tags: getWorkspaceTags(ctx.db, updated.id, ctx.userId),
+				worktreePath: updated.worktreePath,
 			};
 		}),
 

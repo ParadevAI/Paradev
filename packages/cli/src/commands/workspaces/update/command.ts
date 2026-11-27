@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
@@ -31,6 +32,9 @@ export default command({
 				"Replace the workspace's tag set. Repeatable. Each tag files the workspace into a sidebar folder of the same name",
 			),
 		clearTags: boolean().desc("Remove every tag from the workspace"),
+		worktreePath: string().desc(
+			"Point a host workspace at its worktree after `git worktree move`. The path must be the worktree of the workspace's branch",
+		),
 		visibility: string()
 			.enum("just_me", "org")
 			.desc(
@@ -95,11 +99,12 @@ export default command({
 			options.name === undefined &&
 			taskId === undefined &&
 			tags === undefined &&
+			options.worktreePath === undefined &&
 			Object.values(cloudOnly).every((value) => value === undefined)
 		) {
 			throw new CLIError(
 				"No fields to update",
-				"Pass --name, --task-id, --clear-task, --tag, --clear-tags, --machine-size, --visibility, --add-label, or --remove-label",
+				"Pass --name, --task-id, --clear-task, --tag, --clear-tags, --worktree-path, --machine-size, --visibility, --add-label, or --remove-label",
 			);
 		}
 
@@ -109,6 +114,12 @@ export default command({
 			organizationId,
 		);
 		if (!hostId) {
+			if (options.worktreePath !== undefined) {
+				throw new CLIError(
+					"--worktree-path applies to host workspaces only",
+					"Pass --local or --host <id>",
+				);
+			}
 			const data = await updateCloudWorkspace(ctx.api, id, {
 				name: options.name ?? undefined,
 				tags,
@@ -141,12 +152,24 @@ export default command({
 			userJwt: ctx.bearer,
 			api: ctx.api,
 		});
+		const worktreePath =
+			options.worktreePath !== undefined && target.kind === "local"
+				? resolve(options.worktreePath)
+				: options.worktreePath;
 		const updated = await target.client.workspace.update.mutate({
 			id,
 			...(options.name !== undefined ? { name: options.name } : {}),
 			...(taskId !== undefined ? { taskId } : {}),
 			...(tags !== undefined ? { tags } : {}),
+			...(worktreePath !== undefined ? { worktreePath } : {}),
 		});
+		// An older host drops `worktreePath` and still answers success.
+		if (worktreePath !== undefined && !("worktreePath" in updated)) {
+			throw new CLIError(
+				"This host is too old for --worktree-path",
+				"Update the Paradev desktop app on that host",
+			);
+		}
 
 		return {
 			data: updated,
