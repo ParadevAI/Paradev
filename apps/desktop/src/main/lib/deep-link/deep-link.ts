@@ -18,6 +18,11 @@ export function findDeepLinkInArgv(
 	return argv.find((arg) => isDeepLinkUrl(arg, schemes));
 }
 
+/** The `ssh` address of a host setup link can hold a login token. */
+export function redactDeepLink(url: string): string {
+	return url.replace(/([?&]ssh=)[^&#]*/gi, "$1<redacted>");
+}
+
 /** `superset://tasks/my-slug` and `paradev://tasks/my-slug` both route to `/tasks/my-slug`. */
 export function deepLinkToRoute(url: string): string {
 	// Links minted before the route rename (older CLIs, published pages).

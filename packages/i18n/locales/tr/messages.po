@@ -1871,6 +1871,9 @@ msgstr "Gece yarısı bir fikirle uyanıp uygulamayı açmak gibi suçlu hissett
 msgid "A host must have at least one owner."
 msgstr "Bir host'un en az bir sahibi olmalıdır."
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "Bu adresi bir bağlantı doldurdu. Host'u yalnızca ona güveniyorsan kur: Paradev onda hesabınla oturum açar."
+
 msgid "A living reference of every component exported from"
 msgstr "Şuradan dışa aktarılan her bileşenin canlı referansı:"
 
@@ -20480,6 +20483,9 @@ msgstr "Paradev'deki en son güncellemeler, iyileştirmeler ve yeni özellikler.
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Bir Sentry tetikleyicisi ve günlük zamanlaması olan Launch watch otomasyonu, iki çalıştırması ve ajanın açtığı taslak pull request."
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "Bağlantıda geçerli bir SSH adresi yoktu. Bir adres gir, örneğin ssh://user@host:2222."
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "Bağlantı yanlış olabilir ya da burada olan şey taşınmış olabilir."

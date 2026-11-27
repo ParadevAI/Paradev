@@ -1871,6 +1871,9 @@ msgstr "我有個忍不住的習慣：半夜醒來有了想法，就開啟應用
 msgid "A host must have at least one owner."
 msgstr "主機必須至少有一位擁有者。"
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "此位址由連結填入。只有在你信任該主機時才設定它：Paradev 會將它登入你的帳戶。"
+
 msgid "A living reference of every component exported from"
 msgstr "一份持續更新的參考，收錄了從"
 
@@ -20480,6 +20483,9 @@ msgstr "Paradev的最新更新、改進和新功能，每週更新。詳細的�
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "帶有 Sentry 觸發器和每日排程的 Launch watch 自動化、它的兩次執行，以及代理程式開的草稿 pull request。"
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "連結中沒有有效的 SSH 位址。請輸入一個位址，例如 ssh://user@host:2222。"
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "連結可能有誤，或者這裡的內容已經移走了。"

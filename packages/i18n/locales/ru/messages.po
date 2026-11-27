@@ -1871,6 +1871,9 @@ msgstr "У меня есть грешок: проснуться посреди �
 msgid "A host must have at least one owner."
 msgstr "У хоста должен быть хотя бы один владелец."
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "Этот адрес подставлен из ссылки. Настраивайте хост, только если доверяете ему: Paradev выполнит на нём вход в вашу учётную запись."
+
 msgid "A living reference of every component exported from"
 msgstr "Живой справочник всех компонентов, экспортируемых из"
 
@@ -20480,6 +20483,9 @@ msgstr "Свежие обновления, улучшения и новые во
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Автоматизация Launch watch с триггером Sentry и ежедневным расписанием, два её запуска и черновой pull request, открытый агентом."
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "В ссылке нет корректного адреса SSH. Введите адрес, например ssh://user@host:2222."
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "Возможно, ссылка неверна или то, что здесь было, переехало."

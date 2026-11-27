@@ -16,6 +16,7 @@ import { LuCheck, LuTriangleAlert } from "react-icons/lu";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { CommandTerminal } from "renderer/routes/_authenticated/components/CommandTerminal";
+import { useSetUpHostOverSshIntent } from "renderer/stores/set-up-host-over-ssh-intent";
 import {
 	buildHostsAddCommand,
 	isValidSshTarget,
@@ -23,6 +24,7 @@ import {
 import { parseOnlineHostId } from "./utils/parseOnlineHostId";
 
 type Phase = "form" | "running" | "success" | "failed";
+type LinkFill = "address" | "invalid";
 
 interface SetUpOverSshDialogProps {
 	open: boolean;
@@ -43,8 +45,11 @@ export function SetUpOverSshDialog({
 		null,
 	);
 	const [hostId, setHostId] = useState<string | null>(null);
+	const [linkFill, setLinkFill] = useState<LinkFill | null>(null);
 	const outputRef = useRef("");
 	const terminalBoxRef = useRef<HTMLDivElement>(null);
+	const link = useSetUpHostOverSshIntent((state) => state.link);
+	const clearLink = useSetUpHostOverSshIntent((state) => state.clear);
 
 	useEffect(() => {
 		if (open) {
@@ -56,6 +61,24 @@ export function SetUpOverSshDialog({
 	const trimmed = target.trim();
 	const canStart = isValidSshTarget(trimmed) && organizationId !== null;
 	const running = phase === "running";
+
+	useEffect(() => {
+		if (!link || running) return;
+		clearLink();
+		setTarget(link.target ?? "");
+		setLinkFill(link.target === null ? "invalid" : "address");
+		setPhase("form");
+		setRun(null);
+		onOpenChange(true);
+	}, [link, running, clearLink, onOpenChange]);
+
+	const close = () => {
+		if (linkFill) {
+			setTarget("");
+			setLinkFill(null);
+		}
+		onOpenChange(false);
+	};
 
 	const start = () => {
 		if (!canStart || running) return;
@@ -91,7 +114,7 @@ export function SetUpOverSshDialog({
 
 	const openHost = async () => {
 		await cloudUtils.host.roster.invalidate();
-		onOpenChange(false);
+		close();
 		if (hostId) {
 			navigate({ to: "/settings/hosts/$hostId", params: { hostId } });
 		}
@@ -102,7 +125,9 @@ export function SetUpOverSshDialog({
 			open={open}
 			modal
 			onOpenChange={(next) => {
-				if (!running) onOpenChange(next);
+				if (running) return;
+				if (next) onOpenChange(true);
+				else close();
 			}}
 		>
 			<DialogContent
@@ -174,6 +199,24 @@ export function SetUpOverSshDialog({
 						</Button>
 					)}
 				</form>
+				{phase === "form" && linkFill === "address" && (
+					<div className="flex min-h-11 items-center gap-2.5 rounded-md border bg-muted/40 px-3.5 py-2 text-sm">
+						<LuTriangleAlert className="size-3.5 shrink-0 text-amber-500" />
+						<Trans>
+							A link filled in this address. Set up the host only if you trust
+							it: Paradev signs it in to your account.
+						</Trans>
+					</div>
+				)}
+				{phase === "form" && linkFill === "invalid" && (
+					<div className="flex min-h-11 items-center gap-2.5 rounded-md border bg-muted/40 px-3.5 py-2 text-sm">
+						<LuTriangleAlert className="size-3.5 shrink-0 text-destructive" />
+						<Trans>
+							The link did not have a valid SSH address. Enter one, such as
+							ssh://user@host:2222.
+						</Trans>
+					</div>
+				)}
 				{running && (
 					<div className="flex min-h-11 items-center gap-2.5 rounded-md bg-muted/40 px-3.5 text-sm text-muted-foreground">
 						<Spinner className="size-3.5 shrink-0" />

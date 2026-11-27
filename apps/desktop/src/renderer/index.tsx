@@ -14,6 +14,7 @@ import {
 	markBootMounted,
 	reportBootError,
 } from "./lib/boot-errors";
+import { HOSTS_SETTINGS_ROUTE, readHostSetupLink } from "./lib/hostSetupLink";
 import { trackOpenOverlays } from "./lib/overlayOpenClass";
 import { parseDeepLinkPath } from "./lib/parseDeepLinkPath";
 import { sweepDeadPersistedKeys } from "./lib/persisted-keys";
@@ -23,6 +24,7 @@ import { pruneExpiredTerminalState } from "./lib/terminal/terminal-buffer-gc";
 import { electronQueryClient } from "./providers/ElectronTRPCProvider";
 import { NotFound } from "./routes/not-found";
 import { routeTree } from "./routeTree.gen";
+import { useSetUpHostOverSshIntent } from "./stores/set-up-host-over-ssh-intent";
 
 const rootElement = document.querySelector("app");
 initBootErrorHandling(rootElement);
@@ -52,8 +54,15 @@ const unsubscribe = router.subscribe("onResolved", (event) => {
 });
 
 const handleDeepLink = (path: string) => {
-	console.log("[deep-link] Navigating to:", path);
 	const { to, search } = parseDeepLinkPath(path);
+	const hostSetup = readHostSetupLink(to, search);
+	if (hostSetup) {
+		console.log("[deep-link] Opening Set up a host over SSH");
+		useSetUpHostOverSshIntent.getState().request(hostSetup.target);
+		router.navigate({ to: HOSTS_SETTINGS_ROUTE });
+		return;
+	}
+	console.log("[deep-link] Navigating to:", path);
 	router.navigate({ to, search } as never);
 };
 const ipcRenderer = window.ipcRenderer as typeof window.ipcRenderer | undefined;

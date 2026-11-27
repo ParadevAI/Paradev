@@ -1871,6 +1871,9 @@ msgstr "Kebiasaan buruk saya adalah terbangun dengan sebuah ide di tengah malam 
 msgid "A host must have at least one owner."
 msgstr "Sebuah host harus punya setidaknya satu pemilik."
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "Sebuah tautan mengisi alamat ini. Siapkan host hanya jika Anda memercayainya: Paradev menghubungkannya ke akun Anda."
+
 msgid "A living reference of every component exported from"
 msgstr "Referensi hidup untuk setiap komponen yang diekspor dari"
 
@@ -20480,6 +20483,9 @@ msgstr "Pembaruan, peningkatan, dan fitur terbaru di Paradev. Diperbarui tiap mi
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Otomatisasi Launch watch dengan pemicu Sentry dan jadwal harian, dua run-nya, dan draft pull request yang dibuka agen."
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "Tautan tidak berisi alamat SSH yang valid. Masukkan alamat, misalnya ssh://user@host:2222."
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "Tautannya mungkin salah, atau isinya sudah dipindahkan."

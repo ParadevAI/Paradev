@@ -1871,6 +1871,9 @@ msgstr "한밤중에 아이디어가 떠올라 잠에서 깨면 앱을 여는 �
 msgid "A host must have at least one owner."
 msgstr "호스트에는 소유자가 한 명 이상 있어야 합니다."
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "링크가 이 주소를 입력했습니다. 신뢰하는 호스트인 경우에만 설정하세요. Paradev가 이 호스트를 내 계정으로 로그인시킵니다."
+
 msgid "A living reference of every component exported from"
 msgstr "다음 패키지에서 내보낸 모든 컴포넌트의 살아 있는 레퍼런스:"
 
@@ -20480,6 +20483,9 @@ msgstr "Paradev의 최신 업데이트, 개선 사항, 새로운 기능. 매주 
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "Sentry 트리거와 매일 일정이 있는 Launch watch 자동화, 그 두 번의 실행, 에이전트가 연 초안 풀 리퀘스트."
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "링크에 유효한 SSH 주소가 없습니다. ssh://user@host:2222 같은 주소를 입력하세요."
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "링크가 잘못되었거나, 여기에 있던 내용이 옮겨졌을 수 있습니다."

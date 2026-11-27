@@ -1871,6 +1871,9 @@ msgstr "Tengo la mala costumbre de despertarme con una idea en mitad de la noche
 msgid "A host must have at least one owner."
 msgstr "Un host debe tener al menos un propietario."
 
+msgid "A link filled in this address. Set up the host only if you trust it: Paradev signs it in to your account."
+msgstr "Un enlace rellenó esta dirección. Configura el host solo si confías en él: Paradev lo conecta a tu cuenta."
+
 msgid "A living reference of every component exported from"
 msgstr "Una referencia viva de todos los componentes exportados desde"
 
@@ -20480,6 +20483,9 @@ msgstr "Las últimas actualizaciones, mejoras y funciones nuevas de Paradev. Se 
 
 msgid "The Launch watch automation with a Sentry trigger and a daily schedule, its two runs, and the draft pull request the agent opened."
 msgstr "La automatización Launch watch con un desencadenante de Sentry y un horario diario, sus dos ejecuciones y el pull request en borrador que abrió el agente."
+
+msgid "The link did not have a valid SSH address. Enter one, such as ssh://user@host:2222."
+msgstr "El enlace no tenía una dirección SSH válida. Escribe una, por ejemplo ssh://user@host:2222."
 
 msgid "The link may be wrong, or whatever was here has moved."
 msgstr "Puede que el enlace esté mal o que lo que había aquí se haya movido."

@@ -68,7 +68,11 @@ import {
 	installBundledCliShim,
 	installBundledPdevShim,
 } from "./lib/bundled-cli";
-import { deepLinkToRoute, findDeepLinkInArgv } from "./lib/deep-link";
+import {
+	deepLinkToRoute,
+	findDeepLinkInArgv,
+	redactDeepLink,
+} from "./lib/deep-link";
 import { installDevRunnerExit } from "./lib/dev-runner-exit";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -195,7 +199,7 @@ async function processDeepLink(url: string): Promise<void> {
 		return;
 	}
 
-	console.log("[main] Processing deep link:", url);
+	console.log("[main] Processing deep link:", redactDeepLink(url));
 
 	const path = deepLinkToRoute(url);
 	focusMainWindow();
