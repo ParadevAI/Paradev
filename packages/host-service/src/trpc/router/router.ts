@@ -28,6 +28,7 @@ import { teleportRouter } from "./teleport";
 import { terminalRouter } from "./terminal";
 import { terminalAgentsRouter } from "./terminal-agents";
 import { usageRouter } from "./usage";
+import { windowsRouter } from "./windows";
 import { workspaceRouter } from "./workspace";
 import { workspaceCleanupRouter } from "./workspace-cleanup";
 import { workspaceCreationRouter } from "./workspace-creation";
@@ -63,6 +64,7 @@ export const appRouter = router({
 	terminal: terminalRouter,
 	terminalAgents: terminalAgentsRouter,
 	usage: usageRouter,
+	windows: windowsRouter,
 	workspace: workspaceRouter,
 	workspaces: workspacesRouter,
 	workspaceCleanup: workspaceCleanupRouter,

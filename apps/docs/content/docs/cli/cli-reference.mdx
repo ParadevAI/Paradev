@@ -15,7 +15,7 @@ Run `paradev --help` for the top-level command list, or
 
 ## Choosing a host
 
-Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. If the cloud check fails, they target this machine. Remote hosts go through the relay. `snapshot`, `panes`, `browser`, and `notifications` default to this machine. Each cloud workspace runs its own host, so commands about one host, such as `projects list` and `agents list`, take a machineId rather than `cloud`; `snapshot --host cloud` needs `--workspace`.
+Commands with `--host <id>` and `--local` options target a host. `--local` is this machine. For workspace, agent, and terminal commands, `--host <id>` takes a host machineId or `cloud`. With neither option, they target the cloud if your account has cloud workspaces, otherwise this machine. If the cloud check fails, they target this machine. Remote hosts go through the relay. `snapshot`, `panes`, `windows`, `browser`, and `notifications` default to this machine. Each cloud workspace runs its own host, so commands about one host, such as `projects list` and `agents list`, take a machineId rather than `cloud`; `snapshot --host cloud` needs `--workspace`.
 
 ## Global options
 
@@ -1896,6 +1896,41 @@ Move a pane. A tab left empty closes. `paradev panes swap --workspace <id>
 	]}
 >
 Close a pane and end its terminal, as the close button in the app does.
+</Command>
+
+### windows
+
+<Command
+	name="paradev windows list"
+	options={[
+		{ flag: "--host <id>", description: "Host whose desktop app to ask (default: this machine)." },
+	]}
+>
+List the desktop app's windows and the workspace each one shows, the focused
+window first. Use it to find the workspace the user is looking at. `visible`
+means shown and not minimized; another app can still cover the window.
+
+```text
+STATE        WORKSPACE   WORKSPACE ID   ROUTE
+focused      fix-login   3f2a…          /v2-workspace/3f2a…
+hidden                                  /tasks
+```
+
+<CommandReturns>
+<JsonOutput>
+```ts
+Array<{
+  id: number;
+  state: "focused" | "last used" | "open" | "hidden";
+  focused: boolean; lastFocused: boolean; visible: boolean;
+  view: "workspace" | "cloud-workspace" | "other";
+  workspaceId: string | null;
+  workspaceName: string | null; // null for workspaces this host does not have
+  route: string;
+}>
+```
+</JsonOutput>
+</CommandReturns>
 </Command>
 
 ### notifications
