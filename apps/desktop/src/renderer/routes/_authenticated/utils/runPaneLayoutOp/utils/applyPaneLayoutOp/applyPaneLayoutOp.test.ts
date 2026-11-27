@@ -160,6 +160,21 @@ describe("applyPaneLayoutOp", () => {
 		expect(again.areas.main.activeTabId).toBe(first.tabId);
 	});
 
+	test("newTab for a newer session of a chat already shown on its terminal reuses that pane", () => {
+		const first = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", chat },
+			() => "new",
+		);
+		const again = applyPaneLayoutOp(
+			first.areas,
+			{ type: "newTab", chat: { ...chat, sessionId: "chat-2" } },
+			() => "other",
+		);
+		expect(again.paneId).toBe("new");
+		expect(again.areas.main.tabs).toHaveLength(3);
+	});
+
 	test("newTab for a terminal that already has a pane reuses it", () => {
 		const again = applyPaneLayoutOp(
 			fixture(),

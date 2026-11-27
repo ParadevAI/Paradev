@@ -83,7 +83,8 @@ export function usePendingCloudLaunch({
 		(session) => session.terminalId === terminalId,
 	);
 	const answered =
-		surface === "chat" ? sessionsQuery.isFetched : terminalSessions.isFetched;
+		(surface === "chat" ? sessionsQuery.data : terminalSessions.data) !==
+		undefined;
 	const [answeredAtMs, setAnsweredAtMs] = useState<number | null>(null);
 	useEffect(() => {
 		if (!answered || answeredAtMs !== null) return;

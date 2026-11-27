@@ -105,9 +105,9 @@ export function appendLaunchesToPaneLayout({
 			terminalIds: [launch.sessionId],
 			sessionIds: [launch.chatSessionId],
 		};
-		if (isClaimed(claims, keys)) return false;
+		const shown = isClaimed(claims, keys);
 		claimKeys(claims, keys);
-		return true;
+		return !shown;
 	});
 
 	if (launches.length === 0) {

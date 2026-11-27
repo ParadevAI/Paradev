@@ -78,7 +78,7 @@ interface NewTab {
  * The one writer of agent tabs the host owns. Every open agent conversation
  * gets exactly one pane across the workspace's pane areas, unless this
  * desktop hid it; a chat the user closed elsewhere loses its pane; two panes
- * on one conversation collapse to the first. Idempotent: run it again on its
+ * on one chat, one chat terminal or one terminal collapse to the first. Idempotent: run it again on its
  * own output and nothing changes.
  */
 export function reconcileAgentTabs(
@@ -129,6 +129,7 @@ function panesToRemove(
 		),
 	);
 	const shownTerminals = new Set<string>();
+	const shownChatTerminals = new Set<string>();
 	const shownSessions = new Set<string>();
 	const removals: PaneRef[] = [];
 	areas.forEach((layout, area) => {
@@ -145,6 +146,7 @@ function panesToRemove(
 				if (pane.kind !== "chat-v3" || !sessionId) continue;
 				if (
 					shownSessions.has(sessionId) ||
+					(terminalId && shownChatTerminals.has(terminalId)) ||
 					(input.chats &&
 						!(terminalId && openOnTerminal.has(terminalId)) &&
 						closedForThisPane(input, chatById, conversationOf, sessionId))
@@ -153,6 +155,7 @@ function panesToRemove(
 					continue;
 				}
 				shownSessions.add(sessionId);
+				if (terminalId) shownChatTerminals.add(terminalId);
 			}
 		}
 	});
@@ -206,8 +209,9 @@ function tabsToAdd(
 			],
 			sessionIds: conversation.sessionIds,
 		};
-		if (isClaimed(claims, keys)) continue;
+		const shown = isClaimed(claims, keys);
 		claimKeys(claims, keys);
+		if (shown) continue;
 		newTabs.push({
 			at: conversation.updatedAt,
 			chat: true,

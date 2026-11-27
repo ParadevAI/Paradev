@@ -151,6 +151,7 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 			"openFile",
 			"reopenFromHistory",
 			"racingWriter",
+			"cliNewTabLatest",
 			"pendingLaunch",
 			"mobileChat",
 		] as const)
@@ -290,6 +291,20 @@ function step(world: World, rng: ReturnType<typeof random>): void {
 			);
 			return;
 		}
+		case "cliNewTabLatest": {
+			const conversation = rng.pick([...world.latestOf.keys()]);
+			if (!conversation) return;
+			const latest = world.latestOf.get(conversation) as string;
+			const terminal = world.terminalOf.get(conversation) ?? latest;
+			if (
+				agentPanes.some(({ pane }) => paneClaimKeys(pane).sessionId === latest)
+			)
+				return;
+			world.main = edit(world.main, (store) =>
+				store.getState().addTab({ panes: [chatPane(terminal, latest)] }),
+			);
+			return;
+		}
 		case "pendingLaunch": {
 			const terminal = `t${id()}`;
 			world.main = edit(world.main, (store) =>
@@ -386,6 +401,12 @@ function checkInvariants(
 	const chatSessions = panes
 		.map((pane) => paneClaimKeys(pane).sessionId)
 		.filter(Boolean);
+	const chatTerminals = panes
+		.filter((pane) => pane.kind === "chat-v3" && paneClaimKeys(pane).sessionId)
+		.map((pane) => paneClaimKeys(pane).terminalId);
+	if (new Set(chatTerminals).size !== chatTerminals.length) {
+		throw new Error(`two chat panes on one terminal: ${chatTerminals}`);
+	}
 	if (new Set(chatSessions).size !== chatSessions.length)
 		throw new Error(`two panes on one chat: ${chatSessions}`);
 
