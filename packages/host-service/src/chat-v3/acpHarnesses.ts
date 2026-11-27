@@ -24,9 +24,7 @@ export function acpHarnessFactory(
 			cwd: options.cwd,
 			resolveAttachment,
 			storeImage: storeAgentImage,
-			...(entry.fullAccessModeId
-				? { defaultModeId: entry.fullAccessModeId }
-				: {}),
+			...(entry.startModeId ? { defaultModeId: entry.startModeId } : {}),
 			...(entry.clientApprovalModes ? { clientApprovalModes: true } : {}),
 			...(entry.forkAtMessage ? { forkAtMessage: true } : {}),
 			...(entry.protocolVersion

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
 import { valid } from "semver";
 import {
 	ACP_HARNESSES,
@@ -15,6 +16,16 @@ describe("ACP_HARNESSES", () => {
 		expect(ids).toContain("codex-acp");
 		expect(ids).toContain("pi-acp");
 		expect(ids).toContain("pdev-acp");
+		expect(ids).toContain("agy-acp");
+	});
+
+	it.each(
+		entries,
+	)("%s maps the same preset and start mode as the chat package", (id, entry) => {
+		const preset = presetForAcpHarness(id);
+		if (!preset) return;
+		expect(acpHarnessForPreset(preset)).toBe(id);
+		expect(acpStartModes(preset)?.defaultModeId).toBe(entry.startModeId);
 	});
 
 	it("runs pdev as its own ACP server with no adapter", () => {

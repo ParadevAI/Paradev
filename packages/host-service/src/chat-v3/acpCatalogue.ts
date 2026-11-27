@@ -13,8 +13,8 @@ export type AcpHarness = {
 	args: string[];
 	minVersion: string;
 	upgrade?: string;
-	/** The agent's own id for its unrestricted mode; chats start in it. */
-	fullAccessModeId?: string;
+	/** The agent's own mode id that a new chat starts in when it asks for none. */
+	startModeId?: string;
 	clientApprovalModes?: boolean;
 	/** Forks a session up to a given message (JetBrains AIR fork point), so a rewind keeps the agent's own history. */
 	forkAtMessage?: boolean;
@@ -37,7 +37,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		adapterEnv: { CLAUDE_AGENT_ACP_PROTOCOL: "v1" },
 		protocolVersion: 1,
 		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
-		fullAccessModeId: "bypassPermissions",
+		startModeId: "bypassPermissions",
 		forkAtMessage: true,
 		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 verified with 2.1.226 and 2.1.311: a background subagent ends the turn at its reply, the follow-up arrives as a `turn` async task, and steering is advertised.",
 	},
@@ -49,7 +49,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		adapter: "@agentclientprotocol/codex-acp",
 		executableEnv: "CODEX_PATH",
 		upgrade: "npm i -g @openai/codex@latest",
-		fullAccessModeId: "agent-full-access",
+		startModeId: "agent-full-access",
 		forkAtMessage: true,
 		note: "Conservative: the adapter drives `codex app-server`, and the release that introduced it is not pinned. The native codex adapter's MIN_CODEX_VERSION is 0.143.0, so this floor is probably lowerable once app-server is verified against an older build.",
 	},
@@ -60,6 +60,15 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		minVersion: "0.62.0",
 		upgrade: "npm i -g @google/gemini-cli@latest",
 		note: "Conservative. `--acp` replaced `--experimental-acp`, and the rename release is not pinned beyond being above 0.20.0, which defined only the experimental spelling. Sending `--acp` to a CLI that predates it prints usage and exits 0, which reads as a crash, so the floor errs high.",
+	},
+	"agy-acp": {
+		registryId: "agy",
+		binary: "agy",
+		args: ["acp"],
+		minVersion: "1.5.13",
+		upgrade: "agy update",
+		startModeId: "auto",
+		note: "1.5.14 verified: `agy acp` is its own ACP server on protocol v1 and returns modes and model, thought_level and mode config options. 1.5.13 is the floor because it fixed shell commands running outside the session folder and ignored attached file contents, and it includes the 1.5.10 fix for permission requests held back until the next prompt, which hangs a chat. There is no unrestricted mode id: `--dangerously-skip-permissions` covers the whole process and cannot follow a mode change, so chats start in `auto`.",
 	},
 	"opencode-acp": {
 		registryId: "opencode",
@@ -83,7 +92,7 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		binary: "pdev",
 		args: ["acp"],
 		minVersion: UNGATED_VERSION,
-		fullAccessModeId: "bypassPermissions",
+		startModeId: "bypassPermissions",
 		clientApprovalModes: true,
 		forkAtMessage: true,
 		note: "Ungated: every release, from 0.1.0 on, ships `pdev acp`, so there is no older build to reject and no upgrade command. `pdev acp` is its own ACP server, so no adapter. The desktop bundles it and needs no env: pdev signs in to the router through the superset CLI on PATH.",
@@ -108,6 +117,7 @@ export function cliFloor(harness: string): {
 const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 	claude: "claude-acp",
 	codex: "codex-acp",
+	agy: "agy-acp",
 	opencode: "opencode-acp",
 	pi: "pi-acp",
 	pdev: "pdev-acp",

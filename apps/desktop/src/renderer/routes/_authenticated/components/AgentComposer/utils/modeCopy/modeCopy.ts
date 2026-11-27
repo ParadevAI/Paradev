@@ -27,6 +27,14 @@ const APPROVE_FOR_ME: ModeCopy = {
 	icon: Play,
 };
 
+const APPROVE_EDITS: ModeCopy = {
+	title: msg({ message: "Approve edits" }),
+	description: msg({
+		message: "Edit files without asking; ask before commands",
+	}),
+	icon: FilePen,
+};
+
 const FULL_ACCESS: ModeCopy = {
 	title: msg({ message: "Full access" }),
 	description: msg({ message: "Rarely asks before acting" }),
@@ -36,13 +44,8 @@ const FULL_ACCESS: ModeCopy = {
 export const KNOWN_MODES: Readonly<Record<string, ModeCopy>> = {
 	default: ASK_FOR_APPROVAL,
 	"read-only": ASK_FOR_APPROVAL,
-	acceptEdits: {
-		title: msg({ message: "Approve edits" }),
-		description: msg({
-			message: "Edit files without asking; ask before commands",
-		}),
-		icon: FilePen,
-	},
+	acceptEdits: APPROVE_EDITS,
+	"accept-edits": APPROVE_EDITS,
 	plan: {
 		title: msg({ message: "Plan" }),
 		description: msg({ message: "Read and plan without changing anything" }),

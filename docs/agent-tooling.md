@@ -170,6 +170,10 @@ rollout flag: the desktop gates the chat UI and the API gates automation dispatc
 agents and hosts without the new router return an error; these commands never start a terminal.
 Old hosts produce an update instruction instead of falling back to `agents.run`.
 
+`--agent` takes a preset that has a chat harness: `claude`, `codex`, `opencode`, `pi`, `agy`
+(Antigravity) and `pdev`. `ACP_HARNESS_BY_PRESET` in `packages/chat/src/core/harness/harness.ts`
+is the list, and the host's copy in `acpCatalogue.ts` must match it.
+
 `sessions read --json` returns the newest page of events, in journal order, with a `nextBefore`
 cursor. To read older events, pass that cursor as JSON to `--before`. `nextBefore` is `null` on the
 oldest page.
