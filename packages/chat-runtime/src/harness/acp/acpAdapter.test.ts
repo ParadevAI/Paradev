@@ -1208,6 +1208,73 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
+	it("appends text that continues a reply after a tool call", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ protocolVersion: 1 },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "check the history" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			messageId: "m1",
+			content: { type: "text", text: "Checking." },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "tc-1",
+			title: "git log",
+			kind: "execute",
+			status: "pending",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			messageId: "m1",
+			content: { type: "text", text: " Done." },
+		});
+		agent.releasePrompts("end_turn");
+		await flush();
+
+		const replies = itemsOf(events).filter((i) => i.kind === "agent_message");
+		expect(replies.at(-1)).toMatchObject({ text: "Checking. Done." });
+		await adapter.dispose();
+	});
+
+	it("appends a chunk that ends with the text streamed so far", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ protocolVersion: 1 },
+		);
+		await flush();
+		adapter.prompt([{ type: "text", text: "add one and one" }]);
+		await flush();
+
+		for (const text of ["1", " + 1", " = 2"])
+			agent.notify("sess-1", {
+				sessionUpdate: "agent_message_chunk",
+				messageId: "m1",
+				content: { type: "text", text },
+			});
+		agent.releasePrompts("end_turn");
+		await flush();
+
+		const replies = itemsOf(events).filter((i) => i.kind === "agent_message");
+		expect(replies.at(-1)).toMatchObject({ text: "1 + 1 = 2" });
+		await adapter.dispose();
+	});
+
 	it("replays a compaction as a notice in its place, not as a user message", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
