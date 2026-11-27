@@ -22,6 +22,7 @@ import {
 	cleanupTeardownOps,
 	workspaceCleanupRouter,
 } from "../src/trpc/router/workspace-cleanup/workspace-cleanup";
+import { isWorktreeBeingDeleted } from "../src/trpc/router/workspace-cleanup/worktrees-being-deleted";
 import type { HostServiceContext } from "../src/types";
 import { WorkerTaskError } from "../src/workers/WorkerTaskRunner";
 
@@ -986,13 +987,15 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 			});
 			const caller = workspaceCleanupRouter.createCaller(ctx);
 
-			await expect(
-				caller.destroy({
-					workspaceId: "ws-1",
-					deleteBranch: false,
-					force: true,
-				}),
-			).rejects.toThrow("took too long");
+			const destroying = caller.destroy({
+				workspaceId: "ws-1",
+				deleteBranch: false,
+				force: true,
+			});
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			expect(isWorktreeBeingDeleted(tmp)).toBe(true);
+			await expect(destroying).rejects.toThrow("took too long");
+			expect(isWorktreeBeingDeleted(tmp)).toBe(false);
 
 			expect(teardownSignal?.aborted).toBe(true);
 			expect(removeWorktree).not.toHaveBeenCalled();

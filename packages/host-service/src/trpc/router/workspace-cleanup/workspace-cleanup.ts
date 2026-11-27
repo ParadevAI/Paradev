@@ -39,6 +39,10 @@ import {
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
 import { isLocalCheckoutWorkspace } from "./is-local-checkout-workspace";
 import { removeDirectoryTree } from "./remove-directory-tree";
+import {
+	claimWorktreeForDelete,
+	releaseWorktreeForDelete,
+} from "./worktrees-being-deleted";
 
 /**
  * Process-local guard against concurrent destroys of the same workspace.
@@ -292,14 +296,16 @@ export async function destroyWorkspace(
 	try {
 		return await runDestroy(ctx, input);
 	} finally {
+		const release = () => {
+			destroysInFlight.delete(input.workspaceId);
+			releaseWorktreeForDelete(input.workspaceId);
+		};
 		const reclaim = abandonedReclaims.get(input.workspaceId);
 		abandonedReclaims.delete(input.workspaceId);
 		if (reclaim) {
-			void reclaim
-				.catch(() => {})
-				.finally(() => destroysInFlight.delete(input.workspaceId));
+			void reclaim.catch(() => {}).finally(release);
 		} else {
-			destroysInFlight.delete(input.workspaceId);
+			release();
 		}
 	}
 }
@@ -332,6 +338,9 @@ async function runDestroy(
 	const marked = local != null;
 	if (marked) {
 		archiveLocalWorkspace(ctx, input.workspaceId, archiveReasonFor(ctx, local));
+		if (!sharesProjectCheckout) {
+			claimWorktreeForDelete(input.workspaceId, local.worktreePath);
+		}
 	}
 
 	try {
@@ -578,6 +587,16 @@ async function runDestroyPhases(
 	// interrupting it: a half-removed worktree can be neither restored nor
 	// reliably finished by the startup reconciler.
 	const reclaimDisk = async () => {
+		if (
+			local &&
+			!sharesProjectCheckout &&
+			liveWorkspaceOwnsPath(ctx, input.workspaceId, local.worktreePath)
+		) {
+			warnings.push(
+				`Left ${local.worktreePath} on disk: another workspace now uses it`,
+			);
+			return;
+		}
 		if (sharesProjectCheckout) {
 			// The files are the repository itself; nothing on disk belongs to
 			// this workspace alone.

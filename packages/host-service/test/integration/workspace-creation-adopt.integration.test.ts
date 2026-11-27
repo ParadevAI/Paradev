@@ -3,6 +3,10 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { eq } from "drizzle-orm";
 import { workspaces } from "../../src/db/schema";
+import {
+	claimWorktreeForDelete,
+	releaseWorktreeForDelete,
+} from "../../src/trpc/router/workspace-cleanup/worktrees-being-deleted";
 import { cloudFlows } from "../helpers/cloud-fakes";
 import {
 	createBasicScenario,
@@ -69,6 +73,39 @@ describe("workspaceCreation.adopt integration", () => {
 				worktreePath: "/tmp/not-a-real-worktree",
 			}),
 		).rejects.toThrow(/No git worktree registered/);
+	});
+
+	test("refuses to adopt a worktree whose delete has not finished", async () => {
+		const scenario = await createProjectScenario({
+			hostOptions: { apiOverrides: cloudFlows.workspaceCreateOk() },
+		});
+		dispose = scenario.dispose;
+		const worktreePath = join(
+			scenario.repo.repoPath,
+			".worktrees",
+			"feature-deleting",
+		);
+		await scenario.repo.git.raw([
+			"worktree",
+			"add",
+			"-b",
+			"feature/deleting",
+			worktreePath,
+		]);
+
+		claimWorktreeForDelete("ws-being-deleted", worktreePath);
+		try {
+			await expect(
+				scenario.host.trpc.workspaceCreation.adopt.mutate({
+					projectId: scenario.projectId,
+					workspaceName: "too-soon",
+					branch: "feature/deleting",
+					worktreePath,
+				}),
+			).rejects.toThrow(/still being deleted/);
+		} finally {
+			releaseWorktreeForDelete("ws-being-deleted");
+		}
 	});
 
 	test("adopts a worktree at an explicit path, creates cloud row + local row", async () => {
