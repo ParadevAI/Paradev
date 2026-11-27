@@ -59,7 +59,7 @@ const RESOURCES_TO_COPY = [
 	// this nests inside it. Bundles the repo's Claude Code plugin so
 	// agent-setup can provision its skills into user environments at boot.
 	{
-		src: resolve(__dirname, "../../../plugins/superset"),
+		src: resolve(__dirname, "../../../plugins/paradev"),
 		dest: resolve(__dirname, "..", devPath, "main/templates/plugin"),
 	},
 ];

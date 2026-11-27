@@ -417,7 +417,7 @@ function readPluginSkill(
 
 /**
  * Every skill in a source ships everywhere automatically unless the user
- * disabled it — adding a skill to plugins/superset/skills/ requires no code
+ * disabled it — adding a skill to plugins/paradev/skills/ requires no code
  * change here. Returns null on enumeration failure, which the caller must
  * treat as "keep whatever this source already provisioned": an empty desired
  * set would hand every one of its directories to the reaper.

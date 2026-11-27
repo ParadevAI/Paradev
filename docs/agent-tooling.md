@@ -223,7 +223,7 @@ to the user’s attention by switching to its workspace. `--target new-tab` cont
 where the pane is created; it does not imply `--show`.
 
 To test in-development *skills* in Claude Code, run `bun run dev:skills`: it
-mirrors this worktree's `plugins/superset` into `~/.claude/skills/superset-dev`
+mirrors this worktree's `plugins/paradev` into `~/.claude/skills/superset-dev`
 (a renamed copy so it doesn't collide with the installed prod `superset` plugin),
 exposing them as `/superset-dev:<skill>`. Re-run after editing a skill, then
 `/reload-plugins`. In production the skills ship inside the real `superset`
