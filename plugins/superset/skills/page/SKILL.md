@@ -16,6 +16,8 @@ it references by relative path published alongside it. Every publish mints a ver
 pin a comment to any element on it, and those comments come back to an agent to
 fix. That is what makes a page a working surface rather than an export.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. With the MCP tools: `pages_publish` takes the document as `html` text, with `title`, `description`, `label`, `visibility`, and `pageId` to add a version; pass `workspaceId` with `entryPath` when you have a workspace. `pages_list` takes `search` or `workspaceId`; `pages_get`, `pages_versions` and `pages_pull` take an `id` or `slug`. `pages_comments_list` takes `pageId`, `pages_comments_reply` takes `threadId` and `body`, and `pages_comments_resolve` takes `threadId` and `resolved`. Publishing a directory and `panes open pages` are local-only: they need the paradev CLI on this machine.
+
 Pages are served from their own origin under a strict content policy. Most of
 the work in this skill is respecting that policy; a page that ignores it looks
 fine locally and breaks silently once published.

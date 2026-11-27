@@ -15,6 +15,8 @@ Teach the user the advanced Paradev features they aren't using yet, grounded in 
 
 Run `bash scripts/audit.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh` in Claude Code). It runs `paradev auth whoami`, `automations list`, `workspaces list` (the cloud for accounts with cloud workspaces, else this machine) and `workspaces list --local`, `agents list --local`, `hosts list`, `tasks list`, and `pages list` with `--json`, tolerating individual failures, and prints one JSON object.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. With the MCP tools, the audit is `automations_list`, `workspaces_list` (cloud workspaces), `hosts_list`, `tasks_list` and `pages_list`, plus `agents_list` and `workspaces_list` with a `hostId` from `hosts_list` for each host. `auth whoami` and `scripts/audit.sh` are local-only.
+
 If the CLI is missing, offer to install it: `curl -fsSL https://paradev.com/cli/install.sh | sh`. If unauthenticated, `paradev auth login`. If the audit is impossible, ask the user what their current workflow looks like and proceed from their answer.
 
 ## 2. Scorecard
@@ -26,6 +28,8 @@ Compare their usage against the catalog below and present a short scorecard: the
 For each recommendation in order: a two-sentence pitch, then ask (use the ask_user tool if available) with options **Set it up now** / **Tell me more** / **Skip**. "Set it up now" means actually doing it, creating the real automation or spawning the real workspace, after confirming the specifics (name, schedule, prompt) with the user. Never print instructions as a substitute for doing it.
 
 ## Catalog
+
+With the MCP tools, set up a feature with the tool of the same name: `automations_create` and `automations_logs`, `workspaces_create` (`pr` for a PR review workspace, `environment` for a cloud one), `tasks_create` and `tasks_update`, `terminals_list`, `terminals_read` and `terminals_send`, and `pages_publish`. Host wake, workspace sharing, custom slash commands and MCP servers are local-only: they need the paradev CLI on this machine or a file in the user's repo.
 
 | Feature | Why it 10x's you | Live setup |
 | --- | --- | --- |

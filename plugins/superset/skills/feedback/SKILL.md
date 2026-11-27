@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(gh:*) Bash(uname:*) WebFetc
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+
 Check Paradev's documentation for an existing answer first. When feedback still needs reporting, turn it into a short, scannable report and submit it where the user chooses. Treat whatever they wrote after the command as the seed.
 
 The reader is a Paradev engineer triaging dozens of reports. They should get the point from the title, the full picture from the summary bullets, and only read further when they need detail. Cut everything that doesn't help them reproduce or decide.

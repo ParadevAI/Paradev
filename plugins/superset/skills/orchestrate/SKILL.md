@@ -11,6 +11,23 @@ If `paradev` is not found, run the same command as `superset`, or update the CLI
 
 Coordinate terminal agents with Paradev's workspace, agent, and terminal commands. Treat this as a coordinator-driven protocol: Paradev provides session transport, while the coordinator owns task dependencies and completion state.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. Steps marked local-only need the paradev CLI on this machine.
+
+| Step | MCP tool and arguments | CLI |
+| --- | --- | --- |
+| Find hosts | `hosts_list` (each `id`, `name`, `online`) | `hosts list` |
+| Find agents | `agents_list` with `hostId` | `agents list` |
+| Find workspaces | `workspaces_list`; add `hostId` for a host's workspaces | `workspaces list` |
+| Isolated workspace | `workspaces_create` with `projectId`, `name`, `branch`, `hostId` (omit `hostId` for cloud, with `environment`) | `workspaces create` |
+| Dispatch | `agents_create` with `workspaceId`, `agent`, `prompt`, and `hostId` for a host workspace | `agents create` |
+| Live terminals | `terminals_list` with `workspaceId` (and `hostId`) | `terminals list` |
+| Read output | `terminals_read` with `workspaceId`, `terminalId`, `maxLines` (and `hostId`) | `terminals read` |
+| Follow up | `terminals_send` with `workspaceId`, `terminalId`, `text` (and `hostId`) | `terminals send` |
+| Close | `terminals_close` with `workspaceId`, `terminalId` (and `hostId`) | `terminals close` |
+| Run summary page | `pages_publish` with `html` and `title` | `pages publish` |
+
+Local-only: `auth whoami`, `schema`, `hosts add`, `hosts wake`, `agents wait`, `terminals send --keys`, `terminals wait`, `terminals attach`, `snapshot`, `panes`, `notifications show`, `workspaces pull-requests` and `workspaces sleep`. With only the MCP tools, poll `terminals_read` instead of waiting. Key presses (approve, interrupt) are local-only; `terminals_send` sends text and presses Enter after it unless `submit` is false.
+
 ## Establish the control surface
 
 1. Run `paradev auth whoami --json`.

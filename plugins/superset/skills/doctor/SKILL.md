@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. With the MCP tools, `hosts_list` shows each host's `online` state and `workspaces_list` each cloud workspace's `status`; the other checks and every fix are local-only: they need the paradev CLI on this machine.
+
 Diagnose first, change one thing at a time, verify after each change.
 
 ## 1. Snapshot (read-only, run in parallel, tolerate failures)
