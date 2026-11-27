@@ -47,6 +47,8 @@ The `run` field defines commands that start your dev server or other long-runnin
 | `SUPERSET_WORKSPACE_NAME` | Current workspace name |
 | `SUPERSET_WORKSPACE_PATH` | Path to the workspace worktree |
 
+Each variable is also set as a `PARADEV_` copy with the same value, for example `PARADEV_ROOT_PATH`. If both names are set, the `SUPERSET_` name wins when Paradev reads it.
+
 ## Examples
 
 **Node.js:**
