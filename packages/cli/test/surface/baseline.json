@@ -1,0 +1,4748 @@
+{
+	"globalOptions": [
+		{
+			"name": "api-key",
+			"aliases": [],
+			"type": "string",
+			"required": false,
+			"env": "SUPERSET_API_KEY"
+		},
+		{
+			"name": "json",
+			"aliases": [],
+			"type": "boolean",
+			"required": false
+		},
+		{
+			"name": "quiet",
+			"aliases": [],
+			"type": "boolean",
+			"required": false
+		}
+	],
+	"commands": {
+		"agents": {
+			"options": [],
+			"args": []
+		},
+		"agents create": {
+			"options": [
+				{
+					"name": "agent",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "attachment",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "attachment-id",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "context-chars",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "effort",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "fork-session",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "from-terminal",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "model",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "prompt",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "resume-session",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"agents explain": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"agents list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"agents read": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"agents wait": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "timeout",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 600
+				},
+				{
+					"name": "until",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"default": "settled",
+					"enum": ["settled", "idle", "blocked", "working"]
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"auth": {
+			"options": [],
+			"args": []
+		},
+		"auth login": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "api-key",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "organization",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"auth logout": {
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"auth mcp-headers": {
+			"hidden": true,
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"auth whoami": {
+			"options": [],
+			"args": []
+		},
+		"automations": {
+			"aliases": ["auto"],
+			"options": [],
+			"args": []
+		},
+		"automations archive": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations create": {
+			"options": [
+				{
+					"name": "agent",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"default": "claude"
+				},
+				{
+					"name": "cloud",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "continue-session",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "dtstart",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "environment",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "group",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "machine-size",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["small", "medium", "large", "xlarge", "2xlarge"]
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "prompt",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "prompt-file",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "rrule",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "tag",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "timezone",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "triggers",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "triggers-file",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"automations delete": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations get": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations list": {
+			"options": [
+				{
+					"name": "archived",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "group",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": ["n"],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"automations logs": {
+			"options": [
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 20,
+					"int": true
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations pause": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations prompt": {
+			"options": [],
+			"args": []
+		},
+		"automations prompt get": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations prompt set": {
+			"options": [
+				{
+					"name": "from-file",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations resume": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations run": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations trigger-options": {
+			"options": [
+				{
+					"name": "group",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"automations unarchive": {
+			"aliases": ["restore"],
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"automations update": {
+			"options": [
+				{
+					"name": "agent",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "clear-group",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "clear-tags",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "cloud",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "continue-session",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "dtstart",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "enabled",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "environment",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "group",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "machine-size",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["small", "medium", "large", "xlarge", "2xlarge"]
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "rrule",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "tag",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "timezone",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "triggers",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "triggers-file",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"browser": {
+			"options": [],
+			"args": []
+		},
+		"browser cdp": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser console": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "max-lines",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser eval": {
+			"options": [
+				{
+					"name": "code",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser extensions": {
+			"options": [],
+			"args": []
+		},
+		"browser extensions install": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "extension",
+					"required": true
+				}
+			]
+		},
+		"browser extensions list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"browser extensions pin": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "extension",
+					"required": true
+				}
+			]
+		},
+		"browser extensions remove": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "extension",
+					"required": true
+				}
+			]
+		},
+		"browser extensions unpin": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "extension",
+					"required": true
+				}
+			]
+		},
+		"browser import-login": {
+			"options": [
+				{
+					"name": "from",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "profile",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser navigate": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "url",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser open": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "show",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "target",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "url",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"browser screenshot": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "out",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"completion": {
+			"options": [],
+			"args": [
+				{
+					"name": "shell",
+					"required": true,
+					"enum": ["bash", "zsh"]
+				}
+			]
+		},
+		"config": {
+			"options": [],
+			"args": []
+		},
+		"config check": {
+			"options": [],
+			"args": []
+		},
+		"connections": {
+			"options": [],
+			"args": []
+		},
+		"connections agents": {
+			"options": [],
+			"args": []
+		},
+		"connections agents list": {
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"connections agents remove": {
+			"sandbox": false,
+			"options": [],
+			"args": [
+				{
+					"name": "agent",
+					"required": true
+				}
+			]
+		},
+		"connections agents set": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "base-url",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "gateway",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "kind",
+					"aliases": [],
+					"type": "string",
+					"required": true,
+					"enum": ["subscription", "api_key", "manual"]
+				}
+			],
+			"args": [
+				{
+					"name": "agent",
+					"required": true
+				}
+			]
+		},
+		"connections github": {
+			"options": [],
+			"args": []
+		},
+		"connections github connect": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "no-wait",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"connections github disconnect": {
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"connections github status": {
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"environments": {
+			"options": [],
+			"args": []
+		},
+		"environments archive": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "environment",
+					"required": true
+				}
+			]
+		},
+		"environments builds": {
+			"options": [
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "environment",
+					"required": true
+				}
+			]
+		},
+		"environments create": {
+			"options": [
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "primary-repo",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "region",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "repo",
+					"aliases": [],
+					"type": "string",
+					"required": true,
+					"variadic": true
+				},
+				{
+					"name": "scope",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["organization", "personal"]
+				}
+			],
+			"args": []
+		},
+		"environments list": {
+			"options": [],
+			"args": []
+		},
+		"environments rebuild": {
+			"options": [
+				{
+					"name": "wait",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "environment",
+					"required": true
+				}
+			]
+		},
+		"environments replace": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "scope",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["organization", "personal"]
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "environment",
+					"required": true
+				}
+			]
+		},
+		"environments repos": {
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"environments restore": {
+			"sandbox": false,
+			"options": [],
+			"args": [
+				{
+					"name": "environment",
+					"required": true
+				},
+				{
+					"name": "build",
+					"required": true
+				}
+			]
+		},
+		"environments save": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "scope",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["organization", "personal"]
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"environments secrets": {
+			"options": [],
+			"args": []
+		},
+		"environments secrets delete": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "environment",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "name",
+					"required": true
+				}
+			]
+		},
+		"environments secrets list": {
+			"options": [
+				{
+					"name": "environment",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"environments secrets set": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "body",
+					"aliases": ["b"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "env-file",
+					"aliases": ["f"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "environment",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "visible",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "name",
+					"required": false
+				}
+			]
+		},
+		"environments update": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "clear-config",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "config",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "scope",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["organization", "personal"]
+				}
+			],
+			"args": [
+				{
+					"name": "environment",
+					"required": true
+				}
+			]
+		},
+		"feedback": {
+			"options": [],
+			"args": []
+		},
+		"feedback submit": {
+			"options": [
+				{
+					"name": "attach",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "body",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "body-file",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "diagnostics",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "title",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "type",
+					"aliases": [],
+					"type": "string",
+					"required": true,
+					"enum": ["bug", "feature", "general"]
+				}
+			],
+			"args": []
+		},
+		"hosts": {
+			"options": [],
+			"args": []
+		},
+		"hosts add": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "service",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "target",
+					"required": true
+				}
+			]
+		},
+		"hosts list": {
+			"options": [
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"hosts remove": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "target",
+					"required": true
+				}
+			]
+		},
+		"hosts set-wake": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "clear",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "host",
+					"required": true
+				},
+				{
+					"name": "command",
+					"required": false,
+					"variadic": true
+				}
+			]
+		},
+		"hosts wake": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "host",
+					"required": true
+				}
+			]
+		},
+		"integrations": {
+			"options": [],
+			"args": []
+		},
+		"integrations github": {
+			"options": [],
+			"args": []
+		},
+		"integrations github connect": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "no-wait",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"integrations github disconnect": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "account",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"integrations github status": {
+			"sandbox": false,
+			"options": [],
+			"args": []
+		},
+		"mcp": {
+			"options": [],
+			"args": []
+		},
+		"mcp call-tool": {
+			"options": [
+				{
+					"name": "account",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "connection",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "plugin",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "plugin-id",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "tool",
+					"required": true
+				},
+				{
+					"name": "arguments",
+					"required": false
+				}
+			]
+		},
+		"mcp tools": {
+			"options": [
+				{
+					"name": "account",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "connection",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "plugin",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "plugin-id",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "tool",
+					"required": false
+				}
+			]
+		},
+		"notifications": {
+			"options": [],
+			"args": []
+		},
+		"notifications show": {
+			"options": [
+				{
+					"name": "body",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "sound",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "title",
+					"required": true
+				}
+			]
+		},
+		"organization": {
+			"aliases": ["org"],
+			"options": [],
+			"args": []
+		},
+		"organization list": {
+			"options": [],
+			"args": []
+		},
+		"organization members": {
+			"options": [],
+			"args": []
+		},
+		"organization members list": {
+			"options": [
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 50
+				},
+				{
+					"name": "search",
+					"aliases": ["s"],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"organization switch": {
+			"options": [],
+			"args": [
+				{
+					"name": "idOrSlug",
+					"required": true
+				}
+			]
+		},
+		"pages": {
+			"aliases": ["page"],
+			"options": [],
+			"args": []
+		},
+		"pages comments": {
+			"aliases": ["comment"],
+			"options": [],
+			"args": []
+		},
+		"pages comments list": {
+			"options": [
+				{
+					"name": "page",
+					"aliases": ["pageId"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "thread-id",
+					"aliases": ["thread"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "unresolved",
+					"aliases": ["open"],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"pages comments reply": {
+			"options": [
+				{
+					"name": "thread-id",
+					"aliases": ["thread"],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": [
+				{
+					"name": "body",
+					"required": true
+				}
+			]
+		},
+		"pages comments resolve": {
+			"options": [
+				{
+					"name": "reopen",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "thread-id",
+					"aliases": ["thread"],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"pages delete": {
+			"options": [
+				{
+					"name": "yes",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "page",
+					"required": true
+				}
+			]
+		},
+		"pages duplicate": {
+			"options": [
+				{
+					"name": "title",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "page",
+					"required": true
+				}
+			]
+		},
+		"pages get": {
+			"options": [],
+			"args": [
+				{
+					"name": "page",
+					"required": true
+				}
+			]
+		},
+		"pages list": {
+			"options": [
+				{
+					"name": "cursor",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "search",
+					"aliases": ["q"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"pages publish": {
+			"options": [
+				{
+					"name": "description",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "label",
+					"aliases": ["l"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "no-watch",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "page",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "title",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "visibility",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "path",
+					"required": true
+				}
+			]
+		},
+		"pages pull": {
+			"options": [
+				{
+					"name": "version",
+					"aliases": ["v"],
+					"type": "number",
+					"required": false,
+					"int": true
+				}
+			],
+			"args": [
+				{
+					"name": "page",
+					"required": true
+				}
+			]
+		},
+		"pages storage": {
+			"options": [
+				{
+					"name": "key",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "remove",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "scope",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "set",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "page",
+					"required": true
+				}
+			]
+		},
+		"pages versions": {
+			"options": [],
+			"args": [
+				{
+					"name": "page",
+					"required": true
+				}
+			]
+		},
+		"pages watch": {
+			"aliases": ["watching"],
+			"options": [],
+			"args": []
+		},
+		"pages watch list": {
+			"options": [
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"pages watch stop": {
+			"options": [
+				{
+					"name": "page",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes": {
+			"options": [],
+			"args": []
+		},
+		"panes close": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "keep-terminal",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes equalize": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "tab",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes focus": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes move": {
+			"options": [
+				{
+					"name": "direction",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["right", "left", "down", "up"]
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "main",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "new-tab",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "sidebar",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "to",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes new-tab": {
+			"options": [
+				{
+					"name": "command",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "focus",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "sidebar",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes open": {
+			"options": [
+				{
+					"name": "background",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "line",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "slug",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "url",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": [
+				{
+					"name": "what",
+					"required": true,
+					"enum": ["changes", "file", "files", "pages", "browser"]
+				},
+				{
+					"name": "path",
+					"required": false
+				}
+			]
+		},
+		"panes resize": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "ratio",
+					"aliases": [],
+					"type": "number",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes sidebar": {
+			"options": [],
+			"args": []
+		},
+		"panes sidebar hide": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes sidebar show": {
+			"options": [
+				{
+					"name": "full-screen",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes split": {
+			"options": [
+				{
+					"name": "command",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "direction",
+					"aliases": [],
+					"type": "string",
+					"required": true,
+					"enum": ["right", "left", "down", "up"]
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"panes swap": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pane",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "with",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"plugins": {
+			"aliases": ["plugin"],
+			"options": [],
+			"args": []
+		},
+		"plugins connect": {
+			"options": [
+				{
+					"name": "inputs",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "marketplace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "method",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["oauth2", "api_key"]
+				}
+			],
+			"args": [
+				{
+					"name": "plugin",
+					"required": true
+				}
+			]
+		},
+		"plugins create": {
+			"options": [
+				{
+					"name": "category",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "connector",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "description",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "display-name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "kind",
+					"aliases": [],
+					"type": "string",
+					"required": true,
+					"enum": ["url", "none"]
+				},
+				{
+					"name": "skills",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "url",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "name",
+					"required": true
+				}
+			]
+		},
+		"plugins disable": {
+			"options": [
+				{
+					"name": "marketplace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "plugin",
+					"required": true
+				}
+			]
+		},
+		"plugins enable": {
+			"options": [
+				{
+					"name": "marketplace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "plugin",
+					"required": true
+				}
+			]
+		},
+		"plugins install": {
+			"options": [
+				{
+					"name": "inputs",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "marketplace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "method",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["oauth2", "api_key"]
+				},
+				{
+					"name": "no-wait",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "update",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "plugin",
+					"required": true
+				}
+			]
+		},
+		"plugins list": {
+			"options": [
+				{
+					"name": "available",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"plugins marketplace": {
+			"options": [],
+			"args": []
+		},
+		"plugins marketplace add": {
+			"options": [
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "source",
+					"required": true
+				}
+			]
+		},
+		"plugins marketplace list": {
+			"options": [],
+			"args": []
+		},
+		"plugins marketplace remove": {
+			"options": [],
+			"args": [
+				{
+					"name": "name",
+					"required": true
+				}
+			]
+		},
+		"plugins organization": {
+			"options": [],
+			"args": []
+		},
+		"plugins organization access": {
+			"options": [
+				{
+					"name": "admin",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["unavailable", "available", "installed"]
+				},
+				{
+					"name": "member",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["unavailable", "available", "installed"]
+				},
+				{
+					"name": "owner",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["unavailable", "available", "installed"]
+				}
+			],
+			"args": [
+				{
+					"name": "name",
+					"required": true
+				}
+			]
+		},
+		"plugins organization list": {
+			"options": [],
+			"args": []
+		},
+		"plugins organization sources": {
+			"options": [],
+			"args": []
+		},
+		"plugins organization sources add": {
+			"options": [
+				{
+					"name": "path",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "ref",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "repo",
+					"required": true
+				}
+			]
+		},
+		"plugins organization sources list": {
+			"options": [],
+			"args": []
+		},
+		"plugins organization sources remove": {
+			"options": [],
+			"args": [
+				{
+					"name": "source",
+					"required": true
+				}
+			]
+		},
+		"plugins organization sources sync": {
+			"options": [],
+			"args": [
+				{
+					"name": "source",
+					"required": true
+				}
+			]
+		},
+		"plugins publish": {
+			"options": [
+				{
+					"name": "bump",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "force",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "names",
+					"required": false,
+					"variadic": true
+				}
+			]
+		},
+		"plugins sync": {
+			"options": [
+				{
+					"name": "forget-organizations",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"plugins uninstall": {
+			"aliases": ["remove"],
+			"options": [
+				{
+					"name": "marketplace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "plugin",
+					"required": true
+				}
+			]
+		},
+		"plugins validate": {
+			"options": [
+				{
+					"name": "strict",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "path",
+					"required": false
+				}
+			]
+		},
+		"ports": {
+			"options": [],
+			"args": []
+		},
+		"ports list": {
+			"options": [
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"ports port": {
+			"options": [
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "port",
+					"required": true
+				}
+			]
+		},
+		"projects": {
+			"options": [],
+			"args": []
+		},
+		"projects create": {
+			"options": [
+				{
+					"name": "clone",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "import",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "parent-dir",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"projects list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"projects setup": {
+			"options": [
+				{
+					"name": "allow-relocate",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "import",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "parent-dir",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "path",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "repo-url",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"schema": {
+			"options": [],
+			"args": []
+		},
+		"scripts": {
+			"aliases": ["presets"],
+			"options": [],
+			"args": []
+		},
+		"scripts add": {
+			"options": [
+				{
+					"name": "command",
+					"aliases": [],
+					"type": "string",
+					"required": true,
+					"variadic": true
+				},
+				{
+					"name": "cwd",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "description",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "execution-mode",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["split-pane", "new-tab", "new-tab-split-pane", "sequential"]
+				},
+				{
+					"name": "hidden",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "upsert",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "workspace-run",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"scripts delete": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"scripts edit": {
+			"options": [
+				{
+					"name": "all-projects",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "command",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "cwd",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "description",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "execution-mode",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["split-pane", "new-tab", "new-tab-split-pane", "sequential"]
+				},
+				{
+					"name": "hidden",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "workspace-run",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"scripts list": {
+			"options": [],
+			"args": []
+		},
+		"sessions": {
+			"options": [],
+			"args": []
+		},
+		"sessions close": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions create": {
+			"options": [
+				{
+					"name": "agent",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "attachment",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "attachment-id",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "mode",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "model",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "prompt",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions import": {
+			"options": [
+				{
+					"name": "agent",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "native-session",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions open": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "print",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions read": {
+			"options": [
+				{
+					"name": "before",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions resume": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"sessions search": {
+			"options": [
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				}
+			],
+			"args": [
+				{
+					"name": "query",
+					"required": true
+				}
+			]
+		},
+		"sessions send": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "prompt",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"settings": {
+			"options": [],
+			"args": []
+		},
+		"settings get": {
+			"options": [],
+			"args": [
+				{
+					"name": "key",
+					"required": true
+				}
+			]
+		},
+		"settings list": {
+			"options": [],
+			"args": []
+		},
+		"settings reset": {
+			"options": [],
+			"args": [
+				{
+					"name": "key",
+					"required": true
+				}
+			]
+		},
+		"settings set": {
+			"options": [],
+			"args": [
+				{
+					"name": "key",
+					"required": true
+				},
+				{
+					"name": "value",
+					"required": true
+				}
+			]
+		},
+		"settings theme": {
+			"options": [],
+			"args": []
+		},
+		"settings theme export": {
+			"options": [
+				{
+					"name": "out",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"settings theme get": {
+			"options": [],
+			"args": []
+		},
+		"settings theme import": {
+			"options": [],
+			"args": [
+				{
+					"name": "file",
+					"required": true
+				}
+			]
+		},
+		"settings theme list": {
+			"options": [],
+			"args": []
+		},
+		"settings theme remove": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"settings theme set": {
+			"options": [
+				{
+					"name": "system-dark",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "system-light",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "theme",
+					"required": false
+				}
+			]
+		},
+		"skills": {
+			"options": [],
+			"args": []
+		},
+		"skills list": {
+			"options": [
+				{
+					"name": "paths",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"snapshot": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"start": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "auto-update",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "daemon",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "port",
+					"aliases": [],
+					"type": "number",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"status": {
+			"options": [
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"stop": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "org",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "terminals",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"tasks": {
+			"aliases": ["t"],
+			"options": [],
+			"args": []
+		},
+		"tasks create": {
+			"options": [
+				{
+					"name": "assignee",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "description",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "due-date",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "estimate",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "labels",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "priority",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["urgent", "high", "medium", "low", "none"]
+				},
+				{
+					"name": "status-id",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "team",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "title",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "tracker",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["superset", "linear"]
+				}
+			],
+			"args": []
+		},
+		"tasks delete": {
+			"options": [
+				{
+					"name": "tracker",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["superset", "linear"]
+				}
+			],
+			"args": [
+				{
+					"name": "ids",
+					"required": true,
+					"variadic": true
+				}
+			]
+		},
+		"tasks get": {
+			"options": [
+				{
+					"name": "tracker",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["superset", "linear"]
+				}
+			],
+			"args": [
+				{
+					"name": "idOrSlug",
+					"required": true
+				}
+			]
+		},
+		"tasks list": {
+			"options": [
+				{
+					"name": "assignee",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "assignee-me",
+					"aliases": ["m"],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "creator-me",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "due-from",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "due-to",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "labels",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "limit",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 50,
+					"int": true
+				},
+				{
+					"name": "offset",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 0,
+					"int": true
+				},
+				{
+					"name": "priority",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["urgent", "high", "medium", "low", "none"]
+				},
+				{
+					"name": "search",
+					"aliases": ["s"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "sort-by",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["createdAt", "updatedAt", "dueDate", "priority"]
+				},
+				{
+					"name": "sort-order",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["asc", "desc"]
+				},
+				{
+					"name": "status",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "team",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "tracker",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["superset", "linear"]
+				}
+			],
+			"args": []
+		},
+		"tasks statuses": {
+			"options": [],
+			"args": []
+		},
+		"tasks statuses list": {
+			"options": [
+				{
+					"name": "team",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "tracker",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["superset", "linear"]
+				}
+			],
+			"args": []
+		},
+		"tasks update": {
+			"options": [
+				{
+					"name": "assignee",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "description",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "due-date",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "estimate",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "labels",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pr-url",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "priority",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["urgent", "high", "medium", "low", "none"]
+				},
+				{
+					"name": "status-id",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "title",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "tracker",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["superset", "linear"]
+				}
+			],
+			"args": [
+				{
+					"name": "idOrSlug",
+					"required": true
+				}
+			]
+		},
+		"terminals": {
+			"aliases": ["term"],
+			"options": [],
+			"args": []
+		},
+		"terminals attach": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "ssh",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"terminals close": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"terminals create": {
+			"options": [
+				{
+					"name": "command",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "cwd",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"terminals list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"terminals read": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "max-lines",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"terminals send": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "keys",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "no-submit",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "text",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "timeout",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 600
+				},
+				{
+					"name": "until",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"default": "settled",
+					"enum": ["settled", "idle", "blocked", "working"]
+				},
+				{
+					"name": "wait",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"terminals wait": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "match",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "max-lines",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"int": true
+				},
+				{
+					"name": "terminal",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "timeout",
+					"aliases": [],
+					"type": "number",
+					"required": false,
+					"default": 600
+				},
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"update": {
+			"sandbox": false,
+			"options": [
+				{
+					"name": "check",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "force",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "keep-backup",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "version",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"workspaces": {
+			"aliases": ["ws"],
+			"options": [],
+			"args": []
+		},
+		"workspaces activity": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces archive": {
+			"aliases": ["delete"],
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "ids",
+					"required": true,
+					"variadic": true
+				}
+			]
+		},
+		"workspaces create": {
+			"options": [
+				{
+					"name": "agent",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "attachment",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "base-branch",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "branch",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "checkout",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "command",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "effort",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "environment",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "machine-size",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["small", "medium", "large", "xlarge", "2xlarge"]
+				},
+				{
+					"name": "model",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "pr",
+					"aliases": [],
+					"type": "number",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "prompt",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "session",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "skip-branch-prefix",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "tag",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "task",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"workspaces description": {
+			"options": [],
+			"args": []
+		},
+		"workspaces description set": {
+			"options": [
+				{
+					"name": "workspace",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "description",
+					"required": false
+				}
+			]
+		},
+		"workspaces get": {
+			"options": [
+				{
+					"name": "field",
+					"aliases": ["f"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "search",
+					"aliases": ["s"],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "tag",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				}
+			],
+			"args": []
+		},
+		"workspaces open": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "print",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"workspaces pull-requests": {
+			"aliases": ["prs"],
+			"options": [
+				{
+					"name": "all",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "archived",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces restart": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"workspaces share": {
+			"options": [],
+			"args": []
+		},
+		"workspaces share add": {
+			"options": [
+				{
+					"name": "team",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "user",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces share list": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces share remove": {
+			"options": [
+				{
+					"name": "team",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "user",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces sleep": {
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": false
+				}
+			]
+		},
+		"workspaces unarchive": {
+			"aliases": ["restore"],
+			"options": [],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"workspaces update": {
+			"options": [
+				{
+					"name": "add-label",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "clear-tags",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "clear-task",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "machine-size",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["small", "medium", "large", "xlarge", "2xlarge"]
+				},
+				{
+					"name": "name",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "remove-label",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "tag",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"variadic": true
+				},
+				{
+					"name": "task-id",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "visibility",
+					"aliases": [],
+					"type": "string",
+					"required": false,
+					"enum": ["just_me", "org"]
+				}
+			],
+			"args": [
+				{
+					"name": "id",
+					"required": true
+				}
+			]
+		},
+		"worktrees": {
+			"options": [],
+			"args": []
+		},
+		"worktrees list": {
+			"options": [
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				}
+			],
+			"args": []
+		},
+		"worktrees open": {
+			"options": [
+				{
+					"name": "all",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "branch",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "host",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "local",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				},
+				{
+					"name": "path",
+					"aliases": [],
+					"type": "string",
+					"required": false
+				},
+				{
+					"name": "project",
+					"aliases": [],
+					"type": "string",
+					"required": true
+				},
+				{
+					"name": "run-setup",
+					"aliases": [],
+					"type": "boolean",
+					"required": false
+				}
+			],
+			"args": []
+		}
+	}
+}
