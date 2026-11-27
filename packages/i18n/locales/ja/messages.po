@@ -7253,6 +7253,9 @@ msgstr "{1} 台中 {0} 台のデバイスから「{projectName}」を削除し�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "「{projectName}」を削除しました。30 日間は「設定 → プロジェクト」から復元できます。"
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{total}件中{completed}件を削除済み…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen}に削除 · {deviceNames}"
 
@@ -7294,11 +7297,6 @@ msgstr "このホストとそのアクセス権、ワークスペースを削除
 msgctxt "file change"
 msgid "Deleting"
 msgstr "削除中"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{1}件中{0}件を削除中…"
 
 msgid "Deleting {name}..."
 msgstr "{name}を削除中..."

@@ -7253,6 +7253,9 @@ msgstr "已從 {1} 台裝置中的 {0} 台刪除「{projectName}」。其他裝�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "已刪除「{projectName}」。你可以在 30 天內從「設定 → 專案」還原。"
 
+msgid "Deleted {completed} of {total}…"
+msgstr "已刪除 {completed} 個，共 {total} 個…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen}刪除 · {deviceNames}"
 
@@ -7294,11 +7297,6 @@ msgstr "刪除該主機、其存取權限及其工作區。機器上的檔案會
 msgctxt "file change"
 msgid "Deleting"
 msgstr "刪除中"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "正在刪除第{0}個，共{1}個…"
 
 msgid "Deleting {name}..."
 msgstr "正在刪除{name}..."

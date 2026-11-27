@@ -7253,6 +7253,9 @@ msgstr "Se eliminó \"{projectName}\" de {0} de {1} dispositivos. Los demás con
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Se eliminó \"{projectName}\". Puedes restaurarlo desde Configuración → Proyectos durante 30 días."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Eliminados {completed} de {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Eliminado {deletedWhen} · {deviceNames}"
 
@@ -7294,11 +7297,6 @@ msgstr "Elimina este host, su acceso y sus espacios de trabajo. Los archivos de 
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Eliminando"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Eliminando {0} de {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Eliminando {name}..."

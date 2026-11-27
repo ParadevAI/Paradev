@@ -7253,6 +7253,9 @@ msgstr "已从 {1} 台设备中的 {0} 台删除“{projectName}”。其他设�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "已删除“{projectName}”。你可以在 30 天内从“设置 → 项目”恢复它。"
 
+msgid "Deleted {completed} of {total}…"
+msgstr "已删除 {completed} 个，共 {total} 个…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen}删除 · {deviceNames}"
 
@@ -7294,11 +7297,6 @@ msgstr "删除该主机、其访问权限及其工作区。机器上的文件会
 msgctxt "file change"
 msgid "Deleting"
 msgstr "删除中"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "正在删除第{0}个，共{1}个…"
 
 msgid "Deleting {name}..."
 msgstr "正在删除{name}..."

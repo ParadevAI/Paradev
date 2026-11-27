@@ -7253,6 +7253,9 @@ msgstr "„{projectName}“ auf {0} von {1} Geräten gelöscht. Die anderen beha
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "„{projectName}“ gelöscht. Du kannst es 30 Tage lang unter Einstellungen → Projekte wiederherstellen."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{completed} von {total} gelöscht…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Gelöscht {deletedWhen} · {deviceNames}"
 
@@ -7294,11 +7297,6 @@ msgstr "Löscht diesen Host, seine Zugriffsrechte und seine Arbeitsbereiche. Dat
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Lösche"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{0} von {1} werden gelöscht…"
 
 msgid "Deleting {name}..."
 msgstr "{name} wird gelöscht..."

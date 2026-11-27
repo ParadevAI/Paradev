@@ -7253,6 +7253,9 @@ msgstr "\"{projectName}\" dihapus dari {0} dari {1} perangkat. Perangkat lain te
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" dihapus. Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{completed} dari {total} dihapus…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Dihapus {deletedWhen} · {deviceNames}"
 
@@ -7294,11 +7297,6 @@ msgstr "Menghapus host ini, aksesnya, dan workspace-nya. File di mesin itu tetap
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Menghapus"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Menghapus {0} dari {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Menghapus {name}..."
