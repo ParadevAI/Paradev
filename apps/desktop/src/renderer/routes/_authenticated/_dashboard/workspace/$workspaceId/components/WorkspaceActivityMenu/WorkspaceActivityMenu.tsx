@@ -587,7 +587,7 @@ export function WorkspaceActivityMenu({
 			return;
 		}
 		const pageData = { pageId: page.id, slug: page.slug, title: page.title };
-		if (rightPane) {
+		if (rightPane && action !== "newTab") {
 			rightPane.reveal();
 			openPagePaneInStore(rightPane.store, pageData, "tab");
 			return;

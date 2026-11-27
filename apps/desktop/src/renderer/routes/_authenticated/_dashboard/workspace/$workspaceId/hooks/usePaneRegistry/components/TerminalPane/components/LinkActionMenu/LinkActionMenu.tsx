@@ -38,9 +38,7 @@ const ACTION_ICONS: Record<LinkAction, LucideIcon> = {
 const SHORTCUT_TIERS: LinkTier[] = ["meta", "shift", "metaShift"];
 
 function opensAs(action: LinkAction | null, hasRightPane: boolean) {
-	return hasRightPane && action !== null && action !== "external"
-		? "rightPane"
-		: action;
+	return hasRightPane && action === "pane" ? "rightPane" : action;
 }
 
 function shortcutTier(
@@ -56,7 +54,7 @@ function shortcutTier(
 }
 
 const PANE_ACTIONS: LinkAction[] = ["pane", "newTab", "external"];
-const RIGHT_PANE_ACTIONS: LinkAction[] = ["rightPane", "external"];
+const RIGHT_PANE_ACTIONS: LinkAction[] = ["rightPane", "newTab", "external"];
 
 export interface LinkActionMenuProps {
 	menu: LinkActionMenuRequest | null;
