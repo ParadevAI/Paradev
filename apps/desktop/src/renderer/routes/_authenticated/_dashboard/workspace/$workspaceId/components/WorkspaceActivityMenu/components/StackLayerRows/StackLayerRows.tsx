@@ -1,3 +1,5 @@
+import { useLingui } from "@lingui/react/macro";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { PullRequestStateGlyph } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestStateGlyph";
 import { PR_RED_TEXT_CLASS_NAME } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/pull-request-colors";
@@ -22,6 +24,7 @@ export function StackLayerRows({
 	pendingNumber?: number | null;
 	onSelect: (layer: PullRequestStackLayer) => void;
 }) {
+	const { t } = useLingui();
 	const copy = usePullRequestStackCopy();
 	return (
 		<div className="ml-[1.625rem] border-l border-border/60 pl-2">
@@ -29,49 +32,60 @@ export function StackLayerRows({
 				const status = copy.layerStatus(layer);
 				const issue = stackLayerIssue(layer);
 				return (
-					<button
-						key={layer.number}
-						type="button"
-						disabled={pendingNumber !== null}
-						onClick={() => onSelect(layer)}
-						className="flex min-h-6 w-full items-center gap-2 rounded-sm px-1.5 py-0.5 text-left text-[11px] outline-none transition-colors hover:bg-accent focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-60"
-					>
-						{pendingNumber === layer.number ? (
-							<span className="flex size-3 items-center justify-center">
-								<AsciiSpinner className="text-sm leading-none" />
-							</span>
-						) : (
-							<PullRequestStateGlyph
-								state={stackLayerGlyphState(layer)}
-								className="size-3"
-							/>
-						)}
-						<span className="shrink-0 text-muted-foreground tabular-nums">
-							#{layer.number}
-						</span>
-						<span
-							className={cn(
-								"min-w-0 flex-1 truncate",
-								layer.state === "merged"
-									? "text-muted-foreground"
-									: "text-foreground/90",
-							)}
-						>
-							{layer.title}
-						</span>
-						{status ? (
-							<span
-								className={cn(
-									"shrink-0",
-									issue && DANGER_ISSUES.has(issue)
-										? PR_RED_TEXT_CLASS_NAME
-										: "text-muted-foreground",
-								)}
+					<Tooltip key={layer.number}>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								disabled={pendingNumber !== null}
+								onClick={() => onSelect(layer)}
+								className="flex min-h-6 w-full items-center gap-2 rounded-sm px-1.5 py-0.5 text-left text-[11px] outline-none transition-colors hover:bg-accent focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-60"
 							>
-								{status}
-							</span>
-						) : null}
-					</button>
+								{pendingNumber === layer.number ? (
+									<span className="flex size-3 items-center justify-center">
+										<AsciiSpinner className="text-sm leading-none" />
+									</span>
+								) : (
+									<PullRequestStateGlyph
+										state={stackLayerGlyphState(layer)}
+										className="size-3"
+									/>
+								)}
+								<span className="shrink-0 text-muted-foreground tabular-nums">
+									#{layer.number}
+								</span>
+								<span
+									className={cn(
+										"min-w-0 flex-1 truncate",
+										layer.state === "merged"
+											? "text-muted-foreground"
+											: "text-foreground/90",
+									)}
+								>
+									{layer.title}
+								</span>
+								{status ? (
+									<span
+										className={cn(
+											"shrink-0",
+											issue && DANGER_ISSUES.has(issue)
+												? PR_RED_TEXT_CLASS_NAME
+												: "text-muted-foreground",
+										)}
+									>
+										{status}
+									</span>
+								) : null}
+							</button>
+						</TooltipTrigger>
+						{layer.state === "open" && (
+							<TooltipContent>
+								{t({
+									message:
+										"Switch to this PR’s workspace or branch. Uncommitted changes may prevent switching.",
+								})}
+							</TooltipContent>
+						)}
+					</Tooltip>
 				);
 			})}
 		</div>
