@@ -20,6 +20,7 @@ import {
 import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
+import { NewTabDefaultKindSetting } from "./components/NewTabDefaultKindSetting";
 
 interface BehaviorSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -149,6 +150,11 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
 					<AcpChatSetting />
 				)}
+
+				{isItemVisible(
+					SETTING_ITEM_ID.BEHAVIOR_NEW_TAB_DEFAULT_KIND,
+					visibleItems,
+				) && <NewTabDefaultKindSetting searchQuery={searchQuery} />}
 
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">

@@ -3256,6 +3256,9 @@ msgstr "最後に報告された値です。更新するにはホストがオン
 msgid "ascending"
 msgstr "昇順"
 
+msgid "Ask"
+msgstr "毎回確認"
+
 msgid "Ask a member to add you to this channel"
 msgstr "メンバーにこのチャンネルへの追加を依頼してください"
 
@@ -4551,6 +4554,9 @@ msgstr "このメッセージで使うMCPサーバーを選択"
 msgid "Choose one"
 msgstr "選択してください"
 
+msgid "Choose tab type"
+msgstr "タブの種類を選択"
+
 msgid "Choose the model"
 msgstr "モデルを選択"
 
@@ -4559,6 +4565,9 @@ msgstr "AWS Marketplace が請求する組織を選択してください。1 つ
 
 msgid "Choose the primary repository"
 msgstr "メインのリポジトリを選択"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "タブバーの + をクリックしたときに開くものを選択します。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "アプリ内ブラウザから消去する項目を選択してください。"
@@ -7050,6 +7059,9 @@ msgstr "このホストの新規ワークツリーワークスペースの既定
 
 msgid "Default model"
 msgstr "デフォルトのモデル"
+
+msgid "Default new tab"
+msgstr "新しいタブの既定の種類"
 
 msgid "Default team for new tasks"
 msgstr "新しいタスクの既定チーム"

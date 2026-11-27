@@ -3256,6 +3256,9 @@ msgstr "Theo báo cáo gần nhất. Máy chủ phải trực tuyến để cậ
 msgid "ascending"
 msgstr "tăng dần"
 
+msgid "Ask"
+msgstr "Hỏi"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Hãy nhờ một thành viên thêm bạn vào kênh này"
 
@@ -4551,6 +4554,9 @@ msgstr "Chọn server MCP cho tin nhắn này"
 msgid "Choose one"
 msgstr "Chọn một"
 
+msgid "Choose tab type"
+msgstr "Chọn loại thẻ"
+
 msgid "Choose the model"
 msgstr "Chọn mô hình"
 
@@ -4559,6 +4565,9 @@ msgstr "Chọn tổ chức mà AWS Marketplace sẽ tính phí. Mỗi gói đăn
 
 msgid "Choose the primary repository"
 msgstr "Chọn repository chính"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Chọn nội dung mở khi bạn nhấp vào + trên thanh thẻ."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Chọn thứ cần xóa khỏi trình duyệt trong ứng dụng."
@@ -7050,6 +7059,9 @@ msgstr "Vị trí mặc định cho workspace worktree mới trên host này."
 
 msgid "Default model"
 msgstr "Mô hình mặc định"
+
+msgid "Default new tab"
+msgstr "Thẻ mới mặc định"
 
 msgid "Default team for new tasks"
 msgstr "Nhóm mặc định cho tác vụ mới"

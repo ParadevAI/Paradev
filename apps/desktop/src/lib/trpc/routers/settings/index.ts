@@ -8,6 +8,7 @@ import { isSupportedLocale } from "@superset/i18n/locales";
 import {
 	EXTERNAL_APPS,
 	FILE_AUTO_SAVE_MODES,
+	NEW_TAB_DEFAULT_KINDS,
 	NON_EDITOR_APPS,
 	settings,
 	type TerminalPreset,
@@ -280,6 +281,27 @@ export const createSettingsRouter = () => {
 			const row = getSettings();
 			return row.confirmOnQuit ?? DEFAULT_CONFIRM_ON_QUIT;
 		}),
+
+		getNewTabDefaultKind: publicProcedure.query(() => {
+			const row = getSettings();
+			return row.newTabDefaultKind ?? "ask";
+		}),
+
+		setNewTabDefaultKind: publicProcedure
+			.input(z.object({ kind: z.enum(NEW_TAB_DEFAULT_KINDS) }))
+			.mutation(({ input }) => {
+				const { id } = getSettings();
+				localDb
+					.insert(settings)
+					.values({ id, newTabDefaultKind: input.kind })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { newTabDefaultKind: input.kind },
+					})
+					.run();
+
+				return { success: true };
+			}),
 
 		setConfirmOnQuit: publicProcedure
 			.input(z.object({ enabled: z.boolean() }))

@@ -3256,6 +3256,9 @@ msgstr "上次报告的版本。主机必须在线才能更新。"
 msgid "ascending"
 msgstr "升序"
 
+msgid "Ask"
+msgstr "询问"
+
 msgid "Ask a member to add you to this channel"
 msgstr "请让成员将你加入此频道"
 
@@ -4551,6 +4554,9 @@ msgstr "为这条消息选择MCP服务器"
 msgid "Choose one"
 msgstr "请选择"
 
+msgid "Choose tab type"
+msgstr "选择标签页类型"
+
 msgid "Choose the model"
 msgstr "选择模型"
 
@@ -4559,6 +4565,9 @@ msgstr "选择由 AWS Marketplace 计费的组织。每个订阅只能关联一�
 
 msgid "Choose the primary repository"
 msgstr "选择主仓库"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "选择点击标签栏中的 + 时打开的内容。"
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "选择要从应用内浏览器清除的内容。"
@@ -7050,6 +7059,9 @@ msgstr "此主机上新建worktree工作区的默认位置。"
 
 msgid "Default model"
 msgstr "默认模型"
+
+msgid "Default new tab"
+msgstr "默认新标签页"
 
 msgid "Default team for new tasks"
 msgstr "新任务的默认团队"

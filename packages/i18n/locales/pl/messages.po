@@ -3256,6 +3256,9 @@ msgstr "Według ostatniego zgłoszenia. Host musi być online, aby się zaktuali
 msgid "ascending"
 msgstr "rosnąco"
 
+msgid "Ask"
+msgstr "Pytaj"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Poproś członka, aby dodał Cię do tego kanału"
 
@@ -4551,6 +4554,9 @@ msgstr "Wybierz serwery MCP dla tej wiadomości"
 msgid "Choose one"
 msgstr "Wybierz"
 
+msgid "Choose tab type"
+msgstr "Wybierz typ karty"
+
 msgid "Choose the model"
 msgstr "Wybierz model"
 
@@ -4559,6 +4565,9 @@ msgstr "Wybierz organizację, którą AWS Marketplace będzie obciążać. Każd
 
 msgid "Choose the primary repository"
 msgstr "Wybierz główne repozytorium"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Wybierz, co ma się otwierać po kliknięciu + na pasku kart."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Wybierz, co wyczyścić z przeglądarki w aplikacji."
@@ -7050,6 +7059,9 @@ msgstr "Domyślna lokalizacja nowych obszarów roboczych opartych na worktree na
 
 msgid "Default model"
 msgstr "Domyślny model"
+
+msgid "Default new tab"
+msgstr "Domyślna nowa karta"
 
 msgid "Default team for new tasks"
 msgstr "Domyślny zespół dla nowych zadań"

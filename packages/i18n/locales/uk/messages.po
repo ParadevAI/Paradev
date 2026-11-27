@@ -3250,6 +3250,9 @@ msgstr "За останніми даними. Щоб оновити, хост м
 msgid "ascending"
 msgstr "за зростанням"
 
+msgid "Ask"
+msgstr "Запитувати"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Попросіть учасника додати вас до цього каналу"
 
@@ -4545,6 +4548,9 @@ msgstr "Виберіть MCP-сервери для цього повідомле
 msgid "Choose one"
 msgstr "Виберіть варіант"
 
+msgid "Choose tab type"
+msgstr "Вибрати тип вкладки"
+
 msgid "Choose the model"
 msgstr "Виберіть модель"
 
@@ -4553,6 +4559,9 @@ msgstr "Виберіть організацію, якій AWS Marketplace вис
 
 msgid "Choose the primary repository"
 msgstr "Виберіть основний репозиторій"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Виберіть, що відкриватиметься після натискання + на панелі вкладок."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Виберіть, що очистити у вбудованому браузері."
@@ -7044,6 +7053,9 @@ msgstr "Розташування за замовчуванням для нови
 
 msgid "Default model"
 msgstr "Модель за замовчуванням"
+
+msgid "Default new tab"
+msgstr "Нова вкладка за замовчуванням"
 
 msgid "Default team for new tasks"
 msgstr "Команда за замовчуванням для нових завдань"

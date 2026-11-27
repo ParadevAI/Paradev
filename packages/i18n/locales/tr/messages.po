@@ -3256,6 +3256,9 @@ msgstr "Son bildirildiği gibi. Güncellemek için ana makine çevrimiçi olmal�
 msgid "ascending"
 msgstr "artan"
 
+msgid "Ask"
+msgstr "Sor"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Bir üyeden sizi bu kanala eklemesini isteyin"
 
@@ -4551,6 +4554,9 @@ msgstr "Bu ileti için MCP sunucularını seçin"
 msgid "Choose one"
 msgstr "Birini seçin"
 
+msgid "Choose tab type"
+msgstr "Sekme türünü seç"
+
 msgid "Choose the model"
 msgstr "Modeli seç"
 
@@ -4559,6 +4565,9 @@ msgstr "AWS Marketplace'in faturalandıracağı kuruluşu seçin. Her abonelik t
 
 msgid "Choose the primary repository"
 msgstr "Birincil depoyu seçin"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Sekme çubuğunda + simgesine tıkladığınızda ne açılacağını seçin."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Uygulama içi tarayıcıdan neyin temizleneceğini seçin."
@@ -7050,6 +7059,9 @@ msgstr "Bu host'taki yeni worktree çalışma alanları için varsayılan konum.
 
 msgid "Default model"
 msgstr "Varsayılan model"
+
+msgid "Default new tab"
+msgstr "Varsayılan yeni sekme"
 
 msgid "Default team for new tasks"
 msgstr "Yeni görevler için varsayılan takım"

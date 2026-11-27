@@ -43,6 +43,7 @@ export const SETTING_ITEM_ID = {
 
 	KEYBOARD_SHORTCUTS: "keyboard-shortcuts",
 	BEHAVIOR_CONFIRM_QUIT: "behavior-confirm-quit",
+	BEHAVIOR_NEW_TAB_DEFAULT_KIND: "behavior-new-tab-default-kind",
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
 	BEHAVIOR_ACP_CHAT: "behavior-acp-chat",
@@ -698,6 +699,22 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"on focus change",
 			"onwindowchange",
 			"on window change",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_NEW_TAB_DEFAULT_KIND,
+		section: "behavior",
+		title: "Default new tab",
+		description: "Choose what opens when you click + in the tab bar.",
+		keywords: [
+			"tab",
+			"default",
+			"newTabDefaultKind",
+			"terminal",
+			"chat",
+			"browser",
+			"ask",
+			"+",
 		],
 	},
 	{

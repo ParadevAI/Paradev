@@ -3256,6 +3256,9 @@ msgstr "Dernière valeur signalée. L'hôte doit être en ligne pour être mis �
 msgid "ascending"
 msgstr "croissant"
 
+msgid "Ask"
+msgstr "Demander"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Demandez à un membre de vous ajouter à ce canal"
 
@@ -4551,6 +4554,9 @@ msgstr "Choisir des serveurs MCP pour ce message"
 msgid "Choose one"
 msgstr "Choisir"
 
+msgid "Choose tab type"
+msgstr "Choisir le type d’onglet"
+
 msgid "Choose the model"
 msgstr "Choisir le modèle"
 
@@ -4559,6 +4565,9 @@ msgstr "Choisissez l’organisation qu’AWS Marketplace facturera. Chaque abonn
 
 msgid "Choose the primary repository"
 msgstr "Choisir le dépôt principal"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Choisissez ce qui s’ouvre lorsque vous cliquez sur + dans la barre d’onglets."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Choisissez ce qu'il faut effacer du navigateur intégré."
@@ -7050,6 +7059,9 @@ msgstr "Emplacement par défaut des nouveaux espaces de travail worktree sur cet
 
 msgid "Default model"
 msgstr "Modèle par défaut"
+
+msgid "Default new tab"
+msgstr "Nouvel onglet par défaut"
 
 msgid "Default team for new tasks"
 msgstr "Équipe par défaut pour les nouvelles tâches"

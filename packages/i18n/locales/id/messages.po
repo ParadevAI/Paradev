@@ -3256,6 +3256,9 @@ msgstr "Sesuai laporan terakhir. Host harus online untuk memperbarui."
 msgid "ascending"
 msgstr "menaik"
 
+msgid "Ask"
+msgstr "Tanyakan"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Minta anggota untuk menambahkan Anda ke kanal ini"
 
@@ -4551,6 +4554,9 @@ msgstr "Pilih server MCP untuk pesan ini"
 msgid "Choose one"
 msgstr "Pilih salah satu"
 
+msgid "Choose tab type"
+msgstr "Pilih jenis tab"
+
 msgid "Choose the model"
 msgstr "Pilih model"
 
@@ -4559,6 +4565,9 @@ msgstr "Pilih organisasi yang akan ditagih oleh AWS Marketplace. Setiap langgana
 
 msgid "Choose the primary repository"
 msgstr "Pilih repositori utama"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Pilih apa yang dibuka saat Anda mengeklik + di bilah tab."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Pilih apa yang ingin dibersihkan dari browser dalam aplikasi."
@@ -7050,6 +7059,9 @@ msgstr "Lokasi bawaan untuk workspace worktree baru di host ini."
 
 msgid "Default model"
 msgstr "Model bawaan"
+
+msgid "Default new tab"
+msgstr "Tab baru default"
 
 msgid "Default team for new tasks"
 msgstr "Tim bawaan untuk tugas baru"

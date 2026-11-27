@@ -151,7 +151,7 @@ export interface WorkspaceProps<TData> {
 	onTabClick?: (tab: Tab<TData>) => void;
 	renderEmptyState?: () => ReactNode;
 	renderAddTabMenu?: (actions: AddTabMenuActions) => ReactNode;
-	/** Runs when the add-tab button is clicked. Ignored when `renderAddTabMenu` is set. */
+	/** Runs when the add-tab button is clicked. When a menu is also provided, a separate chevron opens it. */
 	onAddTab?: () => void;
 	/** Rendered at the leading (left) edge of the tab bar row, before the tabs. */
 	renderTabBarLeading?: () => ReactNode;

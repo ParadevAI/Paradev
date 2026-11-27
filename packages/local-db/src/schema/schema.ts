@@ -18,6 +18,7 @@ import type {
 	FileOpenMode,
 	GitHubStatus,
 	GitStatus,
+	NewTabDefaultKind,
 	TerminalLinkBehavior,
 	TerminalPreset,
 	WorkspaceType,
@@ -229,6 +230,7 @@ export const settings = sqliteTable("settings", {
 	notificationVolume: integer("notification_volume"),
 	deleteLocalBranch: integer("delete_local_branch", { mode: "boolean" }),
 	fileOpenMode: text("file_open_mode").$type<FileOpenMode>(),
+	newTabDefaultKind: text("new_tab_default_kind").$type<NewTabDefaultKind>(),
 	fileAutoSave: text("file_auto_save").$type<FileAutoSaveMode>(),
 	showPresetsBar: integer("show_presets_bar", { mode: "boolean" }),
 	useCompactTerminalAddButton: integer("use_compact_terminal_add_button", {

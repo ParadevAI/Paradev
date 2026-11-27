@@ -3256,6 +3256,9 @@ msgstr "Podle posledního hlášení. Hostitel musí být online, aby se mohl ak
 msgid "ascending"
 msgstr "vzestupně"
 
+msgid "Ask"
+msgstr "Zeptat se"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Požádejte člena, aby vás do kanálu přidal"
 
@@ -4551,6 +4554,9 @@ msgstr "Vyberte MCP servery pro tuto zprávu"
 msgid "Choose one"
 msgstr "Vyberte"
 
+msgid "Choose tab type"
+msgstr "Vybrat typ karty"
+
 msgid "Choose the model"
 msgstr "Vybrat model"
 
@@ -4559,6 +4565,9 @@ msgstr "Vyberte organizaci, které bude AWS Marketplace účtovat. Každé před
 
 msgid "Choose the primary repository"
 msgstr "Vyberte hlavní repozitář"
+
+msgid "Choose what opens when you click + in the tab bar."
+msgstr "Vyberte, co se otevře po kliknutí na + na liště karet."
 
 msgid "Choose what to clear from the in-app browser."
 msgstr "Vyberte, co se má z vestavěného prohlížeče vymazat."
@@ -7050,6 +7059,9 @@ msgstr "Výchozí umístění nových pracovních prostorů s worktree na tomto 
 
 msgid "Default model"
 msgstr "Výchozí model"
+
+msgid "Default new tab"
+msgstr "Výchozí nová karta"
 
 msgid "Default team for new tasks"
 msgstr "Výchozí tým pro nové úkoly"

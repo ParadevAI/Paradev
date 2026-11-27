@@ -26,6 +26,36 @@ beforeEach(() => {
 });
 
 describe("settings set/get/reset", () => {
+	test("new-tab defaults round-trip and reset to the chooser", async () => {
+		for (const kind of ["ask", "terminal", "chat", "browser"]) {
+			await invoke(setCommand, { key: "newTabDefaultKind", value: kind });
+			const result = (await invoke(getCommand, {
+				key: "newTabDefaultKind",
+			})) as {
+				data: { value: unknown; isSet: boolean };
+			};
+			expect(result.data.value).toBe(kind);
+			expect(result.data.isSet).toBe(true);
+		}
+		await invoke(resetCommand, { key: "newTabDefaultKind" });
+		const result = (await invoke(getCommand, { key: "newTabDefaultKind" })) as {
+			data: { value: unknown; isSet: boolean };
+		};
+		expect(result.data.value).toBe("ask");
+		expect(result.data.isSet).toBe(false);
+	});
+
+	test("invalid new-tab defaults leave the saved preference unchanged", async () => {
+		await invoke(setCommand, { key: "newTabDefaultKind", value: "chat" });
+		await expect(
+			invoke(setCommand, { key: "newTabDefaultKind", value: "invalid" }),
+		).rejects.toThrow();
+		const result = (await invoke(getCommand, { key: "newTabDefaultKind" })) as {
+			data: { value: unknown };
+		};
+		expect(result.data.value).toBe("chat");
+	});
+
 	test("set then get round-trips a value", async () => {
 		await invoke(setCommand, { key: "fileOpenMode", value: "new-tab" });
 		const result = (await invoke(getCommand, { key: "fileOpenMode" })) as {

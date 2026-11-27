@@ -561,6 +561,17 @@ function WorkspaceContent() {
 		},
 		[openChanges, rightStore, launcher, browserUrl, openRightSidebar],
 	);
+	const { data: newTabDefaultKind = "ask" } =
+		electronTrpc.settings.getNewTabDefaultKind.useQuery();
+	const addDefaultTab = {
+		ask: undefined,
+		terminal: addTerminalTab,
+		chat: addChatTab,
+		browser: () => {
+			if (isRightPaneAreaEnabled) openInRightPane("browser");
+			else addBrowserTab();
+		},
+	}[newTabDefaultKind];
 	useRunPendingChatHandoff({
 		workspaceId,
 		isLayoutReady,
@@ -788,6 +799,7 @@ function WorkspaceContent() {
 												/>
 											) : null
 										}
+										onAddTab={addDefaultTab}
 										renderAddTabMenu={({ runAfterClose }) => (
 											<AddTabMenu
 												onAddTerminal={addTerminalTab}
