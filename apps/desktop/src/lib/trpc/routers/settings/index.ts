@@ -1,3 +1,4 @@
+import { EventEmitter } from "node:events";
 import {
 	setupSingleAgent,
 	teardownSingleAgent,
@@ -143,6 +144,17 @@ function initializeDefaultPresets() {
 	saveTerminalPresets(mergedPresets, { terminalPresetsInitialized: true });
 
 	return mergedPresets;
+}
+
+interface TelemetryState {
+	enabled: boolean;
+	doNotTrack: boolean;
+}
+
+const telemetryEvents = new EventEmitter();
+
+function getTelemetryState(): TelemetryState {
+	return { enabled: readTelemetrySetting(), doNotTrack: isDoNotTrackSet() };
 }
 
 export const createSettingsRouter = () => {
@@ -665,15 +677,23 @@ export const createSettingsRouter = () => {
 				return { ran };
 			}),
 
-		getTelemetryState: publicProcedure.query(() => ({
-			enabled: readTelemetrySetting(),
-			doNotTrack: isDoNotTrackSet(),
-		})),
+		getTelemetryState: publicProcedure.query(getTelemetryState),
+
+		onTelemetryChange: publicProcedure.subscription(() =>
+			observable<TelemetryState>((emit) => {
+				const notify = (state: TelemetryState) => emit.next(state);
+				telemetryEvents.on("change", notify);
+				return () => {
+					telemetryEvents.off("change", notify);
+				};
+			}),
+		),
 
 		setTelemetryEnabled: publicProcedure
 			.input(z.object({ enabled: z.boolean() }))
 			.mutation(({ input }) => {
 				writeTelemetrySetting(input.enabled);
+				telemetryEvents.emit("change", getTelemetryState());
 				return { success: true };
 			}),
 	});

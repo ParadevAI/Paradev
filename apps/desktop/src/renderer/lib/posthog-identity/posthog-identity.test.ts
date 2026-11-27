@@ -2,10 +2,11 @@ import { describe, expect, test } from "bun:test";
 import type { PostHog } from "posthog-js/react";
 import { createPostHogIdentity } from "./posthog-identity";
 
-function fakePostHog({ optedOut = false } = {}) {
+function fakePostHog({ optedOut = false, optOutByDefault = false } = {}) {
 	const calls: string[] = [];
 	const state = {
 		optedOut,
+		storedConsent: null as "in" | "out" | null,
 		disableFlags: false,
 		flagProperties: { email: "someone@example.com" } as Record<string, unknown>,
 		received: [] as unknown[],
@@ -21,10 +22,12 @@ function fakePostHog({ optedOut = false } = {}) {
 		opt_in_capturing: () => {
 			calls.push("opt_in_capturing");
 			state.optedOut = false;
+			state.storedConsent = "in";
 		},
 		opt_out_capturing: () => {
 			calls.push("opt_out_capturing");
 			state.optedOut = true;
+			state.storedConsent = "out";
 		},
 		identify: record("identify"),
 		setPersonProperties: record("setPersonProperties"),
@@ -47,13 +50,20 @@ function fakePostHog({ optedOut = false } = {}) {
 		},
 		reset: () => {
 			calls.push("reset");
-			state.optedOut = false;
+			state.storedConsent = null;
+			state.optedOut = optOutByDefault;
 		},
 	};
 	return { posthog: posthog as unknown as PostHog, calls, state };
 }
 
-function setup(options: { optedOut?: boolean; flagsDisabled?: boolean } = {}) {
+function setup(
+	options: {
+		optedOut?: boolean;
+		optOutByDefault?: boolean;
+		flagsDisabled?: boolean;
+	} = {},
+) {
 	const fake = fakePostHog(options);
 	fake.state.disableFlags = options.flagsDisabled ?? false;
 	const requests: unknown[] = [];
@@ -135,5 +145,16 @@ describe("PostHog consent follows the setting", () => {
 		identity.start(false);
 		identity.reset();
 		expect(state.optedOut).toBe(true);
+	});
+
+	test("sign-out in a window launched with it off writes the opt-out back for other windows", () => {
+		const { identity, state } = setup({
+			optedOut: true,
+			optOutByDefault: true,
+			flagsDisabled: true,
+		});
+		identity.start(false);
+		identity.reset();
+		expect(state.storedConsent).toBe("out");
 	});
 });

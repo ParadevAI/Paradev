@@ -130,7 +130,8 @@ export function createPostHogIdentity({
 			flagsRequest++;
 			if (!ready()) return;
 			posthog.reset();
-			syncConsent();
+			if (enabled) posthog.opt_in_capturing({ captureEventName: false });
+			else posthog.opt_out_capturing();
 		},
 	};
 }
