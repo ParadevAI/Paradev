@@ -422,15 +422,18 @@ function WorkspaceContent() {
 	// the reveal (expand + highlight + scroll) is actually visible.
 	const handleQuickOpenSelectFile = useCallback(
 		(filePath: string, openInNewTab?: boolean) => {
+			const shouldOpenInNewTab =
+				openInNewTab ?? userPreferences.sidebarFileLinks.plain === "newTab";
 			if (!isRightPaneAreaEnabled) {
 				setRightSidebarOpen(true);
-				openFilePaneFromTreeClick(filePath, openInNewTab);
+				openFilePaneFromTreeClick(filePath, shouldOpenInNewTab);
 				return;
 			}
-			if (openInNewTab) openFilePaneFromTreeClick(filePath, true);
+			if (shouldOpenInNewTab) openFilePaneFromTreeClick(filePath, true);
 			else openPinnedFilePane(filePath);
 		},
 		[
+			userPreferences.sidebarFileLinks.plain,
 			openFilePaneFromTreeClick,
 			openPinnedFilePane,
 			setRightSidebarOpen,
