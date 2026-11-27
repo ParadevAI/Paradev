@@ -4,18 +4,22 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import {
 	CONSENT_REGION_COOKIE,
+	consentCookieValue,
 	consentRegionForCountry,
 } from "@/lib/analytics/consent-region";
 import { canonicalPathname } from "@/lib/canonical-pathname";
 
 export function proxy(request: NextRequest) {
 	const response = route(request) ?? NextResponse.next();
-	const region = consentRegionForCountry(
-		request.headers.get("x-vercel-ip-country"),
-		{ production: process.env.NODE_ENV === "production" },
+	const country = request.headers.get("x-vercel-ip-country");
+	const value = consentCookieValue(
+		consentRegionForCountry(country, {
+			production: process.env.NODE_ENV === "production",
+		}),
+		country,
 	);
-	if (request.cookies.get(CONSENT_REGION_COOKIE)?.value !== region) {
-		response.cookies.set(CONSENT_REGION_COOKIE, region, {
+	if (request.cookies.get(CONSENT_REGION_COOKIE)?.value !== value) {
+		response.cookies.set(CONSENT_REGION_COOKIE, value, {
 			path: "/",
 			sameSite: "lax",
 			secure: process.env.NODE_ENV === "production",

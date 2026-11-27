@@ -2,7 +2,7 @@ import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 import type { PostHog } from "posthog-js";
 
 import { env } from "@/env";
-import { onConsentChange } from "@/lib/analytics/consent";
+import { onConsentChange, readConsentCountry } from "@/lib/analytics/consent";
 import { setPosthogInstance } from "@/lib/analytics/lazy";
 import {
 	createPosthogStarter,
@@ -74,6 +74,8 @@ function startCookielessPosthog(posthog: PostHog) {
 	});
 	posthog.clear_opt_in_out_capturing();
 	registerPageProperties(posthog);
+	const country = readConsentCountry();
+	if (country) posthog.register({ $geoip_country_code: country });
 }
 
 function registerPageProperties(posthog: PostHog) {

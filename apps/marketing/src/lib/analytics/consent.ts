@@ -1,5 +1,9 @@
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
-import { CONSENT_REGION_COOKIE, type ConsentRegion } from "./consent-region";
+import {
+	CONSENT_REGION_COOKIE,
+	type ConsentRegion,
+	parseConsentCookie,
+} from "./consent-region";
 
 export type ConsentChoice = "accepted" | "declined";
 
@@ -37,15 +41,21 @@ export function mayTrack(
 	return region === "opt-in" ? choice === "accepted" : choice !== "declined";
 }
 
-/** A missing region cookie counts as opt-in. */
-export function readConsentRegion(): ConsentRegion {
+function readConsentCookie() {
 	const cookie = window.document?.cookie ?? "";
 	const match = cookie
 		.split("; ")
 		.find((entry) => entry.startsWith(`${CONSENT_REGION_COOKIE}=`));
-	return match?.slice(CONSENT_REGION_COOKIE.length + 1) === "opt-out"
-		? "opt-out"
-		: "opt-in";
+	return parseConsentCookie(match?.slice(CONSENT_REGION_COOKIE.length + 1));
+}
+
+/** A missing region cookie counts as opt-in. */
+export function readConsentRegion(): ConsentRegion {
+	return readConsentCookie().region;
+}
+
+export function readConsentCountry(): string | null {
+	return readConsentCookie().country;
 }
 
 export function readConsentChoice(): ConsentChoice | null {

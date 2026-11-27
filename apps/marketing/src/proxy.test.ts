@@ -63,7 +63,7 @@ describe("proxy", () => {
 		});
 	});
 
-	test("records the consent region from the visitor's country", () => {
+	test("records the consent region and country from the visitor's country", () => {
 		const region = (country: string | null, cookie?: string) => {
 			const headers = new Headers();
 			if (country) headers.set("x-vercel-ip-country", country);
@@ -72,11 +72,13 @@ describe("proxy", () => {
 				new NextRequest(`${ORIGIN}/pricing`, { headers }),
 			).cookies.get("paradev-consent-region")?.value;
 		};
-		expect(region("DE")).toBe("opt-in");
-		expect(region("gb")).toBe("opt-in");
-		expect(region("CH")).toBe("opt-out");
-		expect(region("US")).toBe("opt-out");
-		expect(region("US", "opt-in")).toBe("opt-out");
-		expect(region("US", "opt-out")).toBeUndefined();
+		expect(region("DE")).toBe("opt-in.DE");
+		expect(region("gb")).toBe("opt-in.GB");
+		expect(region("CH")).toBe("opt-out.CH");
+		expect(region("US")).toBe("opt-out.US");
+		expect(region("US", "opt-in.US")).toBe("opt-out.US");
+		expect(region("US", "opt-out")).toBe("opt-out.US");
+		expect(region("US", "opt-out.US")).toBeUndefined();
+		expect(region("1A")).toBe("opt-out");
 	});
 });
