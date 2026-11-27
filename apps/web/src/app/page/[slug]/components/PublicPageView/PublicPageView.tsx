@@ -97,7 +97,7 @@ export function PublicPageView({
 				</div>
 			</div>
 
-			<main className="relative min-h-0 flex-1">
+			<main className="ph-no-capture relative min-h-0 flex-1">
 				{offered ? (
 					<PageUpdateBanner version={offered.version} onView={viewOffered} />
 				) : null}

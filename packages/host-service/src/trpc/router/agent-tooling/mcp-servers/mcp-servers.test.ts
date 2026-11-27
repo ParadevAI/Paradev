@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+	mkdirSync,
+	mkdtempSync,
+	realpathSync,
+	rmSync,
+	symlinkSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { McpServerEntry } from "@superset/shared/mcp-servers";
@@ -30,12 +37,13 @@ function byName(servers: McpServerEntry[], name: string, agent?: string) {
 }
 
 beforeEach(() => {
-	home = mkdtempSync(join(tmpdir(), "mcp-servers-"));
+	home = realpathSync(mkdtempSync(join(tmpdir(), "mcp-servers-")));
 	worktree = join(home, "repo");
 	mkdirSync(join(worktree, ".git"), { recursive: true });
 	paths = {
 		homeDir: home,
 		claudeStatePath: join(home, ".claude.json"),
+		claudeSettingsPath: join(home, ".claude", "settings.json"),
 		codexConfigPath: join(home, ".codex", "config.toml"),
 	};
 	clearMcpServerCache();
@@ -81,6 +89,124 @@ describe("discoverMcpServers", () => {
 			configPath: join(worktree, ".mcp.json"),
 			state: "available",
 		});
+	});
+
+	it.each([
+		[
+			"a linked worktree",
+			(repo: string) => join(repo, ".git", "worktrees", "x"),
+		],
+		["a worktree with a relative gitdir", () => "../../repo/.git/worktrees/x"],
+	])("reads Claude local scope from the main checkout of %s", async (_, gitDir) => {
+		const linked = join(home, "worktrees", "feature");
+		write(join(linked, ".git"), `gitdir: ${gitDir(worktree)}\n`);
+		write(paths.claudeStatePath, {
+			projects: {
+				[worktree]: { mcpServers: { added: { command: "node" } } },
+				[linked]: { mcpServers: { ignored: { command: "node" } } },
+			},
+		});
+
+		const servers = await discoverMcpServers({
+			worktreePath: linked,
+			agent: "claude",
+			paths,
+		});
+
+		expect(byName(servers, "added")[0]).toMatchObject({ scope: "local" });
+		expect(byName(servers, "ignored")).toEqual([]);
+	});
+
+	it("reads Claude local scope from the bare repository of a worktree", async () => {
+		const bare = join(home, "repo.git");
+		const linked = join(home, "feature");
+		write(join(linked, ".git"), `gitdir: ${join(bare, "worktrees", "x")}\n`);
+		write(paths.claudeStatePath, {
+			projects: { [bare]: { mcpServers: { added: { command: "node" } } } },
+		});
+
+		const servers = await discoverMcpServers({
+			worktreePath: linked,
+			agent: "claude",
+			paths,
+		});
+
+		expect(byName(servers, "added")[0]).toMatchObject({ scope: "local" });
+	});
+
+	it("resolves a symlinked workspace path before the Claude lookup", async () => {
+		const link = join(home, "link");
+		symlinkSync(worktree, link);
+		write(paths.claudeStatePath, {
+			projects: { [worktree]: { mcpServers: { added: { command: "node" } } } },
+		});
+
+		const servers = await discoverMcpServers({
+			worktreePath: link,
+			agent: "claude",
+			paths,
+		});
+
+		expect(byName(servers, "added")[0]).toMatchObject({ scope: "local" });
+	});
+
+	it("reads .mcp.json from directories above the repository", async () => {
+		write(join(home, ".mcp.json"), {
+			mcpServers: { above: { command: "npx" } },
+		});
+
+		const servers = await discoverMcpServers({
+			worktreePath: worktree,
+			agent: "claude",
+			paths,
+		});
+
+		expect(byName(servers, "above")[0]).toMatchObject({
+			scope: "project",
+			state: "available",
+		});
+	});
+
+	it.each([
+		["user settings", () => paths.claudeSettingsPath],
+		["project settings", () => join(worktree, ".claude", "settings.json")],
+		["local settings", () => join(worktree, ".claude", "settings.local.json")],
+	])("marks a .mcp.json server rejected in %s as disabled", async (_, file) => {
+		write(join(worktree, ".mcp.json"), {
+			mcpServers: { shared: { command: "npx" } },
+		});
+		write(file(), { disabledMcpjsonServers: ["shared"] });
+
+		const servers = await discoverMcpServers({
+			worktreePath: worktree,
+			agent: "claude",
+			paths,
+		});
+
+		expect(byName(servers, "shared")[0]).toMatchObject({ state: "disabled" });
+	});
+
+	it("lists a name once, from the scope Claude loads: local, then project, then user", async () => {
+		write(paths.claudeStatePath, {
+			mcpServers: { both: { command: "user" }, all: { command: "user" } },
+			projects: { [worktree]: { mcpServers: { all: { command: "local" } } } },
+		});
+		write(join(worktree, ".mcp.json"), {
+			mcpServers: { both: { command: "npx" }, all: { command: "npx" } },
+		});
+
+		const servers = await discoverMcpServers({
+			worktreePath: worktree,
+			agent: "claude",
+			paths,
+		});
+
+		expect(byName(servers, "all").map((server) => server.scope)).toEqual([
+			"local",
+		]);
+		expect(byName(servers, "both").map((server) => server.scope)).toEqual([
+			"project",
+		]);
 	});
 
 	it("reads Codex tables, ignores their sub-tables, and marks them for the other agent", async () => {

@@ -1,3 +1,9 @@
+import {
+	maskRecordingEvents,
+	POSTHOG_PRIVACY_CONFIG,
+	scrubExceptionPaths,
+	stripLinkTargets,
+} from "@superset/shared/posthog-privacy";
 import posthogFull from "posthog-js/dist/module.full.no-external";
 import type { PostHog } from "posthog-js/react";
 import { env } from "../env.renderer";
@@ -22,12 +28,18 @@ export function initPostHog() {
 		person_profiles: "always",
 		persistence: "localStorage",
 		debug: false,
+		...POSTHOG_PRIVACY_CONFIG,
 		opt_out_capturing_by_default: !telemetryEnabled,
 		disable_session_recording: !telemetryEnabled,
 		disable_surveys: !telemetryEnabled,
 		capture_dead_clicks: telemetryEnabled,
 		capture_performance: telemetryEnabled,
-		before_send: (event) => (isTelemetryEnabled() ? event : null),
+		before_send: [
+			(event) => (isTelemetryEnabled() ? event : null),
+			maskRecordingEvents,
+			stripLinkTargets,
+			scrubExceptionPaths,
+		],
 		...(telemetryEnabled ? {} : { advanced_disable_flags: true }),
 	});
 

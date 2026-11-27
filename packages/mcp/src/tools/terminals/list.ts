@@ -19,7 +19,12 @@ interface TerminalSummary {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "terminals_list",
-		annotations: { readOnlyHint: true },
+		title: "List terminals",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"List the live terminal sessions in a workspace (ids, titles, attach state). Use to discover a terminalId to terminals_send/terminals_read/terminals_close against when you didn't keep the one agents_create returned. Omit hostId for a cloud workspace; for a host workspace, use hosts_list / workspaces_list to find the hostId.",
 		inputSchema: {

@@ -106,7 +106,7 @@ export function PageCommentsFrame({
 	);
 
 	return (
-		<div className="relative h-full">
+		<div className="ph-no-capture relative h-full">
 			{offered && !previewing ? (
 				<PageUpdateBanner version={offered.version} onView={viewOffered} />
 			) : null}

@@ -22,47 +22,81 @@ export async function executeBulkWorkspaceDeleteTargets<
 	Failure,
 >({
 	targets,
+	oneAtATime,
 	shouldForce,
 	shouldRetryWithForce,
 	destroy,
 	onSettled,
 }: {
 	targets: readonly Workspace[];
+	/** Targets that must not wait in a request together, e.g. behind a
+	 * relay whose request deadline is shorter than the host's queue. */
+	oneAtATime?: (workspace: Workspace) => boolean;
 	shouldForce: (workspace: Workspace) => boolean;
 	/** Retry a failed unforced destroy once with force. Used for conflicts on
 	 * workspaces whose preview never completed — "Delete without checking" is
 	 * the user's consent. Checked-clean races stay failures (no silent force). */
 	shouldRetryWithForce?: (workspace: Workspace, error: Failure) => boolean;
 	destroy: (workspace: Workspace, force: boolean) => Promise<Result>;
-	onSettled?: () => void;
+	onSettled?: (deleted: boolean) => void;
 }): Promise<{
 	successes: Array<{ workspace: Workspace; result: Result }>;
 	failures: Array<{ workspace: Workspace; error: Failure }>;
 }> {
-	const successes: Array<{ workspace: Workspace; result: Result }> = [];
-	const failures: Array<{ workspace: Workspace; error: Failure }> = [];
+	type Outcome =
+		| { ok: true; workspace: Workspace; result: Result }
+		| { ok: false; workspace: Workspace; error: Failure };
 
-	for (const workspace of targets) {
+	const destroyOne = async (workspace: Workspace): Promise<Outcome> => {
+		let outcome: Outcome;
 		try {
 			const force = shouldForce(workspace);
-			let result: Result;
 			try {
-				result = await destroy(workspace, force);
+				outcome = {
+					ok: true,
+					workspace,
+					result: await destroy(workspace, force),
+				};
 			} catch (error) {
 				if (!force && shouldRetryWithForce?.(workspace, error as Failure)) {
-					result = await destroy(workspace, true);
+					outcome = {
+						ok: true,
+						workspace,
+						result: await destroy(workspace, true),
+					};
 				} else {
 					throw error;
 				}
 			}
-			successes.push({ workspace, result });
 		} catch (error) {
-			failures.push({ workspace, error: error as Failure });
-		} finally {
-			onSettled?.();
+			outcome = { ok: false, workspace, error: error as Failure };
+		}
+		onSettled?.(outcome.ok);
+		return outcome;
+	};
+
+	const outcomes: Outcome[] = new Array(targets.length);
+	let previousInLine: Promise<void> = Promise.resolve();
+	await Promise.all(
+		targets.map((workspace, index) => {
+			const settle = async () => {
+				outcomes[index] = await destroyOne(workspace);
+			};
+			if (!oneAtATime?.(workspace)) return settle();
+			previousInLine = previousInLine.then(settle);
+			return previousInLine;
+		}),
+	);
+
+	const successes: Array<{ workspace: Workspace; result: Result }> = [];
+	const failures: Array<{ workspace: Workspace; error: Failure }> = [];
+	for (const outcome of outcomes) {
+		if (outcome.ok) {
+			successes.push({ workspace: outcome.workspace, result: outcome.result });
+		} else {
+			failures.push({ workspace: outcome.workspace, error: outcome.error });
 		}
 	}
-
 	return { successes, failures };
 }
 

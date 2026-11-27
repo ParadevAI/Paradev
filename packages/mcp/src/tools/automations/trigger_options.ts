@@ -16,7 +16,12 @@ const OPTION_GROUPS = [
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_trigger_options",
-		annotations: { readOnlyHint: true },
+		title: "List trigger options",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: true,
+		},
 		description:
 			"List the values an event trigger can filter on for one connected provider — Slack channels, GitHub repositories, Linear teams and projects, Sentry projects, Notion data sources, Gmail labels and people. Call this before writing a {mode:'list', ids:[...]} scope in automations_create or automations_update: those ids are provider ids, and a name will not match. Each list comes back keyed by name, and a list is empty both when the organization has not connected that provider and when the lookup failed (a revoked token, or the provider being down) — so treat empty as unknown and ask the user to check the connection rather than reporting it as not connected.",
 		inputSchema: {

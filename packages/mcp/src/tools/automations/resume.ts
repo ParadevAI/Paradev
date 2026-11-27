@@ -6,7 +6,13 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_resume",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Resume automation",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Resume a paused automation. Event triggers fire again, and the next scheduled fire is recomputed from the RRULE. Caller must be the owner.",
 		inputSchema: {

@@ -13,8 +13,13 @@ let definition: {
 	inputSchema: z.ZodObject;
 	handler: (input: Input, ctx: object) => Promise<unknown>;
 };
+const realDefineTool = await import("../../define-tool");
+const { defineTool } = realDefineTool;
+const testServer = {} as McpServer;
 mock.module("../../define-tool", () => ({
-	defineTool: (_server: unknown, value: typeof definition) => {
+	...realDefineTool,
+	defineTool: (server: McpServer, value: typeof definition) => {
+		if (server !== testServer) return defineTool(server, value as never);
 		definition = value;
 	},
 }));
@@ -22,7 +27,9 @@ mock.module("../../define-tool", () => ({
 const PAGE_ID = "3f7a1c22-9c2e-4e3a-9a8b-1f0b6c2d4e55";
 let linked = false;
 let published: Record<string, unknown> | undefined;
+const realCaller = await import("../../caller");
 mock.module("../../caller", () => ({
+	...realCaller,
 	createMcpCaller: () => ({
 		page: {
 			assets: {
@@ -37,7 +44,7 @@ mock.module("../../caller", () => ({
 }));
 
 const { register } = await import("./publish");
-register({} as McpServer);
+register(testServer);
 
 const call = async (input: Omit<Input, "html">) => {
 	linked = Boolean(input.workspaceId);

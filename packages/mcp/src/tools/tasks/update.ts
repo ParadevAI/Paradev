@@ -17,7 +17,13 @@ import {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "tasks_update",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Update task",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: true,
+			idempotentHint: true,
+		},
 		description:
 			"Update fields on an existing task, or a Linear issue when the organization tracks tasks in Linear. Only the fields you pass are changed. Omitting a field preserves its current value (set null explicitly to clear nullable fields).",
 		inputSchema: {

@@ -853,6 +853,12 @@ msgstr "{commitCount, plural, one {# commit} other {# commit}}"
 msgid "{companyName} finds your Conductor worktrees and imports them in place, with uncommitted changes."
 msgstr "{companyName}, Conductor worktree'lerinizi bulur ve commit'lenmemiş değişikliklerle birlikte oldukları yerde içe aktarır."
 
+msgid "{companyName} finds your Orca worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName}, Orca worktree'lerinizi bulur ve commit'lenmemiş değişikliklerle birlikte oldukları yerde içe aktarır."
+
+msgid "{companyName} finds your T3 Code worktrees and imports them in place, with uncommitted changes."
+msgstr "{companyName}, T3 Code worktree'lerinizi bulur ve commit'lenmemiş değişikliklerle birlikte oldukları yerde içe aktarır."
+
 msgid "{companyName} makes {productName}."
 msgstr "{productName}, {companyName} tarafından geliştirilir."
 
@@ -2514,6 +2520,12 @@ msgstr "Zamanlamayla veya tetikleyiciyle çalışan ajanlar"
 msgid "Agents on your phone"
 msgstr "Telefonunuzda ajanlar"
 
+msgid "Agents open as a chat or as their CLI in a terminal. Switch the same session between the two at any time."
+msgstr "Ajanlar sohbet olarak veya terminalde kendi CLI'ları olarak açılır. Aynı oturumu istediğiniz zaman ikisi arasında değiştirin."
+
+msgid "Agents open as a chat, like a T3 Code thread. Switch the same session to its CLI in a terminal at any time."
+msgstr "Ajanlar, T3 Code'daki bir konu gibi sohbet olarak açılır. Aynı oturumu istediğiniz zaman terminaldeki CLI'ına geçirebilirsiniz."
+
 msgid "Agents remember what they learn about your codebase, so every new session starts warm."
 msgstr "Ajanlar kod tabanınız hakkında öğrendiklerini hatırlar, böylece her yeni oturum bağlamla başlar."
 
@@ -2948,6 +2960,9 @@ msgstr "Paradev'de kurduğunuz herhangi bir ajan, örneğin Claude Code veya Cod
 
 msgid "Any channel"
 msgstr "Tüm kanallar"
+
+msgid "Any CLI agent"
+msgstr "Herhangi bir CLI ajanı"
 
 msgid "Any conclusion"
 msgstr "Tüm sonuçlar"
@@ -3518,6 +3533,9 @@ msgstr "Otomasyonlar Pro planı gerektirir."
 msgid "Automations, {myFailedCount} failing"
 msgstr "Otomasyonlar, {myFailedCount} başarısız"
 
+msgid "Automations. Create them again in {companyName}"
+msgstr "Otomasyonlar. Bunları {companyName} içinde yeniden oluşturun"
+
 msgid "Autonomous"
 msgstr "Otonom"
 
@@ -4080,6 +4098,12 @@ msgstr "Daha fazla bulut GB-saati satın alabilir miyim?"
 msgid "Can I create automations from a script?"
 msgstr "Otomasyonları bir betikten oluşturabilir miyim?"
 
+msgid "Can I keep using Orca?"
+msgstr "Orca'yı kullanmaya devam edebilir miyim?"
+
+msgid "Can I keep using T3 Code?"
+msgstr "T3 Code'u kullanmaya devam edebilir miyim?"
+
 msgid "Can I switch plans or cancel anytime?"
 msgstr "İstediğim zaman plan değiştirebilir veya iptal edebilir miyim?"
 
@@ -4382,11 +4406,27 @@ msgstr "Sohbet arayüzü"
 msgid "Chat name"
 msgstr "Sohbet adı"
 
+msgid "Chat or terminal"
+msgstr "Sohbet veya terminal"
+
 msgid "Chat session not found"
 msgstr "Sohbet oturumu bulunamadı"
 
 msgid "Chat surfaces: messages, reasoning, suggestions"
 msgstr "Sohbet yüzeyleri: mesajlar, akıl yürütme, öneriler"
+
+msgid "Chat threads, with a built-in terminal"
+msgstr "Sohbet konuları, yerleşik terminalle"
+
+msgid "Chat UI or terminal for each agent"
+msgstr "Her ajan için sohbet arayüzü veya terminal"
+
+#. placeholder {0}: BRAND.NAME
+msgid "Chat with your agents in {0} the way you're used to, in the worktrees you already have. Review, cloud and mobile are built in."
+msgstr "Ajanlarınızla {0} içinde alıştığınız şekilde, zaten sahip olduğunuz worktree'lerde sohbet edin. İnceleme, bulut ve mobil yerleşik gelir."
+
+msgid "Chat, or the agent's own CLI in a terminal"
+msgstr "Sohbet veya terminalde ajanın kendi CLI'ı"
 
 msgid "Chats"
 msgstr "Sohbetler"
@@ -4605,6 +4645,9 @@ msgstr "Claude Code, Codex, Cursor, OpenCode ve daha fazlası. Ajan başına kur
 msgid "Claude Code, Codex, Cursor, OpenCode, and more."
 msgstr "Claude Code, Codex, Cursor, OpenCode ve daha fazlası."
 
+msgid "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and ACP agents"
+msgstr "Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx ve ACP ajanları"
+
 msgid "Claude is now running in workspace component-showcase."
 msgstr "Claude artık component-showcase çalışma alanında çalışıyor."
 
@@ -4695,6 +4738,12 @@ msgstr "CLI belgeleri"
 
 msgid "CLI reference"
 msgstr "CLI referansı"
+
+msgid "CLI, SDK and MCP"
+msgstr "CLI, SDK ve MCP"
+
+msgid "CLI, TypeScript SDK, and MCP server"
+msgstr "CLI, TypeScript SDK ve MCP sunucusu"
 
 msgid "click"
 msgstr "tık"
@@ -5633,6 +5682,9 @@ msgstr "Katkılar"
 msgid "Control how your local machine is reachable from elsewhere"
 msgstr "Yerel makinenize dışarıdan nasıl erişileceğini kontrol edin"
 
+msgid "Control workspaces and agents from scripts with the CLI, the TypeScript SDK, or the MCP server."
+msgstr "Çalışma alanlarını ve ajanları CLI, TypeScript SDK veya MCP sunucusuyla betiklerden yönetin."
+
 msgid "Controls when manually edited files are saved"
 msgstr "Elle düzenlenen dosyaların ne zaman kaydedileceğini belirler"
 
@@ -5647,6 +5699,12 @@ msgstr "config.toml'a dönüştür"
 
 msgid "Convert to draft"
 msgstr "Taslağa dönüştür"
+
+msgid "Convert your actions"
+msgstr "Eylemlerinizi dönüştürün"
+
+msgid "Convert your scripts"
+msgstr "Betiklerinizi dönüştürün"
 
 msgid "Converting to draft…"
 msgstr "Taslağa dönüştürülüyor…"
@@ -7262,6 +7320,9 @@ msgstr "\"{projectName}\", {1} cihazın {0} tanesinden silindi. Diğerleri kopya
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" silindi. 30 gün boyunca Ayarlar → Projeler bölümünden geri yükleyebilirsin."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{total} öğeden {completed} tanesi silindi…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen} silindi · {deviceNames}"
 
@@ -7303,11 +7364,6 @@ msgstr "Bu host'u, erişimini ve çalışma alanlarını siler. Makinedeki dosya
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Siliniyor"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{1} öğeden {0} tanesi siliniyor…"
 
 msgid "Deleting {name}..."
 msgstr "{name} siliniyor..."
@@ -8430,6 +8486,9 @@ msgstr "Çalışma alanını genişlet"
 msgid "Experimental"
 msgstr "Deneysel"
 
+msgid "Experimental cloud VMs on your own provider"
+msgstr "Kendi sağlayıcınızda deneysel bulut sanal makineleri"
+
 msgid "Expired"
 msgstr "Süresi doldu"
 
@@ -9353,8 +9412,11 @@ msgstr "Hata bildirimleri ve özellik istekleri için en hızlı yol <0>{githubH
 msgid "For individuals getting started"
 msgstr "Yeni başlayan bireyler için"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Apple Silicon ve Intel üzerinde macOS için. Linux AppImage deneyseldir."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Apple Silicon ve Intel üzerinde macOS ile Linux (AppImage) için."
+
+msgid "For Orca users"
+msgstr "Orca kullanıcıları için"
 
 msgid "For organizations with advanced needs"
 msgstr "Gelişmiş ihtiyaçları olan kuruluşlar için"
@@ -9367,6 +9429,9 @@ msgstr "Basın talepleri ve röportaj istekleri için bize e-posta gönderin."
 
 msgid "For questions about billing, <0>contact us</0>."
 msgstr "Faturalandırmayla ilgili sorularınız için <0>bize ulaşın</0>."
+
+msgid "For T3 Code users"
+msgstr "T3 Code kullanıcıları için"
 
 msgid "For teams that need more power"
 msgstr "Daha fazla güce ihtiyaç duyan takımlar için"
@@ -9471,8 +9536,8 @@ msgstr "Ücretsiz krediler"
 msgid "Free for everyone"
 msgstr "Herkes için ücretsiz"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Tek kullanıcı için ücretsiz. macOS ve deneysel bir Linux sürümü."
+msgid "Free for one user. macOS and Linux."
+msgstr "Tek kullanıcı için ücretsiz. macOS ve Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Tek kullanıcı için ücretsiz. MIT lisansıyla açık kaynak."
@@ -10219,6 +10284,9 @@ msgstr "Nasıl çalışıyoruz"
 msgid "How you run agents"
 msgstr "Ajanları nasıl çalıştırdığınız"
 
+msgid "How you work"
+msgstr "Nasıl çalışırsınız"
+
 msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
 msgstr "Ajanlarınızın bulut çalışma alanlarında nasıl oturum açtığı. Başkaları kendi aboneliklerini veya API anahtarlarını bağlar; bu makinede her ajan üzerinde zaten bulunan oturumu kullanmayı sürdürür."
 
@@ -10794,8 +10862,14 @@ msgstr "Davet eden"
 msgid "Invoices and payment method"
 msgstr "Faturalar ve ödeme yöntemi"
 
+msgid "iOS and Android"
+msgstr "iOS ve Android"
+
 msgid "iOS app"
 msgstr "iOS uygulaması"
+
+msgid "iOS app and an Android APK, both in beta"
+msgstr "iOS uygulaması ve bir Android APK'sı, ikisi de beta"
 
 msgid "iOS app; cloud and experimental local Mac remote control"
 msgstr "iOS uygulaması; bulut ve deneysel yerel Mac uzaktan kontrolü"
@@ -10901,6 +10975,12 @@ msgstr "Silinmiş olabilir veya başka bir kuruluşa ait olabilir."
 
 msgid "It must join again and pass its checks to merge."
 msgstr "Birleştirilmesi için yeniden katılması ve kontrollerini geçmesi gerekir."
+
+msgid "It takes a few minutes, and you can keep Orca installed while you try it."
+msgstr "Birkaç dakika sürer ve denerken Orca'yı kurulu bırakabilirsiniz."
+
+msgid "It takes a few minutes, and you can keep T3 Code installed while you try it."
+msgstr "Birkaç dakika sürer ve denerken T3 Code'u kurulu bırakabilirsiniz."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Birkaç dakika sürer. Conductor Cloud mu kullanıyorsunuz? <0>Bulut rehberiyle</0> başlayın."
@@ -11079,6 +11159,9 @@ msgstr "Düzenlemeye devam et"
 
 msgid "Keep paused"
 msgstr "Duraklatılmış kalsın"
+
+msgid "Keep the worktrees you already have, and run your agents as a chat or in a terminal. Review, cloud and mobile are built in."
+msgstr "Zaten sahip olduğunuz worktree'leri koruyun ve ajanlarınızı sohbet olarak veya terminalde çalıştırın. İnceleme, bulut ve mobil yerleşik gelir."
 
 msgid "Keep typing an email to invite"
 msgstr "Davet etmek için e-postayı yazmaya devam edin"
@@ -11809,8 +11892,11 @@ msgstr "Saniyeler içinde açılan ve takım arkadaşlarınızla paylaşılabile
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (deneysel)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
+
+msgid "macOS, Windows, Linux"
+msgstr "macOS, Windows, Linux"
 
 msgid "Magenta"
 msgstr "Macenta"
@@ -11910,6 +11996,9 @@ msgstr "Kuruluşunuzun marka görünümünü ve üyelerini yönetin."
 
 msgid "Managed"
 msgstr "Yönetilen"
+
+msgid "Managed agent accounts in Orca. Sign in to each agent again"
+msgstr "Orca'daki yönetilen ajan hesapları. Her ajanda yeniden oturum açın"
 
 msgid "Managed by"
 msgstr "Yöneten"
@@ -12385,6 +12474,9 @@ msgstr "{name} için diğer seçenekler"
 msgid "More pages"
 msgstr "Daha fazla sayfa"
 
+msgid "More than 25 named agents"
+msgstr "Adı belirtilen 25'ten fazla ajan"
+
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "Birleştirilen değişikliklerin yarısından fazlası, hiç insan düzenlemesi olmadan ajanlar tarafından yazılır."
 
@@ -12415,6 +12507,12 @@ msgstr "Odağı ana sekmeler ile sağ kenar çubuğu arasında taşı ve kapalı
 
 msgid "Move Settings into a modal so people don't leave their workspace. Keep the search filtering, and make ⌘, open it from anywhere."
 msgstr "İnsanlar çalışma alanlarından ayrılmasın diye Ayarlar'ı bir modala taşı. Arama filtrelemesini koru ve ⌘, her yerden açsın."
+
+msgid "Move the actions in t3.json to .paradev/config.json, or ask an agent to do it for you."
+msgstr "t3.json'daki eylemleri .paradev/config.json'a taşıyın veya bir ajandan bunu sizin için yapmasını isteyin."
+
+msgid "Move the scripts in orca.yaml to .paradev/config.json, or ask an agent to do it for you."
+msgstr "orca.yaml'daki betikleri .paradev/config.json'a taşıyın veya bir ajandan bunu sizin için yapmasını isteyin."
 
 msgid "Move this workspace to {computerName}?"
 msgstr "Bu çalışma alanı {computerName} bilgisayarına taşınsın mı?"
@@ -12448,6 +12546,12 @@ msgstr "Sekmeye taşı"
 
 msgid "Move your agents."
 msgstr "Ajanlarınızı taşıyın."
+
+msgid "Move your Orca worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Orca worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
+
+msgid "Move your T3 Code worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "T3 Code worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
 
 msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
 msgstr "Worktree'lerinizi ve ajanlarınızı birkaç dakikada {companyName}'e taşıyın. Ücretsiz ve açık kaynak."
@@ -13531,6 +13635,9 @@ msgstr "Çalışma alanı yok."
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Hayır. {companyName}, model çağrıları için asla proxy görevi görmez. Ajanlar kendi aboneliklerinizi ve anahtarlarınızı kullanır."
 
+msgid "No. Runs on machines you own"
+msgstr "Hayır. Kendi makinelerinizde çalışır"
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Hayır. Ajanlarınız bağımsız kalır; Paradev onların etrafındaki orkestrasyon katmanıdır. Her görev kendi Git worktree'sini ve dalını, kalıcı oturumları, diff incelemesini ve olaylarla ya da bir zamanlamayla çalışan otomasyonları alır; iş akışı tek bir sağlayıcıya bağlanmaz."
 
@@ -13665,8 +13772,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Güncellenmiyor"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Henüz değil. macOS'ta çalışır, deneysel bir Linux sürümü de vardır. Windows kullanıcıları indirme düğmesinden bekleme listesine katılabilir."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Henüz değil. macOS ve Linux'ta çalışır. Windows kullanıcıları indirme düğmesinden bekleme listesine katılabilir."
 
 msgid "Note"
 msgstr "Not"
@@ -14447,6 +14554,9 @@ msgstr "Gönderim seçeneklerini aç"
 msgid "Open Source"
 msgstr "Açık Kaynak"
 
+msgid "Open source (MIT)"
+msgstr "Açık kaynak (MIT)"
+
 msgid "Open source under MIT. Use any agent on your own subscriptions and keys."
 msgstr "MIT lisansıyla açık kaynak. Herhangi bir ajanı kendi abonelikleriniz ve anahtarlarınızla kullanın."
 
@@ -14587,6 +14697,17 @@ msgstr "veya .env içeriğini Anahtar alanına yapıştırın"
 
 msgid "Orange"
 msgstr "Turuncu"
+
+msgid "Orca details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "Orca bilgileri herkese açık belgelerinden ve deposundan alınmıştır. <0>Tam karşılaştırmaya</0> bakın."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca is a trademark of its owner. {0} is not affiliated with or endorsed by it."
+msgstr "Orca, sahibinin ticari markasıdır. {0}, onunla bağlantılı değildir ve onun tarafından onaylanmamıştır."
+
+#. placeholder {0}: BRAND.NAME
+msgid "Orca worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "Orca worktree'leri sıradan Git worktree'leridir. {0} bunları oldukları yerde kullanır."
 
 msgid "Orchestrate Parallel Agents"
 msgstr "Paralel ajanları orkestre edin"
@@ -15725,6 +15846,9 @@ msgstr "Ürünler"
 msgid "Profile name"
 msgstr "Profil adı"
 
+msgid "Programmatic control"
+msgstr "Programatik kontrol"
+
 msgid "Progress"
 msgstr "İlerleme"
 
@@ -15794,6 +15918,9 @@ msgstr "Proje {0} konumunda kuruldu"
 
 msgid "Project Settings"
 msgstr "Proje ayarları"
+
+msgid "Project settings in T3 Code, like worktree cleanup rules"
+msgstr "T3 Code'daki proje ayarları, örneğin worktree temizleme kuralları"
 
 msgid "Project worktree location reset"
 msgstr "Proje worktree konumu sıfırlandı"
@@ -17421,6 +17548,9 @@ msgstr "Bir kodlama ajanı ordusu yönetin"
 msgid "Run an iOS simulator in a workspace pane so you and your agents can test mobile apps."
 msgstr "Siz ve ajanlarınız mobil uygulamaları test edebilsin diye bir çalışma alanı bölmesinde iOS simülatörü çalıştırın."
 
+msgid "Run any agent that has a CLI, on your own subscriptions and keys."
+msgstr "CLI'ı olan herhangi bir ajanı kendi abonelikleriniz ve anahtarlarınızla çalıştırın."
+
 msgid "Run automations on data source and comment activity."
 msgstr "Veri kaynağı ve yorum etkinliğinde otomasyon çalıştırın."
 
@@ -17707,6 +17837,15 @@ msgstr "Toplantı planlayın"
 
 msgid "Scheduled and event-triggered agents (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhooks) with ready-made templates."
 msgstr "Hazır şablonlarla zamanlanmış ve olay tetiklemeli ajanlar (cron, GitHub, Slack, Linear, Sentry, Notion, Microsoft Teams, webhook'lar)."
+
+msgid "Scheduled automations"
+msgstr "Zamanlanmış otomasyonlar"
+
+msgid "Scheduled tasks and workflows. Create them again as automations"
+msgstr "Zamanlanmış görevler ve iş akışları. Bunları otomasyon olarak yeniden oluşturun"
+
+msgid "Scheduled tasks, webhook tasks, and workflows"
+msgstr "Zamanlanmış görevler, webhook görevleri ve iş akışları"
 
 msgid "Schedules repeat — remove COUNT or UNTIL."
 msgstr "Zamanlamalar yinelenir — COUNT veya UNTIL değerini kaldırın."
@@ -18001,6 +18140,9 @@ msgstr "Tüm istatistikleri gör →"
 
 msgid "See Changes"
 msgstr "Değişiklikleri görün"
+
+msgid "See CI checks and review threads next to the diff, and send comments back to the agent."
+msgstr "CI kontrollerini ve inceleme konularını diff'in yanında görün, yorumları ajana geri gönderin."
 
 msgid "See Conductor for current plans and account access"
 msgstr "Güncel planlar ve hesap erişimi için Conductor'a bakın"
@@ -18468,6 +18610,12 @@ msgstr "Kurulum"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Kurulum betikleri, conductor.json'u dönüştürdükten sonra"
+
+msgid "Setup scripts, once you convert orca.yaml"
+msgstr "Kurulum betikleri, orca.yaml'ı dönüştürdükten sonra"
+
+msgid "Setup scripts, once you convert t3.json"
+msgstr "Kurulum betikleri, t3.json'u dönüştürdükten sonra"
 
 msgid "Setup stopped. The reason is in the output below."
 msgstr "Kurulum durdu. Nedeni aşağıdaki çıktıda."
@@ -19783,6 +19931,12 @@ msgstr "Süreklilik · 30 günde etkin gün"
 msgid "Switch account"
 msgstr "Hesap değiştir"
 
+msgid "Switch from Orca to {companyName}"
+msgstr "Orca'dan {companyName}'e geçin"
+
+msgid "Switch from T3 Code to {companyName}"
+msgstr "T3 Code'dan {companyName}'e geçin"
+
 msgid "Switch host"
 msgstr "Host değiştir"
 
@@ -19940,6 +20094,20 @@ msgstr "Sistem RAM payı"
 #. placeholder {2}: formatMemory(freeMemory)
 msgid "System RAM: Paradev {0}, other apps {1}, free {2}"
 msgstr "Sistem RAM'i: Paradev {0}, diğer uygulamalar {1}, boş {2}"
+
+msgid "T3 Code details are from its public docs and repository. See the <0>full comparison</0>."
+msgstr "T3 Code bilgileri herkese açık belgelerinden ve deposundan alınmıştır. <0>Tam karşılaştırmaya</0> bakın."
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code is a trademark of T3 Tools, Inc. {0} is not affiliated with or endorsed by T3 Tools."
+msgstr "T3 Code, T3 Tools, Inc. şirketinin ticari markasıdır. {0}, T3 Tools ile bağlantılı değildir ve onun tarafından onaylanmamıştır."
+
+msgid "T3 Code threads. They stay in T3 Code, which you can keep installed"
+msgstr "T3 Code konuları. Kurulu bırakabileceğiniz T3 Code'da kalırlar"
+
+#. placeholder {0}: BRAND.NAME
+msgid "T3 Code worktrees are plain Git worktrees. {0} uses them where they are."
+msgstr "T3 Code worktree'leri sıradan Git worktree'leridir. {0} bunları oldukları yerde kullanır."
 
 msgid "Tab"
 msgstr "Sekme"
@@ -23022,6 +23190,9 @@ msgstr "Çalışma alanı oluşturuldu"
 msgid "Workspace details"
 msgstr "Çalışma alanı ayrıntıları"
 
+msgid "Workspace details in Orca, like pins, comments and linked issues"
+msgstr "Orca'daki çalışma alanı ayrıntıları; sabitlemeler, yorumlar ve bağlı issue'lar gibi"
+
 msgid "Workspace ID copied"
 msgstr "Çalışma alanı kimliği kopyalandı"
 
@@ -23175,6 +23346,9 @@ msgstr "Evet, rolümü düşür"
 msgid "Yes, on paid plans."
 msgstr "Evet, ücretli planlarda."
 
+msgid "Yes, or the current checkout"
+msgstr "Evet, veya mevcut checkout"
+
 msgid "Yes, resumes Claude Code sessions"
 msgstr "Evet, Claude Code oturumlarını sürdürür"
 
@@ -23186,6 +23360,12 @@ msgstr "Evet. Size en uygun pozisyona başvurun ve ne geliştirmek istediğinizi
 
 msgid "Yes. Free covers individuals with 1 user, local workspaces, the desktop app, and the CLI. No credit card required."
 msgstr "Evet. Ücretsiz plan; 1 kullanıcı, yerel çalışma alanları, masaüstü uygulaması ve CLI ile bireyleri kapsar. Kredi kartı gerekmez."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Do not delete an imported workspace in Orca, because that removes its folder."
+msgstr "Evet. İçe aktarılan worktree'ler oldukları yerde kalır, böylece iki uygulama da onları açabilir. İçe aktarılan bir çalışma alanını Orca'da silmeyin, çünkü bu işlem klasörünü kaldırır."
+
+msgid "Yes. Imported worktrees stay where they are, so both apps can open them. Keep worktree cleanup off in T3 Code so it does not remove them."
+msgstr "Evet. İçe aktarılan worktree'ler oldukları yerde kalır, böylece iki uygulama da onları açabilir. T3 Code'un onları kaldırmaması için worktree temizliğini kapalı tutun."
 
 msgid "Yes. On plans with cloud workspaces, owners can buy any amount of extra GB-hours at {packPrice} per GB-hour in Settings, Billing. Bought GB-hours are used after the monthly pool and never expire, and auto top-up can buy more when they run low."
 msgstr "Evet. Bulut çalışma alanı olan planlarda sahipler, Ayarlar, Faturalandırma bölümünden GB-saat başına {packPrice} fiyatla istedikleri kadar ek GB-saat satın alabilir. Satın alınan GB-saatler aylık havuzdan sonra kullanılır ve süresi dolmaz; otomatik yükleme azaldıklarında daha fazlasını satın alabilir."

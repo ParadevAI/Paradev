@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { COMPANY } from "@superset/shared/constants";
+import { recordingUnmaskProps } from "@superset/shared/posthog-privacy";
 import { Link } from "@tanstack/react-router";
 import {
 	HiArrowLeft,
@@ -71,13 +72,13 @@ export function SettingsSidebar() {
 				className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-1"
 			>
 				<HiArrowLeft className="h-4 w-4" />
-				<span>
+				<span {...recordingUnmaskProps}>
 					<Trans>Back</Trans>
 				</span>
 			</Link>
 
 			{/* Settings title */}
-			<h1 className="text-lg font-semibold px-3 mb-4">
+			<h1 {...recordingUnmaskProps} className="text-lg font-semibold px-3 mb-4">
 				<Trans>Settings</Trans>
 			</h1>
 
@@ -116,7 +117,7 @@ export function SettingsSidebar() {
 					className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md text-muted-foreground hover:bg-fill-hover hover:text-foreground transition-colors"
 				>
 					<HiArrowTopRightOnSquare className="h-4 w-4" />
-					<span>
+					<span {...recordingUnmaskProps}>
 						<Trans>Documentation</Trans>
 					</span>
 				</a>

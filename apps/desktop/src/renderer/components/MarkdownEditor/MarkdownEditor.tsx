@@ -569,7 +569,7 @@ export function MarkdownEditor({
 			)}
 			<EditorContent
 				editor={editor}
-				className="w-full flex-1 min-h-0 flex flex-col [&>.ProseMirror]:flex-1"
+				className="ph-no-capture w-full flex-1 min-h-0 flex flex-col [&>.ProseMirror]:flex-1"
 			/>
 		</div>
 	);

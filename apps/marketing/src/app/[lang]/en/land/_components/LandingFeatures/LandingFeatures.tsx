@@ -17,7 +17,7 @@ const DEMO_COMPONENTS = [
 
 import type { FeatureOverlay } from "../../copy";
 
-export function LandingFeatures({ overlay }: { overlay: FeatureOverlay }) {
+export function LandingFeatures({ overlay }: { overlay?: FeatureOverlay }) {
 	const { t } = useLingui();
 
 	return (
@@ -26,7 +26,7 @@ export function LandingFeatures({ overlay }: { overlay: FeatureOverlay }) {
 				{/* Feature Rows */}
 				<div className="space-y-24 sm:space-y-32">
 					{FEATURES.map((feature, index) => {
-						const modified = feature.id === overlay.id;
+						const modified = overlay && feature.id === overlay.id;
 						const isReversed = index % 2 === 1;
 						const DemoComponent = DEMO_COMPONENTS[index];
 						return (

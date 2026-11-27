@@ -12,7 +12,12 @@ import { optionalish } from "../../optionalish";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_pull",
-		annotations: { readOnlyHint: true },
+		title: "Get page download URL",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"Get a download URL for a published page's HTML, plus that version's metadata. Fetch the returned `downloadUrl` to read the bytes — this tool does not return the document itself. The URL is signed and expires after an hour, or five minutes for a page outside your organization that anyone with the link may read, so fetch it promptly and never store it. Use this when you need to see what a page currently says before editing the source it was published from. Address the page by id or by slug; exactly one is required.",
 		inputSchema: z

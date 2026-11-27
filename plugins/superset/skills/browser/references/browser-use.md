@@ -80,7 +80,7 @@ Without consent for their browser, use one of:
   and stop it when done.
 - An in-app pane, when you specifically want Browser Use's harness against a
   workspace pane: export the pane's own CDP endpoint (the `url` from
-  `superset browser cdp … --json`) as `BU_CDP_WS`, then run `browser-use`. The
+  `paradev browser cdp … --json`) as `BU_CDP_WS`, then run `browser-use`. The
   pane presents itself as a single page target, so Browser Use attaches to it
   directly. Do this only after the user accepted the Browser Use offer in
   SKILL.md; the pane is their signed-in session and the URL carries a token.

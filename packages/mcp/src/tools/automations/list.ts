@@ -7,7 +7,12 @@ import { optionalish } from "../../optionalish";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_list",
-		annotations: { readOnlyHint: true },
+		title: "List automations",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"List automations (agent runs on a schedule or on events) the calling user owns in the active organization. Returns a summary shape — call automations_get_prompt to fetch the prompt for one automation, or automations_get for the rest of its config. Pass `name` to filter rows by case-insensitive substring match on the automation name. Archived automations are left out unless `archived` is true.",
 		inputSchema: {

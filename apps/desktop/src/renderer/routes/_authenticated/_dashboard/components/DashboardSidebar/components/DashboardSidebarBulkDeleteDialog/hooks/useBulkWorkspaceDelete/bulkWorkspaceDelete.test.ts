@@ -160,41 +160,125 @@ describe("buildBulkWorkspaceInspectionSummary", () => {
 });
 
 describe("executeBulkWorkspaceDeleteTargets", () => {
-	it("runs targets sequentially with each target's confirmed force choice", async () => {
-		const calls: Array<{ workspace: string; force: boolean }> = [];
-		let activeCalls = 0;
-		let maxActiveCalls = 0;
-		let settledCount = 0;
+	function controlledDestroy() {
+		const releases = new Map<string, (failure?: Error) => void>();
+		let active = 0;
+		let maxActive = 0;
+		const destroy = async (workspace: string) => {
+			active += 1;
+			maxActive = Math.max(maxActive, active);
+			const failure = await new Promise<Error | undefined>((resolve) =>
+				releases.set(workspace, resolve),
+			);
+			active -= 1;
+			if (failure) throw failure;
+			return `${workspace}-deleted`;
+		};
+		const flush = async () => {
+			for (let i = 0; i < 10; i += 1) await Promise.resolve();
+		};
+		return { releases, destroy, flush, maxActive: () => maxActive };
+	}
 
-		const result = await executeBulkWorkspaceDeleteTargets<
-			string,
-			string,
-			Error
-		>({
+	it("starts every destroy at once", async () => {
+		const control = controlledDestroy();
+
+		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["a", "b", "c"],
+			shouldForce: () => false,
+			destroy: control.destroy,
+		});
+
+		await control.flush();
+		expect([...control.releases.keys()]).toEqual(["a", "b", "c"]);
+		for (const release of control.releases.values()) release();
+		await run;
+		expect(control.maxActive()).toBe(3);
+	});
+
+	it("runs oneAtATime targets in line while the others start at once", async () => {
+		const control = controlledDestroy();
+
+		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["relay-1", "local", "relay-2"],
+			oneAtATime: (workspace) => workspace.startsWith("relay"),
+			shouldForce: () => false,
+			destroy: control.destroy,
+		});
+
+		await control.flush();
+		expect([...control.releases.keys()].sort()).toEqual(["local", "relay-1"]);
+		control.releases.get("relay-1")?.();
+		await control.flush();
+		expect(control.releases.has("relay-2")).toBeTrue();
+		control.releases.get("local")?.();
+		control.releases.get("relay-2")?.();
+		const result = await run;
+		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
+			"relay-1",
+			"local",
+			"relay-2",
+		]);
+	});
+
+	it("reports whether each settled target was deleted", async () => {
+		const settled: boolean[] = [];
+
+		await executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["fails", "deleted"],
+			shouldForce: () => false,
+			destroy: async (workspace) => {
+				if (workspace === "fails") throw new Error("teardown failed");
+				return workspace;
+			},
+			onSettled: (deleted) => settled.push(deleted),
+		});
+
+		expect(settled.sort()).toEqual([false, true]);
+	});
+
+	it("reports outcomes in target order when destroys finish out of order", async () => {
+		const control = controlledDestroy();
+		const failure = new Error("teardown failed");
+
+		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["a", "b", "c", "d"],
+			shouldForce: () => false,
+			destroy: control.destroy,
+		});
+
+		await control.flush();
+		control.releases.get("d")?.();
+		control.releases.get("c")?.(failure);
+		control.releases.get("b")?.();
+		control.releases.get("a")?.(failure);
+		const result = await run;
+
+		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
+			"b",
+			"d",
+		]);
+		expect(result.failures).toEqual([
+			{ workspace: "a", error: failure },
+			{ workspace: "c", error: failure },
+		]);
+	});
+
+	it("passes each target's own force choice", async () => {
+		const calls: Array<{ workspace: string; force: boolean }> = [];
+
+		await executeBulkWorkspaceDeleteTargets<string, string, Error>({
 			targets: ["clean", "dirty"],
 			shouldForce: (workspace) => workspace === "dirty",
 			destroy: async (workspace, force) => {
-				activeCalls += 1;
-				maxActiveCalls = Math.max(maxActiveCalls, activeCalls);
 				calls.push({ workspace, force });
-				await Promise.resolve();
-				activeCalls -= 1;
-				return `${workspace}-deleted`;
-			},
-			onSettled: () => {
-				settledCount += 1;
+				return workspace;
 			},
 		});
 
 		expect(calls).toEqual([
 			{ workspace: "clean", force: false },
 			{ workspace: "dirty", force: true },
-		]);
-		expect(maxActiveCalls).toBe(1);
-		expect(settledCount).toBe(2);
-		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
-			"clean",
-			"dirty",
 		]);
 	});
 
@@ -244,9 +328,11 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			},
 		});
 
-		expect(calls).toEqual([
+		expect(calls.filter((call) => call.workspace === "unchecked")).toEqual([
 			{ workspace: "unchecked", force: false },
 			{ workspace: "unchecked", force: true },
+		]);
+		expect(calls.filter((call) => call.workspace === "clean")).toEqual([
 			{ workspace: "clean", force: false },
 		]);
 		expect(result.successes.map(({ workspace }) => workspace)).toEqual([

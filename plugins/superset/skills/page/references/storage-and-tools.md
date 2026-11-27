@@ -42,8 +42,8 @@ refresh page data without a republish (MCP: `pages_storage_set`,
 `pages_storage_remove`):
 
 ```bash
-superset pages storage <page> --key data --scope shared --set '{"deals": 42}'
-superset pages storage <page> --key data --scope shared --remove
+paradev pages storage <page> --key data --scope shared --set '{"deals": 42}'
+paradev pages storage <page> --key data --scope shared --remove
 ```
 
 ## Live data: `window.superset.tools`

@@ -1036,7 +1036,7 @@ export function DiffPane({
 						>
 							<CodeView<DiffAnnotationMetadata>
 								ref={codeViewRef}
-								className="h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
+								className="ph-no-capture h-full w-full overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
 								style={style}
 								items={items}
 								options={codeViewOptions}

@@ -13,6 +13,7 @@ import {
 	type WorkspaceStoreContext,
 } from "../../../../workspaces/local-workspace-store";
 import { gitConfigWrite } from "../../git/utils/config-write";
+import { isWorktreeBeingDeleted } from "../../workspace-cleanup/worktrees-being-deleted";
 import { requireLocalProject } from "./local-project";
 import { requireIndependentWorktree } from "./require-independent-worktree";
 import type { GitClient } from "./types";
@@ -79,6 +80,12 @@ export async function adoptExistingWorktree(
 	} = args;
 	const project = requireLocalProject(ctx, projectId);
 	requireIndependentWorktree(project.repoPath, worktreePath);
+	if (isWorktreeBeingDeleted(worktreePath)) {
+		throw new TRPCError({
+			code: "CONFLICT",
+			message: `The worktree for ${branch} is still being deleted. Try again once the delete finishes.`,
+		});
+	}
 	if (existingWorkspaceId) {
 		const existing = getLocalWorkspace(ctx.db, existingWorkspaceId);
 		if (

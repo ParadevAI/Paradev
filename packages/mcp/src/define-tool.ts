@@ -28,10 +28,18 @@ export type ToolInputOf<Input extends ToolInput> = Input extends z.ZodType
 		? z.output<z.ZodObject<Input>>
 		: never;
 
+export type ToolHints = Omit<ToolAnnotations, "title"> & {
+	readOnlyHint: boolean;
+	destructiveHint: boolean;
+	openWorldHint: boolean;
+};
+
 export interface ToolDef<Input extends ToolInput, Output extends ZodRawShape> {
 	name: string;
+	title: string;
 	description: string;
-	annotations?: ToolAnnotations;
+	annotations: ToolHints;
+	_meta?: Record<string, unknown>;
 	inputSchema?: Input;
 	outputSchema?: Output;
 	handler: (input: ToolInputOf<Input>, ctx: McpContext) => Promise<unknown>;
@@ -119,10 +127,12 @@ export function defineTool<Input extends ToolInput, Output extends ZodRawShape>(
 	server.registerTool(
 		def.name,
 		{
+			title: def.title,
 			description: def.description,
-			...(def.annotations ? { annotations: def.annotations } : {}),
+			annotations: def.annotations,
 			inputSchema: (def.inputSchema ?? {}) as ZodRawShape,
 			...(def.outputSchema ? { outputSchema: def.outputSchema } : {}),
+			...(def._meta ? { _meta: def._meta } : {}),
 		},
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the SDK callback type depends on whether inputSchema is provided; we always invoke with two args.
 		(async (args: ToolInputOf<Input>, extra: McpRequestExtra) => {

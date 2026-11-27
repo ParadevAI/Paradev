@@ -38,6 +38,8 @@ interface RunTeardownOptions {
 	projectId: string;
 	timeoutMs?: number;
 	appHomeDir?: string;
+	/** Kills the script like the timeout does. */
+	abortSignal?: AbortSignal;
 }
 
 /**
@@ -62,6 +64,7 @@ export async function runTeardown({
 	projectId,
 	timeoutMs = TEARDOWN_TIMEOUT_MS,
 	appHomeDir,
+	abortSignal,
 }: RunTeardownOptions): Promise<TeardownResult> {
 	const resolved = resolveTeardownCommand({
 		repoPath,
@@ -131,10 +134,12 @@ export async function runTeardown({
 			});
 		});
 
-		const timer = setTimeout(() => {
-			if (settled) return;
+		let stopping = false;
+		const stop = (note: string) => {
+			if (settled || stopping) return;
+			stopping = true;
 			timedOut = true;
-			appendTail(`\n[teardown timed out after ${timeoutMs}ms]\n`);
+			appendTail(`\n[${note}]\n`);
 			try {
 				void session.pty.kill().catch(() => {});
 			} catch {
@@ -151,8 +156,16 @@ export async function runTeardown({
 					outputTail: tail,
 				});
 			}, KILL_GRACE_MS).unref();
-		}, timeoutMs);
+		};
+		const timer = setTimeout(
+			() => stop(`teardown timed out after ${timeoutMs}ms`),
+			timeoutMs,
+		);
 		timer.unref();
+		if (abortSignal?.aborted) stop("teardown cancelled");
+		abortSignal?.addEventListener("abort", () => stop("teardown cancelled"), {
+			once: true,
+		});
 	});
 }
 

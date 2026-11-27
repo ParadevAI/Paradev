@@ -24,7 +24,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 | Archive workspace | Delete workspace |
 | `CONDUCTOR_ROOT_PATH` | `SUPERSET_ROOT_PATH` |
 | `CONDUCTOR_WORKSPACE_PATH` | `SUPERSET_WORKSPACE_PATH` |
-| `CONDUCTOR_WORKSPACE_NAME` | `SUPERSET_WORKSPACE_NAME` |
+| `CONDUCTOR_WORKSPACE_NAME` | No equivalent. Use the folder name: `$(basename "$SUPERSET_WORKSPACE_PATH")` |
 | `CONDUCTOR_PORT` | No equivalent. Paradev [detects ports](/ports) instead of assigning them |
 | Diff viewer and checks | [Changes pane](/diff-viewer) and [pull requests](/pull-requests) |
 | Conductor Cloud | [Cloud workspaces](/cloud-workspaces). See [Migrate from Conductor Cloud](/migrate-from-conductor-cloud) |
@@ -39,7 +39,7 @@ Both apps use the same model: one Git worktree and one branch per task, with an 
 
 Each Conductor workspace is an ordinary Git worktree, so Paradev can adopt it in place. Nothing is copied or moved.
 
-1. Right-click the project in the sidebar and choose **Import untracked worktrees**. You can also use the **Import** tab in the New Workspace modal.
+1. Right-click the project in the sidebar and choose **Import untracked worktrees**. From a shell, [`paradev worktrees open --project <projectId> --all`](/cli/cli-reference#worktrees) does the same. Get the ID from `paradev projects list`.
 2. Check the list of branches and paths. Conductor's worktrees are usually under `~/conductor/workspaces/`. Older versions put them in a `.conductor/` folder inside the repository.
 3. Leave **Run setup script** off. These worktrees are already set up.
 
@@ -48,12 +48,12 @@ Imported workspaces keep their paths, branches, and uncommitted changes. New wor
 If a worktree is missing from the list, run `git worktree list` in the repository. Paradev only imports worktrees that have a branch checked out. A worktree on a detached HEAD needs a branch first (`git switch -c <name>` inside it).
 
 <Callout type="warn">
-Do not archive these workspaces in Conductor after you import them. Archiving in Conductor deletes the workspace directory, which is now your Paradev workspace too. Quit Conductor instead. See [Remove Conductor](#6-remove-conductor).
+Do not archive these workspaces in Conductor after you import them. Archiving in Conductor deletes the workspace directory at once, with any uncommitted changes. That directory is now your Paradev workspace too. Quit Conductor instead. See [Remove Conductor](#6-remove-conductor).
 </Callout>
 
 ## 3. Convert Your Scripts
 
-Move your scripts from `conductor.json` or `.conductor/settings.toml` into `.paradev/config.json` at the repository root.
+Conductor keeps scripts in `.conductor/settings.toml`. Older setups use `conductor.json`. Move them into `.paradev/config.json` at the repository root.
 
 A `conductor.json` like this:
 
@@ -67,7 +67,9 @@ A `conductor.json` like this:
 }
 ```
 
-becomes:
+In `settings.toml`, the same scripts are `scripts.setup`, the `command` of each `[scripts.run.<name>]` table, and `scripts.archive`.
+
+Either file becomes:
 
 ```json
 {
@@ -81,7 +83,7 @@ Differences to know:
 
 - **Commands are arrays.** Each entry runs in order in the workspace directory.
 - **`run` is one command set.** It starts from the Run button in its own restartable pane. Save other named actions as [terminal scripts](/terminal-scripts) and launch them from the Scripts bar.
-- **`teardown` runs when you delete a workspace**, before Paradev removes the worktree. If it fails, you can still **Delete Anyway**.
+- **`teardown` runs when you delete a workspace**, before Paradev removes the worktree. If it fails, you can still **Delete anyway**.
 - **There is no `run_mode` setting.** Each workspace has its own Run pane.
 - **Personal overrides** go in `.paradev/config.local.json`, not in the committed file. Add it to `.gitignore` before you commit `.paradev/`. See [Local Config](/setup-teardown-scripts#local-config).
 
@@ -92,7 +94,7 @@ If your setup is a shell script that reads `CONDUCTOR_*` variables, you can keep
 ```json
 {
   "setup": [
-    "CONDUCTOR_ROOT_PATH=\"$SUPERSET_ROOT_PATH\" CONDUCTOR_WORKSPACE_PATH=\"$SUPERSET_WORKSPACE_PATH\" CONDUCTOR_WORKSPACE_NAME=\"$SUPERSET_WORKSPACE_NAME\" ./scripts/conductor-setup.sh"
+    "CONDUCTOR_ROOT_PATH=\"$SUPERSET_ROOT_PATH\" CONDUCTOR_WORKSPACE_PATH=\"$SUPERSET_WORKSPACE_PATH\" CONDUCTOR_WORKSPACE_NAME=\"$(basename \"$SUPERSET_WORKSPACE_PATH\")\" ./scripts/conductor-setup.sh"
   ]
 }
 ```
@@ -122,7 +124,7 @@ Claude Code, Codex, Cursor Agent, and OpenCode all run in Paradev on your existi
 
 Conductor saves Claude Code sessions in your usual `~/.claude` folder, under the workspace's path. Import keeps that path, so open a terminal in the imported workspace and run `claude --resume` to pick a Conductor conversation. Claude Code deletes sessions older than 30 days by default, so very old chats may be gone. For other agents, try their own resume command, such as `codex resume`. To keep a copy of every chat, use Conductor's **Settings → Account → Export data**. After that, Paradev [resumes the session](/agent-sessions) by itself if its terminal dies.
 
-Prefer a chat view to a terminal? Switch the agent pane to [Chat](/chat).
+Sessions of supported agents open as a [chat](/chat), like in Conductor. Use the **CLI** / **Chat** toggle in the agent pane to move the same session to a terminal and back.
 
 ## 5. Learn the Daily Loop
 

@@ -1124,7 +1124,7 @@ export function ComposerBody({
 				contentEditable={
 					<ContentEditable
 						className={cn(
-							"prompt-input-editor",
+							"prompt-input-editor ph-no-capture",
 							inline && "prompt-input-editor-inline",
 						)}
 						spellCheck={false}

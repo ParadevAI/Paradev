@@ -10,6 +10,7 @@ import {
 	inspectWorkspaceAtHost,
 } from "renderer/hooks/host-service/useDestroyWorkspace";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences/useUserPreferences";
+import { usesRelayJwt } from "renderer/lib/host-service-auth";
 import { useNavigateAwayFromWorkspace } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useNavigateAwayFromWorkspace";
 import {
 	type BulkWorkspaceDeleteFailure,
@@ -62,8 +63,8 @@ export function bulkWorkspaceDestroyErrorMessage(
  *
  * Confirming hides the dialog at once and runs the destroys in the
  * background behind a progress toast, the same shape as the single delete:
- * a bulk delete runs every teardown script serially and can take minutes,
- * and a modal open that long blocks the whole app. The request's phase and
+ * every destroy runs a teardown script and can take a minute, and a modal
+ * open that long blocks the whole app. The request's phase and
  * failures live in the intent store, not here: the sidebar (and with it this
  * hook) unmounts when toggled closed, and the run must still surface its
  * failures pane once it is back instead of asking for confirmation again.
@@ -171,12 +172,8 @@ export function useBulkWorkspaceDelete({
 			intent.markRunning(requestId);
 
 			const total = targets.length;
-			// Both placeholders stay positional expressions so the catalog keeps
-			// the dialog-era "{0} of {1}" shape and its translations.
 			const progressMessage = (completed: number) =>
-				t({
-					message: `Deleting ${Math.min(completed + 1, total)} of ${targets.length}…`,
-				});
+				t({ message: `Deleted ${completed} of ${total}…` });
 			const progressToastId = toast.loading(progressMessage(0));
 
 			const targetIds = new Set(targets.map((workspace) => workspace.id));
@@ -192,13 +189,18 @@ export function useBulkWorkspaceDelete({
 
 				const nextFailures = [...retainedFailures];
 				const warnings: string[] = [];
-				let completedCount = 0;
+				let settledCount = 0;
+				let deletedCount = 0;
 				const execution = await executeBulkWorkspaceDeleteTargets<
 					DashboardSidebarWorkspace,
 					DestroyWorkspaceSuccess,
 					DestroyWorkspaceError
 				>({
 					targets,
+					oneAtATime: (workspace) => {
+						const { hostUrl } = targetFor(workspace);
+						return hostUrl !== null && usesRelayJwt(hostUrl);
+					},
 					shouldForce: (workspace) => {
 						const inspection = inspections.get(workspace.id);
 						return (
@@ -223,10 +225,11 @@ export function useBulkWorkspaceDelete({
 							force,
 							skipTeardown,
 						}),
-					onSettled: () => {
-						completedCount += 1;
-						if (completedCount < total) {
-							toast.loading(progressMessage(completedCount), {
+					onSettled: (deleted) => {
+						settledCount += 1;
+						if (deleted) deletedCount += 1;
+						if (settledCount < total) {
+							toast.loading(progressMessage(deletedCount), {
 								id: progressToastId,
 							});
 						}

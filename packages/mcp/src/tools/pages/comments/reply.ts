@@ -6,7 +6,12 @@ import { defineTool } from "../../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_comments_reply",
-		annotations: { destructiveHint: false },
+		title: "Reply to page comment",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"Post a reply into an existing comment thread on a published page. Answer only the threads you were asked to address, and say what you actually changed — the reply is what the person who left the comment reads next. Reply before calling pages_comments_resolve, so closing the thread is not silent.",
 		inputSchema: {

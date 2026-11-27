@@ -821,7 +821,7 @@ export function PullRequestCodeTab({
 					/>
 					<CodeView
 						ref={codeViewRef}
-						className="min-h-0 flex-1 overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
+						className="ph-no-capture min-h-0 flex-1 overflow-y-auto overflow-x-clip overscroll-contain [overflow-anchor:none]"
 						style={codeViewStyle}
 						items={items}
 						options={codeViewOptions}

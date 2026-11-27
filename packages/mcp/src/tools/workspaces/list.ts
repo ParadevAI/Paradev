@@ -8,7 +8,12 @@ import { requireCloudUnlessHost } from "../../workspace-service-target";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "workspaces_list",
-		annotations: { readOnlyHint: true },
+		title: "List workspaces",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"List workspaces. Without hostId, the organization's cloud workspaces with their status ('provisioning', 'awake', 'asleep', 'failed'; an asleep one wakes when used) — use it to watch one created by workspaces_create reach 'awake'. With hostId, the workspaces on that host (see hosts_list), including the host-served projectName; use this to find a workspace ID for automations_create's v2WorkspaceId.",
 		inputSchema: {

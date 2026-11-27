@@ -6,7 +6,12 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_get",
-		annotations: { readOnlyHint: true },
+		title: "Get automation",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"Get a single automation's metadata. Returns name, schedule, agent, host — the prompt body is omitted (call automations_get_prompt to fetch it). For run history, call automations_logs. Caller must be the automation's owner.",
 		inputSchema: {
