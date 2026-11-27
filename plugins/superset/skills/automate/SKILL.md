@@ -7,7 +7,7 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 # Paradev Automate
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
 Turn "I keep doing X every morning" into an automation that does X on a schedule, or "someone should look at every new PR" into one that fires on the event.
 
@@ -19,16 +19,16 @@ Nobody watches a run, so a chore whose product is a digest, a report, or a score
 
 ```
 ...write the digest to digest.html, then publish it:
-superset pages publish digest.html --title "Nightly triage" --label "what changed today"
+paradev pages publish digest.html --title "Nightly triage" --label "what changed today"
 ```
 
 A page is identified by its workspace plus its path, so **which target you picked in step 2 decides whether history accumulates**. A project target creates a fresh workspace per run, which means a new page every run rather than a new version of one. For a report meant to build up history, use a workspace target, or capture the page id from the first run and have the prompt pass `--page <id>` from then on.
 
 ## 2. Pick the target
 
-- `superset projects list`: a project target creates a fresh workspace per run (most tasks)
-- `superset workspaces list --local`: a workspace target reuses the same workspace every run (stateful tasks)
-- `superset environments list`: finds an environment id; pass it to `automations create --environment <id>` to start each run in a fresh cloud workspace, so runs do not need this machine awake
+- `paradev projects list`: a project target creates a fresh workspace per run (most tasks)
+- `paradev workspaces list --local`: a workspace target reuses the same workspace every run (stateful tasks)
+- `paradev environments list`: finds an environment id; pass it to `automations create --environment <id>` to start each run in a fresh cloud workspace, so runs do not need this machine awake
 
 ## 3. Pick what fires it
 
@@ -37,7 +37,7 @@ A clock or an event. Ask which the chore actually wants: "every morning" is a sc
 For an event trigger, resolve the ids first. A scope stores provider ids, never names, so a channel name or repo title written straight into a config matches nothing:
 
 ```bash
-superset automations trigger-options --group slack
+paradev automations trigger-options --group slack
 ```
 
 Groups: `slack`, `github`, `linear`, `sentry`, `notion`, `microsoftTeams`, `google` (Gmail labels and people). An empty result is ambiguous: the org has not connected that group, or its token was revoked, or the provider failed the lookup. Ask the user to check the connection in Settings rather than telling them it is not connected.
@@ -65,7 +65,7 @@ Show the user (use the ask_user tool if available): the name, what fires it (the
 ## 5. Create and shake down
 
 ```bash
-superset automations create \
+paradev automations create \
   --name "Daily issue triage" \
   --rrule "FREQ=DAILY;BYHOUR=9;BYMINUTE=0" \
   --timezone America/Los_Angeles \
@@ -77,7 +77,7 @@ superset automations create \
 For an event trigger, swap `--rrule` and `--timezone` for `--triggers-file`:
 
 ```bash
-superset automations create \
+paradev automations create \
   --name "Triage bug reactions" \
   --triggers-file /tmp/triggers.json \
   --project <id> \
@@ -87,8 +87,8 @@ superset automations create \
 
 (`--workspace <id>` instead of `--project` for reuse mode; `--host <id>` if it should run on another machine; prefer `--prompt-file` for multiline prompts. One automation can hold both kinds: put the schedule in the trigger set alongside the event.)
 
-**Changing triggers later replaces the whole set.** `superset automations update <id> --triggers-file` deletes every trigger you leave out. Read the current set with `superset automations get <id>` and resend the entries you are keeping, each with its `id`, so they are updated in place rather than recreated. Recreating rolls a webhook's signing key and resets a schedule's next run.
+**Changing triggers later replaces the whole set.** `paradev automations update <id> --triggers-file` deletes every trigger you leave out. Read the current set with `paradev automations get <id>` and resend the entries you are keeping, each with its `id`, so they are updated in place rather than recreated. Recreating rolls a webhook's signing key and resets a schedule's next run.
 
-Always confirm the trigger actually landed: run `superset automations get <id>` after the write and check the `triggers` array. Do not report a trigger as set up on the strength of the command exiting 0.
+Always confirm the trigger actually landed: run `paradev automations get <id>` after the write and check the `triggers` array. Do not report a trigger as set up on the strength of the command exiting 0.
 
-Then trigger a first run now with `superset automations run <id>`, review `superset automations logs <id>` with the user, and refine the prompt via `superset automations prompt set <id>` until the run output is right. An automation isn't done until one real run looked good. If the prompt publishes a page, open the published page as part of that review, not just the run log.
+Then trigger a first run now with `paradev automations run <id>`, review `paradev automations logs <id>` with the user, and refine the prompt via `paradev automations prompt set <id>` until the run output is right. An automation isn't done until one real run looked good. If the prompt publishes a page, open the published page as part of that review, not just the run log.

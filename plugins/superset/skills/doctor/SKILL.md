@@ -7,34 +7,34 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 # Paradev Doctor
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
 Diagnose first, change one thing at a time, verify after each change.
 
 ## 1. Snapshot (read-only, run in parallel, tolerate failures)
 
-- `superset status` for host service health
-- `superset auth whoami` for auth and the active org
-- `superset hosts list` for host reachability
-- `superset --version`
+- `paradev status` for host service health
+- `paradev auth whoami` for auth and the active org
+- `paradev hosts list` for host reachability
+- `paradev --version`
 
 ## 2. Match known signatures
 
 | Signature | Fix |
 | --- | --- |
-| `whoami` fails / session expired | `superset auth login` |
-| Host shows offline | `superset hosts wake <id>`; confirm the machine is awake and online |
-| Host service not running | `superset start` |
-| A host set up with `superset hosts add` is offline or broken | re-run `superset hosts add <ssh-target>`; it checks each step and fixes only what is wrong. On Linux its log is `ssh <ssh-target> journalctl --user -u superset-host -n 50` |
+| `whoami` fails / session expired | `paradev auth login` |
+| Host shows offline | `paradev hosts wake <id>`; confirm the machine is awake and online |
+| Host service not running | `paradev start` |
+| A host set up with `paradev hosts add` is offline or broken | re-run `paradev hosts add <ssh-target>`; it checks each step and fixes only what is wrong. On Linux its log is `ssh <ssh-target> journalctl --user -u superset-host -n 50` |
 | `hosts add` cannot reach or set up the machine | confirm `ssh <ssh-target>` works from here, the remote is macOS or glibc Linux (x64 or arm64; Alpine and Windows are not supported), and it has `curl` |
 | Private repos will not clone on a host added with `hosts add` | sign in GitHub there: `ssh -t <ssh-target> gh auth login` (install `gh` first if missing) |
 | Linux host stops when the user logs out of it | enable lingering on that machine: `loginctl enable-linger` |
 | `hosts add` stops on an empty or invalid `/etc/machine-id` (cloned VM or container image) | on that machine, `sudo rm -f /etc/machine-id && sudo systemd-machine-id-setup`, then re-run `hosts add`. The user runs this, since it needs sudo on their box |
-| `superset pages publish` in a Paradev terminal fails with "Not a member of organization" | `superset update`; newer CLIs use the desktop app's account inside its terminals |
+| `paradev pages publish` in a Paradev terminal fails with "Not a member of organization" | `superset update`; newer CLIs use the desktop app's account inside its terminals |
 | CLI and desktop app version mismatch, or stale CLI | `superset update` |
 | `workspaces`, `agents`, or `terminals` inside a local workspace fails with "No cloud workspace … in this organization" | the account has cloud workspaces, so these default to the cloud; add `--local` (or `--host <id>`) |
-| An agent in a cloud workspace keeps an old sign-in after reconnecting Claude or Codex | `superset workspaces restart <id>`; it ends every terminal and agent there, so ask first |
-| A cloud workspace was archived by mistake | `superset workspaces unarchive <id>`; within 7 days it keeps its disk, after that it starts fresh from its environment |
+| An agent in a cloud workspace keeps an old sign-in after reconnecting Claude or Codex | `paradev workspaces restart <id>`; it ends every terminal and agent there, so ask first |
+| A cloud workspace was archived by mistake | `paradev workspaces unarchive <id>`; within 7 days it keeps its disk, after that it starts fresh from its environment |
 | App-side misbehavior (macOS) | read the newest entries in `~/Library/Logs/Superset/main.log` for errors |
 
 Propose the matching fix and get the user's go-ahead before running anything that changes state. Never delete data as a "fix".
