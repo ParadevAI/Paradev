@@ -8,6 +8,7 @@ import { PromptInput } from "@superset/chat-ui/PromptInput";
 import { useCallback, useMemo } from "react";
 import { track } from "renderer/lib/analytics";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useSettings } from "renderer/stores/settings";
 import { useAttachmentPreview } from "./hooks/useAttachmentPreview";
 import { useComposerDictation } from "./hooks/useComposerDictation";
 import { usePageMentionProvider } from "./hooks/usePageMentionProvider";
@@ -41,9 +42,13 @@ export function AgentComposer({
 	commands = NO_COMMANDS,
 	mentionProviders = NO_PROVIDERS,
 	dictation,
+	enterBehavior,
 	onSubmit,
 	...props
 }: AgentComposerProps) {
+	const composerEnterBehavior = useSettings(
+		(state) => state.composerEnterBehavior,
+	);
 	const pluginProvider = usePluginMentionProvider();
 	const pageProvider = usePageMentionProvider();
 	const trackerProvider = useTrackerMentionProvider();
@@ -79,6 +84,7 @@ export function AgentComposer({
 				onSubmit={submit}
 				commands={commands}
 				dictation={dictation ?? composerDictation}
+				enterBehavior={enterBehavior ?? composerEnterBehavior}
 				mentionProviders={providers}
 				onAttachmentClick={attachmentPreview.onAttachmentClick}
 				localFiles={LOCAL_FILES}

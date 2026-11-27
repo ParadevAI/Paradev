@@ -4569,6 +4569,9 @@ msgstr "Pilih kapan Paradev memberi tahu Anda."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Pilih tempat membuka agen yang dimulai dari komentar, mode desain, dan Pages."
 
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Pilih apakah Enter mengirim pesan atau menambah baris baru. Jika menambah baris, ⌘↩︎ mengirim dan ⌘⇧↩︎ mengarahkan giliran yang berjalan."
+
 msgid "Choose your default skin tone"
 msgstr "Pilih warna kulit default"
 
@@ -8176,8 +8179,17 @@ msgstr "Masukkan bilangan bulat"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "Masukkan bilangan bulat dari {minHours} sampai {maxHours} GB-jam."
 
+msgid "Enter adds a line"
+msgstr "Enter menambah baris"
+
+msgid "Enter in the chat composer"
+msgstr "Enter di kolom chat"
+
 msgid "Enter new value"
 msgstr "Masukkan nilai baru"
+
+msgid "Enter sends"
+msgstr "Enter mengirim"
 
 msgid "Enter this code on the page we opened:"
 msgstr "Masukkan kode ini di halaman yang kami buka:"
@@ -15999,6 +16011,9 @@ msgstr "Antrekan pekerjaan untuk agen"
 
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "Antrekan; ⌘↩ untuk mengarahkan giliran yang berjalan"
+
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "Antrekan; ⌘⇧↩︎ untuk mengarahkan giliran yang berjalan"
 
 msgid "Queued"
 msgstr "Antre"

@@ -4569,6 +4569,9 @@ msgstr "Paradev'in sizi ne zaman uyaracağını seçin."
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "Yorumlardan, tasarım modundan ve Pages üzerinden başlatılan ajanların nerede açılacağını seçin."
 
+msgid "Choose whether Enter sends your message or adds a new line. When it adds a line, ⌘↩︎ sends and ⌘⇧↩︎ steers the running turn."
+msgstr "Enter tuşunun mesajınızı göndermesini mi yoksa yeni satır eklemesini mi istediğinizi seçin. Satır eklediğinde ⌘↩︎ gönderir, ⌘⇧↩︎ çalışan turu yönlendirir."
+
 msgid "Choose your default skin tone"
 msgstr "Varsayılan ten rengini seç"
 
@@ -8176,8 +8179,17 @@ msgstr "Bir tam sayı girin"
 msgid "Enter a whole number from {minHours} to {maxHours} GB-hours."
 msgstr "{minHours} ile {maxHours} GB-saat arasında tam sayı girin."
 
+msgid "Enter adds a line"
+msgstr "Enter satır ekler"
+
+msgid "Enter in the chat composer"
+msgstr "Sohbet giriş alanında Enter"
+
 msgid "Enter new value"
 msgstr "Yeni değer girin"
+
+msgid "Enter sends"
+msgstr "Enter gönderir"
 
 msgid "Enter this code on the page we opened:"
 msgstr "Bu kodu açtığımız sayfaya girin:"
@@ -15999,6 +16011,9 @@ msgstr "Ajanlar için işi kuyruğa alın"
 
 msgid "Queue; ⌘↩ to steer the running turn"
 msgstr "Kuyruğa al; çalışan turu yönlendirmek için ⌘↩"
+
+msgid "Queue; ⌘⇧↩︎ to steer the running turn"
+msgstr "Kuyruğa al; çalışan turu yönlendirmek için ⌘⇧↩︎"
 
 msgid "Queued"
 msgstr "Sırada"

@@ -195,6 +195,11 @@ export type PromptInputProps = {
 	) => false | void | Promise<void>;
 	onStop?: () => void;
 	stopOnEscape?: boolean;
+	/**
+	 * "send" (default): Enter sends, Shift+Enter adds a line, ⌘↩ steers.
+	 * "newline": Enter adds a line, ⌘↩ sends, ⌘⇧↩ steers.
+	 */
+	enterBehavior?: "send" | "newline";
 	allowEmptySubmit?: boolean;
 	disabled?: boolean;
 	pending?: boolean;

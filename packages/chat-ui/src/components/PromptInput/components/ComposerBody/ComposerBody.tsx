@@ -132,6 +132,7 @@ import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
 import { MentionSubmenu } from "../MentionSubmenu";
+import { dictationKeyAction } from "./utils/dictationKeyAction";
 import { getFormatShortcutTarget } from "./utils/getFormatShortcutTarget";
 
 function footerButtonClasses(base: string, ghost: string) {
@@ -196,6 +197,7 @@ export type ComposerBodyProps = Required<
 		| "onSubmit"
 		| "onStop"
 		| "stopOnEscape"
+		| "enterBehavior"
 		| "onAttachmentClick"
 		| "chipForPaste"
 		| "localFiles"
@@ -259,6 +261,7 @@ export function ComposerBody({
 	onSubmit,
 	onStop,
 	stopOnEscape = true,
+	enterBehavior = "send",
 	onAttachmentClick,
 	chipForPaste,
 	localFiles,
@@ -386,6 +389,7 @@ export function ComposerBody({
 		attachments,
 		onStop,
 		stopOnEscape,
+		enterBehavior,
 		onSubmit,
 		status,
 		allowEmptySubmit,
@@ -397,6 +401,7 @@ export function ComposerBody({
 		attachments,
 		onStop,
 		stopOnEscape,
+		enterBehavior,
 		onSubmit,
 		status,
 		allowEmptySubmit,
@@ -749,14 +754,16 @@ export function ComposerBody({
 			KEY_ENTER_COMMAND,
 			(event) => {
 				if (event?.isComposing || event?.keyCode === 229) return false;
-				if (event?.shiftKey) {
-					event.preventDefault();
+				const mod = Boolean(event?.metaKey || event?.ctrlKey);
+				const newline = stateRef.current.enterBehavior === "newline";
+				event?.preventDefault();
+				if (newline ? !mod : event?.shiftKey) {
 					editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
 					return true;
 				}
-				const steer = Boolean(event?.metaKey || event?.ctrlKey);
-				event?.preventDefault();
-				submitRef.current({ steer });
+				submitRef.current({
+					steer: newline ? Boolean(event?.shiftKey) : mod,
+				});
 				return true;
 			},
 			COMMAND_PRIORITY_LOW,
@@ -1019,17 +1026,12 @@ export function ComposerBody({
 	useEffect(() => {
 		if (dictationSession.status === "idle") return;
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.isComposing || !isFocusUnclaimed()) return;
-			if (event.key === "Escape") {
-				event.preventDefault();
-				event.stopPropagation();
-				dictationSession.cancel();
-				return;
-			}
-			if (event.key !== "Enter" || event.shiftKey) return;
+			const action = dictationKeyAction(event);
+			if (!action || !isFocusUnclaimed()) return;
 			event.preventDefault();
 			event.stopPropagation();
-			if (dictationSession.status === "recording")
+			if (action === "cancel") dictationSession.cancel();
+			else if (dictationSession.status === "recording")
 				void dictationSession.finish();
 			else if (dictationSession.status === "error")
 				void dictationSession.retry();
@@ -1399,7 +1401,9 @@ export function ComposerBody({
 					}
 					title={
 						(status === "streaming" && onStop) || status === "background"
-							? t({ message: "Queue; ⌘↩ to steer the running turn" })
+							? enterBehavior === "newline"
+								? t({ message: "Queue; ⌘⇧↩︎ to steer the running turn" })
+								: t({ message: "Queue; ⌘↩ to steer the running turn" })
 							: undefined
 					}
 					disabled={!canSend || disabled || pending}
