@@ -20,6 +20,7 @@ import {
 	type ClientMessage,
 	encodeFrame,
 	FrameDecoder,
+	readDaemonRuntimeIdentity,
 } from "@superset/pty-daemon/protocol";
 import {
 	DaemonSupervisor,
@@ -28,6 +29,7 @@ import {
 	ptyDaemonSocketPath,
 	shouldKillStaleDaemonForDev,
 } from "./DaemonSupervisor.ts";
+import { EXPECTED_DAEMON_VERSION } from "./expected-version.ts";
 import { readPtyDaemonManifest, writePtyDaemonManifest } from "./manifest.ts";
 
 // Capture supervisor-emitted log events. We replace console.log for the
@@ -74,6 +76,9 @@ interface FakeDaemonOptions {
 	socketPath?: string;
 	respondWithVersion?: string;
 	daemonPid?: number;
+	daemonExecPath?: string;
+	daemonScriptPath?: string;
+	daemonBundleId?: string;
 	respondRaw?: Buffer;
 	hangUpAfterHello?: boolean;
 	respondWithWrongMessageFirst?: boolean;
@@ -123,6 +128,15 @@ async function startFakeDaemon(opts: FakeDaemonOptions): Promise<{
 							protocol: 1,
 							daemonVersion: opts.respondWithVersion,
 							daemonPid: opts.daemonPid,
+							...(opts.daemonExecPath
+								? { daemonExecPath: opts.daemonExecPath }
+								: {}),
+							...(opts.daemonScriptPath
+								? { daemonScriptPath: opts.daemonScriptPath }
+								: {}),
+							...(opts.daemonBundleId
+								? { daemonBundleId: opts.daemonBundleId }
+								: {}),
 						}),
 					);
 					return;
@@ -545,6 +559,212 @@ describe("DaemonSupervisor.tryAdopt", () => {
 			}
 		}
 	}, 15_000);
+
+	test("marks same-version daemon updatePending when runtime bundle identity drifts (e.g. macOS ShipIt)", async () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-bundle-drift-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('expected-bundle');");
+		const expected = readDaemonRuntimeIdentity(scriptPath, process.execPath);
+		expect(expected?.bundleId).toBeDefined();
+
+		const childPid = spawnIdleChild();
+		const orgId = "org-bundle-drift";
+		const fake = await startFakeDaemon({
+			respondWithVersion: EXPECTED_DAEMON_VERSION,
+			daemonPid: childPid,
+			daemonExecPath: expected?.execPath,
+			daemonScriptPath:
+				"/private/var/folders/_s/T/com.superset.desktop.ShipIt.XXXX/Superset.app/Contents/Resources/app.asar/dist/main/pty-daemon.js",
+			daemonBundleId: "stale-shipit-bundle-hash",
+		});
+		try {
+			writePtyDaemonManifest({
+				pid: childPid,
+				socketPath: fake.socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(sup, orgId)) as
+				| (AdoptedForTest & { bundleMismatch?: boolean })
+				| null;
+			expect(adopted).not.toBeNull();
+			expect(adopted?.runningVersion).toBe(EXPECTED_DAEMON_VERSION);
+			expect(adopted?.bundleMismatch).toBe(true);
+			expect(adopted?.updatePending).toBe(true);
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
+
+	test("marks same-version same-path daemon updatePending when only bundleId changes", async () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-samepath-bundle-drift-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('expected-bundle');");
+		const expected = readDaemonRuntimeIdentity(scriptPath, process.execPath);
+		expect(expected?.bundleId).toBeDefined();
+
+		const childPid = spawnIdleChild();
+		const orgId = "org-samepath-bundle-drift";
+		const fake = await startFakeDaemon({
+			respondWithVersion: EXPECTED_DAEMON_VERSION,
+			daemonPid: childPid,
+			daemonExecPath: expected?.execPath,
+			daemonScriptPath: expected?.scriptPath,
+			daemonBundleId: "stale-in-place-bundle-hash",
+		});
+		try {
+			writePtyDaemonManifest({
+				pid: childPid,
+				socketPath: fake.socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(sup, orgId)) as
+				| (AdoptedForTest & { bundleMismatch?: boolean })
+				| null;
+			expect(adopted).not.toBeNull();
+			expect(adopted?.runningVersion).toBe(EXPECTED_DAEMON_VERSION);
+			expect(adopted?.bundleMismatch).toBe(true);
+			expect(adopted?.updatePending).toBe(true);
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
+
+	test("keeps updatePending false when version and runtime bundle identity both match", async () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-bundle-match-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('matching-bundle');");
+		const expected = readDaemonRuntimeIdentity(scriptPath, process.execPath);
+		expect(expected?.bundleId).toBeDefined();
+
+		const childPid = spawnIdleChild();
+		const orgId = "org-bundle-match";
+		const fake = await startFakeDaemon({
+			respondWithVersion: EXPECTED_DAEMON_VERSION,
+			daemonPid: childPid,
+			daemonExecPath: expected?.execPath,
+			daemonScriptPath: expected?.scriptPath,
+			daemonBundleId: expected?.bundleId,
+		});
+		try {
+			writePtyDaemonManifest({
+				pid: childPid,
+				socketPath: fake.socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(sup, orgId)) as
+				| (AdoptedForTest & { bundleMismatch?: boolean })
+				| null;
+			expect(adopted).not.toBeNull();
+			expect(adopted?.updatePending).toBe(false);
+			expect(adopted?.bundleMismatch).toBeUndefined();
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
+
+	test("marks same-version identity-less daemon updatePending when expected runtime identity exists", async () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-legacy-identityless-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('expected-bundle');");
+
+		const childPid = spawnIdleChild();
+		const orgId = "org-legacy-identityless";
+		const fake = await startFakeDaemon({
+			respondWithVersion: EXPECTED_DAEMON_VERSION,
+			daemonPid: childPid,
+		});
+		try {
+			writePtyDaemonManifest({
+				pid: childPid,
+				socketPath: fake.socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(sup, orgId)) as
+				| (AdoptedForTest & { bundleMismatch?: boolean })
+				| null;
+			expect(adopted).not.toBeNull();
+			expect(adopted?.runningVersion).toBe(EXPECTED_DAEMON_VERSION);
+			expect(adopted?.bundleMismatch).toBe(true);
+			expect(adopted?.updatePending).toBe(true);
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
+
+	test("keeps updatePending false when probe fails even if expected runtime identity exists", async () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-probe-fail-identity-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('expected-bundle');");
+
+		const childPid = spawnIdleChild();
+		const orgId = "org-probe-fail-identity";
+		const fake = await startFakeDaemon({ silent: true });
+		try {
+			writePtyDaemonManifest({
+				pid: childPid,
+				socketPath: fake.socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(sup, orgId)) as
+				| (AdoptedForTest & { bundleMismatch?: boolean })
+				| null;
+			expect(adopted).not.toBeNull();
+			expect(adopted?.runningVersion).toBe("unknown");
+			expect(adopted?.updatePending).toBe(false);
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	}, 15_000);
 });
 
 describe("DaemonSupervisor daemon health", () => {
@@ -692,6 +912,109 @@ describe("DaemonSupervisor daemon health", () => {
 			await fake.close();
 		}
 	});
+
+	test("delayed reachability probe uses adoption-time manifest for identity-less daemons", async () => {
+		const tmpHome = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-late-manifest-"),
+		);
+		const prevHome = process.env.SUPERSET_HOME_DIR;
+		process.env.SUPERSET_HOME_DIR = tmpHome;
+
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-late-manifest-bundle-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('expected-bundle');");
+		const expected = readDaemonRuntimeIdentity(scriptPath, process.execPath);
+		expect(expected?.bundleId).toBeDefined();
+
+		let answerProbe = false;
+		const server = net.createServer((sock) => {
+			const decoder = new FrameDecoder();
+			sock.on("data", (chunk: Buffer) => {
+				decoder.push(chunk);
+				for (const decoded of decoder.drain()) {
+					const msg = decoded.message as ClientMessage;
+					if (msg.type === "hello" && answerProbe) {
+						sock.write(
+							encodeFrame({
+								type: "hello-ack",
+								protocol: 2,
+								daemonVersion: EXPECTED_DAEMON_VERSION,
+								daemonPid: process.pid,
+							}),
+						);
+					}
+				}
+			});
+			sock.on("error", () => {});
+		});
+		const socketPath = ptyDaemonSocketPath("org-late-matching-manifest");
+		await new Promise<void>((resolve) => server.listen(socketPath, resolve));
+
+		try {
+			writePtyDaemonManifest({
+				pid: process.pid,
+				socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: "org-late-matching-manifest",
+				execPath: expected?.execPath,
+				scriptPath: expected?.scriptPath,
+				bundleId: expected?.bundleId,
+			});
+
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(
+				sup,
+				"org-late-matching-manifest",
+			)) as AdoptedForTest | null;
+			expect(adopted?.runningVersion).toBe("unknown");
+			expect(adopted?.updatePending).toBe(false);
+			(sup as unknown as { instances: Map<string, unknown> }).instances.set(
+				"org-late-matching-manifest",
+				adopted,
+			);
+
+			const kickoffMock = mock(() => {});
+			(
+				sup as unknown as { kickoffAutoUpdate: typeof kickoffMock }
+			).kickoffAutoUpdate = kickoffMock;
+
+			// Now the daemon answers without identity fields; the stored
+			// adoption-time manifest proves matching bundle identity.
+			answerProbe = true;
+			await invokeRefreshReachability(
+				sup,
+				"org-late-matching-manifest",
+				process.pid,
+			);
+			expect(sup.getUpdateStatus("org-late-matching-manifest")?.running).toBe(
+				EXPECTED_DAEMON_VERSION,
+			);
+			expect(sup.getUpdateStatus("org-late-matching-manifest")?.pending).toBe(
+				false,
+			);
+			expect(kickoffMock).not.toHaveBeenCalled();
+		} finally {
+			if (prevHome !== undefined) {
+				process.env.SUPERSET_HOME_DIR = prevHome;
+			} else {
+				delete process.env.SUPERSET_HOME_DIR;
+			}
+			await new Promise<void>((resolve) => server.close(() => resolve()));
+			try {
+				fs.unlinkSync(socketPath);
+			} catch {
+				// best-effort
+			}
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+			fs.rmSync(tmpHome, { recursive: true, force: true });
+		}
+	}, 15_000);
 });
 
 describe("DaemonSupervisor.getUpdateStatus", () => {
@@ -967,6 +1290,100 @@ describe("DaemonSupervisor.update concurrency guard", () => {
 		expect(runUpdateMock).toHaveBeenCalledTimes(2);
 		await Promise.all([a, b]);
 	});
+	test("runUpdate persists observed successor identity (not expectedRuntime) and keeps updatePending when successor lacks identity", async () => {
+		const tmpHome = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-runupdate-legacy-"),
+		);
+		const prevHome = process.env.SUPERSET_HOME_DIR;
+		process.env.SUPERSET_HOME_DIR = tmpHome;
+
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-runupdate-bundle-"),
+		);
+		const scriptPath = path.join(tmpDir, "pty-daemon.js");
+		fs.writeFileSync(scriptPath, "console.log('expected-bundle');");
+
+		const predecessorPid = spawnIdleChild();
+		const successorPid = spawnIdleChild();
+		const orgId = "org-runupdate-legacy-successor";
+		const socketPath = ptyDaemonSocketPath(orgId);
+		let successorMode = false;
+
+		const server = net.createServer((sock) => {
+			const decoder = new FrameDecoder();
+			sock.on("data", (chunk: Buffer) => {
+				decoder.push(chunk);
+				for (const decoded of decoder.drain()) {
+					const msg = decoded.message as ClientMessage;
+					if (msg.type === "hello") {
+						sock.write(
+							encodeFrame({
+								type: "hello-ack",
+								protocol: 2,
+								daemonVersion: EXPECTED_DAEMON_VERSION,
+								daemonPid: successorMode ? successorPid : predecessorPid,
+							}),
+						);
+					} else if (msg.type === "prepare-upgrade") {
+						successorMode = true;
+						killIfAlive(predecessorPid);
+						sock.write(
+							encodeFrame({
+								type: "upgrade-prepared",
+								result: { ok: true, successorPid },
+							}),
+						);
+					}
+				}
+			});
+			sock.on("error", () => {});
+		});
+		await new Promise<void>((resolve) => server.listen(socketPath, resolve));
+
+		try {
+			const sup = new DaemonSupervisor({
+				scriptPath,
+				autoUpdate: false,
+			});
+			seedPredecessor(sup, orgId, predecessorPid, socketPath);
+			writePtyDaemonManifest({
+				pid: predecessorPid,
+				socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+
+			const result = await sup.update(orgId);
+			expect(result).toEqual({ ok: true, successorPid });
+
+			// Successor did not report identity, so manifest must NOT fabricate
+			// expectedRuntime fields and status must stay pending.
+			const manifest = readPtyDaemonManifest(orgId);
+			expect(manifest?.pid).toBe(successorPid);
+			expect(manifest?.execPath).toBeUndefined();
+			expect(manifest?.scriptPath).toBeUndefined();
+			expect(manifest?.bundleId).toBeUndefined();
+			expect(sup.getUpdateStatus(orgId)?.pending).toBe(true);
+			await sup.stop(orgId);
+		} finally {
+			if (prevHome !== undefined) {
+				process.env.SUPERSET_HOME_DIR = prevHome;
+			} else {
+				delete process.env.SUPERSET_HOME_DIR;
+			}
+			await new Promise<void>((resolve) => server.close(() => resolve()));
+			try {
+				fs.unlinkSync(socketPath);
+			} catch {
+				// best-effort
+			}
+			killIfAlive(predecessorPid);
+			killIfAlive(successorPid);
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+			fs.rmSync(tmpHome, { recursive: true, force: true });
+		}
+	});
 });
 
 describe("DaemonSupervisor.update failure mode", () => {
@@ -1231,12 +1648,13 @@ function seedPredecessor(
 	sup: DaemonSupervisor,
 	organizationId: string,
 	pid: number,
+	socketPath = "/tmp/seeded.sock",
 ): void {
 	(sup as unknown as { instances: Map<string, unknown> }).instances.set(
 		organizationId,
 		{
 			pid,
-			socketPath: "/tmp/seeded.sock",
+			socketPath,
 			startedAt: Date.now(),
 			runningVersion: "0.1.0",
 			expectedVersion: "0.2.0",

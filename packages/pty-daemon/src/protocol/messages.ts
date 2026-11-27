@@ -44,6 +44,15 @@ export interface HelloAckMessage {
 	 */
 	daemonPid?: number;
 	/**
+	 * Executable, entrypoint script, and bundle fingerprint captured when this
+	 * daemon booted. Lets supervisors detect app updates or moved/deleted
+	 * bundles (e.g. macOS Squirrel ShipIt) even when `daemonVersion` didn't
+	 * bump.
+	 */
+	daemonExecPath?: string;
+	daemonScriptPath?: string;
+	daemonBundleId?: string;
+	/**
 	 * macOS only: whether the daemon's Mach bootstrap can reach `com.apple.trustd`
 	 * (Security-framework TLS trust evaluation). False means terminals it spawns
 	 * hit `gh: x509: OSStatus -26276`; the supervisor respawns such a daemon from
@@ -116,6 +125,13 @@ export interface UnsubscribeMessage {
  */
 export interface PrepareUpgradeMessage {
 	type: "prepare-upgrade";
+	/**
+	 * Optional successor executable + script paths supplied by the supervisor
+	 * when the running daemon's own startup path moved or was deleted (e.g.
+	 * macOS Squirrel ShipIt or relocated `.app` bundles).
+	 */
+	execPath?: string;
+	scriptPath?: string;
 }
 
 // ---------- Daemon -> Client ----------

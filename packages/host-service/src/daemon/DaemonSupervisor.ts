@@ -20,8 +20,11 @@ import {
 } from "@superset/pty-daemon/process-tree";
 import {
 	CURRENT_PROTOCOL_VERSION,
+	type DaemonRuntimeIdentity,
 	encodeFrame,
 	FrameDecoder,
+	readDaemonRuntimeIdentity,
+	resolveCanonicalPath,
 	type ServerMessage,
 	type SessionInfo,
 } from "@superset/pty-daemon/protocol";
@@ -64,8 +67,12 @@ interface DaemonInstance {
 	runningVersion: string;
 	/** Bundled-binary version we expect — i.e. EXPECTED_DAEMON_VERSION at spawn time. */
 	expectedVersion: string;
-	/** True when running < expected. Probe failure does NOT set this. */
+	/** True when running < expected or the running daemon belongs to a different/replaced bundle. */
 	updatePending: boolean;
+	/** True when the daemon's runtime path/bundle fingerprint differs from the current bundle. */
+	bundleMismatch?: boolean;
+	/** Manifest read during adoption, retained for delayed reachability probes. */
+	adoptedManifest?: PtyDaemonManifest;
 	/** Last failed background update attempt for this still-running daemon. */
 	autoUpdateFailure?: DaemonAutoUpdateFailure;
 	/**
@@ -280,6 +287,10 @@ export class DaemonSupervisor {
 		return this.hostTrustdHealthyCache;
 	}
 
+	private expectedRuntime(): DaemonRuntimeIdentity | undefined {
+		return readDaemonRuntimeIdentity(this.opts.scriptPath, process.execPath);
+	}
+
 	/**
 	 * Terminate an adopted daemon so ensure() can respawn a fresh one. An
 	 * adopted daemon has no child handle or crash-respawn hook attached yet, so
@@ -406,13 +417,21 @@ export class DaemonSupervisor {
 			this.startAdoptedLivenessCheck(organizationId, instance.pid);
 		};
 
+		const expectedRuntime = this.expectedRuntime();
 		const client = new DaemonClient({ socketPath: instance.socketPath });
 		let result:
 			| { ok: true; successorPid: number }
 			| { ok: false; reason: string };
 		try {
 			await client.connect();
-			result = await client.prepareUpgrade();
+			result = await client.prepareUpgrade(
+				expectedRuntime
+					? {
+							execPath: expectedRuntime.execPath,
+							scriptPath: expectedRuntime.scriptPath,
+						}
+					: undefined,
+			);
 		} catch (err) {
 			restoreOnFailure();
 			return {
@@ -455,11 +474,13 @@ export class DaemonSupervisor {
 			}
 		}
 
-		const probedVersion = await probeDaemonVersionWithRetry(
+		const successorProbe = await probeDaemonHelloWithRetry(
 			instance.socketPath,
 			HANDOFF_PROBE_TOTAL_TIMEOUT_MS,
 		);
+		const probedVersion = successorProbe?.daemonVersion ?? null;
 		const runningVersion = probedVersion ?? "unknown";
+		const bundleMismatch = isBundleMismatch(successorProbe, expectedRuntime);
 
 		// Single capture so the in-memory instance and the manifest agree.
 		const successorStartedAt = Date.now();
@@ -469,8 +490,10 @@ export class DaemonSupervisor {
 			startedAt: successorStartedAt,
 			runningVersion,
 			expectedVersion: EXPECTED_DAEMON_VERSION,
-			updatePending: isVersionUpdatePending(probedVersion),
+			updatePending: isVersionUpdatePending(probedVersion) || bundleMismatch,
+			...(bundleMismatch ? { bundleMismatch: true } : {}),
 			unreachableSince: probedVersion ? null : Date.now(),
+			trustdHealthy: successorProbe?.trustdHealthy,
 		};
 		this.instances.set(organizationId, successorInstance);
 		this.stopping.delete(organizationId);
@@ -479,7 +502,9 @@ export class DaemonSupervisor {
 		// Always write, even when the predecessor had no manifest (it was
 		// adopted from its socket). Skipping it left the successor invisible to
 		// the next boot's `tryAdopt`, forcing the socket-adopt path whose
-		// probe failure orphans a live daemon (GH #6822).
+		// probe failure orphans a live daemon (GH #6822). Record only the
+		// runtime identity the successor actually reported so a legacy
+		// predecessor that ignored target paths cannot poison the manifest.
 		writePtyDaemonManifest({
 			pid: result.successorPid,
 			socketPath: instance.socketPath,
@@ -488,6 +513,15 @@ export class DaemonSupervisor {
 			],
 			startedAt: successorStartedAt,
 			organizationId,
+			...(successorProbe?.daemonExecPath
+				? { execPath: successorProbe.daemonExecPath }
+				: {}),
+			...(successorProbe?.daemonScriptPath
+				? { scriptPath: successorProbe.daemonScriptPath }
+				: {}),
+			...(successorProbe?.daemonBundleId
+				? { bundleId: successorProbe.daemonBundleId }
+				: {}),
 		});
 
 		// Successor wasn't spawned as our child — start liveness polling.
@@ -690,8 +724,16 @@ export class DaemonSupervisor {
 		}
 		current.unreachableSince = null;
 		if (current.runningVersion === "unknown") {
+			const expectedRuntime = this.expectedRuntime();
+			const bundleMismatch = isBundleMismatch(
+				probe,
+				expectedRuntime,
+				current.adoptedManifest,
+			);
 			current.runningVersion = probe.daemonVersion;
-			current.updatePending = isVersionUpdatePending(probe.daemonVersion);
+			current.bundleMismatch = bundleMismatch;
+			current.updatePending =
+				isVersionUpdatePending(probe.daemonVersion) || bundleMismatch;
 			// The adopt path couldn't see the version, so it skipped these —
 			// this late read is the same "adopted a stale daemon" discovery.
 			this.maybeFireUpdatePending(organizationId, current);
@@ -932,7 +974,7 @@ export class DaemonSupervisor {
 		if (adopted) {
 			this.instances.set(organizationId, adopted);
 			console.log(
-				`[pty-daemon:${organizationId}] adopted existing daemon pid=${adopted.pid} runningVersion=${adopted.runningVersion} updatePending=${adopted.updatePending}`,
+				`[pty-daemon:${organizationId}] adopted existing daemon pid=${adopted.pid} runningVersion=${adopted.runningVersion} updatePending=${adopted.updatePending}${adopted.bundleMismatch ? " (bundle mismatch)" : ""}`,
 			);
 			logEvent("pty_daemon_adopt", {
 				organizationId,
@@ -941,11 +983,13 @@ export class DaemonSupervisor {
 				runningVersion: adopted.runningVersion,
 				expectedVersion: adopted.expectedVersion,
 				updatePending: adopted.updatePending,
+				...(adopted.bundleMismatch ? { bundleMismatch: true } : {}),
 			});
 			this.maybeFireUpdatePending(organizationId, adopted);
 			this.startAdoptedLivenessCheck(organizationId, adopted.pid);
 			// Auto-update opportunistically: if the adopted daemon is older
-			// than the bundled binary, try a smooth handoff in the background.
+			// than the bundled binary (or came from a replaced/relocated bundle),
+			// try a smooth handoff in the background.
 			// This path never force-restarts; if handoff fails, the desktop UI
 			// exposes the explicit destructive fallback.
 			if (adopted.updatePending && this.opts.autoUpdate !== false) {
@@ -977,13 +1021,14 @@ export class DaemonSupervisor {
 			this.lastUpdatePendingPair.delete(organizationId);
 			return;
 		}
-		const pair = `${instance.runningVersion}:${instance.expectedVersion}`;
+		const pair = `${instance.runningVersion}:${instance.expectedVersion}:${instance.bundleMismatch ? "bundle" : "semver"}`;
 		if (this.lastUpdatePendingPair.get(organizationId) === pair) return;
 		this.lastUpdatePendingPair.set(organizationId, pair);
 		logEvent("pty_daemon_update_pending", {
 			organizationId,
 			runningVersion: instance.runningVersion,
 			expectedVersion: instance.expectedVersion,
+			...(instance.bundleMismatch ? { bundleMismatch: true } : {}),
 		});
 	}
 
@@ -1061,13 +1106,18 @@ export class DaemonSupervisor {
 			);
 		}
 		const runningVersion = probe?.daemonVersion ?? "unknown";
+		const expectedRuntime = this.expectedRuntime();
+		const bundleMismatch = isBundleMismatch(probe, expectedRuntime, manifest);
 		return {
 			pid: manifest.pid,
 			socketPath: manifest.socketPath,
 			startedAt: manifest.startedAt,
 			runningVersion,
 			expectedVersion: EXPECTED_DAEMON_VERSION,
-			updatePending: isVersionUpdatePending(probe?.daemonVersion ?? null),
+			updatePending:
+				isVersionUpdatePending(probe?.daemonVersion ?? null) || bundleMismatch,
+			...(bundleMismatch ? { bundleMismatch: true } : {}),
+			adoptedManifest: manifest,
 			// Start the clock here when it didn't answer: the liveness poll
 			// clears it the moment it does.
 			unreachableSince: probe ? null : Date.now(),
@@ -1161,12 +1211,17 @@ export class DaemonSupervisor {
 		}
 
 		const startedAt = Date.now();
+		const expectedRuntime = this.expectedRuntime();
+		const bundleMismatch = isBundleMismatch(probe, expectedRuntime);
 		writePtyDaemonManifest({
 			pid: resolvedPid,
 			socketPath,
 			protocolVersions: [CURRENT_PROTOCOL_VERSION],
 			startedAt,
 			organizationId,
+			...(probe.daemonExecPath ? { execPath: probe.daemonExecPath } : {}),
+			...(probe.daemonScriptPath ? { scriptPath: probe.daemonScriptPath } : {}),
+			...(probe.daemonBundleId ? { bundleId: probe.daemonBundleId } : {}),
 		});
 
 		logEvent("pty_daemon_socket_adopt_manifest_recovered", {
@@ -1183,7 +1238,9 @@ export class DaemonSupervisor {
 			startedAt,
 			runningVersion: probe.daemonVersion,
 			expectedVersion: EXPECTED_DAEMON_VERSION,
-			updatePending: isVersionUpdatePending(probe.daemonVersion),
+			updatePending:
+				isVersionUpdatePending(probe.daemonVersion) || bundleMismatch,
+			...(bundleMismatch ? { bundleMismatch: true } : {}),
 			unreachableSince: null,
 			trustdHealthy: probe.trustdHealthy,
 		};
@@ -1386,12 +1443,22 @@ export class DaemonSupervisor {
 		});
 
 		const startedAt = Date.now();
+		const expectedRuntime = this.expectedRuntime();
 		const manifest: PtyDaemonManifest = {
 			pid: childPid,
 			socketPath,
 			protocolVersions: [CURRENT_PROTOCOL_VERSION],
 			startedAt,
 			organizationId,
+			...(expectedRuntime
+				? {
+						execPath: expectedRuntime.execPath,
+						scriptPath: expectedRuntime.scriptPath,
+						...(expectedRuntime.bundleId
+							? { bundleId: expectedRuntime.bundleId }
+							: {}),
+					}
+				: {}),
 		};
 		writePtyDaemonManifest(manifest);
 
@@ -1454,6 +1521,78 @@ function isVersionUpdatePending(
 		probedVersion != null &&
 		!semver.satisfies(probedVersion, `>=${EXPECTED_DAEMON_VERSION}`)
 	);
+}
+
+/**
+ * Detect when a running daemon came from a different or replaced bundle (e.g.,
+ * macOS Squirrel/ShipIt app updates or relocated bundles) even if its
+ * `daemonVersion` stayed unchanged.
+ *
+ * Probe failures (`probe == null`) or supervisors without an expected runtime
+ * identity on disk return `false` ("unknown" is never pending). Once a live
+ * probe succeeds and `expected` exists, an identity-less probe (legacy daemon)
+ * also counts as a mismatch unless the manifest already proves matching
+ * identity.
+ */
+function isBundleMismatch(
+	probe: DaemonProbeResult | null | undefined,
+	expected: DaemonRuntimeIdentity | undefined,
+	manifest?: PtyDaemonManifest | null,
+): boolean {
+	// Probe failure ≠ stale: stay false until a live probe succeeds.
+	if (!expected || !probe) return false;
+	const hasProbeIdentity =
+		probe.daemonBundleId !== undefined ||
+		probe.daemonScriptPath !== undefined ||
+		probe.daemonExecPath !== undefined;
+	if (hasProbeIdentity) {
+		if (
+			probe.daemonBundleId !== undefined &&
+			expected.bundleId !== undefined &&
+			probe.daemonBundleId !== expected.bundleId
+		) {
+			return true;
+		}
+		if (
+			probe.daemonScriptPath !== undefined &&
+			resolveCanonicalPath(probe.daemonScriptPath) !== expected.scriptPath
+		) {
+			return true;
+		}
+		if (
+			probe.daemonExecPath !== undefined &&
+			resolveCanonicalPath(probe.daemonExecPath) !== expected.execPath
+		) {
+			return true;
+		}
+		return false;
+	}
+	if (manifest) {
+		if (
+			manifest.bundleId !== undefined &&
+			expected.bundleId !== undefined &&
+			manifest.bundleId !== expected.bundleId
+		) {
+			return true;
+		}
+		if (
+			manifest.scriptPath !== undefined &&
+			resolveCanonicalPath(manifest.scriptPath) !== expected.scriptPath
+		) {
+			return true;
+		}
+		if (
+			manifest.execPath !== undefined &&
+			resolveCanonicalPath(manifest.execPath) !== expected.execPath
+		) {
+			return true;
+		}
+	}
+	const manifestProvesIdentity =
+		manifest?.bundleId !== undefined ||
+		manifest?.scriptPath !== undefined ||
+		manifest?.execPath !== undefined;
+	return !manifestProvesIdentity;
 }
 
 async function waitForSocket(
@@ -1593,16 +1732,6 @@ export async function probeDaemonHelloWithRetry(
 		await new Promise((r) => setTimeout(r, 50));
 	}
 	return null;
-}
-
-async function probeDaemonVersionWithRetry(
-	socketPath: string,
-	totalTimeoutMs: number,
-): Promise<string | null> {
-	return (
-		(await probeDaemonHelloWithRetry(socketPath, totalTimeoutMs))
-			?.daemonVersion ?? null
-	);
 }
 
 function terminatePidOnly(pid: number, signal: NodeJS.Signals): void {

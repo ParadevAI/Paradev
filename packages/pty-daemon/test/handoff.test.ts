@@ -339,3 +339,113 @@ test("prepare-upgrade hands off live sessions to a successor binary", async () =
 		}
 	}
 });
+
+test("prepare-upgrade hands off to supervisor-supplied target even if predecessor script was deleted", async () => {
+	const tmpDir = fs.mkdtempSync(
+		path.join(os.tmpdir(), "pty-daemon-shipit-handoff-"),
+	);
+	const oldScript = path.join(tmpDir, "old-shipit-daemon.mjs");
+	const newScript = path.join(tmpDir, "new-app-daemon.mjs");
+	const deletedSock = path.join(
+		os.tmpdir(),
+		`pty-daemon-shipit-${process.pid}.sock`,
+	);
+
+	// Copy src/main.ts launcher wrapper into tmpDir so each copy has a distinct
+	// scriptPath and we can unlink oldScript while daemonOld is still running.
+	const wrapper = `import ${JSON.stringify(DAEMON_SCRIPT)};\n`;
+	fs.writeFileSync(oldScript, wrapper);
+	fs.writeFileSync(newScript, wrapper);
+
+	let daemonOld: childProcess.ChildProcess | null = null;
+	let c1: Awaited<ReturnType<typeof connectAndHello>> | null = null;
+	let c2: Awaited<ReturnType<typeof connectAndHello>> | null = null;
+	let successorPid: number | undefined;
+
+	try {
+		unlinkSafe(deletedSock);
+		daemonOld = childProcess.spawn(
+			process.execPath,
+			[...process.execArgv, oldScript, `--socket=${deletedSock}`],
+			{ stdio: ["ignore", "inherit", "inherit"] },
+		);
+		await waitForSocket(deletedSock);
+
+		c1 = await connectAndHello(deletedSock);
+		c1.send({
+			type: "open",
+			id: "shipit-session",
+			meta: { shell: "/bin/sh", argv: [], cols: 80, rows: 24 },
+		});
+		const opened = await c1.waitFor(
+			(m) => m.type === "open-ok" && m.id === "shipit-session",
+		);
+		assert.equal(opened.type, "open-ok");
+
+		// Simulate Squirrel deleting the old bundle directory after launch.
+		fs.unlinkSync(oldScript);
+
+		// Missing target path fails cleanly rather than crashing.
+		c1.send({
+			type: "prepare-upgrade",
+			execPath: process.execPath,
+			scriptPath: path.join(tmpDir, "missing.mjs"),
+		});
+		const rejected = await c1.waitFor((m) => m.type === "upgrade-prepared");
+		assert.equal(rejected.type, "upgrade-prepared");
+		if (rejected.type === "upgrade-prepared") {
+			assert.equal(rejected.result.ok, false);
+		}
+
+		c1.send({
+			type: "prepare-upgrade",
+			execPath: process.execPath,
+			scriptPath: newScript,
+		});
+		const reply = await c1.waitFor(
+			(m) => m.type === "upgrade-prepared" && m.result.ok === true,
+			10_000,
+		);
+		assert.equal(reply.type, "upgrade-prepared");
+		if (reply.type !== "upgrade-prepared" || !reply.result.ok) {
+			throw new Error(`unexpected reply: ${JSON.stringify(reply)}`);
+		}
+		successorPid = reply.result.successorPid;
+		await new Promise<void>((resolve) => {
+			if (c1?.closed()) return resolve();
+			c1?.onClose(resolve);
+		});
+
+		const reconnectStart = Date.now();
+		while (Date.now() - reconnectStart < 5_000) {
+			try {
+				c2 = await connectAndHello(deletedSock);
+				break;
+			} catch {
+				await new Promise((r) => setTimeout(r, 50));
+			}
+		}
+		assert.ok(c2, "should have reconnected to successor within 5s");
+		c2.send({ type: "list" });
+		const listed = await c2.waitFor((m) => m.type === "list-reply");
+		assert.equal(listed.type, "list-reply");
+		if (listed.type === "list-reply") {
+			assert.equal(
+				listed.sessions.some((s) => s.id === "shipit-session" && s.alive),
+				true,
+			);
+		}
+		c2.send({ type: "close", id: "shipit-session", signal: "SIGKILL" });
+		await c2.waitFor((m) => m.type === "closed" && m.id === "shipit-session");
+	} finally {
+		await Promise.all([c1?.close(), c2?.close()]);
+		if (daemonOld && daemonOld.exitCode === null) daemonOld.kill("SIGKILL");
+		if (successorPid) {
+			try {
+				process.kill(successorPid, "SIGTERM");
+			} catch {}
+		}
+		unlinkSafe(deletedSock);
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	}
+});
