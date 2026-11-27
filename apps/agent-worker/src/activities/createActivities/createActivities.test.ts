@@ -33,6 +33,7 @@ const withBox: TurnCredentials = {
 function memoryStore() {
 	const appends: AppendInput[] = [];
 	const rows: TranscriptRow[] = [];
+	const reads: number[] = [];
 	const store: SessionStore = {
 		async append(input) {
 			if (appends.some((a) => a.stepKey === input.stepKey)) {
@@ -44,14 +45,15 @@ function memoryStore() {
 			}
 			return { duplicate: false };
 		},
-		async transcript() {
-			return [...rows];
+		async transcript(afterSeq = 0) {
+			reads.push(afterSeq);
+			return rows.filter((row) => row.seq > afterSeq);
 		},
 		async transcriptStep(stepKey) {
 			return rows.filter((row) => row.stepKey === stepKey);
 		},
 	};
-	return { store, appends, rows };
+	return { store, appends, rows, reads };
 }
 
 let root: string;
@@ -439,6 +441,22 @@ describe("settleTurn", () => {
 			steersConsumed: 0,
 		});
 		expect(posted).toEqual([]);
+	});
+
+	test("reads only the rows of its own turn", async () => {
+		const { activities, settled, memory } = setup();
+		await runOne(activities, "first", "t1");
+		await runOne(activities, "second", "t2");
+		memory.reads.length = 0;
+		await activities.settleTurn({
+			...turn,
+			turnId: "t2",
+			outcome: "completed",
+			steersConsumed: 0,
+		});
+		expect(settled[0]).toMatchObject({ reply: "reply to: second" });
+		const start = memory.rows.find((row) => row.stepKey === "t2/start");
+		expect(memory.reads).toEqual([start?.seq ?? -1]);
 	});
 
 	test("counts only this turn and closes calls a stop left open", async () => {

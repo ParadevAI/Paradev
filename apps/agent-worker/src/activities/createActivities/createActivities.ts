@@ -263,14 +263,14 @@ export function createActivities(deps: ActivityDeps) {
 			let headersAt = now();
 
 			const runKey = `${input.turnId}/run/${input.steersFrom}`;
-			let rows = await store.transcript();
+			const rows = await store.transcript();
 			if (!rows.some((row) => row.stepKey === runKey)) {
 				await store.append({
 					stepKey: runKey,
 					turnId: input.turnId,
 					transcript: [{ type: RUN_START, turnId: input.turnId }],
 				});
-				rows = await store.transcript();
+				rows.push(...(await store.transcript(rows.at(-1)?.seq)));
 			}
 			const resumeId = await restoreSessionFile(agentDir, rows);
 			const tail = new SessionFileTail(agentDir);
@@ -375,7 +375,7 @@ export function createActivities(deps: ActivityDeps) {
 				await syncFile();
 				if (session.lastStopReason === "error") {
 					const message =
-						lastError(await tailEntries(store, input.turnId)) ??
+						lastError((await turnRows(store, input.turnId)).entries) ??
 						"The model request failed.";
 					if (BAD_REQUEST.test(message)) {
 						throw ApplicationFailure.nonRetryable(message, "PdevTurnError");
@@ -411,11 +411,11 @@ export function createActivities(deps: ActivityDeps) {
 				if (isPermanent(error)) return null;
 				throw error;
 			});
-			let rows: TranscriptRow[] | null = null;
+			let turn: TurnRows | null = null;
 			let settled: Awaited<ReturnType<TurnSettler["settle"]>>;
 			if (running) {
-				rows = await running.store.transcript();
-				const summary = summarizeTurn(entriesOfTurn(rows, input.turnId));
+				turn = await turnRows(running.store, input.turnId);
+				const summary = summarizeTurn(turn.entries);
 				await postReply(
 					{
 						...input,
@@ -438,8 +438,8 @@ export function createActivities(deps: ActivityDeps) {
 				input.sessionId,
 				async () => access.writeTicket,
 			);
-			rows ??= await store.transcript();
-			const summary = summarizeTurn(entriesOfTurn(rows, input.turnId));
+			turn ??= await turnRows(store, input.turnId);
+			const summary = summarizeTurn(turn.entries);
 			const open: AcpUpdate[] = summary.unfinishedCalls.map((call) =>
 				acp.toolStopped(call.id),
 			);
@@ -449,7 +449,6 @@ export function createActivities(deps: ActivityDeps) {
 					: input.outcome === "interrupted"
 						? "cancelled"
 						: "error";
-			const started = turnStartOf(rows, input.turnId);
 			await store.append({
 				stepKey: `${input.turnId}/end`,
 				turnId: input.turnId,
@@ -457,7 +456,7 @@ export function createActivities(deps: ActivityDeps) {
 				turnEnd: {
 					id: input.turnId,
 					status: input.outcome,
-					startedAtMs: started ?? now(),
+					startedAtMs: turn.startedAtMs ?? now(),
 					completedAtMs: now(),
 					...(input.errorMessage
 						? { error: { message: input.errorMessage } }
@@ -572,32 +571,25 @@ Answer questions about your work from list_work and read_task. Keep notes with r
 	return credentials.room ? IN_ROOM : "";
 }
 
-function turnStartIndex(rows: TranscriptRow[], turnId: string): number {
-	return rows.findIndex(
-		(row) =>
-			row.stepKey === `${turnId}/start` &&
-			(row.entry as { type?: string }).type === TURN_START,
-	);
+interface TurnRows {
+	startedAtMs: number | null;
+	/** pdev's entries written after this turn began. */
+	entries: PdevEntry[];
 }
 
-function turnStartOf(rows: TranscriptRow[], turnId: string): number | null {
-	const index = turnStartIndex(rows, turnId);
-	const at =
-		index >= 0 ? (rows[index]?.entry as { at?: number }).at : undefined;
-	return typeof at === "number" ? at : null;
-}
-
-/** pdev's entries written after this turn began. */
-function entriesOfTurn(rows: TranscriptRow[], turnId: string): PdevEntry[] {
-	const start = turnStartIndex(rows, turnId);
-	return start < 0 ? [] : pdevEntriesOf(rows.slice(start + 1));
-}
-
-async function tailEntries(
+async function turnRows(
 	store: SessionStore,
 	turnId: string,
-): Promise<PdevEntry[]> {
-	return entriesOfTurn(await store.transcript(), turnId);
+): Promise<TurnRows> {
+	const start = (await store.transcriptStep(`${turnId}/start`)).find(
+		(row) => (row.entry as { type?: string }).type === TURN_START,
+	);
+	if (!start) return { startedAtMs: null, entries: [] };
+	const at = (start.entry as { at?: unknown }).at;
+	return {
+		startedAtMs: typeof at === "number" ? at : null,
+		entries: pdevEntriesOf(await store.transcript(start.seq)),
+	};
 }
 
 interface PiMessage {
