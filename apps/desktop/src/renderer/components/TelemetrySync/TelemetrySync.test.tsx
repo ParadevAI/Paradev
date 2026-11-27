@@ -55,6 +55,6 @@ describe("TelemetrySync", () => {
 			pushChange?.({ enabled: false, doNotTrack: false });
 		});
 
-		expect(isTelemetryEnabled()).toBe(false);
+		await waitFor(() => expect(isTelemetryEnabled()).toBe(false));
 	});
 });
