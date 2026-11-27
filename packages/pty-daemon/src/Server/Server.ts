@@ -30,12 +30,15 @@ import {
 	serializeSessions,
 	writeSnapshot,
 } from "../SessionStore/index.ts";
+import { probeTrustdHealthy } from "../trustd-probe.ts";
 
 export interface ServerOptions {
 	socketPath: string;
 	daemonVersion: string;
-	/** macOS trustd reachability, probed once at daemon startup; see main.ts. */
-	trustdHealthy?: boolean;
+	/** Override for the macOS trustd probe. Tests inject a fake here. */
+	probeTrustd?: () => Promise<boolean>;
+	/** How long a `refreshTrustd` hello waits for the probe before it acks. */
+	trustdRefreshTimeoutMs?: number;
 	bufferCap?: number;
 	outboundBufferCap?: number;
 	/** Pause producing PTYs when a subscriber buffers past this (flow control). */
@@ -73,6 +76,10 @@ const DEFAULT_OUTBOUND_PAUSE_THRESHOLD_BYTES = 1 * 1024 * 1024;
 // PTYs for everyone else.
 const DEFAULT_PAUSED_CONN_TIMEOUT_MS = 30_000;
 
+// Below the supervisor's 1.5 s hello attempt, so a slow probe can never make
+// adoption take this daemon for a dead one.
+const DEFAULT_TRUSTD_REFRESH_TIMEOUT_MS = 1_000;
+
 interface ConnState extends Conn {
 	socket: net.Socket;
 	decoder: FrameDecoder;
@@ -89,23 +96,29 @@ export class Server {
 	private readonly conns = new Set<ConnState>();
 	private readonly opts: ServerOptions;
 	/**
-	 * macOS trustd reachability, surfaced in the hello-ack. Mutable so the
-	 * probe can run AFTER the socket binds / handoff-ack is sent rather than
-	 * delaying either — see main.ts. Until set, hello-ack omits it and the
+	 * macOS trustd reachability from the last finished probe, surfaced in the
+	 * hello-ack. Until the first probe lands, hello-ack omits it and the
 	 * supervisor treats that as "unknown" (no respawn).
 	 */
 	private trustdHealthy: boolean | undefined;
+	private trustdProbe: Promise<boolean> | null = null;
 
 	constructor(opts: ServerOptions) {
 		this.opts = opts;
-		this.trustdHealthy = opts.trustdHealthy;
 		this.store = new SessionStore({ bufferCap: opts.bufferCap });
 		this.server = net.createServer((socket) => this.onConnection(socket));
 	}
 
-	/** Update the trustd-health value reported in subsequent hello-acks. */
-	setTrustdHealthy(healthy: boolean): void {
-		this.trustdHealthy = healthy;
+	/** Run the trustd probe, or join the one in flight, and keep its result. */
+	refreshTrustdHealthy(): Promise<boolean> {
+		this.trustdProbe ??= (this.opts.probeTrustd ?? probeTrustdHealthy)().then(
+			(healthy) => {
+				this.trustdHealthy = healthy;
+				this.trustdProbe = null;
+				return healthy;
+			},
+		);
+		return this.trustdProbe;
 	}
 
 	async listen(): Promise<void> {
@@ -463,14 +476,33 @@ export class Server {
 				return;
 			}
 			conn.negotiated = negotiated;
-			conn.send({
-				type: "hello-ack",
-				protocol: negotiated,
-				daemonVersion: this.opts.daemonVersion,
-				daemonPid: process.pid,
-				trustdHealthy: this.trustdHealthy,
-				supportsModeSnapshots: true,
-				supportsColorQueries: true,
+			const sendAck = (trustdHealthy: boolean | undefined) =>
+				conn.send({
+					type: "hello-ack",
+					protocol: negotiated,
+					daemonVersion: this.opts.daemonVersion,
+					daemonPid: process.pid,
+					trustdHealthy,
+					supportsModeSnapshots: true,
+					supportsColorQueries: true,
+				});
+			if (!msg.refreshTrustd) {
+				sendAck(this.trustdHealthy);
+				return;
+			}
+			let timer: NodeJS.Timeout | undefined;
+			void Promise.race([
+				this.refreshTrustdHealthy(),
+				new Promise<undefined>((resolve) => {
+					timer = setTimeout(
+						() => resolve(undefined),
+						this.opts.trustdRefreshTimeoutMs ??
+							DEFAULT_TRUSTD_REFRESH_TIMEOUT_MS,
+					);
+				}),
+			]).then((trustdHealthy) => {
+				clearTimeout(timer);
+				sendAck(trustdHealthy);
 			});
 			return;
 		}

@@ -21,7 +21,6 @@ import { drainPendingKills } from "./Pty/index.ts";
 import type { HandoffMessage } from "./protocol/index.ts";
 import { Server } from "./Server/index.ts";
 import { clearSnapshot, readSnapshot } from "./SessionStore/index.ts";
-import { probeTrustdHealthy } from "./trustd-probe.ts";
 
 const DAEMON_VERSION: string = packageJson.version;
 
@@ -86,7 +85,7 @@ async function runFresh(): Promise<void> {
 	// Probe AFTER binding so a slow `security` can't delay the socket coming up
 	// (the supervisor has a socket-ready timeout). The value lands before the
 	// supervisor's adoption hello, which happens well after bind.
-	server.setTrustdHealthy(await probeTrustdHealthy());
+	await server.refreshTrustdHealthy();
 	process.stderr.write(
 		`[pty-daemon] listening on ${args.socket} (v${daemonVersion}, host=${os.hostname()})\n`,
 	);
@@ -202,7 +201,7 @@ async function runHandoffReceiver(): Promise<void> {
 	wireShutdown(server);
 	// Probe only now: running it earlier would delay the upgrade-ack the
 	// predecessor is waiting on (and the socket bind).
-	server.setTrustdHealthy(await probeTrustdHealthy());
+	await server.refreshTrustdHealthy();
 	log(`bound and listening`);
 	process.stderr.write(
 		`[pty-daemon] (handoff successor) listening on ${socketPath} (v${daemonVersion}, host=${os.hostname()}, sessions=${snapshot.sessions.length})\n`,

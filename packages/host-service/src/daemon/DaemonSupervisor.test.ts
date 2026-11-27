@@ -78,6 +78,8 @@ interface FakeDaemonOptions {
 	hangUpAfterHello?: boolean;
 	respondWithWrongMessageFirst?: boolean;
 	silent?: boolean;
+	/** Answer `trustdHealthy` per hello, from whether it asked for a re-probe. */
+	trustdHealthy?: (refreshTrustd: boolean) => boolean;
 }
 
 async function startFakeDaemon(opts: FakeDaemonOptions): Promise<{
@@ -123,6 +125,7 @@ async function startFakeDaemon(opts: FakeDaemonOptions): Promise<{
 							protocol: 1,
 							daemonVersion: opts.respondWithVersion,
 							daemonPid: opts.daemonPid,
+							trustdHealthy: opts.trustdHealthy?.(msg.refreshTrustd === true),
 						}),
 					);
 					return;
@@ -464,6 +467,36 @@ describe("DaemonSupervisor.tryAdopt", () => {
 		}
 	});
 
+	test("asks the daemon for a fresh trustd probe, so a login session that ended since startup reads degraded", async () => {
+		const childPid = spawnIdleChild();
+		const orgId = "org-trustd-refresh";
+		const fake = await startFakeDaemon({
+			respondWithVersion: "0.1.0",
+			daemonPid: childPid,
+			trustdHealthy: (refreshTrustd) => !refreshTrustd,
+		});
+		try {
+			writePtyDaemonManifest({
+				pid: childPid,
+				socketPath: fake.socketPath,
+				protocolVersions: [2],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+			const sup = new DaemonSupervisor({
+				scriptPath: "/nonexistent",
+				autoUpdate: false,
+			});
+			const adopted = (await invokeTryAdopt(sup, orgId)) as {
+				trustdHealthy?: boolean;
+			} | null;
+			expect(adopted?.trustdHealthy).toBe(false);
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
+		}
+	});
+
 	test("refuses to adopt a recycled pid whose socket has no listener", async () => {
 		// After a reboot the manifest's pid can belong to an unrelated live
 		// process while the daemon (and its socket) are gone. Adopting it
@@ -597,6 +630,37 @@ describe("DaemonSupervisor daemon health", () => {
 			expect(sup.getHealth("org-goes-quiet")?.reachable).toBe(false);
 		} finally {
 			await fake.close();
+		}
+	});
+
+	test("never kills a known-healthy daemon over a later degraded report", async () => {
+		const childPid = spawnIdleChild();
+		const fake = await startFakeDaemon({
+			respondWithVersion: "0.1.0",
+			daemonPid: childPid,
+			trustdHealthy: () => false,
+		});
+		try {
+			const sup = new DaemonSupervisor({
+				scriptPath: "/nonexistent",
+				autoUpdate: false,
+				hostTrustdProbe: async () => true,
+			});
+			seedInstance(sup, "org-mid-life", {
+				runningVersion: "0.1.0",
+				expectedVersion: "0.1.0",
+				updatePending: false,
+				unreachableSince: null,
+				pid: childPid,
+				socketPath: fake.socketPath,
+				trustdHealthy: true,
+			});
+			await invokeRefreshReachability(sup, "org-mid-life", childPid);
+			expect(sup.getHealth("org-mid-life")?.reachable).toBe(true);
+			expect(isProcessAliveForTest(childPid)).toBe(true);
+		} finally {
+			await fake.close();
+			killIfAlive(childPid);
 		}
 	});
 
@@ -1225,6 +1289,7 @@ interface SeededFields {
 	unreachableSince?: number | null;
 	pid?: number;
 	socketPath?: string;
+	trustdHealthy?: boolean;
 }
 
 function seedPredecessor(
