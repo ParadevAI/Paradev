@@ -7684,6 +7684,9 @@ msgstr "Discord ve GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Ağınızdaki geliştirme sunucularını bulun ve bağlanın."
 
+msgid "Discovery index"
+msgstr "Keşif dizini"
+
 msgid "Disk version"
 msgstr "Diskteki sürüm"
 
@@ -7991,6 +7994,9 @@ msgstr "Her koltuk, planının saatlerini tüm ekibinizin paylaştığı tek bir
 
 msgid "Each session resumes where it left off."
 msgstr "Her oturum kaldığı yerden devam eder."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Her beceri, bir görev gerektirdiğinde kodlama ajanının yüklediği bir SKILL.md dosyasıdır. Ajanlar hepsini keşif dizininde bulur."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Her başarılı derleme bir anlık görüntü kaydeder. Yeni çalışma alanları geçerli olandan başlar ve daha eskisini geri yükleyebilirsiniz."
@@ -15135,6 +15141,9 @@ msgstr "Paradev bu adı ayırır, bu yüzden çalışma alanları onu almaz. Sil
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
 
+msgid "Paradev Skills"
+msgstr "Paradev Becerileri"
+
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
 
@@ -19149,6 +19158,9 @@ msgstr "Ajanlarınız için beceriler ve MCP araçları. Kendi eklentinizi gönd
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Beceriler Paradev eklentisiyle gelir ve kullandığınız her ajanda otomatik olarak güncel tutulur. Önizlemek için birine tıklayın."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Ajanlara Paradev kullanmayı öğreten beceriler."
 
 msgid "Skin Tone"
 msgstr "Ten Rengi"

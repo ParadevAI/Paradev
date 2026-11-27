@@ -7684,6 +7684,9 @@ msgstr "Discord и GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Находить серверы разработки в вашей сети и подключаться к ним."
 
+msgid "Discovery index"
+msgstr "Индекс обнаружения"
+
 msgid "Disk version"
 msgstr "Версия на диске"
 
@@ -7991,6 +7994,9 @@ msgstr "Каждое место добавляет часы своего тар�
 
 msgid "Each session resumes where it left off."
 msgstr "Каждая сессия продолжит с того места, где остановилась."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Каждый навык — это файл SKILL.md, который агент для кода загружает, когда он нужен задаче. Агенты находят их все в индексе обнаружения."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Каждая успешная сборка сохраняет снимок. Новые рабочие области запускаются с текущего, а более ранний можно восстановить."
@@ -15135,6 +15141,9 @@ msgstr "Paradev резервирует это имя, поэтому рабоч�
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev работает локально на машинах ваших разработчиков. Мы не храним ваш код и диалоги с AI, а Paradev прошёл аудит SOC 2 Type II у независимого аудитора. Запросите отчёт и посмотрите документацию по безопасности на {trustHost}."
 
+msgid "Paradev Skills"
+msgstr "Навыки Paradev"
+
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev начался как проект на хакатоне в ноябре 2025 года. Это было простое десктопное приложение для управления worktree."
 
@@ -19149,6 +19158,9 @@ msgstr "Навыки и инструменты MCP для ваших агент�
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Навыки поставляются с плагином Paradev и автоматически поддерживаются в актуальном состоянии во всех ваших агентах. Нажмите на навык, чтобы посмотреть его."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Навыки, которые учат агентов работать с Paradev."
 
 msgid "Skin Tone"
 msgstr "Оттенок кожи"

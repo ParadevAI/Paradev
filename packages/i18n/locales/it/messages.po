@@ -7684,6 +7684,9 @@ msgstr "Discord e GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Rilevare i server di sviluppo sulla tua rete e connettersi a essi."
 
+msgid "Discovery index"
+msgstr "Indice di discovery"
+
 msgid "Disk version"
 msgstr "Versione su disco"
 
@@ -7991,6 +7994,9 @@ msgstr "Ogni postazione aggiunge le ore del suo piano a un unico pool condiviso 
 
 msgid "Each session resumes where it left off."
 msgstr "Ogni sessione riprende da dove si era interrotta."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Ogni skill è un file SKILL.md che un agente di coding carica quando un’attività ne ha bisogno. Gli agenti le trovano tutte nell’indice di discovery."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Ogni build riuscita salva uno snapshot. I nuovi workspace partono da quello attuale, e puoi ripristinarne uno precedente."
@@ -15135,6 +15141,9 @@ msgstr "Paradev riserva questo nome, quindi i workspace non la ricevono. Elimina
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev gira localmente sulle macchine dei tuoi sviluppatori. Non conserviamo il tuo codice né le conversazioni con l'AI, e Paradev ha completato un audit SOC 2 Type II con un revisore indipendente. Richiedi il report e consulta la nostra documentazione sulla sicurezza su {trustHost}."
 
+msgid "Paradev Skills"
+msgstr "Skill di Paradev"
+
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev è nato come progetto di un hackathon nel novembre 2025. Era una semplice app desktop per gestire i worktree."
 
@@ -19149,6 +19158,9 @@ msgstr "Skill e strumenti MCP per i tuoi agenti. Invia il tuo."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Le skill sono incluse nel plugin Paradev e vengono mantenute aggiornate automaticamente in ogni agente che usi. Cliccane una per vederne l'anteprima."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Skill che insegnano agli agenti a usare Paradev."
 
 msgid "Skin Tone"
 msgstr "Tono della pelle"
