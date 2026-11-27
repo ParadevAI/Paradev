@@ -20,6 +20,7 @@ const base = {
 	answeredAtMs: 0,
 	nowMs: 10,
 	timeoutMs: 100,
+	noAnswerTimeoutMs: 1000,
 };
 
 describe("pendingLaunchOutcome", () => {
@@ -80,10 +81,13 @@ describe("pendingLaunchOutcome", () => {
 		).toEqual({ kind: "chat", session: open });
 	});
 
-	it("never gives up before the host has answered", () => {
+	it("waits for the host's first answer, up to a longer limit", () => {
+		expect(
+			pendingLaunchOutcome({ ...base, answeredAtMs: null, nowMs: 500 }),
+		).toEqual({ kind: "wait", untilMs: 1000 });
 		expect(
 			pendingLaunchOutcome({ ...base, answeredAtMs: null, nowMs: 1000 }),
-		).toEqual({ kind: "wait", untilMs: null });
+		).toEqual({ kind: "release" });
 	});
 
 	it("times the wait from the host's first answer when that comes after provisioning", () => {

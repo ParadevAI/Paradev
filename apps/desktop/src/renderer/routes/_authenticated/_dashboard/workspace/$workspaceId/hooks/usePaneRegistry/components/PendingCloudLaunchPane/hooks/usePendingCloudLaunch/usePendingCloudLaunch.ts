@@ -22,6 +22,7 @@ import { markChatSessionLive } from "../../../ChatPane/components/AcpChatPane/ho
 import { hasComposerDraft } from "../../../ChatSession/components/Composer/hooks/useComposerDraft";
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
 import {
+	PENDING_CLOUD_LAUNCH_NO_ANSWER_TIMEOUT_MS,
 	PENDING_CLOUD_LAUNCH_POLL_MS,
 	PENDING_CLOUD_LAUNCH_SESSIONS_LIMIT,
 	PENDING_CLOUD_LAUNCH_TIMEOUT_MS,
@@ -32,10 +33,12 @@ export function usePendingCloudLaunch({
 	ctx,
 	workspaceId,
 	timeoutMs = PENDING_CLOUD_LAUNCH_TIMEOUT_MS,
+	noAnswerTimeoutMs = PENDING_CLOUD_LAUNCH_NO_ANSWER_TIMEOUT_MS,
 }: {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	timeoutMs?: number;
+	noAnswerTimeoutMs?: number;
 }): void {
 	const data = ctx.pane.data as PendingCloudLaunchPaneData;
 	const { terminalId } = data;
@@ -106,6 +109,7 @@ export function usePendingCloudLaunch({
 		answeredAtMs,
 		nowMs,
 		timeoutMs,
+		noAnswerTimeoutMs,
 	});
 
 	const paneId = ctx.pane.id;

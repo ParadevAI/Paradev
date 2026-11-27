@@ -719,6 +719,45 @@ describe("chat commands", () => {
 		await runtime.dispose();
 	});
 
+	test("forkSession without a terminal leaves the source's terminal to the source", async () => {
+		class ForkingHarness extends FakeHarness {
+			async fork() {
+				return "agent-forked";
+			}
+		}
+		const runtime = createTestRuntime({
+			harnesses: new Map([
+				[
+					FAKE_HARNESS,
+					() =>
+						new ForkingHarness({
+							...SCRIPT,
+							start: [{ kind: "session", session: { status: "idle" } }],
+						}),
+				],
+			]),
+		});
+		const source = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			terminalId: "terminal-source",
+		});
+
+		const forked = await runtime.commands.forkSession({
+			commandId: randomUUID(),
+			sessionId: source.sessionId,
+			cwd: "/tmp/workspace",
+		});
+
+		const branch = runtime.commands
+			.listSessions({})
+			.find((session) => session.sessionId === forked?.sessionId);
+		expect(branch).toMatchObject({ terminalId: null, launchTerminalId: null });
+		await runtime.dispose();
+	});
+
 	test("forkSession starts the branch in the source's mode", async () => {
 		const startModes: (string | undefined)[] = [];
 		class ForkingHarness extends FakeHarness {

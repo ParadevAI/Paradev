@@ -250,6 +250,18 @@ describe("reconcileAgentTabs", () => {
 		expect(result.linked[0]?.tabs).toHaveLength(0);
 	});
 
+	it("keeps the pane in the older tab when a newer one duplicates it", () => {
+		const right = layout([terminalPane("resumed")]);
+		const main = layout([filePane], [terminalPane("resumed")]);
+		const older = (state: Layout): Layout => ({
+			...state,
+			tabs: state.tabs.map((tab) => ({ ...tab, createdAt: 1 })),
+		});
+		const result = reconcile({ main, linked: [older(right)] });
+		expect(shown(result.main)).toEqual(["file:"]);
+		expect(shown(result.linked[0] as Layout)).toEqual(["terminal:resumed"]);
+	});
+
 	it("keeps the user's selected tab", () => {
 		const main = layout([filePane], [terminalPane("mine")]);
 		const selected = main.tabs[0]?.id;

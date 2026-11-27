@@ -78,7 +78,7 @@ interface NewTab {
  * The one writer of agent tabs the host owns. Every open agent conversation
  * gets exactly one pane across the workspace's pane areas, unless this
  * desktop hid it; a chat the user closed elsewhere loses its pane; two panes
- * on one chat, one chat terminal or one terminal collapse to the first. Idempotent: run it again on its
+ * on one chat, one chat terminal or one terminal collapse to the oldest. Idempotent: run it again on its
  * own output and nothing changes.
  */
 export function reconcileAgentTabs(
@@ -132,33 +132,42 @@ function panesToRemove(
 	const shownChatTerminals = new Set<string>();
 	const shownSessions = new Set<string>();
 	const removals: PaneRef[] = [];
-	areas.forEach((layout, area) => {
-		for (const tab of layout.tabs) {
-			for (const pane of Object.values(tab.panes)) {
-				if (!isAgentPane(pane)) continue;
-				const ref = { area, tabId: tab.id, paneId: pane.id };
-				const { terminalId, sessionId } = paneClaimKeys(pane);
-				if (pane.kind === "terminal" && terminalId) {
-					if (shownTerminals.has(terminalId)) removals.push(ref);
-					else shownTerminals.add(terminalId);
-					continue;
-				}
-				if (pane.kind !== "chat-v3" || !sessionId) continue;
-				if (
-					shownSessions.has(sessionId) ||
-					(terminalId && shownChatTerminals.has(terminalId)) ||
-					(input.chats &&
-						!(terminalId && openOnTerminal.has(terminalId)) &&
-						closedForThisPane(input, chatById, conversationOf, sessionId))
-				) {
-					removals.push(ref);
-					continue;
-				}
-				shownSessions.add(sessionId);
-				if (terminalId) shownChatTerminals.add(terminalId);
-			}
+	// Oldest tab first, so a pane the user placed outlives one a racing
+	// writer opened since.
+	const panes = areas
+		.flatMap((layout, area) =>
+			layout.tabs.flatMap((tab) =>
+				Object.values(tab.panes).map((pane) => ({ area, tab, pane })),
+			),
+		)
+		.map((entry, order) => ({ ...entry, order }))
+		.sort(
+			(a, b) =>
+				(a.tab.createdAt ?? 0) - (b.tab.createdAt ?? 0) || a.order - b.order,
+		);
+	for (const { area, tab, pane } of panes) {
+		if (!isAgentPane(pane)) continue;
+		const ref = { area, tabId: tab.id, paneId: pane.id };
+		const { terminalId, sessionId } = paneClaimKeys(pane);
+		if (pane.kind === "terminal" && terminalId) {
+			if (shownTerminals.has(terminalId)) removals.push(ref);
+			else shownTerminals.add(terminalId);
+			continue;
 		}
-	});
+		if (pane.kind !== "chat-v3" || !sessionId) continue;
+		if (
+			shownSessions.has(sessionId) ||
+			(terminalId && shownChatTerminals.has(terminalId)) ||
+			(input.chats &&
+				!(terminalId && openOnTerminal.has(terminalId)) &&
+				closedForThisPane(input, chatById, conversationOf, sessionId))
+		) {
+			removals.push(ref);
+			continue;
+		}
+		shownSessions.add(sessionId);
+		if (terminalId) shownChatTerminals.add(terminalId);
+	}
 	return removals;
 }
 

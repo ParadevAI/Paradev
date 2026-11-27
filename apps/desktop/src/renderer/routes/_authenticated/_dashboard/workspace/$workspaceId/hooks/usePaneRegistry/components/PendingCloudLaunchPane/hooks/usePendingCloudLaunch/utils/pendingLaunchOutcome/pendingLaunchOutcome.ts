@@ -16,7 +16,7 @@ export type PendingLaunchOutcome =
 	| { kind: "terminal" }
 	| { kind: "release" }
 	| { kind: "drop" }
-	| { kind: "wait"; untilMs: number | null };
+	| { kind: "wait"; untilMs: number };
 
 /**
  * What a pending cloud launch pane becomes: the chat or terminal its launch
@@ -34,6 +34,7 @@ export function pendingLaunchOutcome({
 	answeredAtMs,
 	nowMs,
 	timeoutMs,
+	noAnswerTimeoutMs,
 }: {
 	surface: CloudAgentLaunchSurface;
 	terminalId: string | undefined;
@@ -48,6 +49,8 @@ export function pendingLaunchOutcome({
 	answeredAtMs: number | null;
 	nowMs: number;
 	timeoutMs: number;
+	/** How long to wait for the host's first answer, from provisioning. */
+	noAnswerTimeoutMs: number;
 }): PendingLaunchOutcome {
 	const giveUp = givingUpOutcome(surface);
 	if (!terminalId) return giveUp;
@@ -55,8 +58,10 @@ export function pendingLaunchOutcome({
 	if (session) return { kind: "chat", session };
 	if (launchedInTerminal(surface, terminalListed, terminalBinding))
 		return typed ? { kind: "release" } : { kind: "terminal" };
-	if (answeredAtMs === null) return { kind: "wait", untilMs: null };
-	const untilMs = Math.max(sinceMs, answeredAtMs) + timeoutMs;
+	const untilMs =
+		answeredAtMs === null
+			? sinceMs + noAnswerTimeoutMs
+			: Math.max(sinceMs, answeredAtMs) + timeoutMs;
 	return nowMs >= untilMs ? giveUp : { kind: "wait", untilMs };
 }
 

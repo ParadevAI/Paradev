@@ -1,3 +1,5 @@
 export const PENDING_CLOUD_LAUNCH_TIMEOUT_MS = 3 * 60_000;
+/** A box that has not answered at all by then is not coming. */
+export const PENDING_CLOUD_LAUNCH_NO_ANSWER_TIMEOUT_MS = 10 * 60_000;
 export const PENDING_CLOUD_LAUNCH_POLL_MS = 5_000;
 export const PENDING_CLOUD_LAUNCH_SESSIONS_LIMIT = 200;
