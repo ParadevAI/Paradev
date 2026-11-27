@@ -460,6 +460,23 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 		}
 	});
 
+	test("reports a committed page only once the guest leaves its blank document", () => {
+		const paneId = "lifecycle-committed-pane";
+		const entry = createEntry(paneId);
+		const hasCommittedPage = () =>
+			browserRuntimeRegistry.getState(paneId).hasCommittedPage;
+		try {
+			fire(entry.webview, "did-start-loading");
+			expect(hasCommittedPage()).toBe(false);
+			fire(entry.webview, "did-navigate", { url: "about:blank" });
+			expect(hasCommittedPage()).toBe(false);
+			fire(entry.webview, "did-navigate", { url: "http://localhost:3000/" });
+			expect(hasCommittedPage()).toBe(true);
+		} finally {
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
 	test("preserves the page URL when an iframe navigates in-page", () => {
 		const paneId = "subframe-navigation-pane";
 		const entry = createEntry(paneId);

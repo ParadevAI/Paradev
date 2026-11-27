@@ -27,6 +27,7 @@ function guardWebContents(
 		webPreferences.contextIsolation = true;
 		webPreferences.webSecurity = true;
 		webPreferences.allowRunningInsecureContent = false;
+		webPreferences.transparent = false;
 	});
 	// Fallback only: app windows and browser-pane popups replace it with their own.
 	contents.setWindowOpenHandler(({ url }) => {
