@@ -4,7 +4,6 @@ import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 import { track } from "@/lib/analytics";
 import { trackExternalFormSubmission } from "@/lib/analytics/external-tracking-runtime";
-import { withPosthog } from "@/lib/analytics/lazy";
 
 interface WaitlistFormProps {
 	heading?: string;
@@ -19,18 +18,7 @@ export function WaitlistForm({ heading, description }: WaitlistFormProps) {
 		e.preventDefault();
 		if (!email) return;
 
-		withPosthog((posthog) => {
-			const wasOptedOut = posthog.has_opted_out_capturing();
-			if (wasOptedOut) {
-				posthog.opt_in_capturing();
-			}
-
-			track("waitlist_signup", { email, platform: "windows_linux" });
-
-			if (wasOptedOut) {
-				posthog.opt_out_capturing();
-			}
-		});
+		track("waitlist_signup", { email, platform: "windows_linux" });
 
 		setSubmitted(true);
 		trackExternalFormSubmission("windows-linux-waitlist", email);

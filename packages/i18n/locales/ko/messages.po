@@ -22607,8 +22607,8 @@ msgstr "코딩 에이전트 군단을 운영할 수 있도록 {amount} 규모의
 msgid "We sent the download link to {submittedEmail}."
 msgstr "{submittedEmail}으로 다운로드 링크를 보냈습니다."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "분석과 광고 측정을 위해 쿠키를 사용합니다. 거부하시면 쿠키 없이 페이지 조회수만 집계합니다."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "분석과 광고 측정을 위해 쿠키를 사용합니다. 거부하시면 쿠키 없이 페이지 조회수와 클릭 수만 익명으로 집계합니다."
 
 msgid "We'll be in touch shortly."
 msgstr "곧 연락드리겠습니다."

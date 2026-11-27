@@ -22607,8 +22607,8 @@ msgstr "我们完成了 {amount} 种子轮融资，帮你调动一支编程智�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下载链接已发送至{submittedEmail}。"
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "我们使用 Cookie 进行分析和广告效果衡量。如果您拒绝，我们只统计页面浏览量，不使用 Cookie。"
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "我们使用 Cookie 进行分析和广告效果衡量。如果您拒绝，我们只匿名统计页面浏览量和点击次数，不使用 Cookie。"
 
 msgid "We'll be in touch shortly."
 msgstr "我们会尽快与你联系。"

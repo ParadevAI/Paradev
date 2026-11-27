@@ -22607,8 +22607,8 @@ msgstr "Kami meraih pendanaan seed sebesar {amount} untuk membantu Anda menjalan
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Kami mengirim tautan unduhan ke {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "Kami menggunakan cookie untuk analitik dan pengukuran iklan. Jika Anda menolak, kami hanya menghitung tampilan halaman, tanpa cookie."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "Kami menggunakan cookie untuk analitik dan pengukuran iklan. Jika Anda menolak, kami hanya menghitung tampilan halaman dan klik secara anonim, tanpa cookie."
 
 msgid "We'll be in touch shortly."
 msgstr "Kami akan segera menghubungi Anda."

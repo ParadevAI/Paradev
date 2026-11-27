@@ -22607,8 +22607,8 @@ msgstr "Chúng tôi đã gọi vốn hạt giống {amount} để giúp bạn v�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Chúng tôi đã gửi liên kết tải tới {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "Chúng tôi dùng cookie để phân tích và đo lường quảng cáo. Nếu bạn từ chối, chúng tôi chỉ đếm lượt xem trang, không dùng cookie."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "Chúng tôi dùng cookie để phân tích và đo lường quảng cáo. Nếu bạn từ chối, chúng tôi chỉ đếm lượt xem trang và lượt nhấp một cách ẩn danh, không dùng cookie."
 
 msgid "We'll be in touch shortly."
 msgstr "Chúng tôi sẽ liên hệ sớm."

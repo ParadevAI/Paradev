@@ -3,7 +3,7 @@ import type { PostHog } from "posthog-js";
 
 import { env } from "@/env";
 import { onConsentChange, readConsentCountry } from "@/lib/analytics/consent";
-import { setPosthogInstance } from "@/lib/analytics/lazy";
+import { setAnonymousPosthog, setPosthogInstance } from "@/lib/analytics/lazy";
 import {
 	createPosthogStarter,
 	type PosthogMode,
@@ -49,7 +49,6 @@ function startPosthog(posthog: PostHog, mode: PosthogMode) {
 	setPosthogInstance(posthog);
 }
 
-/** Page views only, kept apart from withPosthog() so no custom event or identify reaches it. */
 function startCookielessPosthog(posthog: PostHog) {
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 		api_host: "/ingest",
@@ -76,6 +75,7 @@ function startCookielessPosthog(posthog: PostHog) {
 	registerPageProperties(posthog);
 	const country = readConsentCountry();
 	if (country) posthog.register({ $geoip_country_code: country });
+	setAnonymousPosthog(posthog);
 }
 
 function registerPageProperties(posthog: PostHog) {

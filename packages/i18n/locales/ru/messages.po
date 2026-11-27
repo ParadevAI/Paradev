@@ -22607,8 +22607,8 @@ msgstr "Мы привлекли {amount} в посевном раунде, чт�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Мы отправили ссылку на скачивание на {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "Мы используем файлы cookie для аналитики и измерения рекламы. Если вы откажетесь, мы будем считать только просмотры страниц, без cookie."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "Мы используем файлы cookie для аналитики и измерения рекламы. Если вы откажетесь, мы будем анонимно считать только просмотры страниц и клики, без cookie."
 
 msgid "We'll be in touch shortly."
 msgstr "Скоро свяжемся."

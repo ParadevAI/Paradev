@@ -69,3 +69,21 @@ test("consent starts full analytics", async () => {
 	expect(inits).toEqual(["full"]);
 	expect(hasLoadedTracker()).toBe(true);
 });
+
+test("a failed load can be retried", async () => {
+	fakeWindow("opt-out");
+	const inits: PosthogMode[] = [];
+	let attempts = 0;
+	const start = createPosthogStarter(
+		async () => {
+			attempts += 1;
+			if (attempts === 1) throw new Error("chunk failed");
+		},
+		(_posthog, mode) => inits.push(mode),
+	);
+
+	await expect(start()).rejects.toThrow("chunk failed");
+	await start();
+
+	expect(inits).toEqual(["full"]);
+});

@@ -22607,8 +22607,8 @@ msgstr "Získali jsme {amount} v seed kole, abychom vám pomohli řídit armádu
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Odkaz ke stažení jsme poslali na {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "Soubory cookie používáme pro analytiku a měření reklam. Pokud je odmítnete, počítáme jen zobrazení stránek, bez souborů cookie."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "Soubory cookie používáme pro analytiku a měření reklam. Pokud je odmítnete, anonymně počítáme jen zobrazení stránek a kliknutí, bez souborů cookie."
 
 msgid "We'll be in touch shortly."
 msgstr "Brzy se vám ozveme."

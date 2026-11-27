@@ -16,8 +16,12 @@ export function createPosthogStarter<T>(
 	return async () => {
 		if (loading || mode) return;
 		loading = true;
-		const posthog = await load();
-		loading = false;
+		let posthog: T;
+		try {
+			posthog = await load();
+		} finally {
+			loading = false;
+		}
 		if (mode) return;
 		mode = canTrack() ? "full" : "cookieless";
 		init(posthog, mode);

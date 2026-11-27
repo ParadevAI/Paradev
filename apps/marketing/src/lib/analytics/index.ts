@@ -2,7 +2,7 @@ import {
 	GOOGLE_ADS_DOWNLOAD_CONVERSION,
 	trackGoogleAdsConversion,
 } from "./google-ads";
-import { withPosthog } from "./lazy";
+import { capture } from "./lazy";
 import { trackReddit } from "./reddit";
 
 export type DownloadSource =
@@ -34,7 +34,7 @@ export function track(
 	event: string,
 	properties?: Record<string, unknown>,
 ): void {
-	withPosthog((posthog) => posthog.capture(event, properties));
+	capture(event, properties);
 
 	const googleAdsConversion = Object.hasOwn(GOOGLE_ADS_EVENT_MAP, event)
 		? GOOGLE_ADS_EVENT_MAP[event]

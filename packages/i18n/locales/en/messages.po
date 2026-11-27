@@ -22607,8 +22607,8 @@ msgstr "We raised an {amount} seed round to help you run an army of coding agent
 msgid "We sent the download link to {submittedEmail}."
 msgstr "We sent the download link to {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
-msgstr "We use cookies for analytics and ad measurement. If you decline, we only count page views, without cookies."
+msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
+msgstr "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
 
 msgid "We'll be in touch shortly."
 msgstr "We'll be in touch shortly."
