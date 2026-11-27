@@ -13,13 +13,14 @@ import {
 	chmodSync,
 	existsSync,
 	mkdirSync,
+	readdirSync,
 	readFileSync,
 	rmSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const TEST_ROOT = path.join(
 	tmpdir(),
@@ -96,7 +97,10 @@ const {
 	getAmpPluginContent,
 	getGeminiSettingsJsonContent,
 	getMastraHooksJsonContent,
+	createOpenCodePlugin,
 	getOpenCodePluginContent,
+	getOpenCodePluginPath,
+	OPENCODE_PLUGIN_MARKER,
 	getOpenCodeTuiPluginContent,
 	getOpenCodeTuiPluginPath,
 	createOpenCodeTuiPlugin,
@@ -690,6 +694,99 @@ describe("agent-wrappers opencode tui plugin", () => {
 		createOpenCodeTuiPlugin();
 		removeOpenCodeTuiPlugin();
 		expect(existsSync(pluginPath)).toBe(false);
+	});
+});
+
+describe("agent-wrappers opencode plugin install", () => {
+	const configDir = path.join(TEST_HOOKS_DIR, "opencode");
+	const configPath = path.join(configDir, "opencode.json");
+	const oldPluginPath = path.join(configDir, "plugin", "superset-notify.js");
+	const schema = "https://opencode.ai/config.json";
+	const readConfig = () => JSON.parse(readFileSync(configPath, "utf-8"));
+
+	beforeEach(() => {
+		rmSync(configDir, { recursive: true, force: true });
+		mkdirSync(path.dirname(oldPluginPath), { recursive: true });
+	});
+
+	it("lists the plugin in opencode.json instead of a directory OpenCode V2 loads", () => {
+		createOpenCodePlugin();
+
+		for (const dir of ["plugin", "plugins"]) {
+			const sources = existsSync(path.join(configDir, dir))
+				? readdirSync(path.join(configDir, dir)).filter((name) =>
+						/\.(js|ts)$/.test(name),
+					)
+				: [];
+			expect(sources).toEqual([]);
+		}
+		const pluginUrl = pathToFileURL(getOpenCodePluginPath()).href;
+		expect(readConfig()).toEqual({ $schema: schema, plugin: [pluginUrl] });
+		expect(readFileSync(fileURLToPath(pluginUrl), "utf-8")).toContain(
+			OPENCODE_PLUGIN_MARKER,
+		);
+	});
+
+	it("lists a plugin path with a space and # as a file URL", () => {
+		const homeDir = path.join(TEST_ROOT, "home #1", ".paradev");
+		mkdirSync(path.join(homeDir, "hooks", "opencode", "plugin"), {
+			recursive: true,
+		});
+		process.env.SUPERSET_HOME_DIR = homeDir;
+		try {
+			createOpenCodePlugin();
+			const config = JSON.parse(
+				readFileSync(
+					path.join(homeDir, "hooks", "opencode", "opencode.json"),
+					"utf-8",
+				),
+			);
+			expect(fileURLToPath(config.plugin[0])).toBe(getOpenCodePluginPath());
+		} finally {
+			process.env.SUPERSET_HOME_DIR = TEST_SUPERSET_HOME_DIR;
+		}
+	});
+
+	it("keeps what OpenCode wrote to opencode.json and replaces an old entry", () => {
+		writeFileSync(
+			configPath,
+			JSON.stringify({
+				shell: "/bin/zsh",
+				plugins: ["opencode-foo"],
+				plugin: [
+					"user-plugin",
+					"file:///Users/me/.superset/hooks/opencode/superset-notify.js",
+				],
+			}),
+		);
+
+		createOpenCodePlugin();
+		createOpenCodePlugin();
+
+		expect(readConfig()).toEqual({
+			$schema: schema,
+			shell: "/bin/zsh",
+			plugins: ["opencode-foo"],
+			plugin: ["user-plugin", pathToFileURL(getOpenCodePluginPath()).href],
+		});
+	});
+
+	it("removes the plugin file older versions wrote to plugin/", () => {
+		writeFileSync(oldPluginPath, getOpenCodePluginContent("/tmp/notify.sh"));
+
+		createOpenCodePlugin();
+
+		expect(existsSync(oldPluginPath)).toBe(false);
+	});
+
+	it("keeps the old plugin file when opencode.json cannot be read", () => {
+		writeFileSync(oldPluginPath, getOpenCodePluginContent("/tmp/notify.sh"));
+		writeFileSync(configPath, "{ // edited by hand\n}\n");
+
+		createOpenCodePlugin();
+
+		expect(readFileSync(configPath, "utf-8")).toBe("{ // edited by hand\n}\n");
+		expect(existsSync(oldPluginPath)).toBe(true);
 	});
 });
 

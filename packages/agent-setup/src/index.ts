@@ -7,13 +7,7 @@ import {
 } from "./agent-setup";
 import { resolveDisabledAgentIds } from "./disabled-agent-hooks";
 import { resolveDisabledSkillIds } from "./disabled-skills";
-import {
-	getBashDir,
-	getBinDir,
-	getHooksDir,
-	getOpenCodePluginDir,
-	getZshDir,
-} from "./paths";
+import { getBashDir, getBinDir, getHooksDir, getZshDir } from "./paths";
 import {
 	createBashWrapper,
 	createZshWrapper,
@@ -50,7 +44,6 @@ export function setupAgentIntegrations(
 	fs.mkdirSync(getHooksDir(), { recursive: true });
 	fs.mkdirSync(getZshDir(), { recursive: true });
 	fs.mkdirSync(getBashDir(), { recursive: true });
-	fs.mkdirSync(getOpenCodePluginDir(), { recursive: true });
 
 	setupAgentCapabilities({ disabledAgentIds, disabledSkillIds });
 

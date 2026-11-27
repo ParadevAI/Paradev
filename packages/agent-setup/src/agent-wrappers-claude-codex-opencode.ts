@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import {
 	buildDefaultAccountResolver,
 	buildWrapperScript,
@@ -18,19 +19,20 @@ import {
 	cleanNestedHookDefinition,
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
+	isPlainObject,
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
 import { getNotifyScriptPath } from "./notify-hook";
 import {
 	getOpenCodeConfigDir,
-	getOpenCodePluginDir,
 	getOpenCodeTuiPluginDir,
 	resolveUserHomeDir,
 } from "./paths";
 
 export const OPENCODE_PLUGIN_FILE = "superset-notify.js";
 
+const OPENCODE_CONFIG_SCHEMA = "https://opencode.ai/config.json";
 const OPENCODE_PLUGIN_SIGNATURE = "// Superset opencode plugin";
 const OPENCODE_PLUGIN_VERSION = "v11";
 export const OPENCODE_PLUGIN_MARKER = `${OPENCODE_PLUGIN_SIGNATURE} ${OPENCODE_PLUGIN_VERSION}`;
@@ -41,7 +43,7 @@ export const OPENCODE_TUI_PLUGIN_MARKER = `${OPENCODE_TUI_PLUGIN_SIGNATURE} v2`;
  * Returns the environment-scoped OpenCode plugin path under Superset home.
  */
 export function getOpenCodePluginPath(): string {
-	return path.join(getOpenCodePluginDir(), OPENCODE_PLUGIN_FILE);
+	return path.join(getOpenCodeConfigDir(), OPENCODE_PLUGIN_FILE);
 }
 
 export function getOpenCodeTuiPluginPath(): string {
@@ -361,12 +363,69 @@ export function buildCodexWrapperExecLine(notifyPath: string): string {
  * Global path causes dev/prod conflicts when both are running.
  */
 export function createOpenCodePlugin(): void {
+	fs.mkdirSync(getOpenCodeConfigDir(), { recursive: true });
 	const pluginPath = getOpenCodePluginPath();
 	const notifyPath = getNotifyScriptPath();
 	const content = getOpenCodePluginContent(notifyPath);
 	const changed = writeFileIfChanged(pluginPath, content, 0o644);
 	(changed ? console.log : console.debug)(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} OpenCode plugin`,
+	);
+	if (registerOpenCodePlugin(pluginPath)) {
+		removeOwnedFileIfMarked(
+			path.join(getOpenCodeConfigDir(), "plugin", OPENCODE_PLUGIN_FILE),
+			OPENCODE_PLUGIN_SIGNATURE,
+			"old OpenCode plugin",
+		);
+	}
+}
+
+/**
+ * OpenCode V2 loads each file in `plugin/` as a V2 plugin and fails on this
+ * one, but skips a file listed in `plugin`. V2 also writes to this config.
+ */
+function registerOpenCodePlugin(pluginPath: string): boolean {
+	const configPath = path.join(getOpenCodeConfigDir(), "opencode.json");
+	let config: unknown = {};
+	if (fs.existsSync(configPath)) {
+		try {
+			config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+		} catch (error) {
+			console.warn(
+				`[agent-setup] Could not parse ${configPath}; skipping OpenCode plugin registration:`,
+				error,
+			);
+			return false;
+		}
+	}
+	const plugins = isPlainObject(config) ? (config.plugin ?? []) : undefined;
+	if (!isPlainObject(config) || !Array.isArray(plugins)) {
+		console.warn(
+			`[agent-setup] Expected ${configPath} to contain a JSON object with a plugin array; skipping OpenCode plugin registration`,
+		);
+		return false;
+	}
+	const content = JSON.stringify(
+		{
+			$schema: OPENCODE_CONFIG_SCHEMA,
+			...config,
+			plugin: [
+				...plugins.filter((spec: unknown) => !isSupersetOpenCodePlugin(spec)),
+				pathToFileURL(pluginPath).href,
+			],
+		},
+		null,
+		2,
+	);
+	writeFileIfChanged(configPath, `${content}\n`, 0o644);
+	return true;
+}
+
+function isSupersetOpenCodePlugin(spec: unknown): boolean {
+	return (
+		typeof spec === "string" &&
+		spec.startsWith("file://") &&
+		spec.endsWith(`/hooks/opencode/${OPENCODE_PLUGIN_FILE}`)
 	);
 }
 
