@@ -1164,6 +1164,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# line} other {# lines}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Quote} other {Quote · # lines}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (this device)"
 
@@ -1573,6 +1576,9 @@ msgstr "/{name} doesn't take arguments"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} doesn't take attachments"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} doesn't take quotes"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1915,6 +1921,9 @@ msgstr "A prompt, some triggers, and a workspace for each run"
 
 msgid "A pull request always gets its own worktree"
 msgstr "A pull request always gets its own worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "A quote can be up to {limit} characters"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
@@ -2299,6 +2308,9 @@ msgstr "Add this label"
 
 msgid "Add to channel"
 msgstr "Add to channel"
+
+msgid "Add to chat"
+msgstr "Add to chat"
 
 msgid "Add to Dictionary"
 msgstr "Add to Dictionary"
@@ -7299,6 +7311,9 @@ msgstr "Deleted \"{projectName}\" from {0} of {1} devices. The others keep their
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Deleted {completed} of {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Deleted {deletedWhen} · {deviceNames}"
 
@@ -7340,11 +7355,6 @@ msgstr "Deletes this host, its access, and its workspaces. Files on the machine 
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Deleting"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Deleting {0} of {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Deleting {name}..."
@@ -9048,9 +9058,6 @@ msgstr "Fig. 1 · Human share of the effort behind a merged change"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Fig. 2 · Merged changes written by agents, zero human edits"
 
-msgid "file"
-msgstr "file"
-
 msgid "File"
 msgstr "File"
 
@@ -9396,8 +9403,8 @@ msgstr "For bug reports and feature requests, the fastest path is a GitHub issue
 msgid "For individuals getting started"
 msgstr "For individuals getting started"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
 
 msgid "For Orca users"
 msgstr "For Orca users"
@@ -9520,8 +9527,8 @@ msgstr "Free credits"
 msgid "Free for everyone"
 msgstr "Free for everyone"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Free for one user. macOS, with an experimental Linux build."
+msgid "Free for one user. macOS and Linux."
+msgstr "Free for one user. macOS and Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Free for one user. Open source under MIT."
@@ -11873,8 +11880,8 @@ msgstr "Machine-unbound cloud workspaces that spin up in seconds and can be shar
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimental)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS, Windows, Linux"
@@ -13753,8 +13760,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Not updating"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
 
 msgid "Note"
 msgstr "Note"
@@ -14314,6 +14321,9 @@ msgstr "Open File"
 
 msgid "Open File in New Tab"
 msgstr "Open File in New Tab"
+
+msgid "Open folder in editor"
+msgstr "Open folder in editor"
 
 msgid "Open from folder"
 msgstr "Open from folder"
@@ -16712,6 +16722,9 @@ msgstr "Remove PR Link"
 msgid "Remove queued message"
 msgstr "Remove queued message"
 
+msgid "Remove quote"
+msgstr "Remove quote"
+
 msgid "Remove repository"
 msgstr "Remove repository"
 
@@ -18323,6 +18336,9 @@ msgstr "Selected workspace actions"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
+
+msgid "Selection actions"
+msgstr "Selection actions"
 
 msgid "Self-hosted"
 msgstr "Self-hosted"

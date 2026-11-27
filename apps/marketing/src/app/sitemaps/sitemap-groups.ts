@@ -120,6 +120,11 @@ export async function buildSitemapGroups(): Promise<
 			priority: 0.9,
 		},
 		{
+			url: `${baseUrl}/land/black-friday`,
+			changeFrequency: "weekly",
+			priority: 0.8,
+		},
+		{
 			url: `${baseUrl}/pricing`,
 			changeFrequency: "monthly",
 			priority: 0.9,

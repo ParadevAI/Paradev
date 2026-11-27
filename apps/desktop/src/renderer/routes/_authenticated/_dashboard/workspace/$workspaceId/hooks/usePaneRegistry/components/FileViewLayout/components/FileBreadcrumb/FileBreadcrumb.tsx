@@ -193,7 +193,7 @@ export function FileBreadcrumb({
 			</div>
 			<div
 				ref={chipRef}
-				className="pointer-events-auto absolute top-2 left-2 z-10 flex h-7 max-w-[calc(100%-1rem)] items-center gap-1 overflow-hidden rounded-full border border-border/60 bg-background px-3 text-xs whitespace-nowrap text-muted-foreground shadow-sm"
+				className="ph-no-capture pointer-events-auto absolute top-2 left-2 z-10 flex h-7 max-w-[calc(100%-1rem)] items-center gap-1 overflow-hidden rounded-full border border-border/60 bg-background px-3 text-xs whitespace-nowrap text-muted-foreground shadow-sm"
 				style={maxWidth === null ? undefined : { maxWidth }}
 				title={filePath}
 			>

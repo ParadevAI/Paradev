@@ -117,6 +117,12 @@ export interface EnrichedSubscription {
 	customerEmail: string | null;
 }
 
+export interface SubscriberProfile {
+	signedUpAt: Date | null;
+	subscribedAt: Date;
+	firstSource: string;
+}
+
 // --- Shared field builders ---
 
 const intervalLabel = (interval: "monthly" | "yearly") =>
@@ -257,10 +263,167 @@ function standardFields(enriched: EnrichedSubscription): unknown {
 	};
 }
 
+const acquisitionSourceLabels: Record<string, string> = {
+	chatgpt: "ChatGPT",
+	other_ai_assistant: "Other AI assistant",
+	x_twitter: "X / Twitter",
+	youtube: "YouTube",
+	product_hunt: "Product Hunt",
+	hacker_news: "Hacker News",
+	github: "GitHub",
+};
+
+function acquisitionSourceLabel(source: string): string {
+	const fallback = source.split("_").filter(Boolean).join(" ");
+	return (
+		acquisitionSourceLabels[source] ??
+		`${fallback.charAt(0).toUpperCase()}${fallback.slice(1)}`
+	);
+}
+
+const sourceLabels: Array<[RegExp, string]> = [
+	[/(^|\.)gemini\.google\.com$/, "Gemini"],
+	[/(^|\.)google\.[a-z.]+$/, "Google search"],
+	[/(^|\.)bing\.com$/, "Bing search"],
+	[/(^|\.)duckduckgo\.com$/, "DuckDuckGo search"],
+	[/^search\.brave\.com$/, "Brave search"],
+	[/(^|\.)ecosia\.org$/, "Ecosia search"],
+	[/(^|\.)(chatgpt\.com|openai\.com)$/, "ChatGPT"],
+	[/(^|\.)claude\.ai$/, "Claude"],
+	[/(^|\.)perplexity\.ai$/, "Perplexity"],
+	[/(^|\.)github\.com$/, "GitHub"],
+	[/^bookface\.ycombinator\.com$/, "YC Bookface"],
+	[/^news\.ycombinator\.com$/, "Hacker News"],
+	[/(^|\.)(reddit\.com|redd\.it)$/, "Reddit"],
+	[/^(t\.co|(www\.)?(x|twitter)\.com)$/, "X"],
+	[/(^|\.)(youtube\.com|youtu\.be)$/, "YouTube"],
+	[/(^|\.)(linkedin\.com|lnkd\.in)$/, "LinkedIn"],
+	[/(^|\.)producthunt\.com$/, "Product Hunt"],
+];
+
+const ownSites = /(^|\.)(paradev\.com|superset\.sh)$/;
+const ownAppSites = /^app\.(paradev\.com|superset\.sh)$/;
+
+function sourceLabel(source: string): string {
+	const host = source.toLowerCase();
+	const known = sourceLabels.find(([pattern]) => pattern.test(host));
+	return known ? known[1] : host.replace(/^www\./, "");
+}
+
+function nonEmptyString(value: unknown): string | null {
+	return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function parseUrl(value: string | null): URL | null {
+	if (!value) return null;
+	try {
+		return new URL(value);
+	} catch {
+		return null;
+	}
+}
+
+function firstTouchSource(properties: Record<string, unknown>): string | null {
+	const landing = parseUrl(nonEmptyString(properties.$initial_current_url));
+	const landedOnOurSite =
+		landing !== null &&
+		ownSites.test(landing.hostname) &&
+		!ownAppSites.test(landing.hostname);
+	const landingPage =
+		landedOnOurSite && landing.pathname.replace(/\/$/, "")
+			? ` → ${landing.hostname}${landing.pathname.replace(/\/$/, "")}`
+			: "";
+
+	const utmSource = nonEmptyString(properties.$initial_utm_source);
+	if (utmSource) {
+		const detail = [
+			nonEmptyString(properties.$initial_utm_medium),
+			nonEmptyString(properties.$initial_utm_campaign),
+		]
+			.filter(Boolean)
+			.join(", ");
+		return `${sourceLabel(utmSource)}${detail ? ` (${detail})` : ""}${landingPage}`;
+	}
+
+	if (!landedOnOurSite) return null;
+
+	if (
+		nonEmptyString(properties.$initial_gclid) ||
+		nonEmptyString(properties.$initial_gad_source)
+	) {
+		return `Google ad${landingPage}`;
+	}
+
+	const referrer = nonEmptyString(properties.$initial_referring_domain);
+	if (!referrer || referrer === "$direct" || ownSites.test(referrer)) {
+		return `Direct${landingPage}`;
+	}
+	return `${sourceLabel(referrer)}${landingPage}`;
+}
+
+export function firstSourceFromPersonProperties(
+	properties: Record<string, unknown> | null,
+): string {
+	if (!properties) return "Unknown (no analytics profile)";
+
+	const firstTouch =
+		firstTouchSource(properties) ?? "Unknown (first seen in the app)";
+	const selfReported = nonEmptyString(properties.acquisition_source);
+	return selfReported
+		? `${firstTouch} · said: ${acquisitionSourceLabel(selfReported)}`
+		: firstTouch;
+}
+
+const dayMs = 24 * 60 * 60 * 1000;
+
+function signedUpText(profile: SubscriberProfile): string {
+	if (!profile.signedUpAt) return "Unknown";
+
+	const date = `<!date^${Math.floor(profile.signedUpAt.getTime() / 1000)}^{date_short}|${profile.signedUpAt.toISOString().slice(0, 10)}>`;
+	const days = Math.floor(
+		(profile.subscribedAt.getTime() - profile.signedUpAt.getTime()) / dayMs,
+	);
+	if (days < 1) return `${date} · subscribed within a day`;
+	return `${date} · subscribed ${days} ${days === 1 ? "day" : "days"} later`;
+}
+
+/**
+ * Row 1: Organization | Email
+ * Row 2: Plan         | Total
+ * Row 3: First source | Signed up
+ * Row 4: Price        | Discount
+ */
+function subscriptionStartedFields(
+	enriched: EnrichedSubscription,
+	profile: SubscriberProfile,
+): unknown {
+	const seats = `${enriched.seatCount} ${enriched.seatCount === 1 ? "seat" : "seats"}`;
+	return {
+		type: "section",
+		fields: [
+			{ type: "mrkdwn", text: `*Organization:*\n${enriched.organizationName}` },
+			{ type: "mrkdwn", text: `*Email:*\n${enriched.customerEmail ?? "N/A"}` },
+			{
+				type: "mrkdwn",
+				text: `*Plan:*\n${enriched.planName} · ${enriched.interval} · ${seats}`,
+			},
+			{ type: "mrkdwn", text: totalField(enriched) },
+			{
+				type: "mrkdwn",
+				text: `*First source:*\n${escapeSlackMrkdwn(profile.firstSource)}`,
+			},
+			{ type: "mrkdwn", text: `*Signed up:*\n${signedUpText(profile)}` },
+			{ type: "mrkdwn", text: priceField(enriched) },
+			{ type: "mrkdwn", text: discountField(enriched) },
+		],
+	};
+}
+
 // --- Formatters ---
 
 export function formatSubscriptionStarted(
 	enriched: EnrichedSubscription,
+	profile: SubscriberProfile,
 ): unknown[] {
 	return [
 		{
@@ -271,7 +434,7 @@ export function formatSubscriptionStarted(
 				emoji: true,
 			},
 		},
-		standardFields(enriched),
+		subscriptionStartedFields(enriched, profile),
 		stripeDashboardButtons(
 			enriched.stripeCustomerId,
 			enriched.stripeSubscriptionId,

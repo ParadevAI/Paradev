@@ -1,5 +1,5 @@
-import { readFile, stat } from "node:fs/promises";
-import { dirname, join, sep } from "node:path";
+import { readFile, realpath, stat } from "node:fs/promises";
+import { basename, dirname, join, resolve, sep } from "node:path";
 import type {
 	McpServerEntry,
 	McpServerScope,
@@ -9,6 +9,7 @@ export interface McpConfigPaths {
 	homeDir: string;
 	/** `~/.claude.json`, or `.claude.json` inside a custom CLAUDE_CONFIG_DIR. */
 	claudeStatePath: string;
+	claudeSettingsPath: string;
 	codexConfigPath: string;
 }
 
@@ -92,14 +93,13 @@ async function projectDirs(
 	return dirs;
 }
 
-function nearestPerName(): (servers: FoundServer[]) => FoundServer[] {
+function nearestPerName(): (server: FoundServer) => boolean {
 	const seen = new Set<string>();
-	return (servers) =>
-		servers.filter((server) => {
-			if (seen.has(server.name)) return false;
-			seen.add(server.name);
-			return true;
-		});
+	return (server) => {
+		if (seen.has(server.name)) return false;
+		seen.add(server.name);
+		return true;
+	};
 }
 
 function jsonServers(
@@ -134,40 +134,78 @@ function jsonServers(
 	});
 }
 
+function ancestors(dir: string): string[] {
+	const dirs = [dir];
+	for (let parent = dirname(dir); parent !== dirs.at(-1); ) {
+		dirs.push(parent);
+		parent = dirname(parent);
+	}
+	return dirs;
+}
+
+async function repositoryOf(checkout: string): Promise<string> {
+	const gitFile = await readText(join(checkout, ".git"));
+	const gitDir = gitFile?.match(/^gitdir:\s*(.+)$/m)?.[1]?.trim();
+	if (!gitDir) return checkout;
+	const absolute = resolve(checkout, gitDir);
+	const worktrees = absolute.lastIndexOf(`${sep}worktrees${sep}`);
+	if (worktrees === -1) return checkout;
+	const commonDir = absolute.slice(0, worktrees);
+	return basename(commonDir) === ".git" ? dirname(commonDir) : commonDir;
+}
+
+async function claudeProject(
+	worktreePath: string,
+): Promise<{ cwd: string; repository: string; dirs: string[] }> {
+	const cwd = await realpath(worktreePath).catch(() => worktreePath);
+	const dirs = ancestors(cwd);
+	for (const dir of dirs) {
+		if (await exists(join(dir, ".git"))) {
+			return { cwd, repository: await repositoryOf(dir), dirs };
+		}
+	}
+	return { cwd, repository: cwd, dirs };
+}
+
 async function readClaudeServers(
 	worktreePath: string,
 	paths: McpConfigPaths,
 ): Promise<FoundServer[]> {
+	const { cwd, repository, dirs } = await claudeProject(worktreePath);
 	const state = await readJson(paths.claudeStatePath);
 	const projects = isRecord(state?.projects) ? state.projects : {};
-	const project = isRecord(projects[worktreePath])
-		? projects[worktreePath]
-		: {};
+	const project = isRecord(projects[repository]) ? projects[repository] : {};
 	const disabled = stringList(project.disabledMcpServers);
+	const settings = await Promise.all(
+		[
+			paths.claudeSettingsPath,
+			join(cwd, ".claude", "settings.json"),
+			join(cwd, ".claude", "settings.local.json"),
+			join(repository, ".claude", "settings.local.json"),
+		].map(readJson),
+	);
 	const disabledProjectFile = [
 		...disabled,
 		...stringList(project.disabledMcpjsonServers),
+		...settings.flatMap((file) => stringList(file?.disabledMcpjsonServers)),
 	];
-	const found = [
-		...jsonServers(state?.mcpServers, "user", paths.claudeStatePath, disabled),
-		...jsonServers(
-			project.mcpServers,
-			"local",
-			paths.claudeStatePath,
-			disabled,
-		),
-	];
-	const nearest = nearestPerName();
-	for (const dir of await projectDirs(worktreePath, paths.homeDir)) {
+	const found = jsonServers(
+		project.mcpServers,
+		"local",
+		paths.claudeStatePath,
+		disabled,
+	);
+	for (const dir of dirs) {
 		const file = join(dir, ".mcp.json");
 		const config = await readJson(file);
 		found.push(
-			...nearest(
-				jsonServers(config?.mcpServers, "project", file, disabledProjectFile),
-			),
+			...jsonServers(config?.mcpServers, "project", file, disabledProjectFile),
 		);
 	}
-	return found;
+	found.push(
+		...jsonServers(state?.mcpServers, "user", paths.claudeStatePath, disabled),
+	);
+	return found.filter(nearestPerName());
 }
 
 const TOML_SERVER_TABLE =
@@ -267,9 +305,9 @@ async function readCodexServers(
 			trusted.has(root),
 		);
 		found.push(
-			...nearest(parseCodexMcpServers(content, "project", file)).map(
-				(server) => (untrusted ? { ...server, untrusted } : server),
-			),
+			...parseCodexMcpServers(content, "project", file)
+				.filter(nearest)
+				.map((server) => (untrusted ? { ...server, untrusted } : server)),
 		);
 	}
 	return found;

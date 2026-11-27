@@ -1164,6 +1164,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# řádek} few {# řádky} many {# řádku} other {# řádků}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Citace} few {Citace · # řádky} many {Citace · # řádku} other {Citace · # řádků}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (toto zařízení)"
 
@@ -1573,6 +1576,9 @@ msgstr "/{name} nepřijímá argumenty"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} nepřijímá přílohy"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} nepřijímá citace"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1915,6 +1921,9 @@ msgstr "Prompt, pár spouštěčů a pracovní prostor pro každý běh"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request má vždy vlastní worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Citace může mít nejvýše {limit} znaků"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Přestavěné chatovací rozhraní pro řízení agentů: bohatší výstup nástrojů, plynulejší usměrňování, všechno rychlejší."
@@ -2299,6 +2308,9 @@ msgstr "Přidat tento štítek"
 
 msgid "Add to channel"
 msgstr "Přidat do kanálu"
+
+msgid "Add to chat"
+msgstr "Přidat do chatu"
 
 msgid "Add to Dictionary"
 msgstr "Přidat do slovníku"
@@ -7299,6 +7311,9 @@ msgstr "„{projectName}“ smazán na {0} z {1} zařízení. Ostatní si kopii 
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "„{projectName}“ smazán. Můžete ho obnovit v Nastavení → Projekty po dobu 30 dnů."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Smazáno {completed} z {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Smazáno {deletedWhen} · {deviceNames}"
 
@@ -7340,11 +7355,6 @@ msgstr "Smaže tohoto hosta, přístup k němu i jeho pracovní prostory. Soubor
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Mazání"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Mažu {0} z {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Mažu {name}..."
@@ -9048,9 +9058,6 @@ msgstr "Obr. 1 · Lidský podíl na úsilí za sloučenou změnou"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Obr. 2 · Sloučené změny napsané agenty, bez lidských úprav"
 
-msgid "file"
-msgstr "soubor"
-
 msgid "File"
 msgstr "Soubor"
 
@@ -9396,8 +9403,8 @@ msgstr "Pro hlášení chyb a náměty na funkce je nejrychlejší cestou GitHub
 msgid "For individuals getting started"
 msgstr "Pro jednotlivce, kteří začínají"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Pro macOS na Apple Silicon i Intel. Linux AppImage je experimentální."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Pro macOS na Apple Silicon i Intel a pro Linux (AppImage)."
 
 msgid "For Orca users"
 msgstr "Pro uživatele Orca"
@@ -9520,8 +9527,8 @@ msgstr "Kredity zdarma"
 msgid "Free for everyone"
 msgstr "Zdarma pro všechny"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Zdarma pro jednoho uživatele. macOS a experimentální sestavení pro Linux."
+msgid "Free for one user. macOS and Linux."
+msgstr "Zdarma pro jednoho uživatele. macOS a Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Zdarma pro jednoho uživatele. Open source pod licencí MIT."
@@ -11873,8 +11880,8 @@ msgstr "Cloudové pracovní prostory nevázané na počítač, které naběhnou 
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimentálně)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS, Windows, Linux"
@@ -13753,8 +13760,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Bez aktualizací"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Zatím ne. Běží na macOS, s experimentálním sestavením pro Linux. Uživatelé Windows se mohou přes tlačítko pro stažení zapsat na čekací listinu."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Zatím ne. Běží na macOS a Linuxu. Uživatelé Windows se mohou přes tlačítko pro stažení zapsat na čekací listinu."
 
 msgid "Note"
 msgstr "Poznámka"
@@ -14314,6 +14321,9 @@ msgstr "Otevřít soubor"
 
 msgid "Open File in New Tab"
 msgstr "Otevřít soubor na nové kartě"
+
+msgid "Open folder in editor"
+msgstr "Otevřít složku v editoru"
 
 msgid "Open from folder"
 msgstr "Otevřít ze složky"
@@ -16712,6 +16722,9 @@ msgstr "Odebrat propojení s PR"
 msgid "Remove queued message"
 msgstr "Odebrat zprávu z fronty"
 
+msgid "Remove quote"
+msgstr "Odebrat citaci"
+
 msgid "Remove repository"
 msgstr "Odebrat repozitář"
 
@@ -18323,6 +18336,9 @@ msgstr "Akce pro vybrané pracovní prostory"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Výběr textu v terminálu ho hned zkopíruje do schránky, bez koncových mezer"
+
+msgid "Selection actions"
+msgstr "Akce s výběrem"
 
 msgid "Self-hosted"
 msgstr "Vlastní hosting"

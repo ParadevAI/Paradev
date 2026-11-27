@@ -51,7 +51,7 @@ export function LightDiffViewer({
 		<MultiFileDiff
 			oldFile={{ name: filePath, contents: contents.original }}
 			newFile={{ name: filePath, contents: contents.modified }}
-			className={cn(className)}
+			className={cn("ph-no-capture", className)}
 			style={{
 				...diffStyle,
 				...style,

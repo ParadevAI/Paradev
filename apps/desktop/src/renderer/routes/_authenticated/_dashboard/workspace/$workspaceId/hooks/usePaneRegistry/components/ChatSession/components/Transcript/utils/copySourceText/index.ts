@@ -1,1 +1,1 @@
-export { copySourceText } from "./copySourceText";
+export { copySourceText, sourceTextOfRange } from "./copySourceText";

@@ -211,7 +211,7 @@ export function ImagePreviewOverlay({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.15, ease: "easeOut" }}
-					className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 outline-none"
+					className="ph-no-capture fixed inset-0 z-[100] flex items-center justify-center bg-black/85 outline-none"
 					onClick={(e) => {
 						if (e.target === e.currentTarget) onClose();
 					}}

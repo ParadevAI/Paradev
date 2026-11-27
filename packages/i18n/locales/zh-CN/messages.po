@@ -1164,6 +1164,9 @@ msgstr "{level} {gate}：{statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# 行}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {引用} other {引用 · # 行}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（此设备）"
 
@@ -1573,6 +1576,9 @@ msgstr "/{name} 不接受参数"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} 不接受附件"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} 不接受引用"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1915,6 +1921,9 @@ msgstr "一个提示词、几个触发器，每次运行一个工作区"
 
 msgid "A pull request always gets its own worktree"
 msgstr "拉取请求总是使用自己的 worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "引用最多 {limit} 个字符"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "重建的智能体驱动聊天界面：更丰富的工具输出、更顺手的引导，一切都更快。"
@@ -2299,6 +2308,9 @@ msgstr "添加此标签"
 
 msgid "Add to channel"
 msgstr "添加到频道"
+
+msgid "Add to chat"
+msgstr "添加到聊天"
 
 msgid "Add to Dictionary"
 msgstr "添加到词典"
@@ -7299,6 +7311,9 @@ msgstr "已从 {1} 台设备中的 {0} 台删除“{projectName}”。其他设�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "已删除“{projectName}”。你可以在 30 天内从“设置 → 项目”恢复它。"
 
+msgid "Deleted {completed} of {total}…"
+msgstr "已删除 {completed} 个，共 {total} 个…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen}删除 · {deviceNames}"
 
@@ -7340,11 +7355,6 @@ msgstr "删除该主机、其访问权限及其工作区。机器上的文件会
 msgctxt "file change"
 msgid "Deleting"
 msgstr "删除中"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "正在删除第{0}个，共{1}个…"
 
 msgid "Deleting {name}..."
 msgstr "正在删除{name}..."
@@ -9048,9 +9058,6 @@ msgstr "图1 · 一次合并变更背后人类投入的占比"
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "图2 · 由智能体撰写、无人工修改的合并变更"
 
-msgid "file"
-msgstr "文件"
-
 msgid "File"
 msgstr "文件"
 
@@ -9396,8 +9403,8 @@ msgstr "报告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 msgid "For individuals getting started"
 msgstr "面向刚上手的个人用户"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "适用于 Apple Silicon 和 Intel 的 macOS。Linux AppImage 为实验版本。"
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "适用于 Apple Silicon 和 Intel 的 macOS，以及 Linux（AppImage）。"
 
 msgid "For Orca users"
 msgstr "面向 Orca 用户"
@@ -9520,8 +9527,8 @@ msgstr "免费额度"
 msgid "Free for everyone"
 msgstr "对所有人免费"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "单个用户免费。支持 macOS，另有实验性 Linux 版本。"
+msgid "Free for one user. macOS and Linux."
+msgstr "单个用户免费。支持 macOS 和 Linux。"
 
 msgid "Free for one user. Open source under MIT."
 msgstr "单个用户免费。基于 MIT 许可证开源。"
@@ -11873,8 +11880,8 @@ msgstr "不绑定机器的云端工作区，几秒即可启动，还能分享给
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS、Linux（实验性）"
+msgid "macOS, Linux"
+msgstr "macOS、Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS、Windows、Linux"
@@ -13753,8 +13760,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "未更新"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "暂不支持。目前支持 macOS，另有实验性 Linux 版本。Windows 用户可以通过下载按钮加入候补名单。"
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "暂不支持。目前支持 macOS 和 Linux。Windows 用户可以通过下载按钮加入候补名单。"
 
 msgid "Note"
 msgstr "注意"
@@ -14314,6 +14321,9 @@ msgstr "打开文件"
 
 msgid "Open File in New Tab"
 msgstr "在新标签页中打开文件"
+
+msgid "Open folder in editor"
+msgstr "在编辑器中打开文件夹"
 
 msgid "Open from folder"
 msgstr "从文件夹打开"
@@ -16712,6 +16722,9 @@ msgstr "移除PR链接"
 msgid "Remove queued message"
 msgstr "移除排队消息"
 
+msgid "Remove quote"
+msgstr "移除引用"
+
 msgid "Remove repository"
 msgstr "移除仓库"
 
@@ -18323,6 +18336,9 @@ msgstr "选中工作区的操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "在终端中选中文本后立即复制到剪贴板，并去除行尾空白"
+
+msgid "Selection actions"
+msgstr "选中内容操作"
 
 msgid "Self-hosted"
 msgstr "自托管"

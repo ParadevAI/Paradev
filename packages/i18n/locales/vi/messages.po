@@ -1164,6 +1164,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# dòng}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Trích dẫn} other {Trích dẫn · # dòng}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (thiết bị này)"
 
@@ -1573,6 +1576,9 @@ msgstr "/{name} không nhận đối số"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} không nhận tệp đính kèm"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} không nhận trích dẫn"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1915,6 +1921,9 @@ msgstr "Một prompt, vài trigger và một workspace cho mỗi lượt chạy"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request luôn có worktree riêng"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Trích dẫn có thể dài tối đa {limit} ký tự"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Giao diện chat được dựng lại để điều khiển agent: output tool phong phú hơn, lái mượt hơn, mọi thứ nhanh hơn."
@@ -2299,6 +2308,9 @@ msgstr "Thêm nhãn này"
 
 msgid "Add to channel"
 msgstr "Thêm vào kênh"
+
+msgid "Add to chat"
+msgstr "Thêm vào cuộc trò chuyện"
 
 msgid "Add to Dictionary"
 msgstr "Thêm vào từ điển"
@@ -7299,6 +7311,9 @@ msgstr "Đã xóa \"{projectName}\" khỏi {0}/{1} thiết bị. Các thiết b�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "Đã xóa \"{projectName}\". Bạn có thể khôi phục trong Cài đặt → Dự án trong 30 ngày."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Đã xóa {completed} trong {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Đã xóa {deletedWhen} · {deviceNames}"
 
@@ -7340,11 +7355,6 @@ msgstr "Xóa host này, quyền truy cập và các workspace của nó. Tệp t
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Đang xóa"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Đang xóa {0} trong {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Đang xóa {name}..."
@@ -9048,9 +9058,6 @@ msgstr "Hình 1 · Phần công sức của con người sau mỗi thay đổi �
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Hình 2 · Thay đổi được merge do agent viết, không có chỉnh sửa của con người"
 
-msgid "file"
-msgstr "tệp"
-
 msgid "File"
 msgstr "Tệp"
 
@@ -9396,8 +9403,8 @@ msgstr "Với báo lỗi và đề xuất tính năng, cách nhanh nhất là m�
 msgid "For individuals getting started"
 msgstr "Dành cho cá nhân mới bắt đầu"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Dành cho macOS trên Apple Silicon và Intel. Bản Linux AppImage đang thử nghiệm."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Dành cho macOS trên Apple Silicon và Intel, và Linux (AppImage)."
 
 msgid "For Orca users"
 msgstr "Dành cho người dùng Orca"
@@ -9520,8 +9527,8 @@ msgstr "Tín dụng miễn phí"
 msgid "Free for everyone"
 msgstr "Miễn phí cho tất cả"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Miễn phí cho một người dùng. macOS, kèm bản Linux thử nghiệm."
+msgid "Free for one user. macOS and Linux."
+msgstr "Miễn phí cho một người dùng. macOS và Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Miễn phí cho một người dùng. Mã nguồn mở theo giấy phép MIT."
@@ -11873,8 +11880,8 @@ msgstr "Workspace trên cloud không phụ thuộc máy, dựng trong vài giây
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (thử nghiệm)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS, Windows, Linux"
@@ -13753,8 +13760,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Không cập nhật"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Chưa. Hiện chạy trên macOS, kèm bản Linux thử nghiệm. Người dùng Windows có thể tham gia danh sách chờ từ nút tải xuống."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Chưa. Hiện chạy trên macOS và Linux. Người dùng Windows có thể tham gia danh sách chờ từ nút tải xuống."
 
 msgid "Note"
 msgstr "Lưu ý"
@@ -14314,6 +14321,9 @@ msgstr "Mở tệp"
 
 msgid "Open File in New Tab"
 msgstr "Mở tệp ở tab mới"
+
+msgid "Open folder in editor"
+msgstr "Mở thư mục trong editor"
 
 msgid "Open from folder"
 msgstr "Mở từ thư mục"
@@ -16712,6 +16722,9 @@ msgstr "Gỡ liên kết PR"
 msgid "Remove queued message"
 msgstr "Xóa tin nhắn trong hàng đợi"
 
+msgid "Remove quote"
+msgstr "Xóa trích dẫn"
+
 msgid "Remove repository"
 msgstr "Gỡ repository"
 
@@ -18323,6 +18336,9 @@ msgstr "Hành động cho workspace đã chọn"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Chọn văn bản trong terminal sẽ sao chép ngay vào clipboard, đã cắt khoảng trắng ở cuối"
+
+msgid "Selection actions"
+msgstr "Thao tác với vùng chọn"
 
 msgid "Self-hosted"
 msgstr "Tự lưu trữ"

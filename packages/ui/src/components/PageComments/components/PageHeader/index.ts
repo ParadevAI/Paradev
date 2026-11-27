@@ -1,4 +1,5 @@
 export { DeletePageDialog } from "./components/DeletePageDialog";
+export { PageRefreshButton } from "./components/PageRefreshButton";
 export { PageShareButton } from "./components/PageShareButton";
 export { PageTitleMenu } from "./components/PageTitleMenu";
 export { PageVersionBanner } from "./components/PageVersionBanner";

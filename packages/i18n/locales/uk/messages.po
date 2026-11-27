@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# рядок} few {# рядки} many {# рядків} other {# рядка}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Цитата} one {Цитата · # рядок} few {Цитата · # рядки} many {Цитата · # рядків} other {Цитата · # рядка}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (цей пристрій)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} не приймає аргументів"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} не приймає вкладень"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} не приймає цитат"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Промпт, кілька тригерів і робочий прост
 
 msgid "A pull request always gets its own worktree"
 msgstr "Пул-реквест завжди отримує власний worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Цитата може містити не більше {limit} символів"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Перероблений чат для керування агентами: багатший вивід інструментів, плавніше керування, усе швидше."
@@ -2293,6 +2302,9 @@ msgstr "Додати цю мітку"
 
 msgid "Add to channel"
 msgstr "Додати до каналу"
+
+msgid "Add to chat"
+msgstr "Додати в чат"
 
 msgid "Add to Dictionary"
 msgstr "Додати до словника"
@@ -7293,6 +7305,9 @@ msgstr "«{projectName}» видалено на {0} з {1} пристроїв. �
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "«{projectName}» видалено. Його можна відновити в розділі «Налаштування → Проєкти» протягом 30 днів."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "Видалено {completed} з {total}…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Видалено {deletedWhen} · {deviceNames}"
 
@@ -7334,11 +7349,6 @@ msgstr "Видаляє цей хост, доступ до нього та йог
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Видалення"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Видалення {0} з {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Видалення {name}..."
@@ -9042,9 +9052,6 @@ msgstr "Рис. 1 · Частка людини в зусиллях, що сто�
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Рис. 2 · Злиті зміни, написані агентами без жодних правок людини"
 
-msgid "file"
-msgstr "файл"
-
 msgid "File"
 msgstr "Файл"
 
@@ -9390,8 +9397,8 @@ msgstr "Щоб повідомити про помилку чи запропон�
 msgid "For individuals getting started"
 msgstr "Для тих, хто починає самостійно"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Для macOS на Apple Silicon та Intel. Версія Linux AppImage експериментальна."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Для macOS на Apple Silicon та Intel, а також Linux (AppImage)."
 
 msgid "For Orca users"
 msgstr "Для користувачів Orca"
@@ -9514,8 +9521,8 @@ msgstr "Безкоштовні кредити"
 msgid "Free for everyone"
 msgstr "Безкоштовно для всіх"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Безкоштовно для одного користувача. macOS та експериментальна збірка для Linux."
+msgid "Free for one user. macOS and Linux."
+msgstr "Безкоштовно для одного користувача. macOS та Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Безкоштовно для одного користувача. Відкритий код за ліцензією MIT."
@@ -11867,8 +11874,8 @@ msgstr "Хмарні робочі простори без прив'язки до
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (експериментально)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS, Windows, Linux"
@@ -13747,8 +13754,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Не оновлюється"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Поки що ні. Він працює на macOS, є експериментальна збірка для Linux. Користувачі Windows можуть приєднатися до списку очікування через кнопку завантаження."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Поки що ні. Він працює на macOS та Linux. Користувачі Windows можуть приєднатися до списку очікування через кнопку завантаження."
 
 msgid "Note"
 msgstr "Примітка"
@@ -14308,6 +14315,9 @@ msgstr "Відкрити файл"
 
 msgid "Open File in New Tab"
 msgstr "Відкрити файл у новій вкладці"
+
+msgid "Open folder in editor"
+msgstr "Відкрити папку в редакторі"
 
 msgid "Open from folder"
 msgstr "Відкрити з папки"
@@ -16706,6 +16716,9 @@ msgstr "Прибрати посилання на PR"
 msgid "Remove queued message"
 msgstr "Прибрати повідомлення з черги"
 
+msgid "Remove quote"
+msgstr "Прибрати цитату"
+
 msgid "Remove repository"
 msgstr "Прибрати репозиторій"
 
@@ -18317,6 +18330,9 @@ msgstr "Дії з вибраними робочими просторами"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Виділений у терміналі текст одразу копіюється в буфер обміну, без пробілів у кінці"
+
+msgid "Selection actions"
+msgstr "Дії з виділенням"
 
 msgid "Self-hosted"
 msgstr "Власний хостинг"

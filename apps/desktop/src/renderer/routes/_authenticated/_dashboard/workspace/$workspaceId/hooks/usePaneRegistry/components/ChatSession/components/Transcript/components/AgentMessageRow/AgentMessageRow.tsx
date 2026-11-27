@@ -37,15 +37,17 @@ export function AgentMessageRow({
 		// Actions stay out of the way until the message is pointed at, and stay
 		// reachable by keyboard regardless.
 		<div className="group/message flex flex-col gap-1">
-			<MarkdownView
-				className="text-foreground"
-				fading={fading}
-				final={!streaming && !paced.revealing}
-				findItemId={item.id}
-				pageCards
-				pagesShownEarlier={pagesShownEarlier}
-				text={paced.text}
-			/>
+			<div className="min-w-0" data-reply-id={item.id}>
+				<MarkdownView
+					className="text-foreground"
+					fading={fading}
+					final={!streaming && !paced.revealing}
+					findItemId={item.id}
+					pageCards
+					pagesShownEarlier={pagesShownEarlier}
+					text={paced.text}
+				/>
+			</div>
 			{images.length > 0 && <AttachmentRail className="mt-1" images={images} />}
 			{lastReply && !streaming && (
 				<ReplyFooter

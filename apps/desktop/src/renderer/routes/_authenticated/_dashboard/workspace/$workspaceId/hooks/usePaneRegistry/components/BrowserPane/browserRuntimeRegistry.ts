@@ -152,6 +152,7 @@ export class BrowserRuntimeRegistryImpl {
 		// be raised on its own over a panel that slides above the page.
 		const root = document.createElement("div");
 		root.id = ROOT_CONTAINER_ID;
+		root.className = "ph-no-capture";
 		root.style.width = "0";
 		root.style.height = "0";
 		root.style.pointerEvents = "none";

@@ -1164,6 +1164,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# baris}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Kutipan} other {Kutipan · # baris}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (perangkat ini)"
 
@@ -1573,6 +1576,9 @@ msgstr "/{name} tidak menerima argumen"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} tidak menerima lampiran"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} tidak menerima kutipan"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1915,6 +1921,9 @@ msgstr "Prompt, beberapa pemicu, dan workspace untuk setiap run"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request selalu mendapat worktree sendiri"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Kutipan bisa berisi hingga {limit} karakter"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Permukaan chat yang dibangun ulang untuk mengendalikan agen: output alat lebih kaya, pengarahan lebih halus, semuanya lebih cepat."
@@ -2299,6 +2308,9 @@ msgstr "Tambahkan label ini"
 
 msgid "Add to channel"
 msgstr "Tambahkan ke saluran"
+
+msgid "Add to chat"
+msgstr "Tambahkan ke chat"
 
 msgid "Add to Dictionary"
 msgstr "Tambahkan ke Kamus"
@@ -7299,6 +7311,9 @@ msgstr "\"{projectName}\" dihapus dari {0} dari {1} perangkat. Perangkat lain te
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "\"{projectName}\" dihapus. Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari."
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{completed} dari {total} dihapus…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "Dihapus {deletedWhen} · {deviceNames}"
 
@@ -7340,11 +7355,6 @@ msgstr "Menghapus host ini, aksesnya, dan workspace-nya. File di mesin itu tetap
 msgctxt "file change"
 msgid "Deleting"
 msgstr "Menghapus"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "Menghapus {0} dari {1}…"
 
 msgid "Deleting {name}..."
 msgstr "Menghapus {name}..."
@@ -9048,9 +9058,6 @@ msgstr "Gbr. 1 · Porsi manusia dalam upaya di balik sebuah perubahan yang di-me
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "Gbr. 2 · Perubahan yang di-merge dan ditulis agen, tanpa suntingan manusia"
 
-msgid "file"
-msgstr "file"
-
 msgid "File"
 msgstr "File"
 
@@ -9396,8 +9403,8 @@ msgstr "Untuk laporan bug dan permintaan fitur, jalur tercepat adalah issue GitH
 msgid "For individuals getting started"
 msgstr "Untuk perorangan yang baru memulai"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Untuk macOS di Apple Silicon dan Intel. Linux AppImage masih eksperimental."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Untuk macOS di Apple Silicon dan Intel, serta Linux (AppImage)."
 
 msgid "For Orca users"
 msgstr "Untuk pengguna Orca"
@@ -9520,8 +9527,8 @@ msgstr "Kredit gratis"
 msgid "Free for everyone"
 msgstr "Gratis untuk semua orang"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Gratis untuk satu pengguna. macOS, dengan build Linux eksperimental."
+msgid "Free for one user. macOS and Linux."
+msgstr "Gratis untuk satu pengguna. macOS dan Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Gratis untuk satu pengguna. Open source dengan lisensi MIT."
@@ -11873,8 +11880,8 @@ msgstr "Workspace cloud yang tidak terikat mesin, siap dalam hitungan detik dan 
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (eksperimental)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS, Windows, Linux"
@@ -13753,8 +13760,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Tidak diperbarui"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Belum. Berjalan di macOS, dengan build Linux eksperimental. Pengguna Windows dapat bergabung ke daftar tunggu dari tombol unduh."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Belum. Berjalan di macOS dan Linux. Pengguna Windows dapat bergabung ke daftar tunggu dari tombol unduh."
 
 msgid "Note"
 msgstr "Catatan"
@@ -14314,6 +14321,9 @@ msgstr "Buka File"
 
 msgid "Open File in New Tab"
 msgstr "Buka File di Tab Baru"
+
+msgid "Open folder in editor"
+msgstr "Buka folder di editor"
 
 msgid "Open from folder"
 msgstr "Buka dari folder"
@@ -16712,6 +16722,9 @@ msgstr "Hapus Tautan PR"
 msgid "Remove queued message"
 msgstr "Hapus pesan dari antrean"
 
+msgid "Remove quote"
+msgstr "Hapus kutipan"
+
 msgid "Remove repository"
 msgstr "Hapus repositori"
 
@@ -18323,6 +18336,9 @@ msgstr "Aksi workspace terpilih"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Memilih teks di terminal langsung menyalinnya ke clipboard, tanpa spasi di akhir"
+
+msgid "Selection actions"
+msgstr "Tindakan pilihan"
 
 msgid "Self-hosted"
 msgstr "Hosting mandiri"

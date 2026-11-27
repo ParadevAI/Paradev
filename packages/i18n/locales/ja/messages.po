@@ -1164,6 +1164,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# 行}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {引用} other {引用 · # 行}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（このデバイス）"
 
@@ -1573,6 +1576,9 @@ msgstr "/{name} は引数を受け付けません"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} は添付ファイルを受け付けません"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} は引用を受け付けません"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1915,6 +1921,9 @@ msgstr "プロンプトとトリガー、そして実行ごとのワークスペ
 
 msgid "A pull request always gets its own worktree"
 msgstr "プルリクエストには常に専用のワークツリーが作られます"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "引用は {limit} 文字までです"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "エージェントを操作するためのチャット画面を作り直します。ツール出力はより豊かに、誘導はよりスムーズに、すべてが速くなります。"
@@ -2299,6 +2308,9 @@ msgstr "このラベルを追加"
 
 msgid "Add to channel"
 msgstr "チャンネルに追加"
+
+msgid "Add to chat"
+msgstr "チャットに追加"
 
 msgid "Add to Dictionary"
 msgstr "辞書に追加"
@@ -7299,6 +7311,9 @@ msgstr "{1} 台中 {0} 台のデバイスから「{projectName}」を削除し�
 msgid "Deleted \"{projectName}\". You can restore it from Settings → Projects for 30 days."
 msgstr "「{projectName}」を削除しました。30 日間は「設定 → プロジェクト」から復元できます。"
 
+msgid "Deleted {completed} of {total}…"
+msgstr "{total}件中{completed}件を削除済み…"
+
 msgid "Deleted {deletedWhen} · {deviceNames}"
 msgstr "{deletedWhen}に削除 · {deviceNames}"
 
@@ -7340,11 +7355,6 @@ msgstr "このホストとそのアクセス権、ワークスペースを削除
 msgctxt "file change"
 msgid "Deleting"
 msgstr "削除中"
-
-#. placeholder {0}: Math.min(completed + 1, total)
-#. placeholder {1}: targets.length
-msgid "Deleting {0} of {1}…"
-msgstr "{1}件中{0}件を削除中…"
 
 msgid "Deleting {name}..."
 msgstr "{name}を削除中..."
@@ -9048,9 +9058,6 @@ msgstr "図1 · マージされた変更を支える作業のうち人間の割�
 msgid "Fig. 2 · Merged changes written by agents, zero human edits"
 msgstr "図2 · 人間の編集なしにエージェントが書いたマージ済み変更"
 
-msgid "file"
-msgstr "ファイル"
-
 msgid "File"
 msgstr "ファイル"
 
@@ -9396,8 +9403,8 @@ msgstr "バグ報告や機能リクエストは、<0>{githubHandle}</0>にGitHub
 msgid "For individuals getting started"
 msgstr "これから始める個人向け"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Apple Silicon と Intel の macOS に対応。Linux AppImage は試験版です。"
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Apple Silicon と Intel の macOS、および Linux（AppImage）に対応。"
 
 msgid "For Orca users"
 msgstr "Orca ユーザーの方へ"
@@ -9520,8 +9527,8 @@ msgstr "無料クレジット"
 msgid "Free for everyone"
 msgstr "誰でも無料"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "1ユーザーなら無料。macOS 対応、Linux 版は実験的に提供。"
+msgid "Free for one user. macOS and Linux."
+msgstr "1ユーザーなら無料。macOS と Linux に対応。"
 
 msgid "Free for one user. Open source under MIT."
 msgstr "1ユーザーなら無料。MIT ライセンスのオープンソース。"
@@ -11873,8 +11880,8 @@ msgstr "マシンに縛られないクラウドワークスペース。数秒で
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS、Linux（実験的）"
+msgid "macOS, Linux"
+msgstr "macOS、Linux"
 
 msgid "macOS, Windows, Linux"
 msgstr "macOS、Windows、Linux"
@@ -13753,8 +13760,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "更新なし"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "まだです。macOS で動作し、Linux 版は実験的に提供しています。Windows をお使いの方は、ダウンロードボタンからウェイトリストに登録できます。"
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "まだです。macOS と Linux で動作します。Windows をお使いの方は、ダウンロードボタンからウェイトリストに登録できます。"
 
 msgid "Note"
 msgstr "メモ"
@@ -14314,6 +14321,9 @@ msgstr "ファイルを開く"
 
 msgid "Open File in New Tab"
 msgstr "新しいタブでファイルを開く"
+
+msgid "Open folder in editor"
+msgstr "フォルダをエディタで開く"
 
 msgid "Open from folder"
 msgstr "フォルダから開く"
@@ -16712,6 +16722,9 @@ msgstr "PRリンクを解除"
 msgid "Remove queued message"
 msgstr "キューのメッセージを削除"
 
+msgid "Remove quote"
+msgstr "引用を削除"
+
 msgid "Remove repository"
 msgstr "リポジトリを削除"
 
@@ -18323,6 +18336,9 @@ msgstr "選択したワークスペースの操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "ターミナルでテキストを選択すると、行末の空白を取り除いてすぐにクリップボードへコピーします"
+
+msgid "Selection actions"
+msgstr "選択範囲の操作"
 
 msgid "Self-hosted"
 msgstr "セルフホスト"

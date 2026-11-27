@@ -9,6 +9,7 @@ import {
 import { PagePresenceStack } from "@superset/ui/presence";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { useTRPC } from "@/trpc/react";
 import { OpenInSupersetButton } from "../OpenInSupersetButton";
 import { PageWatchBadge } from "./components/PageWatchBadge";
@@ -46,6 +47,7 @@ export function PageHeaderBar({
 	const deletePage = useMutation(trpc.page.delete.mutationOptions());
 	const duplicatePage = useMutation(trpc.page.duplicate.mutationOptions());
 	const sharing = usePageSharing(page.id);
+	const [refreshing, startRefresh] = useTransition();
 
 	return (
 		<PageHeader
@@ -78,7 +80,8 @@ export function PageHeaderBar({
 				router.refresh();
 			}}
 			sharing={sharing}
-			onRefresh={() => router.refresh()}
+			refreshing={refreshing}
+			onRefresh={() => startRefresh(() => router.refresh())}
 			onPreviewVersion={(version) => {
 				router.push(version === null ? pathname : `${pathname}?v=${version}`);
 			}}

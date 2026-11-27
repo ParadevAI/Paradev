@@ -38,11 +38,13 @@ import {
 	CHAT_SCROLLER_GUTTER_CLASSNAME,
 } from "../../constants";
 import type { ChatForkTarget } from "../../types";
+import { ReplySelectionToolbar } from "./components/ReplySelectionToolbar";
 import { TranscriptFindBar } from "./components/TranscriptFindBar";
 import { TranscriptRowItem } from "./components/TranscriptRowItem";
 import { useCarriedReaderPosition } from "./hooks/useCarriedReaderPosition";
 import { useLoadOlderOnReach } from "./hooks/useLoadOlderOnReach";
 import { useNearRows } from "./hooks/useNearRows";
+import { useReplySelection } from "./hooks/useReplySelection";
 import { useScrollAnchorKey } from "./hooks/useScrollAnchorKey";
 import { useScrollbarGutter } from "./hooks/useScrollbarGutter";
 import { useTranscriptFind } from "./hooks/useTranscriptFind";
@@ -94,6 +96,8 @@ export type TranscriptProps = {
 	isActive?: boolean;
 	/** The reader closed the find bar; focus belongs back in the composer. */
 	onCloseFind?: (() => void) | undefined;
+	/** Puts text picked from a reply in this chat's composer. */
+	onQuote?: ((text: string) => void) | undefined;
 	ref?: Ref<TranscriptHandle>;
 };
 
@@ -143,6 +147,7 @@ export function Transcript({
 	onRespond,
 	onRetryPrompt,
 	onMessageRevealed,
+	onQuote,
 	outbox,
 	ref,
 	revealMessageId = null,
@@ -157,6 +162,11 @@ export function Transcript({
 	);
 	const [viewportRef, scrollbarGutter, viewport] =
 		useScrollbarGutter<HTMLDivElement>();
+	const replySelection = useReplySelection({
+		viewport,
+		resetKey: sessionId,
+		enabled: onQuote !== undefined,
+	});
 	const scroller = useMessageScroller();
 	const scrollerRef = useRef(scroller);
 	scrollerRef.current = scroller;
@@ -422,11 +432,12 @@ export function Transcript({
 				<MessageScroller.Viewport
 					aria-label={t({ message: "Messages" })}
 					className={cn(
-						"min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
+						"ph-no-capture min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
 						CHAT_SCROLLER_GUTTER_CLASSNAME,
 					)}
 					onCopy={copySourceText}
 					onKeyDown={onViewportKeyDown}
+					onMouseUp={replySelection.onMouseUp}
 					onPointerDown={onViewportPointerDown}
 					onTouchMove={markReaderScroll}
 					onWheel={markReaderScroll}
@@ -471,6 +482,16 @@ export function Transcript({
 				<div className="pointer-events-none absolute inset-x-0 bottom-9 flex justify-center">
 					<ScrollToBottomButton />
 				</div>
+				{replySelection.selection && onQuote && (
+					<ReplySelectionToolbar
+						anchor={replySelection.selection.anchor}
+						bounds={replySelection.selection.bounds}
+						onAddToChat={() => replySelection.commit(onQuote)}
+						onCopied={replySelection.dismiss}
+						ref={replySelection.toolbarRef}
+						text={replySelection.selection.text}
+					/>
+				)}
 			</ChatImageGalleryProvider>
 		</MessageScroller.Root>
 	);

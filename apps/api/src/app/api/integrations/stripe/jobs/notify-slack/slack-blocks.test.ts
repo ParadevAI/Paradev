@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
 	type EnrichedSubscription,
+	firstSourceFromPersonProperties,
 	formatPlanChanged,
 	formatSubscriptionCancelled,
+	formatSubscriptionStarted,
 	type PreviousPlan,
 	planChangeDirection,
 	planLabel,
@@ -171,5 +173,134 @@ describe("formatPlanChanged", () => {
 
 		expect(serialized).toContain("Plan Changed");
 		expect(serialized).toContain("yearly -> monthly");
+	});
+});
+
+describe("formatSubscriptionStarted", () => {
+	test("leads with who, plan and total, then source and signup", () => {
+		const blocks = formatSubscriptionStarted(createEnrichedSubscription(), {
+			signedUpAt: new Date("2026-11-20T23:30:00.000Z"),
+			subscribedAt: new Date("2026-11-23T08:00:00.000Z"),
+			firstSource: "Google search",
+		}) as Array<{ fields?: Array<{ text: string }> }>;
+
+		expect(blocks[1]?.fields?.map((field) => field.text)).toEqual([
+			"*Organization:*\nAcme",
+			"*Email:*\nfounder@acme.com",
+			"*Plan:*\nPro · monthly · 3 seats",
+			"*Total:*\n$60.00/mo",
+			"*First source:*\nGoogle search",
+			"*Signed up:*\n<!date^1795217400^{date_short}|2026-11-20> · subscribed 2 days later",
+			"*Price:*\n$20.00/seat/mo",
+			"*Discount:*\nNone",
+		]);
+	});
+
+	test("shows Unknown when the signup date is missing", () => {
+		const blocks = formatSubscriptionStarted(createEnrichedSubscription(), {
+			signedUpAt: null,
+			subscribedAt: new Date("2026-11-23T08:00:00.000Z"),
+			firstSource: "Unknown",
+		});
+
+		expect(JSON.stringify(blocks)).toContain("*Signed up:*\\nUnknown");
+	});
+});
+
+describe("firstSourceFromPersonProperties", () => {
+	test.each([
+		[
+			"a search referrer with its landing page",
+			{
+				$initial_referring_domain: "www.google.com",
+				$initial_current_url: "https://paradev.com/compare/herdr-alternative",
+			},
+			"Google search → paradev.com/compare/herdr-alternative",
+		],
+		[
+			"the UTM source ahead of the referrer",
+			{
+				$initial_utm_source: "chatgpt.com",
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"ChatGPT",
+		],
+		[
+			"UTM medium and campaign",
+			{
+				$initial_utm_source: "reddit",
+				$initial_utm_medium: "cpc",
+				$initial_utm_campaign: "launch",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"reddit (cpc, launch)",
+		],
+		[
+			"Gemini ahead of the general Google rule",
+			{
+				$initial_referring_domain: "gemini.google.com",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"Gemini",
+		],
+		[
+			"a Google ad click",
+			{
+				$initial_gclid: "abc",
+				$initial_referring_domain: "www.google.com",
+				$initial_current_url: "https://paradev.com/?gclid=abc",
+			},
+			"Google ad",
+		],
+		[
+			"GitHub as a real source on a marketing page",
+			{
+				$initial_referring_domain: "github.com",
+				$initial_current_url: "https://paradev.com/",
+			},
+			"GitHub",
+		],
+		[
+			"a direct visit with the self-reported answer",
+			{
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "https://paradev.com/",
+				acquisition_source: "friend_or_colleague",
+			},
+			"Direct · said: Friend or colleague",
+		],
+		[
+			"a sign-in redirect as unknown",
+			{
+				$initial_referring_domain: "github.com",
+				$initial_current_url: "https://app.paradev.com/auth/desktop/success",
+			},
+			"Unknown (first seen in the app)",
+		],
+		[
+			"a direct first visit to the app as unknown",
+			{
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "https://app.superset.sh/sign-in",
+			},
+			"Unknown (first seen in the app)",
+		],
+		[
+			"a desktop-only first visit as unknown",
+			{
+				$initial_referring_domain: "$direct",
+				$initial_current_url: "file:///Applications/Paradev.app/index.html",
+			},
+			"Unknown (first seen in the app)",
+		],
+	])("reads %s", (_name, properties, expected) => {
+		expect(firstSourceFromPersonProperties(properties)).toBe(expected);
+	});
+
+	test("says when the person has no analytics profile", () => {
+		expect(firstSourceFromPersonProperties(null)).toBe(
+			"Unknown (no analytics profile)",
+		);
 	});
 });
