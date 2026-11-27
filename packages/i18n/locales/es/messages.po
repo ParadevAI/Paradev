@@ -12257,6 +12257,9 @@ msgstr "Mensaje en un canal"
 msgid "Message not found"
 msgstr "Mensaje no encontrado"
 
+msgid "Message timestamps"
+msgstr "Marcas de tiempo de los mensajes"
+
 msgid "Message..."
 msgstr "Mensaje..."
 
@@ -18866,6 +18869,9 @@ msgstr "Mostrar la pestaña anterior de la barra lateral derecha sin mover el fo
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Muestra el botón de la barra lateral con enlaces a Móvil, Nube, la CLI y Autoalojado."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Muestra la hora de cada mensaje del chat. Pasa el cursor sobre una hora para ver la fecha completa."
 
 msgid "Show the triggering payload"
 msgstr "Mostrar la carga útil desencadenante"

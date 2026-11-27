@@ -12251,6 +12251,9 @@ msgstr "Повідомлення в каналі"
 msgid "Message not found"
 msgstr "Повідомлення не знайдено"
 
+msgid "Message timestamps"
+msgstr "Позначки часу повідомлень"
+
 msgid "Message..."
 msgstr "Повідомлення..."
 
@@ -18860,6 +18863,9 @@ msgstr "Показати попередню вкладку правої бічн
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Показувати на бічній панелі кнопку з посиланнями на «Мобільні», «Хмара», CLI і «Власний хостинг»."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Показує час кожного повідомлення чату. Наведіть курсор на час, щоб побачити повну дату."
 
 msgid "Show the triggering payload"
 msgstr "Показати payload тригера"

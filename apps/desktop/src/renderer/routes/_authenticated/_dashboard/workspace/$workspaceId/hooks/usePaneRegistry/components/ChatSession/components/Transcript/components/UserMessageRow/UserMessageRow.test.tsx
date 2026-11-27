@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { withQuotedReplies } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import { useSettings } from "renderer/stores/settings";
 import { ChatPaneActionsProvider } from "../../../../providers/ChatPaneActionsProvider";
 import { elementsForChips } from "../../../../utils/messageElements";
 import { copySourceText } from "../../utils/copySourceText";
@@ -32,6 +33,7 @@ const originalClipboard = navigator.clipboard;
 
 beforeEach(() => {
 	writeText.mockClear();
+	useSettings.setState({ showMessageTimestamps: false });
 	Object.defineProperty(navigator, "clipboard", {
 		configurable: true,
 		value: { writeText },
@@ -40,6 +42,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	cleanup();
+	useSettings.setState({ showMessageTimestamps: false });
 	Object.defineProperty(navigator, "clipboard", {
 		configurable: true,
 		value: originalClipboard,
@@ -62,6 +65,20 @@ function renderRow(text: string) {
 		</div>,
 	);
 }
+
+test("a sent message hides its time until the row is pointed at by default", () => {
+	const time = renderRow(TYPED).container.querySelector("time");
+
+	expect(time?.textContent).toBeTruthy();
+	expect(time?.parentElement?.className).toContain("opacity-0");
+});
+
+test("a sent message shows its time in place when the setting is on", () => {
+	useSettings.setState({ showMessageTimestamps: true });
+	const time = renderRow(TYPED).container.querySelector("time");
+
+	expect(time?.parentElement?.className).not.toContain("opacity-0");
+});
 
 test("a sent paste shows as a card beside the typed text, not in the bubble", () => {
 	const view = renderRow(legacyPastedMessage(TYPED, [LOG]));

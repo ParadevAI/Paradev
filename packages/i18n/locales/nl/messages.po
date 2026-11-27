@@ -12257,6 +12257,9 @@ msgstr "Bericht in kanaal"
 msgid "Message not found"
 msgstr "Bericht niet gevonden"
 
+msgid "Message timestamps"
+msgstr "Tijdstempels van berichten"
+
 msgid "Message..."
 msgstr "Bericht..."
 
@@ -18866,6 +18869,9 @@ msgstr "Het vorige tabblad in de rechterzijbalk tonen zonder de focus te verplaa
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Toon de zijbalkknop met links naar Mobiel, Cloud, de CLI en Zelf gehost."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Toont de tijd van elk chatbericht. Beweeg over een tijd om de volledige datum te zien."
 
 msgid "Show the triggering payload"
 msgstr "Activerende payload tonen"

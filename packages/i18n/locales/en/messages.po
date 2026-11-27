@@ -12257,6 +12257,9 @@ msgstr "Message in channel"
 msgid "Message not found"
 msgstr "Message not found"
 
+msgid "Message timestamps"
+msgstr "Message timestamps"
+
 msgid "Message..."
 msgstr "Message..."
 
@@ -18866,6 +18869,9 @@ msgstr "Show the previous tab in the right sidebar without moving focus"
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Show the time of each Chat message. Hover a time to see its full date."
 
 msgid "Show the triggering payload"
 msgstr "Show the triggering payload"

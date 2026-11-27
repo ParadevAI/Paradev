@@ -20,6 +20,7 @@ import {
 import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
+import { MessageTimestampSetting } from "./components/MessageTimestampSetting";
 
 interface BehaviorSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -42,6 +43,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 	);
 	const showDictation = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_DICTATION,
+		visibleItems,
+	);
+	const showMessageTimestamps = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_MESSAGE_TIMESTAMPS,
 		visibleItems,
 	);
 	const showParadevAnywhere = isItemVisible(
@@ -149,6 +154,8 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
 					<AcpChatSetting />
 				)}
+
+				{showMessageTimestamps && <MessageTimestampSetting />}
 
 				{showChangesOpenTarget && (
 					<div className="flex items-center justify-between">

@@ -12257,6 +12257,9 @@ msgstr "Zpráva v kanálu"
 msgid "Message not found"
 msgstr "Zpráva nebyla nalezena"
 
+msgid "Message timestamps"
+msgstr "Časová razítka zpráv"
+
 msgid "Message..."
 msgstr "Zpráva..."
 
@@ -18866,6 +18869,9 @@ msgstr "Zobrazit předchozí kartu v pravém postranním panelu bez přesunu fok
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Zobrazit v postranním panelu tlačítko s odkazy na Mobil, Cloud, CLI a Vlastní hosting."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Zobrazuje čas každé zprávy v chatu. Přejetím myší nad časem zobrazíte úplné datum."
 
 msgid "Show the triggering payload"
 msgstr "Zobrazit spouštěcí data"

@@ -12257,6 +12257,9 @@ msgstr "チャンネルのメッセージ"
 msgid "Message not found"
 msgstr "メッセージが見つかりません"
 
+msgid "Message timestamps"
+msgstr "メッセージのタイムスタンプ"
+
 msgid "Message..."
 msgstr "メッセージ..."
 
@@ -18866,6 +18869,9 @@ msgstr "フォーカスを移動せずに右サイドバーの前のタブを表
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "モバイル、クラウド、CLI、セルフホストへのリンクがあるサイドバーのボタンを表示します。"
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "各チャットメッセージの時刻を表示します。時刻にカーソルを合わせると完全な日付が表示されます。"
 
 msgid "Show the triggering payload"
 msgstr "トリガーのペイロードを表示"

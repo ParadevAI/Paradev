@@ -13,6 +13,7 @@ interface Settings {
 	dictationEnabled: boolean;
 	showParadevAnywhereButton: boolean;
 	showRailUsage: boolean;
+	showMessageTimestamps: boolean;
 }
 
 interface SettingsStore extends Settings {
@@ -29,6 +30,7 @@ export const useSettings = create<SettingsStore>()(
 			dictationEnabled: true,
 			showParadevAnywhereButton: true,
 			showRailUsage: true,
+			showMessageTimestamps: false,
 			update: (key, value) => set({ [key]: value }),
 		}),
 		{ name: "settings" },

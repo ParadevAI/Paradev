@@ -12257,6 +12257,9 @@ msgstr "채널 내 메시지"
 msgid "Message not found"
 msgstr "메시지를 찾을 수 없습니다"
 
+msgid "Message timestamps"
+msgstr "메시지 타임스탬프"
+
 msgid "Message..."
 msgstr "메시지..."
 
@@ -18866,6 +18869,9 @@ msgstr "포커스를 옮기지 않고 오른쪽 사이드바의 이전 탭 표�
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "모바일, 클라우드, CLI, 셀프 호스팅으로 연결되는 사이드바 버튼을 표시합니다."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "각 채팅 메시지의 시간을 표시합니다. 시간 위로 마우스를 올리면 전체 날짜가 표시됩니다."
 
 msgid "Show the triggering payload"
 msgstr "트리거 페이로드 표시"

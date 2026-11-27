@@ -1,8 +1,10 @@
 import type { AgentMessage } from "@superset/chat/protocol";
 import { isImageAttachment } from "@superset/chat/protocol";
+import { useSettings } from "renderer/stores/settings";
 import type { ChatForkTarget } from "../../../../types";
 import { MarkdownView } from "../../../MarkdownView";
 import { AttachmentRail } from "../AttachmentRail";
+import { MessageTime } from "../MessageTime";
 import { ReplyFooter } from "../ReplyFooter";
 import { useBlockFading } from "./hooks/useBlockFading";
 import { usePacedText } from "./hooks/usePacedText";
@@ -28,6 +30,7 @@ export function AgentMessageRow({
 	const streaming = item.completedAtMs === undefined;
 	const paced = usePacedText(text, streaming);
 	const fading = useBlockFading(streaming || paced.revealing);
+	const showTimestamps = useSettings((s) => s.showMessageTimestamps);
 
 	const images = (item.attachments ?? [])
 		.filter(isImageAttachment)
@@ -49,6 +52,11 @@ export function AgentMessageRow({
 				/>
 			</div>
 			{images.length > 0 && <AttachmentRail className="mt-1" images={images} />}
+			{item.completedAtMs !== undefined && showTimestamps && (
+				<div className="flex items-center gap-2 text-muted-foreground/60">
+					<MessageTime atMs={item.completedAtMs} />
+				</div>
+			)}
 			{lastReply && !streaming && (
 				<ReplyFooter
 					canForkToWorktree={canForkToWorktree}
