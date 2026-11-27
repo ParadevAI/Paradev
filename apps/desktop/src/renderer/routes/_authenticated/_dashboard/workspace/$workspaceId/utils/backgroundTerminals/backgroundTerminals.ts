@@ -8,7 +8,7 @@ export const BACKGROUND_TERMINAL_CLOSED_REFETCH_INTERVAL_MS = 10_000;
 export const BACKGROUND_TERMINAL_OPEN_REFETCH_INTERVAL_MS = 2_000;
 
 interface WorkspaceTabLike {
-	panes: Record<string, Pane<PaneViewerData>>;
+	panes: Record<string, Pick<Pane<PaneViewerData>, "kind" | "data">>;
 }
 
 interface BackgroundTerminalSessionLike {

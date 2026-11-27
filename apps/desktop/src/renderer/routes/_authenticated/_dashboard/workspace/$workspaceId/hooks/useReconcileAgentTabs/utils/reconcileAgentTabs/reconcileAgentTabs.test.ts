@@ -54,7 +54,10 @@ const filePane: CreatePaneInput<PaneViewerData> = {
 };
 
 function layout(
-	...tabs: [CreatePaneInput<PaneViewerData>, ...CreatePaneInput<PaneViewerData>[]][]
+	...tabs: [
+		CreatePaneInput<PaneViewerData>,
+		...CreatePaneInput<PaneViewerData>[],
+	][]
 ): Layout {
 	const store = createWorkspaceStore<PaneViewerData>();
 	for (const panes of tabs) store.getState().addTab({ panes });

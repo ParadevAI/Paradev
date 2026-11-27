@@ -11,8 +11,10 @@ export interface AgentPaneClaims {
 	sessionIds: Set<string>;
 }
 
+type PaneLike = Pick<Pane<PaneViewerData>, "kind" | "data">;
+
 interface LayoutLike {
-	tabs: readonly { panes: Record<string, Pane<PaneViewerData>> }[];
+	tabs: readonly { panes: Record<string, PaneLike> }[];
 }
 
 /** What an agent conversation can be claimed by. */
@@ -27,12 +29,12 @@ const AGENT_PANE_KINDS = new Set<string>([
 	PENDING_CLOUD_LAUNCH_PANE_KIND,
 ]);
 
-export function isAgentPane(pane: Pane<PaneViewerData>): boolean {
+export function isAgentPane(pane: PaneLike): boolean {
 	return AGENT_PANE_KINDS.has(pane.kind);
 }
 
 /** The keys one agent pane holds: its terminal, and its chat session once it has one. */
-export function paneClaimKeys(pane: Pane<PaneViewerData>): {
+export function paneClaimKeys(pane: PaneLike): {
 	terminalId: string | null;
 	sessionId: string | null;
 } {
@@ -54,10 +56,7 @@ export function emptyAgentPaneClaims(): AgentPaneClaims {
 	return { terminalIds: new Set(), sessionIds: new Set() };
 }
 
-export function claimAgentPane(
-	claims: AgentPaneClaims,
-	pane: Pane<PaneViewerData>,
-): void {
+export function claimAgentPane(claims: AgentPaneClaims, pane: PaneLike): void {
 	const { terminalId, sessionId } = paneClaimKeys(pane);
 	if (terminalId) claims.terminalIds.add(terminalId);
 	if (sessionId) claims.sessionIds.add(sessionId);
