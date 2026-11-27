@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
+import { recordingUnmaskProps } from "@superset/shared/posthog-privacy";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -397,7 +398,7 @@ export function DashboardSidebarHeader({
 					className="size-4 shrink-0 text-muted-foreground"
 					strokeWidth={1.5}
 				/>
-				<span className="flex-1 text-left">
+				<span {...recordingUnmaskProps} className="flex-1 text-left">
 					<Trans>Workspaces</Trans>
 				</span>
 			</button>
@@ -417,7 +418,7 @@ export function DashboardSidebarHeader({
 						className="size-4 shrink-0 text-muted-foreground"
 						strokeWidth={1.5}
 					/>
-					<span className="flex-1 text-left">
+					<span {...recordingUnmaskProps} className="flex-1 text-left">
 						<Trans>Automations</Trans>
 					</span>
 				</button>
@@ -450,7 +451,7 @@ export function DashboardSidebarHeader({
 				)}
 			>
 				<HiOutlineClipboardDocumentList className="size-4 shrink-0 text-muted-foreground" />
-				<span className="flex-1 text-left">
+				<span {...recordingUnmaskProps} className="flex-1 text-left">
 					<Trans>Tasks</Trans>
 				</span>
 			</button>
@@ -470,7 +471,7 @@ export function DashboardSidebarHeader({
 				)}
 			>
 				<GoGitPullRequest className="size-4 shrink-0 text-muted-foreground" />
-				<span className="flex-1 text-left">
+				<span {...recordingUnmaskProps} className="flex-1 text-left">
 					<Trans>Pull requests</Trans>
 				</span>
 			</button>
@@ -493,7 +494,7 @@ export function DashboardSidebarHeader({
 					className="size-4 shrink-0 text-muted-foreground"
 					strokeWidth={1.5}
 				/>
-				<span className="flex-1 text-left">
+				<span {...recordingUnmaskProps} className="flex-1 text-left">
 					<Trans>Pages</Trans>
 				</span>
 			</button>
@@ -517,7 +518,7 @@ export function DashboardSidebarHeader({
 						className="size-4 shrink-0 text-muted-foreground"
 						strokeWidth={1.5}
 					/>
-					<span className="flex-1 text-left">
+					<span {...recordingUnmaskProps} className="flex-1 text-left">
 						<Trans>Plugins</Trans>
 					</span>
 				</button>

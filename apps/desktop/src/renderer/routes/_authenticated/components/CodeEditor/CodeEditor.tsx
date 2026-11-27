@@ -382,7 +382,7 @@ export function CodeEditor({
 		<div
 			ref={containerRef}
 			className={cn(
-				"min-w-0",
+				"ph-no-capture min-w-0",
 				fillHeight ? "h-full w-full" : "w-full",
 				className,
 			)}

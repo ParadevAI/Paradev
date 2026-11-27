@@ -368,7 +368,7 @@ export function FilesTab({
 			<ShadowClickHint hint={filePolicy.hint} findRow={findFileRow}>
 				<PierreFileTree
 					model={model}
-					className="flex-1 min-h-0"
+					className="ph-no-capture flex-1 min-h-0"
 					style={TREE_STYLE}
 					header={
 						<div

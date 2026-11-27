@@ -160,7 +160,7 @@ function FilePaneTabTitle({
 	return (
 		<div
 			className={cn(
-				"flex min-w-0 items-center gap-1.5 text-xs transition-colors duration-150",
+				"ph-no-capture flex min-w-0 items-center gap-1.5 text-xs transition-colors duration-150",
 				isActive ? "text-foreground" : "text-muted-foreground",
 			)}
 			title={filePath}

@@ -212,7 +212,7 @@ export function FilePane({
 			)}
 			<div
 				className={cn(
-					"relative min-h-0 min-w-0 flex-1",
+					"ph-no-capture relative min-h-0 min-w-0 flex-1",
 					inRightPane &&
 						(activeView.id === "code" ? "[&_.cm-scroller]:pt-10" : "pt-10"),
 				)}
