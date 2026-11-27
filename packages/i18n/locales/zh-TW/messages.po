@@ -9344,8 +9344,8 @@ msgstr "報告bug和提需求，最快的方式是在<0>{githubHandle}</0>提一
 msgid "For individuals getting started"
 msgstr "面向剛上手的個人使用者"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "適用於 Apple Silicon 與 Intel 的 macOS。Linux AppImage 為實驗版本。"
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "適用於 Apple Silicon 與 Intel 的 macOS，以及 Linux（AppImage）。"
 
 msgid "For organizations with advanced needs"
 msgstr "面向有進階需求的組織"
@@ -9462,8 +9462,8 @@ msgstr "免費額度"
 msgid "Free for everyone"
 msgstr "對所有人免費"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "單一使用者免費。支援 macOS，另有實驗性 Linux 版本。"
+msgid "Free for one user. macOS and Linux."
+msgstr "單一使用者免費。支援 macOS 與 Linux。"
 
 msgid "Free for one user. Open source under MIT."
 msgstr "單一使用者免費。以 MIT 授權開源。"
@@ -11797,8 +11797,8 @@ msgstr "不繫結機器的雲端工作區，幾秒即可啟動，還能分享給
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS、Linux（實驗性）"
+msgid "macOS, Linux"
+msgstr "macOS、Linux"
 
 msgid "Magenta"
 msgstr "品紅"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "未更新"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "暫不支援。目前支援 macOS，另有實驗性 Linux 版本。Windows 使用者可以透過下載按鈕加入候補名單。"
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "暫不支援。目前支援 macOS 與 Linux。Windows 使用者可以透過下載按鈕加入候補名單。"
 
 msgid "Note"
 msgstr "注意"

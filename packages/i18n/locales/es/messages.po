@@ -9344,8 +9344,8 @@ msgstr "Para informes de errores y solicitudes de funciones, lo más rápido es 
 msgid "For individuals getting started"
 msgstr "Para quienes empiezan"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Para macOS en Apple Silicon e Intel. La AppImage de Linux es experimental."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Para macOS en Apple Silicon e Intel, y Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "Para organizaciones con necesidades avanzadas"
@@ -9462,8 +9462,8 @@ msgstr "Créditos gratuitos"
 msgid "Free for everyone"
 msgstr "Gratis para todos"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Gratis para un usuario. macOS, con una versión experimental para Linux."
+msgid "Free for one user. macOS and Linux."
+msgstr "Gratis para un usuario. macOS y Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Gratis para un usuario. Código abierto con licencia MIT."
@@ -11797,8 +11797,8 @@ msgstr "Espacios de trabajo en la nube, sin atarse a una máquina, que arrancan 
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimental)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Sin actualizar"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Todavía no. Funciona en macOS, con una versión experimental para Linux. Los usuarios de Windows pueden unirse a la lista de espera desde el botón de descarga."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Todavía no. Funciona en macOS y Linux. Los usuarios de Windows pueden unirse a la lista de espera desde el botón de descarga."
 
 msgid "Note"
 msgstr "Nota"

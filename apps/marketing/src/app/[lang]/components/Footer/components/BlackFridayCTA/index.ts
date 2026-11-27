@@ -1,0 +1,1 @@
+export { BlackFridayCTA } from "./BlackFridayCTA";

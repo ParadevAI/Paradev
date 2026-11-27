@@ -9344,8 +9344,8 @@ msgstr "Pro hlášení chyb a náměty na funkce je nejrychlejší cestou GitHub
 msgid "For individuals getting started"
 msgstr "Pro jednotlivce, kteří začínají"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Pro macOS na Apple Silicon i Intel. Linux AppImage je experimentální."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Pro macOS na Apple Silicon i Intel a pro Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "Pro organizace s náročnými požadavky"
@@ -9462,8 +9462,8 @@ msgstr "Kredity zdarma"
 msgid "Free for everyone"
 msgstr "Zdarma pro všechny"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Zdarma pro jednoho uživatele. macOS a experimentální sestavení pro Linux."
+msgid "Free for one user. macOS and Linux."
+msgstr "Zdarma pro jednoho uživatele. macOS a Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Zdarma pro jednoho uživatele. Open source pod licencí MIT."
@@ -11797,8 +11797,8 @@ msgstr "Cloudové pracovní prostory nevázané na počítač, které naběhnou 
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimentálně)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Purpurová"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Bez aktualizací"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Zatím ne. Běží na macOS, s experimentálním sestavením pro Linux. Uživatelé Windows se mohou přes tlačítko pro stažení zapsat na čekací listinu."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Zatím ne. Běží na macOS a Linuxu. Uživatelé Windows se mohou přes tlačítko pro stažení zapsat na čekací listinu."
 
 msgid "Note"
 msgstr "Poznámka"

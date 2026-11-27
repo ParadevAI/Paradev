@@ -9344,8 +9344,8 @@ msgstr "Untuk laporan bug dan permintaan fitur, jalur tercepat adalah issue GitH
 msgid "For individuals getting started"
 msgstr "Untuk perorangan yang baru memulai"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Untuk macOS di Apple Silicon dan Intel. Linux AppImage masih eksperimental."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "Untuk macOS di Apple Silicon dan Intel, serta Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "Untuk organisasi dengan kebutuhan tingkat lanjut"
@@ -9462,8 +9462,8 @@ msgstr "Kredit gratis"
 msgid "Free for everyone"
 msgstr "Gratis untuk semua orang"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Gratis untuk satu pengguna. macOS, dengan build Linux eksperimental."
+msgid "Free for one user. macOS and Linux."
+msgstr "Gratis untuk satu pengguna. macOS dan Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Gratis untuk satu pengguna. Open source dengan lisensi MIT."
@@ -11797,8 +11797,8 @@ msgstr "Workspace cloud yang tidak terikat mesin, siap dalam hitungan detik dan 
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (eksperimental)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Tidak diperbarui"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Belum. Berjalan di macOS, dengan build Linux eksperimental. Pengguna Windows dapat bergabung ke daftar tunggu dari tombol unduh."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Belum. Berjalan di macOS dan Linux. Pengguna Windows dapat bergabung ke daftar tunggu dari tombol unduh."
 
 msgid "Note"
 msgstr "Catatan"
