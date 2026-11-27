@@ -1,7 +1,7 @@
-interface LocaleTag {
+type LocaleTag = {
 	app_locale: string;
 	app_locale_source: "setting" | "system";
-}
+};
 
 /**
  * What to tag events with, or null while the answer is not known yet:
