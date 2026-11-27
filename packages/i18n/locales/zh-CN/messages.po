@@ -3238,8 +3238,16 @@ msgstr "“{0}”已归档"
 msgid "Archived {0}"
 msgstr "已归档 {0}"
 
+msgctxt "Paradev tool"
+msgid "Archived automation"
+msgstr "已归档自动化"
+
 msgid "Archived shown"
 msgstr "已显示归档"
+
+msgctxt "Paradev tool"
+msgid "Archiving automation"
+msgstr "正在归档自动化"
 
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "确定要删除此文件吗？此操作无法撤销。"
@@ -4951,6 +4959,14 @@ msgstr "已关闭"
 msgctxt "pull request or issue state"
 msgid "Closed"
 msgstr "已关闭"
+
+msgctxt "Paradev tool"
+msgid "Closed terminal"
+msgstr "已关闭终端"
+
+msgctxt "Paradev tool"
+msgid "Closing terminal"
+msgstr "正在关闭终端"
 
 msgid "Closing these ports will end the processes using them."
 msgstr "关闭这些端口会结束正在使用它们的进程。"
@@ -6833,6 +6849,10 @@ msgstr "已在{where}创建{createdDirs}个文件夹"
 msgid "Created 1 folder in {where}"
 msgstr "已在{where}创建1个文件夹"
 
+msgctxt "Paradev tool"
+msgid "Created automation"
+msgstr "已创建自动化"
+
 msgid "Created by"
 msgstr "创建者"
 
@@ -6845,8 +6865,16 @@ msgstr "我创建的"
 msgid "Created ENG-142 Login fails on Safari"
 msgstr "已创建 ENG-142 Safari 上登录失败"
 
+msgctxt "Paradev tool"
+msgid "Created task"
+msgstr "已创建任务"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "已创建团队“{trimmedName}”"
+
+msgctxt "Paradev tool"
+msgid "Created workspace"
+msgstr "已创建工作区"
 
 msgid "creating"
 msgstr "创建中"
@@ -6864,6 +6892,10 @@ msgstr "正在创建任务"
 msgid "Creating a workspace"
 msgstr "正在创建工作区"
 
+msgctxt "Paradev tool"
+msgid "Creating automation"
+msgstr "正在创建自动化"
+
 msgid "Creating PR..."
 msgstr "正在创建PR…"
 
@@ -6876,9 +6908,17 @@ msgstr "正在创建会话"
 msgid "Creating session: {name}"
 msgstr "正在创建会话：{name}"
 
+msgctxt "Paradev tool"
+msgid "Creating task"
+msgstr "正在创建任务"
+
 msgid "Creating the sandbox"
 msgstr "正在创建沙箱"
 
+msgid "Creating workspace"
+msgstr "正在创建工作区"
+
+msgctxt "Paradev tool"
 msgid "Creating workspace"
 msgstr "正在创建工作区"
 
@@ -7329,6 +7369,10 @@ msgstr "{deletedWhen}删除 · {deviceNames}"
 msgid "Deleted {name}"
 msgstr "已删除{name}"
 
+msgctxt "Paradev tool"
+msgid "Deleted automation"
+msgstr "已删除自动化"
+
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "{deletedBy} {deletedWhen}删除 · {deviceNames}"
 
@@ -7341,11 +7385,19 @@ msgstr "已删除或不可用，请另选一个"
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "已删除的项目可在 30 天内恢复，连同一起删除的工作区。之后将被移除；仓库文件夹和有未提交更改的工作树会保留在磁盘上。"
 
+msgctxt "Paradev tool"
+msgid "Deleted task"
+msgstr "已删除任务"
+
 msgid "Deleted user"
 msgstr "已删除的用户"
 
 msgid "Deleted workspace"
 msgstr "已删除的工作区"
+
+msgctxt "Paradev tool"
+msgid "Deleted workspace"
+msgstr "已删除工作区"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "工作区已删除，但侧边栏没能更新完"
@@ -7368,8 +7420,20 @@ msgstr "删除中"
 msgid "Deleting {name}..."
 msgstr "正在删除{name}..."
 
+msgctxt "Paradev tool"
+msgid "Deleting automation"
+msgstr "正在删除自动化"
+
 msgid "Deleting organization..."
 msgstr "正在删除组织..."
+
+msgctxt "Paradev tool"
+msgid "Deleting task"
+msgstr "正在删除任务"
+
+msgctxt "Paradev tool"
+msgid "Deleting workspace"
+msgstr "正在删除工作区"
 
 msgid "Deleting..."
 msgstr "正在删除..."
@@ -7866,8 +7930,16 @@ msgstr "下载主题文件"
 msgid "downloaded"
 msgstr "已下载"
 
+msgctxt "Paradev tool"
+msgid "Downloaded page"
+msgstr "已下载页面"
+
 msgid "Downloading"
 msgstr "下载中"
+
+msgctxt "Paradev tool"
+msgid "Downloading page"
+msgstr "正在下载页面"
 
 msgid "Downloading..."
 msgstr "正在下载..."
@@ -11347,6 +11419,14 @@ msgstr "每当打开新的终端标签页时启动此终端脚本。"
 msgid "Launch watch"
 msgstr "发布监控"
 
+msgctxt "Paradev tool"
+msgid "Launched agent"
+msgstr "已启动智能体"
+
+msgctxt "Paradev tool"
+msgid "Launching agent"
+msgstr "正在启动智能体"
+
 msgid "Layout"
 msgstr "布局"
 
@@ -11621,6 +11701,62 @@ msgctxt "shell intent"
 msgid "Listed"
 msgstr "已列出"
 
+msgctxt "Paradev tool"
+msgid "Listed agents"
+msgstr "已列出智能体"
+
+msgctxt "Paradev tool"
+msgid "Listed automation runs"
+msgstr "已列出自动化运行记录"
+
+msgctxt "Paradev tool"
+msgid "Listed automations"
+msgstr "已列出自动化"
+
+msgctxt "Paradev tool"
+msgid "Listed hosts"
+msgstr "已列出主机"
+
+msgctxt "Paradev tool"
+msgid "Listed members"
+msgstr "已列出成员"
+
+msgctxt "Paradev tool"
+msgid "Listed page comments"
+msgstr "已列出页面评论"
+
+msgctxt "Paradev tool"
+msgid "Listed page versions"
+msgstr "已列出页面版本"
+
+msgctxt "Paradev tool"
+msgid "Listed pages"
+msgstr "已列出页面"
+
+msgctxt "Paradev tool"
+msgid "Listed projects"
+msgstr "已列出项目"
+
+msgctxt "Paradev tool"
+msgid "Listed task statuses"
+msgstr "已列出任务状态"
+
+msgctxt "Paradev tool"
+msgid "Listed tasks"
+msgstr "已列出任务"
+
+msgctxt "Paradev tool"
+msgid "Listed terminals"
+msgstr "已列出终端"
+
+msgctxt "Paradev tool"
+msgid "Listed trigger options"
+msgstr "已列出触发器选项"
+
+msgctxt "Paradev tool"
+msgid "Listed workspaces"
+msgstr "已列出工作区"
+
 msgid "Listening"
 msgstr "正在聆听"
 
@@ -11637,8 +11773,64 @@ msgctxt "shell intent"
 msgid "Listing"
 msgstr "列出中"
 
+msgctxt "Paradev tool"
+msgid "Listing agents"
+msgstr "正在列出智能体"
+
+msgctxt "Paradev tool"
+msgid "Listing automation runs"
+msgstr "正在列出自动化运行记录"
+
+msgctxt "Paradev tool"
+msgid "Listing automations"
+msgstr "正在列出自动化"
+
+msgctxt "Paradev tool"
+msgid "Listing hosts"
+msgstr "正在列出主机"
+
+msgctxt "Paradev tool"
+msgid "Listing members"
+msgstr "正在列出成员"
+
+msgctxt "Paradev tool"
+msgid "Listing page comments"
+msgstr "正在列出页面评论"
+
+msgctxt "Paradev tool"
+msgid "Listing page versions"
+msgstr "正在列出页面版本"
+
+msgctxt "Paradev tool"
+msgid "Listing pages"
+msgstr "正在列出页面"
+
+msgctxt "Paradev tool"
+msgid "Listing projects"
+msgstr "正在列出项目"
+
 msgid "Listing sessions in {what}"
 msgstr "正在列出 {what} 的会话"
+
+msgctxt "Paradev tool"
+msgid "Listing task statuses"
+msgstr "正在列出任务状态"
+
+msgctxt "Paradev tool"
+msgid "Listing tasks"
+msgstr "正在列出任务"
+
+msgctxt "Paradev tool"
+msgid "Listing terminals"
+msgstr "正在列出终端"
+
+msgctxt "Paradev tool"
+msgid "Listing trigger options"
+msgstr "正在列出触发器选项"
+
+msgctxt "Paradev tool"
+msgid "Listing workspaces"
+msgstr "正在列出工作区"
 
 msgid "live"
 msgstr "实时"
@@ -14650,6 +14842,10 @@ msgstr "OpenAI拒绝了此API密钥。"
 msgid "Opened"
 msgstr "已创建"
 
+msgctxt "Paradev tool"
+msgid "Opened terminal"
+msgstr "已打开终端"
+
 msgid "Opening {appName}…"
 msgstr "正在打开 {appName}…"
 
@@ -14667,6 +14863,10 @@ msgstr "正在聊天界面中打开…"
 
 msgid "Opening pages"
 msgstr "打开页面"
+
+msgctxt "Paradev tool"
+msgid "Opening terminal"
+msgstr "正在打开终端"
 
 msgid "Operator"
 msgstr "操作员"
@@ -15256,12 +15456,20 @@ msgctxt "project state"
 msgid "Paused"
 msgstr "已暂停"
 
+msgctxt "Paradev tool"
+msgid "Paused automation"
+msgstr "已暂停自动化"
+
 #. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
 msgid "Paused until {0}"
 msgstr "已暂停至 {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev 关闭时已暂停"
+
+msgctxt "Paradev tool"
+msgid "Pausing automation"
+msgstr "正在暂停自动化"
 
 msgid "Pay {total}"
 msgstr "支付 {total}"
@@ -16021,6 +16229,10 @@ msgctxt "github release action"
 msgid "Published"
 msgstr "已发布"
 
+msgctxt "Paradev tool"
+msgid "Published page"
+msgstr "已发布页面"
+
 msgid "Published version 1."
 msgstr "已发布版本 1。"
 
@@ -16029,6 +16241,10 @@ msgstr "会公开你的token数量和模型名称，绝不会公开仓库名、�
 
 msgid "Publishing as <0>{handle}</0>. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "以<0>{handle}</0>的身份发布。仅包含token数量和模型名称，不含仓库名、文件路径或提示词。"
+
+msgctxt "Paradev tool"
+msgid "Publishing page"
+msgstr "正在发布页面"
 
 msgid "Pull request"
 msgstr "拉取请求"
@@ -16213,6 +16429,10 @@ msgstr "Radix Tooltip文档"
 msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
 msgstr "已运行 <0>bun test settings</0> · 14 个通过 · 1 个失败"
 
+msgctxt "Paradev tool"
+msgid "Ran automation"
+msgstr "已运行自动化"
+
 msgid "Random icon"
 msgstr "随机图标"
 
@@ -16298,6 +16518,14 @@ msgstr "读取和发送邮件"
 msgid "Read announcement"
 msgstr "阅读公告"
 
+msgctxt "Paradev tool"
+msgid "Read automation"
+msgstr "已读取自动化"
+
+msgctxt "Paradev tool"
+msgid "Read automation prompt"
+msgstr "已读取自动化提示词"
+
 msgid "Read data you copy and paste"
 msgstr "读取您复制和粘贴的数据"
 
@@ -16309,6 +16537,22 @@ msgstr "在手机上阅读"
 
 msgid "Read MCP servers again"
 msgstr "重新读取MCP服务器"
+
+msgctxt "Paradev tool"
+msgid "Read page"
+msgstr "已读取页面"
+
+msgctxt "Paradev tool"
+msgid "Read page storage"
+msgstr "已读取页面存储"
+
+msgctxt "Paradev tool"
+msgid "Read task"
+msgstr "已读取任务"
+
+msgctxt "Paradev tool"
+msgid "Read terminal"
+msgstr "已读取终端"
 
 msgid "Read the changelog"
 msgstr "查看更新日志"
@@ -16355,6 +16599,30 @@ msgstr "读取中"
 
 msgid "Reading {what}"
 msgstr "正在读取 {what}"
+
+msgctxt "Paradev tool"
+msgid "Reading automation"
+msgstr "正在读取自动化"
+
+msgctxt "Paradev tool"
+msgid "Reading automation prompt"
+msgstr "正在读取自动化提示词"
+
+msgctxt "Paradev tool"
+msgid "Reading page"
+msgstr "正在读取页面"
+
+msgctxt "Paradev tool"
+msgid "Reading page storage"
+msgstr "正在读取页面存储"
+
+msgctxt "Paradev tool"
+msgid "Reading task"
+msgstr "正在读取任务"
+
+msgctxt "Paradev tool"
+msgid "Reading terminal"
+msgstr "正在读取终端"
 
 msgid "Reading the page"
 msgstr "正在读取页面"
@@ -16791,11 +17059,19 @@ msgstr "已移除{removedLabel}。"
 msgid "Removed from the merge queue"
 msgstr "已移出合并队列"
 
+msgctxt "Paradev tool"
+msgid "Removed page storage"
+msgstr "已从页面存储中移除"
+
 msgid "Removes this agent from this device only."
 msgstr "仅从此设备上移除该智能体。"
 
 msgid "Removing member..."
 msgstr "正在移除成员..."
+
+msgctxt "Paradev tool"
+msgid "Removing page storage"
+msgstr "正在从页面存储中移除"
 
 msgid "Removing terminal..."
 msgstr "正在移除终端..."
@@ -16911,6 +17187,10 @@ msgstr "已替换{where}中的{replaced}个文件"
 msgid "Replaced 1 file in {where}"
 msgstr "已替换{where}中的1个文件"
 
+msgctxt "Paradev tool"
+msgid "Replied to comment"
+msgstr "已回复评论"
+
 msgid "Replied to your DM"
 msgstr "回复了你的私信"
 
@@ -16937,6 +17217,10 @@ msgstr "回复 {replyingTo}"
 
 msgid "Replying to a DM"
 msgstr "正在回复私信"
+
+msgctxt "Paradev tool"
+msgid "Replying to comment"
+msgstr "正在回复评论"
 
 msgid "repo"
 msgstr "仓库"
@@ -17110,6 +17394,14 @@ msgstr "解决讨论串"
 msgid "Resolved"
 msgstr "已解决"
 
+msgctxt "Paradev tool"
+msgid "Resolved comment"
+msgstr "已解决评论"
+
+msgctxt "Paradev tool"
+msgid "Resolving comment"
+msgstr "正在解决评论"
+
 msgid "Resource monitor"
 msgstr "资源监视器"
 
@@ -17248,8 +17540,16 @@ msgstr "已恢复“{projectName}”"
 msgid "Restored \"{workspaceName}\""
 msgstr "已恢复“{workspaceName}”"
 
+msgctxt "Paradev tool"
+msgid "Restored automation"
+msgstr "已还原自动化"
+
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "正在恢复“{workspaceName}”…"
+
+msgctxt "Paradev tool"
+msgid "Restoring automation"
+msgstr "正在还原自动化"
 
 msgid "Restoring Claude's session"
 msgstr "正在恢复 Claude 的会话"
@@ -17287,12 +17587,20 @@ msgstr "恢复自动化"
 msgid "Resume notifications"
 msgstr "恢复通知"
 
+msgctxt "Paradev tool"
+msgid "Resumed automation"
+msgstr "已恢复自动化"
+
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "正在恢复{0}…"
 
 msgid "Resuming at reset"
 msgstr "将在重置后继续"
+
+msgctxt "Paradev tool"
+msgid "Resuming automation"
+msgstr "正在恢复自动化"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds} 秒后继续"
@@ -17657,6 +17965,10 @@ msgstr "正在立即运行“{name}”"
 msgid "Running agents on this profile lose access."
 msgstr "使用此配置文件运行中的智能体将失去访问权限。"
 
+msgctxt "Paradev tool"
+msgid "Running automation"
+msgstr "正在运行自动化"
+
 msgid "Running bun test…"
 msgstr "正在运行bun test…"
 
@@ -17790,6 +18102,10 @@ msgstr "已保存 {name}，但其设置工作区无法启动：{reason}"
 msgid "Saved from a workspace"
 msgstr "从工作区保存"
 
+msgctxt "Paradev tool"
+msgid "Saved page storage"
+msgstr "已保存到页面存储"
+
 msgid "Saved to Downloads"
 msgstr "已保存到“下载”文件夹"
 
@@ -17807,6 +18123,10 @@ msgstr "正在保存为环境..."
 
 msgid "Saving its work and its chats…"
 msgstr "正在保存它的工作和聊天…"
+
+msgctxt "Paradev tool"
+msgid "Saving page storage"
+msgstr "正在保存到页面存储"
 
 msgid "Saving..."
 msgstr "正在保存..."
@@ -18415,6 +18735,10 @@ msgstr "正在发送"
 msgid "Sending a message to {what}"
 msgstr "正在向 {what} 发送消息"
 
+msgctxt "Paradev tool"
+msgid "Sending to terminal"
+msgstr "正在发送到终端"
+
 msgid "Sending..."
 msgstr "正在发送..."
 
@@ -18449,6 +18773,10 @@ msgstr "已再次向 {0} 发送邀请"
 
 msgid "Sent to agent"
 msgstr "已发送给智能体"
+
+msgctxt "Paradev tool"
+msgid "Sent to terminal"
+msgstr "已发送到终端"
 
 msgid "Sent to the pull request's workspace"
 msgstr "已发送到拉取请求的工作区"
@@ -18518,6 +18846,10 @@ msgstr "会话 · 按费用排名前{0}"
 msgid "Set a notification schedule"
 msgstr "设置通知时间表"
 
+msgctxt "Paradev tool"
+msgid "Set automation prompt"
+msgstr "已设置自动化提示词"
+
 msgid "Set channel…"
 msgstr "设置频道…"
 
@@ -18577,6 +18909,10 @@ msgstr "设置你的组织即可开始"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "把已安装的插件改回“可用”后，每个人的副本仍会保留，之后可以自行移除。改为“不可用”会将其移除。"
+
+msgctxt "Paradev tool"
+msgid "Setting automation prompt"
+msgstr "正在设置自动化提示词"
 
 msgid "Setting saved"
 msgstr "设置已保存"
@@ -22244,16 +22580,40 @@ msgstr "已更新 {key}"
 msgid "Updated {updatedRelative}"
 msgstr "更新于{updatedRelative}"
 
+msgctxt "Paradev tool"
+msgid "Updated automation"
+msgstr "已更新自动化"
+
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "刚刚从 {0} 更新。"
 
+msgctxt "Paradev tool"
+msgid "Updated task"
+msgstr "已更新任务"
+
+msgctxt "Paradev tool"
+msgid "Updated workspace"
+msgstr "已更新工作区"
+
 msgid "Updates"
 msgstr "更新"
+
+msgctxt "Paradev tool"
+msgid "Updating automation"
+msgstr "正在更新自动化"
+
+msgctxt "Paradev tool"
+msgid "Updating task"
+msgstr "正在更新任务"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
 msgstr "正在更新到 {0}"
+
+msgctxt "Paradev tool"
+msgid "Updating workspace"
+msgstr "正在更新工作区"
 
 msgid "Updating…"
 msgstr "正在更新…"

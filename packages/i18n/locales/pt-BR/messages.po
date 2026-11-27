@@ -3238,8 +3238,16 @@ msgstr "\"{0}\" arquivada"
 msgid "Archived {0}"
 msgstr "Arquivado {0}"
 
+msgctxt "Paradev tool"
+msgid "Archived automation"
+msgstr "Automação arquivada"
+
 msgid "Archived shown"
 msgstr "Arquivadas exibidas"
+
+msgctxt "Paradev tool"
+msgid "Archiving automation"
+msgstr "Arquivando automação"
 
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Tem certeza de que quer excluir este arquivo? Não dá para desfazer."
@@ -4951,6 +4959,14 @@ msgstr "Fechado"
 msgctxt "pull request or issue state"
 msgid "Closed"
 msgstr "Fechado"
+
+msgctxt "Paradev tool"
+msgid "Closed terminal"
+msgstr "Terminal fechado"
+
+msgctxt "Paradev tool"
+msgid "Closing terminal"
+msgstr "Fechando terminal"
 
 msgid "Closing these ports will end the processes using them."
 msgstr "Fechar estas portas vai encerrar os processos que as usam."
@@ -6833,6 +6849,10 @@ msgstr "{createdDirs} pastas criadas em {where}"
 msgid "Created 1 folder in {where}"
 msgstr "1 pasta criada em {where}"
 
+msgctxt "Paradev tool"
+msgid "Created automation"
+msgstr "Automação criada"
+
 msgid "Created by"
 msgstr "Criado por"
 
@@ -6845,8 +6865,16 @@ msgstr "Criados por mim"
 msgid "Created ENG-142 Login fails on Safari"
 msgstr "ENG-142 criado: falha no login no Safari"
 
+msgctxt "Paradev tool"
+msgid "Created task"
+msgstr "Tarefa criada"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "Equipe \"{trimmedName}\" criada"
+
+msgctxt "Paradev tool"
+msgid "Created workspace"
+msgstr "Área de trabalho criada"
 
 msgid "creating"
 msgstr "criando"
@@ -6864,6 +6892,10 @@ msgstr "Criando uma tarefa"
 msgid "Creating a workspace"
 msgstr "Criando uma área de trabalho"
 
+msgctxt "Paradev tool"
+msgid "Creating automation"
+msgstr "Criando automação"
+
 msgid "Creating PR..."
 msgstr "Criando PR…"
 
@@ -6876,11 +6908,19 @@ msgstr "Criando a sessão"
 msgid "Creating session: {name}"
 msgstr "Criando a sessão: {name}"
 
+msgctxt "Paradev tool"
+msgid "Creating task"
+msgstr "Criando tarefa"
+
 msgid "Creating the sandbox"
 msgstr "Criando o sandbox"
 
 msgid "Creating workspace"
 msgstr "Criando a área de trabalho"
+
+msgctxt "Paradev tool"
+msgid "Creating workspace"
+msgstr "Criando área de trabalho"
 
 msgid "Creating workspace: {name}"
 msgstr "Criando a área de trabalho: {name}"
@@ -7329,6 +7369,10 @@ msgstr "Excluído {deletedWhen} · {deviceNames}"
 msgid "Deleted {name}"
 msgstr "{name} excluído"
 
+msgctxt "Paradev tool"
+msgid "Deleted automation"
+msgstr "Automação excluída"
+
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "Excluído por {deletedBy} {deletedWhen} · {deviceNames}"
 
@@ -7341,9 +7385,17 @@ msgstr "excluída ou indisponível, escolha outra"
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "Projetos excluídos podem ser restaurados por 30 dias, junto com os workspaces excluídos com eles. Depois disso, são removidos; a pasta do repositório e os worktrees com alterações não confirmadas permanecem no disco."
 
+msgctxt "Paradev tool"
+msgid "Deleted task"
+msgstr "Tarefa excluída"
+
 msgid "Deleted user"
 msgstr "Usuário excluído"
 
+msgid "Deleted workspace"
+msgstr "Área de trabalho excluída"
+
+msgctxt "Paradev tool"
 msgid "Deleted workspace"
 msgstr "Área de trabalho excluída"
 
@@ -7368,8 +7420,20 @@ msgstr "Excluindo"
 msgid "Deleting {name}..."
 msgstr "Excluindo {name}..."
 
+msgctxt "Paradev tool"
+msgid "Deleting automation"
+msgstr "Excluindo automação"
+
 msgid "Deleting organization..."
 msgstr "Excluindo a organização..."
+
+msgctxt "Paradev tool"
+msgid "Deleting task"
+msgstr "Excluindo tarefa"
+
+msgctxt "Paradev tool"
+msgid "Deleting workspace"
+msgstr "Excluindo área de trabalho"
 
 msgid "Deleting..."
 msgstr "Excluindo..."
@@ -7866,8 +7930,16 @@ msgstr "Baixar o arquivo do tema"
 msgid "downloaded"
 msgstr "baixada"
 
+msgctxt "Paradev tool"
+msgid "Downloaded page"
+msgstr "Página baixada"
+
 msgid "Downloading"
 msgstr "Baixando"
+
+msgctxt "Paradev tool"
+msgid "Downloading page"
+msgstr "Baixando página"
 
 msgid "Downloading..."
 msgstr "Baixando..."
@@ -11347,6 +11419,14 @@ msgstr "Executa este script de terminal sempre que uma nova aba de terminal abri
 msgid "Launch watch"
 msgstr "Acompanhamento do lançamento"
 
+msgctxt "Paradev tool"
+msgid "Launched agent"
+msgstr "Agente iniciado"
+
+msgctxt "Paradev tool"
+msgid "Launching agent"
+msgstr "Iniciando agente"
+
 msgid "Layout"
 msgstr "Layout"
 
@@ -11621,6 +11701,62 @@ msgctxt "shell intent"
 msgid "Listed"
 msgstr "Listado"
 
+msgctxt "Paradev tool"
+msgid "Listed agents"
+msgstr "Agentes listados"
+
+msgctxt "Paradev tool"
+msgid "Listed automation runs"
+msgstr "Execuções de automação listadas"
+
+msgctxt "Paradev tool"
+msgid "Listed automations"
+msgstr "Automações listadas"
+
+msgctxt "Paradev tool"
+msgid "Listed hosts"
+msgstr "Hosts listados"
+
+msgctxt "Paradev tool"
+msgid "Listed members"
+msgstr "Membros listados"
+
+msgctxt "Paradev tool"
+msgid "Listed page comments"
+msgstr "Comentários da página listados"
+
+msgctxt "Paradev tool"
+msgid "Listed page versions"
+msgstr "Versões da página listadas"
+
+msgctxt "Paradev tool"
+msgid "Listed pages"
+msgstr "Páginas listadas"
+
+msgctxt "Paradev tool"
+msgid "Listed projects"
+msgstr "Projetos listados"
+
+msgctxt "Paradev tool"
+msgid "Listed task statuses"
+msgstr "Status de tarefa listados"
+
+msgctxt "Paradev tool"
+msgid "Listed tasks"
+msgstr "Tarefas listadas"
+
+msgctxt "Paradev tool"
+msgid "Listed terminals"
+msgstr "Terminais listados"
+
+msgctxt "Paradev tool"
+msgid "Listed trigger options"
+msgstr "Opções de gatilho listadas"
+
+msgctxt "Paradev tool"
+msgid "Listed workspaces"
+msgstr "Áreas de trabalho listadas"
+
 msgid "Listening"
 msgstr "Ouvindo"
 
@@ -11637,8 +11773,64 @@ msgctxt "shell intent"
 msgid "Listing"
 msgstr "Listando"
 
+msgctxt "Paradev tool"
+msgid "Listing agents"
+msgstr "Listando agentes"
+
+msgctxt "Paradev tool"
+msgid "Listing automation runs"
+msgstr "Listando execuções de automação"
+
+msgctxt "Paradev tool"
+msgid "Listing automations"
+msgstr "Listando automações"
+
+msgctxt "Paradev tool"
+msgid "Listing hosts"
+msgstr "Listando hosts"
+
+msgctxt "Paradev tool"
+msgid "Listing members"
+msgstr "Listando membros"
+
+msgctxt "Paradev tool"
+msgid "Listing page comments"
+msgstr "Listando comentários da página"
+
+msgctxt "Paradev tool"
+msgid "Listing page versions"
+msgstr "Listando versões da página"
+
+msgctxt "Paradev tool"
+msgid "Listing pages"
+msgstr "Listando páginas"
+
+msgctxt "Paradev tool"
+msgid "Listing projects"
+msgstr "Listando projetos"
+
 msgid "Listing sessions in {what}"
 msgstr "Listando as sessões de {what}"
+
+msgctxt "Paradev tool"
+msgid "Listing task statuses"
+msgstr "Listando status de tarefa"
+
+msgctxt "Paradev tool"
+msgid "Listing tasks"
+msgstr "Listando tarefas"
+
+msgctxt "Paradev tool"
+msgid "Listing terminals"
+msgstr "Listando terminais"
+
+msgctxt "Paradev tool"
+msgid "Listing trigger options"
+msgstr "Listando opções de gatilho"
+
+msgctxt "Paradev tool"
+msgid "Listing workspaces"
+msgstr "Listando áreas de trabalho"
 
 msgid "live"
 msgstr "ao vivo"
@@ -14650,6 +14842,10 @@ msgstr "A OpenAI recusou esta chave de API."
 msgid "Opened"
 msgstr "Aberto"
 
+msgctxt "Paradev tool"
+msgid "Opened terminal"
+msgstr "Terminal aberto"
+
 msgid "Opening {appName}…"
 msgstr "Abrindo o {appName}…"
 
@@ -14667,6 +14863,10 @@ msgstr "Abrindo na interface de chat…"
 
 msgid "Opening pages"
 msgstr "Abertura de páginas"
+
+msgctxt "Paradev tool"
+msgid "Opening terminal"
+msgstr "Abrindo terminal"
 
 msgid "Operator"
 msgstr "Operador"
@@ -15256,12 +15456,20 @@ msgctxt "project state"
 msgid "Paused"
 msgstr "Pausado"
 
+msgctxt "Paradev tool"
+msgid "Paused automation"
+msgstr "Automação pausada"
+
 #. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
 msgid "Paused until {0}"
 msgstr "Pausado até {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Pausado quando o Paradev foi fechado"
+
+msgctxt "Paradev tool"
+msgid "Pausing automation"
+msgstr "Pausando automação"
 
 msgid "Pay {total}"
 msgstr "Pagar {total}"
@@ -16021,6 +16229,10 @@ msgctxt "github release action"
 msgid "Published"
 msgstr "Publicado"
 
+msgctxt "Paradev tool"
+msgid "Published page"
+msgstr "Página publicada"
+
 msgid "Published version 1."
 msgstr "Versão 1 publicada."
 
@@ -16029,6 +16241,10 @@ msgstr "Publica suas contagens de tokens e nomes de modelos, nunca nomes de repo
 
 msgid "Publishing as <0>{handle}</0>. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "Publicando como <0>{handle}</0>. Só contagens de tokens e nomes de modelos, sem nomes de repositórios, caminhos de arquivos ou prompts."
+
+msgctxt "Paradev tool"
+msgid "Publishing page"
+msgstr "Publicando página"
 
 msgid "Pull request"
 msgstr "Pull request"
@@ -16213,6 +16429,10 @@ msgstr "Documentação do Radix Tooltip"
 msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
 msgstr "Executou <0>bun test settings</0> · 14 aprovados · 1 falhou"
 
+msgctxt "Paradev tool"
+msgid "Ran automation"
+msgstr "Automação executada"
+
 msgid "Random icon"
 msgstr "Ícone aleatório"
 
@@ -16298,6 +16518,14 @@ msgstr "Ler e enviar e-mails"
 msgid "Read announcement"
 msgstr "Ler o anúncio"
 
+msgctxt "Paradev tool"
+msgid "Read automation"
+msgstr "Automação lida"
+
+msgctxt "Paradev tool"
+msgid "Read automation prompt"
+msgstr "Prompt da automação lido"
+
 msgid "Read data you copy and paste"
 msgstr "Ler dados que você copia e cola"
 
@@ -16309,6 +16537,22 @@ msgstr "Leia no celular"
 
 msgid "Read MCP servers again"
 msgstr "Ler os servidores MCP de novo"
+
+msgctxt "Paradev tool"
+msgid "Read page"
+msgstr "Página lida"
+
+msgctxt "Paradev tool"
+msgid "Read page storage"
+msgstr "Armazenamento da página lido"
+
+msgctxt "Paradev tool"
+msgid "Read task"
+msgstr "Tarefa lida"
+
+msgctxt "Paradev tool"
+msgid "Read terminal"
+msgstr "Terminal lido"
 
 msgid "Read the changelog"
 msgstr "Ler o changelog"
@@ -16355,6 +16599,30 @@ msgstr "Lendo"
 
 msgid "Reading {what}"
 msgstr "Lendo {what}"
+
+msgctxt "Paradev tool"
+msgid "Reading automation"
+msgstr "Lendo automação"
+
+msgctxt "Paradev tool"
+msgid "Reading automation prompt"
+msgstr "Lendo prompt da automação"
+
+msgctxt "Paradev tool"
+msgid "Reading page"
+msgstr "Lendo página"
+
+msgctxt "Paradev tool"
+msgid "Reading page storage"
+msgstr "Lendo armazenamento da página"
+
+msgctxt "Paradev tool"
+msgid "Reading task"
+msgstr "Lendo tarefa"
+
+msgctxt "Paradev tool"
+msgid "Reading terminal"
+msgstr "Lendo terminal"
 
 msgid "Reading the page"
 msgstr "Lendo a página"
@@ -16791,11 +17059,19 @@ msgstr "{removedLabel} removida."
 msgid "Removed from the merge queue"
 msgstr "Removido da fila de merge"
 
+msgctxt "Paradev tool"
+msgid "Removed page storage"
+msgstr "Armazenamento da página removido"
+
 msgid "Removes this agent from this device only."
 msgstr "Remove este agente apenas deste dispositivo."
 
 msgid "Removing member..."
 msgstr "Removendo o membro..."
+
+msgctxt "Paradev tool"
+msgid "Removing page storage"
+msgstr "Removendo armazenamento da página"
 
 msgid "Removing terminal..."
 msgstr "Removendo o terminal..."
@@ -16911,6 +17187,10 @@ msgstr "{replaced} arquivos substituídos em {where}"
 msgid "Replaced 1 file in {where}"
 msgstr "1 arquivo substituído em {where}"
 
+msgctxt "Paradev tool"
+msgid "Replied to comment"
+msgstr "Comentário respondido"
+
 msgid "Replied to your DM"
 msgstr "Respondeu sua mensagem direta"
 
@@ -16937,6 +17217,10 @@ msgstr "Respondendo a {replyingTo}"
 
 msgid "Replying to a DM"
 msgstr "Respondendo a uma mensagem direta"
+
+msgctxt "Paradev tool"
+msgid "Replying to comment"
+msgstr "Respondendo ao comentário"
 
 msgid "repo"
 msgstr "repo"
@@ -17110,6 +17394,14 @@ msgstr "Resolver thread"
 msgid "Resolved"
 msgstr "Resolvida"
 
+msgctxt "Paradev tool"
+msgid "Resolved comment"
+msgstr "Comentário resolvido"
+
+msgctxt "Paradev tool"
+msgid "Resolving comment"
+msgstr "Resolvendo comentário"
+
 msgid "Resource monitor"
 msgstr "Monitor de recursos"
 
@@ -17248,8 +17540,16 @@ msgstr "\"{projectName}\" restaurado"
 msgid "Restored \"{workspaceName}\""
 msgstr "\"{workspaceName}\" restaurado"
 
+msgctxt "Paradev tool"
+msgid "Restored automation"
+msgstr "Automação restaurada"
+
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "Restaurando \"{workspaceName}\"…"
+
+msgctxt "Paradev tool"
+msgid "Restoring automation"
+msgstr "Restaurando automação"
 
 msgid "Restoring Claude's session"
 msgstr "Restaurando a sessão do Claude"
@@ -17287,12 +17587,20 @@ msgstr "Retomar automação"
 msgid "Resume notifications"
 msgstr "Retomar notificações"
 
+msgctxt "Paradev tool"
+msgid "Resumed automation"
+msgstr "Automação retomada"
+
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "Retomando {0}…"
 
 msgid "Resuming at reset"
 msgstr "Retomando na redefinição"
+
+msgctxt "Paradev tool"
+msgid "Resuming automation"
+msgstr "Retomando automação"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "Retomando em {resumeSeconds} s"
@@ -17657,6 +17965,10 @@ msgstr "Executando \"{name}\" agora"
 msgid "Running agents on this profile lose access."
 msgstr "Os agentes em execução neste perfil perdem o acesso."
 
+msgctxt "Paradev tool"
+msgid "Running automation"
+msgstr "Executando automação"
+
 msgid "Running bun test…"
 msgstr "Executando bun test…"
 
@@ -17790,6 +18102,10 @@ msgstr "{name} salvo, mas não foi possível iniciar o workspace de configuraç�
 msgid "Saved from a workspace"
 msgstr "Salvo a partir de uma área de trabalho"
 
+msgctxt "Paradev tool"
+msgid "Saved page storage"
+msgstr "Armazenamento da página salvo"
+
 msgid "Saved to Downloads"
 msgstr "Salvo em Downloads"
 
@@ -17807,6 +18123,10 @@ msgstr "Salvando como ambiente..."
 
 msgid "Saving its work and its chats…"
 msgstr "Salvando o trabalho e os chats dela…"
+
+msgctxt "Paradev tool"
+msgid "Saving page storage"
+msgstr "Salvando armazenamento da página"
 
 msgid "Saving..."
 msgstr "Salvando..."
@@ -18415,6 +18735,10 @@ msgstr "Enviando"
 msgid "Sending a message to {what}"
 msgstr "Enviando uma mensagem para {what}"
 
+msgctxt "Paradev tool"
+msgid "Sending to terminal"
+msgstr "Enviando para o terminal"
+
 msgid "Sending..."
 msgstr "Enviando..."
 
@@ -18449,6 +18773,10 @@ msgstr "Convite reenviado para {0}"
 
 msgid "Sent to agent"
 msgstr "Enviado ao agente"
+
+msgctxt "Paradev tool"
+msgid "Sent to terminal"
+msgstr "Enviado para o terminal"
 
 msgid "Sent to the pull request's workspace"
 msgstr "Enviado à área de trabalho do pull request"
@@ -18518,6 +18846,10 @@ msgstr "Sessões · top {0} por custo"
 msgid "Set a notification schedule"
 msgstr "Definir um horário de notificações"
 
+msgctxt "Paradev tool"
+msgid "Set automation prompt"
+msgstr "Prompt da automação definido"
+
 msgid "Set channel…"
 msgstr "Definir canal…"
 
@@ -18577,6 +18909,10 @@ msgstr "Configure sua organização para começar"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "Voltar um plugin instalado para Disponível mantém a cópia de cada um; depois eles podem removê-la. Indisponível o remove."
+
+msgctxt "Paradev tool"
+msgid "Setting automation prompt"
+msgstr "Definindo prompt da automação"
 
 msgid "Setting saved"
 msgstr "Configuração salva"
@@ -22244,16 +22580,40 @@ msgstr "{key} atualizada"
 msgid "Updated {updatedRelative}"
 msgstr "Atualizado {updatedRelative}"
 
+msgctxt "Paradev tool"
+msgid "Updated automation"
+msgstr "Automação atualizada"
+
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "Atualizado agora mesmo a partir da {0}."
 
+msgctxt "Paradev tool"
+msgid "Updated task"
+msgstr "Tarefa atualizada"
+
+msgctxt "Paradev tool"
+msgid "Updated workspace"
+msgstr "Área de trabalho atualizada"
+
 msgid "Updates"
 msgstr "Atualizações"
+
+msgctxt "Paradev tool"
+msgid "Updating automation"
+msgstr "Atualizando automação"
+
+msgctxt "Paradev tool"
+msgid "Updating task"
+msgstr "Atualizando tarefa"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
 msgstr "Atualizando para {0}"
+
+msgctxt "Paradev tool"
+msgid "Updating workspace"
+msgstr "Atualizando área de trabalho"
 
 msgid "Updating…"
 msgstr "Atualizando…"

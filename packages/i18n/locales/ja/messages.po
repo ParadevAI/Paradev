@@ -3238,8 +3238,16 @@ msgstr "「{0}」をアーカイブしました"
 msgid "Archived {0}"
 msgstr "アーカイブ済み {0}"
 
+msgctxt "Paradev tool"
+msgid "Archived automation"
+msgstr "オートメーションをアーカイブしました"
+
 msgid "Archived shown"
 msgstr "アーカイブ済みを表示中"
+
+msgctxt "Paradev tool"
+msgid "Archiving automation"
+msgstr "オートメーションをアーカイブ中"
 
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "このファイルを削除してもよろしいですか?この操作は元に戻せません。"
@@ -4951,6 +4959,14 @@ msgstr "クローズ済み"
 msgctxt "pull request or issue state"
 msgid "Closed"
 msgstr "クローズ済み"
+
+msgctxt "Paradev tool"
+msgid "Closed terminal"
+msgstr "ターミナルを終了しました"
+
+msgctxt "Paradev tool"
+msgid "Closing terminal"
+msgstr "ターミナルを終了中"
 
 msgid "Closing these ports will end the processes using them."
 msgstr "これらのポートを閉じると、使用中のプロセスが終了します。"
@@ -6833,6 +6849,10 @@ msgstr "{createdDirs}件のフォルダを{where}に作成しました"
 msgid "Created 1 folder in {where}"
 msgstr "1件のフォルダを{where}に作成しました"
 
+msgctxt "Paradev tool"
+msgid "Created automation"
+msgstr "オートメーションを作成しました"
+
 msgid "Created by"
 msgstr "作成者"
 
@@ -6845,8 +6865,16 @@ msgstr "自分が作成"
 msgid "Created ENG-142 Login fails on Safari"
 msgstr "ENG-142「Safariでログインに失敗する」を作成しました"
 
+msgctxt "Paradev tool"
+msgid "Created task"
+msgstr "タスクを作成しました"
+
 msgid "Created team \"{trimmedName}\""
 msgstr "チーム「{trimmedName}」を作成しました"
+
+msgctxt "Paradev tool"
+msgid "Created workspace"
+msgstr "ワークスペースを作成しました"
 
 msgid "creating"
 msgstr "作成中"
@@ -6864,6 +6892,10 @@ msgstr "タスクを作成中"
 msgid "Creating a workspace"
 msgstr "ワークスペースを作成中"
 
+msgctxt "Paradev tool"
+msgid "Creating automation"
+msgstr "オートメーションを作成中"
+
 msgid "Creating PR..."
 msgstr "PRを作成中…"
 
@@ -6876,9 +6908,17 @@ msgstr "セッションを作成中"
 msgid "Creating session: {name}"
 msgstr "セッションを作成中: {name}"
 
+msgctxt "Paradev tool"
+msgid "Creating task"
+msgstr "タスクを作成中"
+
 msgid "Creating the sandbox"
 msgstr "サンドボックスを作成中"
 
+msgid "Creating workspace"
+msgstr "ワークスペースを作成中"
+
+msgctxt "Paradev tool"
 msgid "Creating workspace"
 msgstr "ワークスペースを作成中"
 
@@ -7329,6 +7369,10 @@ msgstr "{deletedWhen}に削除 · {deviceNames}"
 msgid "Deleted {name}"
 msgstr "{name}を削除しました"
 
+msgctxt "Paradev tool"
+msgid "Deleted automation"
+msgstr "オートメーションを削除しました"
+
 msgid "Deleted by {deletedBy} {deletedWhen} · {deviceNames}"
 msgstr "{deletedBy} が{deletedWhen}に削除 · {deviceNames}"
 
@@ -7341,11 +7385,19 @@ msgstr "削除済みまたは利用不可、別のものを選んでください
 msgid "Deleted projects can be restored for 30 days, with the workspaces that were deleted with them. After that they are removed; the repository folder and worktrees with uncommitted changes stay on disk."
 msgstr "削除したプロジェクトは、一緒に削除されたワークスペースとともに 30 日間復元できます。その後は完全に削除されますが、リポジトリのフォルダーと未コミットの変更があるワークツリーはディスクに残ります。"
 
+msgctxt "Paradev tool"
+msgid "Deleted task"
+msgstr "タスクを削除しました"
+
 msgid "Deleted user"
 msgstr "削除されたユーザー"
 
 msgid "Deleted workspace"
 msgstr "削除されたワークスペース"
+
+msgctxt "Paradev tool"
+msgid "Deleted workspace"
+msgstr "ワークスペースを削除しました"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "ワークスペースは削除しましたが、サイドバーの更新を完了できませんでした"
@@ -7368,8 +7420,20 @@ msgstr "削除中"
 msgid "Deleting {name}..."
 msgstr "{name}を削除中..."
 
+msgctxt "Paradev tool"
+msgid "Deleting automation"
+msgstr "オートメーションを削除中"
+
 msgid "Deleting organization..."
 msgstr "組織を削除中..."
+
+msgctxt "Paradev tool"
+msgid "Deleting task"
+msgstr "タスクを削除中"
+
+msgctxt "Paradev tool"
+msgid "Deleting workspace"
+msgstr "ワークスペースを削除中"
 
 msgid "Deleting..."
 msgstr "削除中..."
@@ -7866,8 +7930,16 @@ msgstr "テーマファイルをダウンロード"
 msgid "downloaded"
 msgstr "ダウンロード済み"
 
+msgctxt "Paradev tool"
+msgid "Downloaded page"
+msgstr "ページをダウンロードしました"
+
 msgid "Downloading"
 msgstr "ダウンロード中"
+
+msgctxt "Paradev tool"
+msgid "Downloading page"
+msgstr "ページをダウンロード中"
 
 msgid "Downloading..."
 msgstr "ダウンロード中..."
@@ -11347,6 +11419,14 @@ msgstr "新しいターミナルタブを開くたびにこのターミナルス
 msgid "Launch watch"
 msgstr "リリース監視"
 
+msgctxt "Paradev tool"
+msgid "Launched agent"
+msgstr "エージェントを起動しました"
+
+msgctxt "Paradev tool"
+msgid "Launching agent"
+msgstr "エージェントを起動中"
+
 msgid "Layout"
 msgstr "レイアウト"
 
@@ -11621,6 +11701,62 @@ msgctxt "shell intent"
 msgid "Listed"
 msgstr "一覧表示済み"
 
+msgctxt "Paradev tool"
+msgid "Listed agents"
+msgstr "エージェントを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed automation runs"
+msgstr "オートメーションの実行履歴を一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed automations"
+msgstr "オートメーションを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed hosts"
+msgstr "ホストを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed members"
+msgstr "メンバーを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed page comments"
+msgstr "ページのコメントを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed page versions"
+msgstr "ページのバージョンを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed pages"
+msgstr "ページを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed projects"
+msgstr "プロジェクトを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed task statuses"
+msgstr "タスクのステータスを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed tasks"
+msgstr "タスクを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed terminals"
+msgstr "ターミナルを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed trigger options"
+msgstr "トリガーのオプションを一覧表示しました"
+
+msgctxt "Paradev tool"
+msgid "Listed workspaces"
+msgstr "ワークスペースを一覧表示しました"
+
 msgid "Listening"
 msgstr "聞き取り中"
 
@@ -11637,8 +11773,64 @@ msgctxt "shell intent"
 msgid "Listing"
 msgstr "一覧表示中"
 
+msgctxt "Paradev tool"
+msgid "Listing agents"
+msgstr "エージェントを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing automation runs"
+msgstr "オートメーションの実行履歴を一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing automations"
+msgstr "オートメーションを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing hosts"
+msgstr "ホストを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing members"
+msgstr "メンバーを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing page comments"
+msgstr "ページのコメントを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing page versions"
+msgstr "ページのバージョンを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing pages"
+msgstr "ページを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing projects"
+msgstr "プロジェクトを一覧表示中"
+
 msgid "Listing sessions in {what}"
 msgstr "{what} のセッションを一覧中"
+
+msgctxt "Paradev tool"
+msgid "Listing task statuses"
+msgstr "タスクのステータスを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing tasks"
+msgstr "タスクを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing terminals"
+msgstr "ターミナルを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing trigger options"
+msgstr "トリガーのオプションを一覧表示中"
+
+msgctxt "Paradev tool"
+msgid "Listing workspaces"
+msgstr "ワークスペースを一覧表示中"
 
 msgid "live"
 msgstr "ライブ"
@@ -14650,6 +14842,10 @@ msgstr "OpenAIがこのAPIキーを拒否しました。"
 msgid "Opened"
 msgstr "オープン"
 
+msgctxt "Paradev tool"
+msgid "Opened terminal"
+msgstr "ターミナルを起動しました"
+
 msgid "Opening {appName}…"
 msgstr "{appName} を開いています…"
 
@@ -14667,6 +14863,10 @@ msgstr "チャット画面で開いています…"
 
 msgid "Opening pages"
 msgstr "ページを開く"
+
+msgctxt "Paradev tool"
+msgid "Opening terminal"
+msgstr "ターミナルを起動中"
 
 msgid "Operator"
 msgstr "オペレーター"
@@ -15256,12 +15456,20 @@ msgctxt "project state"
 msgid "Paused"
 msgstr "一時停止"
 
+msgctxt "Paradev tool"
+msgid "Paused automation"
+msgstr "オートメーションを一時停止しました"
+
 #. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
 msgid "Paused until {0}"
 msgstr "{0}まで一時停止中"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev の終了時に一時停止しました"
+
+msgctxt "Paradev tool"
+msgid "Pausing automation"
+msgstr "オートメーションを一時停止中"
 
 msgid "Pay {total}"
 msgstr "{total} を支払う"
@@ -16021,6 +16229,10 @@ msgctxt "github release action"
 msgid "Published"
 msgstr "公開"
 
+msgctxt "Paradev tool"
+msgid "Published page"
+msgstr "ページを公開しました"
+
 msgid "Published version 1."
 msgstr "バージョン1を公開しました。"
 
@@ -16029,6 +16241,10 @@ msgstr "トークン数とモデル名のみを公開し、リポジトリ名、
 
 msgid "Publishing as <0>{handle}</0>. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "<0>{handle}</0>として公開中。トークン数とモデル名のみで、リポジトリ名、ファイルパス、プロンプトは含まれません。"
+
+msgctxt "Paradev tool"
+msgid "Publishing page"
+msgstr "ページを公開中"
 
 msgid "Pull request"
 msgstr "プルリクエスト"
@@ -16213,6 +16429,10 @@ msgstr "Radix Tooltipのドキュメント"
 msgid "Ran <0>bun test settings</0> · 14 passed · 1 failed"
 msgstr "<0>bun test settings</0> を実行 · 14件成功 · 1件失敗"
 
+msgctxt "Paradev tool"
+msgid "Ran automation"
+msgstr "オートメーションを実行しました"
+
 msgid "Random icon"
 msgstr "ランダムなアイコン"
 
@@ -16298,6 +16518,14 @@ msgstr "メールの閲覧と送信"
 msgid "Read announcement"
 msgstr "お知らせを読む"
 
+msgctxt "Paradev tool"
+msgid "Read automation"
+msgstr "オートメーションを読み取りました"
+
+msgctxt "Paradev tool"
+msgid "Read automation prompt"
+msgstr "オートメーションのプロンプトを読み取りました"
+
 msgid "Read data you copy and paste"
 msgstr "コピーして貼り付けたデータの読み取り"
 
@@ -16309,6 +16537,22 @@ msgstr "スマートフォンで読める"
 
 msgid "Read MCP servers again"
 msgstr "MCPサーバーを再読み込み"
+
+msgctxt "Paradev tool"
+msgid "Read page"
+msgstr "ページを読み取りました"
+
+msgctxt "Paradev tool"
+msgid "Read page storage"
+msgstr "ページのストレージを読み取りました"
+
+msgctxt "Paradev tool"
+msgid "Read task"
+msgstr "タスクを読み取りました"
+
+msgctxt "Paradev tool"
+msgid "Read terminal"
+msgstr "ターミナルを読み取りました"
 
 msgid "Read the changelog"
 msgstr "Changelogを読む"
@@ -16355,6 +16599,30 @@ msgstr "読み取り中"
 
 msgid "Reading {what}"
 msgstr "{what} を読み取り中"
+
+msgctxt "Paradev tool"
+msgid "Reading automation"
+msgstr "オートメーションを読み取り中"
+
+msgctxt "Paradev tool"
+msgid "Reading automation prompt"
+msgstr "オートメーションのプロンプトを読み取り中"
+
+msgctxt "Paradev tool"
+msgid "Reading page"
+msgstr "ページを読み取り中"
+
+msgctxt "Paradev tool"
+msgid "Reading page storage"
+msgstr "ページのストレージを読み取り中"
+
+msgctxt "Paradev tool"
+msgid "Reading task"
+msgstr "タスクを読み取り中"
+
+msgctxt "Paradev tool"
+msgid "Reading terminal"
+msgstr "ターミナルを読み取り中"
 
 msgid "Reading the page"
 msgstr "ページを読み込み中"
@@ -16791,11 +17059,19 @@ msgstr "{removedLabel}を削除しました。"
 msgid "Removed from the merge queue"
 msgstr "マージキューから外しました"
 
+msgctxt "Paradev tool"
+msgid "Removed page storage"
+msgstr "ページのストレージを削除しました"
+
 msgid "Removes this agent from this device only."
 msgstr "このデバイスからのみエージェントを削除します。"
 
 msgid "Removing member..."
 msgstr "メンバーを削除中..."
+
+msgctxt "Paradev tool"
+msgid "Removing page storage"
+msgstr "ページのストレージを削除中"
 
 msgid "Removing terminal..."
 msgstr "ターミナルを削除中..."
@@ -16911,6 +17187,10 @@ msgstr "{replaced}件のファイルを{where}で置き換えました"
 msgid "Replaced 1 file in {where}"
 msgstr "1件のファイルを{where}で置き換えました"
 
+msgctxt "Paradev tool"
+msgid "Replied to comment"
+msgstr "コメントに返信しました"
+
 msgid "Replied to your DM"
 msgstr "あなたのダイレクトメッセージに返信しました"
 
@@ -16937,6 +17217,10 @@ msgstr "{replyingTo} に返信"
 
 msgid "Replying to a DM"
 msgstr "ダイレクトメッセージに返信中"
+
+msgctxt "Paradev tool"
+msgid "Replying to comment"
+msgstr "コメントに返信中"
 
 msgid "repo"
 msgstr "リポジトリ"
@@ -17110,6 +17394,14 @@ msgstr "スレッドを解決"
 msgid "Resolved"
 msgstr "解決済み"
 
+msgctxt "Paradev tool"
+msgid "Resolved comment"
+msgstr "コメントを解決しました"
+
+msgctxt "Paradev tool"
+msgid "Resolving comment"
+msgstr "コメントを解決中"
+
 msgid "Resource monitor"
 msgstr "リソースモニター"
 
@@ -17248,8 +17540,16 @@ msgstr "「{projectName}」を復元しました"
 msgid "Restored \"{workspaceName}\""
 msgstr "「{workspaceName}」を復元しました"
 
+msgctxt "Paradev tool"
+msgid "Restored automation"
+msgstr "オートメーションを復元しました"
+
 msgid "Restoring \"{workspaceName}\"…"
 msgstr "「{workspaceName}」を復元中…"
+
+msgctxt "Paradev tool"
+msgid "Restoring automation"
+msgstr "オートメーションを復元中"
 
 msgid "Restoring Claude's session"
 msgstr "Claude のセッションを復元しています"
@@ -17287,12 +17587,20 @@ msgstr "オートメーションを再開"
 msgid "Resume notifications"
 msgstr "通知を再開"
 
+msgctxt "Paradev tool"
+msgid "Resumed automation"
+msgstr "オートメーションを再開しました"
+
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "{0}を再開中…"
 
 msgid "Resuming at reset"
 msgstr "リセット時に再開します"
+
+msgctxt "Paradev tool"
+msgid "Resuming automation"
+msgstr "オートメーションを再開中"
 
 msgid "Resuming in {resumeSeconds}s"
 msgstr "{resumeSeconds}秒後に再開します"
@@ -17657,6 +17965,10 @@ msgstr "「{name}」を今すぐ実行します"
 msgid "Running agents on this profile lose access."
 msgstr "このプロファイルで実行中のエージェントはアクセスを失います。"
 
+msgctxt "Paradev tool"
+msgid "Running automation"
+msgstr "オートメーションを実行中"
+
 msgid "Running bun test…"
 msgstr "bun testを実行中…"
 
@@ -17790,6 +18102,10 @@ msgstr "{name} を保存しましたが、セットアップ用ワークスペ�
 msgid "Saved from a workspace"
 msgstr "ワークスペースから保存"
 
+msgctxt "Paradev tool"
+msgid "Saved page storage"
+msgstr "ページのストレージを保存しました"
+
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
 
@@ -17807,6 +18123,10 @@ msgstr "環境として保存しています..."
 
 msgid "Saving its work and its chats…"
 msgstr "作業内容とチャットを保存しています…"
+
+msgctxt "Paradev tool"
+msgid "Saving page storage"
+msgstr "ページのストレージを保存中"
 
 msgid "Saving..."
 msgstr "保存中..."
@@ -18415,6 +18735,10 @@ msgstr "送信中"
 msgid "Sending a message to {what}"
 msgstr "{what} にメッセージを送信中"
 
+msgctxt "Paradev tool"
+msgid "Sending to terminal"
+msgstr "ターミナルに送信中"
+
 msgid "Sending..."
 msgstr "送信中..."
 
@@ -18449,6 +18773,10 @@ msgstr "{0}に招待を再送信しました"
 
 msgid "Sent to agent"
 msgstr "エージェントに送信しました"
+
+msgctxt "Paradev tool"
+msgid "Sent to terminal"
+msgstr "ターミナルに送信しました"
 
 msgid "Sent to the pull request's workspace"
 msgstr "プルリクエストのワークスペースに送信しました"
@@ -18518,6 +18846,10 @@ msgstr "セッション · コスト上位{0}件"
 msgid "Set a notification schedule"
 msgstr "通知スケジュールを設定"
 
+msgctxt "Paradev tool"
+msgid "Set automation prompt"
+msgstr "オートメーションのプロンプトを設定しました"
+
 msgid "Set channel…"
 msgstr "チャンネルを設定…"
 
@@ -18577,6 +18909,10 @@ msgstr "組織をセットアップして始めましょう"
 
 msgid "Setting an installed plugin back to Available keeps everyone's copy; they can then remove it. Unavailable removes it."
 msgstr "インストール済みのプラグインを「利用可能」に戻しても、全員のコピーは残り、各自で削除できるようになります。「利用不可」にすると削除されます。"
+
+msgctxt "Paradev tool"
+msgid "Setting automation prompt"
+msgstr "オートメーションのプロンプトを設定中"
 
 msgid "Setting saved"
 msgstr "設定を保存しました"
@@ -22244,16 +22580,40 @@ msgstr "{key} を更新しました"
 msgid "Updated {updatedRelative}"
 msgstr "{updatedRelative}に更新"
 
+msgctxt "Paradev tool"
+msgid "Updated automation"
+msgstr "オートメーションを更新しました"
+
 #. placeholder {0}: previousVersion ?? "?"
 msgid "Updated just now from {0}."
 msgstr "{0}からたった今更新しました。"
 
+msgctxt "Paradev tool"
+msgid "Updated task"
+msgstr "タスクを更新しました"
+
+msgctxt "Paradev tool"
+msgid "Updated workspace"
+msgstr "ワークスペースを更新しました"
+
 msgid "Updates"
 msgstr "アップデート"
+
+msgctxt "Paradev tool"
+msgid "Updating automation"
+msgstr "オートメーションを更新中"
+
+msgctxt "Paradev tool"
+msgid "Updating task"
+msgstr "タスクを更新中"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
 msgstr "{0}に更新中"
+
+msgctxt "Paradev tool"
+msgid "Updating workspace"
+msgstr "ワークスペースを更新中"
 
 msgid "Updating…"
 msgstr "更新中…"

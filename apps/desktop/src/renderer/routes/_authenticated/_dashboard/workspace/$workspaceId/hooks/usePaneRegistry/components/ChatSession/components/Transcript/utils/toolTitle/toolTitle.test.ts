@@ -78,3 +78,15 @@ test("a command title is unwrapped and set as a command; a description is not", 
 		}),
 	).toMatchObject({ label: "Run the unit tests", command: false });
 });
+
+test("a Paradev tool reads as its translated action, not its raw name", () => {
+	const list: ToolCall = {
+		...tool,
+		title: "mcp__superset__tasks_list",
+		toolKind: "other",
+		content: [],
+		mcpServer: { name: "superset", tool: "tasks_list" },
+	};
+	expect(toolTitleText(list, undefined, true)).toBe("Listed tasks");
+	expect(toolTitleText({ ...list, status: "running" })).toBe("Listing tasks");
+});
