@@ -34,7 +34,7 @@ describe("pendingLaunchOutcome", () => {
 	});
 
 	it("binds to the launch's chat after its harness stopped", () => {
-		const finished = chat(T, false);
+		const finished = { ...chat(null, false), launchTerminalId: T };
 		expect(
 			pendingLaunchOutcome({
 				...base,

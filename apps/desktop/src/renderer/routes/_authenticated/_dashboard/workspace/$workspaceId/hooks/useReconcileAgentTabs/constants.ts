@@ -1,0 +1,2 @@
+export const CHAT_SESSIONS_POLL_MS = 15_000;
+export const CHAT_SESSIONS_LIMIT = 200;

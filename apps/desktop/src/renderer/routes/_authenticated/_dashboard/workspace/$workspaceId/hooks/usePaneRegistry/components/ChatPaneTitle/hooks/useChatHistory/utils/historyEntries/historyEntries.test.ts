@@ -9,6 +9,7 @@ function saved(overrides: Partial<SavedSession> = {}): SavedSession {
 		scopeId: "workspace",
 		harness: "claude-acp",
 		agentConfigId: null,
+		launchTerminalId: null,
 		harnessSessionId: "native-1",
 		epoch: "epoch",
 		status: "idle",
@@ -47,15 +48,6 @@ describe("historyEntries", () => {
 			terminalId: "terminal",
 			title: "Saved chat",
 		});
-	});
-
-	it("reopens a stopped chat on a fresh terminal, not the one it ran under", () => {
-		const [entry] = historyEntries(
-			[saved({ live: false, terminalId: "terminal" })],
-			[],
-			"claude-acp",
-		);
-		expect(entry?.terminalId).toBeUndefined();
 	});
 
 	it("keeps provider histories separate and orders native-only chats by recency", () => {

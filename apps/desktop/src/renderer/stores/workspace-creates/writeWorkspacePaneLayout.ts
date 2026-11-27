@@ -32,6 +32,9 @@ export function writeWorkspacePaneLayout(
 		existing: existing?.paneLayout as
 			| WorkspaceState<PaneViewerData>
 			| undefined,
+		linked: [
+			existing?.rightPaneLayout as WorkspaceState<PaneViewerData> | undefined,
+		],
 		terminals,
 		agents,
 	});

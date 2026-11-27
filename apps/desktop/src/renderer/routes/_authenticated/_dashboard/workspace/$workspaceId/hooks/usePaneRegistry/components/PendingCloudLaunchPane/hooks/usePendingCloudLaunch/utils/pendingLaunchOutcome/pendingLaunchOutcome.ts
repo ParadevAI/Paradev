@@ -3,6 +3,8 @@ import type { CloudAgentLaunchSurface } from "@superset/shared/cloud-agent-launc
 export interface LaunchedChatSession {
 	sessionId: string;
 	terminalId: string | null;
+	/** The terminal it launched under, kept after the harness stops. Older hosts omit it. */
+	launchTerminalId?: string | null;
 	harnessSessionId: string | null;
 	title: string | null;
 	live: boolean;
@@ -70,7 +72,8 @@ function launchedChat(
 	const bound = terminalBinding?.chatSessionId;
 	const launched = sessions.filter(
 		(candidate) =>
-			candidate.terminalId === terminalId || candidate.sessionId === bound,
+			(candidate.terminalId ?? candidate.launchTerminalId) === terminalId ||
+			candidate.sessionId === bound,
 	);
 	return (
 		launched.find((candidate) => candidate.live) ??

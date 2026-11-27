@@ -1,35 +1,19 @@
-import { PENDING_CLOUD_LAUNCH_PANE_KIND } from "../../types";
+import type { Pane } from "@superset/panes";
+import type { PaneViewerData } from "../../types";
+import { paneClaimKeys } from "../agentPaneClaims";
 
 export const BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS = 250;
 
-/** A pending cloud chat holds the terminal id its launch was promised. */
-const TERMINAL_CLAIMING_KINDS = new Set([
-	"terminal",
-	PENDING_CLOUD_LAUNCH_PANE_KIND,
-]);
 export const BACKGROUND_TERMINAL_CLOSED_REFETCH_INTERVAL_MS = 10_000;
 export const BACKGROUND_TERMINAL_OPEN_REFETCH_INTERVAL_MS = 2_000;
 
-interface TerminalPaneLike {
-	kind: string;
-	data: unknown;
-}
-
 interface WorkspaceTabLike {
-	panes: Record<string, TerminalPaneLike>;
+	panes: Record<string, Pane<PaneViewerData>>;
 }
 
 interface BackgroundTerminalSessionLike {
 	terminalId: string;
 	createdAt?: number;
-}
-
-function getTerminalIdFromPaneData(data: unknown): string | null {
-	if (!data || typeof data !== "object") return null;
-	const terminalId = (data as { terminalId?: unknown }).terminalId;
-	return typeof terminalId === "string" && terminalId.length > 0
-		? terminalId
-		: null;
 }
 
 export function getAttachedTerminalIdsKey(
@@ -38,8 +22,7 @@ export function getAttachedTerminalIdsKey(
 	const ids = new Set<string>();
 	for (const tab of tabs) {
 		for (const pane of Object.values(tab.panes)) {
-			if (!TERMINAL_CLAIMING_KINDS.has(pane.kind)) continue;
-			const terminalId = getTerminalIdFromPaneData(pane.data);
+			const { terminalId } = paneClaimKeys(pane);
 			if (terminalId) ids.add(terminalId);
 		}
 	}

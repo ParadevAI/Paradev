@@ -305,7 +305,11 @@ describe("chat commands", () => {
 			runtime.commands
 				.listSessions({})
 				.find((session) => session.sessionId === launched.sessionId),
-		).toMatchObject({ live: false, terminalId: "terminal-1" });
+		).toMatchObject({
+			live: false,
+			terminalId: null,
+			launchTerminalId: "terminal-1",
+		});
 		await runtime.dispose();
 	});
 

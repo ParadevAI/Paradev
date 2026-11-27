@@ -1,4 +1,4 @@
-import type { ListedChatSession } from "../chatSessionsToAdopt";
+import type { ListedChatSession } from "../chatConversations";
 
 interface StoredChat {
 	id: string;

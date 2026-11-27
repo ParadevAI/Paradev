@@ -664,7 +664,7 @@ async function migrateSettings(
 /**
  * Queue each v1 terminal pane for lazy recreation (fresh shell at the v1
  * cwd) under its migrated workspace. Sessions are created on first
- * workspace open; useAutoAdoptBackgroundSessions builds the panes.
+ * workspace open; useReconcileAgentTabs builds the panes.
  */
 async function migrateTerminals(
 	deps: RunV1MigrationDeps,

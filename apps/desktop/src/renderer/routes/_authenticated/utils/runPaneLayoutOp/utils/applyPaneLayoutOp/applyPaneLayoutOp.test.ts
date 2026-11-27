@@ -160,6 +160,16 @@ describe("applyPaneLayoutOp", () => {
 		expect(again.areas.main.activeTabId).toBe(first.tabId);
 	});
 
+	test("newTab for a terminal that already has a pane reuses it", () => {
+		const again = applyPaneLayoutOp(
+			fixture(),
+			{ type: "newTab", terminalId: "term-c", focus: true },
+			() => "other",
+		);
+		expect(again.paneId).toBe("c");
+		expect(again.areas.main.tabs).toHaveLength(2);
+	});
+
 	test("a focused newTab in the sidebar shows the sidebar", () => {
 		const focused = applyPaneLayoutOp(
 			fixture(),
