@@ -48,7 +48,7 @@ jobs:
         shell: pwsh
         run: bun install --frozen --ignore-scripts
 
-      - name: Rebuild native desktop dependencies
+      - name: Install desktop native dependencies
         working-directory: apps/desktop
         shell: pwsh
         run: bun run install:deps
@@ -66,10 +66,21 @@ jobs:
       - name: Compile desktop application
         working-directory: apps/desktop
         env:
-          SUPERSET_WORKSPACE_NAME: paradev
+          SUPERSET_WORKSPACE_NAME: superset
           TARGET_ARCH: x64
+          PDEV_BUNDLE_REQUIRED: "1"
         shell: pwsh
         run: bun run compile:app
+
+      - name: Copy packaged native modules
+        working-directory: apps/desktop
+        shell: pwsh
+        run: bun run copy:native-modules
+
+      - name: Validate native runtime dependencies
+        working-directory: apps/desktop
+        shell: pwsh
+        run: bun run validate:native-runtime
 
       - name: Package Windows installer
         working-directory: apps/desktop
@@ -94,7 +105,7 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ${{ inputs.artifact_name }}
+          name: ${{ inputs.artifact_name || 'paradev-windows-x64-experimental' }}
           path: apps/desktop/release/*.exe
           if-no-files-found: error
           retention-days: 14
