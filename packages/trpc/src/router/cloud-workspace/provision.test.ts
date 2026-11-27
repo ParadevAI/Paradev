@@ -10,6 +10,7 @@ import * as meter from "./meter";
 import { provisionCloudWorkspace } from "./provision";
 
 const logged: unknown[] = [];
+const boxCalls: string[] = [];
 const captured: unknown[] = [];
 let claimError: unknown;
 stub(db.query.cloudWorkspaces, {
@@ -24,8 +25,13 @@ stub(sandbox, {
 	buildSandboxClaim: async () => {
 		throw claimError;
 	},
-	deleteSandbox: async () => {},
-	stopSandbox: async () => ({ sessionId: null }),
+	deleteSandbox: async (name: string) => {
+		boxCalls.push(`delete:${name}`);
+	},
+	stopSandbox: async (name: string) => {
+		boxCalls.push(`stop:${name}`);
+		return { sessionId: null };
+	},
 });
 stub(realtime, { nudge: () => {} });
 stub(chatMoves, { failChatMovesTo: async () => {} });
@@ -55,6 +61,15 @@ function rowUpdate(moved: boolean, sets: unknown[] = []) {
 
 describe("a provision that Autumn refuses", () => {
 	stub(db, rowUpdate(true));
+
+	test("a failed create only stops its box and marks the row failed: the cleanup job deletes it later", async () => {
+		boxCalls.length = 0;
+		claimError = new Error("boom");
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
+			"failed",
+		);
+		expect(boxCalls).toEqual(["stop:ws-box"]);
+	});
 
 	test("fails the workspace with a warning and opens no Sentry issue", async () => {
 		logged.length = 0;

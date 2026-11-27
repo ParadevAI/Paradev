@@ -2,6 +2,8 @@ import "../../../scripts/test-preload.ts";
 
 process.env.SKIP_ENV_VALIDATION = "1";
 process.env.BILLING_PROVIDER = "stripe";
+// `sandboxDeletesAllowed` deletes nothing outside production; the tests check the deletes.
+process.env.VERCEL_ENV = "production";
 // Importing a module that constructs a client throws without these. None
 // connects until it is used.
 process.env.STRIPE_SECRET_KEY ??= "sk_test_placeholder";

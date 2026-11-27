@@ -357,13 +357,12 @@ describe("an address read that finds the box stopped", () => {
 });
 
 describe("cloudWorkspace.delete when the reap cannot be queued", () => {
-	test("ends every open boot as archived before the final settle", async () => {
+	test("archive only sets a status: it ends no boot and deletes nothing", async () => {
+		endedBoots = [];
 		expect(await caller.cloudWorkspace.delete({ id: WORKSPACE_ID })).toEqual({
 			deleted: true,
 		});
-		expect(endedBoots).toEqual([
-			[WORKSPACE_ID, { sessionId: null, reason: "archived" }],
-		]);
+		expect(endedBoots).toEqual([]);
 	});
 });
 

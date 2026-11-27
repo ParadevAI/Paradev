@@ -39,7 +39,6 @@ import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
 	CloudWorkspaceNotStartedError,
-	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
 	listRemoteBranches,
@@ -72,21 +71,13 @@ import { recordCloudWorkspaceActivity } from "./activity";
 import { withClientStatus } from "./client-status";
 import { createConcurrencyLimit } from "./concurrency-limit";
 import { isLiveStatus } from "./live";
-import {
-	assertMayBoot,
-	queueSettleWorkspace,
-	settleWorkspaceNow,
-} from "./meter";
+import { assertMayBoot, queueSettleWorkspace } from "./meter";
 import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
-import { queueReap, reapWorkspaceFiles } from "./reap";
+import { queueReap } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import {
-	recordBootEnd,
-	recordBoxStopped,
-	recordStopSeen,
-} from "./sandbox-sleep";
+import { recordBoxStopped, recordStopSeen } from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -894,8 +885,9 @@ export const cloudWorkspaceRouter = {
 
 			const archivedAt = new Date();
 			// From any state, provisioning included: the job checks the row
-			// before it marks it ready and tears its box down when this won.
-			// The box keeps running until the reap stops it, so an undo is instant.
+			// before it marks it ready and stops its box when this won.
+			// The box keeps running until the reap stops it, so an undo is instant;
+			// the cleanup job deletes it once the grace is over.
 			const archived = await transitionCloudWorkspace({
 				id: row.id,
 				from: ["provisioning", "awake", "asleep", "failed"],
@@ -922,27 +914,12 @@ export const cloudWorkspaceRouter = {
 					await queueReap(
 						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
 						row,
-					).catch(async (error) => {
+					).catch((error) =>
 						console.error(
-							`[cloud-workspace] could not queue the reap for ${row.id}`,
+							`[cloud-workspace] could not stop the box of ${row.id}; the cleanup job deletes it after the grace`,
 							error,
-						);
-						await recordBootEnd(
-							{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
-							{
-								sessionId: null,
-								reason: "archived",
-							},
-						);
-						await settleWorkspaceNow(row.id).catch((meterError) =>
-							console.error(
-								`[cloud-workspace] ${row.id} final meter failed`,
-								meterError,
-							),
-						);
-						await deleteSandbox(row.providerSandboxId);
-						await reapWorkspaceFiles(row.id);
-					});
+						),
+					);
 				}
 				await recordCloudWorkspaceActivity(
 					db,
