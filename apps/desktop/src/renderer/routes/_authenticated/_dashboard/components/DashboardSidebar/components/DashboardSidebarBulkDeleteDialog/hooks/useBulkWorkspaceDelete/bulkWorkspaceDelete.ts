@@ -16,27 +16,30 @@ interface BulkWorkspaceInspectionItem {
 	sharesProjectCheckout: boolean | null;
 }
 
+/**
+ * Starts every destroy at once. The host archives each workspace as its
+ * request arrives and runs the heavy cleanup one workspace at a time, so the
+ * whole selection leaves the sidebar together.
+ */
 export async function executeBulkWorkspaceDeleteTargets<
 	Workspace,
 	Result,
 	Failure,
 >({
 	targets,
-	concurrency,
 	shouldForce,
 	shouldRetryWithForce,
 	destroy,
 	onSettled,
 }: {
 	targets: readonly Workspace[];
-	concurrency: number;
 	shouldForce: (workspace: Workspace) => boolean;
 	/** Retry a failed unforced destroy once with force. Used for conflicts on
 	 * workspaces whose preview never completed — "Delete without checking" is
 	 * the user's consent. Checked-clean races stay failures (no silent force). */
 	shouldRetryWithForce?: (workspace: Workspace, error: Failure) => boolean;
 	destroy: (workspace: Workspace, force: boolean) => Promise<Result>;
-	onSettled?: () => void;
+	onSettled?: (deleted: boolean) => void;
 }): Promise<{
 	successes: Array<{ workspace: Workspace; result: Result }>;
 	failures: Array<{ workspace: Workspace; error: Failure }>;
@@ -44,41 +47,36 @@ export async function executeBulkWorkspaceDeleteTargets<
 	type Outcome =
 		| { ok: true; workspace: Workspace; result: Result }
 		| { ok: false; workspace: Workspace; error: Failure };
-	const outcomes: Outcome[] = new Array(targets.length);
 
 	const destroyOne = async (workspace: Workspace): Promise<Outcome> => {
+		let outcome: Outcome;
 		try {
 			const force = shouldForce(workspace);
 			try {
-				return { ok: true, workspace, result: await destroy(workspace, force) };
+				outcome = {
+					ok: true,
+					workspace,
+					result: await destroy(workspace, force),
+				};
 			} catch (error) {
 				if (!force && shouldRetryWithForce?.(workspace, error as Failure)) {
-					return {
+					outcome = {
 						ok: true,
 						workspace,
 						result: await destroy(workspace, true),
 					};
+				} else {
+					throw error;
 				}
-				throw error;
 			}
 		} catch (error) {
-			return { ok: false, workspace, error: error as Failure };
-		} finally {
-			onSettled?.();
+			outcome = { ok: false, workspace, error: error as Failure };
 		}
+		onSettled?.(outcome.ok);
+		return outcome;
 	};
 
-	let nextIndex = 0;
-	const worker = async () => {
-		while (nextIndex < targets.length) {
-			const index = nextIndex++;
-			outcomes[index] = await destroyOne(targets[index] as Workspace);
-		}
-	};
-	const workerCount = Number.isFinite(concurrency)
-		? Math.min(Math.max(1, Math.floor(concurrency)), targets.length)
-		: 1;
-	await Promise.all(Array.from({ length: workerCount }, worker));
+	const outcomes = await Promise.all(targets.map(destroyOne));
 
 	const successes: Array<{ workspace: Workspace; result: Result }> = [];
 	const failures: Array<{ workspace: Workspace; error: Failure }> = [];

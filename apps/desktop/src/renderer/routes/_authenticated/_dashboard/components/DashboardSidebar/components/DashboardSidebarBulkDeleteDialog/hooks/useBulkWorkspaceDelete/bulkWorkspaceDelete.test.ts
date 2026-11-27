@@ -180,30 +180,36 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 		return { releases, destroy, flush, maxActive: () => maxActive };
 	}
 
-	it("runs at most `concurrency` destroys at once", async () => {
+	it("starts every destroy at once", async () => {
 		const control = controlledDestroy();
-		let settledCount = 0;
 
 		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
-			targets: ["a", "b", "c", "d", "e"],
-			concurrency: 2,
+			targets: ["a", "b", "c"],
 			shouldForce: () => false,
 			destroy: control.destroy,
-			onSettled: () => {
-				settledCount += 1;
-			},
 		});
 
 		await control.flush();
-		expect([...control.releases.keys()]).toEqual(["a", "b"]);
-		for (const workspace of ["b", "a", "c", "d", "e"]) {
-			control.releases.get(workspace)?.();
-			await control.flush();
-		}
+		expect([...control.releases.keys()]).toEqual(["a", "b", "c"]);
+		for (const release of control.releases.values()) release();
 		await run;
+		expect(control.maxActive()).toBe(3);
+	});
 
-		expect(control.maxActive()).toBe(2);
-		expect(settledCount).toBe(5);
+	it("reports whether each settled target was deleted", async () => {
+		const settled: boolean[] = [];
+
+		await executeBulkWorkspaceDeleteTargets<string, string, Error>({
+			targets: ["fails", "deleted"],
+			shouldForce: () => false,
+			destroy: async (workspace) => {
+				if (workspace === "fails") throw new Error("teardown failed");
+				return workspace;
+			},
+			onSettled: (deleted) => settled.push(deleted),
+		});
+
+		expect(settled.sort()).toEqual([false, true]);
 	});
 
 	it("reports outcomes in target order when destroys finish out of order", async () => {
@@ -212,7 +218,6 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 
 		const run = executeBulkWorkspaceDeleteTargets<string, string, Error>({
 			targets: ["a", "b", "c", "d"],
-			concurrency: 4,
 			shouldForce: () => false,
 			destroy: control.destroy,
 		});
@@ -239,7 +244,6 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 
 		await executeBulkWorkspaceDeleteTargets<string, string, Error>({
 			targets: ["clean", "dirty"],
-			concurrency: 2,
 			shouldForce: (workspace) => workspace === "dirty",
 			destroy: async (workspace, force) => {
 				calls.push({ workspace, force });
@@ -263,7 +267,6 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			Error
 		>({
 			targets: ["clean", "raced", "later"],
-			concurrency: 1,
 			shouldForce: () => false,
 			destroy: async (workspace) => {
 				callCount.set(workspace, (callCount.get(workspace) ?? 0) + 1);
@@ -290,7 +293,6 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			Error
 		>({
 			targets: ["unchecked", "clean"],
-			concurrency: 1,
 			shouldForce: () => false,
 			shouldRetryWithForce: (workspace, error) =>
 				workspace === "unchecked" && error === conflict,
@@ -301,9 +303,11 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			},
 		});
 
-		expect(calls).toEqual([
+		expect(calls.filter((call) => call.workspace === "unchecked")).toEqual([
 			{ workspace: "unchecked", force: false },
 			{ workspace: "unchecked", force: true },
+		]);
+		expect(calls.filter((call) => call.workspace === "clean")).toEqual([
 			{ workspace: "clean", force: false },
 		]);
 		expect(result.successes.map(({ workspace }) => workspace)).toEqual([
@@ -323,7 +327,6 @@ describe("executeBulkWorkspaceDeleteTargets", () => {
 			Error
 		>({
 			targets: ["ws"],
-			concurrency: 1,
 			shouldForce: () => true,
 			shouldRetryWithForce: () => true,
 			destroy: async (workspace, force) => {

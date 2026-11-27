@@ -30,6 +30,7 @@ import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
+import { createCleanupQueue } from "./cleanup-queue";
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
 import { isLocalCheckoutWorkspace } from "./is-local-checkout-workspace";
 import { removeDirectoryTree } from "./remove-directory-tree";
@@ -53,6 +54,23 @@ export const __testDestroysInFlight = destroysInFlight;
 export const cleanupTeardownOps = { runTeardown };
 
 const restoresInFlight = new Set<string>();
+
+// Above the worst case of one delete's own step timeouts (teardown 60s,
+// worktree removal 120s, preflight 15s), so only a hung delete reaches it.
+const CLEANUP_SLOT_TIMEOUT_MS = 5 * 60_000;
+
+/**
+ * Every delete on this host archives at once, then waits here for its
+ * cleanup turn: teardown scripts and recursive folder removal are heavy, and
+ * running a bulk selection of them together can overload the machine.
+ */
+const enqueueCleanup = createCleanupQueue({
+	slotTimeoutMs: CLEANUP_SLOT_TIMEOUT_MS,
+	onSlotTimeout: () =>
+		console.warn(
+			"[workspace-cleanup] a delete is still running after its cleanup turn; starting the next one",
+		),
+});
 
 /**
  * Claim a workspace for a restore. Returns the release function, or null
@@ -301,115 +319,117 @@ async function runDestroy(
 	}
 
 	try {
-		// ─── Step 1: Preflight ─────────────────────────────────────
-		// Block only on dirty worktree (the common "I forgot to commit"
-		// case). Missing/broken local state is handled by the cleanup phase.
-		// Sessions are standalone repos — the same dirty check applies even
-		// though they have no project row.
-		if (
-			!input.force &&
-			!sharesProjectCheckout &&
-			local &&
-			(project || local.type === "session")
-		) {
-			try {
-				const gitEnv = await cleanupGitOps.resolveGitEnv(
-					ctx,
-					local.worktreePath,
-				);
-				const state = await cleanupGitOps.readWorktreeState({
+		return await enqueueCleanup(async () => {
+			// ─── Step 1: Preflight ─────────────────────────────────────
+			// Block only on dirty worktree (the common "I forgot to commit"
+			// case). Missing/broken local state is handled by the cleanup phase.
+			// Sessions are standalone repos — the same dirty check applies even
+			// though they have no project row.
+			if (
+				!input.force &&
+				!sharesProjectCheckout &&
+				local &&
+				(project || local.type === "session")
+			) {
+				try {
+					const gitEnv = await cleanupGitOps.resolveGitEnv(
+						ctx,
+						local.worktreePath,
+					);
+					const state = await cleanupGitOps.readWorktreeState({
+						worktreePath: local.worktreePath,
+						gitEnv,
+					});
+					if (state.hasChanges) {
+						throw new TRPCError({
+							code: "CONFLICT",
+							message: "Worktree has uncommitted changes",
+						});
+					}
+				} catch (err) {
+					if (err instanceof TRPCError) throw err;
+					if (isIndeterminateGitTaskFailure(err)) {
+						// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
+						// this destructive path rather than silently skipping the
+						// dirty-worktree block — a retry usually succeeds (the first
+						// attempt warmed the FS cache), and force skips preflight
+						// entirely as the explicit escape hatch.
+						const message = err instanceof Error ? err.message : String(err);
+						throw new TRPCError({
+							code: "INTERNAL_SERVER_ERROR",
+							message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
+						});
+					}
+					// Can't read status (missing worktree dir, etc.) — not a
+					// conflict. Continue; step 3b will skip idempotently.
+				}
+			}
+
+			// ─── Step 2: Teardown ──────────────────────────────────────
+			// Script is the user's last chance to stop services / flush state
+			// before the workspace goes away. Runs after the archive so the
+			// (potentially slow) script never delays the row leaving the UI; a
+			// blocking failure throws, the catch below un-archives, and the
+			// globally-mounted dialog re-opens with a force-retry.
+			// A teardown script on the shared checkout would stop services every
+			// other local workspace on it is using.
+			if (
+				input.teardownMode !== "skip" &&
+				!sharesProjectCheckout &&
+				local &&
+				project
+			) {
+				const teardown: TeardownResult = await cleanupTeardownOps.runTeardown({
+					db: ctx.db,
+					workspaceId: input.workspaceId,
 					worktreePath: local.worktreePath,
-					gitEnv,
+					repoPath: project.repoPath,
+					projectId: project.id,
 				});
-				if (state.hasChanges) {
-					throw new TRPCError({
-						code: "CONFLICT",
-						message: "Worktree has uncommitted changes",
-					});
+				if (teardown.status === "failed") {
+					if (input.teardownMode === "blocking") {
+						const cause: TeardownFailureCause = {
+							kind: "TEARDOWN_FAILED",
+							exitCode: teardown.exitCode,
+							signal: teardown.signal,
+							timedOut: teardown.timedOut,
+							outputTail: teardown.outputTail,
+						};
+						// Recoverable via force-retry — an expected user-script failure, not a
+						// service bug; must not be reported as a 500.
+						throw new TRPCError({
+							code: "PRECONDITION_FAILED",
+							message: "Teardown script failed",
+							cause,
+						});
+					}
+					warnings.push(formatTeardownWarning(teardown));
 				}
-			} catch (err) {
-				if (err instanceof TRPCError) throw err;
-				if (isIndeterminateGitTaskFailure(err)) {
-					// Timeout/pool failure: dirty-state is UNKNOWN. Fail closed on
-					// this destructive path rather than silently skipping the
-					// dirty-worktree block — a retry usually succeeds (the first
-					// attempt warmed the FS cache), and force skips preflight
-					// entirely as the explicit escape hatch.
-					const message = err instanceof Error ? err.message : String(err);
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: `Couldn't verify worktree state at ${local.worktreePath}: ${message}`,
-					});
-				}
-				// Can't read status (missing worktree dir, etc.) — not a
-				// conflict. Continue; step 3b will skip idempotently.
 			}
-		}
 
-		// ─── Step 2: Teardown ──────────────────────────────────────
-		// Script is the user's last chance to stop services / flush state
-		// before the workspace goes away. Runs after the archive so the
-		// (potentially slow) script never delays the row leaving the UI; a
-		// blocking failure throws, the catch below un-archives, and the
-		// globally-mounted dialog re-opens with a force-retry.
-		// A teardown script on the shared checkout would stop services every
-		// other local workspace on it is using.
-		if (
-			input.teardownMode !== "skip" &&
-			!sharesProjectCheckout &&
-			local &&
-			project
-		) {
-			const teardown: TeardownResult = await cleanupTeardownOps.runTeardown({
-				db: ctx.db,
-				workspaceId: input.workspaceId,
-				worktreePath: local.worktreePath,
-				repoPath: project.repoPath,
-				projectId: project.id,
-			});
-			if (teardown.status === "failed") {
-				if (input.teardownMode === "blocking") {
-					const cause: TeardownFailureCause = {
-						kind: "TEARDOWN_FAILED",
-						exitCode: teardown.exitCode,
-						signal: teardown.signal,
-						timedOut: teardown.timedOut,
-						outputTail: teardown.outputTail,
-					};
-					// Recoverable via force-retry — an expected user-script failure, not a
-					// service bug; must not be reported as a 500.
-					throw new TRPCError({
-						code: "PRECONDITION_FAILED",
-						message: "Teardown script failed",
-						cause,
-					});
-				}
-				warnings.push(formatTeardownWarning(teardown));
+			if (local && project) {
+				trackConfigResolved({
+					api: ctx.api,
+					organizationId: ctx.organizationId,
+					workspaceId: input.workspaceId,
+					phase: "archive",
+					repoPath: project.repoPath,
+					projectId: project.id,
+					worktreePath: local.worktreePath,
+				});
 			}
-		}
 
-		if (local && project) {
-			trackConfigResolved({
-				api: ctx.api,
-				organizationId: ctx.organizationId,
-				workspaceId: input.workspaceId,
-				phase: "archive",
-				repoPath: project.repoPath,
-				projectId: project.id,
-				worktreePath: local.worktreePath,
+			const result = await runDestroyPhases(ctx, input, {
+				local,
+				project,
+				sharesProjectCheckout,
+				warnings,
 			});
-		}
-
-		const result = await runDestroyPhases(ctx, input, {
-			local,
-			project,
-			sharesProjectCheckout,
-			warnings,
+			// Telemetry at the true commit: a failed destroy un-archives below and
+			// must not count, and a retried destroy must count exactly once.
+			if (marked && local) trackWorkspaceDeleted(ctx, local);
+			return result;
 		});
-		// Telemetry at the true commit: a failed destroy un-archives below and
-		// must not count, and a retried destroy must count exactly once.
-		if (marked && local) trackWorkspaceDeleted(ctx, local);
-		return result;
 	} catch (err) {
 		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
 		throw err;

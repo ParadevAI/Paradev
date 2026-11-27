@@ -33,8 +33,6 @@ interface UseBulkWorkspaceDeleteOptions {
 
 export type { BulkWorkspaceDeleteFailure };
 
-const BULK_DELETE_CONCURRENCY = 10;
-
 export function bulkWorkspaceDestroyErrorMessage(
 	workspace: DashboardSidebarWorkspace,
 	error: DestroyWorkspaceError,
@@ -190,14 +188,14 @@ export function useBulkWorkspaceDelete({
 
 				const nextFailures = [...retainedFailures];
 				const warnings: string[] = [];
-				let completedCount = 0;
+				let settledCount = 0;
+				let deletedCount = 0;
 				const execution = await executeBulkWorkspaceDeleteTargets<
 					DashboardSidebarWorkspace,
 					DestroyWorkspaceSuccess,
 					DestroyWorkspaceError
 				>({
 					targets,
-					concurrency: BULK_DELETE_CONCURRENCY,
 					shouldForce: (workspace) => {
 						const inspection = inspections.get(workspace.id);
 						return (
@@ -222,10 +220,11 @@ export function useBulkWorkspaceDelete({
 							force,
 							skipTeardown,
 						}),
-					onSettled: () => {
-						completedCount += 1;
-						if (completedCount < total) {
-							toast.loading(progressMessage(completedCount), {
+					onSettled: (deleted) => {
+						settledCount += 1;
+						if (deleted) deletedCount += 1;
+						if (settledCount < total) {
+							toast.loading(progressMessage(deletedCount), {
 								id: progressToastId,
 							});
 						}
