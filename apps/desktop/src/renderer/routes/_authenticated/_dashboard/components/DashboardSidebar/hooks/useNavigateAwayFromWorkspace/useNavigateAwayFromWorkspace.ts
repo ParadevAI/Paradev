@@ -11,6 +11,7 @@ import {
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
 import { buildCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useTagFolderContext } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
@@ -33,6 +34,7 @@ export function useNavigateAwayFromWorkspace() {
 	const collections = useCollections();
 	const { workspaces, isReady } = useHostWorkspaces();
 	const tagFolderContext = useTagFolderContext();
+	const { revealWorkspaceInSidebar } = useDashboardSidebarState();
 	const workspaceIds = useMemo(
 		() => new Set(workspaces.map((workspace) => workspace.id)),
 		[workspaces],
@@ -97,6 +99,7 @@ export function useNavigateAwayFromWorkspace() {
 
 			if (!target) return null;
 			if (target.kind === "workspace") {
+				revealWorkspaceInSidebar(target.workspaceId);
 				void navigateToWorkspace(target.workspaceId, navigate, {
 					replace: true,
 				}).catch(reportRemovalNavigationError);
@@ -119,6 +122,7 @@ export function useNavigateAwayFromWorkspace() {
 			matchRoute,
 			navigate,
 			isReady,
+			revealWorkspaceInSidebar,
 		],
 	);
 

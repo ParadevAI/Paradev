@@ -521,6 +521,37 @@ export function useDashboardSidebarState() {
 		[collections],
 	);
 
+	const revealWorkspaceInSidebar = useCallback(
+		(workspaceId: string) => {
+			const row = collections.workspaceLocalState.get(workspaceId);
+			if (!row) return;
+			const { projectId } = row.sidebarState;
+			if (
+				projectId &&
+				collections.sidebarProjects.get(projectId)?.isCollapsed
+			) {
+				collections.sidebarProjects.update(projectId, (draft) => {
+					draft.isCollapsed = false;
+				});
+			}
+			const sectionId = getEffectiveSectionId(
+				collections,
+				tagWorkspaces,
+				tagFolderContext,
+				row,
+			);
+			if (
+				sectionId &&
+				collections.sidebarSections.get(sectionId)?.isCollapsed
+			) {
+				collections.sidebarSections.update(sectionId, (draft) => {
+					draft.isCollapsed = false;
+				});
+			}
+		},
+		[collections, tagWorkspaces, tagFolderContext],
+	);
+
 	const reorderProjects = useCallback(
 		(projectIds: string[]) => {
 			const tabOrders = new Map<string, number>();
@@ -1178,6 +1209,7 @@ export function useDashboardSidebarState() {
 		reorderProjects,
 		reorderWorkspaces,
 		renameSection,
+		revealWorkspaceInSidebar,
 		setSectionColor,
 		setWorkspacePinned,
 		toggleProjectCollapsed,
