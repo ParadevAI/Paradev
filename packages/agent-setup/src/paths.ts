@@ -70,10 +70,6 @@ export function getOpenCodeConfigDir(): string {
 	return path.join(getHooksDir(), "opencode");
 }
 
-export function getOpenCodePluginDir(): string {
-	return path.join(getOpenCodeConfigDir(), "plugin");
-}
-
 /** OpenCode V2's TUI only discovers plugin directories under `plugins/`. */
 export function getOpenCodeTuiPluginDir(): string {
 	return path.join(getOpenCodeConfigDir(), "plugins", "superset-notify");
