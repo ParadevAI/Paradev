@@ -690,6 +690,7 @@ export const Composer = memo(function Composer({
 		<div
 			ref={rootRef}
 			className={cn(CHAT_GUTTER_CLASSNAME, "pt-1 pb-5")}
+			data-chat-composer
 			onKeyDownCapture={drawerEntry.onKeyDownCapture}
 			onFocusCapture={() =>
 				useChatComposerStore.getState().markActive(composerId)

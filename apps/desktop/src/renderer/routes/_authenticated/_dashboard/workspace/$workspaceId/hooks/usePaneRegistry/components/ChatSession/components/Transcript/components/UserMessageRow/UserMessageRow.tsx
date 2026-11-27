@@ -226,6 +226,7 @@ export function UserMessageRow({
 							: "group-[.is-user]:rounded-xl",
 						pending && !pending.failed && "opacity-60",
 					)}
+					data-user-message
 				>
 					<div
 						className="break-words text-sm"
