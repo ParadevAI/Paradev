@@ -145,7 +145,7 @@ describe("sessions router", () => {
 		expect(launches).toHaveLength(1);
 	});
 
-	test("does not continue or return a dead adapter as a live chat", async () => {
+	test("does not prompt a dead adapter, and resume restarts it under the same chat", async () => {
 		startDead = true;
 		const created = await caller.create({
 			workspaceId: WORKSPACE,
@@ -166,14 +166,18 @@ describe("sessions router", () => {
 			workspaceId: WORKSPACE,
 			sessionId: created.sessionId,
 		});
-		expect(resumed.sessionId).not.toBe(created.sessionId);
+		expect(resumed.sessionId).toBe(created.sessionId);
+		await waitFor(
+			() => runtime.live.get(created.sessionId)?.state.status === "idle",
+		);
 		const continued = await caller.create({
 			workspaceId: WORKSPACE,
 			agent: "claude",
 			continueSessionId: created.sessionId,
 			prompt: "continue",
 		});
-		expect(continued.sessionId).not.toBe(created.sessionId);
+		expect(continued.sessionId).toBe(created.sessionId);
+		expect(launches).toHaveLength(2);
 	});
 	test("rejects unsupported agents without terminal fallback", async () => {
 		expect(await caller.capabilities({ agent: "unsupported" })).toEqual({
@@ -306,7 +310,7 @@ describe("sessions router", () => {
 		expect(runtime.live.get(created.sessionId)).not.toBeNull();
 	});
 
-	test("continues a live chat by session id and resumes a stopped provider conversation", async () => {
+	test("continues a live chat by session id and resumes a stopped one under the same id", async () => {
 		const created = await caller.create({
 			workspaceId: WORKSPACE,
 			agent: "claude",
@@ -337,11 +341,145 @@ describe("sessions router", () => {
 			workspaceId: WORKSPACE,
 			sessionId: created.sessionId,
 		});
-		expect(resumed.sessionId).not.toBe(created.sessionId);
+		expect(resumed.sessionId).toBe(created.sessionId);
+		expect(runtime.sessions.get(created.sessionId)?.closedAt).toBeNull();
 		expect(launches[1]?.resume?.harnessSessionId).toBe(
 			`native-${created.sessionId}`,
 		);
+		expect(await caller.list({ workspaceId: WORKSPACE })).toHaveLength(1);
 	});
+
+	test("resume hands back the chat that already runs the conversation", async () => {
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+		});
+		await waitFor(
+			() => runtime.sessions.get(created.sessionId)?.harnessSessionId != null,
+		);
+		await runtime.live.dispose(created.sessionId);
+		const other = runtime.commands.createSession({
+			commandId: crypto.randomUUID(),
+			scopeId: WORKSPACE,
+			cwd: "/repo",
+			harness: "claude-acp",
+			agentConfigId: "claude-config",
+			resume: { harnessSessionId: `native-${created.sessionId}` },
+		});
+		await waitFor(
+			() => runtime.live.get(other.sessionId)?.state.status === "idle",
+		);
+
+		const resumed = await caller.resume({
+			workspaceId: WORKSPACE,
+			sessionId: created.sessionId,
+		});
+
+		expect(resumed.sessionId).toBe(other.sessionId);
+		expect(launches).toHaveLength(2);
+	});
+	test("continues a chat that stopped with the host by reopening its conversation", async () => {
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+		});
+		await waitFor(
+			() => runtime.sessions.get(created.sessionId)?.harnessSessionId != null,
+		);
+		await runtime.live.dispose(created.sessionId);
+		expect(runtime.sessions.get(created.sessionId)?.closedAt).toBeNull();
+
+		const continued = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+			continueSessionId: created.sessionId,
+			prompt: "Continue",
+		});
+
+		expect(continued.sessionId).toBe(created.sessionId);
+		expect(launches[1]?.resume?.harnessSessionId).toBe(
+			`native-${created.sessionId}`,
+		);
+		expect(launches[1]?.agentConfigId).toBe(launches[0]?.agentConfigId);
+		expect(await caller.list({ workspaceId: WORKSPACE })).toHaveLength(1);
+		const page = await caller.read({
+			workspaceId: WORKSPACE,
+			sessionId: created.sessionId,
+		});
+		expect(
+			page.ok &&
+				page.envelopes.filter(
+					(entry) =>
+						entry.event.type === "item" &&
+						entry.event.item.kind === "user_message",
+				),
+		).toHaveLength(1);
+	});
+
+	test("continues the chat that took over a stopped chat's conversation", async () => {
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+		});
+		await waitFor(
+			() => runtime.sessions.get(created.sessionId)?.harnessSessionId != null,
+		);
+		await runtime.live.dispose(created.sessionId);
+		const successor = runtime.commands.createSession({
+			commandId: crypto.randomUUID(),
+			scopeId: WORKSPACE,
+			cwd: "/repo",
+			harness: "claude-acp",
+			agentConfigId: "claude-config",
+			terminalId: crypto.randomUUID(),
+			resume: {
+				harnessSessionId: `native-${created.sessionId}`,
+				replacesSessionId: created.sessionId,
+			},
+		});
+		await waitFor(
+			() => runtime.sessions.get(created.sessionId)?.closedAt != null,
+		);
+		const input = {
+			workspaceId: WORKSPACE,
+			agent: "claude",
+			continueSessionId: created.sessionId,
+			prompt: "Continue",
+		};
+
+		await waitFor(
+			() => runtime.live.get(successor.sessionId)?.state.status === "idle",
+		);
+		expect((await caller.create(input)).sessionId).toBe(successor.sessionId);
+
+		await runtime.live.dispose(successor.sessionId);
+		expect((await caller.create(input)).sessionId).toBe(successor.sessionId);
+		expect(launches).toHaveLength(3);
+	});
+
+	test("starts a new chat when the one to continue was closed", async () => {
+		const created = await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+		});
+		await waitFor(
+			() => runtime.sessions.get(created.sessionId)?.harnessSessionId != null,
+		);
+		await caller.close({
+			workspaceId: WORKSPACE,
+			sessionId: created.sessionId,
+		});
+
+		await caller.create({
+			workspaceId: WORKSPACE,
+			agent: "claude",
+			continueSessionId: created.sessionId,
+			prompt: "Continue",
+		});
+
+		expect(launches[1]?.resume).toBeUndefined();
+	});
+
 	test("resumes on the stored config, else on the default account with a notice", async () => {
 		db.insert(schema.hostAgentConfigs)
 			.values({
