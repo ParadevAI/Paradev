@@ -93,6 +93,9 @@ msgstr "（無輸出）"
 msgid "(you)"
 msgstr "（你）"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[提示詞]"
 
@@ -6338,6 +6341,9 @@ msgstr "不清楚此聊天的移動進度。如果它沒有被移動，仍在原
 msgid "Couldn’t finish deleting workspaces"
 msgstr "沒能完成工作區的刪除"
 
+msgid "Couldn't fork workspace"
+msgstr "無法建立工作區的分支副本"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "無法轉送連接埠 {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "分支參數"
 
 msgid "Fork conversation"
 msgstr "分岔對話"
+
+msgid "Fork here"
+msgstr "從此處建立分支副本"
 
 msgid "Fork into Chat"
 msgstr "分叉到聊天"
@@ -22194,6 +22203,9 @@ msgstr "請更新此裝置上的主機服務，然後再試一次。"
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "更新 <0>{key}</0> 的值"
+
+msgid "Update this host to fork worktrees"
+msgstr "請更新此主機以建立工作樹的分支副本"
 
 msgid "Update this host to message subagents"
 msgstr "請更新此主機以傳送訊息給子代理程式"

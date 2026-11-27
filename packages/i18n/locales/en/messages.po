@@ -93,6 +93,9 @@ msgstr "(no output)"
 msgid "(you)"
 msgstr "(you)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6338,6 +6341,9 @@ msgstr "Couldn't find how this chat's move is going. If it didn't move, it is st
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Couldn’t finish deleting workspaces"
 
+msgid "Couldn't fork workspace"
+msgstr "Couldn't fork workspace"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Couldn't forward port {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "Fork args"
 
 msgid "Fork conversation"
 msgstr "Fork conversation"
+
+msgid "Fork here"
+msgstr "Fork here"
 
 msgid "Fork into Chat"
 msgstr "Fork into Chat"
@@ -22194,6 +22203,9 @@ msgstr "Update the host service on this device and try again."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Update the value for <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Update this host to fork worktrees"
 
 msgid "Update this host to message subagents"
 msgstr "Update this host to message subagents"

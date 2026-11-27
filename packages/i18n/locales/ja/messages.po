@@ -93,6 +93,9 @@ msgstr "（出力なし）"
 msgid "(you)"
 msgstr "（自分）"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[プロンプト]"
 
@@ -6338,6 +6341,9 @@ msgstr "このチャットの移動の状況がわかりません。移動して
 msgid "Couldn’t finish deleting workspaces"
 msgstr "ワークスペースの削除を完了できませんでした"
 
+msgid "Couldn't fork workspace"
+msgstr "ワークスペースをフォークできませんでした"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "ポート {portNumber} を転送できませんでした"
 
@@ -9489,6 +9495,9 @@ msgstr "フォーク引数"
 
 msgid "Fork conversation"
 msgstr "会話を分岐"
+
+msgid "Fork here"
+msgstr "ここからフォーク"
 
 msgid "Fork into Chat"
 msgstr "チャットにフォーク"
@@ -22194,6 +22203,9 @@ msgstr "このデバイスのホストサービスを更新してから、もう
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "<0>{key}</0> の値を更新"
+
+msgid "Update this host to fork worktrees"
+msgstr "ワークツリーをフォークするには、このホストを更新してください"
 
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"

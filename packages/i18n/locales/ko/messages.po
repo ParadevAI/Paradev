@@ -93,6 +93,9 @@ msgstr "(출력 없음)"
 msgid "(you)"
 msgstr "(나)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[프롬프트]"
 
@@ -6338,6 +6341,9 @@ msgstr "이 채팅의 옮기기 상태를 알 수 없습니다. 옮겨지지 않
 msgid "Couldn’t finish deleting workspaces"
 msgstr "워크스페이스 삭제를 끝내지 못했습니다"
 
+msgid "Couldn't fork workspace"
+msgstr "워크스페이스를 포크하지 못했습니다"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "포트 {portNumber}을(를) 전달하지 못했습니다"
 
@@ -9489,6 +9495,9 @@ msgstr "포크 인자"
 
 msgid "Fork conversation"
 msgstr "대화 분기"
+
+msgid "Fork here"
+msgstr "여기에서 포크"
 
 msgid "Fork into Chat"
 msgstr "채팅으로 포크"
@@ -22194,6 +22203,9 @@ msgstr "이 기기의 호스트 서비스를 업데이트한 후 다시 시도�
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "<0>{key}</0>의 값 업데이트"
+
+msgid "Update this host to fork worktrees"
+msgstr "워크트리를 포크하려면 이 호스트를 업데이트하세요"
 
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"

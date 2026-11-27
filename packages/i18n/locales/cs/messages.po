@@ -93,6 +93,9 @@ msgstr "(žádný výstup)"
 msgid "(you)"
 msgstr "(vy)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6338,6 +6341,9 @@ msgstr "Není známo, jak probíhá přesun tohoto chatu. Pokud se nepřesunul, 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Mazání pracovních prostorů se nepodařilo dokončit"
 
+msgid "Couldn't fork workspace"
+msgstr "Pracovní prostor se nepodařilo rozvětvit"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Port {portNumber} se nepodařilo přesměrovat"
 
@@ -9489,6 +9495,9 @@ msgstr "Argumenty pro fork"
 
 msgid "Fork conversation"
 msgstr "Rozvětvit konverzaci"
+
+msgid "Fork here"
+msgstr "Rozvětvit odsud"
 
 msgid "Fork into Chat"
 msgstr "Rozvětvit do chatu"
@@ -22194,6 +22203,9 @@ msgstr "Aktualizujte službu hostitele na tomto zařízení a zkuste to znovu."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Aktualizujte hodnotu <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Pro rozvětvení pracovních stromů aktualizujte tohoto hostitele"
 
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"

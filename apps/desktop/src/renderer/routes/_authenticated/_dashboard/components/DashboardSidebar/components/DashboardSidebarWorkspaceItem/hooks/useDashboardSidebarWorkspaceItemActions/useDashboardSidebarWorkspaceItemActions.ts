@@ -1,6 +1,11 @@
+import { useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { normalizeWorkspaceTags } from "@superset/shared/workspace-tags";
+import { toast } from "@superset/ui/sonner";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
+import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
 import { useDashboardSidebarActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarActionsProvider";
@@ -9,12 +14,17 @@ import {
 	useSidebarWorkspaceStatus,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarWorkspaceStatusProvider";
 import { useWorkspaceMenuActions } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMenuActions";
-import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import {
+	navigateToWorkspace,
+	navigateToWorkspaceAndThen,
+} from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { applyFolderTagChange } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
+import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 
 interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	workspaceId: string;
+	hostId: string;
 	/** Null for project-less "session" workspaces. */
 	projectId: string | null;
 	/** Only sessions may be grouped by tag. */
@@ -28,6 +38,7 @@ interface UseDashboardSidebarWorkspaceItemActionsOptions {
 
 export function useDashboardSidebarWorkspaceItemActions({
 	workspaceId,
+	hostId,
 	projectId,
 	isSessionWorkspace = false,
 	isCloudWorkspace = false,
@@ -36,6 +47,9 @@ export function useDashboardSidebarWorkspaceItemActions({
 	isPinned = false,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
 	const router = useRouter();
+	const { t } = useLingui();
+	const hostUrl = useWorkspaceHostUrl(workspaceId);
+	const { submit } = useWorkspaceCreates();
 	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const { requestSectionRename } = useDashboardSidebarSectionRename();
 	const markWorkspaceTerminalsSeen =
@@ -67,6 +81,35 @@ export function useDashboardSidebarWorkspaceItemActions({
 		moveWorkspaceToSection,
 		setWorkspacePinned,
 	} = useDashboardSidebarActions();
+
+	const handleFork = async () => {
+		if (!projectId || !hostUrl) return;
+		try {
+			const health =
+				await getHostServiceClientByUrl(hostUrl).health.check.query();
+			// Older hosts strip unknown create inputs, which would silently fork the wrong state.
+			if (health.workspaceForkSupported !== true) {
+				toast.error(t({ message: "Update this host to fork worktrees" }));
+				return;
+			}
+			const { completed } = submit({
+				hostId,
+				snapshot: {
+					id: crypto.randomUUID(),
+					projectId,
+					name: t`[Fork] ${workspaceName}`,
+					forkFromWorkspaceId: workspaceId,
+				},
+			});
+			const outcome = await completed;
+			if (!outcome.ok) throw new Error(outcome.error);
+			navigateToWorkspace(outcome.workspaceId, router.navigate);
+		} catch (error) {
+			toast.error(t({ message: "Couldn't fork workspace" }), {
+				description: errorMessage(error, t({ message: "Unknown error" })),
+			});
+		}
+	};
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [renameValue, setRenameValue] = useState(workspaceName);
@@ -170,6 +213,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 		handleCopyPath,
 		handleCopyBranchName,
 		handleCopyWorkspaceId,
+		handleFork,
 		handleCreateSection,
 		handleMoveToSection,
 		handleRemoveFromSidebar,

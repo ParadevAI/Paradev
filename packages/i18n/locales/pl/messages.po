@@ -93,6 +93,9 @@ msgstr "(brak wyniku)"
 msgid "(you)"
 msgstr "(Ty)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6338,6 +6341,9 @@ msgstr "Nie wiadomo, jak idzie przenoszenie tego czatu. Jeśli nie został przen
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Nie udało się dokończyć usuwania obszarów roboczych"
 
+msgid "Couldn't fork workspace"
+msgstr "Nie udało się utworzyć kopii obszaru roboczego"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Nie udało się przekierować portu {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "Argumenty forka"
 
 msgid "Fork conversation"
 msgstr "Rozgałęź rozmowę"
+
+msgid "Fork here"
+msgstr "Utwórz kopię od tego miejsca"
 
 msgid "Fork into Chat"
 msgstr "Rozgałęź do czatu"
@@ -22194,6 +22203,9 @@ msgstr "Zaktualizuj usługę hosta na tym urządzeniu i spróbuj ponownie."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Zaktualizuj wartość <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Zaktualizuj ten host, aby tworzyć kopie drzew roboczych"
 
 msgid "Update this host to message subagents"
 msgstr "Zaktualizuj tego hosta, aby wysyłać wiadomości do subagentów"

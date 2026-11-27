@@ -93,6 +93,9 @@ msgstr "(çıktı yok)"
 msgid "(you)"
 msgstr "(siz)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[istem]"
 
@@ -6338,6 +6341,9 @@ msgstr "Bu sohbetin taşınmasının ne durumda olduğu bilinmiyor. Taşınmadı
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Çalışma alanlarını silme işlemi tamamlanamadı"
 
+msgid "Couldn't fork workspace"
+msgstr "Çalışma alanı çatallanamadı"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "{portNumber} portu yönlendirilemedi"
 
@@ -9489,6 +9495,9 @@ msgstr "Fork argümanları"
 
 msgid "Fork conversation"
 msgstr "Konuşmayı ayır"
+
+msgid "Fork here"
+msgstr "Buradan çatalla"
 
 msgid "Fork into Chat"
 msgstr "Sohbete çatalla"
@@ -22194,6 +22203,9 @@ msgstr "Bu cihazdaki host hizmetini güncelleyip yeniden deneyin."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "<0>{key}</0> değerini güncelleyin"
+
+msgid "Update this host to fork worktrees"
+msgstr "Çalışma ağaçlarını çatallamak için bu ana makineyi güncelleyin"
 
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"

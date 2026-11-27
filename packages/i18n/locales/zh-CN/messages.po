@@ -93,6 +93,9 @@ msgstr "（无输出）"
 msgid "(you)"
 msgstr "（你）"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[提示词]"
 
@@ -6338,6 +6341,9 @@ msgstr "不清楚此聊天的移动进度。如果它没有被移动，仍在原
 msgid "Couldn’t finish deleting workspaces"
 msgstr "没能完成工作区的删除"
 
+msgid "Couldn't fork workspace"
+msgstr "无法分叉工作区"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "无法转发端口 {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "分叉参数"
 
 msgid "Fork conversation"
 msgstr "分叉对话"
+
+msgid "Fork here"
+msgstr "从此处分叉"
 
 msgid "Fork into Chat"
 msgstr "分叉到聊天"
@@ -22194,6 +22203,9 @@ msgstr "请更新此设备上的主机服务，然后重试。"
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "更新 <0>{key}</0> 的值"
+
+msgid "Update this host to fork worktrees"
+msgstr "请更新此主机以分叉工作树"
 
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"

@@ -93,6 +93,9 @@ msgstr "(нет вывода)"
 msgid "(you)"
 msgstr "(вы)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[промпт]"
 
@@ -6338,6 +6341,9 @@ msgstr "Неизвестно, как идёт перенос этого чата
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Не удалось завершить удаление рабочих областей"
 
+msgid "Couldn't fork workspace"
+msgstr "Не удалось создать копию рабочего пространства"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Не удалось перенаправить порт {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "Аргументы форка"
 
 msgid "Fork conversation"
 msgstr "Ответвить разговор"
+
+msgid "Fork here"
+msgstr "Создать копию отсюда"
 
 msgid "Fork into Chat"
 msgstr "Ответвить в чат"
@@ -22194,6 +22203,9 @@ msgstr "Обновите службу хоста на этом устройст�
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Обновите значение <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Обновите этот хост, чтобы копировать рабочие деревья"
 
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"

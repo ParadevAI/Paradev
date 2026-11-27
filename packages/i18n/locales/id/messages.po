@@ -93,6 +93,9 @@ msgstr "(tidak ada keluaran)"
 msgid "(you)"
 msgstr "(Anda)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6338,6 +6341,9 @@ msgstr "Tidak diketahui bagaimana pemindahan chat ini berjalan. Jika tidak dipin
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Tidak bisa menyelesaikan penghapusan workspace"
 
+msgid "Couldn't fork workspace"
+msgstr "Tidak dapat membuat fork ruang kerja"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Tidak bisa meneruskan port {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "Argumen fork"
 
 msgid "Fork conversation"
 msgstr "Cabangkan percakapan"
+
+msgid "Fork here"
+msgstr "Buat fork dari sini"
 
 msgid "Fork into Chat"
 msgstr "Fork ke Obrolan"
@@ -22194,6 +22203,9 @@ msgstr "Perbarui layanan host di perangkat ini, lalu coba lagi."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Perbarui nilai untuk <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Perbarui host ini untuk membuat fork worktree"
 
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"

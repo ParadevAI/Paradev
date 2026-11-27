@@ -93,6 +93,9 @@ msgstr "(sem saída)"
 msgid "(you)"
 msgstr "(você)"
 
+msgid "[Fork] {workspaceName}"
+msgstr "[Fork] {workspaceName}"
+
 msgid "[prompt]"
 msgstr "[prompt]"
 
@@ -6338,6 +6341,9 @@ msgstr "Não foi possível saber como está a movimentação deste chat. Se ele 
 msgid "Couldn’t finish deleting workspaces"
 msgstr "Não foi possível terminar a exclusão das áreas de trabalho"
 
+msgid "Couldn't fork workspace"
+msgstr "Não foi possível criar um fork do espaço de trabalho"
+
 msgid "Couldn't forward port {portNumber}"
 msgstr "Não foi possível encaminhar a porta {portNumber}"
 
@@ -9489,6 +9495,9 @@ msgstr "Argumentos de fork"
 
 msgid "Fork conversation"
 msgstr "Bifurcar conversa"
+
+msgid "Fork here"
+msgstr "Criar fork a partir daqui"
 
 msgid "Fork into Chat"
 msgstr "Bifurcar no chat"
@@ -22194,6 +22203,9 @@ msgstr "Atualize o serviço de host neste dispositivo e tente novamente."
 
 msgid "Update the value for <0>{key}</0>"
 msgstr "Atualize o valor de <0>{key}</0>"
+
+msgid "Update this host to fork worktrees"
+msgstr "Atualize este host para criar forks de árvores de trabalho"
 
 msgid "Update this host to message subagents"
 msgstr "Atualize este host para enviar mensagens aos subagentes"
