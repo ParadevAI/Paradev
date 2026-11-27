@@ -19,6 +19,8 @@ export type FakeHarnessScript = {
 	turns: ScriptedEvent[][];
 	steer?: boolean;
 	steerDelayMs?: number;
+	/** `steer()` answers only once this settles, so a test decides when. */
+	steerGate?: Promise<unknown>;
 	steerableSubagents?: string[];
 	backgroundableSubagents?: string[];
 };
@@ -103,6 +105,7 @@ export class FakeHarness implements HarnessAdapter {
 	async steer(content: UserContent[]): Promise<boolean> {
 		const first = content[0];
 		if (first?.type === "text") this.steered.push(first.text);
+		if (this.script.steerGate) await this.script.steerGate;
 		if (this.script.steerDelayMs !== undefined) {
 			await sleep(this.script.steerDelayMs);
 		}

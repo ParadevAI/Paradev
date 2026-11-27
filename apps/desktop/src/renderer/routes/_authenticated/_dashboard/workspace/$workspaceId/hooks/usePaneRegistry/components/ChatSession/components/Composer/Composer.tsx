@@ -37,6 +37,7 @@ import {
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
+import { useSendIntoRunningTurn } from "renderer/hooks/useSendIntoRunningTurn";
 import { formatHotkeyDisplay, PLATFORM, useHotkey } from "renderer/hotkeys";
 import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
@@ -260,6 +261,7 @@ export const Composer = memo(function Composer({
 		setEditorResets((count) => count + 1);
 	}, [readOnly, takeDraft, onDraftBlocked]);
 	const promptInputRef = useRef<PromptInputHandle>(null);
+	const sendIntoRunningTurn = useSendIntoRunningTurn();
 	const focusInput = useCallback(() => {
 		if (!readOnly) promptInputRef.current?.focus();
 	}, [readOnly]);
@@ -735,6 +737,7 @@ export const Composer = memo(function Composer({
 										message: "Ask the agent, @mention files, run /commands",
 									}))
 					}
+					sendsIntoRunningTurn={sendIntoRunningTurn && !target}
 					status={
 						stop || promptPending
 							? "streaming"
