@@ -9,7 +9,12 @@ import {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "terminals_read",
-		annotations: { readOnlyHint: true },
+		title: "Read terminal",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"Read a terminal's current screen back as plain text — for a claude/codex agent this is the agent's rendered output, so use it to see the reply after terminals_send. Returns what is on screen now (plus recent scrollback), not a full transcript.",
 		inputSchema: {

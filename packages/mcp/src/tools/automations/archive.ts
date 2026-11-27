@@ -6,7 +6,13 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_archive",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Archive automation",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Archive an automation. Its schedules and event triggers stop immediately and it leaves automations_list; its runs remain. automations_unarchive restores it, paused. Caller must be the owner or an organization owner.",
 		inputSchema: {
@@ -20,7 +26,13 @@ export function register(server: McpServer): void {
 
 	defineTool(server, {
 		name: "automations_unarchive",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Unarchive automation",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Restore an archived automation. It comes back paused; call automations_resume to start it again.",
 		inputSchema: {

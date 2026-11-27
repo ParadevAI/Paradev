@@ -9,7 +9,12 @@ import {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "agents_create",
-		annotations: { destructiveHint: false },
+		title: "Launch agent",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: true,
+		},
 		description:
 			"Create (launch) an agent session inside an existing workspace on its host: runs the named agent preset (or HostAgentConfig instance) with the given prompt in a fresh terminal session. Omit hostId for a cloud workspace; for a host workspace, use hosts_list / workspaces_list to find the hostId. Use this to start a second agent in a workspace that already exists; for create-and-spawn in a single call, pass `agents` to workspaces_create instead.",
 		inputSchema: {

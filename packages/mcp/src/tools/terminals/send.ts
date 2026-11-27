@@ -9,7 +9,12 @@ import {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "terminals_send",
-		annotations: { destructiveHint: false },
+		title: "Send to terminal",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: true,
+		},
 		description:
 			"Send text to a terminal ALREADY running in a workspace — e.g. a follow-up prompt to a claude/codex agent — instead of spawning a new session. Targets the terminal by id (the value agents_create returned as `sessionId`, or terminals_create returned as `terminalId`). Use agents_create only to START an agent; use this for every message after. Multi-line text is delivered as a single paste, not separate submits.",
 		inputSchema: {

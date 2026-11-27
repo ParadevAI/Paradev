@@ -12,7 +12,12 @@ import { optionalish } from "../../optionalish";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_get",
-		annotations: { readOnlyHint: true },
+		title: "Get page",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"Show one published page's metadata: title, description, visibility, public URL, and which version is currently served. Does NOT return the page's HTML — use pages_pull for that. Address the page by id or by slug; exactly one is required.",
 		inputSchema: z
