@@ -3,6 +3,7 @@ import { isProfileHandle } from "@superset/trpc/leaderboard-reserved-handles";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { canonicalPathname } from "@/lib/canonical-pathname";
+import { rewriteProfile } from "@/lib/profile-rewrite";
 
 const LANDING_PAGES = new Set([
 	"claude-code-parallel-sessions",
@@ -87,17 +88,13 @@ function route(request: NextRequest) {
 			return NextResponse.rewrite(url);
 		}
 		if (tail.length === 0 && isProfileHandle(second)) {
-			const url = request.nextUrl.clone();
-			url.pathname = `/${first}/user/${second}`;
-			return NextResponse.rewrite(url);
+			return rewriteProfile(request, first, second);
 		}
 		return;
 	}
 
 	if (rest.length === 0 && isProfileHandle(first)) {
-		const url = request.nextUrl.clone();
-		url.pathname = `/en/user/${first}`;
-		return NextResponse.rewrite(url);
+		return rewriteProfile(request, "en", first);
 	}
 
 	const url = request.nextUrl.clone();
