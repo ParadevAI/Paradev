@@ -2,7 +2,7 @@ import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 
 export const PRODUCT_LICENSE = "MIT License";
-export const PRODUCT_PLATFORMS = ["macOS", "Linux (experimental AppImage)"];
+export const PRODUCT_PLATFORMS = ["macOS", "Linux (AppImage)"];
 export const PRODUCT_PLATFORM_SUMMARY = `${PRODUCT_PLATFORMS.join(" and ")}; Windows is not yet available.`;
 export const PRODUCT_ISOLATION_SUMMARY =
 	"Each task runs in its own Git worktree and branch. Worktrees separate working files, but do not sandbox processes or prevent merge conflicts.";

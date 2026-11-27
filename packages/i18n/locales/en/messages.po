@@ -9344,8 +9344,8 @@ msgstr "For bug reports and feature requests, the fastest path is a GitHub issue
 msgid "For individuals getting started"
 msgstr "For individuals getting started"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
+msgid "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
+msgstr "For macOS on Apple Silicon and Intel, and Linux (AppImage)."
 
 msgid "For organizations with advanced needs"
 msgstr "For organizations with advanced needs"
@@ -9462,8 +9462,8 @@ msgstr "Free credits"
 msgid "Free for everyone"
 msgstr "Free for everyone"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "Free for one user. macOS, with an experimental Linux build."
+msgid "Free for one user. macOS and Linux."
+msgstr "Free for one user. macOS and Linux."
 
 msgid "Free for one user. Open source under MIT."
 msgstr "Free for one user. Open source under MIT."
@@ -11797,8 +11797,8 @@ msgstr "Machine-unbound cloud workspaces that spin up in seconds and can be shar
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS, Linux (experimental)"
+msgid "macOS, Linux"
+msgstr "macOS, Linux"
 
 msgid "Magenta"
 msgstr "Magenta"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "Not updating"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
 
 msgid "Note"
 msgstr "Note"
