@@ -20,7 +20,7 @@ Conductor is joining Meta and is winding down. Since November 4, 2026, it takes 
 
 Conductor and Codex are compared often, but they are different kinds of thing. Codex is OpenAI's coding agent, available as a CLI, an editor extension, a desktop app, and a cloud service. Conductor is a macOS app that runs agents, including Codex, in parallel Git worktrees on your machine. So the real question was where you want Codex to run: inside OpenAI's own app and cloud, or inside a local orchestrator that gives each task its own worktree.
 
-If you want that local orchestration but agent-agnostic on macOS and experimental Linux, [Paradev](/compare/superset-vs-codex) is a third option. This page compares all three.
+If you want that local orchestration but agent-agnostic on macOS and Linux, [Paradev](/compare/superset-vs-codex) is a third option. This page compares all three.
 
 ---
 
@@ -32,7 +32,7 @@ If you want that local orchestration but agent-agnostic on macOS and experimenta
 | **Runs Codex?** | Yes, as one of its agents | It is Codex | Yes, as one of many agents |
 | **Parallelism** | Worktree per task (local) | Isolated cloud environments | Local branch-based worktrees; connected hosts; your own Linux servers; cloud workspaces |
 | **Other agents** | Claude Code, Cursor | OpenAI Codex only | Claude Code, OpenCode, Cursor, Gemini, and more |
-| **Platform** | macOS only | CLI, editor, desktop, web, cloud | macOS; experimental Linux AppImage; Windows unavailable |
+| **Platform** | macOS only | CLI, editor, desktop, web, cloud | macOS; Linux AppImage; Windows unavailable |
 | **Pricing** | Not sold; closed to new users since November 4, 2026 | Included with ChatGPT plans | Open source (MIT); free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo |
 
 ---
@@ -71,7 +71,7 @@ Paradev is the option if you want Conductor's local worktree orchestration but a
 - **Choose Codex** if you are standardized on OpenAI and want its cohesive suite with cloud tasks that run while your machine is off.
 - **Choose Paradev** if you want agent-agnostic local orchestration across many agents, on your own machine and remote hosts, not tied to macOS or one vendor.
 
-**Verdict:** Codex is the agent; Conductor is a Mac app that runs it (and others) in local worktrees. Conductor is now closed to new users. Choose Codex for OpenAI's cloud-first suite, and Paradev if you want CLI-agent orchestration on macOS and experimental Linux.
+**Verdict:** Codex is the agent; Conductor is a Mac app that runs it (and others) in local worktrees. Conductor is now closed to new users. Choose Codex for OpenAI's cloud-first suite, and Paradev if you want CLI-agent orchestration on macOS and Linux.
 
 ---
 

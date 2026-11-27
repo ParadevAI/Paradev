@@ -254,7 +254,7 @@ Paradev는 터미널 앱이 아니라 데스크톱 앱입니다. 에이전트는
 <summary>Paradev의 라이선스, 비용, 지원 플랫폼은 어떻게 되나요?</summary>
 <br />
 
-Paradev는 MIT 라이선스로 공개된 오픈 소스입니다. Free 요금제에서는 데스크톱 앱과 CLI로 로컬 워크스페이스를 사용할 수 있습니다. 유료 요금제에는 자동화, 클라우드 워크스페이스 같은 기능이 추가됩니다. 데스크톱 앱은 macOS에서 실행되며, 실험적인 Linux AppImage도 있습니다. Windows는 아직 지원하지 않습니다. [가격](https://paradev.com/pricing) · [FAQ 문서](https://docs.paradev.com/faq)
+Paradev는 MIT 라이선스로 공개된 오픈 소스입니다. Free 요금제에서는 데스크톱 앱과 CLI로 로컬 워크스페이스를 사용할 수 있습니다. 유료 요금제에는 자동화, 클라우드 워크스페이스 같은 기능이 추가됩니다. 데스크톱 앱은 macOS와 Linux에서 실행됩니다. Windows는 아직 지원하지 않습니다. [가격](https://paradev.com/pricing) · [FAQ 문서](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ iOS 앱도 곧 출시됩니다. 휴대폰에서 에이전트를 확인할 수 �
 데스크톱 앱 다운로드:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (실험적; macOS가 주 지원 대상입니다)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: 아직 제공되지 않음
 - [모든 빌드](https://github.com/paradevai/paradev/releases/latest)
 

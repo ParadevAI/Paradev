@@ -254,7 +254,7 @@ Paradev 是桌面应用,不是终端应用。智能体在其中以聊天形式�
 <summary>Paradev 采用什么许可证、费用如何、支持哪些平台?</summary>
 <br />
 
-Paradev 基于 MIT 许可证开源。Free 套餐支持通过桌面应用和 CLI 使用本地工作区。付费套餐增加了自动化和云工作区等功能。桌面应用可在 macOS 上运行,另有实验性的 Linux AppImage。Windows 版暂未推出。[定价](https://paradev.com/pricing) · [FAQ 文档](https://docs.paradev.com/faq)
+Paradev 基于 MIT 许可证开源。Free 套餐支持通过桌面应用和 CLI 使用本地工作区。付费套餐增加了自动化和云工作区等功能。桌面应用可在 macOS 和 Linux 上运行。Windows 版暂未推出。[定价](https://paradev.com/pricing) · [FAQ 文档](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ iOS 应用即将推出,让你可以在手机上查看你的智能体。
 下载桌面应用:
 
 - **macOS**:[Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(实验性;macOS 是主要目标平台)
+- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**:暂不可用
 - [所有构建版本](https://github.com/paradevai/paradev/releases/latest)
 

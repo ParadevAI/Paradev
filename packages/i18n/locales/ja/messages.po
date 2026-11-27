@@ -9344,8 +9344,8 @@ msgstr "バグ報告や機能リクエストは、<0>{githubHandle}</0>にGitHub
 msgid "For individuals getting started"
 msgstr "これから始める個人向け"
 
-msgid "For macOS on Apple Silicon and Intel. Linux AppImage is experimental."
-msgstr "Apple Silicon と Intel の macOS に対応。Linux AppImage は試験版です。"
+msgid "For macOS on Apple Silicon and Intel, and Linux x64."
+msgstr "Apple Silicon と Intel の macOS、および Linux x64 に対応。"
 
 msgid "For organizations with advanced needs"
 msgstr "高度な要件がある組織向け"
@@ -9462,8 +9462,8 @@ msgstr "無料クレジット"
 msgid "Free for everyone"
 msgstr "誰でも無料"
 
-msgid "Free for one user. macOS, with an experimental Linux build."
-msgstr "1ユーザーなら無料。macOS 対応、Linux 版は実験的に提供。"
+msgid "Free for one user. macOS and Linux."
+msgstr "1ユーザーなら無料。macOS と Linux に対応。"
 
 msgid "Free for one user. Open source under MIT."
 msgstr "1ユーザーなら無料。MIT ライセンスのオープンソース。"
@@ -11797,8 +11797,8 @@ msgstr "マシンに縛られないクラウドワークスペース。数秒で
 msgid "macOS"
 msgstr "macOS"
 
-msgid "macOS, Linux (experimental)"
-msgstr "macOS、Linux（実験的）"
+msgid "macOS, Linux"
+msgstr "macOS、Linux"
 
 msgid "Magenta"
 msgstr "マゼンタ"
@@ -13653,8 +13653,8 @@ msgctxt "agent status"
 msgid "Not updating"
 msgstr "更新なし"
 
-msgid "Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button."
-msgstr "まだです。macOS で動作し、Linux 版は実験的に提供しています。Windows をお使いの方は、ダウンロードボタンからウェイトリストに登録できます。"
+msgid "Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button."
+msgstr "まだです。macOS と Linux で動作します。Windows をお使いの方は、ダウンロードボタンからウェイトリストに登録できます。"
 
 msgid "Note"
 msgstr "メモ"

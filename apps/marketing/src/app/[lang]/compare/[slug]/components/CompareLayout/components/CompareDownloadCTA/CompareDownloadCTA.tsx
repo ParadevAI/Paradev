@@ -27,9 +27,7 @@ export function CompareDownloadCTA({
 				</span>
 			</DownloadLink>
 			<p className="text-sm text-muted-foreground">
-				<Trans>
-					For macOS on Apple Silicon and Intel. Linux AppImage is experimental.
-				</Trans>
+				<Trans>For macOS on Apple Silicon and Intel, and Linux x64.</Trans>
 			</p>
 		</div>
 	);

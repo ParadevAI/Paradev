@@ -254,7 +254,7 @@ Paradev 是桌面應用程式,不是終端應用程式。代理程式在其中�
 <summary>Paradev 採用什麼授權、費用多少、支援哪些平台?</summary>
 <br />
 
-Paradev 以 MIT 授權開源。Free 方案可透過桌面應用程式和 CLI 使用本機工作區。付費方案則加入自動化和雲端工作區等功能。桌面應用程式可在 macOS 上執行,另有實驗性的 Linux AppImage。Windows 版尚未推出。[定價](https://paradev.com/pricing) · [FAQ 文件](https://docs.paradev.com/faq)
+Paradev 以 MIT 授權開源。Free 方案可透過桌面應用程式和 CLI 使用本機工作區。付費方案則加入自動化和雲端工作區等功能。桌面應用程式可在 macOS 和 Linux 上執行。Windows 版尚未推出。[定價](https://paradev.com/pricing) · [FAQ 文件](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ iOS 應用程式即將推出,讓你可以在手機上查看你的代理程式。
 下載桌面應用程式:
 
 - **macOS**:[Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)(實驗性;macOS 是主要目標平台)
+- **Linux**:[x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**:暫不提供
 - [所有建置版本](https://github.com/paradevai/paradev/releases/latest)
 

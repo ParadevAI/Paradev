@@ -254,7 +254,7 @@ Nemusíte, Paradev umí zobrazit relaci agenta jako chat místo terminálu a akc
 <summary>Pod jakou licencí je Paradev, kolik stojí a na jakých platformách běží?</summary>
 <br />
 
-Paradev je open source pod licencí MIT. Plán Free pokrývá lokální pracovní prostory s desktopovou aplikací a CLI. Placené plány přidávají funkce jako automatizace a cloudové pracovní prostory. Desktopová aplikace běží na macOS, s experimentálním AppImage pro Linux; Windows zatím není k dispozici. [Ceník](https://paradev.com/pricing) · [Dokumentace FAQ](https://docs.paradev.com/faq)
+Paradev je open source pod licencí MIT. Plán Free pokrývá lokální pracovní prostory s desktopovou aplikací a CLI. Placené plány přidávají funkce jako automatizace a cloudové pracovní prostory. Desktopová aplikace běží na macOS a Linuxu; Windows zatím není k dispozici. [Ceník](https://paradev.com/pricing) · [Dokumentace FAQ](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ Brzy dorazí iOS aplikace, takže na své agenty dohlédnete i z telefonu.
 Stáhněte si desktopovou aplikaci:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimentální; primární platformou je macOS)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: zatím není k dispozici
 - [Všechny buildy](https://github.com/paradevai/paradev/releases/latest)
 

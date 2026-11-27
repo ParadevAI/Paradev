@@ -254,7 +254,7 @@ Tidak harus. Paradev bisa menampilkan sesi agen sebagai chat alih-alih terminal,
 <summary>Apa lisensi Paradev, berapa biayanya, dan di platform apa saja ia berjalan?</summary>
 <br />
 
-Paradev adalah open source dengan Lisensi MIT. Paket Free mencakup workspace lokal dengan aplikasi desktop dan CLI. Paket berbayar menambahkan fitur seperti otomatisasi dan workspace cloud. Aplikasi desktop berjalan di macOS, dengan AppImage Linux yang masih eksperimental; Windows belum tersedia. [Harga](https://paradev.com/pricing) · [Dokumentasi FAQ](https://docs.paradev.com/faq)
+Paradev adalah open source dengan Lisensi MIT. Paket Free mencakup workspace lokal dengan aplikasi desktop dan CLI. Paket berbayar menambahkan fitur seperti otomatisasi dan workspace cloud. Aplikasi desktop berjalan di macOS dan Linux; Windows belum tersedia. [Harga](https://paradev.com/pricing) · [Dokumentasi FAQ](https://docs.paradev.com/faq)
 
 </details>
 
@@ -438,7 +438,7 @@ Aplikasi iOS segera hadir sehingga Anda bisa memantau agen dari ponsel.
 Unduh aplikasi desktop:
 
 - **macOS**: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Superset-x64.dmg)
-- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (eksperimental; macOS adalah target utama)
+- **Linux**: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
 - **Windows**: belum tersedia
 - [Semua build](https://github.com/paradevai/paradev/releases/latest)
 

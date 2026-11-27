@@ -30,7 +30,7 @@ Paradev is the workspace for running parallel coding agents. You can run any cod
 
 1. **Download the app.**
    - macOS: [Apple Silicon (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-arm64.dmg) · [Intel (.dmg)](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x64.dmg)
-   - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage) (experimental)
+   - Linux: [x64 AppImage](https://github.com/paradevai/paradev/releases/latest/download/Paradev-x86_64.AppImage)
    - Windows: not yet available
 2. **Add a repository** from your computer, or clone one.
 3. **Create a workspace**, choose your CLI agent, and describe a small change.
@@ -197,7 +197,7 @@ No, Paradev can show an agent session as a chat instead of a terminal, and you a
 <summary>What is the Paradev license, what does it cost, and which platforms does it run on?</summary>
 <br />
 
-Paradev is open source under the MIT License. The Free plan covers local workspaces with the desktop app and the CLI. Paid plans add features such as automations and cloud workspaces. The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not available yet. [Pricing](https://paradev.com/pricing) · [FAQ docs](https://docs.paradev.com/faq)
+Paradev is open source under the MIT License. The Free plan covers local workspaces with the desktop app and the CLI. Paid plans add features such as automations and cloud workspaces. The desktop app runs on macOS and Linux; Windows is not available yet. [Pricing](https://paradev.com/pricing) · [FAQ docs](https://docs.paradev.com/faq)
 
 </details>
 
