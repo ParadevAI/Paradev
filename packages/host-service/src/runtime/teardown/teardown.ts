@@ -134,8 +134,10 @@ export async function runTeardown({
 			});
 		});
 
+		let stopping = false;
 		const stop = (note: string) => {
-			if (settled) return;
+			if (settled || stopping) return;
+			stopping = true;
 			timedOut = true;
 			appendTail(`\n[${note}]\n`);
 			try {

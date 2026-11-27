@@ -1009,45 +1009,88 @@ describe("workspaceCleanup.destroy cleanup ordering", () => {
 		}
 	});
 
-	test("a delete that runs out of time while removing files stays deleted", async () => {
+	function setUpRemovalTimeout(removalMs: number | "never") {
 		const tmp = mkdtempSync(join(tmpdir(), "workspace-delete-"));
 		const repo = mkdtempSync(join(tmpdir(), "workspace-delete-repo-"));
 		cleanupTeardownOps.runTeardown = mock(async () => ({
 			status: "ok" as const,
 		}));
+		let finishRemoval = () => {};
+		const removal = new Promise<{ stillRegistered: boolean }>((resolve) => {
+			finishRemoval = () => resolve({ stillRegistered: false });
+			if (removalMs !== "never") setTimeout(finishRemoval, removalMs);
+		});
 		const deleteBranch = mock(async () => ({ deleted: true }));
-		const realLimit = cleanupQueueLimits.slotTimeoutMs;
+		const realLimits = { ...cleanupQueueLimits };
 		cleanupQueueLimits.slotTimeoutMs = 20;
-		try {
-			const ctx = makeCtx({
-				workspace: {
-					id: "ws-1",
-					projectId: "p-1",
-					worktreePath: tmp,
-					branch: "feature",
-				},
-				project: { id: "p-1", repoPath: repo },
-				removeWorktree: () => new Promise(() => {}),
-				deleteBranch,
-			});
-			const caller = workspaceCleanupRouter.createCaller(ctx);
+		cleanupQueueLimits.reclaimGraceMs = 100;
+		const ctx = makeCtx({
+			workspace: {
+				id: "ws-1",
+				projectId: "p-1",
+				worktreePath: tmp,
+				branch: "feature",
+			},
+			project: { id: "p-1", repoPath: repo },
+			removeWorktree: () => removal,
+			deleteBranch,
+		});
+		return {
+			caller: workspaceCleanupRouter.createCaller(ctx),
+			ctx,
+			deleteBranch,
+			finishRemoval,
+			cleanUp: () => {
+				Object.assign(cleanupQueueLimits, realLimits);
+				Object.assign(cleanupTeardownOps, realTeardownOps);
+				rmSync(tmp, { recursive: true, force: true });
+				rmSync(repo, { recursive: true, force: true });
+			},
+		};
+	}
 
-			const result = await caller.destroy({
+	test("a delete that runs out of time while removing files lets the removal finish", async () => {
+		const setup = setUpRemovalTimeout(50);
+		try {
+			const result = await setup.caller.destroy({
 				workspaceId: "ws-1",
 				deleteBranch: true,
 				force: true,
 			});
 
 			expect(result.success).toBe(true);
-			expect(result.worktreeRemoved).toBe(false);
-			expect(result.warnings.join(" ")).toContain("took too long");
-			expect(deleteBranch).not.toHaveBeenCalled();
-			expect(ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(1);
+			expect(result.warnings.join(" ")).not.toContain("taking too long");
+			expect(setup.deleteBranch).toHaveBeenCalledTimes(1);
+			expect(setup.ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(
+				1,
+			);
 		} finally {
-			cleanupQueueLimits.slotTimeoutMs = realLimit;
-			Object.assign(cleanupTeardownOps, realTeardownOps);
-			rmSync(tmp, { recursive: true, force: true });
-			rmSync(repo, { recursive: true, force: true });
+			setup.cleanUp();
+		}
+	});
+
+	test("a removal that outlasts the grace stays deleted and keeps the workspace claimed until it ends", async () => {
+		const setup = setUpRemovalTimeout("never");
+		try {
+			const result = await setup.caller.destroy({
+				workspaceId: "ws-1",
+				deleteBranch: true,
+				force: true,
+			});
+
+			expect(result.success).toBe(true);
+			expect(result.warnings.join(" ")).toContain("taking too long");
+			expect(setup.ctx.__mocks.broadcastWorkspaceChanged).toHaveBeenCalledTimes(
+				1,
+			);
+			expect(__testDestroysInFlight.has("ws-1")).toBe(true);
+
+			setup.finishRemoval();
+			for (let i = 0; i < 20; i += 1) await Promise.resolve();
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			expect(__testDestroysInFlight.has("ws-1")).toBe(false);
+		} finally {
+			setup.cleanUp();
 		}
 	});
 

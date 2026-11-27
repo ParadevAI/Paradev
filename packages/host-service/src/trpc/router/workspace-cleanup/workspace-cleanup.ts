@@ -31,7 +31,11 @@ import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
 import { createCleanupQueue } from "./cleanup-queue";
-import { DeleteCancelledError, untilCancelled } from "./delete-cancellation";
+import {
+	DeleteCancelledError,
+	settleWithin,
+	untilCancelled,
+} from "./delete-cancellation";
 import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
 import { isLocalCheckoutWorkspace } from "./is-local-checkout-workspace";
 import { removeDirectoryTree } from "./remove-directory-tree";
@@ -59,7 +63,14 @@ const restoresInFlight = new Set<string>();
 // Above the worst case of one delete's own step timeouts (teardown 60s,
 // worktree removal 120s, preflight 15s), so only a hung delete reaches it.
 /** Patched in place by tests, like `cleanupGitOps`. */
-export const cleanupQueueLimits = { slotTimeoutMs: 5 * 60_000 };
+export const cleanupQueueLimits = {
+	slotTimeoutMs: 5 * 60_000,
+	// Worktree removal stops itself at 120s; this covers it plus the folder fallback.
+	reclaimGraceMs: 3 * 60_000,
+};
+
+/** File removals still running after their delete returned; they keep the in-flight claim. */
+const abandonedReclaims = new Map<string, Promise<unknown>>();
 
 const enqueueCleanup = createCleanupQueue({
 	slotTimeoutMs: () => cleanupQueueLimits.slotTimeoutMs,
@@ -281,7 +292,15 @@ export async function destroyWorkspace(
 	try {
 		return await runDestroy(ctx, input);
 	} finally {
-		destroysInFlight.delete(input.workspaceId);
+		const reclaim = abandonedReclaims.get(input.workspaceId);
+		abandonedReclaims.delete(input.workspaceId);
+		if (reclaim) {
+			void reclaim
+				.catch(() => {})
+				.finally(() => destroysInFlight.delete(input.workspaceId));
+		} else {
+			destroysInFlight.delete(input.workspaceId);
+		}
 	}
 }
 
@@ -555,8 +574,9 @@ async function runDestroyPhases(
 	let worktreeRemoved = false;
 	let branchDeleted = false;
 	let repoGitEnv: GitTaskEnv | null = null;
-	// Past here files start to go, so a cancel no longer restores the
-	// workspace: it stays archived and the startup reconciler finishes it.
+	// Past here files start to go. A cancel waits for this part instead of
+	// interrupting it: a half-removed worktree can be neither restored nor
+	// reliably finished by the startup reconciler.
 	const reclaimDisk = async () => {
 		if (sharesProjectCheckout) {
 			// The files are the repository itself; nothing on disk belongs to
@@ -662,14 +682,11 @@ async function runDestroyPhases(
 				let removeError: string | undefined;
 				try {
 					({ stillRegistered, removeError } =
-						await cleanupGitOps.removeWorktree(
-							{
-								repoPath: project.repoPath,
-								worktreePath: local.worktreePath,
-								gitEnv: repoGitEnv,
-							},
-							signal,
-						));
+						await cleanupGitOps.removeWorktree({
+							repoPath: project.repoPath,
+							worktreePath: local.worktreePath,
+							gitEnv: repoGitEnv,
+						}));
 				} catch (err) {
 					const message = err instanceof Error ? err.message : String(err);
 					throw new TRPCError({
@@ -743,14 +760,11 @@ async function runDestroyPhases(
 		// being mistaken for "already gone".
 		if (repoGitEnv && project && local?.branch && input.deleteBranch) {
 			try {
-				await cleanupGitOps.deleteLocalBranch(
-					{
-						repoPath: project.repoPath,
-						branch: local.branch,
-						gitEnv: repoGitEnv,
-					},
-					signal,
-				);
+				await cleanupGitOps.deleteLocalBranch({
+					repoPath: project.repoPath,
+					branch: local.branch,
+					gitEnv: repoGitEnv,
+				});
 				branchDeleted = true;
 			} catch (err) {
 				const message = err instanceof Error ? err.message : String(err);
@@ -780,17 +794,25 @@ async function runDestroyPhases(
 			}
 		}
 	};
+	const reclaim = reclaimDisk();
 	try {
-		await untilCancelled(signal, reclaimDisk());
+		await untilCancelled(signal, reclaim);
 	} catch (err) {
 		if (!(err instanceof DeleteCancelledError)) throw err;
-		warnings.push(
-			"Removing the files took too long and was stopped; Paradev finishes it the next time it starts",
+		const outcome = await settleWithin(
+			reclaim,
+			cleanupQueueLimits.reclaimGraceMs,
 		);
-		if (local) {
-			worktreeRemoved = isMissingPath(local.worktreePath, {
-				followSymlinks: false,
-			});
+		if (!outcome.settled) {
+			abandonedReclaims.set(input.workspaceId, reclaim);
+			warnings.push(
+				"Removing the files is taking too long; it keeps going in the background",
+			);
+			if (local) {
+				worktreeRemoved = isMissingPath(local.worktreePath, {
+					followSymlinks: false,
+				});
+			}
 		}
 	}
 
@@ -804,7 +826,7 @@ async function runDestroyPhases(
 		found: local !== undefined,
 		worktreeRemoved,
 		branchDeleted,
-		warnings,
+		warnings: [...warnings],
 	};
 }
 

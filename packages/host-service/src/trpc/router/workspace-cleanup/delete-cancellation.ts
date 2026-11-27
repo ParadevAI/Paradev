@@ -23,3 +23,23 @@ export function untilCancelled<T>(
 		});
 	});
 }
+
+/** Waits at most `ms` for `work`. Its value or error passes through when it settles in time. */
+export async function settleWithin<T>(
+	work: Promise<T>,
+	ms: number,
+): Promise<{ settled: true; value: T } | { settled: false }> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const timeout = new Promise<{ settled: false }>((resolve) => {
+		timer = setTimeout(() => resolve({ settled: false }), ms);
+		timer.unref?.();
+	});
+	try {
+		return await Promise.race([
+			work.then((value) => ({ settled: true as const, value })),
+			timeout,
+		]);
+	} finally {
+		clearTimeout(timer);
+	}
+}
