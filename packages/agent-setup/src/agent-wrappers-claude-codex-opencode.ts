@@ -23,6 +23,7 @@ import {
 } from "./managed-json-hooks";
 import { getNotifyScriptPath } from "./notify-hook";
 import {
+	getHooksDir,
 	getOpenCodeConfigDir,
 	getOpenCodePluginDir,
 	getOpenCodeTuiPluginDir,
@@ -74,12 +75,17 @@ export function getClaudeManagedHookCommand(): string {
 
 export const CLAUDE_ARTIFACT_GUARD_EVENT = "PreToolUse";
 export const CLAUDE_ARTIFACT_GUARD_MATCHER = "Artifact";
+const CLAUDE_HOOKS_SETTINGS_FILE = "claude-settings.json";
 
 /**
  * Returns the global Claude settings path used for native hook registration.
  */
 export function getClaudeGlobalSettingsJsonPath(): string {
 	return path.join(resolveUserHomeDir(), ".claude", "settings.json");
+}
+
+function getClaudeHooksSettingsPath(): string {
+	return path.join(getHooksDir(), CLAUDE_HOOKS_SETTINGS_FILE);
 }
 
 // StopFailure is the API-error hook; it fires while the session stays alive,
@@ -153,7 +159,13 @@ export function getClaudeGlobalSettingsJsonContent(
  * matching the approach used for Cursor, Gemini, Droid, and Mastra.
  */
 export function createClaudeSettingsJson(): void {
-	ensureManagedJsonHooks(claudeHooksSpec(getNotifyScriptPath()));
+	const spec = claudeHooksSpec(getNotifyScriptPath());
+	ensureManagedJsonHooks({
+		...spec,
+		fileLabel: "Claude hooks-only settings",
+		getFilePath: getClaudeHooksSettingsPath,
+	});
+	ensureManagedJsonHooks(spec);
 }
 
 /**
@@ -162,6 +174,7 @@ export function createClaudeSettingsJson(): void {
  * not exist — teardown must never create config files.
  */
 export function removeClaudeManagedHooks(): void {
+	fs.rmSync(getClaudeHooksSettingsPath(), { force: true });
 	removeManagedJsonHooks(claudeHooksSpec(getNotifyScriptPath()));
 }
 
@@ -308,13 +321,36 @@ export function getOpenCodeTuiPluginContent(notifyPath: string): string {
 		.replace("{{NOTIFY_PATH}}", () => JSON.stringify(notifyPath));
 }
 
+// Claude reads settings.json only from its active config dir, so a dir the user
+// exported by hand has no managed hooks. Chat sessions pass --setting-sources to load none.
+// Claude runs its background-session commands only when they come first.
+export function buildClaudeWrapperExecLine(): string {
+	return `_superset_claude_hooks="$SUPERSET_HOME_DIR/hooks/${CLAUDE_HOOKS_SETTINGS_FILE}"
+if [ -n "$SUPERSET_TERMINAL_ID" ] && [ -n "$CLAUDE_CONFIG_DIR" ] \\
+  && [ "$CLAUDE_CONFIG_DIR" != "$SUPERSET_DEFAULT_CLAUDE_CONFIG_DIR" ] && [ -f "$_superset_claude_hooks" ]; then
+  case "$1" in
+    daemon|attach|logs|kill|rm|stop|respawn) exec "$REAL_BIN" "$@" ;;
+    --dangerously-skip-permissions|--allow-dangerously-skip-permissions) [ "$2" = daemon ] && exec "$REAL_BIN" "$@" ;;
+  esac
+  for _superset_arg in "$@"; do
+    case "$_superset_arg" in
+      --) break ;;
+      --settings|--settings=*|--setting-sources|--setting-sources=*) exec "$REAL_BIN" "$@" ;;
+    esac
+  done
+  exec "$REAL_BIN" --settings "$_superset_claude_hooks" "$@"
+fi
+exec "$REAL_BIN" "$@"`;
+}
+
 /**
  * Wrapper for Claude: forwards SUPERSET_* env vars into the agent process
  * tree and follows the Usage-tab account switch at launch time. Hooks live
- * in ~/.claude/settings.json (createClaudeSettingsJson).
+ * in ~/.claude/settings.json (createClaudeSettingsJson), or come from
+ * --settings for a config dir exported by hand.
  */
 export function createClaudeWrapper(): void {
-	const script = buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
+	const script = buildWrapperScript("claude", buildClaudeWrapperExecLine(), {
 		agentId: "claude",
 		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",
