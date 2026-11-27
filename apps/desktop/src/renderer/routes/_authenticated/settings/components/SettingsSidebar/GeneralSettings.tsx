@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { recordingUnmaskProps } from "@superset/shared/posthog-privacy";
 import { cn } from "@superset/ui/utils";
 import { Link } from "@tanstack/react-router";
 import { useHostsNeedingUpdateCount } from "renderer/hooks/host-version/useHostsNeedingUpdate";
@@ -35,7 +36,10 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 
 				return (
 					<div key={group.label.id} className={cn(groupIndex > 0 && "mt-4")}>
-						<h2 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.075em] px-3 mb-1">
+						<h2
+							{...recordingUnmaskProps}
+							className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.075em] px-3 mb-1"
+						>
 							{i18n._(group.label)}
 						</h2>
 						<nav className="flex flex-col">
@@ -56,7 +60,9 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 										)}
 									>
 										<section.icon className="h-4 w-4" />
-										<span className="flex-1">{i18n._(section.label)}</span>
+										<span {...recordingUnmaskProps} className="flex-1">
+											{i18n._(section.label)}
+										</span>
 										{count !== undefined && count > 0 && (
 											<span className="text-xs text-muted-foreground bg-accent/50 px-1.5 py-0.5 rounded">
 												{count}

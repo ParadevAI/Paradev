@@ -432,7 +432,7 @@ export function Transcript({
 				<MessageScroller.Viewport
 					aria-label={t({ message: "Messages" })}
 					className={cn(
-						"min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
+						"ph-no-capture min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable_both-edges]",
 						CHAT_SCROLLER_GUTTER_CLASSNAME,
 					)}
 					onCopy={copySourceText}

@@ -638,7 +638,7 @@ export function TerminalPane({
 				/>
 				<div
 					ref={containerRef}
-					className="h-full w-full"
+					className="ph-no-capture h-full w-full"
 					style={{ backgroundColor: appearance.background }}
 				/>
 				<ScrollToBottomButton terminal={terminal} />
