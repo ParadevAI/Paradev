@@ -57,7 +57,7 @@ export const MIGRATION_STEPS: MigrationStep[] = [
 	{
 		title: msg({ message: "Download {companyName}" }),
 		detail: msg({
-			message: "Free for one user. macOS, with an experimental Linux build.",
+			message: "Free for one user. macOS and Linux.",
 		}),
 		download: true,
 	},
@@ -148,7 +148,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 	{
 		id: "platforms",
 		label: msg({ message: "Platforms" }),
-		paradev: msg({ message: "macOS, Linux (experimental)" }),
+		paradev: msg({ message: "macOS, Linux" }),
 		orca: msg({ message: "macOS, Windows, Linux" }),
 	},
 	{
@@ -237,7 +237,7 @@ export const FAQ_ITEMS: FaqItem[] = [
 		question: msg({ message: "Does it run on Windows?" }),
 		answer: msg({
 			message:
-				"Not yet. It runs on macOS, with an experimental Linux build. Windows users can join the waitlist from the download button.",
+				"Not yet. It runs on macOS and Linux. Windows users can join the waitlist from the download button.",
 		}),
 	},
 	{
