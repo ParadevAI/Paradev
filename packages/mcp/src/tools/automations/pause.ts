@@ -6,7 +6,13 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_pause",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Pause automation",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Pause an automation. Its schedules and event triggers stop firing until resumed. Caller must be the owner.",
 		inputSchema: {

@@ -9,7 +9,12 @@ import {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "terminals_close",
-		annotations: { destructiveHint: true },
+		title: "Close terminal",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: false,
+		},
 		description:
 			"Close (dispose) a terminal by id — kills the PTY and the agent running in it. Use to shut down an agent session you started; targets the terminal by id (the value agents_create returned as `sessionId`).",
 		inputSchema: {

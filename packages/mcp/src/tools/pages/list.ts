@@ -11,7 +11,12 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_list",
-		annotations: { readOnlyHint: true },
+		title: "List pages",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"List published pages in the active organization, newest-created first. A page is one self-contained HTML file published to a shareable URL. Returns only pages the caller may read: everything shared with the organization, plus the caller's own private ones. Use this to find a page's id or slug before calling any other pages_* tool. Ordering is by creation, so republishing a page does not move it. Results are paginated: pass `search` to narrow by title, slug or description, and when `nextCursor` comes back non-null pass it as `cursor` to get the next batch.",
 		inputSchema: {

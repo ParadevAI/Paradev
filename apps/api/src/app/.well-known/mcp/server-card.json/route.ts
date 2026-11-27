@@ -15,6 +15,7 @@ async function listTools() {
 		const { tools } = await client.listTools();
 		return tools.map((tool) => ({
 			name: tool.name,
+			...(tool.title ? { title: tool.title } : {}),
 			description: tool.description,
 			...(tool.annotations ? { annotations: tool.annotations } : {}),
 			inputSchema: tool.inputSchema,

@@ -17,7 +17,12 @@ import {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "tasks_create",
-		annotations: { destructiveHint: false },
+		title: "Create task",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: true,
+		},
 		description:
 			"Create a task in the active organization, or a Linear issue when the organization tracks tasks in Linear. Use this when the user describes work they want to track. The task is auto-assigned a default status if statusId is omitted.",
 		inputSchema: {

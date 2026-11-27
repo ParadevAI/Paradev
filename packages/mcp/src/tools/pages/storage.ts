@@ -40,7 +40,12 @@ async function refusal(response: Response, fallback: string): Promise<never> {
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_storage",
-		annotations: { readOnlyHint: true },
+		title: "Read page storage",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"Read what viewers stored on a page through window.superset.storage. Each key holds one slot per person, or one private or shared value when scope is set. Without key, lists every key with its record count and last update. With key, returns every person's slot for that key: name, value, and updatedAt. With scope private, you see only your own value. On a just_me page only the creator can read storage; on an org or everyone page, members of the page's organization can, even when the page is public. Anyone else gets an error. Address the page by id or slug; exactly one is required.",
 		inputSchema: z
@@ -101,7 +106,13 @@ export function register(server: McpServer): void {
 
 	defineTool(server, {
 		name: "pages_storage_set",
-		annotations: { destructiveHint: true },
+		title: "Set page storage value",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Store a JSON value on a page through window.superset.storage, as you. Use scope shared for data the page renders for everyone, like a dashboard an automation refreshes. Values are at most 64 KiB and a page holds at most 20 MiB. Address the page by id or slug; exactly one is required.",
 		inputSchema: z
@@ -128,7 +139,13 @@ export function register(server: McpServer): void {
 
 	defineTool(server, {
 		name: "pages_storage_remove",
-		annotations: { destructiveHint: true },
+		title: "Remove page storage value",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Remove your value under a key on a page's storage. For scope shared, removes the one shared value. Address the page by id or slug; exactly one is required.",
 		inputSchema: z

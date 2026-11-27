@@ -7,7 +7,12 @@ import { resolveTask, trackerInput } from "./tracker";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "tasks_get",
-		annotations: { readOnlyHint: true },
+		title: "Get task",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: true,
+		},
 		description:
 			"Fetch one task by UUID or slug, or a Linear issue by identifier (e.g. ENG-123) when the organization tracks tasks in Linear. Use this when you have a task ID or slug from a list call or the user.",
 		inputSchema: {

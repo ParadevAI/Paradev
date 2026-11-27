@@ -7,14 +7,21 @@ type Definition = {
 	handler: (input: unknown, ctx: object) => Promise<unknown>;
 };
 const definitions = new Map<string, Definition>();
+const realDefineTool = await import("../../define-tool");
+const { defineTool } = realDefineTool;
+const testServer = {} as McpServer;
 mock.module("../../define-tool", () => ({
-	defineTool: (_server: unknown, value: Definition & { name: string }) => {
+	...realDefineTool,
+	defineTool: (server: McpServer, value: Definition & { name: string }) => {
+		if (server !== testServer) return defineTool(server, value as never);
 		definitions.set(value.name, value);
 	},
 }));
 
 const PAGE_ID = "3f7a1c22-9c2e-4e3a-9a8b-1f0b6c2d4e55";
+const realCaller = await import("../../caller");
 mock.module("../../caller", () => ({
+	...realCaller,
 	createMcpCaller: () => ({
 		page: { get: async () => ({ id: PAGE_ID }) },
 	}),
@@ -43,7 +50,7 @@ const realtime = Bun.serve({
 afterAll(() => realtime.stop());
 
 const { register } = await import("./storage");
-register({} as McpServer);
+register(testServer);
 
 const call = (name: string, input: Record<string, unknown>) => {
 	const definition = definitions.get(name);
