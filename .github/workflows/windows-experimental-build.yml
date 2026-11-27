@@ -1,6 +1,9 @@
 name: Experimental Windows Desktop Build
 
 on:
+  push:
+    branches:
+      - feat/windows-build-experimental
   workflow_dispatch:
     inputs:
       artifact_name:
