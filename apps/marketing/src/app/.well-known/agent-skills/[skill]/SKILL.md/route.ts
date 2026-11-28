@@ -1,4 +1,4 @@
-import { fetchSkill, isSkillName } from "../../skills-source";
+import { fetchSkill, isSkillName } from "@/lib/skills-source";
 
 export async function GET(
 	_request: Request,

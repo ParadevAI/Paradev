@@ -1,9 +1,6 @@
 import matter from "gray-matter";
 import { cacheLife } from "next/cache";
-import {
-	fetchSkill,
-	SKILL_NAMES,
-} from "@/app/.well-known/agent-skills/skills-source";
+import { fetchSkill, SKILL_NAMES } from "@/lib/skills-source";
 
 export interface SkillEntry {
 	name: string;

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import matter from "gray-matter";
-import { fetchSkill, SKILL_NAMES } from "../skills-source";
+import { fetchSkill, SKILL_NAMES } from "@/lib/skills-source";
 
 export async function GET() {
 	const skills = (
