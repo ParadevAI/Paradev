@@ -1,0 +1,14 @@
+{
+  "scope": "paradevai",
+  "project": "vercel-sandbox-default-project",
+  "port": 6768,
+  "vcpus": 4,
+  "timeout": "45m",
+  "snapshotExpiration": "30d",
+  "orcaVersion": "1.4.263",
+  "orcaReleaseUrl": "https://github.com/stablyai/orca/releases/download",
+  "orcaServerSha256": "6c0315728a656bcbe5b6232424cec1011d0f1e2e1f250e6197031e9cec95703a",
+  "repoUrl": "https://github.com/ParadevAI/Paradev.git",
+  "repoRef": "main",
+  "projectRoot": "/vercel/sandbox/paradev"
+}

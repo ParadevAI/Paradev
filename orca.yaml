@@ -1,0 +1,12 @@
+scripts:
+  setup: |
+    ./scripts/orca-vm/workspace-setup.sh
+environmentRecipes:
+  - id: vercel-sandbox
+    name: Vercel Sandbox
+    create: ./scripts/orca-vm/vercel-create.sh
+    destroy: ./scripts/orca-vm/vercel-destroy.sh
+    timeoutSeconds:
+      create: 900
+      destroy: 120
+    passEnv: [GH_TOKEN, GITHUB_TOKEN, 'ORCA_VM_*', 'VERCEL_*', 'XDG_*']
