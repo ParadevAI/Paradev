@@ -108,6 +108,7 @@ export function SidebarSlide({
 		<div
 			ref={slideRef}
 			data-sidebar-slide=""
+			data-moving={move ? "" : undefined}
 			className="relative flex h-full shrink-0 ease-[ease] motion-reduce:transition-none"
 			style={{ width: inFlow ? undefined : panelWidth, ...transition }}
 		>
@@ -130,6 +131,7 @@ export function SidebarSlide({
 								),
 						hidden && "invisible",
 					)}
+					data-sidebar-slide-content={fill ? "fill" : "fixed"}
 					style={{
 						width: inFlow ? undefined : contentWidth,
 						contain: move ? "strict" : undefined,

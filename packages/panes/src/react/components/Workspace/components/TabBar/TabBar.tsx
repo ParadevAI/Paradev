@@ -32,11 +32,13 @@ import type { AddTabMenuActions, PaneRegistry } from "../../../../types";
 import { PANE_DRAG_TYPE } from "../Tab/components/Pane/components/PaneHeader";
 import { TAB_DRAG_TYPE, TabItem } from "./components/TabItem";
 import {
+	ADD_TAB_SLOT_WIDTH,
 	computeInsertIndex,
 	scrollLeftToRevealTab,
 	TAB_BAR_FADE_WIDTH,
 	TAB_MAX_WIDTH,
 	TAB_MIN_WIDTH,
+	tabScrollerMinWidth,
 } from "./utils";
 
 function drawnTabWidth(track: HTMLElement): number {
@@ -344,7 +346,9 @@ export function TabBar<TData>({
 				observeChildren
 				onOverflowChange={handleOverflowChange}
 				style={
-					isCards ? { minWidth: TAB_MIN_WIDTH + TAB_BAR_FADE_WIDTH } : undefined
+					isCards
+						? { minWidth: tabScrollerMinWidth(hasHorizontalOverflow) }
+						: undefined
 				}
 				className={cn(
 					"hide-scrollbar flex w-0 min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden",
@@ -408,9 +412,10 @@ export function TabBar<TData>({
 					{!hasHorizontalOverflow && (
 						<div
 							className={cn(
-								"flex h-full w-10 shrink-0 items-center justify-center",
+								"flex h-full shrink-0 items-center justify-center",
 								!isCards && "pt-1",
 							)}
+							style={{ width: ADD_TAB_SLOT_WIDTH }}
 						>
 							<AddTabButton
 								renderAddTabMenu={renderAddTabMenu}
@@ -431,9 +436,10 @@ export function TabBar<TData>({
 			{hasHorizontalOverflow && (
 				<div
 					className={cn(
-						"no-drag flex h-full w-10 shrink-0 items-center justify-center",
+						"no-drag flex h-full shrink-0 items-center justify-center",
 						!isCards && "pt-1",
 					)}
+					style={{ width: ADD_TAB_SLOT_WIDTH }}
 				>
 					<AddTabButton
 						renderAddTabMenu={renderAddTabMenu}

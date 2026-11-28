@@ -7878,6 +7878,9 @@ msgstr "đã tải"
 msgid "Downloading"
 msgstr "Đang tải xuống"
 
+msgid "Downloading update"
+msgstr "Đang tải bản cập nhật"
+
 msgid "Downloading..."
 msgstr "Đang tải xuống..."
 
@@ -10730,6 +10733,9 @@ msgstr "Cài ứng dụng máy tính"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "Cài đặt Paradev GitHub App trên từng tổ chức hoặc tài khoản GitHub có kho mã bạn muốn kết nối."
+
+msgid "Install the update. Sessions keep running"
+msgstr "Cài đặt bản cập nhật. Các phiên vẫn tiếp tục chạy"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Cài đặt, ủy quyền và giới hạn phạm vi server MCP trên mọi workspace từ một chỗ, với OAuth tập trung."
@@ -22187,6 +22193,9 @@ msgstr "Cập nhật daemon"
 
 msgid "Update Error"
 msgstr "Lỗi cập nhật"
+
+msgid "Update failed"
+msgstr "Cập nhật thất bại"
 
 msgid "Update host service"
 msgstr "Cập nhật dịch vụ máy chủ"

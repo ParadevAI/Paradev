@@ -8,7 +8,7 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { MarkdownRenderer } from "renderer/components/MarkdownRenderer";
-import { useAutoUpdateStatus } from "renderer/components/UpdatesPill/useAutoUpdateStatus";
+import { useAutoUpdateStatus } from "renderer/hooks/useUpdateControl";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AUTO_UPDATE_STATUS } from "shared/auto-update";
 

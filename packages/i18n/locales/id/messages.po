@@ -7878,6 +7878,9 @@ msgstr "terunduh"
 msgid "Downloading"
 msgstr "Mengunduh"
 
+msgid "Downloading update"
+msgstr "Mengunduh pembaruan"
+
 msgid "Downloading..."
 msgstr "Mengunduh..."
 
@@ -10730,6 +10733,9 @@ msgstr "Pasang aplikasi desktop"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "Pasang Paradev GitHub App di setiap organisasi atau akun GitHub yang repositorinya ingin Anda hubungkan."
+
+msgid "Install the update. Sessions keep running"
+msgstr "Pasang pembaruan. Sesi tetap berjalan"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Pasang, otorisasi, dan atur cakupan server MCP di semua workspace Anda dari satu tempat, dengan OAuth terpusat."
@@ -22187,6 +22193,9 @@ msgstr "Perbarui daemon"
 
 msgid "Update Error"
 msgstr "Kesalahan Pembaruan"
+
+msgid "Update failed"
+msgstr "Pembaruan gagal"
 
 msgid "Update host service"
 msgstr "Perbarui layanan host"

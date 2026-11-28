@@ -10,12 +10,13 @@ interface PreUpdateConfirmPopoverProps {
 	notice: DesktopNotice | null;
 	onConfirm: () => void;
 	onCancel: () => void;
+	side?: "top" | "bottom";
 	children: ReactNode;
 }
 
 /**
  * Confirmation for `trigger: "pre-update"` notices — anchored to the update
- * pill, shown only at the moment of update intent. Backing out is
+ * control, shown only at the moment of update intent. Backing out is
  * session-only: the next update click asks again.
  */
 export function PreUpdateConfirmPopover({
@@ -23,6 +24,7 @@ export function PreUpdateConfirmPopover({
 	notice,
 	onConfirm,
 	onCancel,
+	side = "top",
 	children,
 }: PreUpdateConfirmPopoverProps) {
 	if (!notice) return <>{children}</>;
@@ -31,7 +33,7 @@ export function PreUpdateConfirmPopover({
 		<Popover open={open} onOpenChange={(o) => !o && onCancel()}>
 			<PopoverAnchor className="inline-flex shrink-0">{children}</PopoverAnchor>
 			<PopoverContent
-				side="top"
+				side={side}
 				align="start"
 				className="relative w-72 overflow-hidden rounded-none p-0"
 			>

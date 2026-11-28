@@ -7878,6 +7878,9 @@ msgstr "téléchargée"
 msgid "Downloading"
 msgstr "Téléchargement"
 
+msgid "Downloading update"
+msgstr "Téléchargement de la mise à jour"
+
 msgid "Downloading..."
 msgstr "Téléchargement..."
 
@@ -10730,6 +10733,9 @@ msgstr "Installer l'application de bureau"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "Installez l’application GitHub Paradev sur chaque organisation ou compte GitHub dont vous voulez connecter les dépôts."
+
+msgid "Install the update. Sessions keep running"
+msgstr "Installez la mise à jour. Les sessions continuent de tourner"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "Installez, autorisez et cadrez les serveurs MCP sur tous vos espaces de travail depuis un seul endroit, avec un OAuth centralisé."
@@ -22187,6 +22193,9 @@ msgstr "Mettre à jour le démon"
 
 msgid "Update Error"
 msgstr "Erreur de mise à jour"
+
+msgid "Update failed"
+msgstr "Échec de la mise à jour"
 
 msgid "Update host service"
 msgstr "Mettre à jour le service d'hôte"

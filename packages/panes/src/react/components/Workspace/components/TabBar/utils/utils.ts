@@ -2,6 +2,18 @@ export const TAB_MAX_WIDTH = 160;
 export const TAB_MIN_WIDTH = 72;
 // OverflowFadeContainer's default fade-edge size (1.5rem).
 export const TAB_BAR_FADE_WIDTH = 24;
+export const ADD_TAB_SLOT_WIDTH = 40;
+
+/**
+ * The add button sits inside the tab scroller until the tabs overflow. Its
+ * width stays in the bar's minimum either way, or a bar held at its minimum
+ * flips between the two layouts.
+ */
+export function tabScrollerMinWidth(hasOverflow: boolean): number {
+	return (
+		TAB_MIN_WIDTH + TAB_BAR_FADE_WIDTH + (hasOverflow ? 0 : ADD_TAB_SLOT_WIDTH)
+	);
+}
 
 export function computeInsertIndex(
 	clientX: number,

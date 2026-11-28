@@ -7878,6 +7878,9 @@ msgstr "다운로드됨"
 msgid "Downloading"
 msgstr "다운로드 중"
 
+msgid "Downloading update"
+msgstr "업데이트 다운로드 중"
+
 msgid "Downloading..."
 msgstr "다운로드 중..."
 
@@ -10730,6 +10733,9 @@ msgstr "데스크톱 앱 설치"
 
 msgid "Install the Paradev GitHub App on each GitHub organization or account whose repositories you want to connect."
 msgstr "연결할 저장소가 있는 GitHub 조직이나 계정마다 Paradev GitHub App을 설치하세요."
+
+msgid "Install the update. Sessions keep running"
+msgstr "업데이트를 설치합니다. 세션은 계속 실행됩니다"
 
 msgid "Install, authorize, and scope MCP servers across all your workspaces from one place, with centralized OAuth."
 msgstr "모든 워크스페이스의 MCP 서버를 한곳에서 설치하고, 인증하고, 범위를 지정하세요. OAuth도 중앙에서 관리합니다."
@@ -22187,6 +22193,9 @@ msgstr "데몬 업데이트"
 
 msgid "Update Error"
 msgstr "업데이트 오류"
+
+msgid "Update failed"
+msgstr "업데이트 실패"
 
 msgid "Update host service"
 msgstr "호스트 서비스 업데이트"

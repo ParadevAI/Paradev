@@ -1,21 +1,18 @@
 import { Trans } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { useEffect, useState } from "react";
 import { LuCircleArrowUp, LuCircleCheck } from "react-icons/lu";
-import { useDesktopNotices } from "renderer/hooks/useDesktopNotices";
-import { electronTrpc } from "renderer/lib/electron-trpc";
-import { AUTO_UPDATE_STATUS } from "shared/auto-update";
+import { PreUpdateConfirmPopover } from "renderer/components/PreUpdateConfirmPopover";
+import {
+	UPDATE_CONFIRM_MS as CONFIRM_MS,
+	UPDATE_EXIT_MS as EXIT_MS,
+	formatUpdateVersion,
+	useUpdateControl,
+} from "renderer/hooks/useUpdateControl";
 import { CountdownBorder } from "./CountdownBorder";
-import { PreUpdateConfirmPopover } from "./components/PreUpdateConfirmPopover";
 import { DownloadRing } from "./DownloadRing";
-import { useAutoUpdateStatus } from "./useAutoUpdateStatus";
 
 const STROKE_WIDTH = 1.5;
-/** How long the post-update "✓ vX.Y.Z" confirmation shows before hiding */
-const CONFIRM_MS = 5000;
-/** Duration of the pixel-dissolve exit once the confirmation expires */
-const EXIT_MS = 450;
 
 /**
  * Compact version for the inline pill — canary builds carry a timestamp
@@ -25,12 +22,6 @@ const EXIT_MS = 450;
 function displayVersion(version: string): string {
 	const [base, prereleaseTag] = version.split("-", 2);
 	return prereleaseTag ? `${base}-${prereleaseTag.slice(0, 2)}` : base;
-}
-
-/** Tooltip version — drops the canary timestamp ("1.14.1-canary.20260711221936" → "1.14.1-canary") */
-function tooltipVersion(version: string): string {
-	const [base, prereleaseTag] = version.split("-", 2);
-	return prereleaseTag ? `${base}-${prereleaseTag.split(".")[0]}` : base;
 }
 
 interface UpdatesPillProps {
@@ -45,92 +36,34 @@ interface UpdatesPillProps {
  * Renders nothing while the app is up to date.
  */
 export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
-	const event = useAutoUpdateStatus();
-	const { preUpdateNotice } = useDesktopNotices();
-	const [isInstalling, setIsInstalling] = useState(false);
-	const [isConfirming, setIsConfirming] = useState(false);
-	const [confirmationDone, setConfirmationDone] = useState(false);
-	const [isLeaving, setIsLeaving] = useState(false);
-	const installMutation = electronTrpc.autoUpdate.install.useMutation();
-	const checkMutation = electronTrpc.autoUpdate.check.useMutation();
+	const {
+		phase,
+		isLeaving,
+		version,
+		percent,
+		error,
+		activate,
+		preUpdateConfirm,
+	} = useUpdateControl();
 
-	const status = event?.status;
+	if (!phase) return null;
 
-	// Drop the local installing state when the status moves off READY (e.g.
-	// dev-mode install emits IDLE, or an install error surfaces) — and as a
-	// safety net, when the install mutation itself fails at the IPC layer,
-	// which produces no status event.
-	useEffect(() => {
-		if (status !== AUTO_UPDATE_STATUS.READY || installMutation.isError) {
-			setIsInstalling(false);
-		}
-	}, [status, installMutation.isError]);
-
-	// The post-update confirmation ("✓ vX.Y.Z" after relaunching on a new
-	// version) hides itself after a beat, even if the status lingers: a line
-	// traces the border while the clock runs, then the pill pixel-dissolves.
-	useEffect(() => {
-		if (status === AUTO_UPDATE_STATUS.UPDATED) {
-			setIsLeaving(false);
-			setConfirmationDone(false);
-			const leaveTimeout = setTimeout(() => setIsLeaving(true), CONFIRM_MS);
-			const doneTimeout = setTimeout(
-				() => setConfirmationDone(true),
-				CONFIRM_MS + EXIT_MS,
-			);
-			return () => {
-				clearTimeout(leaveTimeout);
-				clearTimeout(doneTimeout);
-			};
-		}
-		setIsLeaving(false);
-	}, [status]);
-
-	const isUpdated = status === AUTO_UPDATE_STATUS.UPDATED && !confirmationDone;
-	const isDissolving = isUpdated && isLeaving;
-
-	if (
-		status !== AUTO_UPDATE_STATUS.DOWNLOADING &&
-		status !== AUTO_UPDATE_STATUS.READY &&
-		status !== AUTO_UPDATE_STATUS.ERROR &&
-		!isUpdated
-	) {
-		return null;
-	}
-
-	const isDownloading = status === AUTO_UPDATE_STATUS.DOWNLOADING;
-	const isError = status === AUTO_UPDATE_STATUS.ERROR;
-	const isReady = status === AUTO_UPDATE_STATUS.READY;
+	const isDownloading = phase === "downloading";
+	const isError = phase === "error";
+	const isReady = phase === "ready";
+	const isInstalling = phase === "installing";
+	const isUpdated = phase === "updated";
 	const isBusy = isDownloading || isInstalling || isUpdated;
-	const version = event?.version;
-	const percent = event?.progress?.percent ?? null;
+	const isDissolving = isLeaving;
+	const handleClick = activate;
 
-	const startInstall = () => {
-		setIsConfirming(false);
-		setIsInstalling(true);
-		installMutation.mutate();
-	};
-
-	const handleClick = () => {
-		if (isReady && !isInstalling) {
-			// a server-driven pre-update notice intercepts the install click
-			if (preUpdateNotice) {
-				setIsConfirming(true);
-				return;
-			}
-			startInstall();
-		} else if (isError) {
-			checkMutation.mutate();
-		}
-	};
-
-	const shortVersion = version ? ` v${tooltipVersion(version)}` : "";
+	const shortVersion = version ? ` v${formatUpdateVersion(version)}` : "";
 	const tooltip = isInstalling
 		? "Installing update…"
 		: isDownloading
 			? `Downloading${shortVersion || " update"}`
 			: isError
-				? `${(event?.error ?? "Update failed").replace(/[.\s]+$/, "")}. Click to retry`
+				? `${(error ?? "Update failed").replace(/[.\s]+$/, "")}. Click to retry`
 				: isUpdated
 					? `Updated${shortVersion ? ` to${shortVersion}` : ""}`
 					: `Install${shortVersion || " update"}. Sessions keep running`;
@@ -197,12 +130,10 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 						"font-mono text-[10px] tabular-nums leading-none",
 						"ring-1 ring-inset animate-in fade-in slide-in-from-bottom-1 duration-300",
 						isBusy && "cursor-default",
-						(isDownloading || isInstalling || isUpdated || isReady) &&
-							"bg-foreground/[0.045] ring-foreground/[0.06]",
+						!isError && "bg-foreground/[0.045] ring-foreground/[0.06]",
 						(isDownloading || isUpdated) && "text-muted-foreground",
 						isInstalling && "text-orange-600 dark:text-orange-300",
 						isReady &&
-							!isInstalling &&
 							"text-muted-foreground hover:bg-foreground/[0.08] hover:text-foreground",
 						isError &&
 							"bg-destructive/10 ring-destructive/25 text-destructive hover:bg-destructive/20",
@@ -283,12 +214,7 @@ export function UpdatesPill({ isCollapsed = false }: UpdatesPillProps) {
 	);
 
 	return (
-		<PreUpdateConfirmPopover
-			open={isConfirming}
-			notice={preUpdateNotice}
-			onConfirm={startInstall}
-			onCancel={() => setIsConfirming(false)}
-		>
+		<PreUpdateConfirmPopover {...preUpdateConfirm}>
 			{pill}
 		</PreUpdateConfirmPopover>
 	);

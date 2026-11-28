@@ -12,7 +12,7 @@ import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-stat
 import { TITLE_BAR_OVERLAY_HEIGHT } from "shared/constants";
 import { toHex } from "shared/themes/utils";
 import {
-	useTitleBarSideWidth,
+	useTitleBarSide,
 	useTitleBarSlots,
 } from "../../providers/TitleBarSlotsProvider";
 import { AppMenuButton } from "../AppMenuButton";
@@ -26,6 +26,7 @@ import {
 	WindowControlsInset,
 } from "../WindowControlsInset";
 import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
+import { UpdateButton } from "./components/UpdateButton";
 import { WorkspaceSwitcherButton } from "./components/WorkspaceSwitcherButton";
 import { shellFrameColor } from "./utils/shellFrameColor";
 
@@ -45,7 +46,7 @@ const ROW_HEIGHT = 44;
 export function TitleBar() {
 	const { setMain, setSide, mainClaims, contentCard } = useTitleBarSlots();
 	const leadingRef = useRef<HTMLDivElement>(null);
-	const sideWidth = useTitleBarSideWidth();
+	const { width: sideWidth, layoutWidth: sideLayoutWidth } = useTitleBarSide();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const zoomFactor = useZoomFactor();
@@ -130,6 +131,7 @@ export function TitleBar() {
 						{isListPanelCollapsed && <NewWorkspaceButton />}
 						<PortsDropdown align="start" />
 						<OfflineBadge />
+						<UpdateButton />
 					</ZoomStable>
 				</div>
 				<div className="drag h-full min-w-1 flex-1" />
@@ -149,7 +151,8 @@ export function TitleBar() {
 			{mainClaims === 0 && <div className="drag h-full min-w-0 flex-1" />}
 			<div
 				className={cn(
-					"flex min-w-min overflow-hidden",
+					"flex overflow-hidden",
+					sideLayoutWidth === null ? "min-w-min" : "min-w-0 justify-end",
 					sideWidth === null && "hidden",
 				)}
 				style={
@@ -162,8 +165,17 @@ export function TitleBar() {
 			>
 				<div
 					ref={setSide}
-					className="flex h-full min-w-0 flex-1"
-					style={slotStyle}
+					className={cn(
+						"flex h-full",
+						sideLayoutWidth === null ? "min-w-0 flex-1" : "shrink-0",
+					)}
+					style={{
+						...slotStyle,
+						width:
+							sideLayoutWidth === null
+								? undefined
+								: `calc(max(0px, ${sideLayoutWidth}px - ${WINDOW_CONTROLS_INSET_WIDTH}) * ${isMac ? zoomFactor : 1})`,
+					}}
 				/>
 			</div>
 			<WindowControlsInset inTitleBar />
