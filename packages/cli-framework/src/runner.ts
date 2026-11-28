@@ -488,11 +488,13 @@ async function execute(
 		});
 	} catch (error) {
 		if (isJson && error instanceof CLIError && error.data !== undefined) {
-			await writeStream(
-				process.stdout,
-				`${JSON.stringify(error.data, null, 2)}\n`,
-				signal,
-			).catch(() => {});
+			let text: string | undefined;
+			try {
+				text = JSON.stringify(error.data, null, 2);
+			} catch {}
+			if (text !== undefined) {
+				await writeStream(process.stdout, `${text}\n`, signal).catch(() => {});
+			}
 		}
 		throw error;
 	}

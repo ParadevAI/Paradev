@@ -171,7 +171,13 @@ describe("introspectCli", () => {
 });
 
 describe("CLIError with data", () => {
-	async function runFailing(json: boolean, { stdoutClosed = false } = {}) {
+	async function runFailing(
+		json: boolean,
+		{
+			stdoutClosed = false,
+			data,
+		}: { stdoutClosed?: boolean; data?: unknown } = {},
+	) {
 		const stdout: string[] = [];
 		const stderr: string[] = [];
 		const capture =
@@ -213,10 +219,16 @@ describe("CLIError with data", () => {
 							path: ["rm"],
 							command: cmd("Remove", {
 								run: async () => {
-									throw new CLIError("Not found: b", "Pass full ids", {
-										deleted: ["a"],
-										notFound: ["b"],
-									});
+									throw new CLIError(
+										"Not found: b",
+										"Pass full ids",
+										data !== undefined
+											? data
+											: {
+													deleted: ["a"],
+													notFound: ["b"],
+												},
+									);
 								},
 							}),
 						},
@@ -237,6 +249,29 @@ describe("CLIError with data", () => {
 			deleted: ["a"],
 			notFound: ["b"],
 		});
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("preserves original CLIError when data contains circular references", async () => {
+		const circular: Record<string, unknown> = { id: "a" };
+		circular.self = circular;
+		const result = await runFailing(true, { data: circular });
+		expect(result.stdout).toBe("");
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("preserves original CLIError when data contains a BigInt", async () => {
+		const result = await runFailing(true, { data: { n: 1n } });
+		expect(result.stdout).toBe("");
+		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
+		expect(result.exitCode).toBe(1);
+	});
+
+	it("skips stdout write when data serializes to undefined", async () => {
+		const result = await runFailing(true, { data: () => {} });
+		expect(result.stdout).toBe("");
 		expect(result.stderr).toBe("Error: Not found: b\nHint: Pass full ids\n");
 		expect(result.exitCode).toBe(1);
 	});
