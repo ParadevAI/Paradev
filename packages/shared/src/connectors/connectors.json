@@ -1308,6 +1308,49 @@
 					}
 				}
 			]
+		},
+		"keenable_mcp": {
+			"displayName": "Keenable",
+			"icon": "keenable",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "api_key",
+					"label": "API key",
+					"credential_input": "api_key",
+					"inputs": [
+						{
+							"name": "api_key",
+							"label": "Keenable API key",
+							"placeholder": "keen_…",
+							"description": "Keenable console → API keys → Create (https://app.keenable.ai/console)",
+							"required": true,
+							"secret": true
+						}
+					],
+					"identity": {
+						"url": "https://api.keenable.ai/v1/auth/user",
+						"method": "GET",
+						"headers": {
+							"X-API-Key": "${config.access_token}"
+						},
+						"account": {
+							"id": "$.org_id",
+							"label": "$.org_name"
+						},
+						"user": {
+							"id": "$.user_id",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"X-API-Key": "${config.access_token}"
+						}
+					}
+				}
+			]
 		}
 	}
 }

@@ -238,6 +238,16 @@
 			"version": "1.0.0"
 		},
 		{
+			"name": "keenable",
+			"description": "Search the web and fetch pages as clean markdown with Keenable, built for AI agents.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/keenable",
+			"version": "1.0.1"
+		},
+		{
 			"name": "ahrefs",
 			"description": "Research SEO with Ahrefs: backlinks, organic keywords, rankings, site audits, and brand visibility in AI search.",
 			"author": {
