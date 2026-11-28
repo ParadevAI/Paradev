@@ -350,8 +350,16 @@ describe("notificationsRouter.hook", () => {
 			});
 		await hook("SessionStart", "s1");
 		await hook("SessionEnd", "s1");
+		const broadcastAgentLifecycle = mock(() => {});
+		Object.assign(ctx.eventBus, { broadcastAgentLifecycle });
 
-		await hook("PostToolUse", "nested");
+		for (const eventType of ["PostToolUse", "Stop"]) {
+			expect(await hook(eventType, "nested")).toEqual({
+				success: true,
+				ignored: true,
+			});
+		}
+		expect(broadcastAgentLifecycle).not.toHaveBeenCalled();
 		expect(ctx.terminalAgentStore.get("terminal-1")).toBeUndefined();
 
 		await hook("SessionStart", "s2");
