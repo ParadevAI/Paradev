@@ -1,4 +1,3 @@
-import type { AgentDefinitionId } from "@superset/shared/agent-catalog";
 import {
 	and,
 	desc,
@@ -18,6 +17,7 @@ import type {
 	TerminalAgentBindingPersistence,
 } from "./store";
 import type {
+	BindingDefinitionId,
 	TerminalAgentBinding,
 	TerminalAgentEndReason,
 	TerminalAgentId,
@@ -41,7 +41,7 @@ interface BindingRow {
 	workspaceId: string;
 	agentId: TerminalAgentId;
 	agentSessionId: string | null;
-	definitionId: AgentDefinitionId | null;
+	definitionId: BindingDefinitionId | null;
 	startedAt: number;
 	lastEventAt: number;
 	lastEventType: string;
@@ -393,7 +393,7 @@ export function seedEndedTerminalAgentBinding(
 		workspaceId: string;
 		agentId: TerminalAgentId;
 		agentSessionId: string;
-		definitionId?: AgentDefinitionId;
+		definitionId?: BindingDefinitionId;
 		seededAt?: number;
 	},
 ): SeedEndedBindingResult {
@@ -518,7 +518,7 @@ export class SqliteTerminalAgentBindingPersistence
 	findLiveActive(
 		workspaceId: string,
 		agentId: TerminalAgentId,
-		definitionId?: AgentDefinitionId,
+		definitionId?: BindingDefinitionId,
 	): TerminalAgentBinding | undefined {
 		const rows = this.db
 			.select(bindingColumns)

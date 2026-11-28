@@ -237,6 +237,8 @@ TRANSCRIPT_FIELD=""
 [ -n "$TRANSCRIPT_PATH" ] && TRANSCRIPT_FIELD=",\"transcriptPath\":\"$(json_escape "$TRANSCRIPT_PATH")\""
 LAUNCH_FIELD=""
 [ -n "$SUPERSET_AGENT_LAUNCH_ID" ] && LAUNCH_FIELD=",\"launchId\":\"$(json_escape "$SUPERSET_AGENT_LAUNCH_ID")\""
+DEFINITION_FIELD=""
+[ -n "$SUPERSET_AGENT_DEFINITION_ID" ] && DEFINITION_FIELD=",\"definitionId\":\"$(json_escape "$SUPERSET_AGENT_DEFINITION_ID")\""
 ACCOUNT_FIELD=""
 case "$EVENT_TYPE" in
   Attached|attached|SessionStart|sessionStart|session_start)
@@ -267,7 +269,7 @@ case "$EVENT_TYPE" in
 esac
 
 if [ -n "$SUPERSET_TERMINAL_ID" ]; then
-  dispatch_to_host "{\"json\":{\"terminalId\":\"$(json_escape "$SUPERSET_TERMINAL_ID")\",\"eventType\":\"$(json_escape "$EVENT_TYPE")\",\"agent\":{\"agentId\":\"$(json_escape "$AGENT_ID")\",\"sessionId\":\"$(json_escape "$SESSION_ID")\"}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"
+  dispatch_to_host "{\"json\":{\"terminalId\":\"$(json_escape "$SUPERSET_TERMINAL_ID")\",\"eventType\":\"$(json_escape "$EVENT_TYPE")\",\"agent\":{\"agentId\":\"$(json_escape "$AGENT_ID")\",\"sessionId\":\"$(json_escape "$SESSION_ID")\"$DEFINITION_FIELD}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"
 fi
 
 exit 0

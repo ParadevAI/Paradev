@@ -1,7 +1,4 @@
-import type {
-	AgentDefinitionId,
-	AgentIdentityId,
-} from "@superset/shared/agent-catalog";
+import type { AgentIdentityId } from "@superset/shared/agent-catalog";
 import type { BranchPrefixMode } from "@superset/shared/workspace-launch";
 import {
 	index,
@@ -11,6 +8,7 @@ import {
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import type { BindingDefinitionId } from "../terminal-agents/types";
 
 export const terminalSessions = sqliteTable(
 	"terminal_sessions",
@@ -59,7 +57,7 @@ export const terminalAgentBindings = sqliteTable(
 		workspaceId: text("workspace_id").notNull(),
 		agentId: text("agent_id").notNull().$type<AgentIdentityId>(),
 		agentSessionId: text("agent_session_id"),
-		definitionId: text("definition_id").$type<AgentDefinitionId>(),
+		definitionId: text("definition_id").$type<BindingDefinitionId>(),
 		startedAt: integer("started_at").notNull(),
 		lastEventAt: integer("last_event_at").notNull(),
 		lastEventType: text("last_event_type").notNull(),
