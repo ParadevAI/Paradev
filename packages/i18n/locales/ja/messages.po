@@ -18747,6 +18747,9 @@ msgstr "アプリ終了時に確認ダイアログを表示"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "チャットの入力欄にマイクを表示します。Codex が ChatGPT にサインインしている場合は ChatGPT が、それ以外は可能であれば Mac 上で、それもできない場合は Paradev のサーバーが音声を文字起こしします。"
 
+msgid "Show activity panel automatically"
+msgstr "アクティビティパネルを自動的に表示"
+
 msgid "Show all {count}"
 msgstr "{count}件すべて表示"
 

@@ -18747,6 +18747,9 @@ msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Zobrazit v editoru chatu mikrofon. Řeč přepisuje ChatGPT, pokud je k němu přihlášen Codex, jinak se přepisuje na vašem Macu, když to jde, a jinak na serverech Paradev."
 
+msgid "Show activity panel automatically"
+msgstr "Automaticky zobrazovat panel aktivity"
+
 msgid "Show all {count}"
 msgstr "Zobrazit všech {count}"
 

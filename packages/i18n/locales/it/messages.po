@@ -18747,6 +18747,9 @@ msgstr "Mostra una finestra di conferma quando esci dall'app"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Mostra un microfono nel campo della chat. Il parlato viene trascritto da ChatGPT quando Codex vi ha effettuato l'accesso, altrimenti sul tuo Mac quando possibile, e altrimenti dai server di Paradev."
 
+msgid "Show activity panel automatically"
+msgstr "Mostra automaticamente il pannello delle attività"
+
 msgid "Show all {count}"
 msgstr "Mostra tutti i {count}"
 

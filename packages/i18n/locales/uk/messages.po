@@ -18741,6 +18741,9 @@ msgstr "Показувати діалог підтвердження під ча
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Показувати мікрофон у полі введення чату. Мовлення розпізнає ChatGPT, якщо в Codex виконано вхід у ChatGPT; інакше, коли можливо, ваш Mac; в інших випадках — сервери Paradev."
 
+msgid "Show activity panel automatically"
+msgstr "Автоматично показувати панель активності"
+
 msgid "Show all {count}"
 msgstr "Показати всі ({count})"
 

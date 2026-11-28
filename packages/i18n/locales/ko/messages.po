@@ -18747,6 +18747,9 @@ msgstr "앱을 종료할 때 확인 대화 상자를 표시합니다"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "채팅 입력창에 마이크를 표시합니다. Codex가 ChatGPT에 로그인되어 있으면 ChatGPT가 받아쓰고, 그렇지 않으면 가능한 경우 Mac에서, 그 외에는 Paradev 서버에서 받아씁니다."
 
+msgid "Show activity panel automatically"
+msgstr "활동 패널 자동 표시"
+
 msgid "Show all {count}"
 msgstr "{count}개 모두 보기"
 

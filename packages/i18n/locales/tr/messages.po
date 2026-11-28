@@ -18747,6 +18747,9 @@ msgstr "Uygulamadan çıkarken onay penceresi göster"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Sohbet giriş alanında bir mikrofon göster. Codex ChatGPT'de oturum açmışsa konuşmayı ChatGPT yazıya döker; aksi halde mümkünse Mac'iniz, o da olmazsa Paradev sunucuları döker."
 
+msgid "Show activity panel automatically"
+msgstr "Etkinlik panelini otomatik olarak göster"
+
 msgid "Show all {count}"
 msgstr "Tümünü göster ({count})"
 

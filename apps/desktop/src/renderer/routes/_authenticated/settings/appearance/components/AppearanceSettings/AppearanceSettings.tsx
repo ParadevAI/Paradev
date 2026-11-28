@@ -5,6 +5,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { ActivityPanelSection } from "./components/ActivityPanelSection";
 import { FontSettingSection } from "./components/FontSettingSection";
 import { LanguageSection } from "./components/LanguageSection";
 import { MarkdownStyleSection } from "./components/MarkdownStyleSection";
@@ -55,6 +56,10 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 		SETTING_ITEM_ID.APPEARANCE_LANGUAGE,
 		visibleItems,
 	);
+	const showActivityPanel = isItemVisible(
+		SETTING_ITEM_ID.APPEARANCE_ACTIVITY_PANEL,
+		visibleItems,
+	);
 	const showThemeSection = showTheme || showCustomThemes;
 
 	return (
@@ -69,7 +74,10 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 			</div>
 
 			<SectionList>
-				{(showThemeSection || showLanguage || showMarkdown) && (
+				{(showThemeSection ||
+					showLanguage ||
+					showMarkdown ||
+					showActivityPanel) && (
 					<div
 						key="appearance-card"
 						className="rounded-lg border border-border overflow-hidden divide-y divide-border"
@@ -77,6 +85,7 @@ export function AppearanceSettings({ visibleItems }: AppearanceSettingsProps) {
 						{showThemeSection && <ThemeSection />}
 						{showLanguage && <LanguageSection />}
 						{showMarkdown && <MarkdownStyleSection />}
+						{showActivityPanel && <ActivityPanelSection />}
 					</div>
 				)}
 				{(showEditorFont || showTerminalFont) && (
