@@ -71,11 +71,11 @@ export function ChatPane({
 				panes: [
 					{
 						kind: "chat-v3",
-						...(label ? { titleOverride: label } : {}),
 						data: {
 							terminalId: crypto.randomUUID(),
 							sessionId: null,
 							agent: { id: agentId },
+							...(label ? { chatTitle: label } : {}),
 						} satisfies ChatPaneData,
 					},
 				],
@@ -170,10 +170,17 @@ export function ChatPane({
 					ctx.actions.updateData(next);
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
-					ctx.actions.setTitle(label);
+					if (ctx.pane.titleOverride) {
+						ctx.store.getState().setPaneTitleOverride({
+							tabId: ctx.tab.id,
+							paneId,
+							titleOverride: undefined,
+						});
+					}
 					ctx.actions.updateData(
 						restartedChatPaneData(data, {
 							agent: { id: presetId },
+							chatTitle: label,
 							...(model ? { chatModelId: model.id } : {}),
 							...(modeId ? { chatModeId: modeId } : {}),
 							...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
@@ -185,11 +192,11 @@ export function ChatPane({
 						panes: [
 							{
 								kind: "chat-v3",
-								titleOverride: label,
 								data: {
 									terminalId: crypto.randomUUID(),
 									sessionId: null,
 									agent: { id: presetId },
+									chatTitle: label,
 									...(model ? { chatModelId: model.id } : {}),
 									...(modeId ? { chatModeId: modeId } : {}),
 									...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),

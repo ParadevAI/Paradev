@@ -32,3 +32,17 @@ test("returns null when nothing changed", () => {
 		),
 	).toBeNull();
 });
+
+test("replaces the agent label a chat was launched with by the session's generated title", () => {
+	expect(
+		sessionInfoPaneData(
+			{
+				terminalId: "t",
+				sessionId: null,
+				agent: { id: "claude" },
+				chatTitle: "Claude",
+			},
+			{ title: "Fix the build" },
+		),
+	).toMatchObject({ chatTitle: "Fix the build" });
+});
