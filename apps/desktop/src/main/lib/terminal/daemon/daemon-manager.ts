@@ -714,14 +714,7 @@ export class DaemonTerminalManager extends EventEmitter {
 		if (session) {
 			session.lastActive = Date.now();
 
-			const writer = this.historyManager.getHistoryWriter(paneId);
-			if (writer) {
-				await writer.close().catch((error) => {
-					console.warn(
-						`[DaemonTerminalManager] Failed to close history writer for ${paneId}:`,
-						error,
-					);
-				});
+			if (this.historyManager.isRecording(paneId)) {
 				try {
 					await this.historyManager.initHistoryWriter({
 						paneId,
