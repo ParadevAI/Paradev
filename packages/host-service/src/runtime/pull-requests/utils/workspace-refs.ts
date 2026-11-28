@@ -19,6 +19,27 @@ export interface WorkspaceUpstream {
 	branch: string;
 }
 
+export function pullRequestRefNumber(ref: string): number | null {
+	const match = /^refs\/pull\/([1-9]\d*)\/head$/.exec(ref);
+	const number = match ? Number(match[1]) : NaN;
+	return Number.isSafeInteger(number) ? number : null;
+}
+
+// Preserve the namespace for ordinary branches whose short names look like pull refs.
+export function encodeHeadBranch(branch: string): string {
+	return pullRequestRefNumber(branch.replace(/^(?:refs\/heads\/)+/, "")) !==
+		null
+		? `refs/heads/${branch}`
+		: branch;
+}
+
+export function decodeHeadBranch(branch: string): string {
+	return pullRequestRefNumber(branch.replace(/^(?:refs\/heads\/)+/, "")) !==
+		null
+		? branch.replace(/^refs\/heads\//, "")
+		: branch;
+}
+
 export interface WorkspaceRefsSnapshot {
 	branch: string | null;
 	headSha: string | null;
@@ -79,6 +100,15 @@ async function resolveWorkspaceUpstream(
 	git: SimpleGit,
 	localBranch: string,
 ): Promise<WorkspaceUpstream | null> {
+	const mergeRef = await tryConfig(git, `branch.${localBranch}.merge`);
+	if (mergeRef && pullRequestRefNumber(mergeRef) !== null) {
+		const remote = await tryConfig(git, `branch.${localBranch}.remote`);
+		const url = remote ? await resolveRemoteValueToUrl(git, remote) : null;
+		const parsed = url ? parseGitHubRemote(url) : null;
+		return parsed
+			? { owner: parsed.owner, name: parsed.name, branch: mergeRef }
+			: null;
+	}
 	// `@{push}` resolves remote+branch respecting all config precedence in one call.
 	const pushRef = await tryRaw(git, [
 		"rev-parse",
@@ -94,7 +124,7 @@ async function resolveWorkspaceUpstream(
 				return {
 					owner: parsed.owner,
 					name: parsed.name,
-					branch: pushRef.slice(slash + 1),
+					branch: encodeHeadBranch(pushRef.slice(slash + 1)),
 				};
 			}
 		}
@@ -103,7 +133,6 @@ async function resolveWorkspaceUpstream(
 	// Fallback when `@{push}` isn't configured — mirrors gh's config chain.
 	// Require `branch.<n>.merge`; without it, `remote.pushDefault` alone would
 	// re-open the same-name collision hole on untracked branches.
-	const mergeRef = await tryConfig(git, `branch.${localBranch}.merge`);
 	const trackedBranch = mergeRef?.replace(/^refs\/heads\//, "");
 	if (!trackedBranch) return null;
 
@@ -120,7 +149,11 @@ async function resolveWorkspaceUpstream(
 	// `gh pr checkout` renames the local branch on collision (`main` →
 	// `quueli-main`) but the PR's headRefName stays `main`, so we key on the
 	// tracked remote branch, not the local name.
-	return { owner: parsed.owner, name: parsed.name, branch: trackedBranch };
+	return {
+		owner: parsed.owner,
+		name: parsed.name,
+		branch: encodeHeadBranch(trackedBranch),
+	};
 }
 
 async function tryRaw(git: SimpleGit, args: string[]): Promise<string | null> {

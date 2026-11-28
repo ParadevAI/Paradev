@@ -217,16 +217,22 @@ function makePrNode(pr: {
 // tsc (no private dot-access) and biome (no bracket-access) both satisfied.
 function openPullRequestsSweeper(manager: PullRequestRuntimeManager) {
 	const accessible = manager as unknown as {
-		getCachedOpenPullRequests(repo: {
-			provider: "github";
-			owner: string;
-			name: string;
-			url: string;
-			remoteName: string;
-			defaultBranch: string | null;
-		}): Promise<unknown[]>;
+		getCachedOpenPullRequests(
+			repo: {
+				provider: "github";
+				owner: string;
+				name: string;
+				url: string;
+				remoteName: string;
+				defaultBranch: string | null;
+			},
+			options?: { bypassCache?: boolean },
+		): { promise: Promise<unknown[]> };
 	};
-	return accessible.getCachedOpenPullRequests.bind(accessible);
+	return (
+		repo: Parameters<typeof accessible.getCachedOpenPullRequests>[0],
+		options?: { bypassCache?: boolean },
+	) => accessible.getCachedOpenPullRequests(repo, options).promise;
 }
 
 // Silences the expected warnings the manager logs on handled failures.
@@ -338,6 +344,360 @@ describe("PullRequestRuntimeManager direct checkout PR linking", () => {
 
 		await manager.refreshPullRequestsByWorkspaces(["ws"]);
 
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+	});
+});
+
+describe("PullRequestRuntimeManager synthetic PR refs", () => {
+	function setup() {
+		const db = createRealDb();
+		seedProject(db);
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "deleted-feature",
+			headSha: "abc123",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "refs/pull/42/head",
+		});
+		const paths: string[] = [];
+		const network = {
+			offline: false,
+			headSha: "abc123",
+			beforeLookup: undefined as (() => Promise<void>) | undefined,
+			beforeChecks: undefined as (() => Promise<void>) | undefined,
+			beforeRefs: undefined as (() => Promise<void>) | undefined,
+			overrideBranch: null as string | null,
+			branchHeadSha: null as string | null,
+		};
+		const manager = createManager(db, {
+			readWorkspaceRefs: async (worktreePath) => {
+				const workspace = getWorkspace(
+					db,
+					worktreePath.split("/").at(-1) ?? "",
+				);
+				await network.beforeRefs?.();
+				return {
+					branch: network.overrideBranch ?? workspace?.branch ?? null,
+					headSha: workspace?.headSha ?? null,
+					upstream: {
+						owner: workspace?.upstreamOwner ?? REPO.owner,
+						name: workspace?.upstreamRepo ?? REPO.name,
+						branch:
+							workspace?.upstreamBranch ??
+							workspace?.branch ??
+							"refs/pull/42/head",
+					},
+				};
+			},
+			execGh: async (args) => {
+				if (network.offline) {
+					throw Object.assign(new Error("Command failed: gh api"), {
+						stderr: "error connecting to api.github.com",
+					});
+				}
+				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
+				paths.push(path);
+				if (path === `repos/${REPO.owner}/${REPO.name}/pulls/42`) {
+					await network.beforeLookup?.();
+					return makePrNode({
+						number: 42,
+						headRef: "deleted-feature",
+						headSha: network.headSha,
+						state: "closed",
+						mergedAt: "2026-05-01T10:00:00Z",
+					});
+				}
+				if (
+					path === `repos/${REPO.owner}/${REPO.name}/pulls` &&
+					network.branchHeadSha
+				) {
+					return [
+						makePrNode({
+							number: 42,
+							headRef: "deleted-feature",
+							headSha: network.branchHeadSha,
+						}),
+					];
+				}
+				if (path?.endsWith("/check-runs")) {
+					await network.beforeChecks?.();
+					return { check_runs: [] };
+				}
+				return [];
+			},
+		});
+		return { db, manager, paths, network };
+	}
+
+	test("discovers a merged PR by its synthetic ref without an existing link", async () => {
+		const { db, manager, paths } = setup();
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const [snapshot] = await manager.getPullRequestsByWorkspaces(["ws"]);
+		expect(snapshot?.pullRequest?.number).toBe(42);
+		expect(snapshot?.pullRequest?.state).toBe("merged");
+		expect(getWorkspace(db, "ws")?.upstreamBranch).toBe("refs/pull/42/head");
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+		expect(paths).toContain(`repos/${REPO.owner}/${REPO.name}/pulls/42`);
+		expect(paths).not.toContain(`repos/${REPO.owner}/${REPO.name}/pulls`);
+	});
+
+	test("clears the current checkout link when HEAD changes, keeping its history", async () => {
+		const { db, manager } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
+
+		db.update(workspaces)
+			.set({ headSha: "def456" })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+	});
+
+	test("does not restore an explicitly unlinked synthetic-ref PR", async () => {
+		const { db, manager } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+
+		manager.unlinkWorkspacePullRequest("ws");
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		expect(getWorkspace(db, "ws")?.suppressedPullRequestId).toBe(prId);
+	});
+
+	test.each([
+		{ name: "changed HEAD", headSha: "def456", keepsLink: false },
+		{ name: "matching HEAD", headSha: "abc123", keepsLink: true },
+		{ name: "unknown HEAD", headSha: null, keepsLink: true },
+	])("offline refresh with $name", async ({ headSha, keepsLink }) => {
+		const { db, manager, network } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+
+		db.update(workspaces).set({ headSha }).where(eq(workspaces.id, "ws")).run();
+		network.offline = true;
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(keepsLink ? prId : null);
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+	});
+
+	test("does not resolve a different repository's synthetic ref in the base repo", async () => {
+		const { db, manager, paths } = setup();
+		db.update(workspaces)
+			.set({ upstreamOwner: "fork-owner" })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		expect(paths).not.toContain(`repos/${REPO.owner}/${REPO.name}/pulls/42`);
+	});
+
+	test("a failed old project lookup preserves the newer scoped refresh's matching PR link", async () => {
+		const { db, manager, network } = setup();
+		seedPullRequest(db, {
+			id: "pr-existing",
+			prNumber: 42,
+			headBranch: "deleted-feature",
+			headSha: "abc123",
+		});
+		db.update(workspaces)
+			.set({ pullRequestId: "pr-existing" })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeLookup = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		await withSilencedWarnings(async () => {
+			const fullRefresh = projectRefresher(manager)(PROJECT_ID);
+			await entered.promise;
+			network.beforeLookup = undefined;
+			network.headSha = "def456";
+			db.update(workspaces)
+				.set({ headSha: "def456" })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+			await manager.refreshPullRequestsByWorkspaces(["ws"]);
+			expect(getPrById(db, "pr-existing")?.headSha).toBe("def456");
+			pending.reject(new Error("old lookup failed"));
+			await fullRefresh;
+		});
+		expect(getWorkspace(db, "ws")?.headSha).toBe("def456");
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe("pr-existing");
+	});
+
+	test("a successful old project lookup does not link a checkout that moved to a different HEAD", async () => {
+		const { db, manager, network } = setup();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeLookup = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		const fullRefresh = projectRefresher(manager)(PROJECT_ID);
+		try {
+			await entered.promise;
+			network.beforeLookup = undefined;
+			db.update(workspaces)
+				.set({ headSha: "def456" })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+			await manager.refreshPullRequestsByWorkspaces(["ws"]);
+			expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		} finally {
+			pending.resolve();
+			await fullRefresh;
+		}
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests).toEqual([]);
+	});
+
+	test("keeps a verified link if a sweep sees a cached PR but cannot read HEAD", async () => {
+		const { db, manager, network, paths } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+		seedWorkspace(db, {
+			id: "other",
+			branch: "other",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+		});
+		network.offline = true;
+		db.update(workspaces)
+			.set({ headSha: null })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		await withSilencedWarnings(async () => {
+			await manager.refreshPullRequestsByWorkspaces(["other"]);
+			await projectRefresher(manager)(PROJECT_ID);
+		});
+		expect(paths.filter((p) => p.endsWith("/pulls/42"))).toHaveLength(1);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(prId);
+	});
+
+	test("uses the newer numbered result when another ref has the old PR head cached", async () => {
+		const { db, manager, network } = setup();
+		seedWorkspace(db, {
+			id: "branch",
+			branch: "deleted-feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+		});
+		seedWorkspace(db, {
+			id: "matching",
+			branch: "matching",
+			headSha: "def456",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "refs/pull/42/head",
+		});
+		network.branchHeadSha = "abc123";
+		await manager.refreshPullRequestsByWorkspaces(["branch"]);
+		network.headSha = "def456";
+		await manager.refreshPullRequestsByWorkspaces(["matching"]);
+		const prId = getWorkspace(db, "matching")?.pullRequestId;
+		expect(prId).toBeTruthy();
+		await projectRefresher(manager)(PROJECT_ID);
+		expect(getPrById(db, prId as string)?.headSha).toBe("def456");
+		expect(getWorkspace(db, "matching")?.pullRequestId).toBe(prId);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+	});
+
+	test("does not replace a newer PR head when older checks finish later", async () => {
+		const { db, manager, network } = setup();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeChecks = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		const fullRefresh = projectRefresher(manager)(PROJECT_ID);
+		try {
+			await entered.promise;
+			network.beforeChecks = undefined;
+			network.headSha = "def456";
+			db.update(workspaces)
+				.set({ headSha: "def456" })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+			await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		} finally {
+			pending.resolve();
+			await fullRefresh;
+		}
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+		expect(getPrById(db, prId as string)?.headSha).toBe("def456");
+		network.offline = true;
+		await withSilencedWarnings(() =>
+			manager.refreshPullRequestsByWorkspaces(["ws"]),
+		);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(prId);
+	});
+
+	test("clears a stale synthetic link when another ref already refreshed its PR head", async () => {
+		const { db, manager, network } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
+		seedWorkspace(db, {
+			id: "branch",
+			branch: "deleted-feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+		});
+		network.branchHeadSha = "def456";
+		await manager.refreshPullRequestsByWorkspaces(["branch"]);
+		await projectRefresher(manager)(PROJECT_ID);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+	});
+
+	test("a delayed Git ref read does not restore a link removed during the read", async () => {
+		const { db, manager, network } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeRefs = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		network.overrideBranch = "renamed";
+		network.offline = true;
+		await withSilencedWarnings(async () => {
+			const refresh = manager.refreshPullRequestsByWorkspaces(["ws"]);
+			try {
+				await entered.promise;
+				manager.unlinkWorkspacePullRequest("ws");
+			} finally {
+				pending.resolve();
+				await refresh;
+			}
+		});
+		expect(getWorkspace(db, "ws")?.branch).toBe("renamed");
+		expect(getWorkspace(db, "ws")?.suppressedPullRequestId).toBe(prId);
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
 	});
 });
@@ -1042,22 +1402,15 @@ describe("PullRequestRuntimeManager refresh", () => {
 			remoteName: "origin",
 			defaultBranch: "main",
 		});
-		const accessible = manager as unknown as {
-			getCachedOpenPullRequests(
-				repo: ReturnType<typeof repoOf>,
-				options?: { bypassCache?: boolean },
-			): Promise<unknown[]>;
-		};
+		const sweep = openPullRequestsSweeper(manager);
 		await withSilencedWarnings(async () => {
-			await accessible.getCachedOpenPullRequests(repoOf("a")).catch(() => {});
+			await sweep(repoOf("a")).catch(() => {});
 			expect(ghAttempts).toBe(1);
 			// Polling is held.
-			await accessible.getCachedOpenPullRequests(repoOf("b")).catch(() => {});
+			await sweep(repoOf("b")).catch(() => {});
 			expect(ghAttempts).toBe(1);
 			// A user-driven refresh is not: it is the probe that can reopen the gate.
-			await accessible
-				.getCachedOpenPullRequests(repoOf("c"), { bypassCache: true })
-				.catch(() => {});
+			await sweep(repoOf("c"), { bypassCache: true }).catch(() => {});
 			expect(ghAttempts).toBe(2);
 		});
 	});
@@ -1085,26 +1438,17 @@ describe("PullRequestRuntimeManager refresh", () => {
 			remoteName: "origin",
 			defaultBranch: "main",
 		});
-		const accessible = manager as unknown as {
-			getCachedOpenPullRequests(
-				repo: ReturnType<typeof repoOf>,
-				options?: { bypassCache?: boolean },
-			): Promise<unknown[]>;
-		};
+		const sweep = openPullRequestsSweeper(manager);
 		await withSilencedWarnings(async () => {
-			await accessible.getCachedOpenPullRequests(repoOf("a")).catch(() => {});
+			await sweep(repoOf("a")).catch(() => {});
 			expect(ghAttempts).toBe(1);
 			// Polling is held.
-			await accessible.getCachedOpenPullRequests(repoOf("b")).catch(() => {});
+			await sweep(repoOf("b")).catch(() => {});
 			expect(ghAttempts).toBe(1);
 			online = true;
-			await accessible
-				.getCachedOpenPullRequests(repoOf("c"), { bypassCache: true })
-				.catch(() => {});
+			await sweep(repoOf("c"), { bypassCache: true }).catch(() => {});
 			expect(ghAttempts).toBe(2);
-			await expect(
-				accessible.getCachedOpenPullRequests(repoOf("b")),
-			).resolves.toEqual([]);
+			await expect(sweep(repoOf("b"))).resolves.toEqual([]);
 			expect(ghAttempts).toBe(3);
 		});
 	});
