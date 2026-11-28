@@ -183,7 +183,10 @@ export class TerminalAgentStore extends EventEmitter {
 			ended !== undefined &&
 			eventType !== "Attached" &&
 			(agentSessionId === undefined ||
-				agentSessionId === ended.agentSessionId) &&
+				agentSessionId === ended.agentSessionId ||
+				// Claude starts each session with SessionStart. Another id
+				// here is a nested `claude` that inherited the terminal's env.
+				agentId === "claude") &&
 			occurredAt - ended.endedAt <= END_STRAGGLER_WINDOW_MS
 		) {
 			return;

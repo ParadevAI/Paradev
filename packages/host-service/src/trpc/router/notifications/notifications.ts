@@ -147,7 +147,23 @@ export const notificationsRouter = router({
 		const agent = normalizeAgentIdentity(input.agent);
 		const preview = trimOrUndefined(input.preview);
 
+		const launchId = trimOrUndefined(input.launchId);
+
 		const prior = ctx.terminalAgentStore.get(input.terminalId);
+		// Claude sends SessionEnd before it starts another session in the same
+		// process. A second live session id from one launch is a nested
+		// `claude` that inherited the terminal's env.
+		const fromNestedClaude =
+			prior?.agentId === "claude" &&
+			agent?.agentId === "claude" &&
+			prior.agentSessionId !== undefined &&
+			agent.sessionId !== undefined &&
+			agent.sessionId !== prior.agentSessionId &&
+			launchId !== undefined &&
+			launchId === prior.launchId;
+		if (fromNestedClaude) {
+			return { success: true, ignored: true as const };
+		}
 		const account =
 			verifyAttributionToken(input.terminalId, input.attributionToken) &&
 			eventType === "Attached" &&
@@ -166,7 +182,7 @@ export const notificationsRouter = router({
 				: undefined;
 		ctx.terminalAgentStore.recordEvent({
 			account,
-			launchId: trimOrUndefined(input.launchId),
+			launchId,
 			terminalId: input.terminalId,
 			workspaceId: terminalSession.originWorkspaceId,
 			eventType,
@@ -175,6 +191,14 @@ export const notificationsRouter = router({
 			...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
 			occurredAt,
 		});
+		// No binding after a non-end event: the store dropped it.
+		if (
+			agent?.agentId === "claude" &&
+			eventType !== "Detached" &&
+			!ctx.terminalAgentStore.get(input.terminalId)
+		) {
+			return { success: true, ignored: true as const };
+		}
 		const transcriptPath = trimOrUndefined(input.transcriptPath);
 		if (
 			agent?.sessionId &&
