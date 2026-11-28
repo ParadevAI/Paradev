@@ -256,29 +256,31 @@ export class WorkerTaskRunner {
 			}
 			if (this.queue.length === 0) break;
 
-			const nextTaskId = this.queue.shift();
-			if (!nextTaskId) continue;
-			const task = this.tasks.get(nextTaskId);
-			if (!task) continue;
+			while (this.queue.length > 0 && !slot.activeTaskId) {
+				const nextTaskId = this.queue.shift();
+				if (!nextTaskId) continue;
+				const task = this.tasks.get(nextTaskId);
+				if (!task) continue;
 
-			if (task.abortSignal?.aborted) {
-				this.rejectTask(task.taskId, new WorkerTaskAbortedError("cancelled"));
-				continue;
+				if (task.abortSignal?.aborted) {
+					this.rejectTask(task.taskId, new WorkerTaskAbortedError("cancelled"));
+					continue;
+				}
+
+				slot.activeTaskId = task.taskId;
+				task.slotId = slot.id;
+				task.timeoutHandle = setTimeout(() => {
+					this.handleTaskTimeout(task.taskId);
+				}, task.timeoutMs);
+
+				const request: WorkerTaskRequestMessage = {
+					kind: "task",
+					taskId: task.taskId,
+					taskType: task.taskType,
+					payload: task.payload,
+				};
+				slot.worker.postMessage(request);
 			}
-
-			slot.activeTaskId = task.taskId;
-			task.slotId = slot.id;
-			task.timeoutHandle = setTimeout(() => {
-				this.handleTaskTimeout(task.taskId);
-			}, task.timeoutMs);
-
-			const request: WorkerTaskRequestMessage = {
-				kind: "task",
-				taskId: task.taskId,
-				taskType: task.taskType,
-				payload: task.payload,
-			};
-			slot.worker.postMessage(request);
 		}
 	}
 
