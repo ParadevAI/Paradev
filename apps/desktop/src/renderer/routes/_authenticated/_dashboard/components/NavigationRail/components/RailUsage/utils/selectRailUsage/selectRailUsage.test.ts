@@ -74,15 +74,27 @@ describe("selectRailUsage", () => {
 		]);
 	});
 
-	it("caps the rail at two providers in a fixed order", () => {
+	it("shows all readable providers in a fixed order", () => {
 		const entries = selectRailUsage([
-			account({ agent: "grok", windows: [quotaWindow("weekly", 5)] }),
+			account({ agent: "agy", windows: [quotaWindow("3p-5h", 0)] }),
 			account({ agent: "codex", windows: [quotaWindow("primary", 5)] }),
 			account({}),
 		]);
 		expect(entries.map((entry) => entry.account.agent)).toEqual([
 			"claude",
 			"codex",
+			"agy",
+		]);
+	});
+
+	it("omits only the providers hidden in settings", () => {
+		const entries = selectRailUsage(
+			[account({}), account({ agent: "codex" }), account({ agent: "agy" })],
+			["codex"],
+		);
+		expect(entries.map((entry) => entry.account.agent)).toEqual([
+			"claude",
+			"agy",
 		]);
 	});
 });
