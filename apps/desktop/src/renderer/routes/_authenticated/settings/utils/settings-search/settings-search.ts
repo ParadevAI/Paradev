@@ -46,6 +46,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_FILE_AUTO_SAVE: "behavior-file-auto-save",
 	BEHAVIOR_AGENT_SESSION_PLACEMENT: "behavior-agent-session-placement",
 	BEHAVIOR_ACP_CHAT: "behavior-acp-chat",
+	BEHAVIOR_MESSAGE_TIMESTAMPS: "behavior-message-timestamps",
 	BEHAVIOR_CHANGES_OPEN_TARGET: "behavior-changes-open-target",
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
@@ -740,6 +741,23 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"pane",
 			"toggle",
 			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_MESSAGE_TIMESTAMPS,
+		section: "behavior",
+		title: "Message timestamps",
+		description:
+			"Show the time of each Chat message. Hover a time to see its full date.",
+		keywords: [
+			"chat",
+			"timestamp",
+			"timestamps",
+			"time",
+			"date",
+			"clock",
+			"messages",
+			"sent",
 		],
 	},
 	{

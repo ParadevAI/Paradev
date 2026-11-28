@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { Pencil } from "lucide-react";
 import { useRef, useState } from "react";
+import { useSettings } from "renderer/stores/settings";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import {
 	attachmentDisplayName,
@@ -87,6 +88,7 @@ export function UserMessageRow({
 	const oneLine = useFitsOneLine(textRef);
 	const { editMessage, editableMessageIds } = useChatPaneActions();
 	const [editing, setEditing] = useState(false);
+	const showTimestamps = useSettings((s) => s.showMessageTimestamps);
 	if (note && !pending) return <BookkeepingRow label={note.label} />;
 
 	const images = attachments.filter((attachment) =>
@@ -236,9 +238,14 @@ export function UserMessageRow({
 					</div>
 				</MessageContent>
 			)}
+			{!pending && showTimestamps && (
+				<div className="flex items-center justify-end text-muted-foreground/60">
+					<MessageTime atMs={item.startedAtMs} />
+				</div>
+			)}
 			{copyable && (
 				<div className="-mt-1.5 flex items-center justify-end gap-2 text-muted-foreground/60 opacity-0 transition-opacity focus-within:opacity-100 group-hover/message:opacity-100">
-					<MessageTime atMs={item.startedAtMs} />
+					{!showTimestamps && <MessageTime atMs={item.startedAtMs} />}
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<span>

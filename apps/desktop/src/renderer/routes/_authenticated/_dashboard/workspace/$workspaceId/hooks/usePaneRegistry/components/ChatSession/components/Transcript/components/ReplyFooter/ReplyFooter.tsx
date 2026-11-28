@@ -11,6 +11,7 @@ import { cn } from "@superset/ui/utils";
 import { Check, Copy, Split } from "lucide-react";
 import { useCallback } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { useSettings } from "renderer/stores/settings";
 import type { ChatForkTarget } from "../../../../types";
 import { MessageTime } from "../MessageTime";
 
@@ -31,6 +32,7 @@ export function ReplyFooter({
 }) {
 	const { t } = useLingui();
 	const { copied, copyToClipboard } = useCopyToClipboard(COPIED_MS);
+	const showTimestamps = useSettings((s) => s.showMessageTimestamps);
 
 	const copy = useCallback(() => {
 		copyToClipboard(text).catch((error: unknown) => {
@@ -121,7 +123,9 @@ export function ReplyFooter({
 					{item.model}
 				</span>
 			)}
-			<MessageTime atMs={item.completedAtMs ?? item.startedAtMs} />
+			{!showTimestamps && (
+				<MessageTime atMs={item.completedAtMs ?? item.startedAtMs} />
+			)}
 		</div>
 	);
 }

@@ -12281,6 +12281,9 @@ msgstr "Сообщение в канале"
 msgid "Message not found"
 msgstr "Сообщение не найдено"
 
+msgid "Message timestamps"
+msgstr "Отметки времени сообщений"
+
 msgid "Message..."
 msgstr "Сообщение..."
 
@@ -18902,6 +18905,9 @@ msgstr "Показать предыдущую вкладку правой бок
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Показывать в боковой панели кнопку со ссылками на «Мобильные», «Облако», CLI и «Собственный хостинг»."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Показывает время каждого сообщения чата. Наведите курсор на время, чтобы увидеть полную дату."
 
 msgid "Show the triggering payload"
 msgstr "Показать полезную нагрузку триггера"

@@ -12281,6 +12281,9 @@ msgstr "頻道中的訊息"
 msgid "Message not found"
 msgstr "找不到訊息"
 
+msgid "Message timestamps"
+msgstr "訊息時間戳記"
+
 msgid "Message..."
 msgstr "訊息..."
 
@@ -18902,6 +18905,9 @@ msgstr "顯示右側邊欄中的上一個分頁，不移動焦點"
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "在側邊欄顯示連結到行動裝置、雲端、CLI 和自行託管的按鈕。"
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "顯示每則聊天訊息的時間。將游標停留在時間上可查看完整日期。"
 
 msgid "Show the triggering payload"
 msgstr "顯示觸發酬載"

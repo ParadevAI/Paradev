@@ -21,6 +21,7 @@ import {
 import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
+import { MessageTimestampSetting } from "./components/MessageTimestampSetting";
 import { TelemetrySetting } from "./components/TelemetrySetting";
 
 interface BehaviorSettingsProps {
@@ -46,6 +47,10 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_DICTATION,
 		visibleItems,
 	);
+	const showMessageTimestamps = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_MESSAGE_TIMESTAMPS,
+		visibleItems,
+	);
 	const showParadevAnywhere = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE,
 		visibleItems,
@@ -67,6 +72,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 	const showAgentsSection =
 		showAgentSessionPlacement ||
 		showAcpChat ||
+		showMessageTimestamps ||
 		showChangesOpenTarget ||
 		showDictation;
 	const showStarGithub = isItemVisible(
@@ -239,6 +245,7 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 								<AgentSessionPlacementSetting searchQuery={searchQuery} />
 							)}
 							{showAcpChat && <AcpChatSetting />}
+							{showMessageTimestamps && <MessageTimestampSetting />}
 							{showChangesOpenTarget && (
 								<div className="flex items-center justify-between gap-6 p-4">
 									<div className="space-y-0.5">

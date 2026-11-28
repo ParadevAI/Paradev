@@ -12281,6 +12281,9 @@ msgstr "Wiadomość na kanale"
 msgid "Message not found"
 msgstr "Nie znaleziono wiadomości"
 
+msgid "Message timestamps"
+msgstr "Znaczniki czasu wiadomości"
+
 msgid "Message..."
 msgstr "Wiadomość..."
 
@@ -18902,6 +18905,9 @@ msgstr "Pokaż poprzednią kartę w prawym pasku bocznym bez przenoszenia fokusu
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Pokaż na pasku bocznym przycisk z linkami do sekcji Mobile, Chmura, CLI i Własny hosting."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Pokazuje godzinę każdej wiadomości czatu. Najedź na godzinę, aby zobaczyć pełną datę."
 
 msgid "Show the triggering payload"
 msgstr "Pokaż ładunek wyzwalający"

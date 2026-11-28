@@ -12281,6 +12281,9 @@ msgstr "Nachricht im Channel"
 msgid "Message not found"
 msgstr "Nachricht nicht gefunden"
 
+msgid "Message timestamps"
+msgstr "Zeitstempel der Nachrichten"
+
 msgid "Message..."
 msgstr "Nachricht..."
 
@@ -18902,6 +18905,9 @@ msgstr "Vorherigen Tab in der rechten Seitenleiste anzeigen, ohne den Fokus zu v
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Zeigt in der Seitenleiste die Schaltfläche mit Links zu Mobil, Cloud, CLI und Selbst gehostet."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Zeigt die Uhrzeit jeder Chat-Nachricht an. Fahre mit dem Zeiger über eine Uhrzeit, um das vollständige Datum zu sehen."
 
 msgid "Show the triggering payload"
 msgstr "Auslösende Nutzlast anzeigen"

@@ -12281,6 +12281,9 @@ msgstr "频道中的消息"
 msgid "Message not found"
 msgstr "未找到消息"
 
+msgid "Message timestamps"
+msgstr "消息时间戳"
+
 msgid "Message..."
 msgstr "消息..."
 
@@ -18902,6 +18905,9 @@ msgstr "显示右侧边栏中的上一个标签页，不移动焦点"
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "在侧边栏显示链接到移动端、云端、CLI 和自托管的按钮。"
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "显示每条聊天消息的时间。将鼠标悬停在时间上可查看完整日期。"
 
 msgid "Show the triggering payload"
 msgstr "显示触发负载"

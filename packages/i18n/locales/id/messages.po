@@ -12281,6 +12281,9 @@ msgstr "Pesan di channel"
 msgid "Message not found"
 msgstr "Pesan tidak ditemukan"
 
+msgid "Message timestamps"
+msgstr "Stempel waktu pesan"
+
 msgid "Message..."
 msgstr "Pesan..."
 
@@ -18902,6 +18905,9 @@ msgstr "Tampilkan tab sebelumnya di sidebar kanan tanpa memindahkan fokus"
 
 msgid "Show the sidebar button that links to Mobile, Cloud, the CLI and Self-hosted."
 msgstr "Tampilkan tombol sidebar yang menautkan ke Mobile, Cloud, CLI, dan Hosting mandiri."
+
+msgid "Show the time of each Chat message. Hover a time to see its full date."
+msgstr "Menampilkan waktu setiap pesan chat. Arahkan kursor ke waktu untuk melihat tanggal lengkap."
 
 msgid "Show the triggering payload"
 msgstr "Tampilkan payload pemicu"
