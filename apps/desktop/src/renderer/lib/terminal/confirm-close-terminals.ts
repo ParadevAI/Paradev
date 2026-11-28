@@ -5,10 +5,12 @@ import { useTerminalCloseConfirmStore } from "renderer/stores/terminal-close-con
 
 type WorkspaceTrpcUtils = ReturnType<typeof workspaceTrpc.useUtils>;
 
+const RUNNING_PROCESS_PROBE_TIMEOUT_MS = 2_000;
+
 /**
  * Fetch whether a foreground process is running in a terminal. Probes live
- * state (staleTime: 0), and reports "not running" on any error so a failed
- * probe never blocks the close.
+ * state without the query cache, and reports "not running" on errors or
+ * timeouts so a failed probe never blocks the close.
  */
 export async function probeTerminalRunning(
 	utils: WorkspaceTrpcUtils,
@@ -16,9 +18,12 @@ export async function probeTerminalRunning(
 	terminalId: string,
 ): Promise<boolean> {
 	try {
-		const { running } = await utils.terminal.hasRunningProcess.fetch(
+		const { running } = await utils.client.terminal.hasRunningProcess.query(
 			{ terminalId, workspaceId },
-			{ staleTime: 0 },
+			{
+				signal: AbortSignal.timeout(RUNNING_PROCESS_PROBE_TIMEOUT_MS),
+				context: { skipBatch: true },
+			},
 		);
 		return running;
 	} catch (error) {
@@ -51,20 +56,19 @@ export async function confirmCloseTerminals(
 ): Promise<boolean> {
 	if (useTerminalCloseConfirmStore.getState().suppressed) return true;
 
-	let running = false;
-	for (const terminalId of terminalIds) {
-		// Backgrounded terminals stay alive on close, so nothing is killed.
-		if (hasTerminalBackgroundIntent(terminalId)) continue;
-		try {
-			if (await isRunning(terminalId)) {
-				running = true;
-				break;
+	const runningStates = await Promise.all(
+		terminalIds.map(async (terminalId) => {
+			// Backgrounded terminals stay alive on close, so nothing is killed.
+			if (hasTerminalBackgroundIntent(terminalId)) return false;
+			try {
+				return await isRunning(terminalId);
+			} catch {
+				// If we can't tell, don't block the user from closing.
+				return false;
 			}
-		} catch {
-			// If we can't tell, don't block the user from closing.
-		}
-	}
-	if (!running) return true;
+		}),
+	);
+	if (!runningStates.some(Boolean)) return true;
 
 	return new Promise<boolean>((resolve) => {
 		const shown = alert({
