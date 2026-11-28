@@ -3601,6 +3601,215 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("drops a prompt whose attachment is still resolving when the turn is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		let finishRead: (() => void) | undefined;
+		let counter = 0;
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => agent.transport(handlers),
+			resolveAttachment: () =>
+				new Promise((resolve) => {
+					finishRead = () =>
+						resolve({ path: "/tmp/shot.png", mimeType: "image/png", data: "" });
+				}),
+			now: () => 1,
+			mintId: () => `id-${++counter}`,
+		});
+		const events: AdapterEvent[] = [];
+		void collect(adapter.start({ cwd: "/work" }), events);
+		await flush(16);
+		adapter.prompt([
+			{ type: "text", text: "look" },
+			{
+				type: "attachment",
+				attachmentId: "a",
+				name: "shot.png",
+				mimeType: "image/png",
+			},
+		]);
+		await flush(16);
+
+		adapter.cancelTurn();
+		finishRead?.();
+		await flush(16);
+
+		const turns = events.flatMap((event) =>
+			event.kind === "turn" ? [event.turn] : [],
+		);
+		expect(agent.sent.map((f) => f.method)).not.toContain("session/prompt");
+		expect(turns.pop()?.status).toBe("interrupted");
+
+		await adapter.dispose();
+	});
+
+	it("fails the turn when its prompt cannot be built", async () => {
+		const agent = new FakeAcpAgent();
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => agent.transport(handlers),
+			resolveAttachment: () => {
+				throw new Error("disk gone");
+			},
+		});
+		const events: AdapterEvent[] = [];
+		void collect(adapter.start({ cwd: "/work" }), events);
+		await flush(16);
+		adapter.prompt([
+			{
+				type: "attachment",
+				attachmentId: "a",
+				name: "shot.png",
+				mimeType: "image/png",
+			},
+		]);
+		await flush(16);
+
+		const turns = events.flatMap((event) =>
+			event.kind === "turn" ? [event.turn] : [],
+		);
+		expect(agent.sent.map((f) => f.method)).not.toContain("session/prompt");
+		expect(turns.pop()).toMatchObject({
+			status: "failed",
+			error: { message: "disk gone" },
+		});
+
+		await adapter.dispose();
+	});
+
+	it("reports a prompt cancelled while a quiet resume is still loading", async () => {
+		const agent = new FakeAcpAgent();
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => {
+				const transport = agent.transport(handlers);
+				return {
+					...transport,
+					send: (line) => {
+						if (!line.includes('"session/resume"')) transport.send(line);
+					},
+				};
+			},
+		});
+		const events: AdapterEvent[] = [];
+		void collect(
+			adapter.start({
+				cwd: "/work",
+				resume: { harnessSessionId: "sess-1", quiet: true },
+			}),
+			events,
+		);
+		await flush(16);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		await flush(16);
+
+		expect(
+			events.flatMap((event) =>
+				event.kind === "turn" ? [event.turn.status] : [],
+			),
+		).toEqual(["running", "interrupted"]);
+
+		await adapter.dispose();
+	});
+
+	it("keeps a replayed reply in its own turn when a queued prompt is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		const adapter = new AcpAdapter({
+			command: "fake",
+			createTransport: (_opts, handlers) => {
+				const transport = agent.transport(handlers);
+				return {
+					...transport,
+					send: (line) => {
+						if (!line.includes('"session/resume"')) transport.send(line);
+					},
+				};
+			},
+		});
+		const events: AdapterEvent[] = [];
+		void collect(
+			adapter.start({ cwd: "/work", resume: { harnessSessionId: "sess-1" } }),
+			events,
+		);
+		await flush(16);
+		agent.notify("sess-1", {
+			sessionUpdate: "user_message_chunk",
+			content: { type: "text", text: "old question" },
+		});
+		await flush(16);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			content: { type: "text", text: "old answer" },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "user_message_chunk",
+			content: { type: "text", text: "later question" },
+		});
+		await flush(16);
+
+		const [question, answer] = events.flatMap((event) =>
+			event.kind === "item" ? [event] : [],
+		);
+		expect(answer?.item.kind).toBe("agent_message");
+		expect(answer?.turnId).toBe(question?.turnId);
+
+		await adapter.dispose();
+	});
+
+	it("still reads as starting after a prompt queued during startup is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ launch: () => new Promise(() => {}) },
+		);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		await flush(16);
+
+		expect(events.at(-1)).toEqual({
+			kind: "session",
+			session: { status: "starting" },
+		});
+
+		await adapter.dispose();
+	});
+
+	it("drops a prompt queued while the agent starts when the turn is cancelled", async () => {
+		const agent = new FakeAcpAgent();
+		let launched: (() => void) | undefined;
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{
+				launch: () =>
+					new Promise((resolve) => {
+						launched = () => resolve({ command: "fake" });
+					}),
+			},
+		);
+		adapter.prompt([{ type: "text", text: "go" }]);
+		adapter.cancelTurn();
+		launched?.();
+		await flush(32);
+
+		const turns = events.flatMap((event) =>
+			event.kind === "turn" ? [event.turn] : [],
+		);
+		expect(agent.sent.map((f) => f.method)).not.toContain("session/prompt");
+		expect(turns.map((turn) => turn.status)).toEqual([
+			"running",
+			"interrupted",
+		]);
+
+		await adapter.dispose();
+	});
+
 	it("lets a requested start mode win over the harness default", async () => {
 		const agent = new FakeAcpAgent();
 		agent.newSessionConfigOptions = [
