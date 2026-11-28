@@ -22,6 +22,18 @@ function appOwnsSelection(terminal: XTerm): boolean {
 	return (internal._core?.coreService?.kittyKeyboard?.flags ?? 0) > 0;
 }
 
+// xterm sends committed IME text from a timer that starts on compositionend.
+// Its keydown hook sends that text at once, as xterm does before a plain Enter.
+// The hook returns false when the IME owns the key (keyCode 229).
+function commitComposition(terminal: XTerm, event: KeyboardEvent): boolean {
+	const internal = terminal as XTerm & {
+		_core?: {
+			_compositionHelper?: { keydown(event: KeyboardEvent): boolean };
+		};
+	};
+	return internal._core?._compositionHelper?.keydown(event) ?? true;
+}
+
 function resolvePlatform(options: TerminalKeyEventHandlerOptions): string {
 	const raw =
 		options.platform !== undefined
@@ -62,6 +74,7 @@ function createTerminalKeyEventHandler(
 		const translation = translateLineEditChord(event, { isMac, isWindows });
 		if (translation !== null) {
 			if (event.type === "keydown") {
+				if (!commitComposition(terminal, event)) return true;
 				event.preventDefault();
 				sendUserInput(terminal, translation);
 			}
