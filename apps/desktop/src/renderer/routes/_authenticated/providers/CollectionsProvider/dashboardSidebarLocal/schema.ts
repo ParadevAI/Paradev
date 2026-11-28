@@ -650,6 +650,18 @@ export function healUserPreferences(raw: unknown): UserPreferencesRow {
 		r.urlLinks &&
 		isCompleteLinkTierMap(r.urlLinks) &&
 		isSameLinkTierMap(r.urlLinks, DEFAULT_LINK_TIER_MAP);
+	// Rows written before pageLinks existed carry the retired single
+	// pageOpenAction; keep it as the cmd-click tier instead of dropping it.
+	const legacyPageOpenAction = linkActionSchema.safeParse(
+		(r as { pageOpenAction?: unknown }).pageOpenAction,
+	);
+	const pageLinks =
+		!r.pageLinks && legacyPageOpenAction.success
+			? {
+					...DEFAULT_V2_USER_PREFERENCES.pageLinks,
+					meta: legacyPageOpenAction.data,
+				}
+			: { ...DEFAULT_V2_USER_PREFERENCES.pageLinks, ...r.pageLinks };
 	return {
 		...DEFAULT_V2_USER_PREFERENCES,
 		...r,
@@ -660,7 +672,7 @@ export function healUserPreferences(raw: unknown): UserPreferencesRow {
 		sidebarFileLinks: shouldMigrateLegacySidebarFileLinks
 			? DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks
 			: sidebarFileLinks,
-		pageLinks: { ...DEFAULT_V2_USER_PREFERENCES.pageLinks, ...r.pageLinks },
+		pageLinks,
 		folderLinks: {
 			...DEFAULT_V2_USER_PREFERENCES.folderLinks,
 			...r.folderLinks,
