@@ -1,4 +1,4 @@
-import { hasDeclinedAnalytics } from "./consent";
+import { canTrack } from "./consent";
 
 declare global {
 	interface Window {
@@ -16,8 +16,8 @@ function generateConversionId(): string {
 
 /**
  * Fire a Reddit Pixel conversion event. No-ops on the server, before the
- * base pixel (injected in the root layout) has defined `window.rdt`, or after
- * the visitor declines analytics. Reddit
+ * base pixel (loaded by AdTrackers) has defined `window.rdt`, or while
+ * consent does not allow tracking. Reddit
  * standard events include "PageVisit", "Lead", "SignUp", and "Purchase".
  *
  * A unique `conversionId` is attached for deduplication; pass an explicit
@@ -31,7 +31,7 @@ export function trackReddit(
 	if (
 		typeof window === "undefined" ||
 		typeof window.rdt !== "function" ||
-		hasDeclinedAnalytics()
+		!canTrack()
 	) {
 		return;
 	}

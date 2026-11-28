@@ -68,8 +68,44 @@ describe("proxy", () => {
 	test("serves canonical paths without a redirect", async () => {
 		expect((await run("/careers")).rewrite).toBe("/en/careers");
 		expect(await run("/zh-CN/careers")).toMatchObject({
-			status: undefined,
 			location: undefined,
+			rewrite: undefined,
 		});
+	});
+
+	test("records only the consent region in the cookie", () => {
+		const region = (country: string | null, cookie?: string) => {
+			const headers = new Headers();
+			if (country) headers.set("x-vercel-ip-country", country);
+			if (cookie) headers.set("cookie", `paradev-consent-region=${cookie}`);
+			return proxy(
+				new NextRequest(`${ORIGIN}/pricing`, { headers }),
+			).cookies.get("paradev-consent-region")?.value;
+		};
+		expect(region("DE")).toBe("opt-in");
+		expect(region("gb")).toBe("opt-in");
+		expect(region("CH")).toBe("opt-out");
+		expect(region("US")).toBe("opt-out");
+		expect(region("DE", "opt-in.DE")).toBe("opt-in");
+		expect(region("US", "opt-out.US")).toBe("opt-out");
+		expect(region("US", "opt-out")).toBeUndefined();
+	});
+
+	test("puts the visitor's location on the Server-Timing header", () => {
+		const headers = new Headers({
+			"x-vercel-ip-country": "DE",
+			"x-vercel-ip-country-region": "BY",
+			"x-vercel-ip-city": "M%C3%BCnchen",
+		});
+		expect(
+			proxy(new NextRequest(`${ORIGIN}/pricing`, { headers })).headers.get(
+				"server-timing",
+			),
+		).toBe(
+			'geo-country;desc="DE", geo-region;desc="BY", geo-city;desc="M%C3%BCnchen"',
+		);
+		expect(
+			proxy(new NextRequest(`${ORIGIN}/pricing`)).headers.get("server-timing"),
+		).toBeNull();
 	});
 });

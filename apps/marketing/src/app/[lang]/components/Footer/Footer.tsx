@@ -25,6 +25,7 @@ import { FaApple, FaGooglePlay } from "react-icons/fa";
 import { track } from "@/lib/analytics";
 import { Soc2Badge } from "../Soc2Badge";
 import { SocialLinks } from "../SocialLinks";
+import { CookieSettingsButton } from "./components/CookieSettingsButton";
 import { FooterBackdrop } from "./components/FooterBackdrop";
 
 const CTASection = dynamic(() =>
@@ -302,6 +303,9 @@ export function Footer({
 								<FooterLinkItem link={link} />
 							</li>
 						))}
+						<li>
+							<CookieSettingsButton />
+						</li>
 					</ul>
 				</div>
 			</m.div>

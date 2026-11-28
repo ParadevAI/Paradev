@@ -5709,6 +5709,9 @@ msgstr "Convert your scripts"
 msgid "Converting to draft…"
 msgstr "Converting to draft…"
 
+msgid "Cookie settings"
+msgstr "Cookie settings"
+
 msgid "cookies and site data"
 msgstr "cookies and site data"
 
@@ -7090,6 +7093,9 @@ msgstr "Debug failed runs and rerun functions"
 
 msgid "Debug with production stack traces"
 msgstr "Debug with production stack traces"
+
+msgid "Decline"
+msgstr "Decline"
 
 msgid "default"
 msgstr "default"
@@ -22796,9 +22802,6 @@ msgstr "We do not forecast full self-driving in 2026 or 2027. The honest unknown
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "We found {hostName}. Turn on Remote Access there to finish."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "We only collect analytics cookies so we can improve your experience."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "We raised an {amount} seed round to help you run an army of coding agents."
 
@@ -23485,6 +23488,9 @@ msgstr "You control the access"
 
 msgid "You created this channel on {created}."
 msgstr "You created this channel on {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "You declined the {plugin} authorization request."

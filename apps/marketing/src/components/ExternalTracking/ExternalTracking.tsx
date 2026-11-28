@@ -2,9 +2,10 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { hasDeclinedAnalytics } from "@/lib/analytics/consent";
+import { useCanTrack } from "@/hooks/useCanTrack";
+import { markTrackerLoaded } from "@/lib/analytics/consent";
 import {
 	installExternalTrackingConsentGuard,
 	trackExternalPageView,
@@ -12,13 +13,12 @@ import {
 import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
 
 export function ExternalTracking() {
-	const [enabled, setEnabled] = useState(false);
+	const enabled = useCanTrack();
 	const pathname = usePathname();
 	const search = useSearchParams().toString();
 
 	useEffect(() => {
 		installExternalTrackingConsentGuard();
-		setEnabled(!hasDeclinedAnalytics());
 
 		const onStorage = (event: StorageEvent) => {
 			if (
@@ -31,6 +31,10 @@ export function ExternalTracking() {
 		window.addEventListener("storage", onStorage);
 		return () => window.removeEventListener("storage", onStorage);
 	}, []);
+
+	useEffect(() => {
+		if (enabled) markTrackerLoaded();
+	}, [enabled]);
 
 	useEffect(() => {
 		if (

@@ -5709,6 +5709,9 @@ msgstr "轉換你的指令碼"
 msgid "Converting to draft…"
 msgstr "正在轉為草稿…"
 
+msgid "Cookie settings"
+msgstr "Cookie 設定"
+
 msgid "cookies and site data"
 msgstr "Cookie和站點資料"
 
@@ -7090,6 +7093,9 @@ msgstr "除錯失敗的執行並重新執行函式"
 
 msgid "Debug with production stack traces"
 msgstr "用正式環境堆疊追蹤除錯"
+
+msgid "Decline"
+msgstr "拒絕"
 
 msgid "default"
 msgstr "預設"
@@ -22796,9 +22802,6 @@ msgstr "我們不預測2026或2027年實現完全自動駕駛。誠實地講，�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "已找到{hostName}。在那台電腦上開啟遠端存取即可完成。"
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "我們只收集分析類cookie，用於改進你的使用體驗。"
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "我們完成了 {amount} 種子輪募資，幫你調動一支程式代理程式大軍。"
 
@@ -23485,6 +23488,9 @@ msgstr "存取權限由你掌控"
 
 msgid "You created this channel on {created}."
 msgstr "你於 {created} 建立了此頻道。"
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Cookie 與廣告成效衡量由您決定；不使用 Cookie 的匿名使用統計無論如何都會繼續。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "你拒絕了 {plugin} 的授權請求。"

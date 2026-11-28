@@ -1,4 +1,4 @@
-import { hasDeclinedAnalytics } from "./consent";
+import { canTrack } from "./consent";
 import { createConsentAwareTrackingFetch } from "./external-tracking";
 import {
 	createExternalTrackingClient,
@@ -19,7 +19,7 @@ export function installExternalTrackingConsentGuard(): void {
 	if (getClient()) return;
 	const transport = window.fetch.bind(window);
 	const client = createExternalTrackingClient({
-		hasDeclined: hasDeclinedAnalytics,
+		hasDeclined: () => !canTrack(),
 		readPage: () => ({
 			url: window.location.href,
 			path: window.location.pathname,
@@ -43,7 +43,7 @@ export function installExternalTrackingConsentGuard(): void {
 	window.fetch = Object.assign(
 		createConsentAwareTrackingFetch(
 			transport,
-			hasDeclinedAnalytics,
+			() => !canTrack(),
 			client.initialize,
 		),
 		window.fetch,
@@ -70,7 +70,7 @@ export function trackExternalFormSubmission(
 	form: ExternalTrackingForm,
 	email: string,
 ): void {
-	if (typeof window === "undefined" || hasDeclinedAnalytics()) return;
+	if (typeof window === "undefined" || !canTrack()) return;
 	installExternalTrackingConsentGuard();
 	getClient()?.submit(form, email);
 }

@@ -5709,6 +5709,9 @@ msgstr "转换你的脚本"
 msgid "Converting to draft…"
 msgstr "正在转为草稿…"
 
+msgid "Cookie settings"
+msgstr "Cookie 设置"
+
 msgid "cookies and site data"
 msgstr "Cookie和站点数据"
 
@@ -7090,6 +7093,9 @@ msgstr "调试失败的运行并重新运行函数"
 
 msgid "Debug with production stack traces"
 msgstr "用生产环境堆栈跟踪调试"
+
+msgid "Decline"
+msgstr "拒绝"
 
 msgid "default"
 msgstr "默认"
@@ -22796,9 +22802,6 @@ msgstr "我们不预测2026或2027年实现完全自动驾驶。诚实地讲，�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "已找到{hostName}。在那台电脑上开启远程访问即可完成。"
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "我们只收集分析类cookie，用于改进你的使用体验。"
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "我们完成了 {amount} 种子轮融资，帮你调动一支编程智能体大军。"
 
@@ -23485,6 +23488,9 @@ msgstr "访问权限由你掌控"
 
 msgid "You created this channel on {created}."
 msgstr "你于 {created} 创建了此频道。"
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Cookie 和广告效果衡量由您决定；不使用 Cookie 的匿名使用统计无论如何都会继续。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "你拒绝了 {plugin} 的授权请求。"

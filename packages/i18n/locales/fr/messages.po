@@ -5709,6 +5709,9 @@ msgstr "Convertissez vos scripts"
 msgid "Converting to draft…"
 msgstr "Conversion en brouillon…"
 
+msgid "Cookie settings"
+msgstr "Paramètres des cookies"
+
 msgid "cookies and site data"
 msgstr "cookies et données de site"
 
@@ -7090,6 +7093,9 @@ msgstr "Déboguer les exécutions en échec et relancer les fonctions"
 
 msgid "Debug with production stack traces"
 msgstr "Déboguer avec les stack traces de production"
+
+msgid "Decline"
+msgstr "Refuser"
 
 msgid "default"
 msgstr "par défaut"
@@ -22796,9 +22802,6 @@ msgstr "Nous ne prévoyons pas d'autonomie complète en 2026 ni en 2027. Les vra
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Nous avons trouvé {hostName}. Activez-y l'accès distant pour terminer."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Nous ne collectons que des cookies analytiques, afin d'améliorer votre expérience."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Nous avons levé {amount} en seed pour vous aider à lancer une armée d’agents de code."
 
@@ -23485,6 +23488,9 @@ msgstr "Vous contrôlez l'accès"
 
 msgid "You created this channel on {created}."
 msgstr "Vous avez créé ce canal le {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Vous décidez pour les cookies et la mesure publicitaire ; les statistiques d’utilisation anonymes sans cookies continuent dans tous les cas."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Vous avez refusé la demande d'autorisation de {plugin}."

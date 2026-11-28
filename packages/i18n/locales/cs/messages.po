@@ -5709,6 +5709,9 @@ msgstr "Převeďte své skripty"
 msgid "Converting to draft…"
 msgstr "Převádí se na koncept…"
 
+msgid "Cookie settings"
+msgstr "Nastavení cookies"
+
 msgid "cookies and site data"
 msgstr "cookies a data webů"
 
@@ -7090,6 +7093,9 @@ msgstr "Ladění neúspěšných běhů a opětovné spuštění funkcí"
 
 msgid "Debug with production stack traces"
 msgstr "Ladění s produkčními stack trace"
+
+msgid "Decline"
+msgstr "Odmítnout"
 
 msgid "default"
 msgstr "výchozí"
@@ -22796,9 +22802,6 @@ msgstr "Neslibujeme plnou autonomii v roce 2026 ani 2027. Poctivé neznámé: zd
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Našli jsme {hostName}. Dokončete to zapnutím Vzdáleného přístupu na něm."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Sbíráme jen analytické cookies, abychom mohli zlepšovat vaši zkušenost."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Získali jsme {amount} v seed kole, abychom vám pomohli řídit armádu kódovacích agentů."
 
@@ -23485,6 +23488,9 @@ msgstr "Přístup máte pod kontrolou"
 
 msgid "You created this channel on {created}."
 msgstr "Tento kanál jste vytvořili {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "O souborech cookie a měření reklam rozhodujete vy; anonymní statistiky používání bez souborů cookie pokračují v každém případě."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Žádost o autorizaci pro {plugin} jste odmítli."

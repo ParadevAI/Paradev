@@ -5709,6 +5709,9 @@ msgstr "Betiklerinizi dönüştürün"
 msgid "Converting to draft…"
 msgstr "Taslağa dönüştürülüyor…"
 
+msgid "Cookie settings"
+msgstr "Çerez ayarları"
+
 msgid "cookies and site data"
 msgstr "çerezler ve site verileri"
 
@@ -7090,6 +7093,9 @@ msgstr "Başarısız çalıştırmalarda hata ayıklayın ve fonksiyonları yeni
 
 msgid "Debug with production stack traces"
 msgstr "Üretim yığın izleriyle hata ayıklayın"
+
+msgid "Decline"
+msgstr "Reddet"
 
 msgid "default"
 msgstr "varsayılan"
@@ -22796,9 +22802,6 @@ msgstr "2026 veya 2027'de tam otonomi öngörmüyoruz. Dürüst bilinmezler şun
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "{hostName} bulundu. Tamamlamak için orada uzaktan erişimi açın."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Deneyiminizi iyileştirebilmek için yalnızca analiz çerezleri topluyoruz."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Bir kodlama ajanı ordusu yönetmenize yardımcı olmak için {amount} tutarında bir tohum yatırım turu tamamladık."
 
@@ -23485,6 +23488,9 @@ msgstr "Erişimi siz kontrol edersiniz"
 
 msgid "You created this channel on {created}."
 msgstr "Bu kanalı {created} tarihinde oluşturdunuz."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Çerezlere ve reklam ölçümüne siz karar verirsiniz; çerez kullanmayan anonim kullanım istatistikleri her durumda devam eder."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} yetkilendirme isteğini reddettiniz."

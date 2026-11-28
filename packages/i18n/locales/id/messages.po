@@ -5709,6 +5709,9 @@ msgstr "Konversi skrip Anda"
 msgid "Converting to draft…"
 msgstr "Mengubah menjadi draf…"
 
+msgid "Cookie settings"
+msgstr "Pengaturan cookie"
+
 msgid "cookies and site data"
 msgstr "cookie dan data situs"
 
@@ -7090,6 +7093,9 @@ msgstr "Debug run yang gagal dan jalankan ulang fungsi"
 
 msgid "Debug with production stack traces"
 msgstr "Debug dengan stack trace produksi"
+
+msgid "Decline"
+msgstr "Tolak"
 
 msgid "default"
 msgstr "bawaan"
@@ -22796,9 +22802,6 @@ msgstr "Kami tidak memperkirakan full self-driving pada 2026 atau 2027. Yang juj
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Kami menemukan {hostName}. Aktifkan Akses Jarak Jauh di sana untuk menyelesaikan."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Kami hanya mengumpulkan cookie analitik agar bisa meningkatkan pengalaman Anda."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Kami meraih pendanaan seed sebesar {amount} untuk membantu Anda menjalankan pasukan agen coding."
 
@@ -23485,6 +23488,9 @@ msgstr "Anda mengendalikan akses"
 
 msgid "You created this channel on {created}."
 msgstr "Anda membuat saluran ini pada {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Anda yang memutuskan soal cookie dan pengukuran iklan; statistik penggunaan anonim tanpa cookie tetap berjalan apa pun pilihan Anda."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Anda menolak permintaan otorisasi {plugin}."

@@ -1,10 +1,12 @@
 "use client";
 
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { track } from "@/lib/analytics";
+import { canTrack, hasCookielessAnalytics } from "@/lib/analytics/consent";
 import { trackExternalFormSubmission } from "@/lib/analytics/external-tracking-runtime";
-import { withPosthog } from "@/lib/analytics/lazy";
+import { joinWaitlist } from "./actions";
+import { WAITLIST_PLATFORM } from "./constants";
 
 interface WaitlistFormProps {
 	heading?: string;
@@ -12,33 +14,48 @@ interface WaitlistFormProps {
 }
 
 export function WaitlistForm({ heading, description }: WaitlistFormProps) {
+	const { t, i18n } = useLingui();
 	const [email, setEmail] = useState("");
 	const [submitted, setSubmitted] = useState(false);
+	const [error, setError] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	function handleSubmit(e: React.FormEvent) {
-		e.preventDefault();
-		if (!email) return;
+	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		if (!email || isSubmitting) return;
+		const formData = new FormData(event.currentTarget);
+		const honeypot = String(formData.get("company-website") ?? "");
+		const analyticsConsent = canTrack() && !hasCookielessAnalytics();
 
-		withPosthog((posthog) => {
-			const wasOptedOut = posthog.has_opted_out_capturing();
-			if (wasOptedOut) {
-				posthog.opt_in_capturing();
+		setError("");
+		setIsSubmitting(true);
+		try {
+			const result = await joinWaitlist(
+				{ email, honeypot, analyticsConsent },
+				i18n.locale,
+			);
+			if (!result.success) {
+				setError(result.error);
+				return;
 			}
 
-			track("waitlist_signup", { email, platform: "windows_linux" });
-
-			if (wasOptedOut) {
-				posthog.opt_out_capturing();
-			}
-		});
-
-		setSubmitted(true);
-		trackExternalFormSubmission("windows-linux-waitlist", email);
+			track("waitlist_signup", { email, platform: WAITLIST_PLATFORM });
+			trackExternalFormSubmission("windows-linux-waitlist", email);
+			setSubmitted(true);
+		} catch {
+			setError(
+				t({
+					message: "Something went wrong. Please try again.",
+				}),
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
 	}
 
 	if (submitted) {
 		return (
-			<div>
+			<div aria-live="polite">
 				<h2 className="mb-2 text-xl font-medium text-foreground">
 					<Trans>You're on the list!</Trans>
 				</h2>
@@ -66,12 +83,30 @@ export function WaitlistForm({ heading, description }: WaitlistFormProps) {
 					onChange={(e) => setEmail(e.target.value)}
 					className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
 				/>
+				<input
+					type="text"
+					name="company-website"
+					tabIndex={-1}
+					autoComplete="off"
+					className="hidden"
+					aria-hidden="true"
+				/>
 				<button
 					type="submit"
-					className="w-full rounded-lg bg-foreground py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+					disabled={isSubmitting}
+					className="w-full rounded-lg bg-foreground py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
 				>
-					<Trans>Join waitlist</Trans>
+					{isSubmitting ? (
+						<Trans>Sending…</Trans>
+					) : (
+						<Trans>Join waitlist</Trans>
+					)}
 				</button>
+				{error ? (
+					<p className="text-sm text-red-500" role="alert">
+						{error}
+					</p>
+				) : null}
 			</form>
 		</>
 	);

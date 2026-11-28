@@ -1,9 +1,18 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
+import type { PostHog } from "posthog-js";
 
 import { env } from "@/env";
-import { declineAnalytics } from "@/lib/analytics/decline";
-import { setPosthogInstance } from "@/lib/analytics/lazy";
-import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
+import {
+	CUSTOM_CAMPAIGN_PARAMS,
+	campaignProperties,
+} from "@/lib/analytics/campaign";
+import { onConsentChange } from "@/lib/analytics/consent";
+import { geoProperties, readDocumentGeo } from "@/lib/analytics/geo";
+import { setAnonymousPosthog, setPosthogInstance } from "@/lib/analytics/lazy";
+import {
+	createPosthogStarter,
+	type PosthogMode,
+} from "@/lib/analytics/posthog-start";
 
 // posthog-js and @sentry/nextjs together add ~200KiB to the initial bundle,
 // which tanks the Lighthouse LCP on throttled mobile. Both are dynamically
@@ -16,8 +25,11 @@ type SentryClient = typeof import("@sentry/nextjs");
 let sentryClient: SentryClient | null = null;
 let started = false;
 
-async function initPosthog() {
-	const { default: posthog } = await import("posthog-js");
+function startPosthog(posthog: PostHog, mode: PosthogMode) {
+	if (mode === "cookieless") {
+		startCookielessPosthog(posthog);
+		return;
+	}
 
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 		api_host: "/ingest",
@@ -29,18 +41,59 @@ async function initPosthog() {
 		debug: false,
 		cross_subdomain_cookie: true,
 		person_profiles: "always",
-		custom_campaign_params: ["utm_id", "matchtype"],
+		custom_campaign_params: CUSTOM_CAMPAIGN_PARAMS,
 		persistence: "cookie",
 		persistence_name: POSTHOG_COOKIE_NAME,
 		disable_session_recording: true,
-		loaded: (posthog) => {
-			const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
-			if (consent === "declined") {
-				declineAnalytics(posthog);
-			}
-		},
 	});
+	if (posthog.has_opted_out_capturing()) {
+		posthog.opt_in_capturing({ captureEventName: false });
+	}
 
+	registerPageProperties(posthog);
+	setPosthogInstance(posthog);
+}
+
+function startCookielessPosthog(posthog: PostHog) {
+	posthog.toolbar.maybeLoadToolbar = () => false;
+	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
+		api_host: "/ingest",
+		ui_host: "https://us.posthog.com",
+		defaults: "2025-11-30",
+		cookieless_mode: "always",
+		persistence: "memory",
+		disable_persistence: true,
+		capture_pageview: "history_change",
+		capture_pageleave: true,
+		autocapture: {
+			capture_copied_text: false,
+			element_attribute_ignorelist: ["value"],
+		},
+		capture_exceptions: true,
+		capture_heatmaps: true,
+		capture_dead_clicks: false,
+		capture_performance: false,
+		custom_campaign_params: CUSTOM_CAMPAIGN_PARAMS,
+		save_campaign_params: false,
+		mask_personal_data_properties: true,
+		disable_session_recording: true,
+		disable_surveys: true,
+		disable_conversations: true,
+		disable_product_tours: true,
+		disable_web_experiments: true,
+		advanced_disable_flags: true,
+		person_profiles: "never",
+	});
+	posthog.clear_opt_in_out_capturing();
+	registerPageProperties(posthog);
+	posthog.register({
+		...campaignProperties(window.location.search),
+		...geoProperties(readDocumentGeo()),
+	});
+	setAnonymousPosthog(posthog);
+}
+
+function registerPageProperties(posthog: PostHog) {
 	posthog.register({
 		app_name: "marketing",
 		domain: window.location.hostname,
@@ -50,9 +103,12 @@ async function initPosthog() {
 		app_locale: document.documentElement.lang,
 		app_locale_source: "url",
 	});
-
-	setPosthogInstance(posthog);
 }
+
+const initPosthog = createPosthogStarter(
+	async () => (await import("posthog-js")).default,
+	startPosthog,
+);
 
 async function initSentry() {
 	const [Sentry, { SENTRY_DENY_URLS, SENTRY_IGNORE_ERRORS }] =
@@ -87,6 +143,7 @@ function start() {
 	started = true;
 	void initPosthog();
 	void initSentry();
+	onConsentChange(() => void initPosthog());
 }
 
 function scheduleIdle() {
