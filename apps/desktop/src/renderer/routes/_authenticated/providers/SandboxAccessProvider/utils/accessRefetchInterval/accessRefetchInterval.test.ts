@@ -58,17 +58,25 @@ describe("wakeRefetchInterval", () => {
 describe("createFailureStreak", () => {
 	test("counts only the failures since the last success", () => {
 		const streak = createFailureStreak();
-		expect(streak("a", { errorUpdateCount: 0 })).toBe(0);
-		expect(streak("a", { error, errorUpdateCount: 1 })).toBe(1);
-		expect(streak("a", { error, errorUpdateCount: 2 })).toBe(2);
-		expect(streak("a", { errorUpdateCount: 2 })).toBe(0);
-		expect(streak("a", { error, errorUpdateCount: 3 })).toBe(1);
+		expect(streak("a", { status: "success", errorUpdateCount: 0 })).toBe(0);
+		expect(streak("a", { status: "error", errorUpdateCount: 1 })).toBe(1);
+		expect(streak("a", { status: "error", errorUpdateCount: 2 })).toBe(2);
+		expect(streak("a", { status: "success", errorUpdateCount: 2 })).toBe(0);
+		expect(streak("a", { status: "error", errorUpdateCount: 3 })).toBe(1);
+	});
+
+	test("a fetch that starts with no data does not end the streak", () => {
+		const streak = createFailureStreak();
+		expect(streak("a", { status: "pending", errorUpdateCount: 0 })).toBe(0);
+		expect(streak("a", { status: "error", errorUpdateCount: 1 })).toBe(1);
+		expect(streak("a", { status: "pending", errorUpdateCount: 1 })).toBe(1);
+		expect(streak("a", { status: "error", errorUpdateCount: 2 })).toBe(2);
 	});
 
 	test("a failure long after the last success still starts at 30 seconds", () => {
 		const streak = createFailureStreak();
-		streak("a", { errorUpdateCount: 40 });
-		const failures = streak("a", { error, errorUpdateCount: 41 });
+		streak("a", { status: "success", errorUpdateCount: 40 });
+		const failures = streak("a", { status: "error", errorUpdateCount: 41 });
 		expect(
 			accessRefetchInterval({ error, consecutiveFailures: failures }, NOW),
 		).toBe(ACCESS_RETRY_MS);
@@ -76,9 +84,9 @@ describe("createFailureStreak", () => {
 
 	test("keeps each query's streak separate", () => {
 		const streak = createFailureStreak();
-		streak("a", { errorUpdateCount: 0 });
-		streak("b", { errorUpdateCount: 5 });
-		expect(streak("a", { error, errorUpdateCount: 1 })).toBe(1);
-		expect(streak("b", { error, errorUpdateCount: 6 })).toBe(1);
+		streak("a", { status: "success", errorUpdateCount: 0 });
+		streak("b", { status: "success", errorUpdateCount: 5 });
+		expect(streak("a", { status: "error", errorUpdateCount: 1 })).toBe(1);
+		expect(streak("b", { status: "error", errorUpdateCount: 6 })).toBe(1);
 	});
 });
