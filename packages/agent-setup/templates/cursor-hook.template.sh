@@ -7,6 +7,10 @@ SUPERSET_HOME_DIR="${SUPERSET_HOME_DIR:-${PARADEV_HOME_DIR:-}}"
 SUPERSET_HOST_AGENT_HOOK_URL="${SUPERSET_HOST_AGENT_HOOK_URL:-${PARADEV_HOST_AGENT_HOOK_URL:-}}"
 # cursor-agent lifecycle hook. Event name comes via argv from hooks.json.
 
+# Apple ships a universal /usr/bin/curl; a PATH curl can be the wrong arch (x86_64 Anaconda on Apple Silicon).
+CURL_BIN=/usr/bin/curl
+[ -x "$CURL_BIN" ] || CURL_BIN=$(command -v curl)
+
 INPUT=$(cat)
 HOOK_SESSION_ID=$(printf '%s' "$INPUT" | grep -oE '"session_id"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -oE '"[^"]*"$' | tr -d '"')
 
@@ -71,7 +75,7 @@ if [ -n "$SUPERSET_TERMINAL_ID" ]; then
     case " $SEEN_HOOK_URLS " in *" $HOOK_URL "*) continue ;; esac
     SEEN_HOOK_URLS="$SEEN_HOOK_URLS $HOOK_URL"
 
-    RESPONSE=$(curl -sX POST "$HOOK_URL" \
+    RESPONSE=$("$CURL_BIN" -sX POST "$HOOK_URL" \
       --connect-timeout 2 --max-time 5 \
       -H "Content-Type: application/json" \
       -d "$PAYLOAD" \
