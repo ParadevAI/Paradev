@@ -36,6 +36,7 @@ import { QUOTA_AGENT_LABELS } from "renderer/utils/usage/quotaAgentLabels";
 import { useRemoveUsageAccount } from "../../hooks/useRemoveUsageAccount";
 import { useRestartAgentSessions } from "../../hooks/useRestartAgentSessions";
 import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
+import { CodexUsageSettings } from "../CodexUsageSettings";
 import { LeaderboardCard } from "../LeaderboardCard";
 import { UsageHistorySection } from "../UsageHistorySection";
 import type { SwitchSignInTarget } from "./components/AddAccountDialog";
@@ -477,6 +478,7 @@ export function UsageView({
 
 	return (
 		<div className="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-3 px-6 py-4">
+			<CodexUsageSettings />
 			<LeaderboardCard hostUrl={hostUrl} />
 			<div className="flex items-center gap-2">
 				<span className="ml-auto text-[10px] text-muted-foreground">

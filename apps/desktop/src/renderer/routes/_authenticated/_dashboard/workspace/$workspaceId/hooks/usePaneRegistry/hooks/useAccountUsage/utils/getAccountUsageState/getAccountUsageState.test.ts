@@ -90,6 +90,35 @@ describe("pane quota selection", () => {
 		expect(result.state).toBe("api");
 		expect(result.account).toBeUndefined();
 	});
+	test("keeps the current Codex window when another window has reset", () => {
+		const weekly = {
+			id: "secondary",
+			label: "Weekly",
+			usedPercent: 50,
+			resetsAt: new Date(now + 3600_000),
+		};
+		const result = getAccountUsageState({
+			...input,
+			identity: { ...input.identity, agent: "codex" },
+			accounts: [
+				{
+					...account,
+					agent: "codex",
+					windows: [
+						{
+							id: "primary",
+							label: "Session",
+							usedPercent: 99,
+							resetsAt: new Date(now),
+						},
+						weekly,
+					],
+				},
+			],
+		});
+		expect(result.state).toBe("ready");
+		expect(result.tightest).toBe(weekly);
+	});
 	test("unsupported agents and missing quota are not zero usage", () => {
 		expect(getAccountUsageState({ ...input, supported: false }).state).toBe(
 			"unavailable",
