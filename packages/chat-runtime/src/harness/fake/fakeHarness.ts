@@ -21,6 +21,8 @@ export type FakeHarnessScript = {
 	steerDelayMs?: number;
 	steerableSubagents?: string[];
 	backgroundableSubagents?: string[];
+	/** Reports a tool call a stop cut off as failed, as Claude over ACP does. */
+	failsToolsOnCancel?: boolean;
 };
 
 type PendingApproval = {
@@ -147,7 +149,7 @@ export class FakeHarness implements HarnessAdapter {
 			this.runningToolCalls.delete(itemId);
 			const canceled: ToolCall = {
 				...running.item,
-				status: "canceled",
+				status: this.script.failsToolsOnCancel ? "failed" : "canceled",
 				completedAtMs: canceledAtMs,
 			};
 			this.emit({ kind: "item", item: canceled, turnId: running.turnId });

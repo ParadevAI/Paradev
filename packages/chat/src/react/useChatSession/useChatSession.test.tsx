@@ -17,6 +17,7 @@ import {
 } from "@superset/chat-runtime/testing";
 import type { ChatTransport, SessionClient } from "../../client";
 import { createSessionClient } from "../../client";
+import { forgetSnapshot } from "../../client/chatSession/utils/snapshotCache";
 import { emptySnapshot, reduceMany } from "../../core";
 import type { ToolCall } from "../../protocol/items";
 import { createManualWait } from "../../testing/manualWait";
@@ -28,7 +29,6 @@ import {
 	prefetchChatSession,
 	useChatSession,
 } from "./useChatSession";
-import { forgetSnapshot } from "./utils/snapshotCache";
 
 registerDom();
 const {
