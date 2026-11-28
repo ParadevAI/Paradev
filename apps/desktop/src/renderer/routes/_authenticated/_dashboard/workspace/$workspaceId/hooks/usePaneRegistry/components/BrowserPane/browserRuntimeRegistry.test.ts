@@ -430,6 +430,86 @@ describe("browserRuntimeRegistry guest lifecycle", () => {
 		throw new Error("Invalid guestInstanceId: 7");
 	};
 
+	test("exposes a pending address without replacing the committed URL", async () => {
+		const paneId = "pending-address-pane";
+		const entry = createEntry(paneId);
+		const navigation = Promise.withResolvers<void>();
+		const loadURL = mock(() => navigation.promise);
+		Object.assign(entry.webview, { loadURL });
+		try {
+			browserRuntimeRegistry.navigate(paneId, "localhost:4000/slow");
+			expect(loadURL).toHaveBeenCalledWith("http://localhost:4000/slow");
+			expect(browserRuntimeRegistry.getState(paneId).pendingUrl).toBe(
+				"http://localhost:4000/slow",
+			);
+			expect(browserRuntimeRegistry.getState(paneId).currentUrl).toBe(
+				"http://localhost:3000",
+			);
+			fire(entry.webview, "did-navigate", {
+				url: "http://localhost:4000/redirected",
+			});
+			expect(browserRuntimeRegistry.getState(paneId).pendingUrl).toBeNull();
+			expect(browserRuntimeRegistry.getState(paneId).currentUrl).toBe(
+				"http://localhost:4000/redirected",
+			);
+		} finally {
+			navigation.resolve();
+			await navigation.promise;
+			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("drops an aborted pending address while keeping the current page", async () => {
+		const paneId = "aborted-address-pane";
+		const entry = createEntry(paneId);
+		const navigation = Promise.withResolvers<void>();
+		Object.assign(entry.webview, { loadURL: () => navigation.promise });
+		const log = spyOn(console, "error").mockImplementation(() => {});
+		try {
+			browserRuntimeRegistry.navigate(paneId, "http://localhost:4000/slow");
+			navigation.reject(new Error("ERR_ABORTED"));
+			await navigation.promise.catch(() => {});
+			expect(browserRuntimeRegistry.getState(paneId).pendingUrl).toBeNull();
+			expect(browserRuntimeRegistry.getState(paneId).currentUrl).toBe(
+				"http://localhost:3000",
+			);
+		} finally {
+			registryInternals.entries.delete(paneId);
+			log.mockRestore();
+		}
+	});
+
+	test("an older aborted load cannot clear a newer pending address", async () => {
+		const paneId = "repeated-address-pane";
+		const entry = createEntry(paneId);
+		const first = Promise.withResolvers<void>();
+		const second = Promise.withResolvers<void>();
+		let calls = 0;
+		Object.assign(entry.webview, {
+			loadURL: () => (calls++ === 0 ? first.promise : second.promise),
+		});
+		const log = spyOn(console, "error").mockImplementation(() => {});
+		try {
+			browserRuntimeRegistry.navigate(paneId, "http://localhost:4000/slow");
+			browserRuntimeRegistry.navigate(paneId, "http://localhost:4000/slow");
+			first.reject(new Error("ERR_ABORTED"));
+			await first.promise.catch(() => {});
+			expect(browserRuntimeRegistry.getState(paneId).pendingUrl).toBe(
+				"http://localhost:4000/slow",
+			);
+			fire(entry.webview, "did-navigate", {
+				url: "http://localhost:4000/slow",
+			});
+			expect(browserRuntimeRegistry.getState(paneId).pendingUrl).toBeNull();
+		} finally {
+			first.resolve();
+			second.resolve();
+			await Promise.allSettled([first.promise, second.promise]);
+			registryInternals.entries.delete(paneId);
+			log.mockRestore();
+		}
+	});
+
 	test("tracks the URL and title from events, not from the guest", () => {
 		const paneId = "lifecycle-events-pane";
 		const entry = createEntry(paneId);
