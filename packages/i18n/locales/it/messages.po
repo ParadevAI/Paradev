@@ -12258,7 +12258,7 @@ msgid "Message not found"
 msgstr "Messaggio non trovato"
 
 msgid "Message timestamps"
-msgstr "Timestamp dei messaggi"
+msgstr "Data e ora dei messaggi"
 
 msgid "Message..."
 msgstr "Messaggio..."
