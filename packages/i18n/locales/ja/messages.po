@@ -7684,6 +7684,9 @@ msgstr "DiscordとGitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "ネットワーク上の開発サーバーを検出して接続します。"
 
+msgid "Discovery index"
+msgstr "ディスカバリーインデックス"
+
 msgid "Disk version"
 msgstr "ディスク上のバージョン"
 
@@ -7991,6 +7994,9 @@ msgstr "各席はプランの時間をチーム全体で共有する 1 つのプ
 
 msgid "Each session resumes where it left off."
 msgstr "各セッションは中断したところから再開します。"
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "各スキルは、タスクで必要になったときにコーディングエージェントが読み込む SKILL.md ファイルです。エージェントはディスカバリーインデックスですべてを見つけられます。"
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "ビルドが成功するたびにスナップショットが保存されます。新しいワークスペースは現在のスナップショットから開始し、以前のものに復元することもできます。"
@@ -15135,6 +15141,9 @@ msgstr "この名前は Paradev が予約しているため、ワークスペー
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradevは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Paradevは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認は{trustHost}から行えます。"
 
+msgid "Paradev Skills"
+msgstr "Paradev スキル"
+
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradevは2025年11月、ハッカソンのプロジェクトとして始まりました。ワークツリーを管理するだけの、シンプルなデスクトップアプリでした。"
 
@@ -19149,6 +19158,9 @@ msgstr "エージェント向けのスキルとMCPツール。自分のプラグ
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "スキルはParadevプラグインに同梱され、使用するすべてのエージェントで自動的に最新の状態に保たれます。クリックしてプレビューできます。"
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "エージェントに Paradev の使い方を教えるスキル。"
 
 msgid "Skin Tone"
 msgstr "肌の色"

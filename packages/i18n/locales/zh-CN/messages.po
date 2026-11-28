@@ -7684,6 +7684,9 @@ msgstr "Discord 和 GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "发现并连接你网络中的开发服务器。"
 
+msgid "Discovery index"
+msgstr "发现索引"
+
 msgid "Disk version"
 msgstr "磁盘版本"
 
@@ -7991,6 +7994,9 @@ msgstr "每个席位会把其套餐的时长加入整个团队共享的一个时
 
 msgid "Each session resumes where it left off."
 msgstr "每个会话都会从中断处继续。"
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "每个技能都是一个 SKILL.md 文件，编码代理会在任务需要时加载它。代理可以在发现索引中找到全部技能。"
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "每次构建成功都会保存一个快照。新工作区从当前快照启动，你也可以恢复到更早的快照。"
@@ -15135,6 +15141,9 @@ msgstr "此名称由 Paradev 保留，工作区不会收到它。请删除它，
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Paradev已通过独立审计机构的SOC 2 Type II审计。可在{trustHost}索取报告并查阅我们的安全文档。"
 
+msgid "Paradev Skills"
+msgstr "Paradev 技能"
+
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev起初是2025年11月的一个黑客松项目，一个用来管理worktree的简单桌面应用。"
 
@@ -19149,6 +19158,9 @@ msgstr "为你的智能体提供技能和 MCP 工具。提交你自己的插件�
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "技能随Paradev插件一起提供，并会在你使用的每个智能体中自动保持最新。点击一个即可预览。"
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "教代理使用 Paradev 的技能。"
 
 msgid "Skin Tone"
 msgstr "肤色"

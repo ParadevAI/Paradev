@@ -7684,6 +7684,9 @@ msgstr "Discord dan GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Menemukan dan terhubung ke server pengembangan di jaringan Anda."
 
+msgid "Discovery index"
+msgstr "Indeks penemuan"
+
 msgid "Disk version"
 msgstr "Versi di disk"
 
@@ -7991,6 +7994,9 @@ msgstr "Setiap kursi menambahkan jam paketnya ke satu kumpulan yang dibagi selur
 
 msgid "Each session resumes where it left off."
 msgstr "Setiap sesi melanjutkan dari titik terakhir."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Setiap skill adalah file SKILL.md yang dimuat agen coding saat tugas membutuhkannya. Agen menemukan semuanya di indeks penemuan."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Setiap build yang berhasil menyimpan snapshot. Workspace baru dimulai dari snapshot saat ini, dan kamu bisa memulihkan snapshot sebelumnya."
@@ -15135,6 +15141,9 @@ msgstr "Paradev mencadangkan nama ini, jadi workspace tidak menerimanya. Hapus l
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Paradev telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di {trustHost}."
 
+msgid "Paradev Skills"
+msgstr "Skill Paradev"
+
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev bermula sebagai proyek hackathon pada November 2025. Waktu itu sekadar aplikasi desktop untuk mengelola worktree."
 
@@ -19149,6 +19158,9 @@ msgstr "Skill dan alat MCP untuk agen Anda. Kirimkan milik Anda sendiri."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skill hadir bersama plugin Paradev dan selalu diperbarui otomatis di setiap agen yang Anda pakai. Klik salah satu untuk melihat pratinjaunya."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Skill yang mengajari agen cara memakai Paradev."
 
 msgid "Skin Tone"
 msgstr "Warna Kulit"

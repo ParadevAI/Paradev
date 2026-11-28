@@ -33,6 +33,7 @@ const ROUTES = [
 	"plugins",
 	"pricing",
 	"roadmap",
+	"skills",
 	"starchart",
 	"stats",
 	"t3-code",
