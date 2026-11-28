@@ -3,8 +3,6 @@ name: 10x
 description: Personalized audit that teaches the advanced Paradev (formerly Superset) features the user isn't using yet (automations, parallel agents, tasks, multi-host, terminal remote control, custom commands, MCP, pages) and sets them up live. Use when the user wants to get more out of Paradev, asks "what else can Paradev do", "how do I 10x my workflow", "what am I missing", or wants to learn a specific Paradev feature.
 argument-hint: optional topic, e.g. automations
 allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/audit.sh *)
-metadata:
-  short-description: Personalized audit of Paradev features you're not using yet
 ---
 
 # Paradev 10x

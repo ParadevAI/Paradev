@@ -12,14 +12,15 @@ export interface BundledSkill {
 	description: string;
 }
 
-function frontmatter(contents: string): Record<string, unknown> {
-	if (!contents.startsWith("---\n")) return {};
-	const end = contents.indexOf("\n---\n", 4);
-	if (end === -1) return {};
-	const parsed = Bun.YAML.parse(contents.slice(4, end));
-	return parsed && typeof parsed === "object"
-		? (parsed as Record<string, unknown>)
-		: {};
+function shortDescription(file: string): string | null {
+	if (!fs.existsSync(file)) return null;
+	const parsed = Bun.YAML.parse(fs.readFileSync(file, "utf8")) as {
+		interface?: { short_description?: unknown };
+	} | null;
+	const description = parsed?.interface?.short_description;
+	return typeof description === "string" && description.trim()
+		? description.trim()
+		: null;
 }
 
 export function readBundledSkills(root: string): {
@@ -36,25 +37,17 @@ export function readBundledSkills(root: string): {
 		.filter((name) => fs.existsSync(path.join(dir, name, "SKILL.md")))
 		.sort();
 	for (const name of names) {
-		const data = frontmatter(
-			fs.readFileSync(path.join(dir, name, "SKILL.md"), "utf8"),
+		const description = shortDescription(
+			path.join(dir, name, "agents", "openai.yaml"),
 		);
-		const metadata = data.metadata as Record<string, unknown> | undefined;
-		const description = metadata?.["short-description"];
-		if (data.name !== name) {
+		if (!description) {
 			issues.push({
 				name: `skill ${name}`,
-				problem: `frontmatter name is ${JSON.stringify(data.name)}, not the folder name`,
-			});
-		}
-		if (typeof description !== "string" || !description.trim()) {
-			issues.push({
-				name: `skill ${name}`,
-				problem: "SKILL.md has no metadata.short-description",
+				problem: "agents/openai.yaml has no interface.short_description",
 			});
 			continue;
 		}
-		skills.push({ name, description: description.trim() });
+		skills.push({ name, description });
 	}
 	return { skills, issues };
 }

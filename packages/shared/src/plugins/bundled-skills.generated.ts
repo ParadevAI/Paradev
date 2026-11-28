@@ -3,51 +3,51 @@
 export const BUNDLED_SKILLS = [
 	{
 		name: "10x",
-		description: "Personalized audit of Paradev features you're not using yet",
+		description: "Audit your Paradev usage and set up the features you're missing",
 	},
 	{
 		name: "automate",
-		description: "Turn a recurring chore into a Paradev automation",
+		description: "Turn a recurring chore into a scheduled Paradev automation",
 	},
 	{
 		name: "browser",
-		description: "Drive web pages from the in-app browser panes",
+		description: "Open, screenshot, read, and drive web pages in a workspace browser pane",
 	},
 	{
 		name: "computer",
-		description: "Drive native desktop apps and system browsers",
+		description: "Operate native desktop apps and windows through an accessibility driver",
 	},
 	{
 		name: "contribute",
-		description: "Set up an open-source contribution to Paradev",
+		description: "Fork, set up, and open a merge-ready PR against paradevai/paradev",
 	},
 	{
 		name: "doctor",
-		description: "Diagnose and fix Paradev problems",
+		description: "Diagnose and fix Paradev connection, host, terminal, auth, or update problems",
 	},
 	{
 		name: "environment",
-		description: "Set up a cloud environment end to end",
+		description: "Set up a cloud environment so new workspaces start ready",
 	},
 	{
 		name: "feedback",
-		description: "Report bugs and request features",
+		description: "Report a Paradev bug, feature request, or feedback privately or on GitHub",
 	},
 	{
 		name: "integrations",
-		description: "Call the tools of your connected integrations",
+		description: "List and call the tools your connected integrations expose",
 	},
 	{
 		name: "orchestrate",
-		description: "Coordinate multiple coding agents across workspaces",
+		description: "Coordinate coding agents through Paradev CLI",
 	},
 	{
 		name: "page",
-		description: "Publish shareable pages and answer their comments",
+		description: "Publish a self-contained HTML page to a shareable URL and answer the comments on it",
 	},
 	{
 		name: "panes",
-		description: "Arrange tabs and split panes in a workspace",
+		description: "Arrange panes and the right sidebar in a Paradev workspace",
 	},
 	{
 		name: "plugins",
@@ -55,10 +55,10 @@ export const BUNDLED_SKILLS = [
 	},
 	{
 		name: "setup",
-		description: "Make a repository Paradev-ready",
+		description: "Make a repo Paradev-ready with .paradev/config.toml",
 	},
 	{
 		name: "standup",
-		description: "Digest of what your Paradev agents did",
+		description: "Digest of what your Paradev agents did and what needs you",
 	},
 ] as const;

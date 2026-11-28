@@ -3,8 +3,6 @@ name: feedback
 description: Collect and submit feedback about Paradev (formerly Superset) (bug reports, feature requests, or general feedback) privately to the Paradev team or as a public GitHub issue. Use when the user wants to report a Paradev bug, request a feature, or send feedback about Paradev.
 argument-hint: describe the bug, request, or feedback
 allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(gh:*) Bash(uname:*) WebFetch WebSearch
-metadata:
-  short-description: Report bugs and request features
 ---
 
 # Paradev Feedback

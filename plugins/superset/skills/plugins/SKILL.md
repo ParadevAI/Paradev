@@ -3,8 +3,6 @@ name: plugins
 description: Install Paradev (formerly Superset) plugins, connect the accounts they need, and call their MCP tools through the credential proxy. Use when the user wants a plugin installed, removed, enabled, or connected, asks what tools a plugin exposes, wants to call one, adds a marketplace, or asks why a plugin's tools are not available.
 argument-hint: what you want to install, connect, or call
 allowed-tools: Bash(superset plugins:*) Bash(paradev plugins:*) Bash(superset mcp:*) Bash(paradev mcp:*) Bash(superset skills:*) Bash(paradev skills:*)
-metadata:
-  short-description: Install plugins, connect their accounts, and call their MCP tools
 ---
 
 # Plugins and their tools

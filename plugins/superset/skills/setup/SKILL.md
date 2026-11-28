@@ -3,8 +3,6 @@ name: setup
 description: Make a repository Paradev (formerly Superset)-ready by writing .paradev/config.toml (install, setup, terminals, archive, ports) so every new workspace, local or cloud, comes up configured, converting an old config.json, then verifying with a real workspace. Use when the user wants to set up a project or repo for Paradev, configure workspace setup scripts, convert config.json to config.toml, or fix a failing workspace setup ("new workspaces don't have node_modules", "my .env is missing in workspaces", "setup script isn't running").
 argument-hint: optional notes about the project's setup needs
 allowed-tools: Bash(superset:*) Bash(paradev:*)
-metadata:
-  short-description: Make a repository Paradev-ready
 ---
 
 # Paradev Project Setup
