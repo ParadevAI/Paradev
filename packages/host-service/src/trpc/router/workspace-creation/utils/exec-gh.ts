@@ -5,6 +5,8 @@ import { getToolEnvironment } from "../../../../terminal/clean-shell-env";
 
 const execFileAsync = promisify(execFile);
 
+export const GH_TIMEOUT_MS = 10_000;
+
 export interface ExecGhOptions {
 	cwd?: string;
 	timeout?: number;
@@ -31,7 +33,7 @@ export const execGh: ExecGh = async (args, options) => {
 	options?.signal?.throwIfAborted();
 	const child = execFileAsync(resolveCommand("gh", { env }), args, {
 		encoding: "utf8",
-		timeout: options?.timeout ?? 10_000,
+		timeout: options?.timeout ?? GH_TIMEOUT_MS,
 		// Node's 1MB default dies on large REST payloads (open-PR sweeps of
 		// busy repos exceed it even paginated).
 		maxBuffer: options?.maxBuffer ?? 10 * 1024 * 1024,
