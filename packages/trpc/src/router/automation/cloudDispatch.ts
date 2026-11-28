@@ -267,14 +267,15 @@ export async function reachablePin(
 		return null;
 	}
 	if (row.status === "provisioning") {
-		if (Date.now() - row.createdAt.getTime() > STRANDED_PROVISIONING_MS) {
-			await failCloudWorkspace({
+		if (Date.now() - row.updatedAt.getTime() > STRANDED_PROVISIONING_MS) {
+			const failed = await failCloudWorkspace({
 				scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 				from: ["provisioning"],
+				providerSandboxId: row.providerSandboxId,
 				reason: "create_failed",
 				error: new Error("A pinned workspace stayed in provisioning"),
 			});
-			return null;
+			return failed ? null : reachablePin(cloudWorkspaceId);
 		}
 		throw new RunFailure(
 			"the pinned cloud workspace is still provisioning",
