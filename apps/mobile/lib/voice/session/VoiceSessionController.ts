@@ -181,10 +181,14 @@ export class VoiceSessionController {
 			onToolCall: (call) => this.onToolCall(call),
 			onError: (message) => this.deps.store.getState().setError(message),
 		});
+		let lost = false;
 		this.cleanups.push(
 			transport.onStateChange((state) => {
 				if (this.ended) return;
-				if (state === "failed" || state === "closed") void this.reconnect();
+				if (state === "failed" || state === "closed") {
+					lost = true;
+					void this.reconnect();
+				}
 			}),
 		);
 		this.transport = transport;
@@ -195,6 +199,12 @@ export class VoiceSessionController {
 			client.stop();
 			transport.close();
 			return;
+		}
+		if (this.transport !== transport) return;
+		if (lost) {
+			client.stop();
+			transport.close();
+			throw new Error("Lost the connection while connecting.");
 		}
 		if (this.deps.store.getState().muted) transport.setMuted(true);
 		if (seed) this.seedHistory(client);

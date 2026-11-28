@@ -30,9 +30,18 @@ class FakeTransport implements RealtimeTransport {
 	closed = false;
 	private listeners = new Set<(event: RealtimeServerEvent) => void>();
 	private stateListeners = new Set<(state: TransportState) => void>();
-	constructor(private readonly failConnect = false) {}
+	release = () => {};
+	constructor(
+		private readonly failConnect = false,
+		private readonly holdConnect = false,
+	) {}
 	async connect() {
 		if (this.failConnect) throw new Error("no network");
+		if (this.holdConnect) {
+			await new Promise<void>((resolve) => {
+				this.release = resolve;
+			});
+		}
 	}
 	send(event: RealtimeClientEvent) {
 		this.sent.push(event);
@@ -57,8 +66,8 @@ class FakeTransport implements RealtimeTransport {
 	emit(event: RealtimeServerEvent) {
 		for (const listener of this.listeners) listener(event);
 	}
-	drop() {
-		for (const listener of this.stateListeners) listener("closed");
+	drop(state: TransportState = "closed") {
+		for (const listener of this.stateListeners) listener(state);
 	}
 }
 
@@ -109,7 +118,13 @@ const data: VoiceData = {
 	listTasks: async () => [],
 };
 
-function build(options: { failConnect?: boolean; pathname?: string } = {}) {
+function build(
+	options: {
+		failConnect?: boolean;
+		holdReconnects?: boolean;
+		pathname?: string;
+	} = {},
+) {
 	const transports: FakeTransport[] = [];
 	const routes: string[] = [];
 	let pathname = options.pathname ?? "/";
@@ -121,7 +136,10 @@ function build(options: { failConnect?: boolean; pathname?: string } = {}) {
 		data,
 		mint: async () => ({ clientSecret: "ek_test" }),
 		createTransport: () => {
-			const transport = new FakeTransport(options.failConnect);
+			const transport = new FakeTransport(
+				options.failConnect,
+				options.holdReconnects && transports.length > 0,
+			);
 			transports.push(transport);
 			return transport;
 		},
@@ -237,6 +255,21 @@ describe("VoiceSessionController", () => {
 				event.item.role !== "system",
 		);
 		expect(replayed).toHaveLength(2);
+		controller.end();
+	});
+
+	test("a link that fails while a reconnect is connecting is not reported as listening", async () => {
+		const { controller, transports } = build({ holdReconnects: true });
+		await controller.start();
+		void controller.restart();
+		await new Promise((resolve) => setTimeout(resolve, 600));
+		const retry = transports[1] as FakeTransport;
+		retry.drop("failed");
+		retry.release();
+		await flush();
+
+		expect(useVoiceStore.getState().status).toBe("reconnecting");
+		expect(retry.closed).toBe(true);
 		controller.end();
 	});
 
