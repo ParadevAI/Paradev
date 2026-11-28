@@ -375,6 +375,10 @@ jobs:
           fi
           "$PDEV_BIN" --version
 
+      - name: Check deb has no world-writable paths
+        working-directory: apps/desktop
+        run: bash scripts/check-deb-file-modes.sh release/*.deb
+
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
