@@ -7,6 +7,7 @@ function surface(commands: Record<string, SurfaceCommand>): CliSurface {
 }
 
 const read: SurfaceCommand = {
+	runnable: true,
 	aliases: ["r"],
 	options: [
 		{ name: "workspace", aliases: ["w"], type: "string", required: true },
@@ -50,6 +51,7 @@ describe("diffSurface", () => {
 
 	it("reports lost aliases, enum values, defaults and required positionals", () => {
 		const narrowed: SurfaceCommand = {
+			runnable: true,
 			options: [
 				{ name: "workspace", aliases: [], type: "string", required: true },
 				{
@@ -74,6 +76,22 @@ describe("diffSurface", () => {
 			"terminals read --format: lost value text",
 			"terminals read <id> (position 1): became required",
 		]);
+	});
+
+	it("reports a path that stops being runnable and records one that becomes runnable", () => {
+		const group: SurfaceCommand = { runnable: false, options: [], args: [] };
+		expect(
+			diffSurface(
+				surface({ tasks: { ...group, runnable: true }, hosts: group }),
+				surface({
+					tasks: group,
+					hosts: { ...group, runnable: true, aliases: ["h"] },
+				}),
+			),
+		).toEqual({
+			breaking: ["tasks: no longer runnable"],
+			additions: ["hosts: now runnable", "hosts: added alias h"],
+		});
 	});
 
 	it("reports a removed command and keeps new commands and optional flags as additions", () => {

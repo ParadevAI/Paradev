@@ -53,7 +53,8 @@ export function fakeContext(overrides: Partial<CliContext> = {}): CliContext {
 
 export type FixtureResult =
 	| { data: unknown; message?: string }
-	| { error: { message: string; hint?: string } };
+	| { raw: string }
+	| { error: { message: string; hint?: string; data?: unknown } };
 
 interface Runnable<TInput> {
 	run: (opts: TInput) => Promise<CommandResult>;
@@ -65,28 +66,40 @@ export async function runForFixture<TInput>(
 	command: Runnable<TInput>,
 	input: NoInfer<Omit<TInput, "signal">>,
 ): Promise<FixtureResult> {
+	let result: CommandResult;
 	try {
-		const result = await command.run({
+		result = await command.run({
 			...input,
 			signal: new AbortController().signal,
 		} as TInput);
-		const json = formatOutput(result, command.display, {
-			json: true,
-			quiet: false,
-		});
-		const message =
-			result && typeof result === "object" && "message" in result
-				? result.message
-				: undefined;
-		return {
-			data: json === undefined ? null : JSON.parse(json),
-			...(message !== undefined && { message }),
-		};
 	} catch (error) {
 		if (!(error instanceof Error)) throw error;
-		const hint = error instanceof CLIError ? error.suggestion : undefined;
-		return { error: { message: error.message, ...(hint && { hint }) } };
+		const cliError = error instanceof CLIError ? error : undefined;
+		return {
+			error: {
+				message: error.message,
+				...(cliError?.suggestion && { hint: cliError.suggestion }),
+				...(cliError?.data !== undefined && {
+					data: JSON.parse(JSON.stringify(cliError.data)),
+				}),
+			},
+		};
 	}
+	if (result && typeof result === "object" && "raw" in result) {
+		return { raw: result.raw };
+	}
+	const json = formatOutput(result, command.display, {
+		json: true,
+		quiet: false,
+	});
+	const message =
+		result && typeof result === "object" && "message" in result
+			? result.message
+			: undefined;
+	return {
+		data: json === undefined ? null : JSON.parse(json),
+		...(message !== undefined && { message }),
+	};
 }
 
 /**

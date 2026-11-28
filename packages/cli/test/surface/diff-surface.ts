@@ -16,6 +16,18 @@ const missing = (before: string[] = [], after: string[] = []) =>
 	before.filter((value) => !after.includes(value));
 const list = (values: string[]) => values.join(", ");
 
+function diffAliases(
+	where: string,
+	before: string[] = [],
+	after: string[] = [],
+	diff: SurfaceDiff,
+): void {
+	const lost = missing(before, after);
+	if (lost.length) diff.breaking.push(`${where}: lost alias ${list(lost)}`);
+	const added = missing(after, before);
+	if (added.length) diff.additions.push(`${where}: added alias ${list(added)}`);
+}
+
 function diffOptions(
 	where: string,
 	before: SurfaceOption[],
@@ -36,10 +48,7 @@ function diffOptions(
 			);
 			continue;
 		}
-		const lostAliases = missing(old.aliases, now.aliases);
-		if (lostAliases.length) {
-			diff.breaking.push(`${flag}: lost alias ${list(lostAliases)}`);
-		}
+		diffAliases(flag, old.aliases, now.aliases, diff);
 		if (old.type !== now.type || old.int !== now.int) {
 			diff.breaking.push(
 				`${flag}: type ${old.type}${old.int ? " (int)" : ""} -> ${now.type}${now.int ? " (int)" : ""}`,
@@ -117,10 +126,12 @@ function diffCommand(
 	now: SurfaceCommand,
 	diff: SurfaceDiff,
 ): void {
-	const lostAliases = missing(old.aliases, now.aliases);
-	if (lostAliases.length) {
-		diff.breaking.push(`${path}: lost alias ${list(lostAliases)}`);
+	if (old.runnable && !now.runnable) {
+		diff.breaking.push(`${path}: no longer runnable`);
+	} else if (!old.runnable && now.runnable) {
+		diff.additions.push(`${path}: now runnable`);
 	}
+	diffAliases(path, old.aliases, now.aliases, diff);
 	for (const key of ["hidden", "audience", "sandbox"] as const) {
 		if (old[key] !== now[key]) {
 			diff.breaking.push(

@@ -1,5 +1,5 @@
-import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { renameSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import {
 	buildTree,
 	type CliCommand,
@@ -46,6 +46,7 @@ export interface SurfaceArg {
 }
 
 export interface SurfaceCommand {
+	runnable: boolean;
 	aliases?: string[];
 	hidden?: true;
 	audience?: "internal";
@@ -120,23 +121,34 @@ function toSurfaceOption(option: SchemaOption): SurfaceOption {
 	return surface;
 }
 
+type Availability = Pick<SurfaceCommand, "audience" | "sandbox">;
+
 function flatten(
 	command: SchemaCommand,
-	declared: Map<string, Pick<SurfaceCommand, "audience" | "sandbox">>,
+	runnable: Set<string>,
+	inherited: Availability,
+	declared: Map<string, Availability>,
 	out: Record<string, SurfaceCommand>,
 ): void {
 	const key = command.path.join(" ");
+	const availability = { ...inherited, ...declared.get(key) };
 	out[key] = {
+		runnable: runnable.has(key),
 		...(command.aliases && { aliases: command.aliases }),
 		...(command.hidden && { hidden: true }),
-		...declared.get(key),
+		...availability,
 		options: command.options.map(toSurfaceOption),
 		args: command.args.map(({ description: _description, ...arg }) => arg),
 	};
-	for (const child of command.commands) flatten(child, declared, out);
+	for (const child of command.commands) {
+		flatten(child, runnable, availability, declared, out);
+	}
 }
 
-/** Every command, hidden and internal included, as no audience or sandbox filter sees it. */
+/**
+ * Every command, hidden and internal included, as no audience or sandbox filter sees it.
+ * `audience` and `sandbox` are the effective values: a group's declaration covers its descendants.
+ */
 export async function buildSurface(): Promise<CliSurface> {
 	const { commands, groups } = await loadTree();
 	const { root, commandMap } = buildTree(groups, commands);
@@ -153,10 +165,7 @@ export async function buildSurface(): Promise<CliSurface> {
 		);
 	}
 
-	const declared = new Map<
-		string,
-		Pick<SurfaceCommand, "audience" | "sandbox">
-	>();
+	const declared = new Map<string, Availability>();
 	for (const { path, audience, sandbox } of [
 		...groups,
 		...commands.map(({ path, command }) => ({ path, ...command })),
@@ -174,7 +183,12 @@ export async function buildSurface(): Promise<CliSurface> {
 		{ includeHidden: true },
 	);
 	const flat: Record<string, SurfaceCommand> = {};
-	for (const command of schema.commands) flatten(command, declared, flat);
+	const runnable = new Set(
+		[...commandMap.keys()].map((key) => key.split("/").join(" ")),
+	);
+	for (const command of schema.commands) {
+		flatten(command, runnable, {}, declared, flat);
+	}
 	return {
 		globalOptions: schema.globalOptions.map(toSurfaceOption),
 		commands: Object.fromEntries(
@@ -185,13 +199,19 @@ export async function buildSurface(): Promise<CliSurface> {
 
 /** Writes `value` as JSON in the repo's Biome format, so `bun run lint` accepts the file. */
 export function writeFormattedJson(path: string, value: unknown): void {
-	writeFileSync(path, `${JSON.stringify(value, null, "\t")}\n`);
-	const biome = Bun.spawnSync(["bunx", "biome", "format", "--write", path], {
-		cwd: REPO_ROOT,
-		stdout: "ignore",
-	});
-	if (biome.exitCode !== 0) {
-		throw new Error(`biome format failed: ${biome.stderr.toString()}`);
+	const draft = join(dirname(path), `.${basename(path, ".json")}.draft.json`);
+	try {
+		writeFileSync(draft, `${JSON.stringify(value, null, "\t")}\n`);
+		const biome = Bun.spawnSync(["bunx", "biome", "format", "--write", draft], {
+			cwd: REPO_ROOT,
+			stdout: "ignore",
+		});
+		if (biome.exitCode !== 0) {
+			throw new Error(`biome format failed: ${biome.stderr.toString()}`);
+		}
+		renameSync(draft, path);
+	} finally {
+		rmSync(draft, { force: true });
 	}
 }
 
