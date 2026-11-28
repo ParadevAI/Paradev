@@ -1,4 +1,9 @@
-import { byName, type CliDescription, visibleChildren } from "./help";
+import {
+	byName,
+	type CliDescription,
+	type CommandNode,
+	visibleChildren,
+} from "./help";
 import type { OptionType, ProcessedBuilderConfig } from "./option";
 
 // The command tree as JSON for tooling that needs to know what is callable
@@ -20,6 +25,7 @@ export interface SchemaOption {
 	env?: string;
 	/** Flag names this option cannot be combined with. */
 	conflicts?: string[];
+	hidden?: true;
 }
 
 export interface SchemaArg {
@@ -34,9 +40,15 @@ export interface SchemaCommand {
 	path: string[];
 	description?: string;
 	aliases?: string[];
+	hidden?: true;
 	options: SchemaOption[];
 	args: SchemaArg[];
 	commands: SchemaCommand[];
+}
+
+export interface SchemaOptions {
+	/** Also list hidden commands and options, marked `hidden: true`. */
+	includeHidden?: boolean;
 }
 
 export interface CliSchema {
@@ -71,6 +83,7 @@ function toOption(
 			max: config.maxVal,
 			env: config.envVar,
 			conflicts: config.conflictsWith?.map((key) => siblings[key]?.name ?? key),
+			hidden: config.isHidden || undefined,
 		}),
 	};
 }
@@ -87,42 +100,56 @@ function toArg(config: ProcessedBuilderConfig): SchemaArg {
 	};
 }
 
-function options(configs: Record<string, ProcessedBuilderConfig> | undefined) {
+function options(
+	configs: Record<string, ProcessedBuilderConfig> | undefined,
+	{ includeHidden }: SchemaOptions,
+) {
 	return Object.values(configs ?? {})
-		.filter((config) => config.type !== "positional" && !config.isHidden)
+		.filter(
+			(config) =>
+				config.type !== "positional" && (includeHidden || !config.isHidden),
+		)
 		.map((config) => toOption(config, configs ?? {}))
 		.sort((a, b) => byName(a.name, b.name));
 }
 
+function children(node: CommandNode, { includeHidden }: SchemaOptions) {
+	if (!includeHidden) return visibleChildren(node);
+	return [...node.children.entries()]
+		.filter(([, child]) => child.children.size > 0 || child.hasCommand)
+		.sort(([a], [b]) => byName(a, b));
+}
+
 function toCommand(
 	path: string[],
-	node: CliDescription["root"],
+	node: CommandNode,
+	schemaOptions: SchemaOptions,
 ): SchemaCommand {
 	return {
 		path,
 		...defined({
 			description: node.description,
 			aliases: node.aliases?.length ? node.aliases : undefined,
+			hidden: node.hidden || undefined,
 		}),
-		options: options(node.options),
+		options: options(node.options, schemaOptions),
 		args: (node.args ?? []).map(toArg),
-		commands: visibleChildren(node).map(([name, child]) =>
-			toCommand([...path, name], child),
+		commands: children(node, schemaOptions).map(([name, child]) =>
+			toCommand([...path, name], child, schemaOptions),
 		),
 	};
 }
 
-export function generateSchema({
-	name,
-	version,
-	root,
-}: CliDescription): CliSchema {
+export function generateSchema(
+	{ name, version, root }: CliDescription,
+	schemaOptions: SchemaOptions = {},
+): CliSchema {
 	return {
 		name,
 		version,
-		globalOptions: options(root.options),
-		commands: visibleChildren(root).map(([child, node]) =>
-			toCommand([child], node),
+		globalOptions: options(root.options, schemaOptions),
+		commands: children(root, schemaOptions).map(([child, node]) =>
+			toCommand([child], node, schemaOptions),
 		),
 	};
 }

@@ -1,0 +1,23 @@
+{
+	"paradev tracker": {
+		"data": [
+			{
+				"id": "st_todo",
+				"name": "Todo",
+				"type": "unstarted",
+				"position": 0
+			},
+			{
+				"id": "st_done",
+				"name": "Done",
+				"type": "completed",
+				"position": 1
+			}
+		]
+	},
+	"team on paradev tracker": {
+		"error": {
+			"message": "Paradev statuses are shared by every team"
+		}
+	}
+}
