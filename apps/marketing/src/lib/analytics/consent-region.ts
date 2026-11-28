@@ -45,24 +45,7 @@ export function consentRegionForCountry(
 	return OPT_IN_COUNTRIES.has(country.toUpperCase()) ? "opt-in" : "opt-out";
 }
 
-const COUNTRY_CODE = /^[A-Z]{2}$/;
-
-/** Cookie value "<region>" or "<region>.<country>", for example "opt-in.DE". */
-export function consentCookieValue(
-	region: ConsentRegion,
-	country: string | null | undefined,
-): string {
-	const code = country?.toUpperCase();
-	return code && COUNTRY_CODE.test(code) ? `${region}.${code}` : region;
-}
-
-export function parseConsentCookie(value: string | undefined): {
-	region: ConsentRegion;
-	country: string | null;
-} {
-	const [region, country = ""] = (value ?? "").split(".");
-	return {
-		region: region === "opt-out" ? "opt-out" : "opt-in",
-		country: COUNTRY_CODE.test(country) ? country : null,
-	};
+/** Reads "<region>" and the older "<region>.<country>" form. */
+export function parseConsentCookie(value: string | undefined): ConsentRegion {
+	return value?.split(".")[0] === "opt-out" ? "opt-out" : "opt-in";
 }

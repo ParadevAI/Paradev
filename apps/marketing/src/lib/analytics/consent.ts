@@ -41,21 +41,13 @@ export function mayTrack(
 	return region === "opt-in" ? choice === "accepted" : choice !== "declined";
 }
 
-function readConsentCookie() {
+/** A missing region cookie counts as opt-in. */
+export function readConsentRegion(): ConsentRegion {
 	const cookie = window.document?.cookie ?? "";
 	const match = cookie
 		.split("; ")
 		.find((entry) => entry.startsWith(`${CONSENT_REGION_COOKIE}=`));
 	return parseConsentCookie(match?.slice(CONSENT_REGION_COOKIE.length + 1));
-}
-
-/** A missing region cookie counts as opt-in. */
-export function readConsentRegion(): ConsentRegion {
-	return readConsentCookie().region;
-}
-
-export function readConsentCountry(): string | null {
-	return readConsentCookie().country;
 }
 
 export function readConsentChoice(): ConsentChoice | null {

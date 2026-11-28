@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { canTrack, mayTrack, readConsentCountry } from "./consent";
+import { canTrack, mayTrack } from "./consent";
 import { consentRegionForCountry } from "./consent-region";
 
 const globals = globalThis as { window?: unknown };
@@ -60,18 +60,17 @@ describe("canTrack", () => {
 	});
 });
 
-test("reads the region and country from old and new cookie values", () => {
+test("reads the region from plain and older region.country cookie values", () => {
 	const read = (value: string) => {
 		globals.window = {
 			document: { cookie: `paradev-consent-region=${value}` },
 		};
-		return [canTrack(), readConsentCountry()];
+		return canTrack();
 	};
-	expect(read("opt-out")).toEqual([true, null]);
-	expect(read("opt-out.US")).toEqual([true, "US"]);
-	expect(read("opt-in.DE")).toEqual([false, "DE"]);
-	expect(read("opt-out.us")).toEqual([true, null]);
-	expect(read("opt-out.USA")).toEqual([true, null]);
+	expect(read("opt-out")).toBe(true);
+	expect(read("opt-out.US")).toBe(true);
+	expect(read("opt-in")).toBe(false);
+	expect(read("opt-in.DE")).toBe(false);
 });
 
 describe("consentRegionForCountry", () => {
