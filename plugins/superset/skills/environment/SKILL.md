@@ -3,6 +3,8 @@ name: environment
 description: Set up a Paradev (formerly Superset) cloud environment end to end from this machine - work out what the repositories need, set the environment's variables, boot a cloud box on it, get the project running there, store the environment's config.toml, and build it until new cloud workspaces start ready. Use when the user asks to set up, onboard, or finish a cloud environment, or when a setup session hands you an environment ID.
 argument-hint: environment ID, or the repositories to set up
 allowed-tools: Bash(superset:*) Bash(paradev:*)
+metadata:
+  short-description: Set up a cloud environment end to end
 ---
 
 # Cloud environment setup

@@ -1,61 +1,70 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { SUPERSET_MANAGED_SKILLS } from "@superset/shared/plugins";
 
-const REPO_RAW = "https://raw.githubusercontent.com/paradevai/skills/main";
+const MCP_SKILL_URL =
+	"https://raw.githubusercontent.com/paradevai/skills/main/skills/superset-mcp/SKILL.md";
+const MCP_SKILL_NAME = "superset-mcp";
 
 export const BUNDLED_SKILLS_DIR = path.join(
 	process.cwd(),
 	"../../plugins/superset/skills",
 );
 
-export const EXTERNAL_SKILL_NAMES = [
-	"superset-orchestrate",
-	"superset-setup",
-	"superset-automate",
-	"superset-standup",
-	"superset-doctor",
-	"superset-feedback",
-	"superset-10x",
-	"superset-contribute",
-	"superset-mcp",
-] as const;
+/** Bundled skills first published as `superset-<name>`; those URLs must keep their names. */
+const LEGACY_PREFIXED_SKILLS: ReadonlySet<string> = new Set([
+	"10x",
+	"automate",
+	"contribute",
+	"doctor",
+	"feedback",
+	"orchestrate",
+	"setup",
+	"standup",
+]);
 
-export const BUNDLED_SKILL_NAMES = [
-	"browser",
-	"computer",
-	"environment",
-	"integrations",
-	"page",
-	"panes",
-	"plugins",
-] as const;
+const LEGACY_PREFIX = "superset-";
 
-export const SKILL_NAMES = [
-	...EXTERNAL_SKILL_NAMES,
-	...BUNDLED_SKILL_NAMES,
-] as const;
-export type SkillName = (typeof SKILL_NAMES)[number];
-
-export function isSkillName(value: string): value is SkillName {
-	return (SKILL_NAMES as readonly string[]).includes(value);
+function publishedName(skill: string): string {
+	return LEGACY_PREFIXED_SKILLS.has(skill) ? `${LEGACY_PREFIX}${skill}` : skill;
 }
 
-function isBundledSkillName(
-	name: SkillName,
-): name is (typeof BUNDLED_SKILL_NAMES)[number] {
-	return (BUNDLED_SKILL_NAMES as readonly string[]).includes(name);
+export const SKILL_NAMES: readonly string[] = [
+	...SUPERSET_MANAGED_SKILLS.map((skill) => publishedName(skill.name)),
+	MCP_SKILL_NAME,
+];
+
+const BUNDLED_BY_PUBLISHED_NAME = new Map(
+	SUPERSET_MANAGED_SKILLS.map((skill) => [
+		publishedName(skill.name),
+		skill.name,
+	]),
+);
+
+export function isSkillName(value: string): boolean {
+	return SKILL_NAMES.includes(value);
 }
 
-export async function fetchSkill(name: SkillName): Promise<string | null> {
-	if (isBundledSkillName(name)) {
-		return readFile(
-			path.join(BUNDLED_SKILLS_DIR, name, "SKILL.md"),
+function withName(content: string, name: string): string {
+	const end = content.indexOf("\n---\n", 4);
+	if (!content.startsWith("---\n") || end === -1) return content;
+	return (
+		content.slice(0, end).replace(/^name:[^\n]*$/m, `name: ${name}`) +
+		content.slice(end)
+	);
+}
+
+export async function fetchSkill(name: string): Promise<string | null> {
+	const bundled = BUNDLED_BY_PUBLISHED_NAME.get(name);
+	if (bundled) {
+		const content = await readFile(
+			path.join(BUNDLED_SKILLS_DIR, bundled, "SKILL.md"),
 			"utf-8",
 		).catch(() => null);
+		return content === null ? null : withName(content, name);
 	}
-	const response = await fetch(`${REPO_RAW}/skills/${name}/SKILL.md`, {
-		next: { revalidate: 3600 },
-	});
+	if (name !== MCP_SKILL_NAME) return null;
+	const response = await fetch(MCP_SKILL_URL, { next: { revalidate: 3600 } });
 	if (!response.ok) {
 		return null;
 	}

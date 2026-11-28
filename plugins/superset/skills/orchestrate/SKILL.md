@@ -3,6 +3,8 @@ name: orchestrate
 description: Coordinate several coding agents in parallel through Paradev (formerly Superset), each in its own workspace, with follow-ups, progress reads, dependency tracking, and structured results. Use when the user asks to delegate, parallelize, fan out, or split up coding work across agents, workspaces, or hosts, hand work between agents, or monitor workers, including "spin up agents for each of these", "run these in parallel", "what are my workers doing". Not for ordinary single-agent workspace, task, or automation management.
 argument-hint: the work to split up and coordinate
 allowed-tools: Bash(superset:*) Bash(paradev:*)
+metadata:
+  short-description: Coordinate multiple coding agents across workspaces
 ---
 
 # Paradev Orchestration

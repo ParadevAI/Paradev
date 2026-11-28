@@ -3,11 +3,10 @@ import { cacheLife } from "next/cache";
 import {
 	fetchSkill,
 	SKILL_NAMES,
-	type SkillName,
 } from "@/app/.well-known/agent-skills/skills-source";
 
 export interface SkillEntry {
-	name: SkillName;
+	name: string;
 	summary: string;
 	url: string;
 }

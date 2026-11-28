@@ -3,6 +3,8 @@ name: doctor
 description: Diagnose and fix Paradev (formerly Superset) problems such as connection failures, offline hosts, terminals not attaching, auth or update issues. Use when the user reports something broken or misbehaving in Paradev itself ("Paradev won't connect", "my host shows offline", "terminal won't attach", "the app is stuck"), before filing feedback.
 argument-hint: describe the symptom
 allowed-tools: Bash(superset:*) Bash(paradev:*)
+metadata:
+  short-description: Diagnose and fix Paradev problems
 ---
 
 # Paradev Doctor

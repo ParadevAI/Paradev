@@ -3,6 +3,8 @@ name: automate
 description: Turn a recurring chore into a Paradev (formerly Superset) automation. Drafts the agent prompt, confirms the schedule or event trigger and the target, creates it with the CLI, and reviews the first run together. Use when the user wants a scheduled or recurring agent, a daily or weekly job, or an agent that reacts to a Slack message, GitHub pull request, Linear issue, Sentry issue or incoming email, or says things like "every morning do X", "automate this", "set up a cron agent", "run this on a schedule", "when someone opens a PR, do X".
 argument-hint: describe the recurring task
 allowed-tools: Bash(superset:*) Bash(paradev:*)
+metadata:
+  short-description: Turn a recurring chore into a Paradev automation
 ---
 
 # Paradev Automate
