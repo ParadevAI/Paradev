@@ -22607,9 +22607,6 @@ msgstr "コーディングエージェント軍団を動かせるよう、シー
 msgid "We sent the download link to {submittedEmail}."
 msgstr "{submittedEmail}にダウンロードリンクを送信しました。"
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "分析と広告効果の測定に Cookie を使用しています。拒否した場合は、Cookie を使わずにページビューとクリックのみを匿名で集計します。"
-
 msgid "We'll be in touch shortly."
 msgstr "折り返しご連絡します。"
 
@@ -23278,6 +23275,9 @@ msgstr "アクセス権はあなたが管理します"
 
 msgid "You created this channel on {created}."
 msgstr "{created} にこのチャンネルを作成しました。"
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Cookie と広告効果の測定はあなたが選べます。Cookie を使わない匿名の利用統計は、どちらを選んでも続きます。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} の認可リクエストを拒否しました。"

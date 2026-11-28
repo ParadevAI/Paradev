@@ -22607,9 +22607,6 @@ msgstr "Мы привлекли {amount} в посевном раунде, чт�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Мы отправили ссылку на скачивание на {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "Мы используем файлы cookie для аналитики и измерения рекламы. Если вы откажетесь, мы будем анонимно считать только просмотры страниц и клики, без cookie."
-
 msgid "We'll be in touch shortly."
 msgstr "Скоро свяжемся."
 
@@ -23278,6 +23275,9 @@ msgstr "Вы контролируете доступ"
 
 msgid "You created this channel on {created}."
 msgstr "Вы создали этот канал {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Вы решаете, использовать ли cookie и измерение рекламы; анонимная статистика использования без cookie продолжается в любом случае."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Вы отклонили запрос на авторизацию {plugin}."

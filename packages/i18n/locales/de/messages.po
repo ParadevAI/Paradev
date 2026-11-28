@@ -22607,9 +22607,6 @@ msgstr "Wir haben eine Seed-Runde über {amount} abgeschlossen, damit du eine Ar
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Wir haben den Download-Link an {submittedEmail} geschickt."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "Wir verwenden Cookies für Analysen und Werbemessung. Wenn Sie ablehnen, zählen wir nur Seitenaufrufe und Klicks anonym, ohne Cookies."
-
 msgid "We'll be in touch shortly."
 msgstr "Wir melden uns in Kürze."
 
@@ -23278,6 +23275,9 @@ msgstr "Sie behalten die Kontrolle"
 
 msgid "You created this channel on {created}."
 msgstr "Du hast diesen Kanal am {created} erstellt."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Sie entscheiden über Cookies und Werbemessung; anonyme Nutzungsstatistiken ohne Cookies laufen in jedem Fall weiter."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Sie haben die Autorisierungsanfrage für {plugin} abgelehnt."

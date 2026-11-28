@@ -22607,9 +22607,6 @@ msgstr "Kami meraih pendanaan seed sebesar {amount} untuk membantu Anda menjalan
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Kami mengirim tautan unduhan ke {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "Kami menggunakan cookie untuk analitik dan pengukuran iklan. Jika Anda menolak, kami hanya menghitung tampilan halaman dan klik secara anonim, tanpa cookie."
-
 msgid "We'll be in touch shortly."
 msgstr "Kami akan segera menghubungi Anda."
 
@@ -23278,6 +23275,9 @@ msgstr "Anda mengendalikan akses"
 
 msgid "You created this channel on {created}."
 msgstr "Anda membuat saluran ini pada {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Anda yang memutuskan soal cookie dan pengukuran iklan; statistik penggunaan anonim tanpa cookie tetap berjalan apa pun pilihan Anda."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Anda menolak permintaan otorisasi {plugin}."

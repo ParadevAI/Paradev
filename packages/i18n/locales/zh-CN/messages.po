@@ -22607,9 +22607,6 @@ msgstr "我们完成了 {amount} 种子轮融资，帮你调动一支编程智�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下载链接已发送至{submittedEmail}。"
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "我们使用 Cookie 进行分析和广告效果衡量。如果您拒绝，我们只匿名统计页面浏览量和点击次数，不使用 Cookie。"
-
 msgid "We'll be in touch shortly."
 msgstr "我们会尽快与你联系。"
 
@@ -23278,6 +23275,9 @@ msgstr "访问权限由你掌控"
 
 msgid "You created this channel on {created}."
 msgstr "你于 {created} 创建了此频道。"
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Cookie 和广告效果衡量由您决定；不使用 Cookie 的匿名使用统计无论如何都会继续。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "你拒绝了 {plugin} 的授权请求。"

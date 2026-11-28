@@ -22607,9 +22607,6 @@ msgstr "我們完成了 {amount} 種子輪募資，幫你調動一支程式代�
 msgid "We sent the download link to {submittedEmail}."
 msgstr "下載連結已傳送至{submittedEmail}。"
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "我們使用 Cookie 進行分析與廣告成效衡量。如果您拒絕，我們只匿名統計頁面瀏覽次數與點擊次數，不使用 Cookie。"
-
 msgid "We'll be in touch shortly."
 msgstr "我們會盡快與你聯絡。"
 
@@ -23278,6 +23275,9 @@ msgstr "存取權限由你掌控"
 
 msgid "You created this channel on {created}."
 msgstr "你於 {created} 建立了此頻道。"
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Cookie 與廣告成效衡量由您決定；不使用 Cookie 的匿名使用統計無論如何都會繼續。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "你拒絕了 {plugin} 的授權請求。"

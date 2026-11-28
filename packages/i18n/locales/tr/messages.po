@@ -22607,9 +22607,6 @@ msgstr "Bir kodlama ajanı ordusu yönetmenize yardımcı olmak için {amount} t
 msgid "We sent the download link to {submittedEmail}."
 msgstr "İndirme bağlantısını {submittedEmail} adresine gönderdik."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "Çerezleri analiz ve reklam ölçümü için kullanıyoruz. Reddederseniz, çerez olmadan yalnızca sayfa görüntülemelerini ve tıklamaları anonim olarak sayarız."
-
 msgid "We'll be in touch shortly."
 msgstr "Kısa süre içinde sizinle iletişime geçeceğiz."
 
@@ -23278,6 +23275,9 @@ msgstr "Erişimi siz kontrol edersiniz"
 
 msgid "You created this channel on {created}."
 msgstr "Bu kanalı {created} tarihinde oluşturdunuz."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Çerezlere ve reklam ölçümüne siz karar verirsiniz; çerez kullanmayan anonim kullanım istatistikleri her durumda devam eder."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} yetkilendirme isteğini reddettiniz."

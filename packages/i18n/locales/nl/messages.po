@@ -22607,9 +22607,6 @@ msgstr "We hebben een seedronde van {amount} opgehaald om je te helpen een leger
 msgid "We sent the download link to {submittedEmail}."
 msgstr "We hebben de downloadlink naar {submittedEmail} gestuurd."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "We gebruiken cookies voor analyse en advertentiemeting. Als je weigert, tellen we alleen paginaweergaven en klikken anoniem, zonder cookies."
-
 msgid "We'll be in touch shortly."
 msgstr "We nemen snel contact op."
 
@@ -23278,6 +23275,9 @@ msgstr "Jij bepaalt de toegang"
 
 msgid "You created this channel on {created}."
 msgstr "Je hebt dit kanaal op {created} gemaakt."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Jij beslist over cookies en advertentiemeting; anonieme gebruiksstatistieken zonder cookies gaan hoe dan ook door."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Je hebt het autorisatieverzoek van {plugin} geweigerd."

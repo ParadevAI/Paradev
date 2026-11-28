@@ -22607,9 +22607,6 @@ msgstr "Získali jsme {amount} v seed kole, abychom vám pomohli řídit armádu
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Odkaz ke stažení jsme poslali na {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "Soubory cookie používáme pro analytiku a měření reklam. Pokud je odmítnete, anonymně počítáme jen zobrazení stránek a kliknutí, bez souborů cookie."
-
 msgid "We'll be in touch shortly."
 msgstr "Brzy se vám ozveme."
 
@@ -23278,6 +23275,9 @@ msgstr "Přístup máte pod kontrolou"
 
 msgid "You created this channel on {created}."
 msgstr "Tento kanál jste vytvořili {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "O souborech cookie a měření reklam rozhodujete vy; anonymní statistiky používání bez souborů cookie pokračují v každém případě."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Žádost o autorizaci pro {plugin} jste odmítli."

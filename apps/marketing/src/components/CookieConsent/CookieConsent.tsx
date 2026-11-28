@@ -56,8 +56,8 @@ export function CookieConsent() {
 				>
 					<p className="min-w-0 flex-1 text-xs leading-snug text-muted-foreground">
 						<Trans>
-							We use cookies for analytics and ad measurement. If you decline,
-							we only count page views and clicks anonymously, without cookies.
+							You decide on cookies and ad measurement; anonymous usage
+							statistics without cookies continue either way.
 						</Trans>{" "}
 						<Link
 							href="/privacy"

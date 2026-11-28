@@ -22601,9 +22601,6 @@ msgstr "Ми залучили {amount} у seed-раунді, щоб допомо
 msgid "We sent the download link to {submittedEmail}."
 msgstr "Ми надіслали посилання для завантаження на {submittedEmail}."
 
-msgid "We use cookies for analytics and ad measurement. If you decline, we only count page views and clicks anonymously, without cookies."
-msgstr "Ми використовуємо файли cookie для аналітики та вимірювання реклами. Якщо ви відмовитеся, ми анонімно рахуватимемо лише перегляди сторінок і кліки, без cookie."
-
 msgid "We'll be in touch shortly."
 msgstr "Ми скоро з вами зв'яжемося."
 
@@ -23272,6 +23269,9 @@ msgstr "Ви керуєте доступом"
 
 msgid "You created this channel on {created}."
 msgstr "Ви створили цей канал {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Ви вирішуєте щодо файлів cookie та вимірювання реклами; анонімна статистика використання без cookie триває в будь-якому разі."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Ви відхилили запит на авторизацію {plugin}."
