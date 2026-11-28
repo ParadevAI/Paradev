@@ -18,6 +18,7 @@ import baseConfig, {
 import pkg from "./package.json";
 import { builderProductName } from "./scripts/builder-product-name";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
+import { normalizeLinuxFileModes } from "./scripts/normalize-linux-file-modes";
 
 const productName = `${pkg.productName} Canary`;
 const legacyProductName = `${legacyAppName} Canary`;
@@ -30,7 +31,10 @@ const config: Configuration = {
 	...baseConfig,
 	appId: "com.superset.desktop.canary",
 	productName: builderProductName({ productName, legacyProductName }),
-	afterPack: localizeMacDisplayName(displayName, legacyProductName),
+	afterPack: async (context) => {
+		await localizeMacDisplayName(displayName, legacyProductName)(context);
+		await normalizeLinuxFileModes(context);
+	},
 
 	publish: {
 		provider: "github",

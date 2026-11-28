@@ -16,6 +16,7 @@ import {
 } from "./runtime-dependencies";
 import { builderProductName } from "./scripts/builder-product-name";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
+import { normalizeLinuxFileModes } from "./scripts/normalize-linux-file-modes";
 
 const currentYear = new Date().getFullYear();
 const productName = pkg.productName;
@@ -56,7 +57,10 @@ const config: Configuration = {
 		productName,
 		legacyProductName: legacyAppName,
 	}),
-	afterPack: localizeMacDisplayName(displayName, legacyAppName),
+	afterPack: async (context) => {
+		await localizeMacDisplayName(displayName, legacyAppName)(context);
+		await normalizeLinuxFileModes(context);
+	},
 	copyright: `Copyright © ${currentYear} Superset Inc.`,
 	electronVersion: pkg.devDependencies.electron.replace(/^\^/, ""),
 
