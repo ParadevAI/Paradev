@@ -127,7 +127,7 @@ export function NewSessionSheet() {
 
 	const launch = async (preset: (typeof presets)[number] | null) => {
 		if (!workspace || !hostUrl || launchingKey !== null) return;
-		setLaunchingKey(preset?.presetId ?? "shell");
+		setLaunchingKey(preset?.id ?? "shell");
 		const chatHarness = (await resolveAcpChatEnabled())
 			? acpHarnessForPreset(preset?.presetId)
 			: undefined;
@@ -143,7 +143,7 @@ export function NewSessionSheet() {
 				const { model } = launchFor(preset);
 				const result = await client.agents.run.mutate({
 					workspaceId: workspace.id,
-					agent: preset.presetId,
+					agent: preset.id,
 					prompt: "",
 					model: model?.id,
 					surface: "chat",
@@ -171,7 +171,7 @@ export function NewSessionSheet() {
 				const { model, effort } = launchFor(preset);
 				const result = await client.agents.run.mutate({
 					workspaceId: workspace.id,
-					agent: preset.presetId,
+					agent: preset.id,
 					prompt: "",
 					model: model?.id,
 					effort: effort?.id,
@@ -281,7 +281,7 @@ export function NewSessionSheet() {
 					subtitle={
 						describeAgentLaunchPreferences(launchFor(preset)) ?? undefined
 					}
-					trailing={launchingKey === preset.presetId ? spinner : undefined}
+					trailing={launchingKey === preset.id ? spinner : undefined}
 					onPress={() => void launch(preset)}
 				/>
 			))}
