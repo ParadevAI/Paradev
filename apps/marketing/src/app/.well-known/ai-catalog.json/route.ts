@@ -2,7 +2,7 @@ import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import { AGENT_DID } from "@/lib/agent-identity";
 import { API_URL, MCP_SERVER_URL } from "@/lib/llms";
-import { SKILL_NAMES } from "../agent-skills/skills-source";
+import { SKILL_NAMES } from "@/lib/skills-source";
 
 const TRUST = { identity: AGENT_DID, identityType: "did" } as const;
 

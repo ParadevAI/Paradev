@@ -30,10 +30,13 @@ Or, in Claude Code, via the plugin marketplace:
 | `superset:setup` | Makes a repo Paradev-ready: authors `.paradev/config.toml` (or updates an existing `.superset/` config) and project lifecycle scripts, then verifies with a real workspace |
 | `superset:orchestrate` | Turns the agent you're talking to into a coordinator of parallel agents; see [Agent Orchestration](/orchestration) |
 | `superset:automate` | Turns a recurring chore into an [automation](/automations) that runs on a schedule or an event, and reviews its first run with you |
+| `superset:environment` | Sets up a [cloud environment](/cloud-workspaces) end to end: works out what the repositories need, sets its variables, boots a cloud box, and builds it until new cloud workspaces start ready |
 | `superset:page` | Builds and publishes shareable [Pages](/pages), then updates them in response to pinned team comments |
 | `superset:browser` | Drives a workspace's [in-app browser](/browser) panes: open, navigate, screenshot, eval, read console, and raw CDP for click/type automation, and routes to [Browser Use 3.0](/browser#browser-use-30) for browsers the panes can't reach |
 | `superset:computer` | Drives [native desktop apps](/computer) through an accessibility-first driver (Cua Driver by default): inspect windows, click, type, use menus, and verify results with background interaction when the platform supports it |
 | `superset:panes` | Arranges a workspace's tabs and split panes in the desktop app: split, open tabs, resize, swap, move, focus, and close, with commands running in the new panes; see the [`panes` CLI reference](/cli/cli-reference#panes) |
+| `superset:plugins` | Installs [plugins](/plugins/overview), connects the accounts they need, and calls their MCP tools through the credential proxy |
+| `superset:integrations` | Finds and calls the tools a connected integration exposes, such as Linear, GitHub, Sentry, or Notion, through `paradev mcp` |
 | `superset:standup` | Sweeps your workspaces, tasks, and agent terminals into a digest: what needs you, what's in flight, what's blocked |
 | `superset:doctor` | Diagnoses Paradev problems (expired auth, offline hosts, stale versions) and fixes them one step at a time |
 | `superset:feedback` | Files a bug report or feature request: privately to the Paradev team (from your account, so we can reply) or as a public GitHub issue |

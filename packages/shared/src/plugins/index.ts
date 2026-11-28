@@ -1,6 +1,7 @@
 export * from "./manifests.generated";
 
 import type { OrganizationRole } from "../auth/roles/roles";
+import { BUNDLED_SKILLS } from "./bundled-skills.generated";
 import { firstPartyManifest } from "./manifests.generated";
 
 export const DEFAULT_MARKETPLACE = "superset";
@@ -288,41 +289,7 @@ export function getPluginComponentKinds(
  * these read-only on its Skills tab; they are not installable units in the
  * MVP.
  */
-export const SUPERSET_MANAGED_SKILLS = [
-	{
-		name: "10x",
-		description: "Personalized audit of Paradev features you're not using yet",
-	},
-	{
-		name: "automate",
-		description: "Turn a recurring chore into a Paradev automation",
-	},
-	{
-		name: "browser",
-		description: "Drive web pages from the in-app browser panes",
-	},
-	{
-		name: "computer",
-		description: "Drive native desktop apps and system browsers",
-	},
-	{
-		name: "contribute",
-		description: "Set up an open-source contribution to Paradev",
-	},
-	{ name: "doctor", description: "Diagnose and fix Paradev problems" },
-	{ name: "feedback", description: "Report bugs and request features" },
-	{
-		name: "orchestrate",
-		description: "Coordinate multiple coding agents across workspaces",
-	},
-	{
-		name: "plugins",
-		description:
-			"Install plugins, connect their accounts, and call their MCP tools",
-	},
-	{ name: "setup", description: "Make a repository Paradev-ready" },
-	{ name: "standup", description: "Digest of what your Paradev agents did" },
-] as const;
+export const SUPERSET_MANAGED_SKILLS = BUNDLED_SKILLS;
 
 export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 	{

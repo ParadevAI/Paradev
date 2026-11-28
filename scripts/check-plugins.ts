@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { bundledSkillsDrift } from "../packages/cli/src/lib/plugins/bundled-skills";
 import {
 	findMarketplace,
 	resolvePlugins,
@@ -41,6 +42,7 @@ const issues = [
 	).flat(),
 	...(await Promise.all(plugins.map(typecheck))).flat(),
 	...generatedManifestDrift(ctx),
+	...bundledSkillsDrift(ctx.root),
 ];
 
 if (issues.length) {
