@@ -1,4 +1,4 @@
-import type { ILink, ILinkProvider, Terminal } from "@xterm/xterm";
+import type { IBufferLine, ILink, ILinkProvider, Terminal } from "@xterm/xterm";
 import { computeLinks } from "./utils/url-parser";
 
 const MAX_URL_LENGTH = 4096;
@@ -18,6 +18,26 @@ function trimUrl(text: string): string {
 		}
 	}
 	return text.replace(/[.,;:!?([{]+$/, "");
+}
+
+// A TUI that lays out its own rows breaks a long URL without isWrapped.
+// Agent CLIs hang the next rows under the text of a "⏺ text" or "• text" row.
+// Returns the indent to drop from `next` when it continues `line`, else -1.
+function hardWrapIndent(
+	line: IBufferLine | undefined,
+	next: IBufferLine | undefined,
+	cols: number,
+): number {
+	const lastCell = line
+		?.getCell(cols - 1)
+		?.getChars()
+		.trim();
+	if (!line || !next || next.isWrapped || !lastCell) return -1;
+	const text = line.translateToString();
+	const indent = text.search(/\S/);
+	const hasMarker = /^[^\p{L}\p{N}\s] \S/u.test(text.slice(indent));
+	const expected = hasMarker ? indent + 2 : indent;
+	return next.translateToString().search(/\S/) === expected ? expected : -1;
 }
 
 export class UrlLinkProvider implements ILinkProvider {
@@ -40,15 +60,15 @@ export class UrlLinkProvider implements ILinkProvider {
 		}
 		const contextRows =
 			Math.ceil((MAX_URL_LENGTH * 2) / this.terminal.cols) + 1;
+		const cols = this.terminal.cols;
+		const continues = (y: number) =>
+			buffer.getLine(y + 1)?.isWrapped ||
+			hardWrapIndent(buffer.getLine(y), buffer.getLine(y + 1), cols) >= 0;
 		let first = current;
 		let last = current;
-		while (
-			first > Math.max(0, current - contextRows) &&
-			buffer.getLine(first)?.isWrapped
-		)
+		while (first > Math.max(0, current - contextRows) && continues(first - 1))
 			first--;
-		while (last < current + contextRows && buffer.getLine(last + 1)?.isWrapped)
-			last++;
+		while (last < current + contextRows && continues(last)) last++;
 
 		let text = "";
 		const starts: Position[] = [];
@@ -57,12 +77,14 @@ export class UrlLinkProvider implements ILinkProvider {
 			const line = buffer.getLine(y);
 			if (!line) break;
 			const next = buffer.getLine(y + 1);
-			for (let x = 0; x < this.terminal.cols; x++) {
+			const skip =
+				y > first ? hardWrapIndent(buffer.getLine(y - 1), line, cols) : 0;
+			for (let x = Math.max(skip, 0); x < cols; x++) {
 				const cell = line.getCell(x);
 				if (!cell || cell.getWidth() === 0) continue;
 				const chars = cell.getChars();
 				if (
-					x === this.terminal.cols - 1 &&
+					x === cols - 1 &&
 					chars === "" &&
 					next?.isWrapped &&
 					next.getCell(0)?.getWidth() === 2

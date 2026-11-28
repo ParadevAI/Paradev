@@ -128,6 +128,88 @@ describe("URL boundary regressions", () => {
 			terminal.dispose();
 		}
 	});
+	it.each([
+		["", 10],
+		["  ", 12],
+	])("joins a URL that a TUI broke at the last column, indent %j", async (indent, endX) => {
+		const head = `${indent}https://example.com/`;
+		const url = `https://example.com/${"a".repeat(40 - head.length)}${"b".repeat(10)}`;
+		const { terminal, provider } = await setup(
+			`${head}${"a".repeat(40 - head.length)}\r\n${indent}${"b".repeat(10)}\r\nnext`,
+			40,
+		);
+		try {
+			expect(terminal.buffer.active.getLine(1)?.isWrapped).toBe(false);
+			for (const y of [1, 2])
+				expect(
+					linksAt(provider, y).map((l) => ({ text: l.text, range: l.range })),
+				).toEqual([
+					{
+						text: url,
+						range: {
+							start: { x: indent.length + 1, y: 1 },
+							end: { x: endX, y: 2 },
+						},
+					},
+				]);
+			expect(linksAt(provider, 3)).toEqual([]);
+		} finally {
+			terminal.dispose();
+		}
+	});
+	it.each([
+		[`https://example.com/${"a".repeat(20)}`, "  indented text"],
+		[`  https://example.com/${"a".repeat(18)}`, "README.md describes this"],
+		[`https://example.com/${"a".repeat(20)}`, ""],
+		[`https://example.com/${"a".repeat(19)}`, "README.md describes this"],
+	])("does not join the row %j with %j", async (row, next) => {
+		const { terminal, provider } = await setup(`${row}\r\n${next}`, 40);
+		try {
+			expect(linksAt(provider, 1).map((l) => l.text)).toEqual([row.trim()]);
+			expect(linksAt(provider, 2)).toEqual([]);
+		} finally {
+			terminal.dispose();
+		}
+	});
+	it.each([
+		"⏺",
+		"•",
+	])("joins a URL that an agent CLI hangs under a %s marker", async (marker) => {
+		const url = `https://example.com/${"0123456789".repeat(12)}`;
+		const { terminal, provider } = await setup(
+			`${marker} ${url.slice(0, 58)}\r\n  ${url.slice(58, 116)}\r\n  ${url.slice(116)}\r\n\r\nnext`,
+			60,
+		);
+		try {
+			for (const y of [1, 2, 3])
+				expect(
+					linksAt(provider, y).map((l) => ({ text: l.text, range: l.range })),
+				).toEqual([
+					{
+						text: url,
+						range: { start: { x: 3, y: 1 }, end: { x: 26, y: 3 } },
+					},
+				]);
+		} finally {
+			terminal.dispose();
+		}
+	});
+	it.each([
+		["• ", "• next item"],
+		["ab ", "  indented text"],
+	])("does not join the full row after %j with %j", async (prefix, next) => {
+		const url = `https://example.com/${"a".repeat(40 - prefix.length)}`;
+		const { terminal, provider } = await setup(
+			`${prefix}${url}\r\n${next}`,
+			60,
+		);
+		try {
+			expect(linksAt(provider, 1).map((l) => l.text)).toEqual([url]);
+			expect(linksAt(provider, 2)).toEqual([]);
+		} finally {
+			terminal.dispose();
+		}
+	});
 	it("detects a URL across more than three rows from every row", async () => {
 		const url = `https://example.com/${"a".repeat(160)}`;
 		const { terminal, provider } = await setup(url, 20);
