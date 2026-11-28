@@ -9,7 +9,7 @@ allowed-tools: Bash(cua-driver:*) Bash(peekaboo:*) Bash(superset pages publish:*
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
-This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+The Paradev MCP tools do not drive the desktop. The driver steps need `cua-driver` or `peekaboo` on this machine, not the paradev CLI. Only publishing evidence uses Paradev: `paradev pages publish`, or `pages_publish` when the Paradev MCP tools are in your tool list.
 
 Operate the user's real desktop through an accessibility-first driver: a local
 CLI that exposes accessibility snapshots, exact window screenshots, native menu

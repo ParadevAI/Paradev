@@ -29,7 +29,7 @@ For each recommendation in order: a two-sentence pitch, then ask (use the ask_us
 
 ## Catalog
 
-With the MCP tools, set up a feature with the tool of the same name: `automations_create` and `automations_logs`, `workspaces_create` (`pr` for a PR review workspace, `environment` for a cloud one), `tasks_create` and `tasks_update`, `terminals_list`, `terminals_read` and `terminals_send`, and `pages_publish`. Host wake, workspace sharing, custom slash commands and MCP servers are local-only: they need the paradev CLI on this machine or a file in the user's repo.
+With the MCP tools, set up a feature with the tool of the same name: `automations_create` and `automations_logs`, `workspaces_create` (`hostId`, `projectId` and `pr` for a PR review workspace; `environment` and no `hostId` for a cloud one), `tasks_create` and `tasks_update`, `terminals_list`, `terminals_read` and `terminals_send`, and `pages_publish`. Host wake, workspace sharing, custom slash commands and MCP servers are local-only: they need the paradev CLI on this machine or a file in the user's repo.
 
 | Feature | Why it 10x's you | Live setup |
 | --- | --- | --- |

@@ -9,7 +9,7 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(gh:*) Bash(uname:*) WebFetc
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
-This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+Use the Paradev MCP tools when they are in your tool list, and the `paradev` CLI otherwise. No MCP tool submits feedback: `paradev feedback submit`, `paradev auth` and `paradev status` are local-only, and `hosts_list` replaces `paradev hosts list`. The docs lookup, the mailto link and the prefilled GitHub issue form work without the CLI.
 
 Check Paradev's documentation for an existing answer first. When feedback still needs reporting, turn it into a short, scannable report and submit it where the user chooses. Treat whatever they wrote after the command as the seed.
 
