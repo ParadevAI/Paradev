@@ -170,6 +170,39 @@ describe("generateSchema", () => {
 		expect(JSON.stringify(again)).toBe(JSON.stringify(schema));
 	});
 
+	it("lists hidden commands and options, marked hidden, only when asked", () => {
+		const root = node("", { hasCommand: false }, [
+			node("auth", {}, [
+				node("mcp-headers", {
+					hidden: true,
+					options: { token: option({ name: "token", isHidden: true }) },
+				}),
+			]),
+		]);
+		const description = { name: "superset", version: "1.2.3", root };
+		expect(generateSchema(description).commands[0]?.commands).toEqual([]);
+		expect(
+			generateSchema(description, { includeHidden: true }).commands[0]
+				?.commands,
+		).toEqual([
+			{
+				path: ["auth", "mcp-headers"],
+				hidden: true,
+				options: [
+					{
+						name: "token",
+						aliases: [],
+						type: "string",
+						required: false,
+						hidden: true,
+					},
+				],
+				args: [],
+				commands: [],
+			},
+		]);
+	});
+
 	it("produces an empty command list for an empty tree", () => {
 		const empty = generateSchema({
 			name: "superset",

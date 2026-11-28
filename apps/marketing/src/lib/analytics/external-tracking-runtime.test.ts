@@ -22,10 +22,12 @@ test("a reloaded runtime module keeps the document's tracker and original fetch"
 	});
 	globals.window = browser;
 	globals.document = Object.assign(new EventTarget(), {
+		cookie: "paradev-consent-region=opt-out",
 		title: "Privacy",
 		referrer: "",
 		hidden: false,
 	});
+	Object.assign(browser, { document: globals.document });
 	try {
 		const path = "./external-tracking-runtime.ts";
 		const first = await import(`${path}?before-refresh`);

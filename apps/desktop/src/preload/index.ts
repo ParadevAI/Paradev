@@ -1,6 +1,7 @@
 import "@sentry/electron/preload";
 
 import { contextBridge, ipcRenderer, webUtils } from "electron";
+import { TELEMETRY_ENABLED_CHANNEL } from "shared/telemetry-ipc";
 import { exposeElectronTRPC } from "trpc-electron/main";
 
 declare const __APP_VERSION__: string;
@@ -20,6 +21,7 @@ const API = {
 	username: process.env.USER,
 	appVersion: __APP_VERSION__,
 	platform: process.platform,
+	telemetryEnabled: ipcRenderer.sendSync(TELEMETRY_ENABLED_CHANNEL) !== false,
 };
 
 // Store mapping of user listeners to wrapped listeners for proper cleanup

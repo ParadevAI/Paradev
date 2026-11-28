@@ -9,7 +9,13 @@ import { requireCloudUnlessHost } from "../../workspace-service-target";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "workspaces_update",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Update workspace",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Rename a cloud workspace (omit hostId), or rename or retag a workspace on a host (see hosts_list / workspaces_list for the hostId). Tags exist only on host workspaces.",
 		inputSchema: {

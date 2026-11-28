@@ -9,7 +9,13 @@ import { triggersInput } from "./triggers";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_update",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Update automation",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: true,
+			idempotentHint: true,
+		},
 		description:
 			"Update an existing automation (name, schedule, triggers, agent, host). Only the fields you pass change, except `triggers`, which replaces the whole trigger set. Caller must be the automation's owner. Use automations_set_prompt to change the prompt body.",
 		inputSchema: {

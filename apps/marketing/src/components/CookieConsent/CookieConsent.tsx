@@ -5,33 +5,43 @@ import { Button } from "@superset/ui/button";
 import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { acceptTracking, declineTracking } from "@/lib/analytics/choice";
+import {
+	type ConsentChoice,
+	readConsentChoice,
+	readConsentRegion,
+} from "@/lib/analytics/consent";
+import type { ConsentRegion } from "@/lib/analytics/consent-region";
+import { OPEN_COOKIE_SETTINGS_EVENT } from "./constants";
 
-import { declineAnalytics } from "@/lib/analytics/decline";
-import { withPosthog } from "@/lib/analytics/lazy";
-import { ANALYTICS_CONSENT_KEY } from "@/lib/constants";
+function storedChoice(): ConsentChoice | null {
+	try {
+		return readConsentChoice();
+	} catch {
+		return null;
+	}
+}
 
 export function CookieConsent() {
 	const [showBanner, setShowBanner] = useState(false);
+	const [region, setRegion] = useState<ConsentRegion>("opt-in");
 
 	useEffect(() => {
-		const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
-		if (consent === null) {
-			setShowBanner(true);
-		}
+		setRegion(readConsentRegion());
+		if (storedChoice() === null) setShowBanner(true);
+		const open = () => setShowBanner(true);
+		window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, open);
+		return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, open);
 	}, []);
 
 	const handleAccept = () => {
-		localStorage.setItem(ANALYTICS_CONSENT_KEY, "accepted");
 		setShowBanner(false);
-		withPosthog((posthog) => posthog.opt_in_capturing());
+		acceptTracking();
 	};
 
-	const handleOptOut = () => {
-		localStorage.setItem(ANALYTICS_CONSENT_KEY, "declined");
-		withPosthog(declineAnalytics);
+	const handleDecline = () => {
+		declineTracking();
 		setShowBanner(false);
-		// The external tracker has no teardown API; discard its listeners and timers.
-		window.location.reload();
 	};
 
 	return (
@@ -46,8 +56,8 @@ export function CookieConsent() {
 				>
 					<p className="min-w-0 flex-1 text-xs leading-snug text-muted-foreground">
 						<Trans>
-							We only collect analytics cookies so we can improve your
-							experience.
+							You decide on cookies and ad measurement; anonymous usage
+							statistics without cookies continue either way.
 						</Trans>{" "}
 						<Link
 							href="/privacy"
@@ -57,8 +67,12 @@ export function CookieConsent() {
 						</Link>
 					</p>
 					<div className="flex shrink-0 gap-2">
-						<Button variant="outline" size="sm" onClick={handleOptOut}>
-							<Trans>Opt-out</Trans>
+						<Button variant="outline" size="sm" onClick={handleDecline}>
+							{region === "opt-in" ? (
+								<Trans>Decline</Trans>
+							) : (
+								<Trans>Opt-out</Trans>
+							)}
 						</Button>
 						<Button variant="outline" size="sm" onClick={handleAccept}>
 							<Trans>Accept</Trans>

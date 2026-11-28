@@ -2,6 +2,7 @@ import { afterEach, describe, expect, mock, test } from "bun:test";
 import { track } from "./index";
 
 const globalWithWindow = globalThis as { window?: unknown };
+const document = { cookie: "paradev-consent-region=opt-out" };
 
 afterEach(() => {
 	delete globalWithWindow.window;
@@ -10,7 +11,7 @@ afterEach(() => {
 describe("track", () => {
 	test("sends a download click to the Reddit Pixel as a Lead", () => {
 		const rdt = mock();
-		globalWithWindow.window = { rdt };
+		globalWithWindow.window = { rdt, document };
 
 		track("download_clicked", { source: "compare", slug: "cursor" });
 
@@ -24,6 +25,7 @@ describe("track", () => {
 	test("does not send a download click to Reddit after the visitor declines analytics", () => {
 		const rdt = mock();
 		globalWithWindow.window = {
+			document,
 			rdt,
 			localStorage: { getItem: () => "declined" },
 		};
@@ -35,7 +37,7 @@ describe("track", () => {
 
 	test("does not send other CTA events to the Reddit Pixel", () => {
 		const rdt = mock();
-		globalWithWindow.window = { rdt };
+		globalWithWindow.window = { rdt, document };
 
 		track("github_clicked", { source: "hero" });
 
@@ -44,7 +46,7 @@ describe("track", () => {
 
 	test("sends a download click to Google Ads as a conversion", () => {
 		const gtag = mock();
-		globalWithWindow.window = { gtag };
+		globalWithWindow.window = { gtag, document };
 
 		track("download_clicked", { source: "conductor" });
 
@@ -60,6 +62,7 @@ describe("track", () => {
 	test("does not send a download click to Google Ads after the visitor declines analytics", () => {
 		const gtag = mock();
 		globalWithWindow.window = {
+			document,
 			gtag,
 			localStorage: { getItem: () => "declined" },
 		};
@@ -71,7 +74,7 @@ describe("track", () => {
 
 	test("does not send other CTA events to Google Ads", () => {
 		const gtag = mock();
-		globalWithWindow.window = { gtag };
+		globalWithWindow.window = { gtag, document };
 
 		track("github_clicked", { source: "hero" });
 
@@ -83,6 +86,7 @@ describe("track", () => {
 		const warn = console.warn;
 		console.warn = () => {};
 		globalWithWindow.window = {
+			document,
 			gtag,
 			rdt,
 			localStorage: {
@@ -105,7 +109,7 @@ describe("track", () => {
 	test("ignores events named after built-in object properties", () => {
 		const gtag = mock();
 		const rdt = mock();
-		globalWithWindow.window = { gtag, rdt };
+		globalWithWindow.window = { gtag, rdt, document };
 
 		track("toString");
 

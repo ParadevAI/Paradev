@@ -7,7 +7,9 @@ allowed-tools: Bash(cua-driver:*) Bash(peekaboo:*) Bash(superset pages publish:*
 
 # Paradev Computer Control
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
+
+The Paradev MCP tools do not drive the desktop. The driver steps need `cua-driver` or `peekaboo` on this machine, not the paradev CLI. Only publishing evidence uses Paradev: `paradev pages publish`, or `pages_publish` when the Paradev MCP tools are in your tool list.
 
 Operate the user's real desktop through an accessibility-first driver: a local
 CLI that exposes accessibility snapshots, exact window screenshots, native menu
@@ -169,7 +171,7 @@ them in a directory beside an `index.html` that lays them out, and publish the
 directory so the images ride along at their relative paths:
 
 ```bash
-superset pages publish ./evidence/ --workspace <id> --title "Export dialog: verified"
+paradev pages publish ./evidence/ --workspace <id> --title "Export dialog: verified"
 ```
 
 A desktop screenshot catches whatever else was on screen: mail, messages, a

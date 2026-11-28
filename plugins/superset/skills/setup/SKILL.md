@@ -7,7 +7,9 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 # Paradev Project Setup
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
+
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
 
 Goal: every new workspace for this repo, a local worktree or a cloud box, comes up ready, with dependencies installed, env present and services reachable, without manual steps.
 
@@ -82,11 +84,11 @@ Rules:
 - Copy secrets and `.env` from the main checkout (`$SUPERSET_ROOT_PATH`) at setup time; never commit them.
 - Personal tweaks go in `config.local.toml`, next to `config.toml` in the main checkout. It is gitignored, applies to every worktree, is merged over the shared file, and the cloud never reads it.
 
-In the cloud, an environment can store its own `config.toml` on Paradev: run `superset environments update <env> --config .paradev/config.toml`, or fill in its fields on the environment's page in Settings → Environments. While the environment has no config of its own, its builds and boxes read this repository file; once it has one, they run that instead, so store it again after changing this file. Leave `[mcp]` out of this file: it belongs in the environment's config only. The superset:environment skill sets one up end to end.
+In the cloud, an environment can store its own `config.toml` on Paradev: run `paradev environments update <env> --config .paradev/config.toml`, or fill in its fields on the environment's page in Settings → Environments. While the environment has no config of its own, its builds and boxes read this repository file; once it has one, they run that instead, so store it again after changing this file. Leave `[mcp]` out of this file: it belongs in the environment's config only. The superset:environment skill sets one up end to end.
 
 In the cloud, `[install]` builds the environment's snapshot, which every new cloud workspace starts from:
 
-- A build runs when someone presses Rebuild environment on the environment's page or runs `superset environments rebuild <env>`, and once a day on paid plans, so the snapshot follows the base branch. A failed build keeps the previous snapshot.
+- A build runs when someone presses Rebuild environment on the environment's page or runs `paradev environments rebuild <env>`, and once a day on paid plans, so the snapshot follows the base branch. A failed build keeps the previous snapshot.
 - It runs the environment's config (or, while the environment has none, the primary repository's `.paradev/config.toml`) from the primary repository's root (or its `cwd`), on the base branch at its latest commit, with the environment's variables and `SUPERSET_ENV=cloud`. There is no workspace: no `SUPERSET_WORKSPACE_NAME`, no database branch, no `.env`.
 - The whole build must finish in 10 minutes, and `[install]` must be idempotent: a build usually runs on top of the previous snapshot.
 - Put everything a box needs that does not depend on one workspace in `[install]` or `[install.cloud]`: dependencies, runtimes (`mise use -g node@22`), CLIs, browsers (`playwright install chromium`), generated code, a seeded local test database. `[setup.cloud]` is only for per-workspace state (a database branch, `.env`), because it runs on every boot and resume.
@@ -99,4 +101,4 @@ Commit the change on a branch. If there is no open pull request for it, offer to
 
 ## 4. Verify for real
 
-Create a throwaway workspace with `superset workspaces create --local --project <id> --name "setup-test" --branch setup-test --base-branch <the branch from step 3>` and watch the "Workspace Setup" terminal output. Fix and repeat until it completes cleanly, then delete the test workspace with `superset workspaces archive --local <id>` and its branch with `git branch -D setup-test`. Setup is not done until a real workspace boots green.
+Create a throwaway workspace with `paradev workspaces create --local --project <id> --name "setup-test" --branch setup-test --base-branch <the branch from step 3>` and watch the "Workspace Setup" terminal output. Fix and repeat until it completes cleanly, then delete the test workspace with `paradev workspaces archive --local <id>` and its branch with `git branch -D setup-test`. Setup is not done until a real workspace boots green.

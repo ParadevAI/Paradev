@@ -7,24 +7,42 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 # Paradev Orchestration
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
 Coordinate terminal agents with Paradev's workspace, agent, and terminal commands. Treat this as a coordinator-driven protocol: Paradev provides session transport, while the coordinator owns task dependencies and completion state.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. Steps marked local-only need the paradev CLI on this machine.
+
+| Step | MCP tool and arguments | CLI |
+| --- | --- | --- |
+| Find hosts | `hosts_list` (each `id`, `name`, `online`) | `hosts list` |
+| Find agents | `agents_list` with `hostId` | `agents list` |
+| Find workspaces | `workspaces_list`; add `hostId` for a host's workspaces | `workspaces list` |
+| Isolated workspace on a host | `workspaces_create` with `hostId`, `projectId`, `name`, `branch` | `workspaces create --host` |
+| Cloud workspace | `workspaces_create` with `environment`, `name`, `branch`; no `hostId`, `projectId`, `pr` or `command` | `workspaces create --environment` |
+| Dispatch | `agents_create` with `workspaceId`, `agent`, `prompt`, and `hostId` for a host workspace | `agents create` |
+| Live terminals | `terminals_list` with `workspaceId` (and `hostId`) | `terminals list` |
+| Read output | `terminals_read` with `workspaceId`, `terminalId`, `maxLines` (and `hostId`) | `terminals read` |
+| Follow up | `terminals_send` with `workspaceId`, `terminalId`, `text` (and `hostId`) | `terminals send` |
+| Close | `terminals_close` with `workspaceId`, `terminalId` (and `hostId`) | `terminals close` |
+| Run summary page | `pages_publish` with `html`, `title`, and `workspaceId` with `entryPath`; pass the returned page id as `pageId` to add a version | `pages publish` |
+
+Local-only: `auth whoami`, `schema`, `hosts add`, `hosts wake`, `agents wait`, `terminals send --keys`, `terminals wait`, `terminals attach`, `snapshot`, `panes`, `notifications show`, `workspaces pull-requests` and `workspaces sleep`. With only the MCP tools, poll `terminals_read` instead of waiting. Key presses (approve, interrupt) are local-only; `terminals_send` sends text and presses Enter after it unless `submit` is false.
+
 ## Establish the control surface
 
-1. Run `superset auth whoami --json`.
-2. Run `superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["terminals"]) | .commands[].path[1]' || superset terminals --help` and require `list`, `read`, `send`, and `close`. The `--help` fallback covers a CLI older than 1.34.0 (no `schema`) and a machine without `jq`.
+1. Run `paradev auth whoami --json`.
+2. Run `paradev schema 2>/dev/null | jq -re '.commands[] | select(.path==["terminals"]) | .commands[].path[1]' || paradev terminals --help` and require `list`, `read`, `send`, and `close`. The `--help` fallback covers a CLI older than 1.34.0 (no `schema`) and a machine without `jq`.
 3. If those commands are absent, run `superset update` and recheck. Do not invent or substitute unsupported orchestration commands. `hosts add`, `terminals send --keys`, `terminals wait`, `terminals attach`, `panes`, and `notifications show` are newer than CLI 1.37.0; when one is still missing after an update, skip it and fall back to `terminals read` and `send`.
 4. Resolve the workspace, host, and terminal-capable agent before dispatching:
 
 ```bash
-superset hosts list --json
-superset agents list --local --json
-superset workspaces list --local --json
+paradev hosts list --json
+paradev agents list --local --json
+paradev workspaces list --local --json
 ```
 
-When coordinating from inside the target workspace, pass `--workspace "$SUPERSET_WORKSPACE_ID" --local` explicitly to agent and terminal commands; they never default `--workspace`. Without `--local` or `--host`, `agents create/read/wait`, terminal, and workspace commands target the cloud when the account has cloud workspaces; `agents list` needs one of them. Pass `--host <id>` consistently for a remote host. If the target host is offline, use `hosts wake <id>` and confirm it is online before dispatching. To run workers on a machine that is not a host yet but that the user can SSH into, `superset hosts add <ssh-target>` installs the CLI there, signs it in, and keeps it running as a user service. It changes that machine, so get the user's go-ahead first and pass `--yes` only after they agree. It needs `ssh <ssh-target>` to already work from here, and on the remote: macOS or glibc Linux (x64 or arm64, not Alpine or Windows), `curl`, and on Linux a valid `/etc/machine-id` and systemd user services. Without `gh` signed in there, private repos will not clone on that host. Running it again on the same target repairs a broken setup, and `superset hosts remove <ssh-target>` undoes it. Do not use `--agent superset`: it creates a chat session, and terminal read/send cannot control it.
+When coordinating from inside the target workspace, pass `--workspace "$SUPERSET_WORKSPACE_ID" --local` explicitly to agent and terminal commands; they never default `--workspace`. Without `--local` or `--host`, `agents create/read/wait`, terminal, and workspace commands target the cloud when the account has cloud workspaces; `agents list` needs one of them. Pass `--host <id>` consistently for a remote host. If the target host is offline, use `hosts wake <id>` and confirm it is online before dispatching. To run workers on a machine that is not a host yet but that the user can SSH into, `paradev hosts add <ssh-target>` installs the CLI there, signs it in, and keeps it running as a user service. It changes that machine, so get the user's go-ahead first and pass `--yes` only after they agree. It needs `ssh <ssh-target>` to already work from here, and on the remote: macOS or glibc Linux (x64 or arm64, not Alpine or Windows), `curl`, and on Linux a valid `/etc/machine-id` and systemd user services. Without `gh` signed in there, private repos will not clone on that host. Running it again on the same target repairs a broken setup, and `paradev hosts remove <ssh-target>` undoes it. Do not use `--agent superset`: it creates a chat session, and terminal read/send cannot control it.
 
 ## Plan the work
 
@@ -80,7 +98,7 @@ These markers are a prompt convention visible in terminal snapshots, not durable
 Launch a terminal agent once and retain its session ID:
 
 ```bash
-superset agents create \
+paradev agents create \
   --workspace <workspace-id> \
   --host <host-id> \
   --agent <preset-or-config-id> \
@@ -92,14 +110,14 @@ superset agents create \
 
 Omit `--effort` or `--attachment` when they are not needed. The result is `{ "kind", "sessionId", "label" }`. Require `kind` to be `terminal`; store `sessionId` as the terminal ID. Launch all ready, independent tasks before monitoring them.
 
-Use `superset workspaces create` first when a worker needs an isolated branch. Do not create parallel editing workers in the same worktree unless their file ownership is explicitly disjoint.
+Use `paradev workspaces create` first when a worker needs an isolated branch. Do not create parallel editing workers in the same worktree unless their file ownership is explicitly disjoint.
 
 ## Monitor and communicate
 
 Reacquire live terminal IDs after losing coordinator context or restarting the host service:
 
 ```bash
-superset terminals list \
+paradev terminals list \
   --workspace <workspace-id> \
   --host <host-id> \
   --json
@@ -110,7 +128,7 @@ Terminal discovery does not identify semantic recipients or agent completion sta
 Read recent output without mutating the session:
 
 ```bash
-superset terminals read \
+paradev terminals read \
   --workspace <workspace-id> \
   --host <host-id> \
   --terminal <terminal-id> \
@@ -123,7 +141,7 @@ The JSON result includes `text`. Inspect it for the completion or blocked envelo
 Send clarification, dependency results, review feedback, or a handoff into the existing session:
 
 ```bash
-superset terminals send \
+paradev terminals send \
   --workspace <workspace-id> \
   --host <host-id> \
   --terminal <terminal-id> \
@@ -133,12 +151,12 @@ superset terminals send \
 
 To answer a permission prompt or interrupt a worker, send key presses instead of text: `--keys enter` approves, and `--keys esc` interrupts the agent's turn. Avoid `ctrl+c` on an agent, since some agents quit on it. `--keys` takes a comma-separated list (`--keys down,enter`). Read the screen first so you know which prompt you are answering.
 
-To wait for something on the screen that is not an agent state, such as a dev server's "listening on", use `superset terminals wait --terminal <terminal-id> --match "<regex>"` with the same workspace and host flags.
+To wait for something on the screen that is not an agent state, such as a dev server's "listening on", use `paradev terminals wait --terminal <terminal-id> --match "<regex>"` with the same workspace and host flags.
 
 Wait for a worker instead of polling its screen:
 
 ```bash
-superset agents wait \
+paradev agents wait \
   --workspace <workspace-id> \
   --host <host-id> \
   --terminal <terminal-id> \
@@ -149,13 +167,13 @@ superset agents wait \
 
 `settled` returns once the agent finishes its turn or needs input; the JSON `state` says which (`idle` or `blocked`). It exits 1 on timeout and at once if the agent exits. Keep timeouts short and wait on each running worker in turn, so progress and user updates stay visible between waits. Then read the screen for the envelope as above. To send a follow-up and wait for the turn it starts, add `--wait` to `terminals send`.
 
-If `superset agents wait` is not available (an older CLI), poll `terminals read` at a measured cadence instead.
+If `paradev agents wait` is not available (an older CLI), poll `terminals read` at a measured cadence instead.
 
-To see every worker at once (each terminal, its agent and state), read the host in one call with `superset snapshot --host <host-id> --json`. `superset agents explain` says why a worker shows the state it does.
+To see every worker at once (each terminal, its agent and state), read the host in one call with `paradev snapshot --host <host-id> --json`. `paradev agents explain` says why a worker shows the state it does.
 
-When the user wants to watch workers in the desktop app, lay them out with `superset panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. Add `--sidebar` to `new-tab` to watch a worker in the right sidebar beside your own work, and `panes open changes --workspace <id>` to show its diff there. They work only for workspaces on the machine running the desktop app. For anything beyond this (resizing, swapping, moving, closing, or building a full layout), use the `superset:panes` skill.
+When the user wants to watch workers in the desktop app, lay them out with `paradev panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. Add `--sidebar` to `new-tab` to watch a worker in the right sidebar beside your own work, and `panes open changes --workspace <id>` to show its diff there. They work only for workspaces on the machine running the desktop app. For anything beyond this (resizing, swapping, moving, closing, or building a full layout), use the `superset:panes` skill.
 
-If the user wants to take over a worker from their own shell, give them the command rather than running it: `superset terminals attach --workspace <id> --terminal <terminal-id>` (add `--ssh <user@machine>` for a worker on another machine). It needs an interactive terminal, and `Ctrl+]` detaches without stopping the worker.
+If the user wants to take over a worker from their own shell, give them the command rather than running it: `paradev terminals attach --workspace <id> --terminal <terminal-id>` (add `--ssh <user@machine>` for a worker on another machine). It needs an interactive terminal, and `Ctrl+]` detaches without stopping the worker.
 
 ## Advance the workflow
 
@@ -172,12 +190,12 @@ For isolated branches, ask each implementation worker to commit or otherwise pro
 
 Summarize each task's outcome, workspace/branch, files changed, checks, blockers, and integration order. Distinguish worker claims from checks the coordinator independently ran.
 
-For cloud workers, `superset workspaces pull-requests --all --json` lists every pull request they opened in one call. `superset workspaces sleep <id>` stops a finished worker's sandbox instead of archiving it; opening it wakes it.
+For cloud workers, `paradev workspaces pull-requests --all --json` lists every pull request they opened in one call. `paradev workspaces sleep <id>` stops a finished worker's sandbox instead of archiving it; opening it wakes it.
 
 A long run usually finishes while the user is looking elsewhere. Tell them with a desktop notification; run from a Paradev terminal, clicking it brings them back to the coordinator:
 
 ```bash
-superset notifications show "Parallel run finished" --body "4 done, 1 blocked" --sound
+paradev notifications show "Parallel run finished" --body "4 done, 1 blocked" --sound
 ```
 
 A run across several workspaces is worth a page. One link carrying every outcome, branch, and
@@ -185,7 +203,7 @@ check reads better than a long terminal block, it survives the session, and revi
 a comment to the row they disagree with:
 
 ```bash
-superset pages publish run-summary.html --workspace <id> --title "Parallel run: auth refactor"
+paradev pages publish run-summary.html --workspace <id> --title "Parallel run: auth refactor"
 ```
 
 Offer it and publish only once the user agrees. A page is persistent and
@@ -194,7 +212,7 @@ org-visible by default, and a run summary quotes whatever the workers printed.
 Keep completed terminals available when the user may want to inspect or continue them. Close a terminal only when cleanup is requested or clearly part of the workflow:
 
 ```bash
-superset terminals close \
+paradev terminals close \
   --workspace <workspace-id> \
   --host <host-id> \
   --terminal <terminal-id> \

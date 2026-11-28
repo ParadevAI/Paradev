@@ -2489,6 +2489,9 @@ msgstr "에이전트가 조작하는 미리보기"
 msgid "Agents"
 msgstr "에이전트"
 
+msgid "Agents and workspaces"
+msgstr "에이전트 및 워크스페이스"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "에이전트가 {0}의 도구에 접근할 수 없습니다"
@@ -3084,6 +3087,9 @@ msgstr "API 환산"
 
 msgid "API-equivalent cost"
 msgstr "API 환산 비용"
+
+msgid "App"
+msgstr "앱"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "스크립트 변환하기"
 msgid "Converting to draft…"
 msgstr "초안으로 전환하는 중…"
 
+msgid "Cookie settings"
+msgstr "쿠키 설정"
+
 msgid "cookies and site data"
 msgstr "쿠키 및 사이트 데이터"
 
@@ -6598,6 +6607,9 @@ msgstr "채팅 설정을 업데이트할 수 없습니다"
 msgid "Couldn't update the queue"
 msgstr "대기열을 업데이트할 수 없습니다"
 
+msgid "Couldn't update the usage data setting"
+msgstr "사용 데이터 설정을 업데이트하지 못했습니다"
+
 msgid "Couldn't update thread"
 msgstr "스레드를 업데이트하지 못했습니다"
 
@@ -7081,6 +7093,9 @@ msgstr "실패한 실행 디버그 및 함수 재실행"
 
 msgid "Debug with production stack traces"
 msgstr "프로덕션 스택 트레이스로 디버깅"
+
+msgid "Decline"
+msgstr "거부"
 
 msgid "default"
 msgstr "기본"
@@ -7675,6 +7690,9 @@ msgstr "Discord와 GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "네트워크에 있는 개발 서버를 찾아 연결합니다."
 
+msgid "Discovery index"
+msgstr "디스커버리 인덱스"
+
 msgid "Disk version"
 msgstr "디스크 버전"
 
@@ -7982,6 +8000,9 @@ msgstr "각 좌석은 플랜의 시간을 팀 전체가 공유하는 하나의 �
 
 msgid "Each session resumes where it left off."
 msgstr "각 세션은 중단된 지점부터 이어집니다."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "각 스킬은 작업에 필요할 때 코딩 에이전트가 불러오는 SKILL.md 파일입니다. 에이전트는 디스커버리 인덱스에서 모든 스킬을 찾습니다."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "빌드가 성공할 때마다 스냅샷이 저장됩니다. 새 워크스페이스는 현재 스냅샷에서 시작하며, 이전 스냅샷으로 복원할 수 있습니다."
@@ -9988,6 +10009,9 @@ msgstr "도움말"
 
 msgid "Help & Docs"
 msgstr "도움말 및 문서"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "사용 데이터와 충돌 보고서를 보내 Paradev 개선에 도움을 주세요. <0>자세히 알아보기<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "끔"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "환경에 DO_NOT_TRACK이 설정되어 있어 꺼져 있습니다."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100개 이상의 코딩 에이전트를 병렬로 실행하는 앱, {0}의 공식 문서입니다."
@@ -15122,6 +15149,9 @@ msgstr "Paradev가 예약한 이름이라 워크스페이스에 전달되지 않
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. {trustHost}에서 보고서를 요청하고 보안 문서를 확인하세요."
+
+msgid "Paradev Skills"
+msgstr "Paradev 스킬"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev는 2025년 11월 해커톤 프로젝트로 시작했습니다. worktree를 관리하는 간단한 데스크톱 앱이었습니다."
@@ -17134,6 +17164,9 @@ msgstr "지금 다시 시작하면 {accountLabel}(으)로 이동하며, 각 세�
 msgid "Restart onboarding"
 msgstr "온보딩 다시 시작"
 
+msgid "Restart Paradev to apply"
+msgstr "적용하려면 Paradev를 다시 시작하세요"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
@@ -18638,6 +18671,9 @@ msgstr "페이지 공유(공개)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHub 저장소에서 플러그인을 공유하세요. git 태그로 릴리스를 고정합니다."
 
+msgid "Share usage data"
+msgstr "사용 데이터 공유"
+
 msgid "Share via…"
 msgstr "공유 방법…"
 
@@ -19134,6 +19170,9 @@ msgstr "에이전트를 위한 스킬과 MCP 도구. 직접 만든 플러그인�
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "스킬은 Paradev 플러그인에 포함되어 있으며 사용하는 모든 에이전트에서 자동으로 최신 상태로 유지됩니다. 미리 보려면 클릭하세요."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "에이전트에게 Paradev 사용법을 알려 주는 스킬."
 
 msgid "Skin Tone"
 msgstr "피부색"
@@ -22769,9 +22808,6 @@ msgstr "2026년이나 2027년에 완전 자율 주행이 실현되리라고 예�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "{hostName}을(를) 찾았습니다. 거기에서 원격 액세스를 켜면 완료됩니다."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "사용 경험 개선을 위한 분석 쿠키만 수집합니다."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "코딩 에이전트 군단을 운영할 수 있도록 {amount} 규모의 시드 라운드 투자를 유치했습니다."
 
@@ -23458,6 +23494,9 @@ msgstr "접근 권한은 사용자가 관리합니다"
 
 msgid "You created this channel on {created}."
 msgstr "{created}에 이 채널을 만들었습니다."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "쿠키와 광고 측정은 직접 결정하실 수 있으며, 쿠키 없는 익명 사용 통계는 선택과 관계없이 계속됩니다."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} 인증 요청을 거부했습니다."

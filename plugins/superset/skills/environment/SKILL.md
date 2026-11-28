@@ -2,10 +2,14 @@
 name: environment
 description: Set up a Paradev (formerly Superset) cloud environment end to end from this machine - work out what the repositories need, set the environment's variables, boot a cloud box on it, get the project running there, store the environment's config.toml, and build it until new cloud workspaces start ready. Use when the user asks to set up, onboard, or finish a cloud environment, or when a setup session hands you an environment ID.
 argument-hint: environment ID, or the repositories to set up
-allowed-tools: Bash(superset:*)
+allowed-tools: Bash(superset:*) Bash(paradev:*)
 ---
 
 # Cloud environment setup
+
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
+
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. With the MCP tools, step 4 is `workspaces_create` with `environment`, `name` and `machineSize: "large"`, then `workspaces_list` until the workspace's `status` is `awake`, then `terminals_create` with `workspaceId` and `command`, `terminals_read`, and `terminals_send`. Every `environments`, `connections` and `integrations` command, `terminals wait` and `workspaces get` are local-only: they need the paradev CLI on this machine.
 
 Goal: a cloud environment that new cloud workspaces boot straight into, with dependencies installed, variables set, and services starting on boot. Usually you run on the user's machine with their Paradev login and build the environment by driving a cloud box from there. If you are already inside a cloud box on the environment, read "Inside a cloud box" first: several steps work differently there.
 
@@ -13,17 +17,17 @@ Terms you will use with the user:
 
 - **Environment**: what a cloud workspace boots from. It has repositories (the first is primary), variables, a region, and a visibility.
 - **Box**: one cloud workspace running on the environment.
-- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud. While an environment has none, they read the primary repository's own `.paradev/config.toml` instead. `superset environments update --config` sets it.
-- **Build**: runs the config's `[install]` on a fresh box and saves the result as the snapshot new workspaces start from. `superset environments rebuild` starts one.
+- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud. While an environment has none, they read the primary repository's own `.paradev/config.toml` instead. `paradev environments update --config` sets it.
+- **Build**: runs the config's `[install]` on a fresh box and saves the result as the snapshot new workspaces start from. `paradev environments rebuild` starts one.
 
 ## Inside a cloud box
 
-A setup session often starts you in a box on the environment; its prompt says so. There the `superset` CLI acts for the box, and a box can't change environments: `superset environments` offers only `list` and `secrets list`. Follow the steps below with these changes:
+A setup session often starts you in a box on the environment; its prompt says so. There the `paradev` CLI acts for the box, and a box can't change environments: `paradev environments` offers only `list` and `secrets list`. Follow the steps below with these changes:
 
 - Steps 0 and 1: skip them. GitHub access already works in the box, and you were given the environment.
 - Step 3: you can't set variables. List the keys the code needs and where it reads them, and ask the user to add them under Variables on the environment's page (Settings, Environments).
 - Step 4: don't create another box. Work in this one with your own terminal.
-- Storing the config: give the user the file and ask them to run `superset environments update <environment-id> --config <file>` on their own machine. The environment's page has fields for the install and start scripts, terminals, ports and MCP, not a box for the file, so settings without a field (`[archive]`, `cwd`, cloud tables) need the command. Or commit the file as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request. The cloud reads the repository's file only while the environment has no config of its own.
+- Storing the config: give the user the file and ask them to run `paradev environments update <environment-id> --config <file>` on their own machine. The environment's page has fields for the install and start scripts, terminals, ports and MCP, not a box for the file, so settings without a field (`[archive]`, `cwd`, cloud tables) need the command. Or commit the file as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request. The cloud reads the repository's file only while the environment has no config of its own.
 - Step 5: once the config is stored or merged, ask the user to press Rebuild environment on the environment's page.
 - Step 6: ask the user to rename the environment and choose who can use it on its page. **Never archive this box: it is the one you are running in.** Skip starting a fresh workspace, and write **Try it:** in the final message as what the user does next.
 
@@ -32,7 +36,7 @@ A setup session often starts you in a box on the environment; its prompt says so
 Do not install or upgrade these:
 
 - Node 24, Bun, Python 3 (pip, pipx, venv), a JDK, build-essential, clang, git, git-lfs, `gh`, and Docker with Compose. They come with the image, and a build keeps the versions it was built with.
-- Chrome, Claude Code, Codex and the `superset` CLI. Every boot updates them to the platform's current release, so a build does not freeze their versions.
+- Chrome, Claude Code, Codex and the `paradev` CLI. Every boot updates them to the platform's current release, so a build does not freeze their versions.
 - A Linux desktop (XFCE over VNC, Xvfb), ffmpeg and ImageMagick.
 - GitHub access for git and `gh`. Do not run `gh auth login` or put a token in the box.
 
@@ -40,32 +44,32 @@ There is no macOS: no Xcode, iOS simulator or Safari. If the project needs one, 
 
 ## 0. Connect GitHub
 
-Boxes check out repositories through the organization's Paradev GitHub App. Run `superset integrations github status`. If the App is not installed, run `superset integrations github connect` and ask the user to finish the install in the browser. It needs the Pro plan and a GitHub account that can install apps on the repositories' owner.
+Boxes check out repositories through the organization's Paradev GitHub App. Run `paradev integrations github status`. If the App is not installed, run `paradev integrations github connect` and ask the user to finish the install in the browser. It needs the Pro plan and a GitHub account that can install apps on the repositories' owner.
 
-`superset environments repos` lists the repositories the App can see; only these are valid for `--repo`. If a repository the project needs is missing, ask the user to add it to the App's repository access in GitHub, or to ask whoever manages that installation.
+`paradev environments repos` lists the repositories the App can see; only these are valid for `--repo`. If a repository the project needs is missing, ask the user to add it to the App's repository access in GitHub, or to ask whoever manages that installation.
 
-Then run `superset connections github status`. Without a personal connection, boxes push and open pull requests as the App. Offer `superset connections github connect` so they act as the user instead.
+Then run `paradev connections github status`. Without a personal connection, boxes push and open pull requests as the App. Offer `paradev connections github connect` so they act as the user instead.
 
 ## 1. Find the environment
 
-If you were given an environment ID, run `superset environments list --json` and confirm it exists. Otherwise, look there for a personal environment on the same repositories from an earlier session and offer to continue it. Create one only if there is none:
+If you were given an environment ID, run `paradev environments list --json` and confirm it exists. Otherwise, look there for a personal environment on the same repositories from an earlier session and offer to continue it. Create one only if there is none:
 
 ```bash
-superset environments create --name <name> --repo <owner/name> [--repo ...] --scope personal
+paradev environments create --name <name> --repo <owner/name> [--repo ...] --scope personal
 ```
 
 A new environment is named after its primary repository until you rename it in step 6.
 
 ## 2. Intake
 
-Read each repository before asking anything. Use the local clone when there is one (`superset projects list`), otherwise the GitHub API. Check:
+Read each repository before asking anything. Use the local clone when there is one (`paradev projects list`), otherwise the GitHub API. Check:
 
 - the README, package manifests and lockfiles (they decide the package manager and install command);
 - CI config (it is the most honest list of what a working build needs);
 - `.env.example` and the repository's config folder (`.paradev/`, or `.superset/` in repos set up before the rename): a `config.toml` there is a good start for the environment's config, and the cloud reads it only while the environment has no config of its own;
 - services the project expects, such as Postgres, Redis or Docker Compose.
 
-Then ask only what you could not infer: missing secret values and extra repositories. Check extra repositories against `superset environments repos` as in step 0.
+Then ask only what you could not infer: missing secret values and extra repositories. Check extra repositories against `paradev environments repos` as in step 0.
 
 **Confirm the repository list with the user before the first build in step 5.** An environment's repositories can't change after it is created; other repositories need a new environment.
 
@@ -74,8 +78,8 @@ Then ask only what you could not infer: missing secret values and extra reposito
 Ask the user before you read any local `.env*` file, and name the files you would read. Only with a yes, read them and list the keys you would set, never the values, and set only the keys the user confirms:
 
 ```bash
-printf %s "$VALUE" | superset environments secrets set --environment <environment-id> KEY
-superset environments secrets set --environment <environment-id> --env-file path/to/.env
+printf %s "$VALUE" | paradev environments secrets set --environment <environment-id> KEY
+paradev environments secrets set --environment <environment-id> --env-file path/to/.env
 ```
 
 Use `--env-file` only when the user confirms every key in that file. If the user says no, ask for each value the code needs instead.
@@ -85,18 +89,18 @@ Never pass a value with `--body`: it ends up in the process list and the shell h
 ## 4. Boot a box and get it running
 
 ```bash
-superset workspaces create --environment <environment-id> --name "Set up <name>" --machine-size large
+paradev workspaces create --environment <environment-id> --name "Set up <name>" --machine-size large
 ```
 
 Always pass `--machine-size large`. The default size runs out of memory on many production builds and makes every install and lint slow.
 
-The command returns while the box is still starting. Poll `superset workspaces get <workspace-id> --json` until `status` is `awake` (`ready` from a CLI older than 2.0.10); stop and report if it is `failed`. Then work inside the box through terminals:
+The command returns while the box is still starting. Poll `paradev workspaces get <workspace-id> --json` until `status` is `awake` (`ready` from a CLI older than 2.0.10); stop and report if it is `failed`. Then work inside the box through terminals:
 
 ```bash
-superset terminals create --workspace <workspace-id> --command "<cmd>"
-superset terminals wait --workspace <workspace-id> --terminal <terminal-id> --match "<regex>"
-superset terminals read --workspace <workspace-id> --terminal <terminal-id> --max-lines 200
-superset terminals send --workspace <workspace-id> --terminal <terminal-id> --text "<input>"
+paradev terminals create --workspace <workspace-id> --command "<cmd>"
+paradev terminals wait --workspace <workspace-id> --terminal <terminal-id> --match "<regex>"
+paradev terminals read --workspace <workspace-id> --terminal <terminal-id> --max-lines 200
+paradev terminals send --workspace <workspace-id> --terminal <terminal-id> --text "<input>"
 ```
 
 Install toolchains and dependencies, start the services, and check that the project builds and its tests or dev server run.
@@ -112,7 +116,7 @@ Write what worked into a `config.toml` on this machine, starting from the reposi
 Show the user the file, then store it as the environment's config:
 
 ```bash
-superset environments update <environment-id> --config path/to/config.toml
+paradev environments update <environment-id> --config path/to/config.toml
 ```
 
 The server refuses a file that does not parse and says why. New workspaces and the next build use the stored config; a running box picks it up when it restarts.
@@ -124,18 +128,18 @@ Inside a cloud box you can't run this; see "Inside a cloud box".
 When the config's `[install]` works on the box, build the environment from it:
 
 ```bash
-superset environments rebuild <environment-id> --wait
+paradev environments rebuild <environment-id> --wait
 ```
 
-A build checks out the repositories on a fresh box, runs `[install]`, and saves the result as the snapshot new workspaces start from. It exits 1 with the error when the build fails; read the full history with `superset environments builds <environment-id>`, fix the config, store it again, and rebuild. Builds come with the Team and Ultra plans; if the server refuses for the plan, tell the user and stop. Rebuild after each change to `[install]` rather than once at the end, so a later failure loses little.
+A build checks out the repositories on a fresh box, runs `[install]`, and saves the result as the snapshot new workspaces start from. It exits 1 with the error when the build fails; read the full history with `paradev environments builds <environment-id>`, fix the config, store it again, and rebuild. Builds come with the Team and Ultra plans; if the server refuses for the plan, tell the user and stop. Rebuild after each change to `[install]` rather than once at the end, so a later failure loses little.
 
 ## 6. Finish
 
-1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
-2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. To keep it private: `superset environments update <environment-id> --scope personal` (an environment you were given may already be shared).
+1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `paradev environments update <environment-id> --name "<name>"`.
+2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `paradev environments update <environment-id> --scope organization`. To keep it private: `paradev environments update <environment-id> --scope personal` (an environment you were given may already be shared).
 3. The environment's config drives only the cloud. Offer to commit the same file, without its `[mcp]` table, as the repository's `.paradev/config.toml` so local workspaces get it too, and ask before pushing.
-4. Archive the setup box: `superset workspaces archive <workspace-id>`.
-5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `awake` (or `ready`; stop and report if it is `failed`), then check that `setup` finished and the default terminals run. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
+4. Archive the setup box: `paradev workspaces archive <workspace-id>`.
+5. Start a fresh workspace from the environment, to show it comes up ready: `paradev workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `awake` (or `ready`; stop and report if it is `failed`), then check that `setup` finished and the default terminals run. Get its `webUrl` from `paradev workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
 6. End with a final message in this structure, and nothing after it. Keep each section short. Write "none" for an empty section; do not drop it.
 
 ```markdown

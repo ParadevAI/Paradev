@@ -8,7 +8,12 @@ import { resolveTracker, trackerInput, withLookupHint } from "../tracker";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "tasks_statuses_list",
-		annotations: { readOnlyHint: true },
+		title: "List task statuses",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: true,
+		},
 		description:
 			"List the available task statuses in the active organization, or each Linear team's statuses when the organization tracks tasks in Linear. Use this to look up a status by name (e.g. 'In Progress', 'Done') before creating or updating a task.",
 		inputSchema: {

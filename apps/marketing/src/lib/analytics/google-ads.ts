@@ -1,4 +1,4 @@
-import { hasDeclinedAnalytics } from "./consent";
+import { canTrack } from "./consent";
 
 declare global {
 	interface Window {
@@ -11,15 +11,15 @@ export const GOOGLE_ADS_DOWNLOAD_CONVERSION =
 	"AW-18209336001/XAEwCNPrxrQdEMHV8epD";
 
 /**
- * Report a conversion to Google Ads through the gtag.js tag loaded in the
- * root layout. No-ops on the server, before `window.gtag` exists, or after
- * the visitor declines analytics.
+ * Report a conversion to Google Ads through the gtag.js tag loaded by
+ * AdTrackers. No-ops on the server, before `window.gtag` exists, or while
+ * consent does not allow tracking.
  */
 export function trackGoogleAdsConversion(sendTo: string): void {
 	if (
 		typeof window === "undefined" ||
 		typeof window.gtag !== "function" ||
-		hasDeclinedAnalytics()
+		!canTrack()
 	) {
 		return;
 	}

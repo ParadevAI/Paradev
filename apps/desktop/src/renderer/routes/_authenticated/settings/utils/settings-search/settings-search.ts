@@ -53,6 +53,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_PARADEV_ANYWHERE: "behavior-paradev-anywhere",
 	USAGE_RAIL_RINGS: "usage-rail-rings",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
+	BEHAVIOR_TELEMETRY: "behavior-telemetry",
 
 	BROWSER_HOMEPAGE: "browser-homepage",
 	BROWSER_IMPORT_HISTORY: "browser-import-history",
@@ -867,6 +868,24 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"storage",
 			"base",
 			"default",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.BEHAVIOR_TELEMETRY,
+		section: "behavior",
+		title: "Share usage data",
+		description: "Help improve Paradev by sending usage data and crash reports",
+		keywords: [
+			"telemetry",
+			"analytics",
+			"usage data",
+			"privacy",
+			"tracking",
+			"do not track",
+			"crash reports",
+			"error reports",
+			"session recording",
+			"opt out",
 		],
 	},
 	{

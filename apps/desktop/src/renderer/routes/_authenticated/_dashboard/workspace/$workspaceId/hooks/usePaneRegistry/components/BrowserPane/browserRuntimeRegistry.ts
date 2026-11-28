@@ -17,6 +17,7 @@ const RAISED_OVERLAY_Z = "32";
 
 export interface BrowserRuntimeState {
 	currentUrl: string;
+	hasCommittedPage: boolean;
 	pageTitle: string;
 	faviconUrl: string | null;
 	isLoading: boolean;
@@ -75,6 +76,7 @@ const UNLOAD_INFO_TIMEOUT_MS = 5_000;
 
 const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 	currentUrl: "about:blank",
+	hasCommittedPage: false,
 	pageTitle: "",
 	faviconUrl: null,
 	isLoading: false,
@@ -458,6 +460,7 @@ export class BrowserRuntimeRegistryImpl {
 		const handleDidNavigate = (e: Electron.DidNavigateEvent) => {
 			this.setState(paneId, {
 				currentUrl: e.url ?? "",
+				hasCommittedPage: !!e.url && e.url !== "about:blank",
 				pageTitle: "",
 				faviconUrl: null,
 				isLoading: false,

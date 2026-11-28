@@ -2489,6 +2489,9 @@ msgstr "Ajanın yönettiği önizlemeler"
 msgid "Agents"
 msgstr "Ajanlar"
 
+msgid "Agents and workspaces"
+msgstr "Ajanlar ve çalışma alanları"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Ajanlar {0} araçlarına erişemiyor"
@@ -3084,6 +3087,9 @@ msgstr "API eşdeğeri"
 
 msgid "API-equivalent cost"
 msgstr "API eşdeğeri maliyet"
+
+msgid "App"
+msgstr "Uygulama"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "Betiklerinizi dönüştürün"
 msgid "Converting to draft…"
 msgstr "Taslağa dönüştürülüyor…"
 
+msgid "Cookie settings"
+msgstr "Çerez ayarları"
+
 msgid "cookies and site data"
 msgstr "çerezler ve site verileri"
 
@@ -6598,6 +6607,9 @@ msgstr "Sohbet ayarı güncellenemedi"
 msgid "Couldn't update the queue"
 msgstr "Kuyruk güncellenemedi"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Kullanım verisi ayarı güncellenemedi"
+
 msgid "Couldn't update thread"
 msgstr "Konu güncellenemedi"
 
@@ -7081,6 +7093,9 @@ msgstr "Başarısız çalıştırmalarda hata ayıklayın ve fonksiyonları yeni
 
 msgid "Debug with production stack traces"
 msgstr "Üretim yığın izleriyle hata ayıklayın"
+
+msgid "Decline"
+msgstr "Reddet"
 
 msgid "default"
 msgstr "varsayılan"
@@ -7675,6 +7690,9 @@ msgstr "Discord ve GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Ağınızdaki geliştirme sunucularını bulun ve bağlanın."
 
+msgid "Discovery index"
+msgstr "Keşif dizini"
+
 msgid "Disk version"
 msgstr "Diskteki sürüm"
 
@@ -7982,6 +8000,9 @@ msgstr "Her koltuk, planının saatlerini tüm ekibinizin paylaştığı tek bir
 
 msgid "Each session resumes where it left off."
 msgstr "Her oturum kaldığı yerden devam eder."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Her beceri, bir görev gerektirdiğinde kodlama ajanının yüklediği bir SKILL.md dosyasıdır. Ajanlar hepsini keşif dizininde bulur."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Her başarılı derleme bir anlık görüntü kaydeder. Yeni çalışma alanları geçerli olandan başlar ve daha eskisini geri yükleyebilirsiniz."
@@ -9988,6 +10009,9 @@ msgstr "Yardım"
 
 msgid "Help & Docs"
 msgstr "Yardım ve belgeler"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Kullanım verileri ve çökme raporları göndererek Paradev'i geliştirmemize yardım edin. <0>Daha fazla bilgi<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Kapalı"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Ortamınızda DO_NOT_TRACK ayarlı olduğu için kapalı."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100'den fazla kodlama ajanını paralel çalıştıran {0} uygulamasının resmi belgeleri."
@@ -15122,6 +15149,9 @@ msgstr "Paradev bu adı ayırır, bu yüzden çalışma alanları onu almaz. Sil
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
+
+msgid "Paradev Skills"
+msgstr "Paradev Becerileri"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev, Kasım 2025'te bir hackathon projesi olarak başladı. Worktree yönetimi için basit bir masaüstü uygulamasıydı."
@@ -17134,6 +17164,9 @@ msgstr "Şimdi yeniden başlatarak {accountLabel} hesabına taşıyın; her otur
 msgid "Restart onboarding"
 msgstr "Başlangıç adımlarını yeniden başlat"
 
+msgid "Restart Paradev to apply"
+msgstr "Uygulamak için Paradev'i yeniden başlatın"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Çalışan {providerLabel} ajanları yeniden başlatılsın mı?"
 
@@ -18638,6 +18671,9 @@ msgstr "Sayfayı paylaş (herkese açık)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Eklentileri bir GitHub deposundan paylaşın. Sürümleri git etiketleriyle sabitleyin."
 
+msgid "Share usage data"
+msgstr "Kullanım verilerini paylaş"
+
 msgid "Share via…"
 msgstr "Şununla paylaş…"
 
@@ -19134,6 +19170,9 @@ msgstr "Ajanlarınız için beceriler ve MCP araçları. Kendi eklentinizi gönd
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Beceriler Paradev eklentisiyle gelir ve kullandığınız her ajanda otomatik olarak güncel tutulur. Önizlemek için birine tıklayın."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Ajanlara Paradev kullanmayı öğreten beceriler."
 
 msgid "Skin Tone"
 msgstr "Ten Rengi"
@@ -22769,9 +22808,6 @@ msgstr "2026 veya 2027'de tam otonomi öngörmüyoruz. Dürüst bilinmezler şun
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "{hostName} bulundu. Tamamlamak için orada uzaktan erişimi açın."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Deneyiminizi iyileştirebilmek için yalnızca analiz çerezleri topluyoruz."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Bir kodlama ajanı ordusu yönetmenize yardımcı olmak için {amount} tutarında bir tohum yatırım turu tamamladık."
 
@@ -23458,6 +23494,9 @@ msgstr "Erişimi siz kontrol edersiniz"
 
 msgid "You created this channel on {created}."
 msgstr "Bu kanalı {created} tarihinde oluşturdunuz."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Çerezlere ve reklam ölçümüne siz karar verirsiniz; çerez kullanmayan anonim kullanım istatistikleri her durumda devam eder."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} yetkilendirme isteğini reddettiniz."

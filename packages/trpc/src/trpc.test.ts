@@ -241,3 +241,43 @@ describe("a caller outside the organization it asks for", () => {
 		}
 	});
 });
+
+describe("usage telemetry for a client call", () => {
+	const capturedFor = async (headers: Record<string, string>) => {
+		const events: unknown[] = [];
+		const realCapture = posthog.capture;
+		const realRandom = Math.random;
+		posthog.capture = ((event: unknown) => {
+			events.push(event);
+		}) as typeof posthog.capture;
+		Math.random = () => 0;
+		try {
+			await createCallerFactory(router)(
+				createTRPCContext({
+					session: session as never,
+					auth: {} as never,
+					headers: new Headers(headers),
+				}),
+			).user.myOrganization();
+		} finally {
+			posthog.capture = realCapture;
+			Math.random = realRandom;
+		}
+		return events.length;
+	};
+
+	test("is recorded for a client that does not say telemetry is off", async () => {
+		expect(await capturedFor({ "x-superset-client": "desktop/2.0.12" })).toBe(
+			1,
+		);
+	});
+
+	test("is not recorded for a client whose telemetry setting is off", async () => {
+		expect(
+			await capturedFor({
+				"x-superset-client": "desktop/2.0.12",
+				"x-superset-telemetry": "off",
+			}),
+		).toBe(0);
+	});
+});

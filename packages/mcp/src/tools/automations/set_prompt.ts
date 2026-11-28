@@ -6,7 +6,13 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_set_prompt",
-		annotations: { destructiveHint: false, idempotentHint: true },
+		title: "Set automation prompt",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Replace the full prompt body (markdown) for one automation. The new prompt fully overwrites the old one — fetch with automations_get_prompt first if you only want to edit. Caller must be the automation's owner.",
 		inputSchema: {

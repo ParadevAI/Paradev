@@ -1,3 +1,4 @@
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
 import { resolveProjectConfigDirName } from "@superset/shared/project-config/dir";
 import type { ApiClient } from "../../types";
 import { describeProjectConfigSources } from "./config";
@@ -36,7 +37,7 @@ export function trackConfigResolved({
 				`[config] ${repoPath} uses ${resolveProjectConfigDirName(repoPath)}/config.json (${legacySources.join(", ")})`,
 			);
 		}
-		if (!api) return;
+		if (!api || !isTelemetryEnabled()) return;
 		void api.analytics.captureEvent
 			.mutate({
 				source: "host_service",

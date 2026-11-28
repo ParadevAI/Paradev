@@ -2489,6 +2489,9 @@ msgstr "Previews aangestuurd door agents"
 msgid "Agents"
 msgstr "Agents"
 
+msgid "Agents and workspaces"
+msgstr "Agents en werkruimtes"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agents kunnen de tools van {0} niet bereiken"
@@ -3084,6 +3087,9 @@ msgstr "API-equivalent"
 
 msgid "API-equivalent cost"
 msgstr "API-equivalente kosten"
+
+msgid "App"
+msgstr "App"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "Zet je scripts om"
 msgid "Converting to draft…"
 msgstr "Omzetten naar concept…"
 
+msgid "Cookie settings"
+msgstr "Cookie-instellingen"
+
 msgid "cookies and site data"
 msgstr "cookies en sitegegevens"
 
@@ -6598,6 +6607,9 @@ msgstr "Kan de Chat-instelling niet bijwerken"
 msgid "Couldn't update the queue"
 msgstr "Kan de wachtrij niet bijwerken"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Kan de instelling voor gebruiksgegevens niet bijwerken"
+
 msgid "Couldn't update thread"
 msgstr "Kan thread niet bijwerken"
 
@@ -7081,6 +7093,9 @@ msgstr "Mislukte runs debuggen en functies opnieuw uitvoeren"
 
 msgid "Debug with production stack traces"
 msgstr "Debug met stack traces uit productie"
+
+msgid "Decline"
+msgstr "Weigeren"
 
 msgid "default"
 msgstr "standaard"
@@ -7675,6 +7690,9 @@ msgstr "Discord en GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Ontwikkelservers op je netwerk vinden en ermee verbinden."
 
+msgid "Discovery index"
+msgstr "Discovery-index"
+
 msgid "Disk version"
 msgstr "Versie op schijf"
 
@@ -7982,6 +8000,9 @@ msgstr "Elke gebruiker voegt de uren van zijn abonnement toe aan één pool die 
 
 msgid "Each session resumes where it left off."
 msgstr "Elke sessie gaat verder waar die gebleven was."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Elke skill is een SKILL.md-bestand dat een coding agent laadt wanneer een taak erom vraagt. Agents vinden ze allemaal in de discovery-index."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Elke geslaagde build slaat een snapshot op. Nieuwe werkruimtes starten vanaf de huidige, en je kunt een eerdere herstellen."
@@ -9988,6 +10009,9 @@ msgstr "Help"
 
 msgid "Help & Docs"
 msgstr "Help en docs"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Help Paradev te verbeteren door gebruiksgegevens en crashrapporten te versturen. <0>Meer informatie<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Uit"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Uit omdat DO_NOT_TRACK in je omgeving is ingesteld."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Officiële documentatie van {0}, de app voor meer dan 100 parallelle programmeeragenten."
@@ -15122,6 +15149,9 @@ msgstr "Paradev reserveert deze naam, dus workspaces ontvangen hem niet. Verwijd
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev draait lokaal op de machines van je ontwikkelaars. We slaan je code of AI-gesprekken niet op, en Paradev heeft een SOC 2 Type II-audit door een onafhankelijke auditor afgerond. Vraag het rapport aan en bekijk onze securitydocumentatie op {trustHost}."
+
+msgid "Paradev Skills"
+msgstr "Paradev Skills"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev begon in november 2025 als hackathonproject. Het was een simpele desktop-app om worktrees te beheren."
@@ -17134,6 +17164,9 @@ msgstr "Herstart ze nu om ze naar {accountLabel} te verplaatsen; elke sessie pak
 msgid "Restart onboarding"
 msgstr "Onboarding opnieuw starten"
 
+msgid "Restart Paradev to apply"
+msgstr "Start Paradev opnieuw om toe te passen"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Draaiende {providerLabel}-agents herstarten?"
 
@@ -18638,6 +18671,9 @@ msgstr "Pagina delen (openbaar)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Deel plugins vanuit een GitHub-repo. Zet releases vast met git-tags."
 
+msgid "Share usage data"
+msgstr "Gebruiksgegevens delen"
+
 msgid "Share via…"
 msgstr "Delen via…"
 
@@ -19134,6 +19170,9 @@ msgstr "Skills en MCP-tools voor je agents. Dien je eigen plugin in."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skills worden met de Paradev-plugin meegeleverd en blijven automatisch up-to-date in elke agent die je gebruikt. Klik op een skill voor een voorbeeld."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Skills die agents leren Paradev te gebruiken."
 
 msgid "Skin Tone"
 msgstr "Huidskleur"
@@ -22769,9 +22808,6 @@ msgstr "We voorspellen geen volledige zelfsturing in 2026 of 2027. De eerlijke o
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "We hebben {hostName} gevonden. Zet daar externe toegang aan om af te ronden."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "We verzamelen alleen analytische cookies zodat we je ervaring kunnen verbeteren."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "We hebben een seedronde van {amount} opgehaald om je te helpen een leger aan codeeragents in te zetten."
 
@@ -23458,6 +23494,9 @@ msgstr "Jij bepaalt de toegang"
 
 msgid "You created this channel on {created}."
 msgstr "Je hebt dit kanaal op {created} gemaakt."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Jij beslist over cookies en advertentiemeting; anonieme gebruiksstatistieken zonder cookies gaan hoe dan ook door."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Je hebt het autorisatieverzoek van {plugin} geweigerd."

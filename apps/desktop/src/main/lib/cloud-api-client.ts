@@ -1,4 +1,8 @@
-import { ORGANIZATION_HEADER } from "@superset/shared/constants";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
+import {
+	ORGANIZATION_HEADER,
+	TELEMETRY_HEADER,
+} from "@superset/shared/constants";
 import type { AppRouter } from "@superset/trpc";
 import { createTRPCClient, httpBatchLink, type TRPCClient } from "@trpc/client";
 import { app } from "electron";
@@ -52,6 +56,7 @@ export function createCloudApiClient(
 					Authorization: `Bearer ${token}`,
 					...(organizationId ? { [ORGANIZATION_HEADER]: organizationId } : {}),
 					"x-superset-client": `desktop/${app.getVersion()}`,
+					...(isTelemetryEnabled() ? {} : { [TELEMETRY_HEADER]: "off" }),
 				}),
 			}),
 		],

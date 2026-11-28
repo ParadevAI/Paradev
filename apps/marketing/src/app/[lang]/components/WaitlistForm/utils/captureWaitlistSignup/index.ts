@@ -1,0 +1,1 @@
+export { captureWaitlistSignup } from "./captureWaitlistSignup";

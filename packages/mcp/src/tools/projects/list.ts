@@ -6,7 +6,12 @@ import { hostServiceCall } from "../../host-service-client";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "projects_list",
-		annotations: { readOnlyHint: true },
+		title: "List projects",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"List projects set up on a host. A project is a checked-out repo; projects are host-owned — use hosts_list first to get the hostId. Use this to find a project's id before creating a workspace or scheduling an automation.",
 		inputSchema: {

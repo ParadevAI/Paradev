@@ -7,10 +7,12 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(curl:*)
 
 # Paradev Browser Control
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
+
+The Paradev MCP tools do not drive browser panes. The `paradev browser` and `panes` steps and Browser Use are local-only: they need the paradev CLI on this machine. A plain HTTP read through your fetch tool, as "Choose a surface" says, needs neither.
 
 Drive web pages through the browser panes inside a Paradev workspace with the
-`superset browser` commands. Every operation runs in the pane the user can see,
+`paradev browser` commands. Every operation runs in the pane the user can see,
 against the pane's real, logged-in session. A raw Chrome DevTools Protocol (CDP)
 endpoint covers anything the high-level verbs don't.
 
@@ -40,18 +42,18 @@ the pane verbs already cover those.
 
 ## Establish the control surface
 
-1. Run `superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["browser"]) | .commands[].path[1]' || superset browser --help`
+1. Run `paradev schema 2>/dev/null | jq -re '.commands[] | select(.path==["browser"]) | .commands[].path[1]' || paradev browser --help`
    and require `list`, `open`, `navigate`, `screenshot`, `eval`, `console`, and
    `cdp`. The `--help` fallback covers a CLI older than 1.34.0 (no `schema`) and
    a machine without `jq`. If the verbs are absent, run `superset update`
    and recheck. The app-bundled CLI (`~/.paradev/bin/superset`) updates only
    with the desktop app, so if it lacks `browser`, updating the app is the fix;
-   check `type -a superset` for another install before giving up.
+   check `type -a paradev superset` for another install before giving up.
 2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`;
-   otherwise `superset workspaces list --local --json` and pick the target.
+   otherwise `paradev workspaces list --local --json` and pick the target.
    Pass `--host <id>` for a remote host.
 3. Panes live in the desktop app. A host with no desktop attached (a standalone
-   `superset start`) has no panes and every command errors clearly; surface
+   `paradev start`) has no panes and every command errors clearly; surface
    that rather than retrying.
 
 ## Find or open a pane
@@ -64,9 +66,9 @@ Every pane has a stable `paneId`, scoped to its workspace: pass the same
 `--workspace` you opened it under or the operation is rejected.
 
 ```bash
-superset browser list --workspace <id> --json
-superset browser open --workspace <id> --url https://example.com --target new-tab --json
-superset browser open --workspace <id> --url http://localhost:3000 --json
+paradev browser list --workspace <id> --json
+paradev browser open --workspace <id> --url https://example.com --target new-tab --json
+paradev browser open --workspace <id> --url http://localhost:3000 --json
 ```
 
 `--target new-tab` opens a fresh tab and focuses it; the default `current-tab`
@@ -76,8 +78,8 @@ desktop app (the renderer creates the pane), so if it times out, ask the user to
 open the workspace.
 
 To show the user a page in the right sidebar beside their work, and when
-`superset panes --help` succeeds (older CLIs lack `panes`), run
-`superset panes open browser --workspace <id> --url <url>`
+`paradev panes --help` succeeds (older CLIs lack `panes`), run
+`paradev panes open browser --workspace <id> --url <url>`
 (`superset:panes`). It shows up in `browser list`, and the browser verbs work on
 it like any other pane.
 
@@ -85,16 +87,16 @@ it like any other pane.
 
 ```bash
 # Point an existing pane at a new URL
-superset browser navigate --workspace <id> --pane <paneId> --url https://…
+paradev browser navigate --workspace <id> --pane <paneId> --url https://…
 
 # Capture a PNG (base64 by default; --out writes a file)
-superset browser screenshot --workspace <id> --pane <paneId> --out shot.png
+paradev browser screenshot --workspace <id> --pane <paneId> --out shot.png
 
 # Read the pane's captured console output
-superset browser console --workspace <id> --pane <paneId> --max-lines 100
+paradev browser console --workspace <id> --pane <paneId> --max-lines 100
 
 # Evaluate JavaScript in the page and return the result
-superset browser eval --workspace <id> --pane <paneId> \
+paradev browser eval --workspace <id> --pane <paneId> \
   --code "document.querySelector('h1')?.textContent"
 ```
 
@@ -133,10 +135,10 @@ another OS, or for a non-Chromium browser like Safari or Firefox, say it can't
 import and leave sign-in to the user.
 
 1. List the installed browsers and let the user choose:
-   `superset browser import-login --workspace <id> --pane <paneId>`
+   `paradev browser import-login --workspace <id> --pane <paneId>`
 2. Import from their choice, then reload the pane:
-   `superset browser import-login --workspace <id> --pane <paneId> --from Comet`
-   followed by `superset browser navigate …`. `--profile <name>` disambiguates
+   `paradev browser import-login --workspace <id> --pane <paneId> --from Comet`
+   followed by `paradev browser navigate …`. `--profile <name>` disambiguates
    a browser with several profiles; an ambiguous `--from` errors and lists them.
 
 Only cookies written to disk can import. Many sites keep auth in session
@@ -151,7 +153,7 @@ flow, get the pane's CDP WebSocket endpoint. This pattern is for panes only;
 for the user's own browser, follow `references/browser-use.md`:
 
 ```bash
-superset browser cdp --workspace <id> --pane <paneId> --json
+paradev browser cdp --workspace <id> --pane <paneId> --json
 ```
 
 The printed `url` speaks CDP directly (`Page`, `Runtime`, `DOM`, `Input`,
@@ -226,7 +228,7 @@ paths nobody can open. Put the screenshots in a directory beside an
 along at their relative paths, so nothing needs inlining.
 
 ```bash
-superset pages publish ./evidence/ --workspace <id> --title "Checkout flow: 3 blockers"
+paradev pages publish ./evidence/ --workspace <id> --title "Checkout flow: 3 blockers"
 ```
 
 Read every screenshot before it goes up. A pane is signed in to every site in

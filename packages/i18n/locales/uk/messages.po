@@ -2483,6 +2483,9 @@ msgstr "Попередній перегляд під керуванням аге
 msgid "Agents"
 msgstr "Агенти"
 
+msgid "Agents and workspaces"
+msgstr "Агенти й робочі простори"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Агенти не мають доступу до інструментів {0}"
@@ -3078,6 +3081,9 @@ msgstr "в еквіваленті API"
 
 msgid "API-equivalent cost"
 msgstr "Вартість в еквіваленті API"
+
+msgid "App"
+msgstr "Застосунок"
 
 msgctxt "log scope"
 msgid "App"
@@ -5697,6 +5703,9 @@ msgstr "Конвертуйте скрипти"
 msgid "Converting to draft…"
 msgstr "Перетворення на чернетку…"
 
+msgid "Cookie settings"
+msgstr "Налаштування файлів cookie"
+
 msgid "cookies and site data"
 msgstr "файли cookie та дані сайтів"
 
@@ -6592,6 +6601,9 @@ msgstr "Не вдалося оновити налаштування «Чат»"
 msgid "Couldn't update the queue"
 msgstr "Не вдалося оновити чергу"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Не вдалося змінити налаштування даних про використання"
+
 msgid "Couldn't update thread"
 msgstr "Не вдалося оновити тред"
 
@@ -7075,6 +7087,9 @@ msgstr "Налагодження невдалих запусків і повто
 
 msgid "Debug with production stack traces"
 msgstr "Налагодження за стек-трейсами з продакшену"
+
+msgid "Decline"
+msgstr "Відхилити"
 
 msgid "default"
 msgstr "за замовчуванням"
@@ -7669,6 +7684,9 @@ msgstr "Discord і GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Знаходьте dev-сервери у вашій мережі та підключайтеся до них."
 
+msgid "Discovery index"
+msgstr "Індекс виявлення"
+
 msgid "Disk version"
 msgstr "Версія на диску"
 
@@ -7976,6 +7994,9 @@ msgstr "Кожне місце додає години свого тарифу д
 
 msgid "Each session resumes where it left off."
 msgstr "Кожен сеанс продовжиться з того місця, де зупинився."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Кожна навичка — це файл SKILL.md, який агент для коду завантажує, коли він потрібен завданню. Агенти знаходять їх усі в індексі виявлення."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Кожна успішна збірка зберігає знімок. Нові робочі простори запускаються з поточного, а раніший можна відновити."
@@ -9982,6 +10003,9 @@ msgstr "Довідка"
 
 msgid "Help & Docs"
 msgstr "Довідка та документація"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Допоможіть покращити Paradev, надсилаючи дані про використання та звіти про збої. <0>Докладніше<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Генрі Форд"
@@ -13880,6 +13904,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Вимкнено"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Вимкнено, бо у вашому середовищі задано DO_NOT_TRACK."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Офіційна документація {0}, застосунку для паралельного запуску 100+ кодинг-агентів."
@@ -15116,6 +15143,9 @@ msgstr "Paradev резервує цю назву, тому робочі прос
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev працює локально на комп'ютерах ваших розробників. Ми не зберігаємо ваш код або розмови з ШІ, а Paradev пройшов аудит SOC 2 Type II у незалежного аудитора. Запросіть звіт і перегляньте нашу документацію з безпеки на {trustHost}."
+
+msgid "Paradev Skills"
+msgstr "Навички Paradev"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev почався як хакатонний проєкт у листопаді 2025 року. Це був простий десктопний застосунок для керування worktree."
@@ -17128,6 +17158,9 @@ msgstr "Перезапустіть їх зараз, щоб перенести н
 msgid "Restart onboarding"
 msgstr "Пройти онбординг заново"
 
+msgid "Restart Paradev to apply"
+msgstr "Перезапустіть Paradev, щоб застосувати"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
@@ -18632,6 +18665,9 @@ msgstr "Поділитися сторінкою (публічно)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Діліться плагінами з репозиторію GitHub. Закріплюйте релізи git-тегами."
 
+msgid "Share usage data"
+msgstr "Надсилати дані про використання"
+
 msgid "Share via…"
 msgstr "Поділитися через…"
 
@@ -19128,6 +19164,9 @@ msgstr "Навички та інструменти MCP для ваших аге�
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Навички постачаються з плагіном Paradev і автоматично оновлюються в усіх агентах, якими ви користуєтеся. Натисніть навичку, щоб переглянути її."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Навички, які вчать агентів працювати з Paradev."
 
 msgid "Skin Tone"
 msgstr "Тон шкіри"
@@ -22763,9 +22802,6 @@ msgstr "Ми не прогнозуємо повної автономності �
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Ми знайшли {hostName}. Увімкніть там віддалений доступ, щоб завершити."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Ми збираємо лише аналітичні файли cookie, щоб покращувати ваш досвід."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Ми залучили {amount} у seed-раунді, щоб допомогти вам керувати цілою армією кодинг-агентів."
 
@@ -23452,6 +23488,9 @@ msgstr "Ви керуєте доступом"
 
 msgid "You created this channel on {created}."
 msgstr "Ви створили цей канал {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Ви вирішуєте щодо файлів cookie та вимірювання реклами; анонімна статистика використання без cookie триває в будь-якому разі."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Ви відхилили запит на авторизацію {plugin}."

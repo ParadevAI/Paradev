@@ -1,7 +1,8 @@
-import { app } from "electron";
+import { isTelemetryEnabled } from "@superset/agent-setup/telemetry";
+import { app, ipcMain } from "electron";
 import { env } from "main/env.main";
 import { PostHog } from "posthog-node";
-import { DEFAULT_TELEMETRY_ENABLED } from "shared/constants";
+import { TELEMETRY_ENABLED_CHANNEL } from "shared/telemetry-ipc";
 
 let posthog: PostHog | null = null;
 let userId: string | null = null;
@@ -19,10 +20,6 @@ function getClient(): PostHog | null {
 		});
 	}
 	return posthog;
-}
-
-function isTelemetryEnabled(): boolean {
-	return DEFAULT_TELEMETRY_ENABLED;
 }
 
 export function setUserId(id: string | null): void {
@@ -49,4 +46,10 @@ export function track(
 			},
 		});
 	}
+}
+
+export function registerTelemetryIpc(): void {
+	ipcMain.on(TELEMETRY_ENABLED_CHANNEL, (event) => {
+		event.returnValue = isTelemetryEnabled();
+	});
 }

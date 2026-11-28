@@ -19,7 +19,12 @@ const MAX_LINEAR_ISSUES = 500;
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "tasks_list",
-		annotations: { readOnlyHint: true },
+		title: "List tasks",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: true,
+		},
 		description:
 			"List tasks in the active organization, optionally filtered by status, priority, assignee, or a free-text search. When the organization tracks tasks in Linear this lists its Linear issues. Use this when the user asks 'what tasks are open', 'find tasks about X', or 'what's assigned to me'.",
 		inputSchema: {

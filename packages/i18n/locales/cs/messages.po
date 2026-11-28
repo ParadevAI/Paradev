@@ -2489,6 +2489,9 @@ msgstr "Náhledy řízené agenty"
 msgid "Agents"
 msgstr "Agenti"
 
+msgid "Agents and workspaces"
+msgstr "Agenti a pracovní prostory"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agenti nemají přístup k nástrojům {0}"
@@ -3084,6 +3087,9 @@ msgstr "ekvivalent API"
 
 msgid "API-equivalent cost"
 msgstr "Náklady v přepočtu na API"
+
+msgid "App"
+msgstr "Aplikace"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "Převeďte své skripty"
 msgid "Converting to draft…"
 msgstr "Převádí se na koncept…"
 
+msgid "Cookie settings"
+msgstr "Nastavení cookies"
+
 msgid "cookies and site data"
 msgstr "cookies a data webů"
 
@@ -6598,6 +6607,9 @@ msgstr "Nastavení Chat se nepodařilo aktualizovat"
 msgid "Couldn't update the queue"
 msgstr "Frontu se nepodařilo aktualizovat"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Nastavení sdílení dat o používání se nepodařilo změnit"
+
 msgid "Couldn't update thread"
 msgstr "Nepodařilo se aktualizovat vlákno"
 
@@ -7081,6 +7093,9 @@ msgstr "Ladění neúspěšných běhů a opětovné spuštění funkcí"
 
 msgid "Debug with production stack traces"
 msgstr "Ladění s produkčními stack trace"
+
+msgid "Decline"
+msgstr "Odmítnout"
 
 msgid "default"
 msgstr "výchozí"
@@ -7675,6 +7690,9 @@ msgstr "Discord a GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Najít vývojové servery ve vaší síti a připojit se k nim."
 
+msgid "Discovery index"
+msgstr "Index pro vyhledávání"
+
 msgid "Disk version"
 msgstr "Verze na disku"
 
@@ -7982,6 +8000,9 @@ msgstr "Každé místo přidá hodiny svého plánu do jednoho fondu, který sd�
 
 msgid "Each session resumes where it left off."
 msgstr "Každá relace naváže tam, kde skončila."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Každý skill je soubor SKILL.md, který si kódovací agent načte, když ho úloha potřebuje. Agenti je všechny najdou v indexu pro vyhledávání."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Každé úspěšné sestavení uloží snímek. Nové pracovní prostory začínají z aktuálního a můžete obnovit starší."
@@ -9988,6 +10009,9 @@ msgstr "Nápověda"
 
 msgid "Help & Docs"
 msgstr "Nápověda a dokumentace"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Pomozte vylepšit Paradev odesíláním údajů o používání a hlášení o pádech. <0>Další informace<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Vypnuto"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Vypnuto, protože je ve vašem prostředí nastaveno DO_NOT_TRACK."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Oficiální dokumentace {0}, aplikace pro paralelní spouštění více než 100 programovacích agentů."
@@ -15122,6 +15149,9 @@ msgstr "Paradev si tento název vyhrazuje, takže ho workspacy nedostanou. Smaž
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev běží lokálně na počítačích vašich vývojářů. Neukládáme váš kód ani konverzace s AI a Paradev prošel auditem SOC 2 Type II u nezávislého auditora. Vyžádejte si zprávu a projděte si dokumentaci k bezpečnosti na {trustHost}."
+
+msgid "Paradev Skills"
+msgstr "Paradev Skills"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev vznikl jako projekt na hackathonu v listopadu 2025. Byla to jednoduchá desktopová aplikace na správu worktree."
@@ -17134,6 +17164,9 @@ msgstr "Restartujte je teď a přejdou na {accountLabel}; každá relace naváž
 msgid "Restart onboarding"
 msgstr "Spustit úvodní průvodce znovu"
 
+msgid "Restart Paradev to apply"
+msgstr "Pro použití restartujte Paradev"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Restartovat běžící agenty {providerLabel}?"
 
@@ -18638,6 +18671,9 @@ msgstr "Sdílet stránku (veřejná)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Sdílejte pluginy z repozitáře GitHub. Zafixujte vydání pomocí git tagů."
 
+msgid "Share usage data"
+msgstr "Sdílet data o používání"
+
 msgid "Share via…"
 msgstr "Sdílet přes…"
 
@@ -19134,6 +19170,9 @@ msgstr "Skills a nástroje MCP pro vaše agenty. Odešlete vlastní."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skills se dodávají s pluginem Paradev a v každém agentovi, kterého používáte, se udržují automaticky aktuální. Kliknutím si je zobrazíte."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Skills, které agenty učí používat Paradev."
 
 msgid "Skin Tone"
 msgstr "Odstín pleti"
@@ -22769,9 +22808,6 @@ msgstr "Neslibujeme plnou autonomii v roce 2026 ani 2027. Poctivé neznámé: zd
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Našli jsme {hostName}. Dokončete to zapnutím Vzdáleného přístupu na něm."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Sbíráme jen analytické cookies, abychom mohli zlepšovat vaši zkušenost."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Získali jsme {amount} v seed kole, abychom vám pomohli řídit armádu kódovacích agentů."
 
@@ -23458,6 +23494,9 @@ msgstr "Přístup máte pod kontrolou"
 
 msgid "You created this channel on {created}."
 msgstr "Tento kanál jste vytvořili {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "O souborech cookie a měření reklam rozhodujete vy; anonymní statistiky používání bez souborů cookie pokračují v každém případě."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Žádost o autorizaci pro {plugin} jste odmítli."

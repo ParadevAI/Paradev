@@ -2489,6 +2489,9 @@ msgstr "Pratinjau yang digerakkan agen"
 msgid "Agents"
 msgstr "Agen"
 
+msgid "Agents and workspaces"
+msgstr "Agen dan workspace"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agen tidak dapat menjangkau alat {0}"
@@ -3084,6 +3087,9 @@ msgstr "Setara API"
 
 msgid "API-equivalent cost"
 msgstr "Biaya setara API"
+
+msgid "App"
+msgstr "Aplikasi"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "Konversi skrip Anda"
 msgid "Converting to draft…"
 msgstr "Mengubah menjadi draf…"
 
+msgid "Cookie settings"
+msgstr "Pengaturan cookie"
+
 msgid "cookies and site data"
 msgstr "cookie dan data situs"
 
@@ -6598,6 +6607,9 @@ msgstr "Tidak dapat memperbarui pengaturan Chat"
 msgid "Couldn't update the queue"
 msgstr "Tidak dapat memperbarui antrean"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Tidak dapat memperbarui pengaturan data penggunaan"
+
 msgid "Couldn't update thread"
 msgstr "Tidak bisa memperbarui thread"
 
@@ -7081,6 +7093,9 @@ msgstr "Debug run yang gagal dan jalankan ulang fungsi"
 
 msgid "Debug with production stack traces"
 msgstr "Debug dengan stack trace produksi"
+
+msgid "Decline"
+msgstr "Tolak"
 
 msgid "default"
 msgstr "bawaan"
@@ -7675,6 +7690,9 @@ msgstr "Discord dan GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Menemukan dan terhubung ke server pengembangan di jaringan Anda."
 
+msgid "Discovery index"
+msgstr "Indeks penemuan"
+
 msgid "Disk version"
 msgstr "Versi di disk"
 
@@ -7982,6 +8000,9 @@ msgstr "Setiap kursi menambahkan jam paketnya ke satu kumpulan yang dibagi selur
 
 msgid "Each session resumes where it left off."
 msgstr "Setiap sesi melanjutkan dari titik terakhir."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Setiap skill adalah file SKILL.md yang dimuat agen coding saat tugas membutuhkannya. Agen menemukan semuanya di indeks penemuan."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Setiap build yang berhasil menyimpan snapshot. Workspace baru dimulai dari snapshot saat ini, dan kamu bisa memulihkan snapshot sebelumnya."
@@ -9988,6 +10009,9 @@ msgstr "Bantuan"
 
 msgid "Help & Docs"
 msgstr "Bantuan & Dokumentasi"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Bantu tingkatkan Paradev dengan mengirim data penggunaan dan laporan crash. <0>Pelajari lebih lanjut<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Mati"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Nonaktif karena DO_NOT_TRACK disetel di lingkungan Anda."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Dokumentasi resmi {0}, aplikasi untuk menjalankan lebih dari 100 agen pemrograman secara paralel."
@@ -15122,6 +15149,9 @@ msgstr "Paradev mencadangkan nama ini, jadi workspace tidak menerimanya. Hapus l
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Paradev telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di {trustHost}."
+
+msgid "Paradev Skills"
+msgstr "Skill Paradev"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev bermula sebagai proyek hackathon pada November 2025. Waktu itu sekadar aplikasi desktop untuk mengelola worktree."
@@ -17134,6 +17164,9 @@ msgstr "Jalankan ulang sekarang untuk memindahkannya ke {accountLabel}; setiap s
 msgid "Restart onboarding"
 msgstr "Mulai ulang orientasi"
 
+msgid "Restart Paradev to apply"
+msgstr "Mulai ulang Paradev untuk menerapkan"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Jalankan ulang agen {providerLabel} yang sedang berjalan?"
 
@@ -18638,6 +18671,9 @@ msgstr "Bagikan halaman (publik)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Bagikan plugin dari repo GitHub. Sematkan rilis dengan tag git."
 
+msgid "Share usage data"
+msgstr "Bagikan data penggunaan"
+
 msgid "Share via…"
 msgstr "Bagikan lewat…"
 
@@ -19134,6 +19170,9 @@ msgstr "Skill dan alat MCP untuk agen Anda. Kirimkan milik Anda sendiri."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skill hadir bersama plugin Paradev dan selalu diperbarui otomatis di setiap agen yang Anda pakai. Klik salah satu untuk melihat pratinjaunya."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Skill yang mengajari agen cara memakai Paradev."
 
 msgid "Skin Tone"
 msgstr "Warna Kulit"
@@ -22769,9 +22808,6 @@ msgstr "Kami tidak memperkirakan full self-driving pada 2026 atau 2027. Yang juj
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Kami menemukan {hostName}. Aktifkan Akses Jarak Jauh di sana untuk menyelesaikan."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Kami hanya mengumpulkan cookie analitik agar bisa meningkatkan pengalaman Anda."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Kami meraih pendanaan seed sebesar {amount} untuk membantu Anda menjalankan pasukan agen coding."
 
@@ -23458,6 +23494,9 @@ msgstr "Anda mengendalikan akses"
 
 msgid "You created this channel on {created}."
 msgstr "Anda membuat saluran ini pada {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Anda yang memutuskan soal cookie dan pengukuran iklan; statistik penggunaan anonim tanpa cookie tetap berjalan apa pun pilihan Anda."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Anda menolak permintaan otorisasi {plugin}."

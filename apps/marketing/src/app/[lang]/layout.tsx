@@ -6,9 +6,10 @@ import { COMPANY, SOCIAL } from "@superset/shared/constants";
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import { Suspense } from "react";
+import { AdTrackers } from "@/components/AdTrackers";
 import { CookieConsent } from "@/components/CookieConsent";
+import { CookielessWebVitals } from "@/components/CookielessWebVitals";
 import { ExternalTracking } from "@/components/ExternalTracking";
 import {
 	OrganizationJsonLd,
@@ -16,7 +17,6 @@ import {
 	WebsiteJsonLd,
 } from "@/components/JsonLd";
 import { getChangelogEntries } from "@/lib/changelog";
-import { REDDIT_PIXEL_ID } from "@/lib/constants";
 
 import { CTAButtons } from "./components/CTAButtons";
 import { Footer } from "./components/Footer";
@@ -146,27 +146,6 @@ export default async function RootLayout({
 					dateModified={getChangelogEntries()[0]?.date}
 				/>
 				<WebsiteJsonLd />
-				{/* Google tag (gtag.js) for Google Ads */}
-				<Script
-					src="https://www.googletagmanager.com/gtag/js?id=AW-18209336001"
-					strategy="lazyOnload"
-				/>
-				<Script id="google-ads-gtag" strategy="lazyOnload">
-					{`
-						window.dataLayer = window.dataLayer || [];
-						function gtag(){dataLayer.push(arguments);}
-						gtag('js', new Date());
-						gtag('config', 'AW-18209336001');
-					`}
-				</Script>
-				{/* Reddit Pixel */}
-				<Script id="reddit-pixel" strategy="lazyOnload">
-					{`
-						!function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js?pixel_id=${REDDIT_PIXEL_ID}",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
-						rdt('init','${REDDIT_PIXEL_ID}');
-						rdt('track','PageVisit');
-					`}
-				</Script>
 			</head>
 			<body className="overscroll-none font-sans">
 				<Providers locale={locale} messages={messages}>
@@ -184,6 +163,8 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
+				<AdTrackers />
+				<CookielessWebVitals />
 				<Suspense fallback={null}>
 					<ExternalTracking />
 				</Suspense>

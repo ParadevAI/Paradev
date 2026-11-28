@@ -7,9 +7,11 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(jq:*)
 
 # Paradev Pane Layout
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
-Script the tabs and split panes of a workspace with `superset panes`. Commands go
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+
+Script the tabs and split panes of a workspace with `paradev panes`. Commands go
 to the host, then to the desktop app, which applies them to the live layout the
 user is looking at. Every change is visible immediately, so build layouts the
 user asked for and clean up what you open.
@@ -21,7 +23,7 @@ main area unless the user asks for the sidebar.
 
 ## Establish the control surface
 
-1. Run `superset schema 2>/dev/null | jq -re '.commands[] | select(.path==["panes"]) | .commands[].path[1]' || superset panes --help`
+1. Run `paradev schema 2>/dev/null | jq -re '.commands[] | select(.path==["panes"]) | .commands[].path[1]' || paradev panes --help`
    and require `list`, `split`, `new-tab`, `resize`, `equalize`, `move`, `swap`,
    `focus`, and `close`; sidebar control also needs `open` and `sidebar`.
    `panes` is new in CLI 1.38.0. If it is missing, run
@@ -29,15 +31,15 @@ main area unless the user asks for the sidebar.
    updates only with the desktop app, so if it still lacks `panes`, updating
    the app is the fix.
 2. Resolve the workspace. Inside a workspace, use `$SUPERSET_WORKSPACE_ID`;
-   otherwise `superset workspaces list --local --json` and pick the target.
+   otherwise `paradev workspaces list --local --json` and pick the target.
 3. Panes live in the desktop app. A host with no desktop attached (a standalone
-   `superset start`) has no panes, and an older desktop app answers "This host
-   is too old for `superset panes`". Surface either rather than retrying.
+   `paradev start`) has no panes, and an older desktop app answers "This host
+   is too old for `paradev panes`". Surface either rather than retrying.
 
 ## Read the layout
 
 ```bash
-superset panes list --workspace "$WS" --json
+paradev panes list --workspace "$WS" --json
 ```
 
 The result has `activeTabId` and `tabs[]` for the main area, and `sidebar` with
@@ -54,7 +56,7 @@ Inside a workspace, the pane you are running in is the one whose `terminalId`
 equals `$SUPERSET_TERMINAL_ID`:
 
 ```bash
-ME=$(superset panes list --workspace "$WS" --json \
+ME=$(paradev panes list --workspace "$WS" --json \
   | jq -r --arg t "$SUPERSET_TERMINAL_ID" \
     '[.tabs[], .sidebar.tabs[]?][].panes[] | select(.terminalId==$t) | .id')
 ```
@@ -122,7 +124,7 @@ Behavior to rely on:
 
 ## Read what a pane shows
 
-`superset terminals read --local --workspace $WS --terminal <terminal-id> --json`
+`paradev terminals read --local --workspace $WS --terminal <terminal-id> --json`
 returns the screen text of a terminal pane, which confirms a command started
 and shows its output. Pass `--local` (or `--host <id>`); without it the CLI
 looks for a cloud workspace.
@@ -133,17 +135,17 @@ Side by side with the user's pane, tests on the right, a watcher below them:
 
 ```bash
 WS=$SUPERSET_WORKSPACE_ID
-R=$(superset panes split --workspace $WS --pane "$ME" --direction right --command 'npm test -- --watch' --json)
+R=$(paradev panes split --workspace $WS --pane "$ME" --direction right --command 'npm test -- --watch' --json)
 TESTS=$(jq -r .paneId <<<"$R")
-superset panes split --workspace $WS --pane "$TESTS" --direction down --command 'npm run dev' --json >/dev/null
-superset panes resize --workspace $WS --pane "$ME" --ratio 0.6 --json >/dev/null
+paradev panes split --workspace $WS --pane "$TESTS" --direction down --command 'npm run dev' --json >/dev/null
+paradev panes resize --workspace $WS --pane "$ME" --ratio 0.6 --json >/dev/null
 ```
 
 Show the user the diff, or the app they are building, in the sidebar:
 
 ```bash
-superset panes open changes --workspace $WS --json >/dev/null
-W=$(superset panes open browser --workspace $WS --url http://localhost:3000 --json | jq -r .paneId)
+paradev panes open changes --workspace $WS --json >/dev/null
+W=$(paradev panes open browser --workspace $WS --url http://localhost:3000 --json | jq -r .paneId)
 ```
 
 To screenshot, click or read the console in that pane, use superset:browser

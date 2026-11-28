@@ -1,0 +1,1 @@
+export { CookielessWebVitals } from "./CookielessWebVitals";

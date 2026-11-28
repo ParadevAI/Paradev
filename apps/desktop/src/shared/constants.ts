@@ -1,5 +1,6 @@
 import {
 	ACCEPTED_PROTOCOL_SCHEMES,
+	LINK_PROTOCOL_SCHEME,
 	PROTOCOL_SCHEMES,
 } from "@superset/shared/constants";
 import { getWorkspaceName } from "./env.shared";
@@ -12,8 +13,8 @@ export const PLATFORM = {
 
 const workspace = getWorkspaceName();
 export const PROTOCOL_SCHEME = workspace
-	? `superset-${workspace}`
-	: PROTOCOL_SCHEMES.PROD;
+	? `${PROTOCOL_SCHEMES.PROD}-${workspace}`
+	: LINK_PROTOCOL_SCHEME;
 /** A dev build claims only its own scheme so it never takes links from the installed app. */
 export const REGISTERED_PROTOCOL_SCHEMES: readonly string[] = workspace
 	? [PROTOCOL_SCHEME]
@@ -58,6 +59,5 @@ export const DEFAULT_CONFIRM_ON_QUIT = true;
 export const DEFAULT_TERMINAL_COPY_ON_SELECT = false;
 export const DEFAULT_FILE_AUTO_SAVE = "off" as const;
 export const DEFAULT_WAIT_FOR_SETUP_BEFORE_AGENT = false;
-export const DEFAULT_TELEMETRY_ENABLED = true;
 export const DEFAULT_SHOW_RESOURCE_MONITOR = true;
 export const DEFAULT_EXPOSE_HOST_SERVICE_VIA_RELAY = false;

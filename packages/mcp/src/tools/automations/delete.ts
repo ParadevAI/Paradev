@@ -6,7 +6,12 @@ import { defineTool } from "../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "automations_delete",
-		annotations: { destructiveHint: true },
+		title: "Delete automation",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: false,
+		},
 		description:
 			"Permanently delete an archived automation and its run history. This can't be undone. Archive it first with automations_archive. Caller must be the owner or an organization owner.",
 		inputSchema: {

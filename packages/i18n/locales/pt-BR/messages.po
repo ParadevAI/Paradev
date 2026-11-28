@@ -2489,6 +2489,9 @@ msgstr "Prévias controladas pelo agente"
 msgid "Agents"
 msgstr "Agentes"
 
+msgid "Agents and workspaces"
+msgstr "Agentes e áreas de trabalho"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Os agentes não conseguem acessar as ferramentas de {0}"
@@ -3084,6 +3087,9 @@ msgstr "equivalente em API"
 
 msgid "API-equivalent cost"
 msgstr "Custo equivalente de API"
+
+msgid "App"
+msgstr "App"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "Converta seus scripts"
 msgid "Converting to draft…"
 msgstr "Convertendo em rascunho…"
 
+msgid "Cookie settings"
+msgstr "Configurações de cookies"
+
 msgid "cookies and site data"
 msgstr "cookies e dados de sites"
 
@@ -6598,6 +6607,9 @@ msgstr "Não foi possível atualizar a configuração de Chat"
 msgid "Couldn't update the queue"
 msgstr "Não foi possível atualizar a fila"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Não foi possível atualizar a configuração de dados de uso"
+
 msgid "Couldn't update thread"
 msgstr "Não foi possível atualizar a thread"
 
@@ -7081,6 +7093,9 @@ msgstr "Depurar execuções com falha e executar funções novamente"
 
 msgid "Debug with production stack traces"
 msgstr "Depure com stack traces de produção"
+
+msgid "Decline"
+msgstr "Recusar"
 
 msgid "default"
 msgstr "padrão"
@@ -7675,6 +7690,9 @@ msgstr "Discord e GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Descobrir e conectar a servidores de desenvolvimento na sua rede."
 
+msgid "Discovery index"
+msgstr "Índice de descoberta"
+
 msgid "Disk version"
 msgstr "Versão no disco"
 
@@ -7982,6 +8000,9 @@ msgstr "Cada assento adiciona as horas do seu plano a um único pool compartilha
 
 msgid "Each session resumes where it left off."
 msgstr "Cada sessão retoma de onde parou."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Cada skill é um arquivo SKILL.md que um agente de código carrega quando uma tarefa precisa dele. Os agentes encontram todas no índice de descoberta."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Cada build bem-sucedido salva um snapshot. Novas áreas de trabalho começam a partir do atual, e você pode restaurar um anterior."
@@ -9988,6 +10009,9 @@ msgstr "Ajuda"
 
 msgid "Help & Docs"
 msgstr "Ajuda e documentação"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Ajude a melhorar o Paradev enviando dados de uso e relatórios de falhas. <0>Saiba mais<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Desativado"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Desativado porque DO_NOT_TRACK está definido no seu ambiente."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Documentação oficial do {0}, o aplicativo para executar mais de 100 agentes de programação em paralelo."
@@ -15122,6 +15149,9 @@ msgstr "O Paradev reserva este nome, então os workspaces não o recebem. Exclua
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "O Paradev roda localmente nas máquinas do seu time. Não guardamos seu código nem suas conversas com a IA, e o Paradev concluiu uma auditoria SOC 2 Tipo II com um auditor independente. Solicite o relatório e veja nossa documentação de segurança em {trustHost}."
+
+msgid "Paradev Skills"
+msgstr "Paradev Skills"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "O Paradev começou como um projeto de hackathon em novembro de 2025. Era um app de desktop simples para gerenciar worktrees."
@@ -17134,6 +17164,9 @@ msgstr "Reinicie agora para movê-los para {accountLabel}; cada sessão retoma a
 msgid "Restart onboarding"
 msgstr "Reiniciar a introdução"
 
+msgid "Restart Paradev to apply"
+msgstr "Reinicie o Paradev para aplicar"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Reiniciar os agentes {providerLabel} em execução?"
 
@@ -18638,6 +18671,9 @@ msgstr "Compartilhar página (pública)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Compartilhe plugins a partir de um repo do GitHub. Fixe versões com tags do git."
 
+msgid "Share usage data"
+msgstr "Compartilhar dados de uso"
+
 msgid "Share via…"
 msgstr "Compartilhar via…"
 
@@ -19134,6 +19170,9 @@ msgstr "Skills e ferramentas MCP para seus agentes. Envie o seu."
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "As skills vêm com o plugin do Paradev e são mantidas atualizadas automaticamente em todos os agentes que você usa. Clique em uma para pré-visualizar."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Skills que ensinam agentes a usar o Paradev."
 
 msgid "Skin Tone"
 msgstr "Tom de pele"
@@ -22769,9 +22808,6 @@ msgstr "Não prevemos direção totalmente autônoma em 2026 nem em 2027. As inc
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Encontramos {hostName}. Ative o acesso remoto nele para concluir."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Coletamos apenas cookies de análise para melhorar sua experiência."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Levantamos uma rodada seed de {amount} para ajudar você a comandar um exército de agentes de código."
 
@@ -23458,6 +23494,9 @@ msgstr "Você controla o acesso"
 
 msgid "You created this channel on {created}."
 msgstr "Você criou este canal em {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Você decide sobre cookies e medição de anúncios; as estatísticas de uso anônimas sem cookies continuam de qualquer forma."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Você recusou a solicitação de autorização do {plugin}."

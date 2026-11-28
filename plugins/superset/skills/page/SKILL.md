@@ -7,7 +7,7 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 # Paradev Pages
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
 A page is an **`.html` document** published to a URL people in the org can
 open. Publish a single file and it must be self-contained; publish a directory
@@ -15,6 +15,8 @@ and its `index.html` is the document, with the images, stylesheets, and media
 it references by relative path published alongside it. Every publish mints a version, so a page has history. Readers can
 pin a comment to any element on it, and those comments come back to an agent to
 fix. That is what makes a page a working surface rather than an export.
+
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. With the MCP tools: `pages_publish` takes the document as `html` text, with `title`, `description`, `label`, `visibility`, and `pageId` to add a version; pass `workspaceId` with `entryPath` when you have a workspace. `pages_list` takes `search` or `workspaceId`; `pages_get`, `pages_versions` and `pages_pull` take an `id` or `slug`. `pages_comments_list` takes `pageId`, `pages_comments_reply` takes `threadId` and `body`, and `pages_comments_resolve` takes `threadId` and `resolved`. Publishing a directory and `panes open pages` are local-only: they need the paradev CLI on this machine.
 
 Pages are served from their own origin under a strict content policy. Most of
 the work in this skill is respecting that policy; a page that ignores it looks
@@ -188,7 +190,7 @@ Rules that matter when you write one:
 ## The other hard limits
 
 1. **`.html` only.** Any other extension is rejected at the CLI.
-2. **One file, or one directory.** `superset pages publish ./report/`
+2. **One file, or one directory.** `paradev pages publish ./report/`
    publishes a directory: `index.html` is the page, and every other file
    ships at its relative path, so `<video src="demo.mp4">`,
    `<link href="site.css">` and `<script src="app.js">` all work. Asset
@@ -343,13 +345,13 @@ If the user's project has a design system, read it first and match it.
 ## Publish
 
 ```bash
-superset pages publish report.html \
+paradev pages publish report.html \
   --title "Q3 pipeline" \
   --description "Where every open deal stands going into Q4" \
   --label "first draft"
 
 # Or a directory: index.html is the page, everything else rides along
-superset pages publish ./report/ --title "Q3 pipeline"
+paradev pages publish ./report/ --title "Q3 pipeline"
 ```
 
 `--title` defaults to the filename with dashes and underscores turned into
@@ -357,7 +359,7 @@ spaces, so name the file well or pass the flag. `--label` is what shows in
 version history; write what changed, not "update".
 
 To show the published page to the user in the desktop app, open it in the right
-sidebar: `superset panes open pages --workspace "$SUPERSET_WORKSPACE_ID" --slug <slug>`.
+sidebar: `paradev panes open pages --workspace "$SUPERSET_WORKSPACE_ID" --slug <slug>`.
 
 **Attach a workspace whenever you have one.** The CLI records the file's path
 relative to the workspace root as the page's entry path, and that path is the
@@ -388,8 +390,8 @@ derived from it.
 Two routes, and the difference matters:
 
 ```bash
-superset pages publish report.html --label "fixed Q3 totals"   # same path in the same workspace
-superset pages publish report.html --page <page-id> --label "…" # anywhere, explicit
+paradev pages publish report.html --label "fixed Q3 totals"   # same path in the same workspace
+paradev pages publish report.html --page <page-id> --label "…" # anywhere, explicit
 ```
 
 Use `--page` whenever you're outside the original workspace, the file moved, or
@@ -411,11 +413,11 @@ until someone widens it.
 ## Read a page back
 
 ```bash
-superset pages list --workspace <id>     # or omit --workspace for the whole org
-superset pages list --search "Q3 close"  # -q also works; matches title or slug
-superset pages get <page-id-or-slug>
-superset pages versions <page-id-or-slug>
-superset pages pull <page-id-or-slug> --version 2 > v2.html
+paradev pages list --workspace <id>     # or omit --workspace for the whole org
+paradev pages list --search "Q3 close"  # -q also works; matches title or slug
+paradev pages get <page-id-or-slug>
+paradev pages versions <page-id-or-slug>
+paradev pages pull <page-id-or-slug> --version 2 > v2.html
 ```
 
 `pull` writes HTML to stdout; use it to recover a source file you no longer
@@ -453,11 +455,11 @@ appear more than once.
 The loop, in order:
 
 ```bash
-superset pages comments list --page <page-id-or-slug>
+paradev pages comments list --page <page-id-or-slug>
 # edit the source file, fixing what each thread asked for
-superset pages publish report.html --page <page-id> --label "addressed review comments"
-superset pages comments reply --thread <thread-id> "Recomputed from the Q3 close; the total is 1.42M now."
-superset pages comments resolve --thread <thread-id>
+paradev pages publish report.html --page <page-id> --label "addressed review comments"
+paradev pages comments reply --thread <thread-id> "Recomputed from the Q3 close; the total is 1.42M now."
+paradev pages comments resolve --thread <thread-id>
 ```
 
 Rules that keep this honest:
@@ -471,7 +473,7 @@ Rules that keep this honest:
 - **Don't resolve what you didn't fix.** If a comment asks for something you
   can't do or disagree with, reply saying so and leave it open for a human.
 
-Reopen with `superset pages comments resolve --thread <id> --reopen`.
+Reopen with `paradev pages comments resolve --thread <id> --reopen`.
 
 ## When it fails
 

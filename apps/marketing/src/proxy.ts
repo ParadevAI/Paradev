@@ -2,6 +2,11 @@ import { isSupportedLocale } from "@superset/i18n";
 import { isProfileHandle } from "@superset/trpc/leaderboard-reserved-handles";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import {
+	CONSENT_REGION_COOKIE,
+	consentRegionForCountry,
+} from "@/lib/analytics/consent-region";
+import { geoFromRequestHeaders, geoServerTiming } from "@/lib/analytics/geo";
 import { canonicalPathname } from "@/lib/canonical-pathname";
 
 const LANDING_PAGES = new Set([
@@ -12,7 +17,21 @@ const LANDING_PAGES = new Set([
 ]);
 
 export function proxy(request: NextRequest) {
-	return route(request);
+	const response = route(request) ?? NextResponse.next();
+	const value = consentRegionForCountry(
+		request.headers.get("x-vercel-ip-country"),
+		{ production: process.env.NODE_ENV === "production" },
+	);
+	if (request.cookies.get(CONSENT_REGION_COOKIE)?.value !== value) {
+		response.cookies.set(CONSENT_REGION_COOKIE, value, {
+			path: "/",
+			sameSite: "lax",
+			secure: process.env.NODE_ENV === "production",
+		});
+	}
+	const geo = geoServerTiming(geoFromRequestHeaders(request.headers));
+	if (geo) response.headers.append("Server-Timing", geo);
+	return response;
 }
 
 /**

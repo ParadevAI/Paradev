@@ -9,6 +9,8 @@ allowed-tools: Bash(gh:*) Bash(bun:*) Bash(git:*)
 
 Take the user from "I want to fix/build X in Paradev" to a merge-ready PR that follows the repo's rules. If the checked-out repo has `CONTRIBUTING.md`, `DEVELOPMENT.md`, or `AGENTS.md`, those files are authoritative; read them and prefer them over this summary.
 
+This skill is local-only: it needs `git`, `gh` and `bun` on this machine, and the Paradev MCP tools do not cover it. In a chat host without a shell, say so and do not substitute other tools.
+
 ## 1. Scope first
 
 - Bug fixes, docs, small improvements: straight to a PR, no issue needed

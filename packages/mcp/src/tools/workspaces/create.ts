@@ -45,7 +45,12 @@ const agentLaunchSchema = z.object({
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "workspaces_create",
-		annotations: { destructiveHint: false },
+		title: "Create workspace",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: true,
+		},
 		description:
 			"Create a workspace. Without hostId it is a cloud workspace: it starts from `environment` (by id — a create without one, when several exist, fails listing the ids; its repositories are the checkouts; required when several environments have repositories), runs on Paradev's infrastructure so it keeps going when the user's laptop sleeps, and returns as soon as its row exists in status 'provisioning' — poll workspaces_list until it is 'awake'. It bills until deleted, so call workspaces_delete when the work is done. A cloud workspace takes `name`, `branch`, `machineSize` and at most one entry in `agents` (claude or codex); host-only fields are rejected. With hostId it is created on that host (see projects_list and hosts_list): use `checkout: local` to share the project checkout without switching branches, or omit checkout for an isolated worktree with a branch or PR; omit `projectId` (and `branch`/`pr`/`baseBranch`/`taskId`) for a project-less session. `agents` spawns agents once the workspace is ready (the equivalent of agents_create) and `command` runs a one-off shell command.",
 		inputSchema: {

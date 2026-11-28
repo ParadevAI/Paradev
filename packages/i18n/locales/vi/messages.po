@@ -2489,6 +2489,9 @@ msgstr "Bản xem trước do agent điều khiển"
 msgid "Agents"
 msgstr "Agent"
 
+msgid "Agents and workspaces"
+msgstr "Agent và workspace"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agent không thể truy cập các công cụ của {0}"
@@ -3084,6 +3087,9 @@ msgstr "quy đổi theo API"
 
 msgid "API-equivalent cost"
 msgstr "Chi phí quy đổi theo API"
+
+msgid "App"
+msgstr "Ứng dụng"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "Chuyển đổi script của bạn"
 msgid "Converting to draft…"
 msgstr "Đang chuyển thành bản nháp…"
 
+msgid "Cookie settings"
+msgstr "Cài đặt cookie"
+
 msgid "cookies and site data"
 msgstr "cookie và dữ liệu trang"
 
@@ -6598,6 +6607,9 @@ msgstr "Không thể cập nhật cài đặt Trò chuyện"
 msgid "Couldn't update the queue"
 msgstr "Không thể cập nhật hàng đợi"
 
+msgid "Couldn't update the usage data setting"
+msgstr "Không thể cập nhật cài đặt dữ liệu sử dụng"
+
 msgid "Couldn't update thread"
 msgstr "Không thể cập nhật luồng"
 
@@ -7081,6 +7093,9 @@ msgstr "Gỡ lỗi các lần chạy thất bại và chạy lại hàm"
 
 msgid "Debug with production stack traces"
 msgstr "Gỡ lỗi bằng stack trace từ production"
+
+msgid "Decline"
+msgstr "Từ chối"
 
 msgid "default"
 msgstr "mặc định"
@@ -7675,6 +7690,9 @@ msgstr "Discord và GitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "Phát hiện và kết nối tới các server phát triển trong mạng của bạn."
 
+msgid "Discovery index"
+msgstr "Chỉ mục khám phá"
+
 msgid "Disk version"
 msgstr "Phiên bản trên đĩa"
 
@@ -7982,6 +8000,9 @@ msgstr "Mỗi người dùng thêm số giờ của gói mình vào một quỹ 
 
 msgid "Each session resumes where it left off."
 msgstr "Mỗi phiên sẽ tiếp tục từ chỗ đang dở."
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "Mỗi skill là một tệp SKILL.md mà agent lập trình tải khi tác vụ cần đến. Agent tìm thấy tất cả trong chỉ mục khám phá."
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "Mỗi lần build thành công sẽ lưu một ảnh chụp. Workspace mới bắt đầu từ ảnh chụp hiện tại, và bạn có thể khôi phục một ảnh chụp trước đó."
@@ -9988,6 +10009,9 @@ msgstr "Trợ giúp"
 
 msgid "Help & Docs"
 msgstr "Trợ giúp & Tài liệu"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "Giúp cải thiện Paradev bằng cách gửi dữ liệu sử dụng và báo cáo sự cố. <0>Tìm hiểu thêm<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "Tắt"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "Đã tắt vì DO_NOT_TRACK được đặt trong môi trường của bạn."
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "Tài liệu chính thức của {0}, ứng dụng chạy song song hơn 100 tác tử lập trình."
@@ -15122,6 +15149,9 @@ msgstr "Paradev dành riêng tên này nên các workspace không nhận đượ
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại {trustHost}."
+
+msgid "Paradev Skills"
+msgstr "Skill Paradev"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradev khởi đầu là một dự án hackathon vào tháng 11 năm 2025. Đó là một ứng dụng máy tính đơn giản để quản lý worktree."
@@ -17134,6 +17164,9 @@ msgstr "Khởi động lại ngay để chuyển sang {accountLabel}; mỗi phi�
 msgid "Restart onboarding"
 msgstr "Bắt đầu lại phần hướng dẫn"
 
+msgid "Restart Paradev to apply"
+msgstr "Khởi động lại Paradev để áp dụng"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"
 
@@ -18638,6 +18671,9 @@ msgstr "Chia sẻ trang (công khai)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Chia sẻ plugin từ một repo GitHub. Ghim bản phát hành bằng git tag."
 
+msgid "Share usage data"
+msgstr "Chia sẻ dữ liệu sử dụng"
+
 msgid "Share via…"
 msgstr "Chia sẻ qua…"
 
@@ -19134,6 +19170,9 @@ msgstr "Skill và công cụ MCP cho agent của bạn. Gửi plugin của riên
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "Skill đi kèm plugin Paradev và được tự động cập nhật trong mọi agent bạn dùng. Nhấp vào một skill để xem trước."
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "Các skill dạy agent cách dùng Paradev."
 
 msgid "Skin Tone"
 msgstr "Màu da"
@@ -22769,9 +22808,6 @@ msgstr "Chúng tôi không dự báo tự vận hành hoàn toàn vào năm 2026
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "Đã tìm thấy {hostName}. Bật Truy cập từ xa trên máy đó để hoàn tất."
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "Chúng tôi chỉ thu thập cookie phân tích để cải thiện trải nghiệm của bạn."
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "Chúng tôi đã gọi vốn hạt giống {amount} để giúp bạn vận hành cả một đội quân agent lập trình."
 
@@ -23458,6 +23494,9 @@ msgstr "Bạn kiểm soát quyền truy cập"
 
 msgid "You created this channel on {created}."
 msgstr "Bạn đã tạo kênh này vào {created}."
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Bạn quyết định về cookie và đo lường quảng cáo; thống kê sử dụng ẩn danh không dùng cookie vẫn tiếp tục dù bạn chọn gì."
 
 msgid "You declined the {plugin} authorization request."
 msgstr "Bạn đã từ chối yêu cầu ủy quyền của {plugin}."

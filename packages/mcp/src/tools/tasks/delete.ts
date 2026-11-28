@@ -7,7 +7,12 @@ import { resolveTask, trackerInput } from "./tracker";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "tasks_delete",
-		annotations: { destructiveHint: true },
+		title: "Delete task",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: true,
+			openWorldHint: true,
+		},
 		description:
 			"Delete a task (soft delete — the row is tombstoned, not purged). A Linear issue is archived when the organization tracks tasks in Linear.",
 		inputSchema: {

@@ -16,13 +16,19 @@ let definition: {
 	handler: (input: Input, ctx: object) => Promise<unknown>;
 };
 let request: { procedure: string; input: unknown } | undefined;
+const realDefineTool = await import("../../define-tool");
+const { defineTool } = realDefineTool;
+const testServer = {} as McpServer;
 mock.module("../../define-tool", () => ({
-	defineTool: (_server: unknown, value: typeof definition) => {
+	...realDefineTool,
+	defineTool: (server: McpServer, value: typeof definition) => {
+		if (server !== testServer) return defineTool(server, value as never);
 		definition = value;
 	},
 }));
+const realHostServiceClient = await import("../../host-service-client");
 mock.module("../../host-service-client", () => ({
-	HostServiceUnreachableError: class extends Error {},
+	...realHostServiceClient,
 	hostServiceCall: async (
 		_ctx: unknown,
 		procedure: string,
@@ -33,13 +39,15 @@ mock.module("../../host-service-client", () => ({
 		return {};
 	},
 }));
+const realCaller = await import("../../caller");
 mock.module("../../caller", () => ({
+	...realCaller,
 	createMcpCaller: () => {
 		throw new Error("Unexpected cloud request");
 	},
 }));
 const { register } = await import("./create");
-register({} as McpServer);
+register(testServer);
 const input: Input = {
 	hostId: "host",
 	projectId: "9f1ca3e7-df91-43a1-bfa2-b4f9ac14aeb0",

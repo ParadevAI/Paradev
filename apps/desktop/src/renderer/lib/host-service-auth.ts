@@ -1,5 +1,7 @@
+import { TELEMETRY_HEADER } from "@superset/shared/constants";
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
 import { getJwt, hasExpiredJwt, waitForFreshJwt } from "./auth-client";
+import { isTelemetryEnabled } from "./telemetry";
 
 const RELAY_TOKEN_WAIT_MS = 5_000;
 
@@ -51,6 +53,7 @@ export function getHostServiceHeaders(hostUrl: string): Record<string, string> {
 	// Relay: use JWT
 	const jwt = getJwt();
 	if (jwt) headers.Authorization = `Bearer ${jwt}`;
+	if (!isTelemetryEnabled()) headers[TELEMETRY_HEADER] = "off";
 	return headers;
 }
 

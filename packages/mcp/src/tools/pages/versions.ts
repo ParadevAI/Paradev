@@ -12,7 +12,12 @@ import { optionalish } from "../../optionalish";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_versions",
-		annotations: { readOnlyHint: true },
+		title: "List page versions",
+		annotations: {
+			readOnlyHint: true,
+			destructiveHint: false,
+			openWorldHint: false,
+		},
 		description:
 			"List a page's version history, newest first, with each version's label, size, and who published it. Every publish creates a new version; nothing is overwritten. Address the page by id or slug; exactly one is required.",
 		inputSchema: z

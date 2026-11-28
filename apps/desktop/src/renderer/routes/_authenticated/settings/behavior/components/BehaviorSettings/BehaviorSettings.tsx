@@ -10,6 +10,7 @@ import {
 import { Switch } from "@superset/ui/switch";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
+import { SettingsSection } from "renderer/routes/_authenticated/settings/components/SettingsSection";
 import { type ChangesOpenTarget, useSettings } from "renderer/stores/settings";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
 import {
@@ -21,6 +22,7 @@ import { AcpChatSetting } from "./components/AcpChatSetting";
 import { AgentSessionPlacementSetting } from "./components/AgentSessionPlacementSetting";
 import { GithubStarRow } from "./components/GithubStarRow";
 import { MessageTimestampSetting } from "./components/MessageTimestampSetting";
+import { TelemetrySetting } from "./components/TelemetrySetting";
 
 interface BehaviorSettingsProps {
 	visibleItems?: SettingItemId[] | null;
@@ -53,6 +55,26 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 		SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE,
 		visibleItems,
 	);
+	const showAgentSessionPlacement = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT,
+		visibleItems,
+	);
+	const showAcpChat = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT,
+		visibleItems,
+	);
+	const showTelemetry = isItemVisible(
+		SETTING_ITEM_ID.BEHAVIOR_TELEMETRY,
+		visibleItems,
+	);
+	const showAppSection =
+		showConfirmQuit || showResourceMonitor || showParadevAnywhere;
+	const showAgentsSection =
+		showAgentSessionPlacement ||
+		showAcpChat ||
+		showMessageTimestamps ||
+		showChangesOpenTarget ||
+		showDictation;
 	const showStarGithub = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB,
 		visibleItems,
@@ -121,164 +143,194 @@ export function BehaviorSettings({ visibleItems }: BehaviorSettingsProps) {
 				</p>
 			</div>
 
-			<div className="space-y-6">
-				{showConfirmQuit && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label htmlFor="confirm-on-quit" className="text-sm font-medium">
-								<HighlightText
-									text={t({
-										message: "Confirm before quitting",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>Show a confirmation dialog when quitting the app</Trans>
-							</p>
+			<div className="space-y-8">
+				{showAppSection && (
+					<SettingsSection title={t({ message: "App" })}>
+						<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
+							{showConfirmQuit && (
+								<div className="flex items-center justify-between gap-6 p-4">
+									<div className="space-y-0.5">
+										<Label
+											htmlFor="confirm-on-quit"
+											className="text-sm font-medium"
+										>
+											<HighlightText
+												text={t({
+													message: "Confirm before quitting",
+												})}
+												query={searchQuery}
+											/>
+										</Label>
+										<p className="text-xs text-muted-foreground">
+											<Trans>
+												Show a confirmation dialog when quitting the app
+											</Trans>
+										</p>
+									</div>
+									<Switch
+										id="confirm-on-quit"
+										checked={confirmOnQuit ?? true}
+										onCheckedChange={handleConfirmToggle}
+										disabled={isConfirmLoading || setConfirmOnQuit.isPending}
+									/>
+								</div>
+							)}
+							{showResourceMonitor && (
+								<div className="flex items-center justify-between gap-6 p-4">
+									<div className="space-y-0.5">
+										<Label
+											htmlFor="resource-monitor"
+											className="text-sm font-medium"
+										>
+											<HighlightText
+												text={t({
+													message: "Resource monitor",
+												})}
+												query={searchQuery}
+											/>
+										</Label>
+										<p className="text-xs text-muted-foreground">
+											<Trans>Show CPU and memory usage in the top bar</Trans>
+										</p>
+									</div>
+									<Switch
+										id="resource-monitor"
+										checked={resourceMonitorEnabled ?? false}
+										onCheckedChange={(enabled) =>
+											setShowResourceMonitor.mutate({ enabled })
+										}
+										disabled={
+											isResourceMonitorLoading ||
+											setShowResourceMonitor.isPending
+										}
+									/>
+								</div>
+							)}
+							{showParadevAnywhere && (
+								<div className="flex items-center justify-between gap-6 p-4">
+									<div className="space-y-0.5">
+										<Label
+											htmlFor="paradev-anywhere"
+											className="text-sm font-medium"
+										>
+											<HighlightText
+												text={t({ message: "Use Paradev anywhere button" })}
+												query={searchQuery}
+											/>
+										</Label>
+										<p className="text-xs text-muted-foreground">
+											<Trans>
+												Show the sidebar button that links to Mobile, Cloud, the
+												CLI and Self-hosted.
+											</Trans>
+										</p>
+									</div>
+									<Switch
+										id="paradev-anywhere"
+										checked={paradevAnywhereShown}
+										onCheckedChange={(shown) =>
+											updateSetting("showParadevAnywhereButton", shown)
+										}
+									/>
+								</div>
+							)}
 						</div>
-						<Switch
-							id="confirm-on-quit"
-							checked={confirmOnQuit ?? true}
-							onCheckedChange={handleConfirmToggle}
-							disabled={isConfirmLoading || setConfirmOnQuit.isPending}
-						/>
-					</div>
+					</SettingsSection>
 				)}
 
-				{isItemVisible(
-					SETTING_ITEM_ID.BEHAVIOR_AGENT_SESSION_PLACEMENT,
-					visibleItems,
-				) && <AgentSessionPlacementSetting searchQuery={searchQuery} />}
-
-				{isItemVisible(SETTING_ITEM_ID.BEHAVIOR_ACP_CHAT, visibleItems) && (
-					<AcpChatSetting />
+				{showAgentsSection && (
+					<SettingsSection title={t({ message: "Agents and workspaces" })}>
+						<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
+							{showAgentSessionPlacement && (
+								<AgentSessionPlacementSetting searchQuery={searchQuery} />
+							)}
+							{showAcpChat && <AcpChatSetting />}
+							{showMessageTimestamps && <MessageTimestampSetting />}
+							{showChangesOpenTarget && (
+								<div className="flex items-center justify-between gap-6 p-4">
+									<div className="space-y-0.5">
+										<Label
+											htmlFor="changes-open-target"
+											className="text-sm font-medium"
+										>
+											<HighlightText
+												text={t({
+													message: "Changes open target",
+												})}
+												query={searchQuery}
+											/>
+										</Label>
+										<p className="text-xs text-muted-foreground">
+											<Trans>
+												Choose how the Changes view opens from the top bar
+											</Trans>
+										</p>
+									</div>
+									<Select
+										value={changesOpenTarget}
+										onValueChange={(value) =>
+											updateSetting(
+												"changesOpenTarget",
+												value as ChangesOpenTarget,
+											)
+										}
+									>
+										<SelectTrigger
+											id="changes-open-target"
+											className="w-[180px]"
+										>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="pane">
+												<Trans>Pane in current tab</Trans>
+											</SelectItem>
+											<SelectItem value="tab">
+												<Trans>New tab</Trans>
+											</SelectItem>
+										</SelectContent>
+									</Select>
+								</div>
+							)}
+							{showDictation && (
+								<div className="flex items-center justify-between gap-6 p-4">
+									<div className="space-y-0.5">
+										<Label htmlFor="dictation" className="text-sm font-medium">
+											<HighlightText
+												text={t({
+													message: "Dictation",
+												})}
+												query={searchQuery}
+											/>
+										</Label>
+										<p className="text-xs text-muted-foreground">
+											<Trans>
+												Show a microphone in the chat composer. Speech is
+												transcribed by ChatGPT when Codex is signed in to it,
+												otherwise on your Mac when possible, and otherwise by
+												Paradev's servers.
+											</Trans>
+										</p>
+									</div>
+									<Switch
+										id="dictation"
+										checked={dictationEnabled}
+										onCheckedChange={(enabled) =>
+											updateSetting("dictationEnabled", enabled)
+										}
+									/>
+								</div>
+							)}
+						</div>
+					</SettingsSection>
 				)}
 
-				{showMessageTimestamps && <MessageTimestampSetting />}
-
-				{showChangesOpenTarget && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label
-								htmlFor="changes-open-target"
-								className="text-sm font-medium"
-							>
-								<HighlightText
-									text={t({
-										message: "Changes open target",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>
-									Choose how the Changes view opens from the top bar
-								</Trans>
-							</p>
+				{showTelemetry && (
+					<SettingsSection title={t({ message: "Privacy" })}>
+						<div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
+							<TelemetrySetting />
 						</div>
-						<Select
-							value={changesOpenTarget}
-							onValueChange={(value) =>
-								updateSetting("changesOpenTarget", value as ChangesOpenTarget)
-							}
-						>
-							<SelectTrigger id="changes-open-target" className="w-[180px]">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="pane">
-									<Trans>Pane in current tab</Trans>
-								</SelectItem>
-								<SelectItem value="tab">
-									<Trans>New tab</Trans>
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-				)}
-
-				{showResourceMonitor && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label htmlFor="resource-monitor" className="text-sm font-medium">
-								<HighlightText
-									text={t({
-										message: "Resource monitor",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>Show CPU and memory usage in the top bar</Trans>
-							</p>
-						</div>
-						<Switch
-							id="resource-monitor"
-							checked={resourceMonitorEnabled ?? false}
-							onCheckedChange={(enabled) =>
-								setShowResourceMonitor.mutate({ enabled })
-							}
-							disabled={
-								isResourceMonitorLoading || setShowResourceMonitor.isPending
-							}
-						/>
-					</div>
-				)}
-
-				{showDictation && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label htmlFor="dictation" className="text-sm font-medium">
-								<HighlightText
-									text={t({
-										message: "Dictation",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>
-									Show a microphone in the chat composer. Speech is transcribed
-									by ChatGPT when Codex is signed in to it, otherwise on your
-									Mac when possible, and otherwise by Paradev's servers.
-								</Trans>
-							</p>
-						</div>
-						<Switch
-							id="dictation"
-							checked={dictationEnabled}
-							onCheckedChange={(enabled) =>
-								updateSetting("dictationEnabled", enabled)
-							}
-						/>
-					</div>
-				)}
-
-				{showParadevAnywhere && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label htmlFor="paradev-anywhere" className="text-sm font-medium">
-								<HighlightText
-									text={t({ message: "Use Paradev anywhere button" })}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>
-									Show the sidebar button that links to Mobile, Cloud, the CLI
-									and Self-hosted.
-								</Trans>
-							</p>
-						</div>
-						<Switch
-							id="paradev-anywhere"
-							checked={paradevAnywhereShown}
-							onCheckedChange={(shown) =>
-								updateSetting("showParadevAnywhereButton", shown)
-							}
-						/>
-					</div>
+					</SettingsSection>
 				)}
 
 				{showStarGithub && <GithubStarRow searchQuery={searchQuery} />}

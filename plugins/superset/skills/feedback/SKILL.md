@@ -7,7 +7,9 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(gh:*) Bash(uname:*) WebFetc
 
 # Paradev Feedback
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
+
+Use the Paradev MCP tools when they are in your tool list, and the `paradev` CLI otherwise. No MCP tool submits feedback: `paradev feedback submit`, `paradev auth` and `paradev status` are local-only, and `hosts_list` replaces `paradev hosts list`. The docs lookup, the mailto link and the prefilled GitHub issue form work without the CLI.
 
 Check Paradev's documentation for an existing answer first. When feedback still needs reporting, turn it into a short, scannable report and submit it where the user chooses. Treat whatever they wrote after the command as the seed.
 
@@ -33,9 +35,9 @@ If the answer resolves the request and the user has not asked to file anyway, st
 
 Run in parallel; skip anything that fails:
 
-- `superset --version` and `uname -sm` for the environment line
-- `superset auth whoami` for the signed-in user/org (private submissions only)
-- `superset status --json` for the host service; its `hostServiceVersion` is the desktop app's version when the app spawned the service
+- `paradev --version` and `uname -sm` for the environment line
+- `paradev auth whoami` for the signed-in user/org (private submissions only)
+- `paradev status --json` for the host service; its `hostServiceVersion` is the desktop app's version when the app spawned the service
 
 Don't include repository contents, terminal output, or logs unless the user explicitly agrees when asked; they can contain private paths and code.
 
@@ -44,13 +46,13 @@ Don't include repository contents, terminal output, or logs unless the user expl
 Many reports describe bugs already fixed in a newer release. Desktop, CLI, and host service share one version number, so compare what's running against the latest release:
 
 - Latest: `superset update --check --json` (standalone CLI). If it says the CLI is bundled with the desktop app, the CLI version is the app version; get the latest from `gh release download cli-latest -R paradevai/paradev -p version.txt -O -` instead.
-- Running: the CLI version, and `hostServiceVersion` from `superset status --json` if it differs.
+- Running: the CLI version, and `hostServiceVersion` from `paradev status --json` if it differs.
 
 If anything is behind, say so before drafting and ask whether they want to update first (the desktop app updates itself from its menu; a standalone CLI with `superset update`). If they'd rather file now, note the versions in the report.
 
 ### Bugs about hosts, automations, terminals, or remote workspaces
 
-Symptoms like "host not registered", "hosts list is empty", "automations create fails", "host shows offline", "terminal won't attach", or "workspace missing from the sidebar" are the most common reports and usually have a known cause. Before drafting, run the doctor skill's snapshot (`superset status`, `superset auth whoami`, `superset hosts list`) and apply its signature table. If that fixes it, there's nothing to report. If it doesn't, keep the `superset status --json` output for the report; it's what the team asks for first.
+Symptoms like "host not registered", "hosts list is empty", "automations create fails", "host shows offline", "terminal won't attach", or "workspace missing from the sidebar" are the most common reports and usually have a known cause. Before drafting, run the doctor skill's snapshot (`paradev status`, `paradev auth whoami`, `paradev hosts list`) and apply its signature table. If that fixes it, there's nothing to report. If it doesn't, keep the `paradev status --json` output for the report; it's what the team asks for first.
 
 ### Evidence (bugs only, offer, never assume)
 
@@ -110,7 +112,7 @@ Paradev 1.21.0, macOS 26.0 arm64
 ```
 
 - **Investigation** is optional and only for findings the user or you actually made: a log line, a measurement, a code path read from the repo. Label guesses `Hypothesis:`. Never promote them into the title or Summary; reporters have been confidently wrong, and a wrong cause in the title sends triage down the wrong path.
-- **Host status** is the `superset status --json` output, only for the bug classes in step 1.
+- **Host status** is the `paradev status --json` output, only for the bug classes in step 1.
 - **Environment** goes in the body only on the public path, or when the desktop app version differs from the CLI version; the private path already appends the CLI version and OS.
 - Never submit a checklist with unanswered items ("not yet checked"). Either get the answer or drop the question.
 
@@ -146,14 +148,14 @@ Never submit anything before the user explicitly picks 1 or 2. Loop on edits.
 ## 4. Submit
 
 **Private path:**
-- If `superset feedback --help >/dev/null 2>&1` exits 0 (the exit code alone says the command exists; it works on every CLI version and needs no `jq`), submit via stdin (note: `--body-file=-` with the equals sign; a space-separated `-` is rejected by the parser):
+- If `paradev feedback --help >/dev/null 2>&1` exits 0 (the exit code alone says the command exists; it works on every CLI version and needs no `jq`), submit via stdin (note: `--body-file=-` with the equals sign; a space-separated `-` is rejected by the parser):
   ```bash
-  superset feedback submit --type <bug|feature|general> --title "..." --body-file=- <<'EOF'
+  paradev feedback submit --type <bug|feature|general> --title "..." --body-file=- <<'EOF'
   <drafted report>
   EOF
   ```
   Only when the user agreed to them in step 1, add `--attach /path/to/screenshot.png` (comma-separated paths, about 3 MB total) and/or `--diagnostics`. The submission is sent from the user's Paradev account, a copy is CC'd to them, and the team replies to their account email.
-- If the CLI is missing or not logged in (`superset auth whoami` fails), offer `superset auth login` first; if declined, fall back to email: give the user a clickable mailto link (`mailto:support@paradev.com?subject=<url-encoded title>&body=<url-encoded body>`) and also print the raw draft so they can copy it.
+- If the CLI is missing or not logged in (`paradev auth whoami` fails), offer `paradev auth login` first; if declined, fall back to email: give the user a clickable mailto link (`mailto:support@paradev.com?subject=<url-encoded title>&body=<url-encoded body>`) and also print the raw draft so they can copy it.
 
 **Public path:**
 - **Check for duplicates first**: `gh search issues -R paradevai/paradev "<key terms>" --limit 5`. If an existing issue matches, show it and offer to comment there (`gh issue comment`) instead of opening a new one; only create a fresh issue if the user confirms it's genuinely different.

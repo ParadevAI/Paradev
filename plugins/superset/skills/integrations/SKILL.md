@@ -1,16 +1,18 @@
 ---
 name: integrations
-description: Discover and call the tools a connected integration exposes, such as Linear, GitHub, Sentry, or Notion, through `superset mcp` (or its alias `paradev mcp`). Use when the user wants something done in a connected service, asks what an integration can do or which tools it has, wants a specific tool called, asks why an integration's tools are failing, or when another skill expects `mcp__linear__*`-style tools that are not in your tool list.
+description: Discover and call the tools a connected integration exposes, such as Linear, GitHub, Sentry, or Notion, through `paradev mcp`. Use when the user wants something done in a connected service, asks what an integration can do or which tools it has, wants a specific tool called, asks why an integration's tools are failing, or when another skill expects `mcp__linear__*`-style tools that are not in your tool list.
 argument-hint: what you want done in a connected service
 allowed-tools: Bash(superset mcp:*) Bash(paradev mcp:*) Bash(superset plugins:*) Bash(paradev plugins:*) Bash(superset skills:*) Bash(paradev skills:*)
 ---
 
 # Calling an integration's tools
 
-`paradev` is an alias for the `superset` CLI: every `superset` command here also runs as `paradev`.
+If `paradev` is not found, run the same command as `superset`, or update the CLI.
+
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
 
 An integration is an installed plugin with a connected account. Its tools do not run here.
-`superset mcp` hands the call to Paradev's API, which attaches the stored credential and
+`paradev mcp` hands the call to Paradev's API, which attaches the stored credential and
 forwards it to the plugin's MCP server. No token is ever written to this machine, which is
 also why a sandbox with no route to Linear can still file a Linear issue.
 
@@ -20,7 +22,7 @@ something is connected, and it is two steps: list the tools, then call one.
 ## 1. Find the integration
 
 ```bash
-superset plugins list                     # one row per connected account, one row if none yet
+paradev plugins list                     # one row per connected account, one row if none yet
 ```
 
 Read the `STATUS` column. `connected: <account>` is callable. `needs connection` means the
@@ -33,9 +35,9 @@ two connected accounts has two rows.
 ## 2. List the tools, then read the one you will call
 
 ```bash
-superset mcp tools --plugin linear
-superset mcp tools --plugin linear | jq -r '.[].tool'   # names only; descriptions run long
-superset mcp tools create_issue --plugin linear         # its arguments and output
+paradev mcp tools --plugin linear
+paradev mcp tools --plugin linear | jq -r '.[].tool'   # names only; descriptions run long
+paradev mcp tools create_issue --plugin linear         # its arguments and output
 ```
 
 Names, descriptions and schemas come from the plugin's own server, not from anything in this
@@ -54,9 +56,9 @@ from more than one.
 ## 3. Call it
 
 ```bash
-superset mcp call-tool list_issues --plugin linear
-superset mcp call-tool create_issue --plugin linear '{"team":"ENG","title":"Export 500s"}'
-echo '{"team":"ENG","title":"..."}' | superset mcp call-tool create_issue --plugin linear -
+paradev mcp call-tool list_issues --plugin linear
+paradev mcp call-tool create_issue --plugin linear '{"team":"ENG","title":"Export 500s"}'
+echo '{"team":"ENG","title":"..."}' | paradev mcp call-tool create_issue --plugin linear -
 ```
 
 The tool name is the first positional and the plugin travels in `--plugin`, always. Arguments
@@ -67,7 +69,7 @@ What comes back is the MCP result verbatim: a `content` array whose text parts a
 themselves JSON strings.
 
 ```bash
-superset mcp call-tool list_issues --plugin linear | jq -r '.content[0].text' | jq
+paradev mcp call-tool list_issues --plugin linear | jq -r '.content[0].text' | jq
 ```
 
 ## When another skill expects tools you do not have
@@ -83,8 +85,8 @@ do not tell the user the integration is unavailable. The same operations sit on 
 account, one command away:
 
 ```bash
-superset mcp tools --plugin linear              # what the account can actually do
-superset mcp call-tool create_issue --plugin linear '{"team":"ENG","title":"..."}'
+paradev mcp tools --plugin linear              # what the account can actually do
+paradev mcp call-tool create_issue --plugin linear '{"team":"ENG","title":"..."}'
 ```
 
 Keep following the skill you were reading, since its judgment about what makes a good issue or
@@ -94,9 +96,9 @@ a good triage still applies. Only the transport changes.
 
 | What you see | What it means |
 | --- | --- |
-| `"x" is not connected. Connect an account first.` | Nothing is authorized under that name. Also what an uninstalled plugin looks like. Run `superset plugins connect x`, or install it first. |
+| `"x" is not connected. Connect an account first.` | Nothing is authorized under that name. Also what an uninstalled plugin looks like. Run `paradev plugins connect x`, or install it first. |
 | `--connection takes a plugin name now, not a connection id.` | You passed a UUID. The handle is the plugin name: `--plugin <name>`. |
-| `Pass --plugin <name>.` | `superset mcp tools` with no target. |
+| `Pass --plugin <name>.` | `paradev mcp tools` with no target. |
 | `"x" is installed from more than one marketplace.` | Pass one of the `--plugin x@<marketplace>` refs the hint lists. |
 | `<plugin> has no tool "x".` | The name is not in the listing. Take the hint, or list the tools again. |
 | `Missing required argument: <tool>` | `call-tool` takes the tool name first; the plugin goes in `--plugin`. |
@@ -113,7 +115,7 @@ a good triage still applies. Only the transport changes.
 - Picking one of several connected accounts yourself. Which account acts is the user's call.
 - Reconnecting on any 403. Half of them are a permissions problem on the account you already
   have.
-- Reaching for `superset plugins sync` when a call fails on authorization. Sync converges
+- Reaching for `paradev plugins sync` when a call fails on authorization. Sync converges
   skills on this machine; it has nothing to do with credentials.
 - Installing or connecting a plugin to see what it offers. That writes to the user's account
   and reaches every machine they sign in on, so ask first and use the `plugins` skill.

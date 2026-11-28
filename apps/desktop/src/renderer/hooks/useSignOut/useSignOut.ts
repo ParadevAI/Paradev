@@ -3,7 +3,7 @@ import { toast } from "@superset/ui/sonner";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { posthog } from "renderer/lib/posthog";
+import { postHogIdentity } from "renderer/lib/posthog-identity";
 
 export const ACTIVE_ORG_ID_KEY = "active_organization_id";
 
@@ -17,7 +17,7 @@ export function useSignOut() {
 	const cloudUtils = cloudTrpc.useUtils();
 
 	return async () => {
-		posthog.reset();
+		postHogIdentity.reset();
 		setAnalyticsUserId.mutate({ userId: null });
 		localStorage.removeItem(ACTIVE_ORG_ID_KEY);
 		await Promise.race([

@@ -2489,6 +2489,9 @@ msgstr "エージェントが操作するプレビュー"
 msgid "Agents"
 msgstr "エージェント"
 
+msgid "Agents and workspaces"
+msgstr "エージェントとワークスペース"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "エージェントは {0} のツールにアクセスできません"
@@ -3084,6 +3087,9 @@ msgstr "API換算"
 
 msgid "API-equivalent cost"
 msgstr "API換算のコスト"
+
+msgid "App"
+msgstr "アプリ"
 
 msgctxt "log scope"
 msgid "App"
@@ -5703,6 +5709,9 @@ msgstr "スクリプトを変換"
 msgid "Converting to draft…"
 msgstr "ドラフトに変換しています…"
 
+msgid "Cookie settings"
+msgstr "Cookie 設定"
+
 msgid "cookies and site data"
 msgstr "Cookieとサイトデータ"
 
@@ -6598,6 +6607,9 @@ msgstr "チャットの設定を更新できませんでした"
 msgid "Couldn't update the queue"
 msgstr "キューを更新できませんでした"
 
+msgid "Couldn't update the usage data setting"
+msgstr "使用状況データの設定を更新できませんでした"
+
 msgid "Couldn't update thread"
 msgstr "スレッドを更新できませんでした"
 
@@ -7081,6 +7093,9 @@ msgstr "失敗した実行のデバッグと関数の再実行"
 
 msgid "Debug with production stack traces"
 msgstr "本番のスタックトレースでデバッグ"
+
+msgid "Decline"
+msgstr "拒否"
 
 msgid "default"
 msgstr "デフォルト"
@@ -7675,6 +7690,9 @@ msgstr "DiscordとGitHub"
 msgid "Discover and connect to development servers on your network."
 msgstr "ネットワーク上の開発サーバーを検出して接続します。"
 
+msgid "Discovery index"
+msgstr "ディスカバリーインデックス"
+
 msgid "Disk version"
 msgstr "ディスク上のバージョン"
 
@@ -7982,6 +8000,9 @@ msgstr "各席はプランの時間をチーム全体で共有する 1 つのプ
 
 msgid "Each session resumes where it left off."
 msgstr "各セッションは中断したところから再開します。"
+
+msgid "Each skill is a SKILL.md file that a coding agent loads when a task needs it. Agents find all of them in the discovery index."
+msgstr "各スキルは、タスクで必要になったときにコーディングエージェントが読み込む SKILL.md ファイルです。エージェントはディスカバリーインデックスですべてを見つけられます。"
 
 msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
 msgstr "ビルドが成功するたびにスナップショットが保存されます。新しいワークスペースは現在のスナップショットから開始し、以前のものに復元することもできます。"
@@ -9988,6 +10009,9 @@ msgstr "ヘルプ"
 
 msgid "Help & Docs"
 msgstr "ヘルプとドキュメント"
+
+msgid "Help improve Paradev by sending usage data and crash reports. <0>Learn more<1/></0>"
+msgstr "使用状況データとクラッシュレポートを送信して、Paradev の改善にご協力ください。<0>詳細<1/></0>"
 
 msgid "Henry Ford"
 msgstr "Henry Ford"
@@ -13886,6 +13910,9 @@ msgctxt "auto top-up"
 msgid "Off"
 msgstr "オフ"
 
+msgid "Off because DO_NOT_TRACK is set in your environment."
+msgstr "環境で DO_NOT_TRACK が設定されているためオフになっています。"
+
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
 msgstr "100以上のコーディングエージェントを並列実行できるアプリ、{0}の公式ドキュメント。"
@@ -15122,6 +15149,9 @@ msgstr "この名前は Paradev が予約しているため、ワークスペー
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradevは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Paradevは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認は{trustHost}から行えます。"
+
+msgid "Paradev Skills"
+msgstr "Paradev スキル"
 
 msgid "Paradev started as a hackathon project in November 2025. It was a simple desktop app for managing worktrees."
 msgstr "Paradevは2025年11月、ハッカソンのプロジェクトとして始まりました。ワークツリーを管理するだけの、シンプルなデスクトップアプリでした。"
@@ -17134,6 +17164,9 @@ msgstr "今すぐ再起動すると{accountLabel}に移行し、各セッショ�
 msgid "Restart onboarding"
 msgstr "オンボーディングをやり直す"
 
+msgid "Restart Paradev to apply"
+msgstr "適用するには Paradev を再起動してください"
+
 msgid "Restart running {providerLabel} agents?"
 msgstr "実行中の{providerLabel}エージェントを再起動しますか？"
 
@@ -18638,6 +18671,9 @@ msgstr "ページを共有（公開）"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHubリポジトリからプラグインを共有。gitタグでリリースを固定できます。"
 
+msgid "Share usage data"
+msgstr "使用状況データを共有"
+
 msgid "Share via…"
 msgstr "共有方法を選択…"
 
@@ -19134,6 +19170,9 @@ msgstr "エージェント向けのスキルとMCPツール。自分のプラグ
 
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "スキルはParadevプラグインに同梱され、使用するすべてのエージェントで自動的に最新の状態に保たれます。クリックしてプレビューできます。"
+
+msgid "Skills that teach agents to use Paradev."
+msgstr "エージェントに Paradev の使い方を教えるスキル。"
 
 msgid "Skin Tone"
 msgstr "肌の色"
@@ -22769,9 +22808,6 @@ msgstr "2026年や2027年に完全自動運転が実現するとは予測して�
 msgid "We found {hostName}. Turn on Remote Access there to finish."
 msgstr "{hostName}が見つかりました。そちらでリモートアクセスをオンにすると完了です。"
 
-msgid "We only collect analytics cookies so we can improve your experience."
-msgstr "体験を改善するため、分析用のCookieのみを収集しています。"
-
 msgid "We raised an {amount} seed round to help you run an army of coding agents."
 msgstr "コーディングエージェント軍団を動かせるよう、シードラウンドで {amount} を調達しました。"
 
@@ -23458,6 +23494,9 @@ msgstr "アクセス権はあなたが管理します"
 
 msgid "You created this channel on {created}."
 msgstr "{created} にこのチャンネルを作成しました。"
+
+msgid "You decide on cookies and ad measurement; anonymous usage statistics without cookies continue either way."
+msgstr "Cookie と広告効果の測定はあなたが選べます。Cookie を使わない匿名の利用統計は、どちらを選んでも続きます。"
 
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} の認可リクエストを拒否しました。"

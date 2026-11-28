@@ -6,7 +6,13 @@ import { defineTool } from "../../../define-tool";
 export function register(server: McpServer): void {
 	defineTool(server, {
 		name: "pages_comments_resolve",
-		annotations: { destructiveHint: false },
+		title: "Resolve page comment",
+		annotations: {
+			readOnlyHint: false,
+			destructiveHint: false,
+			openWorldHint: false,
+			idempotentHint: true,
+		},
 		description:
 			"Mark a comment thread on a published page resolved, or reopen one. Call pages_comments_reply first so the thread records what changed before it closes. Anyone who can read the page may resolve a thread — that is a statement about the page, not about the comment.",
 		inputSchema: {

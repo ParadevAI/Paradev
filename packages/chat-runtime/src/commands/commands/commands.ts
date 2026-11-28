@@ -277,6 +277,7 @@ export type ContinueSessionInput = {
 	sessionId: string;
 	cwd: string;
 	harnessSessionId: string;
+	agentConfigId?: string;
 	terminalId?: string;
 };
 
@@ -771,6 +772,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				harness: session.harness,
 				harnessSessionId: input.harnessSessionId,
 			});
+			if (session.closedAt) options.sessions.markOpen(input.sessionId);
 			// Removes the dead entry at once, so `create` can take its id.
 			if (live) {
 				void options.live
@@ -786,6 +788,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				sessionId: input.sessionId,
 				scopeId: session.scopeId,
 				harness: session.harness,
+				...(input.agentConfigId ? { agentConfigId: input.agentConfigId } : {}),
 				cwd: input.cwd,
 				...selections,
 				// The history is already in the journal: replaying it again would show it twice.
