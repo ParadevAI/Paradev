@@ -15,6 +15,7 @@ import {
 	packagedNodeModuleExclusions,
 } from "./runtime-dependencies";
 import { builderProductName } from "./scripts/builder-product-name";
+import { LINUX_LIBC_DEPENDS } from "./scripts/linux-libc-floor";
 import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const currentYear = new Date().getFullYear();
@@ -179,10 +180,23 @@ const config: Configuration = {
 	// one and costs roughly a tenth in download size.
 	// The in-app update runs dpkg -i, which must replace the installed package.
 	// The control file's Vendor defaults to the maintainer.
+	// Setting depends replaces electron-builder's default list, so it is repeated here.
 	deb: {
 		compression: "gz",
 		packageName: "superset",
 		maintainer: "Paradev <support@paradev.com>",
+		depends: [
+			"libgtk-3-0",
+			"libnotify4",
+			"libnss3",
+			"libxss1",
+			"libxtst6",
+			"xdg-utils",
+			"libatspi2.0-0",
+			"libuuid1",
+			"libsecret-1-0",
+			...LINUX_LIBC_DEPENDS,
+		],
 	},
 
 	// Deep linking protocol

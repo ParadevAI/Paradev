@@ -262,10 +262,28 @@ jobs:
   build-linux:
     name: Build - Linux (x64)
     runs-on: ubuntu-latest
+    # Native modules link against the build system's glibc and libstdc++, so
+    # build on the oldest distro in apps/desktop/scripts/linux-libc-floor.ts.
+    container:
+      image: ubuntu:22.04@sha256:b000e69a50ff940390233025e7a337fb8469b509e2334fa4d018ac30f3e18cdb
     timeout-minutes: 60
     environment: ${{ inputs.environment }}
+    # GCC 11 and 12 cannot parse Electron's V8 headers. Clang keeps jammy's
+    # libstdc++, where a newer GCC would add GLIBCXX symbols past the floor.
+    env:
+      CC: clang-15
+      CXX: clang++-15
 
     steps:
+      - name: Install build tools
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates git curl unzip xz-utils binutils \
+            python3 make clang-15 pkg-config libx11-dev libxkbfile-dev
+
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -274,6 +292,11 @@ jobs:
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
 
       - name: Cache dependencies
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -286,9 +309,6 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen --ignore-scripts
-
-      - name: Install Linux native build deps
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev
 
       - name: Install desktop native dependencies
         working-directory: apps/desktop
@@ -345,6 +365,10 @@ jobs:
         env:
           DESKTOP_DISPLAY_NAME: ${{ secrets.DESKTOP_DISPLAY_NAME }}
         run: bun run package -- --publish never --config ${{ inputs.electron_builder_config }}
+
+      - name: Check packaged binaries against the glibc floor
+        working-directory: apps/desktop
+        run: bun run scripts/check-linux-glibc.ts release/linux-unpacked
 
       - name: Verify Linux AppImage + update manifest exist
         working-directory: apps/desktop
