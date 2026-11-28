@@ -22,7 +22,7 @@ test("a click queued before PostHog loads reaches the cookieless instance", () =
 	const capture = mock();
 
 	queue.capture("download_clicked", { platform: "mac", source: "hero" });
-	queue.setAnonymousPosthog({ capture });
+	queue.setAnonymousPosthog({ capture, captureException: mock() });
 
 	expect(capture).toHaveBeenCalledWith("download_clicked", {
 		platform: "mac",
@@ -34,7 +34,7 @@ test("no email reaches the cookieless instance from a waitlist signup", () => {
 	declinedWindow();
 	const queue = createPosthogQueue();
 	const capture = mock();
-	queue.setAnonymousPosthog({ capture });
+	queue.setAnonymousPosthog({ capture, captureException: mock() });
 
 	queue.capture("waitlist_signup", {
 		email: "a@example.com",
@@ -58,7 +58,7 @@ test("calls other than capture never reach the cookieless instance", () => {
 	const callback = mock();
 
 	queue.withPosthog(callback);
-	queue.setAnonymousPosthog({ capture: mock() });
+	queue.setAnonymousPosthog({ capture: mock(), captureException: mock() });
 	queue.withPosthog(callback);
 
 	expect(callback).not.toHaveBeenCalled();
@@ -74,4 +74,26 @@ test("with consent the full instance gets the properties as sent", () => {
 	expect(capture).toHaveBeenCalledWith("waitlist_signup", {
 		email: "a@example.com",
 	});
+});
+
+test("an exception reaches the cookieless instance without personal properties", () => {
+	declinedWindow();
+	const queue = createPosthogQueue();
+	const captureException = mock();
+	const error = new Error("boom");
+
+	queue.captureException(error, { digest: "d1", email: "a@example.com" });
+	queue.setAnonymousPosthog({ capture: mock(), captureException });
+
+	expect(captureException).toHaveBeenCalledWith(error, { digest: "d1" });
+});
+
+test("cookieless-only captures never reach the full instance", () => {
+	const queue = createPosthogQueue();
+	const capture = mock();
+	queue.setPosthogInstance({ capture } as unknown as PostHog);
+
+	queue.captureCookieless("$web_vitals", { $web_vitals_LCP_value: 1200 });
+
+	expect(capture).not.toHaveBeenCalled();
 });

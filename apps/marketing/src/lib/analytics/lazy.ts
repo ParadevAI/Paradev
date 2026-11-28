@@ -4,7 +4,7 @@ import { canTrack } from "./consent";
 
 type PosthogCallback = (posthog: PostHog) => void;
 type Properties = Record<string, unknown>;
-type AnonymousPosthog = Pick<PostHog, "capture">;
+type AnonymousPosthog = Pick<PostHog, "capture" | "captureException">;
 type Target = { posthog: PostHog } | { anonymous: AnonymousPosthog };
 
 const PERSONAL_KEYS = new Set([
@@ -44,7 +44,7 @@ export function anonymousProperties(properties?: Properties): Properties {
 	return kept;
 }
 
-/** Queues calls until posthog-js loads. Without consent only capture() reaches PostHog, with anonymousProperties(). */
+/** Queues calls until posthog-js loads. Without consent only the capture calls reach PostHog, with anonymousProperties(). */
 export function createPosthogQueue() {
 	let target: Target | null = null;
 	const queue: ((target: Target) => void)[] = [];
@@ -72,6 +72,24 @@ export function createPosthogQueue() {
 				else current.anonymous.capture(event, anonymousProperties(properties));
 			});
 		},
+		captureException(error: unknown, properties?: Properties): void {
+			run((current) => {
+				if ("posthog" in current)
+					current.posthog.captureException(error, properties);
+				else
+					current.anonymous.captureException(
+						error,
+						anonymousProperties(properties),
+					);
+			});
+		},
+		/** Sends only on the cookieless instance, for data the full instance collects itself. */
+		captureCookieless(event: string, properties?: Properties): void {
+			run((current) => {
+				if ("anonymous" in current)
+					current.anonymous.capture(event, anonymousProperties(properties));
+			});
+		},
 		setPosthogInstance(posthog: PostHog): void {
 			flush({ posthog });
 		},
@@ -81,5 +99,11 @@ export function createPosthogQueue() {
 	};
 }
 
-export const { withPosthog, capture, setPosthogInstance, setAnonymousPosthog } =
-	createPosthogQueue();
+export const {
+	withPosthog,
+	capture,
+	captureException,
+	captureCookieless,
+	setPosthogInstance,
+	setAnonymousPosthog,
+} = createPosthogQueue();

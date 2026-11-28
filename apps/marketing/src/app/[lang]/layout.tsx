@@ -9,6 +9,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { AdTrackers } from "@/components/AdTrackers";
 import { CookieConsent } from "@/components/CookieConsent";
+import { CookielessWebVitals } from "@/components/CookielessWebVitals";
 import { ExternalTracking } from "@/components/ExternalTracking";
 import {
 	OrganizationJsonLd,
@@ -163,6 +164,7 @@ export default async function RootLayout({
 					<CookieConsent />
 				</Providers>
 				<AdTrackers />
+				<CookielessWebVitals />
 				<Suspense fallback={null}>
 					<ExternalTracking />
 				</Suspense>

@@ -2,7 +2,12 @@ import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
 import type { PostHog } from "posthog-js";
 
 import { env } from "@/env";
-import { onConsentChange, readConsentCountry } from "@/lib/analytics/consent";
+import {
+	CUSTOM_CAMPAIGN_PARAMS,
+	campaignProperties,
+} from "@/lib/analytics/campaign";
+import { onConsentChange } from "@/lib/analytics/consent";
+import { geoProperties, readDocumentGeo } from "@/lib/analytics/geo";
 import { setAnonymousPosthog, setPosthogInstance } from "@/lib/analytics/lazy";
 import {
 	createPosthogStarter,
@@ -36,7 +41,7 @@ function startPosthog(posthog: PostHog, mode: PosthogMode) {
 		debug: false,
 		cross_subdomain_cookie: true,
 		person_profiles: "always",
-		custom_campaign_params: ["utm_id", "matchtype"],
+		custom_campaign_params: CUSTOM_CAMPAIGN_PARAMS,
 		persistence: "cookie",
 		persistence_name: POSTHOG_COOKIE_NAME,
 		disable_session_recording: true,
@@ -50,6 +55,7 @@ function startPosthog(posthog: PostHog, mode: PosthogMode) {
 }
 
 function startCookielessPosthog(posthog: PostHog) {
+	posthog.toolbar.maybeLoadToolbar = () => false;
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 		api_host: "/ingest",
 		ui_host: "https://us.posthog.com",
@@ -59,22 +65,31 @@ function startCookielessPosthog(posthog: PostHog) {
 		disable_persistence: true,
 		capture_pageview: "history_change",
 		capture_pageleave: true,
-		autocapture: false,
-		capture_exceptions: false,
+		autocapture: {
+			capture_copied_text: false,
+			element_attribute_ignorelist: ["value"],
+		},
+		capture_exceptions: true,
+		capture_heatmaps: true,
 		capture_dead_clicks: false,
-		capture_heatmaps: false,
 		capture_performance: false,
+		custom_campaign_params: CUSTOM_CAMPAIGN_PARAMS,
+		save_campaign_params: false,
+		mask_personal_data_properties: true,
 		disable_session_recording: true,
 		disable_surveys: true,
 		disable_conversations: true,
+		disable_product_tours: true,
+		disable_web_experiments: true,
 		advanced_disable_flags: true,
-		person_profiles: "identified_only",
-		debug: false,
+		person_profiles: "never",
 	});
 	posthog.clear_opt_in_out_capturing();
 	registerPageProperties(posthog);
-	const country = readConsentCountry();
-	if (country) posthog.register({ $geoip_country_code: country });
+	posthog.register({
+		...campaignProperties(window.location.search),
+		...geoProperties(readDocumentGeo()),
+	});
 	setAnonymousPosthog(posthog);
 }
 
