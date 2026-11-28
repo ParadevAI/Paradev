@@ -52,6 +52,7 @@ export interface HelloAckMessage {
 	trustdHealthy?: boolean;
 	supportsModeSnapshots?: boolean;
 	supportsColorQueries?: boolean;
+	supportsListRequestIds?: boolean;
 }
 
 // ---------- Client -> Daemon ----------
@@ -90,6 +91,7 @@ export interface CloseMessage {
 
 export interface ListMessage {
 	type: "list";
+	requestId?: number;
 }
 
 export interface SubscribeMessage {
@@ -152,6 +154,7 @@ export interface ClosedMessage {
 
 export interface ListReplyMessage {
 	type: "list-reply";
+	requestId?: number;
 	sessions: SessionInfo[];
 }
 

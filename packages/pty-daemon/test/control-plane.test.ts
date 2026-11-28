@@ -112,6 +112,28 @@ describe("handshake", () => {
 		await c.close();
 	});
 
+	test("echoes a list request ID and still accepts an untagged list", async () => {
+		const c = await connect(sockPath);
+		try {
+			c.send({ type: "hello", protocols: [2] });
+			const ack = await c.waitFor((m) => m.type === "hello-ack");
+			assert.equal(ack.type, "hello-ack");
+			assert.equal(ack.supportsListRequestIds, true);
+			c.send({ type: "list", requestId: 42 });
+			const tagged = await c.waitFor((m) => m.type === "list-reply");
+			assert.deepEqual(tagged, {
+				type: "list-reply",
+				requestId: 42,
+				sessions: [],
+			});
+			c.send({ type: "list" });
+			const untagged = await c.waitForNext((m) => m.type === "list-reply");
+			assert.deepEqual(untagged, { type: "list-reply", sessions: [] });
+		} finally {
+			await c.close();
+		}
+	});
+
 	test("rejects duplicate hello", async () => {
 		const c = await connectAndHello(sockPath);
 		c.send({ type: "hello", protocols: [2] });
