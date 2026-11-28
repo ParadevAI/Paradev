@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. With the MCP tools, step 4 is `workspaces_create` with `environment`, `name` and `machineSize: "large"`, then `workspaces_list` until the workspace's `status` is `awake`, then `terminals_create` with `workspaceId` and `command`, `terminals_read`, and `terminals_send`. Every `environments`, `connections` and `integrations` command, `terminals wait` and `workspaces get` are local-only: they need the paradev CLI on this machine.
+
 Goal: a cloud environment that new cloud workspaces boot straight into, with dependencies installed, variables set, and services starting on boot. Usually you run on the user's machine with their Paradev login and build the environment by driving a cloud box from there. If you are already inside a cloud box on the environment, read "Inside a cloud box" first: several steps work differently there.
 
 Terms you will use with the user:

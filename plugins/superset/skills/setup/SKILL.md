@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*)
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+
 Goal: every new workspace for this repo, a local worktree or a cloud box, comes up ready, with dependencies installed, env present and services reachable, without manual steps.
 
 ## 1. Inspect the repo

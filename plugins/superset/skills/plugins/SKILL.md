@@ -9,6 +9,8 @@ allowed-tools: Bash(superset plugins:*) Bash(paradev plugins:*) Bash(superset mc
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+
 A plugin brings two things: **skills**, which land in the directories agents read, and **MCP
 tools**, which are called through Paradev's proxy. Install state lives on the account, so a
 plugin installed here is installed everywhere you sign in. The credential does not. It stays

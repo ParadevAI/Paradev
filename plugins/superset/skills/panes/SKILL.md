@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(jq:*)
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+
 Script the tabs and split panes of a workspace with `paradev panes`. Commands go
 to the host, then to the desktop app, which applies them to the live layout the
 user is looking at. Every change is visible immediately, so build layouts the

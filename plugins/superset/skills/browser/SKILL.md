@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(curl:*)
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+The Paradev MCP tools do not drive browser panes. The `paradev browser` and `panes` steps and Browser Use are local-only: they need the paradev CLI on this machine. A plain HTTP read through your fetch tool, as "Choose a surface" says, needs neither.
+
 Drive web pages through the browser panes inside a Paradev workspace with the
 `paradev browser` commands. Every operation runs in the pane the user can see,
 against the pane's real, logged-in session. A raw Chrome DevTools Protocol (CDP)

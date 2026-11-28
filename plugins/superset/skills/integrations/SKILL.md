@@ -9,6 +9,8 @@ allowed-tools: Bash(superset mcp:*) Bash(paradev mcp:*) Bash(superset plugins:*)
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+This skill is local-only: its steps need the paradev CLI on this machine, and the Paradev MCP tools do not cover them. In a chat host without a shell, say so and do not substitute other tools.
+
 An integration is an installed plugin with a connected account. Its tools do not run here.
 `paradev mcp` hands the call to Paradev's API, which attaches the stored credential and
 forwards it to the plugin's MCP server. No token is ever written to this machine, which is

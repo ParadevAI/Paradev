@@ -11,6 +11,16 @@ If `paradev` is not found, run the same command as `superset`, or update the CLI
 
 Answer "what happened while I was away?" from real state, not guesses. Entirely read-only.
 
+Use the Paradev MCP tools when they are in your tool list (a chat host such as Claude.ai or ChatGPT with the Paradev connector), and the `paradev` CLI otherwise. Steps marked local-only need the paradev CLI on this machine.
+
+With the MCP tools, the sweep in step 1 is:
+
+1. `tasks_list` with `assigneeMe: true` for the user's tasks, or no filter for all of the organization's tasks.
+2. `workspaces_list` with no arguments for cloud workspaces and their `status`. For workspaces on a machine, call `hosts_list` first and pass a host's `id` as `hostId`.
+3. Per workspace, `terminals_list` with `workspaceId` (and `hostId` for a host workspace), then `terminals_read` with `workspaceId`, `terminalId`, `maxLines: 60` and the same `hostId` for each agent terminal.
+
+`scripts/sweep.sh`, `workspaces pull-requests` and `workspaces activity` are local-only.
+
 ## 1. Sweep
 
 Run `bash scripts/sweep.sh` from this skill's directory (`bash ${CLAUDE_SKILL_DIR}/scripts/sweep.sh` in Claude Code). It lists workspaces and tasks, then for each workspace lists its terminals and reads the last screen of every agent terminal, tolerating individual failures. Pass `--host <id>` to sweep a remote host, `--max-lines <n>` to change the per-terminal tail (default 60).
@@ -39,6 +49,8 @@ workspace, then publish that file: the CLI publishes a document, not your termin
 ```bash
 paradev pages publish standup.html --workspace <id> --title "Standup" --label "what shipped overnight"
 ```
+
+With the MCP tools, pass the HTML text to `pages_publish` as `html`, with `title` and `label`. To add a version instead of a new page, pass `workspaceId` and the same `entryPath` (for example `standup.html`) every day, or `pageId` of the first digest.
 
 Publishing the same file from the same workspace each morning versions one page instead of
 scattering a new one daily, so the history becomes the record of the week. A digest often runs

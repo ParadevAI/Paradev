@@ -9,6 +9,8 @@ allowed-tools: Bash(superset:*) Bash(paradev:*) Bash(gh:*) Bash(uname:*) WebFetc
 
 If `paradev` is not found, run the same command as `superset`, or update the CLI.
 
+Use the Paradev MCP tools when they are in your tool list, and the `paradev` CLI otherwise. No MCP tool submits feedback: `paradev feedback submit`, `paradev auth` and `paradev status` are local-only, and `hosts_list` replaces `paradev hosts list`. The docs lookup, the mailto link and the prefilled GitHub issue form work without the CLI.
+
 Check Paradev's documentation for an existing answer first. When feedback still needs reporting, turn it into a short, scannable report and submit it where the user chooses. Treat whatever they wrote after the command as the seed.
 
 The reader is a Paradev engineer triaging dozens of reports. They should get the point from the title, the full picture from the summary bullets, and only read further when they need detail. Cut everything that doesn't help them reproduce or decide.
