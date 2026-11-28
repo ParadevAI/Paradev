@@ -18952,6 +18952,9 @@ msgstr "Ordre de la barre latérale"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Pastille de barre latérale affichée lorsqu'une mise à jour de l'application est prête à installer"
 
+msgid "Sidebar sections"
+msgstr "Sections de la barre latérale"
+
 msgid "Sign in"
 msgstr "Se connecter"
 

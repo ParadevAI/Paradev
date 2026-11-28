@@ -28,6 +28,7 @@ import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import { syncRailPinsAcrossWindows } from "renderer/routes/_authenticated/_dashboard/components/NavigationRail/stores/railPinsStore";
 import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
@@ -119,6 +120,7 @@ function AuthenticatedLayout() {
 		select: (state) => state.matches[state.matches.length - 1]?.pathname ?? "",
 	});
 	const setOriginRoute = useSettingsStore((s) => s.setOriginRoute);
+	useEffect(syncRailPinsAcrossWindows, []);
 
 	const isSignedIn = env.SKIP_ENV_VALIDATION || !!session?.user;
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION

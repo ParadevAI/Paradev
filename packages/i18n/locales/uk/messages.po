@@ -18946,6 +18946,9 @@ msgstr "Порядок на бічній панелі"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Позначка на бічній панелі, яка з'являється, коли оновлення застосунку готове до встановлення"
 
+msgid "Sidebar sections"
+msgstr "Розділи бічної панелі"
+
 msgid "Sign in"
 msgstr "Увійти"
 

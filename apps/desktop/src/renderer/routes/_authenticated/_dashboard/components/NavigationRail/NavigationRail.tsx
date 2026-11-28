@@ -9,6 +9,7 @@ import { PinnableRailButton } from "./components/PinnableRailButton";
 import { RailMoreMenu } from "./components/RailMoreMenu";
 import { RailUsage } from "./components/RailUsage";
 import { useRailDestinations } from "./hooks/useRailDestinations";
+import { useRailPinsStore } from "./stores/railPinsStore";
 
 export const NAVIGATION_RAIL_WIDTH = 52;
 
@@ -17,6 +18,9 @@ export function NavigationRail() {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
 	const destinations = useRailDestinations(navigation);
+	const isChatHidden = useRailPinsStore((state) =>
+		state.hiddenDestinationIds.includes("chat"),
+	);
 
 	return (
 		<nav
@@ -39,6 +43,7 @@ export function NavigationRail() {
 				destinations={destinations}
 				isActive={
 					navigation.isChannelsOpen &&
+					!isChatHidden &&
 					!destinations.some((destination) => destination.id === "chat")
 				}
 			/>

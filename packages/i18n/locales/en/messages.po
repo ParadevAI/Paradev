@@ -18952,6 +18952,9 @@ msgstr "Sidebar order"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Sidebar pill shown when an app update is ready to install"
 
+msgid "Sidebar sections"
+msgstr "Sidebar sections"
+
 msgid "Sign in"
 msgstr "Sign in"
 

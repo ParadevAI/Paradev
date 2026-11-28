@@ -112,20 +112,24 @@ describe("Tasks and pull requests navigation", () => {
 			'to: "/pull-requests"',
 		);
 
-		const v2Sources = [
-			readComponent(
-				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
-			),
-			readComponent(
-				"../../../components/NavigationRail/hooks/useRailDestinations/useRailDestinations.tsx",
-			),
-		];
-		for (const source of v2Sources) {
+		const dashboardHeaderSource = readComponent(
+			"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
+		);
+		const railSource = readComponent(
+			"../../../components/NavigationRail/hooks/useRailDestinations/useRailDestinations.tsx",
+		);
+		const railLabelsSource = readComponent(
+			"../../../components/NavigationRail/railDestinationLabels.ts",
+		);
+		for (const [source, labelsSource] of [
+			[dashboardHeaderSource, dashboardHeaderSource],
+			[railSource, railLabelsSource],
+		]) {
 			expect(source).toMatch(/onClick(=\{|: )navigation\.openTasks\b/);
 			expect(source).toMatch(/onClick(=\{|: )navigation\.openPullRequests\b/);
-			expect(labelled(source, "Tasks")).toBe(true);
-			expect(labelled(source, "Pull requests")).toBe(true);
-			expect(source).not.toContain("Tasks & PRs");
+			expect(labelled(labelsSource, "Tasks")).toBe(true);
+			expect(labelled(labelsSource, "Pull requests")).toBe(true);
+			expect(labelsSource).not.toContain("Tasks & PRs");
 		}
 	});
 });

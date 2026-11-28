@@ -1,3 +1,4 @@
+import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedStoreAcrossWindows";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -35,16 +36,18 @@ export function withRailPin(
 		: { ...rest, [id]: isPinned };
 }
 
-const DEFAULT_RAIL_ORDER = Object.keys(
+export const DEFAULT_RAIL_ORDER = Object.keys(
 	DEFAULT_RAIL_PINS,
 ) as RailDestinationId[];
+
+function isRailDestinationId(id: unknown): id is RailDestinationId {
+	return typeof id === "string" && Object.hasOwn(DEFAULT_RAIL_PINS, id);
+}
 
 export function resolveRailOrder(
 	savedOrder: readonly RailDestinationId[],
 ): RailDestinationId[] {
-	const saved = [...new Set(savedOrder)].filter(
-		(id) => id in DEFAULT_RAIL_PINS,
-	);
+	const saved = [...new Set(savedOrder)].filter(isRailDestinationId);
 	return [...saved, ...DEFAULT_RAIL_ORDER.filter((id) => !saved.includes(id))];
 }
 
@@ -64,25 +67,24 @@ export function withRailOrder(
 export function sanitizeRailPins(persisted: unknown): {
 	pinOverrides: RailPinOverrides;
 	order: RailDestinationId[];
+	hiddenDestinationIds: RailDestinationId[];
 } {
-	const { pinOverrides, order } = (persisted ?? {}) as Record<string, unknown>;
+	const { pinOverrides, order, hiddenDestinationIds } = (persisted ??
+		{}) as Record<string, unknown>;
 	const overrides =
 		pinOverrides && typeof pinOverrides === "object" ? pinOverrides : {};
 	return {
 		pinOverrides: Object.fromEntries(
 			Object.entries(overrides).filter(
 				([id, isPinned]) =>
-					id in DEFAULT_RAIL_PINS && typeof isPinned === "boolean",
+					isRailDestinationId(id) && typeof isPinned === "boolean",
 			),
 		),
 		order: Array.isArray(order)
-			? withRailOrder(
-					order.filter(
-						(id): id is RailDestinationId =>
-							typeof id === "string" && id in DEFAULT_RAIL_PINS,
-					),
-					[],
-				)
+			? withRailOrder(order.filter(isRailDestinationId), [])
+			: [],
+		hiddenDestinationIds: Array.isArray(hiddenDestinationIds)
+			? [...new Set(hiddenDestinationIds.filter(isRailDestinationId))]
 			: [],
 	};
 }
@@ -90,23 +92,71 @@ export function sanitizeRailPins(persisted: unknown): {
 interface RailPinsState {
 	pinOverrides: RailPinOverrides;
 	order: RailDestinationId[];
+	hiddenDestinationIds: RailDestinationId[];
 	setPinned: (id: RailDestinationId, isPinned: boolean) => void;
 	setVisibleOrder: (visibleOrder: RailDestinationId[]) => void;
+	setDestinationVisible: (id: RailDestinationId, visible: boolean) => void;
 }
 
 /** A fixed-size singleton per profile. */
-export const useRailPinsStore = create<RailPinsState>()(
-	persist(
-		(set) => ({
-			pinOverrides: {},
-			order: [],
-			setPinned: (id, isPinned) =>
-				set((state) => ({
-					pinOverrides: withRailPin(state.pinOverrides, id, isPinned),
-				})),
-			setVisibleOrder: (visibleOrder) =>
-				set((state) => ({ order: withRailOrder(state.order, visibleOrder) })),
-		}),
+export const useRailPinsStore = create<
+	RailPinsState,
+	[["zustand/persist", RailPinsState]]
+>((setLocalState, get, store) =>
+	persist<RailPinsState>(
+		(setPersistedState) => {
+			const reportSaveError = (error: unknown) => {
+				console.error("[rail-pins] Could not save sidebar settings:", error);
+			};
+			const update = (
+				change: (state: RailPinsState) => Partial<RailPinsState>,
+			) => {
+				const persistence = useRailPinsStore.persist;
+				if (!persistence) {
+					setLocalState(change);
+					return;
+				}
+
+				const commit = () => {
+					// localStorage hydration is synchronous, and the event can still be queued.
+					void persistence.rehydrate();
+					const previous = get();
+					try {
+						setPersistedState(change);
+					} catch (error) {
+						setLocalState(previous, true);
+						reportSaveError(error);
+					}
+				};
+				const locks = globalThis.navigator?.locks;
+				if (locks) {
+					void locks
+						.request(RAIL_PINS_STORAGE_KEY, commit)
+						.catch(reportSaveError);
+				} else {
+					commit();
+				}
+			};
+			return {
+				pinOverrides: {},
+				order: [],
+				hiddenDestinationIds: [],
+				setPinned: (id, isPinned) =>
+					update((state) => ({
+						pinOverrides: withRailPin(state.pinOverrides, id, isPinned),
+					})),
+				setVisibleOrder: (visibleOrder) =>
+					update((state) => ({
+						order: withRailOrder(state.order, visibleOrder),
+					})),
+				setDestinationVisible: (id, visible) =>
+					update((state) => ({
+						hiddenDestinationIds: visible
+							? state.hiddenDestinationIds.filter((hiddenId) => hiddenId !== id)
+							: [...new Set([...state.hiddenDestinationIds, id])],
+					})),
+			};
+		},
 		{
 			name: RAIL_PINS_STORAGE_KEY,
 			version: 1,
@@ -115,5 +165,14 @@ export const useRailPinsStore = create<RailPinsState>()(
 				...sanitizeRailPins(persisted),
 			}),
 		},
-	),
+	)(setLocalState, get, store),
 );
+
+export function syncRailPinsAcrossWindows() {
+	const persistence = useRailPinsStore.persist;
+	if (!persistence) return () => {};
+
+	const stopSync = syncPersistedStoreAcrossWindows(useRailPinsStore);
+	void persistence.rehydrate();
+	return stopSync;
+}
