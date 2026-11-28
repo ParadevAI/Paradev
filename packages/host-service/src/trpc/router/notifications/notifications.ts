@@ -191,6 +191,14 @@ export const notificationsRouter = router({
 			...(agent?.definitionId ? { definitionId: agent.definitionId } : {}),
 			occurredAt,
 		});
+		// No binding after a non-end event: the store dropped it.
+		if (
+			agent?.agentId === "claude" &&
+			eventType !== "Detached" &&
+			!ctx.terminalAgentStore.get(input.terminalId)
+		) {
+			return { success: true, ignored: true as const };
+		}
 		const transcriptPath = trimOrUndefined(input.transcriptPath);
 		if (
 			agent?.sessionId &&
