@@ -316,6 +316,7 @@ function WorkspaceContent() {
 		resolvePresetCommands,
 	} = usePresetExecution({
 		store,
+		linkedStores: linkedPaneStores,
 		launcher,
 		openAgentChat,
 	});

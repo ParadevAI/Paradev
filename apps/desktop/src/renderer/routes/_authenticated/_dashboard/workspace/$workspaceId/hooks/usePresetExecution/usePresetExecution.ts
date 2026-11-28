@@ -26,9 +26,14 @@ import { filterMatchingPresetsForProject } from "shared/preset-project-targeting
 import { getPresetsForTriggerField } from "shared/preset-trigger-selection";
 import { quote } from "shell-quote";
 import type { StoreApi } from "zustand/vanilla";
+import {
+	runPresetOnce,
+	waitForPresetTerminalCreations,
+} from "../../state/presetLaunches";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
 import type { OpenAgentChat } from "../useAgentSessionLauncher";
 import type { TerminalLauncher } from "../useTerminalLauncher";
+import { launchPresetTab } from "./utils/launchPresetTab";
 import { isLinkedPresetLaunchable } from "./utils/linkedPresetGating";
 
 function makeTerminalPane(
@@ -90,12 +95,14 @@ function buildFocusedTerminalCommand({
 
 interface UseV2PresetExecutionArgs {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	linkedStores: StoreApi<WorkspaceStore<PaneViewerData>>[];
 	launcher: TerminalLauncher;
 	openAgentChat: OpenAgentChat;
 }
 
 export function usePresetExecution({
 	store,
+	linkedStores,
 	launcher,
 	openAgentChat,
 }: UseV2PresetExecutionArgs) {
@@ -163,7 +170,7 @@ export function usePresetExecution({
 		[agents],
 	);
 
-	const executePreset = useCallback(
+	const launchPreset = useCallback(
 		async (
 			preset: TerminalPresetRow,
 			options?: { target?: "new-tab" | "active-tab" },
@@ -207,20 +214,21 @@ export function usePresetExecution({
 			});
 
 			const linkedAgent = findLinkedAgent(agents, preset.agentId);
-			if (
-				linkedAgent &&
-				acpHarnessForPreset(linkedAgent.presetId) &&
-				(plan === "new-tab-single" || plan === "active-tab-single")
-			) {
-				const chat = await openAgentChat({
-					configId: linkedAgent.id,
-					presetId: linkedAgent.presetId,
-					placement: plan === "active-tab-single" ? "split-pane" : "new-tab",
-				});
-				if (chat) return;
-			}
+			const tryChat =
+				linkedAgent && acpHarnessForPreset(linkedAgent.presetId)
+					? (place?: Parameters<OpenAgentChat>[1]) =>
+							openAgentChat(
+								{
+									configId: linkedAgent.id,
+									presetId: linkedAgent.presetId,
+									placement:
+										plan === "active-tab-single" ? "split-pane" : "new-tab",
+								},
+								place,
+							)
+					: undefined;
 
-			// Sessions for every pane this plan creates are spun up in parallel
+			// Multi-pane plans start every session in parallel
 			// before any of them land in the store, so background tabs (e.g.
 			// new-tab-per-command, where each addTab flips activeTabId and only
 			// the last tab ever mounts) still get their PTY + initial command —
@@ -256,13 +264,20 @@ export function usePresetExecution({
 					}
 
 					case "new-tab-single": {
-						const terminalId = await createTerminal(launchCommands[0]);
-						state.addTab({ panes: [makeTerminalPane(terminalId, title)] });
+						await launchPresetTab({
+							store,
+							linkedStores,
+							launcher,
+							command: launchCommands[0],
+							cwd,
+							title,
+							tryChat,
+						});
 						break;
 					}
 
 					case "new-tab-multi-pane": {
-						const ids = await Promise.all(
+						const ids = await waitForPresetTerminalCreations(
 							launchCommands.length > 0
 								? launchCommands.map((command) => createTerminal(command))
 								: [createTerminal()],
@@ -277,7 +292,7 @@ export function usePresetExecution({
 					}
 
 					case "new-tab-per-command": {
-						const ids = await Promise.all(
+						const ids = await waitForPresetTerminalCreations(
 							launchCommands.map((command) => createTerminal(command)),
 						);
 						for (const terminalId of ids) {
@@ -287,6 +302,7 @@ export function usePresetExecution({
 					}
 
 					case "active-tab-single": {
+						if (await tryChat?.()) break;
 						const terminalId = await createTerminal(launchCommands[0]);
 						const pane = makeTerminalPane(terminalId, title);
 						if (!activeTabId) {
@@ -298,7 +314,7 @@ export function usePresetExecution({
 					}
 
 					case "active-tab-multi-pane": {
-						const ids = await Promise.all(
+						const ids = await waitForPresetTerminalCreations(
 							launchCommands.length > 0
 								? launchCommands.map((command) => createTerminal(command))
 								: [createTerminal()],
@@ -338,6 +354,7 @@ export function usePresetExecution({
 		},
 		[
 			store,
+			linkedStores,
 			launcher,
 			resolvePresetCommands,
 			t,
@@ -349,6 +366,17 @@ export function usePresetExecution({
 			isAgentPresetEnabled,
 			openAgentChat,
 		],
+	);
+
+	const executePreset = useCallback(
+		(
+			preset: TerminalPresetRow,
+			options?: { target?: "new-tab" | "active-tab" },
+		) =>
+			runPresetOnce(workspaceId, preset.id, () =>
+				launchPreset(preset, options),
+			),
+		[workspaceId, launchPreset],
 	);
 
 	return {
