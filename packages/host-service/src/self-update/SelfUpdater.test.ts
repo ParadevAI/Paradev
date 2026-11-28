@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import {
+	chmodSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
@@ -352,6 +353,98 @@ describe("SelfUpdater", () => {
 		await settle(h);
 		expect(h.exitCode).toBe(1);
 		expect(h.updater.status().lastResult?.outcome).toBe("failed");
+	});
+
+	test("exits when a successor that will not die stops the rollback", async () => {
+		const h = harness({
+			spawnHost: () => ({
+				pid: 222,
+				isRunning: () => true,
+				kill: async () => {
+					throw new Error("Failed successor did not exit");
+				},
+			}),
+			pollHealth: async () => null,
+		});
+		h.updater.start({ version: "1.27.0" });
+		await settle(h);
+		expect(h.calls).toContain("stop");
+		expect(h.exitCode).toBe(1);
+		expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("new");
+		expect(h.updater.status().lastResult).toMatchObject({
+			outcome: "failed",
+			to: "1.27.0",
+			error: "Failed successor did not exit",
+		});
+	});
+
+	test.skipIf(process.getuid?.() === 0)(
+		"a backup that cannot be removed does not fail a healthy handoff",
+		async () => {
+			const h = harness();
+			const locked = join(`${h.root}.bak`, "locked");
+			mkdirSync(locked, { recursive: true });
+			writeFileSync(join(locked, "f"), "");
+			chmodSync(locked, 0o500);
+			try {
+				h.updater.start({ version: "1.27.0" });
+				await settle(h);
+			} finally {
+				chmodSync(locked, 0o700);
+			}
+			expect(h.exitCode).toBe(0);
+			expect(h.updater.status().lastResult?.outcome).toBe("updated");
+		},
+	);
+
+	test.skipIf(process.getuid?.() === 0).each([
+		{ leftover: "a stale failed build", inFailed: true },
+		{ leftover: "the failed build", inFailed: false },
+	])(
+		"$leftover that cannot be removed does not stop the rollback",
+		async ({ inFailed }) => {
+			let polls = 0;
+			const logs: string[] = [];
+			const h = harness({
+				pollHealth: async () =>
+					++polls === 1 ? null : { version: "1.22.0", pid: 222 },
+				log: (message) => logs.push(message),
+			});
+			const failed = `${h.root}.failed`;
+			const locked = join(inFailed ? failed : h.root, "locked");
+			mkdirSync(locked, { recursive: true });
+			writeFileSync(join(locked, "f"), "");
+			chmodSync(locked, 0o500);
+			try {
+				h.updater.start({ version: "1.27.0" });
+				await settle(h);
+			} finally {
+				for (const dir of [locked, join(failed, "locked")])
+					if (existsSync(dir)) chmodSync(dir, 0o700);
+			}
+			expect(readFileSync(join(h.root, "lib", "version"), "utf8")).toBe("old");
+			expect(h.exitCode).toBe(0);
+			expect(h.updater.status().lastResult?.outcome).toBe("rolled-back");
+			expect(logs.join("\n")).toContain(
+				inFailed
+					? "could not remove stale failed build"
+					: "could not remove failed build",
+			);
+		},
+	);
+
+	test("exits after a post-stop failure when the install lock cannot be released", async () => {
+		const h: Harness = harness({
+			stopServing: async () => {
+				const lock = `${h.root}.update-lock`;
+				rmSync(lock);
+				mkdirSync(lock);
+				throw new Error("relay did not close");
+			},
+		});
+		h.updater.start({ version: "1.27.0" });
+		await settle(h);
+		expect(h.exitCode).toBe(1);
 	});
 
 	test("releases the install lock after a failed download", async () => {

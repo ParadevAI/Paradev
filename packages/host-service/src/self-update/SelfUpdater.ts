@@ -156,7 +156,20 @@ export class SelfUpdater {
 		this.error = null;
 		void this.run(root, input)
 			.catch((error) => {
-				this.fail(error instanceof Error ? error.message : String(error));
+				const stoppedServing = this.phase === "restarting";
+				const message = error instanceof Error ? error.message : String(error);
+				this.fail(message);
+				if (stoppedServing) {
+					this.writeMarker({
+						outcome: "failed",
+						from: this.deps.currentVersion,
+						to: this.target ?? "",
+						at: Date.now(),
+						error: message,
+					});
+					this.unlock();
+					this.deps.exit(1);
+				}
 			})
 			.finally(() => this.unlock());
 		return this.status();
@@ -201,8 +214,15 @@ export class SelfUpdater {
 	}
 
 	private unlock(): void {
-		this.releaseLock?.();
+		const release = this.releaseLock;
 		this.releaseLock = null;
+		try {
+			release?.();
+		} catch (error) {
+			this.deps.log(
+				`[self-update] could not release install lock: ${String(error)}`,
+			);
+		}
 	}
 
 	private installRoot(): string | null {
@@ -282,7 +302,11 @@ export class SelfUpdater {
 			(health.pid === undefined || health.pid === successor.pid)
 		) {
 			this.writeManifestPid(successor.pid);
-			await rm(`${root}.bak`, { recursive: true, force: true });
+			await rm(`${root}.bak`, { recursive: true, force: true }).catch((error) =>
+				this.deps.log(
+					`[self-update] could not remove backup: ${String(error)}`,
+				),
+			);
 			this.writeMarker({
 				outcome: "updated",
 				from,
@@ -310,11 +334,20 @@ export class SelfUpdater {
 			return;
 		}
 		if (existsSync(backup)) {
-			const failed = `${root}.failed`;
-			await rm(failed, { recursive: true, force: true });
+			let failed = `${root}.failed`;
+			await rm(failed, { recursive: true, force: true }).catch((error) => {
+				this.deps.log(
+					`[self-update] could not remove stale failed build: ${String(error)}`,
+				);
+				failed = `${failed}.${Date.now()}`;
+			});
 			renameSync(root, failed);
 			renameSync(backup, root);
-			await rm(failed, { recursive: true, force: true });
+			await rm(failed, { recursive: true, force: true }).catch((error) =>
+				this.deps.log(
+					`[self-update] could not remove failed build: ${String(error)}`,
+				),
+			);
 		}
 		let restored: SpawnedHost | null = null;
 		let restoredHealth: { version: string; pid?: number } | null = null;
